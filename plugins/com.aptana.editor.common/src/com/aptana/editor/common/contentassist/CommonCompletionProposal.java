@@ -34,10 +34,10 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 	protected int _replacementLength;
 	protected int _cursorPosition;
 	protected Image _image;
-	private String _displayString;
-	private IContextInformation _contextInformation;
-	private String _additionalProposalInformation;
-	private String _fileLocation;
+	protected String _displayString;
+	protected IContextInformation _contextInformation;
+	protected String _additionalProposalInformation;
+	protected String _fileLocation;
 	private int _hash;
 
 	private Image[] _userAgentImages;
@@ -133,11 +133,11 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 			_hash = _hash * 31 + _replacementOffset;
 			_hash = _hash * 31 + _replacementLength;
 			_hash = _hash * 31 + _cursorPosition;
-			_hash = _hash * 31 + ((_image != null) ? _image.hashCode() : 0);
-			_hash = _hash * 31 + ((_displayString != null) ?_displayString.hashCode() : 0);
-			_hash = _hash * 31 + ((_contextInformation != null) ? _contextInformation.hashCode() : 0);
-			_hash = _hash * 31 + ((_additionalProposalInformation != null) ? _additionalProposalInformation.hashCode() : 0);
-			_hash = _hash * 31 + ((_fileLocation != null) ? _fileLocation.hashCode() : 0);
+			_hash = _hash * 31 + ((getImage() != null) ? getImage().hashCode() : 0);
+			_hash = _hash * 31 + ((getDisplayString() != null) ? getDisplayString().hashCode() : 0);
+			_hash = _hash * 31 + ((getContextInformation() != null) ? getContextInformation().hashCode() : 0);
+			_hash = _hash * 31 + ((getAdditionalProposalInfo() != null) ? getAdditionalProposalInfo().hashCode() : 0);
+			_hash = _hash * 31 + ((getFileLocation() != null) ? getFileLocation().hashCode() : 0);
 			// @formatter:on
 		}
 

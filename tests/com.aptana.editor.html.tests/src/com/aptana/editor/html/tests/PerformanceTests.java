@@ -38,7 +38,7 @@ public class PerformanceTests
 		// $JUnit-BEGIN$
 		suite.addTestSuite(HTMLTagScannerPerformanceTest.class);
 		suite.addTestSuite(HTMLTidyValidatorPerformanceTest.class);
-		suite.addTestSuite(OpenHTMLEditorTest.class);
+		suite.addTest(OpenHTMLEditorTest.suite());
 		// $JUnit-END$
 		return suite;
 	}

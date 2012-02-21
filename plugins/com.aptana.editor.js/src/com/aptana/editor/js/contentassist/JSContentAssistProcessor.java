@@ -42,7 +42,6 @@ import com.aptana.editor.js.JSLanguageConstants;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSSourceConfiguration;
 import com.aptana.editor.js.JSTypeConstants;
-import com.aptana.editor.js.contentassist.index.IJSIndexConstants;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.ParameterElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
@@ -160,19 +159,11 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		List<PropertyElement> globals = indexHelper.getCoreGlobals();
 
-		if (globals != null)
+		if (!CollectionsUtil.isEmpty(globals))
 		{
-			URI projectURI = getProjectURI();
-			String location = IJSIndexConstants.CORE;
-
 			for (PropertyElement property : CollectionsUtil.filter(globals, isVisibleFilter))
 			{
-				String name = property.getName();
-				String description = JSModelFormatter.getDescription(property, projectURI);
-				Image image = JSModelFormatter.getImage(property);
-				String[] userAgents = property.getUserAgentNames().toArray(new String[0]);
-
-				addProposal(proposals, name, image, description, userAgents, location, offset);
+				addProposal(proposals, property, offset, null, Messages.JSContentAssistProcessor_KeywordLocation);
 			}
 		}
 	}
@@ -209,6 +200,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			if (0 <= index && index < params.size())
 			{
 				ParameterElement param = params.get(index);
+				URI projectURI = getProjectURI();
 
 				for (String type : param.getTypes())
 				{
@@ -216,14 +208,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 					for (PropertyElement property : CollectionsUtil.filter(properties, isVisibleFilter))
 					{
-						String name = property.getName();
-						String description = JSModelFormatter.getDescription(property, getProjectURI());
-						Image image = JSModelFormatter.getImage(property);
-						List<String> userAgentNameList = property.getUserAgentNames();
-						String[] userAgentNames = userAgentNameList.toArray(new String[userAgentNameList.size()]);
-						String owningType = JSModelFormatter.getTypeDisplayName(property.getOwningType());
-
-						addProposal(proposals, name, image, description, userAgentNames, owningType, offset);
+						addProposal(proposals, property, offset, projectURI, null);
 					}
 				}
 			}
@@ -240,21 +225,13 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		List<PropertyElement> projectGlobals = indexHelper.getProjectGlobals(getIndex());
 
-		if (projectGlobals != null && !projectGlobals.isEmpty())
+		if (!CollectionsUtil.isEmpty(projectGlobals))
 		{
-			String[] userAgentNames = getActiveUserAgentIds();
 			URI projectURI = getProjectURI();
 
 			for (PropertyElement property : CollectionsUtil.filter(projectGlobals, isVisibleFilter))
 			{
-				String name = property.getName();
-				String description = JSModelFormatter.getDescription(property, projectURI);
-				Image image = JSModelFormatter.getImage(property);
-				List<String> documents = property.getDocuments();
-				String location = (documents != null && documents.size() > 0) ? JSModelFormatter
-						.getDocumentDisplayName(documents.get(0)) : null;
-
-				addProposal(proposals, name, image, description, userAgentNames, location, offset);
+				addProposal(proposals, property, offset, projectURI, null);
 			}
 		}
 	}
@@ -281,37 +258,19 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 * addProposal - The display name is used as the insertion text
 	 * 
 	 * @param proposals
-	 * @param name
-	 * @param image
-	 * @param description
-	 * @param userAgents
-	 * @param fileLocation
-	 * @param offset
-	 */
-	private void addProposal(Set<ICompletionProposal> proposals, String name, Image image, String description,
-			String[] userAgentIds, String fileLocation, int offset)
-	{
-		addProposal(proposals, name, name, image, description, userAgentIds, fileLocation, offset);
-	}
-
-	/**
-	 * addProposal - The display name and insertion text are defined separately
-	 * 
-	 * @param proposals
 	 * @param displayName
-	 * @param insertionText
 	 * @param image
 	 * @param description
 	 * @param userAgents
 	 * @param fileLocation
 	 * @param offset
 	 */
-	private void addProposal(Set<ICompletionProposal> proposals, String displayName, String insertionText, Image image,
-			String description, String[] userAgentIds, String fileLocation, int offset)
+	private void addProposal(Set<ICompletionProposal> proposals, String displayName, Image image, String description,
+			String[] userAgentIds, String fileLocation, int offset)
 	{
 		if (isActiveByUserAgent(userAgentIds))
 		{
-			int length = insertionText.length();
+			int length = displayName.length();
 
 			// calculate what text will be replaced
 			int replaceLength = 0;
@@ -326,7 +285,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			IContextInformation contextInfo = null;
 			Image[] userAgents = UserAgentManager.getInstance().getUserAgentImages(getNatureIds(), userAgentIds);
 
-			CommonCompletionProposal proposal = new CommonCompletionProposal(insertionText, offset, replaceLength,
+			CommonCompletionProposal proposal = new CommonCompletionProposal(displayName, offset, replaceLength,
 					length, image, displayName, contextInfo, description);
 			proposal.setFileLocation(fileLocation);
 			proposal.setUserAgentImages(userAgents);
@@ -408,17 +367,43 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 		// add properties and methods
 		List<PropertyElement> properties = indexHelper.getTypeMembers(index, allTypes);
-
+		URI projectURI = getProjectURI();
 		for (PropertyElement property : CollectionsUtil.filter(properties, isVisibleFilter))
 		{
-			String name = property.getName();
-			String description = JSModelFormatter.getDescription(property, getProjectURI());
-			Image image = JSModelFormatter.getImage(property);
-			List<String> userAgentNameList = property.getUserAgentNames();
-			String[] userAgentNames = userAgentNameList.toArray(new String[userAgentNameList.size()]);
-			String owningType = JSModelFormatter.getTypeDisplayName(property.getOwningType());
+			addProposal(proposals, property, offset, projectURI, null);
+		}
+	}
 
-			addProposal(proposals, name, image, description, userAgentNames, owningType, offset);
+	private void addProposal(Set<ICompletionProposal> proposals, PropertyElement property, int offset, URI projectURI,
+			String overridenLocation)
+	{
+		// FIXME If possible, can we grab user agents as needed inside the proposal class?
+		List<String> userAgentNameList = property.getUserAgentNames();
+		String[] userAgentNames = userAgentNameList.toArray(new String[userAgentNameList.size()]);
+
+		if (isActiveByUserAgent(userAgentNames))
+		{
+			// calculate what text will be replaced
+			int replaceLength = 0;
+
+			if (replaceRange != null)
+			{
+				offset = replaceRange.getStartingOffset(); // $codepro.audit.disable questionableAssignment
+				replaceLength = replaceRange.getLength();
+			}
+
+			PropertyElementProposal proposal = new PropertyElementProposal(property, offset, replaceLength, projectURI);
+			proposal.setTriggerCharacters(getProposalTriggerCharacters());
+			if (!StringUtil.isEmpty(overridenLocation))
+			{
+				proposal.setFileLocation(overridenLocation);
+			}
+
+			Image[] userAgents = UserAgentManager.getInstance().getUserAgentImages(getNatureIds(), userAgentNames);
+			proposal.setUserAgentImages(userAgents);
+
+			// add the proposal to the list
+			proposals.add(proposal);
 		}
 	}
 
@@ -456,9 +441,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				// prevent context info popup from appearing and immediately disappearing
 				if (!inObjectLiteral)
 				{
-					String info = JSModelFormatter.getContextInfo(function);
-					List<String> lines = JSModelFormatter.getContextLines(function);
-					IContextInformation ci = new JSContextInformation(info, lines, node.getStartingOffset());
+					IContextInformation ci = new JSContextInformation(function, getProjectURI(),
+							node.getStartingOffset());
 
 					result.add(ci);
 				}

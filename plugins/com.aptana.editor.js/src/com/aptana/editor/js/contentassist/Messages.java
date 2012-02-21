@@ -14,9 +14,12 @@ public class Messages extends NLS
 	private static final String BUNDLE_NAME = "com.aptana.editor.js.contentassist.messages"; //$NON-NLS-1$
 	public static String JSContentAssistProcessor_KeywordDescription;
 	public static String JSContentAssistProcessor_KeywordLocation;
-	public static String JSModelFormatter_Defined_Section_Header;
-	public static String JSModelFormatter_Exampes_Section_Header;
-	public static String JSModelFormatter_Specification_Header;
+	
+	public static String JSTextHover_Example;
+	public static String JSTextHover_NoDescription;
+	public static String JSTextHover_Specification;
+	public static String JSTextHover_SupportedPlatforms;
+	
 	static
 	{
 		// initialize resource bundle

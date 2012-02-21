@@ -136,7 +136,8 @@ public class JSSourceEditor extends AbstractThemeableEditor
 		}
 		catch (Exception e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
+			IdeLog.logTrace(JSPlugin.getDefault(), "Failed to parse JS editor contents", e, //$NON-NLS-1$
+					com.aptana.parsing.IDebugScopes.PARSING);
 		}
 		return null;
 	}

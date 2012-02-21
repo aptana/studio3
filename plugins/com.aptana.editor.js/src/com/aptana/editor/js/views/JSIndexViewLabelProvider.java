@@ -40,6 +40,7 @@ public class JSIndexViewLabelProvider implements ILabelProvider, ILabelDecorator
 	private static final Image EVENT_ICON = JSPlugin.getImage("icons/event.gif"); //$NON-NLS-1$
 
 	private static final ImageDescriptor STATIC_OVERLAY = JSPlugin.getImageDescriptor("icons/overlays/static.png"); //$NON-NLS-1$
+	private static JSModelFormatter modelFormatter = JSModelFormatter.LABEL;
 
 	/*
 	 * (non-Javadoc)
@@ -127,7 +128,7 @@ public class JSIndexViewLabelProvider implements ILabelProvider, ILabelDecorator
 		else if (element instanceof PropertyElement)
 		{
 			// Use same logic we use in CA to determine icon type. This gives us individual icons by property type
-			result = JSModelFormatter.getImage((PropertyElement) element);
+			result = modelFormatter.getImage((PropertyElement) element);
 		}
 		else if (element instanceof EventElement)
 		{
@@ -161,7 +162,7 @@ public class JSIndexViewLabelProvider implements ILabelProvider, ILabelDecorator
 		{
 			FunctionElement function = (FunctionElement) element;
 
-			result = JSModelFormatter.getSimpleDescription(function);
+			result = modelFormatter.getDescription(function, null);
 		}
 		else if (element instanceof BaseElement)
 		{

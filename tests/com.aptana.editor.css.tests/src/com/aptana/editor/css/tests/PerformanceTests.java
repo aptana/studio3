@@ -38,7 +38,7 @@ public class PerformanceTests
 		// $JUnit-BEGIN$
 		suite.addTestSuite(CSSCodeScannerPerformanceTest.class);
 		suite.addTestSuite(CSSParserPerformanceTest.class);
-		suite.addTestSuite(OpenCSSEditorTest.class);
+		suite.addTest(OpenCSSEditorTest.suite());
 		// $JUnit-END$
 		return suite;
 	}

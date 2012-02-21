@@ -8,13 +8,20 @@
 package com.aptana.editor.js.contentassist;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.swt.graphics.Image;
 
+import com.aptana.core.IMap;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.URIUtil;
@@ -24,15 +31,24 @@ import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.ParameterElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.SinceElement;
+import com.aptana.editor.js.contentassist.model.UserAgentElement;
 
 public class JSModelFormatter
 {
+	private static final String BOLD_CLOSE_TAG = "</b>"; //$NON-NLS-1$
+	private static final String BOLD_OPEN_TAG = "<b>"; //$NON-NLS-1$
+	private static final String COLON_SPACE = ": "; //$NON-NLS-1$
+	private static final String COMMA_SPACE = ", "; //$NON-NLS-1$
+
+	/**
+	 * This is intentionally NOT <br />
+	 * because the Additional Info popup doesn't handle that properly right now.
+	 */
+	private static final String HTML_NEWLINE = "<br>"; //$NON-NLS-1$
+
 	private static final Map<String, Image> TYPE_IMAGE_MAP;
 	// used for mixed types
 	private static final Image PROPERTY = JSPlugin.getImage("/icons/js_property.png"); //$NON-NLS-1$
-	private static final String NEW_LINE = "<br>"; //$NON-NLS-1$
-	private static final String DOUBLE_NEW_LINE = NEW_LINE + NEW_LINE;
-	private static final char BULLET = '\u2022';
 	private static final String PROTOTYPE_PROPERTY = "." + JSTypeConstants.PROTOTYPE_PROPERTY; //$NON-NLS-1$
 
 	/**
@@ -51,279 +67,394 @@ public class JSModelFormatter
 		TYPE_IMAGE_MAP.put(JSTypeConstants.STRING_TYPE, JSPlugin.getImage("/icons/string.png")); //$NON-NLS-1$
 	}
 
+	// ----------- The available formats to use.
+
+	/**
+	 * Used by UI label providers.
+	 */
+	public static final JSModelFormatter LABEL = new JSModelFormatter(false, Section.SIGNATURE);
+
+	/**
+	 * For "additional info" popup from highlighted CA item.
+	 */
+	public static final JSModelFormatter ADDITIONAL_INFO = new JSModelFormatter(true, Section.SIGNATURE,
+			Section.DESCRIPTION, Section.PLATFORMS);
+	/**
+	 * For text hovers, focused additional info popup.
+	 */
+	public static final JSModelFormatter TEXT_HOVER = new JSModelFormatter(true, Section.SIGNATURE, Section.LOCATIONS,
+			Section.DESCRIPTION, Section.PLATFORMS, Section.REMARKS, Section.EXAMPLE, Section.SPECIFICATIONS);
+
+	/**
+	 * For dynamic help
+	 */
+	public static final JSModelFormatter DYNAMIC_HELP = new JSModelFormatter(true); // TODO As part of APSTUD-4189
+
+	/**
+	 * For context info popup.
+	 */
+	public static final JSModelFormatter CONTEXT_INFO = new JSModelFormatter(false, Section.SIGNATURE)
+	{
+		private static final char BULLET = '\u2022';
+
+		public String getDocumentation(Collection<PropertyElement> properties)
+		{
+			if (CollectionsUtil.isEmpty(properties))
+			{
+				return null;
+			}
+			PropertyElement prop = properties.iterator().next();
+
+			if (prop instanceof FunctionElement)
+			{
+				FunctionElement function = (FunctionElement) prop;
+				List<String> result = new ArrayList<String>();
+				StringBuilder buffer = new StringBuilder();
+
+				// line 1: function name with argument names
+				result.add(getHeader(function, null));
+
+				// line 2..n: one line for each argument description
+				for (ParameterElement parameter : function.getParameters())
+				{
+					String description = parameter.getDescription();
+
+					buffer.setLength(0);
+					buffer.append(' ').append(BULLET).append('\t').append(parameter.getName());
+
+					if (!StringUtil.isEmpty(description))
+					{
+						buffer.append(':').append(FileUtil.NEW_LINE).append(" \t").append(description); //$NON-NLS-1$
+					}
+
+					result.add(buffer.toString());
+				}
+				return StringUtil.join(FileUtil.NEW_LINE + JSContextInformation.DESCRIPTION_DELIMITER, result);
+			}
+			return null;
+		}
+	};
+
+	/**
+	 * This list of sections to display in our output.
+	 */
+	private List<Section> fSections;
+
+	/**
+	 * Use HTML tags in the output?
+	 */
+	private boolean useHTML;
+
+	enum Section
+	{
+		SIGNATURE, LOCATIONS, EXAMPLE, SPECIFICATIONS, DESCRIPTION, PLATFORMS, REMARKS, REFERENCES
+	}
+
+	private JSModelFormatter(boolean useHTML, Section... sectionsToDisplay)
+	{
+		this.useHTML = useHTML;
+		this.fSections = Arrays.asList(sectionsToDisplay);
+	}
+
+	/**
+	 * getDescription - Returns header, newline, documentation
+	 * 
+	 * @param property
+	 * @param projectURI
+	 * @return
+	 */
+	public String getDescription(PropertyElement property, URI projectURI)
+	{
+		StringBuilder buffer = new StringBuilder();
+		buffer.append(getHeader(property, projectURI));
+		String docs = getDocumentation(property);
+		if (!StringUtil.isEmpty(docs))
+		{
+			buffer.append(newline());
+			buffer.append(docs);
+		}
+		return buffer.toString();
+	}
+
+	/**
+	 * Returns just the header, typically the signature plus optionally the locations
+	 * 
+	 * @param property
+	 * @param root
+	 * @return
+	 */
+	public String getHeader(PropertyElement property, URI root)
+	{
+		return getHeader(CollectionsUtil.newList(property), root);
+	}
+
+	/**
+	 * Returns just the header, typically the signature plus optionally the locations
+	 * 
+	 * @param properties
+	 * @param root
+	 * @return
+	 */
+	public String getHeader(List<PropertyElement> properties, URI root)
+	{
+		if (CollectionsUtil.isEmpty(properties))
+		{
+			return StringUtil.EMPTY;
+		}
+
+		List<String> stringParts = new ArrayList<String>();
+		PropertyElement first = properties.get(0);
+		if (useHTML)
+		{
+			stringParts.add(BOLD_OPEN_TAG); //$NON-NLS-1$
+		}
+		if (fSections.contains(Section.SIGNATURE))
+		{
+			stringParts.add(formatSignature(first));
+		}
+		if (fSections.contains(Section.LOCATIONS))
+		{
+			Set<String> documents = new HashSet<String>();
+			for (PropertyElement pe : properties)
+			{
+				documents.addAll(pe.getDocuments());
+			}
+			String locations = formatDefiningFiles(documents, root);
+			if (!StringUtil.isEmpty(locations))
+			{
+				stringParts.add(" - "); //$NON-NLS-1$
+				stringParts.add(locations);
+			}
+		}
+		if (useHTML)
+		{
+			stringParts.add(BOLD_CLOSE_TAG); //$NON-NLS-1$
+		}
+		return StringUtil.concat(stringParts);
+	}
+
+	/**
+	 * Returns just the documentation body.
+	 * 
+	 * @param property
+	 * @return
+	 */
+	public String getDocumentation(PropertyElement property)
+	{
+		return getDocumentation(CollectionsUtil.newList(property));
+	}
+
+	/**
+	 * Returns just the documentation body.
+	 * 
+	 * @param properties
+	 * @return
+	 */
+	public String getDocumentation(Collection<PropertyElement> properties)
+	{
+		Set<UserAgentElement> userAgents = new HashSet<UserAgentElement>();
+		Set<SinceElement> sinceElements = new HashSet<SinceElement>();
+		Set<String> descriptions = new HashSet<String>();
+		String example = StringUtil.EMPTY;
+
+		for (PropertyElement property : properties)
+		{
+			userAgents.addAll(property.getUserAgents());
+			String desc = property.getDescription();
+			if (!StringUtil.isEmpty(desc))
+			{
+				descriptions.add(desc);
+			}
+			sinceElements.addAll(property.getSinceList());
+			if (StringUtil.isEmpty(example) && !CollectionsUtil.isEmpty(property.getExamples()))
+			{
+				example = property.getExamples().get(0);
+			}
+		}
+
+		List<String> builder = new ArrayList<String>();
+		if (fSections.contains(Section.DESCRIPTION))
+		{
+			String description = Messages.JSTextHover_NoDescription;
+			if (!CollectionsUtil.isEmpty(descriptions))
+			{
+				description = StringUtil.join(COMMA_SPACE, descriptions);
+			}
+			builder.add(description);
+		}
+		if (fSections.contains(Section.PLATFORMS))
+		{
+			builder.add(addSection(Messages.JSTextHover_SupportedPlatforms, getPlatforms(userAgents)));
+		}
+		if (fSections.contains(Section.EXAMPLE))
+		{
+			builder.add(addSection(Messages.JSTextHover_Example, example));
+		}
+		if (fSections.contains(Section.SPECIFICATIONS))
+		{
+			builder.add(addSection(Messages.JSTextHover_Specification, getSpecificationsString(sinceElements)));
+		}
+		return StringUtil.concat(builder);
+	}
+
+	/**
+	 * Formats the signature in the header: name, params, type.
+	 * 
+	 * @param prop
+	 * @return
+	 */
+	private String formatSignature(PropertyElement prop)
+	{
+		StringBuilder builder = new StringBuilder();
+		builder.append(prop.getName());
+		List<String> typeNames = prop.getTypeNames();
+		if (prop instanceof FunctionElement)
+		{
+			FunctionElement fe = (FunctionElement) prop;
+			builder.append('(');
+			builder.append(formatParameters(fe.getParameters()));
+			builder.append(')');
+			typeNames = fe.getReturnTypeNames();
+		}
+		builder.append(COLON_SPACE);
+		builder.append(formatTypes(typeNames));
+		return builder.toString();
+	}
+
+	private String formatTypes(List<String> typeNames)
+	{
+		if (CollectionsUtil.isEmpty(typeNames))
+		{
+			return JSTypeConstants.NO_TYPE;
+		}
+
+		List<String> typeDisplayNames = CollectionsUtil.map(typeNames, new IMap<String, String>()
+		{
+			public String map(String type)
+			{
+				return getTypeDisplayName(type);
+			}
+		});
+
+		return StringUtil.join(COMMA_SPACE, typeDisplayNames);
+	}
+
+	/**
+	 * Formats {@link FunctionElement} parameters.
+	 * 
+	 * @param parameters
+	 * @return
+	 */
+	private String formatParameters(List<ParameterElement> parameters)
+	{
+		List<String> strings = CollectionsUtil.map(parameters, new IMap<ParameterElement, String>()
+		{
+			public String map(ParameterElement item)
+			{
+				StringBuilder b = new StringBuilder();
+				b.append(item.getName());
+				List<String> types = item.getTypes();
+				if (!CollectionsUtil.isEmpty(types))
+				{
+					b.append(COLON_SPACE).append(getTypeDisplayName(types.get(0)));
+				}
+				return b.toString();
+			}
+		});
+		return StringUtil.join(COMMA_SPACE, strings);
+	}
+
 	/**
 	 * formatDefiningFiles
 	 * 
 	 * @param property
 	 * @param projectURI
 	 */
-	private static String formatDefiningFiles(PropertyElement property, URI projectURI)
+	private String formatDefiningFiles(Collection<String> documents, final URI projectURI)
 	{
-		StringBuilder buffer = new StringBuilder();
-		List<String> documents = property.getDocuments();
-
-		if (documents != null && !documents.isEmpty())
+		if (projectURI != null)
 		{
-			String prefix = (projectURI != null) ? URIUtil.decodeURI(projectURI.toString()) : null;
-
-			// back up one segment so we include the project name in the document
-			if (prefix != null && prefix.length() > 2)
+			documents = CollectionsUtil.map(documents, new IMap<String, String>()
 			{
-				int index = prefix.lastIndexOf('/', prefix.length() - 2);
-
-				if (index != -1 && index > 0)
+				public String map(String item)
 				{
-					prefix = prefix.substring(0, index - 1);
+					try
+					{
+						return projectURI.relativize(new URI(item)).getPath();
+					}
+					catch (URISyntaxException e)
+					{
+						return item;
+					}
 				}
-			}
+			});
+		}
 
-			buffer.append(DOUBLE_NEW_LINE);
-			buffer.append("<b>").append(Messages.JSModelFormatter_Defined_Section_Header).append("</b>"); //$NON-NLS-1$ //$NON-NLS-2$
-			buffer.append(NEW_LINE);
+		return StringUtil.join(COMMA_SPACE, documents);
+	}
 
-			boolean first = true;
-
-			for (String document : documents)
+	private String getPlatforms(Collection<UserAgentElement> userAgents)
+	{
+		List<String> strings = CollectionsUtil.map(userAgents, new IMap<UserAgentElement, String>()
+		{
+			public String map(UserAgentElement item)
 			{
-				document = URIUtil.decodeURI(document);
-
-				if (prefix != null && document.startsWith(prefix))
+				StringBuilder b = new StringBuilder();
+				b.append(item.getPlatform());
+				String version = item.getVersion();
+				if (!StringUtil.isEmpty(version))
 				{
-					document = document.substring(prefix.length() + 1);
+					b.append(COLON_SPACE).append(version);
 				}
-
-				if (first)
-				{
-					first = false;
-				}
-				else
-				{
-					buffer.append(NEW_LINE);
-				}
-
-				buffer.append("- ").append(document); //$NON-NLS-1$
+				return b.toString();
 			}
-		}
-
-		return buffer.toString();
+		});
+		return StringUtil.join(COMMA_SPACE, strings);
 	}
 
-	/**
-	 * formatDescription
-	 * 
-	 * @param property
-	 */
-	private static String formatDescription(PropertyElement property)
+	private String getSpecificationsString(Collection<SinceElement> sinceElements)
 	{
-		StringBuilder buffer = new StringBuilder();
-		String description = property.getDescription();
-
-		if (description != null && description.length() > 0)
+		List<String> strings = CollectionsUtil.map(sinceElements, new IMap<SinceElement, String>()
 		{
-			buffer.append(DOUBLE_NEW_LINE);
-			buffer.append(description);
-		}
-
-		return buffer.toString();
-	}
-
-	/**
-	 * formatExamples
-	 * 
-	 * @param examples
-	 */
-	private static String formatExamples(List<String> examples)
-	{
-		StringBuilder buffer = new StringBuilder();
-
-		if (examples != null && examples.size() > 0)
-		{
-			buffer.append(DOUBLE_NEW_LINE);
-			buffer.append("<b>").append(Messages.JSModelFormatter_Exampes_Section_Header).append("</b>");//$NON-NLS-1$ //$NON-NLS-2$
-			buffer.append(NEW_LINE);
-
-			// emit list
-			buffer.append(StringUtil.join(DOUBLE_NEW_LINE, examples));
-		}
-
-		return buffer.toString();
-	}
-
-	/**
-	 * formatSpecifications
-	 * 
-	 * @param property
-	 */
-	private static String formatSpecifications(PropertyElement property)
-	{
-		StringBuilder buffer = new StringBuilder();
-		List<SinceElement> sinceList = property.getSinceList();
-
-		if (sinceList != null && !sinceList.isEmpty())
-		{
-			buffer.append(DOUBLE_NEW_LINE);
-			buffer.append("<b>").append(Messages.JSModelFormatter_Specification_Header).append("</b>"); //$NON-NLS-1$ //$NON-NLS-2$
-			buffer.append(NEW_LINE);
-
-			for (SinceElement since : property.getSinceList())
+			public String map(SinceElement item)
 			{
-				buffer.append("- ").append(since.getName()); //$NON-NLS-1$
-
-				String version = since.getVersion();
-
-				if (version != null && version.length() > 0)
+				StringBuilder b = new StringBuilder();
+				b.append(item.getName());
+				String version = item.getVersion();
+				if (!StringUtil.isEmpty(version))
 				{
-					buffer.append(' ').append(since.getVersion());
+					b.append(COLON_SPACE).append(version);
 				}
-
-				buffer.append(NEW_LINE);
+				return b.toString();
 			}
-		}
-
-		return buffer.toString();
+		});
+		return StringUtil.join(COMMA_SPACE, strings);
 	}
 
-	/**
-	 * formatTypes
-	 * 
-	 * @param types
-	 */
-	private static String formatTypes(List<String> types)
+	private String addSection(String title, String value)
 	{
-		StringBuilder buffer = new StringBuilder();
-
-		buffer.append(" : "); //$NON-NLS-1$
-
-		if (types != null && types.size() > 0)
+		StringBuilder builder = new StringBuilder();
+		if (!StringUtil.isEmpty(value))
 		{
-			List<String> typeDisplayNames = new ArrayList<String>();
-
-			for (String type : types)
+			builder.append(newline()).append(newline());
+			if (useHTML)
 			{
-				typeDisplayNames.add(getTypeDisplayName(type));
+				builder.append(BOLD_OPEN_TAG);
 			}
-
-			buffer.append(StringUtil.join(",", typeDisplayNames)); //$NON-NLS-1$
-		}
-		else
-		{
-			buffer.append(JSTypeConstants.NO_TYPE);
-		}
-
-		return buffer.toString();
-	}
-
-	/**
-	 * getContextInfo
-	 * 
-	 * @param function
-	 * @return
-	 */
-	public static String getContextInfo(FunctionElement function)
-	{
-		StringBuilder buffer = new StringBuilder();
-
-		// function name with argument names
-		List<String> paramNameAndType = new ArrayList<String>();
-		buffer.append(function.getName());
-		buffer.append('(');
-
-		for (ParameterElement parameter : function.getParameters())
-		{
-			paramNameAndType.add(parameter.getName() + formatTypes(parameter.getTypes()));
-		}
-
-		buffer.append(StringUtil.join(", ", paramNameAndType)); //$NON-NLS-1$
-		buffer.append(')');
-		buffer.append(formatTypes(function.getReturnTypeNames()));
-
-		return buffer.toString();
-	}
-
-	/**
-	 * getContextLines
-	 * 
-	 * @param function
-	 * @return
-	 */
-	public static List<String> getContextLines(FunctionElement function)
-	{
-		List<String> result = new ArrayList<String>();
-
-		if (function != null)
-		{
-			StringBuilder buffer = new StringBuilder();
-
-			// line 1: function name with argument names
-			result.add(getContextInfo(function));
-
-			// line 2..n: one line for each argument description
-			for (ParameterElement parameter : function.getParameters())
+			builder.append(title);
+			if (useHTML)
 			{
-				String description = parameter.getDescription();
-
-				buffer.setLength(0);
-				buffer.append(' ').append(BULLET).append('\t').append(parameter.getName());
-
-				if (!StringUtil.isEmpty(description))
-				{
-					buffer.append(':').append(FileUtil.NEW_LINE).append(" \t").append(description); //$NON-NLS-1$
-				}
-
-				result.add(buffer.toString());
+				builder.append(BOLD_CLOSE_TAG);
 			}
+			builder.append(newline());
+			builder.append(value.trim());
 		}
-
-		return result;
+		return builder.toString();
 	}
 
-	/**
-	 * formatFunction
-	 * 
-	 * @param function
-	 * @param projectURI
-	 * @return
-	 */
-	public static String getDescription(FunctionElement function, URI projectURI)
+	private String newline()
 	{
-		StringBuilder buffer = new StringBuilder();
-
-		buffer.append(function.getName());
-		buffer.append('(').append(StringUtil.join(", ", function.getParameterTypes())).append(')'); //$NON-NLS-1$
-
-		buffer.append(formatTypes(function.getReturnTypeNames()));
-		buffer.append(formatDescription(function));
-		buffer.append(formatExamples(function.getExamples()));
-		buffer.append(formatDefiningFiles(function, projectURI));
-		buffer.append(formatSpecifications(function));
-
-		return buffer.toString();
-	}
-
-	/**
-	 * formatProperty
-	 * 
-	 * @param property
-	 * @param projectURI
-	 * @return
-	 */
-	public static String getDescription(PropertyElement property, URI projectURI)
-	{
-		if (property instanceof FunctionElement)
-		{
-			return getDescription((FunctionElement) property, projectURI);
-		}
-
-		StringBuilder buffer = new StringBuilder();
-		buffer.append(property.getName());
-
-		buffer.append(formatTypes(property.getTypeNames()));
-		buffer.append(formatDescription(property));
-		buffer.append(formatExamples(property.getExamples()));
-		buffer.append(formatDefiningFiles(property, projectURI));
-		buffer.append(formatSpecifications(property));
-
-		return buffer.toString();
+		return useHTML ? HTML_NEWLINE : FileUtil.NEW_LINE;
 	}
 
 	/**
@@ -332,7 +463,7 @@ public class JSModelFormatter
 	 * @param document
 	 * @return
 	 */
-	public static String getDocumentDisplayName(String document)
+	public String getDocumentDisplayName(String document)
 	{
 		String result = null;
 
@@ -361,7 +492,7 @@ public class JSModelFormatter
 	 * @param property
 	 * @return
 	 */
-	public static Image getImage(PropertyElement property)
+	public Image getImage(PropertyElement property)
 	{
 		Image result = (property instanceof FunctionElement) ? TYPE_IMAGE_MAP.get(JSTypeConstants.FUNCTION_TYPE)
 				: PROPERTY;
@@ -397,28 +528,12 @@ public class JSModelFormatter
 	}
 
 	/**
-	 * getSimpleDescription
-	 * 
-	 * @param function
-	 * @return
-	 */
-	public static String getSimpleDescription(FunctionElement function)
-	{
-		StringBuilder buffer = new StringBuilder();
-
-		buffer.append(function.getName());
-		buffer.append('(').append(StringUtil.join(", ", function.getParameterTypes())).append(')'); //$NON-NLS-1$
-
-		return buffer.toString();
-	}
-
-	/**
 	 * getDisplayTypeName
 	 * 
 	 * @param type
 	 * @return
 	 */
-	public static String getTypeDisplayName(String type)
+	public String getTypeDisplayName(String type)
 	{
 		String result = null;
 
@@ -450,7 +565,4 @@ public class JSModelFormatter
 		return result;
 	}
 
-	private JSModelFormatter()
-	{
-	}
 }
