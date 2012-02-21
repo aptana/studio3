@@ -29,8 +29,8 @@ public class OpenJSEditorTest extends OpenEditorTest
 {
 
 	private static final String PROJECT = "js_perf";
-	private static final int WARM_UP_RUNS = 10;
-	private static final int MEASURED_RUNS = 50;
+	private static final int WARM_UP_RUNS = 5;
+	private static final int MEASURED_RUNS = 20;
 	private static final String PREFIX = "/" + PROJECT + "/timobile";
 	private static final String FILE_SUFFIX = ".js";
 	private static final IPath LARGE_MINIFIED_FILE = Path.fromPortableString("/" + PROJECT + "/ext-all.js");

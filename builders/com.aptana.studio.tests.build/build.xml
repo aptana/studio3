@@ -271,7 +271,7 @@
 
 	<target name="run-perf-test">
 		<ant target="ui-test" antfile="${library-file}" dir="${baseLocation}">
-			<property name="timeout" value="${perf.test.timeout}" />
+			<property name="timeout" value="${test.timeout}" />
 			<property name="test.target" value="performance" />
 			<property name="os" value="${baseos}" />
 			<property name="ws" value="${basews}" />
@@ -280,7 +280,7 @@
 			<property name="data-dir" value="${baseLocation}/junit-workspace -clean" />
 			<property name="plugin-name" value="${test.plugin}" />
 			<property name="classname" value="${test.classname}" />
-			<property name="extraVMargs" value="-Djunit.properties=${basedir}/build.properties -Declipse.perf.dbloc=${perf.db} -Declipse.perf.config=build=${studio.version};host=${computer.hostname};jvm=${java.version} -Dsetup.override.eclipseArgs=vm=/usr/bin/java ${extraPerfArgs}" />
+			<property name="extraVMargs" value="-XX:MaxPermSize=384m -Djunit.properties=${basedir}/build.properties -Declipse.perf.dbloc=${perf.db} -Declipse.perf.config=build=${studio.version};host=${computer.hostname};jvm=${java.version} -Dsetup.override.eclipseArgs=vm=/usr/bin/java ${extraPerfArgs}" />
 		</ant>
 	</target>
 </project>

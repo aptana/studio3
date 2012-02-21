@@ -36,8 +36,8 @@ public class OpenCSSEditorTest extends OpenEditorTest
 {
 
 	private static final String PROJECT = "css_perf";
-	private static final int WARM_UP_RUNS = 10;
-	private static final int MEASURED_RUNS = 50;
+	private static final int WARM_UP_RUNS = 5;
+	private static final int MEASURED_RUNS = 20;
 	private static final String PREFIX = "/" + PROJECT + "/yui";
 	private static final String FILE_SUFFIX = ".css";
 	private static final IPath LARGE_MINIFIED_FILE = Path.fromPortableString("/" + PROJECT + "/wp-admin.css");

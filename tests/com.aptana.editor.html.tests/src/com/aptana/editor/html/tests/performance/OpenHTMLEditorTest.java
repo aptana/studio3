@@ -29,8 +29,8 @@ public class OpenHTMLEditorTest extends OpenEditorTest
 {
 
 	private static final String PROJECT = "performance_project";
-	private static final int WARM_UP_RUNS = 10;
-	private static final int MEASURED_RUNS = 50;
+	private static final int WARM_UP_RUNS = 5;
+	private static final int MEASURED_RUNS = 20;
 	private static final String PREFIX = "/" + PROJECT + "/amazon";
 	private static final String FILE_SUFFIX = ".html";
 	private static final IPath LARGE_FILE = Path.fromPortableString(PREFIX + FILE_SUFFIX);
