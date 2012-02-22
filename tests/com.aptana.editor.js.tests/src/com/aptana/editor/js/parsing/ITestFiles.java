@@ -78,7 +78,7 @@ public interface ITestFiles
 		"performance/jaxer/regress-244470.js",
 		"performance/jaxer/regress-309925-02.js",
 		"performance/jaxer/regress-76054.js",
-		"performance/jaxer/regress-98901.js",
+//		"performance/jaxer/regress-98901.js", // FIXME Need to re-add this file!
 		"performance/jaxer/scriptaculous.js",
 		"performance/jaxer/split-002.js",
 		"performance/jaxer/test_413784.js",
