@@ -9,6 +9,7 @@ package com.aptana.editor.js.contentassist.index;
 
 import java.net.URI;
 import java.text.MessageFormat;
+import java.util.Collection;
 import java.util.List;
 
 import com.aptana.core.logging.IdeLog;
@@ -150,7 +151,7 @@ public class JSIndexWriter extends IndexWriter
 	 * @param index
 	 * @param paths
 	 */
-	public void writeRequires(Index index, List<String> paths, URI location)
+	public void writeRequires(Index index, Collection<String> paths, URI location)
 	{
 		if (index != null && !CollectionsUtil.isEmpty(paths))
 		{
