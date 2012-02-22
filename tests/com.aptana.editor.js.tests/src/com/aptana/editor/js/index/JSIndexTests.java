@@ -8,10 +8,12 @@
 package com.aptana.editor.js.index;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import junit.framework.TestCase;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.index.IJSIndexConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexReader;
@@ -165,5 +167,42 @@ public class JSIndexTests extends TestCase
 		// make sure the name is correct
 		PropertyElement retrievedProperty = properties.get(0);
 		assertEquals(propertyName, retrievedProperty.getName());
+	}
+
+	public void testRequires() throws URISyntaxException
+	{
+		List<String> requires = CollectionsUtil.newList("abc.js", "def.js");
+		URI location = new URI("testFile.js");
+
+		// write out paths
+		JSIndexWriter writer = new JSIndexWriter();
+		writer.writeRequires(getIndex(), requires, location);
+
+		// read them back in
+		JSIndexReader reader = new JSIndexReader();
+		List<String> newList = reader.getRequires(getIndex(), location);
+
+		assertEquals(requires, newList);
+	}
+
+	public void testRequires2() throws URISyntaxException
+	{
+		List<String> requires1 = CollectionsUtil.newList("abc.js", "def.js");
+		URI location1 = new URI("testFile1.js");
+		List<String> requires2 = CollectionsUtil.newList("def.js", "ghi.js");
+		URI location2 = new URI("testFile2.js");
+
+		// write out paths
+		JSIndexWriter writer = new JSIndexWriter();
+		writer.writeRequires(getIndex(), requires1, location1);
+		writer.writeRequires(getIndex(), requires2, location2);
+
+		// read them back in
+		JSIndexReader reader = new JSIndexReader();
+		List<String> newList1 = reader.getRequires(getIndex(), location1);
+		List<String> newList2 = reader.getRequires(getIndex(), location2);
+
+		assertEquals(requires1, newList1);
+		assertEquals(requires2, newList2);
 	}
 }
