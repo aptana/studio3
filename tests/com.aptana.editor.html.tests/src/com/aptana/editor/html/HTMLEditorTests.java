@@ -21,11 +21,8 @@ public class HTMLEditorTests extends TestCase
 		suite.addTestSuite(HTMLEditorTest.class);
 		suite.addTestSuite(HTMLFoldingComputerTest.class);
 		suite.addTestSuite(HTMLOpenTagCloserTest.class);
-		suite.addTestSuite(HTMLParserTest.class);
-		suite.addTestSuite(HTMLParserTypeAttributeTest.class);
 		suite.addTestSuite(HTMLScannerTest.class);
 		suite.addTestSuite(HTMLSourcePartitionScannerTest.class);
-		// suite.addTestSuite(HTMLTagScannerPerformanceTest.class);
 		suite.addTestSuite(HTMLTagScannerTest.class);
 		suite.addTestSuite(HTMLTagUtilTest.class);
 		// $JUnit-END$

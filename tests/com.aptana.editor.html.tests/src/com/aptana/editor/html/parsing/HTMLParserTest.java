@@ -5,7 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.html;
+package com.aptana.editor.html.parsing;
 
 import java.text.MessageFormat;
 import java.util.List;
@@ -14,6 +14,7 @@ import junit.framework.TestCase;
 
 import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.css.parsing.ast.CSSParseRootNode;
+import com.aptana.editor.html.IHTMLConstants;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.HTMLParser;
 import com.aptana.editor.html.parsing.Messages;

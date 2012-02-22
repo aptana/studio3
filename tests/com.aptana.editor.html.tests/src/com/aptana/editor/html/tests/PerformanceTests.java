@@ -16,6 +16,7 @@ import junit.framework.TestSuite;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.HTMLTagScannerPerformanceTest;
+import com.aptana.editor.html.parsing.HTMLParserPerformanceTest;
 import com.aptana.editor.html.tests.performance.OpenHTMLEditorTest;
 import com.aptana.editor.html.validator.HTMLTidyValidatorPerformanceTest;
 
@@ -36,6 +37,7 @@ public class PerformanceTests
 			}
 		};
 		// $JUnit-BEGIN$
+		suite.addTestSuite(HTMLParserPerformanceTest.class);
 		suite.addTestSuite(HTMLTagScannerPerformanceTest.class);
 		suite.addTestSuite(HTMLTidyValidatorPerformanceTest.class);
 		suite.addTest(OpenHTMLEditorTest.suite());

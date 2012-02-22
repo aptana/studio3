@@ -18,6 +18,8 @@ public class HTMLParsingTests extends TestCase
 	{
 		TestSuite suite = new TestSuite(HTMLParsingTests.class.getName());
 		// $JUnit-BEGIN$
+		suite.addTestSuite(HTMLParserTest.class);
+		suite.addTestSuite(HTMLParserTypeAttributeTest.class);
 		suite.addTestSuite(HTMLUtilsTest.class);
 		// $JUnit-END$
 		return suite;
