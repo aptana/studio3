@@ -11,7 +11,9 @@ import java.net.URI;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -29,6 +31,7 @@ import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.inferencing.JSScope;
 import com.aptana.editor.js.inferencing.JSSymbolTypeInferrer;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
+import com.aptana.editor.js.parsing.ast.JSInvokeNode;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
 import com.aptana.index.core.AbstractFileIndexingParticipant;
 import com.aptana.index.core.Index;
@@ -39,7 +42,9 @@ import com.aptana.parsing.xpath.ParseNodeXPath;
 public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 {
 	private static XPath LAMBDAS_IN_SCOPE;
-	private JSIndexWriter _indexWriter;
+	private static XPath REQUIRE_INVOCATIONS;
+
+	private JSIndexWriter indexWriter;
 
 	static
 	{
@@ -52,6 +57,15 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		{
 			IdeLog.logError(JSPlugin.getDefault(), e);
 		}
+
+		try
+		{
+			REQUIRE_INVOCATIONS = new ParseNodeXPath("//invoke[identifier[position() = 1 and text() = 'require']]"); //$NON-NLS-1$
+		}
+		catch (JaxenException e)
+		{
+			IdeLog.logError(JSPlugin.getDefault(), e);
+		}
 	}
 
 	/**
@@ -59,7 +73,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 	 */
 	public JSFileIndexingParticipant()
 	{
-		this._indexWriter = new JSIndexWriter();
+		indexWriter = new JSIndexWriter();
 	}
 
 	/**
@@ -113,7 +127,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 		try
 		{
-			Object queryResult = LAMBDAS_IN_SCOPE.evaluate(node);
+			Object queryResult = (LAMBDAS_IN_SCOPE != null) ? LAMBDAS_IN_SCOPE.evaluate(node) : null;
 
 			if (queryResult != null)
 			{
@@ -129,10 +143,10 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 						JSScope scope = globals.getScopeAtOffset(function.getBody().getStartingOffset());
 
 						// add all properties off of "window" to our list
-						result.addAll(this.processWindowAssignments(index, scope, location));
+						result.addAll(processWindowAssignments(index, scope, location));
 
 						// handle any nested lambdas in this function
-						result.addAll(this.processLambdas(index, globals, function, location));
+						result.addAll(processLambdas(index, globals, function, location));
 					}
 				}
 			}
@@ -172,7 +186,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 			IdeLog.logTrace(JSPlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
 		}
 
-		JSScope globals = this.getGlobals(ast);
+		JSScope globals = getGlobals(ast);
 
 		// process globals
 		if (globals != null)
@@ -217,7 +231,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 				IdeLog.logTrace(JSPlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
 			}
 
-			for (PropertyElement property : this.processWindowAssignments(index, globals, location))
+			for (PropertyElement property : processWindowAssignments(index, globals, location))
 			{
 				type.addProperty(property);
 			}
@@ -236,7 +250,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 				IdeLog.logTrace(JSPlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
 			}
 
-			for (PropertyElement property : this.processLambdas(index, globals, ast, location))
+			for (PropertyElement property : processLambdas(index, globals, ast, location))
 			{
 				type.addProperty(property);
 			}
@@ -274,10 +288,57 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 				IdeLog.logTrace(JSPlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
 			}
 
-			this._indexWriter.writeType(index, type, location);
+			indexWriter.writeType(index, type, location);
 		}
 
+		// process requires
+		processRequires(index, ast, location);
+
 		sub.done();
+	}
+
+	/**
+	 * @param ast
+	 */
+	protected void processRequires(Index index, IParseNode ast, URI location)
+	{
+		Object queryResult = null;
+
+		// grab all 'require("...")' invocations
+		try
+		{
+			queryResult = (REQUIRE_INVOCATIONS != null) ? REQUIRE_INVOCATIONS.evaluate(ast) : null;
+		}
+		catch (JaxenException e)
+		{
+			IdeLog.logError(JSPlugin.getDefault(), e);
+		}
+
+		// process results, if any
+		if (queryResult != null)
+		{
+			Set<String> paths = new HashSet<String>();
+
+			@SuppressWarnings("unchecked")
+			List<JSInvokeNode> invocations = (List<JSInvokeNode>) queryResult;
+
+			for (JSInvokeNode invocation : invocations)
+			{
+				IParseNode arguments = invocation.getArguments();
+				IParseNode firstArgument = (arguments != null) ? arguments.getFirstChild() : null;
+				String text = (firstArgument != null) ? firstArgument.getText() : null;
+
+				if (text != null && text.length() >= 2)
+				{
+					paths.add(text.substring(1, text.length() - 1));
+				}
+			}
+
+			if (!paths.isEmpty())
+			{
+				indexWriter.writeRequires(index, paths, location);
+			}
+		}
 	}
 
 	/**
