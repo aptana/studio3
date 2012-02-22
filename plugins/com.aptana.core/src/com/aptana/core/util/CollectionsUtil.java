@@ -167,30 +167,6 @@ public class CollectionsUtil
 	}
 
 	/**
-	 * Process all items within a collection. If the collection or filter are null, this this is a no-op. If the return
-	 * value coming from the application of the filter is false, then processing stops at that point.
-	 * 
-	 * @param collection
-	 *            A collection to process
-	 * @param filter
-	 *            A filter used to process items in the collection
-	 */
-	public static <T> void forEach(Collection<T> collection, IFilter<? super T> filter)
-	{
-		if (collection != null && filter != null)
-		{
-			for (T item : collection)
-			{
-				// process the item, possibly exiting this loop after processing
-				if (!filter.include(item))
-				{
-					break;
-				}
-			}
-		}
-	}
-
-	/**
 	 * This is a convenience method that essentially checks for a null list and returns Collections.emptyList in that
 	 * case. If the list is non-null, then this is an identity function.
 	 * 
