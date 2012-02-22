@@ -7,6 +7,7 @@
  */
 package com.aptana.index.core;
 
+import java.net.URI;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +18,9 @@ import java.util.regex.Pattern;
 import org.mortbay.util.ajax.JSON;
 import org.mortbay.util.ajax.JSON.Convertible;
 
+import com.aptana.core.IFilter;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 
 /**
  * IndexReader
@@ -82,6 +85,39 @@ public abstract class IndexReader
 		}
 
 		return DELIMITER_PATTERN;
+	}
+
+	/**
+	 * Filter the list of query results to include items coming from the specified location only. Note that a null
+	 * location will cause the specified list to be returned
+	 * 
+	 * @param results
+	 *            A list of QueryResults
+	 * @param location
+	 *            The location URI used to filter the query result list
+	 * @return
+	 */
+	protected List<QueryResult> getQueryResultsForLocation(List<QueryResult> results, final URI location)
+	{
+		if (location == null)
+		{
+			return results;
+		}
+
+		return CollectionsUtil.filter(results, new IFilter<QueryResult>()
+		{
+			public boolean include(QueryResult item)
+			{
+				boolean result = true;
+
+				if (location != null)
+				{
+					result = item.getDocuments().contains(location.toString());
+				}
+
+				return result;
+			}
+		});
 	}
 
 	/**
