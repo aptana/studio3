@@ -9,23 +9,60 @@ package com.aptana.editor.html;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
+import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.IWordDetector;
 import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.text.rules.CharacterMapRule;
-import com.aptana.editor.common.text.rules.RegexpRule;
+import com.aptana.editor.common.text.rules.ExtendedWordRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
 import com.aptana.editor.common.text.rules.WordDetector;
 import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
 
 public class HTMLDoctypeScanner extends RuleBasedScanner
 {
+
+	private static final class TagStartRule extends ExtendedWordRule
+	{
+		private Pattern pattern;
+
+		private TagStartRule(IWordDetector detector, IToken defaultToken, boolean ignoreCase)
+		{
+			super(detector, defaultToken, ignoreCase);
+		}
+
+		@Override
+		protected boolean wordOK(String word, ICharacterScanner scanner)
+		{
+			if (pattern == null)
+			{
+				pattern = Pattern.compile("<(/)?"); //$NON-NLS-1$
+			}
+			return pattern.matcher(word).matches();
+		}
+	}
+
+	private static final class TagStartWordDetector implements IWordDetector
+	{
+		public boolean isWordStart(char c)
+		{
+			return c == '<';
+		}
+
+		public boolean isWordPart(char c)
+		{
+			return c == '/';
+		}
+	}
 
 	public HTMLDoctypeScanner()
 	{
@@ -43,7 +80,7 @@ public class HTMLDoctypeScanner extends RuleBasedScanner
 		rules.add(new WhitespaceRule(new WhitespaceDetector()));
 
 		// Tags
-		WordRule wordRule = new WordRule(new WordDetector(), createToken(""), true); //$NON-NLS-1$
+		WordRule wordRule = new WordRule(new WordDetector(), createToken(StringUtil.EMPTY), true);
 		wordRule.addWord("DOCTYPE", createToken("entity.name.tag.doctype.html")); //$NON-NLS-1$ //$NON-NLS-2$
 		rules.add(wordRule);
 
@@ -51,11 +88,11 @@ public class HTMLDoctypeScanner extends RuleBasedScanner
 		rule.add('>', createToken(HTMLTokenType.TAG_END));
 		rule.add('=', createToken(HTMLTokenType.EQUAL));
 		rules.add(rule);
-		// FIXME Use a word/extend word rule here to avoid slow regexp rule?
-		rules.add(new RegexpRule("<(/)?", createToken(HTMLTokenType.TAG_START), true)); //$NON-NLS-1$
+		// Tag start <(/)?
+		rules.add(new TagStartRule(new TagStartWordDetector(), createToken(HTMLTokenType.TAG_START), false));
 
 		setRules(rules.toArray(new IRule[rules.size()]));
-		setDefaultReturnToken(createToken("")); //$NON-NLS-1$
+		setDefaultReturnToken(createToken(StringUtil.EMPTY));
 	}
 
 	/**

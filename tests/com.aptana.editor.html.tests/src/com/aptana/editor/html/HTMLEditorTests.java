@@ -18,6 +18,7 @@ public class HTMLEditorTests extends TestCase
 	{
 		TestSuite suite = new TestSuite(HTMLEditorTests.class.getName());
 		// $JUnit-BEGIN$
+		suite.addTestSuite(HTMLDoctypeScannerTest.class);
 		suite.addTestSuite(HTMLEditorTest.class);
 		suite.addTestSuite(HTMLFoldingComputerTest.class);
 		suite.addTestSuite(HTMLOpenTagCloserTest.class);
