@@ -32,6 +32,7 @@ public interface IJSIndexConstants
 	// possible
 	// 0.29 - Update some DOM 2 content for Document
 	// 0.30 - Update some DOM 0 content for Window
+	// 0.31 - Added "requires" to index
 	public static final double INDEX_VERSION = 0.30;
 
 	// for debugging, comment the line above, and uncomment the following
@@ -50,6 +51,7 @@ public interface IJSIndexConstants
 	static final String FUNCTION = PREFIX + "function"; //$NON-NLS-1$
 	static final String PROPERTY = PREFIX + "property"; //$NON-NLS-1$
 	static final String EVENT = PREFIX + "event"; //$NON-NLS-1$
+	static final String REQUIRE = PREFIX + "require"; //$NON-NLS-1$
 
 	// @formatter:off
 	static final String[] ALL_CATEGORIES = new String[]
