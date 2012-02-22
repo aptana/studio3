@@ -6,24 +6,30 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Enumeration;
 
+import junit.extensions.TestSetup;
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.test.performance.Performance;
 import org.eclipse.test.performance.PerformanceMeter;
 import org.eclipse.ui.PartInitException;
 import org.osgi.framework.Bundle;
 
+import com.aptana.core.build.IBuildParticipant.BuildType;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.editor.epl.tests.EditorTestHelper;
 import com.aptana.editor.epl.tests.OpenEditorTest;
 import com.aptana.editor.epl.tests.ResourceTestHelper;
-
-import junit.extensions.TestSetup;
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import com.aptana.editor.js.JSPlugin;
+import com.aptana.editor.js.validator.JSLintValidator;
+import com.aptana.editor.js.validator.MozillaJsValidator;
 
 public class OpenJSEditorTest extends OpenEditorTest
 {
@@ -33,8 +39,8 @@ public class OpenJSEditorTest extends OpenEditorTest
 	private static final int MEASURED_RUNS = 5;
 	private static final String PREFIX = "/" + PROJECT + "/timobile";
 	private static final String FILE_SUFFIX = ".js";
-	private static final IPath LARGE_MINIFIED_FILE = Path.fromPortableString("/" + PROJECT + "/ext-all.js");
-	private static final IPath LARGE_FILE = Path.fromPortableString("/" + PROJECT + "/ext-all-dev.js");
+	private static final IPath EXT_MINIFIED = Path.fromPortableString("/" + PROJECT + "/ext.js");
+	private static final IPath EXT_DEV = Path.fromPortableString("/" + PROJECT + "/ext-dev.js");
 	private static final IPath SRC_FILE = Path.fromPortableString(PREFIX + FILE_SUFFIX);
 
 	public OpenJSEditorTest(String name)
@@ -46,15 +52,11 @@ public class OpenJSEditorTest extends OpenEditorTest
 	{
 		// ensure sequence
 		TestSuite suite = new TestSuite(OpenJSEditorTest.class.getName());
-		suite.addTest(new OpenJSEditorTest("testOpenJSEditor1"));
-		suite.addTest(new OpenJSEditorTest("testOpenLargeMinifiedFileFoldingOnOutlineOn"));
-		// suite.addTest(new OpenJSEditorTest("testOpenLargeMinifiedFileFoldingOffOutlineOn"));
-		suite.addTest(new OpenJSEditorTest("testOpenLargeMinifiedFileFoldingOnOutlineOff"));
-		// suite.addTest(new OpenJSEditorTest("testOpenLargeMinifiedFileFoldingOffOutlineOff"));
-		suite.addTest(new OpenJSEditorTest("testOpenLargeFileFoldingOnOutlineOn"));
-		// suite.addTest(new OpenJSEditorTest("testOpenLargeFileFoldingOffOutlineOn"));
-		suite.addTest(new OpenJSEditorTest("testOpenLargeFileFoldingOnOutlineOff"));
-		// suite.addTest(new OpenJSEditorTest("testOpenLargeFileFoldingOffOutlineOff"));
+		suite.addTest(new OpenJSEditorTest("testOpenTiMobile"));
+		// suite.addTest(new OpenJSEditorTest("testOpenExtMinifiedFoldingOnOutlineOn"));
+		// suite.addTest(new OpenJSEditorTest("testOpenExtMinifiedFoldingOnOutlineOff"));
+		suite.addTest(new OpenJSEditorTest("testOpenExtDevFoldingOnOutlineOn"));
+		suite.addTest(new OpenJSEditorTest("testOpenExtDevFoldingOnOutlineOff"));
 		return new Setup(suite);
 	}
 
@@ -64,6 +66,32 @@ public class OpenJSEditorTest extends OpenEditorTest
 	protected void setUp() throws Exception
 	{
 		super.setUp();
+
+		IEclipsePreferences prefs = (EclipseUtil.instanceScope()).getNode(JSPlugin.PLUGIN_ID);
+
+		// Turn off all JS validators!!!!
+		MozillaJsValidator validator = new MozillaJsValidator()
+		{
+			@Override
+			public String getId()
+			{
+				return ID;
+			}
+		};
+		prefs.putBoolean(validator.getEnablementPreferenceKey(BuildType.BUILD), false);
+		prefs.putBoolean(validator.getEnablementPreferenceKey(BuildType.RECONCILE), false);
+
+		JSLintValidator jsLintValidator = new JSLintValidator()
+		{
+			@Override
+			public String getId()
+			{
+				return ID;
+			}
+		};
+		prefs.putBoolean(jsLintValidator.getEnablementPreferenceKey(BuildType.BUILD), false);
+		prefs.putBoolean(jsLintValidator.getEnablementPreferenceKey(BuildType.RECONCILE), false);
+
 		EditorTestHelper.runEventQueue();
 		setWarmUpRuns(WARM_UP_RUNS);
 		setMeasuredRuns(MEASURED_RUNS);
@@ -78,7 +106,7 @@ public class OpenJSEditorTest extends OpenEditorTest
 		super.tearDown();
 	}
 
-	public void testOpenJSEditor1() throws Exception
+	public void testOpenTiMobile() throws Exception
 	{
 		measureOpenInEditor(ResourceTestHelper.findFiles(PREFIX, FILE_SUFFIX, 0, getWarmUpRuns()), Performance
 				.getDefault().getNullPerformanceMeter(), false);
@@ -87,46 +115,26 @@ public class OpenJSEditorTest extends OpenEditorTest
 				createPerformanceMeter(), false);
 	}
 
-	public void testOpenLargeFileFoldingOnOutlineOn() throws Exception
+	public void testOpenExtDevFoldingOnOutlineOn() throws Exception
 	{
 		PerformanceMeter performanceMeter = createPerformanceMeter();
-		measureOpenInEditor(LARGE_FILE, true, true, performanceMeter);
+		measureOpenInEditor(EXT_DEV, true, true, performanceMeter);
 	}
 
-	// public void testOpenLargeFileFoldingOffOutlineOn() throws Exception
+	public void testOpenExtDevFoldingOnOutlineOff() throws Exception
+	{
+		measureOpenInEditor(EXT_DEV, true, false, createPerformanceMeter());
+	}
+
+	// public void testOpenExtMinifiedFoldingOnOutlineOn() throws Exception
 	// {
-	// measureOpenInEditor(LARGE_FILE, false, true, createPerformanceMeter());
+	// PerformanceMeter performanceMeter = createPerformanceMeter();
+	// measureOpenInEditor(EXT_MINIFIED, true, true, performanceMeter);
 	// }
 
-	public void testOpenLargeFileFoldingOnOutlineOff() throws Exception
-	{
-		measureOpenInEditor(LARGE_FILE, true, false, createPerformanceMeter());
-	}
-
-	// public void testOpenLargeFileFoldingOffOutlineOff() throws Exception
+	// public void testOpenExtMinifiedFoldingOnOutlineOff() throws Exception
 	// {
-	// measureOpenInEditor(LARGE_FILE, false, false, createPerformanceMeter());
-	// }
-
-	public void testOpenLargeMinifiedFileFoldingOnOutlineOn() throws Exception
-	{
-		PerformanceMeter performanceMeter = createPerformanceMeter();
-		measureOpenInEditor(LARGE_MINIFIED_FILE, true, true, performanceMeter);
-	}
-
-	// public void testOpenLargeMinifiedFileFoldingOffOutlineOn() throws Exception
-	// {
-	// measureOpenInEditor(LARGE_MINIFIED_FILE, false, true, createPerformanceMeter());
-	// }
-
-	public void testOpenLargeMinifiedFileFoldingOnOutlineOff() throws Exception
-	{
-		measureOpenInEditor(LARGE_MINIFIED_FILE, true, false, createPerformanceMeter());
-	}
-
-	// public void testOpenLargeMinifiedFileFoldingOffOutlineOff() throws Exception
-	// {
-	// measureOpenInEditor(LARGE_MINIFIED_FILE, false, false, createPerformanceMeter());
+	// measureOpenInEditor(EXT_MINIFIED, true, false, createPerformanceMeter());
 	// }
 
 	protected void measureOpenInEditor(IPath file, boolean enableFolding, boolean showOutline,
