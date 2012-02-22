@@ -8,10 +8,13 @@
 package com.aptana.editor.js.contentassist.index;
 
 import java.io.IOException;
+import java.net.URI;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import com.aptana.core.util.CollectionsUtil;
@@ -501,6 +504,40 @@ public class JSIndexReader extends IndexReader
 		}
 
 		return result;
+	}
+
+	/**
+	 * getRequires
+	 * 
+	 * @param index
+	 * @return
+	 */
+	public List<String> getRequires(Index index, final URI location)
+	{
+		final Set<String> result = new HashSet<String>();
+
+		if (index != null)
+		{
+			// @formatter:off
+			List<QueryResult> requires = index.query(
+				new String[] { IJSIndexConstants.REQUIRE },
+				"*", //$NON-NLS-1$
+				SearchPattern.PATTERN_MATCH
+			);
+			// @formatter:on
+
+			// build list of requires for specified location
+			for (QueryResult item : getQueryResultsForLocation(requires, location))
+			{
+				for (String path : getSubDelimiterPattern().split(item.getWord()))
+				{
+					result.add(path);
+				}
+			}
+			;
+		}
+
+		return new ArrayList<String>(result);
 	}
 
 	/*

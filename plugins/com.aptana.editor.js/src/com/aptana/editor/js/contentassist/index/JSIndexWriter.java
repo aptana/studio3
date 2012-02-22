@@ -12,6 +12,7 @@ import java.text.MessageFormat;
 import java.util.List;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.IDebugScopes;
 import com.aptana.editor.js.JSPlugin;
@@ -141,6 +142,22 @@ public class JSIndexWriter extends IndexWriter
 		}
 
 		index.addEntry(IJSIndexConstants.PROPERTY, value, location);
+	}
+
+	/**
+	 * writeRequires
+	 * 
+	 * @param index
+	 * @param paths
+	 */
+	public void writeRequires(Index index, List<String> paths, URI location)
+	{
+		if (index != null && !CollectionsUtil.isEmpty(paths))
+		{
+			String value = StringUtil.join(IJSIndexConstants.SUB_DELIMITER, paths);
+
+			index.addEntry(IJSIndexConstants.REQUIRE, value, location);
+		}
 	}
 
 	/**
