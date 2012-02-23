@@ -631,4 +631,17 @@ public class StringUtil
 	{
 	}
 
+	/**
+	 * Does the string start with the specific char
+	 * 
+	 * @param string
+	 *            the string to test
+	 * @param c
+	 *            the char to test
+	 * @return true if yes, false if the no, or the string is empty or null
+	 */
+	public static boolean startsWith(String string, char c)
+	{
+		return !StringUtil.isEmpty(string) && string.charAt(0) == c;
+	}
 }

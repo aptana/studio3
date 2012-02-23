@@ -20,7 +20,7 @@ public class AllTests
 	{
 		TestSuite suite = new TestSuite("Tests for com.aptana.editor.js.text");
 		// $JUnit-BEGIN$
-		suite.addTestSuite(CommonAutoIndentStrategyTest.class);
+		suite.addTestSuite(JSAutoIndentStrategyTest.class);
 		// $JUnit-END$
 		return suite;
 	}

@@ -215,7 +215,6 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 			document.replace(command.offset, command.length, command.text);
 		}
 		assertEquals("/**\n * \n **/\nfunction name() {\n}\n", document.get());
-
 	}
 
 	/**

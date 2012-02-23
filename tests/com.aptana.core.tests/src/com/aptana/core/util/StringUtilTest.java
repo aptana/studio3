@@ -416,6 +416,15 @@ public class StringUtilTest extends TestCase
 		assertNull(StringUtil.truncate(null, 8));
 	}
 
+	public void testStartsWith()
+	{
+		String text = "starts with";
+		assertTrue(text, StringUtil.startsWith(text, 's'));
+		assertFalse(text, StringUtil.startsWith(text, 'c'));
+		assertFalse(StringUtil.startsWith("", 'c'));
+		assertFalse(StringUtil.startsWith(null, 'c'));
+	}
+
 	public void testEmptyString()
 	{
 		assertTrue(StringUtil.isEmpty(null));
