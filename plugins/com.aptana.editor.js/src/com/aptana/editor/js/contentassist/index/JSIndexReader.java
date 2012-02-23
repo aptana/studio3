@@ -534,7 +534,6 @@ public class JSIndexReader extends IndexReader
 					result.add(path);
 				}
 			}
-			;
 		}
 
 		return new ArrayList<String>(result);
