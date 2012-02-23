@@ -7,31 +7,249 @@
  */
 package com.aptana.editor.js;
 
+import java.text.MessageFormat;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.eclipse.help.IContext;
+import org.eclipse.help.IContext2;
+import org.eclipse.help.IContextProvider;
+import org.eclipse.help.IHelpResource;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.js.actions.IJSActions;
 import com.aptana.editor.js.actions.OpenDeclarationAction;
+import com.aptana.editor.js.contentassist.JSModelFormatter;
+import com.aptana.editor.js.contentassist.model.PropertyElement;
+import com.aptana.editor.js.contentassist.model.SinceElement;
+import com.aptana.editor.js.internal.JSModelUtil;
 import com.aptana.editor.js.internal.text.JSFoldingComputer;
 import com.aptana.editor.js.outline.JSOutlineContentProvider;
 import com.aptana.editor.js.outline.JSOutlineLabelProvider;
 import com.aptana.editor.js.parsing.JSParseState;
 import com.aptana.parsing.ParserPoolFactory;
+import com.aptana.parsing.ast.INameNode;
+import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
 
 @SuppressWarnings("restriction")
 public class JSSourceEditor extends AbstractThemeableEditor
 {
+
+	private static final class JSContextProvider implements IContextProvider
+	{
+		private static final class JSHelpContext implements IContext2
+		{
+			private AbstractThemeableEditor editor;
+			private final IParseNode node;
+			private List<PropertyElement> fProperties;
+
+			private JSHelpContext(AbstractThemeableEditor editor, IParseNode node)
+			{
+				this.editor = editor;
+				this.node = node;
+			}
+
+			public IHelpResource[] getRelatedTopics()
+			{
+				Collection<PropertyElement> properties = getActiveProperty();
+				if (!CollectionsUtil.isEmpty(properties))
+				{
+					Set<IHelpResource> refs = new HashSet<IHelpResource>();
+					for (PropertyElement pe : properties)
+					{
+						for (SinceElement se : pe.getSinceList())
+						{
+							String version = se.getVersion();
+							if ("DOM 0".equals(version)) //$NON-NLS-1$
+							{
+								refs.add(new JSDOMHelpResource(0));
+							}
+							else if ("DOM 2".equals(version)) //$NON-NLS-1$
+							{
+								refs.add(new JSDOMHelpResource(2));
+							}
+							else if ("DOM 3".equals(version)) //$NON-NLS-1$
+							{
+								refs.add(new JSDOMHelpResource(3));
+							}
+							else if ("DOM 5".equals(version)) //$NON-NLS-1$
+							{
+								refs.add(new JSDOMHelpResource(5));
+							}
+						}
+						return refs.toArray(new IHelpResource[refs.size()]);
+					}
+				}
+				return null;
+			}
+
+			public String getText()
+			{
+				Collection<PropertyElement> properties = getActiveProperty();
+				if (!CollectionsUtil.isEmpty(properties))
+				{
+					return stripUnusedTags(JSModelFormatter.DYNAMIC_HELP.getDocumentation(properties));
+				}
+				return null;
+			}
+
+			private synchronized Collection<PropertyElement> getActiveProperty()
+			{
+				if (node == null)
+				{
+					return Collections.emptyList();
+				}
+				if (fProperties == null)
+				{
+					fProperties = JSModelUtil.getProperties(editor, node);
+				}
+				return fProperties;
+			}
+
+			private String stripUnusedTags(String text)
+			{
+				if (text == null)
+				{
+					return null;
+				}
+
+				String tempText = text;
+				// FIXME This is a very ugly way of doing this. Use Patterns and appendReplacement to fix this up
+				tempText = tempText.replaceAll("<h[23]>", "<b>"); //$NON-NLS-1$ //$NON-NLS-2$
+				tempText = tempText.replaceAll("</h[23]>", "</b><br>"); //$NON-NLS-1$ //$NON-NLS-2$
+				tempText = tempText.replaceAll(
+						"<(hr|/?warning|/?tip|/?glossary|/?method|/?varname|/?specification)>", StringUtil.EMPTY); //$NON-NLS-1$
+				tempText = tempText.replaceAll("<pre>", "<code>"); //$NON-NLS-1$ //$NON-NLS-2$
+				tempText = tempText.replaceAll("</pre>", "</code>"); //$NON-NLS-1$ //$NON-NLS-2$
+				tempText = tempText.replaceAll("</?p>", "<br><br>"); //$NON-NLS-1$ //$NON-NLS-2$
+
+				// Fixup newlines for code blocks
+				Pattern p = Pattern.compile("<code>([^<]+)</code>"); //$NON-NLS-1$
+				Matcher m = p.matcher(tempText);
+				StringBuffer sb = new StringBuffer();
+				while (m.find())
+				{
+					String content = m.group(1);
+					content = StringUtil.LINE_SPLITTER.matcher(content).replaceAll("</code><br><code>"); //$NON-NLS-1$
+					m.appendReplacement(sb, "<code>" + content + "</code>"); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+				m.appendTail(sb);
+				return sb.toString();
+			}
+
+			public String getTitle()
+			{
+				if (node == null)
+				{
+					return null;
+				}
+				INameNode nameNode = node.getNameNode();
+				if (nameNode == null)
+				{
+					return null;
+				}
+				return nameNode.getName();
+			}
+
+			public String getStyledText()
+			{
+				return null;
+			}
+
+			public String getCategory(IHelpResource topic)
+			{
+				// TODO Auto-generated method stub
+				return null;
+			}
+		}
+
+		private final JSSourceEditor editorPart;
+
+		private JSContextProvider(JSSourceEditor editorPart)
+		{
+			this.editorPart = editorPart;
+		}
+
+		public String getSearchExpression(Object target)
+		{
+			return null;
+		}
+
+		public int getContextChangeMask()
+		{
+			return SELECTION;
+		}
+
+		public IContext getContext(Object target)
+		{
+			ISelection selection = editorPart.getSelectionProvider().getSelection();
+			if (selection.isEmpty())
+			{
+				return null;
+			}
+			ITextSelection textSelection = (ITextSelection) selection;
+			int offset = textSelection.getOffset();
+			return new JSHelpContext(editorPart, editorPart.getASTNodeAt(offset));
+		}
+	}
+
+	private static final class JSDOMHelpResource implements IHelpResource
+	{
+		private int domNumber;
+
+		JSDOMHelpResource(int number)
+		{
+			this.domNumber = number;
+		}
+
+		public String getLabel()
+		{
+			return MessageFormat.format("DOM {0}", domNumber); //$NON-NLS-1$
+		}
+
+		public String getHref()
+		{
+			return MessageFormat.format("http://aptana.com/reference/html/api/HTMLDOM{0}.index.html", domNumber); //$NON-NLS-1$
+		}
+
+		@Override
+		public boolean equals(Object obj)
+		{
+			if (obj instanceof JSDOMHelpResource)
+			{
+				JSDOMHelpResource other = (JSDOMHelpResource) obj;
+				return other.domNumber == domNumber;
+			}
+			return false;
+		}
+
+		@Override
+		public int hashCode()
+		{
+			return 31 * domNumber;
+		}
+	}
 
 	@Override
 	protected void initializeEditor()
@@ -140,5 +358,15 @@ public class JSSourceEditor extends AbstractThemeableEditor
 					com.aptana.parsing.IDebugScopes.PARSING);
 		}
 		return null;
+	}
+
+	@Override
+	public Object getAdapter(Class adapter)
+	{
+		if (IContextProvider.class == adapter)
+		{
+			return new JSContextProvider(this);
+		}
+		return super.getAdapter(adapter);
 	}
 }

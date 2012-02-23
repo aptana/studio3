@@ -20,11 +20,11 @@ import java.util.Set;
 
 import org.eclipse.swt.graphics.Image;
 
+import com.aptana.core.IFilter;
 import com.aptana.core.IMap;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.StringUtil;
-import com.aptana.core.util.URIUtil;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
@@ -83,12 +83,13 @@ public class JSModelFormatter
 	 * For text hovers, focused additional info popup.
 	 */
 	public static final JSModelFormatter TEXT_HOVER = new JSModelFormatter(true, Section.SIGNATURE, Section.LOCATIONS,
-			Section.DESCRIPTION, Section.PLATFORMS, Section.REMARKS, Section.EXAMPLE, Section.SPECIFICATIONS);
+			Section.DESCRIPTION, Section.PLATFORMS, Section.EXAMPLE, Section.SPECIFICATIONS);
 
 	/**
 	 * For dynamic help
 	 */
-	public static final JSModelFormatter DYNAMIC_HELP = new JSModelFormatter(true); // TODO As part of APSTUD-4189
+	public static final JSModelFormatter DYNAMIC_HELP = new JSModelFormatter(true, Section.DESCRIPTION,
+			Section.PARAMETERS, Section.RETURNS, Section.EXAMPLES, Section.PLATFORMS, Section.SPECIFICATIONS);
 
 	/**
 	 * For context info popup.
@@ -145,15 +146,14 @@ public class JSModelFormatter
 	 */
 	private boolean useHTML;
 
-	enum Section
-	{
-		SIGNATURE, LOCATIONS, EXAMPLE, SPECIFICATIONS, DESCRIPTION, PLATFORMS, REMARKS, REFERENCES
-	}
-
 	private JSModelFormatter(boolean useHTML, Section... sectionsToDisplay)
 	{
-		this.useHTML = useHTML;
 		this.fSections = Arrays.asList(sectionsToDisplay);
+		this.useHTML = useHTML;
+		for (Section s : fSections)
+		{
+			s.useHTML = useHTML;
+		}
 	}
 
 	/**
@@ -195,7 +195,7 @@ public class JSModelFormatter
 	 * @param root
 	 * @return
 	 */
-	public String getHeader(List<PropertyElement> properties, URI root)
+	public String getHeader(final Collection<PropertyElement> properties, URI root)
 	{
 		if (CollectionsUtil.isEmpty(properties))
 		{
@@ -203,32 +203,29 @@ public class JSModelFormatter
 		}
 
 		List<String> stringParts = new ArrayList<String>();
-		PropertyElement first = properties.get(0);
 		if (useHTML)
 		{
-			stringParts.add(BOLD_OPEN_TAG); //$NON-NLS-1$
+			stringParts.add(BOLD_OPEN_TAG);
 		}
-		if (fSections.contains(Section.SIGNATURE))
+
+		List<Section> headerSections = CollectionsUtil.filter(fSections, new IFilter<Section>()
 		{
-			stringParts.add(formatSignature(first));
-		}
-		if (fSections.contains(Section.LOCATIONS))
+			public boolean include(Section item)
+			{
+				return item.isHeader();
+			}
+		});
+		stringParts.addAll(CollectionsUtil.map(headerSections, new IMap<Section, String>()
 		{
-			Set<String> documents = new HashSet<String>();
-			for (PropertyElement pe : properties)
+			public String map(Section s)
 			{
-				documents.addAll(pe.getDocuments());
+				return s.generate(properties, null);
 			}
-			String locations = formatDefiningFiles(documents, root);
-			if (!StringUtil.isEmpty(locations))
-			{
-				stringParts.add(" - "); //$NON-NLS-1$
-				stringParts.add(locations);
-			}
-		}
+		}));
+
 		if (useHTML)
 		{
-			stringParts.add(BOLD_CLOSE_TAG); //$NON-NLS-1$
+			stringParts.add(BOLD_CLOSE_TAG);
 		}
 		return StringUtil.concat(stringParts);
 	}
@@ -250,240 +247,24 @@ public class JSModelFormatter
 	 * @param properties
 	 * @return
 	 */
-	public String getDocumentation(Collection<PropertyElement> properties)
+	public String getDocumentation(final Collection<PropertyElement> properties)
 	{
-		Set<UserAgentElement> userAgents = new HashSet<UserAgentElement>();
-		Set<SinceElement> sinceElements = new HashSet<SinceElement>();
-		Set<String> descriptions = new HashSet<String>();
-		String example = StringUtil.EMPTY;
-
-		for (PropertyElement property : properties)
+		List<Section> docSections = CollectionsUtil.filter(fSections, new IFilter<Section>()
 		{
-			userAgents.addAll(property.getUserAgents());
-			String desc = property.getDescription();
-			if (!StringUtil.isEmpty(desc))
+			public boolean include(Section s)
 			{
-				descriptions.add(desc);
-			}
-			sinceElements.addAll(property.getSinceList());
-			if (StringUtil.isEmpty(example) && !CollectionsUtil.isEmpty(property.getExamples()))
-			{
-				example = property.getExamples().get(0);
-			}
-		}
-
-		List<String> builder = new ArrayList<String>();
-		if (fSections.contains(Section.DESCRIPTION))
-		{
-			String description = Messages.JSTextHover_NoDescription;
-			if (!CollectionsUtil.isEmpty(descriptions))
-			{
-				description = StringUtil.join(COMMA_SPACE, descriptions);
-			}
-			builder.add(description);
-		}
-		if (fSections.contains(Section.PLATFORMS))
-		{
-			builder.add(addSection(Messages.JSTextHover_SupportedPlatforms, getPlatforms(userAgents)));
-		}
-		if (fSections.contains(Section.EXAMPLE))
-		{
-			builder.add(addSection(Messages.JSTextHover_Example, example));
-		}
-		if (fSections.contains(Section.SPECIFICATIONS))
-		{
-			builder.add(addSection(Messages.JSTextHover_Specification, getSpecificationsString(sinceElements)));
-		}
-		return StringUtil.concat(builder);
-	}
-
-	/**
-	 * Formats the signature in the header: name, params, type.
-	 * 
-	 * @param prop
-	 * @return
-	 */
-	private String formatSignature(PropertyElement prop)
-	{
-		StringBuilder builder = new StringBuilder();
-		builder.append(prop.getName());
-		List<String> typeNames = prop.getTypeNames();
-		if (prop instanceof FunctionElement)
-		{
-			FunctionElement fe = (FunctionElement) prop;
-			builder.append('(');
-			builder.append(formatParameters(fe.getParameters()));
-			builder.append(')');
-			typeNames = fe.getReturnTypeNames();
-		}
-		builder.append(COLON_SPACE);
-		builder.append(formatTypes(typeNames));
-		return builder.toString();
-	}
-
-	private String formatTypes(List<String> typeNames)
-	{
-		if (CollectionsUtil.isEmpty(typeNames))
-		{
-			return JSTypeConstants.NO_TYPE;
-		}
-
-		List<String> typeDisplayNames = CollectionsUtil.map(typeNames, new IMap<String, String>()
-		{
-			public String map(String type)
-			{
-				return getTypeDisplayName(type);
+				return !s.isHeader();
 			}
 		});
 
-		return StringUtil.join(COMMA_SPACE, typeDisplayNames);
-	}
-
-	/**
-	 * Formats {@link FunctionElement} parameters.
-	 * 
-	 * @param parameters
-	 * @return
-	 */
-	private String formatParameters(List<ParameterElement> parameters)
-	{
-		List<String> strings = CollectionsUtil.map(parameters, new IMap<ParameterElement, String>()
+		List<String> sectionStrings = CollectionsUtil.map(docSections, new IMap<Section, String>()
 		{
-			public String map(ParameterElement item)
+			public String map(Section s)
 			{
-				StringBuilder b = new StringBuilder();
-				b.append(item.getName());
-				List<String> types = item.getTypes();
-				if (!CollectionsUtil.isEmpty(types))
-				{
-					b.append(COLON_SPACE).append(getTypeDisplayName(types.get(0)));
-				}
-				return b.toString();
+				return s.generate(properties, null);
 			}
 		});
-		return StringUtil.join(COMMA_SPACE, strings);
-	}
-
-	/**
-	 * formatDefiningFiles
-	 * 
-	 * @param property
-	 * @param projectURI
-	 */
-	private String formatDefiningFiles(Collection<String> documents, final URI projectURI)
-	{
-		if (projectURI != null)
-		{
-			documents = CollectionsUtil.map(documents, new IMap<String, String>()
-			{
-				public String map(String item)
-				{
-					try
-					{
-						return projectURI.relativize(new URI(item)).getPath();
-					}
-					catch (URISyntaxException e)
-					{
-						return item;
-					}
-				}
-			});
-		}
-
-		return StringUtil.join(COMMA_SPACE, documents);
-	}
-
-	private String getPlatforms(Collection<UserAgentElement> userAgents)
-	{
-		List<String> strings = CollectionsUtil.map(userAgents, new IMap<UserAgentElement, String>()
-		{
-			public String map(UserAgentElement item)
-			{
-				StringBuilder b = new StringBuilder();
-				b.append(item.getPlatform());
-				String version = item.getVersion();
-				if (!StringUtil.isEmpty(version))
-				{
-					b.append(COLON_SPACE).append(version);
-				}
-				return b.toString();
-			}
-		});
-		return StringUtil.join(COMMA_SPACE, strings);
-	}
-
-	private String getSpecificationsString(Collection<SinceElement> sinceElements)
-	{
-		List<String> strings = CollectionsUtil.map(sinceElements, new IMap<SinceElement, String>()
-		{
-			public String map(SinceElement item)
-			{
-				StringBuilder b = new StringBuilder();
-				b.append(item.getName());
-				String version = item.getVersion();
-				if (!StringUtil.isEmpty(version))
-				{
-					b.append(COLON_SPACE).append(version);
-				}
-				return b.toString();
-			}
-		});
-		return StringUtil.join(COMMA_SPACE, strings);
-	}
-
-	private String addSection(String title, String value)
-	{
-		StringBuilder builder = new StringBuilder();
-		if (!StringUtil.isEmpty(value))
-		{
-			builder.append(newline()).append(newline());
-			if (useHTML)
-			{
-				builder.append(BOLD_OPEN_TAG);
-			}
-			builder.append(title);
-			if (useHTML)
-			{
-				builder.append(BOLD_CLOSE_TAG);
-			}
-			builder.append(newline());
-			builder.append(value.trim());
-		}
-		return builder.toString();
-	}
-
-	private String newline()
-	{
-		return useHTML ? HTML_NEWLINE : FileUtil.NEW_LINE;
-	}
-
-	/**
-	 * getDocumentDisplayName
-	 * 
-	 * @param document
-	 * @return
-	 */
-	public String getDocumentDisplayName(String document)
-	{
-		String result = null;
-
-		if (document != null)
-		{
-			int index = document.lastIndexOf('/');
-
-			if (index != -1)
-			{
-				result = document.substring(index + 1);
-			}
-			else
-			{
-				result = document;
-			}
-
-			result = URIUtil.decodeURI(result);
-		}
-
-		return result;
+		return StringUtil.concat(sectionStrings);
 	}
 
 	/**
@@ -533,7 +314,7 @@ public class JSModelFormatter
 	 * @param type
 	 * @return
 	 */
-	public String getTypeDisplayName(String type)
+	public static String getTypeDisplayName(String type)
 	{
 		String result = null;
 
@@ -565,4 +346,406 @@ public class JSModelFormatter
 		return result;
 	}
 
+	protected String newline()
+	{
+		return useHTML ? HTML_NEWLINE : FileUtil.NEW_LINE;
+	}
+
+	private abstract static class Section
+	{
+		private boolean useHTML;
+
+		public boolean isHeader()
+		{
+			return false;
+		}
+
+		private String newline()
+		{
+			return useHTML ? HTML_NEWLINE : FileUtil.NEW_LINE;
+		}
+
+		protected String addSection(String title, String value)
+		{
+			StringBuilder builder = new StringBuilder();
+			if (!StringUtil.isEmpty(value))
+			{
+				builder.append(newline()).append(newline());
+				if (useHTML)
+				{
+					builder.append(BOLD_OPEN_TAG);
+				}
+				builder.append(title);
+				if (useHTML)
+				{
+					builder.append(BOLD_CLOSE_TAG);
+				}
+				builder.append(newline());
+				builder.append(value.trim());
+			}
+			return builder.toString();
+		}
+
+		public abstract String generate(Collection<PropertyElement> properties, URI root);
+
+		protected String formatTypes(List<String> typeNames)
+		{
+			if (CollectionsUtil.isEmpty(typeNames))
+			{
+				return JSTypeConstants.NO_TYPE;
+			}
+
+			List<String> typeDisplayNames = CollectionsUtil.map(typeNames, new IMap<String, String>()
+			{
+				public String map(String type)
+				{
+					return getTypeDisplayName(type);
+				}
+			});
+
+			return StringUtil.join(COMMA_SPACE, typeDisplayNames);
+		}
+
+		/**
+		 * Name, type, parameters of property/function all combined
+		 */
+		final static Section SIGNATURE = new Section()
+		{
+			public boolean isHeader()
+			{
+				return true;
+			}
+
+			public String generate(Collection<PropertyElement> properties, URI root)
+			{
+				PropertyElement prop = properties.iterator().next();
+				List<String> builder = new ArrayList<String>();
+				builder.add(prop.getName());
+				List<String> typeNames = prop.getTypeNames();
+				if (prop instanceof FunctionElement)
+				{
+					FunctionElement fe = (FunctionElement) prop;
+					builder.add("("); //$NON-NLS-1$
+					builder.add(formatParameters(fe.getParameters()));
+					builder.add(")"); //$NON-NLS-1$
+					typeNames = fe.getReturnTypeNames();
+				}
+				builder.add(COLON_SPACE);
+				builder.add(formatTypes(typeNames));
+				return StringUtil.concat(builder);
+			}
+
+			/**
+			 * Formats {@link FunctionElement} parameters.
+			 * 
+			 * @param parameters
+			 * @return
+			 */
+			private String formatParameters(Collection<ParameterElement> parameters)
+			{
+				List<String> strings = CollectionsUtil.map(parameters, new IMap<ParameterElement, String>()
+				{
+					public String map(ParameterElement item)
+					{
+						StringBuilder b = new StringBuilder();
+						b.append(item.getName());
+						List<String> types = item.getTypes();
+						if (!CollectionsUtil.isEmpty(types))
+						{
+							b.append(COLON_SPACE).append(getTypeDisplayName(types.get(0)));
+						}
+						return b.toString();
+					}
+				});
+				return StringUtil.join(COMMA_SPACE, strings);
+			}
+		};
+
+		/**
+		 * Documents containing the property/function
+		 */
+		final static Section LOCATIONS = new Section()
+		{
+			public boolean isHeader()
+			{
+				return true;
+			}
+
+			@Override
+			public String generate(Collection<PropertyElement> properties, URI root)
+			{
+				Set<String> documents = new HashSet<String>();
+				for (PropertyElement pe : properties)
+				{
+					documents.addAll(pe.getDocuments());
+				}
+				String locations = formatDefiningFiles(documents, root);
+				if (!StringUtil.isEmpty(locations))
+				{
+					return " - " + locations; //$NON-NLS-1$
+				}
+				return StringUtil.EMPTY;
+			}
+
+			/**
+			 * formatDefiningFiles
+			 * 
+			 * @param property
+			 * @param projectURI
+			 */
+			private String formatDefiningFiles(Collection<String> documents, final URI projectURI)
+			{
+				if (projectURI != null)
+				{
+					documents = CollectionsUtil.map(documents, new IMap<String, String>()
+					{
+						public String map(String item)
+						{
+							try
+							{
+								return projectURI.relativize(new URI(item)).getPath();
+							}
+							catch (URISyntaxException e)
+							{
+								return item;
+							}
+						}
+					});
+				}
+
+				return StringUtil.join(COMMA_SPACE, documents);
+			}
+		};
+
+		/**
+		 * Single example
+		 */
+		final static Section EXAMPLE = new Section()
+		{
+			@Override
+			public String generate(Collection<PropertyElement> properties, URI root)
+			{
+				String example = getFirstExample(properties);
+				return addSection(Messages.JSTextHover_Example, example);
+			}
+
+			private String getFirstExample(Collection<PropertyElement> properties)
+			{
+				for (PropertyElement prop : properties)
+				{
+					List<String> examples = prop.getExamples();
+					for (String example : examples)
+					{
+						if (!StringUtil.isEmpty(example))
+						{
+							return example;
+						}
+					}
+				}
+				return StringUtil.EMPTY;
+			}
+		};
+
+		/**
+		 * Multiple examples
+		 */
+		final static Section EXAMPLES = new Section()
+		{
+			@Override
+			public String generate(Collection<PropertyElement> properties, URI root)
+			{
+				List<String> examples = new ArrayList<String>();
+				for (PropertyElement prop : properties)
+				{
+					examples.addAll(prop.getExamples());
+				}
+				examples = CollectionsUtil.filter(examples, new IFilter<String>()
+				{
+					public boolean include(String item)
+					{
+						return !StringUtil.isEmpty(item);
+					}
+				});
+				if (examples.size() == 1)
+				{
+					return addSection(Messages.JSTextHover_Example, examples.get(0));
+				}
+
+				List<String> builder = new ArrayList<String>();
+				for (int i = 0; i < examples.size(); i++)
+				{
+					builder.add(addSection(Messages.JSTextHover_Example + " " + (i + 1), examples.get(i))); //$NON-NLS-1$
+				}
+				return StringUtil.concat(builder);
+			}
+		};
+
+		/**
+		 * Defining specs
+		 */
+		final static Section SPECIFICATIONS = new Section()
+		{
+			@Override
+			public String generate(Collection<PropertyElement> properties, URI root)
+			{
+				Set<SinceElement> sinceElements = new HashSet<SinceElement>();
+				for (PropertyElement property : properties)
+				{
+					sinceElements.addAll(property.getSinceList());
+				}
+				return addSection(Messages.JSTextHover_Specification, getSpecificationsString(sinceElements));
+			}
+
+			private String getSpecificationsString(Collection<SinceElement> sinceElements)
+			{
+				List<String> strings = CollectionsUtil.map(sinceElements, new IMap<SinceElement, String>()
+				{
+					public String map(SinceElement item)
+					{
+						StringBuilder b = new StringBuilder();
+						b.append(item.getName());
+						String version = item.getVersion();
+						if (!StringUtil.isEmpty(version))
+						{
+							b.append(COLON_SPACE).append(version);
+						}
+						return b.toString();
+					}
+				});
+				return StringUtil.join(COMMA_SPACE, strings);
+			}
+		};
+
+		/**
+		 *
+		 */
+		final static Section DESCRIPTION = new Section()
+		{
+			@Override
+			public String generate(Collection<PropertyElement> properties, URI root)
+			{
+				Set<String> descriptions = new HashSet<String>();
+				for (PropertyElement property : properties)
+				{
+					String desc = property.getDescription();
+					if (!StringUtil.isEmpty(desc))
+					{
+						descriptions.add(desc);
+					}
+				}
+
+				if (CollectionsUtil.isEmpty(descriptions))
+				{
+					return Messages.JSTextHover_NoDescription;
+				}
+				return StringUtil.join(COMMA_SPACE, descriptions);
+			}
+		};
+
+		/**
+		 * User agents and versions
+		 */
+		final static Section PLATFORMS = new Section()
+		{
+			@Override
+			public String generate(Collection<PropertyElement> properties, URI root)
+			{
+				Set<UserAgentElement> userAgents = new HashSet<UserAgentElement>();
+				for (PropertyElement property : properties)
+				{
+					userAgents.addAll(property.getUserAgents());
+				}
+				return addSection(Messages.JSTextHover_SupportedPlatforms, getPlatforms(userAgents));
+			}
+
+			private String getPlatforms(Collection<UserAgentElement> userAgents)
+			{
+				List<String> strings = CollectionsUtil.map(userAgents, new IMap<UserAgentElement, String>()
+				{
+					public String map(UserAgentElement item)
+					{
+						StringBuilder b = new StringBuilder();
+						b.append(item.getPlatform());
+						String version = item.getVersion();
+						if (!StringUtil.isEmpty(version))
+						{
+							b.append(COLON_SPACE).append(version);
+						}
+						return b.toString();
+					}
+				});
+				return StringUtil.join(COMMA_SPACE, strings);
+			}
+		};
+
+		/**
+		 * Separated return value section
+		 */
+		final static Section RETURNS = new Section()
+		{
+			@Override
+			public String generate(Collection<PropertyElement> properties, URI root)
+			{
+				List<String> returnTypeNames = new ArrayList<String>();
+				for (PropertyElement property : properties)
+				{
+					if (property instanceof FunctionElement)
+					{
+						FunctionElement function = (FunctionElement) property;
+						returnTypeNames = function.getReturnTypeNames();
+					}
+				}
+				return addSection(Messages.JSModelFormatter_Returns, formatTypes(returnTypeNames));
+			}
+		};
+
+		/**
+		 * Parameter listing in long-form (outside the signature). Includes names, types, and descriptions.
+		 */
+		final static Section PARAMETERS = new Section()
+		{
+			@Override
+			public String generate(Collection<PropertyElement> properties, URI root)
+			{
+				List<ParameterElement> parameters = new ArrayList<ParameterElement>();
+
+				for (PropertyElement property : properties)
+				{
+					if (property instanceof FunctionElement)
+					{
+						FunctionElement function = (FunctionElement) property;
+						parameters = function.getParameters();
+					}
+				}
+				return addSection(Messages.JSModelFormatter_Parameters, getLongformParameters(parameters));
+			}
+
+			private String getLongformParameters(List<ParameterElement> parameters)
+			{
+				List<String> strings = CollectionsUtil.map(parameters, new IMap<ParameterElement, String>()
+				{
+					public String map(ParameterElement item)
+					{
+						List<String> b = new ArrayList<String>();
+						b.add(item.getName());
+						List<String> types = item.getTypes();
+						if (!CollectionsUtil.isEmpty(types))
+						{
+							b.add(" (");//$NON-NLS-1$
+							b.add(getTypeDisplayName(types.get(0)));
+							b.add(")"); //$NON-NLS-1$
+						}
+						String desc = item.getDescription();
+						if (!StringUtil.isEmpty(desc))
+						{
+							b.add(COLON_SPACE);
+							b.add(desc);
+						}
+						return StringUtil.concat(b);
+					}
+				});
+				return StringUtil.join(COMMA_SPACE, strings);
+			}
+		};
+	}
 }

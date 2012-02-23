@@ -28,22 +28,18 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IURIEditorInput;
 
-import com.aptana.core.IFilter;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.contentassist.CommonTextHover;
 import com.aptana.editor.common.hover.CustomBrowserInformationControl;
 import com.aptana.editor.common.hover.DocumentationBrowserInformationControlInput;
-import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.JSLocationIdentifier;
 import com.aptana.editor.js.contentassist.JSModelFormatter;
 import com.aptana.editor.js.contentassist.LocationType;
-import com.aptana.editor.js.contentassist.ParseUtil;
-import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.hyperlink.JSHyperlinkDetector;
-import com.aptana.editor.js.parsing.ast.JSGetPropertyNode;
+import com.aptana.editor.js.internal.JSModelUtil;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.parsing.ast.IParseNode;
@@ -130,73 +126,18 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 
 			// To avoid duplicating work, we generate the header and documentation together here
 			// and then getHeader and getDocumentation just return the values.
-			JSLocationIdentifier identifier = new JSLocationIdentifier(hoverRegion.getOffset(), activeNode);
-			LocationType type = identifier.getType();
-			IEditorPart editorPart = getEditor();
+			AbstractThemeableEditor editorPart = (AbstractThemeableEditor) getEditor();
 
-			switch (type)
+			Index index = getIndex(editorPart);
+			List<PropertyElement> properties = JSModelUtil.getProperties(editorPart, activeNode);
+			if (!CollectionsUtil.isEmpty(properties))
 			{
-				case IN_CONSTRUCTOR:
-				case IN_GLOBAL:
-				case IN_VARIABLE_NAME:
-				{
-					JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
-					final Index index = getIndex(editorPart);
-					List<PropertyElement> properties = queryHelper.getGlobals(index, activeNode.getText());
-					if (!CollectionsUtil.isEmpty(properties))
-					{
-						fHeader = JSModelFormatter.TEXT_HOVER.getHeader(properties, index.getRoot());
-						fDocs = JSModelFormatter.TEXT_HOVER.getDocumentation(properties);
-					}
-					break;
-				}
-
-				case IN_PROPERTY_NAME:
-					JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
-					final Index index = this.getIndex(editorPart);
-					JSGetPropertyNode propertyNode = ParseUtil.getGetPropertyNode(identifier.getTargetNode(),
-							identifier.getStatementNode());
-
-					List<String> types = ParseUtil.getParentObjectTypes(index, this.getEditorURI(editorPart),
-							identifier.getTargetNode(), propertyNode, hoverRegion.getOffset());
-					String typeName = null;
-					String methodName = null;
-
-					if (!CollectionsUtil.isEmpty(types))
-					{
-						typeName = types.get(0);
-						methodName = propertyNode.getLastChild().getText();
-					}
-
-					if (typeName != null && methodName != null)
-					{
-						List<PropertyElement> properties = queryHelper.getTypeMembers(index, typeName, methodName);
-						// filter to only functions
-						properties = CollectionsUtil.filter(properties, new IFilter<PropertyElement>()
-						{
-							public boolean include(PropertyElement item)
-							{
-								return (item instanceof FunctionElement);
-							}
-						});
-
-						if (!CollectionsUtil.isEmpty(properties))
-						{
-							fHeader = JSModelFormatter.TEXT_HOVER.getHeader(properties, index.getRoot());
-							fDocs = JSModelFormatter.TEXT_HOVER.getDocumentation(properties);
-						}
-					}
-					break;
-
-				case IN_OBJECT_LITERAL_PROPERTY:
-				case IN_PARAMETERS:
-				case IN_LABEL:
-				case UNKNOWN:
-				case NONE:
-				default:
-					return null;
+				fHeader = JSModelFormatter.TEXT_HOVER.getHeader(properties, index.getRoot());
+				fDocs = JSModelFormatter.TEXT_HOVER.getDocumentation(properties);
+				return getHoverInfo(activeNode, isBrowserControlAvailable(textViewer), null, editorPart, hoverRegion);
 			}
-			return getHoverInfo(activeNode, isBrowserControlAvailable(textViewer), null, editorPart, hoverRegion);
+
+			return null;
 		}
 		finally
 		{

@@ -25,7 +25,8 @@ Require-Bundle: org.eclipse.core.runtime,
  json.simple;bundle-version="1.0.0",
  com.aptana.buildpath.core,
  org.eclipse.compare,
- com.aptana.ui.epl
+ com.aptana.ui.epl,
+ org.eclipse.help
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin

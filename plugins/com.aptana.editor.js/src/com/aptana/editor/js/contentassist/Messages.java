@@ -15,6 +15,8 @@ public class Messages extends NLS
 	public static String JSContentAssistProcessor_KeywordDescription;
 	public static String JSContentAssistProcessor_KeywordLocation;
 	
+	public static String JSModelFormatter_Parameters;
+	public static String JSModelFormatter_Returns;
 	public static String JSTextHover_Example;
 	public static String JSTextHover_NoDescription;
 	public static String JSTextHover_Specification;
