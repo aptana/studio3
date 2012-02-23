@@ -8,21 +8,20 @@
 package com.aptana.editor.js.validator;
 
 import java.net.URI;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.IDocument;
 
 import com.aptana.core.build.IProblem;
 import com.aptana.core.build.Problem;
 import com.aptana.core.build.RequiredBuildParticipant;
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.EclipseUtil;
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.preferences.IPreferenceConstants;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.index.core.build.BuildContext;
@@ -50,49 +49,47 @@ public class JSParserValidator extends RequiredBuildParticipant
 		}
 
 		List<IProblem> problems = new ArrayList<IProblem>();
-		if (enableJSParseErrors())
+		try
 		{
-			try
-			{
-				context.getAST(); // Ensure a parse happened
+			context.getAST(); // Ensure a parse happened
 
+			// Add parse errors...
+			if (!CollectionsUtil.isEmpty(context.getParseErrors()))
+			{
 				String source = context.getContents();
 				URI uri = context.getURI();
 				String sourcePath = uri.toString();
-
-				// Add parse errors... FIXME Move this out of here!
+				IDocument doc = null;
+				if (source != null)
+				{
+					doc = new Document(source);
+				}
 				for (IParseError parseError : context.getParseErrors())
 				{
 					int severity = (parseError.getSeverity() == Severity.ERROR) ? IMarker.SEVERITY_ERROR
 							: IMarker.SEVERITY_WARNING;
 					int line = -1;
-					if (source != null)
+					try
 					{
-						line = getLineNumber(parseError.getOffset(), source);
+						if (doc != null)
+						{
+							line = doc.getLineOfOffset(parseError.getOffset()) + 1;
+						}
+					}
+					catch (BadLocationException e)
+					{
+						// ignore
 					}
 					problems.add(new Problem(severity, parseError.getMessage(), parseError.getOffset(), parseError
 							.getLength(), line, sourcePath));
 				}
-
 			}
-			catch (Exception e)
-			{
-				IdeLog.logError(JSPlugin.getDefault(), "Failed to parse for JS Parser Validation", e); //$NON-NLS-1$
-			}
+		}
+		catch (Exception e)
+		{
+			IdeLog.logError(JSPlugin.getDefault(), "Failed to parse for JS Parser Validation", e); //$NON-NLS-1$
 		}
 
 		context.putProblems(IJSConstants.JS_PROBLEM_MARKER_TYPE, problems);
 	}
-
-	private boolean enableJSParseErrors()
-	{
-		IEclipsePreferences store = EclipseUtil.instanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
-		return store.getBoolean(getEnableParseErrorPrefKey(IJSConstants.CONTENT_TYPE_JS), true);
-	}
-
-	private String getEnableParseErrorPrefKey(String language)
-	{
-		return MessageFormat.format("{0}:{1}", language, IPreferenceConstants.PARSE_ERROR_ENABLED); //$NON-NLS-1$
-	}
-
 }

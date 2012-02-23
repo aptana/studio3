@@ -16,11 +16,15 @@ import java.util.Map;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.IDocument;
 
 import com.aptana.core.build.IProblem;
 import com.aptana.core.build.Problem;
 import com.aptana.core.build.RequiredBuildParticipant;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.html.HTMLPlugin;
@@ -55,26 +59,34 @@ public class HTMLParseErrorValidator extends RequiredBuildParticipant
 			String source = context.getContents();
 			if (!StringUtil.isEmpty(source))
 			{
-				URI path = context.getURI();
-				String sourcePath = path.toString();
-
 				context.getAST(); // Ensure a parse has happened
 
 				// Add parse errors...
-				for (IParseError parseError : context.getParseErrors())
+				if (!CollectionsUtil.isEmpty(context.getParseErrors()))
 				{
-					int severity = (parseError.getSeverity() == Severity.ERROR) ? IMarker.SEVERITY_ERROR
-							: IMarker.SEVERITY_WARNING;
-					int line = -1;
-					if (source != null)
+					URI path = context.getURI();
+					String sourcePath = path.toString();
+					IDocument doc = new Document(source);
+					for (IParseError parseError : context.getParseErrors())
 					{
-						line = getLineNumber(parseError.getOffset(), source);
+						int severity = (parseError.getSeverity() == Severity.ERROR) ? IMarker.SEVERITY_ERROR
+								: IMarker.SEVERITY_WARNING;
+						int line = -1;
+						try
+						{
+							line = doc.getLineOfOffset(parseError.getOffset()) + 1;
+						}
+						catch (BadLocationException e)
+						{
+							// ignore
+						}
+
+						String language = parseError.getLangauge();
+						List<IProblem> langProblems = problems.get(language);
+						langProblems.add(new Problem(severity, parseError.getMessage(), parseError.getOffset(),
+								parseError.getLength(), line, sourcePath));
+						problems.put(language, langProblems);
 					}
-					String language = parseError.getLangauge();
-					List<IProblem> langProblems = problems.get(language);
-					langProblems.add(new Problem(severity, parseError.getMessage(), parseError.getOffset(), parseError
-							.getLength(), line, sourcePath));
-					problems.put(language, langProblems);
 				}
 			}
 		}

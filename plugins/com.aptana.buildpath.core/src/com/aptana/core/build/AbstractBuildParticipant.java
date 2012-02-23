@@ -217,6 +217,13 @@ public abstract class AbstractBuildParticipant implements IBuildParticipant, IEx
 		// no-op. Most impls won't do batch clean stuff
 	}
 
+	/**
+	 * @deprecated This method can causes performance issues. If possible, generate an IDocument once for the source and
+	 *             then query it for line numbers!
+	 * @param start
+	 * @param source
+	 * @return
+	 */
 	protected int getLineNumber(int start, String source)
 	{
 		if (start < 0 || start >= source.length())
@@ -227,7 +234,6 @@ public abstract class AbstractBuildParticipant implements IBuildParticipant, IEx
 		{
 			return 1;
 		}
-
 		Matcher m = StringUtil.LINE_SPLITTER.matcher(source.substring(0, start));
 		int line = 1;
 		while (m.find())
