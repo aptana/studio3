@@ -7,7 +7,6 @@
  */
 package com.aptana.editor.js.text;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -16,6 +15,8 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 
+import com.aptana.core.IMap;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.editor.common.text.RubyRegexpAutoIndentStrategy;
 import com.aptana.editor.js.contentassist.ParseUtil;
 
@@ -33,45 +34,20 @@ public class JSAutoIndentStrategy extends RubyRegexpAutoIndentStrategy
 
 	/*
 	 * (non-Javadoc)
-	 * @see
-	 * com.aptana.editor.common.text.CommonAutoIndentStrategy#getAutoIndentAfterNewLine(org.eclipse.jface.text.IDocument
-	 * , org.eclipse.jface.text.DocumentCommand)
-	 */
-	@Override
-	protected String getAutoIndentAfterNewLine(IDocument d, DocumentCommand c)
-	{
-		return super.getAutoIndentAfterNewLine(d, c);
-	}
-
-	/*
-	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.text.CommonAutoIndentStrategy#getAdditionalComments(java.lang.StringBuilder)
 	 */
 	@Override
 	protected List<String> getAdditionalComments(IDocument d, DocumentCommand c)
 	{
-		return createJSDocTags(d, c.offset);
-	}
-
-	/**
-	 * Creates the Javadoc tags for newly inserted comments.
-	 * 
-	 * @param document
-	 *            the document
-	 * @param offset
-	 *            the offset into the document where we're editing
-	 */
-	private List<String> createJSDocTags(IDocument document, int offset)
-	{
-		List<String> params = ParseUtil.getFunctionParameters(document, offset);
-		ArrayList<String> result = new ArrayList<String>();
-
-		for (int i = 0; i < params.size(); i++)
+		List<String> params = ParseUtil.getFunctionParameters(d, c.offset);
+		List<String> results = CollectionsUtil.map(params, new IMap<String, String>()
 		{
-			result.add("@param {Object} " + params.get(i)); //$NON-NLS-1$
-		}
+			public String map(String item)
+			{
+				return "@param {Object} " + item; //$NON-NLS-1$
+			}
+		});
 
-		return result;
+		return results;
 	}
-
 }

@@ -200,7 +200,7 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 				{
 					IRegion nextLineInfo = d.getLineInformationOfOffset(c.offset + 1);
 					String nextLine = d.get(nextLineInfo.getOffset(), nextLineInfo.getLength()).trim();
-					if (!StringUtil.startsWith(nextLine, COMMENT_CHAR) || nextLine.endsWith(COMMENT_END))
+					if (StringUtil.startsWith(nextLine, COMMENT_CHAR) || nextLine.endsWith(COMMENT_END))
 					{
 						return buf.toString();
 					}
