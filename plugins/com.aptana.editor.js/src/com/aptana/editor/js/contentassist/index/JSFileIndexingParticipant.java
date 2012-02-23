@@ -33,6 +33,7 @@ import com.aptana.editor.js.inferencing.JSSymbolTypeInferrer;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSInvokeNode;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
+import com.aptana.editor.js.parsing.ast.JSStringNode;
 import com.aptana.index.core.AbstractFileIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.build.BuildContext;
@@ -326,7 +327,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 			{
 				IParseNode arguments = invocation.getArguments();
 				IParseNode firstArgument = (arguments != null) ? arguments.getFirstChild() : null;
-				String text = (firstArgument != null) ? firstArgument.getText() : null;
+				String text = (firstArgument instanceof JSStringNode) ? firstArgument.getText() : null;
 
 				if (text != null && text.length() >= 2)
 				{
