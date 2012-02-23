@@ -7,10 +7,13 @@
  */
 package com.aptana.editor.js.parsing.ast;
 
-import com.aptana.parsing.ast.TextNode;
+import com.aptana.parsing.ast.IParseNodeAttribute;
+import com.aptana.parsing.ast.ParseNodeAttribute;
 
 public abstract class JSPrimitiveNode extends JSNode
 {
+	private String fText;
+
 	/**
 	 * JSPrimitiveNode
 	 * 
@@ -23,7 +26,17 @@ public abstract class JSPrimitiveNode extends JSNode
 	{
 		super(type);
 
-		addChild(new TextNode(text));
+		fText = text;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseNode#getAttributes()
+	 */
+	@Override
+	public IParseNodeAttribute[] getAttributes()
+	{
+		return new IParseNodeAttribute[] { new ParseNodeAttribute(this, "value", getText()) }; //$NON-NLS-1$
 	}
 
 	/*
@@ -48,7 +61,7 @@ public abstract class JSPrimitiveNode extends JSNode
 	@Override
 	public String getText()
 	{
-		return getFirstChild().getText();
+		return fText;
 	}
 
 	/*
@@ -59,17 +72,5 @@ public abstract class JSPrimitiveNode extends JSNode
 	public int hashCode()
 	{
 		return 31 * super.hashCode() + getText().hashCode();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.ParseNode#setLocation(int, int)
-	 */
-	@Override
-	public void setLocation(int start, int end)
-	{
-		super.setLocation(start, end);
-
-		((TextNode) getFirstChild()).setLocation(start, end);
 	}
 }

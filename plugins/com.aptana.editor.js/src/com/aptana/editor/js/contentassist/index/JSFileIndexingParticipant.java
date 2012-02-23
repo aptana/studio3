@@ -61,7 +61,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 		try
 		{
-			REQUIRE_INVOCATIONS = new ParseNodeXPath("//invoke[identifier[position() = 1 and text() = 'require']]"); //$NON-NLS-1$
+			REQUIRE_INVOCATIONS = new ParseNodeXPath("//invoke[identifier[position() = 1 and @value = 'require']]"); //$NON-NLS-1$
 		}
 		catch (JaxenException e)
 		{
