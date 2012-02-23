@@ -84,7 +84,7 @@ public class TextNode extends ParseNode
 	 */
 	public String getElementName()
 	{
-		return "#text";
+		return "#text"; //$NON-NLS-1$
 	}
 
 	/*
