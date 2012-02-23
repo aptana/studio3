@@ -1,5 +1,6 @@
 package com.aptana.core.build;
 
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -9,6 +10,7 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.resources.IProject;
@@ -199,6 +201,13 @@ public class UnifiedBuilderTest extends TestCase
 
 	public void testFullBuild() throws Exception
 	{
+		IFolder folder = project.getFolder("folder");
+		folder.create(true, true, null);
+
+		final String fileName = "subfile.txt";
+		IFile file = folder.getFile(fileName);
+		file.create(new ByteArrayInputStream("Hello world!".getBytes()), true, null);
+
 		context.checking(new Expectations()
 		{
 			{
@@ -211,10 +220,14 @@ public class UnifiedBuilderTest extends TestCase
 				oneOf(participant).buildStarting(with(project), with(IncrementalProjectBuilder.FULL_BUILD),
 						with(any(IProgressMonitor.class)));
 				// build the .project file
-
 				oneOf(participant).buildFile(
 						(BuildContext) with(Matchers.allOf(Matchers.is(BuildContext.class),
-								Matchers.hasProperty("name", equal(".project")))), with(any(IProgressMonitor.class)));
+								Matchers.hasProperty("name", equal(IProjectDescription.DESCRIPTION_FILE_NAME)))),
+						with(any(IProgressMonitor.class)));
+				// build the subfile
+				oneOf(participant).buildFile(
+						(BuildContext) with(Matchers.allOf(Matchers.is(BuildContext.class),
+								Matchers.hasProperty("name", equal(fileName)))), with(any(IProgressMonitor.class)));
 				// build ending
 				oneOf(participant).buildEnding(with(any(IProgressMonitor.class)));
 			}
@@ -287,7 +300,8 @@ public class UnifiedBuilderTest extends TestCase
 
 				oneOf(participant).buildFile(
 						(BuildContext) with(Matchers.allOf(Matchers.is(BuildContext.class),
-								Matchers.hasProperty("name", equal(".project")))), with(any(IProgressMonitor.class)));
+								Matchers.hasProperty("name", equal(IProjectDescription.DESCRIPTION_FILE_NAME)))),
+						with(any(IProgressMonitor.class)));
 				// build ending
 				oneOf(participant).buildEnding(with(any(IProgressMonitor.class)));
 			}
@@ -315,7 +329,8 @@ public class UnifiedBuilderTest extends TestCase
 				// delete the .project file
 				oneOf(participant).deleteFile(
 						(BuildContext) with(Matchers.allOf(Matchers.is(BuildContext.class),
-								Matchers.hasProperty("name", equal(".project")))), with(any(IProgressMonitor.class)));
+								Matchers.hasProperty("name", equal(IProjectDescription.DESCRIPTION_FILE_NAME)))),
+						with(any(IProgressMonitor.class)));
 				// build ending
 				oneOf(participant).buildEnding(with(any(IProgressMonitor.class)));
 			}
@@ -343,7 +358,8 @@ public class UnifiedBuilderTest extends TestCase
 				// build the .project file
 				oneOf(participant).buildFile(
 						(BuildContext) with(Matchers.allOf(Matchers.is(BuildContext.class),
-								Matchers.hasProperty("name", equal(".project")))), with(any(IProgressMonitor.class)));
+								Matchers.hasProperty("name", equal(IProjectDescription.DESCRIPTION_FILE_NAME)))),
+						with(any(IProgressMonitor.class)));
 				// build ending
 				oneOf(participant).buildEnding(with(any(IProgressMonitor.class)));
 			}
@@ -367,6 +383,140 @@ public class UnifiedBuilderTest extends TestCase
 			}
 		});
 		builder.clean(new NullProgressMonitor());
+		context.assertIsSatisfied();
+	}
+
+	public void testDontBuildDerivedFiles() throws Exception
+	{
+		IFile file = project.getFile(IProjectDescription.DESCRIPTION_FILE_NAME);
+		file.setDerived(true, null);
+
+		context.checking(new Expectations()
+		{
+			{
+				allowing(participant).isEnabled(BuildType.BUILD);
+				will(returnValue(true));
+				allowing(participant).getContentTypes();
+				will(returnValue(Collections.emptySet()));
+
+				// Call build starting
+				oneOf(participant).buildStarting(with(project), with(IncrementalProjectBuilder.FULL_BUILD),
+						with(any(IProgressMonitor.class)));
+				// Don't build the .project file
+				never(participant).buildFile(
+						(BuildContext) with(Matchers.allOf(Matchers.is(BuildContext.class),
+								Matchers.hasProperty("name", equal(IProjectDescription.DESCRIPTION_FILE_NAME)))),
+						with(any(IProgressMonitor.class)));
+				// build ending
+				oneOf(participant).buildEnding(with(any(IProgressMonitor.class)));
+			}
+		});
+		builder.build(IncrementalProjectBuilder.FULL_BUILD, null, new NullProgressMonitor());
+		context.assertIsSatisfied();
+	}
+
+	public void testDontBuildFilesUnderDerivedAncestor() throws Exception
+	{
+		IFolder folder = project.getFolder("build");
+		folder.create(true, true, null);
+
+		final String subFileName = "subfile.txt";
+		IFile subFile = folder.getFile(subFileName);
+		subFile.create(new ByteArrayInputStream("Hello world!".getBytes()), true, null);
+		folder.setDerived(true, null);
+
+		context.checking(new Expectations()
+		{
+			{
+				allowing(participant).isEnabled(BuildType.BUILD);
+				will(returnValue(true));
+				allowing(participant).getContentTypes();
+				will(returnValue(Collections.emptySet()));
+
+				// Call build starting
+				oneOf(participant).buildStarting(with(project), with(IncrementalProjectBuilder.FULL_BUILD),
+						with(any(IProgressMonitor.class)));
+				// Build the .project file
+				oneOf(participant).buildFile(
+						(BuildContext) with(Matchers.allOf(Matchers.is(BuildContext.class),
+								Matchers.hasProperty("name", equal(IProjectDescription.DESCRIPTION_FILE_NAME)))),
+						with(any(IProgressMonitor.class)));
+				// Don't build the sub-file
+				never(participant).buildFile(
+						(BuildContext) with(Matchers.allOf(Matchers.is(BuildContext.class),
+								Matchers.hasProperty("name", equal(subFileName)))), with(any(IProgressMonitor.class)));
+				// build ending
+				oneOf(participant).buildEnding(with(any(IProgressMonitor.class)));
+			}
+		});
+		builder.build(IncrementalProjectBuilder.FULL_BUILD, null, new NullProgressMonitor());
+		context.assertIsSatisfied();
+	}
+
+	public void testDontBuildTeamPrivateFiles() throws Exception
+	{
+		IFile file = project.getFile(IProjectDescription.DESCRIPTION_FILE_NAME);
+		file.setTeamPrivateMember(true);
+
+		context.checking(new Expectations()
+		{
+			{
+				allowing(participant).isEnabled(BuildType.BUILD);
+				will(returnValue(true));
+				allowing(participant).getContentTypes();
+				will(returnValue(Collections.emptySet()));
+
+				// Call build starting
+				oneOf(participant).buildStarting(with(project), with(IncrementalProjectBuilder.FULL_BUILD),
+						with(any(IProgressMonitor.class)));
+				// Don't build the .project file
+				never(participant).buildFile(
+						(BuildContext) with(Matchers.allOf(Matchers.is(BuildContext.class),
+								Matchers.hasProperty("name", equal(IProjectDescription.DESCRIPTION_FILE_NAME)))),
+						with(any(IProgressMonitor.class)));
+				// build ending
+				oneOf(participant).buildEnding(with(any(IProgressMonitor.class)));
+			}
+		});
+		builder.build(IncrementalProjectBuilder.FULL_BUILD, null, new NullProgressMonitor());
+		context.assertIsSatisfied();
+	}
+
+	public void testDontBuildFilesUnderTeamPrivateAncestor() throws Exception
+	{
+		IFolder folder = project.getFolder("git");
+		folder.create(true, true, null);
+		folder.setTeamPrivateMember(true);
+
+		final String subFileName = "subfile.txt";
+		IFile subFile = folder.getFile(subFileName);
+		subFile.create(new ByteArrayInputStream("Hello world!".getBytes()), true, null);
+
+		context.checking(new Expectations()
+		{
+			{
+				allowing(participant).isEnabled(BuildType.BUILD);
+				will(returnValue(true));
+				allowing(participant).getContentTypes();
+				will(returnValue(Collections.emptySet()));
+
+				// Call build starting
+				oneOf(participant).buildStarting(with(project), with(IncrementalProjectBuilder.FULL_BUILD),
+						with(any(IProgressMonitor.class)));
+				// Build the .project file
+				oneOf(participant).buildFile(
+						(BuildContext) with(Matchers.allOf(Matchers.is(BuildContext.class),
+								Matchers.hasProperty("name", equal(IProjectDescription.DESCRIPTION_FILE_NAME)))),
+						with(any(IProgressMonitor.class)));
+				// Don't build the sub-file
+				never(participant).buildFile(
+						(BuildContext) with(Matchers.allOf(Matchers.is(BuildContext.class),
+								Matchers.hasProperty("name", equal(subFileName)))), with(any(IProgressMonitor.class)));
+				// build ending
+				oneOf(participant).buildEnding(with(any(IProgressMonitor.class)));
+			}
+		});
+		builder.build(IncrementalProjectBuilder.FULL_BUILD, null, new NullProgressMonitor());
 		context.assertIsSatisfied();
 	}
 }

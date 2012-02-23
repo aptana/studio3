@@ -42,6 +42,7 @@ import com.aptana.core.build.IProblem;
 import com.aptana.core.build.ReconcileContext;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.ResourceUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonAnnotationModel;
 import com.aptana.editor.common.CommonEditorPlugin;
@@ -276,7 +277,8 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	private void runParticipants(IProgressMonitor monitor)
 	{
 		final IFile file = getFile();
-		if (file == null)
+		// We only want to build files that exist and aren't derived or team private!
+		if (ResourceUtil.shouldIgnore(file))
 		{
 			return;
 		}

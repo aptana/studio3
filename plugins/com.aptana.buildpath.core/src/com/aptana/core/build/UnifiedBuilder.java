@@ -39,6 +39,7 @@ import com.aptana.core.build.IBuildParticipant.BuildType;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.IMarkerConstants;
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.ResourceUtil;
 import com.aptana.index.core.build.BuildContext;
 
 public class UnifiedBuilder extends IncrementalProjectBuilder
@@ -293,9 +294,17 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 			return;
 		}
 
-		SubMonitor sub = SubMonitor.convert(monitor, 15 * files.size());
+		SubMonitor sub = SubMonitor.convert(monitor, 16 * files.size());
 		for (IFile file : files)
 		{
+			// We only want to build files that exist and aren't derived or team private!
+			if (ResourceUtil.shouldIgnore(file))
+			{
+				sub.worked(16);
+				continue;
+			}
+			sub.worked(1);
+
 			BuildContext context = new BuildContext(file);
 			sub.worked(1);
 
