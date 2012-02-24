@@ -37,14 +37,17 @@ import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.common.contentassist.ILexemeProvider;
 import com.aptana.editor.common.contentassist.UserAgentManager;
+import com.aptana.editor.common.util.EditorUtil;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.JSLanguageConstants;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSSourceConfiguration;
 import com.aptana.editor.js.JSTypeConstants;
+import com.aptana.editor.js.contentassist.index.IJSIndexConstants;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.ParameterElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
+import com.aptana.editor.js.inferencing.JSNodeTypeInferrer;
 import com.aptana.editor.js.inferencing.JSPropertyCollection;
 import com.aptana.editor.js.inferencing.JSScope;
 import com.aptana.editor.js.parsing.JSFlexLexemeProvider;
@@ -52,10 +55,12 @@ import com.aptana.editor.js.parsing.JSFlexScanner;
 import com.aptana.editor.js.parsing.JSParseState;
 import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSArgumentsNode;
+import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSGetPropertyNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSObjectNode;
+import com.aptana.editor.js.parsing.ast.JSParseRootNode;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import com.aptana.index.core.Index;
 import com.aptana.parsing.ParserPoolFactory;
@@ -256,6 +261,64 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	}
 
 	/**
+	 * addProposal
+	 * 
+	 * @param proposals
+	 * @param property
+	 * @param offset
+	 * @param projectURI
+	 * @param overriddenLocation
+	 */
+	private void addProposal(Set<ICompletionProposal> proposals, PropertyElement property, int offset, URI projectURI,
+			String overriddenLocation)
+	{
+		List<String> userAgentNameList = property.getUserAgentNames();
+		String[] userAgentNames = userAgentNameList.toArray(new String[userAgentNameList.size()]);
+
+		addProposal(proposals, property, offset, projectURI, overriddenLocation, userAgentNames);
+	}
+
+	/**
+	 * addProposal
+	 * 
+	 * @param proposals
+	 * @param property
+	 * @param offset
+	 * @param projectURI
+	 * @param overriddenLocation
+	 * @param userAgentNames
+	 */
+	private void addProposal(Set<ICompletionProposal> proposals, PropertyElement property, int offset, URI projectURI,
+			String overriddenLocation, String[] userAgentNames)
+	{
+		if (isActiveByUserAgent(userAgentNames))
+		{
+			// calculate what text will be replaced
+			int replaceLength = 0;
+
+			if (replaceRange != null)
+			{
+				offset = replaceRange.getStartingOffset(); // $codepro.audit.disable questionableAssignment
+				replaceLength = replaceRange.getLength();
+			}
+
+			PropertyElementProposal proposal = new PropertyElementProposal(property, offset, replaceLength, projectURI);
+			proposal.setTriggerCharacters(getProposalTriggerCharacters());
+			if (!StringUtil.isEmpty(overriddenLocation))
+			{
+				proposal.setFileLocation(overriddenLocation);
+			}
+
+			Image[] userAgents = UserAgentManager.getInstance().getUserAgentImages(getNatureIds(), userAgentNames);
+			proposal.setUserAgentImages(userAgents);
+
+			// add the proposal to the list
+			proposals.add(proposal);
+		}
+
+	}
+
+	/**
 	 * addProposal - The display name is used as the insertion text
 	 * 
 	 * @param proposals
@@ -350,6 +413,73 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	}
 
 	/**
+	 * addThisProposals
+	 * 
+	 * @param proposals
+	 * @param offset
+	 */
+	protected void addThisProperties(Set<ICompletionProposal> proposals, int offset)
+	{
+		// find containing function or JSParseRootNode
+		IParseNode node = getActiveASTNode(offset);
+
+		while (!(node instanceof JSFunctionNode) && !(node instanceof JSParseRootNode))
+		{
+			node = node.getParent();
+		}
+
+		if (node instanceof JSFunctionNode)
+		{
+			JSFunctionNode function = (JSFunctionNode) node;
+
+			// collect all this.property assignments
+			ThisAssignmentCollector collector = new ThisAssignmentCollector();
+			((JSNode) function.getBody()).accept(collector);
+			List<JSAssignmentNode> assignments = collector.getAssignments();
+
+			if (!CollectionsUtil.isEmpty(assignments))
+			{
+				JSScope globalScope = ParseUtil.getGlobalScope(targetNode);
+
+				if (globalScope != null)
+				{
+					JSScope localScope = globalScope.getScopeAtOffset(offset);
+					Index index = getIndex();
+					URI location = EditorUtil.getURI(editor);
+					String typeName = StringUtil.concat(getNestedFunctionTypeName(function)
+							+ IJSIndexConstants.NESTED_TYPE_SEPARATOR + "this"); //$NON-NLS-1$
+
+					// infer each property and add proposal
+					for (JSAssignmentNode assignment : assignments)
+					{
+						IParseNode lhs = assignment.getLeftHandSide();
+						IParseNode rhs = assignment.getRightHandSide();
+						String name = lhs.getLastChild().getText();
+
+						JSNodeTypeInferrer nodeInferrer = new JSNodeTypeInferrer(localScope, index, location);
+						((JSNode) rhs).accept(nodeInferrer);
+						List<String> types = nodeInferrer.getTypes();
+
+						PropertyElement property = new PropertyElement();
+						property.setName(name);
+						property.setHasAllUserAgents();
+
+						if (!CollectionsUtil.isEmpty(types))
+						{
+							for (String type : types)
+							{
+								property.addType(type);
+							}
+						}
+
+						addProposal(proposals, property, offset, getProjectURI(), typeName);
+					}
+				}
+			}
+		}
+	}
+
+	/**
 	 * addTypeProperties
 	 * 
 	 * @param proposals
@@ -369,48 +499,11 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		// add properties and methods
 		List<PropertyElement> properties = indexHelper.getTypeMembers(index, allTypes);
 		URI projectURI = getProjectURI();
+
 		for (PropertyElement property : CollectionsUtil.filter(properties, isVisibleFilter))
 		{
 			addProposal(proposals, property, offset, projectURI, null);
 		}
-	}
-
-	private void addProposal(Set<ICompletionProposal> proposals, PropertyElement property, int offset, URI projectURI,
-			String overridenLocation)
-	{
-		List<String> userAgentNameList = property.getUserAgentNames();
-		String[] userAgentNames = userAgentNameList.toArray(new String[userAgentNameList.size()]);
-		addProposal(proposals, property, offset, projectURI, overridenLocation, userAgentNames);
-	}
-
-	private void addProposal(Set<ICompletionProposal> proposals, PropertyElement property, int offset, URI projectURI,
-			String overridenLocation, String[] userAgentNames)
-	{
-		if (isActiveByUserAgent(userAgentNames))
-		{
-			// calculate what text will be replaced
-			int replaceLength = 0;
-
-			if (replaceRange != null)
-			{
-				offset = replaceRange.getStartingOffset(); // $codepro.audit.disable questionableAssignment
-				replaceLength = replaceRange.getLength();
-			}
-
-			PropertyElementProposal proposal = new PropertyElementProposal(property, offset, replaceLength, projectURI);
-			proposal.setTriggerCharacters(getProposalTriggerCharacters());
-			if (!StringUtil.isEmpty(overridenLocation))
-			{
-				proposal.setFileLocation(overridenLocation);
-			}
-
-			Image[] userAgents = UserAgentManager.getInstance().getUserAgentImages(getNatureIds(), userAgentNames);
-			proposal.setUserAgentImages(userAgents);
-
-			// add the proposal to the list
-			proposals.add(proposal);
-		}
-
 	}
 
 	/*
@@ -505,7 +598,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		IDocument document = viewer.getDocument();
 
 		// determine the content assist location type
-		LocationType location = getLocation(document, offset);
+		LocationType location = getLocationType(document, offset);
 
 		// process the resulting location
 		switch (location)
@@ -525,6 +618,10 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 			case IN_OBJECT_LITERAL_PROPERTY:
 				addObjectLiteralProperties(result, viewer, offset);
+				break;
+
+			case IN_THIS:
+				addThisProperties(result, offset);
 				break;
 
 			default:
@@ -697,7 +794,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 			// grab the content assist location type for the symbol before the arguments list
 			int functionOffset = node.getStartingOffset();
-			LocationType location = getLocation(viewer.getDocument(), functionOffset);
+			LocationType location = getLocationType(viewer.getDocument(), functionOffset);
 
 			// restore replace range
 			replaceRange = range;
@@ -750,33 +847,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					}
 				}
 			}
-		}
-
-		return result;
-	}
-
-	/**
-	 * getLocation
-	 * 
-	 * @param lexemeProvider
-	 * @param offset
-	 * @return
-	 */
-	LocationType getLocation(IDocument document, int offset)
-	{
-		JSLocationIdentifier identifier = new JSLocationIdentifier(offset, getActiveASTNode(offset - 1));
-		LocationType result = identifier.getType();
-
-		targetNode = identifier.getTargetNode();
-		statementNode = identifier.getStatementNode();
-		replaceRange = identifier.getReplaceRange();
-
-		// if we couldn't determine the location type with the AST, then
-		// fallback to using lexemes
-		if (result == LocationType.UNKNOWN)
-		{
-			// NOTE: this method call sets replaceRange as a side-effect
-			result = getLocationByLexeme(document, offset);
 		}
 
 		return result;
@@ -903,6 +973,33 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	}
 
 	/**
+	 * getLocation
+	 * 
+	 * @param lexemeProvider
+	 * @param offset
+	 * @return
+	 */
+	LocationType getLocationType(IDocument document, int offset)
+	{
+		JSLocationIdentifier identifier = new JSLocationIdentifier(offset, getActiveASTNode(offset - 1));
+		LocationType result = identifier.getType();
+
+		targetNode = identifier.getTargetNode();
+		statementNode = identifier.getStatementNode();
+		replaceRange = identifier.getReplaceRange();
+
+		// if we couldn't determine the location type with the AST, then
+		// fallback to using lexemes
+		if (result == LocationType.UNKNOWN)
+		{
+			// NOTE: this method call sets replaceRange as a side-effect
+			result = getLocationByLexeme(document, offset);
+		}
+
+		return result;
+	}
+
+	/**
 	 * @param result
 	 * @return
 	 */
@@ -947,6 +1044,28 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 		// remove duplicates, merging duplicates into a single proposal
 		return CollectionsUtil.filter(proposals, new ProposalMerger());
+	}
+
+	private String getNestedFunctionTypeName(JSFunctionNode function)
+	{
+		List<String> names = new ArrayList<String>();
+		IParseNode current = function;
+
+		while (current != null && !(current instanceof JSParseRootNode))
+		{
+			if (current instanceof JSFunctionNode)
+			{
+				JSFunctionNode currentFunction = (JSFunctionNode) current;
+
+				names.add(currentFunction.getName().getText());
+			}
+
+			current = current.getParent();
+		}
+
+		Collections.reverse(names);
+
+		return StringUtil.join(IJSIndexConstants.NESTED_TYPE_SEPARATOR, names);
 	}
 
 	/**

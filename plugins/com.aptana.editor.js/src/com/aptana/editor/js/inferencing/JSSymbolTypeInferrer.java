@@ -90,7 +90,7 @@ public class JSSymbolTypeInferrer
 				JSNode value = values.get(i);
 				String candidate = JSTypeUtil.getName(value);
 
-				if (candidate != null && candidate.length() > 0)
+				if (!StringUtil.isEmpty(candidate))
 				{
 					name = candidate;
 					break;
@@ -98,12 +98,13 @@ public class JSSymbolTypeInferrer
 			}
 		}
 
+		// if no generated from values, then use property chain as type name
 		if (StringUtil.isEmpty(name))
 		{
 			name = property.getQualifiedName();
 		}
 
-		// generate a unique name if we didn't find one
+		// if still no name, then generate a unique name
 		if (StringUtil.isEmpty(name))
 		{
 			name = JSTypeUtil.getUniqueTypeName();

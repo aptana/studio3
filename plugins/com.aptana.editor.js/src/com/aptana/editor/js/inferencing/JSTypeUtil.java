@@ -432,8 +432,8 @@ public class JSTypeUtil
 			}
 		}
 
-		// Don't allow certain names to avoid confusion an to prevent overwriting
-		// core types
+		// Don't allow certain names to avoid confusion and to prevent overwriting
+		// of core types
 		if (FILTERED_TYPES.contains(result))
 		{
 			result = null;

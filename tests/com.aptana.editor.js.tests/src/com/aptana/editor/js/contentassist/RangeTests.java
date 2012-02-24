@@ -107,7 +107,7 @@ public class RangeTests extends JSEditorBasedTests
 
 		// discard type since we only care about the side-effect that sets the replace range
 		JSContentAssistProcessor processor = new JSContentAssistProcessor((AbstractThemeableEditor) this.editor);
-		processor.getLocation(document, offset);
+		processor.getLocationType(document, offset);
 
 		IRange range = processor.getReplaceRange();
 		assertNotNull(range);

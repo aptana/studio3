@@ -484,4 +484,37 @@ public class JSContentAssistProposalTests extends JSEditorBasedTests
 		);
 		// @formatter:on
 	}
+
+	public void testThisInFunction()
+	{
+		// @formatter:off
+		this.checkProposals(
+			"contentAssist/function-with-this.js",
+			"property",
+			"method"
+		);
+		// @formatter:on
+	}
+
+	public void testThisInCurrentFunctionOnly()
+	{
+		// @formatter:off
+		this.checkProposals(
+			"contentAssist/functions-with-this.js",
+			"property",
+			"method"
+		);
+		// @formatter:on
+	}
+
+	public void testThisInNestedFunction()
+	{
+		// @formatter:off
+		this.checkProposals(
+			"contentAssist/nested-functions-with-this.js",
+			"ghi",
+			"jkl"
+		);
+		// @formatter:on
+	}
 }
