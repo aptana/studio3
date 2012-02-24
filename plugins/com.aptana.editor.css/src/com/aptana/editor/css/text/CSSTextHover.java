@@ -66,7 +66,7 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 	 * org.eclipse.ui.IEditorPart, org.eclipse.jface.text.IRegion)
 	 */
 	@Override
-	protected String getHeader(Object element, IEditorPart editorPart, IRegion hoverRegion)
+	public String getHeader(Object element, IEditorPart editorPart, IRegion hoverRegion)
 	{
 		if (element instanceof RGB)
 		{
@@ -81,7 +81,7 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 	 * org.eclipse.ui.IEditorPart, org.eclipse.jface.text.IRegion)
 	 */
 	@Override
-	protected String getDocumentation(Object element, IEditorPart editorPart, IRegion hoverRegion)
+	public String getDocumentation(Object element, IEditorPart editorPart, IRegion hoverRegion)
 	{
 		if (info instanceof String)
 		{
@@ -101,7 +101,7 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 	 * ToolBarManager, com.aptana.editor.common.hover.CustomBrowserInformationControl)
 	 */
 	@Override
-	protected void populateToolbarActions(ToolBarManager tbm, CustomBrowserInformationControl iControl)
+	public void populateToolbarActions(ToolBarManager tbm, CustomBrowserInformationControl iControl)
 	{
 		// No toolbar actions for CSS (yet)
 

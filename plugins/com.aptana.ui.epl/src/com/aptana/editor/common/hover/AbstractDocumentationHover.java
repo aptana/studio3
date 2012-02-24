@@ -165,7 +165,7 @@ public abstract class AbstractDocumentationHover extends AbstractCommonTextHover
 	 * @param hoverRegion
 	 * @return A header string, or <code>null</code> to indicate that there is no header.
 	 */
-	protected abstract String getHeader(Object element, IEditorPart editorPart, IRegion hoverRegion);
+	public abstract String getHeader(Object element, IEditorPart editorPart, IRegion hoverRegion);
 
 	/**
 	 * Returns the documentation string that will be placed inside the hover area.<br>
@@ -177,7 +177,7 @@ public abstract class AbstractDocumentationHover extends AbstractCommonTextHover
 	 * @param hoverRegion
 	 * @return A documentation string.
 	 */
-	protected abstract String getDocumentation(Object element, IEditorPart editorPart, IRegion hoverRegion);
+	public abstract String getDocumentation(Object element, IEditorPart editorPart, IRegion hoverRegion);
 
 	/**
 	 * Returns the background color
@@ -216,7 +216,7 @@ public abstract class AbstractDocumentationHover extends AbstractCommonTextHover
 	 * @param tbm
 	 * @param iControl
 	 */
-	protected abstract void populateToolbarActions(ToolBarManager tbm, CustomBrowserInformationControl iControl);
+	public abstract void populateToolbarActions(ToolBarManager tbm, CustomBrowserInformationControl iControl);
 
 	/**
 	 * Install a link listener that should handle links inside the hover popup.

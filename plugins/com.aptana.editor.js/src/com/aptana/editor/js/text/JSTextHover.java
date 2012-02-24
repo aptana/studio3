@@ -152,7 +152,7 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 	 * org.eclipse.ui.IEditorPart, org.eclipse.jface.text.IRegion)
 	 */
 	@Override
-	protected String getHeader(Object element, IEditorPart editorPart, IRegion hoverRegion)
+	public String getHeader(Object element, IEditorPart editorPart, IRegion hoverRegion)
 	{
 		return fHeader;
 	}
@@ -163,7 +163,7 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 	 * org.eclipse.ui.IEditorPart, org.eclipse.jface.text.IRegion)
 	 */
 	@Override
-	protected String getDocumentation(Object element, IEditorPart editorPart, IRegion hoverRegion)
+	public String getDocumentation(Object element, IEditorPart editorPart, IRegion hoverRegion)
 	{
 		return fDocs;
 	}
