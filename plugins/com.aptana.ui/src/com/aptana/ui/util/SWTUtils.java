@@ -8,6 +8,7 @@
 package com.aptana.ui.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.jface.resource.ColorRegistry;
@@ -290,7 +291,7 @@ public class SWTUtils
 	 * 
 	 * @param controls
 	 */
-	public static void resizeControlWidthInGrid(List<Control> controls)
+	public static void resizeControlWidthInGrid(Collection<Control> controls)
 	{
 		int largestWidth = SWT.DEFAULT;
 		List<GridData> gridDatas = new ArrayList<GridData>();
