@@ -110,7 +110,6 @@ public class JSModelFormatter
 			{
 				FunctionElement function = (FunctionElement) prop;
 				List<String> result = new ArrayList<String>();
-				StringBuilder buffer = new StringBuilder();
 
 				// line 1: function name with argument names
 				result.add(getHeader(function, null));
@@ -118,13 +117,14 @@ public class JSModelFormatter
 				// line 2..n: one line for each argument description
 				for (ParameterElement parameter : function.getParameters())
 				{
-					String description = parameter.getDescription();
-
+					StringBuilder buffer = new StringBuilder();
 					buffer.setLength(0);
 					buffer.append(' ').append(BULLET).append('\t').append(parameter.getName());
 
+					String description = parameter.getDescription();
 					if (!StringUtil.isEmpty(description))
 					{
+						description = StringUtil.stripHTMLTags(description);
 						buffer.append(':').append(FileUtil.NEW_LINE).append(" \t").append(description); //$NON-NLS-1$
 					}
 
