@@ -10,8 +10,6 @@ package com.aptana.editor.js.text;
 import java.net.URI;
 import java.util.List;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
@@ -23,10 +21,7 @@ import org.eclipse.jface.text.ITextHoverExtension2;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
-import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IFileEditorInput;
-import org.eclipse.ui.IURIEditorInput;
 
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.CollectionsUtil;
@@ -34,6 +29,7 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.contentassist.CommonTextHover;
 import com.aptana.editor.common.hover.CustomBrowserInformationControl;
 import com.aptana.editor.common.hover.DocumentationBrowserInformationControlInput;
+import com.aptana.editor.common.util.EditorUtil;
 import com.aptana.editor.js.contentassist.JSLocationIdentifier;
 import com.aptana.editor.js.contentassist.JSModelFormatter;
 import com.aptana.editor.js.contentassist.LocationType;
@@ -41,7 +37,6 @@ import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.hyperlink.JSHyperlinkDetector;
 import com.aptana.editor.js.internal.JSModelUtil;
 import com.aptana.index.core.Index;
-import com.aptana.index.core.IndexManager;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.ui.epl.UIEplPlugin;
 
@@ -126,12 +121,12 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 
 			// To avoid duplicating work, we generate the header and documentation together here
 			// and then getHeader and getDocumentation just return the values.
-			AbstractThemeableEditor editorPart = (AbstractThemeableEditor) getEditor();
+			AbstractThemeableEditor editorPart = getEditor(textViewer);
 
-			Index index = getIndex(editorPart);
 			List<PropertyElement> properties = JSModelUtil.getProperties(editorPart, activeNode);
 			if (!CollectionsUtil.isEmpty(properties))
 			{
+				Index index = getIndex(editorPart);
 				fHeader = JSModelFormatter.TEXT_HOVER.getHeader(properties, index.getRoot());
 				fDocs = JSModelFormatter.TEXT_HOVER.getDocumentation(properties);
 				return getHoverInfo(activeNode, isBrowserControlAvailable(textViewer), null, editorPart, hoverRegion);
@@ -199,7 +194,6 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 	{
 		IParseNode activeNode = this.getActiveNode(textViewer, offset);
 		IRegion result = null;
-
 		if (activeNode != null)
 		{
 			JSLocationIdentifier identifier = new JSLocationIdentifier(offset, activeNode);
@@ -225,7 +219,6 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 		{
 			result = new Region(offset, 0);
 		}
-
 		return result;
 	}
 
@@ -238,21 +231,7 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 	protected URI getEditorURI(IEditorPart editorPart)
 	{
 		AbstractThemeableEditor editor = (AbstractThemeableEditor) editorPart;
-		URI result = null;
-
-		if (editor != null)
-		{
-			IEditorInput editorInput = editor.getEditorInput();
-
-			if (editorInput instanceof IURIEditorInput)
-			{
-				IURIEditorInput fileEditorInput = (IURIEditorInput) editorInput;
-
-				result = fileEditorInput.getURI();
-			}
-		}
-
-		return result;
+		return EditorUtil.getURI(editor);
 	}
 
 	/**
@@ -264,22 +243,7 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 	protected Index getIndex(IEditorPart editorPart)
 	{
 		AbstractThemeableEditor editor = (AbstractThemeableEditor) editorPart;
-		Index result = null;
-
-		if (editor != null)
-		{
-			IEditorInput input = editor.getEditorInput();
-
-			if (input instanceof IFileEditorInput)
-			{
-				IFile file = ((IFileEditorInput) input).getFile();
-				IProject project = file.getProject();
-
-				result = IndexManager.getInstance().getIndex(project.getLocationURI());
-			}
-		}
-
-		return result;
+		return EditorUtil.getIndex(editor);
 	}
 
 	/**

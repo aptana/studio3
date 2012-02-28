@@ -1,3 +1,10 @@
+/**
+ * Aptana Studio
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.js.internal;
 
 import java.util.Collections;
@@ -25,7 +32,9 @@ public class JSModelUtil
 
 	public static List<PropertyElement> getProperties(AbstractThemeableEditor editor, IParseNode node)
 	{
-		JSLocationIdentifier identifier = new JSLocationIdentifier(node.getStartingOffset(), node);
+		// We add one because for var assignments, JSLI decrements by one, pushing us before the var name and returning
+		// no results.
+		JSLocationIdentifier identifier = new JSLocationIdentifier(node.getStartingOffset() + 1, node);
 		switch (identifier.getType())
 		{
 			case IN_CONSTRUCTOR:

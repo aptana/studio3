@@ -462,7 +462,7 @@ public class JSLocationIdentifier extends JSTreeWalker
 
 				if (this._offset < equalSign.getStart())
 				{
-					this.setType(LocationType.NONE);
+					this.setType(node.getIdentifier());
 				}
 				else if (this._offset < value.getStartingOffset())
 				{
