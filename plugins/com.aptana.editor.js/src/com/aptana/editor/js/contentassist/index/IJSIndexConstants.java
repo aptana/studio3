@@ -45,6 +45,7 @@ public interface IJSIndexConstants
 	static final String DELIMITER = "\0"; //$NON-NLS-1$
 	static final String SUB_DELIMITER = ","; //$NON-NLS-1$
 	static final String CORE = "JS Core"; //$NON-NLS-1$
+	static final String NESTED_TYPE_SEPARATOR = "#"; //$NON-NLS-1$
 
 	// index categories
 	static final String TYPE = PREFIX + "type"; //$NON-NLS-1$

@@ -31,11 +31,11 @@ import com.aptana.editor.common.preferences.IPreferenceConstants;
  */
 public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 {
-
+	private static final String SPACE = " "; //$NON-NLS-1$
 	protected static final char COMMENT_CHAR = '*';
-	protected static final String DOCUMENTATION_START = "/**";
-	protected static final String COMMENT_END = "*/";
-	protected static final String COMMENT_START = "/*";
+	protected static final String DOCUMENTATION_START = "/**"; //$NON-NLS-1$
+	protected static final String COMMENT_END = "*/"; //$NON-NLS-1$
+	protected static final String COMMENT_START = "/*"; //$NON-NLS-1$
 	private String fContentType;
 	private SourceViewerConfiguration fViewerConfiguration;
 	private ISourceViewer fSourceViewer;
@@ -169,22 +169,22 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 
 				if (upToOffset.trim().startsWith(DOCUMENTATION_START)) // ScriptDoc block
 				{
-					buf.append(commentIndent).append(COMMENT_CHAR).append(" ").append(lineDelimiter); //$NON-NLS-1$
+					buf.append(commentIndent).append(COMMENT_CHAR).append(SPACE);
 
 					c.shiftsCaret = false;
-					c.caretOffset = c.offset + buf.length();
+					c.caretOffset = c.offset + buf.length() + 1;
 
 					List<String> list = getAdditionalComments(d, c);
 					if (list != null && list.size() > 0)
 					{
-						buf.append(commentIndent).append(COMMENT_CHAR).append(" "); //$NON-NLS-1$
-						buf.append(StringUtil.join(lineDelimiter + commentIndent + COMMENT_CHAR + " ", list)); //$NON-NLS-1$
+						buf.append(commentIndent).append(COMMENT_CHAR).append(SPACE);
+						buf.append(StringUtil.join(lineDelimiter + commentIndent + COMMENT_CHAR + SPACE, list));
 					}
 				}
 				// if next char is an asterisk, no need to add an asterisk
 				else if (!StringUtil.startsWith(restOfLine, COMMENT_CHAR))
 				{
-					buf.append(commentIndent).append(COMMENT_CHAR).append(" "); //$NON-NLS-1$
+					buf.append(commentIndent).append(COMMENT_CHAR).append(SPACE);
 				}
 				else
 				{
@@ -209,7 +209,7 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 				{
 				}
 
-				String toEnd = " " + COMMENT_END; //$NON-NLS-1$
+				String toEnd = SPACE + COMMENT_END;
 				d.replace(c.offset, 0, lineDelimiter + indent + toEnd);
 			}
 			else if (buf.length() != 0 && upToOffset.endsWith(COMMENT_END) && buf.charAt(buf.length() - 1) == ' ')
@@ -313,7 +313,7 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 		int spaceCount = indentSize % indentStringWidth;
 		for (int i = 0; i < spaceCount; ++i)
 		{
-			indentation += " "; //$NON-NLS-1$
+			indentation += SPACE;
 		}
 
 		return indentation;

@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
@@ -91,7 +92,16 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 	{
 		super.addPages();
 
-		mainPage = new WizardNewProjectCreationPage("basicNewProjectPage"); //$NON-NLS-1$
+		mainPage = new WizardNewProjectCreationPage("basicNewProjectPage") //$NON-NLS-1$
+		{
+			
+			@Override
+			public void createControl(Composite parent)
+			{
+				super.createControl(parent);
+				validatePage();
+			}
+		};
 		mainPage.setTitle(Messages.NewSampleProjectWizard_ProjectPage_Title);
 		mainPage.setDescription(Messages.NewSampleProjectWizard_ProjectPage_Description);
 		addPage(mainPage);

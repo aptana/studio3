@@ -150,7 +150,16 @@ public class Index
 
 		String fileName = Long.toString(crc.getValue()) + ".index"; //$NON-NLS-1$
 
-		return IndexPlugin.getDefault().getStateLocation().append(fileName);
+		IndexPlugin plugin = IndexPlugin.getDefault();
+		if (plugin != null)
+		{
+			IPath path = plugin.getStateLocation();
+			if (path != null)
+			{
+				return path.append(fileName);
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -312,7 +321,11 @@ public class Index
 
 		// Convert to a filename we can use for the actual index on disk
 		IPath diskIndexPath = computeIndexLocation(containerURI);
-		String diskIndexPathString = diskIndexPath.getDevice() == null ? diskIndexPath.toString() : diskIndexPath
+		if (diskIndexPath == null)
+		{
+			return;
+		}
+		String diskIndexPathString = (diskIndexPath.getDevice() == null) ? diskIndexPath.toString() : diskIndexPath
 				.toOSString();
 		this.enterWrite();
 		try

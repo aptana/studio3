@@ -644,4 +644,15 @@ public class StringUtil
 	{
 		return !StringUtil.isEmpty(string) && string.charAt(0) == c;
 	}
+
+	/**
+	 * Removes <.*?> inside a string.
+	 * 
+	 * @param textWithHTML
+	 * @return
+	 */
+	public static String stripHTMLTags(String textWithHTML)
+	{
+		return textWithHTML.replaceAll("\\<.*?\\>", EMPTY); //$NON-NLS-1$
+	}
 }

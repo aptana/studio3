@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSArgumentsNode;
 import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
@@ -276,7 +277,7 @@ public class JSSymbolCollector extends JSTreeWalker
 		// add symbol if this has a name
 		String name = node.getName().getText();
 
-		if (name != null && name.length() > 0)
+		if (!StringUtil.isEmpty(name))
 		{
 			this.addPropertyValue(name, node);
 		}

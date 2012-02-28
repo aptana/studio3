@@ -786,7 +786,14 @@ public class JSLocationIdentifier extends JSTreeWalker
 			}
 			else
 			{
-				this.setType(LocationType.IN_PROPERTY_NAME);
+				if (lhs instanceof JSThisNode)
+				{
+					this.setType(LocationType.IN_THIS);
+				}
+				else
+				{
+					this.setType(LocationType.IN_PROPERTY_NAME);
+				}
 			}
 		}
 	}

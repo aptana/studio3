@@ -28,7 +28,7 @@ public class LocationTests extends JSEditorBasedTests
 		{
 			for (int offset = range.startingOffset; offset <= range.endingOffset; offset++)
 			{
-				LocationType location = this.processor.getLocation(this.document, offset);
+				LocationType location = this.processor.getLocationType(this.document, offset);
 				// @formatter:off
 				String message = MessageFormat.format(
 					"Expected {0} at location {1} of ''{2}'': character = ''{3}''",
@@ -578,6 +578,14 @@ public class LocationTests extends JSEditorBasedTests
 		this.testLocations(
 			"locations/errorInObjectLiteral.js",
 			new LocationTypeRange(LocationType.NONE, 6)
+		);
+	}
+	
+	public void testThis()
+	{
+		this.testLocations(
+			"locations/this.js",
+			new LocationTypeRange(LocationType.IN_THIS, 5)
 		);
 	}
 }

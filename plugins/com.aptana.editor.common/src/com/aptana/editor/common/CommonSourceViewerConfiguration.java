@@ -64,6 +64,7 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.contentassist.ContentAssistant;
 import com.aptana.editor.common.contentassist.ICommonContentAssistProcessor;
+import com.aptana.editor.common.contentassist.SimpleTextHover;
 import com.aptana.editor.common.hover.AbstractCommonTextHover;
 import com.aptana.editor.common.hover.CommonAnnotationHover;
 import com.aptana.editor.common.hover.ThemedInformationControl;
@@ -680,7 +681,14 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 					return info;
 				}
 			}
-			return super.getHoverInfo(textViewer, hoverRegion);
+			String defaultInfo = super.getHoverInfo(textViewer, hoverRegion);
+			if (defaultInfo != null)
+			{
+				// wrap it in a SimpleTextHover so it will look the same as other hovers (i.e. use the theme colors,
+				// etc.)
+				return new SimpleTextHover(defaultInfo, null).getHoverInfo2(textViewer, hoverRegion);
+			}
+			return null;
 		}
 
 		/*

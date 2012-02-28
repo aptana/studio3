@@ -17,6 +17,8 @@ public class Messages extends NLS
 	public static String CommitAction_MultipleRepos_Title;
 	public static String CommitAction_NoRepo_Message;
 	public static String CommitAction_NoRepo_Title;
+	
+	public static String CommitDialog_BrowserWidgetFailedMsg;
 	public static String CommitDialog_Changes;
 	public static String CommitDialog_NoFileSelected;
 	public static String CommitDialog_StageAll;
@@ -37,17 +39,25 @@ public class Messages extends NLS
 	public static String CommitDialog_StageFilesFirst_Error;
 	public static String CommitDialog_StageSelected;
 	public static String CommitDialog_StageSelectedMarker;
+	
 	public static String DisconnectHandler_Job_Title;
 	public static String DisconnectProviderOperation_DisconnectJob_Title;
+	
 	public static String PullAction_RefreshJob_Title;
+	
 	public static String RevertAction_Label;
 	public static String RevertAction_RefreshJob_Title;
+	
 	public static String SwitchBranchAction_BranchSwitch_Msg;
+	
 	public static String DeleteBranchAction_BranchDelete_Msg;
 	public static String DeleteBranchAction_BranchDeletionFailed_Msg;
 	public static String DeleteBranchAction_BranchDeletionFailed_Title;
+	
 	public static String DeleteBranchHandler_JobName;
+	
 	public static String GithubNetworkHandler_ViewName;
+	
 	public static String GitLaunchDelegate_FailedToAcquireWriteLock;
 
 	static
