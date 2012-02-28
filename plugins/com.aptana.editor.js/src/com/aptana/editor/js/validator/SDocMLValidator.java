@@ -66,7 +66,7 @@ public class SDocMLValidator extends AbstractBuildParticipant
 		try
 		{
 			InputStream input = context.openInputStream(monitor); // $codepro.audit.disable closeWhereCreated
-			reader.loadXML(input);
+			reader.loadXML(input, context.getName());
 		}
 		catch (Exception e)
 		{

@@ -19,7 +19,6 @@ import org.eclipse.core.runtime.Path;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.contentassist.index.JSMetadataReader;
 
-
 public class MetadataTests extends TestCase
 {
 	/**
@@ -29,7 +28,7 @@ public class MetadataTests extends TestCase
 	{
 		this.loadMetadata("/metadata/dom_0.xml");
 	}
-	
+
 	/**
 	 * testDOM2
 	 */
@@ -37,7 +36,7 @@ public class MetadataTests extends TestCase
 	{
 		this.loadMetadata("/metadata/dom_2.xml");
 	}
-	
+
 	/**
 	 * testDOM3
 	 */
@@ -45,7 +44,7 @@ public class MetadataTests extends TestCase
 	{
 		this.loadMetadata("/metadata/dom_3.xml");
 	}
-	
+
 	/**
 	 * testDOM5
 	 */
@@ -53,7 +52,7 @@ public class MetadataTests extends TestCase
 	{
 		this.loadMetadata("/metadata/dom_5.xml");
 	}
-	
+
 	/**
 	 * testJSCore
 	 */
@@ -61,7 +60,7 @@ public class MetadataTests extends TestCase
 	{
 		this.loadMetadata("/metadata/js_core.xml");
 	}
-	
+
 	/**
 	 * loadMetadata
 	 * 
@@ -72,16 +71,16 @@ public class MetadataTests extends TestCase
 		URL url = FileLocator.find(JSPlugin.getDefault().getBundle(), new Path(resource), null);
 
 		assertNotNull(url);
-		
+
 		InputStream stream = null;
 
 		try
 		{
 			JSMetadataReader reader = new JSMetadataReader();
-			
+
 			stream = url.openStream();
 
-			reader.loadXML(stream);
+			reader.loadXML(stream, url.toString());
 		}
 		catch (IOException e)
 		{

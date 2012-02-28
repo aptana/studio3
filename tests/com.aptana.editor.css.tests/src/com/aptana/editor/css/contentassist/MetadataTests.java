@@ -28,7 +28,7 @@ public class MetadataTests extends TestCase
 	{
 		this.loadMetadata("/metadata/css_metadata.xml");
 	}
-	
+
 	/**
 	 * loadMetadata
 	 * 
@@ -39,16 +39,16 @@ public class MetadataTests extends TestCase
 		URL url = FileLocator.find(CSSPlugin.getDefault().getBundle(), new Path(resource), null);
 
 		assertNotNull(url);
-		
+
 		InputStream stream = null;
 
 		try
 		{
 			CSSMetadataReader reader = new CSSMetadataReader();
-			
+
 			stream = url.openStream();
 
-			reader.loadXML(stream);
+			reader.loadXML(stream, url.toString());
 		}
 		catch (IOException e)
 		{

@@ -49,7 +49,7 @@ public class SDocMLFileIndexingParticipant extends AbstractFileIndexingParticipa
 				InputStream stream = context.openInputStream(sub.newChild(5));
 
 				// parse
-				reader.loadXML(stream);
+				reader.loadXML(stream, context.getName());
 				sub.worked(45);
 
 				// create new Window type for this file

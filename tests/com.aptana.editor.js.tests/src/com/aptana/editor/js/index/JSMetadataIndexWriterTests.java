@@ -106,7 +106,7 @@ public class JSMetadataIndexWriterTests extends TestCase
 		assertNotNull(stream);
 
 		JSMetadataReader reader = new JSMetadataReader();
-		reader.loadXML(stream);
+		reader.loadXML(stream, resource);
 		JSIndexWriter writer = new JSIndexWriter();
 		Index index = this.getIndex();
 
