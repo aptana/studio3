@@ -313,7 +313,7 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 		int spaceCount = indentSize % indentStringWidth;
 		for (int i = 0; i < spaceCount; ++i)
 		{
-			indentation += SPACE; //$NON-NLS-1$
+			indentation += SPACE;
 		}
 
 		return indentation;
