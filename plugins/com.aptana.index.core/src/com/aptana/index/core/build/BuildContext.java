@@ -252,7 +252,7 @@ public class BuildContext
 	public InputStream openInputStream(IProgressMonitor monitor) throws CoreException
 	{
 		IFile file = getFile();
-		if (file == null)
+		if (file == null || !file.exists())
 		{
 			return new ByteArrayInputStream(new byte[0]);
 		}
