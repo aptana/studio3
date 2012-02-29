@@ -397,6 +397,7 @@ public abstract class BaseElement<P extends Enum<P> & IPropertyInformation<? ext
 				}
 			}
 
+			this._userAgents = ALL_USER_AGENTS;
 		}
 	}
 
