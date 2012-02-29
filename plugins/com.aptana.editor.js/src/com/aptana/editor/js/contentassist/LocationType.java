@@ -17,7 +17,16 @@ public enum LocationType
 	IN_PARAMETERS,
 	IN_CONSTRUCTOR,
 	IN_PROPERTY_NAME,
+
+	/**
+	 * Returned when we're in the name of a variable when used as a reference.
+	 */
 	IN_VARIABLE_NAME,
+
+	/**
+	 * Returned when we're on the name of a variable being defined
+	 */
+	IN_VARIABLE_DECLARATION,
 	IN_LABEL,
 	IN_OBJECT_LITERAL_PROPERTY,
 	IN_THIS;

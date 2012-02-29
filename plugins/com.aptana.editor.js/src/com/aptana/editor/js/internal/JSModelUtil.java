@@ -39,6 +39,7 @@ public class JSModelUtil
 		{
 			case IN_CONSTRUCTOR:
 			case IN_GLOBAL:
+			case IN_VARIABLE_DECLARATION:
 			case IN_VARIABLE_NAME:
 			{
 				JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();

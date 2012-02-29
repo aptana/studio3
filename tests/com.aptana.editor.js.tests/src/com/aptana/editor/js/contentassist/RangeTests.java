@@ -14,6 +14,7 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 
 import beaver.Parser.Exception;
 
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.common.tests.TextViewer;
@@ -63,7 +64,7 @@ public class RangeTests extends JSEditorBasedTests
 			{
 				ICompletionProposal[] proposals = processor.computeCompletionProposals(viewer, offset, '\0', false);
 
-				if (proposals != null && proposals.length > 0)
+				if (!ArrayUtil.isEmpty(proposals))
 				{
 					if (selection.range != null)
 					{
