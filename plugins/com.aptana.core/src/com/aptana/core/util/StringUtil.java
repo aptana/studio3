@@ -42,6 +42,7 @@ public class StringUtil
 	private static final Map<String, String> SANITIZE_MAP = CollectionsUtil.newMap(
 			"&", "&amp;", "<", "&lt;", ">", "&gt;"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 	private static final Pattern SANITIZE_PATTERN = Pattern.compile("[&<>]"); //$NON-NLS-1$
+	private static final Pattern HTML_TAG_PATTERN = Pattern.compile("\\<.*?\\>"); //$NON-NLS-1$
 
 	/**
 	 * Compares two strings for equality taking into account that none, one, or both may be null
@@ -592,6 +593,35 @@ public class StringUtil
 	}
 
 	/**
+	 * Does the string start with the specific char
+	 * 
+	 * @param string
+	 *            the string to test
+	 * @param c
+	 *            the char to test
+	 * @return true if yes, false if the no, or the string is empty or null
+	 */
+	public static boolean startsWith(String string, char c)
+	{
+		return !StringUtil.isEmpty(string) && string.charAt(0) == c;
+	}
+
+	/**
+	 * Removes <.*?> inside a string. If the specified value is empty or null, then it is returned untouched
+	 * 
+	 * @param textWithHTML
+	 * @return
+	 */
+	public static String stripHTMLTags(String textWithHTML)
+	{
+		// @formatter:off
+		return (!StringUtil.isEmpty(textWithHTML))
+			?	HTML_TAG_PATTERN.matcher(textWithHTML).replaceAll(EMPTY)
+			:	textWithHTML;
+		// @formatter:on
+	}
+
+	/**
 	 * Runs the input through a StringTokenizer and gathers up all the tokens.
 	 * 
 	 * @param inputString
@@ -629,30 +659,5 @@ public class StringUtil
 
 	private StringUtil()
 	{
-	}
-
-	/**
-	 * Does the string start with the specific char
-	 * 
-	 * @param string
-	 *            the string to test
-	 * @param c
-	 *            the char to test
-	 * @return true if yes, false if the no, or the string is empty or null
-	 */
-	public static boolean startsWith(String string, char c)
-	{
-		return !StringUtil.isEmpty(string) && string.charAt(0) == c;
-	}
-
-	/**
-	 * Removes <.*?> inside a string.
-	 * 
-	 * @param textWithHTML
-	 * @return
-	 */
-	public static String stripHTMLTags(String textWithHTML)
-	{
-		return textWithHTML.replaceAll("\\<.*?\\>", EMPTY); //$NON-NLS-1$
 	}
 }

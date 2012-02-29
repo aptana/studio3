@@ -627,7 +627,7 @@ public class JSModelFormatter
 				Set<String> descriptions = new HashSet<String>();
 				for (PropertyElement property : properties)
 				{
-					String desc = property.getDescription();
+					String desc = StringUtil.stripHTMLTags(property.getDescription());
 					if (!StringUtil.isEmpty(desc))
 					{
 						descriptions.add(desc);
