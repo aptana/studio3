@@ -9,7 +9,6 @@ package com.aptana.editor.html.parsing.ast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -24,6 +23,8 @@ import com.aptana.editor.html.parsing.HTMLParser;
 import com.aptana.editor.html.preferences.IPreferenceConstants;
 import com.aptana.parsing.ast.INameNode;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseNodeAttribute;
+import com.aptana.parsing.ast.ParseNodeAttribute;
 import com.aptana.parsing.lexer.IRange;
 
 public class HTMLElementNode extends HTMLNode
@@ -34,7 +35,7 @@ public class HTMLElementNode extends HTMLNode
 
 	private INameNode fNameNode;
 	private INameNode fEndNode;
-	private Map<String, String> fAttributes;
+	private Map<String, IParseNodeAttribute> fAttributes;
 	private List<IParseNode> fCSSStyleNodes;
 	private List<IParseNode> fJSAttributeNodes;
 	private boolean fIsSelfClosing;
@@ -68,7 +69,7 @@ public class HTMLElementNode extends HTMLNode
 			}
 		}
 		fNameNode = new NameNode(tag, tagSymbol.getStart(), tagSymbol.getEnd());
-		fAttributes = new HashMap<String, String>();
+		fAttributes = new HashMap<String, IParseNodeAttribute>(2);
 		fCSSStyleNodes = new ArrayList<IParseNode>();
 		fJSAttributeNodes = new ArrayList<IParseNode>();
 	}
@@ -95,6 +96,12 @@ public class HTMLElementNode extends HTMLNode
 	public String getName()
 	{
 		return fNameNode.getName();
+	}
+
+	@Override
+	public String getElementName()
+	{
+		return getName();
 	}
 
 	@Override
@@ -166,10 +173,10 @@ public class HTMLElementNode extends HTMLNode
 			}
 			else
 			{
-				String value = fAttributes.get(attribute);
+				IParseNodeAttribute value = fAttributes.get(attribute);
 				if (value != null)
 				{
-					text.append(' ').append(value);
+					text.append(' ').append(value.getValue());
 				}
 			}
 		}
@@ -178,22 +185,27 @@ public class HTMLElementNode extends HTMLNode
 
 	public String getID()
 	{
-		return fAttributes.get(ID);
+		return getAttributeValue(ID);
 	}
 
 	public String getCSSClass()
 	{
-		return fAttributes.get(CLASS);
+		return getAttributeValue(CLASS);
 	}
 
 	public String getAttributeValue(String name)
 	{
-		return fAttributes.get(name);
+		IParseNodeAttribute attr = fAttributes.get(name);
+		if (attr == null)
+		{
+			return null;
+		}
+		return attr.getValue();
 	}
 
 	public void setAttribute(String name, String value)
 	{
-		fAttributes.put(name, value);
+		fAttributes.put(name, new ParseNodeAttribute(this, name, value));
 	}
 
 	public INameNode getEndNode()
@@ -250,13 +262,9 @@ public class HTMLElementNode extends HTMLNode
 		if (name.length() > 0)
 		{
 			text.append('<').append(name);
-			Iterator<String> iter = fAttributes.keySet().iterator();
-			String key, value;
-			while (iter.hasNext())
+			for (IParseNodeAttribute attr : fAttributes.values())
 			{
-				key = iter.next();
-				value = fAttributes.get(key);
-				text.append(' ').append(key).append("=\"").append(value).append('"'); //$NON-NLS-1$
+				text.append(' ').append(attr.getName()).append("=\"").append(attr.getValue()).append('"'); //$NON-NLS-1$
 			}
 			text.append('>');
 			IParseNode[] children = getChildren();
@@ -286,5 +294,11 @@ public class HTMLElementNode extends HTMLNode
 			attributes.add(st.nextToken());
 		}
 		return attributes;
+	}
+
+	@Override
+	public IParseNodeAttribute[] getAttributes()
+	{
+		return fAttributes.values().toArray(new IParseNodeAttribute[fAttributes.size()]);
 	}
 }
