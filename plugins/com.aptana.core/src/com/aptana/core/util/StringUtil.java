@@ -15,13 +15,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
 import com.aptana.core.CorePlugin;
+import com.aptana.core.util.replace.SimpleTextPatternReplacer;
 
 public class StringUtil
 {
@@ -37,11 +37,16 @@ public class StringUtil
 	public static final Pattern LINE_SPLITTER = Pattern.compile("\r?\n|\r"); //$NON-NLS-1$
 
 	/**
-	 * Map to sanitize html/xml to entities.
+	 * TextPatternReplacer to sanitize html/xml to entities.
 	 */
-	private static final Map<String, String> SANITIZE_MAP = CollectionsUtil.newMap(
-			"&", "&amp;", "<", "&lt;", ">", "&gt;"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-	private static final Pattern SANITIZE_PATTERN = Pattern.compile("[&<>]"); //$NON-NLS-1$
+	private static final SimpleTextPatternReplacer ENTITY_SANITIZER;
+	static
+	{
+		ENTITY_SANITIZER = new SimpleTextPatternReplacer();
+		ENTITY_SANITIZER.addPattern("&", "&amp;"); //$NON-NLS-1$ //$NON-NLS-2$
+		ENTITY_SANITIZER.addPattern("<", "&lt;"); //$NON-NLS-1$ //$NON-NLS-2$
+		ENTITY_SANITIZER.addPattern(">", "&gt;"); //$NON-NLS-1$ //$NON-NLS-2$
+	}
 	private static final Pattern HTML_TAG_PATTERN = Pattern.compile("\\<.*?\\>"); //$NON-NLS-1$
 
 	/**
@@ -582,14 +587,7 @@ public class StringUtil
 		 */
 	public static String sanitizeHTML(String raw)
 	{
-		StringBuffer sb = new StringBuffer();
-		Matcher m = SANITIZE_PATTERN.matcher(raw);
-		while (m.find())
-		{
-			m.appendReplacement(sb, SANITIZE_MAP.get(m.group()));
-		}
-		m.appendTail(sb);
-		return sb.toString();
+		return ENTITY_SANITIZER.searchAndReplace(raw);
 	}
 
 	/**

@@ -13,8 +13,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.eclipse.help.IContext;
 import org.eclipse.help.IContext2;
@@ -31,9 +29,12 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
+import com.aptana.core.IMap;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.core.util.replace.RegexPatternReplacer;
+import com.aptana.core.util.replace.SimpleTextPatternReplacer;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
@@ -55,11 +56,50 @@ import com.aptana.parsing.ast.IParseRootNode;
 @SuppressWarnings("restriction")
 public class JSSourceEditor extends AbstractThemeableEditor
 {
-
 	private static final class JSContextProvider implements IContextProvider
 	{
+		@SuppressWarnings("nls")
 		private static final class JSHelpContext implements IContext2
 		{
+			private static SimpleTextPatternReplacer TAG_MAPPER;
+			static
+			{
+				TAG_MAPPER = new SimpleTextPatternReplacer();
+
+				// tag mapping
+				TAG_MAPPER.addPattern("<h2>", "<b>");
+				TAG_MAPPER.addPattern("</h2>", "</b>");
+				TAG_MAPPER.addPattern("<h3>", "<b>");
+				TAG_MAPPER.addPattern("</h3>", "</b>");
+				TAG_MAPPER.addPattern("<pre>", "<code>");
+				TAG_MAPPER.addPattern("</pre>", "</code>");
+				TAG_MAPPER.addPattern("<p>", "<br><br>");
+				TAG_MAPPER.addPattern("</p>", "<br><br>");
+
+				// tag removal
+				TAG_MAPPER.addPattern("<hr>");
+
+				for (String tag : CollectionsUtil.newList("warning", "tip", "glossary", "method", "varname",
+						"specification"))
+				{
+					TAG_MAPPER.addPattern(StringUtil.concat("<", tag, ">"));
+					TAG_MAPPER.addPattern(StringUtil.concat("</", tag, ">"));
+				}
+			}
+
+			private static RegexPatternReplacer CODE_CLEANER;
+			static
+			{
+				CODE_CLEANER = new RegexPatternReplacer();
+				CODE_CLEANER.addPattern("<code>[^<]+</code>", new IMap<String, String>()
+				{
+					public String map(String item)
+					{
+						return StringUtil.join("</code><br><code>", StringUtil.LINE_SPLITTER.split(item));
+					}
+				});
+			}
+
 			private AbstractThemeableEditor editor;
 			private final IParseNode node;
 			private List<PropertyElement> fProperties;
@@ -81,19 +121,19 @@ public class JSSourceEditor extends AbstractThemeableEditor
 						for (SinceElement se : pe.getSinceList())
 						{
 							String version = se.getVersion();
-							if ("DOM 0".equals(version)) //$NON-NLS-1$
+							if ("DOM 0".equals(version))
 							{
 								refs.add(new JSDOMHelpResource(0));
 							}
-							else if ("HTML DOM Level 2".equals(version)) //$NON-NLS-1$
+							else if ("HTML DOM Level 2".equals(version))
 							{
 								refs.add(new JSDOMHelpResource(2));
 							}
-							else if ("HTML DOM Level 3".equals(version)) //$NON-NLS-1$
+							else if ("HTML DOM Level 3".equals(version))
 							{
 								refs.add(new JSDOMHelpResource(3));
 							}
-							else if ("DOM5 HTML".equals(version)) //$NON-NLS-1$
+							else if ("DOM5 HTML".equals(version))
 							{
 								refs.add(new JSDOMHelpResource(5));
 							}
@@ -134,28 +174,7 @@ public class JSSourceEditor extends AbstractThemeableEditor
 					return null;
 				}
 
-				String tempText = text;
-				// FIXME This is a very ugly way of doing this. Use Patterns and appendReplacement to fix this up
-				tempText = tempText.replaceAll("<h[23]>", "<b>"); //$NON-NLS-1$ //$NON-NLS-2$
-				tempText = tempText.replaceAll("</h[23]>", "</b><br>"); //$NON-NLS-1$ //$NON-NLS-2$
-				tempText = tempText.replaceAll(
-						"<(hr|/?warning|/?tip|/?glossary|/?method|/?varname|/?specification)>", StringUtil.EMPTY); //$NON-NLS-1$
-				tempText = tempText.replaceAll("<pre>", "<code>"); //$NON-NLS-1$ //$NON-NLS-2$
-				tempText = tempText.replaceAll("</pre>", "</code>"); //$NON-NLS-1$ //$NON-NLS-2$
-				tempText = tempText.replaceAll("</?p>", "<br><br>"); //$NON-NLS-1$ //$NON-NLS-2$
-
-				// Fixup newlines for code blocks
-				Pattern p = Pattern.compile("<code>([^<]+)</code>"); //$NON-NLS-1$
-				Matcher m = p.matcher(tempText);
-				StringBuffer sb = new StringBuffer();
-				while (m.find())
-				{
-					String content = m.group(1);
-					content = StringUtil.LINE_SPLITTER.matcher(content).replaceAll("</code><br><code>"); //$NON-NLS-1$
-					m.appendReplacement(sb, "<code>" + content + "</code>"); //$NON-NLS-1$ //$NON-NLS-2$
-				}
-				m.appendTail(sb);
-				return sb.toString();
+				return CODE_CLEANER.searchAndReplace(TAG_MAPPER.searchAndReplace(text));
 			}
 
 			public String getTitle()
