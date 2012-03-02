@@ -102,7 +102,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	private CommonDoubleClickStrategy fDoubleClickStrategy;
 	private IPreferenceChangeListener fThemeChangeListener;
 	private IPreferenceChangeListener fAutoActivationListener;
-	private CommonReconciler fReconciler;
+	protected CommonReconciler fReconciler;
 	List<IContentAssistProcessor> fCAProcessors = new ArrayList<IContentAssistProcessor>();
 
 	/**
@@ -419,7 +419,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		}
 	}
 
-	private final Collection<String> getSpellingContentTypes(ISourceViewer sourceViewer)
+	protected final Collection<String> getSpellingContentTypes(ISourceViewer sourceViewer)
 	{
 		Set<String> set = new HashSet<String>();
 		IContentTypeTranslator contentTypeTranslator = CommonEditorPlugin.getDefault().getContentTypeTranslator();

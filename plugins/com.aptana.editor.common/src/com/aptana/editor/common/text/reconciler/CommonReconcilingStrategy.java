@@ -56,11 +56,14 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	/**
 	 * The editor we're operating on.
 	 */
-	private AbstractThemeableEditor fEditor;
+	protected AbstractThemeableEditor fEditor;
+	/**
+	 * The working copy we're operating on.
+	 */
+	protected IDocument fDocument;
+
 	private boolean fInitialReconcileDone;
-
 	private IProgressMonitor fMonitor;
-
 	/**
 	 * The folder that calculates folding positions for this editor.
 	 */
@@ -69,12 +72,6 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	 * Code Folding.
 	 */
 	private Map<ProjectionAnnotation, Position> fPositions = new HashMap<ProjectionAnnotation, Position>();
-
-	/**
-	 * The working copy we're operating on.
-	 */
-	private IDocument fDocument;
-
 	/**
 	 * Flag used to auto-expand outlines to 2nd level on first open.
 	 */
@@ -82,7 +79,6 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 
 	private IPropertyListener propertyListener = new IPropertyListener()
 	{
-
 		public void propertyChanged(Object source, int propId)
 		{
 			if (propId == IEditorPart.PROP_INPUT)
@@ -297,7 +293,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		}
 
 		SubMonitor sub = SubMonitor.convert(monitor, (participants.size() * 12) + 10);
-		ReconcileContext context = new ReconcileContext(contentTypeId, file, fDocument.get());
+		ReconcileContext context = createContext();
 		for (IBuildParticipant participant : participants)
 		{
 			participant.buildStarting(context.getProject(), IncrementalProjectBuilder.INCREMENTAL_BUILD,
@@ -313,6 +309,16 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		}
 		reportProblems(context, sub.newChild(10));
 		sub.done();
+	}
+
+	/**
+	 * Creates and returns a {@link ReconcileContext}.
+	 * 
+	 * @return A {@link ReconcileContext}.
+	 */
+	protected ReconcileContext createContext()
+	{
+		return new ReconcileContext(fEditor.getContentType(), getFile(), fDocument.get());
 	}
 
 	private List<IBuildParticipant> filterToEnabled(List<IBuildParticipant> participants)
@@ -377,7 +383,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		caModel.setProgressMonitor(null);
 	}
 
-	private IFile getFile()
+	protected IFile getFile()
 	{
 		if (fEditor != null)
 		{
