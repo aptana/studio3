@@ -579,6 +579,42 @@ public class GitRepositoryTest extends GitTestCase
 		}
 	}
 
+	public void testRemoveRemote() throws Throwable
+	{
+		// Generate remotes
+		testRemoteURLs();
+
+		IStatus status = getRepo().removeRemote("chris");
+		assertTrue(status.isOK());
+
+		// Now verify that 'chris' remote isn't in model
+		Set<String> remoteNames = getRepo().remotes();
+		assertEquals(1, remoteNames.size());
+		assertTrue(remoteNames.contains("bob"));
+
+		// Nor is it's URL endpoint
+		Set<String> urls = getRepo().remoteURLs();
+		assertEquals(1, urls.size());
+		assertTrue(urls.contains("git@github.com:aptana/bob.git"));
+	}
+
+	public void testAddRemote() throws Throwable
+	{
+		// Generate remotes
+		testRemoteURLs();
+
+		IStatus status = getRepo().addRemote("newRemote", "git@github.com:user/newRemote.git", false);
+		assertTrue(status.isOK());
+
+		Set<String> remoteNames = getRepo().remotes();
+		assertEquals(3, remoteNames.size());
+		assertTrue(remoteNames.contains("newRemote"));
+
+		Set<String> urls = getRepo().remoteURLs();
+		assertEquals(3, urls.size());
+		assertTrue(urls.contains("git@github.com:user/newRemote.git"));
+	}
+
 	protected String fileToAdd() throws Exception
 	{
 		return getRepo().workingDirectory() + File.separator + "file.txt";
