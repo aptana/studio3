@@ -56,11 +56,11 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	/**
 	 * The editor we're operating on.
 	 */
-	protected AbstractThemeableEditor fEditor;
+	private AbstractThemeableEditor fEditor;
 	/**
 	 * The working copy we're operating on.
 	 */
-	protected IDocument fDocument;
+	private IDocument fDocument;
 
 	private boolean fInitialReconcileDone;
 	private IProgressMonitor fMonitor;
@@ -107,6 +107,11 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	protected AbstractThemeableEditor getEditor()
 	{
 		return fEditor;
+	}
+
+	protected IDocument getDocument()
+	{
+		return fDocument;
 	}
 
 	public void reconcile(IRegion partition)
