@@ -25,8 +25,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.BaseSelectionListenerAction;
 
-import com.aptana.ide.ui.io.FileSystemUtils;
 import com.aptana.ide.ui.io.IOUIPlugin;
+import com.aptana.ide.ui.io.Utils;
 
 /**
  * @author Michael Xia (mxia@aptana.com)
@@ -107,7 +107,7 @@ public class FileSystemCopyAction extends BaseSelectionListenerAction {
 
         IFileStore fileStore;
         for (Object element : elements) {
-            fileStore = FileSystemUtils.getFileStore(element);
+            fileStore = Utils.getFileStore(element);
             if (fileStore != null) {
                 fFileStores.add(fileStore);
             }
