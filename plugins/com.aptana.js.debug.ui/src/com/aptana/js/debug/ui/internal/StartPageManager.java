@@ -227,7 +227,7 @@ public final class StartPageManager {
 
 	private void launchConfigurationRemovedInternal(ILaunchConfiguration configuration) {
 		try {
-			if (configuration.getType().equals(configType)) {
+			if (configuration.exists() && configuration.getType().equals(configType)) {
 				String location = (String) locations.remove(configuration.getName());
 				if (location != null) {
 					notifyListeners(location);
