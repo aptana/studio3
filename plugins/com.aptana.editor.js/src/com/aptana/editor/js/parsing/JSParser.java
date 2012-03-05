@@ -216,11 +216,10 @@ public class JSParser extends Parser implements IParser
 
 		public void syntaxError(Symbol token)
 		{
-			if (token == null || fParseState == null)
+			if (token != null && fParseState != null)
 			{
-				return;
+				fParseState.addError(new ParseError(IJSConstants.CONTENT_TYPE_JS, token, IParseError.Severity.ERROR));
 			}
-			fParseState.addError(new ParseError(IJSConstants.CONTENT_TYPE_JS, token, IParseError.Severity.ERROR));
 		}
 
 		public void unexpectedTokenRemoved(Symbol token)
@@ -229,6 +228,26 @@ public class JSParser extends Parser implements IParser
 
 		public void missingTokenInserted(Symbol token)
 		{
+		}
+
+		public void missingTokensInserted(List<Symbol> tokens)
+		{
+			if (tokens != null && tokens.size() == 1 && tokens.get(0).getId() == Terminals.SEMICOLON)
+			{
+				// remove last error
+				if (fParseState != null)
+				{
+					List<IParseError> errors = fParseState.getErrors();
+					IParseError lastError = (errors.isEmpty()) ? null : errors.get(errors.size() - 1);
+
+					if (lastError != null)
+					{
+						fParseState.removeError(lastError);
+					}
+				}
+			}
+
+			super.missingTokensInserted(tokens);
 		}
 
 		public void misspelledTokenReplaced(Symbol token)
@@ -591,7 +610,7 @@ public class JSParser extends Parser implements IParser
 			// try the strategies, 3) try these after the mapped strategies
 			for (IRecoveryStrategy strategy : this.recoveryStrategies)
 			{
-				if (strategy.recover(this, getLastSymbol(), token, in))
+				if (strategy.recover(this, getLastSymbol(), token, in, report))
 				{
 					success = true;
 					break;
@@ -621,7 +640,7 @@ public class JSParser extends Parser implements IParser
 		recoveryStrategies.add(new JSInsertionRecoveryStrategy(JSTokenType.LCURLY, "{", JSTokenType.RCURLY, "}", JSTokenType.RPAREN));
 		recoveryStrategies.add(new IRecoveryStrategy()
 		{
-			public boolean recover(IParser parser, Symbol lastToken, Symbol currentToken, TokenStream in) throws IOException
+			public boolean recover(IParser parser, Symbol lastToken, Symbol currentToken, TokenStream in, Parser.Events report) throws IOException
 			{
 				boolean result = false;
 

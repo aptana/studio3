@@ -106,6 +106,13 @@ public interface IParseState
 	public void clearErrors();
 
 	/**
+	 * Remove the specified error from the list of errors
+	 * 
+	 * @param error
+	 */
+	public void removeError(IParseError error);
+
+	/**
 	 * Returns parsing progress monitor primarily for cancellation checks.
 	 * 
 	 * @return

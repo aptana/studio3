@@ -125,9 +125,10 @@ public class InsertionRecoveryStrategy<T extends ITypePredicate> implements IRec
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.IRecoveryStrategy#recover(com.aptana.parsing.IParser, beaver.Symbol, beaver.Symbol,
-	 * beaver.Parser.TokenStream)
+	 * beaver.Parser.TokenStream, beaver.Parser.Events)
 	 */
-	public boolean recover(IParser parser, Symbol lastToken, Symbol currentToken, TokenStream in) throws IOException
+	public boolean recover(IParser parser, Symbol lastToken, Symbol currentToken, TokenStream in, Parser.Events report)
+			throws IOException
 	{
 		boolean result = false;
 
@@ -177,10 +178,7 @@ public class InsertionRecoveryStrategy<T extends ITypePredicate> implements IRec
 					in.rewind();
 
 					// report what tokens were added
-					// for (Symbol terminal : terminals)
-					// {
-					// report.misssingTokenInserted(terminal);
-					// }
+					report.missingTokensInserted(terminals);
 				}
 			}
 		}

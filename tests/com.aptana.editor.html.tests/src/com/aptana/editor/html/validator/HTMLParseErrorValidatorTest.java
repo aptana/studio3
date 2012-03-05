@@ -24,7 +24,7 @@ public class HTMLParseErrorValidatorTest extends AbstractValidatorTestCase
 	@Override
 	protected AbstractBuildParticipant createValidator()
 	{
-		return new HTMLParseErrorValidator();
+		return new HTMLParserValidator();
 	}
 
 	@Override

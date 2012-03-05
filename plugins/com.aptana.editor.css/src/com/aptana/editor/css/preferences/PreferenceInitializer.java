@@ -17,6 +17,7 @@ import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.ICSSConstants;
+import com.aptana.editor.css.validator.CSSParserValidator;
 import com.aptana.editor.css.validator.CSSValidator;
 
 public class PreferenceInitializer extends AbstractPreferenceInitializer
@@ -61,6 +62,23 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		prefs.putBoolean(validator.getEnablementPreferenceKey(BuildType.BUILD), false);
 		prefs.putBoolean(validator.getEnablementPreferenceKey(BuildType.RECONCILE), true);
 		validator.setFilters(EclipseUtil.defaultScope(), CSSValidator.DEFAULT_FILTERS);
+
+		CSSParserValidator parseValidator = new CSSParserValidator()
+		{
+			@Override
+			public String getId()
+			{
+				return ID;
+			}
+
+			@Override
+			protected String getPreferenceNode()
+			{
+				return CSSPlugin.PLUGIN_ID;
+			}
+		};
+		prefs.putBoolean(parseValidator.getEnablementPreferenceKey(BuildType.BUILD), false);
+		prefs.putBoolean(parseValidator.getEnablementPreferenceKey(BuildType.RECONCILE), true);
 
 		// Migrate the old filter prefs to new
 		IEclipsePreferences cepPrefs = EclipseUtil.instanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);

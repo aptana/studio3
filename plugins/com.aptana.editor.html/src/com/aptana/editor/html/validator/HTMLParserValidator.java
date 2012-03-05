@@ -20,9 +20,9 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 
+import com.aptana.core.build.AbstractBuildParticipant;
 import com.aptana.core.build.IProblem;
 import com.aptana.core.build.Problem;
-import com.aptana.core.build.RequiredBuildParticipant;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
@@ -39,8 +39,9 @@ import com.aptana.parsing.ast.IParseError.Severity;
  * 
  * @author cwilliams
  */
-public class HTMLParseErrorValidator extends RequiredBuildParticipant
+public class HTMLParserValidator extends AbstractBuildParticipant
 {
+	public static final String ID = "com.aptana.editor.html.validator.HTMLParseErrorValidator"; //$NON-NLS-1$
 
 	public void buildFile(BuildContext context, IProgressMonitor monitor)
 	{

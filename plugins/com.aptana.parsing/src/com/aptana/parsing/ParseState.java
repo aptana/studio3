@@ -147,6 +147,11 @@ public class ParseState implements IParseState
 		fErrors.clear();
 	}
 
+	public void removeError(IParseError error)
+	{
+		fErrors.remove(error);
+	}
+
 	public boolean requiresReparse(IParseState newState)
 	{
 		// We can't compare, assume re-parse

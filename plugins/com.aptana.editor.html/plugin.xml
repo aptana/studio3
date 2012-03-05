@@ -211,7 +211,7 @@
          </contentTypeBinding>
       </participant>
       <participant
-            class="com.aptana.editor.html.validator.HTMLParseErrorValidator"
+            class="com.aptana.editor.html.validator.HTMLParserValidator"
             id="com.aptana.editor.html.validator.HTMLParseErrorValidator"
             name="%validator.parser.name"
             priority="60">

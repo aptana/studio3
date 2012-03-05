@@ -17,9 +17,9 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 
+import com.aptana.core.build.AbstractBuildParticipant;
 import com.aptana.core.build.IProblem;
 import com.aptana.core.build.Problem;
-import com.aptana.core.build.RequiredBuildParticipant;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.editor.js.IJSConstants;
@@ -28,8 +28,9 @@ import com.aptana.index.core.build.BuildContext;
 import com.aptana.parsing.ast.IParseError;
 import com.aptana.parsing.ast.IParseError.Severity;
 
-public class JSParserValidator extends RequiredBuildParticipant
+public class JSParserValidator extends AbstractBuildParticipant
 {
+	public static final String ID = "com.aptana.editor.js.validator.JSParserValidator"; //$NON-NLS-1$
 
 	public void deleteFile(BuildContext context, IProgressMonitor monitor)
 	{

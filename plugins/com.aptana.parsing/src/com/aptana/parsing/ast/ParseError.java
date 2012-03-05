@@ -43,7 +43,7 @@ public class ParseError implements IParseError // $codepro.audit.disable consist
 		if (fSymbol != null)
 		{
 			fOffset = fSymbol.getStart();
-			fLength = fSymbol.getEnd() - fOffset;
+			fLength = fSymbol.getEnd() - fOffset + 1;
 		}
 	}
 
