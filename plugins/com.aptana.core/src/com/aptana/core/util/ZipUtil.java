@@ -10,6 +10,8 @@ package com.aptana.core.util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,6 +20,7 @@ import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.zip.ZipOutputStream;
 
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
@@ -60,7 +63,7 @@ public final class ZipUtil
 	{
 		return extract(new ZipFile(zipFile), destinationPath, monitor);
 	}
-	
+
 	/**
 	 * Extract zip file into specified local path. File that exist in the destination path will be overwritten if the
 	 * <code>overwrite</code> flag is <code>true</code>.
@@ -90,7 +93,7 @@ public final class ZipUtil
 	{
 		return extract(zip, zip.getEntries(), destinationPath, monitor);
 	}
-	
+
 	/**
 	 * Extract zip file into specified local path. File that exist in the destination path will be overwritten if the
 	 * <code>overwrite</code> flag is <code>true</code>.
@@ -259,15 +262,15 @@ public final class ZipUtil
 							}
 							catch (Exception ignore)
 							{
+							}
 						}
-					}
 						if (symlink)
 						{
 							String target = new String(((ByteArrayOutputStream) out).toByteArray(), "UTF-8"); //$NON-NLS-1$
 							Runtime.getRuntime()
 									.exec(new String[] {
 											"ln", "-s", new File(destinationPath, target).getAbsolutePath(), file.getAbsolutePath() }); //$NON-NLS-1$ //$NON-NLS-2$
-				}
+						}
 					}
 				}
 				if (subMonitor.isCanceled())
@@ -281,6 +284,70 @@ public final class ZipUtil
 		{
 			subMonitor.done();
 			ZipFile.closeQuietly(zip);
+		}
+	}
+
+	/**
+	 * Creates a zipped file that contains the source files
+	 * 
+	 * @param destination
+	 * @param sourceFiles
+	 * @return
+	 */
+	public static boolean compress(String destination, String[] sourceFiles)
+	{
+		if (!StringUtil.isEmpty(destination))
+		{
+			try
+			{
+				ZipOutputStream output = new ZipOutputStream(new FileOutputStream(destination));
+
+				addToZip(sourceFiles, output);
+
+				output.close();
+				return true;
+			}
+			catch (IOException e)
+			{
+				IdeLog.logError(CorePlugin.getDefault(), MessageFormat.format("Error creating zip {0}", destination), e);
+			}
+		}
+
+		return false;
+	}
+
+	private static void addToZip(String[] sourceFiles, ZipOutputStream output)
+			throws FileNotFoundException, IOException
+	{
+		byte[] buffer = new byte[1024];
+		for (String file : sourceFiles)
+		{
+			File content = new File(file);
+			if (content.isDirectory())
+			{
+				File[] children = content.listFiles();
+				String[] childrenPaths = new String[children.length];
+				for (int i = 0; i < children.length; i++)
+				{
+					childrenPaths[i] = children[i].getAbsolutePath();
+				}
+
+				addToZip(childrenPaths, output);
+			}
+			else if (content.canRead())
+			{
+				FileInputStream input = new FileInputStream(file);
+				output.putNextEntry(new java.util.zip.ZipEntry(file));
+
+				int length;
+				while ((length = input.read(buffer)) > 0)
+				{
+					output.write(buffer, 0, length);
+				}
+
+				output.closeEntry();
+				input.close();
+			}
 		}
 	}
 
