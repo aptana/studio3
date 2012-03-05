@@ -7,7 +7,6 @@
  */
 package com.aptana.core.util;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -67,16 +66,20 @@ public abstract class IOUtil
 		{
 			if (charset == null)
 			{
-				if (!stream.markSupported())
+				if (stream.markSupported())
 				{
-					stream = new BufferedInputStream(stream);
+					// Try to detect the charset!
+					CharsetDetector detector = new CharsetDetector();
+					CharsetMatch match = detector.setText(stream).detect();
+					charset = match.getName();
+					reader = new BufferedReader(match.getReader());
 				}
-
-				// Try to detect the charset!
-				CharsetDetector detector = new CharsetDetector();
-				CharsetMatch match = detector.setText(stream).detect();
-				charset = match.getName();
-				reader = new BufferedReader(match.getReader());
+				else
+				{
+					// Now what? Assume UTF-8?
+					charset = UTF_8;
+					reader = new BufferedReader(new InputStreamReader(stream, charset));
+				}
 			}
 			else
 			{
