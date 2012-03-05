@@ -17,6 +17,19 @@ public interface IProblem
 {
 
 	/**
+	 * A unique id used to identify the exact problem type. Used to associate specific problems with quick fixes.
+	 */
+	public static final String ID = "id"; //$NON-NLS-1$
+
+	/**
+	 */
+	public static final String FLAGS = "flags"; //$NON-NLS-1$
+
+	/**
+	 */
+	public static final String ARGUMENTS = "arguments"; //$NON-NLS-1$
+
+	/**
 	 * Gets the text offset where the error starts.
 	 * 
 	 * @return the offset
@@ -71,6 +84,21 @@ public interface IProblem
 	 * @return the attributes in a map
 	 */
 	Map<String, Object> createMarkerAttributes();
+
+	/**
+	 * Return the mapping of custom attributes.
+	 * 
+	 * @return the attributes in a map
+	 */
+	Map<String, Object> getAttributes();
+
+	/**
+	 * Sets a custom attribute.
+	 * 
+	 * @param attrName
+	 * @param value
+	 */
+	public void setAttribute(String attrName, Object value);
 
 	/**
 	 * Does this problem represent a warning?
