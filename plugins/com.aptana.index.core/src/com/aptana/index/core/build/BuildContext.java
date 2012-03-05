@@ -156,7 +156,7 @@ public class BuildContext
 		return fContents;
 	}
 
-	protected String getCharset() throws CoreException
+	public String getCharset() throws CoreException
 	{
 		IFile file = getFile();
 		if (file == null)
@@ -168,7 +168,6 @@ public class BuildContext
 
 	public String getContentType() throws CoreException
 	{
-		// TODO Cache this?
 		IContentType[] types = getContentTypes();
 		if (ArrayUtil.isEmpty(types))
 		{
@@ -179,6 +178,7 @@ public class BuildContext
 
 	protected IContentType[] getContentTypes() throws CoreException
 	{
+		// TODO Cache this?
 		IProject theProject = getProject();
 		if (theProject != null)
 		{

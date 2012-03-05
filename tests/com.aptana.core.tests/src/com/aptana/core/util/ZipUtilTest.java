@@ -17,6 +17,7 @@ import java.util.HashSet;
 
 import junit.framework.TestCase;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
@@ -251,6 +252,75 @@ public class ZipUtilTest extends TestCase
 		{
 			// remove the contents after we are done with the test
 			FileUtil.deleteRecursively(destinationDir);
+		}
+	}
+
+	public void testZipFile() throws IOException
+	{
+		URL resourceURL = Platform.getBundle(BUNDLE_ID).getEntry(TEST_ZIP);
+		assertNotNull(resourceURL);
+		File resourceFile = ResourceUtil.resourcePathToFile(resourceURL);
+		assertNotNull(resourceFile);
+
+		File destinationDir = File.createTempFile(getClass().getSimpleName(), null);
+		assertTrue(destinationDir.delete());
+		assertTrue(destinationDir.mkdirs());
+
+		File destinationDir2 = File.createTempFile(getClass().getSimpleName(), null);
+		assertTrue(destinationDir2.delete());
+		assertTrue(destinationDir2.mkdirs());
+
+		try
+		{
+			assertEquals(Status.OK_STATUS, ZipUtil.extract(resourceFile, destinationDir, new NullProgressMonitor()));
+
+			File[] files = destinationDir.listFiles();
+			assertEquals("Unzipped contents to not match expected number of files", TOP_ENTRIES.size(), files.length);
+
+			String[] paths = new String[files.length];
+			int i = 0;
+			for (File file : files)
+			{
+				String name = file.getName();
+				assertTrue("Unexpected zip entry " + file.getName(), TOP_ENTRIES.contains(name));
+				paths[i] = new Path(destinationDir.getAbsolutePath()).append(name).toOSString();
+				i++;
+			}
+
+			assertTrue("Expected entry is not a directory", new File(destinationDir, "folder").isDirectory());
+			assertTrue("Expected entry is not a file", new File(destinationDir, "file.txt").isFile());
+			assertTrue("Expected entry is not a directory", new File(destinationDir, "folder/other").isDirectory());
+			assertTrue("Expected entry is not a file", new File(destinationDir, "folder/file.txt").isFile());
+
+			IPath zipFilePath = Path.fromOSString(destinationDir2.getAbsolutePath())
+					.append(String.valueOf(System.currentTimeMillis())).addFileExtension("zip");
+
+			assertTrue("Compression failed", ZipUtil.compress(zipFilePath.toOSString(), paths));
+
+			assertEquals(Status.OK_STATUS, ZipUtil.extract(resourceFile, destinationDir2, new NullProgressMonitor()));
+
+			zipFilePath.toFile().delete();
+
+			files = destinationDir2.listFiles();
+			assertEquals("Unzipped contents to not match expected number of files", TOP_ENTRIES.size(), files.length);
+
+			for (File file : files)
+			{
+				String name = file.getName();
+				assertTrue("Unexpected zip entry " + file.getName(), TOP_ENTRIES.contains(name));
+			}
+
+			assertTrue("Expected entry is not a directory", new File(destinationDir2, "folder").isDirectory());
+			assertTrue("Expected entry is not a file", new File(destinationDir2, "file.txt").isFile());
+			assertTrue("Expected entry is not a directory", new File(destinationDir2, "folder/other").isDirectory());
+			assertTrue("Expected entry is not a file", new File(destinationDir2, "folder/file.txt").isFile());
+
+		}
+		finally
+		{
+			// remove the contents after we are done with the test
+			FileUtil.deleteRecursively(destinationDir);
+			FileUtil.deleteRecursively(destinationDir2);
 		}
 	}
 

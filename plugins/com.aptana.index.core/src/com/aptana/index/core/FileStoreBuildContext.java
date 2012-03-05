@@ -73,7 +73,7 @@ public class FileStoreBuildContext extends BuildContext
 	}
 	
 	@Override
-	protected String getCharset() throws CoreException
+	public String getCharset() throws CoreException
 	{
 		return null;
 	}
