@@ -50,7 +50,7 @@ public class JSAutoIndentStrategyTest extends RubyRegexpAutoIndentStrategyTest
 	 */
 	public void testEmpty()
 	{
-		assertSDocParams("/**\n", "\n * \n");
+		assertSDocParams("/**\n", "\n * ");
 	}
 
 	/**
@@ -58,7 +58,7 @@ public class JSAutoIndentStrategyTest extends RubyRegexpAutoIndentStrategyTest
 	 */
 	public void testSDocNoParams()
 	{
-		assertSDocParams("/**\nfunction abc() {\n}\n", "\n * \n");
+		assertSDocParams("/**\nfunction abc() {\n}\n", "\n * ");
 	}
 
 	/**
@@ -125,7 +125,9 @@ public class JSAutoIndentStrategyTest extends RubyRegexpAutoIndentStrategyTest
 		// Inside block comment, add star
 		DocumentCommand command = createNewlineCommand(3);
 		strategy.customizeDocumentCommand(document, command);
-		assertEquals(insertedParameters, command.text);
+		// Test this after converting the line delimiters to \n only.
+		String commandText = (command.text != null) ? command.text.replaceAll("\r\n|\r", "\n") : null;
+		assertEquals(insertedParameters, commandText);
 		assertEquals(command.caretOffset, 7);
 		assertTrue(command.doit);
 	}

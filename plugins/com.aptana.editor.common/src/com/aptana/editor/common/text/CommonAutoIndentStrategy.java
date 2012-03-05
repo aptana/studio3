@@ -177,7 +177,7 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 					List<String> list = getAdditionalComments(d, c);
 					if (list != null && list.size() > 0)
 					{
-						buf.append(commentIndent).append(COMMENT_CHAR).append(SPACE);
+						buf.append(lineDelimiter).append(commentIndent).append(COMMENT_CHAR).append(SPACE);
 						buf.append(StringUtil.join(lineDelimiter + commentIndent + COMMENT_CHAR + SPACE, list));
 					}
 				}

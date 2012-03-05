@@ -24,6 +24,7 @@ public class Problem implements IProblem
 	private int lineNumber;
 	private final String sourcePath;
 	private int priority;
+	private Map<String, Object> fAttributes;
 
 	public Problem(int severity, String message, int offset, int length, int lineNumber, String sourcePath)
 	{
@@ -39,6 +40,12 @@ public class Problem implements IProblem
 		this.lineNumber = lineNumber;
 		this.sourcePath = sourcePath;
 		this.priority = priority;
+		this.fAttributes = new HashMap<String, Object>(3);
+	}
+
+	public void setAttribute(String attrName, Object value)
+	{
+		fAttributes.put(attrName, value);
 	}
 
 	public int getOffset()
@@ -79,6 +86,8 @@ public class Problem implements IProblem
 	public Map<String, Object> createMarkerAttributes()
 	{
 		Map<String, Object> attributes = new HashMap<String, Object>();
+		attributes.putAll(getAttributes());
+
 		attributes.put(IMarker.SEVERITY, getSeverity());
 		int length = getLength();
 		if (length > 0)
@@ -90,6 +99,11 @@ public class Problem implements IProblem
 		attributes.put(IMarker.LINE_NUMBER, getLineNumber());
 
 		return attributes;
+	}
+
+	public Map<String, Object> getAttributes()
+	{
+		return fAttributes;
 	}
 
 	public void setOffset(int offset)

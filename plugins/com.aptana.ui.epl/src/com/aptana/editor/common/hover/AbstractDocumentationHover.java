@@ -12,10 +12,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.ToolBarManager;
@@ -48,6 +44,7 @@ import org.osgi.framework.Bundle;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.core.util.replace.SimpleTextPatternReplacer;
 import com.aptana.ui.epl.UIEplPlugin;
 
 /**
@@ -65,19 +62,17 @@ public abstract class AbstractDocumentationHover extends AbstractCommonTextHover
 
 	private static String styleSheet;
 	// Patterns used for stripping HTML in case there is no support for a CustomBrowserInformationControl on the system
-	private static final Pattern HTML_TAGS = Pattern.compile("<b>|</b>|<p>|</p>|<br>|</br>|&lt|&gt");
-	private static final Map<String, String> HTML_REPLACEMENTS_MAP;
+	private static final SimpleTextPatternReplacer TAG_MAPPER = new SimpleTextPatternReplacer();
 	static
 	{
-		HTML_REPLACEMENTS_MAP = new HashMap<String, String>();
-		HTML_REPLACEMENTS_MAP.put("<b>", StringUtil.EMPTY);
-		HTML_REPLACEMENTS_MAP.put("</b>", StringUtil.EMPTY);
-		HTML_REPLACEMENTS_MAP.put("<p>", "\n");
-		HTML_REPLACEMENTS_MAP.put("</p>", "\n");
-		HTML_REPLACEMENTS_MAP.put("<br>", "\n");
-		HTML_REPLACEMENTS_MAP.put("</br>", "\n");
-		HTML_REPLACEMENTS_MAP.put("&lt", "<");
-		HTML_REPLACEMENTS_MAP.put("&gt", ">");
+		TAG_MAPPER.addPattern("<b>");
+		TAG_MAPPER.addPattern("</b>");
+		TAG_MAPPER.addPattern("<p>", "\n");
+		TAG_MAPPER.addPattern("</p>", "\n");
+		TAG_MAPPER.addPattern("<br>", "\n");
+		TAG_MAPPER.addPattern("</br>", "\n");
+		TAG_MAPPER.addPattern("&lt", "<");
+		TAG_MAPPER.addPattern("&gt", ">");
 	}
 
 	/**
@@ -126,15 +121,7 @@ public abstract class AbstractDocumentationHover extends AbstractCommonTextHover
 	 */
 	public static String stripBasicHTML(String content)
 	{
-		Matcher matcher = HTML_TAGS.matcher(content);
-		StringBuffer sb = new StringBuffer();
-		while (matcher.find())
-		{
-			matcher.appendReplacement(sb, HTML_REPLACEMENTS_MAP.get(matcher.toMatchResult().group()));
-		}
-		matcher.appendTail(sb);
-		content = sb.toString();
-		return content;
+		return TAG_MAPPER.searchAndReplace(content);
 	}
 
 	/**

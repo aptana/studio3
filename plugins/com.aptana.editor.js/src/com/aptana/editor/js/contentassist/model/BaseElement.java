@@ -7,6 +7,7 @@
  */
 package com.aptana.editor.js.contentassist.model;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -365,11 +366,38 @@ public abstract class BaseElement<P extends Enum<P> & IPropertyInformation<? ext
 		{
 			if (!CollectionsUtil.isEmpty(_userAgents))
 			{
-				IdeLog.logWarning(JSPlugin.getDefault(),
-						"User agents may have been deleted when setting element to use all user agents: " + toSource());
+				Set<String> userAgentPlatforms = new HashSet<String>();
+
+				// get current list of associated user agents
+				for (UserAgentElement ua : getUserAgents())
+				{
+					userAgentPlatforms.add(ua.getPlatform());
+				}
+
+				// tag element as using all user agents
+				_userAgents = ALL_USER_AGENTS;
+
+				// remove new list of associate user agents
+				for (UserAgentElement ua : getUserAgents())
+				{
+					userAgentPlatforms.remove(ua.getPlatform());
+				}
+
+				if (!userAgentPlatforms.isEmpty())
+				{
+					// @formatter:off
+					String message = MessageFormat.format(
+						"Setting element to use all user agents deletes the following associated user agents: {0}\nElement : {1}", //$NON-NLS-1$
+						StringUtil.join(", ", userAgentPlatforms), //$NON-NLS-1$
+						toSource()
+					);
+					// @formatter:on
+
+					IdeLog.logWarning(JSPlugin.getDefault(), message);
+				}
 			}
 
-			_userAgents = ALL_USER_AGENTS;
+			this._userAgents = ALL_USER_AGENTS;
 		}
 	}
 

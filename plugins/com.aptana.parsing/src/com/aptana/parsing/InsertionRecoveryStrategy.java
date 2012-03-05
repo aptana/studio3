@@ -142,7 +142,7 @@ public class InsertionRecoveryStrategy<T extends ITypePredicate> implements IRec
 
 			// create a list of tokens we want to try
 			List<Symbol> terminals = new ArrayList<Symbol>(candidateTokens.size());
-			int tokenStart = currentToken.getStart();
+			int tokenStart = lastToken.getEnd() + 1;
 			int tokenEnd = tokenStart - 1;
 
 			for (CandidateToken candidateToken : candidateTokens)

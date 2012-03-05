@@ -63,7 +63,8 @@ import com.aptana.parsing.lexer.Range;
 
 public class JSLocationIdentifier extends JSTreeWalker
 {
-	private static final EnumSet<LocationType> IGNORED_TYPES = EnumSet.of(LocationType.UNKNOWN, LocationType.NONE); // $codepro.audit.disable declareAsInterface
+	private static final EnumSet<LocationType> IGNORED_TYPES = EnumSet.of(LocationType.UNKNOWN, LocationType.NONE); // $codepro.audit.disable
+																													// declareAsInterface
 
 	private int _offset;
 	private IParseNode _targetNode;
@@ -462,7 +463,10 @@ public class JSLocationIdentifier extends JSTreeWalker
 
 				if (this._offset < equalSign.getStart())
 				{
-					this.setType(LocationType.NONE);
+					if (node.getIdentifier().contains(_offset))
+					{
+						this.setType(LocationType.IN_VARIABLE_DECLARATION);
+					}
 				}
 				else if (this._offset < value.getStartingOffset())
 				{
@@ -475,7 +479,14 @@ public class JSLocationIdentifier extends JSTreeWalker
 			}
 			else
 			{
-				this.setType(LocationType.NONE);
+				if (node.getIdentifier().contains(_offset))
+				{
+					this.setType(LocationType.IN_VARIABLE_DECLARATION);
+				}
+				else
+				{
+					this.setType(LocationType.NONE);
+				}
 			}
 		}
 	}
@@ -622,7 +633,7 @@ public class JSLocationIdentifier extends JSTreeWalker
 			{
 				this.setType(LocationType.NONE);
 			}
-			else if (initializer.contains(this._offset) && this._offset != initializer.getEndingOffset())
+			else if (initializer.contains(this._offset))
 			{
 				this.setType(initializer);
 			}

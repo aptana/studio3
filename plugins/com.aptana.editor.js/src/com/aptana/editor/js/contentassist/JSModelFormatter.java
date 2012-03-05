@@ -25,6 +25,7 @@ import com.aptana.core.IMap;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.core.util.replace.RegexPatternReplacer;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
@@ -621,13 +622,35 @@ public class JSModelFormatter
 		 */
 		final static Section DESCRIPTION = new Section()
 		{
+			private RegexPatternReplacer stripAndBold;
+			{
+				stripAndBold = new RegexPatternReplacer();
+				// @formatter:off
+				stripAndBold.addPattern(
+					"<[\\p{Alpha}$_][\\p{Alnum}_$]*(?:\\.[\\p{Alpha}$_][\\p{Alnum}_$]*)+>", //$NON-NLS-1$
+					new IMap<String, String>()
+					{
+						public String map(String item)
+						{
+							String typeName = item.substring(1, item.length() - 1);
+
+							return StringUtil.concat(BOLD_OPEN_TAG, typeName, BOLD_CLOSE_TAG);
+						}
+					}
+				);
+				// @formatter:on
+				stripAndBold.addPattern("</?p>");
+			}
+
 			@Override
 			public String generate(Collection<PropertyElement> properties, URI root)
 			{
 				Set<String> descriptions = new HashSet<String>();
 				for (PropertyElement property : properties)
 				{
-					String desc = property.getDescription();
+					// strip p elements and bold any items that look like open tags with dotted local names
+					String desc = stripAndBold.searchAndReplace(property.getDescription());
+
 					if (!StringUtil.isEmpty(desc))
 					{
 						descriptions.add(desc);

@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import com.aptana.core.IMap;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.RegexUtil;
 import com.aptana.core.util.StringUtil;
@@ -177,13 +178,13 @@ public class JSIndexReader extends IndexReader
 			);
 			// @formatter:on
 
-			if (events != null)
+			result = CollectionsUtil.map(events, new IMap<QueryResult, EventElement>()
 			{
-				for (QueryResult event : events)
+				public EventElement map(QueryResult item)
 				{
-					result.add(this.createEvent(event));
+					return createEvent(item);
 				}
-			}
+			});
 		}
 
 		return result;
@@ -199,29 +200,7 @@ public class JSIndexReader extends IndexReader
 	 */
 	public List<EventElement> getEvents(Index index, String owningType)
 	{
-		List<EventElement> result = new ArrayList<EventElement>();
-
-		if (index != null && !StringUtil.isEmpty(owningType))
-		{
-			// read events
-			// @formatter:off
-			List<QueryResult> events = index.query(
-				new String[] { IJSIndexConstants.EVENT },
-				this.getMemberPattern(owningType),
-				SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE
-			);
-			// @formatter:on
-
-			if (events != null)
-			{
-				for (QueryResult event : events)
-				{
-					result.add(this.createEvent(event));
-				}
-			}
-		}
-
-		return result;
+		return getEvents(index, CollectionsUtil.newList(owningType));
 	}
 
 	/**
@@ -248,13 +227,13 @@ public class JSIndexReader extends IndexReader
 			);
 			// @formatter:on
 
-			if (events != null)
+			result = CollectionsUtil.map(events, new IMap<QueryResult, EventElement>()
 			{
-				for (QueryResult event : events)
+				public EventElement map(QueryResult item)
 				{
-					result.add(this.createEvent(event));
+					return createEvent(item);
 				}
-			}
+			});
 		}
 
 		return result;
@@ -283,13 +262,13 @@ public class JSIndexReader extends IndexReader
 			);
 			// @formatter:on
 
-			if (functions != null)
+			result = CollectionsUtil.map(functions, new IMap<QueryResult, FunctionElement>()
 			{
-				for (QueryResult function : functions)
+				public FunctionElement map(QueryResult item)
 				{
-					result.add(this.createFunction(function));
+					return createFunction(item);
 				}
-			}
+			});
 		}
 
 		return result;
@@ -305,29 +284,7 @@ public class JSIndexReader extends IndexReader
 	 */
 	public List<FunctionElement> getFunctions(Index index, String owningType)
 	{
-		List<FunctionElement> result = new ArrayList<FunctionElement>();
-
-		if (index != null && !StringUtil.isEmpty(owningType))
-		{
-			// read functions
-			// @formatter:off
-			List<QueryResult> functions = index.query(
-				new String[] { IJSIndexConstants.FUNCTION },
-				this.getMemberPattern(owningType),
-				SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE
-			);
-			// @formatter:on
-
-			if (functions != null)
-			{
-				for (QueryResult function : functions)
-				{
-					result.add(this.createFunction(function));
-				}
-			}
-		}
-
-		return result;
+		return getFunctions(index, CollectionsUtil.newList(owningType));
 	}
 
 	/**
@@ -353,13 +310,13 @@ public class JSIndexReader extends IndexReader
 			);
 			// @formatter:on
 
-			if (functions != null)
+			result = CollectionsUtil.map(functions, new IMap<QueryResult, FunctionElement>()
 			{
-				for (QueryResult function : functions)
+				public FunctionElement map(QueryResult item)
 				{
-					result.add(this.createFunction(function));
+					return createFunction(item);
 				}
-			}
+			});
 		}
 
 		return result;
@@ -376,17 +333,6 @@ public class JSIndexReader extends IndexReader
 		String typePattern = RegexUtil.createQuotedListPattern(typeNames);
 
 		return MessageFormat.format("^{1}{0}", new Object[] { this.getDelimiter(), typePattern }); //$NON-NLS-1$
-	}
-
-	/**
-	 * getMemberPattern
-	 * 
-	 * @param typeName
-	 * @return
-	 */
-	private String getMemberPattern(String typeName)
-	{
-		return MessageFormat.format("{1}{0}", new Object[] { this.getDelimiter(), typeName }); //$NON-NLS-1$
 	}
 
 	/**
@@ -424,13 +370,13 @@ public class JSIndexReader extends IndexReader
 			);
 			// @formatter:on
 
-			if (properties != null)
+			result = CollectionsUtil.map(properties, new IMap<QueryResult, PropertyElement>()
 			{
-				for (QueryResult property : properties)
+				public PropertyElement map(QueryResult item)
 				{
-					result.add(this.createProperty(property));
+					return createProperty(item);
 				}
-			}
+			});
 		}
 
 		return result;
@@ -446,29 +392,7 @@ public class JSIndexReader extends IndexReader
 	 */
 	public List<PropertyElement> getProperties(Index index, String owningType)
 	{
-		List<PropertyElement> result = new ArrayList<PropertyElement>();
-
-		if (index != null && !StringUtil.isEmpty(owningType))
-		{
-			// read properties
-			// @formatter:off
-			List<QueryResult> properties = index.query(
-				new String[] { IJSIndexConstants.PROPERTY },
-				this.getMemberPattern(owningType),
-				SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE
-			);
-			// @formatter:on
-
-			if (properties != null)
-			{
-				for (QueryResult property : properties)
-				{
-					result.add(this.createProperty(property));
-				}
-			}
-		}
-
-		return result;
+		return getProperties(index, CollectionsUtil.newList(owningType));
 	}
 
 	/**
@@ -494,13 +418,13 @@ public class JSIndexReader extends IndexReader
 			);
 			// @formatter:on
 
-			if (properties != null)
+			result = CollectionsUtil.map(properties, new IMap<QueryResult, PropertyElement>()
 			{
-				for (QueryResult property : properties)
+				public PropertyElement map(QueryResult item)
 				{
-					result.add(this.createProperty(property));
+					return createProperty(item);
 				}
-			}
+			});
 		}
 
 		return result;

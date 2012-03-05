@@ -7,6 +7,7 @@
  */
 package com.aptana.editor.js.parsing;
 
+import java.io.IOException;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -966,6 +967,27 @@ public class JSParserTest extends TestCase
 	public void testFunctionWithoutBody() throws Exception
 	{
 		parseTest("function abc(s1, s2, s3)", "function abc (s1, s2, s3) {}" + EOL);
+	}
+
+	/**
+	 * Test APSTUD-4072
+	 * 
+	 * @throws IOException
+	 * @throws beaver.Parser.Exception
+	 */
+	public void testNodeOffsetsAtEOF() throws Exception
+	{
+		String source = "a.foo()\n// this is a comment";
+		fScanner.setSource(source);
+		IParseNode result = (IParseNode) fParser.parse(fScanner);
+
+		assertNotNull(result);
+		assertEquals(1, result.getChildCount());
+
+		IParseNode invokeNode = result.getFirstChild();
+		assertNotNull(invokeNode);
+		assertEquals(0, invokeNode.getStartingOffset());
+		assertEquals(6, invokeNode.getEndingOffset());
 	}
 
 	// utility methods

@@ -949,6 +949,10 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 								result = LocationType.IN_CONSTRUCTOR;
 								break;
 
+							case VAR:
+								result = LocationType.IN_VARIABLE_DECLARATION;
+								break;
+
 							default:
 								result = LocationType.IN_VARIABLE_NAME;
 								break;

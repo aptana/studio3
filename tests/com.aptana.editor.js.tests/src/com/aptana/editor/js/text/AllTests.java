@@ -21,6 +21,7 @@ public class AllTests
 		TestSuite suite = new TestSuite("Tests for com.aptana.editor.js.text");
 		// $JUnit-BEGIN$
 		suite.addTestSuite(JSAutoIndentStrategyTest.class);
+		suite.addTestSuite(JSTextHoverTest.class);
 		// $JUnit-END$
 		return suite;
 	}

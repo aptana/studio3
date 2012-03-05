@@ -48,7 +48,7 @@ public class ReconcileContextTest extends TestCase
 		context = new ReconcileContext(null, null, content)
 		{
 			@Override
-			protected String getCharset() throws CoreException
+			public String getCharset() throws CoreException
 			{
 				return "abjfjhytfj";
 			}

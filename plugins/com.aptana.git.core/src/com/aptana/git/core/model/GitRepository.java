@@ -2181,4 +2181,32 @@ public class GitRepository
 	{
 		monitor.writeLock().lock();
 	}
+
+	/**
+	 * Removes a remote with a given name.
+	 * 
+	 * @param remoteName
+	 * @return
+	 */
+	public IStatus removeRemote(String remoteName)
+	{
+		return execute(GitRepository.ReadWrite.WRITE, "remote", "rm", remoteName); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	/**
+	 * Adds a new remote with the given name and URL. If track is specified, it will track the current branch only.
+	 * 
+	 * @param remoteName
+	 * @param url
+	 * @param track
+	 * @return
+	 */
+	public IStatus addRemote(String remoteName, String url, boolean track)
+	{
+		if (track)
+		{
+			return execute(GitRepository.ReadWrite.WRITE, "remote", "add", "--track", currentBranch(), remoteName, url); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		}
+		return execute(GitRepository.ReadWrite.WRITE, "remote", "add", remoteName, url); //$NON-NLS-1$ //$NON-NLS-2$
+	}
 }
