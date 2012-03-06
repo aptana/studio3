@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -475,46 +476,44 @@ public class JSModelFormatter
 			@Override
 			public String generate(Collection<PropertyElement> properties, URI root)
 			{
-				Set<String> documents = new HashSet<String>();
+				Set<String> documents = new LinkedHashSet<String>(); // linked hash set to preserve add order
+
+				// collect all documents
 				for (PropertyElement pe : properties)
 				{
 					documents.addAll(pe.getDocuments());
 				}
-				String locations = formatDefiningFiles(documents, root);
-				if (!StringUtil.isEmpty(locations))
-				{
-					return " - " + locations; //$NON-NLS-1$
-				}
-				return StringUtil.EMPTY;
-			}
 
-			/**
-			 * formatDefiningFiles
-			 * 
-			 * @param property
-			 * @param projectURI
-			 */
-			private String formatDefiningFiles(Collection<String> documents, final URI projectURI)
-			{
-				if (projectURI != null)
+				// convert document list to text
+				if (!documents.isEmpty())
 				{
-					documents = CollectionsUtil.map(documents, new IMap<String, String>()
+					List<String> parts = new ArrayList<String>(3); // concatenation container
+					String first = documents.iterator().next();
+
+					if (root != null)
 					{
-						public String map(String item)
+						try
 						{
-							try
-							{
-								return projectURI.relativize(new URI(item)).getPath();
-							}
-							catch (URISyntaxException e)
-							{
-								return item;
-							}
+							first = root.relativize(new URI(first)).getPath();
 						}
-					});
+						catch (URISyntaxException e)
+						{
+							// ignore and use the default value set in the "first" declaration
+						}
+					}
+
+					parts.add(" - "); //$NON-NLS-1$
+					parts.add(first);
+
+					if (documents.size() > 1)
+					{
+						parts.add(", ..."); //$NON-NLS-1$
+					}
+
+					return StringUtil.concat(parts);
 				}
 
-				return StringUtil.join(COMMA_SPACE, documents);
+				return StringUtil.EMPTY;
 			}
 		};
 
@@ -639,7 +638,7 @@ public class JSModelFormatter
 					}
 				);
 				// @formatter:on
-				stripAndBold.addPattern("</?p>");
+				stripAndBold.addPattern("</?p>"); //$NON-NLS-1$
 			}
 
 			@Override
