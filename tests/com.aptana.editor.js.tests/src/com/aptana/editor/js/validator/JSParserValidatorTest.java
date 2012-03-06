@@ -34,7 +34,7 @@ public class JSParserValidatorTest extends AbstractValidatorTestCase
 
 	public void testJSParseErrors() throws CoreException
 	{
-		String text = "var foo = function() {\nhello()\n};";
+		String text = "var foo = function() {\nhello(\n};";
 
 		List<IProblem> items = getParseErrors(text);
 		assertEquals(1, items.size());

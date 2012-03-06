@@ -103,7 +103,7 @@ public class HTMLParseErrorValidatorTest extends AbstractValidatorTestCase
 
 	public void testHTMLEmbeddedJSParseError() throws CoreException
 	{
-		String text = "<html>\n<script>\nvar foo = function() {\nhello()\n};\n</script>\n<title>test</title>\n<body></body>\n</html>";
+		String text = "<html>\n<script>\nvar foo = function() {\nhello(\n};\n</script>\n<title>test</title>\n<body></body>\n</html>";
 
 		List<IProblem> htmlProblems = getParseErrors(text);
 		assertEquals(0, htmlProblems.size());
