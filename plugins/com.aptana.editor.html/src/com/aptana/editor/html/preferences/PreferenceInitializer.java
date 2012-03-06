@@ -73,7 +73,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 				return HTMLPlugin.PLUGIN_ID;
 			}
 		};
-		prefs.putBoolean(parseValidator.getEnablementPreferenceKey(BuildType.BUILD), false);
+		prefs.putBoolean(parseValidator.getEnablementPreferenceKey(BuildType.BUILD), true);
 		prefs.putBoolean(parseValidator.getEnablementPreferenceKey(BuildType.RECONCILE), true);
 	}
 }
