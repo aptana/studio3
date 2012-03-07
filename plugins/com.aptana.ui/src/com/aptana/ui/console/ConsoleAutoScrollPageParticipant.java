@@ -70,9 +70,8 @@ public class ConsoleAutoScrollPageParticipant extends PlatformObject implements 
 				}
 			}
 		}
-		final IAction scrollLockAction = slAction;
 		textWidget = viewer.getTextWidget();
-		listener = new ConsoleListener(viewer, toolBarManager, scrollLockAction);
+		listener = new ConsoleListener(viewer, toolBarManager, slAction);
 
 		// Based on Eclipse Snippet191 - Detects scrolling that were initiated by the user.
 		textWidget.addListener(SWT.MouseDown, listener);
@@ -139,9 +138,9 @@ public class ConsoleAutoScrollPageParticipant extends PlatformObject implements 
 	 */
 	private final class ConsoleListener implements Listener
 	{
-		private final IOConsoleViewer viewer;
-		private final IToolBarManager toolBarManager;
-		private final IAction scrollLockAction;
+		private IOConsoleViewer viewer;
+		private IToolBarManager toolBarManager;
+		private IAction scrollLockAction;
 		int lastIndex = textWidget.getTopIndex();
 
 		/**
