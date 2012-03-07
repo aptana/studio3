@@ -57,6 +57,7 @@ public class SamplesManager implements ISamplesManager
 	private static final String ATTR_PATH = "path"; //$NON-NLS-1$
 	private static final String ATTR_CATEGORY = "category"; //$NON-NLS-1$
 
+	private static final String BUNDLE_SCRIPT = "bundle.rb"; //$NON-NLS-1$
 	private static final String SAMPLES_SCRIPT = "project_samples.rb"; //$NON-NLS-1$
 
 	private Map<String, SampleCategory> categories;
@@ -73,7 +74,7 @@ public class SamplesManager implements ISamplesManager
 
 		public void scriptLoaded(File script)
 		{
-			if (script.toString().endsWith(SAMPLES_SCRIPT))
+			if (needLoadSamples(script))
 			{
 				loadBundleSampleElements();
 			}
@@ -81,7 +82,7 @@ public class SamplesManager implements ISamplesManager
 
 		public void scriptReloaded(File script)
 		{
-			if (script.toString().endsWith(SAMPLES_SCRIPT))
+			if (needLoadSamples(script))
 			{
 				loadBundleSampleElements();
 			}
@@ -89,10 +90,16 @@ public class SamplesManager implements ISamplesManager
 
 		public void scriptUnloaded(File script)
 		{
-			if (script.toString().endsWith(SAMPLES_SCRIPT))
+			if (needLoadSamples(script))
 			{
 				loadBundleSampleElements();
 			}
+		}
+
+		private boolean needLoadSamples(File script)
+		{
+			String scriptPath = script.toString();
+			return scriptPath.endsWith(BUNDLE_SCRIPT) || scriptPath.endsWith(SAMPLES_SCRIPT);
 		}
 	};
 
