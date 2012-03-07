@@ -376,4 +376,16 @@
             priority="0">
       </diagnosticLog>
    </extension>
+   <extension
+         point="org.eclipse.ui.console.consolePageParticipants">
+      <consolePageParticipant
+            class="com.aptana.ui.console.ConsoleAutoScrollPageParticipant"
+            id="com.aptana.ui.console.autoScrollParticipant">
+         <enablement>
+            <instanceof
+                  value="org.eclipse.debug.internal.ui.views.console.ProcessConsole">
+            </instanceof>
+         </enablement>
+      </consolePageParticipant>
+   </extension>
 </plugin>
