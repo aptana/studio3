@@ -130,7 +130,6 @@ public class ConsoleAutoScrollPageParticipant extends PlatformObject implements 
 
 	private boolean isLastLineVisible(int topLineIndex)
 	{
-		textWidget.getLineCount();
 		int visibleLines = textWidget.getBounds().height / textWidget.getLineHeight();
 		return (textWidget.getLineCount() - topLineIndex <= visibleLines);
 	}
