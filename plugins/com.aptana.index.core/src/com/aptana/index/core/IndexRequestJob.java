@@ -9,14 +9,12 @@ package com.aptana.index.core;
 
 import java.net.URI;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
@@ -24,22 +22,12 @@ import org.eclipse.core.runtime.jobs.Job;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
-import com.aptana.core.util.EclipseUtil;
-import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.index.core.build.BuildContext;
 
 abstract class IndexRequestJob extends Job
 {
-	private static final String INDEX_FILTER_PARTICIPANTS_ID = "indexFilterParticipants"; //$NON-NLS-1$
-	private static final String ELEMENT_FILTER = "filter"; //$NON-NLS-1$
-	private static final String ATTR_CLASS = "class"; //$NON-NLS-1$
-
-	private static final String FILE_CONTRIBUTORS_ID = "fileContributors"; //$NON-NLS-1$
-	private static final String ELEMENT_CONTRIBUTOR = "contributor"; //$NON-NLS-1$
 
 	private URI containerURI;
-	private List<IIndexFilterParticipant> filterParticipants;
-	private List<IIndexFileContributor> fileContributors;
 
 	/**
 	 * IndexRequestJob
@@ -93,7 +81,7 @@ abstract class IndexRequestJob extends Job
 	{
 		if (!CollectionsUtil.isEmpty(fileStores))
 		{
-			for (IIndexFilterParticipant filterParticipant : getFilterParticipants())
+			for (IIndexFilterParticipant filterParticipant : getIndexManager().getFilterParticipants())
 			{
 				fileStores = filterParticipant.applyFilter(fileStores);
 			}
@@ -122,7 +110,7 @@ abstract class IndexRequestJob extends Job
 	{
 		Set<IFileStore> result = new HashSet<IFileStore>();
 
-		for (IIndexFileContributor contributor : this.getFileContributors())
+		for (IIndexFileContributor contributor : getIndexManager().getFileContributors())
 		{
 			Set<IFileStore> files = contributor.getFiles(container);
 
@@ -133,83 +121,6 @@ abstract class IndexRequestJob extends Job
 		}
 
 		return result;
-	}
-
-	/**
-	 * getFileContributors
-	 * 
-	 * @return
-	 */
-	private synchronized List<IIndexFileContributor> getFileContributors()
-	{
-		if (fileContributors == null)
-		{
-			fileContributors = new ArrayList<IIndexFileContributor>();
-
-			EclipseUtil.processConfigurationElements(IndexPlugin.PLUGIN_ID, FILE_CONTRIBUTORS_ID,
-					new IConfigurationElementProcessor()
-					{
-
-						public void processElement(IConfigurationElement element)
-						{
-							try
-							{
-								IIndexFileContributor participant = (IIndexFileContributor) element
-										.createExecutableExtension(ATTR_CLASS);
-								fileContributors.add(participant);
-							}
-							catch (CoreException e)
-							{
-								IdeLog.logError(IndexPlugin.getDefault(), e);
-							}
-						}
-
-						public Set<String> getSupportElementNames()
-						{
-							return CollectionsUtil.newSet(ELEMENT_CONTRIBUTOR);
-						}
-					});
-		}
-
-		return fileContributors;
-	}
-
-	/**
-	 * getFilterParticipants
-	 * 
-	 * @return
-	 */
-	private synchronized List<IIndexFilterParticipant> getFilterParticipants()
-	{
-		if (filterParticipants == null)
-		{
-			filterParticipants = new ArrayList<IIndexFilterParticipant>();
-			EclipseUtil.processConfigurationElements(IndexPlugin.PLUGIN_ID, INDEX_FILTER_PARTICIPANTS_ID,
-					new IConfigurationElementProcessor()
-					{
-
-						public void processElement(IConfigurationElement element)
-						{
-							try
-							{
-								IIndexFilterParticipant participant = (IIndexFilterParticipant) element
-										.createExecutableExtension(ATTR_CLASS);
-								filterParticipants.add(participant);
-							}
-							catch (CoreException e)
-							{
-								IdeLog.logError(IndexPlugin.getDefault(), e);
-							}
-						}
-
-						public Set<String> getSupportElementNames()
-						{
-							return CollectionsUtil.newSet(ELEMENT_FILTER);
-						}
-					});
-		}
-
-		return filterParticipants;
 	}
 
 	/**
@@ -224,7 +135,7 @@ abstract class IndexRequestJob extends Job
 
 	protected IndexManager getIndexManager()
 	{
-		return IndexManager.getInstance();
+		return IndexPlugin.getDefault().getIndexManager();
 	}
 
 	/**

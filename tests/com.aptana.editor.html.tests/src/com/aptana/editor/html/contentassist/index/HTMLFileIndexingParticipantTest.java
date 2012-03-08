@@ -18,6 +18,7 @@ import com.aptana.editor.js.contentassist.index.JSFileIndexingParticipant;
 import com.aptana.index.core.FileStoreBuildContext;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
+import com.aptana.index.core.IndexPlugin;
 import com.aptana.index.core.build.BuildContext;
 
 public class HTMLFileIndexingParticipantTest extends TestCase
@@ -75,7 +76,7 @@ public class HTMLFileIndexingParticipantTest extends TestCase
 			IOUtil.write(new FileOutputStream(coffeeFile), src);
 			IFileStore fileStore = EFS.getStore(coffeeFile.toURI());
 
-			Index index = IndexManager.getInstance().getIndex(tmpDir.toURI());
+			Index index = getIndexManager().getIndex(tmpDir.toURI());
 			BuildContext context = new FileStoreBuildContext(fileStore)
 			{
 				@Override
@@ -91,6 +92,11 @@ public class HTMLFileIndexingParticipantTest extends TestCase
 			// Clean up the generated files!
 			FileUtil.deleteRecursively(tmpDir);
 		}
+	}
+
+	protected IndexManager getIndexManager()
+	{
+		return IndexPlugin.getDefault().getIndexManager();
 	}
 
 }

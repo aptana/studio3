@@ -24,6 +24,7 @@ import com.aptana.editor.html.contentassist.model.EntityElement;
 import com.aptana.editor.html.contentassist.model.EventElement;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
+import com.aptana.index.core.IndexPlugin;
 
 public class HTMLIndexQueryHelper
 {
@@ -34,7 +35,12 @@ public class HTMLIndexQueryHelper
 	 */
 	public static Index getIndex()
 	{
-		return IndexManager.getInstance().getIndex(URI.create(IHTMLIndexConstants.METADATA_INDEX_LOCATION));
+		return getIndexManager().getIndex(URI.create(IHTMLIndexConstants.METADATA_INDEX_LOCATION));
+	}
+
+	protected static IndexManager getIndexManager()
+	{
+		return IndexPlugin.getDefault().getIndexManager();
 	}
 
 	private HTMLIndexReader _reader;

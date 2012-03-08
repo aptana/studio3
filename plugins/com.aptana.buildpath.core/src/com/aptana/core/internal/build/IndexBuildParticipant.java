@@ -26,6 +26,7 @@ import com.aptana.core.util.CollectionsUtil;
 import com.aptana.index.core.IFileStoreIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
+import com.aptana.index.core.IndexPlugin;
 import com.aptana.index.core.build.BuildContext;
 
 public class IndexBuildParticipant extends RequiredBuildParticipant
@@ -125,7 +126,7 @@ public class IndexBuildParticipant extends RequiredBuildParticipant
 
 	protected IndexManager getIndexManager()
 	{
-		return IndexManager.getInstance();
+		return IndexPlugin.getDefault().getIndexManager();
 	}
 
 	protected static void logTrace(String message)

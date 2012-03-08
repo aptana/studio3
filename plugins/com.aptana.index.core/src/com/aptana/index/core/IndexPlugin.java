@@ -19,6 +19,7 @@ public class IndexPlugin extends Plugin
 	public static final String PLUGIN_ID = "com.aptana.index.core"; //$NON-NLS-1$
 
 	private static IndexPlugin plugin;
+	private IndexManager fManager;
 
 	/**
 	 * Returns the shared instance
@@ -53,7 +54,17 @@ public class IndexPlugin extends Plugin
 	 */
 	public void stop(BundleContext context) throws Exception
 	{
+		fManager = null;
 		plugin = null;
 		super.stop(context);
+	}
+
+	public synchronized IndexManager getIndexManager()
+	{
+		if (fManager == null)
+		{
+			fManager = new IndexManager();
+		}
+		return fManager;
 	}
 }

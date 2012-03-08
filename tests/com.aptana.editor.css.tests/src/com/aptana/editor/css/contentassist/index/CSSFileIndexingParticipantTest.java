@@ -14,6 +14,7 @@ import com.aptana.core.util.IOUtil;
 import com.aptana.index.core.FileStoreBuildContext;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
+import com.aptana.index.core.IndexPlugin;
 import com.aptana.index.core.build.BuildContext;
 
 public class CSSFileIndexingParticipantTest extends TestCase
@@ -51,7 +52,7 @@ public class CSSFileIndexingParticipantTest extends TestCase
 		assertTrue(CSSFileIndexingParticipant.isColor("teal"));
 		assertTrue(CSSFileIndexingParticipant.isColor("white"));
 		assertTrue(CSSFileIndexingParticipant.isColor("yellow"));
-		
+
 		// Non-standard names don't work
 		assertFalse(CSSFileIndexingParticipant.isColor("grey"));
 	}
@@ -107,7 +108,7 @@ public class CSSFileIndexingParticipantTest extends TestCase
 			IFileStore fileStore = EFS.getStore(coffeeFile.toURI());
 			BuildContext context = new FileStoreBuildContext(fileStore);
 
-			Index index = IndexManager.getInstance().getIndex(tmpDir.toURI());
+			Index index = getIndexManager().getIndex(tmpDir.toURI());
 			indexer.index(context, index, new NullProgressMonitor());
 		}
 		finally
@@ -115,5 +116,10 @@ public class CSSFileIndexingParticipantTest extends TestCase
 			// Clean up the generated files!
 			FileUtil.deleteRecursively(tmpDir);
 		}
+	}
+
+	protected IndexManager getIndexManager()
+	{
+		return IndexPlugin.getDefault().getIndexManager();
 	}
 }

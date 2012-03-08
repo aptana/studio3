@@ -35,6 +35,7 @@ import com.aptana.editor.js.tests.JSEditorBasedTests;
 import com.aptana.index.core.IFileStoreIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
+import com.aptana.index.core.IndexPlugin;
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.SnippetElement;
@@ -288,11 +289,11 @@ public class JSContentAssistProposalTests extends JSEditorBasedTests
 
 			// Close the editor without saving, make sure we end up indexing underlying content again!
 			EditorTestHelper.closeEditor(editor);
-			
+
 			Thread.sleep(1000); // FIXME Is there anyway to tell when indexing happens and is finished?
 
 			// Now verify that our index reflects the file's contents and not the unsaved contents of the editor.
-			Index index = IndexManager.getInstance().getIndex(project.getURI());
+			Index index = getIndexManager().getIndex(project.getURI());
 			JSIndexQueryHelper _indexHelper = new JSIndexQueryHelper();
 			List<PropertyElement> projectGlobals = _indexHelper.getProjectGlobals(index);
 			assertContainsFunctions(projectGlobals, "delete_me");
@@ -305,6 +306,11 @@ public class JSContentAssistProposalTests extends JSEditorBasedTests
 				project.delete();
 			}
 		}
+	}
+
+	protected IndexManager getIndexManager()
+	{
+		return IndexPlugin.getDefault().getIndexManager();
 	}
 
 	/**

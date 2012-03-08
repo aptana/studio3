@@ -24,6 +24,7 @@ import com.aptana.editor.js.contentassist.model.JSElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
+import com.aptana.index.core.IndexPlugin;
 
 /**
  * JSIndexViewContentProvider
@@ -97,7 +98,7 @@ public class JSIndexViewContentProvider implements ITreeContentProvider
 		if (inputElement instanceof IProject)
 		{
 			IProject project = (IProject) inputElement;
-			Index index = IndexManager.getInstance().getIndex(project.getLocationURI());
+			Index index = getIndexManager().getIndex(project.getLocationURI());
 
 			result = new Object[] { new JSElement(index) };
 		}
@@ -107,6 +108,11 @@ public class JSIndexViewContentProvider implements ITreeContentProvider
 		}
 
 		return result;
+	}
+
+	protected IndexManager getIndexManager()
+	{
+		return IndexPlugin.getDefault().getIndexManager();
 	}
 
 	/*

@@ -15,9 +15,9 @@ import org.osgi.framework.Bundle;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.contentassist.MetadataLoader;
 import com.aptana.editor.css.contentassist.CSSIndexQueryHelper;
-import com.aptana.editor.css.contentassist.index.ICSSIndexConstants;
 import com.aptana.editor.css.contentassist.index.CSSIndexWriter;
 import com.aptana.editor.css.contentassist.index.CSSMetadataReader;
+import com.aptana.editor.css.contentassist.index.ICSSIndexConstants;
 import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.contentassist.model.PropertyElement;
 import com.aptana.editor.css.contentassist.model.PseudoClassElement;
@@ -25,6 +25,7 @@ import com.aptana.editor.css.contentassist.model.PseudoElementElement;
 import com.aptana.editor.css.preferences.IPreferenceConstants;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
+import com.aptana.index.core.IndexPlugin;
 
 public class CSSMetadataLoader extends MetadataLoader<CSSMetadataReader>
 {
@@ -105,7 +106,7 @@ public class CSSMetadataLoader extends MetadataLoader<CSSMetadataReader>
 	protected void writeIndex(CSSMetadataReader reader)
 	{
 		// remove old index
-		IndexManager.getInstance().removeIndex(URI.create(ICSSIndexConstants.METADATA_INDEX_LOCATION));
+		getIndexManager().removeIndex(URI.create(ICSSIndexConstants.METADATA_INDEX_LOCATION));
 
 		CSSIndexWriter indexer = new CSSIndexWriter();
 
@@ -141,6 +142,11 @@ public class CSSMetadataLoader extends MetadataLoader<CSSMetadataReader>
 		{
 			IdeLog.logError(CSSPlugin.getDefault(), e);
 		}
+	}
+
+	protected IndexManager getIndexManager()
+	{
+		return IndexPlugin.getDefault().getIndexManager();
 	}
 
 	@Override

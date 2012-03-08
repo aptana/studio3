@@ -17,6 +17,7 @@ import com.aptana.editor.js.tests.JSEditorBasedTests;
 import com.aptana.index.core.FileStoreBuildContext;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
+import com.aptana.index.core.IndexPlugin;
 
 /**
  * SDocMLIndexingTests
@@ -38,7 +39,7 @@ public class SDocMLIndexingTests extends JSEditorBasedTests
 			uri = sourceFile.toURI();
 
 			// create index for file
-			Index index = IndexManager.getInstance().getIndex(uri);
+			Index index = getIndexManager().getIndex(uri);
 			SDocMLFileIndexingParticipant indexer = new SDocMLFileIndexingParticipant();
 
 			// index file
@@ -51,9 +52,14 @@ public class SDocMLIndexingTests extends JSEditorBasedTests
 		{
 			if (uri != null)
 			{
-				IndexManager.getInstance().removeIndex(uri);
+				getIndexManager().removeIndex(uri);
 			}
 		}
+	}
+
+	protected IndexManager getIndexManager()
+	{
+		return IndexPlugin.getDefault().getIndexManager();
 	}
 
 	public void assertStaticProperties_1_6_2(String fileResource) throws Exception
