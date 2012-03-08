@@ -25,9 +25,10 @@ public class ThemerPreferenceInitializer extends AbstractPreferenceInitializer
 		IEclipsePreferences node = EclipseUtil.defaultScope().getNode(ThemePlugin.PLUGIN_ID);
 		node.put(IPreferenceConstants.ACTIVE_THEME, DEFAULT_THEME);
 		// Make "invasive theming" the default for our standalones.
-		if (EclipseUtil.isStandalone() || EclipseUtil.getPluginVersion("com.appcelerator.titanium.rcp") != null) //$NON-NLS-1$
-		{
-			node.putBoolean(IPreferenceConstants.INVASIVE_THEMES, true);
-		}
+		boolean isStandalone = (EclipseUtil.isStandalone() || EclipseUtil
+				.getPluginVersion("com.appcelerator.titanium.rcp") != null); //$NON-NLS-1$
+
+		node.putBoolean(IPreferenceConstants.APPLY_TO_ALL_VIEWS, isStandalone);
+		node.putBoolean(IPreferenceConstants.APPLY_TO_ALL_EDITORS, isStandalone);
 	}
 }

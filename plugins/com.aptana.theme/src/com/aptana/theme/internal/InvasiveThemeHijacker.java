@@ -40,6 +40,7 @@ import org.eclipse.search.ui.ISearchQuery;
 import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.search.ui.text.AbstractTextSearchViewPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.RGB;
@@ -77,6 +78,7 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.theme.ColorManager;
 import com.aptana.theme.ConsoleThemer;
 import com.aptana.theme.IControlThemerFactory;
 import com.aptana.theme.IThemeManager;
@@ -98,6 +100,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 
 	private ISelectionChangedListener pageListener;
 	private Map<IViewPart, IQueryListener> queryListeners = new HashMap<IViewPart, IQueryListener>(3);
+	private boolean fIsPartListener;
 	private static boolean ranEarlyStartup = false;
 
 	public InvasiveThemeHijacker()
@@ -106,9 +109,9 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 		setSystem(!EclipseUtil.showSystemJobs());
 	}
 
-	protected boolean invasiveThemesEnabled()
+	protected boolean applyToViews()
 	{
-		return ThemePlugin.invasiveThemesEnabled();
+		return ThemePlugin.applyToViews();
 	}
 
 	@Override
@@ -119,57 +122,53 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 		{
 			return Status.CANCEL_STATUS;
 		}
-		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		if (invasiveThemesEnabled())
-		{
-			if (window != null && window.getActivePage() != null)
-			{
-				window.getActivePage().addPartListener(this);
-			}
-			if (sub.isCanceled())
-			{
-				return Status.CANCEL_STATUS;
-			}
-			sub.setWorkRemaining(3);
 
-			applyThemeToEclipseEditors(getCurrentTheme(), false, sub.newChild(1));
-			if (sub.isCanceled())
-			{
-				return Status.CANCEL_STATUS;
-			}
-			applyThemeToConsole(getCurrentTheme(), false, sub.newChild(1));
-			if (sub.isCanceled())
-			{
-				return Status.CANCEL_STATUS;
-			}
-			hijackCurrentViews(window, false, sub.newChild(1));
-		}
-		else
+		// manage being a part listener
+		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		if (window != null && window.getActivePage() != null)
 		{
-			if (window != null && window.getActivePage() != null)
+			if (fIsPartListener && applyToAllEditors() && !applyToViews())
 			{
 				window.getActivePage().removePartListener(this);
+				fIsPartListener = false;
 			}
-			if (sub.isCanceled())
+			else if (!fIsPartListener)
 			{
-				return Status.CANCEL_STATUS;
+				window.getActivePage().addPartListener(this);
+				fIsPartListener = true;
 			}
-			sub.setWorkRemaining(3);
-
-			applyThemeToEclipseEditors(getCurrentTheme(), true, sub.newChild(1));
-			if (sub.isCanceled())
-			{
-				return Status.CANCEL_STATUS;
-			}
-			applyThemeToConsole(getCurrentTheme(), true, sub.newChild(1));
-			if (sub.isCanceled())
-			{
-				return Status.CANCEL_STATUS;
-			}
-			hijackCurrentViews(window, true, sub.newChild(1));
 		}
+
+		if (sub.isCanceled())
+		{
+			return Status.CANCEL_STATUS;
+		}
+		sub.setWorkRemaining(3);
+
+		// Apply to editors
+		applyThemeToEclipseEditors(getCurrentTheme(), applyToAllEditors(), sub.newChild(1));
+		if (sub.isCanceled())
+		{
+			return Status.CANCEL_STATUS;
+		}
+
+		// Apply to consoles
+		applyThemeToConsole(getCurrentTheme(), applyToViews(), sub.newChild(1));
+		if (sub.isCanceled())
+		{
+			return Status.CANCEL_STATUS;
+		}
+
+		// Apply to views
+		hijackCurrentViews(window, applyToViews(), sub.newChild(1));
+
 		sub.done();
 		return Status.OK_STATUS;
+	}
+
+	private boolean applyToAllEditors()
+	{
+		return ThemePlugin.applyToAllEditors();
 	}
 
 	private void applyThemeToConsole(Theme currentTheme, boolean revertToDefaults, IProgressMonitor monitor)
@@ -246,8 +245,11 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 
 	protected void hijackView(final IViewPart view, final boolean revertToDefaults)
 	{
-		if (view == null)
+		if (view == null || !applyToViews())
+		{
 			return;
+		}
+
 		// TODO What about ConsoleView? It's a pagebook, like outline...
 		if (view instanceof IResourceNavigator)
 		{
@@ -1037,10 +1039,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 			prefs.remove(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_BACKGROUND);
 			prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND_SYSTEM_DEFAULT, true);
 			prefs.remove(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND);
-
-			// FIXME Revert back to default current line color...
-			// prefs.put(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE_COLOR,
-			// StringConverter.asString(theme.getLineHighlightAgainstBG()));
+			prefs.remove(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE_COLOR);
 		}
 		else
 		{
@@ -1191,9 +1190,10 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 	// IPreferenceChangeListener
 	public void preferenceChange(PreferenceChangeEvent event)
 	{
-		// If invaisive themes are on and we changed the theme, schedule. Also schedule if we toggled invasive theming.
-		if (event.getKey().equals(IPreferenceConstants.INVASIVE_THEMES)
-				|| (event.getKey().equals(IThemeManager.THEME_CHANGED) && invasiveThemesEnabled()))
+		// If invasive themes are on and we changed the theme, schedule. Also schedule if we toggled invasive theming.
+		if (event.getKey().equals(IPreferenceConstants.APPLY_TO_ALL_VIEWS)
+				|| event.getKey().equals(IPreferenceConstants.APPLY_TO_ALL_EDITORS)
+				|| (event.getKey().equals(IThemeManager.THEME_CHANGED) && applyToViews()))
 		{
 			cancel();
 			schedule();
@@ -1205,7 +1205,9 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 		try
 		{
 			if (Class.forName("com.aptana.editor.common.extensions.IThemeableEditor").isInstance(editor)) // we already handle our own editors //$NON-NLS-1$
+			{
 				return;
+			}
 		}
 		catch (ClassNotFoundException e1)
 		{
@@ -1224,26 +1226,38 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 			// ignore
 		}
 		if (sourceViewer == null || sourceViewer.getTextWidget() == null)
+		{
 			return;
+		}
 
 		// Force selection color
-		Color existingSelectionBG = sourceViewer.getTextWidget().getSelectionBackground();
+		StyledText textWidget = sourceViewer.getTextWidget();
+		Color existingSelectionBG = textWidget.getSelectionBackground();
 		RGB selectionRGB = getCurrentTheme().getSelectionAgainstBG();
 		if (!existingSelectionBG.getRGB().equals(selectionRGB))
 		{
-			sourceViewer.getTextWidget().setSelectionBackground(
-					ThemePlugin.getDefault().getColorManager().getColor(selectionRGB));
+			textWidget.setSelectionBackground(getColorManager().getColor(selectionRGB));
 		}
-		if (!Platform.getOS().equals(Platform.OS_MACOSX))
+		if (!Platform.OS_MACOSX.equals(Platform.getOS()))
 		{
 			// Linux and windows need selection fg set or we just see a block of color.
-			sourceViewer.getTextWidget().setSelectionForeground(
-					ThemePlugin.getDefault().getColorManager().getColor(getCurrentTheme().getForeground()));
+			textWidget.setSelectionForeground(getColorManager().getColor(getCurrentTheme().getForeground()));
 		}
+	}
+
+	protected ColorManager getColorManager()
+	{
+		return ThemePlugin.getDefault().getColorManager();
 	}
 
 	protected void hijackEditor(IEditorPart part, boolean revertToDefaults)
 	{
+		if (applyToAllEditors())
+		{
+			return;
+		}
+
+		// FIXME This doesn't work on CompareEditor!
 		if (part instanceof AbstractTextEditor)
 		{
 			overrideSelectionColor((AbstractTextEditor) part);
@@ -1289,7 +1303,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 			return;
 		}
 		ranEarlyStartup = true;
-		if (invasiveThemesEnabled())
+		if (applyToViews())
 		{
 			schedule();
 		}

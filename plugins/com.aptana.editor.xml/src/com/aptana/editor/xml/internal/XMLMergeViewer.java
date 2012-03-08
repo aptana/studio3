@@ -8,9 +8,7 @@
 package com.aptana.editor.xml.internal;
 
 import org.eclipse.compare.CompareConfiguration;
-import org.eclipse.compare.contentmergeviewer.TextMergeViewer;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.text.IDocumentExtension3;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.TextViewer;
 import org.eclipse.jface.text.source.SourceViewer;
@@ -20,6 +18,7 @@ import com.aptana.editor.common.ExtendedFastPartitioner;
 import com.aptana.editor.common.NullPartitionerSwitchStrategy;
 import com.aptana.editor.common.text.rules.CompositePartitionScanner;
 import com.aptana.editor.common.text.rules.NullSubPartitionScanner;
+import com.aptana.editor.common.viewer.CommonMergeViewer;
 import com.aptana.editor.xml.XMLEditor;
 import com.aptana.editor.xml.XMLSourceConfiguration;
 import com.aptana.editor.xml.XMLSourceViewerConfiguration;
@@ -27,7 +26,7 @@ import com.aptana.editor.xml.XMLSourceViewerConfiguration;
 /**
  * @author cwilliams
  */
-public class XMLMergeViewer extends TextMergeViewer
+public class XMLMergeViewer extends CommonMergeViewer
 {
 	public XMLMergeViewer(Composite parent, CompareConfiguration configuration)
 	{
@@ -37,23 +36,18 @@ public class XMLMergeViewer extends TextMergeViewer
 	@Override
 	protected IDocumentPartitioner getDocumentPartitioner()
 	{
-		CompositePartitionScanner partitionScanner = new CompositePartitionScanner(XMLSourceConfiguration
-				.getDefault().createSubPartitionScanner(), new NullSubPartitionScanner(),
-				new NullPartitionerSwitchStrategy());
+		CompositePartitionScanner partitionScanner = new CompositePartitionScanner(XMLSourceConfiguration.getDefault()
+				.createSubPartitionScanner(), new NullSubPartitionScanner(), new NullPartitionerSwitchStrategy());
 		IDocumentPartitioner partitioner = new ExtendedFastPartitioner(partitionScanner, XMLSourceConfiguration
 				.getDefault().getContentTypes());
 		return partitioner;
 	}
 
 	@Override
-	protected String getDocumentPartitioning()
-	{
-		return IDocumentExtension3.DEFAULT_PARTITIONING;
-	}
-
-	@Override
 	protected void configureTextViewer(TextViewer textViewer)
 	{
+		super.configureTextViewer(textViewer);
+
 		if (textViewer instanceof SourceViewer)
 		{
 			SourceViewer sourceViewer = (SourceViewer) textViewer;

@@ -1023,7 +1023,7 @@ public class FilteringProjectView extends GitProjectView
 
 	protected Color getHoverBackgroundColor()
 	{
-		if (ThemePlugin.invasiveThemesEnabled())
+		if (ThemePlugin.applyToViews())
 		{
 			return ThemePlugin.getDefault().getColorManager().getColor(getActiveTheme().getLineHighlightAgainstBG());
 		}

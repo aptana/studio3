@@ -18,7 +18,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
@@ -52,7 +51,9 @@ import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.scope.ScopeSelector;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.Theme;
@@ -163,6 +164,9 @@ public class ThemeManager implements IThemeManager
 		return new TextAttribute(ThemePlugin.getDefault().getColorManager().getColor(new RGB(255, 255, 255)));
 	}
 
+	/**
+	 * Lazily init the current theme.
+	 */
 	public Theme getCurrentTheme()
 	{
 		if (fCurrentTheme == null)
@@ -192,11 +196,29 @@ public class ThemeManager implements IThemeManager
 		return fCurrentTheme;
 	}
 
+	/**
+	 * Set the new theme to use, this involves setting prefs across a number of plugins.
+	 */
 	public void setCurrentTheme(Theme theme)
 	{
 		fCurrentTheme = theme;
 
 		// Set the find in file search color
+		setSearchResultColor(theme);
+
+		// Set the color for the search result annotation, the pref key is "searchResultIndicationColor"
+		setAnnotationColorsToMatchTheme(theme);
+
+		// Also set the standard eclipse editor props, like fg, bg, selection fg, bg
+		setAptanaEditorColorsToMatchTheme(theme);
+
+		notifyThemeChangeListeners(theme);
+
+		forceFontsUpToDate();
+	}
+
+	private void setSearchResultColor(Theme theme)
+	{
 		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode("org.eclipse.search"); //$NON-NLS-1$
 		prefs.put("org.eclipse.search.potentialMatch.fgColor", toString(theme.getSearchResultColor())); //$NON-NLS-1$
 		try
@@ -207,9 +229,91 @@ public class ThemeManager implements IThemeManager
 		{
 			IdeLog.logError(ThemePlugin.getDefault(), e);
 		}
+	}
 
-		// Set the color for the search result annotation, the pref key is "searchResultIndicationColor"
-		prefs = EclipseUtil.instanceScope().getNode("org.eclipse.ui.editors"); //$NON-NLS-1$
+	private void forceFontsUpToDate()
+	{
+		final String[] fontIds = new String[] { IThemeManager.VIEW_FONT_NAME, JFaceResources.TEXT_FONT,
+				"org.eclipse.ui.workbench.texteditor.blockSelectionModeFont" }; //$NON-NLS-1$
+		UIUtils.getDisplay().asyncExec(new Runnable()
+		{
+
+			public void run()
+			{
+				for (String fontId : fontIds)
+				{
+					Font fFont = JFaceResources.getFontRegistry().get(fontId);
+					// Only set new values if they're different from existing!
+					Font existing = JFaceResources.getFont(fontId);
+					String existingString = StringUtil.EMPTY;
+					if (!existing.isDisposed())
+					{
+						existingString = PreferenceConverter.getStoredRepresentation(existing.getFontData());
+					}
+					String fdString = PreferenceConverter.getStoredRepresentation(fFont.getFontData());
+					if (!existingString.equals(fdString))
+					{
+						// put in registry...
+						JFaceResources.getFontRegistry().put(fontId, fFont.getFontData());
+					}
+				}
+			}
+		});
+	}
+
+	/**
+	 * Set specific pref values that we use to listen for when the theme has changed across our plugins. This ignals to
+	 * them the theme has been changed and they need to update their settings to match.
+	 * 
+	 * @param theme
+	 */
+	private void notifyThemeChangeListeners(Theme theme)
+	{
+		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID);
+		prefs.put(IPreferenceConstants.ACTIVE_THEME, theme.getName());
+		prefs.putLong(THEME_CHANGED, System.currentTimeMillis());
+		try
+		{
+			prefs.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			IdeLog.logError(ThemePlugin.getDefault(), e);
+		}
+	}
+
+	/**
+	 * Set the FG, BG, selection and current line colors on our editors.
+	 * 
+	 * @param theme
+	 */
+	private void setAptanaEditorColorsToMatchTheme(Theme theme)
+	{
+		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode("com.aptana.editor.common"); //$NON-NLS-1$
+		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND_SYSTEM_DEFAULT, false);
+		prefs.put(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND, toString(theme.getSelectionAgainstBG()));
+
+		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_BACKGROUND_SYSTEM_DEFAULT, false);
+		prefs.put(AbstractTextEditor.PREFERENCE_COLOR_BACKGROUND, toString(theme.getBackground()));
+
+		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND_SYSTEM_DEFAULT, false);
+		prefs.put(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND, toString(theme.getForeground()));
+
+		prefs.put(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE_COLOR,
+				toString(theme.getLineHighlightAgainstBG()));
+		try
+		{
+			prefs.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			IdeLog.logError(ThemePlugin.getDefault(), e);
+		}
+	}
+
+	private void setAnnotationColorsToMatchTheme(Theme theme)
+	{
+		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode("org.eclipse.ui.editors"); //$NON-NLS-1$
 		if (!theme.hasEntry("override.searchResultIndication")) //$NON-NLS-1$
 		{
 			prefs.put("searchResultIndicationColor", toString(theme.getSearchResultColor())); //$NON-NLS-1$
@@ -285,92 +389,6 @@ public class ThemeManager implements IThemeManager
 		{
 			IdeLog.logError(ThemePlugin.getDefault(), e);
 		}
-
-		// Set the bg/fg/selection colors for compare editors
-		prefs = EclipseUtil.instanceScope().getNode("org.eclipse.compare"); //$NON-NLS-1$
-		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_BACKGROUND_SYSTEM_DEFAULT, false);
-		prefs.put(AbstractTextEditor.PREFERENCE_COLOR_BACKGROUND, StringConverter.asString(theme.getBackground()));
-		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND_SYSTEM_DEFAULT, false);
-		prefs.put(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND, StringConverter.asString(theme.getForeground()));
-		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_BACKGROUND_SYSTEM_DEFAULT, false);
-		prefs.put(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_BACKGROUND,
-				StringConverter.asString(theme.getSelectionAgainstBG()));
-		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND_SYSTEM_DEFAULT, false);
-		prefs.put(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND,
-				StringConverter.asString(theme.getForeground()));
-		prefs.put(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE_COLOR,
-				toString(theme.getLineHighlightAgainstBG()));
-
-		try
-		{
-			prefs.flush();
-		}
-		catch (BackingStoreException e)
-		{
-			IdeLog.logError(ThemePlugin.getDefault(), e);
-		}
-
-		// Also set the standard eclipse editor props, like fg, bg, selection fg, bg
-		prefs = EclipseUtil.instanceScope().getNode("com.aptana.editor.common"); //$NON-NLS-1$
-		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND_SYSTEM_DEFAULT, false);
-		prefs.put(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND, toString(theme.getSelectionAgainstBG()));
-
-		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_BACKGROUND_SYSTEM_DEFAULT, false);
-		prefs.put(AbstractTextEditor.PREFERENCE_COLOR_BACKGROUND, toString(theme.getBackground()));
-
-		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND_SYSTEM_DEFAULT, false);
-		prefs.put(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND, toString(theme.getForeground()));
-
-		prefs.put(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE_COLOR,
-				toString(theme.getLineHighlightAgainstBG()));
-		try
-		{
-			prefs.flush();
-		}
-		catch (BackingStoreException e)
-		{
-			IdeLog.logError(ThemePlugin.getDefault(), e);
-		}
-
-		prefs = EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID);
-		prefs.put(IPreferenceConstants.ACTIVE_THEME, theme.getName());
-		prefs.putLong(THEME_CHANGED, System.currentTimeMillis());
-		try
-		{
-			prefs.flush();
-		}
-		catch (BackingStoreException e)
-		{
-			IdeLog.logError(ThemePlugin.getDefault(), e);
-		}
-
-		// Force font
-		final String[] fontIds = new String[] { IThemeManager.VIEW_FONT_NAME, JFaceResources.TEXT_FONT,
-				"org.eclipse.ui.workbench.texteditor.blockSelectionModeFont" }; //$NON-NLS-1$
-		UIUtils.getDisplay().asyncExec(new Runnable()
-		{
-
-			public void run()
-			{
-				for (String fontId : fontIds)
-				{
-					Font fFont = JFaceResources.getFontRegistry().get(fontId);
-					// Only set new values if they're different from existing!
-					Font existing = JFaceResources.getFont(fontId);
-					String existingString = ""; //$NON-NLS-1$
-					if (!existing.isDisposed())
-					{
-						existingString = PreferenceConverter.getStoredRepresentation(existing.getFontData());
-					}
-					String fdString = PreferenceConverter.getStoredRepresentation(fFont.getFontData());
-					if (!existingString.equals(fdString))
-					{
-						// put in registry...
-						JFaceResources.getFontRegistry().put(fontId, fFont.getFontData());
-					}
-				}
-			}
-		});
 	}
 
 	private static String toString(RGB selection)
@@ -378,9 +396,13 @@ public class ThemeManager implements IThemeManager
 		return StringConverter.asString(selection);
 	}
 
+	/**
+	 * Attempts to find the theme with a given name, first from prefs, then from pre-packaged builtins. Will return null
+	 * if no match is found.
+	 */
 	public Theme getTheme(String name)
 	{
-		// No, try to see if we have a copy in prefs as a user theme
+		// Try to see if we have a copy in prefs as a user theme
 		Theme loaded = null;
 		try
 		{
@@ -409,6 +431,9 @@ public class ThemeManager implements IThemeManager
 		return null;
 	}
 
+	/**
+	 * laziliy init the set of theme names.
+	 */
 	public synchronized Set<String> getThemeNames()
 	{
 		if (fThemeNames == null)
@@ -527,7 +552,7 @@ public class ThemeManager implements IThemeManager
 	private OrderedProperties getBuiltinThemeProperties(String themeName)
 	{
 		Collection<URL> urls = getBuiltinThemeURLs();
-		if (urls == null || urls.isEmpty())
+		if (CollectionsUtil.isEmpty(urls))
 		{
 			return null;
 		}
@@ -655,12 +680,13 @@ public class ThemeManager implements IThemeManager
 		{
 			return Collections.emptyList();
 		}
-		List<URL> collection = new ArrayList<URL>();
+		ArrayList<URL> collection = new ArrayList<URL>();
 		Enumeration<URL> enumeration = bundle.findEntries("themes", "*.properties", false); //$NON-NLS-1$ //$NON-NLS-2$
 		while (enumeration.hasMoreElements())
 		{
 			collection.add(enumeration.nextElement());
 		}
+		collection.trimToSize();
 		return collection;
 	}
 
@@ -717,7 +743,7 @@ public class ThemeManager implements IThemeManager
 
 	public IStatus validateThemeName(String name)
 	{
-		if (name == null || name.trim().length() == 0)
+		if (StringUtil.isEmpty(name))
 		{
 			return new Status(IStatus.ERROR, ThemePlugin.PLUGIN_ID, Messages.ThemeManager_NameNonEmptyMsg);
 		}
