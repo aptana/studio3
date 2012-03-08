@@ -127,7 +127,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		if (window != null && window.getActivePage() != null)
 		{
-			if (fIsPartListener && applyToAllEditors() && !applyToViews())
+			if (fIsPartListener && !applyToAllEditors() && !applyToViews())
 			{
 				window.getActivePage().removePartListener(this);
 				fIsPartListener = false;
@@ -146,21 +146,21 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 		sub.setWorkRemaining(3);
 
 		// Apply to editors
-		applyThemeToEclipseEditors(getCurrentTheme(), applyToAllEditors(), sub.newChild(1));
+		applyThemeToEclipseEditors(getCurrentTheme(), !applyToAllEditors(), sub.newChild(1));
 		if (sub.isCanceled())
 		{
 			return Status.CANCEL_STATUS;
 		}
 
 		// Apply to consoles
-		applyThemeToConsole(getCurrentTheme(), applyToViews(), sub.newChild(1));
+		applyThemeToConsole(getCurrentTheme(), !applyToViews(), sub.newChild(1));
 		if (sub.isCanceled())
 		{
 			return Status.CANCEL_STATUS;
 		}
 
 		// Apply to views
-		hijackCurrentViews(window, applyToViews(), sub.newChild(1));
+		hijackCurrentViews(window, !applyToViews(), sub.newChild(1));
 
 		sub.done();
 		return Status.OK_STATUS;
