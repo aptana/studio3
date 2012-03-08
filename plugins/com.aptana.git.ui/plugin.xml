@@ -249,6 +249,12 @@
             id="com.aptana.git.ui.command.push_tags"
             name="%PushTagsAction_tooltip">
       </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.DeleteRemoteHandler"
+            id="com.aptana.git.ui.command.delete_remote"
+            name="%DeleteRemoteAction_tooltip">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
@@ -269,6 +275,12 @@
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M2+M3+G E">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.delete_remote"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G 3">
       </key>
       <key
             commandId="com.aptana.git.ui.command.github.network"
@@ -781,6 +793,21 @@
                <dynamic
                      class="com.aptana.git.ui.actions.PushToRemoteItem"
                      id="com.aptana.git.ui.command.push_to_remote.items">
+               </dynamic>
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="com.aptana.git.ui.hasGitRepository">
+                  </reference>
+               </visibleWhen>
+            </menu>
+            <menu
+                  commandId="com.aptana.git.ui.command.delete_remote"
+                  id="com.aptana.git.ui.actions.DeleteRemoteAction"
+                  label="%delete.remote.menu.label">
+               <dynamic
+                     class="com.aptana.git.ui.actions.DeleteRemoteItem"
+                     id="com.aptana.git.ui.command.delete_remote.items">
                </dynamic>
                <visibleWhen
                      checkEnabled="false">
