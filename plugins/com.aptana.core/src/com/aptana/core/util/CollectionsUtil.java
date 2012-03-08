@@ -8,7 +8,6 @@
 package com.aptana.core.util;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -44,7 +43,10 @@ public class CollectionsUtil
 	{
 		if (list != null && items != null)
 		{
-			list.addAll(Arrays.asList(items));
+			for (int i = 0; i < items.length; i++)
+			{
+				list.add(items[i]);
+			}
 		}
 
 		return list;
@@ -66,7 +68,10 @@ public class CollectionsUtil
 	{
 		if (set != null && items != null)
 		{
-			set.addAll(Arrays.asList(items));
+			for (int i = 0; i < items.length; i++)
+			{
+				set.add(items[i]);
+			}
 		}
 
 		return set;
@@ -360,14 +365,7 @@ public class CollectionsUtil
 	 */
 	public static final <T> Set<T> newInOrderSet(T... items)
 	{
-		if (ArrayUtil.isEmpty(items))
-		{
-			return Collections.emptySet();
-		}
-
-		Set<T> result = new LinkedHashSet<T>(items.length);
-		addToSet(result, items);
-		return result;
+		return addToSet(new LinkedHashSet<T>(items != null ? items.length : 0), items);
 	}
 
 	/**
@@ -381,14 +379,7 @@ public class CollectionsUtil
 	 */
 	public static final <T> List<T> newList(T... items)
 	{
-		if (ArrayUtil.isEmpty(items))
-		{
-			return Collections.emptyList();
-		}
-
-		List<T> result = new ArrayList<T>(items.length);
-		addToList(result, items);
-		return result;
+		return addToList(new ArrayList<T>(items != null ? items.length : 0), items);
 	}
 
 	/**
@@ -402,14 +393,7 @@ public class CollectionsUtil
 	 */
 	public static final <T> Set<T> newSet(T... items)
 	{
-		if (ArrayUtil.isEmpty(items))
-		{
-			return Collections.emptySet();
-		}
-
-		Set<T> result = new HashSet<T>(items.length);
-		addToSet(result, items);
-		return result;
+		return addToSet(new HashSet<T>(items != null ? items.length : 0), items);
 	}
 
 	/**
@@ -423,14 +407,7 @@ public class CollectionsUtil
 	 */
 	public static final <T> Map<T, T> newMap(T... items)
 	{
-		if (ArrayUtil.isEmpty(items))
-		{
-			return Collections.emptyMap();
-		}
-
-		Map<T, T> result = new HashMap<T, T>(items.length / 2);
-		addToMap(result, items);
-		return result;
+		return addToMap(new HashMap<T, T>(items != null ? items.length / 2 : 0), items);
 	}
 
 	/**
@@ -514,7 +491,9 @@ public class CollectionsUtil
 		union.addAll(collection1);
 		union.addAll(collection2);
 
-		return new ArrayList<T>(union);
+		ArrayList<T> result = new ArrayList<T>(union.size());
+		result.addAll(union);
+		return result;
 	}
 
 	private CollectionsUtil()
