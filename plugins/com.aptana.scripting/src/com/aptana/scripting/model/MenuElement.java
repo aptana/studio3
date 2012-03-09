@@ -79,7 +79,7 @@ public class MenuElement extends AbstractBundleElement
 
 		synchronized (childrenLock)
 		{
-			if (CollectionsUtil.isEmpty(_children))
+			if (!CollectionsUtil.isEmpty(_children))
 			{
 				result = new ArrayList<MenuElement>(this._children);
 			}
@@ -99,10 +99,11 @@ public class MenuElement extends AbstractBundleElement
 			synchronized (childrenLock)
 			{
 				this._children = new ArrayList<MenuElement>(children);
-			}
-			for (MenuElement child : children)
-			{
-				child._parent = this;
+
+				for (MenuElement child : children)
+				{
+					child._parent = this;
+				}
 			}
 		}
 	}
