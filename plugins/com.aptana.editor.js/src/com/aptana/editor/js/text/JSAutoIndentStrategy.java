@@ -40,14 +40,12 @@ public class JSAutoIndentStrategy extends RubyRegexpAutoIndentStrategy
 	protected List<String> getAdditionalComments(IDocument d, DocumentCommand c)
 	{
 		List<String> params = ParseUtil.getFunctionParameters(d, c.offset);
-		List<String> results = CollectionsUtil.map(params, new IMap<String, String>()
+		return CollectionsUtil.map(params, new IMap<String, String>()
 		{
 			public String map(String item)
 			{
 				return "@param {Object} " + item; //$NON-NLS-1$
 			}
 		});
-
-		return results;
 	}
 }

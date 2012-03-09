@@ -147,7 +147,7 @@ public abstract class AbstractBundleElement extends AbstractElement
 
 		if (ObjectUtil.areNotEqual(this._scope, scope))
 		{
-			this._scope = scope;
+			this._scope = BundleManager.getInstance().sharedString(scope);
 			this._scopeSelector = null;
 		}
 	}

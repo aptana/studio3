@@ -45,7 +45,10 @@ public class ParseUtil
 	{
 		private final IDocument document;
 		private final int offset;
-		private List<String> parameters;
+		/**
+		 * We use ArrayList so we can trim the size down explicitly
+		 */
+		private ArrayList<String> parameters;
 		private JSFlexLexemeProvider lexemeProvider;
 		private Lexeme<JSTokenType> currentLexeme;
 		private int lexemeIndex;
@@ -163,6 +166,7 @@ public class ParseUtil
 				// ignore since this is just for flow-control
 			}
 
+			parameters.trimToSize();
 			return parameters;
 		}
 

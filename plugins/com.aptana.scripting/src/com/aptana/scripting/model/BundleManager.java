@@ -472,6 +472,12 @@ public class BundleManager
 	private List<LoadCycleListener> _loadCycleListeners;
 
 	/**
+	 * This is a pool to reduce duplicated string values eating up RAM. This happens most often with paths (like say in
+	 * MenuElements)
+	 */
+	private Map<String, String> _stringPool;
+
+	/**
 	 * Create a new instance of BundleManager and initialize its internal structure. Note that this constructor is
 	 * private so it can only be instantiated within a static method in this class
 	 */
@@ -481,6 +487,8 @@ public class BundleManager
 		// of null checks and allows us to lock on the field directly instead of using separate locks
 		this._bundlesByPath = new HashMap<File, List<BundleElement>>();
 		this._entriesByName = new HashMap<String, BundleEntry>();
+
+		this._stringPool = new HashMap<String, String>();
 
 		// NOTE: similar logic for these guys too
 		this._bundleVisibilityListeners = new ArrayList<BundleVisibilityListener>();
@@ -2372,5 +2380,31 @@ public class BundleManager
 	public boolean useCache()
 	{
 		return Boolean.valueOf(System.getProperty(USE_BUNDLE_CACHE, Boolean.TRUE.toString()));
+	}
+
+	/**
+	 * This pools duplicate strings so that we only store one instance of that particular value and shared the
+	 * reference. useful for commonly repeated strings, such as paths where elements are defined, common scope
+	 * selectors, key used to hold snippet/command triggers.
+	 * 
+	 * @param value
+	 * @return
+	 */
+	String sharedString(String value)
+	{
+		if (value == null)
+		{
+			return null;
+		}
+		synchronized (_stringPool)
+		{
+			String result = _stringPool.get(value);
+			if (result != null)
+			{
+				return result;
+			}
+			_stringPool.put(value, value);
+		}
+		return value;
 	}
 }

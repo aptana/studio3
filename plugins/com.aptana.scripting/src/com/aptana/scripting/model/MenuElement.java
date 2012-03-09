@@ -11,7 +11,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.SourcePrinter;
+import com.aptana.core.util.StringUtil;
 import com.aptana.scope.ScopeSelector;
 
 public class MenuElement extends AbstractBundleElement
@@ -54,7 +56,7 @@ public class MenuElement extends AbstractBundleElement
 			{
 				if (this._children == null)
 				{
-					this._children = new ArrayList<MenuElement>();
+					this._children = new ArrayList<MenuElement>(1);
 				}
 
 				// set parent
@@ -77,7 +79,7 @@ public class MenuElement extends AbstractBundleElement
 
 		synchronized (childrenLock)
 		{
-			if (this._children != null && this._children.size() > 0)
+			if (CollectionsUtil.isEmpty(_children))
 			{
 				result = new ArrayList<MenuElement>(this._children);
 			}
@@ -92,15 +94,15 @@ public class MenuElement extends AbstractBundleElement
 
 	public synchronized void setChildren(List<MenuElement> children)
 	{
-		synchronized (childrenLock)
-		{
-			this._children = new ArrayList<MenuElement>();
-		}
 		if (children != null)
 		{
+			synchronized (childrenLock)
+			{
+				this._children = new ArrayList<MenuElement>(children);
+			}
 			for (MenuElement child : children)
 			{
-				addMenu(child);
+				child._parent = this;
 			}
 		}
 	}
@@ -224,17 +226,10 @@ public class MenuElement extends AbstractBundleElement
 	 */
 	public boolean hasChildren()
 	{
-		boolean result = false;
-
 		synchronized (childrenLock)
 		{
-			if (this._children != null)
-			{
-				result = this._children.size() > 0;
-			}
+			return !CollectionsUtil.isEmpty(_children);
 		}
-
-		return result;
 	}
 
 	/**
@@ -257,6 +252,16 @@ public class MenuElement extends AbstractBundleElement
 		return this.isSeparator() == false && this.hasChildren() == false;
 	}
 
+	@Override
+	public void setDisplayName(String displayName)
+	{
+		if (StringUtil.startsWith(displayName, SEPARATOR_TEXT))
+		{
+			displayName = SEPARATOR_TEXT;
+		}
+		super.setDisplayName(displayName);
+	}
+
 	/**
 	 * isSeparator
 	 * 
@@ -266,7 +271,7 @@ public class MenuElement extends AbstractBundleElement
 	{
 		String displayName = this.getDisplayName();
 
-		return displayName != null && displayName.startsWith(SEPARATOR_TEXT);
+		return StringUtil.startsWith(displayName, SEPARATOR_TEXT);
 	}
 
 	/**
@@ -334,6 +339,10 @@ public class MenuElement extends AbstractBundleElement
 	 */
 	public void setCommandName(String name)
 	{
+		if (name != null && name.startsWith(SEPARATOR_TEXT))
+		{
+			name = SEPARATOR_TEXT;
+		}
 		this._commandName = name;
 	}
 }

@@ -47,6 +47,10 @@ public class CollectionsUtil
 			{
 				list.add(items[i]);
 			}
+			if (list instanceof ArrayList)
+			{
+				((ArrayList<T>) list).trimToSize();
+			}
 		}
 
 		return list;
@@ -111,6 +115,10 @@ public class CollectionsUtil
 			{
 				destination.addAll(source);
 			}
+			if (destination instanceof ArrayList)
+			{
+				((ArrayList<T>) destination).trimToSize();
+			}
 		}
 	}
 
@@ -133,7 +141,6 @@ public class CollectionsUtil
 		ArrayList<T> result = new ArrayList<T>(collection == null ? 0 : collection.size());
 
 		filter(collection, result, filter);
-		result.trimToSize();
 
 		return result;
 	}
@@ -242,7 +249,14 @@ public class CollectionsUtil
 	{
 		Collection<T> result = union(collection1, collection2);
 
-		result.removeAll(intersect(collection1, collection2));
+		if (!isEmpty(result))
+		{
+			result.removeAll(intersect(collection1, collection2));
+			if (result instanceof ArrayList)
+			{
+				((ArrayList<T>) result).trimToSize();
+			}
+		}
 
 		return result;
 	}
@@ -265,10 +279,8 @@ public class CollectionsUtil
 			return Collections.emptyList();
 		}
 
-		// neither is empty, so we can safely call size()
-		Set<T> intersection = new HashSet<T>(Math.min(collection1.size(), collection2.size()));
+		Set<T> intersection = new HashSet<T>(collection1);
 
-		intersection.addAll(collection1);
 		intersection.retainAll(collection2);
 
 		return intersection;
@@ -325,6 +337,10 @@ public class CollectionsUtil
 			for (T item : source)
 			{
 				destination.add(mapper.map(item));
+			}
+			if (destination instanceof ArrayList)
+			{
+				((ArrayList<U>) destination).trimToSize();
 			}
 		}
 	}
@@ -453,6 +469,10 @@ public class CollectionsUtil
 
 		list.clear();
 		list.addAll(set);
+		if (list instanceof ArrayList)
+		{
+			((ArrayList<T>) list).trimToSize();
+		}
 	}
 
 	/**
@@ -491,9 +511,7 @@ public class CollectionsUtil
 		union.addAll(collection1);
 		union.addAll(collection2);
 
-		ArrayList<T> result = new ArrayList<T>(union.size());
-		result.addAll(union);
-		return result;
+		return new ArrayList<T>(union);
 	}
 
 	private CollectionsUtil()
