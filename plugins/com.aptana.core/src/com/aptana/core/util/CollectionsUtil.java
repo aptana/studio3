@@ -8,7 +8,6 @@
 package com.aptana.core.util;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -44,7 +43,14 @@ public class CollectionsUtil
 	{
 		if (list != null && items != null)
 		{
-			list.addAll(Arrays.asList(items));
+			for (int i = 0; i < items.length; i++)
+			{
+				list.add(items[i]);
+			}
+			if (list instanceof ArrayList)
+			{
+				((ArrayList<T>) list).trimToSize();
+			}
 		}
 
 		return list;
@@ -66,7 +72,10 @@ public class CollectionsUtil
 	{
 		if (set != null && items != null)
 		{
-			set.addAll(Arrays.asList(items));
+			for (int i = 0; i < items.length; i++)
+			{
+				set.add(items[i]);
+			}
 		}
 
 		return set;
@@ -106,6 +115,10 @@ public class CollectionsUtil
 			{
 				destination.addAll(source);
 			}
+			if (destination instanceof ArrayList)
+			{
+				((ArrayList<T>) destination).trimToSize();
+			}
 		}
 	}
 
@@ -128,7 +141,6 @@ public class CollectionsUtil
 		ArrayList<T> result = new ArrayList<T>(collection == null ? 0 : collection.size());
 
 		filter(collection, result, filter);
-		result.trimToSize();
 
 		return result;
 	}
@@ -237,7 +249,14 @@ public class CollectionsUtil
 	{
 		Collection<T> result = union(collection1, collection2);
 
-		result.removeAll(intersect(collection1, collection2));
+		if (!isEmpty(result))
+		{
+			result.removeAll(intersect(collection1, collection2));
+			if (result instanceof ArrayList)
+			{
+				((ArrayList<T>) result).trimToSize();
+			}
+		}
 
 		return result;
 	}
@@ -255,9 +274,14 @@ public class CollectionsUtil
 	 */
 	public static <T> Collection<T> intersect(Collection<T> collection1, Collection<T> collection2)
 	{
+		if (isEmpty(collection1) || isEmpty(collection2))
+		{
+			return Collections.emptyList();
+		}
+
 		Set<T> intersection = new HashSet<T>(collection1);
 
-		intersection.retainAll(new HashSet<T>(collection2));
+		intersection.retainAll(collection2);
 
 		return intersection;
 	}
@@ -314,6 +338,10 @@ public class CollectionsUtil
 			{
 				destination.add(mapper.map(item));
 			}
+			if (destination instanceof ArrayList)
+			{
+				((ArrayList<U>) destination).trimToSize();
+			}
 		}
 	}
 
@@ -332,10 +360,13 @@ public class CollectionsUtil
 	 */
 	public static <T, U> List<U> map(Collection<T> collection, IMap<? super T, U> mapper)
 	{
-		List<U> result = new ArrayList<U>();
+		if (isEmpty(collection))
+		{
+			return Collections.emptyList();
+		}
 
+		List<U> result = new ArrayList<U>(collection.size());
 		map(collection, result, mapper);
-
 		return result;
 	}
 
@@ -350,11 +381,7 @@ public class CollectionsUtil
 	 */
 	public static final <T> Set<T> newInOrderSet(T... items)
 	{
-		Set<T> result = new LinkedHashSet<T>();
-
-		addToSet(result, items);
-
-		return result;
+		return addToSet(new LinkedHashSet<T>(items != null ? items.length : 0), items);
 	}
 
 	/**
@@ -368,19 +395,7 @@ public class CollectionsUtil
 	 */
 	public static final <T> List<T> newList(T... items)
 	{
-		List<T> result;
-
-		if (items != null)
-		{
-			result = new ArrayList<T>();
-			addToList(result, items);
-		}
-		else
-		{
-			result = Collections.emptyList();
-		}
-
-		return result;
+		return addToList(new ArrayList<T>(items != null ? items.length : 0), items);
 	}
 
 	/**
@@ -394,19 +409,7 @@ public class CollectionsUtil
 	 */
 	public static final <T> Set<T> newSet(T... items)
 	{
-		Set<T> result;
-
-		if (items != null)
-		{
-			result = new HashSet<T>();
-			addToSet(result, items);
-		}
-		else
-		{
-			result = Collections.emptySet();
-		}
-
-		return result;
+		return addToSet(new HashSet<T>(items != null ? items.length : 0), items);
 	}
 
 	/**
@@ -420,19 +423,7 @@ public class CollectionsUtil
 	 */
 	public static final <T> Map<T, T> newMap(T... items)
 	{
-		Map<T, T> result;
-
-		if (items != null)
-		{
-			result = new HashMap<T, T>();
-			addToMap(result, items);
-		}
-		else
-		{
-			result = Collections.emptyMap();
-		}
-
-		return result;
+		return addToMap(new HashMap<T, T>(items != null ? items.length / 2 : 0), items);
 	}
 
 	/**
@@ -478,6 +469,10 @@ public class CollectionsUtil
 
 		list.clear();
 		list.addAll(set);
+		if (list instanceof ArrayList)
+		{
+			((ArrayList<T>) list).trimToSize();
+		}
 	}
 
 	/**
@@ -493,9 +488,28 @@ public class CollectionsUtil
 	 */
 	public static <T> Collection<T> union(Collection<T> collection1, Collection<T> collection2)
 	{
-		Set<T> union = new HashSet<T>(collection1);
+		if (isEmpty(collection1))
+		{
+			if (isEmpty(collection2))
+			{
+				// if both are empty, return empty list
+				return Collections.emptyList();
+			}
+			// if just 1 is empty, return 2
+			return new ArrayList<T>(collection2);
+		}
+		// at this point when know 1 is not empty
+		if (isEmpty(collection2))
+		{
+			// so if 2 is, return 1.
+			return new ArrayList<T>(collection1);
+		}
 
-		union.addAll(new HashSet<T>(collection2));
+		// we know both 1 and 2 aren't empty
+		Set<T> union = new HashSet<T>(collection1.size() + collection2.size());
+
+		union.addAll(collection1);
+		union.addAll(collection2);
 
 		return new ArrayList<T>(union);
 	}

@@ -25,6 +25,7 @@ import com.aptana.core.util.URLEncoder;
 import com.aptana.editor.html.contentassist.index.IHTMLIndexConstants;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
+import com.aptana.index.core.IndexPlugin;
 import com.aptana.index.core.QueryResult;
 
 public class PathFilter extends AbstractResourceBasedViewerFilter
@@ -234,7 +235,7 @@ public class PathFilter extends AbstractResourceBasedViewerFilter
 		{
 			// FIXME We should have a search API layer over the top of this and shouldn't be hitting indices directly.
 			// Pass a scope object to the search API and it calculates what indices to search within!
-			Index index = IndexManager.getInstance().getIndex(resource.getProject().getLocationURI());
+			Index index = getIndexManager().getIndex(resource.getProject().getLocationURI());
 			queryResults = index.query(indexCategories(), null, 0);
 		}
 		if (queryResults != null)
@@ -282,6 +283,11 @@ public class PathFilter extends AbstractResourceBasedViewerFilter
 			}
 		}
 		return false;
+	}
+
+	protected IndexManager getIndexManager()
+	{
+		return IndexPlugin.getDefault().getIndexManager();
 	}
 
 	protected String[] indexCategories()

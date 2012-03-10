@@ -14,6 +14,7 @@ import com.aptana.editor.css.contentassist.model.ColorGroupElement;
 import com.aptana.editor.css.contentassist.model.IdGroupElement;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
+import com.aptana.index.core.IndexPlugin;
 
 public class CSSIndexViewContentProvider implements ITreeContentProvider
 {
@@ -64,7 +65,7 @@ public class CSSIndexViewContentProvider implements ITreeContentProvider
 		if (inputElement instanceof IProject)
 		{
 			IProject project = (IProject) inputElement;
-			Index index = IndexManager.getInstance().getIndex(project.getLocationURI());
+			Index index = getIndexManager().getIndex(project.getLocationURI());
 
 			result = new Object[] { new CSSElement(index) };
 		}
@@ -74,6 +75,11 @@ public class CSSIndexViewContentProvider implements ITreeContentProvider
 		}
 
 		return result;
+	}
+
+	protected IndexManager getIndexManager()
+	{
+		return IndexPlugin.getDefault().getIndexManager();
 	}
 
 	public Object getParent(Object element)

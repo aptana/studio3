@@ -29,9 +29,9 @@ public class Messages extends NLS
 	public static String ThemePreferencePage_ForegroundLabel;
 	public static String ThemePreferencePage_ImportLabel;
 	public static String ThemePreferencePage_ExportLabel;
-	public static String ThemePreferencePage_InvasiveThemesLBL;
+	public static String ThemePreferencePage_ApplyToAllViews;
 	public static String ThemePreferencePage_InvasiveFontLBL;
-	public static String ThemePreferencePage_InvasiveThemesToolTip;
+	public static String ThemePreferencePage_ApplyToAllViewsToolTip;
 	public static String ThemePreferencePage_InvasiveFontToolTip;
 	public static String ThemePreferencePage_ItalicButtonLabel;
 	public static String ThemePreferencePage_LineHighlightLabel;
@@ -39,6 +39,7 @@ public class Messages extends NLS
 	public static String ThemePreferencePage_NewThemeDefaultName_2;
 	public static String ThemePreferencePage_NewThemeMsg;
 	public static String ThemePreferencePage_NewThemeTitle;
+	public static String ThemePreferencePage_ApplyToAllEditors;
 	public static String ThemePreferencePage_RemoveTokenLabel;
 	public static String ThemePreferencePage_RenameThemeMsg;
 	public static String ThemePreferencePage_RenameThemeTitle;

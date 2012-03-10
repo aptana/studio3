@@ -42,6 +42,7 @@ import com.aptana.editor.js.parsing.ast.JSParseRootNode;
 import com.aptana.index.core.FileStoreBuildContext;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
+import com.aptana.index.core.IndexPlugin;
 import com.aptana.index.core.build.BuildContext;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseNode;
@@ -120,7 +121,7 @@ public abstract class InferencingTestsBase extends TestCase
 
 		if (indexURI != null)
 		{
-			result = IndexManager.getInstance().getIndex(indexURI);
+			result = getIndexManager().getIndex(indexURI);
 		}
 
 		return result;
@@ -432,10 +433,15 @@ public abstract class InferencingTestsBase extends TestCase
 
 		if (indexURI != null)
 		{
-			IndexManager.getInstance().removeIndex(indexURI);
+			getIndexManager().removeIndex(indexURI);
 		}
 
 		super.tearDown();
+	}
+
+	protected IndexManager getIndexManager()
+	{
+		return IndexPlugin.getDefault().getIndexManager();
 	}
 
 	/**

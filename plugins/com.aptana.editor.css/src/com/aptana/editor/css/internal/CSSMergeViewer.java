@@ -8,15 +8,14 @@
 package com.aptana.editor.css.internal;
 
 import org.eclipse.compare.CompareConfiguration;
-import org.eclipse.compare.contentmergeviewer.TextMergeViewer;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.text.IDocumentExtension3;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.TextViewer;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.swt.widgets.Composite;
 
 import com.aptana.editor.common.ExtendedFastPartitioner;
+import com.aptana.editor.common.viewer.CommonMergeViewer;
 import com.aptana.editor.css.CSSSourceConfiguration;
 import com.aptana.editor.css.CSSSourceEditor;
 import com.aptana.editor.css.CSSSourcePartitionScanner;
@@ -25,7 +24,7 @@ import com.aptana.editor.css.CSSSourceViewerConfiguration;
 /**
  * @author cwilliams
  */
-public class CSSMergeViewer extends TextMergeViewer
+public class CSSMergeViewer extends CommonMergeViewer
 {
 	public CSSMergeViewer(Composite parent, CompareConfiguration configuration)
 	{
@@ -41,14 +40,10 @@ public class CSSMergeViewer extends TextMergeViewer
 	}
 
 	@Override
-	protected String getDocumentPartitioning()
-	{
-		return IDocumentExtension3.DEFAULT_PARTITIONING;
-	}
-
-	@Override
 	protected void configureTextViewer(TextViewer textViewer)
 	{
+		super.configureTextViewer(textViewer);
+
 		if (textViewer instanceof SourceViewer)
 		{
 			SourceViewer sourceViewer = (SourceViewer) textViewer;

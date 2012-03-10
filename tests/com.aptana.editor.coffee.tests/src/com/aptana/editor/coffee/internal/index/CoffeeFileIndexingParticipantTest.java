@@ -15,6 +15,7 @@ import com.aptana.core.util.IOUtil;
 import com.aptana.index.core.FileStoreBuildContext;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
+import com.aptana.index.core.IndexPlugin;
 import com.aptana.index.core.build.BuildContext;
 
 public class CoffeeFileIndexingParticipantTest extends TestCase
@@ -51,7 +52,7 @@ public class CoffeeFileIndexingParticipantTest extends TestCase
 			IFileStore fileStore = EFS.getStore(coffeeFile.toURI());
 			BuildContext context = new FileStoreBuildContext(fileStore);
 
-			Index index = IndexManager.getInstance().getIndex(tmpDir.toURI());
+			Index index = getIndexManager().getIndex(tmpDir.toURI());
 			indexer.index(context, index, new NullProgressMonitor());
 		}
 		finally
@@ -59,6 +60,11 @@ public class CoffeeFileIndexingParticipantTest extends TestCase
 			// Clean up the generated files!
 			FileUtil.deleteRecursively(tmpDir);
 		}
+	}
+
+	protected IndexManager getIndexManager()
+	{
+		return IndexPlugin.getDefault().getIndexManager();
 	}
 
 	public void testIndexWithNullIndex() throws Exception

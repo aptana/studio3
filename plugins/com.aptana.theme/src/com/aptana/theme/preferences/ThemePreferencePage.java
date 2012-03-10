@@ -27,6 +27,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
+import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.preference.ColorSelector;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -105,6 +106,7 @@ import org.osgi.service.prefs.BackingStoreException;
 import com.aptana.core.CoreStrings;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.scope.ScopeSelector;
 import com.aptana.theme.ConsoleThemer;
 import com.aptana.theme.DelayedTextAttribute;
@@ -225,6 +227,8 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 	private ControlDecoration fScopeSelectorDecoration;
 
+	private Button fAptanaEditorsOnlyCheckbox;
+
 	@Override
 	protected Control createContents(Composite parent)
 	{
@@ -283,7 +287,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 	{
 		if (font == null || font.getFontData() == null || font.getFontData().length <= 0)
 		{
-			return ""; //$NON-NLS-1$
+			return StringUtil.EMPTY;
 		}
 		FontData data = font.getFontData()[0];
 		return MessageFormat.format(Messages.ThemePreferencePage_FontName, data.getName(), data.getHeight());
@@ -294,13 +298,20 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		Composite themesComp = new Composite(composite, SWT.NONE);
 		themesComp.setLayout(new GridLayout(1, false));
 
+		// do we have "invasive" theming on? This applies our colors to non-Aptana views (and possibly editors)
 		fInvasiveThemeCheckbox = new Button(themesComp, SWT.CHECK);
-		fInvasiveThemeCheckbox.setText(Messages.ThemePreferencePage_InvasiveThemesLBL);
-		fInvasiveThemeCheckbox.setSelection(Platform.getPreferencesService().getBoolean(ThemePlugin.PLUGIN_ID,
-				IPreferenceConstants.INVASIVE_THEMES, false, null));
+		fInvasiveThemeCheckbox.setText(Messages.ThemePreferencePage_ApplyToAllViews);
+		fInvasiveThemeCheckbox.setSelection(ThemePlugin.applyToViews());
 		fInvasiveThemeCheckbox.addSelectionListener(this);
-		fInvasiveThemeCheckbox.setToolTipText(Messages.ThemePreferencePage_InvasiveThemesToolTip);
+		fInvasiveThemeCheckbox.setToolTipText(Messages.ThemePreferencePage_ApplyToAllViewsToolTip);
 
+		// Do we apply the colors to editors that aren't ours?
+		fAptanaEditorsOnlyCheckbox = new Button(themesComp, SWT.CHECK);
+		fAptanaEditorsOnlyCheckbox.setText(Messages.ThemePreferencePage_ApplyToAllEditors);
+		fAptanaEditorsOnlyCheckbox.setSelection(ThemePlugin.applyToAllEditors());
+		fAptanaEditorsOnlyCheckbox.addSelectionListener(this);
+
+		// Do we force the views to use the editor font?
 		fInvasiveFontCheckbox = new Button(themesComp, SWT.CHECK);
 		fInvasiveFontCheckbox.setText(Messages.ThemePreferencePage_InvasiveFontLBL);
 		fInvasiveFontCheckbox.setSelection(Platform.getPreferencesService().getBoolean(ThemePlugin.PLUGIN_ID,
@@ -1229,7 +1240,20 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		if (source == fInvasiveThemeCheckbox)
 		{
 			IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID);
-			prefs.putBoolean(IPreferenceConstants.INVASIVE_THEMES, fInvasiveThemeCheckbox.getSelection());
+			prefs.putBoolean(IPreferenceConstants.APPLY_TO_ALL_VIEWS, fInvasiveThemeCheckbox.getSelection());
+			try
+			{
+				prefs.flush();
+			}
+			catch (BackingStoreException e1)
+			{
+				IdeLog.logError(ThemePlugin.getDefault(), e1);
+			}
+		}
+		else if (source == fAptanaEditorsOnlyCheckbox)
+		{
+			IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID);
+			prefs.putBoolean(IPreferenceConstants.APPLY_TO_ALL_EDITORS, fAptanaEditorsOnlyCheckbox.getSelection());
 			try
 			{
 				prefs.flush();

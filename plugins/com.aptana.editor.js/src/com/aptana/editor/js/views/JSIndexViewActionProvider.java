@@ -23,6 +23,7 @@ import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.inferencing.JSTypeUtil;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
+import com.aptana.index.core.IndexPlugin;
 import com.aptana.index.core.ui.views.IActionProvider;
 import com.aptana.index.core.ui.views.IndexView;
 
@@ -72,7 +73,7 @@ public class JSIndexViewActionProvider implements IActionProvider
 					{
 						IProject project = (IProject) input;
 
-						Index index = IndexManager.getInstance().getIndex(project.getLocationURI());
+						Index index = getIndexManager().getIndex(project.getLocationURI());
 						JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
 						List<TypeElement> types = queryHelper.getTypes(index, typeNames.get(0), true);
 						List<ClassElement> classes = JSTypeUtil.typesToClasses(types);
@@ -91,5 +92,10 @@ public class JSIndexViewActionProvider implements IActionProvider
 		action.setText(Messages.JSIndexViewActionProvider_JumpToType);
 
 		return action;
+	}
+
+	protected IndexManager getIndexManager()
+	{
+		return IndexPlugin.getDefault().getIndexManager();
 	}
 }

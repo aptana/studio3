@@ -20,6 +20,7 @@ import com.aptana.editor.html.contentassist.model.HTMLElement;
 import com.aptana.editor.html.contentassist.model.JSReferencesGroup;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
+import com.aptana.index.core.IndexPlugin;
 
 public class HTMLIndexViewContentProvider implements ITreeContentProvider
 {
@@ -65,7 +66,7 @@ public class HTMLIndexViewContentProvider implements ITreeContentProvider
 		if (inputElement instanceof IProject)
 		{
 			IProject project = (IProject) inputElement;
-			Index index = IndexManager.getInstance().getIndex(project.getLocationURI());
+			Index index = getIndexManager().getIndex(project.getLocationURI());
 
 			result = new Object[] { new HTMLElement(index) };
 		}
@@ -75,6 +76,11 @@ public class HTMLIndexViewContentProvider implements ITreeContentProvider
 		}
 
 		return result;
+	}
+
+	protected IndexManager getIndexManager()
+	{
+		return IndexPlugin.getDefault().getIndexManager();
 	}
 
 	public Object getParent(Object element)

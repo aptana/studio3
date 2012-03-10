@@ -34,6 +34,7 @@ import com.aptana.editor.xml.contentassist.model.DTDTransformer;
 import com.aptana.editor.xml.contentassist.model.ElementElement;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
+import com.aptana.index.core.IndexPlugin;
 
 /**
  * MetadataLoader
@@ -67,10 +68,11 @@ public class SVGMetadataLoader extends Job
 			URI metadataLocation = URI.create(keyProvider.getMetadataLocation());
 
 			// remove old index
-			IndexManager.getInstance().removeIndex(metadataLocation);
+			getIndexManager().removeIndex(metadataLocation);
 
 			// grab DTD source
-			InputStream stream = FileLocator.openStream(Platform.getBundle(SVGPlugin.PLUGIN_ID), new Path(SVG_DTD), false);
+			InputStream stream = FileLocator.openStream(Platform.getBundle(SVGPlugin.PLUGIN_ID), new Path(SVG_DTD),
+					false);
 			String source = IOUtil.read(stream);
 
 			// transform into our CA model
@@ -78,7 +80,7 @@ public class SVGMetadataLoader extends Job
 			transformer.transform(source);
 
 			// get metadata index
-			Index index = IndexManager.getInstance().getIndex(metadataLocation);
+			Index index = getIndexManager().getIndex(metadataLocation);
 
 			// write elements to the index
 			for (ElementElement element : transformer.getElements())
@@ -100,6 +102,11 @@ public class SVGMetadataLoader extends Job
 		}
 	}
 
+	protected IndexManager getIndexManager()
+	{
+		return IndexPlugin.getDefault().getIndexManager();
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
@@ -107,7 +114,8 @@ public class SVGMetadataLoader extends Job
 	@Override
 	protected IStatus run(IProgressMonitor monitor)
 	{
-		double expectedVersion = Platform.getPreferencesService().getDouble(SVGPlugin.PLUGIN_ID, IPreferenceConstants.SVG_INDEX_VERSION, 0.0, null);
+		double expectedVersion = Platform.getPreferencesService().getDouble(SVGPlugin.PLUGIN_ID,
+				IPreferenceConstants.SVG_INDEX_VERSION, 0.0, null);
 
 		if (expectedVersion != SVGIndexConstants.INDEX_VERSION)
 		{

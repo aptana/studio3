@@ -16,14 +16,15 @@ import java.util.Set;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.css.CSSPlugin;
-import com.aptana.editor.css.contentassist.index.ICSSIndexConstants;
 import com.aptana.editor.css.contentassist.index.CSSIndexReader;
+import com.aptana.editor.css.contentassist.index.ICSSIndexConstants;
 import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.contentassist.model.PropertyElement;
 import com.aptana.editor.css.contentassist.model.PseudoClassElement;
 import com.aptana.editor.css.contentassist.model.PseudoElementElement;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
+import com.aptana.index.core.IndexPlugin;
 
 public class CSSIndexQueryHelper
 {
@@ -34,7 +35,12 @@ public class CSSIndexQueryHelper
 	 */
 	public static Index getIndex()
 	{
-		return IndexManager.getInstance().getIndex(URI.create(ICSSIndexConstants.METADATA_INDEX_LOCATION));
+		return getIndexManager().getIndex(URI.create(ICSSIndexConstants.METADATA_INDEX_LOCATION));
+	}
+
+	protected static IndexManager getIndexManager()
+	{
+		return IndexPlugin.getDefault().getIndexManager();
 	}
 
 	private CSSIndexReader _reader;

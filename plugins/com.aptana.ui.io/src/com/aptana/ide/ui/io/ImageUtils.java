@@ -172,7 +172,7 @@ public final class ImageUtils {
 	private static ImageData awtImageIconToSWTImageData(javax.swing.Icon icon, Color backgroundColor) {
 		if (backgroundColor == null)
 		{
-			if (ThemePlugin.invasiveThemesEnabled())
+			if (ThemePlugin.applyToViews())
 			{
 				backgroundColor = ThemePlugin.getDefault().getColorManager()
 						.getColor(ThemePlugin.getDefault().getThemeManager().getCurrentTheme().getBackground());

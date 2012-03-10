@@ -20,6 +20,7 @@ import com.aptana.editor.common.ExtendedFastPartitioner;
 import com.aptana.editor.common.NullPartitionerSwitchStrategy;
 import com.aptana.editor.common.text.rules.CompositePartitionScanner;
 import com.aptana.editor.common.text.rules.NullSubPartitionScanner;
+import com.aptana.editor.common.viewer.CommonMergeViewer;
 import com.aptana.editor.svg.SVGEditor;
 import com.aptana.editor.svg.SVGSourceConfiguration;
 import com.aptana.editor.svg.SVGSourceViewerConfiguration;
@@ -27,7 +28,7 @@ import com.aptana.editor.svg.SVGSourceViewerConfiguration;
 /**
  * @author cwilliams
  */
-public class SVGMergeViewer extends TextMergeViewer
+public class SVGMergeViewer extends CommonMergeViewer
 {
 	public SVGMergeViewer(Composite parent, CompareConfiguration configuration)
 	{
@@ -50,14 +51,10 @@ public class SVGMergeViewer extends TextMergeViewer
 	}
 
 	@Override
-	protected String getDocumentPartitioning()
-	{
-		return IDocumentExtension3.DEFAULT_PARTITIONING;
-	}
-
-	@Override
 	protected void configureTextViewer(TextViewer textViewer)
 	{
+		super.configureTextViewer(textViewer);
+
 		if (textViewer instanceof SourceViewer)
 		{
 			SourceViewer sourceViewer = (SourceViewer) textViewer;

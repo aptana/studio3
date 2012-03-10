@@ -266,7 +266,7 @@ class ControlThemer implements IControlThemer
 						unapplyControlFont();
 					}
 				}
-				else if (event.getKey().equals(IPreferenceConstants.INVASIVE_THEMES))
+				else if (event.getKey().equals(IPreferenceConstants.APPLY_TO_ALL_VIEWS))
 				{
 					if (Boolean.parseBoolean((String) event.getNewValue()))
 					{

@@ -7,6 +7,7 @@
  */
 package com.aptana.core.build;
 
+import java.net.URI;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
@@ -23,6 +26,7 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -35,11 +39,18 @@ import com.aptana.buildpath.core.BuildPathCorePlugin;
 import com.aptana.core.CorePlugin;
 import com.aptana.core.IDebugScopes;
 import com.aptana.core.IFilter;
+import com.aptana.core.IMap;
 import com.aptana.core.build.IBuildParticipant.BuildType;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.IMarkerConstants;
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.ResourceUtil;
+import com.aptana.index.core.FileStoreBuildContext;
+import com.aptana.index.core.IIndexFileContributor;
+import com.aptana.index.core.IIndexFilterParticipant;
+import com.aptana.index.core.IndexManager;
+import com.aptana.index.core.IndexPlugin;
 import com.aptana.index.core.build.BuildContext;
 
 public class UnifiedBuilder extends IncrementalProjectBuilder
@@ -260,10 +271,80 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 	 */
 	private void fullBuild(List<IBuildParticipant> participants, IProgressMonitor monitor) throws CoreException
 	{
-		// TODO Do we need to basically perform a clean first?
+		SubMonitor sub = SubMonitor.convert(monitor, 100);
+
+		// Index files contributed to projetc build path
+		IProject project = getProjectHandle();
+		URI uri = project.getLocationURI();
+		Set<IFileStore> contributedFiles = getContributedFiles(uri);
+		sub.worked(5);
+		buildContributedFiles(participants, contributedFiles, sub.newChild(10));
+
+		// Now index the actual files in the project
 		CollectingResourceVisitor visitor = new CollectingResourceVisitor();
-		getProjectHandle().accept(visitor);
-		buildFiles(participants, visitor.files, monitor);
+		project.accept(visitor);
+		visitor.files.trimToSize(); // shrink it down to size when we're done
+		sub.worked(5);
+		buildFiles(participants, visitor.files, sub.newChild(80));
+
+		sub.done();
+	}
+
+	/**
+	 * @param participants
+	 * @param files
+	 * @param monitor
+	 * @throws CoreException
+	 */
+	private void buildContributedFiles(List<IBuildParticipant> participants, Set<IFileStore> files,
+			IProgressMonitor monitor) throws CoreException
+	{
+		if (CollectionsUtil.isEmpty(files))
+		{
+			return;
+		}
+
+		SubMonitor sub = SubMonitor.convert(monitor, 15 * files.size());
+		for (IFileStore file : files)
+		{
+			BuildContext context = new FileStoreBuildContext(file);
+			sub.worked(1);
+
+			List<IBuildParticipant> filteredParticipants = getBuildParticipantManager().filterParticipants(
+					participants, context.getContentType());
+			sub.worked(2);
+
+			buildFile(context, filteredParticipants, sub.newChild(12));
+		}
+		sub.done();
+	}
+
+	/**
+	 * getContributedFiles
+	 * 
+	 * @param container
+	 * @return
+	 */
+	protected Set<IFileStore> getContributedFiles(URI container)
+	{
+		Set<IFileStore> result = new HashSet<IFileStore>();
+
+		for (IIndexFileContributor contributor : getIndexManager().getFileContributors())
+		{
+			Set<IFileStore> files = contributor.getFiles(container);
+
+			if (!CollectionsUtil.isEmpty(files))
+			{
+				result.addAll(files);
+			}
+		}
+
+		return result;
+	}
+
+	protected IndexManager getIndexManager()
+	{
+		return IndexPlugin.getDefault().getIndexManager();
 	}
 
 	/**
@@ -289,22 +370,32 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 	private void buildFiles(List<IBuildParticipant> participants, Collection<IFile> files, IProgressMonitor monitor)
 			throws CoreException
 	{
+		if (CollectionsUtil.isEmpty(participants) || CollectionsUtil.isEmpty(files))
+		{
+			return;
+		}
+		SubMonitor sub = SubMonitor.convert(monitor, 100);
+
+		// Filter
+		files = filterFiles(files, sub.newChild(10));
+
+		// Then build
+		doBuildFiles(participants, files, sub.newChild(90));
+
+		sub.done();
+	}
+
+	private void doBuildFiles(List<IBuildParticipant> participants, Collection<IFile> files, IProgressMonitor monitor)
+			throws CoreException
+	{
 		if (CollectionsUtil.isEmpty(files))
 		{
 			return;
 		}
 
-		SubMonitor sub = SubMonitor.convert(monitor, 16 * files.size());
+		SubMonitor sub = SubMonitor.convert(monitor, 15 * files.size());
 		for (IFile file : files)
 		{
-			// We only want to build files that exist and aren't derived or team private!
-			if (ResourceUtil.shouldIgnore(file))
-			{
-				sub.worked(16);
-				continue;
-			}
-			sub.worked(1);
-
 			BuildContext context = new BuildContext(file);
 			sub.worked(1);
 
@@ -315,6 +406,67 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 			buildFile(context, filteredParticipants, sub.newChild(12));
 		}
 		sub.done();
+	}
+
+	/**
+	 * FIXME This is a holy hell of a mess! We map from IFiles to IFileStores, then filter on that, then map back! Can't
+	 * we make the IIndexFilterParticipants also operate on IFiles? It seems like the only impl does anyways.
+	 * 
+	 * @return
+	 */
+	private Collection<IFile> filterFiles(Collection<IFile> files, IProgressMonitor monitor)
+	{
+		SubMonitor sub = SubMonitor.convert(monitor, 100);
+		// First filter out files that don't exist, are derived, or are team-private
+		files = CollectionsUtil.filter(files, new IFilter<IFile>()
+		{
+			public boolean include(IFile item)
+			{
+				return !ResourceUtil.shouldIgnore(item);
+			}
+		});
+		sub.worked(10);
+
+		// Next map IFiles to IFileStores for filter participants' sake
+		Set<IFileStore> fileStores = new HashSet<IFileStore>(CollectionsUtil.map(files, new IMap<IFile, IFileStore>()
+		{
+
+			public IFileStore map(IFile item)
+			{
+				return EFS.getLocalFileSystem().getStore(item.getLocation());
+			}
+
+		}));
+		sub.worked(15);
+
+		if (!CollectionsUtil.isEmpty(fileStores))
+		{
+			// Now let filters run
+			for (IIndexFilterParticipant filterParticipant : getIndexManager().getFilterParticipants())
+			{
+				fileStores = filterParticipant.applyFilter(fileStores);
+			}
+			sub.worked(60);
+
+			// Now we need to map back to IFiles again. UGH!
+			return CollectionsUtil.map(fileStores, new IMap<IFileStore, IFile>()
+			{
+
+				public IFile map(IFileStore fileStore)
+				{
+					IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+					IFile[] iFiles = workspaceRoot.findFilesForLocationURI(fileStore.toURI());
+					if (ArrayUtil.isEmpty(iFiles))
+					{
+						return null;
+					}
+					return iFiles[0];
+				}
+
+			});
+		}
+
+		return files;
 	}
 
 	private void buildFile(BuildContext context, List<IBuildParticipant> participants, IProgressMonitor monitor)
@@ -431,7 +583,7 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 	 */
 	private static class CollectingResourceVisitor implements IResourceVisitor
 	{
-		Collection<IFile> files;
+		ArrayList<IFile> files;
 
 		private CollectingResourceVisitor()
 		{

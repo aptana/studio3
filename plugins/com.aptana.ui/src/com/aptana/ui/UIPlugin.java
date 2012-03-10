@@ -301,13 +301,17 @@ public class UIPlugin extends AbstractUIPlugin
 				if ((Boolean.FALSE.toString().equals(event.getNewValue())))
 				{
 					// APSTUD-4350 - We make sure that the preference change was done through the ToggleAutoBuildAction
-					// (e.g. the menu action). Any other trigger for that preference change will not show the dialog.
-					String buildActionClassName = org.eclipse.ui.internal.ide.actions.ToggleAutoBuildAction.class
+					// (e.g. the menu action), or though the Workspace preference page. Any other trigger for that
+					// preference change will not show the dialog.
+					String buildToggleActionClassName = org.eclipse.ui.internal.ide.actions.ToggleAutoBuildAction.class
+							.getCanonicalName();
+					String workspacePreferencePage = org.eclipse.ui.internal.ide.dialogs.IDEWorkspacePreferencePage.class
 							.getCanonicalName();
 					StackTraceElement[] stackTrace = new Exception().getStackTrace();
 					for (StackTraceElement element : stackTrace)
 					{
-						if (element.getClassName().equals(buildActionClassName))
+						String className = element.getClassName();
+						if (className.equals(buildToggleActionClassName) || className.equals(workspacePreferencePage))
 						{
 							MessageDialog.openWarning(UIUtils.getActiveShell(),
 									Messages.UIPlugin_automaticBuildsWarningTitle,

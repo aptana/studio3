@@ -17,6 +17,7 @@ import com.aptana.editor.xml.contentassist.model.AttributeElement;
 import com.aptana.editor.xml.contentassist.model.ElementElement;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
+import com.aptana.index.core.IndexPlugin;
 
 public class XMLIndexQueryHelper
 {
@@ -84,6 +85,11 @@ public class XMLIndexQueryHelper
 	 */
 	public Index getIndex()
 	{
-		return IndexManager.getInstance().getIndex(this._metadataLocation);
+		return getIndexManager().getIndex(this._metadataLocation);
+	}
+
+	protected IndexManager getIndexManager()
+	{
+		return IndexPlugin.getDefault().getIndexManager();
 	}
 }

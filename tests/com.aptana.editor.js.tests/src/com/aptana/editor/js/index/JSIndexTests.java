@@ -23,6 +23,7 @@ import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
+import com.aptana.index.core.IndexPlugin;
 
 public class JSIndexTests extends TestCase
 {
@@ -33,9 +34,14 @@ public class JSIndexTests extends TestCase
 	@Override
 	protected void tearDown() throws Exception
 	{
-		IndexManager.getInstance().removeIndex(URI.create(IJSIndexConstants.METADATA_INDEX_LOCATION));
+		getIndexManager().removeIndex(URI.create(IJSIndexConstants.METADATA_INDEX_LOCATION));
 
 		super.tearDown();
+	}
+
+	protected IndexManager getIndexManager()
+	{
+		return IndexPlugin.getDefault().getIndexManager();
 	}
 
 	/**

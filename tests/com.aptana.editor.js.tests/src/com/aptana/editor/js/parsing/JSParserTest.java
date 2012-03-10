@@ -1002,6 +1002,26 @@ public class JSParserTest extends TestCase
 		assertEquals(6, invokeNode.getEndingOffset());
 	}
 
+	/**
+	 * test TISTUD-1269 (part 1)
+	 * 
+	 * @throws Exception
+	 */
+	public void testSwitchWithoutExpression() throws Exception
+	{
+		assertParseResult("switch () {}" + EOL);
+	}
+
+	/**
+	 * test TISTUD-1269 (part 2)
+	 * 
+	 * @throws Exception
+	 */
+	public void testCaseWithPartialIdentifier() throws Exception
+	{
+		assertParseResult("switch (id) {case Ti.}", "switch (id) {case Ti.: }" + EOL);
+	}
+
 	// utility methods
 	protected void assertParseErrors(String... messages)
 	{

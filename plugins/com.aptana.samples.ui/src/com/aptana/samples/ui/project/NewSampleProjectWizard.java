@@ -49,6 +49,7 @@ import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ArrayUtil;
+import com.aptana.core.util.FileUtil;
 import com.aptana.git.ui.CloneJob;
 import com.aptana.git.ui.util.GitUtil;
 import com.aptana.projects.internal.wizards.AbstractNewProjectWizard;
@@ -94,12 +95,35 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 
 		mainPage = new WizardNewProjectCreationPage("basicNewProjectPage") //$NON-NLS-1$
 		{
-			
+
 			@Override
 			public void createControl(Composite parent)
 			{
 				super.createControl(parent);
 				validatePage();
+			}
+
+			@Override
+			protected boolean validatePage()
+			{
+				boolean valid = super.validatePage();
+				if (!valid)
+				{
+					return false;
+				}
+
+				// Check if there's already a directory/files at the destination
+				IPath location = getLocationPath();
+				File file = location.toFile();
+				if (file.exists())
+				{
+					setMessage(Messages.NewSampleProjectWizard_LocationExistsMessage, WARNING);
+					return true;
+				}
+
+				setErrorMessage(null);
+				setMessage(null);
+				return true;
 			}
 		};
 		mainPage.setTitle(Messages.NewSampleProjectWizard_ProjectPage_Title);
@@ -116,6 +140,7 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 	@Override
 	public boolean performFinish()
 	{
+		// TODO If location already exists, pop up a confirm dialog?
 		createNewProject();
 		if (newProject == null)
 		{
@@ -281,7 +306,15 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 		{
 			path = path.append(projectDescription.getName());
 		}
-		// FIXME Run an IrunnableWithProgress in wizard container, have it just do job.run(monitor)!
+
+		// Wipe the destination directory if it already exists, or git clone will fail.
+		File directory = path.toFile();
+		if (directory.exists())
+		{
+			FileUtil.deleteRecursively(directory);
+		}
+
+		// FIXME Run an IRunnableWithProgress in wizard container, have it just do job.run(monitor)!
 		Job job = new CloneJob(gitURL, path.toOSString(), true, true);
 		job.addJobChangeListener(new JobChangeAdapter()
 		{
@@ -289,6 +322,11 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 			@Override
 			public void done(IJobChangeEvent event)
 			{
+				if (!event.getResult().isOK())
+				{
+					return;
+				}
+
 				try
 				{
 					projectHandle.setDescription(projectDescription, null);

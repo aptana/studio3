@@ -37,6 +37,7 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
+import com.aptana.index.core.IndexPlugin;
 import com.aptana.ui.util.UIUtils;
 
 /**
@@ -154,7 +155,7 @@ public class EditorUtil
 		if (StringUtil.isEmpty(uriPath) || uriPath.equals("/")) //$NON-NLS-1$
 		{
 			return null;
-}
+		}
 		IPath path = new Path(uriPath);
 		return PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(path.lastSegment());
 	}
@@ -177,25 +178,30 @@ public class EditorUtil
 				IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
 				IFile file = fileEditorInput.getFile();
 
-				return IndexManager.getInstance().getIndex(file.getProject().getLocationURI());
+				return getIndexManager().getIndex(file.getProject().getLocationURI());
 			}
 			if (editorInput instanceof IURIEditorInput)
 			{
 				IURIEditorInput uriEditorInput = (IURIEditorInput) editorInput;
 
 				// FIXME This file may be a child, we need to check to see if there's an index with a parent URI.
-				return IndexManager.getInstance().getIndex(uriEditorInput.getURI());
+				return getIndexManager().getIndex(uriEditorInput.getURI());
 			}
 			if (editorInput instanceof IPathEditorInput)
 			{
 				IPathEditorInput pathEditorInput = (IPathEditorInput) editorInput;
 
 				// FIXME This file may be a child, we need to check to see if there's an index with a parent URI.
-				return IndexManager.getInstance().getIndex(URIUtil.toURI(pathEditorInput.getPath()));
+				return getIndexManager().getIndex(URIUtil.toURI(pathEditorInput.getPath()));
 			}
 		}
 
 		return null;
+	}
+
+	protected static IndexManager getIndexManager()
+	{
+		return IndexPlugin.getDefault().getIndexManager();
 	}
 
 	/**

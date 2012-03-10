@@ -679,7 +679,7 @@ public class SnippetsView extends ViewPart
 	{
 		updateThemeFont();
 
-		if (ThemePlugin.invasiveThemesEnabled())
+		if (ThemePlugin.applyToViews())
 		{
 			themeBgColor = ThemePlugin.getDefault().getColorManager()
 					.getColor(ThemePlugin.getDefault().getThemeManager().getCurrentTheme().getBackground());
@@ -747,7 +747,7 @@ public class SnippetsView extends ViewPart
 			public void preferenceChange(PreferenceChangeEvent event)
 			{
 				String key = event.getKey();
-				if (IThemeManager.THEME_CHANGED.equals(key) || IPreferenceConstants.INVASIVE_THEMES.equals(key)
+				if (IThemeManager.THEME_CHANGED.equals(key) || IPreferenceConstants.APPLY_TO_ALL_VIEWS.equals(key)
 						|| IPreferenceConstants.INVASIVE_FONT.equals(key))
 				{
 					updateThemeColors();

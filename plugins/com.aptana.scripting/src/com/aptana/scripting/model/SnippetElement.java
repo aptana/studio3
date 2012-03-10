@@ -11,11 +11,13 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.aptana.core.util.CollectionsUtil;
+
 public class SnippetElement extends CommandElement
 {
 	private String _expansion;
 	private String _category;
-	private List<String> _tags = new ArrayList<String>();
+	private List<String> _tags;
 	private String _iconPath;
 	private URL _iconURL;
 	private String _description;
@@ -116,7 +118,7 @@ public class SnippetElement extends CommandElement
 	 */
 	public List<String> getTags()
 	{
-		return _tags;
+		return CollectionsUtil.getListValue(_tags);
 	}
 
 	/**
@@ -125,10 +127,13 @@ public class SnippetElement extends CommandElement
 	 */
 	public void setTags(List<String> tags)
 	{
-		this._tags.clear();
 		if (tags != null)
 		{
-			this._tags.addAll(tags);
+			this._tags = new ArrayList<String>(tags);
+		}
+		else
+		{
+			this._tags = null;
 		}
 	}
 

@@ -30,6 +30,7 @@ import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
+import com.aptana.index.core.IndexPlugin;
 
 public class JSIndexQueryHelper
 {
@@ -40,7 +41,12 @@ public class JSIndexQueryHelper
 	 */
 	public static Index getIndex()
 	{
-		return IndexManager.getInstance().getIndex(URI.create(IJSIndexConstants.METADATA_INDEX_LOCATION));
+		return getIndexManager().getIndex(URI.create(IJSIndexConstants.METADATA_INDEX_LOCATION));
+	}
+
+	protected static IndexManager getIndexManager()
+	{
+		return IndexPlugin.getDefault().getIndexManager();
 	}
 
 	private JSIndexReader _reader;

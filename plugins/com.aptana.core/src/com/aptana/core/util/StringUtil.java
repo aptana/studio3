@@ -604,6 +604,11 @@ public class StringUtil
 		return !StringUtil.isEmpty(string) && string.charAt(0) == c;
 	}
 
+	public static boolean startsWith(String string, String prefix)
+	{
+		return !StringUtil.isEmpty(string) && string.startsWith(prefix);
+	}
+
 	/**
 	 * Removes <.*?> inside a string. If the specified value is empty or null, then it is returned untouched
 	 * 

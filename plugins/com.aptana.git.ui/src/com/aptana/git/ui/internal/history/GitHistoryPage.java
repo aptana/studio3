@@ -242,7 +242,7 @@ public class GitHistoryPage extends HistoryPage
 
 	protected RGB getBackground()
 	{
-		if (ThemePlugin.invasiveThemesEnabled())
+		if (ThemePlugin.applyToViews())
 		{
 			return ThemePlugin.getDefault().getThemeManager().getCurrentTheme().getBackground();
 		}

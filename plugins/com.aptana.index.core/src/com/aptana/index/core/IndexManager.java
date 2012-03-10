@@ -40,9 +40,15 @@ public class IndexManager
 	private static final String FILE_INDEXING_PARTICIPANTS_ID = "fileIndexingParticipants"; //$NON-NLS-1$
 	private static final String TAG_FILE_INDEXING_PARTICIPANT = "fileIndexingParticipant"; //$NON-NLS-1$
 	private static final String ATTR_CLASS = "class"; //$NON-NLS-1$
+	private static final String INDEX_FILTER_PARTICIPANTS_ID = "indexFilterParticipants"; //$NON-NLS-1$
+	private static final String ELEMENT_FILTER = "filter"; //$NON-NLS-1$
+	private static final String FILE_CONTRIBUTORS_ID = "fileContributors"; //$NON-NLS-1$
+	private static final String ELEMENT_CONTRIBUTOR = "contributor"; //$NON-NLS-1$
 
-	private static IndexManager INSTANCE;
 	private Map<URI, Index> indexes;
+
+	private ArrayList<IIndexFileContributor> fileContributors;
+	private ArrayList<IIndexFilterParticipant> filterParticipants;
 
 	static final ISchedulingRule MUTEX_RULE = new ISchedulingRule()
 	{
@@ -58,24 +64,9 @@ public class IndexManager
 	};
 
 	/**
-	 * getInstance
-	 * 
-	 * @return
-	 */
-	public synchronized static IndexManager getInstance()
-	{
-		if (INSTANCE == null)
-		{
-			INSTANCE = new IndexManager();
-		}
-
-		return INSTANCE;
-	}
-
-	/**
 	 * IndexManager
 	 */
-	private IndexManager()
+	IndexManager()
 	{
 		this.indexes = new HashMap<URI, Index>();
 	}
@@ -191,8 +182,9 @@ public class IndexManager
 	 */
 	public List<IFileStoreIndexingParticipant> getIndexParticipants(String filename)
 	{
-		Set<IFileStoreIndexingParticipant> participants = new HashSet<IFileStoreIndexingParticipant>();
 		Map<IConfigurationElement, Set<IContentType>> participantstoContentTypes = getFileIndexingParticipants();
+		Set<IFileStoreIndexingParticipant> participants = new HashSet<IFileStoreIndexingParticipant>(
+				participantstoContentTypes.size());
 		for (Map.Entry<IConfigurationElement, Set<IContentType>> entry : participantstoContentTypes.entrySet())
 		{
 			if (hasType(filename, entry.getValue()))
@@ -264,5 +256,83 @@ public class IndexManager
 		}
 
 		return null;
+	}
+
+	/**
+	 * getFileContributors
+	 * 
+	 * @return
+	 */
+	public synchronized List<IIndexFileContributor> getFileContributors()
+	{
+		if (fileContributors == null)
+		{
+			fileContributors = new ArrayList<IIndexFileContributor>();
+			EclipseUtil.processConfigurationElements(IndexPlugin.PLUGIN_ID, FILE_CONTRIBUTORS_ID,
+					new IConfigurationElementProcessor()
+					{
+
+						public void processElement(IConfigurationElement element)
+						{
+							try
+							{
+								IIndexFileContributor participant = (IIndexFileContributor) element
+										.createExecutableExtension(ATTR_CLASS);
+								fileContributors.add(participant);
+							}
+							catch (CoreException e)
+							{
+								IdeLog.logError(IndexPlugin.getDefault(), e);
+							}
+						}
+
+						public Set<String> getSupportElementNames()
+						{
+							return CollectionsUtil.newSet(ELEMENT_CONTRIBUTOR);
+						}
+					});
+			fileContributors.trimToSize();
+		}
+
+		return fileContributors;
+	}
+
+	/**
+	 * getFilterParticipants
+	 * 
+	 * @return
+	 */
+	public synchronized List<IIndexFilterParticipant> getFilterParticipants()
+	{
+		if (filterParticipants == null)
+		{
+			filterParticipants = new ArrayList<IIndexFilterParticipant>();
+			EclipseUtil.processConfigurationElements(IndexPlugin.PLUGIN_ID, INDEX_FILTER_PARTICIPANTS_ID,
+					new IConfigurationElementProcessor()
+					{
+
+						public void processElement(IConfigurationElement element)
+						{
+							try
+							{
+								IIndexFilterParticipant participant = (IIndexFilterParticipant) element
+										.createExecutableExtension(ATTR_CLASS);
+								filterParticipants.add(participant);
+							}
+							catch (CoreException e)
+							{
+								IdeLog.logError(IndexPlugin.getDefault(), e);
+							}
+						}
+
+						public Set<String> getSupportElementNames()
+						{
+							return CollectionsUtil.newSet(ELEMENT_FILTER);
+						}
+					});
+			filterParticipants.trimToSize();
+		}
+
+		return filterParticipants;
 	}
 }

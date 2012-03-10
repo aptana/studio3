@@ -47,6 +47,7 @@ import com.aptana.index.core.FileStoreBuildContext;
 import com.aptana.index.core.IFileStoreIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
+import com.aptana.index.core.IndexPlugin;
 import com.aptana.index.core.build.BuildContext;
 import com.aptana.scripting.model.SnippetElement;
 import com.aptana.ui.util.UIUtils;
@@ -251,7 +252,7 @@ public abstract class EditorBasedTests extends TestCase
 		{
 			return null;
 		}
-		return IndexManager.getInstance().getIndex(this.fileUri);
+		return getIndexManager().getIndex(this.fileUri);
 
 	}
 
@@ -292,7 +293,7 @@ public abstract class EditorBasedTests extends TestCase
 		this.fileUri = store.toURI();
 		this.editor = this.createEditor(editorInput);
 		this.document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
-		this.source = document.get();		
+		this.source = document.get();
 
 		// find offsets
 		this.cursorOffsets = new ArrayList<Integer>();
@@ -318,7 +319,7 @@ public abstract class EditorBasedTests extends TestCase
 			// update document
 			document.set(this.source);
 		}
-		
+
 		IFileStoreIndexingParticipant indexer = this.createIndexer();
 		if (indexer != null)
 		{
@@ -392,8 +393,13 @@ public abstract class EditorBasedTests extends TestCase
 
 		if (fileUri != null)
 		{
-			IndexManager.getInstance().removeIndex(fileUri);
+			getIndexManager().removeIndex(fileUri);
 		}
+	}
+
+	protected IndexManager getIndexManager()
+	{
+		return IndexPlugin.getDefault().getIndexManager();
 	}
 
 	/*

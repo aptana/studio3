@@ -29,6 +29,7 @@ import com.aptana.editor.js.tests.JSEditorBasedTests;
 import com.aptana.index.core.FileStoreBuildContext;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
+import com.aptana.index.core.IndexPlugin;
 
 /**
  * JSCAIndexingTests
@@ -65,9 +66,9 @@ public class JSCAIndexingTests extends JSEditorBasedTests
 	{
 		IFileStore fileToIndex = getFileStore(resource);
 		uri = fileToIndex.toURI();
-		Index index = IndexManager.getInstance().getIndex(uri);
+		Index index = getIndexManager().getIndex(uri);
 		JSCAFileIndexingParticipant indexer = new JSCAFileIndexingParticipant();
-		
+
 		indexer.index(new FileStoreBuildContext(fileToIndex), index, new NullProgressMonitor());
 
 		return index;
@@ -95,7 +96,7 @@ public class JSCAIndexingTests extends JSEditorBasedTests
 	{
 		if (uri != null)
 		{
-			IndexManager.getInstance().removeIndex(uri);
+			getIndexManager().removeIndex(uri);
 			uri = null;
 		}
 
@@ -177,9 +178,9 @@ public class JSCAIndexingTests extends JSEditorBasedTests
 
 		// index jsca file
 		IFileStore fileToIndex = getFileStore("metadata/namespacedTypeMixed.jsca");
-		Index index = IndexManager.getInstance().getIndex(uri);
+		Index index = getIndexManager().getIndex(uri);
 		JSCAFileIndexingParticipant indexer = new JSCAFileIndexingParticipant();
-		indexer.index(new FileStoreBuildContext(fileToIndex), index, new NullProgressMonitor());		
+		indexer.index(new FileStoreBuildContext(fileToIndex), index, new NullProgressMonitor());
 
 		// setup editor and CA context
 		setupTestContext(sourceFile);
@@ -212,5 +213,10 @@ public class JSCAIndexingTests extends JSEditorBasedTests
 
 		assertFalse("SimpleType should not exist in the proposal list", names.contains("SimpleType"));
 		assertTrue("SimpleType2 does not exist in the proposal list", names.contains("SimpleType2"));
+	}
+
+	protected IndexManager getIndexManager()
+	{
+		return IndexPlugin.getDefault().getIndexManager();
 	}
 }

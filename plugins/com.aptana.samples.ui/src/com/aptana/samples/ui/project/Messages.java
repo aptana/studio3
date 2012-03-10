@@ -22,6 +22,7 @@ public class Messages extends NLS
 	public static String NewSampleProjectWizard_ERR_FailToDisconnect;
 	public static String NewSampleProjectWizard_ERR_OpenIndexFile;
 	public static String NewSampleProjectWizard_InternalError;
+	public static String NewSampleProjectWizard_LocationExistsMessage;
 	public static String NewSampleProjectWizard_ProjectPage_Description;
 	public static String NewSampleProjectWizard_ProjectPage_Title;
 	public static String NewSampleProjectWizard_Title;
