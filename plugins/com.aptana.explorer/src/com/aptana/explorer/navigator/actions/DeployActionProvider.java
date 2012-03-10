@@ -28,6 +28,16 @@ public class DeployActionProvider extends ExplorerActionProvider
 		return DeployPlugin.getImage(DeployPlugin.DEPLOY_MENU_ICON);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.ui.actions.DefaultNavigatorActionProvider#getHotImage()
+	 */
+	@Override
+	protected Image getHotImage()
+	{
+		return DeployPlugin.getImage(DeployPlugin.DEPLOY_HOT_MENU_ICON);
+	}
+
 	@Override
 	protected String getMenuId()
 	{

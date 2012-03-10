@@ -51,6 +51,11 @@ public abstract class DefaultNavigatorActionProvider extends CommonActionProvide
 
 	protected abstract Image getImage();
 
+	protected Image getHotImage()
+	{
+		return null;
+	}
+
 	protected abstract String getMenuId();
 
 	protected IWorkbenchPartSite getPartSite()

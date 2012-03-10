@@ -28,6 +28,11 @@ public class DeployPlugin extends AbstractUIPlugin
 	 */
 	public static final String DEPLOY_MENU_ICON = "icons/full/elcl16/deploy_package.png"; //$NON-NLS-1$
 
+	/**
+	 * The path to the hot icon for deploy menu
+	 */
+	public static final String DEPLOY_HOT_MENU_ICON = "icons/full/elcl16/deploy_package_hot.png"; //$NON-NLS-1$
+
 	private static DeployPlugin instance;
 
 	/*

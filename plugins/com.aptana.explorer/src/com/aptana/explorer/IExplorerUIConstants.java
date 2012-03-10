@@ -24,4 +24,9 @@ public interface IExplorerUIConstants
 	 * The path to the icon for commands menu
 	 */
 	public static final String GEAR_MENU_ICON = "icons/full/elcl16/config.png"; //$NON-NLS-1$
+
+	/**
+	 * The path to the icon for commands menu
+	 */
+	public static final String GEAR_HOT_MENU_ICON = "icons/full/elcl16/config_hot.png"; //$NON-NLS-1$
 }
