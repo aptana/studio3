@@ -45,6 +45,7 @@ import com.aptana.editor.js.parsing.ast.JSReturnNode;
 import com.aptana.editor.js.parsing.ast.JSStringNode;
 import com.aptana.editor.js.parsing.ast.JSTreeWalker;
 import com.aptana.editor.js.parsing.ast.JSTrueNode;
+import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import com.aptana.editor.js.sdoc.model.DocumentationBlock;
 import com.aptana.editor.js.sdoc.model.ParamTag;
 import com.aptana.editor.js.sdoc.model.Tag;
@@ -376,7 +377,19 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	@Override
 	public void visit(JSBinaryBooleanOperatorNode node)
 	{
-		this.addType(JSTypeConstants.BOOLEAN_TYPE);
+		JSTokenType token = JSTokenType.get((String) node.getOperator().value);
+
+		switch (token)
+		{
+			case AMPERSAND_AMPERSAND:
+			case PIPE_PIPE:
+				this.addTypes(node.getLeftHandSide());
+				this.addTypes(node.getRightHandSide());
+				break;
+
+			default:
+				this.addType(JSTypeConstants.BOOLEAN_TYPE);
+		}
 	}
 
 	/*
