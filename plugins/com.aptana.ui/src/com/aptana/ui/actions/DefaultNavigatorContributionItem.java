@@ -44,6 +44,7 @@ public class DefaultNavigatorContributionItem extends ContributionItem
 	{
 		toolItem = new ToolItem(parent, SWT.DROP_DOWN);
 		toolItem.setImage(actionProvider.getImage());
+		toolItem.setDisabledImage(actionProvider.getDisabledImage());
 		toolItem.setHotImage(actionProvider.getHotImage());
 		toolItem.setToolTipText(actionProvider.getToolTip());
 
