@@ -211,13 +211,19 @@
                      value="com.aptana.ide.core.io.LocalRoot">
                </instanceof>
                <and>
-                  <adapt
-                        type="org.eclipse.core.resources.IResource">
-                  </adapt>
                   <test
                         property="org.eclipse.core.resources.projectNature"
                         value="com.aptana.projects.webnature">
                   </test>
+                  <and>
+                     <adapt
+                           type="org.eclipse.core.resources.IResource">
+                     </adapt>
+                     <not>
+                        <instanceof
+                              value="org.eclipse.core.resources.IProject">
+                        </instanceof>
+                     </not></and>
                </and>
             </or>
          </enablement>
