@@ -404,6 +404,8 @@ public abstract class IOUtil
 			}
 			catch (IOException e)
 			{
+				IdeLog.logWarning(CorePlugin.getDefault(),
+						"Failed to create a temporary file to check if the directory is writable.", e); //$NON-NLS-1$
 			}
 		}
 		return false;
