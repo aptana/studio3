@@ -75,7 +75,6 @@ public class Messages extends NLS
 	public static String EditorsPreferencePage_Wrap_Selection;
 
 	public static String ValidationPreferencePage_EnablingValidatorWarning;
-
 	public static String ValidationPreferencePage_ERR_EmptyExpression;
 	public static String ValidationPreferencePage_Filter_Description;
 	public static String ValidationPreferencePage_Filter_SelectParticipant;
@@ -85,6 +84,10 @@ public class Messages extends NLS
 	public static String ValidationPreferencePage_LBL_Validators;
 	public static String ValidationPreferencePage_BuildColumn;
 	public static String ValidationPreferencePage_NameColumn;
+	public static String ValidationPreferencePage_RebuildDialogMessage;
+	public static String ValidationPreferencePage_RebuildDialogTitle;
+	public static String ValidationPreferencePage_RebuildJobTaskName;
+	public static String ValidationPreferencePage_RebuildJobTitle;
 	public static String ValidationPreferencePage_ReconcileColumn;
 
 	static
