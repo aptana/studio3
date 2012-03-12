@@ -14,11 +14,24 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.content.IContentType;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.preference.IPreferencePageContainer;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
@@ -47,10 +60,12 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
 import com.aptana.buildpath.core.BuildPathCorePlugin;
 import com.aptana.core.build.AbstractBuildParticipant;
 import com.aptana.core.build.IBuildParticipant;
+import com.aptana.core.build.IBuildParticipant.BuildType;
 import com.aptana.core.build.IBuildParticipantManager;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.CollectionsUtil;
@@ -74,9 +89,15 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 	private TableViewer validatorsViewer;
 	private CListTable filterViewer;
 
+	/**
+	 * Has the user made any changes? If so we'll need to pop a dialog asking to rebuild
+	 */
+	private boolean promptForRebuild;
+
 	public ValidationPreferencePage()
 	{
 		super();
+		promptForRebuild = false;
 	}
 
 	public void init(IWorkbench workbench)
@@ -166,6 +187,75 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 		updateFilterExpressions();
 
 		super.performDefaults();
+	}
+
+	@Override
+	public boolean performOk()
+	{
+		// FIXME We apply changes to participants as the user makes them, rather than when they click OK/Apply. We
+		// probably don't want to do that...
+		if (promptForRebuild)
+		{
+			MessageDialog dialog = new MessageDialog(getShell(), Messages.ValidationPreferencePage_RebuildDialogTitle,
+					null, Messages.ValidationPreferencePage_RebuildDialogMessage, MessageDialog.QUESTION, new String[] {
+							IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL }, 0);
+			if (dialog.open() == 0)
+			{
+				doBuild();
+			}
+		}
+
+		return true;
+	}
+
+	protected void doBuild()
+	{
+		// TODO Extract a class for this job!
+		Job buildJob = new Job(Messages.ValidationPreferencePage_RebuildJobTitle)
+		{
+			@Override
+			protected IStatus run(IProgressMonitor monitor)
+			{
+				SubMonitor sub = SubMonitor.convert(monitor, Messages.ValidationPreferencePage_RebuildJobTaskName, 100);
+				try
+				{
+					IWorkspace workspace = ResourcesPlugin.getWorkspace();
+					sub.worked(1);
+					workspace.build(IncrementalProjectBuilder.FULL_BUILD, sub.newChild(99));
+				}
+				catch (CoreException e)
+				{
+					return e.getStatus();
+				}
+				catch (OperationCanceledException e)
+				{
+					return Status.CANCEL_STATUS;
+				}
+				finally
+				{
+					sub.done();
+				}
+				return Status.OK_STATUS;
+			}
+
+			@Override
+			public boolean belongsTo(Object family)
+			{
+				return ResourcesPlugin.FAMILY_MANUAL_BUILD == family;
+			}
+		};
+		buildJob.setRule(ResourcesPlugin.getWorkspace().getRuleFactory().buildRule());
+		buildJob.setUser(true);
+
+		IPreferencePageContainer container = getContainer();
+		if (container instanceof IWorkbenchPreferenceContainer)
+		{
+			((IWorkbenchPreferenceContainer) container).registerUpdateJob(buildJob);
+		}
+		else
+		{
+			buildJob.schedule();
+		}
 	}
 
 	private Control createValidators(Composite parent)
@@ -298,6 +388,10 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 					filters[i++] = item.toString();
 				}
 				participant.setFilters(EclipseUtil.instanceScope(), filters);
+				if (participant.isEnabled(BuildType.BUILD))
+				{
+					promptForRebuild = true;
+				}
 			}
 		});
 		filterViewer.setEnabled(false);
@@ -417,7 +511,7 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 	 * 
 	 * @author cwilliams
 	 */
-	private static final class ParticipantCellModifier implements ICellModifier
+	private final class ParticipantCellModifier implements ICellModifier
 	{
 		private TableViewer tableViewer;
 
@@ -436,10 +530,13 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 			if (BUILD.equals(property))
 			{
 				participant.setEnabled(IBuildParticipant.BuildType.BUILD, ((Boolean) value).booleanValue());
+				promptForRebuild = true;
 			}
 			else if (RECONCILE.equals(property))
 			{
 				participant.setEnabled(IBuildParticipant.BuildType.RECONCILE, ((Boolean) value).booleanValue());
+				// don't set changed to true, since we don't really need to do a rebuild on reconcile enable/disable
+				// changes
 			}
 			tableViewer.refresh(participant);
 		}
