@@ -58,34 +58,34 @@ public class CSSParser extends Parser implements IParser
 {
 
 	static final ParsingTables PARSING_TABLES = new ParsingTables(
-			"U9pDLcTuLKKGFVSLz4L41AIJn0WHyIL8IK82IKX8w7PGGQnO454K4O4a44X22pMK0A7t3h5"
-					+ "t53iMn8ueA601ks9NXhDxb$Zotir70lxWVj$PcPqxP#xipkvx0rY7C04JKOWfc8ofc8Rfc8"
-					+ "4YpCGiJC8S56Ckvc4#Ih002x48Ix0Kox0SYx42ix4IZR0Agx46Qx4Ewx416x49cqygufcE4"
-					+ "VEHXHh8HYvkGpGwem1DSJt6eIOyyA8QJiFfy24CPw0Uab0BBYIW4#eZ7Z58aU7mOoZQeJRk"
-					+ "Ho9YqH8NeHLQemtQ8WujTCHp655nEf9JXr7Ia8fqSYvWb53EUEPJr#JJZ9nRS3xEDfnabQq"
-					+ "KEsJRFYJR9Bso9iQNkTBNJrytkeNuAiyM8L7Tw17iAKUGWpin4FTW2#x67RWBWz0Gep0Qm$"
-					+ "00XcC4Hke8FT4L4QYE1hWClN4jpX8XCuhCBjm9cvc4JCtihcqnoC2vp53fvPZaNKvUSpGEu"
-					+ "aMMySuZxofS7SBhGru7X9Vn1cgUFOl1XLor7xUZRn1FrMeCQtK3#c4ihaD$rce0yXngfJop"
-					+ "w9cDMxbpAfjs68oBA#bvBovryCnXBGTY2EupUGwGsJhh79b5ktfiktgqdTB9hge0LY5O0fS"
-					+ "OnfM6SLCvlifDuGfSWrwqrYkptCZpUZCitW1to0cgpjjLWtjNasUr5cz37PxwkkJMvxusv5"
-					+ "rkp9COpdsEP8sZMA#cFDlHFDdDUGjE9gB7CM8CTzLdTjNFMHptE84xdiupq9ud8fct8PLtA"
-					+ "uryFyzVfiuXZ3DLWvwiayMPZ$FG739qH8iH5QS9VHJi7CAOGvW3fpFpiKm#Flh7SRs#ihnL"
-					+ "jf4EsKQ6PElNlfdbpakyzlM5#2hF38UeLeWdQFCpet3cQLUW3M##ge2zcoruKrI424OeNm7"
-					+ "5J2HJxOJDL7wAQTjKXbwzcwuWfiLeRfufRn0leXmldUiAvgK7yToQTopljbnrF5STohDh5Q"
-					+ "5hvUDv3gDdj4Ejb6SilUoTiy#5dz#hd6VN2ZmZzUzkkCapbfhAsg9q2n$RhZLjftIoSvUej"
-					+ "GoMHABDO3NiBoG6ydLk2bwENbez0POm0YZDrJy1ECYILbFwyS2d4z73wFs94gCFCdAi0wUv"
-					+ "pWfMb3stKeoiITGsUalZMspa4jhwgjyiytvmPV8B#cvXW3wRCV8fywiOOvkHUuazZ37Cv5D"
-					+ "e9FVHscNqtKOglrZ36qUzkx7t8$eOlIEnp#W7Z9n7h3Hw9h7zlpmi7v4LC6$0OOVvnX3ESu"
-					+ "szW9XOyNgidSTVirLQbJqw5S2d6L5q0ZprUnPH2RyrXFfdp3RprG7lZjN1xy3RJtImTQlH$"
-					+ "x1EEP5rbezX5PbOlGDiSumjpyZ30TyyKa4Sxfqrt$XiCfAzY9LXtaSH2G5njWRnsPDONOpU"
-					+ "gmhv3ws4Jv$AnZiLmAVK5lAl$2r$oP$oX$mklyclSbXRVz7ZpyHFn6FogCoJkORn8$63rbu"
-					+ "aNf27v44zAvKj73V9EbahawLG9ib4cI3ZPPmKIBxaoLWPOo8yBXjbfXJ939akSsI3h9VDKY"
-					+ "oFoCFc$JRYUQqzHspLshDwV4QFJ#lnAU99OesiakMoGfRAOiuMoK9PeD#Nw76#7dCaMx9af"
-					+ "8oG9R9CScMqZ9ALCascoXHvGbRBF$AzV2lVo24vA5$BL$AbV247PB$iay$bCzahU#HJ#KHs"
-					+ "oyUoIpwI3#K3UL$UatVb7TafRyiEUKlUb3VaTTakhychyegyB2$9T$pmUFPv5W7sKoxT0RO"
-					+ "x3fBu7zvUmyF#IS7BFib5MEoSJcqaC#zavfpCd9FP5QHmdi9vAcKgPKVAD0qFOR6Jyh0lTX"
-					+ "EgmrDm6RZPToXuT0VSINTZBiBIQ6kGG7i2PHpVnL6secobfUg3NOIbU#9OtKEvZEuclEpmB"
-					+ "0s$GJU3Z21q2K1y5T4w05qT47CKX2crGW==");
+			"U9pDLcTuL4KKFRC5tOY8W7II604HDq5A4X980Y6XYpKgY1KBHX15f4C2X1fgWD1xxytUKEn"
+					+ "O43kYe8055IjsvNfctX2t8G7ymNxVcJjptpttdPaxytO0TGZZK8W9c8I9c8mfAC9KJCDq56"
+					+ "CyPc8MPcCEvc8UvcC15c8nbc0fbc4HbcC6Lg06Lc8LLcCDrc8TrcC3DcBJAMKyEsB6KHY2S"
+					+ "XYAuRW3TT4Qer4RDs8CoiC3ByhW39m97w9m5geW5HNWGZ9QeIgI48zqwGS$#g8fAg8VKf20"
+					+ "1hW43T48ZT44YQXlCfx7Z9hJWfnApD8I6SWavo9c2UUCfPxALayTScx3XJZNSjAqMYcEeBP"
+					+ "PcDfKCxDQDfPQ6Ujdh1ljmc9rPFsmh6vq28sK8yZ3tSX5Rsp6lRWBlN0FgYCVmz0V0p0GWp"
+					+ "3OPEY8jeX1MLJ3vSZ1zJX7XCmuCjjm9HncAh8DixtnnICBvrEXxWSnoRk2l7ge6SABBU5TG"
+					+ "Durk3QCrvcyveWkuUKQdZEAnyMSjHzteai8JzTg16jr4xgY03UW6slL7ICZr4f73c7aKDpE"
+					+ "bTDgcg8dBYrbv7suB49a7ckPY$lHn#hiZWUCwZoPHZzaglNhd$7JvffHi5zN0Qn2g0KwMSP"
+					+ "Lbd5B45zhqxWIr#5gUgkKU6xcVhtLz7f0yHoum$PHMPwnSbp1yjon5NWcAd7lLsQ6gbpTwZ"
+					+ "pHDRaVexdQiQnq7AjMcpkyBlTtFPw5KydeYPWndclhislhvoYHAvtCTS$aJcZ6VP76Cv714"
+					+ "zQIV3ztORRH4CMHhaH7LajnvECuN4EMoQYOKNDgCKR3qH153L4HEAsfHrazFiOdShw#4jrQ"
+					+ "RMm4jR5XQlqcDZjeroIPM5zOh8xCYf1LXKM2FZyLHLEdKu76FF#w0ivgrkTvqHbYc26u0fg"
+					+ "PGgPU2OUfupJJyMc5NhEQhX2cOZOtzvCtX1SJnClal49vcI4yj#4TrTs4iqxYhCDvJgrYJA"
+					+ "rytCjHZAmReLOwCe5Hpiev#yBFzvrQP2nrjkNtrz6PmBNMgXMjcz$7QCSl$3b#MhSP1VkvI"
+					+ "kmr2BL4YiDWDPmtf0JoZJODBrillPu0JvJnwXC8RCatdmCSP67Bv9lFoN#3lrP41zllHion"
+					+ "$HxM3e$0gMUqGSKvOvLkRNcYekqtiB4ph5r8NnVz$RBFUvL6NyXx2mFwqvcZWBRW17DiitO"
+					+ "liOSv#bezXTPwYLsslzjQ7PTWUQFORs$zNOdEjj#2s6Vx1woTHIop$MnY#xywbAxH8C8Nh4"
+					+ "zLOxF3lgitnoEjVomn$jZpKZkFFtUrgRJhTBg0lpf4qKdmzDSjfXHnAmdzRpdOZbS4F3jQ1"
+					+ "ty4tdwYkTDNDVw7USh9p3CuXogokN82VCNMDyBQmm7lF7ACF5mxDTl6hBUs9trPzdaSaHoG"
+					+ "PwlrTmh9m##9oh7zdC1dnvb7drB4T2vjljC1$6rnZFmjVyeVyhly9h$AB$Ap73RUdqpx8$4"
+					+ "3yOWyB3DbXcLyJtndUiyJpyaMsMn6csGZs$MoMbP9eOoJiJ96Hiie6Ia5CaA6op2nhvP7PP"
+					+ "qKoHIPB9DakgoLDR91YkKXUT0#tqOyQthF45jDxsdJFcNQ9qtx1F4uiLAMon9PAeja0KVpY"
+					+ "NaoL#QOcDccdMNQmJ981ie0wIyBPR7aoL0P8ijaeaoGyVAOh92$v5lvHhwMh#IWV2bVoEVo"
+					+ "cHoG$R9FFfLFPA$iaO$b8zaj7yek#K3Ub$VaNNb7tfQtPAUyAJla3NbTNfDNPRky8Y$BI$A"
+					+ "Yl227#E8nl04g0hnfkSpTiEbnaCf$psO67jwiDBoyGRa8nJlLwOqqwawZvZHgJkDz8PtZT8"
+					+ "upQ3DeMz2sDF0GYdSi3s$CRaBV$JHS5cxUI3GyvcxSojpJN8GoQ6AHJ7yoRIAV9T8sf6reh"
+					+ "BuXkmXbRii9vdRbjbRPlfVtFsNWjsXdaHM2DW58Ea4q2a3R28Z$1tLnka8=");
 
 	private IParseState fParseState;
 
@@ -649,21 +649,32 @@ public class CSSParser extends Parser implements IParser
 
 				return new CSSAttributeSelectorNode(c + i);
 			}
-			case 98: // AttributeSelector = COLON Function.f
+			case 98: // AttributeSelector = COLON.c1 COLON.c2 Identifier.i
+			{
+				final Symbol _symbol_c1 = _symbols[offset + 1];
+				final String c1 = (String) _symbol_c1.value;
+				final Symbol _symbol_c2 = _symbols[offset + 2];
+				final String c2 = (String) _symbol_c2.value;
+				final Symbol _symbol_i = _symbols[offset + 3];
+				final String i = (String) _symbol_i.value;
+
+				return new CSSAttributeSelectorNode(c1 + c2 + i);
+			}
+			case 99: // AttributeSelector = COLON Function.f
 			{
 				final Symbol _symbol_f = _symbols[offset + 2];
 				final CSSExpressionNode f = (CSSExpressionNode) _symbol_f.value;
 
 				return new CSSAttributeSelectorNode(f);
 			}
-			case 99: // AttributeSelector = HASH.h
+			case 100: // AttributeSelector = HASH.h
 			{
 				final Symbol _symbol_h = _symbols[offset + 1];
 				final String h = (String) _symbol_h.value;
 
 				return new CSSAttributeSelectorNode(h);
 			}
-			case 100: // AttributeSelector = LBRACKET.l Identifier.i RBRACKET.r
+			case 101: // AttributeSelector = LBRACKET.l Identifier.i RBRACKET.r
 			{
 				final Symbol _symbol_l = _symbols[offset + 1];
 				final String l = (String) _symbol_l.value;
@@ -674,7 +685,7 @@ public class CSSParser extends Parser implements IParser
 
 				return new CSSAttributeSelectorNode(l + i + r);
 			}
-			case 101: // AttributeSelector = LBRACKET.l Identifier.i AttributeValueOperator.o IdentiferOrString.s
+			case 102: // AttributeSelector = LBRACKET.l Identifier.i AttributeValueOperator.o IdentiferOrString.s
 						// RBRACKET.r
 			{
 				final Symbol _symbol_l = _symbols[offset + 1];
@@ -741,39 +752,39 @@ public class CSSParser extends Parser implements IParser
 			case 70: // Rule = error
 			case 83: // Expression = Term
 			case 86: // Term = Function
-			case 102: // ImportWord = STRING
-			case 103: // ImportWord = URL
-			case 104: // Identifier = IDENTIFIER
-			case 105: // Identifier = PROPERTY
-			case 106: // IdentiferOrString = IDENTIFIER
-			case 107: // IdentiferOrString = STRING
-			case 108: // Separator = SLASH
-			case 109: // Separator = COMMA
-			case 110: // Separator = PLUS
-			case 111: // Separator = MINUS
-			case 112: // Combinator = COMMA
-			case 113: // Combinator = PLUS
-			case 114: // Combinator = GREATER
-			case 115: // Primitive = NUMBER
-			case 116: // Primitive = PERCENTAGE
-			case 117: // Primitive = LENGTH
-			case 118: // Primitive = EMS
-			case 119: // Primitive = EXS
-			case 120: // Primitive = ANGLE
-			case 121: // Primitive = TIME
-			case 122: // Primitive = FREQUENCY
-			case 123: // Primitive = STRING
-			case 124: // Primitive = IDENTIFIER
-			case 125: // Primitive = URL
-			case 126: // Primitive = COLOR
-			case 127: // TypeOrUniversalSelector = IDENTIFIER
-			case 128: // TypeOrUniversalSelector = STAR
-			case 129: // TypeOrUniversalSelector = SELECTOR
-			case 130: // AttributeValueOperator = EQUAL
-			case 131: // AttributeValueOperator = INCLUDES
-			case 132: // AttributeValueOperator = DASHMATCH
-			case 133: // AttributeValueOperator = BEGINS_WITH
-			case 134: // AttributeValueOperator = ENDS_WITH
+			case 103: // ImportWord = STRING
+			case 104: // ImportWord = URL
+			case 105: // Identifier = IDENTIFIER
+			case 106: // Identifier = PROPERTY
+			case 107: // IdentiferOrString = IDENTIFIER
+			case 108: // IdentiferOrString = STRING
+			case 109: // Separator = SLASH
+			case 110: // Separator = COMMA
+			case 111: // Separator = PLUS
+			case 112: // Separator = MINUS
+			case 113: // Combinator = COMMA
+			case 114: // Combinator = PLUS
+			case 115: // Combinator = GREATER
+			case 116: // Primitive = NUMBER
+			case 117: // Primitive = PERCENTAGE
+			case 118: // Primitive = LENGTH
+			case 119: // Primitive = EMS
+			case 120: // Primitive = EXS
+			case 121: // Primitive = ANGLE
+			case 122: // Primitive = TIME
+			case 123: // Primitive = FREQUENCY
+			case 124: // Primitive = STRING
+			case 125: // Primitive = IDENTIFIER
+			case 126: // Primitive = URL
+			case 127: // Primitive = COLOR
+			case 128: // TypeOrUniversalSelector = IDENTIFIER
+			case 129: // TypeOrUniversalSelector = STAR
+			case 130: // TypeOrUniversalSelector = SELECTOR
+			case 131: // AttributeValueOperator = EQUAL
+			case 132: // AttributeValueOperator = INCLUDES
+			case 133: // AttributeValueOperator = DASHMATCH
+			case 134: // AttributeValueOperator = BEGINS_WITH
+			case 135: // AttributeValueOperator = ENDS_WITH
 			{
 				return _symbols[offset + 1];
 			}

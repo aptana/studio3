@@ -527,6 +527,10 @@ AttributeSelector
 		{:
 			return new CSSAttributeSelectorNode(c + i);
 		:}
+	|	COLON.c1 COLON.c2 Identifier.i
+		{:
+			return new CSSAttributeSelectorNode(c1 + c2 + i);
+		:}
 	|	COLON Function.f
 		{:
 			return new CSSAttributeSelectorNode(f);

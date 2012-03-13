@@ -613,6 +613,16 @@ public class CSSParserTest extends TestCase
 	}
 
 	/**
+	 * Test element pseudo-class selector
+	 * 
+	 * @throws Exception
+	 */
+	public void testElementPseudoclassSelector2() throws Exception
+	{
+		parseTest("td::first-child {}" + EOL); //$NON-NLS-1$
+	}
+
+	/**
 	 * Test element pseudo-class function selector
 	 * 
 	 * @throws Exception
