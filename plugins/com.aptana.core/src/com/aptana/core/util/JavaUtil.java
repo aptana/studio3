@@ -74,6 +74,9 @@ public class JavaUtil
 		FLOAT("float"),
 		NATIVE("native"),
 		SUPER("super"),
+		TRUE("true"),
+		FALSE("false"),
+		NULL("null"),
 		WHILE("while");
 
 		private String keyword;
