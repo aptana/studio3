@@ -7,10 +7,15 @@
  */
 package com.aptana.editor.js.parsing;
 
+import java.util.List;
+
 import junit.framework.TestCase;
 import beaver.Scanner.Exception;
 import beaver.Symbol;
 
+import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.StringUtil;
+import com.aptana.editor.common.tests.util.ListCrossProduct;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
 
 /**
@@ -45,6 +50,32 @@ public class JSScannerTest extends TestCase
 	}
 
 	/**
+	 * assertTokenType
+	 * 
+	 * @param source
+	 * @param type
+	 * @throws Exception
+	 */
+	protected void assertTokenType(String source, JSTokenType type)
+	{
+		_scanner.setSource(source);
+
+		try
+		{
+			Symbol token = _scanner.nextToken();
+			int id = token.getId();
+			int length = token.getEnd() - token.getStart() + 1;
+
+			assertEquals("unexpected token type", type.getIndex(), id);
+			assertEquals("token length does not match source length: " + source, source.length(), length);
+		}
+		catch (Throwable e)
+		{
+			fail(e.getMessage());
+		}
+	}
+
+	/**
 	 * assertTokenTypes
 	 * 
 	 * @param source
@@ -72,53 +103,20 @@ public class JSScannerTest extends TestCase
 		}
 	}
 
-	protected void assertListCrossProducts(String[][] lists, JSTokenType... tokenTypes)
+	protected void assertListCrossProducts(List<List<String>> lists, JSTokenType tokenType)
 	{
-		// accumulator used to determine the number of enumerations we have
-		int count = 1;
+		ListCrossProduct<String> crossProduct = new ListCrossProduct<String>();
 
-		// current offset within each sub-list
-		int[] offsets = new int[lists.length];
-
-		// initialize offsets and get total enumeration count
-		for (int i = 0; i < lists.length; i++)
+		for (List<String> list : lists)
 		{
-			offsets[i] = 0;
-
-			count *= lists[i].length;
+			crossProduct.addList(list);
 		}
 
-		// walk through all enumerations
-		for (int enumeration = 0; enumeration < count; enumeration++)
+		for (List<String> list : crossProduct)
 		{
-			StringBuilder buffer = new StringBuilder();
+			String text = StringUtil.concat(list);
 
-			// concatenate the current item from each sub-list into a single string
-			for (int i = 0; i < lists.length; i++)
-			{
-				buffer.append(lists[i][offsets[i]]);
-			}
-
-			// check token types
-			assertTokenTypes(buffer.toString(), tokenTypes);
-
-			// advance each offset, taking carries into account
-			for (int j = lists.length - 1; j >= 0; j--)
-			{
-				int current = offsets[j] + 1;
-
-				if (current > lists[j].length - 1)
-				{
-					// reset offset and continue processing to account for carry
-					offsets[j] = 0;
-				}
-				else
-				{
-					// value is in range, save it and stop processing
-					offsets[j] = current;
-					break;
-				}
-			}
+			assertTokenType(text, tokenType);
 		}
 	}
 
@@ -321,10 +319,11 @@ public class JSScannerTest extends TestCase
 	public void testIdentifier()
 	{
 		// @formatter:off
-		String[][] lists = {
-			{ "_", "$", "a", "A" },
-			{ "", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" }
-		};
+		@SuppressWarnings("unchecked")
+		List<List<String>> lists = CollectionsUtil.newList(
+			CollectionsUtil.newList("_", "$", "a", "A"),
+			CollectionsUtil.newList("", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9")
+		);
 		// @formatter:on
 
 		this.assertListCrossProducts(lists, JSTokenType.IDENTIFIER);
@@ -589,13 +588,14 @@ public class JSScannerTest extends TestCase
 	public void testHex()
 	{
 		// @formatter:off
-		String[][] lists = {
+		@SuppressWarnings("unchecked")
+		List<List<String>> lists = CollectionsUtil.newList(
 			//{ "+", "-", "" },	// TODO: apparently the scanner can't differentiate between 5 + 10 and 5 + +10?
-			{ "0" },
-			{ "x", "X" },
-			{ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "A", "B", "C", "D", "E", "F" },
-			{ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "A", "B", "C", "D", "E", "F" }
-		};
+			CollectionsUtil.newList("0"),
+			CollectionsUtil.newList("x", "X"),
+			CollectionsUtil.newList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "A", "B", "C", "D", "E", "F"),
+			CollectionsUtil.newList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "A", "B", "C", "D", "E", "F")
+		);
 		// @formatter:on
 
 		this.assertListCrossProducts(lists, JSTokenType.NUMBER);
@@ -611,13 +611,14 @@ public class JSScannerTest extends TestCase
 	public void testScientificNotation()
 	{
 		// @formatter:off
-		String[][] lists = {
+		@SuppressWarnings("unchecked")
+		List<List<String>> lists = CollectionsUtil.newList(
 			//{ "+", "-", "" },	// TODO: apparently the scanner can't differentiate between 5 + 10 and 5 + +10?
-			{ "1", "1.", ".9", "1.9" },
-			{ "e", "E" },
-			{ "+", "-", "" },
-			{ "10" }
-		};
+			CollectionsUtil.newList("1", "1.", ".9", "1.9"),
+			CollectionsUtil.newList("e", "E"),
+			CollectionsUtil.newList("+", "-", ""),
+			CollectionsUtil.newList("10")
+		);
 		// @formatter:on
 
 		this.assertListCrossProducts(lists, JSTokenType.NUMBER);

@@ -171,9 +171,9 @@ Whitespace = {LineTerminator} | [ \t\f] | {RubyBlock} | {PHPBlock} | {DjangoBloc
 Identifier = ([:jletter:]|\$)([:jletterdigit:]|\$)*
 
 Integer = [:digit:][:digit:]*
-Hex = "0x" [a-fA-F0-9]+
+Hex = "0" [xX] [a-fA-F0-9]+
 Float = ({Integer} \.[:digit:]*) | (\.[:digit:]+)
-Scientific = {Float} [eE][-+]?[:digit:]+
+Scientific = ({Integer} | {Float}) [eE][-+]?[:digit:]+
 Number = {Integer} | {Hex} | {Float} | {Scientific}
 
 DoubleQuotedString = \"([^\\\"\r\n]|\\[^])*\"
