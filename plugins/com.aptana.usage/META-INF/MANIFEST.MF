@@ -7,10 +7,10 @@ Bundle-Activator: com.aptana.usage.UsagePlugin
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
- org.eclipse.ui,
- com.aptana.core,
+ org.mortbay.jetty.util,
  com.aptana.libraries,
- org.mortbay.jetty.util
+ com.aptana.core,
+ org.eclipse.ui
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.usage,

@@ -9,7 +9,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
  org.eclipse.core.expressions,
  org.eclipse.core.filesystem,
- org.apache.ant,
+ org.apache.ant;visibility:=reexport,
  com.aptana.filewatcher,
  com.aptana.libraries,
  com.ibm.icu
