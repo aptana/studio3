@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -14,8 +14,8 @@ import java.util.Set;
 
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.action.IAction;
@@ -103,15 +103,22 @@ public abstract class BaseSyncAction implements IObjectActionDelegate, IViewActi
 					}
 					if (!remember)
 					{
-						IProject project = resource.getProject();
-						remember = ResourceSynchronizationUtils.isRememberDecision(project);
-						if (remember)
+						// checks the parent path
+						container = resource.getParent();
+						while (container != null && !(container instanceof IWorkspaceRoot))
 						{
-							container = project;
+							remember = ResourceSynchronizationUtils.isRememberDecision(container);
+							if (remember)
+							{
+								break;
+							}
+							container = container.getParent();
 						}
 					}
-
-					fSite = getLastSyncConnection(container);
+					if (remember)
+					{
+						fSite = getLastSyncConnection(container);
+					}
 				}
 
 				if (fSite == null)
@@ -342,17 +349,13 @@ public abstract class BaseSyncAction implements IObjectActionDelegate, IViewActi
 	private void setRememberMyDecision(ISiteConnection site, boolean rememberMyDecision)
 	{
 		IConnectionPoint source = site.getSource();
-		IContainer container = (IContainer) source.getAdapter(IContainer.class);
-		if (container == null)
+		IResource resource = (IResource) source.getAdapter(IResource.class);
+		if (resource instanceof IContainer)
 		{
-			return;
-		}
-		if (rememberMyDecision)
-		{
+			IContainer container = (IContainer) resource;
 			ResourceSynchronizationUtils.setRememberDecision(container, rememberMyDecision);
+			// remembers the last sync connection
+			ResourceSynchronizationUtils.setLastSyncConnection(container, site.getDestination().getName());
 		}
-
-		// remembers the last sync connection
-		ResourceSynchronizationUtils.setLastSyncConnection(container, site.getDestination().getName());
 	}
 }
