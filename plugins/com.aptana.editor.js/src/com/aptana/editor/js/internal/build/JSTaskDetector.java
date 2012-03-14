@@ -70,7 +70,7 @@ public class JSTaskDetector extends RequiredBuildParticipant
 		}
 		catch (CoreException e)
 		{
-			IdeLog.logError(JSPlugin.getDefault(), e);
+			// ignores the parser exception
 		}
 		return Collections.emptyList();
 	}
@@ -106,11 +106,14 @@ public class JSTaskDetector extends RequiredBuildParticipant
 				}
 				sub.worked(1);
 			}
-			sub.done();
 		}
 		catch (CoreException e)
 		{
 			IdeLog.logError(JSPlugin.getDefault(), e);
+		}
+		finally
+		{
+			sub.done();
 		}
 		return tasks;
 	}

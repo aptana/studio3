@@ -13,7 +13,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
@@ -71,22 +70,22 @@ public class HTMLTaskDetector extends RequiredBuildParticipant
 		Collection<IProblem> tasks = new ArrayList<IProblem>();
 
 		SubMonitor sub = SubMonitor.convert(monitor, 2);
+		IParseRootNode rootNode = null;
 		try
 		{
-			IParseRootNode rootNode = context.getAST();
-			if (rootNode == null)
-			{
-				return tasks;
-			}
-
-			tasks.addAll(walkAST(context, rootNode, sub.newChild(1)));
-			tasks.addAll(processComments(rootNode, context, sub.newChild(1)));
-			sub.done();
+			rootNode = context.getAST();
 		}
 		catch (CoreException e)
 		{
-			IdeLog.logError(CSSPlugin.getDefault(), e);
+			// ignores the parser exception
 		}
+		if (rootNode != null)
+		{
+			tasks.addAll(walkAST(context, rootNode, sub.newChild(1)));
+			tasks.addAll(processComments(rootNode, context, sub.newChild(1)));
+		}
+		sub.done();
+
 		return tasks;
 	}
 
@@ -99,9 +98,9 @@ public class HTMLTaskDetector extends RequiredBuildParticipant
 			return Collections.emptyList();
 		}
 
+		SubMonitor sub = SubMonitor.convert(monitor, comments.length);
 		try
 		{
-			SubMonitor sub = SubMonitor.convert(monitor, comments.length);
 			String source = context.getContents();
 			String filePath = context.getURI().toString();
 			for (IParseNode commentNode : comments)
@@ -116,6 +115,10 @@ public class HTMLTaskDetector extends RequiredBuildParticipant
 		catch (CoreException e)
 		{
 			IdeLog.logError(CSSPlugin.getDefault(), e);
+		}
+		finally
+		{
+			sub.done();
 		}
 		return tasks;
 	}

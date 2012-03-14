@@ -49,7 +49,14 @@ public class CSSParserValidator extends AbstractBuildParticipant
 		try
 		{
 			context.getAST(); // make sure a parse has happened...
+		}
+		catch (CoreException e)
+		{
+			// ignores the parser exception
+		}
 
+		try
+		{
 			// Add parse errors...
 			if (!CollectionsUtil.isEmpty(context.getParseErrors()))
 			{

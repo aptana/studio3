@@ -60,7 +60,14 @@ public class HTMLParserValidator extends AbstractBuildParticipant
 			String source = context.getContents();
 			if (!StringUtil.isEmpty(source))
 			{
-				context.getAST(); // Ensure a parse has happened
+				try
+				{
+					context.getAST(); // Ensure a parse has happened
+				}
+				catch (CoreException e)
+				{
+					// ignores the parser exception
+				}
 
 				// Add parse errors...
 				if (!CollectionsUtil.isEmpty(context.getParseErrors()))
