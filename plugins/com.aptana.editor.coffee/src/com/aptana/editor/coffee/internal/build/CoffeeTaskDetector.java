@@ -54,22 +54,29 @@ public class CoffeeTaskDetector extends RequiredBuildParticipant
 
 	private Collection<IProblem> detectTasks(BuildContext context, IProgressMonitor monitor)
 	{
-		Collection<IProblem> tasks = new ArrayList<IProblem>();
-
+		IParseRootNode rootNode = null;
 		try
 		{
-			IParseRootNode rootNode = context.getAST();
-			if (rootNode == null)
-			{
-				return Collections.emptyList();
-			}
+			rootNode = context.getAST();
+		}
+		catch (CoreException e)
+		{
+			// ignores the parser exception
+		}
+		if (rootNode == null)
+		{
+			return Collections.emptyList();
+		}
 
-			IParseNode[] comments = rootNode.getCommentNodes();
-			if (ArrayUtil.isEmpty(comments))
-			{
-				return Collections.emptyList();
-			}
+		IParseNode[] comments = rootNode.getCommentNodes();
+		if (ArrayUtil.isEmpty(comments))
+		{
+			return Collections.emptyList();
+		}
 
+		Collection<IProblem> tasks = new ArrayList<IProblem>();
+		try
+		{
 			SubMonitor sub = SubMonitor.convert(monitor, comments.length);
 			String source = context.getContents();
 			String filePath = context.getURI().toString();

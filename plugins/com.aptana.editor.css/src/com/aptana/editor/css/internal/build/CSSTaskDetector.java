@@ -69,7 +69,7 @@ public class CSSTaskDetector extends RequiredBuildParticipant
 		}
 		catch (CoreException e)
 		{
-			IdeLog.logError(CSSPlugin.getDefault(), e);
+			// ignores the parser exception
 		}
 		return Collections.emptyList();
 	}
@@ -92,9 +92,9 @@ public class CSSTaskDetector extends RequiredBuildParticipant
 		}
 
 		Collection<IProblem> tasks = new ArrayList<IProblem>();
+		SubMonitor sub = SubMonitor.convert(monitor, comments.length);
 		try
 		{
-			SubMonitor sub = SubMonitor.convert(monitor, comments.length);
 			String source = context.getContents();
 			String filePath = context.getURI().toString();
 
@@ -106,11 +106,14 @@ public class CSSTaskDetector extends RequiredBuildParticipant
 				}
 				sub.worked(1);
 			}
-			sub.done();
 		}
 		catch (CoreException e)
 		{
 			IdeLog.logError(CSSPlugin.getDefault(), e);
+		}
+		finally
+		{
+			sub.done();
 		}
 		return tasks;
 	}

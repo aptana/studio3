@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
@@ -49,11 +50,18 @@ public class JSParserValidator extends AbstractBuildParticipant
 			return;
 		}
 
-		List<IProblem> problems = new ArrayList<IProblem>();
 		try
 		{
 			context.getAST(); // Ensure a parse happened
+		}
+		catch (CoreException e)
+		{
+			// ignores the parser exception
+		}
 
+		List<IProblem> problems = new ArrayList<IProblem>();
+		try
+		{
 			// Add parse errors...
 			if (!CollectionsUtil.isEmpty(context.getParseErrors()))
 			{
