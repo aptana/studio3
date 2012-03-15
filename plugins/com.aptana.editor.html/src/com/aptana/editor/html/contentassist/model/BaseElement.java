@@ -8,20 +8,27 @@
 package com.aptana.editor.html.contentassist.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.eclipse.ui.views.properties.IPropertyDescriptor;
+import org.eclipse.ui.views.properties.IPropertySource;
+import org.eclipse.ui.views.properties.PropertyDescriptor;
 import org.mortbay.util.ajax.JSON.Convertible;
 import org.mortbay.util.ajax.JSON.Output;
 
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.IndexDocument;
+import com.aptana.index.core.ui.views.IPropertyInformation;
 
 /**
  * BaseElement
  */
-public abstract class BaseElement implements Convertible, IndexDocument
+public abstract class BaseElement<P extends Enum<P> & IPropertyInformation<? extends BaseElement<P>>> implements
+		Convertible, IndexDocument, IPropertySource
 {
 	private static final String DESCRIPTION_PROPERTY = "description"; //$NON-NLS-1$
 	private static final String NAME_PROPERTY = "name"; //$NON-NLS-1$
@@ -79,6 +86,15 @@ public abstract class BaseElement implements Convertible, IndexDocument
 		return CollectionsUtil.getListValue(this._documents);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.views.properties.IPropertySource#getEditableValue()
+	 */
+	public Object getEditableValue()
+	{
+		return null;
+	}
+
 	/**
 	 * getName
 	 * 
@@ -87,6 +103,74 @@ public abstract class BaseElement implements Convertible, IndexDocument
 	public String getName()
 	{
 		return StringUtil.getStringValue(this._name);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.views.properties.IPropertySource#getPropertyDescriptors()
+	 */
+	public IPropertyDescriptor[] getPropertyDescriptors()
+	{
+		List<IPropertyDescriptor> result = new ArrayList<IPropertyDescriptor>();
+
+		for (P p : getPropertyInfoSet())
+		{
+			PropertyDescriptor descriptor = new PropertyDescriptor(p, p.getHeader());
+			String category = p.getCategory();
+
+			if (!StringUtil.isEmpty(category))
+			{
+				descriptor.setCategory(category);
+			}
+
+			result.add(descriptor);
+		}
+
+		return result.toArray(new IPropertyDescriptor[result.size()]);
+	}
+
+	/**
+	 * getPropertyInfoSet
+	 * 
+	 * @return
+	 */
+	protected Set<P> getPropertyInfoSet()
+	{
+		return Collections.emptySet();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.views.properties.IPropertySource#getPropertyValue(java.lang.Object)
+	 */
+	@SuppressWarnings("unchecked")
+	public Object getPropertyValue(Object id)
+	{
+		Object result = null;
+
+		if (id instanceof IPropertyInformation)
+		{
+			result = ((IPropertyInformation<BaseElement<P>>) id).getPropertyValue(this);
+		}
+
+		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.views.properties.IPropertySource#isPropertySet(java.lang.Object)
+	 */
+	public boolean isPropertySet(Object id)
+	{
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.views.properties.IPropertySource#resetPropertyValue(java.lang.Object)
+	 */
+	public void resetPropertyValue(Object id)
+	{
 	}
 
 	/**
@@ -109,6 +193,14 @@ public abstract class BaseElement implements Convertible, IndexDocument
 	public void setName(String name)
 	{
 		this._name = name;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.views.properties.IPropertySource#setPropertyValue(java.lang.Object, java.lang.Object)
+	 */
+	public void setPropertyValue(Object id, Object value)
+	{
 	}
 
 	/*

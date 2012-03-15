@@ -59,7 +59,7 @@ public class XMLPListParser implements IPListParser
 			// Avoid loading external plist DTD, since it can hit the network, which is really un-necessary.
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			factory.setValidating(false);
-			factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+			factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false); //$NON-NLS-1$
 			builder = factory.newDocumentBuilder();
 		}
 		catch (ParserConfigurationException e)

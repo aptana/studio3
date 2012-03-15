@@ -53,4 +53,8 @@ public class HerokuDeployProvider implements IDeployProvider
 		return false;
 	}
 
+	public String getDeployMenuName()
+	{
+		return null;
+	}
 }

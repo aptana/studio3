@@ -10,13 +10,17 @@ package com.aptana.editor.css;
 
 /**
  * @author Max Stepanov
- *
  */
-public interface ICSSConstants {
+public interface ICSSConstants
+{
 
 	public String CONTENT_TYPE_CSS = "com.aptana.contenttype.css"; //$NON-NLS-1$
-	
+
 	public String CSS_SCOPE = "source.css"; //$NON-NLS-1$
 	public String CSS_COMMENT_BLOCK_SCOPE = "comment.block.css"; //$NON-NLS-1$
 	public String CSS_STRING_SCOPE = "string.quoted.single.css"; //$NON-NLS-1$
+
+	public String CSS_PROBLEM = "com.aptana.editor.css.problem"; //$NON-NLS-1$
+
+	public String W3C_PROBLEM = "com.aptana.editor.css.w3c_problem"; //$NON-NLS-1$
 }

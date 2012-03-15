@@ -61,7 +61,7 @@ public class AppExplorerDropAdapterAssistant extends ResourceDropAdapterAssistan
 			public void run()
 			{
 				getShell().forceActive();
-				new CopyFilesAndFoldersOperation(getShell()).copyFiles(names, target);
+				new CopyFilesAndFoldersOperation(getShell()).copyOrLinkFiles(names, target, currentOperation);
 			}
 		});
 		return problems;

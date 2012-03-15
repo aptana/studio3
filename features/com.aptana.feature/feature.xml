@@ -2,7 +2,7 @@
 <feature
       id="com.aptana.feature"
       label="%featureName"
-      version="3.0.10.qualifier"
+      version="3.1.0.qualifier"
       provider-name="%providerName"
       plugin="com.aptana.branding">
 
@@ -52,6 +52,7 @@
       <import plugin="org.eclipse.equinox.security" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.jsch.core"/>
       <import plugin="com.aptana.ide.libraries.subscription"/>
+      <import plugin="com.aptana.swt.webkitbrowser" version="1.0.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
@@ -527,13 +528,6 @@
 
    <plugin
          id="com.aptana.portal.ui.eclipse36"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="com.aptana.portal.ui.eclipse35"
          download-size="0"
          install-size="0"
          version="0.0.0"

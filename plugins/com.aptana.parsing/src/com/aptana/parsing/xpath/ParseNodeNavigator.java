@@ -16,6 +16,7 @@ import org.jaxen.XPath;
 
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseNodeAttribute;
+import com.aptana.parsing.ast.TextNode;
 
 /**
  * @author Kevin Lindsey
@@ -359,7 +360,7 @@ public class ParseNodeNavigator extends DefaultNavigator
 	 */
 	public boolean isText(Object object)
 	{
-		return object instanceof String;
+		return object instanceof String || object instanceof TextNode;
 	}
 
 	/**

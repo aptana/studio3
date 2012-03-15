@@ -21,11 +21,24 @@
          point="org.eclipse.core.contenttype.contentTypes">
       <content-type
             base-type="org.eclipse.core.runtime.text"
+            default-charset="UTF-8"
             file-extensions="md, mdown, markdown, markdn"
             id="com.aptana.contenttype.markdown"
             name="%content-type.markdown.name"
             priority="normal">
       </content-type>
+   </extension>
+   <extension
+         point="org.eclipse.compare.contentMergeViewers">
+      <contentTypeBinding
+            contentMergeViewerId="com.aptana.editor.markdown.contentMergeViewer"
+            contentTypeId="com.aptana.contenttype.markdown">
+      </contentTypeBinding>
+      <viewer
+            class="com.aptana.editor.markdown.internal.MarkdownMergeViewerCreator"
+            extensions="md, mdown, markdown, markdn"
+            id="com.aptana.editor.markdown.contentMergeViewer">
+      </viewer>
    </extension>
 
 </plugin>

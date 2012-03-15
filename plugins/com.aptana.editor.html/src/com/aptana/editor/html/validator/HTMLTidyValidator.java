@@ -21,48 +21,83 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
 import org.w3c.tidy.Tidy;
 
+import com.aptana.core.build.AbstractBuildParticipant;
+import com.aptana.core.build.IProblem;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
-import com.aptana.editor.common.validator.IValidationItem;
-import com.aptana.editor.common.validator.IValidationManager;
-import com.aptana.editor.common.validator.IValidator;
-import com.aptana.editor.common.validator.ValidationManager;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.IHTMLConstants;
+import com.aptana.index.core.build.BuildContext;
 
-public class HTMLTidyValidator implements IValidator
+public class HTMLTidyValidator extends AbstractBuildParticipant
 {
+	public static final String ID = "com.aptana.editor.html.validator.TidyValidator"; //$NON-NLS-1$
 
 	private static final Pattern PATTERN = Pattern
 			.compile("\\s*line\\s+(\\d+)\\s*column\\s+(\\d+)\\s*-\\s*(Warning|Error):\\s*(.+)$"); //$NON-NLS-1$
 
+	// TODO Move these filters into default filter pref for this participant?!
 	@SuppressWarnings("nls")
 	private static final String[] HTML5_ELEMENTS = { "article>", "aside>", "audio>", "canvas>", "command>",
 			"datalist>", "details>", "embed>", "figcaption>", "figure>", "footer>", "header>", "hgroup>", "keygen>",
 			"mark>", "meter>", "nav>", "output>", "progress>", "rp>", "rt>", "\"role\"", "ruby>", "section>",
-			"source>", "summary>", "time>", "video>", "wbr>" };
+			"source>", "summary>", "time>", "video", "wbr>" };
+
 	@SuppressWarnings("nls")
 	private static final String[] FILTERED = { "lacks \"type\" attribute", "lacks \"summary\" attribute",
 			"replacing illegal character code" };
 
-	public List<IValidationItem> validate(String source, URI path, IValidationManager manager)
+	public void buildFile(BuildContext context, IProgressMonitor monitor)
 	{
-		List<IValidationItem> items = new ArrayList<IValidationItem>();
-		manager.addParseErrors(items, IHTMLConstants.CONTENT_TYPE_HTML);
-		if (!StringUtil.isEmpty(source))
+		if (context == null)
 		{
-			runTidy(path, manager, source, items);
+			return;
 		}
-		return items;
+
+		List<IProblem> problems = new ArrayList<IProblem>();
+		try
+		{
+
+			String source = context.getContents();
+
+			if (!StringUtil.isEmpty(source))
+			{
+				URI path = context.getURI();
+				String sourcePath = path.toString();
+				runTidy(sourcePath, source, problems);
+			}
+		}
+		catch (CoreException e)
+		{
+			IdeLog.logError(HTMLPlugin.getDefault(), "Failed to parse for HTML Tidy Validation", e); //$NON-NLS-1$
+		}
+
+		context.putProblems(IHTMLConstants.TIDY_PROBLEM, problems);
 	}
 
-	private List<IValidationItem> runTidy(URI path, IValidationManager manager, final String source,
-			List<IValidationItem> items)
+	public void deleteFile(BuildContext context, IProgressMonitor monitor)
+	{
+		if (context == null)
+		{
+			return;
+		}
+		context.removeProblems(IHTMLConstants.TIDY_PROBLEM);
+	}
+
+	private List<IProblem> runTidy(String sourcePath, final String source, List<IProblem> items)
 	{
 		final int numberOfLines = new Document(source).getNumberOfLines();
+
+		List<String> filters = getFilters();
 
 		// Set up our pipes
 		PipedInputStream inPipe = new PipedInputStream();
@@ -84,7 +119,7 @@ public class HTMLTidyValidator implements IValidator
 					ByteArrayInputStream in = null;
 					try
 					{
-						in = new ByteArrayInputStream(source.getBytes("UTF-8")); //$NON-NLS-1$
+						in = new ByteArrayInputStream(source.getBytes(IOUtil.UTF_8));
 						tidy.parse(in, null);
 					}
 					catch (UnsupportedEncodingException e)
@@ -116,7 +151,7 @@ public class HTMLTidyValidator implements IValidator
 			String line = null;
 			while ((line = reader.readLine()) != null) // $codepro.audit.disable assignmentInCondition
 			{
-				parseTidyOutput(line, path, manager, items, numberOfLines);
+				parseTidyOutput(source, line, sourcePath, items, numberOfLines, filters);
 			}
 		}
 		catch (Exception e)
@@ -143,8 +178,8 @@ public class HTMLTidyValidator implements IValidator
 	// FIXME This takes in a collection and adds elements to it, which is bad! But necessary for now since we skip
 	// errors based on it's contents right now...
 	// Probably should return a collection of IValidationItems and then post-filter in caller!
-	private static void parseTidyOutput(String report, URI path, IValidationManager manager,
-			List<IValidationItem> items, int numberOfLines)
+	private void parseTidyOutput(String source, String report, String sourcePath, List<IProblem> items,
+			int numberOfLines, List<String> filters)
 	{
 		if (StringUtil.isEmpty(report) || !report.startsWith("line")) //$NON-NLS-1$
 		{
@@ -155,34 +190,90 @@ public class HTMLTidyValidator implements IValidator
 		while (matcher.find())
 		{
 			int lineNumber = Integer.parseInt(matcher.group(1));
-			int column = Integer.parseInt(matcher.group(2));
-			String type = matcher.group(3);
-			String message = patchMessage(matcher.group(4));
-
 			// Don't attempt to add errors or warnings if there are already errors on this line
 
 			// We also squash errors on the last line, since it is normally a repeat of a parse error. For example
 			// "missing </div>" will appear on the last line, which is normally caught by the parser and displayed on a
 			// different line
-			if (ValidationManager.hasErrorOrWarningOnLine(items, lineNumber)
-					|| (numberOfLines == lineNumber && !items.isEmpty()))
+			if (hasErrorOrWarningOnLine(items, lineNumber) || (numberOfLines == lineNumber && !items.isEmpty()))
 			{
 				continue;
 			}
 
+			String message = patchMessage(matcher.group(4));
 			if (message != null && !containsHTML5Element(message) && !isAutoFiltered(message)
-					&& !manager.isIgnored(message, IHTMLConstants.CONTENT_TYPE_HTML))
+					&& !isIgnored(message, filters))
 			{
+				int column = Integer.parseInt(matcher.group(2));
+				String type = matcher.group(3);
 				if (type.startsWith("Error")) //$NON-NLS-1$
 				{
-					items.add(manager.createError(message, lineNumber, column, 0, path));
+					items.add(createError(message, lineNumber, getOffset(source, lineNumber, column), 0, sourcePath));
 				}
 				else if (type.startsWith("Warning")) //$NON-NLS-1$
 				{
-					items.add(manager.createWarning(message, lineNumber, column, 0, path));
+					items.add(createWarning(message, lineNumber, getOffset(source, lineNumber, column), 0, sourcePath));
 				}
 			}
 		}
+	}
+
+	/**
+	 * Handles converting columns we get to actual column offset, since tabs mess the number up.
+	 * 
+	 * @param source
+	 * @param lineNumber
+	 * @param column
+	 * @return
+	 */
+	private int getOffset(String source, int lineNumber, int column)
+	{
+		try
+		{
+			IDocument document = new Document(source);
+			IRegion region = document.getLineInformation(lineNumber - 1);
+			int lineOffset = region.getOffset();
+			String line = document.get(lineOffset, region.getLength());
+			column--;
+			for (int i = 0; i <= column; i++)
+			{
+				char c = line.charAt(i);
+				switch (c)
+				{
+					case '\t':
+						column -= 4;
+						break;
+
+					default:
+						column--;
+						break;
+				}
+				if (column == 0)
+				{
+					return lineOffset + i + 1;
+				}
+			}
+			return lineOffset;
+		}
+		catch (BadLocationException e)
+		{
+			IdeLog.logError(HTMLPlugin.getDefault(), e);
+			// TODO Fallback to some other way to calculate the offset!
+		}
+		return column;
+	}
+
+	private boolean isIgnored(String message, List<String> expressions)
+	{
+		for (String expression : expressions)
+		{
+			if (message.matches(expression))
+			{
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	private static String patchMessage(String message)

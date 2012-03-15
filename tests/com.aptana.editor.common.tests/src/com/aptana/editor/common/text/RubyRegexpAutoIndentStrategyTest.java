@@ -215,7 +215,6 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 			document.replace(command.offset, command.length, command.text);
 		}
 		assertEquals("/**\n * \n **/\nfunction name() {\n}\n", document.get());
-
 	}
 
 	/**
@@ -436,7 +435,7 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 		{
 			document.replace(command.offset, command.length, command.text);
 		}
-		assertEquals("/*\n * \n */", document.get());
+		assertEquals("/*\n * \n */", document.get().replaceAll("\r\n|\n", "\n"));
 	}
 
 	/**

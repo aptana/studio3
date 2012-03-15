@@ -8,17 +8,54 @@
 package com.aptana.editor.css.contentassist.model;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.mortbay.util.ajax.JSON.Output;
 
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.IndexUtil;
+import com.aptana.index.core.ui.views.IPropertyInformation;
 
-public class PropertyElement extends BaseElement
+public class PropertyElement extends BaseElement<PropertyElement.Property>
 {
+	enum Property implements IPropertyInformation<PropertyElement>
+	{
+		NAME(Messages.PropertyElement_NameLabel)
+		{
+			public Object getPropertyValue(PropertyElement node)
+			{
+				return node.getName();
+			}
+		};
+
+		private String header;
+		private String category;
+
+		private Property(String header) // $codepro.audit.disable unusedMethod
+		{
+			this.header = header;
+		}
+
+		private Property(String header, String category)
+		{
+			this.category = category;
+		}
+
+		public String getCategory()
+		{
+			return category;
+		}
+
+		public String getHeader()
+		{
+			return header;
+		}
+	}
+
 	private static final String SPECIFICATIONS_PROPERTY = "specifications"; //$NON-NLS-1$
 	private static final String VALUES_PROPERTY = "values"; //$NON-NLS-1$
 	private static final String ALLOW_MULTIPLE_VALUES_PROPERTY = "allowMultipleValues"; //$NON-NLS-1$
@@ -114,6 +151,12 @@ public class PropertyElement extends BaseElement
 	public String getHint()
 	{
 		return StringUtil.getStringValue(this._hint);
+	}
+
+	@Override
+	protected Set<Property> getPropertyInfoSet()
+	{
+		return EnumSet.allOf(Property.class);
 	}
 
 	/**

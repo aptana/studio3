@@ -117,14 +117,12 @@ public class GitExecutableTest extends TestCase
 	public void testDetectsInStandardLocation() throws Throwable
 	{
 		GitExecutable executable = GitExecutable.instance();
-		// FIXME This is hacky for test, but basically on my machine I have it in /usr.local.bin.git, while test box has
-		// /usr/bin/git
 		IPath expectedLocation = Path.fromOSString("/usr/bin/git");
-		IPath local = Path.fromOSString("/usr/local/bin/git");
-		if (local.toFile().exists())
-		{
-			expectedLocation = local;
-		}
+		// IPath local = Path.fromOSString("/usr/local/bin/git");
+		// if (local.toFile().exists())
+		// {
+		// expectedLocation = local;
+		// }
 		assertEquals(expectedLocation, executable.path());
 	}
 

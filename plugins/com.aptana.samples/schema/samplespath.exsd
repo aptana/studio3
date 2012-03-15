@@ -53,14 +53,14 @@
          <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  an identifier for the sample category
                </documentation>
             </annotation>
          </attribute>
          <attribute name="name" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  the name of the category
                </documentation>
                <appinfo>
                   <meta.attribute translatable="true"/>
@@ -70,7 +70,7 @@
          <attribute name="icon" type="string">
             <annotation>
                <documentation>
-                  An optional icon to use for the category.
+                  An optional icon to use for the category
                </documentation>
                <appinfo>
                   <meta.attribute kind="resource"/>
@@ -80,7 +80,7 @@
          <attribute name="projectHandler" type="string">
             <annotation>
                <documentation>
-                  A handler for adding custom steps as the sample project is getting created.
+                  A handler for adding custom steps after the sample project is created
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn=":com.aptana.samples.handlers.ISampleProjectHandler"/>
@@ -103,14 +103,14 @@
          <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  an identifier for the contributed sample
                </documentation>
             </annotation>
          </attribute>
          <attribute name="name" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  the name of the contributed sample
                </documentation>
                <appinfo>
                   <meta.attribute translatable="true"/>
@@ -120,7 +120,7 @@
          <attribute name="category" type="string">
             <annotation>
                <documentation>
-                  
+                  the id of the category that the sample belongs to; if null, the sample will be put under the &quot;Others&quot; category.
                </documentation>
                <appinfo>
                   <meta.attribute kind="identifier" basedOn="com.aptana.samples.samplespath/category/@id"/>
@@ -130,7 +130,7 @@
          <attribute name="description" type="string">
             <annotation>
                <documentation>
-                  
+                  a description of the sample
                </documentation>
                <appinfo>
                   <meta.attribute translatable="true"/>
@@ -140,7 +140,7 @@
          <attribute name="infoFile" type="string">
             <annotation>
                <documentation>
-                  An optional HTML document to open to get more info on the samples.
+                  a HTML document to open to get more information on the sample
                </documentation>
                <appinfo>
                   <meta.attribute kind="resource"/>
@@ -150,7 +150,7 @@
          <attribute name="projectHandler" type="string">
             <annotation>
                <documentation>
-                  A handler for adding custom steps as the sample project is getting created.
+                  a handler for adding custom steps after the sample project is created
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn=":com.aptana.samples.handlers.ISampleProjectHandler"/>
@@ -160,7 +160,7 @@
          <attribute name="previewHandler" type="string">
             <annotation>
                <documentation>
-                  A handler for generating preview on a sample.
+                  a handler for generating preview on the sample
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn=":com.aptana.samples.handlers.ISamplePreviewHandler"/>
@@ -170,7 +170,7 @@
          <attribute name="icon" type="string">
             <annotation>
                <documentation>
-                  A custom icon for the sample.
+                  a custom icon for the sample
                </documentation>
                <appinfo>
                   <meta.attribute kind="resource"/>
@@ -185,7 +185,7 @@
          <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
-                  The id of the nature to add to the sample project.
+                  the id of the nature to add to the sample project
                </documentation>
             </annotation>
          </attribute>
@@ -197,7 +197,7 @@
          <attribute name="path" type="string" use="required">
             <annotation>
                <documentation>
-                  The path to the files and folders to include when this sample is created as a project or previewed.
+                  the path to the files and folders to include when this sample is created as a project
                </documentation>
                <appinfo>
                   <meta.attribute kind="resource"/>
@@ -212,7 +212,7 @@
          <attribute name="location" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  the local location containing the sample content (currently should be a zip file)
                </documentation>
                <appinfo>
                   <meta.attribute kind="resource"/>
@@ -227,7 +227,7 @@
          <attribute name="location" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  the remote git url for the sample
                </documentation>
             </annotation>
          </attribute>
@@ -239,7 +239,7 @@
          <meta.section type="since"/>
       </appinfo>
       <documentation>
-         This extension point was added in Aptana Studio 0.2.9.
+         This extension point was introduced in Aptana Studio 0.2.9 and modified in Studio 3.0.
       </documentation>
    </annotation>
 
@@ -251,20 +251,37 @@
          &lt;p&gt;
 &lt;pre&gt;
 &lt;extension point=&quot;com.aptana.samples.samplespath&quot;&gt;
- &lt;samplesinfo
-  directory=&quot;mySamples&quot;
-  iconFile=&quot;icons/mySamples.png&quot;
-  infoFile=&quot;samples/helpFile.html&quot;
-  name=&quot;My Library Samples&quot;
-  projectHandler=&quot;com.my.xyz.MySampleProjectCreationHandler&quot;
-  previewHandler=&quot;com.my.xyz.MySamplePreviewHandler&quot;&gt;
-     &lt;nature id=&quot;com.my.xyz.projectNature&quot;/&gt;
- &lt;/samplesinfo&gt;
+  &lt;category
+    id=&quot;com.my.xyz.category&quot;
+    name=&quot;My Category&quot;
+    icon=&quot;icons/category.png&quot;
+    projectHandler=&quot;com.my.xyz.MySampleProjectHandler&quot;&gt;
+  &lt;/category&gt;
+  &lt;samplesinfo
+    category=&quot;com.my.xyz.category&quot;
+    id=&quot;com.my.xyz.remote&quot;
+    name=&quot;Remote&quot;
+    description=&quot;Remote sample&quot;
+    infoFile=&quot;samples/helpFile.html&quot;
+    projectHandler=&quot;com.my.xyz.MySampleProjectHandler&quot;
+    previewHandler=&quot;com.my.xyz.MySamplePreviewHandler&quot;
+    icon=&quot;icons/sample.png&quot;&gt;
+    &lt;remote
+      location=&quot;git://github.com/repo/remote_sample.git&quot;&gt;
+    &lt;/remote&gt;
+    &lt;nature
+      id=&quot;com.aptana.projects.webnature&quot;&gt;
+    &lt;/nature&gt;
+    &lt;include
+      path=&quot;samples/libs&quot;&gt;
+    &lt;/include&gt;
+  &lt;/samplesinfo&gt;
 &lt;/extension&gt;
 &lt;/pre&gt;
 &lt;/p&gt;
 
-This example contributes a samples directory.  Each folder directly under that directory will be displayed as a sample in the Samples view.  The name attribute will be the name of the parent node, and its icon will be the specified iconFile.  A help option will be enabled when the infoFile is specified.
+This example contributes a category for a group of samples and a sample of the category that refers to a remote git location.
+
       </documentation>
    </annotation>
 
@@ -273,10 +290,8 @@ This example contributes a samples directory.  Each folder directly under that d
          <meta.section type="apiInfo"/>
       </appinfo>
       <documentation>
-         Both the preview and project handlers are optional.  If the preview handler is missing, the preview option in the Samples view will be disabled.  If the project handler is missing, the project will just be created normally with the samples files, any included directories, and any additional natures specified.
+         Both the preview and project handlers are optional.  If the preview handler is missing, the preview option in the Samples view will be disabled.  If the project handler is missing, it means there will be no post-project-creation steps.
       </documentation>
    </annotation>
-
-
 
 </schema>

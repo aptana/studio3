@@ -26,12 +26,12 @@ import org.eclipse.jface.text.rules.WordRule;
 
 import com.aptana.editor.common.text.rules.CharacterMapRule;
 import com.aptana.editor.common.text.rules.ExtendedWordRule;
-import com.aptana.editor.common.text.rules.RegexpRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
 import com.aptana.editor.css.internal.text.rules.CSSHexColorRule;
 import com.aptana.editor.css.internal.text.rules.CSSIdentifierRule;
 import com.aptana.editor.css.internal.text.rules.CSSImportantRule;
 import com.aptana.editor.css.internal.text.rules.CSSNumberRule;
+import com.aptana.editor.css.internal.text.rules.CSSURLRule;
 import com.aptana.editor.css.internal.text.rules.EqualOperatorWordDetector;
 import com.aptana.editor.css.internal.text.rules.IdentifierWithPrefixDetector;
 import com.aptana.editor.css.parsing.lexer.CSSTokenType;
@@ -146,8 +146,7 @@ public class CSSTokenScanner extends RuleBasedScanner
 		rules.add(new CSSImportantRule(createToken(CSSTokenType.IMPORTANT)));
 
 		// url
-		// FIXME Don't use a RegexpRule here!
-		rules.add(new RegexpRule("[Uu][Rr][Ll]\\([^)]*\\)", createToken(CSSTokenType.URL), true));
+		rules.add(new CSSURLRule(createToken(CSSTokenType.URL)));
 
 		// TODO: functions
 

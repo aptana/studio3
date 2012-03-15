@@ -16,10 +16,13 @@ import com.aptana.filesystem.ftp.FTPConnectionPoint;
 /**
  * @author Max Stepanov
  */
-public class FTPConnectionTest extends CommonConnectionTest {
+@SuppressWarnings("nls")
+public class FTPConnectionTest extends CommonConnectionTest
+{
 
 	@Override
-	protected void setUp() throws Exception {
+	protected void setUp() throws Exception
+	{
 		FTPConnectionPoint ftpcp = new FTPConnectionPoint();
 		ftpcp.setHost(getConfig().getProperty("ftp.host")); //$NON-NLS-1$
 		ftpcp.setLogin(getConfig().getProperty("ftp.username")); //$NON-NLS-1$
@@ -34,15 +37,18 @@ public class FTPConnectionTest extends CommonConnectionTest {
 	 * @see com.aptana.core.io.tests.CommonConnectionTest#supportsSetModificationTime()
 	 */
 	@Override
-	protected boolean supportsSetModificationTime() {
+	protected boolean supportsSetModificationTime()
+	{
 		return Boolean.parseBoolean(getConfig().getProperty("ftp.supports.setmodtime"));
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.core.io.tests.CommonConnectionTest#supportsFolderSetModificationTime()
 	 */
 	@Override
-	protected boolean supportsFolderSetModificationTime() {
+	protected boolean supportsFolderSetModificationTime()
+	{
 		return Boolean.parseBoolean(getConfig().getProperty("ftp.supports.foldersetmodtime"));
 	}
 
@@ -51,7 +57,8 @@ public class FTPConnectionTest extends CommonConnectionTest {
 	 * @see com.aptana.ide.core.io.tests.CommonConnectionTest#supportsChangeGroup()
 	 */
 	@Override
-	protected boolean supportsChangeGroup() {
+	protected boolean supportsChangeGroup()
+	{
 		return Boolean.parseBoolean(getConfig().getProperty("ftp.supports.changegroup"));
 	}
 
@@ -60,7 +67,8 @@ public class FTPConnectionTest extends CommonConnectionTest {
 	 * @see com.aptana.ide.core.io.tests.CommonConnectionTest#supportsChangePermissions()
 	 */
 	@Override
-	protected boolean supportsChangePermissions() {
+	protected boolean supportsChangePermissions()
+	{
 		return Boolean.parseBoolean(getConfig().getProperty("ftp.supports.permissions"));
 	}
 }

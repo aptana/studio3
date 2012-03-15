@@ -8,12 +8,12 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.source.ISourceViewer;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.test.performance.PerformanceTestCase;
 import org.eclipse.ui.ide.IDE;
 
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.epl.tests.EditorTestHelper;
 import com.aptana.ui.util.UIUtils;
 
 public class ThemeingDamagerRepairerPerfTest extends PerformanceTestCase
@@ -25,14 +25,7 @@ public class ThemeingDamagerRepairerPerfTest extends PerformanceTestCase
 	{
 		if (editor != null)
 		{
-			if (Display.getCurrent() != null)
-			{
-				editor.getSite().getPage().closeEditor(editor, false);
-			}
-			else
-			{
-				editor.close(false);
-			}
+			EditorTestHelper.closeEditor(editor);
 			editor = null;
 		}
 		super.tearDown();

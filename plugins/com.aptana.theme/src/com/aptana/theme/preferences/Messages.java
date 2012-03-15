@@ -11,6 +11,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS
 {
+
 	private static final String BUNDLE_NAME = "com.aptana.theme.preferences.messages"; //$NON-NLS-1$
 
 	public static String ThemePreferencePage_AddTokenLabel;
@@ -28,9 +29,9 @@ public class Messages extends NLS
 	public static String ThemePreferencePage_ForegroundLabel;
 	public static String ThemePreferencePage_ImportLabel;
 	public static String ThemePreferencePage_ExportLabel;
-	public static String ThemePreferencePage_InvasiveThemesLBL;
+	public static String ThemePreferencePage_ApplyToAllViews;
 	public static String ThemePreferencePage_InvasiveFontLBL;
-	public static String ThemePreferencePage_InvasiveThemesToolTip;
+	public static String ThemePreferencePage_ApplyToAllViewsToolTip;
 	public static String ThemePreferencePage_InvasiveFontToolTip;
 	public static String ThemePreferencePage_ItalicButtonLabel;
 	public static String ThemePreferencePage_LineHighlightLabel;
@@ -38,8 +39,8 @@ public class Messages extends NLS
 	public static String ThemePreferencePage_NewThemeDefaultName_2;
 	public static String ThemePreferencePage_NewThemeMsg;
 	public static String ThemePreferencePage_NewThemeTitle;
+	public static String ThemePreferencePage_ApplyToAllEditors;
 	public static String ThemePreferencePage_RemoveTokenLabel;
-	public static String ThemePreferencePage_RenameButtonLabel;
 	public static String ThemePreferencePage_RenameThemeMsg;
 	public static String ThemePreferencePage_RenameThemeTitle;
 	public static String ThemePreferencePage_ScopeSelectoreLabel;

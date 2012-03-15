@@ -11,6 +11,7 @@ import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
+import com.aptana.parsing.ast.IParseNode;
 
 /**
  * A function invocation formatter node.
@@ -43,11 +44,11 @@ public class FormatterJSFunctionInvocationNode extends FormatterBlockWithBeginNo
 	@Override
 	public boolean shouldConsumePreviousWhiteSpaces()
 	{
-		switch (invocationNode.getParent().getNodeType())
+		IParseNode parent = invocationNode.getParent();
+		short parentType = parent.getNodeType();
+		switch (parentType)
 		{
-			case IJSNodeTypes.ASSIGN:
 			case IJSNodeTypes.DECLARATION:
-			case IJSNodeTypes.CONDITIONAL:
 			case IJSNodeTypes.LOGICAL_AND:
 			case IJSNodeTypes.LOGICAL_OR:
 			case IJSNodeTypes.ELEMENTS:
@@ -74,6 +75,7 @@ public class FormatterJSFunctionInvocationNode extends FormatterBlockWithBeginNo
 			case IJSNodeTypes.LESS_THAN_OR_EQUAL:
 			case IJSNodeTypes.NOT_EQUAL:
 			case IJSNodeTypes.NOT_IDENTITY:
+			case IJSNodeTypes.IN:
 			case IJSNodeTypes.ADD_AND_ASSIGN:
 			case IJSNodeTypes.BITWISE_AND_AND_ASSIGN:
 			case IJSNodeTypes.BITWISE_OR_AND_ASSIGN:
@@ -89,15 +91,19 @@ public class FormatterJSFunctionInvocationNode extends FormatterBlockWithBeginNo
 			case IJSNodeTypes.ARITHMETIC_SHIFT_RIGHT:
 			case IJSNodeTypes.ARITHMETIC_SHIFT_RIGHT_AND_ASSIGN:
 			case IJSNodeTypes.NAME_VALUE_PAIR:
-			case IJSNodeTypes.COMMA:
 			case IJSNodeTypes.RETURN:
 			case IJSNodeTypes.THROW:
 			case IJSNodeTypes.ARGUMENTS:
 			case IJSNodeTypes.SUBTRACT:
+			case IJSNodeTypes.TYPEOF:
+			case IJSNodeTypes.DELETE:
 				return true;
-			default:
-				return false;
+			case IJSNodeTypes.ASSIGN:
+			case IJSNodeTypes.COMMA:
+			case IJSNodeTypes.CONDITIONAL:
+				return parent.getChildIndex(invocationNode) != 0;
 		}
+		return false;
 	}
 
 	/*

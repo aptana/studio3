@@ -31,6 +31,23 @@ public class Messages extends NLS
 	public static String CreateBranchDialog_StartPoint_label;
 	public static String CreateBranchDialog_Track_label;
 
+	public static String CreateTagDialog_Title;
+	public static String CreateTagDialog_Message;
+	public static String CreateTagDialog_NonEmptyTagNameMessage;
+	public static String CreateTagDialog_NoWhitespaceTagNameMessage;
+	public static String CreateTagDialog_TagAlreadyExistsMessage;
+	public static String CreateTagDialog_InvalidTagNameMessage;
+	public static String CreateTagDialog_Message_label;
+	public static String CreateTagDialog_AdvancedOptions_label;
+	public static String CreateTagDialog_StartPoint_label;
+
+	public static String CompareWithDialog_Title;
+	public static String CompareWithDialog_Message;
+	public static String CompareWithDialog_NonEmptyRefMessage;
+	public static String CompareWithDialog_Message_label;
+	public static String CompareWithDialog_Ref_label;
+	public static String CompareWithDialog_InvalidRefError;
+
 	static
 	{
 		// initialize resource bundle

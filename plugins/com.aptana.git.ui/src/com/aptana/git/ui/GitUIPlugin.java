@@ -278,7 +278,7 @@ public class GitUIPlugin extends AbstractUIPlugin
 				public void run()
 				{
 					setQuickDiffColors(EclipseUtil.instanceScope().getNode("com.aptana.editor.common")); //$NON-NLS-1$
-					if (ThemePlugin.invasiveThemesEnabled())
+					if (ThemePlugin.applyToAllEditors())
 					{
 						setQuickDiffColors(EclipseUtil.instanceScope().getNode("org.eclipse.ui.editors")); //$NON-NLS-1$
 					}

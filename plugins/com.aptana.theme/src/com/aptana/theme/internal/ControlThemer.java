@@ -22,6 +22,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Scrollable;
 
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.PlatformUtil;
 import com.aptana.theme.ColorManager;
 import com.aptana.theme.IControlThemer;
 import com.aptana.theme.IThemeManager;
@@ -40,6 +41,7 @@ class ControlThemer implements IControlThemer
 	protected static final boolean isWindows = Platform.getOS().equals(Platform.OS_WIN32);
 	protected static final boolean isMacOSX = Platform.getOS().equals(Platform.OS_MACOSX);
 	protected static final boolean isCocoa = Platform.getWS().equals(Platform.WS_COCOA);
+	protected static final boolean isUbuntu = PlatformUtil.isOSName("Ubuntu"); //$NON-NLS-1$
 
 	private Control control;
 
@@ -62,13 +64,23 @@ class ControlThemer implements IControlThemer
 		if (invasiveThemesEnabled() && getControl() != null && !getControl().isDisposed())
 		{
 			getControl().setRedraw(false);
-			getControl().setBackground(getBackground());
-			getControl().setForeground(getForeground());
-			if (useEditorFont())
-			{
-				getControl().setFont(getFont());
-			}
+			applyControlColors();
+			applyControlFont();
 			getControl().setRedraw(true);
+		}
+	}
+
+	protected void applyControlColors()
+	{
+		getControl().setBackground(getBackground());
+		getControl().setForeground(getForeground());
+	}
+
+	protected void applyControlFont()
+	{
+		if (useEditorFont())
+		{
+			getControl().setFont(getFont());
 		}
 	}
 
@@ -94,14 +106,27 @@ class ControlThemer implements IControlThemer
 		if (control != null && !control.isDisposed())
 		{
 			control.setRedraw(false);
-
-			control.setBackground(null);
-			control.setForeground(null);
-			if (useEditorFont())
-			{
-				control.setFont(null);
-			}
+			unapplyControlColors();
+			unapplyControlFont();
 			control.setRedraw(true);
+		}
+	}
+
+	protected void unapplyControlColors()
+	{
+		control.setBackground(null);
+		control.setForeground(null);
+	}
+
+	protected void unapplyControlFont()
+	{
+		if (useEditorFont())
+		{
+			control.setFont(getFont());
+		}
+		else
+		{
+			control.setFont(null);
 		}
 	}
 
@@ -234,14 +259,14 @@ class ControlThemer implements IControlThemer
 					// Handle the invasive font setting change
 					if (Boolean.parseBoolean((String) event.getNewValue()))
 					{
-						getControl().setFont(getFont());
+						applyControlFont();
 					}
 					else
 					{
-						getControl().setFont(null);
+						unapplyControlFont();
 					}
 				}
-				else if (event.getKey().equals(IPreferenceConstants.INVASIVE_THEMES))
+				else if (event.getKey().equals(IPreferenceConstants.APPLY_TO_ALL_VIEWS))
 				{
 					if (Boolean.parseBoolean((String) event.getNewValue()))
 					{

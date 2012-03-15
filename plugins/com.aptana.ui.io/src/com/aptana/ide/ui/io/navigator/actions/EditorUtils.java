@@ -15,11 +15,14 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.text.TextSelection;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.progress.UIJob;
+import org.eclipse.ui.texteditor.AbstractTextEditor;
 
 import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ide.ui.io.IUniformFileStoreEditorInput;
@@ -41,6 +44,19 @@ public class EditorUtils
 	 *            the editor descriptor to use, null if the default one for the file type is desired
 	 */
 	public static void openFileInEditor(final IFileStore fileStore, final IEditorDescriptor editorDescriptor)
+	{
+		openFileInEditor(fileStore, editorDescriptor, null);
+	}
+
+	/**
+	 * Opens a remote file in its editor.
+	 * 
+	 * @param fileStore
+	 * @param editorDescriptor
+	 * @param textSelection
+	 */
+	public static void openFileInEditor(final IFileStore fileStore, final IEditorDescriptor editorDescriptor,
+			final TextSelection textSelection)
 	{
 		Job job = new Job(MessageFormat.format(Messages.EditorUtils_OpeningEditor, fileStore.getName()))
 		{
@@ -83,7 +99,12 @@ public class EditorUtils
 								String editorId = (editorDescriptor == null) ? IDE.getEditorDescriptor(name).getId()
 										: editorDescriptor.getId();
 								int matchFlags = IWorkbenchPage.MATCH_INPUT | IWorkbenchPage.MATCH_ID;
-								page.openEditor(finalEditorInput, editorId, true, matchFlags);
+								IEditorPart editorPart = page.openEditor(finalEditorInput, editorId, true, matchFlags);
+								if (textSelection != null && editorPart instanceof AbstractTextEditor)
+								{
+									AbstractTextEditor editor = (AbstractTextEditor) editorPart;
+									editor.selectAndReveal(textSelection.getOffset(), textSelection.getLength());
+								}
 							}
 						}
 						catch (Exception e)
@@ -99,5 +120,6 @@ public class EditorUtils
 			}
 		};
 		job.schedule();
+
 	}
 }

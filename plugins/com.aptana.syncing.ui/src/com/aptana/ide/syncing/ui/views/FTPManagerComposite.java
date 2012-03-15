@@ -279,7 +279,7 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
 		label.setText(Messages.FTPManagerComposite_LBL_Sites);
 
 		fSitesViewer = new ComboViewer(main, SWT.READ_ONLY);
-		fSitesViewer.setContentProvider(new ArrayContentProvider());
+		fSitesViewer.setContentProvider(ArrayContentProvider.getInstance());
 		fSitesViewer.setLabelProvider(new SitesLabelProvider());
 		fSitesViewer.setInput(SyncingPlugin.getSiteConnectionManager().getSiteConnections());
 		fSitesViewer.getControl().setLayoutData(GridDataFactory.swtDefaults().hint(250, SWT.DEFAULT).create());

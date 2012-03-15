@@ -8,6 +8,7 @@
 package com.aptana.ui.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.jface.resource.ColorRegistry;
@@ -27,6 +28,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -36,6 +38,7 @@ public class SWTUtils
 {
 
 	private static final String SMALL_FONT = "com.aptana.ui.small_font"; //$NON-NLS-1$
+	private static Color backgroundErrorColor;
 	private static Color errorColor;
 	private static ModifyListener modifyListener;
 
@@ -50,9 +53,11 @@ public class SWTUtils
 				ColorRegistry cm = JFaceResources.getColorRegistry();
 				RGB errorRGB = new RGB(255, 255, 180);
 				cm.put("error", errorRGB); //$NON-NLS-1$
-				errorColor = cm.get("error"); //$NON-NLS-1$
+				backgroundErrorColor = cm.get("error"); //$NON-NLS-1$
 			}
 		});
+		// Set a 'Red' error color
+		errorColor = UIUtils.getDisplay().getSystemColor(SWT.COLOR_RED);
 	}
 
 	/**
@@ -182,10 +187,21 @@ public class SWTUtils
 	 */
 	public static FontData[] boldFont(Font font)
 	{
+		return styleFont(font, SWT.BOLD);
+	}
+
+	/**
+	 * Styles a font.
+	 * 
+	 * @param font
+	 * @return styled font data
+	 */
+	public static FontData[] styleFont(Font font, int fontStyle)
+	{
 		FontData[] datas = font.getFontData();
 		for (FontData data : datas)
 		{
-			data.setStyle(data.getStyle() | SWT.BOLD);
+			data.setStyle(data.getStyle() | fontStyle);
 		}
 		return datas;
 	}
@@ -198,12 +214,17 @@ public class SWTUtils
 	 */
 	public static FontData[] italicizedFont(Font font)
 	{
-		FontData[] datas = font.getFontData();
-		for (FontData data : datas)
-		{
-			data.setStyle(data.getStyle() | SWT.ITALIC);
-		}
-		return datas;
+		return styleFont(font, SWT.ITALIC);
+	}
+
+	/**
+	 * Returns a standard error {@link Color}.
+	 * 
+	 * @return An error {@link Color}
+	 */
+	public static Color getErrorColor()
+	{
+		return errorColor;
 	}
 
 	/**
@@ -221,7 +242,7 @@ public class SWTUtils
 		String text = combo.getText();
 		if (text == null || text.length() == 0 || combo.getSelectionIndex() < selectionIndex)
 		{
-			combo.setBackground(errorColor);
+			combo.setBackground(backgroundErrorColor);
 			return false;
 		}
 		combo.setBackground(null);
@@ -239,7 +260,7 @@ public class SWTUtils
 	{
 		if (widget.getText() == null || "".equals(widget.getText())) //$NON-NLS-1$
 		{
-			widget.setBackground(errorColor);
+			widget.setBackground(backgroundErrorColor);
 			if (modifyListener == null)
 			{
 				modifyListener = new ModifyListener()
@@ -253,7 +274,7 @@ public class SWTUtils
 						}
 						else
 						{
-							t.setBackground(errorColor);
+							t.setBackground(backgroundErrorColor);
 						}
 					};
 				};
@@ -270,7 +291,7 @@ public class SWTUtils
 	 * 
 	 * @param controls
 	 */
-	public static void resizeControlWidthInGrid(List<Control> controls)
+	public static void resizeControlWidthInGrid(Collection<Control> controls)
 	{
 		int largestWidth = SWT.DEFAULT;
 		List<GridData> gridDatas = new ArrayList<GridData>();
@@ -301,5 +322,29 @@ public class SWTUtils
 		{
 			gridData.widthHint = largestWidth;
 		}
+	}
+
+	/**
+	 * Update the width of the label to take into account the error font. Only works for labels in a grid layout
+	 * 
+	 * @param label
+	 * @param errorFont
+	 */
+	public static void updateErrorLabelWidth(Label label, Font errorFont)
+	{
+		Object layoutData = label.getLayoutData();
+		if (layoutData instanceof GridData)
+		{
+			Font currentFont = label.getFont();
+			label.setFont(errorFont);
+			((GridData) layoutData).widthHint = label.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
+			label.setFont(currentFont);
+		}
+	}
+
+	public static void updateLabelStatus(Label label, Font errorFont, Color errorColor, boolean isValid)
+	{
+		label.setForeground(isValid ? null : errorColor);
+		label.setFont(isValid ? null : errorFont);
 	}
 }

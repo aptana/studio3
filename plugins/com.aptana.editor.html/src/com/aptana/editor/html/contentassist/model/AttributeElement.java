@@ -16,9 +16,44 @@ import org.mortbay.util.ajax.JSON.Output;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.IndexUtil;
+import com.aptana.index.core.ui.views.IPropertyInformation;
 
-public class AttributeElement extends BaseElement
+public class AttributeElement extends BaseElement<AttributeElement.Property>
 {
+	enum Property implements IPropertyInformation<AttributeElement>
+	{
+		NAME(Messages.AttributeElement_NameLabel)
+		{
+			public Object getPropertyValue(AttributeElement node)
+			{
+				return node.getName();
+			}
+		};
+
+		private String header;
+		private String category;
+
+		private Property(String header) // $codepro.audit.disable unusedMethod
+		{
+			this.header = header;
+		}
+
+		private Property(String header, String category)
+		{
+			this.category = category;
+		}
+
+		public String getCategory()
+		{
+			return category;
+		}
+
+		public String getHeader()
+		{
+			return header;
+		}
+	}
+
 	private static final String USER_AGENTS_PROPERTY = "userAgents"; //$NON-NLS-1$
 	private static final String SPECIFICATIONS_PROPERTY = "specifications"; //$NON-NLS-1$
 	private static final String REFERENCES_PROPERTY = "references"; //$NON-NLS-1$

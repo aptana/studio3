@@ -15,9 +15,9 @@ import org.osgi.framework.Bundle;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.contentassist.MetadataLoader;
 import com.aptana.editor.html.contentassist.HTMLIndexQueryHelper;
-import com.aptana.editor.html.contentassist.index.IHTMLIndexConstants;
 import com.aptana.editor.html.contentassist.index.HTMLIndexWriter;
 import com.aptana.editor.html.contentassist.index.HTMLMetadataReader;
+import com.aptana.editor.html.contentassist.index.IHTMLIndexConstants;
 import com.aptana.editor.html.contentassist.model.AttributeElement;
 import com.aptana.editor.html.contentassist.model.ElementElement;
 import com.aptana.editor.html.contentassist.model.EntityElement;
@@ -25,6 +25,7 @@ import com.aptana.editor.html.contentassist.model.EventElement;
 import com.aptana.editor.html.preferences.IPreferenceConstants;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
+import com.aptana.index.core.IndexPlugin;
 
 /**
  * HTMLMetadataLoader
@@ -108,7 +109,7 @@ public class HTMLMetadataLoader extends MetadataLoader<HTMLMetadataReader>
 	protected void writeIndex(HTMLMetadataReader reader)
 	{
 		// remove old index
-		IndexManager.getInstance().removeIndex(URI.create(IHTMLIndexConstants.METADATA_INDEX_LOCATION));
+		getIndexManager().removeIndex(URI.create(IHTMLIndexConstants.METADATA_INDEX_LOCATION));
 
 		HTMLIndexWriter indexer = new HTMLIndexWriter();
 
@@ -144,6 +145,11 @@ public class HTMLMetadataLoader extends MetadataLoader<HTMLMetadataReader>
 		{
 			IdeLog.logError(HTMLPlugin.getDefault(), e);
 		}
+	}
+
+	protected IndexManager getIndexManager()
+	{
+		return IndexPlugin.getDefault().getIndexManager();
 	}
 
 	@Override

@@ -10,34 +10,43 @@ package com.aptana.editor.js.text;
 import java.net.URI;
 import java.util.List;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.internal.text.html.BrowserInformationControlInput;
+import org.eclipse.jface.text.IInputChangedListener;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.ITextHoverExtension2;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IFileEditorInput;
-import org.eclipse.ui.IURIEditorInput;
+import org.eclipse.jface.text.hyperlink.IHyperlink;
+import org.eclipse.ui.IEditorPart;
 
+import com.aptana.core.util.ArrayUtil;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.contentassist.CommonTextHover;
-import com.aptana.editor.common.parsing.FileService;
-import com.aptana.editor.js.contentassist.ASTUtil;
-import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
+import com.aptana.editor.common.hover.CustomBrowserInformationControl;
+import com.aptana.editor.common.hover.DocumentationBrowserInformationControlInput;
+import com.aptana.editor.common.util.EditorUtil;
 import com.aptana.editor.js.contentassist.JSLocationIdentifier;
+import com.aptana.editor.js.contentassist.JSModelFormatter;
 import com.aptana.editor.js.contentassist.LocationType;
-import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
-import com.aptana.editor.js.parsing.ast.JSGetPropertyNode;
+import com.aptana.editor.js.hyperlink.JSHyperlinkDetector;
+import com.aptana.editor.js.internal.JSModelUtil;
 import com.aptana.index.core.Index;
-import com.aptana.index.core.IndexManager;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.ui.epl.UIEplPlugin;
 
+@SuppressWarnings("restriction")
 public class JSTextHover extends CommonTextHover implements ITextHover, ITextHoverExtension2
 {
+
+	private String fDocs;
+	private String fHeader;
+
 	/**
 	 * getActiveNode
 	 * 
@@ -51,31 +60,24 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 
 		if (this.isHoverEnabled())
 		{
-			FileService fs = this.getFileService(textViewer);
+			AbstractThemeableEditor editor = this.getEditor(textViewer);
+			IParseNode ast = editor.getAST();
 
-			if (fs != null)
+			if (ast != null)
 			{
-				// force a parse
-				fs.parse();
+				result = ast.getNodeAtOffset(offset);
 
-				IParseNode ast = fs.getParseResult();
-
-				if (ast != null)
+				// We won't get a current node if the cursor is outside of the positions
+				// recorded by the AST
+				if (result == null)
 				{
-					result = ast.getNodeAtOffset(offset);
-
-					// We won't get a current node if the cursor is outside of the positions
-					// recorded by the AST
-					if (result == null)
+					if (offset < ast.getStartingOffset())
 					{
-						if (offset < ast.getStartingOffset())
-						{
-							result = ast.getNodeAtOffset(ast.getStartingOffset());
-						}
-						else if (ast.getEndingOffset() < offset)
-						{
-							result = ast.getNodeAtOffset(ast.getEndingOffset());
-						}
+						result = ast.getNodeAtOffset(ast.getStartingOffset());
+					}
+					else if (ast.getEndingOffset() < offset)
+					{
+						result = ast.getNodeAtOffset(ast.getEndingOffset());
 					}
 				}
 			}
@@ -102,36 +104,6 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 		return result;
 	}
 
-	/**
-	 * getFileService
-	 * 
-	 * @param textViewer
-	 * @return
-	 */
-	protected FileService getFileService(ITextViewer textViewer)
-	{
-		AbstractThemeableEditor editor = this.getEditor(textViewer);
-		FileService result = null;
-
-		if (editor != null)
-		{
-			result = editor.getFileService();
-		}
-
-		return result;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.text.ITextHover#getHoverInfo(org.eclipse.jface.text.ITextViewer,
-	 * org.eclipse.jface.text.IRegion)
-	 */
-	public String getHoverInfo(ITextViewer textViewer, IRegion hoverRegion)
-	{
-		// Not called
-		return null;
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.ITextHoverExtension2#getHoverInfo2(org.eclipse.jface.text.ITextViewer,
@@ -139,79 +111,79 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 	 */
 	public Object getHoverInfo2(ITextViewer textViewer, IRegion hoverRegion)
 	{
-		int offset = hoverRegion.getOffset();
-		Object result = null;
-
-		IParseNode activeNode = this.getActiveNode(textViewer, offset);
-
-		if (activeNode != null)
+		try
 		{
-			JSLocationIdentifier identifier = new JSLocationIdentifier(offset, activeNode);
-			LocationType type = identifier.getType();
-
-			switch (type)
+			IParseNode activeNode = getActiveNode(textViewer, hoverRegion.getOffset());
+			if (activeNode == null)
 			{
-				case IN_CONSTRUCTOR:
-				case IN_GLOBAL:
-				case IN_VARIABLE_NAME:
-				{
-					JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
-					Index index = this.getIndex(textViewer);
-					PropertyElement property = queryHelper.getGlobal(index, activeNode.getText());
-
-					if (property != null)
-					{
-						result = property.getDescription();
-					}
-					break;
-				}
-
-				case IN_PROPERTY_NAME:
-					JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
-					Index index = this.getIndex(textViewer);
-					// @formatter:off
-					JSGetPropertyNode propertyNode = ASTUtil.getGetPropertyNode(
-						identifier.getTargetNode(),
-						identifier.getStatementNode()
-					);
-					// @formatter:on
-					List<String> types = ASTUtil.getParentObjectTypes(index, this.getEditorURI(textViewer),
-							identifier.getTargetNode(), propertyNode, offset);
-					String typeName = null;
-					String methodName = null;
-
-					if (types.size() > 0)
-					{
-						typeName = types.get(0);
-						methodName = propertyNode.getLastChild().getText();
-					}
-
-					if (typeName != null && methodName != null)
-					{
-						PropertyElement property = queryHelper.getTypeMember(index, typeName, methodName);
-
-						if (property instanceof FunctionElement)
-						{
-							result = ((FunctionElement) property).getDescription();
-						}
-					}
-					break;
-
-				case IN_OBJECT_LITERAL_PROPERTY:
-					break;
-
-				case IN_PARAMETERS:
-					break;
-
-				case IN_LABEL:
-				case UNKNOWN:
-				case NONE:
-				default:
-					break;
+				return null;
 			}
-		}
 
-		return result;
+			// To avoid duplicating work, we generate the header and documentation together here
+			// and then getHeader and getDocumentation just return the values.
+			AbstractThemeableEditor editorPart = getEditor(textViewer);
+
+			List<PropertyElement> properties = JSModelUtil.getProperties(editorPart, activeNode);
+			if (!CollectionsUtil.isEmpty(properties))
+			{
+				Index index = getIndex(editorPart);
+				fHeader = JSModelFormatter.TEXT_HOVER.getHeader(properties, index.getRoot());
+				fDocs = JSModelFormatter.TEXT_HOVER.getDocumentation(properties);
+				return getHoverInfo(activeNode, isBrowserControlAvailable(textViewer), null, editorPart, hoverRegion);
+			}
+
+			return null;
+		}
+		finally
+		{
+			fHeader = null;
+			fDocs = null;
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.hover.AbstractDocumentationHover#getHeader(java.lang.Object,
+	 * org.eclipse.ui.IEditorPart, org.eclipse.jface.text.IRegion)
+	 */
+	@Override
+	public String getHeader(Object element, IEditorPart editorPart, IRegion hoverRegion)
+	{
+		return fHeader;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.hover.AbstractDocumentationHover#getDocumentation(java.lang.Object,
+	 * org.eclipse.ui.IEditorPart, org.eclipse.jface.text.IRegion)
+	 */
+	@Override
+	public String getDocumentation(Object element, IEditorPart editorPart, IRegion hoverRegion)
+	{
+		return fDocs;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.hover.AbstractDocumentationHover#populateToolbarActions(org.eclipse.jface.action.
+	 * ToolBarManager, com.aptana.editor.common.hover.CustomBrowserInformationControl)
+	 */
+	@Override
+	public void populateToolbarActions(ToolBarManager tbm, CustomBrowserInformationControl iControl)
+	{
+		final OpenDeclarationAction openDeclarationAction = new OpenDeclarationAction(iControl);
+		tbm.add(openDeclarationAction);
+		IInputChangedListener inputChangeListener = new IInputChangedListener()
+		{
+			public void inputChanged(Object newInput)
+			{
+				if (newInput instanceof BrowserInformationControlInput)
+				{
+					openDeclarationAction.update();
+				}
+			}
+		};
+		iControl.addInputChangeListener(inputChangeListener);
 	}
 
 	/*
@@ -222,7 +194,6 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 	{
 		IParseNode activeNode = this.getActiveNode(textViewer, offset);
 		IRegion result = null;
-
 		if (activeNode != null)
 		{
 			JSLocationIdentifier identifier = new JSLocationIdentifier(offset, activeNode);
@@ -248,7 +219,6 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 		{
 			result = new Region(offset, 0);
 		}
-
 		return result;
 	}
 
@@ -258,50 +228,77 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 	 * @param textViewer
 	 * @return
 	 */
-	protected URI getEditorURI(ITextViewer textViewer)
+	protected URI getEditorURI(IEditorPart editorPart)
 	{
-		AbstractThemeableEditor editor = this.getEditor(textViewer);
-		URI result = null;
-
-		if (editor != null)
-		{
-			IEditorInput editorInput = editor.getEditorInput();
-
-			if (editorInput instanceof IURIEditorInput)
-			{
-				IURIEditorInput fileEditorInput = (IURIEditorInput) editorInput;
-
-				result = fileEditorInput.getURI();
-			}
-		}
-
-		return result;
+		AbstractThemeableEditor editor = (AbstractThemeableEditor) editorPart;
+		return EditorUtil.getURI(editor);
 	}
 
 	/**
 	 * getIndex
 	 * 
-	 * @param textViewer
+	 * @param editorPart
 	 * @return
 	 */
-	protected Index getIndex(ITextViewer textViewer)
+	protected Index getIndex(IEditorPart editorPart)
 	{
-		AbstractThemeableEditor editor = this.getEditor(textViewer);
-		Index result = null;
+		AbstractThemeableEditor editor = (AbstractThemeableEditor) editorPart;
+		return EditorUtil.getIndex(editor);
+	}
 
-		if (editor != null)
+	/**
+	 * Open declaration action.
+	 */
+	public class OpenDeclarationAction extends Action
+	{
+		private static final String IMG_OPEN_DECLARATION = "icons/full/elcl16/goto_input.gif"; //$NON-NLS-1$
+		private static final String IMG_OPEN_DECLARATION_DISABLED = "icons/full/dlcl16/goto_input.gif"; //$NON-NLS-1$
+		private CustomBrowserInformationControl iControl;
+		private IHyperlink[] hyperlinks;
+
+		/**
+		 * @param iControl
+		 */
+		public OpenDeclarationAction(CustomBrowserInformationControl iControl)
 		{
-			IEditorInput input = editor.getEditorInput();
-
-			if (input instanceof IFileEditorInput)
-			{
-				IFile file = ((IFileEditorInput) input).getFile();
-				IProject project = file.getProject();
-
-				result = IndexManager.getInstance().getIndex(project.getLocationURI());
-			}
+			setText(Messages.JSTextHover_openDeclarationTooltip);
+			setImageDescriptor(UIEplPlugin.imageDescriptorFromPlugin(UIEplPlugin.PLUGIN_ID, IMG_OPEN_DECLARATION));
+			setDisabledImageDescriptor(UIEplPlugin.imageDescriptorFromPlugin(UIEplPlugin.PLUGIN_ID,
+					IMG_OPEN_DECLARATION_DISABLED));
+			this.iControl = iControl;
 		}
 
-		return result;
+		/**
+		 * Update the action
+		 */
+		void update()
+		{
+			BrowserInformationControlInput input = iControl.getInput();
+			if (input instanceof DocumentationBrowserInformationControlInput)
+			{
+				JSHyperlinkDetector detector = new JSHyperlinkDetector();
+				IRegion hoverRegion = ((DocumentationBrowserInformationControlInput) input).getHoverRegion();
+				if (hoverRegion != null)
+				{
+					hyperlinks = detector.detectHyperlinks((AbstractThemeableEditor) getEditor(), hoverRegion, false);
+					setEnabled(!ArrayUtil.isEmpty(hyperlinks) && hyperlinks[0] != null);
+					return;
+				}
+
+			}
+			setEnabled(false);
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.jface.action.Action#run()
+		 */
+		@Override
+		public void run()
+		{
+			// We already know that this hyperlink is valid. A check was made at the update call.
+			iControl.dispose();
+			hyperlinks[0].open();
+		}
 	}
 }

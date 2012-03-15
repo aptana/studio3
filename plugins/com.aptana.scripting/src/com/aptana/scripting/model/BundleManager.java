@@ -39,7 +39,7 @@ import org.jruby.RubyRegexp;
 import org.osgi.framework.Bundle;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.projects.templates.IProjectTemplate;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.ResourceUtil;
@@ -215,7 +215,7 @@ public class BundleManager
 	private static final Pattern STAR_PATTERN = Pattern.compile("\\*"); //$NON-NLS-1$
 
 	// special sub-directories within a bundle directory
-	private static final String SNIPPETS_DIRECTORY_NAME = "snippets"; //$NON-NLS-1$
+	public static final String SNIPPETS_DIRECTORY_NAME = "snippets"; //$NON-NLS-1$
 	private static final String COMMANDS_DIRECTORY_NAME = "commands"; //$NON-NLS-1$
 	private static final String TEMPLATES_DIRECTORY_NAME = "templates"; //$NON-NLS-1$
 	private static final String SAMPLES_DIRECTORY_NAME = "samples"; //$NON-NLS-1$
@@ -227,7 +227,7 @@ public class BundleManager
 	private static final String BUILTIN_BUNDLES = "bundles"; //$NON-NLS-1$
 
 	// special file name used to define a bundle
-	private static final String BUNDLE_FILE = "bundle.rb"; //$NON-NLS-1$
+	public static final String BUNDLE_FILE = "bundle.rb"; //$NON-NLS-1$
 
 	private static final String RUBY_FILE_EXTENSION = ".rb"; //$NON-NLS-1$
 
@@ -340,8 +340,12 @@ public class BundleManager
 							IdeLog.logError(ScriptingActivator.getDefault(), message);
 						}
 					}
-				},
-				TAG_BUNDLE_PATH
+
+					public Set<String> getSupportElementNames()
+					{
+						return CollectionsUtil.newSet(TAG_BUNDLE_PATH);
+					}
+				}
 			);
 			// @formatter:on
 
@@ -468,6 +472,12 @@ public class BundleManager
 	private List<LoadCycleListener> _loadCycleListeners;
 
 	/**
+	 * This is a pool to reduce duplicated string values eating up RAM. This happens most often with paths (like say in
+	 * MenuElements)
+	 */
+	private Map<String, String> _stringPool;
+
+	/**
 	 * Create a new instance of BundleManager and initialize its internal structure. Note that this constructor is
 	 * private so it can only be instantiated within a static method in this class
 	 */
@@ -477,6 +487,8 @@ public class BundleManager
 		// of null checks and allows us to lock on the field directly instead of using separate locks
 		this._bundlesByPath = new HashMap<File, List<BundleElement>>();
 		this._entriesByName = new HashMap<String, BundleEntry>();
+
+		this._stringPool = new HashMap<String, String>();
 
 		// NOTE: similar logic for these guys too
 		this._bundleVisibilityListeners = new ArrayList<BundleVisibilityListener>();
@@ -1089,6 +1101,56 @@ public class BundleManager
 	}
 
 	/**
+	 * Return a list of snippet category elements in the specified bundle name. Note that bundle precedence is taken
+	 * into account, so only visible elements are returned in this list
+	 * 
+	 * @param name
+	 *            The name of the bundle to query
+	 * @return A list of elements matching the specified criteria
+	 */
+	public List<SnippetCategoryElement> getBundleSnippetCategories(String name)
+	{
+		BundleEntry entry = this.getBundleEntry(name);
+		List<SnippetCategoryElement> result;
+
+		if (entry != null)
+		{
+			result = entry.getSnippetCategories();
+		}
+		else
+		{
+			result = Collections.emptyList();
+		}
+
+		return result;
+	}
+
+	/**
+	 * Return a list of snippet elements in the specified bundle name. Note that bundle precedence is taken into
+	 * account, so only visible elements are returned in this list
+	 * 
+	 * @param name
+	 *            The name of the bundle to query
+	 * @return A list of elements matching the specified criteria
+	 */
+	public List<SnippetElement> getBundleSnippets(String name)
+	{
+		BundleEntry entry = this.getBundleEntry(name);
+		List<SnippetElement> result;
+
+		if (entry != null)
+		{
+			result = entry.getSnippets();
+		}
+		else
+		{
+			result = Collections.emptyList();
+		}
+
+		return result;
+	}
+
+	/**
 	 * Return a list of menu elements in the specified bundle name. Note that bundle precedence is taken into account,
 	 * so only visible elements are returned in this list
 	 * 
@@ -1290,13 +1352,7 @@ public class BundleManager
 
 		for (String name : this.getBundleNames())
 		{
-			for (CommandElement command : this.getBundleCommands(name))
-			{
-				if (filter == null || filter.include(command))
-				{
-					result.add(command);
-				}
-			}
+			CollectionsUtil.filter(getBundleCommands(name), result, filter);
 		}
 
 		return result;
@@ -1317,13 +1373,7 @@ public class BundleManager
 
 		for (String name : this.getBundleNames())
 		{
-			for (ContentAssistElement assist : this.getBundleContentAssists(name))
-			{
-				if (filter == null || filter.include(assist))
-				{
-					result.add(assist);
-				}
-			}
+			CollectionsUtil.filter(getBundleContentAssists(name), result, filter);
 		}
 
 		return result;
@@ -1387,13 +1437,7 @@ public class BundleManager
 
 		for (String name : this.getBundleNames())
 		{
-			for (EnvironmentElement command : this.getBundleEnvs(name))
-			{
-				if (filter == null || filter.include(command))
-				{
-					result.add(command);
-				}
-			}
+			CollectionsUtil.filter(getBundleEnvs(name), result, filter);
 		}
 
 		return result;
@@ -1528,13 +1572,7 @@ public class BundleManager
 
 		for (String name : this.getBundleNames())
 		{
-			for (MenuElement menu : this.getBundleMenus(name))
-			{
-				if (filter == null || filter.include(menu))
-				{
-					result.add(menu);
-				}
-			}
+			CollectionsUtil.filter(getBundleMenus(name), result, filter);
 		}
 
 		return result;
@@ -1555,13 +1593,7 @@ public class BundleManager
 
 		for (String name : this.getBundleNames())
 		{
-			for (SmartTypingPairsElement command : this.getBundlePairs(name))
-			{
-				if (filter == null || filter.include(command))
-				{
-					result.add(command);
-				}
-			}
+			CollectionsUtil.filter(getBundlePairs(name), result, filter);
 		}
 
 		return result;
@@ -1576,21 +1608,15 @@ public class BundleManager
 	 *            result. The filter may be null which is equivalent to a filter that returns true for all elements
 	 * @return A list of elements that are visible and that pass the specified filter
 	 */
-	public List<IProjectTemplate> getProjectTemplates(IModelFilter filter)
+	public List<ProjectTemplateElement> getProjectTemplates(IModelFilter filter)
 	{
-		List<IProjectTemplate> result = new ArrayList<IProjectTemplate>();
+		List<ProjectTemplateElement> result = new ArrayList<ProjectTemplateElement>();
 
 		for (String name : this.getBundleNames())
 		{
 			BundleEntry bundleEntry = this.getBundleEntry(name);
 
-			for (ProjectTemplateElement template : bundleEntry.getProjectTemplates())
-			{
-				if (filter == null || filter.include(template))
-				{
-					result.add(template);
-				}
-			}
+			CollectionsUtil.filter(bundleEntry.getProjectTemplates(), result, filter);
 		}
 
 		return result;
@@ -1613,13 +1639,49 @@ public class BundleManager
 		{
 			BundleEntry bundleEntry = this.getBundleEntry(name);
 
-			for (ProjectSampleElement template : bundleEntry.getProjectSamples())
-			{
-				if (filter == null || filter.include(template))
-				{
-					result.add(template);
-				}
-			}
+			CollectionsUtil.filter(bundleEntry.getProjectSamples(), result, filter);
+		}
+
+		return result;
+	}
+
+	/**
+	 * Return a list of all active snippets. Note that bundle precedence is taken into account, so only visible elements
+	 * are returned in this list
+	 * 
+	 * @param filter
+	 *            A filter to apply to each active element. Only elements that pass the filter will be included in the
+	 *            result. The filter may be null which is equivalent to a filter that returns true for all elements
+	 * @return A list of elements that are visible and that pass the specified filter
+	 */
+	public List<SnippetElement> getSnippets(IModelFilter filter)
+	{
+		List<SnippetElement> result = new ArrayList<SnippetElement>();
+
+		for (String name : this.getBundleNames())
+		{
+			CollectionsUtil.filter(getBundleSnippets(name), result, filter);
+		}
+
+		return result;
+	}
+
+	/**
+	 * Return a list of all active snippet categories. Note that bundle precedence is taken into account, so only
+	 * visible elements are returned in this list
+	 * 
+	 * @param filter
+	 *            A filter to apply to each active element. Only elements that pass the filter will be included in the
+	 *            result. The filter may be null which is equivalent to a filter that returns true for all elements
+	 * @return A list of elements that are visible and that pass the specified filter
+	 */
+	public List<SnippetCategoryElement> getSnippetCategories(IModelFilter filter)
+	{
+		List<SnippetCategoryElement> result = new ArrayList<SnippetCategoryElement>();
+
+		for (String name : this.getBundleNames())
+		{
+			CollectionsUtil.filter(getBundleSnippetCategories(name), result, filter);
 		}
 
 		return result;
@@ -2318,5 +2380,31 @@ public class BundleManager
 	public boolean useCache()
 	{
 		return Boolean.valueOf(System.getProperty(USE_BUNDLE_CACHE, Boolean.TRUE.toString()));
+	}
+
+	/**
+	 * This pools duplicate strings so that we only store one instance of that particular value and shared the
+	 * reference. useful for commonly repeated strings, such as paths where elements are defined, common scope
+	 * selectors, key used to hold snippet/command triggers.
+	 * 
+	 * @param value
+	 * @return
+	 */
+	String sharedString(String value)
+	{
+		if (value == null)
+		{
+			return null;
+		}
+		synchronized (_stringPool)
+		{
+			String result = _stringPool.get(value);
+			if (result != null)
+			{
+				return result;
+			}
+			_stringPool.put(value, value);
+		}
+		return value;
 	}
 }

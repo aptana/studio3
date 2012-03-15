@@ -8,15 +8,20 @@
 package com.aptana.editor.js.contentassist.index;
 
 import java.io.IOException;
+import java.net.URI;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
+import com.aptana.core.IMap;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.RegexUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.editor.js.contentassist.model.EventElement;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
@@ -52,7 +57,24 @@ public class JSIndexReader extends IndexReader
 			{
 				type.addProperty(function);
 			}
+
+			// events
+			for (EventElement event : this.getEvents(index, typeName))
+			{
+				type.addEvent(event);
+			}
 		}
+	}
+
+	/**
+	 * createEvent
+	 * 
+	 * @param event
+	 * @return
+	 */
+	protected EventElement createEvent(QueryResult event)
+	{
+		return this.populateElement(new EventElement(), event, 2);
 	}
 
 	/**
@@ -134,32 +156,84 @@ public class JSIndexReader extends IndexReader
 	}
 
 	/**
-	 * getFunction
+	 * getEvents
 	 * 
 	 * @param index
-	 * @param owningType
-	 * @param propertyName
+	 * @param owningTypes
 	 * @return
 	 * @throws IOException
 	 */
-	public FunctionElement getFunction(Index index, String owningType, String propertyName)
+	public List<EventElement> getEvents(Index index, List<String> owningTypes)
 	{
-		FunctionElement result = null;
+		List<EventElement> result = new ArrayList<EventElement>();
 
-		if (index != null && !StringUtil.isEmpty(owningType) && !StringUtil.isEmpty(propertyName))
+		if (index != null && !CollectionsUtil.isEmpty(owningTypes))
 		{
+			// read events
 			// @formatter:off
-			List<QueryResult> functions = index.query(
+			List<QueryResult> events = index.query(
 				new String[] { IJSIndexConstants.FUNCTION },
-				this.getMemberPattern(owningType, propertyName),
+				this.getMemberPattern(owningTypes),
+				SearchPattern.REGEX_MATCH
+			);
+			// @formatter:on
+
+			result = CollectionsUtil.map(events, new IMap<QueryResult, EventElement>()
+			{
+				public EventElement map(QueryResult item)
+				{
+					return createEvent(item);
+				}
+			});
+		}
+
+		return result;
+	}
+
+	/**
+	 * getEvents
+	 * 
+	 * @param index
+	 * @param owningType
+	 * @return
+	 * @throws IOException
+	 */
+	public List<EventElement> getEvents(Index index, String owningType)
+	{
+		return getEvents(index, CollectionsUtil.newList(owningType));
+	}
+
+	/**
+	 * getEvents
+	 * 
+	 * @param index
+	 * @param owningType
+	 * @param eventName
+	 * @return
+	 * @throws IOException
+	 */
+	public List<EventElement> getEvents(Index index, String owningType, String eventName)
+	{
+		List<EventElement> result = new ArrayList<EventElement>();
+
+		if (index != null && !StringUtil.isEmpty(owningType) && !StringUtil.isEmpty(eventName))
+		{
+			// read events
+			// @formatter:off
+			List<QueryResult> events = index.query(
+				new String[] { IJSIndexConstants.FUNCTION },
+				this.getMemberPattern(owningType, eventName),
 				SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE
 			);
 			// @formatter:on
 
-			if (functions != null && functions.size() > 0)
+			result = CollectionsUtil.map(events, new IMap<QueryResult, EventElement>()
 			{
-				result = this.createFunction(functions.get(0));
-			}
+				public EventElement map(QueryResult item)
+				{
+					return createEvent(item);
+				}
+			});
 		}
 
 		return result;
@@ -188,13 +262,13 @@ public class JSIndexReader extends IndexReader
 			);
 			// @formatter:on
 
-			if (functions != null)
+			result = CollectionsUtil.map(functions, new IMap<QueryResult, FunctionElement>()
 			{
-				for (QueryResult function : functions)
+				public FunctionElement map(QueryResult item)
 				{
-					result.add(this.createFunction(function));
+					return createFunction(item);
 				}
-			}
+			});
 		}
 
 		return result;
@@ -210,26 +284,39 @@ public class JSIndexReader extends IndexReader
 	 */
 	public List<FunctionElement> getFunctions(Index index, String owningType)
 	{
+		return getFunctions(index, CollectionsUtil.newList(owningType));
+	}
+
+	/**
+	 * getFunction
+	 * 
+	 * @param index
+	 * @param owningType
+	 * @param propertyName
+	 * @return
+	 * @throws IOException
+	 */
+	public List<FunctionElement> getFunctions(Index index, String owningType, String propertyName)
+	{
 		List<FunctionElement> result = new ArrayList<FunctionElement>();
 
-		if (index != null && !StringUtil.isEmpty(owningType))
+		if (index != null && !StringUtil.isEmpty(owningType) && !StringUtil.isEmpty(propertyName))
 		{
-			// read functions
 			// @formatter:off
 			List<QueryResult> functions = index.query(
 				new String[] { IJSIndexConstants.FUNCTION },
-				this.getMemberPattern(owningType),
+				this.getMemberPattern(owningType, propertyName),
 				SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE
 			);
 			// @formatter:on
 
-			if (functions != null)
+			result = CollectionsUtil.map(functions, new IMap<QueryResult, FunctionElement>()
 			{
-				for (QueryResult function : functions)
+				public FunctionElement map(QueryResult item)
 				{
-					result.add(this.createFunction(function));
+					return createFunction(item);
 				}
-			}
+			});
 		}
 
 		return result;
@@ -246,17 +333,6 @@ public class JSIndexReader extends IndexReader
 		String typePattern = RegexUtil.createQuotedListPattern(typeNames);
 
 		return MessageFormat.format("^{1}{0}", new Object[] { this.getDelimiter(), typePattern }); //$NON-NLS-1$
-	}
-
-	/**
-	 * getMemberPattern
-	 * 
-	 * @param typeName
-	 * @return
-	 */
-	private String getMemberPattern(String typeName)
-	{
-		return MessageFormat.format("{1}{0}", new Object[] { this.getDelimiter(), typeName }); //$NON-NLS-1$
 	}
 
 	/**
@@ -294,13 +370,13 @@ public class JSIndexReader extends IndexReader
 			);
 			// @formatter:on
 
-			if (properties != null)
+			result = CollectionsUtil.map(properties, new IMap<QueryResult, PropertyElement>()
 			{
-				for (QueryResult property : properties)
+				public PropertyElement map(QueryResult item)
 				{
-					result.add(this.createProperty(property));
+					return createProperty(item);
 				}
-			}
+			});
 		}
 
 		return result;
@@ -316,29 +392,7 @@ public class JSIndexReader extends IndexReader
 	 */
 	public List<PropertyElement> getProperties(Index index, String owningType)
 	{
-		List<PropertyElement> result = new ArrayList<PropertyElement>();
-
-		if (index != null && !StringUtil.isEmpty(owningType))
-		{
-			// read properties
-			// @formatter:off
-			List<QueryResult> properties = index.query(
-				new String[] { IJSIndexConstants.PROPERTY },
-				this.getMemberPattern(owningType),
-				SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE
-			);
-			// @formatter:on
-
-			if (properties != null)
-			{
-				for (QueryResult property : properties)
-				{
-					result.add(this.createProperty(property));
-				}
-			}
-		}
-
-		return result;
+		return getProperties(index, CollectionsUtil.newList(owningType));
 	}
 
 	/**
@@ -350,9 +404,9 @@ public class JSIndexReader extends IndexReader
 	 * @return
 	 * @throws IOException
 	 */
-	public PropertyElement getProperty(Index index, String owningType, String propertyName)
+	public List<PropertyElement> getProperties(Index index, String owningType, String propertyName)
 	{
-		PropertyElement result = null;
+		List<PropertyElement> result = new ArrayList<PropertyElement>();
 
 		if (index != null && !StringUtil.isEmpty(owningType) && !StringUtil.isEmpty(propertyName))
 		{
@@ -364,13 +418,49 @@ public class JSIndexReader extends IndexReader
 			);
 			// @formatter:on
 
-			if (properties != null && properties.size() > 0)
+			result = CollectionsUtil.map(properties, new IMap<QueryResult, PropertyElement>()
 			{
-				result = this.createProperty(properties.get(0));
-			}
+				public PropertyElement map(QueryResult item)
+				{
+					return createProperty(item);
+				}
+			});
 		}
 
 		return result;
+	}
+
+	/**
+	 * getRequires
+	 * 
+	 * @param index
+	 * @return
+	 */
+	public List<String> getRequires(Index index, final URI location)
+	{
+		final Set<String> result = new HashSet<String>();
+
+		if (index != null)
+		{
+			// @formatter:off
+			List<QueryResult> requires = index.query(
+				new String[] { IJSIndexConstants.REQUIRE },
+				"*", //$NON-NLS-1$
+				SearchPattern.PATTERN_MATCH
+			);
+			// @formatter:on
+
+			// build list of requires for specified location
+			for (QueryResult item : getQueryResultsForLocation(requires, location))
+			{
+				for (String path : getSubDelimiterPattern().split(item.getWord()))
+				{
+					result.add(path);
+				}
+			}
+		}
+
+		return new ArrayList<String>(result);
 	}
 
 	/*
@@ -391,9 +481,9 @@ public class JSIndexReader extends IndexReader
 	 * @param includeMembers
 	 * @return
 	 */
-	public TypeElement getType(Index index, String typeName, boolean includeMembers)
+	public List<TypeElement> getType(Index index, String typeName, boolean includeMembers)
 	{
-		TypeElement result = null;
+		List<TypeElement> result = new ArrayList<TypeElement>();
 
 		if (index != null && !StringUtil.isEmpty(typeName))
 		{
@@ -407,15 +497,21 @@ public class JSIndexReader extends IndexReader
 			);
 			// @formatter:on
 
-			if (types != null && !types.isEmpty())
+			if (types != null)
 			{
-				result = createType(types.get(0));
-
-				if (includeMembers)
+				for (QueryResult type : types)
 				{
-					this.attachMembers(result, index);
+					TypeElement t = this.createType(type);
 
-					result.setSerializeProperties(true);
+					if (includeMembers)
+					{
+						this.attachMembers(t, index);
+
+						// make sure the newly created type can be serialized back to JSON in case it is modified
+						t.setSerializeProperties(true);
+					}
+
+					result.add(t);
 				}
 			}
 		}
@@ -438,6 +534,45 @@ public class JSIndexReader extends IndexReader
 		properties.addAll(this.getFunctions(index, typeName));
 
 		return properties;
+	}
+
+	/**
+	 * getTypeNames
+	 * 
+	 * @param index
+	 * @return
+	 */
+	public List<String> getTypeNames(Index index)
+	{
+		List<String> result = new ArrayList<String>();
+
+		if (index != null)
+		{
+			// @formatter:off
+			List<QueryResult> types = index.query(
+				new String[] { IJSIndexConstants.TYPE },
+				"*", //$NON-NLS-1$
+				SearchPattern.PATTERN_MATCH
+			);
+			// @formatter:on
+
+			if (types != null)
+			{
+				for (QueryResult type : types)
+				{
+					String word = type.getWord();
+					int delimiterIndex = word.indexOf(getDelimiter());
+
+					if (delimiterIndex != -1)
+					{
+						result.add(new String(word.substring(0, delimiterIndex)));
+					}
+					// else warn?
+				}
+			}
+		}
+
+		return result;
 	}
 
 	/**

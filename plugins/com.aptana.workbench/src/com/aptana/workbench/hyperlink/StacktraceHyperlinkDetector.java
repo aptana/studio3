@@ -15,9 +15,9 @@ import org.eclipse.jface.text.hyperlink.IHyperlink;
 
 import com.aptana.terminal.hyperlink.IHyperlinkDetector;
 
-
 public class StacktraceHyperlinkDetector implements IHyperlinkDetector
 {
+
 	private static Pattern OPEN_TRACE_LINE_PATTERN = Pattern.compile("\\s*(\\S.+?):(\\d+):\\s+"); //$NON-NLS-1$
 
 	public IHyperlink[] detectHyperlinks(String contents)

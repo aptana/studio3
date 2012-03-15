@@ -57,7 +57,8 @@ import com.aptana.js.debug.ui.internal.dialogs.DetailFormatterDialog;
 /**
  * @author Max Stepanov
  */
-public class JSDetailFormattersPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
+public class JSDetailFormattersPreferencePage extends PreferencePage implements IWorkbenchPreferencePage
+{
 	private Label listLabel;
 	private Button addFormatterButton;
 	private Button removeFormatterButton;
@@ -73,14 +74,16 @@ public class JSDetailFormattersPreferencePage extends PreferencePage implements 
 	/**
 	 * JSDetailFormattersPreferencePage
 	 */
-	public JSDetailFormattersPreferencePage() {
+	public JSDetailFormattersPreferencePage()
+	{
 		super();
 		setTitle(Messages.JSDetailFormattersPreferencePage_DetailFormatters);
 		setPreferenceStore(JSDebugUIPlugin.getDefault().getPreferenceStore());
 		setDescription(Messages.JSDetailFormattersPreferencePage_OverrideDefault);
 	}
 
-	protected Control createContents(Composite parent) {
+	protected Control createContents(Composite parent)
+	{
 		initializeDialogUnits(parent);
 
 		Composite composite = new Composite(parent, SWT.NONE);
@@ -101,10 +104,12 @@ public class JSDetailFormattersPreferencePage extends PreferencePage implements 
 		return composite;
 	}
 
-	public void init(IWorkbench workbench) {
+	public void init(IWorkbench workbench)
+	{
 	}
 
-	private void createOptions(Composite parent) {
+	private void createOptions(Composite parent)
+	{
 		Group group = new Group(parent, SWT.NONE);
 		group.setText(Messages.JSDetailFormattersPreferencePage_ShowVariableDetails);
 		GridDataFactory.fillDefaults().span(2, 1).applyTo(group);
@@ -125,7 +130,8 @@ public class JSDetailFormattersPreferencePage extends PreferencePage implements 
 		detailPane.setSelection(preference.equals(IJSDebugUIConstants.DETAIL_PANE) || preference.length() == 0);
 	}
 
-	private Control createFormattersList(Composite parent) {
+	private Control createFormattersList(Composite parent)
+	{
 		Font font = parent.getFont();
 		listLabel = new Label(parent, SWT.NONE);
 		listLabel.setText(Messages.JSDetailFormattersPreferencePage_TypesWithDetailFormatters);
@@ -138,10 +144,13 @@ public class JSDetailFormattersPreferencePage extends PreferencePage implements 
 				.applyTo(table);
 		table.setFont(font);
 
-		listViewer.setContentProvider(new ArrayContentProvider());
-		listViewer.setLabelProvider(new LabelProvider() {
-			public String getText(Object element) {
-				if (element instanceof DetailFormatter) {
+		listViewer.setContentProvider(ArrayContentProvider.getInstance());
+		listViewer.setLabelProvider(new LabelProvider()
+		{
+			public String getText(Object element)
+			{
+				if (element instanceof DetailFormatter)
+				{
 					return ((DetailFormatter) element).getTypeName();
 				}
 				return null;
@@ -186,44 +195,60 @@ public class JSDetailFormattersPreferencePage extends PreferencePage implements 
 		GridDataFactory.fillDefaults().grab(true, true).span(2, 1).applyTo(sourceViewer.getControl());
 
 		// listeners
-		listViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			public void selectionChanged(SelectionChangedEvent event) {
+		listViewer.addSelectionChangedListener(new ISelectionChangedListener()
+		{
+			public void selectionChanged(SelectionChangedEvent event)
+			{
 				updatePage((IStructuredSelection) event.getSelection());
 			}
 		});
-		listViewer.addDoubleClickListener(new IDoubleClickListener() {
-			public void doubleClick(DoubleClickEvent event) {
-				if (!event.getSelection().isEmpty()) {
+		listViewer.addDoubleClickListener(new IDoubleClickListener()
+		{
+			public void doubleClick(DoubleClickEvent event)
+			{
+				if (!event.getSelection().isEmpty())
+				{
 					editType();
 				}
 			}
 		});
-		listViewer.addCheckStateListener(new ICheckStateListener() {
-			public void checkStateChanged(CheckStateChangedEvent event) {
+		listViewer.addCheckStateListener(new ICheckStateListener()
+		{
+			public void checkStateChanged(CheckStateChangedEvent event)
+			{
 				((DetailFormatter) event.getElement()).setEnabled(event.getChecked());
 			}
 		});
 
-		table.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent event) {
-				if (event.character == SWT.DEL && event.stateMask == 0) {
+		table.addKeyListener(new KeyAdapter()
+		{
+			public void keyPressed(KeyEvent event)
+			{
+				if (event.character == SWT.DEL && event.stateMask == 0)
+				{
 					removeTypes();
 				}
 			}
 		});
 
-		addFormatterButton.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
+		addFormatterButton.addListener(SWT.Selection, new Listener()
+		{
+			public void handleEvent(Event e)
+			{
 				addType();
 			}
 		});
-		editFormatterButton.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
+		editFormatterButton.addListener(SWT.Selection, new Listener()
+		{
+			public void handleEvent(Event e)
+			{
 				editType();
 			}
 		});
-		removeFormatterButton.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
+		removeFormatterButton.addListener(SWT.Selection, new Listener()
+		{
+			public void handleEvent(Event e)
+			{
 				removeTypes();
 			}
 		});
@@ -241,30 +266,36 @@ public class JSDetailFormattersPreferencePage extends PreferencePage implements 
 		return parent;
 	}
 
-	private void updatePage(IStructuredSelection selection) {
+	private void updatePage(IStructuredSelection selection)
+	{
 		removeFormatterButton.setEnabled(!selection.isEmpty());
 		editFormatterButton.setEnabled(selection.size() == 1);
-		sourceViewer.getDocument()
-				.set((selection.size() == 1) ? ((DetailFormatter) selection.getFirstElement()).getSnippet()
+		sourceViewer.getDocument().set(
+				(selection.size() == 1) ? ((DetailFormatter) selection.getFirstElement()).getSnippet()
 						: StringUtil.EMPTY);
 	}
 
-	private void addType() {
+	private void addType()
+	{
 		DetailFormatter detailFormatfer = new DetailFormatter(StringUtil.EMPTY, StringUtil.EMPTY, true);
 		DetailFormatterDialog dlg = new DetailFormatterDialog(getShell(), detailFormatfer, null, false);
-		if (dlg.open() == Window.OK) {
+		if (dlg.open() == Window.OK)
+		{
 			addDetailFormatter(detailFormatfer);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	private void removeTypes() {
+	private void removeTypes()
+	{
 		Object[] list = formatters.toArray();
 		IStructuredSelection selection = (IStructuredSelection) listViewer.getSelection();
 		Object first = selection.getFirstElement();
 		int index = -1;
-		for (int i = 0; i < list.length; i++) {
-			if (list[i].equals(first)) {
+		for (int i = 0; i < list.length; i++)
+		{
+			if (list[i].equals(first))
+			{
 				index = i;
 				break;
 			}
@@ -273,43 +304,54 @@ public class JSDetailFormattersPreferencePage extends PreferencePage implements 
 		removeDetailFormatters((DetailFormatter[]) selection.toList().toArray(new DetailFormatter[selection.size()]));
 
 		list = formatters.toArray();
-		if (index > list.length - 1) {
+		if (index > list.length - 1)
+		{
 			index = list.length - 1;
 		}
-		if (index >= 0) {
+		if (index >= 0)
+		{
 			listViewer.setSelection(new StructuredSelection(list[index]));
 		}
 	}
 
-	private void editType() {
+	private void editType()
+	{
 		IStructuredSelection selection = (IStructuredSelection) listViewer.getSelection();
 		DetailFormatterDialog dlg = new DetailFormatterDialog(getShell(),
 				(DetailFormatter) (selection).getFirstElement(), null, true, true);
-		if (dlg.open() == Window.OK) {
+		if (dlg.open() == Window.OK)
+		{
 			listViewer.refresh();
 			updateViewerCheckboxes();
 			updatePage(selection);
 		}
 	}
 
-	public boolean performOk() {
+	public boolean performOk()
+	{
 		JSDebugPlugin.getDefault().getDebugOptionsManager().setDetailFormatters(formatters);
 
 		String value = IJSDebugUIConstants.DETAIL_PANE;
-		if (inlineAllButton.getSelection()) {
+		if (inlineAllButton.getSelection())
+		{
 			value = IJSDebugUIConstants.INLINE_ALL;
-		} else if (inlineButton.getSelection()) {
+		}
+		else if (inlineButton.getSelection())
+		{
 			value = IJSDebugUIConstants.INLINE_FORMATTERS;
 		}
 		getPreferenceStore().setValue(IJSDebugUIConstants.PREF_SHOW_DETAILS, value);
 		return true;
 	}
 
-	private void updateViewerCheckboxes() {
+	private void updateViewerCheckboxes()
+	{
 		DetailFormatter[] checkedElementsTmp = new DetailFormatter[formatters.size()];
 		int i = 0;
-		for (DetailFormatter detailFormatter : formatters) {
-			if (detailFormatter.isEnabled()) {
+		for (DetailFormatter detailFormatter : formatters)
+		{
+			if (detailFormatter.isEnabled())
+			{
 				checkedElementsTmp[i++] = detailFormatter;
 			}
 		}
@@ -319,7 +361,8 @@ public class JSDetailFormattersPreferencePage extends PreferencePage implements 
 		listViewer.setCheckedElements(checkedElements);
 	}
 
-	private void addDetailFormatter(DetailFormatter detailFormatter) {
+	private void addDetailFormatter(DetailFormatter detailFormatter)
+	{
 		formatters.add(detailFormatter);
 		listViewer.refresh();
 		updateViewerCheckboxes();
@@ -328,8 +371,10 @@ public class JSDetailFormattersPreferencePage extends PreferencePage implements 
 		updatePage(selection);
 	}
 
-	private void removeDetailFormatters(DetailFormatter[] detailFormatters) {
-		for (DetailFormatter detailFormatter : detailFormatters) {
+	private void removeDetailFormatters(DetailFormatter[] detailFormatters)
+	{
+		for (DetailFormatter detailFormatter : detailFormatters)
+		{
 			formatters.remove(detailFormatter);
 		}
 		listViewer.refresh();
@@ -337,12 +382,13 @@ public class JSDetailFormattersPreferencePage extends PreferencePage implements 
 		updatePage(StructuredSelection.EMPTY);
 	}
 
-	private void loadDetailFormatters() {
+	private void loadDetailFormatters()
+	{
 		formatters = new TreeSet<DetailFormatter>();
 		for (DetailFormatter detailFormatter : JSDebugPlugin.getDefault().getDebugOptionsManager()
-				.getDetailFormatters()) {
+				.getDetailFormatters())
+		{
 			formatters.add(detailFormatter);
 		}
 	}
-
 }

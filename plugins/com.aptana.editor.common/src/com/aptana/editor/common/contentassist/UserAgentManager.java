@@ -26,6 +26,7 @@ import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.osgi.framework.Bundle;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.ConfigurationElementDispatcher;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
@@ -52,6 +53,15 @@ public class UserAgentManager
 
 				addDefaultUserAgentID(natureID, userAgentID);
 			}
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.core.util.IConfigurationElementProcessor#getSupportElementNames()
+		 */
+		public Set<String> getSupportElementNames()
+		{
+			return CollectionsUtil.newSet(ELEMENT_DEFAULT_USER_AGENTS);
 		}
 	}
 
@@ -111,6 +121,15 @@ public class UserAgentManager
 				String agentName = element.getAttribute(ATTR_NAME);
 				USER_AGENTS_BY_ID.put(agentID, new UserAgent(agentID, agentName, agentIconPath, agentIconDisabledPath));
 			}
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.core.util.IConfigurationElementProcessor#getSupportElementNames()
+		 */
+		public Set<String> getSupportElementNames()
+		{
+			return CollectionsUtil.newSet(ELEMENT_USER_AGENT);
 		}
 	}
 
@@ -457,17 +476,15 @@ public class UserAgentManager
 	private void loadExtension()
 	{
 		// configure dispatcher for each element type we process
-		ConfigurationElementDispatcher dispatcher = new ConfigurationElementDispatcher();
-		dispatcher.addElementProcessor(ELEMENT_USER_AGENT, new UserAgentProcessor());
-		dispatcher.addElementProcessor(ELEMENT_DEFAULT_USER_AGENTS, new DefaultUserAgentsProcessor());
+		ConfigurationElementDispatcher dispatcher = new ConfigurationElementDispatcher(new UserAgentProcessor(),
+				new DefaultUserAgentsProcessor());
 
 		// @formatter:off
+		// configure dispatcher for each element type we process
 		EclipseUtil.processConfigurationElements(
 			CommonEditorPlugin.PLUGIN_ID,
 			USERAGENT_ID,
-			dispatcher,
-			ELEMENT_USER_AGENT,
-			ELEMENT_DEFAULT_USER_AGENTS
+			dispatcher
 		);
 		// @formatter:on
 	}

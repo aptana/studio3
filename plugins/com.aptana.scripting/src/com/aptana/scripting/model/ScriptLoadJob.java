@@ -8,6 +8,8 @@
 package com.aptana.scripting.model;
 
 import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.MessageFormat;
 import java.util.List;
 
@@ -99,8 +101,10 @@ public class ScriptLoadJob extends AbstractScriptRunner
 				}
 				catch (EvalFailedException e)
 				{
+					StringWriter sw = new StringWriter();
+					e.getCause().printStackTrace(new PrintWriter(sw));
 					String message = MessageFormat.format(Messages.ScriptingEngine_Execution_Error, new Object[] {
-							this._filename, e.getMessage() });
+							this._filename, e.getMessage(), sw.toString() });
 
 					ScriptLogger.logError(message);
 				}

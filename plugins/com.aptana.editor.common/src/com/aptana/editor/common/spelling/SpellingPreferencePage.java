@@ -35,9 +35,9 @@ import com.aptana.editor.common.CommonEditorPlugin;
 
 /**
  * @author Max Stepanov
- *
  */
-public class SpellingPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
+public class SpellingPreferencePage extends PreferencePage implements IWorkbenchPreferencePage
+{
 
 	private static final String GENERAL_SPELLING_PREF_ID = "org.eclipse.ui.editors.preferencePages.Spelling"; //$NON-NLS-1$
 
@@ -47,21 +47,26 @@ public class SpellingPreferencePage extends PreferencePage implements IWorkbench
 	/**
 	 *
 	 */
-	public SpellingPreferencePage() {
+	public SpellingPreferencePage()
+	{
 		setPreferenceStore(CommonEditorPlugin.getDefault().getPreferenceStore());
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
 	 */
-	public void init(IWorkbench workbench) {
+	public void init(IWorkbench workbench)
+	{
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
 	 */
 	@Override
-	protected Control createContents(Composite parent) {
+	protected Control createContents(Composite parent)
+	{
 		Composite composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(GridLayoutFactory.swtDefaults().create());
 		composite.setLayoutData(GridDataFactory.fillDefaults().create());
@@ -75,19 +80,23 @@ public class SpellingPreferencePage extends PreferencePage implements IWorkbench
 
 		tableViewer = CheckboxTableViewer.newCheckList(composite, SWT.BORDER);
 		tableViewer.getTable().setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
-		tableViewer.setContentProvider(new ArrayContentProvider());
-		tableViewer.setLabelProvider(new LabelProvider() {
+		tableViewer.setContentProvider(ArrayContentProvider.getInstance());
+		tableViewer.setLabelProvider(new LabelProvider()
+		{
 			@Override
-			public String getText(Object element) {
+			public String getText(Object element)
+			{
 				return ScopeDefinitions.DEFINITIONS.get(element);
 			}
 		});
 		tableViewer.setInput(ScopeDefinitions.DEFINITIONS.keySet());
 		tableViewer.setCheckedElements(SpellingPreferences.getEnabledScopes().toArray());
 
-		globalPreferencesLink.addSelectionListener(new SelectionAdapter() {
+		globalPreferencesLink.addSelectionListener(new SelectionAdapter()
+		{
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(SelectionEvent e)
+			{
 				((IWorkbenchPreferenceContainer) getContainer()).openPage(GENERAL_SPELLING_PREF_ID, null);
 			}
 		});
@@ -97,29 +106,36 @@ public class SpellingPreferencePage extends PreferencePage implements IWorkbench
 		return composite;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.preference.PreferencePage#setContainer(org.eclipse.jface.preference.IPreferencePageContainer)
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * org.eclipse.jface.preference.PreferencePage#setContainer(org.eclipse.jface.preference.IPreferencePageContainer)
 	 */
 	@Override
-	public void setContainer(IPreferencePageContainer container) {
+	public void setContainer(IPreferencePageContainer container)
+	{
 		super.setContainer(container);
 		updateStatus();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.preference.PreferencePage#performDefaults()
 	 */
 	@Override
-	protected void performDefaults() {
+	protected void performDefaults()
+	{
 		tableViewer.setCheckedElements(ScopeDefinitions.DEFINITIONS.keySet().toArray());
 		super.performDefaults();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.preference.PreferencePage#performOk()
 	 */
 	@Override
-	public boolean performOk() {
+	public boolean performOk()
+	{
 		Object[] checked = tableViewer.getCheckedElements();
 		String[] scopes = new String[checked.length];
 		System.arraycopy(checked, 0, scopes, 0, scopes.length);
@@ -127,16 +143,19 @@ public class SpellingPreferencePage extends PreferencePage implements IWorkbench
 		return super.performOk();
 	}
 
-	private void updateStatus() {
-		boolean spellingEnabled = EditorsUI.getPreferenceStore().getBoolean(SpellingService.PREFERENCE_SPELLING_ENABLED);
-		if (globalPreferencesLink != null) {
+	private void updateStatus()
+	{
+		boolean spellingEnabled = EditorsUI.getPreferenceStore()
+				.getBoolean(SpellingService.PREFERENCE_SPELLING_ENABLED);
+		if (globalPreferencesLink != null)
+		{
 			String spellingEnabledMessage = Messages.SpellingPreferencePage_EnabledMessage;
 			String spellingDisabledMessage = Messages.SpellingPreferencePage_DisabledMessage;
 			globalPreferencesLink.setText(spellingEnabled ? spellingEnabledMessage : spellingDisabledMessage);
 		}
-		if (tableViewer != null) {
+		if (tableViewer != null)
+		{
 			tableViewer.getControl().setEnabled(spellingEnabled);
 		}
 	}
-
 }

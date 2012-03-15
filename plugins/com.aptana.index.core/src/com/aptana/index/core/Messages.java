@@ -5,12 +5,13 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.index.core.messages"; //$NON-NLS-1$
+
 	public static String AbstractFileIndexingParticipant_Indexing_Message;
 	public static String IndexFilesOfProjectJob_Name;
 	public static String IndexPlugin_IndexingFile;
-	public static String IndexProjectJob_Name;
 	public static String IndexRequestJob_Name;
 	public static String RemoveIndexOfFilesOfProjectJob_Name;
+
 	static
 	{
 		// initialize resource bundle

@@ -16,77 +16,97 @@ import java.util.Set;
 import org.mortbay.util.ajax.JSON.Output;
 
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.ObjectUtil;
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.index.core.IndexUtil;
+import com.aptana.index.core.ui.views.IPropertyInformation;
 
 public class PropertyElement extends BaseElement<PropertyElement.Property>
 {
 	enum Property implements IPropertyInformation<PropertyElement>
 	{
-		NAME("Name")
+		NAME(Messages.PropertyElement_Name)
 		{
 			public Object getPropertyValue(PropertyElement node)
 			{
 				return node.getName();
 			}
 		},
-		DESCRIPTION("Description")
+		DESCRIPTION(Messages.PropertyElement_Description)
 		{
 			public Object getPropertyValue(PropertyElement node)
 			{
 				return node.getDescription();
 			}
 		},
-		OWNING_TYPE("Owning Type")
+		OWNING_TYPE(Messages.PropertyElement_OwningType)
 		{
 			public Object getPropertyValue(PropertyElement node)
 			{
 				return node.getOwningType();
 			}
 		},
-		CLASS_PROPERTY("Static Property")
+		CLASS_PROPERTY(Messages.PropertyElement_StaticProperty)
 		{
 			public Object getPropertyValue(PropertyElement node)
 			{
 				return node._isClassProperty;
 			}
 		},
-		INSTANCE_PROPERTY("Instance Property")
+		INSTANCE_PROPERTY(Messages.PropertyElement_InstanceProperty)
 		{
 			public Object getPropertyValue(PropertyElement node)
 			{
 				return node._isInstanceProperty;
 			}
 		},
-		TYPES("Types")
+		RETURN_TYPES(Messages.PropertyElement_ReturnTypes)
 		{
 			public Object getPropertyValue(PropertyElement node)
 			{
 				if (node instanceof FunctionElement)
 				{
-					return StringUtil.join(", ", node.getTypeNames());
+					return StringUtil.join(", ", ((FunctionElement) node).getReturnTypeNames()); //$NON-NLS-1$
 				}
 				else
 				{
-					return StringUtil.join(", ", ((FunctionElement) node).getReturnTypeNames());
+					return StringUtil.EMPTY;
 				}
 			}
 		},
-		DOCUMENTS("Documents")
+		TYPES(Messages.PropertyElement_Types)
 		{
 			public Object getPropertyValue(PropertyElement node)
 			{
-				return StringUtil.join(", ", node.getDocuments());
+				return StringUtil.join(", ", node.getTypeNames()); //$NON-NLS-1$
+			}
+		},
+		DOCUMENTS(Messages.PropertyElement_Documents)
+		{
+			public Object getPropertyValue(PropertyElement node)
+			{
+				return StringUtil.join(", ", node.getDocuments()); //$NON-NLS-1$
 			}
 		};
 
 		private String header;
+		private String category;
 
 		private Property(String header) // $codepro.audit.disable unusedMethod
 		{
 			this.header = header;
+		}
+
+		private Property(String header, String category)
+		{
+			this.category = category;
+		}
+
+		public String getCategory()
+		{
+			return category;
 		}
 
 		public String getHeader()
@@ -191,6 +211,33 @@ public class PropertyElement extends BaseElement<PropertyElement.Property>
 			returnType.setType(type);
 
 			this.addType(returnType);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode()
+	{
+		return toSource().hashCode();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj instanceof PropertyElement)
+		{
+			return ObjectUtil.areEqual(toSource(), ((PropertyElement) obj).toSource());
+		}
+		else
+		{
+			return super.equals(obj);
 		}
 	}
 
@@ -356,20 +403,6 @@ public class PropertyElement extends BaseElement<PropertyElement.Property>
 		out.add(IS_INTERNAL_PROPERTY, this.isInternal());
 		out.add(TYPES_PROPERTY, this.getTypes());
 		out.add(EXAMPLES_PROPERTY, this.getExamples());
-	}
-
-	/**
-	 * toSource
-	 * 
-	 * @return
-	 */
-	public String toSource()
-	{
-		SourcePrinter printer = new SourcePrinter();
-
-		this.toSource(printer);
-
-		return printer.toString();
 	}
 
 	/**

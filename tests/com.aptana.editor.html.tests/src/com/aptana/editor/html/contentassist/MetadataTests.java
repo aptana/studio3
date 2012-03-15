@@ -39,16 +39,16 @@ public class MetadataTests extends TestCase
 		URL url = FileLocator.find(HTMLPlugin.getDefault().getBundle(), new Path(resource), null);
 
 		assertNotNull(url);
-		
+
 		InputStream stream = null;
 
 		try
 		{
 			HTMLMetadataReader reader = new HTMLMetadataReader();
-			
+
 			stream = url.openStream();
 
-			reader.loadXML(stream);
+			reader.loadXML(stream, url.toString());
 		}
 		catch (IOException e)
 		{

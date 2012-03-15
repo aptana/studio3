@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.window.IShellProvider;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 
@@ -65,7 +66,12 @@ public final class PropertyDialogsRegistry
 					{
 						readElement(element);
 					}
-				}, TAG_DIALOG);
+
+					public Set<String> getSupportElementNames()
+					{
+						return CollectionsUtil.newSet(TAG_DIALOG);
+					}
+				});
 	}
 
 	private void readElement(IConfigurationElement element)

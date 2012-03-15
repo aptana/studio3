@@ -15,6 +15,7 @@ import java.util.Set;
 
 import org.eclipse.swt.graphics.Image;
 
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.SnippetElement;
@@ -127,6 +128,6 @@ class SnippetsNode extends BaseNode<SnippetsNode.Property>
 	 */
 	public boolean hasChildren()
 	{
-		return snippets.length > 0;
+		return !ArrayUtil.isEmpty(snippets);
 	}
 }

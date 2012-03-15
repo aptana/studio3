@@ -16,31 +16,47 @@ import com.aptana.editor.common.hover.ThemedInformationControl;
 
 /**
  * @author Max Stepanov
- *
  */
-public class CSSTextHoverInformationControl extends ThemedInformationControl {
+public class CSSTextHoverInformationControl extends ThemedInformationControl
+{
 
 	/**
 	 * @param parent
 	 * @param presenter
 	 * @param status
 	 */
-	public CSSTextHoverInformationControl(Shell parent) {
+	public CSSTextHoverInformationControl(Shell parent)
+	{
 		super(parent);
-		
+
 		GridData data = (GridData) getStyledTextWidget().getLayoutData();
 		data.horizontalIndent = 0;
 		data.verticalIndent = 0;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.InformationControl#hasContents()
+	 */
+	@Override
+	public boolean hasContents()
+	{
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.hover.ThemedInformationControl#setInput(java.lang.Object)
 	 */
 	@Override
-	public void setInput(Object input) {
-		if (input instanceof RGB) {
+	public void setInput(Object input)
+	{
+		if (input instanceof RGB)
+		{
 			setBackgroundColor(getColorManager().getColor((RGB) input));
-		} else if (input instanceof String) {
+		}
+		else if (input instanceof String)
+		{
 			setInformation((String) input);
 		}
 	}

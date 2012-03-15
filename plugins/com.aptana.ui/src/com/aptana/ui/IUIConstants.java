@@ -15,4 +15,8 @@ public interface IUIConstants
 	 */
 	public static final String OPEN_IN_OS_FILE_MANAGER_ID = "com.aptana.ui.command.ShowInFileManager"; //$NON-NLS-1$
 
+	public static final String OK_ICON = "/icons/ok.png"; //$NON-NLS-1$
+	public static final String DELETE_ICON = "/icons/delete.gif"; //$NON-NLS-1$
+	public static final String ADD_ICON = "/icons/add.gif"; //$NON-NLS-1$
+	public static final String EDIT_ICON = "/icons/pencil.gif"; //$NON-NLS-1$
 }

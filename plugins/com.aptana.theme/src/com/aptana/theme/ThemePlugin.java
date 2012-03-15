@@ -39,46 +39,67 @@ public class ThemePlugin extends AbstractUIPlugin
 	{
 		public void preferenceChange(PreferenceChangeEvent event)
 		{
-			if (!invasiveThemesEnabled())
+			if (!applyToAllEditors())
 			{
 				return;
 			}
 			if (AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND.equals(event.getKey()))
 			{
-				RGB value = StringConverter.asRGB((String) event.getNewValue());
-				RGB existing = getThemeManager().getCurrentTheme().getForeground();
-				if (!value.equals(existing))
+				String newValue = (String) event.getNewValue();
+				if (newValue != null)
 				{
-					getThemeManager().getCurrentTheme().updateFG(value);
+					RGB value = StringConverter.asRGB(newValue);
+					RGB existing = getCurrentTheme().getForeground();
+					if (!value.equals(existing))
+					{
+						getCurrentTheme().updateFG(value);
+					}
 				}
 			}
 			else if (AbstractTextEditor.PREFERENCE_COLOR_BACKGROUND.equals(event.getKey()))
 			{
-				RGB value = StringConverter.asRGB((String) event.getNewValue());
-				RGB existing = getThemeManager().getCurrentTheme().getBackground();
-				if (!value.equals(existing))
+				String newValue = (String) event.getNewValue();
+				if (newValue != null)
 				{
-					getThemeManager().getCurrentTheme().updateBG(value);
+					RGB value = StringConverter.asRGB(newValue);
+					RGB existing = getCurrentTheme().getBackground();
+					if (!value.equals(existing))
+					{
+						getCurrentTheme().updateBG(value);
+					}
 				}
 			}
 			else if (AbstractTextEditor.PREFERENCE_COLOR_SELECTION_BACKGROUND.equals(event.getKey()))
 			{
-				RGB value = StringConverter.asRGB((String) event.getNewValue());
-				RGB existing = getThemeManager().getCurrentTheme().getSelectionAgainstBG();
-				if (!value.equals(existing))
+				String newValue = (String) event.getNewValue();
+				if (newValue != null)
 				{
-					getThemeManager().getCurrentTheme().updateSelection(value);
+					RGB value = StringConverter.asRGB(newValue);
+					RGB existing = getCurrentTheme().getSelectionAgainstBG();
+					if (!value.equals(existing))
+					{
+						getCurrentTheme().updateSelection(value);
+					}
 				}
 			}
 			else if (AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE_COLOR.equals(event.getKey()))
 			{
-				RGB value = StringConverter.asRGB((String) event.getNewValue());
-				RGB existing = getThemeManager().getCurrentTheme().getLineHighlightAgainstBG();
-				if (!value.equals(existing))
+				String newValue = (String) event.getNewValue();
+				if (newValue != null)
 				{
-					getThemeManager().getCurrentTheme().updateLineHighlight(value);
+					RGB value = StringConverter.asRGB(newValue);
+					RGB existing = getCurrentTheme().getLineHighlightAgainstBG();
+					if (!value.equals(existing))
+					{
+						getCurrentTheme().updateLineHighlight(value);
+					}
 				}
 			}
+		}
+
+		protected Theme getCurrentTheme()
+		{
+			return getThemeManager().getCurrentTheme();
 		}
 	}
 
@@ -94,7 +115,8 @@ public class ThemePlugin extends AbstractUIPlugin
 	private IControlThemerFactory fControlThemerFactory;
 
 	// Store latest value of whether invasive theme is on so we don't need to query platform prefs every time.
-	private Boolean fInvasiveThemesEnabled;
+	private Boolean fApplyThemeToAllViews;
+	private Boolean fApplyThemeToAllEditors;
 	private IPreferenceChangeListener fThemeChangeListener;
 	private IPreferenceChangeListener fEclipseColorsListener;
 
@@ -119,16 +141,23 @@ public class ThemePlugin extends AbstractUIPlugin
 		{
 			public void preferenceChange(PreferenceChangeEvent event)
 			{
-				if (event.getKey().equals(IPreferenceConstants.INVASIVE_THEMES))
+				if (IPreferenceConstants.APPLY_TO_ALL_VIEWS.equals(event.getKey()))
 				{
-					fInvasiveThemesEnabled = Platform.getPreferencesService().getBoolean(ThemePlugin.PLUGIN_ID,
-							IPreferenceConstants.INVASIVE_THEMES, false, null);
+					fApplyThemeToAllViews = Platform.getPreferencesService().getBoolean(ThemePlugin.PLUGIN_ID,
+							IPreferenceConstants.APPLY_TO_ALL_VIEWS, false, null);
+				}
+				else if (IPreferenceConstants.APPLY_TO_ALL_EDITORS.equals(event.getKey()))
+				{
+					fApplyThemeToAllEditors = Platform.getPreferencesService().getBoolean(ThemePlugin.PLUGIN_ID,
+							IPreferenceConstants.APPLY_TO_ALL_EDITORS, false, null);
 				}
 			}
 		};
 		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
-		fInvasiveThemesEnabled = Platform.getPreferencesService().getBoolean(ThemePlugin.PLUGIN_ID,
-				IPreferenceConstants.INVASIVE_THEMES, false, null);
+		fApplyThemeToAllViews = Platform.getPreferencesService().getBoolean(ThemePlugin.PLUGIN_ID,
+				IPreferenceConstants.APPLY_TO_ALL_VIEWS, false, null);
+		fApplyThemeToAllEditors = Platform.getPreferencesService().getBoolean(ThemePlugin.PLUGIN_ID,
+				IPreferenceConstants.APPLY_TO_ALL_EDITORS, false, null);
 
 		themeHijacker = new InvasiveThemeHijacker();
 		themeHijacker.apply();
@@ -225,8 +254,18 @@ public class ThemePlugin extends AbstractUIPlugin
 		return fControlThemerFactory;
 	}
 
-	public static synchronized boolean invasiveThemesEnabled()
+	/**
+	 * TODO Maybe these methods should live in the ThemeManager?
+	 * 
+	 * @return
+	 */
+	public static synchronized boolean applyToViews()
 	{
-		return getDefault().fInvasiveThemesEnabled;
+		return getDefault().fApplyThemeToAllViews;
+	}
+
+	public static synchronized boolean applyToAllEditors()
+	{
+		return getDefault().fApplyThemeToAllEditors;
 	}
 }

@@ -240,7 +240,7 @@ public class S3ConnectionPoint extends ConnectionPoint implements IBaseRemoteCon
 			if (resp == null || resp.entries == null)
 			{
 				throw new CoreException(new Status(IStatus.ERROR, S3FileSystemPlugin.PLUGIN_ID,
-						"Failed to connect. Invalid credentials?"));
+						Messages.S3ConnectionPoint_FailToConnect));
 			}
 		}
 		catch (CoreException e)

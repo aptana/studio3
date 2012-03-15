@@ -9,8 +9,11 @@ package com.aptana.workbench.commands;
 
 import org.eclipse.osgi.util.NLS;
 
-public class Messages extends NLS {
+public class Messages extends NLS
+{
+
 	private static final String BUNDLE_NAME = "com.aptana.workbench.commands.messages"; //$NON-NLS-1$
+
 	public static String EditBundleJob_BundleHasNoRepository_Error;
 	public static String EditBundleJob_CantCreateUserBundlesDir_Error;
 	public static String EditBundleJob_GitCloneFailed_Error;
@@ -21,11 +24,14 @@ public class Messages extends NLS {
 	public static String EditorCommandsMenuContributor_LBL_EditBundle;
 	public static String EditorCommandsMenuContributor_MSG_CommandNotDefined;
 	public static String EditorCommandsMenuContributor_TITLE_CommandNotDefined;
-	static {
+
+	static
+	{
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
 
-	private Messages() {
+	private Messages()
+	{
 	}
 }

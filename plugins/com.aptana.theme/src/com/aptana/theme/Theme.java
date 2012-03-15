@@ -1139,11 +1139,12 @@ public class Theme
 	/**
 	 * Does the user have invasive themes turned on?
 	 * 
+	 * @deprecated Use {@link ThemePlugin#applyToViews()}
 	 * @return
 	 */
 	public boolean isInvasive()
 	{
-		return ThemePlugin.invasiveThemesEnabled();
+		return ThemePlugin.applyToViews();
 	}
 
 	public Color getForegroundColor()

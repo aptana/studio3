@@ -36,6 +36,7 @@ import org.eclipse.ui.internal.ide.dialogs.ResourceComparator;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 
+import com.aptana.core.CoreStrings;
 import com.aptana.core.util.StringUtil;
 
 /**
@@ -85,7 +86,7 @@ public class HttpServerPathDialog extends StatusDialog {
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(workspacePathText);
 
 		Button browseButton = new Button(container, SWT.PUSH);
-		browseButton.setText(StringUtil.ellipsify(Messages.HttpServerPathDialog_Browse));
+		browseButton.setText(StringUtil.ellipsify(CoreStrings.BROWSE));
 		GridDataFactory.fillDefaults().applyTo(browseButton);
 
 		serverPathText.addModifyListener(new ModifyListener() {

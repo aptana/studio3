@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -10,6 +10,10 @@ package com.aptana.ide.syncing.core;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.QualifiedName;
+
+import com.aptana.core.CorePlugin;
+import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.StringUtil;
 
 /**
  * This is a utility class for synchronization related functionality and settings for containers (i.e. projects and
@@ -22,6 +26,11 @@ public class ResourceSynchronizationUtils
 
 	public static final String LAST_SYNC_CONNECTION_KEY = "lastSyncConnection"; //$NON-NLS-1$
 	public static final String REMEMBER_DECISION_KEY = "rememberDecision"; //$NON-NLS-1$
+
+	private static final QualifiedName REMEMBER_DECISION = new QualifiedName(StringUtil.EMPTY,
+			ResourceSynchronizationUtils.REMEMBER_DECISION_KEY);
+	private static final QualifiedName LAST_SYNC_CONNECTION = new QualifiedName(StringUtil.EMPTY,
+			ResourceSynchronizationUtils.LAST_SYNC_CONNECTION_KEY);
 
 	/**
 	 * Returns the value of "Remember my decision" setting which indicate whether to show the Choose Synchronization
@@ -41,15 +50,11 @@ public class ResourceSynchronizationUtils
 
 		try
 		{
-			String remeberMyDecisionStringValue = container.getPersistentProperty(new QualifiedName("", //$NON-NLS-1$
-					ResourceSynchronizationUtils.REMEMBER_DECISION_KEY));
-			if (remeberMyDecisionStringValue != null)
-			{
-				return Boolean.TRUE.toString().equals(remeberMyDecisionStringValue);
-			}
+			return Boolean.parseBoolean(container.getPersistentProperty(REMEMBER_DECISION));
 		}
 		catch (CoreException e)
 		{
+			IdeLog.logError(CorePlugin.getDefault(), "Failed to retrieve the setting for \"remember my decision\"", e); //$NON-NLS-1$
 		}
 		return false;
 	}
@@ -72,11 +77,11 @@ public class ResourceSynchronizationUtils
 
 		try
 		{
-			container.setPersistentProperty(new QualifiedName("", //$NON-NLS-1$
-					ResourceSynchronizationUtils.REMEMBER_DECISION_KEY), String.valueOf(rememberMyDecision));
+			container.setPersistentProperty(REMEMBER_DECISION, String.valueOf(rememberMyDecision));
 		}
 		catch (CoreException e)
 		{
+			IdeLog.logError(CorePlugin.getDefault(), "Failed to set the setting of \"remember my decision\"", e); //$NON-NLS-1$
 		}
 	}
 
@@ -97,11 +102,12 @@ public class ResourceSynchronizationUtils
 
 		try
 		{
-			return container.getPersistentProperty(new QualifiedName("", //$NON-NLS-1$
-					ResourceSynchronizationUtils.LAST_SYNC_CONNECTION_KEY));
+			return container.getPersistentProperty(LAST_SYNC_CONNECTION);
 		}
 		catch (CoreException e)
 		{
+			IdeLog.logError(CorePlugin.getDefault(),
+					"Failed to retrieve the setting for the last synchronization connection", e); //$NON-NLS-1$
 		}
 		return null;
 	}
@@ -118,20 +124,26 @@ public class ResourceSynchronizationUtils
 	 */
 	public static void setLastSyncConnection(IContainer container, String connection)
 	{
+		if (container == null)
+		{
+			throw new NullPointerException("Null resource container."); //$NON-NLS-1$
+		}
+
 		try
 		{
-			if (connection == null || connection.equals("")) { //$NON-NLS-1$
-				container.setPersistentProperty(new QualifiedName("", //$NON-NLS-1$
-						ResourceSynchronizationUtils.LAST_SYNC_CONNECTION_KEY), null);
+			if (StringUtil.isEmpty(connection))
+			{
+				container.setPersistentProperty(LAST_SYNC_CONNECTION, null);
 			}
 			else
 			{
-				container.setPersistentProperty(new QualifiedName("", //$NON-NLS-1$
-						ResourceSynchronizationUtils.LAST_SYNC_CONNECTION_KEY), connection);
+				container.setPersistentProperty(LAST_SYNC_CONNECTION, connection);
 			}
 		}
 		catch (CoreException e)
 		{
+			IdeLog.logError(CorePlugin.getDefault(),
+					"Failed to set the setting of the last synchronization connection", e); //$NON-NLS-1$
 		}
 	}
 }

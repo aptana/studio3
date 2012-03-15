@@ -42,11 +42,13 @@ import com.aptana.editor.html.HTMLMetadataLoader;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.HTMLTestUtil;
 import com.aptana.editor.html.contentassist.HTMLContentAssistProcessor.LocationType;
+import com.aptana.editor.html.parsing.lexer.HTMLLexemeProvider;
 import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
 import com.aptana.editor.html.preferences.IPreferenceConstants;
 import com.aptana.editor.html.tests.HTMLEditorBasedTests;
+import com.aptana.parsing.lexer.Lexeme;
 import com.aptana.projects.WebProjectNature;
-import com.aptana.webserver.core.EFSWebServerConfiguration;
+import com.aptana.webserver.core.SimpleWebServer;
 import com.aptana.webserver.core.WebServerCorePlugin;
 
 public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
@@ -392,8 +394,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 
 	public void testLinkHREFFolderProposalWithPrefix() throws Exception
 	{
-		assertHREFProposal("<link rel='stylesheet' href='fo|' />", "<link rel='stylesheet' href='folder' />",
-				"folder");
+		assertHREFProposal("<link rel='stylesheet' href='fo|' />", "<link rel='stylesheet' href='folder' />", "folder");
 
 	}
 
@@ -492,10 +493,10 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		final IFile file = project.createFile("test.html", "<link rel='stylesheet' href='/|' />");
 		this.setupTestContext(file);
 
-		EFSWebServerConfiguration server = new EFSWebServerConfiguration();
+		SimpleWebServer server = new SimpleWebServer();
 		server.setDocumentRoot(project.getURI());
 		server.setBaseURL(new URL("http://www.test.com/"));
-		WebServerCorePlugin.getDefault().getServerConfigurationManager().addServerConfiguration(server);
+		WebServerCorePlugin.getDefault().getServerManager().add(server);
 
 		int offset = this.cursorOffsets.get(0);
 		ITextViewer viewer = AssertUtil.createTextViewer(document);
@@ -507,7 +508,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		AssertUtil.assertProposalApplies("<link rel='stylesheet' href='/folder' />", document, "folder", proposals,
 				offset, new Point(0, 0));
 
-		WebServerCorePlugin.getDefault().getServerConfigurationManager().removeServerConfiguration(server);
+		WebServerCorePlugin.getDefault().getServerManager().remove(server);
 		project.delete();
 
 	}
@@ -913,18 +914,26 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 	public void testAPSTUD3862() throws Exception
 	{
 		TestProject project = createWebProject("3862_");
-		project.createFolder("public");
-		project.createFolder("public/css");
-		project.createFolder("application");
-		IFile file = project.createFile("index.html", "<img src=\"/img/\" />\n");
+		try
+		{
+			project.createFolder("public");
+			project.createFolder("public/css");
+			project.createFolder("application");
+			IFile file = project.createFile("index.html", "<img src=\"/img/\" />\n");
 
-		AbstractThemeableEditor editor = (AbstractThemeableEditor) createEditor(new FileEditorInput(file));
-		fProcessor = new HTMLContentAssistProcessor(editor);
-		ISourceViewer viewer = editor.getISourceViewer();
-		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, 15, '\t', false);
+			AbstractThemeableEditor editor = (AbstractThemeableEditor) createEditor(new FileEditorInput(file));
+			fProcessor = new HTMLContentAssistProcessor(editor);
+			ISourceViewer viewer = editor.getISourceViewer();
+			ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, 15, '\t', false);
 
-		assertEquals("src value prefix reefers to non-existant subfolder, but we incorrectly suggested children anyways", 0,
-				proposals.length);
+			assertEquals(
+					"src value prefix refers to non-existant subfolder, but we incorrectly suggested children anyways",
+					0, proposals.length);
+		}
+		finally
+		{
+			project.delete();
+		}
 	}
 
 	protected ITextViewer createTextViewer(IDocument fDocument)
@@ -960,6 +969,70 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		{
 			AssertUtil.assertProposalFound(proposalToChoose, proposals);
 			AssertUtil.assertProposalApplies(postCompletion, document, proposalToChoose, proposals, offset, point);
+		}
+	}
+
+	public void testDoubleQuotedEventAttributeValueType()
+	{
+		setupTestContext("contentAssist/js-event-attribute-double-quoted.html");
+
+		for (int offset : cursorOffsets)
+		{
+			HTMLLexemeProvider lexemeProvider = processor.createLexemeProvider(document, offset);
+			Lexeme<HTMLTokenType> lexeme = lexemeProvider.getLexemeFromOffset(offset);
+
+			assertNotNull(lexeme);
+			assertEquals(HTMLTokenType.DOUBLE_QUOTED_STRING, lexeme.getType());
+			assertEquals(17, lexeme.getStartingOffset());
+			assertEquals(63, lexeme.getEndingOffset());
+		}
+	}
+
+	public void testSingleQuotedEventAttributeValueType()
+	{
+		setupTestContext("contentAssist/js-event-attribute-single-quoted.html");
+
+		for (int offset : cursorOffsets)
+		{
+			HTMLLexemeProvider lexemeProvider = processor.createLexemeProvider(document, offset);
+			Lexeme<HTMLTokenType> lexeme = lexemeProvider.getLexemeFromOffset(offset);
+
+			assertNotNull(lexeme);
+			assertEquals(HTMLTokenType.SINGLE_QUOTED_STRING, lexeme.getType());
+			assertEquals(17, lexeme.getStartingOffset());
+			assertEquals(63, lexeme.getEndingOffset());
+		}
+	}
+
+	public void testDoubleQuotedStyleAttributeValueType()
+	{
+		setupTestContext("contentAssist/css-style-attribute-double-quoted.html");
+
+		for (int offset : cursorOffsets)
+		{
+			HTMLLexemeProvider lexemeProvider = processor.createLexemeProvider(document, offset);
+			Lexeme<HTMLTokenType> lexeme = lexemeProvider.getLexemeFromOffset(offset);
+
+			assertNotNull(lexeme);
+			assertEquals(HTMLTokenType.DOUBLE_QUOTED_STRING, lexeme.getType());
+			assertEquals(12, lexeme.getStartingOffset());
+			assertEquals(29, lexeme.getEndingOffset());
+		}
+	}
+
+	public void testSingleQuotedStyleAttributeValueType()
+	{
+		setupTestContext("contentAssist/css-style-attribute-single-quoted.html");
+
+		for (int offset : cursorOffsets)
+		{
+			HTMLLexemeProvider lexemeProvider = processor.createLexemeProvider(document, offset);
+			Lexeme<HTMLTokenType> lexeme = lexemeProvider.getLexemeFromOffset(offset);
+
+			assertNotNull(lexeme);
+			assertEquals(HTMLTokenType.SINGLE_QUOTED_STRING, lexeme.getType());
+			assertEquals(12, lexeme.getStartingOffset());
+			assertEquals(29, lexeme.getEndingOffset());
 		}
 	}
 }

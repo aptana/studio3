@@ -8,15 +8,16 @@
 package com.aptana.theme;
 
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.Writer;
 import java.util.UUID;
 
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.swt.SWT;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.IOUtil;
+import com.aptana.core.util.StringUtil;
 
 /**
  * @author cwilliams
@@ -42,7 +43,7 @@ public class ThemeExporter
 		buffer.append("<plist version=\"1.0\">\n");
 		buffer.append("<dict>\n");
 		buffer.append("  <key>name</key>\n");
-		buffer.append("  <string>").append(theme.getName()).append("</string>\n");
+		buffer.append("  <string>").append(escape(theme.getName())).append("</string>\n");
 		buffer.append("  <key>uuid</key>\n");
 		buffer.append("  <string>").append(UUID.nameUUIDFromBytes(theme.getName().getBytes())).append("</string>\n");
 		buffer.append("  <key>settings</key>\n");
@@ -71,9 +72,9 @@ public class ThemeExporter
 		{
 			buffer.append("    <dict>\n");
 			buffer.append("      <key>name</key>\n");
-			buffer.append("      <string>").append(rule.getName()).append("</string>\n");
+			buffer.append("      <string>").append(escape(rule.getName())).append("</string>\n");
 			buffer.append("      <key>scope</key>\n");
-			buffer.append("      <string>").append(rule.getScopeSelector().toString()).append("</string>\n");
+			buffer.append("      <string>").append(escape(rule.getScopeSelector().toString())).append("</string>\n");
 			buffer.append("      <key>settings</key>\n");
 			buffer.append("      <dict>\n");
 
@@ -121,30 +122,24 @@ public class ThemeExporter
 		buffer.append("</dict>\n");
 		buffer.append("</plist>\n");
 
-		Writer writer = null;
 		try
 		{
-			writer = new FileWriter(themeFile);
-			writer.write(buffer.toString());
+			IOUtil.write(new FileOutputStream(themeFile), buffer.toString());
 		}
 		catch (IOException e)
 		{
 			IdeLog.logError(ThemePlugin.getDefault(), e);
 		}
-		finally
-		{
-			try
-			{
-				if (writer != null)
-				{
-					writer.close();
-				}
-			}
-			catch (IOException e)
-			{
-				// ignore
-			}
-		}
+	}
+
+	/**
+	 * Escapes special characters (i.e. '<' and '>' which need to be encoded for XML).
+	 * @param string
+	 * @return
+	 */
+	private String escape(String raw)
+	{
+		return StringUtil.sanitizeHTML(raw);
 	}
 
 }

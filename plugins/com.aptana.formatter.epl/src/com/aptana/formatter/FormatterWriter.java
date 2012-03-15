@@ -655,6 +655,31 @@ public class FormatterWriter implements IFormatterWriter
 		return false;
 	}
 
+	/**
+	 * Returns true in case the given source ends with the given new-line delimiter; false otherwise.
+	 * 
+	 * @param source
+	 * @param lineDelimiter
+	 */
+	public static boolean endsWithNewLine(String source, String lineDelimiter)
+	{
+		int sourceLength = source.length();
+		if (sourceLength < lineDelimiter.length())
+		{
+			return false;
+		}
+		if (lineDelimiter.length() == 1)
+		{
+			return source.charAt(sourceLength - 1) == lineDelimiter.charAt(0);
+		}
+		else if (lineDelimiter.length() == 2)
+		{
+			return source.charAt(sourceLength - 2) == lineDelimiter.charAt(0)
+					&& source.charAt(sourceLength - 1) == lineDelimiter.charAt(1);
+		}
+		return false;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.formatter.IFormatterWriter#isInBlankLine()

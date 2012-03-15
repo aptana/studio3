@@ -13,6 +13,8 @@ public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.deploy.internal.ui.messages"; //$NON-NLS-1$
 
+	public static String DeployAppContributionItem_Text;
+
 	public static String DeployPopupContributionItem_Text;
 
 	static

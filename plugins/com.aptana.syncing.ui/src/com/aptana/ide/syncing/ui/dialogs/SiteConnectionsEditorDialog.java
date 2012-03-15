@@ -135,7 +135,7 @@ public class SiteConnectionsEditorDialog extends TitleAreaDialog implements Site
 
 		sitesViewer = new ListViewer(group, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
 		sitesViewer.getControl().setLayoutData(GridDataFactory.fillDefaults().grab(true, true).span(2, 1).create());
-		sitesViewer.setContentProvider(new ArrayContentProvider());
+		sitesViewer.setContentProvider(ArrayContentProvider.getInstance());
 		sitesViewer.setLabelProvider(new SitesLabelProvider());
 		sitesViewer.setComparator(new SitesSorter());
 		sitesViewer.setInput(sites);

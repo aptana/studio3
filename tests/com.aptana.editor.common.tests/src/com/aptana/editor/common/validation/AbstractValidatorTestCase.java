@@ -7,55 +7,91 @@
  */
 package com.aptana.editor.common.validation;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.jface.text.Document;
 
-import com.aptana.core.util.EclipseUtil;
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.parsing.FileService;
-import com.aptana.editor.common.preferences.IPreferenceConstants;
+import com.aptana.core.build.AbstractBuildParticipant;
+import com.aptana.core.build.IProblem;
 import com.aptana.editor.common.tests.util.TestProject;
-import com.aptana.editor.common.validator.IValidationItem;
-import com.aptana.editor.common.validator.IValidationManager;
+import com.aptana.index.core.build.BuildContext;
 import com.aptana.parsing.IParseState;
 
-public class AbstractValidatorTestCase extends TestCase
+public abstract class AbstractValidatorTestCase extends TestCase
 {
 
-	protected void setEnableParseError(boolean enabled, String language)
+	protected AbstractBuildParticipant fValidator;
+
+	@Override
+	protected void setUp() throws Exception
 	{
-		// Set enable parse errors preference
-		IEclipsePreferences store = EclipseUtil.instanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
-		store.putBoolean(getEnableParseErrorPrefKey(language), enabled);
+		super.setUp();
+		fValidator = createValidator();
 	}
 
-	protected List<IValidationItem> getParseErrors(String source, String language, IParseState ps) throws CoreException
+	@Override
+	protected void tearDown() throws Exception
+	{
+		fValidator = null;
+		super.tearDown();
+	}
+
+	protected abstract AbstractBuildParticipant createValidator();
+
+	protected List<IProblem> getParseErrors(String source, IParseState ps, String markerType) throws CoreException
 	{
 		TestProject project = new TestProject("Test", new String[] { "com.aptana.projects.webnature" });
-		IResource file = project.createFile("parseErrorTest", source);
+		IFile file = project.createFile("parseErrorTest." + getFileExtension(), source);
 
-		FileService fileService = new FileService(language, ps);
-		fileService.setDocument(new Document(source));
-		fileService.setResource(file);
-		fileService.parse(new NullProgressMonitor());
-		fileService.validate();
-
-		IValidationManager validationManager = fileService.getValidationManager();
-		List<IValidationItem> items = validationManager.getValidationItems();
+		BuildContext context = new BuildContext(file);
+		fValidator.buildFile(context, new NullProgressMonitor());
 
 		project.delete();
-		return items;
+
+		Map<String, Collection<IProblem>> problems = context.getProblems();
+		Collection<IProblem> daProblems = problems.get(markerType);
+		if (daProblems == null)
+		{
+			return Collections.emptyList();
+		}
+		return new ArrayList<IProblem>(daProblems);
 	}
 
-	protected String getEnableParseErrorPrefKey(String language)
+	protected void assertContains(List<IProblem> items, String message)
 	{
-		return language + ":" + IPreferenceConstants.PARSE_ERROR_ENABLED;
+		for (IProblem item : items)
+		{
+			if (message.equals(item.getMessage()))
+			{
+				return;
+			}
+		}
+		fail("Was unable to find an IProblem with message: " + message);
 	}
+
+	protected void assertDoesntContain(List<IProblem> items, String message)
+	{
+		for (IProblem item : items)
+		{
+			if (message.equals(item.getMessage()))
+			{
+				fail("Found unexepcted IProblem with message: " + message);
+			}
+		}
+	}
+
+	/**
+	 * "js", "css", "txt", "rb", etc.
+	 * 
+	 * @return
+	 */
+	protected abstract String getFileExtension();
 }

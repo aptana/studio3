@@ -8,17 +8,54 @@
 package com.aptana.editor.css.contentassist.model;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.mortbay.util.ajax.JSON.Output;
 
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.IndexUtil;
+import com.aptana.index.core.ui.views.IPropertyInformation;
 
-public class ElementElement extends BaseElement
+public class ElementElement extends BaseElement<ElementElement.Property>
 {
+	enum Property implements IPropertyInformation<ElementElement>
+	{
+		NAME(Messages.ElementElement_NameLabel)
+		{
+			public Object getPropertyValue(ElementElement node)
+			{
+				return node.getName();
+			}
+		};
+
+		private String header;
+		private String category;
+
+		private Property(String header) // $codepro.audit.disable unusedMethod
+		{
+			this.header = header;
+		}
+
+		private Property(String header, String category)
+		{
+			this.category = category;
+		}
+
+		public String getCategory()
+		{
+			return category;
+		}
+
+		public String getHeader()
+		{
+			return header;
+		}
+	}
+
 	private static final String PROPERTIES_PROPERTY = "properties"; //$NON-NLS-1$
 	private static final String REMARK_PROPERTY = "remark"; //$NON-NLS-1$
 	private static final String DISPLAY_NAME_PROPERTY = "displayName"; //$NON-NLS-1$
@@ -87,6 +124,12 @@ public class ElementElement extends BaseElement
 	public List<String> getProperties()
 	{
 		return CollectionsUtil.getListValue(this._properties);
+	}
+
+	@Override
+	protected Set<Property> getPropertyInfoSet()
+	{
+		return EnumSet.allOf(Property.class);
 	}
 
 	/**

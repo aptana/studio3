@@ -9,7 +9,6 @@ package com.aptana.editor.common.outline;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.swt.widgets.Display;
 
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
@@ -20,10 +19,7 @@ public class CommonOutlineContentProvider implements ITreeContentProvider
 {
 
 	protected static final Object[] EMPTY = ArrayUtil.NO_OBJECTS;
-	private IParseListener fListener;
 	protected IPathResolver resolver;
-
-	private boolean autoExpanded;
 
 	public CommonOutlineItem getOutlineItem(IParseNode node)
 	{
@@ -38,7 +34,7 @@ public class CommonOutlineContentProvider implements ITreeContentProvider
 	{
 		if (parentElement instanceof AbstractThemeableEditor)
 		{
-			IParseNode rootNode = ((AbstractThemeableEditor) parentElement).getFileService().getParseResult();
+			IParseNode rootNode = ((AbstractThemeableEditor) parentElement).getAST();
 			if (rootNode != null)
 			{
 				return filter(rootNode.getChildren());
@@ -87,50 +83,14 @@ public class CommonOutlineContentProvider implements ITreeContentProvider
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput)
 	{
 		boolean isCU = (newInput instanceof AbstractThemeableEditor);
-
-		if (isCU && fListener == null)
+		if (isCU)
 		{
 			final AbstractThemeableEditor editor = (AbstractThemeableEditor) newInput;
-			fListener = new ParseAdapter()
-			{
-				public void parseCompletedSuccessfully()
-				{
-					Display.getDefault().asyncExec(new Runnable()
-					{
-
-						public void run()
-						{
-							if (!editor.hasOutlinePageCreated())
-							{
-								return;
-							}
-
-							// FIXME What if the parse failed! We don't really want to wipe the existing results! This
-							// is just a hack!
-							IParseNode node = editor.getFileService().getParseResult();
-							if (node != null)
-							{
-								CommonOutlinePage page = editor.getOutlinePage();
-								page.refresh();
-								if (!autoExpanded)
-								{
-									page.expandToLevel(2);
-									autoExpanded = true;
-								}
-							}
-						}
-					});
-				}
-			};
-			editor.getFileService().addListener(fListener);
 			this.resolver = PathResolverProvider.getResolver(editor.getEditorInput());
 		}
-		else if (!isCU && fListener != null)
+		else
 		{
 			AbstractThemeableEditor editor = (AbstractThemeableEditor) oldInput;
-			editor.getFileService().removeListener(fListener);
-			autoExpanded = false;
-			fListener = null;
 			this.resolver = PathResolverProvider.getResolver(editor.getEditorInput());
 		}
 	}

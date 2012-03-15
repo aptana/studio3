@@ -7,127 +7,38 @@
  */
 package com.aptana.index.core;
 
-import java.io.File;
 import java.net.URI;
 import java.text.MessageFormat;
-import java.util.Set;
-import java.util.regex.Matcher;
 
-import org.eclipse.core.filesystem.EFS;
-import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExecutableExtension;
+import org.eclipse.core.runtime.InvalidRegistryObjectException;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.StringUtil;
 
-public abstract class AbstractFileIndexingParticipant implements IFileStoreIndexingParticipant
+public abstract class AbstractFileIndexingParticipant implements IFileStoreIndexingParticipant, IExecutableExtension
 {
 
-	private static final String EXTERNAL_URI = "uri"; //$NON-NLS-1$
+	private static final String ATTR_PRIORITY = "priority"; //$NON-NLS-1$
 
 	private int priority;
 
-	/**
-	 * addIndex
-	 * 
-	 * @param index
-	 * @param file
-	 * @param category
-	 * @param word
-	 */
-	protected void addIndex(Index index, IFileStore file, String category, String word)
+	protected void addIndex(Index index, URI uri, String category, String word)
 	{
-		index.addEntry(category, word, file.toURI());
+		index.addEntry(category, word, uri);
 	}
 
-	/**
-	 * createTask
-	 * 
-	 * @param store
-	 * @param message
-	 * @param priority
-	 * @param line
-	 * @param start
-	 * @param end
-	 */
-	protected void createTask(IFileStore store, String message, int priority, int line, int start, int end)
-	{
-		try
-		{
-			IResource resource = getResource(store);
-			IMarker marker = resource.createMarker(IMarker.TASK);
-			if (resource.equals(ResourcesPlugin.getWorkspace().getRoot()))
-			{
-				marker.setAttribute(EXTERNAL_URI, store.toURI().toString());
-			}
-			marker.setAttribute(IMarker.MESSAGE, message);
-			marker.setAttribute(IMarker.PRIORITY, priority);
-			marker.setAttribute(IMarker.LINE_NUMBER, line);
-			marker.setAttribute(IMarker.CHAR_START, start);
-			marker.setAttribute(IMarker.CHAR_END, end);
-		}
-		catch (CoreException e)
-		{
-			IdeLog.logError(IndexPlugin.getDefault(), e);
-		}
-	}
-
-	/**
-	 * If the underlying resource is a local file in the workspace, we try to grab the encoding. Otherwise return null,
-	 * so that we attempt to sniff the charset in IOUtil.read.
-	 * 
-	 * @param fileStore
-	 * @return
-	 */
-	protected String getCharset(IFileStore fileStore)
-	{
-		URI uri = fileStore.toURI();
-		if ("file".equals(uri.getScheme())) //$NON-NLS-1$
-		{
-			IFile theFile = ResourcesPlugin.getWorkspace().getRoot()
-					.getFileForLocation(Path.fromOSString(new File(uri).getAbsolutePath()));
-			if (theFile != null)
-			{
-				try
-				{
-					return theFile.getCharset();
-				}
-				catch (CoreException e)
-				{
-					IdeLog.logError(IndexPlugin.getDefault(), e);
-					// It's in the workspace, but we couldn't grab the encoding, fall back to workspace encoding.
-					return ResourcesPlugin.getEncoding();
-				}
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * Returns a display string for use when indexing files
-	 * 
-	 * @param index
-	 * @param file
-	 * @return
-	 */
-	protected String getIndexingMessage(Index index, IFileStore file)
+	protected String getIndexingMessage(Index index, URI uri)
 	{
 		String relativePath = null;
 		if (index != null)
 		{
-			relativePath = index.getRelativeDocumentPath(file.toURI()).toString();
+			relativePath = index.getRelativeDocumentPath(uri).toString();
 		}
 		else
 		{
-			relativePath = file.toURI().toString();
+			relativePath = uri.toString();
 		}
 
 		return MessageFormat.format("Indexing {0}", relativePath); //$NON-NLS-1$
@@ -142,155 +53,23 @@ public abstract class AbstractFileIndexingParticipant implements IFileStoreIndex
 		return priority;
 	}
 
-	/**
-	 * getResource
-	 * 
-	 * @param store
-	 * @return
-	 */
-	private IResource getResource(IFileStore store)
+	public void setInitializationData(IConfigurationElement config, String propertyName, Object data)
+			throws CoreException
 	{
-		URI uri = store.toURI();
-		if (uri.getScheme().equals(EFS.SCHEME_FILE))
-		{
-			File file = new File(uri);
-			IFile iFile = ResourcesPlugin.getWorkspace().getRoot()
-					.getFileForLocation(Path.fromOSString(file.getAbsolutePath()));
-			if (iFile != null)
-			{
-				return iFile;
-			}
-		}
-		return ResourcesPlugin.getWorkspace().getRoot();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.index.core.IFileStoreIndexingParticipant#index(java.util.Set, com.aptana.index.core.Index,
-	 * org.eclipse.core.runtime.IProgressMonitor)
-	 */
-	public void index(Set<IFileStore> files, Index index, IProgressMonitor monitor) throws CoreException
-	{
-		SubMonitor sub = SubMonitor.convert(monitor, files.size() * 100);
-
-		for (IFileStore file : files)
-		{
-			if (sub.isCanceled())
-			{
-				throw new CoreException(Status.CANCEL_STATUS);
-			}
-
-			Thread.yield(); // be nice to other threads, let them get in before each file...
-
-			// @formatter:off
-			String message = MessageFormat.format(
-				"Add file ''{0}'' to index ''{1}''", //$NON-NLS-1$
-				file,
-				index
-			);
-			// @formatter:on
-
-			IdeLog.logInfo(IndexPlugin.getDefault(), message, IDebugScopes.INDEXER);
-
-			indexFileStore(index, file, sub.newChild(100));
-		}
-
-		sub.done();
-	}
-
-	/**
-	 * indexFileStore
-	 * 
-	 * @param index
-	 * @param store
-	 * @param monitor
-	 */
-	protected abstract void indexFileStore(final Index index, IFileStore store, IProgressMonitor monitor);
-
-	/**
-	 * removeTasks
-	 * 
-	 * @param store
-	 * @param monitor
-	 */
-	protected void removeTasks(IFileStore store, IProgressMonitor monitor)
-	{
-		URI uri = store.toURI();
-		String uriString = uri.toString();
+		priority = DEFAULT_PRIORITY;
 
 		try
 		{
-			IResource resource = getResource(store);
-			if (resource.equals(ResourcesPlugin.getWorkspace().getRoot()))
-			{
-				// Iterate over markers on the root and remove any with matching "uri"
-				IMarker[] tasks = resource.findMarkers(IMarker.TASK, true, IResource.DEPTH_ZERO);
-				for (IMarker task : tasks)
-				{
-					if (task == null)
-					{
-						continue;
-					}
-					try
-					{
-						String markerURI = (String) task.getAttribute(EXTERNAL_URI);
-						if (markerURI == null)
-						{
-							continue;
-						}
-						if (markerURI.equals(uriString))
-						{
-							task.delete();
-						}
-					}
-					catch (CoreException e)
-					{
-						IdeLog.logError(IndexPlugin.getDefault(), e);
-					}
-				}
-			}
-			else
-			{
-				resource.deleteMarkers(IMarker.TASK, true, IResource.DEPTH_ZERO);
-			}
+			String priorityString = config.getAttribute(ATTR_PRIORITY);
+			priority = Integer.parseInt(priorityString);
 		}
-		catch (CoreException e)
+		catch (NumberFormatException e)
 		{
 			IdeLog.logError(IndexPlugin.getDefault(), e);
 		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.index.core.IFileStoreIndexingParticipant#setPriority(int)
-	 */
-	public void setPriority(int priority)
-	{
-		this.priority = priority;
-	}
-
-	protected int getLineNumber(int start, String source)
-	{
-		if (start < 0 || start >= source.length())
+		catch (InvalidRegistryObjectException e)
 		{
-			return -1;
+			IdeLog.logError(IndexPlugin.getDefault(), e);
 		}
-		if (start == 0)
-		{
-			return 1;
-		}
-
-		Matcher m = StringUtil.LINE_SPLITTER.matcher(source.substring(0, start));
-		int line = 1;
-		while (m.find())
-		{
-			int offset = m.start();
-			if (offset > start)
-			{
-				break;
-			}
-			line++;
-		}
-		return line;
 	}
 }

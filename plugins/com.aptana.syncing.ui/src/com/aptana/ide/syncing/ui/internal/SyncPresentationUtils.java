@@ -36,16 +36,20 @@ public final class SyncPresentationUtils
 	public static String getFileSize(Object element)
 	{
 		long rawSize = -1;
-		if (element instanceof IResource)
+		if (element instanceof IAdaptable)
 		{
-			rawSize = ((IResource) element).getLocation().toFile().length();
-		}
-		else if (element instanceof IAdaptable)
-		{
-			IFileInfo fileInfo = Utils.getDetailedFileInfo((IAdaptable) element);
-			if (fileInfo != null)
+			IResource resource = (IResource) ((IAdaptable) element).getAdapter(IResource.class);
+			if (resource != null)
 			{
-				rawSize = fileInfo.getLength();
+				rawSize = resource.getLocation().toFile().length();
+			}
+			else
+			{
+				IFileInfo fileInfo = Utils.getDetailedFileInfo((IAdaptable) element);
+				if (fileInfo != null)
+				{
+					rawSize = fileInfo.getLength();
+				}
 			}
 		}
 
@@ -109,16 +113,20 @@ public final class SyncPresentationUtils
 	public static String getLastModified(Object element)
 	{
 		long timestamp = -1;
-		if (element instanceof IResource)
+		if (element instanceof IAdaptable)
 		{
-			timestamp = ((IResource) element).getLocalTimeStamp();
-		}
-		else if (element instanceof IAdaptable)
-		{
-			IFileInfo fileInfo = Utils.getDetailedFileInfo((IAdaptable) element);
-			if (fileInfo != null)
+			IResource resource = (IResource) ((IAdaptable) element).getAdapter(IResource.class);
+			if (resource != null)
 			{
-				timestamp = fileInfo.getLastModified();
+				timestamp = resource.getLocalTimeStamp();
+			}
+			else
+			{
+				IFileInfo fileInfo = Utils.getDetailedFileInfo((IAdaptable) element);
+				if (fileInfo != null)
+				{
+					timestamp = fileInfo.getLastModified();
+				}
 			}
 		}
 		if (timestamp >= 0)

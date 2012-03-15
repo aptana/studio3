@@ -5,6 +5,7 @@
          point="org.eclipse.core.contenttype.contentTypes">
       <content-type
             base-type="org.eclipse.core.runtime.xml"
+            default-charset="UTF-8"
             file-extensions="svg"
             id="com.aptana.contenttype.svg"
             name="%content-type.svg.name"
@@ -35,6 +36,18 @@
       <initializer
             class="com.aptana.editor.svg.preferences.PreferenceInitializer">
       </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.compare.contentMergeViewers">
+      <contentTypeBinding
+            contentMergeViewerId="com.aptana.editor.svg.contentMergeViewer"
+            contentTypeId="com.aptana.contenttype.svg">
+      </contentTypeBinding>
+      <viewer
+            class="com.aptana.editor.svg.internal.SVGMergeViewerCreator"
+            extensions="svg"
+            id="com.aptana.editor.svg.contentMergeViewer">
+      </viewer>
    </extension>
 
 </plugin>

@@ -30,6 +30,7 @@ import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
+import com.aptana.index.core.IndexPlugin;
 
 public class JSMetadataIndexWriterTests extends TestCase
 {
@@ -40,9 +41,14 @@ public class JSMetadataIndexWriterTests extends TestCase
 	@Override
 	protected void tearDown() throws Exception
 	{
-		IndexManager.getInstance().removeIndex(URI.create(IJSIndexConstants.METADATA_INDEX_LOCATION));
+		getIndexManager().removeIndex(URI.create(IJSIndexConstants.METADATA_INDEX_LOCATION));
 
 		super.tearDown();
+	}
+
+	protected IndexManager getIndexManager()
+	{
+		return IndexPlugin.getDefault().getIndexManager();
 	}
 
 	/**
@@ -61,7 +67,7 @@ public class JSMetadataIndexWriterTests extends TestCase
 	 * @param typeName
 	 * @return
 	 */
-	private TypeElement getType(String typeName)
+	private List<TypeElement> getType(String typeName)
 	{
 		JSIndexReader reader = new JSIndexReader();
 
@@ -106,7 +112,7 @@ public class JSMetadataIndexWriterTests extends TestCase
 		assertNotNull(stream);
 
 		JSMetadataReader reader = new JSMetadataReader();
-		reader.loadXML(stream);
+		reader.loadXML(stream, resource);
 		JSIndexWriter writer = new JSIndexWriter();
 		Index index = this.getIndex();
 
@@ -127,7 +133,8 @@ public class JSMetadataIndexWriterTests extends TestCase
 
 		// transfer XML to index and grab our class of interest
 		this.writeMetadataResource("/metadata/typeOnly.xml");
-		TypeElement retrievedType = this.getType(typeName);
+		List<TypeElement> retrievedTypes = this.getType(typeName);
+		TypeElement retrievedType = retrievedTypes.get(0);
 
 		assertNotNull(retrievedType);
 		assertEquals(typeName, retrievedType.getName());
@@ -145,7 +152,8 @@ public class JSMetadataIndexWriterTests extends TestCase
 
 		// transfer XML to index and grab our class of interest
 		this.writeMetadataResource("/metadata/typeWithMethod.xml");
-		TypeElement retrievedType = this.getType(typeName);
+		List<TypeElement> retrievedTypes = this.getType(typeName);
+		TypeElement retrievedType = retrievedTypes.get(0);
 
 		assertNotNull(retrievedType);
 		assertEquals(typeName, retrievedType.getName());
@@ -176,7 +184,8 @@ public class JSMetadataIndexWriterTests extends TestCase
 
 		// transfer XML to index and grab our class of interest
 		this.writeMetadataResource("/metadata/typeWithProperty.xml");
-		TypeElement retrievedType = this.getType(typeName);
+		List<TypeElement> retrievedTypes = this.getType(typeName);
+		TypeElement retrievedType = retrievedTypes.get(0);
 
 		assertNotNull(retrievedType);
 		assertEquals(typeName, retrievedType.getName());
@@ -202,7 +211,8 @@ public class JSMetadataIndexWriterTests extends TestCase
 
 		// transfer XML to index and grab our class of interest
 		this.writeMetadataResource("/metadata/typeWithDescription.xml");
-		TypeElement retrievedType = this.getType(typeName);
+		List<TypeElement> retrievedTypes = this.getType(typeName);
+		TypeElement retrievedType = retrievedTypes.get(0);
 
 		assertNotNull(retrievedType);
 		assertEquals(typeName, retrievedType.getName());

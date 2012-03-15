@@ -48,7 +48,7 @@ public class BeaverEditor extends AbstractThemeableEditor
 	}
 
 	@Override
-	protected String getFileServiceContentTypeId()
+	public String getContentType()
 	{
 		return IBeaverConstants.CONTENT_TYPE_BEAVER;
 	}

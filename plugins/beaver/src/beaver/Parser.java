@@ -9,6 +9,7 @@
 package beaver;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Almost complete implementation of a LALR parser. Two components that it lacks to parse a concrete
@@ -110,6 +111,16 @@ public abstract class Parser
 			{
 				System.err.print('#');
 				System.err.println(token.id);
+			}
+		}
+		public void missingTokensInserted(List<Symbol> tokens)
+		{
+			if (tokens != null)
+			{
+				for (Symbol token : tokens)
+				{
+					missingTokenInserted(token);
+				}
 			}
 		}
 		public void misspelledTokenReplaced(Symbol token)

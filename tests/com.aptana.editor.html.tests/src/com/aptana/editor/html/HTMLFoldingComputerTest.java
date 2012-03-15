@@ -90,7 +90,7 @@ public class HTMLFoldingComputerTest extends TestCase
 			protected IParseNode getAST()
 			{
 				IParseState parseState = new HTMLParseState();
-				parseState.setEditState(getDocument().get(), null, 0, 0);
+				parseState.setEditState(getDocument().get());
 				try
 				{
 					return new HTMLParser().parse(parseState);

@@ -297,7 +297,7 @@ public class NewFileTemplateMenuContributor extends ContributionItem
 			extension = mapping.getExtension();
 			if (matcher != null)
 			{
-				IContentType type = matcher.findContentTypeFor("new_file." + extension);
+				IContentType type = matcher.findContentTypeFor("new_file." + extension); //$NON-NLS-1$
 				if (type != null)
 				{
 					String[] extensions = type.getFileSpecs(IContentType.FILE_EXTENSION_SPEC);

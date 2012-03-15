@@ -48,24 +48,18 @@
      */
     public synchronized IParseRootNode parse(IParseState parseState) throws java.lang.Exception
     {
-        JSONScanner scanner = new JSONScanner();
+       	JSONScanner scanner = new JSONScanner();
 
-        // grab source
-        char[] characters = parseState.getSource();
+		// send source to the scanner
+		scanner.setSource(parseState.getSource());
 
-        // make sure we have some source
-        String source = (characters != null) ? new String(characters) : "";
+		// parse
+		IParseRootNode result = (IParseRootNode) parse(scanner);
 
-        // send source to the scanner
-        scanner.setSource(source);
+		// save reference to result
+		parseState.setParseResult(result);
 
-        // parse
-        IParseRootNode result = (IParseRootNode) parse(scanner);
-
-        // save reference to result
-        parseState.setParseResult(result);
-
-        return result;
+		return result;
     }
 :};
 

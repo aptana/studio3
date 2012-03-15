@@ -19,5 +19,23 @@
             name="%connectionPointType.sftp.name">
       </connectionPointType>
    </extension>
+   <extension
+         point="org.eclipse.core.filesystem.filesystems">
+      <filesystem
+            scheme="sftp">
+         <run
+               class="com.aptana.filesystem.secureftp.SFTPFileSystem">
+         </run>
+      </filesystem>
+   </extension>
+   <extension
+         point="org.eclipse.core.filesystem.filesystems">
+      <filesystem
+            scheme="ftps">
+         <run
+               class="com.aptana.filesystem.secureftp.FTPSFileSystem">
+         </run>
+      </filesystem>
+   </extension>
 
 </plugin>

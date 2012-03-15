@@ -72,7 +72,7 @@
                   
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn="com.aptana.webserver.core.AbstractWebServerConfiguration:"/>
+                  <meta.attribute kind="java" basedOn=":com.aptana.webserver.core.IServer"/>
                </appinfo>
             </annotation>
          </attribute>

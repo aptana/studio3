@@ -8,36 +8,42 @@
 // $codepro.audit.disable declaredExceptions
 // $codepro.audit.disable com.instantiations.assist.eclipse.analysis.audit.rule.effectivejava.enforceTheSingletonPropertyWithAPrivateConstructor
 // $codepro.audit.disable staticFieldNamingConvention
-
 package com.aptana.webserver.ui;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 /**
  * The activator class controls the plug-in life cycle
  */
-public class WebServerUIPlugin extends AbstractUIPlugin {
+public class WebServerUIPlugin extends AbstractUIPlugin
+{
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "com.aptana.webserver.ui"; //$NON-NLS-1$
 
+	// Generic server icon
+	public static final String SERVER_ICON = "icons/obj16/server.png"; //$NON-NLS-1$
+
 	// The shared instance
 	private static WebServerUIPlugin plugin;
-	
+
 	/**
 	 * The constructor
 	 */
-	public WebServerUIPlugin() {
+	public WebServerUIPlugin()
+	{
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
 	 */
-	public void start(BundleContext context) throws Exception {
+	public void start(BundleContext context) throws Exception
+	{
 		super.start(context);
 		plugin = this;
 	}
@@ -46,34 +52,36 @@ public class WebServerUIPlugin extends AbstractUIPlugin {
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
-	public void stop(BundleContext context) throws Exception {
+	public void stop(BundleContext context) throws Exception
+	{
 		plugin = null;
 		super.stop(context);
 	}
 
 	/**
 	 * Returns the shared instance
-	 *
+	 * 
 	 * @return the shared instance
 	 */
-	public static WebServerUIPlugin getDefault() {
+	public static WebServerUIPlugin getDefault()
+	{
 		return plugin;
 	}
 
-	public static void log(Throwable e) {
-		log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, e.getLocalizedMessage(), e));
+	@Override
+	protected void initializeImageRegistry(ImageRegistry reg)
+	{
+		reg.put(SERVER_ICON, imageDescriptorFromPlugin(PLUGIN_ID, SERVER_ICON));
 	}
 
-	public static void log(String msg) {
-		log(new Status(IStatus.INFO, PLUGIN_ID, IStatus.OK, msg, null));
+	public static Image getImage(String iconPath)
+	{
+		ImageDescriptor desc = getDefault().getImageRegistry().getDescriptor(iconPath);
+		if (desc == null)
+		{
+			desc = imageDescriptorFromPlugin(PLUGIN_ID, iconPath);
+			getDefault().getImageRegistry().put(iconPath, desc);
+		}
+		return desc.createImage();
 	}
-
-	public static void log(String msg, Throwable e) {
-		log(new Status(IStatus.INFO, PLUGIN_ID, IStatus.OK, msg, e));
-	}
-
-	public static void log(IStatus status) {
-		getDefault().getLog().log(status);
-	}
-
 }

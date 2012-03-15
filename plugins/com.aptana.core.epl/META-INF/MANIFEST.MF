@@ -10,6 +10,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ecf.filetransfer
 Export-Package: com.aptana.core.epl,
  com.aptana.core.epl.downloader,
+ com.aptana.core.epl.util,
  com.aptana.filewatcher.poller.epl
 Bundle-ActivationPolicy: lazy
 Eclipse-LazyStart: true

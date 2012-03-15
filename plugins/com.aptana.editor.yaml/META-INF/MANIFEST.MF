@@ -16,7 +16,8 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.parsing,
  org.jruby;bundle-version="1.6.0",
  com.aptana.ui;bundle-version="3.0.0",
- com.aptana.editor.common
+ com.aptana.editor.common,
+ org.eclipse.compare
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin

@@ -10,11 +10,13 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.expressions,
  org.eclipse.ui,
  org.eclipse.jface.text,
+ org.eclipse.ui.editors,
  org.eclipse.ui.ide,
  com.aptana.core;bundle-version="3.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: com.aptana.editor.common.contentassist,
+ com.aptana.editor.common.hover,
  com.aptana.editor.common.text.rules,
  com.aptana.ui.dialogs,
  com.aptana.ui.epl,

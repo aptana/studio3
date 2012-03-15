@@ -32,6 +32,7 @@ import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.preferences.IPreferenceConstants;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
+import com.aptana.index.core.IndexPlugin;
 import com.aptana.ui.util.UIUtils;
 
 public class JSMetadataLoader extends MetadataLoader<JSMetadataReader>
@@ -178,7 +179,7 @@ public class JSMetadataLoader extends MetadataLoader<JSMetadataReader>
 	protected void writeIndex(JSMetadataReader reader)
 	{
 		// remove old index
-		IndexManager.getInstance().removeIndex(URI.create(IJSIndexConstants.METADATA_INDEX_LOCATION));
+		getIndexManager().removeIndex(URI.create(IJSIndexConstants.METADATA_INDEX_LOCATION));
 
 		JSIndexWriter indexer = new JSIndexWriter();
 
@@ -200,6 +201,11 @@ public class JSMetadataLoader extends MetadataLoader<JSMetadataReader>
 		{
 			IdeLog.logError(JSPlugin.getDefault(), e);
 		}
+	}
+
+	protected IndexManager getIndexManager()
+	{
+		return IndexPlugin.getDefault().getIndexManager();
 	}
 
 	@Override

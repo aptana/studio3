@@ -7,6 +7,8 @@
  */
 package com.aptana.editor.js;
 
+import java.util.Map;
+
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -14,7 +16,7 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.SimpleSourceViewerConfiguration;
-import com.aptana.editor.common.text.RubyRegexpAutoIndentStrategy;
+import com.aptana.editor.js.text.JSAutoIndentStrategy;
 
 public class JSSourceViewerConfiguration extends SimpleSourceViewerConfiguration
 {
@@ -43,8 +45,24 @@ public class JSSourceViewerConfiguration extends SimpleSourceViewerConfiguration
 	@Override
 	public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType)
 	{
-		return new IAutoEditStrategy[] { new RubyRegexpAutoIndentStrategy(contentType, this, sourceViewer, JSPlugin
+		return new IAutoEditStrategy[] { new JSAutoIndentStrategy(contentType, this, sourceViewer, JSPlugin
 				.getDefault().getPreferenceStore()) };
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.editor.common.CommonSourceViewerConfiguration#getHyperlinkDetectorTargets(org.eclipse.jface.text.source
+	 * .ISourceViewer)
+	 */
+	@Override
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	protected Map getHyperlinkDetectorTargets(ISourceViewer sourceViewer)
+	{
+		Map targets = super.getHyperlinkDetectorTargets(sourceViewer);
+
+		targets.put("com.aptana.editor.js.sourceCode", getEditor()); //$NON-NLS-1$
+
+		return targets;
+	}
 }

@@ -81,7 +81,7 @@ public class CoffeeEditor extends AbstractThemeableEditor
 	}
 
 	@Override
-	protected String getFileServiceContentTypeId()
+	public String getContentType()
 	{
 		return ICoffeeConstants.CONTENT_TYPE_COFFEE;
 	}

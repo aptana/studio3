@@ -129,7 +129,7 @@ public abstract class MetadataLoader<T extends MetadataReader> extends Job
 				{
 					stream = url.openStream();
 
-					reader.loadXML(stream);
+					reader.loadXML(stream, url.toString());
 				}
 				catch (Throwable t)
 				{

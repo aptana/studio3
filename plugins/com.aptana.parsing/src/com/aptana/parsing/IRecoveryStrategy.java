@@ -9,6 +9,7 @@ package com.aptana.parsing;
 
 import java.io.IOException;
 
+import beaver.Parser;
 import beaver.Parser.TokenStream;
 import beaver.Symbol;
 
@@ -25,7 +26,10 @@ public interface IRecoveryStrategy
 	 *            The current token where the error occurred
 	 * @param in
 	 *            The token stream used by the parser
+	 * @param events
+	 *            The error logger associated with parser
 	 * @return
 	 */
-	boolean recover(IParser parser, Symbol lastToken, Symbol currentToken, TokenStream in) throws IOException;
+	boolean recover(IParser parser, Symbol lastToken, Symbol currentToken, TokenStream in, Parser.Events events)
+			throws IOException;
 }

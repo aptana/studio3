@@ -341,7 +341,7 @@ public class CommandElement extends AbstractBundleElement
 		{
 			if (this._invokeUnionMap == null)
 			{
-				this._invokeUnionMap = new HashMap<Platform, InvokeUnion>();
+				this._invokeUnionMap = new HashMap<Platform, InvokeUnion>(1);
 			}
 
 			this._invokeUnionMap.put(bindingOS, invokeUnion);
@@ -939,7 +939,7 @@ public class CommandElement extends AbstractBundleElement
 		{
 			if (this._keyBindings == null)
 			{
-				this._keyBindings = new HashMap<Platform, List<String>>();
+				this._keyBindings = new HashMap<Platform, List<String>>(1);
 			}
 
 			// Force each string to be uppercase, http://aptana.lighthouseapp.com/projects/45260/tickets/393

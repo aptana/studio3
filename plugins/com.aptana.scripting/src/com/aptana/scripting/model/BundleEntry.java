@@ -150,6 +150,8 @@ public class BundleEntry
 		private ChildVisibilityContext<SmartTypingPairsElement> pairs;
 		private ChildVisibilityContext<ProjectTemplateElement> projectTemplates;
 		private ChildVisibilityContext<ProjectSampleElement> projectSamples;
+		private ChildVisibilityContext<SnippetElement> snippets;
+		private ChildVisibilityContext<SnippetCategoryElement> snippetCategories;
 		private ChildVisibilityContext<BuildPathElement> buildPaths;
 
 		/**
@@ -245,6 +247,28 @@ public class BundleEntry
 				};
 			}
 
+			if (elementClass == null || elementClass == SnippetElement.class)
+			{
+				snippets = new ChildVisibilityContext<SnippetElement>()
+				{
+					public List<SnippetElement> getElements()
+					{
+						return getSnippets();
+					}
+				};
+			}
+
+			if (elementClass == null || elementClass == SnippetCategoryElement.class)
+			{
+				snippetCategories = new ChildVisibilityContext<SnippetCategoryElement>()
+				{
+					public List<SnippetCategoryElement> getElements()
+					{
+						return getSnippetCategories();
+					}
+				};
+			}
+
 			if (elementClass == null || elementClass == BuildPathElement.class)
 			{
 				buildPaths = new ChildVisibilityContext<BuildPathElement>()
@@ -319,6 +343,8 @@ public class BundleEntry
 			this.fireElementVisibilityEvents(pairs);
 			this.fireElementVisibilityEvents(projectTemplates);
 			this.fireElementVisibilityEvents(projectSamples);
+			this.fireElementVisibilityEvents(snippets);
+			this.fireElementVisibilityEvents(snippetCategories);
 			this.fireElementVisibilityEvents(buildPaths);
 		}
 
@@ -363,6 +389,8 @@ public class BundleEntry
 			this.updateElementContext(pairs);
 			this.updateElementContext(projectTemplates);
 			this.updateElementContext(projectSamples);
+			this.updateElementContext(snippets);
+			this.updateElementContext(snippetCategories);
 			this.updateElementContext(buildPaths);
 		}
 
@@ -854,6 +882,42 @@ public class BundleEntry
 			protected List<ProjectSampleElement> getElements(BundleElement bundle)
 			{
 				return bundle.getProjectSamples();
+			}
+		};
+
+		this.processBundles(processor);
+
+		return processor.getResult();
+	}
+
+	/**
+	 * @return the list of snippets contributed
+	 */
+	public List<SnippetElement> getSnippets()
+	{
+		NameBasedProcessor<SnippetElement> processor = new NameBasedProcessor<SnippetElement>()
+		{
+			protected List<SnippetElement> getElements(BundleElement bundle)
+			{
+				return bundle.getSnippets();
+			}
+		};
+
+		this.processBundles(processor);
+
+		return processor.getResult();
+	}
+
+	/**
+	 * @return the list of categories contributed
+	 */
+	public List<SnippetCategoryElement> getSnippetCategories()
+	{
+		NameBasedProcessor<SnippetCategoryElement> processor = new NameBasedProcessor<SnippetCategoryElement>()
+		{
+			protected List<SnippetCategoryElement> getElements(BundleElement bundle)
+			{
+				return bundle.getSnippetCategories();
 			}
 		};
 

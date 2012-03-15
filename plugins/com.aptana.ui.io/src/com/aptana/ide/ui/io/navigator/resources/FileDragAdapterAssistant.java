@@ -65,7 +65,7 @@ public class FileDragAdapterAssistant extends ResourceDragAdapterAssistant
 				{
 					try
 					{
-						file = fileStore.toLocalFile(EFS.NONE, null);
+						file = fileStore.toLocalFile(EFS.CACHE, null);
 						if (file != null)
 						{
 							filenames.add(file.getAbsolutePath());

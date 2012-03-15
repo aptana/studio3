@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.eclipse.core.runtime.Assert;
@@ -33,6 +34,7 @@ import org.eclipse.core.runtime.Status;
 import com.aptana.core.epl.IMemento;
 import com.aptana.core.epl.XMLMemento;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.StringUtil;
@@ -44,7 +46,6 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
  */
 /* package */final class ConnectionPointManager extends PlatformObject implements IConnectionPointManager
 {
-
 	/* package */static final String STATE_FILENAME = "connections"; //$NON-NLS-1$
 
 	private static final String EXTENSION_POINT_ID = "connectionPoint"; //$NON-NLS-1$
@@ -63,6 +64,18 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
 	private static final String ELEMENT_CONNECTION = "connection"; //$NON-NLS-1$
 	private static final String ATTR_ID = "id"; //$NON-NLS-1$
 	private static final String ATTR_TYPE = "type"; //$NON-NLS-1$
+
+	private static final String COM_APTANA_IDE_IO_FTPS_FTPS_VIRTUAL_FILE_MANAGER = "com.aptana.ide.io.ftps.FtpsVirtualFileManager"; //$NON-NLS-1$
+	private static final String COM_APTANA_IDE_IO_SFTP_SFTP_VIRTUAL_FILE_MANAGER = "com.aptana.ide.io.sftp.SftpVirtualFileManager"; //$NON-NLS-1$
+	private static final String COM_APTANA_IDE_IO_FTP_FTP_VIRTUAL_FILE_MANAGER = "com.aptana.ide.io.ftp.FtpVirtualFileManager"; //$NON-NLS-1$
+	private static final String COM_APTANA_IDE_CORE_UI_IO_FILE_PROJECT_FILE_MANAGER = "com.aptana.ide.core.ui.io.file.ProjectFileManager"; //$NON-NLS-1$
+	private static final String COM_APTANA_IDE_CORE_UI_IO_FILE_LOCAL_FILE_MANAGER = "com.aptana.ide.core.ui.io.file.LocalFileManager"; //$NON-NLS-1$
+
+	private static final String TYPE_FTPS = "ftps"; //$NON-NLS-1$
+	private static final String TYPE_SFTP = "sftp"; //$NON-NLS-1$
+	private static final String TYPE_FTP = "ftp"; //$NON-NLS-1$
+	private static final String TYPE_WORKSPACE = "workspace"; //$NON-NLS-1$
+	private static final String TYPE_LOCAL = "local"; //$NON-NLS-1$
 
 	private static ConnectionPointManager instance;
 
@@ -175,6 +188,18 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
 
 	public List<IConnectionPoint> addConnectionsFrom(IPath path)
 	{
+		List<IConnectionPoint> newConnections = readConnectionsFrom(path);
+
+		for (IConnectionPoint point : newConnections)
+		{
+			connections.add((ConnectionPoint) point);
+		}
+
+		return newConnections;
+	}
+
+	public List<IConnectionPoint> readConnectionsFrom(IPath path)
+	{
 		List<IConnectionPoint> newConnections = new ArrayList<IConnectionPoint>();
 		File file = path.toFile();
 		if (file.exists())
@@ -189,7 +214,6 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
 					ConnectionPoint connectionPoint = restoreConnectionPoint(child, null);
 					if (connectionPoint != null)
 					{
-						connections.add(connectionPoint);
 						newConnections.add(connectionPoint);
 					}
 					else
@@ -436,20 +460,25 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
 	{
 		ConnectionPoint connectionPoint = null;
 		String typeId = null;
-		if (type.equals("com.aptana.ide.core.ui.io.file.LocalFileManager")) { //$NON-NLS-1$
-			typeId = "local"; //$NON-NLS-1$
+		if (type.equals(COM_APTANA_IDE_CORE_UI_IO_FILE_LOCAL_FILE_MANAGER))
+		{
+			typeId = TYPE_LOCAL;
 		}
-		else if (type.equals("com.aptana.ide.core.ui.io.file.ProjectFileManager")) { //$NON-NLS-1$
-			typeId = "workspace"; //$NON-NLS-1$
+		else if (type.equals(COM_APTANA_IDE_CORE_UI_IO_FILE_PROJECT_FILE_MANAGER))
+		{
+			typeId = TYPE_WORKSPACE;
 		}
-		else if (type.equals("com.aptana.ide.io.ftp.FtpVirtualFileManager")) { //$NON-NLS-1$
-			typeId = "ftp"; //$NON-NLS-1$
+		else if (type.equals(COM_APTANA_IDE_IO_FTP_FTP_VIRTUAL_FILE_MANAGER))
+		{
+			typeId = TYPE_FTP;
 		}
-		else if (type.equals("com.aptana.ide.io.sftp.SftpVirtualFileManager")) { //$NON-NLS-1$
-			typeId = "sftp"; //$NON-NLS-1$
+		else if (type.equals(COM_APTANA_IDE_IO_SFTP_SFTP_VIRTUAL_FILE_MANAGER))
+		{
+			typeId = TYPE_SFTP;
 		}
-		else if (type.equals("com.aptana.ide.io.ftps.FtpsVirtualFileManager")) { //$NON-NLS-1$
-			typeId = "ftps"; //$NON-NLS-1$
+		else if (type.equals(COM_APTANA_IDE_IO_FTPS_FTPS_VIRTUAL_FILE_MANAGER))
+		{
+			typeId = TYPE_FTPS;
 		}
 		if (typeId != null)
 		{
@@ -533,7 +562,12 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
 					{
 						readElement(element);
 					}
-				}, TAG_CONNECTION_POINT_CATEGORY, TAG_CONNECTION_POINT_TYPE);
+
+					public Set<String> getSupportElementNames()
+					{
+						return CollectionsUtil.newInOrderSet(TAG_CONNECTION_POINT_CATEGORY, TAG_CONNECTION_POINT_TYPE);
+	}
+				});
 	}
 
 	private void readElement(IConfigurationElement element)

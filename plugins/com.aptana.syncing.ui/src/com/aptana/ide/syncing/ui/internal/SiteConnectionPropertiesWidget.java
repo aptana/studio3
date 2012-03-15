@@ -61,7 +61,7 @@ import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.core.DefaultSiteConnection;
 import com.aptana.ide.syncing.core.ISiteConnection;
-import com.aptana.ide.syncing.core.SyncingPlugin;
+import com.aptana.ide.syncing.core.SiteConnectionUtils;
 import com.aptana.ui.IPropertyDialog;
 import com.aptana.ui.ftp.internal.FTPPropertyDialogProvider;
 
@@ -223,18 +223,10 @@ public class SiteConnectionPropertiesWidget extends Composite implements ModifyL
 			{
 				message = MessageFormat.format(Messages.SiteConnectionPropertiesWidget_ERR_DuplicateNames, name);
 			}
-			else
+			else if ((siteConnection == null || !name.equalsIgnoreCase(siteConnection.getName()))
+					&& !SiteConnectionUtils.isSiteNameUnique(name))
 			{
-				ISiteConnection[] connections = SyncingPlugin.getSiteConnectionManager().getSiteConnections();
-				for (ISiteConnection connection : connections)
-				{
-					if (connection != siteConnection && name.equals(connection.getName()))
-					{
-						message = MessageFormat
-								.format(Messages.SiteConnectionPropertiesWidget_ERR_DuplicateNames, name);
-						break;
-					}
-				}
+				message = MessageFormat.format(Messages.SiteConnectionPropertiesWidget_ERR_DuplicateNames, name);
 			}
 			if (message == null)
 			{
@@ -436,7 +428,7 @@ public class SiteConnectionPropertiesWidget extends Composite implements ModifyL
 			remotesViewer.getControl().setLayoutData(
 					GridDataFactory.swtDefaults().exclude(!showRemote).align(SWT.FILL, SWT.CENTER).span(2, 1)
 							.grab(true, false).create());
-			remotesViewer.setContentProvider(new ArrayContentProvider());
+			remotesViewer.setContentProvider(ArrayContentProvider.getInstance());
 			remotesViewer.addSelectionChangedListener(this);
 			updateRemotesViewer();
 
@@ -456,7 +448,7 @@ public class SiteConnectionPropertiesWidget extends Composite implements ModifyL
 			projectViewer = new ComboViewer(mainComp, SWT.DROP_DOWN | SWT.READ_ONLY);
 			projectViewer.getControl().setLayoutData(
 					GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).span(3, 1).grab(true, false).create());
-			projectViewer.setContentProvider(new ArrayContentProvider());
+			projectViewer.setContentProvider(ArrayContentProvider.getInstance());
 			if (projects.length == 0)
 			{
 				projectViewer.setLabelProvider(new LabelProvider());

@@ -16,7 +16,6 @@ import junit.framework.TestCase;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.source.ISourceViewer;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.ide.IDE;
@@ -24,6 +23,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.scripting.commands.TextEditorUtils;
+import com.aptana.editor.epl.tests.EditorTestHelper;
 import com.aptana.ui.util.UIUtils;
 
 @SuppressWarnings({ "nls" })
@@ -46,18 +46,7 @@ public class CoffeescriptScopesTest extends TestCase
 		{
 			if (editor != null)
 			{
-				if (editor != null)
-				{
-					if (Display.getCurrent() != null)
-					{
-						editor.getSite().getPage().closeEditor(editor, false);
-					}
-					else
-					{
-						editor.close(false);
-					}
-				}
-				editor = null;
+				EditorTestHelper.closeEditor(editor);
 			}
 			if (file != null)
 			{
@@ -65,12 +54,12 @@ public class CoffeescriptScopesTest extends TestCase
 				{
 					file.deleteOnExit();
 				}
-				file = null;
 			}
 		}
 		finally
 		{
-
+			this.file = null;
+			this.editor = null;
 			super.tearDown();
 		}
 	}

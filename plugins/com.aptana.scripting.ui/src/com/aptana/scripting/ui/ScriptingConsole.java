@@ -63,21 +63,15 @@ public class ScriptingConsole
 	{
 		if (console == null)
 		{
-			// NOTE: We use this odd logic with the getters to cover a case that
-			// occurs when a console stream gets wrapped in a RubyIO object for
-			// scripting purposes. When the RubyIO object gets GC'ed, the stream
-			// is closed. When we get a stream, we detect if it is closed and
-			// create a new one, transfer the old color and font settings, and
-			// update the stream color map for later themeing
-			
 			// create our scripting console so the getters can create streams
 			// from it
-			console = new MessageConsole(Messages.ScriptingConsole_SCRIPTING_CONSOLE_NAME, ScriptingUIPlugin.getImageDescriptor(CONSOLE_ICON_PATH));
+			console = new MessageConsole(Messages.ScriptingConsole_SCRIPTING_CONSOLE_NAME,
+					ScriptingUIPlugin.getImageDescriptor(CONSOLE_ICON_PATH));
 
 			// create the message stream color map so the getters can populate
 			// it
 			streamColorMap = new HashMap<MessageConsoleStream, String>();
-			
+
 			// make sure message streams exist so we can apply themes to them.
 			getOutputConsoleStream();
 			getErrorConsoleStream();
@@ -111,6 +105,12 @@ public class ScriptingConsole
 	 */
 	MessageConsoleStream getConsoleStream(final MessageConsoleStream currentStream, String colorKey)
 	{
+		// NOTE: We use this odd logic with the getters to cover a case that
+		// occurs when a console stream gets wrapped in a RubyIO object for
+		// scripting purposes. When the RubyIO object gets GC'ed, the stream
+		// is closed. When we get a stream, we detect if it is closed and
+		// create a new one, transfer the old color and font settings, and
+		// update the stream color map for later themeing
 		if (currentStream == null || currentStream.isClosed())
 		{
 			// remove obsolete reference
@@ -128,7 +128,8 @@ public class ScriptingConsole
 			// transfer current font and color settings, if possible
 			if (currentStream != null)
 			{
-				Display.getDefault().asyncExec(new Runnable() {
+				Display.getDefault().asyncExec(new Runnable()
+				{
 
 					public void run()
 					{

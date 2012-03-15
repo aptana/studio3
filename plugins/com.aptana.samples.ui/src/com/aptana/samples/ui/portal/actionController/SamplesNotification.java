@@ -65,10 +65,9 @@ public class SamplesNotification extends AbstractBrowserNotification
 	 */
 	protected void notifyAdd(SamplesReference sample)
 	{
+		IdeLog.logInfo(SamplesUIPlugin.getDefault(), "Sample added. Notifying portal...", IDebugScopes.START_PAGE); //$NON-NLS-1$
 		notifyTargets(IBrowserNotificationConstants.EVENT_ID_SAMPLES, IBrowserNotificationConstants.EVENT_TYPE_ADDED,
 				createSampleInfo(sample), true);
-		IdeLog.logInfo(SamplesUIPlugin.getDefault(),
-				"Sample added. Fired Samples notification.", IDebugScopes.START_PAGE); //$NON-NLS-1$
 	}
 
 	/**
@@ -78,10 +77,9 @@ public class SamplesNotification extends AbstractBrowserNotification
 	 */
 	protected void notifyRemoved(SamplesReference sample)
 	{
+		IdeLog.logInfo(SamplesUIPlugin.getDefault(), "Sample removed. Notifying portal...", IDebugScopes.START_PAGE); //$NON-NLS-1$
 		notifyTargets(IBrowserNotificationConstants.EVENT_ID_SAMPLES, IBrowserNotificationConstants.EVENT_TYPE_DELETED,
 				createSampleInfo(sample), true);
-		IdeLog.logInfo(SamplesUIPlugin.getDefault(),
-				"Sample removed. Fired Samples notification.", IDebugScopes.START_PAGE); //$NON-NLS-1$
 	}
 
 	/**

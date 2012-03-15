@@ -80,7 +80,7 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 			"thead", "time", "title", "tr", "tt", "ul", "var", "header", "nav", "section", "article", "footer",
 			"aside", "audio", "video", "canvas", "hgroup" };
 
-	private static final String[] FUNCTIONS = { "rgba", "rgb", "url", "attr", "counters", "counter" };
+	private static final String[] FUNCTIONS = { "rgba", "rgb", "url", "attr", "counters", "counter", "linear-gradient" };
 
 	private static final String[] PROPERTY_NAMES = { "alignment-adjust", "alignment-baseline", "azimuth",
 			"background-attachment", "background-clip", "background-color", "background-image", "background-origin",

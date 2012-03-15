@@ -40,6 +40,7 @@ public class Messages extends NLS
 	public static String LocalConnectionPropertyDialog_NewShortcut;
 	public static String LocalConnectionPropertyDialog_ShortcutName;
 	public static String LocalConnectionPropertyDialog_SpecifyShortcutName;
+	public static String LocalConnectionPropertyDialog_DuplicateShortcutName;
 	public static String WorkspaceConnectionPropertyDialog_CreateText;
 	public static String WorkspaceConnectionPropertyDialog_CreateTitle;
 	public static String WorkspaceConnectionPropertyDialog_EditText;

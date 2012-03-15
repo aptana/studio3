@@ -35,9 +35,7 @@ import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.UIJob;
@@ -46,9 +44,12 @@ import com.aptana.core.CoreStrings;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.js.debug.core.ILaunchConfigurationConstants;
+import com.aptana.js.debug.core.JSLaunchConfigurationDelegate;
+import com.aptana.js.debug.core.JSLaunchConfigurationDelegate.Listener;
 import com.aptana.js.debug.core.JSLaunchConfigurationHelper;
 import com.aptana.js.debug.ui.JSDebugUIPlugin;
 import com.aptana.ui.PopupSchedulingRule;
+import com.aptana.ui.util.UIUtils;
 import com.aptana.ui.util.WorkbenchBrowserUtil;
 
 /**
@@ -61,6 +62,15 @@ public final class LaunchConfigurationsHelper {
 	}
 
 	public static void doCheckDefaultLaunchConfigurations() {
+		JSLaunchConfigurationDelegate.setCheckFirefoxLocationListener(new Listener()
+		{
+
+			public String checkFirefoxLocation()
+			{
+				return showBrowserNotFoundDialog(true);
+			}
+		});
+
 		UIJob job = new UIJob("Checking default launch configuration") { //$NON-NLS-1$
 
 			@Override
@@ -200,6 +210,17 @@ public final class LaunchConfigurationsHelper {
 			for (ILaunchConfiguration config : configs) {
 				if (nature.equals(config.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_BROWSER_NATURE,
 						StringUtil.EMPTY))) {
+					if (JSLaunchConfigurationHelper.FIREFOX.equals(nature))
+					{
+						String browserExecutable = config.getAttribute(
+								ILaunchConfigurationConstants.CONFIGURATION_BROWSER_EXECUTABLE, StringUtil.EMPTY);
+						if (StringUtil.isEmpty(browserExecutable))
+						{
+							ILaunchConfigurationWorkingCopy wc = config.getWorkingCopy();
+							JSLaunchConfigurationHelper.setBrowserDefaults(wc, nature);
+							wc.doSave();
+						}
+					}
 					return config;
 				}
 			}
@@ -208,30 +229,6 @@ public final class LaunchConfigurationsHelper {
 					.getLaunchManager().generateUniqueLaunchConfigurationNameFrom(nature + " - Internal Server")); //$NON-NLS-1$
 			JSLaunchConfigurationHelper.setDefaults(wc, nature);
 
-			boolean showDownload = true;
-			while (!JSLaunchConfigurationHelper.isBrowserDebugCompatible(wc.getAttribute(
-					ILaunchConfigurationConstants.CONFIGURATION_BROWSER_EXECUTABLE, StringUtil.EMPTY))) {
-				String browserPath = null;
-				if (nature.equals(JSLaunchConfigurationHelper.FIREFOX)) {
-					IPreferenceStore store = JSDebugUIPlugin.getDefault().getPreferenceStore();
-					String pref = store
-							.getString(com.aptana.js.debug.ui.internal.IJSDebugUIConstants.PREF_SKIP_FIREFOX_CHECK);
-					if (pref == null || !pref.equals(MessageDialogWithToggle.ALWAYS)) {
-						browserPath = showBrowserNotFoundDialog(showDownload);
-					}
-				}
-
-				if (browserPath == null) {
-					wc.delete();
-					return null;
-				}
-				if (browserPath.length() == 0) {
-					JSLaunchConfigurationHelper.setBrowserDefaults(wc, nature);
-				} else {
-					wc.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_BROWSER_EXECUTABLE, browserPath);
-				}
-				showDownload = false;
-			}
 			return wc.doSave();
 		} catch (CoreException e) {
 			IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
@@ -244,24 +241,15 @@ public final class LaunchConfigurationsHelper {
 		return manager.getLaunchConfigurationType(ILaunchConfigurationConstants.ID_JS_APPLICATION);
 	}
 
-	private String showBrowserNotFoundDialog(final boolean download) {
+	public static String showBrowserNotFoundDialog(final boolean download) {
 		final String[] path = new String[] { null };
-		PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
+		UIUtils.getDisplay().syncExec(new Runnable() {
 			public void run() {
-
-				if (Display.getCurrent().getActiveShell() == null) { // another
-																		// message
-																		// box
-																		// is
-																		// shown
-					return;
-				}
-				MessageDialogWithToggle md = new MessageDialogWithToggle(PlatformUI.getWorkbench()
-						.getActiveWorkbenchWindow().getShell(), Messages.Startup_Notification, null,
-						Messages.Startup_StudioRequiresFirefox, MessageDialog.INFORMATION, new String[] {
-								IDialogConstants.PROCEED_LABEL, StringUtil.ellipsify(CoreStrings.BROWSE),
-								download ? Messages.Startup_Download : Messages.Startup_CheckAgain }, 0,
-						Messages.Startup_DontAskAgain, false);
+				MessageDialogWithToggle md = new MessageDialogWithToggle(UIUtils.getActiveShell(),
+						Messages.Startup_Notification, null, Messages.Startup_StudioRequiresFirefox,
+						MessageDialog.INFORMATION, new String[] { StringUtil.ellipsify(CoreStrings.BROWSE),
+								download ? Messages.Startup_Download : Messages.Startup_CheckAgain,
+								IDialogConstants.CANCEL_LABEL }, 0, Messages.Startup_DontAskAgain, false);
 				md.setPrefKey(com.aptana.js.debug.ui.internal.IJSDebugUIConstants.PREF_SKIP_FIREFOX_CHECK);
 				md.setPrefStore(JSDebugUIPlugin.getDefault().getPreferenceStore());
 

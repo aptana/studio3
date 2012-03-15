@@ -22,24 +22,24 @@ import com.aptana.core.CorePlugin;
 import com.aptana.core.resources.IUniformResource;
 import com.aptana.core.resources.IUniformResourceMarker;
 
-
 /**
  * @author Max Stepanov
- *
  */
-@SuppressWarnings({"restriction", "rawtypes"})
-public class UniformResourceMarker extends PlatformObject implements IUniformResourceMarker {
+@SuppressWarnings({ "restriction", "rawtypes" })
+public class UniformResourceMarker extends PlatformObject implements IUniformResourceMarker
+{
 
 	private IUniformResource resource;
 	private long id;
-	
+
 	/**
 	 * UniformResourceMarker
 	 * 
-	 * @param resource 
-	 * @param id 
+	 * @param resource
+	 * @param id
 	 */
-	public UniformResourceMarker( IUniformResource resource, long id ) {
+	public UniformResourceMarker(IUniformResource resource, long id)
+	{
 		super();
 		this.resource = resource;
 		this.id = id;
@@ -48,21 +48,24 @@ public class UniformResourceMarker extends PlatformObject implements IUniformRes
 	/**
 	 * @see org.eclipse.core.resources.IMarker#delete()
 	 */
-	public void delete() throws CoreException {
+	public void delete() throws CoreException
+	{
 		getMarkerManager().removeMarker(resource, id);
 	}
 
 	/**
 	 * @see org.eclipse.core.resources.IMarker#exists()
 	 */
-	public boolean exists() {
+	public boolean exists()
+	{
 		return getInfo() != null;
 	}
 
 	/**
 	 * @see org.eclipse.core.resources.IMarker#getAttribute(java.lang.String)
 	 */
-	public Object getAttribute(String attributeName) throws CoreException {
+	public Object getAttribute(String attributeName) throws CoreException
+	{
 		MarkerInfo info = getInfo();
 		checkInfo(info);
 		return info.getAttribute(attributeName);
@@ -71,13 +74,16 @@ public class UniformResourceMarker extends PlatformObject implements IUniformRes
 	/**
 	 * @see org.eclipse.core.resources.IMarker#getAttribute(java.lang.String, int)
 	 */
-	public int getAttribute(String attributeName, int defaultValue) {
+	public int getAttribute(String attributeName, int defaultValue)
+	{
 		MarkerInfo info = getInfo();
-		if (info == null) {
+		if (info == null)
+		{
 			return defaultValue;
 		}
 		Object value = info.getAttribute(attributeName);
-		if (value instanceof Integer) {
+		if (value instanceof Integer)
+		{
 			return ((Integer) value).intValue();
 		}
 		return defaultValue;
@@ -86,13 +92,16 @@ public class UniformResourceMarker extends PlatformObject implements IUniformRes
 	/**
 	 * @see org.eclipse.core.resources.IMarker#getAttribute(java.lang.String, java.lang.String)
 	 */
-	public String getAttribute(String attributeName, String defaultValue) {
+	public String getAttribute(String attributeName, String defaultValue)
+	{
 		MarkerInfo info = getInfo();
-		if (info == null) {
+		if (info == null)
+		{
 			return defaultValue;
 		}
 		Object value = info.getAttribute(attributeName);
-		if (value instanceof String) {
+		if (value instanceof String)
+		{
 			return (String) value;
 		}
 		return defaultValue;
@@ -101,13 +110,16 @@ public class UniformResourceMarker extends PlatformObject implements IUniformRes
 	/**
 	 * @see org.eclipse.core.resources.IMarker#getAttribute(java.lang.String, boolean)
 	 */
-	public boolean getAttribute(String attributeName, boolean defaultValue) {
+	public boolean getAttribute(String attributeName, boolean defaultValue)
+	{
 		MarkerInfo info = getInfo();
-		if (info == null) {
+		if (info == null)
+		{
 			return defaultValue;
 		}
 		Object value = info.getAttribute(attributeName);
-		if (value instanceof Boolean) {
+		if (value instanceof Boolean)
+		{
 			return ((Boolean) value).booleanValue();
 		}
 		return defaultValue;
@@ -116,7 +128,9 @@ public class UniformResourceMarker extends PlatformObject implements IUniformRes
 	/**
 	 * @see org.eclipse.core.resources.IMarker#getAttributes()
 	 */
-	public Map getAttributes() throws CoreException {
+	@SuppressWarnings("unchecked")
+	public Map getAttributes() throws CoreException
+	{
 		MarkerInfo info = getInfo();
 		checkInfo(info);
 		return info.getAttributes();
@@ -125,7 +139,8 @@ public class UniformResourceMarker extends PlatformObject implements IUniformRes
 	/**
 	 * @see org.eclipse.core.resources.IMarker#getAttributes(java.lang.String[])
 	 */
-	public Object[] getAttributes(String[] attributeNames) throws CoreException {
+	public Object[] getAttributes(String[] attributeNames) throws CoreException
+	{
 		MarkerInfo info = getInfo();
 		checkInfo(info);
 		return info.getAttributes(attributeNames);
@@ -134,7 +149,8 @@ public class UniformResourceMarker extends PlatformObject implements IUniformRes
 	/**
 	 * @see org.eclipse.core.resources.IMarker#getCreationTime()
 	 */
-	public long getCreationTime() throws CoreException {
+	public long getCreationTime() throws CoreException
+	{
 		MarkerInfo info = getInfo();
 		checkInfo(info);
 		return info.getCreationTime();
@@ -143,28 +159,32 @@ public class UniformResourceMarker extends PlatformObject implements IUniformRes
 	/**
 	 * @see org.eclipse.core.resources.IMarker#getId()
 	 */
-	public long getId() {
+	public long getId()
+	{
 		return id;
 	}
 
 	/**
 	 * @see org.eclipse.core.resources.IMarker#getResource()
 	 */
-	public IResource getResource() {
+	public IResource getResource()
+	{
 		return ResourcesPlugin.getWorkspace().getRoot();
 	}
 
 	/**
 	 * @see com.aptana.ide.core.resources.IUniformResourceMarker#getUniformResource()
 	 */
-	public IUniformResource getUniformResource() {
+	public IUniformResource getUniformResource()
+	{
 		return resource;
 	}
 
 	/**
 	 * @see org.eclipse.core.resources.IMarker#getType()
 	 */
-	public String getType() throws CoreException {
+	public String getType() throws CoreException
+	{
 		MarkerInfo info = getInfo();
 		checkInfo(info);
 		return info.getType();
@@ -173,97 +193,111 @@ public class UniformResourceMarker extends PlatformObject implements IUniformRes
 	/**
 	 * @see org.eclipse.core.resources.IMarker#isSubtypeOf(java.lang.String)
 	 */
-	public boolean isSubtypeOf(String superType) throws CoreException {
+	public boolean isSubtypeOf(String superType) throws CoreException
+	{
 		return getMarkerManager().isSubtype(getType(), superType);
 	}
 
 	/**
 	 * @see org.eclipse.core.resources.IMarker#setAttribute(java.lang.String, int)
 	 */
-	public void setAttribute(String attributeName, int value) throws CoreException {
+	public void setAttribute(String attributeName, int value) throws CoreException
+	{
 		setAttribute(attributeName, Integer.valueOf(value));
 	}
 
 	/**
 	 * @see org.eclipse.core.resources.IMarker#setAttribute(java.lang.String, java.lang.Object)
 	 */
-	public void setAttribute(String attributeName, Object value) throws CoreException {
+	public void setAttribute(String attributeName, Object value) throws CoreException
+	{
 		MarkerInfo info = getInfo();
 		checkInfo(info);
 		boolean validate = getMarkerManager().isPersistent(info);
 		info.setAttribute(attributeName, value, validate);
-		IMarkerSetElement[] changes = new IMarkerSetElement[] { new MarkerDelta(IResourceDelta.CHANGED,resource,info) };
+		IMarkerSetElement[] changes = new IMarkerSetElement[] { new MarkerDelta(IResourceDelta.CHANGED, resource, info) };
 		getMarkerManager().changedMarkers(resource, changes);
 	}
 
 	/**
 	 * @see org.eclipse.core.resources.IMarker#setAttribute(java.lang.String, boolean)
 	 */
-	public void setAttribute(String attributeName, boolean value) throws CoreException {
+	public void setAttribute(String attributeName, boolean value) throws CoreException
+	{
 		setAttribute(attributeName, value ? Boolean.TRUE : Boolean.FALSE);
 	}
 
 	/**
 	 * @see org.eclipse.core.resources.IMarker#setAttributes(java.lang.String[], java.lang.Object[])
 	 */
-	public void setAttributes(String[] attributeNames, Object[] values) throws CoreException {
+	public void setAttributes(String[] attributeNames, Object[] values) throws CoreException
+	{
 		MarkerInfo info = getInfo();
 		checkInfo(info);
 		boolean validate = getMarkerManager().isPersistent(info);
 		info.setAttributes(attributeNames, values, validate);
-		IMarkerSetElement[] changes = new IMarkerSetElement[] { new MarkerDelta(IResourceDelta.CHANGED,resource,info) };
+		IMarkerSetElement[] changes = new IMarkerSetElement[] { new MarkerDelta(IResourceDelta.CHANGED, resource, info) };
 		getMarkerManager().changedMarkers(resource, changes);
 	}
 
 	/**
 	 * @see org.eclipse.core.resources.IMarker#setAttributes(java.util.Map)
 	 */
-	public void setAttributes(Map attributes) throws CoreException {
+	@SuppressWarnings("unchecked")
+	public void setAttributes(Map attributes) throws CoreException
+	{
 		MarkerInfo info = getInfo();
 		checkInfo(info);
 		boolean validate = getMarkerManager().isPersistent(info);
 		info.setAttributes(attributes, validate);
-		IMarkerSetElement[] changes = new IMarkerSetElement[] { new MarkerDelta(IResourceDelta.CHANGED,resource,info) };
+		IMarkerSetElement[] changes = new IMarkerSetElement[] { new MarkerDelta(IResourceDelta.CHANGED, resource, info) };
 		getMarkerManager().changedMarkers(resource, changes);
 	}
 
 	/**
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
-	public boolean equals(Object obj) {
-		if ( !(obj instanceof UniformResourceMarker) ) {
+	public boolean equals(Object obj)
+	{
+		if (!(obj instanceof UniformResourceMarker))
+		{
 			return false;
 		}
-		return (resource.equals(((UniformResourceMarker)obj).resource) && id == ((UniformResourceMarker)obj).id);
+		return (resource.equals(((UniformResourceMarker) obj).resource) && id == ((UniformResourceMarker) obj).id);
 	}
 
 	/**
 	 * @see java.lang.Object#hashCode()
 	 */
-	public int hashCode() {
-		return (int)id + resource.hashCode();
+	public int hashCode()
+	{
+		return (int) id + resource.hashCode();
 	}
-	
+
 	/**
 	 * getInfo
-	 *
+	 * 
 	 * @return MarkerInfo
 	 */
-	protected MarkerInfo getInfo() {
-		return getMarkerManager().findMarkerInfo(resource,id);
+	protected MarkerInfo getInfo()
+	{
+		return getMarkerManager().findMarkerInfo(resource, id);
 	}
-	
-	private static MarkerManager getMarkerManager() {
+
+	private static MarkerManager getMarkerManager()
+	{
 		return MarkerManager.getInstance();
 	}
 
 	/**
-	 * Checks the given marker info to ensure that it is not null.
-	 * Throws an exception if it is.
+	 * Checks the given marker info to ensure that it is not null. Throws an exception if it is.
 	 */
-	private void checkInfo(MarkerInfo info) throws CoreException {
-		if (info == null) {
-			throw new CoreException( new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID,IStatus.OK,Messages.UniformResourceMarker_UniformResourceMarketInfoNull,null));
+	private void checkInfo(MarkerInfo info) throws CoreException
+	{
+		if (info == null)
+		{
+			throw new CoreException(new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, IStatus.OK,
+					Messages.UniformResourceMarker_UniformResourceMarketInfoNull, null));
 		}
 	}
 }

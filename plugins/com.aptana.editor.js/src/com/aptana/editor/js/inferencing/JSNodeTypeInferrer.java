@@ -14,6 +14,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
@@ -44,6 +45,7 @@ import com.aptana.editor.js.parsing.ast.JSReturnNode;
 import com.aptana.editor.js.parsing.ast.JSStringNode;
 import com.aptana.editor.js.parsing.ast.JSTreeWalker;
 import com.aptana.editor.js.parsing.ast.JSTrueNode;
+import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import com.aptana.editor.js.sdoc.model.DocumentationBlock;
 import com.aptana.editor.js.sdoc.model.ParamTag;
 import com.aptana.editor.js.sdoc.model.Tag;
@@ -375,7 +377,19 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	@Override
 	public void visit(JSBinaryBooleanOperatorNode node)
 	{
-		this.addType(JSTypeConstants.BOOLEAN_TYPE);
+		JSTokenType token = JSTokenType.get((String) node.getOperator().value);
+
+		switch (token)
+		{
+			case AMPERSAND_AMPERSAND:
+			case PIPE_PIPE:
+				this.addTypes(node.getLeftHandSide());
+				this.addTypes(node.getRightHandSide());
+				break;
+
+			default:
+				this.addType(JSTypeConstants.BOOLEAN_TYPE);
+		}
 	}
 
 	/*
@@ -427,14 +441,17 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 
 			for (String typeName : returnTypes)
 			{
-				PropertyElement property = this._queryHelper.getTypeMember(this._index, typeName,
+				List<PropertyElement> properties = this._queryHelper.getTypeMembers(this._index, typeName,
 						JSTypeConstants.PROTOTYPE_PROPERTY);
 
-				if (property != null)
+				if (properties != null)
 				{
-					for (String propertyType : property.getTypeNames())
+					for (PropertyElement property : properties)
 					{
-						this.addType(propertyType);
+						for (String propertyType : property.getTypeNames())
+						{
+							this.addType(propertyType);
+						}
 					}
 				}
 			}
@@ -558,21 +575,24 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 				}
 
 				// lookup up rhs name in type and add that value's type here
-				PropertyElement property = this._queryHelper.getTypeMember(this._index, typeName, memberName);
+				List<PropertyElement> properties = this._queryHelper.getTypeMembers(this._index, typeName, memberName);
 
-				if (property != null)
+				if (properties != null)
 				{
-					if (property instanceof FunctionElement)
+					for (PropertyElement property : properties)
 					{
-						FunctionElement function = (FunctionElement) property;
-
-						this.addType(function.getSignature());
-					}
-					else
-					{
-						for (ReturnTypeElement typeElement : property.getTypes())
+						if (property instanceof FunctionElement)
 						{
-							this.addType(typeElement.getType());
+							FunctionElement function = (FunctionElement) property;
+
+							this.addType(function.getSignature());
+						}
+						else
+						{
+							for (ReturnTypeElement typeElement : property.getTypes())
+							{
+								this.addType(typeElement.getType());
+							}
 						}
 					}
 				}
@@ -603,7 +623,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	public void visit(JSIdentifierNode node)
 	{
 		String name = node.getText();
-		PropertyElement property = null;
+		List<PropertyElement> properties = null;
 
 		if (this._scope != null && this._scope.hasSymbol(name))
 		{
@@ -618,35 +638,44 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 			}
 			else
 			{
-				property = this._queryHelper.getGlobal(this._index, name);
+				properties = this._queryHelper.getGlobals(this._index, name);
 
-				if (property == null)
+				if (CollectionsUtil.isEmpty(properties))
 				{
 					JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(this._scope, this._index,
 							this._location);
 
-					property = symbolInferrer.getSymbolPropertyElement(name);
+					PropertyElement property = symbolInferrer.getSymbolPropertyElement(name);
+
+					if (property != null)
+					{
+						properties = new ArrayList<PropertyElement>();
+						properties.add(property);
+					}
 				}
 			}
 		}
 		else
 		{
-			property = this._queryHelper.getGlobal(this._index, name);
+			properties = this._queryHelper.getGlobals(this._index, name);
 		}
 
-		if (property != null)
+		if (properties != null)
 		{
-			if (property instanceof FunctionElement)
+			for (PropertyElement property : properties)
 			{
-				FunctionElement function = (FunctionElement) property;
-
-				this.addType(function.getSignature());
-			}
-			else
-			{
-				for (ReturnTypeElement typeElement : property.getTypes())
+				if (property instanceof FunctionElement)
 				{
-					this.addType(typeElement.getType());
+					FunctionElement function = (FunctionElement) property;
+
+					this.addType(function.getSignature());
+				}
+				else
+				{
+					for (ReturnTypeElement typeElement : property.getTypes())
+					{
+						this.addType(typeElement.getType());
+					}
 				}
 			}
 		}
@@ -665,6 +694,35 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		{
 			List<String> types = this.getTypes(child);
 
+			// NOTE: This is a special case for functions used as a RHS of assignments or as part of a property chain.
+			// If the invocation returns undefined, we change that to Object.
+			// TODO: As a refinement, we want to check that the function being called is not defined in the current
+			// scope
+			if (types.isEmpty())
+			{
+				IParseNode parent = node.getParent();
+
+				if (parent != null)
+				{
+					switch (parent.getNodeType())
+					{
+						case IJSNodeTypes.ASSIGN:
+							if (node.getIndex() == 1)
+							{
+								this.addType(JSTypeConstants.OBJECT_TYPE);
+							}
+							break;
+
+						case IJSNodeTypes.GET_PROPERTY:
+							this.addType(JSTypeConstants.OBJECT_TYPE);
+							break;
+
+						default:
+							break;
+					}
+				}
+			}
+
 			for (String typeName : types)
 			{
 				int index = typeName.indexOf(':');
@@ -677,6 +735,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 					}
 				}
 			}
+
 		}
 	}
 

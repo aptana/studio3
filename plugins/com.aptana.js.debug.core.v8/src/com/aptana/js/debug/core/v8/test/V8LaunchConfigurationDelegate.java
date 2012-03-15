@@ -34,6 +34,7 @@ import com.aptana.js.debug.core.v8.V8DebugPlugin;
  * @author Max Stepanov
  *
  */
+@SuppressWarnings("nls")
 public class V8LaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 
 	/* (non-Javadoc)
@@ -47,7 +48,6 @@ public class V8LaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 		try {
 			Process process = pb.start();
 			DebugPlugin.newProcess(launch, process, "V8 Process");
-			JSDebugTarget debugTarget = null;
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
@@ -55,7 +55,7 @@ public class V8LaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 			AppURIMapper uriMapper = new AppURIMapper(ResourcesPlugin.getWorkspace().getRoot().getProject("v8test"), Path.fromPortableString("Resources"));
 			DebugConnection controller = V8DebugConnection.createConnection(debugHost, new ProtocolLogger("v8testdebugger", V8DebugPlugin.PLUGIN_ID));
 			IProcess debugProcess = new JSDebugProcess(launch, process, false, "V8 Debug Process", null);
-			debugTarget = new JSDebugTarget(launch, "V8 Debugger", debugProcess, uriMapper, controller, true);
+			new JSDebugTarget(launch, "V8 Debugger", debugProcess, uriMapper, controller, true);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

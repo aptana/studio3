@@ -63,7 +63,7 @@ public class GeneralProfileVersioner implements IProfileVersioner
 						((IScriptFormatterFactory) extension).updateProfile(profile);
 					}
 				}
-				// Update the current profile with the new version
+				// Update the current profile with the new version.
 				customProfile.setVersion(CURRENT_VERSION);
 			}
 

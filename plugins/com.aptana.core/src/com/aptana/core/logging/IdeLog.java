@@ -37,7 +37,7 @@ public final class IdeLog
 
 	public static enum StatusLevel
 	{
-		OFF, ERROR, WARNING, INFO
+		ERROR, WARNING, INFO, OFF
 	};
 
 	/**
@@ -67,7 +67,6 @@ public final class IdeLog
 	 */
 	private IdeLog()
 	{
-
 	}
 
 	/**
@@ -177,6 +176,17 @@ public final class IdeLog
 	public static boolean isInfoEnabled(Plugin plugin, String scope)
 	{
 		return isOutputEnabled(plugin, StatusLevel.INFO, scope);
+	}
+
+	/**
+	 * Are we currently outputting items of TRACE severity and this scope? Use this method if you want to check before
+	 * actually composing a message.
+	 * 
+	 * @return
+	 */
+	public static boolean isTraceEnabled(Plugin plugin, String scope)
+	{
+		return isSeverityEnabled(StatusLevel.INFO) && Platform.inDebugMode() && isScopeEnabled(scope);
 	}
 
 	/**
@@ -291,7 +301,7 @@ public final class IdeLog
 	 */
 	public static void logError(Plugin plugin, String message, Throwable th, String scope)
 	{
-		if (isOutputEnabled(plugin, StatusLevel.ERROR, scope))
+		if (isErrorEnabled(plugin, scope))
 		{
 			log(plugin, IStatus.ERROR, message, scope, th);
 		}
@@ -344,7 +354,7 @@ public final class IdeLog
 	 */
 	public static void logWarning(Plugin plugin, String message, Throwable th, String scope)
 	{
-		if (isOutputEnabled(plugin, StatusLevel.WARNING, scope))
+		if (isWarningEnabled(plugin, scope))
 		{
 			log(plugin, IStatus.WARNING, message, scope, th);
 		}
@@ -385,7 +395,59 @@ public final class IdeLog
 	 */
 	public static void logInfo(Plugin plugin, String message, Throwable th, String scope)
 	{
-		if (isOutputEnabled(plugin, StatusLevel.INFO, scope))
+		if (isInfoEnabled(plugin, scope))
+		{
+			log(plugin, IStatus.INFO, message, scope, th);
+		}
+		else
+		{
+			logTrace(plugin, IStatus.INFO, message, scope, th);
+		}
+	}
+
+	/**
+	 * Logs a trace message.
+	 * 
+	 * @param plugin
+	 *            the plugin that generated this message
+	 * @param message
+	 *            the message to log
+	 */
+	public static void logTrace(Plugin plugin, String message)
+	{
+		logTrace(plugin, message, null);
+	}
+
+	/**
+	 * Logs an trace message with a specific scope.
+	 * 
+	 * @param plugin
+	 *            the plugin that generated this message
+	 * @param message
+	 *            the message to log
+	 * @param scope
+	 *            the scope on when the message should be logged
+	 */
+	public static void logTrace(Plugin plugin, String message, String scope)
+	{
+		logTrace(plugin, message, null, scope);
+	}
+
+	/**
+	 * Logs a trace message with a possible exception and specific scope.
+	 * 
+	 * @param plugin
+	 *            the plugin that generated this message
+	 * @param message
+	 *            the message to log
+	 * @param th
+	 *            the exception, or null if there isn't one
+	 * @param scope
+	 *            the scope on when the message should be logged
+	 */
+	public static void logTrace(Plugin plugin, String message, Throwable th, String scope)
+	{
+		if (isTraceEnabled(plugin, scope))
 		{
 			log(plugin, IStatus.INFO, message, scope, th);
 		}
@@ -435,7 +497,6 @@ public final class IdeLog
 				System.err.println(traceMessage); // CHECKSTYLE:ON
 			}
 		}
-
 	}
 
 	/**
@@ -458,7 +519,6 @@ public final class IdeLog
 	 */
 	public static void log(Plugin plugin, IStatus status, String scope)
 	{
-
 		Throwable th = status.getException();
 		if (plugin == null)
 		{
@@ -511,7 +571,6 @@ public final class IdeLog
 				th.printStackTrace(); // CHECKSTYLE:ON
 			}
 		}
-
 	}
 
 	/**

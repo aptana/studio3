@@ -7,6 +7,7 @@ import junit.framework.TestSuite;
 import com.aptana.editor.coffee.CoffeeCodeScannerTest;
 import com.aptana.editor.coffee.CoffeeDoubleClickStrategyTest;
 import com.aptana.editor.coffee.CoffeeSourcePartitionScannerTest;
+import com.aptana.editor.coffee.internal.build.CoffeeTaskDetectorTest;
 import com.aptana.editor.coffee.internal.index.CoffeeFileIndexingParticipantTest;
 import com.aptana.editor.coffee.internal.text.CoffeeFoldingComputerTest;
 import com.aptana.editor.coffee.outline.CoffeeOutlineProviderTest;
@@ -26,6 +27,7 @@ public class AllTests extends TestCase
 		suite.addTestSuite(CoffeeFoldingComputerTest.class);
 		suite.addTestSuite(CoffeeDoubleClickStrategyTest.class);
 		suite.addTestSuite(CoffeeFileIndexingParticipantTest.class);
+		suite.addTestSuite(CoffeeTaskDetectorTest.class);
 		suite.addTestSuite(CoffeeCodeScannerTest.class);
 		suite.addTestSuite(CoffeeOutlineProviderTest.class);
 		suite.addTestSuite(CoffeeSourcePartitionScannerTest.class);

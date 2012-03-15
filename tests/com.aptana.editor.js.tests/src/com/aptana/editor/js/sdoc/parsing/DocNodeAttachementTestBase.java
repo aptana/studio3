@@ -108,7 +108,7 @@ public class DocNodeAttachementTestBase extends TestCase
 		IPath path = Path.fromPortableString(resource);
 		String source = getContent(getFileStore(path));
 
-		parseState.setEditState(source, null, 0, 0);
+		parseState.setEditState(source);
 		try
 		{
 			parser.parse(parseState);

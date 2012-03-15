@@ -48,6 +48,7 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.ConnectionContext;
 import com.aptana.ide.core.io.ConnectionPointType;
+import com.aptana.ide.core.io.ConnectionPointUtils;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
 import com.aptana.ide.core.io.IConnectionPoint;
@@ -334,9 +335,15 @@ public class S3ConnectionPropertyComposite extends Composite implements IOptions
 	public boolean isValid()
 	{
 		String message = null;
-		if (nameText.getText().length() == 0)
+		String name = nameText.getText().trim();
+		if (name.length() == 0)
 		{
 			message = Messages.S3ConnectionPointPropertyDialog_ERR_NameEmpty;
+		}
+		else if ((originalS3ConnectionPoint == null || !name.equalsIgnoreCase(originalS3ConnectionPoint.getName()))
+				&& !ConnectionPointUtils.isConnectionPointNameUnique(name))
+		{
+			message = MessageFormat.format(Messages.S3ConnectionPointPropertyDialog_ERR_NameExists, name);
 		}
 		else if (!HOST_PATTERN.matcher(hostText.getText()).matches())
 		{

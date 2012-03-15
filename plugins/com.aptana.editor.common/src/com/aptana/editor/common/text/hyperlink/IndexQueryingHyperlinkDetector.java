@@ -19,6 +19,7 @@ import org.eclipse.ui.IURIEditorInput;
 
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
+import com.aptana.index.core.IndexPlugin;
 
 public abstract class IndexQueryingHyperlinkDetector extends AbstractHyperlinkDetector
 {
@@ -33,9 +34,14 @@ public abstract class IndexQueryingHyperlinkDetector extends AbstractHyperlinkDe
 		{
 			IFile file = ((IFileEditorInput) input).getFile();
 			IProject project = file.getProject();
-			return IndexManager.getInstance().getIndex(project.getLocationURI());
+			return getIndexManager().getIndex(project.getLocationURI());
 		}
 		return null;
+	}
+
+	protected IndexManager getIndexManager()
+	{
+		return IndexPlugin.getDefault().getIndexManager();
 	}
 
 	protected URI getURI()

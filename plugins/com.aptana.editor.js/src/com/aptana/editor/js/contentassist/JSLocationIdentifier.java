@@ -63,7 +63,8 @@ import com.aptana.parsing.lexer.Range;
 
 public class JSLocationIdentifier extends JSTreeWalker
 {
-	private static final EnumSet<LocationType> IGNORED_TYPES = EnumSet.of(LocationType.UNKNOWN, LocationType.NONE); // $codepro.audit.disable declareAsInterface
+	private static final EnumSet<LocationType> IGNORED_TYPES = EnumSet.of(LocationType.UNKNOWN, LocationType.NONE); // $codepro.audit.disable
+																													// declareAsInterface
 
 	private int _offset;
 	private IParseNode _targetNode;
@@ -402,7 +403,7 @@ public class JSLocationIdentifier extends JSTreeWalker
 			}
 			else if (this._offset <= identifier.getEndingOffset())
 			{
-				this.setType(LocationType.IN_VARIABLE_NAME);
+				this.setType(identifier);
 			}
 			else if (this._offset <= arguments.getStartingOffset())
 			{
@@ -462,7 +463,10 @@ public class JSLocationIdentifier extends JSTreeWalker
 
 				if (this._offset < equalSign.getStart())
 				{
-					this.setType(LocationType.NONE);
+					if (node.getIdentifier().contains(_offset))
+					{
+						this.setType(LocationType.IN_VARIABLE_DECLARATION);
+					}
 				}
 				else if (this._offset < value.getStartingOffset())
 				{
@@ -475,7 +479,14 @@ public class JSLocationIdentifier extends JSTreeWalker
 			}
 			else
 			{
-				this.setType(LocationType.NONE);
+				if (node.getIdentifier().contains(_offset))
+				{
+					this.setType(LocationType.IN_VARIABLE_DECLARATION);
+				}
+				else
+				{
+					this.setType(LocationType.NONE);
+				}
 			}
 		}
 	}
@@ -622,7 +633,7 @@ public class JSLocationIdentifier extends JSTreeWalker
 			{
 				this.setType(LocationType.NONE);
 			}
-			else if (initializer.contains(this._offset) && this._offset != initializer.getEndingOffset())
+			else if (initializer.contains(this._offset))
 			{
 				this.setType(initializer);
 			}
@@ -786,7 +797,14 @@ public class JSLocationIdentifier extends JSTreeWalker
 			}
 			else
 			{
-				this.setType(LocationType.IN_PROPERTY_NAME);
+				if (lhs instanceof JSThisNode)
+				{
+					this.setType(LocationType.IN_THIS);
+				}
+				else
+				{
+					this.setType(LocationType.IN_PROPERTY_NAME);
+				}
 			}
 		}
 	}
@@ -867,6 +885,10 @@ public class JSLocationIdentifier extends JSTreeWalker
 				this.setType(LocationType.NONE);
 			}
 			else if (trueBlock.contains(this._offset) && this._offset != trueBlock.getEndingOffset())
+			{
+				this.setType(trueBlock);
+			}
+			else if (trueBlock.getEndingOffset() == this._offset && falseBlock.isEmpty())
 			{
 				this.setType(trueBlock);
 			}

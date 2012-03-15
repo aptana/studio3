@@ -10,12 +10,14 @@ package com.aptana.preview.internal;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.preview.IPreviewHandler;
@@ -55,7 +57,12 @@ public final class PreviewHandlers {
 					public void processElement(IConfigurationElement element) {
 						readElement(element);
 					}
-				}, TAG_HANDLER);
+
+					public Set<String> getSupportElementNames()
+					{
+						return CollectionsUtil.newSet(TAG_HANDLER);
+					}
+				});
 	}
 
 	private void readElement(IConfigurationElement element) {

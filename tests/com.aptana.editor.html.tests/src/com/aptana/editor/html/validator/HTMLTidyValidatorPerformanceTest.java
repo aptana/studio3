@@ -8,41 +8,71 @@
 package com.aptana.editor.html.validator;
 
 import java.io.File;
-import java.io.InputStream;
-import java.net.URI;
+import java.net.URL;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.test.performance.PerformanceTestCase;
 
-import com.aptana.core.util.IOUtil;
-import com.aptana.editor.common.parsing.FileService;
-import com.aptana.editor.common.validator.ValidationManager;
-import com.aptana.editor.html.IHTMLConstants;
-import com.aptana.editor.html.parsing.HTMLParseState;
+import com.aptana.core.util.ResourceUtil;
+import com.aptana.editor.html.HTMLPlugin;
+import com.aptana.index.core.FileStoreBuildContext;
+import com.aptana.index.core.build.BuildContext;
 
 public class HTMLTidyValidatorPerformanceTest extends PerformanceTestCase
 {
 
+	private HTMLTidyValidator validator;
+
+	@Override
+	protected void setUp() throws Exception
+	{
+		super.setUp();
+
+		validator = new HTMLTidyValidator()
+		{
+
+			@Override
+			protected String getPreferenceNode()
+			{
+				return HTMLPlugin.PLUGIN_ID;
+			}
+
+			@Override
+			public String getId()
+			{
+				return ID;
+			}
+		};
+	}
+
+	@Override
+	protected void tearDown() throws Exception
+	{
+		validator = null;
+		super.tearDown();
+	}
+
 	public void testValidate() throws Exception
 	{
-		HTMLTidyValidator validator = new HTMLTidyValidator();
 		// read in the file
-		InputStream stream = FileLocator.openStream(Platform.getBundle("com.aptana.editor.html.tests"),
-				Path.fromPortableString("performance/amazon.html"), false);
-		String src = IOUtil.read(stream);
-
-		FileService fileService = new FileService(IHTMLConstants.CONTENT_TYPE_HTML, new HTMLParseState());
-		ValidationManager manager = (ValidationManager) fileService.getValidationManager();
-		File fakeFile = File.createTempFile("amazon", ".html");
-		URI path = fakeFile.toURI();
+		URL url = FileLocator.find(Platform.getBundle("com.aptana.editor.html.tests"),
+				Path.fromPortableString("performance/amazon.html"), null);
+		File file = ResourceUtil.resourcePathToFile(url);
+		IFileStore fileStore = EFS.getStore(file.toURI());
 
 		// Ok now actually validate the thing, the real work
 		for (int i = 0; i < 350; i++)
 		{
+			// Don't measure reading in string...
+			BuildContext context = new FileStoreBuildContext(fileStore);
+			context.getContents();
+
 			startMeasuring();
-			validator.validate(src, path, manager);
+			validator.buildFile(context, null);
 			stopMeasuring();
 		}
 		commitMeasurements();

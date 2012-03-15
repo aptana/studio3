@@ -34,7 +34,7 @@ public class OverwriteFilesSelectionDialog extends ListSelectionDialog
 	 */
 	public OverwriteFilesSelectionDialog(Set<IFile> files, String message)
 	{
-		super(UIUtils.getActiveShell(), files, new ArrayContentProvider(), new LabelProvider(), message);
+		super(UIUtils.getActiveShell(), files, ArrayContentProvider.getInstance(), new LabelProvider(), message);
 		setInitialSelections(files.toArray(new Object[files.size()]));
 	}
 
@@ -64,6 +64,5 @@ public class OverwriteFilesSelectionDialog extends ListSelectionDialog
 			IPath projectRelativePath = resource.getProjectRelativePath().removeLastSegments(1);
 			return projectRelativePath.toOSString() + File.separatorChar + resource.getName();
 		}
-
 	}
 }

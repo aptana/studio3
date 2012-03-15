@@ -16,7 +16,7 @@ public class NavigatorDownloadAction extends NavigatorBaseSyncAction
 
 	public NavigatorDownloadAction(IWorkbenchPart activePart)
 	{
-		super("Download", activePart); //$NON-NLS-1$
+		super(Messages.NavigatorDownloadAction_LBL_Download, activePart);
 	}
 
 	@Override

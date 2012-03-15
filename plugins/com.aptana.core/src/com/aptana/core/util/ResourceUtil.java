@@ -19,9 +19,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.ICommand;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IProjectNatureDescriptor;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -223,6 +225,7 @@ public class ResourceUtil
 	 * @param builderId
 	 * @throws CoreException
 	 */
+	@SuppressWarnings("rawtypes")
 	public static boolean addBuilder(IProjectDescription description, String builderId)
 	{
 		ICommand[] commands = description.getBuildSpec();
@@ -487,5 +490,18 @@ public class ResourceUtil
 			return removeBuilder(project, builderId);
 		}
 		return false;
+	}
+
+	/**
+	 * If the file is null, doesn't exist, is derived or is team private this returns true. Used to skip files for
+	 * build/reconcile.
+	 * 
+	 * @param file
+	 * @return
+	 */
+	public static boolean shouldIgnore(IFile file)
+	{
+		return file == null || !file.exists() || file.isTeamPrivateMember(IResource.CHECK_ANCESTORS)
+				|| file.isDerived(IResource.CHECK_ANCESTORS);
 	}
 }

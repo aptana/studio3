@@ -242,7 +242,7 @@ public class OperatorInferencingTests extends InferencingTestsBase
 	 */
 	public void testLogicalAndVar()
 	{
-		this.varTypeTests("var logicalAndVar = a && b;", "logicalAndVar", "Boolean");
+		this.varTypeTests("var logicalAndVar = \"\" && 10;", "logicalAndVar", "String", "Number");
 	}
 
 	/**
@@ -250,7 +250,7 @@ public class OperatorInferencingTests extends InferencingTestsBase
 	 */
 	public void testLogicalOrVar()
 	{
-		this.varTypeTests("var logicalOrVar = a || b;", "logicalOrVar", "Boolean");
+		this.varTypeTests("var logicalOrVar = \"\" || 10;", "logicalOrVar", "String", "Number");
 	}
 
 	/* pre-unary operators */

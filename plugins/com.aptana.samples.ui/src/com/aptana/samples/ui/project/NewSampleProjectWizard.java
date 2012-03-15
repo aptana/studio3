@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -11,28 +11,21 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
-import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceStatus;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
@@ -40,6 +33,7 @@ import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
@@ -54,9 +48,12 @@ import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.ArrayUtil;
+import com.aptana.core.util.FileUtil;
 import com.aptana.git.ui.CloneJob;
-import com.aptana.git.ui.internal.actions.DisconnectHandler;
-import com.aptana.projects.internal.wizards.NewProjectWizard;
+import com.aptana.git.ui.util.GitUtil;
+import com.aptana.projects.internal.wizards.AbstractNewProjectWizard;
+import com.aptana.projects.util.ProjectUtil;
 import com.aptana.samples.handlers.ISampleProjectHandler;
 import com.aptana.samples.model.IProjectSample;
 import com.aptana.samples.ui.SamplesUIPlugin;
@@ -64,7 +61,7 @@ import com.aptana.ui.util.UIUtils;
 
 /**
  * @author Ingo Muschenetz
- * @author Michael Xia
+ * @author Michael Xia TODO Extend from {@link AbstractNewProjectWizard}
  */
 public class NewSampleProjectWizard extends BasicNewResourceWizard implements IExecutableExtension
 {
@@ -96,7 +93,39 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 	{
 		super.addPages();
 
-		mainPage = new WizardNewProjectCreationPage("basicNewProjectPage"); //$NON-NLS-1$
+		mainPage = new WizardNewProjectCreationPage("basicNewProjectPage") //$NON-NLS-1$
+		{
+
+			@Override
+			public void createControl(Composite parent)
+			{
+				super.createControl(parent);
+				validatePage();
+			}
+
+			@Override
+			protected boolean validatePage()
+			{
+				boolean valid = super.validatePage();
+				if (!valid)
+				{
+					return false;
+				}
+
+				// Check if there's already a directory/files at the destination
+				IPath location = getLocationPath();
+				File file = location.toFile();
+				if (file.exists())
+				{
+					setMessage(Messages.NewSampleProjectWizard_LocationExistsMessage, WARNING);
+					return true;
+				}
+
+				setErrorMessage(null);
+				setMessage(null);
+				return true;
+			}
+		};
 		mainPage.setTitle(Messages.NewSampleProjectWizard_ProjectPage_Title);
 		mainPage.setDescription(Messages.NewSampleProjectWizard_ProjectPage_Description);
 		addPage(mainPage);
@@ -111,6 +140,7 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 	@Override
 	public boolean performFinish()
 	{
+		// TODO If location already exists, pop up a confirm dialog?
 		createNewProject();
 		if (newProject == null)
 		{
@@ -170,10 +200,10 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 			location = mainPage.getLocationURI();
 		}
 
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IProjectDescription description = workspace.newProjectDescription(newProjectHandle.getName());
+		IProjectDescription description = ProjectUtil.getProjectDescription(mainPage.getLocationPath(),
+				sample.getNatures(), ArrayUtil.NO_STRINGS);
+		description.setName(newProjectHandle.getName());
 		description.setLocationURI(location);
-		description.setNatureIds(sample.getNatures());
 
 		try
 		{
@@ -186,7 +216,8 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 				doBasicCreateProject(newProjectHandle, description);
 
 				Set<IPath> emptySet = Collections.emptySet();
-				NewProjectWizard.extractZip(new File(sample.getLocation()), newProjectHandle, true, emptySet, false);
+				AbstractNewProjectWizard.extractZip(new File(sample.getLocation()), newProjectHandle, true, emptySet,
+						false);
 
 				doPostProjectCreation(newProjectHandle);
 			}
@@ -275,7 +306,15 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 		{
 			path = path.append(projectDescription.getName());
 		}
-		// FIXME Run an IrunnableWithProgress in wizard container, have it just do job.run(monitor)!
+
+		// Wipe the destination directory if it already exists, or git clone will fail.
+		File directory = path.toFile();
+		if (directory.exists())
+		{
+			FileUtil.deleteRecursively(directory);
+		}
+
+		// FIXME Run an IRunnableWithProgress in wizard container, have it just do job.run(monitor)!
 		Job job = new CloneJob(gitURL, path.toOSString(), true, true);
 		job.addJobChangeListener(new JobChangeAdapter()
 		{
@@ -283,6 +322,11 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 			@Override
 			public void done(IJobChangeEvent event)
 			{
+				if (!event.getResult().isOK())
+				{
+					return;
+				}
+
 				try
 				{
 					projectHandle.setDescription(projectDescription, null);
@@ -293,38 +337,8 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 					IdeLog.logError(SamplesUIPlugin.getDefault(), e);
 				}
 
-				DisconnectHandler disconnect = new DisconnectHandler(new JobChangeAdapter()
-				{
-
-					@Override
-					public void done(IJobChangeEvent event)
-					{
-						IFolder gitFolder = projectHandle.getFolder(".git"); //$NON-NLS-1$
-						if (gitFolder.exists())
-						{
-							try
-							{
-								gitFolder.delete(true, new NullProgressMonitor());
-							}
-							catch (CoreException e)
-							{
-								IdeLog.logError(SamplesUIPlugin.getDefault(), e);
-							}
-						}
-					}
-				});
-				List<IResource> selection = new ArrayList<IResource>();
-				selection.add(projectHandle);
-				disconnect.setSelectedResources(selection);
-				try
-				{
-					disconnect.execute(new ExecutionEvent());
-				}
-				catch (ExecutionException e)
-				{
-					IdeLog.logError(SamplesUIPlugin.getDefault(), Messages.NewSampleProjectWizard_ERR_FailToDisconnect,
-							e);
-				}
+				// disconnects from the git
+				GitUtil.disconnectProjectFromGit(projectHandle);
 
 				doPostProjectCreation(newProject);
 			}

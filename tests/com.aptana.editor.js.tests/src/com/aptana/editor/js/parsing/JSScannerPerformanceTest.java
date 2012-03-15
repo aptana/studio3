@@ -165,7 +165,7 @@ public class JSScannerPerformanceTest extends PerformanceTestCase
 	{
 		// apply to parse state
 		IParseState parseState = new ParseState();
-		parseState.setEditState(src, src, 0, 0);
+		parseState.setEditState(src);
 
 		for (int i = 0; i < numRuns; i++)
 		{

@@ -206,10 +206,11 @@ class TreeThemer extends ControlThemer
 	private void addCustomTreeControlDrawing()
 	{
 		// Hack to overdraw the native tree expand/collapse controls and use custom plus/minus box.
-		if (isMacOSX)
+		if (isMacOSX || isUbuntu)
 		{
 			return;
 		}
+		
 		// FIXME The native control/arrow still shows through on OpenSuSE 11.4
 		final Tree tree = getTree();
 		customDrawingListener = new Listener()

@@ -10,6 +10,7 @@ package com.aptana.editor.js.contentassist;
 import java.net.URI;
 
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.preference.IPreferenceStore;
 
@@ -19,8 +20,11 @@ import com.aptana.editor.common.contentassist.IPreferenceConstants;
 import com.aptana.editor.common.contentassist.UserAgentFilterType;
 import com.aptana.editor.js.contentassist.index.SDocMLFileIndexingParticipant;
 import com.aptana.editor.js.tests.JSEditorBasedTests;
+import com.aptana.index.core.FileStoreBuildContext;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
+import com.aptana.index.core.IndexPlugin;
+import com.aptana.index.core.build.BuildContext;
 
 /**
  * JSUserAgentFiltering
@@ -29,9 +33,10 @@ public class JSUserAgentFilteringTests extends JSEditorBasedTests
 {
 	class Indexer extends SDocMLFileIndexingParticipant
 	{
-		public void index(Index index, IFileStore file)
+		public void index(Index index, IFileStore file) throws CoreException
 		{
-			indexFileStore(index, file, new NullProgressMonitor());
+			BuildContext context = new FileStoreBuildContext(file);
+			index(context, index, new NullProgressMonitor());
 		}
 	}
 
@@ -60,7 +65,7 @@ public class JSUserAgentFilteringTests extends JSEditorBasedTests
 			uri = sourceFile.toURI();
 
 			// create index for file
-			Index index = IndexManager.getInstance().getIndex(uri);
+			Index index = getIndexManager().getIndex(uri);
 			Indexer indexer = new Indexer();
 
 			// index file
@@ -77,9 +82,14 @@ public class JSUserAgentFilteringTests extends JSEditorBasedTests
 		{
 			if (uri != null)
 			{
-				IndexManager.getInstance().removeIndex(uri);
+				getIndexManager().removeIndex(uri);
 			}
 		}
+	}
+
+	protected IndexManager getIndexManager()
+	{
+		return IndexPlugin.getDefault().getIndexManager();
 	}
 
 	/*

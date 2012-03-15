@@ -38,7 +38,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
-import com.aptana.core.IURIMapper;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
@@ -74,7 +73,7 @@ import com.aptana.parsing.lexer.Lexeme;
 import com.aptana.parsing.lexer.Range;
 import com.aptana.preview.ProjectPreviewUtil;
 import com.aptana.ui.util.UIUtils;
-import com.aptana.webserver.core.EFSWebServerConfiguration;
+import com.aptana.webserver.core.IServer;
 import com.aptana.webserver.core.WebServerCorePlugin;
 
 public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
@@ -302,9 +301,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			String[] userAgents = userAgentList.toArray(new String[userAgentList.size()]);
 			Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(getNatureIds(), userAgents);
 
-			if (IdeLog.isInfoEnabled(HTMLPlugin.getDefault(), IDebugScopes.CONTENT_ASSIST))
+			if (IdeLog.isTraceEnabled(HTMLPlugin.getDefault(), IDebugScopes.CONTENT_ASSIST))
 			{
-				IdeLog.logInfo(
+				IdeLog.logTrace(
 						HTMLPlugin.getDefault(),
 						MessageFormat
 								.format("Current element: {0}, Current lexeme: {1}, Replace offset: {2}. Replace length: {3}", elementName, _currentLexeme, offset, replaceLength), //$NON-NLS-1$
@@ -350,7 +349,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		else
 		{
 			IdeLog.logInfo(HTMLPlugin.getDefault(),
-					MessageFormat.format("Current element: {0}, Current lexeme: {1}", elementName, _currentLexeme),
+					MessageFormat.format("Current element: {0}, Current lexeme: {1}", elementName, _currentLexeme), //$NON-NLS-1$
 					IDebugScopes.CONTENT_ASSIST);
 		}
 
@@ -519,11 +518,10 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					baseStore = EFS.getStore(projectUri);
 
 					// Get the project webroot
-					IURIMapper serverConfiguration = ProjectPreviewUtil.getServerConfiguration(getProject());
+					IServer serverConfiguration = ProjectPreviewUtil.getServerConfiguration(getProject());
 					if (serverConfiguration == null)
 					{
-						for (IURIMapper server : WebServerCorePlugin.getDefault().getServerConfigurationManager()
-								.getServerConfigurations())
+						for (IServer server : WebServerCorePlugin.getDefault().getServerManager().getServers())
 						{
 							if (server.resolve(editorStore) != null)
 							{
@@ -532,9 +530,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 							}
 						}
 					}
-					if (serverConfiguration != null && serverConfiguration instanceof EFSWebServerConfiguration)
+					if (serverConfiguration != null)
 					{
-						URI documentRoot = ((EFSWebServerConfiguration) serverConfiguration).getDocumentRoot();
+						URI documentRoot = serverConfiguration.getDocumentRoot();
 						if (documentRoot != null)
 						{
 							baseStore = EFS.getStore(documentRoot);
@@ -627,7 +625,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				}
 				else
 				{
-					// Child is invalid/non-existant, we should just punt. http://jira.appcelerator.org/browse/APSTUD-3862
+					// Child is invalid/non-existant, we should just punt.
+					// http://jira.appcelerator.org/browse/APSTUD-3862
 					return Collections.emptyList();
 				}
 				offset += lastSlash + 1;
@@ -843,7 +842,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					if (state == null)
 					{
 						state = new HTMLParseState();
-						state.setEditState(documentText, null, 0, 0);
+						state.setEditState(documentText, 0);
 					}
 
 					if (element.getName().charAt(0) == '!') // don't close DOCTYPE with a slash
@@ -1096,7 +1095,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				if (state == null)
 				{
 					state = new HTMLParseState();
-					state.setEditState(_document.get(), null, 0, 0);
+					state.setEditState(_document.get(), 0);
 				}
 				if (state.isEmptyTagType(element.getName()))
 				{
@@ -1382,9 +1381,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 		ICompletionProposal[] proposals = result.toArray(new ICompletionProposal[result.size()]);
 
-		if (IdeLog.isInfoEnabled(HTMLPlugin.getDefault(), IDebugScopes.CONTENT_ASSIST))
+		if (IdeLog.isTraceEnabled(HTMLPlugin.getDefault(), IDebugScopes.CONTENT_ASSIST))
 		{
-			IdeLog.logInfo(HTMLPlugin.getDefault(), MessageFormat.format("Generated {0} proposals", proposals.length), //$NON-NLS-1$
+			IdeLog.logTrace(HTMLPlugin.getDefault(), MessageFormat.format("Generated {0} proposals", proposals.length), //$NON-NLS-1$
 					IDebugScopes.CONTENT_ASSIST);
 		}
 
@@ -1476,14 +1475,14 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @return
 	 */
-	ILexemeProvider<HTMLTokenType> createLexemeProvider(IDocument document, int offset)
+	HTMLLexemeProvider createLexemeProvider(IDocument document, int offset)
 	{
 		int documentLength = document.getLength();
 
 		// account for last position returning an empty IDocument default partition
 		int lexemeProviderOffset = (offset >= documentLength) ? documentLength - 1 : offset;
 
-		return new HTMLLexemeProvider(document, lexemeProviderOffset, new HTMLTagScanner());
+		return new HTMLLexemeProvider(document, lexemeProviderOffset, new HTMLTagScanner(false));
 	}
 
 	/**
@@ -1579,57 +1578,21 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	private IRange getAttributeValueRange(ILexemeProvider<HTMLTokenType> lexemeProvider, int offset)
 	{
-		int startingOffset = -1;
-		int endingOffset = -1;
-		int floorIndex = lexemeProvider.getLexemeFloorIndex(offset);
-		int ceilingIndex = lexemeProvider.getLexemeCeilingIndex(offset);
+		Lexeme<HTMLTokenType> attribute = lexemeProvider.getLexemeFromOffset(offset);
+		IRange result = Range.EMPTY;
 
-		// NOTE: technically don't need to make this check since the loop condition will catch this case, but adding
-		// this here for symmetry with next loop and to make it explicit that we are handling a case where the offset
-		// does not provide a lexeme
-		if (floorIndex != -1)
+		if (attribute != null)
 		{
-			for (int i = floorIndex; i >= 0; i--)
+			switch (attribute.getType())
 			{
-				Lexeme<HTMLTokenType> lexeme = lexemeProvider.getLexeme(i);
-
-				// NOTE: we have to check the offset since it's possible to get the right-hand side quote here
-				if (lexeme.getStartingOffset() < offset)
-				{
-					HTMLTokenType type = lexeme.getType();
-
-					if (type == HTMLTokenType.DOUBLE_QUOTED_STRING || type == HTMLTokenType.SINGLE_QUOTED_STRING)
-					{
-						startingOffset = lexeme.getStartingOffset() + 1;
-						break;
-					}
-				}
-			}
-		}
-
-		if (ceilingIndex != -1)
-		{
-			for (int i = ceilingIndex; i < lexemeProvider.size(); i++)
-			{
-				Lexeme<HTMLTokenType> lexeme = lexemeProvider.getLexeme(i);
-				HTMLTokenType type = lexeme.getType();
-
-				if (type == HTMLTokenType.DOUBLE_QUOTED_STRING || type == HTMLTokenType.SINGLE_QUOTED_STRING)
-				{
-					endingOffset = lexeme.getEndingOffset() - 1;
+				case DOUBLE_QUOTED_STRING:
+				case SINGLE_QUOTED_STRING:
+					result = new Range(attribute.getStartingOffset() + 1, attribute.getEndingOffset() - 1);
 					break;
-				}
 			}
 		}
 
-		if (startingOffset != -1 && endingOffset != -1 && startingOffset <= endingOffset)
-		{
-			return new Range(startingOffset, endingOffset);
-		}
-		else
-		{
-			return Range.EMPTY;
-		}
+		return result;
 	}
 
 	/**
@@ -1708,9 +1671,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					IHTMLEditorDebugScopes.CONTENT_ASSIST);
 		}
 
-		if (IdeLog.isInfoEnabled(HTMLPlugin.getDefault(), IDebugScopes.CONTENT_ASSIST))
+		if (IdeLog.isTraceEnabled(HTMLPlugin.getDefault(), IDebugScopes.CONTENT_ASSIST))
 		{
-			IdeLog.logInfo(HTMLPlugin.getDefault(), MessageFormat.format("Coarse location: {0}", result), //$NON-NLS-1$
+			IdeLog.logTrace(HTMLPlugin.getDefault(), MessageFormat.format("Coarse location: {0}", result), //$NON-NLS-1$
 					IDebugScopes.CONTENT_ASSIST);
 		}
 
@@ -1856,10 +1819,10 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			}
 		}
 
-		if (IdeLog.isInfoEnabled(HTMLPlugin.getDefault(), IDebugScopes.CONTENT_ASSIST))
+		if (IdeLog.isTraceEnabled(HTMLPlugin.getDefault(), IDebugScopes.CONTENT_ASSIST))
 		{
-			IdeLog.logInfo(HTMLPlugin.getDefault(),
-					MessageFormat.format("Fine location: {0}", result), IDebugScopes.CONTENT_ASSIST); //$NON-NLS-1$
+			IdeLog.logTrace(HTMLPlugin.getDefault(),
+					MessageFormat.format("Find location: {0}", result), IDebugScopes.CONTENT_ASSIST); //$NON-NLS-1$
 		}
 
 		return result;

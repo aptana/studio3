@@ -22,6 +22,9 @@ import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.ui.progress.UIJob;
 import org.mortbay.util.ajax.JSON;
 
+import com.aptana.core.logging.IdeLog;
+import com.aptana.portal.ui.IDebugScopes;
+import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.browserNotifications.AbstractBrowserNotification;
 import com.aptana.portal.ui.internal.BrowserWrapper;
 
@@ -234,6 +237,8 @@ public class BrowserNotifier
 	public boolean notifyBrowser(List<String> notificationTargets, String eventName, String eventType, String eventData)
 	{
 		String notification = createBrowserNotification(eventName, eventType, eventData);
+		IdeLog.logInfo(PortalUIPlugin.getDefault(),
+				"Notifying the portal with: " + notification, IDebugScopes.START_PAGE); //$NON-NLS-1$
 		boolean notifyAll = notificationTargets.isEmpty();
 		boolean result = true;
 		for (String id : browsers.keySet())

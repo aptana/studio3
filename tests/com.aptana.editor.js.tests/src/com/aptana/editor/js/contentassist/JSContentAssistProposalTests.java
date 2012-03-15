@@ -18,15 +18,28 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.ui.ide.IDE;
+import org.eclipse.ui.texteditor.ITextEditor;
 
+import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.tests.util.TestProject;
+import com.aptana.editor.epl.tests.EditorTestHelper;
 import com.aptana.editor.js.contentassist.index.JSFileIndexingParticipant;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.tests.JSEditorBasedTests;
 import com.aptana.index.core.IFileStoreIndexingParticipant;
+import com.aptana.index.core.Index;
+import com.aptana.index.core.IndexManager;
+import com.aptana.index.core.IndexPlugin;
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.SnippetElement;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * JSContentAssistProposalTests
@@ -227,6 +240,80 @@ public class JSContentAssistProposalTests extends JSEditorBasedTests
 	}
 
 	/**
+	 * <pre>
+	 * - We create a file with a function
+	 * - open the JS editor on it
+	 * - make some unsaved changes
+	 * - let it reconcile
+	 * - invoke CA to see that the unsaved contents are reflected in the CA
+	 * - close the editor without saving those changes
+	 * - wait for re-index of the underlying file to occur
+	 * - verify that the index now reflects underlying file's contents and not the unsaved changes.
+	 * </pre>
+	 * 
+	 * @throws Exception
+	 */
+	public void testAPSTUD2944() throws Exception
+	{
+		final String projectName = "APSTUD2944";
+		final String fileName = "apstud2944.js";
+		final String initialContents = "function delete_me() {}\n";
+		final String workingContents = "function foo() { var eight = 8; }";
+
+		TestProject project = null;
+		try
+		{
+			// Create a test project and file
+			project = new TestProject(projectName, new String[] { "com.aptana.projects.webnature" });
+			IFile file = project.createFile(fileName, initialContents);
+
+			// open JS editor on file
+			editor = (ITextEditor) IDE.openEditor(UIUtils.getActivePage(), file, "com.aptana.editor.js", true);
+
+			// Set the working copy contents to some valid JS
+			IDocument document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
+			document.set(workingContents);
+			// force reconciling? It should get triggered automatically...
+			Thread.sleep(1500); // let reconciling finish...
+
+			// get proposals at end of document
+			this.processor = new JSContentAssistProcessor((AbstractThemeableEditor) editor);
+			ISourceViewer viewer = ((AbstractThemeableEditor) editor).getISourceViewer();
+			ICompletionProposal[] proposals = processor.computeCompletionProposals(viewer, 33, '\0', false);
+
+			// verify that CA contains elements from unsaved JS in document!
+			assertContains(proposals, "foo");
+			assertDoesntContain(proposals, "delete_me");
+
+			// TODO Verify "eight" is in CA inside foo?
+
+			// Close the editor without saving, make sure we end up indexing underlying content again!
+			EditorTestHelper.closeEditor(editor);
+
+			Thread.sleep(1000); // FIXME Is there anyway to tell when indexing happens and is finished?
+
+			// Now verify that our index reflects the file's contents and not the unsaved contents of the editor.
+			Index index = getIndexManager().getIndex(project.getURI());
+			JSIndexQueryHelper _indexHelper = new JSIndexQueryHelper();
+			List<PropertyElement> projectGlobals = _indexHelper.getProjectGlobals(index);
+			assertContainsFunctions(projectGlobals, "delete_me");
+			assertDoesntContainFunctions(projectGlobals, "foo");
+		}
+		finally
+		{
+			if (project != null)
+			{
+				project.delete();
+			}
+		}
+	}
+
+	protected IndexManager getIndexManager()
+	{
+		return IndexPlugin.getDefault().getIndexManager();
+	}
+
+	/**
 	 * testStringCharCodeAt
 	 */
 	public void testStringCharCodeAt()
@@ -315,5 +402,125 @@ public class JSContentAssistProposalTests extends JSEditorBasedTests
 
 		BundleManager.getInstance().unloadScript(f);
 
+	}
+
+	public void testDottedConstructor()
+	{
+		this.checkProposals("contentAssist/dotted-constructor.js", "aptana");
+	}
+
+	public void testAPSTUD3694()
+	{
+		// @formatter:off
+		this.checkProposals(
+			"contentAssist/document.js",
+			"anchors",
+			"applets",
+			"body",
+			"cookie",
+			"documentMode",
+			"domain",
+			"forms",
+			"images",
+			"lastModified",
+			"links",
+			"readyState",
+			"referrer",
+			"title",
+			"URL",
+			"close",
+			"getElementsByName",
+			"open",
+			"write",
+			"writeln"
+		);
+		// @formatter:on
+	}
+
+	public void testAPSTUD3695()
+	{
+		// @formatter:off
+		this.checkProposals(
+			"contentAssist/window.js",
+			"closed",
+			"defaultStatus",
+			"document",
+			"frames",
+			"history",
+			"innerHeight",
+			"innerWidth",
+			"length",
+			"location",
+			"name",
+			"navigator",
+			"opener",
+			"outerHeight",
+			"outerWidth",
+			"pageXOffset",
+			"pageYOffset",
+			"parent",
+			"screen",
+			"screenLeft",
+			"screenTop",
+			"screenX",
+			"screenY",
+			"self",
+			"status",
+			"top",
+			"alert",
+			"blur",
+			"clearInterval",
+			"clearTimeout",
+			"close",
+			"confirm",
+			"createPopup",
+			"focus",
+			"moveBy",
+			"moveTo",
+			"open",
+			"print",
+			"prompt",
+			"resizeBy",
+			"resizeTo",
+			"scroll",
+			"scrollBy",
+			"scrollTo",
+			"setInterval",
+			"setTimeout"
+		);
+		// @formatter:on
+	}
+
+	public void testThisInFunction()
+	{
+		// @formatter:off
+		this.checkProposals(
+			"contentAssist/function-with-this.js",
+			"property",
+			"method"
+		);
+		// @formatter:on
+	}
+
+	public void testThisInCurrentFunctionOnly()
+	{
+		// @formatter:off
+		this.checkProposals(
+			"contentAssist/functions-with-this.js",
+			"property",
+			"method"
+		);
+		// @formatter:on
+	}
+
+	public void testThisInNestedFunction()
+	{
+		// @formatter:off
+		this.checkProposals(
+			"contentAssist/nested-functions-with-this.js",
+			"ghi",
+			"jkl"
+		);
+		// @formatter:on
 	}
 }

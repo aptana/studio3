@@ -6,9 +6,8 @@ Bundle-Version: 3.0.3.qualifier
 Bundle-Activator: com.aptana.debug.core.DebugCorePlugin
 Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.core.filesystem,
  org.eclipse.debug.core,
-  com.aptana.core;bundle-version="3.0.4",
+ com.aptana.core;bundle-version="3.0.4",
  com.aptana.core.io
 Eclipse-LazyStart: true
 Bundle-ActivationPolicy: lazy

@@ -12,13 +12,17 @@ import org.eclipse.osgi.util.NLS;
 /**
  * @author Ingo Muschenetz
  */
-public final class Messages extends NLS {
+public final class Messages extends NLS
+{
+
 	private static final String BUNDLE_NAME = "com.aptana.js.debug.ui.internal.dialogs.messages"; //$NON-NLS-1$
 
-	private Messages() {
+	private Messages()
+	{
 	}
 
-	static {
+	static
+	{
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
@@ -88,15 +92,9 @@ public final class Messages extends NLS {
 	 */
 	public static String DetailFormatterDialog_SelectTypeToFormatWhenDisplayingDetail;
 
-	public static String HttpServerPathDialog_Browse;
-
 	public static String HttpServerPathDialog_Error_EmptyWorkspaceLocation;
-
 	public static String HttpServerPathDialog_Error_IncompleteServerPath;
-
 	public static String HttpServerPathDialog_SelectWorkspaceFolder;
-
 	public static String HttpServerPathDialog_ServerPath;
-
 	public static String HttpServerPathDialog_WorkspaceLocation;
 }

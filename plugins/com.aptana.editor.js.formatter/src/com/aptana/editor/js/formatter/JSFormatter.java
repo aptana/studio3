@@ -62,8 +62,10 @@ import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_
 import static com.aptana.editor.js.formatter.JSFormatterConstants.WRAP_COMMENTS;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.WRAP_COMMENTS_LENGTH;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -94,6 +96,7 @@ import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ParserPoolFactory;
+import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.ui.util.StatusLineMessageTimerManager;
 
@@ -205,7 +208,15 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 			IFormattingContext context, String indentSufix) throws FormatterException
 	{
 		String originalText = source.substring(offset, offset + length);
-		String input = originalText.trim();
+		String input = leftTrim(originalText, 0);
+		if (indentationLevel > 0 && FormatterWriter.endsWithNewLine(input, lineSeparator))
+		{
+			String substring = input.substring(0, input.length() - lineSeparator.length());
+			if (!FormatterWriter.endsWithNewLine(substring, lineSeparator))
+			{
+				input = substring;
+			}
+		}
 		int inputOffset = offset + countLeftWhitespaceChars(originalText);
 		IParseRootNode parseResult = null;
 		try
@@ -277,7 +288,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		output = output.trim();
 		IParser parser = checkoutParser();
 		IParseState parseState = new ParseState();
-		parseState.setEditState(output, null, 0, 0);
+		parseState.setEditState(output);
 		IParseRootNode outputParseResult = null;
 		try
 		{
@@ -285,6 +296,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		}
 		catch (Exception e)
 		{
+			IdeLog.logError(JSFormatterPlugin.getDefault(), e, IDebugScopes.DEBUG);
 			return false;
 		}
 		checkinParser(parser);
@@ -440,4 +452,50 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		return document;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.AbstractScriptFormatter#getOutputOnOffRegions(java.lang.String, java.lang.String,
+	 * java.lang.String, com.aptana.parsing.IParseState)
+	 */
+	protected List<IRegion> getOutputOnOffRegions(String output, String formatterOffPattern, String formatterOnPattern,
+			IParseState parseState)
+	{
+		IParser parser = checkoutParser();
+		parseState.setEditState(output);
+		List<IRegion> onOffRegions = null;
+		try
+		{
+			IParseRootNode parseResult = parser.parse(parseState);
+			checkinParser(parser);
+			if (parseResult != null)
+			{
+				IParseNode[] commentNodes = parseResult.getCommentNodes();
+				if (commentNodes != null)
+				{
+					LinkedHashMap<Integer, String> commentsMap = new LinkedHashMap<Integer, String>(commentNodes.length);
+					for (IParseNode comment : commentNodes)
+					{
+						int start = comment.getStartingOffset();
+						int end = comment.getEndingOffset() + 1;
+						String commentStr = output.substring(start, end);
+						commentsMap.put(start, commentStr);
+					}
+					// Generate the OFF/ON regions
+					if (!commentsMap.isEmpty())
+					{
+						Pattern onPattern = Pattern.compile(Pattern.quote(formatterOnPattern));
+						Pattern offPattern = Pattern.compile(Pattern.quote(formatterOffPattern));
+						onOffRegions = FormatterUtils.resolveOnOffRegions(commentsMap, onPattern, offPattern,
+								output.length() - 1);
+					}
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			IdeLog.logError(FormatterPlugin.getDefault(),
+					"Error while computing the formatter's output OFF/ON regions", e, IDebugScopes.DEBUG); //$NON-NLS-1$
+		}
+		return onOffRegions;
+	}
 }

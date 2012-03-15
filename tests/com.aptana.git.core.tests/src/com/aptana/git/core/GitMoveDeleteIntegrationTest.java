@@ -10,65 +10,84 @@ package com.aptana.git.core;
 import java.io.ByteArrayInputStream;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ProjectScope;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitIndex;
 import com.aptana.git.core.model.GitRepository;
-import com.aptana.git.core.model.IGitRepositoryManager;
+import com.aptana.git.core.model.GitTestCase;
 import com.aptana.testing.utils.ProjectCreator;
 
-public class GitMoveDeleteIntegrationTest extends TestCase
+public class GitMoveDeleteIntegrationTest extends GitTestCase
 {
 
 	private static final String PROJECT_NAME = "gmdht"; //$NON-NLS-1$
 
-	private IProject project;
-	private GitRepository repo;
-
-	@Override
-	protected void setUp() throws Exception
-	{
-		super.setUp();
-
-		project = ProjectCreator.createAndOpen(PROJECT_NAME);
-
-		// create a git repo
-		getGitRepositoryManager().create(project.getLocation());
-		repo = getGitRepositoryManager().attachExisting(project, new NullProgressMonitor());
-		// delete auto-generated .gitignore file
-		repo.workingDirectory().append(GitRepository.GITIGNORE).toFile().delete();
-	}
-
-	protected IGitRepositoryManager getGitRepositoryManager()
-	{
-		return GitPlugin.getDefault().getGitRepositoryManager();
-	}
+	private IProject fProject;
 
 	@Override
 	protected void tearDown() throws Exception
 	{
 		try
 		{
-			if (project != null)
-				project.delete(true, new NullProgressMonitor());
+			if (fProject != null)
+			{
+				fProject.delete(true, new NullProgressMonitor());
+			}
 		}
 		finally
 		{
-			project = null;
-			repo = null;
+			fProject = null;
 			super.tearDown();
 		}
 	}
 
+	@Override
+	protected GitRepository createRepo(IPath path) throws CoreException
+	{
+		IEclipsePreferences prefs = new ProjectScope(getProject()).getNode(GitPlugin.PLUGIN_ID);
+		prefs.putBoolean(IPreferenceConstants.REFRESH_INDEX_WHEN_RESOURCES_CHANGE, false);
+		try
+		{
+			prefs.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			fail(e.getMessage());
+		}
+
+		GitRepository repo = super.createRepo(path);
+		getGitRepositoryManager().createOrAttach(getProject(), new NullProgressMonitor());
+		// delete auto-generated .gitignore file
+		repo.workingDirectory().append(GitRepository.GITIGNORE).toFile().delete();
+		return repo;
+	}
+
+	protected IPath repoToGenerate() throws CoreException
+	{
+		return getProject().getLocation();
+	}
+
+	private synchronized IProject getProject() throws CoreException
+	{
+		if (fProject == null)
+		{
+			fProject = ProjectCreator.createAndOpen(PROJECT_NAME);
+		}
+		return fProject;
+	}
+
 	public void testDeleteNewUnstagedFile() throws Exception
 	{
-		IFile file = project.getFile("newfile.txt");
+		IFile file = getProject().getFile("newfile.txt");
 		file.create(new ByteArrayInputStream("Initial contents".getBytes()), true, new NullProgressMonitor());
 
 		file.delete(IResource.NONE, new NullProgressMonitor());
@@ -78,32 +97,45 @@ public class GitMoveDeleteIntegrationTest extends TestCase
 
 	public void testDeleteStagedFile() throws Exception
 	{
-		IFile file = project.getFile("newfile2.txt");
+		IFile file = getProject().getFile("newfile2.txt");
 		file.create(new ByteArrayInputStream("Initial contents".getBytes()), true, new NullProgressMonitor());
 
-		GitIndex index = repo.index();
-		index.refresh(new NullProgressMonitor());
+		GitIndex index = getRepo().index();
+		assertRefresh(index);
 		List<ChangedFile> changedFiles = index.changedFiles();
-		assertEquals(2, changedFiles.size());
-		repo.index().stageFiles(changedFiles);
+		assertContains("newfile2.txt", changedFiles);
+		assertStageFiles(index, changedFiles);
 
 		file.delete(IResource.NONE, new NullProgressMonitor());
 		assertFalse(file.exists());
 		// TODO Assert that we did delete through repo
 	}
 
+	protected void assertContains(String fileName, List<ChangedFile> changedFiles)
+	{
+		assertTrue("changed files was empty", changedFiles.size() > 0);
+		for (ChangedFile file : changedFiles)
+		{
+			if (file.getPath().equals(fileName))
+			{
+				return;
+			}
+		}
+		fail("Didn't find " + fileName);
+	}
+
 	public void testDeleteAlreadyCommittedFileWithNoChanges() throws Exception
 	{
-		IFile file = project.getFile("newfile3.txt");
+		IFile file = getProject().getFile("newfile3.txt");
 		file.create(new ByteArrayInputStream("Initial contents".getBytes()), true, new NullProgressMonitor());
 
-		GitIndex index = repo.index();
-		index.refresh(new NullProgressMonitor());
+		GitIndex index = getRepo().index();
+		assertRefresh(index);
 		List<ChangedFile> changedFiles = index.changedFiles();
-		assertEquals(2, changedFiles.size());
-		repo.index().stageFiles(changedFiles);
+		assertContains("newfile3.txt", changedFiles);
+		assertStageFiles(index, changedFiles);
 
-		repo.index().commit("Initial commit");
+		assertCommit(index, "Initial commit");
 
 		file.delete(IResource.NONE, new NullProgressMonitor());
 		assertFalse(file.exists());
@@ -112,20 +144,20 @@ public class GitMoveDeleteIntegrationTest extends TestCase
 
 	public void testDeleteUnstagedAlreadyCommittedFile() throws Exception
 	{
-		IFile file = project.getFile("newfile4.txt");
+		IFile file = getProject().getFile("newfile4.txt");
 		file.create(new ByteArrayInputStream("Initial contents".getBytes()), true, new NullProgressMonitor());
 
-		GitIndex index = repo.index();
-		index.refresh(new NullProgressMonitor());
+		GitIndex index = getRepo().index();
+		assertRefresh(index);
 		List<ChangedFile> changedFiles = index.changedFiles();
-		assertEquals(2, changedFiles.size());
-		repo.index().stageFiles(changedFiles);
+		assertContains("newfile4.txt", changedFiles);
+		assertStageFiles(index, changedFiles);
 
-		repo.index().commit("Initial commit");
+		assertCommit(index, "Initial commit");
 
 		file.setContents(new ByteArrayInputStream("Modified contents".getBytes()), IResource.FORCE,
 				new NullProgressMonitor());
-		repo.index().refresh(new NullProgressMonitor());
+		assertRefresh(index);
 
 		file.delete(IResource.NONE, new NullProgressMonitor());
 		assertFalse(file.exists());

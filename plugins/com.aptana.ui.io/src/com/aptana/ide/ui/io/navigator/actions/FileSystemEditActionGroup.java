@@ -1,13 +1,11 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.ide.ui.io.navigator.actions;
-
-import java.lang.reflect.Method;
 
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -27,129 +25,133 @@ import org.eclipse.ui.navigator.ICommonMenuConstants;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.core.io.LocalRoot;
 
-public class FileSystemEditActionGroup extends ActionGroup {
+public class FileSystemEditActionGroup extends ActionGroup
+{
 
-    private Clipboard fClipboard;
-    private Shell fShell;
-    private Tree fTree;
+	private Clipboard fClipboard;
+	private Shell fShell;
+	private Tree fTree;
 
-    private FileSystemCopyAction fCopyAction;
-    private FileSystemPasteAction fPasteAction;
-    private FileSystemDeleteAction fDeleteAction;
+	private FileSystemCopyAction fCopyAction;
+	private FileSystemPasteAction fPasteAction;
+	private FileSystemDeleteAction fDeleteAction;
 
-    private TextActionHandler fTextActionHandler;
+	private TextActionHandler fTextActionHandler;
 
-    public FileSystemEditActionGroup(Shell shell, Tree tree) {
-        fShell = shell;
-        fTree = tree;
-        makeActions();
-    }
+	public FileSystemEditActionGroup(Shell shell, Tree tree)
+	{
+		fShell = shell;
+		fTree = tree;
+		makeActions();
+	}
 
-    @Override
-    public void dispose() {
-        if (fClipboard != null) {
-            fClipboard.dispose();
-            fClipboard = null;
-        }
-        super.dispose();
-    }
-
-    @Override
-    public void fillContextMenu(IMenuManager menu) {
-        IStructuredSelection selection = getSelection();
-        fCopyAction.selectionChanged(selection);
-        menu.appendToGroup(ICommonMenuConstants.GROUP_EDIT, fCopyAction);
-        fPasteAction.selectionChanged(selection);
-        menu.appendToGroup(ICommonMenuConstants.GROUP_EDIT, fPasteAction);
-
-        if (selection != null && !selection.isEmpty()) {
-            Object[] elements = selection.toArray();
-            boolean allFileSystemObjects = true;
-            for (Object element : elements) {
-                if (element instanceof LocalRoot || element instanceof IConnectionPoint) {
-                    allFileSystemObjects = false;
-                    break;
-                }
-            }
-            if (allFileSystemObjects) {
-                menu.appendToGroup(ICommonMenuConstants.GROUP_EDIT, fDeleteAction);
-            }
-        }
-    }
-
-    @Override
-    public void fillActionBars(IActionBars actionBars) {
-        if (fTextActionHandler == null) {
-            fTextActionHandler = new TextActionHandler(actionBars);
-        }
-
-        fTextActionHandler.setCopyAction(fCopyAction);
-        fTextActionHandler.setPasteAction(fPasteAction);
-        fTextActionHandler.setDeleteAction(fDeleteAction);
-        updateActionBars();
-        
-//      fTextActionHandler.updateActionBars(); // 3.6+ only, so we need to use reflection
-        try
+	@Override
+	public void dispose()
+	{
+		if (fClipboard != null)
 		{
-			Method m = TextActionHandler.class.getMethod("updateActionBars"); //$NON-NLS-1$
-			m.invoke(fTextActionHandler);
+			fClipboard.dispose();
+			fClipboard = null;
 		}
-		catch (Exception e)
+		super.dispose();
+	}
+
+	@Override
+	public void fillContextMenu(IMenuManager menu)
+	{
+		IStructuredSelection selection = getSelection();
+		fCopyAction.selectionChanged(selection);
+		menu.appendToGroup(ICommonMenuConstants.GROUP_EDIT, fCopyAction);
+		fPasteAction.selectionChanged(selection);
+		menu.appendToGroup(ICommonMenuConstants.GROUP_EDIT, fPasteAction);
+
+		if (selection != null && !selection.isEmpty())
 		{
-			// ignore
+			Object[] elements = selection.toArray();
+			boolean allFileSystemObjects = true;
+			for (Object element : elements)
+			{
+				if (element instanceof LocalRoot || element instanceof IConnectionPoint)
+				{
+					allFileSystemObjects = false;
+					break;
+				}
+			}
+			if (allFileSystemObjects)
+			{
+				menu.appendToGroup(ICommonMenuConstants.GROUP_EDIT, fDeleteAction);
+			}
+		}
+	}
+
+	@Override
+	public void fillActionBars(IActionBars actionBars)
+	{
+		if (fTextActionHandler == null)
+		{
+			fTextActionHandler = new TextActionHandler(actionBars);
 		}
 
-    }
+		fTextActionHandler.setCopyAction(fCopyAction);
+		fTextActionHandler.setPasteAction(fPasteAction);
+		fTextActionHandler.setDeleteAction(fDeleteAction);
+		updateActionBars();
 
-    @Override
-    public void updateActionBars() {
-        IStructuredSelection selection = getSelection();
+		fTextActionHandler.updateActionBars();
+	}
 
-        fCopyAction.selectionChanged(selection);
-        fPasteAction.selectionChanged(selection);
-        fDeleteAction.selectionChanged(selection);
-    }
+	@Override
+	public void updateActionBars()
+	{
+		IStructuredSelection selection = getSelection();
 
-    /**
-     * Handles a key pressed event by invoking the appropriate action.
-     * 
-     * @param event
-     *            The key event
-     */
-    public void handleKeyPressed(KeyEvent event) {
-        if (event.character == SWT.DEL && event.stateMask == 0) {
-            if (fDeleteAction.isEnabled()) {
-                fDeleteAction.run();
-            }
-            event.doit = false;
-        }
-    }
+		fCopyAction.selectionChanged(selection);
+		fPasteAction.selectionChanged(selection);
+		fDeleteAction.selectionChanged(selection);
+	}
 
-    protected void makeActions() {
-        fClipboard = new Clipboard(fShell.getDisplay());
+	/**
+	 * Handles a key pressed event by invoking the appropriate action.
+	 * 
+	 * @param event
+	 *            The key event
+	 */
+	public void handleKeyPressed(KeyEvent event)
+	{
+		if (event.character == SWT.DEL && event.stateMask == 0)
+		{
+			if (fDeleteAction.isEnabled())
+			{
+				fDeleteAction.run();
+			}
+			event.doit = false;
+		}
+	}
 
-        ISharedImages images = PlatformUI.getWorkbench().getSharedImages();
+	protected void makeActions()
+	{
+		fClipboard = new Clipboard(fShell.getDisplay());
 
-        fPasteAction = new FileSystemPasteAction(fShell, fClipboard);
-        fPasteAction.setDisabledImageDescriptor(images
-                .getImageDescriptor(ISharedImages.IMG_TOOL_PASTE_DISABLED));
-        fPasteAction.setImageDescriptor(images.getImageDescriptor(ISharedImages.IMG_TOOL_PASTE));
-        fPasteAction.setActionDefinitionId(IWorkbenchCommandConstants.EDIT_PASTE);
+		ISharedImages images = PlatformUI.getWorkbench().getSharedImages();
 
-        fCopyAction = new FileSystemCopyAction(fShell, fClipboard, fPasteAction);
-        fCopyAction.setDisabledImageDescriptor(images
-                .getImageDescriptor(ISharedImages.IMG_TOOL_COPY_DISABLED));
-        fCopyAction.setImageDescriptor(images.getImageDescriptor(ISharedImages.IMG_TOOL_COPY));
-        fCopyAction.setActionDefinitionId(IWorkbenchCommandConstants.EDIT_COPY);
+		fPasteAction = new FileSystemPasteAction(fShell, fClipboard);
+		fPasteAction.setDisabledImageDescriptor(images.getImageDescriptor(ISharedImages.IMG_TOOL_PASTE_DISABLED));
+		fPasteAction.setImageDescriptor(images.getImageDescriptor(ISharedImages.IMG_TOOL_PASTE));
+		fPasteAction.setActionDefinitionId(IWorkbenchCommandConstants.EDIT_PASTE);
 
-        fDeleteAction = new FileSystemDeleteAction(fShell, fTree);
-        fDeleteAction.setDisabledImageDescriptor(images
-                .getImageDescriptor(ISharedImages.IMG_TOOL_DELETE_DISABLED));
-        fDeleteAction.setImageDescriptor(images.getImageDescriptor(ISharedImages.IMG_TOOL_DELETE));
-        fDeleteAction.setActionDefinitionId(IWorkbenchCommandConstants.EDIT_DELETE);
-    }
+		fCopyAction = new FileSystemCopyAction(fShell, fClipboard, fPasteAction);
+		fCopyAction.setDisabledImageDescriptor(images.getImageDescriptor(ISharedImages.IMG_TOOL_COPY_DISABLED));
+		fCopyAction.setImageDescriptor(images.getImageDescriptor(ISharedImages.IMG_TOOL_COPY));
+		fCopyAction.setActionDefinitionId(IWorkbenchCommandConstants.EDIT_COPY);
 
-    private IStructuredSelection getSelection() {
-        return (IStructuredSelection) getContext().getSelection();
-    }
+		fDeleteAction = new FileSystemDeleteAction(fShell, fTree);
+		fDeleteAction.setDisabledImageDescriptor(images.getImageDescriptor(ISharedImages.IMG_TOOL_DELETE_DISABLED));
+		fDeleteAction.setImageDescriptor(images.getImageDescriptor(ISharedImages.IMG_TOOL_DELETE));
+		fDeleteAction.setActionDefinitionId(IWorkbenchCommandConstants.EDIT_DELETE);
+	}
+
+	private IStructuredSelection getSelection()
+	{
+		return (IStructuredSelection) getContext().getSelection();
+	}
 }

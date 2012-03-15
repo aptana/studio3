@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -12,7 +12,9 @@ import java.net.URI;
 
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.filesystem.URIUtil;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -40,9 +42,15 @@ import com.aptana.ui.UIPlugin;
 
 /**
  * @author Max Stepanov
+ * @author cwilliams
  */
 public final class UIUtils
 {
+
+	/**
+	 * By default, show tooltips for 3 seconds.
+	 */
+	public static final int DEFAULT_TOOLTIP_TIME = 3000;
 
 	/**
 	 * 
@@ -163,31 +171,57 @@ public final class UIUtils
 				IEvaluationService.class);
 		if (evaluationService != null)
 		{
-			IEvaluationContext currentState = evaluationService.getCurrentState();
-			Object variable = currentState.getVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME);
-			if (variable instanceof IStructuredSelection)
+			return getSelectedResource(evaluationService.getCurrentState());
+		}
+		return null;
+	}
+
+	public static IResource getSelectedResource(IEvaluationContext evaluationContext)
+	{
+		if (evaluationContext == null)
+		{
+			return null;
+		}
+
+		Object variable = evaluationContext.getVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME);
+		if (variable instanceof IStructuredSelection)
+		{
+			Object selectedObject = ((IStructuredSelection) variable).getFirstElement();
+			if (selectedObject instanceof IAdaptable)
 			{
-				Object selectedObject = ((IStructuredSelection) variable).getFirstElement();
-				if (selectedObject instanceof IResource)
+				IResource resource = (IResource) ((IAdaptable) selectedObject).getAdapter(IResource.class);
+				if (resource != null)
 				{
-					return (IResource) selectedObject;
+					return resource;
 				}
 			}
-			else
+		}
+		else
+		{
+			// checks the active editor
+			variable = evaluationContext.getVariable(ISources.ACTIVE_EDITOR_NAME);
+			if (variable instanceof IEditorPart)
 			{
-				// checks the active editor
-				variable = currentState.getVariable(ISources.ACTIVE_EDITOR_NAME);
-				if (variable instanceof IEditorPart)
+				IEditorInput editorInput = ((IEditorPart) variable).getEditorInput();
+				if (editorInput instanceof IFileEditorInput)
 				{
-					IEditorInput editorInput = ((IEditorPart) variable).getEditorInput();
-					if (editorInput instanceof IFileEditorInput)
-					{
-						return ((IFileEditorInput) editorInput).getFile().getProject();
-					}
+					return ((IFileEditorInput) editorInput).getFile();
 				}
 			}
 		}
 		return null;
+	}
+
+	public static IProject getSelectedProject()
+	{
+		IProject project = null;
+		IResource selectedResource = getSelectedResource();
+		if (selectedResource != null)
+		{
+			project = selectedResource.getProject();
+		}
+
+		return project;
 	}
 
 	/**

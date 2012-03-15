@@ -14,7 +14,7 @@ import org.eclipse.ui.IWorkbenchPropertyPage;
 import org.eclipse.ui.dialogs.PropertyPage;
 
 import com.aptana.preview.ProjectPreviewUtil;
-import com.aptana.webserver.core.AbstractWebServerConfiguration;
+import com.aptana.webserver.core.IServer;
 
 /**
  * @author Max Stepanov
@@ -58,7 +58,7 @@ public class ProjectPreviewPropertyPage extends PropertyPage implements IWorkben
 		return (IProject) getElement().getAdapter(IProject.class);
 	}
 
-	private AbstractWebServerConfiguration getServer()
+	private IServer getServer()
 	{
 		return ProjectPreviewUtil.getServerConfiguration(getProject());
 	}

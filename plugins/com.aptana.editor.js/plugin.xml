@@ -21,6 +21,7 @@
          point="org.eclipse.core.contenttype.contentTypes">
       <content-type
             base-type="org.eclipse.core.runtime.text"
+            default-charset="UTF-8"
             file-extensions="js,htc,jsx"
             id="com.aptana.contenttype.js"
             name="%content-type.js.name"
@@ -28,6 +29,7 @@
       </content-type>
       <content-type
             base-type="org.eclipse.core.runtime.xml"
+            default-charset="UTF-8"
             file-extensions="sdocml"
             id="com.aptana.contenttype.sdocml"
             name="%content-type.sdocml.name"
@@ -35,6 +37,7 @@
       </content-type>
       <content-type
             base-type="com.aptana.contenttype.json"
+            default-charset="UTF-8"
             file-extensions="jsca"
             id="com.aptana.contenttype.jsca"
             name="%jsca.content-type.name"
@@ -85,35 +88,6 @@
       </parser>
    </extension>
    <extension
-         point="com.aptana.editor.common.validator">
-      <content-type
-            name="%validator.language.js.name"
-            id="com.aptana.contenttype.js">
-      </content-type>
-      <validator
-            class="com.aptana.editor.js.validator.MozillaJsValidator"
-            content-type="com.aptana.contenttype.js"
-            marker-type="com.aptana.editor.js.problem"
-            name="%validator.mozilla.name">
-      </validator>
-      <validator
-            class="com.aptana.editor.js.validator.JSLintValidator"
-            content-type="com.aptana.contenttype.js"
-            marker-type="com.aptana.editor.js.problem"
-            name="%validator.jslint.name">
-      </validator>
-      <content-type
-            id="com.aptana.contenttype.sdocml"
-            name="%sdocml.content.name">
-      </content-type>
-      <validator
-            class="com.aptana.editor.js.validator.SDocMLValidator"
-            content-type="com.aptana.contenttype.sdocml"
-            marker-type="com.aptana.editor.js.sdocml_problem"
-            name="%validator.sdocml.name">
-      </validator>
-   </extension>
-   <extension
          point="org.eclipse.ui.menus">
       <menuContribution
             allPopups="false"
@@ -131,6 +105,12 @@
             id="com.aptana.editor.js.quick_outline"
             name="%command.quickoutline.name">
       </command>
+      <command
+            categoryId="org.eclipse.ui.category.navigate"
+            description="%openDeclaration.description"
+            id="com.aptana.editor.js.openDeclaration"
+            name="%openDeclaration.name">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
@@ -139,6 +119,12 @@
             contextId="com.aptana.editor.context"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+O">
+      </key>
+      <key
+            commandId="com.aptana.editor.js.openDeclaration"
+            contextId="com.aptana.scripting.context"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="F3">
       </key>
    </extension>
    <extension
@@ -216,13 +202,106 @@
          </contentType>
       </hover>
    </extension>
+      <extension
+         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectorTargets">
+      <target
+            id="com.aptana.editor.js.sourceCode"
+            name="%jshyperlink.description">
+      </target>
+   </extension>
+   <extension
+         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectors">
+      <hyperlinkDetector
+            activate="true"
+            class="com.aptana.editor.js.hyperlink.JSHyperlinkDetector"
+            id="com.aptana.editor.js.hyperlinkDetector"
+            name="%hyperlinkDetector.name"
+            targetId="com.aptana.editor.js.sourceCode">
+      </hyperlinkDetector>
+   </extension>
    <extension
          point="com.aptana.index.core.ui.indexViewContributors">
       <contributor
+            action-provider="com.aptana.editor.js.views.JSIndexViewActionProvider"
             content-provider="com.aptana.editor.js.views.JSIndexViewContentProvider"
             label-provider="com.aptana.editor.js.views.JSIndexViewLabelProvider"
             name="%js.index.view.contributors">
       </contributor>
+   </extension>
+   <extension
+         point="com.aptana.buildpath.core.buildParticipants">
+      <participant
+            class="com.aptana.editor.js.internal.build.JSTaskDetector"
+            id="com.aptana.editor.js.build.JSTaskDetector"
+            name="%js.task.detector.name"
+            priority="50">
+         <contentTypeBinding
+               contentTypeId="com.aptana.contenttype.js">
+         </contentTypeBinding>
+      </participant>
+      <participant
+            class="com.aptana.editor.js.validator.JSLintValidator"
+            id="com.aptana.editor.js.validator.JSLintValidator"
+            name="%validator.jslint.name"
+            priority="50">
+         <contentTypeBinding
+               contentTypeId="com.aptana.contenttype.js">
+         </contentTypeBinding>
+      </participant>
+      <participant
+            class="com.aptana.editor.js.validator.MozillaJsValidator"
+            id="com.aptana.editor.js.validator.MozillaValidator"
+            name="%validator.mozilla.name"
+            priority="50">
+         <contentTypeBinding
+               contentTypeId="com.aptana.contenttype.js">
+         </contentTypeBinding>
+      </participant>
+      <participant
+            class="com.aptana.editor.js.validator.JSParserValidator"
+            id="com.aptana.editor.js.validator.JSParserValidator"
+            name="%validator.parser.name"
+            priority="60">
+         <contentTypeBinding
+               contentTypeId="com.aptana.contenttype.js">
+         </contentTypeBinding>
+      </participant>
+      <participant
+            class="com.aptana.editor.js.validator.SDocMLValidator"
+            id="com.aptana.editor.js.validator.SDocMLValidator"
+            name="%validator.sdocml.name">
+         <contentTypeBinding
+               contentTypeId="com.aptana.contenttype.sdocml">
+         </contentTypeBinding>
+      </participant>
+   </extension>
+   <extension
+         id="jslint_problem"
+         name="%marker.jslint.name"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="com.aptana.editor.js.problem">
+      </super>
+   </extension>
+   <extension
+         id="mozilla_problem"
+         name="%marker.mozilla.name"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="com.aptana.editor.js.problem">
+      </super>
+   </extension>
+   <extension
+         point="org.eclipse.compare.contentMergeViewers">
+      <contentTypeBinding
+            contentMergeViewerId="com.aptana.editor.js.contentMergeViewer"
+            contentTypeId="com.aptana.contenttype.js">
+      </contentTypeBinding>
+      <viewer
+            class="com.aptana.editor.js.internal.JSMergeViewerCreator"
+            extensions="js,jsx,htc"
+            id="com.aptana.editor.js.contentMergeViewer">
+      </viewer>
    </extension>
 
 </plugin>

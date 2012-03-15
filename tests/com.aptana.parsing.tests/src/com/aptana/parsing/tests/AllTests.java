@@ -26,11 +26,12 @@ public class AllTests
 				super.runTest(test, result);
 			}
 		};
-		//$JUnit-BEGIN$
-		suite.addTest(com.aptana.parsing.ast.AllTests.suite());
+		// $JUnit-BEGIN$
 		suite.addTest(com.aptana.json.AllTests.suite());
+		suite.addTest(com.aptana.parsing.ast.AllTests.suite());
+		suite.addTest(com.aptana.parsing.lexer.LexerTests.suite());
 		suite.addTest(com.aptana.sax.AllTests.suite());
-		//$JUnit-END$
+		// $JUnit-END$
 		return suite;
 	}
 

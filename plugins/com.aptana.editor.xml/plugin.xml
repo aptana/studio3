@@ -6,7 +6,7 @@
          point="org.eclipse.ui.editors">
       <editor
             class="com.aptana.editor.xml.XMLEditor"
-            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
+            contributorClass="com.aptana.editor.common.CommonTextEditorActionContributor"
             default="true"
             extensions="tld,pt,cpt,dtml,rss,opml"
             icon="icons/xml.png"
@@ -81,11 +81,28 @@
          point="org.eclipse.core.contenttype.contentTypes">
       <content-type
             base-type="org.eclipse.core.runtime.xml"
+            default-charset="UTF-8"
             file-extensions="xsl"
             id="com.aptana.contenttype.xsl"
             name="%content-type.xsl.name"
             priority="normal">
       </content-type>
+   </extension>
+   <extension
+         point="org.eclipse.compare.contentMergeViewers">
+      <contentTypeBinding
+            contentMergeViewerId="com.aptana.editor.xml.contentMergeViewer"
+            contentTypeId="org.eclipse.core.runtime.xml">
+      </contentTypeBinding>
+      <contentTypeBinding
+            contentMergeViewerId="com.aptana.editor.xml.contentMergeViewer"
+            contentTypeId="com.aptana.contenttype.xsl">
+      </contentTypeBinding>
+      <viewer
+            class="com.aptana.editor.xml.internal.XMLMergeViewerCreator"
+            extensions="xml,xsl"
+            id="com.aptana.editor.xml.contentMergeViewer">
+      </viewer>
    </extension>
 
 </plugin>

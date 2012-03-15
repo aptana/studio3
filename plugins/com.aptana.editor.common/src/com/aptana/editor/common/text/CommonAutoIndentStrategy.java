@@ -7,6 +7,8 @@
  */
 package com.aptana.editor.common.text;
 
+import java.util.List;
+
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentCommand;
@@ -17,6 +19,7 @@ import org.eclipse.jface.text.TextUtilities;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 
 /**
@@ -28,7 +31,11 @@ import com.aptana.editor.common.preferences.IPreferenceConstants;
  */
 public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 {
-
+	private static final String SPACE = " "; //$NON-NLS-1$
+	protected static final char COMMENT_CHAR = '*';
+	protected static final String DOCUMENTATION_START = "/**"; //$NON-NLS-1$
+	protected static final String COMMENT_END = "*/"; //$NON-NLS-1$
+	protected static final String COMMENT_START = "/*"; //$NON-NLS-1$
 	private String fContentType;
 	private SourceViewerConfiguration fViewerConfiguration;
 	private ISourceViewer fSourceViewer;
@@ -142,27 +149,50 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 			String upToOffset = line.substring(0, lineOffset);
 
 			// What we want is to add a star if user hit return inside a comment block
-			if (c1 == '*' && upToOffset.lastIndexOf("*/") <= upToOffset.lastIndexOf("/*") && isComment(c.offset)) //$NON-NLS-1$ //$NON-NLS-2$
+			if (c1 == COMMENT_CHAR && upToOffset.lastIndexOf(COMMENT_END) <= upToOffset.lastIndexOf(COMMENT_START)
+					&& isComment(c.offset))
 			{
-				buf.append('*');
+				buf.append(COMMENT_CHAR);
 				if (d.getChar(c.offset) != '/')
 				{
 					buf.append(' ');
 				}
 			}
 			// Return after /*
-			else if (upToOffset.trim().startsWith("/*") && !upToOffset.contains("*/")) //$NON-NLS-1$ //$NON-NLS-2$
+			else if (upToOffset.trim().startsWith(COMMENT_START) && !upToOffset.contains(COMMENT_END))
 			{
-				buf.append(' '); // space to line up asterisk
-
+				char commentIndent = ' '; // space to line up asterisk
 				String restOfLine = line.substring(lineOffset);
-				// if next char is an asterisk, no need to add an asterisk
-				if (!restOfLine.startsWith("*")) //$NON-NLS-1$
+
+				// get the line delimiter of the text file
+				String lineDelimiter = TextUtilities.getDefaultLineDelimiter(d);
+
+				if (upToOffset.trim().startsWith(DOCUMENTATION_START)) // ScriptDoc block
 				{
-					buf.append("* "); //$NON-NLS-1$
+					buf.append(commentIndent).append(COMMENT_CHAR).append(SPACE);
+
+					c.shiftsCaret = false;
+					c.caretOffset = c.offset + buf.length() + 1;
+
+					List<String> list = getAdditionalComments(d, c);
+					if (list != null && list.size() > 0)
+					{
+						buf.append(lineDelimiter).append(commentIndent).append(COMMENT_CHAR).append(SPACE);
+						buf.append(StringUtil.join(lineDelimiter + commentIndent + COMMENT_CHAR + SPACE, list));
+					}
 				}
+				// if next char is an asterisk, no need to add an asterisk
+				else if (!StringUtil.startsWith(restOfLine, COMMENT_CHAR))
+				{
+					buf.append(commentIndent).append(COMMENT_CHAR).append(SPACE);
+				}
+				else
+				{
+					buf.append(commentIndent);
+				}
+
 				// Already closed block comment on this line after we hit return, so don't close it again
-				if (restOfLine.contains("*/")) //$NON-NLS-1$
+				if (restOfLine.contains(COMMENT_END))
 				{
 					return buf.toString();
 				}
@@ -170,7 +200,7 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 				{
 					IRegion nextLineInfo = d.getLineInformationOfOffset(c.offset + 1);
 					String nextLine = d.get(nextLineInfo.getOffset(), nextLineInfo.getLength()).trim();
-					if (nextLine.startsWith("*") || nextLine.endsWith("*/")) //$NON-NLS-1$ //$NON-NLS-2$
+					if (StringUtil.startsWith(nextLine, COMMENT_CHAR) || nextLine.endsWith(COMMENT_END))
 					{
 						return buf.toString();
 					}
@@ -179,14 +209,10 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 				{
 				}
 
-				String toEnd = " */"; //$NON-NLS-1$
-				if (upToOffset.trim().startsWith("/**")) //$NON-NLS-1$
-				{
-					toEnd = " */"; //$NON-NLS-1$
-				}
-				d.replace(c.offset, 0, "\n" + indent + toEnd); //$NON-NLS-1$
+				String toEnd = SPACE + COMMENT_END;
+				d.replace(c.offset, 0, lineDelimiter + indent + toEnd);
 			}
-			else if (buf.length() != 0 && upToOffset.endsWith("*/") && buf.charAt(buf.length() - 1) == ' ') //$NON-NLS-1$
+			else if (buf.length() != 0 && upToOffset.endsWith(COMMENT_END) && buf.charAt(buf.length() - 1) == ' ')
 			{
 				// We want to delete an extra space when closing block comments
 				buf.deleteCharAt(buf.length() - 1);
@@ -197,6 +223,21 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 		{
 		}
 		return buf.toString();
+	}
+
+	/**
+	 * Returns additional lines of information to append to the auto-inserted comments. Each entry will become a
+	 * separate line
+	 * 
+	 * @param d
+	 *            The current document
+	 * @param c
+	 *            The current document command
+	 * @return
+	 */
+	protected List<String> getAdditionalComments(IDocument d, DocumentCommand c)
+	{
+		return null;
 	}
 
 	protected boolean isComment(int offset)
@@ -272,7 +313,7 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 		int spaceCount = indentSize % indentStringWidth;
 		for (int i = 0; i < spaceCount; ++i)
 		{
-			indentation += " "; //$NON-NLS-1$
+			indentation += SPACE;
 		}
 
 		return indentation;

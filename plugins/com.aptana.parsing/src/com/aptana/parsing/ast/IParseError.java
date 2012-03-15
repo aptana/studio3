@@ -8,7 +8,7 @@
 package com.aptana.parsing.ast;
 
 /**
- * @author ayeung
+ * @author ayeung FIXME Combine with IProblem?
  */
 public interface IParseError // $codepro.audit.disable consistentSuffixUsage
 {
@@ -37,6 +37,13 @@ public interface IParseError // $codepro.audit.disable consistentSuffixUsage
 	public int getOffset();
 
 	/**
+	 * The length of the error
+	 * 
+	 * @return the length of the error
+	 */
+	public int getLength();
+
+	/**
 	 * The message for the parse error
 	 * 
 	 * @return the error message
@@ -49,4 +56,11 @@ public interface IParseError // $codepro.audit.disable consistentSuffixUsage
 	 * @return the severity of the error
 	 */
 	public Severity getSeverity();
+
+	/**
+	 * The language/content type where this error originated.
+	 * 
+	 * @return
+	 */
+	public String getLangauge();
 }

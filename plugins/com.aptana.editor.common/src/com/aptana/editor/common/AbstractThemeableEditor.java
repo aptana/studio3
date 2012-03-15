@@ -9,6 +9,7 @@ package com.aptana.editor.common;
 
 import java.io.File;
 import java.text.MessageFormat;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.filesystem.EFS;
@@ -43,6 +44,7 @@ import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.jface.text.source.IVerticalRulerColumn;
 import org.eclipse.jface.text.source.LineNumberRulerColumn;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
+import org.eclipse.jface.text.source.projection.ProjectionViewer;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -53,17 +55,22 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DropTarget;
+import org.eclipse.swt.dnd.DropTargetAdapter;
+import org.eclipse.swt.dnd.DropTargetEvent;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.contexts.IContextService;
+import org.eclipse.ui.dnd.IDragAndDropService;
 import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
@@ -81,11 +88,12 @@ import org.eclipse.ui.views.properties.IPropertySheetPage;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.resources.IUniformResource;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.actions.FilterThroughCommandAction;
 import com.aptana.editor.common.actions.FoldingActionsGroup;
+import com.aptana.editor.common.dnd.SnippetTransfer;
 import com.aptana.editor.common.extensions.FindBarEditorExtension;
 import com.aptana.editor.common.extensions.IThemeableEditor;
 import com.aptana.editor.common.extensions.ThemeableEditorExtension;
@@ -94,16 +102,22 @@ import com.aptana.editor.common.internal.peer.CharacterPairMatcher;
 import com.aptana.editor.common.internal.peer.PeerCharacterCloser;
 import com.aptana.editor.common.internal.scripting.CommandElementsProvider;
 import com.aptana.editor.common.outline.CommonOutlinePage;
-import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.common.properties.CommonEditorPropertySheetPage;
+import com.aptana.editor.common.scripting.commands.CommandExecutionUtils;
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.common.text.reconciler.RubyRegexpFolder;
 import com.aptana.editor.common.viewer.CommonProjectionViewer;
+import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.keybindings.ICommandElementsProvider;
+import com.aptana.scripting.model.BundleElement;
+import com.aptana.scripting.model.CommandResult;
+import com.aptana.scripting.model.InvocationType;
+import com.aptana.scripting.model.SnippetElement;
 import com.aptana.theme.ThemePlugin;
 import com.aptana.ui.util.UIUtils;
 
@@ -168,13 +182,54 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		}
 	}
 
+	private class SnippetDropTargetListener extends DropTargetAdapter
+	{
+		public void drop(DropTargetEvent event)
+		{
+			if (event.data instanceof SnippetElement)
+			{
+				SnippetElement snippet = (SnippetElement) event.data;
+				CommandResult commandResult = CommandExecutionUtils.executeCommand(snippet, InvocationType.MENU,
+						AbstractThemeableEditor.this);
+				if (commandResult == null)
+				{
+					BundleElement bundle = snippet.getOwningBundle();
+					String bundleName = (bundle == null) ? "Unknown bundle" : bundle.getDisplayName(); //$NON-NLS-1$
+					IdeLog.logError(CommonEditorPlugin.getDefault(),
+							StringUtil.format("Error executing command {0} in bundle {1}. Command returned null.", //$NON-NLS-1$
+									new String[] { snippet.getDisplayName(), bundleName }), IDebugScopes.DRAG_DROP);
+				}
+				else
+				{
+					CommandExecutionUtils.processCommandResult(snippet, commandResult, AbstractThemeableEditor.this);
+					AbstractThemeableEditor.this.setFocus();
+				}
+			}
+		}
+
+		public void dragOver(DropTargetEvent event)
+		{
+			if (event.data instanceof SnippetElement)
+			{
+				event.feedback |= DND.FEEDBACK_SCROLL;
+			}
+		}
+
+		public void dragEnter(DropTargetEvent event)
+		{
+			if (event.data instanceof SnippetElement)
+			{
+				event.detail = DND.DROP_COPY;
+			}
+		}
+	}
+
 	private static final char[] DEFAULT_PAIR_MATCHING_CHARS = new char[] { '(', ')', '{', '}', '[', ']', '`', '`',
 			'\'', '\'', '"', '"' };
 
 	private ICommandElementsProvider fCommandElementsProvider;
 
 	private CommonOutlinePage fOutlinePage;
-	private FileService fFileService;
 
 	private boolean fCursorChangeListened;
 	private SelectionChangedListener fSelectionChangedListener;
@@ -278,6 +333,34 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		occurrencesUpdater.initialize(getPreferenceStore());
 	}
 
+	@Override
+	protected void initializeDragAndDrop(ISourceViewer viewer)
+	{
+		super.initializeDragAndDrop(viewer);
+
+		// Adds snippet drag/drop support
+		IDragAndDropService dndService = (IDragAndDropService) getSite().getService(IDragAndDropService.class);
+		if (dndService == null)
+		{
+			return;
+		}
+		StyledText st = viewer.getTextWidget();
+		DropTarget dropTarget = (DropTarget) st.getData(DND.DROP_TARGET_KEY);
+		if (dropTarget != null)
+		{
+			Transfer[] transfers = dropTarget.getTransfer();
+			List<Transfer> allTransfers = CollectionsUtil.newList(transfers);
+			allTransfers.add(SnippetTransfer.getInstance());
+			dropTarget.setTransfer(allTransfers.toArray(new Transfer[allTransfers.size()]));
+			dropTarget.addDropListener(new SnippetDropTargetListener());
+		}
+		else
+		{
+			dndService.addMergedDropTarget(st, DND.DROP_COPY, new Transfer[] { SnippetTransfer.getInstance() },
+					new SnippetDropTargetListener());
+		}
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.texteditor.AbstractDecoratedTextEditor#getAdapter(java.lang.Class)
@@ -358,7 +441,18 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	protected void initializeLineNumberRulerColumn(LineNumberRulerColumn rulerColumn)
 	{
 		super.initializeLineNumberRulerColumn(rulerColumn);
+		if (rulerColumn instanceof CommonLineNumberChangeRulerColumn)
+		{
+			((CommonLineNumberChangeRulerColumn) rulerColumn).showLineNumbers(isLineNumberVisible());
+		}
 		this.fThemeableEditorColorsExtension.initializeLineNumberRulerColumn(rulerColumn);
+	}
+
+	private boolean isLineNumberVisible()
+	{
+		IPreferenceStore store = getPreferenceStore();
+		return (store != null) ? store
+				.getBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_LINE_NUMBER_RULER) : false;
 	}
 
 	@Override
@@ -479,34 +573,20 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 			}
 
 			fCommandElementsProvider = null;
-			if (fFileService != null)
-			{
-				fFileService.dispose();
-				fFileService = null;
-			}
 			fPeerCharacterCloser = null;
+
+			IDragAndDropService dndService = (IDragAndDropService) getSite().getService(IDragAndDropService.class);
+			if (dndService != null)
+			{
+				ProjectionViewer viewer = (ProjectionViewer) getSourceViewer();
+				StyledText st = viewer.getTextWidget();
+				dndService.removeMergedDropTarget(st);
+			}
 		}
 		finally
 		{
 			super.dispose();
 		}
-	}
-
-	@Override
-	protected void doSetInput(final IEditorInput input) throws CoreException
-	{
-		super.doSetInput(input);
-
-		Object resource;
-		if (input instanceof IFileEditorInput)
-		{
-			resource = ((IFileEditorInput) input).getFile();
-		}
-		else
-		{
-			resource = input.getAdapter(IUniformResource.class);
-		}
-		getFileService().setResource(resource);
 	}
 
 	/*
@@ -693,12 +773,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		return null;
 	}
 
-	protected FileService createFileService()
-	{
-		return new FileService(getFileServiceContentTypeId());
-	}
-
-	protected String getFileServiceContentTypeId()
+	public String getContentType()
 	{
 		try
 		{
@@ -711,6 +786,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		}
 		catch (Exception e)
 		{
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 		return null;
 	}
@@ -731,7 +807,11 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 
 		super.handlePreferenceStoreChanged(event);
 		this.fThemeableEditorColorsExtension.handlePreferenceStoreChanged(event);
-		if (property.equals(IPreferenceConstants.EDITOR_PEER_CHARACTER_CLOSE))
+		if (property.equals(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_LINE_NUMBER_RULER))
+		{
+			((CommonLineNumberChangeRulerColumn) fLineNumberRulerColumn).showLineNumbers(isLineNumberVisible());
+		}
+		else if (property.equals(IPreferenceConstants.EDITOR_PEER_CHARACTER_CLOSE))
 		{
 			fPeerCharacterCloser.setAutoInsertEnabled(Boolean.parseBoolean(StringUtil.getStringValue(event
 					.getNewValue())));
@@ -768,15 +848,6 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 			}
 			return;
 		}
-	}
-
-	public synchronized FileService getFileService()
-	{
-		if (fFileService == null)
-		{
-			fFileService = createFileService();
-		}
-		return fFileService;
 	}
 
 	public Object computeHighlightedOutlineNode(int caretOffset)
@@ -994,11 +1065,41 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		return CommonEditorPlugin.getDefault().getPreferenceStore();
 	}
 
+	protected IDocument getDocument()
+	{
+		return getDocumentProvider().getDocument(getEditorInput());
+	}
+
+	/**
+	 * FIXME Should we hang this here?
+	 * 
+	 * @deprecated Callers should call to {@link ParserPoolFactory} themselves
+	 * @return
+	 */
+	public IParseRootNode getAST()
+	{
+		try
+		{
+			IDocument document = getDocument();
+			return ParserPoolFactory.parse(getContentType(), document.get());
+		}
+		catch (Exception e)
+		{
+			IdeLog.logTrace(CommonEditorPlugin.getDefault(), e.getMessage(), e, IDebugScopes.AST);
+		}
+		return null;
+	}
+
+	/**
+	 * @deprecated This doesn't belong on the editor, this should be in some ASTUtil method or something...
+	 * @param offset
+	 * @return
+	 */
 	protected IParseNode getASTNodeAt(int offset)
 	{
 		try
 		{
-			IParseNode root = getFileService().getParseResult();
+			IParseNode root = getAST();
 			if (root == null)
 			{
 				return null;
@@ -1117,8 +1218,11 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	public void setWordWrapEnabled(boolean enabled)
 	{
 		StyledText textWidget = getSourceViewer().getTextWidget();
-		textWidget.setWordWrap(enabled);
-		fLineNumberRulerColumn.redraw();
+		if (textWidget.getWordWrap() != enabled)
+		{
+			textWidget.setWordWrap(enabled);
+			fLineNumberRulerColumn.redraw();
+		}
 	}
 
 	@Override

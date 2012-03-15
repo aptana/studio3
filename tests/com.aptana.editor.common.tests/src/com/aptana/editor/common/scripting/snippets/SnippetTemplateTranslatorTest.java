@@ -9,6 +9,11 @@ package com.aptana.editor.common.scripting.snippets;
 
 import junit.framework.TestCase;
 
+import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.Position;
+
+import com.aptana.scripting.model.SnippetElement;
+
 public class SnippetTemplateTranslatorTest extends TestCase
 {
 
@@ -176,6 +181,16 @@ public class SnippetTemplateTranslatorTest extends TestCase
 	{
 		assertTranslatesTo("${1:# test.execute <<END\n" + "#   WHEN a > 2 THEN #{a\\}\n" + "# END\n" + "}",
 				"${1:tabstop('# test.execute <<END\n" + "#   WHEN a > 2 THEN #{a}\n" + "# END\n" + "')}");
+	}
+
+	public void testSnippetTemplateEvaluation()
+	{
+		SnippetElement snippet = new SnippetElement(null);
+		snippet.setExpansion("font-size: ${1:100%};$0 ${2:two/2/twice} ${3} ${4:four}");
+		snippet.setScope("source.js");
+		Document document = new Document();
+		String evaluation = SnippetTemplateUtil.evaluateSnippet(snippet, document, new Position(0));
+		assertEquals("Snippet evaluated incorrectly", "font-size: 100%; two  four", evaluation);
 	}
 
 	private void assertTranslatesTo(String input, String expected)

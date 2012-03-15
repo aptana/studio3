@@ -1,0 +1,64 @@
+==PREFS==
+xml.formatter.formatter.on.off.enabled=false
+xml.formatter.formatter.indentation.size=2
+xml.formatter.wrap.comments=false
+xml.formatter.line.before.non.xml=1
+xml.formatter.newline.excluded.on.text.nodes=true
+xml.formatter.formatter.tabulation.char=editor
+xml.formatter.formatter.on=@formatter:on
+xml.formatter.indent.excluded=
+xml.formatter.formatter.off=@formatter:off
+xml.formatter.formatter.tabulation.size=2
+xml.formatter.wrap.comments.length=80
+xml.formatter.newline.excluded=
+xml.formatter.line.preserve=1
+xml.formatter.line.after.non.xml=1
+xml.formatter.line.after.element=2
+==CONTENT==
+<asdd>
+  <tt>
+    <item>a1</item>
+    <admin:generatorAgent rdf:resource="http://www.movabletype.org/?v=3.01D"/>
+    <item>a2</item>
+    <item>bb</item>
+  </tt>
+</asdd>
+<asdd>
+  <tt>
+    <item>a1</item>
+    <admin:generatorAgent rdf:resource="http://www.movabletype.org/?v=3.01D"/>
+    <item>a2</item>
+    <item>bb</item>
+  </tt>
+</asdd>
+==FORMATTED==
+<asdd>
+	<tt>
+		<item>a1</item>
+
+
+		<admin:generatorAgent rdf:resource="http://www.movabletype.org/?v=3.01D"/>
+
+
+		<item>a2</item>
+
+
+		<item>bb</item>
+	</tt>
+</asdd>
+
+
+<asdd>
+	<tt>
+		<item>a1</item>
+
+
+		<admin:generatorAgent rdf:resource="http://www.movabletype.org/?v=3.01D"/>
+
+
+		<item>a2</item>
+
+
+		<item>bb</item>
+	</tt>
+</asdd>

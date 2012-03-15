@@ -108,7 +108,7 @@ public class RebaseBranchHandler extends AbstractGitHandler
 				{
 					repo.exitWriteProcess();
 				}
-				repo.index().refresh(subMonitor.newChild(25));
+				subMonitor.done();
 				return Status.OK_STATUS;
 			}
 		};

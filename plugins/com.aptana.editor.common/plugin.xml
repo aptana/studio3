@@ -626,6 +626,27 @@
             class="com.aptana.editor.common.preferences.TasksPreferencePage"
             id="com.aptana.editor.common.preferences.TasksPreferencePage"
             name="%page.tasks.name">
+      </page>
+      <page
+            category="com.aptana.ui.AptanaPreferencePage"
+            class="com.aptana.editor.common.preferences.ValidationPreferencePage"
+            id="com.aptana.editor.common.ValidationPreferencePage"
+            name="%page.validation.name">
+      </page>
+      <page
+            category="com.aptana.ui.AptanaPreferencePage"
+            class="com.aptana.editor.common.spelling.SpellingPreferencePage"
+            id="com.aptana.editor.common.spelling"
+            name="%page.spelling.name">
+         <keywordReference
+               id="org.eclipse.ui.editors.spelling">
+         </keywordReference>
+      </page>
+      <page
+            category="com.aptana.ui.AptanaPreferencePage"
+            class="com.aptana.editor.common.preferences.ContentAssistPreferencePage"
+            id="com.aptana.editor.common.contentassist"
+            name="%content.assist.pref.page.title">
       </page>            
    </extension>
    <extension
@@ -638,8 +659,27 @@
             targetId="com.aptana.editor.ui.hyperlinkTarget">
       </hyperlinkDetector>
    </extension>
-   <extension
+   
+    <extension
          point="org.eclipse.ui.editors.annotationTypes">
+      <type
+         name="com.aptana.editor.common.error"
+         super="org.eclipse.ui.workbench.texteditor.error"
+         markerType="com.aptana.core.problem"
+         markerSeverity="2">
+      </type>
+      <type
+         name="com.aptana.editor.common.warning"
+         super="org.eclipse.ui.workbench.texteditor.warning"
+         markerType="com.aptana.core.problem"
+         markerSeverity="1">
+      </type>
+      <type
+         name="com.aptana.editor.common.info"
+         super="org.eclipse.ui.workbench.texteditor.info"
+         markerType="com.aptana.core.problem"
+         markerSeverity="0">
+      </type>
       <type
             markerSeverity="0"
             name="com.aptana.editor.common.occurrence">
@@ -674,30 +714,6 @@
       </specification>
    </extension>
    <extension
-         point="org.eclipse.ui.preferencePages">
-      <page
-            category="com.aptana.ui.AptanaPreferencePage"
-            class="com.aptana.editor.common.preferences.ValidationPreferencePage"
-            id="com.aptana.editor.common.ValidationPreferencePage"
-            name="%page.validation.name">
-      </page>
-      <page
-            category="com.aptana.ui.AptanaPreferencePage"
-            class="com.aptana.editor.common.spelling.SpellingPreferencePage"
-            id="com.aptana.editor.common.spelling"
-            name="%page.spelling.name">
-         <keywordReference
-               id="org.eclipse.ui.editors.spelling">
-         </keywordReference>
-      </page>
-      <page
-            category="com.aptana.ui.AptanaPreferencePage"
-            class="com.aptana.editor.common.preferences.ContentAssistPreferencePage"
-            id="com.aptana.editor.common.contentassist"
-            name="%content.assist.pref.page.title">
-      </page>
-   </extension>
-   <extension
          point="org.eclipse.ui.actionSets">
       <actionSet
             id="com.aptana.editor.common.presentation"
@@ -725,5 +741,11 @@
                id="com.aptana.editor.common.presentation">
          </actionSet>
       </perspectiveExtension>
+   </extension>
+   <extension
+         point="org.eclipse.core.filebuffers.annotationModelCreation">
+      <factory
+            contentTypeId="org.eclipse.core.runtime.text"
+            class="com.aptana.editor.common.CommonAnnotationModelFactory"/>
    </extension>
 </plugin>
