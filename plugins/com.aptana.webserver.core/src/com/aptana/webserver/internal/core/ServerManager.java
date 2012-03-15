@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.SafeRunner;
 import com.aptana.core.epl.IMemento;
 import com.aptana.core.epl.XMLMemento;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.StringUtil;
 import com.aptana.webserver.core.IServer;
 import com.aptana.webserver.core.IServerChangeListener;
 import com.aptana.webserver.core.IServerManager;
@@ -282,6 +283,15 @@ public final class ServerManager implements IServerManager
 
 	public IServer findServerByName(String name)
 	{
+		if (StringUtil.isEmpty(name))
+		{
+			return null;
+		}
+		IServer server = WebServerCorePlugin.getDefault().getBuiltinWebServer();
+		if (name.equals(server.getName()))
+		{
+			return server;
+		}
 		synchronized (serverConfigurations)
 		{
 			for (IServer i : serverConfigurations)
