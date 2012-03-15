@@ -64,6 +64,7 @@ import com.aptana.webserver.internal.core.preferences.WebServerPreferences;
 public class LocalWebServer extends SimpleWebServer
 {
 
+	private static final String NAME = "built_in_server"; //$NON-NLS-1$
 	private static final int SOCKET_TIMEOUT = 10000;
 	private static final long STARTUP_TIMEOUT = 10000;
 	private static final long SHUTDOWN_TIMEOUT = 2000;
@@ -89,6 +90,7 @@ public class LocalWebServer extends SimpleWebServer
 		super();
 		Assert.isLegal(documentRoot != null, "DocumentRoot should be set"); //$NON-NLS-1$
 		setDocumentRoot(documentRoot);
+		setName(NAME);
 		this.state = IServer.State.STOPPED;
 		this.host = host;
 		this.port = SocketUtil.findFreePort(host, portRange[0], portRange[1]);

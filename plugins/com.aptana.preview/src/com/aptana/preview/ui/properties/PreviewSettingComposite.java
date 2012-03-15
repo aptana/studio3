@@ -12,8 +12,10 @@ import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -68,6 +70,7 @@ public class PreviewSettingComposite extends Composite implements SelectionListe
 
 	private List<Listener> fListeners;
 	private IServer fSelectedServer;
+	private int style;
 
 	/**
 	 * The constructor.
@@ -77,8 +80,24 @@ public class PreviewSettingComposite extends Composite implements SelectionListe
 	 */
 	public PreviewSettingComposite(Composite parent)
 	{
+		this(parent, SWT.VERTICAL);
+	}
+
+	/**
+	 * The constructor.
+	 * 
+	 * @param parent
+	 *            the parent composite
+	 * @param style
+	 *            the style of the composite to construct; could be {@link SWT#HORIZONTAL} or {@link SWT#VERTICAL}. By
+	 *            default the radio buttons will be aligned vertically.
+	 */
+	public PreviewSettingComposite(Composite parent, int style)
+	{
 		super(parent, SWT.NONE);
-		setLayout(GridLayoutFactory.fillDefaults().spacing(5, 0).create());
+		this.style = (style == SWT.HORIZONTAL) ? style : SWT.VERTICAL;
+		setLayout(GridLayoutFactory.fillDefaults().spacing(5, 0).numColumns((this.style == SWT.HORIZONTAL) ? 2 : 1)
+				.create());
 		fListeners = new ArrayList<Listener>();
 
 		fNoSettingRadio = new Button(this, SWT.RADIO);
@@ -114,10 +133,14 @@ public class PreviewSettingComposite extends Composite implements SelectionListe
 
 		fEditButton = new Button(serverComposite, SWT.PUSH);
 		fEditButton.setText(StringUtil.ellipsify(CoreStrings.EDIT));
+		fEditButton.setLayoutData(GridDataFactory.swtDefaults().hint(getButtonWidthHint(fEditButton), SWT.DEFAULT)
+				.create());
 		fEditButton.addSelectionListener(this);
 
 		fNewButton = new Button(serverComposite, SWT.PUSH);
 		fNewButton.setText(StringUtil.ellipsify(CoreStrings.NEW));
+		fNewButton.setLayoutData(GridDataFactory.swtDefaults().hint(getButtonWidthHint(fNewButton), SWT.DEFAULT)
+				.create());
 		fNewButton.addSelectionListener(this);
 
 		updateServersContent();
@@ -175,7 +198,7 @@ public class PreviewSettingComposite extends Composite implements SelectionListe
 	public void setSelectedServer(IServer server)
 	{
 		fSelectedServer = server;
-		if (fSelectedServer == null)
+		if (fSelectedServer == null || fSelectedServer == WebServerCorePlugin.getDefault().getBuiltinWebServer())
 		{
 			setSelectedType(Type.NONE);
 		}
@@ -353,5 +376,12 @@ public class PreviewSettingComposite extends Composite implements SelectionListe
 			fServersCombo.setInput(servers);
 			fServersCombo.setSelection(new StructuredSelection(servers.get(0)), true);
 		}
+	}
+
+	private static int getButtonWidthHint(Button button)
+	{
+		PixelConverter converter = new PixelConverter(button);
+		int widthHint = converter.convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH);
+		return Math.max(widthHint, button.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x);
 	}
 }
