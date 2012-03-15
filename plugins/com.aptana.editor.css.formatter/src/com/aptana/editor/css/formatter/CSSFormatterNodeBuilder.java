@@ -561,6 +561,11 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			endsWithSlash = true;
 		}
 
+		if (document.charAt(forwardSlashLocation) == '/')
+		{
+			endsWithSlash = true;
+		}
+
 		if ((document.charAt(LFLocation) == '\n' || document.charAt(CRLocation) == '\r') && isLastDeclaration)
 		{
 			isLastNodeInDeclaration = true;

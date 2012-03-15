@@ -90,7 +90,7 @@ public class MimeTypesRegistry
 		map("application/x-compress", "z");
 		map("application/x-cpio", "cpio");
 		map("application/x-csh", "csh");
-		map("application/x-debian-package", "deb");
+		map("application/x-deb", "deb"); // http://wiki.debian.org/DebianPackage
 		map("application/x-director", "dcr", "dir", "dxr");
 		map("application/x-dvi", "dvi");
 		map("application/x-freelance", "pre");
