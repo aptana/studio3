@@ -281,7 +281,7 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 		}
 
 		int indentSize = 0;
-		int tabWidth = getTabWidth();
+		int tabWidth = Math.max(1, getTabWidth());
 		char[] indentChars = lineIndent.toCharArray();
 		for (char e : indentChars)
 		{
