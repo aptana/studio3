@@ -23,7 +23,7 @@
 %terminals IMPORTANT, PROPERTY, SELECTOR, HASH, INCLUDES, DASHMATCH, BEGINS_WITH, ENDS_WITH;
 
 %typeof IDENTIFIER, PROPERTY, STRING, URL, NUMBER, PERCENTAGE, LENGTH, EMS, EXS, ANGLE, TIME, FREQUENCY, COLOR = "String";
-%typeof HASH, CLASS, LBRACKET, RBRACKET, COLON, COMMA, PLUS, GREATER, AT_RULE = "String";
+%typeof HASH, CLASS, LBRACKET, RBRACKET, COLON, COMMA, PLUS, STAR, GREATER, AT_RULE = "String";
 %typeof Statement = "CSSNode";
 %typeof Declaration = "CSSDeclarationNode";
 %typeof Declarations = "List<CSSDeclarationNode>";
@@ -430,6 +430,14 @@ Declaration
 	|   Identifier.i COLON Expression.e IMPORTANT.s
 		{:
 			return new CSSDeclarationNode(i, e, s);
+		:}
+	|   STAR.a Identifier.i COLON Expression.e
+		{:
+			return new CSSDeclarationNode(a + i, e);
+		:}
+	|   STAR.a Identifier.i COLON Expression.e IMPORTANT.s
+		{:
+			return new CSSDeclarationNode(a + i, e, s);
 		:}
 	|   error
 		{:

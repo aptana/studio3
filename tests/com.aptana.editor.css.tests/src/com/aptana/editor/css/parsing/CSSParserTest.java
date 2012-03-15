@@ -992,6 +992,26 @@ public class CSSParserTest extends TestCase
 	}
 
 	/**
+	 * Test for APSTUD-4487
+	 * 
+	 * @throws Exception
+	 */
+	public void testImportantProperty() throws Exception
+	{
+		parseTest("button {*overflow: visible;}" + EOL); //$NON-NLS-1$
+	}
+
+	/**
+	 * Test for APSTUD-4487
+	 * 
+	 * @throws Exception
+	 */
+	public void testStarredImportantProperty() throws Exception
+	{
+		parseTest("button {*overflow: visible !important;}" + EOL); //$NON-NLS-1$
+	}
+
+	/**
 	 * parseTest
 	 * 
 	 * @throws Exception
