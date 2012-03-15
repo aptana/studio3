@@ -475,11 +475,13 @@ public class UserAgentManager
 	 */
 	private void loadExtension()
 	{
-		// configure dispatcher for each element type we process
-		ConfigurationElementDispatcher dispatcher = new ConfigurationElementDispatcher(new UserAgentProcessor(),
-				new DefaultUserAgentsProcessor());
-
 		// @formatter:off
+		// configure dispatcher for each element type we process
+		ConfigurationElementDispatcher dispatcher = new ConfigurationElementDispatcher(
+			new UserAgentProcessor(),
+			new DefaultUserAgentsProcessor()
+		);
+
 		// configure dispatcher for each element type we process
 		EclipseUtil.processConfigurationElements(
 			CommonEditorPlugin.PLUGIN_ID,
@@ -540,6 +542,14 @@ public class UserAgentManager
 				{
 					result.put(natureID, userAgentIDs);
 				}
+			}
+		}
+		else
+		{
+			// set defaults
+			for (String natureID : ResourceUtil.getAptanaNaturesMap().values())
+			{
+				result.put(natureID, getDefaultUserAgentIDs(natureID));
 			}
 		}
 
