@@ -48,8 +48,6 @@ import org.eclipse.swt.dnd.DragSource;
 import org.eclipse.swt.dnd.DragSourceEvent;
 import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.Transfer;
-import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.ExpandEvent;
 import org.eclipse.swt.events.ExpandListener;
 import org.eclipse.swt.events.MouseAdapter;
@@ -72,11 +70,9 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.ExpandBar;
 import org.eclipse.swt.widgets.ExpandItem;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IEditorPart;
@@ -502,14 +498,9 @@ public class SnippetsView extends ViewPart
 				@Override
 				public void widgetSelected(SelectionEvent e)
 				{
-					if (snippetDialog != null)
-					{
-						snippetDialog.close();
-						snippetDialog = null;
-					}
+					closeSnippetDialog();
 
-					snippetDialog = new SnippetPopupDialog(UIUtils.getActiveShell(), snippet, toolbar,
-							scrolledComposite);
+					snippetDialog = new SnippetPopupDialog(getShell(), snippet, toolbar);
 					snippetDialog.open();
 				}
 
@@ -761,6 +752,14 @@ public class SnippetsView extends ViewPart
 		return font;
 	}
 
+	synchronized private void closeSnippetDialog()
+	{
+		if (snippetDialog != null)
+		{
+			snippetDialog.close();
+			snippetDialog = null;
+		}
+	}
 	/**
 	 * Create contents of the view part.
 	 * 

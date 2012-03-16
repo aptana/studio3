@@ -95,7 +95,7 @@ public class SnippetPopupDialog extends PopupDialog
 {
 	private static final String SNIPPETS_POPUP_SETTINGS = "snippets.popup.settings"; //$NON-NLS-1$
 	private ToolBar toolbar;
-	private Control positionTarget, sizeTarget;
+	private Control positionTarget;
 	private List<Image> toolbarImages = new ArrayList<Image>();
 	private SnippetElement snippet;
 	private ColorManager colorManager;
@@ -117,12 +117,11 @@ public class SnippetPopupDialog extends PopupDialog
 	private Composite mainComp;
 	private Composite snippetComp;
 
-	public SnippetPopupDialog(Shell shell, SnippetElement snippet, Control positionTarget, Control sizeTarget)
+	public SnippetPopupDialog(Shell shell, SnippetElement snippet, Control positionTarget)
 	{
-		super(shell, PopupDialog.INFOPOPUPRESIZE_SHELLSTYLE, true, true, false, false, false, snippet.getDisplayName(),
-				null);
+		super(shell, PopupDialog.INFOPOPUP_SHELLSTYLE, true, true, false, false, false, snippet
+				.getDisplayName(), null);
 		this.positionTarget = positionTarget;
-		this.sizeTarget = sizeTarget;
 		this.snippet = snippet;
 		colorManager = new ColorManager();
 		tabChar = Platform.getOS().equals(Platform.OS_MACOSX) ? "\u21E5" : "\u00bb"; //$NON-NLS-1$ //$NON-NLS-2$ 
@@ -514,9 +513,9 @@ public class SnippetPopupDialog extends PopupDialog
 		{
 			getShell().pack();
 			popupSize = getShell().getSize();
-			if (popupSize.x > 300)
+			if (popupSize.x > 500)
 			{
-				popupSize.x = 300;
+				popupSize.x = 500;
 			}
 
 			if (popupSize.y > sizeSize.y)
@@ -525,11 +524,21 @@ public class SnippetPopupDialog extends PopupDialog
 			}
 
 			// On OSX, compensate for the always visible horizontal scroll bar
-			ScrollBar horizontalBar = snippetViewer.getTextWidget().getHorizontalBar();
-			if (Platform.OS_MACOSX.equals(Platform.getOS()) && horizontalBar != null)
+			if (Platform.OS_MACOSX.equals(Platform.getOS()))
 			{
-				int height = horizontalBar.getSize().y;
-				popupSize.y += height;
+				ScrollBar horizontalBar = snippetViewer.getTextWidget().getHorizontalBar();
+				if (horizontalBar != null)
+				{
+					int height = horizontalBar.getSize().y;
+					popupSize.y += height;
+				}
+
+				ScrollBar verticalBar = snippetViewer.getTextWidget().getVerticalBar();
+				if (verticalBar != null)
+				{
+					int width = verticalBar.getSize().x;
+					popupSize.x += width;
+				}
 			}
 		}
 
