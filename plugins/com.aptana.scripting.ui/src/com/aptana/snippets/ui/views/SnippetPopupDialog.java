@@ -46,6 +46,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
@@ -114,6 +115,7 @@ public class SnippetPopupDialog extends PopupDialog
 	private Composite toolbarComp;
 	private ISourceViewer snippetViewer;
 	private Composite mainComp;
+	private Composite snippetComp;
 
 	public SnippetPopupDialog(Shell shell, SnippetElement snippet, Control positionTarget, Control sizeTarget)
 	{
@@ -145,11 +147,11 @@ public class SnippetPopupDialog extends PopupDialog
 	{
 		mainComp = (Composite) super.createDialogArea(parent);
 
-		Composite custom = new Composite(mainComp, SWT.NONE);
-		custom.setLayout(new FillLayout());
-		custom.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
+		snippetComp = new Composite(mainComp, SWT.NONE);
+		snippetComp.setLayout(new FillLayout());
+		snippetComp.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 
-		snippetViewer = createSnippetViewer(custom);
+		snippetViewer = createSnippetViewer(snippetComp);
 
 		Label separator = new Label(mainComp, SWT.HORIZONTAL | SWT.SEPARATOR);
 		separator.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
@@ -298,6 +300,7 @@ public class SnippetPopupDialog extends PopupDialog
 		exclusions.add(toolbar);
 		exclusions.add(toolbarComp);
 		exclusions.add(mainComp);
+		exclusions.add(snippetComp);
 		return exclusions;
 	}
 
@@ -503,7 +506,7 @@ public class SnippetPopupDialog extends PopupDialog
 		Point location = positionTarget.getDisplay()
 				.map(positionTarget.getParent(), null, positionTarget.getLocation());
 		Point targetSize = positionTarget.getSize();
-		Point sizeSize = sizeTarget.getSize();
+		Point sizeSize = UIUtils.getActiveWorkbenchWindow().getShell().getSize();
 		int initialX = location.x + targetSize.x;
 		int initialY = location.y + POPUP_OFFSET;
 
@@ -519,6 +522,14 @@ public class SnippetPopupDialog extends PopupDialog
 			if (popupSize.y > sizeSize.y)
 			{
 				popupSize.y = sizeSize.y;
+			}
+
+			// On OSX, compensate for the always visible horizontal scroll bar
+			ScrollBar horizontalBar = snippetViewer.getTextWidget().getHorizontalBar();
+			if (Platform.OS_MACOSX.equals(Platform.getOS()) && horizontalBar != null)
+			{
+				int height = horizontalBar.getSize().y;
+				popupSize.y += height;
 			}
 		}
 
