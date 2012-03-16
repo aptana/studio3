@@ -7,6 +7,7 @@
  */
 package com.aptana.theme.internal;
 
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Control;
 
 import com.aptana.theme.Theme;
@@ -20,9 +21,9 @@ public class AlphaBlendThemer extends ControlThemer
 {
 	private int alpha;
 
-	public AlphaBlendThemer(Control control, int alpha)
+	public AlphaBlendThemer(Control control, int alpha, Color defaultBg)
 	{
-		super(control);
+		super(control, defaultBg);
 		this.alpha = alpha;
 	}
 

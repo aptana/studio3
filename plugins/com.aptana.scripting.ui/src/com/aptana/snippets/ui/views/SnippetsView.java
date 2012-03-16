@@ -14,9 +14,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -46,6 +48,8 @@ import org.eclipse.swt.dnd.DragSource;
 import org.eclipse.swt.dnd.DragSourceEvent;
 import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.ExpandEvent;
 import org.eclipse.swt.events.ExpandListener;
 import org.eclipse.swt.events.MouseAdapter;
@@ -68,9 +72,11 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.ExpandBar;
 import org.eclipse.swt.widgets.ExpandItem;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IEditorPart;
@@ -150,13 +156,12 @@ public class SnippetsView extends ViewPart
 	private static final int FG_ALPHA = 128;
 
 	private List<Control> themedControls = new ArrayList<Control>();
-
 	private List<String> collapsedCategories = new ArrayList<String>();
 
 	private String currentScope;
 	private SnippetPopupDialog snippetDialog;
 	private SnippetBundleListener snippetBundleListener;
-
+	private int tagWidth = -1;
 	private static Pattern descriptionReplacePattern = Pattern.compile("[\r\n\t]+"); //$NON-NLS-1$ 
 
 	class SnippetBundleListener implements LoadCycleListener
@@ -340,8 +345,8 @@ public class SnippetsView extends ViewPart
 			categoryName = getSnippetCategoryName(snippetData.snippet);
 
 			setLayout(GridLayoutFactory.fillDefaults()
-					.extendedMargins(SNIPPET_MARGIN, SNIPPET_MARGIN, 0, SNIPPET_MARGIN).spacing(2, 0)
-					.numColumns(3).create());
+					.extendedMargins(SNIPPET_MARGIN, SNIPPET_MARGIN, 1, SNIPPET_MARGIN).spacing(2, 0).numColumns(3)
+					.create());
 			GridData gridData = GridDataFactory.fillDefaults().grab(true, false).create();
 			gridData.exclude = snippetData.filtered;
 			setLayoutData(gridData);
@@ -356,6 +361,16 @@ public class SnippetsView extends ViewPart
 					Rectangle clientArea = getClientArea();
 					e.gc.drawLine(clientArea.x - SNIPPET_MARGIN, clientArea.y + clientArea.height - 2, clientArea.x
 							+ clientArea.width + SNIPPET_MARGIN, clientArea.y + clientArea.height - 2);
+					e.gc.drawLine(clientArea.x, clientArea.y, clientArea.x, clientArea.y + clientArea.height - 1);
+					e.gc.drawLine(clientArea.x + clientArea.width - 1, clientArea.y, clientArea.x + clientArea.width
+							- 1, clientArea.y + clientArea.height - 1);
+					Point newPoint = UIUtils.getDisplay().map(SnippetItem.this, getParent(),
+							new Point(clientArea.x, clientArea.y));
+					if (newPoint.y == 0)
+					{
+						e.gc.drawLine(clientArea.x - SNIPPET_MARGIN, clientArea.y, clientArea.x + clientArea.width
+								+ SNIPPET_MARGIN, clientArea.y);
+					}
 					e.gc.setForeground(foreground);
 				}
 			});
@@ -368,6 +383,8 @@ public class SnippetsView extends ViewPart
 			addTagToolbarForSnippet(snippetData.snippet, this);
 
 			applyVisualEnablement();
+
+			setBackground(getBackgroundColor());
 		}
 
 		protected void setFiltered(boolean filtered)
@@ -405,7 +422,7 @@ public class SnippetsView extends ViewPart
 				titleLabel.setForeground(descLabel.getForeground());
 			}
 
-			if (tagToolBar != null)
+			if (tagToolBar != null && tagToolBar.isDisposed())
 			{
 				tagToolBar.setEnabled(snippetData.visuallyEnabled);
 			}
@@ -420,6 +437,7 @@ public class SnippetsView extends ViewPart
 			imageLabel.setLayoutData(GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.CENTER).create());
 			imageLabel.setImage(getSnippetImage(true));
 			imageLabel.addMouseListener(mouseListener);
+			imageLabel.setBackground(getBackgroundColor());
 			addThemedControl(imageLabel, SWT.NONE, -1);
 
 			textComposite = new Composite(itemComposite, SWT.NONE);
@@ -427,6 +445,7 @@ public class SnippetsView extends ViewPart
 			textComposite.setLayoutData(GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER)
 					.grab(true, false).create());
 			textComposite.addMouseListener(mouseListener);
+			textComposite.setBackground(getBackgroundColor());
 			addThemedControl(textComposite, SWT.NONE, -1);
 
 			titleLabel = new CLabel(textComposite, SWT.NONE);
@@ -434,6 +453,7 @@ public class SnippetsView extends ViewPart
 			titleLabel.setLayoutData(GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).grab(false, false)
 					.create());
 			titleLabel.addMouseListener(mouseListener);
+			titleLabel.setBackground(getBackgroundColor());
 			addThemedControl(titleLabel, SWT.BOLD, -1);
 
 			descLabel = new CLabel(textComposite, SWT.NONE);
@@ -447,6 +467,7 @@ public class SnippetsView extends ViewPart
 			descLabel.setLayoutData(GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).grab(true, false)
 					.create());
 			descLabel.addMouseListener(mouseListener);
+			descLabel.setBackground(getBackgroundColor());
 			addThemedControl(descLabel, SWT.NONE, 128);
 
 			addDragDropForSnippet();
@@ -457,6 +478,7 @@ public class SnippetsView extends ViewPart
 			toolbar = new ToolBar(itemComposite, SWT.HORIZONTAL);
 			toolbar.setLayoutData(GridDataFactory.swtDefaults().align(SWT.BEGINNING, SWT.CENTER).create());
 			toolbar.setVisible(false);
+			toolbar.setBackground(getBackgroundColor());
 			addThemedControl(toolbar, SWT.NONE, -1);
 
 			ToolItem insertItem = new ToolItem(toolbar, SWT.NONE);
@@ -526,6 +548,7 @@ public class SnippetsView extends ViewPart
 				tagToolBar = new ToolBar(itemComposite, SWT.HORIZONTAL | SWT.WRAP);
 				tagToolBar.setLayoutData(GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).grab(true, false)
 						.span(2, 1).create());
+				tagToolBar.setBackground(getBackgroundColor());
 				addThemedControl(tagToolBar, SWT.NONE, -1);
 
 				int height = -1;
@@ -695,17 +718,27 @@ public class SnippetsView extends ViewPart
 			themeSelectionColor = null;
 		}
 
+		updateBgColor();
+
 		// Update tag images
 		int height = -1;
 
 		for (String tagName : toolItemMap.keySet())
 		{
 			List<ToolItem> toolItems = toolItemMap.get(tagName);
+
+			for (ToolItem toolItem : toolItems)
+			{
+				toolItem.setImage(null);
+				toolItem.setHotImage(null);
+			}
+
 			imageRegistry.remove(tagName);
 			hotTagImageRegistry.remove(tagName);
 
 			for (ToolItem toolItem : toolItems)
 			{
+				toolItem.getParent().setBackground(getBackgroundColor());
 				height = createTagImagesForToolItem(toolItem.getParent(), height, tagName, toolItem);
 			}
 		}
@@ -805,18 +838,20 @@ public class SnippetsView extends ViewPart
 
 		scrolledComposite = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
 		scrolledComposite.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
-		scrolledComposite.setLayout(GridLayoutFactory.fillDefaults().create());
+		scrolledComposite.setLayout(GridLayoutFactory.fillDefaults().spacing(0, 0).create());
 		scrolledComposite.getVerticalBar().setIncrement(6);
 
 		expandBar = new ExpandBar(scrolledComposite, SWT.NONE);
 		expandBar.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 
-		scrolledComposite.setBackground(themeBgColor);
+		scrolledComposite.setBackground(getBackgroundColor());
 		scrolledComposite.setForeground(themeFgColor);
 
 		scrolledComposite.setContent(expandBar);
 		scrolledComposite.setExpandHorizontal(true);
 		scrolledComposite.setExpandVertical(true);
+
+		updateBgColor();
 
 		createSnippetDrawers();
 
@@ -1085,7 +1120,7 @@ public class SnippetsView extends ViewPart
 			}
 		}
 	}
-	
+
 	private void updateSnippetEnablement(String scope)
 	{
 		currentScope = scope;
@@ -1129,6 +1164,8 @@ public class SnippetsView extends ViewPart
 		sortedSnippets.clear();
 		toolItemMap.clear();
 
+		Set<String> tags = new HashSet<String>();
+
 		for (SnippetElement snippet : snippets)
 		{
 			String category = getSnippetCategoryName(snippet);
@@ -1148,6 +1185,31 @@ public class SnippetsView extends ViewPart
 			}
 
 			snippetList.add(new SnippetData(snippet));
+			tags.addAll(snippet.getTags());
+		}
+
+		// Only on windows: Ensure the image widths are all the same for tags, due to the platform scaling all toolitems
+		// to be the same width
+		if (Platform.OS_WIN32.equals(Platform.getOS()))
+		{
+			tagWidth = -1;
+			GC gc = new GC(UIUtils.getDisplay());
+			if (!CollectionsUtil.isEmpty(tags))
+			{
+				for (String tag : tags)
+				{
+					if (!StringUtil.isEmpty(tag))
+					{
+						int extent = gc.textExtent(MessageFormat.format("__{0}__", tag)).x; //$NON-NLS-1$
+						if (extent > tagWidth)
+						{
+							tagWidth = extent;
+						}
+					}
+				}
+			}
+
+			gc.dispose();
 		}
 
 		List<SnippetCategoryElement> categories = new ArrayList<SnippetCategoryElement>();
@@ -1168,18 +1230,18 @@ public class SnippetsView extends ViewPart
 	private void addThemedControl(Control control, int fontStyle, int alpha)
 	{
 		themedControls.add(control);
-
+		Color defaultBg = UIUtils.getDisplay().getSystemColor(SWT.COLOR_WHITE);
 		if (fontStyle != SWT.NONE)
 		{
-			themeFactory.applyWithFontStyle(control, fontStyle);
+			themeFactory.applyWithFontStyle(control, fontStyle, defaultBg);
 		}
 		else if (alpha > -1)
 		{
-			themeFactory.applyWithAlpha(control, alpha);
+			themeFactory.applyWithAlpha(control, alpha, defaultBg);
 		}
 		else
 		{
-			themeFactory.apply(control);
+			themeFactory.apply(control, defaultBg);
 		}
 	}
 
@@ -1189,6 +1251,20 @@ public class SnippetsView extends ViewPart
 		{
 			themeFactory.dispose(control);
 		}
+	}
+
+	private void updateBgColor()
+	{
+		if (scrolledComposite != null && expandBar != null)
+		{
+			scrolledComposite.setBackground(getBackgroundColor());
+			expandBar.setBackground(getBackgroundColor());
+		}
+	}
+
+	private Color getBackgroundColor()
+	{
+		return themeBgColor != null ? themeBgColor : UIUtils.getDisplay().getSystemColor(SWT.COLOR_WHITE);
 	}
 
 	private void updateSnippetDrawers()
@@ -1204,7 +1280,7 @@ public class SnippetsView extends ViewPart
 	protected ExpandItem createSnippetDrawer(ExpandBar expandBar, SnippetCategoryElement category,
 			List<SnippetData> snippets)
 	{
-		final Composite composite = new Composite(expandBar, SWT.NONE);
+		Composite composite = new Composite(expandBar, SWT.NONE);
 		composite.setForeground(themeFgColor != null ? themeFgColor : UIUtils.getDisplay().getSystemColor(
 				SWT.COLOR_WIDGET_BORDER));
 		composite.setLayout(GridLayoutFactory.fillDefaults().spacing(0, 0).create());
@@ -1222,8 +1298,8 @@ public class SnippetsView extends ViewPart
 		expandItem.setImage(category != null && category.getIconURL() != null ? getImage(category.getIconURL())
 				: genericSnippetImage);
 		expandItem.setData(category != null ? category.getDisplayName() : null);
-
 		expandItem.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+
 		expandItems.put(category != null ? category.getDisplayName() : null, expandItem);
 
 		return expandItem;
@@ -1292,8 +1368,8 @@ public class SnippetsView extends ViewPart
 
 	private int createTagImagesForToolItem(ToolBar tagToolBar, int height, String tag, ToolItem item)
 	{
-		item.setImage(null);
 		item.setHotImage(null);
+		item.setImage(null);
 
 		item.setText(MessageFormat.format("__{0}__", tag)); //$NON-NLS-1$
 		Rectangle bounds = item.getBounds();
@@ -1330,6 +1406,11 @@ public class SnippetsView extends ViewPart
 
 	private Image createTagImage(ToolBar tagToolBar, int height, int width, String tagName, boolean isHot)
 	{
+		if (tagWidth > 0)
+		{
+			width = tagWidth;
+		}
+
 		Image image = new Image(UIUtils.getDisplay(), width, height);
 		GC gc = new GC(image);
 		gc.setAntialias(SWT.ON);
