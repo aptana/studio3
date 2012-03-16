@@ -38,6 +38,7 @@ import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.views.navigator.ResourceComparator;
 
+import com.aptana.core.CoreStrings;
 import com.aptana.core.util.StringUtil;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.configurationProcessors.Messages;
@@ -258,7 +259,7 @@ public class JavaScriptImporterOptionsDialog extends InstallerOptionsDialog
 
 		// browse button
 		browseBt = new Button(composite, SWT.PUSH);
-		browseBt.setText(Messages.InstallProcessor_browse);
+		browseBt.setText(StringUtil.ellipsify(CoreStrings.BROWSE));
 		browseBt.addSelectionListener(new SelectionAdapter()
 		{
 			public void widgetSelected(SelectionEvent event)
@@ -380,7 +381,8 @@ public class JavaScriptImporterOptionsDialog extends InstallerOptionsDialog
 			IProject project = (IProject) attributes.get(ACTIVE_PROJECT_ATTR);
 			if (project != null)
 			{
-				// make sure we add a '/' prefix to the URI path to have this check cross-platform (Windows os returns the URI without it).
+				// make sure we add a '/' prefix to the URI path to have this check cross-platform (Windows os returns
+				// the URI without it).
 				String projectPath = project.getFullPath().toString();
 				String uriPath = uri.getPath();
 				if (uriPath != null && !uriPath.startsWith("/")) //$NON-NLS-1$

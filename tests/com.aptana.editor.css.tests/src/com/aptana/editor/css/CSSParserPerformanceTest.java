@@ -47,8 +47,8 @@ public class CSSParserPerformanceTest extends PerformanceTestCase
 		for (int i = 0; i < 25; i++)
 		{
 			IParseState parseState = new ParseState();
+			parseState.setEditState(src);
 			startMeasuring();
-			parseState.setEditState(src, src, 0, 0);
 			fParser.parse(parseState);
 			stopMeasuring();
 		}

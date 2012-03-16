@@ -14,6 +14,7 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 
 import beaver.Parser.Exception;
 
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.common.tests.TextViewer;
@@ -63,7 +64,7 @@ public class RangeTests extends JSEditorBasedTests
 			{
 				ICompletionProposal[] proposals = processor.computeCompletionProposals(viewer, offset, '\0', false);
 
-				if (proposals != null && proposals.length > 0)
+				if (!ArrayUtil.isEmpty(proposals))
 				{
 					if (selection.range != null)
 					{
@@ -107,7 +108,7 @@ public class RangeTests extends JSEditorBasedTests
 
 		// discard type since we only care about the side-effect that sets the replace range
 		JSContentAssistProcessor processor = new JSContentAssistProcessor((AbstractThemeableEditor) this.editor);
-		processor.getLocation(document, offset);
+		processor.getLocationType(document, offset);
 
 		IRange range = processor.getReplaceRange();
 		assertNotNull(range);

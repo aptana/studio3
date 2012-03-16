@@ -31,16 +31,18 @@ import com.aptana.ui.util.WorkbenchBrowserUtil;
 /**
  * @author Max Stepanov
  */
-public class InstallDebuggerPromptStatusHandler implements IStatusHandler {
+public class InstallDebuggerPromptStatusHandler implements IStatusHandler
+{
 
-	private static final String URL_INSTALL_PDM = "http://www.aptana.com/pro/pdm.php"; //$NON-NLS-1$
-	private static final String URL_DOCS_INSTALL_DEBUGGER = "http://wiki.appcelerator.org/display/tis/Installing+the+JavaScript+debugger"; //$NON-NLS-1$
-	private static final String URL_DOCS_INSTALL_IE_DEBUGGER = "http://wiki.appcelerator.org/display/tis/Installing+the+Internet+Explorer+debugger"; //$NON-NLS-1$
+	private static final String URL_INSTALL_PDM = "http://go.aptana.com/Install+PDM"; //$NON-NLS-1$
+	private static final String URL_DOCS_INSTALL_DEBUGGER = "http://go.aptana.com/Installing+the+JavaScript+debugger"; //$NON-NLS-1$
+	private static final String URL_DOCS_INSTALL_IE_DEBUGGER = "http://go.aptana.com/Installing+the+Internet+Explorer+debugger"; //$NON-NLS-1$
 
 	/**
 	 * @see org.eclipse.debug.core.IStatusHandler#handleStatus(org.eclipse.core.runtime.IStatus, java.lang.Object)
 	 */
-	public Object handleStatus(IStatus status, Object source) throws CoreException {
+	public Object handleStatus(IStatus status, Object source) throws CoreException
+	{
 		Shell shell = UIUtils.getActiveShell();
 		String title = Messages.InstallDebuggerPromptStatusHandler_InstallDebuggerExtension;
 
@@ -48,16 +50,19 @@ public class InstallDebuggerPromptStatusHandler implements IStatusHandler {
 			MessageDialog.openInformation(shell, title,
 					Messages.InstallDebuggerPromptStatusHandler_WaitbrowserLaunches_AcceptExtensionInstallation_Quit);
 			return null;
-		} else if ("postinstall".equals(source)) { //$NON-NLS-1$
+		}
+		else if ("postinstall".equals(source)) { //$NON-NLS-1$
 			MessageDialog.openInformation(shell, title,
 					Messages.InstallDebuggerPromptStatusHandler_WaitbrowserLaunches_Quit);
 			return null;
-		} else if ("nopdm".equals(source)) { //$NON-NLS-1$
+		}
+		else if ("nopdm".equals(source)) { //$NON-NLS-1$
 			MessageDialog md = new MessageDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
 					title, null, Messages.InstallDebuggerPromptStatusHandler_PDMNotInstalled, MessageDialog.WARNING,
 					new String[] { StringUtil.ellipsify(Messages.InstallDebuggerPromptStatusHandler_Download),
 							CoreStrings.CONTINUE, CoreStrings.CANCEL, CoreStrings.HELP }, 0);
-			switch (md.open()) {
+			switch (md.open())
+			{
 				case 0:
 					WorkbenchBrowserUtil.launchExternalBrowser(URL_INSTALL_PDM, "org.eclipse.ui.browser.ie"); //$NON-NLS-1$
 					return Boolean.TRUE;
@@ -70,25 +75,31 @@ public class InstallDebuggerPromptStatusHandler implements IStatusHandler {
 					break;
 			}
 			return null;
-		} else if (source instanceof String && ((String) source).startsWith("quit_")) { //$NON-NLS-1$
+		}
+		else if (source instanceof String && ((String) source).startsWith("quit_")) { //$NON-NLS-1$
 			MessageDialog.openInformation(shell, title, MessageFormat.format(
 					Messages.InstallDebuggerPromptStatusHandler_BrowserIsRunning, ((String) source).substring(5)));
 			return null;
-		} else if (source instanceof String && ((String) source).startsWith("installed_")) { //$NON-NLS-1$
+		}
+		else if (source instanceof String && ((String) source).startsWith("installed_")) { //$NON-NLS-1$
 			MessageDialog.openInformation(shell, title, MessageFormat.format(
 					Messages.InstallDebuggerPromptStatusHandler_ExtensionInstalled, ((String) source).substring(10)));
 			return null;
-		} else if (source instanceof String && ((String) source).startsWith("warning_")) { //$NON-NLS-1$
+		}
+		else if (source instanceof String && ((String) source).startsWith("warning_")) { //$NON-NLS-1$
 			MessageDialog.openWarning(shell, title, ((String) source).substring(8));
 			return null;
-		} else if (source instanceof String && ((String) source).startsWith("failed_")) { //$NON-NLS-1$
+		}
+		else if (source instanceof String && ((String) source).startsWith("failed_")) { //$NON-NLS-1$
 			MessageDialog md = new MessageDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
 					title, null, MessageFormat.format(
 							Messages.InstallDebuggerPromptStatusHandler_ExtensionInstallFailed,
 							new Object[] { ((String) source).substring(7) }), MessageDialog.ERROR, new String[] {
 							IDialogConstants.OK_LABEL, CoreStrings.HELP }, 0);
-			while (true) {
-				switch (md.open()) {
+			while (true)
+			{
+				switch (md.open())
+				{
 					case IDialogConstants.OK_ID:
 						return null;
 					default:
@@ -103,8 +114,10 @@ public class InstallDebuggerPromptStatusHandler implements IStatusHandler {
 		IPreferenceStore store = JSDebugUIPlugin.getDefault().getPreferenceStore();
 
 		String pref = store.getString(IJSDebugUIConstants.PREF_INSTALL_DEBUGGER);
-		if (pref != null) {
-			if (pref.equals(MessageDialogWithToggle.ALWAYS)) {
+		if (pref != null)
+		{
+			if (pref.equals(MessageDialogWithToggle.ALWAYS))
+			{
 				return Boolean.TRUE;
 			}
 		}
@@ -117,8 +130,10 @@ public class InstallDebuggerPromptStatusHandler implements IStatusHandler {
 		dialog.setPrefKey(IJSDebugUIConstants.PREF_INSTALL_DEBUGGER);
 		dialog.setPrefStore(store);
 
-		while (true) {
-			switch (dialog.open()) {
+		while (true)
+		{
+			switch (dialog.open())
+			{
 				case IDialogConstants.YES_ID:
 					return Boolean.TRUE;
 				case IDialogConstants.NO_ID:

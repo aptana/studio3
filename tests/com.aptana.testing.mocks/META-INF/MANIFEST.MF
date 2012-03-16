@@ -24,8 +24,6 @@ Export-Package: net.sf.cglib.asm,
  org.hamcrest,
  org.hamcrest.beans,
  org.hamcrest.collection,
- org.hamcrest.core,
- org.hamcrest.internal,
  org.hamcrest.number,
  org.hamcrest.object,
  org.hamcrest.text,
@@ -47,4 +45,5 @@ Export-Package: net.sf.cglib.asm,
  org.objenesis.instantiator.jrockit,
  org.objenesis.instantiator.sun,
  org.objenesis.strategy
-Require-Bundle: org.eclipse.core.runtime
+Require-Bundle: org.eclipse.core.runtime,
+ org.hamcrest.core;visibility:=reexport

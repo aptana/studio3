@@ -124,7 +124,7 @@ public class ProjectSelectionDialog extends SelectionStatusDialog
 		fTableViewer.getTable().setLayoutData(data);
 
 		fTableViewer.setLabelProvider(new WorkbenchLabelProvider());
-		fTableViewer.setContentProvider(new ArrayContentProvider());
+		fTableViewer.setContentProvider(ArrayContentProvider.getInstance());
 
 		fTableViewer.getControl().setFont(font);
 

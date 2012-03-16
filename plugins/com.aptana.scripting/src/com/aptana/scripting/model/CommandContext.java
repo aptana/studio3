@@ -14,10 +14,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.scripting.ScriptingActivator;
@@ -77,8 +79,12 @@ public class CommandContext
 							ScriptingActivator.logError(message, e);
 						}
 					}
-				},
-				TAG_CONTRIBUTOR
+
+					public Set<String> getSupportElementNames()
+					{
+						return CollectionsUtil.newSet(TAG_CONTRIBUTOR);
+					}
+				}
 			);
 			// @formatter:on
 

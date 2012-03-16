@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -8,16 +8,23 @@
 package com.aptana.preview.ui.properties;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.SameShellProvider;
 import org.eclipse.jface.window.Window;
@@ -35,8 +42,8 @@ import com.aptana.preview.PreviewPlugin;
 import com.aptana.ui.IPropertyDialog;
 import com.aptana.ui.PropertyDialogsRegistry;
 import com.aptana.ui.util.UIUtils;
-import com.aptana.webserver.core.AbstractWebServerConfiguration;
-import com.aptana.webserver.core.ServerConfigurationManager.ConfigurationType;
+import com.aptana.webserver.core.IServer;
+import com.aptana.webserver.core.IServerType;
 import com.aptana.webserver.core.WebServerCorePlugin;
 
 /**
@@ -55,19 +62,12 @@ public class PreviewSettingComposite extends Composite implements SelectionListe
 		public void previewSettingModified();
 	}
 
-	private enum Type
-	{
-		NONE, SERVER
-	};
-
-	private Button fNoSettingRadio;
-	private Button fServerRadio;
 	private ComboViewer fServersCombo;
 	private Button fEditButton;
 	private Button fNewButton;
 
-	private List<Listener> fListeners;
-	private AbstractWebServerConfiguration fSelectedServer;
+	private Set<Listener> fListeners;
+	private IServer fSelectedServer;
 
 	/**
 	 * The constructor.
@@ -78,25 +78,12 @@ public class PreviewSettingComposite extends Composite implements SelectionListe
 	public PreviewSettingComposite(Composite parent)
 	{
 		super(parent, SWT.NONE);
-		setLayout(GridLayoutFactory.fillDefaults().spacing(5, 0).create());
-		fListeners = new ArrayList<Listener>();
+		setLayout(GridLayoutFactory.fillDefaults().spacing(5, 0).numColumns(3).create());
+		fListeners = new LinkedHashSet<Listener>();
 
-		fNoSettingRadio = new Button(this, SWT.RADIO);
-		fNoSettingRadio.setText(Messages.ProjectPreviewPropertyPage_LBL_NoSettings);
-		fNoSettingRadio.addSelectionListener(this);
-
-		Composite serverComposite = new Composite(this, SWT.NONE);
-		serverComposite.setLayout(GridLayoutFactory.fillDefaults().numColumns(4).create());
-		serverComposite.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false)
-				.create());
-
-		fServerRadio = new Button(serverComposite, SWT.RADIO);
-		fServerRadio.setText(Messages.ProjectPreviewPropertyPage_Server_Label);
-		fServerRadio.addSelectionListener(this);
-
-		fServersCombo = new ComboViewer(serverComposite, SWT.DROP_DOWN | SWT.READ_ONLY);
+		fServersCombo = new ComboViewer(this, SWT.DROP_DOWN | SWT.READ_ONLY);
 		fServersCombo.getControl().setLayoutData(
-				GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).create());
+				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).create());
 		fServersCombo.setContentProvider(ArrayContentProvider.getInstance());
 		fServersCombo.setLabelProvider(new LabelProvider()
 		{
@@ -104,24 +91,36 @@ public class PreviewSettingComposite extends Composite implements SelectionListe
 			@Override
 			public String getText(Object element)
 			{
-				if (element instanceof AbstractWebServerConfiguration)
+				if (element instanceof IServer)
 				{
-					return ((AbstractWebServerConfiguration) element).getName();
+					return ((IServer) element).getName();
 				}
 				return super.getText(element);
 			}
 		});
+		fServersCombo.addSelectionChangedListener(new ISelectionChangedListener()
+		{
 
-		fEditButton = new Button(serverComposite, SWT.PUSH);
+			public void selectionChanged(SelectionChangedEvent event)
+			{
+				updateStates();
+				firePreviewSettingModified();
+			}
+		});
+
+		fEditButton = new Button(this, SWT.PUSH);
 		fEditButton.setText(StringUtil.ellipsify(CoreStrings.EDIT));
+		fEditButton.setLayoutData(GridDataFactory.swtDefaults().hint(getButtonWidthHint(fEditButton), SWT.DEFAULT)
+				.create());
 		fEditButton.addSelectionListener(this);
 
-		fNewButton = new Button(serverComposite, SWT.PUSH);
+		fNewButton = new Button(this, SWT.PUSH);
 		fNewButton.setText(StringUtil.ellipsify(CoreStrings.NEW));
+		fNewButton.setLayoutData(GridDataFactory.swtDefaults().hint(getButtonWidthHint(fNewButton), SWT.DEFAULT)
+				.create());
 		fNewButton.addSelectionListener(this);
 
 		updateServersContent();
-		setSelectedType(Type.NONE);
 	}
 
 	/**
@@ -132,10 +131,7 @@ public class PreviewSettingComposite extends Composite implements SelectionListe
 	 */
 	public void addListener(Listener listener)
 	{
-		if (!fListeners.contains(listener))
-		{
-			fListeners.add(listener);
-		}
+		fListeners.add(listener);
 	}
 
 	/**
@@ -149,19 +145,30 @@ public class PreviewSettingComposite extends Composite implements SelectionListe
 		fListeners.remove(listener);
 	}
 
+	public Control getServersCombo()
+	{
+		return fServersCombo.getControl();
+	}
+
+	public Control getEditButton()
+	{
+		return fEditButton;
+	}
+
+	public Control getNewButton()
+	{
+		return fNewButton;
+	}
+
 	/**
 	 * @return the currently selected server
 	 */
-	public AbstractWebServerConfiguration getSelectedServer()
+	public IServer getSelectedServer()
 	{
-		if (fNoSettingRadio.getSelection())
-		{
-			return null;
-		}
 		Object selection = ((IStructuredSelection) fServersCombo.getSelection()).getFirstElement();
-		if (selection instanceof AbstractWebServerConfiguration)
+		if (selection instanceof IServer)
 		{
-			return (AbstractWebServerConfiguration) selection;
+			return (IServer) selection;
 		}
 		return null;
 	}
@@ -172,32 +179,25 @@ public class PreviewSettingComposite extends Composite implements SelectionListe
 	 * @param server
 	 *            the selected server
 	 */
-	public void setSelectedServer(AbstractWebServerConfiguration server)
+	public void setSelectedServer(IServer server)
 	{
 		fSelectedServer = server;
-		if (fSelectedServer == null)
+		if (fSelectedServer == null || fSelectedServer == getBuiltInServer())
 		{
-			setSelectedType(Type.NONE);
+			fServersCombo.setSelection(new StructuredSelection(getBuiltInServer()));
 		}
 		else
 		{
-			setSelectedType(Type.SERVER);
 			fServersCombo.setSelection(new StructuredSelection(fSelectedServer));
 		}
+		updateStates();
 	}
 
 	public void widgetSelected(SelectionEvent e)
 	{
 		Object source = e.getSource();
-		if (source == fNoSettingRadio)
-		{
-			setSelectedType(Type.NONE);
-		}
-		else if (source == fServerRadio)
-		{
-			setSelectedType(Type.SERVER);
-		}
-		else if (source == fEditButton)
+
+		if (source == fEditButton)
 		{
 			editSelectedServer();
 		}
@@ -206,7 +206,7 @@ public class PreviewSettingComposite extends Composite implements SelectionListe
 			createNewServer();
 		}
 
-		AbstractWebServerConfiguration server = getSelectedServer();
+		IServer server = getSelectedServer();
 		if (fSelectedServer != server)
 		{
 			fSelectedServer = server;
@@ -218,41 +218,10 @@ public class PreviewSettingComposite extends Composite implements SelectionListe
 	{
 	}
 
-	private void setSelectedType(Type type)
+	private void updateStates()
 	{
-		switch (type)
-		{
-			case NONE:
-				fNoSettingRadio.setSelection(true);
-				fServerRadio.setSelection(false);
-
-				Control comboControl = fServersCombo.getControl();
-				comboControl.setForeground(comboControl.getDisplay()
-						.getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-				fEditButton.setEnabled(false);
-				fNewButton.setEnabled(false);
-				break;
-			case SERVER:
-				fNoSettingRadio.setSelection(false);
-				fServerRadio.setSelection(true);
-
-				List<AbstractWebServerConfiguration> servers = WebServerCorePlugin.getDefault()
-						.getServerConfigurationManager().getServerConfigurations();
-				comboControl = fServersCombo.getControl();
-				if (servers.size() == 0)
-				{
-					comboControl.setForeground(comboControl.getDisplay().getSystemColor(
-							SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-					fEditButton.setEnabled(false);
-				}
-				else
-				{
-					comboControl.setForeground(comboControl.getDisplay().getSystemColor(SWT.COLOR_LIST_FOREGROUND));
-					fEditButton.setEnabled(true);
-				}
-				fNewButton.setEnabled(true);
-				break;
-		}
+		Object selectedElement = ((IStructuredSelection) fServersCombo.getSelection()).getFirstElement();
+		fEditButton.setEnabled(selectedElement != getBuiltInServer());
 	}
 
 	private void createNewServer()
@@ -265,34 +234,32 @@ public class PreviewSettingComposite extends Composite implements SelectionListe
 			@Override
 			public String getText(Object element)
 			{
-				if (element instanceof ConfigurationType)
+				if (element instanceof IServerType)
 				{
-					return ((ConfigurationType) element).getName();
+					return ((IServerType) element).getName();
 				}
 				return super.getText(element);
 			}
 		});
-		dialog.setInput(WebServerCorePlugin.getDefault().getServerConfigurationManager().getConfigurationTypes());
+		dialog.setInput(WebServerCorePlugin.getDefault().getServerManager().getServerTypes());
 		dialog.setTitle(Messages.ProjectPreviewPropertyPage_ChooseServerType);
 
 		Object[] result;
 		if (dialog.open() == Window.OK && (result = dialog.getResult()) != null && result.length == 1)
 		{
-			String typeId = ((ConfigurationType) result[0]).getId();
+			String typeId = ((IServerType) result[0]).getId();
 			try
 			{
-				AbstractWebServerConfiguration newConfiguration = WebServerCorePlugin.getDefault()
-						.getServerConfigurationManager().createServerConfiguration(typeId);
+				IServer newConfiguration = WebServerCorePlugin.getDefault().getServerManager().createServer(typeId);
 				if (newConfiguration != null)
 				{
 					if (editServerConfiguration(newConfiguration))
 					{
-						WebServerCorePlugin.getDefault().getServerConfigurationManager()
-								.addServerConfiguration(newConfiguration);
+						WebServerCorePlugin.getDefault().getServerManager().add(newConfiguration);
 						updateServersContent();
 						fServersCombo.setSelection(new StructuredSelection(newConfiguration));
 						// forces an update of widget enablements
-						setSelectedType(Type.SERVER);
+						updateStates();
 					}
 				}
 			}
@@ -306,14 +273,13 @@ public class PreviewSettingComposite extends Composite implements SelectionListe
 	private void editSelectedServer()
 	{
 		Object selection = ((IStructuredSelection) fServersCombo.getSelection()).getFirstElement();
-		if (selection instanceof AbstractWebServerConfiguration
-				&& editServerConfiguration((AbstractWebServerConfiguration) selection))
+		if (selection instanceof IServer && editServerConfiguration((IServer) selection))
 		{
 			fServersCombo.refresh();
 		}
 	}
 
-	private boolean editServerConfiguration(AbstractWebServerConfiguration serverConfiguration)
+	private boolean editServerConfiguration(IServer serverConfiguration)
 	{
 		try
 		{
@@ -337,7 +303,8 @@ public class PreviewSettingComposite extends Composite implements SelectionListe
 
 	private void firePreviewSettingModified()
 	{
-		for (Listener listener : fListeners)
+		Listener[] listeners = fListeners.toArray(new Listener[fListeners.size()]);
+		for (Listener listener : listeners)
 		{
 			listener.previewSettingModified();
 		}
@@ -345,18 +312,28 @@ public class PreviewSettingComposite extends Composite implements SelectionListe
 
 	private void updateServersContent()
 	{
-		List<AbstractWebServerConfiguration> servers = WebServerCorePlugin.getDefault().getServerConfigurationManager()
-				.getServerConfigurations();
-		if (servers.size() == 0)
+		List<IServer> servers = new ArrayList<IServer>();
+		servers.add(getBuiltInServer());
+		servers.addAll(WebServerCorePlugin.getDefault().getServerManager().getServers());
+		ISelection selection = fServersCombo.getSelection();
+		fServersCombo.setInput(servers);
+		// keeps the selection if there was one
+		fServersCombo.setSelection(selection);
+		if (fServersCombo.getSelection().isEmpty())
 		{
-			Object[] input = new Object[] { Messages.ProjectPreviewPropertyPage_NoPreviewServer };
-			fServersCombo.setInput(input);
-			fServersCombo.setSelection(new StructuredSelection(input[0]), true);
+			fServersCombo.setSelection(new StructuredSelection(servers.get(0)));
 		}
-		else
-		{
-			fServersCombo.setInput(servers);
-			fServersCombo.setSelection(new StructuredSelection(servers.get(0)), true);
-		}
+	}
+
+	private static IServer getBuiltInServer()
+	{
+		return WebServerCorePlugin.getDefault().getBuiltinWebServer();
+	}
+
+	private static int getButtonWidthHint(Button button)
+	{
+		PixelConverter converter = new PixelConverter(button);
+		int widthHint = converter.convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH);
+		return Math.max(widthHint, button.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x);
 	}
 }

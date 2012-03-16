@@ -8,9 +8,13 @@
 package com.aptana.editor.markdown;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.ui.internal.editors.text.EditorsPlugin;
+import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.CommonEditorPlugin;
 
+@SuppressWarnings("restriction")
 public class MarkdownEditor extends AbstractThemeableEditor
 {
 	/*
@@ -25,6 +29,13 @@ public class MarkdownEditor extends AbstractThemeableEditor
 		setDocumentProvider(MarkdownEditorPlugin.getDefault().getMarkdownDocumentProvider());
 	}
 
+	public static IPreferenceStore getChainedPreferenceStore()
+	{
+		return new ChainedPreferenceStore(new IPreferenceStore[] {
+				MarkdownEditorPlugin.getDefault().getPreferenceStore(),
+				CommonEditorPlugin.getDefault().getPreferenceStore(), EditorsPlugin.getDefault().getPreferenceStore() });
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.AbstractThemeableEditor#getPluginPreferenceStore()
@@ -36,7 +47,7 @@ public class MarkdownEditor extends AbstractThemeableEditor
 	}
 
 	@Override
-	protected String getFileServiceContentTypeId()
+	public String getContentType()
 	{
 		return IMarkdownConstants.CONTENT_TYPE_MARKDOWN;
 	}

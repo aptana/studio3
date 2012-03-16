@@ -7,9 +7,6 @@
  */
 package com.aptana.editor.svg.parsing;
 
-import java.util.LinkedList;
-import java.util.Queue;
-
 import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.xml.parsing.XMLParser;
@@ -17,7 +14,6 @@ import com.aptana.editor.xml.parsing.ast.XMLElementNode;
 import com.aptana.editor.xml.parsing.lexer.XMLTokenType;
 import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
-import com.aptana.parsing.ast.ParseNode;
 
 /**
  * SVGParser
@@ -64,39 +60,6 @@ public class SVGParser extends XMLParser
 	}
 
 	/**
-	 * offsetNodes
-	 * 
-	 * @param offset
-	 * @param result
-	 */
-	private void offsetNodes(int offset, IParseNode result)
-	{
-		// TODO: This really should be part of the IParseNode interface and should
-		// automatically be recursive. We have code like this all of the place
-		Queue<IParseNode> nodes = new LinkedList<IParseNode>();
-
-		nodes.offer(result);
-
-		while (nodes.isEmpty() == false)
-		{
-			IParseNode node = nodes.poll();
-
-			if (node instanceof ParseNode)
-			{
-				((ParseNode) node).addOffset(offset);
-			}
-
-			for (IParseNode child : node)
-			{
-				if (child instanceof ParseNode)
-				{
-					nodes.offer(child);
-				}
-			}
-		}
-	}
-
-	/**
 	 * processLanguage
 	 * 
 	 * @param language
@@ -106,22 +69,19 @@ public class SVGParser extends XMLParser
 	{
 		// grab offset after '>' in open tag
 		int startingOffset = fCurrentLexeme.getEndingOffset() + 1;
-		
+
 		// advance to the matching close tag
 		this.advanceToCloseTag(elementName);
-		
+
 		// grab the offset just before '<' in the close tag
 		int endingOffset = fCurrentLexeme.getStartingOffset() - 1;
-		
+
 		// grab the source between the open and close tag
 		String source = this.getSource(startingOffset, endingOffset - startingOffset + 1);
-		
+
 		try
 		{
-			IParseNode result = ParserPoolFactory.parse(language, source);
-
-			// offset to re-align with SVG source offsets
-			offsetNodes(startingOffset, result);
+			IParseNode result = ParserPoolFactory.parse(language, source, startingOffset);
 
 			fCurrentElement.addChild(result);
 		}

@@ -7,21 +7,40 @@
  */
 package com.aptana.editor.css.tests;
 
+import java.text.MessageFormat;
+
 import junit.framework.Test;
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.css.CSSCodeScannerPerformanceTest;
 import com.aptana.editor.css.CSSParserPerformanceTest;
+import com.aptana.editor.css.CSSPlugin;
+import com.aptana.editor.css.CSSScannerPerformanceTest;
+import com.aptana.editor.css.tests.performance.OpenCSSEditorTest;
 
 public class PerformanceTests
 {
 
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite("Performance Tests for com.aptana.editor.css plugin");
+		TestSuite suite = new TestSuite("Performance Tests for com.aptana.editor.css plugin")
+		{
+			@Override
+			public void runTest(Test test, TestResult result)
+			{
+				String msg = MessageFormat.format("Running test: {0}", test.toString());
+				IdeLog.logError(CSSPlugin.getDefault(), msg);
+				System.out.println(msg);
+				super.runTest(test, result);
+			}
+		};
 		// $JUnit-BEGIN$
 		suite.addTestSuite(CSSCodeScannerPerformanceTest.class);
+		suite.addTestSuite(CSSScannerPerformanceTest.class);
 		suite.addTestSuite(CSSParserPerformanceTest.class);
+		suite.addTest(OpenCSSEditorTest.suite());
 		// $JUnit-END$
 		return suite;
 	}

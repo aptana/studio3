@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.StringUtil;
@@ -39,8 +40,7 @@ public class AnalyticsInfoManager
 
 	private static AnalyticsInfoManager instance;
 
-	private Map<String, AnalyticsInfo> analyticsInfoMap;
-	private Map<String, Analytics> analyticsMap;
+	private Map<String, Analytics> fAnalyticsMap;
 
 	public synchronized static AnalyticsInfoManager getInstance()
 	{
@@ -53,19 +53,20 @@ public class AnalyticsInfoManager
 
 	public AnalyticsInfo getInfo(String id)
 	{
-		Analytics analytics = analyticsMap.get(id);
+		Analytics analytics = fAnalyticsMap.get(id);
 		return (analytics == null) ? null : analytics.info;
 	}
 
 	private AnalyticsInfoManager()
 	{
-		analyticsInfoMap = new HashMap<String, AnalyticsInfo>();
-		analyticsMap = new HashMap<String, Analytics>();
+
 		loadExtension();
 	}
 
 	private void loadExtension()
 	{
+		final Map<String, AnalyticsInfo> analyticsInfoMap = new HashMap<String, AnalyticsInfo>();
+		final Map<String, Analytics> analyticsMap = new HashMap<String, Analytics>();
 		EclipseUtil.processConfigurationElements(UsagePlugin.PLUGIN_ID, EXTENSION_POINT_ID,
 				new IConfigurationElementProcessor()
 				{
@@ -141,19 +142,22 @@ public class AnalyticsInfoManager
 							analyticsMap.put(id, new Analytics(info, overridesId));
 						}
 					}
-				}, ELEMENT_INFO, ELEMENT_ANALYTICS);
 
-		Set<String> keys = analyticsMap.keySet();
-		Analytics analytics;
-		for (String key : keys)
+					public Set<String> getSupportElementNames()
+					{
+						return CollectionsUtil.newInOrderSet(ELEMENT_INFO, ELEMENT_ANALYTICS);
+					}
+				});
+
+		for (Analytics analytics : analyticsMap.values())
 		{
-			analytics = analyticsMap.get(key);
 			if (analytics.overridesId != null && analyticsMap.containsKey(analytics.overridesId))
 			{
 				// replaces the overridden analytics info
 				analyticsMap.put(analytics.overridesId, analytics);
 			}
 		}
+		fAnalyticsMap = new HashMap<String, AnalyticsInfoManager.Analytics>(analyticsMap);
 	}
 
 	private static class Analytics

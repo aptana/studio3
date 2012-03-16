@@ -18,8 +18,7 @@ public class BeaverParser implements IParser
 {
 	public IParseRootNode parse(IParseState parseState) throws Exception
 	{
-		String source = new String(parseState.getSource());
-		GrammarScanner scanner = new GrammarScanner(new StringReader(source));
+		GrammarScanner scanner = new GrammarScanner(new StringReader(parseState.getSource()));
 		GrammarParser parser = new GrammarParser();
 		IParseRootNode result = null;
 

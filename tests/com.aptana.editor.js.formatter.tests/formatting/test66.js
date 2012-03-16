@@ -104,6 +104,7 @@ function bar(p) {
         a : 0,
         b : 1
     };
+
     e = //
     {
     };

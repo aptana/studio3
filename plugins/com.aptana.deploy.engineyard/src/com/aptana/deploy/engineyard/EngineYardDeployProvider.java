@@ -47,4 +47,8 @@ public class EngineYardDeployProvider implements IDeployProvider
 		return file.exists();
 	}
 
+	public String getDeployMenuName()
+	{
+		return null;
+	}
 }

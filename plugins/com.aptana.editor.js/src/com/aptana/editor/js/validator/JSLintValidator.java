@@ -12,8 +12,13 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.IDocument;
 import org.mozilla.javascript.CompilerEnvirons;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
@@ -25,45 +30,65 @@ import org.mozilla.javascript.ScriptOrFnNode;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.optimizer.Codegen;
 
+import com.aptana.core.build.AbstractBuildParticipant;
+import com.aptana.core.build.IProblem;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StreamUtil;
-import com.aptana.editor.common.validator.IValidationItem;
-import com.aptana.editor.common.validator.IValidationManager;
-import com.aptana.editor.common.validator.IValidator;
-import com.aptana.editor.common.validator.ValidationManager;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.JSPlugin;
+import com.aptana.index.core.build.BuildContext;
 
-public class JSLintValidator implements IValidator
+public class JSLintValidator extends AbstractBuildParticipant
 {
+	public static final String ID = "com.aptana.editor.js.validator.JSLintValidator"; //$NON-NLS-1$
 
 	private static final String JSLINT_FILENAME = "fulljslint.js"; //$NON-NLS-1$
 	private static Script JS_LINT_SCRIPT;
 
-	public JSLintValidator()
+	public void buildFile(BuildContext context, IProgressMonitor monitor)
 	{
-	}
+		if (context == null)
+		{
+			return;
+		}
 
-	public List<IValidationItem> validate(String source, URI path, IValidationManager manager)
-	{
-		List<IValidationItem> items = new ArrayList<IValidationItem>();
-		Context context = Context.enter();
-		DefaultErrorReporter reporter = new DefaultErrorReporter();
+		List<IProblem> problems = new ArrayList<IProblem>();
+
 		try
 		{
-			context.setErrorReporter(reporter);
-			manager.addParseErrors(items, IJSConstants.CONTENT_TYPE_JS);
-			parseWithLint(context, source, path, manager, items);
+			String source = context.getContents();
+			URI uri = context.getURI();
+			String sourcePath = uri.toString();
+
+			Context cContext = Context.enter();
+			try
+			{
+				parseWithLint(cContext, source, sourcePath, problems);
+			}
+			finally
+			{
+				Context.exit();
+			}
 		}
-		finally
+		catch (Exception e)
 		{
-			Context.exit();
+			IdeLog.logError(JSPlugin.getDefault(), "Failed to parse for JSLint", e); //$NON-NLS-1$
 		}
-		return items;
+
+		context.putProblems(IJSConstants.JSLINT_PROBLEM_MARKER_TYPE, problems);
 	}
 
-	private void parseWithLint(Context context, String source, URI path, IValidationManager manager,
-			List<IValidationItem> items)
+	public void deleteFile(BuildContext context, IProgressMonitor monitor)
+	{
+		if (context == null)
+		{
+			return;
+		}
+
+		context.removeProblems(IJSConstants.JSLINT_PROBLEM_MARKER_TYPE);
+	}
+
+	private void parseWithLint(Context context, String source, String path, List<IProblem> items)
 	{
 		Scriptable scope = context.initStandardObjects();
 		Script script = getJSLintScript();
@@ -72,6 +97,8 @@ public class JSLintValidator implements IValidator
 			return;
 		}
 		script.exec(context, scope);
+
+		IDocument doc = null;
 
 		Object functionObj = scope.get("JSLINT", scope); //$NON-NLS-1$
 		if (functionObj instanceof Function)
@@ -101,6 +128,8 @@ public class JSLintValidator implements IValidator
 					lastIsError = true;
 				}
 
+				List<String> filters = getFilters();
+
 				NativeObject object;
 				int line;
 				String reason;
@@ -116,26 +145,52 @@ public class JSLintValidator implements IValidator
 						character = (int) Double.parseDouble(object.get("character", scope).toString()); //$NON-NLS-1$
 
 						// Don't attempt to add errors or warnings if there are already errors on this line
-						if (ValidationManager.hasErrorOrWarningOnLine(items, line))
+						if (hasErrorOrWarningOnLine(items, line))
 						{
 							continue;
 						}
 
-						if (!manager.isIgnored(reason, IJSConstants.CONTENT_TYPE_JS))
+						if (!isIgnored(reason, filters))
 						{
+							if (doc == null)
+							{
+								doc = new Document(source);
+							}
+							try
+							{
+								character += doc.getLineOffset(line - 1);
+							}
+							catch (BadLocationException e)
+							{
+								// ignore
+							}
+
 							if (i == ids.length - 2 && lastIsError)
 							{
-								items.add(manager.createError(reason, line, character, 0, path));
+								items.add(createError(reason, line, character, 0, path));
 							}
 							else
 							{
-								items.add(manager.createWarning(reason, line, character, 0, path));
+								items.add(createWarning(reason, line, character, 0, path));
 							}
 						}
 					}
 				}
 			}
 		}
+	}
+
+	private boolean isIgnored(String message, List<String> expressions)
+	{
+		for (String expression : expressions)
+		{
+			if (message.matches(expression))
+			{
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	private static synchronized Script getJSLintScript()
@@ -188,7 +243,6 @@ public class JSLintValidator implements IValidator
 		{
 			Context.exit();
 		}
-
 		return null;
 	}
 }

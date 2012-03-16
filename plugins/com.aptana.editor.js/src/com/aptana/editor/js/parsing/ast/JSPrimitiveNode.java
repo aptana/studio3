@@ -7,6 +7,9 @@
  */
 package com.aptana.editor.js.parsing.ast;
 
+import com.aptana.parsing.ast.IParseNodeAttribute;
+import com.aptana.parsing.ast.ParseNodeAttribute;
+
 public abstract class JSPrimitiveNode extends JSNode
 {
 	private String fText;
@@ -28,21 +31,27 @@ public abstract class JSPrimitiveNode extends JSNode
 
 	/*
 	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseNode#getAttributes()
+	 */
+	@Override
+	public IParseNodeAttribute[] getAttributes()
+	{
+		return new IParseNodeAttribute[] { new ParseNodeAttribute(this, "value", getText()) }; //$NON-NLS-1$
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSNode#equals(java.lang.Object)
 	 */
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (!super.equals(obj))
-		{
-			return false;
-		}
 		if (!(obj instanceof JSPrimitiveNode))
 		{
 			return false;
 		}
 
-		return fText.equals(((JSPrimitiveNode) obj).fText);
+		return getText().equals(((JSPrimitiveNode) obj).getText());
 	}
 
 	/*
@@ -62,6 +71,6 @@ public abstract class JSPrimitiveNode extends JSNode
 	@Override
 	public int hashCode()
 	{
-		return 31 * super.hashCode() + fText.hashCode();
+		return 31 * super.hashCode() + getText().hashCode();
 	}
 }

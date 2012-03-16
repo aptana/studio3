@@ -1,0 +1,156 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="com.aptana.buildpath.core" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="com.aptana.buildpath.core" id="buildParticipants" name="Build Participants"/>
+      </appinfo>
+      <documentation>
+         This extension point allows clients to participate in the build process by receiving notifications during build and reconcile, via an com.aptana.core.build.IBuildParticipant.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="participant" minOccurs="1" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="participant">
+      <complexType>
+         <sequence minOccurs="0" maxOccurs="unbounded">
+            <element ref="contentTypeBinding"/>
+         </sequence>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Unique identifier of this participant. Must be globally unique.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  the class that implements this build participant. This class must implement a public implementation of com.aptana.core.build.IBuildParticipant with a public 0-argument constructor.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":com.aptana.core.build.IBuildParticipant"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="priority" type="string" use="default" value="50">
+            <annotation>
+               <documentation>
+                  This defines at what priority this build participant should be used when a mix of build participants are going to be used at the same time. A higher value indicates a higher priority, meaning that this build participant will run before other participants at a lower priority. The order in which build participants run is undefined when their priority levels match.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="contentTypeBinding">
+      <annotation>
+         <documentation>
+            Advertises that the containing build participant understands the given content type and is suitable for participating in the build/reconcile process for files of that type.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="contentTypeId" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The content type identifier. This is an ID defined by the &apos;org.eclipse.core.contenttype.contentTypes&apos; extension point.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="org.eclipse.core.contenttype.contentTypes/content-type/@id"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="since"/>
+      </appinfo>
+      <documentation>
+         3.1.0
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="examples"/>
+      </appinfo>
+      <documentation>
+         Example of a declaration of a &lt;code&gt;buildParticipant&lt;/code&gt;:  &lt;pre&gt;                                                                       
+&lt;extension
+      id=&quot;example&quot;
+      name=&quot;%exampleParticipantName&quot;
+      point=&quot;com.aptana.buildpath.core.buildParticipants&quot;&gt;
+   &lt;buildParticipant
+         class=&quot;com.aptana.core.internal.ExampleBuildParticipant&quot;
+         id=&quot;ExampleID&quot;
+         priority&quot;65&quot;&gt;
+      &lt;contentTypeBinding contentTypeId=&quot;org.eclipse.jdt.apt.core.compile.problem&quot;/&gt;
+   &lt;/buildParticipant&gt;
+&lt;/extension&gt;
+&lt;/pre&gt;
+      </documentation>
+   </annotation>
+
+
+
+   <annotation>
+      <appinfo>
+         <meta.section type="copyright"/>
+      </appinfo>
+      <documentation>
+         Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+Please see the license.html included with this distribution for details.
+Any modifications to this file must keep this entire copyright intact.
+      </documentation>
+   </annotation>
+
+</schema>

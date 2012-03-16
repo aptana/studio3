@@ -113,6 +113,7 @@ class BundleEntryNode extends BaseNode<BundleEntryNode.Property>
 		// create and add children
 		addNode(result, new CommandsNode(entry.getCommands()));
 		addNode(result, new SnippetsNode(entry.getCommands()));
+		addNode(result, new SnippetCategoriesNode(entry.getSnippetCategories()));
 		addNode(result, new FileTemplatesNode(entry.getCommands()));
 		addNode(result, new MenusNode(entry.getMenus()));
 		addNode(result, new BuildPathsNode(entry.getBuildPaths()));

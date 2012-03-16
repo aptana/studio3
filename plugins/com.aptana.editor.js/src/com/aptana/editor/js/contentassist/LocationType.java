@@ -9,14 +9,26 @@ package com.aptana.editor.js.contentassist;
 
 public enum LocationType
 {
-	UNKNOWN, //
-	NONE, //
+	// @formatter:off
+	UNKNOWN,
+	NONE,
 
-	IN_GLOBAL, //
-	IN_PARAMETERS, //
-	IN_CONSTRUCTOR, //
-	IN_PROPERTY_NAME, //
-	IN_VARIABLE_NAME, //
-	IN_LABEL, //
-	IN_OBJECT_LITERAL_PROPERTY
+	IN_GLOBAL,
+	IN_PARAMETERS,
+	IN_CONSTRUCTOR,
+	IN_PROPERTY_NAME,
+
+	/**
+	 * Returned when we're in the name of a variable when used as a reference.
+	 */
+	IN_VARIABLE_NAME,
+
+	/**
+	 * Returned when we're on the name of a variable being defined
+	 */
+	IN_VARIABLE_DECLARATION,
+	IN_LABEL,
+	IN_OBJECT_LITERAL_PROPERTY,
+	IN_THIS;
+	// @formatter:on
 }

@@ -7,12 +7,7 @@
  */
 package com.aptana.index.core;
 
-import java.text.MessageFormat;
-
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
-import org.eclipse.core.runtime.Status;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -24,6 +19,7 @@ public class IndexPlugin extends Plugin
 	public static final String PLUGIN_ID = "com.aptana.index.core"; //$NON-NLS-1$
 
 	private static IndexPlugin plugin;
+	private IndexManager fManager;
 
 	/**
 	 * Returns the shared instance
@@ -58,34 +54,17 @@ public class IndexPlugin extends Plugin
 	 */
 	public void stop(BundleContext context) throws Exception
 	{
+		fManager = null;
 		plugin = null;
 		super.stop(context);
 	}
 
-	/**
-	 * Determines if the specified debug option is on and set to true
-	 * 
-	 * @param option
-	 * @return
-	 */
-	public static boolean isDebugOptionEnabled(String option)
+	public synchronized IndexManager getIndexManager()
 	{
-		return Boolean.valueOf(Platform.getDebugOption(option));
-	}
-
-	/**
-	 * Logs an informational message
-	 * 
-	 * @param message
-	 * @param scope
-	 */
-	public static void logInfo(String message, String scope)
-	{
-		if (scope != null && Platform.inDebugMode() && isDebugOptionEnabled(scope))
+		if (fManager == null)
 		{
-			getDefault().getLog().log(
-					new Status(IStatus.INFO, PLUGIN_ID, MessageFormat
-							.format(Messages.IndexPlugin_IndexingFile, message), null));
+			fManager = new IndexManager();
 		}
+		return fManager;
 	}
 }

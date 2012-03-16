@@ -8,6 +8,7 @@
 package com.aptana.scripting.model;
 
 import java.io.File;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -16,7 +17,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.internal.utils.StringPool;
+
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.ObjectUtil;
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
 import com.aptana.scripting.IDebugScopes;
@@ -183,8 +187,7 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	 */
 	private static void showRegistration(String message, AbstractElement element)
 	{
-		if (IdeLog.isOutputEnabled(ScriptingActivator.getDefault(), IdeLog.StatusLevel.INFO,
-				IDebugScopes.SHOW_ELEMENT_REGISTRATION))
+		if (IdeLog.isTraceEnabled(ScriptingActivator.getDefault(), IDebugScopes.SHOW_ELEMENT_REGISTRATION))
 		{
 			String name = element.getDisplayName();
 			String path = element.getPath();
@@ -192,8 +195,9 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 			String[] classParts = fullClassName.split("\\."); //$NON-NLS-1$
 			String className = classParts[classParts.length - 1];
 
-			IdeLog.logInfo(ScriptingActivator.getDefault(),
-					message + ": " + className + ", " + name + ", " + path, IDebugScopes.SHOW_ELEMENT_REGISTRATION); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			IdeLog.logTrace(ScriptingActivator.getDefault(),
+					MessageFormat.format("{0}: {1}, {2}, {3}", message, className, name, path), //$NON-NLS-1$
+					IDebugScopes.SHOW_ELEMENT_REGISTRATION);
 		}
 	}
 
@@ -205,7 +209,7 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	 */
 	public AbstractElement(String path)
 	{
-		this._path = path;
+		this._path = BundleManager.getInstance().sharedString(path);
 
 		registerElement(this);
 	}
@@ -300,13 +304,16 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	 */
 	public void put(String property, Object value)
 	{
-		if (property != null && property.length() > 0)
+		if (!StringUtil.isEmpty(property))
 		{
+			// Pool common keys
+			property = BundleManager.getInstance().sharedString(property);
 			synchronized (propertyLock)
 			{
 				if (this._customProperties == null)
 				{
-					this._customProperties = new HashMap<String, Object>();
+					// The overwhelming case is that we just store triggers, so assume a size of 1
+					this._customProperties = new HashMap<String, Object>(1);
 				}
 
 				this._customProperties.put(property, value);
@@ -340,7 +347,13 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 			this._customProperties = null;
 			if (props != null)
 			{
-				this._customProperties = new HashMap<String, Object>(props);
+				// Manually copy over properties so we can pool common key strings
+				this._customProperties = new HashMap<String, Object>(props.size());
+				for (Map.Entry<String, Object> entry : props.entrySet())
+				{
+					String property = BundleManager.getInstance().sharedString(entry.getKey());
+					this._customProperties.put(property, entry.getValue());
+				}
 			}
 		}
 	}
@@ -362,11 +375,11 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	 */
 	public void setPath(String path)
 	{
-		if (StringUtil.areNotEqual(this._path, path))
+		if (ObjectUtil.areNotEqual(this._path, path))
 		{
 			unregisterElement(this);
 
-			this._path = path;
+			this._path = BundleManager.getInstance().sharedString(path);
 
 			registerElement(this);
 		}

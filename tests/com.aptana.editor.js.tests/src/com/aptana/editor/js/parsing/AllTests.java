@@ -18,6 +18,7 @@ public class AllTests
 		TestSuite suite = new TestSuite("Tests for com.aptana.editor.js");
 		// $JUnit-BEGIN$
 		suite.addTestSuite(JSParserTest.class);
+		suite.addTestSuite(JSScannerTest.class);
 		// $JUnit-END$
 		return suite;
 	}

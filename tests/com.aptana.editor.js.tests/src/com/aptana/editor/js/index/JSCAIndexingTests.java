@@ -9,8 +9,10 @@ package com.aptana.editor.js.index;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.TextViewer;
@@ -24,21 +26,16 @@ import com.aptana.editor.js.contentassist.index.JSCAFileIndexingParticipant;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.tests.JSEditorBasedTests;
+import com.aptana.index.core.FileStoreBuildContext;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
+import com.aptana.index.core.IndexPlugin;
 
 /**
  * JSCAIndexingTests
  */
 public class JSCAIndexingTests extends JSEditorBasedTests
 {
-	class Indexer extends JSCAFileIndexingParticipant
-	{
-		public void index(Index index, IFileStore file)
-		{
-			indexFileStore(index, file, new NullProgressMonitor());
-		}
-	}
 
 	private JSIndexQueryHelper queryHelper;
 	private URI uri;
@@ -47,9 +44,10 @@ public class JSCAIndexingTests extends JSEditorBasedTests
 	{
 		for (String propertyName : propertyNames)
 		{
-			PropertyElement property = queryHelper.getTypeMember(index, typeName, propertyName);
+			List<PropertyElement> property = queryHelper.getTypeMembers(index, typeName, propertyName);
 
 			assertNotNull(typeName + "." + propertyName + " does not exist", property);
+			assertFalse(typeName + "." + propertyName + " does not exist", property.isEmpty());
 		}
 	}
 
@@ -57,20 +55,21 @@ public class JSCAIndexingTests extends JSEditorBasedTests
 	{
 		for (String typeName : typeNames)
 		{
-			TypeElement type = queryHelper.getType(index, typeName, false);
+			List<TypeElement> type = queryHelper.getTypes(index, typeName, false);
 
 			assertNotNull(type);
+			assertFalse(type.isEmpty());
 		}
 	}
 
-	protected Index indexResource(String resource)
+	protected Index indexResource(String resource) throws CoreException
 	{
 		IFileStore fileToIndex = getFileStore(resource);
 		uri = fileToIndex.toURI();
-		Index index = IndexManager.getInstance().getIndex(uri);
-		Indexer indexer = new Indexer();
+		Index index = getIndexManager().getIndex(uri);
+		JSCAFileIndexingParticipant indexer = new JSCAFileIndexingParticipant();
 
-		indexer.index(index, fileToIndex);
+		indexer.index(new FileStoreBuildContext(fileToIndex), index, new NullProgressMonitor());
 
 		return index;
 	}
@@ -97,7 +96,7 @@ public class JSCAIndexingTests extends JSEditorBasedTests
 	{
 		if (uri != null)
 		{
-			IndexManager.getInstance().removeIndex(uri);
+			getIndexManager().removeIndex(uri);
 			uri = null;
 		}
 
@@ -106,7 +105,7 @@ public class JSCAIndexingTests extends JSEditorBasedTests
 		super.tearDown();
 	}
 
-	public void testSimpleType()
+	public void testSimpleType() throws Exception
 	{
 		Index index = indexResource("metadata/typeOnly.jsca");
 
@@ -114,11 +113,12 @@ public class JSCAIndexingTests extends JSEditorBasedTests
 		assertTypes(index, "SimpleType");
 
 		// check for global
-		PropertyElement global = queryHelper.getGlobal(index, "SimpleType");
+		List<PropertyElement> global = queryHelper.getGlobals(index, "SimpleType");
 		assertNotNull(global);
+		assertFalse(global.isEmpty());
 	}
 
-	public void testSimpleInternalType()
+	public void testSimpleInternalType() throws Exception
 	{
 		Index index = indexResource("metadata/typeInternal.jsca");
 
@@ -126,11 +126,12 @@ public class JSCAIndexingTests extends JSEditorBasedTests
 		assertTypes(index, "SimpleType");
 
 		// check for global
-		PropertyElement global = queryHelper.getGlobal(index, "SimpleType");
-		assertNull(global);
+		List<PropertyElement> global = queryHelper.getGlobals(index, "SimpleType");
+		assertNotNull(global);
+		assertTrue(global.isEmpty());
 	}
 
-	public void testNamespacedType()
+	public void testNamespacedType() throws Exception
 	{
 		Index index = indexResource("metadata/namespacedType.jsca");
 
@@ -143,7 +144,7 @@ public class JSCAIndexingTests extends JSEditorBasedTests
 		assertProperties(index, "com.aptana", "SimpleType");
 	}
 
-	public void testNamespacedTypeInternal()
+	public void testNamespacedTypeInternal() throws Exception
 	{
 		Index index = indexResource("metadata/namespacedTypeInternal.jsca");
 
@@ -151,11 +152,12 @@ public class JSCAIndexingTests extends JSEditorBasedTests
 		assertTypes(index, "com", "com.aptana", "com.aptana.SimpleType");
 
 		// check for global
-		PropertyElement global = queryHelper.getGlobal(index, "com");
-		assertNull(global);
+		List<PropertyElement> global = queryHelper.getGlobals(index, "com");
+		assertNotNull(global);
+		assertTrue(global.isEmpty());
 	}
 
-	public void testNamespacedTypeMixed()
+	public void testNamespacedTypeMixed() throws Exception
 	{
 		Index index = indexResource("metadata/namespacedTypeMixed.jsca");
 
@@ -168,7 +170,7 @@ public class JSCAIndexingTests extends JSEditorBasedTests
 		assertProperties(index, "com.aptana", "SimpleType2");
 	}
 
-	public void testIsInternalProposals()
+	public void testIsInternalProposals() throws Exception
 	{
 		// grab source file URI
 		IFileStore sourceFile = getFileStore("metadata/isInternalProperty.js");
@@ -176,9 +178,9 @@ public class JSCAIndexingTests extends JSEditorBasedTests
 
 		// index jsca file
 		IFileStore fileToIndex = getFileStore("metadata/namespacedTypeMixed.jsca");
-		Index index = IndexManager.getInstance().getIndex(uri);
-		Indexer indexer = new Indexer();
-		indexer.index(index, fileToIndex);
+		Index index = getIndexManager().getIndex(uri);
+		JSCAFileIndexingParticipant indexer = new JSCAFileIndexingParticipant();
+		indexer.index(new FileStoreBuildContext(fileToIndex), index, new NullProgressMonitor());
 
 		// setup editor and CA context
 		setupTestContext(sourceFile);
@@ -211,5 +213,10 @@ public class JSCAIndexingTests extends JSEditorBasedTests
 
 		assertFalse("SimpleType should not exist in the proposal list", names.contains("SimpleType"));
 		assertTrue("SimpleType2 does not exist in the proposal list", names.contains("SimpleType2"));
+	}
+
+	protected IndexManager getIndexManager()
+	{
+		return IndexPlugin.getDefault().getIndexManager();
 	}
 }

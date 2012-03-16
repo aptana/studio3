@@ -38,7 +38,9 @@ var fb143p;
 var fb15p;
 var fb16p;
 var fb17p;
+var fb18p;
 var firebug_unMinimize;
+var fbCompilationUnit;
 
 const self = this;
 
@@ -61,8 +63,11 @@ this.setHook("init",function(debuggr)
 	fb15p = (AptanaUtils.compareVersion(Firebug.version.substr(0,3), "1.5") >= 0);
 	fb16p = (AptanaUtils.compareVersion(Firebug.version.substr(0,3), "1.6") >= 0);
 	fb17p = (AptanaUtils.compareVersion(Firebug.version.substr(0,3), "1.7") >= 0);
-	const AptanaDebuggerExtension = FBL.extend(Firebug.Extension,
+	fb18p = (AptanaUtils.compareVersion(Firebug.version.substr(0,3), "1.8") >= 0);
+	const AptanaDebuggerExtension = FBL.extend(fb18p ? Firebug.Module : Firebug.Extension,
 	{
+		dispatchName: "AptanaDebugger",
+		
 		// Firebug 1.4
 		shouldCreateContext: function(_browser, url, userCommands)
 		{
@@ -98,7 +103,7 @@ this.setHook("init",function(debuggr)
 		
 		shouldNotCreateContext: function(_browser, url, userCommands)
 		{
-			if ( topWindow ) {
+			if ( topWindow && currentContext) {
 				return true;
 			}
 			return false;
@@ -196,7 +201,7 @@ this.setHook("init",function(debuggr)
 		
 		showContext: function(_browser, context)
 		{
-			var show = (context == currentContext && currentContext != null) || "__aptanaAttached" in _browser;
+			var show = (context == currentContext && currentContext != null) || _browser.__aptanaAttached;
 			if (show && Firebug.getSuspended()) {
 				Firebug.resume();
 			}
@@ -240,7 +245,7 @@ this.setHook("init",function(debuggr)
 		
 		onTopLevelScriptCreated: function(context, frame, href)
 		{
-			if ( context == currentContext && currentContext ) {
+			if ( context === currentContext && currentContext) {
 				debuggr.onTopLevel(frame, href);
 			}			
 		},
@@ -391,13 +396,26 @@ this.setHook("init",function(debuggr)
 	};
 	
 	if (fb14p) {
-		if (fb143p) {
+		if (fb18p) {
+			Firebug.PanelActivation.toggleAll("off");
+		} else if (fb143p) {
 			Firebug.Activation.toggleAll("off");
 		} else {
 			Firebug.toggleAll("off");
 		}
 	}
-	Firebug.registerExtension(AptanaDebuggerExtension);
+	if (fb18p) {
+		Firebug.registerModule(AptanaDebuggerExtension);
+        Firebug.TabWatcher.addListener(AptanaDebuggerExtension);
+		Firebug.require(Firebug.getModuleLoaderConfig(), [
+		    "arch/compilationunit",
+		],
+		function(CompilationUnit) {
+			fbCompilationUnit = CompilationUnit;
+		});
+	} else {
+		Firebug.registerExtension(AptanaDebuggerExtension);
+	}
 	Firebug.Console.addListener(ConsoleListener);
 	Firebug.Spy.addListener(XHRSpyListener);
 	if (fb17p) {
@@ -526,6 +544,13 @@ this.setHook("setBreakpoint",function(href, line, props)
 });
 
 function getSourceFileByHref(href) {
+	if (fb18p) {
+		var sourceFile = currentContext.getCompilationUnit(href);
+		if (sourceFile instanceof fbCompilationUnit) {
+            sourceFile = sourceFile.sourceFile;
+        }
+		return sourceFile;
+	}
 	return fb14p ?
 		FBL.getSourceFileByHref(href, currentContext) :
 		FBL.getScriptFileByHref(href, currentContext)

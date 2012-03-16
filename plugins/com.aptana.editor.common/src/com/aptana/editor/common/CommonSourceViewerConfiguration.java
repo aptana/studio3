@@ -54,6 +54,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.ISources;
+import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
@@ -63,6 +64,8 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.contentassist.ContentAssistant;
 import com.aptana.editor.common.contentassist.ICommonContentAssistProcessor;
+import com.aptana.editor.common.contentassist.SimpleTextHover;
+import com.aptana.editor.common.hover.AbstractCommonTextHover;
 import com.aptana.editor.common.hover.CommonAnnotationHover;
 import com.aptana.editor.common.hover.ThemedInformationControl;
 import com.aptana.editor.common.internal.formatter.CommonMultiPassContentFormatter;
@@ -99,7 +102,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	private CommonDoubleClickStrategy fDoubleClickStrategy;
 	private IPreferenceChangeListener fThemeChangeListener;
 	private IPreferenceChangeListener fAutoActivationListener;
-	private CommonReconciler fReconciler;
+	protected CommonReconciler fReconciler;
 	List<IContentAssistProcessor> fCAProcessors = new ArrayList<IContentAssistProcessor>();
 
 	/**
@@ -416,7 +419,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		}
 	}
 
-	private final Collection<String> getSpellingContentTypes(ISourceViewer sourceViewer)
+	protected final Collection<String> getSpellingContentTypes(ISourceViewer sourceViewer)
 	{
 		Set<String> set = new HashSet<String>();
 		IContentTypeTranslator contentTypeTranslator = CommonEditorPlugin.getDefault().getContentTypeTranslator();
@@ -611,12 +614,20 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	private List<TextHoverDescriptor> getEnabledTextHoverDescriptors(ITextViewer textViewer, int offset)
 	{
 		List<TextHoverDescriptor> result = new ArrayList<TextHoverDescriptor>();
+		if (fTextEditor == null)
+		{
+			return result;
+		}
 		try
 		{
 			QualifiedContentType contentType = CommonEditorPlugin.getDefault().getDocumentScopeManager()
 					.getContentType(textViewer.getDocument(), offset);
 			EvaluationContext context = new EvaluationContext(null, textViewer);
-			context.addVariable(ISources.ACTIVE_EDITOR_ID_NAME, fTextEditor.getSite().getId());
+			IWorkbenchPartSite site = fTextEditor.getSite();
+			if (site != null)
+			{
+				context.addVariable(ISources.ACTIVE_EDITOR_ID_NAME, site.getId());
+			}
 			for (TextHoverDescriptor descriptor : TextHoverDescriptor.getContributedHovers())
 			{
 				if (descriptor.isEnabledFor(contentType, context))
@@ -649,20 +660,35 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		@SuppressWarnings("deprecation")
 		public Object getHoverInfo2(ITextViewer textViewer, IRegion hoverRegion)
 		{
-			Object info = null;
-			if (activeTextHover instanceof ITextHoverExtension2)
+			if (activeTextHover != null)
 			{
-				info = ((ITextHoverExtension2) activeTextHover).getHoverInfo2(textViewer, hoverRegion);
+				Object info = null;
+				if (activeTextHover instanceof AbstractCommonTextHover)
+				{
+					AbstractCommonTextHover commonHover = (AbstractCommonTextHover) activeTextHover;
+					commonHover.setEditor(getEditor());
+				}
+				if (activeTextHover instanceof ITextHoverExtension2)
+				{
+					info = ((ITextHoverExtension2) activeTextHover).getHoverInfo2(textViewer, hoverRegion);
+				}
+				else
+				{
+					info = activeTextHover.getHoverInfo(textViewer, hoverRegion);
+				}
+				if (info != null)
+				{
+					return info;
+				}
 			}
-			else if (activeTextHover != null)
+			String defaultInfo = super.getHoverInfo(textViewer, hoverRegion);
+			if (defaultInfo != null)
 			{
-				info = activeTextHover.getHoverInfo(textViewer, hoverRegion);
+				// wrap it in a SimpleTextHover so it will look the same as other hovers (i.e. use the theme colors,
+				// etc.)
+				return new SimpleTextHover(defaultInfo, null).getHoverInfo2(textViewer, hoverRegion);
 			}
-			if (info != null)
-			{
-				return info;
-			}
-			return super.getHoverInfo(textViewer, hoverRegion);
+			return null;
 		}
 
 		/*

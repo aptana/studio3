@@ -52,9 +52,9 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 	{
 		try
 		{
-			if (IdeLog.isInfoEnabled(CommonEditorPlugin.getDefault(), IDebugScopes.PRESENTATION))
+			if (IdeLog.isTraceEnabled(CommonEditorPlugin.getDefault(), IDebugScopes.PRESENTATION))
 			{
-				IdeLog.logInfo(CommonEditorPlugin.getDefault(), MessageFormat.format(
+				IdeLog.logTrace(CommonEditorPlugin.getDefault(), MessageFormat.format(
 						"Creating presentation for region at offset {0}, length {1} in document of length {2}", //$NON-NLS-1$
 						region.getOffset(), region.getLength(), fDocument.getLength()), IDebugScopes.PRESENTATION);
 			}

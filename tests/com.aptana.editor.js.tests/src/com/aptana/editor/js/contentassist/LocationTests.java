@@ -28,7 +28,7 @@ public class LocationTests extends JSEditorBasedTests
 		{
 			for (int offset = range.startingOffset; offset <= range.endingOffset; offset++)
 			{
-				LocationType location = this.processor.getLocation(this.document, offset);
+				LocationType location = this.processor.getLocationType(this.document, offset);
 				// @formatter:off
 				String message = MessageFormat.format(
 					"Expected {0} at location {1} of ''{2}'': character = ''{3}''",
@@ -275,7 +275,8 @@ public class LocationTests extends JSEditorBasedTests
 		this.testLocations(
 			"locations/var1.js",
 			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
-			new LocationTypeRange(LocationType.NONE, 1, 7),
+			new LocationTypeRange(LocationType.NONE, 1, 4),
+			new LocationTypeRange(LocationType.IN_VARIABLE_DECLARATION, 5, 7),
 			new LocationTypeRange(LocationType.IN_GLOBAL, 8, 9)
 		);
 	}
@@ -288,7 +289,10 @@ public class LocationTests extends JSEditorBasedTests
 		this.testLocations(
 			"locations/var2.js",
 			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
-			new LocationTypeRange(LocationType.NONE, 1, 12),
+			new LocationTypeRange(LocationType.NONE, 1, 4),
+			new LocationTypeRange(LocationType.IN_VARIABLE_DECLARATION, 5, 7),
+			new LocationTypeRange(LocationType.NONE, 8, 9),
+			new LocationTypeRange(LocationType.IN_VARIABLE_DECLARATION, 10, 12),
 			new LocationTypeRange(LocationType.IN_GLOBAL, 13, 14)
 		);
 	}
@@ -301,7 +305,9 @@ public class LocationTests extends JSEditorBasedTests
 		this.testLocations(
 			"locations/var3.js",
 			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
-			new LocationTypeRange(LocationType.NONE, 1, 8),
+			new LocationTypeRange(LocationType.NONE, 1, 4),
+			new LocationTypeRange(LocationType.IN_VARIABLE_DECLARATION, 5, 7),
+			new LocationTypeRange(LocationType.NONE, 8),
 			new LocationTypeRange(LocationType.IN_GLOBAL, 9, 10),
 			new LocationTypeRange(LocationType.NONE, 11, 12),
 			new LocationTypeRange(LocationType.IN_GLOBAL, 13, 14)
@@ -333,7 +339,9 @@ public class LocationTests extends JSEditorBasedTests
 		this.testLocations(
 			"locations/forIn.js",
 			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
-			new LocationTypeRange(LocationType.NONE, 1, 13),
+			new LocationTypeRange(LocationType.NONE, 1, 9),
+			new LocationTypeRange(LocationType.IN_VARIABLE_DECLARATION, 10),
+			new LocationTypeRange(LocationType.NONE, 11, 13),
 			new LocationTypeRange(LocationType.IN_GLOBAL, 14),
 			new LocationTypeRange(LocationType.IN_VARIABLE_NAME, 15, 17),
 			new LocationTypeRange(LocationType.NONE, 18, 19),
@@ -349,8 +357,9 @@ public class LocationTests extends JSEditorBasedTests
 		this.testLocations(
 			"locations/for.js",
 			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
-			new LocationTypeRange(LocationType.NONE, 1, 8),
-			new LocationTypeRange(LocationType.NONE, 9, 11),
+			new LocationTypeRange(LocationType.NONE, 1, 9),
+			new LocationTypeRange(LocationType.IN_VARIABLE_DECLARATION, 10),
+			new LocationTypeRange(LocationType.NONE, 11),
 			new LocationTypeRange(LocationType.IN_GLOBAL, 12, 13),
 			new LocationTypeRange(LocationType.NONE, 14),
 			new LocationTypeRange(LocationType.IN_GLOBAL, 15, 16),
@@ -380,6 +389,17 @@ public class LocationTests extends JSEditorBasedTests
 			new LocationTypeRange(LocationType.IN_GLOBAL, 20, 23)
 		);
 	}
+
+	/**
+	 * testIfAtEOF
+	 */
+	public void testIfAtEOF()
+	{
+		this.testLocations(
+			"locations/if-eof.js",
+			new LocationTypeRange(LocationType.IN_PROPERTY_NAME, 21)
+		);
+	}
 	
 	/**
 	 * testLabelledFor
@@ -390,7 +410,9 @@ public class LocationTests extends JSEditorBasedTests
 			"locations/labelledFor.js",
 			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
 			new LocationTypeRange(LocationType.IN_LABEL, 1, 4),
-			new LocationTypeRange(LocationType.NONE, 5, 17),
+			new LocationTypeRange(LocationType.NONE, 5, 15),
+			new LocationTypeRange(LocationType.IN_VARIABLE_DECLARATION, 16),
+			new LocationTypeRange(LocationType.NONE, 17),
 			new LocationTypeRange(LocationType.IN_GLOBAL, 18, 19),
 			new LocationTypeRange(LocationType.NONE, 20),
 			new LocationTypeRange(LocationType.IN_GLOBAL, 21, 22),
@@ -424,7 +446,9 @@ public class LocationTests extends JSEditorBasedTests
 		this.testLocations(
 			"locations/arrayLiteral.js",
 			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
-			new LocationTypeRange(LocationType.NONE, 1, 8),
+			new LocationTypeRange(LocationType.NONE, 1, 4),
+			new LocationTypeRange(LocationType.IN_VARIABLE_DECLARATION, 5, 7),
+			new LocationTypeRange(LocationType.NONE, 8),
 			new LocationTypeRange(LocationType.IN_GLOBAL, 9, 12),
 			new LocationTypeRange(LocationType.NONE, 13, 18),
 			new LocationTypeRange(LocationType.IN_GLOBAL, 19, 20),
@@ -443,7 +467,9 @@ public class LocationTests extends JSEditorBasedTests
 		this.testLocations(
 			"locations/objectLiteral.js",
 			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
-			new LocationTypeRange(LocationType.NONE, 1, 8),
+			new LocationTypeRange(LocationType.NONE, 1, 4),
+			new LocationTypeRange(LocationType.IN_VARIABLE_DECLARATION, 5, 7),
+			new LocationTypeRange(LocationType.NONE, 8),
 			new LocationTypeRange(LocationType.IN_GLOBAL, 9, 10),
 			new LocationTypeRange(LocationType.IN_OBJECT_LITERAL_PROPERTY, 11, 17),
 			new LocationTypeRange(LocationType.IN_GLOBAL, 18, 19),
@@ -567,6 +593,14 @@ public class LocationTests extends JSEditorBasedTests
 		this.testLocations(
 			"locations/errorInObjectLiteral.js",
 			new LocationTypeRange(LocationType.NONE, 6)
+		);
+	}
+	
+	public void testThis()
+	{
+		this.testLocations(
+			"locations/this.js",
+			new LocationTypeRange(LocationType.IN_THIS, 5)
 		);
 	}
 }

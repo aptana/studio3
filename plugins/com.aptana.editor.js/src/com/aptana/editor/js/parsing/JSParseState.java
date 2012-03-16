@@ -11,6 +11,7 @@ import java.util.Stack;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.js.JSPlugin;
+import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ParseState;
 
 /**
@@ -119,5 +120,34 @@ public class JSParseState extends ParseState
 	public void setCollectComments(boolean flag)
 	{
 		commentContentStack.peek().attachComments = flag;
+	}
+
+	public boolean requiresReparse(IParseState newState)
+	{
+		// We can't compare, assume re-parse
+		if (!(newState instanceof JSParseState))
+		{
+			return true;
+		}
+
+		if (super.requiresReparse(newState))
+		{
+			return true;
+		}
+
+		JSParseState newParseState = (JSParseState) newState;
+		if (newParseState.attachComments() && !attachComments())
+		{
+			// we need comments attached, and old one doesn't have them attached. re-parse
+			return true;
+		}
+
+		if (newParseState.collectComments() && !collectComments())
+		{
+			// we need comments collected, and old one doesn't have them collected. re-parse
+			return true;
+		}
+
+		return false;
 	}
 }

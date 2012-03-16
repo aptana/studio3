@@ -38,13 +38,13 @@ import com.aptana.parsing.ast.IParseNode;
 
 public class JSSymbolTypeInferrer
 {
-	private static final String NO_TYPE = ""; //$NON-NLS-1$
+	private static final String NO_TYPE = StringUtil.EMPTY;
 
-	private Index _index;
-	private JSScope _activeScope;
-	private URI _location;
+	private Index index;
+	private JSScope activeScope;
+	private URI location;
 
-	private JSIndexWriter _writer;
+	private JSIndexWriter writer;
 
 	/**
 	 * generateType
@@ -90,7 +90,7 @@ public class JSSymbolTypeInferrer
 				JSNode value = values.get(i);
 				String candidate = JSTypeUtil.getName(value);
 
-				if (candidate != null && candidate.length() > 0)
+				if (!StringUtil.isEmpty(candidate))
 				{
 					name = candidate;
 					break;
@@ -98,8 +98,14 @@ public class JSSymbolTypeInferrer
 			}
 		}
 
-		// generate a unique name if we didn't find one
-		if (name == null || name.length() == 0)
+		// if no generated from values, then use property chain as type name
+		if (StringUtil.isEmpty(name))
+		{
+			name = property.getQualifiedName();
+		}
+
+		// if still no name, then generate a unique name
+		if (StringUtil.isEmpty(name))
 		{
 			name = JSTypeUtil.getUniqueTypeName();
 		}
@@ -125,9 +131,9 @@ public class JSSymbolTypeInferrer
 	 */
 	public JSSymbolTypeInferrer(JSScope activeScope, Index index, URI location)
 	{
-		this._index = index;
-		this._activeScope = activeScope;
-		this._location = location;
+		this.index = index;
+		this.activeScope = activeScope;
+		this.location = location;
 	}
 
 	/**
@@ -181,7 +187,7 @@ public class JSSymbolTypeInferrer
 						// grab name
 						String symbol = node.getText();
 
-						JSPropertyCollection p = this.getSymbolProperty(this._activeScope.getObject(), symbol);
+						JSPropertyCollection p = this.getSymbolProperty(activeScope.getObject(), symbol);
 
 						if (p != null)
 						{
@@ -206,10 +212,13 @@ public class JSSymbolTypeInferrer
 	}
 
 	/**
-	 * createPropertyElement
+	 * This is a utility method used to create PropertyElements or FunctionElements based on a list of types. If the
+	 * list of types contains a function, then a FunctionElement will be created; otherwise, a PropertyElement will be
+	 * created
 	 * 
 	 * @param types
-	 * @return
+	 *            A set of type names. This value may be empty or null
+	 * @return Returns a PropertyElement or a FunctionElement
 	 */
 	private PropertyElement createPropertyElement(Set<String> types)
 	{
@@ -268,15 +277,16 @@ public class JSSymbolTypeInferrer
 	}
 
 	/**
-	 * getScopeProperties
+	 * Generate a list of PropertyElements (and its descendent classes), one for each symbol defined in the currently
+	 * active scope
 	 * 
-	 * @return
+	 * @return Returns a list of PropertyElements. This value will always be defined even if the list is empty
 	 */
 	public List<PropertyElement> getScopeProperties()
 	{
 		List<PropertyElement> result = new ArrayList<PropertyElement>();
 
-		for (String symbol : this._activeScope.getLocalSymbolNames())
+		for (String symbol : activeScope.getLocalSymbolNames())
 		{
 			PropertyElement p = this.getSymbolPropertyElement(symbol);
 
@@ -287,11 +297,14 @@ public class JSSymbolTypeInferrer
 	}
 
 	/**
-	 * getSymbolProperty
+	 * Get the property collection for the specified symbol. If the symbol does not exist in the specified collections,
+	 * then the active scope is used.
 	 * 
 	 * @param activeObject
+	 *            The collection to use for default lookup of the specified symbol
 	 * @param symbol
-	 * @return
+	 *            The name of the symbol to locate
+	 * @return Return a property collection, possibly null
 	 */
 	private JSPropertyCollection getSymbolProperty(JSPropertyCollection activeObject, String symbol)
 	{
@@ -301,17 +314,21 @@ public class JSSymbolTypeInferrer
 		// if no property, then try a scope-based lookup
 		if (property == null)
 		{
-			property = this._activeScope.getSymbol(symbol);
+			property = activeScope.getSymbol(symbol);
 		}
 
 		return property;
 	}
 
 	/**
-	 * getSymbolPropertyElement
+	 * Return a PropertyElement for the specified symbol in the specified property collection. This method uses cached
+	 * values as it can, creating new elements if none exists in the cache
 	 * 
-	 * @param name
-	 * @return
+	 * @param activeObject
+	 *            The property collection to use when processing the specified symbol
+	 * @param symbol
+	 *            The name of the symbol to process
+	 * @return Returns a new PropertyElement (or FunctionElement). This value will not be null
 	 */
 	public PropertyElement getSymbolPropertyElement(JSPropertyCollection activeObject, String symbol)
 	{
@@ -330,7 +347,7 @@ public class JSSymbolTypeInferrer
 			}
 			else
 			{
-				// infer types
+				// infer value types
 				this.processValues(property, types);
 
 				// process additional properties, possibly generating a new type
@@ -360,37 +377,43 @@ public class JSSymbolTypeInferrer
 	}
 
 	/**
-	 * getSymbolPropertyElement
+	 * Return a PropertyElement for the specified symbol in the currently active scope.
 	 * 
 	 * @param symbol
-	 * @return
+	 *            The name of the symbol to process in the current scope
+	 * @return Returns a new PropertyElement (or FunctionElement). This value will not be null
 	 */
 	public PropertyElement getSymbolPropertyElement(String symbol)
 	{
-		return this.getSymbolPropertyElement(this._activeScope.getObject(), symbol);
+		return this.getSymbolPropertyElement(activeScope.getObject(), symbol);
 	}
 
 	/**
-	 * getTypePropertyMap
+	 * Generate a mapping of property names to their property elements. The properties are a collection generated from
+	 * the specified list of types and of those type's ancestor types
 	 * 
-	 * @param type
-	 * @return
+	 * @param types
+	 *            A set of type names
+	 * @return Returns a map of property name to property element
 	 */
 	private Map<String, PropertyElement> getTypePropertyMap(Set<String> types)
 	{
 		JSIndexQueryHelper helper = new JSIndexQueryHelper();
 
-		// create a set from the specified types and their ancestors
+		// create a unique set of type names and their ancestor types
 		Set<String> ancestors = new HashSet<String>();
 
 		for (String type : types)
 		{
 			ancestors.add(type);
-			ancestors.addAll(helper.getTypeAncestorNames(this._index, type));
+			ancestors.addAll(helper.getTypeAncestorNames(index, type));
 		}
 
+		// grab property elements for all collected types
 		List<String> typesAndAncestors = new ArrayList<String>(ancestors);
-		List<PropertyElement> typeMembers = helper.getTypeMembers(this._index, typesAndAncestors);
+		List<PropertyElement> typeMembers = helper.getTypeMembers(index, typesAndAncestors);
+
+		// generate map of property name to its property element
 		Map<String, PropertyElement> propertyMap = new HashMap<String, PropertyElement>();
 
 		for (PropertyElement propertyElement : typeMembers)
@@ -466,10 +489,13 @@ public class JSSymbolTypeInferrer
 	}
 
 	/**
-	 * processValues
+	 * Collect all types for a given property collection. Types are determined by documentation. However, if no
+	 * documentation is associated with a given property value, then inferencing is used to determine the value type
 	 * 
 	 * @param property
+	 *            The property to process
 	 * @param types
+	 *            The collection of types
 	 */
 	private void processValues(JSPropertyCollection property, Set<String> types)
 	{
@@ -480,6 +506,7 @@ public class JSSymbolTypeInferrer
 
 			if (docs != null)
 			{
+				// create a Property/FunctionElement and apply documentation to it
 				if (isFunction)
 				{
 					FunctionElement f = new FunctionElement();
@@ -502,7 +529,8 @@ public class JSSymbolTypeInferrer
 			}
 			else
 			{
-				JSNodeTypeInferrer inferrer = new JSNodeTypeInferrer(this._activeScope, this._index, this._location);
+				// infer the node's type
+				JSNodeTypeInferrer inferrer = new JSNodeTypeInferrer(activeScope, index, location);
 
 				if (value instanceof JSObjectNode)
 				{
@@ -510,17 +538,24 @@ public class JSSymbolTypeInferrer
 				}
 				else if (isFunction)
 				{
+					// We know this is a Function, so cache that type on the property collection. This serves as a
+					// fallback type if none can be inferred. Once we're done processing the node, we remove the cached
+					// type
 					property.addType(JSTypeConstants.FUNCTION_TYPE);
 					inferrer.visit(value);
 					property.clearTypes();
 				}
 				else
 				{
+					// We're not sure of the value's type, so cache NO_TYPE on the property collection. This serves as a
+					// fallback type if none can be inferred. Once we're done processing the node, we remove the cached
+					// type
 					property.addType(NO_TYPE);
 					inferrer.visit(value);
 					property.clearTypes();
 				}
 
+				// add all collected types to the passed-in type set
 				types.addAll(inferrer.getTypes());
 			}
 		}
@@ -538,17 +573,17 @@ public class JSSymbolTypeInferrer
 			// add user agents to all generated properties
 			for (PropertyElement property : type.getProperties())
 			{
-				JSTypeUtil.addAllUserAgents(property);
+				property.setHasAllUserAgents();
 			}
 
 			// make sure we have an index writer
-			if (this._writer == null)
+			if (writer == null)
 			{
-				this._writer = new JSIndexWriter();
+				writer = new JSIndexWriter();
 			}
 
 			// write the type to the index
-			this._writer.writeType(this._index, type, this._location);
+			writer.writeType(index, type, location);
 		}
 	}
 }

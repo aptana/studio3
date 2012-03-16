@@ -17,7 +17,6 @@ public class ValidationTests
 	{
 		TestSuite suite = new TestSuite(ValidationTests.class.getName());
 		// $JUnit-BEGIN$
-		suite.addTestSuite(ValidationManagerTest.class);
 		// Please do not include ad-hoc performance test classes in here.
 		// They have no pass/fail and just slow down the build!
 		// $JUnit-END$

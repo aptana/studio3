@@ -5,7 +5,6 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-
 package com.aptana.editor.common.preferences;
 
 import java.util.ArrayList;
@@ -22,7 +21,7 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -96,8 +95,7 @@ public final class TasksPreferencePage extends PreferencePage implements IWorkbe
 		fCaseSensitiveButton = new Button(composite, SWT.CHECK);
 		fCaseSensitiveButton.setFont(parent.getFont());
 		fCaseSensitiveButton.setText(Messages.TasksPreferencePage_CaseSensitiveLabel);
-		fCaseSensitiveButton.setSelection(getPreferenceStore()
-.getBoolean(
+		fCaseSensitiveButton.setSelection(getPreferenceStore().getBoolean(
 				ICorePreferenceConstants.TASK_TAGS_CASE_SENSITIVE));
 		setButtonLayoutData(fCaseSensitiveButton);
 	}
@@ -123,7 +121,7 @@ public final class TasksPreferencePage extends PreferencePage implements IWorkbe
 
 		fTasksTableViewer.setContentProvider(ArrayContentProvider.getInstance());
 		fTasksTableViewer.setLabelProvider(new TaskLabelProvider());
-		fTasksTableViewer.setSorter(new ViewerSorter());
+		fTasksTableViewer.setComparator(new ViewerComparator());
 		fTasksTableViewer.setInput(getTaskTags());
 
 		fTasksTableViewer.addSelectionChangedListener(new ISelectionChangedListener()

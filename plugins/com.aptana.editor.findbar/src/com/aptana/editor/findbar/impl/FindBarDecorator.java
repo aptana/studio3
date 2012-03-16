@@ -7,6 +7,7 @@
  */
 package com.aptana.editor.findbar.impl;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -744,10 +745,11 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 		selectionProvider.setSelection(new TextSelection(this.textEditor.getDocumentProvider().getDocument(
 				this.textEditor.getEditorInput()), textSelection.getOffset(), 0));
-		
+
 		// Do initial search before replace (always forward search as we just selected the initial offset).
-		if(!findBarFinder.find(true, false, false)){
-			return; //The messages (why the find didn't work) should be set already.
+		if (!findBarFinder.find(true, false, false))
+		{
+			return; // The messages (why the find didn't work) should be set already.
 		}
 		try
 		{
@@ -756,7 +758,8 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		}
 		catch (Exception e1)
 		{
-			statusLineManager.setMessage(true, "Error: " + e1.getMessage(), null);
+			statusLineManager.setMessage(true,
+					MessageFormat.format(Messages.FindBarDecorator_ReplaceError, e1.getMessage()), null);
 			FindBarPlugin.log(e1);
 			return;
 		}

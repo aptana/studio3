@@ -53,7 +53,7 @@
             <specification name="W3C" version="DOM 0"/>
         </availability>
     </class>
-    
+
     <class type="Applet" visibility="basic">
         <description>Java applet included in a web page.</description>
         <browsers>
@@ -85,7 +85,7 @@
             <specification name="W3C" version="HTML 4.0"/>
         </availability>
     </class>
-    
+
     <class type="Area" visibility="basic">
         <description>Defines an area of an image as an image map.</description>
         <browsers>
@@ -110,7 +110,7 @@
             <specification name="W3C" version="HTML 4.0"/>
         </availability>  
     </class>
-    
+
     <class type="Button" superclass="HTMLElement" visibility="basic">
         <description>A graphical button that can be "pressed" by a user.</description>
         <browsers>
@@ -178,7 +178,7 @@
             <specification name="W3C" version="HTML 4.0"/>
         </availability>
     </class>
-    
+
     <class type="Checkbox" superclass="HTMLElement" visibility="basic">
         <description>A box that the user can check. For groups of checkboxes, users may select multiple checkboxes.</description>
         <browsers>
@@ -200,7 +200,7 @@
           </constructor>
         </constructors>  
         <properties>
-            
+
             <property name="onclick" type="Function" access="read-write" visibility="basic">
                 <availability>
                     <specification name="JavaScript 1.0"/>
@@ -221,7 +221,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="checked" type="Boolean" access="read-write" visibility="basic">
                 <description>Returns true if the checkbox is checked. False if the checkbox is not checked.</description>
                 <browsers>
@@ -233,7 +233,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="defaultChecked" type="Boolean" access="read-write" visibility="basic">
                 <description>Returns true if the checkbox is checked by default.</description>
                 <browsers>
@@ -245,7 +245,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="value" type="String" access="read-write" visibility="basic">
                 <description>Specifies a string value for when the checkbox is checked.</description>
                 <browsers>
@@ -270,7 +270,7 @@
             <specification name="enhanced in JavaScript 1.1"/>
         </availability>
     </class>
-    
+
     <class type="Document" superclass="HTMLElement" visibility="basic">
         <description>Contains information about the current document, including methods to display HTML, XHTML, and XML output to the user.</description>
         <browsers>
@@ -292,7 +292,7 @@
           </constructor>
         </constructors>  
         <properties>
-            
+
             <property name="all" type="Object" access="read-write" visibility="basic">
                 <references>
                     <reference name="HTMLElement"/>
@@ -303,7 +303,7 @@
                     <browser platform="Opera" version="7.0+" />
                 </browsers>
             </property>
-            
+
             <property name="cookie" type="Object" access="read-write" visibility="basic">
                 <availability>
                     <specification name="JavaScript 1.0"/>
@@ -321,7 +321,7 @@
                     <specification name="W3C" version="HTML 4.0"/>
                 </availability>
             </property>
-            
+
             <property name="domain" type="String" access="read-write" visibility="basic">
                 <availability>
                     <specification name="JavaScript 1.1"/>
@@ -339,7 +339,7 @@
                     <specification name="W3C" version="HTML 4.0"/>
                 </availability>
             </property>
-            
+
             <property name="lastModified" type="String" access="read-write" visibility="basic">
                 <availability>
                     <specification name="JavaScript 1.0"/>
@@ -359,7 +359,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="links" type="Link[]" access="read-write" visibility="basic">
                 <availability>
                     <specification name="JavaScript 1.0"/>
@@ -378,7 +378,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="URL" type="String" access="read-write" visibility="basic">
                 <availability>
                     <specification name="JavaScript 1.1"/>
@@ -401,7 +401,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="alinkColor" type="String" access="read-write" visibility="basic">
                 <description>Gets or sets the color of active links in the document.</description>
                 <browsers>
@@ -417,7 +417,7 @@
                 </availability>
                 <deprecated>Deprecated in "Document". Use "alinkColor" as part of "Body" instead.</deprecated>
             </property>
-            
+
             <property name="anchors" type="Anchor[]" access="read-write" visibility="basic">
                 <description>Array of all of the anchors contained in the document.</description>
                 <browsers>
@@ -432,7 +432,7 @@
                     <specification name="W3C" version="HTML 4.0"/>
                 </availability>
             </property>
-            
+
             <property name="applets" type="String" access="read-write" visibility="basic">
                 <description>Array of all of the applets contained in the document.</description>
                 <browsers>
@@ -447,7 +447,7 @@
                     <specification name="W3C" version="HTML 4.0"/>
                 </availability>
             </property>
-            
+
             <property name="bgColor" type="String" access="read-write" visibility="basic">
                 <description>Gets or sets the background color of the document.</description>
                 <browsers>
@@ -463,7 +463,7 @@
                 </availability>
                 <deprecated>Deprecated in "Document". Use "bgColor" as part of "Body" instead.</deprecated>
             </property>
-            
+
             <property name="embeds" type="Array" access="read-write" visibility="basic">
                 <description>Array of all of the embedded objects in the document.</description>
                 <browsers>
@@ -475,7 +475,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="fgColor" type="String" access="read-write" visibility="basic">
                 <description>Gets or sets the text color for the document.</description>
                 <browsers>
@@ -491,7 +491,7 @@
                 </availability>
                 <deprecated>Deprecated in "Document". Use "fgColor" as part of "Body" instead.</deprecated>
             </property>
-            
+
             <property name="forms" type="Form[]" access="read" visibility="basic">
                 <description>Array of all of the form objects in the document.</description>
                 <browsers>
@@ -506,7 +506,7 @@
                     <specification name="W3C" version="HTML 4.0"/>
                 </availability>
             </property>
-            
+
             <property name="images" type="Image[]" access="read" visibility="basic">
                 <description>Array of all of the images in the document.</description>
                 <browsers>
@@ -521,7 +521,7 @@
                     <specification name="W3C" version="HTML 4.0"/>
                 </availability>
             </property>
-            
+
             <property name="linkColor" type="String" access="read-write" visibility="basic">
                 <description>Gets or sets the color of the links in the document.</description>
                 <browsers>
@@ -537,7 +537,7 @@
                 </availability>
                 <deprecated>Deprecated in "Document". Use "fgColor" as part of "Body" instead.</deprecated>
             </property>
-            
+
             <property name="location" type="String" access="read-write" visibility="basic">
                 <description>URL of the current document.</description>
                 <browsers>
@@ -545,7 +545,7 @@
                     <browser platform="Netscape" version="3-4"/>
                 </browsers>
             </property>
-            
+
             <property name="plugins" type="Plugin[]" access="read-write" visibility="basic">
                 <description>Array of all of the plug-ins contained in the document.</description>
                 <browsers>
@@ -557,7 +557,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="referrer" type="String" access="read-write" visibility="basic">
                 <description>URL of the document that called the current document.</description>
                 <browsers>
@@ -572,7 +572,7 @@
                     <specification name="W3C" version="HTML 4.0"/>
                 </availability>
             </property>
-            
+
             <property name="title" type="String" access="read-write" visibility="basic">
                 <description>Title of the current document.</description>
                 <browsers>
@@ -587,7 +587,7 @@
                     <specification name="W3C" version="HTML 4.0"/>
                 </availability>
             </property>
-            
+
             <property name="vlinkColor" type="String" access="read-write" visibility="basic">
                 <description>Gets or sets the color of visited links in the document.</description>
                 <browsers>
@@ -604,7 +604,7 @@
                 <deprecated>Deprecated in "Document". Use "vlinkColor" as part of "Body" instead.</deprecated>
             </property>
         </properties>
-        
+
         <methods>
             <method name="captureEvents" visibility="basic">
                 <return-types>
@@ -615,7 +615,7 @@
                     <browser platform="Netscape" version="4.0+"/>
                 </browsers>
             </method>
-            
+
             <method name="clear" visibility="basic">
                 <references>
                     <reference name="Document.close"/>
@@ -638,7 +638,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </method>
-            
+
             <method name="close" visibility="basic">
                 <references>
                     <reference name="Document.open"/>
@@ -661,7 +661,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </method>
-            
+
             <method name="elementFromPoint" visibility="basic">
                 <parameters>
                     <parameter name="x" type="Object" usage="required">
@@ -684,7 +684,7 @@
                 </browsers>
                 <return-description>Element at the specified location.</return-description>
             </method>
-            
+
             <method name="getSelection" visibility="basic">
                 <return-types>
                     <return-type type="String"/>
@@ -695,7 +695,7 @@
                 </browsers>
                 <return-description>The currently selected text.</return-description>
             </method>
-            
+
             <method name="handleEvent" visibility="basic">
                 <return-types>
                     <return-type type="void"/>
@@ -705,7 +705,7 @@
                     <browser platform="Netscape" version="2.0+"/>
                 </browsers>
             </method>
-            
+
             <method name="open" visibility="basic">
                 <parameters>
                     <parameter name="mimetype" type="String" usage="optional">
@@ -737,7 +737,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </method>
-            
+
             <method name="releaseEvents" visibility="basic">
                 <return-types>
                     <return-type type="void"/>
@@ -747,7 +747,7 @@
                     <browser platform="Netscape" version="4.0+"/>
                 </browsers>
             </method>
-            
+
             <method name="routeEvent" visibility="basic">
                 <return-types>
                     <return-type type="void"/>
@@ -757,7 +757,7 @@
                     <browser platform="Netscape" version="4.0+"/>
                 </browsers>
             </method>
-            
+
             <method name="write" visibility="basic">
                 <references>
                     <reference name="Document.close"/>
@@ -782,7 +782,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </method>
-            
+
             <method name="writeln" visibility="basic">
                 <references>
                     <reference name="Document.close"/>
@@ -807,7 +807,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </method>
-            
+
         </methods>
         <references>
             <reference name="Form"/>
@@ -822,7 +822,7 @@
             <specification name="W3C" version="HTML 4.0"/>
         </availability>
     </class>
-    
+
     <!--
     <class type="Element" visibility="basic">
         <description>HTML form input element.</description>
@@ -848,7 +848,7 @@
         </references>
     </class>
     -->
-    
+
     <class type="Event" visibility="basic">
         <description>Contains properties that give details about a JavaScript event.</description>
         <browsers>
@@ -876,28 +876,28 @@
                     <browser platform="Netscape" version="6.0+"/>
                 </browsers>
             </property>
-            
+
             <property name="layerY" type="Number" access="read" visibility="basic">
                 <description>Vertical position (in pixels) of the event relative to the current layer.</description>
                 <browsers>
                     <browser platform="Netscape" version="6.0+"/>
                 </browsers>
             </property>
-            
+
             <property name="pageX" type="Number" access="read" visibility="basic">
                 <description>Horizontal position (in pixels) of the event relative to the current web page.</description>
                 <browsers>
                     <browser platform="Netscape" version="6.0+"/>
                 </browsers>
             </property>
-            
+
             <property name="pageY" type="Number" access="read" visibility="basic">
                 <description>Vertical position (in pixels) of the event relative to the current web page.</description>
                 <browsers>
                     <browser platform="Netscape" version="6.0+"/>
                 </browsers>
             </property>
-            
+
             <property name="screenX" type="Number" access="read-write" visibility="basic">
                 <description>Horizontal position (in pixels) of the event on the screen.</description>
                 <browsers>
@@ -909,7 +909,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-        
+
             <property name="screenY" type="Number" access="read-write" visibility="basic">
                 <description>Vertical position (in pixels) of the event on the screen.</description>
                 <browsers>
@@ -921,7 +921,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="x" type="Number" access="read-write" visibility="basic">
                 <description>Synonym for layerX.</description>
                 <browsers>
@@ -933,7 +933,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="y" type="Number" access="read-write" visibility="basic">
                 <description>Synonym for layerY.</description>
                 <browsers>
@@ -945,9 +945,9 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
         </properties>
-        
+
         <references>
             <reference name="Event"/>
             <reference name="UIEvent"/>
@@ -958,7 +958,7 @@
             <specification name="incompatible versions supported by Netscape 4 and IE 4"/>
         </availability>
     </class>
-    
+
     <class type="FileUpload" visibility="basic">
         <description>Element on an HTML form for a user to upload a file.</description>
         <browsers>
@@ -979,7 +979,7 @@
             </return-types>
           </constructor>
         </constructors>  
-        
+
         <properties>
             <property name="onchange" type="Function" access="read-write" visibility="basic">
                 <references>
@@ -998,7 +998,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="value" type="String" access="read-write" visibility="basic">
                 <description>Path and file name to the file being uploaded.</description>
                 <browsers>
@@ -1011,7 +1011,7 @@
                 </browsers>
             </property>
         </properties>
-        
+
         <references>
             <reference name="Form"/>
             <reference name="HTMLElement"/>
@@ -1022,7 +1022,7 @@
         <availability>
             <specification name="JavaScript 1.0 Inherits from Input, HTMLElement"/>
         </availability>
-        
+
     </class>
     <class type="Form" visibility="basic">
         <description>An HTML form that collects user input.</description>
@@ -1074,7 +1074,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="onreset" type="Function" access="read-write" visibility="basic">
                 <availability>
                     <specification name="JavaScript 1.1"/>
@@ -1095,7 +1095,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="onsubmit" type="Object" access="read-write" visibility="basic">
                 <availability>
                     <specification name="JavaScript 1.0"/>
@@ -1117,7 +1117,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="target" type="Object" access="read-write" visibility="basic">
                 <availability>
                     <specification name="JavaScript 1.0"/>
@@ -1136,7 +1136,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="action" type="String" access="read-write" visibility="basic">
                 <description>URL to send the submitted results of the form.</description>
                 <availability>
@@ -1151,7 +1151,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="encoding" type="String" access="read-write" visibility="basic">
                 <description>Specifies how the form data should be encoded.</description>
                 <browsers>
@@ -1163,7 +1163,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="length" type="Number" access="read" visibility="basic">
                 <description>Number of elements on a form.</description>
                 <browsers>
@@ -1178,7 +1178,7 @@
                     <specification name="W3C" version="HTML 4.0"/>
                 </availability>
             </property>
-            
+
             <property name="method" type="String" access="read-write" visibility="basic">
                 <description>Specifies whether the form data is sent to the server using "get" or "post".</description>
                 <browsers>
@@ -1193,7 +1193,7 @@
                     <specification name="W3C" version="HTML 4.0"/>
                 </availability>
             </property>
-            
+
             <property name="name" type="String" access="read-write" visibility="basic">
                 <description>Name of the form.</description>
                 <browsers>
@@ -1209,7 +1209,7 @@
                 </availability>
             </property>
         </properties>
-        
+
         <methods>
             <method name="reset" visibility="basic">
                 <return-types>
@@ -1228,7 +1228,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </method>
-            
+
             <method name="submit" visibility="basic">
                 <return-types>
                     <return-type type="void"/>
@@ -1247,7 +1247,7 @@
                 </browsers>
             </method>
         </methods>
-        
+
         <references>
             <reference name="Button"/>
             <reference name="Checkbox"/>
@@ -1268,7 +1268,7 @@
             <specification name="W3C" version="HTML 4.0"/>
         </availability>
     </class>
-    
+
     <class type="Frame" visibility="basic">
         <description>A frame within a frameset in a web browser window.</description>
         <browsers>
@@ -1297,7 +1297,7 @@
             <specification name="W3C" version="HTML 4.0"/>
         </availability>
     </class>
-    
+
     <class type="Hidden" superclass="HTMLElement" visibility="basic">
         <description>An input element on a form that is hidden from a user. Similar to a Text element, except that it is not visible.</description>
         <browsers>
@@ -1318,7 +1318,7 @@
             </return-types>
           </constructor>
         </constructors>  
-        
+
         <properties>
             <property name="value" type="String" access="read-write" visibility="basic">
                 <description>The value of the field when the form is submitted.</description>
@@ -1345,7 +1345,7 @@
             <specification name="enhanced in JavaScript 1.1"/>
         </availability>
     </class>
-    
+
     <class type="History" visibility="basic">
         <description>Array of all of the URLs that a user has visited with the current browser window.</description>
         <browsers>
@@ -1366,7 +1366,7 @@
             </return-types>
           </constructor>
         </constructors>  
-        
+
         <properties>
             <property name="length" type="Number" access="read" visibility="basic">
                 <description>Number of URLs that a user has visited with the current browser window.</description>
@@ -1380,7 +1380,7 @@
                 </browsers>
             </property>
         </properties>
-        
+
         <methods>
             <method name="back" visibility="basic">
                 <return-types>
@@ -1399,7 +1399,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </method>
-            
+
             <method name="forward" visibility="basic">
                 <return-types>
                     <return-type type="void"/>
@@ -1417,7 +1417,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </method>
-            
+
             <method name="go" visibility="basic">
                 <parameters>
                     <parameter name="relative_position" type="Number" usage="required">
@@ -1445,7 +1445,7 @@
                 </browsers>
             </method>
         </methods>
-        
+
         <references>
             <reference name="Window.history"/>
             <reference name="Location"/>
@@ -1454,7 +1454,7 @@
             <specification name="JavaScript 1.0"/>
         </availability>
     </class>
-    
+
     <class type="HTMLElement" visibility="basic">
         <description>Superclass of all HTML element classes.</description>
         <browsers>
@@ -1472,7 +1472,7 @@
             </return-types>
           </constructor>
         </constructors>  
-        
+
         <properties>
             <property name="onclick" type="Object" access="read-write" visibility="basic">
                 <availability>
@@ -1496,7 +1496,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="ondblclick" type="Object" access="read-write" visibility="basic">
                 <availability>
                     <specification name="JavaScript 1.2"/>
@@ -1518,7 +1518,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="onhelp" type="Object" access="read-write" visibility="basic">
                 <availability>
                     <specification name="Internet Explorer 4"/>
@@ -1528,7 +1528,7 @@
                     <browser platform="IE" version="3.0+"/>
                 </browsers>
             </property>
-            
+
             <property name="onkeydown" type="Object" access="read-write" visibility="basic">
                 <availability>
                     <specification name="JavaScript 1.2"/>
@@ -1548,7 +1548,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="onkeypress" type="Object" access="read-write" visibility="basic">
                 <availability>
                     <specification name="JavaScript 1.2"/>
@@ -1567,7 +1567,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="onkeyup" type="Object" access="read-write" visibility="basic">
                 <availability>
                     <specification name="JavaScript 1.2"/>
@@ -1587,7 +1587,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="onmousedown" type="Object" access="read-write" visibility="basic">
                 <availability>
                     <specification name="JavaScript 1.2"/>
@@ -1610,7 +1610,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="onmousemove" type="Object" access="read-write" visibility="basic">
                 <availability>
                     <specification name="JavaScript 1.2"/>
@@ -1633,7 +1633,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="onmouseout" type="Object" access="read-write" visibility="basic">
                 <availability>
                     <specification name="JavaScript 1.2"/>
@@ -1656,7 +1656,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="onmouseover" type="Object" access="read-write" visibility="basic">
                 <availability>
                     <specification name="JavaScript 1.2"/>
@@ -1676,7 +1676,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="onmouseup" type="Object" access="read-write" visibility="basic">
                 <availability>
                     <specification name="JavaScript 1.2"/>
@@ -1699,7 +1699,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="all" type="HTMLElement[]" access="read" visibility="basic">
                 <description>List of all elements within the current element. Behaves similarly to document.all.</description>
                 <browsers>
@@ -1707,14 +1707,14 @@
                     <browser platform="Opera" version="7.0+" />
                 </browsers>
             </property>
-            
+
             <property name="children" type="HTMLElement[]" access="read-write" visibility="basic">
                 <description>The direct child elements of the current element.</description>
                 <browsers>
                     <browser platform="IE" version="4.0+"/>
                 </browsers>
             </property>
-            
+
             <property name="className" type="String" access="read-write" visibility="basic">
                 <description>The CSS class that the element belongs to.</description>
                 <browsers>
@@ -1729,14 +1729,14 @@
                     <specification name="W3C" version="HTML 4.0"/>
                 </availability>
             </property>
-            
+
             <property name="document" type="Object" access="read-write" visibility="basic">
                 <description>Reference to the Document object that contains the current element.</description>
                 <browsers>
                     <browser platform="IE" version="4.0+"/>
                 </browsers>
             </property>
-            
+
             <property name="id" type="String" access="read-write" visibility="basic">
                 <description>Identifier used to assign a unique name to the element.</description>
                 <browsers>
@@ -1751,7 +1751,7 @@
                     <specification name="W3C" version="HTML 4.0"/>
                 </availability>
             </property>
-            
+
             <property name="innerHTML" type="String" access="read-write" visibility="basic">
                 <description>HTML text that the element contains. (Does not include opening and closing tags of the element.)</description>
                 <browsers>
@@ -1763,7 +1763,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="innerText" type="String" access="read-write" visibility="basic">
                 <description>Plain text that the element contains. (Does not include opening and closing tags of the element.)</description>
                 <browsers>
@@ -1775,7 +1775,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="lang" type="String" access="read-write" visibility="basic">
                 <description>lang attribute of the element.</description>
                 <browsers>
@@ -1790,7 +1790,7 @@
                     <specification name="W3C" version="HTML 4.0"/>
                 </availability>
             </property>
-            
+
             <property name="offsetHeight" type="Object" access="read-write" visibility="basic">
                 <description>Height (in pixels) of the element and its contents.</description>
                 <browsers>
@@ -1802,7 +1802,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="offsetLeft" type="Object" access="read-write" visibility="basic">
                 <references>
                     <reference name="offsetParent" />
@@ -1817,7 +1817,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="offsetParent" type="Object" access="read-write" visibility="basic">
                 <references>
                     <reference name="offsetLeft" />
@@ -1833,7 +1833,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="offsetTop" type="Object" access="read-write" visibility="basic">
                 <description>Vertical position (in pixels) of the element relative to the offsetParent container element.</description>
                 <browsers>
@@ -1845,7 +1845,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="offsetWidth" type="Object" access="read-write" visibility="basic">
                 <description>Width (in pixels) of the element and its contents.</description>
                 <browsers>
@@ -1857,7 +1857,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="outerHTML" type="String" access="read-write" visibility="basic">
                 <description>HTML text that the element contains, including its start and end tags.</description>
                 <browsers>
@@ -1865,7 +1865,7 @@
                     <browser platform="Opera" version="7.0+" />
                 </browsers>
             </property>
-            
+
             <property name="outerText" type="String" access="read-write" visibility="basic">
                 <description>Plain text that the element contains, including its start and end tags.</description>
                 <browsers>
@@ -1873,21 +1873,21 @@
                     <browser platform="Opera" version="7.0+" />
                 </browsers>
             </property>
-            
+
             <property name="parentElement" type="Object" access="read-write" visibility="basic">
                 <description>Element that is the direct parent of the current element.</description>
                 <browsers>
                     <browser platform="IE" version="4.0+"/>
                 </browsers>
             </property>
-            
+
             <property name="sourceIndex" type="Object" access="read-write" visibility="basic">
                 <description>Index of the current element in document.all.</description>
                 <browsers>
                     <browser platform="IE" version="4.0+"/>
                 </browsers>
             </property>
-            
+
             <property name="style" type="Object" access="read-write" visibility="basic">
                 <description>Inline CSS style attributes for the element.</description>
                 <browsers>
@@ -1899,7 +1899,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="tagName" type="String" access="read-write" visibility="basic">
                 <description>HTML tag name for the element.</description>
                 <browsers>
@@ -1911,7 +1911,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="title" type="String" access="read-write" visibility="basic">
                 <description>Title attribute of the HTML tag for the element.</description>
                 <browsers>
@@ -1927,7 +1927,7 @@
                 </availability>
             </property>
         </properties>
-        
+
         <methods>
             <method name="contains" visibility="basic">
                 <parameters>
@@ -1947,7 +1947,7 @@
                 </browsers>
                 <return-description>Returns true if the current element contains the target HTML element.</return-description>
             </method>
-            
+
             <method name="getAttribute" visibility="basic">
                 <parameters>
                     <parameter name="name" type="String" usage="required">
@@ -1971,7 +1971,7 @@
                 </browsers>
                 <return-description>Returns the value of the attribute.</return-description>
             </method>
-            
+
             <method name="handleEvent" visibility="basic">
                 <references>
                     <reference name="window.handleEvent"></reference>
@@ -1985,7 +1985,7 @@
                     <browser platform="Netscape" version="6.0+"/>
                 </browsers>
             </method>
-            
+
             <method name="insertAdjacentHTML" visibility="basic">
                 <parameters>
                     <parameter name="where" type="String" usage="required">
@@ -2004,7 +2004,7 @@
                     <browser platform="Opera" version="7.0+" />
                 </browsers>
             </method>
-            
+
             <method name="insertAdjacentText" visibility="basic">
                 <parameters>
                     <parameter name="where" type="String" usage="required">
@@ -2023,7 +2023,7 @@
                     <browser platform="Opera" version="7.0+" />
                 </browsers>
             </method>
-            
+
             <method name="removeAttribute" visibility="basic">
                 <parameters>
                     <parameter name="name" type="String" usage="required">
@@ -2044,7 +2044,7 @@
                 </browsers>
                 <return-description>Returns the removed attribute.</return-description>
             </method>
-            
+
             <method name="scrollIntoView" visibility="basic">
                 <parameters>
                     <parameter name="top" type="Boolean" usage="optional">
@@ -2061,7 +2061,7 @@
                     <browser platform="Netscape" version="7.0+"/>
                 </browsers>
             </method>
-            
+
             <method name="setAttribute" visibility="basic">
                 <parameters>
                     <parameter name="name" type="String" usage="required">
@@ -2102,7 +2102,7 @@
             <specification name="JavaScript 1.2"/>
         </availability>
     </class>
-    
+
     <class type="Image" superclass="HTMLElement" visibility="basic">
         <description>An image in an HTML document.</description>
         <browsers>
@@ -2123,7 +2123,7 @@
             </return-types>
           </constructor>
         </constructors>  
-        
+
         <properties>
             <property name="onabort" type="Function" access="read-write" visibility="basic">
                 <availability>
@@ -2139,7 +2139,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="onerror" type="Function" access="read-write" visibility="basic">
                 <availability>
                     <specification name="JavaScript 1.1"/>
@@ -2154,7 +2154,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="onload" type="Function" access="read-write" visibility="basic">
                 <availability>
                     <specification name="JavaScript 1.1"/>
@@ -2174,7 +2174,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="border" type="Number" access="read-write" visibility="basic">
                 <description>Width (in pixels) of the image border.</description>
                 <browsers>
@@ -2189,7 +2189,7 @@
                     <specification name="W3C" version="HTML 4.0"/>
                 </availability>
             </property>
-            
+
             <property name="complete" type="Boolean" access="read-write" visibility="basic">
                 <description>Specifies whether the image is completely loaded or not.</description>
                 <browsers>
@@ -2201,14 +2201,14 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="height" type="Number" access="read-write" visibility="basic">
                 <description>Height (in pixels) of the image.</description>
                 <availability>
                     <specification name="W3C" version="HTML 4.0"/>
                 </availability>
             </property>
-            
+
             <property name="hspace" type="Number" access="read-write" visibility="basic">
                 <description>Amount of horizontal space (in pixels) to insert to the left and the right of the image.</description>
                 <browsers>
@@ -2223,7 +2223,7 @@
                     <specification name="W3C" version="HTML 4.0"/>
                 </availability>
             </property>
-            
+
             <property name="lowsrc" type="String" access="read-write" visibility="basic">
                 <description>URL for an alternate image to display if a user has a low-resolution monitor.</description>
                 <browsers>
@@ -2235,14 +2235,14 @@
                     <specification name="W3C" version="HTML 4.0"/>
                 </availability>
             </property>
-            
+
             <property name="name" type="String" access="read-write" visibility="basic">
                 <description>Name of the image.</description>
                 <availability>
                     <specification name="W3C" version="HTML 4.0"/>
                 </availability>
             </property>
-            
+
             <property name="src" type="String" access="read-write" visibility="basic">
                 <description>URL of the image.</description>
                 <browsers>
@@ -2257,7 +2257,7 @@
                     <specification name="W3C" version="HTML 4.0"/>
                 </availability>
             </property>
-            
+
             <property name="vspace" type="Number" access="read-write" visibility="basic">
                 <description>Amount of vertical space (in pixels) to insert at the top and bottom of the image.</description>
                 <browsers>
@@ -2272,7 +2272,7 @@
                     <specification name="W3C" version="HTML 4.0"/>
                 </availability>
             </property>
-            
+
             <property name="width" type="Number" access="read-write" visibility="basic">
                 <description>Width (in pixels) of the image.</description>
                 <browsers>
@@ -2287,14 +2287,14 @@
                     <specification name="W3C" version="HTML 4.0"/>
                 </availability>
             </property>
-            
+
         </properties>
         <availability>
             <specification name="JavaScript 1.1"/>
             <specification name="W3C" version="HTML 4.0"/>
         </availability>
     </class>
-    
+
     <class type="Input" superclass="HTMLElement" visibility="basic">
         <description>Input element on an HTML form.</description>
         <browsers>
@@ -2315,7 +2315,7 @@
             </return-types>
           </constructor>
         </constructors>  
-        
+
         <properties>
             <property name="name" type="String" access="read-write" visibility="basic">
                 <availability>
@@ -2332,7 +2332,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="onblur" type="Function" access="read-write" visibility="basic">
                 <availability>
                     <specification name="JavaScript 1.0"/>
@@ -2353,7 +2353,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="onchange" type="Function" access="read-write" visibility="basic">
                 <availability>
                     <specification name="JavaScript 1.0"/>
@@ -2374,7 +2374,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="onclick" type="Function" access="read-write" visibility="basic">
                 <availability>
                     <specification name="JavaScript 1.0"/>
@@ -2396,7 +2396,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="onfocus" type="Function" access="read-write" visibility="basic">
                 <availability>
                     <specification name="JavaScript 1.0"/>
@@ -2417,7 +2417,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="type" type="String" access="read-write" visibility="basic">
                 <availability>
                     <specification name="JavaScript 1.1"/>
@@ -2433,7 +2433,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="value" type="String" access="read-write" visibility="basic">
                 <availability>
                     <specification name="Netscape 2"/>
@@ -2450,7 +2450,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="checked" type="Boolean" access="read-write" visibility="basic">
                 <description>If the element is a radio button or checkbox, specifies whether or not the element is checked.</description>
                 <browsers>
@@ -2465,7 +2465,7 @@
                     <specification name="W3C" version="HTML 4.0"/>
                 </availability>
             </property>
-            
+
             <property name="defaultChecked" type="Boolean" access="read-write" visibility="basic">
                 <description>If the element is a radio button or checkbox, specifies whether or not the element is checked by default.</description>
                 <browsers>
@@ -2480,7 +2480,7 @@
                     <specification name="W3C" version="HTML 4.0"/>
                 </availability>
             </property>
-            
+
             <property name="defaultValue" type="String" access="read-write" visibility="basic">
                 <description>Specifies the default value for the element text.</description>
                 <browsers>
@@ -2495,7 +2495,7 @@
                     <specification name="W3C" version="HTML 4.0"/>
                 </availability>
             </property>
-            
+
             <property name="form" type="String" access="read-write" visibility="basic">
                 <description>Reference to the form that contains the element.</description>
                 <browsers>
@@ -2510,7 +2510,7 @@
                     <specification name="W3C" version="HTML 4.0"/>
                 </availability>
             </property>
-            
+
             <property name="length" type="Number" access="read-write" visibility="basic">
                 <description>Number of options in the options array for the element.</description>
                 <browsers>
@@ -2522,7 +2522,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="options" type="Array" access="read-write" visibility="basic">
                 <description>If the element is a Select list, specifies the list of options (as an array) for the element.</description>
                 <browsers>
@@ -2534,7 +2534,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="selectedIndex" type="String" access="read-write" visibility="basic">
                 <description>If the element is a Select list, specifies the index of the selected option in the options array.</description>
                 <browsers>
@@ -2547,7 +2547,7 @@
                 </browsers>
             </property>
         </properties>
-        
+
         <methods>
             <method name="blur" visibility="basic">
                 <return-types>
@@ -2567,7 +2567,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </method>
-            
+
             <method name="click" visibility="basic">
                 <return-types>
                     <return-type type="Object"/>
@@ -2586,7 +2586,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </method>
-            
+
             <method name="focus" visibility="basic">
                 <return-types>
                     <return-type type="Object"/>
@@ -2605,7 +2605,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </method>
-            
+
             <method name="select" visibility="basic">
                 <return-types>
                     <return-type type="Object"/>
@@ -2625,7 +2625,7 @@
                 </browsers>
             </method>
         </methods>
-        
+
         <references>
             <reference name="Button"/>
             <reference name="Checkbox"/>
@@ -2648,7 +2648,7 @@
             <specification name="W3C" version="HTML 4.0"/>
         </availability>
     </class>
-    
+
     <class type="JavaArray" visibility="basic">
         <description>A Java array that is wrapped in JavaScript and can be accessed by JavaScript code.</description>
         <browsers>
@@ -2665,7 +2665,7 @@
             </return-types>
           </constructor>
         </constructors>  
-        
+
         <properties>
             <property name="length" type="Number" access="read-write" visibility="basic">
                 <description>Number of elements in the Java array.</description>
@@ -2686,7 +2686,7 @@
             <specification name="JavaScript 1.1"/>
         </availability>
     </class>
-    
+
     <class type="JavaClass" visibility="basic">
         <description>JavaScript representation of a Java class.</description>
         <browsers>
@@ -2714,7 +2714,7 @@
             <specification name="JavaScript 1.1"/>
         </availability>
     </class>
-    
+
     <class type="JavaObject" visibility="basic">
         <description>JavaScript representation of a Java object.</description>
         <browsers>
@@ -2742,7 +2742,7 @@
             <specification name="JavaScript 1.1"/>
         </availability>
     </class>
-    
+
     <class type="JavaPackage" visibility="basic">
         <description>JavaScript representation of a Java package.</description>
         <browsers>
@@ -2772,7 +2772,7 @@
             <specification name="JavaScript 1.1"/>
         </availability>
     </class>
-    
+
     <class type="JSObject" visibility="basic">
         <description>Java representation of a JavaScript object.</description>
         <browsers>
@@ -2817,7 +2817,7 @@
                 </browsers>
                 <return-description>Returns a Java object representation of the return value of the method.</return-description>
             </method>
-            
+
             <method name="eval" visibility="basic">
                 <parameters>
                     <parameter name="s" type="String" usage="required">
@@ -2838,7 +2838,7 @@
                 </browsers>
                 <return-description>Returns a Java object representation of the result of the evaluated expression.</return-description>
             </method>
-            
+
             <method name="getMember" visibility="basic">
                 <parameters>
                     <parameter name="name" type="String" usage="required">
@@ -2859,7 +2859,7 @@
                 </browsers>
                 <return-description>Returns the value of the JavaScript property.</return-description>
             </method>
-            
+
             <method name="getSlot" visibility="basic">
                 <parameters>
                     <parameter name="index" type="int" usage="required">
@@ -2880,7 +2880,7 @@
                 </browsers>
                 <return-description>Returns the value of an element in a JavaScript array.</return-description>
             </method>
-            
+
             <method name="getWindow" visibility="basic">
                 <parameters>
                     <parameter name="applet" type="Applet" usage="required">
@@ -2901,7 +2901,7 @@
                 </browsers>
                 <return-description>Returns a JSObject representation of a browser window.</return-description>
             </method>
-            
+
             <method name="removeMember" visibility="basic">
                 <parameters>
                     <parameter name="name" type="String" usage="required">
@@ -2921,7 +2921,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </method>
-            
+
             <method name="setMember" visibility="basic">
                 <parameters>
                     <parameter name="name" type="String" usage="required">
@@ -2944,7 +2944,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </method>
-            
+
             <method name="setSlot" visibility="basic">
                 <parameters>
                     <parameter name="index" type="int" usage="required">
@@ -2967,7 +2967,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </method>
-            
+
             <method name="toString" visibility="basic">
                 <return-types>
                     <return-type type="String"/>
@@ -2985,7 +2985,7 @@
             </method>
         </methods>
     </class>
-    
+
     <class type="Layer" visibility="basic">
         <description>Layer in an HTML document.</description>
         <browsers>
@@ -3001,7 +3001,7 @@
             </return-types>
           </constructor>
         </constructors>  
-        
+
         <properties>
             <property name="above" type="Object" access="read-write" visibility="basic">
                 <description>Layer object directly above the current layer in the z-index order.</description>
@@ -3009,28 +3009,28 @@
                     <browser platform="Netscape" version="4.0+"/>
                 </browsers>
             </property>
-            
+
             <property name="background" type="Object" access="read-write" visibility="basic">
                 <description>Image displayed in the background of the layer.</description>
                 <browsers>
                     <browser platform="Netscape" version="4.0+"/>
                 </browsers>
             </property>
-            
+
             <property name="below" type="Object" access="read-write" visibility="basic">
                 <description>Layer object directly below the current layer in the z-index order.</description>
                 <browsers>
                     <browser platform="Netscape" version="4.0+"/>
                 </browsers>
             </property>
-            
+
             <property name="bgColor" type="String" access="read-write" visibility="basic">
                 <description>Background color of the layer.</description>
                 <browsers>
                     <browser platform="Netscape" version="4.0+"/>
                 </browsers>
             </property>
-            
+
             <property name="clip.bottom" type="Object" access="read-write" visibility="basic">
                 <references>
                     <reference name="layer.top" />
@@ -3040,7 +3040,7 @@
                     <browser platform="Netscape" version="4.0+"/>
                 </browsers>
             </property>
-            
+
             <property name="clip.height" type="Object" access="read-write" visibility="basic">
                 <references>
                     <reference name="layer.clip.bottom" />
@@ -3050,7 +3050,7 @@
                     <browser platform="Netscape" version="4.0+"/>
                 </browsers>
             </property>
-            
+
             <property name="clip.left" type="Object" access="read-write" visibility="basic">
                 <references>
                     <reference name="layer.left" />
@@ -3060,14 +3060,14 @@
                     <browser platform="Netscape" version="4.0+"/>
                 </browsers>
             </property>
-            
+
             <property name="clip.right" type="Object" access="read-write" visibility="basic">
                 <description>Right edge of the clipping area of the layer, relative to layer.right.</description>
                 <browsers>
                     <browser platform="Netscape" version="4.0+"/>
                 </browsers>
             </property>
-            
+
             <property name="clip.top" type="Object" access="read-write" visibility="basic">
                 <references>
                     <reference name="layer.top" />
@@ -3077,91 +3077,91 @@
                     <browser platform="Netscape" version="4.0+"/>
                 </browsers>
             </property>
-            
+
             <property name="clip.width" type="Object" access="read-write" visibility="basic">
                 <description>Width of the clipping area of the layer.</description>
                 <browsers>
                     <browser platform="Netscape" version="4.0+"/>
                 </browsers>
             </property>
-            
+
             <property name="document" type="Object" access="read-write" visibility="basic">
                 <description>Document associated with the layer.</description>
                 <browsers>
                     <browser platform="Netscape" version="4.0+"/>
                 </browsers>
             </property>
-            
+
             <property name="hidden" type="Boolean" access="read-write" visibility="basic">
                 <description>Specifies whether a layer is hidden (true) or visible (false).</description>
                 <browsers>
                     <browser platform="Netscape" version="4.0+"/>
                 </browsers>
             </property>
-            
+
             <property name="layers" type="Layer[]" access="read-write" visibility="basic">
                 <description>Array of child layers of the current layer.</description>
                 <browsers>
                     <browser platform="Netscape" version="4.0+"/>
                 </browsers>
             </property>
-            
+
             <property name="left" type="Number" access="read-write" visibility="basic">
                 <description>Horizontal position (in pixels) of the left edge of the layer.</description>
                 <browsers>
                     <browser platform="Netscape" version="4.0+"/>
                 </browsers>
             </property>
-            
+
             <property name="name" type="String" access="read-write" visibility="basic">
                 <description>Name of the layer.</description>
                 <browsers>
                     <browser platform="Netscape" version="4.0+"/>
                 </browsers>
             </property>
-            
+
             <property name="pageX" type="Number" access="read-write" visibility="basic">
                 <description>Horizontal position (in pixels) of the layer relative to the page.</description>
                 <browsers>
                     <browser platform="Netscape" version="4.0+"/>
                 </browsers>
             </property>
-            
+
             <property name=" pageY" type="Number" access="read-write" visibility="basic">
                 <description>Vertical position (in pixels) of the layer relative to the page.</description>
                 <browsers>
                     <browser platform="Netscape" version="4.0+"/>
                 </browsers>
             </property>
-            
+
             <property name="parentLayer" type="Object" access="read-write" visibility="basic">
                 <description>Parent layer of the current layer.</description>
                 <browsers>
                     <browser platform="Netscape" version="4.0+"/>
                 </browsers>
             </property>
-            
+
             <property name="siblingAbove" type="Object" access="read-write" visibility="basic">
                 <description>Layer object directly above the current layer in the z-index order that shares the same parent as the current layer.</description>
                 <browsers>
                     <browser platform="Netscape" version="4.0+"/>
                 </browsers>
             </property>
-            
+
             <property name="siblingBelow" type="Object" access="read-write" visibility="basic">
                 <description>Layer object directly below the current layer in the z-index order that shares the same parent as the current layer.</description>
                 <browsers>
                     <browser platform="Netscape" version="4.0+"/>
                 </browsers>
             </property>
-            
+
             <property name="src" type="String" access="read-write" visibility="basic">
                 <description>URL for the contents of the layer.</description>
                 <browsers>
                     <browser platform="IE" version="4.0+"/>
                 </browsers>
             </property>
-            
+
             <property name="top" type="Number" access="read-write" visibility="basic">
                 <description>Vertical position (in pixels) of the top edge of the layer.</description>
                 <browsers>
@@ -3171,28 +3171,28 @@
             <property name="visibility" type="String" access="read-write" visibility="basic">
                 <description>Specifies whether the layer should be visible ("show"), hidden ("hide"), or inherit the visibility of the parent layer ("inherit").</description>
             </property>
-            
+
             <property name="window" type="Object" access="read-write" visibility="basic">
                 <description>Window or frame object that contains the layer.</description>
                 <browsers>
                     <browser platform="Netscape" version="4.0+"/>
                 </browsers>
             </property>
-            
+
             <property name="x" type="Object" access="read-write" visibility="basic">
                 <description>Horizontal position (in pixels) of the left edge of the layer.</description>
                 <browsers>
                     <browser platform="Netscape" version="4.0+"/>
                 </browsers>
             </property>
-            
+
             <property name=" y" type="Object" access="read-write" visibility="basic">
                 <description>Vertical position (in pixels) of the top edge of the layer.</description>
                 <browsers>
                     <browser platform="Netscape" version="4.0+"/>
                 </browsers>
             </property>
-            
+
             <property name="zIndex" type="Object" access="read-write" visibility="basic">
                 <description>Position of the layer in the z-order, relative to its sibling layers.</description>
                 <browsers>
@@ -3200,7 +3200,7 @@
                 </browsers>
             </property>
         </properties>
-        
+
         <methods>
             <method name="captureEvents" visibility="basic">
                 <return-types>
@@ -3211,7 +3211,7 @@
                     <browser platform="Netscape" version="4.0+"/>
                 </browsers>
             </method>
-            
+
             <method name="handleEvent" visibility="basic">
                 <return-types>
                     <return-type type="Object"/>
@@ -3221,7 +3221,7 @@
                     <browser platform="Netscape" version="4.0+"/>
                 </browsers>
             </method>
-            
+
             <method name="load" visibility="basic">
                 <parameters>
                     <parameter name="src" type="String" usage="required">
@@ -3245,7 +3245,7 @@
                     <browser platform="Netscape" version="4.0+"/>
                 </browsers>
             </method>
-            
+
             <method name="moveAbove" visibility="basic">
                 <parameters>
                     <parameter name="target" type="Object" usage="required">
@@ -3260,7 +3260,7 @@
                     <browser platform="Netscape" version="4.0+"/>
                 </browsers>
             </method>
-            
+
             <method name="moveBelow" visibility="basic">
                 <parameters>
                     <parameter name="target" type="Object" usage="required">
@@ -3275,7 +3275,7 @@
                     <browser platform="Netscape" version="4.0+"/>
                 </browsers>
             </method>
-            
+
             <method name="moveBy" visibility="basic">
                 <parameters>
                     <parameter name="dx" type="Number" usage="required">
@@ -3293,7 +3293,7 @@
                     <browser platform="Netscape" version="4.0+"/>
                 </browsers>
             </method>
-            
+
             <method name="moveTo" visibility="basic">
                 <parameters>
                     <parameter name="x" type="Object" usage="required">
@@ -3311,7 +3311,7 @@
                     <browser platform="Netscape" version="4.0+"/>
                 </browsers>
             </method>
-            
+
             <method name="moveToAbsolute" visibility="basic">
                 <parameters>
                     <parameter name="x" type="Object" usage="required">
@@ -3332,7 +3332,7 @@
                     <browser platform="Netscape" version="4.0+"/>
                 </browsers>
             </method>
-            
+
             <method name="offset" visibility="basic" deprecated="true">
                 <parameters>
                     <parameter name="dx" type="Number" usage="required">
@@ -3357,7 +3357,7 @@
                     <browser platform="Netscape" version="4.0+"/>
                 </browsers>
             </method>
-            
+
             <method name="releaseEvents" visibility="basic">
                 <return-types>
                     <return-type type="Object"/>
@@ -3367,7 +3367,7 @@
                     <browser platform="Netscape" version="4.0+"/>
                 </browsers>
             </method>
-            
+
             <method name="resizeBy" visibility="basic">
                 <parameters>
                     <parameter name="dw" type="Number" usage="required">
@@ -3388,7 +3388,7 @@
                     <browser platform="Netscape" version="4.0+"/>
                 </browsers>
             </method>
-            
+
             <method name="resizeTo" visibility="basic">
                 <parameters>
                     <parameter name="width" type="Object" usage="required">
@@ -3406,7 +3406,7 @@
                     <browser platform="Netscape" version="4.0+"/>
                 </browsers>
             </method>
-            
+
             <method name="routeEvent" visibility="basic">
                 <return-types>
                     <return-type type="Object"/>
@@ -3417,7 +3417,7 @@
                 </browsers>
             </method>
         </methods>
-        
+
         <references>
             <reference name="Window"/>
         </references>
@@ -3426,7 +3426,7 @@
             <specification name="discontinued in Netscape 6"/>
         </availability>
     </class>
-    
+
     <class type="Link" superclass="HTMLElement" visibility="basic">
         <description>A hypertext link.</description>
         <browsers>
@@ -3447,7 +3447,7 @@
             </return-types>
           </constructor>
         </constructors>  
-        
+
         <properties>
             <property name="onclick" type="Function" access="read-write" visibility="basic">
                 <availability>
@@ -3469,7 +3469,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="onmouseout" type="Function" access="read-write" visibility="basic">
                 <availability>
                     <specification name="JavaScript 1.1"/>
@@ -3489,7 +3489,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="onmouseover" type="Function" access="read-write" visibility="basic">
                 <availability>
                     <specification name="JavaScript 1.0"/>
@@ -3509,7 +3509,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="target" type="Object" access="read-write" visibility="basic">
                 <availability>
                     <specification name="JavaScript 1.0"/>
@@ -3528,7 +3528,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="hash" type="String" access="read-write" visibility="basic">
                 <description>Anchor portion of the URL of the link.</description>
                 <browsers>
@@ -3537,7 +3537,7 @@
                     <browser platform="Netscape" version="6.0+"/>
                 </browsers>
             </property>
-            
+
             <property name="host" type="String" access="read-write" visibility="basic">
                 <description>Host name and port of the URL of the link.</description>
                 <browsers>
@@ -3546,7 +3546,7 @@
                     <browser platform="Netscape" version="6.0+"/>
                 </browsers>
             </property>
-            
+
             <property name="hostname" type="String" access="read-write" visibility="basic">
                 <description>Host name of the URL of the link.</description>
                 <browsers>
@@ -3555,7 +3555,7 @@
                     <browser platform="Netscape" version="6.0+"/>
                 </browsers>
             </property>
-            
+
             <property name="href" type="String" access="read-write" visibility="basic">
                 <description>Complete text of the URL of the link.</description>
                 <browsers>
@@ -3570,7 +3570,7 @@
                     <specification name="W3C" version="HTML 4.0"/>
                 </availability>
             </property>
-            
+
             <property name="pathname" type="String" access="read-write" visibility="basic">
                 <description>Path name portion of the URL of the link. (e.g. "/docs/index.html")</description>
                 <browsers>
@@ -3579,7 +3579,7 @@
                     <browser platform="Netscape" version="6.0+"/>
                 </browsers>
             </property>
-            
+
             <property name="port" type="String" access="read-write" visibility="basic">
                 <description>Port portion of the URL of the link.</description>
                 <browsers>
@@ -3588,7 +3588,7 @@
                     <browser platform="Netscape" version="6.0+"/>
                 </browsers>
             </property>
-            
+
             <property name="protocol" type="String" access="read-write" visibility="basic">
                 <description>Protocol portion of the URL of the link. ("http" or "https")</description>
                 <browsers>
@@ -3597,7 +3597,7 @@
                     <browser platform="Netscape" version="6.0+"/>
                 </browsers>
             </property>
-            
+
             <property name="search" type="String" access="read-write" visibility="basic">
                 <description>Query string portion of the URL of the link.</description>
                 <browsers>
@@ -3606,7 +3606,7 @@
                     <browser platform="Netscape" version="6.0+"/>
                 </browsers>
             </property>
-            
+
             <property name="text" type="String" access="read-write" visibility="basic">
                 <description>Text between the &amp;lt;a&amp;gt; and &amp;lt;/a&amp;gt; tags.</description>
                 <browsers>
@@ -3616,7 +3616,7 @@
                 </browsers>
             </property>
         </properties>
-        
+
         <references>
             <reference name="Anchor"/>
             <reference name="Location"/>
@@ -3628,7 +3628,7 @@
             <specification name="W3C" version="HTML 4.0"/>
         </availability>
     </class>
-    
+
     <class type="Location" visibility="basic">
         <description>URL of the window.</description>
         <browsers>
@@ -3661,7 +3661,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="host" type="String" access="read-write" visibility="basic">
                 <description>Host name and port of the URL.</description>
                 <browsers>
@@ -3673,7 +3673,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="hostname" type="String" access="read-write" visibility="basic">
                 <description>Host name of the URL.</description>
                 <browsers>
@@ -3685,7 +3685,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="href" type="String" access="read-write" visibility="basic">
                 <description>Complete text of the URL.</description>
                 <browsers>
@@ -3697,7 +3697,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="pathname" type="String" access="read-write" visibility="basic">
                 <description>Path name portion of the URL. (e.g. "/docs/index.html")</description>
                 <browsers>
@@ -3709,7 +3709,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="port" type="String" access="read-write" visibility="basic">
                 <description>Port portion of the URL.</description>
                 <browsers>
@@ -3721,7 +3721,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="protocol" type="String" access="read-write" visibility="basic">
                 <description>Protocol portion of the URL. ("http" or "https")</description>
                 <browsers>
@@ -3733,7 +3733,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="search" type="String" access="read-write" visibility="basic">
                 <description>Query string portion of the URL.</description>
                 <browsers>
@@ -3746,7 +3746,7 @@
                 </browsers>
             </property>
         </properties>
-        
+
         <methods>
             <method name="reload" visibility="basic">
                 <parameters>
@@ -3770,7 +3770,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </method>
-            
+
             <method name="replace" visibility="basic">
                 <parameters>
                     <parameter name="url" type="String" usage="required">
@@ -3806,7 +3806,7 @@
             <specification name="enhanced in JavaScript 1.1"/>
         </availability>
     </class>
-    
+
     <class type="MimeType" visibility="basic">
         <description>Representation of a MIME (Multipart Internet Mail Extension) data type.</description>
         <browsers>
@@ -3838,7 +3838,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="enabledPlugin" type="Object" access="read-write" visibility="basic">
                 <description>Reference to the Plugin object that is configured for the MIME type. </description>
                 <browsers>
@@ -3849,7 +3849,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="suffixes" type="String" access="read-write" visibility="basic">
                 <description>String listing possible file extensions for the MIME type, separated by commas.</description>
                 <browsers>
@@ -3860,7 +3860,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="type" type="String" access="read-write" visibility="basic">
                 <description>Name of the MIME type.</description>
                 <browsers>
@@ -3880,7 +3880,7 @@
             <specification name="Netscape 3"/>
         </availability>
     </class>
-    
+
     <class type="Navigator" visibility="basic">
         <description>Contains information about the current web browser.</description>
         <browsers>
@@ -3913,7 +3913,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="appName" type="String" access="read-write" visibility="basic">
                 <description>Name of the browser.</description>
                 <browsers>
@@ -3925,7 +3925,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="appVersion" type="String" access="read-write" visibility="basic">
                 <description>Platform and version of the web browser.</description>
                 <browsers>
@@ -3937,7 +3937,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="cookieEnabled" type="Boolean" access="read-write" visibility="basic">
                 <description>Whether or not the browser has cookies enabled.</description>
                 <browsers>
@@ -3949,7 +3949,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="language" type="String" access="read-write" visibility="basic">
                 <description>Default language of the web browser.</description>
                 <browsers>
@@ -3960,7 +3960,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="mimeTypes" type="Array" access="read-write" visibility="basic">
                 <description>Array of MIME type objects supported by the web browser.</description>
                 <browsers>
@@ -3971,7 +3971,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="platform" type="String" access="read-write" visibility="basic">
                 <description>Client OS.</description>
                 <browsers>
@@ -3983,7 +3983,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="plugins" type="Plugin[]" access="read-write" visibility="basic">
                 <description>Array of plugins installed in the browser.</description>
                 <browsers>
@@ -3994,14 +3994,14 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="systemLanguage" type="String" access="read-only" visibility="basic">
                 <description>Default language of the OS.</description>
                 <browsers>
                     <browser platform="IE" version="4.0+"/>
                 </browsers>
             </property>
-            
+
             <property name="userAgent" type="String" access="read-write" visibility="basic">
                 <description>Specifies the value the browser uses for the user-agent header in http requests.</description>
                 <browsers>
@@ -4013,7 +4013,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="userLanguage" type="String" access="read-write" visibility="basic">
                 <description>Preferred language of the user.</description>
                 <browsers>
@@ -4021,7 +4021,7 @@
                 </browsers>
             </property>
         </properties>
-        
+
         <methods>
             <method name="javaEnabled" visibility="basic">
                 <return-types>
@@ -4041,7 +4041,7 @@
                 </browsers>
                 <return-description>Returns true if Java is supported and enabled by the browser.</return-description>
             </method>
-            
+
             <method name="plugins.refresh" visibility="basic">
                 <parameters>
                     <parameter name="reload" type="Boolean" usage="optional">
@@ -4067,7 +4067,7 @@
             <specification name="enhanced in JavaScript 1.1 and 1.2"/>
         </availability>
     </class>
-    
+
     <class type="Option" superclass="HTMLElement" visibility="basic">
         <description>Option in a Select list.</description>
         <browsers>
@@ -4085,7 +4085,7 @@
             </return-types>
           </constructor>
         </constructors>  
-        
+
         <properties>
             <property name="defaultSelected" type="Boolean" access="read-write" visibility="basic">
                 <description>Whether or not the option is selected by default.</description>
@@ -4101,7 +4101,7 @@
                     <specification name="W3C" version="HTML 4.0"/>
                 </availability>
             </property>
-            
+
             <property name="index" type="Number" access="read-write" visibility="basic">
                 <description>Index in the options array for the option.</description>
                 <browsers>
@@ -4116,7 +4116,7 @@
                     <specification name="W3C" version="HTML 4.0"/>
                 </availability>
             </property>
-            
+
             <property name="selected" type="Boolean" access="read-write" visibility="basic">
                 <description>Whether or not the option is currently selected.</description>
                 <browsers>
@@ -4131,7 +4131,7 @@
                     <specification name="W3C" version="HTML 4.0"/>
                 </availability>
             </property>
-            
+
             <property name="text" type="String" access="read-write" visibility="basic">
                 <description>Text for the option.</description>
                 <browsers>
@@ -4146,7 +4146,7 @@
                     <specification name="W3C" version="HTML 4.0"/>
                 </availability>
             </property>
-            
+
             <property name="value" type="String" access="read-write" visibility="basic">
                 <description>Value of the option that is sent when the form is submitted.</description>
                 <browsers>
@@ -4162,7 +4162,7 @@
                 </availability>
             </property>
         </properties>
-        
+
         <references>
             <reference name="Select"/>
             <reference name="Select.options[]"/>
@@ -4175,7 +4175,7 @@
             <specification name="W3C" version="HTML 4.0"/>
         </availability>
     </class>
-    
+
     <class type="Password" superclass="HTMLElement" visibility="basic">
         <description>Text field on a form where the input is masked by asterisks (*).</description>
         <browsers>
@@ -4219,7 +4219,7 @@
             <specification name="enhanced in JavaScript 1.1"/>
         </availability>
     </class>
-    
+
     <class type="Plugin" visibility="basic">
         <description>Plugin installed in the web browser.</description>
         <browsers>
@@ -4250,7 +4250,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="filename" type="String" access="read-write" visibility="basic">
                 <description>File name of the plugin itself.</description>
                 <browsers>
@@ -4261,7 +4261,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="length" type="Number" access="read-write" visibility="basic">
                 <description>Number of elements in the MimeType array of the data formats supported by the plugin.</description>
                 <browsers>
@@ -4272,7 +4272,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="name" type="String" access="read-write" visibility="basic">
                 <description>Name of the plugin.</description>
                 <browsers>
@@ -4292,7 +4292,7 @@
             <specification name="Netscape 3"/>
         </availability>
     </class>
-    
+
     <class type="Radio" superclass="HTMLElement" visibility="basic">
         <description>Graphical radio button in a group of radio buttons.</description>
         <browsers>
@@ -4331,7 +4331,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="checked" type="Function" access="read-write" visibility="basic">
                 <description>Whether or not the radio button is currently checked.</description>
                 <browsers>
@@ -4343,7 +4343,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="defaultChecked" type="Boolean" access="read-write" visibility="basic">
                 <description>Whether or not the radio button is checked by default.</description>
                 <browsers>
@@ -4355,7 +4355,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="value" type="String" access="read-write" visibility="basic">
                 <description>Value of the radio button that is sent when the form is submitted.</description>
                 <browsers>
@@ -4379,7 +4379,7 @@
             <specification name="enhanced in JavaScript 1.1"/>
         </availability>
     </class>
-    
+
     <class type="Reset" superclass="HTMLElement" visibility="basic">
         <description>Reset button on an HTML form that resets all form elements to their default values.</description>
         <browsers>
@@ -4424,7 +4424,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="value" type="String" access="read-write" visibility="basic">
                 <description>Text displayed on the button.</description>
                 <browsers>
@@ -4449,7 +4449,7 @@
             <specification name="enhanced in JavaScript 1.1"/>
         </availability>
     </class>
-    
+
     <class type="Screen" visibility="basic">
         <description>Provides information about the display screen and colors.</description>
         <browsers>
@@ -4482,7 +4482,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="availLeft" type="Object" access="read-write" visibility="basic">
                 <description>Available space (in pixels) at the far left of the screen (not allocated to a shortcut bar or similar feature).</description>
                 <browsers>
@@ -4492,7 +4492,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="availTop" type="Object" access="read-write" visibility="basic">
                 <description>Available space (in pixels) at the top of the screen (not allocated to a shortcut bar or similar feature).</description>
                 <browsers>
@@ -4502,7 +4502,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="availWidth" type="Object" access="read-write" visibility="basic">
                 <description>Available width (in pixels) of the screen (not allocated to a shortcut bar or similar feature).</description>
                 <browsers>
@@ -4514,7 +4514,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="colorDepth" type="Number" access="read-write" visibility="basic">
                 <description>Depth of the color palette for the screen.</description>
                 <browsers>
@@ -4526,7 +4526,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="height" type="Object" access="read-write" visibility="basic">
                 <description>Total height of the display screen.</description>
                 <browsers>
@@ -4538,7 +4538,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="pixelDepth" type="Object" access="read-write" visibility="basic">
                 <description>Screen color resolution (in bits-per-pixel).</description>
                 <browsers>
@@ -4549,7 +4549,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="width" type="Object" access="read-write" visibility="basic">
                 <description>Total width of the display screen.</description>
                 <browsers>
@@ -4569,7 +4569,7 @@
             <specification name="JavaScript 1.2"/>
         </availability>
     </class>
-    
+
     <class type="Select" superclass="HTMLElement" visibility="basic">
         <description>A graphical Select list on an HTML form.</description>
         <browsers>
@@ -4591,7 +4591,7 @@
           </constructor>
         </constructors>  
         <properties>
-            
+
             <property name="onchange" type="Function" access="read-write" visibility="basic">
                 <availability>
                     <specification name="JavaScript 1.0"/>
@@ -4613,7 +4613,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="options" type="Array" access="read-write" visibility="basic">
                 <availability>
                     <specification name="JavaScript 1.0"/>
@@ -4633,7 +4633,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="length" type="Number" access="read-write" visibility="basic">
                 <description>Number of elements in the options array.</description>
                 <browsers>
@@ -4648,7 +4648,7 @@
                     <specification name="W3C" version="HTML 4.0"/>
                 </availability>
             </property>
-            
+
             <property name="selectedIndex" type="Number" access="read-write" visibility="basic">
                 <description>Index in the options array for the selected option.</description>
                 <browsers>
@@ -4663,7 +4663,7 @@
                     <specification name="W3C" version="HTML 4.0"/>
                 </availability>
             </property>
-            
+
             <property name="type" type="String" access="read-write" visibility="basic">
                 <description>Type of object represented by the Select list and whether or not multiple selections are allowed.</description>
                 <browsers>
@@ -4692,7 +4692,7 @@
             <specification name="W3C" version="HTML 4.0"/>
         </availability>
     </class>
-    
+
     <class type="Style" visibility="basic">
         <description>Specifies style characteristics of HTML elements.</description>
         <browsers>
@@ -4713,7 +4713,7 @@
             </return-types>
           </constructor>
         </constructors>
-        
+
         <properties>
             <property name="cssText" type="String" access="read-write" visibility="basic">
                 <description>CSS definition for the style.</description>
@@ -4771,11 +4771,9 @@
                     <specification name="W3C" version="HTML 4.0"/>
                 </availability>
             </property>
-            
-            
-            
+
         </properties>  
-        
+
         <references>
             <reference name="HTMLElement.style"/>
             <reference name="CSSStyleDeclaration"/>
@@ -4785,7 +4783,7 @@
             <specification name="W3C" version="HTML 4.0"/>
         </availability>
     </class>
-    
+
     <class type="Submit" superclass="HTMLElement" visibility="basic">
         <description>A graphical button that submits the data of an HTML form when clicked.</description>
         <browsers>
@@ -4827,7 +4825,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="value" type="String" access="read-write" visibility="basic">
                 <description>Text displayed on the button.</description>
                 <browsers>
@@ -4853,7 +4851,7 @@
             <specification name="enhanced in JavaScript 1.1"/>
         </availability>
     </class>
-    
+
     <class type="Text" superclass="HTMLElement" visibility="basic">
         <description>Text input field on an HTML form.</description>
         <browsers>
@@ -4896,7 +4894,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="value" type="String" access="read-write" visibility="basic">
                 <description>Value of the text field to be sent when the form is submitted.</description>
                 <browsers>
@@ -4921,7 +4919,7 @@
             <specification name="enhanced in JavaScript 1.1"/>
         </availability>
     </class>
-    
+
     <class type="Textarea" superclass="HTMLElement" visibility="basic">
         <description>Multi-line text input field on a form.</description>
         <browsers>
@@ -4964,7 +4962,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="value" type="String" access="read-write" visibility="basic">
                 <description>Value of the textarea field to be sent when the form is submitted.</description>
                 <browsers>
@@ -5020,7 +5018,7 @@
             <reference name="Link"/>
         </references>
     </class>
-    
+
     <class type="Window" superclass="Global" visibility="basic">
         <description>The Window object represents the web browser window. It provides access to objects to use to manipulate the browsing environment and properties for accessing the object model below it.</description>
         <browsers>
@@ -5041,7 +5039,7 @@
             </return-types>
           </constructor>
         </constructors>  
-        
+
         <properties>
             <property name="defaultStatus" type="String" access="read-write" visibility="basic">
                 <availability>
@@ -5060,7 +5058,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="name" type="String" access="read-write" visibility="basic">
                 <availability>
                     <specification name="JavaScript 1.0"/>
@@ -5080,7 +5078,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="onabort" type="Function" access="read" visibility="basic">
                 <description>Fires when the loading of the element is cancelled before it finishes loading.</description>
                 <browsers>
@@ -5089,28 +5087,28 @@
                    <browser platform="Safari" version="1.0+" />
                </browsers>
             </property>
-            
+
             <property name="onafterprint" type="Function" access="read" visibility="basic">
                 <description>Fires immediately after a user prints or print previews a document.</description>
                 <browsers>
                    <browser platform="IE" version="4.0+"/>
                </browsers>
             </property>
-            
+
             <property name="onbeforeprint" type="Function" access="read" visibility="basic">
                 <description>Fires immediately before a user prints or print previews a document.</description>
                 <browsers>
                     <browser platform="IE" version="4.0+" />
                 </browsers>
             </property>
-            
+
             <property name="onbeforeunload" type="Function" access="read" visibility="basic">
                 <description>Fires immediately before a document is unloaded.</description>
                 <browsers>
                     <browser platform="IE" version="4.0+" />
                 </browsers>
             </property>
-            
+
             <property name="onblur" type="Function" access="read" visibility="basic">
                 <availability>
                     <specification name="HTML DOM Level 0"/>
@@ -5133,7 +5131,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="onchange" type="Function" access="read" visibility="basic">
                 <description>Fires when the value of the element changes.</description>
                 <browsers>
@@ -5145,7 +5143,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="onclick" type="Function" access="read" visibility="basic">
                 <description>Fires when the element is clicked.</description>
                 <browsers>
@@ -5157,7 +5155,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="onclose" type="Function" access="read" visibility="basic">
                 <description>Fires when the user closes the window.</description>
                 <browsers>
@@ -5169,14 +5167,14 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="ondragdrop" type="Function" access="read" visibility="basic">
                 <description>Fires when a user drops a file onto the window.</description>
                 <browsers>
                     <browser platform="Netscape" version="4.0+" />
                 </browsers>
             </property>
-            
+
             <property name="onerror" type="Function" access="read" visibility="basic">
                 <availability>
                     <specification name="JavaScript 1.1"/>
@@ -5192,7 +5190,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="onfocus" type="Function" access="read" visibility="basic">
                 <availability>
                     <specification name="JavaScript 1.1"/>
@@ -5215,14 +5213,14 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="onhelp" type="Function" access="read" visibility="basic">
                 <description>Fires when a user presses the F1 key to activate help.</description>
                 <browsers>
                     <browser platform="IE" version="4.0+" />
                 </browsers>
             </property>
-            
+
             <property name="onkeydown" type="Function"  access="read" visibility="basic">
                 <description>Fires when a user presses down on a key while the element has focus.</description>
                 <browsers>
@@ -5234,7 +5232,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-                    
+
             <property name="onkeypress" type="Function"  access="read" visibility="basic">
                 <description>Fires when a user presses a key or holds down the key while the element has focus.</description>
                 <browsers>
@@ -5246,7 +5244,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-                
+
             <property name="onkeyup" type="Function"  access="read" visibility="basic">
                 <description>Fires when a user releases a key while the element has focus.</description>
                 <browsers>
@@ -5258,7 +5256,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="onload" type="Function" access="read" visibility="basic">
                 <availability>
                     <specification name="JavaScript 1.0"/>
@@ -5279,7 +5277,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="onmousedown" type="Function" access="read" visibility="basic">
                 <description>Fires when a user clicks down on the mouse button while the element has focus.</description>
                 <browsers>
@@ -5291,7 +5289,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="onmousemove" type="Function" access="read" visibility="basic">
                 <description>Fires when the mouse moves while the pointer over the element.</description>
                 <browsers>
@@ -5303,7 +5301,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="onmouseout" type="Function" access="read" visibility="basic">
                 <description>Fires when the mouse pointer moves off of the element.</description>
                 <browsers>
@@ -5315,7 +5313,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-                                    
+
             <property name="onmouseover" type="Function" access="read" visibility="basic">
                 <description>Fires when the mouse pointer moves over the element.</description>
                 <browsers>
@@ -5327,7 +5325,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="onmouseup" type="Function" access="read" visibility="basic">
                 <description>Fires when the user releases the mouse button while the element has focus.</description>
                 <browsers>
@@ -5339,7 +5337,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="onmove" type="Function" access="read" visibility="basic">
                 <description>Event handler for window move events.</description>
                 <browsers>
@@ -5350,7 +5348,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="onreset" type="Function"  access="read" visibility="basic">
                 <description>Fires when the form data is reset.</description>
                 <browsers>
@@ -5362,7 +5360,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="onresize" type="Function" access="read" visibility="basic">
                 <availability>
                     <specification name="JavaScript 1.2"/>
@@ -5377,7 +5375,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="onscroll" type="Function" access="read" visibility="basic">
                 <description>Fires when a user scrolls the element.</description>
                 <browsers>
@@ -5386,7 +5384,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="onselect" type="Function" access="read" visibility="basic">
                 <description>Fires when the element is selected.</description>
                 <browsers>
@@ -5398,7 +5396,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="onsubmit" type="Function" access="read" visibility="basic">
                 <description>Fires when the form data is submitted.</description>
                 <browsers>
@@ -5410,7 +5408,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="onunload" type="Function" access="read-write" visibility="basic">
                 <availability>
                     <specification name="JavaScript 1.0"/>
@@ -5431,7 +5429,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="status" type="String" access="read-write" visibility="basic">
                 <availability>
                     <specification name="JavaScript 1.0"/>
@@ -5449,7 +5447,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="closed" type="Boolean" access="read-write" visibility="basic">
                 <description>Indicates whether a window is closed or not.</description>
                 <browsers>
@@ -5461,7 +5459,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="document" type="Document" access="read-write" visibility="basic">
                 <references>
                     <reference name="Document"/>
@@ -5476,7 +5474,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="event" type="Event" access="read-write" visibility="basic">
                 <references>
                     <reference name="Event"/>
@@ -5489,7 +5487,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="frames" type="Frame[]" access="read-write" visibility="basic">
                 <description>An array of the frames in the current window.</description>
                 <browsers>
@@ -5501,7 +5499,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="history" type="History" access="read-write" visibility="basic">
                 <references>
                     <reference name="History"/>
@@ -5527,7 +5525,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="innerWidth" type="Number" access="read-write" visibility="basic">
                 <description>Width of the active document area of the window.</description>
                 <browsers>
@@ -5550,7 +5548,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="location" type="Location" access="read-write" visibility="basic">
                 <description>Gets or sets the current URL of a window.</description>
                 <browsers>
@@ -5562,7 +5560,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="Math" type="Class&lt;Math&gt;" access="read-write" visibility="basic">
                 <references>
                     <reference name="Math"/>
@@ -5574,7 +5572,7 @@
                     <browser platform="Netscape" version="2.0+"/>
                 </browsers>
             </property>
-            
+
             <property name="navigator" type="Navigator" access="read-write" visibility="basic">
                 <references>
                     <reference name="Navigator"/>
@@ -5589,7 +5587,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="opener" type="Window" access="read-write" visibility="basic">
                 <description>Reference to the window that opened the current window.</description>
                 <browsers>
@@ -5601,7 +5599,53 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
+            <property name="outerHeight" type="Number" access="read-write" visibility="basic">
+            	<description>Gets or sets the outer height of a window.</description>
+            	<browsers>
+                    <browser platform="IE" version="3.0+"/>
+                    <browser platform="Mozilla" version="1.0+"/>
+                    <browser platform="Netscape" version="2.0+"/>
+                    <browser platform="Opera" version="7.0+" />
+                    <browser platform="Chrome" version="5.0+" />
+                    <browser platform="Safari" version="1.0+" />
+                </browsers>
+            </property>
+
+            <property name="outerWidth" type="Number" access="read-write" visibility="basic">
+            	<description>Gets or sets the outer width of a window.</description>
+            	<browsers>
+                    <browser platform="IE" version="3.0+"/>
+                    <browser platform="Mozilla" version="1.0+"/>
+                    <browser platform="Netscape" version="2.0+"/>
+                    <browser platform="Opera" version="7.0+" />
+                    <browser platform="Chrome" version="5.0+" />
+                    <browser platform="Safari" version="1.0+" />
+                </browsers>
+            </property>
+
+            <property name="pageXOffset" type="Number" access="read-write" visibility="basic">
+            	<description>Gets the number of pixels by which the current document has been scrolled horizontally</description>
+            	<browsers>
+                    <browser platform="Mozilla" version="1.0+"/>
+                    <browser platform="Netscape" version="2.0+"/>
+                    <browser platform="Opera" version="7.0+" />
+                    <browser platform="Chrome" version="5.0+" />
+                    <browser platform="Safari" version="1.0+" />
+                </browsers>
+            </property>
+
+            <property name="pageYOffset" type="Number" access="read-write" visibility="basic">
+            	<description>Gets the number of pixels by which the current document has been scrolled vertically</description>
+            	<browsers>
+                    <browser platform="Mozilla" version="1.0+"/>
+                    <browser platform="Netscape" version="2.0+"/>
+                    <browser platform="Opera" version="7.0+" />
+                    <browser platform="Chrome" version="5.0+" />
+                    <browser platform="Safari" version="1.0+" />
+                </browsers>
+            </property>
+
             <property name="parent" type="Window" access="read-write" visibility="basic">
                 <description>Reference to the parent of the current window or subframe.</description>
                 <browsers>
@@ -5613,7 +5657,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="screen" type="Screen" access="read-write" visibility="basic">
                 <references>
                     <reference name="Screen"/>
@@ -5628,7 +5672,43 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
+            <property name="screenLeft" type="Number" access="read-write" visibility="basic">
+                <description>Gets the x-coordinate of a window relative to the screen on which it is displayed</description>
+                <browsers>
+                    <browser platform="IE" version="3.0+"/>
+                    <browser platform="Netscape" version="2.0+"/>
+                    <browser platform="Opera" version="7.0+" />
+                    <browser platform="Chrome" version="5.0+" />
+                    <browser platform="Safari" version="1.0+" />
+                </browsers>
+            </property>
+
+            <property name="screenTop" type="Number" access="read-write" visibility="basic">
+                <description>Gets the y-coordinate of a window relative to the screen on which it is displayed</description>
+                <browsers>
+                    <browser platform="IE" version="3.0+"/>
+                    <browser platform="Netscape" version="2.0+"/>
+                    <browser platform="Opera" version="7.0+" />
+                    <browser platform="Chrome" version="5.0+" />
+                    <browser platform="Safari" version="1.0+" />
+                </browsers>
+            </property>
+
+            <property name="screenX" type="Number" access="read-write" visibility="basic">
+                <description>Gets the x-coordinate of a window relative to the screen on which it is displayed</description>
+                <browsers>
+                    <browser platform="Mozilla" version="1.0+"/>
+                </browsers>
+            </property>
+
+            <property name="screenY" type="Number" access="read-write" visibility="basic">
+                <description>Gets the y-coordinate of a window relative to the screen on which it is displayed</description>
+                <browsers>
+                    <browser platform="Mozilla" version="1.0+"/>
+                </browsers>
+            </property>
+
             <property name="self" type="Window" access="read-write" visibility="basic">
                 <description>Reference to a Window object itself.</description>
                 <browsers>
@@ -5640,7 +5720,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="top" type="Window" access="read-write" visibility="basic">
                 <description>Reference to the top window in the window hierarchy.</description>
                 <browsers>
@@ -5652,7 +5732,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="window" type="Window" access="read-write" visibility="basic">
                 <references>
                     <reference name="Window"/>
@@ -5667,7 +5747,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </property>
-            
+
             <property name="XMLHttpRequest" type="XMLHttpRequest" access="read-write" visibility="basic">
                 <references>
                     <reference name="XMLHttpRequest"/>
@@ -5685,7 +5765,7 @@
                     <specification name="HTML DOM Level 3"/>
                 </availability>
             </property>
-            
+
             <property name="Array" type="Class&lt;Array&gt;" access="read-only" visibility="basic">
                 <availability>
                     <specification name="JavaScript" version="1.1"/>
@@ -5812,9 +5892,9 @@
                     <browser platform="Safari" version="1.2+" />
                 </browsers>
             </property>
-            
+
         </properties>
-        
+
         <methods>
             <method name="alert" visibility="basic">
                 <references>
@@ -5837,7 +5917,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </method>
-            
+
             <method name="back" visibility="basic">
                 <return-types>
                     <return-type type="void"/>
@@ -5852,7 +5932,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </method>
-            
+
             <method name="blur" visibility="basic">
                 <references>
                     <reference name="Window.focus"/>
@@ -5873,7 +5953,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </method>
-            
+
             <method name="captureEvents" visibility="basic">
                 <parameters>
                     <parameter name="eventmask" type="Number" usage="required">
@@ -5895,7 +5975,7 @@
                     <browser platform="Netscape" version="4.0+"/>
                 </browsers>
             </method>
-            
+
             <method name="clearInterval" visibility="basic">
                 <parameters>
                     <parameter name="intervalId" type="Object" usage="required">
@@ -5921,7 +6001,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </method>
-            
+
             <method name="clearTimeout" visibility="basic">
                 <parameters>
                     <parameter name="timeoutId" type="Object" usage="required">
@@ -5947,7 +6027,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </method>
-            
+
             <method name="close" visibility="basic">
                 <references>
                     <reference name="Window.open"/>
@@ -5969,7 +6049,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </method>
-            
+
             <method name="confirm" visibility="basic">
                 <parameters>
                     <parameter name="question" type="String" usage="required">
@@ -5997,7 +6077,17 @@
                 </browsers>
                 <return-description>Returns true if the user clicks OK.</return-description>
             </method>
-            
+
+            <method name="createPopup" visibility="basic">
+            	<description>Creates a pop-up window</description>
+            	<return-types>
+                    <return-type type="Window"/>
+                </return-types>
+            	<browsers>
+                    <browser platform="IE" version="4.0+"/>
+                </browsers>
+            </method>
+
             <method name="focus" visibility="basic">
                 <references>
                     <reference name="Window.blur"/>
@@ -6018,7 +6108,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </method>
-            
+
             <method name="forward" visibility="basic">
                 <return-types>
                     <return-type type="void"/>
@@ -6029,7 +6119,7 @@
                     <browser platform="Opera" version="7.0+" />
                 </browsers>
             </method>
-            
+
             <method name = "getComputedStyle" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "elt" type = "Element" usage = "required">
@@ -6059,7 +6149,7 @@
                 </browsers>
                 <return-description>Returns the CSSStyleDeclaration for the specified document Element.</return-description>           
             </method>
-            
+
             <method name="handleEvent" visibility="basic">
                 <parameters>
                     <parameter name="event" type="Object" usage="required">
@@ -6078,7 +6168,7 @@
                 </browsers>
                 <return-description>Returns the result of the invoked event handler.</return-description>
             </method>
-            
+
             <method name="home" visibility="basic">
                 <return-types>
                     <return-type type="void"/>
@@ -6092,7 +6182,7 @@
                     <browser platform="Opera" version="7.0+" />
                 </browsers>
             </method>
-            
+
             <method name="moveBy" visibility="basic">
                 <parameters>
                     <parameter name="dx" type="Number" usage="required">
@@ -6118,7 +6208,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </method>
-            
+
             <method name="moveTo" visibility="basic">
                 <parameters>
                     <parameter name="x" type="Object" usage="required">
@@ -6144,7 +6234,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </method>
-            
+
             <method name="navigate" visibility="basic">
                 <parameters>
                     <parameter name="url" type="String" usage="required">
@@ -6163,7 +6253,7 @@
                     <browser platform="IE" version="3.0+"/>
                 </browsers>
             </method>
-            
+
             <method name="open" visibility="basic">
                 <parameters>
                     <parameter name="url" type="String" usage="optional">
@@ -6201,7 +6291,7 @@
                 </browsers>
                 <return-description>The new Window that was opened.</return-description>
             </method>
-            
+
             <method name="print" visibility="basic">
                 <return-types>
                     <return-type type="void"/>
@@ -6217,7 +6307,7 @@
                     <browser platform="Opera" version="7.0+" />
                 </browsers>
             </method>
-            
+
             <method name="prompt" visibility="basic">
                 <parameters>
                     <parameter name="message" type="String" usage="required">
@@ -6249,7 +6339,7 @@
                 </browsers>
                 <return-description>String or number entered by the user.</return-description>
             </method>
-            
+
             <method name="releaseEvents" visibility="basic">
                 <parameters>
                     <parameter name="eventmask" type="Number" usage="required">
@@ -6272,7 +6362,7 @@
                     <browser platform="Opera" version="7.0+" />
                 </browsers>
             </method>
-            
+
             <method name="resizeBy" visibility="basic">
                 <parameters>
                     <parameter name="dw" type="Number" usage="required">
@@ -6297,7 +6387,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </method>
-            
+
             <method name="resizeTo" visibility="basic">
                 <parameters>
                     <parameter name="width" type="Object" usage="required">
@@ -6319,7 +6409,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </method>
-            
+
             <method name="routeEvent" visibility="basic">
                 <parameters>
                     <parameter name="event" type="Function" usage="required">
@@ -6340,7 +6430,7 @@
                 </browsers>
                 <return-description>Returns the result of the routed event.</return-description>
             </method>
-            
+
             <method name="scroll" visibility="basic">
                 <parameters>
                     <parameter name="x" type="Object" usage="required">
@@ -6366,7 +6456,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </method>
-            
+
             <method name="scrollBy" visibility="basic">
                 <parameters>
                     <parameter name="dx" type="Number" usage="required">
@@ -6392,7 +6482,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </method>
-            
+
             <method name="scrollTo" visibility="basic">
                 <parameters>
                     <parameter name="x" type="Object" usage="required">
@@ -6418,7 +6508,7 @@
                     <browser platform="Safari" version="1.0+" />
                 </browsers>
             </method>
-            
+
             <method name="setInterval" visibility="basic">
                 <parameters>
                     <parameter name="code" type="String|Function" usage="required">
@@ -6453,7 +6543,7 @@
                 </browsers>
                 <return-description>Returns the result of the function or expression.</return-description>
             </method>
-            
+
             <method name="setTimeout" visibility="basic">
                 <parameters>
                     <parameter name="code" type="String" usage="required">
@@ -6490,7 +6580,7 @@
                 </browsers>
                 <return-description>Result of the function or expression.</return-description>
             </method>
-            
+
             <method name="stop" visibility="basic">
                 <return-types>
                     <return-type type="void"/>
@@ -6514,7 +6604,7 @@
             <specification name="enhanced in JavaScript 1.1 and 1.2"/>
         </availability>
     </class>
-    
+
     <class type="Global" visibility="basic">
         <description>Container object for all other objects in the HTML DOM.</description>
         <browsers>

@@ -26,29 +26,38 @@ import org.eclipse.swt.widgets.Shell;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 
-public class SnippetsContentAssistant extends ContentAssistant {
-	
+public class SnippetsContentAssistant extends ContentAssistant
+{
+
 	static final int MAX_HEIGHT = (Platform.OS_WIN32.equals(Platform.getOS()) ? 12 : 14);
 
 	private IContentAssistProcessor contentAssistProcessor;
-	
-	private static class StringInformationPresenter implements IInformationPresenter {
-		public String updatePresentation(Display display, String hoverInfo,
-				TextPresentation presentation, int maxWidth, int maxHeight) {
+
+	private static class StringInformationPresenter implements IInformationPresenter
+	{
+		public String updatePresentation(Display display, String hoverInfo, TextPresentation presentation,
+				int maxWidth, int maxHeight)
+		{
 			return hoverInfo;
 		}
 	}
-	
-	private static class DefaultInformationControlCreator extends AbstractReusableInformationControlCreator {
-		public IInformationControl doCreateInformationControl(Shell shell) {
-			DefaultInformationControl defaultInformationControl = new DefaultInformationControl(shell, new StringInformationPresenter()) {
+
+	private static class DefaultInformationControlCreator extends AbstractReusableInformationControlCreator
+	{
+		public IInformationControl doCreateInformationControl(Shell shell)
+		{
+			DefaultInformationControl defaultInformationControl = new DefaultInformationControl(shell,
+					new StringInformationPresenter())
+			{
 				private Font maxHeightTextFont;
 
 				@Override
-				protected void createContent(Composite parent) {
+				protected void createContent(Composite parent)
+				{
 					super.createContent(parent);
 					Control[] children = parent.getChildren();
-					for (Control control : children) {
+					for (Control control : children)
+					{
 						if (control instanceof StyledText)
 						{
 							StyledText styledText = (StyledText) control;
@@ -56,10 +65,11 @@ public class SnippetsContentAssistant extends ContentAssistant {
 							FontData[] textFontData = textFont.getFontData();
 							if (textFontData[0].getHeight() > MAX_HEIGHT)
 							{
-								maxHeightTextFont = new Font(textFont.getDevice(),
-										textFontData[0].getName(),
-										MAX_HEIGHT,
-										textFontData[0].getStyle());
+								if (maxHeightTextFont == null)
+								{
+									maxHeightTextFont = new Font(textFont.getDevice(), textFontData[0].getName(),
+											MAX_HEIGHT, textFontData[0].getStyle());
+								}
 								styledText.setFont(maxHeightTextFont);
 							}
 							else
@@ -88,7 +98,8 @@ public class SnippetsContentAssistant extends ContentAssistant {
 		}
 	}
 
-	public SnippetsContentAssistant() {
+	public SnippetsContentAssistant()
+	{
 		super();
 		enableAutoActivation(false);
 		enablePrefixCompletion(true);
@@ -100,18 +111,20 @@ public class SnippetsContentAssistant extends ContentAssistant {
 		setStatusMessage(Messages.SnippetsContentAssistant_MSG_SelectNthSnippet);
 		setInformationControlCreator(new DefaultInformationControlCreator());
 	}
-	
+
 	@Override
-	public IContentAssistProcessor getContentAssistProcessor(
-			String contentType) {
-		if (contentAssistProcessor == null) {
+	public IContentAssistProcessor getContentAssistProcessor(String contentType)
+	{
+		if (contentAssistProcessor == null)
+		{
 			contentAssistProcessor = new SnippetsCompletionProcessor();
 		}
 		return contentAssistProcessor;
 	}
 
 	@Override
-	protected void possibleCompletionsClosed() {
+	protected void possibleCompletionsClosed()
+	{
 		super.possibleCompletionsClosed();
 		if (contentAssistProcessor != null)
 		{

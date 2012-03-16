@@ -31,6 +31,8 @@ import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 
+import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
@@ -61,6 +63,25 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 {
 	private static final Image ELEMENT_ICON = CSSPlugin.getImage("/icons/element.png"); //$NON-NLS-1$
 	private static final Image PROPERTY_ICON = CSSPlugin.getImage("/icons/property.png"); //$NON-NLS-1$
+
+	// @formatter:off
+	private static final Set<String> COLOR_PROPERTY_NAMES = CollectionsUtil.newSet(
+		"background", //$NON-NLS-1$
+		"border-bottom", //$NON-NLS-1$
+		"border-left", //$NON-NLS-1$
+		"border-right", //$NON-NLS-1$
+		"border-top", //$NON-NLS-1$
+		"border", //$NON-NLS-1$
+		"color", //$NON-NLS-1$
+		"background-color", //$NON-NLS-1$
+		"border-color", //$NON-NLS-1$
+		"border-top-color", //$NON-NLS-1$
+		"border-right-color", //$NON-NLS-1$
+		"border-bottom-color", //$NON-NLS-1$
+		"border-left-color", //$NON-NLS-1$
+		"outline-color" //$NON-NLS-1$
+	);
+	// @formatter:on
 
 	private IContextInformationValidator _validator;
 	private CSSIndexQueryHelper _queryHelper;
@@ -401,7 +422,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		// get property name
 		String propertyName = this.getPropertyName(lexemeProvider, offset);
 
-		if (propertyName != null && propertyName.length() > 0)
+		if (!StringUtil.isEmpty(propertyName))
 		{
 			this.setPropertyValueRange(lexemeProvider, offset);
 
@@ -1372,20 +1393,16 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param property
 	 * @return
 	 */
-	@SuppressWarnings("nls")
 	private boolean supportsColorValues(PropertyElement property)
 	{
 		// FIXME Support multiple types on properties, and use an enum of types. Then we can look for color type for
 		// values!
-		if (property == null)
-			return false;
-		String propertyName = property.getName();
-		if (propertyName.equals("background") || propertyName.equals("border-bottom")
-				|| propertyName.equals("border-left") || propertyName.equals("border-right")
-				|| propertyName.equals("border-top") || propertyName.equals("border")
-				|| propertyName.equals("column-rule"))
-			return true;
-		return propertyName.endsWith("color");
-	}
+		if (property != null)
+		{
+			String propertyName = property.getName();
+			return COLOR_PROPERTY_NAMES.contains(propertyName);
+		}
 
+		return false;
+	}
 }

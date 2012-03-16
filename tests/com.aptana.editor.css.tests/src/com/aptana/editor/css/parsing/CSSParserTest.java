@@ -613,6 +613,16 @@ public class CSSParserTest extends TestCase
 	}
 
 	/**
+	 * Test element pseudo-class selector
+	 * 
+	 * @throws Exception
+	 */
+	public void testElementPseudoclassSelector2() throws Exception
+	{
+		parseTest("td::first-child {}" + EOL); //$NON-NLS-1$
+	}
+
+	/**
 	 * Test element pseudo-class function selector
 	 * 
 	 * @throws Exception
@@ -982,13 +992,33 @@ public class CSSParserTest extends TestCase
 	}
 
 	/**
+	 * Test for APSTUD-4487
+	 * 
+	 * @throws Exception
+	 */
+	public void testImportantProperty() throws Exception
+	{
+		parseTest("button {*overflow: visible;}" + EOL); //$NON-NLS-1$
+	}
+
+	/**
+	 * Test for APSTUD-4487
+	 * 
+	 * @throws Exception
+	 */
+	public void testStarredImportantProperty() throws Exception
+	{
+		parseTest("button {*overflow: visible !important;}" + EOL); //$NON-NLS-1$
+	}
+
+	/**
 	 * parseTest
 	 * 
 	 * @throws Exception
 	 */
 	public IParseRootNode parseStateTest(IParseState parseState, String source) throws Exception
 	{
-		parseState.setEditState(source, source, 0, 0);
+		parseState.setEditState(source);
 		return fParser.parse(parseState);
 	}
 

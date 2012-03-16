@@ -486,6 +486,8 @@ public class CopyFilesOperation
 	{
 		final IFileStore parent = originalFile.getParent();
 		final String[] returnValue = { "" }; //$NON-NLS-1$
+		final String filename = originalFile.getName();
+		final boolean isRemote = (originalFile instanceof IExtendedFileStore);
 
 		fShell.getDisplay().syncExec(new Runnable()
 		{
@@ -496,27 +498,30 @@ public class CopyFilesOperation
 				{
 					public String isValid(String string)
 					{
-						if (originalFile.getName().equals(string))
+						if (filename.equals(string))
 						{
 							return Messages.CopyFilesOperation_ERR_NameConflict;
 						}
-						int type = Utils.isDirectory(originalFile) ? IResource.FOLDER : IResource.FILE;
-						IStatus status = ResourcesPlugin.getWorkspace().validateName(string, type);
-						if (!status.isOK())
+						if (!isRemote)
 						{
-							return status.getMessage();
-						}
-						if (Utils.exists(parent.getChild(string)))
-						{
-							return Messages.CopyFilesOperation_ERR_NameExists;
+							int type = Utils.isDirectory(originalFile) ? IResource.FOLDER : IResource.FILE;
+							IStatus status = ResourcesPlugin.getWorkspace().validateName(string, type);
+							if (!status.isOK())
+							{
+								return status.getMessage();
+							}
+							if (Utils.exists(parent.getChild(string)))
+							{
+								return Messages.CopyFilesOperation_ERR_NameExists;
+							}
 						}
 						return null;
 					}
 				};
 
 				InputDialog dialog = new InputDialog(fShell, Messages.CopyFilesOperation_NameConflictDialog_Title,
-						MessageFormat.format(Messages.CopyFilesOperation_NameConflictDialog_Message,
-								originalFile.getName()), getAutoNewNameFor(originalFile), validator);
+						MessageFormat.format(Messages.CopyFilesOperation_NameConflictDialog_Message, filename),
+						getAutoNewNameFor(originalFile), validator);
 				dialog.setBlockOnOpen(true);
 				dialog.open();
 				if (dialog.getReturnCode() == Window.CANCEL)
@@ -540,6 +545,7 @@ public class CopyFilesOperation
 	{
 		String name = originalFile.getName();
 		IFileStore parent = originalFile.getParent();
+		boolean isRemote = (originalFile instanceof IExtendedFileStore);
 
 		String newName;
 		int counter = 1;
@@ -553,7 +559,7 @@ public class CopyFilesOperation
 			{
 				newName = MessageFormat.format(Messages.CopyFilesOperation_DefaultNewName, name);
 			}
-			if (!Utils.exists(parent.getChild(newName)))
+			if (isRemote || !Utils.exists(parent.getChild(newName)))
 			{
 				return newName;
 			}
@@ -572,7 +578,8 @@ public class CopyFilesOperation
 	 */
 	private static String validateDestination(IAdaptable destination, IFileStore[] sourceStores)
 	{
-		if (destination instanceof IResource && !((IResource) destination).isAccessible())
+		IResource resource = (IResource) destination.getAdapter(IResource.class);
+		if (resource != null && !resource.isAccessible())
 		{
 			return Messages.CopyFilesOperation_DestinationNotAccessible;
 		}

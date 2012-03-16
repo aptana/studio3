@@ -19,17 +19,17 @@ import com.aptana.parsing.lexer.Range;
 
 public class JSScope
 {
-	private JSScope _parent;
-	private List<JSScope> _children;
-	private JSPropertyCollection _object;
-	private IRange _range;
+	private JSScope parent;
+	private List<JSScope> children;
+	private JSPropertyCollection object;
+	private IRange range;
 
 	/**
 	 * JSScope
 	 */
 	public JSScope()
 	{
-		this._object = new JSPropertyCollection();
+		object = new JSPropertyCollection();
 	}
 
 	/**
@@ -43,12 +43,12 @@ public class JSScope
 		{
 			scope.setParent(this);
 
-			if (this._children == null)
+			if (children == null)
 			{
-				this._children = new ArrayList<JSScope>();
+				children = new ArrayList<JSScope>();
 			}
 
-			this._children.add(scope);
+			children.add(scope);
 		}
 	}
 
@@ -62,15 +62,15 @@ public class JSScope
 	{
 		JSPropertyCollection property;
 
-		if (this._object.hasProperty(name))
+		if (object.hasProperty(name))
 		{
-			property = this._object.getProperty(name);
+			property = object.getProperty(name);
 		}
 		else
 		{
 			property = new JSPropertyCollection();
 
-			this._object.setProperty(name, property);
+			object.setProperty(name, property);
 		}
 
 		property.addValue(value);
@@ -83,7 +83,7 @@ public class JSScope
 	 */
 	public List<JSScope> getChildren()
 	{
-		List<JSScope> result = this._children;
+		List<JSScope> result = children;
 
 		if (result == null)
 		{
@@ -101,17 +101,17 @@ public class JSScope
 	 */
 	public JSPropertyCollection getLocalSymbol(String name)
 	{
-		return this._object.getProperty(name);
+		return object.getProperty(name);
 	}
 
 	/**
-	 * getLocalSymbolNames
+	 * Return a list of symbol names defined in this scope
 	 * 
-	 * @return
+	 * @return Returns a list of strings
 	 */
 	public List<String> getLocalSymbolNames()
 	{
-		return this._object.getPropertyNames();
+		return object.getPropertyNames();
 	}
 
 	/**
@@ -121,7 +121,7 @@ public class JSScope
 	 */
 	public JSPropertyCollection getObject()
 	{
-		return this._object;
+		return object;
 	}
 
 	/**
@@ -131,7 +131,7 @@ public class JSScope
 	 */
 	public JSScope getParentScope()
 	{
-		return this._parent;
+		return parent;
 	}
 
 	/**
@@ -141,7 +141,7 @@ public class JSScope
 	 */
 	public IRange getRange()
 	{
-		return (this._range != null) ? this._range : Range.EMPTY;
+		return (range != null) ? range : Range.EMPTY;
 	}
 
 	/**
@@ -254,7 +254,7 @@ public class JSScope
 	 */
 	public boolean hasLocalSymbol(String name)
 	{
-		return this._object.hasProperty(name);
+		return object.hasProperty(name);
 	}
 
 	/**
@@ -291,7 +291,7 @@ public class JSScope
 	 */
 	protected void setParent(JSScope parent)
 	{
-		this._parent = parent;
+		this.parent = parent;
 	}
 
 	/**
@@ -301,6 +301,6 @@ public class JSScope
 	 */
 	public void setRange(IRange range)
 	{
-		this._range = range;
+		this.range = range;
 	}
 }

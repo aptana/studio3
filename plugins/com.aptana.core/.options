@@ -5,3 +5,4 @@ com.aptana.core/debug/shell=true
 com.aptana.core/debug/ziputil=true
 com.aptana.core/debug/firefox=true
 com.aptana.core/debug/extension_points=true
+com.aptana.core/debug/ast=true

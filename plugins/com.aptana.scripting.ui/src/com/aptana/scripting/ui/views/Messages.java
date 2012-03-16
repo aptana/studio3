@@ -102,14 +102,24 @@ public class Messages extends NLS
 	public static String ProjectTemplatesNode_Project_Templates_Count;
 	public static String ProjectTemplatesNode_Projects_Templates;
 
+	public static String SnippetNode_Category;
+	public static String SnippetNode_Icon_Path;
 	public static String SnippetNode_Snippet_Expansion;
 	public static String SnippetNode_Snippet_Name;
 	public static String SnippetNode_Snippet_Path;
 	public static String SnippetNode_Snippet_Scope;
 	public static String SnippetNode_Snippet_Triggers;
+	public static String SnippetNode_Tags;
 
 	public static String SnippetsNode_Snippets_Count;
 	public static String SnippetsNode_Snippets_Node;
+
+	public static String SnippetCategoryNode_Snippet_Name;
+	public static String SnippetCategoryNode_Snippet_Path;
+	public static String SnippetCategoryNode_Snippet_Scope;
+	public static String SnippetCategoryNode_Snippet_Icon_Path;
+
+	public static String SnippetCategoriesNode_SnippetCategories_Node;
 
 	static
 	{

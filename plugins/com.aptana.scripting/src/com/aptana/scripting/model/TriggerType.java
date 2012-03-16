@@ -75,6 +75,6 @@ public enum TriggerType
 	 */
 	public String getPropertyName()
 	{
-		return this._name + "_values"; //$NON-NLS-1$
+		return BundleManager.getInstance().sharedString(this._name.concat("_values")); //$NON-NLS-1$
 	}
 }

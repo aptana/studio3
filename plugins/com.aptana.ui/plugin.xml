@@ -61,6 +61,16 @@
                id="com.aptana.samples.ui.SamplesView">
          </viewShortcut>
          <view
+               id="com.aptana.snippets.ui.views.SnippetsView"
+               minimized="false"
+               relationship="stack"
+               relative="org.eclipse.ui.views.ContentOutline"
+               visible="true">
+         </view>
+         <viewShortcut
+               id="com.aptana.snippets.ui.views.SnippetsView">
+         </viewShortcut>
+         <view
                id="com.aptana.terminal.views.terminal"
                relationship="stack"
                relative="org.eclipse.ui.console.ConsoleView"
@@ -123,6 +133,9 @@
          <showInPart
                id="org.eclipse.ui.navigator.ProjectExplorer">
          </showInPart>
+         <viewShortcut
+               id="com.aptana.webserver.ui.view">
+         </viewShortcut>
       </perspectiveExtension>
    </extension>
    <extension
@@ -266,9 +279,6 @@
             id="com.aptana.ui.AptanaPreferencePage"
             name="%page.name">
       </page>
-   </extension>
-   <extension
-         point="org.eclipse.ui.preferencePages">
       <page
             category="com.aptana.ui.AptanaPreferencePage"
             class="com.aptana.ui.preferences.TroubleshootingPreferencePage"
@@ -365,5 +375,17 @@
             class="com.aptana.ui.EclipseDiagnosticLog"
             priority="0">
       </diagnosticLog>
+   </extension>
+   <extension
+         point="org.eclipse.ui.console.consolePageParticipants">
+      <consolePageParticipant
+            class="com.aptana.ui.console.ConsoleAutoScrollPageParticipant"
+            id="com.aptana.ui.console.autoScrollParticipant">
+         <enablement>
+            <instanceof
+                  value="org.eclipse.debug.internal.ui.views.console.ProcessConsole">
+            </instanceof>
+         </enablement>
+      </consolePageParticipant>
    </extension>
 </plugin>

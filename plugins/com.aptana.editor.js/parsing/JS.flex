@@ -162,15 +162,18 @@ import com.aptana.editor.js.parsing.lexer.JSTokenType;
 %}
 
 LineTerminator = \r|\n|\r\n
-Whitespace = {LineTerminator} | [ \t\f]
+RubyBlock = "<%" ~"%>"
+PHPBlock = "<?" ~"?>"
+DjangoBlock = "{%" ~"%}"
+Whitespace = {LineTerminator} | [ \t\f] | {RubyBlock} | {PHPBlock} | {DjangoBlock}
 
 //Identifier = [a-zA-Z_$][a-zA-Z0-9_$]*
 Identifier = ([:jletter:]|\$)([:jletterdigit:]|\$)*
 
 Integer = [:digit:][:digit:]*
-Hex = "0x" [a-fA-F0-9]+
+Hex = "0" [xX] [a-fA-F0-9]+
 Float = ({Integer} \.[:digit:]*) | (\.[:digit:]+)
-Scientific = {Float} [eE][-+]?[:digit:]+
+Scientific = ({Integer} | {Float}) [eE][-+]?[:digit:]+
 Number = {Integer} | {Hex} | {Float} | {Scientific}
 
 DoubleQuotedString = \"([^\\\"\r\n]|\\[^])*\"

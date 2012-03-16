@@ -164,13 +164,28 @@ public abstract class MetadataReader extends ValidatingReader
 	}
 
 	/**
-	 * Load the CSS metadata from the specified stream
+	 * Load metadata from the specified stream
 	 * 
 	 * @param stream
 	 *            The input stream for the source XML
 	 * @throws Exception
 	 */
 	public void loadXML(InputStream stream) throws Exception
+	{
+		loadXML(stream, null);
+	}
+
+	/**
+	 * Load metadata from the specified stream. The input name is used in error messages to indicate what resource is
+	 * being loaded
+	 * 
+	 * @param stream
+	 *            The input stream for the source XML
+	 * @param inputName
+	 *            The name of the resource being processed
+	 * @throws Exception
+	 */
+	public void loadXML(InputStream stream, String inputName) throws Exception
 	{
 		this.loadMetadataSchema();
 
@@ -200,22 +215,21 @@ public abstract class MetadataReader extends ValidatingReader
 			catch (SAXException e)
 			{
 				Exception ex = e.getException();
-				String msg = null;
 
-				if (ex != null)
+				if (!StringUtil.isEmpty(inputName))
 				{
-					msg = MessageFormat.format(Messages.MetadataReader_ErrorParsingDocumentationXML,
-							new Object[] { ex.getMessage() });
-				}
-				else
-				{
-					msg = MessageFormat.format(Messages.MetadataReader_ErrorParsingDocumentationXML,
-							new Object[] { e.getMessage() });
+					inputName = "the documentation XML file"; //$NON-NLS-1$
 				}
 
-				Exception de = new Exception(msg, e);
+				// @formatter:off
+				String msg = MessageFormat.format(
+					Messages.MetadataReader_ErrorParsingDocumentationXML,
+					inputName,
+					(ex != null) ? ex.getMessage() : e.getMessage()
+				);
+				// @formatter:on
 
-				throw de;
+				throw new Exception(msg, e);
 			}
 			catch (IOException e)
 			{

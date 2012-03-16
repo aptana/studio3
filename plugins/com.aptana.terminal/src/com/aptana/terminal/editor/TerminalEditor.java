@@ -301,11 +301,12 @@ public class TerminalEditor extends EditorPart implements ISaveablePart2, IProce
 	}
 
 	private void updateActions() {
-		fActionEditCut.updateAction(true);
-		fActionEditCopy.updateAction(true);
-		fActionEditPaste.updateAction(true);
-		fActionEditSelectAll.updateAction(true);
-		fActionEditClearAll.updateAction(true);
+		boolean aboutToShow = true;
+		fActionEditCut.updateAction(aboutToShow);
+		fActionEditCopy.updateAction(aboutToShow);
+		fActionEditPaste.updateAction(aboutToShow);
+		fActionEditSelectAll.updateAction(aboutToShow);
+		fActionEditClearAll.updateAction(aboutToShow);
 	}
 
 	/**
@@ -315,8 +316,20 @@ public class TerminalEditor extends EditorPart implements ISaveablePart2, IProce
 		fActionEditCopy = new TerminalActionCopy(terminalComposite.getTerminalViewControl());
 		fActionEditCut = new TerminalActionCut(terminalComposite.getTerminalViewControl());
 		fActionEditPaste = new TerminalActionPaste(terminalComposite.getTerminalViewControl());
-		fActionEditClearAll = new TerminalActionClearAll(terminalComposite.getTerminalViewControl());
-		fActionEditSelectAll = new TerminalActionSelectAll(terminalComposite.getTerminalViewControl());
+		fActionEditClearAll = new TerminalActionClearAll(terminalComposite.getTerminalViewControl()) {
+			@Override
+			public void run() {
+				super.run();
+				updateActions();
+			}
+		};
+		fActionEditSelectAll = new TerminalActionSelectAll(terminalComposite.getTerminalViewControl()) {
+			@Override
+			public void run() {
+				super.run();
+				updateActions();
+			}
+		};
 	}
 
 	/**

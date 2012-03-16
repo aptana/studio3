@@ -52,7 +52,6 @@ import com.aptana.editor.common.contentassist.ICommonCompletionProposal;
 import com.aptana.editor.common.util.EditorUtil;
 import com.aptana.ui.epl.scripting.snippets.PositionBasedCompletionProposal;
 
-@SuppressWarnings("restriction")
 public class SnippetTemplateProposal extends TemplateProposal implements ICommonCompletionProposal,
 		ICompletionProposalExtension6, Comparable<ICompletionProposal>
 {

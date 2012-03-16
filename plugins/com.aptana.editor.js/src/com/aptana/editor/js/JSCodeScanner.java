@@ -181,41 +181,43 @@ public class JSCodeScanner extends QueuedRuleBasedScanner
 		fOrigOffset = null;
 		fLength = null;
 		IToken next = super.nextToken();
+
+		JSScopeType nextData = getData(next);
+		JSScopeType lastData = getData(lastToken);
 		// for identifier after 'function' give it special entity function name scope
-		if (scopeEquals(lastToken, JSScopeType.FUNCTION_KEYWORD) && scopeEquals(next, JSScopeType.SOURCE))
+		if (lastData == JSScopeType.FUNCTION_KEYWORD && nextData == JSScopeType.SOURCE)
 		{
-			next = createToken(JSScopeType.FUNCTION_NAME);
+			next = createToken(nextData = JSScopeType.FUNCTION_NAME);
 		}
 		// Parens outside function definition have a generic scope for both beginning and end...
-		else if (scopeEquals(next, JSScopeType.LEFT_PAREN)
-				&& !(scopeEquals(lastToken, JSScopeType.FUNCTION_KEYWORD) || scopeEquals(lastToken,
-						JSScopeType.FUNCTION_NAME)))
+		else if (nextData == JSScopeType.LEFT_PAREN && lastData != JSScopeType.FUNCTION_KEYWORD
+				&& lastData != JSScopeType.FUNCTION_NAME)
 		{
-			next = createToken(JSScopeType.PARENTHESIS);
+			next = createToken(nextData = JSScopeType.PARENTHESIS);
 		}
 		// ')' should be given generic paren scope when outside function definition
-		else if (scopeEquals(next, JSScopeType.RIGHT_PAREN) && !inFunctionDefinition)
+		else if (nextData == JSScopeType.RIGHT_PAREN && !inFunctionDefinition)
 		{
-			next = createToken(JSScopeType.PARENTHESIS);
+			next = createToken(nextData = JSScopeType.PARENTHESIS);
 		}
 		// hold state that we're declaring a function when we see 'function'
-		else if (scopeEquals(next, JSScopeType.FUNCTION_KEYWORD))
+		else if (nextData == JSScopeType.FUNCTION_KEYWORD)
 		{
 			inFunctionDefinition = true;
 		}
 		// get out of function definition when we see '{' or '}'
-		else if (inFunctionDefinition && scopeEquals(next, JSScopeType.CURLY_BRACE))
+		else if (inFunctionDefinition && nextData == JSScopeType.CURLY_BRACE)
 		{
 			inFunctionDefinition = false;
 		}
 		// give function parameters/arguments special scopes
-		else if (inFunctionDefinition && scopeEquals(next, JSScopeType.SOURCE))
+		else if (inFunctionDefinition && nextData == JSScopeType.SOURCE)
 		{
-			next = createToken(JSScopeType.FUNCTION_PARAMETER);
+			next = createToken(nextData = JSScopeType.FUNCTION_PARAMETER);
 		}
 
 		// HACK Anonymous function name check, look for following "=" and then "function"
-		if (!inFunctionDefinition && scopeEquals(next, JSScopeType.SOURCE))
+		if (!inFunctionDefinition && nextData == JSScopeType.SOURCE)
 		{
 			// Store offset and length since we're going to do lookaheads. But don't assign yet, or it messes up the
 			// getToken...() calls below.
@@ -232,7 +234,8 @@ public class JSCodeScanner extends QueuedRuleBasedScanner
 				ahead = super.nextToken();
 				entries.add(new Entry(null, ahead, getTokenOffset(), getTokenLength()));
 			}
-			if (scopeEquals(ahead, JSScopeType.OPERATOR))
+			JSScopeType aheadScope = getData(ahead);
+			if (aheadScope == JSScopeType.OPERATOR)
 			{
 				ahead = super.nextToken();
 				entries.add(new Entry(null, ahead, getTokenOffset(), getTokenLength()));
@@ -242,9 +245,10 @@ public class JSCodeScanner extends QueuedRuleBasedScanner
 					ahead = super.nextToken();
 					entries.add(new Entry(null, ahead, getTokenOffset(), getTokenLength()));
 				}
-				if (scopeEquals(ahead, JSScopeType.FUNCTION_KEYWORD))
+				aheadScope = getData(ahead);
+				if (aheadScope == JSScopeType.FUNCTION_KEYWORD)
 				{
-					next = createToken(JSScopeType.FUNCTION_NAME);
+					next = createToken(nextData = JSScopeType.FUNCTION_NAME);
 				}
 			}
 			for (Entry entry : entries)
@@ -263,9 +267,18 @@ public class JSCodeScanner extends QueuedRuleBasedScanner
 		return next;
 	}
 
-	private boolean scopeEquals(IToken next, JSScopeType scopeType)
+	private JSScopeType getData(IToken next)
 	{
-		return scopeEquals(next, scopeType.getScope());
+		if (next == null)
+		{
+			return JSScopeType.UNDEFINED;
+		}
+		Object data = next.getData();
+		if (data == null)
+		{
+			return JSScopeType.UNDEFINED;
+		}
+		return JSScopeType.get(data.toString());
 	}
 
 	@Override
@@ -288,11 +301,6 @@ public class JSCodeScanner extends QueuedRuleBasedScanner
 			return fOrigOffset;
 		}
 		return super.getTokenOffset();
-	}
-
-	private boolean scopeEquals(IToken next, String scope)
-	{
-		return next != null && next.getData() != null && scope.equals(next.getData());
 	}
 
 	@Override

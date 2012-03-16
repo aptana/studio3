@@ -81,7 +81,7 @@ public class V8DebugHost extends AbstractDebugHost {
 	};
 
 	private static final int V8_CONNECT_TIMEOUT = 300000;
-	private static final Pattern SCOPE_CHAIN_PATTERN = Pattern.compile("^<[A-Z]+>\\.(.*)$"); //$NON-NLS-1$ //$NON-NLS-2$
+	private static final Pattern SCOPE_CHAIN_PATTERN = Pattern.compile("^<[A-Z]+>\\.(.*)$"); //$NON-NLS-1$
 	private static final Pattern DETAIL_EXPRESSION_PATTERN = Pattern.compile("\\bthis\\b"); //$NON-NLS-1$
 	private static final String THIS_SUBSTITUTE = "__this__"; //$NON-NLS-1$
 	private static final String ANONYMOUS = "(anonymous function)"; //$NON-NLS-1$

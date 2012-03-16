@@ -8,15 +8,52 @@
 package com.aptana.editor.css.contentassist.model;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.mortbay.util.ajax.JSON.Output;
 
 import com.aptana.index.core.IndexUtil;
+import com.aptana.index.core.ui.views.IPropertyInformation;
 
-public class PseudoElementElement extends BaseElement
+public class PseudoElementElement extends BaseElement<PseudoElementElement.Property>
 {
+	enum Property implements IPropertyInformation<PseudoElementElement>
+	{
+		NAME(Messages.PseudoElementElement_NameLabel)
+		{
+			public Object getPropertyValue(PseudoElementElement node)
+			{
+				return node.getName();
+			}
+		};
+
+		private String header;
+		private String category;
+
+		private Property(String header) // $codepro.audit.disable unusedMethod
+		{
+			this.header = header;
+		}
+
+		private Property(String header, String category)
+		{
+			this.category = category;
+		}
+
+		public String getCategory()
+		{
+			return category;
+		}
+
+		public String getHeader()
+		{
+			return header;
+		}
+	}
+
 	private static final String SPECIFICATIONS_PROPERTY = "specifications"; //$NON-NLS-1$
 	private static final String ALLOW_PSEUDO_CLASS_SYNTAX_PROPERTY = "allowPseudoClassSyntax"; //$NON-NLS-1$
 
@@ -72,6 +109,12 @@ public class PseudoElementElement extends BaseElement
 		this.setAllowPseudoClassSyntax(Boolean.TRUE == object.get(ALLOW_PSEUDO_CLASS_SYNTAX_PROPERTY));
 
 		this._specifications = IndexUtil.createList(object.get(SPECIFICATIONS_PROPERTY), SpecificationElement.class);
+	}
+
+	@Override
+	protected Set<Property> getPropertyInfoSet()
+	{
+		return EnumSet.allOf(Property.class);
 	}
 
 	/**

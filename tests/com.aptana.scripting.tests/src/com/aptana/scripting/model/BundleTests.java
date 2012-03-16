@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.aptana.scripting.ScriptLogListener;
+import com.aptana.scripting.model.filters.IModelFilter;
 
 public class BundleTests extends BundleTestBase
 {
@@ -176,6 +177,43 @@ public class BundleTests extends BundleTestBase
 		assertNotNull(snippets);
 		assertEquals(1, snippets.size());
 		assertTrue(snippets.get(0) instanceof SnippetElement);
+
+		List<SnippetElement> snippetElements = entry.getSnippets();
+		assertNotNull(snippetElements);
+		assertEquals(1, snippetElements.size());
+	}
+
+	/**
+	 * testLoadBundleWithSnippetUsingFilter
+	 */
+	public void testLoadBundleWithSnippetUsingFilter()
+	{
+		String bundleName = "bundleWithSnippet";
+		BundleEntry entry = this.getBundleEntry(bundleName, BundlePrecedence.APPLICATION);
+		List<SnippetElement> snippets = BundleManager.getInstance().getSnippets(new IModelFilter()
+		{
+
+			public boolean include(AbstractElement element)
+			{
+				return element instanceof SnippetElement;
+			}
+		});
+
+		assertNotNull(snippets);
+		assertEquals(1, snippets.size());
+	}
+
+	/**
+	 * testLoadBundleWithSnippetUsingFilter
+	 */
+	public void testLoadBundleWithSnippetUsingNullFilter()
+	{
+		String bundleName = "bundleWithSnippet";
+		BundleEntry entry = this.getBundleEntry(bundleName, BundlePrecedence.APPLICATION);
+		List<SnippetElement> snippets = BundleManager.getInstance().getSnippets(null);
+
+		assertNotNull(snippets);
+		assertEquals(1, snippets.size());
 	}
 
 	/**

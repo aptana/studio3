@@ -7,8 +7,8 @@
  */
 package com.aptana.editor.js.formatter.nodes;
 
-import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
+import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.parsing.ast.IParseNode;
 
@@ -40,13 +40,58 @@ public class FormatterJSIdentifierNode extends FormatterJSTextNode
 	@Override
 	protected boolean isAddingBeginNewLine()
 	{
+		if (!shouldConsumePreviousSpaces || isAddingBeginLine)
+		{
+			return true;
+		}
+		if (isPartOfExpression(node))
+		{
+			return false;
+		}
 		IParseNode parent = node.getParent();
 		boolean isFirstInLine = parent.getStartingOffset() == node.getStartingOffset();
 		if (parent instanceof JSNode && ((JSNode) parent).getSemicolonIncluded())
 		{
 			return isFirstInLine;
 		}
-		return !shouldConsumePreviousWhiteSpaces();
+		return false;
+	}
+
+	/**
+	 * @param node
+	 * @return
+	 */
+	private boolean isPartOfExpression(JSNode jsNode)
+	{
+		if (jsNode == null)
+		{
+			return false;
+		}
+		switch (jsNode.getNodeType())
+		{
+			case IJSNodeTypes.DECLARATION:
+			case IJSNodeTypes.ASSIGN:
+			case IJSNodeTypes.RETURN:
+			case IJSNodeTypes.INVOKE:
+			case IJSNodeTypes.GROUP:
+			case IJSNodeTypes.ARGUMENTS:
+			case IJSNodeTypes.CONDITIONAL:
+			case IJSNodeTypes.NAME_VALUE_PAIR:
+			case IJSNodeTypes.GET_PROPERTY:
+			case IJSNodeTypes.CONSTRUCT:
+				return true;
+		}
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.AbstractFormatterNode#shouldConsumePreviousWhiteSpaces()
+	 */
+	@Override
+	public boolean shouldConsumePreviousWhiteSpaces()
+	{
+		return !isAddingBeginNewLine();
 	}
 
 	/*

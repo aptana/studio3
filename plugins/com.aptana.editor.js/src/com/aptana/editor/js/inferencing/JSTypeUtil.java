@@ -18,17 +18,13 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 
 import com.aptana.core.util.StringUtil;
-import com.aptana.editor.common.contentassist.UserAgentManager;
-import com.aptana.editor.common.contentassist.UserAgentManager.UserAgent;
 import com.aptana.editor.js.JSTypeConstants;
-import com.aptana.editor.js.contentassist.model.BaseElement;
 import com.aptana.editor.js.contentassist.model.ClassElement;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.ParameterElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
-import com.aptana.editor.js.contentassist.model.UserAgentElement;
 import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
 import com.aptana.editor.js.parsing.ast.JSDeclarationNode;
@@ -67,27 +63,6 @@ public class JSTypeUtil
 		FILTERED_TYPES.add(JSTypeConstants.VOID_TYPE);
 		FILTERED_TYPES.add(JSTypeConstants.WINDOW_TYPE);
 		FILTERED_TYPES.add(JSTypeConstants.WINDOW_PROPERTY);
-	}
-
-	/**
-	 * addAllUserAgents
-	 * 
-	 * @param element
-	 */
-	public static void addAllUserAgents(BaseElement element)
-	{
-		if (element != null)
-		{
-			// make valid in all user agents
-			for (UserAgent userAgent : UserAgentManager.getInstance().getAllUserAgents())
-			{
-				UserAgentElement ua = new UserAgentElement();
-
-				ua.setPlatform(userAgent.ID);
-
-				element.addUserAgent(ua);
-			}
-		}
 	}
 
 	/**
@@ -457,8 +432,8 @@ public class JSTypeUtil
 			}
 		}
 
-		// Don't allow certain names to avoid confusion an to prevent overwriting
-		// core types
+		// Don't allow certain names to avoid confusion and to prevent overwriting
+		// of core types
 		if (FILTERED_TYPES.contains(result))
 		{
 			result = null;

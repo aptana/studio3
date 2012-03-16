@@ -7,9 +7,10 @@
  */
 package com.aptana.scripting.model.filters;
 
+import com.aptana.core.IFilter;
 import com.aptana.scripting.model.AbstractElement;
 
-public interface IModelFilter
+public interface IModelFilter extends IFilter<AbstractElement>
 {
 	/**
 	 * include

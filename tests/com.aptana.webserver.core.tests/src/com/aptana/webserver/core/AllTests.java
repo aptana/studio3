@@ -12,7 +12,7 @@ package com.aptana.webserver.core;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import com.aptana.webserver.core.builtin.LocalWebServerTest;
+import com.aptana.webserver.internal.core.builtin.LocalWebServerTest;
 
 public class AllTests
 {

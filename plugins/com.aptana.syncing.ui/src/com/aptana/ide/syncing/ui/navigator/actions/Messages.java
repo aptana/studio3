@@ -16,7 +16,15 @@ public class Messages extends NLS
 
 	public static String DoubleClickAction_NewConnection;
 
+	public static String NavigatorDownloadAction_LBL_Download;
+
+	public static String NavigatorSynchronizeAction_LBL_Synchronize;
+
+	public static String NavigatorUploadAction_LBL_Upload;
+
 	public static String ProjectConnectionDisconnectAction_Disconnecting;
+
+	public static String RemoteConnectionManagerAction_LBL_ConnectionManager;
 
 	static
 	{

@@ -33,6 +33,8 @@ import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import com.aptana.editor.epl.tests.EditorTestHelper;
+
 public class NextPreviousEditorHandlerTest extends TestCase
 {
 
@@ -64,17 +66,7 @@ public class NextPreviousEditorHandlerTest extends TestCase
 			for (ITextEditor editor : editors)
 			{
 				// Need to force the editor shut!
-				if (editor != null)
-				{
-					if (Display.getCurrent() != null)
-					{
-						editor.getSite().getPage().closeEditor(editor, false);
-					}
-					else
-					{
-						editor.close(false);
-					}
-				}
+				EditorTestHelper.closeEditor(editor);
 			}
 			for (IFile file : files)
 			{
@@ -135,12 +127,12 @@ public class NextPreviousEditorHandlerTest extends TestCase
 				"<html>\n<head>\n<title>Title goes here</title>\n</head>\n<body>\n<div>\n</div>\n</body>");
 		createAndOpenFile("example3.html",
 				"<html>\n<head>\n<title>Title goes here</title>\n</head>\n<body>\n<h1>HEADING</h1>\n</body>");
-		
 
 		assertEquals("example3.html", getActiveEditor().getTitle());
-		
+
 		executeCommand(NEXT_EDITOR_COMMAND_ID);
-		// wraps around to first editor. When whole suite is running we can't guarantee that these three files are the only ones open!
+		// wraps around to first editor. When whole suite is running we can't guarantee that these three files are the
+		// only ones open!
 		assertFalse("example3.html".equals(getActiveEditor().getTitle()));
 
 		executeCommand(PREVIOUS_EDITOR_COMMAND_ID);
@@ -148,26 +140,26 @@ public class NextPreviousEditorHandlerTest extends TestCase
 
 		executeCommand(PREVIOUS_EDITOR_COMMAND_ID);
 		assertEquals("example2.html", getActiveEditor().getTitle());
-		
+
 		executeCommand(PREVIOUS_EDITOR_COMMAND_ID);
 		assertEquals("example1.html", getActiveEditor().getTitle());
-		
+
 		executeCommand(PREVIOUS_EDITOR_COMMAND_ID);
 		// Goes back before 1, can't be sure no other editors are open
 		assertFalse("example1.html".equals(getActiveEditor().getTitle()));
-		
+
 		executeCommand(NEXT_EDITOR_COMMAND_ID);
 		assertEquals("example1.html", getActiveEditor().getTitle());
-		
+
 		executeCommand(NEXT_EDITOR_COMMAND_ID);
 		assertEquals("example2.html", getActiveEditor().getTitle());
-		
+
 		executeCommand(NEXT_EDITOR_COMMAND_ID);
 		assertEquals("example3.html", getActiveEditor().getTitle());
 	}
 
-	protected void executeCommand(String commandId) throws ExecutionException, NotDefinedException, NotEnabledException,
-			NotHandledException
+	protected void executeCommand(String commandId) throws ExecutionException, NotDefinedException,
+			NotEnabledException, NotHandledException
 	{
 		// Grab the handler service to execute our command
 		IHandlerService service = (IHandlerService) getActiveEditor().getSite().getService(IHandlerService.class);

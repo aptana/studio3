@@ -8,9 +8,11 @@
 package com.aptana.editor.beaver.outline;
 
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.swt.graphics.Image;
 
 import beaver.spec.ast.Rule;
 
+import com.aptana.editor.beaver.BeaverPlugin;
 import com.aptana.editor.beaver.outline.BeaverOutlineContentProvider.SymbolWrapper;
 
 /**
@@ -18,6 +20,28 @@ import com.aptana.editor.beaver.outline.BeaverOutlineContentProvider.SymbolWrapp
  */
 public class BeaverOutlineLabelProvider extends LabelProvider
 {
+	private static final Image RULE_ICON = BeaverPlugin.getImage("icons/rule.png");
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.LabelProvider#getImage(java.lang.Object)
+	 */
+	@Override
+	public Image getImage(Object element)
+	{
+		if (element instanceof SymbolWrapper)
+		{
+			element = ((SymbolWrapper) element).getSymbol();
+		}
+
+		if (element instanceof Rule)
+		{
+			return RULE_ICON;
+		}
+
+		return super.getImage(element);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.LabelProvider#getText(java.lang.Object)

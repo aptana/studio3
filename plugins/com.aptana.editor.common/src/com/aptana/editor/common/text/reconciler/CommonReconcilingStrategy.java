@@ -7,10 +7,16 @@
  */
 package com.aptana.editor.common.text.reconciler;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -18,35 +24,61 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.reconciler.DirtyRegion;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategyExtension;
+import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IPropertyListener;
+import org.eclipse.ui.texteditor.IDocumentProvider;
 
+import com.aptana.buildpath.core.BuildPathCorePlugin;
+import com.aptana.core.IFilter;
+import com.aptana.core.build.IBuildParticipant;
+import com.aptana.core.build.IBuildParticipant.BuildType;
+import com.aptana.core.build.IBuildParticipantManager;
+import com.aptana.core.build.IProblem;
+import com.aptana.core.build.ReconcileContext;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.ResourceUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.CommonAnnotationModel;
 import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.outline.IParseListener;
-import com.aptana.parsing.IParseState;
+import com.aptana.editor.common.outline.CommonOutlinePage;
+import com.aptana.parsing.ast.IParseNode;
 
 public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconcilingStrategyExtension,
 		IBatchReconcilingStrategy, IDisposableReconcilingStrategy
 {
 
+	/**
+	 * The editor we're operating on.
+	 */
 	private AbstractThemeableEditor fEditor;
-	private boolean fInitialReconcileDone;
+	/**
+	 * The working copy we're operating on.
+	 */
+	private IDocument fDocument;
 
+	private boolean fInitialReconcileDone;
+	private IProgressMonitor fMonitor;
+	/**
+	 * The folder that calculates folding positions for this editor.
+	 */
+	private IFoldingComputer folder;
 	/**
 	 * Code Folding.
 	 */
 	private Map<ProjectionAnnotation, Position> fPositions = new HashMap<ProjectionAnnotation, Position>();
-
-	private IProgressMonitor fMonitor;
-
-	private IFoldingComputer folder;
+	/**
+	 * Flag used to auto-expand outlines to 2nd level on first open.
+	 */
+	private boolean autoExpanded;
 
 	private IPropertyListener propertyListener = new IPropertyListener()
 	{
-
 		public void propertyChanged(Object source, int propId)
 		{
 			if (propId == IEditorPart.PROP_INPUT)
@@ -56,69 +88,30 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		}
 	};
 
-	private boolean isInitialReconcile;
-	private IParseListener parseListener = new IParseListener()
-	{
-
-		public void afterParse(IParseState parseState)
-		{
-			if (fEditor == null)
-			{
-				return;
-			}
-			// only do folding and validation when parsing happened
-			try
-			{
-				if (fEditor.isFoldingEnabled())
-				{
-					calculatePositions(isInitialReconcile, fMonitor);
-				}
-				else
-				{
-					synchronized (fPositions)
-					{
-						fPositions.clear();
-					}
-					updatePositions();
-				}
-				fEditor.getFileService().validate();
-			}
-			catch (Exception e)
-			{
-				IdeLog.logError(CommonEditorPlugin.getDefault(), e);
-			}
-		}
-
-		public void beforeParse(IParseState parseState)
-		{
-		}
-
-		public void parseCompletedSuccessfully()
-		{
-		}
-	};
-
 	public CommonReconcilingStrategy(AbstractThemeableEditor editor)
 	{
 		fEditor = editor;
 		fEditor.addPropertyListener(propertyListener);
-		fEditor.getFileService().addListener(parseListener);
 	}
 
 	public void dispose()
 	{
 		if (fEditor != null)
 		{
-			fEditor.getFileService().removeListener(parseListener);
 			fEditor.removePropertyListener(propertyListener);
 			fEditor = null;
 		}
 		fPositions.clear();
 	}
 
-	public AbstractThemeableEditor getEditor()
+	protected AbstractThemeableEditor getEditor()
 	{
 		return fEditor;
+	}
+
+	protected IDocument getDocument()
+	{
+		return fDocument;
 	}
 
 	public void reconcile(IRegion partition)
@@ -134,7 +127,8 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	public void setDocument(IDocument document)
 	{
 		folder = createFoldingComputer(document);
-		fEditor.getFileService().setDocument(document);
+		fDocument = document;
+		autoExpanded = false;
 	}
 
 	protected IFoldingComputer createFoldingComputer(IDocument document)
@@ -157,18 +151,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		fMonitor = monitor;
 	}
 
-	public void aboutToBeReconciled()
-	{
-	}
-
-	public void notifyListeners(boolean notify)
-	{
-	}
-
-	public void reconciled()
-	{
-	}
-
+	// FIXME Can folding be made into a build participant?
 	protected void calculatePositions(boolean initialReconcile, IProgressMonitor monitor)
 	{
 		if (monitor != null && monitor.isCanceled())
@@ -229,9 +212,196 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 
 	private void reconcile(boolean initialReconcile, boolean force)
 	{
-		isInitialReconcile = initialReconcile;
-		// doing a full parse at the moment
-		fEditor.getFileService().parse(force, fMonitor);
+		SubMonitor monitor = SubMonitor.convert(fMonitor, 100);
+
+		refreshOutline();
+		monitor.worked(5);
+
+		// FIXME only do folding and validation when the source was changed
+		if (fEditor.isFoldingEnabled())
+		{
+			calculatePositions(initialReconcile, monitor.newChild(20));
+		}
+		else
+		{
+			synchronized (fPositions)
+			{
+				fPositions.clear();
+			}
+			updatePositions();
+		}
+		monitor.setWorkRemaining(75);
+
+		if (monitor.isCanceled())
+		{
+			return;
+		}
+
+		runParticipants(monitor.newChild(75));
+	}
+
+	private void refreshOutline()
+	{
+		// TODO Does this need to be run in asyncExec here?
+		Display.getDefault().asyncExec(new Runnable()
+		{
+			public void run()
+			{
+				if (fEditor == null || !fEditor.hasOutlinePageCreated())
+				{
+					return;
+				}
+
+				IParseNode node = fEditor.getAST();
+				if (node == null)
+				{
+					return;
+				}
+
+				CommonOutlinePage page = fEditor.getOutlinePage();
+				page.refresh();
+
+				if (!autoExpanded)
+				{
+					page.expandToLevel(2);
+					autoExpanded = true;
+				}
+			}
+		});
+	}
+
+	/**
+	 * Runs through the {@link IBuildParticipant}s that apply to this editor's underlying file.
+	 * 
+	 * @param monitor
+	 */
+	private void runParticipants(IProgressMonitor monitor)
+	{
+		final IFile file = getFile();
+		// We only want to build files that exist and aren't derived or team private!
+		if (ResourceUtil.shouldIgnore(file))
+		{
+			return;
+		}
+
+		String contentTypeId = fEditor.getContentType();
+		IBuildParticipantManager manager = BuildPathCorePlugin.getDefault().getBuildParticipantManager();
+		List<IBuildParticipant> participants = manager.getBuildParticipants(contentTypeId);
+		if (CollectionsUtil.isEmpty(participants))
+		{
+			return;
+		}
+		participants = filterToEnabled(participants);
+		if (CollectionsUtil.isEmpty(participants))
+		{
+			return;
+		}
+
+		SubMonitor sub = SubMonitor.convert(monitor, (participants.size() * 12) + 10);
+		ReconcileContext context = createContext();
+		for (IBuildParticipant participant : participants)
+		{
+			participant.buildStarting(context.getProject(), IncrementalProjectBuilder.INCREMENTAL_BUILD,
+					sub.newChild(1));
+		}
+		for (IBuildParticipant participant : participants)
+		{
+			participant.buildFile(context, sub.newChild(10));
+		}
+		for (IBuildParticipant participant : participants)
+		{
+			participant.buildEnding(sub.newChild(1));
+		}
+		reportProblems(context, sub.newChild(10));
+		sub.done();
+	}
+
+	/**
+	 * Creates and returns a {@link ReconcileContext}.
+	 * 
+	 * @return A {@link ReconcileContext}.
+	 */
+	protected ReconcileContext createContext()
+	{
+		return new ReconcileContext(fEditor.getContentType(), getFile(), fDocument.get());
+	}
+
+	private List<IBuildParticipant> filterToEnabled(List<IBuildParticipant> participants)
+	{
+		return CollectionsUtil.filter(participants, new IFilter<IBuildParticipant>()
+		{
+			public boolean include(IBuildParticipant item)
+			{
+				return item != null && item.isEnabled(BuildType.RECONCILE);
+			}
+		});
+	}
+
+	/**
+	 * Reports problems found in reconcile to the annotation model so we can draw them on the editor without creating
+	 * markers on the underlying resource.
+	 * 
+	 * @param context
+	 * @param monitor
+	 */
+	private void reportProblems(ReconcileContext context, IProgressMonitor monitor)
+	{
+		if (fEditor == null)
+		{
+			return;
+		}
+
+		IDocumentProvider docProvider = fEditor.getDocumentProvider();
+		if (docProvider == null)
+		{
+			return;
+		}
+
+		IEditorInput editorInput = fEditor.getEditorInput();
+		if (editorInput == null)
+		{
+			return;
+		}
+
+		IAnnotationModel model = docProvider.getAnnotationModel(editorInput);
+		if (!(model instanceof CommonAnnotationModel))
+		{
+			return;
+		}
+
+		CommonAnnotationModel caModel = (CommonAnnotationModel) model;
+		caModel.setProgressMonitor(monitor);
+
+		// Collect all the problems into a single collection...
+		Map<String, Collection<IProblem>> mapProblems = context.getProblems();
+		Collection<IProblem> allProblems = new ArrayList<IProblem>();
+		for (Collection<IProblem> problemsForMarkerType : mapProblems.values())
+		{
+			if (!CollectionsUtil.isEmpty(problemsForMarkerType))
+			{
+				allProblems.addAll(problemsForMarkerType);
+			}
+		}
+		// Now report them all to the annotation model!
+		caModel.reportProblems(allProblems);
+
+		caModel.setProgressMonitor(null);
+	}
+
+	protected IFile getFile()
+	{
+		if (fEditor != null)
+		{
+			IEditorInput editorInput = fEditor.getEditorInput();
+
+			if (editorInput instanceof IFileEditorInput)
+			{
+				IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
+				return fileEditorInput.getFile();
+			}
+		}
+
+		return null;
 	}
 
 	public void fullReconcile()

@@ -7,13 +7,12 @@
  */
 package com.aptana.editor.css.text;
 
+import java.text.MessageFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IInformationControl;
-import org.eclipse.jface.text.IInformationControlCreator;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.ITextHoverExtension;
@@ -21,28 +20,29 @@ import org.eclipse.jface.text.ITextHoverExtension2;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IEditorPart;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.contentassist.CommonTextHover;
-import com.aptana.editor.common.parsing.FileService;
+import com.aptana.editor.common.hover.CustomBrowserInformationControl;
 import com.aptana.editor.css.CSSColors;
-import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.css.contentassist.CSSIndexQueryHelper;
 import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.contentassist.model.PropertyElement;
 import com.aptana.editor.css.parsing.ast.CSSDeclarationNode;
 import com.aptana.editor.css.parsing.ast.CSSFunctionNode;
 import com.aptana.editor.css.parsing.ast.CSSNode;
-import com.aptana.editor.css.parsing.ast.ICSSNodeTypes;
 import com.aptana.editor.css.parsing.ast.CSSSimpleSelectorNode;
 import com.aptana.editor.css.parsing.ast.CSSTermListNode;
-import com.aptana.parsing.ParserPoolFactory;
+import com.aptana.editor.css.parsing.ast.ICSSNodeTypes;
 import com.aptana.parsing.ast.IParseNode;
 
 public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHoverExtension, ITextHoverExtension2
 {
+	// A table that displays the CSS color in its background
+	private static final String COLORED_TABLE = "<table style=\"background-color:{0}; width:100%; height:100%;\"><tr><td> </td></tr></table>"; //$NON-NLS-1$
+
 	private static class RegionInfo
 	{
 		public final IRegion region;
@@ -60,6 +60,53 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 
 	private Object info;
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.hover.AbstractDocumentationHover#getHeader(java.lang.Object,
+	 * org.eclipse.ui.IEditorPart, org.eclipse.jface.text.IRegion)
+	 */
+	@Override
+	public String getHeader(Object element, IEditorPart editorPart, IRegion hoverRegion)
+	{
+		if (element instanceof RGB)
+		{
+			return Messages.CSSTextHover_cssColorHeaderText;
+		}
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.hover.AbstractDocumentationHover#getDocumentation(java.lang.Object,
+	 * org.eclipse.ui.IEditorPart, org.eclipse.jface.text.IRegion)
+	 */
+	@Override
+	public String getDocumentation(Object element, IEditorPart editorPart, IRegion hoverRegion)
+	{
+		if (info instanceof String)
+		{
+			return info.toString();
+		}
+		else if (info instanceof RGB)
+		{
+			// Wrap the info color in a HTML table that is set with this background color.
+			return MessageFormat.format(COLORED_TABLE, getHexColor((RGB) info));
+		}
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.hover.AbstractDocumentationHover#populateToolbarActions(org.eclipse.jface.action.
+	 * ToolBarManager, com.aptana.editor.common.hover.CustomBrowserInformationControl)
+	 */
+	@Override
+	public void populateToolbarActions(ToolBarManager tbm, CustomBrowserInformationControl iControl)
+	{
+		// No toolbar actions for CSS (yet)
+
+	}
+
 	/**
 	 * getAST
 	 * 
@@ -70,7 +117,6 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 	protected IParseNode getAST(ITextViewer textViewer, int offset)
 	{
 		IParseNode ast = null;
-		boolean forceParse = true;
 
 		if (textViewer instanceof IAdaptable)
 		{
@@ -80,33 +126,7 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 
 			if (editor != null)
 			{
-				FileService fs = editor.getFileService();
-
-				if (fs != null)
-				{
-					fs.parse(null);
-
-					// TODO: check for failed parse status and abort?
-					ast = fs.getParseResult();
-
-					// we use this flag to prevent re-parsing of the document if the ast turns out to be null. No sense
-					// in parsing twice to get nothing
-					forceParse = false;
-				}
-			}
-		}
-
-		// if we couldn't get the AST via an editor's file service then parse content directly
-		if (forceParse)
-		{
-			try
-			{
-				IDocument document = textViewer.getDocument();
-
-				ast = ParserPoolFactory.parse(ICSSConstants.CONTENT_TYPE_CSS, document.get());
-			}
-			catch (Exception e)
-			{
+				ast = editor.getAST();
 			}
 		}
 
@@ -131,39 +151,11 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 			int blue = Integer.parseInt(m.group(3));
 
 			// @formatter:off
-			result = new RegionInfo(
-				new Region(node.getStartingOffset(), node.getLength()),
-				new RGB(red, green, blue)
-			);
+			result = new RegionInfo(new Region(node.getStartingOffset(), node.getLength()), new RGB(red, green, blue));
 			// @formatter:on
 		}
 
 		return result;
-	}
-
-	/*
-	 * @see org.eclipse.jface.text.ITextHoverExtension#getHoverControlCreator()
-	 */
-	public IInformationControlCreator getHoverControlCreator()
-	{
-		return new IInformationControlCreator()
-		{
-			public IInformationControl createInformationControl(Shell parent)
-			{
-				return new CSSTextHoverInformationControl(parent);
-			}
-		};
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.text.ITextHover#getHoverInfo(org.eclipse.jface.text.ITextViewer,
-	 * org.eclipse.jface.text.IRegion)
-	 */
-	public String getHoverInfo(ITextViewer textViewer, IRegion hoverRegion)
-	{
-		// Not called
-		return null;
 	}
 
 	/*
@@ -173,7 +165,7 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 	 */
 	public Object getHoverInfo2(ITextViewer textViewer, IRegion hoverRegion)
 	{
-		return (this.isHoverEnabled()) ? info : null;
+		return getHoverInfo(info, isBrowserControlAvailable(textViewer), null, getEditor(), hoverRegion);
 	}
 
 	/*
@@ -187,7 +179,6 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 
 		// grab document's parse model
 		IParseNode ast = getAST(textViewer, offset);
-
 		if (ast != null)
 		{
 			IParseNode node = ast.getNodeAtOffset(offset);
@@ -201,7 +192,14 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 					case ICSSNodeTypes.TERM:
 					{
 						IParseNode parent = cssNode.getParent();
-
+						if (parent instanceof CSSTermListNode)
+						{
+							// find owning statement for this expression
+							while (parent instanceof CSSTermListNode)
+							{
+								parent = parent.getParent();
+							}
+						}
 						if (parent instanceof CSSDeclarationNode)
 						{
 							String text = cssNode.getText();
@@ -210,34 +208,28 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 							{
 								if (text.charAt(0) == '#')
 								{
-									result = new Region(cssNode.getStartingOffset(), cssNode.getLength());
 									info = CSSColors.hexToRGB(text);
 								}
 								else if (CSSColors.namedColorExists(text))
 								{
-									result = new Region(cssNode.getStartingOffset(), cssNode.getLength());
 									info = CSSColors.namedColorToRGB(text);
 								}
+								else
+								{
+									info = text;
+								}
+								result = new Region(cssNode.getStartingOffset(), cssNode.getLength());
 								break;
 							}
 						}
-						else if (parent instanceof CSSTermListNode)
+						else if (parent instanceof CSSFunctionNode)
 						{
-							// find owning statement for this expression
-							while (parent instanceof CSSTermListNode)
-							{
-								parent = parent.getParent();
-							}
+							RegionInfo ri = this.getFunctionRegionInfo((CSSFunctionNode) parent);
 
-							if (parent instanceof CSSFunctionNode)
+							if (ri != null)
 							{
-								RegionInfo ri = this.getFunctionRegionInfo((CSSFunctionNode) parent);
-
-								if (ri != null)
-								{
-									result = ri.region;
-									info = ri.info;
-								}
+								result = ri.region;
+								info = ri.info;
 							}
 						}
 						break;
@@ -303,9 +295,8 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 		if (result == null)
 		{
 			info = null;
-			result = new Region(offset, 0);
+			return new Region(offset, 0);
 		}
-
 		return result;
 	}
 }

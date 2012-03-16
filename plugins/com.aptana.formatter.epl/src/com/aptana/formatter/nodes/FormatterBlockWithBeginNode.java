@@ -42,6 +42,7 @@ public abstract class FormatterBlockWithBeginNode extends FormatterBlockNode
 		{
 			visitor.ensureLineStarted(context);
 		}
+		context.setBlankLines(getBlankLinesBefore(context));
 		boolean addingNewLine = isAddingBeginNewLine();
 		if (addingNewLine && !visitor.isInBlankLine())
 		{
@@ -53,6 +54,7 @@ public abstract class FormatterBlockWithBeginNode extends FormatterBlockNode
 		{
 			visitor.write(context, begin.getStartOffset(), begin.getEndOffset());
 		}
+		context.resetBlankLines();
 		final boolean indenting = isIndenting();
 		if (indenting)
 		{
@@ -81,6 +83,11 @@ public abstract class FormatterBlockWithBeginNode extends FormatterBlockNode
 
 		context.setBlankLines(getBlankLinesAfter(context));
 
+	}
+
+	protected int getBlankLinesBefore(IFormatterContext context)
+	{
+		return -1;
 	}
 
 	protected int getBlankLinesAfter(IFormatterContext context)

@@ -9,10 +9,15 @@
      ====================================================================== -->
 <project name="Studio" default="test">
 	<description>
-            Tests the RED_Core feature
+            Tests the Studio3 core feature
     </description>
 
 	<property file="build_local.properties" />
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
+		<classpath>
+			<pathelement location="${basedir}/ant-contrib/ant-contrib.jar" />
+		</classpath>
+	</taskdef>
 
 	<!-- Set up EMMA location and instrumentation path -->
 	<path id="emma.lib">
@@ -45,7 +50,7 @@
           target: generate.build.properties              
          ================================= -->
 	<target name="generate.build.properties" description="Takes in properties from build_local.properties and the command line overrides and generates a combined build.properties to use for the build">
-		<exec executable="hostname" outputproperty="computer.hostname"/>
+		<exec executable="hostname" outputproperty="computer.hostname" />
 		<echoproperties destfile="build.properties">
 			<propertyset negate="true">
 				<propertyref prefix="java." />
@@ -74,12 +79,6 @@
 		<delete dir="${buildDirectory}/${buildLabel}" failonerror="false" />
 		<delete dir="${baseLocation}" />
 		<delete dir="${buildDirectory}/features/org.eclipse.pde.build.container.feature" failonerror="false" />
-		<delete dir="${p2.repo.dir}" failonerror="false" />
-		<!-- Do a git clean of the build directory -->
-		<exec executable="/bin/bash" dir="${buildDirectory}">
-			<arg value="-c" />
-			<arg value="${git.executable} clean -f -d -x" />
-		</exec>
 		<delete file="build.properties" failonerror="false" />
 	</target>
 
@@ -102,32 +101,8 @@
 				<include name="**/*" />
 			</fileset>
 		</copy>
-		<antcall target="run.director">
-			<param name="p2.installIU" value="com.aptana.ide.feature.libraries.subscription.feature.group" />
-			<param name="p2.repo" value="${libraries-com.p2.repo}" />
-		</antcall>
-		<antcall target="run.director">
-			<param name="p2.installIU" value="com.aptana.webkitbrowser.feature.group" />
-			<param name="p2.repo" value="${webkit.p2.repo}" />
-		</antcall>
-		<!-- Install Studio Core feature -->
-		<antcall target="install.studio.core" />
-		<!-- FIXME For some reason even though we install RED Core, it doesn't pick it up for building the test plugins/fragments! -->
-		<antcall target="run.director">
-			<param name="p2.installIU" value="com.windowtester.runtime.feature.group" />
-			<param name="p2.repo" value="${windowtester.p2.repo}" />
-		</antcall>
 	</target>
 
-	<!-- - - - - - - - - - - - - - - - - - 
-          target: install.studio.core                      
-         - - - - - - - - - - - - - - - - - -->
-	<target name="install.studio.core" unless="dont.install.studio.core">
-		<antcall target="run.director">
-			<param name="p2.installIU" value="com.aptana.feature.feature.group" />
-			<param name="p2.repo" value="file:${studio3.p2.repo}" />
-		</antcall>
-	</target>
 	<!-- - - - - - - - - - - - - - - - - - 
           target: wipe.plugins                      
          - - - - - - - - - - - - - - - - - -->
@@ -167,25 +142,19 @@
 			<arg line="-application org.eclipse.equinox.p2.director" />
 			<arg line="-nosplash" />
 			<arg line="-consoleLog" />
-			<arg line="-metadataRepository ${p2.repo}" />
-			<arg line="-artifactRepository ${p2.repo}" />
+			<arg line="-repository ${p2.repo}" />
 			<arg line="-installIU ${p2.installIU}" />
 		</java>
 	</target>
 
 	<target name="-pre-test" description="Install test features and do pre-test setup.">
-		<!-- Install the test feature we just built -->
+		<!-- Unzip Eclipse Testing Framework and... -->
+		<unzip src="eclipse-test-framework-3.6.zip" dest="${baseLocation}/dropins" />
+		<!-- Install the test feature we just built along with eclipse test framework -->
 		<antcall target="run.director">
-			<param name="p2.installIU" value="${topLevelElementId}.feature.group" />
-			<param name="p2.repo" value="file:${p2.repo.dir}" />
+			<param name="p2.installIU" value="com.aptana.feature.feature.group,com.windowtester.runtime.feature.group,${topLevelElementId}.feature.group" />
+			<param name="p2.repo" value="${studio3.p2.repo},${windowtester.p2.repo},file:${deploy.dir}" />
 		</antcall>
-		<!-- Add Eclipse Testing Framework -->
-		<unzip src="eclipse-test-framework-3.6.zip" dest="${baseLocation}/test-framework" />
-		<antcall target="run.director">
-			<param name="p2.installIU" value="org.eclipse.test.feature.group" />
-			<param name="p2.repo" value="file:${baseLocation}/test-framework/eclipse" />
-		</antcall>
-
 		<!-- Modify the plugin_custimization.ini to set initial properties for tests! -->
 		<concat append="true" destfile="${baseLocation}/plugins/org.eclipse.sdk_3.6.0.v201006080911/plugin_customization.ini">
 			<filelist dir="${basedir}/prefs" files="plugin_customization.ini" />
@@ -241,8 +210,22 @@
 		<antcall target="clean.after" />
 	</target>
 
-	<target name="performance" depends="build">
+	<target name="performance" depends="generate.build.properties,copy.base.windows,copy.base">
 		<antcall target="-pre-test" />
+
+		<!-- Don't build, assume unit test built already ran and we can just re-use it! -->
+		<!-- Grab the version number of build we're testing -->
+		<pathconvert property="studio.version">
+			<dirset dir="${baseLocation}/features">
+				<include name="com.aptana.feature_*" />
+			</dirset>
+			<chainedmapper>
+				<flattenmapper />
+				<regexpmapper from="^com\.aptana\.feature_([\d\.]+)\-.*$$" to="\1" />
+			</chainedmapper>
+		</pathconvert>
+
+		<echo message="Running performance tests on Studio ${studio.version}, on host: ${computer.hostname}, java version: ${java.version}" />
 
 		<!-- Run the tests. -->
 		<antcall target="run-perf-test">
@@ -285,20 +268,19 @@
 			<property name="extraVMargs" value="-Demma.coverage.out.file=${coverageDirectory}/coverage.emma -Dosgi.dev=${basedir}/lib/emma.jar -Djunit.properties=${basedir}/build.properties" />
 		</ant>
 	</target>
-	
+
 	<target name="run-perf-test">
-    <ant target="ui-test" antfile="${library-file}" dir="${baseLocation}">
-      <reference refid="emma.lib" />
-      <property name="extra.java-test.classpath" value="emma.lib" />
-      <property name="timeout" value="${test.timeout}" />
-      <property name="os" value="${baseos}" />
-      <property name="ws" value="${basews}" />
-      <property name="arch" value="${basearch}" />
-      <property name="eclipse-home" value="${baseLocation}" />
-      <property name="data-dir" value="${baseLocation}/junit-workspace -clean" />
-      <property name="plugin-name" value="${test.plugin}" />
-      <property name="classname" value="${test.classname}" />
-      <property name="extraVMargs" value="-ea -Demma.coverage.out.file=${coverageDirectory}/coverage.emma -Dosgi.dev=${basedir}/lib/emma.jar -Djunit.properties=${basedir}/build.properties -Declipse.perf.dbloc= -Declipse.perf.config=build=R3.0.0beta;host=${computer.hostname};jvm=1.6.0_03-b05 -Declipse.perf.assertAgainst=build=R3.0.0beta -Dsetup.override.eclipseArgs=vm=/usr/bin/java" />
-    </ant>
-  </target>
+		<ant target="ui-test" antfile="${library-file}" dir="${baseLocation}">
+			<property name="timeout" value="${test.timeout}" />
+			<property name="test.target" value="performance" />
+			<property name="os" value="${baseos}" />
+			<property name="ws" value="${basews}" />
+			<property name="arch" value="${basearch}" />
+			<property name="eclipse-home" value="${baseLocation}" />
+			<property name="data-dir" value="${baseLocation}/junit-workspace -clean" />
+			<property name="plugin-name" value="${test.plugin}" />
+			<property name="classname" value="${test.classname}" />
+			<property name="extraVMargs" value="-XX:MaxPermSize=384m -Djunit.properties=${basedir}/build.properties -Declipse.perf.dbloc=${perf.db} -Declipse.perf.config=build=${studio.version};host=${computer.hostname};jvm=${java.version} -Dsetup.override.eclipseArgs=vm=/usr/bin/java ${extraPerfArgs}" />
+		</ant>
+	</target>
 </project>

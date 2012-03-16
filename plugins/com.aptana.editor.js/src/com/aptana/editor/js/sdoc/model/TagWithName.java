@@ -49,14 +49,14 @@ public class TagWithName extends Tag
 		}
 		else
 		{
-			writer.print(type.toString()).print(" {").print(this._name).print('}'); //$NON-NLS-1$ //$NON-NLS-2$
+			writer.print(type.toString()).print(" {").print(this._name).print('}'); //$NON-NLS-1$
 		}
 
 		String text = this.getText();
 
 		if (text != null && !StringUtil.isEmpty(text))
 		{
-			writer.print(' ').print(text); //$NON-NLS-1$
+			writer.print(' ').print(text);
 		}
 	}
 }

@@ -18,9 +18,41 @@ module Ruble
     def expansion
       @jobj.expansion
     end
-    
+
     def expansion=(expansion)
       @jobj.expansion = expansion
+    end
+        
+    def icon_path=(icon_path)
+      @jobj.icon_path = icon_path.to_s
+    end
+    
+    def icon_path
+      @jobj.icon_path.to_s
+    end
+
+    def category=(category)
+      @jobj.category = category.to_s
+    end
+    
+    def category
+      @category.category.to_s
+    end
+            
+    def tags=(tags)
+      @jobj.tags = tags
+    end
+    
+    def tags
+      @tags.tags
+    end
+    
+    def description=(description)
+      @jobj.description = description.to_s
+    end
+    
+    def description
+      @description.description.to_s
     end
     
     def to_env
@@ -39,6 +71,9 @@ module Ruble
         expansion: #{expansion}
         keys:   #{key_binding}
         scope:     #{scope}
+        icon_path: #{icon_path}
+        category:  #{category}
+        tags:	   #{tags}
       )
       EOS
     end

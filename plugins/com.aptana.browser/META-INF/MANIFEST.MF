@@ -14,5 +14,6 @@ Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.browser,
  com.aptana.browser.internal,
- com.aptana.browser.parts
+ com.aptana.browser.parts,
+ com.aptana.browser.support
 Eclipse-ExtensibleAPI: true

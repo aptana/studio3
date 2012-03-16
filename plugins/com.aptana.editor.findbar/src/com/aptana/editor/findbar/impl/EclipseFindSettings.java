@@ -19,6 +19,7 @@ import org.eclipse.ui.internal.texteditor.TextEditorPlugin;
  * 
  * @author fabioz
  */
+@SuppressWarnings("restriction")
 public class EclipseFindSettings
 {
 

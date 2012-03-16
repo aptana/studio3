@@ -455,7 +455,7 @@ public class SchemaElement implements ISchemaElement
 			{
 				SourcePrinter writer = new SourcePrinter();
 
-				writer.print('<').print(this._name).print("> requires a '").print(name).println("' attribute"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				writer.print('<').print(this._name).print("> requires a '").print(name).println("' attribute"); //$NON-NLS-1$ //$NON-NLS-2$
 				this.getOwningSchema().buildErrorMessage(writer, this._name, attributes);
 
 				throw new SAXException(writer.toString());

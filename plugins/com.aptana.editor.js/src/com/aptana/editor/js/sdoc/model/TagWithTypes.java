@@ -68,20 +68,20 @@ public class TagWithTypes extends Tag
 				}
 				else
 				{
-					writer.print(','); //$NON-NLS-1$
+					writer.print(',');
 				}
 
 				type.toSource(writer);
 			}
 		}
 
-		writer.print('}'); //$NON-NLS-1$
+		writer.print('}');
 
 		String text = this.getText();
 
 		if (text != null && !StringUtil.isEmpty(text))
 		{
-			writer.print(' ').print(text); //$NON-NLS-1$
+			writer.print(' ').print(text);
 		}
 	}
 }

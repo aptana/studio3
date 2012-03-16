@@ -43,7 +43,7 @@ public class WebServerPreviewHandler implements IPreviewHandler {
 					return new PreviewConfig(uri.toURL());
 				}
 			} else {
-				for (IURIMapper configuration : WebServerCorePlugin.getDefault().getServerConfigurationManager().getServerConfigurations()) {
+				for (IURIMapper configuration : WebServerCorePlugin.getDefault().getServerManager().getServers()) {
 					URI uri = configuration.resolve(config.getFileStore());
 					if (uri != null) {
 						return new PreviewConfig(uri.toURL());

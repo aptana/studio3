@@ -7,7 +7,13 @@
  */
 package com.aptana.editor.js;
 
+import java.text.MessageFormat;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
+
 import org.eclipse.osgi.util.NLS;
+
+import com.aptana.core.logging.IdeLog;
 
 public class Messages extends NLS
 {
@@ -17,11 +23,37 @@ public class Messages extends NLS
 	public static String JSMetadataLoader_RebuildingProjectIndexError_Message;
 	public static String JSMetadataLoader_RebuildingProjectIndexError_Title;
 	public static String Loading_Metadata;
+	public static String openDeclaration_label;
+	private static ResourceBundle fResourceBundle;
 
 	static
 	{
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+	}
+
+	public static ResourceBundle getResourceBundle()
+	{
+		if (fResourceBundle == null)
+		{
+			try
+			{
+				fResourceBundle = ResourceBundle.getBundle(BUNDLE_NAME);
+			}
+			catch (MissingResourceException x)
+			{
+				// @formatter:off
+				String message = MessageFormat.format(
+					"Error retrieving the resource bundle for {0}: {1}", //$NON-NLS-1$
+					Messages.class.getName(),
+					x.getMessage()
+				);
+				// @formatter:on
+
+				IdeLog.logError(JSPlugin.getDefault(), message);
+			}
+		}
+		return fResourceBundle;
 	}
 
 	private Messages()

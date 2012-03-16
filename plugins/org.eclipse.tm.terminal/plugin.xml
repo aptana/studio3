@@ -13,7 +13,7 @@
 # Michael Scharf (Wind River) - [237425] undefined tm.terminal command
 -->
 <plugin>
-   <extension-point id="terminalConnectors" name="Terminal Connectors" schema="schema/terminalConnectors.exsd"/>
+   <extension-point id="terminalConnectors" name="%extension-point.terminal.connectors.name" schema="schema/terminalConnectors.exsd"/>
    <extension point="org.eclipse.ui.contexts">           
       <context
             name="%terminal.context.name"

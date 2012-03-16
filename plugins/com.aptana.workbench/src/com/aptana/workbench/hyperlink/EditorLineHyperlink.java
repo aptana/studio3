@@ -9,6 +9,7 @@ package com.aptana.workbench.hyperlink;
 
 import java.io.File;
 import java.net.URI;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,6 +51,7 @@ import org.eclipse.ui.part.ISetSelectionTarget;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.explorer.IExplorerUIConstants;
 import com.aptana.terminal.editor.TerminalEditor;
 import com.aptana.terminal.views.TerminalView;
@@ -58,6 +60,8 @@ import com.aptana.workbench.WorkbenchPlugin;
 
 public class EditorLineHyperlink implements IHyperlink
 {
+
+	private static final String SCHEME_FILE = "file"; //$NON-NLS-1$
 
 	private Region region;
 	private String filepath;
@@ -82,7 +86,7 @@ public class EditorLineHyperlink implements IHyperlink
 
 	public String getHyperlinkText()
 	{
-		return this.filepath + ":" + lineNumber; //$NON-NLS-1$
+		return MessageFormat.format("{0}:{1}", this.filepath, lineNumber); //$NON-NLS-1$
 	}
 
 	public void open()
@@ -105,14 +109,14 @@ public class EditorLineHyperlink implements IHyperlink
 		}
 		catch (CoreException e)
 		{
-			WorkbenchPlugin.log(e);
+			IdeLog.logError(WorkbenchPlugin.getDefault(), e);
 		}
 	}
 
 	protected void openDirectory(IWorkbenchPage page, IFileStore store) throws CoreException
 	{
 		URI uri = store.toURI();
-		if (!"file".equals(uri.getScheme())) //$NON-NLS-1$
+		if (!SCHEME_FILE.equals(uri.getScheme()))
 		{
 			return;
 		}
@@ -270,7 +274,7 @@ public class EditorLineHyperlink implements IHyperlink
 		}
 		catch (BadLocationException e)
 		{
-			WorkbenchPlugin.log(e);
+			IdeLog.logError(WorkbenchPlugin.getDefault(), e);
 		}
 		provider.disconnect(pInput);
 	}

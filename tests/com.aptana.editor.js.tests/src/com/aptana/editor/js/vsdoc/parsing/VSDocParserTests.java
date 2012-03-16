@@ -115,7 +115,7 @@ public class VSDocParserTests extends TestCase
 
 		try
 		{
-			parser.loadXML(input);
+			parser.loadXML(input, resource);
 		}
 		catch (Exception e)
 		{

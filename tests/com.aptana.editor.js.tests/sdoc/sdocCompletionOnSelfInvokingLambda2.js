@@ -1,0 +1,2 @@
+/**|
+(function(one, two, three))()

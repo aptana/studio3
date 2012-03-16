@@ -16,6 +16,7 @@ import java.util.Map;
 
 import org.jruby.RubyRegexp;
 
+import com.aptana.core.util.ObjectUtil;
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
 import com.aptana.scope.ScopeSelector;
@@ -93,16 +94,16 @@ public class BundleElement extends AbstractElement
 
 			synchronized (this._children)
 			{
-				if (this._children.contains(element) == false)
+				// removes the equivalent element if one exists
+				this._children.remove(element);
+
+				context = this.getVisibilityContext(element.getClass());
+
+				this._children.add(element);
+
+				if (context != null)
 				{
-					context = this.getVisibilityContext(element.getClass());
-
-					this._children.add(element);
-
-					if (context != null)
-					{
-						context.updateElementContext();
-					}
+					context.updateElementContext();
 				}
 			}
 
@@ -229,7 +230,7 @@ public class BundleElement extends AbstractElement
 	{
 		synchronized (this._children)
 		{
-			this._children = new ArrayList<AbstractBundleElement>();
+			this._children.clear();
 		}
 		if (children != null)
 		{
@@ -704,6 +705,22 @@ public class BundleElement extends AbstractElement
 	}
 
 	/**
+	 * @return the list of snippets contributed
+	 */
+	public List<SnippetElement> getSnippets()
+	{
+		return this.getChildrenByType(SnippetElement.class);
+	}
+
+	/**
+	 * @return the list of snippet categories contributed
+	 */
+	public List<SnippetCategoryElement> getSnippetCategories()
+	{
+		return this.getChildrenByType(SnippetCategoryElement.class);
+	}
+
+	/**
 	 * getGitRepo
 	 * 
 	 * @return
@@ -779,7 +796,7 @@ public class BundleElement extends AbstractElement
 		// calculated display name we generate in this class
 		String displayName = super.getDisplayName();
 
-		return !StringUtil.isEmpty(displayName) && StringUtil.areNotEqual(displayName, this.getDefaultName());
+		return !StringUtil.isEmpty(displayName) && ObjectUtil.areNotEqual(displayName, this.getDefaultName());
 	}
 
 	/**

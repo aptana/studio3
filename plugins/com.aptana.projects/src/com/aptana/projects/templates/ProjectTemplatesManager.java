@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
@@ -20,6 +21,7 @@ import org.osgi.framework.Bundle;
 
 import com.aptana.core.projects.templates.IProjectTemplate;
 import com.aptana.core.projects.templates.TemplateType;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.ResourceUtil;
@@ -150,7 +152,12 @@ public class ProjectTemplatesManager
 					{
 						readElement(element);
 					}
-				}, ELEMENT_TEMPLATEINFO);
+
+					public Set<String> getSupportElementNames()
+					{
+						return CollectionsUtil.newSet(ELEMENT_TEMPLATEINFO);
+	}
+				});
 	}
 
 	private void readElement(IConfigurationElement element)
@@ -214,9 +221,8 @@ public class ProjectTemplatesManager
 
 	private void loadTemplatesFromBundles()
 	{
-		List<IProjectTemplate> templates = BundleManager.getInstance().getProjectTemplates(new IModelFilter()
+		List<ProjectTemplateElement> templates = BundleManager.getInstance().getProjectTemplates(new IModelFilter()
 		{
-
 			public boolean include(AbstractElement element)
 			{
 				return (element instanceof ProjectTemplateElement);

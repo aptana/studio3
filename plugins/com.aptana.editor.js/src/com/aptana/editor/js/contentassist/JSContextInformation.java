@@ -7,39 +7,39 @@
  */
 package com.aptana.editor.js.contentassist;
 
-import java.util.List;
+import java.net.URI;
 
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationExtension;
 import org.eclipse.swt.graphics.Image;
 
-import com.aptana.core.util.FileUtil;
-import com.aptana.core.util.StringUtil;
+import com.aptana.editor.js.contentassist.model.FunctionElement;
 
 /**
  * @author klindsey
  */
 public class JSContextInformation implements IContextInformation, IContextInformationExtension
 {
+
 	public static final String DESCRIPTION_DELIMITER = "\ufeff"; //$NON-NLS-1$
-	private static final String LINE_DELIMITER = FileUtil.NEW_LINE + DESCRIPTION_DELIMITER; //$NON-NLS-1$
 
 	private String _contextString;
 	private String _infoString;
 	private int _offset;
+	private FunctionElement _function;
+	private URI _uri;
 
 	/**
 	 * JSContextInformation
 	 * 
-	 * @param contextDisplayString
-	 * @param informationDisplayStrings
+	 * @param function
+	 * @param uri
 	 * @param informationPosition
 	 */
-	public JSContextInformation(String contextDisplayString, List<String> informationDisplayStrings,
-			int informationPosition)
+	public JSContextInformation(FunctionElement function, URI uri, int informationPosition)
 	{
-		this._contextString = contextDisplayString;
-		this._infoString = StringUtil.join(LINE_DELIMITER, informationDisplayStrings);
+		this._function = function;
+		this._uri = uri;
 		this._offset = informationPosition;
 	}
 
@@ -49,7 +49,17 @@ public class JSContextInformation implements IContextInformation, IContextInform
 	 */
 	public String getContextDisplayString()
 	{
+		lazyLoad();
 		return this._contextString;
+	}
+
+	private synchronized void lazyLoad()
+	{
+		if (this._contextString == null)
+		{
+			this._contextString = JSModelFormatter.CONTEXT_INFO.getHeader(this._function, this._uri);
+			this._infoString = JSModelFormatter.CONTEXT_INFO.getDocumentation(this._function);
+		}
 	}
 
 	/*
@@ -76,6 +86,7 @@ public class JSContextInformation implements IContextInformation, IContextInform
 	 */
 	public String getInformationDisplayString()
 	{
+		lazyLoad();
 		return this._infoString;
 	}
 }

@@ -8,16 +8,17 @@
 package com.aptana.editor.js.contentassist.index;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URI;
+import java.util.List;
 
-import org.eclipse.core.filesystem.EFS;
-import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.model.AliasElement;
@@ -25,6 +26,7 @@ import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.index.core.AbstractFileIndexingParticipant;
 import com.aptana.index.core.Index;
+import com.aptana.index.core.build.BuildContext;
 import com.aptana.json.SchemaContext;
 
 /**
@@ -32,98 +34,30 @@ import com.aptana.json.SchemaContext;
  */
 public class JSCAFileIndexingParticipant extends AbstractFileIndexingParticipant
 {
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.index.core.AbstractFileIndexingParticipant#indexFileStore(com.aptana.index.core.Index,
-	 * org.eclipse.core.filesystem.IFileStore, org.eclipse.core.runtime.IProgressMonitor)
-	 */
-	protected void indexFileStore(Index index, IFileStore file, IProgressMonitor monitor)
+	public void index(BuildContext context, Index index, IProgressMonitor monitor) throws CoreException
 	{
-		SubMonitor sub = SubMonitor.convert(monitor, 100);
-
-		if (file == null)
+		if (context == null || index == null)
 		{
 			return;
 		}
 
+		SubMonitor sub = SubMonitor.convert(monitor, 100);
 		try
 		{
-			InputStreamReader isr = null;
+			sub.subTask(getIndexingMessage(index, context.getURI()));
 
-			sub.subTask(getIndexingMessage(index, file));
+			JSCAReader reader = new JSCAReader();
+			SchemaContext schemaContext = new SchemaContext();
+			JSCAHandler handler = new JSCAHandler();
+			schemaContext.setHandler(handler);
 
+			Reader isr = null;
 			try
 			{
-				JSCAReader reader = new JSCAReader();
-				SchemaContext context = new SchemaContext();
-				JSCAHandler handler = new JSCAHandler();
-
-				context.setHandler(handler);
-
-				InputStream stream = file.openInputStream(EFS.NONE, sub.newChild(20));
-				isr = new InputStreamReader(stream);
-
 				// parse
-				reader.read(isr, context);
-				sub.worked(50);
-
-				// create new Window type for this file
-				JSIndexReader jsir = new JSIndexReader();
-				TypeElement window = jsir.getType(index, JSTypeConstants.WINDOW_TYPE, true);
-
-				if (window == null)
-				{
-					window = new TypeElement();
-					window.setName(JSTypeConstants.WINDOW_TYPE);
-				}
-
-				// process results
-				JSIndexWriter indexer = new JSIndexWriter();
-				TypeElement[] types = handler.getTypes();
-				AliasElement[] aliases = handler.getAliases();
-				URI location = file.toURI();
-
-				for (TypeElement type : types)
-				{
-					indexer.writeType(index, type, location);
-
-					String typeName = type.getName();
-
-					if (isGlobalProperty(type))
-					{
-						PropertyElement property = window.getProperty(typeName);
-
-						if (property == null)
-						{
-							property = new PropertyElement();
-
-							property.setName(typeName);
-							property.addType(typeName);
-
-							window.addProperty(property);
-						}
-					}
-				}
-
-				for (AliasElement alias : aliases)
-				{
-					PropertyElement property = new PropertyElement();
-
-					property.setName(alias.getName());
-					property.addType(alias.getType());
-
-					window.addProperty(property);
-				}
-
-				// write global type info
-				if (window.hasProperties())
-				{
-					indexer.writeType(index, window, location);
-				}
-			}
-			catch (Throwable e)
-			{
-				IdeLog.logError(JSPlugin.getDefault(), e);
+				isr = new InputStreamReader(context.openInputStream(sub.newChild(5)));
+				reader.read(isr, schemaContext);
+				sub.worked(45);
 			}
 			finally
 			{
@@ -138,6 +72,69 @@ public class JSCAFileIndexingParticipant extends AbstractFileIndexingParticipant
 					}
 				}
 			}
+
+			// create new Window type for this file
+			JSIndexReader jsir = new JSIndexReader();
+			List<TypeElement> windows = jsir.getType(index, JSTypeConstants.WINDOW_TYPE, true);
+			TypeElement window;
+
+			if (!CollectionsUtil.isEmpty(windows))
+			{
+				window = windows.get(windows.size() - 1);
+			}
+			else
+			{
+				window = new TypeElement();
+				window.setName(JSTypeConstants.WINDOW_TYPE);
+			}
+
+			// process results
+			JSIndexWriter indexer = new JSIndexWriter();
+			TypeElement[] types = handler.getTypes();
+			AliasElement[] aliases = handler.getAliases();
+			URI location = context.getURI();
+
+			for (TypeElement type : types)
+			{
+				indexer.writeType(index, type, location);
+
+				String typeName = type.getName();
+
+				if (isGlobalProperty(type))
+				{
+					PropertyElement property = window.getProperty(typeName);
+
+					if (property == null)
+					{
+						property = new PropertyElement();
+
+						property.setName(typeName);
+						property.addType(typeName);
+
+						window.addProperty(property);
+					}
+				}
+			}
+
+			for (AliasElement alias : aliases)
+			{
+				PropertyElement property = new PropertyElement();
+
+				property.setName(alias.getName());
+				property.addType(alias.getType());
+
+				window.addProperty(property);
+			}
+
+			// write global type info
+			if (window.hasProperties())
+			{
+				indexer.writeType(index, window, location);
+			}
+		}
+		catch (Throwable e)
+		{
+			IdeLog.logError(JSPlugin.getDefault(), e);
 		}
 		finally
 		{

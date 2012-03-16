@@ -36,6 +36,7 @@ import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.SWTError;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.dnd.DND;
@@ -69,6 +70,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Monitor;
+import org.eclipse.swt.widgets.Scrollable;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -83,6 +85,7 @@ import org.eclipse.ui.handlers.IHandlerActivation;
 import org.eclipse.ui.handlers.IHandlerService;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.StringUtil;
 import com.aptana.git.core.IDebugScopes;
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
@@ -114,7 +117,7 @@ class CommitDialog extends StatusDialog
 	private Image newFileImage;
 	private Image deletedFileImage;
 	private Image emptyFileImage;
-	private Browser diffArea;
+	private Scrollable diffArea;
 	private ChangedFile fLastDiffFile;
 
 	private StagingButtons unstageButtons;
@@ -236,11 +239,31 @@ class CommitDialog extends StatusDialog
 
 	private void createDiffArea(Composite container)
 	{
-		diffArea = new Browser(container, SWT.BORDER);
+		try
+		{
+			diffArea = new Browser(container, SWT.BORDER);
+		}
+		catch (SWTError e)
+		{
+			// most likely cause is that browser stuff isn't set up on Linux. We provide a warning message in validate()
+			diffArea = new Text(container, SWT.BORDER | SWT.MULTI);
+		}
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
 		data.heightHint = 300;
 		diffArea.setLayoutData(data);
-		diffArea.setText(Messages.CommitDialog_NoFileSelected);
+		setDiffText(Messages.CommitDialog_NoFileSelected);
+	}
+
+	private void setDiffText(String msg)
+	{
+		if (diffArea instanceof Browser)
+		{
+			((Browser) diffArea).setText(msg);
+		}
+		else
+		{
+			((Text) diffArea).setText(msg);
+		}
 	}
 
 	private void createUnstagedFileArea(SashForm sashForm)
@@ -684,7 +707,8 @@ class CommitDialog extends StatusDialog
 		// make a copy so we can erase from original table correctly since their flags get changed by operation
 		final List<ChangedFile> copy = new ArrayList<ChangedFile>(files);
 		Collections.copy(copy, new ArrayList<ChangedFile>(files));
-		if (gitRepository.index().unstageFiles(files))
+		IStatus status = gitRepository.index().unstageFiles(files);
+		if (status.isOK())
 		{
 			getParentShell().getDisplay().asyncExec(new Runnable()
 			{
@@ -712,7 +736,8 @@ class CommitDialog extends StatusDialog
 		// make a copy so we can erase from original table correctly since their flags get changed by operation
 		final List<ChangedFile> copy = new ArrayList<ChangedFile>(files);
 		Collections.copy(copy, new ArrayList<ChangedFile>(files));
-		if (gitRepository.index().stageFiles(files))
+		IStatus status = gitRepository.index().stageFiles(files);
+		if (status.isOK())
 		{
 			getParentShell().getDisplay().asyncExec(new Runnable()
 			{
@@ -764,8 +789,13 @@ class CommitDialog extends StatusDialog
 	private void updateDiff(final boolean staged, ChangedFile file)
 	{
 		if (file == null)
+		{
 			return;
-		if (gitRepository.index().hasBinaryAttributes(file) && !file.getStatus().equals(ChangedFile.Status.DELETED))
+		}
+		boolean isBrowser = (diffArea instanceof Browser);
+
+		if (isBrowser && gitRepository.index().hasBinaryAttributes(file)
+				&& !file.getStatus().equals(ChangedFile.Status.DELETED))
 		{
 			// Special code to draw the image if the binary file is an image
 			String[] imageExtensions = new String[] { ".png", ".gif", ".jpeg", ".jpg", ".ico" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
@@ -781,16 +811,21 @@ class CommitDialog extends StatusDialog
 		}
 		// Don't recalc if it's the same file as we are already showing
 		if (fLastDiffFile != null && file.equals(fLastDiffFile))
+		{
 			return;
+		}
 
 		String diff = gitRepository.index().diffForFile(file, staged, 3);
-		try
+		if (isBrowser)
 		{
-			diff = DiffFormatter.toHTML(file.getPath(), diff);
-		}
-		catch (Throwable t)
-		{
-			IdeLog.logError(GitUIPlugin.getDefault(), "Failed to turn diff into HTML", t, IDebugScopes.DEBUG); //$NON-NLS-1$
+			try
+			{
+				diff = DiffFormatter.toHTML(file.getPath(), diff);
+			}
+			catch (Throwable t)
+			{
+				IdeLog.logError(GitUIPlugin.getDefault(), "Failed to turn diff into HTML", t, IDebugScopes.DEBUG); //$NON-NLS-1$
+			}
 		}
 		updateDiff(file, diff);
 	}
@@ -806,7 +841,7 @@ class CommitDialog extends StatusDialog
 	{
 		if (diffArea != null && !diffArea.isDisposed())
 		{
-			diffArea.setText(diff);
+			setDiffText(diff);
 			fLastDiffFile = file;
 		}
 	}
@@ -891,7 +926,16 @@ class CommitDialog extends StatusDialog
 			return;
 		}
 		fMessage = commitMessage.getText();
-		updateStatus(Status.OK_STATUS);
+
+		if (!(diffArea instanceof Browser))
+		{
+			updateStatus(new Status(IStatus.WARNING, GitUIPlugin.getPluginId(),
+					Messages.CommitDialog_BrowserWidgetFailedMsg));
+		}
+		else
+		{
+			updateStatus(Status.OK_STATUS);
+		}
 	}
 
 	// TODO Change way dialog is composed to push buttons into commit message area like GitX?
@@ -923,7 +967,7 @@ class CommitDialog extends StatusDialog
 			if (success)
 			{
 				// commit worked, wipe commit message and staged files in table
-				commitMessage.setText(""); //$NON-NLS-1$
+				commitMessage.setText(StringUtil.EMPTY);
 				stagedTable.removeAll();
 				// TODO Show some sort of success message?
 			}

@@ -10,6 +10,7 @@ package com.aptana.parsing;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -17,17 +18,28 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.content.IContentTypeManager;
 
+import com.aptana.core.epl.util.LRUCache;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.internal.parsing.ParserPool;
+import com.aptana.parsing.ast.IParseError;
 import com.aptana.parsing.ast.IParseRootNode;
 
 public class ParserPoolFactory
 {
+	// extension point constants
+	private static final String PARSER_ID = "parser"; //$NON-NLS-1$
+	private static final String ELEMENT_PARSER = "parser"; //$NON-NLS-1$
+	private static final String ATTR_CONTENT_TYPE = "content-type"; //$NON-NLS-1$
 
 	private static ParserPoolFactory INSTANCE;
-
+	/**
+	 * A parse cache. Keyed by combo of content type and source hash, holds IParseRootNode result. Retains most recently
+	 * used ASTs.
+	 */
+	private LRUCache<String, IParseState> fParseCache;
 	private Map<String, IConfigurationElement> parsers;
 	private Map<String, IParserPool> pools;
 
@@ -59,17 +71,21 @@ public class ParserPoolFactory
 		// @formatter:off
 		EclipseUtil.processConfigurationElements(
 			ParsingPlugin.PLUGIN_ID,
-			"parser", //$NON-NLS-1$
+			PARSER_ID,
 			new IConfigurationElementProcessor()
 			{
 				public void processElement(IConfigurationElement element)
 				{
-					String contentType = element.getAttribute("content-type"); //$NON-NLS-1$
+					String contentType = element.getAttribute(ATTR_CONTENT_TYPE);
 
 					parsers.put(contentType, element);
 				}
-			},
-			"parser" //$NON-NLS-1$
+
+				public Set<String> getSupportElementNames()
+				{
+					return CollectionsUtil.newSet(ELEMENT_PARSER);
+				}
+			}
 		);
 		// @formatter:on
 
@@ -81,6 +97,7 @@ public class ParserPoolFactory
 	 */
 	private ParserPoolFactory()
 	{
+		fParseCache = new LRUCache<String, IParseState>(3);
 	}
 
 	/**
@@ -88,6 +105,12 @@ public class ParserPoolFactory
 	 */
 	synchronized void dispose()
 	{
+		if (fParseCache != null)
+		{
+			fParseCache.flush();
+			fParseCache = null;
+		}
+
 		if (pools != null)
 		{
 			// Clean all the parsers up!
@@ -168,12 +191,13 @@ public class ParserPoolFactory
 	 * 
 	 * @param contentTypeId
 	 * @param source
+	 * @param startingOffset
 	 * @return
 	 */
-	public static IParseRootNode parse(String contentTypeId, String source) throws Exception // $codepro.audit.disable
-																								// declaredExceptions
+	public static IParseRootNode parse(String contentTypeId, String source, int startingOffset) throws Exception // $codepro.audit.disable
+	// declaredExceptions
 	{
-		return parse(contentTypeId, source, null);
+		return parse(contentTypeId, source, startingOffset, null);
 	}
 
 	/**
@@ -183,11 +207,25 @@ public class ParserPoolFactory
 	 * @param source
 	 * @return
 	 */
-	public static IParseRootNode parse(String contentTypeId, String source, IProgressMonitor monitor) throws Exception // $codepro.audit.disable
+	public static IParseRootNode parse(String contentTypeId, String source) throws Exception // $codepro.audit.disable
+																								// declaredExceptions
+	{
+		return parse(contentTypeId, source, 0, null);
+	}
+
+	/**
+	 * parse
+	 * 
+	 * @param contentTypeId
+	 * @param source
+	 * @return
+	 */
+	public static IParseRootNode parse(String contentTypeId, String source, int startingOffset, IProgressMonitor monitor)
+			throws Exception // $codepro.audit.disable
 																														// declaredExceptions
 	{
 		ParseState parseState = new ParseState();
-		parseState.setEditState(source, null, 0, 0);
+		parseState.setEditState(source, startingOffset);
 		parseState.setProgressMonitor(monitor);
 
 		return parse(contentTypeId, parseState);
@@ -203,45 +241,81 @@ public class ParserPoolFactory
 	public static IParseRootNode parse(String contentTypeId, IParseState parseState) throws Exception // $codepro.audit.disable
 																										// declaredExceptions
 	{
-		if (contentTypeId == null)
+		return getInstance().doParse(contentTypeId, parseState);
+	}
+
+	/**
+	 * parse
+	 * 
+	 * @param contentTypeId
+	 * @param source
+	 * @return
+	 */
+	private IParseRootNode doParse(String contentTypeId, IParseState parseState) throws Exception // $codepro.audit.disable
+																									// declaredExceptions
+	{
+		try
 		{
-			return null;
-		}
-
-		IParserPool pool = getInstance().getParserPool(contentTypeId);
-		IParseRootNode result = null;
-
-		if (pool != null)
-		{
-			IParser parser = pool.checkOut();
-
-			if (parser != null)
+			if (contentTypeId == null)
 			{
-				try
+				return null;
+			}
+
+			int sourceHash = parseState.getSource().hashCode();
+			String key = MessageFormat.format("{0}:{1}", contentTypeId, sourceHash); //$NON-NLS-1$
+			IParseState cached = fParseCache.get(key);
+			if (cached != null && !cached.requiresReparse(parseState))
+			{
+				// copy over errors from old parse state to new one since we're not re-parsing
+				for (IParseError error : cached.getErrors())
 				{
-					result = parser.parse(parseState);
+					parseState.addError(error);
 				}
-				finally
+				return cached.getParseResult();
+			}
+
+			IParserPool pool = getParserPool(contentTypeId);
+			if (pool != null)
+			{
+				IParser parser = pool.checkOut();
+
+				if (parser != null)
 				{
-					pool.checkIn(parser);
+					try
+					{
+						IParseRootNode ast = parser.parse(parseState);
+						parseState.setParseResult(ast);
+						fParseCache.put(key, parseState);
+						return ast;
+					}
+					finally
+					{
+						pool.checkIn(parser);
+					}
+				}
+				else
+				{
+					String message = MessageFormat.format(Messages.ParserPoolFactory_Cannot_Acquire_Parser,
+							contentTypeId);
+					IdeLog.logError(ParsingPlugin.getDefault(), message, IDebugScopes.PARSING);
 				}
 			}
 			else
 			{
-				String message = MessageFormat.format(Messages.ParserPoolFactory_Cannot_Acquire_Parser, contentTypeId);
-				IdeLog.logError(ParsingPlugin.getDefault(), message, IDebugScopes.PARSING);
+				if (IdeLog.isInfoEnabled(ParsingPlugin.getDefault(), null))
+				{
+					String message = MessageFormat.format(Messages.ParserPoolFactory_Cannot_Acquire_Parser_Pool,
+							contentTypeId);
+					IdeLog.logInfo(ParsingPlugin.getDefault(), message, IDebugScopes.PARSING);
+				}
 			}
 		}
-		else
+		finally
 		{
-			if (IdeLog.isInfoEnabled(ParsingPlugin.getDefault(), null))
-			{
-				String message = MessageFormat.format(Messages.ParserPoolFactory_Cannot_Acquire_Parser_Pool,
-						contentTypeId);
-				IdeLog.logInfo(ParsingPlugin.getDefault(), message, IDebugScopes.PARSING);
-			}
+			// Clean up source inside parse state to help reduce RAM usage...
+			parseState.clearEditState();
 		}
 
-		return result;
+		return null;
 	}
 }

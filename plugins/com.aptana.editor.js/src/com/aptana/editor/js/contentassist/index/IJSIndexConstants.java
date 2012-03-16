@@ -28,7 +28,12 @@ public interface IJSIndexConstants
 	// 0.25 - Fix document.body type
 	// 0.26 - Fix parsing of arrays in this format: IDENT LPAREN RPAREN
 	// 0.27 - Add isInternal property to type elements
-	public static final double INDEX_VERSION = 0.27;
+	// 0.28 - Include events when reading/writing types from/to indexes. Generate "user type" names from context, if
+	// possible
+	// 0.29 - Update some DOM 2 content for Document
+	// 0.30 - Update some DOM 0 content for Window
+	// 0.31 - Added "requires" to index
+	public static final double INDEX_VERSION = 0.30;
 
 	// for debugging, comment the line above, and uncomment the following
 	// public static final double INDEX_VERSION = new Random().nextDouble() * 1e6;
@@ -40,18 +45,22 @@ public interface IJSIndexConstants
 	static final String DELIMITER = "\0"; //$NON-NLS-1$
 	static final String SUB_DELIMITER = ","; //$NON-NLS-1$
 	static final String CORE = "JS Core"; //$NON-NLS-1$
+	static final String NESTED_TYPE_SEPARATOR = "#"; //$NON-NLS-1$
 
 	// index categories
 	static final String TYPE = PREFIX + "type"; //$NON-NLS-1$
 	static final String FUNCTION = PREFIX + "function"; //$NON-NLS-1$
 	static final String PROPERTY = PREFIX + "property"; //$NON-NLS-1$
+	static final String EVENT = PREFIX + "event"; //$NON-NLS-1$
+	static final String REQUIRE = PREFIX + "require"; //$NON-NLS-1$
 
 	// @formatter:off
 	static final String[] ALL_CATEGORIES = new String[]
 	{
 		TYPE,
 		FUNCTION,
-		PROPERTY
+		PROPERTY,
+		EVENT
 	};
 	// @formatter:on
 

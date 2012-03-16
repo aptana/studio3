@@ -16,14 +16,15 @@ import java.util.Map;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.css.contentassist.index.ICSSIndexConstants;
-import com.aptana.editor.html.contentassist.index.IHTMLIndexConstants;
 import com.aptana.editor.html.contentassist.index.HTMLIndexReader;
+import com.aptana.editor.html.contentassist.index.IHTMLIndexConstants;
 import com.aptana.editor.html.contentassist.model.AttributeElement;
 import com.aptana.editor.html.contentassist.model.ElementElement;
 import com.aptana.editor.html.contentassist.model.EntityElement;
 import com.aptana.editor.html.contentassist.model.EventElement;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
+import com.aptana.index.core.IndexPlugin;
 
 public class HTMLIndexQueryHelper
 {
@@ -34,7 +35,12 @@ public class HTMLIndexQueryHelper
 	 */
 	public static Index getIndex()
 	{
-		return IndexManager.getInstance().getIndex(URI.create(IHTMLIndexConstants.METADATA_INDEX_LOCATION));
+		return getIndexManager().getIndex(URI.create(IHTMLIndexConstants.METADATA_INDEX_LOCATION));
+	}
+
+	protected static IndexManager getIndexManager()
+	{
+		return IndexPlugin.getDefault().getIndexManager();
 	}
 
 	private HTMLIndexReader _reader;
@@ -190,6 +196,17 @@ public class HTMLIndexQueryHelper
 	}
 
 	/**
+	 * Retrieve CSS file references from the current index
+	 * 
+	 * @param index
+	 * @return
+	 */
+	public Map<String, String> getCSSReferences(Index index)
+	{
+		return this._reader.getValues(index, IHTMLIndexConstants.RESOURCE_CSS);
+	}
+
+	/**
 	 * getElement
 	 * 
 	 * @param name
@@ -233,17 +250,6 @@ public class HTMLIndexQueryHelper
 	/**
 	 * getEvents
 	 * 
-	 * @param elementName
-	 * @return
-	 */
-	public List<EventElement> getEvents(String elementName)
-	{
-		return this.getEvents(this.getElement(elementName));
-	}
-
-	/**
-	 * getEvents
-	 * 
 	 * @param element
 	 * @return
 	 */
@@ -259,6 +265,17 @@ public class HTMLIndexQueryHelper
 	}
 
 	/**
+	 * getEvents
+	 * 
+	 * @param elementName
+	 * @return
+	 */
+	public List<EventElement> getEvents(String elementName)
+	{
+		return this.getEvents(this.getElement(elementName));
+	}
+
+	/**
 	 * Retrieve CSS IDs from the current index
 	 * 
 	 * @param index
@@ -267,5 +284,16 @@ public class HTMLIndexQueryHelper
 	public Map<String, String> getIDs(Index index)
 	{
 		return this._reader.getValues(index, ICSSIndexConstants.IDENTIFIER);
+	}
+
+	/**
+	 * Retrieve JS file references from the current index
+	 * 
+	 * @param index
+	 * @return
+	 */
+	public Map<String, String> getJSReferences(Index index)
+	{
+		return this._reader.getValues(index, IHTMLIndexConstants.RESOURCE_JS);
 	}
 }

@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.Platform;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSPlugin;
+import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.model.AliasElement;
 import com.aptana.editor.js.contentassist.model.EventElement;
 import com.aptana.editor.js.contentassist.model.EventPropertyElement;
@@ -364,7 +365,7 @@ public class JSCAHandler implements IContextHandler
 				break;
 
 			default:
-				// TODO: warn
+				log("Unrecognized element type name in JSCAHandler#addElement: " + elementTypeName); //$NON-NLS-1$
 		}
 	}
 
@@ -490,7 +491,10 @@ public class JSCAHandler implements IContextHandler
 				break;
 
 			default:
-				// TODO: warn
+				if (typeName != null && !typeName.startsWith(JSTypeConstants.GENERIC_ARRAY_OPEN))
+				{
+					log("Unrecognized type name in JSCAHandler#createType: " + typeName); //$NON-NLS-1$
+				}
 		}
 	}
 
@@ -537,7 +541,7 @@ public class JSCAHandler implements IContextHandler
 				}
 				else
 				{
-					IdeLog.logError(JSPlugin.getDefault(), Messages.JSCAHandler_Invalid_Type_Name + type);
+					log("Invalid type name: " + type); //$NON-NLS-1$
 				}
 			}
 		}
@@ -621,7 +625,10 @@ public class JSCAHandler implements IContextHandler
 
 				setIsInternal(namespace, isInternal);
 			}
-			// TODO: warn about missing type?
+			else
+			{
+				log("Unrecognized namespace in JSCAHandler#hideNamespace: " + namespace); //$NON-NLS-1$
+			}
 
 			// move back one more segment
 			namespace = getNamespace(namespace);
@@ -784,7 +791,7 @@ public class JSCAHandler implements IContextHandler
 					}
 					else
 					{
-						log(Messages.JSCAHandler_Invalid_Event_Property_Name + currentString);
+						log("Invalid event property name: " + currentString); //$NON-NLS-1$
 					}
 				}
 				else if (currentEvent != null)
@@ -795,7 +802,7 @@ public class JSCAHandler implements IContextHandler
 					}
 					else
 					{
-						log(Messages.JSCAHandler_Invalid_Event_Name + currentString);
+						log("Invalid event name: " + currentString); //$NON-NLS-1$
 					}
 				}
 				else if (currentProperty != null)
@@ -806,7 +813,7 @@ public class JSCAHandler implements IContextHandler
 					}
 					else
 					{
-						log(Messages.JSCAHandler_Invalid_Property_Name + currentString);
+						log("Invalid property name: " + currentString); //$NON-NLS-1$
 					}
 				}
 				else if (currentParameter != null)
@@ -817,7 +824,7 @@ public class JSCAHandler implements IContextHandler
 					}
 					else
 					{
-						log(Messages.JSCAHandler_Invalid_Parameter_Name + currentString);
+						log("Invalid parameter name: " + currentString); //$NON-NLS-1$
 					}
 				}
 				else if (currentFunction != null)
@@ -828,7 +835,7 @@ public class JSCAHandler implements IContextHandler
 					}
 					else
 					{
-						log(Messages.JSCAHandler_Invalid_Function_Name + currentString);
+						log("Invalid function name: " + currentString); //$NON-NLS-1$
 					}
 				}
 				else if (currentAlias != null)
@@ -839,7 +846,7 @@ public class JSCAHandler implements IContextHandler
 					}
 					else
 					{
-						log(Messages.JSCAHandler_Invalid_Alias + currentString);
+						log("Invalid alias: " + currentString); //$NON-NLS-1$
 					}
 				}
 				else if (currentType != null)
@@ -850,12 +857,12 @@ public class JSCAHandler implements IContextHandler
 					}
 					else
 					{
-						log(Messages.JSCAHandler_Invalid_Type_Name + currentString);
+						log("Invalid type name: " + currentString); //$NON-NLS-1$
 					}
 				}
 				else
 				{
-					log(Messages.JSCAHandler_Unable_To_Set_Name_Property);
+					log("Unable to set a name property"); //$NON-NLS-1$
 				}
 
 				currentString = null;
@@ -1068,7 +1075,7 @@ public class JSCAHandler implements IContextHandler
 				break;
 
 			default:
-				log(Messages.JSCAHandler_Unrecognized_Property_Name + propertyName);
+				log("Unrecognized property name: " + propertyName); //$NON-NLS-1$
 				break;
 		}
 	}

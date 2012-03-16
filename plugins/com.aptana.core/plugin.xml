@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension-point id="buildParticipants" name="%extension-point.buildparticipants.name" schema="schema/buildParticipants.exsd"/>
    <extension
          id="problem"
          name="%problem.marker.name"
@@ -32,19 +31,6 @@
       <super
             type="org.eclipse.core.resources.textmarker">
       </super>
-   </extension>
-  <extension
-         id="com.aptana.ide.core.unifiedBuilder"
-         name="%builder.name"
-         point="org.eclipse.core.resources.builders">
-      <builder
-            callOnEmptyDelta="true"
-            hasNature="false"
-            isConfigurable="false">
-         <run
-               class="com.aptana.core.build.UnifiedBuilder">
-         </run>
-      </builder>
    </extension>
   <extension
         point="org.eclipse.core.runtime.preferences">

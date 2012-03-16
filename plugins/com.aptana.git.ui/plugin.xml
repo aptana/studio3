@@ -229,13 +229,31 @@
       </command>
       <command
             id="com.aptana.git.ui.command.commit.dialog"
-            name="Perform Commit">
+            name="%command.commit.name">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
             defaultHandler="com.aptana.git.ui.internal.actions.RebaseBranchHandler"
             id="com.aptana.git.ui.command.rebase_branch"
             name="%RebaseBranchAction_tooltip">
+      </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.CreateTagHandler"
+            id="com.aptana.git.ui.command.create_tag"
+            name="%CreateTagAction_tooltip">
+      </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.PushTagsHandler"
+            id="com.aptana.git.ui.command.push_tags"
+            name="%PushTagsAction_tooltip">
+      </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.DeleteRemoteHandler"
+            id="com.aptana.git.ui.command.delete_remote"
+            name="%DeleteRemoteAction_tooltip">
       </command>
    </extension>
    <extension
@@ -257,6 +275,12 @@
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M2+M3+G E">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.delete_remote"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G 3">
       </key>
       <key
             commandId="com.aptana.git.ui.command.github.network"
@@ -403,6 +427,18 @@
             sequence="M2+M3+G I">
       </key>
       <key
+            commandId="com.aptana.git.ui.command.create_tag"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G NUMPAD_9">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.push_tags"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G NUMPAD_6">
+      </key>
+      <key
             commandId="com.aptana.git.ui.command.commit.dialog"
             contextId="com.aptana.git.ui.context.dialog.commit"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
@@ -454,9 +490,6 @@
                   name="group1">
             </separator>
             <separator
-                  name="applyPatchGroup">
-            </separator>
-            <separator
                   name="group2"
                   visible="true">
             </separator>
@@ -487,6 +520,9 @@
             <separator
                   name="targetGroup"
                   visible="true">
+            </separator>
+            <separator
+                  name="applyPatchGroup">
             </separator>
             <separator
                   name="projectGroup"
@@ -545,33 +581,54 @@
             </visibleWhen>
          </menu>
       </menuContribution>
+       <menuContribution
+             allPopups="true"
+             locationURI="popup:team.main?endof=group1">
+          <command
+                commandId="com.aptana.git.ui.command.push"
+                id="com.aptana.git.ui.actions.PushAction"
+                label="%PushAction_label"
+                style="push"
+                tooltip="%PushAction_tooltip">
+             <visibleWhen
+                   checkEnabled="false">
+                <reference
+                      definitionId="com.aptana.git.ui.hasGitRepository">
+                </reference>
+             </visibleWhen>
+          </command>
+          <command
+                commandId="com.aptana.git.ui.command.pull"
+                id="com.aptana.git.ui.actions.PullAction"
+                label="%PullAction_label"
+                tooltip="%PullAction_tooltip">
+             <visibleWhen
+                   checkEnabled="false">
+                <reference
+                      definitionId="com.aptana.git.ui.hasGitRepository">
+                </reference>
+             </visibleWhen>
+          </command>
+          <command
+                commandId="com.aptana.git.ui.command.commit"
+                id="com.aptana.git.ui.actions.CommitAction"
+                label="%CommitAction_label"
+                tooltip="%CommitAction_tooltip">
+             <visibleWhen
+                   checkEnabled="false">
+                <reference
+                      definitionId="com.aptana.git.ui.hasGitRepository">
+                </reference>
+             </visibleWhen>
+          </command>
+          <separator
+                name="com.aptana.git.ui.separator1"
+                visible="true">
+          </separator>
+       </menuContribution>
       <menuContribution
             allPopups="true"
-            locationURI="popup:team.main?endof=group1">
-         <command
-               commandId="com.aptana.git.ui.command.github.network"
-               id="com.aptana.git.ui.actions.GithubNetworkAction"
-               label="%GithubNetworkAction_label"
-               tooltip="%GithubNetworkAction_tooltip">
-            <visibleWhen
-                  checkEnabled="false">
-               <reference
-                     definitionId="com.aptana.git.ui.hasGitRepository">
-               </reference>
-            </visibleWhen>
-         </command>
-         <command
-         	   commandId="com.aptana.git.ui.command.showInResourceHistory"
-               id="com.aptana.git.ui.actions.ShowResourceInHistoryAction"
-               label="%ShowResourceInHistoryAction_label"
-               tooltip="%ShowResourceInHistoryAction_tooltip">
-            <visibleWhen
-                  checkEnabled="false">
-               <reference
-                     definitionId="com.aptana.git.ui.hasGitRepository">
-               </reference>
-            </visibleWhen>
-         </command>
+            locationURI="popup:team.main?endof=applyPatchGroup">
          <command
                commandId="com.aptana.git.ui.command.diff"
                id="com.aptana.git.ui.actions.DiffAction"
@@ -589,130 +646,181 @@
       <menuContribution
             allPopups="true"
             locationURI="popup:team.main?endof=group2">
-         <command
-               commandId="com.aptana.git.ui.command.create_branch"
-               id="com.aptana.git.ui.actions.CreateBranchAction"
-               label="%CreateBranchAction_label"
-               tooltip="%CreateBranchAction_tooltip">
-            <visibleWhen
-                  checkEnabled="false">
-               <reference
-                     definitionId="com.aptana.git.ui.hasGitRepository">
-               </reference>
-            </visibleWhen>
-         </command>
          <menu
-               commandId="com.aptana.git.ui.command.switch_branch"
-               id="com.aptana.git.ui.actions.SwitchBranchAction"
-               label="%SwitchBranchAction_label"
-               tooltip="%SwitchBranchAction_tooltip">
-            <dynamic
-                  class="com.aptana.git.ui.actions.SwitchBranchItem"
-                  id="com.aptana.git.ui.command.switch_branch.items">
-            </dynamic>
-            <visibleWhen
-                  checkEnabled="false">
-               <reference
-                     definitionId="com.aptana.git.ui.hasGitRepository">
-               </reference>
-            </visibleWhen>
-         </menu>
-         <menu
-               commandId="com.aptana.git.ui.command.merge_branch"
-               id="com.aptana.git.ui.actions.MergeBranchAction"
-               label="%MergeBranchAction_label"
-               tooltip="%MergeBranchAction_tooltip">
-            <dynamic
-                  class="com.aptana.git.ui.actions.MergeBranchItem"
-                  id="com.aptana.git.ui.command.merge_branch.items">
-            </dynamic>
-            <visibleWhen
-                  checkEnabled="false">
-               <reference
-                     definitionId="com.aptana.git.ui.hasGitRepository">
-               </reference>
-            </visibleWhen>
-         </menu>
-          <menu
-               commandId="com.aptana.git.ui.command.squash_merge_branch"
-               id="com.aptana.git.ui.actions.SquashMergeBranchAction"
-               label="%SquashMergeBranchAction_label"
-               tooltip="%SquashMergeBranchAction_tooltip">
-            <dynamic
-                  class="com.aptana.git.ui.actions.SquashMergeBranchItem"
-                  id="com.aptana.git.ui.command.squash_merge_branch.items">
-            </dynamic>
-            <visibleWhen
-                  checkEnabled="false">
+               icon="icons/elcl16/arrow_branch.png"
+               label="%branches.menu.label">
+            <command
+                  commandId="com.aptana.git.ui.command.create_branch"
+                  id="com.aptana.git.ui.actions.CreateBranchAction"
+                  label="%create.branch.menu.label">
+               <visibleWhen
+                     checkEnabled="false">
                   <reference
                         definitionId="com.aptana.git.ui.hasGitRepository">
                   </reference>
-            </visibleWhen>
-         </menu>
-         <menu
-               commandId="com.aptana.git.ui.command.delete_branch"
-               id="com.aptana.git.ui.actions.DeleteBranchAction"
-               label="%DeleteBranchAction_label"
-               tooltip="%DeleteBranchAction_tooltip">
-            <dynamic
-                  class="com.aptana.git.ui.actions.DeleteBranchItem"
-                  id="com.aptana.git.ui.command.delete_branch.items">
-            </dynamic>
-            <visibleWhen
-                  checkEnabled="false">
-               <reference
+               </visibleWhen>
+            </command>
+            <menu
+                  commandId="com.aptana.git.ui.command.delete_branch"
+                  id="com.aptana.git.ui.actions.DeleteBranchAction"
+                  label="%delete.branch.menu.label"
+                  mnemonic="%menu.d.mnemonic">
+               <dynamic
+                     class="com.aptana.git.ui.actions.DeleteBranchItem"
+                     id="com.aptana.git.ui.command.delete_branch.items">
+               </dynamic>
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
                         definitionId="com.aptana.git.ui.hasGitRepository">
                   </reference>
-            </visibleWhen>
+               </visibleWhen>
+            </menu>
+            <menu
+                  commandId="com.aptana.git.ui.command.switch_branch"
+                  id="com.aptana.git.ui.actions.SwitchBranchAction"
+                  label="%switch.branch.menu.label"
+                  mnemonic="%menu.s.mnemonic">
+               <dynamic
+                     class="com.aptana.git.ui.actions.SwitchBranchItem"
+                     id="com.aptana.git.ui.command.switch_branch.items">
+               </dynamic>
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="com.aptana.git.ui.hasGitRepository">
+                  </reference>
+               </visibleWhen>
+            </menu>
+            <menu
+                  commandId="com.aptana.git.ui.command.merge_branch"
+                  id="com.aptana.git.ui.actions.MergeBranchAction"
+                  label="%merge.menu.label"
+                  mnemonic="%menu.m.mnemonic">
+               <dynamic
+                     class="com.aptana.git.ui.actions.MergeBranchItem"
+                     id="com.aptana.git.ui.command.merge_branch.items">
+               </dynamic>
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="com.aptana.git.ui.hasGitRepository">
+                  </reference>
+               </visibleWhen>
+            </menu>
+            <menu
+                  commandId="com.aptana.git.ui.command.squash_merge_branch"
+                  id="com.aptana.git.ui.actions.SquashMergeBranchAction"
+                  label="%squash.merge.menu.label"
+                  mnemonic="%menu.q.mnemonic">
+               <dynamic
+                     class="com.aptana.git.ui.actions.SquashMergeBranchItem"
+                     id="com.aptana.git.ui.command.squash_merge_branch.items">
+               </dynamic>
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="com.aptana.git.ui.hasGitRepository">
+                  </reference>
+               </visibleWhen>
+            </menu>
+            <menu
+                  commandId="com.aptana.git.ui.command.rebase_branch"
+                  id="com.aptana.git.ui.actions.RebaseBranchAction"
+                  label="%RebaseBranchAction_label"
+                  mnemonic="%menu.r.mnemonic"
+                  tooltip="%RebaseBranchAction_tooltip">
+               <dynamic
+                     class="com.aptana.git.ui.actions.RebaseBranchItem"
+                     id="com.aptana.git.ui.command.rebase_branch.items">
+               </dynamic>
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="com.aptana.git.ui.hasGitRepository">
+                  </reference>
+               </visibleWhen>
+            </menu>
          </menu>
          <menu
-               commandId="com.aptana.git.ui.command.rebase_branch"
-               id="com.aptana.git.ui.actions.RebaseBranchAction"
-               label="%RebaseBranchAction_label"
-               tooltip="%RebaseBranchAction_tooltip">
-            <dynamic
-                  class="com.aptana.git.ui.actions.RebaseBranchItem"
-                  id="com.aptana.git.ui.command.rebase_branch.items">
-            </dynamic>
-             <visibleWhen
-                   checkEnabled="false">
-                <reference
-                      definitionId="com.aptana.git.ui.hasGitRepository">
-                </reference>
-             </visibleWhen>
+               icon="icons/elcl16/tag_blue.png"
+               label="%tag.menu.label">
+            <command
+                  commandId="com.aptana.git.ui.command.create_tag"
+                  id="com.aptana.git.ui.actions.CreateTagAction"
+                  label="%create.tag.menu.label">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="com.aptana.git.ui.hasGitRepository">
+                  </reference>
+               </visibleWhen>
+            </command>
+            <menu
+                  commandId="com.aptana.git.ui.command.push_tags"
+                  id="com.aptana.git.ui.actions.PushTagsAction"
+                  label="%push.tags.menu.label">
+               <dynamic
+                     class="com.aptana.git.ui.actions.PushTagsItem"
+                     id="com.aptana.git.ui.command.push_tags.items">
+               </dynamic>
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="com.aptana.git.ui.hasGitRepository">
+                  </reference>
+               </visibleWhen>
+            </menu>
          </menu>
          <menu
-               commandId="com.aptana.git.ui.command.push_to_remote"
-               id="com.aptana.git.ui.actions.PushToRemoteAction"
-               label="%PushToRemoteAction_label"
-               tooltip="%PushToRemoteAction_tooltip">
-            <dynamic
-                  class="com.aptana.git.ui.actions.PushToRemoteItem"
-                  id="com.aptana.git.ui.command.push_to_remote.items">
-            </dynamic>
-            <visibleWhen
-                  checkEnabled="false">
-               <reference
-                     definitionId="com.aptana.git.ui.hasGitRepository">
-               </reference>
-            </visibleWhen>
+               icon="icons/elcl16/server.png"
+               label="%remotes.menu.label">
+            <command
+                  commandId="com.aptana.git.ui.command.add_remote"
+                  id="com.aptana.git.ui.actions.AddRemoteAction"
+                  label="%add.remote.menu.label">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="com.aptana.git.ui.hasGitRepository">
+                  </reference>
+               </visibleWhen>
+            </command>
+            <menu
+                  commandId="com.aptana.git.ui.command.push_to_remote"
+                  id="com.aptana.git.ui.actions.PushToRemoteAction"
+                  label="%push_to_remote.menu.label">
+               <dynamic
+                     class="com.aptana.git.ui.actions.PushToRemoteItem"
+                     id="com.aptana.git.ui.command.push_to_remote.items">
+               </dynamic>
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="com.aptana.git.ui.hasGitRepository">
+                  </reference>
+               </visibleWhen>
+            </menu>
+            <menu
+                  commandId="com.aptana.git.ui.command.delete_remote"
+                  id="com.aptana.git.ui.actions.DeleteRemoteAction"
+                  label="%delete.remote.menu.label">
+               <dynamic
+                     class="com.aptana.git.ui.actions.DeleteRemoteItem"
+                     id="com.aptana.git.ui.command.delete_remote.items">
+               </dynamic>
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="com.aptana.git.ui.hasGitRepository">
+                  </reference>
+               </visibleWhen>
+            </menu>
          </menu>
       </menuContribution>
       <menuContribution
             allPopups="true"
             locationURI="popup:team.main?endof=targetGroup">
-         <command
-               commandId="com.aptana.git.ui.command.commit"
-               id="com.aptana.git.ui.actions.CommitAction"
-               label="%CommitAction_label"
-               tooltip="%CommitAction_tooltip">
-            <visibleWhen
-                  checkEnabled="false">
-              <reference
-                        definitionId="com.aptana.git.ui.hasGitRepository">
-                  </reference>
-            </visibleWhen>
-         </command>
          <command
                commandId="com.aptana.git.ui.command.stage"
                id="com.aptana.git.ui.actions.StageAction"
@@ -750,6 +858,33 @@
             </visibleWhen>
          </command>
          <command
+               commandId="com.aptana.git.ui.command.ignore"
+               id="com.aptana.git.ui.actions.MergeConflictsAction"
+               label="%IgnoreAction_label">
+            <visibleWhen
+                  checkEnabled="false">
+               <reference
+                     definitionId="com.aptana.git.ui.hasGitRepository">
+               </reference>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="com.aptana.git.ui.command.showInResourceHistory"
+               id="com.aptana.git.ui.actions.ShowResourceInHistoryAction"
+               label="%ShowResourceInHistoryAction_label"
+               tooltip="%ShowResourceInHistoryAction_tooltip">
+            <visibleWhen
+                  checkEnabled="false">
+               <reference
+                     definitionId="com.aptana.git.ui.hasGitRepository">
+               </reference>
+            </visibleWhen>
+         </command>
+         <separator
+               name="com.aptana.git.ui.separator4"
+               visible="true">
+         </separator>
+         <command
                commandId="com.aptana.git.ui.command.blame"
                id="com.aptana.git.ui.actions.BlameAction"
                label="%BlameAction_label"
@@ -773,17 +908,10 @@
                </reference>
             </visibleWhen>
          </command>
-         <command
-               commandId="com.aptana.git.ui.command.ignore"
-               id="com.aptana.git.ui.actions.MergeConflictsAction"
-               label="%IgnoreAction_label">
-            <visibleWhen
-                  checkEnabled="false">
-               <reference
-                     definitionId="com.aptana.git.ui.hasGitRepository">
-               </reference>
-            </visibleWhen>
-         </command>
+         <separator
+               name="com.aptana.git.ui.separator5"
+               visible="true">
+         </separator>
       </menuContribution>
        <menuContribution
             allPopups="true"
@@ -800,43 +928,22 @@
                 </reference>
              </visibleWhen>
           </command>
-          <command
-                commandId="com.aptana.git.ui.command.pull"
-                id="com.aptana.git.ui.actions.PullAction"
-                label="%PullAction_label"
-                tooltip="%PullAction_tooltip">
-             <visibleWhen
-                   checkEnabled="false">
-                <reference
-                      definitionId="com.aptana.git.ui.hasGitRepository">
-                </reference>
-             </visibleWhen>
-          </command>
-          <command
-                commandId="com.aptana.git.ui.command.push"
-                id="com.aptana.git.ui.actions.PushAction"
-                label="%PushAction_label"
-                style="push"
-                tooltip="%PushAction_tooltip">
-             <visibleWhen
-                   checkEnabled="false">
-                <reference
-                      definitionId="com.aptana.git.ui.hasGitRepository">
-                </reference>
-             </visibleWhen>
-          </command>
-          <command
-                commandId="com.aptana.git.ui.command.add_remote"
-                id="com.aptana.git.ui.actions.AddRemoteAction"
-                label="%AddRemoteAction_label"
-                tooltip="%AddRemoteAction_tooltip">
-             <visibleWhen
-                   checkEnabled="false">
-                <reference
-                      definitionId="com.aptana.git.ui.hasGitRepository">
-                </reference>
-             </visibleWhen>
-          </command>
+         <command
+               commandId="com.aptana.git.ui.command.github.network"
+               id="com.aptana.git.ui.actions.GithubNetworkAction"
+               label="%GithubNetworkAction_label"
+               tooltip="%GithubNetworkAction_tooltip">
+            <visibleWhen
+                  checkEnabled="false">
+               <reference
+                     definitionId="com.aptana.git.ui.hasGitRepository">
+               </reference>
+            </visibleWhen>
+         </command>
+         <separator
+               name="com.aptana.git.ui.separator2"
+               visible="true">
+         </separator>
          <command
                label="%DisconnectAction_label"
                commandId="com.aptana.git.ui.command.disconnect"
@@ -914,6 +1021,27 @@
             commandId="com.aptana.git.ui.command.unstash"
             icon="icons/elcl16/arrow_right.png">
       </image>
+      <image
+            commandId="com.aptana.git.ui.command.create_tag"
+            disabledIcon="icons/dlcl16/tag_blue_add.png"
+            icon="icons/elcl16/tag_blue_add.png">
+      </image>
+      <image
+            commandId="com.aptana.git.ui.command.disconnect"
+            icon="icons/elcl16/disconnect.png">
+      </image>
+      <image
+            commandId="com.aptana.git.ui.command.add_remote"
+            icon="icons/elcl16/server_add.png">
+      </image>
+      <image
+            commandId="com.aptana.git.ui.command.revert"
+            icon="icons/elcl16/arrow_undo.png">
+      </image>
+      <image
+            commandId="com.aptana.git.ui.command.cherry-pick"
+            icon="icons/elcl16/cherry.gif">
+      </image>
    </extension>
    <extension
          point="org.eclipse.debug.ui.consoleLineTrackers">
@@ -933,7 +1061,7 @@
          point="org.eclipse.ui.contexts">
       <context
             id="com.aptana.git.ui.context.dialog.commit"
-            name="Git Commit Dialog"
+            name="%commit_dialog.context.name"
             parentId="org.eclipse.ui.contexts.dialog">
       </context>
    </extension>
@@ -986,5 +1114,77 @@
             </with>
          </or>
       </definition>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="com.aptana.git.ui.category"
+            id="com.aptana.git.ui.history.switch_branch"
+            name="%switch.history.branch.name">
+      </command>
+      <command
+            id="com.aptana.git.ui.command.cherry-pick"
+            name="%command.cherry-pick.name">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="menu:com.aptana.git.ui.history.switch_branch.command.pulldown">
+         <dynamic
+               class="com.aptana.git.ui.internal.actions.SwitchHistoryBranchPulldownContributionItem"
+               id="com.aptana.git.ui.history.branches_dynamic">
+         </dynamic>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:org.eclipse.team.ui.GenericHistoryView">
+         <command
+               commandId="com.aptana.git.ui.history.switch_branch"
+               icon="icons/elcl16/arrow_branch.png"
+               id="com.aptana.git.ui.history.switch_branch.command.pulldown"
+               label="%switch.history.branch.label"
+               style="pulldown">
+         </command>
+         <command
+               commandId="com.aptana.git.ui.command.cherry-pick"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:com.aptana.git.ui.git_history">
+         <command
+               commandId="com.aptana.git.ui.command.cherry-pick"
+               style="push">
+         </command>
+         <menu
+               commandId="com.aptana.git.ui.history.switch_branch"
+               icon="icons/elcl16/arrow_branch.png"
+               id="com.aptana.git.ui.actions.SwitchHistoryBranchAction"
+               label="%switch.history.branch.label">
+            <dynamic
+                  class="com.aptana.git.ui.internal.actions.SwitchHistoryBranchPulldownContributionItem"
+                  id="com.aptana.git.ui.history.branches_dynamic">
+            </dynamic>
+         </menu>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="com.aptana.git.ui.internal.actions.CherryPickHandler"
+            commandId="com.aptana.git.ui.command.cherry-pick">
+         <enabledWhen>
+               <iterate
+                     ifEmpty="false"
+                     operator="and">
+                  <instanceof
+                        value="com.aptana.git.core.model.GitCommit">
+                  </instanceof>
+               </iterate>
+        </enabledWhen>
+      </handler>
    </extension>
 </plugin>

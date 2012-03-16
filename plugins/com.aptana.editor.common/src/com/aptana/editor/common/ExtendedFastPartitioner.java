@@ -53,8 +53,12 @@ public class ExtendedFastPartitioner extends FastPartitioner implements IExtende
 	public ITypedRegion getPartition(int offset, boolean preferOpenPartitions) {
 		// let the last offset partition be the same as preceding
 		ITypedRegion region = super.getPartition(offset, preferOpenPartitions);
-		if (region.getOffset() == fDocument.getLength() && region.getType().equals(IDocument.DEFAULT_CONTENT_TYPE)) {
-			region = new TypedRegion(region.getOffset(), region.getLength(), getPartition(region.getOffset()-1).getType());
+		if (region.getType().equals(IDocument.DEFAULT_CONTENT_TYPE)) {
+			if (region.getOffset() == fDocument.getLength()) {
+				region = new TypedRegion(region.getOffset(), region.getLength(), getPartition(region.getOffset()-1).getType());
+			} else if (preferOpenPartitions && region.getLength() == 0) {
+				region = super.getPartition(offset, false);
+			}
 		}
 		return region;
 	}

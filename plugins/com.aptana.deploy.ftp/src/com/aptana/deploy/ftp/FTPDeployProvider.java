@@ -50,4 +50,9 @@ public class FTPDeployProvider implements IDeployProvider
 		ISiteConnection[] siteConnections = SiteConnectionUtils.findSitesForSource(selectedContainer, false);
 		return siteConnections.length > 0;
 	}
+
+	public String getDeployMenuName()
+	{
+		return Messages.FTPDeployProvider_DeployMenuName;
+	}
 }

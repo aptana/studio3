@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -87,7 +87,7 @@ public class HyperlinkDetector extends URLHyperlinkDetector
 			}
 			catch (Exception e)
 			{
-				IdeLog.logError(CommonEditorPlugin.getDefault(), e);
+				IdeLog.logWarning(CommonEditorPlugin.getDefault(), e);
 			}
 			return null;
 		}
@@ -108,7 +108,7 @@ public class HyperlinkDetector extends URLHyperlinkDetector
 			}
 			catch (Exception e)
 			{
-				IdeLog.logError(CommonEditorPlugin.getDefault(), e);
+				IdeLog.logWarning(CommonEditorPlugin.getDefault(), e);
 			}
 		}
 		if (ours.isEmpty())

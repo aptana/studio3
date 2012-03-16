@@ -10,7 +10,8 @@ package com.aptana.debug.core;
 /**
  * Core Debug constants
  */
-public interface IDebugCoreConstants {
+public interface IDebugCoreConstants
+{
 
 	String PREFIX = DebugCorePlugin.PLUGIN_ID;
 
@@ -80,11 +81,11 @@ public interface IDebugCoreConstants {
 	/**
 	 * ID_STANDARD_ERROR_STREAM
 	 */
-	String ID_STANDARD_ERROR_STREAM = "ID_STANDARD_ERROR_STREAM";
+	String ID_STANDARD_ERROR_STREAM = "ID_STANDARD_ERROR_STREAM"; //$NON-NLS-1$
 
 	/**
 	 * ID_STANDARD_OUTPUT_STREAM
 	 */
-	String ID_STANDARD_OUTPUT_STREAM = "ID_STANDARD_OUTPUT_STREAM";
+	String ID_STANDARD_OUTPUT_STREAM = "ID_STANDARD_OUTPUT_STREAM"; //$NON-NLS-1$
 
 }

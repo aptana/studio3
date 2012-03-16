@@ -17,6 +17,11 @@ import org.eclipse.jface.text.rules.Token;
 
 import com.aptana.editor.common.TextUtils;
 
+/**
+ * @deprecated This class is very, very slow! If at all possible, use another rule implementation, such as
+ *             ExtendedWordRule.
+ * @author cwilliams
+ */
 public class RegexpRule implements IPredicateRule
 {
 

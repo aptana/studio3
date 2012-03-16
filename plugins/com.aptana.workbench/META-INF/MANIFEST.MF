@@ -24,4 +24,5 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.ui.io
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
-Export-Package: com.aptana.workbench.hyperlink
+Export-Package: com.aptana.workbench.commands,
+ com.aptana.workbench.hyperlink

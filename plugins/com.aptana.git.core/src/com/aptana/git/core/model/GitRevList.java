@@ -86,7 +86,7 @@ public class GitRevList
 
 		if (rev == null)
 		{
-			arguments.add("HEAD"); //$NON-NLS-1$
+			arguments.add(GitRepository.HEAD);
 		}
 		else
 		{

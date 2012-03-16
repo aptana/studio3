@@ -7,6 +7,8 @@
  */
 package com.aptana.git.core.model;
 
+import java.text.MessageFormat;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Path;
 
@@ -83,15 +85,18 @@ public class ChangedFile implements Comparable<ChangedFile>
 		Assert.isTrue(status == Status.NEW || commitBlobSHA != null,
 				"File is not new, but doesn't have an index entry!"); //$NON-NLS-1$
 		if (commitBlobSHA == null)
-			return "0 0000000000000000000000000000000000000000\t" + path + "\0"; //$NON-NLS-1$ //$NON-NLS-2$
+		{
+			return MessageFormat.format("0 0000000000000000000000000000000000000000\t{0}\0", path); //$NON-NLS-1$
+		}
 
-		return commitBlobMode + " " + commitBlobSHA + "\t" + path + "\0"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		return MessageFormat.format("{0} {1}\t{2}\0", commitBlobMode, commitBlobSHA, path); //$NON-NLS-1$
 	}
 
 	@Override
 	public String toString()
 	{
-		return getStatus() + " " + getPath(); //$NON-NLS-1$
+		return MessageFormat
+				.format("{0} {1} (Staged? {2}, Unstaged? {3})", getStatus(), getPath(), hasStagedChanges(), hasUnstagedChanges()); //$NON-NLS-1$
 	}
 
 	public boolean hasUnmergedChanges()

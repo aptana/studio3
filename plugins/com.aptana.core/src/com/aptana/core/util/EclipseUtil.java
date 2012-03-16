@@ -16,6 +16,7 @@ import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -425,6 +426,7 @@ public class EclipseUtil
 	 * @param currentOptions
 	 * @param debugEnabled
 	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static void setBundleDebugOptions(String[] currentOptions, boolean debugEnabled)
 	{
 		Map<String, BundleContext> bundles = getCurrentBundleContexts();
@@ -481,9 +483,10 @@ public class EclipseUtil
 	 * @param elementNames
 	 */
 	public static void processConfigurationElements(String pluginId, String extensionPointId,
-			IConfigurationElementProcessor processor, String... elementNames)
+			IConfigurationElementProcessor processor)
 	{
-		if (!StringUtil.isEmpty(pluginId) && !StringUtil.isEmpty(extensionPointId) && processor != null)
+		if (!StringUtil.isEmpty(pluginId) && !StringUtil.isEmpty(extensionPointId) && processor != null
+				&& !processor.getSupportElementNames().isEmpty())
 		{
 			IExtensionRegistry registry = Platform.getExtensionRegistry();
 
@@ -493,20 +496,22 @@ public class EclipseUtil
 
 				if (extensionPoint != null)
 				{
+					Set<String> elementNames = processor.getSupportElementNames();
 					IExtension[] extensions = extensionPoint.getExtensions();
 					for (String elementName : elementNames)
 					{
 						for (IExtension extension : extensions)
 						{
 							IConfigurationElement[] elements = extension.getConfigurationElements();
+
 							for (IConfigurationElement element : elements)
 							{
 								if (element.getName().equals(elementName))
 								{
 									processor.processElement(element);
-									if (IdeLog.isInfoEnabled(CorePlugin.getDefault(), IDebugScopes.EXTENSION_POINTS))
+									if (IdeLog.isTraceEnabled(CorePlugin.getDefault(), IDebugScopes.EXTENSION_POINTS))
 									{
-										IdeLog.logInfo(
+										IdeLog.logTrace(
 												CorePlugin.getDefault(),
 												MessageFormat
 														.format("Processing extension element {0} with attributes {1}", element.getName(), //$NON-NLS-1$

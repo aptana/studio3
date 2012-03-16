@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -11,23 +11,18 @@ import java.net.URI;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-import org.eclipse.core.filesystem.EFS;
-import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.jaxen.JaxenException;
 import org.jaxen.XPath;
 
-import beaver.Parser;
-
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.resources.TaskTag;
-import com.aptana.core.util.IOUtil;
-import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.IDebugScopes;
-import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
@@ -35,21 +30,22 @@ import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.inferencing.JSScope;
 import com.aptana.editor.js.inferencing.JSSymbolTypeInferrer;
-import com.aptana.editor.js.inferencing.JSTypeUtil;
-import com.aptana.editor.js.parsing.ast.JSCommentNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
+import com.aptana.editor.js.parsing.ast.JSInvokeNode;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
+import com.aptana.editor.js.parsing.ast.JSStringNode;
 import com.aptana.index.core.AbstractFileIndexingParticipant;
 import com.aptana.index.core.Index;
-import com.aptana.parsing.ParserPoolFactory;
+import com.aptana.index.core.build.BuildContext;
 import com.aptana.parsing.ast.IParseNode;
-import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.xpath.ParseNodeXPath;
 
 public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 {
 	private static XPath LAMBDAS_IN_SCOPE;
-	private JSIndexWriter _indexWriter;
+	private static XPath REQUIRE_INVOCATIONS;
+
+	private JSIndexWriter indexWriter;
 
 	static
 	{
@@ -62,6 +58,15 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		{
 			IdeLog.logError(JSPlugin.getDefault(), e);
 		}
+
+		try
+		{
+			REQUIRE_INVOCATIONS = new ParseNodeXPath("//invoke[identifier[position() = 1 and @value = 'require']]"); //$NON-NLS-1$
+		}
+		catch (JaxenException e)
+		{
+			IdeLog.logError(JSPlugin.getDefault(), e);
+		}
 	}
 
 	/**
@@ -69,7 +74,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 	 */
 	public JSFileIndexingParticipant()
 	{
-		this._indexWriter = new JSIndexWriter();
+		indexWriter = new JSIndexWriter();
 	}
 
 	/**
@@ -90,44 +95,17 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		return result;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.index.core.AbstractFileIndexingParticipant#indexFileStore(com.aptana.index.core.Index,
-	 * org.eclipse.core.filesystem.IFileStore, org.eclipse.core.runtime.IProgressMonitor)
-	 */
-	protected void indexFileStore(Index index, IFileStore file, IProgressMonitor monitor)
+	public void index(BuildContext context, Index index, IProgressMonitor monitor) throws CoreException
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
-
 		try
 		{
-			if (file != null)
-			{
-				sub.subTask(getIndexingMessage(index, file));
-
-				removeTasks(file, sub.newChild(10));
-
-				// grab the source of the file we're going to parse
-				String source = IOUtil.read(file.openInputStream(EFS.NONE, sub.newChild(20)), getCharset(file));
-
-				// minor optimization when creating a new empty file
-				if (source != null && source.trim().length() > 0)
-				{
-					IParseNode ast = ParserPoolFactory.parse(IJSConstants.CONTENT_TYPE_JS, source, sub.newChild(50));
-					if (ast != null)
-					{
-						this.processParseResults(file, source, index, ast, sub.newChild(20));
-					}
-				}
-			}
+			sub.subTask(getIndexingMessage(index, context.getURI()));
+			processParseResults(context, index, context.getAST(), sub.newChild(20));
 		}
-		catch (Parser.Exception e) // $codepro.audit.disable emptyCatchClause
+		catch (CoreException ce)
 		{
-			// ignore parse errors
-		}
-		catch (Throwable e)
-		{
-			IdeLog.logError(JSPlugin.getDefault(), e);
+			// ignores the parser exception
 		}
 		finally
 		{
@@ -150,7 +128,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 		try
 		{
-			Object queryResult = LAMBDAS_IN_SCOPE.evaluate(node);
+			Object queryResult = (LAMBDAS_IN_SCOPE != null) ? LAMBDAS_IN_SCOPE.evaluate(node) : null;
 
 			if (queryResult != null)
 			{
@@ -166,10 +144,10 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 						JSScope scope = globals.getScopeAtOffset(function.getBody().getStartingOffset());
 
 						// add all properties off of "window" to our list
-						result.addAll(this.processWindowAssignments(index, scope, location));
+						result.addAll(processWindowAssignments(index, scope, location));
 
 						// handle any nested lambdas in this function
-						result.addAll(this.processLambdas(index, globals, function, location));
+						result.addAll(processLambdas(index, globals, function, location));
 					}
 				}
 			}
@@ -185,38 +163,31 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 	/**
 	 * processParseResults
 	 * 
-	 * @param index
-	 * @param file
+	 * @param context
 	 * @param monitor
 	 * @param parseState
 	 */
-	public void processParseResults(IFileStore file, String source, Index index, IParseNode ast,
-			IProgressMonitor monitor)
+	public void processParseResults(BuildContext context, Index index, IParseNode ast, IProgressMonitor monitor)
 	{
-		SubMonitor sub = SubMonitor.convert(monitor, 100);
-		if (ast instanceof IParseRootNode)
-		{
-			processComments(file, source, ((IParseRootNode) ast).getCommentNodes(), sub.newChild(20));
-		}
-		sub.setWorkRemaining(80);
+		SubMonitor sub = SubMonitor.convert(monitor, 80);
 
 		// build symbol tables
-		URI location = file.toURI();
+		URI location = context.getURI();
 
-		if (IdeLog.isInfoEnabled(JSPlugin.getDefault(), IDebugScopes.INDEXING_STEPS))
+		if (IdeLog.isTraceEnabled(JSPlugin.getDefault(), IDebugScopes.INDEXING_STEPS))
 		{
 			// @formatter:off
 			String message = MessageFormat.format(
-				"Building symbol tables for file ''{0}'' for index ''{1}''",
+				"Building symbol tables for file ''{0}'' for index ''{1}''", //$NON-NLS-1$
 				location.toString(),
 				index.toString()
 			);
 			// @formatter:on
 
-			IdeLog.logInfo(JSPlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
+			IdeLog.logTrace(JSPlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
 		}
 
-		JSScope globals = this.getGlobals(ast);
+		JSScope globals = getGlobals(ast);
 
 		// process globals
 		if (globals != null)
@@ -227,17 +198,17 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 			type.addParentType(JSTypeConstants.GLOBAL_TYPE);
 
 			// add declared variables and functions from the global scope
-			if (IdeLog.isInfoEnabled(JSPlugin.getDefault(), IDebugScopes.INDEXING_STEPS))
+			if (IdeLog.isTraceEnabled(JSPlugin.getDefault(), IDebugScopes.INDEXING_STEPS))
 			{
 				// @formatter:off
 				String message = MessageFormat.format(
-					"Processing globally declared variables and functions in file ''{0}'' for index ''{1}''",
+					"Processing globally declared variables and functions in file ''{0}'' for index ''{1}''", //$NON-NLS-1$
 					location.toString(),
 					index.toString()
 				);
 				// @formatter:on
 
-				IdeLog.logInfo(JSPlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
+				IdeLog.logTrace(JSPlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
 			}
 
 			JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(globals, index, location);
@@ -248,149 +219,127 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 			}
 
 			// include any assignments to Window
-			if (IdeLog.isInfoEnabled(JSPlugin.getDefault(), IDebugScopes.INDEXING_STEPS))
+			if (IdeLog.isTraceEnabled(JSPlugin.getDefault(), IDebugScopes.INDEXING_STEPS))
 			{
 				// @formatter:off
 				String message = MessageFormat.format(
-					"Processing assignments to ''window'' in file ''{0}'' for index ''{1}''",
+					"Processing assignments to ''window'' in file ''{0}'' for index ''{1}''", //$NON-NLS-1$
 					location.toString(),
 					index.toString()
 				);
 				// @formatter:on
 
-				IdeLog.logInfo(JSPlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
+				IdeLog.logTrace(JSPlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
 			}
 
-			for (PropertyElement property : this.processWindowAssignments(index, globals, location))
+			for (PropertyElement property : processWindowAssignments(index, globals, location))
 			{
 				type.addProperty(property);
 			}
 
 			// process window assignments in lambdas (self-invoking functions)
-			if (IdeLog.isInfoEnabled(JSPlugin.getDefault(), IDebugScopes.INDEXING_STEPS))
+			if (IdeLog.isTraceEnabled(JSPlugin.getDefault(), IDebugScopes.INDEXING_STEPS))
 			{
 				// @formatter:off
 				String message = MessageFormat.format(
-					"Processing assignments to ''window'' within self-invoking function literals in file ''{0}'' for index ''{1}''",
+					"Processing assignments to ''window'' within self-invoking function literals in file ''{0}'' for index ''{1}''", //$NON-NLS-1$
 					location.toString(),
 					index.toString()
 				);
 				// @formatter:on
 
-				IdeLog.logInfo(JSPlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
+				IdeLog.logTrace(JSPlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
 			}
 
-			for (PropertyElement property : this.processLambdas(index, globals, ast, location))
+			for (PropertyElement property : processLambdas(index, globals, ast, location))
 			{
 				type.addProperty(property);
 			}
 
 			// associate all user agents with these properties
-			if (IdeLog.isInfoEnabled(JSPlugin.getDefault(), IDebugScopes.INDEXING_STEPS))
+			if (IdeLog.isTraceEnabled(JSPlugin.getDefault(), IDebugScopes.INDEXING_STEPS))
 			{
 				// @formatter:off
 				String message = MessageFormat.format(
-					"Assigning user agents to properties in file ''{0}'' for index ''{1}''",
+					"Assigning user agents to properties in file ''{0}'' for index ''{1}''", //$NON-NLS-1$
 					location.toString(),
 					index.toString()
 				);
 				// @formatter:on
 
-				IdeLog.logInfo(JSPlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
+				IdeLog.logTrace(JSPlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
 			}
 
 			for (PropertyElement property : type.getProperties())
 			{
-				JSTypeUtil.addAllUserAgents(property);
+				property.setHasAllUserAgents();
 			}
 
 			// write new Window type to index
-			if (IdeLog.isInfoEnabled(JSPlugin.getDefault(), IDebugScopes.INDEXING_STEPS))
+			if (IdeLog.isTraceEnabled(JSPlugin.getDefault(), IDebugScopes.INDEXING_STEPS))
 			{
 				// @formatter:off
 				String message = MessageFormat.format(
-					"Writing indexing results to index ''{0}'' for file ''{1}''",
+					"Writing indexing results to index ''{0}'' for file ''{1}''", //$NON-NLS-1$
 					index.toString(),
 					location.toString()
 				);
 				// @formatter:on
 
-				IdeLog.logInfo(JSPlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
+				IdeLog.logTrace(JSPlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
 			}
 
-			this._indexWriter.writeType(index, type, location);
+			indexWriter.writeType(index, type, location);
 		}
+
+		// process requires
+		processRequires(index, ast, location);
 
 		sub.done();
 	}
 
-	private void processComments(IFileStore file, String source, IParseNode[] commentNodes, IProgressMonitor monitor)
+	/**
+	 * @param ast
+	 */
+	protected void processRequires(Index index, IParseNode ast, URI location)
 	{
-		if (commentNodes == null || commentNodes.length == 0)
+		Object queryResult = null;
+
+		// grab all 'require("...")' invocations
+		try
 		{
-			return;
+			queryResult = (REQUIRE_INVOCATIONS != null) ? REQUIRE_INVOCATIONS.evaluate(ast) : null;
 		}
-		SubMonitor sub = SubMonitor.convert(monitor, commentNodes.length);
-		for (IParseNode commentNode : commentNodes)
+		catch (JaxenException e)
 		{
-			if (commentNode instanceof JSCommentNode)
+			IdeLog.logError(JSPlugin.getDefault(), e);
+		}
+
+		// process results, if any
+		if (queryResult != null)
+		{
+			Set<String> paths = new HashSet<String>();
+
+			@SuppressWarnings("unchecked")
+			List<JSInvokeNode> invocations = (List<JSInvokeNode>) queryResult;
+
+			for (JSInvokeNode invocation : invocations)
 			{
-				processCommentNode(file, source, (JSCommentNode) commentNode);
-			}
-			sub.worked(1);
-		}
-		sub.done();
-	}
+				IParseNode arguments = invocation.getArguments();
+				IParseNode firstArgument = (arguments != null) ? arguments.getFirstChild() : null;
+				String text = (firstArgument instanceof JSStringNode) ? firstArgument.getText() : null;
 
-	private void processCommentNode(IFileStore store, String source, JSCommentNode commentNode)
-	{
-		String text = getText(source, commentNode);
-		if (!TaskTag.isCaseSensitive())
-		{
-			text = text.toLowerCase();
-		}
-		int lastOffset = 0;
-		String[] lines = StringUtil.LINE_SPLITTER.split(text);
-		for (String line : lines)
-		{
-			int offset = text.indexOf(line, lastOffset);
-
-			for (TaskTag entry : TaskTag.getTaskTags())
-			{
-				String tag = entry.getName();
-				if (!TaskTag.isCaseSensitive())
+				if (text != null && text.length() >= 2)
 				{
-					tag = tag.toLowerCase();
+					paths.add(text.substring(1, text.length() - 1));
 				}
-				int index = line.indexOf(tag);
-				if (index == -1)
-				{
-					continue;
-				}
-
-				String message = line.substring(index).trim();
-				// Remove "**/" from the end of the line!
-				if (message.endsWith("**/")) //$NON-NLS-1$
-				{
-					message = message.substring(0, message.length() - 3).trim();
-				}
-				// Remove "*/" from the end of the line!
-				if (message.endsWith("*/")) //$NON-NLS-1$
-				{
-					message = message.substring(0, message.length() - 2).trim();
-				}
-				int start = commentNode.getStartingOffset() + offset + index;
-				createTask(store, message, entry.getPriority(), getLineNumber(start, source), start,
-						start + message.length());
 			}
 
-			lastOffset = offset;
+			if (!paths.isEmpty())
+			{
+				indexWriter.writeRequires(index, paths, location);
+			}
 		}
-	}
-
-	private String getText(String source, JSCommentNode commentNode)
-	{
-		return new String(source.substring(commentNode.getStartingOffset(), commentNode.getEndingOffset() + 1));
 	}
 
 	/**

@@ -13,7 +13,7 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.SimpleSourceViewerConfiguration;
 
-class MarkdownSourceViewerConfiguration extends SimpleSourceViewerConfiguration
+public class MarkdownSourceViewerConfiguration extends SimpleSourceViewerConfiguration
 {
 	/**
 	 * MarkdownSourceViewerConfiguration

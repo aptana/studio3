@@ -13,14 +13,13 @@ import java.net.URI;
 import org.eclipse.core.filesystem.IFileStore;
 
 /**
- * 
  * @author Max Stepanov
- *
  */
-public interface IURIMapper {
+public interface IURIMapper
+{
 
 	/**
-	 * Resolve file store to URL
+	 * Resolve file store to URI
 	 * 
 	 * @param file
 	 * @return
@@ -28,7 +27,7 @@ public interface IURIMapper {
 	public URI resolve(IFileStore file);
 
 	/**
-	 * Resolve URL to file store
+	 * Resolve URI to file store
 	 * 
 	 * @param uri
 	 * @return

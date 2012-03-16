@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -10,6 +10,7 @@ package com.aptana.deploy.ftp.internal.handlers;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
 
@@ -27,7 +28,7 @@ public class DeploySettingsHandler extends AbstractHandler
 
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
-		IResource selectedResource = UIUtils.getSelectedResource();
+		IResource selectedResource = UIUtils.getSelectedResource((IEvaluationContext) event.getApplicationContext());
 		if (selectedResource == null)
 		{
 			return null;
@@ -49,8 +50,12 @@ public class DeploySettingsHandler extends AbstractHandler
 		ISiteConnection lastSiteConnection = null;
 		if (siteConnections.length > 1)
 		{
+			String lastConnection = null;
 			// try for last remembered site first
-			String lastConnection = ResourceSynchronizationUtils.getLastSyncConnection(container);
+			if (ResourceSynchronizationUtils.isRememberDecision(container))
+			{
+				lastConnection = ResourceSynchronizationUtils.getLastSyncConnection(container);
+			}
 			if (lastConnection == null)
 			{
 				lastConnection = DeployPreferenceUtil.getDeployEndpoint(container);
@@ -76,16 +81,18 @@ public class DeploySettingsHandler extends AbstractHandler
 			dialog.setShowRememberMyDecision(true);
 			dialog.open();
 
-			IConnectionPoint destination = dialog.getSelectedSite().getDestination();
-			if (destination != null)
+			IConnectionPoint destination = null;
+			ISiteConnection site = dialog.getSelectedSite();
+			if (site != null)
 			{
-				Boolean rememberMyDecision = dialog.isRememberMyDecision();
-				if (rememberMyDecision)
+				ResourceSynchronizationUtils.setRememberDecision(container, dialog.isRememberMyDecision());
+
+				destination = site.getDestination();
+				if (destination != null)
 				{
-					ResourceSynchronizationUtils.setRememberDecision(container, rememberMyDecision);
+					// remembers the last sync connection
+					ResourceSynchronizationUtils.setLastSyncConnection(container, destination.getName());
 				}
-				// remembers the last sync connection
-				ResourceSynchronizationUtils.setLastSyncConnection(container, destination.getName());
 			}
 			settingsDialog.setPropertySource(destination);
 		}

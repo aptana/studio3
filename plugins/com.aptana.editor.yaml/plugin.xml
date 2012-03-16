@@ -20,6 +20,7 @@
          point="org.eclipse.core.contenttype.contentTypes">
       <content-type
             base-type="org.eclipse.core.runtime.text"
+            default-charset="UTF-8"
             file-extensions="yaml,yml"
             id="com.aptana.contenttype.yml"
             name="%content-type.yml.name"
@@ -39,7 +40,7 @@
             category="com.aptana.editor.common.preferences.EditorsPreferencePage"
             class="com.aptana.editor.yaml.preferences.YAMLPreferencePage"
             id="com.aptana.editor.yaml.preferences.YamlPreferencePage"
-            name="YAML">
+            name="%preferencePage.yaml.name">
       </page>
    </extension>
    <extension
@@ -47,6 +48,18 @@
       <initializer
             class="com.aptana.editor.yaml.preferences.YAMLPreferenceInitializer">
       </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.compare.contentMergeViewers">
+      <contentTypeBinding
+            contentMergeViewerId="com.aptana.editor.yaml.contentMergeViewer"
+            contentTypeId="com.aptana.contenttype.yml">
+      </contentTypeBinding>
+      <viewer
+            class="com.aptana.editor.xml.internal.YMLMergeViewerCreator"
+            extensions="yml,yaml"
+            id="com.aptana.editor.yaml.contentMergeViewer">
+      </viewer>
    </extension>
 
 </plugin>

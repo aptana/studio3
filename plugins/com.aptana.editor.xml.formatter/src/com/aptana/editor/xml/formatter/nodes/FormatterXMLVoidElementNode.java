@@ -72,11 +72,27 @@ public class FormatterXMLVoidElementNode extends FormatterBlockWithBeginNode
 	/*
 	 * (non-Javadoc)
 	 * @see
+	 * com.aptana.formatter.nodes.FormatterBlockWithBeginNode#getBlankLinesBefore(com.aptana.formatter.IFormatterContext
+	 * )
+	 */
+	@Override
+	protected int getBlankLinesBefore(IFormatterContext context)
+	{
+		if (context.getParent() != null && context.getChildIndex() > 1)
+		{
+			return getInt(XMLFormatterConstants.LINES_AFTER_ELEMENTS);
+		}
+		return super.getBlankLinesBefore(context);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see
 	 * com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode#getBlankLinesAfter(com.aptana.formatter.IFormatterContext
 	 * )
 	 */
 	protected int getBlankLinesAfter(IFormatterContext context)
 	{
-		return getInt(XMLFormatterConstants.LINES_AFTER_ELEMENTS);
+		return -1;
 	}
 }

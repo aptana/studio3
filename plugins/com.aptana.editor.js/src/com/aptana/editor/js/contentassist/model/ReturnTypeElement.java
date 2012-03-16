@@ -12,6 +12,7 @@ import java.util.Map;
 import org.mortbay.util.ajax.JSON.Convertible;
 import org.mortbay.util.ajax.JSON.Output;
 
+import com.aptana.core.util.ObjectUtil;
 import com.aptana.core.util.StringUtil;
 
 public class ReturnTypeElement implements Convertible
@@ -47,7 +48,7 @@ public class ReturnTypeElement implements Convertible
 			ReturnTypeElement that = (ReturnTypeElement) obj;
 
 			// NOTE: we only care if the types match, not the descriptions
-			result = StringUtil.areEqual(this.getType(), that.getType());
+			result = ObjectUtil.areEqual(this.getType(), that.getType());
 		}
 
 		return result;

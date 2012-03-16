@@ -59,4 +59,4 @@ if(a > b) {
     alert("hello");
 }
 void a;
-void b[6];
+void b[6]; 

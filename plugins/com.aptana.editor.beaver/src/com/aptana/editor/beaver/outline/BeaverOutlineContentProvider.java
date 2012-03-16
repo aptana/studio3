@@ -9,18 +9,13 @@ package com.aptana.editor.beaver.outline;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.swt.widgets.Display;
 
 import beaver.Symbol;
 import beaver.spec.ast.GrammarTreeRoot;
 
 import com.aptana.editor.beaver.parsing.ast.BeaverParseRootNode;
 import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.outline.CommonOutlinePage;
-import com.aptana.editor.common.outline.IParseListener;
-import com.aptana.editor.common.outline.ParseAdapter;
-import com.aptana.editor.common.parsing.FileService;
-import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.lexer.Range;
 
 /**
@@ -46,8 +41,6 @@ public class BeaverOutlineContentProvider implements ITreeContentProvider
 	}
 
 	protected static final Object[] EMPTY = new Object[0];
-
-	private IParseListener fListener;
 
 	/*
 	 * (non-Javadoc)
@@ -77,8 +70,7 @@ public class BeaverOutlineContentProvider implements ITreeContentProvider
 		if (inputElement instanceof AbstractThemeableEditor)
 		{
 			AbstractThemeableEditor editor = (AbstractThemeableEditor) inputElement;
-			FileService fileService = editor.getFileService();
-			IParseNode root = fileService.getParseResult();
+			IParseRootNode root = editor.getAST();
 
 			if (root instanceof BeaverParseRootNode)
 			{
@@ -115,49 +107,8 @@ public class BeaverOutlineContentProvider implements ITreeContentProvider
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object,
-	 * java.lang.Object)
-	 */
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput)
 	{
-		if (newInput instanceof AbstractThemeableEditor)
-		{
-			final AbstractThemeableEditor editor = (AbstractThemeableEditor) newInput;
-
-			fListener = new ParseAdapter()
-			{
-				public void parseCompletedSuccessfully()
-				{
-					Display.getDefault().asyncExec(new Runnable()
-					{
-						public void run()
-						{
-							if (editor.hasOutlinePageCreated())
-							{
-								IParseNode node = editor.getFileService().getParseResult();
-
-								if (node != null)
-								{
-									CommonOutlinePage page = editor.getOutlinePage();
-
-									page.refresh();
-								}
-							}
-						}
-					});
-				}
-			};
-
-			editor.getFileService().addListener(fListener);
-		}
-		else if (fListener != null)
-		{
-			AbstractThemeableEditor editor = (AbstractThemeableEditor) oldInput;
-
-			editor.getFileService().removeListener(fListener);
-			fListener = null;
-		}
+				
 	}
 }

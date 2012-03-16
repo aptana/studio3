@@ -70,7 +70,7 @@ public class YAMLEditor extends AbstractThemeableEditor
 	}
 
 	@Override
-	protected String getFileServiceContentTypeId()
+	public String getContentType()
 	{
 		return IYAMLConstants.CONTENT_TYPE_YAML;
 	}

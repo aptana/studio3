@@ -7,6 +7,7 @@
  */
 package com.aptana.ui.widgets;
 
+import java.text.MessageFormat;
 import java.util.Arrays;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -17,7 +18,6 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Path;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -71,7 +71,7 @@ public class StepIndicatorComposite extends Composite
 		{
 			stepComposite = new Composite(this, SWT.NONE);
 			stepComposite.setLayout(new GridLayout());
-			stepComposite.setLayoutData(GridDataFactory.swtDefaults().create());
+			stepComposite.setLayoutData(GridDataFactory.swtDefaults().align(SWT.CENTER, SWT.CENTER).create());
 			stepComposite.addPaintListener(new PaintListener()
 			{
 
@@ -92,19 +92,22 @@ public class StepIndicatorComposite extends Composite
 			});
 
 			stepLabel = new Label(stepComposite, SWT.NONE);
-			stepLabel.setText(stepName);
-			stepLabel.setLayoutData(GridDataFactory.swtDefaults().grab(false, true).create());
+			stepLabel.setText(MessageFormat.format(" {0} ", stepName)); //$NON-NLS-1$
+			stepLabel.setLayoutData(GridDataFactory.swtDefaults().grab(false, false).align(SWT.CENTER, SWT.CENTER)
+					.create());
+			((GridData) stepLabel.getLayoutData()).widthHint = stepLabel.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
 
 			stepDecorator = new Composite(this, SWT.NONE);
-			GridData gridData = GridDataFactory.swtDefaults().align(SWT.CENTER, SWT.FILL).create();
+			GridData gridData = GridDataFactory.swtDefaults().align(SWT.CENTER, SWT.CENTER).create();
 			gridData.heightHint = stepComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
 			if ((gridData.heightHint % 2) == 0)
 			{
 				gridData.heightHint++;
-				((GridData) stepLabel.getLayoutData()).heightHint = gridData.heightHint - 10;
 			}
 
 			gridData.widthHint = ((gridData.heightHint - 1) / 2) + 1;
+
+			((GridData) stepComposite.getLayoutData()).heightHint = gridData.heightHint;
 
 			if (selectedTextFont == null)
 			{

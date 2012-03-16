@@ -36,8 +36,6 @@ import com.aptana.ui.util.UIUtils;
 public class DeleteBranchHandler extends AbstractGitHandler
 {
 
-	private static final int TOOLTIP_LIFETIME = 3000;
-
 	@Override
 	protected Object doExecute(ExecutionEvent event) throws ExecutionException
 	{
@@ -135,7 +133,7 @@ public class DeleteBranchHandler extends AbstractGitHandler
 						return new Point(xCoord, yCoord);
 					}
 				};
-				toolTip.setHideDelay(TOOLTIP_LIFETIME);
+				toolTip.setHideDelay(UIUtils.DEFAULT_TOOLTIP_TIME);
 				toolTip.setText(text);
 				toolTip.show(new Point(0, 0));
 				return Status.OK_STATUS;

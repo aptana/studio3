@@ -17,18 +17,18 @@ public interface ICSSMetadataElement
 	public String getDescription();
 
 	/**
+	 * getExample
+	 * 
+	 * @return
+	 */
+	public String getExample();
+
+	/**
 	 * getName
 	 * 
 	 * @return
 	 */
 	public String getName();
-
-	/**
-	 * getUserAgents
-	 * 
-	 * @return
-	 */
-	public List<UserAgentElement> getUserAgents();
 
 	/**
 	 * getUserAgentNames
@@ -38,9 +38,9 @@ public interface ICSSMetadataElement
 	public List<String> getUserAgentNames();
 
 	/**
-	 * getExample
+	 * getUserAgents
 	 * 
 	 * @return
 	 */
-	public String getExample();
+	public List<UserAgentElement> getUserAgents();
 }

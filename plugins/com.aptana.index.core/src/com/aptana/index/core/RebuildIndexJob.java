@@ -26,7 +26,7 @@ public class RebuildIndexJob extends IndexContainerJob
 	}
 
 	@Override
-	protected Set<IFileStore> filterFiles(long indexLastModified, Set<IFileStore> files)
+	protected Set<IFileStore> filterFilesByTimestamp(long indexLastModified, Set<IFileStore> files)
 	{
 		return files;
 	}

@@ -12,20 +12,20 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS // NO_UCD
 {
 	private static final String BUNDLE_NAME = "com.aptana.git.core.model.messages"; //$NON-NLS-1$
-	
+
 	public static String GitExecutable_UnableToParseGitVersion;
+	public static String GitExecutable_UnableToLaunchCloneError;
 
 	public static String GitIndex_BinaryDiff_Message; // NO_UCD
-	public static String GitRepository_DestinationBranchNotProvided;
 
+	public static String GitRepository_ERR_BranchNotProvided;
 	public static String GitRepository_FailedAcquireLock;
-
 	public static String GitRepository_FailedAcquireReadLock;
-
 	public static String GitRepository_FailedAcquireWriteLock;
 
+	public static String GitRepository_FailedReadLockForConfig;
+
 	public static String GitRepositoryManager_UnableToFindGitExecutableError; // NO_UCD
-	public static String GitExecutable_UnableToLaunchCloneError;
 
 	static
 	{

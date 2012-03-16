@@ -9,6 +9,7 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
+@SuppressWarnings({ "nls", "deprecation" })
 public class IndexTest extends TestCase
 {
 
@@ -31,7 +32,7 @@ public class IndexTest extends TestCase
 			}
 			if (index != null)
 			{
-				IndexManager.getInstance().removeIndex(index.getRoot());
+				getIndexManager().removeIndex(index.getRoot());
 				index = null;
 			}
 		}
@@ -49,7 +50,12 @@ public class IndexTest extends TestCase
 		indexDir = new File(parent, name);
 		indexDir.mkdirs();
 		URI path = indexDir.toURI();
-		index = IndexManager.getInstance().getIndex(path);
+		index = getIndexManager().getIndex(path);
+	}
+
+	protected IndexManager getIndexManager()
+	{
+		return IndexPlugin.getDefault().getIndexManager();
 	}
 
 	/**

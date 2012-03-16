@@ -150,7 +150,16 @@ public class Index
 
 		String fileName = Long.toString(crc.getValue()) + ".index"; //$NON-NLS-1$
 
-		return IndexPlugin.getDefault().getStateLocation().append(fileName);
+		IndexPlugin plugin = IndexPlugin.getDefault();
+		if (plugin != null)
+		{
+			IPath path = plugin.getStateLocation();
+			if (path != null)
+			{
+				return path.append(fileName);
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -312,7 +321,11 @@ public class Index
 
 		// Convert to a filename we can use for the actual index on disk
 		IPath diskIndexPath = computeIndexLocation(containerURI);
-		String diskIndexPathString = diskIndexPath.getDevice() == null ? diskIndexPath.toString() : diskIndexPath
+		if (diskIndexPath == null)
+		{
+			return;
+		}
+		String diskIndexPathString = (diskIndexPath.getDevice() == null) ? diskIndexPath.toString() : diskIndexPath
 				.toOSString();
 		this.enterWrite();
 		try
@@ -351,16 +364,28 @@ public class Index
 	 */
 	void deleteIndexFile()
 	{
+		if (isTraceEnabled())
+		{
+			logTrace(MessageFormat.format("Deleting index ''{0}''", this)); //$NON-NLS-1$
+		}
+
 		// TODO Enter write?
-		IdeLog.logInfo(IndexPlugin.getDefault(),
-				MessageFormat.format("Deleting index ''{0}''", this), IDebugScopes.INDEXER); //$NON-NLS-1$
 
 		File indexFile = this.getIndexFile();
-
 		if (indexFile != null && indexFile.exists())
 		{
 			indexFile.delete();
 		}
+	}
+
+	protected static void logTrace(String msg)
+	{
+		IdeLog.logTrace(IndexPlugin.getDefault(), msg, IDebugScopes.INDEXER);
+	}
+
+	protected static boolean isTraceEnabled()
+	{
+		return IdeLog.isTraceEnabled(IndexPlugin.getDefault(), IDebugScopes.INDEXER);
 	}
 
 	/**
@@ -584,18 +609,13 @@ public class Index
 		this.enterRead();
 		try
 		{
-			// TODO: Don't do any of this unless we are logging INFOs
-			if (memoryIndex.hasDocument(documentName))
+			if (isTraceEnabled() && memoryIndex.hasDocument(documentName))
 			{
 				// @formatter:off
-				String message = MessageFormat.format(
-					"Removing URI ''{0}'' from index ''{1}''", //$NON-NLS-1$
-					containerRelativeURI,
-					this
-				);
+				String message = MessageFormat.format("Removing URI ''{0}'' from index ''{1}''", //$NON-NLS-1$
+						containerRelativeURI, this);
 				// @formatter:on
-
-				IdeLog.logInfo(IndexPlugin.getDefault(), message, IDebugScopes.INDEXER);
+				logTrace(message);
 			}
 		}
 		finally
@@ -643,8 +663,10 @@ public class Index
 	 */
 	public void save() throws IOException
 	{
-		IdeLog.logInfo(IndexPlugin.getDefault(),
-				MessageFormat.format("Saving index ''{0}''", this), IDebugScopes.INDEXER); //$NON-NLS-1$
+		if (isTraceEnabled())
+		{
+			logTrace(MessageFormat.format("Saving index ''{0}''", this)); //$NON-NLS-1$
+		}
 
 		this.save(true);
 	}

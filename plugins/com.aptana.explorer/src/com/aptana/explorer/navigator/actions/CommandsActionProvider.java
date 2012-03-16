@@ -43,6 +43,16 @@ public class CommandsActionProvider extends ExplorerActionProvider
 		return ExplorerPlugin.getImage(IExplorerUIConstants.GEAR_MENU_ICON);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.ui.actions.DefaultNavigatorActionProvider#getHotImage()
+	 */
+	@Override
+	protected Image getHotImage()
+	{
+		return ExplorerPlugin.getImage(IExplorerUIConstants.GEAR_HOT_MENU_ICON);
+	}
+
 	@Override
 	protected String getMenuId()
 	{

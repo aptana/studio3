@@ -46,7 +46,7 @@ public class JSFoldingComputerTest extends TestCase
 			protected IParseNode getAST()
 			{
 				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get(), null, 0, 0);
+				parseState.setEditState(getDocument().get());
 				try
 				{
 					return new JSParser().parse(parseState);
@@ -72,7 +72,7 @@ public class JSFoldingComputerTest extends TestCase
 			protected IParseNode getAST()
 			{
 				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get(), null, 0, 0);
+				parseState.setEditState(getDocument().get());
 				try
 				{
 					return new JSParser().parse(parseState);
@@ -106,7 +106,7 @@ public class JSFoldingComputerTest extends TestCase
 			protected IParseNode getAST()
 			{
 				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get(), null, 0, 0);
+				parseState.setEditState(getDocument().get());
 				try
 				{
 					return new JSParser().parse(parseState);
@@ -134,7 +134,7 @@ public class JSFoldingComputerTest extends TestCase
 			protected IParseNode getAST()
 			{
 				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get(), null, 0, 0);
+				parseState.setEditState(getDocument().get());
 				try
 				{
 					return new JSParser().parse(parseState);
@@ -169,7 +169,7 @@ public class JSFoldingComputerTest extends TestCase
 			protected IParseNode getAST()
 			{
 				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get(), null, 0, 0);
+				parseState.setEditState(getDocument().get());
 				try
 				{
 					return new JSParser().parse(parseState);
@@ -206,7 +206,7 @@ public class JSFoldingComputerTest extends TestCase
 			protected IParseNode getAST()
 			{
 				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get(), null, 0, 0);
+				parseState.setEditState(getDocument().get());
 				try
 				{
 					return new JSParser().parse(parseState);
@@ -241,7 +241,7 @@ public class JSFoldingComputerTest extends TestCase
 			protected IParseNode getAST()
 			{
 				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get(), null, 0, 0);
+				parseState.setEditState(getDocument().get());
 				try
 				{
 					return new JSParser().parse(parseState);

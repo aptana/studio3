@@ -24,12 +24,14 @@ public class AllTests
 		suite.addTest(com.aptana.editor.js.contentassist.AllTests.suite());
 		suite.addTest(com.aptana.editor.js.index.AllTests.suite());
 		suite.addTest(com.aptana.editor.js.inferencing.AllTests.suite());
-		suite.addTest(com.aptana.editor.js.internal.text.AllTests.suite());
+		suite.addTest(com.aptana.editor.js.internal.build.AllTests.suite());
+		suite.addTest(com.aptana.editor.js.internal.text.AllTests.suite());		
 		suite.addTest(com.aptana.editor.js.outline.AllTests.suite());
 		suite.addTest(com.aptana.editor.js.parsing.AllTests.suite());
 		suite.addTest(com.aptana.editor.js.sdoc.parsing.AllTests.suite());
 		suite.addTest(com.aptana.editor.js.vsdoc.parsing.AllTests.suite());
 		suite.addTest(com.aptana.editor.js.text.AllTests.suite());
+		suite.addTest(com.aptana.editor.js.validator.ValidatorTests.suite());
 		// $JUnit-END$
 		return suite;
 	}

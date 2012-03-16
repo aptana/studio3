@@ -14,9 +14,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import junit.framework.TestCase;
@@ -32,12 +30,10 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.swt.events.VerifyEvent;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.ITextEditor;
@@ -46,10 +42,15 @@ import org.osgi.framework.Bundle;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.editor.epl.tests.EditorTestHelper;
+import com.aptana.index.core.FileStoreBuildContext;
 import com.aptana.index.core.IFileStoreIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
+import com.aptana.index.core.IndexPlugin;
+import com.aptana.index.core.build.BuildContext;
 import com.aptana.scripting.model.SnippetElement;
+import com.aptana.ui.util.UIUtils;
 
 public abstract class EditorBasedTests extends TestCase
 {
@@ -94,7 +95,7 @@ public abstract class EditorBasedTests extends TestCase
 	 */
 	protected ITextEditor createEditor(IEditorInput editorInput, String editorId)
 	{
-		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		IWorkbenchPage page = UIUtils.getActivePage();
 		ITextEditor editor = null;
 
 		try
@@ -164,6 +165,10 @@ public abstract class EditorBasedTests extends TestCase
 	{
 		File tempFile;
 		IFileStore fileStore = null;
+		if (extension.length() > 0 && extension.charAt(0) != '.')
+		{
+			extension = '.' + extension;
+		}
 		try
 		{
 			tempFile = File.createTempFile(prefix, extension);
@@ -227,7 +232,7 @@ public abstract class EditorBasedTests extends TestCase
 	protected abstract String getPluginId();
 
 	/**
-	 * Is we wish to index our files, the index we should use
+	 * Is we wish to index our files, the indexer we should use
 	 * 
 	 * @return
 	 */
@@ -247,7 +252,7 @@ public abstract class EditorBasedTests extends TestCase
 		{
 			return null;
 		}
-		return IndexManager.getInstance().getIndex(this.fileUri);
+		return getIndexManager().getIndex(this.fileUri);
 
 	}
 
@@ -290,21 +295,6 @@ public abstract class EditorBasedTests extends TestCase
 		this.document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
 		this.source = document.get();
 
-		IFileStoreIndexingParticipant indexer = this.createIndexer();
-		if (indexer != null)
-		{
-			Set<IFileStore> set = new HashSet<IFileStore>();
-			set.add(store);
-			try
-			{
-				indexer.index(set, this.getIndex(), new NullProgressMonitor());
-			}
-			catch (CoreException e)
-			{
-				fail("Error indexing file");
-			}
-		}
-
 		// find offsets
 		this.cursorOffsets = new ArrayList<Integer>();
 		int offset = this.source.indexOf('|');
@@ -328,6 +318,27 @@ public abstract class EditorBasedTests extends TestCase
 
 			// update document
 			document.set(this.source);
+		}
+
+		IFileStoreIndexingParticipant indexer = this.createIndexer();
+		if (indexer != null)
+		{
+			BuildContext context = new FileStoreBuildContext(store)
+			{
+				@Override
+				public synchronized String getContents() throws CoreException
+				{
+					return source;
+				}
+			};
+			try
+			{
+				indexer.index(context, this.getIndex(), new NullProgressMonitor());
+			}
+			catch (CoreException e)
+			{
+				fail("Error indexing file: " + e.getMessage());
+			}
 		}
 	}
 
@@ -377,20 +388,18 @@ public abstract class EditorBasedTests extends TestCase
 	{
 		if (editor != null)
 		{
-			if (Display.getCurrent() != null)
-			{
-				editor.getSite().getPage().closeEditor(editor, false);
-			}
-			else
-			{
-				editor.close(false);
-			}
+			EditorTestHelper.closeEditor(editor);
 		}
 
 		if (fileUri != null)
 		{
-			IndexManager.getInstance().removeIndex(fileUri);
+			getIndexManager().removeIndex(fileUri);
 		}
+	}
+
+	protected IndexManager getIndexManager()
+	{
+		return IndexPlugin.getDefault().getIndexManager();
 	}
 
 	/*

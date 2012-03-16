@@ -9,6 +9,7 @@ package com.aptana.ui.actions;
 
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Menu;
@@ -21,12 +22,15 @@ import org.eclipse.ui.navigator.CommonActionProvider;
 import org.eclipse.ui.navigator.ICommonActionExtensionSite;
 import org.eclipse.ui.navigator.ICommonViewerWorkbenchSite;
 
+import com.aptana.ui.util.UIUtils;
+
 public abstract class DefaultNavigatorActionProvider extends CommonActionProvider
 {
 
 	private IWorkbenchPartSite partSite;
 	private DefaultNavigatorContributionItem toolbarItem;
 	private boolean isToolbarFilled;
+	protected Image disabledImage;
 
 	@Override
 	public void init(ICommonActionExtensionSite aSite)
@@ -50,6 +54,20 @@ public abstract class DefaultNavigatorActionProvider extends CommonActionProvide
 	public abstract String getActionId();
 
 	protected abstract Image getImage();
+
+	protected Image getHotImage()
+	{
+		return null;
+	}
+
+	protected Image getDisabledImage()
+	{
+		if (getImage() != null && disabledImage == null)
+		{
+			disabledImage = new Image(UIUtils.getDisplay(), getImage(), SWT.IMAGE_DISABLE);
+		}
+		return disabledImage;
+	}
 
 	protected abstract String getMenuId();
 
@@ -107,5 +125,16 @@ public abstract class DefaultNavigatorActionProvider extends CommonActionProvide
 		DefaultNavigatorContributionItem item = new DefaultNavigatorContributionItem(this);
 		toolBarManager.add(item);
 		return item;
+	}
+
+	@Override
+	public void dispose()
+	{
+		super.dispose();
+
+		if (disabledImage != null)
+		{
+			disabledImage.dispose();
+		}
 	}
 }

@@ -111,7 +111,7 @@ public class FunctionType extends Type
 				type.toSource(writer);
 			}
 
-			writer.print(')'); //$NON-NLS-1$
+			writer.print(')');
 		}
 
 		if (this._returnTypes != null && !this._returnTypes.isEmpty())
