@@ -14,7 +14,7 @@ public class DefaultAnalyticsInfo extends AnalyticsInfo
 	private static final String ID = "com.aptana.studio"; //$NON-NLS-1$
 	private static final String GUID = "936afc9e-28ed-4618-88b8-f6e6e3869b09"; //$NON-NLS-1$
 	private static final String VERSION_PLUGIN_ID = "com.aptana.branding"; //$NON-NLS-1$
-	private static final String USER_AGENT = "AptanaStudio/3.0"; //$NON-NLS-1$
+	private static final String USER_AGENT = "AptanaStudio/3.1"; //$NON-NLS-1$
 
 	public DefaultAnalyticsInfo()
 	{
