@@ -747,7 +747,7 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 			// substitution.
 			content = IOUtil.read(zipFile.getInputStream(entry));
 		}
-		return new ByteArrayInputStream(content.getBytes());
+		return new ByteArrayInputStream(content.getBytes(IOUtil.UTF_8));
 	}
 
 	/**
