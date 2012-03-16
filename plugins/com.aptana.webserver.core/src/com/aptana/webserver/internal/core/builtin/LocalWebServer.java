@@ -64,7 +64,7 @@ import com.aptana.webserver.internal.core.preferences.WebServerPreferences;
 public class LocalWebServer extends SimpleWebServer
 {
 
-	private static final String NAME = "built_in_server"; //$NON-NLS-1$
+	private static final String NAME = "Built-in server"; //$NON-NLS-1$
 	private static final int SOCKET_TIMEOUT = 10000;
 	private static final long STARTUP_TIMEOUT = 10000;
 	private static final long SHUTDOWN_TIMEOUT = 2000;
