@@ -8,6 +8,7 @@
 package com.aptana.theme;
 
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Control;
 
 public interface IControlThemerFactory
@@ -18,6 +19,12 @@ public interface IControlThemerFactory
 	public abstract void applyWithFontStyle(Control control, int fontStyle);
 
 	public abstract void applyWithAlpha(Control control, int alpha);
+
+	public abstract void apply(Control control, Color defaultBg);
+
+	public abstract void applyWithFontStyle(Control control, int fontStyle, Color defaultBg);
+
+	public abstract void applyWithAlpha(Control control, int alpha, Color defaultBg);
 
 	public abstract void dispose(Control control);
 

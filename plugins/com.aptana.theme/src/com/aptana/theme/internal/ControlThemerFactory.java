@@ -14,6 +14,7 @@ import java.util.Map;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Tree;
@@ -32,7 +33,17 @@ public class ControlThemerFactory implements IControlThemerFactory
 	 */
 	public void apply(Control control)
 	{
-		apply(control, SWT.NONE, -1);
+		apply(control, null);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.theme.IControlThemerFactory#apply(org.eclipse.swt.widgets.Control,
+	 * org.eclipse.swt.graphics.Color)
+	 */
+	public void apply(Control control, Color defaultBg)
+	{
+		apply(control, SWT.NONE, -1, defaultBg);
 	}
 
 	/*
@@ -41,7 +52,16 @@ public class ControlThemerFactory implements IControlThemerFactory
 	 */
 	public void applyWithFontStyle(Control control, int fontStyle)
 	{
-		apply(control, fontStyle, -1);
+		applyWithAlpha(control, fontStyle, null);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.theme.IControlThemerFactory#applyWithFontStyle(org.eclipse.swt.widgets.Control, int)
+	 */
+	public void applyWithFontStyle(Control control, int fontStyle, Color defaultBg)
+	{
+		apply(control, fontStyle, -1, defaultBg);
 	}
 
 	/*
@@ -50,10 +70,20 @@ public class ControlThemerFactory implements IControlThemerFactory
 	 */
 	public void applyWithAlpha(Control control, int alpha)
 	{
-		apply(control, SWT.NONE, alpha);
+		applyWithAlpha(control, alpha, null);
 	}
 
-	private void apply(Control control, int fontStyle, int alpha)
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.theme.IControlThemerFactory#applyWithAlpha(org.eclipse.swt.widgets.Control, int,
+	 * org.eclipse.swt.graphics.Color)
+	 */
+	public void applyWithAlpha(Control control, int alpha, Color defaultBg)
+	{
+		apply(control, SWT.NONE, alpha, defaultBg);
+	}
+
+	private void apply(Control control, int fontStyle, int alpha, Color defaultBg)
 	{
 		// If a themer already exists for the control, just return it
 		IControlThemer themer = themers.get(control);
@@ -62,7 +92,7 @@ public class ControlThemerFactory implements IControlThemerFactory
 			return;
 		}
 
-		themer = createThemer(control, fontStyle, alpha);
+		themer = createThemer(control, fontStyle, alpha, defaultBg);
 		synchronized (themers)
 		{
 			themers.put(control, themer);
@@ -87,7 +117,7 @@ public class ControlThemerFactory implements IControlThemerFactory
 		}
 	}
 
-	private IControlThemer createThemer(Control control, int fontStyle, int alpha)
+	private IControlThemer createThemer(Control control, int fontStyle, int alpha, Color defaultBg)
 	{
 		// No themer exists, create a new one
 		if (control instanceof Tree)
@@ -100,14 +130,14 @@ public class ControlThemerFactory implements IControlThemerFactory
 		}
 		if (fontStyle != SWT.NONE)
 		{
-			return new StyledFontThemer(control, fontStyle);
+			return new StyledFontThemer(control, fontStyle, defaultBg);
 		}
 		if (alpha > -1)
 		{
-			return new AlphaBlendThemer(control, alpha);
+			return new AlphaBlendThemer(control, alpha, defaultBg);
 		}
 
-		return new ControlThemer(control);
+		return new ControlThemer(control, defaultBg);
 	}
 
 	/*
@@ -138,7 +168,7 @@ public class ControlThemerFactory implements IControlThemerFactory
 			}
 
 			// No themer exists, create a new one
-			themer =  new TreeThemer((TreeViewer) viewer);
+			themer = new TreeThemer((TreeViewer) viewer);
 			synchronized (themers)
 			{
 				themers.put(viewer.getControl(), themer);

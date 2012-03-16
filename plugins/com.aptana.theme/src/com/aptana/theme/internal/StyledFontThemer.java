@@ -7,6 +7,7 @@
  */
 package com.aptana.theme.internal;
 
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.widgets.Control;
@@ -24,9 +25,9 @@ public class StyledFontThemer extends ControlThemer
 	Font styledFont = null;
 	Font defaultStyledFont = null;
 
-	public StyledFontThemer(Control control, int fontStyle)
+	public StyledFontThemer(Control control, int fontStyle, Color defaultBg)
 	{
-		super(control);
+		super(control, defaultBg);
 		this.fontStyle = fontStyle;
 		defaultStyledFont = new Font(control.getDisplay(), SWTUtils.styleFont(control.getFont(), fontStyle));
 	}

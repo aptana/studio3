@@ -44,13 +44,20 @@ class ControlThemer implements IControlThemer
 	protected static final boolean isUbuntu = PlatformUtil.isOSName("Ubuntu"); //$NON-NLS-1$
 
 	private Control control;
+	private Color defaultBg;
 
 	private Listener selectionOverride;
 	private IPreferenceChangeListener fThemeChangeListener;
 
 	public ControlThemer(Control control)
 	{
+		this(control, null);
+	}
+
+	public ControlThemer(Control control, Color defaultBg)
+	{
 		this.control = control;
+		this.defaultBg = defaultBg;
 	}
 
 	public void apply()
@@ -114,7 +121,7 @@ class ControlThemer implements IControlThemer
 
 	protected void unapplyControlColors()
 	{
-		control.setBackground(null);
+		control.setBackground(defaultBg);
 		control.setForeground(null);
 	}
 

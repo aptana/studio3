@@ -113,6 +113,7 @@ public class SnippetPopupDialog extends PopupDialog
 	private QualifiedContentType translatedQualifiedType;
 	private Composite toolbarComp;
 	private ISourceViewer snippetViewer;
+	private Composite mainComp;
 
 	public SnippetPopupDialog(Shell shell, SnippetElement snippet, Control positionTarget, Control sizeTarget)
 	{
@@ -142,21 +143,24 @@ public class SnippetPopupDialog extends PopupDialog
 	@Override
 	protected Control createDialogArea(Composite parent)
 	{
-		Composite control = (Composite) super.createDialogArea(parent);
+		mainComp = (Composite) super.createDialogArea(parent);
 
-		Composite custom = new Composite(control, SWT.NONE);
+		Composite custom = new Composite(mainComp, SWT.NONE);
 		custom.setLayout(new FillLayout());
 		custom.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 
 		snippetViewer = createSnippetViewer(custom);
 
-		toolbarComp = new Composite(control, SWT.BORDER);
-		toolbarComp.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_GRAY));
+		Label separator = new Label(mainComp, SWT.HORIZONTAL | SWT.SEPARATOR);
+		separator.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
+
+		toolbarComp = new Composite(mainComp, SWT.NONE);
+		toolbarComp.setBackground(null);
 		toolbarComp.setLayout(GridLayoutFactory.fillDefaults().margins(2, 2).create());
 		toolbarComp.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
 
 		toolbar = new ToolBar(toolbarComp, SWT.HORIZONTAL);
-		toolbar.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_GRAY));
+		toolbar.setBackground(null);
 		toolbar.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
 
 		ToolItem openSnippetItem = new ToolItem(toolbar, SWT.PUSH);
@@ -177,8 +181,7 @@ public class SnippetPopupDialog extends PopupDialog
 				// We have to create it if it's still pre-packaged
 				final BundleElement bundle = snippet.getOwningBundle();
 				BundlePrecedence bundlePrecedence = bundle.getBundlePrecedence();
-				if (bundlePrecedence != BundlePrecedence.PROJECT
-						&& bundlePrecedence != BundlePrecedence.USER)
+				if (bundlePrecedence != BundlePrecedence.PROJECT && bundlePrecedence != BundlePrecedence.USER)
 				{
 					final EditBundleJob job = new EditBundleJob(bundle);
 					job.addJobChangeListener(new JobChangeAdapter()
@@ -236,7 +239,7 @@ public class SnippetPopupDialog extends PopupDialog
 			}
 		});
 
-		return control;
+		return mainComp;
 	}
 
 	@Override
@@ -294,6 +297,7 @@ public class SnippetPopupDialog extends PopupDialog
 		List exclusions = super.getBackgroundColorExclusions();
 		exclusions.add(toolbar);
 		exclusions.add(toolbarComp);
+		exclusions.add(mainComp);
 		return exclusions;
 	}
 
