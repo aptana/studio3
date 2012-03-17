@@ -28,8 +28,6 @@ public class Schema
 	private Stack<ISchemaElement> _elementStack; // $codepro.audit.disable declareAsInterface
 	private ISchemaElement _currentElement;
 
-	private Object _handler;
-	private Class<?> _handlerClass;
 	private boolean _allowFreeformMarkup;
 
 	/**
@@ -40,16 +38,6 @@ public class Schema
 	public boolean allowFreeformMarkup()
 	{
 		return this._allowFreeformMarkup;
-	}
-
-	/**
-	 * Get the Class of the handler object used for element transition event handling
-	 * 
-	 * @return The handler object's class
-	 */
-	public Class<?> getHandlerClass()
-	{
-		return this._handlerClass;
 	}
 
 	/**
@@ -116,17 +104,8 @@ public class Schema
 	 * @param handler
 	 *            The handler to be used for event callbacks
 	 */
-	public Schema(Object handler)
+	public Schema()
 	{
-		// set the handler
-		this._handler = handler;
-
-		// cache the handler's class
-		if (handler != null)
-		{
-			this._handlerClass = handler.getClass();
-		}
-
 		this._elementsByName = new HashMap<String, ISchemaElement>();
 		this._elementStack = new Stack<ISchemaElement>();
 		this._rootElement = new SchemaElement(this, "#document"); //$NON-NLS-1$
@@ -222,13 +201,6 @@ public class Schema
 
 		// validate attributes on the new element
 		this._currentElement.validateAttributes(attributes);
-
-		// fire the associated onEnter method
-		if (this._handler != null && this._currentElement.hasOnEnterMethod())
-		{
-			this._currentElement.getOnEnterMethod().invoke(this._handler, // $codepro.audit.disable com.instantiations.assist.eclipse.analysis.audit.rule.preferInterfacesToReflection
-					new Object[] { namespaceURI, localName, qualifiedName, attributes });
-		}
 	}
 
 	/**
@@ -295,18 +267,11 @@ public class Schema
 	 * @throws InvocationTargetException
 	 * @throws IllegalAccessException
 	 * @throws IllegalArgumentException
+	 * @throws SAXException
 	 */
 	public void exitElement(String namespaceURI, String localName, String qualifiedName)
-			throws IllegalArgumentException, IllegalAccessException, InvocationTargetException
+			throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, SAXException
 	{
-		// fire the associated onExit method
-		if (this._handler != null && this._currentElement.hasOnExitMethod())
-		{
-			this._currentElement.getOnExitMethod().invoke(this._handler, // $codepro.audit.disable
-																			// com.instantiations.assist.eclipse.analysis.audit.rule.preferInterfacesToReflection
-					new Object[] { namespaceURI, localName, qualifiedName });
-		}
-
 		// get new current element
 		this._currentElement = this._elementStack.pop();
 	}

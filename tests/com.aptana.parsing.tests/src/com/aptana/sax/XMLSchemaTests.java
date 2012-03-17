@@ -76,7 +76,7 @@ public class XMLSchemaTests extends TestCase
 		InputStream schemaStream = this.getInputStream(schemaResource);
 		ValidatingReader reader = new ValidatingReader();
 
-		reader._schema = SchemaBuilder.fromXML(schemaStream, reader);
+		reader._schema = SchemaBuilder.fromXML(schemaStream);
 
 		return reader;
 	}

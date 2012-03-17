@@ -21,7 +21,9 @@ import java.util.regex.Pattern;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.contentassist.MetadataReader;
 import com.aptana.editor.js.JSPlugin;
@@ -44,6 +46,55 @@ import com.aptana.editor.js.sdoc.parsing.SDocParser;
  */
 public class JSMetadataReader extends MetadataReader
 {
+	private enum Element
+	{
+		JAVASCRIPT("javascript"), //$NON-NLS-1$
+		VALUE("value"), //$NON-NLS-1$
+		TYPE_MAP("type-map"), //$NON-NLS-1$
+		SPECIFICATION("specification"), //$NON-NLS-1$
+		RETURN_TYPE("return-type"), //$NON-NLS-1$
+		REFERENCE("reference"), //$NON-NLS-1$
+		PROPERTY("property"), //$NON-NLS-1$
+		PARAMETER("parameter"), //$NON-NLS-1$
+		MIXINS("mixins"), //$NON-NLS-1$
+		MIXIN("mixin"), //$NON-NLS-1$
+		METHOD("method"), //$NON-NLS-1$
+		CONSTRUCTOR("constructor"), //$NON-NLS-1$
+		EXCEPTION("exception"), //$NON-NLS-1$
+		RETURN_DESCRIPTION("return-description"), //$NON-NLS-1$
+		REMARKS("remarks"), //$NON-NLS-1$
+		EXAMPLE("example"), //$NON-NLS-1$
+		DESCRIPTION("description"), //$NON-NLS-1$
+		DEPRECATED("deprecated"), //$NON-NLS-1$
+		CONSTRUCTORS("constructors"), //$NON-NLS-1$
+		CLASS("class"), //$NON-NLS-1$
+		BROWSER("browser"), //$NON-NLS-1$
+		ALIAS("alias"), //$NON-NLS-1$
+		UNDEFINED(null);
+
+		private String name;
+
+		private Element(String name)
+		{
+			this.name = name;
+		}
+
+		private static Element fromString(String name)
+		{
+			if (name != null)
+			{
+				for (Element b : Element.values())
+				{
+					if (name.equals(b.name))
+					{
+						return b;
+					}
+				}
+			}
+			return UNDEFINED;
+		}
+	}
+
 	static final Pattern DOT_PATTERN = Pattern.compile("\\."); //$NON-NLS-1$
 	static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+"); //$NON-NLS-1$
 	static final Pattern PROPERTY_TYPE_DELIMITER_PATTERN = Pattern.compile("\\s*\\|\\s*"); //$NON-NLS-1$
@@ -71,6 +122,171 @@ public class JSMetadataReader extends MetadataReader
 	 */
 	public JSMetadataReader()
 	{
+	}
+
+	@Override
+	public void startElement(String namespaceURI, String localName, String qualifiedName, Attributes attributes)
+			throws SAXException
+	{
+		super.startElement(namespaceURI, localName, qualifiedName, attributes);
+
+		switch (Element.fromString(localName))
+		{
+			case ALIAS:
+				enterAlias(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case BROWSER:
+				enterBrowser(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case CLASS:
+				enterClass(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case CONSTRUCTORS:
+				enterConstructors(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case DEPRECATED:
+			case DESCRIPTION:
+			case EXAMPLE:
+			case REMARKS:
+			case RETURN_DESCRIPTION:
+				startTextBuffer(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case EXCEPTION:
+				enterException(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case CONSTRUCTOR:
+			case METHOD:
+				enterMethod(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case MIXIN:
+				enterMixin(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case MIXINS:
+				enterMixins(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case PARAMETER:
+				enterParameter(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case PROPERTY:
+				enterProperty(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case REFERENCE:
+				enterReference(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case RETURN_TYPE:
+				enterReturnType(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case SPECIFICATION:
+				enterSpecification(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case TYPE_MAP:
+				enterTypeMap(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case VALUE:
+				enterValue(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case UNDEFINED:
+				IdeLog.logWarning(JSPlugin.getDefault(),
+						MessageFormat.format("Unable to convert element with name {0} to enum value", localName)); //$NON-NLS-1$
+				break;
+
+			default:
+				// do nothing
+				break;
+		}
+	}
+
+	@Override
+	public void endElement(String namespaceURI, String localName, String qualifiedName) throws SAXException
+	{
+		switch (Element.fromString(localName))
+		{
+			case BROWSER:
+				exitBrowser(namespaceURI, localName, qualifiedName);
+				break;
+
+			case CLASS:
+				exitClass(namespaceURI, localName, qualifiedName);
+				break;
+
+			case CONSTRUCTORS:
+				exitConstructors(namespaceURI, localName, qualifiedName);
+				break;
+
+			case DEPRECATED:
+				exitDeprecated(namespaceURI, localName, qualifiedName);
+				break;
+
+			case DESCRIPTION:
+				exitDescription(namespaceURI, localName, qualifiedName);
+				break;
+
+			case EXAMPLE:
+				exitExample(namespaceURI, localName, qualifiedName);
+				break;
+
+			case EXCEPTION:
+				exitException(namespaceURI, localName, qualifiedName);
+				break;
+
+			case JAVASCRIPT:
+				exitJavaScript(namespaceURI, localName, qualifiedName);
+				break;
+
+			case METHOD:
+			case CONSTRUCTOR:
+				exitMethod(namespaceURI, localName, qualifiedName);
+				break;
+
+			case PARAMETER:
+				exitParameter(namespaceURI, localName, qualifiedName);
+				break;
+
+			case PROPERTY:
+				exitProperty(namespaceURI, localName, qualifiedName);
+				break;
+
+			case REMARKS:
+				exitRemarks(namespaceURI, localName, qualifiedName);
+				break;
+
+			case RETURN_DESCRIPTION:
+				exitReturnDescription(namespaceURI, localName, qualifiedName);
+				break;
+
+			case RETURN_TYPE:
+				exitReturnType(namespaceURI, localName, qualifiedName);
+				break;
+
+			case VALUE:
+				exitValue(namespaceURI, localName, qualifiedName);
+				break;
+			case UNDEFINED:
+				IdeLog.logWarning(JSPlugin.getDefault(),
+						MessageFormat.format("Unable to convert element with name {0} to enum value", localName)); //$NON-NLS-1$
+				break;
+
+			default:
+				// do nothing
+				break;
+		}
+		super.endElement(namespaceURI, localName, qualifiedName);
 	}
 
 	/**

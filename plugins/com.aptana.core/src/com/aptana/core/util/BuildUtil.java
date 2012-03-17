@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.osgi.framework.Bundle;
 
 import com.aptana.core.CorePlugin;
 
@@ -39,7 +40,8 @@ public class BuildUtil
 	{
 		try
 		{
-			buildConfigurationClass = Class.forName(BUILD_CONFIGURATION_37_CLASS_NAME);
+			Bundle b = ResourcesPlugin.getPlugin().getBundle();
+			buildConfigurationClass = b.loadClass(BUILD_CONFIGURATION_37_CLASS_NAME);
 		}
 		catch (Throwable t)
 		{

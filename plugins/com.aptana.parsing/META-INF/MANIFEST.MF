@@ -23,4 +23,3 @@ Export-Package: com.aptana.json,
 Bundle-ClassPath: libs/jaxen-1.1.2.jar,
  .
 Eclipse-ExtensibleAPI: true
-Eclipse-BuddyPolicy: dependent

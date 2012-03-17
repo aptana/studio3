@@ -9,13 +9,16 @@ package com.aptana.editor.css.contentassist.index;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.MessageFormat;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.contentassist.MetadataReader;
 import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.contentassist.model.ElementElement;
@@ -31,6 +34,46 @@ import com.aptana.editor.css.contentassist.model.ValueElement;
  */
 public class CSSMetadataReader extends MetadataReader
 {
+
+	private enum Element
+	{
+		VALUE("value"), //$NON-NLS-1$
+		SPECIFICATION("specification"), //$NON-NLS-1$
+		PSEUDO_ELEMENT("pseudo-element"), //$NON-NLS-1$
+		PSEUDO_CLASS("pseudo-class"), //$NON-NLS-1$
+		PROPERTY_REF("property-ref"), //$NON-NLS-1$
+		PROPERTY("property"), //$NON-NLS-1$
+		ELEMENT("element"), //$NON-NLS-1$
+		REMARKS("remarks"), //$NON-NLS-1$
+		HINT("hint"), //$NON-NLS-1$
+		EXAMPLE("example"), //$NON-NLS-1$
+		DESCRIPTION("description"), //$NON-NLS-1$
+		BROWSER("browser"), //$NON-NLS-1$
+		UNDEFINED(null);
+
+		private String name;
+
+		private Element(String name)
+		{
+			this.name = name;
+		}
+
+		private static Element fromString(String name)
+		{
+			if (name != null)
+			{
+				for (Element b : Element.values())
+				{
+					if (name.equals(b.name))
+					{
+						return b;
+					}
+				}
+			}
+			return UNDEFINED;
+		}
+	}
+
 	private static final String METADATA_SCHEMA_XML = "/metadata/CSSMetadataSchema.xml"; //$NON-NLS-1$
 
 	private List<ElementElement> _elements = new LinkedList<ElementElement>();
@@ -49,6 +92,122 @@ public class CSSMetadataReader extends MetadataReader
 	 */
 	public CSSMetadataReader()
 	{
+	}
+
+	@Override
+	public void startElement(String namespaceURI, String localName, String qualifiedName, Attributes attributes)
+			throws SAXException
+	{
+		super.startElement(namespaceURI, localName, qualifiedName, attributes);
+
+		switch (Element.fromString(localName))
+		{
+			case BROWSER:
+				enterBrowser(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case ELEMENT:
+				enterElement(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case PROPERTY:
+				enterProperty(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case PROPERTY_REF:
+				enterPropertyReference(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case PSEUDO_CLASS:
+				enterPseudoClass(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case PSEUDO_ELEMENT:
+				enterPseudoElement(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case SPECIFICATION:
+				enterSpecification(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case VALUE:
+				enterValue(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case DESCRIPTION:
+			case EXAMPLE:
+			case HINT:
+			case REMARKS:
+				startTextBuffer(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case UNDEFINED:
+				IdeLog.logWarning(CSSPlugin.getDefault(),
+						MessageFormat.format("Unable to convert element with name {0} to enum value", localName)); //$NON-NLS-1$
+				break;
+
+			default:
+				// do nothing
+				break;
+		}
+	}
+
+	@Override
+	public void endElement(String namespaceURI, String localName, String qualifiedName) throws SAXException
+	{
+		switch (Element.fromString(localName))
+		{
+			case BROWSER:
+				exitBrowser(namespaceURI, localName, qualifiedName);
+				break;
+
+			case DESCRIPTION:
+				exitDescription(namespaceURI, localName, qualifiedName);
+				break;
+
+			case ELEMENT:
+				exitElement(namespaceURI, localName, qualifiedName);
+				break;
+
+			case EXAMPLE:
+				exitExample(namespaceURI, localName, qualifiedName);
+				break;
+
+			case HINT:
+				exitHint(namespaceURI, localName, qualifiedName);
+				break;
+
+			case PROPERTY:
+				exitProperty(namespaceURI, localName, qualifiedName);
+				break;
+
+			case PSEUDO_CLASS:
+				exitPseudoClass(namespaceURI, localName, qualifiedName);
+				break;
+
+			case PSEUDO_ELEMENT:
+				exitPseudoElement(namespaceURI, localName, qualifiedName);
+				break;
+
+			case REMARKS:
+				exitRemarks(namespaceURI, localName, qualifiedName);
+				break;
+
+			case VALUE:
+				exitValue(namespaceURI, localName, qualifiedName);
+				break;
+
+			case UNDEFINED:
+				IdeLog.logWarning(CSSPlugin.getDefault(),
+						MessageFormat.format("Unable to convert element with name {0} to enum value", localName)); //$NON-NLS-1$
+				break;
+
+			default:
+				// do nothing
+				break;
+		}
+
+		super.endElement(namespaceURI, localName, qualifiedName);
 	}
 
 	/**

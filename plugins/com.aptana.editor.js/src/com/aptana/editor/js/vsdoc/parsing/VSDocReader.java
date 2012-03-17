@@ -9,6 +9,7 @@ package com.aptana.editor.js.vsdoc.parsing;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -16,7 +17,9 @@ import java.util.List;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.contentassist.MetadataReader;
 import com.aptana.editor.js.JSPlugin;
@@ -37,6 +40,44 @@ import com.aptana.editor.js.sdoc.parsing.SDocParser;
 
 public class VSDocReader extends MetadataReader
 {
+	private enum Element
+	{
+		SUMMARY("summary"), //$NON-NLS-1$
+		PRIVATE("private"), //$NON-NLS-1$
+		EXAMPLE("example"), //$NON-NLS-1$
+		USER_AGENT("userAgent"), //$NON-NLS-1$
+		SEEALSO("seealso"), //$NON-NLS-1$
+		SEE("see"), //$NON-NLS-1$
+		RETURNS("returns"), //$NON-NLS-1$
+		PARAM("param"), //$NON-NLS-1$
+		PARA("para"), //$NON-NLS-1$
+		EXCEPTION("exception"), //$NON-NLS-1$
+		DOCS("docs"), //$NON-NLS-1$
+		UNDEFINED(null);
+
+		private String name;
+
+		private Element(String name)
+		{
+			this.name = name;
+		}
+
+		private static Element fromString(String name)
+		{
+			if (name != null)
+			{
+				for (Element b : Element.values())
+				{
+					if (name.equals(b.name))
+					{
+						return b;
+					}
+				}
+			}
+			return UNDEFINED;
+		}
+	}
+
 	private static final String METADATA_SCHEMA_XML = "/metadata/VSDocSchema.xml"; //$NON-NLS-1$
 
 	private String _summary;
@@ -54,6 +95,105 @@ public class VSDocReader extends MetadataReader
 	public VSDocReader()
 	{
 		this._typeParser = new SDocParser();
+	}
+
+	@Override
+	public void startElement(String namespaceURI, String localName, String qualifiedName, Attributes attributes)
+			throws SAXException
+	{
+		super.startElement(namespaceURI, localName, qualifiedName, attributes);
+
+		switch (Element.fromString(localName))
+		{
+			case DOCS:
+				enterDocs(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case EXCEPTION:
+				enterException(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case PARA:
+				enterPara(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case PARAM:
+				enterParam(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case RETURNS:
+				enterReturns(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case SEE:
+			case SEEALSO:
+				enterSee(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case USER_AGENT:
+				enterUserAgent(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case EXAMPLE:
+			case PRIVATE:
+			case SUMMARY:
+				startTextBuffer(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case UNDEFINED:
+				IdeLog.logWarning(JSPlugin.getDefault(),
+						MessageFormat.format("Unable to convert element with name {0} to enum value", localName)); //$NON-NLS-1$
+				break;
+
+			default:
+				// do nothing
+				break;
+		}
+	}
+
+	@Override
+	public void endElement(String namespaceURI, String localName, String qualifiedName) throws SAXException
+	{
+		switch (Element.fromString(localName))
+		{
+			case DOCS:
+				exitDocs(namespaceURI, localName, qualifiedName);
+				break;
+
+			case EXAMPLE:
+				exitExample(namespaceURI, localName, qualifiedName);
+				break;
+
+			case EXCEPTION:
+				exitException(namespaceURI, localName, qualifiedName);
+				break;
+
+			case PARAM:
+				exitParam(namespaceURI, localName, qualifiedName);
+				break;
+
+			case PRIVATE:
+				exitPrivate(namespaceURI, localName, qualifiedName);
+				break;
+
+			case RETURNS:
+				exitReturns(namespaceURI, localName, qualifiedName);
+				break;
+
+			case SUMMARY:
+				exitSummary(namespaceURI, localName, qualifiedName);
+				break;
+
+			case UNDEFINED:
+				IdeLog.logWarning(JSPlugin.getDefault(),
+						MessageFormat.format("Unable to convert element with name {0} to enum value", localName)); //$NON-NLS-1$
+				break;
+
+			default:
+				// do nothing
+				break;
+		}
+		super.endElement(namespaceURI, localName, qualifiedName);
 	}
 
 	/**
