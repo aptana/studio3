@@ -15,7 +15,6 @@ import com.aptana.editor.css.CSSEditorTest;
 import com.aptana.editor.css.CSSSourcePartitionScannerTest;
 import com.aptana.editor.css.internal.build.CSSTaskDetectorTest;
 import com.aptana.editor.css.internal.text.CSSFoldingComputerTest;
-import com.aptana.editor.css.validator.CSSValidatorTest;
 import com.aptana.editor.css.validator.ValidatorTests;
 
 public class AllTests

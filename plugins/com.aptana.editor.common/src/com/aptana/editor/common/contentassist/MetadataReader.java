@@ -135,7 +135,7 @@ public abstract class MetadataReader extends ValidatingReader
 				try
 				{
 					// create the schema
-					this._schema = this._metadataSchema = SchemaBuilder.fromXML(schemaStream, this);
+					this._schema = this._metadataSchema = SchemaBuilder.fromXML(schemaStream);
 				}
 				catch (SchemaInitializationException e)
 				{

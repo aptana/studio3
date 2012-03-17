@@ -7,7 +7,6 @@
  */
 package com.aptana.sax;
 
-import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,10 +24,6 @@ import com.aptana.core.util.SourcePrinter;
  */
 public class SchemaElement implements ISchemaElement
 {
-	private static final Class<?>[] enterSignature = new Class[] { String.class, String.class, String.class,
-			Attributes.class };
-	private static final Class<?>[] exitSignature = new Class[] { String.class, String.class, String.class };
-
 	private String _name;
 	private Schema _owningSchema;
 	private Map<String, ISchemaElement> _transitions;
@@ -38,8 +33,6 @@ public class SchemaElement implements ISchemaElement
 
 	private String _instanceAttributes;
 
-	private Method _onEnter;
-	private Method _onExit;
 	private boolean _hasText;
 
 	/**
@@ -170,24 +163,6 @@ public class SchemaElement implements ISchemaElement
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.sax.ISchemaElement#getOnEnterMethod()
-	 */
-	public Method getOnEnterMethod()
-	{
-		return this._onEnter;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.sax.ISchemaElement#getOnExitMethod()
-	 */
-	public Method getOnExitMethod()
-	{
-		return this._onExit;
-	}
-
-	/*
-	 * (non-Javadoc)
 	 * @see com.aptana.sax.ISchemaElement#getOwningSchema()
 	 */
 	public Schema getOwningSchema()
@@ -213,24 +188,6 @@ public class SchemaElement implements ISchemaElement
 	public boolean hasAttribute(String name)
 	{
 		return this._attributes.containsKey(name);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.sax.ISchemaElement#hasOnEnterMethod()
-	 */
-	public boolean hasOnEnterMethod()
-	{
-		return this._onEnter != null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.sax.ISchemaElement#hasOnExitMethod()
-	 */
-	public boolean hasOnExitMethod()
-	{
-		return this._onExit != null;
 	}
 
 	/*
@@ -356,46 +313,6 @@ public class SchemaElement implements ISchemaElement
 	public void setHasText(boolean value)
 	{
 		this._hasText = value;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.sax.ISchemaElement#setOnEnter(java.lang.String)
-	 */
-	public void setOnEnter(String onEnterMethod) throws SecurityException, NoSuchMethodException
-	{
-		Class<?> handlerClass = this.getOwningSchema().getHandlerClass();
-
-		if (handlerClass != null)
-		{
-			// this._onEnter = handlerClass.getDeclaredMethod(onEnterMethod,
-			// enterSignature);
-			this._onEnter = handlerClass.getMethod(onEnterMethod, enterSignature);
-		}
-		else
-		{
-			this._onEnter = null;
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.sax.ISchemaElement#setOnExit(java.lang.String)
-	 */
-	public void setOnExit(String onExitMethod) throws SecurityException, NoSuchMethodException
-	{
-		Class<?> handlerClass = this.getOwningSchema().getHandlerClass();
-
-		if (handlerClass != null)
-		{
-			// this._onExit = handlerClass.getDeclaredMethod(onExitMethod,
-			// exitSignature);
-			this._onExit = handlerClass.getMethod(onExitMethod, exitSignature);
-		}
-		else
-		{
-			this._onExit = null;
-		}
 	}
 
 	/*

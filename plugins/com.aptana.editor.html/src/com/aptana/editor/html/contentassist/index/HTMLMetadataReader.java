@@ -9,13 +9,16 @@ package com.aptana.editor.html.contentassist.index;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.MessageFormat;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.contentassist.MetadataReader;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.contentassist.model.AttributeElement;
@@ -31,6 +34,49 @@ import com.aptana.editor.html.contentassist.model.ValueElement;
  */
 public class HTMLMetadataReader extends MetadataReader
 {
+	private enum Element
+	{
+		AVAILABILITY("availability"), //$NON-NLS-1$
+		HINT("hint"), //$NON-NLS-1$
+		DEPRECATED("deprecated"), //$NON-NLS-1$
+		DESCRIPTION("description"), //$NON-NLS-1$
+		REMARKS("remarks"), //$NON-NLS-1$
+		EXAMPLE("example"), //$NON-NLS-1$
+		VALUE("value"), //$NON-NLS-1$
+		SPECIFICATION("specification"), //$NON-NLS-1$
+		REFERENCE("reference"), //$NON-NLS-1$
+		EVENT_REF("event-ref"), //$NON-NLS-1$
+		EVENT("event"), //$NON-NLS-1$
+		ENTITY("entity"), //$NON-NLS-1$
+		ELEMENT("element"), //$NON-NLS-1$
+		BROWSER("browser"), //$NON-NLS-1$
+		ATTRIBUTE_REF("attribute-ref"), //$NON-NLS-1$
+		ATTRIBUTE("attribute"), //$NON-NLS-1$
+		UNDEFINED(null);
+
+		private String name;
+
+		private Element(String name)
+		{
+			this.name = name;
+		}
+
+		private static Element fromString(String name)
+		{
+			if (name != null)
+			{
+				for (Element b : Element.values())
+				{
+					if (name.equals(b.name))
+					{
+						return b;
+					}
+				}
+			}
+			return UNDEFINED;
+		}
+	}
+
 	private static final String HTML_METADATA_SCHEMA = "/metadata/HTMLMetadataSchema.xml"; //$NON-NLS-1$
 
 	private List<ElementElement> _elements = new LinkedList<ElementElement>();
@@ -49,6 +95,138 @@ public class HTMLMetadataReader extends MetadataReader
 	 */
 	public HTMLMetadataReader()
 	{
+	}
+
+	@Override
+	public void startElement(String namespaceURI, String localName, String qualifiedName, Attributes attributes)
+			throws SAXException
+	{
+		super.startElement(namespaceURI, localName, qualifiedName, attributes);
+
+		switch (Element.fromString(localName))
+		{
+			case ATTRIBUTE:
+				enterAttribute(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case ATTRIBUTE_REF:
+				enterAttributeReference(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case BROWSER:
+				enterBrowser(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case ELEMENT:
+				enterElement(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case ENTITY:
+				enterEntity(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case EVENT:
+				enterEvent(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case EVENT_REF:
+				enterEventReference(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case REFERENCE:
+				enterReference(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case SPECIFICATION:
+				enterSpecification(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case VALUE:
+				enterValue(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case EXAMPLE:
+			case REMARKS:
+			case DESCRIPTION:
+			case DEPRECATED:
+			case HINT:
+				startTextBuffer(namespaceURI, localName, qualifiedName, attributes);
+				break;
+
+			case UNDEFINED:
+				IdeLog.logWarning(HTMLPlugin.getDefault(),
+						MessageFormat.format("Unable to convert element with name {0} to enum value", localName)); //$NON-NLS-1$
+				break;
+
+			default:
+				// do nothing
+				break;
+		}
+	}
+
+	@Override
+	public void endElement(String namespaceURI, String localName, String qualifiedName) throws SAXException
+	{
+		switch (Element.fromString(localName))
+		{
+			case ATTRIBUTE:
+				exitAttribute(namespaceURI, localName, qualifiedName);
+				break;
+
+			case AVAILABILITY:
+				exitAvailability(namespaceURI, localName, qualifiedName);
+				break;
+
+			case BROWSER:
+				exitBrowser(namespaceURI, localName, qualifiedName);
+				break;
+
+			case DEPRECATED:
+				exitDeprecated(namespaceURI, localName, qualifiedName);
+				break;
+
+			case DESCRIPTION:
+				exitDescription(namespaceURI, localName, qualifiedName);
+				break;
+
+			case ELEMENT:
+				exitElement(namespaceURI, localName, qualifiedName);
+				break;
+
+			case ENTITY:
+				exitEntity(namespaceURI, localName, qualifiedName);
+				break;
+
+			case EVENT:
+				exitEvent(namespaceURI, localName, qualifiedName);
+				break;
+
+			case EXAMPLE:
+				exitExample(namespaceURI, localName, qualifiedName);
+				break;
+
+			case HINT:
+				exitHint(namespaceURI, localName, qualifiedName);
+				break;
+
+			case REMARKS:
+				exitRemarks(namespaceURI, localName, qualifiedName);
+				break;
+
+			case VALUE:
+				exitValue(namespaceURI, localName, qualifiedName);
+				break;
+
+			case UNDEFINED:
+				IdeLog.logWarning(HTMLPlugin.getDefault(),
+						MessageFormat.format("Unable to convert element with name {0} to enum value", localName)); //$NON-NLS-1$
+				break;
+
+			default:
+				// do nothing
+				break;
+		}
+		super.endElement(namespaceURI, localName, qualifiedName);
 	}
 
 	/**
