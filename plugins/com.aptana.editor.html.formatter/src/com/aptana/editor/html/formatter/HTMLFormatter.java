@@ -204,7 +204,7 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 	 */
 	public int getIndentSize()
 	{
-		return getInt(HTMLFormatterConstants.FORMATTER_INDENTATION_SIZE);
+		return getInt(HTMLFormatterConstants.FORMATTER_INDENTATION_SIZE, 1);
 	}
 
 	/*
@@ -222,7 +222,7 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 	 */
 	public int getTabSize()
 	{
-		return getInt(HTMLFormatterConstants.FORMATTER_TAB_SIZE);
+		return getInt(HTMLFormatterConstants.FORMATTER_TAB_SIZE, getEditorSpecificTabWidth());
 	}
 
 	/*
