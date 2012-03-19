@@ -122,11 +122,10 @@ public class JSLaunchShortcut implements ILaunchShortcut {
 		ILaunchConfiguration config = null;
 		ILaunchConfigurationType configType = getLaunchConfigType();
 		try {
-			@SuppressWarnings("deprecation")
 			ILaunchConfigurationWorkingCopy wc = configType.newInstance(
 					null,
 					DebugPlugin.getDefault().getLaunchManager()
-							.generateUniqueLaunchConfigurationNameFrom((path != null) ? path.lastSegment() : "Default")); //$NON-NLS-1$
+							.generateLaunchConfigurationName((path != null) ? path.lastSegment() : "Default")); //$NON-NLS-1$
 			JSLaunchConfigurationHelper.setDefaults(wc, null);
 			if (path != null) {
 				wc.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_START_ACTION_TYPE,
