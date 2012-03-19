@@ -219,7 +219,7 @@ public class JSONFormatter extends AbstractScriptFormatter implements IScriptFor
 	 */
 	public int getIndentSize()
 	{
-		return getInt(IPreferenceConstants.FORMATTER_INDENTATION_SIZE);
+		return getInt(IPreferenceConstants.FORMATTER_INDENTATION_SIZE, 1);
 	}
 
 	/*
@@ -237,7 +237,7 @@ public class JSONFormatter extends AbstractScriptFormatter implements IScriptFor
 	 */
 	public int getTabSize()
 	{
-		return getInt(IPreferenceConstants.FORMATTER_TAB_SIZE);
+		return getInt(IPreferenceConstants.FORMATTER_TAB_SIZE, getEditorSpecificTabWidth());
 	}
 
 	/*

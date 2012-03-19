@@ -202,6 +202,11 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 		return toInt(preferences.get(key));
 	}
 
+	protected int getInt(String key, int minValue)
+	{
+		return Math.max(minValue, toInt(preferences.get(key)));
+	}
+
 	/**
 	 * Logs an error and notify the user through a status line message and a beep.
 	 * 
