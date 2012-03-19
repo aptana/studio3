@@ -7,7 +7,6 @@
  */
 package com.aptana.git.ui.internal;
 
-import java.lang.reflect.Method;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
@@ -33,11 +32,6 @@ import com.aptana.git.core.model.GitRepository;
  */
 public abstract class Launcher
 {
-	/**
-	 * Invalid characters for use in a launch configuration name.
-	 */
-	private static final char[] INVALID_CHARS = new char[] { '@', '&', '\\', '/', ':', '*', '?', '"', '<', '>', '|',
-			'\0' };
 
 	/**
 	 * Launches a git process against the repository.
@@ -59,10 +53,6 @@ public abstract class Launcher
 		return config.launch(ILaunchManager.RUN_MODE, monitor);
 	}
 
-	// TODO 3.6+ Can't properly point to undeprecated constants until 3.6 is our base version where they moved these out
-	// to a core plugin
-	// @SuppressWarnings("deprecation")
-	@SuppressWarnings("deprecation")
 	private static ILaunchConfigurationWorkingCopy createLaunchConfig(String command, IPath workingDir, String... args)
 			throws CoreException
 	{
@@ -70,24 +60,7 @@ public abstract class Launcher
 		ILaunchConfigurationType configType = manager
 				.getLaunchConfigurationType(IGitLaunchConfigurationConstants.ID_GIT_LAUNCH_CONFIGURATION_TYPE);
 		String name = getLastPortion(command) + " " + join(args, " "); //$NON-NLS-1$ //$NON-NLS-2$
-		// if 3.6M6+
-		try
-		{
-			// name = manager.generateLaunchConfigurationName(name);
-			Method m = ILaunchManager.class.getMethod("generateLaunchConfigurationName", String.class); //$NON-NLS-1$
-			name = (String) m.invoke(manager, name);
-		}
-		catch (Exception e)
-		{
-			// ignore exception, we must be on Eclipse < 3.6M6
-			// TODO Remove this code when 3.6 is our base platform
-			for (char c : INVALID_CHARS)
-			{
-				name = name.replace(c, '_');
-			}
-			name = manager.generateUniqueLaunchConfigurationNameFrom(name);
-		}
-
+		name = manager.generateLaunchConfigurationName(name);
 		String toolArgs = '"' + join(args, "\" \"") + '"'; //$NON-NLS-1$
 		ILaunchConfigurationWorkingCopy config = configType.newInstance(null, name);
 		config.setAttribute(IGitLaunchConfigurationConstants.ATTR_LOCATION, command);

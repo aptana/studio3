@@ -185,9 +185,8 @@ public final class StartPageManager {
 	private ILaunchConfiguration createConfiguration(String namePrefix) {
 		ILaunchConfiguration config = null;
 		try {
-			@SuppressWarnings("deprecation")
 			ILaunchConfigurationWorkingCopy wc = configType.newInstance(null, DebugPlugin.getDefault()
-					.getLaunchManager().generateUniqueLaunchConfigurationNameFrom(namePrefix));
+					.getLaunchManager().generateLaunchConfigurationName(namePrefix));
 			JSLaunchConfigurationHelper.setDefaults(wc, null);
 			config = wc.doSave();
 		} catch (CoreException e) {
