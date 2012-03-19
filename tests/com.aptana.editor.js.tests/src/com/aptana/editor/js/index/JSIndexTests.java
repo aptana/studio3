@@ -14,6 +14,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.index.IJSIndexConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexReader;
@@ -21,6 +22,7 @@ import com.aptana.editor.js.contentassist.index.JSIndexWriter;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
+import com.aptana.editor.js.contentassist.model.UserAgentElement;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.IndexPlugin;
@@ -210,5 +212,44 @@ public class JSIndexTests extends TestCase
 
 		assertEquals(requires1, newList1);
 		assertEquals(requires2, newList2);
+	}
+
+	/**
+	 * Test for APSTUD-4289. Make sure we don't allow duplicate user agents into the JS index
+	 */
+	public void testDuplicateUserAgents()
+	{
+		// create property
+		PropertyElement property = new PropertyElement();
+
+		// add all user agents, twice
+		UserAgentManager manager = UserAgentManager.getInstance();
+
+		for (UserAgentManager.UserAgent userAgent : manager.getAllUserAgents())
+		{
+			UserAgentElement uaElement = new UserAgentElement();
+			uaElement.setPlatform(userAgent.name);
+
+			property.addUserAgent(uaElement);
+			property.addUserAgent(uaElement);
+		}
+
+		// create type for property so we can write it to the index
+		TypeElement type = new TypeElement();
+		type.setName("Testing");
+		type.addProperty(property);
+
+		// write type and its properties
+		JSIndexWriter writer = new JSIndexWriter();
+		writer.writeType(getIndex(), type);
+
+		// read property back again
+		JSIndexReader reader = new JSIndexReader();
+		List<PropertyElement> properties = reader.getProperties(getIndex(), property.getOwningType());
+
+		// make sure we have only one of each user agent
+		assertNotNull(properties);
+		assertEquals(1, properties.size());
+		assertEquals(manager.getAllUserAgents().length, properties.get(0).getUserAgents().size());
 	}
 }
