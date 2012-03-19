@@ -10,8 +10,11 @@ package com.aptana.editor.js.index;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
 
 import junit.framework.TestCase;
+
+import org.mortbay.util.ajax.JSON;
 
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.editor.common.contentassist.UserAgentManager;
@@ -26,6 +29,9 @@ import com.aptana.editor.js.contentassist.model.UserAgentElement;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.IndexPlugin;
+import com.aptana.index.core.IndexReader;
+import com.aptana.index.core.QueryResult;
+import com.aptana.index.core.SearchPattern;
 
 public class JSIndexTests extends TestCase
 {
@@ -221,6 +227,7 @@ public class JSIndexTests extends TestCase
 	{
 		// create property
 		PropertyElement property = new PropertyElement();
+		property.setName("property");
 
 		// add all user agents, twice
 		UserAgentManager manager = UserAgentManager.getInstance();
@@ -251,5 +258,52 @@ public class JSIndexTests extends TestCase
 		assertNotNull(properties);
 		assertEquals(1, properties.size());
 		assertEquals(manager.getAllUserAgents().length, properties.get(0).getUserAgents().size());
+	}
+
+	public void testSpecialAllUserAgentFlag()
+	{
+		// create property and use all user agents
+		PropertyElement property = new PropertyElement();
+		property.setName("property");
+		property.setHasAllUserAgents();
+
+		// create type for property so we can write it to the index
+		TypeElement type = new TypeElement();
+		type.setName("Testing");
+		type.addProperty(property);
+
+		// write type and its property
+		JSIndexWriter writer = new JSIndexWriter();
+		writer.writeType(getIndex(), type);
+
+		// perform low-level query
+		// @formatter:off
+		List<QueryResult> properties = getIndex().query(
+			new String[] { IJSIndexConstants.PROPERTY },
+			type.getName(),
+			SearchPattern.PREFIX_MATCH
+		);
+		// @formatter:on
+
+		// make sure we got something
+		assertNotNull(properties);
+		assertEquals(1, properties.size());
+
+		// split result into columns
+		String word = properties.get(0).getWord();
+		String[] columns = IndexReader.DELIMITER_PATTERN.split(word);
+		assertEquals(3, columns.length);
+
+		// grab last column and parse as JSON
+		String json = columns[2];
+		Object m = JSON.parse(json);
+
+		// make sure we have a map
+		assertTrue("Expected a Map from the JSON string", m instanceof Map);
+		Map<?, ?> map = (Map<?, ?>) m;
+
+		// test userAgents for "special value" which is really just a null value.
+		assertTrue("Expected a userAgents property", map.containsKey("userAgents"));
+		assertNull("Expected userAgents property to be null", map.get("userAgents"));
 	}
 }
