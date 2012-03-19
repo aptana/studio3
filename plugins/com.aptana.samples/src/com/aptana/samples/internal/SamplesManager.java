@@ -67,6 +67,8 @@ public class SamplesManager implements ISamplesManager
 	private Map<String, List<SamplesReference>> bundleSamplesByCategory;
 	private Map<String, SamplesReference> bundleSamplesById;
 
+	private List<ProjectSampleElement> bundleSamples;
+
 	private List<ISampleListener> sampleListeners;
 
 	private LoadCycleListener loadCycleListener = new LoadCycleListener()
@@ -110,6 +112,7 @@ public class SamplesManager implements ISamplesManager
 		samplesById = new HashMap<String, SamplesReference>();
 		bundleSamplesByCategory = new HashMap<String, List<SamplesReference>>();
 		bundleSamplesById = new HashMap<String, SamplesReference>();
+		bundleSamples = new ArrayList<ProjectSampleElement>();
 		sampleListeners = new ArrayList<ISampleListener>();
 
 		readExtensionRegistry();
@@ -371,6 +374,14 @@ public class SamplesManager implements ISamplesManager
 
 	private void loadBundleSampleElements()
 	{
+		List<ProjectSampleElement> elements = BundleManager.getInstance().getProjectSamples(null);
+		// only reloads the samples from rubles if there has been a difference
+		if (bundleSamples.equals(elements))
+		{
+			return;
+		}
+		bundleSamples = elements;
+
 		// removes the existing samples loaded from the rubles
 		Collection<SamplesReference> samples = new ArrayList<SamplesReference>(bundleSamplesById.values());
 		bundleSamplesByCategory.clear();
@@ -381,8 +392,7 @@ public class SamplesManager implements ISamplesManager
 		}
 
 		// adds the current list of samples loaded from the rubles
-		List<ProjectSampleElement> elements = BundleManager.getInstance().getProjectSamples(null);
-		for (ProjectSampleElement element : elements)
+		for (ProjectSampleElement element : bundleSamples)
 		{
 			addSample(element);
 		}
