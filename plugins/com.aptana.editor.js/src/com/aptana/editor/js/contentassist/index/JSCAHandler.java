@@ -490,6 +490,10 @@ public class JSCAHandler implements IContextHandler
 				currentBoolean = (Boolean) value;
 				break;
 
+			case JSMETADATA:
+				// no-op, occurs at beginning of JSCA file only
+				break;
+
 			default:
 				if (typeName != null && !typeName.startsWith(JSTypeConstants.GENERIC_ARRAY_OPEN))
 				{
