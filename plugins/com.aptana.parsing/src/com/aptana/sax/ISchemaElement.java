@@ -7,8 +7,6 @@
  */
 package com.aptana.sax;
 
-import java.lang.reflect.Method;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -50,22 +48,6 @@ public interface ISchemaElement
 	String getName();
 
 	/**
-	 * Return the Method to call when entering this element
-	 * 
-	 * @return The Method to invoke. This value can be null if there is no OnEnter event handler associated with this
-	 *         element
-	 */
-	Method getOnEnterMethod();
-
-	/**
-	 * Return the Method to call when exiting this element
-	 * 
-	 * @return The Method to invoke. This value can be null if there is no OnExit event handler associated with this
-	 *         element
-	 */
-	Method getOnExitMethod();
-
-	/**
 	 * getOwningSchema
 	 * 
 	 * @return
@@ -87,20 +69,6 @@ public interface ISchemaElement
 	 * @return Returns true if this element has an entry for the specified attribute name
 	 */
 	boolean hasAttribute(String name);
-
-	/**
-	 * Determine if this element has an associated OnEnter handler
-	 * 
-	 * @return Returns true if this element has an OnEnter handler
-	 */
-	boolean hasOnEnterMethod();
-
-	/**
-	 * Determine if this element has an associated OnExit handler
-	 * 
-	 * @return Returns true if this element has an OnExit handler
-	 */
-	boolean hasOnExitMethod();
 
 	/**
 	 * Determine if this element expects text as a child node or not
@@ -183,26 +151,6 @@ public interface ISchemaElement
 	 * @param value
 	 */
 	void setHasText(boolean value);
-
-	/**
-	 * Set the method to call after entering this element
-	 * 
-	 * @param onEnterMethod
-	 *            The name of the method to call on the schema's handler object when we enter this element
-	 * @throws NoSuchMethodException
-	 * @throws SecurityException
-	 */
-	void setOnEnter(String onEnterMethod) throws SecurityException, NoSuchMethodException;
-
-	/**
-	 * Set the method to call before exiting this element
-	 * 
-	 * @param onExitMethod
-	 *            The name of the method to call on the schema's handler object when we exit this element
-	 * @throws NoSuchMethodException
-	 * @throws SecurityException
-	 */
-	void setOnExit(String onExitMethod) throws SecurityException, NoSuchMethodException;
 
 	/**
 	 * @see java.lang.Object#toString()

@@ -56,7 +56,7 @@ public class ValidatingReader extends DefaultHandler
 		// make sure we have a valid schema
 		if (schema == null)
 		{
-			schema = new Schema(this); // $codepro.audit.disable questionableAssignment
+			schema = new Schema(); // $codepro.audit.disable questionableAssignment
 		}
 
 		this._schema = schema;

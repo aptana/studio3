@@ -12,6 +12,7 @@ import net.contentobjects.jnotify.JNotifyException;
 import net.contentobjects.jnotify.JNotifyListener;
 
 import org.eclipse.core.runtime.Platform;
+import org.osgi.framework.Bundle;
 
 import com.aptana.filewatcher.poller.PollingNotifier;
 
@@ -25,36 +26,25 @@ public class FileWatcher
 	{
 		if (_instance == null)
 		{
+			String className = null;
 			if (Platform.OS_LINUX.equals(Platform.getOS()))
 			{
-				try
-				{
-					_instance = (IJNotify) Class.forName("net.contentobjects.jnotify.linux.JNotifyAdapterLinux") //$NON-NLS-1$
-							.newInstance();
-				}
-				catch (Throwable e)
-				{
-					FileWatcherPlugin.log(e);
-				}
+				className = "net.contentobjects.jnotify.linux.JNotifyAdapterLinux"; //$NON-NLS-1$
 			}
 			else if (Platform.OS_WIN32.equals(Platform.getOS()))
 			{
-				try
-				{
-					_instance = (IJNotify) Class.forName("net.contentobjects.jnotify.win32.JNotifyAdapterWin32") //$NON-NLS-1$
-							.newInstance();
-				}
-				catch (Throwable e)
-				{
-					FileWatcherPlugin.log(e);
-				}
+				className = "net.contentobjects.jnotify.win32.JNotifyAdapterWin32"; //$NON-NLS-1$
 			}
 			else if (Platform.OS_MACOSX.equals(Platform.getOS()))
 			{
+				className = "net.contentobjects.jnotify.macosx.JNotifyAdapterMacOSX"; //$NON-NLS-1$
+			}
+			if (className != null)
+			{
 				try
 				{
-					_instance = (IJNotify) Class
-							.forName("net.contentobjects.jnotify.macosx.JNotifyAdapterMacOSX").newInstance(); //$NON-NLS-1$
+					Bundle b = FileWatcherPlugin.getDefault().getBundle();
+					_instance = (IJNotify) b.loadClass(className).newInstance();
 				}
 				catch (Throwable e)
 				{
