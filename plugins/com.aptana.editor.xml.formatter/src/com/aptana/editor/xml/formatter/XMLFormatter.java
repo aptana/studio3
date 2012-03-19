@@ -171,7 +171,7 @@ public class XMLFormatter extends AbstractScriptFormatter implements IScriptForm
 	 */
 	public int getIndentSize()
 	{
-		return getInt(XMLFormatterConstants.FORMATTER_INDENTATION_SIZE);
+		return getInt(XMLFormatterConstants.FORMATTER_INDENTATION_SIZE, 1);
 	}
 
 	/*
@@ -189,7 +189,7 @@ public class XMLFormatter extends AbstractScriptFormatter implements IScriptForm
 	 */
 	public int getTabSize()
 	{
-		return getInt(XMLFormatterConstants.FORMATTER_TAB_SIZE);
+		return getInt(XMLFormatterConstants.FORMATTER_TAB_SIZE, getEditorSpecificTabWidth());
 	}
 
 	/*

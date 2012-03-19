@@ -323,7 +323,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 	 */
 	public int getIndentSize()
 	{
-		return getInt(FORMATTER_INDENTATION_SIZE);
+		return getInt(FORMATTER_INDENTATION_SIZE, 1);
 	}
 
 	/*
@@ -341,7 +341,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 	 */
 	public int getTabSize()
 	{
-		return getInt(FORMATTER_TAB_SIZE);
+		return getInt(FORMATTER_TAB_SIZE, getEditorSpecificTabWidth());
 	}
 
 	/*
