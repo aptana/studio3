@@ -7,6 +7,9 @@
  */
 package com.aptana.editor.js.index;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -14,12 +17,19 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.mortbay.util.ajax.JSON;
 
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.IOUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.index.IJSIndexConstants;
+import com.aptana.editor.js.contentassist.index.JSFileIndexingParticipant;
 import com.aptana.editor.js.contentassist.index.JSIndexReader;
 import com.aptana.editor.js.contentassist.index.JSIndexWriter;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
@@ -32,6 +42,8 @@ import com.aptana.index.core.IndexPlugin;
 import com.aptana.index.core.IndexReader;
 import com.aptana.index.core.QueryResult;
 import com.aptana.index.core.SearchPattern;
+import com.aptana.index.core.build.BuildContext;
+import com.aptana.parsing.ast.IParseRootNode;
 
 public class JSIndexTests extends TestCase
 {
@@ -305,5 +317,105 @@ public class JSIndexTests extends TestCase
 		// test userAgents for "special value" which is really just a null value.
 		assertTrue("Expected a userAgents property", map.containsKey("userAgents"));
 		assertNull("Expected userAgents property to be null", map.get("userAgents"));
+	}
+	
+	/**
+	 * Test for APSTUD-4535
+	 */
+	public void testTypeCaching()
+	{
+		BuildContext myContext = new BuildContext()
+		{
+			@Override
+			public synchronized String getContents() throws CoreException
+			{
+				// @formatter:off
+				return StringUtil.join(
+					"\n",
+					CollectionsUtil.newList(
+						"var x = {};",
+						"x.y = {};",
+						"x.y.z = function() {}"
+					)
+				);
+				// @formatter:on
+			}
+
+			@Override
+			public String getContentType() throws CoreException
+			{
+				return "com.aptana.contenttype.js";
+			}
+
+			/*
+			 * (non-Javadoc)
+			 * @see com.aptana.index.core.build.BuildContext#getURI()
+			 */
+			@Override
+			public URI getURI()
+			{
+				return URI.create("test.js");
+			}
+		};
+
+		try
+		{
+			IParseRootNode ast = myContext.getAST();
+			JSFileIndexingParticipant indexParticipant = new JSFileIndexingParticipant();
+			Index index = getIndex();
+			
+			indexParticipant.processParseResults(myContext, index, ast, new NullProgressMonitor());
+			JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
+			
+			List<TypeElement> types = queryHelper.getTypes(index);
+			assertNotNull(types);
+			assertEquals("Expected 3 types", 3, types.size());
+
+			// remove index and do it all over again
+			getIndexManager().removeIndex(URI.create(IJSIndexConstants.METADATA_INDEX_LOCATION));
+
+			// make sure we get the same results
+			index = getIndex();
+			indexParticipant.processParseResults(myContext, index, ast, new NullProgressMonitor());
+			types = queryHelper.getTypes(index);
+			assertNotNull(types);
+			assertEquals("Expected 3 types", 3, types.size());
+		}
+		catch (CoreException e)
+		{
+			fail(e.getMessage());
+		}
+	}
+	
+	/**
+	 * getFileStore
+	 * 
+	 * @param resource
+	 * @return
+	 */
+	protected IFileStore createFileStore(String prefix, String extension, String contents)
+	{
+		File tempFile;
+		IFileStore fileStore = null;
+		if (extension.length() > 0 && extension.charAt(0) != '.')
+		{
+			extension = '.' + extension;
+		}
+		try
+		{
+			tempFile = File.createTempFile(prefix, extension);
+			IOUtil.write(new FileOutputStream(tempFile), contents);
+			fileStore = EFS.getStore(tempFile.toURI());
+		}
+		catch (IOException e)
+		{
+			fail();
+		}
+		catch (CoreException e)
+		{
+			fail();
+		}
+
+		return fileStore;
 	}
 }
