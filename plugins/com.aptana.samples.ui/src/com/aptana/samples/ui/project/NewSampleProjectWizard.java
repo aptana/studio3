@@ -114,6 +114,12 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 
 				// Check if there's already a directory/files at the destination
 				IPath location = getLocationPath();
+				if (useDefaults())
+				{
+					// needs to append the project name since getLocationPath() returns the workspace path in this case
+					location = location.append(getProjectName());
+				}
+
 				File file = location.toFile();
 				if (file.exists())
 				{
