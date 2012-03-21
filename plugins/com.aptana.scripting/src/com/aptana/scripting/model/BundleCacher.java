@@ -43,6 +43,7 @@ import org.yaml.snakeyaml.representer.Represent;
 import org.yaml.snakeyaml.representer.Representer;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.scope.ScopeSelector;
 import com.aptana.scripting.ScriptLogger;
@@ -56,8 +57,6 @@ import com.aptana.scripting.ScriptingEngine;
  */
 public class BundleCacher
 {
-
-	private static final String UTF_8 = "UTF-8"; //$NON-NLS-1$
 
 	/**
 	 * The file where we store our serialized model.
@@ -160,7 +159,7 @@ public class BundleCacher
 				Locale locale = Locale.getDefault();
 				cacheFile = new File(be.getBundleDirectory(), MessageFormat.format(
 						"cache.{0}_{1}.yml", locale.getLanguage(), locale.getCountry())); //$NON-NLS-1$
-				writer = new OutputStreamWriter(new FileOutputStream(cacheFile), UTF_8);
+				writer = new OutputStreamWriter(new FileOutputStream(cacheFile), IOUtil.UTF_8);
 
 				yaml.dump(be, writer);
 			}
@@ -191,7 +190,7 @@ public class BundleCacher
 			if (be.getBundleDirectory().canRead())
 			{
 				Assert.isNotNull(cacheFile);
-				reader = new InputStreamReader(new FileInputStream(cacheFile), UTF_8);
+				reader = new InputStreamReader(new FileInputStream(cacheFile), IOUtil.UTF_8);
 				BundleElement be2 = (BundleElement) yaml.load(reader);
 
 				// invoke blocks don't serialize correctly, so the comparison gets screwy.
@@ -307,7 +306,7 @@ public class BundleCacher
 			try
 			{
 				Yaml yaml = createYAML(bundleDirectory);
-				reader = new InputStreamReader(new FileInputStream(cacheFile), UTF_8);
+				reader = new InputStreamReader(new FileInputStream(cacheFile), IOUtil.UTF_8);
 				sub.subTask(MessageFormat.format(Messages.BundleCacher_LoadCacheTaskName,
 						bundleDirectory.getAbsolutePath()));
 

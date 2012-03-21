@@ -74,7 +74,7 @@ public class FullnameEnvContextContributor implements ContextContributor, Enviro
 				try
 				{
 					Process p = ProcessUtil.run("/usr/bin/getent", null, "passwd", username); //$NON-NLS-1$ //$NON-NLS-2$
-					String read = IOUtil.read(p.getInputStream(), "UTF-8"); //$NON-NLS-1$
+					String read = IOUtil.read(p.getInputStream(), IOUtil.UTF_8);
 					String raw = read.split(":")[4]; //$NON-NLS-1$
 					String fullname = raw.split(",")[0]; //$NON-NLS-1$
 					map.put(TM_FULLNAME, fullname);

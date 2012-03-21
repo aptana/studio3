@@ -21,6 +21,7 @@ import org.mortbay.util.ajax.JSON;
 import com.aptana.core.CorePlugin;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.usage.internal.AnalyticsInfo;
 import com.aptana.usage.internal.AnalyticsInfoManager;
@@ -208,7 +209,7 @@ public class AnalyticsEvent
 		event.append("="); //$NON-NLS-1$
 		try
 		{
-			event.append(URLEncoder.encode(value, "UTF-8")); //$NON-NLS-1$
+			event.append(URLEncoder.encode(value, IOUtil.UTF_8));
 		}
 		catch (UnsupportedEncodingException e)
 		{

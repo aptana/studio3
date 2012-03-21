@@ -15,8 +15,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.formatter.preferences.IPreferenceDelegate;
-import com.aptana.formatter.ui.util.Util;
 
 public class FormatterDialogPreferences implements IPreferenceDelegate
 {
@@ -26,7 +26,7 @@ public class FormatterDialogPreferences implements IPreferenceDelegate
 	public String getString(Object key)
 	{
 		final String value = preferences.get(key);
-		return value != null ? value : Util.EMPTY_STRING;
+		return value != null ? value : StringUtil.EMPTY;
 	}
 
 	public boolean getBoolean(Object key)

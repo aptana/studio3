@@ -20,6 +20,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
 import org.jruby.embed.io.ReaderInputStream;
 
+import com.aptana.core.util.IOUtil;
 import com.aptana.scripting.model.AbstractElement;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandElement;
@@ -79,7 +80,7 @@ public class WizardNewFilePage extends WizardNewFileCreationPage
 					getContainerFullPath().append(getFileName()));
 			if (templateContent != null)
 			{
-				return new ReaderInputStream(new StringReader(templateContent), "UTF-8"); //$NON-NLS-1$
+				return new ReaderInputStream(new StringReader(templateContent), IOUtil.UTF_8);
 			}
 		}
 		return super.getInitialContents();

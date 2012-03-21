@@ -16,6 +16,8 @@ import java.io.InputStreamReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.aptana.core.util.IOUtil;
+
 public class BundleUtils
 {
 	public static final String LIB_DIRECTORY_NAME = "lib"; //$NON-NLS-1$
@@ -60,7 +62,7 @@ public class BundleUtils
 
 			try
 			{
-				fr = new InputStreamReader(new FileInputStream(bundleFile), "UTF-8"); //$NON-NLS-1$
+				fr = new InputStreamReader(new FileInputStream(bundleFile), IOUtil.UTF_8);
 				reader = new BufferedReader(fr);
 				String line;
 

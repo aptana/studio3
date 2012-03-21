@@ -24,6 +24,7 @@ import org.eclipse.team.core.history.ITag;
 import org.eclipse.team.core.history.provider.FileRevision;
 
 import com.aptana.core.util.ArrayUtil;
+import com.aptana.core.util.IOUtil;
 import com.aptana.git.core.model.GitCommit;
 import com.aptana.git.core.model.GitRef;
 import com.aptana.git.core.model.GitRepository;
@@ -79,7 +80,8 @@ public class CommitFileRevision extends FileRevision
 				// Encode using UTF-8, otherwise use default character set for platform
 				try
 				{
-					return new ByteArrayInputStream(result.getMessage().getBytes("UTF-8")); //$NON-NLS-1$ // $codepro.audit.disable closeWhereCreated
+					return new ByteArrayInputStream(result.getMessage().getBytes(IOUtil.UTF_8)); // $codepro.audit.disable
+																									// closeWhereCreated
 				}
 				catch (UnsupportedEncodingException e)
 				{

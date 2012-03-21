@@ -18,6 +18,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.URL;
+import java.nio.channels.FileChannel;
 import java.text.MessageFormat;
 
 import org.eclipse.core.runtime.FileLocator;
@@ -33,7 +34,7 @@ public abstract class IOUtil
 {
 
 	public static final String UTF_8 = "UTF-8"; //$NON-NLS-1$
-	private static final int BUFFER_SIZE = 4096;
+	private static final int BUFFER_SIZE = 8192;
 
 	/**
 	 * Reads an InputStream into a String. Safely closes the stream after reading, or if any exceptions occur. Returns
@@ -214,7 +215,8 @@ public abstract class IOUtil
 	}
 
 	/**
-	 * Copy the contents of one file to another. This is a byte-wise copy
+	 * Copy the contents of one file to another. Uses Attempts to use channels for files < 20Mb, uses streams for larger
+	 * files. Closes the streams after transfer.
 	 * 
 	 * @param source
 	 * @param destination
@@ -222,22 +224,74 @@ public abstract class IOUtil
 	 */
 	public static void copyFile(File source, File destination) throws IOException
 	{
-		InputStream iStream = null;
-		OutputStream oStream = null;
-		byte[] buffer = new byte[1024];
+		long fileSize = source.length();
+		FileInputStream in = new FileInputStream(source);
+		FileOutputStream out = new FileOutputStream(destination);
+		// for larger files (20Mb) use streams
+		if (fileSize > 20971520l)
+		{
+			try
+			{
+				pipe(in, out);
+			}
+			finally
+			{
+				try
+				{
+					if (in != null)
+					{
+						in.close();
+					}
+				}
+				catch (Exception e)
+				{
+					// ignore
+				}
 
+				try
+				{
+					if (out != null)
+					{
+						out.close();
+					}
+				}
+				catch (Exception e)
+				{
+					// ignore
+				}
+			}
+		}
+		// smaller files, use channels
+		else
+		{
+			copy(in, out);
+		}
+	}
+
+	/**
+	 * Special optimized version of copying a {@link FileInputStream} to a {@link FileOutputStream}. Uses
+	 * {@link FileChannel#transferTo(long, long, java.nio.channels.WritableByteChannel)}. Closes the streams after
+	 * copying.
+	 * 
+	 * @param iStream
+	 * @param oStream
+	 * @throws IOException
+	 */
+	private static void copy(FileInputStream iStream, FileOutputStream oStream) throws IOException
+	{
 		try
 		{
-			iStream = new FileInputStream(source);
-			oStream = new FileOutputStream(destination);
-
-			int readCount = iStream.read(buffer);
-
-			while (readCount > 0)
+			FileChannel inChannel = iStream.getChannel();
+			FileChannel outChannel = oStream.getChannel();
+			long fileSize = inChannel.size();
+			long offs = 0, doneCnt = 0, copyCnt = Math.min(65536, fileSize);
+			do
 			{
-				oStream.write(buffer, 0, readCount);
-				readCount = iStream.read(buffer);
+				doneCnt = inChannel.transferTo(offs, copyCnt, outChannel);
+				offs += doneCnt;
+				fileSize -= doneCnt;
 			}
+			while (fileSize > 0);
 		}
 		finally
 		{
@@ -289,12 +343,7 @@ public abstract class IOUtil
 		{
 			in = url.openStream();
 			out = new FileOutputStream(file);
-			byte[] buffer = new byte[1024];
-			int n;
-			while ((n = in.read(buffer)) > 0)
-			{
-				out.write(buffer, 0, n);
-			}
+			pipe(in, out);
 		}
 		finally
 		{
@@ -369,7 +418,7 @@ public abstract class IOUtil
 	}
 
 	/**
-	 * Pipes from input stream to output stream. Uses a byte buffer of size 1024. Does no flushing or closing of
+	 * Pipes from input stream to output stream. Uses a byte buffer of size 8192. Does no flushing or closing of
 	 * streams!
 	 * 
 	 * @param inputStream
@@ -378,7 +427,7 @@ public abstract class IOUtil
 	 */
 	public static void pipe(InputStream input, OutputStream output) throws IOException
 	{
-		byte[] buffer = new byte[1024];
+		byte[] buffer = new byte[BUFFER_SIZE];
 		for (int bytes = input.read(buffer); bytes >= 0; bytes = input.read(buffer))
 		{
 			output.write(buffer, 0, bytes);
@@ -395,17 +444,25 @@ public abstract class IOUtil
 	{
 		if (dir.isDirectory() && dir.exists())
 		{
+			File tempFile = null;
 			try
 			{
-				File tempFile = File.createTempFile(String.valueOf(System.currentTimeMillis()), ".tmp", dir); //$NON-NLS-1$
+				tempFile = File.createTempFile(String.valueOf(System.currentTimeMillis()), ".tmp", dir); //$NON-NLS-1$
 				boolean canWrite = tempFile != null && tempFile.exists();
-				tempFile.delete();
+
 				return canWrite;
 			}
 			catch (IOException e)
 			{
 				IdeLog.logWarning(CorePlugin.getDefault(),
 						"Failed to create a temporary file to check if the directory is writable.", e); //$NON-NLS-1$
+			}
+			finally
+			{
+				if (tempFile != null)
+				{
+					tempFile.delete();
+				}
 			}
 		}
 		return false;

@@ -53,6 +53,7 @@ import org.osgi.service.prefs.Preferences;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.scope.ScopeSelector;
 import com.aptana.theme.IThemeManager;
@@ -500,7 +501,7 @@ public class ThemeManager implements IThemeManager
 				InputStream stream = null;
 				try
 				{
-					stream = new ByteArrayInputStream(xml.getBytes("UTF-8")); //$NON-NLS-1$
+					stream = new ByteArrayInputStream(xml.getBytes(IOUtil.UTF_8));
 					Properties props = new OrderedProperties();
 					props.loadFromXML(stream);
 					// Now store it as byte array explicitly so we don't run into this!
