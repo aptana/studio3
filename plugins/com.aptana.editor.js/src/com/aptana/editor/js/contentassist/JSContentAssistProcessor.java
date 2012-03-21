@@ -237,7 +237,22 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 			for (PropertyElement property : CollectionsUtil.filter(projectGlobals, isVisibleFilter))
 			{
-				addProposal(proposals, property, offset, projectURI, null, userAgentNames);
+				String location = null;
+				List<String> documents = property.getDocuments();
+				if (!CollectionsUtil.isEmpty(documents))
+				{
+					String docString = documents.get(0);
+					int index = docString.lastIndexOf('/');
+					if (index != -1)
+					{
+						location = docString.substring(index + 1);
+					}
+					else
+					{
+						location = docString;
+					}
+				}
+				addProposal(proposals, property, offset, projectURI, location, userAgentNames);
 			}
 		}
 	}

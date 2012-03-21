@@ -66,12 +66,12 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 			int cursorPosition, Image image, String displayString, IContextInformation contextInformation,
 			String additionalProposalInfo)
 	{
-		this._replacementString = (replacementString == null) ? "" : replacementString; //$NON-NLS-1$
+		this._replacementString = (replacementString == null) ? StringUtil.EMPTY : replacementString;
 		this._replacementOffset = replacementOffset;
 		this._replacementLength = replacementLength;
 		this._cursorPosition = cursorPosition;
 		this._image = image;
-		this._displayString = (displayString == null) ? "" : displayString; //$NON-NLS-1$
+		this._displayString = (displayString == null) ? StringUtil.EMPTY : displayString;
 		this._contextInformation = contextInformation;
 		this._additionalProposalInformation = additionalProposalInfo;
 	}
@@ -177,7 +177,7 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 	 */
 	public String getFileLocation()
 	{
-		return (this._fileLocation != null) ? this._fileLocation : ""; //$NON-NLS-1$
+		return (this._fileLocation != null) ? this._fileLocation : StringUtil.EMPTY;
 	}
 
 	/*
