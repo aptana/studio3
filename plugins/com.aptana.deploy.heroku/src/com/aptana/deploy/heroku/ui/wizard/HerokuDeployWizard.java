@@ -213,9 +213,9 @@ public class HerokuDeployWizard extends AbstractDeployWizard
 					final String HOST = "http://toolbox.aptana.com"; //$NON-NLS-1$
 					StringBuilder builder = new StringBuilder(HOST);
 					builder.append("/webhook/heroku?request_id="); //$NON-NLS-1$
-					builder.append(URLEncoder.encode(PingStartup.getApplicationId(), "UTF-8")); //$NON-NLS-1$
+					builder.append(URLEncoder.encode(PingStartup.getApplicationId(), IOUtil.UTF_8));
 					builder.append("&email="); //$NON-NLS-1$
-					builder.append(URLEncoder.encode(userID, "UTF-8")); //$NON-NLS-1$
+					builder.append(URLEncoder.encode(userID, IOUtil.UTF_8));
 					builder.append("&type=signuphook"); //$NON-NLS-1$
 
 					URL url = new URL(builder.toString());

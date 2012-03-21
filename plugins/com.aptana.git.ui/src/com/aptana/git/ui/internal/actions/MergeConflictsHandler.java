@@ -26,6 +26,7 @@ import org.eclipse.team.internal.ui.history.FileRevisionTypedElement;
 import org.eclipse.team.ui.synchronize.SaveableCompareEditorInput;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.IOUtil;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.IDebugScopes;
 import com.aptana.git.core.model.ChangedFile;
@@ -72,7 +73,7 @@ public class MergeConflictsHandler extends AbstractGitHandler
 						new GitCommit(repo, ":2"), Path.fromOSString(name)); //$NON-NLS-1$
 				IStorage storage = baseFile.getStorage(new NullProgressMonitor());
 				file.setContents(storage.getContents(), true, true, new NullProgressMonitor());
-				file.setCharset("UTF-8", new NullProgressMonitor()); //$NON-NLS-1$
+				file.setCharset(IOUtil.UTF_8, new NullProgressMonitor());
 			}
 		}
 		catch (CoreException e)

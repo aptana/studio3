@@ -50,6 +50,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.IOUtil;
 import com.aptana.formatter.IDebugScopes;
 import com.aptana.formatter.epl.FormatterPlugin;
 
@@ -60,7 +61,7 @@ public class ProfileStore implements IProfileStore
 {
 
 	/** The default encoding to use */
-	public static final String ENCODING = "UTF-8"; //$NON-NLS-1$
+	public static final String ENCODING = IOUtil.UTF_8;
 
 	/**
 	 * A SAX event handler to parse the xml format for profiles.

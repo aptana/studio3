@@ -266,7 +266,7 @@ public final class ZipUtil
 						}
 						if (symlink)
 						{
-							String target = new String(((ByteArrayOutputStream) out).toByteArray(), "UTF-8"); //$NON-NLS-1$
+							String target = new String(((ByteArrayOutputStream) out).toByteArray(), IOUtil.UTF_8);
 							Runtime.getRuntime()
 									.exec(new String[] {
 											"ln", "-s", new File(destinationPath, target).getAbsolutePath(), file.getAbsolutePath() }); //$NON-NLS-1$ //$NON-NLS-2$

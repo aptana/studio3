@@ -491,7 +491,6 @@ public class GitExecutable
 	 */
 	static class CloneRunnable implements Runnable
 	{
-		private static final String UTF_8 = "UTF-8"; //$NON-NLS-1$
 		private Process p;
 		private IProgressMonitor monitor;
 		private IStatus status;
@@ -521,7 +520,7 @@ public class GitExecutable
 			try
 			{
 				StringBuilder builder = new StringBuilder();
-				br = new BufferedReader(new InputStreamReader(p.getErrorStream(), UTF_8));
+				br = new BufferedReader(new InputStreamReader(p.getErrorStream(), IOUtil.UTF_8));
 				String line = null;
 				while ((line = br.readLine()) != null) // $codepro.audit.disable assignmentInCondition
 				{
@@ -547,7 +546,7 @@ public class GitExecutable
 					}
 				}
 
-				String stdout = IOUtil.read(p.getInputStream(), UTF_8);
+				String stdout = IOUtil.read(p.getInputStream(), IOUtil.UTF_8);
 				if (builder.length() > 0)
 				{
 					builder.deleteCharAt(builder.length() - 1);

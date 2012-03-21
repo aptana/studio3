@@ -66,6 +66,8 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.IOUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.scripting.snippets.SnippetsCompletionProcessor;
 import com.aptana.scripting.ScriptLogger;
@@ -147,7 +149,7 @@ public class CommandExecutionUtils
 
 		public StringInputProvider()
 		{
-			this(""); //$NON-NLS-1$
+			this(StringUtil.EMPTY);
 		}
 
 		public StringInputProvider(String string)
@@ -160,7 +162,7 @@ public class CommandExecutionUtils
 			try
 			{
 				// FIXME Use the encoding from the file/document!
-				return new ByteArrayInputStream(string.getBytes("UTF-8")); //$NON-NLS-1$
+				return new ByteArrayInputStream(string.getBytes(IOUtil.UTF_8));
 			}
 			catch (UnsupportedEncodingException e)
 			{

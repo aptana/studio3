@@ -29,6 +29,7 @@ import org.eclipse.tm.internal.terminal.textcanvas.ILinelRenderer;
 import org.eclipse.tm.internal.terminal.textcanvas.ITextCanvasModel;
 
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.IOUtil;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.ThemePlugin;
 
@@ -89,7 +90,7 @@ public class VT100TerminalControl extends org.eclipse.tm.internal.terminal.emula
 	@Override
 	public void setEncoding(String encoding) throws UnsupportedEncodingException {
 		if (encoding == null) {
-			encoding = "UTF-8"; //$NON-NLS-1$ // $codepro.audit.disable questionableAssignment
+			encoding = IOUtil.UTF_8; // $codepro.audit.disable questionableAssignment
 		}
 		super.setEncoding(encoding);
 	}

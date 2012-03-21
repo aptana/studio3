@@ -542,7 +542,7 @@ public class GitIndex
 		{
 			try
 			{
-				return IOUtil.read(new FileInputStream(workingDirectory().append(file.path).toFile()), "UTF-8"); //$NON-NLS-1$ // $codepro.audit.disable closeWhereCreated
+				return IOUtil.read(new FileInputStream(workingDirectory().append(file.path).toFile()), IOUtil.UTF_8); // $codepro.audit.disable closeWhereCreated
 			}
 			catch (FileNotFoundException e)
 			{

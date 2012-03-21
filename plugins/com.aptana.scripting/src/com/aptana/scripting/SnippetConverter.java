@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.aptana.core.util.IOUtil;
+
 @SuppressWarnings("nls")
 public class SnippetConverter
 {
@@ -115,7 +117,7 @@ public class SnippetConverter
 		{
 			File outFile = new File(outputFilePath);
 			outFile.getParentFile().mkdirs();
-			writer = new java.io.OutputStreamWriter(new java.io.FileOutputStream(outFile), "UTF-8");
+			writer = new java.io.OutputStreamWriter(new java.io.FileOutputStream(outFile), IOUtil.UTF_8);
 			for (String snippet : snippets)
 			{
 				writer.write(snippet);
@@ -123,7 +125,10 @@ public class SnippetConverter
 		}
 		finally
 		{
-			writer.close();
+			if (writer != null)
+			{
+				writer.close();
+			}
 		}
 	}
 

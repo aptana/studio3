@@ -31,6 +31,7 @@ import org.jruby.javasupport.JavaEmbedUtils;
 import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
 
+import com.aptana.core.util.IOUtil;
 import com.aptana.scope.ScopeSelector;
 import com.aptana.scripting.ScriptUtils;
 import com.aptana.scripting.model.filters.IModelFilter;
@@ -249,7 +250,7 @@ public class CommandBlockRunner extends AbstractCommandRunner
 				}
 				// Fix for RR3-677 - Incorrect transformation for non-latin characters after #rrinclude HTML
 				// We take the raw bytes returned and force to a UTF-8 String, vs ASCII default.
-				resultText = new String(result.asString().getByteList().bytes(), "UTF-8"); //$NON-NLS-1$
+				resultText = new String(result.asString().getByteList().bytes(), IOUtil.UTF_8);
 			}
 		}
 		catch (RaiseException e)

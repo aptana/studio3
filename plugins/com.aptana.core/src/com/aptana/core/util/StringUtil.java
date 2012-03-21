@@ -466,10 +466,12 @@ public class StringUtil
 	public static String md5(String lowerCase)
 	{
 		if (lowerCase == null)
+		{
 			return null;
+		}
 		try
 		{
-			byte[] bytesOfMessage = lowerCase.getBytes("UTF-8"); //$NON-NLS-1$
+			byte[] bytesOfMessage = lowerCase.getBytes(IOUtil.UTF_8);
 			MessageDigest md = MessageDigest.getInstance("MD5"); //$NON-NLS-1$
 			byte[] thedigest = md.digest(bytesOfMessage);
 			BigInteger bigInt = new BigInteger(1, thedigest);
