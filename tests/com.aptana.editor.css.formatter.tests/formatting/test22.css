@@ -98,8 +98,8 @@ input, textarea, select {
     font-weight: inherit
 }
 
-input, textarea, select {*
-    font-size: 100%
+input, textarea, select {
+    *font-size: 100%
 }
 
 legend {
@@ -107,9 +107,9 @@ legend {
 }
 
 body {
-    font: 13px/1.231 arial, helvetica, clean, sans-serif;*
-    font-size: small;*
-    font: x-small
+    font: 13px/1.231 arial, helvetica, clean, sans-serif;
+    *font-size: small;
+    *font: x-small
 }
 
 select, input, button, textarea {
@@ -122,8 +122,8 @@ table {
 }
 
 pre, code, kbd, samp, tt {
-    font-family: monospace;*
-    font-size: 108%;
+    font-family: monospace;
+    *font-size: 108%;
     line-height: 100%
 }/* Copyright (c) 2011, Yahoo! Inc.  All rights reserved. */
 
