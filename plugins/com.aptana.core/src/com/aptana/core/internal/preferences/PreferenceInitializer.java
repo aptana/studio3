@@ -45,35 +45,31 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 			IdeLog.logError(CorePlugin.getDefault(), e);
 		}
 
-		// Turn on eclipse's auto-refresh pref
-		prefs = EclipseUtil.defaultScope().getNode(ResourcesPlugin.PI_RESOURCES);
-		prefs.putBoolean(ResourcesPlugin.PREF_AUTO_REFRESH, ICorePreferenceConstants.DEFAULT_AUTO_REFRESH_PROJECTS);
-		try
-		{
-			prefs.flush();
-		}
-		catch (BackingStoreException e)
-		{
-			IdeLog.logError(CorePlugin.getDefault(), e);
-		}
-
 		// Migrate auto-refresh pref to Eclipse's
 		prefs = EclipseUtil.instanceScope().getNode(CorePlugin.PLUGIN_ID);
-		String oldValue = prefs.get(ICorePreferenceConstants.PREF_AUTO_REFRESH_PROJECTS, null);
-		if (oldValue != null)
+		boolean migrated = prefs.getBoolean("migrated_auto_refresh", false); //$NON-NLS-1$
+		if (!migrated)
 		{
-			IEclipsePreferences blah = EclipseUtil.instanceScope().getNode(ResourcesPlugin.PI_RESOURCES);
-			blah.putBoolean(ResourcesPlugin.PREF_AUTO_REFRESH, Boolean.valueOf(oldValue));
-			prefs.remove(ICorePreferenceConstants.PREF_AUTO_REFRESH_PROJECTS);
-			try
+			// by default, turn on auto refresh
+			boolean autoRefresh = ICorePreferenceConstants.DEFAULT_AUTO_REFRESH_PROJECTS;
+			// Check if user set a value explicitly
+			prefs = EclipseUtil.instanceScope().getNode(CorePlugin.PLUGIN_ID);
+			String oldValue = prefs.get(ICorePreferenceConstants.PREF_AUTO_REFRESH_PROJECTS, null);
+			if (oldValue != null)
 			{
-				blah.flush();
-				prefs.flush();
+				// there's an explicit value set, make sure to use that.
+				autoRefresh = Boolean.valueOf(oldValue);
+				prefs.remove(ICorePreferenceConstants.PREF_AUTO_REFRESH_PROJECTS);
+				try
+				{
+					prefs.flush();
+				}
+				catch (BackingStoreException e)
+				{
+					IdeLog.logError(CorePlugin.getDefault(), e);
+				}
 			}
-			catch (BackingStoreException e)
-			{
-				IdeLog.logError(CorePlugin.getDefault(), e);
-			}
+			ResourcesPlugin.getPlugin().getPluginPreferences().setValue(ResourcesPlugin.PREF_AUTO_REFRESH, autoRefresh);
 		}
 	}
 
