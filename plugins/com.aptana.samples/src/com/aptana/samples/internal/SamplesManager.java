@@ -376,7 +376,7 @@ public class SamplesManager implements ISamplesManager
 	{
 		List<ProjectSampleElement> elements = BundleManager.getInstance().getProjectSamples(null);
 		// only reloads the samples from rubles if there has been a difference
-		if (bundleSamples.equals(elements))
+		if (elements.isEmpty() || bundleSamples.equals(elements))
 		{
 			return;
 		}
