@@ -60,7 +60,10 @@ public class SamplesView extends ViewPart
 
 				public void run()
 				{
-					treeViewer.refresh();
+					if (treeViewer != null && !treeViewer.getControl().isDisposed())
+					{
+						treeViewer.refresh();
+					}
 				}
 			});
 		}
