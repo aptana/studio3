@@ -18,16 +18,16 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.aptana.core.util.IOUtil;
+
 /**
  * Utilities library.
  */
 public class Util
 {
+	// FIXME A number of these utilities should be re-using IOUtil, StringUtil, or moved there!
 	private static char[] NO_CHAR = new char[0];
 	private static final int DEFAULT_READING_SIZE = 8192;
-
-	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
-	public final static String UTF_8 = "UTF-8"; //$NON-NLS-1$	
 
 	public static String concatenate(String[] lines, String delimiter)
 	{
@@ -108,7 +108,7 @@ public class Util
 
 			// Do not keep first character for UTF-8 BOM encoding
 			int start = 0;
-			if (totalRead > 0 && UTF_8.equals(encoding))
+			if (totalRead > 0 && IOUtil.UTF_8.equals(encoding))
 			{
 				if (contents[0] == 0xFEFF)
 				{ // if BOM char then skip

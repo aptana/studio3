@@ -26,6 +26,7 @@ import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.text.edits.TextEdit;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.StringUtil;
 import com.aptana.formatter.IDebugScopes;
 import com.aptana.formatter.IScriptFormatter;
 import com.aptana.formatter.IScriptFormatterFactory;
@@ -126,7 +127,7 @@ public class FormatterPreviewUtils
 	private static void disablePreview(ISourceViewer viewer)
 	{
 		viewer.getTextWidget().setEnabled(false);
-		viewer.getDocument().set(Util.EMPTY_STRING);
+		viewer.getDocument().set(StringUtil.EMPTY);
 	}
 
 	/**

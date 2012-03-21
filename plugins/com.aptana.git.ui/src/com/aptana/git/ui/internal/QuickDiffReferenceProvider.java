@@ -82,13 +82,13 @@ public class QuickDiffReferenceProvider implements IQuickDiffReferenceProvider
 					}
 					IPath fileName = repo.relativePath(file);
 					// TODO allow user to specify the revision/SHA/branch to compare against
-					IFileRevision revision = GitPlugin.revisionForCommit(new GitCommit(repo, "HEAD"), fileName); //$NON-NLS-1$
+					IFileRevision revision = GitPlugin.revisionForCommit(new GitCommit(repo, GitRepository.HEAD), fileName);
 					IStorage storage = revision.getStorage(monitor);
 					if (storage == null)
 					{
 						return null;
 					}
-					String src = IOUtil.read(storage.getContents(), "UTF-8"); //$NON-NLS-1$
+					String src = IOUtil.read(storage.getContents(), IOUtil.UTF_8);
 					fReference = new Document(src);
 				}
 				return fReference;

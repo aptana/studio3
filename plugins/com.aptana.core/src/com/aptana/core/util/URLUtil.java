@@ -25,8 +25,6 @@ import java.util.Map;
 public class URLUtil
 {
 
-	private static String UTF8 = "UTF-8"; //$NON-NLS-1$
-
 	/**
 	 * Joins a map of key/values into URL parameters. It will URL encode the new keys and values
 	 * 
@@ -62,7 +60,8 @@ public class URLUtil
 			if (encode)
 			{
 				String value = (entry.getValue() != null) ? entry.getValue() : StringUtil.EMPTY;
-				builder.add(URLEncoder.encode(entry.getKey(), UTF8) + "=" + URLEncoder.encode(value, UTF8)); //$NON-NLS-1$
+				builder.add(URLEncoder.encode(entry.getKey(), IOUtil.UTF_8)
+						+ "=" + URLEncoder.encode(value, IOUtil.UTF_8)); //$NON-NLS-1$
 			}
 			else
 			{

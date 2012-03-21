@@ -20,7 +20,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
+import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ProcessUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.plist.PListParserFactory;
 
 /**
@@ -536,14 +538,17 @@ public class BundleConverter
 		{
 			File outFile = new File(outFilePath);
 			outFile.getParentFile().mkdirs();
-			writer = new java.io.OutputStreamWriter(new java.io.FileOutputStream(outFile), "UTF-8");
+			writer = new java.io.OutputStreamWriter(new java.io.FileOutputStream(outFile), IOUtil.UTF_8);
 			writer.write(output);
 		}
 		finally
 		{
 			try
 			{
-				writer.close();
+				if (writer != null)
+				{
+					writer.close();
+				}
 			}
 			catch (IOException e)
 			{
@@ -555,7 +560,7 @@ public class BundleConverter
 	static String convertKeyBinding(String keyBinding)
 	{
 		if (keyBinding == null)
-			return ""; //$NON-NLS-1$
+			return StringUtil.EMPTY; //$NON-NLS-1$
 		StringBuilder builder = new StringBuilder();
 		for (int i = 0; i < keyBinding.length(); i++)
 		{

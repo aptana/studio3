@@ -134,9 +134,9 @@ public class ProcessUtil
 			{
 				// TODO - Use EditorUtils.getEncoding once we have an IFile reference.
 				// Using the UTF-8 will not work for all cases.
-				writerThread = new OutputStreamThread(process.getOutputStream(), input, "UTF-8"); //$NON-NLS-1$
+				writerThread = new OutputStreamThread(process.getOutputStream(), input, IOUtil.UTF_8);
 			}
-			InputStreamGobbler readerGobbler = new InputStreamGobbler(process.getInputStream(), lineSeparator, "UTF-8"); //$NON-NLS-1$
+			InputStreamGobbler readerGobbler = new InputStreamGobbler(process.getInputStream(), lineSeparator, IOUtil.UTF_8);
 			InputStreamGobbler errorGobbler = new InputStreamGobbler(process.getErrorStream(), lineSeparator, null);
 
 			// Start the threads

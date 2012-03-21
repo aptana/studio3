@@ -18,8 +18,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.formatter.ui.epl.FormatterUIEplPlugin;
-import com.aptana.formatter.ui.util.Util;
 
 /**
  * Dialog field containing a label and a text control.
@@ -41,8 +41,8 @@ public class StringDialogField extends DialogField
 		{
 			// TODO Add content assist here
 		}
-		fText = Util.EMPTY_STRING;
-		fMessage = Util.EMPTY_STRING;
+		fText = StringUtil.EMPTY;
+		fMessage = StringUtil.EMPTY;
 	}
 
 	// ------- layout helpers
