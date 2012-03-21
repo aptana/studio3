@@ -26,6 +26,7 @@ import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.contentassist.ICommonCompletionProposal;
 import com.aptana.editor.common.tests.util.TestProject;
 import com.aptana.editor.epl.tests.EditorTestHelper;
 import com.aptana.editor.js.contentassist.index.JSFileIndexingParticipant;
@@ -522,5 +523,43 @@ public class JSContentAssistProposalTests extends JSEditorBasedTests
 			"jkl"
 		);
 		// @formatter:on
+	}
+
+	public void testAPSTUD4538() throws Exception
+	{
+		final String projectName = "APSTUD4538";
+		final String fileName = "apstud4538.js";
+		final String initialContents = "function foo() {}\n";
+
+		TestProject project = null;
+		try
+		{
+			// Create a test project and file
+			project = new TestProject(projectName, new String[] { "com.aptana.projects.webnature" });
+			IFile file = project.createFile(fileName, initialContents);
+
+			// open JS editor on file
+			editor = (ITextEditor) IDE.openEditor(UIUtils.getActivePage(), file, "com.aptana.editor.js", true);
+
+			// get proposals at end of document
+			this.processor = new JSContentAssistProcessor((AbstractThemeableEditor) editor);
+			ISourceViewer viewer = ((AbstractThemeableEditor) editor).getISourceViewer();
+			ICompletionProposal[] proposals = processor.computeCompletionProposals(viewer, 18, '\0', false);
+
+			// find proposal for "foo" function
+			ICompletionProposal prop = findProposal(proposals, "foo");
+			assertNotNull(prop);
+
+			// Verify that the file location is the filename, not the owning type.
+			ICommonCompletionProposal p2 = (ICommonCompletionProposal) prop;
+			assertEquals(fileName, p2.getFileLocation());
+		}
+		finally
+		{
+			if (project != null)
+			{
+				project.delete();
+			}
+		}
 	}
 }
