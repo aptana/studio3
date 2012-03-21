@@ -98,12 +98,10 @@ module Ruble
       filenames = filenames.map {|f| File.join(locales_dir, f) }
       filenames.each { |filename| load_file(filename) }
     end
-    
+
     def bundle_path
-      bundle = Ruble::BundleManager.bundle_from_path($0)
-      path = bundle.nil? ? $0 : bundle.path # FIXME If no bundle yet, $0 may not be bundle.rb
-      path = path[0..-11] if path.end_with? "bundle.rb"
-      path
+      bundle_file = Ruble::BundleManager.manager.getBundleDirectory(java.io.File.new($0))
+      bundle_file.getAbsolutePath
     end
 
     INTERPOLATION_PATTERN = Regexp.union(
