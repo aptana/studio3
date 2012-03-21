@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
@@ -920,9 +921,8 @@ public class BundleManager
 	}
 
 	/**
-	 * Return the bundle directory that contains the specified script. If the script is the bundle.rb file, then its
-	 * parent is returned; otherwise, it is assumed that the script is within a special directory. In that case the
-	 * grandparent directory of the file is returned
+	 * Return the bundle directory that contains the specified script. We traverse parents until we find a directory
+	 * that {@link #isValidBundleDirectory(File)}
 	 * 
 	 * @param script
 	 *            The descendant script used to locate the bundle directory. Null values are ignored
@@ -934,9 +934,27 @@ public class BundleManager
 
 		if (script != null)
 		{
-			String scriptPath = script.getAbsolutePath();
-
-			result = scriptPath.endsWith(BUNDLE_FILE) ? script.getParentFile() : script.getParentFile().getParentFile();
+			IPath path = Path.fromOSString(script.getAbsolutePath());
+			if (script.isFile())
+			{
+				// Cheat a little and skip to parent already if this is a file
+				path = path.removeLastSegments(1);
+			}
+			// Search up the hierarchy until we hit the bundle dir
+			File file = path.toFile();
+			while (true)
+			{
+				if (isValidBundleDirectory(file))
+				{
+					return file;
+				}
+				if (path.segmentCount() == 0)
+				{
+					break;
+				}
+				path = path.removeLastSegments(1);
+				file = path.toFile();
+			}
 		}
 
 		return result;
