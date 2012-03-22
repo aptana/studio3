@@ -141,11 +141,18 @@ public class AnalyticsEvent
 
 		addPostEntry(event, "event", eventName); //$NON-NLS-1$
 		addPostEntry(event, "type", eventType); //$NON-NLS-1$
-		if (user == null && sessionId == null)
+		if (StringUtil.isEmpty(sessionId))
 		{
-			sessionId = UUID.randomUUID().toString();
+			if (user != null)
+			{
+				sessionId = user.getSessionID();
+			}
+			if (StringUtil.isEmpty(sessionId))
+			{
+				sessionId = UUID.randomUUID().toString();
+			}
 		}
-		addPostEntry(event, "sid", (user == null) ? sessionId : user.getSessionID()); //$NON-NLS-1$
+		addPostEntry(event, "sid", sessionId); //$NON-NLS-1$
 		addPostEntry(event, "guid", APP_INFO.getAppGuid()); //$NON-NLS-1$
 		addPostEntry(event, "mid", CorePlugin.getMID()); //$NON-NLS-1$
 		addPostEntry(event, "app_id", APP_INFO.getAppId()); //$NON-NLS-1$
