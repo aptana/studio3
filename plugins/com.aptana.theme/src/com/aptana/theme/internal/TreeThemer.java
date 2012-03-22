@@ -71,7 +71,7 @@ class TreeThemer extends ControlThemer
 	protected void applyTheme()
 	{
 		super.applyTheme();
-		if (fTreeViewer != null && !fTreeViewer.getTree().isDisposed())
+		if (fTreeViewer != null && !controlIsDisposed())
 		{
 			fTreeViewer.refresh(true);
 		}
@@ -79,6 +79,11 @@ class TreeThemer extends ControlThemer
 
 	protected void addSelectionColorOverride()
 	{
+		if (controlIsDisposed())
+		{
+			return;
+		}
+
 		super.addSelectionColorOverride();
 		final Tree tree = getTree();
 		selectionPaintListener = new Listener()
@@ -94,9 +99,10 @@ class TreeThemer extends ControlThemer
 				try
 				{
 					Rectangle clientArea = tree.getClientArea();
-					
+
 					// FIX for busted drawing on some variants of Linux, notably OpenSuSE, where
-					// setBackground on the tree doesn't behave. We color background behind items in ControlThemer.addSelectionColorOverride()
+					// setBackground on the tree doesn't behave. We color background behind items in
+					// ControlThemer.addSelectionColorOverride()
 					// This draws from bottom of the last item down to bottom of tree with background color
 					if (!isWindows && !isMacOSX)
 					{
@@ -109,21 +115,23 @@ class TreeThemer extends ControlThemer
 							itemBounds = lastItem.getBounds();
 						}
 						int bottomY = itemBounds.y + itemBounds.height;
-						// The +2 on width is for Linux, since clientArea begins at [-2,-2] and 
+						// The +2 on width is for Linux, since clientArea begins at [-2,-2] and
 						// without it we don't properly color full width
-						Rectangle toColor = new Rectangle(clientArea.x, bottomY, clientArea.width + 2, clientArea.height - bottomY);
+						Rectangle toColor = new Rectangle(clientArea.x, bottomY, clientArea.width + 2,
+								clientArea.height - bottomY);
 						gc.fillRectangle(toColor);
 					}
-					
+
 					// FIX For Windows, the selection color doesn't extend past bounds of the tree item, so here we
 					// draw from right end of item to full width of tree, so selection bg color is full width of view
 					if (!isWindows)
 					{
 						return;
 					}
-					
+
 					// FIX for TISTUD-426: http://jira.appcelerator.org/browse/TISTUD-426
-					// HACK to grab cell editors of tree views (specifically Variables view) and set their control's fg explicitly!
+					// HACK to grab cell editors of tree views (specifically Variables view) and set their control's fg
+					// explicitly!
 					if (fTreeViewer != null)
 					{
 						CellEditor[] editors = fTreeViewer.getCellEditors();
@@ -143,7 +151,7 @@ class TreeThemer extends ControlThemer
 							}
 						}
 					}
-					
+
 					TreeItem[] items = tree.getSelection();
 					if (items == null || items.length == 0)
 					{
@@ -171,7 +179,7 @@ class TreeThemer extends ControlThemer
 								gc.fillRectangle(x, bounds.y, clientWidth - x, bounds.height);
 							}
 						}
-					}		
+					}
 				}
 				catch (Exception e)
 				{
@@ -190,7 +198,8 @@ class TreeThemer extends ControlThemer
 		tree.addListener(SWT.Paint, selectionPaintListener);
 	}
 
-	protected TreeItem getLastItemRecursively(TreeItem lastItem) {
+	protected TreeItem getLastItemRecursively(TreeItem lastItem)
+	{
 		if (lastItem == null)
 		{
 			return null;
@@ -206,11 +215,11 @@ class TreeThemer extends ControlThemer
 	private void addCustomTreeControlDrawing()
 	{
 		// Hack to overdraw the native tree expand/collapse controls and use custom plus/minus box.
-		if (isMacOSX || isUbuntu)
+		if (isMacOSX || isUbuntu || controlIsDisposed())
 		{
 			return;
 		}
-		
+
 		// FIXME The native control/arrow still shows through on OpenSuSE 11.4
 		final Tree tree = getTree();
 		customDrawingListener = new Listener()
@@ -268,6 +277,11 @@ class TreeThemer extends ControlThemer
 
 	private void addMeasureItemListener()
 	{
+		if (controlIsDisposed())
+		{
+			return;
+		}
+
 		final Tree tree = getTree();
 		// Hack to force a specific row height and width based on font
 		measureItemListener = new Listener()
@@ -303,6 +317,10 @@ class TreeThemer extends ControlThemer
 
 	private void addFontListener()
 	{
+		if (controlIsDisposed())
+		{
+			return;
+		}
 		final Tree tree = getTree();
 		fontListener = new IPropertyChangeListener()
 		{
@@ -396,7 +414,7 @@ class TreeThemer extends ControlThemer
 
 	private void removeCustomTreeControlDrawing()
 	{
-		if (customDrawingListener != null && getTree() != null && !getTree().isDisposed())
+		if (customDrawingListener != null && !controlIsDisposed())
 		{
 			getTree().removeListener(SWT.PaintItem, customDrawingListener);
 		}
@@ -407,7 +425,7 @@ class TreeThemer extends ControlThemer
 	{
 		super.removeSelectionOverride();
 
-		if (selectionPaintListener != null && getTree() != null && !getTree().isDisposed())
+		if (selectionPaintListener != null && !controlIsDisposed())
 		{
 			getTree().removeListener(SWT.Paint, selectionPaintListener);
 		}
@@ -416,7 +434,7 @@ class TreeThemer extends ControlThemer
 
 	private void removeMeasureItemListener()
 	{
-		if (measureItemListener != null && getTree() != null && !getTree().isDisposed())
+		if (measureItemListener != null && !controlIsDisposed())
 		{
 			getTree().removeListener(SWT.MeasureItem, measureItemListener);
 		}
