@@ -2,12 +2,18 @@ package com.aptana.scripting.model;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.jruby.RubyRegexp;
+
+import com.aptana.scope.ScopeSelector;
 
 public class BundleCacherTest extends TestCase
 {
@@ -40,6 +46,38 @@ public class BundleCacherTest extends TestCase
 		{
 			super.tearDown();
 		}
+	}
+
+	public void testAPSTUD4562() throws Exception
+	{
+		// @formatter:off
+		String fileContents = "--- !!com.aptana.scripting.model.BundleElement \n" +
+			"author: Christopher Williams\n" +
+			"copyright: Copyright 2010 Aptana Inc. Distributed under the MIT license.\n" +
+			"decreaseIndentMarkers: \n" +
+			"  source.js: !regexp /^(.*\\*\\/)?\\s*(\\}|\\))([^{]*\\{)?([;,]?\\s*|\\.[^{]*|\\s*\\)[;\\s]*)$/\n" +
+			"description: Javascript bundle for RadRails, ported from the TextMate bundle\n" +
+			"displayName: \"JavaScript\"\n" +
+			"increaseIndentMarkers: \n" +
+			"  source.js: !regexp /^.*(\\{[^}\"'']*|\\([^)\"'']*)$/\n" +
+			"path: bundle.rb\n" +
+			"repository: git://github.com/aptana/js.ruble.git\n" +
+			"visible: true\n";
+		// @formatter:on
+
+		createBundleDirectory();
+
+		// Now write the contents as a cache file
+		writeFile("cache.yml", fileContents);
+
+		List<File> files = Collections.emptyList();
+		deserialized = cacher.load(bundleDirectory, files, new NullProgressMonitor(), true);
+
+		// Now make sure the bundle has OK increase indent regexp!
+		Map<ScopeSelector, RubyRegexp> indents = deserialized.getIncreaseIndentMarkers();
+		assertEquals(1, indents.size());
+		RubyRegexp regexp = indents.values().iterator().next();
+		assertEquals("(?-mix:^.*(\\{[^}\"'']*|\\([^)\"'']*)$)", regexp.toString());
 	}
 
 	public void testSerializeAndDeserializeSnippet() throws Exception
@@ -190,16 +228,10 @@ public class BundleCacherTest extends TestCase
 	 */
 	private void assertDeserializedCacheEqualsFromDisk(String fileContents) throws Exception
 	{
-		String tmpDir = System.getProperty("java.io.tmpdir");
-		bundleDirectory = new File(new File(tmpDir), "bundle_cache_test_" + System.currentTimeMillis());
-		bundleDirectory.mkdirs();
-		assertTrue("Failed to create test bundle directory", bundleDirectory.exists());
+		createBundleDirectory();
 
 		// Now add a bundle.rb file and define smart typing pairs inside
-		File bundleRB = new File(bundleDirectory, "bundle.rb");
-		FileWriter writer = new FileWriter(bundleRB);
-		writer.write(fileContents);
-		writer.close();
+		File bundleRB = writeFile("bundle.rb", fileContents);
 
 		assertTrue("Failed to write test bundle.rb to disk", bundleRB.exists());
 
@@ -207,7 +239,7 @@ public class BundleCacherTest extends TestCase
 		nonCached = bundleManager.getBundleFromPath(bundleDirectory);
 		assertNotNull("Failed to load the test bundle into memory from file", nonCached);
 		String nonCachedString = nonCached.toSource(false);
-		System.out.println(nonCachedString);
+		// System.out.println(nonCachedString);
 
 		// Now generate a cached YAML serialized version of this...
 		cacher.cache(bundleDirectory, new NullProgressMonitor());
@@ -220,9 +252,27 @@ public class BundleCacherTest extends TestCase
 		deserialized = cacher.load(bundleDirectory, bundleFiles, new NullProgressMonitor(), true);
 		assertNotNull("Failed to deserialize the test bundle from YAML", deserialized);
 		String deserializedString = deserialized.toSource(false);
-		System.out.println(deserializedString);
+		// System.out.println(deserializedString);
 
-		assertEquals(nonCachedString, deserializedString);
+		assertEquals("Desearialized bundle doesn't match original", nonCachedString, deserializedString);
+	}
+
+	protected File writeFile(String fileName, String fileContents) throws IOException
+	{
+		File file = new File(bundleDirectory, fileName);
+		FileWriter writer = new FileWriter(file);
+		writer.write(fileContents);
+		writer.close();
+		assertTrue("Failed to write test " + fileName + " to disk", file.exists());
+		return file;
+	}
+
+	protected void createBundleDirectory()
+	{
+		String tmpDir = System.getProperty("java.io.tmpdir");
+		bundleDirectory = new File(new File(tmpDir), "bundle_cache_test_" + System.currentTimeMillis());
+		bundleDirectory.mkdirs();
+		assertTrue("Failed to create test bundle directory", bundleDirectory.exists());
 	}
 
 	private void delete(File file)

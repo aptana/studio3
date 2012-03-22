@@ -22,7 +22,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.source.ISourceViewer;
-import org.eclipse.ui.ide.IDE;
+import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
@@ -40,7 +40,6 @@ import com.aptana.index.core.IndexPlugin;
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.SnippetElement;
-import com.aptana.ui.util.UIUtils;
 
 /**
  * JSContentAssistProposalTests
@@ -269,17 +268,27 @@ public class JSContentAssistProposalTests extends JSEditorBasedTests
 			IFile file = project.createFile(fileName, initialContents);
 
 			// open JS editor on file
-			editor = (ITextEditor) IDE.openEditor(UIUtils.getActivePage(), file, "com.aptana.editor.js", true);
+			editor = (ITextEditor) EditorTestHelper.openInEditor(file, "com.aptana.editor.js", true);
+			ISourceViewer viewer = ((AbstractThemeableEditor) editor).getISourceViewer();
 
-			// Set the working copy contents to some valid JS
-			IDocument document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
+			EditorTestHelper.joinReconciler((SourceViewer) viewer, 100L, 2000L, 100L);
+
+			// Verify initial contents
+			Index index = getIndexManager().getIndex(project.getURI());
+			JSIndexQueryHelper _indexHelper = new JSIndexQueryHelper();
+			List<PropertyElement> projectGlobals = _indexHelper.getProjectGlobals(index);
+			assertContainsFunctions(projectGlobals, "delete_me");
+			assertDoesntContainFunctions(projectGlobals, "foo");
+
+			// Set the working copy contents to some new valid JS
+			IDocument document = EditorTestHelper.getDocument(editor);
 			document.set(workingContents);
-			// force reconciling? It should get triggered automatically...
-			Thread.sleep(1500); // let reconciling finish...
+
+			// Wait for reconcile
+			EditorTestHelper.joinReconciler((SourceViewer) viewer, 100L, 2000L, 100L);
 
 			// get proposals at end of document
 			this.processor = new JSContentAssistProcessor((AbstractThemeableEditor) editor);
-			ISourceViewer viewer = ((AbstractThemeableEditor) editor).getISourceViewer();
 			ICompletionProposal[] proposals = processor.computeCompletionProposals(viewer, 33, '\0', false);
 
 			// verify that CA contains elements from unsaved JS in document!
@@ -294,9 +303,6 @@ public class JSContentAssistProposalTests extends JSEditorBasedTests
 			Thread.sleep(1000); // FIXME Is there anyway to tell when indexing happens and is finished?
 
 			// Now verify that our index reflects the file's contents and not the unsaved contents of the editor.
-			Index index = getIndexManager().getIndex(project.getURI());
-			JSIndexQueryHelper _indexHelper = new JSIndexQueryHelper();
-			List<PropertyElement> projectGlobals = _indexHelper.getProjectGlobals(index);
 			assertContainsFunctions(projectGlobals, "delete_me");
 			assertDoesntContainFunctions(projectGlobals, "foo");
 		}
@@ -539,20 +545,22 @@ public class JSContentAssistProposalTests extends JSEditorBasedTests
 			IFile file = project.createFile(fileName, initialContents);
 
 			// open JS editor on file
-			editor = (ITextEditor) IDE.openEditor(UIUtils.getActivePage(), file, "com.aptana.editor.js", true);
+			editor = (ITextEditor) EditorTestHelper.openInEditor(file, "com.aptana.editor.js", true);
+			ISourceViewer viewer = ((AbstractThemeableEditor) editor).getISourceViewer();
+
+			EditorTestHelper.joinReconciler((SourceViewer) viewer, 100L, 2000L, 100L);
 
 			// get proposals at end of document
 			this.processor = new JSContentAssistProcessor((AbstractThemeableEditor) editor);
-			ISourceViewer viewer = ((AbstractThemeableEditor) editor).getISourceViewer();
 			ICompletionProposal[] proposals = processor.computeCompletionProposals(viewer, 18, '\0', false);
 
 			// find proposal for "foo" function
 			ICompletionProposal prop = findProposal(proposals, "foo");
-			assertNotNull(prop);
+			assertNotNull("Failed to find 'foo' function proposal in CA", prop);
 
 			// Verify that the file location is the filename, not the owning type.
 			ICommonCompletionProposal p2 = (ICommonCompletionProposal) prop;
-			assertEquals(fileName, p2.getFileLocation());
+			assertEquals("Expected 'location' to show filename, not owning type", fileName, p2.getFileLocation());
 		}
 		finally
 		{
