@@ -616,6 +616,7 @@ public class BundleCacher
 		{
 			this.bundleDirectory = bundleDirectory;
 			this.yamlConstructors.put(new Tag(SCOPE_SELECTOR_TAG), new ConstructScopeSelector());
+			this.yamlConstructors.put(new Tag("!ruby/regexp"), new ConstructRubyRegexp()); //$NON-NLS-1$
 			this.yamlConstructors.put(new Tag(REGEXP_TAG), new ConstructRubyRegexp());
 			this.yamlConstructors.put(new Tag(COMMAND_TAG), new ConstructCommandElement());
 			this.yamlConstructors.put(new Tag(ENVIRONMENT_TAG), new ConstructEnvironmentElement());
@@ -654,6 +655,11 @@ public class BundleCacher
 			public Object construct(Node node)
 			{
 				String val = (String) constructScalar((ScalarNode) node);
+				// Handle when regexp is using // syntax. Lop the slashes off the ends.
+				if (val != null && val.length() > 2 && val.charAt(0) == '/')
+				{
+					val = val.substring(1, val.length() - 1);
+				}
 				return RubyRegexp.newRegexp(ScriptingEngine.getInstance().getScriptingContainer().getProvider()
 						.getRuntime(), val, RegexpOptions.NULL_OPTIONS);
 			}
