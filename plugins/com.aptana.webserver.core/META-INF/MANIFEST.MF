@@ -17,4 +17,5 @@ Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Eclipse-LazyStart: true
 Export-Package: com.aptana.webserver.core,
- com.aptana.webserver.core.preferences
+ com.aptana.webserver.core.preferences,
+ com.aptana.webserver.internal.core.builtin
