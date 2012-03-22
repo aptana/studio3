@@ -49,6 +49,7 @@ import org.jruby.RubySymbol;
 import org.jruby.runtime.builtin.IRubyObject;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
@@ -93,6 +94,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	private static final String SNIPPET_PERF = PERFORMANCE_EVENT_PREFIX + "/snippets"; //$NON-NLS-1$
 
 	private static final String[] NO_STRINGS = new String[0];
+	protected static final ICompletionProposal[] NO_PROPOSALS = new ICompletionProposal[0];
 
 	private char[] _completionProposalChars = null;
 	private char[] _contextInformationChars = null;
@@ -199,7 +201,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 			return Collections.emptyList();
 		}
 		String output = result.getOutputString();
-		if (output == null || output.trim().length() == 0)
+		if (StringUtil.isEmpty(output))
 		{
 			return Collections.emptyList();
 		}
@@ -315,12 +317,12 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 */
 	protected List<ICompletionProposal> addRubleProposals(ITextViewer viewer, int offset)
 	{
-		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
+		ArrayList<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
 		try
 		{
 			String scope = getDocumentScopeManager().getScopeAtOffset(viewer, offset);
 			List<ContentAssistElement> commands = getBundleManager().getContentAssists(new ScopeFilter(scope));
-			if (commands != null && commands.size() > 0)
+			if (!CollectionsUtil.isEmpty(commands))
 			{
 				Ruby ruby = Ruby.newInstance();
 				for (ContentAssistElement ce : commands)
@@ -333,6 +335,8 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		{
 			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
+
+		proposals.trimToSize();
 		return proposals;
 	}
 
@@ -343,35 +347,30 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 * @param offset
 	 * @return
 	 */
-	protected Collection<? extends ICompletionProposal> addSnippetProposals(ITextViewer viewer, int offset)
+	protected Collection<ICompletionProposal> addSnippetProposals(ITextViewer viewer, int offset)
 	{
-		PerformanceStats stats = null;
-		try
+		if (viewer != null && viewer.getSelectionProvider() != null)
 		{
-			if (viewer != null && viewer.getSelectionProvider() != null)
+			PerformanceStats stats = null;
+			if (PerformanceStats.isEnabled(SNIPPET_PERF))
 			{
-				if (PerformanceStats.isEnabled(SNIPPET_PERF))
-				{
-					stats = PerformanceStats.getStats(SNIPPET_PERF, "SnippetsCompletionProcessor"); //$NON-NLS-1$
-					stats.startRun();
-				}
-				ICompletionProposal[] snippets = new SnippetsCompletionProcessor().computeCompletionProposals(viewer,
-						offset);
-				if (stats != null)
-				{
-					stats.endRun();
-				}
-				if (snippets == null)
-				{
-					return Collections.emptyList();
-				}
-				return Arrays.asList(snippets);
+				stats = PerformanceStats.getStats(SNIPPET_PERF, "SnippetsCompletionProcessor"); //$NON-NLS-1$
+				stats.startRun();
 			}
-			return Collections.emptyList();
+			ICompletionProposal[] snippets = new SnippetsCompletionProcessor().computeCompletionProposals(viewer,
+					offset);
+			if (stats != null)
+			{
+				stats.endRun();
+			}
+			if (snippets == null)
+			{
+				return Collections.emptyList();
+			}
+			return Arrays.asList(snippets);
 		}
-		finally
-		{
-		}
+		return Collections.emptyList();
+
 	}
 
 	/*
@@ -411,20 +410,18 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 				stats.startRun();
 			}
 
-			List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
-			Collection<? extends ICompletionProposal> rubleProposals = addRubleProposals(viewer, offset);
+			Collection<ICompletionProposal> rubleProposals = addRubleProposals(viewer, offset);
+			Collection<ICompletionProposal> snippetProposals = addSnippetProposals(viewer, offset);
 
-			proposals.addAll(rubleProposals);
+			Collection<ICompletionProposal> proposals = CollectionsUtil.union(rubleProposals, snippetProposals);
 
-			Collection<? extends ICompletionProposal> snippetProposals = addSnippetProposals(viewer, offset);
-			proposals.addAll(snippetProposals);
 			ICompletionProposal[] others = this.doComputeCompletionProposals(viewer, offset, activationChar,
 					autoActivated);
 
 			// create empty array to simplify logic
 			if (others == null)
 			{
-				others = new ICompletionProposal[0];
+				others = NO_PROPOSALS;
 			}
 
 			if (IdeLog.isTraceEnabled(CommonEditorPlugin.getDefault(), IDebugScopes.CONTENT_ASSIST))
