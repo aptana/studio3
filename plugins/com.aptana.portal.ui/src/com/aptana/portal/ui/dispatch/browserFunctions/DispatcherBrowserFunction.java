@@ -19,7 +19,7 @@ import com.aptana.portal.ui.dispatch.BrowserNotifier;
 import com.aptana.portal.ui.dispatch.IActionController;
 import com.aptana.portal.ui.dispatch.IBrowserNotificationConstants;
 import com.aptana.portal.ui.internal.IBrowserFunctionHandler;
-import com.aptana.usage.AnalyticsEvent;
+import com.aptana.usage.FeatureEvent;
 import com.aptana.usage.StudioAnalytics;
 
 /**
@@ -117,7 +117,7 @@ public class DispatcherBrowserFunction implements IBrowserFunctionHandler
 		}
 		// Send an Analytics ping
 		StudioAnalytics.getInstance().sendEvent(
-				new AnalyticsEvent(PORTAL_ANALYTICS_TYPE, MessageFormat.format("{0}.{1}", controllerID, action), null)); //$NON-NLS-1$
+				new FeatureEvent(MessageFormat.format("{0}.{1}", controllerID, action), null)); //$NON-NLS-1$
 		// OK... Done with the checks. Now dispatch.
 		return dispatch(controller, action, args);
 	}
