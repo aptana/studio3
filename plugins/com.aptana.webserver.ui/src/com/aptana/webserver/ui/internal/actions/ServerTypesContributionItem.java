@@ -92,6 +92,12 @@ public class ServerTypesContributionItem extends ContributionItem
 		private Image getImage(IServerType serverType)
 		{
 			String id = serverType.getId();
+			Image img = WebServerUIPlugin.getDefault().getImageRegistry().get(id);
+			if (img != null)
+			{
+				return img;
+			}
+
 			ImageDescriptor desc = ImageAssociations.getInstance().getImageDescriptor(id);
 			if (desc != null)
 			{
