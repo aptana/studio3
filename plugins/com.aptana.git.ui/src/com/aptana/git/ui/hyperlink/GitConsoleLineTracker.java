@@ -13,6 +13,7 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 
+import com.aptana.console.AdaptingHyperlink;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.git.core.IDebugScopes;
 import com.aptana.git.ui.GitUIPlugin;
@@ -25,12 +26,12 @@ import com.aptana.git.ui.GitUIPlugin;
 public class GitConsoleLineTracker implements IConsoleLineTracker
 {
 
-	private IConsole console;
+	private IConsole fConsole;
 	private HyperlinkDetector detector;
 
 	public void init(IConsole console)
 	{
-		this.console = console;
+		this.fConsole = console;
 		this.detector = new HyperlinkDetector();
 	}
 
@@ -38,14 +39,14 @@ public class GitConsoleLineTracker implements IConsoleLineTracker
 	{
 		try
 		{
-			String lineContents = console.getDocument().get(line.getOffset(), line.getLength());
+			String lineContents = fConsole.getDocument().get(line.getOffset(), line.getLength());
 
 			IHyperlink[] links = detector.detectHyperlinks(lineContents);
 			if (links != null)
 			{
 				for (IHyperlink link : links)
 				{
-					console.addLink(new WrappingConsoleHyperlink(link), line.getOffset()
+					fConsole.addLink(new AdaptingHyperlink(link), line.getOffset()
 							+ link.getHyperlinkRegion().getOffset(), link.getHyperlinkRegion().getLength());
 				}
 			}
@@ -59,34 +60,6 @@ public class GitConsoleLineTracker implements IConsoleLineTracker
 	public void dispose()
 	{
 		this.detector = null;
-		this.console = null;
-	}
-
-	/**
-	 * Wraps a JFace hyperlink to conform to the console IHyperlink interface.
-	 * 
-	 * @author cwilliams
-	 */
-	private static class WrappingConsoleHyperlink implements org.eclipse.ui.console.IHyperlink
-	{
-		private IHyperlink link;
-
-		WrappingConsoleHyperlink(IHyperlink link)
-		{
-			this.link = link;
-		}
-
-		public void linkEntered()
-		{
-		}
-
-		public void linkExited()
-		{
-		}
-
-		public void linkActivated()
-		{
-			link.open();
-		}
+		this.fConsole = null;
 	}
 }
