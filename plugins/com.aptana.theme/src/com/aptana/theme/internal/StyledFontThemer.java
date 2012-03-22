@@ -34,13 +34,16 @@ public class StyledFontThemer extends ControlThemer
 
 	protected void applyControlFont()
 	{
-		if (useEditorFont())
+		if (!controlIsDisposed())
 		{
-			getControl().setFont(getFont());
-		}
-		else
-		{
-			getControl().setFont(defaultStyledFont);
+			if (useEditorFont())
+			{
+				getControl().setFont(getFont());
+			}
+			else
+			{
+				getControl().setFont(defaultStyledFont);
+			}
 		}
 	}
 
@@ -91,7 +94,11 @@ public class StyledFontThemer extends ControlThemer
 	@Override
 	protected void unapplyControlFont()
 	{
-		getControl().setFont(defaultStyledFont != null && !defaultStyledFont.isDisposed() ? defaultStyledFont : null);
+		if (!controlIsDisposed())
+		{
+			getControl().setFont(
+					defaultStyledFont != null && !defaultStyledFont.isDisposed() ? defaultStyledFont : null);
+		}
 	}
 
 	/*
