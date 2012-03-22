@@ -51,9 +51,11 @@ public class AlphaBlendThemer extends ControlThemer
 
 	private void setBlendedColor()
 	{
-		getControl().setForeground(
-				getColorManager().getColor(
-						Theme.alphaBlend(getControl().getBackground().getRGB(), getControl().getForeground().getRGB(),
-								alpha)));
+		if (!controlIsDisposed())
+		{
+			Control c = getControl();
+			c.setForeground(getColorManager().getColor(
+					Theme.alphaBlend(c.getBackground().getRGB(), c.getForeground().getRGB(), alpha)));
+		}
 	}
 }

@@ -68,7 +68,7 @@ class ControlThemer implements IControlThemer
 
 	protected void applyTheme()
 	{
-		if (invasiveThemesEnabled() && getControl() != null && !getControl().isDisposed())
+		if (invasiveThemesEnabled() && !controlIsDisposed())
 		{
 			getControl().setRedraw(false);
 			applyControlColors();
@@ -85,15 +85,25 @@ class ControlThemer implements IControlThemer
 
 	protected void applyControlFont()
 	{
-		if (useEditorFont())
+		if (useEditorFont() && !controlIsDisposed())
 		{
 			getControl().setFont(getFont());
 		}
 	}
 
+	protected boolean controlIsDisposed()
+	{
+		Control control = getControl();
+		if (control == null)
+		{
+			return true;
+		}
+		return control.isDisposed();
+	}
+
 	protected boolean invasiveThemesEnabled()
 	{
-		return getCurrentTheme().isInvasive();
+		return ThemePlugin.applyToViews();
 	}
 
 	protected boolean useEditorFont()
@@ -110,30 +120,33 @@ class ControlThemer implements IControlThemer
 
 	protected void unapplyTheme()
 	{
-		if (control != null && !control.isDisposed())
+		if (!controlIsDisposed())
 		{
-			control.setRedraw(false);
+			getControl().setRedraw(false);
 			unapplyControlColors();
 			unapplyControlFont();
-			control.setRedraw(true);
+			getControl().setRedraw(true);
 		}
 	}
 
 	protected void unapplyControlColors()
 	{
-		control.setBackground(defaultBg);
-		control.setForeground(null);
+		getControl().setBackground(defaultBg);
+		getControl().setForeground(null);
 	}
 
 	protected void unapplyControlFont()
 	{
-		if (useEditorFont())
+		if (!controlIsDisposed())
 		{
-			control.setFont(getFont());
-		}
-		else
-		{
-			control.setFont(null);
+			if (useEditorFont())
+			{
+				getControl().setFont(getFont());
+			}
+			else
+			{
+				getControl().setFont(null);
+			}
 		}
 	}
 
@@ -184,8 +197,7 @@ class ControlThemer implements IControlThemer
 
 	protected void addSelectionColorOverride()
 	{
-		final Control control = getControl();
-		if (control == null || control.isDisposed())
+		if (controlIsDisposed())
 		{
 			return;
 		}
@@ -238,12 +250,12 @@ class ControlThemer implements IControlThemer
 				gc.setForeground(getForeground());
 			}
 		};
-		control.addListener(SWT.EraseItem, selectionOverride);
+		getControl().addListener(SWT.EraseItem, selectionOverride);
 	}
 
 	protected void removeSelectionOverride()
 	{
-		if (selectionOverride != null && getControl() != null && !getControl().isDisposed())
+		if (selectionOverride != null && !controlIsDisposed())
 		{
 			getControl().removeListener(SWT.EraseItem, selectionOverride);
 		}
