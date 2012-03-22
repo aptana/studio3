@@ -51,7 +51,6 @@ import org.eclipse.debug.core.model.IProcess;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.SocketUtil;
-import com.aptana.webserver.core.IServer;
 import com.aptana.webserver.core.SimpleWebServer;
 import com.aptana.webserver.core.WebServerCorePlugin;
 import com.aptana.webserver.internal.core.preferences.WebServerPreferences;
@@ -75,9 +74,8 @@ public class LocalWebServer extends SimpleWebServer
 	private Thread thread;
 	private ListeningIOReactor reactor;
 
-	private int port;
+	protected int port;
 	private String hostName;
-	private State state;
 	private InetAddress host;
 
 	public LocalWebServer(URI documentRoot)
@@ -91,7 +89,6 @@ public class LocalWebServer extends SimpleWebServer
 		Assert.isLegal(documentRoot != null, "DocumentRoot should be set"); //$NON-NLS-1$
 		setDocumentRoot(documentRoot);
 		setName(NAME);
-		this.state = IServer.State.STOPPED;
 		this.host = host;
 		this.port = SocketUtil.findFreePort(host, portRange[0], portRange[1]);
 		if (this.port <= 0)
@@ -143,7 +140,7 @@ public class LocalWebServer extends SimpleWebServer
 
 	private void startServer(final InetAddress host, final int port)
 	{
-		state = State.STARTING;
+		updateState(State.STARTING);
 		thread = new Thread()
 		{
 			@Override
@@ -160,7 +157,7 @@ public class LocalWebServer extends SimpleWebServer
 		{
 			if (reactor != null && reactor.getStatus() == IOReactorStatus.ACTIVE)
 			{
-				state = State.STARTED;
+				updateState(State.STARTED);
 				break;
 			}
 			try
@@ -169,7 +166,7 @@ public class LocalWebServer extends SimpleWebServer
 			}
 			catch (InterruptedException e)
 			{
-				state = State.UNKNOWN;
+				updateState(State.UNKNOWN);
 				break;
 			}
 		}
@@ -212,7 +209,7 @@ public class LocalWebServer extends SimpleWebServer
 		}
 		catch (IOReactorException e)
 		{
-			IdeLog.logError(WebServerCorePlugin.getDefault(), e);
+			IdeLog.logWarning(WebServerCorePlugin.getDefault(), e);
 		}
 		catch (IOException e)
 		{
@@ -278,9 +275,10 @@ public class LocalWebServer extends SimpleWebServer
 		return ILaunchManager.RUN_MODE;
 	}
 
+	@Override
 	public State getState()
 	{
-		return state;
+		return fState;
 	}
 
 	public ILaunch getLaunch()
@@ -293,6 +291,11 @@ public class LocalWebServer extends SimpleWebServer
 	{
 		// We don't use launches or IProcesses.
 		return new IProcess[0];
+	}
+
+	public InetAddress getHost()
+	{
+		return host;
 	}
 
 	public String getHostname()
