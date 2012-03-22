@@ -69,6 +69,7 @@ public class InputStreamGobbler extends Thread
 		InputStreamReader isr = null;
 		try
 		{
+			// FIXME Use IOUtil.read(is, charset);!
 			if (charset != null)
 			{
 				isr = new InputStreamReader(is, charset);

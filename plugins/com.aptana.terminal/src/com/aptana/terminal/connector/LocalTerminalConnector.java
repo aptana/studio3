@@ -33,6 +33,7 @@ import org.eclipse.tm.internal.terminal.provisional.api.provider.TerminalConnect
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.FileUtil;
+import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.PlatformUtil.ProcessItem;
 import com.aptana.terminal.IProcessConfiguration;
@@ -50,7 +51,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 
 	public static final String ID = "com.aptana.terminal.connector.local"; //$NON-NLS-1$
 
-	protected static final String ENCODING = "UTF-8"; //$NON-NLS-1$
+	protected static final String ENCODING = IOUtil.UTF_8;
 	private static final char DLE = '\u0010';
 	private static final int PROCESS_LIST_TIMEOUT = 1500;
 

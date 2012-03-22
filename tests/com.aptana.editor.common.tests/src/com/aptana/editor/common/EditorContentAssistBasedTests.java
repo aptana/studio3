@@ -39,6 +39,18 @@ public abstract class EditorContentAssistBasedTests<T extends CommonContentAssis
 		checkProposals(resource, false, false, displayNames);
 	}
 
+	protected ICompletionProposal findProposal(ICompletionProposal[] proposals, String displayName)
+	{
+		for (ICompletionProposal prop : proposals)
+		{
+			if (displayName.equals(prop.getDisplayString()))
+			{
+				return prop;
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * Assertion that a list of proposals contains the set of displayNames.
 	 * 

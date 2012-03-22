@@ -13,15 +13,19 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 
+import com.aptana.core.util.IOUtil;
+
 /**
  * @author Max Stepanov
  */
-public final class Util {
+public final class Util
+{
 
 	/**
 	 * 
 	 */
-	private Util() {
+	private Util()
+	{
 	}
 
 	/**
@@ -30,22 +34,31 @@ public final class Util {
 	 * @param url
 	 * @return String
 	 */
-	public static String decodeURL(String url) {
-		try {
-			return URLDecoder.decode(url, "UTF-8"); //$NON-NLS-1$
-		} catch (Exception ignore) {
+	public static String decodeURL(String url)
+	{
+		try
+		{
+			return URLDecoder.decode(url, IOUtil.UTF_8);
+		}
+		catch (Exception ignore)
+		{
 			ignore.getCause();
 		}
-		try {
+		try
+		{
 			return URLDecoder.decode(url, "ASCII"); //$NON-NLS-1$
-		} catch (UnsupportedEncodingException ignore) {
+		}
+		catch (UnsupportedEncodingException ignore)
+		{
 			ignore.getCause();
 		}
 		return url;
 	}
 
-	public static URL toURL(URI uri) throws MalformedURLException {
-		if (uri != null) {
+	public static URL toURL(URI uri) throws MalformedURLException
+	{
+		if (uri != null)
+		{
 			return uri.toURL();
 		}
 		return null;

@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.IOUtil;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.IDebugScopes;
 
@@ -148,7 +149,7 @@ public class GitRevList
 					sha = sha.substring(startIndex, startIndex + 40);
 				}
 
-				String encoding = getline(stream, '\1', "UTF-8"); //$NON-NLS-1$
+				String encoding = getline(stream, '\1', IOUtil.UTF_8);
 				GitCommit newCommit = new GitCommit(repository, sha);
 
 				String author = getline(stream, '\1', encoding);

@@ -133,6 +133,13 @@ public class ServersView extends ViewPart implements IServerChangeListener
 				{
 					Identifiable identifiable = (Identifiable) element;
 					String id = identifiable.getId();
+
+					Image img = WebServerUIPlugin.getDefault().getImageRegistry().get(id);
+					if (img != null)
+					{
+						return img;
+					}
+
 					ImageDescriptor desc = ImageAssociations.getInstance().getImageDescriptor(id);
 					if (desc != null)
 					{

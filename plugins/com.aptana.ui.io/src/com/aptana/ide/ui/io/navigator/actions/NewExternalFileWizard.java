@@ -193,7 +193,7 @@ public class NewExternalFileWizard extends Wizard
 			String templateContent = NewFileWizard.getTemplateContent(template, path);
 			if (templateContent != null)
 			{
-				return new ReaderInputStream(new StringReader(templateContent), "UTF-8"); //$NON-NLS-1$
+				return new ReaderInputStream(new StringReader(templateContent), IOUtil.UTF_8);
 			}
 		}
 		return mainPage.getInitialContents();

@@ -7,9 +7,6 @@
  */
 package com.aptana.editor.js.index;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -17,14 +14,11 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.eclipse.core.filesystem.EFS;
-import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.mortbay.util.ajax.JSON;
 
 import com.aptana.core.util.CollectionsUtil;
-import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
@@ -318,7 +312,7 @@ public class JSIndexTests extends TestCase
 		assertTrue("Expected a userAgents property", map.containsKey("userAgents"));
 		assertNull("Expected userAgents property to be null", map.get("userAgents"));
 	}
-	
+
 	/**
 	 * Test for APSTUD-4535
 	 */
@@ -363,10 +357,10 @@ public class JSIndexTests extends TestCase
 			IParseRootNode ast = myContext.getAST();
 			JSFileIndexingParticipant indexParticipant = new JSFileIndexingParticipant();
 			Index index = getIndex();
-			
+
 			indexParticipant.processParseResults(myContext, index, ast, new NullProgressMonitor());
 			JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
-			
+
 			List<TypeElement> types = queryHelper.getTypes(index);
 			assertNotNull(types);
 			assertEquals("Expected 3 types", 3, types.size());
@@ -385,37 +379,5 @@ public class JSIndexTests extends TestCase
 		{
 			fail(e.getMessage());
 		}
-	}
-	
-	/**
-	 * getFileStore
-	 * 
-	 * @param resource
-	 * @return
-	 */
-	protected IFileStore createFileStore(String prefix, String extension, String contents)
-	{
-		File tempFile;
-		IFileStore fileStore = null;
-		if (extension.length() > 0 && extension.charAt(0) != '.')
-		{
-			extension = '.' + extension;
-		}
-		try
-		{
-			tempFile = File.createTempFile(prefix, extension);
-			IOUtil.write(new FileOutputStream(tempFile), contents);
-			fileStore = EFS.getStore(tempFile.toURI());
-		}
-		catch (IOException e)
-		{
-			fail();
-		}
-		catch (CoreException e)
-		{
-			fail();
-		}
-
-		return fileStore;
 	}
 }

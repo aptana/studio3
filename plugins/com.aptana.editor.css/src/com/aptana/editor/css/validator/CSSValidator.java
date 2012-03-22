@@ -38,6 +38,7 @@ import org.w3c.css.util.Utf8Properties;
 import com.aptana.core.build.AbstractBuildParticipant;
 import com.aptana.core.build.IProblem;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.URLEncoder;
 import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.ICSSConstants;
@@ -359,7 +360,7 @@ public class CSSValidator extends AbstractBuildParticipant
 		try
 		{
 			parser.parseStyleElement(ac,
-					new ByteArrayInputStream(source.getBytes("UTF-8")), null, null, path.toURL(), 0); //$NON-NLS-1$
+					new ByteArrayInputStream(source.getBytes(IOUtil.UTF_8)), null, null, path.toURL(), 0);
 		}
 		catch (MalformedURLException e)
 		{

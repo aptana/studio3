@@ -111,7 +111,7 @@ public class CommandScriptRunner extends AbstractCommandRunner
 		}
 		String[] commandLine = this.getCommandLineArguments();
 		String resultText = null;
-		String input = IOUtil.read(this.getContext().getInputStream(), "UTF-8"); //$NON-NLS-1$			
+		String input = IOUtil.read(this.getContext().getInputStream(), IOUtil.UTF_8);
 		IStatus result = ProcessUtil.runInBackground(shell.toOSString(), this.getCommand().getWorkingDirectory(), input, this
 			.getContributedEnvironment(), commandLine);
 

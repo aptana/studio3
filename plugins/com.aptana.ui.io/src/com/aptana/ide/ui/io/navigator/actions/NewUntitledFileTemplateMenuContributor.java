@@ -144,7 +144,7 @@ public class NewUntitledFileTemplateMenuContributor extends NewFileTemplateMenuC
 		String templateContent = NewFileWizard.getTemplateContent(template, path);
 		if (templateContent != null)
 		{
-			return new ReaderInputStream(new StringReader(templateContent), "UTF-8"); //$NON-NLS-1$
+			return new ReaderInputStream(new StringReader(templateContent), IOUtil.UTF_8);
 		}
 		return null;
 	}

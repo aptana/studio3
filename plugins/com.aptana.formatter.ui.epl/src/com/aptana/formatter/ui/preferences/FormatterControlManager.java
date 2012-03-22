@@ -27,12 +27,12 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.formatter.preferences.IFieldValidator;
 import com.aptana.formatter.preferences.IPreferenceDelegate;
 import com.aptana.formatter.ui.IFormatterControlManager;
 import com.aptana.formatter.ui.util.IStatusChangeListener;
 import com.aptana.formatter.ui.util.SWTFactory;
-import com.aptana.formatter.ui.util.Util;
 
 public class FormatterControlManager implements IFormatterControlManager, IStatusChangeListener
 {
@@ -105,7 +105,7 @@ public class FormatterControlManager implements IFormatterControlManager, IStatu
 	public Text createNumber(Composite parent, Object key, String label)
 	{
 		final Label labelControl = SWTFactory.createLabel(parent, label);
-		Text text = SWTFactory.createText(parent, SWT.BORDER, 1, Util.EMPTY_STRING);
+		Text text = SWTFactory.createText(parent, SWT.BORDER, 1, StringUtil.EMPTY);
 		bindingManager.bindControl(text, key, FieldValidators.POSITIVE_NUMBER_VALIDATOR);
 		registerAssociatedLabel(text, labelControl);
 		return text;
@@ -119,7 +119,7 @@ public class FormatterControlManager implements IFormatterControlManager, IStatu
 	public Text createNumber(Composite parent, String key, String label, int minValue)
 	{
 		final Label labelControl = SWTFactory.createLabel(parent, label);
-		Text text = SWTFactory.createText(parent, SWT.BORDER, 1, Util.EMPTY_STRING);
+		Text text = SWTFactory.createText(parent, SWT.BORDER, 1, StringUtil.EMPTY);
 		bindingManager.bindControl(text, key, new FieldValidators.MinimumNumberValidator(minValue));
 		registerAssociatedLabel(text, labelControl);
 		return text;
@@ -165,7 +165,7 @@ public class FormatterControlManager implements IFormatterControlManager, IStatu
 	public Text createText(Composite parent, Object key, String label)
 	{
 		final Label labelControl = SWTFactory.createLabel(parent, label);
-		Text text = SWTFactory.createText(parent, SWT.BORDER, 1, Util.EMPTY_STRING);
+		Text text = SWTFactory.createText(parent, SWT.BORDER, 1, StringUtil.EMPTY);
 		bindingManager.bindControl(text, key, FieldValidators.EMPTY_TEXT_VALIDATOR);
 		registerAssociatedLabel(text, labelControl);
 		return text;
@@ -174,7 +174,7 @@ public class FormatterControlManager implements IFormatterControlManager, IStatu
 	public Text createText(Composite parent, Object key, String label, IFieldValidator validator)
 	{
 		final Label labelControl = SWTFactory.createLabel(parent, label);
-		Text text = SWTFactory.createText(parent, SWT.BORDER, 1, Util.EMPTY_STRING);
+		Text text = SWTFactory.createText(parent, SWT.BORDER, 1, StringUtil.EMPTY);
 		bindingManager.bindControl(text, key, validator);
 		registerAssociatedLabel(text, labelControl);
 		return text;

@@ -48,7 +48,6 @@ public class XMLPListParser implements IPListParser
 		TimeZone tz = TimeZone.getTimeZone("UTC"); //$NON-NLS-1$
 		ISO_8601.setTimeZone(tz);
 	}
-	private static final String UTF_8 = "UTF-8"; //$NON-NLS-1$
 
 	@SuppressWarnings("unchecked")
 	public Map<String, Object> parse(File file) throws IOException
@@ -78,11 +77,11 @@ public class XMLPListParser implements IPListParser
 			{
 				// May have failed due to invalid characters in XML, which happens often with TM themes,
 				// So let's sanitize the XML
-				String raw = IOUtil.read(new FileInputStream(file), UTF_8);
+				String raw = IOUtil.read(new FileInputStream(file), IOUtil.UTF_8);
 				raw = stripNonValidXMLCharacters(raw);
 				try
 				{
-					d = builder.parse(new ByteArrayInputStream(raw.getBytes(UTF_8)));
+					d = builder.parse(new ByteArrayInputStream(raw.getBytes(IOUtil.UTF_8)));
 				}
 				catch (Exception e1)
 				{
@@ -169,7 +168,7 @@ public class XMLPListParser implements IPListParser
 			{
 				String raw = node.getTextContent();
 				// FIXME Implement our own Base64 decoder!
-				return Base64.decode(raw.getBytes(UTF_8));
+				return Base64.decode(raw.getBytes(IOUtil.UTF_8));
 			}
 			catch (UnsupportedEncodingException e)
 			{

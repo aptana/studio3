@@ -140,9 +140,19 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate
 		{
 			boolean found = false;
 			String name = configuration.getName();
-			if (!StringUtil.isEmpty(name) && name.startsWith(JSLaunchConfigurationHelper.FIREFOX) && checkFirefoxLocationListener != null)
+			if (!StringUtil.isEmpty(name) && name.startsWith(JSLaunchConfigurationHelper.FIREFOX))
 			{
-				browserExecutable = checkFirefoxLocationListener.checkFirefoxLocation();
+				if (checkFirefoxLocationListener == null)
+				{
+					ILaunchConfigurationWorkingCopy wc = configuration.getWorkingCopy();
+					JSLaunchConfigurationHelper.setBrowserDefaults(wc, null);
+					browserExecutable = wc.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_BROWSER_EXECUTABLE,
+							(String) null);
+				}
+				else
+				{
+					browserExecutable = checkFirefoxLocationListener.checkFirefoxLocation();
+				}
 				if (StringUtil.isEmpty(browserExecutable))
 				{
 					return;

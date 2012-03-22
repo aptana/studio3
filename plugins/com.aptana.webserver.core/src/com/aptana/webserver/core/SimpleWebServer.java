@@ -106,11 +106,12 @@ public class SimpleWebServer extends AbstractWebServer
 	 */
 	public IPath getDocumentRootPath()
 	{
-		if (documentRoot == null)
+		URI rootUri = getDocumentRoot();
+		if (rootUri == null)
 		{
 			return null;
 		}
-		return Path.fromPortableString(documentRoot.getSchemeSpecificPart());
+		return Path.fromPortableString(rootUri.getSchemeSpecificPart());
 	}
 
 	/**
@@ -119,7 +120,7 @@ public class SimpleWebServer extends AbstractWebServer
 	 */
 	public void setDocumentRootPath(IPath documentRoot)
 	{
-		this.documentRoot = EFS.getLocalFileSystem().getStore(documentRoot).toURI();
+		setDocumentRoot(EFS.getLocalFileSystem().getStore(documentRoot).toURI());
 	}
 
 	public String getHostname()
