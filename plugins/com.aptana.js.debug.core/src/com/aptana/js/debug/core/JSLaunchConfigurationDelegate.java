@@ -52,6 +52,7 @@ import com.aptana.js.debug.core.internal.model.JSDebugProcess;
 import com.aptana.js.debug.core.internal.model.JSDebugTarget;
 import com.aptana.webserver.core.IServer;
 import com.aptana.webserver.core.IServer.State;
+import com.aptana.webserver.core.SimpleWebServer;
 import com.aptana.webserver.core.URLtoURIMapper;
 import com.aptana.webserver.core.WebServerCorePlugin;
 import com.aptana.webserver.core.WorkspaceResolvingURIMapper;
@@ -263,6 +264,8 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate
 			else if (serverType == ILaunchConfigurationConstants.SERVER_INTERNAL)
 			{
 				IServer server = WebServerCorePlugin.getDefault().getBuiltinWebServer();
+				((SimpleWebServer) server).setDocumentRoot(EFSUtils.getFileStore(
+						ResourcesPlugin.getWorkspace().getRoot()).toURI());
 				startServerIfNecessary(server, mode, monitor);
 				urlMapper = server;
 			}
