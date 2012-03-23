@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -39,12 +39,14 @@ public final class Sync
 	public static void uploadCurrentEditor()
 	{
 		IEditorPart editor = UIUtils.getActiveEditor();
-		if (editor == null)
+		if (editor != null)
 		{
-			return;
+			uploadEditor(editor.getEditorInput());
 		}
+	}
 
-		IEditorInput input = editor.getEditorInput();
+	public static void uploadEditor(IEditorInput input)
+	{
 		if (input instanceof IFileEditorInput)
 		{
 			upload(((IFileEditorInput) input).getFile());
