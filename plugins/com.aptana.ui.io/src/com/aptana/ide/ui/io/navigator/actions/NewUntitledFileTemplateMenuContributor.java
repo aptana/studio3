@@ -58,8 +58,9 @@ public class NewUntitledFileTemplateMenuContributor extends NewFileTemplateMenuC
 		{
 			fileExtension = fileExtension.substring(index + 1);
 		}
-		createUntitledFile(template.getOwningBundle().getDisplayName(), fileExtension,
-				getInitialContents(template, Path.fromOSString(template.getPath())));
+		String name = template.getOwningBundle().getDisplayName();
+		createUntitledFile(name, fileExtension,
+				getInitialContents(template, Path.fromOSString(MessageFormat.format("{0}.{1}", name, fileExtension)))); //$NON-NLS-1$
 	}
 
 	@Override
