@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -11,6 +11,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
@@ -21,7 +22,7 @@ import com.aptana.editor.css.internal.text.CSSFoldingComputer;
 import com.aptana.editor.css.outline.CSSOutlineContentProvider;
 import com.aptana.editor.css.outline.CSSOutlineLabelProvider;
 
-@SuppressWarnings("restriction")
+@SuppressWarnings({ "restriction", "deprecation" })
 public class CSSSourceEditor extends AbstractThemeableEditor
 {
 	@Override
@@ -85,5 +86,24 @@ public class CSSSourceEditor extends AbstractThemeableEditor
 	public String getContentType()
 	{
 		return ICSSConstants.CONTENT_TYPE_CSS;
+	}
+
+	@Override
+	public void refreshOutline()
+	{
+		// TODO Does this need to be run in asyncExec here?
+		Display.getDefault().asyncExec(new Runnable()
+		{
+
+			public void run()
+			{
+				if (!hasOutlinePageCreated() || getAST() == null)
+				{
+					return;
+				}
+
+				getOutlinePage().refresh();
+			}
+		});
 	}
 }
