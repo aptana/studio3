@@ -141,6 +141,16 @@ public final class UIUtils
 		}
 	}
 
+	public static IEditorPart[] getDirtyEditors()
+	{
+		IWorkbenchPage page = UIUtils.getActivePage();
+		if (page == null)
+		{
+			return null;
+		}
+		return page.getDirtyEditors();
+	}
+
 	/**
 	 * Returns the URI for the specific editor input.
 	 * 
