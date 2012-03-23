@@ -26,7 +26,6 @@ import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategyExtension;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
@@ -46,8 +45,6 @@ import com.aptana.core.util.ResourceUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonAnnotationModel;
 import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.outline.CommonOutlinePage;
-import com.aptana.parsing.ast.IParseNode;
 
 public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconcilingStrategyExtension,
 		IBatchReconcilingStrategy, IDisposableReconcilingStrategy
@@ -72,10 +69,6 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	 * Code Folding.
 	 */
 	private Map<ProjectionAnnotation, Position> fPositions = new HashMap<ProjectionAnnotation, Position>();
-	/**
-	 * Flag used to auto-expand outlines to 2nd level on first open.
-	 */
-	private boolean autoExpanded;
 
 	private IPropertyListener propertyListener = new IPropertyListener()
 	{
@@ -128,7 +121,6 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	{
 		folder = createFoldingComputer(document);
 		fDocument = document;
-		autoExpanded = false;
 	}
 
 	protected IFoldingComputer createFoldingComputer(IDocument document)
@@ -214,7 +206,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	{
 		SubMonitor monitor = SubMonitor.convert(fMonitor, 100);
 
-		refreshOutline();
+		fEditor.refreshOutline();
 		monitor.worked(5);
 
 		// FIXME only do folding and validation when the source was changed
@@ -238,36 +230,6 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		}
 
 		runParticipants(monitor.newChild(75));
-	}
-
-	private void refreshOutline()
-	{
-		// TODO Does this need to be run in asyncExec here?
-		Display.getDefault().asyncExec(new Runnable()
-		{
-			public void run()
-			{
-				if (fEditor == null || !fEditor.hasOutlinePageCreated())
-				{
-					return;
-				}
-
-				IParseNode node = fEditor.getAST();
-				if (node == null)
-				{
-					return;
-				}
-
-				CommonOutlinePage page = fEditor.getOutlinePage();
-				page.refresh();
-
-				if (!autoExpanded)
-				{
-					page.expandToLevel(2);
-					autoExpanded = true;
-				}
-			}
-		});
 	}
 
 	/**

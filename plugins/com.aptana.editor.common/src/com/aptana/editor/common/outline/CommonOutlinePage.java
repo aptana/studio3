@@ -181,7 +181,6 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		((IContextService) getSite().getService(IContextService.class)).activateContext(OUTLINE_CONTEXT);
 
 		final TreeViewer viewer = getTreeViewer();
-		viewer.setAutoExpandLevel(2);
 		viewer.setUseHashlookup(true);
 		viewer.setContentProvider(fContentProvider);
 		viewer.setLabelProvider(fLabelProvider);
