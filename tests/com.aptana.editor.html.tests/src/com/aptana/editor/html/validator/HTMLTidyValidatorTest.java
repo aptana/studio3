@@ -54,6 +54,14 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 		assertContains(items, "missing </title> before <body>");
 	}
 
+	public void testHTMLEOFNewLineDiv() throws CoreException
+	{
+		String text = "<div id=\"\"\n";
+
+		List<IProblem> items = getParseErrors(text);
+		assertContains(items, "end of file while parsing attributes");
+	}
+
 	public void testHTMLNoErrors() throws CoreException
 	{
 		String text = "<html>\n<title>test</title>\n<body>\n</body>\n</html>";

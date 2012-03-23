@@ -235,22 +235,25 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 			int lineOffset = region.getOffset();
 			String line = document.get(lineOffset, region.getLength());
 			column--;
-			for (int i = 0; i <= column; i++)
+			if (!StringUtil.isEmpty(line))
 			{
-				char c = line.charAt(i);
-				switch (c)
+				for (int i = 0; i <= column; i++)
 				{
-					case '\t':
-						column -= 4;
-						break;
+					char c = line.charAt(i);
+					switch (c)
+					{
+						case '\t':
+							column -= 4;
+							break;
 
-					default:
-						column--;
-						break;
-				}
-				if (column == 0)
-				{
-					return lineOffset + i + 1;
+						default:
+							column--;
+							break;
+					}
+					if (column == 0)
+					{
+						return lineOffset + i + 1;
+					}
 				}
 			}
 			return lineOffset;
