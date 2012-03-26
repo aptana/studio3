@@ -15,6 +15,7 @@ import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
 
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.editor.common.tests.TextViewer;
 import com.aptana.editor.js.contentassist.index.JSFileIndexingParticipant;
 import com.aptana.editor.js.tests.JSEditorBasedTests;
@@ -208,5 +209,21 @@ public class JSContextInfoTests extends JSEditorBasedTests
 	public void testObjectStyles()
 	{
 		assertArgStyleRanges("contextInfo/objectArgs.js");
+	}
+
+	public void testTagStripperAndTypeBolder()
+	{
+		JSContextInformationValidator validator = getValidator("contextInfo/invocationArgsWithTagsAndTypes.js");
+		IContextInformation info = validator.getContextInformation();
+		String displayText = info.getInformationDisplayString();
+
+		assertNotNull("Context info display text should not be empty", displayText);
+
+		String[] parts = displayText.split(JSContextInformation.DESCRIPTION_DELIMITER);
+		assertTrue("Context info display text should have at least one entry", !ArrayUtil.isEmpty(parts));
+
+		String lastLine = parts[parts.length - 1];
+		assertTrue("Last line does not appear to have had tags stripped and types bolded",
+				lastLine.endsWith("Last one with a type Titanium.UI.createWindow and some tags."));
 	}
 }

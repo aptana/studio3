@@ -98,7 +98,8 @@ public class JSModelFormatter
 	 */
 	public static final JSModelFormatter CONTEXT_INFO = new JSModelFormatter(false, Section.SIGNATURE)
 	{
-		private static final char BULLET = '\u2022';
+		private static final String BULLET = "\u2022"; //$NON-NLS-1$
+		private TagStripperAndTypeBolder stripAndBold = new TagStripperAndTypeBolder();
 
 		public String getDocumentation(Collection<PropertyElement> properties)
 		{
@@ -116,24 +117,34 @@ public class JSModelFormatter
 				// line 1: function name with argument names
 				result.add(getHeader(function, null));
 
+				// create buffer once
+				List<String> buffer = new ArrayList<String>();
+
 				// line 2..n: one line for each argument description
 				for (ParameterElement parameter : function.getParameters())
 				{
-					StringBuilder buffer = new StringBuilder();
-					buffer.setLength(0);
-					buffer.append(' ').append(BULLET).append('\t').append(parameter.getName());
+					// make sure buffer is empty
+					buffer.clear();
 
+					CollectionsUtil.addToList(buffer, " ", BULLET, "\t", parameter.getName()); //$NON-NLS-1$ //$NON-NLS-2$
+
+					// add, possibly cleaned up, description, if it exists
 					String description = parameter.getDescription();
+
 					if (!StringUtil.isEmpty(description))
 					{
-						description = StringUtil.stripHTMLTags(description);
-						buffer.append(':').append(FileUtil.NEW_LINE).append(" \t").append(description); //$NON-NLS-1$
+						// strip html tags and preserve types that look like tags
+						description = stripAndBold.searchAndReplace(description);
+
+						CollectionsUtil.addToList(buffer, ":", FileUtil.NEW_LINE, " \t", description); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 
-					result.add(buffer.toString());
+					result.add(StringUtil.concat(buffer));
 				}
+
 				return StringUtil.join(FileUtil.NEW_LINE + JSContextInformation.DESCRIPTION_DELIMITER, result);
 			}
+
 			return null;
 		}
 	};
@@ -355,7 +366,7 @@ public class JSModelFormatter
 
 	private abstract static class Section
 	{
-		private boolean useHTML;
+		protected boolean useHTML;
 
 		public boolean isHeader()
 		{
@@ -621,25 +632,7 @@ public class JSModelFormatter
 		 */
 		final static Section DESCRIPTION = new Section()
 		{
-			private RegexPatternReplacer stripAndBold;
-			{
-				stripAndBold = new RegexPatternReplacer();
-				// @formatter:off
-				stripAndBold.addPattern(
-					"<[\\p{Alpha}$_][\\p{Alnum}_$]*(?:\\.[\\p{Alpha}$_][\\p{Alnum}_$]*)+>", //$NON-NLS-1$
-					new IMap<String, String>()
-					{
-						public String map(String item)
-						{
-							String typeName = item.substring(1, item.length() - 1);
-
-							return StringUtil.concat(BOLD_OPEN_TAG, typeName, BOLD_CLOSE_TAG);
-						}
-					}
-				);
-				// @formatter:on
-				stripAndBold.addPattern("</?p>"); //$NON-NLS-1$
-			}
+			private TagStripperAndTypeBolder stripAndBold = new TagStripperAndTypeBolder();
 
 			@Override
 			public String generate(Collection<PropertyElement> properties, URI root)
@@ -648,6 +641,7 @@ public class JSModelFormatter
 				for (PropertyElement property : properties)
 				{
 					// strip p elements and bold any items that look like open tags with dotted local names
+					stripAndBold.setUseHTML(useHTML);
 					String desc = stripAndBold.searchAndReplace(property.getDescription());
 
 					if (!StringUtil.isEmpty(desc))
@@ -769,5 +763,41 @@ public class JSModelFormatter
 				return StringUtil.join(COMMA_SPACE, strings);
 			}
 		};
+	}
+
+	private static class TagStripperAndTypeBolder extends RegexPatternReplacer
+	{
+		private boolean useHTML;
+
+		public TagStripperAndTypeBolder()
+		{
+			// @formatter:off
+			addPattern(
+				"<[\\p{Alpha}$_][\\p{Alnum}_$]*(?:\\.[\\p{Alpha}$_][\\p{Alnum}_$]*)+>", //$NON-NLS-1$
+				new IMap<String, String>()
+				{
+					public String map(String item)
+					{
+						String typeName = item.substring(1, item.length() - 1);
+
+						if (useHTML)
+						{
+							return StringUtil.concat(BOLD_OPEN_TAG, typeName, BOLD_CLOSE_TAG);
+						}
+						else
+						{
+							return typeName;
+						}
+					}
+				}
+			);
+			// @formatter:on
+			addPattern("</?p>"); //$NON-NLS-1$
+		}
+
+		public void setUseHTML(boolean value)
+		{
+			useHTML = value;
+		}
 	}
 }

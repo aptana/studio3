@@ -18,7 +18,7 @@
             appGuid="936afc9e-28ed-4618-88b8-f6e6e3869b09"
             appId="com.aptana.studio"
             appName="Aptana Studio"
-            userAgent="AptanaStudio/3.0"
+            userAgent="AptanaStudio/3.1"
             versionPluginId="com.aptana.branding">
       </info>
    </extension>
