@@ -131,4 +131,13 @@ public interface IBuildParticipant
 	 * @return
 	 */
 	public List<String> getFilters();
+
+	/**
+	 * Determine if this participant is valid for the given project. Subclasses should use behavior from
+	 * {@link AbstractBuildParticipant}, which checks against the project natures this participant is bound to.
+	 * 
+	 * @param project
+	 * @return
+	 */
+	public boolean isEnabled(IProject project);
 }

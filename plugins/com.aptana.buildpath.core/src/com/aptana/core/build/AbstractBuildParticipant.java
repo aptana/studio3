@@ -34,6 +34,7 @@ import org.osgi.service.prefs.BackingStoreException;
 import com.aptana.buildpath.core.BuildPathCorePlugin;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.TaskTag;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.parsing.ast.IParseNode;
@@ -56,6 +57,8 @@ public abstract class AbstractBuildParticipant implements IBuildParticipant, IEx
 	 */
 	private static final String CONTENT_TYPE_ID = "contentTypeId"; //$NON-NLS-1$
 	private static final String CONTENT_TYPE_BINDING = "contentTypeBinding"; //$NON-NLS-1$
+	private static final String PROJECT_NATURE_BINDING = "projectNatureBinding"; //$NON-NLS-1$
+	private static final String NATURE_ID = "natureId"; //$NON-NLS-1$
 	private static final String NAME = "name"; //$NON-NLS-1$
 	private static final String ID = "id"; //$NON-NLS-1$
 	private static final String ATTR_PRIORITY = "priority"; //$NON-NLS-1$
@@ -66,6 +69,7 @@ public abstract class AbstractBuildParticipant implements IBuildParticipant, IEx
 	private String fId;
 	private String fName;
 	private String contributor;
+	private Set<String> projectNatures;
 
 	public int getPriority()
 	{
@@ -384,9 +388,9 @@ public abstract class AbstractBuildParticipant implements IBuildParticipant, IEx
 		this.contributor = config.getContributor().getName();
 
 		// Read in the content types
-		this.contentTypes = new HashSet<IContentType>();
-		IContentTypeManager manager = Platform.getContentTypeManager();
+		IContentTypeManager manager = getContentTypeManager();
 		IConfigurationElement[] rawContentTypes = config.getChildren(CONTENT_TYPE_BINDING);
+		this.contentTypes = new HashSet<IContentType>(rawContentTypes.length);
 		for (IConfigurationElement contentTypeBinding : rawContentTypes)
 		{
 			String contentTypeId = contentTypeBinding.getAttribute(CONTENT_TYPE_ID);
@@ -396,5 +400,47 @@ public abstract class AbstractBuildParticipant implements IBuildParticipant, IEx
 				contentTypes.add(type);
 			}
 		}
+
+		// Read in the associated project natures
+		IConfigurationElement[] rawProjectNatures = config.getChildren(PROJECT_NATURE_BINDING);
+		this.projectNatures = new HashSet<String>(rawContentTypes.length);
+		for (IConfigurationElement projectNatureBinding : rawProjectNatures)
+		{
+			String natureId = projectNatureBinding.getAttribute(NATURE_ID);
+			if (!StringUtil.isEmpty(natureId))
+			{
+				projectNatures.add(natureId);
+			}
+		}
+	}
+
+	protected IContentTypeManager getContentTypeManager()
+	{
+		return Platform.getContentTypeManager();
+	}
+
+	public boolean isEnabled(IProject project)
+	{
+		if (CollectionsUtil.isEmpty(projectNatures))
+		{
+			// If there are no registered project nature ids, assume we apply to all
+			return true;
+		}
+		try
+		{
+			String[] natureIds = project.getDescription().getNatureIds();
+			for (String natureId : natureIds)
+			{
+				if (projectNatures.contains(natureId))
+				{
+					return true;
+				}
+			}
+		}
+		catch (CoreException e)
+		{
+			IdeLog.logError(BuildPathCorePlugin.getDefault(), e);
+		}
+		return false;
 	}
 }

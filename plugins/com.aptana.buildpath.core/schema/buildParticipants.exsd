@@ -49,8 +49,9 @@
 
    <element name="participant">
       <complexType>
-         <sequence minOccurs="0" maxOccurs="unbounded">
-            <element ref="contentTypeBinding"/>
+         <sequence>
+            <element ref="contentTypeBinding" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="projectNatureBinding" minOccurs="1" maxOccurs="unbounded"/>
          </sequence>
          <attribute name="id" type="string" use="required">
             <annotation>
@@ -103,6 +104,21 @@
                </documentation>
                <appinfo>
                   <meta.attribute kind="identifier" basedOn="org.eclipse.core.contenttype.contentTypes/content-type/@id"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="projectNatureBinding">
+      <complexType>
+         <attribute name="natureId" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="org.eclipse.core.resources.natures/@id"/>
                </appinfo>
             </annotation>
          </attribute>
