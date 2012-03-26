@@ -1,14 +1,7 @@
-/**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the Eclipse Public License (EPL).
- * Please see the license-epl.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
 package com.aptana.editor.common.contentassist;
 
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,7 +14,6 @@ package com.aptana.editor.common.contentassist;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.internal.text.InformationControlReplacer;
@@ -321,16 +313,19 @@ class AdditionalInfoController extends AbstractInformationControlManager
 		 */
 		public final synchronized void reset(ICompletionProposal p)
 		{
-			fCurrentProposal = p;
-			fCurrentInfo = null;
-			fAllowShowing = false;
-
-			long oldWakeup = fNextWakeup;
-			Task task = taskOnReset(p);
-			schedule(task, System.currentTimeMillis());
-			if (fNextWakeup < oldWakeup)
+			if (fCurrentProposal != p)
 			{
-				notifyAll();
+				fCurrentProposal = p;
+				fCurrentInfo = null;
+				fAllowShowing = false;
+
+				long oldWakeup = fNextWakeup;
+				Task task = taskOnReset(p);
+				schedule(task, System.currentTimeMillis());
+				if (fNextWakeup < oldWakeup)
+				{
+					notifyAll();
+				}
 			}
 		}
 
@@ -502,6 +497,20 @@ class AdditionalInfoController extends AbstractInformationControlManager
 	 * @since 3.2
 	 */
 	private Timer fTimer;
+	/**
+	 * The proposal most recently set by {@link #showInformation(ICompletionProposal, Object)}, possibly
+	 * <code>null</code>.
+	 * 
+	 * @since 3.2
+	 */
+	private ICompletionProposal fProposal;
+	/**
+	 * The information most recently set by {@link #showInformation(ICompletionProposal, Object)}, possibly
+	 * <code>null</code>.
+	 * 
+	 * @since 3.2
+	 */
+	private Object fInformation;
 
 	/**
 	 * Creates a new additional information controller.
@@ -542,7 +551,7 @@ class AdditionalInfoController extends AbstractInformationControlManager
 
 		super.install(control.getShell());
 
-		// Assert.isTrue(control instanceof Table);
+		Assert.isTrue(control instanceof Table);
 		fProposalTable = (Table) control;
 		fProposalTable.addSelectionListener(fSelectionListener);
 		getInternalAccessor().getInformationControlReplacer().install(fProposalTable);
@@ -572,6 +581,9 @@ class AdditionalInfoController extends AbstractInformationControlManager
 			fTimer = null;
 		}
 
+		fProposal = null;
+		fInformation = null;
+
 		if (fProposalTable != null && !fProposalTable.isDisposed())
 		{
 			fProposalTable.removeSelectionListener(fSelectionListener);
@@ -582,7 +594,7 @@ class AdditionalInfoController extends AbstractInformationControlManager
 	}
 
 	/**
-	 *Handles a change of the line selected in the associated selector.
+	 * Handles a change of the line selected in the associated selector.
 	 */
 	public void handleTableSelectionChanged()
 	{
@@ -610,6 +622,15 @@ class AdditionalInfoController extends AbstractInformationControlManager
 		{
 			return;
 		}
+
+		if (fProposal == proposal
+				&& ((info == null && fInformation == null) || (info != null && info.equals(fInformation))))
+		{
+			return;
+		}
+
+		fInformation = info;
+		fProposal = proposal;
 		showInformation();
 	}
 
@@ -618,57 +639,21 @@ class AdditionalInfoController extends AbstractInformationControlManager
 	 */
 	protected void computeInformation()
 	{
-		if (fProposalTable == null || fProposalTable.isDisposed())
+		if (fProposal instanceof ICompletionProposalExtension3)
 		{
-			return;
+			setCustomInformationControlCreator(((ICompletionProposalExtension3) fProposal)
+					.getInformationControlCreator());
+		}
+		else
+		{
+			setCustomInformationControlCreator(null);
 		}
 
-		TableItem[] selection = fProposalTable.getSelection();
-		if (selection != null && selection.length > 0)
-		{
-			TableItem item = selection[0];
+		// compute subject area
+		Point size = fProposalTable.getShell().getSize();
 
-			// compute information
-			String information = null;
-			Object d = item.getData();
-
-			if (d instanceof ICompletionProposal)
-			{
-				ICompletionProposal p = (ICompletionProposal) d;
-				information = p.getAdditionalProposalInfo();
-			}
-
-			if (d instanceof ICompletionProposalExtension3)
-			{
-				setCustomInformationControlCreator(((ICompletionProposalExtension3) d).getInformationControlCreator());
-			}
-			else
-			{
-				setCustomInformationControlCreator(null);
-			}
-
-			// compute subject area
-			setMargins(4, 4);
-			Rectangle area = fProposalTable.getBounds();
-
-			area.x = 0; // subject area is the whole subject control
-			area.y = 0;
-
-			Rectangle parentBounds = fProposalTable.getParent().getBounds();
-			Rectangle itemBounds = item.getBounds(0);
-
-			int verticalOffset = parentBounds.y + itemBounds.y;
-			// The SWT/Cocoa bug ( https://bugs.eclipse.org/bugs/show_bug.cgi?id=275617 ) causes problems
-			// in computation of the y offset of the information pop-up window for alignment with
-			// the selected completion item. Disable the smart positioning behavior for macosx/cocoa.
-			if (Platform.getWS().equals(Platform.WS_COCOA))
-			{
-				verticalOffset = parentBounds.y;
-			}
-
-			// set information & subject area
-			setInformation(information, area, verticalOffset);
-		}
+		// set information & subject area
+		setInformation(fInformation, new Rectangle(0, 0, size.x, size.y));
 	}
 
 	/*
@@ -728,6 +713,19 @@ class AdditionalInfoController extends AbstractInformationControlManager
 	protected void hideInformationControl()
 	{
 		super.hideInformationControl();
+		if (fTimer != null)
+		{
+			fTimer.reset(null);
+		}
+	}
+
+	/*
+	 * @see org.eclipse.jface.text.AbstractInformationControlManager#canClearDataOnHide()
+	 * @since 3.6
+	 */
+	protected boolean canClearDataOnHide()
+	{
+		return false; // see https://bugs.eclipse.org/bugs/show_bug.cgi?id=293176
 	}
 
 	/**
