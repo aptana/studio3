@@ -87,6 +87,12 @@ public class IndexBuildParticipant extends RequiredBuildParticipant
 				{
 					IdeLog.logError(BuildPathCorePlugin.getDefault(), e);
 				}
+
+				// stop indexing if it has been canceled
+				if (sub.isCanceled())
+				{
+					break;
+				}
 			}
 		}
 		sub.done();
