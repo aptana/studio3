@@ -32,6 +32,7 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
+import org.eclipse.debug.core.ILaunchMode;
 import org.eclipse.debug.core.IStatusHandler;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
@@ -570,7 +571,8 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate
 
 	protected void startServerIfNecessary(IServer server, String mode, IProgressMonitor monitor) throws CoreException
 	{
-		if (server.getState() != State.STARTED && server.getState() != State.STARTING)
+		if (ILaunchManager.RUN_MODE.equals(mode) && server.getState() != State.STARTED
+				&& server.getState() != State.STARTING)
 		{
 			IStatus result = server.start(mode, monitor);
 			if (!result.isOK())
