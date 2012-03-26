@@ -72,6 +72,9 @@
          <contentTypeBinding
                contentTypeId="com.aptana.contenttype.coffeescript">
          </contentTypeBinding>
+         <projectNatureBinding
+               natureId="com.aptana.projects.webnature">
+         </projectNatureBinding>
       </participant>
    </extension>
    <extension
