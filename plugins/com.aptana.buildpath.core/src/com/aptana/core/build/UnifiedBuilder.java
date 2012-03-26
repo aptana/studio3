@@ -329,6 +329,12 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 			sub.worked(2);
 
 			buildFile(context, filteredParticipants, sub.newChild(12));
+
+			// stop building if canceled
+			if (sub.isCanceled())
+			{
+				break;
+			}
 		}
 		sub.done();
 	}
@@ -418,6 +424,12 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 			sub.worked(2);
 
 			buildFile(context, filteredParticipants, sub.newChild(12));
+
+			// stop building if canceled
+			if (sub.isCanceled())
+			{
+				break;
+			}
 		}
 		sub.done();
 	}
@@ -495,6 +507,12 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 		for (IBuildParticipant participant : participants)
 		{
 			participant.buildFile(context, sub.newChild(1));
+
+			// stop building if it has been canceled
+			if (sub.isCanceled())
+			{
+				break;
+			}
 		}
 		updateMarkers(context, sub.newChild(participants.size()));
 		sub.done();
