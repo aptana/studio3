@@ -157,7 +157,7 @@ public class JSTextHoverTest extends JSEditorBasedTests
 		}
 		else
 		{
-			fail("Could not find documentation string in hover info");
+			fail("Could not find documentation string in hover info.\n" + html);
 		}
 	}
 
