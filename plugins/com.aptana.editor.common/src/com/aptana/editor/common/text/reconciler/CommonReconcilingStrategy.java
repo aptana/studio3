@@ -209,11 +209,14 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	{
 		SubMonitor monitor = SubMonitor.convert(fMonitor, 100);
 
-		fEditor.refreshOutline();
+		if (fEditor != null)
+		{
+			fEditor.refreshOutline();
+		}
 		monitor.worked(5);
 
 		// FIXME only do folding and validation when the source was changed
-		if (fEditor.isFoldingEnabled())
+		if (fEditor != null && fEditor.isFoldingEnabled())
 		{
 			calculatePositions(initialReconcile, monitor.newChild(20));
 		}
