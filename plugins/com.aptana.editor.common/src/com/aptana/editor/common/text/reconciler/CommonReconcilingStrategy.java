@@ -194,7 +194,10 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	 */
 	protected void updatePositions()
 	{
-		fEditor.updateFoldingStructure(fPositions);
+		if (fEditor != null)
+		{
+			fEditor.updateFoldingStructure(fPositions);
+		}
 	}
 
 	private void reconcile(boolean initialReconcile)
@@ -206,11 +209,14 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	{
 		SubMonitor monitor = SubMonitor.convert(fMonitor, 100);
 
-		fEditor.refreshOutline();
+		if (fEditor != null)
+		{
+			fEditor.refreshOutline();
+		}
 		monitor.worked(5);
 
 		// FIXME only do folding and validation when the source was changed
-		if (fEditor.isFoldingEnabled())
+		if (fEditor != null && fEditor.isFoldingEnabled())
 		{
 			calculatePositions(initialReconcile, monitor.newChild(20));
 		}
@@ -334,18 +340,8 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		CommonAnnotationModel caModel = (CommonAnnotationModel) model;
 		caModel.setProgressMonitor(monitor);
 
-		// Collect all the problems into a single collection...
-		Map<String, Collection<IProblem>> mapProblems = context.getProblems();
-		Collection<IProblem> allProblems = new ArrayList<IProblem>();
-		for (Collection<IProblem> problemsForMarkerType : mapProblems.values())
-		{
-			if (!CollectionsUtil.isEmpty(problemsForMarkerType))
-			{
-				allProblems.addAll(problemsForMarkerType);
-			}
-		}
 		// Now report them all to the annotation model!
-		caModel.reportProblems(allProblems);
+		caModel.reportProblems(context.getProblems());
 
 		caModel.setProgressMonitor(null);
 	}

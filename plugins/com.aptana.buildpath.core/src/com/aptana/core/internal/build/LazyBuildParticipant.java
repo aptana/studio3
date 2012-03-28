@@ -76,4 +76,10 @@ class LazyBuildParticipant extends AbstractBuildParticipant
 	{
 		getParticipant().deleteFile(context, monitor);
 	}
+
+	@Override
+	public boolean isEnabled(BuildType type)
+	{
+		return getParticipant().isEnabled(type);
+	}
 }

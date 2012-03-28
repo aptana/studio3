@@ -213,6 +213,8 @@ public class UnifiedBuilderTest extends TestCase
 			{
 				allowing(participant).isEnabled(BuildType.BUILD);
 				will(returnValue(true));
+				allowing(participant).isEnabled(project);
+				will(returnValue(true));
 				allowing(participant).getContentTypes();
 				will(returnValue(Collections.emptySet()));
 
@@ -290,6 +292,8 @@ public class UnifiedBuilderTest extends TestCase
 			{
 				allowing(participant).isEnabled(BuildType.BUILD);
 				will(returnValue(true));
+				allowing(participant).isEnabled(project);
+				will(returnValue(true));
 				allowing(participant).getContentTypes();
 				will(returnValue(Collections.emptySet()));
 
@@ -320,6 +324,8 @@ public class UnifiedBuilderTest extends TestCase
 			{
 				allowing(participant).isEnabled(BuildType.BUILD);
 				will(returnValue(true));
+				allowing(participant).isEnabled(project);
+				will(returnValue(true));
 				allowing(participant).getContentTypes();
 				will(returnValue(Collections.emptySet()));
 
@@ -349,6 +355,8 @@ public class UnifiedBuilderTest extends TestCase
 			{
 				allowing(participant).isEnabled(BuildType.BUILD);
 				will(returnValue(true));
+				allowing(participant).isEnabled(project);
+				will(returnValue(true));
 				allowing(participant).getContentTypes();
 				will(returnValue(Collections.emptySet()));
 
@@ -375,6 +383,8 @@ public class UnifiedBuilderTest extends TestCase
 			{
 				allowing(participant).isEnabled(BuildType.BUILD);
 				will(returnValue(true));
+				allowing(participant).isEnabled(project);
+				will(returnValue(true));
 				allowing(participant).getContentTypes();
 				will(returnValue(Collections.emptySet()));
 
@@ -395,6 +405,8 @@ public class UnifiedBuilderTest extends TestCase
 		{
 			{
 				allowing(participant).isEnabled(BuildType.BUILD);
+				will(returnValue(true));
+				allowing(participant).isEnabled(project);
 				will(returnValue(true));
 				allowing(participant).getContentTypes();
 				will(returnValue(Collections.emptySet()));
@@ -430,6 +442,8 @@ public class UnifiedBuilderTest extends TestCase
 			{
 				allowing(participant).isEnabled(BuildType.BUILD);
 				will(returnValue(true));
+				allowing(participant).isEnabled(project);
+				will(returnValue(true));
 				allowing(participant).getContentTypes();
 				will(returnValue(Collections.emptySet()));
 
@@ -462,6 +476,8 @@ public class UnifiedBuilderTest extends TestCase
 		{
 			{
 				allowing(participant).isEnabled(BuildType.BUILD);
+				will(returnValue(true));
+				allowing(participant).isEnabled(project);
 				will(returnValue(true));
 				allowing(participant).getContentTypes();
 				will(returnValue(Collections.emptySet()));
@@ -496,6 +512,8 @@ public class UnifiedBuilderTest extends TestCase
 		{
 			{
 				allowing(participant).isEnabled(BuildType.BUILD);
+				will(returnValue(true));
+				allowing(participant).isEnabled(project);
 				will(returnValue(true));
 				allowing(participant).getContentTypes();
 				will(returnValue(Collections.emptySet()));
