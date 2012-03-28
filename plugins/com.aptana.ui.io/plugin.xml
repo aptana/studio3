@@ -211,9 +211,9 @@
                      value="com.aptana.ide.core.io.LocalRoot">
                </instanceof>
                <and>
-                  <adapt
-                        type="org.eclipse.core.resources.IResource">
-                  </adapt>
+                  <instanceof
+                        value="org.eclipse.core.resources.IResource">
+                  </instanceof>
                   <not>
                     <instanceof
                           value="org.eclipse.core.resources.IProject">
