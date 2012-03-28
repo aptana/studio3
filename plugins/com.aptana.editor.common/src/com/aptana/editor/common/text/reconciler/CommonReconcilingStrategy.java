@@ -194,7 +194,10 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	 */
 	protected void updatePositions()
 	{
-		fEditor.updateFoldingStructure(fPositions);
+		if (fEditor != null)
+		{
+			fEditor.updateFoldingStructure(fPositions);
+		}
 	}
 
 	private void reconcile(boolean initialReconcile)
@@ -337,18 +340,8 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		CommonAnnotationModel caModel = (CommonAnnotationModel) model;
 		caModel.setProgressMonitor(monitor);
 
-		// Collect all the problems into a single collection...
-		Map<String, Collection<IProblem>> mapProblems = context.getProblems();
-		Collection<IProblem> allProblems = new ArrayList<IProblem>();
-		for (Collection<IProblem> problemsForMarkerType : mapProblems.values())
-		{
-			if (!CollectionsUtil.isEmpty(problemsForMarkerType))
-			{
-				allProblems.addAll(problemsForMarkerType);
-			}
-		}
 		// Now report them all to the annotation model!
-		caModel.reportProblems(allProblems);
+		caModel.reportProblems(context.getProblems());
 
 		caModel.setProgressMonitor(null);
 	}
