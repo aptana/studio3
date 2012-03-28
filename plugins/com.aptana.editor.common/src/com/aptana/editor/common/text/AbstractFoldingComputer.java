@@ -91,7 +91,15 @@ public abstract class AbstractFoldingComputer implements IFoldingComputer
 				}
 			}
 			sub = SubMonitor.convert(monitor, Messages.CommonReconcilingStrategy_FoldingTaskName, length);
-			return getPositions(sub.newChild(length), parseNode);
+			SubMonitor subMonitor = sub.newChild(length);
+			Map<ProjectionAnnotation, Position> positions = getPositions(subMonitor, parseNode);
+			// In case the getPositions call canceled the monitor, we cancel the 'parent' monitor as well.
+			// This will cause the system to skip a foldings update (see CommonReconcilingStrategy#calculatePositions).
+			if (subMonitor.isCanceled())
+			{
+				monitor.setCanceled(true);
+			}
+			return positions;
 		}
 		finally
 		{
@@ -121,7 +129,16 @@ public abstract class AbstractFoldingComputer implements IFoldingComputer
 		return children;
 	}
 
-	private Map<ProjectionAnnotation, Position> getPositions(IProgressMonitor monitor, IParseNode parseNode)
+	/**
+	 * Compute and return the folding positions. In case a folding update should be avoided, the given monitor should be
+	 * canceled. The default implementation does not cancel the monitor, and in case it's needed, it should be handled
+	 * by a subclass.
+	 * 
+	 * @param monitor
+	 * @param parseNode
+	 * @return folding positions
+	 */
+	protected Map<ProjectionAnnotation, Position> getPositions(IProgressMonitor monitor, IParseNode parseNode)
 	{
 		Map<ProjectionAnnotation, Position> newPositions = new HashMap<ProjectionAnnotation, Position>();
 		IParseNode[] children = getChildren(parseNode);
