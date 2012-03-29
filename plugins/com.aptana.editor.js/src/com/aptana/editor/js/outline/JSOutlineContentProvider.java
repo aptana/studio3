@@ -99,17 +99,6 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 	}
 
 	@Override
-	public boolean hasChildren(Object element)
-	{
-		if (element instanceof JSOutlineItem)
-		{
-			JSOutlineItem item = (JSOutlineItem) element;
-			return item.getChildrenCount() > 0;
-		}
-		return super.hasChildren(element);
-	}
-
-	@Override
 	protected Object[] filter(IParseNode[] nodes)
 	{
 		Set<JSOutlineItem> elements = new TreeSet<JSOutlineItem>();
