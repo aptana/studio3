@@ -512,6 +512,22 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 				}
 			}
 		}
+		else if (lhs.getNodeType() == IJSNodeTypes.FUNCTION)
+		{
+			// sees if we are in a self-invoking function
+			if (node.getNodeType() != IJSNodeTypes.FUNCTION || node.getText().length() == 0)
+			{
+				IParseNode[] children = lhs.getChildren();
+				for (IParseNode node2 : children)
+				{
+					processNode(elements, node2);
+				}
+			}
+			else
+			{
+				processNode(elements, lhs);
+			}
+		}
 		else if (lhs.getNodeType() == IJSNodeTypes.IDENTIFIER)
 		{
 			IParseNode args = node.getChild(1);
@@ -594,7 +610,7 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 			childType = child.getNodeType();
 			if (childType == IJSNodeTypes.ASSIGN || childType == IJSNodeTypes.IDENTIFIER
 					|| childType == IJSNodeTypes.NAME_VALUE_PAIR || childType == IJSNodeTypes.INVOKE
-					|| childType == IJSNodeTypes.RETURN)
+					|| childType == IJSNodeTypes.GROUP || childType == IJSNodeTypes.RETURN)
 			{
 				processNode(elements, child);
 			}
