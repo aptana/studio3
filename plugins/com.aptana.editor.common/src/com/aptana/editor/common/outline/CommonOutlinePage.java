@@ -113,6 +113,26 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 	private ToggleLinkingAction fToggleLinkingAction;
 
 	private IPreferenceStore fPrefs;
+	private ModifyListener fSearchModifyListener = new ModifyListener()
+	{
+
+		public void modifyText(ModifyEvent e)
+		{
+			String text = fSearchBox.getText();
+
+			if (INITIAL_FILTER_TEXT.equals(text))
+			{
+				fFilter.setPattern(null);
+			}
+			else
+			{
+				fFilter.setPattern(text);
+			}
+			// refresh the content on a delay
+			fFilterRefreshJob.cancel();
+			fFilterRefreshJob.schedule(FILTER_REFRESH_DELAY);
+		}
+	};
 
 	public CommonOutlinePage(AbstractThemeableEditor editor, IPreferenceStore prefs)
 	{
@@ -133,25 +153,7 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		fSearchBox.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).indent(0, 3).create());
 		fSearchBox.setText(INITIAL_FILTER_TEXT);
 		fSearchBox.setForeground(fSearchBox.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-		fSearchBox.addModifyListener(new ModifyListener()
-		{
-
-			public void modifyText(ModifyEvent e)
-			{
-				String text = fSearchBox.getText();
-				if (INITIAL_FILTER_TEXT.equals(text))
-				{
-					fFilter.setPattern(null);
-				}
-				else
-				{
-					fFilter.setPattern(text);
-				}
-				// refresh the content on a delay
-				fFilterRefreshJob.cancel();
-				fFilterRefreshJob.schedule(FILTER_REFRESH_DELAY);
-			}
-		});
+		fSearchBox.addModifyListener(fSearchModifyListener);
 		fSearchBox.addFocusListener(new FocusListener()
 		{
 
@@ -159,7 +161,9 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 			{
 				if (fSearchBox.getText().length() == 0)
 				{
+					fSearchBox.removeModifyListener(fSearchModifyListener);
 					fSearchBox.setText(INITIAL_FILTER_TEXT);
+					fSearchBox.addModifyListener(fSearchModifyListener);
 				}
 				fSearchBox.setForeground(fSearchBox.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 			}
@@ -168,7 +172,9 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 			{
 				if (fSearchBox.getText().equals(INITIAL_FILTER_TEXT))
 				{
-					fSearchBox.setText(""); //$NON-NLS-1$
+					fSearchBox.removeModifyListener(fSearchModifyListener);
+					fSearchBox.setText(StringUtil.EMPTY);
+					fSearchBox.addModifyListener(fSearchModifyListener);
 				}
 				fSearchBox.setForeground(null);
 			}
