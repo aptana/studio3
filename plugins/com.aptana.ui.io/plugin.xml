@@ -155,11 +155,6 @@
                            property="org.eclipse.core.resources.projectNature"
                            value="com.aptana.projects.webnature">
                      </test>
-                     <not>
-                        <instanceof
-                              value="org.eclipse.core.resources.IProject">
-                        </instanceof>
-                     </not>
                   </and>
                   <instanceof
                         value="com.aptana.ide.ui.io.navigator.FileSystemObject">
@@ -167,6 +162,12 @@
                   <instanceof
                         value="com.aptana.ide.core.io.LocalRoot">
                   </instanceof>
+                  <adapt
+                        type="java.util.Collection">
+                     <count
+                           value="0">
+                     </count>
+                  </adapt>
                </or>
             </enablement>
          </actionProvider>
