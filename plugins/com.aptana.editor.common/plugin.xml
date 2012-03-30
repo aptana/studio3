@@ -368,6 +368,12 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="COMMAND+ALT+O">
       </key>
+      <key
+            commandId="com.aptana.editor.common.gotoMatchingBracket"
+            contextId="com.aptana.editor.context"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+P">
+      </key>
    </extension>
    <extension
          point="org.eclipse.ui.contexts">
@@ -496,6 +502,12 @@
                class="org.eclipse.ui.handlers.RegistryToggleState:true"
                id="org.eclipse.ui.commands.toggleState">
          </state>
+      </command>
+      <command
+            description="%command.gotomatchingbracket.description"
+            defaultHandler="com.aptana.editor.common.internal.handlers.GotoMatchingBracketHandler"
+            id="com.aptana.editor.common.gotoMatchingBracket"
+            name="%command.gotomatchingbracket.name">
       </command>
    </extension>
    <extension
@@ -747,5 +759,19 @@
       <factory
             contentTypeId="org.eclipse.core.runtime.text"
             class="com.aptana.editor.common.CommonAnnotationModelFactory"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            commandId="com.aptana.editor.common.gotoMatchingBracket">
+         <enabledWhen>
+            <with
+                  variable="activePart">
+               <instanceof
+                     value="com.aptana.editor.common.AbstractThemeableEditor">
+               </instanceof>
+            </with>
+         </enabledWhen>
+      </handler>
    </extension>
 </plugin>

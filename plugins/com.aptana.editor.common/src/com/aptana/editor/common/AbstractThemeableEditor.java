@@ -506,7 +506,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	 * 
 	 * @return
 	 */
-	protected char[] getPairMatchingCharacters()
+	public char[] getPairMatchingCharacters()
 	{
 		return DEFAULT_PAIR_MATCHING_CHARS;
 	}
