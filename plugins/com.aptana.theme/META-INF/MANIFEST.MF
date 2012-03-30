@@ -19,7 +19,8 @@ Require-Bundle: org.eclipse.ui,
  com.aptana.ui,
  com.aptana.core,
  org.eclipse.search;resolution:=optional,
- com.aptana.plist
+ com.aptana.plist,
+ com.aptana.parsing
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.theme,

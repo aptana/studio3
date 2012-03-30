@@ -15,6 +15,15 @@ import java.util.List;
  */
 public class MatchAnyScopeSelector implements IScopeSelector
 {
+	public int compareTo(IScopeSelector o)
+	{
+		if (o instanceof MatchAnyScopeSelector)
+		{
+			return 0;
+		}
+		return -1;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.scope.IScopeSelector#getMatchFragments()
@@ -42,6 +51,11 @@ public class MatchAnyScopeSelector implements IScopeSelector
 		return 0;
 	}
 
+	public List<Integer> getMatchResults()
+	{
+		return Collections.emptyList();
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.scope.IScopeSelector#matches(java.lang.String)
@@ -58,19 +72,5 @@ public class MatchAnyScopeSelector implements IScopeSelector
 	public boolean matches(String[] scopes)
 	{
 		return true;
-	}
-
-	public List<Integer> matchResults()
-	{
-		return Collections.emptyList();
-	}
-
-	public int compareTo(IScopeSelector o)
-	{
-		if (o instanceof MatchAnyScopeSelector)
-		{
-			return 0;
-		}
-		return -1;
 	}
 }

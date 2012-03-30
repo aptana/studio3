@@ -7,33 +7,19 @@
  */
 package com.aptana.scope;
 
-public class OrSelector extends BinarySelector
+import java.util.ArrayList;
+
+public class IntersectionSelector extends BinarySelector
 {
-	private String operator;
-
 	/**
-	 * OrSelector
+	 * IntersectionSelector
 	 * 
 	 * @param left
 	 * @param right
 	 */
-	public OrSelector(ISelectorNode left, ISelectorNode right)
-	{
-		this(left, right, ","); //$NON-NLS-1$
-	}
-
-	/**
-	 * OrSelector
-	 * 
-	 * @param left
-	 * @param right
-	 * @param operator
-	 */
-	public OrSelector(ISelectorNode left, ISelectorNode right, String operator)
+	public IntersectionSelector(ISelectorNode left, ISelectorNode right)
 	{
 		super(left, right);
-
-		this.operator = operator;
 	}
 
 	/*
@@ -42,12 +28,7 @@ public class OrSelector extends BinarySelector
 	 */
 	protected String getOperator()
 	{
-		if ("|".equals(operator)) //$NON-NLS-1$
-		{
-			return " |"; //$NON-NLS-1$
-		}
-
-		return ","; //$NON-NLS-1$
+		return " &"; //$NON-NLS-1$
 	}
 
 	/*
@@ -59,27 +40,28 @@ public class OrSelector extends BinarySelector
 		matchResults = null;
 		boolean result = false;
 
-		if (context != null)
+		if (context != null && this._left != null && this._right != null)
 		{
 			context.pushCurrentStep();
 
-			if (this._left != null)
+			if (this._left.matches(context))
 			{
-				result = this._left.matches(context);
+				matchResults = this._left.getMatchResults();
 
-				if (result)
+				if (matchResults.isEmpty())
 				{
-					matchResults = this._left.getMatchResults();
+					matchResults = new ArrayList<Integer>();
 				}
 
-				if (result == false && this._right != null)
+				if (this._right.matches(context))
 				{
-					result = this._right.matches(context);
-
-					if (result)
-					{
-						matchResults = this._right.getMatchResults();
-					}
+					// matched at current step, append match results
+					matchResults.addAll(this._right.getMatchResults());
+					result = true;
+				}
+				else
+				{
+					matchResults = null;
 				}
 			}
 
