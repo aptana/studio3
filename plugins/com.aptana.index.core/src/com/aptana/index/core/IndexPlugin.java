@@ -8,7 +8,11 @@
 package com.aptana.index.core;
 
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.core.runtime.jobs.IJobManager;
+import org.eclipse.core.runtime.jobs.Job;
 import org.osgi.framework.BundleContext;
+
+import com.aptana.core.util.ArrayUtil;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -54,6 +58,19 @@ public class IndexPlugin extends Plugin
 	 */
 	public void stop(BundleContext context) throws Exception
 	{
+		// grab any running indexing jobs
+		IJobManager manager = Job.getJobManager();
+		Job[] jobs = manager.find(IndexRequestJob.INDEX_REQUEST_JOB_FAMILY);
+
+		// ...and cancel them
+		if (!ArrayUtil.isEmpty(jobs))
+		{
+			for (Job job : jobs)
+			{
+				job.cancel();
+			}
+		}
+
 		fManager = null;
 		plugin = null;
 		super.stop(context);

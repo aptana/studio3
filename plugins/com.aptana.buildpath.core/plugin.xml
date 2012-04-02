@@ -10,6 +10,9 @@
             id="com.aptana.core.build.IndexBuildParticipant"
             name="%index.participant.name"
             priority="95">
+            <projectNatureBinding
+               natureId="com.aptana.projects.webnature">
+            </projectNatureBinding>
       </participant>
   </extension>
   <extension

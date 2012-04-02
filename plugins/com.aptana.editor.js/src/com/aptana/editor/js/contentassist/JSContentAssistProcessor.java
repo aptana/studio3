@@ -181,6 +181,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		for (String name : KEYWORDS)
 		{
+			// TODO Create a KeywordProposal class that lazily generates description, etc?
 			String description = StringUtil.format(Messages.JSContentAssistProcessor_KeywordDescription, name);
 			addProposal(proposals, name, JS_KEYWORD, description, getActiveUserAgentIds(),
 					Messages.JSContentAssistProcessor_KeywordLocation, offset);
@@ -418,6 +419,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 						String description = null;
 						Image image = (isFunction) ? JS_FUNCTION : JS_PROPERTY;
 
+						// TODO Add a JSPropertyCollectionProposal that takes the object and generates the rest?
 						addProposal(proposals, name, image, description, userAgentNames, fileLocation, offset);
 					}
 

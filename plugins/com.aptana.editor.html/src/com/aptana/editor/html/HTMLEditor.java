@@ -125,7 +125,7 @@ public class HTMLEditor extends AbstractThemeableEditor
 	 * 
 	 * @return
 	 */
-	protected char[] getPairMatchingCharacters()
+	public char[] getPairMatchingCharacters()
 	{
 		return HTML_PAIR_MATCHING_CHARS;
 	}

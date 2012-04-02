@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the Eclipse Public License (EPL).
  * Please see the license-epl.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -32,6 +32,7 @@ public class FileStoreNode extends BufferedContent implements IStructureComparat
 {
 
 	private IFileStore fileStore;
+	private String name;
 
 	/**
 	 * Creates a new file store node.
@@ -41,6 +42,12 @@ public class FileStoreNode extends BufferedContent implements IStructureComparat
 	public FileStoreNode(IFileStore fileStore)
 	{
 		this.fileStore = fileStore;
+	}
+
+	public FileStoreNode(IFileStore fileStore, String name)
+	{
+		this(fileStore);
+		this.name = name;
 	}
 
 	@Override
@@ -65,7 +72,7 @@ public class FileStoreNode extends BufferedContent implements IStructureComparat
 
 	public String getName()
 	{
-		return (fileStore == null) ? null : fileStore.getName();
+		return (name != null) ? name : (fileStore == null) ? null : fileStore.getName();
 	}
 
 	public String getType()

@@ -7,24 +7,24 @@
  */
 package com.aptana.scope;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Stack;
-import java.util.regex.Pattern;
 
+import beaver.Symbol;
+
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.scope.parsing.ScopeParser;
+import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.model.AbstractBundleElement;
 
-public class ScopeSelector implements IScopeSelector
+public class ScopeSelector extends Symbol implements IScopeSelector
 {
-	private static final String NEGATIVE_LOOKAHEAD = "-"; //$NON-NLS-1$
-	private static final Pattern or_split = Pattern.compile("\\s*,\\s*"); //$NON-NLS-1$
-	private static final Pattern and_split = Pattern.compile("\\s+"); //$NON-NLS-1$
-
 	/**
 	 * http://manual.macromates.com/en/scope_selectors
 	 * <ol>
@@ -41,35 +41,75 @@ public class ScopeSelector implements IScopeSelector
 	 */
 	public static IScopeSelector bestMatch(Collection<IScopeSelector> selectors, String scope)
 	{
-		if (CollectionsUtil.isEmpty(selectors))
-		{
-			return null;
-		}
-
-		List<IScopeSelector> reversed = new ArrayList<IScopeSelector>(selectors);
-		Collections.reverse(reversed);
 		IScopeSelector bestMatch = null;
-		for (IScopeSelector selector : reversed)
-		{
-			if (selector == null)
-			{
-				continue;
-			}
-			if (selector.matches(scope))
-			{
-				if (bestMatch == null)
-				{
-					bestMatch = selector;
-					continue;
-				}
 
-				if (selector.compareTo(bestMatch) > 0)
+		if (!CollectionsUtil.isEmpty(selectors))
+		{
+			List<IScopeSelector> reversed = new ArrayList<IScopeSelector>(selectors);
+
+			Collections.reverse(reversed);
+
+			for (IScopeSelector selector : reversed)
+			{
+				if (selector != null && selector.matches(scope))
 				{
-					bestMatch = selector;
+					if (bestMatch == null)
+					{
+						bestMatch = selector;
+					}
+					else if (selector.compareTo(bestMatch) > 0)
+					{
+						bestMatch = selector;
+					}
 				}
 			}
 		}
+
 		return bestMatch;
+	}
+
+	private static int compare(List<Integer> results, List<Integer> matchResults)
+	{
+		// offset in list is offset of space-delimited part
+		// number at that offset is length of the match at that part
+		// winner is the one with longest deepest match
+		// so first look for highest offset with a non-zero value
+
+		// if lists are not of same length, expand smaller one to match by filling with zeros
+		while (results.size() > matchResults.size())
+		{
+			if (matchResults.isEmpty())
+			{
+				matchResults = new ArrayList<Integer>();
+			}
+
+			matchResults.add(0);
+		}
+
+		while (matchResults.size() > results.size())
+		{
+			if (results.isEmpty())
+			{
+				results = new ArrayList<Integer>();
+			}
+
+			results.add(0);
+		}
+
+		// So starting at the end of the lists, look for the highest match length, ties go back an offset to be broken
+		for (int i = results.size() - 1; i >= 0; i--)
+		{
+			int firstVal = results.get(i);
+			int secondVal = matchResults.get(i);
+
+			// If one of the two has a longer match at the offset, it wins
+			if (firstVal != secondVal)
+			{
+				return firstVal - secondVal;
+			}
+		}
+
+		return 0;
 	}
 
 	/**
@@ -79,24 +119,21 @@ public class ScopeSelector implements IScopeSelector
 	 */
 	public static void sort(List<? extends AbstractBundleElement> bundleElements)
 	{
-		if (CollectionsUtil.isEmpty(bundleElements))
+		if (!CollectionsUtil.isEmpty(bundleElements))
 		{
-			return;
-		}
-
-		Collections.sort(bundleElements, new Comparator<AbstractBundleElement>()
-		{
-
-			public int compare(AbstractBundleElement o1, AbstractBundleElement o2)
+			Collections.sort(bundleElements, new Comparator<AbstractBundleElement>()
 			{
-				return o1.getScopeSelector().compareTo(o2.getScopeSelector());
-			}
-
-		});
+				public int compare(AbstractBundleElement o1, AbstractBundleElement o2)
+				{
+					return o1.getScopeSelector().compareTo(o2.getScopeSelector());
+				}
+			});
+		}
 	}
 
 	private ISelectorNode _root;
 	private List<Integer> matchResults;
+
 	/**
 	 * Lazily cache the toString() value solely for performance reasons. We call toString() in equals(), hashCode(),
 	 * some other locations - so this value is computed by concatenating children nodes repeatedly.
@@ -123,6 +160,11 @@ public class ScopeSelector implements IScopeSelector
 		this.parse(selector);
 	}
 
+	public int compareTo(IScopeSelector o)
+	{
+		return compare(matchResults, o.getMatchResults());
+	}
+
 	@Override
 	public boolean equals(Object obj)
 	{
@@ -130,7 +172,18 @@ public class ScopeSelector implements IScopeSelector
 		{
 			return this.toString().equals(obj.toString());
 		}
+
 		return false;
+	}
+
+	public List<Integer> getMatchResults()
+	{
+		if (matchResults == null)
+		{
+			return Collections.emptyList();
+		}
+
+		return matchResults;
 	}
 
 	/**
@@ -171,7 +224,7 @@ public class ScopeSelector implements IScopeSelector
 				if (this._root.matches(context))
 				{
 					// Add match results. If more than one value, we need to replace existing zeros in our list...
-					Collection<Integer> tmpResults = this._root.matchResults();
+					Collection<Integer> tmpResults = this._root.getMatchResults();
 					int toRemove = tmpResults.size() - 1;
 					for (int x = 0; x < toRemove; x++)
 					{
@@ -223,126 +276,32 @@ public class ScopeSelector implements IScopeSelector
 		return result;
 	}
 
-	/**
-	 * parse
-	 * 
-	 * @param selector
-	 * @return
-	 */
 	private void parse(String selector)
 	{
-		Stack<ISelectorNode> stack = null;
+		ScopeParser parser = new ScopeParser();
 
-		if (selector != null)
+		// clear current root
+		this._root = null;
+
+		if (!StringUtil.isEmpty(selector))
 		{
-			stack = new Stack<ISelectorNode>();
-
-			// simple parser for "and" and "or"
-			String[] ors = or_split.split(selector);
-
-			for (String or : ors)
+			try
 			{
-				// process ands
-				String[] ands = and_split.split(or);
-				ands = processNegativeLookaheads(ands);
-				int startingSize = stack.size();
-				int i = 0;
+				this._root = parser.parse(selector);
+			}
+			catch (Exception e)
+			{
+				// @formatter:off
+				String message = MessageFormat.format(
+					"An error occurred while parsing scope ''{0}'' : {1}",
+					selector,
+					e.getMessage()
+				);
+				// @formatter:on
 
-				for (; i < ands.length; i++)
-				{
-					String and = ands[i];
-
-					// stop processing "and"s if we encounter a negative lookahead operator
-					if (and != null && and.equals(NEGATIVE_LOOKAHEAD))
-					{
-						break;
-					}
-
-					stack.push(new NameSelector(and));
-
-					if (stack.size() > startingSize + 1)
-					{
-						ISelectorNode right = stack.pop();
-						ISelectorNode left = stack.pop();
-
-						stack.push(new AndSelector(left, right));
-					}
-				}
-
-				// process negative lookaheads
-				if (i < ands.length && stack.size() > startingSize)
-				{
-					String operator = ands[i];
-
-					if (operator != null && operator.equals(NEGATIVE_LOOKAHEAD))
-					{
-						if (i + 1 < ands.length)
-						{
-							// advance over '-'
-							i++;
-
-							// remember current position
-							startingSize = stack.size();
-
-							for (; i < ands.length; i++)
-							{
-								String simpleSelector = ands[i];
-
-								stack.push(new NameSelector(simpleSelector));
-
-								if (stack.size() > startingSize + 1)
-								{
-									ISelectorNode right = stack.pop();
-									ISelectorNode left = stack.pop();
-
-									stack.push(new AndSelector(left, right));
-								}
-							}
-
-							ISelectorNode right = stack.pop();
-							ISelectorNode left = stack.pop();
-
-							stack.push(new NegativeLookaheadSelector(left, right));
-						}
-					}
-					// else parse error
-				}
-
-				if (stack.size() > 1)
-				{
-					ISelectorNode right = stack.pop();
-					ISelectorNode left = stack.pop();
-
-					stack.push(new OrSelector(left, right));
-				}
+				IdeLog.logError(ScriptingActivator.getDefault(), message);
 			}
 		}
-
-		this._root = (stack != null && stack.size() > 0) ? stack.pop() : null;
-	}
-
-	/**
-	 * Handles when '-' negative lookahead is butted up against next NameSelector.
-	 * 
-	 * @param ands
-	 * @return
-	 */
-	private String[] processNegativeLookaheads(String[] ands)
-	{
-		List<String> processed = new ArrayList<String>();
-		for (String and : ands)
-		{
-			if (and.startsWith(NEGATIVE_LOOKAHEAD) && and.length() > 1)
-			{
-				processed.add(NEGATIVE_LOOKAHEAD);
-				processed.add(and.substring(1));
-			}
-			else
-			{
-				processed.add(and);
-			}
-		}
-		return processed.toArray(new String[processed.size()]);
 	}
 
 	/*
@@ -356,61 +315,7 @@ public class ScopeSelector implements IScopeSelector
 		{
 			fString = (this._root == null) ? StringUtil.EMPTY : this._root.toString();
 		}
+
 		return fString;
-	}
-
-	public List<Integer> matchResults()
-	{
-		if (matchResults == null)
-		{
-			return Collections.emptyList();
-		}
-		return matchResults;
-	}
-
-	public int compareTo(IScopeSelector o)
-	{
-		return compare(matchResults, o.matchResults());
-	}
-
-	private static int compare(List<Integer> results, List<Integer> matchResults)
-	{
-		// offset in list is offset of space-delimited part
-		// number at that offset is length of the match at that part
-		// winner is the one with longest deepest match
-		// so first look for highest offset with a non-zero value
-
-		// if lists are not of same length, expand smaller one to match by filling with zeros
-		while (results.size() > matchResults.size())
-		{
-			if (matchResults.isEmpty())
-			{
-				matchResults = new ArrayList<Integer>();
-			}
-			matchResults.add(0);
-		}
-		while (matchResults.size() > results.size())
-		{
-			if (results.isEmpty())
-			{
-				results = new ArrayList<Integer>();
-			}
-
-			results.add(0);
-		}
-
-		// So starting at the end of the lists, look for the highest match length, ties go back an offset to be broken
-		for (int i = results.size() - 1; i >= 0; i--)
-		{
-			int firstVal = results.get(i);
-			int secondVal = matchResults.get(i);
-			// If one of the two has a longer match at the offset, it wins
-			if (firstVal != secondVal)
-			{
-				return firstVal - secondVal;
-			}
-		}
-
-		return 0;
 	}
 }

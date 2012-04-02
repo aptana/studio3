@@ -37,6 +37,7 @@ import com.aptana.core.util.replace.RegexPatternReplacer;
 import com.aptana.core.util.replace.SimpleTextPatternReplacer;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.js.actions.IJSActions;
 import com.aptana.editor.js.actions.OpenDeclarationAction;
@@ -52,6 +53,7 @@ import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.INameNode;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
+import com.aptana.ui.util.UIUtils;
 
 @SuppressWarnings("restriction")
 public class JSSourceEditor extends AbstractThemeableEditor
@@ -387,5 +389,23 @@ public class JSSourceEditor extends AbstractThemeableEditor
 			return new JSContextProvider(this);
 		}
 		return super.getAdapter(adapter);
+	}
+
+	public void refreshOutline()
+	{
+		UIUtils.getDisplay().asyncExec(new Runnable()
+		{
+
+			public void run()
+			{
+				if (!hasOutlinePageCreated() || getAST() == null)
+				{
+					return;
+				}
+
+				CommonOutlinePage page = getOutlinePage();
+				page.refresh();
+			}
+		});
 	}
 }

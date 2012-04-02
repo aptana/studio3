@@ -11,13 +11,19 @@ import java.util.List;
 
 public interface ISelectorNode
 {
-	boolean matches(MatchContext context);
-
 	/**
-	 * See {@link IScopeSelector#matchResults()}. Should never return null, if there are no matches, return an empty
+	 * See {@link IScopeSelector#getMatchResults()}. Should never return null, if there are no matches, return an empty
 	 * List.
 	 * 
 	 * @return
 	 */
-	List<Integer> matchResults();
+	List<Integer> getMatchResults();
+
+	/**
+	 * Determines if this selector node matches the current scope as encapsulated in the MatchContext
+	 * 
+	 * @param context
+	 * @return
+	 */
+	boolean matches(MatchContext context);
 }

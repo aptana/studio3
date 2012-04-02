@@ -7,12 +7,9 @@
  */
 package com.aptana.scope;
 
-import java.util.Collections;
-import java.util.List;
-
 public class OrSelector extends BinarySelector
 {
-	private List<Integer> matchResults;
+	private String operator;
 
 	/**
 	 * OrSelector
@@ -22,7 +19,35 @@ public class OrSelector extends BinarySelector
 	 */
 	public OrSelector(ISelectorNode left, ISelectorNode right)
 	{
+		this(left, right, ","); //$NON-NLS-1$
+	}
+
+	/**
+	 * OrSelector
+	 * 
+	 * @param left
+	 * @param right
+	 * @param operator
+	 */
+	public OrSelector(ISelectorNode left, ISelectorNode right, String operator)
+	{
 		super(left, right);
+
+		this.operator = operator;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.scope.BinarySelector#getOperator()
+	 */
+	protected String getOperator()
+	{
+		if ("|".equals(operator)) //$NON-NLS-1$
+		{
+			return " |"; //$NON-NLS-1$
+		}
+
+		return ","; //$NON-NLS-1$
 	}
 
 	/*
@@ -41,17 +66,19 @@ public class OrSelector extends BinarySelector
 			if (this._left != null)
 			{
 				result = this._left.matches(context);
+
 				if (result)
 				{
-					matchResults = this._left.matchResults();
+					matchResults = this._left.getMatchResults();
 				}
 
 				if (result == false && this._right != null)
 				{
 					result = this._right.matches(context);
+
 					if (result)
 					{
-						matchResults = this._right.matchResults();
+						matchResults = this._right.getMatchResults();
 					}
 				}
 			}
@@ -60,23 +87,5 @@ public class OrSelector extends BinarySelector
 		}
 
 		return result;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.scope.BinarySelector#getOperator()
-	 */
-	protected String getOperator()
-	{
-		return ","; //$NON-NLS-1$
-	}
-
-	public List<Integer> matchResults()
-	{
-		if (matchResults == null)
-		{
-			return Collections.emptyList();
-		}
-		return matchResults;
 	}
 }

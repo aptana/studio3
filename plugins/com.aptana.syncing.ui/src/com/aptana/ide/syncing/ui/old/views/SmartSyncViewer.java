@@ -1,15 +1,20 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.ide.syncing.ui.old.views;
 
+import java.io.File;
+
 import org.eclipse.compare.CompareConfiguration;
 import org.eclipse.compare.CompareUI;
+import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.ICellModifier;
@@ -40,6 +45,8 @@ import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.PlatformUI;
 
+import com.aptana.core.io.vfs.IExtendedFileStore;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.ide.syncing.core.old.ISyncResource;
 import com.aptana.ide.syncing.core.old.SyncFile;
 import com.aptana.ide.syncing.core.old.SyncFolder;
@@ -431,7 +438,25 @@ public class SmartSyncViewer
 							FileStoreCompareEditorInput input = new FileStoreCompareEditorInput(
 									new CompareConfiguration());
 							input.setLeftFileStore(pair.getSourceFile());
-							input.setRightFileStore(pair.getDestinationFile());
+							IFileStore destinationFile = pair.getDestinationFile();
+							String name = destinationFile.getName();
+							if (destinationFile instanceof IExtendedFileStore)
+							{
+								// this is a remote file, so downloads to a local temp copy first for speed purpose
+								try
+								{
+									File localFile = destinationFile.toLocalFile(EFS.CACHE, null);
+									destinationFile = EFS.getLocalFileSystem().getStore(
+											Path.fromOSString(localFile.getAbsolutePath()));
+								}
+								catch (CoreException ce)
+								{
+									// logs as warning since we will fall back to use the remote file store directly in
+									// this case
+									IdeLog.logWarning(SyncingUIPlugin.getDefault(), ce);
+								}
+							}
+							input.setRightFileStore(destinationFile, name);
 							input.initializeCompareConfiguration();
 							CompareUI.openCompareDialog(input);
 						}

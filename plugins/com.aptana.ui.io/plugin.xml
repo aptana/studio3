@@ -141,6 +141,36 @@
                   </instanceof>
                </or></possibleDropTargets>
          </dropAssistant>
+         <actionProvider
+               class="com.aptana.ide.ui.io.navigator.actions.FileSystemEditActionProvider"
+               id="com.aptana.ide.ui.io.navigator.actions.FileSystemEditActions"
+               overrides="org.eclipse.ui.navigator.resources.actions.EditActions">
+            <enablement>
+               <or>
+                  <and>
+                     <instanceof
+                           value="org.eclipse.core.resources.IResource">
+                     </instanceof>
+                     <test
+                           property="org.eclipse.core.resources.projectNature"
+                           value="com.aptana.projects.webnature">
+                     </test>
+                  </and>
+                  <instanceof
+                        value="com.aptana.ide.ui.io.navigator.FileSystemObject">
+                  </instanceof>
+                  <instanceof
+                        value="com.aptana.ide.core.io.LocalRoot">
+                  </instanceof>
+                  <adapt
+                        type="java.util.Collection">
+                     <count
+                           value="0">
+                     </count>
+                  </adapt>
+               </or>
+            </enablement>
+         </actionProvider>
       </navigatorContent>
       <actionProvider
             class="com.aptana.ide.ui.io.navigator.actions.OpenActionProvider"
@@ -193,35 +223,6 @@
                   <test
                         property="com.aptana.ide.core.io.connection.canDisconnect"
                         value="true">
-                  </test>
-               </and>
-            </or>
-         </enablement>
-      </actionProvider>
-      <actionProvider
-            class="com.aptana.ide.ui.io.navigator.actions.FileSystemEditActionProvider"
-            id="com.aptana.ide.ui.io.navigator.actions.FileSystemEditActions"
-            overrides="org.eclipse.ui.navigator.resources.actions.EditActions">
-         <enablement>
-            <or>
-               <instanceof
-                     value="com.aptana.ide.ui.io.navigator.FileSystemObject">
-               </instanceof>
-               <instanceof
-                     value="com.aptana.ide.core.io.LocalRoot">
-               </instanceof>
-               <and>
-                  <adapt
-                        type="org.eclipse.core.resources.IResource">
-                  </adapt>
-                  <not>
-                    <instanceof
-                          value="org.eclipse.core.resources.IProject">
-                    </instanceof>
-                  </not>
-                  <test
-                        property="org.eclipse.core.resources.projectNature"
-                        value="com.aptana.projects.webnature">
                   </test>
                </and>
             </or>

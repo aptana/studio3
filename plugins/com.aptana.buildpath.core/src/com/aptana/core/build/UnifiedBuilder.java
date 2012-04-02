@@ -83,27 +83,40 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 	{
 		super.clean(monitor);
 
-		List<IBuildParticipant> participants = getBuildParticipantManager().getAllBuildParticipants();
-		SubMonitor sub = SubMonitor.convert(monitor, participants.size() + 1);
-
 		IProject project = getProjectHandle();
+
+		List<IBuildParticipant> participants = getBuildParticipantManager().getAllBuildParticipants();
+		participants = filterToEnabled(participants, project);
+
+		SubMonitor sub = SubMonitor.convert(monitor, participants.size() + 2);
+		sub.worked(1);
+
 		removeProblemsAndTasksFor(project);
+		sub.worked(1);
 
 		// FIXME Should we visit all files and call "deleteFile" sort of like what we do with fullBuild?
 		for (IBuildParticipant participant : participants)
 		{
+			if (sub.isCanceled())
+			{
+				return;
+			}
+
 			participant.clean(project, sub.newChild(1));
 		}
 		sub.done();
 	}
 
-	private List<IBuildParticipant> filterToEnabled(List<IBuildParticipant> participants)
+	private List<IBuildParticipant> filterToEnabled(List<IBuildParticipant> participants, final IProject project)
 	{
 		return CollectionsUtil.filter(participants, new IFilter<IBuildParticipant>()
 		{
 			public boolean include(IBuildParticipant item)
 			{
-				return item != null && item.isEnabled(BuildType.BUILD);
+				// Order is important here! If we check for enablement based on build type in prefs, the contributing
+				// plugin loads!
+				// FIXME is there any way to defer the second enablement check until after we do content type check?
+				return item != null && item.isEnabled(project) && item.isEnabled(BuildType.BUILD);
 			}
 		});
 	}
@@ -114,7 +127,8 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 	{
 		boolean logTraceEnabled = traceLoggingEnabled();
 
-		String projectName = getProjectHandle().getName();
+		IProject project = getProjectHandle();
+		String projectName = project.getName();
 		long startTime = System.nanoTime();
 
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
@@ -122,7 +136,7 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 		// Keep these build participant instances and use them in the build process, rather than grabbing new ones
 		// in sub-methods. We do pre- and post- setups on them, so we need to retain instances.
 		List<IBuildParticipant> participants = getBuildParticipantManager().getAllBuildParticipants();
-		participants = filterToEnabled(participants);
+		participants = filterToEnabled(participants, project);
 		buildStarting(participants, kind, sub.newChild(10));
 
 		if (kind == IncrementalProjectBuilder.FULL_BUILD)
@@ -190,7 +204,7 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 
 	private void buildStarting(List<IBuildParticipant> participants, int kind, IProgressMonitor monitor)
 	{
-		if (participants == null)
+		if (CollectionsUtil.isEmpty(participants))
 		{
 			return;
 		}
@@ -315,6 +329,12 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 			sub.worked(2);
 
 			buildFile(context, filteredParticipants, sub.newChild(12));
+
+			// stop building if canceled
+			if (sub.isCanceled())
+			{
+				break;
+			}
 		}
 		sub.done();
 	}
@@ -404,6 +424,12 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 			sub.worked(2);
 
 			buildFile(context, filteredParticipants, sub.newChild(12));
+
+			// stop building if canceled
+			if (sub.isCanceled())
+			{
+				break;
+			}
 		}
 		sub.done();
 	}
@@ -481,6 +507,12 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 		for (IBuildParticipant participant : participants)
 		{
 			participant.buildFile(context, sub.newChild(1));
+
+			// stop building if it has been canceled
+			if (sub.isCanceled())
+			{
+				break;
+			}
 		}
 		updateMarkers(context, sub.newChild(participants.size()));
 		sub.done();

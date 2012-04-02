@@ -255,6 +255,10 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	private CommonOccurrencesUpdater occurrencesUpdater;
 
 	private Job linkWithEditorJob;
+	/**
+	 * Flag used to auto-expand outlines to 2nd level on first open.
+	 */
+	private boolean outlineAutoExpanded;
 
 	/**
 	 * AbstractThemeableEditor
@@ -502,7 +506,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	 * 
 	 * @return
 	 */
-	protected char[] getPairMatchingCharacters()
+	public char[] getPairMatchingCharacters()
 	{
 		return DEFAULT_PAIR_MATCHING_CHARS;
 	}
@@ -1238,5 +1242,30 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	{
 		return Platform.getPreferencesService().getBoolean(CommonEditorPlugin.PLUGIN_ID,
 				IPreferenceConstants.ENABLE_WORD_WRAP, false, null);
+	}
+
+	public void refreshOutline()
+	{
+		// TODO Does this need to be run in asyncExec here?
+		UIUtils.getDisplay().asyncExec(new Runnable()
+		{
+
+			public void run()
+			{
+				if (!hasOutlinePageCreated() || getAST() == null)
+				{
+					return;
+				}
+
+				CommonOutlinePage page = getOutlinePage();
+				page.refresh();
+
+				if (!outlineAutoExpanded)
+				{
+					page.expandToLevel(2);
+					outlineAutoExpanded = true;
+				}
+			}
+		});
 	}
 }

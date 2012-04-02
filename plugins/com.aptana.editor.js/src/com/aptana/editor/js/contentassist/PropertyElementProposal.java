@@ -2,12 +2,14 @@ package com.aptana.editor.js.contentassist;
 
 import java.net.URI;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.text.contentassist.ICompletionProposalExtension5;
 import org.eclipse.swt.graphics.Image;
 
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 
-public class PropertyElementProposal extends CommonCompletionProposal
+public class PropertyElementProposal extends CommonCompletionProposal implements ICompletionProposalExtension5
 {
 
 	private PropertyElement property;
@@ -24,10 +26,9 @@ public class PropertyElementProposal extends CommonCompletionProposal
 	@Override
 	public String getFileLocation()
 	{
-		// lazy load
 		if (_fileLocation == null)
 		{
-			_fileLocation = JSModelFormatter.ADDITIONAL_INFO.getTypeDisplayName(property.getOwningType());
+			_fileLocation = JSModelFormatter.getTypeDisplayName(property.getOwningType());
 		}
 		return super.getFileLocation();
 	}
@@ -42,14 +43,9 @@ public class PropertyElementProposal extends CommonCompletionProposal
 		return super.getImage();
 	}
 
-	@Override
-	public String getAdditionalProposalInfo()
+	public Object getAdditionalProposalInfo(IProgressMonitor monitor)
 	{
-		if (_additionalProposalInformation == null)
-		{
-			_additionalProposalInformation = JSModelFormatter.ADDITIONAL_INFO.getDescription(property, uri);
-		}
-		return super.getAdditionalProposalInfo();
+		return JSModelFormatter.ADDITIONAL_INFO.getDescription(property, uri);
 	}
 
 }

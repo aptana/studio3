@@ -34,7 +34,7 @@ public class CommonReconciler extends Reconciler
 	 * Used for performance testing purposes so we can see if we've finished our first reconcile!
 	 */
 	@SuppressWarnings("unused")
-	private boolean fIninitalProcessDone = false;
+	private boolean fInitialProcessDone = false;
 
 	/**
 	 * 
@@ -188,7 +188,7 @@ public class CommonReconciler extends Reconciler
 				((IReconcilingStrategyExtension) s).initialReconcile();
 			}
 		}
-		fIninitalProcessDone = true;
+		fInitialProcessDone = true;
 	}
 
 	/*

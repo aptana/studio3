@@ -7,10 +7,12 @@
  */
 package com.aptana.scope;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class NameSelector implements ISelectorNode
+import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.StringUtil;
+
+public class NameSelector extends SelectorNode
 {
 	private String _name;
 	private int matchLength = 0;
@@ -25,6 +27,12 @@ public class NameSelector implements ISelectorNode
 		this._name = name;
 	}
 
+	public List<Integer> getMatchResults()
+	{
+		// This is always just one segment, so only one value, and it is the length of this match
+		return CollectionsUtil.newList(matchLength);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.scope.ISelectorNode#matches(com.aptana.scope.MatchContext)
@@ -34,7 +42,7 @@ public class NameSelector implements ISelectorNode
 		matchLength = 0;
 		boolean result = false;
 
-		if (context != null && this._name != null && this._name.length() > 0)
+		if (context != null && !StringUtil.isEmpty(this._name))
 		{
 			String step = context.getCurrentStep();
 
@@ -65,13 +73,5 @@ public class NameSelector implements ISelectorNode
 	public String toString()
 	{
 		return this._name;
-	}
-
-	public List<Integer> matchResults()
-	{
-		// This is always just one segment, so only one value, and it is the length of this match
-		List<Integer> results = new ArrayList<Integer>();
-		results.add(matchLength);
-		return results;
 	}
 }
