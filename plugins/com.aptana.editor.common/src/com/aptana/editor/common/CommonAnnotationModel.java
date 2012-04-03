@@ -10,6 +10,7 @@ package com.aptana.editor.common;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
@@ -20,6 +21,8 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.ui.texteditor.ResourceMarkerAnnotationModel;
 
 import com.aptana.core.build.IProblem;
+import com.aptana.core.util.ArrayUtil;
+import com.aptana.core.util.CollectionsUtil;
 
 /**
  * Annotation Model for {@link IProblem}s. This model is used to draw annotations on the editor for
@@ -42,10 +45,10 @@ public class CommonAnnotationModel extends ResourceMarkerAnnotationModel
 	/**
 	 * Signals the end of problem reporting.
 	 * 
-	 * @param reportedProblems
-	 *            the problems to report
+	 * @param map
+	 *            the map of Marker types to collection of "markers/problems" to report
 	 */
-	public void reportProblems(Collection<IProblem> reportedProblems)
+	public void reportProblems(Map<String, Collection<IProblem>> map)
 	{
 		if (fProgressMonitor != null && fProgressMonitor.isCanceled())
 		{
@@ -54,13 +57,19 @@ public class CommonAnnotationModel extends ResourceMarkerAnnotationModel
 
 		boolean temporaryProblemsChanged = false;
 
-		// Forcibly remove marker annotations now that we've reconciled...
+		// Forcibly remove marker annotations of any particular type we're managing now that we've reconciled...
 		try
 		{
 			IMarker[] markers = retrieveMarkers();
-			for (IMarker marker : markers)
+			if (!ArrayUtil.isEmpty(markers))
 			{
-				removeMarkerAnnotation(marker);
+				for (IMarker marker : markers)
+				{
+					if (map.containsKey(marker.getType()))
+					{
+						removeMarkerAnnotation(marker);
+					}
+				}
 			}
 		}
 		catch (CoreException e)
@@ -77,32 +86,36 @@ public class CommonAnnotationModel extends ResourceMarkerAnnotationModel
 				fGeneratedAnnotations.clear();
 			}
 
-			if (reportedProblems != null)
+			if (!CollectionsUtil.isEmpty(map))
 			{
-
-				for (IProblem problem : reportedProblems)
+				for (Collection<IProblem> problems : map.values())
 				{
-
-					if (fProgressMonitor != null && fProgressMonitor.isCanceled())
+					if (!CollectionsUtil.isEmpty(problems))
 					{
-						break;
-					}
-
-					Position position = generatePosition(problem);
-					if (position != null)
-					{
-
-						try
+						for (IProblem problem : problems)
 						{
-							ProblemAnnotation annotation = new ProblemAnnotation(problem);
-							addAnnotation(annotation, position, false);
-							fGeneratedAnnotations.add(annotation);
 
-							temporaryProblemsChanged = true;
-						}
-						catch (BadLocationException x)
-						{
-							// ignore invalid position
+							if (fProgressMonitor != null && fProgressMonitor.isCanceled())
+							{
+								break;
+							}
+
+							Position position = generatePosition(problem);
+							if (position != null)
+							{
+								try
+								{
+									ProblemAnnotation annotation = new ProblemAnnotation(problem);
+									addAnnotation(annotation, position, false);
+									fGeneratedAnnotations.add(annotation);
+
+									temporaryProblemsChanged = true;
+								}
+								catch (BadLocationException x)
+								{
+									// ignore invalid position
+								}
+							}
 						}
 					}
 				}

@@ -14,23 +14,6 @@ import java.util.List;
  */
 public interface IScopeSelector extends Comparable<IScopeSelector>
 {
-
-	/**
-	 * matches
-	 * 
-	 * @param scope
-	 * @return
-	 */
-	boolean matches(String scope);
-
-	/**
-	 * matches
-	 * 
-	 * @param scopes
-	 * @return
-	 */
-	boolean matches(String[] scopes);
-
 	/**
 	 * Returns a list of integers. This list matches up with the match length for each segment of the scope we matched
 	 * against. We break the scope up by spaces, and for each part there, we have a value at that offset in this list.
@@ -40,5 +23,21 @@ public interface IScopeSelector extends Comparable<IScopeSelector>
 	 * 
 	 * @return
 	 */
-	List<Integer> matchResults();
+	List<Integer> getMatchResults();
+
+	/**
+	 * Determines if this selector matches the specified scope
+	 * 
+	 * @param scope
+	 * @return
+	 */
+	boolean matches(String scope);
+
+	/**
+	 * Determines if this selector matches the specified scopes
+	 * 
+	 * @param scopes
+	 * @return
+	 */
+	boolean matches(String[] scopes);
 }

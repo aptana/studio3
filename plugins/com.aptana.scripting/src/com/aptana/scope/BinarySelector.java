@@ -7,10 +7,14 @@
  */
 package com.aptana.scope;
 
-public abstract class BinarySelector implements ISelectorNode
+import java.util.Collections;
+import java.util.List;
+
+public abstract class BinarySelector extends SelectorNode
 {
 	protected ISelectorNode _left;
 	protected ISelectorNode _right;
+	protected List<Integer> matchResults;
 
 	/**
 	 * NegativeLookaheadSelector
@@ -35,6 +39,24 @@ public abstract class BinarySelector implements ISelectorNode
 	}
 
 	/**
+	 * matchResults
+	 */
+	public List<Integer> getMatchResults()
+	{
+		if (matchResults == null)
+		{
+			return Collections.emptyList();
+		}
+
+		return matchResults;
+	}
+
+	/**
+	 * getOperator
+	 */
+	protected abstract String getOperator();
+
+	/**
 	 * getRightChild
 	 * 
 	 * @return
@@ -43,11 +65,6 @@ public abstract class BinarySelector implements ISelectorNode
 	{
 		return this._right;
 	}
-
-	/**
-	 * getOperator
-	 */
-	protected abstract String getOperator();
 
 	/*
 	 * (non-Javadoc)
@@ -61,5 +78,4 @@ public abstract class BinarySelector implements ISelectorNode
 
 		return left + this.getOperator() + " " + right; //$NON-NLS-1$
 	}
-
 }

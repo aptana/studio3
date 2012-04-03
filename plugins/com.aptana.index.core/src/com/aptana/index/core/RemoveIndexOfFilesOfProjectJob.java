@@ -49,6 +49,12 @@ public class RemoveIndexOfFilesOfProjectJob extends IndexRequestJob
 		}
 
 		Index index = getIndex();
+		if (index == null)
+		{
+			IdeLog.logError(IndexPlugin.getDefault(),
+					MessageFormat.format("Index is null for container: {0}", getContainerURI())); //$NON-NLS-1$
+			return Status.CANCEL_STATUS;
+		}
 		try
 		{
 			// Cleanup indices for files

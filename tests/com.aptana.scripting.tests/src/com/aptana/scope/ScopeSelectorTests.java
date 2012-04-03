@@ -51,10 +51,10 @@ public class ScopeSelectorTests extends TestCase
 
 		// make sure we have the right selector type
 		ISelectorNode root = selector.getRoot();
-		assertTrue(root instanceof AndSelector);
+		assertTrue(root instanceof DescendantSelector);
 
 		// check children
-		AndSelector andSelector = (AndSelector) root;
+		DescendantSelector andSelector = (DescendantSelector) root;
 		assertTrue(andSelector.getLeftChild() instanceof NameSelector);
 		assertTrue(andSelector.getRightChild() instanceof NameSelector);
 	}
@@ -99,11 +99,11 @@ public class ScopeSelectorTests extends TestCase
 
 		// make sure we have the right selector type
 		ISelectorNode root = selector.getRoot();
-		assertTrue(root instanceof AndSelector);
+		assertTrue(root instanceof DescendantSelector);
 
 		// check children
-		AndSelector andSelector = (AndSelector) root;
-		assertTrue(andSelector.getLeftChild() instanceof AndSelector);
+		DescendantSelector andSelector = (DescendantSelector) root;
+		assertTrue(andSelector.getLeftChild() instanceof DescendantSelector);
 		assertTrue(andSelector.getRightChild() instanceof NameSelector);
 	}
 
@@ -152,7 +152,7 @@ public class ScopeSelectorTests extends TestCase
 		// check children
 		OrSelector orSelector = (OrSelector) root;
 		assertTrue(orSelector.getLeftChild() instanceof OrSelector);
-		assertTrue(orSelector.getRightChild() instanceof AndSelector);
+		assertTrue(orSelector.getRightChild() instanceof DescendantSelector);
 	}
 
 	// Match the element deepest down in the scope e.g. string wins over source.php when the
@@ -191,10 +191,10 @@ public class ScopeSelectorTests extends TestCase
 		String scope = "text.html.markdown meta.disable-markdown meta.tag.block.any.html entity.name.tag.block.any.html";
 
 		assertTrue(entity.matches(scope));
-		assertEquals(Arrays.asList(0, 0, 0, 6), entity.matchResults());
+		assertEquals(Arrays.asList(0, 0, 0, 6), entity.getMatchResults());
 
 		assertTrue(metaTagEntity.matches(scope));
-		assertEquals(Arrays.asList(0, 0, 8, 6), metaTagEntity.matchResults());
+		assertEquals(Arrays.asList(0, 0, 8, 6), metaTagEntity.getMatchResults());
 	}
 
 	public void testBestMatchExample()
@@ -233,10 +233,10 @@ public class ScopeSelectorTests extends TestCase
 		String scope = "source.php string.quoted";
 
 		assertTrue(string.matches(scope));
-		assertEquals(Arrays.asList(0, 6), string.matchResults());
+		assertEquals(Arrays.asList(0, 6), string.getMatchResults());
 
 		assertTrue(source.matches(scope));
-		assertEquals(Arrays.asList(10, 0), source.matchResults());
+		assertEquals(Arrays.asList(10, 0), source.getMatchResults());
 	}
 
 	public void testBestMatchLengthOfDeepestElementWins()
@@ -294,10 +294,10 @@ public class ScopeSelectorTests extends TestCase
 		String scope = "text.html.basic meta.tag.sgml.html meta.tag.sgml.doctype.html entity.name.tag.doctype.html";
 
 		assertTrue(entityName.matches(scope));
-		assertEquals(Arrays.asList(0, 0, 0, 15), entityName.matchResults());
+		assertEquals(Arrays.asList(0, 0, 0, 15), entityName.getMatchResults());
 
 		assertTrue(doctype.matches(scope));
-		assertEquals(Arrays.asList(0, 0, 0, 28), doctype.matchResults());
+		assertEquals(Arrays.asList(0, 0, 0, 28), doctype.getMatchResults());
 
 		assertEquals(doctype, ScopeSelector.bestMatch(Arrays.asList(entityName, doctype), scope));
 	}
@@ -321,10 +321,10 @@ public class ScopeSelectorTests extends TestCase
 		IScopeSelector metaSourceSelector = new ScopeSelector("meta source");
 
 		assertTrue("Selector should match, but doesn't", textSourceSelector.matches(scope));
-		assertEquals(Arrays.asList(4, 0, 6), textSourceSelector.matchResults());
+		assertEquals(Arrays.asList(4, 0, 6), textSourceSelector.getMatchResults());
 
 		assertTrue("Selector should match, but doesn't", metaSourceSelector.matches(scope));
-		assertEquals(Arrays.asList(0, 4, 6), metaSourceSelector.matchResults());
+		assertEquals(Arrays.asList(0, 4, 6), metaSourceSelector.getMatchResults());
 
 		assertEquals(metaSourceSelector,
 				ScopeSelector.bestMatch(Arrays.asList(textSourceSelector, metaSourceSelector), scope));
@@ -339,10 +339,10 @@ public class ScopeSelectorTests extends TestCase
 		IScopeSelector textSourceSelector = new ScopeSelector("text source");
 
 		assertTrue("Selector should match, but doesn't", textMinusMetaSelector.matches(scope));
-		assertEquals(Arrays.asList(4), textMinusMetaSelector.matchResults());
+		assertEquals(Arrays.asList(4), textMinusMetaSelector.getMatchResults());
 
 		assertTrue("Selector should match, but doesn't", textMinusMetaSourceSelector.matches(scope));
-		assertEquals(Arrays.asList(4), textMinusMetaSourceSelector.matchResults());
+		assertEquals(Arrays.asList(4), textMinusMetaSourceSelector.getMatchResults());
 
 		assertFalse("Selector shouldn't match, but does", textSourceSelector.matches(scope));
 
@@ -367,10 +367,10 @@ public class ScopeSelectorTests extends TestCase
 		IScopeSelector textMinusMetaSourceSelector = new ScopeSelector("text -meta source");
 
 		assertTrue("Selector should match, but doesn't", textSourceSelector.matches(scope));
-		assertEquals(Arrays.asList(4, 0, 6, 0), textSourceSelector.matchResults());
+		assertEquals(Arrays.asList(4, 0, 6, 0), textSourceSelector.getMatchResults());
 
 		assertTrue("Selector should match, but doesn't", metaSourceSelector.matches(scope));
-		assertEquals(Arrays.asList(0, 4, 6, 0), metaSourceSelector.matchResults());
+		assertEquals(Arrays.asList(0, 4, 6, 0), metaSourceSelector.getMatchResults());
 
 		assertFalse("Selector shouldn't match, but does", textMinusMetaSelector.matches(scope));
 		assertFalse("Selector shouldn't match, but does", textMinusMetaSourceSelector.matches(scope));
@@ -386,7 +386,7 @@ public class ScopeSelectorTests extends TestCase
 		assertFalse("Selector shouldn't match, but does", textMinusMetaSelector.matches(scope2));
 
 		assertTrue("Selector should match, but doesn't", textMinusMetaSourceSelector.matches(scope2));
-		assertEquals(Arrays.asList(4, 0), textMinusMetaSourceSelector.matchResults());
+		assertEquals(Arrays.asList(4, 0), textMinusMetaSourceSelector.getMatchResults());
 
 		assertEquals(textMinusMetaSourceSelector, ScopeSelector.bestMatch(Arrays.asList(textSourceSelector,
 				metaSourceSelector, textMinusMetaSelector, textMinusMetaSourceSelector), scope2));
@@ -402,16 +402,16 @@ public class ScopeSelectorTests extends TestCase
 		IScopeSelector sourceRubySelector = new ScopeSelector("source.ruby");
 
 		assertTrue("Selector should match, but doesn't", textSourceSelector.matches(scope));
-		assertEquals(Arrays.asList(4, 0, 6), textSourceSelector.matchResults());
+		assertEquals(Arrays.asList(4, 0, 6), textSourceSelector.getMatchResults());
 
 		assertTrue("Selector should match, but doesn't", metaSourceSelector.matches(scope));
-		assertEquals(Arrays.asList(0, 4, 6), metaSourceSelector.matchResults());
+		assertEquals(Arrays.asList(0, 4, 6), metaSourceSelector.getMatchResults());
 
 		assertTrue("Selector should match, but doesn't", sourceSelector.matches(scope));
-		assertEquals(Arrays.asList(0, 0, 6), sourceSelector.matchResults());
+		assertEquals(Arrays.asList(0, 0, 6), sourceSelector.getMatchResults());
 
 		assertTrue("Selector should match, but doesn't", sourceRubySelector.matches(scope));
-		assertEquals(Arrays.asList(0, 0, 11), sourceRubySelector.matchResults());
+		assertEquals(Arrays.asList(0, 0, 11), sourceRubySelector.getMatchResults());
 
 		// Generate a list of matches
 		List<IScopeSelector> matches = Arrays.asList(metaSourceSelector, textSourceSelector, sourceRubySelector,
@@ -429,5 +429,24 @@ public class ScopeSelectorTests extends TestCase
 		assertEquals(textSourceSelector, matches.get(1));
 		assertEquals(metaSourceSelector, matches.get(2));
 		assertEquals(sourceRubySelector, matches.get(3));
+	}
+
+	public void testNegativeOr()
+	{
+		IScopeSelector textSourceSelector = new ScopeSelector("text.html - (source | string)");
+
+		// test inside attribute string
+		assertFalse(
+				"Selector shouldn't match, but does",
+				textSourceSelector
+						.matches("text.html.basic meta.tag.any.html meta.attribute-with-value.id.html string.quoted.double.html punctuation.definition.string.end.html"));
+
+		// test inside body of html
+		assertTrue("Selector should match, but doesn't", textSourceSelector.matches("text.html.basic"));
+		assertEquals(Arrays.asList(9), textSourceSelector.getMatchResults());
+
+		// Test inside erb tag
+		assertFalse("Selector shouldn't match, but does",
+				textSourceSelector.matches("text.html.basic source.ruby.embedded.html"));
 	}
 }

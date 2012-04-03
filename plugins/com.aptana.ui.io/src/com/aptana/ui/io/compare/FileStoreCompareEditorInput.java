@@ -1,12 +1,11 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the Eclipse Public License (EPL).
  * Please see the license-epl.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 // $codepro.audit.disable unnecessaryExceptions
-
 package com.aptana.ui.io.compare;
 
 import java.lang.reflect.InvocationTargetException;
@@ -173,8 +172,18 @@ public class FileStoreCompareEditorInput extends CompareEditorInput
 	 */
 	public void setLeftFileStore(IFileStore fileStore)
 	{
+		setLeftFileStore(fileStore, null);
+	}
+
+	/**
+	 * Sets the left file store with a specific name.
+	 * 
+	 * @param fileStore
+	 */
+	public void setLeftFileStore(IFileStore fileStore, String name)
+	{
 		fLeftFileStore = fileStore;
-		fLeft = new FileStoreNode(fLeftFileStore);
+		fLeft = new FileStoreNode(fLeftFileStore, name);
 	}
 
 	/**
@@ -184,8 +193,18 @@ public class FileStoreCompareEditorInput extends CompareEditorInput
 	 */
 	public void setRightFileStore(IFileStore fileStore)
 	{
+		setRightFileStore(fileStore, null);
+	}
+
+	/**
+	 * Sets the right file store with a specific name.
+	 * 
+	 * @param resource
+	 */
+	public void setRightFileStore(IFileStore fileStore, String name)
+	{
 		fRightFileStore = fileStore;
-		fRight = new FileStoreNode(fRightFileStore);
+		fRight = new FileStoreNode(fRightFileStore, name);
 	}
 
 	/**
@@ -222,8 +241,8 @@ public class FileStoreCompareEditorInput extends CompareEditorInput
 
 			prepareFiles();
 
-			String leftLabel = fLeftFileStore.getName();
-			String rightLabel = fRightFileStore.getName();
+			String leftLabel = fLeft.getName();
+			String rightLabel = fRight.getName();
 
 			String format = Utilities.getString("ResourceCompare.twoWay.title"); //$NON-NLS-1$
 			String title = MessageFormat.format(format, new Object[] { leftLabel, rightLabel });

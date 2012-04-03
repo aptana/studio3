@@ -200,6 +200,9 @@
          <contentTypeBinding
                contentTypeId="com.aptana.contenttype.html">
          </contentTypeBinding>
+         <projectNatureBinding
+               natureId="com.aptana.projects.webnature">
+         </projectNatureBinding>
       </participant>
       <participant
             class="com.aptana.editor.html.validator.HTMLTidyValidator"
@@ -209,6 +212,9 @@
          <contentTypeBinding
                contentTypeId="com.aptana.contenttype.html">
          </contentTypeBinding>
+         <projectNatureBinding
+               natureId="com.aptana.projects.webnature">
+         </projectNatureBinding>
       </participant>
       <participant
             class="com.aptana.editor.html.validator.HTMLParserValidator"
@@ -218,6 +224,9 @@
          <contentTypeBinding
                contentTypeId="com.aptana.contenttype.html">
          </contentTypeBinding>
+         <projectNatureBinding
+               natureId="com.aptana.projects.webnature">
+         </projectNatureBinding>
       </participant>
    </extension>
    <extension
