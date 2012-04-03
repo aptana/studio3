@@ -115,12 +115,20 @@ public class URIUtil
 
 	private static boolean openInFinder(File file)
 	{
-		String subcommand = "open"; //$NON-NLS-1$
+		return openInFinder(file, file.isFile());
+	}
+
+	/**
+	 * Opens a file in OSX Finder. Specifies whether the file should be opened or revealed
+	 * 
+	 * @param file
+	 * @param reveal
+	 * @return
+	 */
+	public static boolean openInFinder(File file, boolean reveal)
+	{
 		String path = file.getAbsolutePath();
-		if (file.isFile())
-		{
-			subcommand = "reveal"; //$NON-NLS-1$
-		}
+		String subcommand = reveal ? "reveal" : "open"; //$NON-NLS-1$ //$NON-NLS-2$
 		String appleScript = "tell application \"Finder\" to " + subcommand + " (POSIX file \"" + path + "\")\ntell application \"Finder\" to activate"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		IStatus result = ProcessUtil.runInBackground("osascript", null, "-e", appleScript); //$NON-NLS-1$ //$NON-NLS-2$
 		if (result != null && result.isOK())
