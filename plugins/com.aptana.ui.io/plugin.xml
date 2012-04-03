@@ -335,9 +335,9 @@
          </enablement>
       </actionProvider>
       <actionProvider
-            class="com.aptana.ide.ui.io.navigator.actions.FileSystemEditActionProvider"
-            id="com.aptana.ide.ui.io.navigator.actions.ResourceActions"
-            overrides="org.eclipse.ui.navigator.resources.actions.EditActions">
+            class="com.aptana.ide.ui.io.navigator.actions.ResourceEditActionProvider"
+            id="com.aptana.ide.ui.io.navigator.actions.ResourceEditActions"
+            overrides="org.python.pydev.navigator.actions.pythonActionProvider">
          <enablement>
             <and>
                <instanceof

@@ -19,6 +19,7 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionGroup;
+import org.eclipse.ui.actions.BaseSelectionListenerAction;
 import org.eclipse.ui.actions.TextActionHandler;
 import org.eclipse.ui.navigator.ICommonMenuConstants;
 
@@ -34,7 +35,7 @@ public class FileSystemEditActionGroup extends ActionGroup
 
 	private FileSystemCopyAction fCopyAction;
 	private FileSystemPasteAction fPasteAction;
-	private FileSystemDeleteAction fDeleteAction;
+	private BaseSelectionListenerAction fDeleteAction;
 
 	private TextActionHandler fTextActionHandler;
 
@@ -144,10 +145,15 @@ public class FileSystemEditActionGroup extends ActionGroup
 		fCopyAction.setImageDescriptor(images.getImageDescriptor(ISharedImages.IMG_TOOL_COPY));
 		fCopyAction.setActionDefinitionId(IWorkbenchCommandConstants.EDIT_COPY);
 
-		fDeleteAction = new FileSystemDeleteAction(fShell, fTree);
+		fDeleteAction = createDeleteAction(fShell);
 		fDeleteAction.setDisabledImageDescriptor(images.getImageDescriptor(ISharedImages.IMG_TOOL_DELETE_DISABLED));
 		fDeleteAction.setImageDescriptor(images.getImageDescriptor(ISharedImages.IMG_TOOL_DELETE));
 		fDeleteAction.setActionDefinitionId(IWorkbenchCommandConstants.EDIT_DELETE);
+	}
+
+	protected BaseSelectionListenerAction createDeleteAction(Shell shell)
+	{
+		return new FileSystemDeleteAction(shell, fTree);
 	}
 
 	private IStructuredSelection getSelection()
