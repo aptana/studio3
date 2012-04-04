@@ -62,6 +62,7 @@ import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
@@ -255,6 +256,10 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	private CommonOccurrencesUpdater occurrencesUpdater;
 
 	private Job linkWithEditorJob;
+	/**
+	 * Flag used to auto-expand outlines to 2nd level on first open.
+	 */
+	private boolean outlineAutoExpanded;
 
 	/**
 	 * AbstractThemeableEditor
@@ -1243,7 +1248,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	public void refreshOutline()
 	{
 		// TODO Does this need to be run in asyncExec here?
-		UIUtils.getDisplay().asyncExec(new Runnable()
+		Display.getDefault().asyncExec(new Runnable()
 		{
 
 			public void run()
