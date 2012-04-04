@@ -60,7 +60,7 @@
             labelProvider="com.aptana.ide.ui.io.navigator.FileTreeLabelProvider"
             name="%navigatorContent.default.name"
             priority="normal">
-         <enablement>
+         <triggerPoints>
             <or>
                <adapt
                      type="org.eclipse.core.resources.IProject">
@@ -81,7 +81,23 @@
                      value="com.aptana.ide.core.io.LocalRoot">
                </instanceof>
             </or>
-         </enablement>
+         </triggerPoints>
+         <possibleChildren>
+            <or>
+               <instanceof
+                     value="com.aptana.ide.ui.io.navigator.FileSystemObject">
+               </instanceof>
+               <instanceof
+                     value="com.aptana.ide.ui.io.navigator.LocalFileSystems">
+               </instanceof>
+               <instanceof
+                     value="com.aptana.ide.ui.io.navigator.WindowsFileSystemRoot">
+               </instanceof>
+               <instanceof
+                     value="com.aptana.ide.core.io.LocalRoot">
+               </instanceof>
+            </or>
+         </possibleChildren>
          <commonSorter
                class="com.aptana.ide.ui.io.navigator.FileTreeNameSorter">
             <parentExpression>
@@ -106,22 +122,6 @@
                   </adapt></or>
             </parentExpression>
          </commonSorter>
-         <possibleChildren>
-            <or>
-               <instanceof
-                     value="com.aptana.ide.ui.io.navigator.FileSystemObject">
-               </instanceof>
-               <instanceof
-                     value="com.aptana.ide.ui.io.navigator.LocalFileSystems">
-               </instanceof>
-               <instanceof
-                     value="com.aptana.ide.ui.io.navigator.WindowsFileSystemRoot">
-               </instanceof>
-               <instanceof
-                     value="com.aptana.ide.core.io.LocalRoot">
-               </instanceof>
-            </or>
-         </possibleChildren>
          <dropAssistant
                class="com.aptana.ide.ui.io.navigator.resources.FileDropAdapterAssistant"
                id="com.aptana.ide.ui.io.navigator.resources.fileDropAdapter">
@@ -200,8 +200,7 @@
       </actionProvider>
       <actionProvider
             class="com.aptana.ide.ui.io.navigator.actions.FileSystemEditActionProvider"
-            id="com.aptana.ide.ui.io.navigator.actions.FileSystemEditActions"
-            overrides="org.eclipse.ui.navigator.resources.actions.EditActions">
+            id="com.aptana.ide.ui.io.navigator.actions.FileSystemEditActions">
          <enablement>
             <or>
                <instanceof
@@ -210,20 +209,6 @@
                <instanceof
                      value="com.aptana.ide.core.io.LocalRoot">
                </instanceof>
-               <and>
-                  <adapt
-                        type="org.eclipse.core.resources.IResource">
-                  </adapt>
-                  <not>
-                    <instanceof
-                          value="org.eclipse.core.resources.IProject">
-                    </instanceof>
-                  </not>
-                  <test
-                        property="org.eclipse.core.resources.projectNature"
-                        value="com.aptana.projects.webnature">
-                  </test>
-               </and>
             </or>
          </enablement>
       </actionProvider>
@@ -345,6 +330,22 @@
                <test
                      property="com.aptana.ide.core.io.connection.category.id"
                      value="com.aptana.ide.core.io.localShortcuts">
+               </test>
+            </and>
+         </enablement>
+      </actionProvider>
+      <actionProvider
+            class="com.aptana.ide.ui.io.navigator.actions.FileSystemEditActionProvider"
+            id="com.aptana.ide.ui.io.navigator.actions.ResourceActions"
+            overrides="org.eclipse.ui.navigator.resources.actions.EditActions">
+         <enablement>
+            <and>
+               <instanceof
+                     value="org.eclipse.core.resources.IResource">
+               </instanceof>
+               <test
+                     property="org.eclipse.core.resources.projectNature"
+                     value="com.aptana.projects.webnature">
                </test>
             </and>
          </enablement>
