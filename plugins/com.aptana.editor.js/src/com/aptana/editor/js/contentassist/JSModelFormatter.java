@@ -26,7 +26,7 @@ import com.aptana.core.IMap;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.StringUtil;
-import com.aptana.core.util.replace.RegexPatternReplacer;
+import com.aptana.editor.common.hover.TagStripperAndTypeBolder;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
@@ -37,8 +37,7 @@ import com.aptana.editor.js.contentassist.model.UserAgentElement;
 
 public class JSModelFormatter
 {
-	private static final String BOLD_CLOSE_TAG = "</b>"; //$NON-NLS-1$
-	private static final String BOLD_OPEN_TAG = "<b>"; //$NON-NLS-1$
+
 	private static final String COLON_SPACE = ": "; //$NON-NLS-1$
 	private static final String COMMA_SPACE = ", "; //$NON-NLS-1$
 
@@ -218,7 +217,7 @@ public class JSModelFormatter
 		List<String> stringParts = new ArrayList<String>();
 		if (useHTML)
 		{
-			stringParts.add(BOLD_OPEN_TAG);
+			stringParts.add(TagStripperAndTypeBolder.BOLD_OPEN_TAG);
 		}
 
 		List<Section> headerSections = CollectionsUtil.filter(fSections, new IFilter<Section>()
@@ -238,7 +237,7 @@ public class JSModelFormatter
 
 		if (useHTML)
 		{
-			stringParts.add(BOLD_CLOSE_TAG);
+			stringParts.add(TagStripperAndTypeBolder.BOLD_CLOSE_TAG);
 		}
 		return StringUtil.concat(stringParts);
 	}
@@ -386,12 +385,12 @@ public class JSModelFormatter
 				builder.append(newline()).append(newline());
 				if (useHTML)
 				{
-					builder.append(BOLD_OPEN_TAG);
+					builder.append(TagStripperAndTypeBolder.BOLD_OPEN_TAG);
 				}
 				builder.append(title);
 				if (useHTML)
 				{
-					builder.append(BOLD_CLOSE_TAG);
+					builder.append(TagStripperAndTypeBolder.BOLD_CLOSE_TAG);
 				}
 				builder.append(newline());
 				builder.append(value.trim());
@@ -763,41 +762,5 @@ public class JSModelFormatter
 				return StringUtil.join(COMMA_SPACE, strings);
 			}
 		};
-	}
-
-	private static class TagStripperAndTypeBolder extends RegexPatternReplacer
-	{
-		private boolean useHTML;
-
-		public TagStripperAndTypeBolder()
-		{
-			// @formatter:off
-			addPattern(
-				"<[\\p{Alpha}$_][\\p{Alnum}_$]*(?:\\.[\\p{Alpha}$_][\\p{Alnum}_$]*)+>", //$NON-NLS-1$
-				new IMap<String, String>()
-				{
-					public String map(String item)
-					{
-						String typeName = item.substring(1, item.length() - 1);
-
-						if (useHTML)
-						{
-							return StringUtil.concat(BOLD_OPEN_TAG, typeName, BOLD_CLOSE_TAG);
-						}
-						else
-						{
-							return typeName;
-						}
-					}
-				}
-			);
-			// @formatter:on
-			addPattern("</?p>"); //$NON-NLS-1$
-		}
-
-		public void setUseHTML(boolean value)
-		{
-			useHTML = value;
-		}
 	}
 }

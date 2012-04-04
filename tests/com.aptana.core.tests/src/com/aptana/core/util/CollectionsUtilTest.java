@@ -501,6 +501,49 @@ public class CollectionsUtilTest extends TestCase
 		assertTrue("Map should be empty", map.isEmpty());
 	}
 
+	public void testNewMapUnevenItems()
+	{
+		try
+		{
+			CollectionsUtil.newMap("item1", "item2", "item3");
+			fail("Failed to throw IllegalArgumentException with odd number of items");
+		}
+		catch( IllegalArgumentException e)
+		{
+			// what we're expecting
+		}
+	}
+
+	public void testNewMapDefinedTypes()
+	{
+		// @formatter:off
+		Map<String, Integer> map = CollectionsUtil.<String, Integer>newMap(
+				String.class, Integer.class,
+				"item1", 1,
+				"item2", 2,
+				"item3", 3);
+		// @formatter:on
+
+		assertNotNull(map);
+		assertEquals("The map should have three items", 3, map.size());
+		assertEquals(Integer.valueOf(1), map.get("item1"));
+		assertEquals(Integer.valueOf(2), map.get("item2"));
+		assertEquals(Integer.valueOf(3), map.get("item3"));
+	}
+
+	public void testNewMapDefinedTypesUnevenItems()
+	{
+		try
+		{
+			CollectionsUtil.<String, Integer>newMap(String.class, Integer.class, "item1", 1, "item3");
+			fail("Failed to throw IllegalArgumentException with odd number of items");
+		}
+		catch( IllegalArgumentException e)
+		{
+			// what we're expecting
+		}
+	}
+
 	public void testAddToMapSubclass()
 	{
 		Number doubleOne = 1.0;
@@ -573,6 +616,21 @@ public class CollectionsUtilTest extends TestCase
 		try
 		{
 			CollectionsUtil.addToMap(map, "c", "d", "e");
+			fail("Didn't throw IllegalArgumentException when we tried to add uneven number of elements to a map.");
+		}
+		catch (IllegalArgumentException t)
+		{
+			assertTrue(true);
+		}
+	}
+
+	public void testAddUnevenItemsToMapDefinedTypes()
+	{
+		Map<String, Integer> map = CollectionsUtil.<String, Integer>newMap(String.class, Integer.class, "a", 1);
+		assertNotNull(map);
+		try
+		{
+			CollectionsUtil.addToMap(String.class, Integer.class, map, "c", 2, "e");
 			fail("Didn't throw IllegalArgumentException when we tried to add uneven number of elements to a map.");
 		}
 		catch (IllegalArgumentException t)

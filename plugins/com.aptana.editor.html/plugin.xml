@@ -257,4 +257,15 @@
             name="%index.view.contributor.name">
       </contributor>
    </extension>
+   <extension
+         point="com.aptana.editor.common.textHovers">
+      <hover
+            class="com.aptana.editor.html.text.HTMLTextHover"
+            id="com.aptana.editor.html.hover"
+            label="HTML Hover">
+         <contentType
+               type="com.aptana.contenttype.html">
+         </contentType>
+      </hover>
+   </extension>
 </plugin>

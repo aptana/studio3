@@ -11,7 +11,6 @@ import java.net.URI;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -39,6 +38,7 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
@@ -200,39 +200,46 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	static
 	{
-		locationMap = new HashMap<String, LocationType>();
-		locationMap.put(HTMLSourceConfiguration.DEFAULT, LocationType.IN_TEXT);
-		locationMap.put(HTMLSourceConfiguration.HTML_COMMENT, LocationType.IN_COMMENT);
-		locationMap.put(HTMLSourceConfiguration.HTML_DOCTYPE, LocationType.IN_DOCTYPE);
+		// @formatter:off
+		locationMap = CollectionsUtil.<String, LocationType>newMap(
+			String.class, LocationType.class,
+			HTMLSourceConfiguration.DEFAULT, LocationType.IN_TEXT,
+			HTMLSourceConfiguration.HTML_COMMENT, LocationType.IN_COMMENT,
+			HTMLSourceConfiguration.HTML_DOCTYPE, LocationType.IN_DOCTYPE,
 
-		locationMap.put(HTMLSourceConfiguration.HTML_SCRIPT, LocationType.IN_OPEN_TAG);
-		locationMap.put(HTMLSourceConfiguration.HTML_STYLE, LocationType.IN_OPEN_TAG);
-		locationMap.put(HTMLSourceConfiguration.HTML_TAG, LocationType.IN_OPEN_TAG);
-		locationMap.put(HTMLSourceConfiguration.HTML_TAG_CLOSE, LocationType.IN_CLOSE_TAG);
+			HTMLSourceConfiguration.HTML_SCRIPT, LocationType.IN_OPEN_TAG,
+			HTMLSourceConfiguration.HTML_STYLE, LocationType.IN_OPEN_TAG,
+			HTMLSourceConfiguration.HTML_TAG, LocationType.IN_OPEN_TAG,
+			HTMLSourceConfiguration.HTML_TAG_CLOSE, LocationType.IN_CLOSE_TAG,
 
-		locationMap.put(JSSourceConfiguration.DEFAULT, LocationType.IN_TEXT);
-		locationMap.put(CSSSourceConfiguration.DEFAULT, LocationType.IN_TEXT);
-		locationMap.put(IDocument.DEFAULT_CONTENT_TYPE, LocationType.IN_TEXT);
+			JSSourceConfiguration.DEFAULT, LocationType.IN_TEXT,
+			CSSSourceConfiguration.DEFAULT, LocationType.IN_TEXT,
+			IDocument.DEFAULT_CONTENT_TYPE, LocationType.IN_TEXT
+		);
+		// @formatter:on
 
-		DOCTYPES = new HashMap<String, String>();
-		DOCTYPES.put("HTML 5", "HTML"); //$NON-NLS-1$ //$NON-NLS-2$
-		DOCTYPES.put("HTML 4.01 Strict", //$NON-NLS-1$
-				"HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"\n\"http://www.w3.org/TR/html4/strict.dtd\""); //$NON-NLS-1$ // $codepro.audit.disable platformSpecificLineSeparator
-		DOCTYPES.put("HTML 4.01 Transitional", //$NON-NLS-1$
-				"HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\n\"http://www.w3.org/TR/html4/loose.dtd\""); //$NON-NLS-1$ // $codepro.audit.disable platformSpecificLineSeparator
-		DOCTYPES.put("HTML 4.01 Transitional (Quirks)", "HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\""); //$NON-NLS-1$ //$NON-NLS-2$ // $codepro.audit.disable platformSpecificLineSeparator
-		DOCTYPES.put("HTML 4.01 Frameset", //$NON-NLS-1$
-				"HTML PUBLIC \"-//W3C//DTD HTML 4.01 Frameset//EN\"\n\"http://www.w3.org/TR/html4/frameset.dtd\""); //$NON-NLS-1$ // $codepro.audit.disable platformSpecificLineSeparator
-		DOCTYPES.put("XHTML 1.1", //$NON-NLS-1$
-				"html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\""); //$NON-NLS-1$ // $codepro.audit.disable platformSpecificLineSeparator
-		DOCTYPES.put("XHTML 1.0 Strict", //$NON-NLS-1$
-				"html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\""); //$NON-NLS-1$ // $codepro.audit.disable platformSpecificLineSeparator
-		DOCTYPES.put("XHTML 1.0 Transitional", //$NON-NLS-1$
-				"html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"\n\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\""); //$NON-NLS-1$ // $codepro.audit.disable platformSpecificLineSeparator
-		DOCTYPES.put("XHTML 1.0 Frameset", //$NON-NLS-1$
-				"html PUBLIC \"-//W3C//DTD XHTML 1.0 Frameset//EN\"\n\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd\""); //$NON-NLS-1$ // $codepro.audit.disable platformSpecificLineSeparator
-		DOCTYPES.put("HTML 3.2", "HTML PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\""); //$NON-NLS-1$ //$NON-NLS-2$
-		DOCTYPES.put("HTML 2.0", "HTML PUBLIC \"-//IETF//DTD HTML//EN\""); //$NON-NLS-1$ //$NON-NLS-2$
+		// @formatter:off
+		DOCTYPES = CollectionsUtil.newMap(
+			"HTML 5", "HTML", //$NON-NLS-1$ //$NON-NLS-2$
+			"HTML 4.01 Strict", //$NON-NLS-1$
+					"HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"\n\"http://www.w3.org/TR/html4/strict.dtd\"", //$NON-NLS-1$ // $codepro.audit.disable platformSpecificLineSeparator
+			"HTML 4.01 Transitional", //$NON-NLS-1$
+					"HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\n\"http://www.w3.org/TR/html4/loose.dtd\"", //$NON-NLS-1$ // $codepro.audit.disable platformSpecificLineSeparator
+			"HTML 4.01 Transitional (Quirks)", "HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"", //$NON-NLS-1$ //$NON-NLS-2$ // $codepro.audit.disable platformSpecificLineSeparator
+			"HTML 4.01 Frameset", //$NON-NLS-1$
+					"HTML PUBLIC \"-//W3C//DTD HTML 4.01 Frameset//EN\"\n\"http://www.w3.org/TR/html4/frameset.dtd\"", //$NON-NLS-1$ // $codepro.audit.disable platformSpecificLineSeparator
+			"XHTML 1.1", //$NON-NLS-1$
+					"html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\"", //$NON-NLS-1$ // $codepro.audit.disable platformSpecificLineSeparator
+			"XHTML 1.0 Strict", //$NON-NLS-1$
+					"html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\"", //$NON-NLS-1$ // $codepro.audit.disable platformSpecificLineSeparator
+			"XHTML 1.0 Transitional", //$NON-NLS-1$
+					"html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"\n\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\"", //$NON-NLS-1$ // $codepro.audit.disable platformSpecificLineSeparator
+			"XHTML 1.0 Frameset", //$NON-NLS-1$
+					"html PUBLIC \"-//W3C//DTD XHTML 1.0 Frameset//EN\"\n\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd\"", //$NON-NLS-1$ // $codepro.audit.disable platformSpecificLineSeparator
+			"HTML 3.2", "HTML PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\"", //$NON-NLS-1$ //$NON-NLS-2$
+			"HTML 2.0", "HTML PUBLIC \"-//IETF//DTD HTML//EN\"" //$NON-NLS-1$ //$NON-NLS-2$
+		);
+		// @formatter:on
 	}
 
 	/**

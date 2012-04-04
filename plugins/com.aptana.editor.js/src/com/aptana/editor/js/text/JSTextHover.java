@@ -7,10 +7,8 @@
  */
 package com.aptana.editor.js.text;
 
-import java.net.URI;
 import java.util.List;
 
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.internal.text.html.BrowserInformationControlInput;
@@ -29,7 +27,6 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.contentassist.CommonTextHover;
 import com.aptana.editor.common.hover.CustomBrowserInformationControl;
 import com.aptana.editor.common.hover.DocumentationBrowserInformationControlInput;
-import com.aptana.editor.common.util.EditorUtil;
 import com.aptana.editor.js.contentassist.JSLocationIdentifier;
 import com.aptana.editor.js.contentassist.JSModelFormatter;
 import com.aptana.editor.js.contentassist.LocationType;
@@ -46,63 +43,6 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 
 	private String fDocs;
 	private String fHeader;
-
-	/**
-	 * getActiveNode
-	 * 
-	 * @param textViewer
-	 * @param offset
-	 * @return
-	 */
-	protected IParseNode getActiveNode(ITextViewer textViewer, int offset)
-	{
-		IParseNode result = null;
-
-		if (this.isHoverEnabled())
-		{
-			AbstractThemeableEditor editor = this.getEditor(textViewer);
-			IParseNode ast = editor.getAST();
-
-			if (ast != null)
-			{
-				result = ast.getNodeAtOffset(offset);
-
-				// We won't get a current node if the cursor is outside of the positions
-				// recorded by the AST
-				if (result == null)
-				{
-					if (offset < ast.getStartingOffset())
-					{
-						result = ast.getNodeAtOffset(ast.getStartingOffset());
-					}
-					else if (ast.getEndingOffset() < offset)
-					{
-						result = ast.getNodeAtOffset(ast.getEndingOffset());
-					}
-				}
-			}
-		}
-
-		return result;
-	}
-
-	/**
-	 * getEditor
-	 * 
-	 * @param textViewer
-	 * @return
-	 */
-	protected AbstractThemeableEditor getEditor(ITextViewer textViewer)
-	{
-		AbstractThemeableEditor result = null;
-
-		if (textViewer instanceof IAdaptable)
-		{
-			result = (AbstractThemeableEditor) ((IAdaptable) textViewer).getAdapter(AbstractThemeableEditor.class);
-		}
-
-		return result;
-	}
 
 	/*
 	 * (non-Javadoc)
@@ -220,30 +160,6 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 			result = new Region(offset, 0);
 		}
 		return result;
-	}
-
-	/**
-	 * getEditorURI
-	 * 
-	 * @param textViewer
-	 * @return
-	 */
-	protected URI getEditorURI(IEditorPart editorPart)
-	{
-		AbstractThemeableEditor editor = (AbstractThemeableEditor) editorPart;
-		return EditorUtil.getURI(editor);
-	}
-
-	/**
-	 * getIndex
-	 * 
-	 * @param editorPart
-	 * @return
-	 */
-	protected Index getIndex(IEditorPart editorPart)
-	{
-		AbstractThemeableEditor editor = (AbstractThemeableEditor) editorPart;
-		return EditorUtil.getIndex(editor);
 	}
 
 	/**

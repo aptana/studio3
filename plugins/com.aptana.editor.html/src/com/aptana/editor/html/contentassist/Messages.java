@@ -15,6 +15,12 @@ public class Messages extends NLS
 	public static String HTMLContentAssistProcessor_ErrorFetchingPartition;
 	public static String HTMLContentAssistProcessor_ErrorFetchingText;
 	public static String HTMLContentAssistProcessor_ErrorReplacingText;
+	public static String HTMLModelFormatter_DisplayName;
+	public static String HTMLModelFormatter_ExampleSection;
+	public static String HTMLModelFormatter_NoDescription;
+	public static String HTMLModelFormatter_RemarksSection;
+	public static String HTMLModelFormatter_SpecificationSection;
+	public static String HTMLModelFormatter_SupportedPlatforms;
 	static
 	{
 		// initialize resource bundle

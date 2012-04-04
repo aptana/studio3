@@ -189,6 +189,7 @@ public class ElementElement extends BaseElement<ElementElement.Property>
 		this.setDeprecated(StringUtil.getStringValue(object.get(DEPRECATED_PROPERTY)));
 		this.setExample(StringUtil.getStringValue(object.get(EXAMPLE_PROPERTY)));
 		this.setRelatedClass(StringUtil.getStringValue(object.get(RELATED_CLASS_PROPERTY)));
+		this.setRemark(StringUtil.getStringValue(object.get(REMARK_PROPERTY)));
 
 		this._attributes = IndexUtil.createList(object.get(ATTRIBUTES_PROPERTY));
 		this._events = IndexUtil.createList(object.get(EVENTS_PROPERTY));
