@@ -1586,6 +1586,7 @@ public class SnippetsView extends ViewPart
 		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(themeListener);
 		snippetBundleListener.dispose();
 
+		super.dispose();
 		colorManager.dispose();
 		disposeThemers();
 
@@ -1596,8 +1597,6 @@ public class SnippetsView extends ViewPart
 		{
 			service.removePartListener(partListener);
 		}
-
-		super.dispose();
 	}
 
 	@Override
