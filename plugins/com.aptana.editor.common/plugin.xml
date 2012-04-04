@@ -504,8 +504,8 @@
          </state>
       </command>
       <command
+            categoryId="org.eclipse.ui.category.textEditor"
             description="%command.gotomatchingbracket.description"
-            defaultHandler="com.aptana.editor.common.internal.handlers.GotoMatchingBracketHandler"
             id="com.aptana.editor.common.gotoMatchingBracket"
             name="%command.gotomatchingbracket.name">
       </command>
@@ -763,6 +763,7 @@
    <extension
          point="org.eclipse.ui.handlers">
       <handler
+            class="com.aptana.editor.common.internal.handlers.GotoMatchingBracketHandler"
             commandId="com.aptana.editor.common.gotoMatchingBracket">
          <enabledWhen>
             <with
