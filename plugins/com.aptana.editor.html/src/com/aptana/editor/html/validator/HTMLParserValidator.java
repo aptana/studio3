@@ -49,58 +49,59 @@ public class HTMLParserValidator extends AbstractBuildParticipant
 		{
 			return;
 		}
+		String source = null;
+		try
+		{
+			source = context.getContents();
+		}
+		catch (CoreException e)
+		{
+			IdeLog.logWarning(HTMLPlugin.getDefault(), "Failed to grab the HTML content", e); //$NON-NLS-1$
+		}
 
 		Map<String, List<IProblem>> problems = new HashMap<String, List<IProblem>>();
 		problems.put(IHTMLConstants.CONTENT_TYPE_HTML, new ArrayList<IProblem>());
 		problems.put(IJSConstants.CONTENT_TYPE_JS, new ArrayList<IProblem>());
 		problems.put(ICSSConstants.CONTENT_TYPE_CSS, new ArrayList<IProblem>());
 
-		try
+		if (!StringUtil.isEmpty(source))
 		{
-			String source = context.getContents();
-			if (!StringUtil.isEmpty(source))
+			try
 			{
-				try
-				{
-					context.getAST(); // Ensure a parse has happened
-				}
-				catch (CoreException e)
-				{
-					// ignores the parser exception
-				}
+				context.getAST(); // Ensure a parse has happened
+			}
+			catch (CoreException e)
+			{
+				// ignores the parser exception
+			}
 
-				// Add parse errors...
-				if (!CollectionsUtil.isEmpty(context.getParseErrors()))
+			// Add parse errors...
+			if (!CollectionsUtil.isEmpty(context.getParseErrors()))
+			{
+				URI path = context.getURI();
+				String sourcePath = path.toString();
+				IDocument doc = new Document(source);
+				for (IParseError parseError : context.getParseErrors())
 				{
-					URI path = context.getURI();
-					String sourcePath = path.toString();
-					IDocument doc = new Document(source);
-					for (IParseError parseError : context.getParseErrors())
+					int severity = (parseError.getSeverity() == Severity.ERROR) ? IMarker.SEVERITY_ERROR
+							: IMarker.SEVERITY_WARNING;
+					int line = -1;
+					try
 					{
-						int severity = (parseError.getSeverity() == Severity.ERROR) ? IMarker.SEVERITY_ERROR
-								: IMarker.SEVERITY_WARNING;
-						int line = -1;
-						try
-						{
-							line = doc.getLineOfOffset(parseError.getOffset()) + 1;
-						}
-						catch (BadLocationException e)
-						{
-							// ignore
-						}
-
-						String language = parseError.getLangauge();
-						List<IProblem> langProblems = problems.get(language);
-						langProblems.add(new Problem(severity, parseError.getMessage(), parseError.getOffset(),
-								parseError.getLength(), line, sourcePath));
-						problems.put(language, langProblems);
+						line = doc.getLineOfOffset(parseError.getOffset()) + 1;
 					}
+					catch (BadLocationException e)
+					{
+						// ignore
+					}
+
+					String language = parseError.getLangauge();
+					List<IProblem> langProblems = problems.get(language);
+					langProblems.add(new Problem(severity, parseError.getMessage(), parseError.getOffset(), parseError
+							.getLength(), line, sourcePath));
+					problems.put(language, langProblems);
 				}
 			}
-		}
-		catch (CoreException e)
-		{
-			IdeLog.logError(HTMLPlugin.getDefault(), "Failed to parse for HTML Parse Error Validation", e); //$NON-NLS-1$
 		}
 
 		context.putProblems(IHTMLConstants.HTML_PROBLEM, problems.get(IHTMLConstants.CONTENT_TYPE_HTML));
