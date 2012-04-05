@@ -123,4 +123,9 @@ public class ScopeParserTests extends TestCase
 	{
 		assertParseResult("text.html - (source | string)", "(- text.html (GROUP (| source string)))");
 	}
+
+	public void testNegativeLookaheadWithDescendantSelector()
+	{
+		assertParseResult("text.html - source string", "(- text.html (> source string)))");
+	}
 }
