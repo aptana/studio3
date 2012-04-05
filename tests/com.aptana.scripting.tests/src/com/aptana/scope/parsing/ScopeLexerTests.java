@@ -69,6 +69,31 @@ public class ScopeLexerTests extends TestCase
 		assertTokenType("name", ScopeTokenType.IDENTIFIER);
 	}
 
+	public void testIdentifierWithDashes()
+	{
+		assertTokenType("name-with-dashes", ScopeTokenType.IDENTIFIER);
+	}
+
+	public void testIdentifierWithUnderscores()
+	{
+		assertTokenType("name_with_underscores", ScopeTokenType.IDENTIFIER);
+	}
+
+	public void testIdentifierWithNumbers()
+	{
+		assertTokenType("name0", ScopeTokenType.IDENTIFIER);
+		assertTokenType("name1", ScopeTokenType.IDENTIFIER);
+		assertTokenType("name2", ScopeTokenType.IDENTIFIER);
+		assertTokenType("name3", ScopeTokenType.IDENTIFIER);
+		assertTokenType("name4", ScopeTokenType.IDENTIFIER);
+		assertTokenType("name5", ScopeTokenType.IDENTIFIER);
+		assertTokenType("name6", ScopeTokenType.IDENTIFIER);
+		assertTokenType("name7", ScopeTokenType.IDENTIFIER);
+		assertTokenType("name8", ScopeTokenType.IDENTIFIER);
+		assertTokenType("name9", ScopeTokenType.IDENTIFIER);
+		assertTokenType("name10", ScopeTokenType.IDENTIFIER);
+	}
+
 	public void testDottedIdentifier()
 	{
 		assertTokenType("name.another", ScopeTokenType.IDENTIFIER);
