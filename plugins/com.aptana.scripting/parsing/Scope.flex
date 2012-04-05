@@ -77,7 +77,10 @@ import com.aptana.scope.parsing.ScopeTokenType;
 LineTerminator = \r|\n|\r\n
 Whitespace = [ \t\f]
 
-Identifier = [a-zA-Z][-a-zA-Z]*(\.[a-zA-Z][-a-zA-Z]*)*
+StartLetter = [_a-zA-Z]
+BodyLetter = [-_a-zA-Z0-9]
+Word = {StartLetter}{BodyLetter}*
+Identifier = {Word}(\.{Word})*
 
 %%
 
