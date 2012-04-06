@@ -208,7 +208,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		if (classes != null)
 		{
 			UserAgentManager manager = UserAgentManager.getInstance();
-			String[] userAgentIds = manager.getActiveUserAgentIDs(); // classes can be used by all user agents
+			String[] userAgentIds = manager.getActiveUserAgentIDs(getProject()); // classes can be used by all user agents
 
 			for (Entry<String, String> entry : classes.entrySet())
 			{
@@ -233,7 +233,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		if (ids != null)
 		{
 			UserAgentManager manager = UserAgentManager.getInstance();
-			String[] userAgentIds = manager.getActiveUserAgentIDs(); // classes can be used by all user agents
+			String[] userAgentIds = manager.getActiveUserAgentIDs(getProject()); // classes can be used by all user agents
 
 			for (Entry<String, String> entry : ids.entrySet())
 			{
@@ -702,7 +702,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 
 		// build proposal
-		Image[] userAgents = UserAgentManager.getInstance().getUserAgentImages(getNatureIds(), userAgentIds);
+		Image[] userAgents = UserAgentManager.getInstance().getUserAgentImages(getProject(), userAgentIds);
 
 		CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength, length, image,
 				displayName, contextInfo, description);

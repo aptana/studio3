@@ -306,7 +306,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			}
 			List<String> userAgentList = element.getUserAgentNames();
 			String[] userAgents = userAgentList.toArray(new String[userAgentList.size()]);
-			Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(getNatureIds(), userAgents);
+			Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(getProject(), userAgents);
 
 			if (IdeLog.isTraceEnabled(HTMLPlugin.getDefault(), IDebugScopes.CONTENT_ASSIST))
 			{
@@ -475,7 +475,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		if (classes != null)
 		{
 			UserAgentManager manager = UserAgentManager.getInstance();
-			String[] userAgents = manager.getActiveUserAgentIDs(); // classes can be used by all user agents
+			String[] userAgents = manager.getActiveUserAgentIDs(getProject()); // classes can be used by all user agents
 
 			for (Entry<String, String> entry : classes.entrySet())
 			{
@@ -900,7 +900,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				}
 				positions.add(0, cursorPosition);
 				HTMLTagProposal proposal = new HTMLTagProposal(replacement.toString(), replaceOffset, replaceLength,
-						element, getNatureIds(), positions.toArray(new Integer[positions.size()]));
+						element, getProject(), positions.toArray(new Integer[positions.size()]));
 				proposals.add(proposal);
 			}
 		}
@@ -1121,7 +1121,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		List<String> userAgentList = element.getUserAgentNames();
 		String[] userAgents = userAgentList.toArray(new String[userAgentList.size()]);
-		Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(getNatureIds(), userAgents);
+		Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(getProject(), userAgents);
 		String replaceString = "/" + element.getName(); //$NON-NLS-1$
 		Lexeme<HTMLTokenType> firstLexeme = lexemeProvider.getFirstLexeme(); // Open of tag
 		Lexeme<HTMLTokenType> tagLexeme = lexemeProvider.getLexeme(1); // Tag name
@@ -1273,7 +1273,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			replaceLength = this._replaceRange.getLength();
 		}
 
-		Image[] userAgents = UserAgentManager.getInstance().getUserAgentImages(getNatureIds(), userAgentIds);
+		Image[] userAgents = UserAgentManager.getInstance().getUserAgentImages(getProject(), userAgentIds);
 
 		// build proposal
 		CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength, length, image,

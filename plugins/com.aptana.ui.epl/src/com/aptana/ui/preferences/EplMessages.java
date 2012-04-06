@@ -20,6 +20,8 @@ public class EplMessages extends NLS
 	public static String PropertyAndPreferencePage_configureProjectSettings;
 	public static String PropertyAndPreferencePage_configureWorkspaceSettings;
 	public static String PropertyAndPreferencePage_enableProjectSpecific;
+	public static String PropertyAndPreferencePage_projectSettingsLabel;
+	public static String PropertyAndPreferencePage_workspaceSettingsLabel;
 
 	static
 	{
