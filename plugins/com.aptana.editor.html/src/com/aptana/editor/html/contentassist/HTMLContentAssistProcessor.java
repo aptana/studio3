@@ -201,7 +201,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	static
 	{
 		// @formatter:off
-		locationMap = CollectionsUtil.<String, LocationType>newMap(
+		locationMap = CollectionsUtil.newTypedMap(
 			String.class, LocationType.class,
 			HTMLSourceConfiguration.DEFAULT, LocationType.IN_TEXT,
 			HTMLSourceConfiguration.HTML_COMMENT, LocationType.IN_COMMENT,

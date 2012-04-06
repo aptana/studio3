@@ -481,8 +481,8 @@ public class ContentAssistPreferencePage extends PropertyAndPreferenceFieldEdito
 				{
 					userAgentIDs[i] = userAgents[i].ID;
 				}
-				manager.savePreference(project, CollectionsUtil.<String, String[]> newMap(String.class, String[].class,
-						activeNatureID, userAgentIDs));
+				manager.savePreference(project,
+						CollectionsUtil.newTypedMap(String.class, String[].class, activeNatureID, userAgentIDs));
 			}
 			else
 			{

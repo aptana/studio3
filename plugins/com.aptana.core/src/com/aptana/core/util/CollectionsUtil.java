@@ -508,7 +508,7 @@ public class CollectionsUtil
 	 *            An interleaved list of keys and values
 	 * @return Returns a new HashMap<T, U> or an empty map
 	 */
-	public static final <T, U> Map<T, U> newMap(Class<T> keyType, Class<U> valueType, Object... items)
+	public static final <T, U> Map<T, U> newTypedMap(Class<T> keyType, Class<U> valueType, Object... items)
 	{
 		Map<T, U> result;
 

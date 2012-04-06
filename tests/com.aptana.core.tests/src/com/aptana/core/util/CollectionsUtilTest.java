@@ -508,7 +508,7 @@ public class CollectionsUtilTest extends TestCase
 			CollectionsUtil.newMap("item1", "item2", "item3");
 			fail("Failed to throw IllegalArgumentException with odd number of items");
 		}
-		catch( IllegalArgumentException e)
+		catch (IllegalArgumentException e)
 		{
 			// what we're expecting
 		}
@@ -517,7 +517,7 @@ public class CollectionsUtilTest extends TestCase
 	public void testNewMapDefinedTypes()
 	{
 		// @formatter:off
-		Map<String, Integer> map = CollectionsUtil.<String, Integer>newMap(
+		Map<String, Integer> map = CollectionsUtil.newTypedMap(
 				String.class, Integer.class,
 				"item1", 1,
 				"item2", 2,
@@ -535,10 +535,10 @@ public class CollectionsUtilTest extends TestCase
 	{
 		try
 		{
-			CollectionsUtil.<String, Integer>newMap(String.class, Integer.class, "item1", 1, "item3");
+			CollectionsUtil.newTypedMap(String.class, Integer.class, "item1", 1, "item3");
 			fail("Failed to throw IllegalArgumentException with odd number of items");
 		}
-		catch( IllegalArgumentException e)
+		catch (IllegalArgumentException e)
 		{
 			// what we're expecting
 		}
@@ -626,7 +626,7 @@ public class CollectionsUtilTest extends TestCase
 
 	public void testAddUnevenItemsToMapDefinedTypes()
 	{
-		Map<String, Integer> map = CollectionsUtil.<String, Integer>newMap(String.class, Integer.class, "a", 1);
+		Map<String, Integer> map = CollectionsUtil.newTypedMap(String.class, Integer.class, "a", 1);
 		assertNotNull(map);
 		try
 		{
