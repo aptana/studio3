@@ -34,6 +34,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChang
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.jface.preference.PreferenceConverter;
+import org.eclipse.jface.resource.DataFormatException;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.jface.text.TextAttribute;
@@ -214,31 +215,74 @@ public class ThemeManager implements IThemeManager
 		setAptanaEditorColorsToMatchTheme(theme);
 
 		// Set the diff/compare colors based on theme
-		setQuickDiffColors(EclipseUtil.instanceScope().getNode("com.aptana.editor.common")); //$NON-NLS-1$
-		if (ThemePlugin.applyToAllEditors())
-		{
-			setQuickDiffColors(EclipseUtil.instanceScope().getNode("org.eclipse.ui.editors")); //$NON-NLS-1$
-		}
+		setCompareColors("com.aptana.editor.common", true); //$NON-NLS-1$
+		setCompareColors("org.eclipse.ui.editors", ThemePlugin.applyToAllEditors()); //$NON-NLS-1$
 
 		notifyThemeChangeListeners(theme);
 
 		forceFontsUpToDate();
 	}
 
-	private void setQuickDiffColors(IEclipsePreferences prefs)
+	// APSTUD-4152
+	private void setCompareColors(String nodeName, boolean override)
 	{
-		RGB bg = getCurrentTheme().getBackground();
-		RGB inverted = new RGB(255 - bg.red, 255 - bg.green, 255 - bg.blue);
+		IEclipsePreferences instancePrefs = EclipseUtil.instanceScope().getNode(nodeName);
 
-		// APSTUD-4152
-		JFaceResources.getColorRegistry().put("INCOMING_COLOR", inverted); //$NON-NLS-1$
-		JFaceResources.getColorRegistry().put("OUTGOING_COLOR", inverted); //$NON-NLS-1$
-		prefs.put("INCOMING_COLOR", StringConverter.asString(inverted)); //$NON-NLS-1$
-		prefs.put("OUTGOING_COLOR", StringConverter.asString(inverted)); //$NON-NLS-1$
+		if (override)
+		{
+			RGB bg = getCurrentTheme().getBackground();
+			RGB inverted = new RGB(255 - bg.red, 255 - bg.green, 255 - bg.blue);
+
+			JFaceResources.getColorRegistry().put("INCOMING_COLOR", inverted); //$NON-NLS-1$
+			JFaceResources.getColorRegistry().put("OUTGOING_COLOR", inverted); //$NON-NLS-1$
+			instancePrefs.put("INCOMING_COLOR", StringConverter.asString(inverted)); //$NON-NLS-1$
+			instancePrefs.put("OUTGOING_COLOR", StringConverter.asString(inverted)); //$NON-NLS-1$
+		}
+		else
+		{
+			// Revert to defaults if we have them
+			IEclipsePreferences defPrefs = EclipseUtil.defaultScope().getNode(nodeName);
+			String value = defPrefs.get("OUTGOING_COLOR", null); //$NON-NLS-1$
+			if (value != null)
+			{
+				try
+				{
+					RGB rgb = StringConverter.asRGB(value);
+					if (rgb != null)
+					{
+						JFaceResources.getColorRegistry().put("OUTGOING_COLOR", rgb); //$NON-NLS-1$
+					}
+				}
+				catch (DataFormatException e)
+				{
+					// ignore
+				}
+			}
+			value = defPrefs.get("INCOMING_COLOR", null); //$NON-NLS-1$
+			if (value != null)
+			{
+				try
+				{
+					RGB rgb = StringConverter.asRGB(value);
+					if (rgb != null)
+					{
+						JFaceResources.getColorRegistry().put("INCOMING_COLOR", rgb); //$NON-NLS-1$
+					}
+				}
+				catch (DataFormatException e)
+				{
+					// ignore
+				}
+			}
+
+			// Now remove the instance prefs
+			instancePrefs.remove("INCOMING_COLOR"); //$NON-NLS-1$
+			instancePrefs.remove("OUTGOING_COLOR"); //$NON-NLS-1$
+		}
 
 		try
 		{
-			prefs.flush();
+			instancePrefs.flush();
 		}
 		catch (BackingStoreException e)
 		{
