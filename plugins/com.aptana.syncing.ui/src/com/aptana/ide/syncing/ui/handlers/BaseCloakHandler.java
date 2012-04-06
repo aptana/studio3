@@ -10,7 +10,7 @@ package com.aptana.ide.syncing.ui.handlers;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.expressions.EvaluationContext;
+import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.filesystem.URIUtil;
@@ -43,9 +43,9 @@ public abstract class BaseCloakHandler extends BaseSyncHandler
 	public void setEnabled(Object evaluationContext)
 	{
 		fSelectedFiles.clear();
-		if (evaluationContext instanceof EvaluationContext)
+		if (evaluationContext instanceof IEvaluationContext)
 		{
-			Object activePart = ((EvaluationContext) evaluationContext).getVariable(ISources.ACTIVE_PART_NAME);
+			Object activePart = ((IEvaluationContext) evaluationContext).getVariable(ISources.ACTIVE_PART_NAME);
 			if (activePart instanceof IEditorPart)
 			{
 				IEditorInput editorInput = ((IEditorPart) activePart).getEditorInput();
@@ -90,7 +90,7 @@ public abstract class BaseCloakHandler extends BaseSyncHandler
 			}
 			else
 			{
-				Object value = ((EvaluationContext) evaluationContext)
+				Object value = ((IEvaluationContext) evaluationContext)
 						.getVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME);
 				if (value instanceof ISelection)
 				{

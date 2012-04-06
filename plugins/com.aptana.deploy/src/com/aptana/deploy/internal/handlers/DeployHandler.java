@@ -10,7 +10,7 @@ package com.aptana.deploy.internal.handlers;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.expressions.EvaluationContext;
+import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
@@ -73,9 +73,9 @@ public class DeployHandler extends AbstractHandler
 	public void setEnabled(Object evaluationContext)
 	{
 		selectedContainer = null;
-		if (evaluationContext instanceof EvaluationContext)
+		if (evaluationContext instanceof IEvaluationContext)
 		{
-			Object activePart = ((EvaluationContext) evaluationContext).getVariable(ISources.ACTIVE_PART_NAME);
+			Object activePart = ((IEvaluationContext) evaluationContext).getVariable(ISources.ACTIVE_PART_NAME);
 			if (activePart instanceof IEditorPart)
 			{
 				IEditorInput editorInput = ((IEditorPart) activePart).getEditorInput();
@@ -87,7 +87,7 @@ public class DeployHandler extends AbstractHandler
 			}
 			else
 			{
-				Object value = ((EvaluationContext) evaluationContext)
+				Object value = ((IEvaluationContext) evaluationContext)
 						.getVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME);
 				if (value instanceof ISelection)
 				{
