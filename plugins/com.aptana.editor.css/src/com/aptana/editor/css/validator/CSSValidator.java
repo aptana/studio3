@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -25,7 +25,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.w3c.css.css.StyleReport;
 import org.w3c.css.css.StyleReportFactory;
@@ -359,8 +358,8 @@ public class CSSValidator extends AbstractBuildParticipant
 		ac.setProfile(APTANA_PROFILE);
 		try
 		{
-			parser.parseStyleElement(ac,
-					new ByteArrayInputStream(source.getBytes(IOUtil.UTF_8)), null, null, path.toURL(), 0);
+			parser.parseStyleElement(ac, new ByteArrayInputStream(source.getBytes(IOUtil.UTF_8)), null, null,
+					path.toURL(), 0);
 		}
 		catch (MalformedURLException e)
 		{
@@ -469,21 +468,16 @@ public class CSSValidator extends AbstractBuildParticipant
 		}
 
 		List<IProblem> problems = new ArrayList<IProblem>();
-		try
-		{
-			String source = context.getContents();
-			URI uri = context.getURI();
-			String path = uri.toString();
 
-			String report = getReport(source, uri);
-			List<String> filters = getFilters();
-			processErrorsInReport(report, path, problems, filters);
-			processWarningsInReport(report, path, problems, filters);
-		}
-		catch (CoreException e)
-		{
-			IdeLog.logError(CSSPlugin.getDefault(), e);
-		}
+		String source = context.getContents();
+		URI uri = context.getURI();
+		String path = uri.toString();
+
+		String report = getReport(source, uri);
+		List<String> filters = getFilters();
+		processErrorsInReport(report, path, problems, filters);
+		processWarningsInReport(report, path, problems, filters);
+
 		context.putProblems(ICSSConstants.W3C_PROBLEM, problems);
 	}
 

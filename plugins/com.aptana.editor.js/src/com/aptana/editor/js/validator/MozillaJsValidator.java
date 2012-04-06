@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.mozilla.javascript.CompilerEnvirons;
 import org.mozilla.javascript.Context;
@@ -22,9 +21,7 @@ import org.mozilla.javascript.Parser;
 
 import com.aptana.core.build.AbstractBuildParticipant;
 import com.aptana.core.build.IProblem;
-import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.js.IJSConstants;
-import com.aptana.editor.js.JSPlugin;
 import com.aptana.index.core.build.BuildContext;
 
 public class MozillaJsValidator extends AbstractBuildParticipant
@@ -75,10 +72,6 @@ public class MozillaJsValidator extends AbstractBuildParticipant
 			{
 				// ignores the exception here
 			}
-		}
-		catch (CoreException e)
-		{
-			IdeLog.logError(JSPlugin.getDefault(), "Failed to parse for Mozilla JS Validation", e); //$NON-NLS-1$
 		}
 		finally
 		{
