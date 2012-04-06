@@ -46,6 +46,7 @@ import com.aptana.editor.css.contentassist.model.PropertyElement;
 import com.aptana.editor.css.contentassist.model.PseudoClassElement;
 import com.aptana.editor.css.contentassist.model.PseudoElementElement;
 import com.aptana.editor.css.contentassist.model.ValueElement;
+import com.aptana.editor.css.internal.text.CSSModelFormatter;
 import com.aptana.editor.css.parsing.CSSTokenScanner;
 import com.aptana.editor.css.parsing.lexer.CSSLexemeProvider;
 import com.aptana.editor.css.parsing.lexer.CSSTokenType;
@@ -127,7 +128,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		{
 			for (ElementElement element : elements)
 			{
-				String description = CSSModelFormatter.getDescription(element);
+				String description = CSSModelFormatter.ADDITIONAL_INFO.getDocumentation(element);
 				List<String> userAgentIdList = element.getUserAgentNames();
 				String[] userAgentIds = userAgentIdList.toArray(new String[userAgentIdList.size()]);
 
@@ -184,7 +185,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 
 			for (PropertyElement property : properties)
 			{
-				String description = CSSModelFormatter.getDescription(property);
+				String description = CSSModelFormatter.ADDITIONAL_INFO.getDocumentation(property);
 				List<String> userAgentIdList = property.getUserAgentNames();
 				String[] userAgentIds = userAgentIdList.toArray(new String[userAgentIdList.size()]);
 
@@ -605,7 +606,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		{
 			for (PseudoClassElement pseudoClass : classes)
 			{
-				String description = CSSModelFormatter.getDescription(pseudoClass);
+				String description = CSSModelFormatter.ADDITIONAL_INFO.getDocumentation(pseudoClass);
 				List<String> userAgentIdList = pseudoClass.getUserAgentNames();
 				String[] userAgentIds = userAgentIdList.toArray(new String[userAgentIdList.size()]);
 
@@ -622,7 +623,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 				{
 					continue;
 				}
-				String description = CSSModelFormatter.getDescription(pseudoElement);
+				String description = CSSModelFormatter.ADDITIONAL_INFO.getDocumentation(pseudoElement);
 				List<String> userAgentIdList = pseudoElement.getUserAgentNames();
 				String[] userAgentIds = userAgentIdList.toArray(new String[userAgentIdList.size()]);
 
@@ -644,7 +645,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		{
 			for (PseudoElementElement pseudoElement : elements)
 			{
-				String description = CSSModelFormatter.getDescription(pseudoElement);
+				String description = CSSModelFormatter.ADDITIONAL_INFO.getDocumentation(pseudoElement);
 				List<String> userAgentIdList = pseudoElement.getUserAgentNames();
 				String[] userAgentIds = userAgentIdList.toArray(new String[userAgentIdList.size()]);
 
