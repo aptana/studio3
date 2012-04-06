@@ -99,7 +99,7 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 		{
 			int oldIndex = 0;
 			int newIndex = 0;
-			int oldLength = oldPositions.length;
+			int oldLength = (oldPositions == null) ? 0 : oldPositions.length;
 			int newLength = newPositions.size();
 			while (newIndex < newLength && oldIndex < oldLength)
 			{
