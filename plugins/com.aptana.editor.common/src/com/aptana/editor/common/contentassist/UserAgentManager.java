@@ -33,6 +33,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.ConfigurationElementDispatcher;
 import com.aptana.core.util.EclipseUtil;
@@ -141,8 +142,6 @@ public class UserAgentManager
 		}
 	}
 
-	// empty array constants
-	private static final String[] NO_STRINGS = new String[0];
 	public static final UserAgent[] NO_USER_AGENTS = new UserAgent[0];
 
 	/**
@@ -279,7 +278,7 @@ public class UserAgentManager
 	{
 		if (project == null)
 		{
-			return NO_STRINGS;
+			return ArrayUtil.NO_STRINGS;
 		}
 		// Extract the natures from the given project
 		String[] natureIDs = getProjectNatures(project);
@@ -309,7 +308,7 @@ public class UserAgentManager
 	 */
 	public static String[] getProjectNatures(IProject project)
 	{
-		String[] natureIDs = NO_STRINGS;
+		String[] natureIDs = ArrayUtil.NO_STRINGS;
 		try
 		{
 			natureIDs = ResourceUtil.getAptanaNatures(project.getDescription());
@@ -344,14 +343,19 @@ public class UserAgentManager
 	 */
 	private String[] getActiveUserAgentIDs(Map<String, String[]> userAgents, String... natureIDs)
 	{
-		String[] result = NO_STRINGS;
+		String[] result = ArrayUtil.NO_STRINGS;
 
-		if (natureIDs != null && natureIDs.length > 0)
+		if (!ArrayUtil.isEmpty(natureIDs))
 		{
 			// NOTE: Currently, we only care about the primary nature.
 			String natureID = natureIDs[0];
 
 			result = userAgents.get(natureID);
+		}
+		else
+		{
+			IdeLog.logWarning(CommonEditorPlugin.getDefault(), "UserAgentManager - Got empty natures list", //$NON-NLS-1$
+					IDebugScopes.CONTENT_ASSIST);
 		}
 
 		return result;
@@ -636,7 +640,7 @@ public class UserAgentManager
 				}
 				else
 				{
-					result.put(natureID, NO_STRINGS);
+					result.put(natureID, ArrayUtil.NO_STRINGS);
 				}
 			}
 		}
@@ -763,7 +767,7 @@ public class UserAgentManager
 	{
 		if (!StringUtil.isEmpty(natureID))
 		{
-			String[] value = (userAgentIDs != null) ? userAgentIDs : NO_STRINGS;
+			String[] value = (userAgentIDs != null) ? userAgentIDs : ArrayUtil.NO_STRINGS;
 
 			ACTIVE_USER_AGENTS_BY_NATURE_ID.put(natureID, value);
 		}

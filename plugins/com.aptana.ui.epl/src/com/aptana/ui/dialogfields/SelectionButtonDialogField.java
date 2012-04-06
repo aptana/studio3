@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2007 IBM Corporation and others.
+ * Copyright (c) 2000, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -49,9 +49,9 @@ public class SelectionButtonDialogField extends DialogField
 	public void attachDialogFields(DialogField[] dialogFields)
 	{
 		fAttachedDialogFields = dialogFields;
-		for (int i = 0; i < dialogFields.length; i++)
+		for (DialogField field : dialogFields)
 		{
-			dialogFields[i].setEnabled(fIsSelected);
+			field.setEnabled(fIsSelected);
 		}
 	}
 
@@ -152,12 +152,12 @@ public class SelectionButtonDialogField extends DialogField
 			if (fAttachedDialogFields != null)
 			{
 				boolean focusSet = false;
-				for (int i = 0; i < fAttachedDialogFields.length; i++)
+				for (DialogField field : fAttachedDialogFields)
 				{
-					fAttachedDialogFields[i].setEnabled(fIsSelected);
+					field.setEnabled(fIsSelected);
 					if (fIsSelected && !focusSet)
 					{
-						focusSet = fAttachedDialogFields[i].setFocus();
+						focusSet = field.setFocus();
 					}
 				}
 			}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2007 IBM Corporation and others.
+ * Copyright (c) 2000, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,6 +16,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+
+import com.aptana.core.util.StringUtil;
 
 /**
  * Base class of all dialog fields. Dialog fields manage controls together with the model, independed from the creation
@@ -36,7 +38,7 @@ public class DialogField
 	{
 		fEnabled = true;
 		fLabel = null;
-		fLabelText = ""; //$NON-NLS-1$
+		fLabelText = StringUtil.EMPTY;
 	}
 
 	/**
@@ -149,7 +151,8 @@ public class DialogField
 			fLabel = new Label(parent, SWT.LEFT | SWT.WRAP);
 			fLabel.setFont(parent.getFont());
 			fLabel.setEnabled(fEnabled);
-			if (fLabelText != null && !"".equals(fLabelText)) { //$NON-NLS-1$
+			if (!StringUtil.isEmpty(fLabelText))
+			{
 				fLabel.setText(fLabelText);
 			}
 			else
