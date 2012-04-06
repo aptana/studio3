@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -24,6 +25,7 @@ import com.aptana.core.build.IProblem;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.IOUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.IndexPlugin;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ParseState;
@@ -147,11 +149,18 @@ public class BuildContext
 		fParseState = null;
 	}
 
-	public synchronized String getContents() throws CoreException
+	public synchronized String getContents()
 	{
 		if (fContents == null)
 		{
-			fContents = IOUtil.read(openInputStream(new NullProgressMonitor()), getCharset());
+			try
+			{
+				fContents = IOUtil.read(openInputStream(new NullProgressMonitor()), getCharset());
+			}
+			catch (CoreException e)
+			{
+				fContents = StringUtil.EMPTY;
+			}
 		}
 		return fContents;
 	}
@@ -252,9 +261,14 @@ public class BuildContext
 	public InputStream openInputStream(IProgressMonitor monitor) throws CoreException
 	{
 		IFile file = getFile();
-		if (file == null || !file.exists())
+		if (file == null)
 		{
-			return new ByteArrayInputStream(new byte[0]);
+			return new ByteArrayInputStream(ArrayUtil.NO_BYTES);
+		}
+		file.refreshLocal(IResource.DEPTH_ZERO, null);
+		if (!file.exists())
+		{
+			return new ByteArrayInputStream(ArrayUtil.NO_BYTES);
 		}
 		return file.getContents();
 	}

@@ -19,9 +19,7 @@ import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.core.build.IProblem;
 import com.aptana.core.build.RequiredBuildParticipant;
-import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.IMarkerConstants;
-import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.css.internal.build.CSSTaskDetector;
 import com.aptana.editor.html.parsing.ast.HTMLCommentNode;
@@ -111,10 +109,6 @@ public class HTMLTaskDetector extends RequiredBuildParticipant
 				}
 				sub.worked(1);
 			}
-		}
-		catch (CoreException e)
-		{
-			IdeLog.logError(CSSPlugin.getDefault(), e);
 		}
 		finally
 		{

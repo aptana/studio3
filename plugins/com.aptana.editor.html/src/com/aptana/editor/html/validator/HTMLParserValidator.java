@@ -23,11 +23,9 @@ import org.eclipse.jface.text.IDocument;
 import com.aptana.core.build.AbstractBuildParticipant;
 import com.aptana.core.build.IProblem;
 import com.aptana.core.build.Problem;
-import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.css.ICSSConstants;
-import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.IHTMLConstants;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.index.core.build.BuildContext;
@@ -49,15 +47,7 @@ public class HTMLParserValidator extends AbstractBuildParticipant
 		{
 			return;
 		}
-		String source = null;
-		try
-		{
-			source = context.getContents();
-		}
-		catch (CoreException e)
-		{
-			IdeLog.logWarning(HTMLPlugin.getDefault(), "Failed to grab the HTML content", e); //$NON-NLS-1$
-		}
+		String source = context.getContents();
 
 		Map<String, List<IProblem>> problems = new HashMap<String, List<IProblem>>();
 		problems.put(IHTMLConstants.CONTENT_TYPE_HTML, new ArrayList<IProblem>());

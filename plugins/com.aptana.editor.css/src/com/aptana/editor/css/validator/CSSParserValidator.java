@@ -21,9 +21,7 @@ import org.eclipse.jface.text.IDocument;
 import com.aptana.core.build.AbstractBuildParticipant;
 import com.aptana.core.build.IProblem;
 import com.aptana.core.build.Problem;
-import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
-import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.ICSSConstants;
 import com.aptana.index.core.build.BuildContext;
 import com.aptana.parsing.ast.IParseError;
@@ -55,43 +53,36 @@ public class CSSParserValidator extends AbstractBuildParticipant
 			// ignores the parser exception
 		}
 
-		try
+		// Add parse errors...
+		if (!CollectionsUtil.isEmpty(context.getParseErrors()))
 		{
-			// Add parse errors...
-			if (!CollectionsUtil.isEmpty(context.getParseErrors()))
+			String source = context.getContents();
+			URI uri = context.getURI();
+			String path = uri.toString();
+			IDocument doc = null;
+			if (source != null)
 			{
-				String source = context.getContents();
-				URI uri = context.getURI();
-				String path = uri.toString();
-				IDocument doc = null;
-				if (source != null)
-				{
-					doc = new Document(source);
-				}
-				for (IParseError parseError : context.getParseErrors())
-				{
-					int severity = (parseError.getSeverity() == Severity.ERROR) ? IMarker.SEVERITY_ERROR
-							: IMarker.SEVERITY_WARNING;
-					int line = -1;
-					try
-					{
-						if (doc != null)
-						{
-							line = doc.getLineOfOffset(parseError.getOffset()) + 1;
-						}
-					}
-					catch (BadLocationException e)
-					{
-						// ignore
-					}
-					problems.add(new Problem(severity, parseError.getMessage(), parseError.getOffset(), parseError
-							.getLength(), line, path));
-				}
+				doc = new Document(source);
 			}
-		}
-		catch (CoreException e)
-		{
-			IdeLog.logError(CSSPlugin.getDefault(), e);
+			for (IParseError parseError : context.getParseErrors())
+			{
+				int severity = (parseError.getSeverity() == Severity.ERROR) ? IMarker.SEVERITY_ERROR
+						: IMarker.SEVERITY_WARNING;
+				int line = -1;
+				try
+				{
+					if (doc != null)
+					{
+						line = doc.getLineOfOffset(parseError.getOffset()) + 1;
+					}
+				}
+				catch (BadLocationException e)
+				{
+					// ignore
+				}
+				problems.add(new Problem(severity, parseError.getMessage(), parseError.getOffset(), parseError
+						.getLength(), line, path));
+			}
 		}
 
 		context.putProblems(ICSSConstants.CSS_PROBLEM, problems);

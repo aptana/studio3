@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
@@ -64,21 +63,14 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 		}
 
 		List<IProblem> problems = new ArrayList<IProblem>();
-		try
-		{
 
-			String source = context.getContents();
+		String source = context.getContents();
 
-			if (!StringUtil.isEmpty(source))
-			{
-				URI path = context.getURI();
-				String sourcePath = path.toString();
-				runTidy(sourcePath, source, problems);
-			}
-		}
-		catch (CoreException e)
+		if (!StringUtil.isEmpty(source))
 		{
-			IdeLog.logError(HTMLPlugin.getDefault(), "Failed to parse for HTML Tidy Validation", e); //$NON-NLS-1$
+			URI path = context.getURI();
+			String sourcePath = path.toString();
+			runTidy(sourcePath, source, problems);
 		}
 
 		context.putProblems(IHTMLConstants.TIDY_PROBLEM, problems);
