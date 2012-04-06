@@ -26,7 +26,6 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.progress.UIJob;
@@ -286,20 +285,13 @@ public class GitUIPlugin extends AbstractUIPlugin
 
 				protected void setQuickDiffColors(IEclipsePreferences prefs)
 				{
-					IThemeManager tm = ThemePlugin.getDefault().getThemeManager();
-					RGB bg = tm.getCurrentTheme().getBackground();
-					RGB inverted = new RGB(255 - bg.red, 255 - bg.green, 255 - bg.blue);
-
 					prefs.put("changeIndicationColor", StringConverter.asString(GitColors.greenBG().getRGB())); //$NON-NLS-1$
 					prefs.put("additionIndicationColor", StringConverter.asString(GitColors.greenBG().getRGB())); //$NON-NLS-1$
 					prefs.put("deletionIndicationColor", StringConverter.asString(GitColors.redBG().getRGB())); //$NON-NLS-1$
 					// APSTUD-4152
-					JFaceResources.getColorRegistry().put("INCOMING_COLOR", inverted); //$NON-NLS-1$
-					JFaceResources.getColorRegistry().put("OUTGOING_COLOR", inverted); //$NON-NLS-1$
+					// See ThemeManager#setCurrentTheme() for outgoing/incoming diff/compare colors
 					JFaceResources.getColorRegistry().put("CONFLICTING_COLOR", GitColors.redBG().getRGB()); //$NON-NLS-1$
 					JFaceResources.getColorRegistry().put("RESOLVED_COLOR", GitColors.greenBG().getRGB()); //$NON-NLS-1$
-					prefs.put("INCOMING_COLOR", StringConverter.asString(inverted)); //$NON-NLS-1$
-					prefs.put("OUTGOING_COLOR", StringConverter.asString(inverted)); //$NON-NLS-1$
 					prefs.put("CONFLICTING_COLOR", StringConverter.asString(GitColors.redBG().getRGB())); //$NON-NLS-1$
 					prefs.put("RESOLVED_COLOR", StringConverter.asString(GitColors.greenBG().getRGB())); //$NON-NLS-1$
 

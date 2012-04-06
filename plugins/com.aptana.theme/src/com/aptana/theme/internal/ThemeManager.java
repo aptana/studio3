@@ -213,9 +213,37 @@ public class ThemeManager implements IThemeManager
 		// Also set the standard eclipse editor props, like fg, bg, selection fg, bg
 		setAptanaEditorColorsToMatchTheme(theme);
 
+		// Set the diff/compare colors based on theme
+		setQuickDiffColors(EclipseUtil.instanceScope().getNode("com.aptana.editor.common")); //$NON-NLS-1$
+		if (ThemePlugin.applyToAllEditors())
+		{
+			setQuickDiffColors(EclipseUtil.instanceScope().getNode("org.eclipse.ui.editors")); //$NON-NLS-1$
+		}
+
 		notifyThemeChangeListeners(theme);
 
 		forceFontsUpToDate();
+	}
+
+	private void setQuickDiffColors(IEclipsePreferences prefs)
+	{
+		RGB bg = getCurrentTheme().getBackground();
+		RGB inverted = new RGB(255 - bg.red, 255 - bg.green, 255 - bg.blue);
+
+		// APSTUD-4152
+		JFaceResources.getColorRegistry().put("INCOMING_COLOR", inverted); //$NON-NLS-1$
+		JFaceResources.getColorRegistry().put("OUTGOING_COLOR", inverted); //$NON-NLS-1$
+		prefs.put("INCOMING_COLOR", StringConverter.asString(inverted)); //$NON-NLS-1$
+		prefs.put("OUTGOING_COLOR", StringConverter.asString(inverted)); //$NON-NLS-1$
+
+		try
+		{
+			prefs.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			IdeLog.logError(ThemePlugin.getDefault(), e);
+		}
 	}
 
 	private void setSearchResultColor(Theme theme)
