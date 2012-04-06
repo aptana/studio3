@@ -662,14 +662,16 @@ public class ParseNode extends Node implements IParseNode
 				source = ""; //$NON-NLS-1$
 			}
 
-			String message = MessageFormat.format( //
-					Messages.ParseNode_Bad_Ending_Offset, //
-					start, //
-					end, //
-					this.getLanguage(), //
-					this.getNodeType(), //
-					source //
-					);
+			// @formatter:off
+			String message = MessageFormat.format(
+				Messages.ParseNode_Bad_Ending_Offset,
+				start,
+				end,
+				this.getLanguage(),
+				this.getNodeType(),
+				source
+			);
+			// @formatter:on
 
 			IdeLog.logError(ParsingPlugin.getDefault(), message);
 
