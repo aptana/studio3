@@ -16,6 +16,7 @@ import java.util.List;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.expressions.EvaluationContext;
+import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IContainer;
@@ -134,7 +135,7 @@ public class EditorLineHyperlink implements IHyperlink
 			ParameterizedCommand pc = ParameterizedCommand.generateCommand(command, null);
 			List<Object> list = new ArrayList<Object>();
 			list.add(store);
-			EvaluationContext context = new EvaluationContext(service.getCurrentState(), list);
+			IEvaluationContext context = new EvaluationContext(service.getCurrentState(), list);
 			context.addVariable(ISources.SHOW_IN_SELECTION, new StructuredSelection(list));
 			try
 			{

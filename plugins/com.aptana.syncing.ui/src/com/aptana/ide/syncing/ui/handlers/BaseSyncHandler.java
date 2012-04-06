@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.commands.AbstractHandler;
-import org.eclipse.core.expressions.EvaluationContext;
+import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.runtime.CoreException;
@@ -63,9 +63,9 @@ public abstract class BaseSyncHandler extends AbstractHandler
 	public void setEnabled(Object evaluationContext)
 	{
 		fSelectedResources = null;
-		if (evaluationContext instanceof EvaluationContext)
+		if (evaluationContext instanceof IEvaluationContext)
 		{
-			Object value = ((EvaluationContext) evaluationContext).getVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME);
+			Object value = ((IEvaluationContext) evaluationContext).getVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME);
 			if (value instanceof ISelection)
 			{
 				ISelection selections = (ISelection) value;
@@ -85,7 +85,7 @@ public abstract class BaseSyncHandler extends AbstractHandler
 				else
 				{
 					// checks the active editor
-					value = ((EvaluationContext) evaluationContext).getVariable(ISources.ACTIVE_EDITOR_NAME);
+					value = ((IEvaluationContext) evaluationContext).getVariable(ISources.ACTIVE_EDITOR_NAME);
 					if (value instanceof IEditorPart)
 					{
 						IAdaptable resource = null;

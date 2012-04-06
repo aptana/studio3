@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.commands.AbstractHandler;
-import org.eclipse.core.expressions.EvaluationContext;
+import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -90,9 +90,9 @@ abstract class BaseHandler extends AbstractHandler
 		// clear cached selection
 		this.clearFileStores();
 
-		if (evaluationContext instanceof EvaluationContext)
+		if (evaluationContext instanceof IEvaluationContext)
 		{
-			EvaluationContext context = (EvaluationContext) evaluationContext;
+			IEvaluationContext context = (IEvaluationContext) evaluationContext;
 			Object value = context.getVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME);
 
 			if (value instanceof ISelection)
