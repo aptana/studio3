@@ -34,5 +34,12 @@
             priority="normal">
       </content-type>
    </extension>
+   <extension
+         point="com.aptana.parsing.parser">
+      <parser
+            class="com.aptana.editor.text.parsing.GenericTextParser"
+            content-type="com.aptana.editor.text.content-type.generic">
+      </parser>
+   </extension>
 
 </plugin>
