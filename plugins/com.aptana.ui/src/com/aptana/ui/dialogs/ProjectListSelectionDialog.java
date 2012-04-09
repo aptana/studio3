@@ -26,12 +26,12 @@ import com.aptana.ui.UIPlugin;
 /**
  * @author Max Stepanov
  */
-public class ProjectSelectionDialog extends ElementListSelectionDialog {
+public class ProjectListSelectionDialog extends ElementListSelectionDialog {
 
 	/**
 	 * @param parent
 	 */
-	public ProjectSelectionDialog(Shell parent) {
+	public ProjectListSelectionDialog(Shell parent) {
 		super(parent, WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider());
 		setTitle(Messages.ProjectSelectionDialog_Title);
 		setMessage(Messages.ProjectSelectionDialog_Message);
