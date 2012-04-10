@@ -59,9 +59,11 @@ public class UniformFileStoreEditorInputFactory implements IElementFactory
 		return null;
 	}
 
-	public static IEditorInput getUniformEditorInput(IFileStore fileStore, IProgressMonitor monitor) throws CoreException
+	public static IEditorInput getUniformEditorInput(IFileStore fileStore, IProgressMonitor monitor)
+			throws CoreException
 	{
-		if (fileStore.getFileSystem() == EFS.getLocalFileSystem()) { // $codepro.audit.disable useEquals
+		if (fileStore.getFileSystem() == EFS.getLocalFileSystem())
+		{ // $codepro.audit.disable useEquals
 			return new FileStoreEditorInput(fileStore);
 		}
 		IFileInfo remoteFileInfo = fileStore.fetchInfo(EFS.NONE, monitor);
@@ -84,7 +86,8 @@ public class UniformFileStoreEditorInputFactory implements IElementFactory
 	 *            the progress monitor (could be null)
 	 * @return File the local file store
 	 */
-	private static IFileStore toLocalFileStore(IFileStore fileStore, IFileInfo fileInfo, IProgressMonitor monitor) throws CoreException
+	private static IFileStore toLocalFileStore(IFileStore fileStore, IFileInfo fileInfo, IProgressMonitor monitor)
+			throws CoreException
 	{
 		File file = fileStore.toLocalFile(EFS.NONE, monitor);
 		if (file != null)
@@ -99,7 +102,10 @@ public class UniformFileStoreEditorInputFactory implements IElementFactory
 			{
 				prefix.append('_');
 			}
-			file = File.createTempFile(prefix.toString(), fileStore.getName());
+			String prefixStr = prefix.toString();
+			File destDir = new File(System.getProperty("java.io.tmpdir"), prefixStr); //$NON-NLS-1$
+			destDir.mkdirs();
+			file = File.createTempFile(prefixStr, fileStore.getName(), destDir);
 		}
 		catch (IOException e)
 		{
