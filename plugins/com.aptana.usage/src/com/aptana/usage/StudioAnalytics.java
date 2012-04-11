@@ -12,10 +12,13 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.MessageFormat;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
@@ -47,10 +50,10 @@ public class StudioAnalytics
 
 	public void sendEvent(final AnalyticsEvent event)
 	{
-		// if (Platform.inDevelopmentMode() && !EclipseUtil.isTesting())
-		// {
-		// return;
-		// }
+		if (Platform.inDevelopmentMode() && !EclipseUtil.isTesting())
+		{
+			return;
+		}
 
 		Job job = new Job("Sending Analytics Ping ...") //$NON-NLS-1$
 		{
@@ -72,28 +75,28 @@ public class StudioAnalytics
 
 				IAnalyticsUser user = userManager.getUser();
 				// Only send ping if user is logged in. Otherwise, we log it to the database
-				// if (user == null || !user.isOnline() || !isValidResponse(responseCode = sendPing(event, user)))
-				// {
-				// log the event to the database
-				AnalyticsLogger.getInstance().logEvent(event);
-				// }
-				// else
-				// {
-				// // Send out all previous events from the db
-				// List<AnalyticsEvent> events = AnalyticsLogger.getInstance().getEvents();
-				// // Sort the events. We want all project.create events to be first, and all project.delete events to
-				// // be last
-				// Collections.sort(events, new AnalyticsEventComparator());
-				// for (AnalyticsEvent aEvent : events)
-				// {
-				// if (!isValidResponse(responseCode = sendPing(aEvent, user)))
-				// {
-				// return Status.OK_STATUS;
-				// }
-				// // Remove the event after it has been sent
-				// AnalyticsLogger.getInstance().clearEvent(aEvent);
-				// }
-				// }
+				if (user == null || !user.isOnline() || !isValidResponse(responseCode = sendPing(event, user)))
+				{
+					// log the event to the database
+					AnalyticsLogger.getInstance().logEvent(event);
+				}
+				else
+				{
+					// Send out all previous events from the db
+					List<AnalyticsEvent> events = AnalyticsLogger.getInstance().getEvents();
+					// Sort the events. We want all project.create events to be first, and all project.delete events to
+					// be last
+					Collections.sort(events, new AnalyticsEventComparator());
+					for (AnalyticsEvent aEvent : events)
+					{
+						if (!isValidResponse(responseCode = sendPing(aEvent, user)))
+						{
+							return Status.OK_STATUS;
+						}
+						// Remove the event after it has been sent
+						AnalyticsLogger.getInstance().clearEvent(aEvent);
+					}
+				}
 				return Status.OK_STATUS;
 			}
 		};
