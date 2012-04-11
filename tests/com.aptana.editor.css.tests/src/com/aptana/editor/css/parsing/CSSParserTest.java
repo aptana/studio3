@@ -7,14 +7,26 @@
  */
 package com.aptana.editor.css.parsing;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import junit.framework.TestCase;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
+
+import com.aptana.core.util.FileUtil;
+import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.editor.common.tests.util.ASTUtil;
+import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.parsing.ast.CSSParseRootNode;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
+import com.aptana.parsing.ast.ParseNode;
 
 /**
  * @author Kevin Lindsey
@@ -22,8 +34,7 @@ import com.aptana.parsing.ast.IParseRootNode;
  */
 public class CSSParserTest extends TestCase
 {
-
-	private static final String EOL = "\n"; //$NON-NLS-1$
+	private static final String EOL = FileUtil.NEW_LINE;
 
 	private CSSParser fParser;
 	private CSSScanner fScanner;
@@ -40,6 +51,20 @@ public class CSSParserTest extends TestCase
 	{
 		fParser = null;
 		fScanner = null;
+	}
+
+	/**
+	 * getSource
+	 * 
+	 * @param resourceName
+	 * @return
+	 * @throws IOException
+	 */
+	private String getSource(String resourceName) throws IOException
+	{
+		InputStream stream = FileLocator.openStream(Platform.getBundle(CSSPlugin.PLUGIN_ID), new Path(resourceName),
+				false);
+		return IOUtil.read(stream);
 	}
 
 	/**
@@ -1009,6 +1034,18 @@ public class CSSParserTest extends TestCase
 	public void testStarredImportantProperty() throws Exception
 	{
 		parseTest("button {*overflow: visible !important;}" + EOL); //$NON-NLS-1$
+	}
+
+	/**
+	 * This method is not being used for formal testing, but it's useful to determine how effective
+	 * {@link ParseNode#trimToSize()} is.
+	 * 
+	 * @throws Exception
+	 */
+	public void trimToSize() throws Exception
+	{
+		fScanner.setSource(getSource("performance/wp-admin.dev.css"));
+		ASTUtil.showBeforeAndAfterTrim((IParseRootNode) fParser.parse(fScanner));
 	}
 
 	/**

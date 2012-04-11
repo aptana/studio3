@@ -123,6 +123,9 @@ public class HTMLParser implements IParser
 			parseAll(source);
 			root.setCommentNodes(fCommentNodes.toArray(new IParseNode[fCommentNodes.size()]));
 
+			// trim the tree
+			ParseUtil.trimToSize(root);
+
 			// If we wrapped the parse state, copy the collected errors back over to original
 			if (!(parseState instanceof HTMLParseState))
 			{
