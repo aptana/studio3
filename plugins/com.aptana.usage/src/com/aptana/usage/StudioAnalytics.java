@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -39,6 +39,8 @@ public class StudioAnalytics
 	private static StudioAnalytics instance;
 
 	private int responseCode = 0;
+
+	private Object lock = new Object();
 
 	public synchronized static StudioAnalytics getInstance()
 	{
@@ -84,18 +86,21 @@ public class StudioAnalytics
 				else
 				{
 					// Send out all previous events from the db
-					List<AnalyticsEvent> events = AnalyticsLogger.getInstance().getEvents();
-					// Sort the events. We want all project.create events to be first, and all project.delete events to
-					// be last
-					Collections.sort(events, new AnalyticsEventComparator());
-					for (AnalyticsEvent aEvent : events)
+					synchronized (lock)
 					{
-						if (!isValidResponse(responseCode = sendPing(aEvent, user)))
+						List<AnalyticsEvent> events = AnalyticsLogger.getInstance().getEvents();
+						// Sort the events. We want all project.create events to be first, and all project.delete events
+						// to be last
+						Collections.sort(events, new AnalyticsEventComparator());
+						for (AnalyticsEvent aEvent : events)
 						{
-							return Status.OK_STATUS;
+							if (!isValidResponse(responseCode = sendPing(aEvent, user)))
+							{
+								return Status.OK_STATUS;
+							}
+							// Remove the event after it has been sent
+							AnalyticsLogger.getInstance().clearEvent(aEvent);
 						}
-						// Remove the event after it has been sent
-						AnalyticsLogger.getInstance().clearEvent(aEvent);
 					}
 				}
 				return Status.OK_STATUS;
