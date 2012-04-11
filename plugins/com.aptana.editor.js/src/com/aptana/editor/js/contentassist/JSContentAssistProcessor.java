@@ -1156,7 +1156,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				{
 					char candidate = document.getChar(index);
 
-					if (candidate == ',' || candidate == '(')
+					if (candidate == ',' || candidate == '(' || candidate == '{')
 					{
 						result = true;
 						break;
