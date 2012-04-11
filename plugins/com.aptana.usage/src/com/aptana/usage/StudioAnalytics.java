@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 
 public class StudioAnalytics
@@ -143,8 +144,14 @@ public class StudioAnalytics
 			connection.setRequestMethod("POST"); //$NON-NLS-1$
 			// writes POST
 			output = new DataOutputStream(connection.getOutputStream());
-			output.writeBytes(event.getEventString());
+			String data = event.getEventString();
+			output.writeBytes(data);
 			output.flush();
+
+			if (IdeLog.isTraceEnabled(UsagePlugin.getDefault(), IDebugScopes.USAGE))
+			{
+				IdeLog.logTrace(UsagePlugin.getDefault(), MessageFormat.format("Sending usage: {0}, {1}", url, data)); //$NON-NLS-1$
+			}
 
 			int code = connection.getResponseCode();
 			if (code == HttpURLConnection.HTTP_UNAUTHORIZED || code == HttpURLConnection.HTTP_FORBIDDEN)
