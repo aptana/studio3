@@ -20,4 +20,9 @@ public interface IDebugScopes
 	 */
 	String DB = UsagePlugin.PLUGIN_ID + "/debug/db"; //$NON-NLS-1$
 
+	/**
+	 * Items related to the database
+	 */
+	String USAGE = UsagePlugin.PLUGIN_ID + "/debug/usage"; //$NON-NLS-1$
+
 }
