@@ -65,6 +65,11 @@ public class AptanaDB
 			{
 				statement = connection.createStatement();
 
+				if (IdeLog.isTraceEnabled(UsagePlugin.getDefault(), IDebugScopes.DB))
+				{
+					IdeLog.logTrace(UsagePlugin.getDefault(), query);
+				}
+
 				if (handler == null)
 				{
 					statement.execute(query);
