@@ -8,6 +8,7 @@
 package com.aptana.parsing.ast;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -22,7 +23,6 @@ import com.aptana.parsing.lexer.Range;
 
 public class ParseNode extends Node implements IParseNode
 {
-
 	protected static final class NameNode implements INameNode
 	{
 		private final String fName;
@@ -230,6 +230,17 @@ public class ParseNode extends Node implements IParseNode
 		return result;
 	}
 
+	/**
+	 * This method is mostly used for diagnostics and testing. This returns the size of the internal array used to store
+	 * child nodes.
+	 * 
+	 * @return
+	 */
+	public int getInternalChildCount()
+	{
+		return fChildren.length;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.ast.IParseNode#getChildren()
@@ -237,10 +248,21 @@ public class ParseNode extends Node implements IParseNode
 	public IParseNode[] getChildren()
 	{
 		IParseNode[] result = new IParseNode[fChildrenCount];
-		if (fChildrenCount > 0)
+
+		if (fChildren.length == fChildrenCount)
 		{
-			System.arraycopy(fChildren, 0, result, 0, fChildrenCount);
+			result = fChildren;
 		}
+		else
+		{
+			result = new IParseNode[fChildrenCount];
+
+			if (fChildrenCount > 0)
+			{
+				System.arraycopy(fChildren, 0, result, 0, fChildrenCount);
+			}
+		}
+
 		return result;
 	}
 
@@ -768,6 +790,19 @@ public class ParseNode extends Node implements IParseNode
 		else
 		{
 			printer.printWithIndent('<').print(getElementName()).println("/>"); //$NON-NLS-1$
+		}
+	}
+
+	/**
+	 * Remove any unneeded memory from this node. This compacts the internal array used to store child nodes and is
+	 * similar in concept to {@link ArrayList#trimToSize()}.
+	 */
+	public void trimToSize()
+	{
+		if (fChildren != null && fChildren.length > fChildrenCount)
+		{
+			// NOTE: getChildren returns a minimally sized array for us
+			fChildren = getChildren();
 		}
 	}
 }

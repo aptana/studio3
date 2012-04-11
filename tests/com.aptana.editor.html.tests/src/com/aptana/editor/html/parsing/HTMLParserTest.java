@@ -7,17 +7,24 @@
  */
 package com.aptana.editor.html.parsing;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
+
+import com.aptana.core.util.FileUtil;
+import com.aptana.core.util.IOUtil;
+import com.aptana.editor.common.tests.util.ASTUtil;
 import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.css.parsing.ast.CSSParseRootNode;
+import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.IHTMLConstants;
-import com.aptana.editor.html.parsing.HTMLParseState;
-import com.aptana.editor.html.parsing.HTMLParser;
-import com.aptana.editor.html.parsing.Messages;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
@@ -25,12 +32,12 @@ import com.aptana.parsing.ast.INameNode;
 import com.aptana.parsing.ast.IParseError;
 import com.aptana.parsing.ast.IParseError.Severity;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.ParseNode;
 import com.aptana.parsing.lexer.Range;
 
 public class HTMLParserTest extends TestCase
 {
-
-	private static final String EOL = "\n";
+	private static final String EOL = FileUtil.NEW_LINE;
 
 	private static final String[] JS_VALID_TYPE_ATTR = new String[] { "application/javascript",
 			"application/ecmascript", "application/x-javascript", "application/x-ecmascript", "text/javascript",
@@ -48,6 +55,20 @@ public class HTMLParserTest extends TestCase
 	protected void tearDown() throws Exception
 	{
 		fParser = null;
+	}
+
+	/**
+	 * getSource
+	 * 
+	 * @param resourceName
+	 * @return
+	 * @throws IOException
+	 */
+	private String getSource(String resourceName) throws IOException
+	{
+		InputStream stream = FileLocator.openStream(Platform.getBundle(HTMLPlugin.PLUGIN_ID), new Path(resourceName),
+				false);
+		return IOUtil.read(stream);
 	}
 
 	public void testSelfClosing() throws Exception
@@ -310,6 +331,18 @@ public class HTMLParserTest extends TestCase
 		endTag = ((HTMLElementNode) children[1]).getEndNode();
 		assertNotNull(endTag);
 		assertEquals(new Range(19, 19), endTag.getNameRange());
+	}
+
+	/**
+	 * This method is not being used for formal testing, but it's useful to determine how effective
+	 * {@link ParseNode#trimToSize()} is.
+	 * 
+	 * @throws Exception
+	 */
+	public void trimToSize() throws Exception
+	{
+		fParseState.setEditState(getSource("performance/amazon.html"));
+		ASTUtil.showBeforeAndAfterTrim(fParser.parse(fParseState));
 	}
 
 	protected void parseTest(String source) throws Exception
