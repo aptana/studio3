@@ -123,7 +123,7 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 	{
 		if (c.offset == -1 || d.getLength() == 0)
 		{
-			return ""; //$NON-NLS-1$
+			return StringUtil.EMPTY;
 		}
 
 		StringBuilder buf = new StringBuilder();
@@ -135,7 +135,7 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 			// finds the white spaces
 			int end = findEndOfWhiteSpace(d, start, c.offset);
 
-			String indent = ""; //$NON-NLS-1$
+			String indent = StringUtil.EMPTY;
 			char c1 = d.getChar(end);
 			if (end > start)
 			{
@@ -147,6 +147,7 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 			String line = d.get(info.getOffset(), info.getLength());
 			int lineOffset = c.offset - info.getOffset();
 			String upToOffset = line.substring(0, lineOffset);
+			String trimmedUpToOffset = upToOffset.trim();
 
 			// What we want is to add a star if user hit return inside a comment block
 			if (c1 == COMMENT_CHAR && upToOffset.lastIndexOf(COMMENT_END) <= upToOffset.lastIndexOf(COMMENT_START)
@@ -159,27 +160,17 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 				}
 			}
 			// Return after /*
-			else if (upToOffset.trim().startsWith(COMMENT_START) && !upToOffset.contains(COMMENT_END))
+			else if (trimmedUpToOffset.startsWith(COMMENT_START) && !upToOffset.contains(COMMENT_END))
 			{
-				char commentIndent = ' '; // space to line up asterisk
+				String commentIndent = SPACE; // space to line up asterisk
 				String restOfLine = line.substring(lineOffset);
 
 				// get the line delimiter of the text file
 				String lineDelimiter = TextUtilities.getDefaultLineDelimiter(d);
 
-				if (upToOffset.trim().startsWith(DOCUMENTATION_START)) // ScriptDoc block
+				if (trimmedUpToOffset.startsWith(DOCUMENTATION_START)) // ScriptDoc block
 				{
-					buf.append(commentIndent).append(COMMENT_CHAR).append(SPACE);
-
-					c.shiftsCaret = false;
-					c.caretOffset = c.offset + buf.length() + 1;
-
-					List<String> list = getAdditionalComments(d, c);
-					if (list != null && list.size() > 0)
-					{
-						buf.append(lineDelimiter).append(commentIndent).append(COMMENT_CHAR).append(SPACE);
-						buf.append(StringUtil.join(lineDelimiter + commentIndent + COMMENT_CHAR + SPACE, list));
-					}
+					handleScriptDoc(d, c, buf, commentIndent, lineDelimiter);
 				}
 				// if next char is an asterisk, no need to add an asterisk
 				else if (!StringUtil.startsWith(restOfLine, COMMENT_CHAR))
@@ -196,20 +187,40 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 				{
 					return buf.toString();
 				}
-				try
+				if (checkNextLineForComment(d, c))
 				{
-					IRegion nextLineInfo = d.getLineInformationOfOffset(c.offset + 1);
-					String nextLine = d.get(nextLineInfo.getOffset(), nextLineInfo.getLength()).trim();
-					if (StringUtil.startsWith(nextLine, COMMENT_CHAR) || nextLine.endsWith(COMMENT_END))
-					{
-						return buf.toString();
-					}
-				}
-				catch (BadLocationException e)
-				{
+					return buf.toString();
 				}
 
 				String toEnd = SPACE + COMMENT_END;
+				d.replace(c.offset, 0, lineDelimiter + indent + toEnd);
+			}
+			else if (trimmedUpToOffset.endsWith(COMMENT_START) || trimmedUpToOffset.endsWith(DOCUMENTATION_START))
+			{
+				// the rest of the line is the content before the start of the comment
+				int index = line.lastIndexOf(COMMENT_START);
+				String restOfLine = line.substring(0, index);
+				// space to line up asterisk
+				String commentIndent = StringUtil.pad(StringUtil.EMPTY, restOfLine.length() - indent.length() + 1, ' ');
+
+				// get the line delimiter of the text file
+				String lineDelimiter = TextUtilities.getDefaultLineDelimiter(d);
+
+				if (trimmedUpToOffset.endsWith(DOCUMENTATION_START)) // ScriptDoc block
+				{
+					handleScriptDoc(d, c, buf, commentIndent, lineDelimiter);
+				}
+				else
+				{
+					buf.append(commentIndent).append(COMMENT_CHAR).append(SPACE);
+				}
+
+				if (checkNextLineForComment(d, c))
+				{
+					return buf.toString();
+				}
+
+				String toEnd = commentIndent + COMMENT_END;
 				d.replace(c.offset, 0, lineDelimiter + indent + toEnd);
 			}
 			else if (buf.length() != 0 && upToOffset.endsWith(COMMENT_END) && buf.charAt(buf.length() - 1) == ' ')
@@ -223,6 +234,36 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 		{
 		}
 		return buf.toString();
+	}
+
+	protected boolean checkNextLineForComment(IDocument document, DocumentCommand command)
+	{
+		try
+		{
+			IRegion nextLineInfo = document.getLineInformationOfOffset(command.offset + 1);
+			String nextLine = document.get(nextLineInfo.getOffset(), nextLineInfo.getLength()).trim();
+			return StringUtil.startsWith(nextLine, COMMENT_CHAR) || nextLine.endsWith(COMMENT_END);
+		}
+		catch (BadLocationException e)
+		{
+		}
+		return false;
+	}
+
+	protected void handleScriptDoc(IDocument document, DocumentCommand command, StringBuilder buf,
+			String commentIndent, String lineDelimiter)
+	{
+		buf.append(commentIndent).append(COMMENT_CHAR).append(SPACE);
+
+		command.shiftsCaret = false;
+		command.caretOffset = command.offset + buf.length() + 1;
+
+		List<String> list = getAdditionalComments(document, command);
+		if (list != null && list.size() > 0)
+		{
+			buf.append(lineDelimiter).append(commentIndent).append(COMMENT_CHAR).append(SPACE);
+			buf.append(StringUtil.join(lineDelimiter + commentIndent + COMMENT_CHAR + SPACE, list));
+		}
 	}
 
 	/**
