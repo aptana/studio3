@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -36,8 +36,6 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.ide.core.io.preferences.CloakingUtils;
 import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ide.ui.io.Utils;
-import com.aptana.ide.ui.io.preferences.IPreferenceConstants;
-import com.aptana.ui.DialogUtils;
 import com.aptana.ui.util.UIUtils;
 
 /**
@@ -55,11 +53,6 @@ public class CopyFilesOperation
 	 * Flag to indicate if the operation has been canceled by the user
 	 */
 	private boolean fCancelled;
-
-	/**
-	 * Overwrite-all flag
-	 */
-	private boolean fAlwaysOverwrite;
 
 	/**
 	 * Constructor.
@@ -129,21 +122,6 @@ public class CopyFilesOperation
 		if (monitor == null)
 		{
 			monitor = new NullProgressMonitor();
-		}
-		fShell.getDisplay().syncExec(new Runnable()
-		{
-
-			public void run()
-			{
-				int retCode = DialogUtils.openIgnoreMessageDialogConfirm(fShell,
-						Messages.CopyFilesOperation_OverwriteTitle, Messages.CopyFilesOperation_OverwriteWarning,
-						IOUIPlugin.getDefault().getPreferenceStore(), IPreferenceConstants.COPY_OVERWRITE);
-				fAlwaysOverwrite = (retCode == Window.OK);
-			}
-		});
-		if (!fAlwaysOverwrite)
-		{
-			return Status.CANCEL_STATUS;
 		}
 
 		int successCount = 0;
@@ -220,22 +198,6 @@ public class CopyFilesOperation
 		if (monitor == null)
 		{
 			monitor = new NullProgressMonitor();
-		}
-		fShell.getDisplay().syncExec(new Runnable()
-		{
-
-			public void run()
-			{
-				int retCode = DialogUtils.openIgnoreMessageDialogConfirm(fShell,
-						Messages.CopyFilesOperation_OverwriteTitle, Messages.CopyFilesOperation_OverwriteWarning,
-						IOUIPlugin.getDefault().getPreferenceStore(), IPreferenceConstants.COPY_OVERWRITE);
-				fAlwaysOverwrite = (retCode == Window.OK);
-			}
-		});
-
-		if (!fAlwaysOverwrite)
-		{
-			return Status.CANCEL_STATUS;
 		}
 
 		int successCount = 0;
