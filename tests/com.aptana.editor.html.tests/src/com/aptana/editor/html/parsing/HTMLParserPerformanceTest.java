@@ -8,6 +8,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.test.performance.PerformanceTestCase;
 
 import com.aptana.core.util.IOUtil;
+import com.aptana.editor.epl.tests.EditorTestHelper;
 import com.aptana.parsing.IParseState;
 
 public class HTMLParserPerformanceTest extends PerformanceTestCase
@@ -35,7 +36,9 @@ public class HTMLParserPerformanceTest extends PerformanceTestCase
 				Path.fromPortableString("performance/amazon.html"), false);
 		String src = IOUtil.read(stream);
 
-		for (int i = 0; i < 500; i++)
+		EditorTestHelper.joinBackgroundActivities();
+
+		for (int i = 0; i < 1500; i++)
 		{
 			IParseState parseState = new HTMLParseState();
 			parseState.setEditState(src);

@@ -616,4 +616,35 @@ public class CollectionsUtil
 	private CollectionsUtil()
 	{
 	}
+
+	/**
+	 * Given a collection of items, we use an IMap to generate keys to associate, and then return the map from generated
+	 * keys to the values used to generate them. Useful for generating maps from ids/names to a complex object for quick
+	 * lookups as a cache 9whe what you have is just the set of objects).
+	 * 
+	 * @param values
+	 * @param valueTokeyMapper
+	 * @return
+	 */
+	public static <K, V> Map<K, V> mapFromValues(Collection<V> values, IMap<V, K> valueTokeyMapper)
+	{
+		if (isEmpty(values))
+		{
+			return Collections.emptyMap();
+		}
+
+		Map<K, V> map = new HashMap<K, V>(values.size());
+		for (V value : values)
+		{
+			K key = valueTokeyMapper.map(value);
+			if (key == null)
+			{
+				throw new IllegalStateException(MessageFormat.format(
+						"Generated key for value {0} was null, which is not allowed.", value.toString())); //$NON-NLS-1$
+			}
+			map.put(key, value);
+		}
+
+		return map;
+	}
 }

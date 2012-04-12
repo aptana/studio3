@@ -7,12 +7,16 @@
  */
 package com.aptana.editor.html.parsing;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.aptana.core.IMap;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.core.util.replace.RegexPatternReplacer;
 import com.aptana.editor.html.contentassist.HTMLIndexQueryHelper;
 import com.aptana.editor.html.contentassist.model.EventElement;
 import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
@@ -21,7 +25,24 @@ import com.aptana.parsing.lexer.Range;
 
 public class HTMLUtils
 {
-	private static Map<String, Boolean> JS_ATTRIBUTE_MAP = new HashMap<String, Boolean>();
+	private static final String STYLE = "style"; //$NON-NLS-1$
+	private static final String JAVASCRIPT = "javascript"; //$NON-NLS-1$
+
+	/**
+	 * Cache from event name to event metadata
+	 */
+	private static Set<String> fgEventsMap;
+
+	/**
+	 * Used to strip tags.
+	 */
+	private static RegexPatternReplacer replacer = new RegexPatternReplacer();
+	static
+	{
+		replacer.addPattern("^\\s*</"); //$NON-NLS-1$
+		replacer.addPattern(">\\s*$"); //$NON-NLS-1$
+		replacer.addPattern("^\\s*<"); //$NON-NLS-1$
+	}
 
 	/**
 	 * Determine if the specified attribute name indicates an attribute that may contain CSS
@@ -35,7 +56,7 @@ public class HTMLUtils
 
 		if (name != null)
 		{
-			result = name.equalsIgnoreCase("style"); //$NON-NLS-1$
+			result = name.equalsIgnoreCase(STYLE);
 		}
 
 		return result;
@@ -50,34 +71,25 @@ public class HTMLUtils
 	 */
 	public static boolean isJSAttribute(String elementName, String attributeName)
 	{
-		boolean result = false;
-
-		if (elementName != null && attributeName != null)
+		if (elementName == null || attributeName == null)
 		{
-			attributeName = attributeName.toLowerCase();
-
-			String key = elementName + ":" + attributeName; //$NON-NLS-1$
-
-			if (JS_ATTRIBUTE_MAP.containsKey(key))
-			{
-				result = JS_ATTRIBUTE_MAP.get(key);
-			}
-			else
-			{
-				for (EventElement event : new HTMLIndexQueryHelper().getEvents(elementName))
-				{
-					if (event.getName().equals(attributeName))
-					{
-						result = true;
-						break;
-					}
-				}
-
-				JS_ATTRIBUTE_MAP.put(key, result);
-			}
+			return false;
 		}
 
-		return result;
+		// Load all events once and then generate the unique set of names for them.
+		// TODO Do we need to verify that the attribute is attached to the element?
+		if (fgEventsMap == null)
+		{
+			List<EventElement> events = new HTMLIndexQueryHelper().getEvents();
+			fgEventsMap = new HashSet<String>(CollectionsUtil.map(events, new IMap<EventElement, String>()
+			{
+				public String map(EventElement item)
+				{
+					return item.getName();
+				}
+			}));
+		}
+		return fgEventsMap.contains(attributeName.toLowerCase());
 	}
 
 	/**
@@ -89,9 +101,7 @@ public class HTMLUtils
 	 */
 	public static String stripTagEndings(String tag)
 	{
-		String name = tag.replaceAll("^\\s*</", ""); //$NON-NLS-1$ //$NON-NLS-2$
-		name = name.replaceAll(">\\s*$", ""); //$NON-NLS-1$ //$NON-NLS-2$
-		return name.replaceAll("^\\s*<", ""); //$NON-NLS-1$ //$NON-NLS-2$
+		return replacer.searchAndReplace(tag);
 	}
 
 	/**
@@ -102,7 +112,8 @@ public class HTMLUtils
 	 */
 	public static boolean isTagSelfClosing(String tagContents)
 	{
-		return tagContents.endsWith("/>"); //$NON-NLS-1$
+		return isTagComplete(tagContents) && tagContents.length() >= 2
+				&& tagContents.charAt(tagContents.length() - 2) == '/';
 	}
 
 	/**
@@ -113,11 +124,11 @@ public class HTMLUtils
 	 */
 	public static boolean isTagComplete(String tagContents)
 	{
-		if (tagContents == null)
+		if (tagContents == null || tagContents.length() < 1)
 		{
 			return false;
 		}
-		return tagContents.endsWith(">"); //$NON-NLS-1$
+		return tagContents.charAt(tagContents.length() - 1) == '>';
 	}
 
 	/**
@@ -133,12 +144,12 @@ public class HTMLUtils
 			return false;
 		}
 		String type = getTagAttribute(tagContents, "type"); //$NON-NLS-1$
-		if (type != null && type.toLowerCase().contains("javascript")) //$NON-NLS-1$
+		if (type != null && type.toLowerCase().contains(JAVASCRIPT))
 		{
 			return true;
 		}
 		String language = getTagAttribute(tagContents, "language"); //$NON-NLS-1$
-		if (language != null && language.toLowerCase().contains("javascript")) //$NON-NLS-1$
+		if (language != null && language.toLowerCase().contains(JAVASCRIPT))
 		{
 			return true;
 		}

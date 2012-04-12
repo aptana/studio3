@@ -48,7 +48,7 @@ public class HTMLTextHover extends CommonTextHover implements ITextHover, ITextH
 				return null;
 			}
 			HTMLElementNode node = (HTMLElementNode) activeNode;
-			ElementElement element = new HTMLIndexQueryHelper().getElement(node.getElementName());
+			ElementElement element = new HTMLIndexQueryHelper().getElement(node.getElementName().toLowerCase());
 
 			// To avoid duplicating work, we generate the header and documentation together here
 			// and then getHeader and getDocumentation just return the values.

@@ -371,8 +371,7 @@ San Diego, CA 92122
         <browser platform="Safari" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
       </browsers>
-      <deprecated>Deprecated in HTML 4.01. Use "Object" instead.
-			</deprecated>
+      <deprecated>Deprecated in HTML 4.01. Use "Object" instead.</deprecated>
       <description>Defines a Java applet object.</description>
       <event-refs>
         <event-ref name="onactivate"/>

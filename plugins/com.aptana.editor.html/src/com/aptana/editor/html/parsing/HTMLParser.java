@@ -605,11 +605,6 @@ public class HTMLParser implements IParser
 		}
 	}
 
-	private void addOffset(IParseNode node, int offset)
-	{
-		ParseUtil.addOffset(node, offset);
-	}
-
 	public static boolean isJavaScript(HTMLElementNode node)
 	{
 		String type = node.getAttributeValue(ATTR_TYPE);

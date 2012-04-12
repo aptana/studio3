@@ -638,4 +638,22 @@ public class CollectionsUtilTest extends TestCase
 			assertTrue(true);
 		}
 	}
+
+	public void testMapFromValues()
+	{
+		List<Integer> numbers = CollectionsUtil.newList(1, 2, 3);
+
+		Map<String, Integer> cache = CollectionsUtil.mapFromValues(numbers, new IMap<Integer, String>()
+		{
+			public String map(Integer item)
+			{
+				return item.toString();
+			}
+		});
+		assertNotNull(cache);
+		assertEquals(numbers.size(), cache.size());
+		assertEquals(Integer.valueOf(1), cache.get("1"));
+		assertEquals(Integer.valueOf(2), cache.get("2"));
+		assertEquals(Integer.valueOf(3), cache.get("3"));
+	}
 }
