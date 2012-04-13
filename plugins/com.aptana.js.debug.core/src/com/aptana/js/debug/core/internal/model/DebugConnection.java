@@ -14,6 +14,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.text.MessageFormat;
 import java.util.Hashtable;
 import java.util.Map;
@@ -91,7 +92,13 @@ public class DebugConnection {
 				String message;
 				while ((socket != null && !socket.isClosed()) || reader != null) {
 					try {
-						message = readMessage();
+						try {
+							message = readMessage();
+						} catch (SocketTimeoutException ste) {
+							// This is expected, since we may set the socket timeout to a short interval.
+							// See https://jira.appcelerator.org/browse/TISTUD-1431
+							continue;
+						}
 						if (message == null) {
 							break;
 						}
