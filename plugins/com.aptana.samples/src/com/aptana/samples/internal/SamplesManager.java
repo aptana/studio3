@@ -29,6 +29,7 @@ import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.samples.IDebugScopes;
 import com.aptana.samples.ISampleListener;
 import com.aptana.samples.ISamplesManager;
 import com.aptana.samples.SamplesPlugin;
@@ -198,7 +199,19 @@ public class SamplesManager implements ISamplesManager
 			samples.add(sample);
 			bundleSamplesById.put(id, sample);
 
+			if (IdeLog.isInfoEnabled(SamplesPlugin.getDefault(), IDebugScopes.MANAGER))
+			{
+				IdeLog.logInfo(
+						SamplesPlugin.getDefault(),
+						MessageFormat.format("Added sample: id = {0}; name = {1}", id, sample.getName()), IDebugScopes.MANAGER); //$NON-NLS-1$
+			}
 			fireSampleAdded(sample);
+		}
+		else
+		{
+			IdeLog.logWarning(SamplesPlugin.getDefault(),
+					MessageFormat.format("No category ''{0}'' exists", categoryId), //$NON-NLS-1$
+					IDebugScopes.MANAGER);
 		}
 	}
 
@@ -386,12 +399,20 @@ public class SamplesManager implements ISamplesManager
 		Collection<SamplesReference> samples = new ArrayList<SamplesReference>(bundleSamplesById.values());
 		bundleSamplesByCategory.clear();
 		bundleSamplesById.clear();
+		if (IdeLog.isInfoEnabled(SamplesPlugin.getDefault(), IDebugScopes.MANAGER))
+		{
+			IdeLog.logInfo(SamplesPlugin.getDefault(), "Removed all existing samples", IDebugScopes.MANAGER); //$NON-NLS-1$
+		}
 		for (SamplesReference sample : samples)
 		{
 			fireSampleRemoved(sample);
 		}
 
 		// adds the current list of samples loaded from the rubles
+		if (IdeLog.isInfoEnabled(SamplesPlugin.getDefault(), IDebugScopes.MANAGER))
+		{
+			IdeLog.logInfo(SamplesPlugin.getDefault(), "adding the list of samples", IDebugScopes.MANAGER); //$NON-NLS-1$
+		}
 		for (ProjectSampleElement element : bundleSamples)
 		{
 			addSample(element);
