@@ -35,7 +35,9 @@ import com.aptana.samples.ISamplesManager;
 import com.aptana.samples.SamplesPlugin;
 import com.aptana.samples.model.SampleCategory;
 import com.aptana.samples.model.SamplesReference;
+import com.aptana.scripting.model.AbstractElement;
 import com.aptana.scripting.model.BundleManager;
+import com.aptana.scripting.model.ElementVisibilityListener;
 import com.aptana.scripting.model.LoadCycleListener;
 import com.aptana.scripting.model.ProjectSampleElement;
 
@@ -106,6 +108,26 @@ public class SamplesManager implements ISamplesManager
 		}
 	};
 
+	private ElementVisibilityListener elementListener = new ElementVisibilityListener()
+	{
+
+		public void elementBecameHidden(AbstractElement element)
+		{
+			if (element instanceof ProjectSampleElement)
+			{
+				loadBundleSampleElements();
+			}
+		}
+
+		public void elementBecameVisible(AbstractElement element)
+		{
+			if (element instanceof ProjectSampleElement)
+			{
+				addSample((ProjectSampleElement) element);
+			}
+		}
+	};
+
 	public SamplesManager()
 	{
 		categories = new HashMap<String, SampleCategory>();
@@ -120,6 +142,7 @@ public class SamplesManager implements ISamplesManager
 		loadBundleSampleElements();
 
 		BundleManager.getInstance().addLoadCycleListener(loadCycleListener);
+		BundleManager.getInstance().addElementVisibilityListener(elementListener);
 	}
 
 	public List<SampleCategory> getCategories()
