@@ -393,6 +393,10 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 
 	private Collection<IProblem> handleNode(IParseNode node, IDocument doc, String sourcePath)
 	{
+		if (!(node instanceof HTMLNode))
+		{
+			return Collections.emptyList();
+		}
 		switch (node.getNodeType())
 		{
 			case IHTMLNodeTypes.ELEMENT:
