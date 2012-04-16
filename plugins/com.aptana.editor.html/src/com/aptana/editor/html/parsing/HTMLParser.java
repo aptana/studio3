@@ -12,10 +12,10 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.text.Document;
-import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 
 import beaver.Scanner.Exception;
@@ -25,7 +25,6 @@ import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.css.parsing.ast.CSSDeclarationNode;
 import com.aptana.editor.css.parsing.ast.CSSRuleNode;
 import com.aptana.editor.html.IHTMLConstants;
-import com.aptana.editor.html.parsing.HTMLTagScanner.TokenType;
 import com.aptana.editor.html.parsing.ast.HTMLCommentNode;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLNode;
@@ -64,7 +63,7 @@ public class HTMLParser implements IParser
 	private HTMLParserScanner fScanner;
 	private HTMLParseState fParseState;
 	private Stack<IParseNode> fElementStack;
-	private HTMLTagScanner fTagScanner;
+	private static final Pattern attributes = Pattern.compile("\\s+(\\w[\\w\\-:]*)\\s*=\\s*(('[^']*')|(\"[^\"]*\"))"); //$NON-NLS-1$
 
 	private IParseNode fCurrentElement;
 	private Symbol fCurrentSymbol;
@@ -74,22 +73,14 @@ public class HTMLParser implements IParser
 	private boolean previousSymbolSkipped;
 
 	/**
-	 * HTMLParser
-	 */
-	public HTMLParser()
-	{
-		fCommentNodes = new ArrayList<IParseNode>();
-	}
-
-	/**
 	 * parse
 	 */
 	public synchronized IParseRootNode parse(IParseState parseState) throws java.lang.Exception
 	{
 		fMonitor = parseState.getProgressMonitor();
 		fScanner = new HTMLParserScanner();
-		fTagScanner = new HTMLTagScanner();
 		fElementStack = new Stack<IParseNode>();
+		fCommentNodes = new ArrayList<IParseNode>();
 
 		String source = parseState.getSource();
 		if (parseState instanceof HTMLParseState)
@@ -141,12 +132,11 @@ public class HTMLParser implements IParser
 			// clear for garbage collection
 			fMonitor = null;
 			fScanner = null;
-			fTagScanner = null;
 			fElementStack = null;
 			fCurrentElement = null;
 			fCurrentSymbol = null;
 			fParseState = null;
-			fCommentNodes.clear();
+			fCommentNodes = null;
 		}
 
 		return root;
@@ -460,75 +450,61 @@ public class HTMLParser implements IParser
 	private void parseAttribute(HTMLElementNode element, Symbol tagSymbol)
 	{
 		String tag = tagSymbol.value.toString();
-		fTagScanner.setRange(new Document(tag), 0, tag.length());
-		IToken token;
-		Object data;
-		String name = null, value = null;
-		while (!(token = fTagScanner.nextToken()).isEOF())
+
+		Matcher m = attributes.matcher(tag);
+		while (m.find())
 		{
-			data = token.getData();
-			if (data == null)
-			{
-				continue;
-			}
+			String name = m.group(1);
+			String value = m.group(2);
 
-			if (data == TokenType.ATTR_NAME)
-			{
-				name = tag.substring(fTagScanner.getTokenOffset(),
-						fTagScanner.getTokenOffset() + fTagScanner.getTokenLength());
-			}
-			else if (data == TokenType.ATTR_VALUE)
-			{
-				// found a pair
-				int start = fTagScanner.getTokenOffset();
-				value = tag.substring(start, start + fTagScanner.getTokenLength());
-				// strips the quotation marks and any surrounding whitespaces
-				value = value.substring(1, value.length() - 1).trim();
-				element.setAttribute(name, value);
+			int absoluteOffset = tagSymbol.getStart() + m.start(2);
 
-				// checks if we need to process the value as CSS
-				if (HTMLUtils.isCSSAttribute(name))
+			value = value.substring(1, value.length() - 1).trim();
+			element.setAttribute(name, value);
+
+			// checks if we need to process the value as CSS
+			if (HTMLUtils.isCSSAttribute(name))
+			{
+				String text = element.getName() + " {" + value + "}"; //$NON-NLS-1$ //$NON-NLS-2$
+				try
 				{
-					String text = element.getName() + " {" + value + "}"; //$NON-NLS-1$ //$NON-NLS-2$
-					try
-					{
-						int startingOffset = tagSymbol.getStart() + start - (element.getName().length() + 1);
-						IParseNode node = ParserPoolFactory.parse(ICSSConstants.CONTENT_TYPE_CSS, text, startingOffset);
 
-						// should always have a rule node
-						if (node.hasChildren())
+					int startingOffset = absoluteOffset - (element.getName().length() + 1);
+					IParseNode node = ParserPoolFactory.parse(ICSSConstants.CONTENT_TYPE_CSS, text, startingOffset);
+
+					// should always have a rule node
+					if (node.hasChildren())
+					{
+						IParseNode rule = node.getChild(0);
+						if (rule instanceof CSSRuleNode)
 						{
-							IParseNode rule = node.getChild(0);
-							if (rule instanceof CSSRuleNode)
+							CSSDeclarationNode[] declarations = ((CSSRuleNode) rule).getDeclarations();
+							for (CSSDeclarationNode declaration : declarations)
 							{
-								CSSDeclarationNode[] declarations = ((CSSRuleNode) rule).getDeclarations();
-								for (CSSDeclarationNode declaration : declarations)
-								{
-									element.addCSSStyleNode(declaration);
-								}
+								element.addCSSStyleNode(declaration);
 							}
 						}
 					}
-					catch (java.lang.Exception e)
+				}
+				catch (java.lang.Exception e)
+				{
+				}
+			}
+			// checks if we need to process the value as JS
+			else if (HTMLUtils.isJSAttribute(element.getName(), name))
+			{
+				try
+				{
+					int startingOffset = absoluteOffset + 1;
+					IParseNode node = ParserPoolFactory.parse(IJSConstants.CONTENT_TYPE_JS, value, startingOffset);
+
+					for (IParseNode child : node)
 					{
+						element.addJSAttributeNode(child);
 					}
 				}
-				// checks if we need to process the value as JS
-				else if (HTMLUtils.isJSAttribute(element.getName(), name))
+				catch (java.lang.Exception e)
 				{
-					try
-					{
-						int startingOffset = tagSymbol.getStart() + start + 1;
-						IParseNode node = ParserPoolFactory.parse(IJSConstants.CONTENT_TYPE_JS, value, startingOffset);
-
-						for (IParseNode child : node)
-						{
-							element.addJSAttributeNode(child);
-						}
-					}
-					catch (java.lang.Exception e)
-					{
-					}
 				}
 			}
 		}

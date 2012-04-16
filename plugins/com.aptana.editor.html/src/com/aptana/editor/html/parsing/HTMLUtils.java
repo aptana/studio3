@@ -16,7 +16,6 @@ import java.util.regex.Pattern;
 import com.aptana.core.IMap;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
-import com.aptana.core.util.replace.RegexPatternReplacer;
 import com.aptana.editor.html.contentassist.HTMLIndexQueryHelper;
 import com.aptana.editor.html.contentassist.model.EventElement;
 import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
@@ -32,17 +31,6 @@ public class HTMLUtils
 	 * Cache from event name to event metadata
 	 */
 	private static Set<String> fgEventsMap;
-
-	/**
-	 * Used to strip tags.
-	 */
-	private static RegexPatternReplacer replacer = new RegexPatternReplacer();
-	static
-	{
-		replacer.addPattern("^\\s*</"); //$NON-NLS-1$
-		replacer.addPattern(">\\s*$"); //$NON-NLS-1$
-		replacer.addPattern("^\\s*<"); //$NON-NLS-1$
-	}
 
 	/**
 	 * Determine if the specified attribute name indicates an attribute that may contain CSS
@@ -101,7 +89,31 @@ public class HTMLUtils
 	 */
 	public static String stripTagEndings(String tag)
 	{
-		return replacer.searchAndReplace(tag);
+		if (tag == null)
+		{
+			return null;
+		}
+
+		String trimmed = tag.trim(); // strip leading and trailing whitespace
+		int length = trimmed.length();
+		if (length > 0 && trimmed.charAt(0) == '<')
+		{
+			if (length > 1 && trimmed.charAt(1) == '/')
+			{
+				trimmed = trimmed.substring(2).trim();
+			}
+			else
+			{
+				trimmed = trimmed.substring(1).trim();
+			}
+			// Re-calculate length
+			length = trimmed.length();
+		}
+		if (length > 0 && trimmed.charAt(length - 1) == '>')
+		{
+			trimmed = trimmed.substring(0, length - 1).trim();
+		}
+		return trimmed;
 	}
 
 	/**
