@@ -10,7 +10,9 @@
  *******************************************************************************/
 package com.aptana.eclipse.fullscreen.ui;
 
-import org.eclipse.swt.internal.cocoa.NSWindow;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWindowListener;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -26,7 +28,6 @@ import com.bandlem.eclipse.objc.SO;
  * 
  * @author Alex Blewitt <alex.blewit@gmail.com>
  */
-@SuppressWarnings("restriction")
 public class Activator extends AbstractUIPlugin implements IWindowListener
 {
 
@@ -70,10 +71,28 @@ public class Activator extends AbstractUIPlugin implements IWindowListener
 		setWindowFullscreen(shell);
 	}
 
+	static Object getNSWindow(Shell shell)
+	{
+		try
+		{
+			Field field = shell.getClass().getField("view"); //$NON-NLS-1$
+			Object view = field.get(shell);
+			Method method = view.getClass().getMethod("window"); //$NON-NLS-1$
+			return method.invoke(view);
+		}
+		catch (Exception e)
+		{
+			// ignores since non-OSX platforms will always throw the exception
+		}
+		return null;
+	}
+
 	static void setWindowFullscreen(Shell shell)
 	{
-		NSWindow nswindow = shell.view.window();
-		nswindow.setToolbar(null);
-		SO.Reflect.executeLong(nswindow, "setCollectionBehavior", new Class[] { SO.NSUInteger }, (int) (1 << 7)); //$NON-NLS-1$
+		Object nsWindow = getNSWindow(shell);
+		if (nsWindow != null)
+		{
+			SO.Reflect.executeLong(nsWindow, "setCollectionBehavior", new Class[] { SO.NSUInteger }, (int) (1 << 7)); //$NON-NLS-1$
+		}
 	}
 }

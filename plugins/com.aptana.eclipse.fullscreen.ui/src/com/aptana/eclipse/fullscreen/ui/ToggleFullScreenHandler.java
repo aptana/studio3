@@ -10,11 +10,12 @@
  *******************************************************************************/
 package com.aptana.eclipse.fullscreen.ui;
 
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
+
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.swt.internal.cocoa.NSWindow;
-import org.eclipse.swt.internal.cocoa.OS;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
@@ -26,16 +27,17 @@ import com.bandlem.eclipse.objc.BnLWindow;
  * 
  * @author Alex Blewitt <alex.blewitt@gmail.com>
  */
-@SuppressWarnings("restriction")
 public class ToggleFullScreenHandler extends AbstractHandler
 {
 
+	private static final Object[] EMPTY_ARRAY = new Object[0];
+
 	/**
-	 * Toggles the window into fullScreen mode, via {@link BnLWindow#toggleFullScreen(NSWindow)}.
+	 * Toggles the window into fullScreen mode.
 	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
-		NSWindow[] windows = getWindows();
+		Object[] windows = getWindows();
 		if (windows.length > 0)
 		{
 			BnLWindow.toggleFullScreen(windows[0]);
@@ -48,15 +50,24 @@ public class ToggleFullScreenHandler extends AbstractHandler
 	 * 
 	 * @return the NSWindow to go into fullScreen mode.
 	 */
-	protected NSWindow[] getWindows()
+	protected Object[] getWindows()
 	{
 		IWorkbenchWindow[] windows = PlatformUI.getWorkbench().getWorkbenchWindows();
-		NSWindow[] nsWindows = new NSWindow[windows.length];
-		for (int i = 0; i < windows.length; i++)
+		try
 		{
-			nsWindows[i] = windows[i].getShell().view.window();
+			Object nsWindows = Array.newInstance(Class.forName("org.eclipse.swt.internal.cocoa.NSWindow"), //$NON-NLS-1$
+					windows.length);
+			for (int i = 0; i < windows.length; i++)
+			{
+				Array.set(nsWindows, i, Activator.getNSWindow(windows[i].getShell()));
+			}
+			return (Object[]) nsWindows;
 		}
-		return nsWindows;
+		catch (Exception e)
+		{
+			// ignores since non-OSX platforms will always throw the exception
+		}
+		return EMPTY_ARRAY;
 	}
 
 	/**
@@ -66,6 +77,21 @@ public class ToggleFullScreenHandler extends AbstractHandler
 	public boolean isEnabled()
 	{
 		IWorkbenchWindow[] windows = PlatformUI.getWorkbench().getWorkbenchWindows();
-		return windows.length >= 1 && OS.VERSION >= 0x1070;
+		return windows.length >= 1 && getOSVersion() >= 0x1070;
+	}
+
+	private static int getOSVersion()
+	{
+		try
+		{
+			Class<?> os = Class.forName("org.eclipse.swt.internal.cocoa.OS"); //$NON-NLS-1$
+			Field version = os.getField("VERSION"); //$NON-NLS-1$
+			return Integer.parseInt(version.get(os).toString());
+		}
+		catch (Exception e)
+		{
+			// ignores since non-OSX platforms will always throw the exception
+		}
+		return 0;
 	}
 }

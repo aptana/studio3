@@ -14,24 +14,20 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.swt.internal.cocoa.OS;
-import org.eclipse.swt.internal.cocoa.id;
-
 /**
  * Handles some of the Objective-C code in a architecture neutral way. Since SWT is compiled for 32-bit or 64-bit access
- * separately (and types like {@link id} correspond to NSUInteger, which is 32-bit on a 32-bit system and 64-bit on a
- * 64-bit system), we can't just use the same parameter for all method invocations. This front-end to the Objective-C
- * runtime uses <code>long</code> for everything, and maps it to <code>int</code> when running on a 32-bit system. As a
- * result, code can call this and not have to worry about the distinction between the two. It also allows access to
- * selectors not normally available in SWT, via the {@link #selector(String)} call. For example, invoking
- * <code>selector("toggleFullScreen:")</code> allows that method to be called even if {@link OS} doesn't provide a
- * handle to that natively, which it doesn't on at least Eclipse 3.6 and Eclipse 3.7 systems. Finally, since a lot of
- * this uses reflection, it also provides some helper methods to get a field to make the reflection API a little more
- * sane.
+ * separately (and types like id correspond to NSUInteger, which is 32-bit on a 32-bit system and 64-bit on a 64-bit
+ * system), we can't just use the same parameter for all method invocations. This front-end to the Objective-C runtime
+ * uses <code>long</code> for everything, and maps it to <code>int</code> when running on a 32-bit system. As a result,
+ * code can call this and not have to worry about the distinction between the two. It also allows access to selectors
+ * not normally available in SWT, via the {@link #selector(String)} call. For example, invoking
+ * <code>selector("toggleFullScreen:")</code> allows that method to be called even if OS doesn't provide a handle to
+ * that natively, which it doesn't on at least Eclipse 3.6 and Eclipse 3.7 systems. Finally, since a lot of this uses
+ * reflection, it also provides some helper methods to get a field to make the reflection API a little more sane.
  * 
  * @author Alex Blewitt <alex.blewit@gmail.com>
  */
-@SuppressWarnings({ "rawtypes", "restriction" })
+@SuppressWarnings({ "rawtypes" })
 public class SO
 {
 	/**
@@ -138,10 +134,29 @@ public class SO
 	 * This represents the corresponding Java primitive type of NSUInteger, and can be passed in methods that perform
 	 * lookups via reflection. On a 32-bit system, this will have the value <code>Integer.TYPE</code> whilst on a 64-bit
 	 * system it will have the value <code>Long.TYPE</code>. This is dynamically determined based on the type of
-	 * {@link OS#class_NSObjectl} compiled into the SWT library.
+	 * OS#class_NSObject compiled into the SWT library.
 	 */
-	public static final Class NSUInteger = Reflect.getField(OS.class, "class_NSObject").getClass() == Long.class ? Long.TYPE //$NON-NLS-1$
-			: Integer.TYPE;
+	public static final Class NSUInteger;
+	static
+	{
+		Class<?> os = null;
+		try
+		{
+			os = Class.forName("org.eclipse.swt.internal.cocoa.OS"); //$NON-NLS-1$
+		}
+		catch (ClassNotFoundException e)
+		{
+			// ignores since non-OSX platforms will always throw the exception
+		}
+		if (os != null)
+		{
+			NSUInteger = Reflect.getField(os, "class_NSObject").getClass() == Long.class ? Long.TYPE : Integer.TYPE; //$NON-NLS-1$
+		}
+		else
+		{
+			NSUInteger = Integer.TYPE;
+		}
+	}
 
 	/**
 	 * Private cache of selectors-to-ids.
@@ -155,15 +170,23 @@ public class SO
 	 *            the object
 	 * @return the long value
 	 */
-	public static long getID(id id)
+	public static long getID(Object id)
 	{
 		return ((Number) Reflect.getField(id, "id")).longValue(); //$NON-NLS-1$
 	}
 
 	public static void objc_msgSend(long target, long sel, long arg)
 	{
-		Reflect.executeLong(OS.class, "objc_msgSend", new Class[] { NSUInteger, NSUInteger, NSUInteger }, target, sel, //$NON-NLS-1$
-				arg);
+		try
+		{
+			Class<?> os = Class.forName("org.eclipse.swt.internal.cocoa.OS"); //$NON-NLS-1$
+			Reflect.executeLong(os, "objc_msgSend", new Class[] { NSUInteger, NSUInteger, NSUInteger }, target, sel, //$NON-NLS-1$
+					arg);
+		}
+		catch (ClassNotFoundException e)
+		{
+			// ignores since non-OSX platforms will always throw the exception
+		}
 	}
 
 	public static long selector(String sel)
@@ -173,8 +196,16 @@ public class SO
 			Number selector = selectors.get(sel);
 			if (selector == null)
 			{
-				selector = (Number) (OS.class.getMethod("sel_registerName", String.class).invoke(null, sel)); //$NON-NLS-1$
-				selectors.put(sel, selector);
+				try
+				{
+					Class<?> os = Class.forName("org.eclipse.swt.internal.cocoa.OS"); //$NON-NLS-1$
+					selector = (Number) (os.getMethod("sel_registerName", String.class).invoke(null, sel)); //$NON-NLS-1$
+					selectors.put(sel, selector);
+				}
+				catch (ClassNotFoundException e)
+				{
+					return 0;
+				}
 			}
 			return selector.longValue();
 		}

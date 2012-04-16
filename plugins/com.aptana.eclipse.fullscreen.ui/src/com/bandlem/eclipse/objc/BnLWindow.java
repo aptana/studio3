@@ -10,8 +10,6 @@
  *******************************************************************************/
 package com.bandlem.eclipse.objc;
 
-import org.eclipse.swt.internal.cocoa.NSWindow;
-
 import com.bandlem.eclipse.objc.SO.Reflect;
 
 /**
@@ -19,7 +17,6 @@ import com.bandlem.eclipse.objc.SO.Reflect;
  * 
  * @author Alex Blewitt <alex.blewitt@gmail.com>
  */
-@SuppressWarnings("restriction")
 public class BnLWindow
 {
 
@@ -29,7 +26,7 @@ public class BnLWindow
 	 * @param window
 	 *            the window, which must not be <code>null</code>.
 	 */
-	public static void toggleFullScreen(NSWindow window)
+	public static void toggleFullScreen(Object window)
 	{
 		long toggleFullScreen = SO.selector("toggleFullScreen:"); //$NON-NLS-1$
 		long target = SO.getID(window);
@@ -43,7 +40,7 @@ public class BnLWindow
 	 *            the window, which must not be null.
 	 * @return true if the window is in fullScreen mode, false otherwise.
 	 */
-	public static boolean isFullScreen(NSWindow window)
+	public static boolean isFullScreen(Object window)
 	{
 		long styleMask = Reflect.executeLong(window, "styleMask"); //$NON-NLS-1$
 		return (((styleMask >> 14) & 1) == 1);
@@ -57,7 +54,7 @@ public class BnLWindow
 	 * @param fullScreen
 	 *            true if the window is to go into fullScreen mode, false otherwise.
 	 */
-	public static void setFullScreen(NSWindow window, boolean fullScreen)
+	public static void setFullScreen(Object window, boolean fullScreen)
 	{
 		if (isFullScreen(window) != fullScreen)
 		{

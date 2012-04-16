@@ -10,8 +10,6 @@
  *******************************************************************************/
 package com.aptana.eclipse.fullscreen.ui;
 
-import org.eclipse.swt.internal.cocoa.NSWindow;
-
 import com.bandlem.eclipse.objc.BnLWindow;
 
 /**
@@ -19,7 +17,6 @@ import com.bandlem.eclipse.objc.BnLWindow;
  * 
  * @author Alex Blewitt <alex.blewit@gmail.com>
  */
-@SuppressWarnings("restriction")
 public class ToggleFullScreenEscapeHandler extends ToggleFullScreenHandler
 {
 
@@ -29,7 +26,7 @@ public class ToggleFullScreenEscapeHandler extends ToggleFullScreenHandler
 	@Override
 	public boolean isEnabled()
 	{
-		NSWindow[] windows = getWindows();
+		Object[] windows = getWindows();
 		return super.isEnabled() && windows != null && windows.length >= 1 && BnLWindow.isFullScreen(windows[0]);
 	}
 }
