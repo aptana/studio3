@@ -32,7 +32,22 @@
 		<java jar="${baseLocation}/plugins/${launcher.plugin}.jar" fork="true" failonerror="yes">
 			<arg line="-application org.eclipse.ant.core.antRunner -buildfile ${baseLocation}/plugins/${builder.plugin}/scripts/build.xml -Dbuilder=${basedir} -Dbuild.revision=${build.revision} -nosplash" />
 		</java>
+		<antcall target="categorize" />
 	</target>
+
+	<!-- ================================= 
+          target: categorize
+
+          Note: in http://wiki.eclipse.org/Equinox_p2_Metadata_Generator
+          there are newer instructions (so, if at sometime this is not ok, it might be worth
+          revisiting that site to update the command line - again).
+         ================================= -->
+    <target name="categorize" description="categorize the update site">
+    	<java jar="${baseLocation}/plugins/${launcher.plugin}.jar" fork="true" failonerror="yes">
+    		<!-- regenerates the content.jar with proper categories -->
+            <arg line="-application org.eclipse.equinox.p2.publisher.EclipseGenerator -nosplash -consoleLog -updateSite ${deploy.dir} -site file:${deploy.dir}/site.xml -metadataRepository file:${deploy.dir} -metadataRepositoryName &quot;Aptana Studio 3 Update Site&quot; -artifactRepository file:${deploy.dir} -artifactRepositoryName &quot;Aptana Studio 3 Artifacts&quot; -publishArtifacts -publishArtifactRepository -compress -reusePack200Files -noDefaultIUs -vmargs -Xmx256m" />
+    	</java>
+    </target>
 
 	<!-- ================================= 
           target: generate.build.properties              

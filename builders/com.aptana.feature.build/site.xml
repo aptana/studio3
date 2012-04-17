@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site pack200="true">
+   <description url="http://www.appcelerator.com">Aptana Studio 3</description>   
+
+   <feature url="features/com.aptana.feature.studio_{version.full}.jar" id="com.aptana.feature.studio" version="{version.full}">
+      <category name="Aptana Studio 3"/>
+   </feature>
+
+   <category-def name="Aptana Studio 3" label="Aptana Studio 3">
+      <description>Aptana Studio 3 plugins</description>
+   </category-def>
+
+</site>
