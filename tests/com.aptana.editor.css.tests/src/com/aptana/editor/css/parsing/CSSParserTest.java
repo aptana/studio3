@@ -9,6 +9,8 @@ package com.aptana.editor.css.parsing;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import junit.framework.TestCase;
 
@@ -19,9 +21,14 @@ import org.eclipse.core.runtime.Platform;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
-import com.aptana.editor.common.tests.util.ASTUtil;
 import com.aptana.editor.css.CSSPlugin;
+import com.aptana.editor.css.parsing.ast.CSSImportNode;
+import com.aptana.editor.css.parsing.ast.CSSMediaNode;
+import com.aptana.editor.css.parsing.ast.CSSNode;
+import com.aptana.editor.css.parsing.ast.CSSPageNode;
 import com.aptana.editor.css.parsing.ast.CSSParseRootNode;
+import com.aptana.editor.css.parsing.ast.CSSRuleNode;
+import com.aptana.editor.css.parsing.ast.ICSSNodeTypes;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseNode;
@@ -984,8 +991,7 @@ public class CSSParserTest extends TestCase
 	public void testMissingSemiColon() throws Exception
 	{
 		IParseState parseState = new ParseState();
-		parseStateTest(parseState,
-				"h1      , h2      , h3 {color   : #AA2808\ncolor   : #AA2808}");
+		parseStateTest(parseState, "h1      , h2      , h3 {color   : #AA2808\ncolor   : #AA2808}");
 
 		assertTrue("Could not find parse errors in parse state", !parseState.getErrors().isEmpty());
 	}
@@ -1044,8 +1050,92 @@ public class CSSParserTest extends TestCase
 	 */
 	public void trimToSize() throws Exception
 	{
-		fScanner.setSource(getSource("performance/wp-admin.dev.css"));
-		ASTUtil.showBeforeAndAfterTrim((IParseRootNode) fParser.parse(fScanner));
+		fScanner.setSource(getSource("performance/github-formatted.css"));
+		CSSParseRootNode root = (CSSParseRootNode) fParser.parse(fScanner);
+
+		int count = 0;
+		Queue<IParseNode> queue = new LinkedList<IParseNode>();
+		queue.offer(root);
+
+		while (!queue.isEmpty())
+		{
+			IParseNode node = queue.poll();
+
+			if (node instanceof IParseRootNode)
+			{
+				for (IParseNode child : node)
+				{
+					queue.add(child);
+				}
+
+				for (IParseNode comment : ((IParseRootNode) node).getCommentNodes())
+				{
+					queue.add(comment);
+				}
+			}
+			else if (node instanceof CSSNode)
+			{
+				count++;
+
+				for (IParseNode child : node)
+				{
+					queue.add(child);
+				}
+
+				switch (node.getNodeType())
+				{
+					case ICSSNodeTypes.IMPORT:
+						for (IParseNode child : ((CSSImportNode) node).getMedias())
+						{
+							queue.add(child);
+						}
+						break;
+
+					case ICSSNodeTypes.RULE:
+						for (IParseNode child : ((CSSRuleNode) node).getSelectors())
+						{
+							queue.add(child);
+						}
+						for (IParseNode child : ((CSSRuleNode) node).getDeclarations())
+						{
+							queue.add(child);
+						}
+						break;
+
+					case ICSSNodeTypes.MEDIA:
+						for (IParseNode child : ((CSSMediaNode) node).getMedias())
+						{
+							queue.add(child);
+						}
+						break;
+
+					case ICSSNodeTypes.PAGE:
+						queue.add(((CSSPageNode) node).getSelector());
+						break;
+
+					case ICSSNodeTypes.AT_RULE:
+					case ICSSNodeTypes.ATTRIBUTE_SELECTOR:
+					case ICSSNodeTypes.CHAR_SET:
+					case ICSSNodeTypes.COMMENT:
+					case ICSSNodeTypes.DECLARATION:
+					case ICSSNodeTypes.EXPRESSION:
+					case ICSSNodeTypes.FONTFACE:
+					case ICSSNodeTypes.FUNCTION:
+					case ICSSNodeTypes.NAMESPACE:
+					case ICSSNodeTypes.PAGE_SELECTOR:
+					case ICSSNodeTypes.SELECTOR:
+					case ICSSNodeTypes.SIMPLE_SELECTOR:
+					case ICSSNodeTypes.TERM:
+					case ICSSNodeTypes.TERM_LIST:
+					case ICSSNodeTypes.TEXT:
+					default:
+						// do nothing else
+						break;
+				}
+			}
+		}
+
+		System.out.println("Node count = " + count);
 	}
 
 	/**
