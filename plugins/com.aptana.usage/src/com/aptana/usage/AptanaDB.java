@@ -141,7 +141,7 @@ public class AptanaDB
 			}
 			catch (SQLException e)
 			{
-				IdeLog.logError(UsagePlugin.getDefault(), Messages.AptanaDB_FailedToConnect, e);
+				IdeLog.logWarning(UsagePlugin.getDefault(), Messages.AptanaDB_FailedToConnect, e);
 			}
 		}
 		return null;
