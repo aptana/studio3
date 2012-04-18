@@ -597,8 +597,8 @@ public class CompletionProposalPopup implements IContentAssistListener
 				}
 			}
 		});
-
-		fPopupCloser.install(fContentAssistant, fProposalTable);
+		fPopupCloser.install(fContentAssistant, fProposalTable, fAdditionalInfoController);
+		// TISTUD-913: changed to the line above from 'fPopupCloser.install(fContentAssistant, fProposalTable);'
 
 		installPreferenceListener();
 
@@ -1032,6 +1032,11 @@ public class CompletionProposalPopup implements IContentAssistListener
 	 */
 	public boolean hasFocus()
 	{
+		if (fPopupCloser != null && fPopupCloser.isAdditionalInfoInFocus())
+		{
+			// TISTUD-913
+			return true;
+		}
 		if (Helper.okToUse(fProposalShell))
 		{
 			return (fProposalShell.isFocusControl() || fProposalTable.isFocusControl());
@@ -1057,7 +1062,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 		if (Helper.okToUse(fProposalShell))
 		{
 			fContentAssistant.removeContentAssistListener(this, ContentAssistant.PROPOSAL_SELECTOR);
-			fPopupCloser.uninstall();
+			// TISTUD-913: moved the 'fPopupCloser.uninstall();' to disposePopup()
 			if (fAdditionalInfoController != null)
 			{
 				fAdditionalInfoController.disposeInformationControl();
@@ -1085,6 +1090,11 @@ public class CompletionProposalPopup implements IContentAssistListener
 		{
 			instanceScopeNode.removePreferenceChangeListener(prefListener);
 			instanceScopeNode = null;
+		}
+		if (fPopupCloser != null)
+		{
+			// TISTUD-913
+			fPopupCloser.uninstall();
 		}
 		prefListener = null;
 	}

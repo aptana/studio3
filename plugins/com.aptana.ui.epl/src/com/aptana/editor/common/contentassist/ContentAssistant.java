@@ -1759,7 +1759,10 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 	 */
 	void popupFocusLost(FocusEvent e)
 	{
-		fCloser.focusLost(e);
+		if (fCloser != null)
+		{
+			fCloser.focusLost(e);
+		}
 	}
 
 	/**
