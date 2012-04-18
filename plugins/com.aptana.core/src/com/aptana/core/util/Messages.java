@@ -46,6 +46,8 @@ public class Messages extends NLS
 
 	public static String ZipUtil_default_extract_label;
 
+	public static String ZipUtil_ERR_NoWritePermission;
+
 	public static String ZipUtil_extract_prefix_label;
 
 }

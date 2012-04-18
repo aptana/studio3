@@ -395,6 +395,10 @@ public class GitFileHistoryProviderTest extends TestCase
 			public void accept(IResourceVisitor visitor) throws CoreException
 			{
 			}
+
+			public void accept(IResourceProxyVisitor visitor, int depth, int memberFlags) throws CoreException
+			{
+			}
 		};
 		IFileRevision revision = new GitFileHistoryProvider().getWorkspaceFileRevision(resource);
 		assertTrue(revision instanceof WorkspaceFileRevision);

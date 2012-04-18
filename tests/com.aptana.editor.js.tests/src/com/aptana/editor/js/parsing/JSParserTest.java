@@ -8,20 +8,30 @@
 package com.aptana.editor.js.parsing;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import junit.framework.TestCase;
+
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
+
 import beaver.Symbol;
 
+import com.aptana.core.util.FileUtil;
+import com.aptana.core.util.IOUtil;
+import com.aptana.editor.common.tests.util.ASTUtil;
+import com.aptana.editor.js.JSPlugin;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseError;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.ParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
 
 public class JSParserTest extends TestCase
 {
-
-	private static final String EOL = "\n";
+	private static final String EOL = FileUtil.NEW_LINE;
 
 	private JSParser fParser;
 	private ParseState fParseState;
@@ -31,6 +41,20 @@ public class JSParserTest extends TestCase
 	{
 		fParser = new JSParser();
 		fParseState = new ParseState();
+	}
+
+	/**
+	 * getSource
+	 * 
+	 * @param resourceName
+	 * @return
+	 * @throws IOException
+	 */
+	private String getSource(String resourceName) throws IOException
+	{
+		InputStream stream = FileLocator.openStream(Platform.getBundle(JSPlugin.PLUGIN_ID), new Path(resourceName),
+				false);
+		return IOUtil.read(stream);
 	}
 
 	public void testEmptyStatement() throws Exception
@@ -1020,6 +1044,18 @@ public class JSParserTest extends TestCase
 	public void testCaseWithPartialIdentifier() throws Exception
 	{
 		assertParseResult("switch (id) {case Ti.}", "switch (id) {case Ti.: }" + EOL);
+	}
+
+	/**
+	 * This method is not being used for formal testing, but it's useful to determine how effective
+	 * {@link ParseNode#trimToSize()} is.
+	 * 
+	 * @throws Exception
+	 */
+	public void trimToSize() throws Exception
+	{
+		fParseState.setEditState(getSource("performance/ext/ext-all-debug-w-comments.js"));
+		ASTUtil.showBeforeAndAfterTrim(fParser.parse(fParseState));
 	}
 
 	// utility methods

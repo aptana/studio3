@@ -304,4 +304,9 @@ public class UserAgentElement implements Convertible
 		out.add(OS_VERSION_PROPERTY, this.getOSVersion());
 		out.add(DESCRIPTION_PROPERTY, this.getDescription());
 	}
+
+	public String toString()
+	{
+		return this.getPlatform() + "[" + this.getVersion() + "]:" + this.getOS();
+	}
 }

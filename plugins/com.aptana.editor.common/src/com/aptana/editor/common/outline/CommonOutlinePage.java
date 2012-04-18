@@ -345,9 +345,9 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 	@Override
 	public void dispose()
 	{
-		getIControlThemerFactory().dispose(getTreeViewer());
 		fPrefs.removePropertyChangeListener(this);
 		super.dispose();
+		getIControlThemerFactory().dispose(getTreeViewer());
 	}
 
 	@Override

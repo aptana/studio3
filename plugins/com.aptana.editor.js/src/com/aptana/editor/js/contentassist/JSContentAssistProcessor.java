@@ -325,7 +325,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				proposal.setFileLocation(overriddenLocation);
 			}
 
-			Image[] userAgents = UserAgentManager.getInstance().getUserAgentImages(getNatureIds(), userAgentNames);
+			Image[] userAgents = UserAgentManager.getInstance().getUserAgentImages(getProject(), userAgentNames);
 			proposal.setUserAgentImages(userAgents);
 
 			// add the proposal to the list
@@ -363,7 +363,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 			// build proposal
 			IContextInformation contextInfo = null;
-			Image[] userAgents = UserAgentManager.getInstance().getUserAgentImages(getNatureIds(), userAgentIds);
+			Image[] userAgents = UserAgentManager.getInstance().getUserAgentImages(getProject(), userAgentIds);
 
 			CommonCompletionProposal proposal = new CommonCompletionProposal(displayName, offset, replaceLength,
 					length, image, displayName, contextInfo, description);
@@ -1156,7 +1156,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				{
 					char candidate = document.getChar(index);
 
-					if (candidate == ',' || candidate == '(')
+					if (candidate == ',' || candidate == '(' || candidate == '{')
 					{
 						result = true;
 						break;

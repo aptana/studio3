@@ -17,10 +17,8 @@ import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.core.build.IProblem;
 import com.aptana.core.build.RequiredBuildParticipant;
-import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.IMarkerConstants;
 import com.aptana.core.util.ArrayUtil;
-import com.aptana.editor.coffee.CoffeeScriptEditorPlugin;
 import com.aptana.editor.coffee.parsing.ast.CoffeeCommentNode;
 import com.aptana.index.core.build.BuildContext;
 import com.aptana.parsing.ast.IParseNode;
@@ -75,25 +73,20 @@ public class CoffeeTaskDetector extends RequiredBuildParticipant
 		}
 
 		Collection<IProblem> tasks = new ArrayList<IProblem>();
-		try
+
+		SubMonitor sub = SubMonitor.convert(monitor, comments.length);
+		String source = context.getContents();
+		String filePath = context.getURI().toString();
+		for (IParseNode commentNode : comments)
 		{
-			SubMonitor sub = SubMonitor.convert(monitor, comments.length);
-			String source = context.getContents();
-			String filePath = context.getURI().toString();
-			for (IParseNode commentNode : comments)
+			if (commentNode instanceof CoffeeCommentNode)
 			{
-				if (commentNode instanceof CoffeeCommentNode)
-				{
-					tasks.addAll(processCommentNode(filePath, source, 0, commentNode, COMMENT_ENDING));
-				}
-				sub.worked(1);
+				tasks.addAll(processCommentNode(filePath, source, 0, commentNode, COMMENT_ENDING));
 			}
-			sub.done();
+			sub.worked(1);
 		}
-		catch (CoreException e)
-		{
-			IdeLog.logError(CoffeeScriptEditorPlugin.getDefault(), e);
-		}
+		sub.done();
+
 		return tasks;
 	}
 }

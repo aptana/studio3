@@ -584,7 +584,7 @@ public class HTMLMetadataReader extends MetadataReader
 
 		if (this._currentElement != null)
 		{
-			this._currentElement.setExample(this.resolveEntities(text));
+			this._currentElement.setExample(text);
 		}
 	}
 

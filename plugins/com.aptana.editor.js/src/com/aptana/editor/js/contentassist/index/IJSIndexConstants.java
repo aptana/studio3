@@ -33,7 +33,8 @@ public interface IJSIndexConstants
 	// 0.29 - Update some DOM 2 content for Document
 	// 0.30 - Update some DOM 0 content for Window
 	// 0.31 - Added "requires" to index
-	public static final double INDEX_VERSION = 0.30;
+	// 0.32 - Transfer user agents from JSCA types to the properties that point to them
+	public static final double INDEX_VERSION = 0.32;
 
 	// for debugging, comment the line above, and uncomment the following
 	// public static final double INDEX_VERSION = new Random().nextDouble() * 1e6;

@@ -9,12 +9,12 @@ package com.aptana.editor.common.parsing;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import beaver.Scanner.Exception;
 import beaver.Symbol;
 
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.ParseState;
@@ -25,10 +25,8 @@ import com.aptana.parsing.ast.ParseNode;
 
 public class CompositeParser implements IParser
 {
-
 	protected CompositeParserScanner fScanner;
 	private String fParserLanguage;
-
 	protected IParseNode fEmbeddedlanguageRoot;
 	protected Symbol fCurrentSymbol;
 
@@ -44,79 +42,114 @@ public class CompositeParser implements IParser
 		fScanner.setSource(parseState.getSource());
 		fCurrentSymbol = null;
 
-		// first processes the embedded language
+		// first process the embedded language
 		fEmbeddedlanguageRoot = processEmbeddedlanguage(parseState);
 
-		// then processes the source as normal, but skips the nodes returned from embedded language parsing
+		// setup to skip the embedded language nodes before doing the primary parse
 		IParseNode[] embeddedNodes = null;
+
 		if (fEmbeddedlanguageRoot != null)
 		{
 			embeddedNodes = fEmbeddedlanguageRoot.getChildren();
+
 			if (embeddedNodes.length == 0)
 			{
 				embeddedNodes = new IParseNode[] { fEmbeddedlanguageRoot };
 			}
+
 			((ParseState) parseState).setSkippedRanges(embeddedNodes);
 		}
+
+		// process source as normal
 		IParseRootNode result = primaryParse(parseState);
+
+		// reset skip regions now that they're no longer needed
 		if (embeddedNodes != null)
 		{
 			((ParseState) parseState).setSkippedRanges(null);
 		}
 
-		// merges the tree for the embedded language into the result
+		// merge the embedded language nodes into the primary AST
 		if (fEmbeddedlanguageRoot != null)
 		{
-			List<IParseNode> list = new LinkedList<IParseNode>();
-			getAllNodes(result, list);
-
-			IParseNode parent;
-			for (IParseNode embeddedNode : embeddedNodes)
-			{
-				parent = findNode(embeddedNode, list);
-				if (parent == null)
-				{
-					// the node is at the end of the source
-					result.addChild(embeddedNode);
-				}
-				else
-				{
-					// inserts the node into the right position
-					List<IParseNode> newList = new ArrayList<IParseNode>();
-					IParseNode[] children = parent.getChildren();
-					boolean found = false;
-					int embeddedStart = embeddedNode.getStartingOffset();
-					int embeddedEnd = embeddedNode.getEndingOffset();
-					for (IParseNode primaryNodeChild : children)
-					{
-						if (!found && primaryNodeChild.getStartingOffset() > embeddedStart)
-						{
-							found = true;
-							newList.add(embeddedNode);
-						}
-						if (primaryNodeChild.getStartingOffset() > embeddedEnd)
-						{
-							newList.add(primaryNodeChild);
-						}
-						else if (primaryNodeChild.getStartingOffset() < embeddedStart
-								&& (primaryNodeChild.getEndingOffset() < embeddedStart || primaryNodeChild
-										.getEndingOffset() > embeddedEnd))
-						{
-							newList.add(primaryNodeChild);
-						}
-
-					}
-					if (!found)
-					{
-						// the node locates at the end of the parent node
-						newList.add(embeddedNode);
-					}
-					((ParseNode) parent).setChildren(newList.toArray(new IParseNode[newList.size()]));
-				}
-			}
+			mergeEmbeddedNodes(result, embeddedNodes);
 		}
 
 		return result;
+	}
+
+	/**
+	 * mergeEmbeddedNodes
+	 * 
+	 * @param ast
+	 * @param embeddedNodes
+	 */
+	protected void mergeEmbeddedNodes(IParseRootNode ast, IParseNode[] embeddedNodes)
+	{
+		if (ArrayUtil.isEmpty(embeddedNodes) || ast == null)
+		{
+			return;
+		}
+
+		for (IParseNode embeddedNode : embeddedNodes)
+		{
+			IParseNode parent = ast.getNodeAtOffset(embeddedNode.getStartingOffset());
+
+			// fix-up results to preserve behavior of old "getAllNodes" method. Basically move back up the AST until we
+			// find a node that completely encloses the embedded node
+			// @formatter:off
+			while (
+					parent != null
+				&& !(parent instanceof IParseRootNode)
+				&& (embeddedNode.getStartingOffset() <= parent.getStartingOffset() || embeddedNode.getEndingOffset() >= parent.getEndingOffset())
+			)
+			{
+				parent = parent.getParent();
+			}
+			// @formatter:on
+
+			if (parent == null)
+			{
+				// the node is at the end of the source
+				ast.addChild(embeddedNode);
+			}
+			else
+			{
+				// inserts the node into the right position
+				List<IParseNode> newList = new ArrayList<IParseNode>();
+				boolean found = false;
+				int embeddedStart = embeddedNode.getStartingOffset();
+				int embeddedEnd = embeddedNode.getEndingOffset();
+
+				for (IParseNode primaryNodeChild : parent)
+				{
+					if (!found && primaryNodeChild.getStartingOffset() > embeddedStart)
+					{
+						found = true;
+						newList.add(embeddedNode);
+					}
+
+					if (primaryNodeChild.getStartingOffset() > embeddedEnd)
+					{
+						newList.add(primaryNodeChild);
+					}
+					else if (primaryNodeChild.getStartingOffset() < embeddedStart
+							&& (primaryNodeChild.getEndingOffset() < embeddedStart || primaryNodeChild
+									.getEndingOffset() > embeddedEnd))
+					{
+						newList.add(primaryNodeChild);
+					}
+				}
+
+				if (!found)
+				{
+					// the node locates at the end of the parent node
+					newList.add(embeddedNode);
+				}
+
+				((ParseNode) parent).setChildren(newList.toArray(new IParseNode[newList.size()]));
+			}
+		}
 	}
 
 	/**
@@ -161,29 +194,6 @@ public class CompositeParser implements IParser
 		}
 		catch (java.lang.Exception e)
 		{
-		}
-		return null;
-	}
-
-	protected static void getAllNodes(IParseNode node, List<IParseNode> list)
-	{
-		IParseNode[] children = node.getChildren();
-		for (IParseNode child : children)
-		{
-			getAllNodes(child, list);
-		}
-		list.add(node);
-	}
-
-	protected static IParseNode findNode(IParseNode node, List<IParseNode> list)
-	{
-		for (IParseNode element : list)
-		{
-			if (element.getStartingOffset() <= node.getStartingOffset()
-					&& element.getEndingOffset() >= node.getEndingOffset())
-			{
-				return element;
-			}
 		}
 		return null;
 	}

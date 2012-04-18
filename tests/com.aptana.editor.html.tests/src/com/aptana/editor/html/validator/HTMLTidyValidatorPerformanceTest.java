@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.test.performance.PerformanceTestCase;
 
 import com.aptana.core.util.ResourceUtil;
+import com.aptana.editor.epl.tests.EditorTestHelper;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.index.core.FileStoreBuildContext;
 import com.aptana.index.core.build.BuildContext;
@@ -64,8 +65,10 @@ public class HTMLTidyValidatorPerformanceTest extends PerformanceTestCase
 		File file = ResourceUtil.resourcePathToFile(url);
 		IFileStore fileStore = EFS.getStore(file.toURI());
 
+		EditorTestHelper.joinBackgroundActivities();
+
 		// Ok now actually validate the thing, the real work
-		for (int i = 0; i < 350; i++)
+		for (int i = 0; i < 700; i++)
 		{
 			// Don't measure reading in string...
 			BuildContext context = new FileStoreBuildContext(fileStore);

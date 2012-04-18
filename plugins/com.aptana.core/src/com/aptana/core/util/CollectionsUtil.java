@@ -7,6 +7,7 @@
  */
 package com.aptana.core.util;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -434,6 +435,104 @@ public class CollectionsUtil
 	 * <br>
 	 * Note that this method is not thread safe. Users of this method will need to maintain type safety against the map.
 	 * 
+	 * @param keyType
+	 *            The key type in the resulting map
+	 * @param valueType
+	 *            The value type in the resulting collection
+	 * @param map
+	 *            A map to which items will be added
+	 * @param items
+	 *            An interleaved list of keys and values
+	 */
+	public static final <T, U> void addToMap(Class<T> keyType, Class<U> valueType, Map<T, U> map, Object... items)
+	{
+		if (keyType != null && valueType != null && map != null && !ArrayUtil.isEmpty(items))
+		{
+			if (items.length % 2 != 0)
+			{
+				throw new IllegalArgumentException("Length of list of items must be multiple of 2"); //$NON-NLS-1$
+			}
+
+			for (int i = 0; i < items.length; i += 2)
+			{
+				Object keyObject = items[i];
+				T key;
+				if (keyType.isAssignableFrom(keyObject.getClass()))
+				{
+					key = keyType.cast(keyObject);
+				}
+				else
+				{
+					// @formatter:off
+					String message = MessageFormat.format(
+						"Key {0} was not of the expected type: {1}", //$NON-NLS-1$
+						i,
+						keyType
+					);
+					// @formatter:on
+					throw new IllegalArgumentException(message);
+				}
+
+				Object valueObject = items[i + 1];
+				U value;
+				if (valueType.isAssignableFrom(valueObject.getClass()))
+				{
+					value = valueType.cast(valueObject);
+
+					map.put(key, value);
+				}
+				else
+				{
+					// @formatter:off
+					String message = MessageFormat.format(
+						"Value {0} was not of the expected type: {1}", //$NON-NLS-1$
+						i + 1,
+						valueType
+					);
+					// @formatter:on
+					throw new IllegalArgumentException(message);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Convert a list of items into a Map where the key and value types are specified. An empty map is returned if
+	 * keyType, valueType, or items is null
+	 * 
+	 * @param keyType
+	 *            The key type in the resulting map
+	 * @param valueType
+	 *            The value type in the resulting collection
+	 * @param items
+	 *            An interleaved list of keys and values
+	 * @return Returns a new HashMap<T, U> or an empty map
+	 */
+	public static final <T, U> Map<T, U> newTypedMap(Class<T> keyType, Class<U> valueType, Object... items)
+	{
+		Map<T, U> result;
+
+		if (keyType != null && valueType != null && !ArrayUtil.isEmpty(items))
+		{
+			result = new HashMap<T, U>();
+			addToMap(keyType, valueType, result, items);
+		}
+		else
+		{
+			result = Collections.emptyMap();
+		}
+
+		return result;
+	}
+
+	/**
+	 * Add a varargs list of items into a map. It is expected that items be in "key, value, key2, value2, etc.."
+	 * ordering. If the map or items are null then no action is performed. Note that the destination map has no
+	 * requirements other than it must be a Map of the source item's type. This allows the destination to be used, for
+	 * example, as an accumulator.<br>
+	 * <br>
+	 * Note that this method is not thread safe. Users of this method will need to maintain type safety against the map.
+	 * 
 	 * @param map
 	 *            A map to which items will be added
 	 * @param items
@@ -516,5 +615,36 @@ public class CollectionsUtil
 
 	private CollectionsUtil()
 	{
+	}
+
+	/**
+	 * Given a collection of items, we use an IMap to generate keys to associate, and then return the map from generated
+	 * keys to the values used to generate them. Useful for generating maps from ids/names to a complex object for quick
+	 * lookups as a cache 9whe what you have is just the set of objects).
+	 * 
+	 * @param values
+	 * @param valueTokeyMapper
+	 * @return
+	 */
+	public static <K, V> Map<K, V> mapFromValues(Collection<V> values, IMap<V, K> valueTokeyMapper)
+	{
+		if (isEmpty(values))
+		{
+			return Collections.emptyMap();
+		}
+
+		Map<K, V> map = new HashMap<K, V>(values.size());
+		for (V value : values)
+		{
+			K key = valueTokeyMapper.map(value);
+			if (key == null)
+			{
+				throw new IllegalStateException(MessageFormat.format(
+						"Generated key for value {0} was null, which is not allowed.", value.toString())); //$NON-NLS-1$
+			}
+			map.put(key, value);
+		}
+
+		return map;
 	}
 }

@@ -32,4 +32,5 @@ public interface IHTMLConstants
 	 * The marker type id for HTML Tidy problems. Extends {@link #HTML_PROBLEM}
 	 */
 	public String TIDY_PROBLEM = "com.aptana.editor.html.tidy_problem"; //$NON-NLS-1$
+
 }

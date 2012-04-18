@@ -65,6 +65,11 @@ public class AptanaDB
 			{
 				statement = connection.createStatement();
 
+				if (IdeLog.isTraceEnabled(UsagePlugin.getDefault(), IDebugScopes.DB))
+				{
+					IdeLog.logTrace(UsagePlugin.getDefault(), query);
+				}
+
 				if (handler == null)
 				{
 					statement.execute(query);
@@ -136,7 +141,7 @@ public class AptanaDB
 			}
 			catch (SQLException e)
 			{
-				IdeLog.logError(UsagePlugin.getDefault(), Messages.AptanaDB_FailedToConnect, e);
+				IdeLog.logWarning(UsagePlugin.getDefault(), Messages.AptanaDB_FailedToConnect, e);
 			}
 		}
 		return null;

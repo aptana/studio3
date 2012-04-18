@@ -194,12 +194,22 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 		 */
 		public void focusGained(FocusEvent e)
 		{
+			focusChanged(e);
 		}
 
 		/**
 		 * @see org.eclipse.swt.events.FocusListener#focusLost(org.eclipse.swt.events.FocusEvent)
 		 */
 		public void focusLost(FocusEvent e)
+		{
+			focusChanged(e);
+
+		}
+
+		/*
+		 * Called on focus gained or lost.
+		 */
+		private void focusChanged(FocusEvent e)
 		{
 			Control control = fControl;
 			if (Helper.okToUse(control))
@@ -1749,7 +1759,10 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 	 */
 	void popupFocusLost(FocusEvent e)
 	{
-		fCloser.focusLost(e);
+		if (fCloser != null)
+		{
+			fCloser.focusLost(e);
+		}
 	}
 
 	/**

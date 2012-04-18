@@ -20,7 +20,6 @@
          point="org.eclipse.core.contenttype.contentTypes">
       <content-type
             base-type="org.eclipse.core.runtime.text"
-            default-charset="UTF-8"
             file-extensions="html,htm,xhtml,shtml"
             id="com.aptana.contenttype.html"
             name="%content-type.html.name"
@@ -256,5 +255,16 @@
             label-provider="com.aptana.editor.html.views.HTMLIndexViewLabelProvider"
             name="%index.view.contributor.name">
       </contributor>
+   </extension>
+   <extension
+         point="com.aptana.editor.common.textHovers">
+      <hover
+            class="com.aptana.editor.html.text.HTMLTextHover"
+            id="com.aptana.editor.html.hover"
+            label="HTML Hover">
+         <contentType
+               type="com.aptana.contenttype.html">
+         </contentType>
+      </hover>
    </extension>
 </plugin>

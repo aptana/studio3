@@ -93,8 +93,8 @@ public class ServersView extends ViewPart implements IServerChangeListener
 	@Override
 	public void dispose()
 	{
-		ThemePlugin.getDefault().getControlThemerFactory().dispose(serverTableViewer);
 		super.dispose();
+		ThemePlugin.getDefault().getControlThemerFactory().dispose(serverTableViewer);
 	}
 
 	/**

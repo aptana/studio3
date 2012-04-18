@@ -349,13 +349,17 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 	{
 		Set<IFileStore> result = new HashSet<IFileStore>();
 
-		for (IIndexFileContributor contributor : getIndexManager().getFileContributors())
+		IndexManager manager = getIndexManager();
+		if (manager != null)
 		{
-			Set<IFileStore> files = contributor.getFiles(container);
-
-			if (!CollectionsUtil.isEmpty(files))
+			for (IIndexFileContributor contributor : manager.getFileContributors())
 			{
-				result.addAll(files);
+				Set<IFileStore> files = contributor.getFiles(container);
+
+				if (!CollectionsUtil.isEmpty(files))
+				{
+					result.addAll(files);
+				}
 			}
 		}
 
@@ -364,7 +368,8 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 
 	protected IndexManager getIndexManager()
 	{
-		return IndexPlugin.getDefault().getIndexManager();
+		IndexPlugin plugin = IndexPlugin.getDefault();
+		return (plugin == null) ? null : plugin.getIndexManager();
 	}
 
 	/**
@@ -468,9 +473,13 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 		if (!CollectionsUtil.isEmpty(fileStores))
 		{
 			// Now let filters run
-			for (IIndexFilterParticipant filterParticipant : getIndexManager().getFilterParticipants())
+			IndexManager manager = getIndexManager();
+			if (manager != null)
 			{
-				fileStores = filterParticipant.applyFilter(fileStores);
+				for (IIndexFilterParticipant filterParticipant : manager.getFilterParticipants())
+				{
+					fileStores = filterParticipant.applyFilter(fileStores);
+				}
 			}
 			sub.worked(60);
 

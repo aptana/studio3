@@ -23,7 +23,7 @@
          version="0.0.0"/>
 
    <includes
-         id="com.aptana.webkitbrowser"
+         id="com.aptana.webkitbrowser.feature"
          version="0.0.0"/>
 
    <requires>
@@ -548,13 +548,6 @@
          unpack="false"/>
 
    <plugin
-         id="org.w3c.tidy"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="com.aptana.debug.core"
          download-size="0"
          install-size="0"
@@ -692,6 +685,15 @@
 
    <plugin
          id="com.aptana.buildpath.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.eclipse.fullscreen.ui"
+         os="macosx"
+         ws="cocoa"
          download-size="0"
          install-size="0"
          version="0.0.0"

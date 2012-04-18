@@ -17,10 +17,16 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ProjectScope;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.contentassist.IContentAssistSubjectControl;
 import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.JFacePreferences;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.BadLocationException;
@@ -40,8 +46,6 @@ import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension3;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension4;
 import org.eclipse.jface.text.contentassist.IContextInformation;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.ControlAdapter;
@@ -68,8 +72,11 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ui.epl.UIEplPlugin;
 
@@ -81,6 +88,7 @@ import com.aptana.ui.epl.UIEplPlugin;
  */
 public class CompletionProposalPopup implements IContentAssistListener
 {
+	private static final String COM_APTANA_EDITOR_COMMON = "com.aptana.editor.common"; //$NON-NLS-1$
 
 	/**
 	 * Set to <code>true</code> to use a Table with SWT.VIRTUAL. XXX: This is a workaround for:
@@ -243,6 +251,12 @@ public class CompletionProposalPopup implements IContentAssistListener
 	 * @since 3.1
 	 */
 	private boolean fIsFilteredSubset;
+
+	private IEclipsePreferences projectScopeNode;
+
+	private IEclipsePreferences instanceScopeNode;
+
+	private IPreferenceChangeListener prefListener;
 
 	/**
 	 * Creates a new completion proposal popup for the given elements.
@@ -459,8 +473,6 @@ public class CompletionProposalPopup implements IContentAssistListener
 			}
 		});
 
-		// Custom code for our impl!
-		final IPreferenceStore store = UIEplPlugin.getDefault().getPreferenceStore();
 		_insertOnTab = true; // store.getBoolean(IPreferenceConstants.INSERT_ON_TAB);
 
 		// Here we add custom columns
@@ -585,31 +597,10 @@ public class CompletionProposalPopup implements IContentAssistListener
 				}
 			}
 		});
+		fPopupCloser.install(fContentAssistant, fProposalTable, fAdditionalInfoController);
+		// TISTUD-913: changed to the line above from 'fPopupCloser.install(fContentAssistant, fProposalTable);'
 
-		fPopupCloser.install(fContentAssistant, fProposalTable);
-
-		final IPropertyChangeListener propListener = new IPropertyChangeListener()
-		{
-			public void propertyChange(PropertyChangeEvent event)
-			{
-				if (event.getProperty().equals(IPreferenceConstants.USER_AGENT_PREFERENCE))
-				{
-					if (Helper.okToUse(fProposalShell))
-					{
-						fProposalShell.dispose();
-					}
-					else
-					{
-						// shell already disposed so remove this listener
-						if (store != null)
-						{
-							store.removePropertyChangeListener(this);
-						}
-					}
-				}
-			}
-		};
-		store.addPropertyChangeListener(propListener);
+		installPreferenceListener();
 
 		fProposalShell.addDisposeListener(new DisposeListener()
 		{
@@ -622,6 +613,74 @@ public class CompletionProposalPopup implements IContentAssistListener
 		fProposalTable.setHeaderVisible(false);
 
 		// addCommandSupport(fProposalTable);
+	}
+
+	/**
+	 * Set up the preference listener
+	 */
+	private void installPreferenceListener()
+	{
+		prefListener = new IPreferenceChangeListener()
+		{
+			public void preferenceChange(PreferenceChangeEvent event)
+			{
+				if (event.getKey().equals(IPreferenceConstants.USER_AGENT_PREFERENCE))
+				{
+					if (Helper.okToUse(fProposalShell))
+					{
+						fProposalShell.dispose();
+					}
+					else
+					{
+						if (projectScopeNode != null)
+						{
+							projectScopeNode.removePreferenceChangeListener(this);
+						}
+						if (instanceScopeNode != null)
+						{
+							instanceScopeNode.removePreferenceChangeListener(this);
+						}
+					}
+				}
+			}
+		};
+
+		projectScopeNode = getProjectScopeNode();
+		if (projectScopeNode != null)
+		{
+			projectScopeNode.addPreferenceChangeListener(prefListener);
+		}
+		instanceScopeNode = EclipseUtil.instanceScope().getNode(COM_APTANA_EDITOR_COMMON);
+		if (instanceScopeNode != null)
+		{
+			instanceScopeNode.addPreferenceChangeListener(prefListener);
+		}
+	}
+
+	/**
+	 * Returns a project scope node, or null.
+	 */
+	private IEclipsePreferences getProjectScopeNode()
+	{
+		// Locate the project. What a joy!...
+		if (fViewer instanceof IAdaptable)
+		{
+			ITextEditor editor = (ITextEditor) ((IAdaptable) fViewer).getAdapter(ITextEditor.class);
+			if (editor != null)
+			{
+				IEditorInput editorInput = editor.getEditorInput();
+				if (editorInput != null)
+				{
+					IResource resource = (IResource) editorInput.getAdapter(IResource.class);
+					if (resource != null)
+					{
+						IProject project = resource.getProject();
+						return new ProjectScope(project).getNode(COM_APTANA_EDITOR_COMMON);
+					}
+				}
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -973,6 +1032,11 @@ public class CompletionProposalPopup implements IContentAssistListener
 	 */
 	public boolean hasFocus()
 	{
+		if (fPopupCloser != null && fPopupCloser.isAdditionalInfoInFocus())
+		{
+			// TISTUD-913
+			return true;
+		}
 		if (Helper.okToUse(fProposalShell))
 		{
 			return (fProposalShell.isFocusControl() || fProposalTable.isFocusControl());
@@ -998,7 +1062,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 		if (Helper.okToUse(fProposalShell))
 		{
 			fContentAssistant.removeContentAssistListener(this, ContentAssistant.PROPOSAL_SELECTOR);
-			fPopupCloser.uninstall();
+			// TISTUD-913: moved the 'fPopupCloser.uninstall();' to disposePopup()
 			if (fAdditionalInfoController != null)
 			{
 				fAdditionalInfoController.disposeInformationControl();
@@ -1016,6 +1080,23 @@ public class CompletionProposalPopup implements IContentAssistListener
 		{
 			fProposalShell.dispose();
 		}
+
+		if (projectScopeNode != null)
+		{
+			projectScopeNode.removePreferenceChangeListener(prefListener);
+			projectScopeNode = null;
+		}
+		if (instanceScopeNode != null)
+		{
+			instanceScopeNode.removePreferenceChangeListener(prefListener);
+			instanceScopeNode = null;
+		}
+		if (fPopupCloser != null)
+		{
+			// TISTUD-913
+			fPopupCloser.uninstall();
+		}
+		prefListener = null;
 	}
 
 	/**

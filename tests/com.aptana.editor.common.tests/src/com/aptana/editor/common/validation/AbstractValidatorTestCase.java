@@ -7,6 +7,7 @@
  */
 package com.aptana.editor.common.validation;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -19,8 +20,11 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 
+import com.aptana.core.IMap;
 import com.aptana.core.build.AbstractBuildParticipant;
 import com.aptana.core.build.IProblem;
+import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.tests.util.TestProject;
 import com.aptana.index.core.build.BuildContext;
 import com.aptana.parsing.IParseState;
@@ -65,16 +69,25 @@ public abstract class AbstractValidatorTestCase extends TestCase
 		return new ArrayList<IProblem>(daProblems);
 	}
 
-	protected void assertContains(List<IProblem> items, String message)
+	protected IProblem assertContains(List<IProblem> items, String message)
 	{
 		for (IProblem item : items)
 		{
 			if (message.equals(item.getMessage()))
 			{
-				return;
+				return item;
 			}
 		}
-		fail("Was unable to find an IProblem with message: " + message);
+		Collection<String> strings = CollectionsUtil.map(items, new IMap<IProblem, String>()
+		{
+			public String map(IProblem item)
+			{
+				return item.getMessage();
+			}
+		});
+		fail(MessageFormat.format("Was unable to find an IProblem with message: {0}. Found problems: {1}", message,
+				StringUtil.join(", ", strings)));
+		return null;
 	}
 
 	protected void assertDoesntContain(List<IProblem> items, String message)
@@ -83,7 +96,8 @@ public abstract class AbstractValidatorTestCase extends TestCase
 		{
 			if (message.equals(item.getMessage()))
 			{
-				fail("Found unexepcted IProblem with message: " + message);
+				fail("Found unexpected IProblem with message: " + message);
+				return;
 			}
 		}
 	}

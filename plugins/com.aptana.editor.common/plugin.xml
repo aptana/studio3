@@ -504,8 +504,8 @@
          </state>
       </command>
       <command
+            categoryId="org.eclipse.ui.category.textEditor"
             description="%command.gotomatchingbracket.description"
-            defaultHandler="com.aptana.editor.common.internal.handlers.GotoMatchingBracketHandler"
             id="com.aptana.editor.common.gotoMatchingBracket"
             name="%command.gotomatchingbracket.name">
       </command>
@@ -657,9 +657,22 @@
       <page
             category="com.aptana.ui.AptanaPreferencePage"
             class="com.aptana.editor.common.preferences.ContentAssistPreferencePage"
-            id="com.aptana.editor.common.contentassist"
+            id="com.aptana.editor.common.contentAssistPreferencePage"
             name="%content.assist.pref.page.title">
       </page>            
+   </extension>
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            class="com.aptana.editor.common.preferences.ContentAssistPreferencePage"
+            id="com.aptana.editor.common.contentAssistPropertyPage"
+            name="%content.assist.pref.page.title">
+         <enabledWhen>
+            <instanceof
+                  value="org.eclipse.core.resources.IProject">
+            </instanceof>
+         </enabledWhen>
+      </page>
    </extension>
    <extension
          point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectors">
@@ -763,6 +776,7 @@
    <extension
          point="org.eclipse.ui.handlers">
       <handler
+            class="com.aptana.editor.common.internal.handlers.GotoMatchingBracketHandler"
             commandId="com.aptana.editor.common.gotoMatchingBracket">
          <enabledWhen>
             <with

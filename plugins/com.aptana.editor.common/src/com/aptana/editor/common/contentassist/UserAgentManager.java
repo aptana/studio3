@@ -19,13 +19,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ProjectScope;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.osgi.framework.Bundle;
+import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.ConfigurationElementDispatcher;
 import com.aptana.core.util.EclipseUtil;
@@ -33,6 +41,7 @@ import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.IDebugScopes;
 import com.aptana.ui.epl.UIEplPlugin;
 import com.aptana.ui.util.UIUtils;
 
@@ -133,8 +142,6 @@ public class UserAgentManager
 		}
 	}
 
-	// empty array constants
-	private static final String[] NO_STRINGS = new String[0];
 	public static final UserAgent[] NO_USER_AGENTS = new UserAgent[0];
 
 	/**
@@ -258,6 +265,63 @@ public class UserAgentManager
 	}
 
 	/**
+	 * Given a project, return the list of active user agent IDs. The current implementation processes only the first
+	 * (primary) nature ID of the given project. Secondary natures may be taken into consideration at a later point in
+	 * time
+	 * 
+	 * @param project
+	 *            An {@link IProject}.
+	 * @return Returns an array of user agent IDs for the main mature of the given project. In case the given project is
+	 *         null, an empty string array is returned.
+	 */
+	public String[] getActiveUserAgentIDs(IProject project)
+	{
+		if (project == null)
+		{
+			return ArrayUtil.NO_STRINGS;
+		}
+		// Extract the natures from the given project
+		String[] natureIDs = getProjectNatures(project);
+
+		// Look at the project-scope preferences for the active agents.
+		ProjectScope scope = new ProjectScope(project);
+		IEclipsePreferences node = scope.getNode(CommonEditorPlugin.PLUGIN_ID);
+		if (node != null)
+		{
+			String agents = node.get(IPreferenceConstants.USER_AGENT_PREFERENCE, null);
+			if (agents != null)
+			{
+				Map<String, String[]> userAgents = extractUserAgents(agents);
+				return getActiveUserAgentIDs(userAgents, natureIDs);
+			}
+		}
+		// In case we did not find any project-specific settings, use the project's nature IDs to grab the agents that
+		// were set in the workspace settings.
+		return getActiveUserAgentIDs(natureIDs);
+	}
+
+	/**
+	 * Extract the aptana project natures.
+	 * 
+	 * @param project
+	 * @return An array of project nature ids.
+	 */
+	public static String[] getProjectNatures(IProject project)
+	{
+		String[] natureIDs = ArrayUtil.NO_STRINGS;
+		try
+		{
+			natureIDs = ResourceUtil.getAptanaNatures(project.getDescription());
+		}
+		catch (CoreException e)
+		{
+			IdeLog.logWarning(CommonEditorPlugin.getDefault(), "Problem detecting the project's nature IDs for " //$NON-NLS-1$
+					+ project.getName(), e, IDebugScopes.CONTENT_ASSIST);
+		}
+		return natureIDs;
+	}
+
+	/**
 	 * Given a list of nature IDs, return the list of active user agent IDs. The current implementation processes only
 	 * the first (primary) nature ID. The signature allows for multiple nature IDs in case secondary natures need to be
 	 * taken into consideration at a later point in time
@@ -268,17 +332,44 @@ public class UserAgentManager
 	 */
 	public String[] getActiveUserAgentIDs(String... natureIDs)
 	{
-		String[] result = NO_STRINGS;
+		return getActiveUserAgentIDs(ACTIVE_USER_AGENTS_BY_NATURE_ID, natureIDs);
+	}
 
-		if (natureIDs != null && natureIDs.length > 0)
+	/**
+	 * Given a map of nature-ids to user-agents, and a list of nature-ids, return the matching user-agents.
+	 * 
+	 * @param userAgents
+	 * @param natureIDs
+	 */
+	private String[] getActiveUserAgentIDs(Map<String, String[]> userAgents, String... natureIDs)
+	{
+		String[] result = ArrayUtil.NO_STRINGS;
+
+		if (!ArrayUtil.isEmpty(natureIDs))
 		{
 			// NOTE: Currently, we only care about the primary nature.
 			String natureID = natureIDs[0];
 
-			result = ACTIVE_USER_AGENTS_BY_NATURE_ID.get(natureID);
+			result = userAgents.get(natureID);
+		}
+		else
+		{
+			IdeLog.logWarning(CommonEditorPlugin.getDefault(), "UserAgentManager - Got empty natures list", //$NON-NLS-1$
+					IDebugScopes.CONTENT_ASSIST);
 		}
 
 		return result;
+	}
+
+	/**
+	 * Returns an array of UserAgent instances for a given an {@link IProject}. This method uses
+	 * {@link #getActiveUserAgentIDs(IProject)} and therefore has the same limitations on natureIDs as described there
+	 * 
+	 * @return Returns an array array of UserAgent instances
+	 */
+	public UserAgent[] getActiveUserAgents(IProject project)
+	{
+		return getUserAgentsByID(getActiveUserAgentIDs(project));
 	}
 
 	/**
@@ -399,18 +490,20 @@ public class UserAgentManager
 	}
 
 	/**
-	 * Return an array of icons, one for each user agent ID in the userAgents array. The specified list of natures is
-	 * used to determine the list of active user agents via {@link #getActiveUserAgents(String...)}. These user agents
-	 * are compared to the user agents passed into this method. All user agents that are not in the specified array will
-	 * return disabled icons. All others return enabled icons.
+	 * Return an array of icons, one for each user agent ID in the userAgents array. The specified project provides a
+	 * list of natures that is used to determine the list of active user agents via
+	 * {@link #getActiveUserAgents(IProject)}. These user agents are compared to the user agents passed into this
+	 * method. All user agents that are not in the specified array will return disabled icons. All others return enabled
+	 * icons.
 	 * 
+	 * @param project
 	 * @param userAgents
 	 *            An array of user agent IDs
 	 * @return Returns an array of Images
 	 */
-	public Image[] getUserAgentImages(String[] natureIDs, String... userAgents)
+	public Image[] getUserAgentImages(IProject project, String... userAgents)
 	{
-		UserAgent[] activeUserAgents = getActiveUserAgents(natureIDs);
+		UserAgent[] activeUserAgents = getActiveUserAgents(project);
 		Set<String> enabledAgents;
 		if (userAgents == null)
 		{
@@ -499,53 +592,21 @@ public class UserAgentManager
 	 */
 	public void loadPreference()
 	{
-		Map<String, String[]> result = new HashMap<String, String[]>();
+		// Grab preference value. We use a ChainedPreferenceStore to be able to migrate the preference location from the
+		// UIEplPlugin to the CommonEditorPlugin (the new location that we will use to save the
+		// IPreferenceConstants.USER_AGENT_PREFERENCE)
+		ChainedPreferenceStore chainedStore = new ChainedPreferenceStore(new IPreferenceStore[] {
+				CommonEditorPlugin.getDefault().getPreferenceStore(), UIEplPlugin.getDefault().getPreferenceStore() });
+		String preferenceValue = chainedStore.getString(IPreferenceConstants.USER_AGENT_PREFERENCE);
 
-		// grab preference value
-		IPreferenceStore prefs = UIEplPlugin.getDefault().getPreferenceStore();
-		String preferenceValue = prefs.getString(IPreferenceConstants.USER_AGENT_PREFERENCE);
-
+		Map<String, String[]> result;
 		if (!StringUtil.isEmpty(preferenceValue))
 		{
-			if (preferenceValue.contains(NAME_VALUE_SEPARATOR) && preferenceValue.contains(ENTRY_DELIMITER))
-			{
-				// looks like the latest format for this pref key
-				String[] entries = preferenceValue.split(ENTRY_DELIMITER);
-
-				for (String entry : entries)
-				{
-					String[] nameValue = entry.split(NAME_VALUE_SEPARATOR);
-					String natureID = nameValue[0];
-
-					if (nameValue.length > 1)
-					{
-						String userAgentIDsString = nameValue[1];
-						String[] userAgentIDs = userAgentIDsString.split(USER_AGENT_DELIMITER);
-
-						result.put(natureID, userAgentIDs);
-					}
-					else
-					{
-						result.put(natureID, NO_STRINGS);
-					}
-				}
-			}
-			else
-			{
-				// assume this is an old style preference and update each nature ID with its user agent settings
-
-				// NOTE: We don't manipulate these arrays directly, so it should be fine to reference the same
-				// array for all natures
-				String[] userAgentIDs = preferenceValue.split(USER_AGENT_DELIMITER);
-
-				for (String natureID : ResourceUtil.getAptanaNaturesMap().values())
-				{
-					result.put(natureID, userAgentIDs);
-				}
-			}
+			result = extractUserAgents(preferenceValue);
 		}
 		else
 		{
+			result = new HashMap<String, String[]>();
 			// set defaults
 			for (String natureID : ResourceUtil.getAptanaNaturesMap().values())
 			{
@@ -557,32 +618,142 @@ public class UserAgentManager
 		ACTIVE_USER_AGENTS_BY_NATURE_ID = result;
 	}
 
+	private Map<String, String[]> extractUserAgents(String preferenceValue)
+	{
+		Map<String, String[]> result = new HashMap<String, String[]>();
+		if (preferenceValue.contains(NAME_VALUE_SEPARATOR))
+		{
+			// looks like the latest format for this pref key
+			String[] entries = preferenceValue.split(ENTRY_DELIMITER);
+
+			for (String entry : entries)
+			{
+				String[] nameValue = entry.split(NAME_VALUE_SEPARATOR);
+				String natureID = nameValue[0];
+
+				if (nameValue.length > 1)
+				{
+					String userAgentIDsString = nameValue[1];
+					String[] userAgentIDs = userAgentIDsString.split(USER_AGENT_DELIMITER);
+
+					result.put(natureID, userAgentIDs);
+				}
+				else
+				{
+					result.put(natureID, ArrayUtil.NO_STRINGS);
+				}
+			}
+		}
+		else
+		{
+			// assume this is an old style preference and update each nature ID with its user agent settings
+
+			// NOTE: We don't manipulate these arrays directly, so it should be fine to reference the same
+			// array for all natures
+			String[] userAgentIDs = preferenceValue.split(USER_AGENT_DELIMITER);
+
+			for (String natureID : ResourceUtil.getAptanaNaturesMap().values())
+			{
+				result.put(natureID, userAgentIDs);
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * Save the current in-memory cache of nature/user-agent info to the UserAgentManager preference key. Note that
+	 * changes made to the cache via {@link #setActiveUserAgents(String, String[])} will not be automatically reflected
+	 * in the preference key value. This method needs to be called to make those changes persist between Studio
+	 * sessions.<br>
+	 * This method should be called when saving the workspace-scope settings. For a project-specific scope, use
+	 * {@link #savePreference(IProject, Map)}.
+	 * 
+	 * @see #savePreference(IProject, Map)
+	 */
+	public void savePreference()
+	{
+		savePreference(null, ACTIVE_USER_AGENTS_BY_NATURE_ID);
+	}
+
 	/**
 	 * Save the current in-memory cache of nature/user-agent info to the UserAgentManager preference key. Note that
 	 * changes made to the cache via {@link #setActiveUserAgents(String, String[])} will not be automatically reflected
 	 * in the preference key value. This method needs to be called to make those changes persist between Studio
 	 * sessions.
+	 * 
+	 * @param project
+	 *            An {@link IProject}. Non <code>null</code> when saved for a specific project. <code>null</code> when
+	 *            the settings are saved as a workspace-level.
+	 * @param natureIdToUserAgents
+	 *            A map that holds mapping between nature-ids to user-agents.
 	 */
-	public void savePreference()
+	public void savePreference(IProject project, Map<String, String[]> natureIdToUserAgents)
 	{
+		IEclipsePreferences preferences = null;
+		if (project != null)
+		{
+			// Save to the project scope
+			preferences = new ProjectScope(project).getNode(CommonEditorPlugin.PLUGIN_ID);
+		}
+		else
+		{
+			// Save to the instance scope (plugin)
+			preferences = EclipseUtil.instanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
+		}
+
 		// convert active user agents to a string representation
 		List<String> natureEntries = new ArrayList<String>();
 
-		for (Map.Entry<String, String[]> entry : ACTIVE_USER_AGENTS_BY_NATURE_ID.entrySet())
+		for (Map.Entry<String, String[]> entry : natureIdToUserAgents.entrySet())
 		{
 			String natureID = entry.getKey();
 			String userAgentIDs = StringUtil.join(USER_AGENT_DELIMITER, entry.getValue());
-
 			natureEntries.add(natureID + NAME_VALUE_SEPARATOR + userAgentIDs);
 		}
 
 		String value = StringUtil.join(ENTRY_DELIMITER, natureEntries);
 
-		// grab preference store
-		IPreferenceStore prefs = UIEplPlugin.getDefault().getPreferenceStore();
-
 		// save value
-		prefs.setValue(IPreferenceConstants.USER_AGENT_PREFERENCE, value);
+		if (preferences != null)
+		{
+			preferences.put(IPreferenceConstants.USER_AGENT_PREFERENCE, value);
+			try
+			{
+				preferences.flush();
+			}
+			catch (BackingStoreException e)
+			{
+				IdeLog.logError(CommonEditorPlugin.getDefault(), "Error saving the user-agent preferences.", e); //$NON-NLS-1$
+			}
+		}
+		else
+		{
+			IdeLog.logError(CommonEditorPlugin.getDefault(),
+					"Error saving the user-agent preferences. Preferences node was null"); //$NON-NLS-1$
+		}
+	}
+
+	/**
+	 * Clear a project-specific User-Agents setting for a given project.
+	 * 
+	 * @param project
+	 */
+	public void clearPreferences(IProject project)
+	{
+		if (project != null)
+		{
+			// Save to the project scope
+			IEclipsePreferences preferences = new ProjectScope(project).getNode(CommonEditorPlugin.PLUGIN_ID);
+			preferences.remove(IPreferenceConstants.USER_AGENT_PREFERENCE);
+			try
+			{
+				preferences.flush();
+			}
+			catch (BackingStoreException e)
+			{
+				// ignore
+			}
+		}
 	}
 
 	/**
@@ -596,7 +767,7 @@ public class UserAgentManager
 	{
 		if (!StringUtil.isEmpty(natureID))
 		{
-			String[] value = (userAgentIDs != null) ? userAgentIDs : NO_STRINGS;
+			String[] value = (userAgentIDs != null) ? userAgentIDs : ArrayUtil.NO_STRINGS;
 
 			ACTIVE_USER_AGENTS_BY_NATURE_ID.put(natureID, value);
 		}

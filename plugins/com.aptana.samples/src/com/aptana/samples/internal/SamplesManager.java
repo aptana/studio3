@@ -29,12 +29,15 @@ import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.samples.IDebugScopes;
 import com.aptana.samples.ISampleListener;
 import com.aptana.samples.ISamplesManager;
 import com.aptana.samples.SamplesPlugin;
 import com.aptana.samples.model.SampleCategory;
 import com.aptana.samples.model.SamplesReference;
+import com.aptana.scripting.model.AbstractElement;
 import com.aptana.scripting.model.BundleManager;
+import com.aptana.scripting.model.ElementVisibilityListener;
 import com.aptana.scripting.model.LoadCycleListener;
 import com.aptana.scripting.model.ProjectSampleElement;
 
@@ -105,6 +108,26 @@ public class SamplesManager implements ISamplesManager
 		}
 	};
 
+	private ElementVisibilityListener elementListener = new ElementVisibilityListener()
+	{
+
+		public void elementBecameHidden(AbstractElement element)
+		{
+			if (element instanceof ProjectSampleElement)
+			{
+				loadBundleSampleElements();
+			}
+		}
+
+		public void elementBecameVisible(AbstractElement element)
+		{
+			if (element instanceof ProjectSampleElement)
+			{
+				addSample((ProjectSampleElement) element);
+			}
+		}
+	};
+
 	public SamplesManager()
 	{
 		categories = new HashMap<String, SampleCategory>();
@@ -119,6 +142,7 @@ public class SamplesManager implements ISamplesManager
 		loadBundleSampleElements();
 
 		BundleManager.getInstance().addLoadCycleListener(loadCycleListener);
+		BundleManager.getInstance().addElementVisibilityListener(elementListener);
 	}
 
 	public List<SampleCategory> getCategories()
@@ -198,7 +222,19 @@ public class SamplesManager implements ISamplesManager
 			samples.add(sample);
 			bundleSamplesById.put(id, sample);
 
+			if (IdeLog.isInfoEnabled(SamplesPlugin.getDefault(), IDebugScopes.MANAGER))
+			{
+				IdeLog.logInfo(
+						SamplesPlugin.getDefault(),
+						MessageFormat.format("Added sample: id = {0}; name = {1}", id, sample.getName()), IDebugScopes.MANAGER); //$NON-NLS-1$
+			}
 			fireSampleAdded(sample);
+		}
+		else
+		{
+			IdeLog.logWarning(SamplesPlugin.getDefault(),
+					MessageFormat.format("No category ''{0}'' exists", categoryId), //$NON-NLS-1$
+					IDebugScopes.MANAGER);
 		}
 	}
 
@@ -386,12 +422,20 @@ public class SamplesManager implements ISamplesManager
 		Collection<SamplesReference> samples = new ArrayList<SamplesReference>(bundleSamplesById.values());
 		bundleSamplesByCategory.clear();
 		bundleSamplesById.clear();
+		if (IdeLog.isInfoEnabled(SamplesPlugin.getDefault(), IDebugScopes.MANAGER))
+		{
+			IdeLog.logInfo(SamplesPlugin.getDefault(), "Removed all existing samples", IDebugScopes.MANAGER); //$NON-NLS-1$
+		}
 		for (SamplesReference sample : samples)
 		{
 			fireSampleRemoved(sample);
 		}
 
 		// adds the current list of samples loaded from the rubles
+		if (IdeLog.isInfoEnabled(SamplesPlugin.getDefault(), IDebugScopes.MANAGER))
+		{
+			IdeLog.logInfo(SamplesPlugin.getDefault(), "adding the list of samples", IDebugScopes.MANAGER); //$NON-NLS-1$
+		}
 		for (ProjectSampleElement element : bundleSamples)
 		{
 			addSample(element);

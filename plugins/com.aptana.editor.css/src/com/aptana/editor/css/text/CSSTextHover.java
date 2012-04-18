@@ -30,6 +30,7 @@ import com.aptana.editor.css.CSSColors;
 import com.aptana.editor.css.contentassist.CSSIndexQueryHelper;
 import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.contentassist.model.PropertyElement;
+import com.aptana.editor.css.internal.text.CSSModelFormatter;
 import com.aptana.editor.css.parsing.ast.CSSDeclarationNode;
 import com.aptana.editor.css.parsing.ast.CSSFunctionNode;
 import com.aptana.editor.css.parsing.ast.CSSNode;
@@ -60,6 +61,8 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 
 	private Object info;
 
+	private String fHeader;
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.hover.AbstractDocumentationHover#getHeader(java.lang.Object,
@@ -72,7 +75,7 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 		{
 			return Messages.CSSTextHover_cssColorHeaderText;
 		}
-		return null;
+		return fHeader;
 	}
 
 	/*
@@ -85,7 +88,7 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 	{
 		if (info instanceof String)
 		{
-			return info.toString();
+			return (String) info;
 		}
 		else if (info instanceof RGB)
 		{
@@ -176,6 +179,8 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 	{
 		// assume no hover region
 		IRegion result = null;
+		info = null;
+		fHeader = null;
 
 		// grab document's parse model
 		IParseNode ast = getAST(textViewer, offset);
@@ -250,7 +255,9 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 							if (property != null)
 							{
 								result = new Region(cssNode.getStartingOffset(), propertyName.length());
-								info = property.getDescription();
+
+								fHeader = CSSModelFormatter.TEXT_HOVER.getHeader(property);
+								info = CSSModelFormatter.TEXT_HOVER.getDocumentation(property);
 							}
 						}
 						break;
