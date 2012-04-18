@@ -8,6 +8,7 @@
 package com.aptana.core.internal.preferences;
 
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.osgi.service.prefs.BackingStoreException;
@@ -23,10 +24,13 @@ import com.aptana.core.util.EclipseUtil;
 public class PreferenceInitializer extends AbstractPreferenceInitializer
 {
 
+	private static final String MIGRATED_AUTO_REFRESH = "migrated_auto_refresh"; //$NON-NLS-1$
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
 	 */
+	@SuppressWarnings("deprecation")
 	@Override
 	public void initializeDefaultPreferences()
 	{
@@ -47,7 +51,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 
 		// Migrate auto-refresh pref to Eclipse's
 		prefs = EclipseUtil.instanceScope().getNode(CorePlugin.PLUGIN_ID);
-		boolean migrated = prefs.getBoolean("migrated_auto_refresh", false); //$NON-NLS-1$
+		boolean migrated = prefs.getBoolean(MIGRATED_AUTO_REFRESH, false);
 		if (!migrated)
 		{
 			// by default, turn on auto refresh
@@ -59,18 +63,34 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 			{
 				// there's an explicit value set, make sure to use that.
 				autoRefresh = Boolean.valueOf(oldValue);
-				prefs.remove(ICorePreferenceConstants.PREF_AUTO_REFRESH_PROJECTS);
-				try
-				{
-					prefs.flush();
-				}
-				catch (BackingStoreException e)
-				{
-					IdeLog.logError(CorePlugin.getDefault(), e);
-				}
 			}
 			ResourcesPlugin.getPlugin().getPluginPreferences().setValue(ResourcesPlugin.PREF_AUTO_REFRESH, autoRefresh);
+
+			// Listen for user changing auto-refresh value, when they do, don't automatically turn it on for them
+			// anymore
+			ResourcesPlugin.getPlugin().getPluginPreferences()
+					.addPropertyChangeListener(new Preferences.IPropertyChangeListener()
+					{
+
+						public void propertyChange(org.eclipse.core.runtime.Preferences.PropertyChangeEvent event)
+						{
+							if (ResourcesPlugin.PREF_AUTO_REFRESH.equals(event.getProperty()))
+							{
+								IEclipsePreferences ourPrefs = EclipseUtil.instanceScope()
+										.getNode(CorePlugin.PLUGIN_ID);
+								ourPrefs.putBoolean(MIGRATED_AUTO_REFRESH, true);
+								try
+								{
+									ourPrefs.sync();
+								}
+								catch (BackingStoreException e)
+								{
+									// ignore
+								}
+								ResourcesPlugin.getPlugin().getPluginPreferences().removePropertyChangeListener(this);
+							}
+						}
+					});
 		}
 	}
-
 }
