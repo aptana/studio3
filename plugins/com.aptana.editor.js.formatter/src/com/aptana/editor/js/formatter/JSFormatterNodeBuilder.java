@@ -456,7 +456,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				push(elseNode);
 				if (isCurlyFalseBlock)
 				{
-					pushBlockNode(falseBlock, true);
+					pushBlockNode(falseBlock, false);
 				}
 				else
 				{
