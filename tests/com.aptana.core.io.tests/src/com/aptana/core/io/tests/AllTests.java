@@ -7,6 +7,8 @@
  */
 package com.aptana.core.io.tests;
 
+import com.aptana.ide.core.io.preferences.CloakingUtilsTest;
+
 import junit.framework.Test;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
@@ -30,6 +32,7 @@ public class AllTests
 		suite.addTestSuite(WorkspaceFileSystemTest.class);
 		suite.addTestSuite(WorkspaceConnectionPointTest.class);
 		suite.addTestSuite(ConnectionPointManagerTest.class);
+		suite.addTestSuite(CloakingUtilsTest.class);
 		// $JUnit-END$
 		return suite;
 	}
