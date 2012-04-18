@@ -63,7 +63,8 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 
 		List<IProblem> items = getParseErrors(text);
 		assertTrue(items.size() > 0);
-		assertContainsProblem(items, "SYSTEM, PUBLIC, W3C, DTD, EN must be upper case", IMarker.SEVERITY_WARNING, 1, 26, 3);
+		assertContainsProblem(items, "SYSTEM, PUBLIC, W3C, DTD, EN must be upper case", IMarker.SEVERITY_WARNING, 1,
+				26, 3);
 	}
 
 	public void testLowercaseDoctypeEN() throws CoreException
@@ -73,7 +74,8 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 
 		List<IProblem> items = getParseErrors(text);
 		assertTrue(items.size() > 0);
-		assertContainsProblem(items, "SYSTEM, PUBLIC, W3C, DTD, EN must be upper case", IMarker.SEVERITY_WARNING, 1, 46, 2);
+		assertContainsProblem(items, "SYSTEM, PUBLIC, W3C, DTD, EN must be upper case", IMarker.SEVERITY_WARNING, 1,
+				46, 2);
 	}
 
 	public void testLowercaseDoctypeDTD() throws CoreException
@@ -83,7 +85,8 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 
 		List<IProblem> items = getParseErrors(text);
 		assertTrue(items.size() > 0);
-		assertContainsProblem(items, "SYSTEM, PUBLIC, W3C, DTD, EN must be upper case", IMarker.SEVERITY_WARNING, 1, 31, 3);
+		assertContainsProblem(items, "SYSTEM, PUBLIC, W3C, DTD, EN must be upper case", IMarker.SEVERITY_WARNING, 1,
+				31, 3);
 	}
 
 	public void testLowercaseDoctypeSYSTEM() throws CoreException
@@ -92,7 +95,8 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 
 		List<IProblem> items = getParseErrors(text);
 		assertTrue(items.size() > 0);
-		assertContainsProblem(items, "SYSTEM, PUBLIC, W3C, DTD, EN must be upper case", IMarker.SEVERITY_WARNING, 1, 15, 6);
+		assertContainsProblem(items, "SYSTEM, PUBLIC, W3C, DTD, EN must be upper case", IMarker.SEVERITY_WARNING, 1,
+				15, 6);
 	}
 
 	public void testOKSystemDoctype() throws CoreException
@@ -402,6 +406,61 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 
 		List<IProblem> items = getParseErrors(text);
 		assertContainsProblem(items, "unescaped & or unknown entity \"&am\"", IMarker.SEVERITY_WARNING, 7, 79, 3);
+	}
+
+	public void testAttributeValueOutsidePredefinedValues() throws CoreException
+	{
+		// @formatter:off
+		String text = "<!DOCTYPE html>\n" +
+			"<HTML>\n" +
+			"<HEAD>\n" +
+			"<TITLE>Example</TITLE>\n" +
+			"</HEAD>\n" +
+			"<body>\n" +
+			"<article hidden=\"yup\"><p>Yeah</p></article>\n" + 
+			"</body>\n" +
+			"</HTML>\n";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertContainsProblem(items, "article attribute \"hidden\" has invalid value \"yup\"",
+				IMarker.SEVERITY_WARNING, 7, 68, 22);
+	}
+
+	public void testAttributeValueInPredefinedValues() throws CoreException
+	{
+		// @formatter:off
+		String text = "<!DOCTYPE html>\n" +
+			"<HTML>\n" +
+			"<HEAD>\n" +
+			"<TITLE>Example</TITLE>\n" +
+			"</HEAD>\n" +
+			"<body>\n" +
+			"<article hidden=\"true\"><p>Yeah</p></article>\n" + 
+			"</body>\n" +
+			"</HTML>\n";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "article attribute \"hidden\" has invalid value \"true\"");
+	}
+
+	public void testAttributeValueWithAsteriskDefinedInMetadata() throws CoreException
+	{
+		// @formatter:off
+		String text = "<!DOCTYPE html>\n" +
+			"<HTML>\n" +
+			"<HEAD>\n" +
+			"<TITLE>Example</TITLE>\n" +
+			"<meta name=\"description\" content=\"not specified\" />\n" +
+			"</HEAD>\n" +
+			"<body>\n" +
+			"</body>\n" +
+			"</HTML>\n";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "meta attribute \"content\" has invalid value \"not specified\"");
 	}
 
 	protected List<IProblem> getParseErrors(String source) throws CoreException

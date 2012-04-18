@@ -525,8 +525,8 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 				int offset = element.getStartingOffset();
 				problems.add(createWarning(
 						MessageFormat.format(Messages.HTMLTidyValidator_ProprietaryAttribute, tagName, attrName,
-								attr.getValue()), doc.getLineOfOffset(offset) + 1, offset, element.getLength(),
-						sourcePath));
+								attr.getValue()), doc.getLineOfOffset(offset) + 1, offset, element.getNameNode()
+								.getNameRange().getLength(), sourcePath));
 				continue;
 			}
 
@@ -537,8 +537,8 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 				int offset = element.getStartingOffset();
 				problems.add(createWarning(
 						MessageFormat.format(Messages.HTMLTidyValidator_DeprecatedAttribute, tagName, attrName,
-								attr.getValue()), doc.getLineOfOffset(offset) + 1, offset, element.getLength(),
-						sourcePath));
+								attr.getValue()), doc.getLineOfOffset(offset) + 1, offset, element.getNameNode()
+								.getNameRange().getLength(), sourcePath));
 			}
 
 			// verify the value for the attribute
@@ -549,7 +549,7 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 				for (ValueElement value : values)
 				{
 					String valueName = value.getName();
-					if (valueName.equals(attr.getValue()))
+					if (valueName.equals(attr.getValue()) || "*".equals(valueName)) //$NON-NLS-1$
 					{
 						matchingValue = true;
 						break;
@@ -560,7 +560,7 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 					int offset = element.getStartingOffset();
 					problems.add(createWarning(MessageFormat.format(Messages.HTMLTidyValidator_InvalidAttributeValue,
 							tagName, attrName, attr.getValue()), doc.getLineOfOffset(offset) + 1, offset, element
-							.getLength(), sourcePath));
+							.getNameNode().getNameRange().getLength(), sourcePath));
 				}
 			}
 		}
