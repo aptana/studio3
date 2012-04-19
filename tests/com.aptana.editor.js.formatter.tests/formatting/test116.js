@@ -51,30 +51,14 @@ js.formatter.brace.position.function.declaration=same.line
 js.formatter.spaces.after.key.value.operator=1
 js.formatter.brace.position.blocks=same.line
 ==CONTENT==
-if((new jd({command:x, match:o.a.usermenus[u].title})).execCommand({f:o.f, g:o.A.Wa},[],
-	function() {
-		return function(G) {
-			o.Ea(G)
-		}
-	}(),function() {
-		return function() {
-			o.b.focus()
-		}
-	}(),"",0,0));
+if(2 > $a)
+$a = 2;
+else
+for( d = a[0]; e < j; ++s);
+$a = 5;
 ==FORMATTED==
-if((new jd({
-        command : x,
-        match : o.a.usermenus[u].title
-    })).execCommand({
-        f : o.f,
-        g : o.A.Wa
-    }, [], function() {
-        return function(G) {
-            o.Ea(G)
-        }
-    }(), function() {
-        return function() {
-            o.b.focus()
-        }
-    }(), "", 0, 0))
-    ;
+if(2 > $a)
+    $a = 2;
+else
+    for( d = a[0]; e < j; ++s);
+$a = 5; 

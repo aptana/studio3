@@ -321,7 +321,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		{
 			if (node.getLength() > 0 && node.getChildCount() == 0)
 			{
-				visitTextNode(node.getStartingOffset(), node.getEndingOffset(), false, 0);
+				visitTextNode(node.getStartingOffset(), node.getEndingOffset() + 1, false, 0);
 			}
 			super.visit(node);
 		}
@@ -433,11 +433,6 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				wrapInImplicitBlock(trueBlock, false);
 			}
 			checkedPop(ifNode, trueBlock.getEndingOffset());
-			if (trueBlock.getNodeType() == IJSNodeTypes.EMPTY && trueBlock.getSemicolonIncluded())
-			{
-				// APSTUD-3337
-				findAndPushPunctuationNode(TypePunctuation.SEMICOLON, trueBlock.getEndingOffset(), false, true);
-			}
 			if (!isEmptyFalseBlock)
 			{
 				// Construct the 'false' part if exist.
