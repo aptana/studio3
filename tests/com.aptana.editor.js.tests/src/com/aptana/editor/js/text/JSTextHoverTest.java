@@ -146,17 +146,23 @@ public class JSTextHoverTest extends JSEditorBasedTests
 		String html = input.getHtml();
 		int count = 0;
 
+		// HACK: retry grabbing HTML, with delay, up to 5 times
 		while (count < 5 && StringUtil.isEmpty(html))
 		{
+			IRegion hoverRegion = getHoverRegion(this.cursorOffsets.get(0));
+			info = hover.getHoverInfo2(getSourceViewer(), hoverRegion);
+			input = (DocumentationBrowserInformationControlInput) info;
+
 			try
 			{
 				Thread.sleep(1000);
-				html = input.getHtml();
-				count++;
 			}
 			catch (InterruptedException e)
 			{
 			}
+
+			html = input.getHtml();
+			count++;
 		}
 
 		// test that HTML ends with our cleaned-up description
