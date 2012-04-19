@@ -15,6 +15,7 @@ import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.junit.Test;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.hover.DocumentationBrowserInformationControlInput;
 import com.aptana.editor.common.util.EditorUtil;
 import com.aptana.editor.js.JSSourceEditor;
@@ -142,7 +143,21 @@ public class JSTextHoverTest extends JSEditorBasedTests
 		// grab hover HTML content
 		assertTrue(info instanceof DocumentationBrowserInformationControlInput);
 		DocumentationBrowserInformationControlInput input = (DocumentationBrowserInformationControlInput) info;
-		final String html = input.getHtml();
+		String html = input.getHtml();
+		int count = 0;
+
+		while (count < 5 && StringUtil.isEmpty(html))
+		{
+			try
+			{
+				Thread.sleep(1000);
+				html = input.getHtml();
+				count++;
+			}
+			catch (InterruptedException e)
+			{
+			}
+		}
 
 		// test that HTML ends with our cleaned-up description
 		Pattern p = Pattern.compile("<body[^>]*>(.*?)</body>");
@@ -152,12 +167,12 @@ public class JSTextHoverTest extends JSEditorBasedTests
 		{
 			String text = m.group(1);
 
-			assertTrue("Could not find documentation string in hover info",
+			assertTrue("Could not find documentation string in hover info: '" + html + "'",
 					text.endsWith("This relates to <b>Titanium.UI.createWindow</b>"));
 		}
 		else
 		{
-			fail("Could not find documentation string in hover info.\n" + html);
+			fail("Could not find documentation string in hover info: '" + html + "'");
 		}
 	}
 
