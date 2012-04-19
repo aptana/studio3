@@ -71,7 +71,7 @@ public class JSTypeUtil
 	 * @param function
 	 * @param block
 	 */
-	public static void applyDocumentation(FunctionElement function, DocumentationBlock block)
+	public static void applyDocumentation(FunctionElement function, JSNode node, DocumentationBlock block)
 	{
 		if (block != null)
 		{
@@ -79,21 +79,38 @@ public class JSTypeUtil
 			function.setDescription(block.getText());
 
 			// apply parameters
-			for (Tag tag : block.getTags(TagType.PARAM))
+			if (block.hasTag(TagType.PARAM))
 			{
-				ParamTag paramTag = (ParamTag) tag;
-				ParameterElement parameter = new ParameterElement();
-
-				parameter.setName(paramTag.getName());
-				parameter.setDescription(paramTag.getText());
-				parameter.setUsage(paramTag.getUsage().getName());
-
-				for (Type type : paramTag.getTypes())
+				for (Tag tag : block.getTags(TagType.PARAM))
 				{
-					parameter.addType(type.toSource());
-				}
+					ParamTag paramTag = (ParamTag) tag;
+					ParameterElement parameter = new ParameterElement();
 
-				function.addParameter(parameter);
+					parameter.setName(paramTag.getName());
+					parameter.setDescription(paramTag.getText());
+					parameter.setUsage(paramTag.getUsage().getName());
+
+					for (Type type : paramTag.getTypes())
+					{
+						parameter.addType(type.toSource());
+					}
+
+					function.addParameter(parameter);
+				}
+			}
+			else
+			{
+				JSFunctionNode functionNode = (JSFunctionNode) node;
+
+				for (IParseNode parameterNode : functionNode.getParameters())
+				{
+					ParameterElement parameterElement = new ParameterElement();
+
+					parameterElement.setName(parameterNode.getText());
+					parameterElement.addType(JSTypeConstants.OBJECT_TYPE);
+
+					function.addParameter(parameterElement);
+				}
 			}
 
 			// apply return types
@@ -128,11 +145,11 @@ public class JSTypeUtil
 	 * @param property
 	 * @param block
 	 */
-	public static void applyDocumentation(PropertyElement property, DocumentationBlock block)
+	public static void applyDocumentation(PropertyElement property, JSNode node, DocumentationBlock block)
 	{
 		if (property instanceof FunctionElement)
 		{
-			applyDocumentation((FunctionElement) property, block);
+			applyDocumentation((FunctionElement) property, node, block);
 		}
 		else
 		{
