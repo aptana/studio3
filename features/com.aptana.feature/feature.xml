@@ -23,7 +23,7 @@
          version="0.0.0"/>
 
    <includes
-         id="com.aptana.webkitbrowser.feature"
+         id="com.aptana.webkitbrowser"
          version="0.0.0"/>
 
    <requires>
