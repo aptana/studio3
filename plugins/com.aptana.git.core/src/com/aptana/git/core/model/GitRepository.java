@@ -57,6 +57,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
@@ -711,7 +712,7 @@ public class GitRepository
 	 */
 	private Set<String> simpleRefsOfType(GitRef.TYPE... types)
 	{
-		if (types == null || types.length == 0)
+		if (ArrayUtil.isEmpty(types))
 		{
 			return Collections.emptySet();
 		}

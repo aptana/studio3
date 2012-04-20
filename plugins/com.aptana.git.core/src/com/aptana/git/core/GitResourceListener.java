@@ -117,13 +117,7 @@ class GitResourceListener implements IResourceChangeListener
 					{
 						public IPath map(IResource item)
 						{
-							IPath location = item.getLocation();
-							IPath wd = repo.workingDirectory();
-							if (wd.isPrefixOf(location))
-							{
-								location = location.removeFirstSegments(wd.segmentCount());
-							}
-							return location;
+							return repo.relativePath(item);
 						}
 					});
 					index.refreshAsync(filePaths); // queue up a refresh
