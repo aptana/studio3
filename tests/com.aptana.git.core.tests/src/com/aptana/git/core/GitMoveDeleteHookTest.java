@@ -224,12 +224,8 @@ public class GitMoveDeleteHookTest extends TestCase
 				will(returnValue("folder"));
 
 				// repo relative path
-				oneOf(repo).workingDirectory();
-
-				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root")));
-				oneOf(folder).getLocation();
-				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root" + File.separator
-						+ "folder")));
+				oneOf(repo).relativePath(folder);
+				will(returnValue(Path.fromOSString("folder")));
 
 				// check for committed files
 
@@ -299,12 +295,8 @@ public class GitMoveDeleteHookTest extends TestCase
 				will(returnValue("folder"));
 
 				// repo relative path
-				oneOf(repo).workingDirectory();
-
-				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root")));
-				oneOf(folder).getLocation();
-				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root" + File.separator
-						+ "folder")));
+				oneOf(repo).relativePath(folder);
+				will(returnValue(Path.fromOSString("folder")));
 
 				// We don't try these because we punted
 				never(repo).deleteFolder(Path.fromOSString("folder"));
@@ -333,13 +325,8 @@ public class GitMoveDeleteHookTest extends TestCase
 				will(returnValue("folder"));
 
 				// get repo root
-				oneOf(repo).workingDirectory();
-				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root")));
-
-				// get folder location
-				oneOf(folder).getLocation();
-				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root" + File.separator
-						+ "folder")));
+				oneOf(repo).relativePath(folder);
+				will(returnValue(Path.fromOSString("folder")));
 
 				// We try to delete the folder through git...
 				oneOf(repo).deleteFolder(Path.fromOSString("folder"));
@@ -417,12 +404,8 @@ public class GitMoveDeleteHookTest extends TestCase
 						+ "project")));
 
 				// Repo relative path
-				oneOf(repo).workingDirectory();
-
-				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root")));
-				oneOf(project).getLocation();
-				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root" + File.separator
-						+ "project")));
+				oneOf(repo).relativePath(project);
+				will(returnValue(Path.fromOSString("project")));
 
 				// Don't ever delete .git folder!
 				never(tree).standardDeleteFolder(folder, IResource.DEPTH_INFINITE, null);
@@ -459,12 +442,8 @@ public class GitMoveDeleteHookTest extends TestCase
 						+ "project")));
 
 				// Repo relative path
-				oneOf(repo).workingDirectory();
-
-				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root")));
-				oneOf(project).getLocation();
-				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root" + File.separator
-						+ "project")));
+				oneOf(repo).relativePath(project);
+				will(returnValue(Path.fromOSString("project")));
 
 				// We're not forcing, so we need to check if file is synched
 				oneOf(tree).isSynchronized(project, IResource.DEPTH_INFINITE);
@@ -489,10 +468,13 @@ public class GitMoveDeleteHookTest extends TestCase
 		context.checking(new Expectations()
 		{
 			{
-				exactly(2).of(repo).workingDirectory();
+				oneOf(repo).workingDirectory();
 				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root")));
 
-				exactly(2).of(project).getLocation();
+				oneOf(repo).relativePath(project);
+				will(returnValue(Path.fromOSString("project")));
+
+				oneOf(project).getLocation();
 				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root" + File.separator
 						+ "project")));
 
@@ -526,10 +508,13 @@ public class GitMoveDeleteHookTest extends TestCase
 		context.checking(new Expectations()
 		{
 			{
-				exactly(2).of(repo).workingDirectory();
+				oneOf(repo).workingDirectory();
 				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root")));
 
-				exactly(2).of(project).getLocation();
+				oneOf(repo).relativePath(project);
+				will(returnValue(Path.fromOSString("project")));
+
+				oneOf(project).getLocation();
 				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root" + File.separator
 						+ "project")));
 
