@@ -172,7 +172,7 @@ public class JSIndexReader extends IndexReader
 			// read events
 			// @formatter:off
 			List<QueryResult> events = index.query(
-				new String[] { IJSIndexConstants.FUNCTION },
+				new String[] { IJSIndexConstants.EVENT },
 				this.getMemberPattern(owningTypes),
 				SearchPattern.REGEX_MATCH
 			);
@@ -221,7 +221,7 @@ public class JSIndexReader extends IndexReader
 			// read events
 			// @formatter:off
 			List<QueryResult> events = index.query(
-				new String[] { IJSIndexConstants.FUNCTION },
+				new String[] { IJSIndexConstants.EVENT },
 				this.getMemberPattern(owningType, eventName),
 				SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE
 			);
