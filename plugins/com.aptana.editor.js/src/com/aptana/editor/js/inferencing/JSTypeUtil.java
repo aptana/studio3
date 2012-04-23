@@ -7,6 +7,7 @@
  */
 package com.aptana.editor.js.inferencing;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -17,7 +18,10 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
 
+import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.model.ClassElement;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
@@ -100,16 +104,32 @@ public class JSTypeUtil
 			}
 			else
 			{
-				JSFunctionNode functionNode = (JSFunctionNode) node;
-
-				for (IParseNode parameterNode : functionNode.getParameters())
+				if (node instanceof JSFunctionNode)
 				{
-					ParameterElement parameterElement = new ParameterElement();
+					JSFunctionNode functionNode = (JSFunctionNode) node;
 
-					parameterElement.setName(parameterNode.getText());
-					parameterElement.addType(JSTypeConstants.OBJECT_TYPE);
+					for (IParseNode parameterNode : functionNode.getParameters())
+					{
+						ParameterElement parameterElement = new ParameterElement();
 
-					function.addParameter(parameterElement);
+						parameterElement.setName(parameterNode.getText());
+						parameterElement.addType(JSTypeConstants.OBJECT_TYPE);
+
+						function.addParameter(parameterElement);
+					}
+				}
+				else
+				{
+					// @formatter:off
+					String message = MessageFormat.format(
+						"Expected JSFunction node when applying documentation; however, the node type was ''{0}'' instead. Source ={1}{2}",
+						(node != null) ? node.getClass().getName() : "null",
+						FileUtil.NEW_LINE,
+						node
+					);
+					// @formatter:on
+
+					IdeLog.logError(JSPlugin.getDefault(), message);
 				}
 			}
 
