@@ -20,7 +20,6 @@ import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.validator.JSLintValidator;
 import com.aptana.editor.js.validator.JSParserValidator;
-import com.aptana.editor.js.validator.MozillaJsValidator;
 
 public class PreferenceInitializer extends AbstractPreferenceInitializer
 {
@@ -50,24 +49,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 
 		// mark occurrences
 		// prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.EDITOR_MARK_OCCURRENCES, true);
-
-		// Set Mozilla validator to be on by default for reconcile (JSLint is off by default)
-		MozillaJsValidator mozValidator = new MozillaJsValidator()
-		{
-			@Override
-			public String getId()
-			{
-				return ID;
-			}
-
-			@Override
-			protected String getPreferenceNode()
-			{
-				return JSPlugin.PLUGIN_ID;
-			}
-		};
-		prefs.putBoolean(mozValidator.getEnablementPreferenceKey(BuildType.BUILD), false);
-		prefs.putBoolean(mozValidator.getEnablementPreferenceKey(BuildType.RECONCILE), true);
 
 		JSParserValidator parseValidator = new JSParserValidator()
 		{
@@ -109,7 +90,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 			};
 
 			String[] oldFilterArray = oldFilters.split(AbstractBuildParticipant.FILTER_DELIMITER);
-			mozValidator.setFilters(EclipseUtil.instanceScope(), oldFilterArray);
 			jsLintValidator.setFilters(EclipseUtil.instanceScope(), oldFilterArray);
 			cepPrefs.remove(oldKey);
 		}
