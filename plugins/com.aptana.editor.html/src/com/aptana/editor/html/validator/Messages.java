@@ -29,6 +29,8 @@ public class Messages extends NLS
 	public static String HTMLTidyValidator_MissingCloseTag;
 	public static String HTMLTidyValidator_MissingDoctype;
 	public static String HTMLTidyValidator_MissingNoFrames;
+
+	public static String HTMLTidyValidator_NonUniqueIdValue;
 	public static String HTMLTidyValidator_ProprietaryAttribute;
 	public static String HTMLTidyValidator_RepeatedFrameset;
 	public static String HTMLTidyValidator_TrimEmptyElement;
