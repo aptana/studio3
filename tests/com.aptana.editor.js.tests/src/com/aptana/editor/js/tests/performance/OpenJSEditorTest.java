@@ -29,7 +29,6 @@ import com.aptana.editor.epl.tests.OpenEditorTest;
 import com.aptana.editor.epl.tests.ResourceTestHelper;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.validator.JSLintValidator;
-import com.aptana.editor.js.validator.MozillaJsValidator;
 
 public class OpenJSEditorTest extends OpenEditorTest
 {
@@ -70,17 +69,6 @@ public class OpenJSEditorTest extends OpenEditorTest
 		IEclipsePreferences prefs = (EclipseUtil.instanceScope()).getNode(JSPlugin.PLUGIN_ID);
 
 		// Turn off all JS validators!!!!
-		MozillaJsValidator validator = new MozillaJsValidator()
-		{
-			@Override
-			public String getId()
-			{
-				return ID;
-			}
-		};
-		prefs.putBoolean(validator.getEnablementPreferenceKey(BuildType.BUILD), false);
-		prefs.putBoolean(validator.getEnablementPreferenceKey(BuildType.RECONCILE), false);
-
 		JSLintValidator jsLintValidator = new JSLintValidator()
 		{
 			@Override
