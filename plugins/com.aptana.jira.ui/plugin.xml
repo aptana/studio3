@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="com.aptana.ui.accountsPreferencePage">
+      <provider
+            class="com.aptana.jira.ui.preferences.JiraPreferencePageProvider"
+            priority="50">
+      </provider>
+   </extension>
+
+</plugin>

@@ -1,0 +1,4 @@
+user1, group3
+user1, group4
+user1, group5, xxxxx,  extra stuff should be ignored
+user1, group6

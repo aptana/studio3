@@ -699,4 +699,24 @@
          version="0.0.0"
          unpack="false"/>
 
+   <plugin
+         id="com.aptana.jira.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.jira.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.swift.jira.cli"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
 </feature>

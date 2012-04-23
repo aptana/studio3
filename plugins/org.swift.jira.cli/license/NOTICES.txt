@@ -1,0 +1,19 @@
+
+   For license information, see LICENSE files included with
+   this distribution as well as LICENSE files packaged in
+   the various jar files included with this distribution.
+
+   This distribution includes binary distributions from
+   other providers including, but not limited to, the following:
+
+   This product includes software developed by
+   The Apache Software Foundation (http://www.apache.org/).
+
+   This product includes software developed by
+   Martian Software, Inc. (http://www.martiansoftware.com).
+
+   This product includes software developed by
+   Dolby Laboratories, Inc. (http://www.dolby.co.uk).
+
+   This product includes software developed by
+   PostgreSQL Global Development Group. (http://jdbc.postgresql.org).
