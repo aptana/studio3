@@ -329,6 +329,12 @@ public class JSParser extends Parser implements IParser
 				{
 					((JSNode) node.getFirstChild()).setDocumentation(block);
 				}
+				else if (node instanceof JSIdentifierNode && node.getParent() instanceof JSNameValuePairNode)
+				{
+					// associate documentation with property's value
+					JSNameValuePairNode entry = (JSNameValuePairNode) node.getParent();
+					((JSNode) entry.getValue()).setDocumentation(block);
+				}
 				else
 				{
 					IParseNode statement = ((JSNode) node).getContainingStatementNode();
@@ -345,17 +351,6 @@ public class JSParser extends Parser implements IParser
 								// associate documentation with first declared variable's value
 								JSVarNode varNode = (JSVarNode) node;
 								((JSNode) varNode.getFirstChild().getLastChild()).setDocumentation(block);
-								break;
-
-							case IJSNodeTypes.IDENTIFIER:
-								IParseNode parent = node.getParent();
-
-								if (parent instanceof JSNameValuePairNode)
-								{
-									// associate documentation with property's value
-									JSNameValuePairNode entry = (JSNameValuePairNode) parent;
-									((JSNode) entry.getValue()).setDocumentation(block);
-								}
 								break;
 
 							default:

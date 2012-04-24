@@ -12,6 +12,7 @@ import junit.framework.TestSuite;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
@@ -33,14 +34,30 @@ import com.aptana.editor.js.validator.JSLintValidator;
 public class OpenJSEditorTest extends OpenEditorTest
 {
 
+	/**
+	 * Performance input files
+	 */
+	private static final String DOJO_MINIFIED = "dojo.js.minified";
+	private static final String DOJO = "dojo.js.uncompressed";
+	// private static final String EXT = "ext";
+	private static final String EXT_DEV = "ext-dev";
+	private static final String TIMOBILE = "timobile";
+	private static final String TINY_MCE = "tiny_mce";
+
 	private static final String PROJECT = "js_perf";
 	private static final int WARM_UP_RUNS = 2;
 	private static final int MEASURED_RUNS = 5;
-	private static final String PREFIX = "/" + PROJECT + "/timobile";
 	private static final String FILE_SUFFIX = ".js";
-	private static final IPath EXT_MINIFIED = Path.fromPortableString("/" + PROJECT + "/ext.js");
-	private static final IPath EXT_DEV = Path.fromPortableString("/" + PROJECT + "/ext-dev.js");
-	private static final IPath SRC_FILE = Path.fromPortableString(PREFIX + FILE_SUFFIX);
+
+	private static String getPrefix(String baseName)
+	{
+		return "/" + PROJECT + "/" + baseName;
+	}
+
+	private static IPath getFile(String baseName)
+	{
+		return Path.fromPortableString(getPrefix(baseName) + FILE_SUFFIX);
+	}
 
 	public OpenJSEditorTest(String name)
 	{
@@ -51,11 +68,14 @@ public class OpenJSEditorTest extends OpenEditorTest
 	{
 		// ensure sequence
 		TestSuite suite = new TestSuite(OpenJSEditorTest.class.getName());
-		suite.addTest(new OpenJSEditorTest("testOpenTiMobile"));
+//		suite.addTest(new OpenJSEditorTest("testOpenTiMobile"));
+//		suite.addTest(new OpenJSEditorTest("testOpenDojo"));
+		suite.addTest(new OpenJSEditorTest("testOpenDojoMinified"));
+//		suite.addTest(new OpenJSEditorTest("testOpenTinyMCE"));
 		// suite.addTest(new OpenJSEditorTest("testOpenExtMinifiedFoldingOnOutlineOn"));
 		// suite.addTest(new OpenJSEditorTest("testOpenExtMinifiedFoldingOnOutlineOff"));
-		suite.addTest(new OpenJSEditorTest("testOpenExtDevFoldingOnOutlineOn"));
-		suite.addTest(new OpenJSEditorTest("testOpenExtDevFoldingOnOutlineOff"));
+//		suite.addTest(new OpenJSEditorTest("testOpenExtDevFoldingOnOutlineOn"));
+//		suite.addTest(new OpenJSEditorTest("testOpenExtDevFoldingOnOutlineOff"));
 		return new Setup(suite);
 	}
 
@@ -96,34 +116,56 @@ public class OpenJSEditorTest extends OpenEditorTest
 
 	public void testOpenTiMobile() throws Exception
 	{
-		measureOpenInEditor(ResourceTestHelper.findFiles(PREFIX, FILE_SUFFIX, 0, getWarmUpRuns()), Performance
-				.getDefault().getNullPerformanceMeter(), false);
-		EditorTestHelper.closeAllEditors();
-		measureOpenInEditor(ResourceTestHelper.findFiles(PREFIX, FILE_SUFFIX, getWarmUpRuns(), getMeasuredRuns()),
-				createPerformanceMeter(), false);
+		timeOpening(TIMOBILE, false);
+	}
+
+	public void testOpenDojo() throws Exception
+	{
+		timeOpening(DOJO, true);
+	}
+
+	public void testOpenDojoMinified() throws Exception
+	{
+		timeOpening(DOJO_MINIFIED, true);
+	}
+
+	public void testOpenTinyMCE() throws Exception
+	{
+		timeOpening(TINY_MCE, true);
 	}
 
 	public void testOpenExtDevFoldingOnOutlineOn() throws Exception
 	{
-		PerformanceMeter performanceMeter = createPerformanceMeter();
-		measureOpenInEditor(EXT_DEV, true, true, performanceMeter);
+		measureOpenInEditor(getFile(EXT_DEV), true, true, createPerformanceMeter());
 	}
 
 	public void testOpenExtDevFoldingOnOutlineOff() throws Exception
 	{
-		measureOpenInEditor(EXT_DEV, true, false, createPerformanceMeter());
+		measureOpenInEditor(getFile(EXT_DEV), true, false, createPerformanceMeter());
 	}
 
 	// public void testOpenExtMinifiedFoldingOnOutlineOn() throws Exception
 	// {
-	// PerformanceMeter performanceMeter = createPerformanceMeter();
-	// measureOpenInEditor(EXT_MINIFIED, true, true, performanceMeter);
+	// measureOpenInEditor(getFile(EXT), true, true, createPerformanceMeter());
 	// }
 
 	// public void testOpenExtMinifiedFoldingOnOutlineOff() throws Exception
 	// {
-	// measureOpenInEditor(EXT_MINIFIED, true, false, createPerformanceMeter());
+	// measureOpenInEditor(getFile(EXT), true, false, createPerformanceMeter());
 	// }
+
+	protected void timeOpening(String baseFileName, boolean closeEach) throws PartInitException
+	{
+		measureOpenInEditor(ResourceTestHelper.findFiles(getPrefix(baseFileName), FILE_SUFFIX, 0, getWarmUpRuns()),
+				Performance.getDefault().getNullPerformanceMeter(), closeEach);
+		if (!closeEach)
+		{
+			EditorTestHelper.closeAllEditors();
+		}
+		measureOpenInEditor(
+				ResourceTestHelper.findFiles(getPrefix(baseFileName), FILE_SUFFIX, getWarmUpRuns(), getMeasuredRuns()),
+				createPerformanceMeter(), closeEach);
+	}
 
 	protected void measureOpenInEditor(IPath file, boolean enableFolding, boolean showOutline,
 			PerformanceMeter performanceMeter) throws PartInitException
@@ -189,8 +231,18 @@ public class OpenJSEditorTest extends OpenEditorTest
 
 				EditorTestHelper.joinBackgroundActivities();
 			}
-			ResourceTestHelper.replicate(SRC_FILE, PREFIX, FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS,
-					ResourceTestHelper.IfExists.SKIP);
+
+			replicate(DOJO);
+			replicate(DOJO_MINIFIED);
+			replicate(TIMOBILE);
+			replicate(TINY_MCE);
+			// Don't need to replicate EXT_DEV or EXT
+		}
+
+		private void replicate(String baseFileName) throws CoreException
+		{
+			ResourceTestHelper.replicate(getFile(baseFileName), getPrefix(baseFileName), FILE_SUFFIX, WARM_UP_RUNS
+					+ MEASURED_RUNS, ResourceTestHelper.IfExists.SKIP);
 		}
 
 		private void setUpProject() throws Exception
@@ -220,7 +272,10 @@ public class OpenJSEditorTest extends OpenEditorTest
 		{
 			if (fTearDown)
 			{
-				ResourceTestHelper.delete(PREFIX, FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS);
+				ResourceTestHelper.delete(getPrefix(DOJO), FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS);
+				ResourceTestHelper.delete(getPrefix(DOJO_MINIFIED), FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS);
+				ResourceTestHelper.delete(getPrefix(TIMOBILE), FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS);
+				ResourceTestHelper.delete(getPrefix(TINY_MCE), FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS);
 			}
 		}
 	}

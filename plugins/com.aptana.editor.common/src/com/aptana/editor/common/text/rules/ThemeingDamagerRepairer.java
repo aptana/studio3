@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -23,24 +23,73 @@ import org.eclipse.jface.text.TypedPosition;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyleRange;
+import org.eclipse.swt.graphics.Color;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.ICommonConstants;
 import com.aptana.editor.common.IDebugScopes;
+import com.aptana.editor.common.scripting.IDocumentScopeManager;
+import com.aptana.theme.IThemeManager;
+import com.aptana.theme.Theme;
 import com.aptana.theme.ThemePlugin;
 
+/**
+ * Stores scopes in Positions on the IDocument. Transforms scopes to TextAttributes for colorization. Has a couple
+ * performance tweaks to limit the number of StyleRanges applied to an editor. We don't apply ranges that have the same
+ * fg/bg/font as the defaults, and we don't apply ranges past a given column # per-line (default is 200).
+ * 
+ * @author cwilliams
+ */
 public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 {
 
+	/**
+	 * Command line property we can set to change the max number of columns to color per-line.
+	 */
+	private static final String STUDIO_MAX_COLORED_COLUMNS = "studio.maxColoredColumns"; //$NON-NLS-1$
+
+	/**
+	 * Default value for max # of columns per-line to color.
+	 */
+	private static final int DEFAULT_MAX_COLS = 200;
+
+	/**
+	 * If we've gone past this column number on a given line, we no longer return styles/colors
+	 */
+	private static int MAX_CHARS_PER_LINE_COLORED = DEFAULT_MAX_COLS;
+
+	/**
+	 * Constant for no positions.
+	 */
+	private static final Position[] NO_POSITIONS = new Position[0];
+
 	private TextAttribute lastAttribute;
 	private String scope = StringUtil.EMPTY;
-	private IRegion fLastLine;
-	private int fCountForLine;
 	private TypedPosition fLastPosition;
 	private List<Position> newPositions;
 	private Position[] oldPositions;
+	private int fEndOfLine;
+	private int fEndOffset;
+
+	static
+	{
+		try
+		{
+			String maxColsVal = System.getProperty(STUDIO_MAX_COLORED_COLUMNS);
+			if (!StringUtil.isEmpty(maxColsVal))
+			{
+				MAX_CHARS_PER_LINE_COLORED = Integer.parseInt(maxColsVal);
+			}
+		}
+		catch (NumberFormatException e)
+		{
+			// ignore
+		}
+	}
 
 	public ThemeingDamagerRepairer(ITokenScanner scanner)
 	{
@@ -58,11 +107,11 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 						"Creating presentation for region at offset {0}, length {1} in document of length {2}", //$NON-NLS-1$
 						region.getOffset(), region.getLength(), fDocument.getLength()), IDebugScopes.PRESENTATION);
 			}
-			fLastLine = null;
+			fEndOfLine = -1;
+			fEndOffset = -1;
 			fLastPosition = null;
-			fCountForLine = 0;
 			int offset = region.getOffset();
-			scope = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(fDocument, offset);
+			scope = getDocumentScopeManager().getScopeAtOffset(fDocument, offset);
 			if (scope == null)
 			{
 				scope = StringUtil.EMPTY;
@@ -76,6 +125,7 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 		}
 		finally
 		{
+			presentation.setDefaultStyleRange(new StyleRange(region.getOffset(), region.getLength(), null, null));
 			// Do coloring and collect all the scopes
 			super.createPresentation(presentation, region);
 			updateScopePositions();
@@ -83,9 +133,9 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 			oldPositions = null;
 			newPositions = null;
 			scope = StringUtil.EMPTY;
-			fLastLine = null;
+			fEndOfLine = -1;
+			fEndOffset = -1;
 			fLastPosition = null;
-			fCountForLine = 0;
 		}
 	}
 
@@ -128,25 +178,23 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 					oldIndex++;
 					continue;
 				}
+
+				// same scope, but offset/length has changed. Update them on position
+				if (((TypedPosition) oldPosition).getType().equals(((TypedPosition) newPosition).getType()))
+				{
+					oldPosition.offset = newPosition.offset;
+					oldPosition.length = newPosition.length;
+				}
 				else
 				{
-					// same scope, but offset/length has changed. Update them on position
-					if (((TypedPosition) oldPosition).getType().equals(((TypedPosition) newPosition).getType()))
-					{
-						oldPosition.offset = newPosition.offset;
-						oldPosition.length = newPosition.length;
-					}
-					else
-					{
-						// scope has changed, remove old, add new
-						oldPosition.delete();
-						fDocument.removePosition(ICommonConstants.SCOPE_CATEGORY, oldPosition);
-						fDocument.addPosition(ICommonConstants.SCOPE_CATEGORY, newPosition);
-					}
-					oldIndex++;
-					newIndex++;
-					continue;
+					// scope has changed, remove old, add new
+					oldPosition.delete();
+					fDocument.removePosition(ICommonConstants.SCOPE_CATEGORY, oldPosition);
+					fDocument.addPosition(ICommonConstants.SCOPE_CATEGORY, newPosition);
 				}
+				oldIndex++;
+				newIndex++;
+				continue;
 			}
 			// if we went off the end of one list, but not the other - We still need to add or remove!
 			for (int i = oldIndex; i < oldLength; i++)
@@ -188,7 +236,7 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 			if (endIndex == index)
 			{
 				// there should be nothing to wipe!
-				return new Position[0];
+				return NO_POSITIONS;
 			}
 			if (fDocument instanceof AbstractDocument)
 			{
@@ -197,17 +245,15 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 						false, false);
 				return positions;
 			}
-			else
-			{
-				Position[] positions = fDocument.getPositions(ICommonConstants.SCOPE_CATEGORY);
-				int start = index;
-				int stop = endIndex;
 
-				int length = stop - start;
-				Position[] sub = new Position[length];
-				System.arraycopy(positions, start, sub, 0, length);
-				return sub;
-			}
+			Position[] positions = fDocument.getPositions(ICommonConstants.SCOPE_CATEGORY);
+			int start = index;
+			int stop = endIndex;
+
+			int length = stop - start;
+			Position[] sub = new Position[length];
+			System.arraycopy(positions, start, sub, 0, length);
+			return sub;
 		}
 		catch (BadPositionCategoryException e)
 		{
@@ -218,7 +264,7 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 		{
 			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage());
 		}
-		return new Position[0];
+		return NO_POSITIONS;
 	}
 
 	@Override
@@ -244,7 +290,7 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 					last = scope + ' ' + last;
 				}
 			}
-			IToken converted = ThemePlugin.getDefault().getThemeManager().getToken(last);
+			IToken converted = getThemeManager().getToken(last);
 			lastAttribute = super.getTokenTextAttribute(converted);
 			return lastAttribute;
 		}
@@ -293,30 +339,23 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 	{
 		try
 		{
-			// first time, grab line info
-			if (fLastLine == null)
+			// we haven't recorded the offsets yet
+			if (fEndOffset == -1 && fEndOfLine == -1)
 			{
-				fLastLine = fDocument.getLineInformationOfOffset(offset);
-				fCountForLine = 1;
+				recordCurrentLineOffsets(offset);
 			}
-			else
+
+			if (offset > fEndOffset)
 			{
-				// is this still on the same line?
-				if (offset > (fLastLine.getOffset() + fLastLine.getLength()))
+				if (offset > fEndOfLine)
 				{
-					// it's a new line, reset counter, update line region
-					fCountForLine = 0;
-					fLastLine = fDocument.getLineInformationOfOffset(offset);
+					// we've hit the next line, record its offsets
+					recordCurrentLineOffsets(offset);
 				}
 				else
 				{
-					// same line, update counter
-					fCountForLine++;
-					if (fCountForLine > 200)
-					{
-						// only record 200 styles per line!
-						return;
-					}
+					// don't color past #MAX_CHARS_PER_LINE_COLORED chars per line! Return early
+					return;
 				}
 			}
 		}
@@ -324,6 +363,74 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 		{
 			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
+
+		// Normalize attribute if the font and fg/bg colors are defaults. This lets us eliminate extraneous StyleRange
+		// objects
+		if (matchesDefaults(attr))
+		{
+			attr = new TextAttribute(null);
+		}
 		super.addRange(presentation, offset, length, attr);
+	}
+
+	private boolean matchesDefaults(TextAttribute attr)
+	{
+		if (attr == null)
+		{
+			return false;
+		}
+
+		// Make sure font is just normal
+		int style = attr.getStyle();
+		int fontStyle = style & (SWT.ITALIC | SWT.BOLD | SWT.NORMAL);
+		if (fontStyle != SWT.NORMAL)
+		{
+			return false;
+		}
+		if ((style & TextAttribute.STRIKETHROUGH) != 0)
+		{
+			return false;
+		}
+		if ((style & TextAttribute.UNDERLINE) != 0)
+		{
+			return false;
+		}
+
+		// Is FG different?
+		Color fg = attr.getForeground();
+		if (fg != null && !fg.getRGB().equals(getCurrentTheme().getForeground()))
+		{
+			return false;
+		}
+
+		// Is BG different?
+		Color bg = attr.getBackground();
+		if (bg != null && !bg.getRGB().equals(getCurrentTheme().getBackground()))
+		{
+			return false;
+		}
+		return true;
+	}
+
+	private void recordCurrentLineOffsets(int offset) throws BadLocationException
+	{
+		IRegion lastLine = fDocument.getLineInformationOfOffset(offset);
+		fEndOfLine = lastLine.getOffset() + lastLine.getLength();
+		fEndOffset = lastLine.getOffset() + Math.min(MAX_CHARS_PER_LINE_COLORED, lastLine.getLength());
+	}
+
+	protected Theme getCurrentTheme()
+	{
+		return getThemeManager().getCurrentTheme();
+	}
+
+	protected IThemeManager getThemeManager()
+	{
+		return ThemePlugin.getDefault().getThemeManager();
+	}
+
+	protected IDocumentScopeManager getDocumentScopeManager()
+	{
+		return CommonEditorPlugin.getDefault().getDocumentScopeManager();
 	}
 }

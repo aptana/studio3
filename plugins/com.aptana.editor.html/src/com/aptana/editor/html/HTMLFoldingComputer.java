@@ -30,11 +30,12 @@ public class HTMLFoldingComputer extends AbstractFoldingComputer
 	@Override
 	public boolean isFoldable(IParseNode child)
 	{
-		if (IJSConstants.CONTENT_TYPE_JS.equals(child.getLanguage()))
+		String language = child.getLanguage();
+		if (IJSConstants.CONTENT_TYPE_JS.equals(language))
 		{
 			return getJSFoldingComputer().isFoldable(child);
 		}
-		if (ICSSConstants.CONTENT_TYPE_CSS.equals(child.getLanguage()))
+		else if (ICSSConstants.CONTENT_TYPE_CSS.equals(language))
 		{
 			return getCSSFoldingComputer().isFoldable(child);
 		}
@@ -44,11 +45,12 @@ public class HTMLFoldingComputer extends AbstractFoldingComputer
 	@Override
 	public boolean isCollapsed(IParseNode child)
 	{
-		if (IJSConstants.CONTENT_TYPE_JS.equals(child.getLanguage()))
+		String language = child.getLanguage();
+		if (IJSConstants.CONTENT_TYPE_JS.equals(language))
 		{
 			return getJSFoldingComputer().isCollapsed(child);
 		}
-		if (ICSSConstants.CONTENT_TYPE_CSS.equals(child.getLanguage()))
+		else if (ICSSConstants.CONTENT_TYPE_CSS.equals(language))
 		{
 			return getCSSFoldingComputer().isCollapsed(child);
 		}

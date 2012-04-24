@@ -135,5 +135,13 @@ public class HTMLUtilsTest extends TestCase
 	public void testStripTagEndings() throws Exception
 	{
 		assertEquals("", HTMLUtils.stripTagEndings(""));
+		assertEquals("tag", HTMLUtils.stripTagEndings("<tag>"));
+		assertEquals("tag", HTMLUtils.stripTagEndings("</tag>"));
+		assertEquals("tag", HTMLUtils.stripTagEndings("< tag >"));
+		assertEquals("tag", HTMLUtils.stripTagEndings("</ tag>"));
+		assertEquals("tag", HTMLUtils.stripTagEndings("</ tag"));
+		assertEquals("tag", HTMLUtils.stripTagEndings("tag>"));
+		assertEquals("tag", HTMLUtils.stripTagEndings(" tag >"));
+		assertEquals("tag", HTMLUtils.stripTagEndings(" tag "));
 	}
 }

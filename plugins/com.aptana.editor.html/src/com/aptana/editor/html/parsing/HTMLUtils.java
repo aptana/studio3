@@ -81,7 +81,8 @@ public class HTMLUtils
 	}
 
 	/**
-	 * Removes the "<" and "</" from the beginning and ">" from the end of a tag.
+	 * Removes the "<" and "</" from the beginning and ">" from the end of a tag. This is used on end/close tags
+	 * specifically in the HTMLParser.
 	 * 
 	 * @param tag
 	 *            the tag text to strip
