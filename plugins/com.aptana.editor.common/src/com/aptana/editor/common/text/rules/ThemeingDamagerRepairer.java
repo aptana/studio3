@@ -24,6 +24,7 @@ import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.Color;
 
 import com.aptana.core.logging.IdeLog;
@@ -124,6 +125,7 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 		}
 		finally
 		{
+			presentation.setDefaultStyleRange(new StyleRange(region.getOffset(), region.getLength(), null, null));
 			// Do coloring and collect all the scopes
 			super.createPresentation(presentation, region);
 			updateScopePositions();
@@ -362,10 +364,11 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 
-		// Don't add a range if the font and fg/bg colors are defaults!
+		// Normalize attribute if the font and fg/bg colors are defaults. This lets us eliminate extraneous StyleRange
+		// objects
 		if (matchesDefaults(attr))
 		{
-			return;
+			attr = new TextAttribute(null);
 		}
 		super.addRange(presentation, offset, length, attr);
 	}
