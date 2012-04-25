@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.Platform;
 
 import beaver.Symbol;
 
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.parsing.HTMLParser;
@@ -68,6 +69,7 @@ public class HTMLElementNode extends HTMLNode
 			{
 			}
 		}
+		// FIXME this is actually the range of the entire start tag. I'd "fix" it, but I think a lot of code relies on this behavior right now
 		fNameNode = new NameNode(tag, tagSymbol.getStart(), tagSymbol.getEnd());
 		fAttributes = new HashMap<String, IParseNodeAttribute>(2);
 		fCSSStyleNodes = new ArrayList<IParseNode>();
@@ -203,9 +205,9 @@ public class HTMLElementNode extends HTMLNode
 		return attr.getValue();
 	}
 
-	public void setAttribute(String name, String value)
+	public void setAttribute(String name, String value, IRange nameRegion, IRange valueRegion)
 	{
-		fAttributes.put(name, new ParseNodeAttribute(this, name, value));
+		fAttributes.put(name, new ParseNodeAttribute(this, name, value, nameRegion, valueRegion));
 	}
 
 	public INameNode getEndNode()
@@ -300,5 +302,36 @@ public class HTMLElementNode extends HTMLNode
 	public IParseNodeAttribute[] getAttributes()
 	{
 		return fAttributes.values().toArray(new IParseNodeAttribute[fAttributes.size()]);
+	}
+
+	/**
+	 * If the offset covers an attribute's name or value ranges, return the attribute.
+	 * 
+	 * @param offset
+	 * @return
+	 */
+	public IParseNodeAttribute getAttributeAtOffset(int offset)
+	{
+		IParseNodeAttribute[] attrs = getAttributes();
+		if (ArrayUtil.isEmpty(attrs))
+		{
+			return null;
+		}
+
+		for (IParseNodeAttribute attr : attrs)
+		{
+			IRange nameRange = attr.getNameRange();
+			if (nameRange != null && nameRange.contains(offset))
+			{
+				return attr;
+			}
+
+			IRange valueRange = attr.getValueRange();
+			if (valueRange != null && valueRange.contains(offset))
+			{
+				return attr;
+			}
+		}
+		return null;
 	}
 }

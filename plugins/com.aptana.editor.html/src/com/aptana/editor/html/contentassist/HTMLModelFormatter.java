@@ -12,6 +12,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -22,6 +23,8 @@ import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.hover.TagStripperAndTypeBolder;
+import com.aptana.editor.html.contentassist.model.AttributeElement;
+import com.aptana.editor.html.contentassist.model.BaseElement;
 import com.aptana.editor.html.contentassist.model.ElementElement;
 import com.aptana.editor.html.contentassist.model.SpecificationElement;
 import com.aptana.editor.html.contentassist.model.UserAgentElement;
@@ -69,7 +72,7 @@ public class HTMLModelFormatter
 	 * @param property
 	 * @return
 	 */
-	public String getHeader(ElementElement element)
+	public String getHeader(BaseElement element)
 	{
 		return getHeader(CollectionsUtil.newList(element));
 	}
@@ -80,7 +83,7 @@ public class HTMLModelFormatter
 	 * @param elements
 	 * @return
 	 */
-	public String getHeader(final Collection<ElementElement> elements)
+	public String getHeader(final Collection<BaseElement> elements)
 	{
 		if (CollectionsUtil.isEmpty(elements))
 		{
@@ -121,7 +124,7 @@ public class HTMLModelFormatter
 	 * @param element
 	 * @return
 	 */
-	public String getDocumentation(ElementElement element)
+	public String getDocumentation(BaseElement element)
 	{
 		return getDocumentation(CollectionsUtil.newList(element));
 	}
@@ -132,7 +135,7 @@ public class HTMLModelFormatter
 	 * @param elements
 	 * @return
 	 */
-	public String getDocumentation(final Collection<ElementElement> elements)
+	public String getDocumentation(final Collection<BaseElement> elements)
 	{
 		List<Section> docSections = CollectionsUtil.filter(fSections, new IFilter<Section>()
 		{
@@ -204,7 +207,7 @@ public class HTMLModelFormatter
 			return name;
 		}
 
-		public abstract String generate(Collection<ElementElement> properties, URI root);
+		public abstract String generate(Collection<BaseElement> properties, URI root);
 
 		/**
 		 * Name
@@ -216,9 +219,9 @@ public class HTMLModelFormatter
 				return true;
 			}
 
-			public String generate(Collection<ElementElement> elements, URI root)
+			public String generate(Collection<BaseElement> elements, URI root)
 			{
-				ElementElement prop = elements.iterator().next();
+				BaseElement prop = elements.iterator().next();
 				return prop.getName();
 			}
 		};
@@ -233,10 +236,15 @@ public class HTMLModelFormatter
 				return true;
 			}
 
-			public String generate(Collection<ElementElement> elements, URI root)
+			public String generate(Collection<BaseElement> elements, URI root)
 			{
-				ElementElement prop = elements.iterator().next();
-				return MessageFormat.format(Messages.HTMLModelFormatter_DisplayName, prop.getDisplayName());
+				BaseElement prop = elements.iterator().next();
+				if (!(prop instanceof ElementElement))
+				{
+					return StringUtil.EMPTY;
+				}
+				return MessageFormat.format(Messages.HTMLModelFormatter_DisplayName,
+						((ElementElement) prop).getDisplayName());
 			}
 		};
 
@@ -246,17 +254,22 @@ public class HTMLModelFormatter
 		final static Section EXAMPLE = new Section("EXAMPLE") //$NON-NLS-1$
 		{
 			@Override
-			public String generate(Collection<ElementElement> elements, URI root)
+			public String generate(Collection<BaseElement> elements, URI root)
 			{
 				String example = getFirstExample(elements);
 				return addSection(Messages.HTMLModelFormatter_ExampleSection, example);
 			}
 
-			private String getFirstExample(Collection<ElementElement> elements)
+			private String getFirstExample(Collection<BaseElement> elements)
 			{
-				for (ElementElement prop : elements)
+				for (BaseElement prop : elements)
 				{
-					String example = prop.getExample();
+					if (!(prop instanceof ElementElement))
+					{
+						continue;
+					}
+					ElementElement el = (ElementElement) prop;
+					String example = el.getExample();
 					if (!StringUtil.isEmpty(example))
 					{
 						return example;
@@ -272,12 +285,17 @@ public class HTMLModelFormatter
 		final static Section EXAMPLES = new Section("EXAMPLES") //$NON-NLS-1$
 		{
 			@Override
-			public String generate(Collection<ElementElement> elements, URI root)
+			public String generate(Collection<BaseElement> elements, URI root)
 			{
 				List<String> examples = new ArrayList<String>();
-				for (ElementElement prop : elements)
+				for (BaseElement prop : elements)
 				{
-					examples.add(prop.getExample());
+					if (!(prop instanceof ElementElement))
+					{
+						continue;
+					}
+					ElementElement el = (ElementElement) prop;
+					examples.add(el.getExample());
 				}
 				examples = CollectionsUtil.filter(examples, new IFilter<String>()
 				{
@@ -306,17 +324,27 @@ public class HTMLModelFormatter
 		final static Section REMARK = new Section("REMARK") //$NON-NLS-1$
 		{
 			@Override
-			public String generate(Collection<ElementElement> elements, URI root)
+			public String generate(Collection<BaseElement> elements, URI root)
 			{
 				String remark = getFirstRemark(elements);
 				return addSection(Messages.HTMLModelFormatter_RemarksSection, remark);
 			}
 
-			private String getFirstRemark(Collection<ElementElement> elements)
+			private String getFirstRemark(Collection<BaseElement> elements)
 			{
-				for (ElementElement prop : elements)
+				for (BaseElement prop : elements)
 				{
-					String remark = prop.getRemark();
+					String remark = null;
+					if (prop instanceof ElementElement)
+					{
+						ElementElement el = (ElementElement) prop;
+						remark = el.getRemark();
+					}
+					else if (prop instanceof AttributeElement)
+					{
+						AttributeElement at = (AttributeElement) prop;
+						remark = at.getRemark();
+					}
 					if (!StringUtil.isEmpty(remark))
 					{
 						return remark;
@@ -332,12 +360,23 @@ public class HTMLModelFormatter
 		final static Section SPECIFICATIONS = new Section("SPECIFICATIONS") //$NON-NLS-1$
 		{
 			@Override
-			public String generate(Collection<ElementElement> properties, URI root)
+			public String generate(Collection<BaseElement> properties, URI root)
 			{
 				Set<SpecificationElement> specs = new HashSet<SpecificationElement>();
-				for (ElementElement property : properties)
+				for (BaseElement property : properties)
 				{
-					specs.addAll(property.getSpecifications());
+					List<SpecificationElement> someSpecs = Collections.emptyList();
+					if (property instanceof ElementElement)
+					{
+						ElementElement el = (ElementElement) property;
+						someSpecs = el.getSpecifications();
+					}
+					else if (property instanceof AttributeElement)
+					{
+						AttributeElement at = (AttributeElement) property;
+						someSpecs = at.getSpecifications();
+					}
+					specs.addAll(someSpecs);
 				}
 				return addSection(Messages.HTMLModelFormatter_SpecificationSection, getSpecificationsString(specs));
 			}
@@ -370,10 +409,10 @@ public class HTMLModelFormatter
 			private TagStripperAndTypeBolder stripAndBold = new TagStripperAndTypeBolder();
 
 			@Override
-			public String generate(Collection<ElementElement> properties, URI root)
+			public String generate(Collection<BaseElement> properties, URI root)
 			{
 				Set<String> descriptions = new HashSet<String>();
-				for (ElementElement property : properties)
+				for (BaseElement property : properties)
 				{
 					// strip p elements and bold any items that look like open tags with dotted local names
 					stripAndBold.setUseHTML(useHTML);
@@ -399,12 +438,23 @@ public class HTMLModelFormatter
 		final static Section PLATFORMS = new Section("PLATFORMS") //$NON-NLS-1$
 		{
 			@Override
-			public String generate(Collection<ElementElement> elements, URI root)
+			public String generate(Collection<BaseElement> elements, URI root)
 			{
 				Set<UserAgentElement> userAgents = new HashSet<UserAgentElement>();
-				for (ElementElement property : elements)
+				for (BaseElement property : elements)
 				{
-					userAgents.addAll(property.getUserAgents());
+					List<UserAgentElement> ua = Collections.emptyList();
+					if (property instanceof ElementElement)
+					{
+						ElementElement element = (ElementElement) property;
+						ua = element.getUserAgents();
+					}
+					else if (property instanceof AttributeElement)
+					{
+						AttributeElement at = (AttributeElement) property;
+						ua = at.getUserAgents();
+					}
+					userAgents.addAll(ua);
 				}
 				return addSection(Messages.HTMLModelFormatter_SupportedPlatforms, getPlatforms(userAgents));
 			}

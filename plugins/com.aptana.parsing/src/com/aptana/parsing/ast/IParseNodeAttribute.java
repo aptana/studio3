@@ -7,6 +7,8 @@
  */
 package com.aptana.parsing.ast;
 
+import com.aptana.parsing.lexer.IRange;
+
 /**
  * @author Kevin Lindsey
  */
@@ -32,4 +34,18 @@ public interface IParseNodeAttribute
 	 * @return String
 	 */
 	String getValue();
+
+	/**
+	 * getNameRange
+	 * 
+	 * @return
+	 */
+	IRange getNameRange();
+
+	/**
+	 * getValueRange
+	 * 
+	 * @return
+	 */
+	IRange getValueRange();
 }
