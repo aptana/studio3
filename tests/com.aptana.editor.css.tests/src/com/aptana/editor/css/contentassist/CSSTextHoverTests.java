@@ -144,15 +144,22 @@ public class CSSTextHoverTests extends TestCase
 				.getHoverInfo2(textViewer, hoverRegion);
 		assertNotNull("Info was null", info);
 		assertNotNull("Info Element was null", info.getElement());
-		assertTrue("info's element was not " + infoElementType.getName(), infoElementType.isAssignableFrom(info.getElement().getClass()));
+		assertTrue("info's element was not " + infoElementType.getName(),
+				infoElementType.isAssignableFrom(info.getElement().getClass()));
 	}
 
-	/**
-	 * testElement
-	 */
+	protected void assertNoHover(String source, int hoverOffset) throws Exception
+	{
+		ITextViewer textViewer = getTextViewer(source);
+
+		IRegion hoverRegion = fHover.getHoverRegion(textViewer, hoverOffset);
+		assertNull("Got a hover region when we didn't expect one", hoverRegion);
+	}
+
 	public void testElement() throws Exception
 	{
-		assertRegionAndInfoType("div { background: green; }", 1, 0, 3, String.class);
+		// CSSElementSelectorHover in HTML plugin handles these
+		assertNoHover("div { background: green; }", 1);
 	}
 
 	/**

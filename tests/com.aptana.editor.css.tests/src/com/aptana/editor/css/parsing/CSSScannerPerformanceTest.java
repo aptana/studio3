@@ -14,68 +14,83 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.test.performance.PerformanceTestCase;
 
+import beaver.Symbol;
+
 import com.aptana.core.util.IOUtil;
-import com.aptana.parsing.IParseState;
-import com.aptana.parsing.ParseState;
 
-public class CSSParserPerformanceTest extends PerformanceTestCase
+public class CSSScannerPerformanceTest extends PerformanceTestCase
 {
-
-	private CSSParser fParser;
+	private CSSFlexScanner fScanner;
 
 	@Override
 	protected void setUp() throws Exception
 	{
 		super.setUp();
-		fParser = new CSSParser();
+		fScanner = new CSSFlexScanner();
 	}
 
 	@Override
 	protected void tearDown() throws Exception
 	{
-		fParser = null;
+		fScanner = null;
 		super.tearDown();
 	}
 
 	public void testWordpressAdminCSS() throws Exception
 	{
-		parseTest("wp-admin.css", 330);
+		timeScan("wp-admin.css", 50);
 	}
-	
+
 	public void testWordpressAdminDev() throws Exception
 	{
-		parseTest("wp-admin.dev.css", 1250);
+		timeScan("wp-admin.dev.css", 50);
 	}
-	
+
 	public void testFromMetadata() throws Exception
 	{
-		parseTest("from-metadata.css", 50);
+		timeScan("from-metadata.css", 50);
 	}
-	
+
 	public void testGithubFormatted() throws Exception
 	{
-		parseTest("github-formatted.css", 25);
+		timeScan("github-formatted.css", 50);
 	}
-	
+
 	public void testGithubMinimized() throws Exception
 	{
-		parseTest("github-minimized.css", 25);
+		timeScan("github-minimized.css", 50);
 	}
-	
-	private void parseTest(String fileName, int iterations) throws Exception
+
+	/**
+	 * timeScan
+	 * 
+	 * @param resourceName
+	 * @param src
+	 * @param numRuns
+	 * @throws Exception
+	 */
+	private void timeScan(String resourceName, int numRuns) throws Exception
 	{
 		InputStream stream = FileLocator.openStream(Platform.getBundle("com.aptana.editor.css.tests"),
-				Path.fromPortableString("performance/" + fileName), false);
+				Path.fromPortableString("performance/" + resourceName), false);
 		String src = IOUtil.read(stream);
 
-		for (int i = 0; i < iterations; i++)
+		for (int i = 0; i < numRuns; i++)
 		{
-			IParseState parseState = new ParseState();
-			parseState.setEditState(src);
 			startMeasuring();
-			fParser.parse(parseState);
+
+			fScanner.setSource(src);
+
+			Symbol symbol = fScanner.nextToken();
+
+			while (symbol != null && symbol.getId() != 0)
+			{
+				symbol = fScanner.nextToken();
+			}
+
 			stopMeasuring();
 		}
+
 		commitMeasurements();
 		assertPerformance();
 	}
