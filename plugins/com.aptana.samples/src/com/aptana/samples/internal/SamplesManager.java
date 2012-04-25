@@ -13,6 +13,7 @@ import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +41,7 @@ import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.ElementVisibilityListener;
 import com.aptana.scripting.model.LoadCycleListener;
 import com.aptana.scripting.model.ProjectSampleElement;
+import com.aptana.scripting.model.filters.IModelFilter;
 
 public class SamplesManager implements ISamplesManager
 {
@@ -222,12 +224,6 @@ public class SamplesManager implements ISamplesManager
 			samples.add(sample);
 			bundleSamplesById.put(id, sample);
 
-			if (IdeLog.isInfoEnabled(SamplesPlugin.getDefault(), IDebugScopes.MANAGER))
-			{
-				IdeLog.logInfo(
-						SamplesPlugin.getDefault(),
-						MessageFormat.format("Added sample: id = {0}; name = {1}", id, sample.getName()), IDebugScopes.MANAGER); //$NON-NLS-1$
-			}
 			fireSampleAdded(sample);
 		}
 		else
@@ -410,7 +406,14 @@ public class SamplesManager implements ISamplesManager
 
 	private void loadBundleSampleElements()
 	{
-		List<ProjectSampleElement> elements = BundleManager.getInstance().getProjectSamples(null);
+		List<ProjectSampleElement> elements = BundleManager.getInstance().getProjectSamples(new IModelFilter()
+		{
+			public boolean include(AbstractElement element)
+			{
+				return (element instanceof ProjectSampleElement);
+			}
+		});
+		Collections.sort(elements);
 		// only reloads the samples from rubles if there has been a difference
 		if (elements.isEmpty() || bundleSamples.equals(elements))
 		{
@@ -422,20 +425,12 @@ public class SamplesManager implements ISamplesManager
 		Collection<SamplesReference> samples = new ArrayList<SamplesReference>(bundleSamplesById.values());
 		bundleSamplesByCategory.clear();
 		bundleSamplesById.clear();
-		if (IdeLog.isInfoEnabled(SamplesPlugin.getDefault(), IDebugScopes.MANAGER))
-		{
-			IdeLog.logInfo(SamplesPlugin.getDefault(), "Removed all existing samples", IDebugScopes.MANAGER); //$NON-NLS-1$
-		}
 		for (SamplesReference sample : samples)
 		{
 			fireSampleRemoved(sample);
 		}
 
 		// adds the current list of samples loaded from the rubles
-		if (IdeLog.isInfoEnabled(SamplesPlugin.getDefault(), IDebugScopes.MANAGER))
-		{
-			IdeLog.logInfo(SamplesPlugin.getDefault(), "adding the list of samples", IDebugScopes.MANAGER); //$NON-NLS-1$
-		}
 		for (ProjectSampleElement element : bundleSamples)
 		{
 			addSample(element);
@@ -444,6 +439,12 @@ public class SamplesManager implements ISamplesManager
 
 	private void fireSampleAdded(SamplesReference sample)
 	{
+		if (IdeLog.isInfoEnabled(SamplesPlugin.getDefault(), IDebugScopes.MANAGER))
+		{
+			IdeLog.logInfo(
+					SamplesPlugin.getDefault(),
+					MessageFormat.format("Added sample: id = {0}; name = {1}", sample.getId(), sample.getName()), IDebugScopes.MANAGER); //$NON-NLS-1$
+		}
 		for (ISampleListener listener : sampleListeners)
 		{
 			listener.sampleAdded(sample);
@@ -452,6 +453,12 @@ public class SamplesManager implements ISamplesManager
 
 	private void fireSampleRemoved(SamplesReference sample)
 	{
+		if (IdeLog.isInfoEnabled(SamplesPlugin.getDefault(), IDebugScopes.MANAGER))
+		{
+			IdeLog.logInfo(
+					SamplesPlugin.getDefault(),
+					MessageFormat.format("Removed sample: id = {0}; name = {1}", sample.getId(), sample.getName()), IDebugScopes.MANAGER); //$NON-NLS-1$
+		}
 		for (ISampleListener listener : sampleListeners)
 		{
 			listener.sampleRemoved(sample);
