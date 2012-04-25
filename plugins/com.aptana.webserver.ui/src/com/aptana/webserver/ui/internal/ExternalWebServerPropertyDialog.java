@@ -354,7 +354,7 @@ public class ExternalWebServerPropertyDialog extends TitleAreaDialog implements 
 		String path = dlg.open();
 		if (path != null)
 		{
-			documentRootText.setText(Path.fromOSString(path).toPortableString());
+			documentRootText.setText(Path.fromOSString(path).toOSString());
 		}
 	}
 
