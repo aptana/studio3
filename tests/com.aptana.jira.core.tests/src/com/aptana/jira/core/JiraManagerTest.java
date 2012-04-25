@@ -30,7 +30,7 @@ public class JiraManagerTest extends TestCase
 		}
 		catch (JiraException e)
 		{
-			fail("Valid user failed to log into JIRA");
+			fail("Valid user failed to log into JIRA due to reason '" + e.getMessage() + "'");
 		}
 	}
 
