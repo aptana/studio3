@@ -247,5 +247,13 @@
 		<move file="${buildDirectory}/${buildType}.${build.revision}/${topLevelElementId}-${build.revision}-group.group.group.zip" tofile="${deploy.dir}/${topLevelElementId}-${finalVersion}.zip" />
 		<!-- Extract zipped p2 repo too -->
 		<unzip src="${deploy.dir}/${topLevelElementId}-${finalVersion}.zip" dest="${deploy.dir}" />
+
+		<!-- Check for JDT plugins -->
+		<pathconvert property="jdt.found" setonempty="false">
+			<path>
+				<fileset dir="${deploy.dir}/plugins" includes="org.eclipse.jdt.*" />
+			</path>
+		</pathconvert>
+		<fail message="Generated p2 repo contains JDT plugins!" if="jdt.found" />
 	</target>
 </project>
