@@ -11,7 +11,6 @@ import java.text.MessageFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextHover;
@@ -23,18 +22,15 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.IEditorPart;
 
 import com.aptana.core.util.StringUtil;
-import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.contentassist.CommonTextHover;
 import com.aptana.editor.common.hover.CustomBrowserInformationControl;
 import com.aptana.editor.css.CSSColors;
 import com.aptana.editor.css.contentassist.CSSIndexQueryHelper;
-import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.contentassist.model.PropertyElement;
 import com.aptana.editor.css.internal.text.CSSModelFormatter;
 import com.aptana.editor.css.parsing.ast.CSSDeclarationNode;
 import com.aptana.editor.css.parsing.ast.CSSFunctionNode;
 import com.aptana.editor.css.parsing.ast.CSSNode;
-import com.aptana.editor.css.parsing.ast.CSSSimpleSelectorNode;
 import com.aptana.editor.css.parsing.ast.CSSTermListNode;
 import com.aptana.editor.css.parsing.ast.ICSSNodeTypes;
 import com.aptana.parsing.ast.IParseNode;
@@ -111,32 +107,6 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 	}
 
 	/**
-	 * getAST
-	 * 
-	 * @param textViewer
-	 * @param offset
-	 * @return
-	 */
-	protected IParseNode getAST(ITextViewer textViewer, int offset)
-	{
-		IParseNode ast = null;
-
-		if (textViewer instanceof IAdaptable)
-		{
-			IAdaptable adaptable = (IAdaptable) textViewer;
-			AbstractThemeableEditor editor = (AbstractThemeableEditor) adaptable
-					.getAdapter(AbstractThemeableEditor.class);
-
-			if (editor != null)
-			{
-				ast = editor.getAST();
-			}
-		}
-
-		return ast;
-	}
-
-	/**
 	 * getFunctionRegionInfo
 	 * 
 	 * @param node
@@ -182,119 +152,93 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 		info = null;
 		fHeader = null;
 
-		// grab document's parse model
-		IParseNode ast = getAST(textViewer, offset);
-		if (ast != null)
+		IParseNode node = getActiveNode(textViewer, offset);
+
+		if (node instanceof CSSNode)
 		{
-			IParseNode node = ast.getNodeAtOffset(offset);
+			CSSNode cssNode = (CSSNode) node;
 
-			if (node instanceof CSSNode)
+			switch (cssNode.getNodeType())
 			{
-				CSSNode cssNode = (CSSNode) node;
-
-				switch (cssNode.getNodeType())
+				case ICSSNodeTypes.TERM:
 				{
-					case ICSSNodeTypes.TERM:
+					IParseNode parent = cssNode.getParent();
+					if (parent instanceof CSSTermListNode)
 					{
-						IParseNode parent = cssNode.getParent();
-						if (parent instanceof CSSTermListNode)
+						// find owning statement for this expression
+						while (parent instanceof CSSTermListNode)
 						{
-							// find owning statement for this expression
-							while (parent instanceof CSSTermListNode)
-							{
-								parent = parent.getParent();
-							}
+							parent = parent.getParent();
 						}
-						if (parent instanceof CSSDeclarationNode)
-						{
-							String text = cssNode.getText();
-
-							if (!StringUtil.isEmpty(text))
-							{
-								if (text.charAt(0) == '#')
-								{
-									info = CSSColors.hexToRGB(text);
-								}
-								else if (CSSColors.namedColorExists(text))
-								{
-									info = CSSColors.namedColorToRGB(text);
-								}
-								else
-								{
-									info = text;
-								}
-								result = new Region(cssNode.getStartingOffset(), cssNode.getLength());
-								break;
-							}
-						}
-						else if (parent instanceof CSSFunctionNode)
-						{
-							RegionInfo ri = this.getFunctionRegionInfo((CSSFunctionNode) parent);
-
-							if (ri != null)
-							{
-								result = ri.region;
-								info = ri.info;
-							}
-						}
-						break;
 					}
-
-					case ICSSNodeTypes.DECLARATION:
+					if (parent instanceof CSSDeclarationNode)
 					{
-						CSSDeclarationNode decl = (CSSDeclarationNode) cssNode;
-						String propertyName = decl.getIdentifier();
-						int startingOffset = decl.getStartingOffset();
+						String text = cssNode.getText();
 
-						if (propertyName != null && startingOffset <= offset
-								&& offset < startingOffset + propertyName.length())
+						if (!StringUtil.isEmpty(text))
 						{
-							CSSIndexQueryHelper queryHelper = new CSSIndexQueryHelper();
-							PropertyElement property = queryHelper.getProperty(propertyName);
-
-							if (property != null)
+							if (text.charAt(0) == '#')
 							{
-								result = new Region(cssNode.getStartingOffset(), propertyName.length());
-
-								fHeader = CSSModelFormatter.TEXT_HOVER.getHeader(property);
-								info = CSSModelFormatter.TEXT_HOVER.getDocumentation(property);
+								info = CSSColors.hexToRGB(text);
 							}
+							else if (CSSColors.namedColorExists(text))
+							{
+								info = CSSColors.namedColorToRGB(text);
+							}
+							else
+							{
+								info = text;
+							}
+							result = new Region(cssNode.getStartingOffset(), cssNode.getLength());
+							break;
 						}
-						break;
 					}
-
-					case ICSSNodeTypes.FUNCTION:
+					else if (parent instanceof CSSFunctionNode)
 					{
-						RegionInfo ri = this.getFunctionRegionInfo((CSSFunctionNode) cssNode);
+						RegionInfo ri = this.getFunctionRegionInfo((CSSFunctionNode) parent);
 
 						if (ri != null)
 						{
 							result = ri.region;
 							info = ri.info;
 						}
-						break;
 					}
+					break;
+				}
 
-					case ICSSNodeTypes.SIMPLE_SELECTOR:
+				case ICSSNodeTypes.DECLARATION:
+				{
+					CSSDeclarationNode decl = (CSSDeclarationNode) cssNode;
+					String propertyName = decl.getIdentifier();
+					int startingOffset = decl.getStartingOffset();
+
+					if (propertyName != null && startingOffset <= offset
+							&& offset < startingOffset + propertyName.length())
 					{
-						CSSSimpleSelectorNode simpleSelector = (CSSSimpleSelectorNode) cssNode;
-						String elementName = simpleSelector.getTypeSelector();
-						int startingOffset = simpleSelector.getStartingOffset();
+						CSSIndexQueryHelper queryHelper = new CSSIndexQueryHelper();
+						PropertyElement property = queryHelper.getProperty(propertyName);
 
-						if (elementName != null && startingOffset <= offset
-								&& offset < startingOffset + elementName.length())
+						if (property != null)
 						{
-							CSSIndexQueryHelper queryHelper = new CSSIndexQueryHelper();
-							ElementElement element = queryHelper.getElement(elementName);
+							result = new Region(cssNode.getStartingOffset(), propertyName.length());
 
-							if (element != null)
-							{
-								result = new Region(cssNode.getStartingOffset(), elementName.length());
-								info = element.getDescription();
-							}
+							fHeader = CSSModelFormatter.TEXT_HOVER.getHeader(property);
+							info = CSSModelFormatter.TEXT_HOVER.getDocumentation(property);
 						}
-						break;
 					}
+					break;
+				}
+
+				case ICSSNodeTypes.FUNCTION:
+				{
+					RegionInfo ri = this.getFunctionRegionInfo((CSSFunctionNode) cssNode);
+
+					if (ri != null)
+					{
+						result = ri.region;
+						info = ri.info;
+					}
+					break;
 				}
 			}
 		}
@@ -302,7 +246,6 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 		if (result == null)
 		{
 			info = null;
-			return new Region(offset, 0);
 		}
 		return result;
 	}

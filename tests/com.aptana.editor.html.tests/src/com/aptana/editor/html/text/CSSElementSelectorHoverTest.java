@@ -11,16 +11,18 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
 import org.eclipse.ui.IEditorPart;
 import org.junit.Test;
+import org.osgi.framework.Bundle;
 
+import com.aptana.editor.css.tests.CSSEditorBasedTests;
 import com.aptana.editor.html.HTMLMetadataLoader;
+import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.contentassist.HTMLIndexQueryHelper;
 import com.aptana.editor.html.contentassist.model.BaseElement;
-import com.aptana.editor.html.tests.HTMLEditorBasedTests;
 
 @SuppressWarnings("rawtypes")
-public class HTMLTextHoverTest extends HTMLEditorBasedTests
+public class CSSElementSelectorHoverTest extends CSSEditorBasedTests
 {
-	private HTMLTextHover hover;
+	private CSSElementSelectorHover hover;
 	private Object fHeaderElement;
 	private HTMLIndexQueryHelper fQueryHelper;
 
@@ -33,7 +35,7 @@ public class HTMLTextHoverTest extends HTMLEditorBasedTests
 		loader.schedule();
 		loader.join();
 
-		hover = new HTMLTextHover()
+		hover = new CSSElementSelectorHover()
 		{
 
 			@Override
@@ -56,27 +58,27 @@ public class HTMLTextHoverTest extends HTMLEditorBasedTests
 	}
 
 	@Test
-	public void testHTMLElement()
+	public void testH2ElementSelector()
 	{
-		assertHoverRegionAndInfo("hover/element.html", getElement("html"), new Region(17, 4));
+		assertHoverRegionAndInfo("hover/element_selector.css", getElement("h2"), new Region(4, 2));
 	}
 
 	@Test
-	public void testH1AttributeClass()
+	public void testSpaceBetweenSelectors()
 	{
-		assertHoverRegionAndInfo("hover/attribute.html", getAttribute("h1", "class"), new Region(86, 6));
+		assertNoHover("hover/space_between_selectors.css");
 	}
 
 	@Test
-	public void testAtSpaceInsideElementStartTag()
+	public void testClassSelector()
 	{
-		assertNoHover("hover/inside_element_space.html");
+		assertNoHover("hover/class_selector.css");
 	}
 
 	@Test
-	public void testNoHoverOverAttributeValue()
+	public void testIdSelector()
 	{
-		assertNoHover("hover/attribute_value.html");
+		assertNoHover("hover/id_selector.css");
 	}
 
 	protected BaseElement getElement(String name)
@@ -135,7 +137,7 @@ public class HTMLTextHoverTest extends HTMLEditorBasedTests
 
 		if (expectedRegion != null)
 		{
-			assertNotNull(hoverRegion);
+			assertNotNull("Expected to receive a hover region, but didn't", hoverRegion);
 			assertEquals("Incorrect hover region returned", expectedRegion, hoverRegion);
 		}
 
@@ -145,5 +147,10 @@ public class HTMLTextHoverTest extends HTMLEditorBasedTests
 	protected IRegion getHoverRegion(int offset)
 	{
 		return hover.getHoverRegion(getSourceViewer(), offset);
+	}
+
+	protected Bundle getBundle()
+	{
+		return HTMLPlugin.getDefault().getBundle();
 	}
 }

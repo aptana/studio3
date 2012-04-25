@@ -47,7 +47,7 @@ public class CSSEditorBasedTests extends EditorContentAssistBasedTests<CSSConten
 	 * @see com.aptana.editor.common.EditorContentAssistBasedTests#getPluginId()
 	 */
 	@Override
-	protected String getPluginId()
+	protected String getEditorId()
 	{
 		return CSSPlugin.PLUGIN_ID;
 	}
