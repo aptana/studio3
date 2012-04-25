@@ -79,6 +79,7 @@ public enum CSSTokenType implements ITypePredicate
 	META_PROPERTY_VALUE("meta.property-value.css", Terminals.PROPERTY), //$NON-NLS-1$
 
 	UNDEFINED("undefined.css", -1), //$NON-NLS-1$
+	ERROR("error.css", -2), //$NON-NLS-1$
 	COMMENT("comment.block.css", 1024); //$NON-NLS-1$
 
 	private static final Map<String, CSSTokenType> NAME_MAP;

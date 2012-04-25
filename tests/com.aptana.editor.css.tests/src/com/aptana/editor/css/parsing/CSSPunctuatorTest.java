@@ -71,9 +71,7 @@ public class CSSPunctuatorTest extends CSSTokensTest
 	{
 		setSource("10 - 5");
 		assertToken(CSSTokenType.NUMBER, 0, 2);
-		assertToken(null, 2, 1);
 		assertToken(CSSTokenType.MINUS, 3, 1);
-		assertToken(null, 4, 1);
 		assertToken(CSSTokenType.NUMBER, 5, 1);
 	}
 

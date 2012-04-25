@@ -43,6 +43,7 @@ import com.aptana.editor.css.parsing.ast.CSSTextNode;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.ast.IParseError;
+import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.ast.ParseError;
 import com.aptana.parsing.ast.ParseRootNode;
@@ -134,26 +135,30 @@ public class CSSParser extends Parser implements IParser
 		fParseState.clearErrors();
 
 		// create scanner and send source to it
-		CSSScanner scanner = new CSSScanner();
+		CSSFlexScanner scanner = new CSSFlexScanner();
 		scanner.setSource(source);
 
 		// parse
 		ParseRootNode result = (ParseRootNode) parse(scanner);
 
 		// attach comments to parse root node
-		IRange[] comments = scanner.getComments();
-		CSSCommentNode[] commentNodes = new CSSCommentNode[comments.length];
+		List<Symbol> comments = scanner.getComments();
+		List<CSSCommentNode> commentNodes = new ArrayList<CSSCommentNode>(comments.size());
 
-		for (int i = 0; i < comments.length; i++)
+		for (Symbol comment : comments)
 		{
-			IRange comment = comments[i];
-			CSSCommentNode commentNode = new CSSCommentNode( //
-					this.getSource(fParseState, comment), comment.getStartingOffset(), comment.getEndingOffset());
+			// @formatter:off
+			CSSCommentNode commentNode = new CSSCommentNode(
+				source.substring(comment.getStart(), comment.getEnd() + 1),
+				comment.getStart(),
+				comment.getEnd()
+			);
+			// @formatter:on
 
-			commentNodes[i] = commentNode;
+			commentNodes.add(commentNode);
 		}
 
-		result.setCommentNodes(commentNodes);
+		result.setCommentNodes(commentNodes.toArray(new IParseNode[commentNodes.size()]));
 
 		// update node offsets
 		int start = fParseState.getStartingOffset();

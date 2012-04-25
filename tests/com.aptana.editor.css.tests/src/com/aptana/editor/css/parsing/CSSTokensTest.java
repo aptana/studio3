@@ -7,11 +7,8 @@
  */
 package com.aptana.editor.css.parsing;
 
-
 import junit.framework.TestCase;
-
-import org.eclipse.jface.text.Document;
-import org.eclipse.jface.text.rules.IToken;
+import beaver.Symbol;
 
 import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 
@@ -31,12 +28,12 @@ public class CSSTokensTest extends TestCase
 		}
 	}
 
-	private CSSTokenScanner fScanner;
+	private CSSFlexScanner fScanner;
 
 	@Override
 	protected void setUp() throws Exception
 	{
-		fScanner = new CSSTokenScanner();
+		fScanner = new CSSFlexScanner();
 	}
 
 	@Override
@@ -66,25 +63,32 @@ public class CSSTokensTest extends TestCase
 	{
 		for (TokenInfo info : infos)
 		{
-			IToken token = fScanner.nextToken();
-
-			// Allow null types when we don't need to verify the type, like with WHITESPACE, for example
-			if (info.type != null)
+			try
 			{
-				// Add in token types that are being tested, regardless if they pass or not. This info is used by
-				// another test to determine if we've covered all token types during testing
-				VerifyTestedTokensTest.TESTED_TOKEN_TYPES.add(info.type);
+				Symbol token = fScanner.nextToken();
 
-				assertEquals("Checking token type", info.type, token.getData());
+				// Allow null types when we don't need to verify the type, like with WHITESPACE, for example
+				if (info.type != null)
+				{
+					// Add in token types that are being tested, regardless if they pass or not. This info is used by
+					// another test to determine if we've covered all token types during testing
+					VerifyTestedTokensTest.TESTED_TOKEN_TYPES.add(info.type);
+
+					assertEquals("Checking token type", info.type.getIndex(), token.getId());
+				}
+
+				assertEquals("Checking token offset", info.offset, token.getStart());
+				assertEquals("Checking token length", info.length, token.getEnd() - token.getStart() + 1);
 			}
-
-			assertEquals("Checking token offset", info.offset, fScanner.getTokenOffset());
-			assertEquals("Checking token length", info.length, fScanner.getTokenLength());
+			catch (Exception t)
+			{
+				fail(t.getMessage());
+			}
 		}
 	}
 
 	protected void setSource(String source)
 	{
-		fScanner.setRange(new Document(source), 0, source.length());
+		fScanner.setSource(source);
 	}
 }
