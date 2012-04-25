@@ -7,25 +7,32 @@
  */
 package com.aptana.jira.core;
 
-public class JiraUser
+public class JiraIssue
 {
 
-	private final String username;
-	private final String password;
+	private final String name;
+	private final String id;
+	private final String url;
 
-	public JiraUser(String username, String password)
+	public JiraIssue(String name, String id, String url)
 	{
-		this.username = username;
-		this.password = password;
+		this.name = name;
+		this.id = id;
+		this.url = url;
 	}
 
-	public String getUsername()
+	public String getName()
 	{
-		return username;
+		return name;
 	}
 
-	public String getPassword()
+	public String getId()
 	{
-		return password;
+		return id;
+	}
+
+	public String getUrl()
+	{
+		return url;
 	}
 }
