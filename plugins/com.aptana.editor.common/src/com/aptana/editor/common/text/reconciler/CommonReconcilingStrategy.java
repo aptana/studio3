@@ -7,8 +7,6 @@
  */
 package com.aptana.editor.common.text.reconciler;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +35,6 @@ import com.aptana.core.IFilter;
 import com.aptana.core.build.IBuildParticipant;
 import com.aptana.core.build.IBuildParticipant.BuildType;
 import com.aptana.core.build.IBuildParticipantManager;
-import com.aptana.core.build.IProblem;
 import com.aptana.core.build.ReconcileContext;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
@@ -167,12 +164,23 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		}
 		// If we had all positions we shouldn't probably listen to cancel, but we may have exited emitFoldingRegions
 		// early because of cancel...
-		if (monitor != null && monitor.isCanceled())
+		if (monitor != null && monitor.isCanceled() || !shouldUpdatePositions(folder))
 		{
 			return;
 		}
 
 		updatePositions();
+	}
+
+	/**
+	 * A hook that can prevent folding position update when needed.
+	 * 
+	 * @param folder
+	 * @return <code>true</code> by default. Subclasses may override.
+	 */
+	protected boolean shouldUpdatePositions(IFoldingComputer folder)
+	{
+		return true;
 	}
 
 	// Delete all the positions in the document
