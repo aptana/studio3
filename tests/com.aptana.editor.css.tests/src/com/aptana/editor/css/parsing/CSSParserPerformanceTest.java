@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.test.performance.PerformanceTestCase;
 
 import com.aptana.core.util.IOUtil;
+import com.aptana.editor.epl.tests.EditorTestHelper;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ParseState;
 
@@ -67,6 +68,8 @@ public class CSSParserPerformanceTest extends PerformanceTestCase
 		InputStream stream = FileLocator.openStream(Platform.getBundle("com.aptana.editor.css.tests"),
 				Path.fromPortableString("performance/" + fileName), false);
 		String src = IOUtil.read(stream);
+
+		EditorTestHelper.joinBackgroundActivities();
 
 		for (int i = 0; i < iterations; i++)
 		{
