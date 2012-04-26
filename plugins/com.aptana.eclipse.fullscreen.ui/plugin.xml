@@ -26,6 +26,13 @@
             locationURI="menu:window?after=newEditor">
                            <command
                                  commandId="com.bandlem.eclipse.fullscreen.ui.ToggleFullScreen">
+                              <visibleWhen
+                                    checkEnabled="false">
+                                 <test
+                                       property="com.aptana.eclipse.fullscreen.ui.isOSLion"
+                                       value="true">
+                                 </test>
+                              </visibleWhen>
                            </command>
       </menuContribution>
    </extension>
@@ -37,6 +44,16 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="Esc">
       </key>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="com.aptana.eclipse.fullscreen.ui.OSPropertyTester"
+            id="com.aptana.eclipse.fullscreen.ui.osPropertyTester"
+            namespace="com.aptana.eclipse.fullscreen.ui"
+            properties="isOSLion"
+            type="java.lang.Object">
+      </propertyTester>
    </extension>
 
 </plugin>

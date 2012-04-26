@@ -1,6 +1,7 @@
 Manifest-Version: 1.0
 Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime
+ org.eclipse.core.runtime,
+ org.eclipse.core.expressions
 Bundle-Vendor: %Bundle-Vendor
 Bundle-ActivationPolicy: lazy
 Bundle-Version: 1.0.4.201108061054
