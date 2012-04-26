@@ -7,6 +7,11 @@
  */
 package com.aptana.editor.css.parsing;
 
+import java.util.List;
+
+import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.StringUtil;
+import com.aptana.editor.common.tests.util.ListCrossProduct;
 import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 
 public class CSSLiteralTest extends CSSTokensTest
@@ -24,12 +29,133 @@ public class CSSLiteralTest extends CSSTokensTest
 
 	public void testNumber()
 	{
-		assertToken("10", CSSTokenType.NUMBER, 0, 2); //$NON-NLS-1$
+		ListCrossProduct<String> crossProduct = new ListCrossProduct<String>();
+
+		crossProduct.addList(CollectionsUtil.newList("", "-", "+"));
+		crossProduct.addList(CollectionsUtil.newList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"));
+		crossProduct.addList(CollectionsUtil.newList("."));
+		crossProduct.addList(CollectionsUtil.newList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"));
+
+		for (List<String> list : crossProduct)
+		{
+			String text = StringUtil.concat(list);
+
+			assertToken(text, CSSTokenType.NUMBER, 0, text.length());
+		}
+	}
+
+	public void testNumber2()
+	{
+		ListCrossProduct<String> crossProduct = new ListCrossProduct<String>();
+
+		crossProduct.addList(CollectionsUtil.newList("{"));
+		crossProduct.addList(CollectionsUtil.newList("", "-", "+"));
+		crossProduct.addList(CollectionsUtil.newList("", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"));
+		crossProduct.addList(CollectionsUtil.newList("."));
+		crossProduct.addList(CollectionsUtil.newList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"));
+		crossProduct.addList(CollectionsUtil.newList("}"));
+
+		for (List<String> list : crossProduct)
+		{
+			String text = StringUtil.concat(list);
+
+			// @formatter:off
+			assertToken(
+				text,
+				new TokenInfo(CSSTokenType.LCURLY, 0, 1),
+				new TokenInfo(CSSTokenType.NUMBER, 1, text.length() - 2),
+				new TokenInfo(CSSTokenType.RCURLY, text.length() - 1, 1)
+			);
+			// @formatter:on
+		}
+	}
+
+	public void testRGB()
+	{
+		ListCrossProduct<String> crossProduct = new ListCrossProduct<String>();
+		// @formatter:off
+		List<String> hexValues = CollectionsUtil.newList(
+			"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+			"A", "B", "C", "D", "E", "F",
+			"a", "b", "c", "d", "e", "f"
+		);
+		// @formatter:on
+
+		crossProduct.addList(CollectionsUtil.newList("{#"));
+		crossProduct.addList(hexValues);
+		crossProduct.addList(hexValues);
+		crossProduct.addList(hexValues);
+		crossProduct.addList(CollectionsUtil.newList("}"));
+
+		for (List<String> list : crossProduct)
+		{
+			String text = StringUtil.concat(list);
+
+			// @formatter:off
+			assertToken(
+				text,
+				new TokenInfo(CSSTokenType.LCURLY, 0, 1),
+				new TokenInfo(CSSTokenType.RGB, 1, text.length() - 2),
+				new TokenInfo(CSSTokenType.RCURLY, text.length() - 1, 1)
+			);
+			// @formatter:on
+		}
+	}
+
+	/*
+	 * NOTE: only test uppercase hex values; otherwise, this unit test will take a very long time
+	 */
+	public void testRGB2()
+	{
+		ListCrossProduct<String> crossProduct = new ListCrossProduct<String>();
+		// @formatter:off
+		List<String> hexValues = CollectionsUtil.newList(
+			"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+			"A", "B", "C", "D", "E", "F"
+		);
+		// @formatter:on
+
+		crossProduct.addList(CollectionsUtil.newList("{#"));
+		crossProduct.addList(hexValues);
+		crossProduct.addList(hexValues);
+		crossProduct.addList(hexValues);
+		crossProduct.addList(hexValues);
+		crossProduct.addList(hexValues);
+		crossProduct.addList(hexValues);
+		crossProduct.addList(CollectionsUtil.newList("}"));
+
+		for (List<String> list : crossProduct)
+		{
+			String text = StringUtil.concat(list);
+
+			// @formatter:off
+			assertToken(
+				text,
+				new TokenInfo(CSSTokenType.LCURLY, 0, 1),
+				new TokenInfo(CSSTokenType.RGB, 1, text.length() - 2),
+				new TokenInfo(CSSTokenType.RCURLY, text.length() - 1, 1)
+			);
+			// @formatter:on
+		}
 	}
 
 	public void testClass()
 	{
 		assertToken(".class", CSSTokenType.CLASS, 0, 6); //$NON-NLS-1$
+	}
+	
+	public void testClass2()
+	{
+		String source = "{.class}";
+		
+		// @formatter:off
+		assertToken(
+			source, //$NON-NLS-1$
+			new TokenInfo(CSSTokenType.LCURLY, 0, 1),
+			new TokenInfo(CSSTokenType.CLASS, 1, source.length() - 2),
+			new TokenInfo(CSSTokenType.RCURLY, source.length() - 1, 1)
+		);
+		// @formatter:on
 	}
 
 	public void testClassWithDashes()
@@ -40,6 +166,20 @@ public class CSSLiteralTest extends CSSTokensTest
 	public void testHash()
 	{
 		assertToken("#hash", CSSTokenType.ID, 0, 5); //$NON-NLS-1$
+	}
+
+	public void testHash2()
+	{
+		String source = "{#hash}";
+
+		// @formatter:off
+		assertToken(
+			source, //$NON-NLS-1$
+			new TokenInfo(CSSTokenType.LCURLY, 0, 1),
+			new TokenInfo(CSSTokenType.ID, 1, source.length() - 2),
+			new TokenInfo(CSSTokenType.RCURLY, source.length() - 1, 1)
+		);
+		// @formatter:on
 	}
 
 	public void testHashLikeRGB1()
@@ -69,9 +209,15 @@ public class CSSLiteralTest extends CSSTokensTest
 
 	public void testFunction()
 	{
-		setSource("function(");
-		assertToken(CSSTokenType.IDENTIFIER, 0, 8); //$NON-NLS-1$
-		assertToken(CSSTokenType.LPAREN, 8, 1); //$NON-NLS-1$
+		String source = "function("; //$NON-NLS-1$
+
+		// @formatter:off
+		assertToken(
+			source,
+			new TokenInfo(CSSTokenType.IDENTIFIER, 0, 8),
+			new TokenInfo(CSSTokenType.LPAREN, 8, 1)
+		);
+		// @formatter:on
 	}
 
 	public void testPercentage()
