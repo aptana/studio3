@@ -481,7 +481,10 @@ public class HTMLParser implements IParser
 				value = tag.substring(start, start + fTagScanner.getTokenLength());
 				// strips the quotation marks and any surrounding whitespaces
 				value = value.substring(1, value.length() - 1).trim();
-				element.setAttribute(name, value);
+				if (name != null)
+				{
+					element.setAttribute(name, value);
+				}
 
 				// checks if we need to process the value as CSS
 				if (HTMLUtils.isCSSAttribute(name))
