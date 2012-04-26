@@ -13,6 +13,7 @@ import com.aptana.editor.js.parsing.lexer.JSTokenType;
 
 %%
 
+%public
 %class JSFlexScanner
 %extends Scanner
 %type Symbol
@@ -185,7 +186,7 @@ MultiLineComment = "/*" ~"*/"
 SDocComment = "/**" ~"*/"
 VSDocComment = "///" [^\r\n]*
 
-Regex = "/" ([^\\/\r\n]|\\[^\r\n])+ "/" [a-z]*
+Regex = "/" ([^\\\r\n]|\\[^\r\n])+ "/" [a-z]*
 
 %state DIVISION, REGEX
 

@@ -580,6 +580,23 @@ public class JSScannerTest extends TestCase
 		assertTokenTypes("/^abc/img", JSTokenType.REGEX);
 	}
 
+	/**
+	 * APSTUD-4647
+	 */
+	public void testRegex2()
+	{
+		// @formatter:off
+		assertTokenTypes(
+			"var r = /[/]/;",
+			JSTokenType.VAR,
+			JSTokenType.IDENTIFIER,
+			JSTokenType.EQUAL,
+			JSTokenType.REGEX,
+			JSTokenType.SEMICOLON
+		);
+		// @formatter:on
+	}
+
 	public void testInteger()
 	{
 		assertTokenTypes("10", JSTokenType.NUMBER);
