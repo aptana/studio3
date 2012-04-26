@@ -225,79 +225,123 @@ public class CSSLiteralTest extends CSSTokensTest
 		assertToken("10%", CSSTokenType.PERCENTAGE, 0, 3); //$NON-NLS-1$
 	}
 
+	private ListCrossProduct<String> getNumberCrossProduct(String prefix, String suffix)
+	{
+		ListCrossProduct<String> crossProduct = new ListCrossProduct<String>();
+
+		if (!StringUtil.isEmpty(prefix))
+		{
+			crossProduct.addList(CollectionsUtil.newList(prefix));
+		}
+
+		crossProduct.addList(CollectionsUtil.newList("", "-", "+"));
+		crossProduct.addList(CollectionsUtil.newList("", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"));
+		crossProduct.addList(CollectionsUtil.newList("."));
+		crossProduct.addList(CollectionsUtil.newList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"));
+
+		if (!StringUtil.isEmpty(suffix))
+		{
+			crossProduct.addList(CollectionsUtil.newList(suffix));
+		}
+
+		return crossProduct;
+	}
+
+	protected void assertTokens(String prefix, CSSTokenType prefixType, String content, CSSTokenType contentType,
+			String suffix, CSSTokenType suffixType)
+	{
+		ListCrossProduct<String> crossProduct = getNumberCrossProduct(prefix, content + suffix);
+
+		for (List<String> list : crossProduct)
+		{
+			String text = StringUtil.concat(list);
+			int contentStart = prefix.length();
+			int suffixStart = text.length() - suffix.length();
+
+			// @formatter:off
+			assertToken(
+				text,
+				new TokenInfo(prefixType, 0, contentStart),
+				new TokenInfo(contentType, contentStart, suffixStart - contentStart),
+				new TokenInfo(suffixType, suffixStart, suffix.length())
+			);
+			// @formatter:on
+		}
+	}
+
 	public void testEms()
 	{
-		assertToken("10em", CSSTokenType.EMS, 0, 4); //$NON-NLS-1$
+		assertTokens("{", CSSTokenType.LCURLY, "em", CSSTokenType.EMS, "}", CSSTokenType.RCURLY);
 	}
 
 	public void testExs()
 	{
-		assertToken("10ex", CSSTokenType.EXS, 0, 4); //$NON-NLS-1$
+		assertTokens("{", CSSTokenType.LCURLY, "ex", CSSTokenType.EXS, "}", CSSTokenType.RCURLY);
 	}
 
 	public void testPixels()
 	{
-		assertToken("10px", CSSTokenType.LENGTH, 0, 4); //$NON-NLS-1$
+		assertTokens("{", CSSTokenType.LCURLY, "px", CSSTokenType.LENGTH, "}", CSSTokenType.RCURLY);
 	}
 
 	public void testCentimeters()
 	{
-		assertToken("10cm", CSSTokenType.LENGTH, 0, 4); //$NON-NLS-1$
+		assertTokens("{", CSSTokenType.LCURLY, "cm", CSSTokenType.LENGTH, "}", CSSTokenType.RCURLY);
 	}
 
 	public void testMillimeters()
 	{
-		assertToken("10mm", CSSTokenType.LENGTH, 0, 4); //$NON-NLS-1$
+		assertTokens("{", CSSTokenType.LCURLY, "mm", CSSTokenType.LENGTH, "}", CSSTokenType.RCURLY);
 	}
 
 	public void testInches()
 	{
-		assertToken("10in", CSSTokenType.LENGTH, 0, 4); //$NON-NLS-1$
+		assertTokens("{", CSSTokenType.LCURLY, "in", CSSTokenType.LENGTH, "}", CSSTokenType.RCURLY);
 	}
 
 	public void testPoints()
 	{
-		assertToken("10pt", CSSTokenType.LENGTH, 0, 4); //$NON-NLS-1$
+		assertTokens("{", CSSTokenType.LCURLY, "pt", CSSTokenType.LENGTH, "}", CSSTokenType.RCURLY);
 	}
 
 	public void testPicas()
 	{
-		assertToken("10pc", CSSTokenType.LENGTH, 0, 4); //$NON-NLS-1$
+		assertTokens("{", CSSTokenType.LCURLY, "pc", CSSTokenType.LENGTH, "}", CSSTokenType.RCURLY);
 	}
 
 	public void testDegrees()
 	{
-		assertToken("10deg", CSSTokenType.ANGLE, 0, 5); //$NON-NLS-1$
+		assertTokens("{", CSSTokenType.LCURLY, "deg", CSSTokenType.ANGLE, "}", CSSTokenType.RCURLY);
 	}
 
 	public void testRads()
 	{
-		assertToken("10rad", CSSTokenType.ANGLE, 0, 5); //$NON-NLS-1$
+		assertTokens("{", CSSTokenType.LCURLY, "rad", CSSTokenType.ANGLE, "}", CSSTokenType.RCURLY);
 	}
 
 	public void testGrads()
 	{
-		assertToken("10grad", CSSTokenType.ANGLE, 0, 6); //$NON-NLS-1$
+		assertTokens("{", CSSTokenType.LCURLY, "grad", CSSTokenType.ANGLE, "}", CSSTokenType.RCURLY);
 	}
 
 	public void testMilliseconds()
 	{
-		assertToken("10ms", CSSTokenType.TIME, 0, 4); //$NON-NLS-1$
+		assertTokens("{", CSSTokenType.LCURLY, "ms", CSSTokenType.TIME, "}", CSSTokenType.RCURLY);
 	}
 
 	public void testSeconds()
 	{
-		assertToken("10s", CSSTokenType.TIME, 0, 3); //$NON-NLS-1$
+		assertTokens("{", CSSTokenType.LCURLY, "s", CSSTokenType.TIME, "}", CSSTokenType.RCURLY);
 	}
 
 	public void testHertz()
 	{
-		assertToken("10hz", CSSTokenType.FREQUENCY, 0, 4); //$NON-NLS-1$
+		assertTokens("{", CSSTokenType.LCURLY, "hz", CSSTokenType.FREQUENCY, "}", CSSTokenType.RCURLY);
 	}
 
 	public void testKiloHertz()
 	{
-		assertToken("10khz", CSSTokenType.FREQUENCY, 0, 5); //$NON-NLS-1$
+		assertTokens("{", CSSTokenType.LCURLY, "khz", CSSTokenType.FREQUENCY, "}", CSSTokenType.RCURLY);
 	}
 
 	// NOTE: Moved color tests to CSSSpecialTokenHandlingTest now that we have special handling when we're inside and

@@ -139,6 +139,25 @@ nl							= \r|\n|\r\n|\f
 	{bad_single_quoted_string}	{ return newToken(CSSTokenType.SINGLE_QUOTED_STRING, yytext()); }
 	{bad_double_quoted_string}	{ return newToken(CSSTokenType.DOUBLE_QUOTED_STRING, yytext()); }
 
+	{num}"em"					{ return newToken(CSSTokenType.EMS, yytext()); }
+	{num}"ex"					{ return newToken(CSSTokenType.EXS, yytext()); }
+	{num}"px"					{ return newToken(CSSTokenType.LENGTH, yytext()); }
+	{num}"cm"					{ return newToken(CSSTokenType.LENGTH, yytext()); }
+	{num}"mm"					{ return newToken(CSSTokenType.LENGTH, yytext()); }
+	{num}"in"					{ return newToken(CSSTokenType.LENGTH, yytext()); }
+	{num}"pt"					{ return newToken(CSSTokenType.LENGTH, yytext()); }
+	{num}"pc"					{ return newToken(CSSTokenType.LENGTH, yytext()); }
+	{num}"deg"					{ return newToken(CSSTokenType.ANGLE, yytext()); }
+	{num}"rad"					{ return newToken(CSSTokenType.ANGLE, yytext()); }
+	{num}"grad"					{ return newToken(CSSTokenType.ANGLE, yytext()); }
+	{num}"ms"					{ return newToken(CSSTokenType.TIME, yytext()); }
+	{num}"s"					{ return newToken(CSSTokenType.TIME, yytext()); }
+	{num}"hz"					{ return newToken(CSSTokenType.FREQUENCY, yytext()); }
+	{num}"khz"					{ return newToken(CSSTokenType.FREQUENCY, yytext()); }
+//	{num}{identifier}			{ return newToken(CSSTokenType.DIMENSION, yytext()); }
+	{num}%						{ return newToken(CSSTokenType.PERCENTAGE, yytext()); }
+	{num}						{ return newToken(CSSTokenType.NUMBER, yytext()); }
+	
 	"."{name}					{
 									CSSTokenType type;
 
@@ -243,25 +262,6 @@ nl							= \r|\n|\r\n|\f
 	"/"							{ return newToken(CSSTokenType.SLASH, yytext()); }
 	"="							{ return newToken(CSSTokenType.EQUAL, yytext()); }
 	"-"							{ return newToken(CSSTokenType.MINUS, yytext()); }
-
-	{num}"em"					{ return newToken(CSSTokenType.EMS, yytext()); }
-	{num}"ex"					{ return newToken(CSSTokenType.EXS, yytext()); }
-	{num}"px"					{ return newToken(CSSTokenType.LENGTH, yytext()); }
-	{num}"cm"					{ return newToken(CSSTokenType.LENGTH, yytext()); }
-	{num}"mm"					{ return newToken(CSSTokenType.LENGTH, yytext()); }
-	{num}"in"					{ return newToken(CSSTokenType.LENGTH, yytext()); }
-	{num}"pt"					{ return newToken(CSSTokenType.LENGTH, yytext()); }
-	{num}"pc"					{ return newToken(CSSTokenType.LENGTH, yytext()); }
-	{num}"deg"					{ return newToken(CSSTokenType.ANGLE, yytext()); }
-	{num}"rad"					{ return newToken(CSSTokenType.ANGLE, yytext()); }
-	{num}"grad"					{ return newToken(CSSTokenType.ANGLE, yytext()); }
-	{num}"ms"					{ return newToken(CSSTokenType.TIME, yytext()); }
-	{num}"s"					{ return newToken(CSSTokenType.TIME, yytext()); }
-	{num}"hz"					{ return newToken(CSSTokenType.FREQUENCY, yytext()); }
-	{num}"khz"					{ return newToken(CSSTokenType.FREQUENCY, yytext()); }
-//	{num}{identifier}			{ return newToken(CSSTokenType.DIMENSION, yytext()); }
-	{num}%						{ return newToken(CSSTokenType.PERCENTAGE, yytext()); }
-	{num}						{ return newToken(CSSTokenType.NUMBER, yytext()); }
 
 	"url("[^)]*")"				{ return newToken(CSSTokenType.URL, yytext()); }
 
