@@ -7,7 +7,6 @@
  */
 package com.aptana.jira.core;
 
-import java.io.File;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.StringTokenizer;
@@ -18,7 +17,6 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
 import org.eclipse.equinox.security.storage.StorageException;
@@ -91,6 +89,10 @@ public class JiraManager
 	public void login(String username, String password) throws JiraException
 	{
 		IPath jiraExecutable = getJiraExecutable();
+		if (jiraExecutable == null)
+		{
+			throw new JiraException(Messages.JiraManager_ERR_NoJiraExecutable);
+		}
 		String output = ProcessUtil.outputForCommand(jiraExecutable.toOSString(), jiraExecutable.removeLastSegments(1),
 				PARAM_ACTION, ACTION_LOGIN, PARAM_USERNAME, username, PARAM_PASSWORD, password);
 		if (!StringUtil.isEmpty(output))
@@ -235,7 +237,6 @@ public class JiraManager
 	{
 		if (jiraExecutable == null)
 		{
-			File file;
 			IPath path;
 			try
 			{
@@ -250,8 +251,8 @@ public class JiraManager
 				URL url = FileLocator.find(Platform.getBundle(LIBRARY_PLUGIN_ID), path, null);
 				if (url != null)
 				{
-					file = URIUtil.toFile(FileLocator.toFileURL(url).toURI());
-					jiraExecutable = Path.fromOSString(file.getAbsolutePath());
+					url = FileLocator.toFileURL(url);
+					jiraExecutable = Path.fromOSString(url.getFile());
 				}
 			}
 			catch (Exception e)
