@@ -42,6 +42,11 @@ public class CSSTokensTest extends TestCase
 		fScanner = null;
 	}
 
+	protected void assertToken(String source, CSSTokenType type)
+	{
+		assertToken(source, type, 0, source.length());
+	}
+
 	protected void assertToken(String source, CSSTokenType type, int offset, int length)
 	{
 		assertToken(source, new TokenInfo(type, offset, length));

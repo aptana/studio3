@@ -1,3 +1,11 @@
+// $codepro.audit.disable
+/**
+ * Aptana Studio
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.css.parsing;
 
 import java.io.Reader;
@@ -122,7 +130,9 @@ single_quoted_string		= \'([^\n\r\f\']|\\{nl}|{escape})*\'
 bad_double_quoted_string	= \"([^\n\r\f\"]|\\{nl}|{escape})*\\?
 bad_single_quoted_string	= \'([^\n\r\f\']|\\{nl}|{escape})*\\?
 comment						= "/*" ~"*/"
-identifier					= -?{nmstart}{nmchar}*
+base_identifier				= -?{nmstart}{nmchar}*
+ms_identifier				= "progid:"{base_identifier}(\.{base_identifier})*
+identifier					= {base_identifier}|{ms_identifier}
 name						= {nmchar}+
 num							= [-+]?([0-9]+|[0-9]*\.[0-9]+)
 s							= [ \t\r\n\f]+
@@ -221,6 +231,7 @@ nl							= \r|\n|\r\n|\f
 	"@charset"					{ return newToken(CSSTokenType.CHARSET, yytext()); }
 	"@font-face"				{ return newToken(CSSTokenType.FONTFACE, yytext()); }
 	"@namespace"				{ return newToken(CSSTokenType.NAMESPACE, yytext()); }
+	"@-moz-document"			{ return newToken(CSSTokenType.MOZ_DOCUMENT, yytext()); }
 	"@"{name}					{ return newToken(CSSTokenType.AT_RULE, yytext()); }
 
 	"!"({s}|{comment})*"important"	{ return newToken(CSSTokenType.IMPORTANT, yytext()); }
