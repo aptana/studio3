@@ -22,6 +22,8 @@ public class Messages extends NLS
 	public static String JiraPreferencePageProvider_LBL_Signup;
 	public static String JiraPreferencePageProvider_LBL_Username;
 	public static String JiraPreferencePageProvider_LBL_Validate;
+	public static String JiraPreferencePageProvider_Success_Message;
+	public static String JiraPreferencePageProvider_Success_Title;
 
 	static
 	{

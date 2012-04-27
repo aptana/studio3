@@ -32,6 +32,7 @@ import com.aptana.jira.core.JiraManager;
 import com.aptana.jira.core.JiraUser;
 import com.aptana.ui.preferences.AbstractAccountPageProvider;
 import com.aptana.ui.util.SWTUtils;
+import com.aptana.ui.util.UIUtils;
 import com.aptana.ui.util.WorkbenchBrowserUtil;
 
 /**
@@ -76,7 +77,13 @@ public class JiraPreferencePageProvider extends AbstractAccountPageProvider
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				validate();
+				if (validate())
+				{
+					// shows a success message
+					MessageDialog.openInformation(UIUtils.getActiveShell(),
+							Messages.JiraPreferencePageProvider_Success_Title,
+							Messages.JiraPreferencePageProvider_Success_Message);
+				}
 			}
 		});
 
