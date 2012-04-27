@@ -597,6 +597,30 @@ public class JSScannerTest extends TestCase
 		// @formatter:on
 	}
 
+	public void testRegex3()
+	{
+		// @formatter:off
+		assertTokenTypes(
+			"var r = /opacity=([^)]*)/)[1] ) /",
+			JSTokenType.VAR,
+			JSTokenType.IDENTIFIER,
+			JSTokenType.EQUAL,
+			JSTokenType.REGEX,
+			JSTokenType.RPAREN,
+			JSTokenType.LBRACKET,
+			JSTokenType.NUMBER,
+			JSTokenType.RBRACKET,
+			JSTokenType.RPAREN,
+			JSTokenType.FORWARD_SLASH
+		);
+		// @formatter:on
+	}
+
+	public void testNotRegex()
+	{
+		assertTokenTypes("/* squelch */", JSTokenType.EOF);
+	}
+
 	public void testInteger()
 	{
 		assertTokenTypes("10", JSTokenType.NUMBER);
