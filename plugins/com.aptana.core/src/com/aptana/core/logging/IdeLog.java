@@ -610,11 +610,17 @@ public final class IdeLog
 			scope = StringUtil.EMPTY;
 		}
 
-		String tempMessage = StringUtil.format(
-				"(Build {0}) {1} {2} {3}", new String[] { EclipseUtil.getPluginVersion(plugin), //$NON-NLS-1$
-						getLabel(severity), scope, message });
-
-		return tempMessage;
+		String version;
+		if (EclipseUtil.isStandalone())
+		{
+			version = EclipseUtil.getProductVersion();
+		}
+		else
+		{
+			version = EclipseUtil.getStudioVersion();
+		}
+		return StringUtil.format("(Build {0}) {1} {2} {3}", //$NON-NLS-1$
+				new String[] { version, getLabel(severity), scope, message });
 	}
 
 	/**
