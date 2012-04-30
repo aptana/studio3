@@ -60,13 +60,22 @@ public class Messages extends NLS
 	public static String JSFormatterWhiteSpacesPage_semicolonsInFor;
 	public static String JSFormatterWhiteSpacesPage_spacingSettings;
 	public static String JSFormatterWhiteSpacesPage_operatorsGroupTitle;
+	public static String JSFormatterWhiteSpacesPage_otherParenthesesExpressions;
 	public static String JSFormatterWhiteSpacesPage_arithmeticOperators;
+	public static String JSFormatterWhiteSpacesPage_arrayAccessExpressions;
 	public static String JSFormatterWhiteSpacesPage_relationalOperators;
 	public static String JSFormatterWhiteSpacesPage_unaryOperators;
 	public static String JSFormatterWhiteSpacesPage_assignments;
+	public static String JSFormatterWhiteSpacesPage_conditionalExpressions;
 	public static String JSFormatterWhiteSpacesPage_conditionalOperators;
+	public static String JSFormatterWhiteSpacesPage_declarationExpressions;
+	public static String JSFormatterWhiteSpacesPage_invocationExpressions;
 	public static String JSFormatterWhiteSpacesPage_keyValueOperator;
-
+	public static String JSFormatterWhiteSpacesPage_loopExpressions;
+	public static String JSFormatterWhiteSpacesPage_parentheses_beforeOpening;
+	public static String JSFormatterWhiteSpacesPage_parentheses_afterOpening;
+	public static String JSFormatterWhiteSpacesPage_parentheses_beforeClosing;
+	public static String JSFormatterWhiteSpacesPage_parenthesesGroupTitle;
 	static
 	{
 		// initialize resource bundle
