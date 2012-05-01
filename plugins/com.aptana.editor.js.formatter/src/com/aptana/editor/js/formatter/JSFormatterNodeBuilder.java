@@ -521,6 +521,8 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				blockEnd = body.getEndingOffset() + 1;
 				checkedPop(doWhileBlock, blockEnd);
 				doWhileBlock.setEnd(createTextNode(document, blockEnd, blockEnd));
+				// have to adjust the block end (see TISTUD-1572)
+				blockEnd--;
 			}
 
 			// now deal with the 'while' condition part. we need to include the word 'while' that appears
