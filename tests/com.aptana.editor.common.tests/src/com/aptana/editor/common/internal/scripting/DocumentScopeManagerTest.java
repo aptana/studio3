@@ -2,6 +2,7 @@ package com.aptana.editor.common.internal.scripting;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 
 import junit.framework.TestCase;
 
@@ -11,6 +12,7 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.texteditor.ITextEditor;
 
@@ -31,6 +33,7 @@ public class DocumentScopeManagerTest extends TestCase
 	private ITextEditor editor;
 	// File we may be opening if not inside project
 	private File file;
+	private TestProject project;
 
 	protected void setUp() throws Exception
 	{
@@ -60,6 +63,7 @@ public class DocumentScopeManagerTest extends TestCase
 			EditorTestHelper.closeEditor(editor);
 			editor = null;
 		}
+
 		if (file != null)
 		{
 			if (!file.delete())
@@ -67,6 +71,13 @@ public class DocumentScopeManagerTest extends TestCase
 				file.deleteOnExit();
 			}
 		}
+
+		if (project != null)
+		{
+			project.delete();
+			project = null;
+		}
+
 		manager = null;
 		super.tearDown();
 	}
@@ -90,6 +101,18 @@ public class DocumentScopeManagerTest extends TestCase
 	protected void assertScope(String scope, int offset, IDocument document) throws BadLocationException
 	{
 		assertEquals("Scope doesn't match", scope, getDocumentScopeManager().getScopeAtOffset(document, offset));
+	}
+
+	protected void createAndOpenFile(String filename, String extension, String content) throws IOException,
+			PartInitException
+	{
+		file = File.createTempFile(filename, extension);
+		FileWriter writer = new FileWriter(file);
+		writer.write(content);
+		writer.close();
+
+		editor = (ITextEditor) IDE.openEditorOnFileStore(UIUtils.getActivePage(), EFS.getLocalFileSystem()
+				.fromLocalFile(file));
 	}
 
 	// ---------------------------------------------------------------------------------------------------------
@@ -143,10 +166,8 @@ public class DocumentScopeManagerTest extends TestCase
 	{
 		setUpStandardScopes();
 
-		file = File.createTempFile("testing", ".js");
-		FileWriter writer = new FileWriter(file);
-		writer.write("if(Object.isUndefined(Effect))\nthrow(\"dragdrop.js requires including script.aculo.us' effects.js library\");");
-		writer.close();
+		createAndOpenFile("testing", ".js",
+				"if(Object.isUndefined(Effect))\nthrow(\"dragdrop.js requires including script.aculo.us' effects.js library\");");
 
 		editor = (ITextEditor) IDE.openEditorOnFileStore(UIUtils.getActivePage(), EFS.getLocalFileSystem()
 				.fromLocalFile(file));
@@ -159,12 +180,12 @@ public class DocumentScopeManagerTest extends TestCase
 	{
 		setUpStandardScopes();
 
-		TestProject project = new TestProject("scope_nature", new String[] { "com.aptana.projects.webnature" });
+		project = new TestProject("scope_nature", new String[] { "com.aptana.projects.webnature" });
 
-		IFile file = project
+		IFile iFile = project
 				.createFile("project_scope.js",
 						"if(Object.isUndefined(Effect))\nthrow(\"dragdrop.js requires including script.aculo.us' effects.js library\");");
-		editor = (ITextEditor) EditorTestHelper.openInEditor(file, true);
+		editor = (ITextEditor) EditorTestHelper.openInEditor(iFile, true);
 
 		assertScope("meta.project.com.aptana.projects.webnature source.js keyword.control.js", 1);
 		assertScope("meta.project.com.aptana.projects.webnature source.js support.class.js", 7);
@@ -174,13 +195,7 @@ public class DocumentScopeManagerTest extends TestCase
 	{
 		setUpStandardScopes();
 
-		file = File.createTempFile("eof_scope", ".js");
-		FileWriter writer = new FileWriter(file);
-		writer.write("// This is a comment");
-		writer.close();
-
-		editor = (ITextEditor) IDE.openEditorOnFileStore(UIUtils.getActivePage(), EFS.getLocalFileSystem()
-				.fromLocalFile(file));
+		createAndOpenFile("eof_scope", ".js", "// This is a comment");
 
 		assertScope("source.js comment.line.double-slash.js", 2);
 		assertScope("source.js comment.line.double-slash.js", 20);
@@ -190,11 +205,8 @@ public class DocumentScopeManagerTest extends TestCase
 	{
 		setUpStandardScopes();
 
-		file = File.createTempFile("testing", ".html");
-		FileWriter writer = new FileWriter(file);
-		writer.write("<html>\n  <head>\n" + "    <style type=\"text/css\">\n" + "    h1 { color: #f00; }\n"
-				+ "  </style>\n" + "</head>\n" + "<body>\n" + "</html>");
-		writer.close();
+		createAndOpenFile("testing", ".html", "<html>\n  <head>\n" + "    <style type=\"text/css\">\n"
+				+ "    h1 { color: #f00; }\n" + "  </style>\n" + "</head>\n" + "<body>\n" + "</html>");
 
 		editor = (ITextEditor) IDE.openEditorOnFileStore(UIUtils.getActivePage(), EFS.getLocalFileSystem()
 				.fromLocalFile(file));
@@ -213,13 +225,8 @@ public class DocumentScopeManagerTest extends TestCase
 	{
 		setUpStandardScopes();
 
-		file = File.createTempFile("testing", ".js");
-		FileWriter writer = new FileWriter(file);
-		writer.write("if(Object.isUndefined(Effect))\nthrow(\"dragdrop.js requires including script.aculo.us' effects.js library\");");
-		writer.close();
-
-		editor = (ITextEditor) IDE.openEditorOnFileStore(UIUtils.getActivePage(), EFS.getLocalFileSystem()
-				.fromLocalFile(file));
+		createAndOpenFile("testing", ".js",
+				"if(Object.isUndefined(Effect))\nthrow(\"dragdrop.js requires including script.aculo.us' effects.js library\");");
 		ISourceViewer viewer = TextEditorUtils.getSourceViewer(editor);
 
 		assertScope("source.js", 1, viewer.getDocument());
