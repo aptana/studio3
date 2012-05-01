@@ -125,7 +125,6 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 		}
 		finally
 		{
-			presentation.setDefaultStyleRange(new StyleRange(region.getOffset(), region.getLength(), null, null));
 			// Do coloring and collect all the scopes
 			super.createPresentation(presentation, region);
 			updateScopePositions();
@@ -369,6 +368,12 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 		if (matchesDefaults(attr))
 		{
 			attr = new TextAttribute(null);
+		}
+		// If the bg matches editor bg, set it to null explicity!
+		else if (attr.getBackground() != null
+				&& attr.getBackground().getRGB().equals(getCurrentTheme().getBackground()))
+		{
+			attr = new TextAttribute(attr.getForeground(), null, attr.getStyle());
 		}
 		super.addRange(presentation, offset, length, attr);
 	}

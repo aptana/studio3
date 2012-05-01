@@ -151,8 +151,7 @@ public class CommonPresentationReconciler extends PresentationReconciler
 				damageLength = adjustedLength;
 			}
 			TextPresentation presentation = new TextPresentation(damage, iterationPartitionLimit * 5);
-			presentation.setDefaultStyleRange(new StyleRange(damage.getOffset(), damage.getLength(), getCurrentTheme()
-					.getForegroundColor(), getCurrentTheme().getBackgroundColor()));
+			presentation.setDefaultStyleRange(new StyleRange(damage.getOffset(), damage.getLength(), null, null));
 			ITypedRegion[] partitioning = TextUtilities.computePartitioning(document, getDocumentPartitioning(),
 					damageOffset, damageLength, false);
 			if (partitioning.length == 0)

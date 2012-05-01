@@ -223,7 +223,7 @@ button {
 }
 
 .ua-ie6 .view-error .oops-msg .shadow {
-    filter: progid :DXImageTransform.Microsoft.AlphaImageLoader(enabled=true,sizingMethod=crop src="http://l.yimg.com/a/i/ww/met/shadow_icon_32_101508.png");
+    filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(enabled=true,sizingMethod=crop src="http://l.yimg.com/a/i/ww/met/shadow_icon_32_101508.png");
     background-image: none
 }
 
@@ -866,7 +866,7 @@ ul.y-tl-news {
 
 .ua-ie8 .y-tooltip-pa-dialog .tooltip {
     background: transparent;
-    filter: progid :DXImageTransform.Microsoft.gradient(startColorstr=#20000000,endColorstr=#20000000)
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#20000000,endColorstr=#20000000)
 }
 
 .ua-ie6 .y-tooltip-pa-dialog .tooltip, .ua-ie7 .y-tooltip-pa-dialog .tooltip {
@@ -965,13 +965,13 @@ ul.y-tl-news {
 }
 
 .ua-ie .y-sortable-stage-active .y-sortable-proxy {
-    filter: progid :DXImageTransform.Microsoft.Alpha(Opacity=80);
+    filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=80);
     -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)"
 }
 
 .ua-ie .y-sortable-shims div {
     background-color: #fff;
-    filter: progid :DXImageTransform.Microsoft.Alpha(Opacity=0);
+    filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
     -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)"
 }
 
@@ -1002,7 +1002,7 @@ ul.y-tl-news {
 .y-sortable-debug .y-sortable-shims div {
     background-color: blue;
     -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
-    filter: progid :DXImageTransform.Microsoft.Alpha(Opacity=50);
+    filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=50);
     opacity: .5
 }/* Copyright (c) 2011, Yahoo! Inc.  All rights reserved. */
 
@@ -4549,7 +4549,7 @@ ul.y-tl-news {
 }
 
 .ua-ie .type_multimedia_default .videos .video-overlay-back {
-    filter: progid :DXImageTransform.Microsoft.Alpha(Opacity=50)
+    filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=50)
 }
 
 .type_multimedia_default .videos .video-overlay div.cta {
@@ -4616,7 +4616,7 @@ ul.y-tl-news {
 }
 
 .ua-ie .type_multimedia_default .player-header {
-    filter: progid :DXImageTransform.Microsoft.Alpha(Opacity=80)
+    filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=80)
 }
 
 .type_multimedia_default .hide-vid {
@@ -4721,7 +4721,7 @@ ul.y-tl-news {
 }
 
 .ua-ie .type_multimedia_default .videos .video-length {
-    filter: progid :DXImageTransform.Microsoft.Alpha(Opacity=80)
+    filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=80)
 }
 
 .ua-ie6 .type_multimedia_default .video-length-wrapper, .ua-ie7 .type_multimedia_default .video-length-wrapper {
@@ -5114,7 +5114,7 @@ html.y-day-4 {
 }
 
 .ua-ie7 .y-pa-open .fp-fx {
-    filter: progid :DXImageTransform.Microsoft.Alpha(Opacity=40)
+    filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=40)
 }
 
 .bkt330 #y-content, .bkt332 #y-content {
@@ -5729,7 +5729,7 @@ html.y-day-4 {
 }
 
 .ua-ie6 .type_masthead_default .sa-holder .sa-results li.selected a:hover, .ua-ie7 .type_masthead_default .sa-holder .sa-results li.selected a:hover {
-    filter: progid :DXImageTransform.Microsoft.Alpha(opacity=100)
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100)
 }
 
 .ua-ie7 .type_masthead_default .sa-holder .sa-results a, .ua-wk .type_masthead_default .sa-holder .sa-results a {
@@ -8727,7 +8727,7 @@ html.y-day-4 {
     border-left-color: cyan;
     border-right-color: cyan;
     border-bottom-color: cyan;
-    filter: progid :DXImageTransform.Microsoft.Chroma(color=cyan)
+    filter: progid:DXImageTransform.Microsoft.Chroma(color=cyan)
 }
 
 .type_fptoday .y-carousel-list .three-items {
@@ -9252,7 +9252,7 @@ html.y-day-4 {
 }
 
 .ua-ie6 .type_contentcarouselNews_default .var-news .img p, .ua-ie7 .type_contentcarouselNews_default .var-news .img p {
-    filter: progid :DXImageTransform.Microsoft.Alpha(opacity = 90)
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity = 90)
 }
 
 .type_contentcarouselNews_default .mlinks li {
@@ -9448,7 +9448,7 @@ html.y-day-4 {
 }
 
 .ua-ie7 .type_pa .edit-mode .y, .ua-ie7 .type_pa .edit-mode .u, .ua-ie7 .type_pa .edit-mode .p {
-    filter: progid :DXImageTransform.Microsoft.Alpha(Opacity=40)
+    filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=40)
 }
 
 .ua-ie7 .type_pa .edit-mode .edit {
@@ -9951,7 +9951,7 @@ html.y-day-4 {
     height: 100%;
     opacity: .3;
     -moz-opacity: .3;
-    filter: progid :DXImageTransform.Microsoft.Alpha(opacity=30);
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     position: absolute;
     top: 0;
     width: 100%;
@@ -10557,7 +10557,7 @@ html.y-day-4 {
     width: 100%;
     opacity: .4;
     -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=40)";
-    filter: progid :DXImageTransform.Microsoft.Alpha(Opacity=40);
+    filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=40);
     z-index: 1
 }
 
