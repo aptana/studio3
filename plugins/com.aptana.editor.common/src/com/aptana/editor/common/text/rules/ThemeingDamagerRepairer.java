@@ -370,6 +370,12 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 		{
 			attr = new TextAttribute(null);
 		}
+		// If the bg matches editor bg, set it to null explicity!
+		else if (attr.getBackground() != null
+				&& attr.getBackground().getRGB().equals(getCurrentTheme().getBackground()))
+		{
+			attr = new TextAttribute(attr.getForeground(), null, attr.getStyle());
+		}
 		super.addRange(presentation, offset, length, attr);
 	}
 
