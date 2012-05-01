@@ -125,7 +125,6 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 		}
 		finally
 		{
-			presentation.setDefaultStyleRange(new StyleRange(region.getOffset(), region.getLength(), null, null));
 			// Do coloring and collect all the scopes
 			super.createPresentation(presentation, region);
 			updateScopePositions();
