@@ -43,6 +43,7 @@ public class JiraManager
 	private static final String PARAM_PROJECT = "--project"; //$NON-NLS-1$
 	private static final String PARAM_VERSION = "--affectsVersions"; //$NON-NLS-1$
 	private static final String PARAM_TYPE = "--type"; //$NON-NLS-1$
+	private static final String PARAM_PRIORITY = "--priority"; //$NON-NLS-1$
 	private static final String PARAM_SUMMARY = "--summary"; //$NON-NLS-1$
 	private static final String PARAM_DESCRIPTION = "--description"; //$NON-NLS-1$
 	private static final String PARAM_ISSUE = "--issue"; //$NON-NLS-1$
@@ -119,6 +120,8 @@ public class JiraManager
 	 * 
 	 * @param type
 	 *            the issue type (bug, feature, or improvement)
+	 * @param priority
+	 *            the issue's priority
 	 * @param summary
 	 *            the summary of the ticket
 	 * @param description
@@ -126,7 +129,8 @@ public class JiraManager
 	 * @return the JIRA issue created
 	 * @throws JiraException
 	 */
-	public JiraIssue createIssue(JiraIssueType type, String summary, String description) throws JiraException
+	public JiraIssue createIssue(JiraIssueType type, JiraIssuePriority priority, String summary, String description)
+			throws JiraException
 	{
 		if (user == null)
 		{
@@ -137,7 +141,8 @@ public class JiraManager
 		String output = ProcessUtil.outputForCommand(jiraExecutable.toOSString(), jiraExecutable.removeLastSegments(1),
 				PARAM_ACTION, ACTION_CREATE_ISSUE, PARAM_USERNAME, user.getUsername(), PARAM_PASSWORD,
 				user.getPassword(), PARAM_PROJECT, projectKey, PARAM_VERSION, getProjectVersion(), PARAM_TYPE,
-				type.getParameterName(), PARAM_SUMMARY, summary, PARAM_DESCRIPTION, description);
+				type.getParameterName(), PARAM_PRIORITY, priority.toString(), PARAM_SUMMARY, summary,
+				PARAM_DESCRIPTION, description);
 		Matcher m = PATTERN_SUCCESS.matcher(output);
 		if (m.find())
 		{

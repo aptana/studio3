@@ -14,11 +14,13 @@ public class Messages extends NLS
 	private static final String BUNDLE_NAME = "com.aptana.jira.ui.internal.messages"; //$NON-NLS-1$
 
 	public static String SubmitTicketDialog_DefaultMessage;
+	public static String SubmitTicketDialog_ERR_EmptyPriority;
 	public static String SubmitTicketDialog_ERR_EmptyStepsToReproduce;
 	public static String SubmitTicketDialog_ERR_EmptySummary;
 	public static String SubmitTicketDialog_ERR_EmptyType;
 	public static String SubmitTicketDialog_LBL_DiagnosticLog;
 	public static String SubmitTicketDialog_LBL_LogsToAttach;
+	public static String SubmitTicketDialog_LBL_Priority;
 	public static String SubmitTicketDialog_LBL_Screenshots;
 	public static String SubmitTicketDialog_LBL_StepsToReproduce;
 	public static String SubmitTicketDialog_LBL_StudioLog;

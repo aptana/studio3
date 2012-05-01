@@ -43,6 +43,7 @@ import org.eclipse.swt.widgets.Text;
 import com.aptana.core.CoreStrings;
 import com.aptana.core.util.StringUtil;
 import com.aptana.jira.core.JiraCorePlugin;
+import com.aptana.jira.core.JiraIssuePriority;
 import com.aptana.jira.core.JiraIssueType;
 import com.aptana.jira.core.JiraManager;
 import com.aptana.jira.core.JiraUser;
@@ -56,6 +57,7 @@ public class SubmitTicketDialog extends TitleAreaDialog
 
 	private JiraPreferencePageProvider userInfoProvider;
 	private ComboViewer typeCombo;
+	private ComboViewer priorityCombo;
 	private Text summaryText;
 	private Text descriptionText;
 	private Button studioLogCheckbox;
@@ -63,6 +65,7 @@ public class SubmitTicketDialog extends TitleAreaDialog
 	private Composite screenshotsComposite;
 
 	private JiraIssueType type;
+	private JiraIssuePriority priority;
 	private String summary;
 	private String description;
 	private boolean studioLogSelected;
@@ -83,6 +86,11 @@ public class SubmitTicketDialog extends TitleAreaDialog
 	public JiraIssueType getType()
 	{
 		return type;
+	}
+
+	public JiraIssuePriority getPriority()
+	{
+		return priority;
 	}
 
 	/**
@@ -165,14 +173,27 @@ public class SubmitTicketDialog extends TitleAreaDialog
 		typeCombo.setInput(JiraIssueType.values());
 		typeCombo.getControl().setLayoutData(GridDataFactory.swtDefaults().create());
 		typeCombo.setSelection(new StructuredSelection(JiraIssueType.BUG));
-		typeCombo.addSelectionChangedListener(new ISelectionChangedListener()
+		ISelectionChangedListener listener = new ISelectionChangedListener()
 		{
 
 			public void selectionChanged(SelectionChangedEvent event)
 			{
 				validate();
 			}
-		});
+		};
+		typeCombo.addSelectionChangedListener(listener);
+
+		// priority
+		label = new Label(main, SWT.NONE);
+		label.setText(StringUtil.makeFormLabel(Messages.SubmitTicketDialog_LBL_Priority));
+		label.setLayoutData(GridDataFactory.swtDefaults().create());
+		priorityCombo = new ComboViewer(main, SWT.DROP_DOWN | SWT.READ_ONLY);
+		priorityCombo.setContentProvider(ArrayContentProvider.getInstance());
+		priorityCombo.setLabelProvider(new LabelProvider());
+		priorityCombo.setInput(JiraIssuePriority.values());
+		priorityCombo.getControl().setLayoutData(GridDataFactory.swtDefaults().create());
+		priorityCombo.setSelection(new StructuredSelection(JiraIssuePriority.MEDIUM));
+		priorityCombo.addSelectionChangedListener(listener);
 
 		// summary
 		label = new Label(main, SWT.NONE);
@@ -282,6 +303,7 @@ public class SubmitTicketDialog extends TitleAreaDialog
 			return;
 		}
 		type = (JiraIssueType) ((IStructuredSelection) typeCombo.getSelection()).getFirstElement();
+		priority = (JiraIssuePriority) ((IStructuredSelection) priorityCombo.getSelection()).getFirstElement();
 		summary = summaryText.getText();
 		description = descriptionText.getText();
 		studioLogSelected = studioLogCheckbox.getSelection();
@@ -296,6 +318,10 @@ public class SubmitTicketDialog extends TitleAreaDialog
 		if (typeCombo.getSelection().isEmpty())
 		{
 			message = Messages.SubmitTicketDialog_ERR_EmptyType;
+		}
+		if (priorityCombo.getSelection().isEmpty())
+		{
+			message = Messages.SubmitTicketDialog_ERR_EmptyPriority;
 		}
 		else if (StringUtil.isEmpty(summaryText.getText()))
 		{
