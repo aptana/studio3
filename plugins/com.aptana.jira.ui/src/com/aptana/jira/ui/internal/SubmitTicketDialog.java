@@ -260,8 +260,6 @@ public class SubmitTicketDialog extends TitleAreaDialog
 		screenshotsComposite.setLayout(GridLayoutFactory.fillDefaults().spacing(0, 0).create());
 		screenshotsComposite.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 
-		validate();
-
 		setTitle(Messages.SubmitTicketDialog_Title);
 		setMessage(Messages.SubmitTicketDialog_DefaultMessage);
 
@@ -272,10 +270,7 @@ public class SubmitTicketDialog extends TitleAreaDialog
 	protected Control createButtonBar(Composite parent)
 	{
 		Control buttons = super.createButtonBar(parent);
-		if (getMessage() != null)
-		{
-			getButton(IDialogConstants.OK_ID).setEnabled(false);
-		}
+		getButton(IDialogConstants.OK_ID).setEnabled(false);
 		return buttons;
 	}
 
