@@ -110,7 +110,16 @@ public class JiraManager
 			else
 			{
 				// an error
-				throw new JiraException(output);
+				int index = output.lastIndexOf("Exception: "); //$NON-NLS-1$
+				if (index > -1)
+				{
+					String reason = output.substring(index + 11).trim();
+					throw new JiraException(reason);
+				}
+				else
+				{
+					throw new JiraException(output);
+				}
 			}
 		}
 	}

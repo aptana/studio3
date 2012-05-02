@@ -19,7 +19,9 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.wizard.ProgressMonitorPart;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbench;
@@ -45,6 +47,7 @@ public class AccountsPreferencePage extends PreferencePage implements IWorkbench
 	private static final String ATTR_CLASS = "class"; //$NON-NLS-1$
 
 	private List<IAccountPageProvider> providers;
+	private ProgressMonitorPart progressMonitorPart;
 
 	public void init(IWorkbench workbench)
 	{
@@ -108,16 +111,55 @@ public class AccountsPreferencePage extends PreferencePage implements IWorkbench
 	@Override
 	protected Control createContents(Composite parent)
 	{
-		Composite main = new Composite(parent, SWT.NONE);
+		final Composite main = new Composite(parent, SWT.NONE);
 		main.setLayout(GridLayoutFactory.fillDefaults().create());
 		main.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 
+		Composite accounts = new Composite(main, SWT.NONE);
+		accounts.setLayout(GridLayoutFactory.fillDefaults().create());
+		accounts.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
+
+		IAccountPageProvider.IValidationListener listener = new IAccountPageProvider.IValidationListener()
+		{
+
+			public void preValidationStart()
+			{
+				progressMonitorPart.setVisible(true);
+				((GridData) progressMonitorPart.getLayoutData()).exclude = false;
+				main.layout(true, true);
+			}
+
+			public void postValidationEnd()
+			{
+				progressMonitorPart.setVisible(false);
+				((GridData) progressMonitorPart.getLayoutData()).exclude = true;
+				main.layout(true, true);
+			}
+		};
 		for (IAccountPageProvider provider : providers)
 		{
-			Control control = provider.createContents(main);
+			Control control = provider.createContents(accounts);
 			control.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
+			provider.addValidationListener(listener);
 		}
+
+		// a progress bar for when validating account credentials
+		progressMonitorPart = new ProgressMonitorPart(main, GridLayoutFactory.fillDefaults().create());
+		progressMonitorPart.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).exclude(true).create());
+
+		for (IAccountPageProvider provider : providers)
+		{
+			provider.setProgressMonitor(progressMonitorPart);
+		}
+
 		return main;
+	}
+
+	@Override
+	public boolean performCancel()
+	{
+		progressMonitorPart.setCanceled(true);
+		return super.performCancel();
 	}
 
 	@Override
