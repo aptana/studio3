@@ -189,18 +189,24 @@ public class JiraPreferencePageProvider extends AbstractAccountPageProvider
 					}
 					finally
 					{
-						monitor.done();
+						if (!monitor.isCanceled())
+						{
+							monitor.done();
+						}
 					}
 				}
 			}, true, getProgressMonitor(), UIUtils.getDisplay());
 		}
 		catch (InvocationTargetException e)
 		{
-			MessageDialog.openError(main.getShell(), Messages.JiraPreferencePageProvider_ERR_LoginFailed_Title, e
-					.getTargetException().getMessage());
+			if (main != null && !main.isDisposed())
+			{
+				MessageDialog.openError(main.getShell(), Messages.JiraPreferencePageProvider_ERR_LoginFailed_Title, e
+						.getTargetException().getMessage());
+			}
 			return false;
 		}
-		catch (InterruptedException e)
+		catch (Exception e)
 		{
 			IdeLog.logError(JiraUIPlugin.getDefault(), e);
 		}
@@ -215,6 +221,10 @@ public class JiraPreferencePageProvider extends AbstractAccountPageProvider
 
 	private void setUILocked(boolean locked)
 	{
+		if (main == null || main.isDisposed())
+		{
+			return;
+		}
 		usernameText.setEnabled(!locked);
 		passwordText.setEnabled(!locked);
 		testButton.setEnabled(!locked);

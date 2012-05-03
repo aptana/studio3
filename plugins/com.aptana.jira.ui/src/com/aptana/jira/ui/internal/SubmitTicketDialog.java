@@ -309,15 +309,21 @@ public class SubmitTicketDialog extends TitleAreaDialog
 			{
 				setUILocked(false);
 				// hides the control for entering user credentials if the user is validated
-				boolean isValidated = (getJiraManager().getUser() != null);
-				if (isValidated)
+				if (!userInfoControl.isDisposed())
 				{
-					userInfoControl.setVisible(false);
-					((GridData) userInfoControl.getLayoutData()).exclude = true;
+					boolean isValidated = (getJiraManager().getUser() != null);
+					if (isValidated)
+					{
+						userInfoControl.setVisible(false);
+						((GridData) userInfoControl.getLayoutData()).exclude = true;
+					}
 				}
-				progressMonitorPart.setVisible(false);
-				((GridData) progressMonitorPart.getLayoutData()).exclude = true;
-				layoutShell();
+				if (!progressMonitorPart.isDisposed())
+				{
+					progressMonitorPart.setVisible(false);
+					((GridData) progressMonitorPart.getLayoutData()).exclude = true;
+					layoutShell();
+				}
 			}
 		});
 
@@ -455,6 +461,10 @@ public class SubmitTicketDialog extends TitleAreaDialog
 
 	private void setUILocked(boolean locked)
 	{
+		if (getContents() == null || getContents().isDisposed())
+		{
+			return;
+		}
 		typeCombo.getCombo().setEnabled(!locked);
 		priorityCombo.getCombo().setEnabled(!locked);
 		summaryText.setEnabled(!locked);

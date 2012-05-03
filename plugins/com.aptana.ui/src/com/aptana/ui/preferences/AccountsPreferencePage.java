@@ -131,9 +131,12 @@ public class AccountsPreferencePage extends PreferencePage implements IWorkbench
 
 			public void postValidationEnd()
 			{
-				progressMonitorPart.setVisible(false);
-				((GridData) progressMonitorPart.getLayoutData()).exclude = true;
-				main.layout(true, true);
+				if (!progressMonitorPart.isDisposed())
+				{
+					progressMonitorPart.setVisible(false);
+					((GridData) progressMonitorPart.getLayoutData()).exclude = true;
+					main.layout(true, true);
+				}
 			}
 		};
 		for (IAccountPageProvider provider : providers)

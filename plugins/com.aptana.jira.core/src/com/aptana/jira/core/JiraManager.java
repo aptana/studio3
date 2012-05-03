@@ -114,7 +114,7 @@ public class JiraManager
 				int index = output.lastIndexOf(FAILED_REASON_START);
 				if (index > -1)
 				{
-					String reason = output.substring(index + 11).trim();
+					String reason = output.substring(index + FAILED_REASON_START.length()).trim();
 					throw new JiraException(reason);
 				}
 				else

@@ -38,7 +38,7 @@ public abstract class AbstractAccountPageProvider implements IAccountPageProvide
 	public AbstractAccountPageProvider(IProgressMonitor progressMonitor)
 	{
 		validationListeners = new LinkedHashSet<IValidationListener>();
-		this.progressMonitor = (progressMonitor == null) ? new NullProgressMonitor() : progressMonitor;
+		setProgressMonitor(progressMonitor);
 	}
 
 	public void addValidationListener(IValidationListener listener)
