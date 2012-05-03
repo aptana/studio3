@@ -57,6 +57,7 @@ public class JiraManager
 	private static final String PASSWORD = "password"; //$NON-NLS-1$
 
 	private static final Pattern PATTERN_SUCCESS = Pattern.compile("(.*) created with id (.*). URL: (.*)"); //$NON-NLS-1$
+	private static final String FAILED_REASON_START = "Exception: "; //$NON-NLS-1$
 
 	private static IPath jiraExecutable;
 	// could override using setProjectInfo()
@@ -110,7 +111,7 @@ public class JiraManager
 			else
 			{
 				// an error
-				int index = output.lastIndexOf("Exception: "); //$NON-NLS-1$
+				int index = output.lastIndexOf(FAILED_REASON_START);
 				if (index > -1)
 				{
 					String reason = output.substring(index + 11).trim();
