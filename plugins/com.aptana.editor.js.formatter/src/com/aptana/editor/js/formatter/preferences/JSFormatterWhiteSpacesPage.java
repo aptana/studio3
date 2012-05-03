@@ -51,8 +51,58 @@ public class JSFormatterWhiteSpacesPage extends FormatterModifyTabPage
 		Group wrappingGroup = SWTFactory.createGroup(parent, Messages.JSFormatterWhiteSpacesPage_spacingSettings, 1, 1,
 				GridData.FILL_HORIZONTAL);
 
-		// Punctuation Group
+		// Parentheses Group
 		ExpandableComposite expandibleComposite = SWTFactory.createExpandibleComposite(wrappingGroup,
+				Messages.JSFormatterWhiteSpacesPage_parenthesesGroupTitle, 4);
+		Composite parenthesesGroup = SWTFactory
+				.createComposite(expandibleComposite, 4, 20, 1, GridData.FILL_HORIZONTAL);
+		expandibleComposite.setClient(parenthesesGroup);
+
+		// @formatter:off
+		SWTFactory.createCenteredLabel(parenthesesGroup, StringUtil.EMPTY);
+		SWTFactory.createCenteredLabel(parenthesesGroup, Messages.JSFormatterWhiteSpacesPage_parentheses_beforeOpening);
+		SWTFactory.createCenteredLabel(parenthesesGroup, Messages.JSFormatterWhiteSpacesPage_parentheses_afterOpening);
+		SWTFactory.createCenteredLabel(parenthesesGroup, Messages.JSFormatterWhiteSpacesPage_parentheses_beforeClosing);
+		// @formatter:on
+
+		// Declarations parentheses
+		SWTFactory.createLabel(parenthesesGroup, Messages.JSFormatterWhiteSpacesPage_declarationExpressions);
+		manager.createSpinner(parenthesesGroup, JSFormatterConstants.SPACES_BEFORE_OPENING_DECLARATION_PARENTHESES);
+		manager.createSpinner(parenthesesGroup, JSFormatterConstants.SPACES_AFTER_OPENING_DECLARATION_PARENTHESES);
+		manager.createSpinner(parenthesesGroup, JSFormatterConstants.SPACES_BEFORE_CLOSING_DECLARATION_PARENTHESES);
+
+		// Invocations parentheses
+		SWTFactory.createLabel(parenthesesGroup, Messages.JSFormatterWhiteSpacesPage_invocationExpressions);
+		manager.createSpinner(parenthesesGroup, JSFormatterConstants.SPACES_BEFORE_OPENING_INVOCATION_PARENTHESES);
+		manager.createSpinner(parenthesesGroup, JSFormatterConstants.SPACES_AFTER_OPENING_INVOCATION_PARENTHESES);
+		manager.createSpinner(parenthesesGroup, JSFormatterConstants.SPACES_BEFORE_CLOSING_INVOCATION_PARENTHESES);
+
+		// Conditionals parentheses
+		SWTFactory.createLabel(parenthesesGroup, Messages.JSFormatterWhiteSpacesPage_conditionalExpressions);
+		manager.createSpinner(parenthesesGroup, JSFormatterConstants.SPACES_BEFORE_OPENING_CONDITIONAL_PARENTHESES);
+		manager.createSpinner(parenthesesGroup, JSFormatterConstants.SPACES_AFTER_OPENING_CONDITIONAL_PARENTHESES);
+		manager.createSpinner(parenthesesGroup, JSFormatterConstants.SPACES_BEFORE_CLOSING_CONDITIONAL_PARENTHESES);
+
+		// Loops parentheses
+		SWTFactory.createLabel(parenthesesGroup, Messages.JSFormatterWhiteSpacesPage_loopExpressions);
+		manager.createSpinner(parenthesesGroup, JSFormatterConstants.SPACES_BEFORE_OPENING_LOOP_PARENTHESES);
+		manager.createSpinner(parenthesesGroup, JSFormatterConstants.SPACES_AFTER_OPENING_LOOP_PARENTHESES);
+		manager.createSpinner(parenthesesGroup, JSFormatterConstants.SPACES_BEFORE_CLOSING_LOOP_PARENTHESES);
+
+		// Array-access parentheses
+		SWTFactory.createLabel(parenthesesGroup, Messages.JSFormatterWhiteSpacesPage_arrayAccessExpressions);
+		manager.createSpinner(parenthesesGroup, JSFormatterConstants.SPACES_BEFORE_OPENING_ARRAY_ACCESS_PARENTHESES);
+		manager.createSpinner(parenthesesGroup, JSFormatterConstants.SPACES_AFTER_OPENING_ARRAY_ACCESS_PARENTHESES);
+		manager.createSpinner(parenthesesGroup, JSFormatterConstants.SPACES_BEFORE_CLOSING_ARRAY_ACCESS_PARENTHESES);
+
+		// All the rest of the parenthesis types
+		SWTFactory.createLabel(parenthesesGroup, Messages.JSFormatterWhiteSpacesPage_otherParenthesesExpressions);
+		manager.createSpinner(parenthesesGroup, JSFormatterConstants.SPACES_BEFORE_OPENING_PARENTHESES);
+		manager.createSpinner(parenthesesGroup, JSFormatterConstants.SPACES_AFTER_OPENING_PARENTHESES);
+		manager.createSpinner(parenthesesGroup, JSFormatterConstants.SPACES_BEFORE_CLOSING_PARENTHESES);
+
+		// Punctuation Group
+		expandibleComposite = SWTFactory.createExpandibleComposite(wrappingGroup,
 				Messages.JSFormatterWhiteSpacesPage_puctuationElementsGroupTitle, 3);
 		Composite punctuationGroup = SWTFactory
 				.createComposite(expandibleComposite, 3, 20, 1, GridData.FILL_HORIZONTAL);
@@ -66,11 +116,6 @@ public class JSFormatterWhiteSpacesPage extends FormatterModifyTabPage
 		SWTFactory.createLabel(punctuationGroup, Messages.JSFormatterWhiteSpacesPage_commas);
 		manager.createSpinner(punctuationGroup, JSFormatterConstants.SPACES_BEFORE_COMMAS);
 		manager.createSpinner(punctuationGroup, JSFormatterConstants.SPACES_AFTER_COMMAS);
-
-		// Parentheses
-		SWTFactory.createLabel(punctuationGroup, Messages.JSFormatterWhiteSpacesPage_parentheses);
-		manager.createSpinner(punctuationGroup, JSFormatterConstants.SPACES_BEFORE_PARENTHESES);
-		manager.createSpinner(punctuationGroup, JSFormatterConstants.SPACES_AFTER_PARENTHESES);
 
 		// Semicolon in 'for' statements
 		SWTFactory.createLabel(punctuationGroup, Messages.JSFormatterWhiteSpacesPage_semicolonsInFor);

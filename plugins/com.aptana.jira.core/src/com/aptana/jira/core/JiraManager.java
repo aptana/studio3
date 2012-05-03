@@ -7,7 +7,6 @@
  */
 package com.aptana.jira.core;
 
-import java.io.File;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.StringTokenizer;
@@ -18,7 +17,6 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
 import org.eclipse.equinox.security.storage.StorageException;
@@ -45,6 +43,7 @@ public class JiraManager
 	private static final String PARAM_PROJECT = "--project"; //$NON-NLS-1$
 	private static final String PARAM_VERSION = "--affectsVersions"; //$NON-NLS-1$
 	private static final String PARAM_TYPE = "--type"; //$NON-NLS-1$
+	private static final String PARAM_PRIORITY = "--priority"; //$NON-NLS-1$
 	private static final String PARAM_SUMMARY = "--summary"; //$NON-NLS-1$
 	private static final String PARAM_DESCRIPTION = "--description"; //$NON-NLS-1$
 	private static final String PARAM_ISSUE = "--issue"; //$NON-NLS-1$
@@ -58,6 +57,7 @@ public class JiraManager
 	private static final String PASSWORD = "password"; //$NON-NLS-1$
 
 	private static final Pattern PATTERN_SUCCESS = Pattern.compile("(.*) created with id (.*). URL: (.*)"); //$NON-NLS-1$
+	private static final String FAILED_REASON_START = "Exception: "; //$NON-NLS-1$
 
 	private static IPath jiraExecutable;
 	// could override using setProjectInfo()
@@ -91,6 +91,10 @@ public class JiraManager
 	public void login(String username, String password) throws JiraException
 	{
 		IPath jiraExecutable = getJiraExecutable();
+		if (jiraExecutable == null)
+		{
+			throw new JiraException(Messages.JiraManager_ERR_NoJiraExecutable);
+		}
 		String output = ProcessUtil.outputForCommand(jiraExecutable.toOSString(), jiraExecutable.removeLastSegments(1),
 				PARAM_ACTION, ACTION_LOGIN, PARAM_USERNAME, username, PARAM_PASSWORD, password);
 		if (!StringUtil.isEmpty(output))
@@ -107,7 +111,16 @@ public class JiraManager
 			else
 			{
 				// an error
-				throw new JiraException(output);
+				int index = output.lastIndexOf(FAILED_REASON_START);
+				if (index > -1)
+				{
+					String reason = output.substring(index + 11).trim();
+					throw new JiraException(reason);
+				}
+				else
+				{
+					throw new JiraException(output);
+				}
 			}
 		}
 	}
@@ -117,6 +130,8 @@ public class JiraManager
 	 * 
 	 * @param type
 	 *            the issue type (bug, feature, or improvement)
+	 * @param priority
+	 *            the issue's priority
 	 * @param summary
 	 *            the summary of the ticket
 	 * @param description
@@ -124,7 +139,8 @@ public class JiraManager
 	 * @return the JIRA issue created
 	 * @throws JiraException
 	 */
-	public JiraIssue createIssue(JiraIssueType type, String summary, String description) throws JiraException
+	public JiraIssue createIssue(JiraIssueType type, JiraIssuePriority priority, String summary, String description)
+			throws JiraException
 	{
 		if (user == null)
 		{
@@ -135,7 +151,8 @@ public class JiraManager
 		String output = ProcessUtil.outputForCommand(jiraExecutable.toOSString(), jiraExecutable.removeLastSegments(1),
 				PARAM_ACTION, ACTION_CREATE_ISSUE, PARAM_USERNAME, user.getUsername(), PARAM_PASSWORD,
 				user.getPassword(), PARAM_PROJECT, projectKey, PARAM_VERSION, getProjectVersion(), PARAM_TYPE,
-				type.getParameterName(), PARAM_SUMMARY, summary, PARAM_DESCRIPTION, description);
+				type.getParameterName(), PARAM_PRIORITY, priority.toString(), PARAM_SUMMARY, summary,
+				PARAM_DESCRIPTION, description);
 		Matcher m = PATTERN_SUCCESS.matcher(output);
 		if (m.find())
 		{
@@ -235,7 +252,6 @@ public class JiraManager
 	{
 		if (jiraExecutable == null)
 		{
-			File file;
 			IPath path;
 			try
 			{
@@ -250,8 +266,8 @@ public class JiraManager
 				URL url = FileLocator.find(Platform.getBundle(LIBRARY_PLUGIN_ID), path, null);
 				if (url != null)
 				{
-					file = URIUtil.toFile(FileLocator.toFileURL(url).toURI());
-					jiraExecutable = Path.fromOSString(file.getAbsolutePath());
+					url = FileLocator.toFileURL(url);
+					jiraExecutable = Path.fromOSString(url.getFile());
 				}
 			}
 			catch (Exception e)

@@ -31,6 +31,7 @@ public class CoreTests
 		suite.addTest(com.aptana.core.io.tests.AllTests.suite());
 		// suite.addTest(com.aptana.filesystem.ftp.tests.AllTests.suite());
 		// suite.addTest(com.aptana.filesystem.secureftp.tests.AllTests.suite());
+		suite.addTest(com.aptana.filesystem.http.tests.AllTests.suite());
 		suite.addTest(com.aptana.git.core.tests.AllGitCoreTests.suite());
 		suite.addTest(com.aptana.index.core.tests.AllIndexCoreTests.suite());
 		suite.addTest(com.aptana.parsing.tests.AllTests.suite());

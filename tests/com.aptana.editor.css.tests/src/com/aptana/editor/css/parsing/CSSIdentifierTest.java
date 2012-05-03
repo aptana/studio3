@@ -14,31 +14,39 @@ public class CSSIdentifierTest extends CSSTokensTest
 
 	public void testSimpleIdentifier()
 	{
-		assertToken("abc", CSSTokenType.IDENTIFIER, 0, 3); //$NON-NLS-1$
+		assertToken("abc", CSSTokenType.IDENTIFIER); //$NON-NLS-1$
 	}
 
 	public void testIdentifierWithNumber()
 	{
-		assertToken("abc0", CSSTokenType.IDENTIFIER, 0, 4); //$NON-NLS-1$
+		assertToken("abc0", CSSTokenType.IDENTIFIER); //$NON-NLS-1$
 	}
 
 	public void testIdentifierWithHyphen()
 	{
-		assertToken("abc-def", CSSTokenType.IDENTIFIER, 0, 7); //$NON-NLS-1$
+		assertToken("abc-def", CSSTokenType.IDENTIFIER); //$NON-NLS-1$
 	}
 
 	public void testIdentifierWithLeadingHyphen()
 	{
-		assertToken("-abc", CSSTokenType.IDENTIFIER, 0, 4); //$NON-NLS-1$
+		assertToken("-abc", CSSTokenType.IDENTIFIER); //$NON-NLS-1$
 	}
 
 	public void testIdentifierWithUnderscore()
 	{
-		assertToken("abc_def", CSSTokenType.IDENTIFIER, 0, 7); //$NON-NLS-1$
+		assertToken("abc_def", CSSTokenType.IDENTIFIER); //$NON-NLS-1$
 	}
 
 	public void testIdentifierWithLeadingUnderscore()
 	{
-		assertToken("_abc", CSSTokenType.IDENTIFIER, 0, 4); //$NON-NLS-1$
+		assertToken("_abc", CSSTokenType.IDENTIFIER); //$NON-NLS-1$
+	}
+
+	/**
+	 * APSTUD-4646
+	 */
+	public void testMSIdentifier()
+	{
+		assertToken("progid:DXImageTransform.Microsoft.DropShadow", CSSTokenType.IDENTIFIER);
 	}
 }

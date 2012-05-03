@@ -1,3 +1,11 @@
+// $codepro.audit.disable
+/**
+ * Aptana Studio
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.css.parsing;
 
 import java.io.Reader;
@@ -37,10 +45,10 @@ import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 
 	// comment collections, by type
 	private List<Symbol> _comments = new ArrayList<Symbol>();
-	
+
 	// curly brace nesting level
 	private int _nestingLevel;
-	
+
 	// a flag indicating we're inside of a @media block
 	private boolean _inMedia;
 
@@ -102,10 +110,10 @@ import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 
 		// reset comment collection list
 		_comments.clear();
-		
+
 		// reset nesting level
 		_nestingLevel = 0;
-		
+
 		// reset media flag
 		_inMedia = false;
 	}
@@ -122,9 +130,11 @@ single_quoted_string		= \'([^\n\r\f\']|\\{nl}|{escape})*\'
 bad_double_quoted_string	= \"([^\n\r\f\"]|\\{nl}|{escape})*\\?
 bad_single_quoted_string	= \'([^\n\r\f\']|\\{nl}|{escape})*\\?
 comment						= "/*" ~"*/"
-identifier					= -?{nmstart}{nmchar}*
+base_identifier				= -?{nmstart}{nmchar}*
+ms_identifier				= "progid:"{base_identifier}(\.{base_identifier})*
+identifier					= {base_identifier}|{ms_identifier}
 name						= {nmchar}+
-num							= [0-9]+|[0-9]*\.[0-9]+
+num							= [-+]?([0-9]+|[0-9]*\.[0-9]+)
 s							= [ \t\r\n\f]+
 nl							= \r|\n|\r\n|\f
 
@@ -132,33 +142,86 @@ nl							= \r|\n|\r\n|\f
 
 <YYINITIAL> {
 	{s}							{ /* ignore */ }
-
-	{comment}					{
-									Symbol comment = newToken(CSSTokenType.COMMENT, yytext());
-									
-									_comments.add(comment);
-									
-									return comment;
-								}
+	{comment}					{ _comments.add(newToken(CSSTokenType.COMMENT, yytext())); }
 
 	{single_quoted_string}		{ return newToken(CSSTokenType.SINGLE_QUOTED_STRING, yytext()); }
 	{double_quoted_string}		{ return newToken(CSSTokenType.DOUBLE_QUOTED_STRING, yytext()); }
 	{bad_single_quoted_string}	{ return newToken(CSSTokenType.SINGLE_QUOTED_STRING, yytext()); }
 	{bad_double_quoted_string}	{ return newToken(CSSTokenType.DOUBLE_QUOTED_STRING, yytext()); }
 
-	"."{name}					{ return newToken(CSSTokenType.CLASS, yytext()); }
+	{num}"em"					{ return newToken(CSSTokenType.EMS, yytext()); }
+	{num}"ex"					{ return newToken(CSSTokenType.EXS, yytext()); }
+	{num}"px"					{ return newToken(CSSTokenType.LENGTH, yytext()); }
+	{num}"cm"					{ return newToken(CSSTokenType.LENGTH, yytext()); }
+	{num}"mm"					{ return newToken(CSSTokenType.LENGTH, yytext()); }
+	{num}"in"					{ return newToken(CSSTokenType.LENGTH, yytext()); }
+	{num}"pt"					{ return newToken(CSSTokenType.LENGTH, yytext()); }
+	{num}"pc"					{ return newToken(CSSTokenType.LENGTH, yytext()); }
+	{num}"deg"					{ return newToken(CSSTokenType.ANGLE, yytext()); }
+	{num}"rad"					{ return newToken(CSSTokenType.ANGLE, yytext()); }
+	{num}"grad"					{ return newToken(CSSTokenType.ANGLE, yytext()); }
+	{num}"ms"					{ return newToken(CSSTokenType.TIME, yytext()); }
+	{num}"s"					{ return newToken(CSSTokenType.TIME, yytext()); }
+	{num}"hz"					{ return newToken(CSSTokenType.FREQUENCY, yytext()); }
+	{num}"khz"					{ return newToken(CSSTokenType.FREQUENCY, yytext()); }
+//	{num}{identifier}			{ return newToken(CSSTokenType.DIMENSION, yytext()); }
+	{num}%						{ return newToken(CSSTokenType.PERCENTAGE, yytext()); }
+	{num}						{ return newToken(CSSTokenType.NUMBER, yytext()); }
+	
+	"."{name}					{
+									CSSTokenType type;
+
+									if ((_inMedia && _nestingLevel == 1) || _nestingLevel <= 0)
+									{
+										type = CSSTokenType.CLASS;
+									}
+									else
+									{
+										boolean numbers = true;
+										String text = yytext();
+
+										for (int i = 1; i < text.length(); i++)
+										{
+											char c = text.charAt(i);
+
+											if (c < '0' || '9' < c)
+											{
+												numbers = false;
+												break;
+											}
+										}
+
+										type = (numbers) ? CSSTokenType.NUMBER : CSSTokenType.CLASS;
+									}
+
+									return newToken(type, yytext());
+								}
 	"#"{name}					{
 									CSSTokenType type;
-									
+
 									if ((_inMedia && _nestingLevel == 1) || _nestingLevel <= 0)
 									{
 										type = CSSTokenType.ID;
 									}
 									else
 									{
-										type = CSSTokenType.RGB;
+										boolean numbers = true;
+										String text = yytext();
+
+										for (int i = 1; i < text.length(); i++)
+										{
+											char c = text.charAt(i);
+
+											if (!('0' <= c && c <= '9' || 'a' <= c && c <= 'f' || 'A' <= c && c <= 'F'))
+											{
+												numbers = false;
+												break;
+											}
+										}
+
+										type = (numbers) ? CSSTokenType.RGB : CSSTokenType.ID;
 									}
-									
+
 									return newToken(type, yytext());
 								}
 
@@ -168,6 +231,7 @@ nl							= \r|\n|\r\n|\f
 	"@charset"					{ return newToken(CSSTokenType.CHARSET, yytext()); }
 	"@font-face"				{ return newToken(CSSTokenType.FONTFACE, yytext()); }
 	"@namespace"				{ return newToken(CSSTokenType.NAMESPACE, yytext()); }
+	"@-moz-document"			{ return newToken(CSSTokenType.MOZ_DOCUMENT, yytext()); }
 	"@"{name}					{ return newToken(CSSTokenType.AT_RULE, yytext()); }
 
 	"!"({s}|{comment})*"important"	{ return newToken(CSSTokenType.IMPORTANT, yytext()); }
@@ -178,7 +242,7 @@ nl							= \r|\n|\r\n|\f
 	"|="						{ return newToken(CSSTokenType.DASHMATCH, yytext()); }
 	"^="						{ return newToken(CSSTokenType.BEGINS_WITH, yytext()); }
 	"$="						{ return newToken(CSSTokenType.ENDS_WITH, yytext()); }
-	
+
 	":"							{ return newToken(CSSTokenType.COLON, yytext()); }
 	";"							{ return newToken(CSSTokenType.SEMICOLON, yytext()); }
 	"{"							{
@@ -209,30 +273,10 @@ nl							= \r|\n|\r\n|\f
 	"/"							{ return newToken(CSSTokenType.SLASH, yytext()); }
 	"="							{ return newToken(CSSTokenType.EQUAL, yytext()); }
 	"-"							{ return newToken(CSSTokenType.MINUS, yytext()); }
-	
-	{num}"em"					{ return newToken(CSSTokenType.EMS, yytext()); }
-	{num}"ex"					{ return newToken(CSSTokenType.EXS, yytext()); }
-	{num}"px"					{ return newToken(CSSTokenType.LENGTH, yytext()); }
-	{num}"cm"					{ return newToken(CSSTokenType.LENGTH, yytext()); }
-	{num}"mm"					{ return newToken(CSSTokenType.LENGTH, yytext()); }
-	{num}"in"					{ return newToken(CSSTokenType.LENGTH, yytext()); }
-	{num}"pt"					{ return newToken(CSSTokenType.LENGTH, yytext()); }
-	{num}"pc"					{ return newToken(CSSTokenType.LENGTH, yytext()); }
-	{num}"deg"					{ return newToken(CSSTokenType.ANGLE, yytext()); }
-	{num}"rad"					{ return newToken(CSSTokenType.ANGLE, yytext()); }
-	{num}"grad"					{ return newToken(CSSTokenType.ANGLE, yytext()); }
-	{num}"ms"					{ return newToken(CSSTokenType.TIME, yytext()); }
-	{num}"s"					{ return newToken(CSSTokenType.TIME, yytext()); }
-	{num}"hz"					{ return newToken(CSSTokenType.FREQUENCY, yytext()); }
-	{num}"khz"					{ return newToken(CSSTokenType.FREQUENCY, yytext()); }
-//	{num}{identifier}			{ return newToken(CSSTokenType.DIMENSION, yytext()); }
-	{num}%						{ return newToken(CSSTokenType.PERCENTAGE, yytext()); }
-	{num}						{ return newToken(CSSTokenType.NUMBER, yytext()); }
-	
+
 	"url("[^)]*")"				{ return newToken(CSSTokenType.URL, yytext()); }
-	
+
 	{identifier}				{ return newToken(CSSTokenType.IDENTIFIER, yytext()); }
 }
 
 .|\n	{ return newToken(CSSTokenType.ERROR, yytext()); }
-

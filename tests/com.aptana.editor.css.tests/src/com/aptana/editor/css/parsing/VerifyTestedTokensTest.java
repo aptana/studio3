@@ -49,7 +49,9 @@ public class VerifyTestedTokensTest extends TestCase
 		CSSTokenType.ELEMENT,
 		CSSTokenType.FONT,
 		CSSTokenType.VALUE,
-		CSSTokenType.ERROR
+		// the following are special token types that are not used in parsing
+		CSSTokenType.ERROR,
+		CSSTokenType.COMMENT
 	);
 	// @formatter:on
 

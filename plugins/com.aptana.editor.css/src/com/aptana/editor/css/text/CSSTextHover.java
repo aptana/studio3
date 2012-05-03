@@ -26,8 +26,13 @@ import com.aptana.editor.common.contentassist.CommonTextHover;
 import com.aptana.editor.common.hover.CustomBrowserInformationControl;
 import com.aptana.editor.css.CSSColors;
 import com.aptana.editor.css.contentassist.CSSIndexQueryHelper;
+import com.aptana.editor.css.contentassist.model.BaseElement;
+import com.aptana.editor.css.contentassist.model.ICSSMetadataElement;
 import com.aptana.editor.css.contentassist.model.PropertyElement;
+import com.aptana.editor.css.contentassist.model.PseudoClassElement;
+import com.aptana.editor.css.contentassist.model.PseudoElementElement;
 import com.aptana.editor.css.internal.text.CSSModelFormatter;
+import com.aptana.editor.css.parsing.ast.CSSAttributeSelectorNode;
 import com.aptana.editor.css.parsing.ast.CSSDeclarationNode;
 import com.aptana.editor.css.parsing.ast.CSSFunctionNode;
 import com.aptana.editor.css.parsing.ast.CSSNode;
@@ -55,9 +60,11 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 	private static final Pattern RGB_CHANNELS = Pattern
 			.compile("rgb\\(\\s*(\\d+)\\s*,\\s*(\\d+)\\s*,\\s*(\\d+)\\s*\\)"); //$NON-NLS-1$
 
+	/**
+	 * The object we're using as the source for the hover. For colors this is an {@link RGB} object. For properties,
+	 * pseudo-classes and pseudo-elements this is an {@link ICSSMetadataElement}.
+	 */
 	private Object info;
-
-	private String fHeader;
 
 	/*
 	 * (non-Javadoc)
@@ -71,7 +78,11 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 		{
 			return Messages.CSSTextHover_cssColorHeaderText;
 		}
-		return fHeader;
+		if (element instanceof ICSSMetadataElement)
+		{
+			return CSSModelFormatter.TEXT_HOVER.getHeader((ICSSMetadataElement) element);
+		}
+		return null;
 	}
 
 	/*
@@ -82,14 +93,18 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 	@Override
 	public String getDocumentation(Object element, IEditorPart editorPart, IRegion hoverRegion)
 	{
-		if (info instanceof String)
+		if (element instanceof String)
 		{
-			return (String) info;
+			return (String) element;
 		}
-		else if (info instanceof RGB)
+		else if (element instanceof RGB)
 		{
 			// Wrap the info color in a HTML table that is set with this background color.
-			return MessageFormat.format(COLORED_TABLE, getHexColor((RGB) info));
+			return MessageFormat.format(COLORED_TABLE, getHexColor((RGB) element));
+		}
+		else if (element instanceof ICSSMetadataElement)
+		{
+			return CSSModelFormatter.TEXT_HOVER.getDocumentation((ICSSMetadataElement) element);
 		}
 		return null;
 	}
@@ -147,106 +162,194 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 	 */
 	public IRegion getHoverRegion(ITextViewer textViewer, int offset)
 	{
-		// assume no hover region
-		IRegion result = null;
 		info = null;
-		fHeader = null;
 
 		IParseNode node = getActiveNode(textViewer, offset);
-
-		if (node instanceof CSSNode)
+		if (!(node instanceof CSSNode))
 		{
-			CSSNode cssNode = (CSSNode) node;
+			return null;
+		}
 
-			switch (cssNode.getNodeType())
+		// assume no hover region
+		RegionInfo ri = null;
+
+		CSSNode cssNode = (CSSNode) node;
+		switch (cssNode.getNodeType())
+		{
+			case ICSSNodeTypes.TERM:
 			{
-				case ICSSNodeTypes.TERM:
+				ri = getTermRegionInfo(cssNode);
+				break;
+			}
+
+			case ICSSNodeTypes.DECLARATION:
+			{
+				ri = getPropertyNameRegionInfo((CSSDeclarationNode) cssNode, offset);
+				break;
+			}
+
+			case ICSSNodeTypes.FUNCTION:
+			{
+				CSSFunctionNode functionNode = (CSSFunctionNode) cssNode;
+				ri = getFunctionRegionInfo(functionNode);
+
+				if (ri == null)
 				{
-					IParseNode parent = cssNode.getParent();
-					if (parent instanceof CSSTermListNode)
+					// This may be a pseudo-class that takes arguments!
+					String functionName = functionNode.getName();
+					BaseElement matching = getPsuedoClass(functionName);
+					if (matching != null)
 					{
-						// find owning statement for this expression
-						while (parent instanceof CSSTermListNode)
-						{
-							parent = parent.getParent();
-						}
+						ri = new RegionInfo(new Region(cssNode.getStartingOffset(), functionName.length()), matching);
 					}
-					if (parent instanceof CSSDeclarationNode)
-					{
-						String text = cssNode.getText();
-
-						if (!StringUtil.isEmpty(text))
-						{
-							if (text.charAt(0) == '#')
-							{
-								info = CSSColors.hexToRGB(text);
-							}
-							else if (CSSColors.namedColorExists(text))
-							{
-								info = CSSColors.namedColorToRGB(text);
-							}
-							else
-							{
-								info = text;
-							}
-							result = new Region(cssNode.getStartingOffset(), cssNode.getLength());
-							break;
-						}
-					}
-					else if (parent instanceof CSSFunctionNode)
-					{
-						RegionInfo ri = this.getFunctionRegionInfo((CSSFunctionNode) parent);
-
-						if (ri != null)
-						{
-							result = ri.region;
-							info = ri.info;
-						}
-					}
-					break;
 				}
+				break;
+			}
 
-				case ICSSNodeTypes.DECLARATION:
-				{
-					CSSDeclarationNode decl = (CSSDeclarationNode) cssNode;
-					String propertyName = decl.getIdentifier();
-					int startingOffset = decl.getStartingOffset();
-
-					if (propertyName != null && startingOffset <= offset
-							&& offset < startingOffset + propertyName.length())
-					{
-						CSSIndexQueryHelper queryHelper = new CSSIndexQueryHelper();
-						PropertyElement property = queryHelper.getProperty(propertyName);
-
-						if (property != null)
-						{
-							result = new Region(cssNode.getStartingOffset(), propertyName.length());
-
-							fHeader = CSSModelFormatter.TEXT_HOVER.getHeader(property);
-							info = CSSModelFormatter.TEXT_HOVER.getDocumentation(property);
-						}
-					}
-					break;
-				}
-
-				case ICSSNodeTypes.FUNCTION:
-				{
-					RegionInfo ri = this.getFunctionRegionInfo((CSSFunctionNode) cssNode);
-
-					if (ri != null)
-					{
-						result = ri.region;
-						info = ri.info;
-					}
-					break;
-				}
+			case ICSSNodeTypes.ATTRIBUTE_SELECTOR:
+			{
+				ri = getPseudoSelector((CSSAttributeSelectorNode) cssNode);
+				break;
 			}
 		}
 
-		if (result == null)
+		if (ri != null)
 		{
-			info = null;
+			info = ri.info;
+			return ri.region;
 		}
-		return result;
+
+		return null;
+	}
+
+	private RegionInfo getPropertyNameRegionInfo(CSSDeclarationNode decl, int offset)
+	{
+		String propertyName = decl.getIdentifier();
+		int startingOffset = decl.getStartingOffset();
+
+		if (propertyName != null && startingOffset <= offset && offset < startingOffset + propertyName.length())
+		{
+			PropertyElement property = getQueryHelper().getProperty(propertyName);
+
+			if (property != null)
+			{
+				return new RegionInfo(new Region(decl.getStartingOffset(), propertyName.length()), property);
+			}
+		}
+
+		return null;
+	}
+
+	private RegionInfo getTermRegionInfo(CSSNode cssNode)
+	{
+		IParseNode parent = getOwningStatement(cssNode.getParent());
+		if (parent instanceof CSSDeclarationNode)
+		{
+			return getColorRegionInfo(cssNode);
+		}
+		else if (parent instanceof CSSFunctionNode)
+		{
+			return getFunctionRegionInfo((CSSFunctionNode) parent);
+		}
+
+		return null;
+	}
+
+	// Check for psuedo-classes and -elements
+	private RegionInfo getPseudoSelector(CSSAttributeSelectorNode selectorNode)
+	{
+		String rawAttribute = selectorNode.toString();
+		if (StringUtil.isEmpty(rawAttribute) || rawAttribute.charAt(0) != ':')
+		{
+			return null;
+		}
+
+		String psuedoSomething = rawAttribute.substring(1);
+		boolean isPsuedoElement = false;
+		if (!StringUtil.isEmpty(psuedoSomething) && psuedoSomething.charAt(0) == ':')
+		{
+			psuedoSomething = psuedoSomething.substring(1);
+			isPsuedoElement = true;
+		}
+
+		BaseElement matching = getPsuedoElement(psuedoSomething);
+		if (matching == null && !isPsuedoElement)
+		{
+			matching = getPsuedoClass(psuedoSomething);
+		}
+
+		if (matching != null)
+		{
+			return new RegionInfo(new Region(selectorNode.getStartingOffset(), rawAttribute.length()), matching);
+		}
+
+		return null;
+	}
+
+	private RegionInfo getColorRegionInfo(CSSNode cssNode)
+	{
+		if (cssNode == null)
+		{
+			return null;
+		}
+
+		String text = cssNode.getText();
+		if (StringUtil.isEmpty(text))
+		{
+			return null;
+		}
+
+		IRegion region = new Region(cssNode.getStartingOffset(), cssNode.getLength());
+		if (text.charAt(0) == '#')
+		{
+			return new RegionInfo(region, CSSColors.hexToRGB(text));
+		}
+		else if (CSSColors.namedColorExists(text))
+		{
+			return new RegionInfo(region, CSSColors.namedColorToRGB(text));
+		}
+		return new RegionInfo(region, text);
+	}
+
+	// find owning statement for this expression
+	private IParseNode getOwningStatement(IParseNode parent)
+	{
+		if (parent instanceof CSSTermListNode)
+		{
+			while (parent instanceof CSSTermListNode)
+			{
+				parent = parent.getParent();
+			}
+		}
+		return parent;
+	}
+
+	protected BaseElement getPsuedoElement(String psuedoSomething)
+	{
+		for (PseudoElementElement pee : getQueryHelper().getPseudoElements())
+		{
+			if (pee.getName().equals(psuedoSomething))
+			{
+				return pee;
+			}
+		}
+		return null;
+	}
+
+	protected BaseElement getPsuedoClass(String functionName)
+	{
+		for (PseudoClassElement pce : getQueryHelper().getPseudoClasses())
+		{
+			if (pce.getName().equals(functionName))
+			{
+				return pce;
+			}
+		}
+		return null;
+	}
+
+	protected CSSIndexQueryHelper getQueryHelper()
+	{
+		return new CSSIndexQueryHelper();
 	}
 }

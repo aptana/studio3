@@ -7,14 +7,18 @@
  */
 package com.aptana.jira.ui.preferences;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.operation.ModalContext;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -25,13 +29,16 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.jira.core.JiraCorePlugin;
 import com.aptana.jira.core.JiraException;
 import com.aptana.jira.core.JiraManager;
 import com.aptana.jira.core.JiraUser;
+import com.aptana.jira.ui.JiraUIPlugin;
 import com.aptana.ui.preferences.AbstractAccountPageProvider;
 import com.aptana.ui.util.SWTUtils;
+import com.aptana.ui.util.UIUtils;
 import com.aptana.ui.util.WorkbenchBrowserUtil;
 
 /**
@@ -50,6 +57,11 @@ public class JiraPreferencePageProvider extends AbstractAccountPageProvider
 
 	public JiraPreferencePageProvider()
 	{
+	}
+
+	public JiraPreferencePageProvider(IProgressMonitor progressMonitor)
+	{
+		super(progressMonitor);
 	}
 
 	public Control createContents(Composite parent)
@@ -76,7 +88,13 @@ public class JiraPreferencePageProvider extends AbstractAccountPageProvider
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				validate();
+				if (validate())
+				{
+					// shows a success message
+					MessageDialog.openInformation(UIUtils.getActiveShell(),
+							Messages.JiraPreferencePageProvider_Success_Title,
+							Messages.JiraPreferencePageProvider_Success_Message);
+				}
 			}
 		});
 
@@ -136,8 +154,8 @@ public class JiraPreferencePageProvider extends AbstractAccountPageProvider
 
 	private boolean validate()
 	{
-		String username = usernameText.getText();
-		String password = passwordText.getText();
+		final String username = usernameText.getText();
+		final String password = passwordText.getText();
 		if (StringUtil.isEmpty(username))
 		{
 			MessageDialog.openError(main.getShell(), Messages.JiraPreferencePageProvider_ERR_InvalidInput_Title,
@@ -150,17 +168,57 @@ public class JiraPreferencePageProvider extends AbstractAccountPageProvider
 					Messages.JiraPreferencePageProvider_ERR_EmptyPassword);
 			return false;
 		}
+
+		setUILocked(true);
+		firePreValidationStartEvent();
 		try
 		{
-			getJiraManager().login(username, password);
+			ModalContext.run(new IRunnableWithProgress()
+			{
+
+				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
+				{
+					monitor.beginTask(Messages.JiraPreferencePageProvider_ValidateCredentials, IProgressMonitor.UNKNOWN);
+					try
+					{
+						getJiraManager().login(username, password);
+					}
+					catch (JiraException e)
+					{
+						throw new InvocationTargetException(e);
+					}
+					finally
+					{
+						monitor.done();
+					}
+				}
+			}, true, getProgressMonitor(), UIUtils.getDisplay());
 		}
-		catch (JiraException e)
+		catch (InvocationTargetException e)
 		{
-			MessageDialog.openError(main.getShell(), Messages.JiraPreferencePageProvider_ERR_LoginFailed_Title,
-					e.getMessage());
+			MessageDialog.openError(main.getShell(), Messages.JiraPreferencePageProvider_ERR_LoginFailed_Title, e
+					.getTargetException().getMessage());
 			return false;
 		}
+		catch (InterruptedException e)
+		{
+			IdeLog.logError(JiraUIPlugin.getDefault(), e);
+		}
+		finally
+		{
+			setUILocked(false);
+			firePostValidationEndEvent();
+		}
+
 		return true;
+	}
+
+	private void setUILocked(boolean locked)
+	{
+		usernameText.setEnabled(!locked);
+		passwordText.setEnabled(!locked);
+		testButton.setEnabled(!locked);
+		createAccountButton.setEnabled(!locked);
 	}
 
 	private static int getButtonWidthHint(Button button)

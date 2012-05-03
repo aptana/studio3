@@ -7,7 +7,9 @@
  */
 package com.aptana.jira.ui.internal;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IPath;
@@ -23,6 +25,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.wizard.ProgressMonitorPart;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -31,11 +34,12 @@ import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -43,10 +47,13 @@ import org.eclipse.swt.widgets.Text;
 import com.aptana.core.CoreStrings;
 import com.aptana.core.util.StringUtil;
 import com.aptana.jira.core.JiraCorePlugin;
+import com.aptana.jira.core.JiraIssuePriority;
 import com.aptana.jira.core.JiraIssueType;
 import com.aptana.jira.core.JiraManager;
-import com.aptana.jira.core.JiraUser;
+import com.aptana.jira.ui.JiraUIPlugin;
 import com.aptana.jira.ui.preferences.JiraPreferencePageProvider;
+import com.aptana.ui.preferences.IAccountPageProvider;
+import com.aptana.ui.util.SWTUtils;
 
 /**
  * @author Michael Xia (mxia@appcelerator.com)
@@ -54,15 +61,24 @@ import com.aptana.jira.ui.preferences.JiraPreferencePageProvider;
 public class SubmitTicketDialog extends TitleAreaDialog
 {
 
+	private static final String IMAGE_PATH = "icons/full/wizban/jira_wiz.png"; //$NON-NLS-1$
+
 	private JiraPreferencePageProvider userInfoProvider;
+	private Control userInfoControl;
 	private ComboViewer typeCombo;
+	private ComboViewer priorityCombo;
 	private Text summaryText;
 	private Text descriptionText;
 	private Button studioLogCheckbox;
 	private Button diagnosticLogCheckbox;
+	private Text screenshotText;
+	private Button browseButton;
 	private Composite screenshotsComposite;
+	private List<Button> screenshotCheckboxes;
+	private ProgressMonitorPart progressMonitorPart;
 
 	private JiraIssueType type;
+	private JiraIssuePriority priority;
 	private String summary;
 	private String description;
 	private boolean studioLogSelected;
@@ -74,6 +90,7 @@ public class SubmitTicketDialog extends TitleAreaDialog
 		super(parentShell);
 		setHelpAvailable(false);
 		setShellStyle(getShellStyle() | SWT.RESIZE);
+		screenshotCheckboxes = new ArrayList<Button>();
 		screenshots = new LinkedHashSet<IPath>();
 	}
 
@@ -83,6 +100,11 @@ public class SubmitTicketDialog extends TitleAreaDialog
 	public JiraIssueType getType()
 	{
 		return type;
+	}
+
+	public JiraIssuePriority getPriority()
+	{
+		return priority;
 	}
 
 	/**
@@ -143,17 +165,10 @@ public class SubmitTicketDialog extends TitleAreaDialog
 		separator.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).span(2, 1).create());
 
 		// adds control for login credentials if this is first time use
-		JiraUser user = getJiraManager().getUser();
-		if (user == null)
-		{
-			userInfoProvider = new JiraPreferencePageProvider();
-			Control userInfoControl = userInfoProvider.createContents(main);
-			if (userInfoControl instanceof Group)
-			{
-				((Group) userInfoControl).setText(Messages.SubmitTicketDialog_LBL_User);
-			}
-			userInfoControl.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).span(2, 1).create());
-		}
+		userInfoProvider = new JiraPreferencePageProvider();
+		userInfoControl = userInfoProvider.createContents(main);
+		userInfoControl.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).span(2, 1)
+				.exclude(getJiraManager().getUser() != null).create());
 
 		// issue type
 		Label label = new Label(main, SWT.NONE);
@@ -165,14 +180,27 @@ public class SubmitTicketDialog extends TitleAreaDialog
 		typeCombo.setInput(JiraIssueType.values());
 		typeCombo.getControl().setLayoutData(GridDataFactory.swtDefaults().create());
 		typeCombo.setSelection(new StructuredSelection(JiraIssueType.BUG));
-		typeCombo.addSelectionChangedListener(new ISelectionChangedListener()
+		ISelectionChangedListener listener = new ISelectionChangedListener()
 		{
 
 			public void selectionChanged(SelectionChangedEvent event)
 			{
 				validate();
 			}
-		});
+		};
+		typeCombo.addSelectionChangedListener(listener);
+
+		// priority
+		label = new Label(main, SWT.NONE);
+		label.setText(StringUtil.makeFormLabel(Messages.SubmitTicketDialog_LBL_Priority));
+		label.setLayoutData(GridDataFactory.swtDefaults().create());
+		priorityCombo = new ComboViewer(main, SWT.DROP_DOWN | SWT.READ_ONLY);
+		priorityCombo.setContentProvider(ArrayContentProvider.getInstance());
+		priorityCombo.setLabelProvider(new LabelProvider());
+		priorityCombo.setInput(JiraIssuePriority.values());
+		priorityCombo.getControl().setLayoutData(GridDataFactory.swtDefaults().create());
+		priorityCombo.setSelection(new StructuredSelection(JiraIssuePriority.MEDIUM));
+		priorityCombo.addSelectionChangedListener(listener);
 
 		// summary
 		label = new Label(main, SWT.NONE);
@@ -221,7 +249,7 @@ public class SubmitTicketDialog extends TitleAreaDialog
 		composite.setLayout(GridLayoutFactory.fillDefaults().numColumns(2).create());
 		composite.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
 
-		Text screenshotText = new Text(composite, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
+		screenshotText = new Text(composite, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
 		screenshotText.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false)
 				.create());
 		screenshotText.addMouseListener(new MouseListener()
@@ -240,7 +268,7 @@ public class SubmitTicketDialog extends TitleAreaDialog
 			{
 			}
 		});
-		Button browseButton = new Button(composite, SWT.PUSH);
+		browseButton = new Button(composite, SWT.PUSH);
 		browseButton.setText(StringUtil.ellipsify(CoreStrings.BROWSE));
 		browseButton.setLayoutData(GridDataFactory.swtDefaults().create());
 		browseButton.addSelectionListener(new SelectionAdapter()
@@ -260,9 +288,41 @@ public class SubmitTicketDialog extends TitleAreaDialog
 		screenshotsComposite.setLayout(GridLayoutFactory.fillDefaults().spacing(0, 0).create());
 		screenshotsComposite.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 
-		validate();
+		// a progress bar for when validating the login
+		progressMonitorPart = new ProgressMonitorPart(main, GridLayoutFactory.fillDefaults().create());
+		progressMonitorPart.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).exclude(true).span(2, 1)
+				.create());
+
+		userInfoProvider.setProgressMonitor(progressMonitorPart);
+		userInfoProvider.addValidationListener(new IAccountPageProvider.IValidationListener()
+		{
+
+			public void preValidationStart()
+			{
+				setUILocked(true);
+				progressMonitorPart.setVisible(true);
+				((GridData) progressMonitorPart.getLayoutData()).exclude = false;
+				layoutShell();
+			}
+
+			public void postValidationEnd()
+			{
+				setUILocked(false);
+				// hides the control for entering user credentials if the user is validated
+				boolean isValidated = (getJiraManager().getUser() != null);
+				if (isValidated)
+				{
+					userInfoControl.setVisible(false);
+					((GridData) userInfoControl.getLayoutData()).exclude = true;
+				}
+				progressMonitorPart.setVisible(false);
+				((GridData) progressMonitorPart.getLayoutData()).exclude = true;
+				layoutShell();
+			}
+		});
 
 		setTitle(Messages.SubmitTicketDialog_Title);
+		setTitleImage(SWTUtils.getImage(JiraUIPlugin.getDefault(), IMAGE_PATH));
 		setMessage(Messages.SubmitTicketDialog_DefaultMessage);
 
 		return main;
@@ -272,21 +332,26 @@ public class SubmitTicketDialog extends TitleAreaDialog
 	protected Control createButtonBar(Composite parent)
 	{
 		Control buttons = super.createButtonBar(parent);
-		if (getMessage() != null)
-		{
-			getButton(IDialogConstants.OK_ID).setEnabled(false);
-		}
+		getButton(IDialogConstants.OK_ID).setEnabled(false);
 		return buttons;
+	}
+
+	@Override
+	protected void cancelPressed()
+	{
+		progressMonitorPart.setCanceled(true);
+		super.cancelPressed();
 	}
 
 	@Override
 	protected void okPressed()
 	{
-		if (userInfoProvider != null && !userInfoProvider.performOk())
+		if (!((GridData) userInfoControl.getLayoutData()).exclude && !userInfoProvider.performOk())
 		{
 			return;
 		}
 		type = (JiraIssueType) ((IStructuredSelection) typeCombo.getSelection()).getFirstElement();
+		priority = (JiraIssuePriority) ((IStructuredSelection) priorityCombo.getSelection()).getFirstElement();
 		summary = summaryText.getText();
 		description = descriptionText.getText();
 		studioLogSelected = studioLogCheckbox.getSelection();
@@ -301,6 +366,10 @@ public class SubmitTicketDialog extends TitleAreaDialog
 		if (typeCombo.getSelection().isEmpty())
 		{
 			message = Messages.SubmitTicketDialog_ERR_EmptyType;
+		}
+		if (priorityCombo.getSelection().isEmpty())
+		{
+			message = Messages.SubmitTicketDialog_ERR_EmptyPriority;
 		}
 		else if (StringUtil.isEmpty(summaryText.getText()))
 		{
@@ -345,6 +414,7 @@ public class SubmitTicketDialog extends TitleAreaDialog
 
 			// adds a checkbox entry for the file
 			final Button checkbox = new Button(screenshotsComposite, SWT.CHECK);
+			screenshotCheckboxes.add(checkbox);
 			checkbox.setLayoutData(GridDataFactory.swtDefaults().span(2, 1).create());
 			// just shows the filename in case the path is too long
 			checkbox.setText(path.lastSegment());
@@ -373,6 +443,29 @@ public class SubmitTicketDialog extends TitleAreaDialog
 			{
 				shell.setSize(currentSize.x, neededHeight);
 			}
+		}
+	}
+
+	private void layoutShell()
+	{
+		Point size = getInitialSize();
+		Rectangle bounds = getConstrainedShellBounds(new Rectangle(0, 0, size.x, size.y));
+		getShell().setSize(bounds.width, bounds.height);
+	}
+
+	private void setUILocked(boolean locked)
+	{
+		typeCombo.getCombo().setEnabled(!locked);
+		priorityCombo.getCombo().setEnabled(!locked);
+		summaryText.setEnabled(!locked);
+		descriptionText.setEnabled(!locked);
+		studioLogCheckbox.setEnabled(!locked);
+		diagnosticLogCheckbox.setEnabled(!locked);
+		screenshotText.setEnabled(!locked);
+		browseButton.setEnabled(!locked);
+		for (Button checkbox : screenshotCheckboxes)
+		{
+			checkbox.setEnabled(!locked);
 		}
 	}
 }

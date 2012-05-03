@@ -42,6 +42,11 @@ public class CSSTokensTest extends TestCase
 		fScanner = null;
 	}
 
+	protected void assertToken(String source, CSSTokenType type)
+	{
+		assertToken(source, type, 0, source.length());
+	}
+
 	protected void assertToken(String source, CSSTokenType type, int offset, int length)
 	{
 		assertToken(source, new TokenInfo(type, offset, length));
@@ -51,16 +56,7 @@ public class CSSTokensTest extends TestCase
 	protected void assertToken(String source, TokenInfo... infos)
 	{
 		setSource(source);
-		assertToken(infos);
-	}
 
-	protected void assertToken(CSSTokenType type, int offset, int length)
-	{
-		assertToken(new TokenInfo(type, offset, length));
-	}
-
-	protected void assertToken(TokenInfo... infos)
-	{
 		for (TokenInfo info : infos)
 		{
 			try
@@ -74,7 +70,7 @@ public class CSSTokensTest extends TestCase
 					// another test to determine if we've covered all token types during testing
 					VerifyTestedTokensTest.TESTED_TOKEN_TYPES.add(info.type);
 
-					assertEquals("Checking token type", info.type.getIndex(), token.getId());
+					assertEquals("Checking token type for '" + source + "'", info.type.getIndex(), token.getId());
 				}
 
 				assertEquals("Checking token offset", info.offset, token.getStart());

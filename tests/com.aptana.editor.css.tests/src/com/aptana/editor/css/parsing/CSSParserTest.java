@@ -44,13 +44,13 @@ public class CSSParserTest extends TestCase
 	private static final String EOL = FileUtil.NEW_LINE;
 
 	private CSSParser fParser;
-	private CSSScanner fScanner;
+	private CSSFlexScanner fScanner;
 
 	@Override
 	protected void setUp() throws Exception
 	{
 		fParser = new CSSParser();
-		fScanner = new CSSScanner();
+		fScanner = new CSSFlexScanner();
 	}
 
 	@Override
@@ -1040,6 +1040,26 @@ public class CSSParserTest extends TestCase
 	public void testStarredImportantProperty() throws Exception
 	{
 		parseTest("button {*overflow: visible !important;}" + EOL); //$NON-NLS-1$
+	}
+
+	/**
+	 * APSTUD-4646
+	 * 
+	 * @throws Exception
+	 */
+	public void testEqualInFunction() throws Exception
+	{
+		parseTest("button {filter: alpha(opacity=30);}" + EOL); //$NON-NLS-1$
+	}
+
+	/**
+	 * APSTUD-4646
+	 * 
+	 * @throws Exception
+	 */
+	public void testMozDocument() throws Exception
+	{
+		parseTest("@-moz-document url-prefix() { .g-section {overflow: hidden;}}" + EOL);
 	}
 
 	/**

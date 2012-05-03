@@ -150,7 +150,8 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 			String trimmedUpToOffset = upToOffset.trim();
 
 			// What we want is to add a star if user hit return inside a comment block
-			if (c1 == COMMENT_CHAR && upToOffset.lastIndexOf(COMMENT_END) <= upToOffset.lastIndexOf(COMMENT_START)
+			if (c1 == COMMENT_CHAR && !trimmedUpToOffset.startsWith(COMMENT_END)
+					&& upToOffset.lastIndexOf(COMMENT_END) <= upToOffset.lastIndexOf(COMMENT_START)
 					&& isComment(c.offset))
 			{
 				buf.append(COMMENT_CHAR);
@@ -242,7 +243,8 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 		{
 			IRegion nextLineInfo = document.getLineInformationOfOffset(command.offset + 1);
 			String nextLine = document.get(nextLineInfo.getOffset(), nextLineInfo.getLength()).trim();
-			return StringUtil.startsWith(nextLine, COMMENT_CHAR) || nextLine.endsWith(COMMENT_END);
+			return (StringUtil.startsWith(nextLine, COMMENT_CHAR) && !StringUtil.startsWith(nextLine, COMMENT_END))
+					|| nextLine.endsWith(COMMENT_END);
 		}
 		catch (BadLocationException e)
 		{

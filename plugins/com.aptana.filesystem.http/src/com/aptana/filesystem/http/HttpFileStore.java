@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -14,6 +14,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.MessageFormat;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
@@ -27,6 +28,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+
+import com.aptana.core.logging.IdeLog;
 
 public class HttpFileStore extends FileStore
 {
@@ -140,45 +143,71 @@ public class HttpFileStore extends FileStore
 	@Override
 	public synchronized File toLocalFile(int options, IProgressMonitor monitor) throws CoreException
 	{
+		if ((options & EFS.CACHE) == 0)
+			return null;
+
 		SubMonitor sub = SubMonitor.convert(monitor);
 
 		// Try to grab copied cache file based on URL!
 		File tmpDir = new File(System.getProperty("java.io.tmpdir")); //$NON-NLS-1$
-		File cached = new File(tmpDir, getPath());
+		File cached = new File(tmpDir, getPath(uri));
 		if (cached.exists())
 		{
 			IFileStore localFile = EFS.getLocalFileSystem().fromLocalFile(cached);
 			long lastModified = localFile.fetchInfo(EFS.NONE, sub.newChild(5)).getLastModified();
 			long remoteLastModified = fetchInfo(EFS.NONE, sub.newChild(20)).getLastModified();
+
 			// TODO What if one or both return EFS.NONE?
 			if (lastModified >= remoteLastModified)
 			{
+				if (IdeLog.isTraceEnabled(HttpFilesystemPlugin.getDefault(), IDebugScopes.FILESYSTEM))
+				{
+					IdeLog.logTrace(HttpFilesystemPlugin.getDefault(),
+							MessageFormat.format(
+							"Returning locally cached URI {0} version for remote URI {0}", localFile.toURI(), uri)); //$NON-NLS-1$
+				}
 				return cached;
 			}
 		}
 		sub.worked(25);
 		// make directory structure for our copy
-		if (!cached.getParentFile().mkdirs())
+		if (!cached.getParentFile().exists() && !cached.getParentFile().mkdirs())
 		{
 			throw new CoreException(new Status(IStatus.ERROR, HttpFilesystemPlugin.PLUGIN_ID, EFS.ERROR_INTERNAL,
-					"Unable to create directory structure for local cached copy", null)); //$NON-NLS-1$
+							MessageFormat
+									.format("Unable to create directory structure {0} for locally cached copy", cached.getParentFile()), null)); //$NON-NLS-1$
 		}
 
 		// Download to some filename we can associate and pull back up based on URL! (used above)
 		IFileStore resultStore = EFS.getLocalFileSystem().fromLocalFile(cached);
 		copy(resultStore, EFS.OVERWRITE, sub.newChild(75));
 		cached.deleteOnExit();
+
+		if (IdeLog.isTraceEnabled(HttpFilesystemPlugin.getDefault(), IDebugScopes.FILESYSTEM))
+		{
+			IdeLog.logTrace(HttpFilesystemPlugin.getDefault(),
+					MessageFormat.format("Caching remote URI {0} to local URI {1}", uri, resultStore.toURI())); //$NON-NLS-1$
+		}
+
 		return cached;
 	}
 
-	private String getPath()
+	/**
+	 * Given a URL, returns a filesystem-sanctioned-path
+	 * 
+	 * @param uri
+	 * @return
+	 */
+	public static String getPath(URI uri)
 	{
+		char separator = '_';
+
 		// FIXME What about fragments/query params?
 		StringBuilder builder = new StringBuilder();
 		builder.append(uri.getScheme());
-		builder.append(File.separator);
+		builder.append(separator);
 		builder.append(uri.getHost());
-		builder.append(File.separator);
+		builder.append(separator);
 		int port = uri.getPort();
 		int defaultPort = 80;
 		if ("https".equalsIgnoreCase(uri.getScheme())) //$NON-NLS-1$
@@ -188,9 +217,11 @@ public class HttpFileStore extends FileStore
 		if (port != -1 && port != defaultPort)
 		{
 			builder.append(uri.getPort());
-			builder.append(File.separator);
+			builder.append(separator);
 		}
-		builder.append(new Path(uri.getPath()).toOSString());
+		builder.append(separator);
+		builder.append(builder.hashCode());
+		builder.append(new Path(uri.getPath().replace('/', separator)).toOSString());
 		return builder.toString();
 	}
 

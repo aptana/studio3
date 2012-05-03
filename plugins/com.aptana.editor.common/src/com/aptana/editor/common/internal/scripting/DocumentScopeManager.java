@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -11,6 +11,9 @@ package com.aptana.editor.common.internal.scripting;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
@@ -19,19 +22,27 @@ import org.eclipse.jface.text.TypedPosition;
 import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.ICommonConstants;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
 import com.aptana.editor.common.scripting.QualifiedContentType;
+import com.aptana.editor.common.util.EditorUtil;
 
 /**
  * @author Max Stepanov
  */
 public class DocumentScopeManager implements IDocumentScopeManager
 {
+
+	/**
+	 * The prefix used for meta scope fragments holding project nature ids we prepend to the total scope.
+	 */
+	private static final String PROJECT_NATURE_SCOPE_PREFIX = "meta.project."; //$NON-NLS-1$
 
 	private static final QualifiedContentType UNKNOWN = new QualifiedContentType(ICommonConstants.CONTENT_TYPE_UKNOWN);
 	private Map<IDocument, ExtendedDocumentInfo> infos = new WeakHashMap<IDocument, ExtendedDocumentInfo>();
@@ -130,8 +141,13 @@ public class DocumentScopeManager implements IDocumentScopeManager
 		{
 			return StringUtil.EMPTY;
 		}
+
 		IDocument document = viewer.getDocument();
 		String partitionFragment = getPartitionScopeFragmentsAtOffset(document, offset);
+
+		// Prepend scope with meta scopes based on project natures of the associated project!
+		partitionFragment = prependNaturesToScope(viewer) + partitionFragment;
+
 		String tokenPortion = getTokenScopeFragments(viewer, document, offset);
 		if (tokenPortion != null)
 		{
@@ -146,6 +162,48 @@ public class DocumentScopeManager implements IDocumentScopeManager
 			}
 		}
 		return partitionFragment;
+	}
+
+	/**
+	 * We try to adapt the ITextViewer to our own base editor class and then from that grab the associated IProject if
+	 * possible. When we can, we then grab the list of project natures and convert them into scope fragments of
+	 * "meta.project.<nature.id>"
+	 * 
+	 * @param viewer
+	 * @return
+	 */
+	protected String prependNaturesToScope(ITextViewer viewer)
+	{
+		if (!(viewer instanceof IAdaptable))
+		{
+			return StringUtil.EMPTY;
+		}
+
+		IAdaptable adaptable = (IAdaptable) viewer;
+		AbstractThemeableEditor editor = (AbstractThemeableEditor) adaptable.getAdapter(AbstractThemeableEditor.class);
+		if (editor == null)
+		{
+			return StringUtil.EMPTY;
+		}
+
+		IProject project = EditorUtil.getProject(editor);
+		if (project == null)
+		{
+			return StringUtil.EMPTY;
+		}
+		try
+		{
+			String[] natures = project.getDescription().getNatureIds();
+			if (!ArrayUtil.isEmpty(natures))
+			{
+				return PROJECT_NATURE_SCOPE_PREFIX + StringUtil.join(" " + PROJECT_NATURE_SCOPE_PREFIX, natures) + ' '; //$NON-NLS-1$
+			}
+		}
+		catch (CoreException e)
+		{
+			// ignore
+		}
+		return StringUtil.EMPTY;
 	}
 
 	private String getTokenScopeFragments(ITextViewer viewer, IDocument document, int offset)
