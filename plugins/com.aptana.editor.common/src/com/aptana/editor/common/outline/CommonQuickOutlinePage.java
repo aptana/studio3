@@ -60,6 +60,7 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * @author Paul Colton
@@ -708,7 +709,7 @@ class CommonQuickOutlinePage extends ContentOutlinePage
 				getTreeViewer().getControl().setVisible(true);
 			}
 		};
-		sortAction.setImageDescriptor(CommonEditorPlugin.getImageDescriptor("icons/sort.gif")); //$NON-NLS-1$
+		sortAction.setImageDescriptor(UIUtils.getImageDescriptor(CommonEditorPlugin.PLUGIN_ID, "icons/sort.gif")); //$NON-NLS-1$
 		sortAction.setToolTipText(Messages.CommonQuickOutlinePage_SortAlphabetically);
 		// this._sortItem = new ActionContributionItem(sortAction);
 		manager.add(new ActionContributionItem(sortAction));
@@ -734,7 +735,8 @@ class CommonQuickOutlinePage extends ContentOutlinePage
 				getTreeViewer().expandAll();
 			}
 		};
-		expandAction.setImageDescriptor(CommonEditorPlugin.getImageDescriptor("icons/expandall.gif")); //$NON-NLS-1$
+		expandAction
+				.setImageDescriptor(UIUtils.getImageDescriptor(CommonEditorPlugin.PLUGIN_ID, "icons/expandall.gif")); //$NON-NLS-1$
 		expandAction.setToolTipText(Messages.CommonQuickOutlinePage_ExpandAll);
 		manager.add(new ActionContributionItem(expandAction));
 	}

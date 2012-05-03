@@ -58,6 +58,7 @@ import com.aptana.parsing.lexer.IRange;
 import com.aptana.theme.IControlThemerFactory;
 import com.aptana.theme.ThemePlugin;
 import com.aptana.theme.ThemedDelegatingLabelProvider;
+import com.aptana.ui.util.UIUtils;
 
 public class CommonOutlinePage extends ContentOutlinePage implements IPropertyChangeListener
 {
@@ -85,7 +86,7 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 			setText(Messages.CommonOutlinePage_Sorting_LBL);
 			setToolTipText(Messages.CommonOutlinePage_Sorting_TTP);
 			setDescription(Messages.CommonOutlinePage_Sorting_Description);
-			setImageDescriptor(CommonEditorPlugin.getImageDescriptor(ICON_PATH));
+			setImageDescriptor(UIUtils.getImageDescriptor(CommonEditorPlugin.PLUGIN_ID, ICON_PATH));
 
 			setChecked(isSortingEnabled());
 		}

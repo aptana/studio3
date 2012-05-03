@@ -72,6 +72,7 @@ import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.ui.util.UIUtils;
 import com.aptana.ui.widgets.CListTable;
 
 public class ValidationPreferencePage extends PreferencePage implements IWorkbenchPreferencePage
@@ -588,17 +589,17 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 			{
 				if (participant.isEnabled(IBuildParticipant.BuildType.BUILD))
 				{
-					return CommonEditorPlugin.getImage(CHECKMARK_ICON);
+					return UIUtils.getImage(CommonEditorPlugin.getDefault(), CHECKMARK_ICON);
 				}
-				return CommonEditorPlugin.getImage(RED_X_ICON);
+				return UIUtils.getImage(CommonEditorPlugin.getDefault(), RED_X_ICON);
 			}
 			else if (columnIndex == 2)
 			{
 				if (participant.isEnabled(IBuildParticipant.BuildType.RECONCILE))
 				{
-					return CommonEditorPlugin.getImage(CHECKMARK_ICON);
+					return UIUtils.getImage(CommonEditorPlugin.getDefault(), CHECKMARK_ICON);
 				}
-				return CommonEditorPlugin.getImage(RED_X_ICON);
+				return UIUtils.getImage(CommonEditorPlugin.getDefault(), RED_X_ICON);
 			}
 			return null;
 		}
