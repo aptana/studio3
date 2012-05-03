@@ -301,7 +301,7 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 				catch (beaver.Parser.Exception e)
 				{
 					IdeLog.logTrace(HTMLPlugin.getDefault(),
-							MessageFormat.format("Unable to parse the contents in {0}", srcPathOrURL), e, //$NON-NLS-1$
+							MessageFormat.format("Unable to parse the content in {0}", srcPathOrURL), e, //$NON-NLS-1$
 							IDebugScopes.OUTLINE);
 					elements = new Object[] { new OutlinePlaceholderItem(IStatus.ERROR,
 							Messages.HTMLOutlineContentProvider_ERR_ParseContent) };
