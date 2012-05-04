@@ -337,7 +337,11 @@ public class CollectionsUtil
 		{
 			for (T item : source)
 			{
-				destination.add(mapper.map(item));
+				U value = mapper.map(item);
+				if (value != null)
+				{
+					destination.add(value);
+				}
 			}
 			if (destination instanceof ArrayList)
 			{

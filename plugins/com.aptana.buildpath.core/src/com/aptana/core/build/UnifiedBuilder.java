@@ -31,6 +31,7 @@ import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
@@ -464,7 +465,8 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 
 			public IFileStore map(IFile item)
 			{
-				return EFS.getLocalFileSystem().getStore(item.getLocation());
+				IPath path = item.getLocation();
+				return (path == null) ? null : EFS.getLocalFileSystem().getStore(path);
 			}
 
 		}));
