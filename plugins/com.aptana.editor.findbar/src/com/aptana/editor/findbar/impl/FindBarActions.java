@@ -18,6 +18,7 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.NotEnabledException;
+import org.eclipse.core.commands.NotHandledException;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.jface.bindings.Binding;
 import org.eclipse.jface.bindings.BindingManagerEvent;
@@ -36,6 +37,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.contexts.IContextActivation;
@@ -123,6 +125,51 @@ public class FindBarActions
 		// even if the editor does not have focus.
 		fCommandToHandler.put("org.eclipse.ui.edit.undo", null); //$NON-NLS-1$
 		fCommandToHandler.put("org.eclipse.ui.edit.redo", null); //$NON-NLS-1$
+
+		fCommandToHandler.put(IWorkbenchCommandConstants.WINDOW_CLOSE_PART, null);
+
+		fCommandToHandler.put(IWorkbenchCommandConstants.FILE_CLOSE, null);
+		fCommandToHandler.put(IWorkbenchCommandConstants.FILE_CLOSE_ALL, null);
+
+		fCommandToHandler.put(IWorkbenchCommandConstants.FILE_SAVE, null);
+		fCommandToHandler.put(IWorkbenchCommandConstants.FILE_SAVE_ALL, null);
+
+		fCommandToHandler.put("org.eclipse.ui.navigate.openResource", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.eclipse.ui.views.showView", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.eclipse.ui.navigate.backwardHistory", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.eclipse.ui.navigate.forwardHistory", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.eclipse.ui.window.switchToEditor", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.eclipse.ui.window.nextEditor", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.eclipse.ui.window.previousEditor", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.eclipse.ui.window.nextView", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.eclipse.ui.window.previousView", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.eclipse.ui.window.nextPerspective", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.eclipse.ui.window.previousPerspective", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.eclipse.ui.part.nextPage", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.eclipse.ui.part.previousPage", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.eclipse.ui.window.showKeyAssist", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.eclipse.debug.ui.commands.RunLast", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.eclipse.debug.ui.commands.DebugLast", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.eclipse.debug.ui.commands.Terminate", null); //$NON-NLS-1$
+
+		// PyDev actions
+		fCommandToHandler.put("org.python.pydev.editor.actions.pyShowOutline", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.python.pydev.editor.actions.pyShowBrowser", null); //$NON-NLS-1$
+		fCommandToHandler.put("com.python.pydev.analysis.actions.pyGlobalsBrowserWorkbench", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.python.pydev.debug.ui.actions.runEditorBasedOnNatureTypeAction", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.python.pydev.debug.ui.actions.runEditorAsCustomUnitTestAction", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.python.pydev.debug.ui.actions.relaunchLastAction", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.python.pydev.debug.ui.actions.terminateAllLaunchesAction", null); //$NON-NLS-1$
+
+		// Aptana actions
+		fCommandToHandler.put("com.aptana.editor.NextEditorCommand", null); //$NON-NLS-1$
+		fCommandToHandler.put("com.aptana.editor.PreviousEditorCommand", null); //$NON-NLS-1$
+		fCommandToHandler.put("com.aptana.editor.js.quick_outline", null); //$NON-NLS-1$
+		fCommandToHandler.put("com.aptana.editor.php.openType.command", null); //$NON-NLS-1$
+
+		// JDT actions
+		fCommandToHandler.put("org.eclipse.jdt.ui.navigate.open.type", null); //$NON-NLS-1$
+
 	}
 
 	/**
@@ -252,10 +299,17 @@ public class FindBarActions
 								{
 									handlerService.executeCommand(entry.getKey(), null);
 								}
+								catch (NotHandledException e1)
+								{
+									// Ignore it in this case (i.e.: the command may be there without any handler).
+									continue;
+								}
+
 								catch (NotEnabledException e1)
 								{
 									// Ignore it in this case (i.e.: undo will only be enabled if there's something
 									// to be undone).
+									continue;
 								}
 								catch (Exception e1)
 								{
@@ -580,22 +634,44 @@ public class FindBarActions
 		IBindingService service = (IBindingService) site.getService(IBindingService.class);
 		Binding[] bindings = service.getBindings();
 
-		for (Map.Entry<String, AbstractHandler> entry : fCommandToHandler.entrySet())
+		for (int i = 0; i < bindings.length; i++)
 		{
-			List<TriggerSequence> seq = new ArrayList<TriggerSequence>();
-			commandToBinding.put(entry.getKey(), seq);
-			for (Binding binding : bindings)
+			Binding binding = bindings[i];
+			ParameterizedCommand command = binding.getParameterizedCommand();
+			if (command != null)
 			{
-				ParameterizedCommand command = binding.getParameterizedCommand();
-				if (command != null)
+				String id = command.getId();
+				// Filter only the actions we decided would be active.
+				//
+				// Note: we don't just make all actions active because they conflict with the find bar
+				// expected accelerators, so, things as Alt+W don't work -- even a second Ctrl+F isn't properly
+				// treated as specified in the options.
+				// A different option could be filtering those out and let everything else enabled,
+				// but this would need to be throughly tested to know if corner-cases work.
+				if (fCommandToHandler.containsKey(id))
 				{
-					if (entry.getKey().equals(command.getId()))
+					List<TriggerSequence> list = commandToBinding.get(id);
+					if (list == null)
 					{
-						seq.add(binding.getTriggerSequence());
+						list = new ArrayList<TriggerSequence>();
+						commandToBinding.put(id, list);
 					}
+					list.add(binding.getTriggerSequence());
 				}
-			}
 
+				// Uncomment to know which actions will be disabled
+				// else
+				// {
+				// try
+				// {
+				// System.out.println("Command disabled: " + id + ": " + command.getName());
+				// }
+				// catch (NotDefinedException e)
+				// {
+				//
+				// }
+				// }
+			}
 		}
 		return commandToBinding;
 	}
