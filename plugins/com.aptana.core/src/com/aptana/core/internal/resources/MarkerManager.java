@@ -183,7 +183,7 @@ public final class MarkerManager
 		else
 		{
 			IdeLog.logInfo(CorePlugin.getDefault(), MessageFormat.format(
-					"Could not remove a marker with id {0}. The rerouse-info returned null marker-set.", id)); //$NON-NLS-1$
+					"Could not remove the marker with the id {0}. The resource-info returned a null marker-set.", id)); //$NON-NLS-1$
 		}
 	}
 
