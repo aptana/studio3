@@ -10,11 +10,13 @@ package com.aptana.core.build;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 
 import com.aptana.buildpath.core.BuildPathCorePlugin;
@@ -31,9 +33,17 @@ import com.aptana.index.core.build.BuildContext;
 public class ReconcileContext extends BuildContext
 {
 
-	private final String contents;
-	private final String contentType;
+	private String contents;
+	private String contentType;
+	private URI uri;
 
+	/**
+	 * When reconciling a file that is in the workspace
+	 * 
+	 * @param contentType
+	 * @param file
+	 * @param contents
+	 */
 	public ReconcileContext(String contentType, IFile file, String contents)
 	{
 		super(file);
@@ -41,6 +51,41 @@ public class ReconcileContext extends BuildContext
 		this.contentType = contentType;
 	}
 
+	/**
+	 * When reconciling a file external to the workspace.
+	 * 
+	 * @param contentType
+	 * @param uri
+	 * @param contents
+	 */
+	public ReconcileContext(String contentType, URI uri, String contents)
+	{
+		this(contentType, (IFile) null, contents);
+		this.uri = uri;
+	}
+
+	@Override
+	public URI getURI()
+	{
+		if (uri != null)
+		{
+			return uri;
+		}
+		return super.getURI();
+	}
+
+	@Override
+	public String getName()
+	{
+		String name = super.getName();
+		if (name != null)
+		{
+			return name;
+		}
+		return Path.fromPortableString(getURI().getPath()).lastSegment();
+	}
+
+	@SuppressWarnings("sync-override")
 	@Override
 	public String getContents()
 	{

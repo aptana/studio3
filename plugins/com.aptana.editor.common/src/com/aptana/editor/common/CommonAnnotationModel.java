@@ -26,15 +26,14 @@ import com.aptana.core.util.CollectionsUtil;
 
 /**
  * Annotation Model for {@link IProblem}s. This model is used to draw annotations on the editor for
- * problems/tasks/warnings foudn during reconcile.
+ * problems/tasks/warnings found during reconcile.
  * 
  * @author cwilliams
  */
-public class CommonAnnotationModel extends ResourceMarkerAnnotationModel
+public class CommonAnnotationModel extends ResourceMarkerAnnotationModel implements ICommonAnnotationModel
 {
 
 	private List<ProblemAnnotation> fGeneratedAnnotations;
-	private IProgressMonitor fProgressMonitor;
 
 	public CommonAnnotationModel(IResource resource)
 	{
@@ -42,15 +41,13 @@ public class CommonAnnotationModel extends ResourceMarkerAnnotationModel
 		fGeneratedAnnotations = new ArrayList<ProblemAnnotation>();
 	}
 
-	/**
-	 * Signals the end of problem reporting.
-	 * 
-	 * @param map
-	 *            the map of Marker types to collection of "markers/problems" to report
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.ICommonAnnotationModel#reportProblems(java.util.Map)
 	 */
-	public void reportProblems(Map<String, Collection<IProblem>> map)
+	public void reportProblems(Map<String, Collection<IProblem>> map, IProgressMonitor monitor)
 	{
-		if (fProgressMonitor != null && fProgressMonitor.isCanceled())
+		if (monitor != null && monitor.isCanceled())
 		{
 			return;
 		}
@@ -79,7 +76,7 @@ public class CommonAnnotationModel extends ResourceMarkerAnnotationModel
 
 		synchronized (getLockObject())
 		{
-			if (fGeneratedAnnotations.size() > 0)
+			if (!CollectionsUtil.isEmpty(fGeneratedAnnotations))
 			{
 				temporaryProblemsChanged = true;
 				removeAnnotations(fGeneratedAnnotations, false, true);
@@ -95,7 +92,7 @@ public class CommonAnnotationModel extends ResourceMarkerAnnotationModel
 						for (IProblem problem : problems)
 						{
 
-							if (fProgressMonitor != null && fProgressMonitor.isCanceled())
+							if (monitor != null && monitor.isCanceled())
 							{
 								break;
 							}
@@ -142,10 +139,5 @@ public class CommonAnnotationModel extends ResourceMarkerAnnotationModel
 		}
 
 		return new Position(start, length);
-	}
-
-	public void setProgressMonitor(IProgressMonitor monitor)
-	{
-		fProgressMonitor = monitor;
 	}
 }

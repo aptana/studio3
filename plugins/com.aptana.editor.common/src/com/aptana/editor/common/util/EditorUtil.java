@@ -210,7 +210,7 @@ public class EditorUtil
 	 * @param editor
 	 * @return
 	 */
-	public static URI getURI(AbstractThemeableEditor editor)
+	public static URI getURI(IEditorPart editor)
 	{
 		// NOTE: Moved from CommonContentAssistProcessor
 		if (editor != null)

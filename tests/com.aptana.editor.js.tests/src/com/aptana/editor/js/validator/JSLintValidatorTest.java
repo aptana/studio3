@@ -77,7 +77,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "'hello' was used before it was defined.", 3, IMarker.SEVERITY_WARNING, 51);
+		assertProblemExists(items, "'hello' was used before it was defined.", 3, IMarker.SEVERITY_WARNING, 50);
 	}
 
 	public void testVarANot() throws CoreException
@@ -85,7 +85,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		String text = "var chris = blah = 'something';";
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Variable blah was not declared correctly.", 1, IMarker.SEVERITY_WARNING, 13);
+		assertProblemExists(items, "Variable blah was not declared correctly.", 1, IMarker.SEVERITY_WARNING, 12);
 	}
 
 	public void testUsedBeforeA() throws CoreException
@@ -98,7 +98,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "'foo' was used before it was defined.", 3, IMarker.SEVERITY_WARNING, 59);
+		assertProblemExists(items, "'foo' was used before it was defined.", 3, IMarker.SEVERITY_WARNING, 58);
 	}
 
 	public void testWriteIsWrong() throws CoreException
@@ -109,7 +109,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "document.write can be a form of eval.", 2, IMarker.SEVERITY_WARNING, 25);
+		assertProblemExists(items, "document.write can be a form of eval.", 2, IMarker.SEVERITY_WARNING, 24);
 	}
 
 	public void testWriteIsWrong2() throws CoreException
@@ -120,7 +120,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "document.write can be a form of eval.", 2, IMarker.SEVERITY_WARNING, 25);
+		assertProblemExists(items, "document.write can be a form of eval.", 2, IMarker.SEVERITY_WARNING, 24);
 	}
 
 	public void testWrapRegexp() throws CoreException
@@ -131,7 +131,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 
 		List<IProblem> items = getParseErrors(text);
 		assertProblemExists(items, "Wrap the /regexp/ literal in parens to disambiguate the slash operator.", 1,
-				IMarker.SEVERITY_WARNING, 27);
+				IMarker.SEVERITY_WARNING, 26);
 	}
 
 	public void testWrapImmediate() throws CoreException
@@ -145,7 +145,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		assertProblemExists(
 				items,
 				"Wrap an immediate function invocation in parentheses to assist the reader in understanding that the expression is the result of a function, and not the function itself.",
-				2, IMarker.SEVERITY_WARNING, 31);
+				2, IMarker.SEVERITY_WARNING, 30);
 	}
 
 	public void testFixedWrapImmediate() throws CoreException
@@ -168,7 +168,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Weird ternary.", 1, IMarker.SEVERITY_WARNING, 24);
+		assertProblemExists(items, "Weird ternary.", 1, IMarker.SEVERITY_WARNING, 23);
 	}
 
 	public void testWeirdTernary2() throws CoreException
@@ -178,7 +178,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Weird ternary.", 1, IMarker.SEVERITY_WARNING, 31);
+		assertProblemExists(items, "Weird ternary.", 1, IMarker.SEVERITY_WARNING, 30);
 	}
 
 	public void testWeirdRelation1() throws CoreException
@@ -188,7 +188,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Weird relation.", 1, IMarker.SEVERITY_WARNING, 17);
+		assertProblemExists(items, "Weird relation.", 1, IMarker.SEVERITY_WARNING, 16);
 	}
 
 	public void testWeirdRelation2() throws CoreException
@@ -198,7 +198,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Weird relation.", 1, IMarker.SEVERITY_WARNING, 19);
+		assertProblemExists(items, "Weird relation.", 1, IMarker.SEVERITY_WARNING, 18);
 	}
 
 	public void testWeirdRelation3() throws CoreException
@@ -208,7 +208,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Weird relation.", 1, IMarker.SEVERITY_WARNING, 19);
+		assertProblemExists(items, "Weird relation.", 1, IMarker.SEVERITY_WARNING, 18);
 	}
 
 	public void testWeirdRelation4() throws CoreException
@@ -218,7 +218,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Weird relation.", 1, IMarker.SEVERITY_WARNING, 19);
+		assertProblemExists(items, "Weird relation.", 1, IMarker.SEVERITY_WARNING, 18);
 	}
 
 	public void testWeirdRelation5() throws CoreException
@@ -228,7 +228,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Weird relation.", 1, IMarker.SEVERITY_WARNING, 19);
+		assertProblemExists(items, "Weird relation.", 1, IMarker.SEVERITY_WARNING, 18);
 	}
 
 	public void testWeirdRelation6() throws CoreException
@@ -238,7 +238,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Weird relation.", 1, IMarker.SEVERITY_WARNING, 19);
+		assertProblemExists(items, "Weird relation.", 1, IMarker.SEVERITY_WARNING, 18);
 	}
 
 	public void testWeirdRelation7() throws CoreException
@@ -248,7 +248,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Weird relation.", 1, IMarker.SEVERITY_WARNING, 19);
+		assertProblemExists(items, "Weird relation.", 1, IMarker.SEVERITY_WARNING, 18);
 	}
 
 	public void testWeirdRelation8() throws CoreException
@@ -258,7 +258,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Weird relation.", 1, IMarker.SEVERITY_WARNING, 19);
+		assertProblemExists(items, "Weird relation.", 1, IMarker.SEVERITY_WARNING, 18);
 	}
 
 	public void testWeirdProgram1() throws CoreException
@@ -268,7 +268,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Weird program.", 1, IMarker.SEVERITY_WARNING, 1);
+		assertProblemExists(items, "Weird program.", 1, IMarker.SEVERITY_WARNING, 0);
 	}
 
 	public void testWeirdProgram2() throws CoreException
@@ -278,7 +278,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Weird program.", 1, IMarker.SEVERITY_WARNING, 1);
+		assertProblemExists(items, "Weird program.", 1, IMarker.SEVERITY_WARNING, 0);
 	}
 
 	public void testWeirdProgram3() throws CoreException
@@ -288,7 +288,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Weird program.", 1, IMarker.SEVERITY_WARNING, 1);
+		assertProblemExists(items, "Weird program.", 1, IMarker.SEVERITY_WARNING, 0);
 	}
 
 	public void testWeirdProgram4() throws CoreException
@@ -298,7 +298,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Weird program.", 1, IMarker.SEVERITY_WARNING, 7);
+		assertProblemExists(items, "Weird program.", 1, IMarker.SEVERITY_WARNING, 6);
 	}
 
 	public void testWeirdNew() throws CoreException
@@ -308,7 +308,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Weird construction. Delete 'new'.", 1, IMarker.SEVERITY_WARNING, 15);
+		assertProblemExists(items, "Weird construction. Delete 'new'.", 1, IMarker.SEVERITY_WARNING, 14);
 	}
 
 	public void testUseOr() throws CoreException
@@ -318,7 +318,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Use the || operator.", 1, IMarker.SEVERITY_WARNING, 21);
+		assertProblemExists(items, "Use the || operator.", 1, IMarker.SEVERITY_WARNING, 20);
 	}
 
 	public void testWeirdCondition1() throws CoreException
@@ -328,7 +328,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Weird condition.", 1, IMarker.SEVERITY_WARNING, 15);
+		assertProblemExists(items, "Weird condition.", 1, IMarker.SEVERITY_WARNING, 14);
 	}
 
 	public void testWeirdCondition2() throws CoreException
@@ -338,7 +338,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Weird condition.", 1, IMarker.SEVERITY_WARNING, 15);
+		assertProblemExists(items, "Weird condition.", 1, IMarker.SEVERITY_WARNING, 14);
 	}
 
 	public void testWeirdCondition3() throws CoreException
@@ -348,7 +348,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Weird condition.", 1, IMarker.SEVERITY_WARNING, 15);
+		assertProblemExists(items, "Weird condition.", 1, IMarker.SEVERITY_WARNING, 14);
 	}
 
 	public void testWeirdCondition4() throws CoreException
@@ -360,7 +360,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Weird condition.", 1, IMarker.SEVERITY_WARNING, 5);
+		assertProblemExists(items, "Weird condition.", 1, IMarker.SEVERITY_WARNING, 4);
 	}
 
 	public void testWeirdAssignment() throws CoreException
@@ -371,7 +371,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Weird assignment.", 2, IMarker.SEVERITY_WARNING, 14);
+		assertProblemExists(items, "Weird assignment.", 2, IMarker.SEVERITY_WARNING, 13);
 	}
 
 	public void testUseParam() throws CoreException
@@ -383,7 +383,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Use a named parameter.", 2, IMarker.SEVERITY_WARNING, 34);
+		assertProblemExists(items, "Use a named parameter.", 2, IMarker.SEVERITY_WARNING, 33);
 	}
 
 	public void testUseObject() throws CoreException
@@ -393,7 +393,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Use the object literal notation {}.", 1, IMarker.SEVERITY_WARNING, 15);
+		assertProblemExists(items, "Use the object literal notation {}.", 1, IMarker.SEVERITY_WARNING, 14);
 	}
 
 	public void testUseObject2() throws CoreException
@@ -403,7 +403,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Use the object literal notation {}.", 1, IMarker.SEVERITY_WARNING, 17);
+		assertProblemExists(items, "Use the object literal notation {}.", 1, IMarker.SEVERITY_WARNING, 16);
 	}
 
 	public void testUseBraces() throws CoreException
@@ -413,7 +413,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Spaces are hard to count. Use {2}.", 1, IMarker.SEVERITY_WARNING, 16);
+		assertProblemExists(items, "Spaces are hard to count. Use {2}.", 1, IMarker.SEVERITY_WARNING, 15);
 	}
 
 	public void testUseArray() throws CoreException
@@ -423,7 +423,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Use the array literal notation [].", 1, IMarker.SEVERITY_WARNING, 22);
+		assertProblemExists(items, "Use the array literal notation [].", 1, IMarker.SEVERITY_WARNING, 21);
 	}
 
 	public void testUseArray2() throws CoreException
@@ -433,7 +433,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Use the array literal notation [].", 1, IMarker.SEVERITY_WARNING, 22);
+		assertProblemExists(items, "Use the array literal notation [].", 1, IMarker.SEVERITY_WARNING, 21);
 	}
 
 	public void testUseArray3() throws CoreException
@@ -443,7 +443,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Use the array literal notation [].", 1, IMarker.SEVERITY_WARNING, 17);
+		assertProblemExists(items, "Use the array literal notation [].", 1, IMarker.SEVERITY_WARNING, 16);
 	}
 
 	public void testUseArray4() throws CoreException
@@ -453,7 +453,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Use the array literal notation [].", 1, IMarker.SEVERITY_WARNING, 10);
+		assertProblemExists(items, "Use the array literal notation [].", 1, IMarker.SEVERITY_WARNING, 9);
 	}
 
 	public void testURL() throws CoreException
@@ -463,7 +463,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "JavaScript URL.", 1, IMarker.SEVERITY_WARNING, 14);
+		assertProblemExists(items, "JavaScript URL.", 1, IMarker.SEVERITY_WARNING, 13);
 	}
 
 	public void testURL2() throws CoreException
@@ -473,7 +473,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "JavaScript URL.", 1, IMarker.SEVERITY_WARNING, 14);
+		assertProblemExists(items, "JavaScript URL.", 1, IMarker.SEVERITY_WARNING, 13);
 	}
 
 	public void testURL3() throws CoreException
@@ -483,7 +483,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "JavaScript URL.", 1, IMarker.SEVERITY_WARNING, 14);
+		assertProblemExists(items, "JavaScript URL.", 1, IMarker.SEVERITY_WARNING, 13);
 	}
 
 	public void testURL4() throws CoreException
@@ -493,7 +493,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "JavaScript URL.", 1, IMarker.SEVERITY_WARNING, 14);
+		assertProblemExists(items, "JavaScript URL.", 1, IMarker.SEVERITY_WARNING, 13);
 	}
 
 	public void testURL5() throws CoreException
@@ -503,7 +503,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "JavaScript URL.", 1, IMarker.SEVERITY_WARNING, 14);
+		assertProblemExists(items, "JavaScript URL.", 1, IMarker.SEVERITY_WARNING, 13);
 	}
 
 	public void testURL6() throws CoreException
@@ -513,7 +513,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "JavaScript URL.", 1, IMarker.SEVERITY_WARNING, 14);
+		assertProblemExists(items, "JavaScript URL.", 1, IMarker.SEVERITY_WARNING, 13);
 	}
 
 	public void testURL7() throws CoreException
@@ -523,7 +523,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "JavaScript URL.", 1, IMarker.SEVERITY_WARNING, 14);
+		assertProblemExists(items, "JavaScript URL.", 1, IMarker.SEVERITY_WARNING, 13);
 	}
 
 	public void testURL8() throws CoreException
@@ -538,7 +538,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "JavaScript URL.", 2, IMarker.SEVERITY_WARNING, 18);
+		assertProblemExists(items, "JavaScript URL.", 2, IMarker.SEVERITY_WARNING, 17);
 	}
 
 	// FIXME I can't seem to find a way to insert the required special characters into the string
@@ -559,7 +559,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Unrecognized tag '<madeup>'.", 1, IMarker.SEVERITY_WARNING, 8);
+		assertProblemExists(items, "Unrecognized tag '<madeup>'.", 1, IMarker.SEVERITY_WARNING, 7);
 	}
 
 	public void testUnrecognizedStyleAttributeA() throws CoreException
@@ -573,7 +573,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Unrecognized style attribute 'fake'.", 3, IMarker.SEVERITY_WARNING, 27);
+		assertProblemExists(items, "Unrecognized style attribute 'fake'.", 3, IMarker.SEVERITY_WARNING, 26);
 	}
 
 	public void testTrailingDecimalA() throws CoreException
@@ -584,7 +584,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 
 		List<IProblem> items = getParseErrors(text);
 		assertProblemExists(items, "A trailing decimal point can be confused with a dot: '.1.'.", 1,
-				IMarker.SEVERITY_WARNING, 16);
+				IMarker.SEVERITY_WARNING, 15);
 	}
 
 	public void testReservedA1() throws CoreException
@@ -594,7 +594,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Reserved name '__iterator__'.", 1, IMarker.SEVERITY_WARNING, 5);
+		assertProblemExists(items, "Reserved name '__iterator__'.", 1, IMarker.SEVERITY_WARNING, 4);
 	}
 
 	public void testReservedA2() throws CoreException
@@ -604,7 +604,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Reserved name '__proto__'.", 1, IMarker.SEVERITY_WARNING, 5);
+		assertProblemExists(items, "Reserved name '__proto__'.", 1, IMarker.SEVERITY_WARNING, 4);
 	}
 
 	public void testRadix() throws CoreException
@@ -614,7 +614,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Missing radix parameter.", 1, IMarker.SEVERITY_WARNING, 14);
+		assertProblemExists(items, "Missing radix parameter.", 1, IMarker.SEVERITY_WARNING, 13);
 	}
 
 	public void testFunctionEval() throws CoreException
@@ -624,7 +624,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "The Function constructor is eval.", 1, IMarker.SEVERITY_WARNING, 26);
+		assertProblemExists(items, "The Function constructor is eval.", 1, IMarker.SEVERITY_WARNING, 25);
 	}
 
 	public void testEvil1() throws CoreException
@@ -634,7 +634,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "eval is evil.", 1, IMarker.SEVERITY_WARNING, 1);
+		assertProblemExists(items, "eval is evil.", 1, IMarker.SEVERITY_WARNING, 0);
 	}
 
 	public void testEvil2() throws CoreException
@@ -645,7 +645,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "eval is evil.", 2, IMarker.SEVERITY_WARNING, 19);
+		assertProblemExists(items, "eval is evil.", 2, IMarker.SEVERITY_WARNING, 18);
 	}
 
 	public void testEvil3() throws CoreException
@@ -656,7 +656,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "eval is evil.", 2, IMarker.SEVERITY_WARNING, 30);
+		assertProblemExists(items, "eval is evil.", 2, IMarker.SEVERITY_WARNING, 29);
 	}
 
 	public void testDanglingA1() throws CoreException
@@ -666,7 +666,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Unexpected dangling '_' in '_foo'.", 1, IMarker.SEVERITY_WARNING, 5);
+		assertProblemExists(items, "Unexpected dangling '_' in '_foo'.", 1, IMarker.SEVERITY_WARNING, 4);
 	}
 
 	public void testDanglingA2() throws CoreException
@@ -676,7 +676,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Unexpected dangling '_' in 'foo_'.", 1, IMarker.SEVERITY_WARNING, 5);
+		assertProblemExists(items, "Unexpected dangling '_' in 'foo_'.", 1, IMarker.SEVERITY_WARNING, 4);
 	}
 
 	public void testImpliedEvil1() throws CoreException
@@ -687,7 +687,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 
 		List<IProblem> items = getParseErrors(text);
 		assertProblemExists(items, "Implied eval is evil. Pass a function instead of a string.", 1,
-				IMarker.SEVERITY_WARNING, 1);
+				IMarker.SEVERITY_WARNING, 0);
 	}
 
 	public void testImpliedEvil2() throws CoreException
@@ -698,7 +698,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 
 		List<IProblem> items = getParseErrors(text);
 		assertProblemExists(items, "Implied eval is evil. Pass a function instead of a string.", 1,
-				IMarker.SEVERITY_WARNING, 1);
+				IMarker.SEVERITY_WARNING, 0);
 	}
 
 	public void testIsNaN1() throws CoreException
@@ -708,7 +708,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Use the isNaN function to compare with NaN.", 1, IMarker.SEVERITY_WARNING, 14);
+		assertProblemExists(items, "Use the isNaN function to compare with NaN.", 1, IMarker.SEVERITY_WARNING, 13);
 	}
 
 	public void testIsNaN2() throws CoreException
@@ -718,7 +718,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Use the isNaN function to compare with NaN.", 1, IMarker.SEVERITY_WARNING, 14);
+		assertProblemExists(items, "Use the isNaN function to compare with NaN.", 1, IMarker.SEVERITY_WARNING, 13);
 	}
 
 	public void testIsNaN3() throws CoreException
@@ -728,7 +728,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Use the isNaN function to compare with NaN.", 1, IMarker.SEVERITY_WARNING, 14);
+		assertProblemExists(items, "Use the isNaN function to compare with NaN.", 1, IMarker.SEVERITY_WARNING, 13);
 	}
 
 	public void testIsNaN4() throws CoreException
@@ -738,7 +738,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Use the isNaN function to compare with NaN.", 1, IMarker.SEVERITY_WARNING, 14);
+		assertProblemExists(items, "Use the isNaN function to compare with NaN.", 1, IMarker.SEVERITY_WARNING, 13);
 	}
 
 	public void testIsNaN5() throws CoreException
@@ -748,7 +748,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Use the isNaN function to compare with NaN.", 1, IMarker.SEVERITY_WARNING, 14);
+		assertProblemExists(items, "Use the isNaN function to compare with NaN.", 1, IMarker.SEVERITY_WARNING, 13);
 	}
 
 	public void testIsNaN6() throws CoreException
@@ -758,7 +758,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Use the isNaN function to compare with NaN.", 1, IMarker.SEVERITY_WARNING, 14);
+		assertProblemExists(items, "Use the isNaN function to compare with NaN.", 1, IMarker.SEVERITY_WARNING, 13);
 	}
 
 	public void testIsNaN7() throws CoreException
@@ -768,7 +768,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Use the isNaN function to compare with NaN.", 1, IMarker.SEVERITY_WARNING, 14);
+		assertProblemExists(items, "Use the isNaN function to compare with NaN.", 1, IMarker.SEVERITY_WARNING, 13);
 	}
 
 	public void testIsNaN8() throws CoreException
@@ -778,7 +778,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Use the isNaN function to compare with NaN.", 1, IMarker.SEVERITY_WARNING, 18);
+		assertProblemExists(items, "Use the isNaN function to compare with NaN.", 1, IMarker.SEVERITY_WARNING, 17);
 	}
 
 	public void testSubscript() throws CoreException
@@ -789,7 +789,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "['something'] is better written in dot notation.", 2, IMarker.SEVERITY_WARNING, 27);
+		assertProblemExists(items, "['something'] is better written in dot notation.", 2, IMarker.SEVERITY_WARNING, 26);
 	}
 
 	public void testSubscriptOK() throws CoreException
@@ -811,7 +811,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Unexpected sync method: 'methodSync'.", 2, IMarker.SEVERITY_WARNING, 27);
+		assertProblemExists(items, "Unexpected sync method: 'methodSync'.", 2, IMarker.SEVERITY_WARNING, 26);
 	}
 
 	public void testLeadingDecimalA() throws CoreException
@@ -822,7 +822,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 
 		List<IProblem> items = getParseErrors(text);
 		assertProblemExists(items, "A leading decimal point can be confused with a dot: '.8'.", 1,
-				IMarker.SEVERITY_WARNING, 14);
+				IMarker.SEVERITY_WARNING, 13);
 	}
 
 	public void testNestedNot() throws CoreException
@@ -840,7 +840,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Nested not.", 4, IMarker.SEVERITY_WARNING, 28);
+		assertProblemExists(items, "Nested not.", 4, IMarker.SEVERITY_WARNING, 27);
 	}
 
 	public void testAnd() throws CoreException
@@ -855,7 +855,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 
 		List<IProblem> items = getParseErrors(text);
 		assertProblemExists(items, "The '&&' subexpression should be wrapped in parens.", 5, IMarker.SEVERITY_WARNING,
-				79);
+				78);
 	}
 
 	public void testAvoidA1() throws CoreException
@@ -867,7 +867,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Avoid 'arguments.caller'.", 2, IMarker.SEVERITY_WARNING, 33);
+		assertProblemExists(items, "Avoid 'arguments.caller'.", 2, IMarker.SEVERITY_WARNING, 32);
 	}
 
 	public void testAvoidA2() throws CoreException
@@ -879,7 +879,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Avoid 'arguments.callee'.", 2, IMarker.SEVERITY_WARNING, 33);
+		assertProblemExists(items, "Avoid 'arguments.callee'.", 2, IMarker.SEVERITY_WARNING, 32);
 	}
 
 	public void testConstructorNameA1() throws CoreException
@@ -891,7 +891,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 
 		List<IProblem> items = getParseErrors(text);
 		assertProblemExists(items, "A constructor name 'bar' should start with an uppercase letter.", 2,
-				IMarker.SEVERITY_WARNING, 33);
+				IMarker.SEVERITY_WARNING, 32);
 	}
 
 	public void testEmptyClass() throws CoreException
@@ -901,7 +901,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Empty class.", 1, IMarker.SEVERITY_WARNING, 14);
+		assertProblemExists(items, "Empty class.", 1, IMarker.SEVERITY_WARNING, 13);
 	}
 
 	public void testEmptyCase() throws CoreException
@@ -917,7 +917,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Empty case.", 5, IMarker.SEVERITY_WARNING, 60);
+		assertProblemExists(items, "Empty case.", 5, IMarker.SEVERITY_WARNING, 59);
 	}
 
 	public void testStrangeLoop1() throws CoreException
@@ -931,7 +931,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Strange loop.", 4, IMarker.SEVERITY_WARNING, 63);
+		assertProblemExists(items, "Strange loop.", 4, IMarker.SEVERITY_WARNING, 62);
 	}
 
 	public void testStrangeLoop2() throws CoreException
@@ -945,7 +945,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Strange loop.", 4, IMarker.SEVERITY_WARNING, 44);
+		assertProblemExists(items, "Strange loop.", 4, IMarker.SEVERITY_WARNING, 43);
 	}
 
 	public void testStrangeLoop3() throws CoreException
@@ -959,7 +959,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Strange loop.", 4, IMarker.SEVERITY_WARNING, 64);
+		assertProblemExists(items, "Strange loop.", 4, IMarker.SEVERITY_WARNING, 63);
 	}
 
 	public void testNameFunction() throws CoreException
@@ -969,7 +969,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Missing name in function statement.", 1, IMarker.SEVERITY_WARNING, 10);
+		assertProblemExists(items, "Missing name in function statement.", 1, IMarker.SEVERITY_WARNING, 9);
 	}
 
 	public void testAssignException() throws CoreException
@@ -985,7 +985,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Do not assign to the exception parameter.", 5, IMarker.SEVERITY_WARNING, 79);
+		assertProblemExists(items, "Do not assign to the exception parameter.", 5, IMarker.SEVERITY_WARNING, 78);
 	}
 
 	public void testBadNumber1() throws CoreException
@@ -995,7 +995,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Bad number '1.7976931348623157e+309'.", 1, IMarker.SEVERITY_WARNING, 37);
+		assertProblemExists(items, "Bad number '1.7976931348623157e+309'.", 1, IMarker.SEVERITY_WARNING, 36);
 	}
 
 	public void testBadNumber2() throws CoreException
@@ -1005,7 +1005,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Bad number '1.7976931348623157e+309'.", 1, IMarker.SEVERITY_WARNING, 38);
+		assertProblemExists(items, "Bad number '1.7976931348623157e+309'.", 1, IMarker.SEVERITY_WARNING, 37);
 	}
 
 	public void testBadNameA1() throws CoreException
@@ -1015,7 +1015,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Bad name: '123'.", 1, IMarker.SEVERITY_WARNING, 13);
+		assertProblemExists(items, "Bad name: '123'.", 1, IMarker.SEVERITY_WARNING, 12);
 	}
 
 	public void testBadNameA2() throws CoreException
@@ -1025,7 +1025,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Bad name: '1'.", 1, IMarker.SEVERITY_WARNING, 15);
+		assertProblemExists(items, "Bad name: '1'.", 1, IMarker.SEVERITY_WARNING, 14);
 	}
 
 	public void testBadAssignmentA1() throws CoreException
@@ -1035,7 +1035,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Bad assignment.", 1, IMarker.SEVERITY_WARNING, 10);
+		assertProblemExists(items, "Bad assignment.", 1, IMarker.SEVERITY_WARNING, 9);
 	}
 
 	public void testBadAssignmentA2() throws CoreException
@@ -1045,7 +1045,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Bad assignment.", 1, IMarker.SEVERITY_WARNING, 35);
+		assertProblemExists(items, "Bad assignment.", 1, IMarker.SEVERITY_WARNING, 34);
 	}
 
 	public void testBadAssignmentA3() throws CoreException
@@ -1055,7 +1055,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Bad assignment.", 1, IMarker.SEVERITY_WARNING, 31);
+		assertProblemExists(items, "Bad assignment.", 1, IMarker.SEVERITY_WARNING, 30);
 	}
 
 	public void testBadAssignmentA4() throws CoreException
@@ -1065,7 +1065,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Bad assignment.", 1, IMarker.SEVERITY_WARNING, 32);
+		assertProblemExists(items, "Bad assignment.", 1, IMarker.SEVERITY_WARNING, 31);
 	}
 
 	public void testBadAssignmentA5() throws CoreException
@@ -1075,7 +1075,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Bad assignment.", 1, IMarker.SEVERITY_WARNING, 7);
+		assertProblemExists(items, "Bad assignment.", 1, IMarker.SEVERITY_WARNING, 6);
 	}
 
 	public void testDelete1() throws CoreException
@@ -1086,7 +1086,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Only properties should be deleted.", 2, IMarker.SEVERITY_WARNING, 20);
+		assertProblemExists(items, "Only properties should be deleted.", 2, IMarker.SEVERITY_WARNING, 19);
 	}
 
 	public void testDelete2() throws CoreException
@@ -1097,7 +1097,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Only properties should be deleted.", 2, IMarker.SEVERITY_WARNING, 25);
+		assertProblemExists(items, "Only properties should be deleted.", 2, IMarker.SEVERITY_WARNING, 24);
 	}
 
 	public void testDeleteOK() throws CoreException
@@ -1109,6 +1109,18 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 
 		List<IProblem> items = getParseErrors(text);
 		assertDoesntContain(items, "Only properties should be deleted.");
+	}
+
+	public void testTabsDontMessUpOffset() throws CoreException
+	{
+		// @formatter:off
+			String text = "function x() {\n" +
+					"	eval('blah!');\n" +
+					"}";
+			// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "eval is evil.", 2, IMarker.SEVERITY_WARNING, 16);
 	}
 
 	protected void assertProblemExists(List<IProblem> items, String msg, int line, int severity, int offset)
