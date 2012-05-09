@@ -7,24 +7,48 @@
  */
 package com.aptana.jira.core;
 
+import java.util.Map;
+
+import com.aptana.core.util.CollectionsUtil;
+
+@SuppressWarnings("nls")
 public enum JiraIssueType
 {
 
-	BUG(Messages.JiraIssueType_Bug, "bug"), //$NON-NLS-1$
-	FEATURE(Messages.JiraIssueType_Feature, "story"), //$NON-NLS-1$
-	IMPROVEMENT(Messages.JiraIssueType_Improvement, "improvement"); //$NON-NLS-1$
+	// @formatter:off
+	BUG(Messages.JiraIssueType_Bug, "bug"),
+	FEATURE(Messages.JiraIssueType_Feature, JiraManager.APTANA_STUDIO, "story", JiraManager.TITANIUM_COMMUNITY, "New Feature"),
+	IMPROVEMENT(Messages.JiraIssueType_Improvement, "improvement");
+	// @formatter:on
 
 	private String displayName;
-	private String parameterName;
+
+	/**
+	 * Holds the parameter value for all projects. (if it never differs).
+	 */
+	private String parameterValue;
+
+	/**
+	 * If the parameter value differs by the project, this stores the mappings from project keys to values.
+	 */
+	private Map<String, String> projectKeysToParameterValues;
 
 	public String getDisplayName()
 	{
 		return displayName;
 	}
 
-	public String getParameterName()
+	public String getParameterValue(String projectKey)
 	{
-		return parameterName;
+		if (projectKeysToParameterValues != null)
+		{
+			String name = projectKeysToParameterValues.get(projectKey);
+			if (name != null)
+			{
+				return name;
+			}
+		}
+		return parameterValue;
 	}
 
 	@Override
@@ -33,9 +57,15 @@ public enum JiraIssueType
 		return displayName;
 	}
 
-	private JiraIssueType(String displayName, String parameterName)
+	private JiraIssueType(String displayName, String parameterValue)
 	{
 		this.displayName = displayName;
-		this.parameterName = parameterName;
+		this.parameterValue = parameterValue;
+	}
+
+	private JiraIssueType(String displayName, String... projectKeysToParameterValues)
+	{
+		this.displayName = displayName;
+		this.projectKeysToParameterValues = CollectionsUtil.newMap(projectKeysToParameterValues);
 	}
 }

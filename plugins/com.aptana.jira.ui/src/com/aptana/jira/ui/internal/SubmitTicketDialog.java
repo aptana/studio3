@@ -7,6 +7,7 @@
  */
 package com.aptana.jira.ui.internal;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -48,6 +49,7 @@ import com.aptana.core.CoreStrings;
 import com.aptana.core.util.StringUtil;
 import com.aptana.jira.core.JiraCorePlugin;
 import com.aptana.jira.core.JiraIssuePriority;
+import com.aptana.jira.core.JiraIssueSeverity;
 import com.aptana.jira.core.JiraIssueType;
 import com.aptana.jira.core.JiraManager;
 import com.aptana.jira.ui.JiraUIPlugin;
@@ -67,8 +69,11 @@ public class SubmitTicketDialog extends TitleAreaDialog
 	private Control userInfoControl;
 	private ComboViewer typeCombo;
 	private ComboViewer priorityCombo;
+	private ComboViewer severityCombo;
 	private Text summaryText;
-	private Text descriptionText;
+	private Text reproduceText;
+	private Text actualResultText;
+	private Text expectedResultText;
 	private Button studioLogCheckbox;
 	private Button diagnosticLogCheckbox;
 	private Text screenshotText;
@@ -79,6 +84,7 @@ public class SubmitTicketDialog extends TitleAreaDialog
 
 	private JiraIssueType type;
 	private JiraIssuePriority priority;
+	private JiraIssueSeverity severity;
 	private String summary;
 	private String description;
 	private boolean studioLogSelected;
@@ -105,6 +111,11 @@ public class SubmitTicketDialog extends TitleAreaDialog
 	public JiraIssuePriority getPriority()
 	{
 		return priority;
+	}
+
+	public JiraIssueSeverity getSeverity()
+	{
+		return severity;
 	}
 
 	/**
@@ -190,10 +201,12 @@ public class SubmitTicketDialog extends TitleAreaDialog
 		};
 		typeCombo.addSelectionChangedListener(listener);
 
+		// TODO Do we want to hide priority from users?
 		// priority
 		label = new Label(main, SWT.NONE);
 		label.setText(StringUtil.makeFormLabel(Messages.SubmitTicketDialog_LBL_Priority));
 		label.setLayoutData(GridDataFactory.swtDefaults().create());
+
 		priorityCombo = new ComboViewer(main, SWT.DROP_DOWN | SWT.READ_ONLY);
 		priorityCombo.setContentProvider(ArrayContentProvider.getInstance());
 		priorityCombo.setLabelProvider(new LabelProvider());
@@ -202,10 +215,25 @@ public class SubmitTicketDialog extends TitleAreaDialog
 		priorityCombo.setSelection(new StructuredSelection(JiraIssuePriority.MEDIUM));
 		priorityCombo.addSelectionChangedListener(listener);
 
+		// FIXME Severity doesn't apply for Story in Studio tracker
+		// severity
+		label = new Label(main, SWT.NONE);
+		label.setText(StringUtil.makeFormLabel(Messages.SubmitTicketDialog_LBL_Severity));
+		label.setLayoutData(GridDataFactory.swtDefaults().create());
+
+		severityCombo = new ComboViewer(main, SWT.DROP_DOWN | SWT.READ_ONLY);
+		severityCombo.setContentProvider(ArrayContentProvider.getInstance());
+		severityCombo.setLabelProvider(new LabelProvider());
+		severityCombo.setInput(JiraIssueSeverity.values());
+		severityCombo.getControl().setLayoutData(GridDataFactory.swtDefaults().create());
+		severityCombo.setSelection(new StructuredSelection(JiraIssueSeverity.MINOR));
+		severityCombo.addSelectionChangedListener(listener);
+
 		// summary
 		label = new Label(main, SWT.NONE);
 		label.setText(StringUtil.makeFormLabel(Messages.SubmitTicketDialog_LBL_Summary));
 		label.setLayoutData(GridDataFactory.swtDefaults().create());
+
 		summaryText = new Text(main, SWT.BORDER | SWT.SINGLE);
 		summaryText.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).create());
 		ModifyListener modifyListener = new ModifyListener()
@@ -218,18 +246,39 @@ public class SubmitTicketDialog extends TitleAreaDialog
 		};
 		summaryText.addModifyListener(modifyListener);
 
-		// description
+		// Steps to Reproduce
 		label = new Label(main, SWT.NONE);
 		label.setText(StringUtil.makeFormLabel(Messages.SubmitTicketDialog_LBL_StepsToReproduce));
 		label.setLayoutData(GridDataFactory.swtDefaults().align(SWT.BEGINNING, SWT.BEGINNING).create());
-		descriptionText = new Text(main, SWT.BORDER | SWT.MULTI);
-		descriptionText.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).hint(SWT.DEFAULT, 300).create());
-		descriptionText.addModifyListener(modifyListener);
+
+		reproduceText = new Text(main, SWT.BORDER | SWT.MULTI);
+		reproduceText.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).hint(SWT.DEFAULT, 100).create());
+		reproduceText.addModifyListener(modifyListener);
+
+		// Actual Result
+		label = new Label(main, SWT.NONE);
+		label.setText(StringUtil.makeFormLabel(Messages.SubmitTicketDialog_LBL_ActualResult));
+		label.setLayoutData(GridDataFactory.swtDefaults().align(SWT.BEGINNING, SWT.BEGINNING).create());
+
+		actualResultText = new Text(main, SWT.BORDER | SWT.MULTI);
+		actualResultText.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).hint(SWT.DEFAULT, 50).create());
+		actualResultText.addModifyListener(modifyListener);
+
+		// Expected Result
+		label = new Label(main, SWT.NONE);
+		label.setText(StringUtil.makeFormLabel(Messages.SubmitTicketDialog_LBL_ExpectedResult));
+		label.setLayoutData(GridDataFactory.swtDefaults().align(SWT.BEGINNING, SWT.BEGINNING).create());
+
+		expectedResultText = new Text(main, SWT.BORDER | SWT.MULTI);
+		expectedResultText
+				.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).hint(SWT.DEFAULT, 50).create());
+		expectedResultText.addModifyListener(modifyListener);
 
 		// logs to attach
 		label = new Label(main, SWT.NONE);
 		label.setText(StringUtil.makeFormLabel(Messages.SubmitTicketDialog_LBL_LogsToAttach));
 		label.setLayoutData(GridDataFactory.swtDefaults().create());
+
 		Composite composite = new Composite(main, SWT.NONE);
 		composite.setLayout(GridLayoutFactory.fillDefaults().numColumns(2).create());
 		composite.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
@@ -237,6 +286,7 @@ public class SubmitTicketDialog extends TitleAreaDialog
 		studioLogCheckbox = new Button(composite, SWT.CHECK);
 		studioLogCheckbox.setText(Messages.SubmitTicketDialog_LBL_StudioLog);
 		studioLogCheckbox.setSelection(true);
+
 		diagnosticLogCheckbox = new Button(composite, SWT.CHECK);
 		diagnosticLogCheckbox.setText(Messages.SubmitTicketDialog_LBL_DiagnosticLog);
 		diagnosticLogCheckbox.setSelection(true);
@@ -245,6 +295,7 @@ public class SubmitTicketDialog extends TitleAreaDialog
 		label = new Label(main, SWT.NONE);
 		label.setText(StringUtil.makeFormLabel(Messages.SubmitTicketDialog_LBL_Screenshots));
 		label.setLayoutData(GridDataFactory.swtDefaults().create());
+
 		composite = new Composite(main, SWT.NONE);
 		composite.setLayout(GridLayoutFactory.fillDefaults().numColumns(2).create());
 		composite.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
@@ -358,8 +409,11 @@ public class SubmitTicketDialog extends TitleAreaDialog
 		}
 		type = (JiraIssueType) ((IStructuredSelection) typeCombo.getSelection()).getFirstElement();
 		priority = (JiraIssuePriority) ((IStructuredSelection) priorityCombo.getSelection()).getFirstElement();
+		severity = (JiraIssueSeverity) ((IStructuredSelection) severityCombo.getSelection()).getFirstElement();
 		summary = summaryText.getText();
-		description = descriptionText.getText();
+		description = MessageFormat.format(
+				"h3. Steps to Reproduce\n{0}\n\nh3. Actual Result\n{1}\n\nh3. Expected Result\n{2}", //$NON-NLS-1$
+				reproduceText.getText(), actualResultText.getText(), expectedResultText.getText());
 		studioLogSelected = studioLogCheckbox.getSelection();
 		diagnosticLogSelected = diagnosticLogCheckbox.getSelection();
 
@@ -381,9 +435,13 @@ public class SubmitTicketDialog extends TitleAreaDialog
 		{
 			message = Messages.SubmitTicketDialog_ERR_EmptySummary;
 		}
-		else if (StringUtil.isEmpty(descriptionText.getText()))
+		else if (StringUtil.isEmpty(reproduceText.getText()))
 		{
 			message = Messages.SubmitTicketDialog_ERR_EmptyStepsToReproduce;
+		}
+		else if (StringUtil.isEmpty(actualResultText.getText()))
+		{
+			message = Messages.SubmitTicketDialog_ERR_EmptyActualResult;
 		}
 
 		setErrorMessage(message);
@@ -468,7 +526,9 @@ public class SubmitTicketDialog extends TitleAreaDialog
 		typeCombo.getCombo().setEnabled(!locked);
 		priorityCombo.getCombo().setEnabled(!locked);
 		summaryText.setEnabled(!locked);
-		descriptionText.setEnabled(!locked);
+		reproduceText.setEnabled(!locked);
+		actualResultText.setEnabled(!locked);
+		expectedResultText.setEnabled(!locked);
 		studioLogCheckbox.setEnabled(!locked);
 		diagnosticLogCheckbox.setEnabled(!locked);
 		screenshotText.setEnabled(!locked);

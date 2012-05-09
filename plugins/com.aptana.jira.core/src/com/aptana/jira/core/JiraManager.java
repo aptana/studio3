@@ -48,6 +48,7 @@ public class JiraManager
 	private static final String PARAM_DESCRIPTION = "--description"; //$NON-NLS-1$
 	private static final String PARAM_ISSUE = "--issue"; //$NON-NLS-1$
 	private static final String PARAM_FILE = "--file"; //$NON-NLS-1$
+	private static final String PARAM_ENVIRONMENT = "--environment"; //$NON-NLS-1$
 	private static final String ACTION_LOGIN = "login"; //$NON-NLS-1$
 	private static final String ACTION_CREATE_ISSUE = "createIssue"; //$NON-NLS-1$
 	private static final String ACTION_ADD_ATTACHMENT = "addAttachment"; //$NON-NLS-1$
@@ -59,10 +60,16 @@ public class JiraManager
 	private static final Pattern PATTERN_SUCCESS = Pattern.compile("(.*) created with id (.*). URL: (.*)"); //$NON-NLS-1$
 	private static final String FAILED_REASON_START = "Exception: "; //$NON-NLS-1$
 
+	/**
+	 * Project Keys for Aptana and Titanium
+	 */
+	static final String APTANA_STUDIO = "APSTUD"; //$NON-NLS-1$
+	static final String TITANIUM_COMMUNITY = "TC"; //$NON-NLS-1$
+
 	private static IPath jiraExecutable;
 	// could override using setProjectInfo()
 	private static String projectName = "Aptana Studio"; //$NON-NLS-1$
-	private static String projectKey = "APSTUD"; //$NON-NLS-1$
+	private static String projectKey = APTANA_STUDIO;
 
 	private JiraUser user;
 
@@ -132,6 +139,8 @@ public class JiraManager
 	 *            the issue type (bug, feature, or improvement)
 	 * @param priority
 	 *            the issue's priority
+	 * @param severity
+	 *            the issue's severity (Blocker, Major, Minor, Trivial, None)
 	 * @param summary
 	 *            the summary of the ticket
 	 * @param description
@@ -139,20 +148,29 @@ public class JiraManager
 	 * @return the JIRA issue created
 	 * @throws JiraException
 	 */
-	public JiraIssue createIssue(JiraIssueType type, JiraIssuePriority priority, String summary, String description)
-			throws JiraException
+	public JiraIssue createIssue(JiraIssueType type, JiraIssuePriority priority, JiraIssueSeverity severity,
+			String summary, String description) throws JiraException
 	{
 		if (user == null)
 		{
 			throw new JiraException(Messages.JiraManager_ERR_NotLoggedIn);
 		}
 		IPath jiraExecutable = getJiraExecutable();
-
+		// @formatter:off
 		String output = ProcessUtil.outputForCommand(jiraExecutable.toOSString(), jiraExecutable.removeLastSegments(1),
-				PARAM_ACTION, ACTION_CREATE_ISSUE, PARAM_USERNAME, user.getUsername(), PARAM_PASSWORD,
-				user.getPassword(), PARAM_PROJECT, projectKey, PARAM_VERSION, getProjectVersion(), PARAM_TYPE,
-				type.getParameterName(), PARAM_PRIORITY, priority.toString(), PARAM_SUMMARY, summary,
-				PARAM_DESCRIPTION, description);
+				PARAM_ACTION, ACTION_CREATE_ISSUE,
+				PARAM_USERNAME, user.getUsername(),
+				PARAM_PASSWORD, user.getPassword(),
+				PARAM_PROJECT, projectKey,
+				// If we're submitting against TC, we can't do version, we need to stuff that into the Environment
+				(TITANIUM_COMMUNITY.equals(projectKey) ? PARAM_ENVIRONMENT : PARAM_VERSION), getProjectVersion(),
+				PARAM_TYPE, type.getParameterValue(projectKey),
+				PARAM_PRIORITY, priority.toString(),
+				PARAM_SUMMARY, summary,
+				PARAM_DESCRIPTION, description,
+				"--custom", severity.getParameterValue() //$NON-NLS-1$
+				);
+		// @formatter:on
 		Matcher m = PATTERN_SUCCESS.matcher(output);
 		if (m.find())
 		{

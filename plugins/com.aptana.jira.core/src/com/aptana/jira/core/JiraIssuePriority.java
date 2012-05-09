@@ -10,11 +10,17 @@ package com.aptana.jira.core;
 public enum JiraIssuePriority
 {
 
-	CRITICAL(Messages.JiraIssuePriority_Critical), HIGH(Messages.JiraIssuePriority_High), MEDIUM(
-			Messages.JiraIssuePriority_Medium), LOW(Messages.JiraIssuePriority_Low), TRIVIAL(
-			Messages.JiraIssuePriority_Trivial), NONE(Messages.JiraIssuePriority_None);
+	// @formatter:off
+	CRITICAL(Messages.JiraIssuePriority_Critical, "Critical"), //$NON-NLS-1$
+	HIGH(Messages.JiraIssuePriority_High, "High"), //$NON-NLS-1$
+	MEDIUM(Messages.JiraIssuePriority_Medium, "Medium"), //$NON-NLS-1$
+	LOW(Messages.JiraIssuePriority_Low, "Low"), //$NON-NLS-1$
+	TRIVIAL(Messages.JiraIssuePriority_Trivial, "Trivial"), //$NON-NLS-1$
+	NONE(Messages.JiraIssuePriority_None, "None"); //$NON-NLS-1$
+	// @formatter:on
 
-	private String displayName;
+	private String displayName; // Translated name for UI
+	private String parameterValue; // Untranslated value for JIRA
 
 	@Override
 	public String toString()
@@ -22,8 +28,14 @@ public enum JiraIssuePriority
 		return displayName;
 	}
 
-	private JiraIssuePriority(String displayName)
+	public String getParameterValue()
+	{
+		return parameterValue;
+	}
+
+	private JiraIssuePriority(String displayName, String parameterValue)
 	{
 		this.displayName = displayName;
+		this.parameterValue = parameterValue;
 	}
 }

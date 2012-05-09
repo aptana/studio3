@@ -27,6 +27,12 @@ public class Messages extends NLS
 	public static String JiraManager_ERR_NoJiraExecutable;
 	public static String JiraManager_ERR_NotLoggedIn;
 
+	public static String JiraIssueSeverity_Blocker;
+	public static String JiraIssueSeverity_Major;
+	public static String JiraIssueSeverity_Minor;
+	public static String JiraIssueSeverity_None;
+	public static String JiraIssueSeverity_Trivial;
+
 	static
 	{
 		// initialize resource bundle
