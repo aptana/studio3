@@ -8,7 +8,6 @@
 package com.aptana.editor.js.validator;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -69,8 +68,7 @@ public class JSLintValidator extends AbstractBuildParticipant
 		}
 
 		List<IProblem> problems = Collections.emptyList();
-		URI uri = context.getURI();
-		String sourcePath = uri.toString();
+		String sourcePath = context.getURI().toString();
 		try
 		{
 

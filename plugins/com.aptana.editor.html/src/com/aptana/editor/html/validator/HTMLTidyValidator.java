@@ -140,16 +140,16 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 
 		try
 		{
+			String sourcePath = context.getURI().toString();
 			Collection<IProblem> problems = new ArrayList<IProblem>();
 			try
 			{
-				String sourcePath = context.getURI().toString();
+
 				String source = context.getContents();
 				if (!StringUtil.isEmpty(source))
 				{
 					// TODO Can't we ask the context for line number of an offset so we don't duplicate the source? Or
-					// maybe
-					// just ask for IDocument?
+					// maybe just ask for IDocument?
 					IDocument doc = new Document(source);
 					problems.addAll(validateDoctype(sourcePath, doc));
 
@@ -169,7 +169,8 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 			}
 			catch (CoreException e)
 			{
-				IdeLog.logError(HTMLPlugin.getDefault(), e);
+				IdeLog.logError(HTMLPlugin.getDefault(),
+						MessageFormat.format("Failed to validate {0} using HTML Tidy validator", sourcePath), e); //$NON-NLS-1$
 			}
 
 			context.putProblems(IHTMLConstants.TIDY_PROBLEM, problems);

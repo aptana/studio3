@@ -222,16 +222,13 @@ abstract class IndexRequestJob extends Job
 
 	protected List<IFileStoreIndexingParticipant> getIndexParticipants(IFileStore file)
 	{
-		IndexManager manager = getIndexManager();
+		IndexManager indexManager = getIndexManager();
+		if (indexManager != null)
+		{
+			return indexManager.getIndexParticipants(file.getName());
+		}
 
-		if (manager != null)
-		{
-			return manager.getIndexParticipants(file.getName());
-		}
-		else
-		{
-			return Collections.emptyList();
-		}
+		return Collections.emptyList();
 	}
 
 }

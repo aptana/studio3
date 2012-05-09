@@ -84,6 +84,13 @@ public class IndexBuildParticipant extends RequiredBuildParticipant
 				}
 			}
 
+			// Check for cancellation
+			if (sub.isCanceled())
+			{
+				return;
+			}
+
+			// wipe the index for the file first
 			deleteFile(context, sub.newChild(10));
 
 			List<IFileStoreIndexingParticipant> indexers = getIndexParticipants(context);
