@@ -25,6 +25,7 @@ public class AllUtilTests
 		suite.addTestSuite(ExpiringMapTests.class);
 		suite.addTestSuite(FileUtilTest.class);
 		suite.addTestSuite(FirefoxUtilTest.class);
+		suite.addTestSuite(ImmutableTupleNTest.class);
 		suite.addTestSuite(InputStreamGobblerTest.class);
 		suite.addTestSuite(IOUtilTest.class);
 		suite.addTestSuite(ObjectUtilTest.class);

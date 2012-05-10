@@ -1,3 +1,10 @@
+/**
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.index.core.build;
 
 import java.io.ByteArrayInputStream;
@@ -28,6 +35,7 @@ import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.IndexPlugin;
 import com.aptana.parsing.IParseState;
+import com.aptana.parsing.IParseStateCacheKey;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseError;
@@ -41,6 +49,7 @@ public class BuildContext
 	private IFile file;
 	protected Map<String, Collection<IProblem>> problems;
 	private IParseState fParseState;
+	private IParseStateCacheKey fParseStateCacheKey;
 
 	private String fContents;
 
@@ -90,43 +99,32 @@ public class BuildContext
 		parseState.setEditState(getContents());
 		try
 		{
-			boolean reparse = false;
-			if (fParseState == null)
+			String contentType = getContentType();
+			IParseStateCacheKey newCacheKey = parseState.getCacheKey(contentType);
+			if (fParseState != null && fParseStateCacheKey != null
+					&& !fParseStateCacheKey.requiresReparse(newCacheKey))
 			{
-				reparse = true;
+				// copy over errors from old parse state to new one since we're not re-parsing
+				parseState.copyErrorsFrom(fParseState);
+				return fParseState.getParseResult();
 			}
-			else
+			fParseState = parseState;
+			fParseStateCacheKey = newCacheKey;
+			// FIXME What if we fail to parse? Should we catch and log that exception here and return null?
+			try
 			{
-				reparse = fParseState.requiresReparse(parseState);
-				if (!reparse)
-				{
-					// copy over errors from old parse state to new one since we're not re-parsing
-					for (IParseError error : fParseState.getErrors())
-					{
-						parseState.addError(error);
-					}
-				}
+				// FIXME The parsers need to throw a specific SyntaxException or something for us to differentiate
+				// between those and IO errors!
+				IParseRootNode ast = parse(contentType, fParseState);
+				fParseState.setParseResult(ast);
 			}
-
-			if (reparse)
+			catch (CoreException e)
 			{
-				fParseState = parseState;
-				// FIXME What if we fail to parse? Should we catch and log that exception here and return null?
-				try
-				{
-					// FIXME The parsers need to throw a specific SyntaxException or something for us to differentiate
-					// between those and IO errors!
-					IParseRootNode ast = ParserPoolFactory.parse(getContentType(), fParseState);
-					fParseState.setParseResult(ast);
-				}
-				catch (CoreException e)
-				{
-					throw e;
-				}
-				catch (Exception e)
-				{
-					throw new CoreException(new Status(IStatus.ERROR, IndexPlugin.PLUGIN_ID, e.getMessage(), e));
-				}
+				throw e;
+			}
+			catch (Exception e)
+			{
+				throw new CoreException(new Status(IStatus.ERROR, IndexPlugin.PLUGIN_ID, e.getMessage(), e));
 			}
 			if (fParseState == null)
 			{
@@ -144,9 +142,15 @@ public class BuildContext
 		}
 	}
 
+	protected IParseRootNode parse(String contentType, IParseState parseState) throws Exception
+	{
+		return ParserPoolFactory.parse(contentType, parseState);
+	}
+
 	public synchronized void resetAST()
 	{
 		fParseState = null;
+		fParseStateCacheKey = null;
 	}
 
 	public synchronized String getContents()
