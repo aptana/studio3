@@ -7,6 +7,8 @@
  */
 package com.aptana.parsing.tests;
 
+import com.aptana.parsing.ParseStateCacheKeyWithCommentsTest;
+
 import junit.framework.Test;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
@@ -27,9 +29,12 @@ public class AllTests
 			}
 		};
 		// $JUnit-BEGIN$
+		suite.addTestSuite(ParseStateCacheKeyWithCommentsTest.class);
+		suite.addTestSuite(ParseStateTest.class);
 		suite.addTest(com.aptana.json.AllTests.suite());
 		suite.addTest(com.aptana.parsing.ast.AllTests.suite());
 		suite.addTest(com.aptana.parsing.lexer.LexerTests.suite());
+		suite.addTest(com.aptana.parsing.pool.AllTests.suite());
 		suite.addTest(com.aptana.sax.AllTests.suite());
 		// $JUnit-END$
 		return suite;
