@@ -54,7 +54,6 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.team.core.RepositoryProvider;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
@@ -76,7 +75,6 @@ import com.aptana.core.projects.templates.IProjectTemplate;
 import com.aptana.core.projects.templates.TemplateType;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ProcessStatus;
-import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.ui.CloneJob;
 import com.aptana.projects.ProjectsPlugin;
@@ -838,7 +836,7 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
 		CloneJob job = new CloneJob(sourceURI, destPath.toOSString(), true, true);
 		// We're executing inside the wizard's container already, run sync.
-		IStatus status = job.run(sub.newChild(95));
+		IStatus status = job.run(sub.newChild(100));
 		if (!status.isOK())
 		{
 			if (status instanceof ProcessStatus)
@@ -849,25 +847,6 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 						status.getPlugin(), stderr)));
 			}
 			throw new InvocationTargetException(new CoreException(status));
-		}
-		else
-		{
-			try
-			{
-				projectHandle.setDescription(projectDescription, sub.newChild(2));
-				// Ensure that we disconnect our git support in case it auto-attached
-				RepositoryProvider.unmap(projectHandle);
-				GitPlugin.getDefault().getGitRepositoryManager().removeRepository(projectHandle);
-				IFolder gitFolder = projectHandle.getFolder(".git"); //$NON-NLS-1$
-				if (gitFolder.exists())
-				{
-					gitFolder.delete(true, sub.newChild(3));
-				}
-			}
-			catch (CoreException e)
-			{
-				throw new InvocationTargetException(e);
-			}
 		}
 		sub.done();
 	}

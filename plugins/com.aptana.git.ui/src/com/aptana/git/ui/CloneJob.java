@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
@@ -29,11 +30,17 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.ui.statushandlers.StatusManager;
+import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.EclipseUtil;
+import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.IDebugScopes;
+import com.aptana.git.core.IPreferenceConstants;
 import com.aptana.git.core.model.GitExecutable;
+import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.internal.sharing.ConnectProviderOperation;
 import com.aptana.git.ui.internal.wizards.Messages;
 
@@ -61,6 +68,18 @@ public class CloneJob extends Job
 		this(sourceURI, dest, forceRootAsProject, false);
 	}
 
+	/**
+	 * @param sourceURI
+	 *            The source repo we're cloning from
+	 * @param dest
+	 *            The destination to clone to.
+	 * @param forceRootAsProject
+	 *            boolean. If true, we force the root of the repo to be the root of a new project
+	 * @param connectProvider
+	 *            boolean. if set to false, we do not attach our git support and we remove the .git dir from the
+	 *            project. Please note that if connectProvider is false, we also do not clone over teh full history of
+	 *            the repo since it will be deleted.
+	 */
 	public CloneJob(String sourceURI, String dest, boolean forceRootAsProject, boolean shallow)
 	{
 		super(Messages.CloneWizard_Job_title);
@@ -77,20 +96,19 @@ public class CloneJob extends Job
 		SubMonitor subMonitor = SubMonitor.convert(monitor, 1000);
 		try
 		{
-			if (GitExecutable.instance() == null)
+			if (getGitExecutable() == null)
 			{
 				throw new CoreException(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(),
 						Messages.CloneJob_UnableToFindGitExecutableError));
 			}
 
-			IStatus result = GitExecutable.instance().clone(sourceURI, Path.fromOSString(dest), shallowClone,
-					subMonitor);
+			IStatus result = getGitExecutable().clone(sourceURI, Path.fromOSString(dest), shallowClone,
+					subMonitor.newChild(900));
 			if (!result.isOK())
 			{
 				return result;
 			}
 
-			subMonitor.setWorkRemaining(100);
 			Collection<File> existingProjects = null;
 			if (!forceRootAsProject)
 			{
@@ -133,6 +151,11 @@ public class CloneJob extends Job
 			subMonitor.done();
 		}
 		return Status.OK_STATUS;
+	}
+
+	protected GitExecutable getGitExecutable()
+	{
+		return GitExecutable.instance();
 	}
 
 	/**
@@ -274,8 +297,27 @@ public class CloneJob extends Job
 
 			doCreateProject(project, record.description, sub.newChild(75));
 
-			ConnectProviderOperation connectProviderOperation = new ConnectProviderOperation(project);
-			connectProviderOperation.run(sub.newChild(20));
+			if (!this.shallowClone)
+			{
+				ConnectProviderOperation connectProviderOperation = new ConnectProviderOperation(project);
+				connectProviderOperation.run(sub.newChild(20));
+			}
+			else
+			{
+				// explicitly delete the .git folder
+				IFolder gitFolder = project.getFolder(GitRepository.GIT_DIR);
+				if (gitFolder.exists())
+				{
+					try
+					{
+						gitFolder.delete(true, sub.newChild(20));
+					}
+					catch (CoreException e)
+					{
+						IdeLog.logError(GitUIPlugin.getDefault(), e);
+					}
+				}
+			}
 		}
 		finally
 		{
@@ -292,10 +334,40 @@ public class CloneJob extends Job
 	{
 		try
 		{
-			// monitor.beginTask(
-			// UIText.WizardProjectsImportPage_CreateProjectsTask, 100);
+			// Turn off auto-attaching git temporarily here!
+			boolean autoAttach = Platform.getPreferencesService().getBoolean(GitPlugin.getPluginId(),
+					IPreferenceConstants.AUTO_ATTACH_REPOS, true, null);
+
+			IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(GitPlugin.PLUGIN_ID);
+			if (autoAttach)
+			{
+				// Default value is true, so assuem they explicitly set false in instance prefs
+				prefs.putBoolean(IPreferenceConstants.AUTO_ATTACH_REPOS, false);
+				try
+				{
+					prefs.sync();
+				}
+				catch (BackingStoreException e)
+				{
+					// ignore
+				}
+			}
+
 			project.create(desc, new SubProgressMonitor(monitor, 30));
 			project.open(IResource.BACKGROUND_REFRESH, new SubProgressMonitor(monitor, 50));
+
+			if (autoAttach)
+			{
+				prefs.remove(IPreferenceConstants.AUTO_ATTACH_REPOS);
+				try
+				{
+					prefs.sync();
+				}
+				catch (BackingStoreException e)
+				{
+					// ignore
+				}
+			}
 		}
 		finally
 		{
