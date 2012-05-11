@@ -13,6 +13,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -35,6 +39,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.dialogs.ListDialog;
+import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.core.CoreStrings;
 import com.aptana.core.util.StringUtil;
@@ -120,7 +125,7 @@ public class PreviewSettingComposite extends Composite implements SelectionListe
 				.create());
 		fNewButton.addSelectionListener(this);
 
-		updateServersContent();
+		updateServersContentJob();
 	}
 
 	/**
@@ -308,6 +313,21 @@ public class PreviewSettingComposite extends Composite implements SelectionListe
 		{
 			listener.previewSettingModified();
 		}
+	}
+
+	private void updateServersContentJob()
+	{
+		Job job = new UIJob("Updating servers content...") //$NON-NLS-1$ // system job
+		{
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor)
+			{
+				updateServersContent();
+				return Status.OK_STATUS;
+			}
+		};
+		job.setSystem(true);
+		job.schedule();
 	}
 
 	private void updateServersContent()
