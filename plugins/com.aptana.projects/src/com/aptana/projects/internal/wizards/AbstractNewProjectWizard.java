@@ -11,9 +11,6 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.text.MessageFormat;
@@ -28,8 +25,6 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -75,6 +70,7 @@ import com.aptana.core.projects.templates.IProjectTemplate;
 import com.aptana.core.projects.templates.TemplateType;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ProcessStatus;
+import com.aptana.core.util.replace.SimpleTextPatternReplacer;
 import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.ui.CloneJob;
 import com.aptana.projects.ProjectsPlugin;
@@ -731,7 +727,7 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 			try
 			{
 				// read and do template substitution
-				content = applyTemplateVariables(new InputStreamReader(zipFile.getInputStream(entry)), file, project);
+				content = applyTemplateVariables(zipFile.getInputStream(entry), file, project);
 			}
 			catch (Exception e)
 			{
@@ -765,41 +761,32 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 	/**
 	 * Apply the project-template variables on the files that were extracted as the project contents.
 	 * 
-	 * @param reader
+	 * @param inputStream
 	 * @param file
 	 * @param project
 	 * @return A string content of the {@link InputStream}, <b>after</b> the variables substitution.
 	 * @throws CoreException
 	 */
-	private static String applyTemplateVariables(Reader reader, IFile file, IProject project) throws CoreException
+	private static String applyTemplateVariables(InputStream inputStream, IFile file, IProject project)
+			throws CoreException
 	{
-		try
-		{
-			// Initialize the singleton Velocity
-			Velocity.init();
-		}
-		catch (Exception e)
-		{
-			throw new CoreException(
-					new Status(IStatus.ERROR, ProjectsPlugin.PLUGIN_ID, "Failed initialize Velocity", e)); //$NON-NLS-1$
-		}
+		SimpleTextPatternReplacer replacer = new SimpleTextPatternReplacer();
+
 		try
 		{
 			IPath absoluteFilePath = file.getLocation();
 			String filePathString = absoluteFilePath.toOSString();
 
-			VelocityContext context = new VelocityContext();
-			context.put("TM_NEW_FILE_BASENAME", absoluteFilePath.removeFileExtension().lastSegment()); //$NON-NLS-1$
-			context.put("TM_NEW_FILE", filePathString); //$NON-NLS-1$
-			context.put("TM_NEW_FILE_DIRECTORY", absoluteFilePath.removeLastSegments(1).toOSString()); //$NON-NLS-1$
-			context.put("TM_PROJECTNAME", project.getName()); //$NON-NLS-1$
+			replacer.addPattern("${TM_NEW_FILE_BASENAME}", absoluteFilePath.removeFileExtension().lastSegment()); //$NON-NLS-1$
+			replacer.addPattern("${TM_NEW_FILE}", filePathString); //$NON-NLS-1$
+			replacer.addPattern("${TM_NEW_FILE_DIRECTORY}", absoluteFilePath.removeLastSegments(1).toOSString()); //$NON-NLS-1$
+			replacer.addPattern("${TM_PROJECTNAME}", project.getName()); //$NON-NLS-1$
 			Calendar calendar = Calendar.getInstance();
-			context.put("TIME", calendar.getTime()); //$NON-NLS-1$
-			context.put("YEAR", calendar.get(Calendar.YEAR)); //$NON-NLS-1$
+			replacer.addPattern("${TIME}", calendar.getTime().toString()); //$NON-NLS-1$
+			replacer.addPattern("${YEAR}", Integer.toString(calendar.get(Calendar.YEAR))); //$NON-NLS-1$
 
-			StringWriter writer = new StringWriter();
-			Velocity.evaluate(context, writer, filePathString, reader);
-			return writer.getBuffer().toString();
+			String text = IOUtil.read(inputStream);
+			return replacer.searchAndReplace(text);
 		}
 		catch (Exception e)
 		{
@@ -808,11 +795,11 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 		}
 		finally
 		{
-			if (reader != null)
+			if (inputStream != null)
 			{
 				try
 				{
-					reader.close();
+					inputStream.close();
 				}
 				catch (IOException e)
 				{
