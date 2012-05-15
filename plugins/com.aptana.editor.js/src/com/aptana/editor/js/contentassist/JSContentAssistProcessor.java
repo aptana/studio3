@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -118,9 +117,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 	private static Set<String> AUTO_ACTIVATION_PARTITION_TYPES;
 	{
-		AUTO_ACTIVATION_PARTITION_TYPES = new HashSet<String>();
-		AUTO_ACTIVATION_PARTITION_TYPES.add(JSSourceConfiguration.DEFAULT);
-		AUTO_ACTIVATION_PARTITION_TYPES.add(IDocument.DEFAULT_CONTENT_TYPE);
+		AUTO_ACTIVATION_PARTITION_TYPES = CollectionsUtil.newSet(JSSourceConfiguration.DEFAULT,
+				IDocument.DEFAULT_CONTENT_TYPE);
 	}
 
 	private JSIndexQueryHelper indexHelper;

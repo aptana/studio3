@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
 import com.aptana.core.CorePlugin;
 import com.aptana.core.ICorePreferenceConstants;
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 
@@ -57,7 +58,7 @@ public class WebFilesPropertyTester extends PropertyTester {
 	private void loadExtensions() {
 		IEclipsePreferences preferences = EclipseUtil.instanceScope().getNode(CorePlugin.PLUGIN_ID);
 		String[] files = preferences.get(ICorePreferenceConstants.PREF_WEB_FILES, StringUtil.EMPTY).split(";"); //$NON-NLS-1$
-		extensions = new HashSet<String>();
+		extensions = new HashSet<String>(ArrayUtil.length(files));
 		for (String ext : files) {
 			int index = ext.lastIndexOf('.');
 			if ( index >= 0 ) {

@@ -265,7 +265,6 @@ public final class MarkerManager
 	 */
 	public MarkerInfo[] findMarkersInfo(IUniformResource resource, String type, boolean includeSubtypes)
 	{
-		ArrayList result = new ArrayList();
 		ResourceInfo info = getResourceInfo(resource);
 		if (info == null)
 		{
@@ -279,6 +278,7 @@ public final class MarkerManager
 		}
 
 		IMarkerSetElement[] elements = markers.elements();
+		ArrayList result = new ArrayList(elements.length);
 		for (int i = 0; i < elements.length; ++i)
 		{
 			MarkerInfo marker = (MarkerInfo) elements[i];
