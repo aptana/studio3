@@ -21,6 +21,7 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
@@ -272,7 +273,14 @@ public class GitExecutableTest extends TestCase
 			}
 		});
 
-		GitExecutable.CloneRunnable runnable = new GitExecutable.CloneRunnable(process, monitor);
+		GitExecutable.CloneRunnable runnable = new GitExecutable.CloneRunnable(process, monitor)
+		{
+			@Override
+			protected IProgressMonitor convertMonitor(IProgressMonitor monitor)
+			{
+				return monitor;
+			}
+		};
 		Thread t = new Thread(runnable);
 		t.start();
 		t.join();
