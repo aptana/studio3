@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -22,8 +22,11 @@ import java.util.Set;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Text;
 
+import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.ObjectUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.findbar.FindBarPlugin;
 
 /**
@@ -44,13 +47,13 @@ public class FindBarEntriesHelper
 	{
 
 		final String preferenceName;
-		final Combo combo;
+		final Text text;
 		final IStartEndIgnore modifyListener;
 
-		public EntriesControlHandle(String preferenceName, Combo combo, IStartEndIgnore modifyListener)
+		public EntriesControlHandle(String preferenceName, Text text, IStartEndIgnore modifyListener)
 		{
 			this.preferenceName = preferenceName;
-			this.combo = combo;
+			this.text = text;
 			this.modifyListener = modifyListener;
 		}
 	}
@@ -58,7 +61,7 @@ public class FindBarEntriesHelper
 	/**
 	 * Map from the preference name > combos to be updated when the preference changes.
 	 */
-	private final Map<String, Set<EntriesControlHandle>> preferenceToComboAndListener = new HashMap<String, Set<EntriesControlHandle>>();
+	private final Map<String, Set<EntriesControlHandle>> preferenceToTextAndListener = new HashMap<String, Set<EntriesControlHandle>>();
 	
 	private final EclipseFindSettings eclipseFindSettings;
 
@@ -86,7 +89,7 @@ public class FindBarEntriesHelper
 		OutputStream out = new ByteArrayOutputStream();
 		try
 		{
-			properties.store(out, ""); //$NON-NLS-1$
+			properties.store(out, StringUtil.EMPTY);
 		}
 		catch (IOException e)
 		{
@@ -180,17 +183,20 @@ public class FindBarEntriesHelper
 	}
 
 	/**
-	 * Set the items available in the combo (and ask it to ignore any changes while that's done).
+	 * Set the items available in the text (and ask it to ignore any changes while that's done).
 	 */
-	private void setItemsInCombo(Combo combo, IStartEndIgnore modifyListener, List<String> items)
+	private void setTextText(Text text, IStartEndIgnore modifyListener, List<String> items)
 	{
 		modifyListener.startIgnore();
 		try
 		{
-			if (!combo.isDisposed())
+			if (!text.isDisposed() && !CollectionsUtil.isEmpty(items))
 			{
-				combo.setItems(items.toArray(new String[items.size()]));
-				combo.select(0);
+				if (ObjectUtil.areNotEqual(items.get(0), text.getText()))
+				{
+					text.setText(items.get(0));
+				}
+				text.setForeground(null);
 			}
 		}
 		finally
@@ -200,19 +206,19 @@ public class FindBarEntriesHelper
 	}
 
 	/**
-	 * Start taking control of the combo (i.e.: when the preference changes, update the combo).
+	 * Start taking control of the text (i.e.: when the preference changes, update the text).
 	 * 
 	 * @return a handle that should be used to later unregister it.
 	 */
-	public EntriesControlHandle register(Combo combo, IStartEndIgnore modifyListener, final String preferenceName)
+	public EntriesControlHandle register(Text text, IStartEndIgnore modifyListener, final String preferenceName)
 	{
 		List<String> items = loadEntries(preferenceName);
-		setItemsInCombo(combo, modifyListener, items);
-		Set<EntriesControlHandle> set = preferenceToComboAndListener.get(preferenceName);
+		setTextText(text, modifyListener, items);
+		Set<EntriesControlHandle> set = preferenceToTextAndListener.get(preferenceName);
 		if (set == null)
 		{
 			set = new HashSet<EntriesControlHandle>();
-			preferenceToComboAndListener.put(preferenceName, set);
+			preferenceToTextAndListener.put(preferenceName, set);
 			// preference that's still not treated: start to hear it.
 			IPreferenceStore preferenceStore = FindBarPlugin.getDefault().getPreferenceStore();
 			final Set<EntriesControlHandle> usedInternal = set;
@@ -226,13 +232,13 @@ public class FindBarEntriesHelper
 						List<String> entries = loadEntries(preferenceName);
 						for (EntriesControlHandle entry : usedInternal)
 						{
-							setItemsInCombo(entry.combo, entry.modifyListener, entries);
+							setTextText(entry.text, entry.modifyListener, entries);
 						}
 					}
 				}
 			});
 		}
-		EntriesControlHandle handle = new EntriesControlHandle(preferenceName, combo, modifyListener);
+		EntriesControlHandle handle = new EntriesControlHandle(preferenceName, text, modifyListener);
 		set.add(handle);
 		return handle;
 	}
@@ -244,14 +250,13 @@ public class FindBarEntriesHelper
 	{
 		for (EntriesControlHandle entriesControlHandle : entriesControlHandles)
 		{
-			Set<EntriesControlHandle> set = preferenceToComboAndListener.get(entriesControlHandle.preferenceName);
+			Set<EntriesControlHandle> set = preferenceToTextAndListener.get(entriesControlHandle.preferenceName);
 			if (set != null)
 			{
 				set.remove(entriesControlHandle);
 			}
 		}
 	}
-
 
 	public void updateFromEclipseFindSettings()
 	{

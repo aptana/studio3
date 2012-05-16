@@ -22,6 +22,12 @@ public class FindBarPlugin extends AbstractUIPlugin {
 	// The plug-in ID
 	public static final String PLUGIN_ID = "com.aptana.editor.findbar"; //$NON-NLS-1$
 
+	public static final String ICON_SEARCH_HISTORY = "icons/elcl16/search_history.png"; //$NON-NLS-1$
+	public static final String ICON_SEARCH_CURRENT_FILE = "icons/elcl16/search_current_file.gif"; //$NON-NLS-1$
+	public static final String ICON_SEARCH_OPEN_FILES = "icons/elcl16/search_open_files.gif"; //$NON-NLS-1$
+	public static final String ICON_SEARCH_PROJECT = "icons/elcl16/search_project.gif"; //$NON-NLS-1$
+	public static final String ICON_SEARCH_WORKSPACE = "icons/elcl16/search_workspace.gif"; //$NON-NLS-1$
+
 	// The shared instance
 	private static FindBarPlugin plugin;
 	

@@ -65,9 +65,29 @@
       </command>
       <command
             categoryId="org.eclipse.ui.category.edit"
+            id="org.eclipse.ui.edit.findbar.toggleMatchCount"
+            name="%ToggleMatchCount.command.name">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
             id="org.eclipse.ui.edit.findbar.searchInOpenFiles"
             name="%SearchInOpenFiles.command.name">
       </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            id="org.eclipse.ui.edit.findbar.searchInCurrentFile"
+            name="%SearchInCurrentFile.command.name">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            id="org.eclipse.ui.edit.findbar.searchInEnclosingProject"
+            name="%SearchInEnclosingProject.command.name">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            id="org.eclipse.ui.edit.findbar.searchInWorkspace"
+            name="%SearchInWorkspace.command.name">
+      </command>      
       <command
             categoryId="org.eclipse.ui.category.edit"
             id="org.eclipse.ui.edit.findbar.showOptions"
@@ -193,12 +213,40 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M3+B">
       </key>
+      <!-- Toggle count matches -->      
+      <key
+            commandId="org.eclipse.ui.edit.findbar.toggleMatchCount"
+            contextId="org.eclipse.ui.textEditorScope.findbar"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M3+M">
+      </key>
       <!-- Search in open files -->      
       <key
             commandId="org.eclipse.ui.edit.findbar.searchInOpenFiles"
             contextId="org.eclipse.ui.textEditorScope.findbar"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M3+S">
+      </key>
+      <!-- Search in current file -->      
+      <key
+            commandId="org.eclipse.ui.edit.findbar.searchInCurrentFile"
+            contextId="org.eclipse.ui.textEditorScope.findbar"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M3+T">
+      </key>
+      <!-- Search in enclosing project -->      
+      <key
+            commandId="org.eclipse.ui.edit.findbar.searchInEnclosingProject"
+            contextId="org.eclipse.ui.textEditorScope.findbar"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M3+P">
+      </key>
+      <!-- Search in workspace -->      
+      <key
+            commandId="org.eclipse.ui.edit.findbar.searchInWorkspace"
+            contextId="org.eclipse.ui.textEditorScope.findbar"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M3+K">
       </key>
       <!-- Show the search options -->      
       <key

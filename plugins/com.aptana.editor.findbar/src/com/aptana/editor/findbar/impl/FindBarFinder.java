@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.findbar.impl;
 
 import java.lang.ref.WeakReference;
@@ -70,7 +70,7 @@ public class FindBarFinder
 					IFindReplaceTargetExtension findReplaceTargetExtension = (IFindReplaceTargetExtension) findReplaceTarget;
 					findReplaceTargetExtension.beginSession();
 				}
-				String findText = dec.combo.getText();
+				String findText = dec.textFind.getText();
 				StyledText textWidget = sourceViewer.getTextWidget();
 				int offset = textWidget.getCaretOffset();
 				Point selection = textWidget.getSelection();
@@ -138,7 +138,7 @@ public class FindBarFinder
 
 				if (newOffset != -1)
 				{
-					dec.combo.setBackground(null);
+					dec.textFind.setBackground(null);
 					if (!forward)
 					{
 						selection = textWidget.getSelection();
@@ -162,7 +162,7 @@ public class FindBarFinder
 							return find(forward, incremental, wrap, true);
 						}
 					}
-					dec.combo.setBackground(dec.getfStringNotFoundColor());
+					dec.textFind.setBackground(dec.getfStringNotFoundColor());
 					dec.statusLineManager.setMessage(false, Messages.FindBarDecorator_MSG_StringNotFound, null);
 				}
 			}
@@ -181,7 +181,10 @@ public class FindBarFinder
 	public void resetIncrementalOffset()
 	{
 		incrementalOffset = -1;
-
 	}
 
+	public int getIncrementalOffset()
+	{
+		return incrementalOffset;
+	}
 }
