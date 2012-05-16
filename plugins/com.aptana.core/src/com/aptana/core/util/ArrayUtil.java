@@ -65,8 +65,17 @@ public class ArrayUtil
 		return (T[]) list.toArray();
 	}
 
-	public static <T> boolean isEmpty(T[] array)
+	public static boolean isEmpty(Object[] array)
 	{
 		return array == null || array.length == 0;
+	}
+
+	public static int length(Object[] array)
+	{
+		if (isEmpty(array))
+		{
+			return 0;
+		}
+		return array.length;
 	}
 }

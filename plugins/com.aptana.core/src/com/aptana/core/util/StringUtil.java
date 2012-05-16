@@ -345,6 +345,34 @@ public class StringUtil
 	}
 
 	/**
+	 * Create a string by concatenating the elements of a collection using a delimiter between each item
+	 * 
+	 * @param delimiter
+	 *            The text to place between each element in the array
+	 * @param items
+	 *            The array of items
+	 * @return The resulting string
+	 */
+	public static String join(String delimiter, Object... items)
+	{
+		String[] s = new String[items.length];
+		for (int i = 0; i < items.length; i++)
+		{
+			Object item = items[i];
+			if (item == null)
+			{
+				s[i] = "null"; //$NON-NLS-1$
+
+			}
+			else
+			{
+				s[i] = item.toString();
+			}
+		}
+		return join(delimiter, s);
+	}
+
+	/**
 	 * Create a string by concatenating the elements of a string array using a delimiter between each item
 	 * 
 	 * @param delimiter

@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.Platform;
 
 import com.aptana.configurations.ConfigurationsPlugin;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.ArrayUtil;
 
 /**
  * A registry for the Studio's configurators.
@@ -82,9 +83,9 @@ public class ConfiguratorsRegistry
 	 */
 	private void loadExtensions()
 	{
-		configurators = new HashSet<IConfigurator>();
 		IConfigurationElement[] elements = Platform.getExtensionRegistry().getConfigurationElementsFor(
 				EXTENSION_POINT_ID);
+		configurators = new HashSet<IConfigurator>(ArrayUtil.length(elements));
 		for (IConfigurationElement element : elements)
 		{
 			String id = element.getAttribute(ATT_ID);

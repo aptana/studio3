@@ -558,8 +558,13 @@ public class GitExecutable
 		CloneRunnable(Process p, IProgressMonitor monitor)
 		{
 			this.p = p;
-			this.monitor = SubMonitor.convert(monitor, 100);
+			this.monitor = convertMonitor(monitor);
 			this.status = Status.OK_STATUS;
+		}
+
+		protected IProgressMonitor convertMonitor(IProgressMonitor monitor)
+		{
+			return SubMonitor.convert(monitor, 100);
 		}
 
 		public IStatus getResult()

@@ -15,12 +15,12 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.outline.CommonOutlineContentProvider;
@@ -43,16 +43,19 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 	private static final Set<String> CLASS_EXTENDERS;
 	static
 	{
-		CLASS_EXTENDERS = new HashSet<String>();
-		CLASS_EXTENDERS.add("dojo.lang.extend"); //$NON-NLS-1$
-		CLASS_EXTENDERS.add("Ext.extend"); //$NON-NLS-1$
-		CLASS_EXTENDERS.add("jQuery.extend"); //$NON-NLS-1$
-		CLASS_EXTENDERS.add("MochiKit.Base.update"); //$NON-NLS-1$
-		CLASS_EXTENDERS.add("Object.extend"); //$NON-NLS-1$
-		CLASS_EXTENDERS.add("qx.Class.define"); //$NON-NLS-1$
-		CLASS_EXTENDERS.add("qx.Interface.define"); //$NON-NLS-1$
-		CLASS_EXTENDERS.add("qx.Theme.define"); //$NON-NLS-1$
-		CLASS_EXTENDERS.add("qx.Mixin.define"); //$NON-NLS-1$
+		// @formatter:off
+		CLASS_EXTENDERS = CollectionsUtil.newSet(
+			"dojo.lang.extend", //$NON-NLS-1$
+			"Ext.extend", //$NON-NLS-1$
+			"jQuery.extend", //$NON-NLS-1$
+			"MochiKit.Base.update", //$NON-NLS-1$
+			"Object.extend", //$NON-NLS-1$
+			"qx.Class.define", //$NON-NLS-1$
+			"qx.Interface.define", //$NON-NLS-1$
+			"qx.Theme.define", //$NON-NLS-1$
+			"qx.Mixin.define" //$NON-NLS-1$
+		);
+		// @formatter:on
 	}
 
 	public JSOutlineContentProvider()
