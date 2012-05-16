@@ -11,7 +11,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -19,6 +18,7 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSPlugin;
@@ -55,18 +55,21 @@ public class JSTypeUtil
 	 */
 	static
 	{
-		FILTERED_TYPES = new HashSet<String>();
-		FILTERED_TYPES.add(JSTypeConstants.ARRAY_TYPE);
-		FILTERED_TYPES.add(JSTypeConstants.BOOLEAN_TYPE);
-		FILTERED_TYPES.add(JSTypeConstants.FUNCTION_TYPE);
-		FILTERED_TYPES.add(JSTypeConstants.NUMBER_TYPE);
-		FILTERED_TYPES.add(JSTypeConstants.OBJECT_TYPE);
-		FILTERED_TYPES.add(JSTypeConstants.REG_EXP_TYPE);
-		FILTERED_TYPES.add(JSTypeConstants.STRING_TYPE);
-		FILTERED_TYPES.add(JSTypeConstants.UNDEFINED_TYPE);
-		FILTERED_TYPES.add(JSTypeConstants.VOID_TYPE);
-		FILTERED_TYPES.add(JSTypeConstants.WINDOW_TYPE);
-		FILTERED_TYPES.add(JSTypeConstants.WINDOW_PROPERTY);
+		// @formatter:off
+		FILTERED_TYPES = CollectionsUtil.newSet(
+			JSTypeConstants.ARRAY_TYPE,
+			JSTypeConstants.BOOLEAN_TYPE,
+			JSTypeConstants.FUNCTION_TYPE,
+			JSTypeConstants.NUMBER_TYPE,
+			JSTypeConstants.OBJECT_TYPE,
+			JSTypeConstants.REG_EXP_TYPE,
+			JSTypeConstants.STRING_TYPE,
+			JSTypeConstants.UNDEFINED_TYPE,
+			JSTypeConstants.VOID_TYPE,
+			JSTypeConstants.WINDOW_TYPE,
+			JSTypeConstants.WINDOW_PROPERTY
+		);
+		// @formatter:on
 	}
 
 	/**
