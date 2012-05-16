@@ -119,8 +119,6 @@ public class IndexFilterManager
 		// build a preference value of all file stores we are filtering
 		List<String> uris = CollectionsUtil.map(_filteredItems, new IMap<IFileStore, String>()
 		{
-
-			@Override
 			public String map(IFileStore item)
 			{
 				URI uri = item.toURI();
@@ -161,7 +159,6 @@ public class IndexFilterManager
 		{
 			Job job = new Job(MessageFormat.format(Messages.IndexFilterManager_Rebuilding_0, p.getName()))
 			{
-				@Override
 				protected IStatus run(IProgressMonitor monitor)
 				{
 					try
@@ -197,7 +194,6 @@ public class IndexFilterManager
 		CollectionsUtil.filterInPlace(fileStores, new IFilter<IFileStore>()
 		{
 
-			@Override
 			public boolean include(IFileStore item)
 			{
 				// NOTE: The indexing system creates LocalFiles but filters are based
