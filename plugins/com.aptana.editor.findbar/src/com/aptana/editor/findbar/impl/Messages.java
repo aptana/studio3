@@ -61,6 +61,10 @@ public class Messages extends NLS
 	public static String FindBarActions_TOOLTIP_FocusReplaceCombo;
 	public static String FindBarActions_TOOLTIP_FocusFindCombo;
 
+	public static String FindHelper_Error_active_page_null;
+
+	public static String FindHelper_Error_workbench_window_null;
+
 	public static String FindInOpenDocuments_NoFileFound;
 	public static String FindInOpenDocuments_FileNotInWorkspace;
 

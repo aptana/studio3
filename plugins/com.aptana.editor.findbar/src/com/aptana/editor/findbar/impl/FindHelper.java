@@ -237,7 +237,7 @@ public class FindHelper
 		{
 			if (statusLineManager != null)
 			{
-				statusLineManager.setErrorMessage("Active workbench window is null."); //$NON-NLS-1$ 
+				statusLineManager.setErrorMessage(Messages.FindHelper_Error_workbench_window_null);
 			}
 			return null;
 		}
@@ -246,7 +246,7 @@ public class FindHelper
 		{
 			if (statusLineManager != null)
 			{
-				statusLineManager.setErrorMessage("Active page is null."); //$NON-NLS-1$
+				statusLineManager.setErrorMessage(Messages.FindHelper_Error_active_page_null);
 			}
 		}
 

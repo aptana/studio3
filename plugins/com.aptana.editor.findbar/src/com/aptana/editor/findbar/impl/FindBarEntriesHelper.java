@@ -62,7 +62,7 @@ public class FindBarEntriesHelper
 	 * Map from the preference name > combos to be updated when the preference changes.
 	 */
 	private final Map<String, Set<EntriesControlHandle>> preferenceToTextAndListener = new HashMap<String, Set<EntriesControlHandle>>();
-	
+
 	private final EclipseFindSettings eclipseFindSettings;
 
 	public FindBarEntriesHelper(EclipseFindSettings eclipseFindSettings)
