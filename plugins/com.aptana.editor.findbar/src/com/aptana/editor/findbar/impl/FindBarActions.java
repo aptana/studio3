@@ -47,6 +47,7 @@ import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.findbar.FindBarPlugin;
 import com.aptana.editor.findbar.impl.FindBarDecorator.FindScope;
@@ -619,13 +620,13 @@ public class FindBarActions
 			updateTooltip(SHOW_OPTIONS_COMMAND_ID, Messages.FindBarDecorator_LABEL_ShowOptions, dec.options);
 
 			List<TriggerSequence> bindings = fCommandToBinding.get(FOCUS_REPLACE_COMMAND_ID);
-			if (bindings != null && bindings.size() > 0)
+			if (!CollectionsUtil.isEmpty(bindings))
 			{
 				dec.textReplace.setToolTipText(Messages.FindBarActions_TOOLTIP_FocusReplaceCombo + bindings.get(0));
 			}
 
 			bindings = fCommandToBinding.get(FOCUS_FIND_COMMAND_ID);
-			if (bindings != null && bindings.size() > 0)
+			if (!CollectionsUtil.isEmpty(bindings))
 			{
 				dec.textFind.setToolTipText(Messages.FindBarActions_TOOLTIP_FocusFindCombo + bindings.get(0));
 			}

@@ -36,7 +36,7 @@ public class Messages extends NLS
 
 	public static String FindBarDecorator_LABEL_Count_Match;
 	public static String FindBarDecorator_LABEL_Elipses;
-	public static String FindBarDecorator_LABEL_FInd;
+	public static String FindBarDecorator_LABEL_Find;
 	public static String FindBarDecorator_LABEL_RegularExpression;
 	public static String FindBarDecorator_LABEL_WholeWord;
 	public static String FindBarDecorator_LABEL_Replace;

@@ -9,7 +9,6 @@ package com.aptana.editor.findbar.impl;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -160,8 +159,6 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	private Button replaceFind;
 	private Button replace;
 	private Button replaceAll;
-	// private Button showFindReplaceDialog;
-	// Button searchInOpenFiles;
 	private Control[] disableWhenHidden;
 	int lastCountPosition, lastCountTotal, lastCountOffset;
 
@@ -189,20 +186,20 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 	enum FindScope
 	{
-		CURRENT_FILE(Messages.FindBarDecorator_LABEL_Scope_Current_File), OPEN_FILES(Messages.FindBarDecorator_LABEL_Scope_Open_Files), ENCLOSING_PROJECT(Messages.FindBarDecorator_LABEL_Scope_Enclosing_Project), WORKSPACE(
-				Messages.FindBarDecorator_LABEL_Scope_Workspace);
+		//@formatter:off
+		CURRENT_FILE(Messages.FindBarDecorator_LABEL_Scope_Current_File),
+		OPEN_FILES(Messages.FindBarDecorator_LABEL_Scope_Open_Files),
+		ENCLOSING_PROJECT(Messages.FindBarDecorator_LABEL_Scope_Enclosing_Project),
+		WORKSPACE(Messages.FindBarDecorator_LABEL_Scope_Workspace);
+		//@formatter:on
 
-		String name;
+		private String name;
 
 		FindScope(String name)
 		{
 			this.name = name;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * @see java.lang.Enum#toString()
-		 */
 		@Override
 		public String toString()
 		{
@@ -211,7 +208,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	}
 
 	FindScope findScope;
-	LinkedHashMap<FindScope, String> scopeMap = new LinkedHashMap<FindScope, String>(4);
+	Map<FindScope, String> scopeMap = new LinkedHashMap<FindScope, String>(4);
 
 	public FindBarDecorator(final ITextEditor textEditor)
 	{
@@ -433,7 +430,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		findButtonComposite.setLayoutData(GridDataFactory.fillDefaults().create());
 
 		findButton = createButton(findButtonComposite, null, true);
-		findButton.setText(Messages.FindBarDecorator_LABEL_FInd);
+		findButton.setText(Messages.FindBarDecorator_LABEL_Find);
 
 		replaceFind = createButton(findButtonComposite, null, true);
 		replaceFind.setText(Messages.FindBarDecorator_LABEL_ReplaceFind);
@@ -489,7 +486,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 						menu = new Menu(UIUtils.getActiveShell(),
 								(toolbar.getStyle() & (SWT.RIGHT_TO_LEFT | SWT.LEFT_TO_RIGHT)) | SWT.POP_UP);
 
-						HashMap<String, List<TriggerSequence>> commandToBindings = findBarActions
+						Map<String, List<TriggerSequence>> commandToBindings = findBarActions
 								.getCommandToBindings();
 
 						for (final FindScope scope : scopeMap.keySet())
