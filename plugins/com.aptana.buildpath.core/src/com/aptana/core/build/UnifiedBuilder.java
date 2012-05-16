@@ -49,10 +49,10 @@ import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.index.core.FileStoreBuildContext;
 import com.aptana.index.core.IIndexFileContributor;
-import com.aptana.index.core.IIndexFilterParticipant;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.IndexPlugin;
 import com.aptana.index.core.build.BuildContext;
+import com.aptana.index.core.filter.IIndexFilterParticipant;
 
 public class UnifiedBuilder extends IncrementalProjectBuilder
 {

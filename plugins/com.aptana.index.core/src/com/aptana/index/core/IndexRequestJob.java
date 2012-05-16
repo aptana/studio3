@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.index.core.build.BuildContext;
+import com.aptana.index.core.filter.IIndexFilterParticipant;
 
 abstract class IndexRequestJob extends Job
 {
