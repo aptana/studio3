@@ -9,7 +9,7 @@ package com.aptana.editor.html.contentassist.model;
 
 import java.util.Map;
 
-import org.mortbay.util.ajax.JSON.Output;
+import com.aptana.jetty.util.epl.ajax.JSON.Output;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.ui.views.IPropertyInformation;

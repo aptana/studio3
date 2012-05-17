@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.mortbay.util.ajax.JSON.Convertible;
+import com.aptana.jetty.util.epl.ajax.JSON.Convertible;
 
 import com.aptana.core.logging.IdeLog;
 
