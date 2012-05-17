@@ -9,12 +9,14 @@ package com.aptana.editor.js.validator;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 
 import com.aptana.core.build.AbstractBuildParticipant;
 import com.aptana.core.build.IProblem;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.editor.common.validation.AbstractValidatorTestCase;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.JSPlugin;
@@ -1114,13 +1116,291 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 	public void testTabsDontMessUpOffset() throws CoreException
 	{
 		// @formatter:off
-			String text = "function x() {\n" +
-					"	eval('blah!');\n" +
-					"}";
-			// @formatter:on
+		String text = "function x() {\n" +
+				"	eval('blah!');\n" +
+				"}";
+		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
 		assertProblemExists(items, "eval is evil.", 2, IMarker.SEVERITY_WARNING, 16);
+	}
+
+	public void testSlashEqual() throws CoreException
+	{
+		// @formatter:off
+		String text = "/= 2;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "A regular expression literal can be confused with '/='.", 1,
+				IMarker.SEVERITY_WARNING, 3);
+	}
+
+	public void testExpectedAAtBC() throws CoreException
+	{
+		// @formatter:off
+		String text = "function x() {\n" +
+				"var a = 1;\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Expected 'var' at column 5, not column 1.", 2, IMarker.SEVERITY_WARNING, 15);
+	}
+
+	public void testES5() throws CoreException
+	{
+		// @formatter:off
+		String text = "var obj = (function () {\n" +
+				"        var a;\n" +
+				"        return {\n" +
+				"            get a() {\n" +
+				"                return a;\n" +
+				"            },\n" +
+				"            \n" +
+				"            set a(value) {\n" +
+				"                a = 'prepender: ' + value;\n" +
+				"            }\n" +
+				"        };\n" +
+				"    }());";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "This is an ES5 feature.", 4, IMarker.SEVERITY_WARNING, 69);
+	}
+
+	public void testES5_2() throws CoreException
+	{
+		// @formatter:off
+		String text = "var string = \"\\\n" +
+				"\";";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "This is an ES5 feature.", 1, IMarker.SEVERITY_WARNING, 15);
+	}
+
+	public void testParameterSetA() throws CoreException
+	{
+		// @formatter:off
+		String text = "var obj = (function () {\n" +
+				"        var a;\n" +
+				"        return {\n" +
+				"            get a() {\n" +
+				"                return a;\n" +
+				"            },\n" +
+				"            \n" +
+				"            set a() {\n" +
+				"                a = 'prepender: ';\n" +
+				"            }\n" +
+				"        };\n" +
+				"    }());";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		// FIXME Should be an error
+		assertProblemExists(items, "Expected parameter (value) in set value function.", 8, IMarker.SEVERITY_WARNING,
+				145);
+	}
+
+	public void testParameterSetA2() throws CoreException
+	{
+		// @formatter:off
+		String text = "var obj = (function () {\n" +
+				"        var a;\n" +
+				"        return {\n" +
+				"            get a() {\n" +
+				"                return a;\n" +
+				"            },\n" +
+				"            \n" +
+				"            set a(value, other) {\n" +
+				"                a = 'prepender: ';\n" +
+				"            }\n" +
+				"        };\n" +
+				"    }());";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		// FIXME Should be an error
+		assertProblemExists(items, "Expected parameter (value) in set value function.", 8, IMarker.SEVERITY_WARNING,
+				145);
+	}
+
+	public void testParameterAGetB() throws CoreException
+	{
+		// @formatter:off
+		String text = "var obj = (function () {\n" +
+				"        var a;\n" +
+				"        return {\n" +
+				"            get a(param) {\n" +
+				"                return a;\n" +
+				"            },\n" +
+				"            \n" +
+				"            set a(value) {\n" +
+				"                a = 'prepender: ';\n" +
+				"            }\n" +
+				"        };\n" +
+				"    }());";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Unexpected parameter 'param' in get a function.", 4, IMarker.SEVERITY_WARNING, 75);
+	}
+
+	public void testOctalA() throws CoreException
+	{
+		for (int i = 0; i <= 6; i++)
+		{
+			// @formatter:off
+			String text = "var string = \"\\" + i + "\";";
+			// @formatter:on
+
+			List<IProblem> items = getParseErrors(text);
+			assertProblemExists(items, "Don't use octal: '\\" + i + "'. Use '\\u....' instead.", 1,
+					IMarker.SEVERITY_WARNING, 15);
+		}
+	}
+
+	public void testParameterArgumentsA() throws CoreException
+	{
+		// @formatter:off
+		String text = "function foo(param) {\n" +
+				"    param = 3;\n" +
+				"    arguments[0] = true;\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Do not mutate parameter 'param' when using 'arguments'.", 1,
+				IMarker.SEVERITY_WARNING, 13);
+	}
+
+	public void testUnnecessaryInitialize() throws CoreException
+	{
+		// @formatter:off
+		String text = "var foo = undefined;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "It is not necessary to initialize 'foo' to 'undefined'.", 1,
+				IMarker.SEVERITY_WARNING, 8);
+	}
+
+	public void testStatementBlock() throws CoreException
+	{
+		// @formatter:off
+		String text = "var foo = 1;\n" +
+				"{}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Expected to see a statement and instead saw a block.", 2, IMarker.SEVERITY_WARNING,
+				14);
+	}
+
+	public void testInsecureA1() throws CoreException
+	{
+		// @formatter:off
+		String text = "var r = /.regexp/;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Insecure '.'.", 1, IMarker.SEVERITY_WARNING, 9);
+	}
+
+	public void testInsecureA2() throws CoreException
+	{
+		// @formatter:off
+		String text = "var r = /[^t]regexp/;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Insecure '^'.", 1, IMarker.SEVERITY_WARNING, 10);
+	}
+
+	public void testMoveInvocation() throws CoreException
+	{
+		// @formatter:off
+		String text = "/*jslint sloppy: true, es5: true */\n" +
+				"var obj = (function () {\n" +
+				"        var a;\n" +
+				"        return {\n" +
+				"            get a() {\n" +
+				"                return a;\n" +
+				"            },\n" +
+				"            set a(value) {\n" +
+				"                a = 'prepender: ';\n" +
+				"            }\n" +
+				"        };\n" +
+				"    })();";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Move the invocation into the parens that contain the function.", 12,
+				IMarker.SEVERITY_WARNING, 249);
+	}
+
+	public void testReadOnly() throws CoreException
+	{
+		Set<String> predefineds = CollectionsUtil.newSet("Array", "Boolean", "Date", "decodeURI", "decodeURIComponent",
+				"encodeURI", "encodeURIComponent", "Error", "eval", "EvalError", "Function", "isFinite", "isNaN",
+				"JSON", "Math", "Number", "Object", "parseInt", "parseFloat", "RangeError", "ReferenceError", "RegExp",
+				"String", "SyntaxError", "TypeError", "URIError");
+		for (String predefined : predefineds)
+		{
+			// @formatter:off
+			String text = predefined + " = true;";
+			// @formatter:on
+
+			List<IProblem> items = getParseErrors(text);
+			// FIXME Should be an error
+			assertProblemExists(items, "Read only.", 1, IMarker.SEVERITY_WARNING, "eval".equals(predefined) ? 7 : 0);
+		}
+	}
+
+	public void testBadWrap() throws CoreException
+	{
+		// @formatter:off
+		String text = "/*jslint sloppy: true, es5: true */\n" +
+				"var obj = (function () {\n" +
+				"        var a;\n" +
+				"        return {\n" +
+				"            get a() {\n" +
+				"                return a;\n" +
+				"            },\n" +
+				"            set a(value) {\n" +
+				"                a = 'prepender: ';\n" +
+				"            }\n" +
+				"        };\n" +
+				"    });";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items,
+				"Do not wrap function literals in parens unless they are to be immediately invoked.", 2,
+				IMarker.SEVERITY_WARNING, 46);
+	}
+
+	public void testBadInvocation1() throws CoreException
+	{
+		// @formatter:off
+		String text = "'string'(7);";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		// FIXME Should be error
+		assertProblemExists(items, "Bad invocation.", 1, IMarker.SEVERITY_WARNING, 0);
+	}
+
+	public void testBadInvocation2() throws CoreException
+	{
+		// @formatter:off
+		String text = "/regexp/(7);";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		// FIXME Should be error
+		assertProblemExists(items, "Bad invocation.", 1, IMarker.SEVERITY_WARNING, 0);
 	}
 
 	protected void assertProblemExists(List<IProblem> items, String msg, int line, int severity, int offset)
