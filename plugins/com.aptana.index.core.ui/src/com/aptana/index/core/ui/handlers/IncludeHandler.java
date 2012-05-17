@@ -11,7 +11,7 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.filesystem.IFileStore;
 
-import com.aptana.index.core.ui.IndexFilterManager;
+import com.aptana.index.core.filter.IndexFilterManager;
 
 public class IncludeHandler extends BaseHandler
 {
