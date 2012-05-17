@@ -8,12 +8,12 @@
 package com.aptana.editor.common.preferences;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
@@ -33,6 +34,8 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferencePageContainer;
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CheckboxCellEditor;
@@ -58,20 +61,28 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
+import org.eclipse.ui.progress.UIJob;
+import org.eclipse.ui.texteditor.AbstractTextEditor;
 
 import com.aptana.buildpath.core.BuildPathCorePlugin;
+import com.aptana.core.IFilter;
+import com.aptana.core.IMap;
 import com.aptana.core.build.AbstractBuildParticipant;
 import com.aptana.core.build.IBuildParticipant;
-import com.aptana.core.build.IBuildParticipant.BuildType;
 import com.aptana.core.build.IBuildParticipantManager;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.CommonSourceViewerConfiguration;
+import com.aptana.index.core.build.BuildContext;
 import com.aptana.ui.util.UIUtils;
 import com.aptana.ui.widgets.CListTable;
 
@@ -89,16 +100,297 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 	private ListViewer contentTypesViewer;
 	private TableViewer validatorsViewer;
 	private CListTable filterViewer;
+	private List<ParticipantChanges> participants;
 
-	/**
-	 * Has the user made any changes? If so we'll need to pop a dialog asking to rebuild
-	 */
-	private boolean promptForRebuild;
+	private final class ApplyChangesAndBuildJob extends Job
+	{
+		private final boolean rebuild;
+		private final boolean reReconcile;
+
+		private ApplyChangesAndBuildJob(String name, boolean rebuild, boolean reReconcile)
+		{
+			super(name);
+			this.rebuild = rebuild;
+			this.reReconcile = reReconcile;
+			setRule(ResourcesPlugin.getWorkspace().getRuleFactory().buildRule());
+			setUser(true);
+		}
+
+		@Override
+		protected IStatus run(IProgressMonitor monitor)
+		{
+			SubMonitor sub = SubMonitor.convert(monitor, Messages.ValidationPreferencePage_RebuildJobTaskName, 100);
+			try
+			{
+				IWorkspace workspace = ResourcesPlugin.getWorkspace();
+
+				if (rebuild)
+				{
+					sub.subTask(Messages.ValidationPreferencePage_CleaningProjects);
+					workspace.build(IncrementalProjectBuilder.CLEAN_BUILD, sub.newChild(20));
+					sub.setWorkRemaining(80);
+				}
+
+				sub.subTask(Messages.ValidationPreferencePage_ApplyingChangesToParticipants);
+				// apply the changes in participants!
+				for (ParticipantChanges change : participants)
+				{
+					change.apply();
+				}
+				sub.worked(10);
+
+				// if the reconcile enablement/filters change? We'll need to force a new reconcile on
+				// open editors...
+				if (reReconcile)
+				{
+					UIJob job = new UIJob(Messages.ValidationPreferencePage_ForcingReconcile)
+					{
+
+						@Override
+						public IStatus runInUIThread(IProgressMonitor monitor)
+						{
+							IEditorReference[] refs = UIUtils.getActivePage().getEditorReferences();
+							monitor.beginTask(Messages.ValidationPreferencePage_ReconcilingOpenEditors, refs.length);
+							for (IEditorReference ref : refs)
+							{
+								if (monitor.isCanceled())
+								{
+									return Status.CANCEL_STATUS;
+								}
+								IEditorPart part = ref.getEditor(false);
+								if (part instanceof AbstractTextEditor)
+								{
+
+									monitor.subTask(part.getTitle());
+									// For AbstractThemeableEditors, we can adapt to SourceViewerConfiguration and
+									// then cast to CommonSourceViewerconfiguration and call forceReconcile...
+									if (part instanceof AbstractThemeableEditor)
+									{
+										AbstractThemeableEditor ate = (AbstractThemeableEditor) part;
+										CommonSourceViewerConfiguration csvc = (CommonSourceViewerConfiguration) ate
+												.getAdapter(SourceViewerConfiguration.class);
+										csvc.forceReconcile();
+									}
+									else
+									{
+										// This is a hack to force a reconcile. We set the document's contents to
+										// it's existing contents. Unfortunately this marks the editor as dirty
+										AbstractTextEditor editor = (AbstractTextEditor) part;
+										IDocument doc = editor.getDocumentProvider().getDocument(
+												editor.getEditorInput());
+										doc.set(doc.get());
+									}
+								}
+								monitor.worked(1);
+							}
+							return Status.OK_STATUS;
+						}
+					};
+					job.schedule(500);
+				}
+
+				if (rebuild)
+				{
+					sub.subTask(Messages.ValidationPreferencePage_RebuildingProjects);
+					workspace.build(IncrementalProjectBuilder.FULL_BUILD, sub.newChild(70));
+				}
+			}
+			catch (CoreException e)
+			{
+				return e.getStatus();
+			}
+			catch (OperationCanceledException e)
+			{
+				return Status.CANCEL_STATUS;
+			}
+			finally
+			{
+				sub.done();
+			}
+			return Status.OK_STATUS;
+		}
+
+		@Override
+		public boolean belongsTo(Object family)
+		{
+			return ResourcesPlugin.FAMILY_MANUAL_BUILD == family;
+		}
+	}
+
+	private class ParticipantChanges implements IBuildParticipant
+	{
+		private IBuildParticipant wrapped;
+		private Boolean enabledForBuild;
+		private Boolean enabledForReconcile;
+		private List<String> filters;
+		private IScopeContext context;
+
+		public ParticipantChanges(IBuildParticipant wrapped)
+		{
+			this.wrapped = wrapped;
+		}
+
+		public void clean(IProject project, IProgressMonitor monitor)
+		{
+			wrapped.clean(project, monitor);
+		}
+
+		public void buildStarting(IProject project, int kind, IProgressMonitor monitor)
+		{
+			wrapped.buildStarting(project, kind, monitor);
+		}
+
+		public void buildEnding(IProgressMonitor monitor)
+		{
+			wrapped.buildEnding(monitor);
+		}
+
+		public int getPriority()
+		{
+			return wrapped.getPriority();
+		}
+
+		public void buildFile(BuildContext context, IProgressMonitor monitor)
+		{
+			wrapped.buildFile(context, monitor);
+		}
+
+		public void deleteFile(BuildContext context, IProgressMonitor monitor)
+		{
+			wrapped.deleteFile(context, monitor);
+		}
+
+		public Set<IContentType> getContentTypes()
+		{
+			return wrapped.getContentTypes();
+		}
+
+		public String getName()
+		{
+			return wrapped.getName();
+		}
+
+		public String getId()
+		{
+			return wrapped.getId();
+		}
+
+		public boolean isEnabled(BuildType type)
+		{
+			switch (type)
+			{
+				case BUILD:
+					if (enabledForBuild != null)
+					{
+						return enabledForBuild;
+					}
+					break;
+
+				case RECONCILE:
+					if (enabledForReconcile != null)
+					{
+						return enabledForReconcile;
+					}
+					break;
+
+				default:
+					break;
+			}
+			return wrapped.isEnabled(type);
+		}
+
+		public void setEnabled(BuildType type, boolean enabled)
+		{
+			switch (type)
+			{
+				case BUILD:
+					enabledForBuild = enabled;
+					break;
+
+				case RECONCILE:
+					enabledForReconcile = enabled;
+					break;
+				default:
+					break;
+			}
+		}
+
+		public void restoreDefaults()
+		{
+			wrapped.restoreDefaults();
+			enabledForBuild = null;
+			enabledForReconcile = null;
+			filters = null;
+		}
+
+		public boolean isRequired()
+		{
+			return wrapped.isRequired();
+		}
+
+		public List<String> getFilters()
+		{
+			if (filters != null)
+			{
+				return filters;
+			}
+			return wrapped.getFilters();
+		}
+
+		public boolean isEnabled(IProject project)
+		{
+			return wrapped.isEnabled(project);
+		}
+
+		public void setFilters(IScopeContext context, String... filters)
+		{
+			this.context = context;
+			this.filters = CollectionsUtil.newList(filters);
+		}
+
+		public boolean needsRebuild()
+		{
+			return enabledForBuild != null || (filters != null && wrapped.isEnabled(BuildType.BUILD));
+		}
+
+		public void apply()
+		{
+			if (enabledForBuild != null)
+			{
+				wrapped.setEnabled(BuildType.BUILD, enabledForBuild);
+				enabledForBuild = null;
+			}
+			if (enabledForReconcile != null)
+			{
+				wrapped.setEnabled(BuildType.RECONCILE, enabledForReconcile);
+				enabledForReconcile = null;
+			}
+			if (filters != null)
+			{
+				((AbstractBuildParticipant) wrapped).setFilters(context, filters.toArray(new String[filters.size()]));
+				filters = null;
+				context = null;
+			}
+
+		}
+
+		public boolean needsReconcile()
+		{
+			return enabledForReconcile != null || (filters != null && wrapped.isEnabled(BuildType.RECONCILE));
+		}
+	}
 
 	public ValidationPreferencePage()
 	{
 		super();
-		promptForRebuild = false;
+		this.participants = CollectionsUtil.map(getBuildParticipantManager().getAllBuildParticipants(),
+				new IMap<IBuildParticipant, ParticipantChanges>()
+				{
+					public ParticipantChanges map(IBuildParticipant item)
+					{
+						return new ParticipantChanges(item);
+					}
+				});
 	}
 
 	public void init(IWorkbench workbench)
@@ -179,7 +471,6 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 	@Override
 	protected void performDefaults()
 	{
-		Collection<IBuildParticipant> participants = getAllBuildParticipants();
 		for (IBuildParticipant participant : participants)
 		{
 			participant.restoreDefaults();
@@ -193,60 +484,10 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 	@Override
 	public boolean performOk()
 	{
-		// FIXME We apply changes to participants as the user makes them, rather than when they click OK/Apply. We
-		// probably don't want to do that...
-		if (promptForRebuild)
-		{
-			MessageDialog dialog = new MessageDialog(getShell(), Messages.ValidationPreferencePage_RebuildDialogTitle,
-					null, Messages.ValidationPreferencePage_RebuildDialogMessage, MessageDialog.QUESTION, new String[] {
-							IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL }, 0);
-			if (dialog.open() == 0)
-			{
-				doBuild();
-			}
-		}
-
-		return true;
-	}
-
-	protected void doBuild()
-	{
-		// TODO Extract a class for this job!
-		Job buildJob = new Job(Messages.ValidationPreferencePage_RebuildJobTitle)
-		{
-			@Override
-			protected IStatus run(IProgressMonitor monitor)
-			{
-				SubMonitor sub = SubMonitor.convert(monitor, Messages.ValidationPreferencePage_RebuildJobTaskName, 100);
-				try
-				{
-					IWorkspace workspace = ResourcesPlugin.getWorkspace();
-					sub.worked(1);
-					workspace.build(IncrementalProjectBuilder.FULL_BUILD, sub.newChild(99));
-				}
-				catch (CoreException e)
-				{
-					return e.getStatus();
-				}
-				catch (OperationCanceledException e)
-				{
-					return Status.CANCEL_STATUS;
-				}
-				finally
-				{
-					sub.done();
-				}
-				return Status.OK_STATUS;
-			}
-
-			@Override
-			public boolean belongsTo(Object family)
-			{
-				return ResourcesPlugin.FAMILY_MANUAL_BUILD == family;
-			}
-		};
-		buildJob.setRule(ResourcesPlugin.getWorkspace().getRuleFactory().buildRule());
-		buildJob.setUser(true);
+		final boolean rebuild = rebuild();
+		final boolean reReconcile = needsReconcile();
+		Job buildJob = new ApplyChangesAndBuildJob(Messages.ValidationPreferencePage_RebuildJobTitle, rebuild,
+				reReconcile);
 
 		IPreferencePageContainer container = getContainer();
 		if (container instanceof IWorkbenchPreferenceContainer)
@@ -257,6 +498,54 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 		{
 			buildJob.schedule();
 		}
+
+		return true;
+	}
+
+	private boolean needsReconcile()
+	{
+		for (ParticipantChanges change : participants)
+		{
+			if (change.needsReconcile())
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * If changes don't require a rebuild, return false. Otherwise prompt user and take their answer.
+	 * 
+	 * @return
+	 */
+	private boolean rebuild()
+	{
+		if (promptForRebuild())
+		{
+			MessageDialog dialog = new MessageDialog(getShell(), Messages.ValidationPreferencePage_RebuildDialogTitle,
+					null, Messages.ValidationPreferencePage_RebuildDialogMessage, MessageDialog.QUESTION, new String[] {
+							IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL }, 0);
+			return (dialog.open() == 0);
+		}
+		return false;
+	}
+
+	/**
+	 * Determines if any changes will require a rebuild.
+	 * 
+	 * @return
+	 */
+	private boolean promptForRebuild()
+	{
+		for (ParticipantChanges change : participants)
+		{
+			if (change.needsRebuild())
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private Control createValidators(Composite parent)
@@ -380,8 +669,9 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 
 			public void itemsChanged(List<Object> rawFilters)
 			{
-				// Save the filter expressions
-				AbstractBuildParticipant participant = (AbstractBuildParticipant) getSelectedBuildParticipant();
+				// Store the new filter expressions in our temporary copy
+				@SuppressWarnings("cast")
+				ParticipantChanges participant = (ParticipantChanges) getSelectedBuildParticipant();
 				String[] filters = new String[rawFilters.size()];
 				int i = 0;
 				for (Object item : rawFilters)
@@ -389,20 +679,11 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 					filters[i++] = item.toString();
 				}
 				participant.setFilters(EclipseUtil.instanceScope(), filters);
-				if (participant.isEnabled(BuildType.BUILD))
-				{
-					promptForRebuild = true;
-				}
 			}
 		});
 		filterViewer.setEnabled(false);
 
 		return group;
-	}
-
-	protected List<IBuildParticipant> getAllBuildParticipants()
-	{
-		return getBuildParticipantManager().getAllBuildParticipants();
 	}
 
 	protected Set<IContentType> getContentTypes()
@@ -425,27 +706,27 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 
 	private List<IBuildParticipant> getBuildParticipants(String contentTypeId)
 	{
-		List<IBuildParticipant> participants = getBuildParticipantManager().getBuildParticipants(contentTypeId);
+		List<IBuildParticipant> participantsForContentType = getBuildParticipantManager().filterParticipants(
+				this.participants, contentTypeId);
 		// removes the ones that don't have a name defined
-		List<IBuildParticipant> result = new ArrayList<IBuildParticipant>(participants);
-		for (IBuildParticipant participant : participants)
+		return CollectionsUtil.filter(participantsForContentType, new IFilter<IBuildParticipant>()
 		{
-			if (StringUtil.isEmpty(participant.getName()))
+
+			public boolean include(IBuildParticipant participant)
 			{
-				result.remove(participant);
+				return !StringUtil.isEmpty(participant.getName());
 			}
-		}
-		return result;
+		});
 	}
 
-	private IBuildParticipant getSelectedBuildParticipant()
+	private ParticipantChanges getSelectedBuildParticipant()
 	{
 		IStructuredSelection selection = (IStructuredSelection) validatorsViewer.getSelection();
 		if (selection.isEmpty())
 		{
 			return null;
 		}
-		return (IBuildParticipant) selection.getFirstElement();
+		return (ParticipantChanges) selection.getFirstElement();
 	}
 
 	private void updateFilterExpressions()
@@ -531,13 +812,10 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 			if (BUILD.equals(property))
 			{
 				participant.setEnabled(IBuildParticipant.BuildType.BUILD, ((Boolean) value).booleanValue());
-				promptForRebuild = true;
 			}
 			else if (RECONCILE.equals(property))
 			{
 				participant.setEnabled(IBuildParticipant.BuildType.RECONCILE, ((Boolean) value).booleanValue());
-				// don't set changed to true, since we don't really need to do a rebuild on reconcile enable/disable
-				// changes
 			}
 			tableViewer.refresh(participant);
 		}
