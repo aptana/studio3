@@ -25,6 +25,7 @@ import org.eclipse.jface.bindings.BindingManagerEvent;
 import org.eclipse.jface.bindings.IBindingManagerListener;
 import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.jface.bindings.keys.KeySequence;
+import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
@@ -76,6 +77,7 @@ public class FindBarActions
 	public static final String TOGGLE_SEARCH_BACKWARD_COMMAND_ID = "org.eclipse.ui.edit.findbar.toggleSearchBackward"; //$NON-NLS-1$
 	public static final String TOGGLE_COUNT_MATCHES_COMMAND_ID = "org.eclipse.ui.edit.findbar.toggleMatchCount"; //$NON-NLS-1$
 	public static final String TOGGLE_WORD_MATCHING_COMMAND_ID = "org.eclipse.ui.edit.findbar.toggleWordMatching"; //$NON-NLS-1$
+	public static final String TOGGLE_SEARCH_SELECTION_COMMAND_ID = "org.eclipse.ui.edit.findbar.toggleSearchSelection"; //$NON-NLS-1$
 	public static final String SEARCH_IN_OPEN_FILES_COMMAND_ID = "org.eclipse.ui.edit.findbar.searchInOpenFiles"; //$NON-NLS-1$
 	public static final String SEARCH_IN_CURRENT_FILE_COMMAND_ID = "org.eclipse.ui.edit.findbar.searchInCurrentFile"; //$NON-NLS-1$
 	public static final String SEARCH_IN_ENCLOSING_PROJECT_COMMAND_ID = "org.eclipse.ui.edit.findbar.searchInEnclosingProject"; //$NON-NLS-1$
@@ -126,6 +128,7 @@ public class FindBarActions
 		fCommandToHandler.put(TOGGLE_REGEXP_MATCHING_COMMAND_ID, new ToggleRegexpFindBarHandler());
 		fCommandToHandler.put(TOGGLE_SEARCH_BACKWARD_COMMAND_ID, new ToggleSearchBackwardFindBarHandler());
 		fCommandToHandler.put(TOGGLE_COUNT_MATCHES_COMMAND_ID, new ToggleMatchCountFindBarHandler());
+		fCommandToHandler.put(TOGGLE_SEARCH_SELECTION_COMMAND_ID, new ToggleSearchSelectionFindBarHandler());
 		fCommandToHandler.put(SEARCH_IN_OPEN_FILES_COMMAND_ID, new ChangeScopeHandler(FindScope.OPEN_FILES));
 		fCommandToHandler.put(SEARCH_IN_CURRENT_FILE_COMMAND_ID, new ChangeScopeHandler(FindScope.CURRENT_FILE));
 		fCommandToHandler.put(SEARCH_IN_ENCLOSING_PROJECT_COMMAND_ID, new ChangeScopeHandler(
@@ -509,6 +512,21 @@ public class FindBarActions
 			{
 				FindBarConfiguration conf = dec.getConfiguration();
 				conf.setMatchCount(!conf.getMatchCount());
+				dec.showCountTotal();
+			}
+			return null;
+		}
+	}
+
+	private class ToggleSearchSelectionFindBarHandler extends AbstractHandler
+	{
+		public Object execute(ExecutionEvent event) throws ExecutionException
+		{
+			FindBarDecorator dec = findBarDecorator.get();
+			if (dec != null)
+			{
+				dec.searchSelection.setSelection(!dec.searchSelection.getSelection());
+				dec.updateSearchSelection();
 			}
 			return null;
 		}
@@ -617,18 +635,28 @@ public class FindBarActions
 					dec.searchBackward);
 			updateTooltip(TOGGLE_COUNT_MATCHES_COMMAND_ID, Messages.FindBarDecorator_TOOLTIP_ShowMatchCount,
 					dec.countMatches);
+			updateTooltip(TOGGLE_SEARCH_SELECTION_COMMAND_ID, Messages.FindBarDecorator_LABEL_SearchSelection,
+					dec.searchSelection);
 			updateTooltip(SHOW_OPTIONS_COMMAND_ID, Messages.FindBarDecorator_LABEL_ShowOptions, dec.options);
 
 			List<TriggerSequence> bindings = fCommandToBinding.get(FOCUS_REPLACE_COMMAND_ID);
 			if (!CollectionsUtil.isEmpty(bindings))
 			{
-				dec.textReplace.setToolTipText(Messages.FindBarActions_TOOLTIP_FocusReplaceCombo + bindings.get(0));
+				dec.textReplace.setToolTipText(MessageFormat.format(
+						Messages.FindBarActions_TOOLTIP_FocusReplaceCombo,
+						bindings.get(0),
+						KeySequence.getInstance(new KeyStroke[] { KeyStroke.getInstance(SWT.CTRL, SWT.CR),
+								KeyStroke.getInstance(SWT.COMMAND, SWT.CR) })));
 			}
 
 			bindings = fCommandToBinding.get(FOCUS_FIND_COMMAND_ID);
 			if (!CollectionsUtil.isEmpty(bindings))
 			{
-				dec.textFind.setToolTipText(Messages.FindBarActions_TOOLTIP_FocusFindCombo + bindings.get(0));
+				dec.textFind.setToolTipText(MessageFormat.format(
+						Messages.FindBarActions_TOOLTIP_FocusFindCombo,
+						bindings.get(0),
+						KeySequence.getInstance(new KeyStroke[] { KeyStroke.getInstance(SWT.CTRL, SWT.CR),
+								KeyStroke.getInstance(SWT.COMMAND, SWT.CR) })));
 			}
 		}
 

@@ -13,10 +13,14 @@ import java.util.regex.PatternSyntaxException;
 import org.eclipse.jface.text.IFindReplaceTarget;
 import org.eclipse.jface.text.IFindReplaceTargetExtension;
 import org.eclipse.jface.text.IFindReplaceTargetExtension3;
+import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.texteditor.ITextEditor;
+
+import com.aptana.core.util.StringUtil;
 
 /**
  * Helper for actually doing the find actions.
@@ -28,6 +32,7 @@ public class FindBarFinder
 	private ITextEditor textEditor;
 	private int incrementalOffset = -1;
 	private ISourceViewer sourceViewer;
+	private IRegion scope;
 	private WeakReference<FindBarDecorator> findBarDecorator;
 
 	public FindBarFinder(ITextEditor textEditor, ISourceViewer sourceViewer, FindBarDecorator findBarDecorator)
@@ -65,15 +70,10 @@ public class FindBarFinder
 		{
 			try
 			{
-				if (findReplaceTarget instanceof IFindReplaceTargetExtension)
-				{
-					IFindReplaceTargetExtension findReplaceTargetExtension = (IFindReplaceTargetExtension) findReplaceTarget;
-					findReplaceTargetExtension.beginSession();
-				}
-				String findText = dec.textFind.getText();
 				StyledText textWidget = sourceViewer.getTextWidget();
-				int offset = textWidget.getCaretOffset();
 				Point selection = textWidget.getSelection();
+				String findText = dec.textFind.getText();
+				int offset = textWidget.getCaretOffset();
 				if (wrapping)
 				{
 					if (forward)
@@ -115,6 +115,27 @@ public class FindBarFinder
 					}
 				}
 				int newOffset = -1;
+				if (findReplaceTarget instanceof IFindReplaceTargetExtension)
+				{
+					IFindReplaceTargetExtension findReplaceTargetExtension = (IFindReplaceTargetExtension) findReplaceTarget;
+
+					// If a session was previously started, end it
+					if (findReplaceTargetExtension.getScope() != null)
+					{
+						findReplaceTargetExtension.endSession();
+					}
+					findReplaceTargetExtension.beginSession();
+
+					// Set the scope based on whether selection is enabled
+					if (dec.searchSelection.getSelection())
+					{
+						enableScope(findReplaceTargetExtension);
+					}
+					else
+					{
+						findReplaceTargetExtension.setScope(null);
+					}
+				}
 				if (findReplaceTarget instanceof IFindReplaceTargetExtension3)
 				{
 					try
@@ -123,6 +144,7 @@ public class FindBarFinder
 						newOffset = ((IFindReplaceTargetExtension3) findReplaceTarget).findAndSelect(forward ? offset
 								: offset - 1, findText, forward, dec.getConfiguration().getCaseSensitive(), dec
 								.getWholeWord(), dec.getConfiguration().getRegularExpression());
+
 					}
 					catch (PatternSyntaxException e)
 					{
@@ -150,7 +172,7 @@ public class FindBarFinder
 					}
 					else
 					{
-						dec.statusLineManager.setMessage(false, "", null); //$NON-NLS-1$
+						dec.statusLineManager.setMessage(false, StringUtil.EMPTY, null);
 					}
 				}
 				else
@@ -168,10 +190,9 @@ public class FindBarFinder
 			}
 			finally
 			{
-				if (findReplaceTarget instanceof IFindReplaceTargetExtension)
+				if (findReplaceTarget instanceof IFindReplaceTargetExtension && !dec.searchSelection.getSelection())
 				{
-					IFindReplaceTargetExtension findReplaceTargetExtension = (IFindReplaceTargetExtension) findReplaceTarget;
-					findReplaceTargetExtension.endSession();
+					((IFindReplaceTargetExtension) findReplaceTarget).endSession();
 				}
 			}
 		}
@@ -183,8 +204,54 @@ public class FindBarFinder
 		incrementalOffset = -1;
 	}
 
-	public int getIncrementalOffset()
+	void resetScope()
 	{
-		return incrementalOffset;
+		scope = null;
+		IFindReplaceTarget findReplaceTarget = (IFindReplaceTarget) textEditor.getAdapter(IFindReplaceTarget.class);
+		if (findReplaceTarget instanceof IFindReplaceTargetExtension)
+		{
+			((IFindReplaceTargetExtension) findReplaceTarget).endSession();
+		}
+	}
+
+	void enableScope(IFindReplaceTargetExtension findReplaceTargetExtension)
+	{
+		FindBarDecorator dec = findBarDecorator.get();
+		if (dec == null)
+		{
+			return;
+		}
+
+		if (findReplaceTargetExtension == null)
+		{
+			IFindReplaceTarget findReplaceTarget = (IFindReplaceTarget) textEditor.getAdapter(IFindReplaceTarget.class);
+			if (findReplaceTarget instanceof IFindReplaceTargetExtension)
+			{
+				findReplaceTargetExtension = (IFindReplaceTargetExtension) findReplaceTarget;
+			}
+		}
+
+		if (findReplaceTargetExtension != null)
+		{
+			if (dec.searchSelection.getSelection())
+			{
+				if (scope == null)
+				{
+					Point lineSelection = findReplaceTargetExtension.getLineSelection();
+					scope = new Region(lineSelection.x, lineSelection.y);
+				}
+				findReplaceTargetExtension.setSelection(sourceViewer.getTextWidget().getCaretOffset(), 0);
+				if (findReplaceTargetExtension.getScope() != null)
+				{
+					findReplaceTargetExtension.setScope(null);
+				}
+				findReplaceTargetExtension.setScope(scope);
+			}
+		}
+	}
+
+	IRegion getScope()
+	{
+		return scope;
 	}
 }

@@ -35,7 +35,9 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IFindReplaceTarget;
 import org.eclipse.jface.text.IFindReplaceTargetExtension3;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextSelection;
+import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.text.TextUtilities;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -45,6 +47,10 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
@@ -210,6 +216,20 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	FindScope findScope;
 	Map<FindScope, String> scopeMap = new LinkedHashMap<FindScope, String>(4);
 
+	// Focus listener used to trigger when the find bar focus is lost
+	FocusListener textViewerFocusListener = new FocusListener()
+	{
+
+		public void focusLost(FocusEvent e)
+		{
+		}
+
+		public void focusGained(FocusEvent e)
+		{
+			findBarFocusLost();
+		}
+	};
+
 	public FindBarDecorator(final ITextEditor textEditor)
 	{
 		this.textEditor = textEditor;
@@ -234,6 +254,19 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 			public void execute(FindBarDecorator dec)
 			{
 				dec.findNextOrprevAfterChangeOption();
+			}
+		});
+		fFindBarOptions.add(new FindBarOption("searchSelection", //$NON-NLS-1$
+				ICON_SEARCH_SELECTION, null, Messages.FindBarDecorator_LABEL_SearchSelection, this, true, null)
+		{
+			public void execute(FindBarDecorator dec)
+			{
+				updateSearchSelection();
+			}
+
+			boolean isCheckable()
+			{
+				return true;
 			}
 		});
 		fFindBarOptions.add(new FindBarOption(
@@ -280,7 +313,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		});
 		countMatchesOption = new FindBarOption(
 				"countMatches", //$NON-NLS-1$
-				SIGMA, null, Messages.FindBarDecorator_TOOLTIP_MatchCount, this, true,
+				SIGMA, null, Messages.FindBarDecorator_TOOLTIP_MatchCount, this,
 				IPreferencesConstants.MATCH_COUNT_IN_FIND_BAR)
 		{
 			public void execute(FindBarDecorator dec)
@@ -360,6 +393,16 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 				}
 			}
 		});
+
+		composite.addControlListener(new ControlAdapter()
+		{
+			public void controlResized(ControlEvent event)
+			{
+				// When the parent composite is resized, layout the find bar
+				findBar.getParent().layout(new Control[] { findBar });
+			}
+		});
+
 		sashGridData = createdDefaultGridData(SWT.FILL, SWT.BEGINNING, true, false);
 		sashGridData.heightHint = 3;
 		sashGridData.exclude = true;
@@ -401,33 +444,18 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 		ToolBar replaceToolbar = new ToolBar(findBar, SWT.NONE);
 		replaceToolbar.setLayoutData(createdDefaultGridData(SWT.LEFT, SWT.BEGINNING, false, false));
+		replaceHistory = createHistoryToolItem(replaceToolbar, FindBarEntriesHelper.PREFERENCE_NAME_REPLACE);
 
 		Composite searchComposite = new Composite(findBar, SWT.NONE);
 		searchComposite.setLayout(GridLayoutFactory.fillDefaults().spacing(0, 0).create());
 		searchComposite.setLayoutData(GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING)
 				.grab(false, true).create());
 
-		ToolBar optionsToolBar = new ToolBar(searchComposite, SWT.RIGHT);
-		optionsToolBar.setLayoutData(createdDefaultGridData(SWT.LEFT, SWT.BEGINNING, false, false));
-
-		replaceHistory = createHistoryToolItem(optionsToolBar, FindBarEntriesHelper.PREFERENCE_NAME_REPLACE);
-
-		new ToolItem(optionsToolBar, SWT.SEPARATOR);
-
-		for (FindBarOption option : fFindBarOptions)
-		{
-			option.createToolItem(optionsToolBar);
-		}
-
-		new ToolItem(optionsToolBar, SWT.SEPARATOR);
-
-		scopeToolItem = createScopeToolItem(optionsToolBar);
-
-		countMatchesOption.createToolItem(optionsToolBar);
-
 		Composite findButtonComposite = new Composite(searchComposite, SWT.NONE);
-		findButtonComposite.setLayout(GridLayoutFactory.fillDefaults().spacing(0, 0).numColumns(4).create());
-		findButtonComposite.setLayoutData(GridDataFactory.fillDefaults().create());
+		findButtonComposite.setLayout(GridLayoutFactory.fillDefaults()
+				.spacing(Platform.OS_MACOSX.equals(Platform.getOS()) ? 0 : 5, 0).numColumns(4).create());
+		findButtonComposite.setLayoutData(GridDataFactory.fillDefaults()
+				.indent(0, Platform.OS_MACOSX.equals(Platform.getOS()) ? -4 : 0).create());
 
 		findButton = createButton(findButtonComposite, null, true);
 		findButton.setText(Messages.FindBarDecorator_LABEL_Find);
@@ -440,6 +468,21 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 		replaceAll = createButton(findButtonComposite, null, true);
 		replaceAll.setText(Messages.FindBarDecorator_LABEL_ReplaceAll);
+
+		ToolBar optionsToolBar = new ToolBar(searchComposite, SWT.RIGHT);
+		optionsToolBar.setLayoutData(GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING)
+				.indent(Platform.OS_MACOSX.equals(Platform.getOS()) ? 5 : 0, 0).create());
+
+		for (FindBarOption option : fFindBarOptions)
+		{
+			option.createToolItem(optionsToolBar);
+		}
+
+		new ToolItem(optionsToolBar, SWT.SEPARATOR);
+
+		scopeToolItem = createScopeToolItem(optionsToolBar);
+
+		countMatchesOption.createToolItem(optionsToolBar);
 
 		close = createLabel(findBar, CLOSE, true, CLOSE_ENTER);
 		close.setToolTipText(Messages.FindBarDecorator_TOOLTIP_HideFindBar);
@@ -456,14 +499,23 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		findBarVisibilityControl.register(this);
 	}
 
+	private void findBarFocusLost()
+	{
+		// When the find bar focus is lost, update the search selection
+		searchSelection.setSelection(false);
+		updateSearchSelection();
+	}
+
 	/**
 	 * @return
 	 */
 	private ToolItem createScopeToolItem(ToolBar parent)
 	{
+		findScope = FindScope.CURRENT_FILE;
 		ToolItem toolItem = new ToolItem(parent, SWT.DROP_DOWN);
 		toolItem.setText(Messages.FindBarDecorator_LABEL_Scope);
-		findScope = FindScope.CURRENT_FILE;
+		toolItem.setToolTipText(MessageFormat.format(Messages.FindBarDecorator_TOOLTIP_Scope_menu_item,
+				findScope.toString()));
 		toolItem.setImage(FindBarPlugin.getImage(FindBarPlugin.ICON_SEARCH_CURRENT_FILE));
 		toolItem.addSelectionListener(new SelectionAdapter()
 		{
@@ -476,60 +528,58 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				if (e.detail == SWT.ARROW)
+				ToolItem toolItem = (ToolItem) e.widget;
+				ToolBar toolbar = toolItem.getParent();
+				Rectangle bounds = toolItem.getBounds();
+				Point point = toolbar.toDisplay(new Point(bounds.x, bounds.y + bounds.height));
+
+				if (menu == null)
 				{
-					ToolBar toolbar = ((ToolItem) e.widget).getParent();
-					Point point = toolbar.toDisplay(new Point(e.x, e.y));
+					menu = new Menu(UIUtils.getActiveShell(),
+							(toolbar.getStyle() & (SWT.RIGHT_TO_LEFT | SWT.LEFT_TO_RIGHT)) | SWT.POP_UP);
 
-					if (menu == null)
+					Map<String, List<TriggerSequence>> commandToBindings = findBarActions.getCommandToBindings();
+
+					for (final FindScope scope : scopeMap.keySet())
 					{
-						menu = new Menu(UIUtils.getActiveShell(),
-								(toolbar.getStyle() & (SWT.RIGHT_TO_LEFT | SWT.LEFT_TO_RIGHT)) | SWT.POP_UP);
-
-						Map<String, List<TriggerSequence>> commandToBindings = findBarActions
-								.getCommandToBindings();
-
-						for (final FindScope scope : scopeMap.keySet())
+						String commandId = StringUtil.EMPTY;
+						String trigger = StringUtil.EMPTY;
+						switch (scope)
 						{
-							String commandId = StringUtil.EMPTY;
-							String trigger = StringUtil.EMPTY;
-							switch (scope)
-							{
-								case CURRENT_FILE:
-									commandId = FindBarActions.SEARCH_IN_CURRENT_FILE_COMMAND_ID;
-									break;
-								case OPEN_FILES:
-									commandId = FindBarActions.SEARCH_IN_OPEN_FILES_COMMAND_ID;
-									break;
-								case ENCLOSING_PROJECT:
-									commandId = FindBarActions.SEARCH_IN_ENCLOSING_PROJECT_COMMAND_ID;
-									break;
-								case WORKSPACE:
-									commandId = FindBarActions.SEARCH_IN_WORKSPACE_COMMAND_ID;
-									break;
-							}
-
-							List<TriggerSequence> triggers = commandToBindings.get(commandId);
-							if (!CollectionsUtil.isEmpty(triggers))
-							{
-								trigger = triggers.get(0).toString();
-							}
-							MenuItem menuItem = new MenuItem(menu, SWT.NONE);
-							menuItem.setText(StringUtil.isEmpty(trigger) ? scope.toString() : MessageFormat.format(
-									Messages.FindBarDecorator_LABEL_Scope_Shortcut, scope.toString(), trigger));
-							menuItem.setImage(FindBarPlugin.getImage(scopeMap.get(scope)));
-							menuItem.addSelectionListener(new SelectionAdapter()
-							{
-								public void widgetSelected(SelectionEvent e)
-								{
-									updateSearchScope(scope);
-								};
-							});
+							case CURRENT_FILE:
+								commandId = FindBarActions.SEARCH_IN_CURRENT_FILE_COMMAND_ID;
+								break;
+							case OPEN_FILES:
+								commandId = FindBarActions.SEARCH_IN_OPEN_FILES_COMMAND_ID;
+								break;
+							case ENCLOSING_PROJECT:
+								commandId = FindBarActions.SEARCH_IN_ENCLOSING_PROJECT_COMMAND_ID;
+								break;
+							case WORKSPACE:
+								commandId = FindBarActions.SEARCH_IN_WORKSPACE_COMMAND_ID;
+								break;
 						}
+
+						List<TriggerSequence> triggers = commandToBindings.get(commandId);
+						if (!CollectionsUtil.isEmpty(triggers))
+						{
+							trigger = triggers.get(0).toString();
+						}
+						MenuItem menuItem = new MenuItem(menu, SWT.NONE);
+						menuItem.setText(StringUtil.isEmpty(trigger) ? scope.toString() : MessageFormat.format(
+								Messages.FindBarDecorator_LABEL_Scope_Shortcut, scope.toString(), trigger));
+						menuItem.setImage(FindBarPlugin.getImage(scopeMap.get(scope)));
+						menuItem.addSelectionListener(new SelectionAdapter()
+						{
+							public void widgetSelected(SelectionEvent e)
+							{
+								updateSearchScope(scope);
+							};
+						});
 					}
-					menu.setLocation(point.x, point.y);
-					menu.setVisible(true);
 				}
+				menu.setLocation(point.x, point.y);
+				menu.setVisible(true);
 			}
 		});
 
@@ -540,7 +590,8 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	{
 		findScope = scope;
 		scopeToolItem.setImage(FindBarPlugin.getImage(scopeMap.get(findScope)));
-		scopeToolItem.setToolTipText(MessageFormat.format(Messages.FindBarDecorator_TOOLTIP_Scope_menu_item, findScope.toString()));
+		scopeToolItem.setToolTipText(MessageFormat.format(Messages.FindBarDecorator_TOOLTIP_Scope_menu_item,
+				findScope.toString()));
 
 		boolean isCurrentFile = findScope == FindScope.CURRENT_FILE;
 		Control[] controls = new Control[] { textReplace, replace, replaceAll, replaceFind };
@@ -552,6 +603,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		textReplace.setBackground(isCurrentFile ? null : UIUtils.getDisplay().getSystemColor(
 				SWT.COLOR_WIDGET_BACKGROUND));
 		replaceHistory.setEnabled(isCurrentFile);
+		searchSelection.setEnabled(isCurrentFile);
 		countMatches.setEnabled(isCurrentFile);
 	}
 
@@ -595,8 +647,9 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 		historyToolItem.addSelectionListener(new SelectionAdapter()
 		{
-			Menu menu = null;
+			// Replace newline characters with the literals
 			Map<String, String> replacements = CollectionsUtil.newMap("\\n", "\\\\n", "\\r", "\\\\r"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			Menu menu = null;
 
 			/*
 			 * (non-Javadoc)
@@ -628,7 +681,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 							{
 								public void widgetSelected(SelectionEvent e)
 								{
-									getText().setText(item);
+									updateText(item);
 								};
 							});
 						}
@@ -638,13 +691,18 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 				}
 				else if (!CollectionsUtil.isEmpty(loadEntries))
 				{
-					getText().setText(loadEntries.get(0));
+					String lastSearch = loadEntries.get(0);
+					updateText(lastSearch);
 				}
 			}
 
-			Text getText()
+			void updateText(String text)
 			{
-				return FindBarEntriesHelper.PREFERENCE_NAME_REPLACE.equals(preferenceName) ? textReplace : textFind;
+				Text textBox = FindBarEntriesHelper.PREFERENCE_NAME_REPLACE.equals(preferenceName) ? textReplace
+						: textFind;
+				textBox.setForeground(null);
+				textBox.setText(text);
+				textBox.setSelection(0, text.length());
 			}
 		});
 
@@ -703,7 +761,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	 */
 	private Text createText(String preferenceName)
 	{
-		final Text text = new Text(findBar, SWT.MULTI | SWT.V_SCROLL | SWT.BORDER);
+		final Text text = new Text(findBar, SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL | SWT.BORDER);
 		text.setLayoutData(createdDefaultGridData(SWT.FILL, SWT.FILL, true, true));
 
 		entriesControlHandles.add(findBarEntriesHelper.register(text, modifyListener, preferenceName));
@@ -737,7 +795,8 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 				{
 					ITextSelection textSelection = (ITextSelection) selection;
 					String text = textSelection.getText();
-					if (text.indexOf("\n") == -1 && text.indexOf("\r") == -1 && text.length() > 0) { //$NON-NLS-1$ //$NON-NLS-2$
+					if (!StringUtil.isEmpty(text))
+					{
 						selectedFindText = text;
 					}
 				}
@@ -945,6 +1004,11 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		}
 		findBarEntriesHelper.unregister(entriesControlHandles);
 		entriesControlHandles.clear();
+
+		if (sourceViewer.getTextWidget() != null && !sourceViewer.getTextWidget().isDisposed())
+		{
+			sourceViewer.getTextWidget().removeFocusListener(textViewerFocusListener);
+		}
 	}
 
 	public void widgetDefaultSelected(SelectionEvent e)
@@ -1094,8 +1158,11 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	private void adjustEnablement()
 	{
 		String text = textFind.getText();
-		findButton.setEnabled(!StringUtil.EMPTY.equals(text));
-		// countMatches.setText(StringUtil.EMPTY); s
+		boolean isFindEmpty = StringUtil.EMPTY.equals(text) || DISABLED_COLOR.equals(textFind.getForeground());
+		findButton.setEnabled(!isFindEmpty);
+		replace.setEnabled(!isFindEmpty);
+		replaceFind.setEnabled(!isFindEmpty);
+		replaceAll.setEnabled(!isFindEmpty);
 		wholeWord.setEnabled(!StringUtil.EMPTY.equals(text) && !getConfiguration().getRegularExpression()
 				&& isWord(text));
 	}
@@ -1113,6 +1180,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 			findBarGridData.exclude = true;
 			composite.layout();
 			findBarFinder.resetIncrementalOffset();
+			findBarFinder.resetScope();
 			removeComboSearchOnTextChangeListener();
 			statusLineManager.setMessage(false, StringUtil.EMPTY, null);
 		}
@@ -1124,6 +1192,8 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 				w.setEnabled(false);
 			}
 		}
+
+		sourceViewer.getTextWidget().removeFocusListener(textViewerFocusListener);
 	}
 
 	public void addComboSearchOnTextChangeListener()
@@ -1174,12 +1244,12 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 			});
 		}
 		adjustEnablement();
-		boolean comboHasFocus = textFind.isFocusControl();
-		if (!comboHasFocus)
+		if (!textFind.isFocusControl())
 		{
 			textFind.setFocus();
 			findBarFinder.resetIncrementalOffset();
 		}
+		sourceViewer.getTextWidget().addFocusListener(textViewerFocusListener);
 	}
 
 	/* default */void findPrevious()
@@ -1245,7 +1315,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 	private FindBarOption countMatchesOption;
 
-	private void showCountTotal()
+	void showCountTotal()
 	{
 		if (!countMatches.getSelection())
 		{
@@ -1257,17 +1327,32 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 		int currentCount = 0;
 		int total = 0;
-		if (!StringUtil.EMPTY.equals(textFind.getText()))
+		if (!StringUtil.isEmpty(textFind.getText()))
 		{
 			String text = sourceViewer.getDocument().get();
 			Pattern pattern = createFindPattern();
+			IRegion scope = findBarFinder.getScope();
+
+			// Truncate the search string if there is a scope set
+			if (scope != null)
+			{
+				text = text.substring(scope.getOffset(), scope.getOffset() + scope.getLength());
+			}
+			else
+			{
+				scope = new Region(0, text.length());
+			}
+
 			Matcher matcher = pattern.matcher(text);
+
 			if (matcher.find(0))
 			{
 				total = 1;
 
-				if ((!getConfiguration().getSearchBackward() && lastCountOffset > matcher.start())
-						|| (getConfiguration().getSearchBackward() && lastCountOffset >= matcher.start()))
+				FindBarConfiguration configuration = getConfiguration();
+				if ((!configuration.getSearchBackward() && lastCountOffset > (matcher.start() + scope.getOffset()))
+						|| (configuration.getSearchBackward() && lastCountOffset >= (matcher.start() + scope
+								.getOffset())))
 				{
 					currentCount = total;
 				}
@@ -1275,8 +1360,9 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 				{
 					++total;
 
-					if ((!getConfiguration().getSearchBackward() && lastCountOffset > matcher.start())
-							|| (getConfiguration().getSearchBackward() && lastCountOffset >= matcher.start()))
+					if ((!configuration.getSearchBackward() && lastCountOffset > (matcher.start() + scope.getOffset()))
+							|| (configuration.getSearchBackward() && lastCountOffset >= (matcher.start() + scope
+									.getOffset())))
 					{
 						currentCount = total;
 					}
@@ -1300,12 +1386,13 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		}
 		else
 		{
-			countMatches.setText(MessageFormat.format(Messages.FindBarDecorator_LABEL_Count_Match, String.valueOf(currentCount), String.valueOf(total)));
+			countMatches.setText(MessageFormat.format(Messages.FindBarDecorator_LABEL_Count_Match,
+					String.valueOf(currentCount), String.valueOf(total)));
 			lastCountPosition = currentCount;
 		}
 		lastCountTotal = total;
 
-		countMatches.getParent().getParent().layout(new Control[] { countMatches.getParent() });
+		findBar.layout(true, true);
 	}
 
 	Pattern createFindPattern()
@@ -1356,8 +1443,8 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 						lastCountPosition = lastCountTotal;
 					}
 				}
-				countMatches.setText(MessageFormat.format(Messages.FindBarDecorator_LABEL_Count_Match, String.valueOf(lastCountPosition),
-						String.valueOf(lastCountTotal)));
+				countMatches.setText(MessageFormat.format(Messages.FindBarDecorator_LABEL_Count_Match,
+						String.valueOf(lastCountPosition), String.valueOf(lastCountTotal)));
 			}
 			else
 			{
@@ -1372,6 +1459,23 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		if (countMatches.getSelection())
 		{
 			lastCountOffset = sourceViewer.getTextWidget().getCaretOffset();
+		}
+	}
+
+	void updateSearchSelection()
+	{
+		findBarFinder.resetScope();
+		if (searchSelection.getSelection())
+		{
+			if (!textReplace.isFocusControl())
+			{
+				textFind.setFocus();
+			}
+			findBarFinder.enableScope(null);
+		}
+		if (countMatches.getSelection())
+		{
+			showCountTotal();
 		}
 	}
 
@@ -1509,6 +1613,10 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		sashSeparator.setBounds(0, hSashBounds.y - separatorBounds.height, clientRect.width, separatorBounds.height);
 		findBar.setBounds(0, hSashBounds.y + hSashBounds.height, clientRect.width, clientRect.height
 				- (hSashBounds.y + hSashBounds.height));
+
+		// Set the height hint so that upon resize the previous height is honored
+		findBarGridData.heightHint = clientRect.height - (hSashBounds.y + hSashBounds.height);
+
 	}
 
 	String getLineDelimiter(IDocument document)

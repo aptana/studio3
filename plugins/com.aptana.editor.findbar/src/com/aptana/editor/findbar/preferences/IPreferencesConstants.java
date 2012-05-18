@@ -43,8 +43,6 @@ public interface IPreferencesConstants
 
 	public static final String WHOLE_WORD_IN_FIND_BAR = FindBarPlugin.PLUGIN_ID + ".wholeWordFindBar"; //$NON-NLS-1$
 
-	public static final String SEARCH_SELECTION_IN_FIND_BAR = FindBarPlugin.PLUGIN_ID + ".searchSelectionFindBar"; //$NON-NLS-1$
-
 	public static final String MATCH_COUNT_IN_FIND_BAR = FindBarPlugin.PLUGIN_ID + ".matchCount"; //$NON-NLS-1$
 
 	public static final String SCOPE_IN_FIND_BAR = FindBarPlugin.PLUGIN_ID + ".scope"; //$NON-NLS-1$
