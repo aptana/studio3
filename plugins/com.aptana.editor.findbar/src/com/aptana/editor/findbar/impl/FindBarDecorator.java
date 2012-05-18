@@ -51,7 +51,6 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
@@ -80,7 +79,6 @@ import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
-import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.commands.ICommandService;
@@ -769,7 +767,6 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		entriesControlHandles.add(findBarEntriesHelper.register(text, modifyListener, preferenceName));
 
 		text.addFocusListener(findBarActions.createFocusListener(text));
-		text.addKeyListener(newlineKeyListener);
 		return text;
 	}
 
@@ -810,6 +807,11 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		if (visible)
 		{
 			textFind.setFocus();
+			String text = textFind.getText();
+			if (!StringUtil.isEmpty(text))
+			{
+				textFind.setSelection(0, text.length());
+			}
 		}
 	}
 
@@ -918,32 +920,6 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 			searchOnModifyText = false;
 		}
 	}
-
-	private KeyAdapter newlineKeyListener = new KeyAdapter()
-	{
-		public void keyPressed(KeyEvent e)
-		{
-			if ((e.keyCode == SWT.CR || e.keyCode == SWT.KEYPAD_CR)
-					&& ((e.stateMask & SWT.COMMAND) == SWT.COMMAND || (e.stateMask & SWT.CTRL) == SWT.CTRL))
-			{
-				e.doit = false;
-				Widget widget = e.widget;
-				if (widget instanceof Text)
-				{
-
-					Text text = (Text) widget;
-					StringBuilder sb = new StringBuilder(text.getText());
-					Point selection = text.getSelection();
-					sb.insert(
-							selection.x,
-							getLineDelimiter(textEditor.getDocumentProvider().getDocument(
-									UIUtils.getActiveEditor().getEditorInput())));
-					text.setText(sb.toString());
-					text.setSelection(selection.x + 1);
-				}
-			}
-		}
-	};
 
 	private final class UpdateFindBarActionOnPropertyChange implements IPropertyChangeListener
 	{
@@ -1167,9 +1143,14 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		}
 	}
 
-	boolean isActive()
+	boolean isFindTextActive()
 	{
 		return isVisible() && (textFind.getDisplay().getFocusControl() == textFind);
+	}
+
+	boolean isReplaceTextActive()
+	{
+		return isVisible() && (textReplace.getDisplay().getFocusControl() == textReplace);
 	}
 
 	private void adjustEnablement()
@@ -1653,5 +1634,17 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	{
 		return textReplace == null || textReplace.isDisposed() || DISABLED_COLOR.equals(textReplace.getForeground()) ? StringUtil.EMPTY
 				: textReplace.getText();
+	}
+
+	void inputNewline(Text text)
+	{
+		StringBuilder sb = new StringBuilder(text.getText());
+		Point selection = text.getSelection();
+		sb.insert(
+				selection.x,
+				getLineDelimiter(textEditor.getDocumentProvider().getDocument(
+						UIUtils.getActiveEditor().getEditorInput())));
+		text.setText(sb.toString());
+		text.setSelection(selection.x + 1);
 	}
 }

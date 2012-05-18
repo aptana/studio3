@@ -26,7 +26,6 @@ import org.eclipse.jface.bindings.BindingManagerEvent;
 import org.eclipse.jface.bindings.IBindingManagerListener;
 import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.jface.bindings.keys.KeySequence;
-import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -70,6 +69,7 @@ public class FindBarActions
 	public static final String FIND_PREVIOUS_COMMAND_ID = "org.eclipse.ui.edit.findbar.findPrevious"; //$NON-NLS-1$
 	public static final String FIND_NEXT_COMMAND_ID = "org.eclipse.ui.edit.findbar.findNext"; //$NON-NLS-1$
 	public static final String FIND_NEXT_OR_PREV_COMMAND_ID = "org.eclipse.ui.edit.findbar.findNextOrPrev"; //$NON-NLS-1$
+	public static final String INPUT_NEWLINE_COMMAND_ID = "org.eclipse.ui.edit.findbar.inputNewline"; //$NON-NLS-1$
 	public static final String FOCUS_REPLACE_COMMAND_ID = "org.eclipse.ui.edit.findbar.focusReplace"; //$NON-NLS-1$
 	public static final String FOCUS_FIND_COMMAND_ID = "org.eclipse.ui.edit.findbar.focusFind"; //$NON-NLS-1$
 	public static final String FOCUS_FIND_OR_OPEN_ECLIPSE_SEARCH_COMMAND_ID = "org.eclipse.ui.edit.findbar.focusFindOrOpenEclipseSearch"; //$NON-NLS-1$
@@ -120,6 +120,7 @@ public class FindBarActions
 		fCommandToHandler.put(FIND_PREVIOUS_COMMAND_ID, new FindPreviousHandler());
 		fCommandToHandler.put(FIND_NEXT_COMMAND_ID, new FindNextHandler());
 		fCommandToHandler.put(FIND_NEXT_OR_PREV_COMMAND_ID, new FindNextOrPrevHandler());
+		fCommandToHandler.put(INPUT_NEWLINE_COMMAND_ID, new InputNewlineInFindBarHandler());
 		fCommandToHandler.put(FOCUS_FIND_COMMAND_ID, new FocusFindFindBarHandler());
 		fCommandToHandler.put(FOCUS_FIND_OR_OPEN_ECLIPSE_SEARCH_COMMAND_ID,
 				new FocusFindOrOpenEclipseSearchFindBarHandler());
@@ -395,6 +396,23 @@ public class FindBarActions
 		}
 	}
 
+	private class InputNewlineInFindBarHandler extends AbstractHandler
+	{
+		public Object execute(ExecutionEvent event) throws ExecutionException
+		{
+			FindBarDecorator dec = findBarDecorator.get();
+			if (dec.isFindTextActive())
+			{
+				dec.inputNewline(dec.textFind);
+			}
+			else if (dec.isReplaceTextActive())
+			{
+				dec.inputNewline(dec.textReplace);
+			}
+			return null;
+		}
+	}
+
 	private class FocusFindFindBarHandler extends AbstractHandler
 	{
 		public Object execute(ExecutionEvent event) throws ExecutionException
@@ -643,21 +661,31 @@ public class FindBarActions
 			List<TriggerSequence> bindings = fCommandToBinding.get(FOCUS_REPLACE_COMMAND_ID);
 			if (!CollectionsUtil.isEmpty(bindings))
 			{
-				dec.textReplace.setToolTipText(MessageFormat.format(
-						Messages.FindBarActions_TOOLTIP_FocusReplaceCombo,
-						bindings.get(0),
-						KeySequence.getInstance(new KeyStroke[] { KeyStroke.getInstance(SWT.CTRL, SWT.CR),
-								KeyStroke.getInstance(SWT.COMMAND, SWT.CR) })));
+				List<TriggerSequence> newlineTriggers = fCommandToBinding.get(INPUT_NEWLINE_COMMAND_ID);
+				List<String> triggers = new ArrayList<String>(newlineTriggers.size() + 1);
+				triggers.add(bindings.get(0).toString());
+				for (TriggerSequence sequence : newlineTriggers)
+				{
+					triggers.add(sequence.toString());
+				}
+
+				dec.textReplace.setToolTipText(MessageFormat.format(Messages.FindBarActions_TOOLTIP_FocusReplaceCombo,
+						triggers.toArray(new Object[triggers.size()])));
 			}
 
 			bindings = fCommandToBinding.get(FOCUS_FIND_COMMAND_ID);
 			if (!CollectionsUtil.isEmpty(bindings))
 			{
-				dec.textFind.setToolTipText(MessageFormat.format(
-						Messages.FindBarActions_TOOLTIP_FocusFindCombo,
-						bindings.get(0),
-						KeySequence.getInstance(new KeyStroke[] { KeyStroke.getInstance(SWT.CTRL, SWT.CR),
-								KeyStroke.getInstance(SWT.COMMAND, SWT.CR) })));
+				List<TriggerSequence> newlineTriggers = fCommandToBinding.get(INPUT_NEWLINE_COMMAND_ID);
+				List<String> triggers = new ArrayList<String>(newlineTriggers.size() + 1);
+				triggers.add(bindings.get(0).toString());
+				for (TriggerSequence sequence : newlineTriggers)
+				{
+					triggers.add(sequence.toString());
+				}
+
+				dec.textFind.setToolTipText(MessageFormat.format(Messages.FindBarActions_TOOLTIP_FocusFindCombo,
+						triggers.toArray(new Object[triggers.size()])));
 			}
 		}
 

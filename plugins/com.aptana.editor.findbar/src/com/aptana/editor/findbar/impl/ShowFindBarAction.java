@@ -38,7 +38,7 @@ public class ShowFindBarAction extends FindReplaceAction
 		if (findBarDecorated != null)
 		{
 			IFindBarDecorator findBarDecorator = findBarDecorated.getFindBarDecorator();
-			if (((FindBarDecorator) findBarDecorator).isActive())
+			if (((FindBarDecorator) findBarDecorator).isFindTextActive())
 			{
 				super.run();
 			}

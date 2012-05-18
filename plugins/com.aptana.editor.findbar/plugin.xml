@@ -30,6 +30,11 @@
       </command>
       <command
             categoryId="org.eclipse.ui.category.edit"
+            id="org.eclipse.ui.edit.findbar.inputNewline"
+            name="%InputNewline.command.name">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
             id="org.eclipse.ui.edit.findbar.focusFind"
             name="%FocusFind.command.name">
       </command>
@@ -183,6 +188,21 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M3+F">
       </key>
+
+      <!-- Input newline -->
+      <key
+            commandId="org.eclipse.ui.edit.findbar.inputNewline"
+            contextId="org.eclipse.ui.textEditorScope.findbar"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M3+ENTER">
+      </key>
+      <key
+            commandId="org.eclipse.ui.edit.findbar.inputNewline"
+            contextId="org.eclipse.ui.textEditorScope.findbar"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+ENTER">
+      </key>
+      
       <!-- Focus the replace combo -->
       <key
             commandId="org.eclipse.ui.edit.findbar.focusReplace"
