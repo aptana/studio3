@@ -375,7 +375,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		sashSeparator.setLayoutData(separatorGridData = GridDataFactory.fillDefaults().grab(true, false).exclude(true)
 				.create());
 
-		sash = new Sash(composite, SWT.HORIZONTAL | SWT.SMOOTH | SWT.BORDER);
+		sash = new Sash(composite, SWT.HORIZONTAL | SWT.SMOOTH);
 		sash.addSelectionListener(new SelectionAdapter()
 		{
 			/*
@@ -434,7 +434,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 			}
 		});
 
-		ToolBar findToolbar = new ToolBar(findBar, SWT.NONE);
+		ToolBar findToolbar = new ToolBar(findBar, SWT.FLAT);
 		findToolbar.setLayoutData(createdDefaultGridData(SWT.LEFT, SWT.BEGINNING, false, false));
 
 		findHistory = createHistoryToolItem(findToolbar, FindBarEntriesHelper.PREFERENCE_NAME_FIND);
@@ -443,7 +443,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		textReplace.setText(Messages.FindBarDecorator_Replace_initial_text);
 		textReplace.setForeground(DISABLED_COLOR);
 
-		ToolBar replaceToolbar = new ToolBar(findBar, SWT.NONE);
+		ToolBar replaceToolbar = new ToolBar(findBar, SWT.FLAT);
 		replaceToolbar.setLayoutData(createdDefaultGridData(SWT.LEFT, SWT.BEGINNING, false, false));
 		replaceHistory = createHistoryToolItem(replaceToolbar, FindBarEntriesHelper.PREFERENCE_NAME_REPLACE);
 
@@ -470,7 +470,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		replaceAll = createButton(findButtonComposite, null, true);
 		replaceAll.setText(Messages.FindBarDecorator_LABEL_ReplaceAll);
 
-		ToolBar optionsToolBar = new ToolBar(searchComposite, SWT.RIGHT);
+		ToolBar optionsToolBar = new ToolBar(searchComposite, SWT.RIGHT | SWT.FLAT);
 		optionsToolBar.setLayoutData(GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING)
 				.indent(Platform.OS_MACOSX.equals(Platform.getOS()) ? 5 : 0, 0).create());
 
@@ -923,6 +923,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	{
 		public void keyPressed(KeyEvent e)
 		{
+			System.out.println(e.keyCode + "," + e.stateMask);
 			if ((e.keyCode == SWT.CR || e.keyCode == SWT.KEYPAD_CR)
 					&& ((e.stateMask & SWT.COMMAND) == SWT.COMMAND || (e.stateMask & SWT.CTRL) == SWT.CTRL))
 			{
@@ -934,12 +935,10 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 					Text text = (Text) widget;
 					StringBuilder sb = new StringBuilder(text.getText());
 					Point selection = text.getSelection();
-					sb.insert(
-							selection.x,
-							getLineDelimiter(textEditor.getDocumentProvider().getDocument(
-									UIUtils.getActiveEditor().getEditorInput())));
+					String delimiter = Text.DELIMITER;
+					sb.replace(selection.x, selection.y, delimiter);
 					text.setText(sb.toString());
-					text.setSelection(selection.x + 1);
+					text.setSelection(selection.x + delimiter.length());
 				}
 			}
 		}
@@ -1271,23 +1270,29 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 	/* default */void findPrevious()
 	{
-		setFindText(textFind.getText());
-		incrementCountPosition(false);
-		findBarFinder.find(false);
-		updateLastCountPosition();
+		if (findScope == FindScope.CURRENT_FILE && isTextFindValid())
+		{
+			setFindText(textFind.getText());
+			incrementCountPosition(false);
+			findBarFinder.find(false);
+			updateLastCountPosition();
+		}
 	}
 
 	/* default */void findNext()
 	{
-		setFindText(textFind.getText());
-		incrementCountPosition(true);
-		findBarFinder.find(true);
-		updateLastCountPosition();
+		if (findScope == FindScope.CURRENT_FILE && isTextFindValid())
+		{
+			setFindText(textFind.getText());
+			incrementCountPosition(true);
+			findBarFinder.find(true);
+			updateLastCountPosition();
+		}
 	}
 
 	/* default */void findNextOrPrev()
 	{
-		if (findScope == FindScope.CURRENT_FILE)
+		if (findScope == FindScope.CURRENT_FILE && isTextFindValid())
 		{
 			if (getConfiguration().getSearchBackward())
 			{
@@ -1415,6 +1420,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	Pattern createFindPattern()
 	{
 		String patternString = textFind.getText();
+		patternString = convertTextString(patternString);
 		boolean patternStringIsAWord = isWord(patternString);
 
 		int flags = 0;
@@ -1526,6 +1532,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		String searchText = textFind.getText();
 		if (searchText.length() >= 0)
 		{
+			searchText = convertTextString(searchText);
 			boolean isWholeWord = getConfiguration().getWholeWord();
 			boolean isRegEx = getConfiguration().getRegularExpression();
 			boolean isCaseSensitive = getConfiguration().getCaseSensitive();
@@ -1552,6 +1559,14 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 			}
 		}
 
+	}
+
+	String convertTextString(String textString)
+	{
+		return textString.replaceAll(
+				Text.DELIMITER,
+				getLineDelimiter(textEditor.getDocumentProvider().getDocument(
+						UIUtils.getActiveEditor().getEditorInput())));
 	}
 
 	void showFindReplaceDialog()

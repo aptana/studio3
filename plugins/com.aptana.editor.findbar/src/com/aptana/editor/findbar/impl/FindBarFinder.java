@@ -18,9 +18,11 @@ import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.core.util.StringUtil;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * Helper for actually doing the find actions.
@@ -73,6 +75,7 @@ public class FindBarFinder
 				StyledText textWidget = sourceViewer.getTextWidget();
 				Point selection = textWidget.getSelection();
 				String findText = dec.textFind.getText();
+				findText = dec.convertTextString(findText);
 				int offset = textWidget.getCaretOffset();
 				if (wrapping)
 				{
