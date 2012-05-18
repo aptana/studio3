@@ -10,8 +10,8 @@ package com.aptana.editor.js.contentassist.model;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.mortbay.util.ajax.JSON.Convertible;
-import org.mortbay.util.ajax.JSON.Output;
+import com.aptana.jetty.util.epl.ajax.JSON.Convertible;
+import com.aptana.jetty.util.epl.ajax.JSON.Output;
 
 import com.aptana.core.util.ObjectUtil;
 import com.aptana.core.util.StringUtil;

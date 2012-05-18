@@ -51,6 +51,7 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
@@ -131,7 +132,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	private static final String REGEX = "icons/regex.png"; //$NON-NLS-1$
 	private static final String REGEX_DISABLED = "icons/regex_disabled.png"; //$NON-NLS-1$
 	private static final String WHOLE_WORD = "icons/whole_word.png"; //$NON-NLS-1$
-	private static final String ICON_SEARCH_SELECTION = "icons/elcl16/segment_edit.gif"; //$NON-NLS-1$
+	private static final String ICON_SEARCH_SELECTION = "icons/elcl16/segment_edit.png"; //$NON-NLS-1$
 	private static final String WHOLE_WORD_DISABLED = "icons/whole_word_disabled.png"; //$NON-NLS-1$
 
 	private final ITextEditor textEditor;
@@ -658,42 +659,43 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
+				ToolItem toolItem = (ToolItem) e.widget;
+				ToolBar toolbar = toolItem.getParent();
+				Rectangle bounds = toolItem.getBounds();
+				Point point = toolbar.toDisplay(new Point(bounds.x, bounds.y + bounds.height));
+
 				List<String> loadEntries = findBarEntriesHelper.loadEntries(preferenceName);
-				if (e.detail == SWT.ARROW)
+				if (menu != null && !menu.isDisposed())
 				{
-					ToolBar toolbar = ((ToolItem) e.widget).getParent();
-					Point point = toolbar.toDisplay(new Point(e.x, e.y));
+					menu.dispose();
+				}
 
-					if (!CollectionsUtil.isEmpty(loadEntries))
+				menu = new Menu(UIUtils.getActiveShell(),
+						(toolbar.getStyle() & (SWT.RIGHT_TO_LEFT | SWT.LEFT_TO_RIGHT)) | SWT.POP_UP);
+
+				if (!CollectionsUtil.isEmpty(loadEntries))
+				{
+					for (final String item : loadEntries)
 					{
-						if (menu != null && !menu.isDisposed())
+						MenuItem menuItem = new MenuItem(menu, SWT.NONE);
+						menuItem.setText(StringUtil.truncate(StringUtil.replaceAll(item, replacements), 30));
+						menuItem.addSelectionListener(new SelectionAdapter()
 						{
-							menu.dispose();
-						}
-
-						menu = new Menu(UIUtils.getActiveShell(),
-								(toolbar.getStyle() & (SWT.RIGHT_TO_LEFT | SWT.LEFT_TO_RIGHT)) | SWT.POP_UP);
-						for (final String item : loadEntries)
-						{
-							MenuItem menuItem = new MenuItem(menu, SWT.NONE);
-							menuItem.setText(StringUtil.truncate(StringUtil.replaceAll(item, replacements), 30));
-							menuItem.addSelectionListener(new SelectionAdapter()
+							public void widgetSelected(SelectionEvent e)
 							{
-								public void widgetSelected(SelectionEvent e)
-								{
-									updateText(item);
-								};
-							});
-						}
-						menu.setLocation(point.x, point.y);
-						menu.setVisible(true);
+								updateText(item);
+							};
+						});
 					}
 				}
-				else if (!CollectionsUtil.isEmpty(loadEntries))
+				else
 				{
-					String lastSearch = loadEntries.get(0);
-					updateText(lastSearch);
+					MenuItem menuItem = new MenuItem(menu, SWT.NONE);
+					menuItem.setText(Messages.FindBarDecorator_LABEL_No_History);
 				}
+
+				menu.setLocation(point.x, point.y);
+				menu.setVisible(true);
 			}
 
 			void updateText(String text)
@@ -767,6 +769,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		entriesControlHandles.add(findBarEntriesHelper.register(text, modifyListener, preferenceName));
 
 		text.addFocusListener(findBarActions.createFocusListener(text));
+		text.addKeyListener(newlineKeyListener);
 		return text;
 	}
 
@@ -908,7 +911,18 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 				default:
 					searchOnModifyText = true;
 			}
+		}
 
+		public void keyReleased(KeyEvent e)
+		{
+			searchOnModifyText = false;
+		}
+	}
+
+	private KeyAdapter newlineKeyListener = new KeyAdapter()
+	{
+		public void keyPressed(KeyEvent e)
+		{
 			if ((e.keyCode == SWT.CR || e.keyCode == SWT.KEYPAD_CR)
 					&& ((e.stateMask & SWT.COMMAND) == SWT.COMMAND || (e.stateMask & SWT.CTRL) == SWT.CTRL))
 			{
@@ -929,12 +943,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 				}
 			}
 		}
-
-		public void keyReleased(KeyEvent e)
-		{
-			searchOnModifyText = false;
-		}
-	}
+	};
 
 	private final class UpdateFindBarActionOnPropertyChange implements IPropertyChangeListener
 	{
@@ -1047,9 +1056,17 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 	private void findNextOrprevAfterChangeOption()
 	{
-		setFindText(textFind.getText());
-		findBarFinder.find(!getConfiguration().getSearchBackward(), true);
-		showCountTotal();
+		if (isTextFindValid())
+		{
+			setFindText(textFind.getText());
+			findBarFinder.find(!getConfiguration().getSearchBackward(), true);
+			showCountTotal();
+		}
+	}
+
+	private boolean isTextFindValid()
+	{
+		return !DISABLED_COLOR.equals(textFind.getForeground()) && !StringUtil.isEmpty(textFind.getText());
 	}
 
 	private IFindReplaceTarget getFindReplaceTarget()
@@ -1158,11 +1175,11 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	private void adjustEnablement()
 	{
 		String text = textFind.getText();
-		boolean isFindEmpty = StringUtil.EMPTY.equals(text) || DISABLED_COLOR.equals(textFind.getForeground());
-		findButton.setEnabled(!isFindEmpty);
-		replace.setEnabled(!isFindEmpty);
-		replaceFind.setEnabled(!isFindEmpty);
-		replaceAll.setEnabled(!isFindEmpty);
+		boolean isTextFindValue = isTextFindValid();
+		findButton.setEnabled(isTextFindValue);
+		replace.setEnabled(isTextFindValue);
+		replaceFind.setEnabled(isTextFindValue);
+		replaceAll.setEnabled(isTextFindValue);
 		wholeWord.setEnabled(!StringUtil.EMPTY.equals(text) && !getConfiguration().getRegularExpression()
 				&& isWord(text));
 	}

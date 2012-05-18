@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %pluginName
+Bundle-SymbolicName: com.aptana.jetty.util.epl;singleton:=true
+Bundle-Version: 3.0.0.qualifier
+Bundle-Vendor: %providerName
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ecf,
+ org.eclipse.ecf.filetransfer,
+ com.aptana.core
+Export-Package: com.aptana.jetty.util.epl,
+ com.aptana.jetty.util.epl.ajax
+Bundle-ActivationPolicy: lazy
+Eclipse-LazyStart: true
+Eclipse-ExtensibleAPI: true

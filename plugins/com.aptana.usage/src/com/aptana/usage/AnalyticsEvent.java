@@ -16,7 +16,7 @@ import java.util.TimeZone;
 import java.util.UUID;
 
 import org.eclipse.core.runtime.Platform;
-import org.mortbay.util.ajax.JSON;
+import com.aptana.jetty.util.epl.ajax.JSON;
 
 import com.aptana.core.CorePlugin;
 import com.aptana.core.logging.IdeLog;
