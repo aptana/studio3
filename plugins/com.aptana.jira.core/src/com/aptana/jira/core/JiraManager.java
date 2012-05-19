@@ -7,7 +7,12 @@
  */
 package com.aptana.jira.core;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
@@ -24,6 +29,7 @@ import org.osgi.framework.Version;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ProcessUtil;
 import com.aptana.core.util.StringUtil;
 
@@ -147,15 +153,24 @@ public class JiraManager
 	 *            the description of the ticket
 	 * @return the JIRA issue created
 	 * @throws JiraException
+	 * @throws IOException
 	 */
 	public JiraIssue createIssue(JiraIssueType type, JiraIssuePriority priority, JiraIssueSeverity severity,
-			String summary, String description) throws JiraException
+			String summary, String description) throws JiraException, IOException
 	{
 		if (user == null)
 		{
 			throw new JiraException(Messages.JiraManager_ERR_NotLoggedIn);
 		}
 		IPath jiraExecutable = getJiraExecutable();
+
+		File desc = File.createTempFile("jira-description", ".txt"); //$NON-NLS-1$ //$NON-NLS-2$
+		desc.deleteOnExit();
+		Charset charset = Charset.forName(IOUtil.UTF_8);
+		OutputStreamWriter w = new OutputStreamWriter(new FileOutputStream(desc), charset);
+		w.write(description);
+		w.close();
+
 		// @formatter:off
 		String output = ProcessUtil.outputForCommand(jiraExecutable.toOSString(), jiraExecutable.removeLastSegments(1),
 				PARAM_ACTION, ACTION_CREATE_ISSUE,
@@ -167,7 +182,7 @@ public class JiraManager
 				PARAM_TYPE, type.getParameterValue(projectKey),
 				PARAM_PRIORITY, priority.toString(),
 				PARAM_SUMMARY, summary,
-				PARAM_DESCRIPTION, description,
+				PARAM_FILE, desc.getAbsolutePath(),
 				"--custom", severity.getParameterValue() //$NON-NLS-1$
 				);
 		// @formatter:on
