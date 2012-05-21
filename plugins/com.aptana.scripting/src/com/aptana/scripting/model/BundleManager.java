@@ -377,14 +377,16 @@ public class BundleManager
 					}
 					else
 					{
-						ScriptingActivator.logError(
-								Messages.BundleManager_USER_PATH_NOT_READ_WRITE + f.getAbsolutePath(), null);
+						IdeLog.logError(
+								ScriptingActivator.getDefault(),
+								MessageFormat.format(Messages.BundleManager_USER_PATH_NOT_READ_WRITE,
+										f.getAbsolutePath()));
 					}
 				}
 				else
 				{
-					ScriptingActivator.logError(Messages.BundleManager_USER_PATH_NOT_DIRECTORY + f.getAbsolutePath(),
-							null);
+					IdeLog.logError(ScriptingActivator.getDefault(),
+							MessageFormat.format(Messages.BundleManager_USER_PATH_NOT_DIRECTORY, f.getAbsolutePath()));
 				}
 			}
 			else
@@ -396,6 +398,11 @@ public class BundleManager
 			if (validUserBundlePath)
 			{
 				this.userBundlesPath = f.getAbsolutePath();
+			}
+			else
+			{
+				IdeLog.logError(ScriptingActivator.getDefault(),
+						MessageFormat.format(Messages.BundleManager_USER_PATH_NOT_DIRECTORY, f.getAbsolutePath()));
 			}
 		}
 
