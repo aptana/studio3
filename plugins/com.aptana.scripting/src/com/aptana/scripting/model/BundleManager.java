@@ -651,7 +651,8 @@ public class BundleManager
 				}
 				catch (Throwable t)
 				{
-					ScriptingActivator.logError(Messages.BundleManager_Bundle_Became_Hidden_Event_Error, t);
+					IdeLog.logError(ScriptingActivator.getDefault(),
+							Messages.BundleManager_Bundle_Became_Hidden_Event_Error, t);
 				}
 			}
 		}
@@ -676,7 +677,8 @@ public class BundleManager
 				}
 				catch (Throwable t)
 				{
-					ScriptingActivator.logError(Messages.BundleManager_Bundle_Became_Visible_Event_Error, t);
+					IdeLog.logError(ScriptingActivator.getDefault(),
+							Messages.BundleManager_Bundle_Became_Visible_Event_Error, t);
 				}
 			}
 		}
@@ -701,7 +703,8 @@ public class BundleManager
 				}
 				catch (Throwable t)
 				{
-					ScriptingActivator.logError(Messages.BundleManager_Element_Became_Hidden_Event_Error, t);
+					IdeLog.logError(ScriptingActivator.getDefault(),
+							Messages.BundleManager_Element_Became_Hidden_Event_Error, t);
 				}
 			}
 		}
@@ -726,7 +729,8 @@ public class BundleManager
 				}
 				catch (Throwable t)
 				{
-					ScriptingActivator.logError(Messages.BundleManager_Element_Became_Visible_Event_Error, t);
+					IdeLog.logError(ScriptingActivator.getDefault(),
+							Messages.BundleManager_Element_Became_Visible_Event_Error, t);
 				}
 			}
 		}
@@ -751,7 +755,8 @@ public class BundleManager
 				}
 				catch (Throwable t)
 				{
-					ScriptingActivator.logError(Messages.BundleManager_Script_Loaded_Event_Error, t);
+					IdeLog.logError(ScriptingActivator.getDefault(), Messages.BundleManager_Script_Loaded_Event_Error,
+							t);
 				}
 			}
 		}
@@ -776,7 +781,8 @@ public class BundleManager
 				}
 				catch (Throwable t)
 				{
-					ScriptingActivator.logError(Messages.BundleManager_Script_Reloaded_Event_Error, t);
+					IdeLog.logError(ScriptingActivator.getDefault(),
+							Messages.BundleManager_Script_Reloaded_Event_Error, t);
 				}
 			}
 		}
@@ -801,7 +807,8 @@ public class BundleManager
 				}
 				catch (Throwable t)
 				{
-					ScriptingActivator.logError(Messages.BundleManager_Script_Unloaded_Event_Error, t);
+					IdeLog.logError(ScriptingActivator.getDefault(),
+							Messages.BundleManager_Script_Unloaded_Event_Error, t);
 				}
 			}
 		}

@@ -15,6 +15,7 @@ import net.contentobjects.jnotify.IJNotify;
 import net.contentobjects.jnotify.JNotifyException;
 import net.contentobjects.jnotify.JNotifyListener;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.filewatcher.FileWatcher;
 
 /**
@@ -141,7 +142,7 @@ public class FileChangeNotifier
 		}
 		catch (JNotifyException e)
 		{
-			ScriptingActivator.logError("Error adding file change listener", e); //$NON-NLS-1$
+			IdeLog.logError(ScriptingActivator.getDefault(), "Error adding file change listener", e); //$NON-NLS-1$
 			return false;
 		}
 
@@ -159,7 +160,7 @@ public class FileChangeNotifier
 		}
 		catch (JNotifyException e)
 		{
-			ScriptingActivator.logError("Error removing file change listener", e); //$NON-NLS-1$
+			IdeLog.logError(ScriptingActivator.getDefault(), "Error removing file change listener", e); //$NON-NLS-1$
 			return false;
 		}
 	}

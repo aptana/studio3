@@ -119,14 +119,15 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 				}
 				catch (JNotifyException e)
 				{
-					ScriptingActivator.logError(Messages.BundleMonitor_ERROR_REGISTERING_FILE_WATCHER, e);
+					IdeLog.logError(ScriptingActivator.getDefault(),
+							Messages.BundleMonitor_ERROR_REGISTERING_FILE_WATCHER, e);
 				}
 			}
 			else
 			{
 				String message = MessageFormat.format(Messages.BundleMonitor_INVALID_WATCHER_PATH, userBundlesPath);
 
-				ScriptingActivator.logError(message, null);
+				IdeLog.logError(ScriptingActivator.getDefault(), message);
 			}
 
 			this._registered = true;
@@ -556,7 +557,8 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 			}
 			catch (CoreException e)
 			{
-				ScriptingActivator.logError(Messages.BundleMonitor_Error_Processing_Resource_Change, e);
+				IdeLog.logError(ScriptingActivator.getDefault(),
+						Messages.BundleMonitor_Error_Processing_Resource_Change, e);
 			}
 		}
 	}

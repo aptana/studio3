@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ProcessUtil;
 import com.aptana.core.util.StringUtil;
@@ -518,7 +519,7 @@ public class BundleConverter
 		}
 		catch (IOException e)
 		{
-			ScriptingActivator.logError(e.getMessage(), e);
+			IdeLog.logError(ScriptingActivator.getDefault(), e.getMessage(), e);
 		}
 		return Collections.emptyMap();
 	}
