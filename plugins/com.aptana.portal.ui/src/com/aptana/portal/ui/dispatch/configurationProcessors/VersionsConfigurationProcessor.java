@@ -18,7 +18,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IPreferencesService;
-import org.mortbay.util.ajax.JSON;
+import com.aptana.jetty.util.epl.ajax.JSON;
 import org.osgi.framework.Version;
 
 import com.aptana.configurations.processor.AbstractConfigurationProcessor;

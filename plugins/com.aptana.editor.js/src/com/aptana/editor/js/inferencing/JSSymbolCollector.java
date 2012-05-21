@@ -110,7 +110,7 @@ public class JSSymbolCollector extends JSTreeWalker
 	 */
 	public void addPropertyValue(String name, JSNode value)
 	{
-		if (name != null && name.length() > 0 && value != null)
+		if (!StringUtil.isEmpty(name) && value != null)
 		{
 			JSPropertyCollection object = this._scope.getObject();
 			JSPropertyCollection property;
@@ -122,11 +122,29 @@ public class JSSymbolCollector extends JSTreeWalker
 			}
 			else
 			{
-				// create a new property
-				property = new JSPropertyCollection();
+				if (this._scope.hasSymbol(name))
+				{
+					property = this._scope.getSymbol(name);
+				}
+				else
+				{
+					// get global
+					JSScope scope = this._scope;
 
-				// add it to the current object
-				object.setProperty(name, property);
+					if (isPotentialGlobalValue(value))
+					{
+						while (scope.getParentScope() != null)
+						{
+							scope = scope.getParentScope();
+						}
+					}
+
+					// create a new property
+					property = new JSPropertyCollection();
+
+					// add it to the current object
+					scope.getObject().setProperty(name, property);
+				}
 			}
 
 			if (value instanceof JSObjectNode)
@@ -137,6 +155,35 @@ public class JSSymbolCollector extends JSTreeWalker
 
 			property.addValue(value);
 		}
+	}
+
+	private boolean isPotentialGlobalValue(JSNode node)
+	{
+		boolean result = true;
+
+		if (node != null)
+		{
+			if (node.getNodeType() == IJSNodeTypes.FUNCTION)
+			{
+				result = false;
+			}
+			else
+			{
+				// check parent type
+				IParseNode parent = node.getParent();
+				int nodeType = (parent != null) ? parent.getNodeType() : -1;
+
+				switch (nodeType)
+				{
+					case IJSNodeTypes.DECLARATION:
+					case IJSNodeTypes.PARAMETERS:
+						result = false;
+						break;
+				}
+			}
+		}
+
+		return result;
 	}
 
 	/**

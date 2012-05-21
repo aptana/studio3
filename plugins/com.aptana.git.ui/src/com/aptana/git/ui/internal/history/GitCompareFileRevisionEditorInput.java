@@ -536,9 +536,9 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 
 	protected void handleDispose()
 	{
+		super.handleDispose();
 		getControlThemerFactory().dispose(fStructurePane.getContent());
 		fPane = null;
-		super.handleDispose();
 	}
 
 	private IControlThemerFactory getControlThemerFactory()

@@ -7,18 +7,13 @@
  */
 package com.aptana.editor.js.text;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
-import org.eclipse.jface.text.source.ISourceViewer;
 import org.junit.Test;
 
-import com.aptana.core.util.StringUtil;
-import com.aptana.editor.common.hover.DocumentationBrowserInformationControlInput;
+import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.hover.TagStripperAndTypeBolder;
 import com.aptana.editor.common.util.EditorUtil;
-import com.aptana.editor.js.JSSourceEditor;
 import com.aptana.editor.js.contentassist.index.JSIndexWriter;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
@@ -101,16 +96,6 @@ public class JSTextHoverTest extends JSEditorBasedTests
 		return hover.getHoverRegion(getSourceViewer(), offset);
 	}
 
-	protected JSSourceEditor getJSEditor()
-	{
-		return (JSSourceEditor) this.editor;
-	}
-
-	protected ISourceViewer getSourceViewer()
-	{
-		return getJSEditor().getISourceViewer();
-	}
-
 	protected void writeProperty(String name, String description)
 	{
 		// create property with description
@@ -125,7 +110,7 @@ public class JSTextHoverTest extends JSEditorBasedTests
 
 		// write type to index
 		JSIndexWriter indexWriter = new JSIndexWriter();
-		indexWriter.writeType(getIndex(), window, EditorUtil.getURI(getJSEditor()));
+		indexWriter.writeType(getIndex(), window, EditorUtil.getURI((AbstractThemeableEditor) this.editor));
 
 	}
 
@@ -136,50 +121,14 @@ public class JSTextHoverTest extends JSEditorBasedTests
 
 	public void testTagStrippingAndTypeBolding()
 	{
-		// grab hover info
-		Object info = assertHoverRegionAndInfo("hover/1236.js", "win2",
-				"<p>This relates to <Titanium.UI.createWindow></p>", null);
+		TagStripperAndTypeBolder formatter = new TagStripperAndTypeBolder();
+		formatter.setUseHTML(true);
 
-		// grab hover HTML content
-		assertTrue(info instanceof DocumentationBrowserInformationControlInput);
-		DocumentationBrowserInformationControlInput input = (DocumentationBrowserInformationControlInput) info;
-		String html = input.getHtml();
-		int count = 0;
+		String source = "<p>This relates to <Titanium.UI.createWindow></p>";
+		String expected = "This relates to <b>Titanium.UI.createWindow</b>";
+		String result = formatter.searchAndReplace(source);
 
-		// HACK: retry grabbing HTML, with delay, up to 5 times
-		while (count < 5 && StringUtil.isEmpty(html))
-		{
-			IRegion hoverRegion = getHoverRegion(this.cursorOffsets.get(0));
-			info = hover.getHoverInfo2(getSourceViewer(), hoverRegion);
-			input = (DocumentationBrowserInformationControlInput) info;
-
-			try
-			{
-				Thread.sleep(1000);
-			}
-			catch (InterruptedException e)
-			{
-			}
-
-			html = input.getHtml();
-			count++;
-		}
-
-		// test that HTML ends with our cleaned-up description
-		Pattern p = Pattern.compile("<body[^>]*>(.*?)</body>");
-		Matcher m = p.matcher(html);
-
-		if (m.find())
-		{
-			String text = m.group(1);
-
-			assertTrue("Could not find documentation string in hover info: '" + html + "'",
-					text.endsWith("This relates to <b>Titanium.UI.createWindow</b>"));
-		}
-		else
-		{
-			fail("Could not find documentation string in hover info: '" + html + "'");
-		}
+		assertEquals(expected, result);
 	}
 
 	@Test

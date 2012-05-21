@@ -20,9 +20,13 @@ public class CSSFunctionNode extends CSSExpressionNode
 	public CSSFunctionNode(String name, CSSExpressionNode expression)
 	{
 		super(ICSSNodeTypes.FUNCTION);
+
 		fName = name;
 
-		setChildren(new CSSNode[] { expression });
+		if (expression != null)
+		{
+			setChildren(new CSSNode[] { expression });
+		}
 	}
 
 	@Override
@@ -73,9 +77,18 @@ public class CSSFunctionNode extends CSSExpressionNode
 	public String toString()
 	{
 		StringBuilder text = new StringBuilder();
+		CSSExpressionNode expr = getExpression();
 
 		text.append(getName());
-		text.append('(').append(getExpression()).append(')');
+
+		if (expr != null)
+		{
+			text.append('(').append(getExpression()).append(')');
+		}
+		else
+		{
+			text.append("()"); //$NON-NLS-1$
+		}
 
 		return text.toString();
 	}

@@ -29,4 +29,6 @@ public interface ICSSNodeTypes
 	public static final short PAGE_SELECTOR = 17;
 	public static final short TEXT = 18;
 	public static final short AT_RULE = 19;
+	public static final short LIST = 20;
+	public static final short MOZ_DOCUMENT = 21;
 }

@@ -1,0 +1,103 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="com.aptana.ui" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="com.aptana.ui" id="accountsPreferencePage" name="Accounts Preference Page"/>
+      </appinfo>
+      <documentation>
+         This extension point allows contributing content to the Accounts preference page.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="provider" minOccurs="1" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="provider">
+      <complexType>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The class that contributes UI to the Accounts preference page.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":com.aptana.ui.preferences.IAccountPageProvider"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="priority" type="string" use="default" value="50">
+            <annotation>
+               <documentation>
+                  An optional attribute that defines the order in which contributing UIs should appear.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="since"/>
+      </appinfo>
+      <documentation>
+         Aptana Studio 3.1.3
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="examples"/>
+      </appinfo>
+      <documentation>
+         &lt;p&gt;
+&lt;pre&gt;
+&lt;extension
+    point=&quot;com.aptana.ui.accountsPreferencePage&quot;&gt;
+    &lt;provider
+        class=&quot;com.aptana.examples.preferences.AccountPreferencePageProvider&quot;
+        priority=&quot;50&quot;&gt;
+    &lt;/provider&gt;
+&lt;/extension&gt;
+&lt;/pre&gt;
+&lt;/p&gt;
+      </documentation>
+   </annotation>
+
+
+
+
+</schema>

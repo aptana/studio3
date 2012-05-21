@@ -14,8 +14,29 @@ public class Messages extends NLS
 
 	private static final String BUNDLE_NAME = "com.aptana.editor.html.validator.messages"; //$NON-NLS-1$
 
-	public static String HTMLTidyValidator_ERR_ParseErrors;
-	public static String HTMLTidyValidator_ERR_Tidy;
+	public static String HTMLTidyValidator_DeprecatedAttribute;
+	public static String HTMLTidyValidator_DeprecatedElement;
+	public static String HTMLTidyValidator_DoctypeAfterElements;
+	public static String HTMLTidyValidator_ElementNotEmptyOrClosed;
+	public static String HTMLTidyValidator_ElementNotInsideNoFrames;
+	public static String HTMLTidyValidator_ElementNotRecognized;
+	public static String HTMLTidyValidator_EntityMissingSemicolon;
+	public static String HTMLTidyValidator_IdNameAttributeMismatch;
+	public static String HTMLTidyValidator_InsertImplicitNoFrames;
+	public static String HTMLTidyValidator_InsertMissingTitle;
+	public static String HTMLTidyValidator_InvalidAttributeValue;
+	public static String HTMLTidyValidator_MalformedDoctype;
+	public static String HTMLTidyValidator_MissingCloseTag;
+	public static String HTMLTidyValidator_MissingDoctype;
+	public static String HTMLTidyValidator_MissingNoFrames;
+
+	public static String HTMLTidyValidator_NonUniqueIdValue;
+	public static String HTMLTidyValidator_ProprietaryAttribute;
+	public static String HTMLTidyValidator_RepeatedFrameset;
+	public static String HTMLTidyValidator_TrimEmptyElement;
+	public static String HTMLTidyValidator_UnescapedAmpersand;
+	public static String HTMLTidyValidator_UnknownEntity;
+	public static String HTMLTidyValidator_UppercaseDoctype;
 
 	static
 	{

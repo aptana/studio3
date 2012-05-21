@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -25,7 +25,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
@@ -37,6 +36,7 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.ShellExecutable;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.IOUtil;
@@ -48,14 +48,48 @@ import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.IDebugScopes;
 import com.aptana.git.core.IPreferenceConstants;
 
+/**
+ * @author cwilliams
+ */
 public class GitExecutable
 {
+	/**
+	 * Special ENV variables used for git processes.
+	 */
+	private static final String GIT_SSH = "GIT_SSH"; //$NON-NLS-1$
+	private static final String SSH_ASKPASS = "SSH_ASKPASS"; //$NON-NLS-1$
+	private static final String GIT_ASKPASS = "GIT_ASKPASS"; //$NON-NLS-1$
+
+	/**
+	 * Constants used for git version handling.
+	 */
+	private static final String GIT_VERSION_PREFIX = "git version "; //$NON-NLS-1$
+	private static final Pattern GIT_VERSION_PATTERN = Pattern
+			.compile("\\d+(\\.\\d+(\\.\\d+(\\.[a-zA-z\\d\\-_]+)?)?)?"); //$NON-NLS-1$
+	public static final String MIN_GIT_VERSION = "1.6.0"; //$NON-NLS-1$
+
 	private static final String GIT_EXECUTABLE = "git"; //$NON-NLS-1$
 	protected static final String GIT_EXECUTABLE_WIN32 = GIT_EXECUTABLE + ".exe"; //$NON-NLS-1$
-	public static final String MIN_GIT_VERSION = "1.6.0"; //$NON-NLS-1$
+
+	/**
+	 * Pattern used to sniff progress on clones.
+	 */
+	private static final Pattern CLONE_PERCENT_PATTERN = Pattern
+			.compile("^Receiving objects:\\s+(\\d+)%\\s\\((\\d+)/(\\d+)\\).+"); //$NON-NLS-1$
+
+	/**
+	 * Common locations to look for git (initialized based on OS).
+	 */
 	private static List<IPath> fgLocations;
+
+	/**
+	 * Where we found git.
+	 */
 	private IPath gitPath;
 
+	/**
+	 * The singleton.
+	 */
 	static GitExecutable fgExecutable;
 	private static boolean fgAddedPrefListener;
 
@@ -88,7 +122,7 @@ public class GitExecutable
 									if (pathString != null)
 									{
 										IPath path = Path.fromOSString(pathString);
-										if (path != null && path.toFile().isFile())
+										if (path.toFile().isFile())
 										{
 											path = path.removeLastSegments(1);
 										}
@@ -201,27 +235,34 @@ public class GitExecutable
 		IdeLog.logInfo(GitPlugin.getDefault(), string);
 	}
 
+	@SuppressWarnings("nls")
 	private synchronized static List<IPath> searchLocations()
 	{
 		if (fgLocations == null)
 		{
-			fgLocations = new ArrayList<IPath>();
 			if (Platform.getOS().equals(Platform.OS_WIN32))
 			{
-				fgLocations.add(Path.fromOSString(PlatformUtil.expandEnvironmentStrings("%PROGRAMW6432%\\Git\\bin"))); //$NON-NLS-1$
-				fgLocations.add(Path.fromOSString(PlatformUtil.expandEnvironmentStrings("%PROGRAMFILES%\\Git\\bin"))); //$NON-NLS-1$
-				fgLocations.add(Path.fromOSString(PlatformUtil
-						.expandEnvironmentStrings("%PROGRAMFILES(X86)%\\Git\\bin"))); //$NON-NLS-1$
-				fgLocations.add(Path.fromOSString("C:\\RailsInstaller\\Git\\bin")); //$NON-NLS-1$
+				// @formatter:off
+				fgLocations = CollectionsUtil.newList(
+					Path.fromOSString(PlatformUtil.expandEnvironmentStrings("%PROGRAMW6432%\\Git\\bin")),
+					Path.fromOSString(PlatformUtil.expandEnvironmentStrings("%PROGRAMFILES%\\Git\\bin")),
+					Path.fromOSString(PlatformUtil.expandEnvironmentStrings("%PROGRAMFILES(X86)%\\Git\\bin")),
+					Path.fromOSString("C:\\RailsInstaller\\Git\\bin")
+				);
+				// @formatter:on
 			}
 			else
 			{
-				fgLocations.add(Path.fromOSString("/opt/local/bin")); //$NON-NLS-1$
-				fgLocations.add(Path.fromOSString("/sw/bin")); //$NON-NLS-1$
-				fgLocations.add(Path.fromOSString("/opt/git/bin")); //$NON-NLS-1$
-				fgLocations.add(Path.fromOSString("/usr/local/bin")); //$NON-NLS-1$
-				fgLocations.add(Path.fromOSString("/usr/local/git/bin")); //$NON-NLS-1$
-				fgLocations.add(Path.fromOSString(PlatformUtil.expandEnvironmentStrings("~/bin"))); //$NON-NLS-1$
+				// @formatter:off
+				fgLocations = CollectionsUtil.newList(
+					Path.fromOSString("/opt/local/bin"),
+					Path.fromOSString("/sw/bin"),
+					Path.fromOSString("/opt/git/bin"),
+					Path.fromOSString("/usr/local/bin"),
+					Path.fromOSString("/usr/local/git/bin"),
+					Path.fromOSString(PlatformUtil.expandEnvironmentStrings("~/bin"))
+				);
+				// @formatter:on
 			}
 		}
 		return fgLocations;
@@ -230,14 +271,40 @@ public class GitExecutable
 	private static String versionForPath(IPath path)
 	{
 		if (path == null)
+		{
 			return null;
+		}
 
 		if (!path.toFile().isFile())
+		{
 			return null;
+		}
 
 		String version = ProcessUtil.outputForCommand(path.toOSString(), null, "--version"); //$NON-NLS-1$
-		if (version != null && version.startsWith("git version ")) //$NON-NLS-1$
-			return version.substring(12);
+		if (version != null && version.startsWith(GIT_VERSION_PREFIX))
+		{
+			version = version.substring(GIT_VERSION_PREFIX.length());
+
+			// Special handling for funky msysgit version string
+			if (version.contains("msysgit.")) //$NON-NLS-1$
+			{
+				version = version.replace("msysgit.", "msysgit_"); //$NON-NLS-1$ //$NON-NLS-2$
+
+				// If there's still too many periods, turn ".msys" into "_msys"
+				if (StringUtil.characterInstanceCount(version, '.') > 3)
+				{
+					version = version.replace(".msysgit", "_msysgit"); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+			}
+
+			// Now grab the version out using a regexp
+			Matcher m = GIT_VERSION_PATTERN.matcher(version);
+			if (m.find())
+			{
+				return m.group();
+			}
+			return version;
+		}
 
 		return null;
 	}
@@ -245,11 +312,15 @@ public class GitExecutable
 	public static boolean acceptBinary(IPath path)
 	{
 		if (path == null)
+		{
 			return false;
+		}
 
 		String version = versionForPath(path);
 		if (version == null)
+		{
 			return false;
+		}
 
 		int c = version.compareTo(MIN_GIT_VERSION);
 		if (c >= 0)
@@ -328,17 +399,17 @@ public class GitExecutable
 		IPath git_ssh = GitPlugin.getDefault().getGIT_SSH();
 		if (git_ssh != null)
 		{
-			env.put("GIT_SSH", git_ssh.toOSString()); //$NON-NLS-1$
+			env.put(GIT_SSH, git_ssh.toOSString());
 		}
 		IPath ssh_askpass = GitPlugin.getDefault().getSSH_ASKPASS();
 		if (ssh_askpass != null)
 		{
-			env.put("SSH_ASKPASS", ssh_askpass.toOSString()); //$NON-NLS-1$
+			env.put(SSH_ASKPASS, ssh_askpass.toOSString());
 		}
 		IPath git_askpass = GitPlugin.getDefault().getGIT_ASKPASS();
 		if (git_askpass != null)
 		{
-			env.put("GIT_ASKPASS", git_askpass.toOSString()); //$NON-NLS-1$
+			env.put(GIT_ASKPASS, git_askpass.toOSString());
 		}
 		if (Platform.OS_WIN32.equals(Platform.getOS()))
 		{
@@ -385,17 +456,6 @@ public class GitExecutable
 
 		try
 		{
-			// Special handling for funky msysgit version string
-			if (versionString.contains("msysgit.")) //$NON-NLS-1$
-			{
-				versionString = versionString.replace("msysgit.", "msysgit_"); //$NON-NLS-1$ //$NON-NLS-2$
-
-				// If there's still too many periods, turn ".msys" into "_msys"
-				if (StringUtil.characterInstanceCount(versionString, '.') > 3)
-				{
-					versionString = versionString.replace(".msysgit", "_msysgit"); //$NON-NLS-1$ //$NON-NLS-2$
-				}
-			}
 			return Version.parseVersion(versionString);
 		}
 		catch (Exception ex)
@@ -455,10 +515,10 @@ public class GitExecutable
 						Messages.GitExecutable_UnableToLaunchCloneError, sourceURI, dest));
 			}
 
+			subMonitor.worked(100);
 			CloneRunnable runnable = new CloneRunnable(p, subMonitor.newChild(900));
 			Thread t = new Thread(runnable);
 			t.start();
-			subMonitor.worked(100);
 			t.join();
 
 			return runnable.getResult();
@@ -498,12 +558,13 @@ public class GitExecutable
 		CloneRunnable(Process p, IProgressMonitor monitor)
 		{
 			this.p = p;
-			this.monitor = monitor;
-			if (this.monitor == null)
-			{
-				this.monitor = new NullProgressMonitor();
-			}
+			this.monitor = convertMonitor(monitor);
 			this.status = Status.OK_STATUS;
+		}
+
+		protected IProgressMonitor convertMonitor(IProgressMonitor monitor)
+		{
+			return SubMonitor.convert(monitor, 100);
 		}
 
 		public IStatus getResult()
@@ -514,7 +575,6 @@ public class GitExecutable
 		public void run()
 		{
 			// Only sniff for "receiving objects", which is the meat of the operation
-			Pattern percentPattern = Pattern.compile("^Receiving objects:\\s+(\\d+)%\\s\\((\\d+)/(\\d+)\\).+"); //$NON-NLS-1$
 			BufferedReader br = null;
 			int lastPercent = 0;
 			try
@@ -533,7 +593,7 @@ public class GitExecutable
 					monitor.subTask(line);
 					builder.append(line).append('\n');
 					// Else, read in the line and see if we can sniff progress
-					Matcher m = percentPattern.matcher(line);
+					Matcher m = CLONE_PERCENT_PATTERN.matcher(line);
 					if (m.find())
 					{
 						String percent = m.group(1);

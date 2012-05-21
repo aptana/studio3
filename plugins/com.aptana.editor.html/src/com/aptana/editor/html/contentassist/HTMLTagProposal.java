@@ -9,6 +9,7 @@ package com.aptana.editor.html.contentassist;
 
 import java.util.List;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
@@ -42,10 +43,11 @@ class HTMLTagProposal extends CommonCompletionProposal
 	 * @param replacementOffset
 	 * @param replacementLength
 	 * @param element
+	 * @param project
 	 * @param positions
 	 */
 	HTMLTagProposal(String replacementString, int replacementOffset, int replacementLength, ElementElement element,
-			String[] natureIds, Integer... positions)
+			IProject project, Integer... positions)
 	{
 		super(replacementString, replacementOffset, replacementLength, positions[0],
 				HTMLContentAssistProcessor.ELEMENT_ICON, element.getName(), null, element.getDescription());
@@ -53,7 +55,7 @@ class HTMLTagProposal extends CommonCompletionProposal
 
 		List<String> userAgentList = element.getUserAgentNames();
 		String[] userAgents = userAgentList.toArray(new String[userAgentList.size()]);
-		Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(natureIds, userAgents);
+		Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(project, userAgents);
 		setUserAgentImages(userAgentIcons);
 
 		this._positions = positions;

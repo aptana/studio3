@@ -28,6 +28,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ui.PlatformUI;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.outline.CommonOutlineItem;
@@ -35,6 +36,7 @@ import com.aptana.editor.common.outline.CompositeOutlineContentProvider;
 import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.css.outline.CSSOutlineContentProvider;
 import com.aptana.editor.html.HTMLPlugin;
+import com.aptana.editor.html.IDebugScopes;
 import com.aptana.editor.html.parsing.HTMLParser;
 import com.aptana.editor.html.parsing.ast.HTMLCommentNode;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
@@ -292,15 +294,22 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 				}
 				catch (FileNotFoundException e)
 				{
-					HTMLPlugin.getDefault().getLog()
-							.log(new Status(IStatus.ERROR, HTMLPlugin.PLUGIN_ID, e.getMessage(), e));
+					IdeLog.logTrace(HTMLPlugin.getDefault(), e.getMessage(), e, IDebugScopes.OUTLINE);
 					elements = new Object[] { new OutlinePlaceholderItem(IStatus.ERROR, MessageFormat.format(
 							Messages.HTMLOutlineContentProvider_FileNotFound_Error, e.getMessage())) };
 				}
+				catch (beaver.Parser.Exception e)
+				{
+					IdeLog.logTrace(HTMLPlugin.getDefault(),
+							MessageFormat.format("Unable to parse the content in {0}", srcPathOrURL), e, //$NON-NLS-1$
+							IDebugScopes.OUTLINE);
+					elements = new Object[] { new OutlinePlaceholderItem(IStatus.ERROR,
+							Messages.HTMLOutlineContentProvider_ERR_ParseContent) };
+				}
 				catch (Exception e)
 				{
-					HTMLPlugin.getDefault().getLog()
-							.log(new Status(IStatus.ERROR, HTMLPlugin.PLUGIN_ID, e.getMessage(), e));
+					IdeLog.logTrace(HTMLPlugin.getDefault(),
+							MessageFormat.format("{0} ''{1}''", e.getMessage(), srcPathOrURL), e, IDebugScopes.OUTLINE); //$NON-NLS-1$
 					elements = new Object[] { new OutlinePlaceholderItem(IStatus.ERROR, e.getMessage()) };
 				}
 				final Object[] finalElements = elements;

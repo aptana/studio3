@@ -22,7 +22,7 @@ import org.eclipse.ui.console.IConsoleManager;
 import org.eclipse.ui.console.IConsoleView;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
-import org.mortbay.util.ajax.JSON;
+import com.aptana.jetty.util.epl.ajax.JSON;
 
 import com.aptana.configurations.processor.ConfigurationStatus;
 import com.aptana.core.logging.IdeLog;

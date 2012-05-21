@@ -35,7 +35,6 @@ public class AllTests
 		};
 
 		// $JUnit-BEGIN$
-		suite.addTestSuite(CSSCommentTest.class);
 		suite.addTestSuite(CSSIdentifierTest.class);
 		suite.addTestSuite(CSSKeywordTest.class);
 		suite.addTestSuite(CSSLiteralTest.class);

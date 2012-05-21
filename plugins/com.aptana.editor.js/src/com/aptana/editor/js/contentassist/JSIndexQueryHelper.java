@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-import org.mortbay.util.ajax.JSON;
+import com.aptana.jetty.util.epl.ajax.JSON;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSTypeConstants;
@@ -316,14 +316,14 @@ public class JSIndexQueryHelper
 	 * 
 	 * @param index
 	 * @param typeName
-	 * @param fields
+	 * @param includeMembers
 	 * @return
 	 */
-	public List<TypeElement> getTypes(Index index, String typeName, boolean indexMembers)
+	public List<TypeElement> getTypes(Index index, String typeName, boolean includeMembers)
 	{
 		List<TypeElement> result = new ArrayList<TypeElement>();
-		List<TypeElement> indexTypes = this._reader.getType(index, typeName, indexMembers);
-		List<TypeElement> builtinTypes = this._reader.getType(getIndex(), typeName, indexMembers);
+		List<TypeElement> indexTypes = this._reader.getType(index, typeName, includeMembers);
+		List<TypeElement> builtinTypes = this._reader.getType(getIndex(), typeName, includeMembers);
 
 		if (indexTypes != null)
 		{

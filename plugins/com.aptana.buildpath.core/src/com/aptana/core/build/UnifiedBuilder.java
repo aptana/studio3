@@ -31,6 +31,7 @@ import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
@@ -48,10 +49,10 @@ import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.index.core.FileStoreBuildContext;
 import com.aptana.index.core.IIndexFileContributor;
-import com.aptana.index.core.IIndexFilterParticipant;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.IndexPlugin;
 import com.aptana.index.core.build.BuildContext;
+import com.aptana.index.core.filter.IIndexFilterParticipant;
 
 public class UnifiedBuilder extends IncrementalProjectBuilder
 {
@@ -349,13 +350,17 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 	{
 		Set<IFileStore> result = new HashSet<IFileStore>();
 
-		for (IIndexFileContributor contributor : getIndexManager().getFileContributors())
+		IndexManager manager = getIndexManager();
+		if (manager != null)
 		{
-			Set<IFileStore> files = contributor.getFiles(container);
-
-			if (!CollectionsUtil.isEmpty(files))
+			for (IIndexFileContributor contributor : manager.getFileContributors())
 			{
-				result.addAll(files);
+				Set<IFileStore> files = contributor.getFiles(container);
+
+				if (!CollectionsUtil.isEmpty(files))
+				{
+					result.addAll(files);
+				}
 			}
 		}
 
@@ -364,7 +369,8 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 
 	protected IndexManager getIndexManager()
 	{
-		return IndexPlugin.getDefault().getIndexManager();
+		IndexPlugin plugin = IndexPlugin.getDefault();
+		return (plugin == null) ? null : plugin.getIndexManager();
 	}
 
 	/**
@@ -459,7 +465,8 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 
 			public IFileStore map(IFile item)
 			{
-				return EFS.getLocalFileSystem().getStore(item.getLocation());
+				IPath path = item.getLocation();
+				return (path == null) ? null : EFS.getLocalFileSystem().getStore(path);
 			}
 
 		}));
@@ -468,9 +475,13 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 		if (!CollectionsUtil.isEmpty(fileStores))
 		{
 			// Now let filters run
-			for (IIndexFilterParticipant filterParticipant : getIndexManager().getFilterParticipants())
+			IndexManager manager = getIndexManager();
+			if (manager != null)
 			{
-				fileStores = filterParticipant.applyFilter(fileStores);
+				for (IIndexFilterParticipant filterParticipant : manager.getFilterParticipants())
+				{
+					fileStores = filterParticipant.applyFilter(fileStores);
+				}
 			}
 			sub.worked(60);
 
@@ -576,7 +587,7 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 			{
 				Collection<IProblem> newItems = itemsByType.get(markerType);
 				// deletes the old markers
-				file.deleteMarkers(markerType, true, IResource.DEPTH_INFINITE);
+				file.deleteMarkers(markerType, false, IResource.DEPTH_INFINITE);
 				sub.worked(1);
 
 				// adds the new ones

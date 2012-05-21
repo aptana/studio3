@@ -11,9 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.mortbay.util.ajax.JSON.Output;
+import com.aptana.jetty.util.epl.ajax.JSON.Output;
 
+import com.aptana.core.IMap;
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.ObjectUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.IndexUtil;
 import com.aptana.index.core.ui.views.IPropertyInformation;
@@ -189,6 +191,7 @@ public class ElementElement extends BaseElement<ElementElement.Property>
 		this.setDeprecated(StringUtil.getStringValue(object.get(DEPRECATED_PROPERTY)));
 		this.setExample(StringUtil.getStringValue(object.get(EXAMPLE_PROPERTY)));
 		this.setRelatedClass(StringUtil.getStringValue(object.get(RELATED_CLASS_PROPERTY)));
+		this.setRemark(StringUtil.getStringValue(object.get(REMARK_PROPERTY)));
 
 		this._attributes = IndexUtil.createList(object.get(ATTRIBUTES_PROPERTY));
 		this._events = IndexUtil.createList(object.get(EVENTS_PROPERTY));
@@ -294,14 +297,13 @@ public class ElementElement extends BaseElement<ElementElement.Property>
 	 */
 	public List<String> getUserAgentNames()
 	{
-		List<String> result = new ArrayList<String>();
-
-		for (UserAgentElement userAgent : this.getUserAgents())
+		return CollectionsUtil.map(getUserAgents(), new IMap<UserAgentElement, String>()
 		{
-			result.add(userAgent.getPlatform());
-		}
-
-		return result;
+			public String map(UserAgentElement userAgent)
+			{
+				return userAgent.getPlatform();
+			}
+		});
 	}
 
 	/**
@@ -386,5 +388,22 @@ public class ElementElement extends BaseElement<ElementElement.Property>
 		out.add(REFERENCES_PROPERTY, this.getReferences());
 		out.add(SPECIFICATIONS_PROPERTY, this.getSpecifications());
 		out.add(USER_AGENTS_PROPERTY, this.getUserAgents());
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (!(obj instanceof ElementElement))
+		{
+			return false;
+		}
+		ElementElement other = (ElementElement) obj;
+		return ObjectUtil.areEqual(getName(), other.getName());
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return getName().hashCode();
 	}
 }

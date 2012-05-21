@@ -20,7 +20,10 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
@@ -35,6 +38,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.services.IEvaluationService;
 
@@ -139,6 +143,16 @@ public final class UIUtils
 			// Workbench has not been created yet
 			return null;
 		}
+	}
+
+	public static IEditorPart[] getDirtyEditors()
+	{
+		IWorkbenchPage page = UIUtils.getActivePage();
+		if (page == null)
+		{
+			return null;
+		}
+		return page.getDirtyEditors();
 	}
 
 	/**
@@ -321,5 +335,27 @@ public final class UIUtils
 	private static boolean showPromptDialogUI(String title, String message)
 	{
 		return MessageDialog.openQuestion(getActiveWorkbenchWindow().getShell(), title, message);
+	}
+
+	public static Image getImage(AbstractUIPlugin plugin, String path)
+	{
+		ImageRegistry registry = plugin.getImageRegistry();
+		Image image = registry.get(path);
+		if (image == null)
+		{
+			ImageDescriptor id = getImageDescriptor(plugin.getBundle().getSymbolicName(), path);
+			if (id == null)
+			{
+				return null;
+			}
+			registry.put(path, id);
+			image = registry.get(path);
+		}
+		return image;
+	}
+
+	public static ImageDescriptor getImageDescriptor(String pluginId, String path)
+	{
+		return AbstractUIPlugin.imageDescriptorFromPlugin(pluginId, path);
 	}
 }

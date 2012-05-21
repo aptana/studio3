@@ -12,11 +12,15 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.aptana.core.IMap;
+import com.aptana.core.util.ArrayUtil;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.RegexUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.css.contentassist.index.ICSSIndexConstants;
@@ -31,6 +35,38 @@ import com.aptana.index.core.SearchPattern;
 
 public class HTMLIndexReader extends IndexReader
 {
+	private final class QueryResultToEventElementMapper implements IMap<QueryResult, EventElement>
+	{
+		public EventElement map(QueryResult event)
+		{
+			return createEvent(event);
+		}
+	}
+
+	private final class QueryResultToElementElementMapper implements IMap<QueryResult, ElementElement>
+	{
+		public ElementElement map(QueryResult element)
+		{
+			return createElement(element);
+		}
+	}
+
+	private final class QueryResultToAttributeElementMapper implements IMap<QueryResult, AttributeElement>
+	{
+		public AttributeElement map(QueryResult attribute)
+		{
+			return createAttribute(attribute);
+		}
+	}
+
+	private final class QueryResultToEntityElementMapper implements IMap<QueryResult, EntityElement>
+	{
+		public EntityElement map(QueryResult entity)
+		{
+			return createEntity(entity);
+		}
+	}
+
 	/**
 	 * createAttribute
 	 * 
@@ -85,26 +121,18 @@ public class HTMLIndexReader extends IndexReader
 	 */
 	public List<AttributeElement> getAttribute(Index index, String name)
 	{
-		List<AttributeElement> result = new ArrayList<AttributeElement>();
-
-		if (index != null && name != null && name.length() > 0)
+		if (index == null || StringUtil.isEmpty(name))
 		{
-			List<QueryResult> attributes = index.query( //
-					new String[] { IHTMLIndexConstants.ATTRIBUTE }, //
-					name + ICSSIndexConstants.DELIMITER, //
-					SearchPattern.PREFIX_MATCH //
-					);
-
-			if (attributes != null)
-			{
-				for (QueryResult attribute : attributes)
-				{
-					result.add(this.createAttribute(attribute));
-				}
-			}
+			return Collections.emptyList();
 		}
 
-		return result;
+		List<QueryResult> attributes = index.query( //
+				new String[] { IHTMLIndexConstants.ATTRIBUTE }, //
+				name + ICSSIndexConstants.DELIMITER, //
+				SearchPattern.PREFIX_MATCH //
+				);
+
+		return CollectionsUtil.map(attributes, new QueryResultToAttributeElementMapper());
 	}
 
 	/**
@@ -130,26 +158,41 @@ public class HTMLIndexReader extends IndexReader
 	 */
 	public List<AttributeElement> getAttributes(Index index, List<String> names)
 	{
-		List<AttributeElement> result = new ArrayList<AttributeElement>();
-
-		if (index != null && names != null)
+		if (index == null || CollectionsUtil.isEmpty(names))
 		{
-			List<QueryResult> attributes = index.query( //
-					new String[] { IHTMLIndexConstants.ATTRIBUTE }, //
-					this.getAttributePattern(names), //
-					SearchPattern.REGEX_MATCH //
-					);
-
-			if (attributes != null)
-			{
-				for (QueryResult attribute : attributes)
-				{
-					result.add(this.createAttribute(attribute));
-				}
-			}
+			return Collections.emptyList();
 		}
 
-		return result;
+		List<QueryResult> attributes = index.query( //
+				new String[] { IHTMLIndexConstants.ATTRIBUTE }, //
+				this.getAttributePattern(names), //
+				SearchPattern.REGEX_MATCH //
+				);
+
+		return CollectionsUtil.map(attributes, new QueryResultToAttributeElementMapper());
+	}
+
+	/**
+	 * getAttributes - Returns all attributes in the index.
+	 * 
+	 * @param index
+	 * @return
+	 * @throws IOException
+	 */
+	public List<AttributeElement> getAttributes(Index index)
+	{
+		if (index == null)
+		{
+			return Collections.emptyList();
+		}
+
+		List<QueryResult> attributes = index.query( //
+				new String[] { IHTMLIndexConstants.ATTRIBUTE }, //
+				"*", //$NON-NLS-1$
+				SearchPattern.PATTERN_MATCH //
+				);
+
+		return CollectionsUtil.map(attributes, new QueryResultToAttributeElementMapper());
 	}
 
 	/*
@@ -170,26 +213,18 @@ public class HTMLIndexReader extends IndexReader
 	 */
 	public List<ElementElement> getElements(Index index)
 	{
-		List<ElementElement> result = new ArrayList<ElementElement>();
-
-		if (index != null)
+		if (index == null)
 		{
-			List<QueryResult> elements = index.query( //
-					new String[] { IHTMLIndexConstants.ELEMENT }, //
-					"*", //$NON-NLS-1$
-					SearchPattern.PATTERN_MATCH //
-					);
-
-			if (elements != null)
-			{
-				for (QueryResult element : elements)
-				{
-					result.add(this.createElement(element));
-				}
-			}
+			return Collections.emptyList();
 		}
 
-		return result;
+		List<QueryResult> elements = index.query( //
+				new String[] { IHTMLIndexConstants.ELEMENT }, //
+				"*", //$NON-NLS-1$
+				SearchPattern.PATTERN_MATCH //
+				);
+
+		return CollectionsUtil.map(elements, new QueryResultToElementElementMapper());
 	}
 
 	/**
@@ -202,28 +237,26 @@ public class HTMLIndexReader extends IndexReader
 	 */
 	public List<ElementElement> getElements(Index index, String... names)
 	{
-		List<ElementElement> result = new ArrayList<ElementElement>();
-
-		if (index != null && names != null)
+		if (index == null || ArrayUtil.isEmpty(names))
 		{
-			for (String name : names)
-			{
-				List<QueryResult> elements = index.query( //
-						new String[] { IHTMLIndexConstants.ELEMENT }, //
-						name + ICSSIndexConstants.DELIMITER, //
-						SearchPattern.PREFIX_MATCH //
-						);
-
-				if (elements != null)
-				{
-					for (QueryResult element : elements)
-					{
-						result.add(this.createElement(element));
-					}
-				}
-			}
+			return Collections.emptyList();
 		}
 
+		// We're using ArrayList explicitly so I can call trimToSize later.
+		ArrayList<ElementElement> result = new ArrayList<ElementElement>();
+		for (String name : names)
+		{
+			// we force lowercase so we can do a case sensitive search of index for performance reasons
+			name = name.toLowerCase();
+			List<QueryResult> elements = index.query( //
+					new String[] { IHTMLIndexConstants.ELEMENT }, //
+					name + ICSSIndexConstants.DELIMITER, //
+					SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE //
+			);
+
+			result.addAll(CollectionsUtil.map(elements, new QueryResultToElementElementMapper()));
+		}
+		result.trimToSize();
 		return result;
 	}
 
@@ -235,26 +268,18 @@ public class HTMLIndexReader extends IndexReader
 	 */
 	public List<EntityElement> getEntities(Index index)
 	{
-		List<EntityElement> result = new ArrayList<EntityElement>();
-
-		if (index != null)
+		if (index == null)
 		{
-			List<QueryResult> entities = index.query( //
-					new String[] { IHTMLIndexConstants.ENTITY }, //
-					"*", //$NON-NLS-1$
-					SearchPattern.PATTERN_MATCH //
-					);
-
-			if (entities != null)
-			{
-				for (QueryResult entity : entities)
-				{
-					result.add(this.createEntity(entity));
-				}
-			}
+			return Collections.emptyList();
 		}
 
-		return result;
+		List<QueryResult> entities = index.query( //
+				new String[] { IHTMLIndexConstants.ENTITY }, //
+				"*", //$NON-NLS-1$
+				SearchPattern.PATTERN_MATCH //
+				);
+
+		return CollectionsUtil.map(entities, new QueryResultToEntityElementMapper());
 	}
 
 	/**
@@ -331,32 +356,47 @@ public class HTMLIndexReader extends IndexReader
 	 * getEvents
 	 * 
 	 * @param index
-	 * @param name
+	 * @return
+	 * @throws IOException
+	 */
+	public List<EventElement> getEvents(Index index)
+	{
+		if (index == null)
+		{
+			return Collections.emptyList();
+		}
+
+		List<QueryResult> events = index.query( //
+				new String[] { IHTMLIndexConstants.EVENT }, //
+				"*", //$NON-NLS-1$
+				SearchPattern.PATTERN_MATCH //
+				);
+
+		return CollectionsUtil.map(events, new QueryResultToEventElementMapper());
+	}
+
+	/**
+	 * getEvents
+	 * 
+	 * @param index
+	 * @param names
 	 * @return
 	 * @throws IOException
 	 */
 	public List<EventElement> getEvents(Index index, List<String> names)
 	{
-		List<EventElement> result = new ArrayList<EventElement>();
-
-		if (index != null && names != null)
+		if (index == null || CollectionsUtil.isEmpty(names))
 		{
-			List<QueryResult> events = index.query( //
-					new String[] { IHTMLIndexConstants.EVENT }, //
-					this.getAttributePattern(names), //
-					SearchPattern.REGEX_MATCH //
-					);
-
-			if (events != null)
-			{
-				for (QueryResult event : events)
-				{
-					result.add(this.createEvent(event));
-				}
-			}
+			return Collections.emptyList();
 		}
 
-		return result;
+		List<QueryResult> events = index.query( //
+				new String[] { IHTMLIndexConstants.EVENT }, //
+				this.getAttributePattern(names), //
+				SearchPattern.REGEX_MATCH //
+				);
+
+		return CollectionsUtil.map(events, new QueryResultToEventElementMapper());
 	}
 
 	/*
@@ -389,7 +429,7 @@ public class HTMLIndexReader extends IndexReader
 				for (QueryResult item : items)
 				{
 					Set<String> paths = item.getDocuments();
-					String path = (paths != null && !paths.isEmpty()) ? paths.iterator().next() : ""; //$NON-NLS-1$
+					String path = (paths != null && !paths.isEmpty()) ? paths.iterator().next() : StringUtil.EMPTY;
 
 					try
 					{

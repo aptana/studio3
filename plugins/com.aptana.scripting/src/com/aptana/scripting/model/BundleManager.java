@@ -58,6 +58,12 @@ import com.aptana.scripting.model.filters.IsExecutableCommandFilter;
 
 public class BundleManager
 {
+
+	/**
+	 * The system property to look at for an override of the # of nundles to load in parallel.
+	 */
+	private static final String STUDIO_BUNDLE_LOAD_CONCURRENCY = "studio.bundleLoadConcurrency"; //$NON-NLS-1$
+
 	private static final String APPLICATION_BUNDLE_PATHS_ID = "applicationBundlePaths"; //$NON-NLS-1$
 	private static final String TAG_BUNDLE_PATH = "bundlePath"; //$NON-NLS-1$
 	private static final String ATTR_PATH = "path"; //$NON-NLS-1$
@@ -477,6 +483,12 @@ public class BundleManager
 	 * MenuElements)
 	 */
 	private Map<String, String> _stringPool;
+
+	/**
+	 * The number of bundles to load in parallel. Uninitialized value is -1. After initialization, value must be an
+	 * integer, value of 1 (meaning only load one at a time sequentially) or greater.
+	 */
+	private int fBundlesToLoadInParallel = -1;
 
 	/**
 	 * Create a new instance of BundleManager and initialize its internal structure. Note that this constructor is
@@ -1922,21 +1934,19 @@ public class BundleManager
 	{
 		BundleLoadJob job = new BundleLoadJob(bundleDirectory);
 
+		// If we're running and not testing, schedule in parallel but limit how many run in parallel based on processor
+		// count
 		if (EclipseUtil.isTesting() == false && Platform.isRunning())
 		{
 			job.setRule(new SerialPerObjectRule(counter++));
 
-			if (counter >= Runtime.getRuntime().availableProcessors())
+			if (counter >= maxBundlesToLoadInParallel())
 			{
 				counter = 0;
 			}
 
 			job.setPriority(Job.SHORT);
 			job.schedule();
-		}
-		else
-		{
-			job.run(new NullProgressMonitor());
 			if (wait)
 			{
 				try
@@ -1949,6 +1959,40 @@ public class BundleManager
 				}
 			}
 		}
+		else
+		{
+			// We're already running inline, so don't need to ever "wait"
+			job.run(new NullProgressMonitor());
+		}
+	}
+
+	/**
+	 * We cap the number of bundles to load in parallel. By default we'll cap it based on number of processors in the
+	 * system. You can override this by setting an integer value in the system property
+	 * {@value #STUDIO_BUNDLE_LOAD_CONCURRENCY}
+	 * 
+	 * @return
+	 */
+	protected synchronized int maxBundlesToLoadInParallel()
+	{
+		if (fBundlesToLoadInParallel < 0)
+		{
+			fBundlesToLoadInParallel = Runtime.getRuntime().availableProcessors();
+			String max = System.getProperty(STUDIO_BUNDLE_LOAD_CONCURRENCY);
+			if (!StringUtil.isEmpty(max))
+			{
+				try
+				{
+					fBundlesToLoadInParallel = Integer.parseInt(max);
+				}
+				catch (NumberFormatException e)
+				{
+					// ignore
+				}
+			}
+			fBundlesToLoadInParallel = Math.max(1, fBundlesToLoadInParallel);
+		}
+		return fBundlesToLoadInParallel;
 	}
 
 	/**

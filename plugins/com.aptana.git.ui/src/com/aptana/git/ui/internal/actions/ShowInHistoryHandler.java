@@ -12,9 +12,10 @@ import java.util.Collection;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.expressions.EvaluationContext;
+import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.team.ui.TeamUI;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.ISources;
@@ -40,9 +41,9 @@ public class ShowInHistoryHandler extends AbstractHandler
 	@Override
 	public void setEnabled(Object evaluationContext)
 	{
-		if (evaluationContext instanceof EvaluationContext)
+		if (evaluationContext instanceof IEvaluationContext)
 		{
-			IResource resource = getResource((EvaluationContext) evaluationContext);
+			IResource resource = getResource((IEvaluationContext) evaluationContext);
 			if (resource != null)
 			{
 				GitRepository repo = getGitRepositoryManager().getAttached(resource.getProject());
@@ -68,9 +69,9 @@ public class ShowInHistoryHandler extends AbstractHandler
 			return null;
 		}
 		Object context = event.getApplicationContext();
-		if (context instanceof EvaluationContext)
+		if (context instanceof IEvaluationContext)
 		{
-			IResource resource = getResource((EvaluationContext) context);
+			IResource resource = getResource((IEvaluationContext) context);
 			if (resource != null)
 			{
 				IWorkbenchPage page = UIUtils.getActivePage();
@@ -81,7 +82,7 @@ public class ShowInHistoryHandler extends AbstractHandler
 	}
 
 	@SuppressWarnings("unchecked")
-	private IResource getResource(EvaluationContext evContext)
+	private IResource getResource(IEvaluationContext evContext)
 	{
 		Object input = evContext.getVariable(ISources.SHOW_IN_INPUT);
 		if (input instanceof IFileEditorInput)
@@ -90,18 +91,38 @@ public class ShowInHistoryHandler extends AbstractHandler
 			return fei.getFile();
 		}
 
-		Collection<Object> selectedFiles = (Collection<Object>) evContext.getDefaultVariable();
-		for (Object selected : selectedFiles)
+		input = evContext.getDefaultVariable();
+		if (input instanceof IStructuredSelection)
 		{
-			if (selected instanceof IResource)
+			IStructuredSelection selection = (IStructuredSelection) input;
+			Object[] selectedFiles = selection.toArray();
+			for (Object selected : selectedFiles)
 			{
-				return (IResource) selected;
+				if (selected instanceof IResource)
+				{
+					return (IResource) selected;
+				}
+				else if (selected instanceof IAdaptable)
+				{
+					return (IResource) ((IAdaptable) selected).getAdapter(IResource.class);
+				}
 			}
-			else if (selected instanceof IAdaptable)
+		}
+		else if (input instanceof Collection)
+		{
+			Collection<Object> selectedFiles = (Collection<Object>) input;
+			for (Object selected : selectedFiles)
 			{
-				return (IResource) ((IAdaptable) selected).getAdapter(IResource.class);
-			}
+				if (selected instanceof IResource)
+				{
+					return (IResource) selected;
+				}
+				else if (selected instanceof IAdaptable)
+				{
+					return (IResource) ((IAdaptable) selected).getAdapter(IResource.class);
+				}
 
+			}
 		}
 		return null;
 	}

@@ -25,7 +25,7 @@ import org.eclipse.ui.internal.IPreferenceConstants;
 import org.eclipse.ui.internal.Workbench;
 import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
-import org.mortbay.util.ajax.JSON;
+import com.aptana.jetty.util.epl.ajax.JSON;
 
 import com.aptana.configurations.processor.ConfigurationStatus;
 import com.aptana.core.logging.IdeLog;

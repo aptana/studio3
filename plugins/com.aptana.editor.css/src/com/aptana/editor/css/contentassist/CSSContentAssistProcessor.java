@@ -46,6 +46,7 @@ import com.aptana.editor.css.contentassist.model.PropertyElement;
 import com.aptana.editor.css.contentassist.model.PseudoClassElement;
 import com.aptana.editor.css.contentassist.model.PseudoElementElement;
 import com.aptana.editor.css.contentassist.model.ValueElement;
+import com.aptana.editor.css.internal.text.CSSModelFormatter;
 import com.aptana.editor.css.parsing.CSSTokenScanner;
 import com.aptana.editor.css.parsing.lexer.CSSLexemeProvider;
 import com.aptana.editor.css.parsing.lexer.CSSTokenType;
@@ -127,7 +128,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		{
 			for (ElementElement element : elements)
 			{
-				String description = CSSModelFormatter.getDescription(element);
+				String description = CSSModelFormatter.ADDITIONAL_INFO.getDocumentation(element);
 				List<String> userAgentIdList = element.getUserAgentNames();
 				String[] userAgentIds = userAgentIdList.toArray(new String[userAgentIdList.size()]);
 
@@ -184,7 +185,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 
 			for (PropertyElement property : properties)
 			{
-				String description = CSSModelFormatter.getDescription(property);
+				String description = CSSModelFormatter.ADDITIONAL_INFO.getDocumentation(property);
 				List<String> userAgentIdList = property.getUserAgentNames();
 				String[] userAgentIds = userAgentIdList.toArray(new String[userAgentIdList.size()]);
 
@@ -207,7 +208,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		if (classes != null)
 		{
 			UserAgentManager manager = UserAgentManager.getInstance();
-			String[] userAgentIds = manager.getActiveUserAgentIDs(); // classes can be used by all user agents
+			String[] userAgentIds = manager.getActiveUserAgentIDs(getProject()); // classes can be used by all user agents
 
 			for (Entry<String, String> entry : classes.entrySet())
 			{
@@ -232,7 +233,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		if (ids != null)
 		{
 			UserAgentManager manager = UserAgentManager.getInstance();
-			String[] userAgentIds = manager.getActiveUserAgentIDs(); // classes can be used by all user agents
+			String[] userAgentIds = manager.getActiveUserAgentIDs(getProject()); // classes can be used by all user agents
 
 			for (Entry<String, String> entry : ids.entrySet())
 			{
@@ -605,7 +606,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		{
 			for (PseudoClassElement pseudoClass : classes)
 			{
-				String description = CSSModelFormatter.getDescription(pseudoClass);
+				String description = CSSModelFormatter.ADDITIONAL_INFO.getDocumentation(pseudoClass);
 				List<String> userAgentIdList = pseudoClass.getUserAgentNames();
 				String[] userAgentIds = userAgentIdList.toArray(new String[userAgentIdList.size()]);
 
@@ -622,7 +623,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 				{
 					continue;
 				}
-				String description = CSSModelFormatter.getDescription(pseudoElement);
+				String description = CSSModelFormatter.ADDITIONAL_INFO.getDocumentation(pseudoElement);
 				List<String> userAgentIdList = pseudoElement.getUserAgentNames();
 				String[] userAgentIds = userAgentIdList.toArray(new String[userAgentIdList.size()]);
 
@@ -644,7 +645,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		{
 			for (PseudoElementElement pseudoElement : elements)
 			{
-				String description = CSSModelFormatter.getDescription(pseudoElement);
+				String description = CSSModelFormatter.ADDITIONAL_INFO.getDocumentation(pseudoElement);
 				List<String> userAgentIdList = pseudoElement.getUserAgentNames();
 				String[] userAgentIds = userAgentIdList.toArray(new String[userAgentIdList.size()]);
 
@@ -701,7 +702,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 
 		// build proposal
-		Image[] userAgents = UserAgentManager.getInstance().getUserAgentImages(getNatureIds(), userAgentIds);
+		Image[] userAgents = UserAgentManager.getInstance().getUserAgentImages(getProject(), userAgentIds);
 
 		CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength, length, image,
 				displayName, contextInfo, description);

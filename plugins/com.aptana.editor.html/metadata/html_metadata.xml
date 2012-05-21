@@ -371,8 +371,7 @@ San Diego, CA 92122
         <browser platform="Safari" version="1.0+"/>
         <browser platform="Opera" version="7.0+"/>
       </browsers>
-      <deprecated>Deprecated in HTML 4.01. Use "Object" instead.
-			</deprecated>
+      <deprecated>Deprecated in HTML 4.01. Use "Object" instead.</deprecated>
       <description>Defines a Java applet object.</description>
       <event-refs>
         <event-ref name="onactivate"/>
@@ -4562,13 +4561,13 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <event-ref name="onreadystatechange"/>
       </event-refs>
       <example>
-			&lt;p&gt;This example shows the &amp;lt;head&amp;gt;&amp;&amp;lt;/head&amp;gt;&amp; element for a company home page, including a meta tag, title, and a link to a stylesheet:&lt;/p&gt;
+			&lt;p&gt;This example shows the &amp;lt;head&amp;gt;&amp;lt;/head&amp;gt; element for a company home page, including a meta tag, title, and a link to a stylesheet:&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt; 
 &amp;lt;head&amp;gt;
 	&amp;lt;meta http-equiv="Content-Type" content="text/html; charset=utf-8" /&amp;gt;
 	&amp;lt;title&amp;gt;Aptana Home Page&amp;lt;/title&amp;gt;
 	&amp;lt;link rel="stylesheet" href="style.css" type="text/css" /&amp;gt;
-&amp;/head&amp;gt;
+&amp;lt;/head&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
 			</example>
       <references>
@@ -6050,12 +6049,12 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <event-ref name="onreadystatechange"/>
       </event-refs>
       <example>
-			&lt;p&gt;This example shows a &amp;lt;head&amp;gt;&amp;&amp;lt;/head&amp;gt;&amp; element with a link to a stylesheet:&lt;/p&gt;
+			&lt;p&gt;This example shows a &amp;lt;head&amp;gt;&amp;lt;/head&amp;gt; element with a link to a stylesheet:&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt; 
 &amp;lt;head&amp;gt;
 	&amp;lt;title&amp;gt;Aptana Home Page&amp;lt;/title&amp;gt;
 	&amp;lt;link rel="stylesheet" href="style.css" type="text/css" /&amp;gt;
-&amp;/head&amp;gt;
+&amp;lt;/head&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
 			</example>
       <references>
@@ -6545,13 +6544,13 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <event-ref name="onlayoutcomplete"/>
       </event-refs>
       <example>
-			&lt;p&gt;This example shows the &amp;lt;head&amp;gt;&amp;&amp;lt;/head&amp;gt;&amp; element for a company home page, including a meta tag, title, and a link to a stylesheet:&lt;/p&gt;
+			&lt;p&gt;This example shows the &amp;lt;head&amp;gt;&amp;lt;/head&amp;gt; element for a company home page, including a meta tag, title, and a link to a stylesheet:&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt; 
 &amp;lt;head&amp;gt;
 	&amp;lt;meta http-equiv="Content-Type" content="text/html; charset=utf-8" /&amp;gt;
 	&amp;lt;title&amp;gt;Aptana Home Page&amp;lt;/title&amp;gt;
 	&amp;lt;link rel="stylesheet" href="style.css" type="text/css" /&amp;gt;
-&amp;/head&amp;gt;
+&amp;lt;/head&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
 			</example>
       <references>
@@ -10182,7 +10181,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <event-ref name="onreadystatechange"/>
       </event-refs>
       <example>
-			&lt;p&gt;This example shows the &amp;lt;head&amp;gt;&amp;&amp;lt;/head&amp;gt;&amp; element for a company home page, including a meta tag, title, and a link to a stylesheet:&lt;/p&gt;
+			&lt;p&gt;This example shows the &amp;lt;head&amp;gt;&amp;lt;/head&amp;gt; element for a company home page, including a meta tag, title, and a link to a stylesheet:&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt; 
 &amp;lt;head&amp;gt;
 	&amp;lt;meta http-equiv="Content-Type" content="text/html; charset=utf-8" /&amp;gt;

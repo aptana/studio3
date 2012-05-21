@@ -43,7 +43,7 @@ public interface IBuildParticipantManager
 	 * @param contentTypeId
 	 * @return
 	 */
-	List<IBuildParticipant> filterParticipants(List<IBuildParticipant> participants, String contentTypeId);
+	List<IBuildParticipant> filterParticipants(List<? extends IBuildParticipant> participants, String contentTypeId);
 
 	/**
 	 * Returns the set of all explicitly registered content types across all registered build participants.

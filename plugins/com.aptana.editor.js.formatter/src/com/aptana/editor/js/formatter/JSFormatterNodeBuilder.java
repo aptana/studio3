@@ -100,6 +100,7 @@ import com.aptana.formatter.FormatterUtils;
 import com.aptana.formatter.IDebugScopes;
 import com.aptana.formatter.nodes.AbstractFormatterNodeBuilder;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
+import com.aptana.formatter.nodes.NodeTypes.TypeBracket;
 import com.aptana.formatter.nodes.NodeTypes.TypeOperator;
 import com.aptana.formatter.nodes.NodeTypes.TypePunctuation;
 import com.aptana.parsing.ast.IParseNode;
@@ -255,7 +256,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			IParseNode functionParameters = node.getParameters();
 			List<JSNode> parameters = asJSNodesList(functionParameters.getChildren());
 			pushParametersInParentheses(functionParameters.getStartingOffset(), functionParameters.getEndingOffset(),
-					parameters, TypePunctuation.COMMA, false);
+					parameters, TypePunctuation.COMMA, false, TypeBracket.DECLARATION_PARENTHESIS);
 
 			// Push the function body
 			FormatterJSFunctionBodyNode bodyNode = new FormatterJSFunctionBodyNode(document,
@@ -321,7 +322,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		{
 			if (node.getLength() > 0 && node.getChildCount() == 0)
 			{
-				visitTextNode(node.getStartingOffset(), node.getEndingOffset(), false, 0);
+				visitTextNode(node.getStartingOffset(), node.getEndingOffset() + 1, false, 0);
 			}
 			super.visit(node);
 		}
@@ -421,7 +422,8 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			push(ifNode);
 			// push the 'if' condition
 			pushNodeInParentheses('(', ')', node.getLeftParenthesis().getStart(),
-					node.getRightParenthesis().getEnd() + 1, (JSNode) node.getCondition(), false);
+					node.getRightParenthesis().getEnd() + 1, (JSNode) node.getCondition(), false,
+					TypeBracket.CONDITIONAL_PARENTHESIS);
 			// Construct the 'true' part of the 'if' and visit its children
 			if (isCurlyTrueBlock)
 			{
@@ -433,11 +435,6 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				wrapInImplicitBlock(trueBlock, false);
 			}
 			checkedPop(ifNode, trueBlock.getEndingOffset());
-			if (trueBlock.getNodeType() == IJSNodeTypes.EMPTY && trueBlock.getSemicolonIncluded())
-			{
-				// APSTUD-3337
-				findAndPushPunctuationNode(TypePunctuation.SEMICOLON, trueBlock.getEndingOffset(), false, true);
-			}
 			if (!isEmptyFalseBlock)
 			{
 				// Construct the 'false' part if exist.
@@ -456,7 +453,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				push(elseNode);
 				if (isCurlyFalseBlock)
 				{
-					pushBlockNode(falseBlock, true);
+					pushBlockNode(falseBlock, false);
 				}
 				else
 				{
@@ -524,6 +521,8 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				blockEnd = body.getEndingOffset() + 1;
 				checkedPop(doWhileBlock, blockEnd);
 				doWhileBlock.setEnd(createTextNode(document, blockEnd, blockEnd));
+				// have to adjust the block end (see TISTUD-1572)
+				blockEnd--;
 			}
 
 			// now deal with the 'while' condition part. we need to include the word 'while' that appears
@@ -545,7 +544,8 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		@Override
 		public void visit(JSArrayNode node)
 		{
-			pushNodeInParentheses('[', ']', node.getStartingOffset(), node.getEndingOffset(), node, true);
+			pushNodeInParentheses('[', ']', node.getStartingOffset(), node.getEndingOffset(), node, true,
+					TypeBracket.ARRAY_SQUARE);
 		}
 
 		/*
@@ -579,7 +579,8 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			// visit the elements in the parentheses
 			int openParen = locateCharForward(document, '(', node.getLeftParenthesis().getStart());
 			int closeParen = locateCharBackward(document, ')', node.getRightParenthesis().getStart());
-			FormatterJSParenthesesNode parenthesesNode = new FormatterJSParenthesesNode(document);
+			FormatterJSParenthesesNode parenthesesNode = new FormatterJSParenthesesNode(document,
+					TypeBracket.LOOP_PARENTHESIS);
 			parenthesesNode.setBegin(createTextNode(document, openParen, openParen + 1));
 			push(parenthesesNode);
 			// visit the 'while' condition
@@ -608,7 +609,8 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			// visit the elements in the parentheses
 			int openParen = locateCharForward(document, '(', node.getLeftParenthesis().getStart());
 			int closeParen = locateCharBackward(document, ')', node.getRightParenthesis().getStart());
-			FormatterJSParenthesesNode parenthesesNode = new FormatterJSParenthesesNode(document);
+			FormatterJSParenthesesNode parenthesesNode = new FormatterJSParenthesesNode(document,
+					TypeBracket.LOOP_PARENTHESIS);
 			parenthesesNode.setBegin(createTextNode(document, openParen, openParen + 1));
 			push(parenthesesNode);
 			// visit the initializers, the conditions and the updaters.
@@ -650,7 +652,8 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			// visit the elements in the parentheses
 			int openParen = locateCharForward(document, '(', node.getLeftParenthesis().getStart());
 			int closeParen = locateCharBackward(document, ')', node.getRightParenthesis().getStart());
-			FormatterJSParenthesesNode parenthesesNode = new FormatterJSParenthesesNode(document);
+			FormatterJSParenthesesNode parenthesesNode = new FormatterJSParenthesesNode(document,
+					TypeBracket.LOOP_PARENTHESIS);
 			parenthesesNode.setBegin(createTextNode(document, openParen, openParen + 1));
 			push(parenthesesNode);
 			// push the expression
@@ -682,7 +685,8 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			// visit the elements in the parentheses
 			int openParen = locateCharForward(document, '(', node.getLeftParenthesis().getStart());
 			int closeParen = locateCharBackward(document, ')', node.getRightParenthesis().getStart());
-			FormatterJSParenthesesNode parenthesesNode = new FormatterJSParenthesesNode(document);
+			FormatterJSParenthesesNode parenthesesNode = new FormatterJSParenthesesNode(document,
+					TypeBracket.LOOP_PARENTHESIS);
 			parenthesesNode.setBegin(createTextNode(document, openParen, openParen + 1));
 			push(parenthesesNode);
 			// push the expression
@@ -957,7 +961,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 					|| (document.getLength() > argumentsStartOffset && document.charAt(argumentsStartOffset) == '('))
 			{
 				pushParametersInParentheses(argumentsNode.getStartingOffset(), argumentsNode.getEndingOffset(),
-						arguments, TypePunctuation.COMMA, false);
+						arguments, TypePunctuation.COMMA, false, TypeBracket.DECLARATION_PARENTHESIS);
 			}
 			if (node.getSemicolonIncluded())
 			{
@@ -989,7 +993,8 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		public void visit(JSArgumentsNode node)
 		{
 			pushParametersInParentheses(node.getStartingOffset(), node.getEndingOffset() + 1,
-					asJSNodesList(node.getChildren()), TypePunctuation.COMMA, false);
+					asJSNodesList(node.getChildren()), TypePunctuation.COMMA, false,
+					TypeBracket.DECLARATION_PARENTHESIS);
 		}
 
 		/*
@@ -1094,7 +1099,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			// Push the parenthesis and the parameters (if exist)
 			List<JSNode> parameters = asJSNodesList(node.getArguments().getChildren());
 			pushParametersInParentheses(functionName.getEnd() + 1, node.getEndingOffset(), parameters,
-					TypePunctuation.COMMA, false);
+					TypePunctuation.COMMA, false, TypeBracket.INVOCATION_PARENTHESIS);
 			if (node.getSemicolonIncluded())
 			{
 				findAndPushPunctuationNode(TypePunctuation.SEMICOLON, node.getEndingOffset(), false, true);
@@ -1214,7 +1219,8 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			int leftBracketOffset = node.getLeftBracket().getStart();
 			int rightBracketOffset = node.getRightBracket().getStart();
 			JSNode rightHandSide = (JSNode) node.getRightHandSide();
-			pushNodeInParentheses('[', ']', leftBracketOffset, rightBracketOffset, rightHandSide, false);
+			pushNodeInParentheses('[', ']', leftBracketOffset, rightBracketOffset, rightHandSide, false,
+					TypeBracket.ARRAY_SQUARE);
 		}
 
 		/*
@@ -1325,14 +1331,16 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		 * @param visitOnlyChildren
 		 *            When true, the visit will be only for the node's children. Otherwise, a call on the node.accept
 		 *            will be made.
+		 * @param type
+		 *            The bracket type.
 		 */
 		private void pushNodeInParentheses(char openChar, char closeChar, int parenLookupStart, int parenLookupEnd,
-				JSNode node, boolean visitOnlyChildren)
+				JSNode node, boolean visitOnlyChildren, TypeBracket type)
 		{
 			int openParen = locateCharForward(document, openChar, parenLookupStart);
 			int closeParen = locateCharBackward(document, closeChar, parenLookupEnd);
 			FormatterJSParenthesesNode parenthesesNode = new FormatterJSParenthesesNode(document, false,
-					hasSingleCommentBefore(openParen), hasSingleCommentBefore(closeParen));
+					hasSingleCommentBefore(openParen), hasSingleCommentBefore(closeParen), type);
 			parenthesesNode.setBegin(createTextNode(document, openParen, openParen + 1));
 			push(parenthesesNode);
 			if (node != null)
@@ -1439,7 +1447,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		}
 
 		/**
-		 * Push a FormatterPHPParenthesesNode that contains a parameters array. <br>
+		 * Push a FormatterJSParenthesesNode that contains a parameters array. <br>
 		 * Each parameter in the parameters list is expected to be separated from the others with a comma.
 		 * 
 		 * @param declarationEndOffset
@@ -1452,15 +1460,17 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		 *            Indicate that the parameters list may end with an extra comma that is not included in them. This
 		 *            function will look for that comma if the value is true and will add it as a punctuation node in
 		 *            case it was found.
+		 * @param bracketsType
 		 */
 		private void pushParametersInParentheses(int declarationEndOffset, int expressionEndOffset,
-				List<? extends JSNode> parameters, TypePunctuation punctuationType, boolean lookForExtraComma)
+				List<? extends JSNode> parameters, TypePunctuation punctuationType, boolean lookForExtraComma,
+				TypeBracket bracketsType)
 		{
 			FormatterJSParenthesesNode parenthesesNode = null;
 			int openParen = getNextNonWhiteCharOffset(document, declarationEndOffset);
 			if (document.charAt(openParen) == '(')
 			{
-				parenthesesNode = new FormatterJSParenthesesNode(document);
+				parenthesesNode = new FormatterJSParenthesesNode(document, bracketsType);
 				parenthesesNode.setBegin(createTextNode(document, openParen, openParen + 1));
 			}
 			else

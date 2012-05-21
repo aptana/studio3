@@ -18,8 +18,8 @@ import java.util.Set;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
 import org.eclipse.ui.views.properties.PropertyDescriptor;
-import org.mortbay.util.ajax.JSON.Convertible;
-import org.mortbay.util.ajax.JSON.Output;
+import com.aptana.jetty.util.epl.ajax.JSON.Convertible;
+import com.aptana.jetty.util.epl.ajax.JSON.Output;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;

@@ -69,6 +69,7 @@ public enum CSSTokenType implements ITypePredicate
 	DASHMATCH(".css", Terminals.DASHMATCH), //$NON-NLS-1$
 	BEGINS_WITH(".css", Terminals.BEGINS_WITH), //$NON-NLS-1$
 	ENDS_WITH(".css", Terminals.ENDS_WITH), //$NON-NLS-1$
+	MOZ_DOCUMENT("keyword.control.at-rule.page.css", Terminals.MOZ_DOCUMENT), //$NON-NLS-1$
 
 	// stuff used internally for special scopes in CSSCodeScanner...
 	LCURLY_MEDIA("punctuation.section.at-rule.media.css", Terminals.LCURLY), //$NON-NLS-1$
@@ -79,6 +80,7 @@ public enum CSSTokenType implements ITypePredicate
 	META_PROPERTY_VALUE("meta.property-value.css", Terminals.PROPERTY), //$NON-NLS-1$
 
 	UNDEFINED("undefined.css", -1), //$NON-NLS-1$
+	ERROR("error.css", -2), //$NON-NLS-1$
 	COMMENT("comment.block.css", 1024); //$NON-NLS-1$
 
 	private static final Map<String, CSSTokenType> NAME_MAP;

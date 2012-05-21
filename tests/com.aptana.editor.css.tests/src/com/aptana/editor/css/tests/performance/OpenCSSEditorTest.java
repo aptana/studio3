@@ -19,6 +19,7 @@ import junit.framework.TestSuite;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
@@ -35,14 +36,30 @@ import com.aptana.editor.epl.tests.ResourceTestHelper;
 public class OpenCSSEditorTest extends OpenEditorTest
 {
 
+	/**
+	 * Performance input files
+	 */
+	private static final String FROM_METADATA = "from-metadata";
+	private static final String GITHUB_FORMATTED = "github-formatted";
+	private static final String GITHUB_MINIMIZED = "github-minimized";
+	private static final String WORDPRESS_ADMIN_MINIMIZED = "wp-admin";
+	private static final String WORDPRESS_ADMIN = "wp-admin.dev";
+	private static final String YUI = "yui";
+
 	private static final String PROJECT = "css_perf";
 	private static final int WARM_UP_RUNS = 2;
 	private static final int MEASURED_RUNS = 5;
-	private static final String PREFIX = "/" + PROJECT + "/yui";
 	private static final String FILE_SUFFIX = ".css";
-	private static final IPath LARGE_MINIFIED_FILE = Path.fromPortableString("/" + PROJECT + "/wp-admin.css");
-	private static final IPath LARGE_FILE = Path.fromPortableString("/" + PROJECT + "/wp-admin.dev.css");
-	private static final IPath SRC_FILE = Path.fromPortableString(PREFIX + FILE_SUFFIX);
+
+	private static String getPrefix(String baseName)
+	{
+		return "/" + PROJECT + "/" + baseName;
+	}
+
+	private static IPath getFile(String baseName)
+	{
+		return Path.fromPortableString(getPrefix(baseName) + FILE_SUFFIX);
+	}
 
 	public OpenCSSEditorTest(String name)
 	{
@@ -53,15 +70,18 @@ public class OpenCSSEditorTest extends OpenEditorTest
 	{
 		// ensure sequence
 		TestSuite suite = new TestSuite(OpenCSSEditorTest.class.getName());
-		suite.addTest(new OpenCSSEditorTest("testOpenCSSEditor1"));
-		suite.addTest(new OpenCSSEditorTest("testOpenLargeMinifiedFileFoldingOnOutlineOn"));
-		// suite.addTest(new OpenCSSEditorTest("testOpenLargeMinifiedFileFoldingOffOutlineOn"));
-		suite.addTest(new OpenCSSEditorTest("testOpenLargeMinifiedFileFoldingOnOutlineOff"));
-		// suite.addTest(new OpenCSSEditorTest("testOpenLargeMinifiedFileFoldingOffOutlineOff"));
-		suite.addTest(new OpenCSSEditorTest("testOpenLargeFileFoldingOnOutlineOn"));
-		// suite.addTest(new OpenCSSEditorTest("testOpenLargeFileFoldingOffOutlineOn"));
-		suite.addTest(new OpenCSSEditorTest("testOpenLargeFileFoldingOnOutlineOff"));
-		// suite.addTest(new OpenCSSEditorTest("testOpenLargeFileFoldingOffOutlineOff"));
+		suite.addTest(new OpenCSSEditorTest("testOpenCSSEditor1")); // YUI
+		// suite.addTest(new OpenCSSEditorTest("testOpenFromMetadata"));
+		// suite.addTest(new OpenCSSEditorTest("testOpenGithubFormatted"));
+		// suite.addTest(new OpenCSSEditorTest("testOpenGithubMinimized"));
+		suite.addTest(new OpenCSSEditorTest("testOpenLargeMinifiedFileFoldingOnOutlineOn")); // WORDPRESS_MINIMIZED
+		// suite.addTest(new OpenCSSEditorTest("testOpenLargeMinifiedFileFoldingOffOutlineOn")); // WORDPRESS_MINIMIZED
+		suite.addTest(new OpenCSSEditorTest("testOpenLargeMinifiedFileFoldingOnOutlineOff")); // WORDPRESS_MINIMIZED
+		// suite.addTest(new OpenCSSEditorTest("testOpenLargeMinifiedFileFoldingOffOutlineOff")); // WORDPRESS_MINIMIZED
+		suite.addTest(new OpenCSSEditorTest("testOpenLargeFileFoldingOnOutlineOn")); // WORDPRESS_ADMIN
+		// suite.addTest(new OpenCSSEditorTest("testOpenLargeFileFoldingOffOutlineOn")); // WORDPRESS_ADMIN
+		suite.addTest(new OpenCSSEditorTest("testOpenLargeFileFoldingOnOutlineOff")); // WORDPRESS_ADMIN
+		// suite.addTest(new OpenCSSEditorTest("testOpenLargeFileFoldingOffOutlineOff")); // WORDPRESS_ADMIN
 		return new Setup(suite);
 	}
 
@@ -87,54 +107,76 @@ public class OpenCSSEditorTest extends OpenEditorTest
 
 	public void testOpenCSSEditor1() throws Exception
 	{
-		measureOpenInEditor(ResourceTestHelper.findFiles(PREFIX, FILE_SUFFIX, 0, getWarmUpRuns()), Performance
-				.getDefault().getNullPerformanceMeter(), false);
-		EditorTestHelper.closeAllEditors();
-		measureOpenInEditor(ResourceTestHelper.findFiles(PREFIX, FILE_SUFFIX, getWarmUpRuns(), getMeasuredRuns()),
-				createPerformanceMeter(), false);
+		timeOpening(YUI, false);
+	}
+
+	public void testOpenFromMetadata() throws Exception
+	{
+		timeOpening(FROM_METADATA, true);
+	}
+
+	public void testOpenGithubFormatted() throws Exception
+	{
+		timeOpening(GITHUB_FORMATTED, true);
+	}
+
+	public void testOpenGithubMinimized() throws Exception
+	{
+		timeOpening(GITHUB_MINIMIZED, true);
 	}
 
 	public void testOpenLargeFileFoldingOnOutlineOn() throws Exception
 	{
-		PerformanceMeter performanceMeter = createPerformanceMeter();
-		measureOpenInEditor(LARGE_FILE, true, true, performanceMeter);
+		measureOpenInEditor(getFile(WORDPRESS_ADMIN), true, true, createPerformanceMeter());
 	}
 
 	// public void testOpenLargeFileFoldingOffOutlineOn() throws Exception
 	// {
-	// measureOpenInEditor(LARGE_FILE, false, true, createPerformanceMeter());
+	// measureOpenInEditor(getFile(WORDPRESS_ADMIN), false, true, createPerformanceMeter());
 	// }
 
 	public void testOpenLargeFileFoldingOnOutlineOff() throws Exception
 	{
-		measureOpenInEditor(LARGE_FILE, true, false, createPerformanceMeter());
+		measureOpenInEditor(getFile(WORDPRESS_ADMIN), true, false, createPerformanceMeter());
 	}
 
 	// public void testOpenLargeFileFoldingOffOutlineOff() throws Exception
 	// {
-	// measureOpenInEditor(LARGE_FILE, false, false, createPerformanceMeter());
+	// measureOpenInEditor(getFile(WORDPRESS_ADMIN), false, false, createPerformanceMeter());
 	// }
 
 	public void testOpenLargeMinifiedFileFoldingOnOutlineOn() throws Exception
 	{
-		PerformanceMeter performanceMeter = createPerformanceMeter();
-		measureOpenInEditor(LARGE_MINIFIED_FILE, true, true, performanceMeter);
+		measureOpenInEditor(getFile(WORDPRESS_ADMIN_MINIMIZED), true, true, createPerformanceMeter());
 	}
 
 	// public void testOpenLargeMinifiedFileFoldingOffOutlineOn() throws Exception
 	// {
-	// measureOpenInEditor(LARGE_MINIFIED_FILE, false, true, createPerformanceMeter());
+	// measureOpenInEditor(getFile(WORDPRESS_ADMIN_MINIMIZED), false, true, createPerformanceMeter());
 	// }
 
 	public void testOpenLargeMinifiedFileFoldingOnOutlineOff() throws Exception
 	{
-		measureOpenInEditor(LARGE_MINIFIED_FILE, true, false, createPerformanceMeter());
+		measureOpenInEditor(getFile(WORDPRESS_ADMIN_MINIMIZED), true, false, createPerformanceMeter());
 	}
 
 	// public void testOpenLargeMinifiedFileFoldingOffOutlineOff() throws Exception
 	// {
-	// measureOpenInEditor(LARGE_MINIFIED_FILE, false, false, createPerformanceMeter());
+	// measureOpenInEditor(getFile(WORDPRESS_ADMIN_MINIMIZED), false, false, createPerformanceMeter());
 	// }
+
+	protected void timeOpening(String baseFileName, boolean closeEach) throws PartInitException
+	{
+		measureOpenInEditor(ResourceTestHelper.findFiles(getPrefix(baseFileName), FILE_SUFFIX, 0, getWarmUpRuns()),
+				Performance.getDefault().getNullPerformanceMeter(), closeEach);
+		if (!closeEach)
+		{
+			EditorTestHelper.closeAllEditors();
+		}
+		measureOpenInEditor(
+				ResourceTestHelper.findFiles(getPrefix(baseFileName), FILE_SUFFIX, getWarmUpRuns(), getMeasuredRuns()),
+				createPerformanceMeter(), closeEach);
+	}
 
 	protected void measureOpenInEditor(IPath file, boolean enableFolding, boolean showOutline,
 			PerformanceMeter performanceMeter) throws PartInitException
@@ -200,8 +242,18 @@ public class OpenCSSEditorTest extends OpenEditorTest
 
 				EditorTestHelper.joinBackgroundActivities();
 			}
-			ResourceTestHelper.replicate(SRC_FILE, PREFIX, FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS,
-					ResourceTestHelper.IfExists.SKIP);
+
+			replicate(FROM_METADATA);
+			replicate(GITHUB_FORMATTED);
+			replicate(GITHUB_MINIMIZED);
+			replicate(YUI);
+			// Wordpress files don't need to be replicated
+		}
+
+		private void replicate(String baseFileName) throws CoreException
+		{
+			ResourceTestHelper.replicate(getFile(baseFileName), getPrefix(baseFileName), FILE_SUFFIX, WARM_UP_RUNS
+					+ MEASURED_RUNS, ResourceTestHelper.IfExists.SKIP);
 		}
 
 		private void setUpProject() throws Exception
@@ -231,7 +283,10 @@ public class OpenCSSEditorTest extends OpenEditorTest
 		{
 			if (fTearDown)
 			{
-				ResourceTestHelper.delete(PREFIX, FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS);
+				ResourceTestHelper.delete(getPrefix(FROM_METADATA), FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS);
+				ResourceTestHelper.delete(getPrefix(GITHUB_FORMATTED), FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS);
+				ResourceTestHelper.delete(getPrefix(GITHUB_MINIMIZED), FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS);
+				ResourceTestHelper.delete(getPrefix(YUI), FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS);
 			}
 		}
 	}

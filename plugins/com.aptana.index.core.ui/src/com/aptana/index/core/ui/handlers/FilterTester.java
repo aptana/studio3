@@ -12,7 +12,7 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IResource;
 
 import com.aptana.core.io.efs.EFSUtils;
-import com.aptana.index.core.ui.IndexFilterManager;
+import com.aptana.index.core.filter.IndexFilterManager;
 
 public class FilterTester extends PropertyTester
 {

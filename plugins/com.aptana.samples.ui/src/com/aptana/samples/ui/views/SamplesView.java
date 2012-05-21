@@ -90,8 +90,8 @@ public class SamplesView extends ViewPart
 	public void dispose()
 	{
 		getSamplesManager().removeSampleListener(sampleListener);
-		ThemePlugin.getDefault().getControlThemerFactory().dispose(treeViewer);
 		super.dispose();
+		ThemePlugin.getDefault().getControlThemerFactory().dispose(treeViewer);
 	}
 
 	public void collapseAll()

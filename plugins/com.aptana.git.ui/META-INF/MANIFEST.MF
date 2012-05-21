@@ -32,6 +32,5 @@ Export-Package: com.aptana.git.ui,
  com.aptana.git.ui.actions,
  com.aptana.git.ui.dialogs,
  com.aptana.git.ui.internal.actions,
- com.aptana.git.ui.internal.history,
- com.aptana.git.ui.util
+ com.aptana.git.ui.internal.history
 Eclipse-ExtensibleAPI: true

@@ -29,6 +29,7 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
+import com.aptana.index.core.filter.IIndexFilterParticipant;
 
 public class IndexManager
 {

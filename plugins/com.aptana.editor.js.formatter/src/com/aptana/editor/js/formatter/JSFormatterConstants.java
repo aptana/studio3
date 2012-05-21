@@ -62,8 +62,6 @@ public interface JSFormatterConstants
 	// Spaces
 	public static final String SPACES_BEFORE_COMMAS = FORMATTER_ID + ".spaces.before.commas"; //$NON-NLS-1$
 	public static final String SPACES_AFTER_COMMAS = FORMATTER_ID + ".spaces.after.commas"; //$NON-NLS-1$
-	public static final String SPACES_BEFORE_PARENTHESES = FORMATTER_ID + ".spaces.before.parentheses"; //$NON-NLS-1$
-	public static final String SPACES_AFTER_PARENTHESES = FORMATTER_ID + ".spaces.after.parentheses"; //$NON-NLS-1$
 	public static final String SPACES_BEFORE_UNARY_OPERATOR = FORMATTER_ID + ".spaces.before.unary.operator"; //$NON-NLS-1$
 	public static final String SPACES_AFTER_UNARY_OPERATOR = FORMATTER_ID + ".spaces.after.unary.operator"; //$NON-NLS-1$
 	public static final String SPACES_BEFORE_KEY_VALUE_OPERATOR = FORMATTER_ID + ".spaces.before.key.value.operator"; //$NON-NLS-1$
@@ -98,4 +96,26 @@ public interface JSFormatterConstants
 	public static final String FORMATTER_OFF = FORMATTER_ID + ".formatter.off"; //$NON-NLS-1$
 	public static final String DEFAULT_FORMATTER_OFF = "@formatter:off"; //$NON-NLS-1$
 	public static final String DEFAULT_FORMATTER_ON = "@formatter:on"; //$NON-NLS-1$
+
+	// Parenthesis
+	// @formatter:off
+	public static final String SPACES_BEFORE_OPENING_PARENTHESES = FORMATTER_ID + ".spaces.before.parentheses"; //$NON-NLS-1$
+	public static final String SPACES_AFTER_OPENING_PARENTHESES = FORMATTER_ID + ".spaces.after.parentheses"; //$NON-NLS-1$
+	public static final String SPACES_BEFORE_CLOSING_PARENTHESES = FORMATTER_ID + ".spaces.before.parentheses.closing"; //$NON-NLS-1$
+	public static final String SPACES_BEFORE_OPENING_DECLARATION_PARENTHESES = FORMATTER_ID + ".spaces.before.declaration.parentheses.opening"; //$NON-NLS-1$
+	public static final String SPACES_AFTER_OPENING_DECLARATION_PARENTHESES = FORMATTER_ID + ".spaces.after.declaration.parentheses.opening"; //$NON-NLS-1$
+	public static final String SPACES_BEFORE_CLOSING_DECLARATION_PARENTHESES = FORMATTER_ID + ".spaces.before.declaration.parentheses.closing"; //$NON-NLS-1$
+	public static final String SPACES_BEFORE_OPENING_INVOCATION_PARENTHESES = FORMATTER_ID + ".spaces.before.invocation.parentheses.opening"; //$NON-NLS-1$
+	public static final String SPACES_AFTER_OPENING_INVOCATION_PARENTHESES = FORMATTER_ID + ".spaces.after.invocation.parentheses.opening"; //$NON-NLS-1$
+	public static final String SPACES_BEFORE_CLOSING_INVOCATION_PARENTHESES = FORMATTER_ID + ".spaces.before.invocation.parentheses.closing"; //$NON-NLS-1$
+	public static final String SPACES_BEFORE_OPENING_ARRAY_ACCESS_PARENTHESES = FORMATTER_ID + ".spaces.before.array.access.parentheses.opening"; //$NON-NLS-1$
+	public static final String SPACES_AFTER_OPENING_ARRAY_ACCESS_PARENTHESES = FORMATTER_ID + ".spaces.after.array.access.parentheses.opening"; //$NON-NLS-1$
+	public static final String SPACES_BEFORE_CLOSING_ARRAY_ACCESS_PARENTHESES = FORMATTER_ID + ".spaces.before.array.access.parentheses.closing"; //$NON-NLS-1$
+	public static final String SPACES_BEFORE_OPENING_LOOP_PARENTHESES = FORMATTER_ID + ".spaces.before.loop.parentheses.opening"; //$NON-NLS-1$
+	public static final String SPACES_AFTER_OPENING_LOOP_PARENTHESES = FORMATTER_ID + ".spaces.after.loop.parentheses.opening"; //$NON-NLS-1$
+	public static final String SPACES_BEFORE_CLOSING_LOOP_PARENTHESES = FORMATTER_ID + ".spaces.before.loop.parentheses.closing"; //$NON-NLS-1$
+	public static final String SPACES_BEFORE_OPENING_CONDITIONAL_PARENTHESES = FORMATTER_ID + ".spaces.before.conditional.parentheses.opening"; //$NON-NLS-1$
+	public static final String SPACES_AFTER_OPENING_CONDITIONAL_PARENTHESES = FORMATTER_ID + ".spaces.after.conditional.parentheses.opening"; //$NON-NLS-1$
+	public static final String SPACES_BEFORE_CLOSING_CONDITIONAL_PARENTHESES = FORMATTER_ID + ".spaces.before.conditional.parentheses.closing"; //$NON-NLS-1$
+	// @formatter:on
 }

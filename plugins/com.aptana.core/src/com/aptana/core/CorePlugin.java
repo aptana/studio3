@@ -133,18 +133,13 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 		return plugin;
 	}
 
+	/**
+	 * @return
+	 * @deprecated uses {@link EclipseUtil#getStudioVersion()} instead
+	 */
 	public static String getAptanaStudioVersion()
 	{
-		String version = EclipseUtil.getPluginVersion(EclipseUtil.STANDALONE_PLUGIN_ID);
-		if (version == null)
-		{
-			version = EclipseUtil.getPluginVersion(PLUGIN_ID);
-		}
-		if (version == null)
-		{
-			version = EclipseUtil.getProductVersion();
-		}
-		return version;
+		return EclipseUtil.getStudioVersion();
 	}
 
 	/**

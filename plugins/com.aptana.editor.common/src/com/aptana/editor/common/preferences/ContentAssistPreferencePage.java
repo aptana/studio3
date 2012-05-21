@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -8,15 +8,20 @@
 package com.aptana.editor.common.preferences;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ProjectScope;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.ComboFieldEditor;
-import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ITableLabelProvider;
@@ -33,10 +38,11 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import com.aptana.core.CoreStrings;
+import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.ArrayUtil;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
@@ -45,38 +51,15 @@ import com.aptana.editor.common.contentassist.UserAgentFilterType;
 import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.common.contentassist.UserAgentManager.UserAgent;
 import com.aptana.ui.preferences.AptanaPreferencePage;
+import com.aptana.ui.preferences.PropertyAndPreferenceFieldEditorPage;
 
 /**
  * UserAgentPreferencePage
  */
-public class ContentAssistPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage
+public class ContentAssistPreferencePage extends PropertyAndPreferenceFieldEditorPage
 {
-
-	private class CategoryLabelProvider extends LabelProvider implements ITableLabelProvider
-	{
-		/**
-		 * @param decorate
-		 */
-		public CategoryLabelProvider(boolean decorate)
-		{
-		}
-
-		/**
-		 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java.lang.Object, int)
-		 */
-		public Image getColumnImage(Object element, int columnIndex)
-		{
-			return UserAgentManager.getInstance().getImage(((UserAgentManager.UserAgent) element).enabledIconPath);
-		}
-
-		/**
-		 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.lang.Object, int)
-		 */
-		public String getColumnText(Object element, int columnIndex)
-		{
-			return ((UserAgentManager.UserAgent) element).name;
-		}
-	}
+	private static final String PREFERENCE_PAGE_ID = "com.aptana.editor.common.contentAssistPreferencePage"; //$NON-NLS-1$
+	private static final String PROPERTY_PAGE_ID = "com.aptana.editor.common.contentAssistPropertyPage"; //$NON-NLS-1$
 
 	private Combo natureCombo;
 	private String activeNatureID;
@@ -107,10 +90,13 @@ public class ContentAssistPreferencePage extends FieldEditorPreferencePage imple
 				Messages.ContentAssistPreferencePage_UserAgentGroupLabel);
 		createUserAgentGroupContent(uaGroup);
 
-		// create proposal group
-		Composite pGroup = AptanaPreferencePage.createGroup(parent,
-				Messages.ContentAssistPreferencePage_ProposalsGroupLabel);
-		createProposalGroupContent(pGroup);
+		if (!isProjectPreferencePage())
+		{
+			// create proposal group
+			Composite pGroup = AptanaPreferencePage.createGroup(parent,
+					Messages.ContentAssistPreferencePage_ProposalsGroupLabel);
+			createProposalGroupContent(pGroup);
+		}
 	}
 
 	/**
@@ -121,20 +107,23 @@ public class ContentAssistPreferencePage extends FieldEditorPreferencePage imple
 	protected void createFilterSelector(Composite parent)
 	{
 		// @formatter:off
-		addField(
-			new ComboFieldEditor(
-				com.aptana.editor.common.contentassist.IPreferenceConstants.CONTENT_ASSIST_USER_AGENT_FILTER_TYPE,
-				Messages.ContentAssistPreferencePage_ProposalFilterTypeLabel,
-				new String[][]
-				{
-					{ Messages.ContentAssistPreferencePage_NoFilterLabel, UserAgentFilterType.NO_FILTER.getText() },
-					{ Messages.ContentAssistPreferencePage_OneOrMoreFilterLabel, UserAgentFilterType.ONE_OR_MORE.getText() },
-					{ Messages.ContentAssistPreferencePage_AllFilterLabel, UserAgentFilterType.ALL.getText() }
-				},
-				parent
-			)
+		ComboFieldEditor fieldEditor = new ComboFieldEditor(
+			com.aptana.editor.common.contentassist.IPreferenceConstants.CONTENT_ASSIST_USER_AGENT_FILTER_TYPE,
+			Messages.ContentAssistPreferencePage_ProposalFilterTypeLabel,
+			new String[][]
+			{
+				{ Messages.ContentAssistPreferencePage_NoFilterLabel, UserAgentFilterType.NO_FILTER.getText() },
+				{ Messages.ContentAssistPreferencePage_OneOrMoreFilterLabel, UserAgentFilterType.ONE_OR_MORE.getText() },
+				{ Messages.ContentAssistPreferencePage_AllFilterLabel, UserAgentFilterType.ALL.getText() }
+			},
+			parent
 		);
+		addField(fieldEditor);
 		// @formatter:on
+		// We only want to enable this field editor for workspace-specific settings.
+		// Since the UI will not draw anything unless we have at least one field-editor in this page, we have to add it
+		// and disable it for project-specific.
+		fieldEditor.setEnabled(!isProjectPreferencePage(), parent);
 	}
 
 	/**
@@ -161,30 +150,63 @@ public class ContentAssistPreferencePage extends FieldEditorPreferencePage imple
 		gd.horizontalAlignment = GridData.FILL;
 		natureCombo.setLayoutData(gd);
 
+		// Selected nature, in case it's a property page.
+		boolean isProjectPreference = isProjectPreferencePage();
+		String primaryProjectNature = null;
+		if (isProjectPreference)
+		{
+			try
+			{
+				String[] aptanaNatures = ResourceUtil.getAptanaNatures(getProject().getDescription());
+				if (!ArrayUtil.isEmpty(aptanaNatures))
+				{
+					primaryProjectNature = aptanaNatures[0];
+				}
+			}
+			catch (CoreException e)
+			{
+			}
+		}
 		// set combo list
 		for (Map.Entry<String, String> entry : natureMap.entrySet())
 		{
-			natureCombo.add(entry.getKey());
+			if (primaryProjectNature != null)
+			{
+				// Select only the matching entry
+				if (primaryProjectNature.equals(entry.getValue()))
+				{
+					natureCombo.add(entry.getKey());
+					break;
+				}
+			}
+			else
+			{
+				natureCombo.add(entry.getKey());
+			}
 		}
 
 		// select first item and save reference to that nature id for future selection updates
-		natureCombo.setText(natureMap.firstKey());
-		activeNatureID = getNatureMap().get(natureMap.firstKey());
+		natureCombo.select(0);
+		activeNatureID = natureMap.get(natureCombo.getText());
 
-		natureCombo.addSelectionListener(new SelectionAdapter()
+		natureCombo.setEnabled(!isProjectPreference);
+		if (!isProjectPreference)
 		{
-			public void widgetSelected(SelectionEvent evt)
+			natureCombo.addSelectionListener(new SelectionAdapter()
 			{
-				// update selection in model
-				userAgentsByNatureID.put(activeNatureID, getSelectedUserAgents());
+				public void widgetSelected(SelectionEvent evt)
+				{
+					// update selection in model
+					userAgentsByNatureID.put(activeNatureID, getSelectedUserAgents());
 
-				// update nature id
-				activeNatureID = getNatureMap().get(natureCombo.getText());
+					// update nature id
+					activeNatureID = getNatureMap().get(natureCombo.getText());
 
-				// update visible selection
-				updateUserAgentSelection();
-			}
-		});
+					// update visible selection
+					updateUserAgentSelection();
+				}
+			});
+		}
 	}
 
 	/**
@@ -283,7 +305,34 @@ public class ContentAssistPreferencePage extends FieldEditorPreferencePage imple
 		createUserAgentTable(parent);
 		createUserAgentButtons(parent);
 		createFilterSelector(parent);
+		UserAgentManager manager = UserAgentManager.getInstance();
+		// initialize nature to user agent map
+		userAgentsByNatureID = new HashMap<String, UserAgent[]>();
+		if (isProjectPreferencePage())
+		{
+			try
+			{
+				IProject project = getProject();
+				String[] aptanaNatures = ResourceUtil.getAptanaNatures(project.getDescription());
+				if (!ArrayUtil.isEmpty(aptanaNatures))
+				{
+					userAgentsByNatureID.put(aptanaNatures[0], manager.getActiveUserAgents(project));
+				}
+			}
+			catch (CoreException e)
+			{
+				IdeLog.logError(CommonEditorPlugin.getDefault(), e);
+			}
+		}
+		else
+		{
+			// Filter selection only visible on the workspace setting level.
 
+			for (String natureID : ResourceUtil.getAptanaNaturesMap().values())
+			{
+				userAgentsByNatureID.put(natureID, manager.getActiveUserAgents(natureID));
+			}
+		}
 		updateUserAgentSelection();
 	}
 
@@ -370,23 +419,6 @@ public class ContentAssistPreferencePage extends FieldEditorPreferencePage imple
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
-	 */
-	public void init(IWorkbench workbench)
-	{
-		UserAgentManager manager = UserAgentManager.getInstance();
-
-		// initialize nature to user agent map
-		userAgentsByNatureID = new HashMap<String, UserAgent[]>();
-
-		for (String natureID : ResourceUtil.getAptanaNaturesMap().values())
-		{
-			userAgentsByNatureID.put(natureID, manager.getActiveUserAgents(natureID));
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
 	 * @see org.eclipse.jface.preference.FieldEditorPreferencePage#performDefaults()
 	 */
 	@Override
@@ -419,23 +451,51 @@ public class ContentAssistPreferencePage extends FieldEditorPreferencePage imple
 		// set active user agents for all natures
 		UserAgentManager manager = UserAgentManager.getInstance();
 
-		for (Map.Entry<String, UserAgent[]> entry : userAgentsByNatureID.entrySet())
+		IProject project = getProject();
+		if (project == null)
 		{
-			String natureID = entry.getKey();
-			UserAgent[] userAgents = entry.getValue();
-			String[] userAgentIDs = new String[userAgents.length];
-
-			for (int i = 0; i < userAgents.length; i++)
+			for (Map.Entry<String, UserAgent[]> entry : userAgentsByNatureID.entrySet())
 			{
-				userAgentIDs[i] = userAgents[i].ID;
+				String natureID = entry.getKey();
+				UserAgent[] userAgents = entry.getValue();
+				String[] userAgentIDs = new String[userAgents.length];
+
+				for (int i = 0; i < userAgents.length; i++)
+				{
+					userAgentIDs[i] = userAgents[i].ID;
+				}
+
+				manager.setActiveUserAgents(natureID, userAgentIDs);
+				// Write changes to preferences (workspace scope)
+				manager.savePreference();
 			}
-
-			manager.setActiveUserAgents(natureID, userAgentIDs);
 		}
-
-		// Write changes to preferences
-		manager.savePreference();
-
+		else if (useProjectSettings())
+		{
+			// Write changes to preferences (project-scope).
+			if (activeNatureID != null && !CollectionsUtil.isEmpty(userAgentsByNatureID))
+			{
+				UserAgent[] userAgents = userAgentsByNatureID.get(activeNatureID);
+				String[] userAgentIDs = new String[userAgents.length];
+				for (int i = 0; i < userAgents.length; i++)
+				{
+					userAgentIDs[i] = userAgents[i].ID;
+				}
+				manager.savePreference(project,
+						CollectionsUtil.newTypedMap(String.class, String[].class, activeNatureID, userAgentIDs));
+			}
+			else
+			{
+				IdeLog.logWarning(CommonEditorPlugin.getDefault(),
+						"ContentAssist preferences - Did not save. Expected to have a valid Aptana nature"); //$NON-NLS-1$
+			}
+		}
+		else
+		{
+			// This is a project property page. However, the user have no selection to enable a project-specific.
+			// We need to make sure that the project-scope preferences are cleared.
+			manager.clearPreferences(project);
+		}
 		return super.performOk();
 	}
 
@@ -449,5 +509,78 @@ public class ContentAssistPreferencePage extends FieldEditorPreferencePage imple
 		UserAgent[] userAgents = userAgentsByNatureID.get(natureID);
 
 		categoryViewer.setCheckedElements(userAgents != null ? userAgents : UserAgentManager.NO_USER_AGENTS);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.ui.preferences.PropertyAndPreferenceFieldEditorPage#hasProjectSpecificOptions(org.eclipse.core.resources
+	 * .IProject )
+	 */
+	@Override
+	protected boolean hasProjectSpecificOptions(IProject project)
+	{
+		ProjectScope scope = new ProjectScope(project);
+		IEclipsePreferences node = scope.getNode(CommonEditorPlugin.PLUGIN_ID);
+		if (node != null)
+		{
+			return node.get(com.aptana.editor.common.contentassist.IPreferenceConstants.USER_AGENT_PREFERENCE, null) != null;
+		}
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.ui.preferences.PropertyAndPreferenceFieldEditorPage#getPreferencePageId()
+	 */
+	@Override
+	protected String getPreferencePageId()
+	{
+		return PREFERENCE_PAGE_ID;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.ui.preferences.PropertyAndPreferenceFieldEditorPage#getNatureIDs()
+	 */
+	protected Set<String> getNatureIDs()
+	{
+		return new HashSet<String>(ResourceUtil.getAptanaNaturesMap().values());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.ui.preferences.PropertyAndPreferenceFieldEditorPage#getPropertyPageId()
+	 */
+	@Override
+	protected String getPropertyPageId()
+	{
+		return PROPERTY_PAGE_ID;
+	}
+
+	private class CategoryLabelProvider extends LabelProvider implements ITableLabelProvider
+	{
+		/**
+		 * @param decorate
+		 */
+		public CategoryLabelProvider(boolean decorate)
+		{
+		}
+
+		/**
+		 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java.lang.Object, int)
+		 */
+		public Image getColumnImage(Object element, int columnIndex)
+		{
+			return UserAgentManager.getInstance().getImage(((UserAgentManager.UserAgent) element).enabledIconPath);
+		}
+
+		/**
+		 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.lang.Object, int)
+		 */
+		public String getColumnText(Object element, int columnIndex)
+		{
+			return ((UserAgentManager.UserAgent) element).name;
+		}
 	}
 }

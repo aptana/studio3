@@ -90,6 +90,10 @@ public class EclipseUtil
 
 	private static Boolean isTesting;
 
+	private static String rcpPluginId = STANDALONE_PLUGIN_ID;
+	// uses branding plugin for retrieving the version
+	private static String versionPluginId = "com.aptana.branding"; //$NON-NLS-1$
+
 	private EclipseUtil()
 	{
 	}
@@ -219,13 +223,27 @@ public class EclipseUtil
 	}
 
 	/**
+	 * @return the current version of Studio plugins
+	 */
+	public static String getStudioVersion()
+	{
+		Bundle bundle = Platform.getBundle(versionPluginId);
+		if (bundle != null)
+		{
+			return bundle.getVersion().toString();
+		}
+		// falls back to the about box
+		return getProductVersion();
+	}
+
+	/**
 	 * Determines if the IDE is running as a standalone app versus as a plugin
 	 * 
 	 * @return
 	 */
 	public static boolean isStandalone()
 	{
-		return getPluginVersion(STANDALONE_PLUGIN_ID) != null;
+		return getPluginVersion(rcpPluginId) != null;
 	}
 
 	/**
@@ -312,6 +330,22 @@ public class EclipseUtil
 			launcher = new Path(PlatformUtil.getApplicationExecutable(launcher.toOSString()).getAbsolutePath());
 		}
 		return launcher;
+	}
+
+	public static void setRCPPluginId(String pluginId)
+	{
+		if (!StringUtil.isEmpty(pluginId))
+		{
+			rcpPluginId = pluginId;
+		}
+	}
+
+	public static void setVersionPluginId(String pluginId)
+	{
+		if (!StringUtil.isEmpty(pluginId))
+		{
+			versionPluginId = pluginId;
+		}
 	}
 
 	/**

@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.index.core.build.BuildContext;
+import com.aptana.index.core.filter.IIndexFilterParticipant;
 
 abstract class IndexRequestJob extends Job
 {
@@ -222,16 +223,13 @@ abstract class IndexRequestJob extends Job
 
 	protected List<IFileStoreIndexingParticipant> getIndexParticipants(IFileStore file)
 	{
-		IndexManager manager = getIndexManager();
+		IndexManager indexManager = getIndexManager();
+		if (indexManager != null)
+		{
+			return indexManager.getIndexParticipants(file.getName());
+		}
 
-		if (manager != null)
-		{
-			return manager.getIndexParticipants(file.getName());
-		}
-		else
-		{
-			return Collections.emptyList();
-		}
+		return Collections.emptyList();
 	}
 
 }

@@ -1,0 +1,21 @@
+{
+	"types": [
+		{
+			"name": "Titanium.API",
+			"userAgents": [
+                {
+                    "platform": "android"
+                }, 
+                {
+                    "platform": "iphone"
+                }, 
+                {
+                    "platform": "ipad"
+                }, 
+                {
+                    "platform": "mobileweb"
+                }
+            ]
+		}
+	]
+}

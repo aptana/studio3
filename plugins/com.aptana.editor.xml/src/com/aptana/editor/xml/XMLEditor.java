@@ -93,7 +93,7 @@ public class XMLEditor extends AbstractThemeableEditor
 	 * 
 	 * @return
 	 */
-	protected char[] getPairMatchingCharacters()
+	public char[] getPairMatchingCharacters()
 	{
 		return XML_PAIR_MATCHING_CHARS;
 	}

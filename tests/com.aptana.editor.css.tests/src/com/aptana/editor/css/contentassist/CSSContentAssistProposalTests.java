@@ -158,7 +158,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/*
 	 * Matches element E when E is the first child of its parent.
 	 */
-	public void testPseduoClass()
+	public void testPseudoClass()
 	{
 		assertCompletionCorrect("p:| {}", '\t', "first-child", "p:first-child {}");
 	}
@@ -166,7 +166,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/*
 	 * Matches element E when E is the first child of its parent.
 	 */
-	public void testPseduoClassPrefix()
+	public void testPseudoClassPrefix()
 	{
 		assertCompletionCorrect("p:f| {}", '\t', "first-child", "p:first-child {}");
 	}
@@ -175,7 +175,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	 * Matches element E if E is the source anchor of a hyperlink of which the target is not yet visited (:link) or
 	 * already visited (:visited).
 	 */
-	public void testLinkPseduoClass()
+	public void testLinkPseudoClass()
 	{
 		assertCompletionCorrect("a:| {}", '\t', "link", "a:link {}");
 	}
@@ -184,7 +184,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	 * Matches element E if E is the source anchor of a hyperlink of which the target is not yet visited (:link) or
 	 * already visited (:visited).
 	 */
-	public void testLinkPseduoClassPrefix()
+	public void testLinkPseudoClassPrefix()
 	{
 		assertCompletionCorrect("a:l| {}", '\t', "link", "a:link {}");
 	}
@@ -193,7 +193,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	 * Matches element E if E is the source anchor of a hyperlink of which the target is not yet visited (:link) or
 	 * already visited (:visited).
 	 */
-	public void testVistedPseduoClass()
+	public void testVistedPseudoClass()
 	{
 		assertCompletionCorrect("a:| {}", '\t', "visited", "a:visited {}");
 	}
@@ -202,55 +202,55 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	 * Matches element E if E is the source anchor of a hyperlink of which the target is not yet visited (:link) or
 	 * already visited (:visited).
 	 */
-	public void testVistedPseduoClassPrefix()
+	public void testVistedPseudoClassPrefix()
 	{
 		assertCompletionCorrect("a:v| {}", '\t', "visited", "a:visited {}");
 	}
 
 	/*
-	 * testDynamicPseduoClassActivePrefix
+	 * testDynamicPseudoClassActivePrefix
 	 */
-	public void testDynamicPseduoClassActive()
+	public void testDynamicPseudoClassActive()
 	{
 		assertCompletionCorrect("a:| {}", '\t', "active", "a:active {}");
 	}
 
 	/*
-	 * testDynamicPseduoClassActivePrefix
+	 * testDynamicPseudoClassActivePrefix
 	 */
-	public void testDynamicPseduoClassActivePrefix()
+	public void testDynamicPseudoClassActivePrefix()
 	{
 		assertCompletionCorrect("a:a| {}", '\t', "active", "a:active {}");
 	}
 
 	/*
-	 * testDynamicPseduoClassHover
+	 * testDynamicPseudoClassHover
 	 */
-	public void testDynamicPseduoClassHover()
+	public void testDynamicPseudoClassHover()
 	{
 		assertCompletionCorrect("a:| {}", '\t', "hover", "a:hover {}");
 	}
 
 	/*
-	 * testDynamicPseduoClassHoverPrefix
+	 * testDynamicPseudoClassHoverPrefix
 	 */
-	public void testDynamicPseduoClassHoverPrefix()
+	public void testDynamicPseudoClassHoverPrefix()
 	{
 		assertCompletionCorrect("a:h| {}", '\t', "hover", "a:hover {}");
 	}
 
 	/*
-	 * testDynamicPseduoClassFocus
+	 * testDynamicPseudoClassFocus
 	 */
-	public void testDynamicPseduoClassFocus()
+	public void testDynamicPseudoClassFocus()
 	{
 		assertCompletionCorrect("a:| {}", '\t', "focus", "a:focus {}");
 	}
 
 	/*
-	 * testDynamicPseduoClassFocusPrefix
+	 * testDynamicPseudoClassFocusPrefix
 	 */
-	public void testDynamicPseduoClassFocusPrefix()
+	public void testDynamicPseudoClassFocusPrefix()
 	{
 		assertCompletionCorrect("a:f| {}", '\t', "focus", "a:focus {}");
 	}
@@ -259,7 +259,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	 * E:lang(c) Matches element of type E if it is in (human) language c (the document language specifies how language
 	 * is determined)
 	 */
-	public void testLangPseduoClass()
+	public void testLangPseudoClass()
 	{
 		assertCompletionCorrect("html:| { quotes: '« ' ' »' }", '\t', "lang", "html:lang { quotes: '« ' ' »' }");
 	}
@@ -268,7 +268,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	 * E:lang(c) Matches element of type E if it is in (human) language c (the document language specifies how language
 	 * is determined)
 	 */
-	public void testLangPseduoClassPrefix()
+	public void testLangPseudoClassPrefix()
 	{
 		assertCompletionCorrect("html:l| { quotes: '« ' ' »' }", '\t', "lang", "html:lang { quotes: '« ' ' »' }");
 	}
@@ -277,7 +277,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	 * E:lang(c) Matches element of type E if it is in (human) language c (the document language specifies how language
 	 * is determined)
 	 */
-	public void testLangPseduoClassNoElement()
+	public void testLangPseudoClassNoElement()
 	{
 		assertCompletionCorrect(":|", '\t', "lang", ":lang");
 	}
@@ -286,7 +286,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	 * E:lang(c) Matches element of type E if it is in (human) language c (the document language specifies how language
 	 * is determined)
 	 */
-	public void testLangPseduoClassNoElementPrefix()
+	public void testLangPseudoClassNoElementPrefix()
 	{
 		assertCompletionCorrect(":l|", '\t', "lang", ":lang");
 	}
@@ -295,7 +295,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	 * E:lang(c) Matches element of type E if it is in (human) language c (the document language specifies how language
 	 * is determined)
 	 */
-	public void testLangPseduoClassPreviousElement()
+	public void testLangPseudoClassPreviousElement()
 	{
 		// currently reports pseduo-elements as proposals _before_ the colon
 		assertCompletionCorrect("p {} |:", '\t', "div", "p {} div:");
@@ -305,7 +305,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	 * E:lang(c) Matches element of type E if it is in (human) language c (the document language specifies how language
 	 * is determined)
 	 */
-	public void testLangPseduoClassProperties()
+	public void testLangPseudoClassProperties()
 	{
 		assertCompletionCorrect("html:lang(|) { quotes: '« ' ' »' }", '\t', "fr-ca",
 				"html:lang(fr-ca) { quotes: '« ' ' »' }");
@@ -315,7 +315,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	 * E:lang(c) Matches element of type E if it is in (human) language c (the document language specifies how language
 	 * is determined)
 	 */
-	public void testLangPseduoClassPropertiesPrefix()
+	public void testLangPseudoClassPropertiesPrefix()
 	{
 		assertCompletionCorrect("html:lang(f|) { quotes: '« ' ' »' }", '\t', "fr-ca",
 				"html:lang(fr-ca) { quotes: '« ' ' »' }");
@@ -325,16 +325,16 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	 * E:lang(c) Matches element of type E if it is in (human) language c (the document language specifies how language
 	 * is determined)
 	 */
-	public void testLangPseduoClassPropertiesPrefixSpace()
+	public void testLangPseudoClassPropertiesPrefixSpace()
 	{
 		assertCompletionCorrect("html:lang(f| ) { quotes: '« ' ' »' }", '\t', "fr-ca",
 				"html:lang(fr-ca ) { quotes: '« ' ' »' }");
 	}
 
 	/**
-	 * testPseduoElements
+	 * testPseudoElements
 	 */
-	public void testPseduoClassesAndElements()
+	public void testPseudoClassesAndElements()
 	{
 		this.checkProposals("contentAssist/pseduo-class-proposal.css", true, true, "active", "after", "before",
 				"checked", "disabled", "empty", "enabled", "first-child", "first-letter", "first-line",
@@ -344,18 +344,18 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	}
 
 	/**
-	 * testPseduoElements
+	 * testPseudoElements
 	 */
-	public void testPseduoElements()
+	public void testPseudoElements()
 	{
 		this.checkProposals("contentAssist/pseduo-element-proposal.css", true, true, "after", "before", "first-letter",
 				"first-line");
 	}
 
 	/**
-	 * testPseduoElementsPrefix
+	 * testPseudoElementsPrefix
 	 */
-	public void testPseduoElementsPrefix()
+	public void testPseudoElementsPrefix()
 	{
 		this.checkProposals("contentAssist/pseduo-element-proposal-prefix.css", true, true, "first-letter",
 				"first-line");
@@ -364,7 +364,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/**
 	 * same pseduo-class test as above, but has a more complete list of the items being tested
 	 */
-	public void testPseduoClassPrefixFull()
+	public void testPseudoClassPrefixFull()
 	{
 		this.checkProposals("contentAssist/pseduo-class-proposal-prefix.css", true, true, "first-child",
 				"first-letter", "first-line", "first-of-type", "focus");

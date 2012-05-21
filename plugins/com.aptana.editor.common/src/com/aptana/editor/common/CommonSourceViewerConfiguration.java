@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.expressions.EvaluationContext;
+import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
@@ -622,7 +623,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		{
 			QualifiedContentType contentType = CommonEditorPlugin.getDefault().getDocumentScopeManager()
 					.getContentType(textViewer.getDocument(), offset);
-			EvaluationContext context = new EvaluationContext(null, textViewer);
+			IEvaluationContext context = new EvaluationContext(null, textViewer);
 			IWorkbenchPartSite site = fTextEditor.getSite();
 			if (site != null)
 			{

@@ -33,6 +33,7 @@ import com.aptana.editor.js.parsing.ast.JSIdentifierNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSObjectNode;
 import com.aptana.editor.js.sdoc.model.DocumentationBlock;
+import com.aptana.editor.js.sdoc.model.TagType;
 import com.aptana.index.core.Index;
 import com.aptana.parsing.ast.IParseNode;
 
@@ -164,7 +165,7 @@ public class JSSymbolTypeInferrer
 
 					if (docs != null)
 					{
-						JSTypeUtil.applyDocumentation(property, docs);
+						JSTypeUtil.applyDocumentation(property, node, docs);
 						break;
 					}
 					else if (property instanceof FunctionElement && node instanceof JSFunctionNode)
@@ -511,15 +512,29 @@ public class JSSymbolTypeInferrer
 				{
 					FunctionElement f = new FunctionElement();
 
-					JSTypeUtil.applyDocumentation(f, docs);
+					JSTypeUtil.applyDocumentation(f, value, docs);
 
-					types.add(f.getSignature());
+					if (!docs.hasTag(TagType.RETURN))
+					{
+						JSNodeTypeInferrer inferrer = new JSNodeTypeInferrer(activeScope, index, location);
+
+						// infer return type
+						property.addType(JSTypeConstants.FUNCTION_TYPE);
+						inferrer.visit(value);
+						property.clearTypes();
+
+						types.addAll(inferrer.getTypes());
+					}
+					else
+					{
+						types.add(f.getSignature());
+					}
 				}
 				else
 				{
 					PropertyElement p = new PropertyElement();
 
-					JSTypeUtil.applyDocumentation(p, docs);
+					JSTypeUtil.applyDocumentation(p, value, docs);
 
 					for (ReturnTypeElement typeElement : p.getTypes())
 					{

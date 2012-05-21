@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -118,9 +117,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 	private static Set<String> AUTO_ACTIVATION_PARTITION_TYPES;
 	{
-		AUTO_ACTIVATION_PARTITION_TYPES = new HashSet<String>();
-		AUTO_ACTIVATION_PARTITION_TYPES.add(JSSourceConfiguration.DEFAULT);
-		AUTO_ACTIVATION_PARTITION_TYPES.add(IDocument.DEFAULT_CONTENT_TYPE);
+		AUTO_ACTIVATION_PARTITION_TYPES = CollectionsUtil.newSet(JSSourceConfiguration.DEFAULT,
+				IDocument.DEFAULT_CONTENT_TYPE);
 	}
 
 	private JSIndexQueryHelper indexHelper;
@@ -325,7 +323,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				proposal.setFileLocation(overriddenLocation);
 			}
 
-			Image[] userAgents = UserAgentManager.getInstance().getUserAgentImages(getNatureIds(), userAgentNames);
+			Image[] userAgents = UserAgentManager.getInstance().getUserAgentImages(getProject(), userAgentNames);
 			proposal.setUserAgentImages(userAgents);
 
 			// add the proposal to the list
@@ -363,7 +361,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 			// build proposal
 			IContextInformation contextInfo = null;
-			Image[] userAgents = UserAgentManager.getInstance().getUserAgentImages(getNatureIds(), userAgentIds);
+			Image[] userAgents = UserAgentManager.getInstance().getUserAgentImages(getProject(), userAgentIds);
 
 			CommonCompletionProposal proposal = new CommonCompletionProposal(displayName, offset, replaceLength,
 					length, image, displayName, contextInfo, description);
@@ -1156,7 +1154,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				{
 					char candidate = document.getChar(index);
 
-					if (candidate == ',' || candidate == '(')
+					if (candidate == ',' || candidate == '(' || candidate == '{')
 					{
 						result = true;
 						break;

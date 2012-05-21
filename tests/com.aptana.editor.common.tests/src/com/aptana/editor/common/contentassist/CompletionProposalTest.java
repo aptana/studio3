@@ -13,6 +13,7 @@ import org.eclipse.jface.text.contentassist.ContextInformation;
 import org.eclipse.swt.graphics.Image;
 
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * CompletionProposalTest
@@ -30,7 +31,7 @@ public class CompletionProposalTest extends TestCase
 	{
 		super.setUp();
 
-		image = CommonEditorPlugin.getImage("icons/proposal.png");
+		image = UIUtils.getImage(CommonEditorPlugin.getDefault(), "icons/proposal.png");
 	}
 
 	public void testProposalsAreEqual()

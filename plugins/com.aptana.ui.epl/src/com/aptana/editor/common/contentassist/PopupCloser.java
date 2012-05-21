@@ -216,13 +216,24 @@ class PopupCloser extends ShellAdapter implements FocusListener, SelectionListen
 					 * The asyncExec is a workaround for https://bugs.eclipse.org/bugs/show_bug.cgi?id=235556 :
 					 * fContentAssistant.hasProposalPopupFocus() is still true during the shellDeactivated(..) event.
 					 */
-					if (fContentAssistant != null && !fContentAssistant.hasProposalPopupFocus())
+					if (fContentAssistant != null && !fContentAssistant.hasProposalPopupFocus()
+							&& !isAdditionalInfoInFocus())
 					{
 						fContentAssistant.hide();
 					}
 				}
 			});
 		}
+	}
+
+	public boolean isAdditionalInfoInFocus()
+	{
+		if (fAdditionalInfoController != null)
+		{
+			IInformationControl control2 = fAdditionalInfoController.getCurrentInformationControl2();
+			return control2 != null && control2.isFocusControl();
+		}
+		return false;
 	}
 
 	/*
@@ -279,7 +290,8 @@ class PopupCloser extends ShellAdapter implements FocusListener, SelectionListen
 					}
 					else if (infoControl != null && infoControl.isFocusControl())
 					{
-						fAdditionalInfoController.getInternalAccessor().replaceInformationControl(true);
+						// TODO: SG - Once the control have a replacer, we can enable this.
+						// fAdditionalInfoController.getInternalAccessor().replaceInformationControl(true);
 					}
 				}
 				break;

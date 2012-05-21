@@ -1,0 +1,141 @@
+// java -jar beaver.jar -T -w JS.grammar
+%package "com.aptana.scope.parsing";
+
+%import "com.aptana.scope.ISelectorNode";
+%import "com.aptana.scope.DescendantSelector";
+%import "com.aptana.scope.GroupSelector";
+%import "com.aptana.scope.IntersectionSelector";
+%import "com.aptana.scope.NameSelector";
+%import "com.aptana.scope.NegativeLookaheadSelector";
+%import "com.aptana.scope.OrSelector";
+
+%class "ScopeParser";
+
+%embed {:
+	// suppress parser error reporting and let the custom error recovery mechanism handle it
+	private static class SDocEvents extends Events
+	{
+		public void scannerError(Scanner.Exception e)
+		{
+		}
+
+		public void syntaxError(Symbol token)
+		{
+		}
+
+		public void unexpectedTokenRemoved(Symbol token)
+		{
+		}
+
+		public void missingTokenInserted(Symbol token)
+		{
+		}
+
+		public void misspelledTokenReplaced(Symbol token)
+		{
+		}
+
+		public void errorPhraseRemoved(Symbol error)
+		{
+		}
+	}
+
+	/**
+	 * parse
+	 * 
+	 * @param source
+	 */
+	public ISelectorNode parse(String source) throws java.lang.Exception
+	{
+		ScopeFlexScanner fScanner = new ScopeFlexScanner();
+
+		fScanner.setSource(source);
+
+		Object result = parse(fScanner);
+
+		if (result instanceof ISelectorNode)
+		{
+			return (ISelectorNode) result;
+		}
+		else
+		{
+			String resultType = (result != null) ? result.getClass().getName() : "null";
+			String message = "Expected result of ScopeParser to be of type ISelectorNode but was of type "
+					.concat(resultType);
+
+			IdeLog.logError(ScriptingActivator.getDefault(), message);
+
+			return null;
+		}
+	}
+:};
+
+%init {:
+	report = new SDocEvents();
+:};
+
+%terminals COMMA, PIPE, AMPERSAND, LPAREN, RPAREN, IDENTIFIER, MINUS;
+%typeof IDENTIFIER = "String";
+%goal Grammar;
+
+Grammar
+	=	Scope
+	;
+
+Scope
+	=	PipeExpression.d
+		{:
+			return d;
+		:}
+	;
+
+PipeExpression
+	=	PipeExpression.p PIPE CommaExpression.c
+		{:
+			return new OrSelector((ISelectorNode) p.value, (ISelectorNode) c.value, "|");
+		:}
+	|	CommaExpression
+	;
+
+CommaExpression
+	=	CommaExpression.c COMMA NegativeLookaheadExpression.t
+		{:
+			return new OrSelector((ISelectorNode) c.value, (ISelectorNode) t.value);
+		:}
+	|	NegativeLookaheadExpression
+	;
+
+NegativeLookaheadExpression
+	=	NegativeLookaheadExpression.d1 MINUS DescendantExpression.d2
+		{:
+			return new NegativeLookaheadSelector((ISelectorNode) d1.value, (ISelectorNode) d2.value);
+		:}
+	|	DescendantExpression
+	;
+
+DescendantExpression
+	=	DescendantExpression.a IntersectionExpression.i
+		{:
+			return new DescendantSelector((ISelectorNode) a.value, (ISelectorNode) i.value);
+		:}
+	|	IntersectionExpression
+	;
+
+IntersectionExpression
+	=	IntersectionExpression.i AMPERSAND Term.p
+		{:
+			return new IntersectionSelector((ISelectorNode) i.value, (ISelectorNode) p.value);
+		:}
+	|	Term
+	;
+
+Term
+	=	IDENTIFIER.i
+		{:
+			return new NameSelector(i);
+		:}
+	|	LPAREN PipeExpression.a RPAREN
+		{:
+			return new GroupSelector((ISelectorNode) a.value);
+		:}
+	;

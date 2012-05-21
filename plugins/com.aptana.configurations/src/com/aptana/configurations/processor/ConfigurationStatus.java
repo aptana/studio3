@@ -14,9 +14,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.mortbay.util.ajax.JSON;
-import org.mortbay.util.ajax.JSON.Convertible;
-import org.mortbay.util.ajax.JSON.Output;
+import com.aptana.jetty.util.epl.ajax.JSON;
+import com.aptana.jetty.util.epl.ajax.JSON.Convertible;
+import com.aptana.jetty.util.epl.ajax.JSON.Output;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.configurations.ConfigurationsPlugin;

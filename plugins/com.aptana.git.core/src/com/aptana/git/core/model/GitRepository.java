@@ -1280,14 +1280,13 @@ public class GitRepository
 		// TODO Store the config contents and only read it again when last mod changes?
 		if (!enterRead())
 		{
-			IdeLog.logError(GitPlugin.getDefault(), Messages.GitRepository_FailedReadLockForConfig, IDebugScopes.DEBUG);
+			IdeLog.logInfo(GitPlugin.getDefault(), Messages.GitRepository_FailedReadLockForConfig, IDebugScopes.DEBUG);
 			return null;
 		}
 
 		try
 		{
-			return IOUtil.read(new FileInputStream(gitFile(CONFIG_FILENAME))); // $codepro.audit.disable
-																				// closeWhereCreated
+			return IOUtil.read(new FileInputStream(gitFile(CONFIG_FILENAME))); // $codepro.audit.disable closeWhereCreated
 		}
 		catch (FileNotFoundException e)
 		{

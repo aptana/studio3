@@ -1,3 +1,11 @@
+// $codepro.audit.disable
+/**
+ * Aptana Studio
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.js.parsing;
 
 import java.io.Reader;
@@ -13,6 +21,7 @@ import com.aptana.editor.js.parsing.lexer.JSTokenType;
 
 %%
 
+%public
 %class JSFlexScanner
 %extends Scanner
 %type Symbol
@@ -185,7 +194,9 @@ MultiLineComment = "/*" ~"*/"
 SDocComment = "/**" ~"*/"
 VSDocComment = "///" [^\r\n]*
 
-Regex = "/" ([^\\/\r\n]|\\[^\r\n])+ "/" [a-z]*
+CharClass = "[" ([^\]\\\r\n]|\\[^\r\n])* "]"
+Character = ([^\[\\\/\r\n]|\\[^\r\n])+
+Regex = "/" ({CharClass}|{Character})+ "/" [a-z]*
 
 %state DIVISION, REGEX
 

@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -8,8 +8,11 @@
 package com.aptana.editor.js.formatter.nodes;
 
 import com.aptana.editor.js.formatter.JSFormatterConstants;
+import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
+import com.aptana.formatter.IFormatterWriter;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
+import com.aptana.formatter.nodes.NodeTypes.TypeBracket;
 
 /**
  * A JS node formatter for parentheses, which can be used for any other single char open and close pair, such as
@@ -23,6 +26,7 @@ public class FormatterJSParenthesesNode extends FormatterBlockWithBeginEndNode
 	private boolean asWrapper;
 	private boolean hasCommentBeforeOpen;
 	private boolean hasCommentBeforeClose;
+	private TypeBracket parenthesesType;
 
 	/**
 	 * Constructs a new FormatterJSParenthesesNode
@@ -37,12 +41,13 @@ public class FormatterJSParenthesesNode extends FormatterBlockWithBeginEndNode
 	 *            Indicate that the close parenthesis has a single-line comment right above it.
 	 */
 	public FormatterJSParenthesesNode(IFormatterDocument document, boolean asWrapper, boolean hasCommentBeforeOpen,
-			boolean hasCommentBeforeClose)
+			boolean hasCommentBeforeClose, TypeBracket type)
 	{
-		this(document);
+		super(document);
 		this.asWrapper = asWrapper;
 		this.hasCommentBeforeOpen = hasCommentBeforeOpen;
 		this.hasCommentBeforeClose = hasCommentBeforeClose;
+		this.parenthesesType = type;
 	}
 
 	/**
@@ -55,17 +60,18 @@ public class FormatterJSParenthesesNode extends FormatterBlockWithBeginEndNode
 	 */
 	public FormatterJSParenthesesNode(IFormatterDocument document, boolean asWrapper)
 	{
-		this(document, asWrapper, false, false);
+		this(document, asWrapper, false, false, null);
 	}
 
 	/**
 	 * Constructs a new FormatterJSParenthesesNode
 	 * 
 	 * @param document
+	 * @param type
 	 */
-	public FormatterJSParenthesesNode(IFormatterDocument document)
+	public FormatterJSParenthesesNode(IFormatterDocument document, TypeBracket type)
 	{
-		super(document);
+		this(document, false, false, false, type);
 	}
 
 	/*
@@ -79,21 +85,48 @@ public class FormatterJSParenthesesNode extends FormatterBlockWithBeginEndNode
 		{
 			return 1;
 		}
-		return getInt(JSFormatterConstants.SPACES_BEFORE_PARENTHESES);
+		if (parenthesesType != null)
+		{
+			switch (parenthesesType)
+			{
+				case DECLARATION_PARENTHESIS:
+					return getInt(JSFormatterConstants.SPACES_BEFORE_OPENING_DECLARATION_PARENTHESES);
+				case INVOCATION_PARENTHESIS:
+				case ARRAY_PARENTHESIS:
+					return getInt(JSFormatterConstants.SPACES_BEFORE_OPENING_INVOCATION_PARENTHESES);
+				case ARRAY_SQUARE:
+					return getInt(JSFormatterConstants.SPACES_BEFORE_OPENING_ARRAY_ACCESS_PARENTHESES);
+				case CONDITIONAL_PARENTHESIS:
+					return getInt(JSFormatterConstants.SPACES_BEFORE_OPENING_CONDITIONAL_PARENTHESES);
+				case LOOP_PARENTHESIS:
+					return getInt(JSFormatterConstants.SPACES_BEFORE_OPENING_LOOP_PARENTHESES);
+				default:
+					return 0;
+			}
+		}
+		return super.getSpacesCountBefore();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.AbstractFormatterNode#getSpacesCountAfter()
+	/**
+	 * We override the acceptBody to control any spaces that should be added before or after the body.
+	 * 
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#acceptBody(com.aptana.formatter.IFormatterContext,
+	 *      com.aptana.formatter.IFormatterWriter)
 	 */
 	@Override
-	public int getSpacesCountAfter()
+	protected void acceptBody(IFormatterContext context, IFormatterWriter visitor) throws Exception
 	{
-		if (isAsWrapper())
+		int spacesBeforeBody = getSpacesBeforeBody();
+		if (spacesBeforeBody > 0)
 		{
-			return 0;
+			writeSpaces(visitor, context, spacesBeforeBody);
 		}
-		return getInt(JSFormatterConstants.SPACES_AFTER_PARENTHESES);
+		super.acceptBody(context, visitor);
+		int spacesAfterBody = getSpacesAfterBody();
+		if (spacesAfterBody > 0)
+		{
+			writeSpaces(visitor, context, spacesAfterBody);
+		}
 	}
 
 	/*
@@ -150,5 +183,59 @@ public class FormatterJSParenthesesNode extends FormatterBlockWithBeginEndNode
 	protected boolean isAddingEndNewLine()
 	{
 		return hasCommentBeforeClose && !asWrapper;
+	}
+
+	/**
+	 * @return The amount of spaces that we should insert before the body.
+	 */
+	private int getSpacesBeforeBody()
+	{
+		if (isAsWrapper() || parenthesesType == null)
+		{
+			return 0;
+		}
+		switch (parenthesesType)
+		{
+			case DECLARATION_PARENTHESIS:
+				return getInt(JSFormatterConstants.SPACES_AFTER_OPENING_DECLARATION_PARENTHESES);
+			case INVOCATION_PARENTHESIS:
+			case ARRAY_PARENTHESIS:
+				return getInt(JSFormatterConstants.SPACES_AFTER_OPENING_INVOCATION_PARENTHESES);
+			case ARRAY_SQUARE:
+				return getInt(JSFormatterConstants.SPACES_AFTER_OPENING_ARRAY_ACCESS_PARENTHESES);
+			case CONDITIONAL_PARENTHESIS:
+				return getInt(JSFormatterConstants.SPACES_AFTER_OPENING_CONDITIONAL_PARENTHESES);
+			case LOOP_PARENTHESIS:
+				return getInt(JSFormatterConstants.SPACES_AFTER_OPENING_LOOP_PARENTHESES);
+			default:
+				return 0;
+		}
+	}
+
+	/**
+	 * @return The amount of spaces that we should insert after the body.
+	 */
+	private int getSpacesAfterBody()
+	{
+		if (isAsWrapper() || parenthesesType == null)
+		{
+			return 0;
+		}
+		switch (parenthesesType)
+		{
+			case DECLARATION_PARENTHESIS:
+				return getInt(JSFormatterConstants.SPACES_BEFORE_CLOSING_DECLARATION_PARENTHESES);
+			case INVOCATION_PARENTHESIS:
+			case ARRAY_PARENTHESIS:
+				return getInt(JSFormatterConstants.SPACES_BEFORE_CLOSING_INVOCATION_PARENTHESES);
+			case ARRAY_SQUARE:
+				return getInt(JSFormatterConstants.SPACES_BEFORE_CLOSING_ARRAY_ACCESS_PARENTHESES);
+			case CONDITIONAL_PARENTHESIS:
+				return getInt(JSFormatterConstants.SPACES_BEFORE_CLOSING_CONDITIONAL_PARENTHESES);
+			case LOOP_PARENTHESIS:
+				return getInt(JSFormatterConstants.SPACES_BEFORE_CLOSING_LOOP_PARENTHESES);
+			default:
+				return 0;
+		}
 	}
 }

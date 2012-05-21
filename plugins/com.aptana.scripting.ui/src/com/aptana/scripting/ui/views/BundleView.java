@@ -138,9 +138,8 @@ public class BundleView extends ViewPart
 		// remove load cycle listener
 		BundleManager.getInstance().removeLoadCycleListener(loadCycleListener);
 
-		ThemePlugin.getDefault().getControlThemerFactory().dispose(treeViewer);
-
 		super.dispose();
+		ThemePlugin.getDefault().getControlThemerFactory().dispose(treeViewer);
 	}
 
 	/**

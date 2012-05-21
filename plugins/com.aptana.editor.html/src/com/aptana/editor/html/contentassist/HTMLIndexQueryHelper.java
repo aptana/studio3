@@ -116,6 +116,17 @@ public class HTMLIndexQueryHelper
 	}
 
 	/**
+	 * getAttributes - Returns all the attributes in our metadata
+	 * 
+	 * @param element
+	 * @return
+	 */
+	public List<AttributeElement> getAttributes()
+	{
+		return _reader.getAttributes(getIndex());
+	}
+
+	/**
 	 * getAttributes
 	 * 
 	 * @param element
@@ -245,6 +256,16 @@ public class HTMLIndexQueryHelper
 	public List<EntityElement> getEntities()
 	{
 		return this._reader.getEntities(getIndex());
+	}
+
+	/**
+	 * getEvents - gets all event metadata
+	 * 
+	 * @return
+	 */
+	public List<EventElement> getEvents()
+	{
+		return this._reader.getEvents(getIndex());
 	}
 
 	/**

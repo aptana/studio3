@@ -17,10 +17,8 @@ import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.core.build.IProblem;
 import com.aptana.core.build.RequiredBuildParticipant;
-import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.IMarkerConstants;
 import com.aptana.core.util.ArrayUtil;
-import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.parsing.ast.JSCommentNode;
 import com.aptana.index.core.build.BuildContext;
 import com.aptana.parsing.ast.IParseNode;
@@ -81,7 +79,7 @@ public class JSTaskDetector extends RequiredBuildParticipant
 	 */
 	public Collection<IProblem> detectTasks(IParseRootNode rootNode, BuildContext context, IProgressMonitor monitor)
 	{
-		if (rootNode == null)
+		if (rootNode == null || context == null)
 		{
 			return Collections.emptyList();
 		}
@@ -93,7 +91,7 @@ public class JSTaskDetector extends RequiredBuildParticipant
 		}
 		SubMonitor sub = SubMonitor.convert(monitor, comments.length);
 
-		Collection<IProblem> tasks = new ArrayList<IProblem>();
+		Collection<IProblem> tasks = new ArrayList<IProblem>(comments.length);
 		try
 		{
 			String source = context.getContents();
@@ -106,10 +104,6 @@ public class JSTaskDetector extends RequiredBuildParticipant
 				}
 				sub.worked(1);
 			}
-		}
-		catch (CoreException e)
-		{
-			IdeLog.logError(JSPlugin.getDefault(), e);
 		}
 		finally
 		{

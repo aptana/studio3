@@ -127,12 +127,15 @@ public interface IParseState
 	public void setProgressMonitor(IProgressMonitor monitor);
 
 	/**
-	 * Given the new parse state, does this old one encompass the requirements? (i.e. can we just re-use the parse
-	 * result from this parse state instead of doing a re-parse?)
-	 * 
-	 * @param newState
-	 * @return
+	 * @return an immutable object to be used as the key for this parse state (i.e.: object with hashCode/equals).
 	 */
-	public boolean requiresReparse(IParseState newState);
+	public IParseStateCacheKey getCacheKey(String contentTypeId);
+
+	/**
+	 * Copies the errors from the cachedParseState to this parse state.
+	 * 
+	 * @param cachedParseState errors will be copied from this parse state.
+	 */
+	public void copyErrorsFrom(IParseState cachedParseState);
 
 }

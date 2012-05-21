@@ -52,6 +52,18 @@ public class HTMLMetadataReader extends MetadataReader
 		BROWSER("browser"), //$NON-NLS-1$
 		ATTRIBUTE_REF("attribute-ref"), //$NON-NLS-1$
 		ATTRIBUTE("attribute"), //$NON-NLS-1$
+		ATTRIBUTES("attributes"), //$NON-NLS-1$
+		ATTRIBUTE_REFS("attribute-refs"), //$NON-NLS-1$
+		BROWSERS("browsers"), //$NON-NLS-1$
+		HTML("html"), //$NON-NLS-1$
+		ELEMENTS("elements"), //$NON-NLS-1$
+		ENTITIES("entities"), //$NON-NLS-1$
+		ESCAPE_CODES("escape-codes"), //$NON-NLS-1$
+		ESCAPE_CODE("escape-code"), //$NON-NLS-1$
+		EVENTS("events"), //$NON-NLS-1$
+		EVENT_REFS("event-refs"), //$NON-NLS-1$
+		VALUES("values"), //$NON-NLS-1$
+		REFERENCES("references"), //$NON-NLS-1$
 		UNDEFINED(null);
 
 		private String name;
@@ -584,7 +596,7 @@ public class HTMLMetadataReader extends MetadataReader
 
 		if (this._currentElement != null)
 		{
-			this._currentElement.setExample(this.resolveEntities(text));
+			this._currentElement.setExample(text);
 		}
 	}
 

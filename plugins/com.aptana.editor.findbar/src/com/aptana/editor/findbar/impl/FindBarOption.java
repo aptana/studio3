@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -124,7 +124,7 @@ abstract class FindBarOption extends SelectionAdapter implements SelectionListen
 						if (item != null)
 						{
 							boolean val = Boolean.parseBoolean(StringUtil.getStringValue(event.getNewValue()));
-							if (val != item.getSelection())
+							if (!item.isDisposed() && val != item.getSelection())
 							{
 								startInternalUpdate();
 								try
@@ -201,8 +201,15 @@ abstract class FindBarOption extends SelectionAdapter implements SelectionListen
 		if (isCheckable())
 		{
 			item = new MenuItem(menu, SWT.CHECK);
-			IPreferenceStore preferenceStore = FindBarPlugin.getDefault().getPreferenceStore();
-			item.setSelection(preferenceStore.getBoolean(preferencesKey));
+			if (!StringUtil.isEmpty(preferencesKey))
+			{
+				IPreferenceStore preferenceStore = FindBarPlugin.getDefault().getPreferenceStore();
+				item.setSelection(preferenceStore.getBoolean(preferencesKey));
+			}
+			else
+			{
+				item.setSelection(toolItem.getSelection());
+			}
 		}
 		else
 		{
@@ -212,7 +219,7 @@ abstract class FindBarOption extends SelectionAdapter implements SelectionListen
 		{
 			public void widgetSelected(SelectionEvent e)
 			{
-				if (isCheckable())
+				if (isCheckable() && !StringUtil.isEmpty(preferencesKey))
 				{
 					FindBarDecorator.findBarConfiguration.toggle(preferencesKey);
 				}

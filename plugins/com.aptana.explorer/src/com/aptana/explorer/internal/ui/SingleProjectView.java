@@ -836,6 +836,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	@Override
 	public void dispose()
 	{
+		super.dispose();
 		getControlThemerFactory().dispose(getCommonViewer());
 		getControlThemerFactory().dispose(noProjectButtonsComp);
 		getControlThemerFactory().dispose(noProjectslabel);
@@ -845,7 +846,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		removeThemeChangeListener();
 		removeProjectResourceListener();
 		removeActiveProjectPrefListener();
-		super.dispose();
 	}
 
 	private IControlThemerFactory getControlThemerFactory()

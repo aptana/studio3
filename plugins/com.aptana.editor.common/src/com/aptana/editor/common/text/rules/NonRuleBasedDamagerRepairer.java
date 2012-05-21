@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -29,8 +29,16 @@ import org.eclipse.swt.custom.StyleRange;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.ICommonConstants;
+import com.aptana.editor.common.scripting.IDocumentScopeManager;
+import com.aptana.theme.IThemeManager;
 import com.aptana.theme.ThemePlugin;
 
+/**
+ * Applies a single scope/text attribute to the entire region. Useful for partitions that have no sub-scopes.
+ * 
+ * @author Max Stepanov
+ * @author cwilliams
+ */
 public class NonRuleBasedDamagerRepairer implements IPresentationDamager, IPresentationRepairer
 {
 
@@ -102,7 +110,8 @@ public class NonRuleBasedDamagerRepairer implements IPresentationDamager, IPrese
 				IRegion info = fDocument.getLineInformationOfOffset(event.getOffset());
 				int start = Math.max(partition.getOffset(), info.getOffset());
 
-				int end = event.getOffset() + ((event.getText() == null) ? event.getLength() : event.getText().length());
+				int end = event.getOffset()
+						+ ((event.getText() == null) ? event.getLength() : event.getText().length());
 
 				if (info.getOffset() <= end && end <= info.getOffset() + info.getLength())
 				{
@@ -234,15 +243,14 @@ public class NonRuleBasedDamagerRepairer implements IPresentationDamager, IPrese
 				{
 					String last = (String) data;
 					int offset = region.getOffset();
-					String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager()
-							.getScopeAtOffset(fDocument, offset);
+					String scope = getDocumentScopeManager().getScopeAtOffset(fDocument, offset);
 					if (last.length() == 0)
 					{
 						last = scope;
 					}
 					else if (!scope.endsWith(last))
 					{
-						scope += " " + last; //$NON-NLS-1$
+						scope += ' ' + last;
 					}
 					fFullScope = scope;
 				}
@@ -251,7 +259,7 @@ public class NonRuleBasedDamagerRepairer implements IPresentationDamager, IPrese
 					IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 				}
 			}
-			IToken token = ThemePlugin.getDefault().getThemeManager().getToken(fFullScope);
+			IToken token = getThemeManager().getToken(fFullScope);
 			data = token.getData();
 		}
 		if (data instanceof TextAttribute)
@@ -280,5 +288,15 @@ public class NonRuleBasedDamagerRepairer implements IPresentationDamager, IPrese
 			presentation.addStyleRange(new StyleRange(offset, length, attr.getForeground(), attr.getBackground(), attr
 					.getStyle()));
 		}
+	}
+
+	protected IDocumentScopeManager getDocumentScopeManager()
+	{
+		return CommonEditorPlugin.getDefault().getDocumentScopeManager();
+	}
+
+	protected IThemeManager getThemeManager()
+	{
+		return ThemePlugin.getDefault().getThemeManager();
 	}
 }
