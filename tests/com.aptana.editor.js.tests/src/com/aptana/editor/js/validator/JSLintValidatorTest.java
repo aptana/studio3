@@ -1388,7 +1388,6 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		// FIXME Should be error
 		assertProblemExists(items, "Bad invocation.", 1, IMarker.SEVERITY_WARNING, 0);
 	}
 
@@ -1399,8 +1398,169 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		// FIXME Should be error
 		assertProblemExists(items, "Bad invocation.", 1, IMarker.SEVERITY_WARNING, 0);
+	}
+
+	public void testConfusingRegexp1() throws CoreException
+	{
+		// @formatter:off
+		String text = "var r = /regexp//;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Confusing regular expression.", 1, IMarker.SEVERITY_WARNING, 8);
+	}
+
+	public void testConfusingRegexp2() throws CoreException
+	{
+		// @formatter:off
+		String text = "var r = /regexp/*;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Confusing regular expression.", 1, IMarker.SEVERITY_WARNING, 8);
+	}
+
+	public void testConditionalAssignmentIf() throws CoreException
+	{
+		// @formatter:off
+		String text = "var a = 3;\n" +
+				"if (a = 1) {\n" +
+				"    a = 7;\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Expected a conditional expression and instead saw an assignment.", 2,
+				IMarker.SEVERITY_WARNING, 17);
+	}
+
+	public void testConditionalAssignmentWhile() throws CoreException
+	{
+		// @formatter:off
+		String text = "var a = 3;\n" +
+				"while (a = 1) {\n" +
+				"    a = 7;\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Expected a conditional expression and instead saw an assignment.", 2,
+				IMarker.SEVERITY_WARNING, 20);
+	}
+
+	public void testConditionalAssignmentDoWhile() throws CoreException
+	{
+		// @formatter:off
+		String text = "var a = 3;\n" +
+				"do {\n" +
+				"    a = 7;\n" +
+				"} while (a = 1);";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Expected a conditional expression and instead saw an assignment.", 4,
+				IMarker.SEVERITY_WARNING, 38);
+	}
+
+	public void testConditionalAssignmentTernary() throws CoreException
+	{
+		// @formatter:off
+		String text = "var a = 3;\n" +
+				"var b = (a = 3) ? true : false;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Expected a conditional expression and instead saw an assignment.", 2,
+				IMarker.SEVERITY_WARNING, 22);
+	}
+
+	public void testConditionalAssignmentSwitch() throws CoreException
+	{
+		// @formatter:off
+		String text = "var a;\n" +
+				"switch (a = 3) {\n" +
+				"case 3:\n" +
+				"    var b = 1;\n" +
+				"    break;\n" +
+				"default:\n" +
+				"    break;\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Expected a conditional expression and instead saw an assignment.", 2,
+				IMarker.SEVERITY_WARNING, 17);
+	}
+
+	public void testConditionalAssignmentFor() throws CoreException
+	{
+		// @formatter:off
+		String text = "var a;\n" +
+				"for (a = 3; a = 7; a += 3) {\n" +
+				"    var b = 1;\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Expected a conditional expression and instead saw an assignment.", 2,
+				IMarker.SEVERITY_WARNING, 21);
+	}
+
+	public void testConditionalAssignmentOrRightSide() throws CoreException
+	{
+		// @formatter:off
+		String text = "var a = 1;\n" +
+				"if (a || (a = 3)) {\n" +
+				"    var b = 3;\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Expected a conditional expression and instead saw an assignment.", 2,
+				IMarker.SEVERITY_WARNING, 23);
+	}
+
+	public void testConditionalAssignmentOrLeftSide() throws CoreException
+	{
+		// @formatter:off
+		String text = "var a = 1;\n" +
+				"if ((a = 3) || a) {\n" +
+				"    var b = 3;\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Expected a conditional expression and instead saw an assignment.", 2,
+				IMarker.SEVERITY_WARNING, 18);
+	}
+
+	public void testConditionalAssignmentAndRightSide() throws CoreException
+	{
+		// @formatter:off
+		String text = "var a = 1;\n" +
+				"if (a && (a = 3)) {\n" +
+				"    var b = 3;\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Expected a conditional expression and instead saw an assignment.", 2,
+				IMarker.SEVERITY_WARNING, 23);
+	}
+
+	public void testConditionalAssignmentAndLeftSide() throws CoreException
+	{
+		// @formatter:off
+		String text = "var a = 1;\n" +
+				"if ((a = 3) && a) {\n" +
+				"    var b = 3;\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Expected a conditional expression and instead saw an assignment.", 2,
+				IMarker.SEVERITY_WARNING, 18);
 	}
 
 	protected void assertProblemExists(List<IProblem> items, String msg, int line, int severity, int offset)
