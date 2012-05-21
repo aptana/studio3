@@ -41,7 +41,12 @@ import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_AFTER_C
 import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_AFTER_CONDITIONAL_OPERATOR;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_AFTER_FOR_SEMICOLON;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_AFTER_KEY_VALUE_OPERATOR;
-import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_AFTER_PARENTHESES;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_AFTER_OPENING_ARRAY_ACCESS_PARENTHESES;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_AFTER_OPENING_CONDITIONAL_PARENTHESES;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_AFTER_OPENING_DECLARATION_PARENTHESES;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_AFTER_OPENING_INVOCATION_PARENTHESES;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_AFTER_OPENING_LOOP_PARENTHESES;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_AFTER_OPENING_PARENTHESES;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_AFTER_POSTFIX_OPERATOR;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_AFTER_PREFIX_OPERATOR;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_AFTER_RELATIONAL_OPERATORS;
@@ -50,12 +55,23 @@ import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_AFTER_U
 import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_ARITHMETIC_OPERATOR;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_ASSIGNMENT_OPERATOR;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_CASE_COLON_OPERATOR;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_CLOSING_ARRAY_ACCESS_PARENTHESES;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_CLOSING_CONDITIONAL_PARENTHESES;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_CLOSING_DECLARATION_PARENTHESES;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_CLOSING_INVOCATION_PARENTHESES;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_CLOSING_LOOP_PARENTHESES;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_CLOSING_PARENTHESES;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_COMMAS;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_CONCATENATION_OPERATOR;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_CONDITIONAL_OPERATOR;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_FOR_SEMICOLON;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_KEY_VALUE_OPERATOR;
-import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_PARENTHESES;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_OPENING_ARRAY_ACCESS_PARENTHESES;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_OPENING_CONDITIONAL_PARENTHESES;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_OPENING_DECLARATION_PARENTHESES;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_OPENING_INVOCATION_PARENTHESES;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_OPENING_LOOP_PARENTHESES;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_OPENING_PARENTHESES;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_POSTFIX_OPERATOR;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_PREFIX_OPERATOR;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_RELATIONAL_OPERATORS;
@@ -119,8 +135,6 @@ public class JSFormatterPreferenceInitializer extends AbstractPreferenceInitiali
 		store.put(BRACE_POSITION_FUNCTION_DECLARATION, CodeFormatterConstants.SAME_LINE);
 		store.putInt(SPACES_BEFORE_COMMAS, 0);
 		store.putInt(SPACES_AFTER_COMMAS, 1);
-		store.putInt(SPACES_BEFORE_PARENTHESES, 0);
-		store.putInt(SPACES_AFTER_PARENTHESES, 0);
 		store.putInt(SPACES_BEFORE_UNARY_OPERATOR, 0);
 		store.putInt(SPACES_AFTER_UNARY_OPERATOR, 0);
 		store.putInt(SPACES_BEFORE_KEY_VALUE_OPERATOR, 1);
@@ -145,9 +159,28 @@ public class JSFormatterPreferenceInitializer extends AbstractPreferenceInitiali
 		store.putInt(SPACES_AFTER_SEMICOLON, 1);
 		store.putInt(SPACES_BEFORE_CASE_COLON_OPERATOR, 1);
 		store.putInt(SPACES_AFTER_CASE_COLON_OPERATOR, 1);
+		store.putInt(SPACES_BEFORE_OPENING_PARENTHESES, 0);
+		store.putInt(SPACES_AFTER_OPENING_PARENTHESES, 0);
+		store.putInt(SPACES_BEFORE_CLOSING_PARENTHESES, 0);
+		store.putInt(SPACES_BEFORE_OPENING_DECLARATION_PARENTHESES, 0);
+		store.putInt(SPACES_AFTER_OPENING_DECLARATION_PARENTHESES, 0);
+		store.putInt(SPACES_BEFORE_CLOSING_DECLARATION_PARENTHESES, 0);
+		store.putInt(SPACES_BEFORE_OPENING_INVOCATION_PARENTHESES, 0);
+		store.putInt(SPACES_AFTER_OPENING_INVOCATION_PARENTHESES, 0);
+		store.putInt(SPACES_BEFORE_CLOSING_INVOCATION_PARENTHESES, 0);
+		store.putInt(SPACES_BEFORE_OPENING_ARRAY_ACCESS_PARENTHESES, 0);
+		store.putInt(SPACES_AFTER_OPENING_ARRAY_ACCESS_PARENTHESES, 0);
+		store.putInt(SPACES_BEFORE_CLOSING_ARRAY_ACCESS_PARENTHESES, 0);
+		store.putInt(SPACES_BEFORE_OPENING_LOOP_PARENTHESES, 1);
+		store.putInt(SPACES_AFTER_OPENING_LOOP_PARENTHESES, 0);
+		store.putInt(SPACES_BEFORE_CLOSING_LOOP_PARENTHESES, 0);
+		store.putInt(SPACES_BEFORE_OPENING_CONDITIONAL_PARENTHESES, 1);
+		store.putInt(SPACES_AFTER_OPENING_CONDITIONAL_PARENTHESES, 0);
+		store.putInt(SPACES_BEFORE_CLOSING_CONDITIONAL_PARENTHESES, 0);
 		store.putBoolean(FORMATTER_OFF_ON_ENABLED, false);
 		store.put(FORMATTER_ON, DEFAULT_FORMATTER_ON);
 		store.put(FORMATTER_OFF, DEFAULT_FORMATTER_OFF);
+
 		try
 		{
 			store.flush();

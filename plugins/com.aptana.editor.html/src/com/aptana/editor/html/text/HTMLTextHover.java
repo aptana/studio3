@@ -8,6 +8,8 @@
 package com.aptana.editor.html.text;
 
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.ITextHoverExtension2;
@@ -15,23 +17,22 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
 import org.eclipse.ui.IEditorPart;
 
-import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.contentassist.CommonTextHover;
 import com.aptana.editor.common.hover.CustomBrowserInformationControl;
 import com.aptana.editor.html.contentassist.HTMLIndexQueryHelper;
 import com.aptana.editor.html.contentassist.HTMLModelFormatter;
-import com.aptana.editor.html.contentassist.model.ElementElement;
+import com.aptana.editor.html.contentassist.model.BaseElement;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseNodeAttribute;
+import com.aptana.parsing.lexer.IRange;
+import com.aptana.parsing.lexer.Range;
 
 /**
  * @author cwilliams
  */
 public class HTMLTextHover extends CommonTextHover implements ITextHover, ITextHoverExtension2
 {
-
-	private String fDocs;
-	private String fHeader;
 
 	/*
 	 * (non-Javadoc)
@@ -40,33 +41,69 @@ public class HTMLTextHover extends CommonTextHover implements ITextHover, ITextH
 	 */
 	public Object getHoverInfo2(ITextViewer textViewer, IRegion hoverRegion)
 	{
-		try
+		IParseNode activeNode = getActiveNode(textViewer, hoverRegion.getOffset());
+		if (!(activeNode instanceof HTMLElementNode))
 		{
-			IParseNode activeNode = getActiveNode(textViewer, hoverRegion.getOffset());
-			if (!(activeNode instanceof HTMLElementNode))
-			{
-				return null;
-			}
-			HTMLElementNode node = (HTMLElementNode) activeNode;
-			ElementElement element = new HTMLIndexQueryHelper().getElement(node.getElementName().toLowerCase());
-
-			// To avoid duplicating work, we generate the header and documentation together here
-			// and then getHeader and getDocumentation just return the values.
-			if (element != null)
-			{
-				fHeader = HTMLModelFormatter.TEXT_HOVER.getHeader(element);
-				fDocs = HTMLModelFormatter.TEXT_HOVER.getDocumentation(element);
-				AbstractThemeableEditor editorPart = getEditor(textViewer);
-				return getHoverInfo(activeNode, isBrowserControlAvailable(textViewer), null, editorPart, hoverRegion);
-			}
-
 			return null;
 		}
-		finally
+
+		BaseElement element = getMatchingElement(textViewer, hoverRegion, (HTMLElementNode) activeNode);
+		// To avoid duplicating work, we generate the header and documentation together here
+		// and then getHeader and getDocumentation just return the values.
+		if (element != null)
 		{
-			fHeader = null;
-			fDocs = null;
+			return getHoverInfo(element, isBrowserControlAvailable(textViewer), null, getEditor(textViewer),
+					hoverRegion);
 		}
+
+		return null;
+
+	}
+
+	protected BaseElement getMatchingElement(ITextViewer textViewer, IRegion hoverRegion, HTMLElementNode node)
+	{
+		// Hover over start tag?
+		IRange elementNameRange = node.getNameNode().getNameRange();
+		if (!elementNameRange.contains(hoverRegion.getOffset()))
+		{
+			return null;
+		}
+
+		// Check if we're hovering over the tag/element name
+		try
+		{
+			IDocument doc = textViewer.getDocument();
+			String openTagContent = doc.get(elementNameRange.getStartingOffset(), elementNameRange.getLength());
+			int index = openTagContent.indexOf(node.getName());
+			IRange tagNameRange = new Range(elementNameRange.getStartingOffset() + index,
+					elementNameRange.getStartingOffset() + index + node.getName().length());
+
+			if (tagNameRange.contains(hoverRegion.getOffset()))
+			{
+				return new HTMLIndexQueryHelper().getElement(node.getElementName().toLowerCase());
+			}
+		}
+		catch (BadLocationException e)
+		{
+			// ignore
+		}
+
+		// Are we hovering over an attribute?
+		IParseNodeAttribute attr = node.getAttributeAtOffset(hoverRegion.getOffset());
+		if (attr == null)
+		{
+			return null;
+		}
+
+		// Are we over the attribute name?
+		IRange nameRange = attr.getNameRange();
+		if (nameRange != null && nameRange.contains(hoverRegion.getOffset()))
+		{
+			return new HTMLIndexQueryHelper().getAttribute(node.getElementName().toLowerCase(), attr.getName());
+		}
+
+		// We must be hovering over empty space, or attribute value, show no hover
+		return null;
 	}
 
 	/*
@@ -77,7 +114,11 @@ public class HTMLTextHover extends CommonTextHover implements ITextHover, ITextH
 	@Override
 	public String getHeader(Object element, IEditorPart editorPart, IRegion hoverRegion)
 	{
-		return fHeader;
+		if (!(element instanceof BaseElement))
+		{
+			return null;
+		}
+		return HTMLModelFormatter.TEXT_HOVER.getHeader((BaseElement) element);
 	}
 
 	/*
@@ -88,7 +129,11 @@ public class HTMLTextHover extends CommonTextHover implements ITextHover, ITextH
 	@Override
 	public String getDocumentation(Object element, IEditorPart editorPart, IRegion hoverRegion)
 	{
-		return fDocs;
+		if (!(element instanceof BaseElement))
+		{
+			return null;
+		}
+		return HTMLModelFormatter.TEXT_HOVER.getDocumentation((BaseElement) element);
 	}
 
 	/*
@@ -97,15 +142,53 @@ public class HTMLTextHover extends CommonTextHover implements ITextHover, ITextH
 	 */
 	public IRegion getHoverRegion(ITextViewer textViewer, int offset)
 	{
-		IParseNode activeNode = this.getActiveNode(textViewer, offset);
-		if (activeNode instanceof HTMLElementNode)
+		IParseNode activeNode = getActiveNode(textViewer, offset);
+		if (!(activeNode instanceof HTMLElementNode))
 		{
-			HTMLElementNode node = (HTMLElementNode) activeNode;
-			// TODO Be able to distinguish between hover over element name, attribute name, attribute value...
-			return new Region(node.getNameNode().getNameRange().getStartingOffset(), node.getNameNode().getNameRange().getLength() );
+			return null;
 		}
 
-		return new Region(offset, 0);
+		// Are we over a start tag?
+		HTMLElementNode node = (HTMLElementNode) activeNode;
+		IRange elementNameRange = node.getNameNode().getNameRange();
+		if (!elementNameRange.contains(offset))
+		{
+			return null;
+		}
+
+		// Check if we're hovering over the tag/element name
+		try
+		{
+			IDocument doc = textViewer.getDocument();
+			String openTagContent = doc.get(elementNameRange.getStartingOffset(), elementNameRange.getLength());
+			int start = elementNameRange.getStartingOffset() + openTagContent.indexOf(node.getName());
+			IRange tagNameRange = new Range(start, start + node.getName().length() - 1);
+
+			if (tagNameRange.contains(offset))
+			{
+				return new Region(tagNameRange.getStartingOffset(), tagNameRange.getLength());
+			}
+		}
+		catch (BadLocationException e)
+		{
+			// ignore
+		}
+
+		// Are we hovering over an attribute?
+		IParseNodeAttribute attr = node.getAttributeAtOffset(offset);
+		if (attr == null)
+		{
+			return null;
+		}
+
+		// Are we over the name of the attribute?
+		IRange nameRange = attr.getNameRange();
+		if (nameRange != null && nameRange.contains(offset))
+		{
+			return new Region(nameRange.getStartingOffset(), nameRange.getLength());
+		}
+
+		return null;
 	}
 
 	@Override

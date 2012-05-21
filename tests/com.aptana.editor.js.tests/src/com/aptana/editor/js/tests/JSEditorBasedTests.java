@@ -45,7 +45,7 @@ public class JSEditorBasedTests extends EditorContentAssistBasedTests<JSContentA
 	 * @see com.aptana.editor.common.EditorContentAssistBasedTests#getPluginId()
 	 */
 	@Override
-	protected String getPluginId()
+	protected String getEditorId()
 	{
 		return JSPlugin.PLUGIN_ID;
 	}

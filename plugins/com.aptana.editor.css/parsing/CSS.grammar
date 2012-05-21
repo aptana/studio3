@@ -13,14 +13,15 @@
 %import "com.aptana.parsing.ast.ParseError";
 %import "com.aptana.parsing.ast.IParseRootNode";
 %import "com.aptana.parsing.ast.ParseRootNode";
-%import "com.aptana.parsing.lexer.IRange";
 %import "com.aptana.parsing.util.ParseUtil";
+%import "com.aptana.parsing.ast.IParseNode";
 
 %terminals AT_RULE, CHARSET, IMPORT, MEDIA_KEYWORD, PAGE, FONTFACE, NAMESPACE, LPAREN;
 %terminals SEMICOLON, COLON, COMMA, LCURLY, RCURLY, LBRACKET, RBRACKET, RPAREN, SLASH;
 %terminals MINUS, PLUS, EQUAL, STAR, GREATER;
 %terminals IDENTIFIER, STRING, URL, NUMBER, CLASS, LENGTH, EMS, EXS, ANGLE, TIME, FREQUENCY, COLOR, PERCENTAGE;
 %terminals IMPORTANT, PROPERTY, SELECTOR, HASH, INCLUDES, DASHMATCH, BEGINS_WITH, ENDS_WITH;
+%terminals MOZ_DOCUMENT;
 
 %typeof IDENTIFIER, PROPERTY, STRING, URL, NUMBER, PERCENTAGE, LENGTH, EMS, EXS, ANGLE, TIME, FREQUENCY, COLOR = "String";
 %typeof HASH, CLASS, LBRACKET, RBRACKET, COLON, COMMA, PLUS, STAR, GREATER, AT_RULE = "String";
@@ -35,6 +36,8 @@
 %typeof Selector = "CSSSelectorNode";
 %typeof SimpleSelector = "CSSSimpleSelectorNode";
 %typeof Combinator = "String";
+%typeof Rule = "CSSRuleNode";
+%typeof Rules, FunctionList = "CSSList";
 
 %implements "IParser";
 
@@ -83,26 +86,30 @@
 		fParseState.clearErrors();
 
 		// create scanner and send source to it
-		CSSScanner scanner = new CSSScanner();
+		CSSFlexScanner scanner = new CSSFlexScanner();
 		scanner.setSource(source);
 
 		// parse
 		ParseRootNode result = (ParseRootNode) parse(scanner);
 
 		// attach comments to parse root node
-		IRange[] comments = scanner.getComments();
-		CSSCommentNode[] commentNodes = new CSSCommentNode[comments.length];
+		List<Symbol> comments = scanner.getComments();
+		List<CSSCommentNode> commentNodes = new ArrayList<CSSCommentNode>(comments.size());
 
-		for (int i = 0; i < comments.length; i++)
+		for (Symbol comment : comments)
 		{
-			IRange comment = comments[i];
-			CSSCommentNode commentNode = new CSSCommentNode( //
-					this.getSource(fParseState, comment), comment.getStartingOffset(), comment.getEndingOffset());
+			// @formatter:off
+			CSSCommentNode commentNode = new CSSCommentNode(
+				source.substring(comment.getStart(), comment.getEnd() + 1),
+				comment.getStart(),
+				comment.getEnd()
+			);
+			// @formatter:on
 
-			commentNodes[i] = commentNode;
+			commentNodes.add(commentNode);
 		}
 
-		result.setCommentNodes(commentNodes);
+		result.setCommentNodes(commentNodes.toArray(new IParseNode[commentNodes.size()]));
 
 		// update node offsets
 		int start = fParseState.getStartingOffset();
@@ -123,14 +130,6 @@
 		fParseState = null;
 
 		return result;
-	}
-
-	private String getSource(IParseState parseState, IRange comment)
-	{
-		String src = parseState.getSource();
-		int start = comment.getStartingOffset();
-		int endIndex = start + comment.getLength();
-		return new String(src.substring(start, endIndex));
 	}
 :};
 
@@ -164,6 +163,7 @@ Statement
 	|	Namespace
 	|	AtRule
 	|	Rule
+	|	MozDocument
 	;
 
 CharSet
@@ -326,6 +326,23 @@ AtRule
 // TODO: We probably want some collection nodes, one to hold selectors and one to hold
 // declarations. Since these would be true CSSNodes, parent relationships would be setup
 // properly during parsing. However, until then, we need to wire up the parents here
+Rules
+	=	Rules.rs Rule.r
+		{:
+			rs.addChild(r);
+			
+			return rs;
+		:}
+	|	Rule.r
+		{:
+			CSSList list = new CSSList();
+			
+			list.addChild(r);
+			
+			return list;
+		:}
+	;
+
 Rule
 	=	Selectors.s LCURLY RCURLY
 		{:
@@ -359,8 +376,50 @@ Rule
 	|	error
 	;
 
+MozDocument
+	=	MOZ_DOCUMENT FunctionList.fs LCURLY RCURLY
+		{:
+			CSSMozDocument doc = new CSSMozDocument();
+			
+			doc.addChild(fs);
+			doc.addChild(new CSSList());
+			
+			return doc;
+		:}
+	|	MOZ_DOCUMENT FunctionList.fs LCURLY Rules.rs RCURLY
+		{:
+			CSSMozDocument doc = new CSSMozDocument();
+			
+			doc.addChild(fs);
+			doc.addChild(rs);
+			
+			return doc;
+		:}
+	;
+
+FunctionList
+	=	FunctionList.fs COMMA Function.f
+		{:
+			fs.addChild(f);
+			
+			return fs;
+		:}
+	|	Function.f
+		{:
+			CSSList list = new CSSList();
+			
+			list.addChild(f);
+			
+			return list;
+		:}
+	;
+
 Function
-	=	Identifier.i LPAREN Expression.e RPAREN
+	=	Identifier.i LPAREN RPAREN
+		{:
+			return new CSSFunctionNode(i, null);
+		:}
+	|	Identifier.i LPAREN Expression.e RPAREN
 		{:
 			return new CSSFunctionNode(i, e);
 		:}
@@ -577,6 +636,7 @@ Separator
 	|	COMMA
 	|	PLUS
 	|	MINUS
+	|	EQUAL
 	;
 
 Combinator

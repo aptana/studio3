@@ -40,8 +40,9 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.CommonAnnotationModel;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.ICommonAnnotationModel;
+import com.aptana.editor.common.util.EditorUtil;
 
 public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconcilingStrategyExtension,
 		IBatchReconcilingStrategy, IDisposableReconcilingStrategy
@@ -253,20 +254,24 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	 */
 	private void runParticipants(IProgressMonitor monitor)
 	{
-		final IFile file = getFile();
-		// We only want to build files that exist and aren't derived or team private!
-		if (ResourceUtil.shouldIgnore(file))
+		// if file is in the workspace, check if it's valid.
+		// (We only want to build files that exist and aren't derived or team private!)
+		// Otherwise it's an external file, so just assume it is.
+		IFile file = getFile();
+		if (file != null && ResourceUtil.shouldIgnore(file))
 		{
 			return;
 		}
 
-		String contentTypeId = fEditor.getContentType();
-		IBuildParticipantManager manager = BuildPathCorePlugin.getDefault().getBuildParticipantManager();
-		List<IBuildParticipant> participants = manager.getBuildParticipants(contentTypeId);
+		// Grab the list of participants that apply to the editor's content type.
+		List<IBuildParticipant> participants = getBuildParticipantManager().getBuildParticipants(
+				fEditor.getContentType());
 		if (CollectionsUtil.isEmpty(participants))
 		{
 			return;
 		}
+
+		// Now filter based on enablement preferences...
 		participants = filterToEnabled(participants);
 		if (CollectionsUtil.isEmpty(participants))
 		{
@@ -292,6 +297,11 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		sub.done();
 	}
 
+	protected IBuildParticipantManager getBuildParticipantManager()
+	{
+		return BuildPathCorePlugin.getDefault().getBuildParticipantManager();
+	}
+
 	/**
 	 * Creates and returns a {@link ReconcileContext}.
 	 * 
@@ -299,7 +309,13 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	 */
 	protected ReconcileContext createContext()
 	{
-		return new ReconcileContext(fEditor.getContentType(), getFile(), fDocument.get());
+		IFile file = getFile();
+		if (file != null)
+		{
+			return new ReconcileContext(fEditor.getContentType(), file, fDocument.get());
+		}
+
+		return new ReconcileContext(fEditor.getContentType(), EditorUtil.getURI(fEditor), fDocument.get());
 	}
 
 	private List<IBuildParticipant> filterToEnabled(List<IBuildParticipant> participants)
@@ -340,18 +356,14 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		}
 
 		IAnnotationModel model = docProvider.getAnnotationModel(editorInput);
-		if (!(model instanceof CommonAnnotationModel))
+		if (!(model instanceof ICommonAnnotationModel))
 		{
 			return;
 		}
 
-		CommonAnnotationModel caModel = (CommonAnnotationModel) model;
-		caModel.setProgressMonitor(monitor);
-
+		ICommonAnnotationModel caModel = (ICommonAnnotationModel) model;
 		// Now report them all to the annotation model!
-		caModel.reportProblems(context.getProblems());
-
-		caModel.setProgressMonitor(null);
+		caModel.reportProblems(context.getProblems(), monitor);
 	}
 
 	protected IFile getFile()

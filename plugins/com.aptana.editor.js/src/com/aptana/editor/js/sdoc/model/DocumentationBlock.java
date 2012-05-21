@@ -14,6 +14,7 @@ import java.util.List;
 
 import beaver.Symbol;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
 
@@ -81,7 +82,7 @@ public class DocumentationBlock extends Symbol
 	{
 		List<Tag> result;
 
-		if (this._tags != null && !this._tags.isEmpty())
+		if (!CollectionsUtil.isEmpty(this._tags))
 		{
 			result = new ArrayList<Tag>();
 
@@ -120,6 +121,32 @@ public class DocumentationBlock extends Symbol
 	public String getText()
 	{
 		return this._text;
+	}
+
+	/**
+	 * Determine if this documentation block contains the given tag type.
+	 * 
+	 * @param type
+	 *            The tag type to test
+	 * @return Returns a boolean
+	 */
+	public boolean hasTag(TagType type)
+	{
+		boolean result = false;
+
+		if (type != null && !CollectionsUtil.isEmpty(this._tags))
+		{
+			for (Tag tag : this._tags)
+			{
+				if (tag.getType() == type)
+				{
+					result = true;
+					break;
+				}
+			}
+		}
+
+		return result;
 	}
 
 	/**

@@ -19,7 +19,7 @@ Require-Bundle: org.eclipse.ui,
  com.aptana.theme,
  com.aptana.git.ui,
  com.aptana.projects,
- org.mortbay.jetty.util,
+ com.aptana.jetty.util.epl,
  com.aptana.configurations,
  com.aptana.portal.ui,
  com.aptana.scripting

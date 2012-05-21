@@ -10,16 +10,16 @@ package com.aptana.editor.html.internal.build;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
-import java.util.Queue;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 
+import com.aptana.core.IFilter;
 import com.aptana.core.build.IProblem;
 import com.aptana.core.build.RequiredBuildParticipant;
 import com.aptana.core.resources.IMarkerConstants;
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.css.internal.build.CSSTaskDetector;
 import com.aptana.editor.html.parsing.ast.HTMLCommentNode;
@@ -29,6 +29,7 @@ import com.aptana.editor.js.internal.build.JSTaskDetector;
 import com.aptana.index.core.build.BuildContext;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
+import com.aptana.parsing.util.ParseUtil;
 
 /**
  * Detects task tags in HTML comments. Also traverses into JS and CSS and delegates detecting tasks in those
@@ -39,6 +40,7 @@ import com.aptana.parsing.ast.IParseRootNode;
 public class HTMLTaskDetector extends RequiredBuildParticipant
 {
 
+	private static final String COMMENT_ENDING = "-->";
 	private static final String ELEMENT_SCRIPT = "script"; //$NON-NLS-1$
 	private static final String ATTRIBUTE_SRC = "src"; //$NON-NLS-1$
 
@@ -80,23 +82,23 @@ public class HTMLTaskDetector extends RequiredBuildParticipant
 		if (rootNode != null)
 		{
 			tasks.addAll(walkAST(context, rootNode, sub.newChild(1)));
-			tasks.addAll(processComments(rootNode, context, sub.newChild(1)));
+			tasks.addAll(processComments(context, rootNode, sub.newChild(1)));
 		}
 		sub.done();
 
 		return tasks;
 	}
 
-	private Collection<IProblem> processComments(IParseRootNode rootNode, BuildContext context, IProgressMonitor monitor)
+	private Collection<IProblem> processComments(BuildContext context, IParseRootNode rootNode, IProgressMonitor monitor)
 	{
-		Collection<IProblem> tasks = new ArrayList<IProblem>();
 		IParseNode[] comments = rootNode.getCommentNodes();
-		if (comments == null || comments.length == 0)
+		if (ArrayUtil.isEmpty(comments))
 		{
 			return Collections.emptyList();
 		}
 
 		SubMonitor sub = SubMonitor.convert(monitor, comments.length);
+		Collection<IProblem> tasks = new ArrayList<IProblem>(comments.length);
 		try
 		{
 			String source = context.getContents();
@@ -105,7 +107,7 @@ public class HTMLTaskDetector extends RequiredBuildParticipant
 			{
 				if (commentNode instanceof HTMLCommentNode)
 				{
-					tasks.addAll(processCommentNode(filePath, source, 0, commentNode, "-->")); //$NON-NLS-1$
+					tasks.addAll(processCommentNode(filePath, source, 0, commentNode, COMMENT_ENDING));
 				}
 				sub.worked(1);
 			}
@@ -126,9 +128,7 @@ public class HTMLTaskDetector extends RequiredBuildParticipant
 	 */
 	private Collection<IProblem> processHTMLSpecialNode(BuildContext context, HTMLSpecialNode htmlSpecialNode)
 	{
-		Collection<IProblem> tasks = new ArrayList<IProblem>();
 		IParseNode child = htmlSpecialNode.getChild(0);
-
 		if (child != null)
 		{
 			String language = child.getLanguage();
@@ -137,7 +137,7 @@ public class HTMLTaskDetector extends RequiredBuildParticipant
 			{
 				// process inline code
 				CSSTaskDetector detector = new CSSTaskDetector();
-				tasks.addAll(detector.detectTasks((IParseRootNode) child, context, null));
+				return detector.detectTasks((IParseRootNode) child, context, null);
 			}
 		}
 		if (ELEMENT_SCRIPT.equalsIgnoreCase(htmlSpecialNode.getName()))
@@ -147,10 +147,10 @@ public class HTMLTaskDetector extends RequiredBuildParticipant
 			{
 				// process inline code
 				JSTaskDetector detector = new JSTaskDetector();
-				tasks.addAll(detector.detectTasks((IParseRootNode) child, context, null));
+				return detector.detectTasks((IParseRootNode) child, context, null);
 			}
 		}
-		return tasks;
+		return Collections.emptyList();
 	}
 
 	/**
@@ -161,31 +161,25 @@ public class HTMLTaskDetector extends RequiredBuildParticipant
 	 * @param parent
 	 * @param monitor
 	 */
-	private Collection<IProblem> walkAST(BuildContext context, IParseNode parent, IProgressMonitor monitor)
+	private Collection<IProblem> walkAST(final BuildContext context, IParseNode parent, IProgressMonitor monitor)
 	{
 		// TODO Provide progress somehow?
-		Collection<IProblem> tasks = new ArrayList<IProblem>();
+		final Collection<IProblem> tasks = new ArrayList<IProblem>();
 		if (parent != null)
 		{
-			Queue<IParseNode> queue = new LinkedList<IParseNode>();
 
-			// prime queue
-			queue.offer(parent);
-
-			while (!queue.isEmpty())
+			ParseUtil.treeApply(parent, new IFilter<IParseNode>()
 			{
-				IParseNode current = queue.poll();
-
-				if (current instanceof HTMLSpecialNode)
+				public boolean include(IParseNode item)
 				{
-					tasks.addAll(processHTMLSpecialNode(context, (HTMLSpecialNode) current));
+					if (item instanceof HTMLSpecialNode)
+					{
+						tasks.addAll(processHTMLSpecialNode(context, (HTMLSpecialNode) item));
+					}
+					return true;
 				}
+			});
 
-				for (IParseNode child : current)
-				{
-					queue.offer(child);
-				}
-			}
 		}
 		return tasks;
 	}

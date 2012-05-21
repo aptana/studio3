@@ -337,7 +337,11 @@ public class CollectionsUtil
 		{
 			for (T item : source)
 			{
-				destination.add(mapper.map(item));
+				U value = mapper.map(item);
+				if (value != null)
+				{
+					destination.add(value);
+				}
 			}
 			if (destination instanceof ArrayList)
 			{
@@ -368,6 +372,36 @@ public class CollectionsUtil
 
 		List<U> result = new ArrayList<U>(collection.size());
 		map(collection, result, mapper);
+		return result;
+	}
+
+	/**
+	 * Transform the items of an Iterator to a new type and add to a new list. If the iterator or mapper are null then
+	 * no action is performed<br>
+	 * <br>
+	 * Note that this method is not thread safe. Users of this method will need to maintain type safety against the
+	 * items backing the iterator
+	 * 
+	 * @param iterator
+	 *            The iterator containing items to be transformed
+	 * @param mapper
+	 *            The map to transforms items from their source type to their destination type
+	 * @return
+	 */
+	public static <T, U> List<U> map(Iterator<T> iterator, IMap<? super T, U> mapper)
+	{
+		if (iterator == null || mapper == null)
+		{
+			return Collections.emptyList();
+		}
+
+		List<U> result = new ArrayList<U>();
+
+		while (iterator.hasNext())
+		{
+			result.add(mapper.map(iterator.next()));
+		}
+
 		return result;
 	}
 

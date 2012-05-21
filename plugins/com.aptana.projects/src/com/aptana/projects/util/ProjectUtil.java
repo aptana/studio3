@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.ICommand;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -116,5 +117,17 @@ public class ProjectUtil
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Returns <code>true</code> if the given project is not <code>null</code> and is accessible.
+	 * 
+	 * @param project
+	 * @return <code>true</code> if accessible; <code>false</code> otherwise.
+	 * @see IProject#isAccessible()
+	 */
+	public static boolean isAccessible(IProject project)
+	{
+		return project != null && project.isAccessible();
 	}
 }

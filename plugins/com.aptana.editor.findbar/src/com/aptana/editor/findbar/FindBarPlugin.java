@@ -17,25 +17,34 @@ import org.osgi.framework.BundleContext;
 /**
  * This class controls the plug-in life cycle
  */
-public class FindBarPlugin extends AbstractUIPlugin {
+public class FindBarPlugin extends AbstractUIPlugin
+{
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "com.aptana.editor.findbar"; //$NON-NLS-1$
 
+	public static final String ICON_SEARCH_HISTORY = "icons/elcl16/search_history.png"; //$NON-NLS-1$
+	public static final String ICON_SEARCH_CURRENT_FILE = "icons/elcl16/search_current_file.gif"; //$NON-NLS-1$
+	public static final String ICON_SEARCH_OPEN_FILES = "icons/elcl16/search_open_files.gif"; //$NON-NLS-1$
+	public static final String ICON_SEARCH_PROJECT = "icons/elcl16/search_project.gif"; //$NON-NLS-1$
+	public static final String ICON_SEARCH_WORKSPACE = "icons/elcl16/search_workspace.gif"; //$NON-NLS-1$
+
 	// The shared instance
 	private static FindBarPlugin plugin;
-	
+
 	/**
 	 * The constructor
 	 */
-	public FindBarPlugin() {
+	public FindBarPlugin()
+	{
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
 	 */
-	public void start(BundleContext context) throws Exception {
+	public void start(BundleContext context) throws Exception
+	{
 		super.start(context);
 		plugin = this;
 	}
@@ -44,17 +53,19 @@ public class FindBarPlugin extends AbstractUIPlugin {
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
-	public void stop(BundleContext context) throws Exception {
+	public void stop(BundleContext context) throws Exception
+	{
 		plugin = null;
 		super.stop(context);
 	}
 
 	/**
 	 * Returns the shared instance
-	 *
+	 * 
 	 * @return the shared instance
 	 */
-	public static FindBarPlugin getDefault() {
+	public static FindBarPlugin getDefault()
+	{
 		return plugin;
 	}
 
@@ -73,8 +84,7 @@ public class FindBarPlugin extends AbstractUIPlugin {
 
 	public static void log(Throwable e)
 	{
-		Status s = new Status(IStatus.ERROR, FindBarPlugin.PLUGIN_ID, IStatus.ERROR,
-				e.getMessage(), e);
+		Status s = new Status(IStatus.ERROR, FindBarPlugin.PLUGIN_ID, IStatus.ERROR, e.getMessage(), e);
 		FindBarPlugin.getDefault().getLog().log(s);
 	}
 }

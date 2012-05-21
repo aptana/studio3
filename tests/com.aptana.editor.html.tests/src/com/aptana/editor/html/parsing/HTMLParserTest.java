@@ -265,7 +265,7 @@ public class HTMLParserTest extends TestCase
 
 	public void testTypeAttributeForStyle() throws Exception
 	{
-		String source = "<style type=\"text/css\">html {color: red;}</script>";
+		String source = "<style type=\"text/css\">html {color: red;}</style>";
 		fParseState.setEditState(source, 0);
 		IParseNode result = fParser.parse(fParseState);
 		IParseNode styleTag = result.getChild(0);
@@ -277,7 +277,7 @@ public class HTMLParserTest extends TestCase
 
 	public void testIncorrectTypeAttributeForStyle() throws Exception
 	{
-		String source = "<style type=\"text/incorrect\">html {color: red;}</script>";
+		String source = "<style type=\"text/incorrect\">html {color: red;}</style>";
 		fParseState.setEditState(source, 0);
 		IParseNode result = fParser.parse(fParseState);
 		IParseNode styleTag = result.getChild(0);

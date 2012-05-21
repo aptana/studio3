@@ -70,6 +70,8 @@
       <import plugin="com.aptana.index.core"/>
       <import plugin="com.aptana.portal.ui"/>
       <import plugin="com.aptana.buildpath.core"/>
+      <import plugin="com.aptana.jira.core"/>
+      <import plugin="org.swift.jira.cli"/>
    </requires>
 
    <plugin
@@ -398,6 +400,22 @@
 
    <plugin
          id="com.aptana.buildpath.core.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.jira.core.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.filesystem.http.tests"
          download-size="0"
          install-size="0"
          version="0.0.0"

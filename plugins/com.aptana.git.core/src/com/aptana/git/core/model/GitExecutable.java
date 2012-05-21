@@ -25,7 +25,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
@@ -516,10 +515,10 @@ public class GitExecutable
 						Messages.GitExecutable_UnableToLaunchCloneError, sourceURI, dest));
 			}
 
+			subMonitor.worked(100);
 			CloneRunnable runnable = new CloneRunnable(p, subMonitor.newChild(900));
 			Thread t = new Thread(runnable);
 			t.start();
-			subMonitor.worked(100);
 			t.join();
 
 			return runnable.getResult();
@@ -559,12 +558,13 @@ public class GitExecutable
 		CloneRunnable(Process p, IProgressMonitor monitor)
 		{
 			this.p = p;
-			this.monitor = monitor;
-			if (this.monitor == null)
-			{
-				this.monitor = new NullProgressMonitor();
-			}
+			this.monitor = convertMonitor(monitor);
 			this.status = Status.OK_STATUS;
+		}
+
+		protected IProgressMonitor convertMonitor(IProgressMonitor monitor)
+		{
+			return SubMonitor.convert(monitor, 100);
 		}
 
 		public IStatus getResult()

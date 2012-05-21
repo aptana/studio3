@@ -31,6 +31,7 @@ import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
@@ -48,10 +49,10 @@ import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.index.core.FileStoreBuildContext;
 import com.aptana.index.core.IIndexFileContributor;
-import com.aptana.index.core.IIndexFilterParticipant;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.IndexPlugin;
 import com.aptana.index.core.build.BuildContext;
+import com.aptana.index.core.filter.IIndexFilterParticipant;
 
 public class UnifiedBuilder extends IncrementalProjectBuilder
 {
@@ -464,7 +465,8 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 
 			public IFileStore map(IFile item)
 			{
-				return EFS.getLocalFileSystem().getStore(item.getLocation());
+				IPath path = item.getLocation();
+				return (path == null) ? null : EFS.getLocalFileSystem().getStore(path);
 			}
 
 		}));
@@ -585,7 +587,7 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 			{
 				Collection<IProblem> newItems = itemsByType.get(markerType);
 				// deletes the old markers
-				file.deleteMarkers(markerType, true, IResource.DEPTH_INFINITE);
+				file.deleteMarkers(markerType, false, IResource.DEPTH_INFINITE);
 				sub.worked(1);
 
 				// adds the new ones

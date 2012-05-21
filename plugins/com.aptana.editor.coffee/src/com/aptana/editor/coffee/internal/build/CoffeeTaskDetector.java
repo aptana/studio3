@@ -72,9 +72,9 @@ public class CoffeeTaskDetector extends RequiredBuildParticipant
 			return Collections.emptyList();
 		}
 
-		Collection<IProblem> tasks = new ArrayList<IProblem>();
-
 		SubMonitor sub = SubMonitor.convert(monitor, comments.length);
+
+		Collection<IProblem> tasks = new ArrayList<IProblem>(comments.length);
 		String source = context.getContents();
 		String filePath = context.getURI().toString();
 		for (IParseNode commentNode : comments)

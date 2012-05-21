@@ -11,7 +11,7 @@ import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.mortbay.util.ajax.JSON.Output;
+import com.aptana.jetty.util.epl.ajax.JSON.Output;
 
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;

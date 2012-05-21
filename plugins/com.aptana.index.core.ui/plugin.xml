@@ -9,13 +9,6 @@
       </initializer>
    </extension>
    <extension
-         point="com.aptana.index.core.indexFilterParticipants">
-      <filter
-            class="com.aptana.index.core.ui.IndexFilterParticipant"
-            name="Preference-based index filter">
-      </filter>
-   </extension>
-   <extension
          point="org.eclipse.ui.commands">
       <command
             categoryId="com.aptana.ui.category"

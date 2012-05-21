@@ -70,6 +70,7 @@ import com.aptana.scripting.model.CommandContext;
 import com.aptana.scripting.model.CommandResult;
 import com.aptana.scripting.model.ContentAssistElement;
 import com.aptana.scripting.model.filters.ScopeFilter;
+import com.aptana.ui.util.UIUtils;
 
 public class CommonContentAssistProcessor implements IContentAssistProcessor, ICommonContentAssistProcessor,
 		IPreferenceChangeListener
@@ -221,7 +222,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 			String location = null;
 			IContextInformation contextInfo = null;
 			int replaceLength = 0;
-			Image image = CommonEditorPlugin.getImage(DEFAULT_IMAGE);
+			Image image = UIUtils.getImage(CommonEditorPlugin.getDefault(), DEFAULT_IMAGE);
 			if (element instanceof RubyHash)
 			{
 				Map<?, ?> hash = (RubyHash) element;

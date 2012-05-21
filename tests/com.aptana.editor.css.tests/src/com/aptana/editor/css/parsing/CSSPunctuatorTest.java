@@ -69,12 +69,16 @@ public class CSSPunctuatorTest extends CSSTokensTest
 
 	public void testMinus()
 	{
-		setSource("10 - 5");
-		assertToken(CSSTokenType.NUMBER, 0, 2);
-		assertToken(null, 2, 1);
-		assertToken(CSSTokenType.MINUS, 3, 1);
-		assertToken(null, 4, 1);
-		assertToken(CSSTokenType.NUMBER, 5, 1);
+		String source = "10 - 5";
+
+		// @formatter:off
+		assertToken(
+			source,
+			new TokenInfo(CSSTokenType.NUMBER, 0, 2),
+			new TokenInfo(CSSTokenType.MINUS, 3, 1),
+			new TokenInfo(CSSTokenType.NUMBER, 5, 1)
+		);
+		// @formatter:on
 	}
 
 	public void testStar()

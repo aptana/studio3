@@ -89,8 +89,8 @@ public class CSSTaskDetector extends RequiredBuildParticipant
 			return Collections.emptyList();
 		}
 
-		Collection<IProblem> tasks = new ArrayList<IProblem>();
 		SubMonitor sub = SubMonitor.convert(monitor, comments.length);
+		Collection<IProblem> tasks = new ArrayList<IProblem>(comments.length);
 		try
 		{
 			String source = context.getContents();

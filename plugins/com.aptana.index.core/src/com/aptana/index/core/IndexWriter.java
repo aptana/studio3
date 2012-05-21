@@ -9,7 +9,7 @@ package com.aptana.index.core;
 
 import java.net.URI;
 
-import org.mortbay.util.ajax.JSON;
+import com.aptana.jetty.util.epl.ajax.JSON;
 
 /**
  * IndexWriter

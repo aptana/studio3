@@ -32,6 +32,7 @@ import org.eclipse.core.internal.preferences.Base64;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.equinox.security.storage.provider.IPreferencesContainer;
+import org.eclipse.equinox.security.storage.provider.IProviderHints;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
@@ -71,6 +72,12 @@ public class PasswordProvider extends org.eclipse.equinox.security.storage.provi
 			// Prompt user via dialog!
 			if (!useUI())
 				return null;
+			// checks the option for disabling user prompt
+			Object prompt = container.getOption(IProviderHints.PROMPT_USER);
+			if (prompt != null && !Boolean.parseBoolean(prompt.toString()))
+			{
+				return null;
+			}
 			final String[] result = new String[1];
 			PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable()
 			{

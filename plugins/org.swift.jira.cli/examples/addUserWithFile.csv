@@ -1,0 +1,5 @@
+
+user1,          , email1@x.com
+user2, password2, email2@x.com, Full User Name 2
+user3,          , email3@x.com, Full User Name 3, group1
+user4,          , email4@x.com,                 , group1, group2

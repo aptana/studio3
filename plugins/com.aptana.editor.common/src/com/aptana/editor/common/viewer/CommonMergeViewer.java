@@ -9,13 +9,9 @@ package com.aptana.editor.common.viewer;
 
 import org.eclipse.compare.CompareConfiguration;
 import org.eclipse.compare.contentmergeviewer.TextMergeViewer;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.CursorLinePainter;
 import org.eclipse.jface.text.IDocumentExtension3;
 import org.eclipse.jface.text.TextViewer;
-import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.TypedListener;
@@ -41,9 +37,7 @@ public abstract class CommonMergeViewer extends TextMergeViewer
 	@Override
 	protected void configureTextViewer(final TextViewer textViewer)
 	{
-		setBackgroundColor(getCurrentTheme().getBackground());
-		setForegroundColor(getCurrentTheme().getForeground());
-		setSelectionColors(textViewer);
+		ThemePlugin.getDefault().getControlThemerFactory().apply(textViewer);
 
 		// Force line highlight color. We need to perform this after the line painter is attached, which happens after
 		// the return of this method. Scheduling async seems to work.
@@ -82,25 +76,6 @@ public abstract class CommonMergeViewer extends TextMergeViewer
 	protected String getDocumentPartitioning()
 	{
 		return IDocumentExtension3.DEFAULT_PARTITIONING;
-	}
-
-	private void setSelectionColors(TextViewer sourceViewer)
-	{
-		// TODO Combine with code from ThemeableEditorExtension
-		// Force selection color
-		StyledText textWidget = sourceViewer.getTextWidget();
-		Color existingSelectionBG = textWidget.getSelectionBackground();
-		RGB selectionRGB = getCurrentTheme().getSelectionAgainstBG();
-		if (!existingSelectionBG.getRGB().equals(selectionRGB))
-		{
-			textWidget.setSelectionBackground(getColorManager().getColor(selectionRGB));
-		}
-
-		if (!Platform.OS_MACOSX.equals(Platform.getOS()))
-		{
-			// Linux and windows need selection fg set or we just see a block of color.
-			textWidget.setSelectionForeground(getColorManager().getColor(getCurrentTheme().getForeground()));
-		}
 	}
 
 	protected Theme getCurrentTheme()

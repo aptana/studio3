@@ -326,13 +326,7 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 
 	private IPath getRepoRelativePath(final IResource file, GitRepository repo)
 	{
-		IPath workingDir = repo.workingDirectory();
-		IPath filePath = file.getLocation();
-		if (workingDir.isPrefixOf(filePath))
-		{
-			return filePath.makeRelativeTo(workingDir);
-		}
-		return filePath;
+		return repo.relativePath(file);
 	}
 
 	protected GitRepository getAttachedGitRepository(IProject project)

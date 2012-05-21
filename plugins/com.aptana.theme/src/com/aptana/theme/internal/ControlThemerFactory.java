@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.jface.text.TextViewer;
+import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
@@ -169,6 +171,23 @@ public class ControlThemerFactory implements IControlThemerFactory
 
 			// No themer exists, create a new one
 			themer = new TreeThemer((TreeViewer) viewer);
+			synchronized (themers)
+			{
+				themers.put(viewer.getControl(), themer);
+			}
+			themer.apply();
+		}
+		if (viewer instanceof TextViewer)
+		{
+			// If a themer already exists for the control, just return it
+			IControlThemer themer = themers.get(viewer.getControl());
+			if (themer != null)
+			{
+				return;
+			}
+
+			// No themer exists, create a new one
+			themer = new TextViewerThemer((TextViewer) viewer);
 			synchronized (themers)
 			{
 				themers.put(viewer.getControl(), themer);

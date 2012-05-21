@@ -15,7 +15,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
@@ -27,9 +26,6 @@ import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.jface.text.source.projection.ProjectionViewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.editors.text.EditorsUI;
@@ -50,7 +46,6 @@ import com.aptana.formatter.ui.FormatterMessages;
 import com.aptana.formatter.ui.IFormatterModifyDialogOwner;
 import com.aptana.formatter.ui.util.IStatusChangeListener;
 import com.aptana.theme.ColorManager;
-import com.aptana.theme.IThemeManager;
 import com.aptana.theme.ThemePlugin;
 
 public abstract class AbstractFormatterPreferencePage extends AbstractConfigurationBlockPropertyAndPreferencePage
@@ -174,8 +169,7 @@ public abstract class AbstractFormatterPreferencePage extends AbstractConfigurat
 		{
 			ProjectionViewer viewer = new ProjectionViewer(parent, verticalRuler, overviewRuler,
 					showAnnotationsOverview, styles);
-			setFont(viewer, JFaceResources.getTextFont());
-			setBackgroundColor(viewer);
+			ThemePlugin.getDefault().getControlThemerFactory().apply(viewer);
 			return viewer;
 		}
 
@@ -200,35 +194,6 @@ public abstract class AbstractFormatterPreferencePage extends AbstractConfigurat
 		{
 			return NO_BUILD_JOBS;
 		}
-
-		/**
-		 * Sets the background color according to the active Theme
-		 * 
-		 * @param viewer
-		 */
-		private void setBackgroundColor(ISourceViewer sourceViewer)
-		{
-			ColorManager colorManager = ThemePlugin.getDefault().getColorManager();
-			IThemeManager themeManager = ThemePlugin.getDefault().getThemeManager();
-			Color color = colorManager.getColor(themeManager.getCurrentTheme().getBackground());
-			StyledText styledText = sourceViewer.getTextWidget();
-			styledText.setBackground(color);
-		}
-
-		/**
-		 * Sets the font for the given viewer sustaining selection and scroll position.
-		 * 
-		 * @param sourceViewer
-		 *            the source viewer
-		 * @param font
-		 *            the font
-		 */
-		private void setFont(ISourceViewer sourceViewer, Font font)
-		{
-			StyledText styledText = sourceViewer.getTextWidget();
-			styledText.setFont(font);
-		}
-
 	}
 
 	protected AbstractOptionsBlock createOptionsBlock(IStatusChangeListener newStatusChangedListener, IProject project,

@@ -26,6 +26,7 @@ public class AllTests
 		suite.addTest(com.aptana.editor.html.outline.AllTests.suite());
 		suite.addTest(com.aptana.editor.html.contentassist.AllTests.suite());
 		suite.addTest(ValidatorTests.suite());
+		suite.addTest(com.aptana.editor.html.text.AllTests.suite());
 		suite.addTestSuite(HTMLFileIndexingParticipantTest.class);
 		suite.addTestSuite(HTMLTaskDetectorTest.class);
 		// $JUnit-END$

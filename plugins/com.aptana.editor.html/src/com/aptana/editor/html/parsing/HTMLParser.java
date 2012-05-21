@@ -43,6 +43,7 @@ import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.ast.ParseError;
 import com.aptana.parsing.ast.ParseRootNode;
 import com.aptana.parsing.lexer.IRange;
+import com.aptana.parsing.lexer.Range;
 import com.aptana.parsing.util.ParseUtil;
 
 public class HTMLParser implements IParser
@@ -457,10 +458,12 @@ public class HTMLParser implements IParser
 			String name = m.group(1);
 			String value = m.group(2);
 
+			IRange nameRange = new Range(tagSymbol.getStart() + m.start(1), tagSymbol.getStart() + m.end(1));
+			IRange valueRange = new Range(tagSymbol.getStart() + m.start(2), tagSymbol.getStart() + m.end(2));
 			int absoluteOffset = tagSymbol.getStart() + m.start(2);
 
 			value = value.substring(1, value.length() - 1).trim();
-			element.setAttribute(name, value);
+			element.setAttribute(name, value, nameRange, valueRange);
 
 			// checks if we need to process the value as CSS
 			if (HTMLUtils.isCSSAttribute(name))

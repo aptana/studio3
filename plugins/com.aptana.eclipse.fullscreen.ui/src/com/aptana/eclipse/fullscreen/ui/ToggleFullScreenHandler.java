@@ -80,7 +80,7 @@ public class ToggleFullScreenHandler extends AbstractHandler
 		return windows.length >= 1 && getOSVersion() >= 0x1070;
 	}
 
-	private static int getOSVersion()
+	public static int getOSVersion()
 	{
 		try
 		{

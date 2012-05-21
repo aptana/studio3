@@ -7,8 +7,10 @@
  */
 package com.aptana.editor.js;
 
+import java.io.IOException;
 import java.io.InputStream;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
@@ -18,6 +20,7 @@ import org.eclipse.jface.text.rules.Token;
 import org.eclipse.test.performance.PerformanceTestCase;
 
 import com.aptana.core.util.IOUtil;
+import com.aptana.editor.epl.tests.EditorTestHelper;
 
 public class JSCodeScannerPerformanceTest extends PerformanceTestCase
 {
@@ -41,17 +44,35 @@ public class JSCodeScannerPerformanceTest extends PerformanceTestCase
 
 	public void testScanUncompressedDojo() throws Exception
 	{
-		// read in the file
-		InputStream stream = FileLocator.openStream(Platform.getBundle("com.aptana.editor.js.tests"),
-				Path.fromPortableString("performance/dojo.js.uncompressed.js"), false);
-		String src = IOUtil.read(stream);
-		IDocument document = new Document(src);
+		perfScan("dojo.js.uncompressed.js", 50);
+	}
 
+	public void testScanMinifiedDojo() throws Exception
+	{
+		perfScan("dojo.js.minified.js", 70);
+	}
+
+	public void testScanTiMobile() throws Exception
+	{
+		perfScan("timobile.js", 15);
+	}
+
+	public void testScanTinyMCE() throws Exception
+	{
+		perfScan("tiny_mce.js", 20);
+	}
+
+	protected void perfScan(String fileName, int iterations) throws IOException, CoreException
+	{
+		IDocument document = createDocument(fileName);
+
+		EditorTestHelper.joinBackgroundActivities();
+		int docLength = document.getLength();
 		// Ok now actually scan the thing, the real work
-		for (int i = 0; i < 15; i++)
+		for (int i = 0; i < iterations; i++)
 		{
 			startMeasuring();
-			fScanner.setRange(document, 0, src.length());
+			fScanner.setRange(document, 0, docLength);
 			while (fScanner.nextToken() != Token.EOF)
 			{
 				fScanner.getTokenOffset();
@@ -61,5 +82,12 @@ public class JSCodeScannerPerformanceTest extends PerformanceTestCase
 		}
 		commitMeasurements();
 		assertPerformance();
+	}
+
+	protected IDocument createDocument(String fileName) throws IOException
+	{
+		InputStream stream = FileLocator.openStream(Platform.getBundle("com.aptana.editor.js.tests"),
+				Path.fromPortableString("performance/" + fileName), false);
+		return new Document(IOUtil.read(stream));
 	}
 }

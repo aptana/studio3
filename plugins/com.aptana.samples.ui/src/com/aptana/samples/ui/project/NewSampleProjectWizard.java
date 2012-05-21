@@ -51,7 +51,6 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.FileUtil;
 import com.aptana.git.ui.CloneJob;
-import com.aptana.git.ui.util.GitUtil;
 import com.aptana.projects.internal.wizards.AbstractNewProjectWizard;
 import com.aptana.projects.util.ProjectUtil;
 import com.aptana.samples.handlers.ISampleProjectHandler;
@@ -342,9 +341,6 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 				{
 					IdeLog.logError(SamplesUIPlugin.getDefault(), e);
 				}
-
-				// disconnects from the git
-				GitUtil.disconnectProjectFromGit(projectHandle);
 
 				doPostProjectCreation(newProject);
 			}

@@ -47,13 +47,14 @@ public class HTMLParserValidator extends AbstractBuildParticipant
 		{
 			return;
 		}
-		String source = context.getContents();
 
+		// Set up our problems per language map
 		Map<String, List<IProblem>> problems = new HashMap<String, List<IProblem>>();
 		problems.put(IHTMLConstants.CONTENT_TYPE_HTML, new ArrayList<IProblem>());
 		problems.put(IJSConstants.CONTENT_TYPE_JS, new ArrayList<IProblem>());
 		problems.put(ICSSConstants.CONTENT_TYPE_CSS, new ArrayList<IProblem>());
 
+		String source = context.getContents();
 		if (!StringUtil.isEmpty(source))
 		{
 			try

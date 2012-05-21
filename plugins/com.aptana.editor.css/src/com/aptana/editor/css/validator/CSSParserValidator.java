@@ -7,8 +7,8 @@
  */
 package com.aptana.editor.css.validator;
 
-import java.net.URI;
-import java.util.ArrayList;
+import java.text.MessageFormat;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
@@ -18,10 +18,13 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 
+import com.aptana.core.IMap;
 import com.aptana.core.build.AbstractBuildParticipant;
 import com.aptana.core.build.IProblem;
 import com.aptana.core.build.Problem;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.ICSSConstants;
 import com.aptana.index.core.build.BuildContext;
 import com.aptana.parsing.ast.IParseError;
@@ -43,7 +46,6 @@ public class CSSParserValidator extends AbstractBuildParticipant
 			return;
 		}
 
-		List<IProblem> problems = new ArrayList<IProblem>();
 		try
 		{
 			context.getAST(); // make sure a parse has happened...
@@ -53,36 +55,45 @@ public class CSSParserValidator extends AbstractBuildParticipant
 			// ignores the parser exception
 		}
 
-		// Add parse errors...
-		if (!CollectionsUtil.isEmpty(context.getParseErrors()))
+		final String path = context.getURI().toString();
+		List<IProblem> problems = Collections.emptyList();
+		try
 		{
-			String source = context.getContents();
-			URI uri = context.getURI();
-			String path = uri.toString();
-			IDocument doc = null;
-			if (source != null)
+			// Add parse errors...
+			if (!CollectionsUtil.isEmpty(context.getParseErrors()))
 			{
-				doc = new Document(source);
-			}
-			for (IParseError parseError : context.getParseErrors())
-			{
-				int severity = (parseError.getSeverity() == Severity.ERROR) ? IMarker.SEVERITY_ERROR
-						: IMarker.SEVERITY_WARNING;
-				int line = -1;
-				try
+				String source = context.getContents();
+				final IDocument doc = new Document(source);
+
+				problems = CollectionsUtil.map(context.getParseErrors(), new IMap<IParseError, IProblem>()
 				{
-					if (doc != null)
+
+					public IProblem map(IParseError parseError)
 					{
-						line = doc.getLineOfOffset(parseError.getOffset()) + 1;
+						int severity = (parseError.getSeverity() == Severity.ERROR) ? IMarker.SEVERITY_ERROR
+								: IMarker.SEVERITY_WARNING;
+						int line = -1;
+						try
+						{
+							if (doc != null)
+							{
+								line = doc.getLineOfOffset(parseError.getOffset()) + 1;
+							}
+						}
+						catch (BadLocationException e)
+						{
+							// ignore
+						}
+						return new Problem(severity, parseError.getMessage(), parseError.getOffset(), parseError
+								.getLength(), line, path);
 					}
-				}
-				catch (BadLocationException e)
-				{
-					// ignore
-				}
-				problems.add(new Problem(severity, parseError.getMessage(), parseError.getOffset(), parseError
-						.getLength(), line, path));
+				});
 			}
+		}
+		catch (Exception e)
+		{
+			IdeLog.logError(CSSPlugin.getDefault(),
+					MessageFormat.format("Failed to parse {0} for CSS Parser Validation", path), e); //$NON-NLS-1$
 		}
 
 		context.putProblems(ICSSConstants.CSS_PROBLEM, problems);

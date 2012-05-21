@@ -7,6 +7,7 @@
  */
 package com.aptana.webserver.core;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -111,7 +112,8 @@ public class SimpleWebServer extends AbstractWebServer
 		{
 			return null;
 		}
-		return Path.fromPortableString(rootUri.getSchemeSpecificPart());
+		File docRoot = new File(rootUri);
+		return Path.fromOSString(docRoot.getAbsolutePath());
 	}
 
 	/**

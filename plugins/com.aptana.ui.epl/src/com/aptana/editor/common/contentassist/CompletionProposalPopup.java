@@ -1067,7 +1067,8 @@ public class CompletionProposalPopup implements IContentAssistListener
 			{
 				fAdditionalInfoController.disposeInformationControl();
 			}
-			fProposalShell.setVisible(false);
+			// TISTUD-1550: Call to dispose, instead of fProposalShell.setVisible(false);
+			fProposalShell.dispose();
 		}
 	}
 

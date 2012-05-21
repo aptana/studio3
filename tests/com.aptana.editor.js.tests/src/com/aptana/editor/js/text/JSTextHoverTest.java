@@ -9,12 +9,11 @@ package com.aptana.editor.js.text;
 
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
-import org.eclipse.jface.text.source.ISourceViewer;
 import org.junit.Test;
 
+import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.hover.TagStripperAndTypeBolder;
 import com.aptana.editor.common.util.EditorUtil;
-import com.aptana.editor.js.JSSourceEditor;
 import com.aptana.editor.js.contentassist.index.JSIndexWriter;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
@@ -97,16 +96,6 @@ public class JSTextHoverTest extends JSEditorBasedTests
 		return hover.getHoverRegion(getSourceViewer(), offset);
 	}
 
-	protected JSSourceEditor getJSEditor()
-	{
-		return (JSSourceEditor) this.editor;
-	}
-
-	protected ISourceViewer getSourceViewer()
-	{
-		return getJSEditor().getISourceViewer();
-	}
-
 	protected void writeProperty(String name, String description)
 	{
 		// create property with description
@@ -121,7 +110,7 @@ public class JSTextHoverTest extends JSEditorBasedTests
 
 		// write type to index
 		JSIndexWriter indexWriter = new JSIndexWriter();
-		indexWriter.writeType(getIndex(), window, EditorUtil.getURI(getJSEditor()));
+		indexWriter.writeType(getIndex(), window, EditorUtil.getURI((AbstractThemeableEditor) this.editor));
 
 	}
 

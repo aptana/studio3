@@ -28,11 +28,6 @@ public interface IJSConstants
 	public String JSLINT_PROBLEM_MARKER_TYPE = "com.aptana.editor.js.jslint_problem"; //$NON-NLS-1$
 
 	/**
-	 * Marker type id used for Mozilla JS problems. Extends {@link #JS_PROBLEM_MARKER_TYPE}
-	 */
-	public String MOZILLA_PROBLEM_MARKER_TYPE = "com.aptana.editor.js.mozilla_problem"; //$NON-NLS-1$
-
-	/**
 	 * Marker type id used for SDocML problems. Extends {@link IMarker#PROBLEM}
 	 */
 	public String SDOCML_PROBLEM_MARKER_TYPE = "com.aptana.editor.js.sdocml_problem"; //$NON-NLS-1$

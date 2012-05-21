@@ -8,6 +8,7 @@
 package com.aptana.core.internal.resources;
 
 import java.net.URI;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -166,15 +167,23 @@ public final class MarkerManager
 		}
 		ResourceInfo info = getResourceInfo(resource);
 		MarkerSet markers = info.getMarkers(true);
-		int size = markers.size();
-		markers.remove(marker);
-		info.setMarkers(markers.size() == 0 ? null : markers);
-		if (markers.size() != size)
+		if (markers != null)
 		{
-			/* TODO: store persistent marker state */
-			IMarkerSetElement[] changes = new IMarkerSetElement[] { new MarkerDelta(IResourceDelta.REMOVED, resource,
-					marker) };
-			changedMarkers(resource, changes);
+			int size = markers.size();
+			markers.remove(marker);
+			info.setMarkers(markers.size() == 0 ? null : markers);
+			if (markers.size() != size)
+			{
+				/* TODO: store persistent marker state */
+				IMarkerSetElement[] changes = new IMarkerSetElement[] { new MarkerDelta(IResourceDelta.REMOVED,
+						resource, marker) };
+				changedMarkers(resource, changes);
+			}
+		}
+		else
+		{
+			IdeLog.logInfo(CorePlugin.getDefault(), MessageFormat.format(
+					"Could not remove the marker with the id {0}. The resource-info returned a null marker-set.", id)); //$NON-NLS-1$
 		}
 	}
 
@@ -256,7 +265,6 @@ public final class MarkerManager
 	 */
 	public MarkerInfo[] findMarkersInfo(IUniformResource resource, String type, boolean includeSubtypes)
 	{
-		ArrayList result = new ArrayList();
 		ResourceInfo info = getResourceInfo(resource);
 		if (info == null)
 		{
@@ -270,6 +278,7 @@ public final class MarkerManager
 		}
 
 		IMarkerSetElement[] elements = markers.elements();
+		ArrayList result = new ArrayList(elements.length);
 		for (int i = 0; i < elements.length; ++i)
 		{
 			MarkerInfo marker = (MarkerInfo) elements[i];

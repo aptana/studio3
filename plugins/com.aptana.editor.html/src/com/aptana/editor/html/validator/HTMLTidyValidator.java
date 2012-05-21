@@ -74,11 +74,9 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 	/**
 	 * XPath expressions we use to jump to lists of nodes.
 	 */
-	private static ParseNodeXPath TITLE_TAG;
 	private static ParseNodeXPath FRAMESET_TAG;
 	private static ParseNodeXPath BODY_TAG;
 	private static ParseNodeXPath NOFRAMES_TAG;
-	private static ParseNodeXPath A_TAGS;
 	private static ParseNodeXPath HTML_CHILDREN;
 
 	static
@@ -86,11 +84,9 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 		try
 		{
 			ParseNodeNavigator caseInsensitive = new ParseNodeNavigator(true);
-			TITLE_TAG = new ParseNodeXPath("//title", caseInsensitive); //$NON-NLS-1$
 			BODY_TAG = new ParseNodeXPath("/html/body", caseInsensitive); //$NON-NLS-1$
 			FRAMESET_TAG = new ParseNodeXPath("/html/frameset", caseInsensitive); //$NON-NLS-1$
 			NOFRAMES_TAG = new ParseNodeXPath("/html/frameset/noframes", caseInsensitive); //$NON-NLS-1$
-			A_TAGS = new ParseNodeXPath("//a", caseInsensitive); //$NON-NLS-1$
 			HTML_CHILDREN = new ParseNodeXPath("/html/*", caseInsensitive); //$NON-NLS-1$
 		}
 		catch (JaxenException e)
@@ -120,6 +116,8 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 	 */
 	private Set<String> fIds;
 
+	private boolean foundTitle;
+
 	public void deleteFile(BuildContext context, IProgressMonitor monitor)
 	{
 		if (context == null)
@@ -142,32 +140,37 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 
 		try
 		{
+			String sourcePath = context.getURI().toString();
 			Collection<IProblem> problems = new ArrayList<IProblem>();
 			try
 			{
-				String sourcePath = context.getURI().toString();
+
 				String source = context.getContents();
 				if (!StringUtil.isEmpty(source))
 				{
 					// TODO Can't we ask the context for line number of an offset so we don't duplicate the source? Or
-					// maybe
-					// just ask for IDocument?
+					// maybe just ask for IDocument?
 					IDocument doc = new Document(source);
 					problems.addAll(validateDoctype(sourcePath, doc));
 
 					IParseRootNode ast = context.getAST();
 					if (ast != null)
 					{
-						problems.addAll(missingTitleElement(ast, sourcePath));
+						foundTitle = false;
 						problems.addAll(validateFrames(ast, doc, sourcePath));
-						problems.addAll(checkLinks(ast, doc, sourcePath));
 						problems.addAll(validateAST(ast, doc, sourcePath));
+						if (!foundTitle)
+						{
+							problems.add(createWarning(Messages.HTMLTidyValidator_InsertMissingTitle, 1, 0, 0,
+									sourcePath));
+						}
 					}
 				}
 			}
 			catch (CoreException e)
 			{
-				IdeLog.logError(HTMLPlugin.getDefault(), e);
+				IdeLog.logError(HTMLPlugin.getDefault(),
+						MessageFormat.format("Failed to validate {0} using HTML Tidy validator", sourcePath), e); //$NON-NLS-1$
 			}
 
 			context.putProblems(IHTMLConstants.TIDY_PROBLEM, problems);
@@ -191,46 +194,25 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 	 * @param sourcePath
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
-	private Collection<? extends IProblem> checkLinks(IParseRootNode ast, IDocument doc, String sourcePath)
+	private Collection<IProblem> checkLink(HTMLElementNode aNode, IDocument doc, String sourcePath)
 	{
-		List<HTMLElementNode> linkNodes = null;
-		try
+		String id = aNode.getAttributeValue("id"); //$NON-NLS-1$
+		String name = aNode.getAttributeValue("name"); //$NON-NLS-1$
+		if (id != null && name != null && !name.equals(id))
 		{
-			linkNodes = (List<HTMLElementNode>) A_TAGS.evaluate(ast);
-		}
-		catch (Exception e)
-		{
-			IdeLog.logError(HTMLPlugin.getDefault(), e);
-		}
-
-		if (CollectionsUtil.isEmpty(linkNodes))
-		{
-			return Collections.emptyList();
-		}
-
-		// TODO Also verify unique anchor names?
-		Collection<IProblem> problems = new ArrayList<IProblem>(linkNodes.size());
-		for (HTMLElementNode aNode : linkNodes)
-		{
-			String id = aNode.getAttributeValue("id"); //$NON-NLS-1$
-			String name = aNode.getAttributeValue("name"); //$NON-NLS-1$
-			if (id != null && name != null && !name.equals(id))
+			try
 			{
-				try
-				{
-					int offset = aNode.getStartingOffset();
-					int length = aNode.getLength();
-					problems.add(createError(Messages.HTMLTidyValidator_IdNameAttributeMismatch,
-							doc.getLineOfOffset(offset) + 1, offset, length, sourcePath));
-				}
-				catch (BadLocationException e)
-				{
-					IdeLog.logError(HTMLPlugin.getDefault(), e);
-				}
+				int offset = aNode.getStartingOffset();
+				int length = aNode.getLength();
+				return CollectionsUtil.newList(createError(Messages.HTMLTidyValidator_IdNameAttributeMismatch,
+						doc.getLineOfOffset(offset) + 1, offset, length, sourcePath));
+			}
+			catch (BadLocationException e)
+			{
+				IdeLog.logError(HTMLPlugin.getDefault(), e);
 			}
 		}
-		return problems;
+		return Collections.emptyList();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -349,32 +331,6 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 		return null;
 	}
 
-	/**
-	 * Do a simple search for a "title" element and mark a warning if there is none.
-	 * 
-	 * @param ast
-	 * @param sourcePath
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	private Collection<? extends IProblem> missingTitleElement(IParseRootNode ast, String sourcePath)
-	{
-		try
-		{
-			List<HTMLElementNode> titleNodes = (List<HTMLElementNode>) TITLE_TAG.evaluate(ast);
-			if (CollectionsUtil.isEmpty(titleNodes))
-			{
-				return CollectionsUtil.newList(createWarning(Messages.HTMLTidyValidator_InsertMissingTitle, 1, 0, 0,
-						sourcePath));
-			}
-		}
-		catch (JaxenException e)
-		{
-			IdeLog.logError(HTMLPlugin.getDefault(), e);
-		}
-		return Collections.emptyList();
-	}
-
 	private Collection<IProblem> validateAST(IParseRootNode root, final IDocument doc, final String sourcePath)
 	{
 		final Collection<IProblem> problems = new ArrayList<IProblem>();
@@ -420,6 +376,10 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 		try
 		{
 			String tagName = element.getName().toLowerCase();
+			if (!foundTitle && "title".equals(tagName)) //$NON-NLS-1$
+			{
+				foundTitle = true;
+			}
 
 			// Search if tag is unknown element!
 			ElementElement ee = getElement(tagName);
@@ -497,6 +457,12 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 
 		Collection<IProblem> problems = new ArrayList<IProblem>(attributes.length);
 		String tagName = element.getElementName();
+
+		if ("a".equalsIgnoreCase(tagName)) //$NON-NLS-1$
+		{
+			problems.addAll(checkLink(element, doc, sourcePath));
+		}
+
 		for (IParseNodeAttribute attr : attributes)
 		{
 			String attrName = attr.getName();
@@ -508,9 +474,9 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 				{
 					int offset = element.getStartingOffset();
 					problems.add(createWarning(
-							MessageFormat.format("<{0}> ''id'' attribute value ''{1}'' not unique", tagName,
-									attr.getValue()), doc.getLineOfOffset(offset) + 1, offset, element.getNameNode()
-									.getNameRange().getLength(), sourcePath));
+							MessageFormat.format(Messages.HTMLTidyValidator_NonUniqueIdValue, tagName, attr.getValue()),
+							doc.getLineOfOffset(offset) + 1, offset, element.getNameNode().getNameRange().getLength(),
+							sourcePath));
 				}
 				else
 				{

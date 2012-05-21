@@ -261,9 +261,17 @@
       <hover
             class="com.aptana.editor.html.text.HTMLTextHover"
             id="com.aptana.editor.html.hover"
-            label="HTML Hover">
+            label="%htmlHover.name">
          <contentType
                type="com.aptana.contenttype.html">
+         </contentType>
+      </hover>
+      <hover
+            class="com.aptana.editor.html.text.CSSElementSelectorHover"
+            id="com.aptana.editor.html.css_element_selector_hover"
+            label="%cssElementSelectorHover.name">
+         <contentType
+               type="com.aptana.contenttype.css">
          </contentType>
       </hover>
    </extension>

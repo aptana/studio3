@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.IEditorInput;
@@ -71,8 +72,7 @@ public abstract class EditorBasedTests extends TestCase
 	 */
 	protected ITextEditor createEditor(IFileStore fileStore)
 	{
-		FileStoreEditorInput editorInput = new FileStoreEditorInput(fileStore);
-		return createEditor(editorInput);
+		return createEditor(new FileStoreEditorInput(fileStore));
 	}
 
 	/**
@@ -83,7 +83,7 @@ public abstract class EditorBasedTests extends TestCase
 	 */
 	protected ITextEditor createEditor(IEditorInput editorInput)
 	{
-		return createEditor(editorInput, this.getPluginId());
+		return createEditor(editorInput, getEditorId());
 	}
 
 	/**
@@ -110,6 +110,16 @@ public abstract class EditorBasedTests extends TestCase
 		assertTrue(editor instanceof AbstractThemeableEditor);
 
 		return editor;
+	}
+
+	protected ISourceViewer getSourceViewer()
+	{
+		if (editor == null)
+		{
+			return null;
+		}
+
+		return ((AbstractThemeableEditor) editor).getISourceViewer();
 	}
 
 	/**
@@ -229,7 +239,7 @@ public abstract class EditorBasedTests extends TestCase
 	 * 
 	 * @return
 	 */
-	protected abstract String getPluginId();
+	protected abstract String getEditorId();
 
 	/**
 	 * Is we wish to index our files, the indexer we should use

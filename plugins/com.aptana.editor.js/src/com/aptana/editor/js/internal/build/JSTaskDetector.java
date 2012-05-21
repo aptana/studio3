@@ -79,7 +79,7 @@ public class JSTaskDetector extends RequiredBuildParticipant
 	 */
 	public Collection<IProblem> detectTasks(IParseRootNode rootNode, BuildContext context, IProgressMonitor monitor)
 	{
-		if (rootNode == null)
+		if (rootNode == null || context == null)
 		{
 			return Collections.emptyList();
 		}
@@ -91,7 +91,7 @@ public class JSTaskDetector extends RequiredBuildParticipant
 		}
 		SubMonitor sub = SubMonitor.convert(monitor, comments.length);
 
-		Collection<IProblem> tasks = new ArrayList<IProblem>();
+		Collection<IProblem> tasks = new ArrayList<IProblem>(comments.length);
 		try
 		{
 			String source = context.getContents();

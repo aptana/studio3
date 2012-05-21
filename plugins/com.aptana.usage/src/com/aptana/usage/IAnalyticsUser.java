@@ -16,5 +16,7 @@ public interface IAnalyticsUser
 
 	public String getCookie();
 
+	public String getUID();
+
 	public boolean isOnline();
 }

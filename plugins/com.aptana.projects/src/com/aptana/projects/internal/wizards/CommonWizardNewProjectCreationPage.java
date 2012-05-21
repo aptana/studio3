@@ -151,6 +151,7 @@ public class CommonWizardNewProjectCreationPage extends WizardNewProjectCreation
 		if (isValid)
 		{
 			File locationFile = getLocationPath().toFile();
+			boolean existing = false;
 
 			if (useDefaults())
 			{
@@ -162,7 +163,7 @@ public class CommonWizardNewProjectCreationPage extends WizardNewProjectCreation
 					String[] files = dir.list();
 					if (!ArrayUtil.isEmpty(files))
 					{
-						isValid = false;
+						existing = true;
 					}
 				}
 			}
@@ -171,10 +172,10 @@ public class CommonWizardNewProjectCreationPage extends WizardNewProjectCreation
 				String[] files = locationFile.list();
 				if (!ArrayUtil.isEmpty(files))
 				{
-					isValid = false;
+					existing = true;
 				}
 			}
-			if (!isValid)
+			if (existing)
 			{
 				warningLabel.setText(Messages.CommonWizardNewProjectCreationPage_location_has_existing_content_warning);
 				warningLabel.getParent().layout(true);

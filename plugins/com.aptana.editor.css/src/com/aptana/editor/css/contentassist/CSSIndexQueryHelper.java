@@ -15,6 +15,9 @@ import java.util.Map;
 import java.util.Set;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.ObjectUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.contentassist.index.CSSIndexReader;
 import com.aptana.editor.css.contentassist.index.ICSSIndexConstants;
@@ -71,19 +74,17 @@ public class CSSIndexQueryHelper
 	 */
 	public Set<String> getColors(Index index)
 	{
-		Set<String> result = Collections.emptySet();
-
 		if (index != null)
 		{
-			Map<String, String> colorMap = this._reader.getValues(index, ICSSIndexConstants.COLOR);
+			Map<String, String> colorMap = _reader.getValues(index, ICSSIndexConstants.COLOR);
 
 			if (colorMap != null)
 			{
-				result = colorMap.keySet();
+				return colorMap.keySet();
 			}
 		}
 
-		return result;
+		return Collections.emptySet();
 	}
 
 	/**
@@ -94,25 +95,25 @@ public class CSSIndexQueryHelper
 	 */
 	public ElementElement getElement(String name)
 	{
-		ElementElement result = null;
-
-		if (name != null && name.length() > 0)
+		if (StringUtil.isEmpty(name))
 		{
-			try
-			{
-				List<ElementElement> elements = this._reader.getElements(getIndex(), name);
-				if (!elements.isEmpty())
-				{
-					result = elements.get(0);
-				}
-			}
-			catch (IOException e)
-			{
-				IdeLog.logError(CSSPlugin.getDefault(), e);
-			}
+			return null;
 		}
 
-		return result;
+		try
+		{
+			List<ElementElement> elements = _reader.getElements(getIndex(), name);
+			if (!CollectionsUtil.isEmpty(elements))
+			{
+				return elements.get(0);
+			}
+		}
+		catch (IOException e)
+		{
+			IdeLog.logError(CSSPlugin.getDefault(), e);
+		}
+
+		return null;
 	}
 
 	/**
@@ -122,17 +123,16 @@ public class CSSIndexQueryHelper
 	 */
 	public List<ElementElement> getElements()
 	{
-		List<ElementElement> result = Collections.emptyList();
 		try
 		{
-			result = this._reader.getElements(getIndex());
+			return _reader.getElements(getIndex());
 		}
 		catch (IOException e)
 		{
 			IdeLog.logError(CSSPlugin.getDefault(), e);
 		}
 
-		return result;
+		return Collections.emptyList();
 	}
 
 	/**
@@ -153,17 +153,16 @@ public class CSSIndexQueryHelper
 	 */
 	public List<PropertyElement> getProperties()
 	{
-		List<PropertyElement> result = Collections.emptyList();
 		try
 		{
-			result = this._reader.getProperties(getIndex());
+			return _reader.getProperties(getIndex());
 		}
 		catch (IOException e)
 		{
 			IdeLog.logError(CSSPlugin.getDefault(), e);
 		}
 
-		return result;
+		return Collections.emptyList();
 	}
 
 	/**
@@ -173,25 +172,25 @@ public class CSSIndexQueryHelper
 	 */
 	public PropertyElement getProperty(String name)
 	{
-		PropertyElement result = null;
-		if (name != null && name.length() > 0)
+		if (StringUtil.isEmpty(name))
 		{
-			try
-			{
-				List<PropertyElement> properties = this._reader.getProperties(getIndex(), name);
-
-				if (!properties.isEmpty())
-				{
-					result = properties.get(0);
-				}
-			}
-			catch (IOException e)
-			{
-				IdeLog.logError(CSSPlugin.getDefault(), e);
-			}
+			return null;
 		}
 
-		return result;
+		try
+		{
+			List<PropertyElement> properties = _reader.getProperties(getIndex(), name);
+			if (!CollectionsUtil.isEmpty(properties))
+			{
+				return properties.get(0);
+			}
+		}
+		catch (IOException e)
+		{
+			IdeLog.logError(CSSPlugin.getDefault(), e);
+		}
+
+		return null;
 	}
 
 	/**
@@ -201,17 +200,28 @@ public class CSSIndexQueryHelper
 	 */
 	public List<PseudoClassElement> getPseudoClasses()
 	{
-		List<PseudoClassElement> result = Collections.emptyList();
 		try
 		{
-			result = this._reader.getPseudoClasses(getIndex());
+			return _reader.getPseudoClasses(getIndex());
 		}
 		catch (IOException e)
 		{
 			IdeLog.logError(CSSPlugin.getDefault(), e);
 		}
 
-		return result;
+		return Collections.emptyList();
+	}
+
+	public PseudoClassElement getPseudoClass(String name)
+	{
+		for (PseudoClassElement pce : getPseudoClasses())
+		{
+			if (ObjectUtil.areEqual(name, pce.getName()))
+			{
+				return pce;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -221,16 +231,27 @@ public class CSSIndexQueryHelper
 	 */
 	public List<PseudoElementElement> getPseudoElements()
 	{
-		List<PseudoElementElement> result = Collections.emptyList();
 		try
 		{
-			result = this._reader.getPseudoElements(getIndex());
+			return _reader.getPseudoElements(getIndex());
 		}
 		catch (IOException e)
 		{
 			IdeLog.logError(CSSPlugin.getDefault(), e);
 		}
 
-		return result;
+		return Collections.emptyList();
+	}
+
+	public PseudoElementElement getPseudoElement(String name)
+	{
+		for (PseudoElementElement pee : getPseudoElements())
+		{
+			if (ObjectUtil.areEqual(name, pee.getName()))
+			{
+				return pee;
+			}
+		}
+		return null;
 	}
 }
