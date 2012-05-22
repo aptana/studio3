@@ -37,7 +37,7 @@ import java.util.TimeZone;
  * 
  * 
  */
-
+@SuppressWarnings({ "nls" })
 public class DateCache  
 {
     public static String DEFAULT_FORMAT="EEE MMM dd HH:mm:ss zzz yyyy";

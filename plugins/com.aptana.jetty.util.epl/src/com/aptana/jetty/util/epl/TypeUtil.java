@@ -34,6 +34,7 @@ import java.util.List;
  *
  * @since Jetty 4.1
  */
+@SuppressWarnings("nls")
 public class TypeUtil
 {
     private static final RedirectToAptanaLog LOG = RedirectToAptanaLog.getSingleton();
