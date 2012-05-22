@@ -18,11 +18,10 @@ import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import com.aptana.core.util.ObjectUtil;
 import com.aptana.core.util.StringUtil;
-import com.aptana.ui.util.UIUtils;
 
 /**
  * Helper for actually doing the find actions.
@@ -74,8 +73,12 @@ public class FindBarFinder
 			{
 				StyledText textWidget = sourceViewer.getTextWidget();
 				Point selection = textWidget.getSelection();
-				String findText = dec.textFind.getText();
-				findText = dec.convertTextString(findText);
+				String originalText = dec.textFind.getText();
+				String findText = dec.convertTextString(originalText);
+
+				// If the find string was converted then it should be run as a regular expression
+				boolean runRegEx = dec.getConfiguration().getRegularExpression()
+						|| ObjectUtil.areNotEqual(originalText, findText);
 				int offset = textWidget.getCaretOffset();
 				if (wrapping)
 				{
@@ -146,7 +149,7 @@ public class FindBarFinder
 						// When searching backward, we have to get the offset-1 (otherwise it doesn't work properly)
 						newOffset = ((IFindReplaceTargetExtension3) findReplaceTarget).findAndSelect(forward ? offset
 								: offset - 1, findText, forward, dec.getConfiguration().getCaseSensitive(), dec
-								.getWholeWord(), dec.getConfiguration().getRegularExpression());
+								.getWholeWord(), runRegEx);
 
 					}
 					catch (PatternSyntaxException e)
