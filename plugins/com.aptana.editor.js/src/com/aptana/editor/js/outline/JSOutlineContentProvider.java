@@ -368,7 +368,7 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 
 		String fullpath = reference.toString();
 		JSOutlineItem item = fItemsByScope.get(fullpath);
-		if (item == null || item.getType() != Type.FUNCTION)
+		if (item == null || item.getType() != Type.FUNCTION || !name.equals(item.getLabel()))
 		{
 			String text;
 			if (name.endsWith(FUNCTION_LITERAL + ")")) //$NON-NLS-1$
