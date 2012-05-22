@@ -7,12 +7,15 @@
  */
 package com.aptana.portal.ui.dispatch.actionControllers;
 
+import java.text.MessageFormat;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -23,6 +26,7 @@ import org.eclipse.ui.handlers.IHandlerService;
 import com.aptana.configurations.processor.ConfigurationStatus;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.portal.ui.PortalUIPlugin;
+import com.aptana.portal.ui.dispatch.BrowserNotifier;
 import com.aptana.portal.ui.dispatch.IBrowserNotificationConstants;
 
 /**
@@ -41,6 +45,9 @@ import com.aptana.portal.ui.dispatch.IBrowserNotificationConstants;
  */
 public class CommandHandlerActionController extends AbstractActionController
 {
+	private static final String JSON_WRAPPER = "\"{0}\""; //$NON-NLS-1$
+	private static final String NULL_JSON = "\"null\""; //$NON-NLS-1$
+
 	// ############## Actions ###############
 
 	/**
@@ -79,7 +86,17 @@ public class CommandHandlerActionController extends AbstractActionController
 				arguments = Collections.emptyMap();
 			}
 			event = new ExecutionEvent(command, arguments, null, handlerService.getCurrentState());
-			command.executeWithChecks(event);
+			Object result = command.executeWithChecks(event);
+			if (result != null)
+			{
+				String eventCallback = getEventCallbackName(attributes);
+				if (eventCallback != null)
+				{
+					List<String> emptyList = Collections.emptyList();
+					BrowserNotifier.getInstance().notifyBrowserInUIThread(emptyList, eventCallback,
+							IBrowserNotificationConstants.EVENT_TYPE_CHANGED, getJSONResult(result));
+				}
+			}
 		}
 		catch (Exception e)
 		{
@@ -100,7 +117,7 @@ public class CommandHandlerActionController extends AbstractActionController
 		if (attributes instanceof Object[])
 		{
 			Object[] arr = (Object[]) attributes;
-			if ((arr.length == 1 || arr.length == 2) && arr[0] != null)
+			if ((arr.length >= 1 && arr.length <= 3) && arr[0] != null)
 			{
 				return arr[0].toString();
 			}
@@ -127,7 +144,7 @@ public class CommandHandlerActionController extends AbstractActionController
 	private Map getCommandArguments(Object attributes)
 	{
 		Object[] arr = (Object[]) attributes;
-		if (arr.length == 2)
+		if (arr.length == 2 || arr.length == 3)
 		{
 			if (arr[1] instanceof Map)
 			{
@@ -141,6 +158,41 @@ public class CommandHandlerActionController extends AbstractActionController
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Returns the event callback that should be fired via a notify call on the portal.
+	 * 
+	 * @param attributes
+	 * @return The name of the event; <code>null</code> when undefined.
+	 */
+	private String getEventCallbackName(Object attributes)
+	{
+		Object[] arr = (Object[]) attributes;
+		if (arr.length == 3)
+		{
+			return (String) arr[2];
+		}
+		return null;
+	}
+
+	/**
+	 * Generate a JSON result from the given result.
+	 * 
+	 * @param result
+	 * @return A result wrapped in a JSON representation.
+	 */
+	private String getJSONResult(Object result)
+	{
+		if (result == null)
+		{
+			return NULL_JSON;
+		}
+		if (result instanceof IResource)
+		{
+			return MessageFormat.format(JSON_WRAPPER, ((IResource) result).getName());
+		}
+		return MessageFormat.format(JSON_WRAPPER, result.toString());
 	}
 
 	/*

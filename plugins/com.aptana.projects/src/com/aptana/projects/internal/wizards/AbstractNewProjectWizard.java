@@ -301,6 +301,17 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 		return true;
 	}
 
+	/**
+	 * Returns the {@link IProject} reference that was created by this wizard. Note that the result may be
+	 * <code>null</code> if called before the project was created.
+	 * 
+	 * @return An {@link IProject} (can be <code>null</code>).
+	 */
+	public IProject getCreatedProject()
+	{
+		return newProject;
+	}
+
 	protected abstract String getProjectCreateEventName();
 
 	protected void sendProjectCreateEvent()
