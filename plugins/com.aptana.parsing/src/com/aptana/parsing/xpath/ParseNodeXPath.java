@@ -25,4 +25,9 @@ public class ParseNodeXPath extends BaseXPath
 	{
 		super(xpathExpr, ParseNodeNavigator.getInstance());
 	}
+
+	public ParseNodeXPath(String xpathExpr, ParseNodeNavigator navigator) throws JaxenException
+	{
+		super(xpathExpr, navigator);
+	}
 }

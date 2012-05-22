@@ -10,7 +10,7 @@ package com.aptana.samples.ui.portal.actionController;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.mortbay.util.ajax.JSON;
+import com.aptana.jetty.util.epl.ajax.JSON;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;

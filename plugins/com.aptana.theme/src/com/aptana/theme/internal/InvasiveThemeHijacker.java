@@ -14,7 +14,6 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
@@ -40,8 +39,6 @@ import org.eclipse.search.ui.ISearchQuery;
 import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.search.ui.text.AbstractTextSearchViewPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
@@ -1230,19 +1227,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 			return;
 		}
 
-		// Force selection color
-		StyledText textWidget = sourceViewer.getTextWidget();
-		Color existingSelectionBG = textWidget.getSelectionBackground();
-		RGB selectionRGB = getCurrentTheme().getSelectionAgainstBG();
-		if (!existingSelectionBG.getRGB().equals(selectionRGB))
-		{
-			textWidget.setSelectionBackground(getColorManager().getColor(selectionRGB));
-		}
-		if (!Platform.OS_MACOSX.equals(Platform.getOS()))
-		{
-			// Linux and windows need selection fg set or we just see a block of color.
-			textWidget.setSelectionForeground(getColorManager().getColor(getCurrentTheme().getForeground()));
-		}
+		ThemePlugin.getDefault().getControlThemerFactory().apply((Viewer) sourceViewer);
 	}
 
 	protected ColorManager getColorManager()

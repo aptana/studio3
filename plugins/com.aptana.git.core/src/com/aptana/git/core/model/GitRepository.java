@@ -57,6 +57,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
@@ -711,7 +712,7 @@ public class GitRepository
 	 */
 	private Set<String> simpleRefsOfType(GitRef.TYPE... types)
 	{
-		if (types == null || types.length == 0)
+		if (ArrayUtil.isEmpty(types))
 		{
 			return Collections.emptySet();
 		}
@@ -1279,14 +1280,13 @@ public class GitRepository
 		// TODO Store the config contents and only read it again when last mod changes?
 		if (!enterRead())
 		{
-			IdeLog.logError(GitPlugin.getDefault(), Messages.GitRepository_FailedReadLockForConfig, IDebugScopes.DEBUG);
+			IdeLog.logInfo(GitPlugin.getDefault(), Messages.GitRepository_FailedReadLockForConfig, IDebugScopes.DEBUG);
 			return null;
 		}
 
 		try
 		{
-			return IOUtil.read(new FileInputStream(gitFile(CONFIG_FILENAME))); // $codepro.audit.disable
-																				// closeWhereCreated
+			return IOUtil.read(new FileInputStream(gitFile(CONFIG_FILENAME))); // $codepro.audit.disable closeWhereCreated
 		}
 		catch (FileNotFoundException e)
 		{

@@ -216,7 +216,7 @@ public abstract class MetadataReader extends ValidatingReader
 			{
 				Exception ex = e.getException();
 
-				if (!StringUtil.isEmpty(inputName))
+				if (StringUtil.isEmpty(inputName))
 				{
 					inputName = "the documentation XML file"; //$NON-NLS-1$
 				}

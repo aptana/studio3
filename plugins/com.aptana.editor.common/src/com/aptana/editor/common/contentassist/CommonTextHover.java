@@ -7,16 +7,25 @@
  */
 package com.aptana.editor.common.contentassist;
 
+import java.net.URI;
+
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.core.runtime.preferences.IScopeContext;
+import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.ui.IEditorPart;
 
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.hover.AbstractDocumentationHover;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
+import com.aptana.editor.common.util.EditorUtil;
+import com.aptana.index.core.Index;
+import com.aptana.parsing.ast.IParseNode;
 import com.aptana.theme.ColorManager;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.Theme;
@@ -66,6 +75,87 @@ public abstract class CommonTextHover extends AbstractDocumentationHover
 	protected Color getBorderColor()
 	{
 		return themeListener.borderColor;
+	}
+
+	/**
+	 * getActiveNode
+	 * 
+	 * @param textViewer
+	 * @param offset
+	 * @return
+	 */
+	protected IParseNode getActiveNode(ITextViewer textViewer, int offset)
+	{
+		IParseNode result = null;
+
+		if (this.isHoverEnabled())
+		{
+			AbstractThemeableEditor editor = this.getEditor(textViewer);
+			IParseNode ast = editor.getAST();
+
+			if (ast != null)
+			{
+				result = ast.getNodeAtOffset(offset);
+
+				// We won't get a current node if the cursor is outside of the positions
+				// recorded by the AST
+				if (result == null)
+				{
+					if (offset < ast.getStartingOffset())
+					{
+						result = ast.getNodeAtOffset(ast.getStartingOffset());
+					}
+					else if (ast.getEndingOffset() < offset)
+					{
+						result = ast.getNodeAtOffset(ast.getEndingOffset());
+					}
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * getEditor
+	 * 
+	 * @param textViewer
+	 * @return
+	 */
+	protected AbstractThemeableEditor getEditor(ITextViewer textViewer)
+	{
+		AbstractThemeableEditor result = null;
+
+		if (textViewer instanceof IAdaptable)
+		{
+			result = (AbstractThemeableEditor) ((IAdaptable) textViewer).getAdapter(AbstractThemeableEditor.class);
+		}
+
+		return result;
+	}
+
+	/**
+	 * getEditorURI
+	 * 
+	 * @param textViewer
+	 * @return
+	 */
+	protected URI getEditorURI(IEditorPart editorPart)
+	{
+		AbstractThemeableEditor editor = (AbstractThemeableEditor) editorPart;
+		return EditorUtil.getURI(editor);
+	}
+
+	/**
+	 * getIndex
+	 * 
+	 * @param editorPart
+	 * @return
+	 */
+	protected Index getIndex(IEditorPart editorPart)
+	{
+		AbstractThemeableEditor editor = (AbstractThemeableEditor) editorPart;
+		return EditorUtil.getIndex(editor);
 	}
 
 	// Theme listener that caches the colors.

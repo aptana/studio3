@@ -27,6 +27,21 @@ public class ParseNodeNavigator extends DefaultNavigator
 	private static ParseNodeNavigator INSTANCE = new ParseNodeNavigator();
 
 	/**
+	 * Flag used to make element name matching case insensitive (by forcing element names to lowercase)
+	 */
+	private boolean caseInsensitive;
+
+	public ParseNodeNavigator()
+	{
+		this(false);
+	}
+
+	public ParseNodeNavigator(boolean caseInsensitive)
+	{
+		this.caseInsensitive = caseInsensitive;
+	}
+
+	/**
 	 * getInstance
 	 * 
 	 * @return ParseNodeNavigator
@@ -47,10 +62,7 @@ public class ParseNodeNavigator extends DefaultNavigator
 
 			return new ParseNodeAttributeIterator(element.getAttributes());
 		}
-		else
-		{
-			return JaxenConstants.EMPTY_ITERATOR;
-		}
+		return JaxenConstants.EMPTY_ITERATOR;
 	}
 
 	/**
@@ -175,7 +187,8 @@ public class ParseNodeNavigator extends DefaultNavigator
 	 */
 	public String getElementName(Object element)
 	{
-		return ((IParseNode) element).getElementName();
+		String elementName = ((IParseNode) element).getElementName();
+		return this.caseInsensitive ? elementName.toLowerCase() : elementName;
 	}
 
 	/**

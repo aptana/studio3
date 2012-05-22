@@ -13,9 +13,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.mortbay.util.ajax.JSON.Output;
+import com.aptana.jetty.util.epl.ajax.JSON.Output;
 
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.ObjectUtil;
 import com.aptana.index.core.IndexUtil;
 import com.aptana.index.core.ui.views.IPropertyInformation;
 
@@ -157,5 +158,22 @@ public class PseudoClassElement extends BaseElement<PseudoClassElement.Property>
 
 		out.add(SPECIFICATIONS_PROPERTY, this.getSpecifications());
 		out.add(VALUES_PROPERTY, this.getValues());
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (!(obj instanceof PseudoClassElement))
+		{
+			return false;
+		}
+		PseudoClassElement other = (PseudoClassElement) obj;
+		return ObjectUtil.areEqual(getName(), other.getName());
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return getName().hashCode();
 	}
 }

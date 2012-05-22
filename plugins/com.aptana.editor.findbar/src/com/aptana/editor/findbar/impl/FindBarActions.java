@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.findbar.impl;
 
 import java.lang.ref.WeakReference;
@@ -18,24 +18,26 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.NotEnabledException;
+import org.eclipse.core.commands.NotHandledException;
 import org.eclipse.core.commands.ParameterizedCommand;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.bindings.Binding;
 import org.eclipse.jface.bindings.BindingManagerEvent;
 import org.eclipse.jface.bindings.IBindingManagerListener;
 import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.jface.bindings.keys.KeySequence;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.contexts.IContextActivation;
@@ -45,7 +47,11 @@ import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.findbar.FindBarPlugin;
+import com.aptana.editor.findbar.impl.FindBarDecorator.FindScope;
 import com.aptana.editor.findbar.preferences.IPreferencesConstants;
 
 /**
@@ -63,14 +69,20 @@ public class FindBarActions
 	public static final String FIND_PREVIOUS_COMMAND_ID = "org.eclipse.ui.edit.findbar.findPrevious"; //$NON-NLS-1$
 	public static final String FIND_NEXT_COMMAND_ID = "org.eclipse.ui.edit.findbar.findNext"; //$NON-NLS-1$
 	public static final String FIND_NEXT_OR_PREV_COMMAND_ID = "org.eclipse.ui.edit.findbar.findNextOrPrev"; //$NON-NLS-1$
+	public static final String INPUT_NEWLINE_COMMAND_ID = "org.eclipse.ui.edit.findbar.inputNewline"; //$NON-NLS-1$
 	public static final String FOCUS_REPLACE_COMMAND_ID = "org.eclipse.ui.edit.findbar.focusReplace"; //$NON-NLS-1$
 	public static final String FOCUS_FIND_COMMAND_ID = "org.eclipse.ui.edit.findbar.focusFind"; //$NON-NLS-1$
 	public static final String FOCUS_FIND_OR_OPEN_ECLIPSE_SEARCH_COMMAND_ID = "org.eclipse.ui.edit.findbar.focusFindOrOpenEclipseSearch"; //$NON-NLS-1$
 	public static final String TOGGLE_CASE_MATCHING_COMMAND_ID = "org.eclipse.ui.edit.findbar.toggleCaseMatching"; //$NON-NLS-1$
 	public static final String TOGGLE_REGEXP_MATCHING_COMMAND_ID = "org.eclipse.ui.edit.findbar.toggleRegexpMatching"; //$NON-NLS-1$
 	public static final String TOGGLE_SEARCH_BACKWARD_COMMAND_ID = "org.eclipse.ui.edit.findbar.toggleSearchBackward"; //$NON-NLS-1$
+	public static final String TOGGLE_COUNT_MATCHES_COMMAND_ID = "org.eclipse.ui.edit.findbar.toggleMatchCount"; //$NON-NLS-1$
 	public static final String TOGGLE_WORD_MATCHING_COMMAND_ID = "org.eclipse.ui.edit.findbar.toggleWordMatching"; //$NON-NLS-1$
+	public static final String TOGGLE_SEARCH_SELECTION_COMMAND_ID = "org.eclipse.ui.edit.findbar.toggleSearchSelection"; //$NON-NLS-1$
 	public static final String SEARCH_IN_OPEN_FILES_COMMAND_ID = "org.eclipse.ui.edit.findbar.searchInOpenFiles"; //$NON-NLS-1$
+	public static final String SEARCH_IN_CURRENT_FILE_COMMAND_ID = "org.eclipse.ui.edit.findbar.searchInCurrentFile"; //$NON-NLS-1$
+	public static final String SEARCH_IN_ENCLOSING_PROJECT_COMMAND_ID = "org.eclipse.ui.edit.findbar.searchInEnclosingProject"; //$NON-NLS-1$
+	public static final String SEARCH_IN_WORKSPACE_COMMAND_ID = "org.eclipse.ui.edit.findbar.searchInWorkspace"; //$NON-NLS-1$
 	public static final String SHOW_OPTIONS_COMMAND_ID = "org.eclipse.ui.edit.findbar.showOptions"; //$NON-NLS-1$
 
 	private boolean fActivated;
@@ -108,6 +120,7 @@ public class FindBarActions
 		fCommandToHandler.put(FIND_PREVIOUS_COMMAND_ID, new FindPreviousHandler());
 		fCommandToHandler.put(FIND_NEXT_COMMAND_ID, new FindNextHandler());
 		fCommandToHandler.put(FIND_NEXT_OR_PREV_COMMAND_ID, new FindNextOrPrevHandler());
+		fCommandToHandler.put(INPUT_NEWLINE_COMMAND_ID, new InputNewlineInFindBarHandler());
 		fCommandToHandler.put(FOCUS_FIND_COMMAND_ID, new FocusFindFindBarHandler());
 		fCommandToHandler.put(FOCUS_FIND_OR_OPEN_ECLIPSE_SEARCH_COMMAND_ID,
 				new FocusFindOrOpenEclipseSearchFindBarHandler());
@@ -116,13 +129,64 @@ public class FindBarActions
 		fCommandToHandler.put(TOGGLE_WORD_MATCHING_COMMAND_ID, new ToggleWordFindBarHandler());
 		fCommandToHandler.put(TOGGLE_REGEXP_MATCHING_COMMAND_ID, new ToggleRegexpFindBarHandler());
 		fCommandToHandler.put(TOGGLE_SEARCH_BACKWARD_COMMAND_ID, new ToggleSearchBackwardFindBarHandler());
-		fCommandToHandler.put(SEARCH_IN_OPEN_FILES_COMMAND_ID, new SearchInOpenFilesFindBarHandler());
+		fCommandToHandler.put(TOGGLE_COUNT_MATCHES_COMMAND_ID, new ToggleMatchCountFindBarHandler());
+		fCommandToHandler.put(TOGGLE_SEARCH_SELECTION_COMMAND_ID, new ToggleSearchSelectionFindBarHandler());
+		fCommandToHandler.put(SEARCH_IN_OPEN_FILES_COMMAND_ID, new ChangeScopeHandler(FindScope.OPEN_FILES));
+		fCommandToHandler.put(SEARCH_IN_CURRENT_FILE_COMMAND_ID, new ChangeScopeHandler(FindScope.CURRENT_FILE));
+		fCommandToHandler.put(SEARCH_IN_ENCLOSING_PROJECT_COMMAND_ID, new ChangeScopeHandler(
+				FindScope.ENCLOSING_PROJECT));
+		fCommandToHandler.put(SEARCH_IN_WORKSPACE_COMMAND_ID, new ChangeScopeHandler(FindScope.WORKSPACE));
 		fCommandToHandler.put(SHOW_OPTIONS_COMMAND_ID, new ShowOptionsFindBarHandler());
 
 		// Now, aside from the find bar commands, there are some other commands that it's nice to have available too,
 		// even if the editor does not have focus.
 		fCommandToHandler.put("org.eclipse.ui.edit.undo", null); //$NON-NLS-1$
 		fCommandToHandler.put("org.eclipse.ui.edit.redo", null); //$NON-NLS-1$
+
+		fCommandToHandler.put(IWorkbenchCommandConstants.WINDOW_CLOSE_PART, null);
+
+		fCommandToHandler.put(IWorkbenchCommandConstants.FILE_CLOSE, null);
+		fCommandToHandler.put(IWorkbenchCommandConstants.FILE_CLOSE_ALL, null);
+
+		fCommandToHandler.put(IWorkbenchCommandConstants.FILE_SAVE, null);
+		fCommandToHandler.put(IWorkbenchCommandConstants.FILE_SAVE_ALL, null);
+
+		fCommandToHandler.put("org.eclipse.ui.navigate.openResource", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.eclipse.ui.views.showView", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.eclipse.ui.navigate.backwardHistory", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.eclipse.ui.navigate.forwardHistory", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.eclipse.ui.window.switchToEditor", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.eclipse.ui.window.nextEditor", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.eclipse.ui.window.previousEditor", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.eclipse.ui.window.nextView", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.eclipse.ui.window.previousView", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.eclipse.ui.window.nextPerspective", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.eclipse.ui.window.previousPerspective", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.eclipse.ui.part.nextPage", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.eclipse.ui.part.previousPage", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.eclipse.ui.window.showKeyAssist", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.eclipse.debug.ui.commands.RunLast", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.eclipse.debug.ui.commands.DebugLast", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.eclipse.debug.ui.commands.Terminate", null); //$NON-NLS-1$
+
+		// PyDev actions
+		fCommandToHandler.put("org.python.pydev.editor.actions.pyShowOutline", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.python.pydev.editor.actions.pyShowBrowser", null); //$NON-NLS-1$
+		fCommandToHandler.put("com.python.pydev.analysis.actions.pyGlobalsBrowserWorkbench", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.python.pydev.debug.ui.actions.runEditorBasedOnNatureTypeAction", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.python.pydev.debug.ui.actions.runEditorAsCustomUnitTestAction", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.python.pydev.debug.ui.actions.relaunchLastAction", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.python.pydev.debug.ui.actions.terminateAllLaunchesAction", null); //$NON-NLS-1$
+
+		// Aptana actions
+		fCommandToHandler.put("com.aptana.editor.NextEditorCommand", null); //$NON-NLS-1$
+		fCommandToHandler.put("com.aptana.editor.PreviousEditorCommand", null); //$NON-NLS-1$
+		fCommandToHandler.put("com.aptana.editor.js.quick_outline", null); //$NON-NLS-1$
+		fCommandToHandler.put("com.aptana.editor.php.openType.command", null); //$NON-NLS-1$
+
+		// JDT actions
+		fCommandToHandler.put("org.eclipse.jdt.ui.navigate.open.type", null); //$NON-NLS-1$
+
 	}
 
 	/**
@@ -252,10 +316,17 @@ public class FindBarActions
 								{
 									handlerService.executeCommand(entry.getKey(), null);
 								}
+								catch (NotHandledException e1)
+								{
+									// Ignore it in this case (i.e.: the command may be there without any handler).
+									continue;
+								}
+
 								catch (NotEnabledException e1)
 								{
 									// Ignore it in this case (i.e.: undo will only be enabled if there's something
 									// to be undone).
+									continue;
 								}
 								catch (Exception e1)
 								{
@@ -317,9 +388,26 @@ public class FindBarActions
 		public Object execute(ExecutionEvent event) throws ExecutionException
 		{
 			FindBarDecorator dec = findBarDecorator.get();
-			if (dec != null)
+			if (dec != null && dec.findButton.isEnabled())
 			{
 				dec.findNextOrPrev();
+			}
+			return null;
+		}
+	}
+
+	private class InputNewlineInFindBarHandler extends AbstractHandler
+	{
+		public Object execute(ExecutionEvent event) throws ExecutionException
+		{
+			FindBarDecorator dec = findBarDecorator.get();
+			if (dec.isFindTextActive())
+			{
+				dec.inputNewline(dec.textFind);
+			}
+			else if (dec.isReplaceTextActive())
+			{
+				dec.inputNewline(dec.textReplace);
 			}
 			return null;
 		}
@@ -332,8 +420,8 @@ public class FindBarActions
 			FindBarDecorator dec = findBarDecorator.get();
 			if (dec != null)
 			{
-				dec.combo.setFocus();
-				dec.combo.setSelection(new Point(0, dec.combo.getText().length()));
+				dec.textFind.setFocus();
+				dec.textFind.setSelection(new Point(0, dec.textFind.getText().length()));
 			}
 			return null;
 		}
@@ -346,9 +434,9 @@ public class FindBarActions
 			FindBarDecorator dec = findBarDecorator.get();
 			if (dec != null)
 			{
-				IPreferenceStore preferenceStore = FindBarPlugin.getDefault().getPreferenceStore();
-				boolean openEclipseFindBar = preferenceStore
-						.getBoolean(IPreferencesConstants.CTRL_F_TWICE_OPENS_ECLIPSE_FIND_BAR);
+				IEclipsePreferences preferenceStore = EclipseUtil.instanceScope().getNode(FindBarPlugin.PLUGIN_ID);
+				boolean openEclipseFindBar = preferenceStore.getBoolean(
+						IPreferencesConstants.CTRL_F_TWICE_OPENS_ECLIPSE_FIND_BAR, false);
 
 				if (openEclipseFindBar)
 				{
@@ -356,8 +444,8 @@ public class FindBarActions
 				}
 				else
 				{
-					dec.combo.setFocus();
-					dec.combo.setSelection(new Point(0, dec.combo.getText().length()));
+					dec.textFind.setFocus();
+					dec.textFind.setSelection(new Point(0, dec.textFind.getText().length()));
 				}
 			}
 			return null;
@@ -371,8 +459,8 @@ public class FindBarActions
 			FindBarDecorator dec = findBarDecorator.get();
 			if (dec != null)
 			{
-				dec.comboReplace.setFocus();
-				dec.comboReplace.setSelection(new Point(0, dec.comboReplace.getText().length()));
+				dec.textReplace.setFocus();
+				dec.textReplace.setSelection(new Point(0, dec.textReplace.getText().length()));
 			}
 			return null;
 		}
@@ -434,14 +522,30 @@ public class FindBarActions
 		}
 	}
 
-	private class SearchInOpenFilesFindBarHandler extends AbstractHandler
+	private class ToggleMatchCountFindBarHandler extends AbstractHandler
 	{
 		public Object execute(ExecutionEvent event) throws ExecutionException
 		{
 			FindBarDecorator dec = findBarDecorator.get();
 			if (dec != null)
 			{
-				dec.searchInOpenFiles();
+				FindBarConfiguration conf = dec.getConfiguration();
+				conf.setMatchCount(!conf.getMatchCount());
+				dec.showCountTotal();
+			}
+			return null;
+		}
+	}
+
+	private class ToggleSearchSelectionFindBarHandler extends AbstractHandler
+	{
+		public Object execute(ExecutionEvent event) throws ExecutionException
+		{
+			FindBarDecorator dec = findBarDecorator.get();
+			if (dec != null)
+			{
+				dec.searchSelection.setSelection(!dec.searchSelection.getSelection());
+				dec.updateSearchSelection();
 			}
 			return null;
 		}
@@ -455,6 +559,30 @@ public class FindBarActions
 			if (dec != null)
 			{
 				dec.showOptions(false);
+			}
+			return null;
+		}
+	}
+
+	private class ChangeScopeHandler extends AbstractHandler
+	{
+		FindScope scope;
+
+		ChangeScopeHandler(FindScope scope)
+		{
+			this.scope = scope;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+		 */
+		public Object execute(ExecutionEvent event) throws ExecutionException
+		{
+			FindBarDecorator dec = findBarDecorator.get();
+			if (dec != null)
+			{
+				dec.updateSearchScope(scope);
 			}
 			return null;
 		}
@@ -514,8 +642,6 @@ public class FindBarActions
 		if (dec != null)
 		{
 			// Whenever we get the bindings, update the tooltips accordingly.
-			updateTooltip(SEARCH_IN_OPEN_FILES_COMMAND_ID, Messages.FindBarDecorator_TOOLTIP_SearchInOpenFiles,
-					dec.searchInOpenFiles);
 			updateTooltip(TOGGLE_WORD_MATCHING_COMMAND_ID, Messages.FindBarDecorator_LABEL_WholeWord, dec.wholeWord);
 			updateTooltip(TOGGLE_CASE_MATCHING_COMMAND_ID, Messages.FindBarDecorator_LABEL_CaseSensitive,
 					dec.caseSensitive);
@@ -526,34 +652,43 @@ public class FindBarActions
 			}
 			updateTooltip(TOGGLE_SEARCH_BACKWARD_COMMAND_ID, Messages.FindBarDecorator_LABEL_SearchBackward,
 					dec.searchBackward);
+			updateTooltip(TOGGLE_COUNT_MATCHES_COMMAND_ID, Messages.FindBarDecorator_TOOLTIP_ShowMatchCount,
+					dec.countMatches);
+			updateTooltip(TOGGLE_SEARCH_SELECTION_COMMAND_ID, Messages.FindBarDecorator_LABEL_SearchSelection,
+					dec.searchSelection);
 			updateTooltip(SHOW_OPTIONS_COMMAND_ID, Messages.FindBarDecorator_LABEL_ShowOptions, dec.options);
 
 			List<TriggerSequence> bindings = fCommandToBinding.get(FOCUS_REPLACE_COMMAND_ID);
-			if (bindings != null && bindings.size() > 0)
+			if (!CollectionsUtil.isEmpty(bindings))
 			{
-				dec.comboReplace.setToolTipText(Messages.FindBarActions_TOOLTIP_FocusReplaceCombo + bindings.get(0));
+				List<TriggerSequence> newlineTriggers = fCommandToBinding.get(INPUT_NEWLINE_COMMAND_ID);
+				List<String> triggers = new ArrayList<String>(newlineTriggers.size() + 1);
+				triggers.add(bindings.get(0).toString());
+				for (TriggerSequence sequence : newlineTriggers)
+				{
+					triggers.add(sequence.toString());
+				}
+
+				dec.textReplace.setToolTipText(MessageFormat.format(Messages.FindBarActions_TOOLTIP_FocusReplaceCombo,
+						triggers.toArray(new Object[triggers.size()])));
 			}
 
 			bindings = fCommandToBinding.get(FOCUS_FIND_COMMAND_ID);
-			if (bindings != null && bindings.size() > 0)
+			if (!CollectionsUtil.isEmpty(bindings))
 			{
-				dec.combo.setToolTipText(Messages.FindBarActions_TOOLTIP_FocusFindCombo + bindings.get(0));
+				List<TriggerSequence> newlineTriggers = fCommandToBinding.get(INPUT_NEWLINE_COMMAND_ID);
+				List<String> triggers = new ArrayList<String>(newlineTriggers.size() + 1);
+				triggers.add(bindings.get(0).toString());
+				for (TriggerSequence sequence : newlineTriggers)
+				{
+					triggers.add(sequence.toString());
+				}
+
+				dec.textFind.setToolTipText(MessageFormat.format(Messages.FindBarActions_TOOLTIP_FocusFindCombo,
+						triggers.toArray(new Object[triggers.size()])));
 			}
 		}
 
-	}
-
-	private void updateTooltip(String commandId, String tooltip, Button button)
-	{
-		List<TriggerSequence> bindings = fCommandToBinding.get(commandId);
-		if (bindings != null && bindings.size() > 0)
-		{
-			button.setToolTipText(MessageFormat.format("{0} ({1})", tooltip, bindings.get(0))); //$NON-NLS-1$
-		}
-		else
-		{
-			button.setToolTipText(tooltip);
-		}
 	}
 
 	private void updateTooltip(String commandId, String tooltip, ToolItem item)
@@ -580,22 +715,44 @@ public class FindBarActions
 		IBindingService service = (IBindingService) site.getService(IBindingService.class);
 		Binding[] bindings = service.getBindings();
 
-		for (Map.Entry<String, AbstractHandler> entry : fCommandToHandler.entrySet())
+		for (int i = 0; i < bindings.length; i++)
 		{
-			List<TriggerSequence> seq = new ArrayList<TriggerSequence>();
-			commandToBinding.put(entry.getKey(), seq);
-			for (Binding binding : bindings)
+			Binding binding = bindings[i];
+			ParameterizedCommand command = binding.getParameterizedCommand();
+			if (command != null)
 			{
-				ParameterizedCommand command = binding.getParameterizedCommand();
-				if (command != null)
+				String id = command.getId();
+				// Filter only the actions we decided would be active.
+				//
+				// Note: we don't just make all actions active because they conflict with the find bar
+				// expected accelerators, so, things as Alt+W don't work -- even a second Ctrl+F isn't properly
+				// treated as specified in the options.
+				// A different option could be filtering those out and let everything else enabled,
+				// but this would need to be throughly tested to know if corner-cases work.
+				if (fCommandToHandler.containsKey(id))
 				{
-					if (entry.getKey().equals(command.getId()))
+					List<TriggerSequence> list = commandToBinding.get(id);
+					if (list == null)
 					{
-						seq.add(binding.getTriggerSequence());
+						list = new ArrayList<TriggerSequence>();
+						commandToBinding.put(id, list);
 					}
+					list.add(binding.getTriggerSequence());
 				}
-			}
 
+				// Uncomment to know which actions will be disabled
+				// else
+				// {
+				// try
+				// {
+				// System.out.println("Command disabled: " + id + ": " + command.getName());
+				// }
+				// catch (NotDefinedException e)
+				// {
+				//
+				// }
+				// }
+			}
 		}
 		return commandToBinding;
 	}
@@ -614,19 +771,24 @@ public class FindBarActions
 	}
 
 	/**
-	 * Creates a listener to manage the focus on combos.
+	 * Creates a listener to manage the focus on texts.
 	 */
-	public FocusListener createFocusListener(Combo combo)
+	public FocusListener createFocusListener(Text text)
 	{
-		final WeakReference<Combo> weakCombo = new WeakReference<Combo>(combo);
-		return new FindBarControlFocusListener(combo)
+		final WeakReference<Text> weakText = new WeakReference<Text>(text);
+		return new FindBarControlFocusListener(text)
 		{
 			public void focusGained(FocusEvent e)
 			{
-				Combo c = weakCombo.get();
-				if (c != null)
+				Text text = weakText.get();
+				if (text != null)
 				{
-					c.setBackground(null);
+					text.setBackground(null);
+					if (FindBarDecorator.DISABLED_COLOR.equals(text.getForeground()))
+					{
+						text.setText(StringUtil.EMPTY);
+						text.setForeground(null);
+					}
 				}
 				super.focusGained(e);
 			}

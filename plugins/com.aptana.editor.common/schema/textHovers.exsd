@@ -9,7 +9,7 @@
          [Enter description of this extension point.]
       </documentation>
    </annotation>
-   
+
    <include schemaLocation="schema://org.eclipse.core.expressions/schema/expressionLanguage.exsd"/>
 
    <element name="extension">
@@ -68,7 +68,7 @@
                   
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java"/>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.jface.text.ITextHover"/>
                </appinfo>
             </annotation>
          </attribute>
@@ -117,6 +117,9 @@
                <documentation>
                   
                </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="org.eclipse.core.contenttype.contentTypes/@id"/>
+               </appinfo>
             </annotation>
          </attribute>
       </complexType>

@@ -548,13 +548,6 @@
          unpack="false"/>
 
    <plugin
-         id="org.w3c.tidy"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="com.aptana.debug.core"
          download-size="0"
          install-size="0"
@@ -692,6 +685,42 @@
 
    <plugin
          id="com.aptana.buildpath.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.eclipse.fullscreen.ui"
+         os="macosx"
+         ws="cocoa"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.jira.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.jira.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.swift.jira.cli"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="com.aptana.jetty.util.epl"
          download-size="0"
          install-size="0"
          version="0.0.0"

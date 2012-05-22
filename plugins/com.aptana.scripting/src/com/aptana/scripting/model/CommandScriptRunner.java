@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
 import com.aptana.core.ShellExecutable;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ProcessUtil;
 import com.aptana.scripting.ScriptLogger;
@@ -104,7 +105,7 @@ public class CommandScriptRunner extends AbstractCommandRunner
 		}
 		catch (CoreException e)
 		{
-			ScriptingActivator.logError(Messages.CommandScriptRunner_CANNOT_LOCATE_SHELL, e);
+			IdeLog.logError(ScriptingActivator.getDefault(), Messages.CommandScriptRunner_CANNOT_LOCATE_SHELL, e);
 			this._exitValue = 1;
 			this.setExecutedSuccessfully(false);
 			return MessageFormat.format(Messages.CommandScriptRunner_UNABLE_TO_LOCATE_SHELL_FOR_COMMAND, new Object[] { this.getCommand().getPath() });

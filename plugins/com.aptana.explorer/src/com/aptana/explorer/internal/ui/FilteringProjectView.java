@@ -571,11 +571,16 @@ public class FilteringProjectView extends GitProjectView
 	protected void restoreState(IProject project)
 	{
 		TreeViewer viewer = getCommonViewer();
+		Control control = viewer.getControl();
+		if (control == null || control.isDisposed())
+		{
+			return;
+		}
 
 		IContainer container = ResourcesPlugin.getWorkspace().getRoot();
 		List<String> expansions = projectExpansions.get(project);
 		List<String> selections = projectSelections.get(project);
-		viewer.getControl().setRedraw(false);
+		control.setRedraw(false);
 		// FIXME Reconstruct filter into IResource
 		String filter = projectFilters.get(project);
 		if (filter == null || filter.length() == 0)
@@ -617,7 +622,7 @@ public class FilteringProjectView extends GitProjectView
 			}
 			viewer.setExpandedElements(elements.toArray());
 		}
-		viewer.getControl().setRedraw(true);
+		control.setRedraw(true);
 	}
 
 	@Override
@@ -1102,7 +1107,8 @@ public class FilteringProjectView extends GitProjectView
 				else if (Platform.getOS().equals(Platform.OS_LINUX)) // draw near bottom at far-left on Linux (still
 																		// doesn't overlap magnifying glass)
 				{
-					//For Ubuntu, draw the down arrow below the text. That is better than right in the middle of the text
+					// For Ubuntu, draw the down arrow below the text. That is better than right in the middle of the
+					// text
 					if (PlatformUtil.isOSName("Ubuntu")) //$NON-NLS-1$
 					{
 						x = 0;

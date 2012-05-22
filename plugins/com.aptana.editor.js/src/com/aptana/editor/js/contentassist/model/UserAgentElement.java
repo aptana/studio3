@@ -10,8 +10,8 @@ package com.aptana.editor.js.contentassist.model;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.mortbay.util.ajax.JSON.Convertible;
-import org.mortbay.util.ajax.JSON.Output;
+import com.aptana.jetty.util.epl.ajax.JSON.Convertible;
+import com.aptana.jetty.util.epl.ajax.JSON.Output;
 
 import com.aptana.core.util.ObjectUtil;
 import com.aptana.core.util.StringUtil;
@@ -303,5 +303,10 @@ public class UserAgentElement implements Convertible
 		out.add(OS_PROPERTY, this.getOS());
 		out.add(OS_VERSION_PROPERTY, this.getOSVersion());
 		out.add(DESCRIPTION_PROPERTY, this.getDescription());
+	}
+
+	public String toString()
+	{
+		return this.getPlatform() + "[" + this.getVersion() + "]:" + this.getOS();
 	}
 }

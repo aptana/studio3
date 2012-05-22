@@ -7,17 +7,21 @@
  */
 package com.aptana.editor.js.inferencing;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
 
+import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.model.ClassElement;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
@@ -51,18 +55,21 @@ public class JSTypeUtil
 	 */
 	static
 	{
-		FILTERED_TYPES = new HashSet<String>();
-		FILTERED_TYPES.add(JSTypeConstants.ARRAY_TYPE);
-		FILTERED_TYPES.add(JSTypeConstants.BOOLEAN_TYPE);
-		FILTERED_TYPES.add(JSTypeConstants.FUNCTION_TYPE);
-		FILTERED_TYPES.add(JSTypeConstants.NUMBER_TYPE);
-		FILTERED_TYPES.add(JSTypeConstants.OBJECT_TYPE);
-		FILTERED_TYPES.add(JSTypeConstants.REG_EXP_TYPE);
-		FILTERED_TYPES.add(JSTypeConstants.STRING_TYPE);
-		FILTERED_TYPES.add(JSTypeConstants.UNDEFINED_TYPE);
-		FILTERED_TYPES.add(JSTypeConstants.VOID_TYPE);
-		FILTERED_TYPES.add(JSTypeConstants.WINDOW_TYPE);
-		FILTERED_TYPES.add(JSTypeConstants.WINDOW_PROPERTY);
+		// @formatter:off
+		FILTERED_TYPES = CollectionsUtil.newSet(
+			JSTypeConstants.ARRAY_TYPE,
+			JSTypeConstants.BOOLEAN_TYPE,
+			JSTypeConstants.FUNCTION_TYPE,
+			JSTypeConstants.NUMBER_TYPE,
+			JSTypeConstants.OBJECT_TYPE,
+			JSTypeConstants.REG_EXP_TYPE,
+			JSTypeConstants.STRING_TYPE,
+			JSTypeConstants.UNDEFINED_TYPE,
+			JSTypeConstants.VOID_TYPE,
+			JSTypeConstants.WINDOW_TYPE,
+			JSTypeConstants.WINDOW_PROPERTY
+		);
+		// @formatter:on
 	}
 
 	/**
@@ -71,7 +78,7 @@ public class JSTypeUtil
 	 * @param function
 	 * @param block
 	 */
-	public static void applyDocumentation(FunctionElement function, DocumentationBlock block)
+	public static void applyDocumentation(FunctionElement function, JSNode node, DocumentationBlock block)
 	{
 		if (block != null)
 		{
@@ -79,21 +86,54 @@ public class JSTypeUtil
 			function.setDescription(block.getText());
 
 			// apply parameters
-			for (Tag tag : block.getTags(TagType.PARAM))
+			if (block.hasTag(TagType.PARAM))
 			{
-				ParamTag paramTag = (ParamTag) tag;
-				ParameterElement parameter = new ParameterElement();
-
-				parameter.setName(paramTag.getName());
-				parameter.setDescription(paramTag.getText());
-				parameter.setUsage(paramTag.getUsage().getName());
-
-				for (Type type : paramTag.getTypes())
+				for (Tag tag : block.getTags(TagType.PARAM))
 				{
-					parameter.addType(type.toSource());
-				}
+					ParamTag paramTag = (ParamTag) tag;
+					ParameterElement parameter = new ParameterElement();
 
-				function.addParameter(parameter);
+					parameter.setName(paramTag.getName());
+					parameter.setDescription(paramTag.getText());
+					parameter.setUsage(paramTag.getUsage().getName());
+
+					for (Type type : paramTag.getTypes())
+					{
+						parameter.addType(type.toSource());
+					}
+
+					function.addParameter(parameter);
+				}
+			}
+			else
+			{
+				if (node instanceof JSFunctionNode)
+				{
+					JSFunctionNode functionNode = (JSFunctionNode) node;
+
+					for (IParseNode parameterNode : functionNode.getParameters())
+					{
+						ParameterElement parameterElement = new ParameterElement();
+
+						parameterElement.setName(parameterNode.getText());
+						parameterElement.addType(JSTypeConstants.OBJECT_TYPE);
+
+						function.addParameter(parameterElement);
+					}
+				}
+				else
+				{
+					// @formatter:off
+					String message = MessageFormat.format(
+						"Expected JSFunction node when applying documentation; however, the node type was ''{0}'' instead. Source ={1}{2}",
+						(node != null) ? node.getClass().getName() : "null",
+						FileUtil.NEW_LINE,
+						node
+					);
+					// @formatter:on
+
+					IdeLog.logError(JSPlugin.getDefault(), message);
+				}
 			}
 
 			// apply return types
@@ -128,11 +168,11 @@ public class JSTypeUtil
 	 * @param property
 	 * @param block
 	 */
-	public static void applyDocumentation(PropertyElement property, DocumentationBlock block)
+	public static void applyDocumentation(PropertyElement property, JSNode node, DocumentationBlock block)
 	{
 		if (property instanceof FunctionElement)
 		{
-			applyDocumentation((FunctionElement) property, block);
+			applyDocumentation((FunctionElement) property, node, block);
 		}
 		else
 		{

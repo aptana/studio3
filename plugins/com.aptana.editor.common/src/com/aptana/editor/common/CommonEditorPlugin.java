@@ -21,7 +21,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.jface.text.templates.ContextTypeRegistry;
@@ -70,8 +69,6 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 
 	public static final String SNIPPET = "/icons/snippet.png"; //$NON-NLS-1$
 	public static final String COMMAND = "/icons/command.png"; //$NON-NLS-1$
-	public static final String IBEAM_BLACK = "/icons/ibeam-black.gif"; //$NON-NLS-1$
-	public static final String IBEAM_WHITE = "/icons/ibeam-white.gif"; //$NON-NLS-1$
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "com.aptana.editor.common"; //$NON-NLS-1$
@@ -379,35 +376,11 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		return plugin;
 	}
 
-	public static Image getImage(String path)
-	{
-		ImageRegistry registry = plugin.getImageRegistry();
-		Image image = registry.get(path);
-		if (image == null)
-		{
-			ImageDescriptor id = getImageDescriptor(path);
-			if (id == null)
-			{
-				return null;
-			}
-			registry.put(path, id);
-			image = registry.get(path);
-		}
-		return image;
-	}
-
-	public static ImageDescriptor getImageDescriptor(String path)
-	{
-		return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
-	}
-
 	@Override
 	protected void initializeImageRegistry(ImageRegistry reg)
 	{
 		reg.put(SNIPPET, imageDescriptorFromPlugin(PLUGIN_ID, SNIPPET));
 		reg.put(COMMAND, imageDescriptorFromPlugin(PLUGIN_ID, COMMAND));
-		reg.put(IBEAM_BLACK, imageDescriptorFromPlugin(PLUGIN_ID, IBEAM_BLACK));
-		reg.put(IBEAM_WHITE, imageDescriptorFromPlugin(PLUGIN_ID, IBEAM_WHITE));
 	}
 
 	public Image getImageFromImageRegistry(String imageID)

@@ -18,8 +18,6 @@ public class JSParseRootNode extends ParseRootNode
 {
 	private static final Symbol[] NO_SYMBOLS = new Symbol[0];
 
-	private JSScope _globals;
-
 	/**
 	 * JSParseRootNode
 	 */
@@ -63,16 +61,11 @@ public class JSParseRootNode extends ParseRootNode
 	 */
 	public JSScope getGlobals()
 	{
-		if (this._globals == null)
-		{
-			JSSymbolCollector s = new JSSymbolCollector();
+		JSSymbolCollector s = new JSSymbolCollector();
 
-			this.accept(s);
+		this.accept(s);
 
-			this._globals = s.getScope();
-		}
-
-		return this._globals;
+		return s.getScope();
 	}
 
 	/*

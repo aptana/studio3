@@ -10,6 +10,7 @@ package com.aptana.editor.common;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
@@ -20,18 +21,19 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.ui.texteditor.ResourceMarkerAnnotationModel;
 
 import com.aptana.core.build.IProblem;
+import com.aptana.core.util.ArrayUtil;
+import com.aptana.core.util.CollectionsUtil;
 
 /**
  * Annotation Model for {@link IProblem}s. This model is used to draw annotations on the editor for
- * problems/tasks/warnings foudn during reconcile.
+ * problems/tasks/warnings found during reconcile.
  * 
  * @author cwilliams
  */
-public class CommonAnnotationModel extends ResourceMarkerAnnotationModel
+public class CommonAnnotationModel extends ResourceMarkerAnnotationModel implements ICommonAnnotationModel
 {
 
 	private List<ProblemAnnotation> fGeneratedAnnotations;
-	private IProgressMonitor fProgressMonitor;
 
 	public CommonAnnotationModel(IResource resource)
 	{
@@ -39,28 +41,32 @@ public class CommonAnnotationModel extends ResourceMarkerAnnotationModel
 		fGeneratedAnnotations = new ArrayList<ProblemAnnotation>();
 	}
 
-	/**
-	 * Signals the end of problem reporting.
-	 * 
-	 * @param reportedProblems
-	 *            the problems to report
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.ICommonAnnotationModel#reportProblems(java.util.Map)
 	 */
-	public void reportProblems(Collection<IProblem> reportedProblems)
+	public void reportProblems(Map<String, Collection<IProblem>> map, IProgressMonitor monitor)
 	{
-		if (fProgressMonitor != null && fProgressMonitor.isCanceled())
+		if (monitor != null && monitor.isCanceled())
 		{
 			return;
 		}
 
 		boolean temporaryProblemsChanged = false;
 
-		// Forcibly remove marker annotations now that we've reconciled...
+		// Forcibly remove marker annotations of any particular type we're managing now that we've reconciled...
 		try
 		{
 			IMarker[] markers = retrieveMarkers();
-			for (IMarker marker : markers)
+			if (!ArrayUtil.isEmpty(markers))
 			{
-				removeMarkerAnnotation(marker);
+				for (IMarker marker : markers)
+				{
+					if (map.containsKey(marker.getType()))
+					{
+						removeMarkerAnnotation(marker);
+					}
+				}
 			}
 		}
 		catch (CoreException e)
@@ -70,39 +76,43 @@ public class CommonAnnotationModel extends ResourceMarkerAnnotationModel
 
 		synchronized (getLockObject())
 		{
-			if (fGeneratedAnnotations.size() > 0)
+			if (!CollectionsUtil.isEmpty(fGeneratedAnnotations))
 			{
 				temporaryProblemsChanged = true;
 				removeAnnotations(fGeneratedAnnotations, false, true);
 				fGeneratedAnnotations.clear();
 			}
 
-			if (reportedProblems != null)
+			if (!CollectionsUtil.isEmpty(map))
 			{
-
-				for (IProblem problem : reportedProblems)
+				for (Collection<IProblem> problems : map.values())
 				{
-
-					if (fProgressMonitor != null && fProgressMonitor.isCanceled())
+					if (!CollectionsUtil.isEmpty(problems))
 					{
-						break;
-					}
-
-					Position position = generatePosition(problem);
-					if (position != null)
-					{
-
-						try
+						for (IProblem problem : problems)
 						{
-							ProblemAnnotation annotation = new ProblemAnnotation(problem);
-							addAnnotation(annotation, position, false);
-							fGeneratedAnnotations.add(annotation);
 
-							temporaryProblemsChanged = true;
-						}
-						catch (BadLocationException x)
-						{
-							// ignore invalid position
+							if (monitor != null && monitor.isCanceled())
+							{
+								break;
+							}
+
+							Position position = generatePosition(problem);
+							if (position != null)
+							{
+								try
+								{
+									ProblemAnnotation annotation = new ProblemAnnotation(problem);
+									addAnnotation(annotation, position, false);
+									fGeneratedAnnotations.add(annotation);
+
+									temporaryProblemsChanged = true;
+								}
+								catch (BadLocationException x)
+								{
+									// ignore invalid position
+								}
+							}
 						}
 					}
 				}
@@ -129,10 +139,5 @@ public class CommonAnnotationModel extends ResourceMarkerAnnotationModel
 		}
 
 		return new Position(start, length);
-	}
-
-	public void setProgressMonitor(IProgressMonitor monitor)
-	{
-		fProgressMonitor = monitor;
 	}
 }

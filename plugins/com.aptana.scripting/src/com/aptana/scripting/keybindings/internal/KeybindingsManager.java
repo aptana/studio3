@@ -64,6 +64,7 @@ import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.progress.WorkbenchJob;
 import org.eclipse.ui.services.IEvaluationService;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.keybindings.ICommandElementsProvider;
@@ -688,7 +689,7 @@ public class KeybindingsManager implements LoadCycleListener
 						}
 						catch (NotDefinedException nde)
 						{
-							ScriptingActivator.logError(nde.getMessage(), nde);
+							IdeLog.logError(ScriptingActivator.getDefault(), nde.getMessage(), nde);
 						}
 					}
 				}
@@ -727,7 +728,7 @@ public class KeybindingsManager implements LoadCycleListener
 							}
 							catch (CommandException e)
 							{
-								ScriptingActivator.logError(e.getMessage(), e);
+								IdeLog.logError(ScriptingActivator.getDefault(), e.getMessage(), e);
 							}
 						}
 					}
@@ -767,7 +768,7 @@ public class KeybindingsManager implements LoadCycleListener
 									}
 									catch (CommandException ex)
 									{
-										ScriptingActivator.logError(ex.getMessage(), ex);
+										IdeLog.logError(ScriptingActivator.getDefault(), ex.getMessage(), ex);
 									}
 								}
 							}

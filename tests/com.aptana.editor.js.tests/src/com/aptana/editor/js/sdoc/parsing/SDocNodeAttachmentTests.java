@@ -40,6 +40,18 @@ public class SDocNodeAttachmentTests extends DocNodeAttachementTestBase
 		assertDescription(resource, xpath, description);
 	}
 
+	/**
+	 * APSTUD-4706
+	 */
+	public void testSDocOnObjectLiteralProperty2()
+	{
+		String resource = "sdoc/sdocOnObjectLiteralProperty2.js";
+		String xpath = "assign/invoke/arguments/object_literal/name_value_pair[1]/function";
+		String description = "Render the items that will import a sample project.";
+
+		assertDescription(resource, xpath, description);
+	}
+
 	public void testSDocOnAssignment()
 	{
 		String resource = "sdoc/sdocOnAssignment.js";

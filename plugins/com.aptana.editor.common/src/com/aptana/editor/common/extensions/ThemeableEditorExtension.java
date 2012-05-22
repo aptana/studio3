@@ -19,15 +19,9 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRulerColumn;
 import org.eclipse.jface.text.source.LineNumberRulerColumn;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Cursor;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.PaletteData;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.widgets.Caret;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
@@ -50,21 +44,6 @@ public class ThemeableEditorExtension
 	 * The original parent of the editor.
 	 */
 	private Composite fParent;
-
-	/**
-	 * Caret image (updated as needed with the color)
-	 */
-	private Image fCaretImage;
-
-	/**
-	 * Color of the cursor
-	 */
-	private RGB fCaretColor;
-
-	/**
-	 * Cursor which should have the color changed
-	 */
-	private Cursor fCursor;
 
 	/**
 	 * The line column
@@ -91,10 +70,13 @@ public class ThemeableEditorExtension
 
 	public void overrideThemeColors()
 	{
-		// TODO Extract the application of the theme to the sourceviewer/text widget and then re-use it in DisplayView.
-		overrideSelectionColor();
-		overrideCursor();
-		overrideCaretColor();
+		IThemeableEditor editor = this.fEditor.get();
+		if (editor != null)
+		{
+			ThemePlugin.getDefault().getControlThemerFactory().apply((Viewer) editor.getISourceViewer());
+		}
+
+		setCharacterPairColor(getThemeManager().getCurrentTheme().getCharacterPairColor());
 		overrideRulerColors();
 	}
 
@@ -152,20 +134,7 @@ public class ThemeableEditorExtension
 
 	public void dispose()
 	{
-		if (fCaretImage != null)
-		{
-			fCaretImage.dispose();
-			fCaretImage = null;
-		}
-
-		if (fCursor != null)
-		{
-			fCursor.dispose();
-			fCursor = null;
-		}
-
 		fLineColumn = null;
-		fCaretColor = null;
 		if (fEditor != null)
 		{
 			fEditor.clear();
@@ -185,142 +154,6 @@ public class ThemeableEditorExtension
 		return ThemePlugin.getDefault().getThemeManager();
 	}
 
-	private void overrideSelectionColor()
-	{
-		IThemeableEditor editor = this.fEditor.get();
-		if (editor == null)
-		{
-			return;
-		}
-		ISourceViewer sourceViewer = editor.getISourceViewer();
-		if (sourceViewer == null || sourceViewer.getTextWidget() == null)
-		{
-			return;
-		}
-
-		// Force selection color
-		Color existingSelectionBG = sourceViewer.getTextWidget().getSelectionBackground();
-		RGB selectionRGB = getThemeManager().getCurrentTheme().getSelectionAgainstBG();
-		if (!existingSelectionBG.getRGB().equals(selectionRGB))
-		{
-			sourceViewer.getTextWidget().setSelectionBackground(
-					ThemePlugin.getDefault().getColorManager().getColor(selectionRGB));
-		}
-
-		if (!Platform.getOS().equals(Platform.OS_MACOSX))
-		{
-			// Linux and windows need selection fg set or we just see a block of color.
-			sourceViewer.getTextWidget().setSelectionForeground(
-					ThemePlugin.getDefault().getColorManager()
-							.getColor(getThemeManager().getCurrentTheme().getForeground()));
-		}
-	}
-
-	private void overrideCursor()
-	{
-		IThemeableEditor editor = this.fEditor.get();
-		if (editor == null)
-		{
-			return;
-		}
-		ISourceViewer sourceViewer = editor.getISourceViewer();
-		if (sourceViewer.getTextWidget() == null)
-			return;
-
-		Image cursorImage = null;
-		if (getThemeManager().getCurrentTheme().hasDarkBG())
-		{
-			cursorImage = CommonEditorPlugin.getImage(CommonEditorPlugin.IBEAM_WHITE);
-		}
-		else
-		{
-			cursorImage = CommonEditorPlugin.getImage(CommonEditorPlugin.IBEAM_BLACK);
-		}
-
-		Display display = sourceViewer.getTextWidget().getDisplay();
-		Cursor oldCursor = fCursor;
-
-		fCursor = new Cursor(display, cursorImage.getImageData(), 7, 11);
-		sourceViewer.getTextWidget().setCursor(fCursor);
-
-		if (oldCursor != null)
-		{
-			oldCursor.dispose();
-		}
-	}
-
-	private void overrideCaretColor()
-	{
-		IThemeableEditor editor = this.fEditor.get();
-		if (editor == null)
-		{
-			return;
-		}
-		ISourceViewer sourceViewer = editor.getISourceViewer();
-		if (sourceViewer.getTextWidget() == null)
-			return;
-
-		Caret caret = sourceViewer.getTextWidget().getCaret();
-		RGB caretColor = getThemeManager().getCurrentTheme().getCaret();
-		if (caretColor == null)
-			return;
-
-		// Set the character pair matching color to this
-		setCharacterPairColor(getThemeManager().getCurrentTheme().getCharacterPairColor());
-
-		// This is an ugly hack. Setting a black image doesn't work for some reason, but setting no image will cause it
-		// to be black.
-		if (caretColor.equals(new RGB(0, 0, 0)))
-		{
-			caret.setImage(null);
-			return;
-		}
-
-		// Shortcut for when color is same, don't do any heavy lifting
-		if (this.fCaretImage != null && fCaretColor.equals(caretColor))
-			return;
-
-		int x = caret.getSize().x;
-		int y = caret.getSize().y;
-		// Apparently the current caret may have invalid sizings
-		// that will cause errors when an attempt to
-		// change the color is made. So perform the check and catch
-		// errors and exceptions so caret coloring
-		// doesn't affect opening the editor.
-		if (x > 0 && y > 0)
-		{
-			try
-			{
-				PaletteData data;
-				if (getThemeManager().getCurrentTheme().hasDarkBG())
-				{
-					data = new PaletteData(new RGB[] { caretColor });
-				}
-				else
-				{
-					RGB inverted = new RGB(255 - caretColor.red, 255 - caretColor.green, 255 - caretColor.blue);
-					data = new PaletteData(new RGB[] { inverted });
-				}
-				ImageData iData = new ImageData(x, y, 1, data);
-				caret.setImage(null);
-				if (this.fCaretImage != null)
-				{
-					this.fCaretImage.dispose();
-					this.fCaretImage = null;
-				}
-				this.fCaretImage = new Image(caret.getDisplay(), iData);
-				caret.setImage(this.fCaretImage);
-				fCaretColor = caretColor;
-			}
-			catch (Error e)
-			{
-			}
-			catch (Exception e)
-			{
-			}
-		}
-	}
-
 	@SuppressWarnings("unchecked")
 	private void overrideRulerColors()
 	{
@@ -328,7 +161,10 @@ public class ThemeableEditorExtension
 
 		// Use normal parent gray bg
 		if (fParent == null || fLineColumn == null)
+		{
 			return;
+		}
+
 		fLineColumn.setBackground(fParent.getBackground());
 		// force the colors for all the ruler columns (specifically so we force the folding bg to match).
 		Iterator<IVerticalRulerColumn> iter = ((CompositeRuler) editor.getIVerticalRuler()).getDecoratorIterator();

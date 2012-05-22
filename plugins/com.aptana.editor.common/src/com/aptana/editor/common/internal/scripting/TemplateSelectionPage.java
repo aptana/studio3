@@ -38,6 +38,7 @@ import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.scripting.model.TemplateElement;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * Wizard page for selecting a file template when creating a new generic file. This wizard looks into the file extension
@@ -294,7 +295,7 @@ public class TemplateSelectionPage extends WizardPage implements ISelectionChang
 
 		public Image getColumnImage(Object obj, int index)
 		{
-			return CommonEditorPlugin.getImage(TEMPLATE_IMAGE_PATH);
+			return UIUtils.getImage(CommonEditorPlugin.getDefault(), TEMPLATE_IMAGE_PATH);
 		}
 	}
 

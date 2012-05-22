@@ -9,6 +9,7 @@ package com.aptana.index.core;
 
 import java.net.URI;
 import java.text.MessageFormat;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -23,9 +24,11 @@ import org.eclipse.core.runtime.jobs.Job;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.index.core.build.BuildContext;
+import com.aptana.index.core.filter.IIndexFilterParticipant;
 
 abstract class IndexRequestJob extends Job
 {
+	public static final String INDEX_REQUEST_JOB_FAMILY = "index-request-job-family";
 
 	private URI containerURI;
 
@@ -61,15 +64,7 @@ abstract class IndexRequestJob extends Job
 	@Override
 	public boolean belongsTo(Object family)
 	{
-		if (getContainerURI() == null)
-		{
-			return family == null;
-		}
-		if (family == null)
-		{
-			return false;
-		}
-		return getContainerURI().equals(family);
+		return (family == INDEX_REQUEST_JOB_FAMILY);
 	}
 
 	/**
@@ -81,9 +76,14 @@ abstract class IndexRequestJob extends Job
 	{
 		if (!CollectionsUtil.isEmpty(fileStores))
 		{
-			for (IIndexFilterParticipant filterParticipant : getIndexManager().getFilterParticipants())
+			IndexManager manager = getIndexManager();
+
+			if (manager != null)
 			{
-				fileStores = filterParticipant.applyFilter(fileStores);
+				for (IIndexFilterParticipant filterParticipant : manager.getFilterParticipants())
+				{
+					fileStores = filterParticipant.applyFilter(fileStores);
+				}
 			}
 		}
 
@@ -109,14 +109,18 @@ abstract class IndexRequestJob extends Job
 	protected Set<IFileStore> getContributedFiles(URI container)
 	{
 		Set<IFileStore> result = new HashSet<IFileStore>();
+		IndexManager manager = getIndexManager();
 
-		for (IIndexFileContributor contributor : getIndexManager().getFileContributors())
+		if (manager != null)
 		{
-			Set<IFileStore> files = contributor.getFiles(container);
-
-			if (!CollectionsUtil.isEmpty(files))
+			for (IIndexFileContributor contributor : manager.getFileContributors())
 			{
-				result.addAll(files);
+				Set<IFileStore> files = contributor.getFiles(container);
+
+				if (!CollectionsUtil.isEmpty(files))
+				{
+					result.addAll(files);
+				}
 			}
 		}
 
@@ -130,12 +134,21 @@ abstract class IndexRequestJob extends Job
 	 */
 	protected Index getIndex()
 	{
-		return getIndexManager().getIndex(getContainerURI());
+		IndexManager manager = getIndexManager();
+
+		return (manager != null) ? manager.getIndex(getContainerURI()) : null;
 	}
 
+	/**
+	 * getIndexManager
+	 * 
+	 * @return
+	 */
 	protected IndexManager getIndexManager()
 	{
-		return IndexPlugin.getDefault().getIndexManager();
+		IndexPlugin plugin = IndexPlugin.getDefault();
+
+		return (plugin != null) ? plugin.getIndexManager() : null;
 	}
 
 	/**
@@ -210,7 +223,13 @@ abstract class IndexRequestJob extends Job
 
 	protected List<IFileStoreIndexingParticipant> getIndexParticipants(IFileStore file)
 	{
-		return getIndexManager().getIndexParticipants(file.getName());
+		IndexManager indexManager = getIndexManager();
+		if (indexManager != null)
+		{
+			return indexManager.getIndexParticipants(file.getName());
+		}
+
+		return Collections.emptyList();
 	}
 
 }

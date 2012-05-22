@@ -10,6 +10,7 @@ package com.aptana.theme;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -28,6 +29,9 @@ import com.aptana.theme.preferences.IPreferenceConstants;
  */
 public class ThemePlugin extends AbstractUIPlugin
 {
+
+	public static final String IBEAM_BLACK = "/icons/ibeam-black.gif"; //$NON-NLS-1$
+	public static final String IBEAM_WHITE = "/icons/ibeam-white.gif"; //$NON-NLS-1$
 
 	/**
 	 * This listens for changes to the editor FG/BG/line highlight/selection colors from Eclipse's pref page. if
@@ -213,6 +217,13 @@ public class ThemePlugin extends AbstractUIPlugin
 			plugin = null;
 			super.stop(context);
 		}
+	}
+
+	@Override
+	protected void initializeImageRegistry(ImageRegistry reg)
+	{
+		reg.put(IBEAM_BLACK, imageDescriptorFromPlugin(PLUGIN_ID, IBEAM_BLACK));
+		reg.put(IBEAM_WHITE, imageDescriptorFromPlugin(PLUGIN_ID, IBEAM_WHITE));
 	}
 
 	/**

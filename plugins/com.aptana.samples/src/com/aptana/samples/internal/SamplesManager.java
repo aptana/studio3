@@ -13,6 +13,7 @@ import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,14 +30,18 @@ import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.samples.IDebugScopes;
 import com.aptana.samples.ISampleListener;
 import com.aptana.samples.ISamplesManager;
 import com.aptana.samples.SamplesPlugin;
 import com.aptana.samples.model.SampleCategory;
 import com.aptana.samples.model.SamplesReference;
+import com.aptana.scripting.model.AbstractElement;
 import com.aptana.scripting.model.BundleManager;
+import com.aptana.scripting.model.ElementVisibilityListener;
 import com.aptana.scripting.model.LoadCycleListener;
 import com.aptana.scripting.model.ProjectSampleElement;
+import com.aptana.scripting.model.filters.IModelFilter;
 
 public class SamplesManager implements ISamplesManager
 {
@@ -105,6 +110,26 @@ public class SamplesManager implements ISamplesManager
 		}
 	};
 
+	private ElementVisibilityListener elementListener = new ElementVisibilityListener()
+	{
+
+		public void elementBecameHidden(AbstractElement element)
+		{
+			if (element instanceof ProjectSampleElement)
+			{
+				loadBundleSampleElements();
+			}
+		}
+
+		public void elementBecameVisible(AbstractElement element)
+		{
+			if (element instanceof ProjectSampleElement)
+			{
+				addSample((ProjectSampleElement) element);
+			}
+		}
+	};
+
 	public SamplesManager()
 	{
 		categories = new HashMap<String, SampleCategory>();
@@ -119,6 +144,7 @@ public class SamplesManager implements ISamplesManager
 		loadBundleSampleElements();
 
 		BundleManager.getInstance().addLoadCycleListener(loadCycleListener);
+		BundleManager.getInstance().addElementVisibilityListener(elementListener);
 	}
 
 	public List<SampleCategory> getCategories()
@@ -199,6 +225,12 @@ public class SamplesManager implements ISamplesManager
 			bundleSamplesById.put(id, sample);
 
 			fireSampleAdded(sample);
+		}
+		else
+		{
+			IdeLog.logWarning(SamplesPlugin.getDefault(),
+					MessageFormat.format("No category ''{0}'' exists", categoryId), //$NON-NLS-1$
+					IDebugScopes.MANAGER);
 		}
 	}
 
@@ -374,7 +406,14 @@ public class SamplesManager implements ISamplesManager
 
 	private void loadBundleSampleElements()
 	{
-		List<ProjectSampleElement> elements = BundleManager.getInstance().getProjectSamples(null);
+		List<ProjectSampleElement> elements = BundleManager.getInstance().getProjectSamples(new IModelFilter()
+		{
+			public boolean include(AbstractElement element)
+			{
+				return (element instanceof ProjectSampleElement);
+			}
+		});
+		Collections.sort(elements);
 		// only reloads the samples from rubles if there has been a difference
 		if (elements.isEmpty() || bundleSamples.equals(elements))
 		{
@@ -400,6 +439,12 @@ public class SamplesManager implements ISamplesManager
 
 	private void fireSampleAdded(SamplesReference sample)
 	{
+		if (IdeLog.isInfoEnabled(SamplesPlugin.getDefault(), IDebugScopes.MANAGER))
+		{
+			IdeLog.logInfo(
+					SamplesPlugin.getDefault(),
+					MessageFormat.format("Added sample: id = {0}; name = {1}", sample.getId(), sample.getName()), IDebugScopes.MANAGER); //$NON-NLS-1$
+		}
 		for (ISampleListener listener : sampleListeners)
 		{
 			listener.sampleAdded(sample);
@@ -408,6 +453,12 @@ public class SamplesManager implements ISamplesManager
 
 	private void fireSampleRemoved(SamplesReference sample)
 	{
+		if (IdeLog.isInfoEnabled(SamplesPlugin.getDefault(), IDebugScopes.MANAGER))
+		{
+			IdeLog.logInfo(
+					SamplesPlugin.getDefault(),
+					MessageFormat.format("Removed sample: id = {0}; name = {1}", sample.getId(), sample.getName()), IDebugScopes.MANAGER); //$NON-NLS-1$
+		}
 		for (ISampleListener listener : sampleListeners)
 		{
 			listener.sampleRemoved(sample);

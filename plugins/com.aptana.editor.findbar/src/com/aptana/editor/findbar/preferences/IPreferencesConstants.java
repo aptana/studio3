@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.findbar.preferences;
 
 import com.aptana.editor.findbar.FindBarPlugin;
@@ -41,6 +41,9 @@ public interface IPreferencesConstants
 
 	public static final String CASE_SENSITIVE_IN_FIND_BAR = FindBarPlugin.PLUGIN_ID + ".caseSensitiveFindBar"; //$NON-NLS-1$
 
-
 	public static final String WHOLE_WORD_IN_FIND_BAR = FindBarPlugin.PLUGIN_ID + ".wholeWordFindBar"; //$NON-NLS-1$
+
+	public static final String MATCH_COUNT_IN_FIND_BAR = FindBarPlugin.PLUGIN_ID + ".matchCount"; //$NON-NLS-1$
+
+	public static final String SCOPE_IN_FIND_BAR = FindBarPlugin.PLUGIN_ID + ".scope"; //$NON-NLS-1$
 }

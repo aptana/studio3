@@ -1,0 +1,26 @@
+# Run example to create a project with versions, components, and issues
+# Example command line:
+#     jira --action run --file runExample.txt --findReplace @project@:XYZ,@user@:automation --continue
+
+# Remove project
+--action deleteProject --project @project@
+
+# Create project
+--action createProject --project @project@ --name "@project@ test" --description "@project@ test" --lead @user@
+--action updateProject --project @project@ --permissionScheme "Restrict create issue"
+
+# Versions
+--action addVersion --project @project@ --name "V1"
+--action addVersion --project @project@ --name "V2"
+
+# Components
+--action addComponent --project @project@ --name "C1"
+--action addComponent --project @project@ --name "C2"
+
+# Issues
+--action createIssue --project @project@ --type "1" --summary "summary text" --assignee @user@ --affectsVersions "V1, V2" --components "C1"
+--action createIssue --project @project@ --type "Sub-task" --summary "subtask summary text" --parent @issue@ --comment "Subtask comment"
+
+# Attachments - add attachment to previously created issue and subtask
+--action addAttachment --issue @issue@ --file "src/itest/resources/data.txt"
+--action addAttachment --issue @subtask@ --file "src/itest/resources/data.txt"

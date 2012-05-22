@@ -10,7 +10,7 @@ package com.aptana.explorer.internal.ui;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.expressions.EvaluationContext;
+import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
@@ -33,7 +33,7 @@ public class SearchTextHandler extends AbstractHandler implements IExecutableExt
 	{
 		if (commandId != null)
 		{
-			EvaluationContext evaluationContext = (EvaluationContext) event.getApplicationContext();
+			IEvaluationContext evaluationContext = (IEvaluationContext) event.getApplicationContext();
 			Object focusControlObject = evaluationContext.getVariable(ISources.ACTIVE_FOCUS_CONTROL_NAME);
 			if (focusControlObject instanceof Text)
 			{

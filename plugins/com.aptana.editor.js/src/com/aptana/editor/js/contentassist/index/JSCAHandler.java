@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 import org.eclipse.core.runtime.Platform;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
@@ -236,12 +237,35 @@ public class JSCAHandler implements IContextHandler
 			case TYPE:
 				// grab namespace
 				String typeName = currentType.getName();
+				String namespace = getNamespace(typeName);
 
 				// hide property
 				setIsInternal(typeName, currentType.isInternal());
 
 				// potentially hide all segments up to this one
-				hideNamespace(getNamespace(typeName));
+				hideNamespace(namespace);
+
+				// transfer user agents
+				TypeElement namespaceType = getType(namespace);
+
+				if (namespaceType != null)
+				{
+					String propertyName = typeName.substring(namespace.length() + 1);
+					PropertyElement property = namespaceType.getProperty(propertyName);
+
+					if (property != null)
+					{
+						List<UserAgentElement> userAgents = currentType.getUserAgents();
+
+						if (!CollectionsUtil.isEmpty(userAgents))
+						{
+							for (UserAgentElement userAgent : userAgents)
+							{
+								property.addUserAgent(userAgent);
+							}
+						}
+					}
+				}
 
 				// NOTE: Setting name on type already puts it into the typesByName hash, so we don't have
 				// to do anything else here
@@ -488,6 +512,10 @@ public class JSCAHandler implements IContextHandler
 
 			case BOOLEAN:
 				currentBoolean = (Boolean) value;
+				break;
+
+			case JSMETADATA:
+				// no-op, occurs at beginning of JSCA file only
 				break;
 
 			default:

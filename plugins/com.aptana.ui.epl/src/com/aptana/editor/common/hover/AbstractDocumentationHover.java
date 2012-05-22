@@ -318,7 +318,7 @@ public abstract class AbstractDocumentationHover extends AbstractCommonTextHover
 		}
 		if (useHTMLTags)
 		{
-			buffer.append("<div class=\"header\""); //$NON-NLS-1$
+			buffer.append("<div class=\"header\">"); //$NON-NLS-1$
 			HTMLPrinter.addSmallHeader(buffer, header);
 			buffer.append("</div>"); //$NON-NLS-1$
 		}

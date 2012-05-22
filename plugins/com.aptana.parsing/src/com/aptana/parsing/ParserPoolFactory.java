@@ -7,7 +7,6 @@
  */
 package com.aptana.parsing;
 
-import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -18,16 +17,13 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.content.IContentTypeManager;
 
-import com.aptana.core.epl.util.LRUCache;
-import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.internal.parsing.ParserPool;
-import com.aptana.parsing.ast.IParseError;
 import com.aptana.parsing.ast.IParseRootNode;
 
-public class ParserPoolFactory
+public class ParserPoolFactory implements ParsingEngine.IParserPoolProvider
 {
 	// extension point constants
 	private static final String PARSER_ID = "parser"; //$NON-NLS-1$
@@ -35,13 +31,9 @@ public class ParserPoolFactory
 	private static final String ATTR_CONTENT_TYPE = "content-type"; //$NON-NLS-1$
 
 	private static ParserPoolFactory INSTANCE;
-	/**
-	 * A parse cache. Keyed by combo of content type and source hash, holds IParseRootNode result. Retains most recently
-	 * used ASTs.
-	 */
-	private LRUCache<String, IParseState> fParseCache;
 	private Map<String, IConfigurationElement> parsers;
 	private Map<String, IParserPool> pools;
+	private final ParsingEngine fParsingEngine;
 
 	/**
 	 * Singleton!
@@ -97,7 +89,7 @@ public class ParserPoolFactory
 	 */
 	private ParserPoolFactory()
 	{
-		fParseCache = new LRUCache<String, IParseState>(3);
+		fParsingEngine = new ParsingEngine(this);
 	}
 
 	/**
@@ -105,11 +97,7 @@ public class ParserPoolFactory
 	 */
 	synchronized void dispose()
 	{
-		if (fParseCache != null)
-		{
-			fParseCache.flush();
-			fParseCache = null;
-		}
+		fParsingEngine.dispose();
 
 		if (pools != null)
 		{
@@ -222,7 +210,7 @@ public class ParserPoolFactory
 	 */
 	public static IParseRootNode parse(String contentTypeId, String source, int startingOffset, IProgressMonitor monitor)
 			throws Exception // $codepro.audit.disable
-																														// declaredExceptions
+								// declaredExceptions
 	{
 		ParseState parseState = new ParseState();
 		parseState.setEditState(source, startingOffset);
@@ -254,68 +242,6 @@ public class ParserPoolFactory
 	private IParseRootNode doParse(String contentTypeId, IParseState parseState) throws Exception // $codepro.audit.disable
 																									// declaredExceptions
 	{
-		try
-		{
-			if (contentTypeId == null)
-			{
-				return null;
-			}
-
-			int sourceHash = parseState.getSource().hashCode();
-			String key = MessageFormat.format("{0}:{1}", contentTypeId, sourceHash); //$NON-NLS-1$
-			IParseState cached = fParseCache.get(key);
-			if (cached != null && !cached.requiresReparse(parseState))
-			{
-				// copy over errors from old parse state to new one since we're not re-parsing
-				for (IParseError error : cached.getErrors())
-				{
-					parseState.addError(error);
-				}
-				return cached.getParseResult();
-			}
-
-			IParserPool pool = getParserPool(contentTypeId);
-			if (pool != null)
-			{
-				IParser parser = pool.checkOut();
-
-				if (parser != null)
-				{
-					try
-					{
-						IParseRootNode ast = parser.parse(parseState);
-						parseState.setParseResult(ast);
-						fParseCache.put(key, parseState);
-						return ast;
-					}
-					finally
-					{
-						pool.checkIn(parser);
-					}
-				}
-				else
-				{
-					String message = MessageFormat.format(Messages.ParserPoolFactory_Cannot_Acquire_Parser,
-							contentTypeId);
-					IdeLog.logError(ParsingPlugin.getDefault(), message, IDebugScopes.PARSING);
-				}
-			}
-			else
-			{
-				if (IdeLog.isInfoEnabled(ParsingPlugin.getDefault(), null))
-				{
-					String message = MessageFormat.format(Messages.ParserPoolFactory_Cannot_Acquire_Parser_Pool,
-							contentTypeId);
-					IdeLog.logInfo(ParsingPlugin.getDefault(), message, IDebugScopes.PARSING);
-				}
-			}
-		}
-		finally
-		{
-			// Clean up source inside parse state to help reduce RAM usage...
-			parseState.clearEditState();
-		}
-
-		return null;
+		return fParsingEngine.parse(contentTypeId, parseState);
 	}
 }

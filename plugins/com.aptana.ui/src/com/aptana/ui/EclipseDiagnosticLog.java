@@ -9,9 +9,9 @@ package com.aptana.ui;
 
 import org.eclipse.core.runtime.Platform;
 
+import com.aptana.core.diagnostic.IDiagnosticLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
-import com.aptana.ui.diagnostic.IDiagnosticLog;
 
 public class EclipseDiagnosticLog implements IDiagnosticLog
 {

@@ -10,6 +10,7 @@ package com.aptana.editor.js.index;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
@@ -21,6 +22,8 @@ import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 
+import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.index.JSCAFileIndexingParticipant;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
@@ -213,6 +216,42 @@ public class JSCAIndexingTests extends JSEditorBasedTests
 
 		assertFalse("SimpleType should not exist in the proposal list", names.contains("SimpleType"));
 		assertTrue("SimpleType2 does not exist in the proposal list", names.contains("SimpleType2"));
+	}
+
+	/**
+	 * Test for TISTUD-1327
+	 * 
+	 * @throws CoreException
+	 */
+	public void testTypeUserAgentsOnProperty() throws CoreException
+	{
+		Index index = indexResource("metadata/userAgentOnType.jsca");
+
+		// make sure target type exists
+		List<TypeElement> tiAPI = queryHelper.getTypes(index, "Titanium.API", false);
+		assertNotNull("There should be at least one type for Titanium.API", tiAPI);
+		assertTrue("There should be one type for Titanium.API", tiAPI.size() == 1);
+
+		// confirm parent type exists
+		List<TypeElement> ti = queryHelper.getTypes(index, "Titanium", true);
+		assertNotNull("There should be at least one type for Titanium", ti);
+		assertTrue("There should be one type for Titanium", ti.size() == 1);
+
+		// grab property for Titanium.API
+		TypeElement t = ti.get(0);
+		PropertyElement p = t.getProperty("API");
+		assertNotNull(p);
+
+		Set<String> uas = CollectionsUtil.newSet("android", "iphone", "ipad", "mobileweb");
+		List<String> missing = new ArrayList<String>();
+		for (String ua : p.getUserAgentNames())
+		{
+			if (!uas.contains(ua))
+			{
+				missing.add(ua);
+			}
+		}
+		assertTrue("The following user agents were missing: " + StringUtil.join(", ", missing), missing.isEmpty());
 	}
 
 	protected IndexManager getIndexManager()

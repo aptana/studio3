@@ -4,6 +4,7 @@
    <extension-point id="propertyDialogs" name="%extension-point.propertydialogs.name" schema="schema/propertyDialogs.exsd"/>
    <extension-point id="imageAssociations" name="%extension-point.imageassociations.name" schema="schema/imageAssociations.exsd"/>
    <extension-point id="diagnostic" name="%extension-point.diagnostic.name" schema="schema/diagnostic.exsd"/>
+   <extension-point id="accountsPreferencePage" name="%extension-point.accounts.name" schema="schema/accountsPreferencePage.exsd"/>
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
@@ -284,6 +285,12 @@
             class="com.aptana.ui.preferences.TroubleshootingPreferencePage"
             id="com.aptana.ui.TroubleshootingPreferencePage"
             name="%page.troubleshooting.name">
+      </page>
+      <page
+            category="com.aptana.ui.AptanaPreferencePage"
+            class="com.aptana.ui.preferences.AccountsPreferencePage"
+            id="com.aptana.ui.accountsPreferencePage"
+            name="%page.accounts.name">
       </page>
    </extension>
    <extension

@@ -570,7 +570,8 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate
 
 	protected void startServerIfNecessary(IServer server, String mode, IProgressMonitor monitor) throws CoreException
 	{
-		if (server.getState() != State.STARTED && server.getState() != State.STARTING)
+		if (ILaunchManager.RUN_MODE.equals(mode) && server.getState() != State.STARTED
+				&& server.getState() != State.STARTING)
 		{
 			IStatus result = server.start(mode, monitor);
 			if (!result.isOK())

@@ -368,6 +368,12 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="COMMAND+ALT+O">
       </key>
+      <key
+            commandId="com.aptana.editor.common.gotoMatchingBracket"
+            contextId="com.aptana.editor.context"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+P">
+      </key>
    </extension>
    <extension
          point="org.eclipse.ui.contexts">
@@ -496,6 +502,12 @@
                class="org.eclipse.ui.handlers.RegistryToggleState:true"
                id="org.eclipse.ui.commands.toggleState">
          </state>
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.textEditor"
+            description="%command.gotomatchingbracket.description"
+            id="com.aptana.editor.common.gotoMatchingBracket"
+            name="%command.gotomatchingbracket.name">
       </command>
    </extension>
    <extension
@@ -645,9 +657,22 @@
       <page
             category="com.aptana.ui.AptanaPreferencePage"
             class="com.aptana.editor.common.preferences.ContentAssistPreferencePage"
-            id="com.aptana.editor.common.contentassist"
+            id="com.aptana.editor.common.contentAssistPreferencePage"
             name="%content.assist.pref.page.title">
       </page>            
+   </extension>
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            class="com.aptana.editor.common.preferences.ContentAssistPreferencePage"
+            id="com.aptana.editor.common.contentAssistPropertyPage"
+            name="%content.assist.pref.page.title">
+         <enabledWhen>
+            <instanceof
+                  value="org.eclipse.core.resources.IProject">
+            </instanceof>
+         </enabledWhen>
+      </page>
    </extension>
    <extension
          point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectors">
@@ -747,5 +772,20 @@
       <factory
             contentTypeId="org.eclipse.core.runtime.text"
             class="com.aptana.editor.common.CommonAnnotationModelFactory"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="com.aptana.editor.common.internal.handlers.GotoMatchingBracketHandler"
+            commandId="com.aptana.editor.common.gotoMatchingBracket">
+         <enabledWhen>
+            <with
+                  variable="activePart">
+               <instanceof
+                     value="com.aptana.editor.common.AbstractThemeableEditor">
+               </instanceof>
+            </with>
+         </enabledWhen>
+      </handler>
    </extension>
 </plugin>

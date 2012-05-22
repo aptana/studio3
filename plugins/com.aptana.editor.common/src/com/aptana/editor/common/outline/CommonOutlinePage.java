@@ -58,6 +58,7 @@ import com.aptana.parsing.lexer.IRange;
 import com.aptana.theme.IControlThemerFactory;
 import com.aptana.theme.ThemePlugin;
 import com.aptana.theme.ThemedDelegatingLabelProvider;
+import com.aptana.ui.util.UIUtils;
 
 public class CommonOutlinePage extends ContentOutlinePage implements IPropertyChangeListener
 {
@@ -85,7 +86,7 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 			setText(Messages.CommonOutlinePage_Sorting_LBL);
 			setToolTipText(Messages.CommonOutlinePage_Sorting_TTP);
 			setDescription(Messages.CommonOutlinePage_Sorting_Description);
-			setImageDescriptor(CommonEditorPlugin.getImageDescriptor(ICON_PATH));
+			setImageDescriptor(UIUtils.getImageDescriptor(CommonEditorPlugin.PLUGIN_ID, ICON_PATH));
 
 			setChecked(isSortingEnabled());
 		}
@@ -113,6 +114,26 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 	private ToggleLinkingAction fToggleLinkingAction;
 
 	private IPreferenceStore fPrefs;
+	private ModifyListener fSearchModifyListener = new ModifyListener()
+	{
+
+		public void modifyText(ModifyEvent e)
+		{
+			String text = fSearchBox.getText();
+
+			if (INITIAL_FILTER_TEXT.equals(text))
+			{
+				fFilter.setPattern(null);
+			}
+			else
+			{
+				fFilter.setPattern(text);
+			}
+			// refresh the content on a delay
+			fFilterRefreshJob.cancel();
+			fFilterRefreshJob.schedule(FILTER_REFRESH_DELAY);
+		}
+	};
 
 	public CommonOutlinePage(AbstractThemeableEditor editor, IPreferenceStore prefs)
 	{
@@ -133,25 +154,7 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		fSearchBox.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).indent(0, 3).create());
 		fSearchBox.setText(INITIAL_FILTER_TEXT);
 		fSearchBox.setForeground(fSearchBox.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-		fSearchBox.addModifyListener(new ModifyListener()
-		{
-
-			public void modifyText(ModifyEvent e)
-			{
-				String text = fSearchBox.getText();
-				if (INITIAL_FILTER_TEXT.equals(text))
-				{
-					fFilter.setPattern(null);
-				}
-				else
-				{
-					fFilter.setPattern(text);
-				}
-				// refresh the content on a delay
-				fFilterRefreshJob.cancel();
-				fFilterRefreshJob.schedule(FILTER_REFRESH_DELAY);
-			}
-		});
+		fSearchBox.addModifyListener(fSearchModifyListener);
 		fSearchBox.addFocusListener(new FocusListener()
 		{
 
@@ -159,7 +162,9 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 			{
 				if (fSearchBox.getText().length() == 0)
 				{
+					fSearchBox.removeModifyListener(fSearchModifyListener);
 					fSearchBox.setText(INITIAL_FILTER_TEXT);
+					fSearchBox.addModifyListener(fSearchModifyListener);
 				}
 				fSearchBox.setForeground(fSearchBox.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 			}
@@ -168,7 +173,9 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 			{
 				if (fSearchBox.getText().equals(INITIAL_FILTER_TEXT))
 				{
-					fSearchBox.setText(""); //$NON-NLS-1$
+					fSearchBox.removeModifyListener(fSearchModifyListener);
+					fSearchBox.setText(StringUtil.EMPTY);
+					fSearchBox.addModifyListener(fSearchModifyListener);
 				}
 				fSearchBox.setForeground(null);
 			}
@@ -181,7 +188,6 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		((IContextService) getSite().getService(IContextService.class)).activateContext(OUTLINE_CONTEXT);
 
 		final TreeViewer viewer = getTreeViewer();
-		viewer.setAutoExpandLevel(2);
 		viewer.setUseHashlookup(true);
 		viewer.setContentProvider(fContentProvider);
 		viewer.setLabelProvider(fLabelProvider);
@@ -340,9 +346,9 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 	@Override
 	public void dispose()
 	{
-		getIControlThemerFactory().dispose(getTreeViewer());
 		fPrefs.removePropertyChangeListener(this);
 		super.dispose();
+		getIControlThemerFactory().dispose(getTreeViewer());
 	}
 
 	@Override

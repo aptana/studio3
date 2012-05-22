@@ -28,7 +28,9 @@ import com.aptana.editor.css.parsing.ast.CSSExpressionNode;
 import com.aptana.editor.css.parsing.ast.CSSFontFaceNode;
 import com.aptana.editor.css.parsing.ast.CSSFunctionNode;
 import com.aptana.editor.css.parsing.ast.CSSImportNode;
+import com.aptana.editor.css.parsing.ast.CSSList;
 import com.aptana.editor.css.parsing.ast.CSSMediaNode;
+import com.aptana.editor.css.parsing.ast.CSSMozDocument;
 import com.aptana.editor.css.parsing.ast.CSSNamespaceNode;
 import com.aptana.editor.css.parsing.ast.CSSNode;
 import com.aptana.editor.css.parsing.ast.CSSPageNode;
@@ -43,10 +45,10 @@ import com.aptana.editor.css.parsing.ast.CSSTextNode;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.ast.IParseError;
+import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.ast.ParseError;
 import com.aptana.parsing.ast.ParseRootNode;
-import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.util.ParseUtil;
 
 /**
@@ -58,37 +60,39 @@ public class CSSParser extends Parser implements IParser
 {
 
 	static final ParsingTables PARSING_TABLES = new ParsingTables(
-			"U9pDLcTuL4KKFM#J3Pe4H4H4n12g69OGIaZ144921r4HKEo5ee8AIkyXzDvxxxqNmO856zW"
-					+ "LEm8gebXG4K7Kwvdx9d6pkqYGFxpzpjmxy#wvPShR0Jn968y9c8L9c8B9c8ffc8wPc869c8"
-					+ "svc8VvM825M8J5M88vM8hbM86LM8LbM8qrM8Thi1RhiG6Ri16RiGLRiUq2FHOEuN4qib42G"
-					+ "z0CcHYEHr04O$00nk9oXCEB21J29RWKaOX24YqUWmUrqHsFuaaKHR9qHmgkG3og8G7LKGCr"
-					+ "KGk9g8TYAAuU6oghB3B8kWhfg8$haOoIPBKCmQg4vhWIBR0TuvINWLBa6LOvf95t7Ncn8NY"
-					+ "fQ62ZLKKMofFdGqNbDTNwibbVPvcYzLMszTK9gYzLRQ#bRLLKKLkVseQXKP2jiMpiDsjzhM"
-					+ "M$G4lv6pcu4KCvSyRMdJcJRpQ6QQGi6#aXt8IRKGRHk1gjqGxtuZ8HSczGRa$EdijjmzcxW"
-					+ "zp#682168J1Ecjtea9#BfbtA$DnbBRC9nZt7ZBlm$sCMrTvFivsfo1cAsN68SOltrGoksY#"
-					+ "XklZ$FdGBO1frgm9Ud3Duj1B$ISphnJq3bepOzb79j7INRSkjBm5AJ8nfALvSYr1orlf4mM"
-					+ "oR1lICWTtQON8crLmLdDOeJkAl57aZQRcZPhwmL4VMrCZE8Tkn17KRrTM76vJEH8FiitDPn"
-					+ "JQ1p3Cqv5x0TmB7HZbOUu5Duf$7kvxyvZtheSAURAPrjqL3izcMD1EZUQfByArASeJNOndj"
-					+ "JXFM0dMNPBhLehVcDBSyJ5SnrYUqd8yEnLuSYhnf5NcIRqmZzuG7gjoBHokXV5irYAAgvN4"
-					+ "TJAdhmxtUXhdDfqdEaCjmhdll3Po5cCtP#oe4B6R4cwkfetGs5uREvA$Q7eAPlcOZSETqP0"
-					+ "$mol3cNHPASmuafnepihPU2QQsL4cMYApSgEP#k9PNm9hD$NLj$ML3QhFfxODykrBrzONP6"
-					+ "iim$rcpR6MtY1By5sKhfcnTMVEZLGu89B3slAlcU7MLsvCtgp7SXwoo7LNBuxVHUCjYhEMd"
-					+ "#lGoZ1zUJkbElKeChriJLp3IoIlKH0pHPcPUKnZwICpNda6YPo$H8u5CZtCryS8cVmM6rOa"
-					+ "$KVp2nIuPiOoHgjorosUbX6qZ0bbANnoBQcf9UM5M3gcGhNL2jNMOOKwofuTfMP7uSiTDVL"
-					+ "JBun4jgoHRJLRHGdg4ShAv9VJI9vYzU7cKudvv6EeJGJYsIPmriDrBxXH$F9mtslVlC$ruE"
-					+ "U9CfoxPSSW$IGv7YBMwES27$EbQcbryrLhPVLELiuCmQcikS19i$7QsV5Hn02hRxLoivLBQ"
-					+ "DUJieFbZ2b8VW5nb$dfQ#bZ8UNW0d9R4yV8sKOvD#3TQPjJ2JQdA2VQ$Z8h8ubTLZzXvJuY"
-					+ "pkfbYRfMvp#8as7rmu0dpDKzXUtONcA$ZTkUuyN$pSDJW#zQK3cUFpydWYXaEIUeTxNZtOY"
-					+ "#Pw$PK#hSy#8SEfVDnGO#5OdL$uDNXQXP0BisH5jYgktlzdlNsPNkUWJmUDjmIblzlFCBuU"
-					+ "yW$QKMq3Rtx2SJE$$RrYblPIk$iJrMYlLtrC$tcRFuYIOEk7hkFjUSZrXzcd$#vdnPcHNWf"
-					+ "oLHs#fr2bAljUrO09kJ1VLtCO3F3bV8Nt96$f3JSaf#bvFocvpGqL#r$ONucTWkssIQJBMC"
-					+ "uyHFghr4l2YRPPFsDie6jcjaXIoNaJ92Xiim6IevCaIoPR0Cae4om7hO8QjbWeoNSJ9M9ii"
-					+ "gMMd7ryiwcI9hPQjiiICl4C#hjfjuJhLdjNr6swUrtKNi99R94baeYsI#p6Ll3Z5RPibCjP"
-					+ "cXxNHj#qXlwIKzfOVCamNIN$f9NraiOsIqZ9AdPAdyAJ$Azt9ClfDlvQXy8qVaQ$bAlfJ3S"
-					+ "aWEoXToG3wNp#HJ#KG#be$aGzal7yZxyfwyA#$8s$AMl2blo3xPAw$BQ$Agl28lonxv0UP$"
-					+ "gpd$HStTlG7$bHjGJpu7KlblNqSHpjkUWPTtLG$XwDtrOaOQyqvZpcdCEOstZxhirsK$dJA"
-					+ "TiXvbXY9SR$tLAPkotrHlXWOUYp3UFWp2BRnw6p4trlfw4tGKDIoIE9waDsMFtdPhwjtPKI"
-					+ "HGDxVfU8M72BFIiRgNzrb7uRDeOf4PW4P#I3nFrF93un2e#WyJoFwq");
+			"U9pDLdTyL4KG$jwHYuX1HKLYmK1KGjGBCPA2YQQG18aXGSM6NR7JCGeeqWqg7L51GWyje0W"
+					+ "8OZGgA8gz5q2nec1NiEluxRnDV1Vlp4N$uUxtxSnEszcTtNqB#7gX0hEn17Cn7$Em00jHYS"
+					+ "LOYaMOWoeinmhSZmUm4WzY5PPXDOx4GrYBTNWOQx0UZ#1HR40r7aCDziSJU1nFOYEUQcJC0"
+					+ "yB6RE69EH5ZSIPkmnteYmIKucuSZAkm7#x3iOY27z7O1qsnBveX1csHWKBuw95kFGv59$IM"
+					+ "tZWP7P2C4v62az0HgKX37afesrNRUDoWdfrHGCzSv6CMZgEdqVsxvp6MDvvdgwU9aurOnd4"
+					+ "rXp7EkMWVCewPpwruMkbmTCSH6gUxnZaQtNJkvmJDlLtOkH#YraS5MRTKwoOXh6ahuuDiiy"
+					+ "BPofyeHoR6OI2IK8J1682RS09kHq24ca6gkH6dMqqRQfhZS9o7Yt053cHEPt2SFXod3IO5Q"
+					+ "Sx2dVI$MlqdeRNr7q$$JFIWPgPg9Y0kREJpmqGsDPYiDHXBJJ#jGUXQNegXk1WZQDjAlIwX"
+					+ "RJf6OXH6Omoz3i8f8RoCfObNM#DCMlR4Z0WiBwFbXRW#XAMftkMs8hrmBoioXHMvX#lGNzV"
+					+ "XIaorwr3ETJ2IB4otaZ9Afcc48JR2pRY54Vepmbsq7sRivGwvlLu4ymidWTRXDDAaEjg5RO"
+					+ "2efRLoA9z8UHBbfv87SfI7Xo$MdPPZVO$dFdVNnF3Nu0BL6jwLTcSsrzLbSsrGRbxUuNblK"
+					+ "c$FxiSTtfmtqm7S2orOmuDvEbhoBcZ5EX$6VN84xxFMF2jnt3bjUVgFvZdsysmby9mcykGt"
+					+ "BcPCs9Y5dfX9h7YKhNY0lJIkHmPtmyciVnPtsQcyDN9uylDu1yHg1bteuRSU3ZD8uvg4oi3"
+					+ "DrhJH7C5Gau5VCpYD6JHJMKEUBcyyezNJz1COnMyrpVWtyKF5CVDnE9QXViwdcyRfg74ocO"
+					+ "6PUsRGt6F2pZr6hRi4MHyQrjhOnWVPneUr1NCCQ5sJITswfhAkwK6QAAjfHOsthXsOcJjEA"
+					+ "zwHNesZAnch$iVMxPWsz0ze9PDLqxvEyy$8iM4Z#tWcJ0qwK7EYrY1qBHtkkqAjkgCMCRJq"
+					+ "wxuxddUrkV4JGdhv5BKr3cYDaoEmB5JBhY4iapmhvUVAf75sfY8EvMOTOkhMmT7lJHGhLYi"
+					+ "9K5AY4G8sGX6$Asdikn7Yr3wE$w08mbyu2QcfGn9fSXrDPPjEr58hLwy0lxsfj4adDLyuvO"
+					+ "sybZTovbZhMy2TfckYV3JtkHkjmAvKHsOSNPTVPb2sNXxOD4AlDQSb4M$uIC1V795g#MNqB"
+					+ "RVyDai7Xl19r97XvDanIwtyJ6DY#GfBNxPqDUt6aLvdVIeYpT4pxdOFluCn#bY#l14nfj3l"
+					+ "668L#QfWdPDeQGvXplK2wxFIoek8#PPVP#aeOhZbUnCrbjzCl63v4m1VhilxYgriD$67bNK"
+					+ "ZUdXo74tTuwHpw#N7xwfpfRNPIFvjAzz2R0q$Pr$FXjV5cKEi9rwt$MqU$sWhMzDGdBqL$B"
+					+ "KZgl#ZRrEYHGHsm#2#RXRQ$giUtNHB0$$qSpubVhFwNVz$hivEb$gSHipnQ#kxXtxxD60xm"
+					+ "zAglsM#vbQsmSR9zkHJ5YRFCleTQVtUiJIRSh$LvnEBFEF#PENhwyMf8IejNndvd9sD4TYq"
+					+ "jNIcfTKUNOgbGo8TSsy2VvjS8d$8R$Ah$28$oq$oe#oHtVA3oh$NzZlYM#81kLycoWJhymt"
+					+ "njNAyYMI3LCaoxIsL9MmNoboP8oDakDmgm#GMkLc6oX0PB3V9ZLAcTWyIAsM1Z9DokKt6oX"
+					+ "YvK#RBF1jziIoIyL8fAsIvbJn9FA4SRqQfKUunRH$LjbhRXubrn6oP9JDafjmZqzcxYvWcK"
+					+ "sMAsapMTfAs0wI$z9E#qaVkbdlb1Xaa0#K#6IsZPAIijIC$H3mYQwH2U3$AQbablyjNyeNi"
+					+ "aftokNmcE#HJ#KG#be$aG$b0jilxyfviawsoHTwLT#HjUKlUb3VaTNbDNfLNv6LvILwK5#H"
+					+ "vUKusoxFoZ6oIf#Kf#P93JUCRtI7CBM9Uy0vVeWqZY##4KnHHVB4Q#Fc6zX7cLRrt8vjvPp"
+					+ "FdREQSpVTF3livxEUIvfBcaPPmBYMqxKI#4sNcBTUPj3DzIYahjQzay$ek9YrcFrFXip3lA"
+					+ "FSjvSAlhwvyolAfprVUuVlCHGRb6QHfrAMHff2cA7NuhlGHvZLguDDNgKiTo$lvkdKK0OlJ"
+					+ "BGf2eAi7wOt4IHuKXK3IN$s5DZS=");
 
 	private IParseState fParseState;
 
@@ -134,26 +138,30 @@ public class CSSParser extends Parser implements IParser
 		fParseState.clearErrors();
 
 		// create scanner and send source to it
-		CSSScanner scanner = new CSSScanner();
+		CSSFlexScanner scanner = new CSSFlexScanner();
 		scanner.setSource(source);
 
 		// parse
 		ParseRootNode result = (ParseRootNode) parse(scanner);
 
 		// attach comments to parse root node
-		IRange[] comments = scanner.getComments();
-		CSSCommentNode[] commentNodes = new CSSCommentNode[comments.length];
+		List<Symbol> comments = scanner.getComments();
+		List<CSSCommentNode> commentNodes = new ArrayList<CSSCommentNode>(comments.size());
 
-		for (int i = 0; i < comments.length; i++)
+		for (Symbol comment : comments)
 		{
-			IRange comment = comments[i];
-			CSSCommentNode commentNode = new CSSCommentNode( //
-					this.getSource(fParseState, comment), comment.getStartingOffset(), comment.getEndingOffset());
+			// @formatter:off
+			CSSCommentNode commentNode = new CSSCommentNode(
+				source.substring(comment.getStart(), comment.getEnd() + 1),
+				comment.getStart(),
+				comment.getEnd()
+			);
+			// @formatter:on
 
-			commentNodes[i] = commentNode;
+			commentNodes.add(commentNode);
 		}
 
-		result.setCommentNodes(commentNodes);
+		result.setCommentNodes(commentNodes.toArray(new IParseNode[commentNodes.size()]));
 
 		// update node offsets
 		int start = fParseState.getStartingOffset();
@@ -174,14 +182,6 @@ public class CSSParser extends Parser implements IParser
 		fParseState = null;
 
 		return result;
-	}
-
-	private String getSource(IParseState parseState, IRange comment)
-	{
-		String src = parseState.getSource();
-		int start = comment.getStartingOffset();
-		int endIndex = start + comment.getLength();
-		return new String(src.substring(start, endIndex));
 	}
 
 	public CSSParser()
@@ -220,21 +220,21 @@ public class CSSParser extends Parser implements IParser
 				lst.add(_symbols[offset + 1].value);
 				return new Symbol(lst);
 			}
-			case 12: // CharSet = CHARSET STRING.s SEMICOLON
+			case 13: // CharSet = CHARSET STRING.s SEMICOLON
 			{
 				final Symbol _symbol_s = _symbols[offset + 2];
 				final String s = (String) _symbol_s.value;
 
 				return new CSSCharSetNode(s);
 			}
-			case 13: // Import = IMPORT ImportWord.s SEMICOLON
+			case 14: // Import = IMPORT ImportWord.s SEMICOLON
 			{
 				final Symbol _symbol_s = _symbols[offset + 2];
 				final String s = (String) _symbol_s.value;
 
 				return new CSSImportNode(s);
 			}
-			case 14: // Import = IMPORT ImportWord.s List.w SEMICOLON
+			case 15: // Import = IMPORT ImportWord.s List.w SEMICOLON
 			{
 				final Symbol _symbol_s = _symbols[offset + 2];
 				final String s = (String) _symbol_s.value;
@@ -243,7 +243,7 @@ public class CSSParser extends Parser implements IParser
 
 				return new CSSImportNode(s, w.toArray(new CSSTextNode[w.size()]));
 			}
-			case 15: // Media = MEDIA_KEYWORD MediaExprs.m LCURLY RCURLY
+			case 16: // Media = MEDIA_KEYWORD MediaExprs.m LCURLY RCURLY
 			{
 				final Symbol _symbol_m = _symbols[offset + 2];
 				final ArrayList _list_m = (ArrayList) _symbol_m.value;
@@ -262,7 +262,7 @@ public class CSSParser extends Parser implements IParser
 
 				return new CSSMediaNode(list.toArray(new CSSTextNode[list.size()]));
 			}
-			case 16: // Media = MEDIA_KEYWORD MediaExprs.m LCURLY Statements.s RCURLY
+			case 17: // Media = MEDIA_KEYWORD MediaExprs.m LCURLY Statements.s RCURLY
 			{
 				final Symbol _symbol_m = _symbols[offset + 2];
 				final ArrayList _list_m = (ArrayList) _symbol_m.value;
@@ -285,30 +285,30 @@ public class CSSParser extends Parser implements IParser
 
 				return new CSSMediaNode(list.toArray(new CSSTextNode[list.size()]), s);
 			}
-			case 17: // MediaExprs = MediaExprs MediaExpr
+			case 18: // MediaExprs = MediaExprs MediaExpr
 			{
 				((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 2]);
 				return _symbols[offset + 1];
 			}
-			case 18: // MediaExprs = MediaExpr
+			case 19: // MediaExprs = MediaExpr
 			{
 				ArrayList lst = new ArrayList();
 				lst.add(_symbols[offset + 1]);
 				return new Symbol(lst);
 			}
-			case 59: // Page = PAGE LCURLY RCURLY
+			case 60: // Page = PAGE LCURLY RCURLY
 			{
 
 				return new CSSPageNode();
 			}
-			case 60: // Page = PAGE LCURLY Declarations.d RCURLY
+			case 61: // Page = PAGE LCURLY Declarations.d RCURLY
 			{
 				final Symbol _symbol_d = _symbols[offset + 3];
 				final List<CSSDeclarationNode> d = (List<CSSDeclarationNode>) _symbol_d.value;
 
 				return new CSSPageNode(d);
 			}
-			case 61: // Page = PAGE COLON IDENTIFIER.s LCURLY RCURLY
+			case 62: // Page = PAGE COLON IDENTIFIER.s LCURLY RCURLY
 			{
 				final Symbol _symbol_s = _symbols[offset + 3];
 				final String s = (String) _symbol_s.value;
@@ -321,7 +321,7 @@ public class CSSParser extends Parser implements IParser
 
 				return result;
 			}
-			case 62: // Page = PAGE COLON IDENTIFIER.s LCURLY Declarations.d RCURLY
+			case 63: // Page = PAGE COLON IDENTIFIER.s LCURLY Declarations.d RCURLY
 			{
 				final Symbol _symbol_s = _symbols[offset + 3];
 				final String s = (String) _symbol_s.value;
@@ -336,26 +336,26 @@ public class CSSParser extends Parser implements IParser
 
 				return result;
 			}
-			case 63: // FontFace = FONTFACE LCURLY RCURLY
+			case 64: // FontFace = FONTFACE LCURLY RCURLY
 			{
 
 				return new CSSFontFaceNode();
 			}
-			case 64: // FontFace = FONTFACE LCURLY Declarations.d RCURLY
+			case 65: // FontFace = FONTFACE LCURLY Declarations.d RCURLY
 			{
 				final Symbol _symbol_d = _symbols[offset + 3];
 				final List<CSSDeclarationNode> d = (List<CSSDeclarationNode>) _symbol_d.value;
 
 				return new CSSFontFaceNode(d);
 			}
-			case 65: // Namespace = NAMESPACE ImportWord.w SEMICOLON
+			case 66: // Namespace = NAMESPACE ImportWord.w SEMICOLON
 			{
 				final Symbol _symbol_w = _symbols[offset + 2];
 				final String w = (String) _symbol_w.value;
 
 				return new CSSNamespaceNode(w);
 			}
-			case 66: // Namespace = NAMESPACE IDENTIFIER.i ImportWord.w SEMICOLON
+			case 67: // Namespace = NAMESPACE IDENTIFIER.i ImportWord.w SEMICOLON
 			{
 				final Symbol _symbol_i = _symbols[offset + 2];
 				final String i = (String) _symbol_i.value;
@@ -364,7 +364,7 @@ public class CSSParser extends Parser implements IParser
 
 				return new CSSNamespaceNode(i, w);
 			}
-			case 67: // AtRule = AT_RULE.a STRING.s SEMICOLON
+			case 68: // AtRule = AT_RULE.a STRING.s SEMICOLON
 			{
 				final Symbol _symbol_a = _symbols[offset + 1];
 				final String a = (String) _symbol_a.value;
@@ -373,7 +373,29 @@ public class CSSParser extends Parser implements IParser
 
 				return new CSSAtRuleNode(a, s);
 			}
-			case 68: // Rule = Selectors.s LCURLY RCURLY
+			case 69: // Rules = Rules.rs Rule.r
+			{
+				final Symbol _symbol_rs = _symbols[offset + 1];
+				final CSSList rs = (CSSList) _symbol_rs.value;
+				final Symbol _symbol_r = _symbols[offset + 2];
+				final CSSRuleNode r = (CSSRuleNode) _symbol_r.value;
+
+				rs.addChild(r);
+
+				return rs;
+			}
+			case 70: // Rules = Rule.r
+			{
+				final Symbol _symbol_r = _symbols[offset + 1];
+				final CSSRuleNode r = (CSSRuleNode) _symbol_r.value;
+
+				CSSList list = new CSSList();
+
+				list.addChild(r);
+
+				return list;
+			}
+			case 71: // Rule = Selectors.s LCURLY RCURLY
 			{
 				final Symbol _symbol_s = _symbols[offset + 1];
 				final List<CSSSelectorNode> s = (List<CSSSelectorNode>) _symbol_s.value;
@@ -387,7 +409,7 @@ public class CSSParser extends Parser implements IParser
 
 				return result;
 			}
-			case 69: // Rule = Selectors.s LCURLY Declarations.d RCURLY
+			case 72: // Rule = Selectors.s LCURLY Declarations.d RCURLY
 			{
 				final Symbol _symbol_s = _symbols[offset + 1];
 				final List<CSSSelectorNode> s = (List<CSSSelectorNode>) _symbol_s.value;
@@ -410,7 +432,62 @@ public class CSSParser extends Parser implements IParser
 
 				return result;
 			}
-			case 71: // Function = Identifier.i LPAREN Expression.e RPAREN
+			case 74: // MozDocument = MOZ_DOCUMENT FunctionList.fs LCURLY RCURLY
+			{
+				final Symbol _symbol_fs = _symbols[offset + 2];
+				final CSSList fs = (CSSList) _symbol_fs.value;
+
+				CSSMozDocument doc = new CSSMozDocument();
+
+				doc.addChild(fs);
+				doc.addChild(new CSSList());
+
+				return doc;
+			}
+			case 75: // MozDocument = MOZ_DOCUMENT FunctionList.fs LCURLY Rules.rs RCURLY
+			{
+				final Symbol _symbol_fs = _symbols[offset + 2];
+				final CSSList fs = (CSSList) _symbol_fs.value;
+				final Symbol _symbol_rs = _symbols[offset + 4];
+				final CSSList rs = (CSSList) _symbol_rs.value;
+
+				CSSMozDocument doc = new CSSMozDocument();
+
+				doc.addChild(fs);
+				doc.addChild(rs);
+
+				return doc;
+			}
+			case 76: // FunctionList = FunctionList.fs COMMA Function.f
+			{
+				final Symbol _symbol_fs = _symbols[offset + 1];
+				final CSSList fs = (CSSList) _symbol_fs.value;
+				final Symbol _symbol_f = _symbols[offset + 3];
+				final CSSExpressionNode f = (CSSExpressionNode) _symbol_f.value;
+
+				fs.addChild(f);
+
+				return fs;
+			}
+			case 77: // FunctionList = Function.f
+			{
+				final Symbol _symbol_f = _symbols[offset + 1];
+				final CSSExpressionNode f = (CSSExpressionNode) _symbol_f.value;
+
+				CSSList list = new CSSList();
+
+				list.addChild(f);
+
+				return list;
+			}
+			case 78: // Function = Identifier.i LPAREN RPAREN
+			{
+				final Symbol _symbol_i = _symbols[offset + 1];
+				final String i = (String) _symbol_i.value;
+
+				return new CSSFunctionNode(i, null);
+			}
+			case 79: // Function = Identifier.i LPAREN Expression.e RPAREN
 			{
 				final Symbol _symbol_i = _symbols[offset + 1];
 				final String i = (String) _symbol_i.value;
@@ -419,7 +496,7 @@ public class CSSParser extends Parser implements IParser
 
 				return new CSSFunctionNode(i, e);
 			}
-			case 72: // List = List COMMA IDENTIFIER.i
+			case 80: // List = List COMMA IDENTIFIER.i
 			{
 				final Symbol _symbol_i = _symbols[offset + 3];
 				final String i = (String) _symbol_i.value;
@@ -432,7 +509,7 @@ public class CSSParser extends Parser implements IParser
 
 				return _symbols[offset + 1];
 			}
-			case 73: // List = IDENTIFIER.i
+			case 81: // List = IDENTIFIER.i
 			{
 				final Symbol _symbol_i = _symbols[offset + 1];
 				final String i = (String) _symbol_i.value;
@@ -445,7 +522,7 @@ public class CSSParser extends Parser implements IParser
 
 				return new Symbol(list);
 			}
-			case 74: // Declarations = Declaration.d
+			case 82: // Declarations = Declaration.d
 			{
 				final Symbol _symbol_d = _symbols[offset + 1];
 				final CSSDeclarationNode d = (CSSDeclarationNode) _symbol_d.value;
@@ -456,7 +533,7 @@ public class CSSParser extends Parser implements IParser
 
 				return new Symbol(list);
 			}
-			case 75: // Declarations = Declaration.d SEMICOLON.s
+			case 83: // Declarations = Declaration.d SEMICOLON.s
 			{
 				final Symbol _symbol_d = _symbols[offset + 1];
 				final CSSDeclarationNode d = (CSSDeclarationNode) _symbol_d.value;
@@ -469,7 +546,7 @@ public class CSSParser extends Parser implements IParser
 
 				return new Symbol(list);
 			}
-			case 76: // Declarations = Declarations.ds Declaration.d
+			case 84: // Declarations = Declarations.ds Declaration.d
 			{
 				final Symbol _symbol_ds = _symbols[offset + 1];
 				final List<CSSDeclarationNode> ds = (List<CSSDeclarationNode>) _symbol_ds.value;
@@ -480,7 +557,7 @@ public class CSSParser extends Parser implements IParser
 
 				return _symbols[offset + 1];
 			}
-			case 77: // Declarations = Declarations.ds Declaration.d SEMICOLON.s
+			case 85: // Declarations = Declarations.ds Declaration.d SEMICOLON.s
 			{
 				final Symbol _symbol_ds = _symbols[offset + 1];
 				final List<CSSDeclarationNode> ds = (List<CSSDeclarationNode>) _symbol_ds.value;
@@ -493,7 +570,7 @@ public class CSSParser extends Parser implements IParser
 
 				return _symbols[offset + 1];
 			}
-			case 78: // Declaration = Identifier.i COLON Expression.e
+			case 86: // Declaration = Identifier.i COLON Expression.e
 			{
 				final Symbol _symbol_i = _symbols[offset + 1];
 				final String i = (String) _symbol_i.value;
@@ -502,7 +579,7 @@ public class CSSParser extends Parser implements IParser
 
 				return new CSSDeclarationNode(i, e);
 			}
-			case 79: // Declaration = Identifier.i COLON Expression.e IMPORTANT.s
+			case 87: // Declaration = Identifier.i COLON Expression.e IMPORTANT.s
 			{
 				final Symbol _symbol_i = _symbols[offset + 1];
 				final String i = (String) _symbol_i.value;
@@ -512,7 +589,7 @@ public class CSSParser extends Parser implements IParser
 
 				return new CSSDeclarationNode(i, e, s);
 			}
-			case 80: // Declaration = STAR.a Identifier.i COLON Expression.e
+			case 88: // Declaration = STAR.a Identifier.i COLON Expression.e
 			{
 				final Symbol _symbol_a = _symbols[offset + 1];
 				final String a = (String) _symbol_a.value;
@@ -523,7 +600,7 @@ public class CSSParser extends Parser implements IParser
 
 				return new CSSDeclarationNode(a + i, e);
 			}
-			case 81: // Declaration = STAR.a Identifier.i COLON Expression.e IMPORTANT.s
+			case 89: // Declaration = STAR.a Identifier.i COLON Expression.e IMPORTANT.s
 			{
 				final Symbol _symbol_a = _symbols[offset + 1];
 				final String a = (String) _symbol_a.value;
@@ -535,12 +612,12 @@ public class CSSParser extends Parser implements IParser
 
 				return new CSSDeclarationNode(a + i, e, s);
 			}
-			case 82: // Declaration = error
+			case 90: // Declaration = error
 			{
 
 				return new CSSErrorDeclarationNode();
 			}
-			case 83: // Expression = Expression.e Separator.s Term.t
+			case 91: // Expression = Expression.e Separator.s Term.t
 			{
 				final Symbol _symbol_e = _symbols[offset + 1];
 				final CSSExpressionNode e = (CSSExpressionNode) _symbol_e.value;
@@ -551,7 +628,7 @@ public class CSSParser extends Parser implements IParser
 
 				return new CSSTermListNode(e, t, s);
 			}
-			case 84: // Expression = Expression.e Term.t
+			case 92: // Expression = Expression.e Term.t
 			{
 				final Symbol _symbol_e = _symbols[offset + 1];
 				final CSSExpressionNode e = (CSSExpressionNode) _symbol_e.value;
@@ -560,19 +637,19 @@ public class CSSParser extends Parser implements IParser
 
 				return new CSSTermListNode(e, t);
 			}
-			case 86: // Expression = error
+			case 94: // Expression = error
 			{
 
 				return new CSSErrorExpressionNode();
 			}
-			case 87: // Term = Primitive.p
+			case 95: // Term = Primitive.p
 			{
 				final Symbol _symbol_p = _symbols[offset + 1];
 				final String p = (String) _symbol_p.value;
 
 				return new CSSTermNode(p);
 			}
-			case 89: // Selectors = Selectors.ss Combinator.c Selector.s
+			case 97: // Selectors = Selectors.ss Combinator.c Selector.s
 			{
 				final Symbol _symbol_ss = _symbols[offset + 1];
 				final List<CSSSelectorNode> ss = (List<CSSSelectorNode>) _symbol_ss.value;
@@ -588,7 +665,7 @@ public class CSSParser extends Parser implements IParser
 
 				return _symbols[offset + 1];
 			}
-			case 90: // Selectors = Selector.s
+			case 98: // Selectors = Selector.s
 			{
 				final Symbol _symbol_s = _symbols[offset + 1];
 				final CSSSelectorNode s = (CSSSelectorNode) _symbol_s.value;
@@ -599,7 +676,7 @@ public class CSSParser extends Parser implements IParser
 
 				return new Symbol(list);
 			}
-			case 91: // Selector = Selector.s SimpleSelector.ss
+			case 99: // Selector = Selector.s SimpleSelector.ss
 			{
 				final Symbol _symbol_s = _symbols[offset + 1];
 				final CSSSelectorNode s = (CSSSelectorNode) _symbol_s.value;
@@ -610,7 +687,7 @@ public class CSSParser extends Parser implements IParser
 
 				return s;
 			}
-			case 92: // Selector = SimpleSelector.ss
+			case 100: // Selector = SimpleSelector.ss
 			{
 				final Symbol _symbol_ss = _symbols[offset + 1];
 				final CSSSimpleSelectorNode ss = (CSSSimpleSelectorNode) _symbol_ss.value;
@@ -621,7 +698,7 @@ public class CSSParser extends Parser implements IParser
 
 				return selector;
 			}
-			case 93: // SimpleSelector = TypeOrUniversalSelector.t AttributeSelectors.a
+			case 101: // SimpleSelector = TypeOrUniversalSelector.t AttributeSelectors.a
 			{
 				final Symbol _symbol_t = _symbols[offset + 1];
 				final String t = (String) _symbol_t.value;
@@ -632,14 +709,14 @@ public class CSSParser extends Parser implements IParser
 
 				return new CSSSimpleSelectorNode(t, a);
 			}
-			case 94: // SimpleSelector = TypeOrUniversalSelector.t
+			case 102: // SimpleSelector = TypeOrUniversalSelector.t
 			{
 				final Symbol _symbol_t = _symbols[offset + 1];
 				final String t = (String) _symbol_t.value;
 
 				return new CSSSimpleSelectorNode(t);
 			}
-			case 95: // SimpleSelector = AttributeSelectors.a
+			case 103: // SimpleSelector = AttributeSelectors.a
 			{
 				final Symbol _symbol_a = _symbols[offset + 1];
 				final ArrayList _list_a = (ArrayList) _symbol_a.value;
@@ -648,25 +725,25 @@ public class CSSParser extends Parser implements IParser
 
 				return new CSSSimpleSelectorNode(a);
 			}
-			case 96: // AttributeSelectors = AttributeSelectors AttributeSelector
+			case 104: // AttributeSelectors = AttributeSelectors AttributeSelector
 			{
 				((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 2].value);
 				return _symbols[offset + 1];
 			}
-			case 97: // AttributeSelectors = AttributeSelector
+			case 105: // AttributeSelectors = AttributeSelector
 			{
 				ArrayList lst = new ArrayList();
 				lst.add(_symbols[offset + 1].value);
 				return new Symbol(lst);
 			}
-			case 98: // AttributeSelector = CLASS.c
+			case 106: // AttributeSelector = CLASS.c
 			{
 				final Symbol _symbol_c = _symbols[offset + 1];
 				final String c = (String) _symbol_c.value;
 
 				return new CSSAttributeSelectorNode(c);
 			}
-			case 99: // AttributeSelector = COLON.c Identifier.i
+			case 107: // AttributeSelector = COLON.c Identifier.i
 			{
 				final Symbol _symbol_c = _symbols[offset + 1];
 				final String c = (String) _symbol_c.value;
@@ -675,7 +752,7 @@ public class CSSParser extends Parser implements IParser
 
 				return new CSSAttributeSelectorNode(c + i);
 			}
-			case 100: // AttributeSelector = COLON.c1 COLON.c2 Identifier.i
+			case 108: // AttributeSelector = COLON.c1 COLON.c2 Identifier.i
 			{
 				final Symbol _symbol_c1 = _symbols[offset + 1];
 				final String c1 = (String) _symbol_c1.value;
@@ -686,21 +763,21 @@ public class CSSParser extends Parser implements IParser
 
 				return new CSSAttributeSelectorNode(c1 + c2 + i);
 			}
-			case 101: // AttributeSelector = COLON Function.f
+			case 109: // AttributeSelector = COLON Function.f
 			{
 				final Symbol _symbol_f = _symbols[offset + 2];
 				final CSSExpressionNode f = (CSSExpressionNode) _symbol_f.value;
 
 				return new CSSAttributeSelectorNode(f);
 			}
-			case 102: // AttributeSelector = HASH.h
+			case 110: // AttributeSelector = HASH.h
 			{
 				final Symbol _symbol_h = _symbols[offset + 1];
 				final String h = (String) _symbol_h.value;
 
 				return new CSSAttributeSelectorNode(h);
 			}
-			case 103: // AttributeSelector = LBRACKET.l Identifier.i RBRACKET.r
+			case 111: // AttributeSelector = LBRACKET.l Identifier.i RBRACKET.r
 			{
 				final Symbol _symbol_l = _symbols[offset + 1];
 				final String l = (String) _symbol_l.value;
@@ -711,7 +788,7 @@ public class CSSParser extends Parser implements IParser
 
 				return new CSSAttributeSelectorNode(l + i + r);
 			}
-			case 104: // AttributeSelector = LBRACKET.l Identifier.i AttributeValueOperator.o IdentiferOrString.s
+			case 112: // AttributeSelector = LBRACKET.l Identifier.i AttributeValueOperator.o IdentiferOrString.s
 						// RBRACKET.r
 			{
 				final Symbol _symbol_l = _symbols[offset + 1];
@@ -735,82 +812,84 @@ public class CSSParser extends Parser implements IParser
 			case 9: // Statement = Namespace
 			case 10: // Statement = AtRule
 			case 11: // Statement = Rule
-			case 19: // MediaExpr = IDENTIFIER
-			case 20: // MediaExpr = PROPERTY
-			case 21: // MediaExpr = COLOR
-			case 22: // MediaExpr = COLON
-			case 23: // MediaExpr = RCURLY
-			case 24: // MediaExpr = STRING
-			case 25: // MediaExpr = LBRACKET
-			case 26: // MediaExpr = CLASS
-			case 27: // MediaExpr = HASH
-			case 28: // MediaExpr = SEMICOLON
-			case 29: // MediaExpr = URL
-			case 30: // MediaExpr = STAR
-			case 31: // MediaExpr = SELECTOR
-			case 32: // MediaExpr = COMMA
-			case 33: // MediaExpr = NUMBER
-			case 34: // MediaExpr = PERCENTAGE
-			case 35: // MediaExpr = LENGTH
-			case 36: // MediaExpr = EMS
-			case 37: // MediaExpr = EXS
-			case 38: // MediaExpr = ANGLE
-			case 39: // MediaExpr = TIME
-			case 40: // MediaExpr = FREQUENCY
-			case 41: // MediaExpr = PAGE
-			case 42: // MediaExpr = AT_RULE
-			case 43: // MediaExpr = CHARSET
-			case 44: // MediaExpr = MEDIA_KEYWORD
-			case 45: // MediaExpr = FONTFACE
-			case 46: // MediaExpr = NAMESPACE
-			case 47: // MediaExpr = IMPORT
-			case 48: // MediaExpr = RBRACKET
-			case 49: // MediaExpr = LPAREN
-			case 50: // MediaExpr = PLUS
-			case 51: // MediaExpr = SLASH
-			case 52: // MediaExpr = MINUS
-			case 53: // MediaExpr = RPAREN
-			case 54: // MediaExpr = IMPORTANT
-			case 55: // MediaExpr = GREATER
-			case 56: // MediaExpr = EQUAL
-			case 57: // MediaExpr = INCLUDES
-			case 58: // MediaExpr = DASHMATCH
-			case 70: // Rule = error
-			case 85: // Expression = Term
-			case 88: // Term = Function
-			case 105: // ImportWord = STRING
-			case 106: // ImportWord = URL
-			case 107: // Identifier = IDENTIFIER
-			case 108: // Identifier = PROPERTY
-			case 109: // IdentiferOrString = IDENTIFIER
-			case 110: // IdentiferOrString = STRING
-			case 111: // Separator = SLASH
-			case 112: // Separator = COMMA
-			case 113: // Separator = PLUS
-			case 114: // Separator = MINUS
-			case 115: // Combinator = COMMA
-			case 116: // Combinator = PLUS
-			case 117: // Combinator = GREATER
-			case 118: // Primitive = NUMBER
-			case 119: // Primitive = PERCENTAGE
-			case 120: // Primitive = LENGTH
-			case 121: // Primitive = EMS
-			case 122: // Primitive = EXS
-			case 123: // Primitive = ANGLE
-			case 124: // Primitive = TIME
-			case 125: // Primitive = FREQUENCY
-			case 126: // Primitive = STRING
-			case 127: // Primitive = IDENTIFIER
-			case 128: // Primitive = URL
-			case 129: // Primitive = COLOR
-			case 130: // TypeOrUniversalSelector = IDENTIFIER
-			case 131: // TypeOrUniversalSelector = STAR
-			case 132: // TypeOrUniversalSelector = SELECTOR
-			case 133: // AttributeValueOperator = EQUAL
-			case 134: // AttributeValueOperator = INCLUDES
-			case 135: // AttributeValueOperator = DASHMATCH
-			case 136: // AttributeValueOperator = BEGINS_WITH
-			case 137: // AttributeValueOperator = ENDS_WITH
+			case 12: // Statement = MozDocument
+			case 20: // MediaExpr = IDENTIFIER
+			case 21: // MediaExpr = PROPERTY
+			case 22: // MediaExpr = COLOR
+			case 23: // MediaExpr = COLON
+			case 24: // MediaExpr = RCURLY
+			case 25: // MediaExpr = STRING
+			case 26: // MediaExpr = LBRACKET
+			case 27: // MediaExpr = CLASS
+			case 28: // MediaExpr = HASH
+			case 29: // MediaExpr = SEMICOLON
+			case 30: // MediaExpr = URL
+			case 31: // MediaExpr = STAR
+			case 32: // MediaExpr = SELECTOR
+			case 33: // MediaExpr = COMMA
+			case 34: // MediaExpr = NUMBER
+			case 35: // MediaExpr = PERCENTAGE
+			case 36: // MediaExpr = LENGTH
+			case 37: // MediaExpr = EMS
+			case 38: // MediaExpr = EXS
+			case 39: // MediaExpr = ANGLE
+			case 40: // MediaExpr = TIME
+			case 41: // MediaExpr = FREQUENCY
+			case 42: // MediaExpr = PAGE
+			case 43: // MediaExpr = AT_RULE
+			case 44: // MediaExpr = CHARSET
+			case 45: // MediaExpr = MEDIA_KEYWORD
+			case 46: // MediaExpr = FONTFACE
+			case 47: // MediaExpr = NAMESPACE
+			case 48: // MediaExpr = IMPORT
+			case 49: // MediaExpr = RBRACKET
+			case 50: // MediaExpr = LPAREN
+			case 51: // MediaExpr = PLUS
+			case 52: // MediaExpr = SLASH
+			case 53: // MediaExpr = MINUS
+			case 54: // MediaExpr = RPAREN
+			case 55: // MediaExpr = IMPORTANT
+			case 56: // MediaExpr = GREATER
+			case 57: // MediaExpr = EQUAL
+			case 58: // MediaExpr = INCLUDES
+			case 59: // MediaExpr = DASHMATCH
+			case 73: // Rule = error
+			case 93: // Expression = Term
+			case 96: // Term = Function
+			case 113: // ImportWord = STRING
+			case 114: // ImportWord = URL
+			case 115: // Identifier = IDENTIFIER
+			case 116: // Identifier = PROPERTY
+			case 117: // IdentiferOrString = IDENTIFIER
+			case 118: // IdentiferOrString = STRING
+			case 119: // Separator = SLASH
+			case 120: // Separator = COMMA
+			case 121: // Separator = PLUS
+			case 122: // Separator = MINUS
+			case 123: // Separator = EQUAL
+			case 124: // Combinator = COMMA
+			case 125: // Combinator = PLUS
+			case 126: // Combinator = GREATER
+			case 127: // Primitive = NUMBER
+			case 128: // Primitive = PERCENTAGE
+			case 129: // Primitive = LENGTH
+			case 130: // Primitive = EMS
+			case 131: // Primitive = EXS
+			case 132: // Primitive = ANGLE
+			case 133: // Primitive = TIME
+			case 134: // Primitive = FREQUENCY
+			case 135: // Primitive = STRING
+			case 136: // Primitive = IDENTIFIER
+			case 137: // Primitive = URL
+			case 138: // Primitive = COLOR
+			case 139: // TypeOrUniversalSelector = IDENTIFIER
+			case 140: // TypeOrUniversalSelector = STAR
+			case 141: // TypeOrUniversalSelector = SELECTOR
+			case 142: // AttributeValueOperator = EQUAL
+			case 143: // AttributeValueOperator = INCLUDES
+			case 144: // AttributeValueOperator = DASHMATCH
+			case 145: // AttributeValueOperator = BEGINS_WITH
+			case 146: // AttributeValueOperator = ENDS_WITH
 			{
 				return _symbols[offset + 1];
 			}

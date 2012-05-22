@@ -16,6 +16,7 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.parsing.messages"; //$NON-NLS-1$
+	public static String ParserPoolFactory_Expecting_Source;
 	public static String ParserPoolFactory_Cannot_Acquire_Parser;
 	public static String ParserPoolFactory_Cannot_Acquire_Parser_Pool;
 	static

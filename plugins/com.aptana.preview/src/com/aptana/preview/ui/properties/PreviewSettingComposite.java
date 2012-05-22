@@ -13,6 +13,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -120,7 +124,7 @@ public class PreviewSettingComposite extends Composite implements SelectionListe
 				.create());
 		fNewButton.addSelectionListener(this);
 
-		updateServersContent();
+		updateServersContentJob();
 	}
 
 	/**
@@ -256,7 +260,7 @@ public class PreviewSettingComposite extends Composite implements SelectionListe
 					if (editServerConfiguration(newConfiguration))
 					{
 						WebServerCorePlugin.getDefault().getServerManager().add(newConfiguration);
-						updateServersContent();
+						updateServersContent(false);
 						fServersCombo.setSelection(new StructuredSelection(newConfiguration));
 						// forces an update of widget enablements
 						updateStates();
@@ -310,18 +314,53 @@ public class PreviewSettingComposite extends Composite implements SelectionListe
 		}
 	}
 
-	private void updateServersContent()
+	private void updateServersContentJob()
 	{
-		List<IServer> servers = new ArrayList<IServer>();
+		Job job = new Job("Updating servers content...") //$NON-NLS-1$ // system job
+		{
+			@Override
+			public IStatus run(IProgressMonitor monitor)
+			{
+				updateServersContent(true);
+				return Status.OK_STATUS;
+			}
+		};
+		job.setSystem(true);
+		job.schedule();
+	}
+
+	/**
+	 * Update the servers content.
+	 * 
+	 * @param async
+	 *            An indication that the UI part of this update should be done asynchronously.
+	 */
+	private void updateServersContent(boolean async)
+	{
+		final List<IServer> servers = new ArrayList<IServer>();
 		servers.add(getBuiltInServer());
 		servers.addAll(WebServerCorePlugin.getDefault().getServerManager().getServers());
-		ISelection selection = fServersCombo.getSelection();
-		fServersCombo.setInput(servers);
-		// keeps the selection if there was one
-		fServersCombo.setSelection(selection);
-		if (fServersCombo.getSelection().isEmpty())
+		Runnable runnable = new Runnable()
 		{
-			fServersCombo.setSelection(new StructuredSelection(servers.get(0)));
+			public void run()
+			{
+				ISelection selection = fServersCombo.getSelection();
+				fServersCombo.setInput(servers);
+				// keeps the selection if there was one
+				fServersCombo.setSelection(selection);
+				if (fServersCombo.getSelection().isEmpty())
+				{
+					fServersCombo.setSelection(new StructuredSelection(servers.get(0)));
+				}
+			}
+		};
+		if (async)
+		{
+			UIUtils.getDisplay().asyncExec(runnable);
+		}
+		else
+		{
+			UIUtils.getDisplay().syncExec(runnable);
 		}
 	}
 

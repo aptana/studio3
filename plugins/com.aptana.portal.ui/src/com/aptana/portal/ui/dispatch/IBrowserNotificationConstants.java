@@ -161,4 +161,9 @@ public interface IBrowserNotificationConstants
 	 * An event id for notifying a 'Templates' change.
 	 */
 	public static final String EVENT_ID_TEMPLATES = "templates"; //$NON-NLS-1$
+
+	/**
+	 * An event id for notifying a 'Modules' change.
+	 */
+	public static final String EVENT_ID_MODULES = "modules"; //$NON-NLS-1$
 }

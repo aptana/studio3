@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -64,6 +64,11 @@ public class AptanaDB
 			try
 			{
 				statement = connection.createStatement();
+
+				if (IdeLog.isTraceEnabled(UsagePlugin.getDefault(), IDebugScopes.DB))
+				{
+					IdeLog.logTrace(UsagePlugin.getDefault(), query);
+				}
 
 				if (handler == null)
 				{
@@ -136,7 +141,7 @@ public class AptanaDB
 			}
 			catch (SQLException e)
 			{
-				IdeLog.logError(UsagePlugin.getDefault(), Messages.AptanaDB_FailedToConnect, e);
+				IdeLog.logWarning(UsagePlugin.getDefault(), Messages.AptanaDB_FailedToConnect, e);
 			}
 		}
 		return null;
@@ -152,12 +157,7 @@ public class AptanaDB
 			}
 			catch (SQLException e)
 			{
-				// NOTE: We always get an exception when shutting down the database. We make sure it was the right
-				// one for successful shutdown. SQLState is "08006" and ErrorCode is 45000 for single database shutdown
-				if (e.getErrorCode() != 45000 && !"XJ015".equals(e.getSQLState()) && !"08006".equals(e.getSQLState())) //$NON-NLS-1$ //$NON-NLS-2$
-				{
-					IdeLog.logWarning(UsagePlugin.getDefault(), Messages.AptanaDB_ErrorShutdown, e);
-				}
+				// ignores since it's during shutdown
 			}
 		}
 	}

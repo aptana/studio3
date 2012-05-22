@@ -10792,7 +10792,7 @@ if(!dojo._hasResource["dojo._base.html"]) {//_hasResource checks added by build.
                     }
                     node = node.parentNode;
                 }
-            } catch(e) { /* squelch */
+            } catch(e) {/* squelch */
             }
             return false;
             // Boolean
@@ -13519,7 +13519,7 @@ if(!dojo._hasResource["dojo._base.xhr"]) {//_hasResource checks added by build. 
                         doc.loadXML(xhr.responseText);
                         return doc;
                         //	DOMDocument
-                    } catch(e) { /* squelch */
+                    } catch(e) {/* squelch */
                     };
                 });
             } else {

@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.PerformanceStats;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
@@ -71,6 +70,7 @@ import com.aptana.scripting.model.CommandContext;
 import com.aptana.scripting.model.CommandResult;
 import com.aptana.scripting.model.ContentAssistElement;
 import com.aptana.scripting.model.filters.ScopeFilter;
+import com.aptana.ui.util.UIUtils;
 
 public class CommonContentAssistProcessor implements IContentAssistProcessor, ICommonContentAssistProcessor,
 		IPreferenceChangeListener
@@ -93,7 +93,6 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	private static final String RUBLE_PERF = PERFORMANCE_EVENT_PREFIX + "/rubles"; //$NON-NLS-1$
 	private static final String SNIPPET_PERF = PERFORMANCE_EVENT_PREFIX + "/snippets"; //$NON-NLS-1$
 
-	private static final String[] NO_STRINGS = new String[0];
 	protected static final ICompletionProposal[] NO_PROPOSALS = new ICompletionProposal[0];
 
 	private char[] _completionProposalChars = null;
@@ -223,7 +222,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 			String location = null;
 			IContextInformation contextInfo = null;
 			int replaceLength = 0;
-			Image image = CommonEditorPlugin.getImage(DEFAULT_IMAGE);
+			Image image = UIUtils.getImage(CommonEditorPlugin.getDefault(), DEFAULT_IMAGE);
 			if (element instanceof RubyHash)
 			{
 				Map<?, ?> hash = (RubyHash) element;
@@ -508,7 +507,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 */
 	public String[] getActiveUserAgentIds()
 	{
-		return UserAgentManager.getInstance().getActiveUserAgentIDs(getNatureIds());
+		return UserAgentManager.getInstance().getActiveUserAgentIDs(getProject());
 	}
 
 	/**
@@ -518,7 +517,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 */
 	protected Image[] getAllUserAgentIcons()
 	{
-		return UserAgentManager.getInstance().getUserAgentImages(getActiveUserAgentIds());
+		return UserAgentManager.getInstance().getUserAgentImages(getProject());
 	}
 
 	/**
@@ -603,32 +602,6 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	}
 
 	/**
-	 * Grab the natures associated with this processor's project
-	 * 
-	 * @return Returns an array of all nature ids
-	 */
-	protected String[] getNatureIds()
-	{
-		String[] natureIDs = NO_STRINGS;
-
-		try
-		{
-			IProject project = getProject();
-
-			if (project != null)
-			{
-				natureIDs = project.getDescription().getNatureIds();
-			}
-		}
-		catch (CoreException e)
-		{
-			// log?
-		}
-
-		return natureIDs;
-	}
-
-	/**
 	 * Returns the qualifier for the preference service. Gnerally the plugin ID as that's where the relevant preferences
 	 * are stored.
 	 * 
@@ -705,7 +678,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 				case ONE_OR_MORE:
 				{
 					// if any of the active user agents are in the specified list, then allow this proposal
-					String[] userAgentIds = UserAgentManager.getInstance().getActiveUserAgentIDs(getNatureIds());
+					String[] userAgentIds = UserAgentManager.getInstance().getActiveUserAgentIDs(getProject());
 					Set<String> activeNameSet = new HashSet<String>(Arrays.asList(userAgentIds));
 
 					for (String id : userAgents)
@@ -724,7 +697,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 				{
 					// if all of the active user agents are in the specified list, then allow this proposal
 					Set<String> nameSet = new HashSet<String>(Arrays.asList(userAgents));
-					String[] activeUserAgentIds = UserAgentManager.getInstance().getActiveUserAgentIDs(getNatureIds());
+					String[] activeUserAgentIds = UserAgentManager.getInstance().getActiveUserAgentIDs(getProject());
 
 					result = nameSet.containsAll(Arrays.asList(activeUserAgentIds));
 

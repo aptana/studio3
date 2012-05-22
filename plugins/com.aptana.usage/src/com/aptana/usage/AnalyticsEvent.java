@@ -16,7 +16,7 @@ import java.util.TimeZone;
 import java.util.UUID;
 
 import org.eclipse.core.runtime.Platform;
-import org.mortbay.util.ajax.JSON;
+import com.aptana.jetty.util.epl.ajax.JSON;
 
 import com.aptana.core.CorePlugin;
 import com.aptana.core.logging.IdeLog;
@@ -156,6 +156,7 @@ public class AnalyticsEvent
 		addPostEntry(event, "guid", APP_INFO.getAppGuid()); //$NON-NLS-1$
 		addPostEntry(event, "mid", CorePlugin.getMID()); //$NON-NLS-1$
 		addPostEntry(event, "app_id", APP_INFO.getAppId()); //$NON-NLS-1$
+		addPostEntry(event, "creator_user_id", (user == null) ? StringUtil.EMPTY : user.getUID()); //$NON-NLS-1$
 		addPostEntry(event, "app_name", APP_INFO.getAppName()); //$NON-NLS-1$
 		addPostEntry(event, "app_version", EclipseUtil.getPluginVersion(APP_INFO.getVersionPluginId())); //$NON-NLS-1$
 		addPostEntry(event, "mac_addr", MACAddress.getMACAddress()); //$NON-NLS-1$

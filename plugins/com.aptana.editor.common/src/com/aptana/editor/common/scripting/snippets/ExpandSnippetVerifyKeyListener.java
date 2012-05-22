@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -13,6 +13,7 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.link.LinkedModeModel;
 import org.eclipse.swt.custom.VerifyKeyListener;
@@ -21,6 +22,10 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.ITextEditorExtension;
 import org.eclipse.ui.texteditor.ITextEditorExtension2;
 
+import com.aptana.core.util.ArrayUtil;
+import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.ObjectUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
 import com.aptana.scripting.model.BundleManager;
@@ -30,6 +35,9 @@ import com.aptana.scripting.model.filters.AndFilter;
 import com.aptana.scripting.model.filters.HasTriggerFilter;
 import com.aptana.scripting.model.filters.ScopeFilter;
 
+/**
+ * @author cwilliams
+ */
 public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener
 {
 
@@ -52,8 +60,8 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener
 
 	public void verifyKey(VerifyEvent event)
 	{
-		if (textViewer == null || document == null || !canModifyEditor || !event.doit || event.character != '\t'
-				|| !enableSnippetProposals)
+		if (textViewer == null || document == null || contentAssistant == null || !canModifyEditor || !event.doit
+				|| event.character != '\t' || !enableSnippetProposals)
 		{
 			return;
 		}
@@ -63,20 +71,19 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener
 		{
 			return;
 		}
-		ITextSelection selection = (ITextSelection) textEditor.getSelectionProvider().getSelection();
+		ITextSelection selection = getSelection();
 		if (selection.getLength() == 0)
 		{
-			int offset = selection.getOffset() - 1;
 			try
 			{
-				String previousChar = document.get(offset, 1);
-				if (!Character.isWhitespace(previousChar.charAt(0)))
+				char previousChar = document.getChar(selection.getOffset() - 1);
+				if (!Character.isWhitespace(previousChar))
 				{
 					int caretOffset = textViewer.getTextWidget().getCaretOffset();
 					String scope = getScope(textViewer, caretOffset);
 					AndFilter filter = new AndFilter(new ScopeFilter(scope), new HasTriggerFilter());
-					List<CommandElement> commandsFromScope = BundleManager.getInstance().getExecutableCommands(filter);
-					if (commandsFromScope.size() > 0)
+					List<CommandElement> commandsFromScope = getBundleManager().getExecutableCommands(filter);
+					if (!CollectionsUtil.isEmpty(commandsFromScope))
 					{
 						// chop off portions of prefix from beginning until we have a match!
 						String prefix = SnippetsCompletionProcessor.extractPrefixFromDocument(document, caretOffset);
@@ -84,11 +91,8 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener
 						{
 							if (hasMatchingSnippet(prefix, commandsFromScope))
 							{
-								if (contentAssistant != null)
-								{
-									contentAssistant.showPossibleCompletions();
-									event.doit = false;
-								}
+								contentAssistant.showPossibleCompletions();
+								event.doit = false;
 								return;
 							}
 							prefix = SnippetsCompletionProcessor.narrowPrefix(prefix);
@@ -98,10 +102,25 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener
 			}
 			catch (BadLocationException e)
 			{
+				// ignore
 				return;
 			}
 		}
 
+	}
+
+	protected ITextSelection getSelection()
+	{
+		if (textEditor == null || textEditor.getSelectionProvider() == null)
+		{
+			return TextSelection.emptySelection();
+		}
+		return (ITextSelection) textEditor.getSelectionProvider().getSelection();
+	}
+
+	protected BundleManager getBundleManager()
+	{
+		return BundleManager.getInstance();
 	}
 
 	protected boolean hasMatchingSnippet(String prefix, List<CommandElement> commandsFromScope)
@@ -109,11 +128,11 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener
 		for (CommandElement commandElement : commandsFromScope)
 		{
 			String[] triggers = commandElement.getTriggerTypeValues(TriggerType.PREFIX);
-			if (triggers != null)
+			if (!ArrayUtil.isEmpty(triggers))
 			{
 				for (String trigger : triggers)
 				{
-					if (trigger != null && trigger.equals(prefix))
+					if (ObjectUtil.areEqual(prefix, trigger))
 					{
 						return true;
 					}
@@ -162,14 +181,14 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener
 
 	private static String getScope(ITextViewer viewer, int offset)
 	{
-		String scope = ""; //$NON-NLS-1$
+		String scope = StringUtil.EMPTY;
 		try
 		{
 			scope = getDocumentScopeManager().getScopeAtOffset(viewer, offset);
 		}
 		catch (BadLocationException e)
 		{
-			// TODO
+			// ignore
 		}
 		return scope;
 	}

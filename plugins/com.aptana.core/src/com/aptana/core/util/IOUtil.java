@@ -467,4 +467,28 @@ public abstract class IOUtil
 		}
 		return false;
 	}
+
+	/**
+	 * Returns true if the path is writable
+	 * 
+	 * @param path
+	 * @return
+	 */
+	public static boolean isWritablePath(IPath path)
+	{
+		if (path.toFile().isFile())
+		{
+			return false;
+		}
+
+		for (int i = 1; i <= path.segmentCount(); i++)
+		{
+			if (IOUtil.isWritableDirectory(path.removeLastSegments(i).toFile()))
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
 }

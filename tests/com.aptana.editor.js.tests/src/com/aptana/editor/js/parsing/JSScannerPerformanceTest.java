@@ -84,7 +84,12 @@ public class JSScannerPerformanceTest extends PerformanceTestCase
 	 */
 	public void testDojo() throws Exception
 	{
-		assertScan(10, ITestFiles.DOJO_FILES);
+		assertScan(75, ITestFiles.DOJO_FILES);
+	}
+
+	public void testDojoMinified() throws Exception
+	{
+		assertScan(500, "performance/dojo.js.minified.js");
 	}
 
 	/**
@@ -94,7 +99,7 @@ public class JSScannerPerformanceTest extends PerformanceTestCase
 	 */
 	public void testExt() throws Exception
 	{
-		assertScan(15, ITestFiles.EXT_FILES);
+		assertScan(30, ITestFiles.EXT_FILES);
 	}
 
 	/**
@@ -104,7 +109,7 @@ public class JSScannerPerformanceTest extends PerformanceTestCase
 	 */
 	public void testTiMobile() throws Exception
 	{
-		assertScan(10, ITestFiles.TIMOBILE_FILES);
+		assertScan(50, ITestFiles.TIMOBILE_FILES);
 	}
 
 	/**
@@ -114,7 +119,7 @@ public class JSScannerPerformanceTest extends PerformanceTestCase
 	 */
 	public void testTinyMce() throws Exception
 	{
-		assertScan(10, ITestFiles.TINY_MCE_FILES);
+		assertScan(150, ITestFiles.TINY_MCE_FILES);
 	}
 
 	/**
@@ -124,7 +129,7 @@ public class JSScannerPerformanceTest extends PerformanceTestCase
 	 */
 	public void testJaxerFiles() throws Exception
 	{
-		assertScan(5, ITestFiles.JAXER_FILES);
+		assertScan(125, ITestFiles.JAXER_FILES);
 	}
 
 	/**

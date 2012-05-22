@@ -15,13 +15,14 @@ Require-Bundle: org.eclipse.ui,
  com.aptana.configurations,
  org.eclipse.core.resources,
  org.eclipse.ui.console,
- org.mortbay.jetty.util,
+ com.aptana.jetty.util.epl,
  com.aptana.theme,
  com.aptana.explorer,
  com.aptana.core.io,
  com.aptana.browser;visibility:=reexport,
  org.eclipse.core.expressions,
- com.aptana.projects
+ com.aptana.projects,
+ com.aptana.swt.webkitbrowser
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.portal.ui,

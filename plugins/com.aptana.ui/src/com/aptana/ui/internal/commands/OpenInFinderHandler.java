@@ -12,7 +12,7 @@ import java.util.List;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.expressions.EvaluationContext;
+import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IResource;
@@ -34,12 +34,12 @@ public class OpenInFinderHandler extends AbstractHandler
 			return Boolean.FALSE;
 		}
 		Object context = event.getApplicationContext();
-		if (!(context instanceof EvaluationContext))
+		if (!(context instanceof IEvaluationContext))
 		{
 			return Boolean.FALSE;
 		}
 
-		EvaluationContext evContext = (EvaluationContext) event.getApplicationContext();
+		IEvaluationContext evContext = (IEvaluationContext) event.getApplicationContext();
 		Object input = evContext.getVariable(ISources.SHOW_IN_INPUT);
 		if (input instanceof IFileEditorInput)
 		{

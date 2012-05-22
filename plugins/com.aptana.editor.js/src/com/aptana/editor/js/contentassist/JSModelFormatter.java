@@ -26,7 +26,7 @@ import com.aptana.core.IMap;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.StringUtil;
-import com.aptana.core.util.replace.RegexPatternReplacer;
+import com.aptana.editor.common.hover.TagStripperAndTypeBolder;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
@@ -37,8 +37,7 @@ import com.aptana.editor.js.contentassist.model.UserAgentElement;
 
 public class JSModelFormatter
 {
-	private static final String BOLD_CLOSE_TAG = "</b>"; //$NON-NLS-1$
-	private static final String BOLD_OPEN_TAG = "<b>"; //$NON-NLS-1$
+
 	private static final String COLON_SPACE = ": "; //$NON-NLS-1$
 	private static final String COMMA_SPACE = ", "; //$NON-NLS-1$
 
@@ -98,7 +97,8 @@ public class JSModelFormatter
 	 */
 	public static final JSModelFormatter CONTEXT_INFO = new JSModelFormatter(false, Section.SIGNATURE)
 	{
-		private static final char BULLET = '\u2022';
+		private static final String BULLET = "\u2022"; //$NON-NLS-1$
+		private TagStripperAndTypeBolder stripAndBold = new TagStripperAndTypeBolder();
 
 		public String getDocumentation(Collection<PropertyElement> properties)
 		{
@@ -116,24 +116,34 @@ public class JSModelFormatter
 				// line 1: function name with argument names
 				result.add(getHeader(function, null));
 
+				// create buffer once
+				List<String> buffer = new ArrayList<String>();
+
 				// line 2..n: one line for each argument description
 				for (ParameterElement parameter : function.getParameters())
 				{
-					StringBuilder buffer = new StringBuilder();
-					buffer.setLength(0);
-					buffer.append(' ').append(BULLET).append('\t').append(parameter.getName());
+					// make sure buffer is empty
+					buffer.clear();
 
+					CollectionsUtil.addToList(buffer, " ", BULLET, "\t", parameter.getName()); //$NON-NLS-1$ //$NON-NLS-2$
+
+					// add, possibly cleaned up, description, if it exists
 					String description = parameter.getDescription();
+
 					if (!StringUtil.isEmpty(description))
 					{
-						description = StringUtil.stripHTMLTags(description);
-						buffer.append(':').append(FileUtil.NEW_LINE).append(" \t").append(description); //$NON-NLS-1$
+						// strip html tags and preserve types that look like tags
+						description = stripAndBold.searchAndReplace(description);
+
+						CollectionsUtil.addToList(buffer, ":", FileUtil.NEW_LINE, " \t", description); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 
-					result.add(buffer.toString());
+					result.add(StringUtil.concat(buffer));
 				}
+
 				return StringUtil.join(FileUtil.NEW_LINE + JSContextInformation.DESCRIPTION_DELIMITER, result);
 			}
+
 			return null;
 		}
 	};
@@ -207,7 +217,7 @@ public class JSModelFormatter
 		List<String> stringParts = new ArrayList<String>();
 		if (useHTML)
 		{
-			stringParts.add(BOLD_OPEN_TAG);
+			stringParts.add(TagStripperAndTypeBolder.BOLD_OPEN_TAG);
 		}
 
 		List<Section> headerSections = CollectionsUtil.filter(fSections, new IFilter<Section>()
@@ -227,7 +237,7 @@ public class JSModelFormatter
 
 		if (useHTML)
 		{
-			stringParts.add(BOLD_CLOSE_TAG);
+			stringParts.add(TagStripperAndTypeBolder.BOLD_CLOSE_TAG);
 		}
 		return StringUtil.concat(stringParts);
 	}
@@ -355,7 +365,7 @@ public class JSModelFormatter
 
 	private abstract static class Section
 	{
-		private boolean useHTML;
+		protected boolean useHTML;
 
 		public boolean isHeader()
 		{
@@ -375,12 +385,12 @@ public class JSModelFormatter
 				builder.append(newline()).append(newline());
 				if (useHTML)
 				{
-					builder.append(BOLD_OPEN_TAG);
+					builder.append(TagStripperAndTypeBolder.BOLD_OPEN_TAG);
 				}
 				builder.append(title);
 				if (useHTML)
 				{
-					builder.append(BOLD_CLOSE_TAG);
+					builder.append(TagStripperAndTypeBolder.BOLD_CLOSE_TAG);
 				}
 				builder.append(newline());
 				builder.append(value.trim());
@@ -621,25 +631,7 @@ public class JSModelFormatter
 		 */
 		final static Section DESCRIPTION = new Section()
 		{
-			private RegexPatternReplacer stripAndBold;
-			{
-				stripAndBold = new RegexPatternReplacer();
-				// @formatter:off
-				stripAndBold.addPattern(
-					"<[\\p{Alpha}$_][\\p{Alnum}_$]*(?:\\.[\\p{Alpha}$_][\\p{Alnum}_$]*)+>", //$NON-NLS-1$
-					new IMap<String, String>()
-					{
-						public String map(String item)
-						{
-							String typeName = item.substring(1, item.length() - 1);
-
-							return StringUtil.concat(BOLD_OPEN_TAG, typeName, BOLD_CLOSE_TAG);
-						}
-					}
-				);
-				// @formatter:on
-				stripAndBold.addPattern("</?p>"); //$NON-NLS-1$
-			}
+			private TagStripperAndTypeBolder stripAndBold = new TagStripperAndTypeBolder();
 
 			@Override
 			public String generate(Collection<PropertyElement> properties, URI root)
@@ -648,6 +640,7 @@ public class JSModelFormatter
 				for (PropertyElement property : properties)
 				{
 					// strip p elements and bold any items that look like open tags with dotted local names
+					stripAndBold.setUseHTML(useHTML);
 					String desc = stripAndBold.searchAndReplace(property.getDescription());
 
 					if (!StringUtil.isEmpty(desc))

@@ -48,6 +48,12 @@ public class CSSKeywordTest extends CSSTokensTest
 		assertToken("@namespaces", CSSTokenType.AT_RULE, 0, 11); //$NON-NLS-1$
 	}
 
+	public void testMozDocumentKeyword()
+	{
+		assertToken("@-moz-document", CSSTokenType.MOZ_DOCUMENT, 0, 14); //$NON-NLS-1$
+		assertToken("@-moz-documents", CSSTokenType.AT_RULE, 0, 15); //$NON-NLS-1$
+	}
+
 	public void testUrlKeyword()
 	{
 		assertToken("url(test.css)", CSSTokenType.URL, 0, 13); //$NON-NLS-1$

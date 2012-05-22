@@ -65,7 +65,7 @@ public class CategoryInfo
 			}
 			else
 			{
-				median = (lengths.get(mid) + lengths.get(mid + 1)) / 2;
+				median = (lengths.get(mid - 1) + lengths.get(mid)) / 2;
 			}
 
 			this.median = median;

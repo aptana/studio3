@@ -10,6 +10,7 @@ package com.aptana.portal.ui.internal.command;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -19,6 +20,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.wizards.IWizardDescriptor;
 import org.eclipse.ui.wizards.IWizardRegistry;
 
+import com.aptana.projects.internal.wizards.AbstractNewProjectWizard;
 import com.aptana.projects.internal.wizards.ProjectTemplateSelectionPage;
 import com.aptana.ui.util.UIUtils;
 
@@ -31,6 +33,12 @@ import com.aptana.ui.util.UIUtils;
 public class NewProjectFromTemplateCommandHandler extends AbstractHandler
 {
 
+	/**
+	 * Execute the new project command. The command returns the created {@link IProject} name when it's done, in case a
+	 * project was created.
+	 * 
+	 * @see org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
 		String wizardId = event.getParameter(ProjectTemplateSelectionPage.COMMAND_PROJECT_FROM_TEMPLATE_NEW_WIZARD_ID);
@@ -58,20 +66,33 @@ public class NewProjectFromTemplateCommandHandler extends AbstractHandler
 			if (wizardDescriptor.canFinishEarly() && !wizardDescriptor.hasPages())
 			{
 				wizard.performFinish();
-				return null;
+				return getProject(wizard);
 			}
 
 			Shell parent = UIUtils.getActiveShell();
 			WizardDialog dialog = new WizardDialog(parent, wizard);
 			dialog.create();
 			dialog.open();
-
+			return getProject(wizard);
 		}
 		catch (CoreException ex)
 		{
 			throw new ExecutionException("error creating wizard", ex); //$NON-NLS-1$
 		}
-		// TODO Auto-generated method stub
+	}
+
+	/**
+	 * Returns the created project.
+	 * 
+	 * @param wizard
+	 * @return An {@link IProject}, or <code>null</code>.
+	 */
+	private IProject getProject(IWorkbenchWizard wizard)
+	{
+		if (wizard instanceof AbstractNewProjectWizard)
+		{
+			return ((AbstractNewProjectWizard) wizard).getCreatedProject();
+		}
 		return null;
 	}
 }

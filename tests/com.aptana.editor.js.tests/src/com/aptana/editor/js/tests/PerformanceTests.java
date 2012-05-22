@@ -16,6 +16,7 @@ import junit.framework.TestSuite;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.js.JSCodeScannerPerformanceTest;
 import com.aptana.editor.js.JSPlugin;
+import com.aptana.editor.js.JSSourcePartitionScannerPerformanceTest;
 import com.aptana.editor.js.contentassist.JSBuildPerformanceTest;
 import com.aptana.editor.js.contentassist.JSIndexingPerformanceTest;
 import com.aptana.editor.js.parsing.JSParserPerformanceTest;
@@ -45,6 +46,7 @@ public class PerformanceTests
 		suite.addTestSuite(JSIndexingPerformanceTest.class);
 		suite.addTestSuite(JSParserPerformanceTest.class);
 		suite.addTestSuite(JSScannerPerformanceTest.class);
+		suite.addTestSuite(JSSourcePartitionScannerPerformanceTest.class);
 		suite.addTestSuite(SDocParserPerformanceTest.class);
 		suite.addTest(OpenJSEditorTest.suite());
 		// $JUnit-END$

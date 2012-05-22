@@ -49,7 +49,7 @@ public class HTMLEditorBasedTests extends EditorContentAssistBasedTests<HTMLCont
 	 * @see com.aptana.editor.common.EditorContentAssistBasedTests#getPluginId()
 	 */
 	@Override
-	protected String getPluginId()
+	protected String getEditorId()
 	{
 		return HTMLPlugin.PLUGIN_ID;
 	}

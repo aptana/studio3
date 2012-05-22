@@ -48,7 +48,10 @@ public class VerifyTestedTokensTest extends TestCase
 		CSSTokenType.DEPRECATED_COLOR,
 		CSSTokenType.ELEMENT,
 		CSSTokenType.FONT,
-		CSSTokenType.VALUE
+		CSSTokenType.VALUE,
+		// the following are special token types that are not used in parsing
+		CSSTokenType.ERROR,
+		CSSTokenType.COMMENT
 	);
 	// @formatter:on
 

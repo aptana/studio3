@@ -1,11 +1,10 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-
 package com.aptana.core.util;
 
 import java.io.ByteArrayOutputStream;
@@ -173,12 +172,20 @@ public final class ZipUtil
 				ZipEntry entry = (ZipEntry) i;
 				String name = entry.getName();
 				File file = new File(destinationPath, name);
-				if (entry.isDirectory() && !file.exists())
+				if (entry.isDirectory())
 				{
-					IdeLog.logInfo(
-							CorePlugin.getDefault(),
-							MessageFormat.format("Creating directory {0}", file.getAbsolutePath()), IDebugScopes.ZIPUTIL); //$NON-NLS-1$
-					file.mkdirs();
+					if (!file.exists())
+					{
+						IdeLog.logInfo(
+								CorePlugin.getDefault(),
+								MessageFormat.format("Creating directory {0}", file.getAbsolutePath()), IDebugScopes.ZIPUTIL); //$NON-NLS-1$
+						file.mkdirs();
+					}
+					if (!IOUtil.isWritableDirectory(file))
+					{
+						return new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, MessageFormat.format(
+								Messages.ZipUtil_ERR_NoWritePermission, file));
+					}
 				}
 				else if (name.indexOf('/') != -1)
 				{
@@ -189,6 +196,11 @@ public final class ZipUtil
 								CorePlugin.getDefault(),
 								MessageFormat.format("Creating directory {0}", parent.getAbsolutePath()), IDebugScopes.ZIPUTIL); //$NON-NLS-1$
 						parent.mkdirs();
+					}
+					if (!IOUtil.isWritableDirectory(parent))
+					{
+						return new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, MessageFormat.format(
+								Messages.ZipUtil_ERR_NoWritePermission, parent));
 					}
 				}
 				if (subMonitor.isCanceled())
@@ -309,15 +321,15 @@ public final class ZipUtil
 			}
 			catch (IOException e)
 			{
-				IdeLog.logError(CorePlugin.getDefault(), MessageFormat.format("Error creating zip {0}", destination), e);
+				IdeLog.logError(CorePlugin.getDefault(), MessageFormat.format("Error creating zip {0}", destination), e); //$NON-NLS-1$
 			}
 		}
 
 		return false;
 	}
 
-	private static void addToZip(String[] sourceFiles, ZipOutputStream output)
-			throws FileNotFoundException, IOException
+	private static void addToZip(String[] sourceFiles, ZipOutputStream output) throws FileNotFoundException,
+			IOException
 	{
 		byte[] buffer = new byte[1024];
 		for (String file : sourceFiles)

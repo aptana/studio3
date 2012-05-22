@@ -5,7 +5,6 @@
          point="org.eclipse.core.contenttype.contentTypes">
       <content-type
             base-type="org.eclipse.core.runtime.text"
-            default-charset="UTF-8"
             file-extensions="coffee"
             file-names="Cakefile"
             id="com.aptana.contenttype.coffeescript"
@@ -72,6 +71,9 @@
          <contentTypeBinding
                contentTypeId="com.aptana.contenttype.coffeescript">
          </contentTypeBinding>
+         <projectNatureBinding
+               natureId="com.aptana.projects.webnature">
+         </projectNatureBinding>
       </participant>
    </extension>
    <extension

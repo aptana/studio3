@@ -139,6 +139,8 @@ public class SyncingUIPlugin extends AbstractUIPlugin
 		private static final String COMMAND_SAVE = "org.eclipse.ui.file.save"; //$NON-NLS-1$
 		private static final String COMMAND_SAVE_ALL = "org.eclipse.ui.file.saveAll"; //$NON-NLS-1$
 
+		private IEditorPart[] editorsToUpload;
+
 		public void notHandled(String commandId, NotHandledException exception)
 		{
 		}
@@ -152,18 +154,21 @@ public class SyncingUIPlugin extends AbstractUIPlugin
 			// if we see a save command
 			if (COMMAND_SAVE.equals(commandId) || COMMAND_SAVE_ALL.equals(commandId))
 			{
-				IEditorPart editorPart = UIUtils.getActiveEditor();
-				if (editorPart != null)
+				if (editorsToUpload != null)
 				{
-					IEditorInput input = editorPart.getEditorInput();
-					if (input instanceof IFileEditorInput)
+					for (IEditorPart editor : editorsToUpload)
 					{
-						// for upload, checks if the active editor belongs to a project auto-synced to a FTP connection
-						IProject project = ((IFileEditorInput) input).getFile().getProject();
-						if (SyncPreferenceUtil.isAutoSync(project)
-								&& SyncPreferenceUtil.getAutoSyncDirection(project) != SyncDirection.DOWNLOAD)
+						IEditorInput input = editor.getEditorInput();
+						if (input instanceof IFileEditorInput)
 						{
-							Sync.uploadCurrentEditor();
+							// for upload, checks if the active editor belongs to a project auto-synced to a FTP
+							// connection
+							IProject project = ((IFileEditorInput) input).getFile().getProject();
+							if (SyncPreferenceUtil.isAutoSync(project)
+									&& SyncPreferenceUtil.getAutoSyncDirection(project) != SyncDirection.DOWNLOAD)
+							{
+								Sync.uploadEditor(input);
+							}
 						}
 					}
 				}
@@ -172,6 +177,18 @@ public class SyncingUIPlugin extends AbstractUIPlugin
 
 		public void preExecute(String commandId, ExecutionEvent event)
 		{
+			if (COMMAND_SAVE.equals(commandId))
+			{
+				editorsToUpload = new IEditorPart[] { UIUtils.getActiveEditor() };
+			}
+			else if (COMMAND_SAVE_ALL.equals(commandId))
+			{
+				editorsToUpload = UIUtils.getDirtyEditors();
+			}
+			else
+			{
+				editorsToUpload = null;
+			}
 		}
 	};
 

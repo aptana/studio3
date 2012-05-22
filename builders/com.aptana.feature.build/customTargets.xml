@@ -237,9 +237,7 @@
 	<!-- ===================================================================== -->
 	<!-- Steps to do to publish the build results -->
 	<!-- ===================================================================== -->
-	<target name="publish">
-		<delete dir="${deploy.dir}" failonerror="false" />
-		<mkdir dir="${deploy.dir}" />
+	<target name="publish" depends="wipe.deploy.dir, publish.javadocs">
 		<!-- grab final version -->
 		<property file="${buildDirectory}/finalFeaturesVersions.properties" />
 		<propertycopy name="finalVersion" from="${topLevelElementId}" />
@@ -247,5 +245,65 @@
 		<move file="${buildDirectory}/${buildType}.${build.revision}/${topLevelElementId}-${build.revision}-group.group.group.zip" tofile="${deploy.dir}/${topLevelElementId}-${finalVersion}.zip" />
 		<!-- Extract zipped p2 repo too -->
 		<unzip src="${deploy.dir}/${topLevelElementId}-${finalVersion}.zip" dest="${deploy.dir}" />
+
+		<!-- Check for JDT plugins -->
+		<pathconvert property="jdt.found" setonempty="false">
+			<path>
+				<fileset dir="${deploy.dir}/plugins" includes="org.eclipse.jdt.*" />
+			</path>
+		</pathconvert>
+		<fail message="Generated p2 repo contains JDT plugins!" if="jdt.found" />
+	</target>
+
+	<!-- Wipe and rebuild the deploy directory. -->
+	<target name="wipe.deploy.dir">
+		<delete dir="${deploy.dir}" failonerror="false" />
+		<mkdir dir="${deploy.dir}" />
+	</target>
+
+	<!-- ===================================================================== -->
+	<!-- Steps to do to generate Javadocs -->
+	<!-- ===================================================================== -->
+	<target name="publish.javadocs" if="generate.javadocs">
+		<!-- Hack together the classpath for our plugins -->
+		<path id="javadoc.classpath">
+			<!-- Eclipse plugins -->
+			<fileset dir="${baseLocation}/plugins">
+				<include name="*.jar" />
+			</fileset>
+
+			<!-- Mirrored dependencies -->
+			<fileset dir="${repoBaseLocation}/mirrored/plugins">
+				<include name="*.jar" />
+			</fileset>
+
+			<!-- need to include the binaries of the non-included source packages like org.jruby or org.w3c -->
+			<dirset dir="${buildDirectory}/plugins">
+				<include name="beaver*/bin" />
+				<include name="com.amazon.*/bin" />
+				<include name="org.*/bin" />
+				<include name="json.*/bin" />
+			</dirset>
+			<fileset dir="${buildDirectory}/plugins">
+				<include name="**/*.jar" />
+			</fileset>
+		</path>
+		<!-- Now generate the javadocs for com.aptana.* packages -->
+		<javadoc destdir="${deploy.dir}/docs" packagenames="com.aptana.*" classpathref="javadoc.classpath" author="true" version="true" use="true" windowtitle="Aptana Studio API" encoding="UTF-8" maxmemory="256m">
+
+			<sourcepath>
+				<dirset dir="${buildDirectory}/plugins">
+					<include name="com.*/src" />
+				</dirset>
+			</sourcepath>
+		</javadoc>
+
+		<!-- Lastly, copy over the new stylesheet and files -->
+		<copy todir="${deploy.dir}/docs" overwrite="true">
+			<fileset dir="${builder}/docs" defaultexcludes="true">
+			    <include name="resources/*"/>
+				<include name="stylesheet.css"/>
+			</fileset>
+		</copy>
 	</target>
 </project>

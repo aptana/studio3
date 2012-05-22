@@ -142,6 +142,7 @@ input:before {
     background-color: #B4C8E3;
     height: 10px;
   }
+}
 ==FORMATTED==
 body {
     background-color: #FFFFFF;
@@ -193,7 +194,7 @@ a.afooter:hover {
     font-weight: bold;
     color: #FFFFFF;
     vertical-align: middle;
-    width: 129px;  /* WIDTH OF MAINNAV CELLS */
+    width: 129px; /* WIDTH OF MAINNAV CELLS */
     padding: 0px 0px 0px 10px;
     cursor: hand
 }
@@ -265,4 +266,6 @@ input[type=checkbox] {
 input:before {
     background-color: #B4C8E3;
     height: 10px;
+}
+
 }

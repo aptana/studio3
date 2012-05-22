@@ -7,8 +7,6 @@
  */
 package com.aptana.editor.common.text.reconciler;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +24,6 @@ import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategyExtension;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
@@ -38,16 +35,14 @@ import com.aptana.core.IFilter;
 import com.aptana.core.build.IBuildParticipant;
 import com.aptana.core.build.IBuildParticipant.BuildType;
 import com.aptana.core.build.IBuildParticipantManager;
-import com.aptana.core.build.IProblem;
 import com.aptana.core.build.ReconcileContext;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.CommonAnnotationModel;
 import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.outline.CommonOutlinePage;
-import com.aptana.parsing.ast.IParseNode;
+import com.aptana.editor.common.ICommonAnnotationModel;
+import com.aptana.editor.common.util.EditorUtil;
 
 public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconcilingStrategyExtension,
 		IBatchReconcilingStrategy, IDisposableReconcilingStrategy
@@ -72,10 +67,6 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	 * Code Folding.
 	 */
 	private Map<ProjectionAnnotation, Position> fPositions = new HashMap<ProjectionAnnotation, Position>();
-	/**
-	 * Flag used to auto-expand outlines to 2nd level on first open.
-	 */
-	private boolean autoExpanded;
 
 	private IPropertyListener propertyListener = new IPropertyListener()
 	{
@@ -128,7 +119,6 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	{
 		folder = createFoldingComputer(document);
 		fDocument = document;
-		autoExpanded = false;
 	}
 
 	protected IFoldingComputer createFoldingComputer(IDocument document)
@@ -175,12 +165,23 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		}
 		// If we had all positions we shouldn't probably listen to cancel, but we may have exited emitFoldingRegions
 		// early because of cancel...
-		if (monitor != null && monitor.isCanceled())
+		if (monitor != null && monitor.isCanceled() || !shouldUpdatePositions(folder))
 		{
 			return;
 		}
 
 		updatePositions();
+	}
+
+	/**
+	 * A hook that can prevent folding position update when needed.
+	 * 
+	 * @param folder
+	 * @return <code>true</code> by default. Subclasses may override.
+	 */
+	protected boolean shouldUpdatePositions(IFoldingComputer folder)
+	{
+		return true;
 	}
 
 	// Delete all the positions in the document
@@ -202,7 +203,10 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	 */
 	protected void updatePositions()
 	{
-		fEditor.updateFoldingStructure(fPositions);
+		if (fEditor != null)
+		{
+			fEditor.updateFoldingStructure(fPositions);
+		}
 	}
 
 	private void reconcile(boolean initialReconcile)
@@ -214,11 +218,14 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	{
 		SubMonitor monitor = SubMonitor.convert(fMonitor, 100);
 
-		refreshOutline();
+		if (fEditor != null)
+		{
+			fEditor.refreshOutline();
+		}
 		monitor.worked(5);
 
 		// FIXME only do folding and validation when the source was changed
-		if (fEditor.isFoldingEnabled())
+		if (fEditor != null && fEditor.isFoldingEnabled())
 		{
 			calculatePositions(initialReconcile, monitor.newChild(20));
 		}
@@ -240,36 +247,6 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		runParticipants(monitor.newChild(75));
 	}
 
-	private void refreshOutline()
-	{
-		// TODO Does this need to be run in asyncExec here?
-		Display.getDefault().asyncExec(new Runnable()
-		{
-			public void run()
-			{
-				if (fEditor == null || !fEditor.hasOutlinePageCreated())
-				{
-					return;
-				}
-
-				IParseNode node = fEditor.getAST();
-				if (node == null)
-				{
-					return;
-				}
-
-				CommonOutlinePage page = fEditor.getOutlinePage();
-				page.refresh();
-
-				if (!autoExpanded)
-				{
-					page.expandToLevel(2);
-					autoExpanded = true;
-				}
-			}
-		});
-	}
-
 	/**
 	 * Runs through the {@link IBuildParticipant}s that apply to this editor's underlying file.
 	 * 
@@ -277,20 +254,24 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	 */
 	private void runParticipants(IProgressMonitor monitor)
 	{
-		final IFile file = getFile();
-		// We only want to build files that exist and aren't derived or team private!
-		if (ResourceUtil.shouldIgnore(file))
+		// if file is in the workspace, check if it's valid.
+		// (We only want to build files that exist and aren't derived or team private!)
+		// Otherwise it's an external file, so just assume it is.
+		IFile file = getFile();
+		if (file != null && ResourceUtil.shouldIgnore(file))
 		{
 			return;
 		}
 
-		String contentTypeId = fEditor.getContentType();
-		IBuildParticipantManager manager = BuildPathCorePlugin.getDefault().getBuildParticipantManager();
-		List<IBuildParticipant> participants = manager.getBuildParticipants(contentTypeId);
+		// Grab the list of participants that apply to the editor's content type.
+		List<IBuildParticipant> participants = getBuildParticipantManager().getBuildParticipants(
+				fEditor.getContentType());
 		if (CollectionsUtil.isEmpty(participants))
 		{
 			return;
 		}
+
+		// Now filter based on enablement preferences...
 		participants = filterToEnabled(participants);
 		if (CollectionsUtil.isEmpty(participants))
 		{
@@ -316,6 +297,11 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		sub.done();
 	}
 
+	protected IBuildParticipantManager getBuildParticipantManager()
+	{
+		return BuildPathCorePlugin.getDefault().getBuildParticipantManager();
+	}
+
 	/**
 	 * Creates and returns a {@link ReconcileContext}.
 	 * 
@@ -323,7 +309,13 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	 */
 	protected ReconcileContext createContext()
 	{
-		return new ReconcileContext(fEditor.getContentType(), getFile(), fDocument.get());
+		IFile file = getFile();
+		if (file != null)
+		{
+			return new ReconcileContext(fEditor.getContentType(), file, fDocument.get());
+		}
+
+		return new ReconcileContext(fEditor.getContentType(), EditorUtil.getURI(fEditor), fDocument.get());
 	}
 
 	private List<IBuildParticipant> filterToEnabled(List<IBuildParticipant> participants)
@@ -364,28 +356,14 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		}
 
 		IAnnotationModel model = docProvider.getAnnotationModel(editorInput);
-		if (!(model instanceof CommonAnnotationModel))
+		if (!(model instanceof ICommonAnnotationModel))
 		{
 			return;
 		}
 
-		CommonAnnotationModel caModel = (CommonAnnotationModel) model;
-		caModel.setProgressMonitor(monitor);
-
-		// Collect all the problems into a single collection...
-		Map<String, Collection<IProblem>> mapProblems = context.getProblems();
-		Collection<IProblem> allProblems = new ArrayList<IProblem>();
-		for (Collection<IProblem> problemsForMarkerType : mapProblems.values())
-		{
-			if (!CollectionsUtil.isEmpty(problemsForMarkerType))
-			{
-				allProblems.addAll(problemsForMarkerType);
-			}
-		}
+		ICommonAnnotationModel caModel = (ICommonAnnotationModel) model;
 		// Now report them all to the annotation model!
-		caModel.reportProblems(allProblems);
-
-		caModel.setProgressMonitor(null);
+		caModel.reportProblems(context.getProblems(), monitor);
 	}
 
 	protected IFile getFile()

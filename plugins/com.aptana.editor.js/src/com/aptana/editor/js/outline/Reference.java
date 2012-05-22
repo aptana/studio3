@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
 import com.aptana.parsing.ast.IParseNode;
 
@@ -146,7 +147,7 @@ class Reference
 						else
 						{
 							// calculates name for anonymous function
-							String path = ""; //$NON-NLS-1$
+							String path = StringUtil.EMPTY;
 							IParseNode p = currentNode;
 							IParseNode currentParent;
 							int index;
@@ -184,22 +185,6 @@ class Reference
 
 		Collections.reverse(parts);
 
-		return DELIMITER + join(DELIMITER, parts.toArray(new String[parts.size()]));
-	}
-
-	private static String join(String delimiter, String[] items)
-	{
-		int length = items.length;
-		if (length == 0)
-		{
-			return ""; //$NON-NLS-1$
-		}
-		StringBuilder text = new StringBuilder();
-		for (int i = 0; i < length - 1; ++i)
-		{
-			text.append(items[i]).append(delimiter);
-		}
-		text.append(items[length - 1]);
-		return text.toString();
+		return DELIMITER + StringUtil.join(DELIMITER, parts);
 	}
 }

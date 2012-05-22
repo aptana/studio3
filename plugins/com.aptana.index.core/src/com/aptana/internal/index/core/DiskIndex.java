@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.QueryResult;
 import com.aptana.index.core.SearchPattern;
@@ -157,8 +158,8 @@ public class DiskIndex
 	 * @return
 	 * @throws IOException
 	 */
-	private Map<String, QueryResult> addQueryResult(Map<String, QueryResult> results, String word, Map<String, Object> wordsToDocNumbers,
-		MemoryIndex memoryIndex) throws IOException
+	private Map<String, QueryResult> addQueryResult(Map<String, QueryResult> results, String word,
+			Map<String, Object> wordsToDocNumbers, MemoryIndex memoryIndex) throws IOException
 	{
 		// must skip over documents which have been added/changed/deleted in the memory index
 		if (results == null)
@@ -225,7 +226,8 @@ public class DiskIndex
 	 * @return
 	 * @throws IOException
 	 */
-	public Map<String, QueryResult> addQueryResults(String[] categories, String key, int matchRule, MemoryIndex memoryIndex) throws IOException
+	public Map<String, QueryResult> addQueryResults(String[] categories, String key, int matchRule,
+			MemoryIndex memoryIndex) throws IOException
 	{
 		// assumes sender has called startQuery() & will call stopQuery() when finished
 		if (this.categoryOffsets == null)
@@ -234,6 +236,20 @@ public class DiskIndex
 		}
 
 		Map<String, QueryResult> results = null; // initialized if needed
+
+		// Add perf fixes for common ways of searching for everything:
+		// PREFIX_MATCH with an empty key
+		if ((matchRule == SearchPattern.PREFIX_MATCH || matchRule == (SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE))
+				&& StringUtil.EMPTY.equals(key))
+		{
+			key = null;
+		}
+		// PATTERN_MATCH with a key of "*"
+		else if ((matchRule == SearchPattern.PATTERN_MATCH || matchRule == (SearchPattern.PATTERN_MATCH | SearchPattern.CASE_SENSITIVE))
+				&& "*".equals(key)) //$NON-NLS-1$
+		{
+			key = null;
+		}
 
 		if (key == null)
 		{
@@ -368,7 +384,8 @@ public class DiskIndex
 	 * @param memoryIndex
 	 * @return
 	 */
-	private List<String> computeDocumentNames(List<String> onDiskNames, int[] positions, Map<String, Integer> indexedDocuments, MemoryIndex memoryIndex)
+	private List<String> computeDocumentNames(List<String> onDiskNames, int[] positions,
+			Map<String, Integer> indexedDocuments, MemoryIndex memoryIndex)
 	{
 		int onDiskLength = onDiskNames.size();
 		Map<String, Map<String, Set<String>>> memIndexDocs = memoryIndex.getDocumentsToReferences();
@@ -566,8 +583,6 @@ public class DiskIndex
 			}
 		}
 	}
-
-	
 
 	/**
 	 * getCategories
@@ -767,7 +782,8 @@ public class DiskIndex
 	 * @throws IOException
 	 */
 	@SuppressWarnings("unchecked")
-	private void mergeCategory(String categoryName, DiskIndex onDisk, int[] positions, OutputStream stream) throws IOException
+	private void mergeCategory(String categoryName, DiskIndex onDisk, int[] positions, OutputStream stream)
+			throws IOException
 	{
 		Map<String, Object> wordsToDocs = this.categoryTables.get(categoryName);
 
@@ -893,7 +909,8 @@ public class DiskIndex
 					{
 						if (entry.getKey() != null)
 						{
-							newDiskIndex.copyQueryResults(memoryIndex.getCategoriesForDocument(entry.getKey()), entry.getValue());
+							newDiskIndex.copyQueryResults(memoryIndex.getCategoriesForDocument(entry.getKey()),
+									entry.getValue());
 						}
 					}
 				}
@@ -1014,7 +1031,8 @@ public class DiskIndex
 	 * @return
 	 * @throws IOException
 	 */
-	private synchronized Map<String, Object> readCategoryTable(String categoryName, boolean readDocNumbers) throws IOException
+	private synchronized Map<String, Object> readCategoryTable(String categoryName, boolean readDocNumbers)
+			throws IOException
 	{
 		// result will be null if categoryName is unknown
 		Integer offset = this.categoryOffsets.get(categoryName);
@@ -1593,7 +1611,8 @@ public class DiskIndex
 	 * @throws IOException
 	 */
 	@SuppressWarnings("unchecked")
-	private void writeCategoryTable(String categoryName, Map<String, Object> wordsToDocs, OutputStream stream) throws IOException
+	private void writeCategoryTable(String categoryName, Map<String, Object> wordsToDocs, OutputStream stream)
+			throws IOException
 	{
 		if (this.categoriesToDiscard != null)
 		{

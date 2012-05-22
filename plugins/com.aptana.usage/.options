@@ -1,0 +1,3 @@
+com.aptana.usage/debug=true
+com.aptana.usage/debug/db=true
+com.aptana.usage/debug/usage=true

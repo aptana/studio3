@@ -112,7 +112,7 @@ public class CommonProjectionViewerTest extends EditorBasedTests
 	 * @see com.aptana.editor.common.EditorBasedTests#getPluginId()
 	 */
 	@Override
-	protected String getPluginId()
+	protected String getEditorId()
 	{
 		// straight text editor
 		return "com.aptana.editor.text";

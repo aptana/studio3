@@ -71,25 +71,57 @@ public class IndexBuildParticipant extends RequiredBuildParticipant
 	public void buildFile(BuildContext context, IProgressMonitor monitor)
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
-		deleteFile(context, sub.newChild(10));
-
-		List<IFileStoreIndexingParticipant> indexers = getIndexParticipants(context);
-		if (!CollectionsUtil.isEmpty(indexers))
+		try
 		{
-			int unit = 90 / indexers.size();
-			for (IFileStoreIndexingParticipant indexer : indexers)
+			// try to grab the associated index. If it's not there, we're probably reconciling on an external file, so
+			// just skip indexing
+			if (fIndex == null)
 			{
-				try
+				fIndex = getIndex(context.getProject());
+				if (fIndex == null)
 				{
-					indexer.index(context, fIndex, sub.newChild(unit));
+					return;
 				}
-				catch (CoreException e)
+			}
+
+			// Check for cancellation
+			if (sub.isCanceled())
+			{
+				return;
+			}
+
+			// wipe the index for the file first
+			deleteFile(context, sub.newChild(10));
+
+			List<IFileStoreIndexingParticipant> indexers = getIndexParticipants(context);
+			if (!CollectionsUtil.isEmpty(indexers))
+			{
+				int workPerIndexer = 90 / indexers.size();
+				for (IFileStoreIndexingParticipant indexer : indexers)
 				{
-					IdeLog.logError(BuildPathCorePlugin.getDefault(), e);
+					try
+					{
+						indexer.index(context, fIndex, sub.newChild(workPerIndexer));
+					}
+					catch (CoreException e)
+					{
+						IdeLog.logError(BuildPathCorePlugin.getDefault(), MessageFormat.format(
+								"Failed to index file {0} with indexer {1}", context.getURI(), indexer.getClass() //$NON-NLS-1$
+										.getName()), e);
+					}
+
+					// stop indexing if it has been canceled
+					if (sub.isCanceled())
+					{
+						break;
+					}
 				}
 			}
 		}
-		sub.done();
+		finally
+		{
+			sub.done();
+		}
 	}
 
 	public void deleteFile(BuildContext context, IProgressMonitor monitor)
@@ -97,12 +129,20 @@ public class IndexBuildParticipant extends RequiredBuildParticipant
 		if (fIndex == null)
 		{
 			fIndex = getIndex(context.getProject());
+			if (fIndex == null)
+			{
+				return;
+			}
 		}
 		fIndex.remove(context.getURI());
 	}
 
 	protected URI getURI(IProject project)
 	{
+		if (project == null)
+		{
+			return null;
+		}
 		URI uri = project.getLocationURI();
 		if (uri != null)
 		{
@@ -116,6 +156,10 @@ public class IndexBuildParticipant extends RequiredBuildParticipant
 
 	protected Index getIndex(IProject project)
 	{
+		if (project == null)
+		{
+			return null;
+		}
 		return getIndexManager().getIndex(getURI(project));
 	}
 

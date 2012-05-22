@@ -13,9 +13,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.mortbay.util.ajax.JSON.Output;
+import com.aptana.jetty.util.epl.ajax.JSON.Output;
 
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.ObjectUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.IndexUtil;
 import com.aptana.index.core.ui.views.IPropertyInformation;
@@ -255,5 +256,22 @@ public class PropertyElement extends BaseElement<PropertyElement.Property>
 		out.add(ALLOW_MULTIPLE_VALUES_PROPERTY, this.allowMultipleValues());
 		out.add(VALUES_PROPERTY, this.getValues());
 		out.add(SPECIFICATIONS_PROPERTY, this.getSpecifications());
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (!(obj instanceof PropertyElement))
+		{
+			return false;
+		}
+		PropertyElement other = (PropertyElement) obj;
+		return ObjectUtil.areEqual(getName(), other.getName());
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return getName().hashCode();
 	}
 }

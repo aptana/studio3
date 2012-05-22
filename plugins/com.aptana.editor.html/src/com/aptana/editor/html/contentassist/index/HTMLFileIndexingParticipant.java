@@ -8,8 +8,6 @@
 package com.aptana.editor.html.contentassist.index;
 
 import java.net.URI;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.runtime.CoreException;
@@ -17,6 +15,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 
+import com.aptana.core.IFilter;
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.resolver.IPathResolver;
 import com.aptana.editor.common.resolver.URIResolver;
 import com.aptana.editor.css.ICSSConstants;
@@ -30,6 +30,7 @@ import com.aptana.index.core.AbstractFileIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.build.BuildContext;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.util.ParseUtil;
 
 public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 {
@@ -73,8 +74,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 	private void processHTMLElementNode(Index index, URI uri, HTMLElementNode element)
 	{
 		String cssClass = element.getCSSClass();
-
-		if (cssClass != null && cssClass.trim().length() > 0)
+		if (!StringUtil.isEmpty(cssClass))
 		{
 			StringTokenizer tokenizer = new StringTokenizer(cssClass);
 
@@ -85,8 +85,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 		}
 
 		String id = element.getID();
-
-		if (id != null && id.trim().length() > 0)
+		if (!StringUtil.isEmpty(id))
 		{
 			addIndex(index, uri, ICSSIndexConstants.IDENTIFIER, id);
 		}
@@ -94,9 +93,9 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 		if (element.getName().equalsIgnoreCase(ELEMENT_LINK))
 		{
 			String cssLink = element.getAttributeValue(ATTRIBUTE_HREF);
-
-			if (cssLink != null)
+			if (!StringUtil.isEmpty(cssLink))
 			{
+				// TODO Fire off a thread to run this, since it could be slow or hit the network
 				IPathResolver resolver = new URIResolver(uri);
 				URI resolved = resolver.resolveURI(cssLink);
 
@@ -171,7 +170,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 	 * @param file
 	 * @param current
 	 */
-	protected void processNode(Index index, BuildContext context, IParseNode current)
+	protected void processNode(Index index, BuildContext context, URI uri, IParseNode current)
 	{
 		if (current instanceof HTMLSpecialNode)
 		{
@@ -179,7 +178,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 		}
 		else if (current instanceof HTMLElementNode)
 		{
-			processHTMLElementNode(index, context.getURI(), (HTMLElementNode) current);
+			processHTMLElementNode(index, uri, (HTMLElementNode) current);
 		}
 	}
 
@@ -191,28 +190,21 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 	 * @param parent
 	 * @param monitor
 	 */
-	public void walkAST(BuildContext context, Index index, IParseNode parent, IProgressMonitor monitor)
+	public void walkAST(final BuildContext context, final Index index, IParseNode parent, IProgressMonitor monitor)
 	{
 		if (context == null || index == null || parent == null)
 		{
 			return;
 		}
-
-		Queue<IParseNode> queue = new LinkedList<IParseNode>();
-
-		// prime queue
-		queue.offer(parent);
-
-		while (!queue.isEmpty())
+		final URI uri = context.getURI();
+		ParseUtil.treeApply(parent, new IFilter<IParseNode>()
 		{
-			IParseNode current = queue.poll();
 
-			processNode(index, context, current);
-
-			for (IParseNode child : current)
+			public boolean include(IParseNode item)
 			{
-				queue.offer(child);
+				processNode(index, context, uri, item);
+				return true;
 			}
-		}
+		});
 	}
 }

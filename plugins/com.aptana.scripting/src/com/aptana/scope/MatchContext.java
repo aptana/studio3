@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 public class MatchContext
 {
 	private static final Pattern spaces = Pattern.compile("\\s+"); //$NON-NLS-1$
+
 	private String[] _steps;
 	private int _currentIndex;
 	private Stack<Integer> _savedPositions;
@@ -30,20 +31,33 @@ public class MatchContext
 	}
 
 	/**
-	 * advance
+	 * Advance to the next step within the match context. This method does no bounds checking.
 	 */
 	public void advance()
 	{
 		this._currentIndex++;
 	}
 
+	/**
+	 * Back up to the previous step within the match context. This method does no bounds checking.
+	 */
 	public void backup()
 	{
 		this._currentIndex--;
 	}
 
 	/**
-	 * getCurrentStep
+	 * Determine if the match context has more steps from the current location.
+	 * 
+	 * @return
+	 */
+	public boolean canAdvance()
+	{
+		return _currentIndex < _steps.length - 1;
+	}
+
+	/**
+	 * Return the currently active step within this match context. Returns null if the current step is undefined
 	 * 
 	 * @return
 	 */
@@ -60,7 +74,7 @@ public class MatchContext
 	}
 
 	/**
-	 * getLength
+	 * Return the number of steps within this context
 	 * 
 	 * @return
 	 */
@@ -70,7 +84,7 @@ public class MatchContext
 	}
 
 	/**
-	 * popCurrentStep
+	 * Remove the last stored position and make that the current position within this match context.
 	 */
 	public void popCurrentStep()
 	{
@@ -78,7 +92,8 @@ public class MatchContext
 	}
 
 	/**
-	 * popCurrentStep
+	 * Remove the last stored position. If restore is true then make the restored position the current position within
+	 * this match context.
 	 * 
 	 * @param restore
 	 */
@@ -96,24 +111,16 @@ public class MatchContext
 	}
 
 	/**
-	 * pushCurrentStep
+	 * Save the currently active position for later retrieval. This uses a stack, so pushCurrentSteps should have
+	 * matching popCurrentStep calls.
 	 */
 	public void pushCurrentStep()
 	{
 		this._savedPositions.push(this._currentIndex);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	public String toString()
 	{
 		return this.getCurrentStep();
-	}
-
-	public boolean canAdvance()
-	{
-		return _currentIndex < _steps.length - 1;
 	}
 }

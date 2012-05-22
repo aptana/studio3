@@ -178,7 +178,12 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	 */
 	public void testDojo() throws Exception
 	{
-		assertParse(10, ITestFiles.DOJO_FILES);
+		assertParse(1000, ITestFiles.DOJO_FILES);
+	}
+	
+	public void testDojoMinified() throws Exception
+	{
+		assertParse(1000, "performance/dojo.js.minified.js");
 	}
 
 	/**
@@ -188,7 +193,7 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	 */
 	public void testExt() throws Exception
 	{
-		assertParse(10, ITestFiles.EXT_FILES);
+		assertParse(15, ITestFiles.EXT_FILES);
 	}
 
 	/**
@@ -198,7 +203,7 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	 */
 	public void testJaxerFiles() throws Exception
 	{
-		assertParse(5, ITestFiles.JAXER_FILES);
+		assertParse(50, ITestFiles.JAXER_FILES);
 	}
 
 	/**
@@ -208,7 +213,7 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	 */
 	public void testTiMobile() throws Exception
 	{
-		assertParse(10, ITestFiles.TIMOBILE_FILES);
+		assertParse(375, ITestFiles.TIMOBILE_FILES);
 	}
 
 	/**
@@ -218,7 +223,7 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	 */
 	public void testTinyMce() throws Exception
 	{
-		assertParse(10, ITestFiles.TINY_MCE_FILES);
+		assertParse(430, ITestFiles.TINY_MCE_FILES);
 	}
 
 	/**

@@ -11,6 +11,7 @@ import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.index.core.IPreferenceConstants;
 import com.aptana.index.core.ui.IndexUiActivator;
 
 public class PreferenceInitializer extends AbstractPreferenceInitializer

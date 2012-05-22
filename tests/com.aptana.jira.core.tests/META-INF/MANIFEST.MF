@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Jira Tests
+Bundle-SymbolicName: com.aptana.jira.core.tests
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: Appcelerator, Inc.
+Fragment-Host: com.aptana.jira.core
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Require-Bundle: org.junit
+Export-Package: com.aptana.jira.core.tests

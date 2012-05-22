@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.jruby.RubyInstanceConfig;
 import org.osgi.framework.BundleContext;
 
 import com.aptana.core.logging.IdeLog;
@@ -32,6 +33,15 @@ public class ScriptingActivator extends Plugin
 {
 	public static final String PLUGIN_ID = "com.aptana.scripting"; //$NON-NLS-1$
 	private static ScriptingActivator plugin;
+
+	static
+	{
+		// Fix for: APSTUD-4508 Rubles don't appear to load correctly when Aptana Studio is in a directory with foreign
+		// characters.
+		// This makes the jruby posix implementation use a java-only implementation which does handle unicode characters
+		// properly when on windows.
+		RubyInstanceConfig.nativeEnabled = false;
+	}
 
 	/**
 	 * Context id set by workbench part to indicate they are scripting aware.
@@ -61,40 +71,6 @@ public class ScriptingActivator extends Plugin
 	public static RunType getDefaultRunType()
 	{
 		return RunType.CURRENT_THREAD;
-	}
-
-	/**
-	 * logError
-	 * 
-	 * @deprecated Use {@link IdeLog#logError(Plugin, String, Throwable)}
-	 * @param msg
-	 * @param e
-	 */
-	public static void logError(String msg, Throwable e)
-	{
-		IdeLog.logError(getDefault(), msg, e);
-	}
-
-	/**
-	 * logInfo
-	 * 
-	 * @deprecated Use {@link IdeLog#logInfo(Plugin, String)}
-	 * @param string
-	 */
-	public static void logInfo(String string)
-	{
-		IdeLog.logInfo(getDefault(), string);
-	}
-
-	/**
-	 * logWarning
-	 * 
-	 * @deprecated Use {@link IdeLog#logWarning(Plugin, String)}
-	 * @param msg
-	 */
-	public static void logWarning(String msg)
-	{
-		IdeLog.logWarning(getDefault(), msg);
 	}
 
 	private FileTypeAssociationListener fileTypeListener;
@@ -153,7 +129,8 @@ public class ScriptingActivator extends Plugin
 				}
 				catch (JNotifyException e)
 				{
-					ScriptingActivator.logError(Messages.EarlyStartup_Error_Initializing_File_Monitoring, e);
+					IdeLog.logError(ScriptingActivator.getDefault(),
+							Messages.EarlyStartup_Error_Initializing_File_Monitoring, e);
 				}
 
 				return Status.OK_STATUS;

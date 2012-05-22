@@ -21,6 +21,7 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
@@ -40,8 +41,8 @@ import com.aptana.git.core.IPreferenceConstants;
 public class GitExecutableTest extends TestCase
 {
 	// FIXME This certainly won't work on Windows!
-	private static final String FAKE_GIT_1_5 = "fake_git_1.5.sh";
-	private static final String FAKE_GIT_1_6 = "fake_git_1.6.sh";
+	private static final String FAKE_GIT_1_5 = "test_files/fake_git_1.5.sh";
+	private static final String FAKE_GIT_1_6 = "test_files/fake_git_1.6.sh";
 
 	private Mockery context;
 
@@ -272,7 +273,14 @@ public class GitExecutableTest extends TestCase
 			}
 		});
 
-		GitExecutable.CloneRunnable runnable = new GitExecutable.CloneRunnable(process, monitor);
+		GitExecutable.CloneRunnable runnable = new GitExecutable.CloneRunnable(process, monitor)
+		{
+			@Override
+			protected IProgressMonitor convertMonitor(IProgressMonitor monitor)
+			{
+				return monitor;
+			}
+		};
 		Thread t = new Thread(runnable);
 		t.start();
 		t.join();
@@ -288,6 +296,39 @@ public class GitExecutableTest extends TestCase
 		assertEquals("Monitor isn't reporting proper work units based on stderr output from clone", 7,
 				monitor.getWorkedUnits());
 		context.assertIsSatisfied();
+	}
+
+	public void testAPSTUD4596() throws Throwable
+	{
+		URL url = makeURLForExecutableFile(new Path("test_files/apstud4596_git.sh"));
+
+		IPath path = Path.fromOSString(url.getPath());
+		assertTrue(GitExecutable.acceptBinary(path));
+		GitExecutable.setPreferenceGitPath(path);
+		GitExecutable exe = GitExecutable.instance();
+		assertEquals(Version.parseVersion("1.7.7.5"), exe.version());
+	}
+
+	public void testMsysgitVersionString() throws Throwable
+	{
+		URL url = makeURLForExecutableFile(new Path("test_files/msysgit.sh"));
+
+		IPath path = Path.fromOSString(url.getPath());
+		assertTrue(GitExecutable.acceptBinary(path));
+		GitExecutable.setPreferenceGitPath(path);
+		GitExecutable exe = GitExecutable.instance();
+		assertEquals(Version.parseVersion("1.6.4.msysgit_0"), exe.version());
+	}
+
+	public void testMsysgitVersionStringWithTooManySegments() throws Throwable
+	{
+		URL url = makeURLForExecutableFile(new Path("test_files/1.7.7.5.msysgit.0.sh"));
+
+		IPath path = Path.fromOSString(url.getPath());
+		assertTrue(GitExecutable.acceptBinary(path));
+		GitExecutable.setPreferenceGitPath(path);
+		GitExecutable exe = GitExecutable.instance();
+		assertEquals(Version.parseVersion("1.7.7.5_msysgit_0"), exe.version());
 	}
 
 	private class TestProgressMonitor extends NullProgressMonitor

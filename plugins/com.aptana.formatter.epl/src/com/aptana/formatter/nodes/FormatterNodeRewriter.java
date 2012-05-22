@@ -13,7 +13,9 @@ package com.aptana.formatter.nodes;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.formatter.FormatterUtils;
 import com.aptana.formatter.IFormatterDocument;
 
@@ -208,7 +210,24 @@ public abstract class FormatterNodeRewriter
 				if (start < comment.startOffset)
 				{
 					int validEnd = Math.min(end, comment.startOffset);
-					result.add(new FormatterTextNode(document, start, validEnd));
+					// Check if the comment has a prefix of only tabs and spaces.
+					String preCommentContent = document.get(start, validEnd);
+					Pattern TABS_OR_SPACES = Pattern.compile("\\t| "); //$NON-NLS-1$
+					if (TABS_OR_SPACES.matcher(preCommentContent).replaceAll(StringUtil.EMPTY).length() > 0)
+					{
+						// Not all characters are spaces and tabs, so we add all the range as a text node.
+						result.add(new FormatterTextNode(document, start, validEnd));
+					}
+					else
+					{
+						// In case all characters in the range are spaces and tabs, we are adding *one* space/tab.
+						if (preCommentContent.length() > 0 && !result.isEmpty()
+								&& result.get(result.size() - 1).getSpacesCountAfter() == 0)
+						{
+							result.add(new FormatterTextNode(document, validEnd - 1, validEnd));
+						}
+					}
+
 					start = comment.startOffset;
 				}
 				result.add(createCommentNode(document, start, Math.min(comment.endOffset, end), comment.object));

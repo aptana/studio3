@@ -7,14 +7,33 @@
  */
 package com.aptana.editor.css.parsing;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.LinkedList;
+import java.util.Queue;
+
 import junit.framework.TestCase;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
+
+import com.aptana.core.util.FileUtil;
+import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.editor.css.CSSPlugin;
+import com.aptana.editor.css.parsing.ast.CSSImportNode;
+import com.aptana.editor.css.parsing.ast.CSSMediaNode;
+import com.aptana.editor.css.parsing.ast.CSSNode;
+import com.aptana.editor.css.parsing.ast.CSSPageNode;
 import com.aptana.editor.css.parsing.ast.CSSParseRootNode;
+import com.aptana.editor.css.parsing.ast.CSSRuleNode;
+import com.aptana.editor.css.parsing.ast.ICSSNodeTypes;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
+import com.aptana.parsing.ast.ParseNode;
 
 /**
  * @author Kevin Lindsey
@@ -22,17 +41,16 @@ import com.aptana.parsing.ast.IParseRootNode;
  */
 public class CSSParserTest extends TestCase
 {
-
-	private static final String EOL = "\n"; //$NON-NLS-1$
+	private static final String EOL = FileUtil.NEW_LINE;
 
 	private CSSParser fParser;
-	private CSSScanner fScanner;
+	private CSSFlexScanner fScanner;
 
 	@Override
 	protected void setUp() throws Exception
 	{
 		fParser = new CSSParser();
-		fScanner = new CSSScanner();
+		fScanner = new CSSFlexScanner();
 	}
 
 	@Override
@@ -40,6 +58,20 @@ public class CSSParserTest extends TestCase
 	{
 		fParser = null;
 		fScanner = null;
+	}
+
+	/**
+	 * getSource
+	 * 
+	 * @param resourceName
+	 * @return
+	 * @throws IOException
+	 */
+	private String getSource(String resourceName) throws IOException
+	{
+		InputStream stream = FileLocator.openStream(Platform.getBundle(CSSPlugin.PLUGIN_ID), new Path(resourceName),
+				false);
+		return IOUtil.read(stream);
 	}
 
 	/**
@@ -959,8 +991,7 @@ public class CSSParserTest extends TestCase
 	public void testMissingSemiColon() throws Exception
 	{
 		IParseState parseState = new ParseState();
-		parseStateTest(parseState,
-				"h1      , h2      , h3 {color   : #AA2808\ncolor   : #AA2808}");
+		parseStateTest(parseState, "h1      , h2      , h3 {color   : #AA2808\ncolor   : #AA2808}");
 
 		assertTrue("Could not find parse errors in parse state", !parseState.getErrors().isEmpty());
 	}
@@ -1009,6 +1040,122 @@ public class CSSParserTest extends TestCase
 	public void testStarredImportantProperty() throws Exception
 	{
 		parseTest("button {*overflow: visible !important;}" + EOL); //$NON-NLS-1$
+	}
+
+	/**
+	 * APSTUD-4646
+	 * 
+	 * @throws Exception
+	 */
+	public void testEqualInFunction() throws Exception
+	{
+		parseTest("button {filter: alpha(opacity=30);}" + EOL); //$NON-NLS-1$
+	}
+
+	/**
+	 * APSTUD-4646
+	 * 
+	 * @throws Exception
+	 */
+	public void testMozDocument() throws Exception
+	{
+		parseTest("@-moz-document url-prefix() { .g-section {overflow: hidden;}}" + EOL);
+	}
+
+	/**
+	 * This method is not being used for formal testing, but it's useful to determine how effective
+	 * {@link ParseNode#trimToSize()} is.
+	 * 
+	 * @throws Exception
+	 */
+	public void trimToSize() throws Exception
+	{
+		fScanner.setSource(getSource("performance/github-formatted.css"));
+		CSSParseRootNode root = (CSSParseRootNode) fParser.parse(fScanner);
+
+		int count = 0;
+		Queue<IParseNode> queue = new LinkedList<IParseNode>();
+		queue.offer(root);
+
+		while (!queue.isEmpty())
+		{
+			IParseNode node = queue.poll();
+
+			if (node instanceof IParseRootNode)
+			{
+				for (IParseNode child : node)
+				{
+					queue.add(child);
+				}
+
+				for (IParseNode comment : ((IParseRootNode) node).getCommentNodes())
+				{
+					queue.add(comment);
+				}
+			}
+			else if (node instanceof CSSNode)
+			{
+				count++;
+
+				for (IParseNode child : node)
+				{
+					queue.add(child);
+				}
+
+				switch (node.getNodeType())
+				{
+					case ICSSNodeTypes.IMPORT:
+						for (IParseNode child : ((CSSImportNode) node).getMedias())
+						{
+							queue.add(child);
+						}
+						break;
+
+					case ICSSNodeTypes.RULE:
+						for (IParseNode child : ((CSSRuleNode) node).getSelectors())
+						{
+							queue.add(child);
+						}
+						for (IParseNode child : ((CSSRuleNode) node).getDeclarations())
+						{
+							queue.add(child);
+						}
+						break;
+
+					case ICSSNodeTypes.MEDIA:
+						for (IParseNode child : ((CSSMediaNode) node).getMedias())
+						{
+							queue.add(child);
+						}
+						break;
+
+					case ICSSNodeTypes.PAGE:
+						queue.add(((CSSPageNode) node).getSelector());
+						break;
+
+					case ICSSNodeTypes.AT_RULE:
+					case ICSSNodeTypes.ATTRIBUTE_SELECTOR:
+					case ICSSNodeTypes.CHAR_SET:
+					case ICSSNodeTypes.COMMENT:
+					case ICSSNodeTypes.DECLARATION:
+					case ICSSNodeTypes.EXPRESSION:
+					case ICSSNodeTypes.FONTFACE:
+					case ICSSNodeTypes.FUNCTION:
+					case ICSSNodeTypes.NAMESPACE:
+					case ICSSNodeTypes.PAGE_SELECTOR:
+					case ICSSNodeTypes.SELECTOR:
+					case ICSSNodeTypes.SIMPLE_SELECTOR:
+					case ICSSNodeTypes.TERM:
+					case ICSSNodeTypes.TERM_LIST:
+					case ICSSNodeTypes.TEXT:
+					default:
+						// do nothing else
+						break;
+				}
+			}
+		}
+
+		System.out.println("Node count = " + count);
 	}
 
 	/**

@@ -205,7 +205,7 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	private void pushForeignSpecialNode(IParseNode node)
 	{
 		int nodeStart = node.getStartingOffset();
-		int nodeEnd = node.getEndingOffset();
+		int nodeEnd = node.getEndingOffset() + 1;
 		nodeEnd = Math.min(document.getLength(), nodeEnd);
 		String text = document.get(nodeStart, nodeEnd);
 		// create a default node by looking at edges
@@ -367,7 +367,8 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		formatterNode.setBegin(createTextNode(document, beginNodeRange.getStartingOffset(),
 				beginNodeRange.getEndingOffset() + 1));
 		push(formatterNode);
-		if (node.getNodeType() == IHTMLNodeTypes.SPECIAL && !IHTMLConstants.CONTENT_TYPE_HTML.equals(node.getLanguage()))
+		if (node.getNodeType() == IHTMLNodeTypes.SPECIAL
+				&& !IHTMLConstants.CONTENT_TYPE_HTML.equals(node.getLanguage()))
 		{
 			// Everything under this HTMLSpecialNode should be wrapped with a
 			// FormatterSpecialElementNode, and no need to visit its children.
