@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
@@ -30,6 +31,7 @@ import org.osgi.framework.Version;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
+import com.aptana.core.util.ProcessStatus;
 import com.aptana.core.util.ProcessUtil;
 import com.aptana.core.util.StringUtil;
 
@@ -108,10 +110,19 @@ public class JiraManager
 		{
 			throw new JiraException(Messages.JiraManager_ERR_NoJiraExecutable);
 		}
-		String output = ProcessUtil.outputForCommand(jiraExecutable.toOSString(), jiraExecutable.removeLastSegments(1),
+		IStatus status = ProcessUtil.runInBackground(jiraExecutable.toOSString(), jiraExecutable.removeLastSegments(1),
 				PARAM_ACTION, ACTION_LOGIN, PARAM_USERNAME, username, PARAM_PASSWORD, password);
-		if (!StringUtil.isEmpty(output))
+		if (status != null)
 		{
+			String output = StringUtil.EMPTY;
+			if (status instanceof ProcessStatus)
+			{
+				output = ((ProcessStatus) status).getStdErr();
+			}
+			if (StringUtil.isEmpty(output))
+			{
+				output = status.getMessage();
+			}
 			output = output.trim();
 			StringTokenizer tk = new StringTokenizer(output);
 			if (tk.countTokens() == 1)
