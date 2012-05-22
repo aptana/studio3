@@ -596,6 +596,15 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 				processNode(elements, child);
 			}
 		}
+		// processes if statements
+		for (int i = 0; i < size; ++i)
+		{
+			child = node.getChild(i);
+			if (child.getNodeType() == IJSNodeTypes.IF)
+			{
+				processNode(elements, child);
+			}
+		}
 		// processes var declarations
 		for (int i = 0; i < size; ++i)
 		{
@@ -614,15 +623,6 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 			if (childType == IJSNodeTypes.ASSIGN || childType == IJSNodeTypes.IDENTIFIER
 					|| childType == IJSNodeTypes.NAME_VALUE_PAIR || childType == IJSNodeTypes.INVOKE
 					|| childType == IJSNodeTypes.GROUP || childType == IJSNodeTypes.RETURN)
-			{
-				processNode(elements, child);
-			}
-		}
-		// processes if statements
-		for (int i = 0; i < size; ++i)
-		{
-			child = node.getChild(i);
-			if (child.getNodeType() == IJSNodeTypes.IF)
 			{
 				processNode(elements, child);
 			}
