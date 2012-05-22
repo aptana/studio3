@@ -51,7 +51,7 @@ public class JiraManager
 	private static final String PARAM_TYPE = "--type"; //$NON-NLS-1$
 	private static final String PARAM_PRIORITY = "--priority"; //$NON-NLS-1$
 	private static final String PARAM_SUMMARY = "--summary"; //$NON-NLS-1$
-	private static final String PARAM_DESCRIPTION = "--description"; //$NON-NLS-1$
+	//private static final String PARAM_DESCRIPTION = "--description"; //$NON-NLS-1$
 	private static final String PARAM_ISSUE = "--issue"; //$NON-NLS-1$
 	private static final String PARAM_FILE = "--file"; //$NON-NLS-1$
 	private static final String PARAM_ENVIRONMENT = "--environment"; //$NON-NLS-1$
@@ -181,7 +181,7 @@ public class JiraManager
 				(TITANIUM_COMMUNITY.equals(projectKey) ? PARAM_ENVIRONMENT : PARAM_VERSION), getProjectVersion(),
 				PARAM_TYPE, type.getParameterValue(projectKey),
 				PARAM_PRIORITY, priority.toString(),
-				PARAM_SUMMARY, summary,
+				PARAM_SUMMARY, summary.replaceAll("\"", "'"),  //$NON-NLS-1$//$NON-NLS-2$
 				PARAM_FILE, desc.getAbsolutePath(),
 				"--custom", severity.getParameterValue() //$NON-NLS-1$
 				);
