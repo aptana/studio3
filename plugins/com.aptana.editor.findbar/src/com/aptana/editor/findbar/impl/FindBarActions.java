@@ -20,12 +20,12 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.NotEnabledException;
 import org.eclipse.core.commands.NotHandledException;
 import org.eclipse.core.commands.ParameterizedCommand;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.bindings.Binding;
 import org.eclipse.jface.bindings.BindingManagerEvent;
 import org.eclipse.jface.bindings.IBindingManagerListener;
 import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.jface.bindings.keys.KeySequence;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -48,6 +48,7 @@ import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.findbar.FindBarPlugin;
 import com.aptana.editor.findbar.impl.FindBarDecorator.FindScope;
@@ -68,6 +69,7 @@ public class FindBarActions
 	public static final String FIND_PREVIOUS_COMMAND_ID = "org.eclipse.ui.edit.findbar.findPrevious"; //$NON-NLS-1$
 	public static final String FIND_NEXT_COMMAND_ID = "org.eclipse.ui.edit.findbar.findNext"; //$NON-NLS-1$
 	public static final String FIND_NEXT_OR_PREV_COMMAND_ID = "org.eclipse.ui.edit.findbar.findNextOrPrev"; //$NON-NLS-1$
+	public static final String INPUT_NEWLINE_COMMAND_ID = "org.eclipse.ui.edit.findbar.inputNewline"; //$NON-NLS-1$
 	public static final String FOCUS_REPLACE_COMMAND_ID = "org.eclipse.ui.edit.findbar.focusReplace"; //$NON-NLS-1$
 	public static final String FOCUS_FIND_COMMAND_ID = "org.eclipse.ui.edit.findbar.focusFind"; //$NON-NLS-1$
 	public static final String FOCUS_FIND_OR_OPEN_ECLIPSE_SEARCH_COMMAND_ID = "org.eclipse.ui.edit.findbar.focusFindOrOpenEclipseSearch"; //$NON-NLS-1$
@@ -76,6 +78,7 @@ public class FindBarActions
 	public static final String TOGGLE_SEARCH_BACKWARD_COMMAND_ID = "org.eclipse.ui.edit.findbar.toggleSearchBackward"; //$NON-NLS-1$
 	public static final String TOGGLE_COUNT_MATCHES_COMMAND_ID = "org.eclipse.ui.edit.findbar.toggleMatchCount"; //$NON-NLS-1$
 	public static final String TOGGLE_WORD_MATCHING_COMMAND_ID = "org.eclipse.ui.edit.findbar.toggleWordMatching"; //$NON-NLS-1$
+	public static final String TOGGLE_SEARCH_SELECTION_COMMAND_ID = "org.eclipse.ui.edit.findbar.toggleSearchSelection"; //$NON-NLS-1$
 	public static final String SEARCH_IN_OPEN_FILES_COMMAND_ID = "org.eclipse.ui.edit.findbar.searchInOpenFiles"; //$NON-NLS-1$
 	public static final String SEARCH_IN_CURRENT_FILE_COMMAND_ID = "org.eclipse.ui.edit.findbar.searchInCurrentFile"; //$NON-NLS-1$
 	public static final String SEARCH_IN_ENCLOSING_PROJECT_COMMAND_ID = "org.eclipse.ui.edit.findbar.searchInEnclosingProject"; //$NON-NLS-1$
@@ -117,6 +120,7 @@ public class FindBarActions
 		fCommandToHandler.put(FIND_PREVIOUS_COMMAND_ID, new FindPreviousHandler());
 		fCommandToHandler.put(FIND_NEXT_COMMAND_ID, new FindNextHandler());
 		fCommandToHandler.put(FIND_NEXT_OR_PREV_COMMAND_ID, new FindNextOrPrevHandler());
+		fCommandToHandler.put(INPUT_NEWLINE_COMMAND_ID, new InputNewlineInFindBarHandler());
 		fCommandToHandler.put(FOCUS_FIND_COMMAND_ID, new FocusFindFindBarHandler());
 		fCommandToHandler.put(FOCUS_FIND_OR_OPEN_ECLIPSE_SEARCH_COMMAND_ID,
 				new FocusFindOrOpenEclipseSearchFindBarHandler());
@@ -126,6 +130,7 @@ public class FindBarActions
 		fCommandToHandler.put(TOGGLE_REGEXP_MATCHING_COMMAND_ID, new ToggleRegexpFindBarHandler());
 		fCommandToHandler.put(TOGGLE_SEARCH_BACKWARD_COMMAND_ID, new ToggleSearchBackwardFindBarHandler());
 		fCommandToHandler.put(TOGGLE_COUNT_MATCHES_COMMAND_ID, new ToggleMatchCountFindBarHandler());
+		fCommandToHandler.put(TOGGLE_SEARCH_SELECTION_COMMAND_ID, new ToggleSearchSelectionFindBarHandler());
 		fCommandToHandler.put(SEARCH_IN_OPEN_FILES_COMMAND_ID, new ChangeScopeHandler(FindScope.OPEN_FILES));
 		fCommandToHandler.put(SEARCH_IN_CURRENT_FILE_COMMAND_ID, new ChangeScopeHandler(FindScope.CURRENT_FILE));
 		fCommandToHandler.put(SEARCH_IN_ENCLOSING_PROJECT_COMMAND_ID, new ChangeScopeHandler(
@@ -391,6 +396,23 @@ public class FindBarActions
 		}
 	}
 
+	private class InputNewlineInFindBarHandler extends AbstractHandler
+	{
+		public Object execute(ExecutionEvent event) throws ExecutionException
+		{
+			FindBarDecorator dec = findBarDecorator.get();
+			if (dec.isFindTextActive())
+			{
+				dec.inputNewline(dec.textFind);
+			}
+			else if (dec.isReplaceTextActive())
+			{
+				dec.inputNewline(dec.textReplace);
+			}
+			return null;
+		}
+	}
+
 	private class FocusFindFindBarHandler extends AbstractHandler
 	{
 		public Object execute(ExecutionEvent event) throws ExecutionException
@@ -412,9 +434,9 @@ public class FindBarActions
 			FindBarDecorator dec = findBarDecorator.get();
 			if (dec != null)
 			{
-				IPreferenceStore preferenceStore = FindBarPlugin.getDefault().getPreferenceStore();
-				boolean openEclipseFindBar = preferenceStore
-						.getBoolean(IPreferencesConstants.CTRL_F_TWICE_OPENS_ECLIPSE_FIND_BAR);
+				IEclipsePreferences preferenceStore = EclipseUtil.instanceScope().getNode(FindBarPlugin.PLUGIN_ID);
+				boolean openEclipseFindBar = preferenceStore.getBoolean(
+						IPreferencesConstants.CTRL_F_TWICE_OPENS_ECLIPSE_FIND_BAR, false);
 
 				if (openEclipseFindBar)
 				{
@@ -509,6 +531,21 @@ public class FindBarActions
 			{
 				FindBarConfiguration conf = dec.getConfiguration();
 				conf.setMatchCount(!conf.getMatchCount());
+				dec.showCountTotal();
+			}
+			return null;
+		}
+	}
+
+	private class ToggleSearchSelectionFindBarHandler extends AbstractHandler
+	{
+		public Object execute(ExecutionEvent event) throws ExecutionException
+		{
+			FindBarDecorator dec = findBarDecorator.get();
+			if (dec != null)
+			{
+				dec.searchSelection.setSelection(!dec.searchSelection.getSelection());
+				dec.updateSearchSelection();
 			}
 			return null;
 		}
@@ -617,18 +654,38 @@ public class FindBarActions
 					dec.searchBackward);
 			updateTooltip(TOGGLE_COUNT_MATCHES_COMMAND_ID, Messages.FindBarDecorator_TOOLTIP_ShowMatchCount,
 					dec.countMatches);
+			updateTooltip(TOGGLE_SEARCH_SELECTION_COMMAND_ID, Messages.FindBarDecorator_LABEL_SearchSelection,
+					dec.searchSelection);
 			updateTooltip(SHOW_OPTIONS_COMMAND_ID, Messages.FindBarDecorator_LABEL_ShowOptions, dec.options);
 
 			List<TriggerSequence> bindings = fCommandToBinding.get(FOCUS_REPLACE_COMMAND_ID);
 			if (!CollectionsUtil.isEmpty(bindings))
 			{
-				dec.textReplace.setToolTipText(Messages.FindBarActions_TOOLTIP_FocusReplaceCombo + bindings.get(0));
+				List<TriggerSequence> newlineTriggers = fCommandToBinding.get(INPUT_NEWLINE_COMMAND_ID);
+				List<String> triggers = new ArrayList<String>(newlineTriggers.size() + 1);
+				triggers.add(bindings.get(0).toString());
+				for (TriggerSequence sequence : newlineTriggers)
+				{
+					triggers.add(sequence.toString());
+				}
+
+				dec.textReplace.setToolTipText(MessageFormat.format(Messages.FindBarActions_TOOLTIP_FocusReplaceCombo,
+						triggers.toArray(new Object[triggers.size()])));
 			}
 
 			bindings = fCommandToBinding.get(FOCUS_FIND_COMMAND_ID);
 			if (!CollectionsUtil.isEmpty(bindings))
 			{
-				dec.textFind.setToolTipText(Messages.FindBarActions_TOOLTIP_FocusFindCombo + bindings.get(0));
+				List<TriggerSequence> newlineTriggers = fCommandToBinding.get(INPUT_NEWLINE_COMMAND_ID);
+				List<String> triggers = new ArrayList<String>(newlineTriggers.size() + 1);
+				triggers.add(bindings.get(0).toString());
+				for (TriggerSequence sequence : newlineTriggers)
+				{
+					triggers.add(sequence.toString());
+				}
+
+				dec.textFind.setToolTipText(MessageFormat.format(Messages.FindBarActions_TOOLTIP_FocusFindCombo,
+						triggers.toArray(new Object[triggers.size()])));
 			}
 		}
 

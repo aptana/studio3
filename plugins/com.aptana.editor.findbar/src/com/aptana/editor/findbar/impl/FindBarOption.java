@@ -201,8 +201,15 @@ abstract class FindBarOption extends SelectionAdapter implements SelectionListen
 		if (isCheckable())
 		{
 			item = new MenuItem(menu, SWT.CHECK);
-			IPreferenceStore preferenceStore = FindBarPlugin.getDefault().getPreferenceStore();
-			item.setSelection(preferenceStore.getBoolean(preferencesKey));
+			if (!StringUtil.isEmpty(preferencesKey))
+			{
+				IPreferenceStore preferenceStore = FindBarPlugin.getDefault().getPreferenceStore();
+				item.setSelection(preferenceStore.getBoolean(preferencesKey));
+			}
+			else
+			{
+				item.setSelection(toolItem.getSelection());
+			}
 		}
 		else
 		{
@@ -212,7 +219,7 @@ abstract class FindBarOption extends SelectionAdapter implements SelectionListen
 		{
 			public void widgetSelected(SelectionEvent e)
 			{
-				if (isCheckable())
+				if (isCheckable() && !StringUtil.isEmpty(preferencesKey))
 				{
 					FindBarDecorator.findBarConfiguration.toggle(preferencesKey);
 				}

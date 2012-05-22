@@ -587,7 +587,7 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 			{
 				Collection<IProblem> newItems = itemsByType.get(markerType);
 				// deletes the old markers
-				file.deleteMarkers(markerType, true, IResource.DEPTH_INFINITE);
+				file.deleteMarkers(markerType, false, IResource.DEPTH_INFINITE);
 				sub.worked(1);
 
 				// adds the new ones

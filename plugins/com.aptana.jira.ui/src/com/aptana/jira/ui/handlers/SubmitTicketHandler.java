@@ -89,6 +89,23 @@ public class SubmitTicketHandler extends AbstractHandler
 							}
 						});
 					}
+					catch (final IOException e)
+					{
+						// shows an error message. In this case likely to be because we couldn't create the temp file
+						// for the description
+						UIUtils.getDisplay().asyncExec(new Runnable()
+						{
+
+							public void run()
+							{
+								// using workbench window's shell instead of UIUtils.getActiveShell() since the latter
+								// could be the shell of job's progress dialog and would cause this dialog to close
+								// automatically when job finishes
+								MessageDialog.openError(UIUtils.getActiveWorkbenchWindow().getShell(),
+										Messages.SubmitTicketHandler_ERR_CreateFailed, e.getMessage());
+							}
+						});
+					}
 
 					if (issue != null)
 					{

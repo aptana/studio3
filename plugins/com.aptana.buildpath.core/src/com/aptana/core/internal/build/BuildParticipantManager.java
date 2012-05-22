@@ -134,9 +134,11 @@ public class BuildParticipantManager implements IBuildParticipantManager
 	 * Given a list of already instantiated {@link IBuildParticipant}s, and a contentTypeId, we filter the list down to
 	 * the participants that apply for this content type.
 	 */
-	public List<IBuildParticipant> filterParticipants(List<IBuildParticipant> participants, final String contentTypeId)
+	@SuppressWarnings("unchecked")
+	public List<IBuildParticipant> filterParticipants(List<? extends IBuildParticipant> participants,
+			final String contentTypeId)
 	{
-		return CollectionsUtil.filter(participants, new IFilter<IBuildParticipant>()
+		return CollectionsUtil.filter((List<IBuildParticipant>) participants, new IFilter<IBuildParticipant>()
 		{
 			public boolean include(IBuildParticipant item)
 			{
