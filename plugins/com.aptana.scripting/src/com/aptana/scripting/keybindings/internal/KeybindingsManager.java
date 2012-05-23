@@ -31,6 +31,7 @@ import org.eclipse.jface.bindings.Binding;
 import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.jface.bindings.keys.KeyStroke;
+import org.eclipse.jface.bindings.keys.SWTKeySupport;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.swt.SWT;
@@ -64,7 +65,6 @@ import org.eclipse.ui.progress.WorkbenchJob;
 import org.eclipse.ui.services.IEvaluationService;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.ui.keybinding.KeyBindingHelper;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.keybindings.ICommandElementsProvider;
@@ -114,11 +114,13 @@ public class KeybindingsManager implements LoadCycleListener
 			{
 				return;
 			}
-			
-			if(!KeyBindingHelper.isKeyEventComplete(event)){
+
+			// Is this a complete KeyStroke
+			if (!SWTKeySupport.convertAcceleratorToKeyStroke(SWTKeySupport.convertEventToUnmodifiedAccelerator(event))
+					.isComplete())
+			{
 				return;
 			}
-
 
 			// Generate possible key strokes - we only handle the first one right now
 			List possibleKeyStrokes = WorkbenchKeyboard.generatePossibleKeyStrokes(event);

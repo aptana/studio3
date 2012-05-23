@@ -51,9 +51,11 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
+import org.eclipse.ui.internal.keys.BindingService;
+import org.eclipse.ui.internal.keys.WorkbenchKeyboard.KeyDownFilter;
+import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.part.ViewPart;
 
-import com.aptana.core.ui.keybinding.KeyBindingHelper;
 import com.aptana.terminal.TerminalPlugin;
 import com.aptana.terminal.Utils;
 import com.aptana.terminal.editor.TerminalEditor;
@@ -64,6 +66,7 @@ import com.aptana.terminal.widget.TerminalComposite;
 /**
  * @author Max Stepanov
  */
+@SuppressWarnings("restriction")
 public class TerminalView extends ViewPart implements ISaveablePart2, IProcessListener {
 
 	public static final String ID = "com.aptana.terminal.views.terminal"; //$NON-NLS-1$
@@ -156,6 +159,8 @@ public class TerminalView extends ViewPart implements ISaveablePart2, IProcessLi
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.doit) {
+					IBindingService bindingService = (IBindingService) PlatformUI.getWorkbench().getAdapter(
+							IBindingService.class);
 					Event event = new Event();
 					event.character = e.character;
 					event.keyCode = e.keyCode;
@@ -165,7 +170,17 @@ public class TerminalView extends ViewPart implements ISaveablePart2, IProcessLi
 					event.widget = e.widget;
 					event.time = e.time;
 					event.data = e.data;
-					KeyBindingHelper.handleEvent(event);
+					KeyDownFilter keyDownFilter = ((BindingService) bindingService).getKeyboard().getKeyDownFilter();
+					boolean enabled = keyDownFilter.isEnabled();
+					Control focusControl = e.display.getFocusControl();
+					try {
+						keyDownFilter.setEnabled(true);
+						keyDownFilter.handleEvent(event);
+					} finally {
+						if (focusControl == e.display.getFocusControl()) { // $codepro.audit.disable useEquals
+							keyDownFilter.setEnabled(enabled);
+						}
+					}
 				}
 			}
 		});

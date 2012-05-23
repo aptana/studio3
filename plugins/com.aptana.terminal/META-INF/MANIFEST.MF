@@ -15,8 +15,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.ide,
  com.aptana.org.eclipse.tm.terminal,
  com.aptana.theme,
- com.aptana.scripting,
- com.aptana.core.ui
+ com.aptana.scripting
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Eclipse-LazyStart: true

@@ -1,21 +1,16 @@
 /**
- * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the Eclipse Public License (EPL).
  * Please see the license.txt included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.core.ui.keybinding;
+package com.aptana.editor.findbar.impl;
 
 import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.jface.bindings.keys.KeyStroke;
-import org.eclipse.jface.bindings.keys.SWTKeySupport;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.internal.keys.BindingService;
 import org.eclipse.ui.keys.IBindingService;
 
 /**
@@ -23,7 +18,6 @@ import org.eclipse.ui.keys.IBindingService;
  * 
  * @author Fabio Zadrozny
  */
-@SuppressWarnings("restriction")
 public class KeyBindingHelper
 {
 
@@ -62,18 +56,15 @@ public class KeyBindingHelper
 		return false;
 	}
 
+	
 	public static boolean matchesKeybinding(int keyCode, int stateMask, TriggerSequence seq)
 	{
 		int upperCase = Character.toUpperCase(keyCode);
-		if (upperCase == keyCode)
-		{
+		if(upperCase == keyCode){
 			return internalMatchesKeybinding(keyCode, stateMask, seq);
-		}
-		else
-		{
-			// try both: upper and lower case.
-			return internalMatchesKeybinding(upperCase, stateMask, seq)
-					|| internalMatchesKeybinding(keyCode, stateMask, seq);
+		}else{
+			//try both: upper and lower case.
+			return internalMatchesKeybinding(upperCase, stateMask, seq) || internalMatchesKeybinding(keyCode, stateMask, seq);
 		}
 	}
 
@@ -82,10 +73,9 @@ public class KeyBindingHelper
 		KeySequence keySequence = (KeySequence) seq;
 		KeyStroke[] keyStrokes = keySequence.getKeyStrokes();
 
-		if (keyStrokes.length > 1)
+		if(keyStrokes.length > 1)
 		{
-			return false; // Only handling one step binding... the code below does not support things as "CTRL+X R" for
-							// redo.
+			return false; //Only handling one step binding... the code below does not support things as "CTRL+X R" for redo.
 		}
 		for (KeyStroke keyStroke : keyStrokes)
 		{
@@ -96,34 +86,6 @@ public class KeyBindingHelper
 			}
 		}
 		return false;
-	}
-
-	public static boolean isKeyEventComplete(Event event)
-	{
-		// Is this a complete KeyStroke
-		return SWTKeySupport.convertAcceleratorToKeyStroke(SWTKeySupport.convertEventToUnmodifiedAccelerator(event))
-				.isComplete();
-	}
-
-	public static void handleEvent(Event e)
-	{
-		IBindingService bindingService = (IBindingService) PlatformUI.getWorkbench().getAdapter(IBindingService.class);
-
-		Listener keyDownFilter = ((BindingService) bindingService).getKeyboard().getKeyDownFilter();
-		boolean enabled = bindingService.isKeyFilterEnabled();
-		Control focusControl = e.display.getFocusControl();
-		try
-		{
-			bindingService.setKeyFilterEnabled(true);
-			keyDownFilter.handleEvent(e);
-		}
-		finally
-		{
-			if (focusControl == e.display.getFocusControl()) // $codepro.audit.disable useEquals
-			{
-				bindingService.setKeyFilterEnabled(enabled);
-			}
-		}
 	}
 
 }
