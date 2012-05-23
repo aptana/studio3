@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -11,13 +11,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.aptana.jetty.util.epl.ajax.JSON.Output;
-
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.IndexUtil;
 import com.aptana.index.core.ui.views.IPropertyInformation;
+import com.aptana.jetty.util.epl.ajax.JSON.Output;
 
 public class TypeElement extends BaseElement<TypeElement.Property>
 {
@@ -567,5 +566,12 @@ public class TypeElement extends BaseElement<TypeElement.Property>
 		}
 
 		printer.decreaseIndent().println('}');
+	}
+
+	public String toString()
+	{
+		SourcePrinter printer = new SourcePrinter();
+		toSource(printer);
+		return printer.toString();
 	}
 }

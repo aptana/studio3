@@ -468,7 +468,7 @@ public abstract class InferencingTestsBase extends TestCase
 
 		for (String type : types)
 		{
-			assertTrue(symbolTypes.contains(type));
+			assertTrue(MessageFormat.format("Expected to find type ''{0}'' in list: {1}", type, symbolTypes), symbolTypes.contains(type));
 		}
 	}
 }
