@@ -165,7 +165,7 @@ public class ElementElement extends BaseElement<ElementElement.Property>
 	/*
 	 * (non-Javadoc)
 	 * @see
-	 * com.aptana.editor.css.contentassist.model.AbstractCSSMetadataElement#toJSON(org.mortbay.util.ajax.JSON.Output)
+	 * com.aptana.editor.css.contentassist.model.AbstractCSSMetadataElement#toJSON(com.aptana.jetty.util.epl.ajax.JSON.Output)
 	 */
 	@Override
 	public void toJSON(Output out)
