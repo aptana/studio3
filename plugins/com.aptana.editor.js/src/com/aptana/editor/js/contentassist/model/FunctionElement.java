@@ -450,4 +450,11 @@ public class FunctionElement extends PropertyElement
 			printer.print(" throws ").print(StringUtil.join(", ", this.getExceptionTypes())); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
+
+	public String toString()
+	{
+		SourcePrinter printer = new SourcePrinter();
+		toSource(printer);
+		return printer.toString();
+	}
 }

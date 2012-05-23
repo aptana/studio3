@@ -19,6 +19,7 @@ import java.util.Set;
 
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -37,6 +38,7 @@ import com.aptana.index.core.IFileStoreIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.IndexPlugin;
+import com.aptana.index.core.build.BuildContext;
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.SnippetElement;
@@ -571,4 +573,90 @@ public class JSContentAssistProposalTests extends JSEditorBasedTests
 			}
 		}
 	}
+
+	public void testParameterInsideFunction()
+	{
+		// @formatter:off
+		this.checkProposals(
+			"contentAssist/param-inside-function.js",
+			"myParam",
+			"myFunction"
+		);
+		// @formatter:on
+	}
+
+	// APSTUD-4206
+	public void testUndefinedFunctionReturnShowsObjectProposals()
+	{
+		// @formatter:off
+		this.checkProposals(
+			"contentAssist/undefined-function-return.js",
+			"constructor",
+			"eval",
+			"hasOwnProperty",
+			"isPrototypeOf",
+			"propertyIsEnumerable",
+			"toSource",
+			"toLocaleString",
+			"toString",
+			"unwatch",
+			"valueOf",
+			"watch"
+		);
+		// @formatter:on
+	}
+
+	// https://jira.appcelerator.org/browse/APSTUD-4017
+	public void testOffersCAOnMultipleTypesInferredForSameVariable() throws Exception
+	{
+		TestProject project = null;
+		try
+		{
+			// Create a test project and files
+			project = new TestProject("APSTUD4017", new String[] { "com.aptana.projects.webnature" });
+			IFile number = project.createFile("apstud4017_number.js", "var abc = 10;");
+			IFile string = project.createFile("apstud4017_string.js", "var abc = \"hello\";");
+
+			// Index the files
+			index(number, string);
+
+			// Now create a third file to open in the editor
+			IFile file = project.createFile("apstud4017.js", "abc.");
+
+			// open JS editor on file
+			editor = (ITextEditor) EditorTestHelper.openInEditor(file, "com.aptana.editor.js", true);
+			ISourceViewer viewer = ((AbstractThemeableEditor) editor).getISourceViewer();
+
+			EditorTestHelper.joinReconciler((SourceViewer) viewer, 100L, 2000L, 100L);
+
+			// get proposals after "abc."
+			this.processor = new JSContentAssistProcessor((AbstractThemeableEditor) editor);
+			ICompletionProposal[] proposals = processor.computeCompletionProposals(viewer, 4, '\0', false);
+
+			// make sure we get Number proposals (from first file's defining type as number)
+			assertContains(proposals, "toFixed", "toExponential", "toPrecision");
+			// make sure we get String proposals (from second file's defining type as string)
+			assertContains(proposals, "charAt", "concat", "indexOf", "length", "toUpperCase", "toLowerCase");
+		}
+		finally
+		{
+			if (project != null)
+			{
+				project.delete();
+			}
+		}
+	}
+
+	protected void index(IFile... files) throws CoreException
+	{
+		IFileStoreIndexingParticipant part = createIndexer();
+		if (part != null)
+		{
+			for (IFile file : files)
+			{
+				part.index(new BuildContext(file), getIndexManager().getIndex(file.getProject().getLocationURI()), null);
+			}
+		}
+	}
+
 }
