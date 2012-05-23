@@ -34,7 +34,17 @@ public class StringUtil
 	/**
 	 * regexp for counting lines and splitting strings by lines.
 	 */
-	public static final Pattern LINE_SPLITTER = Pattern.compile("\r?\n|\r"); //$NON-NLS-1$
+	public static final String LINE_SPLITTER_REGEX = "\r?\n|\r"; //$NON-NLS-1$
+
+	/**
+	 * regex for newline group
+	 */
+	public static final String REGEX_NEWLINE_GROUP = StringUtil.format("({0})", StringUtil.LINE_SPLITTER_REGEX); //$NON-NLS-1$
+
+	/**
+	 * Pattern for counting lines and splitting strings by lines.
+	 */
+	public static final Pattern LINE_SPLITTER = Pattern.compile(LINE_SPLITTER_REGEX);
 
 	/**
 	 * TextPatternReplacer to sanitize html/xml to entities.
