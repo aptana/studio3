@@ -6120,32 +6120,32 @@
                 </browsers>
             </method>
 
-            <method name = "getComputedStyle" scope = "instance" visibility = "basic">
+            <method name="getComputedStyle" scope="instance" visibility="basic">
                 <parameters>
-                    <parameter name = "elt" type = "Element" usage = "required">
+                    <parameter name="elt" type="Element" usage="required">
                         <description>Document element to get the style information for.</description>
                     </parameter>
-                    <parameter name = "pseudoElt" type = "String" usage = "required">
+                    <parameter name="pseudoElt" type="String" usage="required">
                         <description>CSS pseudoelement.</description>
                     </parameter>
                 </parameters>
                 <references>
-                    <reference name = "CSS2Properties"/>
-                    <reference name = "CSSStyleDeclaration"/>
-                    <reference name = "HTMLElement.style"/>
+                    <reference name="CSS2Properties"/>
+                    <reference name="CSSStyleDeclaration"/>
+                    <reference name="HTMLElement.style"/>
                 </references>
                 <return-types>
-                    <return-type type = "CSSStyleDeclaration"/>
+                    <return-type type="CSSStyleDeclaration"/>
                 </return-types>
                 <availability>
-                    <specification name = "HTML DOM Level 2"/>
+                    <specification name="HTML DOM Level 2"/>
                 </availability>
                 <description>Computes style information and returns the CSSStyleDeclaration for the specified document Element.</description>
                 <browsers>
-                    <browser platform = "IE" version = "6.0+"/>
-                    <browser platform = "Mozilla" version = "1.0+"/>
-                    <browser platform = "Netscape" version = "6.0+"/>
-                    <browser platform = "Safari" version = "1.0+"/>
+                    <browser platform="IE" version="6.0+"/>
+                    <browser platform="Mozilla" version="1.0+"/>
+                    <browser platform="Netscape" version="6.0+"/>
+                    <browser platform="Safari" version="1.0+"/>
                 </browsers>
                 <return-description>Returns the CSSStyleDeclaration for the specified document Element.</return-description>           
             </method>
