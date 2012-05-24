@@ -34,6 +34,8 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
@@ -254,6 +256,15 @@ public class SubmitTicketDialog extends TitleAreaDialog
 		reproduceText = new Text(main, SWT.BORDER | SWT.MULTI);
 		reproduceText.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).hint(SWT.DEFAULT, 100).create());
 		reproduceText.addModifyListener(modifyListener);
+		TraverseListener traverseListener = new TraverseListener()
+		{
+
+			public void keyTraversed(TraverseEvent e)
+			{
+				e.doit = true;
+			}
+		};
+		reproduceText.addTraverseListener(traverseListener);
 
 		// Actual Result
 		label = new Label(main, SWT.NONE);
@@ -263,6 +274,7 @@ public class SubmitTicketDialog extends TitleAreaDialog
 		actualResultText = new Text(main, SWT.BORDER | SWT.MULTI);
 		actualResultText.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).hint(SWT.DEFAULT, 50).create());
 		actualResultText.addModifyListener(modifyListener);
+		actualResultText.addTraverseListener(traverseListener);
 
 		// Expected Result
 		label = new Label(main, SWT.NONE);
@@ -273,6 +285,7 @@ public class SubmitTicketDialog extends TitleAreaDialog
 		expectedResultText
 				.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).hint(SWT.DEFAULT, 50).create());
 		expectedResultText.addModifyListener(modifyListener);
+		expectedResultText.addTraverseListener(traverseListener);
 
 		// logs to attach
 		label = new Label(main, SWT.NONE);
