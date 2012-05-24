@@ -1,0 +1,1 @@
+var constructedError = new Error;
