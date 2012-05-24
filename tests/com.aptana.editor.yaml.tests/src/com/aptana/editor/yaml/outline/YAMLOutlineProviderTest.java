@@ -27,7 +27,6 @@ public class YAMLOutlineProviderTest extends TestCase
 		fContentProvider = new YAMLOutlineContentProvider();
 		fLabelProvider = new YAMLOutlineLabelProvider();
 		fParser = new YAMLParser();
-		fParseState = new ParseState();
 	}
 
 	@Override
@@ -41,7 +40,7 @@ public class YAMLOutlineProviderTest extends TestCase
 	public void testString() throws Exception
 	{
 		String source = "string : text";
-		fParseState.setEditState(source);
+		fParseState = new ParseState(source);
 		Object result = fParser.parse(fParseState);
 
 		Object[] children = fContentProvider.getChildren(result);
@@ -58,7 +57,7 @@ public class YAMLOutlineProviderTest extends TestCase
 	public void testNumber() throws Exception
 	{
 		String source = "number : 12345";
-		fParseState.setEditState(source);
+		fParseState = new ParseState(source);
 		Object result = fParser.parse(fParseState);
 
 		Object[] children = fContentProvider.getChildren(result);

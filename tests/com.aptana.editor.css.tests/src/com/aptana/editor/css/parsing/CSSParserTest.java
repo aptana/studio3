@@ -990,8 +990,9 @@ public class CSSParserTest extends TestCase
 	 */
 	public void testMissingSemiColon() throws Exception
 	{
-		IParseState parseState = new ParseState();
-		parseStateTest(parseState, "h1      , h2      , h3 {color   : #AA2808\ncolor   : #AA2808}");
+		String src = "h1      , h2      , h3 {color   : #AA2808\ncolor   : #AA2808}";
+		IParseState parseState = new ParseState(src);
+		fParser.parse(parseState);
 
 		assertTrue("Could not find parse errors in parse state", !parseState.getErrors().isEmpty());
 	}
@@ -1003,9 +1004,9 @@ public class CSSParserTest extends TestCase
 	 */
 	public void testCommentsInsideDeclaration() throws Exception
 	{
-		IParseState parseState = new ParseState();
-		IParseRootNode parseResult = parseStateTest(parseState, "body{color   : #AA2808;\n /*this is a comment*/}"
-				+ EOL);
+		String src = "body{color   : #AA2808;\n /*this is a comment*/}" + EOL;
+		IParseState parseState = new ParseState(src);
+		IParseRootNode parseResult = fParser.parse(parseState);
 		assertTrue("Comments were not stored in parse result", parseResult.getCommentNodes().length == 1);
 	}
 
@@ -1016,8 +1017,9 @@ public class CSSParserTest extends TestCase
 	 */
 	public void testBlankCSSContent() throws Exception
 	{
-		IParseState parseState = new ParseState();
-		IParseRootNode parseResult = parseStateTest(parseState, StringUtil.EMPTY + EOL);
+		String src = StringUtil.EMPTY + EOL;
+		IParseState parseState = new ParseState(src);
+		IParseRootNode parseResult = fParser.parse(parseState);
 
 		assertTrue(parseResult instanceof CSSParseRootNode);
 	}
@@ -1156,17 +1158,6 @@ public class CSSParserTest extends TestCase
 		}
 
 		System.out.println("Node count = " + count);
-	}
-
-	/**
-	 * parseTest
-	 * 
-	 * @throws Exception
-	 */
-	public IParseRootNode parseStateTest(IParseState parseState, String source) throws Exception
-	{
-		parseState.setEditState(source);
-		return fParser.parse(parseState);
 	}
 
 	/**

@@ -77,9 +77,8 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 	public int detectIndentationLevel(IDocument document, int offset, boolean isSelection,
 			IFormattingContext formattingContext)
 	{
-		IParseState parseState = new HTMLParseState();
 		String source = document.get();
-		parseState.setEditState(source);
+		IParseState parseState = new HTMLParseState(source);
 		int indent = 0;
 		try
 		{
@@ -136,8 +135,7 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 		}
 		try
 		{
-			IParseState parseState = new HTMLParseState();
-			parseState.setEditState(input);
+			IParseState parseState = new HTMLParseState(input);
 			IParseNode parseResult = null;
 			try
 			{
@@ -279,9 +277,8 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 		{
 			// We re-parse the output to extract its On-Off regions, so we will be able to compute the offsets and
 			// adjust it.
-			List<IRegion> outputOnOffRegions = getOutputOnOffRegions(output,
-					getString(HTMLFormatterConstants.FORMATTER_OFF), getString(HTMLFormatterConstants.FORMATTER_ON),
-					new HTMLParseState());
+			List<IRegion> outputOnOffRegions = getOutputOnOffRegions(getString(HTMLFormatterConstants.FORMATTER_OFF),
+					getString(HTMLFormatterConstants.FORMATTER_ON), new HTMLParseState(output));
 			output = FormatterUtils.applyOffOnRegions(input, output, offOnRegions, outputOnOffRegions);
 		}
 		if (isSelection)

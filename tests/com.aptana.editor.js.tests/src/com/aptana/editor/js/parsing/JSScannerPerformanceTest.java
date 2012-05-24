@@ -169,8 +169,7 @@ public class JSScannerPerformanceTest extends PerformanceTestCase
 	private void timeScan(String resourceName, String src, int numRuns) throws Exception
 	{
 		// apply to parse state
-		IParseState parseState = new ParseState();
-		parseState.setEditState(src);
+		IParseState parseState = new ParseState(src);
 
 		for (int i = 0; i < numRuns; i++)
 		{

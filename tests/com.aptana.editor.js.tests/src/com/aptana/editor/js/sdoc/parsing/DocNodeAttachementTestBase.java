@@ -41,20 +41,17 @@ import com.aptana.parsing.xpath.ParseNodeXPath;
 public class DocNodeAttachementTestBase extends TestCase
 {
 	private JSParser parser;
-	private ParseState parseState;
 
 	@Override
 	protected void setUp() throws Exception
 	{
 		parser = new JSParser();
-		parseState = new ParseState();
 	}
 
 	@Override
 	protected void tearDown() throws Exception
 	{
 		parser = null;
-		parseState = null;
 
 		super.tearDown();
 	}
@@ -108,7 +105,7 @@ public class DocNodeAttachementTestBase extends TestCase
 		IPath path = Path.fromPortableString(resource);
 		String source = getContent(getFileStore(path));
 
-		parseState.setEditState(source);
+		ParseState parseState = new ParseState(source);
 		try
 		{
 			parser.parse(parseState);

@@ -47,8 +47,7 @@ public class JSONFoldingComputerTest extends TestCase
 		{
 			protected IParseNode getAST()
 			{
-				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get());
+				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
 					return new JSONParser().parse(parseState);
@@ -79,8 +78,7 @@ public class JSONFoldingComputerTest extends TestCase
 		{
 			protected IParseNode getAST()
 			{
-				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get());
+				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
 					return new JSONParser().parse(parseState);
@@ -107,8 +105,7 @@ public class JSONFoldingComputerTest extends TestCase
 		{
 			protected IParseNode getAST()
 			{
-				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get());
+				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
 					return new JSONParser().parse(parseState);
@@ -145,8 +142,7 @@ public class JSONFoldingComputerTest extends TestCase
 		{
 			protected IParseNode getAST()
 			{
-				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get());
+				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
 					return new JSONParser().parse(parseState);

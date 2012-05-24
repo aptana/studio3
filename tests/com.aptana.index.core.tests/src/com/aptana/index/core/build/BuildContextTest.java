@@ -53,13 +53,13 @@ public class BuildContextTest extends TestCase
 			}
 		};
 
-		ParseState parseState = new ParseState();
+		ParseState parseState = new ParseState(buildContext.getContents());
 		IParseRootNode ast = buildContext.getAST(parseState);
 		assertEquals(parseRootNode, ast);
 		assertEquals(1, parseState.getErrors().size());
 		assertEquals(1, reparses[0]);
 
-		parseState = new ParseState();
+		parseState = new ParseState(buildContext.getContents());
 		ast = buildContext.getAST(parseState); // This time it's cached.
 		assertEquals(1, parseState.getErrors().size()); //errors must be copied
 		assertEquals(parseRootNode, ast);

@@ -61,25 +61,6 @@ public interface IParseState
 	public Map<String, Object> getProperties();
 
 	/**
-	 * Equal to calling {@link #setEditState(String, int)} with starting offset of 0.
-	 * 
-	 * @param source
-	 * @param startingOffset
-	 */
-	public void setEditState(String source);
-
-	/**
-	 * Sets the source to operate on along with the starting offset to use. Typically this would be 0, if that is the
-	 * case, use {@link #setEditState(String)}
-	 * 
-	 * @param source
-	 * @param startingOffset
-	 *            Typically 0, use a non-zero value for parsing embedded languages that don't start at the beginning of
-	 *            the file.
-	 */
-	public void setEditState(String source, int startingOffset);
-
-	/**
 	 * setParseResult
 	 * 
 	 * @param result
