@@ -525,6 +525,7 @@ public class SubmitTicketDialog extends TitleAreaDialog
 		}
 		typeCombo.getCombo().setEnabled(!locked);
 		priorityCombo.getCombo().setEnabled(!locked);
+		severityCombo.getCombo().setEnabled(!locked);
 		summaryText.setEnabled(!locked);
 		reproduceText.setEnabled(!locked);
 		actualResultText.setEnabled(!locked);
