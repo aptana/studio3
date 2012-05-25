@@ -177,11 +177,10 @@ public class SubmitTicketDialog extends TitleAreaDialog
 		Label separator = new Label(main, SWT.HORIZONTAL | SWT.SEPARATOR);
 		separator.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).span(2, 1).create());
 
-		// adds control for login credentials if this is first time use
+		// adds control for login credentials
 		userInfoProvider = new JiraPreferencePageProvider();
 		userInfoControl = userInfoProvider.createContents(main);
-		userInfoControl.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).span(2, 1)
-				.exclude(getJiraManager().getUser() != null).create());
+		userInfoControl.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).span(2, 1).create());
 
 		// issue type
 		Label label = new Label(main, SWT.NONE);
@@ -372,16 +371,6 @@ public class SubmitTicketDialog extends TitleAreaDialog
 			public void postValidationEnd()
 			{
 				setUILocked(false);
-				// hides the control for entering user credentials if the user is validated
-				if (!userInfoControl.isDisposed())
-				{
-					boolean isValidated = (getJiraManager().getUser() != null);
-					if (isValidated)
-					{
-						userInfoControl.setVisible(false);
-						((GridData) userInfoControl.getLayoutData()).exclude = true;
-					}
-				}
 				if (!progressMonitorPart.isDisposed())
 				{
 					progressMonitorPart.setVisible(false);
@@ -416,7 +405,7 @@ public class SubmitTicketDialog extends TitleAreaDialog
 	@Override
 	protected void okPressed()
 	{
-		if (!((GridData) userInfoControl.getLayoutData()).exclude && !userInfoProvider.performOk())
+		if (!userInfoProvider.performOk())
 		{
 			return;
 		}
