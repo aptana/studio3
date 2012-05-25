@@ -8,7 +8,6 @@
 package com.aptana.jira.ui.preferences;
 
 import java.lang.reflect.InvocationTargetException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +28,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Text;
 
 import com.aptana.core.logging.IdeLog;
@@ -59,7 +57,8 @@ public class JiraPreferencePageProvider extends AbstractAccountPageProvider
 	private Text passwordText;
 	private Button testButton;
 	private Button createAccountButton;
-	private Link logoutLink;
+	private Label userLabel;
+	private Button logoutButton;
 
 	public JiraPreferencePageProvider()
 	{
@@ -148,13 +147,14 @@ public class JiraPreferencePageProvider extends AbstractAccountPageProvider
 	private Composite createLogoutComponents(Composite parent)
 	{
 		Composite logoutComp = new Composite(parent, SWT.NONE);
-		logoutComp.setLayout(GridLayoutFactory.swtDefaults().spacing(0, 5).numColumns(2).create());
+		logoutComp.setLayout(GridLayoutFactory.swtDefaults().spacing(0, 5).numColumns(3).create());
 
 		Label label = new Label(logoutComp, SWT.NONE);
 		label.setText(StringUtil.makeFormLabel(Messages.JiraPreferencePageProvider_LBL_User));
-		logoutLink = new Link(logoutComp, SWT.NONE);
-		logoutLink.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).create());
-		logoutLink.addSelectionListener(new SelectionAdapter()
+		userLabel = new Label(logoutComp, SWT.NONE);
+		logoutButton = new Button(logoutComp, SWT.PUSH);
+		logoutButton.setText(Messages.JiraPreferencePageProvider_LBL_Logout);
+		logoutButton.addSelectionListener(new SelectionAdapter()
 		{
 
 			@Override
@@ -163,7 +163,7 @@ public class JiraPreferencePageProvider extends AbstractAccountPageProvider
 				logout();
 			}
 		});
-		updateLinkText();
+		updateUserText();
 
 		return logoutComp;
 	}
@@ -187,13 +187,12 @@ public class JiraPreferencePageProvider extends AbstractAccountPageProvider
 		return getJiraManager().getUser() == null;
 	}
 
-	private void updateLinkText()
+	private void updateUserText()
 	{
 		JiraUser user = getJiraManager().getUser();
 		if (user != null)
 		{
-			logoutLink
-					.setText(MessageFormat.format(Messages.JiraPreferencePageProvider_Link_Logout, user.getUsername()));
+			userLabel.setText(user.getUsername());
 		}
 	}
 
@@ -242,7 +241,7 @@ public class JiraPreferencePageProvider extends AbstractAccountPageProvider
 
 							public void run()
 							{
-								updateLinkText();
+								updateUserText();
 								layout();
 							}
 						});
