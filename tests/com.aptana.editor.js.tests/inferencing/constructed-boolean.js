@@ -1,0 +1,1 @@
+var constructedBoolean = new Boolean;

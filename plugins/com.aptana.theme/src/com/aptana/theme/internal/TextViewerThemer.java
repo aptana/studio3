@@ -8,10 +8,12 @@
 package com.aptana.theme.internal;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
@@ -41,11 +43,17 @@ public class TextViewerThemer extends ControlThemer
 		super(viewer.getTextWidget());
 	}
 
+	/**
+	 * Themes always apply to text viewers.
+	 */
 	protected boolean invasiveThemesEnabled()
 	{
 		return true;
 	}
 
+	/**
+	 * Always use the editor font.
+	 */
 	protected boolean useEditorFont()
 	{
 		return true;
@@ -62,6 +70,15 @@ public class TextViewerThemer extends ControlThemer
 			overrideCursor();
 			overrideCaretColor();
 		}
+	}
+
+	/**
+	 * This is a TextViewer (usually editor contents), so use the text font explicitly, not the view font we set up in
+	 * parent class.
+	 */
+	protected Font getFont()
+	{
+		return JFaceResources.getTextFont();
 	}
 
 	private StyledText getTextWidget()

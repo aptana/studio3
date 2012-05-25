@@ -1,0 +1,1 @@
+var constructedFunction = new Function;

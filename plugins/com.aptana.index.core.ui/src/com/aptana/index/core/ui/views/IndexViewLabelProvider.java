@@ -9,6 +9,7 @@ package com.aptana.index.core.ui.views;
 
 import java.util.List;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.IFontProvider;
@@ -22,6 +23,7 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.Theme;
 import com.aptana.theme.ThemePlugin;
+import com.aptana.theme.preferences.IPreferenceConstants;
 
 /**
  * IndexViewLabelProvider
@@ -81,14 +83,23 @@ public class IndexViewLabelProvider extends AbstractProvider<ILabelProvider> imp
 	 */
 	public Font getFont(Object element)
 	{
-		Font font = JFaceResources.getFont(IThemeManager.VIEW_FONT_NAME);
+		if (!useEditorFont())
+		{
+			return null;
+		}
 
+		Font font = JFaceResources.getFont(IThemeManager.VIEW_FONT_NAME);
 		if (font == null)
 		{
 			font = JFaceResources.getTextFont();
 		}
-
 		return font;
+	}
+
+	protected boolean useEditorFont()
+	{
+		return Platform.getPreferencesService().getBoolean(ThemePlugin.PLUGIN_ID, IPreferenceConstants.INVASIVE_FONT,
+				false, null);
 	}
 
 	/*
@@ -97,14 +108,12 @@ public class IndexViewLabelProvider extends AbstractProvider<ILabelProvider> imp
 	 */
 	public Color getForeground(Object element)
 	{
-		Color result = null;
-
-		if (getCurrentTheme().isInvasive())
+		if (ThemePlugin.applyToViews())
 		{
-			result = getCurrentTheme().getForegroundColor();
+			return getCurrentTheme().getForegroundColor();
 		}
 
-		return result;
+		return null;
 	}
 
 	/*
