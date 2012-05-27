@@ -7,13 +7,13 @@
  */
 package com.aptana.editor.js.contentassist.model;
 
+import java.text.MessageFormat;
 import java.util.Map;
-
-import com.aptana.jetty.util.epl.ajax.JSON.Convertible;
-import com.aptana.jetty.util.epl.ajax.JSON.Output;
 
 import com.aptana.core.util.ObjectUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.jetty.util.epl.ajax.JSON.Convertible;
+import com.aptana.jetty.util.epl.ajax.JSON.Output;
 
 public class ReturnTypeElement implements Convertible
 {
@@ -130,5 +130,10 @@ public class ReturnTypeElement implements Convertible
 	{
 		out.add(TYPE_PROPERTY, this.getType());
 		out.add(DESCRIPTION_PROPERTY, this.getDescription());
+	}
+
+	public String toString()
+	{
+		return MessageFormat.format("Type: ''{0}'', description: ''{1}''", _type, _description); //$NON-NLS-1$
 	}
 }

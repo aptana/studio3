@@ -8,6 +8,7 @@
 package com.aptana.jira.ui.preferences;
 
 import java.lang.reflect.InvocationTargetException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,11 +23,13 @@ import org.eclipse.jface.operation.ModalContext;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Text;
 
 import com.aptana.core.logging.IdeLog;
@@ -50,10 +53,13 @@ public class JiraPreferencePageProvider extends AbstractAccountPageProvider
 	private static final String SIGNUP_URL = "https://jira.appcelerator.org/secure/Signup!default.jspa"; //$NON-NLS-1$
 
 	private Group main;
+	private Composite loginComposite;
+	private Composite logoutComposite;
 	private Text usernameText;
 	private Text passwordText;
 	private Button testButton;
 	private Button createAccountButton;
+	private Link logoutLink;
 
 	public JiraPreferencePageProvider()
 	{
@@ -68,17 +74,31 @@ public class JiraPreferencePageProvider extends AbstractAccountPageProvider
 	{
 		main = new Group(parent, SWT.NONE);
 		main.setText(Messages.JiraPreferencePageProvider_LBL_Jira);
-		main.setLayout(GridLayoutFactory.swtDefaults().numColumns(3).create());
+		main.setLayout(GridLayoutFactory.fillDefaults().create());
 
-		Label label = new Label(main, SWT.NONE);
+		loginComposite = createLoginComponents(main);
+		boolean isLoggedOut = isLoggedOut();
+		loginComposite.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).exclude(!isLoggedOut).create());
+		logoutComposite = createLogoutComponents(main);
+		logoutComposite.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).exclude(isLoggedOut).create());
+
+		return main;
+	}
+
+	private Composite createLoginComponents(Composite parent)
+	{
+		Composite loginComp = new Composite(parent, SWT.NONE);
+		loginComp.setLayout(GridLayoutFactory.swtDefaults().numColumns(3).create());
+
+		Label label = new Label(loginComp, SWT.NONE);
 		label.setText(StringUtil.makeFormLabel(Messages.JiraPreferencePageProvider_LBL_Username));
 		label.setLayoutData(GridDataFactory.swtDefaults().create());
 
-		usernameText = new Text(main, SWT.BORDER);
+		usernameText = new Text(loginComp, SWT.BORDER);
 		usernameText
 				.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).create());
 
-		testButton = new Button(main, SWT.NONE);
+		testButton = new Button(loginComp, SWT.NONE);
 		testButton.setText(Messages.JiraPreferencePageProvider_LBL_Validate);
 		testButton.setLayoutData(GridDataFactory.swtDefaults().hint(getButtonWidthHint(testButton), SWT.DEFAULT)
 				.create());
@@ -88,7 +108,7 @@ public class JiraPreferencePageProvider extends AbstractAccountPageProvider
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				if (validate())
+				if (login())
 				{
 					// shows a success message
 					MessageDialog.openInformation(UIUtils.getActiveShell(),
@@ -98,15 +118,15 @@ public class JiraPreferencePageProvider extends AbstractAccountPageProvider
 			}
 		});
 
-		label = new Label(main, SWT.NONE);
+		label = new Label(loginComp, SWT.NONE);
 		label.setText(StringUtil.makeFormLabel(Messages.JiraPreferencePageProvider_LBL_Password));
 		label.setLayoutData(GridDataFactory.swtDefaults().create());
 
-		passwordText = new Text(main, SWT.BORDER | SWT.PASSWORD);
+		passwordText = new Text(loginComp, SWT.BORDER | SWT.PASSWORD);
 		passwordText
 				.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).create());
 
-		createAccountButton = new Button(main, SWT.NONE);
+		createAccountButton = new Button(loginComp, SWT.NONE);
 		createAccountButton.setText(StringUtil.ellipsify(Messages.JiraPreferencePageProvider_LBL_Signup));
 		createAccountButton.setLayoutData(GridDataFactory.swtDefaults()
 				.hint(getButtonWidthHint(createAccountButton), SWT.DEFAULT).create());
@@ -122,25 +142,59 @@ public class JiraPreferencePageProvider extends AbstractAccountPageProvider
 
 		adjustWidth();
 
-		// loads the existing user
-		JiraUser user = getJiraManager().getUser();
-		if (user != null)
-		{
-			usernameText.setText(user.getUsername());
-			passwordText.setText(user.getPassword());
-		}
+		return loginComp;
+	}
 
-		return main;
+	private Composite createLogoutComponents(Composite parent)
+	{
+		Composite logoutComp = new Composite(parent, SWT.NONE);
+		logoutComp.setLayout(GridLayoutFactory.swtDefaults().spacing(0, 5).numColumns(2).create());
+
+		Label label = new Label(logoutComp, SWT.NONE);
+		label.setText(StringUtil.makeFormLabel(Messages.JiraPreferencePageProvider_LBL_User));
+		logoutLink = new Link(logoutComp, SWT.NONE);
+		logoutLink.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).create());
+		logoutLink.addSelectionListener(new SelectionAdapter()
+		{
+
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				logout();
+			}
+		});
+		updateLinkText();
+
+		return logoutComp;
 	}
 
 	public boolean performOk()
 	{
-		return validate();
+		if (isLoggedOut())
+		{
+			return login();
+		}
+		return true;
 	}
 
 	protected JiraManager getJiraManager()
 	{
 		return JiraCorePlugin.getDefault().getJiraManager();
+	}
+
+	private boolean isLoggedOut()
+	{
+		return getJiraManager().getUser() == null;
+	}
+
+	private void updateLinkText()
+	{
+		JiraUser user = getJiraManager().getUser();
+		if (user != null)
+		{
+			logoutLink
+					.setText(MessageFormat.format(Messages.JiraPreferencePageProvider_Link_Logout, user.getUsername()));
+		}
 	}
 
 	private void adjustWidth()
@@ -152,7 +206,7 @@ public class JiraPreferencePageProvider extends AbstractAccountPageProvider
 		SWTUtils.resizeControlWidthInGrid(actionControls);
 	}
 
-	private boolean validate()
+	private boolean login()
 	{
 		final String username = usernameText.getText();
 		final String password = passwordText.getText();
@@ -182,6 +236,16 @@ public class JiraPreferencePageProvider extends AbstractAccountPageProvider
 					try
 					{
 						getJiraManager().login(username, password);
+						// successful; now re-layout to show the logout components
+						UIUtils.getDisplay().asyncExec(new Runnable()
+						{
+
+							public void run()
+							{
+								updateLinkText();
+								layout();
+							}
+						});
 					}
 					catch (JiraException e)
 					{
@@ -217,6 +281,24 @@ public class JiraPreferencePageProvider extends AbstractAccountPageProvider
 		}
 
 		return true;
+	}
+
+	private void logout()
+	{
+		getJiraManager().logout();
+		usernameText.setText(StringUtil.EMPTY);
+		passwordText.setText(StringUtil.EMPTY);
+		layout();
+	}
+
+	private void layout()
+	{
+		boolean isLoggedOut = isLoggedOut();
+		loginComposite.setVisible(isLoggedOut);
+		((GridData) loginComposite.getLayoutData()).exclude = !isLoggedOut;
+		logoutComposite.setVisible(!isLoggedOut);
+		((GridData) logoutComposite.getLayoutData()).exclude = isLoggedOut;
+		main.getParent().layout(true, true);
 	}
 
 	private void setUILocked(boolean locked)

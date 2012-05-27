@@ -1,0 +1,1 @@
+var constructedRegexp = new RegExp;

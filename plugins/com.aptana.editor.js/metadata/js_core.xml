@@ -242,7 +242,7 @@ var result = makeFactorialFunc()(5); // returns 120 (5 * 4 * 3 * 2 * 1)
           array still contains only 2 elements.&lt;/p&gt;
         </remarks>
       </property>
-    <property name="prototype" type="Object" access="read-write">
+    <property name="prototype" type="Array" access="read-write">
 		<availability>
 			<specification name="JavaScript 1.1"/>
 			<specification name="JScript 2.0"/>
@@ -1499,7 +1499,7 @@ myArray = myRe.exec("cdbBdbsbz");&lt;/pre&gt;&lt;p&gt;The properties and element
 			<description>Specifies the function that creates the Boolean prototype.</description>
 		</property>
 		
-		<property name="prototype" type="Object">
+		<property name="prototype" type="Boolean">
 			<browsers>
 				<browser platform="IE" version="4.0+"/>
 				<browser platform="Mozilla" version="1.0+"/>
@@ -4300,7 +4300,7 @@ timeDifference = timeB - timeA;&lt;/pre&gt;
 		</browsers>
 	</property>
 	
-    <property name="prototype" type="Object">
+    <property name="prototype" type="Error">
 		<availability>
 			<specification name="JavaScript 1.5"/>
 			<specification name="JScript 5.0"/>
@@ -4649,7 +4649,7 @@ addNumbers(103,104) // returns 207&lt;/pre&gt;
           function.&lt;/p&gt;
         </remarks>
       </property>
-      <property name="prototype" type="Object" access="read-write">
+      <property name="prototype" type="Function" access="read-write">
         <description>Creates an instance of a Function class.</description>
 		<browsers>
 			<browser platform="IE" version="4.0+"/>
@@ -7119,7 +7119,7 @@ if (month &amp;lt; 1 || month &amp;gt; 12) {
 		</browsers>
 	</property>
 	
-	<property name="prototype" type="Object">
+	<property name="prototype" type="Number">
 		<availability>
 			<specification name="JavaScript 1.1"/>
 		</availability>
@@ -8282,7 +8282,7 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
 		</browsers>
 	</property>
 	
-	<property name="prototype" type="Object" access="read-write">
+	<property name="prototype" type="RegExp" access="read-write">
 		<availability>
 			<specification name="JavaScript 1.2"/>
 			<specification name="JScript 3.0"/>
@@ -8865,7 +8865,7 @@ alert("The string length is " + x.length);&lt;/pre&gt;
         </remarks>
       	</property>
     	
-		<property name="prototype" type="Object">
+		<property name="prototype" type="String">
 			<availability>
 				<specification name="JavaScript 1.1"/>
 				<specification name="JScript 2.0"/>

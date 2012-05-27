@@ -46,7 +46,6 @@ class BundleViewLabelProvider implements ILabelProvider, IColorProvider, IFontPr
 	 */
 	public Color getBackground(Object element)
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -81,7 +80,7 @@ class BundleViewLabelProvider implements ILabelProvider, IColorProvider, IFontPr
 	 */
 	public Color getForeground(Object element)
 	{
-		if (getCurrentTheme().isInvasive())
+		if (ThemePlugin.applyToViews())
 		{
 			return getCurrentTheme().getForegroundColor();
 		}

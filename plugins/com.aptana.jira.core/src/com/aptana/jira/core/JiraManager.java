@@ -150,6 +150,25 @@ public class JiraManager
 	}
 
 	/**
+	 * Logs current user out of JIRA in Studio.
+	 */
+	public void logout()
+	{
+		ISecurePreferences prefs = getSecurePreferences();
+		try
+		{
+			prefs.remove(USERNAME);
+			prefs.remove(PASSWORD);
+			prefs.flush();
+			user = null;
+		}
+		catch (Exception e)
+		{
+			IdeLog.logError(JiraCorePlugin.getDefault(), "Failed to log out Jira user", e); //$NON-NLS-1$
+		}
+	}
+
+	/**
 	 * Creates a JIRA ticket.
 	 * 
 	 * @param type

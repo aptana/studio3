@@ -331,7 +331,7 @@ public abstract class InferencingTestsBase extends TestCase
 	{
 		assertNotNull(statementTypes);
 
-		assertEquals(types.length, statementTypes.size());
+		assertEquals("Number of types doesn't match", types.length, statementTypes.size());
 
 		for (String type : types)
 		{
@@ -369,7 +369,6 @@ public abstract class InferencingTestsBase extends TestCase
 	@Override
 	protected void setUp() throws Exception
 	{
-		// TODO Auto-generated method stub
 		super.setUp();
 
 		reader = new JSIndexReader();
