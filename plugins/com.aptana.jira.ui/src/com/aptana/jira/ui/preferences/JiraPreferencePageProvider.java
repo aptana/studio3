@@ -107,7 +107,7 @@ public class JiraPreferencePageProvider extends AbstractAccountPageProvider
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				if (login())
+				if (login(true))
 				{
 					// shows a success message
 					MessageDialog.openInformation(UIUtils.getActiveShell(),
@@ -172,7 +172,7 @@ public class JiraPreferencePageProvider extends AbstractAccountPageProvider
 	{
 		if (isLoggedOut())
 		{
-			return login();
+			return login(false);
 		}
 		return true;
 	}
@@ -205,21 +205,29 @@ public class JiraPreferencePageProvider extends AbstractAccountPageProvider
 		SWTUtils.resizeControlWidthInGrid(actionControls);
 	}
 
-	private boolean login()
+	private boolean login(boolean test)
 	{
 		final String username = usernameText.getText();
 		final String password = passwordText.getText();
 		if (StringUtil.isEmpty(username))
 		{
-			MessageDialog.openError(main.getShell(), Messages.JiraPreferencePageProvider_ERR_InvalidInput_Title,
-					Messages.JiraPreferencePageProvider_ERR_EmptyUsername);
-			return false;
+			if (test)
+			{
+				MessageDialog.openError(main.getShell(), Messages.JiraPreferencePageProvider_ERR_InvalidInput_Title,
+						Messages.JiraPreferencePageProvider_ERR_EmptyUsername);
+				return false;
+			}
+			return true;
 		}
 		if (StringUtil.isEmpty(password))
 		{
-			MessageDialog.openError(main.getShell(), Messages.JiraPreferencePageProvider_ERR_InvalidInput_Title,
-					Messages.JiraPreferencePageProvider_ERR_EmptyPassword);
-			return false;
+			if (test)
+			{
+				MessageDialog.openError(main.getShell(), Messages.JiraPreferencePageProvider_ERR_InvalidInput_Title,
+						Messages.JiraPreferencePageProvider_ERR_EmptyPassword);
+				return false;
+			}
+			return true;
 		}
 
 		setUILocked(true);
