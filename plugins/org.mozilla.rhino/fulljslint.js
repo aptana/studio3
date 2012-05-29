@@ -1,13 +1,3 @@
-// aptana options
-var aptanaOptions = new Object();
-aptanaOptions.laxLineEnd = true;
-aptanaOptions.undef = true;
-aptanaOptions.browser = true;
-aptanaOptions.jscript = true;
-aptanaOptions.debug = true;
-aptanaOptions.maxerr = 1000;
-aptanaOptions.predef = ["Ti","Titanium","alert","require","exports","native","implements"];
-
 // jslint.js
 // 2012-04-15
 
@@ -578,7 +568,7 @@ var JSLINT = (function () {
             too_long: "Line too long.",
             too_many: "Too many errors.",
             trailing_decimal_a: "A trailing decimal point can be confused " +
-                "with a dot: '.{a}'.",
+                "with a dot: '{a}'.",
             type: "type is unnecessary.",
             unclosed: "Unclosed string.",
             unclosed_comment: "Unclosed comment.",

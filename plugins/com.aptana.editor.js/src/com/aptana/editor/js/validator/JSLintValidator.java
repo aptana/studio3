@@ -12,7 +12,9 @@ import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
@@ -59,6 +61,25 @@ public class JSLintValidator extends AbstractBuildParticipant
 
 	private static final String JSLINT_FILENAME = "fulljslint.js"; //$NON-NLS-1$
 	private static Script JS_LINT_SCRIPT;
+
+	private Map<String, Object> options;
+
+	@SuppressWarnings("nls")
+	public JSLintValidator()
+	{
+		super();
+		// aptana options
+		options = new HashMap<String, Object>();
+		options.put("laxLineEnd", true);
+		options.put("undef", true);
+		options.put("browser", true);
+		options.put("jscript", true);
+		options.put("debug", true);
+		options.put("maxerr", 100);
+		options.put("predef", true);
+		options.put("predef", new NativeArray(new String[] { "Ti", "Titanium", "alert", "require", "exports", "native",
+				"implements" }));
+	}
 
 	public void buildFile(BuildContext context, IProgressMonitor monitor)
 	{
@@ -119,7 +140,17 @@ public class JSLintValidator extends AbstractBuildParticipant
 		}
 
 		Function function = (Function) functionObj;
-		Object[] args = { source, scope.get("aptanaOptions", scope) }; //$NON-NLS-1$
+		NativeObject optionsObj = new NativeObject();
+		// Set our overriding options.
+		if (this.options != null)
+		{
+			for (Map.Entry<String, Object> entry : this.options.entrySet())
+			{
+				scope.put(entry.getKey(), optionsObj, entry.getValue());
+			}
+		}
+
+		Object[] args = { source, optionsObj };
 		// PC: we ignore the result, because i have found that with some versions, there might
 		// be errors but this function returned true (false == errors)
 		function.call(context, scope, scope, args);
@@ -298,5 +329,10 @@ public class JSLintValidator extends AbstractBuildParticipant
 			Context.exit();
 		}
 		return null;
+	}
+
+	public void setOption(String propertyName, Object value)
+	{
+		this.options.put(propertyName, value);
 	}
 }

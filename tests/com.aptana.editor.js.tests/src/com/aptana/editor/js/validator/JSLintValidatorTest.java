@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -585,7 +585,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "A trailing decimal point can be confused with a dot: '.1.'.", 1,
+		assertProblemExists(items, "A trailing decimal point can be confused with a dot: '1.'.", 1,
 				IMarker.SEVERITY_WARNING, 15);
 	}
 
@@ -1563,9 +1563,1212 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 				IMarker.SEVERITY_WARNING, 18);
 	}
 
+	public void testAlreadyDefined() throws CoreException
+	{
+		// @formatter:off
+		String text = "function bar() {\n" +
+				"    var foo = 1;\n" +
+				"    var foo = 2;\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "'foo' is already defined.", 3, IMarker.SEVERITY_WARNING, 42);
+	}
+
+	// public void testANotDefined() throws CoreException
+	// {
+//		// @formatter:off
+//		String text = "function bar() {\n" +
+//				"    var foo = 1;\n" +
+//				"    var foo = 2;\n" +
+//				"}";
+//		// @formatter:on
+	//
+	// List<IProblem> items = getParseErrors(text);
+	// assertProblemExists(items, "'foo' is already defined.", 3, IMarker.SEVERITY_WARNING, 42);
+	// }
+
+	public void testBadNew() throws CoreException
+	{
+		// @formatter:off
+		String text = "function Blah() {}\n" +
+				"new Blah();";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Do not use 'new' for side effects.", 2, IMarker.SEVERITY_WARNING, 29);
+	}
+
+	public void testBadInA() throws CoreException
+	{
+		// @formatter:off
+		String text = "var x = [1, 2, 3];\n" +
+				"for (i in x) {\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Bad for in variable 'i'.", 2, IMarker.SEVERITY_WARNING, 24);
+	}
+
+	public void testBadConstructor() throws CoreException
+	{
+		// @formatter:off
+		String text = "function One(a, b, c) {\n" +
+				"    this.value = a + b + c;\n" +
+				"}\n" +
+				"function Two(a, b, c) {\n" +
+				"    this.value = c + b + a;\n" +
+				"}\n" +
+				"var which = Math.round(Math.random());\n" +
+				"var x = new (which ? One : Two) (\"1\", \"2\", \"3\");";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Bad constructor.", 8, IMarker.SEVERITY_WARNING, 177);
+	}
+
+	public void testCombineVar() throws CoreException
+	{
+		// @formatter:off
+		String text = "function foo() {\n" +
+				"    var bar = 1;\n" +
+				"    var x = 10;\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Combine this with the previous 'var' statement.", 3, IMarker.SEVERITY_WARNING, 42);
+	}
+
+	public void testEmptyBlock1() throws CoreException
+	{
+		// @formatter:off
+		String text = "if (true) {\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Empty block.", 2, IMarker.SEVERITY_WARNING, 12);
+	}
+
+	public void testEmptyBlock2() throws CoreException
+	{
+		// @formatter:off
+		String text = "if (true) {\n" +
+				"    var i = 0;\n" +
+				"} else {\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Empty block.", 4, IMarker.SEVERITY_WARNING, 36);
+	}
+
+	public void testEmptyBlock3() throws CoreException
+	{
+		// @formatter:off
+		String text = "for (i = 0; i < 10; i += 1) {\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Empty block.", 2, IMarker.SEVERITY_WARNING, 30);
+	}
+
+	public void testEmptyBlock4() throws CoreException
+	{
+		// @formatter:off
+		String text = "while (true) {\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Empty block.", 2, IMarker.SEVERITY_WARNING, 15);
+	}
+
+	public void testEmptyBlock5() throws CoreException
+	{
+		// @formatter:off
+		String text = "do {\n" +
+				"} while (i > 0);";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Empty block.", 2, IMarker.SEVERITY_WARNING, 7);
+	}
+
+	public void testUnreachableAB1() throws CoreException
+	{
+		// @formatter:off
+		String text = "break;\n" +
+				"var a = 1;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Unreachable 'var' after 'break'.", 2, IMarker.SEVERITY_WARNING, 7);
+	}
+
+	public void testUnreachableAB2() throws CoreException
+	{
+		// @formatter:off
+		String text = "continue;\n" +
+				"var a = 1;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Unreachable 'var' after 'continue'.", 2, IMarker.SEVERITY_WARNING, 10);
+	}
+
+	public void testUnreachableAB3() throws CoreException
+	{
+		// @formatter:off
+		String text = "return 1;\n" +
+				"var a = 1;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Unreachable 'var' after 'return'.", 2, IMarker.SEVERITY_WARNING, 10);
+	}
+
+	public void testNestedComment() throws CoreException
+	{
+		// @formatter:off
+		String text = "/* comment \n" +
+				"/* yep\n" +
+				"*/";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Nested comment.", 2, IMarker.SEVERITY_WARNING, 14);
+	}
+
+	public void testMoveVar() throws CoreException
+	{
+		// @formatter:off
+		String text = "for (var i = 0; i < 10; i++) {\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Move 'var' declarations to the top of the function.", 1, IMarker.SEVERITY_WARNING,
+				5);
+	}
+
+	public void testExpectedIdentiferAReserved1() throws CoreException
+	{
+		// @formatter:off
+		String text = "var break = 1;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Expected an identifier and instead saw 'break' (a reserved word).", 1,
+				IMarker.SEVERITY_WARNING, 4);
+	}
+
+	public void testExpectedIdentiferAReserved2() throws CoreException
+	{
+		// @formatter:off
+		String text = "function break() {}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Expected an identifier and instead saw 'break' (a reserved word).", 1,
+				IMarker.SEVERITY_WARNING, 9);
+	}
+
+	public void testExpectedIdentifer() throws CoreException
+	{
+		// @formatter:off
+		String text = "var = 1;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Expected an identifier and instead saw '='.", 1, IMarker.SEVERITY_WARNING, 4);
+	}
+
+	public void testAssignmentFunctionExpression() throws CoreException
+	{
+		// @formatter:off
+		String text = "(1 + 2);";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Expected an assignment or function call and instead saw an expression.", 1,
+				IMarker.SEVERITY_WARNING, 6);
+	}
+
+	public void testDangerousComment1() throws CoreException
+	{
+		((JSLintValidator) fValidator).setOption("safe", true);
+		// @formatter:off
+		String text = "/* </ */";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Dangerous comment.", 1, IMarker.SEVERITY_WARNING, 2);
+	}
+
+	public void testDangerousComment2() throws CoreException
+	{
+		((JSLintValidator) fValidator).setOption("safe", true);
+		// @formatter:off
+		String text = "// <";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Dangerous comment.", 1, IMarker.SEVERITY_WARNING, 2);
+	}
+
+	public void testDangerousComment3() throws CoreException
+	{
+		((JSLintValidator) fValidator).setOption("safe", true);
+		// @formatter:off
+		String text = "// scRipT";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Dangerous comment.", 1, IMarker.SEVERITY_WARNING, 2);
+	}
+
+	public void testDangerousComment4() throws CoreException
+	{
+		((JSLintValidator) fValidator).setOption("safe", true);
+		// @formatter:off
+		String text = "// &Lt";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Dangerous comment.", 1, IMarker.SEVERITY_WARNING, 2);
+	}
+
+	public void testDangerousComment5() throws CoreException
+	{
+		((JSLintValidator) fValidator).setOption("safe", true);
+		// @formatter:off
+		String text = "/* ]    ] */";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Dangerous comment.", 1, IMarker.SEVERITY_WARNING, 2);
+	}
+
+	public void testDangerousComment6() throws CoreException
+	{
+		((JSLintValidator) fValidator).setOption("safe", true);
+		// @formatter:off
+		String text = "/* <   ! */";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Dangerous comment.", 1, IMarker.SEVERITY_WARNING, 2);
+	}
+
+	public void testDangerousComment7() throws CoreException
+	{
+		((JSLintValidator) fValidator).setOption("safe", true);
+		// @formatter:off
+		String text = "/*@cc */";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Dangerous comment.", 1, IMarker.SEVERITY_WARNING, 2);
+	}
+
+	public void testHTMLConfusionA1() throws CoreException
+	{
+		// @formatter:off
+		String text = "<html>\n" +
+				"<head>\n" +
+				"<script>\n" +
+				"var r = /<!/;\n" +
+				"</script>\n" +
+				"</head>\n" +
+				"</html>";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "HTML confusion in regular expression '<!'.", 4, IMarker.SEVERITY_WARNING, 32);
+	}
+
+	public void testHTMLConfusionA2() throws CoreException
+	{
+		// @formatter:off
+		String text = "<html>\n" +
+				"<head>\n" +
+				"<script>\n" +
+				"var r = /[</]/;\n" +
+				"</script>\n" +
+				"</head>\n" +
+				"</html>";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "HTML confusion in regular expression '</'.", 4, IMarker.SEVERITY_WARNING, 33);
+	}
+
+	public void testHTMLConfusionA3() throws CoreException
+	{
+		// @formatter:off
+		String text = "<html>\n" +
+				"<head>\n" +
+				"<script>\n" +
+				"var r = /[<!]/;\n" +
+				"</script>\n" +
+				"</head>\n" +
+				"</html>";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "HTML confusion in regular expression '<!'.", 4, IMarker.SEVERITY_WARNING, 33);
+	}
+
+	public void testFunctionBlock1() throws CoreException
+	{
+		// @formatter:off
+		String text = "var i;\n" +
+				"for (i = 0; i < 10; i += 1) {\n" +
+				"    function foo() {\n" +
+				"    }\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(
+				items,
+				"Function statements should not be placed in blocks. Use a function expression or move the statement to the top of the outer function.",
+				3, IMarker.SEVERITY_WARNING, 41);
+	}
+
+	public void testFunctionLoop1() throws CoreException
+	{
+		// @formatter:off
+		String text = "var i;\n" +
+				"for (i = 0; i < 10; i += 1) {\n" +
+				"    var a = function foo() {\n" +
+				"    }\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Don't make functions within a loop.", 5, IMarker.SEVERITY_WARNING, 72);
+	}
+
+	public void testFunctionLoop2() throws CoreException
+	{
+		// @formatter:off
+		String text = "function Field(val) {\n" +
+				"    this.value = val;\n" +
+				"}\n" +
+				"var i;\n" +
+				"for (i = 0; i < 10; i += 1) {\n" +
+				"    Field.prototype = {\n" +
+				"        get value() {\n" +
+				"            return this.value;\n" +
+				"        },\n" +
+				"        set value(value) {\n" +
+				"            this.value = value;\n" +
+				"        }\n" +
+				"    };\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Don't make functions within a loop.", 7, IMarker.SEVERITY_WARNING, 115);
+	}
+
+	public void testFunctionStatement() throws CoreException
+	{
+		// @formatter:off
+		String text = "function foo() {}();";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items,
+				"Function statements are not invocable. Wrap the whole function invocation in parens.", 1,
+				IMarker.SEVERITY_WARNING, 17);
+	}
+
+	public void testBadOperand1() throws CoreException
+	{
+		// @formatter:off
+		String text = "/*jslint plusplus: true */\n" +
+				"var s = '';\n" +
+				"var jQuery = {};\n" +
+				"if (s.global && !jQuery.active++) {\n" +
+				"    var a = s;\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Bad operand.", 4, IMarker.SEVERITY_WARNING, 86);
+	}
+
+	public void testBadOperand2() throws CoreException
+	{
+		// @formatter:off
+		String text = "/*jslint plusplus: true */\n" +
+				"var jQuery = {};\n" +
+				"if (--!jQuery.active) {\n" +
+				"    var a = 1;\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Bad operand.", 3, IMarker.SEVERITY_WARNING, 48);
+	}
+
+	public void testUnexpectedAPlusPlus() throws CoreException
+	{
+		// @formatter:off
+		String text = "var jQuery = {};\n" +
+				"if (++!jQuery.active) {\n" +
+				"    var a = 1;\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Unexpected '++'.", 2, IMarker.SEVERITY_WARNING, 21);
+	}
+
+	public void testUnexpectedAPlusPlus2() throws CoreException
+	{
+		// @formatter:off
+		String text = "var jQuery = {};\n" +
+				"if (++jQuery.active) {\n" +
+				"    var a = 1;\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Unexpected '++'.", 2, IMarker.SEVERITY_WARNING, 21);
+	}
+
+	public void testUnexpectedAMinusMinus() throws CoreException
+	{
+		// @formatter:off
+		String text = "var jQuery = {};\n" +
+				"if (--!jQuery.active) {\n" +
+				"    var a = 1;\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Unexpected '--'.", 2, IMarker.SEVERITY_WARNING, 21);
+	}
+
+	public void testForIf1() throws CoreException
+	{
+		// @formatter:off
+		String text = "var array = [1, 2, 3];\n" +
+				"var i;\n" +
+				"for (i in array) {\n" +
+				"    if (i === 2) {\n" +
+				"        var x = i % 2;\n" +
+				"    }\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(
+				items,
+				"The body of a for in should be wrapped in an if statement to filter unwanted properties from the prototype.",
+				3, IMarker.SEVERITY_WARNING, 30);
+	}
+
+	public void testForIf2() throws CoreException
+	{
+		// @formatter:off
+		String text = "var array = [1, 2, 3];\n" +
+				"var i;\n" +
+				"for (i in array) {\n" +
+				"    if (i !== 2) {\n" +
+				"        var x = i % 2;\n" +
+				"    }\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(
+				items,
+				"The body of a for in should be wrapped in an if statement to filter unwanted properties from the prototype.",
+				3, IMarker.SEVERITY_WARNING, 30);
+	}
+
+	public void testForIf3() throws CoreException
+	{
+		// Skips && conditions to next segment
+		// @formatter:off
+		String text = "var array = [1, 2, 3];\n" +
+				"var i;\n" +
+				"for (i in array) {\n" +
+				"    if (i && i !== 2) {\n" +
+				"        var x = i % 2;\n" +
+				"    }\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(
+				items,
+				"The body of a for in should be wrapped in an if statement to filter unwanted properties from the prototype.",
+				3, IMarker.SEVERITY_WARNING, 30);
+	}
+
+	public void testForIfOk1() throws CoreException
+	{
+		// @formatter:off
+		String text = "var array = [1, 2, 3];\n" +
+				"var i;\n" +
+				"for (i in array) {\n" +
+				"    if (array[i] === Object) {\n" +
+				"        var x = i % 2;\n" +
+				"    }\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items,
+				"The body of a for in should be wrapped in an if statement to filter unwanted properties from the prototype.");
+	}
+
+	public void testForIf4() throws CoreException
+	{
+		// @formatter:off
+		String text = "var array = [1, 2, 3];\n" +
+				"var i;\n" +
+				"for (i in array) {\n" +
+				"    if (array['thing'] === Object) {\n" +
+				"        var x = i % 2;\n" +
+				"    }\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(
+				items,
+				"The body of a for in should be wrapped in an if statement to filter unwanted properties from the prototype.",
+				3, IMarker.SEVERITY_WARNING, 30);
+	}
+
+	public void testForIfOk2() throws CoreException
+	{
+		// @formatter:off
+		String text = "var array = [1, 2, 3];\n" +
+				"var i;\n" +
+				"for (i in array) {\n" +
+				"    if (typeof array[i] === Object) {\n" +
+				"        var x = i % 2;\n" +
+				"    }\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items,
+				"The body of a for in should be wrapped in an if statement to filter unwanted properties from the prototype.");
+	}
+
+	public void testForIf5() throws CoreException
+	{
+		// @formatter:off
+		String text = "var array = [1, 2, 3];\n" +
+				"var i;\n" +
+				"for (i in array) {\n" +
+				"    if (typeof array[1] === Object) {\n" +
+				"        var x = i % 2;\n" +
+				"    }\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(
+				items,
+				"The body of a for in should be wrapped in an if statement to filter unwanted properties from the prototype.",
+				3, IMarker.SEVERITY_WARNING, 30);
+	}
+
+	public void testForIf6() throws CoreException
+	{
+		// @formatter:off
+		String text = "var array = [1, 2, 3];\n" +
+				"var i;\n" +
+				"for (i in array) {\n" +
+				"    if (array.blah(i)) {\n" +
+				"        var x = i % 2;\n" +
+				"    }\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(
+				items,
+				"The body of a for in should be wrapped in an if statement to filter unwanted properties from the prototype.",
+				3, IMarker.SEVERITY_WARNING, 30);
+	}
+
+	public void testForIfOk3() throws CoreException
+	{
+		// @formatter:off
+		String text = "var array = [1, 2, 3];\n" +
+				"var i;\n" +
+				"for (i in array) {\n" +
+				"    if (array.hasOwnProperty(i)) {\n" +
+				"        var x = i % 2;\n" +
+				"    }\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items,
+				"The body of a for in should be wrapped in an if statement to filter unwanted properties from the prototype.");
+	}
+
+	public void testForIf7() throws CoreException
+	{
+		// @formatter:off
+		String text = "var array = [1, 2, 3];\n" +
+				"var i;\n" +
+				"for (i in array) {\n" +
+				"    if (ADSAFE.foo(array, i)) {\n" +
+				"        var x = i % 2;\n" +
+				"    }\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(
+				items,
+				"The body of a for in should be wrapped in an if statement to filter unwanted properties from the prototype.",
+				3, IMarker.SEVERITY_WARNING, 30);
+	}
+
+	public void testForIfOk4() throws CoreException
+	{
+		// @formatter:off
+		String text = "var array = [1, 2, 3];\n" +
+				"var i;\n" +
+				"for (i in array) {\n" +
+				"    if (ADSAFE.has(array, i)) {\n" +
+				"        var x = i % 2;\n" +
+				"    }\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items,
+				"The body of a for in should be wrapped in an if statement to filter unwanted properties from the prototype.");
+	}
+
+	public void testForIf8() throws CoreException
+	{
+		// @formatter:off
+		String text = "var array = [1, 2, 3];\n" +
+				"var i;\n" +
+				"for (i in array) {\n" +
+				"    if (Object.prototype.hasOwnProperty.call(array, 1)) {\n" +
+				"        var x = i % 2;\n" +
+				"    }\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(
+				items,
+				"The body of a for in should be wrapped in an if statement to filter unwanted properties from the prototype.",
+				3, IMarker.SEVERITY_WARNING, 30);
+	}
+
+	public void testForIfOk5() throws CoreException
+	{
+		// @formatter:off
+		String text = "var array = [1, 2, 3];\n" +
+				"var i;\n" +
+				"for (i in array) {\n" +
+				"    if (Object.prototype.hasOwnProperty.call(array, i)) {\n" +
+				"        var x = i % 2;\n" +
+				"    }\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items,
+				"The body of a for in should be wrapped in an if statement to filter unwanted properties from the prototype.");
+	}
+
+	public void testNotALabel1() throws CoreException
+	{
+		// @formatter:off
+		String text = "var i;\n" +
+				"for (i = 0; i < 10; i += 1) {\n" +
+				"    break something;\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "'something' is not a label.", 3, IMarker.SEVERITY_WARNING, 47);
+	}
+
+	public void testNotALabelOK1() throws CoreException
+	{
+		// @formatter:off
+		String text = "function foo() {\n" +
+				"    var i;\n" +
+				"something:\n" +
+				"    for (i = 0; i < 10; i += 1) {\n" +
+				"        if (i === 2) {\n" +
+				"            break something;\n" +
+				"        }\n" +
+				"    }\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "'something' is not a label.");
+	}
+
+	public void testNotALabel2() throws CoreException
+	{
+		// @formatter:off
+		String text = "var i;\n" +
+				"for (i = 0; i < 10; i += 1) {\n" +
+				"    continue foo;\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "'foo' is not a label.", 3, IMarker.SEVERITY_WARNING, 50);
+	}
+
+	public void testNotALabelOK2() throws CoreException
+	{
+		// @formatter:off
+		String text = "function foo() {\n" +
+				"    var i;\n" +
+				"something:\n" +
+				"    for (i = 0; i < 10; i += 1) {\n" +
+				"        if (i === 2) {\n" +
+				"            continue something;\n" +
+				"        }\n" +
+				"    }\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "'something' is not a label.");
+	}
+
+	// public void testNotAScope1() throws CoreException
+	// {
+//		// @formatter:off
+//		String text = "var i;\n" +
+//				"for (i = 0; i < 10; i += 1) {\n" +
+//				"    continue foo;\n" +
+//				"}";
+//		// @formatter:on
+	//
+	// List<IProblem> items = getParseErrors(text);
+	// assertProblemExists(items, "'foo' is not a label.", 3, IMarker.SEVERITY_WARNING, 11);
+	// }
+
+	public void testNotAFunction1() throws CoreException
+	{
+		// @formatter:off
+		String text = "Math(10);";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "'Math' is not a function.", 1, IMarker.SEVERITY_WARNING, 0);
+	}
+
+	// FIXME This is a bug in JSlint that this doesn't work.
+	// public void testNotAFunction2() throws CoreException
+	// {
+//		// @formatter:off
+//		String text = "JSON(10);";
+//		// @formatter:on
+	//
+	// List<IProblem> items = getParseErrors(text);
+	// assertProblemExists(items, "'JSON' is not a function.", 1, IMarker.SEVERITY_WARNING, 0);
+	// }
+
+	public void testNotAConstructor1() throws CoreException
+	{
+		// @formatter:off
+		String text = "var x = new Math();";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Do not use Math as a constructor.", 1, IMarker.SEVERITY_WARNING, 12);
+	}
+
+	public void testNotAConstructor2() throws CoreException
+	{
+		// @formatter:off
+		String text = "var x = new Number();";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Do not use Number as a constructor.", 1, IMarker.SEVERITY_WARNING, 12);
+	}
+
+	public void testNotAConstructor3() throws CoreException
+	{
+		// @formatter:off
+		String text = "var x = new String();";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Do not use String as a constructor.", 1, IMarker.SEVERITY_WARNING, 12);
+	}
+
+	public void testNotAConstructor4() throws CoreException
+	{
+		// @formatter:off
+		String text = "var x = new JSON();";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Do not use JSON as a constructor.", 1, IMarker.SEVERITY_WARNING, 12);
+	}
+
+	public void testNotAConstructor5() throws CoreException
+	{
+		// @formatter:off
+		String text = "var x = new Boolean();";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Do not use Boolean as a constructor.", 1, IMarker.SEVERITY_WARNING, 12);
+	}
+
+	public void testALabel1() throws CoreException
+	{
+		// @formatter:off
+		String text = "function foo() {\n" +
+				"    var i;\n" +
+				"bar:\n" +
+				"    for (i = 0; i < 10; i += 1) {\n" +
+				"        bar += 10;\n" +
+				"    }\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "'bar' is a statement label.", 5, IMarker.SEVERITY_WARNING, 75);
+	}
+
+	public void testConfusingAPrefixPlusPlusPlus() throws CoreException
+	{
+		// @formatter:off
+		String text = "var x;\n" +
+				"var y = +++x;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Confusing use of '+++'.", 2, IMarker.SEVERITY_WARNING, 15);
+	}
+
+	public void testConfusingAInfixPlusPlusPlus() throws CoreException
+	{
+		// @formatter:off
+		String text = "var x;\n" +
+				"var y = 1 +++ x;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Confusing use of '+++'.", 2, IMarker.SEVERITY_WARNING, 17);
+	}
+
+	public void testConfusingAPrefixMinusMinusMinus() throws CoreException
+	{
+		// @formatter:off
+		String text = "var x;\n" +
+				"var y = ---x;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Confusing use of '---'.", 2, IMarker.SEVERITY_WARNING, 15);
+	}
+
+	public void testConfusingAInfixMinusMinusMinus() throws CoreException
+	{
+		// @formatter:off
+		String text = "var x;\n" +
+				"var y = 1 --- x;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Confusing use of '---'.", 2, IMarker.SEVERITY_WARNING, 17);
+	}
+
+	public void testConfusingABang1() throws CoreException
+	{
+		// @formatter:off
+		String text = "var x;\n" +
+				"if (!(x = 3)) {\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Confusing use of '!'.", 2, IMarker.SEVERITY_WARNING, 11);
+	}
+
+	public void testConfusingABang2() throws CoreException
+	{
+		// @formatter:off
+		String text = "var x, y;\n" +
+				"if (x > !y) {\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Confusing use of '!'.", 2, IMarker.SEVERITY_WARNING, 18);
+	}
+
+	public void testInfixIn() throws CoreException
+	{
+		// @formatter:off
+		String text = "var x = '';\n" +
+				"var y = [];\n" +
+				"if (x in y) {}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items,
+				"Unexpected 'in'. Compare with undefined, or use the hasOwnProperty method instead.", 3,
+				IMarker.SEVERITY_WARNING, 30);
+	}
+
+	public void testuseStrict1() throws CoreException
+	{
+		// @formatter:off
+		String text = "function foo() {\n" +
+				"    var x;\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Missing 'use strict' statement.", 2, IMarker.SEVERITY_WARNING, 21);
+	}
+
+	public void testuseStrict2() throws CoreException
+	{
+		// @formatter:off
+		String text = "function foo() {\n" +
+				"    var x;\n" +
+				"    try {\n" +
+				"        x = 1;\n" +
+				"    } catch (e) {\n" +
+				"        x = 10;\n" +
+				"    }\n" +
+				"}";
+		// @formatter:on
+
+		String msg = "Missing 'use strict' statement.";
+		List<IProblem> items = getParseErrors(text);
+		items = getProblems(items, msg);
+		assertEquals(3, items.size());
+		assertProblem(items.get(0), msg, 2, IMarker.SEVERITY_WARNING, 21);
+		assertProblem(items.get(1), msg, 4, IMarker.SEVERITY_WARNING, 46);
+		assertProblem(items.get(2), msg, 6, IMarker.SEVERITY_WARNING, 79);
+	}
+
+	public void testUseStrictOK() throws CoreException
+	{
+		// @formatter:off
+		String text = "function foo() {\n" +
+				"    \"use strict\";\n" +
+				"    var x;\n" +
+				"    try {\n" +
+				"        x = 1;\n" +
+				"    } catch (e) {\n" +
+				"        x = 10;\n" +
+				"    }\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "Missing 'use strict' statement.");
+	}
+
+	public void testFunctionStrict1() throws CoreException
+	{
+		// @formatter:off
+		String text = "\"use strict\";\n" +
+				"var x = 1;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Use the function form of 'use strict'.", 1, IMarker.SEVERITY_WARNING, 0);
+	}
+
+	public void testFunctionStrict2() throws CoreException
+	{
+		// @formatter:off
+		String text = "function foo() {\n" +
+				"    var x = 1;\n" +
+				"    \"use strict\";\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Use the function form of 'use strict'.", 3, IMarker.SEVERITY_WARNING, 36);
+	}
+
+	public void testUnnecessaryUseStrict1() throws CoreException
+	{
+		// @formatter:off
+		String text = "function foo() {\n" +
+				"    \"use strict\";\n" +
+				"    var x = 1;\n" +
+				"    try {\n" +
+				"        \"use strict\";\n" +
+				"    } catch (e) {\n" +
+				"    }\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Unnecessary 'use strict'.", 5, IMarker.SEVERITY_WARNING, 68);
+	}
+
+	public void testStrict1() throws CoreException
+	{
+		// @formatter:off
+		String text = "function foo() {\n" +
+				"    \"use strict\";\n" +
+				"    this.yeah = 1;\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Strict violation.", 3, IMarker.SEVERITY_WARNING, 39);
+	}
+
+	public void testStrict2() throws CoreException
+	{
+		// @formatter:off
+		String text = "\"use strict\";\n" +
+				"var a = arguments.length;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Strict violation.", 2, IMarker.SEVERITY_WARNING, 22);
+	}
+
+	public void testUnexpectedPropertyA1() throws CoreException
+	{
+		// @formatter:off
+		String text = "/*properties\n" +
+				"    object:name, object:other\n" +
+				"*/\n" +
+				"var object = {};\n" +
+				"object.name = 1;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Unexpected /*property*/ 'name'.", 5, IMarker.SEVERITY_WARNING, 70);
+	}
+
+	public void testUnexpectedPropertyA2() throws CoreException
+	{
+		// @formatter:off
+		String text = "/*properties\n" +
+				"    object:name, object:other\n" +
+				"*/\n" +
+				"var object = {};\n" +
+				"object.other = 1;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Unexpected /*property*/ 'other'.", 5, IMarker.SEVERITY_WARNING, 70);
+	}
+
+	public void testDuplicateAGetterSetter() throws CoreException
+	{
+		// @formatter:off
+		String text = "var obj = (function () {\n" +
+				"        var a;\n" +
+				"        return {\n" +
+				"            get a() {\n" +
+				"                return a;\n" +
+				"            },\n" +
+				"            set a(value) {\n" +
+				"                a = 'prepender: ';\n" +
+				"            },\n" +
+				"            get a() {\n" +
+				"                return a;\n" +
+				"            },\n" +
+				"            set a(value) {\n" +
+				"                a = 'prepender: ';\n" +
+				"            }\n" +
+				"        };\n" +
+				"    }());";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Duplicate 'a'.", 16, IMarker.SEVERITY_WARNING, 344);
+	}
+
+	public void testDuplicateAJSONPropertyName() throws CoreException
+	{
+		// @formatter:off
+		String text = "{\"property\": 1, \"property\": 2}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Duplicate 'property'.", 1, IMarker.SEVERITY_WARNING, 16);
+	}
+
+	public void testDuplicateACase1() throws CoreException
+	{
+		// @formatter:off
+		String text = "var a = 1;\n" +
+				"switch (a) {\n" +
+				"case 1:\n" +
+				"    break;\n" +
+				"case 'a':\n" +
+				"case \"a\":\n" +
+				"case 2 - 1:\n" +
+				"    break;\n" +
+				"default:\n" +
+				"    break;\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Duplicate 'a'.", 5, IMarker.SEVERITY_WARNING, 48);
+	}
+
+	public void testDuplicateACase2() throws CoreException
+	{
+		// @formatter:off
+		String text = "var a = 1;\n" +
+				"switch (a) {\n" +
+				"case 1:\n" +
+				"    break;\n" +
+				"case 'a':\n" +
+				"case 2 - 1:\n" +
+				"    break;\n" +
+				"default:\n" +
+				"    break;\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Duplicate '1'.", 3, IMarker.SEVERITY_WARNING, 29);
+	}
+
 	protected void assertProblemExists(List<IProblem> items, String msg, int line, int severity, int offset)
 	{
 		IProblem item = assertContains(items, msg);
+		assertProblem(item, msg, line, severity, offset);
+	}
+
+	protected void assertProblem(IProblem item, String msg, int line, int severity, int offset)
+	{
+		assertEquals("message", msg, item.getMessage());
 		assertEquals("line", line, item.getLineNumber());
 		assertEquals("severity", severity, item.getSeverity());
 		assertEquals("offset", offset, item.getOffset());
