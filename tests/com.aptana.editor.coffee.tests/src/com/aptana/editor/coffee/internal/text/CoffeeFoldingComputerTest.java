@@ -51,8 +51,7 @@ public class CoffeeFoldingComputerTest extends TestCase
 				@Override
 				protected IParseNode getAST()
 				{
-					IParseState parseState = new ParseState();
-					parseState.setEditState(getDocument().get());
+					IParseState parseState = new ParseState(getDocument().get());
 					try
 					{
 						return new CoffeeParser().parse(parseState);

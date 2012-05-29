@@ -14,6 +14,7 @@ import java.util.Set;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.editor.html.parsing.HTMLDocumentTypes.Type;
 import com.aptana.parsing.ParseState;
+import com.aptana.parsing.lexer.IRange;
 
 /**
  * @author Kevin Lindsey
@@ -46,8 +47,20 @@ public class HTMLParseState extends ParseState
 		}
 	}
 
-	public HTMLParseState()
+	public HTMLParseState(String source)
 	{
+		this(source, 0);
+	}
+
+	public HTMLParseState(String source, int startingOffset)
+	{
+		this(source, startingOffset, null);
+	}
+
+	public HTMLParseState(String source, int startingOffset, IRange[] ranges)
+	{
+		super(source, startingOffset, ranges);
+		fDocumentType = HTMLDocumentTypes.getType(source);
 	}
 
 	public Type getDocumentType()
@@ -88,13 +101,6 @@ public class HTMLParseState extends ParseState
 			return (fEndTagInfo.get(key) & IHTMLTagInfo.EMPTY) == IHTMLTagInfo.EMPTY;
 		}
 		return false;
-	}
-
-	@Override
-	public void setEditState(String source, int startingOffset)
-	{
-		super.setEditState(source, startingOffset);
-		fDocumentType = HTMLDocumentTypes.getType(source);
 	}
 
 	public static boolean isEndForbiddenOrEmptyTag(String name)

@@ -66,7 +66,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 
 	protected List<IProblem> getParseErrors(String source) throws CoreException
 	{
-		return getParseErrors(source, new JSParseState(), IJSConstants.JSLINT_PROBLEM_MARKER_TYPE);
+		return getParseErrors(source, new JSParseState(source), IJSConstants.JSLINT_PROBLEM_MARKER_TYPE);
 	}
 
 	public void testJSLintValidator() throws CoreException

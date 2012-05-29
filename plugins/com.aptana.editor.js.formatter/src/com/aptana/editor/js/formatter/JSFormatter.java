@@ -308,8 +308,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		}
 		output = output.trim();
 		IParser parser = checkoutParser();
-		IParseState parseState = new ParseState();
-		parseState.setEditState(output);
+		IParseState parseState = new ParseState(output);
 		IParseRootNode outputParseResult = null;
 		try
 		{
@@ -478,11 +477,12 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 	 * @see com.aptana.formatter.AbstractScriptFormatter#getOutputOnOffRegions(java.lang.String, java.lang.String,
 	 * java.lang.String, com.aptana.parsing.IParseState)
 	 */
-	protected List<IRegion> getOutputOnOffRegions(String output, String formatterOffPattern, String formatterOnPattern,
+	@Override
+	protected List<IRegion> getOutputOnOffRegions(String formatterOffPattern, String formatterOnPattern,
 			IParseState parseState)
 	{
+		String output = parseState.getSource();
 		IParser parser = checkoutParser();
-		parseState.setEditState(output);
 		List<IRegion> onOffRegions = null;
 		try
 		{

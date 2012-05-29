@@ -24,8 +24,7 @@ public class YAMLParserTest extends TestCase
 	{
 		YAMLParser parser = new YAMLParser();
 		String src = "development:\n  adapter: mysql\n  pool: 5\n  timeout: 5000\n\ntest:\n  adapter: sqlite3\n\n";
-		IParseState parseState = new ParseState();
-		parseState.setEditState(src);
+		IParseState parseState = new ParseState(src);
 		IParseRootNode rootNode = parser.parse(parseState);
 
 		// Check the structure and offsets!
@@ -75,8 +74,7 @@ public class YAMLParserTest extends TestCase
 	{
 		YAMLParser parser = new YAMLParser();
 		String src = "items:\n  - part_no:   A0001";
-		IParseState parseState = new ParseState();
-		parseState.setEditState(src);
+		IParseState parseState = new ParseState(src);
 		IParseRootNode rootNode = parser.parse(parseState);
 
 		IParseNode fullSrcMap = rootNode.getChild(0);

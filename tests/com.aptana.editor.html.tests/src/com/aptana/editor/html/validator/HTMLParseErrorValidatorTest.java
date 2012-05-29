@@ -124,6 +124,6 @@ public class HTMLParseErrorValidatorTest extends AbstractValidatorTestCase
 
 	protected List<IProblem> getParseErrors(String source, String markerType) throws CoreException
 	{
-		return getParseErrors(source, new HTMLParseState(), markerType);
+		return getParseErrors(source, new HTMLParseState(source), markerType);
 	}
 }

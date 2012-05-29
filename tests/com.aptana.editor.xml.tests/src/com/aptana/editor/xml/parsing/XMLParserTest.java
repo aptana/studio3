@@ -45,8 +45,7 @@ public class XMLParserTest extends TestCase
 	public void testComment() throws Exception
 	{
 		String source = "<!-- this is a comment -->";
-		ParseState parseState = new ParseState();
-		parseState.setEditState(source);
+		ParseState parseState = new ParseState(source);
 		IParseRootNode rootNode = (IParseRootNode) fParser.parse(parseState);
 
 		assertEquals(1, rootNode.getChildCount());
@@ -63,8 +62,7 @@ public class XMLParserTest extends TestCase
 	public void testCDATA() throws Exception
 	{
 		String source = "<![CDATA[<author>Appcelerator</author>]]>";
-		ParseState parseState = new ParseState();
-		parseState.setEditState(source);
+		ParseState parseState = new ParseState(source);
 		IParseRootNode rootNode = (IParseRootNode) fParser.parse(parseState);
 
 		assertEquals(1, rootNode.getChildCount());
@@ -83,8 +81,7 @@ public class XMLParserTest extends TestCase
 
 	protected void parseTest(String source, String expected) throws Exception
 	{
-		ParseState parseState = new ParseState();
-		parseState.setEditState(source);
+		ParseState parseState = new ParseState(source);
 		IParseNode result = fParser.parse(parseState);
 
 		StringBuilder text = new StringBuilder();

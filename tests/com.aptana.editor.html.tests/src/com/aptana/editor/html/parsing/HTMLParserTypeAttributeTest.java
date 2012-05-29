@@ -24,7 +24,6 @@ public class HTMLParserTypeAttributeTest extends TestCase
 	protected void setUp() throws Exception
 	{
 		fParser = new HTMLParser();
-		fParseState = new HTMLParseState();
 	}
 
 	protected void tearDown() throws Exception
@@ -135,7 +134,7 @@ public class HTMLParserTypeAttributeTest extends TestCase
 
 	protected void parseTest(String source, String expected) throws Exception
 	{
-		fParseState.setEditState(source, 0);
+		fParseState = new HTMLParseState(source);
 		IParseNode result = fParser.parse(fParseState);
 
 		StringBuilder text = new StringBuilder();

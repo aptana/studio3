@@ -70,8 +70,7 @@ public class HTMLParserPerformanceTest extends PerformanceTestCase
 
 		for (int i = 0; i < iterations; i++)
 		{
-			IParseState parseState = new HTMLParseState();
-			parseState.setEditState(src);
+			IParseState parseState = new HTMLParseState(src);
 			startMeasuring();
 			fParser.parse(parseState);
 			stopMeasuring();

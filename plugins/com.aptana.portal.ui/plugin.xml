@@ -141,6 +141,16 @@
             id="portal.themes"
             name="Theme Actions">
       </actionController>
+      <actionController
+            class="com.aptana.portal.ui.dispatch.actionControllers.LaunchActionController"
+            id="portal.launch"
+            name="Launch Actions">
+      </actionController>
+      <actionController
+            class="com.aptana.portal.ui.dispatch.actionControllers.ResourcesActionController"
+            id="portal.resources"
+            name="Resources Actions">
+      </actionController>
       <browserNotification
             class="com.aptana.portal.ui.dispatch.browserNotifications.RecentFilesBrowserNotification"
             id="com.aptana.portal.ui.recentFilesNotification"

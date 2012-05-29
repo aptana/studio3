@@ -36,6 +36,11 @@ public class ParsingPoolFactoryTest extends TestCase
 	 */
 	private static final class ParseStateCollectingComments extends ParseState
 	{
+		public ParseStateCollectingComments(String source, int startingOffset)
+		{
+			super(source, startingOffset);
+		}
+
 		@Override
 		public IParseStateCacheKey getCacheKey(String contentTypeId)
 		{
@@ -48,6 +53,11 @@ public class ParsingPoolFactoryTest extends TestCase
 	 */
 	private static final class ParseStateNotCollectingComments extends ParseState
 	{
+		public ParseStateNotCollectingComments(String source, int startingOffset)
+		{
+			super(source, startingOffset);
+		}
+
 		@Override
 		public IParseStateCacheKey getCacheKey(String contentTypeId)
 		{
@@ -188,13 +198,13 @@ public class ParsingPoolFactoryTest extends TestCase
 	public void testParserPoolFactory() throws Exception
 	{
 		queue.add(parseRootNode);
-		IParseRootNode ast = parsingEngine.parse("test", new ParseState());
+		IParseRootNode ast = parsingEngine.parse("test", new ParseState("", 0));
 		assertEquals(parseRootNode, ast);
 		assertEquals(0, queue.size());
 		assertEquals(1, parser.parses);
 
 		// Second parse: ast should be cached.
-		ast = parsingEngine.parse("test", new ParseState());
+		ast = parsingEngine.parse("test", new ParseState("", 0));
 		assertEquals(parseRootNode, ast);
 		assertEquals(0, queue.size());
 		assertEquals(1, parser.parses);
@@ -213,7 +223,7 @@ public class ParsingPoolFactoryTest extends TestCase
 
 			public void run()
 			{
-				ParseState parseState = new ParseState();
+				ParseState parseState = new ParseState("", 0);
 				try
 				{
 					IParseRootNode node = parsingEngine.parse("test", parseState);
@@ -279,13 +289,13 @@ public class ParsingPoolFactoryTest extends TestCase
 	{
 		queue.add(parseRootNode);
 
-		IParseRootNode ast = parsingEngine.parse("test", new ParseStateCollectingComments());
+		IParseRootNode ast = parsingEngine.parse("test", new ParseStateCollectingComments("", 0));
 		assertEquals(parseRootNode, ast);
 		assertEquals(0, queue.size());
 		assertEquals(1, parser.parses);
 
 		// Second parse: ast should be cached as the first has the comments.
-		ast = parsingEngine.parse("test", new ParseStateNotCollectingComments());
+		ast = parsingEngine.parse("test", new ParseStateNotCollectingComments("", 0));
 		assertEquals(parseRootNode, ast);
 		assertEquals(0, queue.size());
 		assertEquals(1, parser.parses);
@@ -294,14 +304,14 @@ public class ParsingPoolFactoryTest extends TestCase
 
 		queue.add(parseRootNode);
 
-		ast = parsingEngine.parse("test", new ParseStateNotCollectingComments());
+		ast = parsingEngine.parse("test", new ParseStateNotCollectingComments("", 0));
 		assertEquals(parseRootNode, ast);
 		assertEquals(0, queue.size());
 		assertEquals(2, parser.parses);
 
 		queue.add(parseRootNode);
 		// Second parse: this time as it was cached without comments, it should be reparsed.
-		ast = parsingEngine.parse("test", new ParseStateCollectingComments());
+		ast = parsingEngine.parse("test", new ParseStateCollectingComments("", 0));
 		assertEquals(parseRootNode, ast);
 		assertEquals(0, queue.size());
 		assertEquals(3, parser.parses);

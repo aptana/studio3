@@ -38,9 +38,8 @@ public class ScopeTests extends FileContentBasedTests
 	protected IParseNode getAST(String source) throws Exception
 	{
 		JSParser parser = new JSParser();
-		ParseState parseState = new ParseState();
+		ParseState parseState = new ParseState(source);
 
-		parseState.setEditState(source);
 		parser.parse(parseState);
 
 		return parseState.getParseResult();
@@ -74,9 +73,8 @@ public class ScopeTests extends FileContentBasedTests
 
 		// parser
 		JSParser parser = new JSParser();
-		ParseState parseState = new ParseState();
+		ParseState parseState = new ParseState(source);
 
-		parseState.setEditState(source);
 		parser.parse(parseState);
 
 		IParseNode root = parseState.getParseResult();

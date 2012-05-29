@@ -33,22 +33,20 @@ import com.aptana.parsing.ast.IParseNode;
 public abstract class BaseOutlineItemTest extends TestCase
 {
 	private JSParser fParser;
-	private ParseState fParseState;
 
 	@Override
 	protected void setUp() throws Exception
 	{
 		fParser = new JSParser();
-		fParseState = new ParseState();
 	}
 
 	protected IParseNode getParseResults(String source)
 	{
-		fParseState.setEditState(source);
+		ParseState parseState = new ParseState(source);
 		try
 		{
-			fParser.parse(fParseState);
-			return fParseState.getParseResult();
+			fParser.parse(parseState);
+			return parseState.getParseResult();
 		}
 		catch (Exception e)
 		{

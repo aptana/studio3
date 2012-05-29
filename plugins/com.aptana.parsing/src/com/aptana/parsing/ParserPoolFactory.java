@@ -212,8 +212,7 @@ public class ParserPoolFactory implements ParsingEngine.IParserPoolProvider
 			throws Exception // $codepro.audit.disable
 								// declaredExceptions
 	{
-		ParseState parseState = new ParseState();
-		parseState.setEditState(source, startingOffset);
+		ParseState parseState = new ParseState(source, startingOffset);
 		parseState.setProgressMonitor(monitor);
 
 		return parse(contentTypeId, parseState);

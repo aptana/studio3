@@ -91,12 +91,11 @@ public class BuildContext
 
 	public IParseRootNode getAST() throws CoreException
 	{
-		return getAST(new ParseState());
+		return getAST(new ParseState(getContents()));
 	}
 
 	public synchronized IParseRootNode getAST(IParseState parseState) throws CoreException
 	{
-		parseState.setEditState(getContents());
 		try
 		{
 			String contentType = getContentType();

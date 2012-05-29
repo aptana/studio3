@@ -246,8 +246,7 @@ public class JSIndexingPerformanceTest extends PerformanceTestCase
 	private void timeIndex(int numRuns, String resourceName, String src) throws Exception
 	{
 		// apply to parse state
-		IParseState parseState = new ParseState();
-		parseState.setEditState(src);
+		IParseState parseState = new ParseState(src);
 
 		URL url = FileLocator.find(Platform.getBundle(JSPlugin.PLUGIN_ID), new Path(resourceName), null);
 		url = FileLocator.toFileURL(url);

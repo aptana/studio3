@@ -40,7 +40,6 @@ public class JSParserTest extends TestCase
 	protected void setUp() throws Exception
 	{
 		fParser = new JSParser();
-		fParseState = new ParseState();
 	}
 
 	/**
@@ -965,10 +964,9 @@ public class JSParserTest extends TestCase
 
 	public void testSingleLineComment() throws Exception
 	{
-		ParseState parseState = new ParseState();
 		String source = "// this is a single-line comment";
 
-		parseState.setEditState(source);
+		ParseState parseState = new ParseState(source);
 		fParser.parse(parseState);
 
 		IParseNode parseNode = parseState.getParseResult();
@@ -1014,7 +1012,7 @@ public class JSParserTest extends TestCase
 	public void testNodeOffsetsAtEOF() throws Exception
 	{
 		String source = "a.foo()\n// this is a comment";
-		fParseState.setEditState(source);
+		fParseState = new ParseState(source);
 		IParseNode result = fParser.parse(fParseState);
 
 		assertNotNull(result);
@@ -1054,7 +1052,7 @@ public class JSParserTest extends TestCase
 	 */
 	public void trimToSize() throws Exception
 	{
-		fParseState.setEditState(getSource("performance/ext/ext-all-debug-w-comments.js"));
+		fParseState = new ParseState(getSource("performance/ext/ext-all-debug-w-comments.js"));
 		ASTUtil.showBeforeAndAfterTrim(fParser.parse(fParseState));
 	}
 
@@ -1078,7 +1076,7 @@ public class JSParserTest extends TestCase
 
 	protected void assertParseResult(String source, String expected) throws Exception
 	{
-		fParseState.setEditState(source);
+		fParseState = new ParseState(source);
 
 		IParseNode result = fParser.parse(fParseState);
 		StringBuilder text = new StringBuilder();

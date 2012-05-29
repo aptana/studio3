@@ -465,6 +465,6 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 
 	protected List<IProblem> getParseErrors(String source) throws CoreException
 	{
-		return getParseErrors(source, new HTMLParseState(), IHTMLConstants.TIDY_PROBLEM);
+		return getParseErrors(source, new HTMLParseState(source), IHTMLConstants.TIDY_PROBLEM);
 	}
 }

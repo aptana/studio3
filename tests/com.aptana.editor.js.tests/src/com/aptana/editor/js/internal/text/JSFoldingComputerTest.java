@@ -45,8 +45,7 @@ public class JSFoldingComputerTest extends TestCase
 		{
 			protected IParseNode getAST()
 			{
-				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get());
+				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
 					return new JSParser().parse(parseState);
@@ -71,8 +70,7 @@ public class JSFoldingComputerTest extends TestCase
 		{
 			protected IParseNode getAST()
 			{
-				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get());
+				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
 					return new JSParser().parse(parseState);
@@ -105,8 +103,7 @@ public class JSFoldingComputerTest extends TestCase
 		{
 			protected IParseNode getAST()
 			{
-				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get());
+				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
 					return new JSParser().parse(parseState);
@@ -133,8 +130,7 @@ public class JSFoldingComputerTest extends TestCase
 		{
 			protected IParseNode getAST()
 			{
-				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get());
+				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
 					return new JSParser().parse(parseState);
@@ -168,8 +164,7 @@ public class JSFoldingComputerTest extends TestCase
 		{
 			protected IParseNode getAST()
 			{
-				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get());
+				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
 					return new JSParser().parse(parseState);
@@ -205,8 +200,7 @@ public class JSFoldingComputerTest extends TestCase
 		{
 			protected IParseNode getAST()
 			{
-				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get());
+				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
 					return new JSParser().parse(parseState);
@@ -240,8 +234,7 @@ public class JSFoldingComputerTest extends TestCase
 		{
 			protected IParseNode getAST()
 			{
-				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get());
+				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
 					return new JSParser().parse(parseState);

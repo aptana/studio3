@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import com.aptana.core.util.ImmutableTupleN;
 import com.aptana.core.util.StringUtil;
 import com.aptana.parsing.ast.IParseError;
+import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.lexer.IRange;
 
@@ -41,55 +42,23 @@ public class ParseState implements IParseState
 	 */
 	private ImmutableTupleN fCacheKey;
 
-	public ParseState()
+	public ParseState(String source)
 	{
-		fSource = StringUtil.EMPTY;
+		this(source, 0);
+	}
+
+	public ParseState(String source, int startingOffset)
+	{
+		this(source, startingOffset, null);
+	}
+
+	public ParseState(String source, int startingOffset, IRange[] ranges)
+	{
 		fProperties = new HashMap<String, Object>();
 		fErrors = new ArrayList<IParseError>();
-		fCacheKey = new ImmutableTupleN();
-	}
-
-	public void clearEditState()
-	{
-		fSource = null;
-		fSkippedRanges = null;
-	}
-
-	public IParseRootNode getParseResult()
-	{
-		return fParseResult;
-	}
-
-	public String getSource()
-	{
-		return fSource;
-	}
-
-	public int getStartingOffset()
-	{
-		return fStartingOffset;
-	}
-
-	public IRange[] getSkippedRanges()
-	{
-		return fSkippedRanges;
-	}
-
-	public Map<String, Object> getProperties()
-	{
-		return fProperties;
-	}
-
-	public void setEditState(String source)
-	{
-		setEditState(source, 0);
-	}
-
-	public void setEditState(String source, int startingOffset)
-	{
 		fSource = (source != null) ? source : StringUtil.EMPTY;
 		fStartingOffset = startingOffset;
-		fSkippedRanges = null;
+		fSkippedRanges = ranges;
 
 		int length = fSource.length();
 		if (length < 11)
@@ -117,14 +86,45 @@ public class ParseState implements IParseState
 		}
 	}
 
+	public void clearEditState()
+	{
+		fSource = null;
+		fSkippedRanges = null;
+	}
+
+	public IParseRootNode getParseResult()
+	{
+		return fParseResult;
+	}
+
+	public String getSource()
+	{
+		return fSource;
+	}
+
+	public int getStartingOffset()
+	{
+		return fStartingOffset;
+	}
+
+	public void setSkippedRanges(IParseNode[] skippedRanges)
+	{
+		fSkippedRanges = skippedRanges;
+	}
+
+	public IRange[] getSkippedRanges()
+	{
+		return fSkippedRanges;
+	}
+
+	public Map<String, Object> getProperties()
+	{
+		return fProperties;
+	}
+
 	public void setParseResult(IParseRootNode result)
 	{
 		fParseResult = result;
-	}
-
-	public void setSkippedRanges(IRange[] ranges)
-	{
-		fSkippedRanges = ranges;
 	}
 
 	/*

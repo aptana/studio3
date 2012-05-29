@@ -53,8 +53,7 @@ public class CSSFoldingComputerTest extends TestCase
 		{
 			protected IParseNode getAST()
 			{
-				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get());
+				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
 					return new CSSParser().parse(parseState);
@@ -81,8 +80,7 @@ public class CSSFoldingComputerTest extends TestCase
 		{
 			protected IParseNode getAST()
 			{
-				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get());
+				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
 					return new CSSParser().parse(parseState);
@@ -107,8 +105,7 @@ public class CSSFoldingComputerTest extends TestCase
 		{
 			protected IParseNode getAST()
 			{
-				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get());
+				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
 					return new CSSParser().parse(parseState);
@@ -138,8 +135,7 @@ public class CSSFoldingComputerTest extends TestCase
 		{
 			protected IParseNode getAST()
 			{
-				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get());
+				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
 					return new CSSParser().parse(parseState);
@@ -169,8 +165,7 @@ public class CSSFoldingComputerTest extends TestCase
 		{
 			protected IParseNode getAST()
 			{
-				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get());
+				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
 					return new CSSParser().parse(parseState);
@@ -196,8 +191,7 @@ public class CSSFoldingComputerTest extends TestCase
 		{
 			protected IParseNode getAST()
 			{
-				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get());
+				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
 					return new CSSParser().parse(parseState);
@@ -222,8 +216,7 @@ public class CSSFoldingComputerTest extends TestCase
 		{
 			protected IParseNode getAST()
 			{
-				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get());
+				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
 					return new CSSParser().parse(parseState);
