@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -56,6 +56,6 @@ public class JSLintReplacementValidatorTest extends JSLintValidatorTest
 
 	protected List<IProblem> getParseErrors(String source) throws CoreException
 	{
-		return getParseErrors(source, new JSParseState(), IJSConstants.JSLINT_PROBLEM_MARKER_TYPE);
+		return getParseErrors(source, new JSParseState(source), IJSConstants.JSLINT_PROBLEM_MARKER_TYPE);
 	}
 }
