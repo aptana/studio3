@@ -512,6 +512,16 @@ public class HTMLParser implements IParser
 
 	private void processText(String source)
 	{
+		// checks text node that starts with "<"
+		String text = fCurrentSymbol.value.toString().trim();
+		if (text.startsWith("<")) //$NON-NLS-1$
+		{
+			// this means we have an open < tag that doesn't have a closing >
+			fParseState.addError(new ParseError(IHTMLConstants.CONTENT_TYPE_HTML, fCurrentSymbol.getStart(),
+					fCurrentSymbol.getEnd() - fCurrentSymbol.getStart() + 1, MessageFormat.format(
+							Messages.HTMLParser_ERR_TagMissingEnd, text), IParseError.Severity.ERROR));
+		}
+
 		// checks if the last child of the current node is also a HTML text node. If so, we should unify both to one
 		// node with a larger offset.
 		if (!previousSymbolSkipped
