@@ -56,15 +56,7 @@ public class HTMLTokenScanner extends RuleBasedScanner
 
 		// text
 		IToken token = createToken(getTokenName(HTMLTokens.TEXT));
-		rules.add(new WordRule(new WordDetector()
-		{
-
-			@Override
-			public boolean isWordStart(char c)
-			{
-				return super.isWordStart(c) || c == '<';
-			}
-		}, token));
+		rules.add(new WordRule(new WordDetector(), token));
 
 		setRules(rules.toArray(new IRule[rules.size()]));
 		setDefaultReturnToken(token);
