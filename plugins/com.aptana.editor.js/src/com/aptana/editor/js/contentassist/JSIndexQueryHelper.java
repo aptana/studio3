@@ -21,6 +21,7 @@ import java.util.Set;
 
 import com.aptana.jetty.util.epl.ajax.JSON;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.index.IJSIndexConstants;
@@ -120,21 +121,10 @@ public class JSIndexQueryHelper
 	 */
 	public List<PropertyElement> getGlobals(Index index, String name)
 	{
-		List<PropertyElement> result = new ArrayList<PropertyElement>();
 		List<PropertyElement> indexGlobals = this.getMembers(index, JSTypeConstants.WINDOW_TYPE, name);
 		List<PropertyElement> builtinGlobals = this.getMembers(getIndex(), JSTypeConstants.WINDOW_TYPE, name);
 
-		if (indexGlobals != null)
-		{
-			result.addAll(indexGlobals);
-		}
-
-		if (builtinGlobals != null)
-		{
-			result.addAll(builtinGlobals);
-		}
-
-		return result;
+		return new ArrayList<PropertyElement>(CollectionsUtil.union(indexGlobals, builtinGlobals));
 	}
 
 	/**
