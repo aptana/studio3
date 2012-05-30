@@ -61,7 +61,7 @@ public class HTMLParseErrorValidatorTest extends AbstractValidatorTestCase
 
 		List<IProblem> items = getParseErrors(text);
 		assertEquals(1, items.size());
-		assertContains(items, "\"<a\" missing '>' for end of tag");
+		assertContains(items, "\"<\" missing '>' for end of tag");
 	}
 
 	public void testHTMLNoErrors() throws CoreException
