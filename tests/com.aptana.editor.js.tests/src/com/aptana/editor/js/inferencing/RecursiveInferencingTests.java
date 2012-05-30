@@ -18,7 +18,7 @@ public class RecursiveInferencingTests extends InferencingTestsBase
 	{
 		this.varTypeTests("var a = b, b = a;", "a");
 	}
-	
+
 	/**
 	 * testIdentifierCycle2
 	 */
@@ -34,7 +34,7 @@ public class RecursiveInferencingTests extends InferencingTestsBase
 	{
 		this.varTypeTests("var a = b, b = c, c = a;", "a");
 	}
-	
+
 	/**
 	 * testIdentifierCycle4
 	 */
@@ -42,7 +42,7 @@ public class RecursiveInferencingTests extends InferencingTestsBase
 	{
 		this.varTypeTests("var a = b, b = c, c = a;", "b");
 	}
-	
+
 	/**
 	 * testIdentifierCycle5
 	 */
@@ -77,9 +77,11 @@ public class RecursiveInferencingTests extends InferencingTestsBase
 
 	/**
 	 * testObjectPropertyReturnsSelf
+	 * 
+	 * @throws Exception
 	 */
-	public void testObjectPropertyReturnsSelf()
+	public void testObjectPropertyReturnsSelf() throws Exception
 	{
-		this.lastStatementTypeTests(Path.fromPortableString("inferencing/chaining.js"), "Utils.create.self");
+		this.lastStatementTypeTests(Path.fromPortableString("inferencing/chaining.js"), "Utils.create.utilsSelf");
 	}
 }

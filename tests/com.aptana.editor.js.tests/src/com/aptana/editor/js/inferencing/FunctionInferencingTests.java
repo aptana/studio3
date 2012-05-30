@@ -16,7 +16,6 @@ import org.eclipse.core.runtime.Path;
 import com.aptana.core.IMap;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.editor.common.tests.util.TestProject;
-import com.aptana.editor.epl.tests.EditorTestHelper;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.index.JSFileIndexingParticipant;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
@@ -124,43 +123,43 @@ public class FunctionInferencingTests extends InferencingTestsBase
 
 	public void testConstructedArray() throws Exception
 	{
-		EditorTestHelper.joinBackgroundActivities();
+		loadJSMetadata();
 		this.lastStatementTypeTests(Path.fromPortableString("inferencing/constructed-array.js"), "Array");
 	}
 
 	public void testConstructedBoolean() throws Exception
 	{
-		EditorTestHelper.joinBackgroundActivities();
+		loadJSMetadata();
 		this.lastStatementTypeTests(Path.fromPortableString("inferencing/constructed-boolean.js"), "Boolean");
 	}
 
 	public void testConstructedDate() throws Exception
 	{
-		EditorTestHelper.joinBackgroundActivities();
+		loadJSMetadata();
 		this.lastStatementTypeTests(Path.fromPortableString("inferencing/constructed-date.js"), "Date");
 	}
 
 	public void testConstructedError() throws Exception
 	{
-		EditorTestHelper.joinBackgroundActivities();
+		loadJSMetadata();
 		this.lastStatementTypeTests(Path.fromPortableString("inferencing/constructed-error.js"), "Error");
 	}
 
 	public void testConstructedFunction() throws Exception
 	{
-		EditorTestHelper.joinBackgroundActivities();
+		loadJSMetadata();
 		this.lastStatementTypeTests(Path.fromPortableString("inferencing/constructed-function.js"), "Function");
 	}
 
 	public void testConstructedNumber() throws Exception
 	{
-		EditorTestHelper.joinBackgroundActivities();
+		loadJSMetadata();
 		this.lastStatementTypeTests(Path.fromPortableString("inferencing/constructed-number.js"), "Number");
 	}
 
 	public void testConstructedRegExp() throws Exception
 	{
-		EditorTestHelper.joinBackgroundActivities();
+		loadJSMetadata();
 		this.lastStatementTypeTests(Path.fromPortableString("inferencing/constructed-regexp.js"), "RegExp");
 	}
 }

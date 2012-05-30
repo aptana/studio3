@@ -30,6 +30,8 @@ import org.eclipse.core.runtime.Platform;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.editor.epl.tests.EditorTestHelper;
+import com.aptana.editor.js.JSMetadataLoader;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.index.JSFileIndexingParticipant;
@@ -82,6 +84,18 @@ public abstract class InferencingTestsBase extends TestCase
 		}
 
 		return result;
+	}
+
+	/**
+	 * Loads JS Metadata synchronously.
+	 * 
+	 * @throws InterruptedException
+	 */
+	protected void loadJSMetadata() throws InterruptedException
+	{
+		JSMetadataLoader loader = new JSMetadataLoader();
+		loader.schedule();
+		loader.join();
 	}
 
 	/**
@@ -372,6 +386,8 @@ public abstract class InferencingTestsBase extends TestCase
 		super.setUp();
 
 		reader = new JSIndexReader();
+		loadJSMetadata();
+		EditorTestHelper.joinBackgroundActivities();
 	}
 
 	/**
@@ -467,7 +483,8 @@ public abstract class InferencingTestsBase extends TestCase
 
 		for (String type : types)
 		{
-			assertTrue(MessageFormat.format("Expected to find type ''{0}'' in list: {1}", type, symbolTypes), symbolTypes.contains(type));
+			assertTrue(MessageFormat.format("Expected to find type ''{0}'' in list: {1}", type, symbolTypes),
+					symbolTypes.contains(type));
 		}
 	}
 }

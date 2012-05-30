@@ -15,77 +15,77 @@ public class ConstructorInferencingTests extends InferencingTestsBase
 	public void testNewArray()
 	{
 		String source = "var x = new Array(); x";
-		
-		this.lastStatementTypeTests(source);
+
+		this.lastStatementTypeTests(source, "Array");
 	}
-	
+
 	/**
 	 * testNewBoolean
 	 */
 	public void testNewBoolean()
 	{
 		String source = "var x = new Boolean(); x";
-		
-		this.lastStatementTypeTests(source);
+
+		this.lastStatementTypeTests(source, "Boolean");
 	}
-	
+
 	/**
 	 * testNewDate
 	 */
 	public void testNewDate()
 	{
 		String source = "var x = new Date(); x";
-		
-		this.lastStatementTypeTests(source);
+
+		this.lastStatementTypeTests(source, "Date");
 	}
-	
+
 	/**
 	 * testNewFunction
 	 */
 	public void testNewFunction()
 	{
 		String source = "var x = new Function(); x";
-		
-		this.lastStatementTypeTests(source);
+
+		this.lastStatementTypeTests(source, "Function");
 	}
-	
+
 	/**
 	 * testNewObject
 	 */
 	public void testNewObject()
 	{
 		String source = "var x = new Object(); x";
-		
-		this.lastStatementTypeTests(source);
+
+		this.lastStatementTypeTests(source, "Object");
 	}
-	
+
 	/**
 	 * testNewNumber
 	 */
 	public void testNewNumber()
 	{
 		String source = "var x = new Number(); x";
-		
-		this.lastStatementTypeTests(source);
+
+		this.lastStatementTypeTests(source, "Number");
 	}
-	
+
 	/**
 	 * testNewString
 	 */
 	public void testNewString()
 	{
 		String source = "var x = new String(); x";
-		
-		this.lastStatementTypeTests(source);
+
+		this.lastStatementTypeTests(source, "String");
 	}
-	
+
 	/**
 	 * testNewRegeExp
 	 */
 	public void testNewRegExp()
 	{
 		String source = "var x = new RegExp(); x";
-		
-		this.lastStatementTypeTests(source);
+
+		this.lastStatementTypeTests(source, "RegExp");
 	}
 }
