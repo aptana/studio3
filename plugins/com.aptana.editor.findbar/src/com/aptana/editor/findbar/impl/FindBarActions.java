@@ -47,13 +47,13 @@ import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.texteditor.ITextEditor;
 
-import com.aptana.ui.keybinding.KeyBindingHelper;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.findbar.FindBarPlugin;
 import com.aptana.editor.findbar.impl.FindBarDecorator.FindScope;
 import com.aptana.editor.findbar.preferences.IPreferencesConstants;
+import com.aptana.ui.keybinding.KeyBindingHelper;
 
 /**
  * Helper to manage the activation of actions. When some control of the find bar receives the focus, the binding service
@@ -187,7 +187,6 @@ public class FindBarActions
 
 		// JDT actions
 		fCommandToHandler.put("org.eclipse.jdt.ui.navigate.open.type", null); //$NON-NLS-1$
-
 	}
 
 	/**

@@ -128,8 +128,6 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	private static final String SEARCH_BACKWARD = "icons/search_backward.png"; //$NON-NLS-1$
 	private static final String OPTIONS = "icons/gear.png"; //$NON-NLS-1$
 	private static final String SIGMA = "icons/sigma.png"; //$NON-NLS-1$
-	private static final String FINDREPLACE = "icons/findreplace.png"; //$NON-NLS-1$
-	private static final String SEARCH_OPEN_FILES = "icons/searchopenfiles.png"; //$NON-NLS-1$
 	private static final String CASE_SENSITIVE = "icons/casesensitive.png"; //$NON-NLS-1$
 	private static final String CASE_SENSITIVE_DISABLED = "icons/casesensitive_disabled.png"; //$NON-NLS-1$
 	private static final String REGEX = "icons/regex.png"; //$NON-NLS-1$
@@ -231,6 +229,26 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		public void focusGained(FocusEvent e)
 		{
 			findBarFocusLost();
+		}
+	};
+
+	KeyListener textKeyListner = new KeyListener()
+	{
+
+		public void keyReleased(KeyEvent e)
+		{
+		}
+
+		public void keyPressed(KeyEvent e)
+		{
+			boolean isCommandCtrl = (Platform.OS_MACOSX.equals(Platform.getOS()) && e.stateMask == SWT.COMMAND)
+					|| (!Platform.OS_MACOSX.equals(Platform.getOS()) && e.stateMask == SWT.CTRL);
+			boolean isCKey = e.character == 'A' || e.character == 'a'; //$NON-NLS-1$ //$NON-NLS-2$
+
+			if (isCommandCtrl && isCKey)
+			{
+				((Text) e.widget).selectAll();
+			}
 		}
 	};
 
@@ -772,6 +790,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		entriesControlHandles.add(findBarEntriesHelper.register(text, modifyListener, preferenceName));
 
 		text.addFocusListener(findBarActions.createFocusListener(text));
+		text.addKeyListener(textKeyListner);
 		return text;
 	}
 
