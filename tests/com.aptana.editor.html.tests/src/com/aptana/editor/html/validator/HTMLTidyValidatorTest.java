@@ -56,6 +56,26 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 		assertDoesntContain(items, "SYSTEM, PUBLIC, W3C, DTD, EN must be upper case");
 	}
 
+	public void testUnknownAttribute() throws CoreException
+	{
+		// @formatter:off
+		String text = "<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\">\n" +
+				"    <head>\n" +
+				"        <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\n" +
+				"        <title>HTML</title>\n" +
+				"        <meta name=\"author\" content=\"qatester\" />\n" +
+				"        <!-- Date: 2012-05-25 -->\n" +
+				"    </head>\n" +
+				"    <body>\n" +
+				"        <a href=\"http://google.com\" src=\"this shouldn't work\" div>Google</a>\n" +
+				"    </body>\n" +
+				"</html>";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertContains(items, "a proprietary attribute \"div\"");
+	}
+
 	public void testLowercaseDoctypeW3C() throws CoreException
 	{
 		String text = "<!DOCTYPE HTML PUBLIC \"-//w3c//DTD HTML 4.01//EN\"\n"

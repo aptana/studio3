@@ -21,6 +21,7 @@ import org.eclipse.jface.text.rules.ITokenScanner;
 import beaver.Scanner.Exception;
 import beaver.Symbol;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.css.parsing.ast.CSSDeclarationNode;
 import com.aptana.editor.css.parsing.ast.CSSRuleNode;
@@ -64,7 +65,8 @@ public class HTMLParser implements IParser
 	private HTMLParserScanner fScanner;
 	private HTMLParseState fParseState;
 	private Stack<IParseNode> fElementStack;
-	private static final Pattern attributes = Pattern.compile("\\s+(\\w[\\w\\-:]*)\\s*=\\s*(('[^']*')|(\"[^\"]*\"))"); //$NON-NLS-1$
+	private static final Pattern attributes = Pattern
+			.compile("\\s+(\\w[\\w\\-:]*)\\s*?(=\\s*(('[^']*')|(\"[^\"]*\")))?"); //$NON-NLS-1$
 
 	private IParseNode fCurrentElement;
 	private Symbol fCurrentSymbol;
@@ -449,62 +451,75 @@ public class HTMLParser implements IParser
 	{
 		String tag = tagSymbol.value.toString();
 
+		String tagName = element.getElementName();
+		int index = tag.indexOf(tagName);
+		tag = tag.substring(index + tagName.length());
+
+		int startOftagText = tagSymbol.getStart() + index + tagName.length();
+
 		Matcher m = attributes.matcher(tag);
 		while (m.find())
 		{
 			String name = m.group(1);
-			String value = m.group(2);
+			String value = m.group(3);
 
-			IRange nameRange = new Range(tagSymbol.getStart() + m.start(1), tagSymbol.getStart() + m.end(1));
-			IRange valueRange = new Range(tagSymbol.getStart() + m.start(2), tagSymbol.getStart() + m.end(2));
-			int absoluteOffset = tagSymbol.getStart() + m.start(2);
+			IRange nameRange = new Range(startOftagText + m.start(1), startOftagText + m.end(1));
+			IRange valueRange = new Range(startOftagText + m.start(3), startOftagText + m.end(3));
+			int absoluteOffset = startOftagText + m.start(3);
 
-			value = value.substring(1, value.length() - 1).trim();
-			element.setAttribute(name, value, nameRange, valueRange);
-
-			// checks if we need to process the value as CSS
-			if (HTMLUtils.isCSSAttribute(name))
+			if (value != null)
 			{
-				String text = element.getName() + " {" + value + "}"; //$NON-NLS-1$ //$NON-NLS-2$
-				try
+				// trim off the quotes
+				value = value.substring(1, value.length() - 1).trim();
+			}
+			element.setAttribute(name, value == null ? StringUtil.EMPTY : value, nameRange, valueRange);
+
+			if (!StringUtil.isEmpty(value))
+			{
+				// checks if we need to process the value as CSS
+				if (HTMLUtils.isCSSAttribute(name))
 				{
-
-					int startingOffset = absoluteOffset - (element.getName().length() + 1);
-					IParseNode node = ParserPoolFactory.parse(ICSSConstants.CONTENT_TYPE_CSS, text, startingOffset);
-
-					// should always have a rule node
-					if (node.hasChildren())
+					String text = tagName + " {" + value + "}"; //$NON-NLS-1$ //$NON-NLS-2$
+					try
 					{
-						IParseNode rule = node.getChild(0);
-						if (rule instanceof CSSRuleNode)
+
+						int startingOffset = absoluteOffset - (tagName.length() + 1);
+						IParseNode node = ParserPoolFactory.parse(ICSSConstants.CONTENT_TYPE_CSS, text, startingOffset);
+
+						// should always have a rule node
+						if (node.hasChildren())
 						{
-							CSSDeclarationNode[] declarations = ((CSSRuleNode) rule).getDeclarations();
-							for (CSSDeclarationNode declaration : declarations)
+							IParseNode rule = node.getChild(0);
+							if (rule instanceof CSSRuleNode)
 							{
-								element.addCSSStyleNode(declaration);
+								CSSDeclarationNode[] declarations = ((CSSRuleNode) rule).getDeclarations();
+								for (CSSDeclarationNode declaration : declarations)
+								{
+									element.addCSSStyleNode(declaration);
+								}
 							}
 						}
 					}
-				}
-				catch (java.lang.Exception e)
-				{
-				}
-			}
-			// checks if we need to process the value as JS
-			else if (HTMLUtils.isJSAttribute(element.getName(), name))
-			{
-				try
-				{
-					int startingOffset = absoluteOffset + 1;
-					IParseNode node = ParserPoolFactory.parse(IJSConstants.CONTENT_TYPE_JS, value, startingOffset);
-
-					for (IParseNode child : node)
+					catch (java.lang.Exception e)
 					{
-						element.addJSAttributeNode(child);
 					}
 				}
-				catch (java.lang.Exception e)
+				// checks if we need to process the value as JS
+				else if (HTMLUtils.isJSAttribute(tagName, name))
 				{
+					try
+					{
+						int startingOffset = absoluteOffset + 1;
+						IParseNode node = ParserPoolFactory.parse(IJSConstants.CONTENT_TYPE_JS, value, startingOffset);
+
+						for (IParseNode child : node)
+						{
+							element.addJSAttributeNode(child);
+						}
+					}
+					catch (java.lang.Exception e)
+					{
+					}
 				}
 			}
 		}
