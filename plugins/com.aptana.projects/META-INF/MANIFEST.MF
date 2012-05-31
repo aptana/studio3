@@ -5,22 +5,22 @@ Bundle-SymbolicName: com.aptana.projects;singleton:=true
 Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.projects.ProjectsPlugin
 Bundle-Vendor: %providerName
-Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime,
- org.eclipse.core.resources,
- org.eclipse.ui.ide,
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.resources;visibility:=reexport,
+ org.eclipse.core.filesystem,
+ org.eclipse.team.core,
+ com.aptana.core,
+ com.aptana.buildpath.core,
+ com.aptana.git.core,
+ org.eclipse.ui,
+ org.eclipse.ui.ide;visibility:=reexport,
  com.aptana.scripting,
  com.aptana.git.ui,
  com.aptana.ui,
  com.aptana.ui.epl,
  com.aptana.ui.io,
- com.aptana.core,
  org.w3c.css,
  com.aptana.usage,
- com.aptana.git.core,
- org.eclipse.team.core,
- org.eclipse.core.filesystem,
- com.aptana.buildpath.core,
  com.aptana.samples
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy

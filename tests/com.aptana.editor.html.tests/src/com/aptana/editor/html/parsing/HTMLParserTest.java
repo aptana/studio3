@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.Platform;
 
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.IOUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.tests.util.ASTUtil;
 import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.css.parsing.ast.CSSParseRootNode;
@@ -32,6 +33,7 @@ import com.aptana.parsing.ast.INameNode;
 import com.aptana.parsing.ast.IParseError;
 import com.aptana.parsing.ast.IParseError.Severity;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseNodeAttribute;
 import com.aptana.parsing.ast.ParseNode;
 import com.aptana.parsing.lexer.Range;
 
@@ -311,6 +313,34 @@ public class HTMLParserTest extends TestCase
 
 		// should remain a HTML node
 		assertEquals(IHTMLConstants.CONTENT_TYPE_HTML, textNode.getLanguage());
+	}
+
+	public void testAttributeWithNoValue() throws Exception
+	{
+		String source = "<li div=>item 1</li>";
+		fParseState = new HTMLParseState(source);
+		IParseNode result = fParser.parse(fParseState);
+		IParseNode[] children = result.getChildren();
+		assertEquals(1, children.length);
+
+		IParseNodeAttribute[] attrs = children[0].getAttributes();
+		assertEquals("attribute count", 1, attrs.length);
+		assertEquals("attribute name", "div", attrs[0].getName());
+		assertEquals("attribute value", StringUtil.EMPTY, attrs[0].getValue());
+	}
+
+	public void testAttributeWithNoValueOrEquals() throws Exception
+	{
+		String source = "<li div>item 1</li>";
+		fParseState = new HTMLParseState(source);
+		IParseNode result = fParser.parse(fParseState);
+		IParseNode[] children = result.getChildren();
+		assertEquals(1, children.length);
+
+		IParseNodeAttribute[] attrs = children[0].getAttributes();
+		assertEquals("attribute count", 1, attrs.length);
+		assertEquals("attribute name", "div", attrs[0].getName());
+		assertEquals("attribute value", StringUtil.EMPTY, attrs[0].getValue());
 	}
 
 	public void testNestedOptionalEndTag() throws Exception
