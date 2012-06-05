@@ -374,6 +374,12 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M2+P">
       </key>
+      <key
+            commandId="org.eclipse.ui.edit.text.toggleShowWhitespaceCharacters"
+            contextId="com.aptana.editor.context"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="COMMAND+ALT+W">
+      </key>
    </extension>
    <extension
          point="org.eclipse.ui.contexts">
