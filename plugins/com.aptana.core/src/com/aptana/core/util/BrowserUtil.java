@@ -53,34 +53,42 @@ public class BrowserUtil
 				// See: http://stackoverflow.com/questions/2370732/how-to-find-all-the-browsers-installed-on-a-machine
 				Regor regor = new Regor();
 
-				Key key = regor.openKey(Regor.HKEY_LOCAL_MACHINE, "Software\\Clients\\StartMenuInternet"); //$NON-NLS-1$
-				if (key != null)
-				{
-					try
+				for (String path : new String[] {
+						"Software\\Clients\\StartMenuInternet", "Software\\WOW6432Node\\Clients\\StartMenuInternet" }) { //$NON-NLS-1$ //$NON-NLS-2$
+					Key key = regor.openKey(Regor.HKEY_LOCAL_MACHINE, path, Regor.KEY_READ);
+					if (key != null)
 					{
-						@SuppressWarnings("unchecked")
-						List<String> keys = regor.listKeys(key);
-						if (keys != null)
+						try
 						{
-							for (String s : keys)
+							@SuppressWarnings("unchecked")
+							List<String> keys = regor.listKeys(key);
+							if (keys != null)
 							{
-								String browserName = readKeyValue(regor, key, s);
-								String browserLocation = readKeyValue(regor, key, s + "\\shell\\open\\command"); //$NON-NLS-1$
-
-								if (browserName != null && browserLocation != null)
+								for (String s : keys)
 								{
-									// Only add it if it really exists.
-									if (new File(browserLocation).exists())
+									String browserName = readKeyValue(regor, key, s);
+									String browserLocation = readKeyValue(regor, key, s + "\\shell\\open\\command"); //$NON-NLS-1$
+
+									if (browserName != null && browserLocation != null)
 									{
-										browsers.add(new BrowserInfo(browserName, browserLocation));
+										// Only add it if it really exists.
+										if (browserLocation.startsWith("\"") && browserLocation.endsWith("\"")) //$NON-NLS-1$ //$NON-NLS-2$
+										{
+											browserLocation = browserLocation
+													.substring(1, browserLocation.length() - 1);
+										}
+										if (new File(browserLocation).exists())
+										{
+											browsers.add(new BrowserInfo(browserName, browserLocation));
+										}
 									}
 								}
 							}
 						}
-					}
-					finally
-					{
-						regor.closeKey(key);
+						finally
+						{
+							regor.closeKey(key);
+						}
 					}
 				}
 			}
@@ -98,7 +106,7 @@ public class BrowserUtil
 	 */
 	private static String readKeyValue(Regor regor, Key key, String path) throws RegistryErrorException
 	{
-		Key openKey = regor.openKey(key, path);
+		Key openKey = regor.openKey(key, path, Regor.KEY_READ);
 		if (openKey != null)
 		{
 			try
