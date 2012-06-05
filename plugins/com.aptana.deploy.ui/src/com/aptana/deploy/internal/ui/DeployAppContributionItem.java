@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -23,8 +23,8 @@ import org.eclipse.ui.menus.IWorkbenchContribution;
 import org.eclipse.ui.services.IServiceLocator;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.deploy.DeployPlugin;
 import com.aptana.deploy.IDeployProvider;
+import com.aptana.deploy.ui.DeployUIPlugin;
 import com.aptana.deploy.util.DeployProviderUtil;
 import com.aptana.ui.util.UIUtils;
 
@@ -77,7 +77,7 @@ public class DeployAppContributionItem extends ContributionItem implements IWork
 			catch (NotDefinedException e)
 			{
 				// should not happen, but log it just in case
-				IdeLog.logError(DeployPlugin.getDefault(), "The name for the deploy command is not defined."); //$NON-NLS-1$
+				IdeLog.logError(DeployUIPlugin.getDefault(), "The name for the deploy command is not defined."); //$NON-NLS-1$
 			}
 		}
 		// the default-default for the menu name is "Deploy App"
@@ -96,7 +96,7 @@ public class DeployAppContributionItem extends ContributionItem implements IWork
 				}
 				catch (Exception e1)
 				{
-					IdeLog.logError(DeployPlugin.getDefault(),
+					IdeLog.logError(DeployUIPlugin.getDefault(),
 							"Failed to execute the command to deploy the application."); //$NON-NLS-1$
 				}
 			}

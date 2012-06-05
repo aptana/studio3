@@ -2,7 +2,7 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
-         point="com.aptana.deploy.deployWizards">
+         point="com.aptana.deploy.ui.deployWizards">
       <wizard
             class="com.aptana.deploy.engineyard.ui.wizard.EngineYardDeployWizard"
             icon="icons/icon-engineyard.png"
