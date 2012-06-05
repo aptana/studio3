@@ -20,6 +20,8 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.operation.ModalContext;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -93,9 +95,18 @@ public class JiraPreferencePageProvider extends AbstractAccountPageProvider
 		label.setText(StringUtil.makeFormLabel(Messages.JiraPreferencePageProvider_LBL_Username));
 		label.setLayoutData(GridDataFactory.swtDefaults().create());
 
+		ModifyListener modifyListener = new ModifyListener()
+		{
+
+			public void modifyText(ModifyEvent e)
+			{
+				updateButtonStates();
+			}
+		};
 		usernameText = new Text(loginComp, SWT.BORDER);
 		usernameText
 				.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).create());
+		usernameText.addModifyListener(modifyListener);
 
 		testButton = new Button(loginComp, SWT.NONE);
 		testButton.setText(Messages.JiraPreferencePageProvider_LBL_Validate);
@@ -124,6 +135,7 @@ public class JiraPreferencePageProvider extends AbstractAccountPageProvider
 		passwordText = new Text(loginComp, SWT.BORDER | SWT.PASSWORD);
 		passwordText
 				.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).create());
+		passwordText.addModifyListener(modifyListener);
 
 		createAccountButton = new Button(loginComp, SWT.NONE);
 		createAccountButton.setText(StringUtil.ellipsify(Messages.JiraPreferencePageProvider_LBL_Signup));
@@ -139,6 +151,7 @@ public class JiraPreferencePageProvider extends AbstractAccountPageProvider
 			}
 		});
 
+		updateButtonStates();
 		adjustWidth();
 
 		return loginComp;
@@ -194,6 +207,12 @@ public class JiraPreferencePageProvider extends AbstractAccountPageProvider
 		{
 			userLabel.setText(user.getUsername());
 		}
+	}
+
+	private void updateButtonStates()
+	{
+		testButton.setEnabled(!StringUtil.isEmpty(usernameText.getText())
+				&& !StringUtil.isEmpty(passwordText.getText()));
 	}
 
 	private void adjustWidth()
