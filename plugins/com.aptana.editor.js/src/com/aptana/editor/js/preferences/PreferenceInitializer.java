@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
 import com.aptana.core.build.AbstractBuildParticipant;
 import com.aptana.core.build.IBuildParticipant.BuildType;
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.js.IJSConstants;
@@ -67,6 +68,26 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		prefs.putBoolean(parseValidator.getEnablementPreferenceKey(BuildType.BUILD), true);
 		prefs.putBoolean(parseValidator.getEnablementPreferenceKey(BuildType.RECONCILE), true);
 
+		JSLintValidator jsLintValidator = new JSLintValidator()
+		{
+			@Override
+			public String getId()
+			{
+				return ID;
+			}
+
+			@Override
+			protected String getPreferenceNode()
+			{
+				return JSPlugin.PLUGIN_ID;
+			}
+		};
+		// Set default JSLint filters
+		String[] defaultJSLintFilters = new String[] {
+				"Missing space between .+", "Unexpected '\\(space\\)'\\.", //$NON-NLS-1$ //$NON-NLS-2$
+				"Expected '.+' at column \\d+, not column \\d+\\.", "Unexpected space between .+", "Expected exactly one space between .+" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		jsLintValidator.setFilters(EclipseUtil.defaultScope(), defaultJSLintFilters);
+
 		// Migrate the old filter prefs to new validators
 		IEclipsePreferences cepPrefs = EclipseUtil.instanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
 		String oldKey = MessageFormat.format("{0}:{1}", IJSConstants.CONTENT_TYPE_JS, //$NON-NLS-1$
@@ -74,23 +95,9 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		String oldFilters = cepPrefs.get(oldKey, null);
 		if (oldFilters != null)
 		{
-			JSLintValidator jsLintValidator = new JSLintValidator()
-			{
-				@Override
-				public String getId()
-				{
-					return ID;
-				}
-
-				@Override
-				protected String getPreferenceNode()
-				{
-					return JSPlugin.PLUGIN_ID;
-				}
-			};
-
 			String[] oldFilterArray = oldFilters.split(AbstractBuildParticipant.FILTER_DELIMITER);
-			jsLintValidator.setFilters(EclipseUtil.instanceScope(), oldFilterArray);
+			String[] combined = ArrayUtil.flatten(oldFilterArray, defaultJSLintFilters);
+			jsLintValidator.setFilters(EclipseUtil.instanceScope(), combined);
 			cepPrefs.remove(oldKey);
 		}
 	}
