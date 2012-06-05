@@ -39,6 +39,7 @@ import com.aptana.editor.html.contentassist.HTMLIndexQueryHelper;
 import com.aptana.editor.html.contentassist.model.AttributeElement;
 import com.aptana.editor.html.contentassist.model.ElementElement;
 import com.aptana.editor.html.contentassist.model.EntityElement;
+import com.aptana.editor.html.contentassist.model.EventElement;
 import com.aptana.editor.html.contentassist.model.ValueElement;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.ast.HTMLCommentNode;
@@ -110,6 +111,10 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 	 * Cache from entity names to the entity metadata.
 	 */
 	private Map<String, EntityElement> fEntityMap;
+	/**
+	 * Cache from event names to the event metadata.
+	 */
+	private Map<String, EventElement> fEventMap;
 
 	/**
 	 * Set of unique id values from elements
@@ -487,12 +492,15 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 			AttributeElement ae = getAttribute(tagName, attrName);
 			if (ae == null)
 			{
-				// Unrecognized attribute!
-				int offset = element.getStartingOffset();
-				problems.add(createWarning(
-						MessageFormat.format(Messages.HTMLTidyValidator_ProprietaryAttribute, tagName, attrName,
-								attr.getValue()), doc.getLineOfOffset(offset) + 1, offset, element.getNameNode()
-								.getNameRange().getLength(), sourcePath));
+				EventElement event = getEvent(attrName);
+				if (event == null)
+				{
+					// Unrecognized attribute!
+					int offset = element.getStartingOffset();
+					problems.add(createWarning(MessageFormat.format(Messages.HTMLTidyValidator_ProprietaryAttribute,
+							tagName, attrName, attr.getValue()), doc.getLineOfOffset(offset) + 1, offset, element
+							.getNameNode().getNameRange().getLength(), sourcePath));
+				}
 				continue;
 			}
 
@@ -603,6 +611,22 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 			});
 		}
 		return fEntityMap.get(entityName);
+	}
+
+	private EventElement getEvent(String eventName)
+	{
+		if (fEventMap == null)
+		{
+			List<EventElement> events = fQueryHelper.getEvents();
+			fEventMap = CollectionsUtil.mapFromValues(events, new IMap<EventElement, String>()
+			{
+				public String map(EventElement item)
+				{
+					return item.getName();
+				}
+			});
+		}
+		return fEventMap.get(eventName);
 	}
 
 	private ElementElement getElement(String tagName)
