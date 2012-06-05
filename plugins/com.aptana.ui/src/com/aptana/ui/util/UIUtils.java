@@ -33,11 +33,13 @@ import org.eclipse.ui.IPathEditorInput;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.IURIEditorInput;
 import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.services.IEvaluationService;
@@ -357,5 +359,34 @@ public final class UIUtils
 	public static ImageDescriptor getImageDescriptor(String pluginId, String path)
 	{
 		return AbstractUIPlugin.imageDescriptorFromPlugin(pluginId, path);
+	}
+
+	public static boolean getCoolBarVisibility()
+	{
+		IWorkbench workbench = PlatformUI.getWorkbench();
+		if (workbench != null)
+		{
+			IEvaluationService service = (IEvaluationService) workbench.getService(IEvaluationService.class);
+			IEvaluationContext appState = service.getCurrentState();
+			Object coolbarVisible = appState.getVariable(ISources.ACTIVE_WORKBENCH_WINDOW_IS_COOLBAR_VISIBLE_NAME);
+			if (coolbarVisible instanceof Boolean)
+			{
+				return ((Boolean) coolbarVisible).booleanValue();
+			}
+		}
+		return true;
+	}
+
+	public static void setCoolBarVisibility(boolean visible)
+	{
+		if (getCoolBarVisibility() != visible)
+		{
+			ActionFactory.IWorkbenchAction toggleToolbarAction = ActionFactory.TOGGLE_COOLBAR.create(PlatformUI
+					.getWorkbench().getActiveWorkbenchWindow());
+			if (toggleToolbarAction != null && toggleToolbarAction.isEnabled())
+			{
+				toggleToolbarAction.run();
+			}
+		}
 	}
 }
