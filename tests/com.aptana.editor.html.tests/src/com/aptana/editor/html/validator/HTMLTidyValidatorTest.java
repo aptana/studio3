@@ -539,6 +539,42 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 		assertDoesntContain(items, "link attribute \"rev\" has invalid value \"shortcut icon\"");
 	}
 
+	public void testDoesntComplainAboutScriptTagWithSrcAttributeHavingNoContent() throws CoreException
+	{
+		// @formatter:off
+		String text = "<!DOCTYPE html>\n" +
+			"<HTML>\n" +
+			"<HEAD>\n" +
+			"<TITLE>Example</TITLE>\n" +
+			"<script src=\"portal/resources/prototype.js\" type=\"text/javascript\"></script>\n" +
+			"</HEAD>\n" +
+			"<body>\n" +
+			"</body>\n" +
+			"</HTML>\n";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "should trim empty <script>");
+	}
+
+	public void testComplainsAboutScriptTagWithNoSrcAttributeHavingNoContent() throws CoreException
+	{
+		// @formatter:off
+		String text = "<!DOCTYPE html>\n" +
+			"<HTML>\n" +
+			"<HEAD>\n" +
+			"<TITLE>Example</TITLE>\n" +
+			"<script type=\"text/javascript\"></script>\n" +
+			"</HEAD>\n" +
+			"<body>\n" +
+			"</body>\n" +
+			"</HTML>\n";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertContains(items, "should trim empty <script>");
+	}
+
 	protected List<IProblem> getParseErrors(String source) throws CoreException
 	{
 		return getParseErrors(source, new HTMLParseState(source), IHTMLConstants.TIDY_PROBLEM);

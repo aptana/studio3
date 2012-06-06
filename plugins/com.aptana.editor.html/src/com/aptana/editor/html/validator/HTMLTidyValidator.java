@@ -415,10 +415,14 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 				// Check for empty tags that shouldn't be
 				if (!HTMLParseState.isEmptyTagType(tagName) && ArrayUtil.isEmpty(element.getChildren()))
 				{
-					int offset = element.getStartingOffset();
-					problems.add(createWarning(
-							MessageFormat.format(Messages.HTMLTidyValidator_TrimEmptyElement, tagName),
-							doc.getLineOfOffset(offset) + 1, offset, element.getLength(), sourcePath));
+					// If it's a script tag with a src attribute, don't mark it
+					if (!"script".equals(tagName) || StringUtil.isEmpty(element.getAttributeValue("src"))) //$NON-NLS-1$ //$NON-NLS-2$
+					{
+						int offset = element.getStartingOffset();
+						problems.add(createWarning(
+								MessageFormat.format(Messages.HTMLTidyValidator_TrimEmptyElement, tagName),
+								doc.getLineOfOffset(offset) + 1, offset, element.getLength(), sourcePath));
+					}
 				}
 
 				// Check for tags that should be empty that aren't
