@@ -503,6 +503,42 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 		assertDoesntContain(items, "meta attribute \"content\" has invalid value \"not specified\"");
 	}
 
+	public void testArbitraryRelAttributeValue() throws CoreException
+	{
+		// @formatter:off
+		String text = "<!DOCTYPE html>\n" +
+			"<HTML>\n" +
+			"<HEAD>\n" +
+			"<TITLE>Example</TITLE>\n" +
+			"<link rel=\"shortcut icon\" href=\"/favicon.ico\" />\n" +
+			"</HEAD>\n" +
+			"<body>\n" +
+			"</body>\n" +
+			"</HTML>\n";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "link attribute \"rel\" has invalid value \"shortcut icon\"");
+	}
+
+	public void testArbitraryRevAttributeValue() throws CoreException
+	{
+		// @formatter:off
+		String text = "<!DOCTYPE html>\n" +
+			"<HTML>\n" +
+			"<HEAD>\n" +
+			"<TITLE>Example</TITLE>\n" +
+			"<link rev=\"shortcut icon\" href=\"/favicon.ico\" />\n" +
+			"</HEAD>\n" +
+			"<body>\n" +
+			"</body>\n" +
+			"</HTML>\n";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "link attribute \"rev\" has invalid value \"shortcut icon\"");
+	}
+
 	protected List<IProblem> getParseErrors(String source) throws CoreException
 	{
 		return getParseErrors(source, new HTMLParseState(source), IHTMLConstants.TIDY_PROBLEM);
