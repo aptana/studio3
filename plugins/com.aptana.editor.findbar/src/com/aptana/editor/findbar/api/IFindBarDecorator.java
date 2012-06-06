@@ -45,6 +45,13 @@ public interface IFindBarDecorator
 	void createFindBar(ISourceViewer sourceViewer);
 
 	/**
+	 * Delegates the context activation to the decorator
+	 * 
+	 * @param contextIds
+	 */
+	void activateContexts(String[] contextIds);
+
+	/**
 	 * Install actions.
 	 */
 	void installActions();
