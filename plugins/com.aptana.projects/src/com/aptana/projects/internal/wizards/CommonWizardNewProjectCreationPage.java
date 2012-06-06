@@ -90,6 +90,7 @@ public class CommonWizardNewProjectCreationPage extends WizardNewProjectCreation
 		stepIndicatorComposite = new StepIndicatorComposite(pageComposite, stepNames);
 		stepIndicatorComposite.setSelection(getStepName());
 
+		createTopArea(pageComposite);
 		super.createControl(pageComposite);
 
 		((Composite) getControl()).setLayout(GridLayoutFactory.fillDefaults().spacing(0, 0).create());
@@ -98,6 +99,17 @@ public class CommonWizardNewProjectCreationPage extends WizardNewProjectCreation
 
 		createProjectTemplateSection(pageComposite);
 		createWarningArea();
+	}
+
+	/**
+	 * Be default the method does nothing. Subclass could override to add additional controls to the top of the wizard
+	 * page.
+	 * 
+	 * @param parent
+	 *            the parent composite
+	 */
+	protected void createTopArea(Composite parent)
+	{
 	}
 
 	private void createWarningArea()
