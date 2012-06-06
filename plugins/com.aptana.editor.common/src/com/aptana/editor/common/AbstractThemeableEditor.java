@@ -70,7 +70,6 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.dnd.IDragAndDropService;
 import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 import org.eclipse.ui.ide.FileStoreEditorInput;
@@ -318,10 +317,8 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		fSelectionChangedListener.install(getSelectionProvider());
 		fThemeListener = new PropertyChangeListener();
 		ThemePlugin.getDefault().getPreferenceStore().addPropertyChangeListener(fThemeListener);
-
-		IContextService contextService = (IContextService) getSite().getService(IContextService.class);
-		contextService.activateContext(ScriptingActivator.SCRIPTING_CONTEXT_ID);
-		contextService.activateContext(ScriptingActivator.EDITOR_CONTEXT_ID);
+		this.fThemeableEditorFindBarExtension.activateContexts(new String[] { ScriptingActivator.EDITOR_CONTEXT_ID,
+				ScriptingActivator.SCRIPTING_CONTEXT_ID });
 
 		if (isWordWrapEnabled())
 		{

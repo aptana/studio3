@@ -111,6 +111,10 @@ public class FindBarActions
 	private ITextEditor textEditor;
 	private WeakReference<FindBarDecorator> findBarDecorator;
 
+	// Map of context activations that the find bar is responsible for enabling/disabling contexts
+	List<String> editorContextIds = new ArrayList<String>();
+	List<IContextActivation> editorContextActivations = new ArrayList<IContextActivation>();
+
 	public FindBarActions(ITextEditor textEditor, FindBarDecorator findBarDecorator)
 	{
 		this.textEditor = textEditor;
@@ -616,6 +620,8 @@ public class FindBarActions
 
 			service.addBindingManagerListener(fClearCommandToBindingOnChangesListener);
 			findBarContextActivation = contextService.activateContext("org.eclipse.ui.textEditorScope.findbar"); //$NON-NLS-1$
+
+			contextService.deactivateContexts(editorContextActivations);
 		}
 		else
 		{
@@ -628,6 +634,23 @@ public class FindBarActions
 				fHandlerActivations.clear();
 				contextService.deactivateContext(findBarContextActivation);
 				findBarContextActivation = null;
+			}
+
+			activateContexts(editorContextIds.toArray(new String[editorContextIds.size()]));
+		}
+	}
+
+	public void activateContexts(String[] contextIds)
+	{
+		if (textEditor != null)
+		{
+			IContextService contextService = (IContextService) textEditor.getSite().getService(IContextService.class);
+			editorContextActivations.clear();
+			editorContextIds.clear();
+			for (String contextId : contextIds)
+			{
+				editorContextIds.add(contextId);
+				editorContextActivations.add(contextService.activateContext(contextId));
 			}
 		}
 	}
