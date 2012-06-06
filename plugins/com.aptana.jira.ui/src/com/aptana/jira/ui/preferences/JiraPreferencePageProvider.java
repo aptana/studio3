@@ -20,6 +20,8 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.operation.ModalContext;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -150,6 +152,27 @@ public class JiraPreferencePageProvider extends AbstractAccountPageProvider
 				WorkbenchBrowserUtil.launchExternalBrowser(SIGNUP_URL);
 			}
 		});
+
+		KeyListener keyListener = new KeyListener()
+		{
+
+			public void keyPressed(KeyEvent e)
+			{
+				if (e.character == SWT.CR)
+				{
+					if (testButton.isEnabled())
+					{
+						login(true);
+					}
+				}
+			}
+
+			public void keyReleased(KeyEvent e)
+			{
+			}
+		};
+		usernameText.addKeyListener(keyListener);
+		passwordText.addKeyListener(keyListener);
 
 		updateButtonStates();
 		adjustWidth();
@@ -314,6 +337,7 @@ public class JiraPreferencePageProvider extends AbstractAccountPageProvider
 		getJiraManager().logout();
 		usernameText.setText(StringUtil.EMPTY);
 		passwordText.setText(StringUtil.EMPTY);
+		usernameText.setFocus();
 		layout();
 	}
 
