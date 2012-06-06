@@ -1718,4 +1718,13 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		text.setText(sb.toString());
 		text.setSelection(selection.x + delimiter.length());
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.findbar.api.IFindBarDecorator#activateContexts(java.lang.String[])
+	 */
+	public void activateContexts(String[] contextIds)
+	{
+		findBarActions.activateContexts(contextIds);
+	}
 }
