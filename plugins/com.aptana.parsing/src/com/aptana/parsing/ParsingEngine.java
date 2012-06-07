@@ -10,6 +10,7 @@ package com.aptana.parsing;
 import java.text.MessageFormat;
 
 import com.aptana.core.epl.util.LRUCache;
+import com.aptana.core.epl.util.LRUCacheWithSoftPrunnedValues;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.parsing.ast.IParseRootNode;
 
@@ -117,7 +118,7 @@ public class ParsingEngine
 	 * A parse cache. Keyed by combo of content type and source hash, holds IParseRootNode result. Retains most recently
 	 * used ASTs.
 	 */
-	private LRUCache<IParseStateCacheKey, CacheValue> fParseCache;
+	private LRUCacheWithSoftPrunnedValues<IParseStateCacheKey, CacheValue> fParseCache;
 
 	/**
 	 * Object providing access to the pool provider.
@@ -131,7 +132,8 @@ public class ParsingEngine
 
 	public ParsingEngine(IParserPoolProvider parserPoolProvider)
 	{
-		fParseCache = new LRUCache<IParseStateCacheKey, CacheValue>(3);
+		// Create a cache with N 'strong' references but still keep prunned values as soft references.
+		fParseCache = new LRUCacheWithSoftPrunnedValues<IParseStateCacheKey, CacheValue>(15);
 		fParserPoolProvider = parserPoolProvider;
 	}
 
@@ -172,7 +174,7 @@ public class ParsingEngine
 			}
 			IParseStateCacheKey newParseStateKey = parseState.getCacheKey(contentTypeId);
 			CacheValue cacheValue = null;
-			LRUCache<IParseStateCacheKey, CacheValue> parseCache = fParseCache;
+			LRUCacheWithSoftPrunnedValues<IParseStateCacheKey, CacheValue> parseCache = fParseCache;
 			if (parseCache == null)
 			{
 				return null; // already disposed.
@@ -274,6 +276,13 @@ public class ParsingEngine
 					finally
 					{
 						pool.checkIn(parser);
+					}
+					synchronized (fParseCacheLock)
+					{
+						// Make a get just to update time stamp or change it from the soft map back into the main LRU.
+						// Done because we may have the situation where the a main parse has multiple sub-parses, and
+						// it's more important to persist the main parse than the sub-parses.
+						parseCache.get(newParseStateKey);
 					}
 				}
 				finally

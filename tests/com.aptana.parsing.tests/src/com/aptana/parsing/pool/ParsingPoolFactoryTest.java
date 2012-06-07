@@ -7,17 +7,28 @@
  */
 package com.aptana.parsing.pool;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import junit.framework.TestCase;
 import beaver.Symbol;
 
+import com.aptana.core.epl.util.LRUCacheWithSoftPrunnedValues;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParseStateCacheKey;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.IParserPool;
 import com.aptana.parsing.ParseState;
+import com.aptana.parsing.ParseStateCacheKey;
 import com.aptana.parsing.ParseStateCacheKeyWithComments;
 import com.aptana.parsing.ParsingEngine;
 import com.aptana.parsing.ast.IParseRootNode;
@@ -73,23 +84,30 @@ public class ParsingPoolFactoryTest extends TestCase
 		/**
 		 * 
 		 */
-		private final IParserPool parserPool;
+		private final Map<String, IParserPool> parserPool;
 
 		/**
 		 * @param parserPool
 		 */
 		private ParserPoolProvider(IParserPool parserPool)
 		{
-			this.parserPool = parserPool;
+			this.parserPool = new HashMap<String, IParserPool>();
+			this.parserPool.put("test", parserPool);
+		}
+
+		public ParserPoolProvider(HashMap<String, IParserPool> contentTypeToPool)
+		{
+			this.parserPool = contentTypeToPool;
 		}
 
 		public IParserPool getParserPool(String contentTypeId)
 		{
-			if (!contentTypeId.equals("test"))
+			IParserPool pool = this.parserPool.get(contentTypeId);
+			if (pool == null)
 			{
-				fail("Expected content type to be 'test'");
+				fail("Expected content type to be one of: " + this.parserPool.keySet());
 			}
-			return parserPool;
+			return pool;
 		}
 	}
 
@@ -101,12 +119,12 @@ public class ParsingPoolFactoryTest extends TestCase
 		/**
 		 * 
 		 */
-		private final Parser parser;
+		private final IParser parser;
 
 		/**
 		 * @param parser
 		 */
-		private ParserPool(Parser parser)
+		private ParserPool(IParser parser)
 		{
 			this.parser = parser;
 		}
@@ -315,6 +333,86 @@ public class ParsingPoolFactoryTest extends TestCase
 		assertEquals(parseRootNode, ast);
 		assertEquals(0, queue.size());
 		assertEquals(3, parser.parses);
+	}
+
+	private class ParserWithSubParse implements IParser
+	{
+
+		private ParsingEngine parsingEngine;
+
+		public IParseRootNode parse(IParseState parseState) throws Exception
+		{
+			this.parsingEngine.parse("subContent", new ParseState("sub1"));
+			this.parsingEngine.parse("subContent", new ParseState("sub2"));
+			this.parsingEngine.parse("subContent", new ParseState("sub3"));
+			return new ParseRootNode("main", new Symbol[0], 0, 0);
+		}
+
+		public void setParsingEngine(ParsingEngine parsingEngine)
+		{
+			this.parsingEngine = parsingEngine;
+		}
+
+	}
+
+	private class SubParser implements IParser
+	{
+
+		public IParseRootNode parse(IParseState parseState) throws Exception
+		{
+			return new ParseRootNode("sub", new Symbol[0], 0, 0);
+		}
+
+	}
+
+	@SuppressWarnings({ "rawtypes" })
+	public void testParseWithSubParses() throws Exception
+	{
+		ParserWithSubParse mainParser = new ParserWithSubParse();
+		SubParser subParser = new SubParser();
+
+		HashMap<String, IParserPool> contentTypeToPool = new HashMap<String, IParserPool>();
+		contentTypeToPool.put("mainContent", new ParserPool(mainParser));
+		contentTypeToPool.put("subContent", new ParserPool(subParser));
+
+		parsingEngine = new ParsingEngine(new ParserPoolProvider(contentTypeToPool));
+
+		// Change the cache for a cache with an auxiliary cache that's predictable.
+		Field declaredField = parsingEngine.getClass().getDeclaredField("fParseCache");
+		declaredField.setAccessible(true);
+		Map auxiliaryCache = new HashMap();
+		Constructor<LRUCacheWithSoftPrunnedValues> constructor = LRUCacheWithSoftPrunnedValues.class
+				.getDeclaredConstructor(int.class, Map.class);
+		constructor.setAccessible(true);
+		LRUCacheWithSoftPrunnedValues cache = constructor.newInstance(1, auxiliaryCache);
+		declaredField.set(parsingEngine, cache);
+
+		mainParser.setParsingEngine(parsingEngine);
+
+		// In the end, the mainContent should be in the LRU, while the subContent should be in the auxiliary cache.
+		parsingEngine.parse("mainContent", new ParseState("main"));
+
+		assertEquals(1, cache.keys().size());
+		for (Object key : cache.keys())
+		{
+			ParseStateCacheKey cacheKey = (ParseStateCacheKey) key;
+			Object content = cacheKey.getAt(0);
+			if (!"mainContent".equals(content))
+			{
+				fail("Could not find mainContent in LRU main memory. Found: " + content);
+			}
+		}
+		assertEquals(3, auxiliaryCache.size());
+		for (Object key : auxiliaryCache.keySet())
+		{
+			ParseStateCacheKey cacheKey = (ParseStateCacheKey) key;
+			Object content = cacheKey.getAt(0);
+			if (!"subContent".equals(content))
+			{
+				fail("Could not find subContent in LRU main memory. Found: " + content);
+			}
+		}
+
 	}
 
 }
