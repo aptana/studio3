@@ -158,7 +158,7 @@ public class JiraPreferencePageProvider extends AbstractAccountPageProvider
 
 			public void keyPressed(KeyEvent e)
 			{
-				if (e.character == SWT.CR)
+				if (e.character == SWT.CR || e.character == SWT.KEYPAD_CR)
 				{
 					if (testButton.isEnabled())
 					{
