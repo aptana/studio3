@@ -1086,7 +1086,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		try
 		{
 			IDocument document = getDocument();
-			return ParserPoolFactory.parse(getContentType(), document.get());
+			return ParserPoolFactory.parse(getContentType(), document.get()).getRootNode();
 		}
 		catch (Exception e)
 		{

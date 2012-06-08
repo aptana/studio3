@@ -159,7 +159,7 @@ public class DTDTransformer
 
 		try
 		{
-			result = ParserPoolFactory.parse(IDTDConstants.CONTENT_TYPE_DTD, source);
+			result = ParserPoolFactory.parse(IDTDConstants.CONTENT_TYPE_DTD, source).getRootNode();
 		}
 		catch (Exception e)
 		{

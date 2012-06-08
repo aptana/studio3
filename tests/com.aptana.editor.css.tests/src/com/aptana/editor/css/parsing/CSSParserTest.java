@@ -30,6 +30,7 @@ import com.aptana.editor.css.parsing.ast.CSSParseRootNode;
 import com.aptana.editor.css.parsing.ast.CSSRuleNode;
 import com.aptana.editor.css.parsing.ast.ICSSNodeTypes;
 import com.aptana.parsing.IParseState;
+import com.aptana.parsing.ParseResult;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
@@ -992,9 +993,9 @@ public class CSSParserTest extends TestCase
 	{
 		String src = "h1      , h2      , h3 {color   : #AA2808\ncolor   : #AA2808}";
 		IParseState parseState = new ParseState(src);
-		fParser.parse(parseState);
+		ParseResult result = fParser.parse(parseState);
 
-		assertTrue("Could not find parse errors in parse state", !parseState.getErrors().isEmpty());
+		assertTrue("Could not find parse errors in parse state", !result.getErrors().isEmpty());
 	}
 
 	/**
@@ -1006,8 +1007,8 @@ public class CSSParserTest extends TestCase
 	{
 		String src = "body{color   : #AA2808;\n /*this is a comment*/}" + EOL;
 		IParseState parseState = new ParseState(src);
-		IParseRootNode parseResult = fParser.parse(parseState);
-		assertTrue("Comments were not stored in parse result", parseResult.getCommentNodes().length == 1);
+		ParseResult parseResult = fParser.parse(parseState);
+		assertTrue("Comments were not stored in parse result", parseResult.getRootNode().getCommentNodes().length == 1);
 	}
 
 	/**
@@ -1019,9 +1020,9 @@ public class CSSParserTest extends TestCase
 	{
 		String src = StringUtil.EMPTY + EOL;
 		IParseState parseState = new ParseState(src);
-		IParseRootNode parseResult = fParser.parse(parseState);
+		ParseResult parseResult = fParser.parse(parseState);
 
-		assertTrue(parseResult instanceof CSSParseRootNode);
+		assertTrue(parseResult.getRootNode() instanceof CSSParseRootNode);
 	}
 
 	/**

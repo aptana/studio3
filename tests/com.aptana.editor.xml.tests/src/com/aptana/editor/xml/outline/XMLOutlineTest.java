@@ -49,9 +49,8 @@ public class XMLOutlineTest extends TestCase
 	{
 		String source = "<test></test>";
 		ParseState parseState = new ParseState(source);
-		fParser.parse(parseState);
 
-		Object[] elements = fContentProvider.getElements(parseState.getParseResult());
+		Object[] elements = fContentProvider.getElements(fParser.parse(parseState).getRootNode());
 		assertEquals(1, elements.length);
 		assertEquals("test", fLabelProvider.getText(elements[0]));
 		assertEquals(XMLPlugin.getImage("icons/element.png"), fLabelProvider.getImage(elements[0]));
@@ -61,9 +60,8 @@ public class XMLOutlineTest extends TestCase
 	{
 		String source = "<test x=\"100\" y=\"10\"></test>";
 		ParseState parseState = new ParseState(source);
-		fParser.parse(parseState);
 
-		Object[] elements = fContentProvider.getElements(parseState.getParseResult());
+		Object[] elements = fContentProvider.getElements(fParser.parse(parseState).getRootNode());
 		assertEquals(1, elements.length);
 		assertEquals("test : 100", fLabelProvider.getText(elements[0]));
 		assertEquals(XMLPlugin.getImage("icons/element.png"), fLabelProvider.getImage(elements[0]));

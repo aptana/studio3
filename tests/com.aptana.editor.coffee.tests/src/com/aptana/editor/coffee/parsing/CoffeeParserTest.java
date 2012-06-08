@@ -1546,7 +1546,7 @@ public class CoffeeParserTest extends TestCase
 	{
 		CoffeeParser parser = new CoffeeParser();
 		ParseState parseState = new ParseState(source);
-		return parser.parse(parseState);
+		return parser.parse(parseState).getRootNode();
 	}
 
 	protected void assertCommentNode(IParseNode comment, int start, int end, String text)

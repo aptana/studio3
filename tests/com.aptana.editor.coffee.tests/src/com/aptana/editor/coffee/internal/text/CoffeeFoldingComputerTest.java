@@ -17,6 +17,7 @@ import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 
 public class CoffeeFoldingComputerTest extends TestCase
 {
@@ -54,7 +55,7 @@ public class CoffeeFoldingComputerTest extends TestCase
 					IParseState parseState = new ParseState(getDocument().get());
 					try
 					{
-						return new CoffeeParser().parse(parseState);
+						return parse(parseState);
 					}
 					catch (Exception e)
 					{
@@ -176,6 +177,11 @@ public class CoffeeFoldingComputerTest extends TestCase
 		assertTrue("Folding incorrect for Snake.move function block", positions.contains(new Position(140, 41)));
 		assertTrue("Folding incorrect for Horse class block", positions.contains(new Position(182, 76)));
 		assertTrue("Folding incorrect for Horse.move function block", positions.contains(new Position(217, 41)));
+	}
+
+	private IParseRootNode parse(IParseState parseState) throws Exception
+	{
+		return new CoffeeParser().parse(parseState).getRootNode();
 	}
 
 	// TODO Do we want folding on try/catch/finally blocks?

@@ -302,7 +302,7 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 			{
 				if (parser != null)
 				{
-					parseResult = parser.parse(parseState);
+					parseResult = parser.parse(parseState).getRootNode();
 				}
 			}
 			finally

@@ -52,6 +52,7 @@ public class HTMLParseState extends ParseState
 		this(source, 0);
 	}
 
+
 	public HTMLParseState(String source, int startingOffset)
 	{
 		this(source, startingOffset, null);

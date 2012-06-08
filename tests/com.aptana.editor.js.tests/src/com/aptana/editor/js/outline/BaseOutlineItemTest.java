@@ -45,8 +45,7 @@ public abstract class BaseOutlineItemTest extends TestCase
 		ParseState parseState = new ParseState(source);
 		try
 		{
-			fParser.parse(parseState);
-			return parseState.getParseResult();
+			return fParser.parse(parseState).getRootNode();
 		}
 		catch (Exception e)
 		{

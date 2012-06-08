@@ -78,11 +78,11 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 			IFormattingContext formattingContext)
 	{
 		String source = document.get();
-		IParseState parseState = new HTMLParseState(source);
 		int indent = 0;
 		try
 		{
-			IParseRootNode parseResult = ParserPoolFactory.parse(getMainContentType(), parseState);
+			IParseState parseState = new HTMLParseState(source);
+			IParseRootNode parseResult = ParserPoolFactory.parse(getMainContentType(), parseState).getRootNode();
 			if (parseResult != null)
 			{
 				final HTMLFormatterNodeBuilder builder = new HTMLFormatterNodeBuilder();
@@ -139,7 +139,7 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 			IParseNode parseResult = null;
 			try
 			{
-				parseResult = parser.parse(parseState);
+				parseResult = parser.parse(parseState).getRootNode();
 			}
 			catch (Exception e)
 			{

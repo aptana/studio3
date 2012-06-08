@@ -9,20 +9,16 @@ package com.aptana.parsing.pool;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import junit.framework.TestCase;
 import beaver.Symbol;
 
 import com.aptana.core.epl.util.LRUCacheWithSoftPrunnedValues;
+import com.aptana.parsing.AbstractParser;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParseStateCacheKey;
 import com.aptana.parsing.IParser;
@@ -31,6 +27,7 @@ import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ParseStateCacheKey;
 import com.aptana.parsing.ParseStateCacheKeyWithComments;
 import com.aptana.parsing.ParsingEngine;
+import com.aptana.parsing.WorkingParseResult;
 import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.ast.ParseRootNode;
 
@@ -162,7 +159,7 @@ public class ParsingPoolFactoryTest extends TestCase
 	/**
 	 * @author Fabio
 	 */
-	private static final class Parser implements IParser
+	private static final class Parser extends AbstractParser
 	{
 		/**
 		 * 
@@ -181,11 +178,12 @@ public class ParsingPoolFactoryTest extends TestCase
 			this.queue = queue;
 		}
 
-		public synchronized IParseRootNode parse(IParseState parseState) throws Exception
+		protected synchronized void parse(IParseState parseState, WorkingParseResult working) throws Exception
 		{
 			Thread.sleep(parseTimeout);
 			parses += 1;
-			return queue.remove();
+			ParseRootNode ast = queue.remove();
+			working.setParseResult(ast);
 		}
 	}
 
@@ -216,13 +214,13 @@ public class ParsingPoolFactoryTest extends TestCase
 	public void testParserPoolFactory() throws Exception
 	{
 		queue.add(parseRootNode);
-		IParseRootNode ast = parsingEngine.parse("test", new ParseState("", 0));
+		IParseRootNode ast = parsingEngine.parse("test", new ParseState("", 0)).getRootNode();
 		assertEquals(parseRootNode, ast);
 		assertEquals(0, queue.size());
 		assertEquals(1, parser.parses);
 
 		// Second parse: ast should be cached.
-		ast = parsingEngine.parse("test", new ParseState("", 0));
+		ast = parsingEngine.parse("test", new ParseState("", 0)).getRootNode();
 		assertEquals(parseRootNode, ast);
 		assertEquals(0, queue.size());
 		assertEquals(1, parser.parses);
@@ -244,7 +242,7 @@ public class ParsingPoolFactoryTest extends TestCase
 				ParseState parseState = new ParseState("", 0);
 				try
 				{
-					IParseRootNode node = parsingEngine.parse("test", parseState);
+					IParseRootNode node = parsingEngine.parse("test", parseState).getRootNode();
 					if (node == null)
 					{
 						return;
@@ -307,13 +305,13 @@ public class ParsingPoolFactoryTest extends TestCase
 	{
 		queue.add(parseRootNode);
 
-		IParseRootNode ast = parsingEngine.parse("test", new ParseStateCollectingComments("", 0));
+		IParseRootNode ast = parsingEngine.parse("test", new ParseStateCollectingComments("", 0)).getRootNode();
 		assertEquals(parseRootNode, ast);
 		assertEquals(0, queue.size());
 		assertEquals(1, parser.parses);
 
 		// Second parse: ast should be cached as the first has the comments.
-		ast = parsingEngine.parse("test", new ParseStateNotCollectingComments("", 0));
+		ast = parsingEngine.parse("test", new ParseStateNotCollectingComments("", 0)).getRootNode();
 		assertEquals(parseRootNode, ast);
 		assertEquals(0, queue.size());
 		assertEquals(1, parser.parses);
@@ -322,30 +320,30 @@ public class ParsingPoolFactoryTest extends TestCase
 
 		queue.add(parseRootNode);
 
-		ast = parsingEngine.parse("test", new ParseStateNotCollectingComments("", 0));
+		ast = parsingEngine.parse("test", new ParseStateNotCollectingComments("", 0)).getRootNode();
 		assertEquals(parseRootNode, ast);
 		assertEquals(0, queue.size());
 		assertEquals(2, parser.parses);
 
 		queue.add(parseRootNode);
 		// Second parse: this time as it was cached without comments, it should be reparsed.
-		ast = parsingEngine.parse("test", new ParseStateCollectingComments("", 0));
+		ast = parsingEngine.parse("test", new ParseStateCollectingComments("", 0)).getRootNode();
 		assertEquals(parseRootNode, ast);
 		assertEquals(0, queue.size());
 		assertEquals(3, parser.parses);
 	}
 
-	private class ParserWithSubParse implements IParser
+	private class ParserWithSubParse extends AbstractParser
 	{
 
 		private ParsingEngine parsingEngine;
 
-		public IParseRootNode parse(IParseState parseState) throws Exception
+		public void parse(IParseState parseState, WorkingParseResult working) throws Exception
 		{
 			this.parsingEngine.parse("subContent", new ParseState("sub1"));
 			this.parsingEngine.parse("subContent", new ParseState("sub2"));
 			this.parsingEngine.parse("subContent", new ParseState("sub3"));
-			return new ParseRootNode("main", new Symbol[0], 0, 0);
+			working.setParseResult(new ParseRootNode("main", new Symbol[0], 0, 0));
 		}
 
 		public void setParsingEngine(ParsingEngine parsingEngine)
@@ -355,12 +353,12 @@ public class ParsingPoolFactoryTest extends TestCase
 
 	}
 
-	private class SubParser implements IParser
+	private class SubParser extends AbstractParser
 	{
 
-		public IParseRootNode parse(IParseState parseState) throws Exception
+		protected void parse(IParseState parseState, WorkingParseResult working) throws Exception
 		{
-			return new ParseRootNode("sub", new Symbol[0], 0, 0);
+			working.setParseResult(new ParseRootNode("sub", new Symbol[0], 0, 0));
 		}
 
 	}

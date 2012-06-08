@@ -15,6 +15,8 @@
 %import "com.aptana.parsing.ast.ParseRootNode";
 %import "com.aptana.parsing.util.ParseUtil";
 %import "com.aptana.parsing.ast.IParseNode";
+%import "com.aptana.parsing.WorkingParseResult";
+%import "com.aptana.parsing.ParseResult";
 
 %terminals AT_RULE, CHARSET, IMPORT, MEDIA_KEYWORD, PAGE, FONTFACE, NAMESPACE, LPAREN;
 %terminals SEMICOLON, COLON, COMMA, LCURLY, RCURLY, LBRACKET, RBRACKET, RPAREN, SLASH;
@@ -42,7 +44,7 @@
 %implements "IParser";
 
 %embed {:
-	private IParseState fParseState;
+	private WorkingParseResult fWorking;
 
 	// Collect the errors into a list of IParseErrors
 	private class CSSEvents extends Events
@@ -53,11 +55,11 @@
 
 		public void syntaxError(Symbol token)
 		{
-			if (token == null || fParseState == null)
+			if (token == null || fWorking == null)
 			{
 				return;
 			}
-			fParseState.addError(new ParseError(ICSSConstants.CONTENT_TYPE_CSS, token, IParseError.Severity.ERROR));
+			fWorking.addError(new ParseError(ICSSConstants.CONTENT_TYPE_CSS, token, IParseError.Severity.ERROR));
 		}
 
 		public void unexpectedTokenRemoved(Symbol token)
@@ -77,59 +79,69 @@
 		}
 	}
 
-	public synchronized IParseRootNode parse(IParseState parseState) throws java.lang.Exception
+    public synchronized ParseResult parse(IParseState parseState) throws java.lang.Exception
+    {
+        WorkingParseResult working = new WorkingParseResult();
+        parse(parseState, working);
+        return working.getImmutableResult();
+    }
+    
+    
+	protected synchronized void parse(IParseState parseState, WorkingParseResult working) throws java.lang.Exception
 	{
-		fParseState = parseState;
-		// grab source
-		String source = fParseState.getSource();
-
-		fParseState.clearErrors();
-
-		// create scanner and send source to it
-		CSSFlexScanner scanner = new CSSFlexScanner();
-		scanner.setSource(source);
-
-		// parse
-		ParseRootNode result = (ParseRootNode) parse(scanner);
-
-		// attach comments to parse root node
-		List<Symbol> comments = scanner.getComments();
-		List<CSSCommentNode> commentNodes = new ArrayList<CSSCommentNode>(comments.size());
-
-		for (Symbol comment : comments)
-		{
-			// @formatter:off
-			CSSCommentNode commentNode = new CSSCommentNode(
-				source.substring(comment.getStart(), comment.getEnd() + 1),
-				comment.getStart(),
-				comment.getEnd()
-			);
-			// @formatter:on
-
-			commentNodes.add(commentNode);
+		fWorking = working;
+        try
+        {
+    		// grab source
+    		String source = parseState.getSource();
+    
+    		// create scanner and send source to it
+    		CSSFlexScanner scanner = new CSSFlexScanner();
+    		scanner.setSource(source);
+    
+    		// parse
+    		ParseRootNode result = (ParseRootNode) parse(scanner);
+    
+    		// attach comments to parse root node
+    		List<Symbol> comments = scanner.getComments();
+    		List<CSSCommentNode> commentNodes = new ArrayList<CSSCommentNode>(comments.size());
+    
+    		for (Symbol comment : comments)
+    		{
+    			// @formatter:off
+    			CSSCommentNode commentNode = new CSSCommentNode(
+    				source.substring(comment.getStart(), comment.getEnd() + 1),
+    				comment.getStart(),
+    				comment.getEnd()
+    			);
+    			// @formatter:on
+    
+    			commentNodes.add(commentNode);
+    		}
+    
+    		result.setCommentNodes(commentNodes.toArray(new IParseNode[commentNodes.size()]));
+    
+    		// update node offsets
+    		int start = parseState.getStartingOffset();
+    		int length = source.length();
+    
+    		// align root with zero-based offset
+    		result.setLocation(0, length - 1);
+    
+    		if (start != 0)
+    		{
+    			// shift all offsets to the correct position
+    			ParseUtil.addOffset(result, start);
+    		}
+    
+    		// store results in the parse state
+    		fWorking.setParseResult(result);
+        }
+        finally
+        {
+    		fWorking = null;
 		}
 
-		result.setCommentNodes(commentNodes.toArray(new IParseNode[commentNodes.size()]));
-
-		// update node offsets
-		int start = fParseState.getStartingOffset();
-		int length = source.length();
-
-		// align root with zero-based offset
-		result.setLocation(0, length - 1);
-
-		if (start != 0)
-		{
-			// shift all offsets to the correct position
-			ParseUtil.addOffset(result, start);
-		}
-
-		// store results in the parse state
-		fParseState.setParseResult(result);
-
-		fParseState = null;
-
-		return result;
 	}
 :};
 

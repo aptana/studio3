@@ -22,15 +22,16 @@ import com.aptana.editor.xml.parsing.ast.XMLCommentNode;
 import com.aptana.editor.xml.parsing.ast.XMLElementNode;
 import com.aptana.editor.xml.parsing.ast.XMLNode;
 import com.aptana.editor.xml.parsing.lexer.XMLTokenType;
+import com.aptana.parsing.AbstractParser;
 import com.aptana.parsing.IParseState;
-import com.aptana.parsing.IParser;
+import com.aptana.parsing.WorkingParseResult;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.ast.ParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
 import com.aptana.parsing.lexer.Lexeme;
 
-public class XMLParser implements IParser
+public class XMLParser extends AbstractParser
 {
 	public static final XMLNode[] NO_XML_NODES = new XMLNode[0];
 	private XMLParserScanner fScanner;
@@ -108,7 +109,7 @@ public class XMLParser implements IParser
 	 * 
 	 * @throws Exception
 	 */
-	public IParseRootNode parse(IParseState parseState) throws Exception
+	protected void parse(IParseState parseState, WorkingParseResult working) throws Exception
 	{
 		fMonitor = parseState.getProgressMonitor();
 		fScanner = new XMLParserScanner();
@@ -136,7 +137,7 @@ public class XMLParser implements IParser
 			parseAll(root);
 			root.setCommentNodes(fCommentNodes.toArray(new IParseNode[fCommentNodes.size()]));
 
-			parseState.setParseResult(root);
+			working.setParseResult(root);
 		}
 		finally
 		{
@@ -148,8 +149,6 @@ public class XMLParser implements IParser
 			fCurrentLexeme = null;
 			fCommentNodes.clear();
 		}
-
-		return root;
 	}
 
 	/**

@@ -25,6 +25,7 @@ import com.aptana.editor.json.preferences.IPreferenceConstants;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 
 @SuppressWarnings("nls")
 public class JSONFoldingComputerTest extends TestCase
@@ -50,7 +51,7 @@ public class JSONFoldingComputerTest extends TestCase
 				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
-					return new JSONParser().parse(parseState);
+					return parse(parseState);
 				}
 				catch (Exception e)
 				{
@@ -81,7 +82,7 @@ public class JSONFoldingComputerTest extends TestCase
 				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
-					return new JSONParser().parse(parseState);
+					return parse(parseState);
 				}
 				catch (Exception e)
 				{
@@ -108,7 +109,7 @@ public class JSONFoldingComputerTest extends TestCase
 				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
-					return new JSONParser().parse(parseState);
+					return parse(parseState);
 				}
 				catch (Exception e)
 				{
@@ -145,7 +146,7 @@ public class JSONFoldingComputerTest extends TestCase
 				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
-					return new JSONParser().parse(parseState);
+					return parse(parseState);
 				}
 				catch (Exception e)
 				{
@@ -178,5 +179,10 @@ public class JSONFoldingComputerTest extends TestCase
 			}
 		}
 		return null;
+	}
+
+	private IParseRootNode parse(IParseState parseState) throws Exception
+	{
+		return new JSONParser().parse(parseState).getRootNode();
 	}
 }

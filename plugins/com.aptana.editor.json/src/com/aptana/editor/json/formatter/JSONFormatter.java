@@ -90,7 +90,7 @@ public class JSONFormatter extends AbstractScriptFormatter implements IScriptFor
 			}
 
 			String source = document.get();
-			IParseRootNode parseResult = ParserPoolFactory.parse(getMainContentType(), source);
+			IParseRootNode parseResult = ParserPoolFactory.parse(getMainContentType(), source).getRootNode();
 
 			if (parseResult != null)
 			{
@@ -134,7 +134,7 @@ public class JSONFormatter extends AbstractScriptFormatter implements IScriptFor
 
 		try
 		{
-			IParseRootNode parseResult = ParserPoolFactory.parse(getMainContentType(), input);
+			IParseRootNode parseResult = ParserPoolFactory.parse(getMainContentType(), input).getRootNode();
 			if (parseResult != null)
 			{
 				String output = format(input, parseResult, indentationLevel, offset, isSelection);

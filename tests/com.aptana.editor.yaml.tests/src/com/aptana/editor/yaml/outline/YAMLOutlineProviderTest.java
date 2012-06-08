@@ -1,17 +1,18 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.editor.yaml.outline;
 
+import junit.framework.TestCase;
+
 import com.aptana.editor.yaml.YAMLPlugin;
 import com.aptana.editor.yaml.parsing.YAMLParser;
 import com.aptana.parsing.ParseState;
-
-import junit.framework.TestCase;
+import com.aptana.parsing.ast.IParseRootNode;
 
 public class YAMLOutlineProviderTest extends TestCase
 {
@@ -41,7 +42,7 @@ public class YAMLOutlineProviderTest extends TestCase
 	{
 		String source = "string : text";
 		fParseState = new ParseState(source);
-		Object result = fParser.parse(fParseState);
+		IParseRootNode result = fParser.parse(fParseState).getRootNode();
 
 		Object[] children = fContentProvider.getChildren(result);
 		assertEquals(1, children.length);
@@ -58,7 +59,7 @@ public class YAMLOutlineProviderTest extends TestCase
 	{
 		String source = "number : 12345";
 		fParseState = new ParseState(source);
-		Object result = fParser.parse(fParseState);
+		IParseRootNode result = fParser.parse(fParseState).getRootNode();
 
 		Object[] children = fContentProvider.getChildren(result);
 		assertEquals(1, children.length);

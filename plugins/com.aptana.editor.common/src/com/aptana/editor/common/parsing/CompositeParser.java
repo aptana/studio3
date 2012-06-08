@@ -15,15 +15,17 @@ import beaver.Scanner.Exception;
 import beaver.Symbol;
 
 import com.aptana.core.util.ArrayUtil;
+import com.aptana.parsing.AbstractParser;
 import com.aptana.parsing.IParseState;
-import com.aptana.parsing.IParser;
+import com.aptana.parsing.ParseResult;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ParserPoolFactory;
+import com.aptana.parsing.WorkingParseResult;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.ast.ParseNode;
 
-public class CompositeParser implements IParser
+public class CompositeParser extends AbstractParser
 {
 	protected CompositeParserScanner fScanner;
 	private String fParserLanguage;
@@ -36,14 +38,14 @@ public class CompositeParser implements IParser
 		fParserLanguage = primaryParserLanguage;
 	}
 
-	public IParseRootNode parse(IParseState parseState) throws java.lang.Exception
+	protected void parse(IParseState parseState, WorkingParseResult working) throws java.lang.Exception
 	{
 		fScanner.getTokenScanner().reset();
 		fScanner.setSource(parseState.getSource());
 		fCurrentSymbol = null;
 
 		// first process the embedded language
-		fEmbeddedlanguageRoot = processEmbeddedlanguage(parseState);
+		fEmbeddedlanguageRoot = processEmbeddedlanguage(parseState, working);
 
 		// setup to skip the embedded language nodes before doing the primary parse
 		IParseNode[] embeddedNodes = null;
@@ -61,7 +63,9 @@ public class CompositeParser implements IParser
 		}
 
 		// process source as normal
-		IParseRootNode result = primaryParse(parseState);
+		ParseResult parseResult = primaryParse(parseState);
+		working.addAllErrors(parseResult.getErrors());
+		IParseRootNode result = parseResult.getRootNode();
 
 		// reset skip regions now that they're no longer needed
 		if (embeddedNodes != null)
@@ -74,8 +78,6 @@ public class CompositeParser implements IParser
 		{
 			mergeEmbeddedNodes(result, embeddedNodes);
 		}
-
-		return result;
 	}
 
 	/**
@@ -159,7 +161,7 @@ public class CompositeParser implements IParser
 	 * @return
 	 * @throws java.lang.Exception
 	 */
-	private IParseRootNode primaryParse(IParseState parseState) throws java.lang.Exception
+	private ParseResult primaryParse(IParseState parseState) throws java.lang.Exception
 	{
 		return ParserPoolFactory.parse(fParserLanguage, parseState);
 	}
@@ -168,7 +170,7 @@ public class CompositeParser implements IParser
 	 * The method is for finding and processing embedded language inside the primary one and stores them in a separate
 	 * node. The subclass should override.
 	 */
-	protected IParseNode processEmbeddedlanguage(IParseState parseState) throws java.lang.Exception
+	protected IParseNode processEmbeddedlanguage(IParseState parseState, WorkingParseResult working) throws java.lang.Exception
 	{
 		return null;
 	}
@@ -183,14 +185,12 @@ public class CompositeParser implements IParser
 		return fCurrentSymbol;
 	}
 
-	protected IParseRootNode getParseResult(String language, int start, int end)
+	protected ParseResult getParseResult(String language, int start, int end)
 	{
 		try
 		{
 			String text = fScanner.getSource().get(start, end - start + 1);
-			IParseRootNode node = ParserPoolFactory.parse(language, text, start);
-
-			return node;
+			return ParserPoolFactory.parse(language, text, start);
 		}
 		catch (java.lang.Exception e)
 		{

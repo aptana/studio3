@@ -32,6 +32,7 @@ import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.IndexPlugin;
 import com.aptana.parsing.IParseState;
+import com.aptana.parsing.ParseResult;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseRootNode;
 
@@ -254,9 +255,9 @@ public class JSIndexingPerformanceTest extends PerformanceTestCase
 
 		try
 		{
-			fParser.parse(parseState);
+			ParseResult parse = fParser.parse(parseState);
 
-			final IParseRootNode root = parseState.getParseResult();
+			final IParseRootNode root = parse.getRootNode();
 
 			FileStoreBuildContext context = new FileStoreBuildContext(store)
 			{
