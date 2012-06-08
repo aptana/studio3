@@ -8,15 +8,11 @@ Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
  org.eclipse.core.expressions,
- org.eclipse.ui,
- org.eclipse.ui.ide,
  com.aptana.core;bundle-version="3.0.4",
- com.aptana.scripting,
- com.aptana.ui
+ com.aptana.scripting
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.deploy,
  com.aptana.deploy.preferences,
- com.aptana.deploy.util,
- com.aptana.deploy.wizard
+ com.aptana.deploy.util
 Eclipse-ExtensibleAPI: true

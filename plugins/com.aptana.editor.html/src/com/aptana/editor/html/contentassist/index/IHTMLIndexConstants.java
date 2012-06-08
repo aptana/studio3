@@ -14,7 +14,8 @@ public interface IHTMLIndexConstants
 	// 0.11 - Using JSON for element and property content assist model elements
 	// 0.12 - Updated the browser support for html5 tags
 	// 0.13 - Fixed some misformatted examples
-	public static final double INDEX_VERSION = 0.13;
+	// 0.14 - Added '*' value to both 'rel' and 'rev attribute, fixed a typo
+	public static final double INDEX_VERSION = 0.14;
 
 	// for debugging, comment the line above, and uncomment the following
 	// public static final double INDEX_VERSION = new Random().nextDouble() * 1e6;

@@ -44,7 +44,7 @@ import com.aptana.deploy.heroku.HerokuDeployProvider;
 import com.aptana.deploy.heroku.HerokuPlugin;
 import com.aptana.deploy.heroku.preferences.IPreferenceConstants;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
-import com.aptana.deploy.wizard.AbstractDeployWizard;
+import com.aptana.deploy.ui.wizard.AbstractDeployWizard;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryManager;

@@ -4,5 +4,5 @@ Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: com.aptana.deploy.epl;singleton:=true
 Bundle-Version: 3.0.0.qualifier
 Bundle-Vendor: %Bundle-Vendor
-Fragment-Host: com.aptana.deploy
+Fragment-Host: com.aptana.deploy.ui
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

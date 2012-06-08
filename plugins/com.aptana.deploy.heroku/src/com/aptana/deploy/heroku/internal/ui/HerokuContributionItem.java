@@ -23,8 +23,8 @@ import com.aptana.core.ShellExecutable;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.ProcessUtil;
-import com.aptana.deploy.DeployContributionItem;
 import com.aptana.deploy.heroku.HerokuPlugin;
+import com.aptana.deploy.ui.DeployContributionItem;
 import com.aptana.ui.util.UIUtils;
 
 public class HerokuContributionItem extends DeployContributionItem

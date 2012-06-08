@@ -75,7 +75,7 @@ public class JSLintValidator extends AbstractBuildParticipant
 		options.put("browser", true);
 		options.put("jscript", true);
 		options.put("debug", true);
-		options.put("maxerr", 100);
+		options.put("maxerr", 1000);
 		options.put("predef", true);
 		options.put("predef", new NativeArray(new String[] { "Ti", "Titanium", "alert", "require", "exports", "native",
 				"implements" }));

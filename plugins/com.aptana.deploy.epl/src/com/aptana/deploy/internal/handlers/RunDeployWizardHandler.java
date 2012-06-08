@@ -18,7 +18,9 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import com.aptana.deploy.DeployPlugin;
+import com.aptana.deploy.internal.ui.handlers.DeployWizardDialog;
+import com.aptana.deploy.internal.ui.handlers.Messages;
+import com.aptana.deploy.ui.DeployUIPlugin;
 import com.aptana.deploy.wizard.DeployWizard;
 
 public class RunDeployWizardHandler extends AbstractHandler
@@ -45,7 +47,7 @@ public class RunDeployWizardHandler extends AbstractHandler
 		DeployWizard wizard = new DeployWizard();
 		wizard.init(activePart.getSite().getWorkbenchWindow().getWorkbench(), selection);
 		wizard.setWindowTitle(Messages.DeployHandler_Wizard_Title);
-		IDialogSettings workbenchSettings = DeployPlugin.getDefault().getDialogSettings();
+		IDialogSettings workbenchSettings = DeployUIPlugin.getDefault().getDialogSettings();
 		IDialogSettings wizardSettings = workbenchSettings.getSection("DeployWizardAction"); //$NON-NLS-1$
 		if (wizardSettings == null)
 		{
