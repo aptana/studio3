@@ -16,12 +16,12 @@ import java.util.Map;
  * 
  * @author Fabio Zadrozny
  */
-public class LRUCacheWithSoftPrunnedValues<K, V> extends LRUCache<K, V>
+public class LRUCacheWithSoftPrunedValues<K, V> extends LRUCache<K, V>
 {
 
 	private final Map<K, V> auxiliaryCache;
 
-	public LRUCacheWithSoftPrunnedValues(int size)
+	public LRUCacheWithSoftPrunedValues(int size)
 	{
 		this(size, new SoftHashMap<K, V>());
 	}
@@ -30,7 +30,7 @@ public class LRUCacheWithSoftPrunnedValues<K, V> extends LRUCache<K, V>
 	 * This constructor is meant only to be used in unit-tests, as the map should always be a soft hash map (but may be
 	 * changed for testing purposes).
 	 */
-	/* default */LRUCacheWithSoftPrunnedValues(int size, Map<K, V> auxiliaryCache)
+	LRUCacheWithSoftPrunedValues(int size, Map<K, V> auxiliaryCache)
 	{
 		super(size);
 		this.auxiliaryCache = auxiliaryCache;

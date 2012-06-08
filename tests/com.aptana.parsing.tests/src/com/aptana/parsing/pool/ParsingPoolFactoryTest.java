@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import junit.framework.TestCase;
 import beaver.Symbol;
 
-import com.aptana.core.epl.util.LRUCacheWithSoftPrunnedValues;
+import com.aptana.core.epl.util.LRUCacheWithSoftPrunedValues;
 import com.aptana.parsing.AbstractParser;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParseStateCacheKey;
@@ -379,10 +379,10 @@ public class ParsingPoolFactoryTest extends TestCase
 		Field declaredField = parsingEngine.getClass().getDeclaredField("fParseCache");
 		declaredField.setAccessible(true);
 		Map auxiliaryCache = new HashMap();
-		Constructor<LRUCacheWithSoftPrunnedValues> constructor = LRUCacheWithSoftPrunnedValues.class
+		Constructor<LRUCacheWithSoftPrunedValues> constructor = LRUCacheWithSoftPrunedValues.class
 				.getDeclaredConstructor(int.class, Map.class);
 		constructor.setAccessible(true);
-		LRUCacheWithSoftPrunnedValues cache = constructor.newInstance(1, auxiliaryCache);
+		LRUCacheWithSoftPrunedValues cache = constructor.newInstance(1, auxiliaryCache);
 		declaredField.set(parsingEngine, cache);
 
 		mainParser.setParsingEngine(parsingEngine);
