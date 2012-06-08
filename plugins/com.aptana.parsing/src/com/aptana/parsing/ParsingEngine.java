@@ -10,7 +10,7 @@ package com.aptana.parsing;
 import java.text.MessageFormat;
 
 import com.aptana.core.epl.util.LRUCache;
-import com.aptana.core.epl.util.LRUCacheWithSoftPrunnedValues;
+import com.aptana.core.epl.util.LRUCacheWithSoftPrunedValues;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.parsing.ast.IParseRootNode;
 
@@ -118,7 +118,7 @@ public class ParsingEngine
 	 * A parse cache. Keyed by combo of content type and source hash, holds IParseRootNode result. Retains most recently
 	 * used ASTs.
 	 */
-	private LRUCacheWithSoftPrunnedValues<IParseStateCacheKey, CacheValue> fParseCache;
+	private LRUCacheWithSoftPrunedValues<IParseStateCacheKey, CacheValue> fParseCache;
 
 	/**
 	 * Object providing access to the pool provider.
@@ -133,7 +133,7 @@ public class ParsingEngine
 	public ParsingEngine(IParserPoolProvider parserPoolProvider)
 	{
 		// Create a cache with N 'strong' references but still keep prunned values as soft references.
-		fParseCache = new LRUCacheWithSoftPrunnedValues<IParseStateCacheKey, CacheValue>(15);
+		fParseCache = new LRUCacheWithSoftPrunedValues<IParseStateCacheKey, CacheValue>(15);
 		fParserPoolProvider = parserPoolProvider;
 	}
 
@@ -174,7 +174,7 @@ public class ParsingEngine
 			}
 			IParseStateCacheKey newParseStateKey = parseState.getCacheKey(contentTypeId);
 			CacheValue cacheValue = null;
-			LRUCacheWithSoftPrunnedValues<IParseStateCacheKey, CacheValue> parseCache = fParseCache;
+			LRUCacheWithSoftPrunedValues<IParseStateCacheKey, CacheValue> parseCache = fParseCache;
 			if (parseCache == null)
 			{
 				return null; // already disposed.

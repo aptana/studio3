@@ -15,7 +15,7 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
-public class LRUCacheWithSoftPrunnedValuesTest extends TestCase
+public class LRUCacheWithSoftPrunedValuesTest extends TestCase
 {
 
 	class SizedEntry implements ILRUCacheable
@@ -45,7 +45,7 @@ public class LRUCacheWithSoftPrunnedValuesTest extends TestCase
 	public void testLRUWithSoftPrunnedValues() throws Exception
 	{
 		HashMap<String, SizedEntry> auxiliaryCache = new HashMap<String, SizedEntry>();
-		LRUCacheWithSoftPrunnedValues<String, SizedEntry> cache = new LRUCacheWithSoftPrunnedValues<String, SizedEntry>(
+		LRUCacheWithSoftPrunedValues<String, SizedEntry> cache = new LRUCacheWithSoftPrunedValues<String, SizedEntry>(
 				10, auxiliaryCache);
 		cache.put("1", new SizedEntry(5));
 		cache.put("2", new SizedEntry(5));
@@ -104,11 +104,11 @@ public class LRUCacheWithSoftPrunnedValuesTest extends TestCase
 	public void testLRUWithSoftCache() throws Exception
 	{
 		// Check the soft map
-		LRUCacheWithSoftPrunnedValues<Integer, SizedEntry> cache = new LRUCacheWithSoftPrunnedValues<Integer, SizedEntry>(
+		LRUCacheWithSoftPrunedValues<Integer, SizedEntry> cache = new LRUCacheWithSoftPrunedValues<Integer, SizedEntry>(
 				3);
 
 		// Getting private field with reflection
-		Field field = LRUCacheWithSoftPrunnedValues.class.getDeclaredField("auxiliaryCache");
+		Field field = LRUCacheWithSoftPrunedValues.class.getDeclaredField("auxiliaryCache");
 		field.setAccessible(true);
 		SoftHashMap<Integer, SizedEntry> softHashMap = (SoftHashMap<Integer, SizedEntry>) field.get(cache);
 
@@ -116,16 +116,23 @@ public class LRUCacheWithSoftPrunnedValuesTest extends TestCase
 		cache.put(-2, new SizedEntry(1));
 		cache.put(-1, new SizedEntry(1));
 
-		for (int i = 0; i < Integer.MAX_VALUE; i++)
+		try
 		{
-			cache.put(i, new SizedEntry(1, new byte[1024 * 1024])); // 1 MB
-			assertEquals(3, cache.getCurrentSpace()); // Space is always the same
-			int previousSize = softHashMap.size();
-			softHashMap.removeStaleEntries();
-			if (previousSize > softHashMap.size())
+			for (int i = 0; i < Integer.MAX_VALUE; i++)
 			{
-				return;
+				cache.put(i, new SizedEntry(1, new byte[1024 * 1024])); // 1 MB
+				assertEquals(3, cache.getCurrentSpace()); // Space is always the same
+				int previousSize = softHashMap.size();
+				softHashMap.removeStaleEntries();
+				if (previousSize > softHashMap.size())
+				{
+					return;
+				}
 			}
+		}
+		catch (OutOfMemoryError e)
+		{
+			cache = null; //if the soft hash map does not work properly clear it and fail 'gracefully' later.
 		}
 		fail("Expected soft hash map to reduce memory at some point.");
 	}

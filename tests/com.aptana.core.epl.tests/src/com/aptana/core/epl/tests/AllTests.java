@@ -11,7 +11,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import com.aptana.core.epl.util.LRUCacheTest;
-import com.aptana.core.epl.util.LRUCacheWithSoftPrunnedValuesTest;
+import com.aptana.core.epl.util.LRUCacheWithSoftPrunedValuesTest;
 import com.aptana.core.epl.util.SoftHashMapTest;
 
 public class AllTests
@@ -22,7 +22,7 @@ public class AllTests
 		TestSuite suite = new TestSuite("Test for com.aptana.core.epl.tests");
 		// $JUnit-BEGIN$
 		suite.addTestSuite(LRUCacheTest.class);
-		suite.addTestSuite(LRUCacheWithSoftPrunnedValuesTest.class);
+		suite.addTestSuite(LRUCacheWithSoftPrunedValuesTest.class);
 		suite.addTestSuite(SoftHashMapTest.class);
 		// $JUnit-END$
 		return suite;
