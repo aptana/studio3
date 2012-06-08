@@ -50,7 +50,6 @@ import org.eclipse.swt.widgets.Text;
 import com.aptana.core.CoreStrings;
 import com.aptana.core.util.StringUtil;
 import com.aptana.jira.core.JiraCorePlugin;
-import com.aptana.jira.core.JiraIssuePriority;
 import com.aptana.jira.core.JiraIssueSeverity;
 import com.aptana.jira.core.JiraIssueType;
 import com.aptana.jira.core.JiraManager;
@@ -70,7 +69,6 @@ public class SubmitTicketDialog extends TitleAreaDialog
 	private JiraPreferencePageProvider userInfoProvider;
 	private Control userInfoControl;
 	private ComboViewer typeCombo;
-	private ComboViewer priorityCombo;
 	private ComboViewer severityCombo;
 	private Text summaryText;
 	private Text reproduceText;
@@ -85,7 +83,6 @@ public class SubmitTicketDialog extends TitleAreaDialog
 	private ProgressMonitorPart progressMonitorPart;
 
 	private JiraIssueType type;
-	private JiraIssuePriority priority;
 	private JiraIssueSeverity severity;
 	private String summary;
 	private String description;
@@ -108,11 +105,6 @@ public class SubmitTicketDialog extends TitleAreaDialog
 	public JiraIssueType getType()
 	{
 		return type;
-	}
-
-	public JiraIssuePriority getPriority()
-	{
-		return priority;
 	}
 
 	public JiraIssueSeverity getSeverity()
@@ -201,20 +193,6 @@ public class SubmitTicketDialog extends TitleAreaDialog
 			}
 		};
 		typeCombo.addSelectionChangedListener(listener);
-
-		// TODO Do we want to hide priority from users?
-		// priority
-		label = new Label(main, SWT.NONE);
-		label.setText(StringUtil.makeFormLabel(Messages.SubmitTicketDialog_LBL_Priority));
-		label.setLayoutData(GridDataFactory.swtDefaults().create());
-
-		priorityCombo = new ComboViewer(main, SWT.DROP_DOWN | SWT.READ_ONLY);
-		priorityCombo.setContentProvider(ArrayContentProvider.getInstance());
-		priorityCombo.setLabelProvider(new LabelProvider());
-		priorityCombo.setInput(JiraIssuePriority.values());
-		priorityCombo.getControl().setLayoutData(GridDataFactory.swtDefaults().create());
-		priorityCombo.setSelection(new StructuredSelection(JiraIssuePriority.MEDIUM));
-		priorityCombo.addSelectionChangedListener(listener);
 
 		// FIXME Severity doesn't apply for Story in Studio tracker
 		// severity
@@ -410,7 +388,6 @@ public class SubmitTicketDialog extends TitleAreaDialog
 			return;
 		}
 		type = (JiraIssueType) ((IStructuredSelection) typeCombo.getSelection()).getFirstElement();
-		priority = (JiraIssuePriority) ((IStructuredSelection) priorityCombo.getSelection()).getFirstElement();
 		severity = (JiraIssueSeverity) ((IStructuredSelection) severityCombo.getSelection()).getFirstElement();
 		summary = summaryText.getText();
 		description = MessageFormat.format(
@@ -428,10 +405,6 @@ public class SubmitTicketDialog extends TitleAreaDialog
 		if (typeCombo.getSelection().isEmpty())
 		{
 			message = Messages.SubmitTicketDialog_ERR_EmptyType;
-		}
-		if (priorityCombo.getSelection().isEmpty())
-		{
-			message = Messages.SubmitTicketDialog_ERR_EmptyPriority;
 		}
 		else if (StringUtil.isEmpty(summaryText.getText()))
 		{
@@ -526,7 +499,6 @@ public class SubmitTicketDialog extends TitleAreaDialog
 			return;
 		}
 		typeCombo.getCombo().setEnabled(!locked);
-		priorityCombo.getCombo().setEnabled(!locked);
 		severityCombo.getCombo().setEnabled(!locked);
 		summaryText.setEnabled(!locked);
 		reproduceText.setEnabled(!locked);

@@ -2,7 +2,7 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
-         point="com.aptana.deploy.deployWizards">
+         point="com.aptana.deploy.ui.deployWizards">
       <wizard
             class="com.aptana.deploy.capistrano.ui.wizard.CapistranoDeployWizard"
             icon="icons/newproj.png"

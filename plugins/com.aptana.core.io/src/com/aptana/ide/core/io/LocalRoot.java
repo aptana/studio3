@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.PlatformObject;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.PlatformUtil;
+import com.aptana.core.util.StringUtil;
 
 /**
  * @author Max Stepanov
@@ -46,7 +47,7 @@ public final class LocalRoot extends PlatformObject {
 	 */
 	private LocalRoot(String name, File root) {
 		super();
-		this.name = name;
+		this.name = StringUtil.isEmpty(name) ? Path.ROOT.toOSString() : name;
 		this.root = root;
 	}
 	

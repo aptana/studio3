@@ -18,6 +18,7 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.ui.ftp,
  com.aptana.ui.secureftp,
  com.aptana.deploy,
+ com.aptana.deploy.ui,
  com.aptana.syncing.core,
  com.aptana.syncing.ui
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
