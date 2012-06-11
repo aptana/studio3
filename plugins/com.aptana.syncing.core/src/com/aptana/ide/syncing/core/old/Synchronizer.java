@@ -33,12 +33,15 @@ import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.core.io.efs.EFSUtils;
 import com.aptana.core.io.efs.SyncUtils;
+import com.aptana.core.io.vfs.IExtendedFileInfo;
 import com.aptana.core.io.vfs.IExtendedFileStore;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.filewatcher.FileWatcher;
 import com.aptana.ide.core.io.IConnectionPoint;
+import com.aptana.ide.core.io.preferences.PermissionDirection;
+import com.aptana.ide.core.io.preferences.PreferenceUtils;
 import com.aptana.ide.syncing.core.SyncingPlugin;
 
 /**
@@ -801,18 +804,21 @@ public class Synchronizer implements ILoggable
 							break;
 
 						case SyncState.ServerItemOnly:
-							final IFileStore targetClientFile = EFSUtils.createFile(_serverFileRoot,
+							IFileStore targetClientFile = EFSUtils.createFile(_serverFileRoot,
 									item.getDestinationFile(), _clientFileRoot);
-
+							boolean exists = targetClientFile.fetchInfo().exists();
 							if (serverFileInfo.isDirectory())
 							{
 								logCreatedDirectory(targetClientFile);
 
-								if (!targetClientFile.fetchInfo().exists())
+								if (!exists)
 								{
 									targetClientFile.mkdir(EFS.NONE, null);
 									this._clientDirectoryCreatedCount++;
 									_newFilesDownloaded.add(targetClientFile);
+									// update permissions for the newly created directory
+									updatePermissions(serverFile, targetClientFile, false,
+											PermissionDirection.DOWNLOAD, childMonitor);
 								}
 
 								logSuccess();
@@ -827,7 +833,12 @@ public class Synchronizer implements ILoggable
 											.copy(serverFile, serverFileInfo, targetClientFile, EFS.NONE, childMonitor);
 									Synchronizer.this._serverFileTransferedCount++;
 									_newFilesDownloaded.add(targetClientFile);
-
+									// update permissions for the newly created file
+									if (!exists)
+									{
+										updatePermissions(serverFile, targetClientFile, true,
+												PermissionDirection.DOWNLOAD, childMonitor);
+									}
 									logSuccess();
 									syncDone(item, childMonitor);
 								}
@@ -1055,18 +1066,21 @@ public class Synchronizer implements ILoggable
 							else
 							{
 								// creates the item on server
-								final IFileStore targetServerFile = EFSUtils.createFile(_clientFileRoot,
+								IFileStore targetServerFile = EFSUtils.createFile(_clientFileRoot,
 										item.getSourceFile(), _serverFileRoot);
-
+								boolean exists = targetServerFile.fetchInfo().exists();
 								if (clientFileInfo.isDirectory())
 								{
 									logCreatedDirectory(targetServerFile);
 
-									if (!targetServerFile.fetchInfo().exists())
+									if (!exists)
 									{
 										targetServerFile.mkdir(EFS.NONE, null);
 										this._serverDirectoryCreatedCount++;
 										_newFilesUploaded.add(targetServerFile);
+										// update permissions for the newly created directory
+										updatePermissions(clientFile, targetServerFile, false,
+												PermissionDirection.UPLOAD, childMonitor);
 									}
 
 									logSuccess();
@@ -1074,7 +1088,6 @@ public class Synchronizer implements ILoggable
 								}
 								else
 								{
-									// targetServerFile = server.createVirtualFile(serverPath);
 									logUploading(clientFile);
 									try
 									{
@@ -1082,6 +1095,12 @@ public class Synchronizer implements ILoggable
 												childMonitor);
 										Synchronizer.this._clientFileTransferedCount++;
 										_newFilesUploaded.add(targetServerFile);
+										// update permissions for the newly created file
+										if (!exists)
+										{
+											updatePermissions(clientFile, targetServerFile, true,
+													PermissionDirection.UPLOAD, childMonitor);
+										}
 										logSuccess();
 										syncDone(item, childMonitor);
 									}
@@ -1155,20 +1174,21 @@ public class Synchronizer implements ILoggable
 							else
 							{
 								// creates the item on client
-								final IFileStore targetClientFile = EFSUtils.createFile(_serverFileRoot,
+								IFileStore targetClientFile = EFSUtils.createFile(_serverFileRoot,
 										item.getDestinationFile(), _clientFileRoot);
-
+								boolean exists = targetClientFile.fetchInfo().exists();
 								if (serverFileInfo.isDirectory())
 								{
 									logCreatedDirectory(targetClientFile);
 
-									if (!targetClientFile.fetchInfo().exists())
+									if (!exists)
 									{
-										targetClientFile.mkdir(EFS.NONE, null); // =
-										// client.createVirtualDirectory(clientPath);
-										// client.createLocalDirectory(targetClientFile);
+										targetClientFile.mkdir(EFS.NONE, null);
 										this._clientDirectoryCreatedCount++;
 										_newFilesDownloaded.add(targetClientFile);
+										// update permissions for the newly created directory
+										updatePermissions(serverFile, targetClientFile, false,
+												PermissionDirection.DOWNLOAD, childMonitor);
 									}
 
 									logSuccess();
@@ -1176,7 +1196,6 @@ public class Synchronizer implements ILoggable
 								}
 								else
 								{
-									// targetClientFile = client.createVirtualFile(clientPath);
 									logDownloading(targetClientFile);
 
 									try
@@ -1185,6 +1204,12 @@ public class Synchronizer implements ILoggable
 												childMonitor);
 										Synchronizer.this._serverFileTransferedCount++;
 										_newFilesDownloaded.add(targetClientFile);
+										// update permissions for the newly created file
+										if (!exists)
+										{
+											updatePermissions(serverFile, targetClientFile, true,
+													PermissionDirection.DOWNLOAD, childMonitor);
+										}
 										logSuccess();
 										syncDone(item, childMonitor);
 									}
@@ -1343,19 +1368,19 @@ public class Synchronizer implements ILoggable
 					{
 						case SyncState.ClientItemOnly:
 							// only exists on client; creates the item on server
-							final IFileStore targetServerFile = EFSUtils.createFile(_clientFileRoot,
-									item.getSourceFile(), _serverFileRoot);
-
+							IFileStore targetServerFile = EFSUtils.createFile(_clientFileRoot, item.getSourceFile(),
+									_serverFileRoot);
+							boolean exists = targetServerFile.fetchInfo().exists();
 							if (clientFileInfo.isDirectory())
 							{
-								// targetServerFile.mkdir(EFS.NONE, null); // =
-								// server.createVirtualDirectory(serverPath);
-
-								if (!targetServerFile.fetchInfo().exists())
+								if (!exists)
 								{
-									targetServerFile.mkdir(EFS.NONE, null); // server.createLocalDirectory(targetServerFile);
+									targetServerFile.mkdir(EFS.NONE, null);
 									this._serverDirectoryCreatedCount++;
 									_newFilesUploaded.add(targetServerFile);
+									// update permissions for the newly created directory
+									updatePermissions(clientFile, targetServerFile, false, PermissionDirection.UPLOAD,
+											childMonitor);
 								}
 
 								syncDone(item, childMonitor);
@@ -1370,6 +1395,12 @@ public class Synchronizer implements ILoggable
 											.copy(clientFile, clientFileInfo, targetServerFile, EFS.NONE, childMonitor);
 									Synchronizer.this._clientFileTransferedCount++;
 									_newFilesUploaded.add(targetServerFile);
+									// update permissions for the newly created file
+									if (!exists)
+									{
+										updatePermissions(clientFile, targetServerFile, true,
+												PermissionDirection.UPLOAD, childMonitor);
+									}
 									logSuccess();
 									syncDone(item, childMonitor);
 								}
@@ -1516,6 +1547,114 @@ public class Synchronizer implements ILoggable
 				break;
 		}
 		item.setSyncDirection(direction);
+	}
+
+	private static void updatePermissions(IFileStore sourceFileStore, IFileStore targetFileStore, boolean isFile,
+			PermissionDirection direction, IProgressMonitor monitor)
+	{
+		if (PreferenceUtils.getUpdatePermissions(direction))
+		{
+			IFileInfo targetFileInfo = getFileInfo(targetFileStore, monitor);
+			long permissions = 0;
+			if (PreferenceUtils.getSpecificPermissions(direction))
+			{
+				// use specified permissions from preferences
+				permissions = isFile ? PreferenceUtils.getFilePermissions(direction) : PreferenceUtils
+						.getFolderPermissions(direction);
+			}
+			else
+			{
+				// uses source's permissions
+				IFileInfo sourceFileInfo = getFileInfo(sourceFileStore, monitor);
+				if (sourceFileInfo != null)
+				{
+					permissions = getPermissions(sourceFileInfo);
+				}
+			}
+			if (permissions > 0)
+			{
+				if (targetFileInfo instanceof IExtendedFileInfo)
+				{
+					((IExtendedFileInfo) targetFileInfo).setPermissions(permissions);
+				}
+				else
+				{
+					targetFileInfo.setAttribute(EFS.ATTRIBUTE_OWNER_READ,
+							(permissions & IExtendedFileInfo.PERMISSION_OWNER_READ) != 0);
+					targetFileInfo.setAttribute(EFS.ATTRIBUTE_OWNER_WRITE,
+							(permissions & IExtendedFileInfo.PERMISSION_OWNER_WRITE) != 0);
+					targetFileInfo.setAttribute(EFS.ATTRIBUTE_OWNER_EXECUTE,
+							(permissions & IExtendedFileInfo.PERMISSION_OWNER_EXECUTE) != 0);
+					targetFileInfo.setAttribute(EFS.ATTRIBUTE_GROUP_READ,
+							(permissions & IExtendedFileInfo.PERMISSION_GROUP_READ) != 0);
+					targetFileInfo.setAttribute(EFS.ATTRIBUTE_GROUP_WRITE,
+							(permissions & IExtendedFileInfo.PERMISSION_GROUP_WRITE) != 0);
+					targetFileInfo.setAttribute(EFS.ATTRIBUTE_GROUP_EXECUTE,
+							(permissions & IExtendedFileInfo.PERMISSION_GROUP_EXECUTE) != 0);
+					targetFileInfo.setAttribute(EFS.ATTRIBUTE_OTHER_READ,
+							(permissions & IExtendedFileInfo.PERMISSION_OTHERS_READ) != 0);
+					targetFileInfo.setAttribute(EFS.ATTRIBUTE_OTHER_WRITE,
+							(permissions & IExtendedFileInfo.PERMISSION_OTHERS_WRITE) != 0);
+					targetFileInfo.setAttribute(EFS.ATTRIBUTE_OTHER_EXECUTE,
+							(permissions & IExtendedFileInfo.PERMISSION_OTHERS_EXECUTE) != 0);
+				}
+			}
+			try
+			{
+				if (targetFileInfo instanceof IExtendedFileInfo)
+				{
+					targetFileStore.putInfo(targetFileInfo, IExtendedFileInfo.SET_PERMISSIONS, monitor);
+				}
+				else
+				{
+					targetFileStore.putInfo(targetFileInfo, EFS.SET_ATTRIBUTES, monitor);
+				}
+			}
+			catch (CoreException e)
+			{
+				IdeLog.logWarning(SyncingPlugin.getDefault(), "Failed to update permissions for " + targetFileStore, e); //$NON-NLS-1$
+			}
+		}
+	}
+
+	private static IFileInfo getFileInfo(IFileStore fileStore, IProgressMonitor monitor)
+	{
+		IFileInfo fileInfo = (IFileInfo) fileStore.getAdapter(IFileInfo.class);
+		if (fileInfo != null)
+		{
+			return fileInfo;
+		}
+		try
+		{
+			return fileStore.fetchInfo(EFS.NONE, monitor);
+		}
+		catch (CoreException e)
+		{
+			// ignores the exception
+		}
+		return null;
+	}
+
+	private static long getPermissions(IFileInfo fileInfo)
+	{
+		if (fileInfo instanceof IExtendedFileInfo)
+		{
+			return ((IExtendedFileInfo) fileInfo).getPermissions();
+		}
+		long permissions = 0;
+		permissions |= fileInfo.getAttribute(EFS.ATTRIBUTE_OWNER_READ) ? IExtendedFileInfo.PERMISSION_OWNER_READ : 0;
+		permissions |= fileInfo.getAttribute(EFS.ATTRIBUTE_OWNER_WRITE) ? IExtendedFileInfo.PERMISSION_OWNER_WRITE : 0;
+		permissions |= fileInfo.getAttribute(EFS.ATTRIBUTE_OWNER_EXECUTE) ? IExtendedFileInfo.PERMISSION_OWNER_EXECUTE
+				: 0;
+		permissions |= fileInfo.getAttribute(EFS.ATTRIBUTE_GROUP_READ) ? IExtendedFileInfo.PERMISSION_GROUP_READ : 0;
+		permissions |= fileInfo.getAttribute(EFS.ATTRIBUTE_GROUP_WRITE) ? IExtendedFileInfo.PERMISSION_GROUP_WRITE : 0;
+		permissions |= fileInfo.getAttribute(EFS.ATTRIBUTE_GROUP_EXECUTE) ? IExtendedFileInfo.PERMISSION_GROUP_EXECUTE
+				: 0;
+		permissions |= fileInfo.getAttribute(EFS.ATTRIBUTE_OTHER_READ) ? IExtendedFileInfo.PERMISSION_OTHERS_READ : 0;
+		permissions |= fileInfo.getAttribute(EFS.ATTRIBUTE_OTHER_WRITE) ? IExtendedFileInfo.PERMISSION_OTHERS_WRITE : 0;
+		permissions |= fileInfo.getAttribute(EFS.ATTRIBUTE_OTHER_EXECUTE) ? IExtendedFileInfo.PERMISSION_OTHERS_EXECUTE
+				: 0;
+		return permissions;
 	}
 
 	/**
