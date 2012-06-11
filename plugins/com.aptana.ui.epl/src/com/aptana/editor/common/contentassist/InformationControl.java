@@ -10,11 +10,11 @@
  *******************************************************************************/
 package com.aptana.editor.common.contentassist;
 
+import org.eclipse.jface.text.DefaultInformationControl.IInformationPresenter;
 import org.eclipse.jface.text.IInformationControl;
 import org.eclipse.jface.text.IInformationControlExtension;
 import org.eclipse.jface.text.IInformationControlExtension3;
 import org.eclipse.jface.text.TextPresentation;
-import org.eclipse.jface.text.DefaultInformationControl.IInformationPresenter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.DisposeEvent;
@@ -336,8 +336,11 @@ public class InformationControl implements IInformationControl, IInformationCont
 	public void setLocation(Point location) {
 		Rectangle trim= fShell.computeTrim(0, 0, 0, 0);
 		Point textLocation= fText.getLocation();
-		location.x += trim.x - textLocation.x + INNER_BORDER;
-		location.y += trim.y - textLocation.y + INNER_BORDER;
+		if (textLocation.x != 0 || textLocation.y != 0)
+		{
+			location.x += trim.x - textLocation.x + INNER_BORDER;
+			location.y += trim.y - textLocation.y + INNER_BORDER;
+		}
 		fShell.setLocation(location);
 	}
 
