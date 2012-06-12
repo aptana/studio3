@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -63,6 +63,8 @@ public class Messages extends NLS
 	public static String SmartSyncDialog_FlatView;
 	public static String SmartSyncDialog_InSync;
 	public static String SmartSyncDialog_LBL_MultipleFiles;
+	public static String SmartSyncDialog_LBL_PermForDownloads;
+	public static String SmartSyncDialog_LBL_PermforUploads;
 	public static String SmartSyncDialog_LocalTime;
 	public static String SmartSyncDialog_Modified;
 	public static String SmartSyncDialog_New;
@@ -71,9 +73,6 @@ public class Messages extends NLS
 	public static String SmartSyncDialog_NumFilesToUpdate;
 	public static String SmartSyncDialog_OptionsToolTip;
 	public static String SmartSyncDialog_Overwrite;
-	public static String SmartSyncDialog_PermForDirectories;
-	public static String SmartSyncDialog_PermForFiles;
-	public static String SmartSyncDialog_Permissions;
 	public static String SmartSyncDialog_PreviewDescription;
 	public static String SmartSyncDialog_RemoteTime;
 	public static String SmartSyncDialog_Retry;
