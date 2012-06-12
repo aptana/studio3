@@ -28,11 +28,10 @@ public class ParseResult
 	}
 
 	@SuppressWarnings("unchecked")
-	private ParseResult() //Use ParseResult.EMPTY instead
+	private ParseResult() // Use ParseResult.EMPTY instead
 	{
 		this(null, Collections.EMPTY_LIST);
 	}
-	
 
 	/**
 	 * @return the ast with the result of a parse.

@@ -85,8 +85,8 @@
         parse(parseState, working);
         return working.getImmutableResult();
     }
-    
-    
+
+
 	protected synchronized void parse(IParseState parseState, WorkingParseResult working) throws java.lang.Exception
 	{
 		fWorking = working;

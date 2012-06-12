@@ -126,21 +126,21 @@
         parse(parseState, working);
         return working.getImmutableResult();
     }
-    
-    
+
+
 	protected synchronized void parse(IParseState parseState, WorkingParseResult working) throws java.lang.Exception
 	{
 		fWorking = working;
-		
+
 		try
 		{
     		// make sure we have some source
     		String source = parseState.getSource();
-    
+
     		// create scanner and send source to it
     		CoffeeScanner scanner = new CoffeeScanner();
     		scanner.setSource(source);
-    
+
 			// parse
 			ParseRootNode result = (ParseRootNode) parse(scanner);
 			int start = parseState.getStartingOffset();
