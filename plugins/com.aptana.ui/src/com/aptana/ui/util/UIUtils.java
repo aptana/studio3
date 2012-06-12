@@ -30,6 +30,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IPathEditorInput;
+import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.IURIEditorInput;
 import org.eclipse.ui.IViewPart;
@@ -147,6 +148,25 @@ public final class UIUtils
 		}
 	}
 
+	/**
+	 * Returns the active perspective id if there is one
+	 * 
+	 * @return the active perspective id
+	 */
+	public static String getActivePerspectiveId()
+	{
+		IWorkbenchPage activePage = getActivePage();
+		if (activePage != null)
+		{
+			IPerspectiveDescriptor perspective = activePage.getPerspective();
+			if (perspective != null)
+			{
+				return perspective.getId();
+			}
+		}
+		return null;
+	}
+
 	public static IEditorPart[] getDirtyEditors()
 	{
 		IWorkbenchPage page = UIUtils.getActivePage();
@@ -256,6 +276,30 @@ public final class UIUtils
 			return page.findView(viewID);
 		}
 		return null;
+	}
+
+	/**
+	 * Shows the view specified
+	 * 
+	 * @param viewID
+	 * @return whether the view was shown
+	 */
+	public static boolean showView(String viewID)
+	{
+		IWorkbenchPage activePage = getActivePage();
+		if (activePage != null)
+		{
+			try
+			{
+				return activePage.showView(viewID) != null;
+			}
+			catch (PartInitException e)
+			{
+				return false;
+			}
+		}
+
+		return false;
 	}
 
 	public static void showErrorMessage(String title, String message)
