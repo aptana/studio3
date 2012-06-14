@@ -151,6 +151,11 @@
             id="portal.resources"
             name="Resources Actions">
       </actionController>
+      <actionController
+            class="com.aptana.portal.ui.dispatch.actionControllers.WorkbenchActionController"
+            id="portal.workbench"
+            name="Workbench Actions">
+      </actionController>
       <browserNotification
             class="com.aptana.portal.ui.dispatch.browserNotifications.RecentFilesBrowserNotification"
             id="com.aptana.portal.ui.recentFilesNotification"

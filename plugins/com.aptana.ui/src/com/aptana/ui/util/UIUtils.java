@@ -151,18 +151,29 @@ public final class UIUtils
 	/**
 	 * Returns the active perspective id if there is one
 	 * 
-	 * @return the active perspective id
+	 * @return the active perspective id; <code>null</code> in case it could not be resolved.
 	 */
 	public static String getActivePerspectiveId()
+	{
+		IPerspectiveDescriptor perspective = getActivePerspectiveDescriptor();
+		if (perspective != null)
+		{
+			return perspective.getId();
+		}
+		return null;
+	}
+
+	/**
+	 * Returns the active perspective descriptor if there is one.
+	 * 
+	 * @return the active perspective descriptor; <code>null</code> in case it could not be resolved.
+	 */
+	public static IPerspectiveDescriptor getActivePerspectiveDescriptor()
 	{
 		IWorkbenchPage activePage = getActivePage();
 		if (activePage != null)
 		{
-			IPerspectiveDescriptor perspective = activePage.getPerspective();
-			if (perspective != null)
-			{
-				return perspective.getId();
-			}
+			return activePage.getPerspective();
 		}
 		return null;
 	}
