@@ -45,7 +45,7 @@ public class DTDParser extends Parser implements IParser {
 		"jJSeZh95yIpP9PYkXq42pz0m0==");
 
 
-    DTDScanner _scanner;
+    private DTDScanner _scanner;
     
 	/*
 	 * (non-Javadoc)
@@ -97,6 +97,9 @@ public class DTDParser extends Parser implements IParser {
 
 	public DTDParser() {
 		super(PARSING_TABLES);
+
+
+        this._scanner = new DTDScanner();
 	}
 
 	protected Symbol invokeReduceAction(int rule_num, int offset) {

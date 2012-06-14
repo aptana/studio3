@@ -78,6 +78,7 @@ public class CompositeParser extends AbstractParser
 		{
 			mergeEmbeddedNodes(result, embeddedNodes);
 		}
+		working.setParseResult(result);
 	}
 
 	/**

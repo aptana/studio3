@@ -11,9 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.aptana.parsing.ast.IParseError;
-import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
-import com.aptana.parsing.lexer.IRange;
 
 /**
  * A working-copy of the parse result to be used during parsing. After done working with it,
@@ -26,7 +24,6 @@ public class WorkingParseResult
 
 	private final List<IParseError> fErrors;
 	private IParseRootNode fParseResult;
-	private IRange[] fSkippedRanges;
 
 	public WorkingParseResult()
 	{
@@ -62,16 +59,6 @@ public class WorkingParseResult
 	public List<IParseError> getErrors()
 	{
 		return fErrors;
-	}
-
-	public void setSkippedRanges(IParseNode[] skippedRanges)
-	{
-		fSkippedRanges = skippedRanges;
-	}
-
-	public IRange[] getSkippedRanges()
-	{
-		return fSkippedRanges;
 	}
 
 	public ParseResult getImmutableResult()

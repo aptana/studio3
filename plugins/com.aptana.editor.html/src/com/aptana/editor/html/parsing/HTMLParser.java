@@ -42,7 +42,6 @@ import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.WorkingParseResult;
 import com.aptana.parsing.ast.IParseError;
 import com.aptana.parsing.ast.IParseNode;
-import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.ast.ParseError;
 import com.aptana.parsing.ast.ParseRootNode;
 import com.aptana.parsing.lexer.IRange;
@@ -260,7 +259,7 @@ public class HTMLParser extends AbstractParser
 
 	private boolean isSkipped(int start, int end)
 	{
-		IRange[] ranges = fWorkingParseResult.getSkippedRanges();
+		IRange[] ranges = fParseState.getSkippedRanges();
 		if (ranges != null)
 		{
 			int length = ranges.length;
@@ -519,6 +518,7 @@ public class HTMLParser extends AbstractParser
 			}
 		}
 	}
+
 
 	private void processText(String source)
 	{

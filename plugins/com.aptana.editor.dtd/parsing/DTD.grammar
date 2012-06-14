@@ -13,9 +13,13 @@
 
 %implements "IParser";
 
+%init {:
+        this._scanner = new DTDScanner();
+:} ;
+
 %embed {:
 
-    DTDScanner _scanner;
+    private DTDScanner _scanner;
     
 	/*
 	 * (non-Javadoc)
