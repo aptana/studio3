@@ -133,6 +133,19 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 		context.removeProblems(IHTMLConstants.TIDY_PROBLEM);
 	}
 
+	private static boolean isIgnored(String message, List<String> expressions)
+	{
+		for (String expression : expressions)
+		{
+			if (message.matches(expression))
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	public void buildFile(BuildContext context, IProgressMonitor monitor)
 	{
 		if (context == null)
@@ -178,6 +191,14 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 						MessageFormat.format("Failed to validate {0} using HTML Tidy validator", sourcePath), e); //$NON-NLS-1$
 			}
 
+			final List<String> filters = getFilters();
+			problems = CollectionsUtil.filter(problems, new IFilter<IProblem>()
+			{
+				public boolean include(IProblem item)
+				{
+					return !isIgnored(item.getMessage(), filters);
+				}
+			});
 			context.putProblems(IHTMLConstants.TIDY_PROBLEM, problems);
 		}
 		finally
