@@ -8,6 +8,11 @@
             id="com.aptana.deploy.commands.deployApp"
             name="%Deploy.label">
       </command>
+      <command
+            defaultHandler="com.aptana.deploy.internal.ui.handlers.RunDeployWizardHandler"
+            id="com.aptana.deploy.commands.deploywizard"
+            name="%DeployWizard.label">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
@@ -81,6 +86,39 @@
             </visibleWhen>
          </dynamic>
       </menuContribution>
+         <menuContribution
+               locationURI="menu:com.aptana.explorer.deploy?endof=group.wizard">
+            <command
+                  commandId="com.aptana.deploy.commands.deploywizard"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <with
+                        variable="selection">
+                     <iterate
+                           ifEmpty="false">
+                        <and>
+                           <adapt
+                                 type="org.eclipse.core.resources.IResource">
+                           </adapt>
+                           <not>
+                              <or>
+                                 <test
+                                       property="org.eclipse.core.resources.projectNature"
+                                       value="com.appcelerator.titanium.desktop.nature">
+                                 </test>
+                                 <test
+                                       property="org.eclipse.core.resources.projectNature"
+                                       value="com.appcelerator.titanium.mobile.nature">
+                                 </test>
+                              </or>
+                           </not>
+                        </and>
+                     </iterate>
+                  </with>
+               </visibleWhen>
+            </command>
+         </menuContribution>
       <menuContribution
             locationURI="popup:org.eclipse.ui.popup.any?before=group.edit">
          <dynamic

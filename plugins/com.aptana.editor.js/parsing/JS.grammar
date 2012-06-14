@@ -22,11 +22,13 @@
 %import "com.aptana.parsing.ast.IParseError";
 %import "com.aptana.parsing.ast.ParseError";
 %import "com.aptana.parsing.util.ParseUtil";
+%import "com.aptana.parsing.WorkingParseResult";
+%import "com.aptana.parsing.ParseResult";
 
 %implements "IParser";
 
 %embed {:
-	private IParseState fParseState;
+	private WorkingParseResult fWorking;
 
 	// Collect the errors into a list of IParseErrors and let the custom error recovery mechanism handle it
 	private class JSEvents extends Events
@@ -37,9 +39,9 @@
 
 		public void syntaxError(Symbol token)
 		{
-			if (token != null && fParseState != null)
+			if (token != null && fWorking != null)
 			{
-				fParseState.addError(new ParseError(IJSConstants.CONTENT_TYPE_JS, token, IParseError.Severity.ERROR));
+				fWorking.addError(new ParseError(IJSConstants.CONTENT_TYPE_JS, token, IParseError.Severity.ERROR));
 			}
 		}
 
@@ -56,14 +58,14 @@
 			if (tokens != null && tokens.size() == 1 && tokens.get(0).getId() == Terminals.SEMICOLON)
 			{
 				// remove last error
-				if (fParseState != null)
+				if (fWorking != null)
 				{
-					List<IParseError> errors = fParseState.getErrors();
+					List<IParseError> errors = fWorking.getErrors();
 					IParseError lastError = (errors.isEmpty()) ? null : errors.get(errors.size() - 1);
 
 					if (lastError != null)
 					{
-						fParseState.removeError(lastError);
+						fWorking.removeError(lastError);
 					}
 				}
 			}
@@ -224,16 +226,24 @@
 		return result;
 	}
 
+    public synchronized ParseResult parse(IParseState parseState) throws java.lang.Exception
+    {
+        WorkingParseResult working = new WorkingParseResult();
+        parse(parseState, working);
+        return working.getImmutableResult();
+    }
+
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.IParser#parse(com.aptana.parsing.IParseState)
 	 */
-	public synchronized IParseRootNode parse(IParseState parseState) throws java.lang.Exception
+	protected synchronized void parse(IParseState parseState, WorkingParseResult working) throws java.lang.Exception
 	{
-		fParseState = parseState;
+		fWorking = working;
 
 		// make sure we have some source
-		String source = fParseState.getSource();
+		String source = parseState.getSource();
 
 		// create scanner and send source to it
 		fScanner = new JSFlexScanner();
@@ -253,9 +263,6 @@
 		}
 
 		fScanner.setCollectComments(collectComments);
-
-		// reset any errors we may have had from the last parse
-		fParseState.clearErrors();
 
 		try
 		{
@@ -298,7 +305,7 @@
 			}
 
 			// update node offsets
-			int start = fParseState.getStartingOffset();
+			int start = parseState.getStartingOffset();
 			int length = source.length();
 
 			// align root with zero-based offset
@@ -311,15 +318,13 @@
 			}
 
 			// store results in the parse state
-			fParseState.setParseResult(result);
-
-			return result;
+			fWorking.setParseResult(result);
 		}
 		finally
 		{
 			// clear scanner for garbage collection
 			fScanner = null;
-			fParseState = null;
+			fWorking = null;
 		}
 	}
 

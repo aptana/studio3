@@ -10,6 +10,8 @@
 %import "com.aptana.parsing.IParser";
 %import "com.aptana.parsing.ast.IParseNode";
 %import "com.aptana.parsing.ast.IParseRootNode";
+%import "com.aptana.parsing.WorkingParseResult";
+%import "com.aptana.parsing.ParseResult";
 
 %implements "IParser";
 
@@ -42,11 +44,19 @@
         }
     }
 
+
+    public synchronized ParseResult parse(IParseState parseState) throws java.lang.Exception
+    {
+        WorkingParseResult working = new WorkingParseResult();
+        parse(parseState, working);
+        return working.getImmutableResult();
+    }
+
     /*
      * (non-Javadoc)
      * @see com.aptana.parsing.IParser#parse(com.aptana.parsing.IParseState)
      */
-    public synchronized IParseRootNode parse(IParseState parseState) throws java.lang.Exception
+    protected synchronized void parse(IParseState parseState, WorkingParseResult working) throws java.lang.Exception
     {
        	JSONScanner scanner = new JSONScanner();
 
@@ -57,9 +67,7 @@
 		IParseRootNode result = (IParseRootNode) parse(scanner);
 
 		// save reference to result
-		parseState.setParseResult(result);
-
-		return result;
+		working.setParseResult(result);
     }
 :};
 

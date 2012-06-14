@@ -1,8 +1,11 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.deploy.internal.handlers;
+package com.aptana.deploy.internal.ui.handlers;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -26,6 +29,8 @@ import com.aptana.deploy.wizard.DeployWizard;
 public class RunDeployWizardHandler extends AbstractHandler
 {
 
+	private static final String DEPLOY_WIZARD_SECTION = "DeployWizardAction"; //$NON-NLS-1$
+
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
 		IStructuredSelection selection = StructuredSelection.EMPTY;
@@ -48,10 +53,10 @@ public class RunDeployWizardHandler extends AbstractHandler
 		wizard.init(activePart.getSite().getWorkbenchWindow().getWorkbench(), selection);
 		wizard.setWindowTitle(Messages.DeployHandler_Wizard_Title);
 		IDialogSettings workbenchSettings = DeployUIPlugin.getDefault().getDialogSettings();
-		IDialogSettings wizardSettings = workbenchSettings.getSection("DeployWizardAction"); //$NON-NLS-1$
+		IDialogSettings wizardSettings = workbenchSettings.getSection(DEPLOY_WIZARD_SECTION);
 		if (wizardSettings == null)
 		{
-			wizardSettings = workbenchSettings.addNewSection("DeployWizardAction"); //$NON-NLS-1$
+			wizardSettings = workbenchSettings.addNewSection(DEPLOY_WIZARD_SECTION);
 		}
 		wizard.setDialogSettings(wizardSettings);
 		wizard.setForcePreviousAndNextButtons(true);

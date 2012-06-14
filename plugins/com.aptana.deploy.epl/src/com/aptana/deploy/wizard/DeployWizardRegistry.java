@@ -12,13 +12,13 @@ package com.aptana.deploy.wizard;
 
 import org.eclipse.ui.internal.wizards.AbstractExtensionWizardRegistry;
 
-import com.aptana.deploy.ui.DeployUIPlugin;
+import com.aptana.deploy.epl.DeployEplPlugin;
 
 @SuppressWarnings("restriction")
 public class DeployWizardRegistry extends AbstractExtensionWizardRegistry
 {
 
-	private static final String EXT_PT = "com.aptana.deploy.deployWizards"; //$NON-NLS-1$
+	private static final String EXT_PT = "deployWizards"; //$NON-NLS-1$
 
 	private static DeployWizardRegistry singleton;
 
@@ -58,6 +58,6 @@ public class DeployWizardRegistry extends AbstractExtensionWizardRegistry
 	 */
 	protected String getPlugin()
 	{
-		return DeployUIPlugin.PLUGIN_ID;
+		return DeployEplPlugin.PLUGIN_ID;
 	}
 }

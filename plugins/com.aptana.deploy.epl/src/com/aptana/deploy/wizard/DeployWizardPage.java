@@ -53,8 +53,6 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.wizards.IWizardCategory;
 import org.eclipse.ui.wizards.IWizardDescriptor;
 
-import com.aptana.core.util.StringUtil;
-
 @SuppressWarnings("restriction")
 public class DeployWizardPage extends WorkbenchWizardSelectionPage
 {
@@ -248,7 +246,6 @@ public class DeployWizardPage extends WorkbenchWizardSelectionPage
 		descriptionLabel = new Label(comp, SWT.WRAP);
 		if (descriptionLabel != null)
 		{
-			descriptionLabel.setText(StringUtil.EMPTY);
 			descriptionLabel.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).hint(SWT.DEFAULT, 50)
 					.create());
 			descriptionLabel.setFont(font);

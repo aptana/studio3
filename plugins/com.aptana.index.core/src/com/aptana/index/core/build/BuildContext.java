@@ -36,8 +36,10 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.IndexPlugin;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParseStateCacheKey;
+import com.aptana.parsing.ParseResult;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ParserPoolFactory;
+import com.aptana.parsing.WorkingParseResult;
 import com.aptana.parsing.ast.IParseError;
 import com.aptana.parsing.ast.IParseRootNode;
 
@@ -48,8 +50,8 @@ public class BuildContext
 
 	private IFile file;
 	protected Map<String, Collection<IProblem>> problems;
-	private IParseState fParseState;
 	private IParseStateCacheKey fParseStateCacheKey;
+	private ParseResult fParseResult;
 
 	private String fContents;
 
@@ -91,31 +93,31 @@ public class BuildContext
 
 	public IParseRootNode getAST() throws CoreException
 	{
-		return getAST(new ParseState(getContents()));
+		return getAST(new ParseState(getContents())).getRootNode();
 	}
 
-	public synchronized IParseRootNode getAST(IParseState parseState) throws CoreException
+	/**
+	 * Does not return null (must be an empty parse result in the case the ast == null).
+	 */
+	public synchronized ParseResult getAST(IParseState parseState) throws CoreException
 	{
 		try
 		{
 			String contentType = getContentType();
 			IParseStateCacheKey newCacheKey = parseState.getCacheKey(contentType);
-			if (fParseState != null && fParseStateCacheKey != null
+			if (fParseResult != null && fParseStateCacheKey != null
 					&& !fParseStateCacheKey.requiresReparse(newCacheKey))
 			{
-				// copy over errors from old parse state to new one since we're not re-parsing
-				parseState.copyErrorsFrom(fParseState);
-				return fParseState.getParseResult();
+				return fParseResult;
 			}
-			fParseState = parseState;
 			fParseStateCacheKey = newCacheKey;
 			// FIXME What if we fail to parse? Should we catch and log that exception here and return null?
 			try
 			{
 				// FIXME The parsers need to throw a specific SyntaxException or something for us to differentiate
 				// between those and IO errors!
-				IParseRootNode ast = parse(contentType, fParseState);
-				fParseState.setParseResult(ast);
+				WorkingParseResult working = new WorkingParseResult();
+				fParseResult = parse(contentType, parseState, working);
 			}
 			catch (CoreException e)
 			{
@@ -125,30 +127,30 @@ public class BuildContext
 			{
 				throw new CoreException(new Status(IStatus.ERROR, IndexPlugin.PLUGIN_ID, e.getMessage(), e));
 			}
-			if (fParseState == null)
+			if (fParseResult == null)
 			{
-				return null;
+				return ParseResult.EMPTY;
 			}
-			return fParseState.getParseResult();
+			return fParseResult;
 		}
 		finally
 		{
-			if (fParseState != null)
+			if (parseState != null)
 			{
 				// Wipe the source out of the parse state to clean up RAM?
-				fParseState.clearEditState();
+				parseState.clearEditState();
 			}
 		}
 	}
 
-	protected IParseRootNode parse(String contentType, IParseState parseState) throws Exception
+	protected ParseResult parse(String contentType, IParseState parseState, WorkingParseResult working) throws Exception
 	{
 		return ParserPoolFactory.parse(contentType, parseState);
 	}
 
 	public synchronized void resetAST()
 	{
-		fParseState = null;
+		fParseResult = null;
 		fParseStateCacheKey = null;
 	}
 
@@ -251,14 +253,14 @@ public class BuildContext
 
 	public Collection<IParseError> getParseErrors()
 	{
-		if (fParseState == null)
+		if (fParseResult == null)
 		{
 			// FIXME Maybe we should force getAST() if fParseState == null?
 			return Collections.emptyList();
 		}
 
-		// TODO Handle possible concurrent modification exceptions
-		return Collections.unmodifiableCollection(fParseState.getErrors());
+		// Note: unmodifiable collection returned
+		return fParseResult.getErrors();
 	}
 
 	public InputStream openInputStream(IProgressMonitor monitor) throws CoreException

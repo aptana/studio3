@@ -21,6 +21,7 @@ import com.aptana.editor.html.parsing.HTMLParser;
 import com.aptana.editor.html.preferences.HTMLPreferenceUtil;
 import com.aptana.editor.html.preferences.IPreferenceConstants;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 
 public class HTMLOutlineProviderTest extends TestCase
 {
@@ -56,7 +57,7 @@ public class HTMLOutlineProviderTest extends TestCase
 		String source = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">\n"
 				+ "<html><head></head><body>Text</body></html>\n";
 		fParseState = new HTMLParseState(source);
-		IParseNode astRoot = fParser.parse(fParseState);
+		IParseNode astRoot = parse();
 
 		Object[] outlineResult = fContentProvider.getElements(astRoot);
 		assertEquals(1, outlineResult.length);
@@ -73,7 +74,7 @@ public class HTMLOutlineProviderTest extends TestCase
 	{
 		String source = "<div id=\"content\" class=\"name\"></div>";
 		fParseState = new HTMLParseState(source);
-		IParseNode astRoot = fParser.parse(fParseState);
+		IParseNode astRoot = parse();
 
 		Object[] outlineResult = fContentProvider.getElements(astRoot);
 		assertEquals(1, outlineResult.length);
@@ -84,7 +85,7 @@ public class HTMLOutlineProviderTest extends TestCase
 	{
 		String source = "<script src=\"test.js\">";
 		fParseState = new HTMLParseState(source);
-		IParseNode astRoot = fParser.parse(fParseState);
+		IParseNode astRoot = parse();
 
 		Object[] outlineResult = fContentProvider.getElements(astRoot);
 		assertEquals(1, outlineResult.length);
@@ -95,7 +96,7 @@ public class HTMLOutlineProviderTest extends TestCase
 	{
 		String source = "<link href=\"stylesheet.css\">";
 		fParseState = new HTMLParseState(source);
-		IParseNode astRoot = fParser.parse(fParseState);
+		IParseNode astRoot = parse();
 
 		Object[] outlineResult = fContentProvider.getElements(astRoot);
 		assertEquals(1, outlineResult.length);
@@ -106,7 +107,7 @@ public class HTMLOutlineProviderTest extends TestCase
 	{
 		String source = "<!-- this is a comment -->";
 		fParseState = new HTMLParseState(source);
-		IParseNode astRoot = fParser.parse(fParseState);
+		IParseNode astRoot = parse();
 
 		Object[] outlineResult = fContentProvider.getElements(astRoot);
 		assertEquals(0, outlineResult.length);
@@ -116,7 +117,7 @@ public class HTMLOutlineProviderTest extends TestCase
 	{
 		String source = "<meta charset=\"utf-8\">";
 		fParseState = new HTMLParseState(source);
-		IParseNode astRoot = fParser.parse(fParseState);
+		IParseNode astRoot = parse();
 
 		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(HTMLPlugin.PLUGIN_ID);
 		prefs.put(IPreferenceConstants.HTML_OUTLINE_TAG_ATTRIBUTES_TO_SHOW, "charset");
@@ -130,7 +131,7 @@ public class HTMLOutlineProviderTest extends TestCase
 	{
 		String source = "some texts";
 		fParseState = new HTMLParseState(source);
-		IParseNode astRoot = fParser.parse(fParseState);
+		IParseNode astRoot = parse();
 
 		HTMLPreferenceUtil.setShowTextNodesInOutline(false);
 		Object[] outlineResult = fContentProvider.getElements(astRoot);
@@ -146,7 +147,7 @@ public class HTMLOutlineProviderTest extends TestCase
 	{
 		String source = "<td style=\"color: red;\"></td>";
 		fParseState = new HTMLParseState(source);
-		IParseNode astRoot = fParser.parse(fParseState);
+		IParseNode astRoot = parse();
 
 		Object[] outlineResult = fContentProvider.getElements(astRoot);
 		assertEquals(1, outlineResult.length);
@@ -166,7 +167,7 @@ public class HTMLOutlineProviderTest extends TestCase
 	{
 		String source = "<script>\n(function() {\nvar foo = function() {};\nfoo.bar = function() {};\n})();\n</script>";
 		fParseState = new HTMLParseState(source);
-		IParseNode astRoot = fParser.parse(fParseState);
+		IParseNode astRoot = parse();
 
 		Object[] outlineResult = fContentProvider.getElements(astRoot);
 		assertEquals(1, outlineResult.length);
@@ -179,5 +180,10 @@ public class HTMLOutlineProviderTest extends TestCase
 		Object[] grandchildBar = fContentProvider.getElements(childFoo[0]);
 		assertEquals(1, grandchildBar.length);
 		assertEquals("bar()", fLabelProvider.getText(grandchildBar[0]));
+	}
+
+	private IParseRootNode parse() throws Exception
+	{
+		return fParser.parse(fParseState).getRootNode();
 	}
 }

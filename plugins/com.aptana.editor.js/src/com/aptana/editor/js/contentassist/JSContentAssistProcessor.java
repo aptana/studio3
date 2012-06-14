@@ -694,7 +694,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			JSParseState parseState = new JSParseState(source, startingOffset, false, false);
 
 			// parse and grab resulting AST
-			IParseNode ast = ParserPoolFactory.parse(IJSConstants.CONTENT_TYPE_JS, parseState);
+			IParseNode ast = ParserPoolFactory.parse(IJSConstants.CONTENT_TYPE_JS, parseState).getRootNode();
 
 			if (ast != null)
 			{

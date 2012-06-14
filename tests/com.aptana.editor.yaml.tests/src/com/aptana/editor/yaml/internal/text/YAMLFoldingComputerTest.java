@@ -45,7 +45,7 @@ public class YAMLFoldingComputerTest extends TestCase
 				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
-					return new YAMLParser().parse(parseState);
+					return new YAMLParser().parse(parseState).getRootNode();
 				}
 				catch (Exception e)
 				{

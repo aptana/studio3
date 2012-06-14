@@ -261,14 +261,14 @@ public abstract class InferencingTestsBase extends TestCase
 
 		try
 		{
-			parser.parse(parseState);
+			return parser.parse(parseState).getRootNode();
 		}
 		catch (Exception e)
 		{
 			fail(e.getMessage());
 		}
 
-		return parseState.getParseResult();
+		throw new AssertionError("Should never get here.");
 	}
 
 	/**

@@ -193,7 +193,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 				return super.detectIndentationLevel(document, offset);
 			}
 			String source = document.get();
-			IParseRootNode parseResult = ParserPoolFactory.parse(getMainContentType(), source);
+			IParseRootNode parseResult = ParserPoolFactory.parse(getMainContentType(), source).getRootNode();
 			if (parseResult != null)
 			{
 				final JSFormatterNodeBuilder builder = new JSFormatterNodeBuilder();
@@ -242,7 +242,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		IParseRootNode parseResult = null;
 		try
 		{
-			parseResult = ParserPoolFactory.parse(getMainContentType(), input);
+			parseResult = ParserPoolFactory.parse(getMainContentType(), input).getRootNode();
 		}
 		catch (Exception e)
 		{
@@ -312,7 +312,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		IParseRootNode outputParseResult = null;
 		try
 		{
-			outputParseResult = parser.parse(parseState);
+			outputParseResult = parser.parse(parseState).getRootNode();
 		}
 		catch (Exception e)
 		{
@@ -486,7 +486,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		List<IRegion> onOffRegions = null;
 		try
 		{
-			IParseRootNode parseResult = parser.parse(parseState);
+			IParseRootNode parseResult = parser.parse(parseState).getRootNode();
 			checkinParser(parser);
 			if (parseResult != null)
 			{

@@ -40,9 +40,7 @@ public class ScopeTests extends FileContentBasedTests
 		JSParser parser = new JSParser();
 		ParseState parseState = new ParseState(source);
 
-		parser.parse(parseState);
-
-		return parseState.getParseResult();
+		return parser.parse(parseState).getRootNode();
 	}
 
 	/**
@@ -75,9 +73,7 @@ public class ScopeTests extends FileContentBasedTests
 		JSParser parser = new JSParser();
 		ParseState parseState = new ParseState(source);
 
-		parser.parse(parseState);
-
-		IParseNode root = parseState.getParseResult();
+		IParseNode root = parser.parse(parseState).getRootNode();
 
 		if (root instanceof JSParseRootNode)
 		{

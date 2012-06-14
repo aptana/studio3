@@ -135,7 +135,7 @@ public class HTMLParserTypeAttributeTest extends TestCase
 	protected void parseTest(String source, String expected) throws Exception
 	{
 		fParseState = new HTMLParseState(source);
-		IParseNode result = fParser.parse(fParseState);
+		IParseNode result = fParser.parse(fParseState).getRootNode();
 
 		StringBuilder text = new StringBuilder();
 		IParseNode[] children = result.getChildren();

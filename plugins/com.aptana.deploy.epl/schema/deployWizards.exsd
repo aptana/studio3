@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="com.aptana.deploy.ui" xmlns="http://www.w3.org/2001/XMLSchema">
+<schema targetNamespace="com.aptana.deploy.epl" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="com.aptana.deploy.ui" id="deployWizards" name="Deployment Wizards"/>
+         <meta.schema plugin="com.aptana.deploy.epl" id="deployWizards" name="Deployment Wizards"/>
       </appinfo>
       <documentation>
          This extension point is used to register export wizard extensions. Export wizards appear as choices within the &quot;Export Dialog&quot;, and are used to export resources from the workbench. 

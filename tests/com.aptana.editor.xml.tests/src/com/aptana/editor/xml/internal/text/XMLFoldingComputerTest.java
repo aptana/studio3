@@ -21,6 +21,7 @@ import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.xml.parsing.XMLParser;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 
 public class XMLFoldingComputerTest extends TestCase
 {
@@ -44,7 +45,7 @@ public class XMLFoldingComputerTest extends TestCase
 				ParseState parseState = new ParseState(getDocument().get());
 				try
 				{
-					return new XMLParser().parse(parseState);
+					return parse(parseState);
 				}
 				catch (Exception e)
 				{
@@ -68,7 +69,7 @@ public class XMLFoldingComputerTest extends TestCase
 				ParseState parseState = new ParseState(getDocument().get());
 				try
 				{
-					return new XMLParser().parse(parseState);
+					return parse(parseState);
 				}
 				catch (Exception e)
 				{
@@ -94,7 +95,7 @@ public class XMLFoldingComputerTest extends TestCase
 				ParseState parseState = new ParseState(getDocument().get());
 				try
 				{
-					return new XMLParser().parse(parseState);
+					return parse(parseState);
 				}
 				catch (Exception e)
 				{
@@ -119,7 +120,7 @@ public class XMLFoldingComputerTest extends TestCase
 				ParseState parseState = new ParseState(getDocument().get());
 				try
 				{
-					return new XMLParser().parse(parseState);
+					return parse(parseState);
 				}
 				catch (Exception e)
 				{
@@ -145,7 +146,7 @@ public class XMLFoldingComputerTest extends TestCase
 				ParseState parseState = new ParseState(getDocument().get());
 				try
 				{
-					return new XMLParser().parse(parseState);
+					return parse(parseState);
 				}
 				catch (Exception e)
 				{
@@ -161,5 +162,10 @@ public class XMLFoldingComputerTest extends TestCase
 		assertTrue(positions.contains(new Position(7, 31)));
 		assertTrue(positions.contains(new Position(38, 46)));
 		assertTrue(positions.contains(new Position(45, 31)));
+	}
+
+	private IParseRootNode parse(ParseState parseState) throws Exception
+	{
+		return new XMLParser().parse(parseState).getRootNode();
 	}
 }

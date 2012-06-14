@@ -368,7 +368,7 @@ public class JSSourceEditor extends AbstractThemeableEditor
 			// Don't attach or collect comments for hovers/outline
 			IDocument document = getDocument();
 			JSParseState parseState = new JSParseState(document.get());
-			return ParserPoolFactory.parse(getContentType(), parseState);
+			return ParserPoolFactory.parse(getContentType(), parseState).getRootNode();
 		}
 		catch (Exception e)
 		{

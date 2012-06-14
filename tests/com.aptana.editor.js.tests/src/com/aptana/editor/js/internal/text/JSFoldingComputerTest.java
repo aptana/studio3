@@ -25,6 +25,7 @@ import com.aptana.editor.js.preferences.IPreferenceConstants;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 
 public class JSFoldingComputerTest extends TestCase
 {
@@ -48,7 +49,7 @@ public class JSFoldingComputerTest extends TestCase
 				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
-					return new JSParser().parse(parseState);
+					return parse(parseState);
 				}
 				catch (Exception e)
 				{
@@ -73,7 +74,7 @@ public class JSFoldingComputerTest extends TestCase
 				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
-					return new JSParser().parse(parseState);
+					return parse(parseState);
 				}
 				catch (Exception e)
 				{
@@ -106,7 +107,7 @@ public class JSFoldingComputerTest extends TestCase
 				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
-					return new JSParser().parse(parseState);
+					return parse(parseState);
 				}
 				catch (Exception e)
 				{
@@ -133,7 +134,7 @@ public class JSFoldingComputerTest extends TestCase
 				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
-					return new JSParser().parse(parseState);
+					return parse(parseState);
 				}
 				catch (Exception e)
 				{
@@ -167,7 +168,7 @@ public class JSFoldingComputerTest extends TestCase
 				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
-					return new JSParser().parse(parseState);
+					return parse(parseState);
 				}
 				catch (Exception e)
 				{
@@ -203,7 +204,7 @@ public class JSFoldingComputerTest extends TestCase
 				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
-					return new JSParser().parse(parseState);
+					return parse(parseState);
 				}
 				catch (Exception e)
 				{
@@ -237,7 +238,7 @@ public class JSFoldingComputerTest extends TestCase
 				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
-					return new JSParser().parse(parseState);
+					return parse(parseState);
 				}
 				catch (Exception e)
 				{
@@ -267,5 +268,10 @@ public class JSFoldingComputerTest extends TestCase
 			}
 		}
 		return null;
+	}
+
+	private IParseRootNode parse(IParseState parseState) throws Exception
+	{
+		return new JSParser().parse(parseState).getRootNode();
 	}
 }

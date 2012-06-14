@@ -11,8 +11,9 @@
 package com.aptana.core.epl.util;
 
 import java.text.NumberFormat;
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * The <code>LRUCache</code> is a hashtable that stores a finite number of elements.
@@ -29,7 +30,7 @@ import java.util.Hashtable;
  *
  * @see com.aptana.core.epl.util.ILRUCacheable
  */
-public class LRUCache<K, V> implements Cloneable {
+public class LRUCache<K, V> {
 
 	/**
 	 * This type is used internally by the LRUCache to represent entries
@@ -89,155 +90,6 @@ public class LRUCache<K, V> implements Cloneable {
 			return "LRUCacheEntry [" + this.key + "-->" + this.value + "]"; //$NON-NLS-3$ //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
-	
-	public class Stats {
-		private int[] counters = new int[20];
-		private long[] timestamps = new long[20];
-		private int counterIndex = -1;
-		
-		private void add(int counter) {
-			for (int i = 0; i <= this.counterIndex; i++) {
-				if (this.counters[i] == counter)
-					return;
-			}
-			int length = this.counters.length;
-			if (++this.counterIndex == length) {
-				int newLength = this.counters.length * 2;
-				System.arraycopy(this.counters, 0, this.counters = new int[newLength], 0, length);
-				System.arraycopy(this.timestamps, 0, this.timestamps = new long[newLength], 0, length);
-			}
-			this.counters[this.counterIndex] = counter;
-			this.timestamps[this.counterIndex] = System.currentTimeMillis();
-		}
-		private String getAverageAge(long totalTime, int numberOfElements, long currentTime) {
-			if (numberOfElements == 0)
-				return "N/A"; //$NON-NLS-1$
-			long time = totalTime / numberOfElements;
-			long age = currentTime - time;
-			long ageInSeconds = age/1000;
-			int seconds = 0;
-			int minutes = 0;
-			int hours = 0;
-			int days = 0;
-			if (ageInSeconds > 60) {
-				long ageInMin = ageInSeconds / 60;
-				seconds = (int) (ageInSeconds - (60 * ageInMin));
-				if (ageInMin > 60) {
-					long ageInHours = ageInMin / 60;
-					minutes = (int) (ageInMin - (60 * ageInHours));
-					if (ageInHours > 24) {
-						long ageInDays = ageInHours / 24;
-						hours = (int) (ageInHours - (24 * ageInDays));
-						days = (int) ageInDays;
-					} else {
-						hours = (int) ageInHours;
-					}
-				} else {
-					minutes = (int) ageInMin;
-				}
-			} else {
-				seconds = (int) ageInSeconds;
-			}
-			StringBuffer buffer = new StringBuffer();
-			if (days > 0) {
-				buffer.append(days);
-				buffer.append(" days "); //$NON-NLS-1$
-			}
-			if (hours > 0) {
-				buffer.append(hours);
-				buffer.append(" hours "); //$NON-NLS-1$
-			}
-			if (minutes > 0) {
-				buffer.append(minutes);
-				buffer.append(" minutes "); //$NON-NLS-1$
-			}
-			buffer.append(seconds);
-			buffer.append(" seconds"); //$NON-NLS-1$
-			return buffer.toString();
-		}
-		private long getTimestamps(int counter) {
-			for (int i = 0; i <= this.counterIndex; i++) {
-				if (this.counters[i] >= counter)
-					return this.timestamps[i];
-			}
-			return -1;
-		}
-		public synchronized String printStats() {
-			int numberOfElements = LRUCache.this.currentSpace;
-			if (numberOfElements == 0) {
-				return "No elements in cache"; //$NON-NLS-1$
-			}
-			StringBuffer buffer = new StringBuffer();
-			
-			buffer.append("Number of elements in cache: "); //$NON-NLS-1$
-			buffer.append(numberOfElements);
-			
-			final int numberOfGroups = 5;
-			int numberOfElementsPerGroup = numberOfElements / numberOfGroups;
-			buffer.append("\n("); //$NON-NLS-1$
-			buffer.append(numberOfGroups);
-			buffer.append(" groups of "); //$NON-NLS-1$
-			buffer.append(numberOfElementsPerGroup);
-			buffer.append(" elements)"); //$NON-NLS-1$
-			buffer.append("\n\nAverage age:"); //$NON-NLS-1$
-			int groupNumber = 1;
-			int elementCounter = 0;
-			LRUCacheEntry<K, V> entry = LRUCache.this.entryQueueTail;
-			long currentTime = System.currentTimeMillis();
-			long accumulatedTime = 0;
-			while (entry != null) {
-				long timeStamps = getTimestamps(entry.timestamp);
-				if (timeStamps > 0) {
-					accumulatedTime += timeStamps;
-					elementCounter++;
-				}
-				if (elementCounter >= numberOfElementsPerGroup && (groupNumber < numberOfGroups)) {
-					buffer.append("\nGroup "); //$NON-NLS-1$
-					buffer.append(groupNumber);
-					if (groupNumber == 1) {
-						buffer.append(" (oldest)\t: "); //$NON-NLS-1$
-					} else {
-						buffer.append("\t\t: "); //$NON-NLS-1$
-					}
-					groupNumber++;
-					buffer.append(getAverageAge(accumulatedTime, elementCounter, currentTime));
-					elementCounter = 0;
-					accumulatedTime = 0;
-				}
-				entry = entry.previous;
-			}
-			buffer.append("\nGroup "); //$NON-NLS-1$
-			buffer.append(numberOfGroups);
-			buffer.append(" (youngest)\t: "); //$NON-NLS-1$
-			buffer.append(getAverageAge(accumulatedTime, elementCounter, currentTime));
-			
-			return buffer.toString();
-		}
-		private void removeCountersOlderThan(int counter) {
-			for (int i = 0; i <= this.counterIndex; i++) {
-				if (this.counters[i] >= counter) {
-					if (i > 0) {
-						int length = this.counterIndex-i+1;
-						System.arraycopy(this.counters, i, this.counters, 0, length);
-						System.arraycopy(this.timestamps, i, this.timestamps, 0, length);
-						this.counterIndex = length;
-					}
-					return;
-				}
-			}
-		}
-		public Object getOldestElement() {
-			return LRUCache.this.getOldestElement();
-		}
-		public long getOldestTimestamps() {
-			return getTimestamps(getOldestTimestampCounter());
-		}
-		public synchronized void snapshot() {
-			removeCountersOlderThan(getOldestTimestampCounter());
-			add(getNewestTimestampCounter());
-		}
-	}
-
 	/**
 	 * Amount of cache space used so far
 	 */
@@ -256,7 +108,7 @@ public class LRUCache<K, V> implements Cloneable {
 	/**
 	 * Hash table for fast random access to cache entries
 	 */
-	protected Hashtable<K, LRUCacheEntry<K, V>> entryTable;
+	protected HashMap<K, LRUCacheEntry<K, V>> entryTable;
 
 	/**
 	 * Start of queue (most recently used entry)
@@ -288,60 +140,26 @@ public class LRUCache<K, V> implements Cloneable {
 
 		this.timestampCounter = this.currentSpace = 0;
 		this.entryQueue = this.entryQueueTail = null;
-		this.entryTable = new Hashtable<K, LRUCacheEntry<K, V>>(size);
+		this.entryTable = new HashMap<K, LRUCacheEntry<K, V>>(size);
 		this.spaceLimit = size;
 	}
-	/**
-	 * Returns a new cache containing the same contents.
-	 *
-	 * @return New copy of object.
-	 */
-	public Object clone() {
 
-		LRUCache<K, V> newCache = newInstance(this.spaceLimit);
-		LRUCacheEntry<K, V> qEntry;
-
-		/* Preserve order of entries by copying from oldest to newest */
-		qEntry = this.entryQueueTail;
-		while (qEntry != null) {
-			newCache.privateAdd (qEntry.key, qEntry.value, qEntry.space);
-			qEntry = qEntry.previous;
-		}
-		return newCache;
-	}
+	
 	public double fillingRatio() {
 		return (this.currentSpace) * 100.0 / this.spaceLimit;
 	}
+
 	/**
 	 * Flushes all entries from the cache.
 	 */
 	public void flush() {
 
 		this.currentSpace = 0;
-		LRUCacheEntry<K, V> entry = this.entryQueueTail; // Remember last entry
-		this.entryTable = new Hashtable<K, LRUCacheEntry<K, V>>();  // Clear it out
+		this.entryTable = new HashMap<K, LRUCacheEntry<K, V>>();  // Clear it out
 		this.entryQueue = this.entryQueueTail = null;
-		while (entry != null) {  // send deletion notifications in LRU order
-			entry = entry.previous;
-		}
 	}
-	/**
-	 * Flushes the given entry from the cache.  Does nothing if entry does not
-	 * exist in cache.
-	 *
-	 * @param key Key of object to flush
-	 */
-	public void flush (K key) {
 
-		LRUCacheEntry<K, V> entry;
 
-		entry = (LRUCacheEntry<K, V>) this.entryTable.get(key);
-
-		/* If entry does not exist, return */
-		if (entry == null) return;
-
-		privateRemoveEntry (entry, false);
-	}
 	/*
 	 * Answers the existing key that is equals to the given key.
 	 * If the key is not in the cache, returns the given key
@@ -404,9 +222,8 @@ public class LRUCache<K, V> implements Cloneable {
 	/**
 	 * Returns an Enumeration of the keys currently in the cache.
 	 */
-	public Enumeration<K> keys() {
-
-		return this.entryTable.keys();
+	public Set<K> keys() {
+		return this.entryTable.keySet();
 	}
 	/**
 	 * Ensures there is the specified amount of free space in the receiver,
@@ -437,12 +254,7 @@ public class LRUCache<K, V> implements Cloneable {
 		}
 		return true;
 	}
-	/**
-	 * Returns a new LRUCache instance
-	 */
-	protected LRUCache<K, V> newInstance(int size) {
-		return new LRUCache<K, V>(size);
-	}
+
 	/**
 	 * Answers the value in the cache at the given key.
 	 * If the value is not in the cache, returns null
@@ -528,9 +340,11 @@ public class LRUCache<K, V> implements Cloneable {
 	 *
 	 * @param key Key of object to add.
 	 * @param value Value of object to add.
-	 * @return added value.
+	 * @return whether the value was actually added or not to the cache (it could be that it was
+	 * not added because there was not enough space for the entry in the cache -- happens if that
+	 * single value exceeds the maximum space for the cache).
 	 */
-	public V put(K key, V value) {
+	public boolean put(K key, V value) {
 
 		int newSpace, oldSpace, newTotal;
 		LRUCacheEntry<K, V> entry;
@@ -553,33 +367,20 @@ public class LRUCache<K, V> implements Cloneable {
 				entry.value = value;
 				entry.space = newSpace;
 				this.currentSpace = newTotal;
-				return value;
+				return true;
 			} else {
 				privateRemoveEntry (entry, false);
+				return false;
 			}
 		}
 		if (makeSpace(newSpace)) {
 			privateAdd (key, value, newSpace);
+			return true;
+		} else {
+			return false;
 		}
-		return value;
 	}
-	/**
-	 * Removes and returns the value in the cache for the given key.
-	 * If the key is not in the cache, returns null.
-	 *
-	 * @param key Key of object to remove from cache.
-	 * @return Value removed from cache.
-	 */
-	public V removeKey (K key) {
 
-		LRUCacheEntry<K, V> entry = (LRUCacheEntry<K, V>) this.entryTable.get(key);
-		if (entry == null) {
-			return null;
-		}
-		V value = entry.value;
-		privateRemoveEntry (entry, false);
-		return value;
-	}
 	/**
 	 * Sets the maximum amount of space that the cache can store
 	 *
@@ -621,9 +422,9 @@ public class LRUCache<K, V> implements Cloneable {
 		int length = this.entryTable.size();
 		Object[] unsortedKeys = new Object[length];
 		String[] unsortedToStrings = new String[length];
-		Enumeration<K> e = keys();
+		Iterator<K> e = keys().iterator();
 		for (int i = 0; i < length; i++) {
-			K key = e.nextElement();
+			K key = e.next();
 			unsortedKeys[i] = key;
 			unsortedToStrings[i] = key.toString();
 		}

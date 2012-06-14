@@ -81,7 +81,7 @@ public class SVGParser extends XMLParser
 
 		try
 		{
-			IParseNode result = ParserPoolFactory.parse(language, source, startingOffset);
+			IParseNode result = ParserPoolFactory.parse(language, source, startingOffset).getRootNode();
 
 			fCurrentElement.addChild(result);
 		}

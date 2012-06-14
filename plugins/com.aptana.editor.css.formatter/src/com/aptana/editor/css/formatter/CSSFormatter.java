@@ -85,7 +85,7 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 			}
 
 			String source = document.get();
-			IParseRootNode parseResult = ParserPoolFactory.parse(getMainContentType(), source);
+			IParseRootNode parseResult = ParserPoolFactory.parse(getMainContentType(), source).getRootNode();
 			if (parseResult != null)
 			{
 				final CSSFormatterNodeBuilder builder = new CSSFormatterNodeBuilder();
@@ -124,7 +124,7 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 		try
 		{
 			IParseRootNode parseResult = null;
-			parseResult = ParserPoolFactory.parse(getMainContentType(), input);
+			parseResult = ParserPoolFactory.parse(getMainContentType(), input).getRootNode();
 
 			if (parseResult != null)
 			{
