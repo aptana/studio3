@@ -7,6 +7,7 @@
  */
 package com.aptana.editor.html.validator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
@@ -24,21 +25,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 	@Override
 	protected AbstractBuildParticipant createValidator()
 	{
-		return new HTMLTidyValidator()
-		{
-
-			@Override
-			protected String getPreferenceNode()
-			{
-				return HTMLPlugin.PLUGIN_ID;
-			}
-
-			@Override
-			public String getId()
-			{
-				return ID;
-			}
-		};
+		return new HTMLTidyValidatorInternal();
 	}
 
 	@Override
@@ -575,8 +562,60 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 		assertContains(items, "should trim empty <script>");
 	}
 
+	public void testFilter() throws CoreException
+	{
+		// @formatter:off
+		String text = "<!DOCTYPE html>\n" +
+			"<HTML>\n" +
+			"<HEAD>\n" +
+			"<TITLE>Example</TITLE>\n" +
+			"<script type=\"text/javascript\"></script>\n" +
+			"</HEAD>\n" +
+			"<body>\n" +
+			"</body>\n" +
+			"</HTML>\n";
+		// @formatter:on
+
+		((HTMLTidyValidatorInternal) fValidator).addFilter(".*should trim empty.*");
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "should trim empty <script>");
+	}
+
 	protected List<IProblem> getParseErrors(String source) throws CoreException
 	{
 		return getParseErrors(source, new HTMLParseState(source), IHTMLConstants.TIDY_PROBLEM);
+	}
+
+	class HTMLTidyValidatorInternal extends HTMLTidyValidator
+	{
+		private List<String> filters = new ArrayList<String>();
+
+		@Override
+		protected String getPreferenceNode()
+		{
+			return HTMLPlugin.PLUGIN_ID;
+		}
+
+		@Override
+		public String getId()
+		{
+			return ID;
+		}
+
+		public void addFilter(String filter)
+		{
+			filters.add(filter);
+		}
+
+		public void clearFilters()
+		{
+			filters.clear();
+		}
+
+		@Override
+		public List<String> getFilters()
+		{
+			return filters;
+		}
 	}
 }
