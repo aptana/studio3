@@ -288,19 +288,6 @@ public class CSSValidator extends AbstractBuildParticipant
 		}
 	}
 
-	private static boolean isIgnored(String message, List<String> expressions)
-	{
-		for (String expression : expressions)
-		{
-			if (message.matches(expression))
-			{
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 	/**
 	 * Adds the CSS warnings.
 	 * 
