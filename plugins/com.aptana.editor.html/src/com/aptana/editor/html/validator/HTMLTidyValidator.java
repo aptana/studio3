@@ -133,19 +133,6 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 		context.removeProblems(IHTMLConstants.TIDY_PROBLEM);
 	}
 
-	private static boolean isIgnored(String message, List<String> expressions)
-	{
-		for (String expression : expressions)
-		{
-			if (message.matches(expression))
-			{
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 	public void buildFile(BuildContext context, IProgressMonitor monitor)
 	{
 		if (context == null)
