@@ -86,7 +86,11 @@ public class JSLintValidatorPerformanceTest extends PerformanceTestCase
 				protected ParseResult parse(String contentType, IParseState parseState, WorkingParseResult working)
 						throws Exception
 				{
-					return new JSParser().parse(parseState);
+					if (reparseEveryTime())
+					{
+						return new JSParser().parse(parseState);
+					}
+					return super.parse(contentType, parseState, working);
 				}
 			};
 			// Don't measure reading in string...
@@ -100,6 +104,11 @@ public class JSLintValidatorPerformanceTest extends PerformanceTestCase
 		assertPerformance();
 	}
 
+	protected boolean reparseEveryTime()
+	{
+		return false;
+	}
+
 	public void testValidateUncompressedDojo() throws Exception
 	{
 		perfValidate("dojo.js.uncompressed.js", 10);
@@ -110,10 +119,10 @@ public class JSLintValidatorPerformanceTest extends PerformanceTestCase
 		perfValidate("dojo.js.minified.js", 10);
 	}
 
-	public void testValidateExtAllDev() throws Exception
-	{
-		perfValidate("ext/ext-all-dev.js", 10);
-	}
+//	public void testValidateExtAllDev() throws Exception
+//	{
+//		perfValidate("ext/ext-all-dev.js", 10);
+//	}
 
 	public void testValidateTiMobile() throws Exception
 	{
