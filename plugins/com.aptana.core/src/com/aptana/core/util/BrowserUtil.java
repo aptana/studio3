@@ -9,7 +9,10 @@ package com.aptana.core.util;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import at.jta.Key;
 import at.jta.RegistryErrorException;
@@ -37,6 +40,16 @@ public class BrowserUtil
 		{
 			return StringUtil.join("", "BrowserInfo[", browserName, ", ", browserLocation, "]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		}
+	}
+
+	private static final Map<String, String> MAC_BROWSER_LOCATIONS;
+	static
+	{
+		MAC_BROWSER_LOCATIONS = new HashMap<String, String>();
+		MAC_BROWSER_LOCATIONS.put("Chrome", "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"); //$NON-NLS-1$ //$NON-NLS-2$
+		MAC_BROWSER_LOCATIONS.put("Safari", "/Applications/Safari.app/Contents/MacOS/Safari"); //$NON-NLS-1$ //$NON-NLS-2$
+		MAC_BROWSER_LOCATIONS.put("Firefox", "/Applications/Firefox.app/Contents/MacOS/firefox-bin"); //$NON-NLS-1$ //$NON-NLS-2$
+		MAC_BROWSER_LOCATIONS.put("Opera", "/Applications/Opera.app/Contents/MacOS/Opera"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
@@ -89,6 +102,18 @@ public class BrowserUtil
 						{
 							regor.closeKey(key);
 						}
+					}
+				}
+			}
+			else if (PlatformUtil.isMac())
+			{
+				Set<String> browserNames = MAC_BROWSER_LOCATIONS.keySet();
+				for (String name : browserNames)
+				{
+					String location = MAC_BROWSER_LOCATIONS.get(name);
+					if (new File(location).exists())
+					{
+						browsers.add(new BrowserInfo(name, location));
 					}
 				}
 			}
