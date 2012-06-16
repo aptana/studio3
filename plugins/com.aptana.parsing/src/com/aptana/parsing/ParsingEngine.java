@@ -13,6 +13,7 @@ import org.eclipse.core.runtime.Assert;
 
 import com.aptana.core.epl.util.LRUCacheWithSoftPrunedValues;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.StringUtil;
 
 /**
  * This class is responsible for actually calling the parsing. It'll use the ParseState#getCacheKey() to know if an
@@ -183,20 +184,48 @@ public class ParsingEngine
 			IParserPool pool = null;
 			IParser parser = null;
 			boolean getResultFromCache = false;
-
+			boolean traceEnabled = IdeLog.isTraceEnabled(ParsingPlugin.getDefault(), IDebugScopes.PARSING);
 			try
 			{
 				synchronized (fParseCacheLock)
 				{
 					cacheValue = parseCache.get(newParseStateKey);
+
 					if (cacheValue != null && !cacheValue.requiresReparse(newParseStateKey))
 					{
+
+						if (traceEnabled)
+						{
+							IdeLog.logTrace(ParsingPlugin.getDefault(),
+									MessageFormat.format("Parsing cache hit for key {0}", newParseStateKey), //$NON-NLS-1$
+									IDebugScopes.PARSING);
+						}
+
 						// Cache hit... it may still be in progress, but the cacheValue.getResult should handle that
 						// (but we'll get out of the synchronized block to actually do that).
 						getResultFromCache = true;
 					}
 					else
 					{
+						if (cacheValue == null)
+						{
+							if (traceEnabled)
+							{
+								IdeLog.logTrace(ParsingPlugin.getDefault(),
+										MessageFormat.format("Parsing cache miss for key {0}", newParseStateKey), //$NON-NLS-1$
+										IDebugScopes.PARSING);
+							}
+						}
+						else if (cacheValue != null && cacheValue.requiresReparse(newParseStateKey))
+						{
+							if (traceEnabled)
+							{
+								IdeLog.logTrace(ParsingPlugin.getDefault(), MessageFormat.format(
+										"Parsing cache hit for key {0}, but reparse required", newParseStateKey), //$NON-NLS-1$
+										IDebugScopes.PARSING);
+							}
+						}
+
 						// No cache-hit, we'll do the parsing here.
 						pool = fParserPoolProvider.getParserPool(contentTypeId);
 
@@ -271,7 +300,17 @@ public class ParsingEngine
 				{
 					try
 					{
+						if (IdeLog.isTraceEnabled(ParsingPlugin.getDefault(), IDebugScopes.PARSING))
+						{
+							IdeLog.logTrace(ParsingPlugin.getDefault(), MessageFormat.format(
+									"Parsing content type {0}, length {1}, source ''{2}''", contentTypeId, //$NON-NLS-1$
+									parseState.getSource().length(), StringUtil.truncate(parseState.getSource(), 100)
+											.replaceAll("\\r|\\n", " ")), //$NON-NLS-1$ //$NON-NLS-2$
+									IDebugScopes.PARSING);
+						}
+
 						result = parser.parse(parseState);
+
 					}
 					finally
 					{
