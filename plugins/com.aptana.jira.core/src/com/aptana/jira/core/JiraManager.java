@@ -209,7 +209,6 @@ public class JiraManager
 				// If we're submitting against TC, we can't do version, we need to stuff that into the Environment
 				(TITANIUM_COMMUNITY.equals(projectKey) ? PARAM_ENVIRONMENT : PARAM_VERSION), getProjectVersion(),
 				PARAM_TYPE, type.getParameterValue(projectKey),
-				PARAM_PRIORITY, priority.toString(),
 				PARAM_SUMMARY, summary.replaceAll("\"", "'"),  //$NON-NLS-1$//$NON-NLS-2$
 				PARAM_FILE, desc.getAbsolutePath(),
 				"--custom", severity.getParameterValue() //$NON-NLS-1$
