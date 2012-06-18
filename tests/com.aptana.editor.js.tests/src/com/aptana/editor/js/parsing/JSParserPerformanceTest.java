@@ -247,10 +247,7 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	private void timeParse(String resourceName, String src, int numRuns) throws Exception
 	{
 		// apply to parse state
-		JSParseState parseState = new JSParseState();
-		parseState.setEditState(src);
-		parseState.setAttachComments(false);
-		parseState.setCollectComments(false);
+		JSParseState parseState = new JSParseState(src);
 
 		for (int i = 0; i < numRuns; i++)
 		{

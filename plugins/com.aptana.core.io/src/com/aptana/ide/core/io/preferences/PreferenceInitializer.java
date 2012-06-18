@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -24,8 +24,14 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 	public void initializeDefaultPreferences()
 	{
 		IEclipsePreferences prefs = EclipseUtil.defaultScope().getNode(CoreIOPlugin.PLUGIN_ID);
-		prefs.putLong(IPreferenceConstants.FILE_PERMISSION, DEFAULT_FILE_PERMISSIONS);
-		prefs.putLong(IPreferenceConstants.DIRECTORY_PERMISSION, DEFAULT_DIRECTORY_PERMISSIONS);
+		prefs.putBoolean(IPreferenceConstants.UPLOAD_UPDATE_PERMISSIONS, true);
+		prefs.putBoolean(IPreferenceConstants.UPLOAD_SPECIFIC_PERMISSIONS, true);
+		prefs.putLong(IPreferenceConstants.UPLOAD_FILE_PERMISSION, DEFAULT_FILE_PERMISSIONS);
+		prefs.putLong(IPreferenceConstants.UPLOAD_FOLDER_PERMISSION, DEFAULT_DIRECTORY_PERMISSIONS);
+		prefs.putBoolean(IPreferenceConstants.DOWNLOAD_UPDATE_PERMISSIONS, true);
+		prefs.putBoolean(IPreferenceConstants.DOWNLOAD_SPECIFIC_PERMISSIONS, true);
+		prefs.putLong(IPreferenceConstants.DOWNLOAD_FILE_PERMISSION, DEFAULT_FILE_PERMISSIONS);
+		prefs.putLong(IPreferenceConstants.DOWNLOAD_FOLDER_PERMISSION, DEFAULT_DIRECTORY_PERMISSIONS);
 		prefs.put(IPreferenceConstants.GLOBAL_CLOAKING_EXTENSIONS, DEFAULT_CLOAK_EXPRESSIONS);
 	}
 }

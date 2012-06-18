@@ -2,6 +2,7 @@ package com.aptana.editor.common.scripting.snippets;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.jface.text.ITextOperationTarget;
@@ -9,11 +10,10 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.swt.events.VerifyEvent;
 import org.osgi.framework.Bundle;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.EditorBasedTests;
-import com.aptana.scripting.model.BundleElement;
-import com.aptana.scripting.model.BundleManager;
-import com.aptana.scripting.model.SnippetElement;
+import com.aptana.scripting.model.CommandElement;
 
 public class ExpandSnippetVerifyKeyListenerTest extends EditorBasedTests
 {
@@ -45,17 +45,9 @@ public class ExpandSnippetVerifyKeyListenerTest extends EditorBasedTests
 	protected void assertVerifyKey(String documentSource, String snippetTrigger, char typedChar,
 			boolean listenerEnabled, boolean expectedOutcome) throws IOException
 	{
-		File bundleFile = File.createTempFile("common_projection_viewer_unit_tests", "rb");
-		bundleFile.deleteOnExit();
-
-		BundleElement bundleElement = new BundleElement(bundleFile.getAbsolutePath());
-		bundleElement.setDisplayName("CommonProjectionViewerTest Unit Tests");
 
 		File file = File.createTempFile("snippet", "rb");
-		SnippetElement se = createSnippet(file.getAbsolutePath(), "FunctionTemplate", snippetTrigger, "",
-				"text __dftl_partition_content_type");
-		bundleElement.addChild(se);
-		BundleManager.getInstance().addBundle(bundleElement);
+		final CommandElement se = createSnippet(file.getAbsolutePath(), "FunctionTemplate", snippetTrigger, "", "text");
 
 		IFileStore fileStore = createFileStore("proposal_tests", "txt", documentSource);
 		this.setupTestContext(fileStore);
@@ -64,7 +56,14 @@ public class ExpandSnippetVerifyKeyListenerTest extends EditorBasedTests
 		SnippetsContentAssistant snipContentAssistant = new SnippetsContentAssistant();
 		snipContentAssistant.install(viewer);
 		ExpandSnippetVerifyKeyListener listener = new ExpandSnippetVerifyKeyListener(editor, viewer,
-				snipContentAssistant);
+				snipContentAssistant)
+		{
+			@Override
+			protected List<CommandElement> getSnippetsInScope(int caretOffset)
+			{
+				return CollectionsUtil.newList(se);
+			}
+		};
 
 		// modify snippet assistance
 		listener.setEnabled(listenerEnabled);
@@ -74,14 +73,7 @@ public class ExpandSnippetVerifyKeyListenerTest extends EditorBasedTests
 		listener.verifyKey(ve);
 
 		// doit == false means we've popped CA
-		try
-		{
-			assertEquals(expectedOutcome, ve.doit);
-		}
-		finally
-		{
-			BundleManager.getInstance().unloadScript(file);
-		}
+		assertEquals(expectedOutcome, ve.doit);
 	}
 
 	/*

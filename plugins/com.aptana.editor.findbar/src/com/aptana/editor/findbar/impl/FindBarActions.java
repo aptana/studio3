@@ -53,6 +53,7 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.editor.findbar.FindBarPlugin;
 import com.aptana.editor.findbar.impl.FindBarDecorator.FindScope;
 import com.aptana.editor.findbar.preferences.IPreferencesConstants;
+import com.aptana.ui.keybinding.KeyBindingHelper;
 
 /**
  * Helper to manage the activation of actions. When some control of the find bar receives the focus, the binding service
@@ -109,6 +110,10 @@ public class FindBarActions
 	private HashMap<String, List<TriggerSequence>> fCommandToBinding;
 	private ITextEditor textEditor;
 	private WeakReference<FindBarDecorator> findBarDecorator;
+
+	// Map of context activations that the find bar is responsible for enabling/disabling contexts
+	private List<String> editorContextIds = new ArrayList<String>();
+	private List<IContextActivation> editorContextActivations = new ArrayList<IContextActivation>();
 
 	public FindBarActions(ITextEditor textEditor, FindBarDecorator findBarDecorator)
 	{
@@ -186,7 +191,6 @@ public class FindBarActions
 
 		// JDT actions
 		fCommandToHandler.put("org.eclipse.jdt.ui.navigate.open.type", null); //$NON-NLS-1$
-
 	}
 
 	/**
@@ -616,6 +620,8 @@ public class FindBarActions
 
 			service.addBindingManagerListener(fClearCommandToBindingOnChangesListener);
 			findBarContextActivation = contextService.activateContext("org.eclipse.ui.textEditorScope.findbar"); //$NON-NLS-1$
+
+			contextService.deactivateContexts(editorContextActivations);
 		}
 		else
 		{
@@ -628,6 +634,26 @@ public class FindBarActions
 				fHandlerActivations.clear();
 				contextService.deactivateContext(findBarContextActivation);
 				findBarContextActivation = null;
+			}
+
+			activateContexts(editorContextIds.toArray(new String[editorContextIds.size()]));
+		}
+	}
+
+	public void activateContexts(String[] contextIds)
+	{
+		if (textEditor != null)
+		{
+			IContextService contextService = (IContextService) textEditor.getSite().getService(IContextService.class);
+			if (contextService != null)
+			{
+				editorContextActivations.clear();
+				editorContextIds.clear();
+				for (String contextId : contextIds)
+				{
+					editorContextIds.add(contextId);
+					editorContextActivations.add(contextService.activateContext(contextId));
+				}
 			}
 		}
 	}

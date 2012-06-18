@@ -193,7 +193,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 				return super.detectIndentationLevel(document, offset);
 			}
 			String source = document.get();
-			IParseRootNode parseResult = ParserPoolFactory.parse(getMainContentType(), source);
+			IParseRootNode parseResult = ParserPoolFactory.parse(getMainContentType(), source).getRootNode();
 			if (parseResult != null)
 			{
 				final JSFormatterNodeBuilder builder = new JSFormatterNodeBuilder();
@@ -242,7 +242,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		IParseRootNode parseResult = null;
 		try
 		{
-			parseResult = ParserPoolFactory.parse(getMainContentType(), input);
+			parseResult = ParserPoolFactory.parse(getMainContentType(), input).getRootNode();
 		}
 		catch (Exception e)
 		{
@@ -308,12 +308,11 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		}
 		output = output.trim();
 		IParser parser = checkoutParser();
-		IParseState parseState = new ParseState();
-		parseState.setEditState(output);
+		IParseState parseState = new ParseState(output);
 		IParseRootNode outputParseResult = null;
 		try
 		{
-			outputParseResult = parser.parse(parseState);
+			outputParseResult = parser.parse(parseState).getRootNode();
 		}
 		catch (Exception e)
 		{
@@ -478,15 +477,16 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 	 * @see com.aptana.formatter.AbstractScriptFormatter#getOutputOnOffRegions(java.lang.String, java.lang.String,
 	 * java.lang.String, com.aptana.parsing.IParseState)
 	 */
-	protected List<IRegion> getOutputOnOffRegions(String output, String formatterOffPattern, String formatterOnPattern,
+	@Override
+	protected List<IRegion> getOutputOnOffRegions(String formatterOffPattern, String formatterOnPattern,
 			IParseState parseState)
 	{
+		String output = parseState.getSource();
 		IParser parser = checkoutParser();
-		parseState.setEditState(output);
 		List<IRegion> onOffRegions = null;
 		try
 		{
-			IParseRootNode parseResult = parser.parse(parseState);
+			IParseRootNode parseResult = parser.parse(parseState).getRootNode();
 			checkinParser(parser);
 			if (parseResult != null)
 			{

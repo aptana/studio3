@@ -45,8 +45,7 @@ public class XMLParserPerformanceTest extends PerformanceTestCase
 
 		for (int i = 0; i < 50; i++)
 		{
-			IParseState parseState = new ParseState();
-			parseState.setEditState(src);
+			IParseState parseState = new ParseState(src);
 			startMeasuring();
 			fParser.parse(parseState);
 			stopMeasuring();

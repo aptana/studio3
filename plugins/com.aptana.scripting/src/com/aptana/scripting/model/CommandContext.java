@@ -19,6 +19,7 @@ import java.util.Set;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
@@ -76,7 +77,7 @@ public class CommandContext
 								new Object[] { e.getMessage() }
 							);
 
-							ScriptingActivator.logError(message, e);
+							IdeLog.logError(ScriptingActivator.getDefault(), message, e);
 						}
 					}
 

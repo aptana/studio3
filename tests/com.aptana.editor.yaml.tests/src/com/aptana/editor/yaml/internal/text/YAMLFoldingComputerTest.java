@@ -42,11 +42,10 @@ public class YAMLFoldingComputerTest extends TestCase
 		{
 			protected IParseNode getAST()
 			{
-				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get());
+				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
-					return new YAMLParser().parse(parseState);
+					return new YAMLParser().parse(parseState).getRootNode();
 				}
 				catch (Exception e)
 				{

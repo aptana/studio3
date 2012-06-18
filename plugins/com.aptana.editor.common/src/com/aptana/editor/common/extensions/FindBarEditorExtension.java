@@ -112,6 +112,16 @@ public class FindBarEditorExtension
 	}
 
 	/**
+	 * Delegates the context activation to the find bar
+	 * 
+	 * @param contextIds
+	 */
+	public void activateContexts(String[] contextIds)
+	{
+		getFindBarDecorator().activateContexts(contextIds);
+	}
+
+	/**
 	 * Provide an adapter to IFindBarDecorator.
 	 */
 	@SuppressWarnings("rawtypes")

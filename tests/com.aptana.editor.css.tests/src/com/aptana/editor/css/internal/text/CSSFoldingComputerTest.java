@@ -25,6 +25,7 @@ import com.aptana.editor.css.preferences.IPreferenceConstants;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 
 public class CSSFoldingComputerTest extends TestCase
 {
@@ -53,11 +54,10 @@ public class CSSFoldingComputerTest extends TestCase
 		{
 			protected IParseNode getAST()
 			{
-				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get());
+				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
-					return new CSSParser().parse(parseState);
+					return parse(parseState);
 				}
 				catch (Exception e)
 				{
@@ -81,11 +81,10 @@ public class CSSFoldingComputerTest extends TestCase
 		{
 			protected IParseNode getAST()
 			{
-				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get());
+				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
-					return new CSSParser().parse(parseState);
+					return parse(parseState);
 				}
 				catch (Exception e)
 				{
@@ -107,11 +106,10 @@ public class CSSFoldingComputerTest extends TestCase
 		{
 			protected IParseNode getAST()
 			{
-				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get());
+				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
-					return new CSSParser().parse(parseState);
+					return parse(parseState);
 				}
 				catch (Exception e)
 				{
@@ -138,11 +136,10 @@ public class CSSFoldingComputerTest extends TestCase
 		{
 			protected IParseNode getAST()
 			{
-				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get());
+				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
-					return new CSSParser().parse(parseState);
+					return parse(parseState);
 				}
 				catch (Exception e)
 				{
@@ -169,11 +166,10 @@ public class CSSFoldingComputerTest extends TestCase
 		{
 			protected IParseNode getAST()
 			{
-				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get());
+				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
-					return new CSSParser().parse(parseState);
+					return parse(parseState);
 				}
 				catch (Exception e)
 				{
@@ -196,11 +192,10 @@ public class CSSFoldingComputerTest extends TestCase
 		{
 			protected IParseNode getAST()
 			{
-				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get());
+				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
-					return new CSSParser().parse(parseState);
+					return parse(parseState);
 				}
 				catch (Exception e)
 				{
@@ -222,11 +217,10 @@ public class CSSFoldingComputerTest extends TestCase
 		{
 			protected IParseNode getAST()
 			{
-				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get());
+				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
-					return new CSSParser().parse(parseState);
+					return parse(parseState);
 				}
 				catch (Exception e)
 				{
@@ -239,5 +233,10 @@ public class CSSFoldingComputerTest extends TestCase
 		Collection<Position> positions = annotations.values();
 		assertEquals(1, positions.size());
 		assertTrue(positions.contains(new Position(0, src.length())));
+	}
+
+	private IParseRootNode parse(IParseState parseState) throws Exception
+	{
+		return new CSSParser().parse(parseState).getRootNode();
 	}
 }

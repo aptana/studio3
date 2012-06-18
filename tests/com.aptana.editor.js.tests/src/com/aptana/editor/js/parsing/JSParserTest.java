@@ -23,9 +23,11 @@ import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.common.tests.util.ASTUtil;
 import com.aptana.editor.js.JSPlugin;
+import com.aptana.parsing.ParseResult;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseError;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.ast.ParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
 
@@ -34,13 +36,13 @@ public class JSParserTest extends TestCase
 	private static final String EOL = FileUtil.NEW_LINE;
 
 	private JSParser fParser;
-	private ParseState fParseState;
+
+	private ParseResult fParseResult;
 
 	@Override
 	protected void setUp() throws Exception
 	{
 		fParser = new JSParser();
-		fParseState = new ParseState();
 	}
 
 	/**
@@ -965,13 +967,11 @@ public class JSParserTest extends TestCase
 
 	public void testSingleLineComment() throws Exception
 	{
-		ParseState parseState = new ParseState();
 		String source = "// this is a single-line comment";
 
-		parseState.setEditState(source);
-		fParser.parse(parseState);
+		ParseState parseState = new ParseState(source);
 
-		IParseNode parseNode = parseState.getParseResult();
+		IParseNode parseNode = fParser.parse(parseState).getRootNode();
 		assertTrue(parseNode instanceof ParseRootNode);
 
 		ParseRootNode root = (ParseRootNode) parseNode;
@@ -1014,8 +1014,8 @@ public class JSParserTest extends TestCase
 	public void testNodeOffsetsAtEOF() throws Exception
 	{
 		String source = "a.foo()\n// this is a comment";
-		fParseState.setEditState(source);
-		IParseNode result = fParser.parse(fParseState);
+		ParseState parseState = new ParseState(source);
+		IParseNode result = parse(parseState);
 
 		assertNotNull(result);
 		assertEquals(1, result.getChildCount());
@@ -1054,14 +1054,19 @@ public class JSParserTest extends TestCase
 	 */
 	public void trimToSize() throws Exception
 	{
-		fParseState.setEditState(getSource("performance/ext/ext-all-debug-w-comments.js"));
-		ASTUtil.showBeforeAndAfterTrim(fParser.parse(fParseState));
+		ParseState parseState = new ParseState(getSource("performance/ext/ext-all-debug-w-comments.js"));
+		ASTUtil.showBeforeAndAfterTrim(parse(parseState));
+	}
+
+	private IParseRootNode parse(ParseState parseState) throws Exception
+	{
+		return fParser.parse(parseState).getRootNode();
 	}
 
 	// utility methods
 	protected void assertParseErrors(String... messages)
 	{
-		List<IParseError> errors = fParseState.getErrors();
+		List<IParseError> errors = fParseResult.getErrors();
 		assertNotNull(errors);
 		assertEquals(messages.length, errors.size());
 
@@ -1078,9 +1083,10 @@ public class JSParserTest extends TestCase
 
 	protected void assertParseResult(String source, String expected) throws Exception
 	{
-		fParseState.setEditState(source);
+		ParseState parseState = new ParseState(source);
 
-		IParseNode result = fParser.parse(fParseState);
+		fParseResult = fParser.parse(parseState);
+		IParseNode result = fParseResult.getRootNode();
 		StringBuilder text = new StringBuilder();
 		IParseNode[] children = result.getChildren();
 		for (IParseNode child : children)

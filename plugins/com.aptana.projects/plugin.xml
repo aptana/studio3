@@ -77,7 +77,7 @@
             icon="icons/new_web_project.png"
             id="com.aptana.ui.wizards.NewWebProject"
             name="%wizard.webproject.name"
-            preferredPerspectives="com.aptana.ui.WebPerspective"
+            preferredPerspectives="com.aptana.ui.WebPerspective,com.appcelerator.titanium.ui.StudioPerspective"
             project="true">
          <description>
             %wizard.webproject.description

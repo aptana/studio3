@@ -2,7 +2,7 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
-         point="com.aptana.deploy.deployWizards">
+         point="com.aptana.deploy.epl.deployWizards">
       <wizard
             class="com.aptana.deploy.ftp.ui.wizard.FTPDeployWizard"
             icon="icons/ftp16.png"

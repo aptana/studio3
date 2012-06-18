@@ -80,9 +80,7 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener
 				if (!Character.isWhitespace(previousChar))
 				{
 					int caretOffset = textViewer.getTextWidget().getCaretOffset();
-					String scope = getScope(textViewer, caretOffset);
-					AndFilter filter = new AndFilter(new ScopeFilter(scope), new HasTriggerFilter());
-					List<CommandElement> commandsFromScope = getBundleManager().getExecutableCommands(filter);
+					List<CommandElement> commandsFromScope = getSnippetsInScope(caretOffset);
 					if (!CollectionsUtil.isEmpty(commandsFromScope))
 					{
 						// chop off portions of prefix from beginning until we have a match!
@@ -106,7 +104,13 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener
 				return;
 			}
 		}
+	}
 
+	protected List<CommandElement> getSnippetsInScope(int caretOffset)
+	{
+		String scope = getScope(textViewer, caretOffset);
+		AndFilter filter = new AndFilter(new ScopeFilter(scope), new HasTriggerFilter());
+		return getBundleManager().getExecutableCommands(filter);
 	}
 
 	protected ITextSelection getSelection()
@@ -162,7 +166,7 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener
 		return enableSnippetProposals;
 	}
 
-	private static boolean canModifyEditor(ITextEditor editor)
+	private boolean canModifyEditor(ITextEditor editor)
 	{
 		if (editor instanceof ITextEditorExtension2)
 		{
@@ -179,7 +183,7 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener
 		return false;
 	}
 
-	private static String getScope(ITextViewer viewer, int offset)
+	private String getScope(ITextViewer viewer, int offset)
 	{
 		String scope = StringUtil.EMPTY;
 		try
@@ -193,7 +197,7 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener
 		return scope;
 	}
 
-	protected static IDocumentScopeManager getDocumentScopeManager()
+	protected IDocumentScopeManager getDocumentScopeManager()
 	{
 		return CommonEditorPlugin.getDefault().getDocumentScopeManager();
 	}

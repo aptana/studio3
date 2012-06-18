@@ -25,8 +25,7 @@ public class HTMLOpenTagCloser extends OpenTagCloser
 
 	protected boolean isEmptyTagType(IDocument doc, String tagName)
 	{
-		HTMLParseState state = new HTMLParseState();
-		state.setEditState(doc.get(), 0);
+		HTMLParseState state = new HTMLParseState(doc.get());
 		return state.isEmptyTagType(tagName);
 	}
 

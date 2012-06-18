@@ -16,6 +16,7 @@ import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.HTMLParser;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 
 public class HTMLFoldingComputerTest extends TestCase
 {
@@ -89,11 +90,10 @@ public class HTMLFoldingComputerTest extends TestCase
 		{
 			protected IParseNode getAST()
 			{
-				IParseState parseState = new HTMLParseState();
-				parseState.setEditState(getDocument().get());
+				IParseState parseState = new HTMLParseState(getDocument().get());
 				try
 				{
-					return new HTMLParser().parse(parseState);
+					return parse(parseState);
 				}
 				catch (Exception e)
 				{
@@ -104,5 +104,10 @@ public class HTMLFoldingComputerTest extends TestCase
 		};
 		Map<ProjectionAnnotation, Position> annotations = folder.emitFoldingRegions(false, new NullProgressMonitor());
 		return annotations;
+	}
+
+	private IParseRootNode parse(IParseState parseState) throws Exception
+	{
+		return new HTMLParser().parse(parseState).getRootNode();
 	}
 }

@@ -48,7 +48,7 @@ public class PasswordProvider extends org.eclipse.equinox.security.storage.provi
 	private static final String ALGORITHM = "AES/ECB/PKCS5Padding"; //$NON-NLS-1$
 	private static final String ENCODING = "UTF-8"; //$NON-NLS-1$
 	private static final int BYTE_ARRAY_SIZE = 1024;
-	
+
 	private String accountName = System.getProperty("user.home"); //$NON-NLS-1$
 
 	@Override
@@ -76,7 +76,7 @@ public class PasswordProvider extends org.eclipse.equinox.security.storage.provi
 			Object prompt = container.getOption(IProviderHints.PROMPT_USER);
 			if (prompt != null && !Boolean.parseBoolean(prompt.toString()))
 			{
-				return null;
+				return new PBEKeySpec(new char[0]);
 			}
 			final String[] result = new String[1];
 			PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable()

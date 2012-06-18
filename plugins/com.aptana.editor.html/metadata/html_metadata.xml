@@ -12683,6 +12683,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <value name="start" description="Linked document is the first document in an ordered set."/>
         <value name="stylesheet" description="Linked document is a stylesheet."/>
         <value name="subsection" description="Linked document is a subsection."/>
+        <value name="*" description="Any text value"/>
       </values>
     </attribute>
     <attribute name="required" type="String">
@@ -12722,9 +12723,10 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <value name="next" description="This document is the next document in an ordered set."/>
         <value name="prev" description="This document is the previous document in an ordered set."/>
         <value name="section" description="This document is a section."/>
-        <value name="start" description="This docuement is the first document in an ordered set."/>
+        <value name="start" description="This document is the first document in an ordered set."/>
         <value name="stylesheet" description="This document is a stylesheet."/>
         <value name="subsection" description="This document is a subsection."/>
+        <value name="*" description="Any text value"/>
       </values>
     </attribute>
     <attribute name="reversed" type="Boolean">

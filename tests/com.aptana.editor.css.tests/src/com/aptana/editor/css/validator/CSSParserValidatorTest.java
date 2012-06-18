@@ -34,7 +34,7 @@ public class CSSParserValidatorTest extends AbstractValidatorTestCase
 
 	protected List<IProblem> getParseErrors(String source) throws CoreException
 	{
-		return getParseErrors(source, new ParseState(), ICSSConstants.CSS_PROBLEM);
+		return getParseErrors(source, new ParseState(source), ICSSConstants.CSS_PROBLEM);
 	}
 
 	public void testCSSParseErrors() throws CoreException

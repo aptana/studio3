@@ -49,7 +49,7 @@ public class CSSValidatorTest extends AbstractValidatorTestCase
 
 	protected List<IProblem> getParseErrors(String source) throws CoreException
 	{
-		return getParseErrors(source, new ParseState(), ICSSConstants.W3C_PROBLEM);
+		return getParseErrors(source, new ParseState(source), ICSSConstants.W3C_PROBLEM);
 	}
 
 	public void testCSS3TransitionProperty() throws CoreException

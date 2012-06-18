@@ -377,14 +377,16 @@ public class BundleManager
 					}
 					else
 					{
-						ScriptingActivator.logError(
-								Messages.BundleManager_USER_PATH_NOT_READ_WRITE + f.getAbsolutePath(), null);
+						IdeLog.logError(
+								ScriptingActivator.getDefault(),
+								MessageFormat.format(Messages.BundleManager_USER_PATH_NOT_READ_WRITE,
+										f.getAbsolutePath()));
 					}
 				}
 				else
 				{
-					ScriptingActivator.logError(Messages.BundleManager_USER_PATH_NOT_DIRECTORY + f.getAbsolutePath(),
-							null);
+					IdeLog.logError(ScriptingActivator.getDefault(),
+							MessageFormat.format(Messages.BundleManager_USER_PATH_NOT_DIRECTORY, f.getAbsolutePath()));
 				}
 			}
 			else
@@ -396,6 +398,11 @@ public class BundleManager
 			if (validUserBundlePath)
 			{
 				this.userBundlesPath = f.getAbsolutePath();
+			}
+			else
+			{
+				IdeLog.logError(ScriptingActivator.getDefault(),
+						MessageFormat.format(Messages.BundleManager_USER_PATH_NOT_DIRECTORY, f.getAbsolutePath()));
 			}
 		}
 
@@ -644,7 +651,8 @@ public class BundleManager
 				}
 				catch (Throwable t)
 				{
-					ScriptingActivator.logError(Messages.BundleManager_Bundle_Became_Hidden_Event_Error, t);
+					IdeLog.logError(ScriptingActivator.getDefault(),
+							Messages.BundleManager_Bundle_Became_Hidden_Event_Error, t);
 				}
 			}
 		}
@@ -669,7 +677,8 @@ public class BundleManager
 				}
 				catch (Throwable t)
 				{
-					ScriptingActivator.logError(Messages.BundleManager_Bundle_Became_Visible_Event_Error, t);
+					IdeLog.logError(ScriptingActivator.getDefault(),
+							Messages.BundleManager_Bundle_Became_Visible_Event_Error, t);
 				}
 			}
 		}
@@ -694,7 +703,8 @@ public class BundleManager
 				}
 				catch (Throwable t)
 				{
-					ScriptingActivator.logError(Messages.BundleManager_Element_Became_Hidden_Event_Error, t);
+					IdeLog.logError(ScriptingActivator.getDefault(),
+							Messages.BundleManager_Element_Became_Hidden_Event_Error, t);
 				}
 			}
 		}
@@ -719,7 +729,8 @@ public class BundleManager
 				}
 				catch (Throwable t)
 				{
-					ScriptingActivator.logError(Messages.BundleManager_Element_Became_Visible_Event_Error, t);
+					IdeLog.logError(ScriptingActivator.getDefault(),
+							Messages.BundleManager_Element_Became_Visible_Event_Error, t);
 				}
 			}
 		}
@@ -744,7 +755,8 @@ public class BundleManager
 				}
 				catch (Throwable t)
 				{
-					ScriptingActivator.logError(Messages.BundleManager_Script_Loaded_Event_Error, t);
+					IdeLog.logError(ScriptingActivator.getDefault(), Messages.BundleManager_Script_Loaded_Event_Error,
+							t);
 				}
 			}
 		}
@@ -769,7 +781,8 @@ public class BundleManager
 				}
 				catch (Throwable t)
 				{
-					ScriptingActivator.logError(Messages.BundleManager_Script_Reloaded_Event_Error, t);
+					IdeLog.logError(ScriptingActivator.getDefault(),
+							Messages.BundleManager_Script_Reloaded_Event_Error, t);
 				}
 			}
 		}
@@ -794,7 +807,8 @@ public class BundleManager
 				}
 				catch (Throwable t)
 				{
-					ScriptingActivator.logError(Messages.BundleManager_Script_Unloaded_Event_Error, t);
+					IdeLog.logError(ScriptingActivator.getDefault(),
+							Messages.BundleManager_Script_Unloaded_Event_Error, t);
 				}
 			}
 		}

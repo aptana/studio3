@@ -8,16 +8,17 @@ Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
  org.eclipse.equinox.security,
+ com.aptana.core;bundle-version="3.0.4",
+ com.aptana.git.core,
+ com.aptana.deploy,
  org.eclipse.jface,
  org.eclipse.ui,
  org.eclipse.ui.browser,
-  com.aptana.core;bundle-version="3.0.4",
  com.aptana.ui,
- com.aptana.deploy,
- com.aptana.git.core,
  com.aptana.scripting,
  com.aptana.usage,
- com.aptana.terminal
+ com.aptana.terminal,
+ com.aptana.deploy.ui
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.deploy.heroku

@@ -51,7 +51,6 @@ public class JiraManager
 	private static final String PARAM_PROJECT = "--project"; //$NON-NLS-1$
 	private static final String PARAM_VERSION = "--affectsVersions"; //$NON-NLS-1$
 	private static final String PARAM_TYPE = "--type"; //$NON-NLS-1$
-	private static final String PARAM_PRIORITY = "--priority"; //$NON-NLS-1$
 	private static final String PARAM_SUMMARY = "--summary"; //$NON-NLS-1$
 	//private static final String PARAM_DESCRIPTION = "--description"; //$NON-NLS-1$
 	private static final String PARAM_ISSUE = "--issue"; //$NON-NLS-1$
@@ -150,6 +149,25 @@ public class JiraManager
 	}
 
 	/**
+	 * Logs current user out of JIRA in Studio.
+	 */
+	public void logout()
+	{
+		ISecurePreferences prefs = getSecurePreferences();
+		try
+		{
+			prefs.remove(USERNAME);
+			prefs.remove(PASSWORD);
+			prefs.flush();
+			user = null;
+		}
+		catch (Exception e)
+		{
+			IdeLog.logError(JiraCorePlugin.getDefault(), "Failed to log out Jira user", e); //$NON-NLS-1$
+		}
+	}
+
+	/**
 	 * Creates a JIRA ticket.
 	 * 
 	 * @param type
@@ -166,8 +184,8 @@ public class JiraManager
 	 * @throws JiraException
 	 * @throws IOException
 	 */
-	public JiraIssue createIssue(JiraIssueType type, JiraIssuePriority priority, JiraIssueSeverity severity,
-			String summary, String description) throws JiraException, IOException
+	public JiraIssue createIssue(JiraIssueType type, JiraIssueSeverity severity, String summary, String description)
+			throws JiraException, IOException
 	{
 		if (user == null)
 		{

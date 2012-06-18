@@ -41,13 +41,25 @@ public class JSParseState extends ParseState
 	private Stack<CommentContext> commentContentStack;
 
 	/**
+	 * In this constructor, startingOffset is considered 0 and comments won't be attached 
+	 * nor collected.
+	 */
+	public JSParseState(String source)
+	{
+		this(source, 0, false, false);
+	}
+
+	/**
 	 * JSParseState
 	 */
-	public JSParseState()
+	public JSParseState(String source, int startingOffset, boolean attachComments, boolean collectComments)
 	{
+		super(source, startingOffset);
 		commentContentStack = new Stack<CommentContext>();
 
 		commentContentStack.push(new CommentContext());
+		setAttachComments(attachComments);
+		setCollectComments(collectComments);
 	}
 
 	/**
@@ -108,7 +120,7 @@ public class JSParseState extends ParseState
 	 * 
 	 * @param flag
 	 */
-	public void setAttachComments(boolean flag)
+	private void setAttachComments(boolean flag)
 	{
 		commentContentStack.peek().attachComments = flag;
 	}
@@ -118,7 +130,7 @@ public class JSParseState extends ParseState
 	 * 
 	 * @param flag
 	 */
-	public void setCollectComments(boolean flag)
+	private void setCollectComments(boolean flag)
 	{
 		commentContentStack.peek().attachComments = flag;
 	}

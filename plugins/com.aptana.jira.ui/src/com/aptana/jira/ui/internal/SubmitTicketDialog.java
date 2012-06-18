@@ -34,6 +34,8 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
@@ -48,7 +50,6 @@ import org.eclipse.swt.widgets.Text;
 import com.aptana.core.CoreStrings;
 import com.aptana.core.util.StringUtil;
 import com.aptana.jira.core.JiraCorePlugin;
-import com.aptana.jira.core.JiraIssuePriority;
 import com.aptana.jira.core.JiraIssueSeverity;
 import com.aptana.jira.core.JiraIssueType;
 import com.aptana.jira.core.JiraManager;
@@ -68,7 +69,6 @@ public class SubmitTicketDialog extends TitleAreaDialog
 	private JiraPreferencePageProvider userInfoProvider;
 	private Control userInfoControl;
 	private ComboViewer typeCombo;
-	private ComboViewer priorityCombo;
 	private ComboViewer severityCombo;
 	private Text summaryText;
 	private Text reproduceText;
@@ -83,7 +83,6 @@ public class SubmitTicketDialog extends TitleAreaDialog
 	private ProgressMonitorPart progressMonitorPart;
 
 	private JiraIssueType type;
-	private JiraIssuePriority priority;
 	private JiraIssueSeverity severity;
 	private String summary;
 	private String description;
@@ -106,11 +105,6 @@ public class SubmitTicketDialog extends TitleAreaDialog
 	public JiraIssueType getType()
 	{
 		return type;
-	}
-
-	public JiraIssuePriority getPriority()
-	{
-		return priority;
 	}
 
 	public JiraIssueSeverity getSeverity()
@@ -175,11 +169,10 @@ public class SubmitTicketDialog extends TitleAreaDialog
 		Label separator = new Label(main, SWT.HORIZONTAL | SWT.SEPARATOR);
 		separator.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).span(2, 1).create());
 
-		// adds control for login credentials if this is first time use
+		// adds control for login credentials
 		userInfoProvider = new JiraPreferencePageProvider();
 		userInfoControl = userInfoProvider.createContents(main);
-		userInfoControl.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).span(2, 1)
-				.exclude(getJiraManager().getUser() != null).create());
+		userInfoControl.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).span(2, 1).create());
 
 		// issue type
 		Label label = new Label(main, SWT.NONE);
@@ -200,20 +193,6 @@ public class SubmitTicketDialog extends TitleAreaDialog
 			}
 		};
 		typeCombo.addSelectionChangedListener(listener);
-
-		// TODO Do we want to hide priority from users?
-		// priority
-		label = new Label(main, SWT.NONE);
-		label.setText(StringUtil.makeFormLabel(Messages.SubmitTicketDialog_LBL_Priority));
-		label.setLayoutData(GridDataFactory.swtDefaults().create());
-
-		priorityCombo = new ComboViewer(main, SWT.DROP_DOWN | SWT.READ_ONLY);
-		priorityCombo.setContentProvider(ArrayContentProvider.getInstance());
-		priorityCombo.setLabelProvider(new LabelProvider());
-		priorityCombo.setInput(JiraIssuePriority.values());
-		priorityCombo.getControl().setLayoutData(GridDataFactory.swtDefaults().create());
-		priorityCombo.setSelection(new StructuredSelection(JiraIssuePriority.MEDIUM));
-		priorityCombo.addSelectionChangedListener(listener);
 
 		// FIXME Severity doesn't apply for Story in Studio tracker
 		// severity
@@ -254,6 +233,15 @@ public class SubmitTicketDialog extends TitleAreaDialog
 		reproduceText = new Text(main, SWT.BORDER | SWT.MULTI);
 		reproduceText.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).hint(SWT.DEFAULT, 100).create());
 		reproduceText.addModifyListener(modifyListener);
+		TraverseListener traverseListener = new TraverseListener()
+		{
+
+			public void keyTraversed(TraverseEvent e)
+			{
+				e.doit = true;
+			}
+		};
+		reproduceText.addTraverseListener(traverseListener);
 
 		// Actual Result
 		label = new Label(main, SWT.NONE);
@@ -263,6 +251,7 @@ public class SubmitTicketDialog extends TitleAreaDialog
 		actualResultText = new Text(main, SWT.BORDER | SWT.MULTI);
 		actualResultText.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).hint(SWT.DEFAULT, 50).create());
 		actualResultText.addModifyListener(modifyListener);
+		actualResultText.addTraverseListener(traverseListener);
 
 		// Expected Result
 		label = new Label(main, SWT.NONE);
@@ -273,6 +262,7 @@ public class SubmitTicketDialog extends TitleAreaDialog
 		expectedResultText
 				.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).hint(SWT.DEFAULT, 50).create());
 		expectedResultText.addModifyListener(modifyListener);
+		expectedResultText.addTraverseListener(traverseListener);
 
 		// logs to attach
 		label = new Label(main, SWT.NONE);
@@ -359,16 +349,6 @@ public class SubmitTicketDialog extends TitleAreaDialog
 			public void postValidationEnd()
 			{
 				setUILocked(false);
-				// hides the control for entering user credentials if the user is validated
-				if (!userInfoControl.isDisposed())
-				{
-					boolean isValidated = (getJiraManager().getUser() != null);
-					if (isValidated)
-					{
-						userInfoControl.setVisible(false);
-						((GridData) userInfoControl.getLayoutData()).exclude = true;
-					}
-				}
 				if (!progressMonitorPart.isDisposed())
 				{
 					progressMonitorPart.setVisible(false);
@@ -403,12 +383,11 @@ public class SubmitTicketDialog extends TitleAreaDialog
 	@Override
 	protected void okPressed()
 	{
-		if (!((GridData) userInfoControl.getLayoutData()).exclude && !userInfoProvider.performOk())
+		if (!userInfoProvider.performOk())
 		{
 			return;
 		}
 		type = (JiraIssueType) ((IStructuredSelection) typeCombo.getSelection()).getFirstElement();
-		priority = (JiraIssuePriority) ((IStructuredSelection) priorityCombo.getSelection()).getFirstElement();
 		severity = (JiraIssueSeverity) ((IStructuredSelection) severityCombo.getSelection()).getFirstElement();
 		summary = summaryText.getText();
 		description = MessageFormat.format(
@@ -426,10 +405,6 @@ public class SubmitTicketDialog extends TitleAreaDialog
 		if (typeCombo.getSelection().isEmpty())
 		{
 			message = Messages.SubmitTicketDialog_ERR_EmptyType;
-		}
-		if (priorityCombo.getSelection().isEmpty())
-		{
-			message = Messages.SubmitTicketDialog_ERR_EmptyPriority;
 		}
 		else if (StringUtil.isEmpty(summaryText.getText()))
 		{
@@ -524,7 +499,7 @@ public class SubmitTicketDialog extends TitleAreaDialog
 			return;
 		}
 		typeCombo.getCombo().setEnabled(!locked);
-		priorityCombo.getCombo().setEnabled(!locked);
+		severityCombo.getCombo().setEnabled(!locked);
 		summaryText.setEnabled(!locked);
 		reproduceText.setEnabled(!locked);
 		actualResultText.setEnabled(!locked);

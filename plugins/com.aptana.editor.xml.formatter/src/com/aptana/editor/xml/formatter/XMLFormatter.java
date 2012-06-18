@@ -75,7 +75,7 @@ public class XMLFormatter extends AbstractScriptFormatter implements IScriptForm
 			}
 
 			String source = document.get();
-			IParseRootNode parseResult = ParserPoolFactory.parse(getMainContentType(), source);
+			IParseRootNode parseResult = ParserPoolFactory.parse(getMainContentType(), source).getRootNode();
 			if (parseResult != null)
 			{
 				final XMLFormatterNodeBuilder builder = new XMLFormatterNodeBuilder();
@@ -116,7 +116,7 @@ public class XMLFormatter extends AbstractScriptFormatter implements IScriptForm
 			IParseRootNode parseResult = null;
 			try
 			{
-				parseResult = ParserPoolFactory.parse(getMainContentType(), input);
+				parseResult = ParserPoolFactory.parse(getMainContentType(), input).getRootNode();
 			}
 			catch (Exception e)
 			{

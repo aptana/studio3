@@ -6,8 +6,10 @@ Bundle-Version: 3.0.0.qualifier
 Bundle-Vendor: %providerName
 Bundle-ClassPath: .,
  derby.jar,
- uuid.jar
-Export-Package: com.eaio.uuid,
+ uuid.jar,
+ WinRegistry-4.4.jar
+Export-Package: at.jta,
+ com.eaio.uuid,
  org.apache.derby.authentication,
  org.apache.derby.catalog,
  org.apache.derby.catalog.types,

@@ -1,24 +1,18 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.parsing;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 
 import com.aptana.core.util.ImmutableTupleN;
 import com.aptana.core.util.StringUtil;
-import com.aptana.parsing.ast.IParseError;
-import com.aptana.parsing.ast.IParseRootNode;
+import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
 
 public class ParseState implements IParseState
@@ -26,13 +20,9 @@ public class ParseState implements IParseState
 
 	private String fSource;
 	private int fStartingOffset;
-	private List<IParseError> fErrors;
 
 	private IRange[] fSkippedRanges;
-	private Map<String, Object> fProperties;
 
-	// represents the root node of the parsing result
-	private IParseRootNode fParseResult;
 	private IProgressMonitor fProgressMonitor;
 
 	/**
@@ -41,61 +31,34 @@ public class ParseState implements IParseState
 	 */
 	private ImmutableTupleN fCacheKey;
 
-	public ParseState()
+	public ParseState(String source)
 	{
-		fSource = StringUtil.EMPTY;
-		fProperties = new HashMap<String, Object>();
-		fErrors = new ArrayList<IParseError>();
-		fCacheKey = new ImmutableTupleN();
+		this(source, 0);
 	}
 
-	public void clearEditState()
+	public ParseState(String source, int startingOffset)
 	{
-		fSource = null;
-		fSkippedRanges = null;
+		this(source, startingOffset, null);
 	}
 
-	public IParseRootNode getParseResult()
-	{
-		return fParseResult;
-	}
-
-	public String getSource()
-	{
-		return fSource;
-	}
-
-	public int getStartingOffset()
-	{
-		return fStartingOffset;
-	}
-
-	public IRange[] getSkippedRanges()
-	{
-		return fSkippedRanges;
-	}
-
-	public Map<String, Object> getProperties()
-	{
-		return fProperties;
-	}
-
-	public void setEditState(String source)
-	{
-		setEditState(source, 0);
-	}
-
-	public void setEditState(String source, int startingOffset)
+	public ParseState(String source, int startingOffset, IRange[] ranges)
 	{
 		fSource = (source != null) ? source : StringUtil.EMPTY;
 		fStartingOffset = startingOffset;
-		fSkippedRanges = null;
+		fSkippedRanges = ranges;
+		fCacheKey = calculateCacheKey();
+	}
 
+	/**
+	 * @return the cache-key to be used. Subclasses may override.
+	 */
+	protected ImmutableTupleN calculateCacheKey()
+	{
 		int length = fSource.length();
 		if (length < 11)
 		{
 			// If it's a small string, just keep it instead of using the hashCode().
-			fCacheKey = new ImmutableTupleN(length, fSource, fStartingOffset);
+			return new ImmutableTupleN(length, fSource, fStartingOffset);
 		}
 		else
 		{
@@ -113,19 +76,36 @@ public class ParseState implements IParseState
 			chars[3] = fSource.charAt((int) (3 * factor));
 			chars[4] = fSource.charAt(length - 1); // last char
 
-			fCacheKey = new ImmutableTupleN(length, fSource.hashCode(), new String(chars), fStartingOffset);
+			return new ImmutableTupleN(length, fSource.hashCode(), new String(chars), fStartingOffset);
 		}
 	}
 
-	public void setParseResult(IParseRootNode result)
+	public void clearEditState()
 	{
-		fParseResult = result;
+		fSource = null;
+		fSkippedRanges = null;
 	}
 
-	public void setSkippedRanges(IRange[] ranges)
+	public String getSource()
 	{
-		fSkippedRanges = ranges;
+		return fSource;
 	}
+
+	public int getStartingOffset()
+	{
+		return fStartingOffset;
+	}
+
+	public void setSkippedRanges(IParseNode[] skippedRanges)
+	{
+		fSkippedRanges = skippedRanges;
+	}
+
+	public IRange[] getSkippedRanges()
+	{
+		return fSkippedRanges;
+	}
+
 
 	/*
 	 * (non-Javadoc)
@@ -153,38 +133,6 @@ public class ParseState implements IParseState
 		return text.toString();
 	}
 
-	protected void addProperty(String key, Object value)
-	{
-		fProperties.put(key, value);
-	}
-
-	public List<IParseError> getErrors()
-	{
-		return new ArrayList<IParseError>(fErrors);
-	}
-
-	public void copyErrorsFrom(IParseState cachedParseState)
-	{
-		for (IParseError error : cachedParseState.getErrors())
-		{
-			addError(error);
-		}
-	}
-
-	public void addError(IParseError error)
-	{
-		fErrors.add(error);
-	}
-
-	public void clearErrors()
-	{
-		fErrors.clear();
-	}
-
-	public void removeError(IParseError error)
-	{
-		fErrors.remove(error);
-	}
 
 	public IParseStateCacheKey getCacheKey(String contentTypeId)
 	{

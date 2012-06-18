@@ -270,7 +270,7 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 	 */
 	protected List<IRegion> getOutputOnOffRegions(String output, String formatterOffPattern, String formatterOnPattern)
 	{
-		return getOutputOnOffRegions(output, formatterOffPattern, formatterOnPattern, new ParseState());
+		return getOutputOnOffRegions(formatterOffPattern, formatterOnPattern, new ParseState(output));
 	}
 
 	/**
@@ -289,16 +289,26 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 	 *            An {@link IParseState} that will be used when parsing the output.
 	 * @return The formatter On-Off regions that we have in the output source.
 	 */
-	protected List<IRegion> getOutputOnOffRegions(String output, String formatterOffPattern, String formatterOnPattern,
+	protected List<IRegion> getOutputOnOffRegions(String formatterOffPattern, String formatterOnPattern,
 			IParseState parseState)
 	{
-		IParser parser = checkoutParser();
-		parseState.setEditState(output);
+		String output = parseState.getSource();
 		List<IRegion> onOffRegions = null;
 		try
 		{
-			IParseRootNode parseResult = parser.parse(parseState);
-			checkinParser(parser);
+			IParseRootNode parseResult = null;
+			IParser parser = checkoutParser();
+			try
+			{
+				if (parser != null)
+				{
+					parseResult = parser.parse(parseState).getRootNode();
+				}
+			}
+			finally
+			{
+				checkinParser(parser);
+			}
 			if (parseResult != null)
 			{
 				IParseNode[] commentNodes = parseResult.getCommentNodes();

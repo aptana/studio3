@@ -31,7 +31,6 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.jira.core.JiraCorePlugin;
 import com.aptana.jira.core.JiraException;
 import com.aptana.jira.core.JiraIssue;
-import com.aptana.jira.core.JiraIssuePriority;
 import com.aptana.jira.core.JiraIssueSeverity;
 import com.aptana.jira.core.JiraIssueType;
 import com.aptana.jira.core.JiraManager;
@@ -53,7 +52,6 @@ public class SubmitTicketHandler extends AbstractHandler
 		{
 			// runs in a job since it could be long-running
 			final JiraIssueType type = dialog.getType();
-			final JiraIssuePriority priority = dialog.getPriority();
 			final JiraIssueSeverity severity = dialog.getSeverity();
 			final String summary = dialog.getSummary();
 			final String description = dialog.getDescription();
@@ -71,7 +69,7 @@ public class SubmitTicketHandler extends AbstractHandler
 					JiraIssue issue = null;
 					try
 					{
-						issue = manager.createIssue(type, priority, severity, summary, description);
+						issue = manager.createIssue(type, severity, summary, description);
 					}
 					catch (final JiraException e)
 					{

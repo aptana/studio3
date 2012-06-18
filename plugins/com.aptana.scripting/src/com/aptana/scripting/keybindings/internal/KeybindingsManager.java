@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -31,7 +31,6 @@ import org.eclipse.jface.bindings.Binding;
 import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.jface.bindings.keys.KeyStroke;
-import org.eclipse.jface.bindings.keys.SWTKeySupport;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.swt.SWT;
@@ -64,6 +63,8 @@ import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.progress.WorkbenchJob;
 import org.eclipse.ui.services.IEvaluationService;
 
+import com.aptana.core.logging.IdeLog;
+import com.aptana.ui.keybinding.KeyBindingHelper;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.keybindings.ICommandElementsProvider;
@@ -114,9 +115,7 @@ public class KeybindingsManager implements LoadCycleListener
 				return;
 			}
 
-			// Is this a complete KeyStroke
-			if (!SWTKeySupport.convertAcceleratorToKeyStroke(SWTKeySupport.convertEventToUnmodifiedAccelerator(event))
-					.isComplete())
+			if (!KeyBindingHelper.isKeyEventComplete(event))
 			{
 				return;
 			}
@@ -186,7 +185,8 @@ public class KeybindingsManager implements LoadCycleListener
 	{
 		public void contextManagerChanged(ContextManagerEvent contextManagerEvent)
 		{
-			setEnabled(contextManagerEvent.getContextManager().getActiveContextIds().contains(ScriptingActivator.SCRIPTING_CONTEXT_ID));
+			setEnabled(contextManagerEvent.getContextManager().getActiveContextIds()
+					.contains(ScriptingActivator.SCRIPTING_CONTEXT_ID));
 		}
 	};
 
@@ -688,7 +688,7 @@ public class KeybindingsManager implements LoadCycleListener
 						}
 						catch (NotDefinedException nde)
 						{
-							ScriptingActivator.logError(nde.getMessage(), nde);
+							IdeLog.logError(ScriptingActivator.getDefault(), nde.getMessage(), nde);
 						}
 					}
 				}
@@ -727,7 +727,7 @@ public class KeybindingsManager implements LoadCycleListener
 							}
 							catch (CommandException e)
 							{
-								ScriptingActivator.logError(e.getMessage(), e);
+								IdeLog.logError(ScriptingActivator.getDefault(), e.getMessage(), e);
 							}
 						}
 					}
@@ -767,7 +767,7 @@ public class KeybindingsManager implements LoadCycleListener
 									}
 									catch (CommandException ex)
 									{
-										ScriptingActivator.logError(ex.getMessage(), ex);
+										IdeLog.logError(ScriptingActivator.getDefault(), ex.getMessage(), ex);
 									}
 								}
 							}

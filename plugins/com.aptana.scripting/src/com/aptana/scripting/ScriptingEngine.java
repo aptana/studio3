@@ -26,6 +26,7 @@ import org.jruby.embed.LocalVariableBehavior;
 import org.jruby.embed.ScriptingContainer;
 import org.osgi.framework.Bundle;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
@@ -104,7 +105,7 @@ public class ScriptingEngine
 			String message = MessageFormat.format(Messages.ScriptingEngine_Error_Setting_JRuby_Home,
 					new Object[] { e.getMessage() });
 
-			ScriptingActivator.logError(message, e);
+			IdeLog.logError(ScriptingActivator.getDefault(), message, e);
 			ScriptLogger.logError(message);
 		}
 
@@ -147,7 +148,7 @@ public class ScriptingEngine
 							String message = MessageFormat.format(
 									Messages.ScriptingEngine_Unable_To_Convert_Load_Path, declaringPluginID, url);
 
-							ScriptingActivator.logError(message, null);
+							IdeLog.logError(ScriptingActivator.getDefault(), message);
 						}
 					}
 

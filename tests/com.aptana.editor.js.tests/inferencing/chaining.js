@@ -1,12 +1,12 @@
 var Utils = {
 	create: function() {
-		var self = {
+		var utilsSelf = {
 			chain: function() {
-				return self;
+				return utilsSelf;
 			}
 		};
 		
-		return self;
+		return utilsSelf;
 	}
 };
 
