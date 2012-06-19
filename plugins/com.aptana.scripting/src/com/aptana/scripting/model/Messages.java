@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -12,36 +12,25 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.scripting.model.messages"; //$NON-NLS-1$
-	
+
 	public static String BundleCacher_ComparingTimestampSubTaskName;
 	public static String BundleCacher_FileReferencedInCacheMissingMsg;
 	public static String BundleCacher_LoadCacheTaskName;
 	public static String BundleCacher_LoadingYAMLError;
 	public static String BundleCacher_OutOfDateCacheMsg;
-
-	public static String BundleCacher_SerializationException;
-
 	public static String BundleCacher_SerializationExceptionDeletingCacheFile;
 
 	public static String BundleEntry_Name_Not_Defined;
 
 	public static String BundleManager_Bundle_Became_Hidden_Event_Error;
-
 	public static String BundleManager_Bundle_Became_Visible_Event_Error;
-
 	public static String BundleManager_Element_Became_Hidden_Event_Error;
-
 	public static String BundleManager_Element_Became_Visible_Event_Error;
-
 	public static String BundleManager_Executed_Null_Script;
-
 	public static String BundleManager_ProjectBundlesInBundlesDirectoryIsDeprecated;
 	public static String BundleManager_Reloaded_Null_Script;
-
 	public static String BundleManager_Script_Loaded_Event_Error;
-
 	public static String BundleManager_Script_Reloaded_Event_Error;
-
 	public static String BundleManager_Script_Unloaded_Event_Error;
 	public static String BundleManager_Unloaded_Null_Script;
 	public static String BundleManager_UNREADABLE_SCRIPT;
@@ -62,7 +51,7 @@ public class Messages extends NLS
 
 	public static String CommandScriptRunner_CANNOT_LOCATE_SHELL;
 	public static String CommandScriptRunner_UNABLE_TO_LOCATE_SHELL_FOR_COMMAND;
-	
+
 	static
 	{
 		// initialize resource bundle
