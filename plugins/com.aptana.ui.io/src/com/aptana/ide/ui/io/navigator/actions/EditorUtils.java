@@ -24,6 +24,7 @@ import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ide.ui.io.IUniformFileStoreEditorInput;
 import com.aptana.ide.ui.io.internal.UniformFileStoreEditorInputFactory;
@@ -72,6 +73,8 @@ public class EditorUtils
 				{
 					UIUtils.showErrorMessage(
 							MessageFormat.format(Messages.EditorUtils_OpeningEditor, fileStore.toString()), e);
+					IdeLog.logError(IOUIPlugin.getDefault(),
+							MessageFormat.format("Unable to open file {0}", fileStore.toString()), e); //$NON-NLS-1$
 					return Status.CANCEL_STATUS;
 				}
 				final IEditorInput finalEditorInput = editorInput;
