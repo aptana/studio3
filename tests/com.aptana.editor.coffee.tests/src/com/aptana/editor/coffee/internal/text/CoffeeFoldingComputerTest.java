@@ -5,6 +5,8 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.Position;
@@ -16,7 +18,6 @@ import com.aptana.editor.coffee.parsing.CoffeeParser;
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ParseState;
-import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
 
 public class CoffeeFoldingComputerTest extends TestCase
@@ -43,29 +44,35 @@ public class CoffeeFoldingComputerTest extends TestCase
 		}
 	}
 
-	protected synchronized IFoldingComputer getFoldingComputer(IDocument document)
+	private Map<ProjectionAnnotation, Position> emitFoldingRegions(boolean initialReconcile, IProgressMonitor monitor,
+			IDocument document)
 	{
 		if (folder == null)
 		{
-			folder = new CoffeeFoldingComputer(null, document)
-			{
-				@Override
-				protected IParseNode getAST()
-				{
-					IParseState parseState = new ParseState(getDocument().get());
-					try
-					{
-						return parse(parseState);
-					}
-					catch (Exception e)
-					{
-						fail(e.getMessage());
-					}
-					return null;
-				};
-			};
+			folder = new CoffeeFoldingComputer(null, document);
 		}
-		return folder;
+
+		IParseState parseState = new ParseState(document.get());
+		IParseRootNode ast;
+		try
+		{
+			ast = parse(parseState);
+		}
+		catch (Exception e)
+		{
+			fail(e.getMessage());
+			return null;
+		}
+
+		try
+		{
+			return folder.emitFoldingRegions(initialReconcile, monitor, ast);
+		}
+		catch (BadLocationException e)
+		{
+			throw new RuntimeException(e);
+		}
+
 	}
 
 	@Test
@@ -76,7 +83,7 @@ public class CoffeeFoldingComputerTest extends TestCase
 				"  square: square\n" + //
 				"  cube:   (x) -> x * square x";
 		IDocument document = new Document(src);
-		Map<ProjectionAnnotation, Position> annotations = getFoldingComputer(document).emitFoldingRegions(true, null);
+		Map<ProjectionAnnotation, Position> annotations = emitFoldingRegions(true, null, document);
 		Collection<Position> positions = annotations.values();
 		assertEquals(1, positions.size());
 		assertTrue(positions.contains(new Position(0, src.length()))); // only can go so far as EOF
@@ -88,7 +95,7 @@ public class CoffeeFoldingComputerTest extends TestCase
 		String src = "race = (winner, runners...) ->\n" + //
 				"  print winner, runners"; //
 		IDocument document = new Document(src);
-		Map<ProjectionAnnotation, Position> annotations = getFoldingComputer(document).emitFoldingRegions(true, null);
+		Map<ProjectionAnnotation, Position> annotations = emitFoldingRegions(true, null, document);
 		Collection<Position> positions = annotations.values();
 		assertEquals(1, positions.size());
 		// folding from args to end of function body
@@ -106,7 +113,7 @@ public class CoffeeFoldingComputerTest extends TestCase
 				"    name: \"Ida\"\n" + //
 				"    age:  9"; //
 		IDocument document = new Document(src);
-		Map<ProjectionAnnotation, Position> annotations = getFoldingComputer(document).emitFoldingRegions(true, null);
+		Map<ProjectionAnnotation, Position> annotations = emitFoldingRegions(true, null, document);
 		Collection<Position> positions = annotations.values();
 		assertEquals(3, positions.size());
 		assertTrue("Folding incorrect for 'kids' object", positions.contains(new Position(0, src.length())));
@@ -123,7 +130,7 @@ public class CoffeeFoldingComputerTest extends TestCase
 				"  1, 1, 0\n" + //
 				"]"; //
 		IDocument document = new Document(src);
-		Map<ProjectionAnnotation, Position> annotations = getFoldingComputer(document).emitFoldingRegions(true, null);
+		Map<ProjectionAnnotation, Position> annotations = emitFoldingRegions(true, null, document);
 		Collection<Position> positions = annotations.values();
 		assertEquals(1, positions.size());
 		assertTrue("Folding incorrect for multieline array literal", positions.contains(new Position(0, src.length())));
@@ -136,7 +143,7 @@ public class CoffeeFoldingComputerTest extends TestCase
 				"  buy()  while supply > demand\n" + //
 				"  sell() until supply > demand"; //
 		IDocument document = new Document(src);
-		Map<ProjectionAnnotation, Position> annotations = getFoldingComputer(document).emitFoldingRegions(true, null);
+		Map<ProjectionAnnotation, Position> annotations = emitFoldingRegions(true, null, document);
 		Collection<Position> positions = annotations.values();
 		assertEquals(1, positions.size());
 		assertTrue("Folding incorrect for if block", positions.contains(new Position(0, src.length())));
@@ -167,7 +174,7 @@ public class CoffeeFoldingComputerTest extends TestCase
 				"tom.move()\n"; //
 
 		IDocument document = new Document(source);
-		Map<ProjectionAnnotation, Position> annotations = getFoldingComputer(document).emitFoldingRegions(true, null);
+		Map<ProjectionAnnotation, Position> annotations = emitFoldingRegions(true, null, document);
 		Collection<Position> positions = annotations.values();
 		assertEquals("Incorrect number of folding positions reported", 7, positions.size());
 		assertTrue("Folding incorrect for Animal class block", positions.contains(new Position(0, 104)));
@@ -195,7 +202,7 @@ public class CoffeeFoldingComputerTest extends TestCase
 	// "    \"And the error is ... \" + error\n" + //
 	// ")"; //
 	// IDocument document = new Document(src);
-	// Map<ProjectionAnnotation, Position> annotations = getFoldingComputer(document).emitFoldingRegions(true, null);
+	// Map<ProjectionAnnotation, Position> annotations = emitFoldingRegions(true, null, document);
 	// Collection<Position> positions = annotations.values();
 	// assertEquals(2, positions.size());
 	// assertTrue("Folding incorrect for try block", positions.contains(new Position(9, 32)));

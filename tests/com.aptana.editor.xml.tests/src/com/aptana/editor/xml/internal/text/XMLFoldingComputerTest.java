@@ -13,6 +13,7 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
@@ -38,27 +39,32 @@ public class XMLFoldingComputerTest extends TestCase
 	public void testSingleLineOpenAndCloseTagDoesntFold() throws Exception
 	{
 		String src = "<root>some text</root>";
-		folder = new XMLFoldingComputer(null, new Document(src))
-		{
-			protected IParseNode getAST()
-			{
-				ParseState parseState = new ParseState(getDocument().get());
-				try
-				{
-					return parse(parseState);
-				}
-				catch (Exception e)
-				{
-					fail(e.getMessage());
-				}
-				return null;
-			};
-		};
-		Map<ProjectionAnnotation, Position> annotations = folder.emitFoldingRegions(false, new NullProgressMonitor());
+
+		Map<ProjectionAnnotation, Position> annotations = emitFoldingRegions(false, src);
 		Collection<Position> positions = annotations.values();
 		assertEquals(0, positions.size());
 	}
-	
+
+	protected Map<ProjectionAnnotation, Position> emitFoldingRegions(boolean initialReconcile, String src)
+			throws BadLocationException
+	{
+		if (folder == null)
+		{
+			folder = new XMLFoldingComputer(null, new Document(src));
+		}
+		ParseState parseState = new ParseState(src);
+		IParseRootNode ast;
+		try
+		{
+			ast = parse(parseState);
+		}
+		catch (Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+		return folder.emitFoldingRegions(false, new NullProgressMonitor(), ast);
+	}
+
 	public void testBasicXMLFolding() throws Exception
 	{
 		String src = "<root>\n<child>\n<name>Chris</name>\n<age>103</age>\n</child>\n</root>";
@@ -78,7 +84,7 @@ public class XMLFoldingComputerTest extends TestCase
 				return null;
 			};
 		};
-		Map<ProjectionAnnotation, Position> annotations = folder.emitFoldingRegions(false, new NullProgressMonitor());
+		Map<ProjectionAnnotation, Position> annotations = emitFoldingRegions(false, src);
 		Collection<Position> positions = annotations.values();
 		assertEquals(2, positions.size());
 		assertTrue(positions.contains(new Position(0, src.length())));
@@ -104,12 +110,12 @@ public class XMLFoldingComputerTest extends TestCase
 				return null;
 			};
 		};
-		Map<ProjectionAnnotation, Position> annotations = folder.emitFoldingRegions(false, new NullProgressMonitor());
+		Map<ProjectionAnnotation, Position> annotations = emitFoldingRegions(false, src);
 		Collection<Position> positions = annotations.values();
 		assertEquals(1, positions.size());
 		assertTrue(positions.contains(new Position(0, src.length())));
 	}
-	
+
 	public void testXMLCDATAFolding() throws Exception
 	{
 		String src = "<root>\n<![CDATA[\n  This is cdata.\n]]>\n</root>\n";
@@ -129,13 +135,13 @@ public class XMLFoldingComputerTest extends TestCase
 				return null;
 			};
 		};
-		Map<ProjectionAnnotation, Position> annotations = folder.emitFoldingRegions(false, new NullProgressMonitor());
+		Map<ProjectionAnnotation, Position> annotations = emitFoldingRegions(false, src);
 		Collection<Position> positions = annotations.values();
 		assertEquals(2, positions.size());
 		assertTrue(positions.contains(new Position(0, src.length())));
 		assertTrue(positions.contains(new Position(7, 31)));
-	}	
-	
+	}
+
 	public void testCombinedXMLFolding() throws Exception
 	{
 		String src = "<yeah>\n<!--\n  This is a comment.\n -->\n<root>\n<![CDATA[\n  This is cdata.\n]]>\n</root>\n</yeah>";
@@ -155,7 +161,7 @@ public class XMLFoldingComputerTest extends TestCase
 				return null;
 			};
 		};
-		Map<ProjectionAnnotation, Position> annotations = folder.emitFoldingRegions(false, new NullProgressMonitor());
+		Map<ProjectionAnnotation, Position> annotations = emitFoldingRegions(false, src);
 		Collection<Position> positions = annotations.values();
 		assertEquals(4, positions.size());
 		assertTrue(positions.contains(new Position(0, src.length())));

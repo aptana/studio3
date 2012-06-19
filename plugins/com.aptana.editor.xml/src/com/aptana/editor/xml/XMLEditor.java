@@ -204,7 +204,7 @@ public class XMLEditor extends AbstractThemeableEditor
 		Map<Annotation, Position> occurrences = new HashMap<Annotation, Position>();
 		IDocument document = getSourceViewer().getDocument();
 
-		IParseNode node = getASTNodeAt(offset);
+		IParseNode node = getASTNodeAt(offset, getAST());
 		if (node instanceof XMLElementNode)
 		{
 			XMLElementNode en = (XMLElementNode) node;
