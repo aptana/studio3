@@ -40,7 +40,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.actions.ActionFactory;
+import org.eclipse.ui.internal.WorkbenchWindow;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.services.IEvaluationService;
@@ -416,32 +416,30 @@ public final class UIUtils
 		return AbstractUIPlugin.imageDescriptorFromPlugin(pluginId, path);
 	}
 
+	@SuppressWarnings("restriction")
 	public static boolean getCoolBarVisibility()
 	{
 		IWorkbench workbench = PlatformUI.getWorkbench();
 		if (workbench != null)
 		{
-			IEvaluationService service = (IEvaluationService) workbench.getService(IEvaluationService.class);
-			IEvaluationContext appState = service.getCurrentState();
-			Object coolbarVisible = appState.getVariable(ISources.ACTIVE_WORKBENCH_WINDOW_IS_COOLBAR_VISIBLE_NAME);
-			if (coolbarVisible instanceof Boolean)
+			IWorkbenchWindow activeWorkbenchWindow = getActiveWorkbenchWindow();
+			if (activeWorkbenchWindow instanceof WorkbenchWindow)
 			{
-				return ((Boolean) coolbarVisible).booleanValue();
+				return ((WorkbenchWindow) activeWorkbenchWindow).getCoolBarVisible();
 			}
 		}
 		return true;
 	}
 
+	@SuppressWarnings("restriction")
 	public static void setCoolBarVisibility(boolean visible)
 	{
-		if (getCoolBarVisibility() != visible)
+		IWorkbenchWindow activeWorkbenchWindow = getActiveWorkbenchWindow();
+		if (activeWorkbenchWindow instanceof WorkbenchWindow)
 		{
-			ActionFactory.IWorkbenchAction toggleToolbarAction = ActionFactory.TOGGLE_COOLBAR.create(PlatformUI
-					.getWorkbench().getActiveWorkbenchWindow());
-			if (toggleToolbarAction != null && toggleToolbarAction.isEnabled())
-			{
-				toggleToolbarAction.run();
-			}
+			WorkbenchWindow workbenchWindow = (WorkbenchWindow) activeWorkbenchWindow;
+			workbenchWindow.setCoolBarVisible(visible);
+			workbenchWindow.setPerspectiveBarVisible(visible);
 		}
 	}
 }
