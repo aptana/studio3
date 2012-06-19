@@ -26,7 +26,6 @@ import org.eclipse.jface.text.TextPresentation;
 import org.eclipse.jface.text.TextUtilities;
 import org.eclipse.jface.text.presentation.IPresentationRepairer;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
-import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 
 import com.aptana.core.logging.IdeLog;
@@ -151,7 +150,6 @@ public class CommonPresentationReconciler extends PresentationReconciler
 				damageLength = adjustedLength;
 			}
 			TextPresentation presentation = new TextPresentation(damage, iterationPartitionLimit * 5);
-			presentation.setDefaultStyleRange(new StyleRange(damage.getOffset(), damage.getLength(), null, null));
 			ITypedRegion[] partitioning = TextUtilities.computePartitioning(document, getDocumentPartitioning(),
 					damageOffset, damageLength, false);
 			if (partitioning.length == 0)
