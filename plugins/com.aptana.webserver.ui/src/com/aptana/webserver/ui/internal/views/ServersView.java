@@ -185,7 +185,8 @@ public class ServersView extends ViewPart implements IServerChangeListener
 				case 3:
 					return server.getHostname();
 				case 4:
-					return Integer.toString(server.getPort());
+					int port = server.getPort();
+					return (port == -1) ? "?" : Integer.toString(port); //$NON-NLS-1$
 				default:
 					return StringUtil.EMPTY;
 			}
