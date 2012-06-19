@@ -37,7 +37,6 @@ import com.aptana.core.util.replace.RegexPatternReplacer;
 import com.aptana.core.util.replace.SimpleTextPatternReplacer;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.js.actions.IJSActions;
 import com.aptana.editor.js.actions.OpenDeclarationAction;
@@ -53,7 +52,6 @@ import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.INameNode;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
-import com.aptana.ui.util.UIUtils;
 
 @SuppressWarnings("restriction")
 public class JSSourceEditor extends AbstractThemeableEditor
@@ -231,7 +229,7 @@ public class JSSourceEditor extends AbstractThemeableEditor
 			}
 			ITextSelection textSelection = (ITextSelection) selection;
 			int offset = textSelection.getOffset();
-			return new JSHelpContext(editorPart, editorPart.getASTNodeAt(offset));
+			return new JSHelpContext(editorPart, editorPart.getASTNodeAt(offset, editorPart.getAST()));
 		}
 	}
 
@@ -388,21 +386,10 @@ public class JSSourceEditor extends AbstractThemeableEditor
 		return super.getAdapter(adapter);
 	}
 
-	public void refreshOutline()
+	@Override
+	public void refreshOutline(final IParseRootNode ast)
 	{
-		UIUtils.getDisplay().asyncExec(new Runnable()
-		{
-
-			public void run()
-			{
-				if (!hasOutlinePageCreated() || getAST() == null)
-				{
-					return;
-				}
-
-				CommonOutlinePage page = getOutlinePage();
-				page.refresh();
-			}
-		});
+		outlineAutoExpanded = true; // Don't auto-expand it here.
+		super.refreshOutline(ast);
 	}
 }

@@ -106,7 +106,6 @@ public class ParseState implements IParseState
 		return fSkippedRanges;
 	}
 
-
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.IParseState#getProgressMonitor()
@@ -132,7 +131,6 @@ public class ParseState implements IParseState
 		text.append(':');
 		return text.toString();
 	}
-
 
 	public IParseStateCacheKey getCacheKey(String contentTypeId)
 	{

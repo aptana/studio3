@@ -54,6 +54,7 @@ import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.actions.BaseToggleLinkingAction;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.theme.IControlThemerFactory;
 import com.aptana.theme.ThemePlugin;
@@ -112,6 +113,7 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 	private PatternFilter fFilter;
 	private WorkbenchJob fFilterRefreshJob;
 	private ToggleLinkingAction fToggleLinkingAction;
+	private CommonOutlinePageInput fInput;
 
 	private IPreferenceStore fPrefs;
 	private ModifyListener fSearchModifyListener = new ModifyListener()
@@ -191,7 +193,10 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		viewer.setUseHashlookup(true);
 		viewer.setContentProvider(fContentProvider);
 		viewer.setLabelProvider(fLabelProvider);
-		viewer.setInput(fEditor);
+		fInput = new CommonOutlinePageInput(fEditor.getAST());
+		// Note: the input remains the same (we change its internal contents with a new ast and call refresh,
+		// so that the outline structure is maintained).
+		viewer.setInput(fInput);
 		viewer.setComparator(isSortingEnabled() ? new ViewerComparator() : null);
 		fFilter = new PatternFilter()
 		{
@@ -290,6 +295,15 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 			}
 		};
 		fFilterRefreshJob.setSystem(true);
+	}
+
+	public void refresh(IParseRootNode ast)
+	{
+		// Just change the internal ast and call refresh, that way we keep
+		// the expanded state of items.
+		fInput.ast = ast;
+		getTreeViewer().refresh();
+
 	}
 
 	@Override
@@ -494,4 +508,13 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 	{
 		return fPrefs.getBoolean(IPreferenceConstants.SORT_OUTLINE_ALPHABETIC);
 	}
+
+	public IParseRootNode getCurrentAst()
+	{
+		if(fInput == null){
+			return null;
+		}
+		return fInput.ast;
+	}
+
 }
