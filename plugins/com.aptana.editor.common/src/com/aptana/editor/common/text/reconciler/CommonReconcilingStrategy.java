@@ -214,8 +214,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	{
 		reconcile(initialReconcile, false);
 	}
-	
-	protected IParseRootNode lastGeneratedAst;
+
 
 	private void reconcile(boolean initialReconcile, boolean force)
 	{
@@ -225,7 +224,6 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		if (fEditor != null)
 		{
 			ast = fEditor.getAST();
-			lastGeneratedAst = ast;
 			fEditor.refreshOutline(ast);
 		}
 		monitor.worked(5);

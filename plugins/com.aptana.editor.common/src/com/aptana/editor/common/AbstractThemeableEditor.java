@@ -262,6 +262,21 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	protected boolean outlineAutoExpanded;
 
 	/**
+	 * Used to cache the last ast for a document.
+	 */
+	private long lastModificationStamp = IDocumentExtension4.UNKNOWN_MODIFICATION_STAMP;
+
+	/**
+	 * Used to cache the last ast for a document.
+	 */
+	private IParseRootNode lastAstForModificationStamp;
+
+	/**
+	 * Lock used to cache the last ast for a document.
+	 */
+	private Object modificationStampLock = new Object();
+
+	/**
 	 * AbstractThemeableEditor
 	 */
 	protected AbstractThemeableEditor()
@@ -1080,9 +1095,18 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		return documentProvider.getDocument(getEditorInput());
 	}
 
-	private long lastModificationStamp = IDocumentExtension4.UNKNOWN_MODIFICATION_STAMP;
-	private IParseRootNode lastAstForModificationStamp;
-	private Object modificationStampLock = new Object();
+	@Override
+	protected void doSetInput(IEditorInput input) throws CoreException
+	{
+		synchronized (modificationStampLock)
+		{
+			//Reset our cache when a new input is set.
+			lastModificationStamp = IDocumentExtension4.UNKNOWN_MODIFICATION_STAMP;
+			lastAstForModificationStamp = null;
+
+		}
+		super.doSetInput(input);
+	}
 
 	/**
 	 * Note: this was deprecated and is restored as this has a faster cache based on the document time (so, this is the
