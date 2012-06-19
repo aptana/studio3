@@ -7,6 +7,8 @@
  */
 package com.aptana.editor.common.extensions;
 
+import java.text.MessageFormat;
+
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IPaintPositionManager;
@@ -138,7 +140,9 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 				}
 				catch (Exception e)
 				{
-					IdeLog.logError(CommonEditorPlugin.getDefault(), e);
+					IdeLog.logError(CommonEditorPlugin.getDefault(), MessageFormat.format(
+							"Error invalidating syntax coloring for offset {0}, length {1}", fLastLine.getOffset(), //$NON-NLS-1$
+							fLastLine.getLength()), e);
 				}
 			}
 			drawHighlightLine(fLastLine);
