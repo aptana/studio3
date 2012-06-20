@@ -15,7 +15,6 @@ public class Messages extends NLS
 
 	public static String SubmitTicketDialog_DefaultMessage;
 	public static String SubmitTicketDialog_ERR_EmptyActualResult;
-	public static String SubmitTicketDialog_ERR_EmptyPriority;
 	public static String SubmitTicketDialog_ERR_EmptyStepsToReproduce;
 	public static String SubmitTicketDialog_ERR_EmptySummary;
 	public static String SubmitTicketDialog_ERR_EmptyType;
@@ -23,7 +22,6 @@ public class Messages extends NLS
 	public static String SubmitTicketDialog_LBL_DiagnosticLog;
 	public static String SubmitTicketDialog_LBL_ExpectedResult;
 	public static String SubmitTicketDialog_LBL_LogsToAttach;
-	public static String SubmitTicketDialog_LBL_Priority;
 	public static String SubmitTicketDialog_LBL_Screenshots;
 	public static String SubmitTicketDialog_LBL_Severity;
 	public static String SubmitTicketDialog_LBL_StepsToReproduce;

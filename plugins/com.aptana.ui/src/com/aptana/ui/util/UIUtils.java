@@ -30,14 +30,17 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IPathEditorInput;
+import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.IURIEditorInput;
 import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.internal.WorkbenchWindow;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.services.IEvaluationService;
@@ -143,6 +146,36 @@ public final class UIUtils
 			// Workbench has not been created yet
 			return null;
 		}
+	}
+
+	/**
+	 * Returns the active perspective id if there is one
+	 * 
+	 * @return the active perspective id; <code>null</code> in case it could not be resolved.
+	 */
+	public static String getActivePerspectiveId()
+	{
+		IPerspectiveDescriptor perspective = getActivePerspectiveDescriptor();
+		if (perspective != null)
+		{
+			return perspective.getId();
+		}
+		return null;
+	}
+
+	/**
+	 * Returns the active perspective descriptor if there is one.
+	 * 
+	 * @return the active perspective descriptor; <code>null</code> in case it could not be resolved.
+	 */
+	public static IPerspectiveDescriptor getActivePerspectiveDescriptor()
+	{
+		IWorkbenchPage activePage = getActivePage();
+		if (activePage != null)
+		{
+			return activePage.getPerspective();
+		}
+		return null;
 	}
 
 	public static IEditorPart[] getDirtyEditors()
@@ -256,6 +289,30 @@ public final class UIUtils
 		return null;
 	}
 
+	/**
+	 * Shows the view specified
+	 * 
+	 * @param viewID
+	 * @return whether the view was shown
+	 */
+	public static boolean showView(String viewID)
+	{
+		IWorkbenchPage activePage = getActivePage();
+		if (activePage != null)
+		{
+			try
+			{
+				return activePage.showView(viewID) != null;
+			}
+			catch (PartInitException e)
+			{
+				return false;
+			}
+		}
+
+		return false;
+	}
+
 	public static void showErrorMessage(String title, String message)
 	{
 		showErrorMessage((title != null) ? title : Messages.UIUtils_Error, message, null);
@@ -357,5 +414,32 @@ public final class UIUtils
 	public static ImageDescriptor getImageDescriptor(String pluginId, String path)
 	{
 		return AbstractUIPlugin.imageDescriptorFromPlugin(pluginId, path);
+	}
+
+	@SuppressWarnings("restriction")
+	public static boolean getCoolBarVisibility()
+	{
+		IWorkbench workbench = PlatformUI.getWorkbench();
+		if (workbench != null)
+		{
+			IWorkbenchWindow activeWorkbenchWindow = getActiveWorkbenchWindow();
+			if (activeWorkbenchWindow instanceof WorkbenchWindow)
+			{
+				return ((WorkbenchWindow) activeWorkbenchWindow).getCoolBarVisible();
+			}
+		}
+		return true;
+	}
+
+	@SuppressWarnings("restriction")
+	public static void setCoolBarVisibility(boolean visible)
+	{
+		IWorkbenchWindow activeWorkbenchWindow = getActiveWorkbenchWindow();
+		if (activeWorkbenchWindow instanceof WorkbenchWindow)
+		{
+			WorkbenchWindow workbenchWindow = (WorkbenchWindow) activeWorkbenchWindow;
+			workbenchWindow.setCoolBarVisible(visible);
+			workbenchWindow.setPerspectiveBarVisible(visible);
+		}
 	}
 }

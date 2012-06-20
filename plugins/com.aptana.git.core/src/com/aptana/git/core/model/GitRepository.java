@@ -2059,9 +2059,12 @@ public class GitRepository
 				remaining = remaining.substring(0, remaining.length() - 4);
 			}
 			int split = remaining.indexOf('/');
-			String userName = remaining.substring(0, split);
-			String repoName = remaining.substring(split + 1);
-			githubURLs.add(MessageFormat.format("https://github.com/{0}/{1}", userName, repoName)); //$NON-NLS-1$
+			if (split > -1)
+			{
+				String userName = remaining.substring(0, split);
+				String repoName = remaining.substring(split + 1);
+				githubURLs.add(MessageFormat.format("https://github.com/{0}/{1}", userName, repoName)); //$NON-NLS-1$
+			}
 		}
 		return githubURLs;
 	}

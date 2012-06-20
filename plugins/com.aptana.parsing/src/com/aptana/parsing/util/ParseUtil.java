@@ -176,6 +176,118 @@ public class ParseUtil
 		}
 	}
 
+	/*
+	 * A visitor for ASTs that handles entering and exiting node callbacks.
+	 */
+	public static interface IASTVisitor
+	{
+		/**
+		 * Return value indicates if we continue traversing AST.
+		 * 
+		 * @param node
+		 * @return
+		 */
+		public boolean enterNode(IParseNode node);
+
+		/**
+		 * Return value indicates if we continue traversing AST.
+		 * 
+		 * @param node
+		 * @return
+		 */
+		public boolean exitNode(IParseNode node);
+	}
+
+	/**
+	 * Used to maintain an entry in the AST visiting process. Holds the node and whether we're entering or exiting it.
+	 * 
+	 * @author cwilliams
+	 */
+	private static class QueueEntry
+	{
+		private IParseNode node;
+		private boolean enter;
+
+		public QueueEntry(IParseNode node, boolean enter)
+		{
+			this.node = node;
+			this.enter = enter;
+		}
+	}
+
+	/**
+	 * For visitors that need to iterate over the AST but get callbacks when we exit a node. This allows implementations
+	 * to generate stacks of scopes/etc.
+	 * 
+	 * @param node
+	 * @param function
+	 */
+	public static void treeApply(IParseNode node, IASTVisitor function)
+	{
+		treeApply(node, function, true);
+	}
+
+	public static void treeApply(IParseNode node, IASTVisitor function, boolean recursive)
+	{
+		if (node == null || function == null)
+		{
+			return;
+		}
+
+		List<QueueEntry> queue = new LinkedList<QueueEntry>();
+
+		// prime queue
+		queue.add(new QueueEntry(node, true));
+
+		while (!queue.isEmpty())
+		{
+			QueueEntry current = queue.remove(0);
+			// TODO: wrap function call in try/block?
+
+			// Entering a node
+			if (current.enter)
+			{
+				// apply function
+				if (!function.enterNode(current.node))
+				{
+					// stop processing if the function indicates to do so
+					break;
+				}
+
+				if (recursive)
+				{
+					int i = 0;
+					if (current.node instanceof ParseRootNode)
+					{
+						// Insert the children to front of the list, in-order
+						for (IParseNode commentNode : ((ParseRootNode) node).getCommentNodes())
+						{
+							queue.add(i++, new QueueEntry(commentNode, true));
+						}
+					}
+
+					// Insert the children to front of the list, in-order
+					for (IParseNode child : current.node)
+					{
+						queue.add(i++, new QueueEntry(child, true));
+					}
+					// This sticks the exit of the node at the end?
+					queue.add(i++, new QueueEntry(current.node, false));
+				}
+			}
+			// Exiting a node
+			else
+			{
+				// apply function
+				if (!function.exitNode(current.node))
+				{
+					// stop processing if the function indicates to do so
+					break;
+				}
+			}
+		}
+	}
+
 	/**
 	 * Trim memory usage for the specified node (and its descendants).
 	 * 

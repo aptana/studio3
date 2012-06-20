@@ -12,7 +12,7 @@ package com.aptana.deploy.wizard;
 
 import org.eclipse.ui.internal.wizards.AbstractExtensionWizardRegistry;
 
-import com.aptana.deploy.DeployPlugin;
+import com.aptana.deploy.epl.DeployEplPlugin;
 
 @SuppressWarnings("restriction")
 public class DeployWizardRegistry extends AbstractExtensionWizardRegistry
@@ -58,6 +58,6 @@ public class DeployWizardRegistry extends AbstractExtensionWizardRegistry
 	 */
 	protected String getPlugin()
 	{
-		return DeployPlugin.getPluginIdentifier();
+		return DeployEplPlugin.PLUGIN_ID;
 	}
 }

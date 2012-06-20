@@ -26,7 +26,7 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.deploy.capistrano.CapistranoDeployProvider;
 import com.aptana.deploy.capistrano.CapistranoPlugin;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
-import com.aptana.deploy.wizard.AbstractDeployWizard;
+import com.aptana.deploy.ui.wizard.AbstractDeployWizard;
 
 public class CapistranoDeployWizard extends AbstractDeployWizard
 {

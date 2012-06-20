@@ -88,6 +88,7 @@ import com.aptana.ide.core.io.ConnectionPointType;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.core.io.WorkspaceConnectionPoint;
+import com.aptana.ide.core.io.preferences.PermissionDirection;
 import com.aptana.ide.core.io.preferences.PreferenceUtils;
 import com.aptana.ide.syncing.core.old.ConnectionPointSyncPair;
 import com.aptana.ide.syncing.core.old.ILogger;
@@ -107,8 +108,8 @@ import com.aptana.ide.syncing.ui.old.SyncingConsole;
 import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants;
 import com.aptana.ide.ui.io.Utils;
 import com.aptana.ide.ui.io.navigator.RemoteNavigatorView;
-import com.aptana.ide.ui.io.preferences.PermissionsGroup;
 import com.aptana.ui.UIPlugin;
+import com.aptana.ui.ftp.preferences.UpdatePermissionsComposite;
 import com.aptana.ui.util.SWTUtils;
 import com.aptana.ui.util.UIUtils;
 import com.aptana.ui.widgets.SearchComposite;
@@ -157,8 +158,9 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 	private Button deleteLocalFiles;
 	private Button useCrc;
 	private Button syncInBackground;
-	private PermissionsGroup filePermission;
-	private PermissionsGroup dirPermission;
+
+	private UpdatePermissionsComposite uploadPermComposite;
+	private UpdatePermissionsComposite downloadPermComposite;
 
 	private Composite loadingComp;
 	private Label loadingLabel;
@@ -824,20 +826,18 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		syncInBackground.addSelectionListener(this);
 
 		Group group = new Group(advancedOptions, SWT.NONE);
-		group.setText(Messages.SmartSyncDialog_Permissions);
-		layout = new GridLayout(2, true);
-		layout.marginWidth = 0;
-		group.setLayout(layout);
-		group.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		group.setText(Messages.SmartSyncDialog_LBL_PermforUploads);
+		group.setLayout(GridLayoutFactory.fillDefaults().create());
+		group.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
+		uploadPermComposite = new UpdatePermissionsComposite(group, PermissionDirection.UPLOAD);
+		uploadPermComposite.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 
-		filePermission = new PermissionsGroup(group);
-		filePermission.setText(Messages.SmartSyncDialog_PermForFiles);
-		filePermission.getControl().setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
-		filePermission.setPermissions(PreferenceUtils.getFilePermissions());
-		dirPermission = new PermissionsGroup(group);
-		dirPermission.setText(Messages.SmartSyncDialog_PermForDirectories);
-		dirPermission.getControl().setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
-		dirPermission.setPermissions(PreferenceUtils.getDirectoryPermissions());
+		group = new Group(advancedOptions, SWT.NONE);
+		group.setText(Messages.SmartSyncDialog_LBL_PermForDownloads);
+		group.setLayout(GridLayoutFactory.fillDefaults().create());
+		group.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
+		downloadPermComposite = new UpdatePermissionsComposite(group, PermissionDirection.DOWNLOAD);
+		downloadPermComposite.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 
 		return advanced;
 	}
@@ -1592,8 +1592,18 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 
 	private void savePermissions()
 	{
-		PreferenceUtils.setFilePermissions(filePermission.getPermissions());
-		PreferenceUtils.setDirectoryPermissions(dirPermission.getPermissions());
+		PreferenceUtils.setUpdatePermissions(uploadPermComposite.getUpdatePermissions(), PermissionDirection.UPLOAD);
+		PreferenceUtils
+				.setSpecificPermissions(uploadPermComposite.getSpecificPermissions(), PermissionDirection.UPLOAD);
+		PreferenceUtils.setFilePermissions(uploadPermComposite.getFilePermissions(), PermissionDirection.UPLOAD);
+		PreferenceUtils.setFolderPermissions(uploadPermComposite.getFolderPermissions(), PermissionDirection.UPLOAD);
+		PreferenceUtils
+				.setUpdatePermissions(downloadPermComposite.getUpdatePermissions(), PermissionDirection.DOWNLOAD);
+		PreferenceUtils.setSpecificPermissions(downloadPermComposite.getSpecificPermissions(),
+				PermissionDirection.DOWNLOAD);
+		PreferenceUtils.setFilePermissions(downloadPermComposite.getFilePermissions(), PermissionDirection.DOWNLOAD);
+		PreferenceUtils
+				.setFolderPermissions(downloadPermComposite.getFolderPermissions(), PermissionDirection.DOWNLOAD);
 	}
 
 	/**

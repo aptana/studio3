@@ -2,7 +2,7 @@
 <feature
       id="com.aptana.feature"
       label="%featureName"
-      version="3.1.4.qualifier"
+      version="3.2.0.qualifier"
       provider-name="%providerName"
       plugin="com.aptana.branding">
 
@@ -662,14 +662,6 @@
          unpack="false"/>
 
    <plugin
-         id="com.aptana.deploy.epl"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
          id="com.aptana.editor.epl"
          download-size="0"
          install-size="0"
@@ -721,6 +713,20 @@
 
    <plugin
          id="com.aptana.jetty.util.epl"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.deploy.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.deploy.epl"
          download-size="0"
          install-size="0"
          version="0.0.0"

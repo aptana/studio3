@@ -12,8 +12,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -70,6 +72,11 @@ public abstract class AbstractBuildParticipant implements IBuildParticipant, IEx
 	private String fName;
 	private String contributor;
 	private Set<String> projectNatures;
+
+	/**
+	 * We lazily compile the filters into {@link Pattern}s as we try to match them.
+	 */
+	private Map<String, Pattern> compiledFilters = new HashMap<String, Pattern>();
 
 	public int getPriority()
 	{
@@ -441,6 +448,26 @@ public abstract class AbstractBuildParticipant implements IBuildParticipant, IEx
 		{
 			IdeLog.logError(BuildPathCorePlugin.getDefault(), e);
 		}
+		return false;
+	}
+
+	protected boolean isIgnored(String message, List<String> expressions)
+	{
+		for (String expression : expressions)
+		{
+			// Lazily compile the filter expressions into Patterns
+			Pattern p = compiledFilters.get(expression);
+			if (p == null)
+			{
+				p = Pattern.compile(expression);
+				compiledFilters.put(expression, p);
+			}
+			if (p.matcher(message).matches())
+			{
+				return true;
+			}
+		}
+
 		return false;
 	}
 }

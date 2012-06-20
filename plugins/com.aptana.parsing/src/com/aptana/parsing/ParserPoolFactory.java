@@ -182,7 +182,7 @@ public class ParserPoolFactory implements ParsingEngine.IParserPoolProvider
 	 * @param startingOffset
 	 * @return
 	 */
-	public static IParseRootNode parse(String contentTypeId, String source, int startingOffset) throws Exception // $codepro.audit.disable
+	public static ParseResult parse(String contentTypeId, String source, int startingOffset) throws Exception // $codepro.audit.disable
 	// declaredExceptions
 	{
 		return parse(contentTypeId, source, startingOffset, null);
@@ -195,7 +195,7 @@ public class ParserPoolFactory implements ParsingEngine.IParserPoolProvider
 	 * @param source
 	 * @return
 	 */
-	public static IParseRootNode parse(String contentTypeId, String source) throws Exception // $codepro.audit.disable
+	public static ParseResult parse(String contentTypeId, String source) throws Exception // $codepro.audit.disable
 																								// declaredExceptions
 	{
 		return parse(contentTypeId, source, 0, null);
@@ -208,12 +208,11 @@ public class ParserPoolFactory implements ParsingEngine.IParserPoolProvider
 	 * @param source
 	 * @return
 	 */
-	public static IParseRootNode parse(String contentTypeId, String source, int startingOffset, IProgressMonitor monitor)
+	public static ParseResult parse(String contentTypeId, String source, int startingOffset, IProgressMonitor monitor)
 			throws Exception // $codepro.audit.disable
 								// declaredExceptions
 	{
-		ParseState parseState = new ParseState();
-		parseState.setEditState(source, startingOffset);
+		ParseState parseState = new ParseState(source, startingOffset);
 		parseState.setProgressMonitor(monitor);
 
 		return parse(contentTypeId, parseState);
@@ -226,22 +225,9 @@ public class ParserPoolFactory implements ParsingEngine.IParserPoolProvider
 	 * @param source
 	 * @return
 	 */
-	public static IParseRootNode parse(String contentTypeId, IParseState parseState) throws Exception // $codepro.audit.disable
+	public static ParseResult parse(String contentTypeId, IParseState parseState) throws Exception // $codepro.audit.disable
 																										// declaredExceptions
 	{
-		return getInstance().doParse(contentTypeId, parseState);
-	}
-
-	/**
-	 * parse
-	 * 
-	 * @param contentTypeId
-	 * @param source
-	 * @return
-	 */
-	private IParseRootNode doParse(String contentTypeId, IParseState parseState) throws Exception // $codepro.audit.disable
-																									// declaredExceptions
-	{
-		return fParsingEngine.parse(contentTypeId, parseState);
+		return getInstance().fParsingEngine.parse(contentTypeId, parseState);
 	}
 }

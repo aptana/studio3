@@ -85,6 +85,7 @@ import com.aptana.jetty.util.epl.TypeUtil;
  *
  *
  */
+@SuppressWarnings({ "unchecked", "restriction", "rawtypes", "nls" })
 public class JSON
 {
     static final RedirectToAptanaLog LOG = RedirectToAptanaLog.getSingleton();
@@ -1637,7 +1638,7 @@ public class JSON
          * @param json
          *            A literal JSON string.
          */
-        public Literal(String json)
+		public Literal(String json)
         {
             if (LOG.isDebugEnabled()) // TODO: Make this a configurable option on JSON instead!
                 parse(json);

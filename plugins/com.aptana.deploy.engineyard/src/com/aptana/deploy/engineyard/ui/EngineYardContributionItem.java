@@ -13,7 +13,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
-import com.aptana.deploy.DeployContributionItem;
+import com.aptana.deploy.ui.DeployContributionItem;
 import com.aptana.scripting.model.CommandElement;
 
 public class EngineYardContributionItem extends DeployContributionItem

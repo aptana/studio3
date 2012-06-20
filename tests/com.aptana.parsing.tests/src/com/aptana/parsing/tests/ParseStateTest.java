@@ -19,24 +19,19 @@ public class ParseStateTest extends TestCase
 
 	public void testParseState() throws Exception
 	{
-		ParseState parseState = new ParseState();
-		parseState.setEditState("test");
+		ParseState parseState = new ParseState("test");
 		Object key1 = parseState.getCacheKey("contentType");
 
-		parseState = new ParseState();
-		parseState.setEditState("test");
+		parseState = new ParseState("test");
 		Object key1a = parseState.getCacheKey("contentType");
 
-		parseState = new ParseState();
-		parseState.setEditState("test1234569078000-");
+		parseState = new ParseState("test1234569078000-");
 		Object key2 = parseState.getCacheKey("contentType");
 
-		parseState = new ParseState();
-		parseState.setEditState("test1234569078000-");
+		parseState = new ParseState("test1234569078000-");
 		Object key2a = parseState.getCacheKey("contentType");
 
-		parseState = new ParseState();
-		parseState.setEditState("test1234569078000");
+		parseState = new ParseState("test1234569078000");
 		Object key3 = parseState.getCacheKey("contentType");
 
 		assertEquals(key1, key1a);

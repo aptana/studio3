@@ -108,9 +108,10 @@ class HTMLParserTagRule extends MultiLineRule
 	{
 		CollectingCharacterScanner collectingCharacterScanner = new CollectingCharacterScanner(scanner,
 				String.valueOf(fStartSequence));
-		int c;
+		int c, length = 0;
 		while ((c = collectingCharacterScanner.read()) != ICharacterScanner.EOF)
 		{
+			length++;
 			if (c == '\'')
 			{
 				collectingCharacterScanner.unread();
@@ -156,6 +157,11 @@ class HTMLParserTagRule extends MultiLineRule
 			}
 			return true;
 		}
+		for (int i = 0; i < length; ++i)
+		{
+			collectingCharacterScanner.unread();
+		}
+		// unread the original character
 		collectingCharacterScanner.unread();
 		return false;
 	}

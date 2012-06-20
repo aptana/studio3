@@ -7,16 +7,17 @@ import beaver.spec.parser.GrammarParser;
 import beaver.spec.parser.GrammarScanner;
 
 import com.aptana.editor.beaver.parsing.ast.BeaverParseRootNode;
+import com.aptana.parsing.AbstractParser;
 import com.aptana.parsing.IParseState;
-import com.aptana.parsing.IParser;
+import com.aptana.parsing.WorkingParseResult;
 import com.aptana.parsing.ast.IParseRootNode;
 
 /**
  * This is a wrapper/adapter for the Beaver grammar parser so we can use it within our parsing framework
  */
-public class BeaverParser implements IParser
+public class BeaverParser extends AbstractParser
 {
-	public IParseRootNode parse(IParseState parseState) throws Exception
+	protected void parse(IParseState parseState, WorkingParseResult working) throws Exception
 	{
 		GrammarScanner scanner = new GrammarScanner(new StringReader(parseState.getSource()));
 		GrammarParser parser = new GrammarParser();
@@ -30,9 +31,7 @@ public class BeaverParser implements IParser
 
 			result = new BeaverParseRootNode(grammarRoot);
 
-			parseState.setParseResult(result);
+			working.setParseResult(result);
 		}
-
-		return result;
 	}
 }

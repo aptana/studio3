@@ -257,20 +257,18 @@ public abstract class InferencingTestsBase extends TestCase
 	protected IParseNode getParseRootNode(String source)
 	{
 		JSParser parser = new JSParser();
-		ParseState parseState = new ParseState();
-
-		parseState.setEditState(source);
+		ParseState parseState = new ParseState(source);
 
 		try
 		{
-			parser.parse(parseState);
+			return parser.parse(parseState).getRootNode();
 		}
 		catch (Exception e)
 		{
 			fail(e.getMessage());
 		}
 
-		return parseState.getParseResult();
+		throw new AssertionError("Should never get here.");
 	}
 
 	/**

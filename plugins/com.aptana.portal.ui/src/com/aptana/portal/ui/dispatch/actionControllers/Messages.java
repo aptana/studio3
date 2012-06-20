@@ -17,6 +17,7 @@ public class Messages extends NLS
 	public static String GemsActionController_computingGemsJobName;
 	public static String ActionController_internalError;
 	public static String ConsoleController_devToolboxConsoleName;
+	public static String LaunchActionController_launchingJob;
 	public static String PluginsActionController_computingInstalledPlugins;
 	public static String PluginsActionController_installNewSoftware;
 	static

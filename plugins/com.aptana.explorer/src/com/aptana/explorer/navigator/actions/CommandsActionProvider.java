@@ -9,6 +9,8 @@ package com.aptana.explorer.navigator.actions;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.action.ContributionItem;
+import org.eclipse.jface.action.GroupMarker;
+import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.search.ui.IContextMenuConstants;
@@ -67,6 +69,11 @@ public class CommandsActionProvider extends ExplorerActionProvider
 
 	protected void fillMenu(MenuManager menuManager)
 	{
+		IContributionItem item = menuManager.find(IContextMenuConstants.GROUP_PROPERTIES);
+		if (item == null)
+		{
+			menuManager.add(new GroupMarker(IContextMenuConstants.GROUP_PROPERTIES));
+		}
 		// Stick Delete in Properties area
 		menuManager.appendToGroup(IContextMenuConstants.GROUP_PROPERTIES, new ContributionItem()
 		{

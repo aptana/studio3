@@ -14,6 +14,6 @@ public class TextDocumentProvider extends CommonDocumentProvider
 
 	protected String getDefaultContentType(String filename)
 	{
-		return "text"; //$NON-NLS-1$
+		return ITextConstants.CONTENT_TYPE;
 	}
 }

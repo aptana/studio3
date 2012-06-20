@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -9,9 +9,11 @@ package com.aptana.parsing;
 
 import java.text.MessageFormat;
 
-import com.aptana.core.epl.util.LRUCache;
+import org.eclipse.core.runtime.Assert;
+
+import com.aptana.core.epl.util.LRUCacheWithSoftPrunedValues;
 import com.aptana.core.logging.IdeLog;
-import com.aptana.parsing.ast.IParseRootNode;
+import com.aptana.core.util.StringUtil;
 
 /**
  * This class is responsible for actually calling the parsing. It'll use the ParseState#getCacheKey() to know if an
@@ -41,7 +43,7 @@ public class ParsingEngine
 		/**
 		 * This is the state that was used for the parsing.
 		 */
-		private IParseState fCachedParseState;
+		private ParseResult fCachedParseResult;
 
 		/**
 		 * Lock to help in synchronizing (threads should wait in it while a result is not available).
@@ -59,10 +61,9 @@ public class ParsingEngine
 		 * @param parseState
 		 *            the state for which the parse will be done.
 		 */
-		public CacheValue(IParseStateCacheKey parseStateKey, IParseState parseState)
+		public CacheValue(IParseStateCacheKey parseStateKey)
 		{
 			fCachedParseStateKey = parseStateKey;
-			fCachedParseState = parseState;
 		}
 
 		/**
@@ -76,7 +77,7 @@ public class ParsingEngine
 		/**
 		 * @return the result from doing the parse. If it's still not available, blocks until it's provided.
 		 */
-		public IParseRootNode getResult(IParseState newParseState)
+		public ParseResult getResult()
 		{
 			while (!fResultGotten) // Double-check pattern for speed.
 			{
@@ -95,16 +96,17 @@ public class ParsingEngine
 					}
 				}
 			}
-			newParseState.copyErrorsFrom(fCachedParseState);
-			return fCachedParseState.getParseResult();
+			return fCachedParseResult;
 		}
 
 		/**
 		 * Sets the result of the parse. Notifies any waiting thread that it has become available.
 		 */
-		public void setResult(IParseRootNode ast)
+		public void setResult(ParseResult parseResult)
 		{
-			fCachedParseState.setParseResult(ast);
+			Assert.isNotNull(parseResult); // A parse result must NOT be null (should be an empty parse result if
+											// needed).
+			fCachedParseResult = parseResult;
 			synchronized (fLock)
 			{
 				fResultGotten = true;
@@ -117,7 +119,7 @@ public class ParsingEngine
 	 * A parse cache. Keyed by combo of content type and source hash, holds IParseRootNode result. Retains most recently
 	 * used ASTs.
 	 */
-	private LRUCache<IParseStateCacheKey, CacheValue> fParseCache;
+	private LRUCacheWithSoftPrunedValues<IParseStateCacheKey, CacheValue> fParseCache;
 
 	/**
 	 * Object providing access to the pool provider.
@@ -131,7 +133,8 @@ public class ParsingEngine
 
 	public ParsingEngine(IParserPoolProvider parserPoolProvider)
 	{
-		fParseCache = new LRUCache<IParseStateCacheKey, CacheValue>(3);
+		// Create a cache with N 'strong' references but still keep prunned values as soft references.
+		fParseCache = new LRUCacheWithSoftPrunedValues<IParseStateCacheKey, CacheValue>(15);
 		fParserPoolProvider = parserPoolProvider;
 	}
 
@@ -152,14 +155,14 @@ public class ParsingEngine
 		fParseCache.flush();
 	}
 
-	public IParseRootNode parse(String contentTypeId, IParseState parseState) throws Exception // $codepro.audit.disable
-																								// declaredExceptions
+	public ParseResult parse(String contentTypeId, IParseState parseState) throws Exception // $codepro.audit.disable
+																							// declaredExceptions
 	{
 		try
 		{
 			if (contentTypeId == null)
 			{
-				return null;
+				return ParseResult.EMPTY;
 			}
 
 			String source = parseState.getSource();
@@ -168,33 +171,61 @@ public class ParsingEngine
 				// If we don't have the source, we're not able to do a parse in the first place.
 				IdeLog.logError(ParsingPlugin.getDefault(), Messages.ParserPoolFactory_Expecting_Source,
 						IDebugScopes.PARSING);
-				return null;
+				return ParseResult.EMPTY;
 			}
 			IParseStateCacheKey newParseStateKey = parseState.getCacheKey(contentTypeId);
 			CacheValue cacheValue = null;
-			LRUCache<IParseStateCacheKey, CacheValue> parseCache = fParseCache;
+			LRUCacheWithSoftPrunedValues<IParseStateCacheKey, CacheValue> parseCache = fParseCache;
 			if (parseCache == null)
 			{
-				return null; // already disposed.
+				return ParseResult.EMPTY; // already disposed.
 			}
 
 			IParserPool pool = null;
 			IParser parser = null;
 			boolean getResultFromCache = false;
-
+			boolean traceEnabled = IdeLog.isTraceEnabled(ParsingPlugin.getDefault(), IDebugScopes.PARSING);
 			try
 			{
 				synchronized (fParseCacheLock)
 				{
 					cacheValue = parseCache.get(newParseStateKey);
+
 					if (cacheValue != null && !cacheValue.requiresReparse(newParseStateKey))
 					{
+
+						if (traceEnabled)
+						{
+							IdeLog.logTrace(ParsingPlugin.getDefault(),
+									MessageFormat.format("Parsing cache hit for key {0}", newParseStateKey), //$NON-NLS-1$
+									IDebugScopes.PARSING);
+						}
+
 						// Cache hit... it may still be in progress, but the cacheValue.getResult should handle that
 						// (but we'll get out of the synchronized block to actually do that).
 						getResultFromCache = true;
 					}
 					else
 					{
+						if (cacheValue == null)
+						{
+							if (traceEnabled)
+							{
+								IdeLog.logTrace(ParsingPlugin.getDefault(),
+										MessageFormat.format("Parsing cache miss for key {0}", newParseStateKey), //$NON-NLS-1$
+										IDebugScopes.PARSING);
+							}
+						}
+						else if (cacheValue != null && cacheValue.requiresReparse(newParseStateKey))
+						{
+							if (traceEnabled)
+							{
+								IdeLog.logTrace(ParsingPlugin.getDefault(), MessageFormat.format(
+										"Parsing cache hit for key {0}, but reparse required", newParseStateKey), //$NON-NLS-1$
+										IDebugScopes.PARSING);
+							}
+						}
+
 						// No cache-hit, we'll do the parsing here.
 						pool = fParserPoolProvider.getParserPool(contentTypeId);
 
@@ -209,7 +240,7 @@ public class ParsingEngine
 										Messages.ParserPoolFactory_Cannot_Acquire_Parser_Pool, contentTypeId);
 								IdeLog.logInfo(ParsingPlugin.getDefault(), message, IDebugScopes.PARSING);
 							}
-							return null;
+							return ParseResult.EMPTY;
 						}
 						parser = pool.checkOut();
 						if (parser == null)
@@ -217,13 +248,13 @@ public class ParsingEngine
 							String message = MessageFormat.format(Messages.ParserPoolFactory_Cannot_Acquire_Parser,
 									contentTypeId);
 							IdeLog.logError(ParsingPlugin.getDefault(), message, IDebugScopes.PARSING);
-							return null;
+							return ParseResult.EMPTY;
 						}
 
 						// Ok, we're in a state where either there's no one parsing or the currently cached value does
 						// not match the one in the cache for this key (i.e.: parse without comments and later with
 						// comments).
-						cacheValue = new CacheValue(newParseStateKey, parseState);
+						cacheValue = new CacheValue(newParseStateKey);
 						parseCache.put(newParseStateKey, cacheValue);
 						// Important: after we put it here (in the situation getResultFromCache), we MUST have a result
 						// cacheValue.setResult(), otherwise we may end up with a listener waiting eternally for a
@@ -251,7 +282,7 @@ public class ParsingEngine
 					if (cacheValue != null)
 					{
 						// We really HAVE to call this one to avoid possible deadlocks.
-						cacheValue.setResult(null);
+						cacheValue.setResult(ParseResult.EMPTY);
 					}
 				}
 				throw new RuntimeException(e);
@@ -260,29 +291,46 @@ public class ParsingEngine
 
 			if (getResultFromCache)
 			{
-				return cacheValue.getResult(parseState);
+				return cacheValue.getResult();
 			}
 			else
 			{
-				IParseRootNode ast = null;
+				ParseResult result = ParseResult.EMPTY;
 				try
 				{
 					try
 					{
-						ast = parser.parse(parseState);
+						if (IdeLog.isTraceEnabled(ParsingPlugin.getDefault(), IDebugScopes.PARSING))
+						{
+							IdeLog.logTrace(ParsingPlugin.getDefault(), MessageFormat.format(
+									"Parsing content type {0}, length {1}, source ''{2}''", contentTypeId, //$NON-NLS-1$
+									parseState.getSource().length(), StringUtil.truncate(parseState.getSource(), 100)
+											.replaceAll("\\r|\\n", " ")), //$NON-NLS-1$ //$NON-NLS-2$
+									IDebugScopes.PARSING);
+						}
+
+						result = parser.parse(parseState);
+
 					}
 					finally
 					{
 						pool.checkIn(parser);
+					}
+					synchronized (fParseCacheLock)
+					{
+						// Make a get just to update time stamp or change it from the soft map back into the main LRU.
+						// Done because we may have the situation where the a main parse has multiple sub-parses, and
+						// it's more important to persist the main parse than the sub-parses.
+						parseCache.get(newParseStateKey);
 					}
 				}
 				finally
 				{
 					// Set the result even if this means setting null (otherwise it's possible that some listener
 					// deadlocks because of that).
-					cacheValue.setResult(ast);
+					cacheValue.setResult(result);
 				}
-				return ast;
+				return result;
 			}
 		}
 		finally
