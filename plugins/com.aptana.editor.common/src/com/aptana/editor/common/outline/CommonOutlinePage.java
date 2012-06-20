@@ -301,9 +301,11 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 	{
 		// Just change the internal ast and call refresh, that way we keep
 		// the expanded state of items.
-		fInput.ast = ast;
-		getTreeViewer().refresh();
-
+		if (!isDisposed())
+		{
+			fInput.ast = ast;
+			getTreeViewer().refresh();
+		}
 	}
 
 	@Override
