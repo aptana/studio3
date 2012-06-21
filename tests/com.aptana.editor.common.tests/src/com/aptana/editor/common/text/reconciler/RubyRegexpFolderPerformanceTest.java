@@ -28,7 +28,8 @@ public class RubyRegexpFolderPerformanceTest extends PerformanceTestCase
 	public void testYUICSSFolding() throws Exception
 	{
 		Ruby runtime = Ruby.newInstance();
-		final RubyRegexp endFolding = RubyRegexp.newRegexp(runtime, "(?<!\\*)\\*\\*\\/|^\\s*\\}", RegexpOptions.NULL_OPTIONS);
+		final RubyRegexp endFolding = RubyRegexp.newRegexp(runtime, "(?<!\\*)\\*\\*\\/|^\\s*\\}",
+				RegexpOptions.NULL_OPTIONS);
 		final RubyRegexp startFolding = RubyRegexp.newRegexp(runtime,
 				"\\/\\*\\*(?!\\*)|\\{\\s*($|\\/\\*(?!.*?\\*\\/.*\\S))", RegexpOptions.NULL_OPTIONS);
 
@@ -60,7 +61,7 @@ public class RubyRegexpFolderPerformanceTest extends PerformanceTestCase
 		{
 			IProgressMonitor monitor = new NullProgressMonitor();
 			startMeasuring();
-			folder.emitFoldingRegions(false, monitor);
+			folder.emitFoldingRegions(false, monitor, null);
 			stopMeasuring();
 			// TODO Verify the positions?
 		}

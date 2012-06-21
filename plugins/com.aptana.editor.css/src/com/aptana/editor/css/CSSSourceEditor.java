@@ -11,7 +11,6 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
@@ -21,6 +20,7 @@ import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.css.internal.text.CSSFoldingComputer;
 import com.aptana.editor.css.outline.CSSOutlineContentProvider;
 import com.aptana.editor.css.outline.CSSOutlineLabelProvider;
+import com.aptana.parsing.ast.IParseRootNode;
 
 @SuppressWarnings({ "restriction", "deprecation" })
 public class CSSSourceEditor extends AbstractThemeableEditor
@@ -57,7 +57,11 @@ public class CSSSourceEditor extends AbstractThemeableEditor
 	@Override
 	protected Object getOutlineElementAt(int caret)
 	{
-		return CSSOutlineContentProvider.getElementAt(getAST(), caret);
+		if (hasOutlinePageCreated())
+		{
+			return CSSOutlineContentProvider.getElementAt(getOutlinePage().getCurrentAst(), caret);
+		}
+		return null;
 	}
 
 	@Override
@@ -89,21 +93,9 @@ public class CSSSourceEditor extends AbstractThemeableEditor
 	}
 
 	@Override
-	public void refreshOutline()
+	public void refreshOutline(final IParseRootNode ast)
 	{
-		// TODO Does this need to be run in asyncExec here?
-		Display.getDefault().asyncExec(new Runnable()
-		{
-
-			public void run()
-			{
-				if (!hasOutlinePageCreated() || getAST() == null)
-				{
-					return;
-				}
-
-				getOutlinePage().refresh();
-			}
-		});
+		outlineAutoExpanded = true; // Don't auto-expand it here.
+		super.refreshOutline(ast);
 	}
 }

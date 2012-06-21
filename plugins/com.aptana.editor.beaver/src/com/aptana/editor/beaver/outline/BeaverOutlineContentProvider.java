@@ -15,6 +15,7 @@ import beaver.spec.ast.GrammarTreeRoot;
 
 import com.aptana.editor.beaver.parsing.ast.BeaverParseRootNode;
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.outline.CommonOutlinePageInput;
 import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.lexer.Range;
 
@@ -67,22 +68,28 @@ public class BeaverOutlineContentProvider implements ITreeContentProvider
 	{
 		Object[] result = EMPTY;
 
-		if (inputElement instanceof AbstractThemeableEditor)
+		IParseRootNode root = null;
+
+		if (inputElement instanceof CommonOutlinePageInput)
+		{
+			root = ((CommonOutlinePageInput) inputElement).ast;
+		}
+		else if (inputElement instanceof AbstractThemeableEditor)
 		{
 			AbstractThemeableEditor editor = (AbstractThemeableEditor) inputElement;
-			IParseRootNode root = editor.getAST();
+			root = editor.getAST();
+		}
 
-			if (root instanceof BeaverParseRootNode)
+		if (root instanceof BeaverParseRootNode)
+		{
+			GrammarTreeRoot grammarRoot = ((BeaverParseRootNode) root).getRoot();
+
+			// TODO: include declarations?
+			result = new Object[grammarRoot.rules.length];
+
+			for (int i = 0; i < result.length; i++)
 			{
-				GrammarTreeRoot grammarRoot = ((BeaverParseRootNode) root).getRoot();
-
-				// TODO: include declarations?
-				result = new Object[grammarRoot.rules.length];
-
-				for (int i = 0; i < result.length; i++)
-				{
-					result[i] = new SymbolWrapper(grammarRoot.rules[i]);
-				}
+				result[i] = new SymbolWrapper(grammarRoot.rules[i]);
 			}
 		}
 
@@ -109,6 +116,6 @@ public class BeaverOutlineContentProvider implements ITreeContentProvider
 
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput)
 	{
-				
+
 	}
 }
