@@ -40,6 +40,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.internal.WorkbenchWindow;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.progress.UIJob;
@@ -440,6 +441,14 @@ public final class UIUtils
 			WorkbenchWindow workbenchWindow = (WorkbenchWindow) activeWorkbenchWindow;
 			workbenchWindow.setCoolBarVisible(visible);
 			workbenchWindow.setPerspectiveBarVisible(visible);
+
+			// Try to force a refresh of the text on the action
+			IWorkbenchPart activePart = getActivePart();
+			if (activePart != null)
+			{
+				ICommandService cmdService = (ICommandService) activePart.getSite().getService(ICommandService.class);
+				cmdService.refreshElements("org.eclipse.ui.ToggleCoolbarAction", null); //$NON-NLS-1$
+			}
 		}
 	}
 }
