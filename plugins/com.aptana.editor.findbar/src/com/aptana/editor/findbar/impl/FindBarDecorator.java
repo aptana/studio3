@@ -249,6 +249,19 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 			{
 				((Text) e.widget).selectAll();
 			}
+			else if (e.character == SWT.TAB)
+			{
+				if (e.stateMask == 0)
+				{
+					e.doit = false;
+					((Text) e.widget).traverse(SWT.TRAVERSE_TAB_NEXT);
+				}
+				else if (e.stateMask == SWT.SHIFT)
+				{
+					e.doit = false;
+					((Text) e.widget).traverse(SWT.TRAVERSE_TAB_PREVIOUS);
+				}
+			}
 		}
 	};
 
