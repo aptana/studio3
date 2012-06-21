@@ -112,6 +112,20 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		assertProblemExists(items, "'foo' is already defined.", 3, IMarker.SEVERITY_WARNING, 42);
 	}
 
+	public void testAlreadyDefinedOK1() throws CoreException
+	{
+		// @formatter:off
+		String text = "var Class = ( function() {\n" +
+				"    var IS_DONTENUM_BUGGY = ( function() {\n" +
+				"        return true;\n" +
+				"    }());\n" +
+				"}());";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "'' is already defined.");
+	}
+
 	public void testAnd() throws CoreException
 	{
 		// @formatter:off
@@ -125,6 +139,27 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		List<IProblem> items = getParseErrors(text);
 		assertProblemExists(items, "The '&&' subexpression should be wrapped in parens.", 5, IMarker.SEVERITY_WARNING,
 				78);
+	}
+
+	public void testAScopeOK1() throws CoreException
+	{
+		// @formatter:off
+		String text = "var Prototype = {\n" +
+				"	Browser : (function() {\n" +
+				"		var isOpera = Object.prototype.toString.call(window.opera) == '[object Opera]';\n" +
+				"	})(),\n" +
+				"	\n" +
+				"	BrowserFeatures : {\n" +
+				"		ElementExtensions : (function() {\n" +
+				"			var constructor = window.Element || window.HTMLElement;\n" +
+				"			return !!(constructor && constructor.prototype);\n" +
+				"		})()\n" +
+				"	}\n" +
+				"}; ";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "'window' used out of scope.");
 	}
 
 	public void testAssignException() throws CoreException
@@ -226,6 +261,16 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 
 		List<IProblem> items = getParseErrors(text);
 		assertProblemExists(items, "Bad assignment.", 1, IMarker.SEVERITY_WARNING, 6);
+	}
+
+	public void testBadAssignmentAOK1() throws CoreException
+	{
+		// @formatter:off
+		String text = "Prototype.BrowserFeatures.SpecificElementExtensions = false;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "Bad assignment.");
 	}
 
 	public void testBadConstructor() throws CoreException
@@ -331,6 +376,26 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		assertDoesntContain(items, "Do not use 'new' for side effects.");
 	}
 
+	public void testBadNewOK3() throws CoreException
+	{
+		// @formatter:off
+		String text = "throw new TypeError();";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "Do not use 'new' for side effects.");
+	}
+
+	public void testBadNewOK4() throws CoreException
+	{
+		// @formatter:off
+		String text = "function foo() { return new TypeError(); }";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "Do not use 'new' for side effects.");
+	}
+
 	public void testBadNumber1() throws CoreException
 	{
 		// @formatter:off
@@ -414,6 +479,18 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 
 		List<IProblem> items = getParseErrors(text);
 		assertProblemExists(items, "Combine this with the previous 'var' statement.", 3, IMarker.SEVERITY_WARNING, 42);
+	}
+
+	public void testCombineVarOK1() throws CoreException
+	{
+		// @formatter:off
+		String text = "function eachSlice(number, iterator, context) {\n" +
+				"	var index = -number, slices = [], array = this.toArray();\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "Combine this with the previous 'var' statement.");
 	}
 
 	public void testConditionalAssignmentAndLeftSide() throws CoreException
@@ -751,6 +828,16 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		assertProblemExists(items, "Dangerous comment.", 1, IMarker.SEVERITY_WARNING, 2);
 	}
 
+	public void testDangerousCommentOKIfSafeOptionNotExplicitlyTurnedOn() throws CoreException
+	{
+		// @formatter:off
+		String text = "/*  Prototype Javascript framework, version 1.7 */";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "Dangerous comment.");
+	}
+
 	public void testDanglingA1() throws CoreException
 	{
 		// @formatter:off
@@ -1028,6 +1115,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 
 	public void testExpectedAAtBC() throws CoreException
 	{
+		setOption("white", false);
 		// @formatter:off
 		String text = "function x() {\n" +
 				"var a = 1;\n" +
@@ -1078,6 +1166,16 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 
 		List<IProblem> items = getParseErrors(text);
 		assertProblemExists(items, "Expected a number and instead saw 'a'.", 1, IMarker.SEVERITY_WARNING, 10);
+	}
+
+	public void testExpectedNumberAOK1() throws CoreException
+	{
+		// @formatter:off
+		String text = "Template.Pattern = /(^|.|\\r|\\n)(#\\{(.*?)\\})/;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "Expected a number and instead saw '(.*?)\\'.");
 	}
 
 	public void testFixedWrapImmediate() throws CoreException
@@ -1661,6 +1759,23 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 				IMarker.SEVERITY_WARNING, 249);
 	}
 
+	public void testMoveInvocation2() throws CoreException
+	{
+		// @formatter:off
+		String text = "var Prototype = {\n" +
+				"  Browser: (function(){\n" +
+				"    var ua = navigator.userAgent;\n" +
+				"  })()\n" +
+				"};";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		// This isn't a "bad_wrap", it's a "move_invocation"
+		assertDoesntContain(items, "Do not wrap function literals in parens unless they are to be immediately invoked.");
+		assertProblemExists(items, "Move the invocation into the parens that contain the function.", 4,
+				IMarker.SEVERITY_WARNING, 80);
+	}
+
 	public void testMoveVar() throws CoreException
 	{
 		// @formatter:off
@@ -2185,6 +2300,32 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		assertProblemExists(items, "Unexpected '++'.", 2, IMarker.SEVERITY_WARNING, 21);
 	}
 
+	public void testUnexpectedAOK1() throws CoreException
+	{
+		// @formatter:off
+		String text = "var Prototype = {\n" +
+				"  Browser: (function(){\n" +
+				"    var ua = navigator.userAgent;\n" +
+				"  })()\n" +
+				"};";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "Unexpected 'ua'.");
+	}
+
+	public void testUnexpectedAOK2() throws CoreException
+	{
+		// @formatter:off
+		String text = "function create() {\n" +
+				"    var parent = null, properties = $A(arguments);\n" +
+				"};";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "Unexpected 'parent'.");
+	}
+
 	public void testUnexpectedPropertyA1() throws CoreException
 	{
 		// @formatter:off
@@ -2435,6 +2576,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 
 	public void testUsedBeforeA() throws CoreException
 	{
+		setOption("undef", false);
 		// @formatter:off
 		String text = "/*jslint undef: false */\n" +
 				"function chris() {\n" +
@@ -2444,6 +2586,16 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 
 		List<IProblem> items = getParseErrors(text);
 		assertProblemExists(items, "'foo' was used before it was defined.", 3, IMarker.SEVERITY_WARNING, 58);
+	}
+
+	public void testUsedBeforeAOK1() throws CoreException
+	{
+		// @formatter:off
+		String text = "var Prototype = { Version: '1.7' }";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "'Version' was used before it was defined.");
 	}
 
 	public void testUseObject() throws CoreException
@@ -2802,7 +2954,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 				"Wrap an immediate function invocation in parentheses to assist the reader in understanding that the expression is the result of a function, and not the function itself.");
 	}
 
-	public void testWrapRegexp() throws CoreException
+	public void testWrapRegexp1() throws CoreException
 	{
 		// @formatter:off
 		String text = "function chris() { return /regexp/i; }";
@@ -2811,6 +2963,19 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		List<IProblem> items = getParseErrors(text);
 		assertProblemExists(items, "Wrap the /regexp/ literal in parens to disambiguate the slash operator.", 1,
 				IMarker.SEVERITY_WARNING, 26);
+	}
+
+	public void testWrapRegexp2() throws CoreException
+	{
+		// @formatter:off
+		String text = "function blank() {\n" +
+				"	return /^\\s*$/.test(this);\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Wrap the /regexp/ literal in parens to disambiguate the slash operator.", 2,
+				IMarker.SEVERITY_WARNING, 27);
 	}
 
 	public void testWriteIsWrong() throws CoreException

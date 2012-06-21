@@ -96,11 +96,6 @@ public class JSStyleValidatorTest extends JSLintValidatorTest
 		// TODO Implement!
 	}
 
-	public void testCombineVar() throws CoreException
-	{
-		// TODO Implement!
-	}
-
 	public void testConfusingABang1() throws CoreException
 	{
 		// TODO Implement!
@@ -282,16 +277,6 @@ public class JSStyleValidatorTest extends JSLintValidatorTest
 	}
 
 	public void testInfixIn() throws CoreException
-	{
-		// TODO Implement!
-	}
-
-	public void testInsecureA1() throws CoreException
-	{
-		// TODO Implement!
-	}
-
-	public void testInsecureA2() throws CoreException
 	{
 		// TODO Implement!
 	}
@@ -567,11 +552,6 @@ public class JSStyleValidatorTest extends JSLintValidatorTest
 	}
 
 	public void testWeirdTernary2() throws CoreException
-	{
-		// TODO Implement!
-	}
-
-	public void testWrapRegexp() throws CoreException
 	{
 		// TODO Implement!
 	}
