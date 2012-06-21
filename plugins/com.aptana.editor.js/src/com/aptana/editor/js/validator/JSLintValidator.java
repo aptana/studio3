@@ -62,23 +62,27 @@ public class JSLintValidator extends AbstractBuildParticipant
 	private static final String JSLINT_FILENAME = "fulljslint.js"; //$NON-NLS-1$
 	private static Script JS_LINT_SCRIPT;
 
+	private static Map<String, Object> DEFAULT_OPTION = new HashMap<String, Object>();
+	static
+	{
+		// Set default aptana options
+		DEFAULT_OPTION.put("laxLineEnd", true); //$NON-NLS-1$
+		DEFAULT_OPTION.put("undef", true); //$NON-NLS-1$
+		DEFAULT_OPTION.put("browser", true); //$NON-NLS-1$
+		DEFAULT_OPTION.put("jscript", true); //$NON-NLS-1$
+		DEFAULT_OPTION.put("debug", true); //$NON-NLS-1$
+		DEFAULT_OPTION.put("maxerr", 100000); //$NON-NLS-1$
+		DEFAULT_OPTION.put("white", true); //$NON-NLS-1$
+		DEFAULT_OPTION.put(
+				"predef", new NativeArray(new String[] { "Ti", "Titanium", "alert", "require", "exports", "native", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
+						"implements" })); //$NON-NLS-1$
+	}
+
 	private Map<String, Object> options;
 
-	@SuppressWarnings("nls")
 	public JSLintValidator()
 	{
 		super();
-		// aptana options
-		options = new HashMap<String, Object>();
-		options.put("laxLineEnd", true);
-		options.put("undef", true);
-		options.put("browser", true);
-		options.put("jscript", true);
-		options.put("debug", true);
-		options.put("maxerr", 1000);
-		options.put("predef", true);
-		options.put("predef", new NativeArray(new String[] { "Ti", "Titanium", "alert", "require", "exports", "native",
-				"implements" }));
 	}
 
 	public void buildFile(BuildContext context, IProgressMonitor monitor)
@@ -88,6 +92,7 @@ public class JSLintValidator extends AbstractBuildParticipant
 			return;
 		}
 
+		intializeOptions();
 		List<IProblem> problems = Collections.emptyList();
 		String sourcePath = context.getURI().toString();
 		try
@@ -109,6 +114,7 @@ public class JSLintValidator extends AbstractBuildParticipant
 					MessageFormat.format("Failed to parse {0} with JSLint", sourcePath), e); //$NON-NLS-1$
 		}
 
+		this.options = null;
 		context.putProblems(IJSConstants.JSLINT_PROBLEM_MARKER_TYPE, problems);
 	}
 
@@ -189,10 +195,6 @@ public class JSLintValidator extends AbstractBuildParticipant
 
 			// Grab the line of the error. Skip if we already recorded an error on this line (why?)
 			int line = (int) Double.parseDouble(object.get("line", scope).toString()); //$NON-NLS-1$
-			if (hasErrorOrWarningOnLine(items, line))
-			{
-				continue;
-			}
 
 			// Grab the details of the error. If user has set up filters to ignore it, move on
 			String reason = object.get("reason", scope).toString().trim(); //$NON-NLS-1$
@@ -313,6 +315,17 @@ public class JSLintValidator extends AbstractBuildParticipant
 
 	public void setOption(String propertyName, Object value)
 	{
+		intializeOptions();
 		this.options.put(propertyName, value);
+	}
+
+	private void intializeOptions()
+	{
+		if (this.options == null)
+		{
+			this.options = new HashMap<String, Object>();
+			this.options.putAll(DEFAULT_OPTION);
+		}
+
 	}
 }

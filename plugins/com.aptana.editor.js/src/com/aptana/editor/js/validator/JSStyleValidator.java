@@ -42,6 +42,7 @@ import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSArgumentsNode;
 import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
 import com.aptana.editor.js.parsing.ast.JSBinaryBooleanOperatorNode;
+import com.aptana.editor.js.parsing.ast.JSBinaryOperatorNode;
 import com.aptana.editor.js.parsing.ast.JSBreakNode;
 import com.aptana.editor.js.parsing.ast.JSCatchNode;
 import com.aptana.editor.js.parsing.ast.JSCommentNode;
@@ -68,6 +69,7 @@ import com.aptana.editor.js.parsing.ast.JSStatementsNode;
 import com.aptana.editor.js.parsing.ast.JSStringNode;
 import com.aptana.editor.js.parsing.ast.JSSwitchNode;
 import com.aptana.editor.js.parsing.ast.JSThrowNode;
+import com.aptana.editor.js.parsing.ast.JSVarNode;
 import com.aptana.editor.js.parsing.ast.JSWhileNode;
 import com.aptana.index.core.build.BuildContext;
 import com.aptana.parsing.ast.IParseNode;
@@ -103,7 +105,7 @@ public class JSStyleValidator extends AbstractBuildParticipant
 	 */
 	public static final String ID = "com.aptana.editor.js.validator.JSStyleValidator"; //$NON-NLS-1$
 
-	private static final Pattern QUANTIFIER = Pattern.compile("\\{([^\\}]*)\\}"); //$NON-NLS-1$
+	private static final Pattern QUANTIFIER = Pattern.compile("(?<!\\\\)\\{([^\\}]*)\\}"); //$NON-NLS-1$
 
 	private static final Set<String> NOT_CONSTRUCTOR = CollectionsUtil.newSet(
 			"Number", "String", "Boolean", "Math", "JSON"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
@@ -111,8 +113,38 @@ public class JSStyleValidator extends AbstractBuildParticipant
 	private static final Set<String> BANNED = CollectionsUtil.newSet("arguments", "callee", "caller", "constructor", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			"eval", "prototype", "stack", "unwatch", "valueOf", "watch"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 
-	private static final String[] DEFAULT_PREDEFINEDS = new String[] {
-			"Ti", "Titanium", "alert", "require", "exports", "native", "implements" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$			;
+	/**
+	 * The standard set of predefineds.
+	 */
+	private static final Set<String> STANDARD_PREDEFINEDS = CollectionsUtil.newSet("Array", "Boolean", "Date", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			"decodeURI", "decodeURIComponent", "encodeURI", "encodeURIComponent", "Error", "eval", "EvalError", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
+			"Function", "isFinite", "isNaN", "JSON", "Math", "Number", "Object", "parseInt", "parseFloat", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$
+			"RangeError", "ReferenceError", "RegExp", "String", "SyntaxError", "TypeError", "URIError"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
+
+	/**
+	 * Our Appcelerator-specific predefineds.
+	 */
+	private static final Set<String> APPC_PREDEFINEDS = CollectionsUtil.newSet(
+			"Ti", "Titanium", "alert", "require", "exports", "native", "implements"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$			;
+
+	private static final Set<String> BROWSER_PREDEFINEDS = CollectionsUtil.newSet("clearInterval", "clearTimeout", //$NON-NLS-1$ //$NON-NLS-2$
+			"document", "event", "FormData", "frames", "history", "Image", "localStorage", "location", "name", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$
+			"navigator", "Option", "parent", "screen", "sessionStorage", "setInterval", "setTimeout", "Storage", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
+			"window", "XMLHttpRequest"); //$NON-NLS-1$ //$NON-NLS-2$
+
+	private static final Set<String> DEVEL_PREDEFINEDS = CollectionsUtil.newSet(
+			"alert", "confirm", "console", "Debug", "opera", "prompt", "WSH"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
+
+	private static final Set<String> NODE_PREDEFINEDS = CollectionsUtil.newSet("ActiveXObject", "CScript", "Debug", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			"Enumerator", "System", "VBArray", "WScript", "WSH"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+
+	private static final Set<String> RHINO_PREDEFINEDS = CollectionsUtil.newSet("defineClass", "deserialize", "gc", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			"help", "load", "loadClass", "print", "quit", "readFile", "readUrl", "runCommand", "seal", "serialize", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$
+			"spawn", "sync", "toint32", "version"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+
+	private static final Set<String> WINDOWS_PREDEFINEDS = CollectionsUtil.newSet("Buffer", "clearInterval", //$NON-NLS-1$ //$NON-NLS-2$
+			"clearTimeout", "console", "exports", "global", "module", "process", "querystring", "require", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
+			"setInterval", "setTimeout", "__dirname", "__filename"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
 	/**
 	 * The Set of reserved words in javascript
@@ -224,45 +256,48 @@ public class JSStyleValidator extends AbstractBuildParticipant
 		}
 	}
 
+	// We have a bit of a hack here. We're mixing the notion of default values that we have overridden typically (the
+	// true values), with assuming false for options that have no explicit value set.
 	// aptanaOptions.laxLineEnd = true;
 	// aptanaOptions.jscript = true;
 	enum Option
 	{
 		// @formatter:off
-		ANON      (true),
-        BITWISE   (true),
+		ADSAFE    (false),
+		ANON      (false),
+        BITWISE   (false),
         BROWSER   (true),
-        CAP       (true),
-        CONTINUE  (true),
-        CSS       (true),
+        CAP       (false),
+        CONTINUE  (false),
+        CSS       (false),
         DEBUG     (true),
-        DEVEL     (true),
-        EQEQ      (true),
-        ES5       (true),
-        EVIL      (true),
-        FORIN     (true),
-        FRAGMENT  (true),
+        DEVEL     (false),
+        EQEQ      (false),
+        ES5       (false),
+        EVIL      (false),
+        FORIN     (false),
+        FRAGMENT  (false),
 //      INDENT    (  10),
 //      MAXERR    (1000),
 //      MAXLEN    ( 256),
-        NEWCAP    (true),
-        NODE      (true),
-        NOMEN     (true),
-        ON        (true),
-        PASSFAIL  (true),
-        PLUSPLUS  (true),
-        PROPERTIES(true),
-        REGEXP    (true),
-        RHINO     (true),
+        NEWCAP    (false),
+        NODE      (false),
+        NOMEN     (false),
+        ON        (false),
+        PASSFAIL  (false),
+        PLUSPLUS  (false),
+        PROPERTIES(false),
+        REGEXP    (false),
+        RHINO     (false),
         UNDEF     (true),
-        UNPARAM   (true),
-        SAFE	  (true),
-        SLOPPY    (true),
-        STUPID    (true),
-        SUB       (true),
-        VARS      (true),
+        UNPARAM   (false),
+        SAFE	  (false),
+        SLOPPY    (false),
+        STUPID    (false),
+        SUB       (false),
+        VARS      (false),
         WHITE     (true),
-        WINDOWS   (true);
+        WINDOWS   (false);
 		// @formatter:on
 
 		private boolean defValue;
@@ -272,6 +307,7 @@ public class JSStyleValidator extends AbstractBuildParticipant
 			this.defValue = defValue;
 		}
 
+		// FIXME We actually need to be defining the type of value (Number/Boolean)
 		public boolean defaultValue()
 		{
 			return this.defValue;
@@ -290,6 +326,11 @@ public class JSStyleValidator extends AbstractBuildParticipant
 		private int breakage;
 		private int loopage;
 		private Scope scope;
+
+		/**
+		 * Have we already defined variables in this function?
+		 */
+		private boolean vars = false;
 
 		private Map<String, Kind> map;
 		private boolean argumentsAccessed;
@@ -440,9 +481,6 @@ public class JSStyleValidator extends AbstractBuildParticipant
 			{
 				// Wrap the source in an IDocument so we can easily look up line numbers/offsets.
 				this.doc = new Document(context.getContents());
-
-				// Set up the JSLint fields
-				this.predefineds = CollectionsUtil.newSet(DEFAULT_PREDEFINEDS);
 
 				ParseUtil.treeApply(ast, new ParseUtil.IASTVisitor()
 				{
@@ -630,6 +668,10 @@ public class JSStyleValidator extends AbstractBuildParticipant
 				enterGetProperty((JSGetPropertyNode) node);
 				break;
 
+			case IJSNodeTypes.GROUP:
+				enterGroupNode((JSGroupNode) node);
+				break;
+
 			case IJSNodeTypes.IDENTIFIER:
 				enterIdentifier((JSIdentifierNode) node);
 				break;
@@ -662,12 +704,20 @@ public class JSStyleValidator extends AbstractBuildParticipant
 				enterRegexp((JSRegexNode) node);
 				break;
 
+			case IJSNodeTypes.RETURN:
+				enterReturn((JSReturnNode) node);
+				break;
+
 			case IJSNodeTypes.STATEMENTS:
 				enterStatements((JSStatementsNode) node);
 				break;
 
 			case IJSNodeTypes.SWITCH:
 				enterSwitch((JSSwitchNode) node);
+				break;
+
+			case IJSNodeTypes.VAR:
+				enterVar((JSVarNode) node);
 				break;
 
 			case IJSNodeTypes.WHILE:
@@ -679,24 +729,105 @@ public class JSStyleValidator extends AbstractBuildParticipant
 		}
 	}
 
+	private void enterVar(JSVarNode node)
+	{
+		// Check if we can combine var decls
+		if (currentFunction().vars && !option(Option.VARS))
+		{
+			problems.add(createWarning(Messages.JSStyleValidator_CombineVar, node));
+		}
+		else if (!inGlobalFunct())
+		{
+			currentFunction().vars = true;
+		}
+	}
+
+	private void enterReturn(JSReturnNode node)
+	{
+		IParseNode child = node.getFirstChild();
+		while (child != null)
+		{
+			if (child instanceof JSRegexNode)
+			{
+				try
+				{
+					int returnLine = doc.getLineOfOffset(node.getStartingOffset()) + 1;
+					int regexpLine = doc.getLineOfOffset(child.getStartingOffset()) + 1;
+					if (returnLine == regexpLine)
+					{
+						problems.add(createWarning(Messages.JSStyleValidator_WrapRegexp, child));
+					}
+				}
+				catch (BadLocationException e)
+				{
+					// ignore
+				}
+			}
+
+			// Only delve into GetProperty and Invoke nodes
+			if (!(child instanceof JSGetPropertyNode || child instanceof JSInvokeNode))
+			{
+				break;
+			}
+
+			child = child.getFirstChild();
+		}
+	}
+
+	private void enterGroupNode(JSGroupNode node)
+	{
+		IParseNode expression = node.getExpression();
+		if (expression instanceof JSFunctionNode)
+		{
+			IParseNode parent = node.getParent();
+			if (parent instanceof JSInvokeNode)
+			{
+				// FIXME the offset/length here is a little wonky. May need to grab next sibling (argumenets node) and
+				// mark on that.
+				problems.add(createWarning(Messages.JSStyleValidator_MoveInvocation, parent.getEndingOffset() - 1, 1));
+			}
+			else
+			{
+				problems.add(createWarning(Messages.JSStyleValidator_BadWrap, node));
+			}
+		}
+	}
+
 	private void enterComment(JSCommentNode node)
 	{
-		if (option(Option.SAFE))
+		try
 		{
-			try
+			String commentText = this.doc.get(node.getStartingOffset(), node.getLength());
+			if (commentText.startsWith("/*jslint")) //$NON-NLS-1$
 			{
-				String commentText = this.doc.get(node.getStartingOffset(), node.getLength());
+				// TODO Parse out the directives!
+				// if (option(Option.SAFE))
+				// {
+				// warn('adsafe_a', this);
+				// }
+
+				String values = commentText.substring(8, commentText.length() - 2).trim();
+				String[] propertyPairs = values.split(","); //$NON-NLS-1$
+				for (String pair : propertyPairs)
+				{
+					String[] nameValue = pair.split(":"); //$NON-NLS-1$
+					Option option = Option.valueOf(nameValue[0].trim().toUpperCase());
+					options().put(option, Boolean.parseBoolean(nameValue[1].trim()));
+				}
+			}
+			else if (option(Option.SAFE))
+			{
 				if (AX.matcher(commentText).find())
 				{
 					int start = node.getStart() + 2;
-					problems.add(createWarning(Messages.JSLintReplacementValidator_DangerousComment, start,
-							node.getEnd() - start + 1));
+					problems.add(createWarning(Messages.JSStyleValidator_DangerousComment, start, node.getEnd() - start
+							+ 1));
 				}
 			}
-			catch (BadLocationException e)
-			{
-				// ignore
-			}
+		}
+		catch (BadLocationException e)
+		{
+			// ignore
 		}
 	}
 
@@ -724,8 +855,7 @@ public class JSStyleValidator extends AbstractBuildParticipant
 			JSBinaryBooleanOperatorNode andNode = (JSBinaryBooleanOperatorNode) node;
 			Symbol operator = andNode.getOperator();
 			int start = operator.getStart();
-			this.problems.add(createWarning(Messages.JSLintReplacementValidator_And, start, operator.getEnd() - start
-					+ 1));
+			this.problems.add(createWarning(Messages.JSStyleValidator_And, start, operator.getEnd() - start + 1));
 		}
 	}
 
@@ -737,6 +867,9 @@ public class JSStyleValidator extends AbstractBuildParticipant
 
 	private void enterRootNode(IParseRootNode node)
 	{
+		// Set up the JSLint fields
+		this.predefineds = new HashSet<String>(CollectionsUtil.union(STANDARD_PREDEFINEDS, APPC_PREDEFINEDS));
+
 		// Seed the stacks with the global funct/scope/options
 		this.optionStack = new Stack<EnumMap<Option, Boolean>>();
 		this.optionStack.push(initialOptions);
@@ -746,6 +879,40 @@ public class JSStyleValidator extends AbstractBuildParticipant
 
 		this.functionStack = new Stack<JSStyleValidator.Function>();
 		this.functionStack.push(new Function(currentScope()));
+
+		if (option(Option.ADSAFE))
+		{
+			options().put(Option.SAFE, true);
+		}
+		if (option(Option.SAFE))
+		{
+			options().put(Option.BROWSER, false);
+			options().put(Option.CONTINUE, false);
+			options().put(Option.CSS, false);
+			options().put(Option.DEBUG, false);
+			options().put(Option.DEVEL, false);
+			options().put(Option.EVIL, false);
+			options().put(Option.FORIN, false);
+			options().put(Option.NEWCAP, false);
+			options().put(Option.NOMEN, false);
+			options().put(Option.ON, false);
+			options().put(Option.RHINO, false);
+			options().put(Option.SLOPPY, false);
+			options().put(Option.SUB, false);
+			options().put(Option.UNDEF, false);
+			options().put(Option.WINDOWS, false);
+
+			predefineds.remove("Array"); //$NON-NLS-1$
+			predefineds.remove("Date"); //$NON-NLS-1$
+			predefineds.remove("Function"); //$NON-NLS-1$
+			predefineds.remove("Object"); //$NON-NLS-1$
+			predefineds.remove("eval"); //$NON-NLS-1$
+
+			predefineds.add("ADSAFE"); //$NON-NLS-1$
+			predefineds.add("lib"); //$NON-NLS-1$
+		}
+
+		assume();
 	}
 
 	private void exitRootNode(IParseRootNode node)
@@ -771,8 +938,9 @@ public class JSStyleValidator extends AbstractBuildParticipant
 			IParseNode child = children[i];
 			if (disruptor != null)
 			{
-				problems.add(createWarning(MessageFormat.format(Messages.JSLintReplacementValidator_UnreachableAB,
-						string(child), string(disruptor)), child));
+				problems.add(createWarning(
+						MessageFormat.format(Messages.JSStyleValidator_UnreachableAB, string(child), string(disruptor)),
+						child));
 				disruptor = null;
 			}
 			if (scope.isDisruptor(child))
@@ -782,7 +950,7 @@ public class JSStyleValidator extends AbstractBuildParticipant
 				{
 					if (node instanceof IParseRootNode)
 					{
-						problems.add(createWarning(Messages.JSLintReplacementValidator_WeirdProgram, lastChild(child)));
+						problems.add(createWarning(Messages.JSStyleValidator_WeirdProgram, lastChild(child)));
 						markedStrangeLoop = true;
 					}
 					else
@@ -790,8 +958,8 @@ public class JSStyleValidator extends AbstractBuildParticipant
 						IParseNode parent = node.getParent();
 						if (parent instanceof JSDoNode || parent instanceof JSWhileNode || parent instanceof JSForNode)
 						{
-							problems.add(createWarning(Messages.JSLintReplacementValidator_StrangeLoop,
-									child.getEndingOffset(), 1));
+							problems.add(createWarning(Messages.JSStyleValidator_StrangeLoop, child.getEndingOffset(),
+									1));
 							markedStrangeLoop = true;
 						}
 					}
@@ -875,8 +1043,7 @@ public class JSStyleValidator extends AbstractBuildParticipant
 	{
 		if (body instanceof JSStatementsNode && body.getChildCount() == 0)
 		{
-			problems.add(createWarning(Messages.JSLintReplacementValidator_EmptyBlock, body.getEndingOffset() + offset,
-					length));
+			problems.add(createWarning(Messages.JSStyleValidator_EmptyBlock, body.getEndingOffset() + offset, length));
 		}
 	}
 
@@ -911,8 +1078,8 @@ public class JSStyleValidator extends AbstractBuildParticipant
 			JSAssignmentNode assign = (JSAssignmentNode) condition;
 			Symbol operator = assign.getOperator();
 			int start = operator.getStart();
-			this.problems.add(createWarning(Messages.JSLintReplacementValidator_ConditionalAssignment, start,
-					operator.getEnd() - start + 1));
+			this.problems.add(createWarning(Messages.JSStyleValidator_ConditionalAssignment, start, operator.getEnd()
+					- start + 1));
 		}
 	}
 
@@ -945,15 +1112,14 @@ public class JSStyleValidator extends AbstractBuildParticipant
 	private void enterAssignment(JSAssignmentNode node)
 	{
 		IParseNode left = node.getLeftHandSide();
-		if (left instanceof JSGetElementNode)
+		if (left instanceof JSGetElementNode || left instanceof JSGetPropertyNode)
 		{
-			JSGetElementNode get = (JSGetElementNode) left;
+			JSBinaryOperatorNode get = (JSBinaryOperatorNode) left;
 			IParseNode first = get.getFirstChild();
 			String name = first.getNameNode().getName();
 			if ("arguments".equals(name)) //$NON-NLS-1$
 			{
-				problems.add(createWarning(Messages.JSLintReplacementValidator_BadAssignment,
-						get.getEndingOffset() + 2, 1));
+				problems.add(createWarning(Messages.JSStyleValidator_BadAssignment, get.getEndingOffset() + 2, 1));
 			}
 		}
 		else if (left instanceof JSIdentifierNode)
@@ -961,15 +1127,14 @@ public class JSStyleValidator extends AbstractBuildParticipant
 			String name = left.getNameNode().getName();
 			if (!RESERVED.contains(name) && currentFunction().get(name) == Kind.EXCEPTION)
 			{
-				problems.add(createWarning(Messages.JSLintReplacementValidator_AssignException, left));
+				problems.add(createWarning(Messages.JSStyleValidator_AssignException, left));
 			}
 			// Make a note that we're assigning to this variable.
 			currentFunction().varAssigned(name);
 		}
 		else
 		{
-			problems.add(createWarning(Messages.JSLintReplacementValidator_BadAssignment,
-					node.getOperator().getStart(), 1));
+			problems.add(createWarning(Messages.JSStyleValidator_BadAssignment, node.getOperator().getStart(), 1));
 		}
 	}
 
@@ -995,8 +1160,7 @@ public class JSStyleValidator extends AbstractBuildParticipant
 			JSAssignmentNode assign = (JSAssignmentNode) value;
 			IParseNode left = assign.getLeftHandSide();
 			problems.add(createWarning(
-					MessageFormat.format(Messages.JSLintReplacementValidator_VarANot, left.getNameNode().getName()),
-					left));
+					MessageFormat.format(Messages.JSStyleValidator_VarANot, left.getNameNode().getName()), left));
 		}
 		// Check for assignment of 'undefined'
 		else if ("undefined".equals(value.getNameNode().getName())) //$NON-NLS-1$
@@ -1004,15 +1168,18 @@ public class JSStyleValidator extends AbstractBuildParticipant
 			// FIXME JSLint marks the equal sign as start of warning. Should we mark there? Mark the value? Mark the
 			// equals to the end of the value?
 			int start = node.getEqualSign().getStart();
-			problems.add(createWarning(
-					MessageFormat.format(Messages.JSLintReplacementValidator_UnnecessaryInitialize, id), start, 1));
+			problems.add(createWarning(MessageFormat.format(Messages.JSStyleValidator_UnnecessaryInitialize, id),
+					start, 1));
 		}
 	}
 
 	private void enterFunction(JSFunctionNode node)
 	{
 		String name = node.getNameNode().getName();
-		addLabel(Kind.FUNCTION, name, node);
+		if (!StringUtil.isEmpty(name))
+		{
+			addLabel(Kind.FUNCTION, name, node);
+		}
 
 		IParseNode nameNode = node.getName();
 		checkIdentifier(nameNode);
@@ -1022,15 +1189,10 @@ public class JSStyleValidator extends AbstractBuildParticipant
 		this.optionStack.push(options().clone());
 		this.scopeStack.push((Scope) currentScope().clone());
 
-		if (name != null)
+		// FIXME Why do we do this in both places?
+		if (!StringUtil.isEmpty(name))
 		{
 			addLabel(Kind.FUNCTION, name, node);
-		}
-
-		IParseNode parent = node.getParent();
-		if (parent instanceof JSGroupNode)
-		{
-			problems.add(createWarning(Messages.JSLintReplacementValidator_BadWrap, parent));
 		}
 	}
 
@@ -1039,8 +1201,15 @@ public class JSStyleValidator extends AbstractBuildParticipant
 		String name = node.getNameNode().getName();
 		if (option(Option.SAFE) && BANNED.contains(name))
 		{
-			problems.add(createWarning(MessageFormat.format(Messages.JSLintReplacementValidator_AdsafeA, name), node));
+			problems.add(createWarning(MessageFormat.format(Messages.JSStyleValidator_AdsafeA, name), node));
 		}
+		// TODO Implement expected_identifier_a_reserved
+		// else if (RESERVED.contains(name) && !option(Option.ES5))
+		// {
+		// problems.add(createWarning(
+		// MessageFormat.format("Expected an identifier and instead saw ''{0}'' (a reserved word).", name),
+		// node));
+		// }
 	}
 
 	private void exitFunction(JSFunctionNode node)
@@ -1059,8 +1228,7 @@ public class JSStyleValidator extends AbstractBuildParticipant
 				if (assigned.contains(paramName))
 				{
 					problems.add(createWarning(
-							MessageFormat.format(Messages.JSLintReplacementValidator_ParameterArgumentsA, paramName),
-							children[i]));
+							MessageFormat.format(Messages.JSStyleValidator_ParameterArgumentsA, paramName), children[i]));
 				}
 			}
 		}
@@ -1075,6 +1243,7 @@ public class JSStyleValidator extends AbstractBuildParticipant
 	{
 		for (IParseNode child : node.getChildren())
 		{
+			identifier((JSIdentifierNode) child);
 			addLabel(Kind.PARAMETER, child.getNameNode().getName(), child);
 		}
 	}
@@ -1100,22 +1269,21 @@ public class JSStyleValidator extends AbstractBuildParticipant
 						if (low > high)
 						{
 							problems.add(createWarning(
-									MessageFormat.format(Messages.JSLintReplacementValidator_NotGreater, low, high),
+									MessageFormat.format(Messages.JSStyleValidator_NotGreater, low, high),
 									node.getStartingOffset() + m.end(1), 1));
 						}
 					}
 					catch (NumberFormatException e)
 					{
 						problems.add(createWarning(
-								MessageFormat.format(Messages.JSLintReplacementValidator_ExpectedNumberA, parts[1]),
+								MessageFormat.format(Messages.JSStyleValidator_ExpectedNumberA, parts[1]),
 								node.getStartingOffset() + m.end(1) - 1, 1));
 					}
 				}
 			}
 			catch (NumberFormatException e)
 			{
-				problems.add(createWarning(
-						MessageFormat.format(Messages.JSLintReplacementValidator_ExpectedNumberA, parts[0]),
+				problems.add(createWarning(MessageFormat.format(Messages.JSStyleValidator_ExpectedNumberA, parts[0]),
 						node.getStartingOffset() + m.start(1) - 1, 1));
 			}
 		}
@@ -1132,10 +1300,31 @@ public class JSStyleValidator extends AbstractBuildParticipant
 					break;
 
 				case '[':
-					if ((i + 1) < length && rawRegexp.charAt(i + 1) == ']')
+					if ((i + 1) < length)
 					{
-						problems.add(createWarning(Messages.JSLintReplacementValidator_EmptyClass,
-								node.getStartingOffset() + i - 1, 2));
+						char d = rawRegexp.charAt(i + 1);
+						if (d == '^')
+						{
+							if (!option(Option.REGEXP))
+							{
+								problems.add(createWarning(
+										MessageFormat.format(Messages.JSStyleValidator_InsecureA, '^'),
+										node.getStartingOffset() + i + 1, 1));
+							}
+						}
+						else if (d == ']')
+						{
+							problems.add(createWarning(Messages.JSStyleValidator_EmptyClass, node.getStartingOffset()
+									+ i - 1, 2));
+						}
+					}
+					break;
+
+				case '.':
+					if (!option(Option.REGEXP))
+					{
+						problems.add(createWarning(MessageFormat.format(Messages.JSStyleValidator_InsecureA, '.'),
+								node.getStartingOffset() + i, 1));
 					}
 					break;
 
@@ -1147,8 +1336,7 @@ public class JSStyleValidator extends AbstractBuildParticipant
 					}
 					if (count > 1)
 					{
-						problems.add(createWarning(
-								MessageFormat.format(Messages.JSLintReplacementValidator_UseBraces, count),
+						problems.add(createWarning(MessageFormat.format(Messages.JSStyleValidator_UseBraces, count),
 								node.getStartingOffset() + i + count - 1, count));
 					}
 					break;
@@ -1166,14 +1354,14 @@ public class JSStyleValidator extends AbstractBuildParticipant
 		{
 			JSIdentifierNode identifierNode = (JSIdentifierNode) expressionNode;
 			String name = identifierNode.getNameNode().getName();
-			if (option(Option.EVIL) && "Function".equals(name)) //$NON-NLS-1$
+			if (!option(Option.EVIL) && "Function".equals(name)) //$NON-NLS-1$
 			{
 				// FIXME JSLint reports the warning _after_ the node, we should just mark the node.
-				problems.add(createWarningAtEndOfNode(Messages.JSLintReplacementValidator_FunctionEval, identifierNode));
+				problems.add(createWarningAtEndOfNode(Messages.JSStyleValidator_FunctionEval, identifierNode));
 			}
 			else if ("Object".equals(name)) //$NON-NLS-1$
 			{
-				problems.add(createWarning(Messages.JSLintReplacementValidator_UseObject, identifierNode));
+				problems.add(createWarning(Messages.JSStyleValidator_UseObject, identifierNode));
 			}
 			else if ("Array".equals(name)) //$NON-NLS-1$
 			{
@@ -1181,36 +1369,37 @@ public class JSStyleValidator extends AbstractBuildParticipant
 				IParseNode next = identifierNode.getNextNode();
 				if (next instanceof JSEmptyNode)
 				{
-					problems.add(createWarning(Messages.JSLintReplacementValidator_UseArray, identifierNode));
+					problems.add(createWarning(Messages.JSStyleValidator_UseArray, identifierNode));
 				}
 				else
 				{
 					// FIXME JSLint reports the warning _after_ the node, we should just mark the node.
-					problems.add(createWarningAtEndOfNode(Messages.JSLintReplacementValidator_UseArray, identifierNode));
+					problems.add(createWarningAtEndOfNode(Messages.JSStyleValidator_UseArray, identifierNode));
 				}
 			}
 			else if (NOT_CONSTRUCTOR.contains(name))
 			{
-				problems.add(createWarning(
-						MessageFormat.format(Messages.JSLintReplacementValidator_NotAConstructor, name), identifierNode));
+				problems.add(createWarning(MessageFormat.format(Messages.JSStyleValidator_NotAConstructor, name),
+						identifierNode));
 			}
-			else if (option(Option.NEWCAP) && !Character.isUpperCase(name.charAt(0)))
+			else if (!option(Option.NEWCAP) && !Character.isUpperCase(name.charAt(0)))
 			{
-				problems.add(createWarning(
-						MessageFormat.format(Messages.JSLintReplacementValidator_ConstructorNameA, name),
+				problems.add(createWarning(MessageFormat.format(Messages.JSStyleValidator_ConstructorNameA, name),
 						identifierNode));
 			}
 
 			// Check if this is part of an assignment, if not complain about bad_new!
 			IParseNode parent = node.getParent();
-			if (!(parent instanceof JSDeclarationNode || parent instanceof JSAssignmentNode))
+			if (!(parent instanceof JSDeclarationNode || parent instanceof JSAssignmentNode
+					|| parent instanceof JSThrowNode || parent instanceof JSReturnNode
+					|| parent instanceof JSArgumentsNode || parent instanceof JSGetPropertyNode))
 			{
-				problems.add(createWarning(Messages.JSLintReplacementValidator_BadNew, node.getEndingOffset(), 1));
+				problems.add(createWarning(Messages.JSStyleValidator_BadNew, node.getEndingOffset(), 1));
 			}
 		}
 		else
 		{
-			problems.add(createWarning(Messages.JSLintReplacementValidator_WeirdNew, node));
+			problems.add(createWarning(Messages.JSStyleValidator_WeirdNew, node));
 		}
 	}
 
@@ -1223,20 +1412,19 @@ public class JSStyleValidator extends AbstractBuildParticipant
 			IParseNode left = node.getLeftHandSide();
 			if (left instanceof JSIdentifierNode && "arguments".equals(left.getNameNode().getName())) //$NON-NLS-1$
 			{
-				problems.add(createWarning(Messages.JSLintReplacementValidator_UseParam, node));
+				problems.add(createWarning(Messages.JSStyleValidator_UseParam, node));
 			}
 		}
 		else if (property instanceof JSStringNode)
 		{
 			String name = stripQuotes(property.getText());
-			if (option(Option.EVIL) && ("eval".equals(name) || "execScript".equals(name))) //$NON-NLS-1$ //$NON-NLS-2$
+			if (!option(Option.EVIL) && ("eval".equals(name) || "execScript".equals(name))) //$NON-NLS-1$ //$NON-NLS-2$
 			{
-				problems.add(createWarning(Messages.JSLintReplacementValidator_Evil, property));
+				problems.add(createWarning(Messages.JSStyleValidator_Evil, property));
 			}
-			else if (option(Option.SUB) && !RESERVED.contains(name) && IX.matcher(name).find())
+			else if (!option(Option.SUB) && !RESERVED.contains(name) && IX.matcher(name).find())
 			{
-				problems.add(createWarning(MessageFormat.format(Messages.JSLintReplacementValidator_Subscript, name),
-						property));
+				problems.add(createWarning(MessageFormat.format(Messages.JSStyleValidator_Subscript, name), property));
 			}
 		}
 	}
@@ -1251,16 +1439,16 @@ public class JSStyleValidator extends AbstractBuildParticipant
 
 		if (("callee".equals(rightName) || "caller".equals(rightName)) && "arguments".equals(leftName)) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		{
-			problems.add(createWarning(MessageFormat.format(Messages.JSLintReplacementValidator_AvoidA, rightName),
+			problems.add(createWarning(MessageFormat.format(Messages.JSStyleValidator_AvoidA, rightName),
 					getPropertyNode));
 		}
 
-		if (option(Option.STUPID) && rightName.contains("Sync")) //$NON-NLS-1$
+		if (!option(Option.STUPID) && rightName.contains("Sync")) //$NON-NLS-1$
 		{
-			problems.add(createWarning(MessageFormat.format(Messages.JSLintReplacementValidator_Sync, rightName), right));
+			problems.add(createWarning(MessageFormat.format(Messages.JSStyleValidator_Sync, rightName), right));
 		}
 
-		if (option(Option.EVIL))
+		if (!option(Option.EVIL))
 		{
 			if ("eval".equals(rightName) || "execScript".equals(rightName)) //$NON-NLS-1$ //$NON-NLS-2$
 			{
@@ -1275,17 +1463,17 @@ public class JSStyleValidator extends AbstractBuildParticipant
 				{
 					// ignore
 				}
-				problems.add(createWarning(Messages.JSLintReplacementValidator_Evil, line, start, 1, sourcePath));
+				problems.add(createWarning(Messages.JSStyleValidator_Evil, line, start, 1, sourcePath));
 			}
 			else if (("write".equals(rightName) || "writeln".equals(rightName)) && "document".equals(leftName)) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			{
-				problems.add(createWarning(Messages.JSLintReplacementValidator_WriteIsWrong, getPropertyNode));
+				problems.add(createWarning(Messages.JSStyleValidator_WriteIsWrong, getPropertyNode));
 			}
 		}
 
 		if ("split".equals(rightName) && left instanceof JSStringNode) //$NON-NLS-1$
 		{
-			problems.add(createWarning(Messages.JSLintReplacementValidator_UseArray, right));
+			problems.add(createWarning(Messages.JSStyleValidator_UseArray, right));
 		}
 	}
 
@@ -1315,7 +1503,23 @@ public class JSStyleValidator extends AbstractBuildParticipant
 		{
 			currentFunction().argumentsAccessed(true);
 		}
+		if ("__iterator__".equals(name) || "__proto__".equals(name)) //$NON-NLS-1$ //$NON-NLS-2$
+		{
+			problems.add(createWarning(MessageFormat.format(Messages.JSStyleValidator_ReservedA, name), node));
+		}
+		else if (!option(Option.NOMEN) && name.length() > 0
+				&& (name.charAt(0) == '_' || name.charAt(name.length() - 1) == '_'))
+		{
+			problems.add(createWarning(MessageFormat.format(Messages.JSStyleValidator_DanglingA, name), node));
+		}
 
+		identifier(node);
+	}
+
+	// FIXME JSLint assumes this gets executed when we scan the identifier and then addLabel gets called after!
+	private void identifier(JSIdentifierNode node)
+	{
+		String name = node.getNameNode().getName();
 		Scope variable = currentScope().get(name);
 		if (variable == null)
 		{
@@ -1328,10 +1532,9 @@ public class JSStyleValidator extends AbstractBuildParticipant
 			}
 			else
 			{
-				if (option(Option.UNDEF))
+				if (!option(Option.UNDEF))
 				{
-					problems.add(createWarning(
-							MessageFormat.format(Messages.JSLintReplacementValidator_UsedBeforeA, name), node));
+					problems.add(createWarning(MessageFormat.format(Messages.JSStyleValidator_UsedBeforeA, name), node));
 				}
 				variable = new Scope(name, true, currentFunction());
 				currentScope().put(name, variable);
@@ -1348,8 +1551,12 @@ public class JSStyleValidator extends AbstractBuildParticipant
 				switch (currentFunction().get(name))
 				{
 					case BECOMING:
-						problems.add(createWarning(
-								MessageFormat.format(Messages.JSLintReplacementValidator_UnexpectedA, name), node));
+						if (!(node.getParent() instanceof JSDeclarationNode))
+						{
+							// FIXME I had to hack this extra if check since logic in JSLint seems wrong here.
+							problems.add(createWarning(
+									MessageFormat.format(Messages.JSStyleValidator_UnexpectedA, name), node));
+						}
 						currentFunction().put(name, Kind.VAR);
 						break;
 					case UNUSED:
@@ -1362,8 +1569,9 @@ public class JSStyleValidator extends AbstractBuildParticipant
 						currentFunction().put(name, Kind.FUNCTION);
 						break;
 					case LABEL:
-						problems.add(createWarning(
-								MessageFormat.format(Messages.JSLintReplacementValidator_ALabel, name), node));
+						// TODO Implement a_label!
+						// problems.add(createWarning(
+						// MessageFormat.format(Messages.JSStyleValidator_ALabel, name), node));
 						break;
 				}
 				// If the name is already defined in the current
@@ -1377,12 +1585,14 @@ public class JSStyleValidator extends AbstractBuildParticipant
 					case FUNCTION:
 					case VAR:
 					case UNUSED:
-						problems.add(createWarning(
-								MessageFormat.format(Messages.JSLintReplacementValidator_AScope, name), node));
+						// TODO Implement a_scope!
+						// problems.add(createWarning(
+						// MessageFormat.format(Messages.JSStyleValidator_AScope, name), node));
 						break;
 					case LABEL:
-						problems.add(createWarning(
-								MessageFormat.format(Messages.JSLintReplacementValidator_ALabel, name), node));
+						// TODO Implement a_label!
+						// problems.add(createWarning(
+						// MessageFormat.format(Messages.JSStyleValidator_ALabel, name), node));
 						break;
 					case OUTER:
 					case GLOBAL:
@@ -1411,22 +1621,13 @@ public class JSStyleValidator extends AbstractBuildParticipant
 								currentFunction().put(name, Kind.UNDEF);
 								break;
 							case LABEL:
-								problems.add(createWarning(
-										MessageFormat.format(Messages.JSLintReplacementValidator_ALabel, name), node));
+								// TODO Implement a_label!
+								// problems.add(createWarning(
+								// MessageFormat.format(Messages.JSStyleValidator_ALabel, name), node));
 								break;
 						}
 				}
 			}
-		}
-
-		if ("__iterator__".equals(name) || "__proto__".equals(name)) //$NON-NLS-1$ //$NON-NLS-2$
-		{
-			problems.add(createWarning(MessageFormat.format(Messages.JSLintReplacementValidator_ReservedA, name), node));
-		}
-		else if (option(Option.NOMEN) && name.length() > 0
-				&& (name.charAt(0) == '_' || name.charAt(name.length() - 1) == '_'))
-		{
-			problems.add(createWarning(MessageFormat.format(Messages.JSLintReplacementValidator_DanglingA, name), node));
 		}
 	}
 
@@ -1438,34 +1639,34 @@ public class JSStyleValidator extends AbstractBuildParticipant
 			JSIdentifierNode identifierNode = (JSIdentifierNode) expressionNode;
 			String name = identifierNode.getNameNode().getName();
 			JSArgumentsNode args = (JSArgumentsNode) node.getArguments();
-			if (option(Option.EVIL))
+			if (!option(Option.EVIL))
 			{
 				if ("eval".equals(name) || "execScript".equals(name)) //$NON-NLS-1$ //$NON-NLS-2$
 				{
-					problems.add(createWarning(Messages.JSLintReplacementValidator_Evil, expressionNode));
+					problems.add(createWarning(Messages.JSStyleValidator_Evil, expressionNode));
 				}
 				else if ("setTimeout".equals(name) || "setInterval".equals(name)) //$NON-NLS-1$ //$NON-NLS-2$
 				{
 					if (args.getChildCount() > 0 && args.getChild(0) instanceof JSStringNode)
 					{
-						problems.add(createWarning(Messages.JSLintReplacementValidator_ImpliedEvil, expressionNode));
+						problems.add(createWarning(Messages.JSStyleValidator_ImpliedEvil, expressionNode));
 					}
 				}
 			}
 
 			if ("parseInt".equals(name) && args.getChildCount() == 1) //$NON-NLS-1$
 			{
-				problems.add(createWarning(Messages.JSLintReplacementValidator_Radix, expressionNode));
+				problems.add(createWarning(Messages.JSStyleValidator_Radix, expressionNode));
 			}
 			else if ("Object".equals(name)) //$NON-NLS-1$
 			{
 				// FIXME JSLint reports the warning _after_ the node, we should just mark the node.
-				problems.add(createWarningAtEndOfNode(Messages.JSLintReplacementValidator_UseObject, identifierNode));
+				problems.add(createWarningAtEndOfNode(Messages.JSStyleValidator_UseObject, identifierNode));
 			}
 		}
 		else if (expressionNode instanceof JSFunctionNode && !(node.getParent() instanceof JSGroupNode))
 		{
-			problems.add(createWarning(Messages.JSLintReplacementValidator_WrapImmediate, node.getEndingOffset(), 1));
+			problems.add(createWarning(Messages.JSStyleValidator_WrapImmediate, node.getEndingOffset(), 1));
 		}
 	}
 
@@ -1476,14 +1677,13 @@ public class JSStyleValidator extends AbstractBuildParticipant
 		{
 			if (text.charAt(0) == '.')
 			{
-				problems.add(createWarning(
-						MessageFormat.format(Messages.JSLintReplacementValidator_LeadingDecimalA, text), node));
+				problems.add(createWarning(MessageFormat.format(Messages.JSStyleValidator_LeadingDecimalA, text), node));
 			}
 			if (text.charAt(text.length() - 1) == '.')
 			{
 				// FIXME JSLint reports the warning _after_ the node, we should just mark the node.
 				problems.add(createWarningAtEndOfNode(
-						MessageFormat.format(Messages.JSLintReplacementValidator_TrailingDecimalA, text), node));
+						MessageFormat.format(Messages.JSStyleValidator_TrailingDecimalA, text), node));
 			}
 			try
 			{
@@ -1492,19 +1692,19 @@ public class JSStyleValidator extends AbstractBuildParticipant
 				{
 					// FIXME JSLint reports the warning _after_ the node, we should just mark the node.
 					problems.add(createWarningAtEndOfNode(
-							MessageFormat.format(Messages.JSLintReplacementValidator_BadNumber, text), node));
+							MessageFormat.format(Messages.JSStyleValidator_BadNumber, text), node));
 				}
 				else if (value.compareTo(MIN_NUMBER) < 0)
 				{
 					// FIXME JSLint reports the warning _after_ the node, we should just mark the node.
 					problems.add(createWarningAtEndOfNode(
-							MessageFormat.format(Messages.JSLintReplacementValidator_BadNumber, text), node));
+							MessageFormat.format(Messages.JSStyleValidator_BadNumber, text), node));
 				}
 			}
 			catch (NumberFormatException e)
 			{
-				IdeLog.logError(JSPlugin.getDefault(),
-						MessageFormat.format("Error trying to parse JS number: ''{0}''", text), e); //$NON-NLS-1$
+				IdeLog.logInfo(JSPlugin.getDefault(),
+						MessageFormat.format("Error trying to parse JS number: ''{0}''", text), e, null); //$NON-NLS-1$
 			}
 		}
 	}
@@ -1519,8 +1719,7 @@ public class JSStyleValidator extends AbstractBuildParticipant
 		{
 			if (option(Option.SAFE))
 			{
-				problems.add(createWarning(MessageFormat.format(Messages.JSLintReplacementValidator_AdsafeA, name),
-						node));
+				problems.add(createWarning(MessageFormat.format(Messages.JSStyleValidator_AdsafeA, name), node));
 
 			}
 			if (!globalFunct().containsKey(name))
@@ -1544,17 +1743,17 @@ public class JSStyleValidator extends AbstractBuildParticipant
 			{
 				if (currentFunction().get(name) == Kind.UNDEF)
 				{
-					if (option(Option.UNDEF))
+					if (!option(Option.UNDEF))
 					{
-						problems.add(createWarning(
-								MessageFormat.format(Messages.JSLintReplacementValidator_UsedBeforeA, name), node));
+						problems.add(createWarning(MessageFormat.format(Messages.JSStyleValidator_UsedBeforeA, name),
+								node));
 					}
 					kind = Kind.VAR;
 				}
 				else
 				{
-					problems.add(createWarning(
-							MessageFormat.format(Messages.JSLintReplacementValidator_AlreadyDefined, name), node));
+					problems.add(createWarning(MessageFormat.format(Messages.JSStyleValidator_AlreadyDefined, name),
+							node));
 				}
 			}
 			// Add the symbol to the current function.
@@ -1579,6 +1778,7 @@ public class JSStyleValidator extends AbstractBuildParticipant
 		{
 			return options().get(option);
 		}
+		// FIXME if we haven't stuck a value in the option list, it should be false!
 		return option.defaultValue();
 	}
 
@@ -1611,4 +1811,36 @@ public class JSStyleValidator extends AbstractBuildParticipant
 		initialOptions.put(Option.valueOf(optionName.toUpperCase()), value);
 	}
 
+	private void assume()
+	{
+		if (!option(Option.SAFE))
+		{
+			if (option(Option.RHINO))
+			{
+				predefineds.addAll(RHINO_PREDEFINEDS);
+				options().put(Option.RHINO, false);
+			}
+			if (option(Option.DEVEL))
+			{
+				predefineds.addAll(DEVEL_PREDEFINEDS);
+				options().put(Option.DEVEL, false);
+			}
+			if (option(Option.BROWSER))
+			{
+				predefineds.addAll(BROWSER_PREDEFINEDS);
+				options().put(Option.BROWSER, false);
+			}
+			if (option(Option.WINDOWS))
+			{
+				predefineds.addAll(WINDOWS_PREDEFINEDS);
+				options().put(Option.WINDOWS, false);
+			}
+			if (option(Option.NODE))
+			{
+				predefineds.addAll(NODE_PREDEFINEDS);
+				options().put(Option.NODE, false);
+				// node_js = true;
+			}
+		}
+	}
 }

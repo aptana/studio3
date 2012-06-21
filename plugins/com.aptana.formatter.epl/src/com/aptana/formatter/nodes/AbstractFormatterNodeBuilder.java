@@ -275,7 +275,7 @@ public class AbstractFormatterNodeBuilder
 	/**
 	 * @return
 	 */
-	public IFormatterTextNode createTextNode(IFormatterDocument document, int startIndex, int endIndex)
+	public static IFormatterTextNode createTextNode(IFormatterDocument document, int startIndex, int endIndex)
 	{
 		return new FormatterTextNode(document, startIndex, endIndex);
 	}
@@ -289,7 +289,7 @@ public class AbstractFormatterNodeBuilder
 	 * @param start
 	 * @return The char offset, and if not found - the original start offset.
 	 */
-	public int locateCharBackward(FormatterDocument document, char c, int start)
+	public static int locateCharBackward(FormatterDocument document, char c, int start)
 	{
 		for (int offset = start; offset >= 0; offset--)
 		{
@@ -310,7 +310,7 @@ public class AbstractFormatterNodeBuilder
 	 * @param start
 	 * @return The char offset, and if not found - the original start offset.
 	 */
-	public int locateCharForward(FormatterDocument document, char c, int start)
+	public static int locateCharForward(FormatterDocument document, char c, int start)
 	{
 		int length = document.getLength();
 		for (int offset = start; offset < length; offset++)
