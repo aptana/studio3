@@ -92,11 +92,14 @@ module Ruble
     def load_translations
       trace("Loading translations for bundle: #{bundle_path}")
       locales_dir = File.join(bundle_path, 'config', 'locales')
-      Dir.chdir(locales_dir)
-      filenames = Dir.glob("*.yml")
-      trace("Locale files: #{filenames}")
-      filenames = filenames.map {|f| File.join(locales_dir, f) }
-      filenames.each { |filename| load_file(filename) }
+      if File.exist? locales_dir
+        Dir.chdir(locales_dir) do
+          filenames = Dir.glob("*.yml")
+          trace("Locale files: #{filenames}")
+          filenames = filenames.map {|f| File.join(locales_dir, f) }
+          filenames.each { |filename| load_file(filename) }
+        end
+      end
     end
 
     def bundle_path
