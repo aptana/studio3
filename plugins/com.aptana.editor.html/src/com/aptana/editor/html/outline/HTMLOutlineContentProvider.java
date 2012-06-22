@@ -31,8 +31,11 @@ import org.eclipse.ui.PlatformUI;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.common.outline.CompositeOutlineContentProvider;
+import com.aptana.editor.common.outline.PathResolverProvider;
+import com.aptana.editor.common.resolver.IPathResolver;
 import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.css.outline.CSSOutlineContentProvider;
 import com.aptana.editor.html.HTMLPlugin;
@@ -59,6 +62,8 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 	private TreeViewer treeViewer;
 
 	private boolean showTextNode;
+	private IPathResolver resolver;
+	private AbstractThemeableEditor fEditor;
 
 	private IPreferenceChangeListener preferenceListener = new IPreferenceChangeListener()
 	{
@@ -72,13 +77,14 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 		}
 	};
 
-	public HTMLOutlineContentProvider()
+	public HTMLOutlineContentProvider(AbstractThemeableEditor editor)
 	{
 		addSubLanguage(ICSSConstants.CONTENT_TYPE_CSS, new CSSOutlineContentProvider());
 		addSubLanguage(IJSConstants.CONTENT_TYPE_JS, new JSOutlineContentProvider());
 
 		showTextNode = HTMLPreferenceUtil.getShowTextNodesInOutline();
 		EclipseUtil.instanceScope().getNode(HTMLPlugin.PLUGIN_ID).addPreferenceChangeListener(preferenceListener);
+		fEditor = editor;
 	}
 
 	@Override
@@ -411,6 +417,10 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput)
 	{
 		this.treeViewer = (TreeViewer) viewer;
+		if (fEditor != null)
+		{
+			this.resolver = PathResolverProvider.getResolver(fEditor.getEditorInput());
+		}
 		super.inputChanged(viewer, oldInput, newInput);
 	}
 

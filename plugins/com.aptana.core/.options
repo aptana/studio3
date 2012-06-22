@@ -1,6 +1,9 @@
 com.aptana.core/debug=true
 com.aptana.core/debug/logger=true
 com.aptana.core/debug/builder=true
+com.aptana.core/debug/builder/indexer=true
+com.aptana.core/debug/builder/participants=true
+com.aptana.core/debug/builder/advanced=true
 com.aptana.core/debug/shell=true
 com.aptana.core/debug/ziputil=true
 com.aptana.core/debug/firefox=true

@@ -43,6 +43,7 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.ICommonAnnotationModel;
 import com.aptana.editor.common.util.EditorUtil;
+import com.aptana.parsing.ast.IParseRootNode;
 
 public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconcilingStrategyExtension,
 		IBatchReconcilingStrategy, IDisposableReconcilingStrategy
@@ -142,7 +143,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	}
 
 	// FIXME Can folding be made into a build participant?
-	protected void calculatePositions(boolean initialReconcile, IProgressMonitor monitor)
+	protected void calculatePositions(boolean initialReconcile, IProgressMonitor monitor, IParseRootNode ast)
 	{
 		if (monitor != null && monitor.isCanceled())
 		{
@@ -156,7 +157,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 			synchronized (fPositions)
 			{
 				fPositions.clear();
-				fPositions = folder.emitFoldingRegions(initialReconcile, monitor);
+				fPositions = folder.emitFoldingRegions(initialReconcile, monitor, ast);
 			}
 		}
 		catch (BadLocationException e)
@@ -214,20 +215,23 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		reconcile(initialReconcile, false);
 	}
 
+
 	private void reconcile(boolean initialReconcile, boolean force)
 	{
 		SubMonitor monitor = SubMonitor.convert(fMonitor, 100);
 
+		IParseRootNode ast = null;
 		if (fEditor != null)
 		{
-			fEditor.refreshOutline();
+			ast = fEditor.getAST();
+			fEditor.refreshOutline(ast);
 		}
 		monitor.worked(5);
 
 		// FIXME only do folding and validation when the source was changed
 		if (fEditor != null && fEditor.isFoldingEnabled())
 		{
-			calculatePositions(initialReconcile, monitor.newChild(20));
+			calculatePositions(initialReconcile, monitor.newChild(20), ast);
 		}
 		else
 		{

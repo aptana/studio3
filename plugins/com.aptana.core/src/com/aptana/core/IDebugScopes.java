@@ -26,6 +26,21 @@ public interface IDebugScopes
 	String BUILDER = CorePlugin.PLUGIN_ID + "/debug/builder"; //$NON-NLS-1$
 
 	/**
+	 * Items related to the indexing process
+	 */
+	String BUILDER_INDEXER = CorePlugin.PLUGIN_ID + "/debug/builder/indexer"; //$NON-NLS-1$
+
+	/**
+	 * Items related to the indexing process, specific to build participants
+	 */
+	String BUILDER_PARTICIPANTS = CorePlugin.PLUGIN_ID + "/debug/builder/participants"; //$NON-NLS-1$
+
+	/**
+	 * Items related to the indexing process, but additional information, like when we wipe the index
+	 */
+	String BUILDER_ADVANCED = CorePlugin.PLUGIN_ID + "/debug/builder/advanced"; //$NON-NLS-1$
+
+	/**
 	 * Items related to running things on the command line
 	 */
 	String SHELL = CorePlugin.PLUGIN_ID + "/debug/shell"; //$NON-NLS-1$

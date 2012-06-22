@@ -133,7 +133,7 @@ public class HTMLEditor extends AbstractThemeableEditor
 	@Override
 	public ITreeContentProvider getOutlineContentProvider()
 	{
-		return new HTMLOutlineContentProvider();
+		return new HTMLOutlineContentProvider(this);
 	}
 
 	@Override

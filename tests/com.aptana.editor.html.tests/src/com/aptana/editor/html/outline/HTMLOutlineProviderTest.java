@@ -38,7 +38,7 @@ public class HTMLOutlineProviderTest extends TestCase
 		super.setUp();
 
 		fLabelProvider = new HTMLOutlineLabelProvider();
-		fContentProvider = new HTMLOutlineContentProvider();
+		fContentProvider = new HTMLOutlineContentProvider(null);
 		fParser = new HTMLParser();
 	}
 

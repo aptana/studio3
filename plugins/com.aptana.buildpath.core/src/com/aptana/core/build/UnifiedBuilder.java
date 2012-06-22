@@ -58,6 +58,7 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 {
 
 	public static final String ID = "com.aptana.ide.core.unifiedBuilder"; //$NON-NLS-1$
+	private boolean traceParticipantsEnabled = false;
 
 	public UnifiedBuilder()
 	{
@@ -126,6 +127,9 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 	@Override
 	protected IProject[] build(int kind, Map args, IProgressMonitor monitor) throws CoreException
 	{
+		traceParticipantsEnabled = IdeLog.isTraceEnabled(BuildPathCorePlugin.getDefault(),
+				IDebugScopes.BUILDER_PARTICIPANTS);
+
 		boolean logTraceEnabled = traceLoggingEnabled();
 
 		IProject project = getProjectHandle();
@@ -517,7 +521,16 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 		SubMonitor sub = SubMonitor.convert(monitor, 2 * participants.size());
 		for (IBuildParticipant participant : participants)
 		{
+			long startTime = System.nanoTime();
 			participant.buildFile(context, sub.newChild(1));
+			if (traceParticipantsEnabled)
+			{
+				double endTime = ((double) System.nanoTime() - startTime) / 1000000;
+				IdeLog.logTrace(
+						BuildPathCorePlugin.getDefault(),
+						MessageFormat
+								.format("Executed build participant ''{0}'' on ''{1}'' in {2} ms.", participant.getName(), context.getURI(), endTime), IDebugScopes.BUILDER_PARTICIPANTS); //$NON-NLS-1$
+			}
 
 			// stop building if it has been canceled
 			if (sub.isCanceled())
