@@ -26,6 +26,7 @@ import org.eclipse.jface.bindings.BindingManagerEvent;
 import org.eclipse.jface.bindings.IBindingManagerListener;
 import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.jface.bindings.keys.KeySequence;
+import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -695,6 +696,13 @@ public class FindBarActions
 					triggers.add(sequence.toString());
 				}
 
+				if (triggers.size() < 3)
+				{
+					triggers.add(StringUtil.EMPTY);
+				}
+
+				triggers.add(KeySequence.getInstance(KeyStroke.getInstance(SWT.MOD1, SWT.ARROW_DOWN)).toString());
+
 				dec.textReplace.setToolTipText(MessageFormat.format(Messages.FindBarActions_TOOLTIP_FocusReplaceCombo,
 						triggers.toArray(new Object[triggers.size()])));
 			}
@@ -709,6 +717,13 @@ public class FindBarActions
 				{
 					triggers.add(sequence.toString());
 				}
+
+				if (triggers.size() < 3)
+				{
+					triggers.add(StringUtil.EMPTY);
+				}
+
+				triggers.add(KeySequence.getInstance(KeyStroke.getInstance(SWT.MOD1, SWT.ARROW_DOWN)).toString());
 
 				dec.textFind.setToolTipText(MessageFormat.format(Messages.FindBarActions_TOOLTIP_FocusFindCombo,
 						triggers.toArray(new Object[triggers.size()])));
