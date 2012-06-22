@@ -10,10 +10,8 @@ package com.aptana.editor.common.outline;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
-import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
 
@@ -53,10 +51,7 @@ public class CommonOutlineContentProvider implements ITreeContentProvider
 		}
 		else if (parentElement instanceof AbstractThemeableEditor)
 		{
-			// Note: make this an error for the next release (just here to be safe for now).
-			IdeLog.logError(CommonEditorPlugin.getDefault(),
-					"The input of the content provider should be the IParseRootNode, not the editor!" //$NON-NLS-1$
-			);
+			// quick outline is passing the editor as the input
 			IParseNode rootNode = ((AbstractThemeableEditor) parentElement).getAST();
 			if (rootNode != null)
 			{
