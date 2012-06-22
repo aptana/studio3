@@ -156,6 +156,18 @@ public class GitIndex
 					}
 				}));
 
+		// If we don't run this, we end up showing files as unstaged when they're no longer modified!
+		IStatus result = repository.execute(GitRepository.ReadWrite.WRITE, "update-index", "-q", //$NON-NLS-1$ //$NON-NLS-2$
+				"--unmerged", "--ignore-missing", "--refresh"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (result == null) // couldn't even execute!
+		{
+			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), "Failed to execute git update-index"); //$NON-NLS-1$
+		}
+		if (!result.isOK())
+		{
+			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), result.getMessage());
+		}
+
 		Set<Job> jobs = new HashSet<Job>();
 		jobs.add(new UntrackedFilesRefreshJob(this, filePathStrings));
 		jobs.add(new UnstagedFilesRefreshJob(this, filePathStrings));
