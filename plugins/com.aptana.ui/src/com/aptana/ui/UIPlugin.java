@@ -18,6 +18,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IPerspectiveListener;
 import org.eclipse.ui.IWindowListener;
 import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -46,6 +47,8 @@ public class UIPlugin extends AbstractUIPlugin
 			WebPerspectiveFactory.ID, PLUGIN_ID,
 			IPreferenceConstants.PERSPECTIVE_VERSION, WebPerspectiveFactory.VERSION);
 
+	private boolean hasMainWindowActivated = false;
+
 	private final IWindowListener windowListener = new IWindowListener()
 	{
 
@@ -65,6 +68,15 @@ public class UIPlugin extends AbstractUIPlugin
 		public void windowOpened(IWorkbenchWindow window)
 		{
 			window.addPerspectiveListener(perspectiveListener);
+			if (!hasMainWindowActivated)
+			{
+				hasMainWindowActivated = true;
+				IWorkbenchPage page = window.getActivePage();
+				if (page != null)
+				{
+					perspectiveListener.perspectiveActivated(page, page.getPerspective());
+				}
+			}
 		}
 	};
 
