@@ -24,6 +24,8 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.mozilla.javascript.CompilerEnvirons;
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ErrorReporter;
+import org.mozilla.javascript.EvaluatorException;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.NativeObject;
@@ -101,6 +103,8 @@ public class JSLintValidator extends AbstractBuildParticipant
 			Context cContext = Context.enter();
 			try
 			{
+				DefaultErrorReporter reporter = new DefaultErrorReporter();
+				cContext.setErrorReporter(reporter);
 				problems = parseWithLint(cContext, context.getContents(), sourcePath);
 			}
 			finally
@@ -130,13 +134,13 @@ public class JSLintValidator extends AbstractBuildParticipant
 
 	private List<IProblem> parseWithLint(Context context, String source, String path)
 	{
+		Scriptable scope = context.initStandardObjects();
 		Script script = getJSLintScript();
 		if (script == null)
 		{
 			return Collections.emptyList();
 		}
 
-		Scriptable scope = context.initStandardObjects();
 		script.exec(context, scope);
 
 		Object functionObj = scope.get("JSLINT", scope); //$NON-NLS-1$
@@ -239,7 +243,17 @@ public class JSLintValidator extends AbstractBuildParticipant
 			// Now record the error
 			if (i == ids.length - 2 && lastIsError)
 			{
-				items.add(createError(reason, line, character, 1, path));
+				// If this starts with "Stopping", convert the last warning to an error and skip this.
+				if (reason.startsWith("Stopping")) //$NON-NLS-1$
+				{
+					IProblem lastWarning = items.remove(items.size() - 1);
+					items.add(createError(lastWarning.getMessage(), lastWarning.getLineNumber(),
+							lastWarning.getOffset(), 1, path));
+				}
+				else
+				{
+					items.add(createError(reason, line, character, 1, path));
+				}
 			}
 			else
 			{
@@ -326,6 +340,37 @@ public class JSLintValidator extends AbstractBuildParticipant
 			this.options = new HashMap<String, Object>();
 			this.options.putAll(DEFAULT_OPTION);
 		}
+	}
 
+	class DefaultErrorReporter implements ErrorReporter
+	{
+
+		private List<IProblem> items = new ArrayList<IProblem>();
+
+		public DefaultErrorReporter()
+		{
+			items = new ArrayList<IProblem>();
+		}
+
+		public void error(String message, String sourceURI, int line, String lineText, int lineOffset)
+		{
+			items.add(createError(message, line, lineOffset, 1, sourceURI));
+		}
+
+		public void warning(String message, String sourceURI, int line, String lineText, int lineOffset)
+		{
+			items.add(createWarning(message, line, lineOffset, 1, sourceURI));
+		}
+
+		public EvaluatorException runtimeError(String message, String sourceURI, int line, String lineText,
+				int lineOffset)
+		{
+			return new EvaluatorException(message, sourceURI, line, lineText, lineOffset);
+		}
+
+		public List<IProblem> getItems()
+		{
+			return Collections.unmodifiableList(items);
+		}
 	}
 }
