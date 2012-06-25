@@ -162,9 +162,11 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 	/* default */Text textFind;
 	ToolItem findHistory;
+	int lastFindHistory;
 
 	/* default */Text textReplace;
 	ToolItem replaceHistory;
+	int lastReplaceHistory;
 
 	ToolItem caseSensitive;
 	ToolItem wholeWord;
@@ -263,28 +265,18 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 			}
 			else if (e.character == SWT.TAB)
 			{
-				if (e.stateMask == 0)
+				if (e.stateMask == 0 || e.stateMask == SWT.SHIFT)
 				{
 					e.doit = false;
-					((Text) e.widget).traverse(SWT.TRAVERSE_TAB_NEXT);
-				}
-				else if (e.stateMask == SWT.SHIFT)
-				{
-					e.doit = false;
-					((Text) e.widget).traverse(SWT.TRAVERSE_TAB_PREVIOUS);
+					((Text) e.widget).traverse(e.stateMask == 0 ? SWT.TRAVERSE_TAB_NEXT : SWT.TRAVERSE_TAB_PREVIOUS);
 				}
 			}
-			else if (e.keyCode == SWT.ARROW_DOWN && e.stateMask == SWT.MOD1)
+			else if ((e.keyCode == SWT.ARROW_DOWN || e.keyCode == SWT.ARROW_UP) && e.stateMask == SWT.MOD1)
 			{
 				e.doit = false;
-				if (e.widget == textFind)
-				{
-					createHistoryMenu(findHistory, FindBarEntriesHelper.PREFERENCE_NAME_FIND, null);
-				}
-				else
-				{
-					createHistoryMenu(replaceHistory, FindBarEntriesHelper.PREFERENCE_NAME_REPLACE, null);
-				}
+				String preferenceName = (e.widget == textFind) ? FindBarEntriesHelper.PREFERENCE_NAME_FIND
+						: FindBarEntriesHelper.PREFERENCE_NAME_REPLACE;
+				insertHistory(preferenceName, e.keyCode == SWT.ARROW_DOWN);
 			}
 		}
 	};
@@ -406,6 +398,8 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		scopeMap.put(FindScope.OPEN_FILES, FindBarPlugin.ICON_SEARCH_OPEN_FILES);
 		scopeMap.put(FindScope.ENCLOSING_PROJECT, FindBarPlugin.ICON_SEARCH_PROJECT);
 		scopeMap.put(FindScope.WORKSPACE, FindBarPlugin.ICON_SEARCH_WORKSPACE);
+
+		resetHistoryCounters();
 	}
 
 	public Composite createFindBarComposite(Composite parent)
@@ -746,17 +740,28 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 		if (!CollectionsUtil.isEmpty(loadEntries))
 		{
+			int i = 0;
 			for (final String item : loadEntries)
 			{
-				MenuItem menuItem = new MenuItem(menu, SWT.NONE);
+				final MenuItem menuItem = new MenuItem(menu, SWT.NONE);
+				menuItem.setData(Integer.valueOf(i));
 				menuItem.setText(StringUtil.truncate(NEWLINE_SANITIZER.searchAndReplace(item), 30));
 				menuItem.addSelectionListener(new SelectionAdapter()
 				{
 					public void widgetSelected(SelectionEvent e)
 					{
+						if (FindBarEntriesHelper.PREFERENCE_NAME_REPLACE.equals(preferenceName))
+						{
+							lastReplaceHistory = (Integer) menuItem.getData();
+						}
+						else
+						{
+							lastFindHistory = (Integer) menuItem.getData();
+						}
 						updateTextAfterHistorySelection(item, preferenceName);
 					};
 				});
+				i++;
 			}
 		}
 		else
@@ -768,6 +773,34 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		menu.setLocation(point.x, point.y);
 		menu.setVisible(true);
 		return menu;
+	}
+
+	private void insertHistory(String preferenceName, boolean isNext)
+	{
+		List<String> loadEntries = findBarEntriesHelper.loadEntries(preferenceName);
+		boolean isReplace = FindBarEntriesHelper.PREFERENCE_NAME_REPLACE.equals(preferenceName);
+		int currentIndex = isReplace ? lastReplaceHistory : lastFindHistory;
+		currentIndex = currentIndex + (isNext ? -1 : 1);
+		if (currentIndex >= loadEntries.size())
+		{
+			currentIndex = 0;
+		}
+		else if (currentIndex < 0)
+		{
+			currentIndex = loadEntries.size() - 1;
+		}
+
+		String text = loadEntries.get(currentIndex);
+		updateTextAfterHistorySelection(text, preferenceName);
+
+		if (isReplace)
+		{
+			lastReplaceHistory = currentIndex;
+		}
+		else
+		{
+			lastFindHistory = currentIndex;
+		}
 	}
 
 	private void updateTextAfterHistorySelection(String text, String preferenceName)
@@ -1381,6 +1414,13 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	private void setFindText(String findText, final Text text, String preferenceName)
 	{
 		findBarEntriesHelper.addEntry(findText, preferenceName);
+		resetHistoryCounters();
+	}
+
+	private void resetHistoryCounters()
+	{
+		lastFindHistory = -1;
+		lastReplaceHistory = -1;
 	}
 
 	private static final int TOO_MANY = Integer.getInteger(FindBarDecorator.class.getName() + ".TOO_MANY", 100); //$NON-NLS-1$
