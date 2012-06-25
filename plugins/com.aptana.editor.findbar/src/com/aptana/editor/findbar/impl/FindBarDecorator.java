@@ -475,7 +475,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 			public void modifyText(ModifyEvent e)
 			{
-				findButton.setEnabled(!StringUtil.isEmpty(textFind.getText()));
+				findButton.setEnabled(!isTextFindEmpty());
 				if (countMatches.getSelection())
 				{
 					FindBarDecorator.findBarConfiguration.toggle(countMatchesOption.preferencesKey);
@@ -1145,7 +1145,13 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 	private boolean isTextFindValid()
 	{
-		return !DISABLED_COLOR.equals(textFind.getForeground()) && !StringUtil.isEmpty(textFind.getText());
+		return !DISABLED_COLOR.equals(textFind.getForeground()) && !isTextFindEmpty();
+	}
+
+	private boolean isTextFindEmpty()
+	{
+		String findText = textFind.getText();
+		return findText == null || findText.length() == 0;
 	}
 
 	private IFindReplaceTarget getFindReplaceTarget()
@@ -1441,7 +1447,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 		int currentCount = 0;
 		int total = 0;
-		if (!StringUtil.isEmpty(textFind.getText()))
+		if (isTextFindValid())
 		{
 			String text = sourceViewer.getDocument().get();
 			Pattern pattern = createFindPattern();
