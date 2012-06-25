@@ -101,8 +101,8 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		}
 		synchronized (fPositionsLock)
 		{
-			fPositions.clear();
-		}
+		fPositions.clear();
+	}
 	}
 
 	protected AbstractThemeableEditor getEditor()
@@ -222,9 +222,9 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 			{
 				// Create a copy to pass to updateFoldingStructure, as it may take more time there.
 				positions = new HashMap<ProjectionAnnotation, Position>(fPositions);
-			}
-			editor.updateFoldingStructure(positions);
 		}
+			editor.updateFoldingStructure(positions);
+	}
 	}
 
 	private void reconcile(boolean initialReconcile)
@@ -247,7 +247,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 			if (editor != null)
 			{
 				editor.refreshOutline(ast);
-			}
+		}
 		}
 		monitor.worked(5);
 

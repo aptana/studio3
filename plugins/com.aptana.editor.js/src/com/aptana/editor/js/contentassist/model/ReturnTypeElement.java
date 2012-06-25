@@ -56,7 +56,7 @@ public class ReturnTypeElement implements Convertible
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.mortbay.util.ajax.JSON.Convertible#fromJSON(java.util.Map)
+	 * @see com.aptana.jetty.util.epl.ajax.JSON.Convertible#fromJSON(java.util.Map)
 	 */
 	@SuppressWarnings("rawtypes")
 	public void fromJSON(Map object)
@@ -124,7 +124,7 @@ public class ReturnTypeElement implements Convertible
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.mortbay.util.ajax.JSON.Convertible#toJSON(org.mortbay.util.ajax.JSON.Output)
+	 * @see com.aptana.jetty.util.epl.ajax.JSON.Convertible#toJSON(com.aptana.jetty.util.epl.ajax.JSON.Output)
 	 */
 	public void toJSON(Output out)
 	{

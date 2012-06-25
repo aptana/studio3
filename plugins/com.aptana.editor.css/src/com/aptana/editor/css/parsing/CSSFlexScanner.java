@@ -25,6 +25,7 @@ import com.aptana.editor.css.parsing.lexer.CSSTokenType;
  * on 4/27/12 9:53 AM from the specification file
  * <tt>CSS.flex</tt>
  */
+@SuppressWarnings("nls")
 class CSSFlexScanner extends Scanner {
 
   /** This character denotes the end of file */
@@ -49,7 +50,7 @@ class CSSFlexScanner extends Scanner {
   /** 
    * Translates characters to character classes
    */
-  private static final String ZZ_CMAP_PACKED = 
+	private static final String ZZ_CMAP_PACKED =
     "\11\0\1\23\1\25\1\0\1\3\1\24\22\0\1\23\1\46\1\5"+
     "\1\42\1\53\1\41\1\0\1\6\1\57\1\60\1\10\1\22\1\63"+
     "\1\11\1\21\1\7\12\1\1\20\1\54\1\0\1\50\1\64\1\0"+

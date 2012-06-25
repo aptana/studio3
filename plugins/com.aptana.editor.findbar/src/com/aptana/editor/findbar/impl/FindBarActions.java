@@ -26,6 +26,7 @@ import org.eclipse.jface.bindings.BindingManagerEvent;
 import org.eclipse.jface.bindings.IBindingManagerListener;
 import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.jface.bindings.keys.KeySequence;
+import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -684,6 +685,9 @@ public class FindBarActions
 					dec.searchSelection);
 			updateTooltip(SHOW_OPTIONS_COMMAND_ID, Messages.FindBarDecorator_LABEL_ShowOptions, dec.options);
 
+			String prevHistoryKey = KeySequence.getInstance(KeyStroke.getInstance(SWT.MOD1, SWT.ARROW_UP)).toString();
+			String nextHistoryKey = KeySequence.getInstance(KeyStroke.getInstance(SWT.MOD1, SWT.ARROW_DOWN)).toString();
+
 			List<TriggerSequence> bindings = fCommandToBinding.get(FOCUS_REPLACE_COMMAND_ID);
 			if (!CollectionsUtil.isEmpty(bindings))
 			{
@@ -694,6 +698,14 @@ public class FindBarActions
 				{
 					triggers.add(sequence.toString());
 				}
+
+				if (triggers.size() < 3)
+				{
+					triggers.add(StringUtil.EMPTY);
+				}
+
+				triggers.add(prevHistoryKey);
+				triggers.add(nextHistoryKey);
 
 				dec.textReplace.setToolTipText(MessageFormat.format(Messages.FindBarActions_TOOLTIP_FocusReplaceCombo,
 						triggers.toArray(new Object[triggers.size()])));
@@ -709,6 +721,14 @@ public class FindBarActions
 				{
 					triggers.add(sequence.toString());
 				}
+
+				if (triggers.size() < 3)
+				{
+					triggers.add(StringUtil.EMPTY);
+				}
+
+				triggers.add(prevHistoryKey);
+				triggers.add(nextHistoryKey);
 
 				dec.textFind.setToolTipText(MessageFormat.format(Messages.FindBarActions_TOOLTIP_FocusFindCombo,
 						triggers.toArray(new Object[triggers.size()])));
