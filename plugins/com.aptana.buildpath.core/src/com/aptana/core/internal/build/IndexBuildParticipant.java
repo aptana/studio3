@@ -33,6 +33,8 @@ public class IndexBuildParticipant extends RequiredBuildParticipant
 {
 
 	private Index fIndex;
+	private boolean index_trace_enabled = false;
+	private boolean advanced_trace_enabled = false;
 
 	public void clean(IProject project, IProgressMonitor monitor)
 	{
@@ -41,10 +43,13 @@ public class IndexBuildParticipant extends RequiredBuildParticipant
 		{
 			if (isTraceEnabled())
 			{
-				logTrace(MessageFormat.format("Cleaning index for project {0} ({1})", project.getName(), uri)); //$NON-NLS-1$
+				logTrace(MessageFormat.format("Cleaning index for project ''{0}'' ({1})", project.getName(), uri)); //$NON-NLS-1$
 			}
 			getIndexManager().removeIndex(uri);
 		}
+		index_trace_enabled = IdeLog.isTraceEnabled(BuildPathCorePlugin.getDefault(), IDebugScopes.BUILDER_INDEXER);
+		advanced_trace_enabled = IdeLog.isTraceEnabled(BuildPathCorePlugin.getDefault(), IDebugScopes.BUILDER_ADVANCED);
+
 	}
 
 	public void buildStarting(IProject project, int kind, IProgressMonitor monitor)
@@ -101,7 +106,20 @@ public class IndexBuildParticipant extends RequiredBuildParticipant
 				{
 					try
 					{
+						long startTime = 0;
+						if (index_trace_enabled)
+						{
+							startTime = System.nanoTime();
+						}
 						indexer.index(context, fIndex, sub.newChild(workPerIndexer));
+						if (index_trace_enabled)
+						{
+							double endTime = ((double) System.nanoTime() - startTime) / 1000000;
+							IdeLog.logTrace(
+									BuildPathCorePlugin.getDefault(),
+									MessageFormat
+											.format("Indexed file ''{0}'' via ''{1}'' in {2} ms.", context.getURI(), indexer.getClass().getName(), endTime), IDebugScopes.BUILDER_INDEXER); //$NON-NLS-1$
+						}
 					}
 					catch (CoreException e)
 					{
@@ -115,6 +133,15 @@ public class IndexBuildParticipant extends RequiredBuildParticipant
 					{
 						break;
 					}
+				}
+			}
+			else
+			{
+				if (advanced_trace_enabled)
+				{
+					IdeLog.logTrace(
+							BuildPathCorePlugin.getDefault(),
+							MessageFormat.format("No indexers available for file ''{0}''", context.getURI()), IDebugScopes.BUILDER_ADVANCED); //$NON-NLS-1$
 				}
 			}
 		}
@@ -135,6 +162,12 @@ public class IndexBuildParticipant extends RequiredBuildParticipant
 			}
 		}
 		fIndex.remove(context.getURI());
+		if (advanced_trace_enabled)
+		{
+			IdeLog.logTrace(BuildPathCorePlugin.getDefault(),
+					MessageFormat.format("Wiped index for file ''{0}''", context.getURI()), IDebugScopes.BUILDER_ADVANCED); //$NON-NLS-1$
+		}
+
 	}
 
 	protected URI getURI(IProject project)

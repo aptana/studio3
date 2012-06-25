@@ -18,6 +18,8 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
+import com.aptana.core.IMap;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
@@ -223,32 +225,19 @@ public class JSSymbolTypeInferrer
 	 */
 	private PropertyElement createPropertyElement(Set<String> types)
 	{
-		boolean isFunction = false;
-		PropertyElement result;
-
 		// determine if any of the types are functions
-		if (types != null && types.size() > 0)
+		if (!CollectionsUtil.isEmpty(types))
 		{
 			for (String type : types)
 			{
 				if (JSTypeUtil.isFunctionPrefix(type))
 				{
-					isFunction = true;
-					break;
+					return new FunctionElement();
 				}
 			}
 		}
 
-		if (isFunction)
-		{
-			result = new FunctionElement();
-		}
-		else
-		{
-			result = new PropertyElement();
-		}
-
-		return result;
+		return new PropertyElement();
 	}
 
 	/**
@@ -285,16 +274,14 @@ public class JSSymbolTypeInferrer
 	 */
 	public List<PropertyElement> getScopeProperties()
 	{
-		List<PropertyElement> result = new ArrayList<PropertyElement>();
-
-		for (String symbol : activeScope.getLocalSymbolNames())
+		List<String> symbolNames = activeScope.getLocalSymbolNames();
+		return CollectionsUtil.map(symbolNames, new IMap<String, PropertyElement>()
 		{
-			PropertyElement p = this.getSymbolPropertyElement(symbol);
-
-			result.add(p);
-		}
-
-		return result;
+			public PropertyElement map(String symbol)
+			{
+				return getSymbolPropertyElement(symbol);
+			}
+		});
 	}
 
 	/**

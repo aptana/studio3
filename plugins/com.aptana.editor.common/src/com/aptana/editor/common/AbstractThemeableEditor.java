@@ -35,6 +35,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IDocumentExtension4;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.ITextViewerExtension5;
 import org.eclipse.jface.text.source.CommonLineNumberChangeRulerColumn;
@@ -70,7 +71,6 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.dnd.IDragAndDropService;
 import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 import org.eclipse.ui.ide.FileStoreEditorInput;
@@ -259,7 +259,22 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	/**
 	 * Flag used to auto-expand outlines to 2nd level on first open.
 	 */
-	private boolean outlineAutoExpanded;
+	protected boolean outlineAutoExpanded;
+
+	/**
+	 * Used to cache the last ast for a document.
+	 */
+	private long lastModificationStamp = IDocumentExtension4.UNKNOWN_MODIFICATION_STAMP;
+
+	/**
+	 * Used to cache the last ast for a document.
+	 */
+	private IParseRootNode lastAstForModificationStamp;
+
+	/**
+	 * Lock used to cache the last ast for a document.
+	 */
+	private Object modificationStampLock = new Object();
 
 	/**
 	 * AbstractThemeableEditor
@@ -318,10 +333,8 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		fSelectionChangedListener.install(getSelectionProvider());
 		fThemeListener = new PropertyChangeListener();
 		ThemePlugin.getDefault().getPreferenceStore().addPropertyChangeListener(fThemeListener);
-
-		IContextService contextService = (IContextService) getSite().getService(IContextService.class);
-		contextService.activateContext(ScriptingActivator.SCRIPTING_CONTEXT_ID);
-		contextService.activateContext(ScriptingActivator.EDITOR_CONTEXT_ID);
+		this.fThemeableEditorFindBarExtension.activateContexts(new String[] { ScriptingActivator.EDITOR_CONTEXT_ID,
+				ScriptingActivator.SCRIPTING_CONTEXT_ID });
 
 		if (isWordWrapEnabled())
 		{
@@ -430,13 +443,15 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 
 	protected CommonOutlinePage createOutlinePage()
 	{
-		if (getOutlineContentProvider() == null || getOutlineLabelProvider() == null)
+		ITreeContentProvider outlineContentProvider = getOutlineContentProvider();
+		ILabelProvider outlineLabelProvider = getOutlineLabelProvider();
+		if (outlineContentProvider == null || outlineLabelProvider == null)
 		{
 			return null;
 		}
 		CommonOutlinePage outline = new CommonOutlinePage(this, getOutlinePreferenceStore());
-		outline.setContentProvider(getOutlineContentProvider());
-		outline.setLabelProvider(getOutlineLabelProvider());
+		outline.setContentProvider(outlineContentProvider);
+		outline.setLabelProvider(outlineLabelProvider);
 		return outline;
 	}
 
@@ -1048,7 +1063,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 			{
 				return null;
 			}
-			IParseNode astNode = getASTNodeAt(caret);
+			IParseNode astNode = getASTNodeAt(caret, fOutlinePage.getCurrentAst());
 			if (astNode == null)
 			{
 				return null;
@@ -1072,21 +1087,66 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 
 	protected IDocument getDocument()
 	{
-		return getDocumentProvider().getDocument(getEditorInput());
+		IDocumentProvider documentProvider = getDocumentProvider();
+		if (documentProvider == null)
+		{
+			return null;
+		}
+		return documentProvider.getDocument(getEditorInput());
+	}
+
+	@Override
+	protected void doSetInput(IEditorInput input) throws CoreException
+	{
+		synchronized (modificationStampLock)
+		{
+			//Reset our cache when a new input is set.
+			lastModificationStamp = IDocumentExtension4.UNKNOWN_MODIFICATION_STAMP;
+			lastAstForModificationStamp = null;
+
+		}
+		super.doSetInput(input);
 	}
 
 	/**
-	 * FIXME Should we hang this here?
+	 * Note: this was deprecated and is restored as this has a faster cache based on the document time (so, this is the
+	 * preferred way of getting the ast based on the full document for the editor).
 	 * 
-	 * @deprecated Callers should call to {@link ParserPoolFactory} themselves
-	 * @return
+	 * @return the parse node for this editor.
+	 * @note this call may lock until the parser finishes generating the ast.
 	 */
 	public IParseRootNode getAST()
 	{
 		try
 		{
 			IDocument document = getDocument();
-			return ParserPoolFactory.parse(getContentType(), document.get());
+			if (document == null)
+			{
+				return null;
+			}
+			long modificationStamp = IDocumentExtension4.UNKNOWN_MODIFICATION_STAMP;
+			if (document instanceof IDocumentExtension4)
+			{
+				synchronized (modificationStampLock)
+				{
+					IDocumentExtension4 iDocumentExtension = (IDocumentExtension4) document;
+					modificationStamp = iDocumentExtension.getModificationStamp();
+					if (modificationStamp != IDocumentExtension4.UNKNOWN_MODIFICATION_STAMP
+							&& modificationStamp == lastModificationStamp)
+					{
+						return lastAstForModificationStamp;
+					}
+				}
+			}
+			// Don't synchronize the actual parse!
+			IParseRootNode ast = ParserPoolFactory.parse(getContentType(), document.get()).getRootNode();
+
+			synchronized (modificationStampLock)
+			{
+				lastAstForModificationStamp = ast;
+				lastModificationStamp = modificationStamp;
+				return lastAstForModificationStamp;
+			}
 		}
 		catch (Exception e)
 		{
@@ -1098,13 +1158,13 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	/**
 	 * @deprecated This doesn't belong on the editor, this should be in some ASTUtil method or something...
 	 * @param offset
+	 * @param iParseRootNode
 	 * @return
 	 */
-	protected IParseNode getASTNodeAt(int offset)
+	protected IParseNode getASTNodeAt(int offset, IParseRootNode root)
 	{
 		try
 		{
-			IParseNode root = getAST();
 			if (root == null)
 			{
 				return null;
@@ -1245,21 +1305,21 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 				IPreferenceConstants.ENABLE_WORD_WRAP, false, null);
 	}
 
-	public void refreshOutline()
+	public void refreshOutline(final IParseRootNode ast)
 	{
+		if (!hasOutlinePageCreated())
+		{
+			return;
+		}
 		// TODO Does this need to be run in asyncExec here?
+
 		Display.getDefault().asyncExec(new Runnable()
 		{
 
 			public void run()
 			{
-				if (!hasOutlinePageCreated() || getAST() == null)
-				{
-					return;
-				}
-
 				CommonOutlinePage page = getOutlinePage();
-				page.refresh();
+				page.refresh(ast);
 
 				if (!outlineAutoExpanded)
 				{
@@ -1269,4 +1329,5 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 			}
 		});
 	}
+
 }

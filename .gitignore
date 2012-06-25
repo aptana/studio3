@@ -26,3 +26,4 @@ tests/com.aptana.studio.tests.all/wintest
 .recordings
 runtime-New_configuration/
 plugins/com.aptana.scripting/bundles/**/
+.mu_repo

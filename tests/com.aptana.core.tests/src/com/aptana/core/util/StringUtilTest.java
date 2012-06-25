@@ -623,4 +623,9 @@ public class StringUtilTest extends TestCase
 
 		System.out.println("string builder: " + diff + "ms");
 	}
+
+	public void testRepeat() throws Exception
+	{
+		assertEquals("ttt", StringUtil.repeat('t', 3));
+	}
 }

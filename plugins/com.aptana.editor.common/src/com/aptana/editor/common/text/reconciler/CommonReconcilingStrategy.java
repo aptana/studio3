@@ -43,6 +43,7 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.ICommonAnnotationModel;
 import com.aptana.editor.common.util.EditorUtil;
+import com.aptana.parsing.ast.IParseRootNode;
 
 public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconcilingStrategyExtension,
 		IBatchReconcilingStrategy, IDisposableReconcilingStrategy
@@ -51,7 +52,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	/**
 	 * The editor we're operating on.
 	 */
-	private AbstractThemeableEditor fEditor;
+	private volatile AbstractThemeableEditor fEditor;
 	/**
 	 * The working copy we're operating on.
 	 */
@@ -63,6 +64,12 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	 * The folder that calculates folding positions for this editor.
 	 */
 	private IFoldingComputer folder;
+
+	/**
+	 * Any access to fPositions should obtain this lock.
+	 */
+	private final Object fPositionsLock = new Object();
+
 	/**
 	 * Code Folding.
 	 */
@@ -92,7 +99,10 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 			fEditor.removePropertyListener(propertyListener);
 			fEditor = null;
 		}
+		synchronized (fPositionsLock)
+		{
 		fPositions.clear();
+	}
 	}
 
 	protected AbstractThemeableEditor getEditor()
@@ -142,7 +152,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	}
 
 	// FIXME Can folding be made into a build participant?
-	protected void calculatePositions(boolean initialReconcile, IProgressMonitor monitor)
+	protected void calculatePositions(boolean initialReconcile, IProgressMonitor monitor, IParseRootNode ast)
 	{
 		if (monitor != null && monitor.isCanceled())
 		{
@@ -153,10 +163,11 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 
 		try
 		{
-			synchronized (fPositions)
+			Map<ProjectionAnnotation, Position> positions = folder.emitFoldingRegions(initialReconcile, monitor, ast);
+			synchronized (fPositionsLock)
 			{
 				fPositions.clear();
-				fPositions = folder.emitFoldingRegions(initialReconcile, monitor);
+				fPositions = positions;
 			}
 		}
 		catch (BadLocationException e)
@@ -192,7 +203,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 			return;
 		}
 		// clear folding positions
-		synchronized (fPositions)
+		synchronized (fPositionsLock)
 		{
 			fPositions.clear();
 		}
@@ -203,10 +214,17 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	 */
 	protected void updatePositions()
 	{
-		if (fEditor != null)
+		AbstractThemeableEditor editor = fEditor;
+		if (editor != null)
 		{
-			fEditor.updateFoldingStructure(fPositions);
+			HashMap<ProjectionAnnotation, Position> positions;
+			synchronized (fPositionsLock)
+			{
+				// Create a copy to pass to updateFoldingStructure, as it may take more time there.
+				positions = new HashMap<ProjectionAnnotation, Position>(fPositions);
 		}
+			editor.updateFoldingStructure(positions);
+	}
 	}
 
 	private void reconcile(boolean initialReconcile)
@@ -218,20 +236,29 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	{
 		SubMonitor monitor = SubMonitor.convert(fMonitor, 100);
 
-		if (fEditor != null)
+		IParseRootNode ast = null;
+		AbstractThemeableEditor editor = fEditor;
+		if (editor != null)
 		{
-			fEditor.refreshOutline();
+			ast = editor.getAST();
+
+			// The call to get the ast can get a long time, so, let's check our field again.
+			editor = fEditor;
+			if (editor != null)
+			{
+				editor.refreshOutline(ast);
+		}
 		}
 		monitor.worked(5);
 
 		// FIXME only do folding and validation when the source was changed
-		if (fEditor != null && fEditor.isFoldingEnabled())
+		if (editor != null && editor.isFoldingEnabled())
 		{
-			calculatePositions(initialReconcile, monitor.newChild(20));
+			calculatePositions(initialReconcile, monitor.newChild(20), ast);
 		}
 		else
 		{
-			synchronized (fPositions)
+			synchronized (fPositionsLock)
 			{
 				fPositions.clear();
 			}
@@ -254,6 +281,11 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	 */
 	private void runParticipants(IProgressMonitor monitor)
 	{
+		AbstractThemeableEditor editor = fEditor;
+		if (editor == null)
+		{
+			return;
+		}
 		// if file is in the workspace, check if it's valid.
 		// (We only want to build files that exist and aren't derived or team private!)
 		// Otherwise it's an external file, so just assume it is.
@@ -265,7 +297,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 
 		// Grab the list of participants that apply to the editor's content type.
 		List<IBuildParticipant> participants = getBuildParticipantManager().getBuildParticipants(
-				fEditor.getContentType());
+				editor.getContentType());
 		if (CollectionsUtil.isEmpty(participants))
 		{
 			return;
@@ -280,6 +312,10 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 
 		SubMonitor sub = SubMonitor.convert(monitor, (participants.size() * 12) + 10);
 		ReconcileContext context = createContext();
+		if (context == null)
+		{
+			return;
+		}
 		for (IBuildParticipant participant : participants)
 		{
 			participant.buildStarting(context.getProject(), IncrementalProjectBuilder.INCREMENTAL_BUILD,
@@ -309,13 +345,18 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	 */
 	protected ReconcileContext createContext()
 	{
+		AbstractThemeableEditor editor = fEditor;
+		if (editor == null)
+		{
+			return null;
+		}
 		IFile file = getFile();
 		if (file != null)
 		{
-			return new ReconcileContext(fEditor.getContentType(), file, fDocument.get());
+			return new ReconcileContext(editor.getContentType(), file, fDocument.get());
 		}
 
-		return new ReconcileContext(fEditor.getContentType(), EditorUtil.getURI(fEditor), fDocument.get());
+		return new ReconcileContext(editor.getContentType(), EditorUtil.getURI(editor), fDocument.get());
 	}
 
 	private List<IBuildParticipant> filterToEnabled(List<IBuildParticipant> participants)
@@ -338,18 +379,19 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	 */
 	private void reportProblems(ReconcileContext context, IProgressMonitor monitor)
 	{
-		if (fEditor == null)
+		AbstractThemeableEditor editor = fEditor;
+		if (editor == null)
 		{
 			return;
 		}
 
-		IDocumentProvider docProvider = fEditor.getDocumentProvider();
+		IDocumentProvider docProvider = editor.getDocumentProvider();
 		if (docProvider == null)
 		{
 			return;
 		}
 
-		IEditorInput editorInput = fEditor.getEditorInput();
+		IEditorInput editorInput = editor.getEditorInput();
 		if (editorInput == null)
 		{
 			return;
@@ -368,9 +410,10 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 
 	protected IFile getFile()
 	{
-		if (fEditor != null)
+		AbstractThemeableEditor editor = fEditor;
+		if (editor != null)
 		{
-			IEditorInput editorInput = fEditor.getEditorInput();
+			IEditorInput editorInput = editor.getEditorInput();
 
 			if (editorInput instanceof IFileEditorInput)
 			{

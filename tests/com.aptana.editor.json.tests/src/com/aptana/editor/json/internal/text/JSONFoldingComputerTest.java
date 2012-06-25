@@ -13,6 +13,7 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
@@ -25,6 +26,7 @@ import com.aptana.editor.json.preferences.IPreferenceConstants;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 
 @SuppressWarnings("nls")
 public class JSONFoldingComputerTest extends TestCase
@@ -43,27 +45,27 @@ public class JSONFoldingComputerTest extends TestCase
 	{
 		String src = "{\n" + "    \"description\": \"event object\", \n" + "    \"name\": \"event\", \n"
 				+ "    \"type\": \"object\"\n" + "}";
-		folder = new JSONFoldingComputer(null, new Document(src))
-		{
-			protected IParseNode getAST()
-			{
-				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get());
-				try
-				{
-					return new JSONParser().parse(parseState);
-				}
-				catch (Exception e)
-				{
-					fail(e.getMessage());
-				}
-				return null;
-			};
-		};
-		Map<ProjectionAnnotation, Position> annotations = folder.emitFoldingRegions(false, new NullProgressMonitor());
+		Map<ProjectionAnnotation, Position> annotations = emitFoldingRegions(false, src);
 		Collection<Position> positions = annotations.values();
 		assertEquals(1, positions.size());
 		assertTrue(positions.contains(new Position(0, src.length())));
+	}
+
+	protected Map<ProjectionAnnotation, Position> emitFoldingRegions(boolean initialReconcile, String src)
+			throws BadLocationException
+	{
+		IParseState parseState = new ParseState(src);
+		IParseRootNode ast;
+		try
+		{
+			ast = parse(parseState);
+		}
+		catch (Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+		folder = new JSONFoldingComputer(null, new Document(src));
+		return folder.emitFoldingRegions(initialReconcile, new NullProgressMonitor(), ast);
 	}
 
 	public void testArrayFolding() throws Exception
@@ -79,11 +81,10 @@ public class JSONFoldingComputerTest extends TestCase
 		{
 			protected IParseNode getAST()
 			{
-				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get());
+				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
-					return new JSONParser().parse(parseState);
+					return parse(parseState);
 				}
 				catch (Exception e)
 				{
@@ -92,7 +93,7 @@ public class JSONFoldingComputerTest extends TestCase
 				return null;
 			};
 		};
-		Map<ProjectionAnnotation, Position> annotations = folder.emitFoldingRegions(false, new NullProgressMonitor());
+		Map<ProjectionAnnotation, Position> annotations = emitFoldingRegions(false, src);
 		Collection<Position> positions = annotations.values();
 		assertEquals(2, positions.size());
 		assertTrue(positions.contains(new Position(0, src.length())));
@@ -107,11 +108,10 @@ public class JSONFoldingComputerTest extends TestCase
 		{
 			protected IParseNode getAST()
 			{
-				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get());
+				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
-					return new JSONParser().parse(parseState);
+					return parse(parseState);
 				}
 				catch (Exception e)
 				{
@@ -122,13 +122,14 @@ public class JSONFoldingComputerTest extends TestCase
 		};
 
 		// Turn on initially folding objects
-		EclipseUtil.instanceScope().getNode(JSONPlugin.PLUGIN_ID).putBoolean(IPreferenceConstants.INITIALLY_FOLD_OBJECTS, true);
+		EclipseUtil.instanceScope().getNode(JSONPlugin.PLUGIN_ID)
+				.putBoolean(IPreferenceConstants.INITIALLY_FOLD_OBJECTS, true);
 
-		Map<ProjectionAnnotation, Position> annotations = folder.emitFoldingRegions(true, new NullProgressMonitor());
+		Map<ProjectionAnnotation, Position> annotations = emitFoldingRegions(true, src);
 		assertTrue(annotations.keySet().iterator().next().isCollapsed());
 
 		// After initial reconcile, don't mark any collapsed
-		annotations = folder.emitFoldingRegions(false, new NullProgressMonitor());
+		annotations = emitFoldingRegions(false, src);
 		assertFalse(annotations.keySet().iterator().next().isCollapsed());
 	}
 
@@ -145,11 +146,10 @@ public class JSONFoldingComputerTest extends TestCase
 		{
 			protected IParseNode getAST()
 			{
-				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get());
+				IParseState parseState = new ParseState(getDocument().get());
 				try
 				{
-					return new JSONParser().parse(parseState);
+					return parse(parseState);
 				}
 				catch (Exception e)
 				{
@@ -160,14 +160,15 @@ public class JSONFoldingComputerTest extends TestCase
 		};
 
 		// Turn on initially folding arrays
-		EclipseUtil.instanceScope().getNode(JSONPlugin.PLUGIN_ID).putBoolean(IPreferenceConstants.INITIALLY_FOLD_ARRAYS, true);
+		EclipseUtil.instanceScope().getNode(JSONPlugin.PLUGIN_ID)
+				.putBoolean(IPreferenceConstants.INITIALLY_FOLD_ARRAYS, true);
 
-		Map<ProjectionAnnotation, Position> annotations = folder.emitFoldingRegions(true, new NullProgressMonitor());
+		Map<ProjectionAnnotation, Position> annotations = emitFoldingRegions(true, src);
 		ProjectionAnnotation annotation = getByPosition(annotations, new Position(21, 64));
 		assertTrue(annotation.isCollapsed());
 
 		// After initial reconcile, don't mark any collapsed
-		annotations = folder.emitFoldingRegions(false, new NullProgressMonitor());
+		annotations = emitFoldingRegions(false, src);
 		annotation = getByPosition(annotations, new Position(21, 64));
 		assertFalse(annotation.isCollapsed());
 	}
@@ -182,5 +183,10 @@ public class JSONFoldingComputerTest extends TestCase
 			}
 		}
 		return null;
+	}
+
+	private IParseRootNode parse(IParseState parseState) throws Exception
+	{
+		return new JSONParser().parse(parseState).getRootNode();
 	}
 }

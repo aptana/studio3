@@ -58,7 +58,8 @@ public class RubyRegexpFolderTest extends TestCase
 			@Override
 			protected RubyRegexp getStartFoldRegexp(String scope)
 			{
-				return RubyRegexp.newRegexp(runtime, "\\/\\*\\*(?!\\*)|\\{\\s*($|\\/\\*(?!.*?\\*\\/.*\\S))", RegexpOptions.NULL_OPTIONS);
+				return RubyRegexp.newRegexp(runtime, "\\/\\*\\*(?!\\*)|\\{\\s*($|\\/\\*(?!.*?\\*\\/.*\\S))",
+						RegexpOptions.NULL_OPTIONS);
 			}
 
 			@Override
@@ -67,14 +68,15 @@ public class RubyRegexpFolderTest extends TestCase
 				return "source.css";
 			}
 		};
-		Map<ProjectionAnnotation, Position> annotations = folder.emitFoldingRegions(false, new NullProgressMonitor());
+		Map<ProjectionAnnotation, Position> annotations = folder.emitFoldingRegions(false, new NullProgressMonitor(),
+				null);
 		Collection<Position> positions = annotations.values();
 		assertEquals(3, positions.size());
 		assertTrue(positions.contains(new Position(0, 22))); // eats whole line at end
 		assertTrue(positions.contains(new Position(23, 36))); // eats whole line at end
 		assertTrue(positions.contains(new Position(91, 33))); // only can go so far as EOF
 	}
-	
+
 	public void testScriptdocFolding() throws Exception
 	{
 		String src = "/**\n * This is a comment.\n **/\n";
@@ -90,7 +92,9 @@ public class RubyRegexpFolderTest extends TestCase
 			@Override
 			protected RubyRegexp getStartFoldRegexp(String scope)
 			{
-				return RubyRegexp.newRegexp(runtime, "\\/\\*+|^.*\\bfunction\\s*(\\w+\\s*)?\\([^\\)]*\\)(\\s*\\{[^\\}]*)?\\s*$", RegexpOptions.NULL_OPTIONS);
+				return RubyRegexp.newRegexp(runtime,
+						"\\/\\*+|^.*\\bfunction\\s*(\\w+\\s*)?\\([^\\)]*\\)(\\s*\\{[^\\}]*)?\\s*$",
+						RegexpOptions.NULL_OPTIONS);
 			}
 
 			@Override
@@ -99,12 +103,13 @@ public class RubyRegexpFolderTest extends TestCase
 				return "source.js";
 			}
 		};
-		Map<ProjectionAnnotation, Position> annotations = folder.emitFoldingRegions(false, new NullProgressMonitor());
+		Map<ProjectionAnnotation, Position> annotations = folder.emitFoldingRegions(false, new NullProgressMonitor(),
+				null);
 		Collection<Position> positions = annotations.values();
 		assertEquals(1, positions.size());
 		assertTrue(positions.contains(new Position(0, src.length()))); // eats whole line at end
 	}
-	
+
 	public void testJSCommentFolding() throws Exception
 	{
 		String src = "/*\n * This is a comment.\n */\n";
@@ -120,7 +125,9 @@ public class RubyRegexpFolderTest extends TestCase
 			@Override
 			protected RubyRegexp getStartFoldRegexp(String scope)
 			{
-				return RubyRegexp.newRegexp(runtime, "\\/\\*+|^.*\\bfunction\\s*(\\w+\\s*)?\\([^\\)]*\\)(\\s*\\{[^\\}]*)?\\s*$", RegexpOptions.NULL_OPTIONS);
+				return RubyRegexp.newRegexp(runtime,
+						"\\/\\*+|^.*\\bfunction\\s*(\\w+\\s*)?\\([^\\)]*\\)(\\s*\\{[^\\}]*)?\\s*$",
+						RegexpOptions.NULL_OPTIONS);
 			}
 
 			@Override
@@ -129,23 +136,19 @@ public class RubyRegexpFolderTest extends TestCase
 				return "source.js";
 			}
 		};
-		Map<ProjectionAnnotation, Position> annotations = folder.emitFoldingRegions(false, new NullProgressMonitor());
+		Map<ProjectionAnnotation, Position> annotations = folder.emitFoldingRegions(false, new NullProgressMonitor(),
+				null);
 		Collection<Position> positions = annotations.values();
 		assertEquals(1, positions.size());
 		assertTrue(positions.contains(new Position(0, src.length()))); // eats whole line at end
 	}
-	
+
 	public void testJSFunctionFolding() throws Exception
 	{
-		String src = "function listItems(itemList) \n" +
-"{\n" +
-"   document.write(\"<UL>\\n\")\n" +
-"   for (i = 0;i < itemList.length;i++)\n" +
-"   {\n" +
-"      document.write(\"<LI>\" + itemList[i] + \"\\n\")\n" +
-"   }\n" +
-"   document.write(\"</UL>\\n\") \n" +
-"} ";
+		String src = "function listItems(itemList) \n" + "{\n" + "   document.write(\"<UL>\\n\")\n"
+				+ "   for (i = 0;i < itemList.length;i++)\n" + "   {\n"
+				+ "      document.write(\"<LI>\" + itemList[i] + \"\\n\")\n" + "   }\n"
+				+ "   document.write(\"</UL>\\n\") \n" + "} ";
 		IDocument document = new Document(src);
 		RubyRegexpFolder folder = new RubyRegexpFolder(null, document)
 		{
@@ -158,7 +161,9 @@ public class RubyRegexpFolderTest extends TestCase
 			@Override
 			protected RubyRegexp getStartFoldRegexp(String scope)
 			{
-				return RubyRegexp.newRegexp(runtime, "\\/\\*+|^.*\\bfunction\\s*(\\w+\\s*)?\\([^\\)]*\\)(\\s*\\{[^\\}]*)?\\s*$", RegexpOptions.NULL_OPTIONS);
+				return RubyRegexp.newRegexp(runtime,
+						"\\/\\*+|^.*\\bfunction\\s*(\\w+\\s*)?\\([^\\)]*\\)(\\s*\\{[^\\}]*)?\\s*$",
+						RegexpOptions.NULL_OPTIONS);
 			}
 
 			@Override
@@ -167,7 +172,8 @@ public class RubyRegexpFolderTest extends TestCase
 				return "source.js";
 			}
 		};
-		Map<ProjectionAnnotation, Position> annotations = folder.emitFoldingRegions(false, new NullProgressMonitor());
+		Map<ProjectionAnnotation, Position> annotations = folder.emitFoldingRegions(false, new NullProgressMonitor(),
+				null);
 		Collection<Position> positions = annotations.values();
 		assertEquals(1, positions.size());
 		assertTrue(positions.contains(new Position(0, src.length()))); // eats whole line at end

@@ -21,6 +21,7 @@ import com.aptana.jetty.util.epl.Loader;
 import com.aptana.jetty.util.epl.ajax.JSON.Convertor;
 import com.aptana.jetty.util.epl.ajax.JSON.Output;
 
+@SuppressWarnings({ "rawtypes", "nls" })
 public class JSONPojoConvertorFactory implements JSON.Convertor
 {
     private final JSON _json;

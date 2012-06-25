@@ -20,6 +20,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 
+import com.aptana.core.IFilter;
 import com.aptana.core.IMap;
 import com.aptana.core.build.AbstractBuildParticipant;
 import com.aptana.core.build.IProblem;
@@ -88,6 +89,17 @@ public abstract class AbstractValidatorTestCase extends TestCase
 		fail(MessageFormat.format("Was unable to find an IProblem with message: {0}. Found problems: {1}", message,
 				StringUtil.join(", ", strings)));
 		return null;
+	}
+
+	protected List<IProblem> getProblems(List<IProblem> items, final String message)
+	{
+		return CollectionsUtil.filter(items, new IFilter<IProblem>()
+		{
+			public boolean include(IProblem item)
+			{
+				return message.equals(item.getMessage());
+			}
+		});
 	}
 
 	protected void assertDoesntContain(List<IProblem> items, String message)

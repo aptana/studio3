@@ -262,10 +262,27 @@
                contentTypeId="com.aptana.contenttype.sdocml">
          </contentTypeBinding>
       </participant>
+      <participant
+            class="com.aptana.editor.js.validator.JSStyleValidator"
+            id="com.aptana.editor.js.validator.JSStyleValidator"
+            name="%validator.jsstyle.name"
+            priority="50">
+         <contentTypeBinding
+               contentTypeId="com.aptana.contenttype.js">
+         </contentTypeBinding>
+      </participant>
    </extension>
    <extension
          id="jslint_problem"
          name="%marker.jslint.name"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="com.aptana.editor.js.problem">
+      </super>
+   </extension>
+   <extension
+         id="jsstyle_problem"
+         name="%marker.jsstyle.name"
          point="org.eclipse.core.resources.markers">
       <super
             type="com.aptana.editor.js.problem">

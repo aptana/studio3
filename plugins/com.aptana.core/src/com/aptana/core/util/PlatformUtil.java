@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.osgi.service.environment.Constants;
 
 import com.aptana.core.CorePlugin;
 import com.aptana.core.internal.platform.CoreMacOSX;
@@ -69,6 +70,81 @@ public final class PlatformUtil
 
 	}
 
+	public enum PlatformOs
+	{
+		WINDOWS, MAC, LINUX
+	};
+
+	/**
+	 * The platform we're in.
+	 */
+	public static final PlatformOs platform;
+
+	static
+	{
+		PlatformOs tempPlatform;
+		if (CorePlugin.getDefault() != null)
+		{
+			String os = Platform.getOS();
+			if (os.equals(Constants.OS_WIN32))
+			{
+				tempPlatform = PlatformOs.WINDOWS;
+			}
+			else if (os.equals(Constants.OS_MACOSX))
+			{
+				tempPlatform = PlatformOs.MAC;
+			}
+			else
+			{
+				tempPlatform = PlatformOs.LINUX;
+			}
+
+		}
+		else
+		{
+			// Platform.getOS() cannot be used without bundles loaded (throws NPE),
+			// so, the code-below is used to get the platform when running without bundles loaded.
+			String env = System.getProperty("os.name").toLowerCase(); //$NON-NLS-1$
+			if (env.indexOf("win") != -1) //$NON-NLS-1$
+			{
+				tempPlatform = PlatformOs.WINDOWS;
+			}
+			else if (env.startsWith("mac os")) //$NON-NLS-1$
+			{
+				tempPlatform = PlatformOs.MAC;
+			}
+			else
+			{
+				tempPlatform = PlatformOs.LINUX;
+			}
+		}
+		platform = tempPlatform; // assign final variable.
+	}
+
+	/**
+	 * @return whether we are in windows or not
+	 */
+	public static boolean isWindows()
+	{
+		return platform == PlatformOs.WINDOWS;
+	}
+
+	/**
+	 * @return whether we are in MacOs or not
+	 */
+	public static boolean isMac()
+	{
+		return platform == PlatformOs.MAC;
+	}
+
+	/**
+	 * @return whether we are in MacOs or not
+	 */
+	public static boolean isLinux()
+	{
+		return platform == PlatformOs.LINUX;
+	}
+
 	/**
 	 * DESKTOP_DIRECTORY
 	 */
@@ -92,7 +168,7 @@ public final class PlatformUtil
 	/**
 	 * HOME_DIRECTORY
 	 */
-	public static final String HOME_DIRECTORY = Platform.OS_WIN32.equals(Platform.getOS()) ? "%USERPROFILE%" : "~"; //$NON-NLS-1$ //$NON-NLS-2$	
+	public static final String HOME_DIRECTORY = isWindows() ? "%USERPROFILE%" : "~"; //$NON-NLS-1$ //$NON-NLS-2$	
 
 	private PlatformUtil()
 	{
@@ -783,4 +859,5 @@ public final class PlatformUtil
 
 		return false;
 	}
+
 }

@@ -57,7 +57,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 			// by default, turn on auto refresh
 			boolean autoRefresh = ICorePreferenceConstants.DEFAULT_AUTO_REFRESH_PROJECTS;
 			// Check if user set a value explicitly
-			prefs = EclipseUtil.instanceScope().getNode(CorePlugin.PLUGIN_ID);
 			String oldValue = prefs.get(ICorePreferenceConstants.PREF_AUTO_REFRESH_PROJECTS, null);
 			if (oldValue != null)
 			{
@@ -81,7 +80,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 								ourPrefs.putBoolean(MIGRATED_AUTO_REFRESH, true);
 								try
 								{
-									ourPrefs.sync();
+									ourPrefs.flush();
 								}
 								catch (BackingStoreException e)
 								{

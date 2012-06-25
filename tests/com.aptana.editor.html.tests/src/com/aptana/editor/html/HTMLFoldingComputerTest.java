@@ -6,7 +6,6 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
@@ -15,7 +14,7 @@ import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.HTMLParser;
 import com.aptana.parsing.IParseState;
-import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 
 public class HTMLFoldingComputerTest extends TestCase
 {
@@ -83,26 +82,18 @@ public class HTMLFoldingComputerTest extends TestCase
 		assertFalse(positions.contains(new Position(1, 44)));
 	}
 
-	protected Map<ProjectionAnnotation, Position> fold(String src) throws BadLocationException
+	protected Map<ProjectionAnnotation, Position> fold(String src) throws Exception
 	{
-		folder = new HTMLFoldingComputer(null, new Document(src))
-		{
-			protected IParseNode getAST()
-			{
-				IParseState parseState = new HTMLParseState();
-				parseState.setEditState(getDocument().get());
-				try
-				{
-					return new HTMLParser().parse(parseState);
-				}
-				catch (Exception e)
-				{
-					fail(e.getMessage());
-				}
-				return null;
-			};
-		};
-		Map<ProjectionAnnotation, Position> annotations = folder.emitFoldingRegions(false, new NullProgressMonitor());
+		IParseState parseState = new HTMLParseState(src);
+		IParseRootNode ast = parse(parseState);
+		folder = new HTMLFoldingComputer(null, new Document(src));
+		Map<ProjectionAnnotation, Position> annotations = folder.emitFoldingRegions(false, new NullProgressMonitor(),
+				ast);
 		return annotations;
+	}
+
+	private IParseRootNode parse(IParseState parseState) throws Exception
+	{
+		return new HTMLParser().parse(parseState).getRootNode();
 	}
 }

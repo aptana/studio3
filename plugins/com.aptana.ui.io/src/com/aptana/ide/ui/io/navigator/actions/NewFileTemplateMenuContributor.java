@@ -60,7 +60,8 @@ import com.aptana.ui.util.UIUtils;
 public class NewFileTemplateMenuContributor extends ContributionItem
 {
 
-	private static final String APTANA_EDITOR_PREFIX = "com.aptana.editor."; //$NON-NLS-1$
+	private static final String[] APTANA_EDITOR_PREFIX = new String[] {
+			"com.aptana.editor.", "org.python.pydev.editor." }; //$NON-NLS-1$ //$NON-NLS-2$
 
 	private static Map<String, String> aptanaEditors;
 
@@ -309,15 +310,20 @@ public class NewFileTemplateMenuContributor extends ContributionItem
 			}
 			for (IEditorDescriptor editor : editors)
 			{
-				if (editor.getId().startsWith(APTANA_EDITOR_PREFIX))
+				String editorId = editor.getId();
+				for (String prefix : APTANA_EDITOR_PREFIX)
 				{
-					String name = editor.getLabel();
-					// grabs the first word as it will be used to link the editor type with the bundle's name
-					// (e.g. HTML Editor -> HTML)
-					name = (new StringTokenizer(name)).nextToken();
-					if (!editorMap.containsKey(name))
+					if (editorId.startsWith(prefix))
 					{
-						editorMap.put(name, extension);
+						String name = editor.getLabel();
+						// grabs the first word as it will be used to link the editor type with the bundle's name
+						// (e.g. HTML Editor -> HTML)
+						name = (new StringTokenizer(name)).nextToken();
+						if (!editorMap.containsKey(name))
+						{
+							editorMap.put(name, extension);
+						}
+						break;
 					}
 				}
 			}

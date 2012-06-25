@@ -7,19 +7,19 @@
  */
 package com.aptana.editor.text.parsing;
 
+import com.aptana.parsing.AbstractParser;
 import com.aptana.parsing.IParseState;
-import com.aptana.parsing.IParser;
+import com.aptana.parsing.WorkingParseResult;
 import com.aptana.parsing.ast.IParseRootNode;
 
-public class GenericTextParser implements IParser
+public class GenericTextParser extends AbstractParser
 {
 
 	public GenericTextParser()
 	{
 	}
 
-	public IParseRootNode parse(IParseState parseState) throws Exception
+	protected void parse(IParseState parseState, WorkingParseResult working) throws Exception
 	{
-		return null;
 	}
 }

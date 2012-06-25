@@ -13,6 +13,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.scripting.model.BundleEntry;
 import com.aptana.scripting.model.BundleVisibilityListener;
 
@@ -48,7 +49,8 @@ class FileTypeAssociationListener implements BundleVisibilityListener
 		type = Platform.getContentTypeManager().getContentType(GENERIC_CONTENT_TYPE_ID);
 		if (type == null)
 		{
-			ScriptingActivator.logError("Unable to get reference to generic content type for dynamic filetype associations!", null); //$NON-NLS-1$
+			IdeLog.logError(ScriptingActivator.getDefault(),
+					"Unable to get reference to generic content type for dynamic filetype associations!"); //$NON-NLS-1$
 			return;
 		}
 		try
@@ -65,7 +67,7 @@ class FileTypeAssociationListener implements BundleVisibilityListener
 		}
 		catch (CoreException e)
 		{
-			ScriptingActivator.logError(e.getMessage(), e);
+			IdeLog.logError(ScriptingActivator.getDefault(), e.getMessage(), e);
 		}
 	}
 
@@ -93,7 +95,7 @@ class FileTypeAssociationListener implements BundleVisibilityListener
 		}
 		catch (CoreException e)
 		{
-			ScriptingActivator.logError(e.getMessage(), e);
+			IdeLog.logError(ScriptingActivator.getDefault(), e.getMessage(), e);
 		}
 	}
 
@@ -122,7 +124,7 @@ class FileTypeAssociationListener implements BundleVisibilityListener
 				}
 				catch (CoreException e)
 				{
-					ScriptingActivator.logError(e.getMessage(), e);
+					IdeLog.logError(ScriptingActivator.getDefault(), e.getMessage(), e);
 				}
 			}
 		}

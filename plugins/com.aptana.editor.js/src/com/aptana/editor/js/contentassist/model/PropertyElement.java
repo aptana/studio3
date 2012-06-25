@@ -13,8 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.aptana.jetty.util.epl.ajax.JSON.Output;
-
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.ObjectUtil;
 import com.aptana.core.util.SourcePrinter;
@@ -22,6 +20,7 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.index.core.IndexUtil;
 import com.aptana.index.core.ui.views.IPropertyInformation;
+import com.aptana.jetty.util.epl.ajax.JSON.Output;
 
 public class PropertyElement extends BaseElement<PropertyElement.Property>
 {
@@ -436,5 +435,10 @@ public class PropertyElement extends BaseElement<PropertyElement.Property>
 		{
 			printer.print(JSTypeConstants.UNDEFINED_TYPE);
 		}
+	}
+
+	public String toString()
+	{
+		return toSource();
 	}
 }

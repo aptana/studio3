@@ -25,8 +25,10 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
 
@@ -53,6 +55,13 @@ public class CopyFilesOperation
 	 * Flag to indicate if the operation has been canceled by the user
 	 */
 	private boolean fCancelled;
+
+	private static enum OverwriteStatus
+	{
+		YES, YES_TO_ALL, NO, CANCEL
+	}
+
+	private OverwriteStatus overwriteStatus;
 
 	/**
 	 * Constructor.
@@ -280,6 +289,51 @@ public class CopyFilesOperation
 		{
 			IFileStore[] childStores = Utils.isDirectory(sourceStore) ? sourceStore.childStores(EFS.NONE, monitor)
 					: new IFileStore[0];
+			if (Utils.exists(destinationStore) && sourceStore.getName().equals(destinationStore.getName()))
+			{
+				// a name conflict; ask to overwrite
+				if (overwriteStatus != OverwriteStatus.YES_TO_ALL)
+				{
+					final IFileStore dStore = destinationStore;
+					final IFileStore sStore = sourceStore;
+					fShell.getDisplay().syncExec(new Runnable()
+					{
+
+						public void run()
+						{
+							MessageDialog dialog = new MessageDialog(fShell,
+									Messages.CopyFilesOperation_OverwriteTitle, null, MessageFormat.format(
+											Messages.CopyFilesOperation_OverwriteWarning, dStore.toString(),
+											sStore.toString()), MessageDialog.CONFIRM, new String[] {
+											IDialogConstants.YES_LABEL, IDialogConstants.YES_TO_ALL_LABEL,
+											IDialogConstants.NO_LABEL, IDialogConstants.CANCEL_LABEL }, 0);
+							int retCode = dialog.open();
+							switch (retCode)
+							{
+								case 0: // Yes
+									overwriteStatus = OverwriteStatus.YES;
+									break;
+								case 1: // Yes to All
+									overwriteStatus = OverwriteStatus.YES_TO_ALL;
+									break;
+								case 2: // No
+									overwriteStatus = OverwriteStatus.NO;
+									break;
+								default:
+									overwriteStatus = OverwriteStatus.CANCEL;
+							}
+						}
+					});
+					switch (overwriteStatus)
+					{
+						case CANCEL:
+							monitor.setCanceled(true);
+							// let it fall through since it would return false as well
+						case NO:
+							return false;
+					}
+				}
+			}
 			SyncUtils.copy(sourceStore, null, destinationStore, EFS.NONE, monitor);
 
 			// copy the children recursively

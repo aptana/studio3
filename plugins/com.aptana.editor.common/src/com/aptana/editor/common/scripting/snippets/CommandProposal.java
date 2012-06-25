@@ -75,7 +75,7 @@ public class CommandProposal extends SnippetTemplateProposal
 			}
 			catch (BadLocationException e)
 			{
-				ScriptingActivator.logError(e.getMessage(), e);
+				IdeLog.logError(ScriptingActivator.getDefault(), e.getMessage(), e);
 			}
 
 			ITextEditor textEditor = null;

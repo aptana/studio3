@@ -70,6 +70,23 @@ public class JSMetadataReader extends MetadataReader
 		CLASS("class"), //$NON-NLS-1$
 		BROWSER("browser"), //$NON-NLS-1$
 		ALIAS("alias"), //$NON-NLS-1$
+		// Ignored elements
+		BROWSERS("browsers"), //$NON-NLS-1$
+		AVAILABILITY("availability"), //$NON-NLS-1$
+		REFERENCES("references"), //$NON-NLS-1$
+		METHODS("methods"), //$NON-NLS-1$
+		PROPERTIES("properties"), //$NON-NLS-1$
+		RETURN_TYPES("return-types"), //$NON-NLS-1$
+		ALIASES("aliases"), //$NON-NLS-1$
+		EXAMPLES("examples"), //$NON-NLS-1$
+		EXCEPTIONS("exceptions"), //$NON-NLS-1$
+		INTERFACE("interface"), //$NON-NLS-1$
+		INTERFACES("interfaces"), //$NON-NLS-1$
+		OVERVIEW("overview"), //$NON-NLS-1$
+		PARAMETERS("parameters"), //$NON-NLS-1$
+		TYPE_MAPS("type-maps"), //$NON-NLS-1$
+		VALUES("values"), //$NON-NLS-1$
+		// Undefined
 		UNDEFINED(null);
 
 		private String name;

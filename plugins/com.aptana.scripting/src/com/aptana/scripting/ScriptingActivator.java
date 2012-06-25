@@ -73,40 +73,6 @@ public class ScriptingActivator extends Plugin
 		return RunType.CURRENT_THREAD;
 	}
 
-	/**
-	 * logError
-	 * 
-	 * @deprecated Use {@link IdeLog#logError(Plugin, String, Throwable)}
-	 * @param msg
-	 * @param e
-	 */
-	public static void logError(String msg, Throwable e)
-	{
-		IdeLog.logError(getDefault(), msg, e);
-	}
-
-	/**
-	 * logInfo
-	 * 
-	 * @deprecated Use {@link IdeLog#logInfo(Plugin, String)}
-	 * @param string
-	 */
-	public static void logInfo(String string)
-	{
-		IdeLog.logInfo(getDefault(), string);
-	}
-
-	/**
-	 * logWarning
-	 * 
-	 * @deprecated Use {@link IdeLog#logWarning(Plugin, String)}
-	 * @param msg
-	 */
-	public static void logWarning(String msg)
-	{
-		IdeLog.logWarning(getDefault(), msg);
-	}
-
 	private FileTypeAssociationListener fileTypeListener;
 
 	/**
@@ -163,7 +129,8 @@ public class ScriptingActivator extends Plugin
 				}
 				catch (JNotifyException e)
 				{
-					ScriptingActivator.logError(Messages.EarlyStartup_Error_Initializing_File_Monitoring, e);
+					IdeLog.logError(ScriptingActivator.getDefault(),
+							Messages.EarlyStartup_Error_Initializing_File_Monitoring, e);
 				}
 
 				return Status.OK_STATUS;

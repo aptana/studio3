@@ -15,6 +15,8 @@
 %import "com.aptana.parsing.ast.IParseRootNode";
 %import "com.aptana.parsing.ast.ParseError";
 %import "com.aptana.parsing.ast.ParseRootNode";
+%import "com.aptana.parsing.WorkingParseResult";
+%import "com.aptana.parsing.ParseResult";
 
 %terminals AT_SIGIL, BOOL, BOUND_FUNC_ARROW, BY, CALL_END, CALL_START, CATCH, CLASS, COLON;
 %terminals COLON_SLASH, COMMA, COMPARE, COMPOUND_ASSIGN, DOT, DOT_DOT;
@@ -83,7 +85,7 @@
 %implements "IParser";
 
 %embed {:
-	private IParseState fParseState;
+	private WorkingParseResult fWorking;
 
 	// suppress the error printouts
 	private class CoffeeEvents extends Events
@@ -94,11 +96,11 @@
 
 		public void syntaxError(Symbol token)
 		{
-			if (token == null || fParseState == null)
+			if (token == null || fWorking == null)
 			{
 				return;
 			}
-			fParseState.addError(new ParseError(ICoffeeConstants.CONTENT_TYPE_COFFEE, token, IParseError.Severity.ERROR));
+			fWorking.addError(new ParseError(ICoffeeConstants.CONTENT_TYPE_COFFEE, token, IParseError.Severity.ERROR));
 		}
 
 		public void unexpectedTokenRemoved(Symbol token)
@@ -118,22 +120,27 @@
 		}
 	}
 
-	public synchronized IParseRootNode parse(IParseState parseState) throws java.lang.Exception
+    public synchronized ParseResult parse(IParseState parseState) throws java.lang.Exception
+    {
+        WorkingParseResult working = new WorkingParseResult();
+        parse(parseState, working);
+        return working.getImmutableResult();
+    }
+
+
+	protected synchronized void parse(IParseState parseState, WorkingParseResult working) throws java.lang.Exception
 	{
-		fParseState = parseState;
+		fWorking = working;
 
-		// make sure we have some source
-		String source = parseState.getSource();
-
-		// create scanner and send source to it
-		CoffeeScanner scanner = new CoffeeScanner();
-		scanner.setSource(source);
-
-		// reset any errors we may have had from the last parse
-		fParseState.clearErrors();
-		
 		try
 		{
+    		// make sure we have some source
+    		String source = parseState.getSource();
+
+    		// create scanner and send source to it
+    		CoffeeScanner scanner = new CoffeeScanner();
+    		scanner.setSource(source);
+
 			// parse
 			ParseRootNode result = (ParseRootNode) parse(scanner);
 			int start = parseState.getStartingOffset();
@@ -141,16 +148,14 @@
 			result.setLocation(start, end);
 
 			// store results in the parse state
-			parseState.setParseResult(result);
+			working.setParseResult(result);
 
 			// attach comments to parse root node
 			result.setCommentNodes(scanner.getComments().toArray(new IParseNode[scanner.getComments().size()]));
-
-			return result;
 		}
 		finally
 		{
-			fParseState = null;
+			fWorking = null;
 		}
 	}
 :};

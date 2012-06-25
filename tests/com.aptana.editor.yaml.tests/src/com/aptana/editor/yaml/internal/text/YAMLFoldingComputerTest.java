@@ -21,7 +21,7 @@ import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.yaml.parsing.YAMLParser;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ParseState;
-import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 
 public class YAMLFoldingComputerTest extends TestCase
 {
@@ -38,24 +38,11 @@ public class YAMLFoldingComputerTest extends TestCase
 	public void testBasicYAMLFolding() throws Exception
 	{
 		String src = "development:\n  adapter: mysql\n\ntest:\n  adapter: sqlite3\n"; //$NON-NLS-1$
-		folder = new YAMLFoldingComputer(null, new Document(src))
-		{
-			protected IParseNode getAST()
-			{
-				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get());
-				try
-				{
-					return new YAMLParser().parse(parseState);
-				}
-				catch (Exception e)
-				{
-					fail(e.getMessage());
-				}
-				return null;
-			};
-		};
-		Map<ProjectionAnnotation, Position> annotations = folder.emitFoldingRegions(false, new NullProgressMonitor());
+		folder = new YAMLFoldingComputer(null, new Document(src));
+		IParseState parseState = new ParseState(src);
+		IParseRootNode ast = new YAMLParser().parse(parseState).getRootNode();
+		Map<ProjectionAnnotation, Position> annotations = folder.emitFoldingRegions(false, new NullProgressMonitor(),
+				ast);
 		Collection<Position> positions = annotations.values();
 		assertEquals(2, positions.size());
 		assertTrue(positions.contains(new Position(0, 30)));

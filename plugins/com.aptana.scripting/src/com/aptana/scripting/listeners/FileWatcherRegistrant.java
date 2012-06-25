@@ -18,6 +18,7 @@ import net.contentobjects.jnotify.IJNotify;
 import net.contentobjects.jnotify.JNotifyException;
 import net.contentobjects.jnotify.JNotifyListener;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.filewatcher.FileWatcher;
 import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.model.AbstractElement;
@@ -158,7 +159,7 @@ public class FileWatcherRegistrant implements ElementVisibilityListener, JNotify
 				}
 				catch (JNotifyException e)
 				{
-					ScriptingActivator.logError(e.getMessage(), e);
+					IdeLog.logError(ScriptingActivator.getDefault(), e.getMessage(), e);
 				}
 			}
 		}
@@ -341,7 +342,7 @@ public class FileWatcherRegistrant implements ElementVisibilityListener, JNotify
 							}
 							catch (JNotifyException e)
 							{
-								ScriptingActivator.logError(e.getMessage(), e);
+								IdeLog.logError(ScriptingActivator.getDefault(), e.getMessage(), e);
 							}
 						}
 
@@ -381,7 +382,7 @@ public class FileWatcherRegistrant implements ElementVisibilityListener, JNotify
 			}
 			catch (JNotifyException e)
 			{
-				ScriptingActivator.logError(e.getMessage(), e);
+				IdeLog.logError(ScriptingActivator.getDefault(), e.getMessage(), e);
 			}
 		}
 

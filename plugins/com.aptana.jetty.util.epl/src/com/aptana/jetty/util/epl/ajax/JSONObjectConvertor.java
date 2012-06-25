@@ -29,6 +29,7 @@ import com.aptana.jetty.util.epl.ajax.JSON.Output;
  * 
  *
  */
+@SuppressWarnings({ "unchecked", "unused", "rawtypes", "nls" })
 public class JSONObjectConvertor implements JSON.Convertor
 {
     private boolean _fromJSON;

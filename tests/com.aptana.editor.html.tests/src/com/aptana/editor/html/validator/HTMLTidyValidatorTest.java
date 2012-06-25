@@ -7,6 +7,7 @@
  */
 package com.aptana.editor.html.validator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
@@ -24,21 +25,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 	@Override
 	protected AbstractBuildParticipant createValidator()
 	{
-		return new HTMLTidyValidator()
-		{
-
-			@Override
-			protected String getPreferenceNode()
-			{
-				return HTMLPlugin.PLUGIN_ID;
-			}
-
-			@Override
-			public String getId()
-			{
-				return ID;
-			}
-		};
+		return new HTMLTidyValidatorInternal();
 	}
 
 	@Override
@@ -54,6 +41,46 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 
 		List<IProblem> items = getParseErrors(text);
 		assertDoesntContain(items, "SYSTEM, PUBLIC, W3C, DTD, EN must be upper case");
+	}
+
+	public void testUnknownAttribute() throws CoreException
+	{
+		// @formatter:off
+		String text = "<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\">\n" +
+				"    <head>\n" +
+				"        <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\n" +
+				"        <title>HTML</title>\n" +
+				"        <meta name=\"author\" content=\"qatester\" />\n" +
+				"        <!-- Date: 2012-05-25 -->\n" +
+				"    </head>\n" +
+				"    <body>\n" +
+				"        <a href=\"http://google.com\" src=\"this shouldn't work\" div>Google</a>\n" +
+				"    </body>\n" +
+				"</html>";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertContains(items, "a proprietary attribute \"div\"");
+	}
+
+	public void testEventNotMarkedAsUnknownAttribute() throws CoreException
+	{
+		// @formatter:off
+		String text = "<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\">\n" +
+				"    <head>\n" +
+				"        <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\n" +
+				"        <title>HTML</title>\n" +
+				"        <meta name=\"author\" content=\"qatester\" />\n" +
+				"        <!-- Date: 2012-05-25 -->\n" +
+				"    </head>\n" +
+				"    <body>\n" +
+				"        <a href=\"http://google.com\" onclick=\"alert('this');\">Google</a>\n" +
+				"    </body>\n" +
+				"</html>";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "a proprietary attribute \"onclick\"");
 	}
 
 	public void testLowercaseDoctypeW3C() throws CoreException
@@ -463,8 +490,132 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 		assertDoesntContain(items, "meta attribute \"content\" has invalid value \"not specified\"");
 	}
 
+	public void testArbitraryRelAttributeValue() throws CoreException
+	{
+		// @formatter:off
+		String text = "<!DOCTYPE html>\n" +
+			"<HTML>\n" +
+			"<HEAD>\n" +
+			"<TITLE>Example</TITLE>\n" +
+			"<link rel=\"shortcut icon\" href=\"/favicon.ico\" />\n" +
+			"</HEAD>\n" +
+			"<body>\n" +
+			"</body>\n" +
+			"</HTML>\n";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "link attribute \"rel\" has invalid value \"shortcut icon\"");
+	}
+
+	public void testArbitraryRevAttributeValue() throws CoreException
+	{
+		// @formatter:off
+		String text = "<!DOCTYPE html>\n" +
+			"<HTML>\n" +
+			"<HEAD>\n" +
+			"<TITLE>Example</TITLE>\n" +
+			"<link rev=\"shortcut icon\" href=\"/favicon.ico\" />\n" +
+			"</HEAD>\n" +
+			"<body>\n" +
+			"</body>\n" +
+			"</HTML>\n";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "link attribute \"rev\" has invalid value \"shortcut icon\"");
+	}
+
+	public void testDoesntComplainAboutScriptTagWithSrcAttributeHavingNoContent() throws CoreException
+	{
+		// @formatter:off
+		String text = "<!DOCTYPE html>\n" +
+			"<HTML>\n" +
+			"<HEAD>\n" +
+			"<TITLE>Example</TITLE>\n" +
+			"<script src=\"portal/resources/prototype.js\" type=\"text/javascript\"></script>\n" +
+			"</HEAD>\n" +
+			"<body>\n" +
+			"</body>\n" +
+			"</HTML>\n";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "should trim empty <script>");
+	}
+
+	public void testComplainsAboutScriptTagWithNoSrcAttributeHavingNoContent() throws CoreException
+	{
+		// @formatter:off
+		String text = "<!DOCTYPE html>\n" +
+			"<HTML>\n" +
+			"<HEAD>\n" +
+			"<TITLE>Example</TITLE>\n" +
+			"<script type=\"text/javascript\"></script>\n" +
+			"</HEAD>\n" +
+			"<body>\n" +
+			"</body>\n" +
+			"</HTML>\n";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertContains(items, "should trim empty <script>");
+	}
+
+	public void testFilter() throws CoreException
+	{
+		// @formatter:off
+		String text = "<!DOCTYPE html>\n" +
+			"<HTML>\n" +
+			"<HEAD>\n" +
+			"<TITLE>Example</TITLE>\n" +
+			"<script type=\"text/javascript\"></script>\n" +
+			"</HEAD>\n" +
+			"<body>\n" +
+			"</body>\n" +
+			"</HTML>\n";
+		// @formatter:on
+
+		((HTMLTidyValidatorInternal) fValidator).addFilter(".*should trim empty.*");
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "should trim empty <script>");
+	}
+
 	protected List<IProblem> getParseErrors(String source) throws CoreException
 	{
-		return getParseErrors(source, new HTMLParseState(), IHTMLConstants.TIDY_PROBLEM);
+		return getParseErrors(source, new HTMLParseState(source), IHTMLConstants.TIDY_PROBLEM);
+	}
+
+	class HTMLTidyValidatorInternal extends HTMLTidyValidator
+	{
+		private List<String> filters = new ArrayList<String>();
+
+		@Override
+		protected String getPreferenceNode()
+		{
+			return HTMLPlugin.PLUGIN_ID;
+		}
+
+		@Override
+		public String getId()
+		{
+			return ID;
+		}
+
+		public void addFilter(String filter)
+		{
+			filters.add(filter);
+		}
+
+		public void clearFilters()
+		{
+			filters.clear();
+		}
+
+		@Override
+		public List<String> getFilters()
+		{
+			return filters;
+		}
 	}
 }

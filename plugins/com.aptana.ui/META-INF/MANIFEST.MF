@@ -27,6 +27,7 @@ Export-Package: com.aptana.ui,
  com.aptana.ui.commands,
  com.aptana.ui.diagnostic,
  com.aptana.ui.dialogs,
+ com.aptana.ui.keybinding,
  com.aptana.ui.preferences,
  com.aptana.ui.util,
  com.aptana.ui.widgets

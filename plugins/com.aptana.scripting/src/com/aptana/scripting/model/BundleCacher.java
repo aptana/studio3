@@ -1,3 +1,10 @@
+/**
+ * Aptana Studio
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.scripting.model;
 
 import java.beans.IntrospectionException;
@@ -15,7 +22,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -46,7 +52,6 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.scope.ScopeSelector;
-import com.aptana.scripting.ScriptLogger;
 import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.ScriptingEngine;
 
@@ -134,8 +139,7 @@ public class BundleCacher
 	public void cache(File bundleDirectory, IProgressMonitor monitor)
 	{
 		// grab the bundle model
-		BundleElement be = BundleManager.getInstance().getBundleFromPath(bundleDirectory);
-		cache(be);
+		cache(BundleManager.getInstance().getBundleFromPath(bundleDirectory));
 	}
 
 	protected boolean cache(BundleElement be)
@@ -189,7 +193,10 @@ public class BundleCacher
 		{
 			if (be.getBundleDirectory().canRead())
 			{
-				Assert.isNotNull(cacheFile);
+				if (cacheFile == null)
+				{
+					return false;
+				}
 				reader = new InputStreamReader(new FileInputStream(cacheFile), IOUtil.UTF_8);
 				BundleElement be2 = (BundleElement) yaml.load(reader);
 
@@ -199,8 +206,7 @@ public class BundleCacher
 
 				// It's not the ideal way to test equality, but seems to work correctly. This is the mechanism
 				// currently in use by the unit tests
-				serializationSucceeded = Assert.isTrue(beString2.equals(beString1),
-						StringUtil.format(Messages.BundleCacher_SerializationException, cacheFile));
+				serializationSucceeded = beString2.equals(beString1);
 				return true;
 			}
 		}
@@ -224,8 +230,8 @@ public class BundleCacher
 
 			if (!serializationSucceeded && cacheFile != null)
 			{
-				ScriptLogger.logError(StringUtil.format(Messages.BundleCacher_SerializationExceptionDeletingCacheFile,
-						cacheFile));
+				IdeLog.logWarning(ScriptingActivator.getDefault(),
+						StringUtil.format(Messages.BundleCacher_SerializationExceptionDeletingCacheFile, cacheFile));
 				cacheFile.delete();
 			}
 		}
@@ -761,7 +767,7 @@ public class BundleCacher
 										}
 										else
 										{
-											IdeLog.logError(ScriptingActivator.getDefault(),
+											IdeLog.logWarning(ScriptingActivator.getDefault(),
 													"Expected a flattened array for trigger, but got nested arrays."); //$NON-NLS-1$
 										}
 									}

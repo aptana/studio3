@@ -191,10 +191,29 @@ public class FileSystemWorkbenchAdapter implements IWorkbenchAdapter, IDeferredW
 		return String.valueOf(object);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.model.IWorkbenchAdapter#getParent(java.lang.Object)
 	 */
-	public Object getParent(Object object) {
+	public Object getParent(Object object)
+	{
+		if (object instanceof FileSystemObject)
+		{
+			IFileStore fileStore = ((FileSystemObject) object).getFileStore();
+			IFileStore parentFileStore = fileStore.getParent();
+			if (parentFileStore != null)
+			{
+				try
+				{
+					IFileInfo parentFileInfo = parentFileStore.fetchInfo(EFS.NONE, new NullProgressMonitor());
+					return new FileSystemObject(parentFileStore, parentFileInfo);
+				}
+				catch (CoreException e)
+				{
+					IdeLog.logWarning(IOUIPlugin.getDefault(), e);
+				}
+			}
+		}
 		return null;
 	}
 

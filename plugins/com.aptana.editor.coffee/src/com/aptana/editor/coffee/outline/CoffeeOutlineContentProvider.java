@@ -24,6 +24,7 @@ import com.aptana.editor.coffee.parsing.ast.CoffeeValueNode;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.outline.CommonOutlineContentProvider;
 import com.aptana.editor.common.outline.CommonOutlineItem;
+import com.aptana.editor.common.outline.CommonOutlinePageInput;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
 
@@ -33,10 +34,14 @@ public class CoffeeOutlineContentProvider extends CommonOutlineContentProvider
 	@Override
 	public Object[] getChildren(Object parentElement)
 	{
+		if (parentElement instanceof CommonOutlinePageInput)
+		{
+			parentElement = ((CommonOutlinePageInput) parentElement).ast;
+		}
 		if (parentElement instanceof AbstractThemeableEditor)
 		{
 			IParseNode rootNode = ((AbstractThemeableEditor) parentElement).getAST();
-			return getChildren(rootNode);
+			parentElement = rootNode;
 		}
 		if (parentElement instanceof IParseRootNode)
 		{
@@ -142,39 +147,39 @@ public class CoffeeOutlineContentProvider extends CommonOutlineContentProvider
 			{
 				switch (element.getNodeType())
 				{
-					// case CoffeeNodeTypes.SCRIPT:
-					// return -2;
-					// case CoffeeNodeTypes.GLOBAL:
-					// return -1;
-					// case CoffeeNodeTypes.IMPORT_CONTAINER:
-					// return 0;
-					// case CoffeeNodeTypes.IMPORT_DECLARATION:
-					// return 1;
-					// case CoffeeNodeTypes.TYPE:
-					// return 2;
-					// case CoffeeNodeTypes.CONSTANT:
-					// return 3;
-					// case CoffeeNodeTypes.CLASS_VAR:
-					// return 4;
-					// case CoffeeNodeTypes.INSTANCE_VAR:
-					// case CoffeeNodeTypes.FIELD:
-					// return 5;
-					// case CoffeeNodeTypes.METHOD:
-					// IRubyMethod method = (IRubyMethod) element;
-					// if (method.isSingleton())
-					// {
-					// return 6;
-					// }
-					// if (method.isConstructor())
-					// {
-					// return 7;
-					// }
-					// return 8;
-					// case CoffeeNodeTypes.LOCAL_VAR:
-					// return 9;
-					// case CoffeeNodeTypes.BLOCK:
-					// case CoffeeNodeTypes.DYNAMIC_VAR:
-					// return 10;
+				// case CoffeeNodeTypes.SCRIPT:
+				// return -2;
+				// case CoffeeNodeTypes.GLOBAL:
+				// return -1;
+				// case CoffeeNodeTypes.IMPORT_CONTAINER:
+				// return 0;
+				// case CoffeeNodeTypes.IMPORT_DECLARATION:
+				// return 1;
+				// case CoffeeNodeTypes.TYPE:
+				// return 2;
+				// case CoffeeNodeTypes.CONSTANT:
+				// return 3;
+				// case CoffeeNodeTypes.CLASS_VAR:
+				// return 4;
+				// case CoffeeNodeTypes.INSTANCE_VAR:
+				// case CoffeeNodeTypes.FIELD:
+				// return 5;
+				// case CoffeeNodeTypes.METHOD:
+				// IRubyMethod method = (IRubyMethod) element;
+				// if (method.isSingleton())
+				// {
+				// return 6;
+				// }
+				// if (method.isConstructor())
+				// {
+				// return 7;
+				// }
+				// return 8;
+				// case CoffeeNodeTypes.LOCAL_VAR:
+				// return 9;
+				// case CoffeeNodeTypes.BLOCK:
+				// case CoffeeNodeTypes.DYNAMIC_VAR:
+				// return 10;
 					default:
 						return 5;
 				}

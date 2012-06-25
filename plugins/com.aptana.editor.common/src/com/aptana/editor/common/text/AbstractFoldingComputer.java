@@ -52,18 +52,13 @@ public abstract class AbstractFoldingComputer implements IFoldingComputer
 		return fEditor;
 	}
 
-	protected IParseNode getAST()
-	{
-		return getEditor().getAST();
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.text.reconciler.IFoldingComputer#emitFoldingRegions(boolean,
 	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public Map<ProjectionAnnotation, Position> emitFoldingRegions(boolean initialReconcile, IProgressMonitor monitor)
-			throws BadLocationException
+	public Map<ProjectionAnnotation, Position> emitFoldingRegions(boolean initialReconcile, IProgressMonitor monitor,
+			IParseRootNode parseNode) throws BadLocationException
 	{
 		this.initialReconcile = initialReconcile;
 		fLines = new ArrayList<Integer>();
@@ -75,7 +70,6 @@ public abstract class AbstractFoldingComputer implements IFoldingComputer
 		SubMonitor sub = null;
 		try
 		{
-			IParseNode parseNode = getAST();
 			if (parseNode == null)
 			{
 				return Collections.emptyMap();

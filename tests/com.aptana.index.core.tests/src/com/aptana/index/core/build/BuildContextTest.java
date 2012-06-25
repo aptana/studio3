@@ -14,7 +14,9 @@ import org.eclipse.core.runtime.CoreException;
 import beaver.Symbol;
 
 import com.aptana.parsing.IParseState;
+import com.aptana.parsing.ParseResult;
 import com.aptana.parsing.ParseState;
+import com.aptana.parsing.WorkingParseResult;
 import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.ast.ParseError;
 import com.aptana.parsing.ast.ParseRootNode;
@@ -39,11 +41,12 @@ public class BuildContextTest extends TestCase
 			}
 
 			@Override
-			protected IParseRootNode parse(String contentType, IParseState parseState) throws Exception
+			protected ParseResult parse(String contentType, IParseState parseState, WorkingParseResult working) throws Exception
 			{
 				reparses[0] += 1;
-				parseState.addError(new ParseError("language", new Symbol(1), null));
-				return parseRootNode;
+				working.addError(new ParseError("language", new Symbol(1), null));
+				working.setParseResult(parseRootNode);
+				return working.getImmutableResult();
 			}
 
 			@Override
@@ -53,15 +56,16 @@ public class BuildContextTest extends TestCase
 			}
 		};
 
-		ParseState parseState = new ParseState();
-		IParseRootNode ast = buildContext.getAST(parseState);
+		ParseState parseState = new ParseState(buildContext.getContents());
+		ParseResult parseResult = buildContext.getAST(parseState);
+		IParseRootNode ast = parseResult.getRootNode();
 		assertEquals(parseRootNode, ast);
-		assertEquals(1, parseState.getErrors().size());
+		assertEquals(1, parseResult.getErrors().size());
 		assertEquals(1, reparses[0]);
 
-		parseState = new ParseState();
-		ast = buildContext.getAST(parseState); // This time it's cached.
-		assertEquals(1, parseState.getErrors().size()); //errors must be copied
+		parseState = new ParseState(buildContext.getContents());
+		ast = parseResult.getRootNode(); // This time it's cached.
+		assertEquals(1, parseResult.getErrors().size()); //errors must be copied
 		assertEquals(parseRootNode, ast);
 		assertEquals(1, reparses[0]);
 

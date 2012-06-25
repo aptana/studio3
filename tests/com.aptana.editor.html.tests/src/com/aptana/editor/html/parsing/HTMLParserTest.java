@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.Platform;
 
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.IOUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.tests.util.ASTUtil;
 import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.css.parsing.ast.CSSParseRootNode;
@@ -28,10 +29,13 @@ import com.aptana.editor.html.IHTMLConstants;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
+import com.aptana.parsing.ParseResult;
 import com.aptana.parsing.ast.INameNode;
 import com.aptana.parsing.ast.IParseError;
 import com.aptana.parsing.ast.IParseError.Severity;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseNodeAttribute;
+import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.ast.ParseNode;
 import com.aptana.parsing.lexer.Range;
 
@@ -49,7 +53,6 @@ public class HTMLParserTest extends TestCase
 	protected void setUp() throws Exception
 	{
 		fParser = new HTMLParser();
-		fParseState = new HTMLParseState();
 	}
 
 	protected void tearDown() throws Exception
@@ -106,20 +109,25 @@ public class HTMLParserTest extends TestCase
 	public void testOutlineAttributes() throws Exception
 	{
 		String source = "<html id=\"aptana\" class=\"cool\" height=\"100\">";
-		fParseState.setEditState(source, 0);
+		fParseState = new HTMLParseState(source);
 
-		IParseNode result = fParser.parse(fParseState);
+		IParseNode result = parse();
 		IParseNode[] children = result.getChildren();
 		assertEquals(1, children.length);
 		assertEquals("html#aptana.cool", children[0].getText());
 	}
 
+	private IParseRootNode parse() throws Exception
+	{
+		return fParser.parse(fParseState).getRootNode();
+	}
+
 	public void testNameNode() throws Exception
 	{
 		String source = "<html><head></head></html>\n";
-		fParseState.setEditState(source, 0);
+		fParseState = new HTMLParseState(source);
 
-		IParseNode result = fParser.parse(fParseState);
+		IParseNode result = parse();
 		IParseNode[] children = result.getChildren();
 		INameNode nameNode = children[0].getNameNode();
 		assertEquals("html", nameNode.getName());
@@ -165,8 +173,8 @@ public class HTMLParserTest extends TestCase
 	public void testCloseTagPosition() throws Exception
 	{
 		String source = "<body><p>text</body>";
-		fParseState.setEditState(source, 0);
-		IParseNode result = fParser.parse(fParseState);
+		fParseState = new HTMLParseState(source);
+		IParseNode result = parse();
 		IParseNode[] children = result.getChildren();
 		assertEquals(1, children.length);
 		assertEquals(19, children[0].getEndingOffset());
@@ -183,8 +191,8 @@ public class HTMLParserTest extends TestCase
 	public void testUnclosedRootTag() throws Exception
 	{
 		String source = "<body><p>text";
-		fParseState.setEditState(source, 0);
-		IParseNode result = fParser.parse(fParseState);
+		fParseState = new HTMLParseState(source);
+		IParseNode result = parse();
 		IParseNode[] children = result.getChildren();
 		assertEquals(1, children.length);
 		assertEquals(12, children[0].getEndingOffset());
@@ -201,8 +209,8 @@ public class HTMLParserTest extends TestCase
 	public void testSpecialNodeEnd() throws Exception
 	{
 		String source = "<script>var one = 1;</script>";
-		fParseState.setEditState(source, 0);
-		IParseNode result = fParser.parse(fParseState);
+		fParseState = new HTMLParseState(source);
+		IParseNode result = parse();
 		IParseNode[] children = result.getChildren();
 		assertEquals(1, children.length);
 		INameNode endTag = ((HTMLElementNode) children[0]).getEndNode();
@@ -222,8 +230,8 @@ public class HTMLParserTest extends TestCase
 				"    </style>\n" + //
 				"  </head>\n" + //
 				"</html>"; //
-		fParseState.setEditState(source, 0);
-		IParseNode result = fParser.parse(fParseState);
+		fParseState = new HTMLParseState(source);
+		IParseNode result = parse();
 		IParseNode[] children = result.getChildren();
 
 		HTMLElementNode html = (HTMLElementNode) children[0];
@@ -245,10 +253,10 @@ public class HTMLParserTest extends TestCase
 	public void testMissingEndTagError() throws Exception
 	{
 		String source = "<title><body><div><p></body>";
-		fParseState.setEditState(source, 0);
-		fParser.parse(fParseState);
+		fParseState = new HTMLParseState(source);
+		ParseResult parseResult = fParser.parse(fParseState);
 
-		List<IParseError> errors = fParseState.getErrors();
+		List<IParseError> errors = parseResult.getErrors();
 		// should contain only two errors, for unclosed <title> and <div>, but not <p> since </p> is optional
 		assertEquals(2, errors.size());
 
@@ -266,8 +274,8 @@ public class HTMLParserTest extends TestCase
 	public void testTypeAttributeForStyle() throws Exception
 	{
 		String source = "<style type=\"text/css\">html {color: red;}</style>";
-		fParseState.setEditState(source, 0);
-		IParseNode result = fParser.parse(fParseState);
+		fParseState = new HTMLParseState(source);
+		IParseNode result = parse();
 		IParseNode styleTag = result.getChild(0);
 		IParseNode cssNode = styleTag.getChild(0);
 
@@ -278,8 +286,8 @@ public class HTMLParserTest extends TestCase
 	public void testIncorrectTypeAttributeForStyle() throws Exception
 	{
 		String source = "<style type=\"text/incorrect\">html {color: red;}</style>";
-		fParseState.setEditState(source, 0);
-		IParseNode result = fParser.parse(fParseState);
+		fParseState = new HTMLParseState(source);
+		IParseNode result = parse();
 		IParseNode styleTag = result.getChild(0);
 		IParseNode textNode = styleTag.getChild(0);
 
@@ -292,8 +300,8 @@ public class HTMLParserTest extends TestCase
 		for (String type : JS_VALID_TYPE_ATTR)
 		{
 			String source = "<script type=\"" + type + "\">var one = 1;</script>";
-			fParseState.setEditState(source, 0);
-			IParseNode result = fParser.parse(fParseState);
+			fParseState = new HTMLParseState(source);
+			IParseNode result = parse();
 			IParseNode scriptTag = result.getChild(0);
 			IParseNode jsNode = scriptTag.getChild(0);
 
@@ -305,8 +313,8 @@ public class HTMLParserTest extends TestCase
 	public void testIncorrectTypeAttributeForScript() throws Exception
 	{
 		String source = "<script type=\"text/incorrect\">var one = 1;</script>";
-		fParseState.setEditState(source, 0);
-		IParseNode result = fParser.parse(fParseState);
+		fParseState = new HTMLParseState(source);
+		IParseNode result = parse();
 		IParseNode scriptTag = result.getChild(0);
 		IParseNode textNode = scriptTag.getChild(0);
 
@@ -314,11 +322,39 @@ public class HTMLParserTest extends TestCase
 		assertEquals(IHTMLConstants.CONTENT_TYPE_HTML, textNode.getLanguage());
 	}
 
+	public void testAttributeWithNoValue() throws Exception
+	{
+		String source = "<li div=>item 1</li>";
+		fParseState = new HTMLParseState(source);
+		IParseNode result = parse();
+		IParseNode[] children = result.getChildren();
+		assertEquals(1, children.length);
+
+		IParseNodeAttribute[] attrs = children[0].getAttributes();
+		assertEquals("attribute count", 1, attrs.length);
+		assertEquals("attribute name", "div", attrs[0].getName());
+		assertEquals("attribute value", StringUtil.EMPTY, attrs[0].getValue());
+	}
+
+	public void testAttributeWithNoValueOrEquals() throws Exception
+	{
+		String source = "<li div>item 1</li>";
+		fParseState = new HTMLParseState(source);
+		IParseNode result = parse();
+		IParseNode[] children = result.getChildren();
+		assertEquals(1, children.length);
+
+		IParseNodeAttribute[] attrs = children[0].getAttributes();
+		assertEquals("attribute count", 1, attrs.length);
+		assertEquals("attribute name", "div", attrs[0].getName());
+		assertEquals("attribute value", StringUtil.EMPTY, attrs[0].getValue());
+	}
+
 	public void testNestedOptionalEndTag() throws Exception
 	{
 		String source = "<li>item 1<li>item 2";
-		fParseState.setEditState(source, 0);
-		IParseNode result = fParser.parse(fParseState);
+		fParseState = new HTMLParseState(source);
+		IParseNode result = parse();
 		IParseNode[] children = result.getChildren();
 		assertEquals(2, children.length);
 
@@ -341,8 +377,9 @@ public class HTMLParserTest extends TestCase
 	 */
 	public void trimToSize() throws Exception
 	{
-		fParseState.setEditState(getSource("performance/amazon.html"));
-		ASTUtil.showBeforeAndAfterTrim(fParser.parse(fParseState));
+		fParseState = new HTMLParseState(getSource("performance/amazon.html"));
+
+		ASTUtil.showBeforeAndAfterTrim(parse());
 	}
 
 	protected void parseTest(String source) throws Exception
@@ -352,8 +389,8 @@ public class HTMLParserTest extends TestCase
 
 	protected void parseTest(String source, String expected) throws Exception
 	{
-		fParseState.setEditState(source, 0);
-		IParseNode result = fParser.parse(fParseState);
+		fParseState = new HTMLParseState(source);
+		IParseNode result = parse();
 
 		StringBuilder text = new StringBuilder();
 		IParseNode[] children = result.getChildren();

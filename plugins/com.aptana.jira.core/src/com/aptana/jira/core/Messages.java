@@ -13,13 +13,6 @@ public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.jira.core.messages"; //$NON-NLS-1$
 
-	public static String JiraIssuePriority_Critical;
-	public static String JiraIssuePriority_High;
-	public static String JiraIssuePriority_Low;
-	public static String JiraIssuePriority_Medium;
-	public static String JiraIssuePriority_None;
-	public static String JiraIssuePriority_Trivial;
-
 	public static String JiraIssueType_Bug;
 	public static String JiraIssueType_Feature;
 	public static String JiraIssueType_Improvement;

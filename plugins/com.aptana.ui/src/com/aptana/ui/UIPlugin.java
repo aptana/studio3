@@ -8,18 +8,13 @@
 package com.aptana.ui;
 
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveListener;
 import org.eclipse.ui.IWindowListener;
 import org.eclipse.ui.IWorkbench;
@@ -27,7 +22,6 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.eclipse.ui.progress.UIJob;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.prefs.BackingStoreException;
 
@@ -49,59 +43,11 @@ public class UIPlugin extends AbstractUIPlugin
 	private static UIPlugin plugin;
 	private IPreferenceChangeListener autoBuildListener;
 
-	private final IPerspectiveListener perspectiveListener = new IPerspectiveListener()
-	{
+	private final IPerspectiveListener perspectiveListener = new PerspectiveChangeResetListener(
+			WebPerspectiveFactory.ID, PLUGIN_ID,
+			IPreferenceConstants.PERSPECTIVE_VERSION, WebPerspectiveFactory.VERSION);
 
-		public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective)
-		{
-			if (WebPerspectiveFactory.ID.equals(perspective.getId()))
-			{
-				int version = Platform.getPreferencesService().getInt(PLUGIN_ID,
-						IPreferenceConstants.PERSPECTIVE_VERSION, 0, null);
-				if (WebPerspectiveFactory.VERSION > version)
-				{
-					resetPerspective(page);
-					// we will only ask once regardless if user chose to update the perspective
-					IEclipsePreferences prefs = (EclipseUtil.instanceScope()).getNode(PLUGIN_ID);
-					prefs.putInt(IPreferenceConstants.PERSPECTIVE_VERSION, WebPerspectiveFactory.VERSION);
-					try
-					{
-						prefs.flush();
-					}
-					catch (BackingStoreException e)
-					{
-						// ignores the exception
-					}
-				}
-			}
-		}
-
-		public void perspectiveChanged(IWorkbenchPage page, IPerspectiveDescriptor perspective, String changeId)
-		{
-		}
-
-		private void resetPerspective(final IWorkbenchPage page)
-		{
-			UIJob job = new UIJob("Resetting Studio perspective...") //$NON-NLS-1$
-			{
-
-				@Override
-				public IStatus runInUIThread(IProgressMonitor monitor)
-				{
-					if (MessageDialog.openQuestion(UIUtils.getActiveShell(),
-							com.aptana.ui.Messages.UIPlugin_ResetPerspective_Title,
-							com.aptana.ui.Messages.UIPlugin_ResetPerspective_Description))
-					{
-						page.resetPerspective();
-					}
-					return Status.OK_STATUS;
-				}
-			};
-			job.setSystem(!EclipseUtil.showSystemJobs());
-			job.setPriority(Job.INTERACTIVE);
-			job.schedule();
-		}
-	};
+	private boolean hasMainWindowActivated = false;
 
 	private final IWindowListener windowListener = new IWindowListener()
 	{
@@ -122,6 +68,15 @@ public class UIPlugin extends AbstractUIPlugin
 		public void windowOpened(IWorkbenchWindow window)
 		{
 			window.addPerspectiveListener(perspectiveListener);
+			if (!hasMainWindowActivated)
+			{
+				hasMainWindowActivated = true;
+				IWorkbenchPage page = window.getActivePage();
+				if (page != null)
+				{
+					perspectiveListener.perspectiveActivated(page, page.getPerspective());
+				}
+			}
 		}
 	};
 

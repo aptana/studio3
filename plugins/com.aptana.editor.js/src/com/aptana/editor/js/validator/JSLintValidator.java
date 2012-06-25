@@ -12,7 +12,9 @@ import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
@@ -60,6 +62,29 @@ public class JSLintValidator extends AbstractBuildParticipant
 	private static final String JSLINT_FILENAME = "fulljslint.js"; //$NON-NLS-1$
 	private static Script JS_LINT_SCRIPT;
 
+	private static Map<String, Object> DEFAULT_OPTION = new HashMap<String, Object>();
+	static
+	{
+		// Set default aptana options
+		DEFAULT_OPTION.put("laxLineEnd", true); //$NON-NLS-1$
+		DEFAULT_OPTION.put("undef", true); //$NON-NLS-1$
+		DEFAULT_OPTION.put("browser", true); //$NON-NLS-1$
+		DEFAULT_OPTION.put("jscript", true); //$NON-NLS-1$
+		DEFAULT_OPTION.put("debug", true); //$NON-NLS-1$
+		DEFAULT_OPTION.put("maxerr", 100000); //$NON-NLS-1$
+		DEFAULT_OPTION.put("white", true); //$NON-NLS-1$
+		DEFAULT_OPTION.put(
+				"predef", new NativeArray(new String[] { "Ti", "Titanium", "alert", "require", "exports", "native", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
+						"implements" })); //$NON-NLS-1$
+	}
+
+	private Map<String, Object> options;
+
+	public JSLintValidator()
+	{
+		super();
+	}
+
 	public void buildFile(BuildContext context, IProgressMonitor monitor)
 	{
 		if (context == null)
@@ -67,6 +92,7 @@ public class JSLintValidator extends AbstractBuildParticipant
 			return;
 		}
 
+		intializeOptions();
 		List<IProblem> problems = Collections.emptyList();
 		String sourcePath = context.getURI().toString();
 		try
@@ -88,6 +114,7 @@ public class JSLintValidator extends AbstractBuildParticipant
 					MessageFormat.format("Failed to parse {0} with JSLint", sourcePath), e); //$NON-NLS-1$
 		}
 
+		this.options = null;
 		context.putProblems(IJSConstants.JSLINT_PROBLEM_MARKER_TYPE, problems);
 	}
 
@@ -119,7 +146,17 @@ public class JSLintValidator extends AbstractBuildParticipant
 		}
 
 		Function function = (Function) functionObj;
-		Object[] args = { source, scope.get("aptanaOptions", scope) }; //$NON-NLS-1$
+		NativeObject optionsObj = new NativeObject();
+		// Set our overriding options.
+		if (this.options != null)
+		{
+			for (Map.Entry<String, Object> entry : this.options.entrySet())
+			{
+				scope.put(entry.getKey(), optionsObj, entry.getValue());
+			}
+		}
+
+		Object[] args = { source, optionsObj };
 		// PC: we ignore the result, because i have found that with some versions, there might
 		// be errors but this function returned true (false == errors)
 		function.call(context, scope, scope, args);
@@ -158,10 +195,6 @@ public class JSLintValidator extends AbstractBuildParticipant
 
 			// Grab the line of the error. Skip if we already recorded an error on this line (why?)
 			int line = (int) Double.parseDouble(object.get("line", scope).toString()); //$NON-NLS-1$
-			if (hasErrorOrWarningOnLine(items, line))
-			{
-				continue;
-			}
 
 			// Grab the details of the error. If user has set up filters to ignore it, move on
 			String reason = object.get("reason", scope).toString().trim(); //$NON-NLS-1$
@@ -214,26 +247,6 @@ public class JSLintValidator extends AbstractBuildParticipant
 			}
 		}
 		return items;
-	}
-
-	/**
-	 * Check text of the error against our filter expressions.
-	 * 
-	 * @param message
-	 * @param expressions
-	 * @return
-	 */
-	private boolean isIgnored(String message, List<String> expressions)
-	{
-		for (String expression : expressions)
-		{
-			if (message.matches(expression))
-			{
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	/**
@@ -298,5 +311,21 @@ public class JSLintValidator extends AbstractBuildParticipant
 			Context.exit();
 		}
 		return null;
+	}
+
+	public void setOption(String propertyName, Object value)
+	{
+		intializeOptions();
+		this.options.put(propertyName, value);
+	}
+
+	private void intializeOptions()
+	{
+		if (this.options == null)
+		{
+			this.options = new HashMap<String, Object>();
+			this.options.putAll(DEFAULT_OPTION);
+		}
+
 	}
 }

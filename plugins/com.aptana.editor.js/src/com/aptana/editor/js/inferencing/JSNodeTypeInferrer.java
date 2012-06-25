@@ -649,8 +649,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 
 					if (property != null)
 					{
-						properties = new ArrayList<PropertyElement>();
-						properties.add(property);
+						properties = CollectionsUtil.newList(property);
 					}
 				}
 			}

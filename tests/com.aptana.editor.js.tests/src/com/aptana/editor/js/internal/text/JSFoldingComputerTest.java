@@ -13,6 +13,7 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
@@ -24,7 +25,7 @@ import com.aptana.editor.js.parsing.JSParser;
 import com.aptana.editor.js.preferences.IPreferenceConstants;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ParseState;
-import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 
 public class JSFoldingComputerTest extends TestCase
 {
@@ -41,50 +42,38 @@ public class JSFoldingComputerTest extends TestCase
 	public void testScriptdocFolding() throws Exception
 	{
 		String src = "/**\n * This is a comment.\n **/\n";
-		folder = new JSFoldingComputer(null, new Document(src))
-		{
-			protected IParseNode getAST()
-			{
-				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get());
-				try
-				{
-					return new JSParser().parse(parseState);
-				}
-				catch (Exception e)
-				{
-					fail(e.getMessage());
-				}
-				return null;
-			};
-		};
-		Map<ProjectionAnnotation, Position> annotations = folder.emitFoldingRegions(false, new NullProgressMonitor());
+
+		Map<ProjectionAnnotation, Position> annotations = emitFoldingRegions(false, src);
 		Collection<Position> positions = annotations.values();
 		assertEquals(1, positions.size());
 		assertTrue(positions.contains(new Position(0, src.length()))); // eats whole line at end
 	}
 
+	protected Map<ProjectionAnnotation, Position> emitFoldingRegions(boolean initialReconcile, String src)
+			throws BadLocationException
+	{
+		if (folder == null)
+		{
+			folder = new JSFoldingComputer(null, new Document(src));
+		}
+		IParseState parseState = new ParseState(src);
+		IParseRootNode ast;
+		try
+		{
+			ast = parse(parseState);
+		}
+		catch (Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+		return folder.emitFoldingRegions(initialReconcile, new NullProgressMonitor(), ast);
+	}
+
 	public void testJSCommentFolding() throws Exception
 	{
 		String src = "/*\n * This is a comment.\n */\n";
-		folder = new JSFoldingComputer(null, new Document(src))
-		{
-			protected IParseNode getAST()
-			{
-				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get());
-				try
-				{
-					return new JSParser().parse(parseState);
-				}
-				catch (Exception e)
-				{
-					fail(e.getMessage());
-				}
-				return null;
-			};
-		};
-		Map<ProjectionAnnotation, Position> annotations = folder.emitFoldingRegions(false, new NullProgressMonitor());
+
+		Map<ProjectionAnnotation, Position> annotations = emitFoldingRegions(false, src);
 		Collection<Position> positions = annotations.values();
 		assertEquals(1, positions.size());
 		assertTrue(positions.contains(new Position(0, src.length()))); // eats whole line at end
@@ -101,24 +90,8 @@ public class JSFoldingComputerTest extends TestCase
 				"   }\n" + //
 				"   document.write(\"</UL>\\n\") \n" + //
 				"} "; //
-		folder = new JSFoldingComputer(null, new Document(src))
-		{
-			protected IParseNode getAST()
-			{
-				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get());
-				try
-				{
-					return new JSParser().parse(parseState);
-				}
-				catch (Exception e)
-				{
-					fail(e.getMessage());
-				}
-				return null;
-			};
-		};
-		Map<ProjectionAnnotation, Position> annotations = folder.emitFoldingRegions(false, new NullProgressMonitor());
+
+		Map<ProjectionAnnotation, Position> annotations = emitFoldingRegions(false, src);
 		Collection<Position> positions = annotations.values();
 		assertEquals(2, positions.size()); // FIXME We're getting one too many here. Probably need to check if one
 											// already exists on this line!
@@ -129,31 +102,16 @@ public class JSFoldingComputerTest extends TestCase
 	public void testJSCommentInitiallyFolded() throws Exception
 	{
 		String src = "/*\n * This is a comment.\n */\n";
-		folder = new JSFoldingComputer(null, new Document(src))
-		{
-			protected IParseNode getAST()
-			{
-				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get());
-				try
-				{
-					return new JSParser().parse(parseState);
-				}
-				catch (Exception e)
-				{
-					fail(e.getMessage());
-				}
-				return null;
-			};
-		};
-		// Turn on initially folding comments
-		EclipseUtil.instanceScope().getNode(JSPlugin.PLUGIN_ID).putBoolean(IPreferenceConstants.INITIALLY_FOLD_COMMENTS, true);
 
-		Map<ProjectionAnnotation, Position> annotations = folder.emitFoldingRegions(true, new NullProgressMonitor());
+		// Turn on initially folding comments
+		EclipseUtil.instanceScope().getNode(JSPlugin.PLUGIN_ID)
+				.putBoolean(IPreferenceConstants.INITIALLY_FOLD_COMMENTS, true);
+
+		Map<ProjectionAnnotation, Position> annotations = emitFoldingRegions(true, src);
 		assertTrue(annotations.keySet().iterator().next().isCollapsed());
 
 		// After initial reconcile, don't mark any collapsed
-		annotations = folder.emitFoldingRegions(false, new NullProgressMonitor());
+		annotations = emitFoldingRegions(false, src);
 		assertFalse(annotations.keySet().iterator().next().isCollapsed());
 	}
 
@@ -164,31 +122,16 @@ public class JSFoldingComputerTest extends TestCase
 				"   document.write(\"<UL>\\n\")\n" + //
 				"   document.write(\"</UL>\\n\") \n" + //
 				"} "; //
-		folder = new JSFoldingComputer(null, new Document(src))
-		{
-			protected IParseNode getAST()
-			{
-				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get());
-				try
-				{
-					return new JSParser().parse(parseState);
-				}
-				catch (Exception e)
-				{
-					fail(e.getMessage());
-				}
-				return null;
-			};
-		};
-		// Turn on initially folding functions
-		EclipseUtil.instanceScope().getNode(JSPlugin.PLUGIN_ID).putBoolean(IPreferenceConstants.INITIALLY_FOLD_FUNCTIONS, true);
 
-		Map<ProjectionAnnotation, Position> annotations = folder.emitFoldingRegions(true, new NullProgressMonitor());
+		// Turn on initially folding functions
+		EclipseUtil.instanceScope().getNode(JSPlugin.PLUGIN_ID)
+				.putBoolean(IPreferenceConstants.INITIALLY_FOLD_FUNCTIONS, true);
+
+		Map<ProjectionAnnotation, Position> annotations = emitFoldingRegions(true, src);
 		assertTrue(annotations.keySet().iterator().next().isCollapsed());
 
 		// After initial reconcile, don't mark any collapsed
-		annotations = folder.emitFoldingRegions(false, new NullProgressMonitor());
+		annotations = emitFoldingRegions(false, src);
 		assertFalse(annotations.keySet().iterator().next().isCollapsed());
 	}
 
@@ -201,32 +144,17 @@ public class JSFoldingComputerTest extends TestCase
 				"        \"event\"\n" + //
 				"    ]\n" + //
 				"}"; //
-		folder = new JSFoldingComputer(null, new Document(src))
-		{
-			protected IParseNode getAST()
-			{
-				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get());
-				try
-				{
-					return new JSParser().parse(parseState);
-				}
-				catch (Exception e)
-				{
-					fail(e.getMessage());
-				}
-				return null;
-			};
-		};
-		// Turn on initially folding arrays
-		EclipseUtil.instanceScope().getNode(JSPlugin.PLUGIN_ID).putBoolean(IPreferenceConstants.INITIALLY_FOLD_ARRAYS, true);
 
-		Map<ProjectionAnnotation, Position> annotations = folder.emitFoldingRegions(true, new NullProgressMonitor());
+		// Turn on initially folding arrays
+		EclipseUtil.instanceScope().getNode(JSPlugin.PLUGIN_ID)
+				.putBoolean(IPreferenceConstants.INITIALLY_FOLD_ARRAYS, true);
+
+		Map<ProjectionAnnotation, Position> annotations = emitFoldingRegions(true, src);
 		ProjectionAnnotation annotation = getByPosition(annotations, new Position(21, 64));
 		assertTrue(annotation.isCollapsed());
 
 		// After initial reconcile, don't mark any collapsed
-		annotations = folder.emitFoldingRegions(false, new NullProgressMonitor());
+		annotations = emitFoldingRegions(false, src);
 		annotation = getByPosition(annotations, new Position(21, 64));
 		assertFalse(annotation.isCollapsed());
 	}
@@ -236,31 +164,16 @@ public class JSFoldingComputerTest extends TestCase
 		String src = "object = {\n" + //
 				"    \"description\": \"event\"\n" + //
 				"};"; //
-		folder = new JSFoldingComputer(null, new Document(src))
-		{
-			protected IParseNode getAST()
-			{
-				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get());
-				try
-				{
-					return new JSParser().parse(parseState);
-				}
-				catch (Exception e)
-				{
-					fail(e.getMessage());
-				}
-				return null;
-			};
-		};
-		// Turn on initially folding objects
-		EclipseUtil.instanceScope().getNode(JSPlugin.PLUGIN_ID).putBoolean(IPreferenceConstants.INITIALLY_FOLD_OBJECTS, true);
 
-		Map<ProjectionAnnotation, Position> annotations = folder.emitFoldingRegions(true, new NullProgressMonitor());
+		// Turn on initially folding objects
+		EclipseUtil.instanceScope().getNode(JSPlugin.PLUGIN_ID)
+				.putBoolean(IPreferenceConstants.INITIALLY_FOLD_OBJECTS, true);
+
+		Map<ProjectionAnnotation, Position> annotations = emitFoldingRegions(true, src);
 		assertTrue(annotations.keySet().iterator().next().isCollapsed());
 
 		// After initial reconcile, don't mark any collapsed
-		annotations = folder.emitFoldingRegions(false, new NullProgressMonitor());
+		annotations = emitFoldingRegions(false, src);
 		assertFalse(annotations.keySet().iterator().next().isCollapsed());
 	}
 
@@ -274,5 +187,10 @@ public class JSFoldingComputerTest extends TestCase
 			}
 		}
 		return null;
+	}
+
+	private IParseRootNode parse(IParseState parseState) throws Exception
+	{
+		return new JSParser().parse(parseState).getRootNode();
 	}
 }

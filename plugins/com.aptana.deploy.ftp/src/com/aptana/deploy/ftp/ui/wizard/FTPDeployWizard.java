@@ -26,7 +26,7 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.deploy.ftp.FTPDeployPlugin;
 import com.aptana.deploy.ftp.FTPDeployProvider;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
-import com.aptana.deploy.wizard.AbstractDeployWizard;
+import com.aptana.deploy.ui.wizard.AbstractDeployWizard;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.core.ISiteConnection;

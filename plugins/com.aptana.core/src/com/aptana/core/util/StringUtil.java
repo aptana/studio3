@@ -34,7 +34,17 @@ public class StringUtil
 	/**
 	 * regexp for counting lines and splitting strings by lines.
 	 */
-	public static final Pattern LINE_SPLITTER = Pattern.compile("\r?\n|\r"); //$NON-NLS-1$
+	public static final String LINE_SPLITTER_REGEX = "\r?\n|\r"; //$NON-NLS-1$
+
+	/**
+	 * regex for newline group
+	 */
+	public static final String REGEX_NEWLINE_GROUP = StringUtil.format("({0})", StringUtil.LINE_SPLITTER_REGEX); //$NON-NLS-1$
+
+	/**
+	 * Pattern for counting lines and splitting strings by lines.
+	 */
+	public static final Pattern LINE_SPLITTER = Pattern.compile(LINE_SPLITTER_REGEX);
 
 	/**
 	 * TextPatternReplacer to sanitize html/xml to entities.
@@ -505,11 +515,7 @@ public class StringUtil
 			BigInteger bigInt = new BigInteger(1, thedigest);
 			String hashtext = bigInt.toString(16);
 			// Now we need to zero pad it if you actually want the full 32 chars.
-			while (hashtext.length() < 32)
-			{
-				hashtext = "0" + hashtext; //$NON-NLS-1$
-			}
-			return hashtext;
+			return pad(hashtext, 32, '0');
 		}
 		catch (Exception e)
 		{
@@ -531,9 +537,10 @@ public class StringUtil
 			string = EMPTY;
 		}
 
-		while (string.length() < desiredLength)
+		int diff = desiredLength - string.length();
+		if (diff > 0)
 		{
-			string = padChar + string;
+			string = repeat(padChar, diff) + string;
 		}
 		return string;
 	}
@@ -690,7 +697,21 @@ public class StringUtil
 		return new String(ellipsify(text.substring(0, length)));
 	}
 
+	/**
+	 * Repeats the given char n times and returns it as a new string.
+	 */
+	public static String repeat(char c, int times)
+	{
+		char[] buf = new char[times];
+		for (int i = 0; i < times; i++)
+		{
+			buf[i] = c;
+		}
+		return new String(buf);
+	}
+
 	private StringUtil()
 	{
 	}
+
 }

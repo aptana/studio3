@@ -10,11 +10,11 @@
  *******************************************************************************/
 package com.aptana.editor.common.contentassist;
 
+import org.eclipse.jface.text.DefaultInformationControl.IInformationPresenter;
 import org.eclipse.jface.text.IInformationControl;
 import org.eclipse.jface.text.IInformationControlExtension;
 import org.eclipse.jface.text.IInformationControlExtension3;
 import org.eclipse.jface.text.TextPresentation;
-import org.eclipse.jface.text.DefaultInformationControl.IInformationPresenter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.DisposeEvent;
@@ -60,7 +60,7 @@ public class InformationControl implements IInformationControl, IInformationCont
 	/** A cached text presentation */
 	private TextPresentation fPresentation = new TextPresentation();
 	/** The control width constraint */
-	//private int fMaxWidth= -1;
+	private int fMaxWidth= -1;
 	/** The control height constraint */
 	private int fMaxHeight= -1;
 	private String statusFieldText = null;
@@ -275,7 +275,7 @@ public class InformationControl implements IInformationControl, IInformationCont
 			fText.setText(content);
 		} else {
 			fPresentation.clear();
-			content= fPresenter.updatePresentation(fShell.getDisplay(), content, fPresentation, 260, fMaxHeight);
+			content= fPresenter.updatePresentation(fShell.getDisplay(), content, fPresentation, Math.max(fMaxWidth, 260), fMaxHeight);
 			if (content != null) {
 				fText.setText(content);
 				TextPresentation.applyTextPresentation(fPresentation, fText);
@@ -336,8 +336,11 @@ public class InformationControl implements IInformationControl, IInformationCont
 	public void setLocation(Point location) {
 		Rectangle trim= fShell.computeTrim(0, 0, 0, 0);
 		Point textLocation= fText.getLocation();
-		location.x += trim.x - textLocation.x + INNER_BORDER;
-		location.y += trim.y - textLocation.y + INNER_BORDER;
+		if (textLocation.x != 0 || textLocation.y != 0)
+		{
+			location.x += trim.x - textLocation.x + INNER_BORDER;
+			location.y += trim.y - textLocation.y + INNER_BORDER;
+		}
 		fShell.setLocation(location);
 	}
 
@@ -345,7 +348,7 @@ public class InformationControl implements IInformationControl, IInformationCont
 	 * @see IInformationControl#setSizeConstraints(int, int)
 	 */
 	public void setSizeConstraints(int maxWidth, int maxHeight) {
-		//fMaxWidth= maxWidth;
+		fMaxWidth= maxWidth;
 		fMaxHeight= maxHeight;
 	}
 

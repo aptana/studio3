@@ -55,6 +55,15 @@ public class HTMLParseErrorValidatorTest extends AbstractValidatorTestCase
 		assertContains(items, "Missing end tag </title>");
 	}
 
+	public void testHTMLMissingEndOpenTag() throws CoreException
+	{
+		String text = "<html>\n<body>\n<a\n</body>\n</html>";
+
+		List<IProblem> items = getParseErrors(text);
+		assertEquals(1, items.size());
+		assertContains(items, "\"<\" missing '>' for end of tag");
+	}
+
 	public void testHTMLNoErrors() throws CoreException
 	{
 		String text = "<html>\n<title>test</title>\n<body>\n</body>\n</html>";
@@ -124,6 +133,6 @@ public class HTMLParseErrorValidatorTest extends AbstractValidatorTestCase
 
 	protected List<IProblem> getParseErrors(String source, String markerType) throws CoreException
 	{
-		return getParseErrors(source, new HTMLParseState(), markerType);
+		return getParseErrors(source, new HTMLParseState(source), markerType);
 	}
 }
