@@ -30,6 +30,7 @@ import java.io.Writer;
  * Provides stream handling utilities in
  * singleton Threadpool implementation accessed by static members.
  */
+@SuppressWarnings({ "nls" })
 public class IO 
 {
     private static final RedirectToAptanaLog LOG = RedirectToAptanaLog.getSingleton();

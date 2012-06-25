@@ -15,6 +15,7 @@ import com.aptana.core.logging.IdeLog;
  * 
  * @author Fabio Zadrozny
  */
+@SuppressWarnings({ "nls" })
 public class RedirectToAptanaLog
 {
 	private static RedirectToAptanaLog singleton;

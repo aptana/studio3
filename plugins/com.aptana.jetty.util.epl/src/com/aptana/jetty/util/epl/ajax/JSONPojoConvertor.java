@@ -34,6 +34,7 @@ import com.aptana.jetty.util.epl.ajax.JSON.Output;
  *  - correctly sets the number fields
  * 
  */
+@SuppressWarnings({ "unchecked", "rawtypes", "nls" })
 public class JSONPojoConvertor implements JSON.Convertor
 {
     private static final RedirectToAptanaLog LOG = RedirectToAptanaLog.getSingleton();

@@ -116,7 +116,7 @@ public class EventPropertyElement extends BaseElement<EventPropertyElement.Prope
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.contentassist.model.BaseElement#toJSON(org.mortbay.util.ajax.JSON.Output)
+	 * @see com.aptana.editor.js.contentassist.model.BaseElement#toJSON(com.aptana.jetty.util.epl.ajax.JSON.Output)
 	 */
 	@Override
 	public void toJSON(Output out)

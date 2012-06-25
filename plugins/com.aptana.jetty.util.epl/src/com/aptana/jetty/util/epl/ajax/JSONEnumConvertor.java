@@ -29,6 +29,7 @@ import com.aptana.jetty.util.epl.ajax.JSON.Output;
  * 
  *
  */
+@SuppressWarnings({ "unchecked", "rawtypes", "nls" })
 public class JSONEnumConvertor implements JSON.Convertor
 {
     private static final RedirectToAptanaLog LOG = RedirectToAptanaLog.getSingleton();
