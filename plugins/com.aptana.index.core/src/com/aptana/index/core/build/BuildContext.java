@@ -33,6 +33,7 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.index.core.IDebugScopes;
 import com.aptana.index.core.IndexPlugin;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParseStateCacheKey;
@@ -143,7 +144,8 @@ public class BuildContext
 		}
 	}
 
-	protected ParseResult parse(String contentType, IParseState parseState, WorkingParseResult working) throws Exception
+	protected ParseResult parse(String contentType, IParseState parseState, WorkingParseResult working)
+			throws Exception
 	{
 		return ParserPoolFactory.parse(contentType, parseState);
 	}
@@ -275,6 +277,15 @@ public class BuildContext
 		{
 			return new ByteArrayInputStream(ArrayUtil.NO_BYTES);
 		}
-		return file.getContents();
+		try
+		{
+			return file.getContents();
+		}
+		catch (Exception e)
+		{
+			IdeLog.logWarning(IndexPlugin.getDefault(), "Error while opening the input stream.", e, //$NON-NLS-1$
+					IDebugScopes.INDEXER);
+			return new ByteArrayInputStream(ArrayUtil.NO_BYTES);
+		}
 	}
 }
