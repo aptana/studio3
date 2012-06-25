@@ -60,7 +60,7 @@ public class InformationControl implements IInformationControl, IInformationCont
 	/** A cached text presentation */
 	private TextPresentation fPresentation = new TextPresentation();
 	/** The control width constraint */
-	//private int fMaxWidth= -1;
+	private int fMaxWidth= -1;
 	/** The control height constraint */
 	private int fMaxHeight= -1;
 	private String statusFieldText = null;
@@ -275,7 +275,7 @@ public class InformationControl implements IInformationControl, IInformationCont
 			fText.setText(content);
 		} else {
 			fPresentation.clear();
-			content= fPresenter.updatePresentation(fShell.getDisplay(), content, fPresentation, 260, fMaxHeight);
+			content= fPresenter.updatePresentation(fShell.getDisplay(), content, fPresentation, Math.max(fMaxWidth, 260), fMaxHeight);
 			if (content != null) {
 				fText.setText(content);
 				TextPresentation.applyTextPresentation(fPresentation, fText);
@@ -348,7 +348,7 @@ public class InformationControl implements IInformationControl, IInformationCont
 	 * @see IInformationControl#setSizeConstraints(int, int)
 	 */
 	public void setSizeConstraints(int maxWidth, int maxHeight) {
-		//fMaxWidth= maxWidth;
+		fMaxWidth= maxWidth;
 		fMaxHeight= maxHeight;
 	}
 

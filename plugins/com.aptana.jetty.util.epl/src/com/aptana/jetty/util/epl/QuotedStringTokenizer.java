@@ -30,6 +30,7 @@ import java.util.StringTokenizer;
  * @see java.util.StringTokenizer
  *
  */
+@SuppressWarnings({ "nls" })
 public class QuotedStringTokenizer
     extends StringTokenizer
 {

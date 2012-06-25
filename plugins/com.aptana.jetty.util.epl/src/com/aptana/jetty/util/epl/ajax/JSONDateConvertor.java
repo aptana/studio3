@@ -31,6 +31,7 @@ import com.aptana.jetty.util.epl.ajax.JSON.Output;
 * be of the form {class="java.util.Date",value="1/1/1970 12:00 GMT"}
 * If fromJSON is false, then only the string value of the date is generated.
 */
+@SuppressWarnings({ "rawtypes", "nls" })
 public class JSONDateConvertor implements JSON.Convertor
 {
     private static final RedirectToAptanaLog LOG = RedirectToAptanaLog.getSingleton();
