@@ -27,8 +27,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.Index;
+import com.aptana.index.core.IndexPlugin;
 import com.aptana.index.core.QueryResult;
 import com.aptana.index.core.SearchPattern;
 
@@ -1100,13 +1102,15 @@ public class DiskIndex
 			}
 			catch (OutOfMemoryError oom)
 			{
+				// Here we hope that those string allocation will not throw another OutOfMemoryError...
 				// DEBUG
 				oom.printStackTrace();
+				String error = MessageFormat
+						.format("Index error in readCategoryTable. \nfile = {0} \noffset = {1} \n size = {2}", this.indexFile, offset, size); //$NON-NLS-1$
 				System.err.println("-------------------- DEBUG --------------------"); //$NON-NLS-1$
-				System.err.println("file = " + this.indexFile); //$NON-NLS-1$
-				System.err.println("offset = " + offset); //$NON-NLS-1$
-				System.err.println("size = " + size); //$NON-NLS-1$
+				System.err.println(error);
 				System.err.println("--------------------   END   --------------------"); //$NON-NLS-1$
+				IdeLog.logError(IndexPlugin.getDefault(), error, oom);
 				throw oom;
 			}
 
