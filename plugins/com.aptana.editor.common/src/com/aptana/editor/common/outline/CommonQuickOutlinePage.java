@@ -201,6 +201,7 @@ class CommonQuickOutlinePage extends ContentOutlinePage
 				return result;
 			}
 		};
+		this._filter.setIncludeLeadingWildcard(true);
 		this._treeViewer.addFilter(this._filter);
 
 		// create filter refresh job
