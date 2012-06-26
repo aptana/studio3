@@ -2079,7 +2079,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 	public void testReadOnly() throws CoreException
 	{
 		Set<String> predefineds = CollectionsUtil.newSet("Array", "Boolean", "Date", "decodeURI", "decodeURIComponent",
-				"encodeURI", "encodeURIComponent", "Error", "eval", "EvalError", "Function", "isFinite", "isNaN",
+				"encodeURI", "encodeURIComponent", "Error", "EvalError", "Function", "isFinite", "isNaN",
 				"JSON", "Math", "Number", "Object", "parseInt", "parseFloat", "RangeError", "ReferenceError", "RegExp",
 				"String", "SyntaxError", "TypeError", "URIError");
 		for (String predefined : predefineds)
@@ -2089,7 +2089,21 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 			// @formatter:on
 
 			List<IProblem> items = getParseErrors(text);
-			assertProblemExists(items, "Read only.", 1, IMarker.SEVERITY_ERROR, "eval".equals(predefined) ? 7 : 0);
+			assertProblemExists(items, "Read only.", 1, IMarker.SEVERITY_WARNING, 0);
+		}
+	}
+
+	public void testReadOnlyEval() throws CoreException
+	{
+		Set<String> predefineds = CollectionsUtil.newSet("eval");
+		for (String predefined : predefineds)
+		{
+			// @formatter:off
+			String text = predefined + " = true;";
+			// @formatter:on
+
+			List<IProblem> items = getParseErrors(text);
+			assertProblemExists(items, "Read only.", 1, IMarker.SEVERITY_ERROR, 7);
 		}
 	}
 
