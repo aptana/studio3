@@ -22,7 +22,6 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.scripting.commands.CommandExecutionUtils;
 import com.aptana.editor.common.scripting.commands.TextEditorUtils;
-import com.aptana.scripting.keybindings.ICommandElementsProvider;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.CommandResult;
@@ -30,6 +29,8 @@ import com.aptana.scripting.model.InvocationType;
 import com.aptana.scripting.model.SnippetElement;
 import com.aptana.scripting.model.filters.IModelFilter;
 import com.aptana.scripting.model.filters.ScopeFilter;
+import com.aptana.scripting.ui.ICommandElementsProvider;
+import com.aptana.scripting.ui.KeyBindingUtil;
 
 public class CommandElementsProvider implements ICommandElementsProvider
 {
@@ -68,7 +69,7 @@ public class CommandElementsProvider implements ICommandElementsProvider
 				{
 					continue;
 				}
-				KeySequence[] commandElementKeySequences = commandElement.getKeySequences();
+				KeySequence[] commandElementKeySequences = KeyBindingUtil.getKeySequences(commandElement);
 				for (KeySequence commandElementKeySequence : commandElementKeySequences)
 				{
 					if (keySequence.equals(commandElementKeySequence))

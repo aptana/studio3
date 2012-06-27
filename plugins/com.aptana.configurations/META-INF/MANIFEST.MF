@@ -5,11 +5,11 @@ Bundle-SymbolicName: com.aptana.configurations;singleton:=true
 Bundle-Version: 3.0.3.qualifier
 Bundle-Activator: com.aptana.configurations.ConfigurationsPlugin
 Bundle-Vendor: %providerName
-Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime,
- com.aptana.jetty.util.epl,
+Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.expressions,
- com.aptana.core;bundle-version="3.0.4"
+ com.aptana.jetty.util.epl,
+ com.aptana.core;bundle-version="3.0.4",
+ org.eclipse.ui
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.configurations,

@@ -109,14 +109,28 @@ public final class ExecutableUtil
 			pathENV = System.getenv(PATH);
 		}
 
-		// Grab PATH and search it!
+		boolean infoLoggingEnabled = IdeLog.isInfoEnabled(CorePlugin.getDefault(), IDebugScopes.SHELL);
+		// Grab PATH...
 		String[] paths = pathENV.split(File.pathSeparator);
+		if (infoLoggingEnabled)
+		{
+			IdeLog.logInfo(
+					CorePlugin.getDefault(),
+					MessageFormat.format(
+							"Searching for {0} in PATH locations: {1}", executableName, StringUtil.join(", ", paths)), IDebugScopes.SHELL); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		// Now search the PATH locations
 		for (String pathString : paths)
 		{
 			IPath path = Path.fromOSString(pathString).append(executableName);
 			IPath result = findExecutable(path, appendExtension);
 			if (result != null && (filter == null || filter.accept(result.toFile())))
 			{
+				if (infoLoggingEnabled)
+				{
+					IdeLog.logInfo(CorePlugin.getDefault(),
+							MessageFormat.format("Found executable on PATH: {0}", result), IDebugScopes.SHELL); //$NON-NLS-1$
+				}
 				return result;
 			}
 		}
@@ -129,7 +143,7 @@ public final class ExecutableUtil
 				IPath result = findExecutable(location.append(executableName), appendExtension);
 				if (result != null && (filter == null || filter.accept(result.toFile())))
 				{
-					if (IdeLog.isInfoEnabled(CorePlugin.getDefault(), IDebugScopes.SHELL))
+					if (infoLoggingEnabled)
 					{
 						IdeLog.logInfo(
 								CorePlugin.getDefault(),

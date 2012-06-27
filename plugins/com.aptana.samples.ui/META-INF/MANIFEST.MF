@@ -5,24 +5,16 @@ Bundle-SymbolicName: com.aptana.samples.ui;singleton:=true
 Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.samples.ui.SamplesUIPlugin
 Bundle-Vendor: %providerName
-Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime,
- org.eclipse.core.resources,
- org.eclipse.core.expressions,
- org.eclipse.core.filesystem,
- org.eclipse.ui.browser,
- org.eclipse.ui.ide,
+Require-Bundle: com.aptana.jetty.util.epl,
  com.aptana.core,
- com.aptana.ui,
- com.aptana.ui.io,
  com.aptana.samples,
+ org.eclipse.ui.browser,
+ com.aptana.ui,
  com.aptana.theme,
  com.aptana.git.ui,
  com.aptana.projects,
- com.aptana.jetty.util.epl,
  com.aptana.configurations,
- com.aptana.portal.ui,
- com.aptana.scripting
+ com.aptana.portal.ui
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Eclipse-LazyStart: true
 Bundle-Localization: plugin

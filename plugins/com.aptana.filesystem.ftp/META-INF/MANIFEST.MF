@@ -6,8 +6,7 @@ Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.filesystem.ftp.FTPPlugin
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
-Require-Bundle: org.eclipse.core.runtime,
- com.aptana.core,
+Require-Bundle: com.aptana.core,
  com.aptana.core.io,
  com.aptana.core.epl,
  com.aptana.ide.libraries.subscription

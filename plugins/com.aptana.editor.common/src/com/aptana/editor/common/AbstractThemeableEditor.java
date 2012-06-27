@@ -114,11 +114,12 @@ import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.scripting.ScriptingActivator;
-import com.aptana.scripting.keybindings.ICommandElementsProvider;
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.CommandResult;
 import com.aptana.scripting.model.InvocationType;
 import com.aptana.scripting.model.SnippetElement;
+import com.aptana.scripting.ui.ICommandElementsProvider;
+import com.aptana.scripting.ui.ScriptingUIPlugin;
 import com.aptana.theme.ThemePlugin;
 import com.aptana.ui.util.UIUtils;
 
@@ -334,7 +335,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		fThemeListener = new PropertyChangeListener();
 		ThemePlugin.getDefault().getPreferenceStore().addPropertyChangeListener(fThemeListener);
 		this.fThemeableEditorFindBarExtension.activateContexts(new String[] { ScriptingActivator.EDITOR_CONTEXT_ID,
-				ScriptingActivator.SCRIPTING_CONTEXT_ID });
+				ScriptingUIPlugin.SCRIPTING_CONTEXT_ID });
 
 		if (isWordWrapEnabled())
 		{

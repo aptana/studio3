@@ -5,9 +5,7 @@ Bundle-SymbolicName: com.aptana.filesystem.s3;singleton:=true
 Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.ide.filesystem.s3.S3FileSystemPlugin
 Bundle-Vendor: %providerName
-Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.core.filesystem,
- com.aptana.core,
+Require-Bundle: com.aptana.core,
  com.aptana.core.io,
  com.aptana.core.epl,
  com.amazon.s3;visibility:=reexport

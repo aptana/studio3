@@ -5,26 +5,19 @@ Bundle-SymbolicName: com.aptana.portal.ui;singleton:=true
 Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.portal.ui.PortalUIPlugin
 Bundle-Vendor: %providerName
-Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime,
- org.eclipse.ui.browser,
- org.eclipse.ui.ide,
- com.aptana.usage,
+Require-Bundle: com.aptana.jetty.util.epl,
  com.aptana.core,
+ com.aptana.core.io,
+ org.eclipse.ui.browser,
+ org.eclipse.ui.console,
+ org.eclipse.debug.ui,
  com.aptana.ui,
  com.aptana.configurations,
- org.eclipse.core.resources,
- org.eclipse.ui.console,
- org.eclipse.debug.core,
- org.eclipse.debug.ui,
- com.aptana.jetty.util.epl,
+ com.aptana.usage,
  com.aptana.theme,
  com.aptana.explorer,
- com.aptana.core.io,
  com.aptana.browser;visibility:=reexport,
- org.eclipse.core.expressions,
- com.aptana.projects,
- com.aptana.swt.webkitbrowser
+ com.aptana.projects
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.portal.ui,
@@ -36,9 +29,9 @@ Export-Package: com.aptana.portal.ui,
  com.aptana.portal.ui.dispatch.configurationProcessors,
  com.aptana.portal.ui.dispatch.configurationProcessors.installer,
  com.aptana.portal.ui.dispatch.processorDelegates,
- com.aptana.portal.ui.internal,
- com.aptana.portal.ui.internal.command,
- com.aptana.portal.ui.internal.startpage,
- com.aptana.portal.ui.internal.startup,
+ com.aptana.portal.ui.internal;x-internal:=true,
+ com.aptana.portal.ui.internal.command;x-internal:=true,
+ com.aptana.portal.ui.internal.startpage;x-internal:=true,
+ com.aptana.portal.ui.internal.startup;x-internal:=true,
  com.aptana.portal.ui.propertyTesters
 Eclipse-ExtensibleAPI: true

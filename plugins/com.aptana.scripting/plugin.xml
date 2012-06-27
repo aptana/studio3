@@ -6,12 +6,6 @@
    <extension-point id="com.aptana.scripting.contextContributors" name="%context.contributors.extension.point" schema="schema/contextContributors.exsd"/>
    <extension-point id="com.aptana.scripting.applicationBundlePaths" name="%application.bundles.path.extension.point" schema="schema/applicationBundlePaths.exsd"/>
    <extension
-         point="org.eclipse.ui.startup">
-      <startup
-            class="com.aptana.scripting.EarlyStartup">
-      </startup>
-   </extension>
-   <extension
          point="com.aptana.scripting.loadPaths">
       <loadPath
             path="framework/">

@@ -17,8 +17,6 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.jface.bindings.keys.KeySequence;
-import org.eclipse.jface.bindings.keys.ParseException;
 import org.jruby.Ruby;
 import org.jruby.RubyHash;
 import org.jruby.RubyProc;
@@ -431,40 +429,6 @@ public class CommandElement extends AbstractBundleElement
 				setKeyBindings(entry.getKey().getName(), entry.getValue().toArray(new String[entry.getValue().size()]));
 			}
 		}
-	}
-
-	/**
-	 * getKeySequence
-	 * 
-	 * @return
-	 */
-	public KeySequence[] getKeySequences()
-	{
-		String[] bindings = this.getKeyBindings();
-		List<KeySequence> result = new ArrayList<KeySequence>();
-
-		if (bindings != null && bindings.length > 0)
-		{
-			for (String binding : bindings)
-			{
-				try
-				{
-					// Need to convert the format
-					String normalizedKeyBinding = ScriptUtils.normalizeKeyBinding(binding);
-					KeySequence sequence = KeySequence.getInstance(normalizedKeyBinding);
-
-					result.add(sequence);
-				}
-				catch (ParseException e)
-				{
-					String message = MessageFormat.format(Messages.CommandElement_Invalid_Key_Binding, new Object[] {
-							binding, this.getDisplayName(), this.getPath(), e.getMessage() });
-
-					ScriptLogger.logError(message);
-				}
-			}
-		}
-		return result.toArray(new KeySequence[result.size()]);
 	}
 
 	/**

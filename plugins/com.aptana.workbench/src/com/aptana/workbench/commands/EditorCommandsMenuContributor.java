@@ -59,10 +59,12 @@ import com.aptana.scripting.model.TriggerType;
 import com.aptana.scripting.model.filters.IModelFilter;
 import com.aptana.scripting.model.filters.NotFilter;
 import com.aptana.scripting.model.filters.ScopeFilter;
+import com.aptana.scripting.ui.KeyBindingUtil;
 import com.aptana.workbench.WorkbenchPlugin;
 
 /**
- * This contributes the menus for editor scope to the Commands menu.
+ * TODO Why can't this be contributed in the editor.common plugin?! This contributes the menus for editor scope to the
+ * Commands menu.
  * 
  * @author schitale
  */
@@ -312,7 +314,7 @@ public class EditorCommandsMenuContributor extends ContributionItem
 				String acceleratorText = ""; //$NON-NLS-1$
 				if (command != null)
 				{
-					KeySequence[] keySequences = command.getKeySequences();
+					KeySequence[] keySequences = KeyBindingUtil.getKeySequences(command);
 					if (keySequences != null && keySequences.length > 0)
 					{
 						KeySequence keySequence = keySequences[0];

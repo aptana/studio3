@@ -68,7 +68,6 @@
             path="framework/">
       </loadPath>
    </extension>
-   <!-- uncomment to activate the bundles view -->
    <extension
          point="org.eclipse.ui.views">
       <view
@@ -79,12 +78,13 @@
             name="%view.name"
             restorable="true">
       </view>
-      <view
-            category="com.aptana"
-            class="com.aptana.snippets.ui.views.SnippetsView"
-            icon="icons/snippet.png"
-            id="com.aptana.snippets.ui.views.SnippetsView"
-            name="%snippets.view.name">
-      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.contexts">
+      <context
+            id="com.aptana.scripting.context"
+            name="%context.scripting.name"
+            parentId="org.eclipse.ui.contexts.window">
+      </context>
    </extension>
 </plugin>
