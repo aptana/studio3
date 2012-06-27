@@ -61,6 +61,8 @@ import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -485,6 +487,25 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 				}
 			}
 		});
+		textFind.addTraverseListener(new TraverseListener()
+		{
+
+			public void keyTraversed(TraverseEvent e)
+			{
+				if (e.detail == SWT.TRAVERSE_TAB_PREVIOUS)
+				{
+					if (replaceAll.isEnabled())
+					{
+						replaceAll.setFocus();
+					}
+					else
+					{
+						textReplace.setFocus();
+					}
+					e.doit = false;
+				}
+			}
+		});
 		findBarTabOrder.add(textFind);
 
 		ToolBar findToolbar = new ToolBar(findBar, SWT.FLAT);
@@ -540,10 +561,14 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 		countMatchesOption.createToolItem(optionsToolBar);
 
+		searchComposite.setTabList(new Control[] { findButtonComposite });
+
+		findBarTabOrder.add(textFind);
+		findBarTabOrder.add(textReplace);
+
 		close = createLabel(findBar, CLOSE, true, CLOSE_ENTER);
 		close.setToolTipText(Messages.FindBarDecorator_TOOLTIP_HideFindBar);
 		close.setLayoutData(GridDataFactory.swtDefaults().align(SWT.END, SWT.BEGINNING).create());
-		findBarTabOrder.add(close);
 
 		disableWhenHidden = new Control[] { textFind, textReplace, optionsToolBar, close, findButton, replaceFind,
 				replace, replaceAll };
