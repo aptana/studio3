@@ -8,12 +8,12 @@ Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
  org.eclipse.core.filesystem,
+ beaver,
+ com.aptana.parsing,
  org.eclipse.jface.text,
  org.eclipse.ui,
  org.eclipse.ui.editors,
  org.eclipse.ui.views,
- beaver,
- com.aptana.parsing,
  com.aptana.theme,
  com.aptana.editor.common
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

@@ -5,17 +5,14 @@ Bundle-SymbolicName: com.aptana.debug.ui; singleton:=true
 Bundle-Version: 3.0.3.qualifier
 Bundle-Activator: com.aptana.debug.ui.DebugUiPlugin
 Bundle-Vendor: %Bundle-Vendor
-Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.debug.ui,
- org.eclipse.jface.text,
- org.eclipse.ui,
+Require-Bundle: org.eclipse.core.filesystem,
+ com.aptana.core;bundle-version="3.0.4",
+ com.aptana.debug.core,
+ org.eclipse.debug.ui;visibility:=reexport,
  org.eclipse.ui.console,
  org.eclipse.ui.editors,
  org.eclipse.ui.ide,
  org.eclipse.ui.workbench.texteditor,
- com.aptana.core;bundle-version="3.0.4",
- org.eclipse.core.filesystem,
- com.aptana.debug.core,
  com.aptana.ui
 Eclipse-LazyStart: true
 Bundle-ActivationPolicy: lazy

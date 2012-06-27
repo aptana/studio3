@@ -6,10 +6,7 @@ Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.samples.SamplesPlugin
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
-Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.core.resources,
- com.aptana.core,
- org.eclipse.core.expressions,
+Require-Bundle: com.aptana.core,
  com.aptana.scripting
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.samples,

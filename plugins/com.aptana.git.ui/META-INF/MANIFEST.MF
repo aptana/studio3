@@ -5,32 +5,24 @@ Bundle-SymbolicName: com.aptana.git.ui;singleton:=true
 Bundle-Version: 3.0.3.qualifier
 Bundle-Activator: com.aptana.git.ui.GitUIPlugin
 Bundle-Vendor: %Bundle-Vendor
-Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.core.expressions,
- org.eclipse.core.filesystem,
- org.eclipse.debug.ui,
- org.eclipse.team.core,
- org.eclipse.jface.text,
- org.eclipse.ui,
+Require-Bundle: com.aptana.core;bundle-version="3.0.4",
+ com.aptana.git.core;visibility:=reexport,
  org.eclipse.ui.ide,
- org.eclipse.team.ui,
+ org.eclipse.debug.ui,
+ org.eclipse.team.ui;visibility:=reexport,
  org.eclipse.compare,
  org.eclipse.ui.browser,
+ org.eclipse.ui.console,
  org.eclipse.ui.editors,
  org.eclipse.ui.workbench.texteditor,
- org.eclipse.ui.console,
- com.aptana.core;bundle-version="3.0.4",
- com.aptana.git.core,
+ com.aptana.ui,
  com.aptana.theme,
  com.aptana.console,
- com.aptana.ui,
  com.aptana.terminal
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: com.aptana.git.ui,
  com.aptana.git.ui.actions,
- com.aptana.git.ui.dialogs,
- com.aptana.git.ui.internal.actions,
- com.aptana.git.ui.internal.history
+ com.aptana.git.ui.dialogs
 Eclipse-ExtensibleAPI: true

@@ -13,13 +13,4 @@
             sourcePathComputerId="com.aptana.debug.core.sourcePathComputer">
       </launchConfigurationType>
    </extension>
-   <extension
-         point="org.eclipse.debug.ui.launchConfigurationTabGroups">
-      <launchConfigurationTabGroup
-            class="com.aptana.js.debug.core.v8.test.ui.LaunchConfigurationTabGroup"
-            id="com.aptana.js.debug.core.v8.launchConfigurationTabGroup"
-            type="com.aptana.js.debug.core.v8.launchConfigurationType">
-      </launchConfigurationTabGroup>
-   </extension>
-
 </plugin>

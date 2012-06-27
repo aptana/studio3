@@ -1,11 +1,11 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.projects.internal.wizards;
+package com.aptana.projects.wizards;
 
 import java.net.URL;
 import java.util.HashMap;
@@ -39,6 +39,7 @@ import org.eclipse.swt.widgets.Label;
 import com.aptana.core.projects.templates.IProjectTemplate;
 import com.aptana.core.util.StringUtil;
 import com.aptana.projects.ProjectsPlugin;
+import com.aptana.projects.internal.wizards.Messages;
 import com.aptana.ui.widgets.StepIndicatorComposite;
 
 /**

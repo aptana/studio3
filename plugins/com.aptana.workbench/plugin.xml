@@ -60,5 +60,14 @@
          </adapter>
       </factory>
    </extension>
-
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            category="com.aptana"
+            class="com.aptana.snippets.ui.views.SnippetsView"
+            icon="platform:/plugin/com.aptana.scripting.ui/icons/snippet.png"
+            id="com.aptana.snippets.ui.views.SnippetsView"
+            name="%snippets.view.name">
+      </view>
+   </extension>
 </plugin>

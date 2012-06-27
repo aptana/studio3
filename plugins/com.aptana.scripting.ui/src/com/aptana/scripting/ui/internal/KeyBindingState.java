@@ -1,11 +1,11 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.scripting.keybindings.internal;
+package com.aptana.scripting.ui.internal;
 
 import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.ui.IWorkbench;
@@ -13,9 +13,8 @@ import org.eclipse.ui.IWorkbenchWindow;
 
 /**
  * This is based on <code>org.eclipse.ui.internal.keys.KeyBindingState</code>.
- *
+ * 
  * @author schitale
- *
  */
 class KeyBindingState
 {
@@ -27,8 +26,8 @@ class KeyBindingState
 	private IWorkbenchWindow associatedWindow;
 
 	/**
-	 * This is the current extent of the sequence entered by the user. If there are multi-stroke key bindings, this is the sequence
-	 * entered by the user that partially matches another key bindings.
+	 * This is the current extent of the sequence entered by the user. If there are multi-stroke key bindings, this is
+	 * the sequence entered by the user that partially matches another key bindings.
 	 */
 	private KeySequence currentSequence;
 
@@ -40,7 +39,7 @@ class KeyBindingState
 
 	/**
 	 * Constructs a new instance of <code>KeyBindingState</code> with an empty key sequence, set to reset fully.
-	 *
+	 * 
 	 * @param workbenchToNotify
 	 *            The workbench that this state should keep advised of changes to the key binding state; must not be
 	 *            <code>null</code>.
@@ -55,7 +54,7 @@ class KeyBindingState
 	/**
 	 * An accessor for the workbench window associated with this state. This should never be <code>null</code>, as the
 	 * setting follows the last workbench window to have focus.
-	 *
+	 * 
 	 * @return The workbench window to which the key binding architecture is currently attached; should never be
 	 *         <code>null</code>.
 	 */
@@ -66,7 +65,7 @@ class KeyBindingState
 
 	/**
 	 * An accessor for the current key sequence waiting for completion.
-	 *
+	 * 
 	 * @return The current incomplete key sequence; never <code>null</code>, but may be empty.
 	 */
 	KeySequence getCurrentSequence()
@@ -91,7 +90,7 @@ class KeyBindingState
 
 	/**
 	 * A mutator for the workbench window to which this state is associated.
-	 *
+	 * 
 	 * @param window
 	 *            The workbench window to associated; should never be <code>null</code>.
 	 */
@@ -102,7 +101,7 @@ class KeyBindingState
 
 	/**
 	 * A mutator for the partial sequence entered by the user.
-	 *
+	 * 
 	 * @param sequence
 	 *            The current key sequence; should not be <code>null</code>, but may be empty.
 	 */

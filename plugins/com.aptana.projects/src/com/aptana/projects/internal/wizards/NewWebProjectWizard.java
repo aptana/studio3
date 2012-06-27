@@ -14,6 +14,9 @@ import com.aptana.core.build.UnifiedBuilder;
 import com.aptana.core.projects.templates.TemplateType;
 import com.aptana.projects.ProjectsPlugin;
 import com.aptana.projects.WebProjectNature;
+import com.aptana.projects.wizards.AbstractNewProjectWizard;
+import com.aptana.projects.wizards.CommonWizardNewProjectCreationPage;
+import com.aptana.projects.wizards.IWizardProjectCreationPage;
 
 /**
  * New Web Project Wizard

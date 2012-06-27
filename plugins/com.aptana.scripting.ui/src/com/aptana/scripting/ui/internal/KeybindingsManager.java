@@ -5,7 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.scripting.keybindings.internal;
+package com.aptana.scripting.ui.internal;
 
 import java.io.File;
 import java.util.HashSet;
@@ -64,15 +64,17 @@ import org.eclipse.ui.progress.WorkbenchJob;
 import org.eclipse.ui.services.IEvaluationService;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.ui.keybinding.KeyBindingHelper;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.scripting.ScriptingActivator;
-import com.aptana.scripting.keybindings.ICommandElementsProvider;
 import com.aptana.scripting.model.AbstractElement;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.LoadCycleListener;
 import com.aptana.scripting.model.filters.IModelFilter;
+import com.aptana.scripting.ui.ICommandElementsProvider;
+import com.aptana.scripting.ui.KeyBindingUtil;
+import com.aptana.scripting.ui.ScriptingUIPlugin;
+import com.aptana.ui.keybinding.KeyBindingHelper;
 
 @SuppressWarnings("restriction")
 public class KeybindingsManager implements LoadCycleListener
@@ -186,7 +188,7 @@ public class KeybindingsManager implements LoadCycleListener
 		public void contextManagerChanged(ContextManagerEvent contextManagerEvent)
 		{
 			setEnabled(contextManagerEvent.getContextManager().getActiveContextIds()
-					.contains(ScriptingActivator.SCRIPTING_CONTEXT_ID));
+					.contains(ScriptingUIPlugin.SCRIPTING_CONTEXT_ID));
 		}
 	};
 
@@ -323,7 +325,7 @@ public class KeybindingsManager implements LoadCycleListener
 				// Set the initial enabled state of KeybindingsManager
 				IContextService contextService = (IContextService) workbench.getService(IContextService.class);
 				contextService.addContextManagerListener(contextManagerListener);
-				setEnabled(contextService.getActiveContextIds().contains(ScriptingActivator.SCRIPTING_CONTEXT_ID));
+				setEnabled(contextService.getActiveContextIds().contains(ScriptingUIPlugin.SCRIPTING_CONTEXT_ID));
 
 				return Status.OK_STATUS;
 			}
@@ -406,7 +408,7 @@ public class KeybindingsManager implements LoadCycleListener
 		for (CommandElement commandElement : commands)
 		{
 			// Get key sequences
-			KeySequence[] keySequences = commandElement.getKeySequences();
+			KeySequence[] keySequences = KeyBindingUtil.getKeySequences(commandElement);
 			if (keySequences != null && keySequences.length > 0)
 			{
 				// Add to the set

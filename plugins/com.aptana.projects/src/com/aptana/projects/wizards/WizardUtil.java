@@ -3,12 +3,13 @@
  * Copyright (c) 2012 by Appcelerator, Inc. All Rights Reserved.
  * Proprietary and Confidential - This source code is not for redistribution
  */
-package com.aptana.projects.internal.wizards;
+package com.aptana.projects.wizards;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.wizard.IWizardPage;
+
 
 /**
  * Utilities for JFace Wizards

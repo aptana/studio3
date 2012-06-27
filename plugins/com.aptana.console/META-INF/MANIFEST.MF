@@ -5,13 +5,13 @@ Bundle-SymbolicName: com.aptana.console;singleton:=true
 Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.console.ConsolePlugin
 Bundle-Vendor: %Bundle-Vendor
-Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime,
+Require-Bundle: org.eclipse.core.runtime,
+ com.aptana.core,
+ org.eclipse.jface.text,
+ org.eclipse.ui,
  org.eclipse.debug.ui,
  org.eclipse.ui.console,
- org.eclipse.jface.text,
- com.aptana.theme,
- com.aptana.core
+ com.aptana.theme
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Eclipse-LazyStart: true

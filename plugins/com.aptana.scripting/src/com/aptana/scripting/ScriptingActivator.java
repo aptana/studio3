@@ -19,8 +19,6 @@ import org.osgi.framework.BundleContext;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
-import com.aptana.scripting.keybindings.internal.KeybindingsManager;
-import com.aptana.scripting.listeners.ExecutionListenerRegistrant;
 import com.aptana.scripting.listeners.FileWatcherRegistrant;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.BundleMonitor;
@@ -42,11 +40,6 @@ public class ScriptingActivator extends Plugin
 		// properly when on windows.
 		RubyInstanceConfig.nativeEnabled = false;
 	}
-
-	/**
-	 * Context id set by workbench part to indicate they are scripting aware.
-	 */
-	public static final String SCRIPTING_CONTEXT_ID = "com.aptana.scripting.context"; //$NON-NLS-1$
 
 	/**
 	 * Context id set by workbench part to indicate it's an Aptana Editor and make it aware to any generic command.
@@ -106,7 +99,6 @@ public class ScriptingActivator extends Plugin
 				// TODO: Make this an extension point so plugins can contribute these
 				// grabbing instances register listeners
 				FileWatcherRegistrant.getInstance();
-				ExecutionListenerRegistrant.getInstance();
 
 				// load all existing bundles automatically, if we're not running
 				// unit tests
@@ -118,9 +110,6 @@ public class ScriptingActivator extends Plugin
 				{
 					manager.loadBundles();
 				}
-
-				// install key binding Manager
-				KeybindingsManager.install();
 
 				// turn on project and file monitoring
 				try
@@ -150,8 +139,6 @@ public class ScriptingActivator extends Plugin
 		{
 			BundleMonitor.getInstance().endMonitoring();
 
-			KeybindingsManager.uninstall();
-
 			if (fileTypeListener != null)
 			{
 				fileTypeListener.cleanup();
@@ -160,8 +147,6 @@ public class ScriptingActivator extends Plugin
 			}
 
 			FileWatcherRegistrant.shutdown();
-			ExecutionListenerRegistrant.shutdown();
-
 			// FIXME Clean up the bundle manager singleton!
 		}
 		catch (Exception e)

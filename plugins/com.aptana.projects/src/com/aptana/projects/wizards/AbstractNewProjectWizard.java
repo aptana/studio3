@@ -5,7 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.projects.internal.wizards;
+package com.aptana.projects.wizards;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -70,11 +70,13 @@ import com.aptana.core.projects.templates.IProjectTemplate;
 import com.aptana.core.projects.templates.TemplateType;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ProcessStatus;
+import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.replace.SimpleTextPatternReplacer;
 import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.ui.CloneJob;
 import com.aptana.projects.ProjectsPlugin;
-import com.aptana.projects.util.ProjectUtil;
+import com.aptana.projects.internal.wizards.Messages;
+import com.aptana.projects.internal.wizards.OverwriteFilesSelectionDialog;
 import com.aptana.ui.util.UIUtils;
 import com.aptana.usage.FeatureEvent;
 import com.aptana.usage.StudioAnalytics;
@@ -408,7 +410,7 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
 		// Project description creation
-		IProjectDescription description = ProjectUtil.getProjectDescription(destPath, getProjectNatures(),
+		IProjectDescription description = ResourceUtil.getProjectDescription(destPath, getProjectNatures(),
 				getProjectBuilders());
 		description.setName(newProject.getName());
 		description.setLocationURI(location);
