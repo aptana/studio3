@@ -65,6 +65,8 @@ import com.aptana.parsing.xpath.ParseNodeXPath;
 public class HTMLTidyValidator extends AbstractBuildParticipant
 {
 	public static final String ID = "com.aptana.editor.html.validator.TidyValidator"; //$NON-NLS-1$
+	
+	private static final String BOOLEAN_TYPE = "Boolean"; //$NON-NLS-1$
 
 	private static final Pattern DOCTYPE_PATTERN = Pattern
 			.compile(
@@ -483,21 +485,21 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 		for (IParseNodeAttribute attr : attributes)
 		{
 			String attrName = attr.getName();
+			String attrValue = attr.getValue();
 			// Check for uniqueness of id values.
 			if ("id".equalsIgnoreCase(attrName)) //$NON-NLS-1$
 			{
-				String id = attr.getValue();
-				if (fIds.contains(id))
+				if (fIds.contains(attrValue))
 				{
 					int offset = element.getStartingOffset();
 					problems.add(createWarning(
-							MessageFormat.format(Messages.HTMLTidyValidator_NonUniqueIdValue, tagName, attr.getValue()),
+							MessageFormat.format(Messages.HTMLTidyValidator_NonUniqueIdValue, tagName, attrValue),
 							doc.getLineOfOffset(offset) + 1, offset, element.getNameNode().getNameRange().getLength(),
 							sourcePath));
 				}
 				else
 				{
-					fIds.add(id);
+					fIds.add(attrValue);
 				}
 			}
 
@@ -510,7 +512,7 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 					// Unrecognized attribute!
 					int offset = element.getStartingOffset();
 					problems.add(createWarning(MessageFormat.format(Messages.HTMLTidyValidator_ProprietaryAttribute,
-							tagName, attrName, attr.getValue()), doc.getLineOfOffset(offset) + 1, offset, element
+							tagName, attrName, attrValue), doc.getLineOfOffset(offset) + 1, offset, element
 							.getNameNode().getNameRange().getLength(), sourcePath));
 				}
 				continue;
@@ -521,31 +523,39 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 			if (!StringUtil.isEmpty(deprecated))
 			{
 				int offset = element.getStartingOffset();
-				problems.add(createWarning(
-						MessageFormat.format(Messages.HTMLTidyValidator_DeprecatedAttribute, tagName, attrName,
-								attr.getValue()), doc.getLineOfOffset(offset) + 1, offset, element.getNameNode()
-								.getNameRange().getLength(), sourcePath));
+				problems.add(createWarning(MessageFormat.format(Messages.HTMLTidyValidator_DeprecatedAttribute,
+						tagName, attrName, attrValue), doc.getLineOfOffset(offset) + 1, offset, element.getNameNode()
+						.getNameRange().getLength(), sourcePath));
 			}
 
 			// verify the value for the attribute
 			List<ValueElement> values = ae.getValues();
 			if (!CollectionsUtil.isEmpty(values))
 			{
-				boolean matchingValue = false;
-				for (ValueElement value : values)
+				boolean validAttribute = false;
+				// If attribute is a boolean one, valid values are empty string, no value, or case-insensitive match with
+				// the attribute name.
+				if (BOOLEAN_TYPE.equalsIgnoreCase(ae.getType()))
 				{
-					String valueName = value.getName();
-					if (valueName.equals(attr.getValue()) || "*".equals(valueName)) //$NON-NLS-1$
+					validAttribute = (StringUtil.isEmpty(attrValue) || attrName.equalsIgnoreCase(attrValue));
+				}
+				else
+				{
+					for (ValueElement value : values)
 					{
-						matchingValue = true;
-						break;
+						String valueName = value.getName();
+						if (valueName.equals(attrValue) || "*".equals(valueName)) //$NON-NLS-1$
+						{
+							validAttribute = true;
+							break;
+						}
 					}
 				}
-				if (!matchingValue)
+				if (!validAttribute)
 				{
 					int offset = element.getStartingOffset();
 					problems.add(createWarning(MessageFormat.format(Messages.HTMLTidyValidator_InvalidAttributeValue,
-							tagName, attrName, attr.getValue()), doc.getLineOfOffset(offset) + 1, offset, element
+							tagName, attrName, attrValue), doc.getLineOfOffset(offset) + 1, offset, element
 							.getNameNode().getNameRange().getLength(), sourcePath));
 				}
 			}

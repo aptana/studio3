@@ -726,6 +726,7 @@ San Diego, CA 92122
         <attribute-ref name="id"/>
         <attribute-ref name="lang"/>
         <attribute-ref name="loop"/>
+        <attribute-ref name="muted"/>
         <attribute-ref name="preload"/>
         <attribute-ref name="spellcheck"/>
         <attribute-ref name="src"/>
@@ -1411,11 +1412,13 @@ This sentence is on the second line.
     <element name="button" related-class="HTMLButtonElement" display-name="Button">
       <attribute-refs>
         <attribute-ref name="accesskey"/>
+        <attribute-ref name="autofocus"/>
         <attribute-ref name="class"/>
         <attribute-ref name="contenteditable"/>
         <attribute-ref name="datafld"/>
         <attribute-ref name="dataformatas"/>
         <attribute-ref name="datasrc"/>
+        <attribute-ref name="formnovalidate"/>
         <attribute-ref name="hidefocus"/>
         <attribute-ref name="id"/>
         <attribute-ref name="lang"/>
@@ -2736,6 +2739,83 @@ This sentence is on the second line.
       </references>
       <remarks>You can use CSS rules to style the &amp;lt;dfn&amp;gt;&amp;lt;/dfn&amp;gt; tag.</remarks>
     </element>
+    <element name="dialog" related-class="HTMLDialogElement">
+      <attribute-refs>
+      	<attribute-ref name="accesskey"/>
+        <attribute-ref name="class"/>
+        <attribute-ref name="contenteditable"/>
+        <attribute-ref name="contextmenu"/>
+        <attribute-ref name="dir"/>
+        <attribute-ref name="draggable"/>
+        <attribute-ref name="dropzone"/>
+        <attribute-ref name="hidden"/>
+        <attribute-ref name="id"/>
+        <attribute-ref name="lang"/>
+        <attribute-ref name="spellcheck"/>
+        <attribute-ref name="style"/>
+        <attribute-ref name="tabindex"/>
+        <attribute-ref name="title"/>
+        <attribute-ref name="translate"/>
+        <attribute-ref name="open"/>
+      </attribute-refs>
+      <browsers>
+        <!-- TODO Browser support list -->
+      </browsers>
+      <description>The dialog element represents a part of an application that a user interacts with to perform a task, for example a dialog box, inspector, or window.</description>
+      <event-refs>
+        <event-ref name="onactivate"/>
+        <event-ref name="onbeforeactivate"/>
+        <event-ref name="onbeforecopy"/>
+        <event-ref name="onbeforecut"/>
+        <event-ref name="onbeforedeactivate"/>
+        <event-ref name="onbeforeeditfocus"/>
+        <event-ref name="onbeforepaste"/>
+        <event-ref name="onblur"/>
+        <event-ref name="onclick"/>
+        <event-ref name="oncontextmenu"/>
+        <event-ref name="oncontrolselect"/>
+        <event-ref name="oncopy"/>
+        <event-ref name="oncut"/>
+        <event-ref name="ondblclick"/>
+        <event-ref name="ondeactivate"/>
+        <event-ref name="ondrag"/>
+        <event-ref name="ondragend"/>
+        <event-ref name="ondragenter"/>
+        <event-ref name="ondragleave"/>
+        <event-ref name="ondragover"/>
+        <event-ref name="ondragstart"/>
+        <event-ref name="ondrop"/>
+        <event-ref name="onfocus"/>
+        <event-ref name="onfocusin"/>
+        <event-ref name="onfocusout"/>
+        <event-ref name="onhelp"/>
+        <event-ref name="onkeydown"/>
+        <event-ref name="onkeypress"/>
+        <event-ref name="onkeyup"/>
+        <event-ref name="onlosecapture"/>
+        <event-ref name="onmousedown"/>
+        <event-ref name="onmouseenter"/>
+        <event-ref name="onmouseleave"/>
+        <event-ref name="onmousemove"/>
+        <event-ref name="onmouseout"/>
+        <event-ref name="onmouseover"/>
+        <event-ref name="onmouseup"/>
+        <event-ref name="onmousewheel"/>
+        <event-ref name="onmove"/>
+        <event-ref name="onmoveend"/>
+        <event-ref name="onmovestart"/>
+        <event-ref name="onpaste"/>
+        <event-ref name="onpropertychange"/>
+        <event-ref name="onreadystatechange"/>
+        <event-ref name="onresizeend"/>
+        <event-ref name="onresizestart"/>
+        <event-ref name="onselectstart"/>
+        <event-ref name="ontimeerror"/>
+      </event-refs>
+      <references>
+        <reference name="HTMLElement"/>
+      </references>
+    </element>
     <element name="dir" related-class="HTMLDirectoryElement" display-name="Directory List">
       <attribute-refs>
         <attribute-ref name="accesskey"/>
@@ -3775,6 +3855,7 @@ This sentence is on the second line.
         <attribute-ref name="language"/>
         <attribute-ref name="method"/>
         <attribute-ref name="name"/>
+        <attribute-ref name="novalidate"/>
         <attribute-ref name="style"/>
         <attribute-ref name="tabindex"/>
         <attribute-ref name="target"/>
@@ -5049,6 +5130,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <attribute-ref name="marginwidth"/>
         <attribute-ref name="name"/>
         <attribute-ref name="scrolling"/>
+        <attribute-ref name="seamless"/>
         <attribute-ref name="security"/>
         <attribute-ref name="src"/>
         <attribute-ref name="style"/>
@@ -5267,6 +5349,7 @@ Sorry, your browser does not support inline frames. ;/iframe&amp;gt;
         <attribute-ref name="dir"/>
         <attribute-ref name="disabled"/>
         <attribute-ref name="dynsrc"/>
+        <attribute-ref name="formnovalidate"/>
         <attribute-ref name="hidefocus"/>
         <attribute-ref name="hspace"/>
         <attribute-ref name="id"/>
@@ -6932,6 +7015,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <attribute-ref name="tabindex"/>
         <attribute-ref name="title"/>
         <attribute-ref name="type"/>
+        <attribute-ref name="typemustmatch"/>
         <attribute-ref name="unselectable"/>
         <attribute-ref name="usemap"/>
         <attribute-ref name="vspace"/>
@@ -8173,6 +8257,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     </element>
     <element name="script" related-class="HTMLScriptElement" display-name="Script">
       <attribute-refs>
+      	<attribute-ref name="async"/>
         <attribute-ref name="charset"/>
         <attribute-ref name="defer"/>
         <attribute-ref name="event"/>
@@ -8321,6 +8406,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       <attribute-refs>
         <attribute-ref name="accesskey"/>
         <attribute-ref name="align"/>
+        <attribute-ref name="autofocus"/>
         <attribute-ref name="class"/>
         <attribute-ref name="datafld"/>
         <attribute-ref name="datasrc"/>
@@ -8885,6 +8971,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <attribute-ref name="id"/>
         <attribute-ref name="lang"/>
         <attribute-ref name="media"/>
+        <attribute-ref name="scoped"/>
         <attribute-ref name="title"/>
         <attribute-ref name="type"/>
         <attribute-ref name="xml:space"/>
@@ -9617,6 +9704,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     <element name="textarea" related-class="HTMLTextAreaElement" display-name="Text Area">
       <attribute-refs>
         <attribute-ref name="accesskey"/>
+        <attribute-ref name="autofocus"/>
         <attribute-ref name="class"/>
         <attribute-ref name="cols"/>
         <attribute-ref name="datafld"/>
@@ -10304,6 +10392,97 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       </references>
       <remarks>Nest your &amp;lt;tr&amp;gt; &amp;lt;/tr&amp;gt; elements within &amp;lt;table&amp;gt; &amp;lt;/tabe&amp;gt;, &amp;lt;thead&amp;gt; &amp;lt;/thead&amp;gt;, &amp;lt;tbody&amp;gt; &amp;lt;/tbody&amp;gt;, and &amp;lt;tfoot&amp;gt; &amp;lt;/tfoot&amp;gt; elements. A &amp;lt;tr&amp;gt; &amp;lt;/tr&amp;gt; element may contain &amp;lt;td&amp;gt; &amp;lt;/td&amp;gt; or &amp;lt;th&amp;gt; &amp;lt;/th&amp;gt; elements.</remarks>
     </element>
+    <element name="track" related-class="HTMLTrackElement">
+      <attribute-refs>
+        <attribute-ref name="accesskey"/>
+        <attribute-ref name="class"/>
+        <attribute-ref name="contenteditable"/>
+        <attribute-ref name="contextmenu"/>
+        <attribute-ref name="dir"/>
+        <attribute-ref name="draggable"/>
+        <attribute-ref name="dropzone"/>
+        <attribute-ref name="hidden"/>
+        <attribute-ref name="id"/>
+        <attribute-ref name="lang"/>
+        <attribute-ref name="spellcheck"/>
+        <attribute-ref name="style"/>
+        <attribute-ref name="tabindex"/>
+        <attribute-ref name="title"/>
+        <attribute-ref name="translate"/>
+        <!-- TODO This above list of attributes is global! Can we not list them, or even use a reference? -->
+        <attribute-ref name="kind"/>
+        <attribute-ref name="src"/>
+        <attribute-ref name="srclang"/>
+        <attribute-ref name="label"/>
+        <attribute-ref name="default"/>
+      </attribute-refs>
+      <event-refs>
+        <event-ref name="onactivate"/>
+        <event-ref name="onbeforeactivate"/>
+        <event-ref name="onbeforecopy"/>
+        <event-ref name="onbeforecut"/>
+        <event-ref name="onbeforedeactivate"/>
+        <event-ref name="onbeforeeditfocus"/>
+        <event-ref name="onbeforepaste"/>
+        <event-ref name="onblur"/>
+        <event-ref name="onclick"/>
+        <event-ref name="oncontextmenu"/>
+        <event-ref name="oncontrolselect"/>
+        <event-ref name="oncopy"/>
+        <event-ref name="oncut"/>
+        <event-ref name="ondblclick"/>
+        <event-ref name="ondeactivate"/>
+        <event-ref name="ondrag"/>
+        <event-ref name="ondragend"/>
+        <event-ref name="ondragenter"/>
+        <event-ref name="ondragleave"/>
+        <event-ref name="ondragover"/>
+        <event-ref name="ondragstart"/>
+        <event-ref name="ondrop"/>
+        <event-ref name="onfocus"/>
+        <event-ref name="onfocusin"/>
+        <event-ref name="onfocusout"/>
+        <event-ref name="onhelp"/>
+        <event-ref name="onkeydown"/>
+        <event-ref name="onkeypress"/>
+        <event-ref name="onkeyup"/>
+        <event-ref name="onlosecapture"/>
+        <event-ref name="onmousedown"/>
+        <event-ref name="onmouseenter"/>
+        <event-ref name="onmouseleave"/>
+        <event-ref name="onmousemove"/>
+        <event-ref name="onmouseout"/>
+        <event-ref name="onmouseover"/>
+        <event-ref name="onmouseup"/>
+        <event-ref name="onmousewheel"/>
+        <event-ref name="onmove"/>
+        <event-ref name="onmoveend"/>
+        <event-ref name="onmovestart"/>
+        <event-ref name="onpaste"/>
+        <event-ref name="onpropertychange"/>
+        <event-ref name="onreadystatechange"/>
+        <event-ref name="onresize"/>
+        <event-ref name="onresizeend"/>
+        <event-ref name="onresizestart"/>
+        <event-ref name="onselectstart"/>
+        <event-ref name="ontimeerror"/>
+      </event-refs>
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>     
+      <description>The track element allows authors to specify explicit external timed text tracks for media elements. It does not represent anything on its own.</description>
+      <example>
+&lt;video src="brave.webm"&gt;
+ &lt;track kind=subtitles src=brave.en.vtt srclang=en label="English"&gt;
+ &lt;track kind=captions src=brave.en.hoh.vtt srclang=en label="English for the Hard of Hearing"&gt;
+ &lt;track kind=subtitles src=brave.fr.vtt srclang=fr lang=fr label="Français"&gt;
+ &lt;track kind=subtitles src=brave.de.vtt srclang=de lang=de label="Deutsch"&gt;
+&lt;/video&gt;
+			</example>
+      <references>
+        <reference name="HTMLTrackElement"/>
+      </references>
+    </element>
     <element name="tt" related-class="HTMLElement" display-name="Teletype Text">
       <attribute-refs>
         <attribute-ref name="accesskey"/>
@@ -10674,6 +10853,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <attribute-ref name="id"/>
         <attribute-ref name="lang"/>
         <attribute-ref name="loop"/>
+        <attribute-ref name="muted"/>
         <attribute-ref name="poster"/>
         <attribute-ref name="preload"/>
         <attribute-ref name="spellcheck"/>
@@ -11124,6 +11304,19 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       <description>URL or list of URLs that need to be preloaded for the element.</description>
       <hint>[url, url, ...]</hint>
     </attribute>
+     <attribute name="async" type="Boolean">
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+		<browser platform="Mozilla" version="4.0+"/>
+		<browser platform="Opera" version="11.1+"/>
+      </browsers>
+      <description>Execute script asynchronously.</description>
+      <values>
+        <value name="async" description="Execute script asynchronously."/>
+      </values>
+    </attribute>
     <attribute name="autocomplete" type="String">
       <availability>
         <specification name="W3C" version="HTML 5"/>
@@ -11138,24 +11331,23 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <value name="off" description="Form autocompletion is off."/>
       </values>
     </attribute>
-    <attribute name="autofocus" type="String">
+    <attribute name="autofocus" type="Boolean">
       <browsers>
 		<browser platform="Mozilla" version="4.0+"/>
 		<browser platform="Opera" version="11.1+"/>
 		<browser platform="Chrome" version="10.0+"/>
 		<browser platform="Safari" version="5.0+"/>
       </browsers>
-      <description>Makes the input field focused on page load</description>
+      <description>Automatically focus the form control when the page is loaded.</description>
       <hint>[disabled]</hint>
     </attribute>
-    <attribute name="autoplay" type="String">
+    <attribute name="autoplay" type="Boolean">
       <browsers>
         <!-- Not currently supported by any browser -->
       </browsers>
-      <description>Specifies whether the user agent will automatically begin playback of the media resource as soon as it can do so without stopping</description>
+      <description>Hint that the media resource can be started automatically when the page is loaded.</description>
       <values>
-        <value name="true" description="Element has autoplay enabled"/>
-        <value name="false" description="Element has autoplay disabled"/>
+        <value name="autoplay" description="Element has autoplay enabled"/>
       </values>
     </attribute>
     <attribute name="axis" type="String">
@@ -11391,7 +11583,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <value name="cp1258" description="Vietnamese."/>
       </values>
     </attribute>
-    <attribute name="checked" type="String">
+    <attribute name="checked" type="Boolean">
       <availability>
         <specification name="W3C" version="HTML 4.01"/>
       </availability>
@@ -11623,14 +11815,13 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       <description>Specifies context-menu for an element.</description>
       <hint>[menu_id]</hint>
     </attribute>
-    <attribute name="controls" type="String">
+    <attribute name="controls" type="Boolean">
       <browsers>
         <!-- Not currently supported by any browser -->
       </browsers>
-      <description>Specifies whether the author would like the user agent to provide its own set of controls</description>
+      <description>Show user agent controls.</description>
       <values>
-        <value name="true" description="Element has controls enabled"/>
-        <value name="false" description="Element has controls disabled"/>
+        <value name="controls" description="Element has controls enabled"/>
       </values>
     </attribute>
     <attribute name="coords" type="String">
@@ -11733,7 +11924,16 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <value name="declare" description="Declare the object."/>
       </values>
     </attribute>
-    <attribute name="defer" type="String">
+    <attribute name="default" type="Boolean">
+      <browsers>
+        <!-- Not currently supported by any browser -->
+      </browsers>
+      <description>Enable the track if no other text track is more suitable.</description>
+      <values>
+        <value name="default" description="Enable the track if no other text track is more suitable."/>
+      </values>
+    </attribute>
+    <attribute name="defer" type="Boolean">
       <availability>
         <specification name="W3C" version="HTML 4.01"/>
       </availability>
@@ -11796,8 +11996,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       </browsers>
       <description>Specifies whether or not the element is disabled.</description>
       <values>
-        <value name="true" description="Element is disabled."/>
-        <value name="false" description="Element is not disabled."/>
+        <value name="disabled" description="Element is disabled."/>
       </values>
     </attribute>
     <attribute name="draggable" type="String">
@@ -11883,6 +12082,16 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       </browsers>
       <description>Specifies which form element the element is associated with.</description>
       <hint></hint>
+    </attribute>
+    <attribute name="formnovalidate" type="Boolean">
+      <availability>
+        <specification name="W3C" version="HTML 4.01"/>
+      </availability>
+	<!-- TODO Unknown browser support -->
+      <description>Bypass form control validation for form submission.</description>
+      <values>
+        <value name="formnovalidate" description="Bypass form control validation for form submission."/>
+      </values>
     </attribute>
     <attribute name="frame" type="String">
       <availability>
@@ -11985,8 +12194,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       </browsers>
       <description>If true, specifies that the element is hidden.</description>
       <values>
-        <value name="true" description="Element is hidden."/>
-        <value name="false" description="Element is not hidden."/>
+        <value name="hidden" description="Element is hidden."/>
       </values>
     </attribute>
     <attribute name="hidefocus" type="Boolean">
@@ -12091,6 +12299,17 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       </browsers>
       <description>Unique identifier for the element.</description>
       <hint>[element-id]</hint>
+    </attribute>
+    <attribute name="ismap" type="Boolean">
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+      </browsers>
+      <description>Whether the image is a server-side image map.</description>
+      <values>
+        <value name="ismap" description="Whether the image is a server-side image map."/>
+      </values>
     </attribute>
     <attribute name="keytype" type="String">
       <browsers>
@@ -12225,14 +12444,19 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       <description>URL that contains a long description of the contents of the element.</description>
       <hint>[url]</hint>
     </attribute>
-    <attribute name="loop" type="String">
+    <attribute name="loop" type="Boolean">
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
       <browsers>
         <browser platform="IE" version="2.0+"/>
         <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
-      <description>Number of times to loop the media file. Specify "infinite" for a continuous loop.</description>
-      <hint>[number]</hint>
+      <description>Whether to loop the media resource.</description>
+      <values>
+        <value name="loop" description="Whether to loop the media resource."/>
+       </values>
     </attribute>
     <attribute name="low" type="String">
       <browsers>
@@ -12375,7 +12599,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       <description>Specifies the lower bound of the range.</description>
       <hint></hint>
     </attribute>
-    <attribute name="multiple" type="String">
+    <attribute name="multiple" type="Boolean">
       <availability>
         <specification name="W3C" version="HTML 4.01"/>
       </availability>
@@ -12390,6 +12614,18 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       <description>If present, specifies that a user can select multiple options.</description>
       <values>
         <value name="multiple" description="Multiple selections allowed."/>
+      </values>
+    </attribute>
+    <attribute name="muted" type="Boolean">
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <!-- TODO Browser support list -->
+      </browsers>
+      <description>Whether to mute the media resource by default.</description>
+      <values>
+        <value name="muted" description="Whether to mute the media resource by default."/>
       </values>
     </attribute>
     <attribute name="name" type="String">
@@ -12458,6 +12694,18 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <value name="noshade" description="Element does not have shading."/>
       </values>
     </attribute>
+    <attribute name="novalidate" type="Boolean">
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <!-- TODO Browser support list -->
+      </browsers>
+      <description>Bypass form control validation for form submission.</description>
+      <values>
+        <value name="novalidate" description="Bypass form control validation for form submission."/>
+      </values>
+    </attribute>
     <attribute name="nowrap" type="String">
       <browsers>
         <browser platform="IE" version="2.0+"/>
@@ -12489,14 +12737,28 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       </references>
       <remarks>Do not use the code attribute if you are using the object attribute.</remarks>
     </attribute>
-    <attribute name="open" type="String">
+    <attribute name="open" type="Boolean" element="details">
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+        <!-- TODO Not currently supported by any browser -->
       </browsers>
-      <description>Specifies if the details should be visible (present) or not (not present).</description>
+      <description>Whether the details are visible (present) or not (not present).</description>
       <values>
-        <value name="true" description="Details are shown to the user."/>
-        <value name="false" description="Details are not shown to the user."/>
+        <value name="open" description="Whether the details are visible."/>
+      </values>
+    </attribute>
+    <attribute name="open" type="Boolean" element="dialog">
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <!-- TODO Not currently supported by any browser -->
+      </browsers>
+      <description>Whether the dialog box is showing (present) or not (not present).</description>
+      <values>
+        <value name="open" description="Whether the dialog box is showing."/>
       </values>
     </attribute>
     <attribute name="optimum" type="String">
@@ -12639,7 +12901,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       <description>Specifies the name of the group of commands that will be toggled when the command itself is toggled, for commands whose type attribute has the value "radio".</description>
       <hint>[name]</hint>
     </attribute>
-    <attribute name="readonly" type="String">
+    <attribute name="readonly" type="Boolean">
       <availability>
         <specification name="W3C" version="HTML 4.01"/>
       </availability>
@@ -12653,7 +12915,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       </browsers>
       <description>If present, specifies that the element is read-only.</description>
       <values>
-        <value name="readonly" description=""/>
+        <value name="readonly" description="If present, specifies that the element is read-only."/>
       </values>
     </attribute>
     <attribute name="rel" type="String">
@@ -12686,7 +12948,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <value name="*" description="Any text value"/>
       </values>
     </attribute>
-    <attribute name="required" type="String">
+    <attribute name="required" type="Boolean">
       <availability>
         <specification name="W3C" version="HTML 5"/>
       </availability>
@@ -12697,6 +12959,9 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>Indicates that the input field's value is required in order to submit the form.</description>
+      <values>
+        <value name="required" description="The control is required for form submission."/>
+      </values>
       <hint></hint>
     </attribute>
     <attribute name="rev" type="String">
@@ -12737,6 +13002,9 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <!-- TODO I have no idea which browsers support this! -->
       </browsers>
       <description>If present, it indicates that the list is a descending list (..., 3, 2, 1). If the attribute is omitted, the list is an ascending list (1, 2, 3, ...).</description>
+      <values>
+      	  <value name="reversed" description="Number the list backwards."/>
+      </values>
     </attribute>
     <attribute name="rightmargin" type="Boolean" element="body">
       <browsers>
@@ -12831,6 +13099,18 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <value name="rowgroup" description="Cell is a header for its row group."/>
       </values>
     </attribute>
+    <attribute name="scoped" type="Boolean">
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <!-- TODO Browser support -->
+      </browsers>
+      <description>Whether the styles apply to the entire document or just the parent subtree.</description>
+      <values>
+        <value name="scoped" description="Apply the specified style information only to the style element's parent element (if any), and that element's descendants.."/>
+      </values>
+    </attribute>
     <attribute name="scroll" type="String" element="body">
       <browsers>
         <browser platform="IE" version="4.0+"/>
@@ -12889,7 +13169,19 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <value name="yes" description="Element has scroll bars."/>
       </values>
     </attribute>
-    <attribute name="selected" type="String">
+    <attribute name="seamless" type="Boolean">
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <!-- TODO Browser support -->
+      </browsers>
+      <description>Whether to apply the document's styles to the nested content.</description>
+      <values>
+        <value name="seamless" description="Apply the document's styles to the nested content."/>
+      </values>
+    </attribute>
+    <attribute name="selected" type="Boolean">
       <availability>
         <specification name="W3C" version="HTML 4.01"/>
       </availability>
@@ -13383,6 +13675,18 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <value name="square" description="Square bullet."/>
       </values>
     </attribute>
+    <attribute name="typemustmatch" type="Boolean">
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <!-- TODO Browser support -->
+      </browsers>
+      <description>Whether the type attribute and the Content-Type value need to match for the resource to be used.</description>
+      <values>
+        <value name="typemustmatch" description="The resource specified by the data attribute is only to be used if the value of the type attribute and the Content-Type of the aforementioned resource match.."/>
+      </values>
+    </attribute>
     <attribute name="units" type="String">
       <browsers>
         <browser platform="Netscape" version="4.0+"/>
@@ -13572,7 +13876,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       <values>
         <value name="hard" description="Word wrap with hard line breaks."/>
         <value name="soft" description="Word wrap with soft line breaks."/>
-        <value name="off" description="No word wrap."/>
+        <!-- <value name="off" description="No word wrap."/> -->
       </values>
     </attribute>
     <attribute name="xml:space" type="String">
