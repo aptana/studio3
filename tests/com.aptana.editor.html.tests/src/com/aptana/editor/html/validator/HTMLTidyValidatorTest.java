@@ -444,6 +444,25 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 			"<TITLE>Example</TITLE>\n" +
 			"</HEAD>\n" +
 			"<body>\n" +
+			"<button type=\"yup\"><p>Yeah</p></button>\n" + 
+			"</body>\n" +
+			"</HTML>\n";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertContainsProblem(items, "button attribute \"type\" has invalid value \"yup\"", IMarker.SEVERITY_WARNING,
+				7, 68, 19);
+	}
+
+	public void testAttributeValueOutsidePredefinedValues2() throws CoreException
+	{
+		// @formatter:off
+		String text = "<!DOCTYPE html>\n" +
+			"<HTML>\n" +
+			"<HEAD>\n" +
+			"<TITLE>Example</TITLE>\n" +
+			"</HEAD>\n" +
+			"<body>\n" +
 			"<article hidden=\"yup\"><p>Yeah</p></article>\n" + 
 			"</body>\n" +
 			"</HTML>\n";
@@ -463,13 +482,85 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 			"<TITLE>Example</TITLE>\n" +
 			"</HEAD>\n" +
 			"<body>\n" +
-			"<article hidden=\"true\"><p>Yeah</p></article>\n" + 
+			"<button type=\"reset\"><p>Yeah</p></button>\n" + 
 			"</body>\n" +
 			"</HTML>\n";
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertDoesntContain(items, "article attribute \"hidden\" has invalid value \"true\"");
+		assertDoesntContain(items, "button attribute \"type\" has invalid value \"reset\"");
+	}
+
+	public void testBooleanAttributeWithMatchingValue() throws CoreException
+	{
+		// @formatter:off
+		String text = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\n" +
+				"\"http://www.w3.org/TR/html4/loose.dtd\">\n" +
+				"<html xmlns=\"http://www.w3.org/1999/xhtml\">\n" +
+				"    <head>\n" +
+				"        <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\n" +
+				"        <title>New Web Project</title>\n" +
+				"    </head>\n" +
+				"    <body>\n" +
+				"        <form action=\"form_action.asp\">\n" +
+				"  First name: <input type=\"text\" name=\"fname\" /><br />\n" +
+				"  Last name: <input type=\"text\" name=\"lname\" disabled=\"disabled\" /><br />\n" +
+				"  <input type=\"submit\" value=\"Submit\" />\n" +
+				"</form>\n" +
+				"    </body>\n" +
+				"</html>";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "input attribute \"disabled\" has invalid value \"disabled\"");
+	}
+
+	public void testBooleanAttributeWithNoValue() throws CoreException
+	{
+		// @formatter:off
+		String text = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\n" +
+				"\"http://www.w3.org/TR/html4/loose.dtd\">\n" +
+				"<html xmlns=\"http://www.w3.org/1999/xhtml\">\n" +
+				"    <head>\n" +
+				"        <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\n" +
+				"        <title>New Web Project</title>\n" +
+				"    </head>\n" +
+				"    <body>\n" +
+				"        <form action=\"form_action.asp\">\n" +
+				"  First name: <input type=\"text\" name=\"fname\" /><br />\n" +
+				"  Last name: <input type=\"text\" name=\"lname\" disabled /><br />\n" +
+				"  <input type=\"submit\" value=\"Submit\" />\n" +
+				"</form>\n" +
+				"    </body>\n" +
+				"</html>";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "input attribute \"disabled\" has invalid value \"\"");
+	}
+
+	public void testBooleanAttributeWithEmptyValue() throws CoreException
+	{
+		// @formatter:off
+		String text = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\n" +
+				"\"http://www.w3.org/TR/html4/loose.dtd\">\n" +
+				"<html xmlns=\"http://www.w3.org/1999/xhtml\">\n" +
+				"    <head>\n" +
+				"        <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\n" +
+				"        <title>New Web Project</title>\n" +
+				"    </head>\n" +
+				"    <body>\n" +
+				"        <form action=\"form_action.asp\">\n" +
+				"  First name: <input type=\"text\" name=\"fname\" /><br />\n" +
+				"  Last name: <input type=\"text\" name=\"lname\" disabled=\"\" /><br />\n" +
+				"  <input type=\"submit\" value=\"Submit\" />\n" +
+				"</form>\n" +
+				"    </body>\n" +
+				"</html>";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "input attribute \"disabled\" has invalid value \"\"");
 	}
 
 	public void testAttributeValueWithAsteriskDefinedInMetadata() throws CoreException
