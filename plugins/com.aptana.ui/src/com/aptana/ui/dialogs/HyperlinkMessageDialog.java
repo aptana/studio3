@@ -73,6 +73,10 @@ public class HyperlinkMessageDialog extends MessageDialog {
 		open(INFORMATION, parent, title, message, SWT.NONE);
 	}
 
+	public static void openError(Shell parent, String title, String message) {
+		open(ERROR, parent, title, message, SWT.NONE);
+	}
+
 	private static String[] getButtonLabels(int kind) {
 		switch (kind) {
 		case ERROR:
