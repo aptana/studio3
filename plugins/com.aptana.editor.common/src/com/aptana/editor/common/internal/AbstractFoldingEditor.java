@@ -31,7 +31,10 @@ import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotationModel;
 import org.eclipse.jface.text.source.projection.ProjectionSupport;
 import org.eclipse.jface.text.source.projection.ProjectionViewer;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
@@ -39,7 +42,9 @@ import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.IDocumentProviderExtension;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IFoldingEditor;
 import com.aptana.index.core.IndexFilesOfProjectJob;
 import com.aptana.index.core.RemoveIndexOfFilesOfProjectJob;
@@ -52,6 +57,66 @@ public class AbstractFoldingEditor extends AbstractDecoratedTextEditor implement
 	 */
 	public AbstractFoldingEditor()
 	{
+
+		// Hack because we cannot override org.eclipse.ui.texteditor.AbstractTextEditor.getSelectionChangedListener().
+		ISelectionChangedListener selectionChangedListener = new ISelectionChangedListener()
+		{
+
+			private Runnable fRunnable = new Runnable()
+			{
+				public void run()
+				{
+					ISourceViewer sourceViewer = getSourceViewer();
+					// check whether editor has not been disposed yet
+					if (sourceViewer != null && sourceViewer.getDocument() != null)
+					{
+						updateSelectionDependentActions();
+					}
+				}
+			};
+
+			private Display fDisplay;
+
+			public void selectionChanged(SelectionChangedEvent event)
+			{
+				Display current = Display.getCurrent();
+				if (current != null)
+				{
+					// Don't execute asynchronously if we're in a thread that has a display.
+					// Fix for: https://jira.appcelerator.org/browse/APSTUD-3061 (the rationale
+					// is that the actions were not being enabled because they were previously
+					// updated in an async call).
+					// Ideally, if this is really the root case of that issue, this code should
+					// be provided back to Eclipse.org as part of the bug:
+					// https://bugs.eclipse.org/bugs/show_bug.cgi?id=368354
+					// but just patching getSelectionChangedListener() properly.
+					fRunnable.run();
+				}
+				else
+				{
+					if (fDisplay == null)
+					{
+						fDisplay = getSite().getShell().getDisplay();
+					}
+					fDisplay.asyncExec(fRunnable);
+				}
+				handleCursorPositionChanged();
+			}
+		};
+
+		try
+		{
+			// Hack to change private field fSelectionChangedListener
+			Field field = AbstractTextEditor.class.getDeclaredField("fSelectionChangedListener"); //$NON-NLS-1$
+			field.setAccessible(true);
+			field.set(this, selectionChangedListener);
+		}
+		catch (Exception e)
+		{
+			// Should not really happen, but let's not fail if it happens.
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
+		}
+
 	}
 
 	public void createPartControl(Composite parent)
@@ -223,4 +288,5 @@ public class AbstractFoldingEditor extends AbstractDecoratedTextEditor implement
 		}
 		return null;
 	}
+
 }
