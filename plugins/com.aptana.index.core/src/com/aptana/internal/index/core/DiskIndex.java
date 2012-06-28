@@ -1510,7 +1510,10 @@ public class DiskIndex
 					break;
 
 				default:
-					throw new UTFDataFormatException();
+					throw new UTFDataFormatException(
+							MessageFormat
+									.format("Unexpected byte value ''{0}'' at index {1}, reading string of length {2}. Read so far: ''{3}''. Possibly corrupt index file: ''{4}''", //$NON-NLS-1$
+											b, i, length, word, indexFile.getAbsolutePath()));
 			}
 		}
 
@@ -1910,6 +1913,10 @@ public class DiskIndex
 	 */
 	private void writeString(OutputStream stream, String signature) throws IOException
 	{
+		// FIXME JDT jumps through some big hoops to convert unicode into special characters!
+		// Scanner#getNextUnicodeCharacter
+		// it appears to read numeric value of 4 chars
+		// then combine them into a single char value using ScannerHelper#getNumericValue
 		char[] array = signature.toCharArray();
 
 		int length = array.length;

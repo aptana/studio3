@@ -53,8 +53,12 @@ module Ruble
       init_translations unless initialized?
       locale = java.util.Locale.default.language
       trace("Current locale: #{locale}")
-      locale_translations = translations[locale] || translations[:en]
-      entry = locale_translations[key] || translations[:en][key] || key.to_s
+      locale_translations = nil
+      locale_translations = (translations[locale] || translations[:en]) if translations
+      locale_translations ||= {}
+      entry = locale_translations[key]
+      entry ||= translations[:en][key] if translations and translations[:en]
+      entry ||= key.to_s
       entry = interpolate(entry, variables) if variables && variables.size > 0
       entry
     end

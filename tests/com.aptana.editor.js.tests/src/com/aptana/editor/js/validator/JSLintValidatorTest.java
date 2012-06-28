@@ -710,7 +710,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Confusing regular expression.", 1, IMarker.SEVERITY_WARNING, 8);
+		assertProblemExists(items, "Confusing regular expression.", 1, IMarker.SEVERITY_ERROR, 8);
 	}
 
 	public void testConfusingRegexp2() throws CoreException
@@ -720,7 +720,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Confusing regular expression.", 1, IMarker.SEVERITY_WARNING, 8);
+		assertProblemExists(items, "Confusing regular expression.", 1, IMarker.SEVERITY_ERROR, 8);
 	}
 
 	// FIXME I can't seem to find a way to insert the required special characters into the string
@@ -1133,7 +1133,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Expected an identifier and instead saw '='.", 1, IMarker.SEVERITY_WARNING, 4);
+		assertProblemExists(items, "Expected an identifier and instead saw '='.", 1, IMarker.SEVERITY_ERROR, 4);
 	}
 
 	public void testExpectedIdentiferAReserved1() throws CoreException
@@ -1502,7 +1502,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		List<IProblem> items = getParseErrors(text);
 		assertProblemExists(items,
 				"Function statements are not invocable. Wrap the whole function invocation in parens.", 1,
-				IMarker.SEVERITY_WARNING, 17);
+				IMarker.SEVERITY_ERROR, 17);
 	}
 
 	public void testFunctionStrict1() throws CoreException
@@ -1784,7 +1784,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Move 'var' declarations to the top of the function.", 1, IMarker.SEVERITY_WARNING,
+		assertProblemExists(items, "Move 'var' declarations to the top of the function.", 1, IMarker.SEVERITY_ERROR,
 				5);
 	}
 
@@ -1795,7 +1795,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Missing name in function statement.", 1, IMarker.SEVERITY_WARNING, 9);
+		assertProblemExists(items, "Missing name in function statement.", 1, IMarker.SEVERITY_ERROR, 9);
 	}
 
 	public void testNestedComment() throws CoreException
@@ -1807,7 +1807,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Nested comment.", 2, IMarker.SEVERITY_WARNING, 14);
+		assertProblemExists(items, "Nested comment.", 2, IMarker.SEVERITY_ERROR, 14);
 	}
 
 	public void testNestedNot() throws CoreException
@@ -2040,8 +2040,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		// FIXME Should be an error
-		assertProblemExists(items, "Expected parameter (value) in set value function.", 8, IMarker.SEVERITY_WARNING,
+		assertProblemExists(items, "Expected parameter (value) in set value function.", 8, IMarker.SEVERITY_ERROR,
 				145);
 	}
 
@@ -2063,8 +2062,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		// FIXME Should be an error
-		assertProblemExists(items, "Expected parameter (value) in set value function.", 8, IMarker.SEVERITY_WARNING,
+		assertProblemExists(items, "Expected parameter (value) in set value function.", 8, IMarker.SEVERITY_ERROR,
 				145);
 	}
 
@@ -2081,7 +2079,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 	public void testReadOnly() throws CoreException
 	{
 		Set<String> predefineds = CollectionsUtil.newSet("Array", "Boolean", "Date", "decodeURI", "decodeURIComponent",
-				"encodeURI", "encodeURIComponent", "Error", "eval", "EvalError", "Function", "isFinite", "isNaN",
+				"encodeURI", "encodeURIComponent", "Error", "EvalError", "Function", "isFinite", "isNaN",
 				"JSON", "Math", "Number", "Object", "parseInt", "parseFloat", "RangeError", "ReferenceError", "RegExp",
 				"String", "SyntaxError", "TypeError", "URIError");
 		for (String predefined : predefineds)
@@ -2091,8 +2089,21 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 			// @formatter:on
 
 			List<IProblem> items = getParseErrors(text);
-			// FIXME Should be an error
-			assertProblemExists(items, "Read only.", 1, IMarker.SEVERITY_WARNING, "eval".equals(predefined) ? 7 : 0);
+			assertProblemExists(items, "Read only.", 1, IMarker.SEVERITY_WARNING, 0);
+		}
+	}
+
+	public void testReadOnlyEval() throws CoreException
+	{
+		Set<String> predefineds = CollectionsUtil.newSet("eval");
+		for (String predefined : predefineds)
+		{
+			// @formatter:off
+			String text = predefined + " = true;";
+			// @formatter:on
+
+			List<IProblem> items = getParseErrors(text);
+			assertProblemExists(items, "Read only.", 1, IMarker.SEVERITY_ERROR, 7);
 		}
 	}
 
@@ -2103,7 +2114,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Reserved name '__iterator__'.", 1, IMarker.SEVERITY_WARNING, 4);
+		assertProblemExists(items, "Reserved name '__iterator__'.", 1, IMarker.SEVERITY_ERROR, 4);
 	}
 
 	public void testReservedA2() throws CoreException
@@ -2113,7 +2124,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Reserved name '__proto__'.", 1, IMarker.SEVERITY_WARNING, 4);
+		assertProblemExists(items, "Reserved name '__proto__'.", 1, IMarker.SEVERITY_ERROR, 4);
 	}
 
 	public void testSlashEqual() throws CoreException
@@ -2124,7 +2135,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 
 		List<IProblem> items = getParseErrors(text);
 		assertProblemExists(items, "A regular expression literal can be confused with '/='.", 1,
-				IMarker.SEVERITY_WARNING, 3);
+				IMarker.SEVERITY_ERROR, 3);
 	}
 
 	public void testStatementBlock() throws CoreException
@@ -2436,7 +2447,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Unrecognized tag '<madeup>'.", 1, IMarker.SEVERITY_WARNING, 7);
+		assertProblemExists(items, "Unrecognized tag '<madeup>'.", 1, IMarker.SEVERITY_ERROR, 7);
 	}
 
 	public void testURL() throws CoreException
@@ -2721,7 +2732,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		String text = "var chris = blah = 'something';";
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Variable blah was not declared correctly.", 1, IMarker.SEVERITY_WARNING, 12);
+		assertProblemExists(items, "Variable blah was not declared correctly.", 1, IMarker.SEVERITY_ERROR, 12);
 	}
 
 	public void testWeirdAssignment() throws CoreException
