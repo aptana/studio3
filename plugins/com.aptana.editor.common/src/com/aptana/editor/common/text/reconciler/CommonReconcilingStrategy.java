@@ -166,7 +166,6 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 			Map<ProjectionAnnotation, Position> positions = folder.emitFoldingRegions(initialReconcile, monitor, ast);
 			synchronized (fPositionsLock)
 			{
-				fPositions.clear();
 				fPositions = positions;
 			}
 		}
