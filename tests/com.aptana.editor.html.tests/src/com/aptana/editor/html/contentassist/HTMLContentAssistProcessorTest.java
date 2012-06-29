@@ -54,9 +54,9 @@ import com.aptana.webserver.core.WebServerCorePlugin;
 public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 {
 
-	private static final int ELEMENT_PROPOSALS_COUNT = 133;
+	private static final int ELEMENT_PROPOSALS_COUNT = 135;
 	private static final int DOCTYPE_PROPOSALS_COUNT = 11;
-	private static final int CLOSE_TAG_PROPOSALS_COUNT = 120;
+	private static final int CLOSE_TAG_PROPOSALS_COUNT = 121;
 	private static final int ENTITY_PROPOSAL_COUNT = 252;
 
 	private HTMLContentAssistProcessor fProcessor;
