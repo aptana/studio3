@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.QueryResult;
@@ -57,7 +58,6 @@ public class DiskIndex
 	private int[] chunkOffsets;
 	private int startOfCategoryTables;
 	private Map<String, Integer> categoryOffsets;
-	private Map<String, Integer> categoryEnds;
 	// Usually a map from string to map from string to list of integer. But may also be a single integer (to represent a
 	// pointer to long array)
 	// FIXME YUCK!! This "usually a list of integers, sometimes one integer that acts as a pointer" stuff is killing me!
@@ -84,7 +84,6 @@ public class DiskIndex
 		this.documentReferenceSize = -1;
 		this.categoryTables = null;
 		this.categoryOffsets = null;
-		this.categoryEnds = null;
 		this.categoriesToDiscard = null;
 	}
 
@@ -732,7 +731,6 @@ public class DiskIndex
 
 		int size = diskIndex.categoryOffsets == null ? 8 : diskIndex.categoryOffsets.size();
 		this.categoryOffsets = new HashMap<String, Integer>(size);
-		this.categoryEnds = new HashMap<String, Integer>(size);
 		this.categoryTables = new HashMap<String, Map<String, Object>>(size);
 		this.separator = diskIndex.separator;
 		this.categoriesToDiscard = diskIndex.categoriesToDiscard;
@@ -1081,8 +1079,10 @@ public class DiskIndex
 
 		try
 		{
+			// skip to start of category
 			skip(stream, offset);
 
+			// Read the number of words in the category
 			int size = readStreamInt(stream);
 
 			try
@@ -1124,10 +1124,7 @@ public class DiskIndex
 				// to the table)
 				if (arrayOffset <= 0)
 				{
-					List<Integer> positions = new ArrayList<Integer>();
-
-					positions.add(-arrayOffset);
-					categoryTable.put(word, positions); // store 1 element array by negating
+					categoryTable.put(word, CollectionsUtil.newList(-arrayOffset)); // store 1 element array by negating
 					// documentNumber
 				}
 				else if (arrayOffset < largeArraySize)
@@ -1353,30 +1350,14 @@ public class DiskIndex
 
 		this.startOfCategoryTables = readStreamInt(stream);
 
-		int size = readStreamInt(stream);
-		this.categoryOffsets = new HashMap<String, Integer>(size);
-		this.categoryEnds = new HashMap<String, Integer>(size);
-		String previousCategory = null;
-		int offset = -1;
-
-		for (int i = 0; i < size; i++)
+		// Build the table of categories to offsets where they start
+		int categoryCount = readStreamInt(stream);
+		this.categoryOffsets = new HashMap<String, Integer>(categoryCount);
+		for (int i = 0; i < categoryCount; i++)
 		{
 			String categoryName = readString(stream);
-
-			offset = readStreamInt(stream);
+			int offset = readStreamInt(stream);
 			this.categoryOffsets.put(categoryName, offset); // cache offset to category table
-
-			if (previousCategory != null)
-			{
-				this.categoryEnds.put(previousCategory, offset); // cache end of the category table
-			}
-
-			previousCategory = categoryName;
-		}
-
-		if (previousCategory != null)
-		{
-			this.categoryEnds.put(previousCategory, this.headerInfoOffset); // cache end of the category table
 		}
 
 		this.categoryTables = new HashMap<String, Map<String, Object>>(3);
@@ -1506,7 +1487,10 @@ public class DiskIndex
 					break;
 
 				default:
-					throw new UTFDataFormatException();
+					throw new UTFDataFormatException(
+							MessageFormat
+									.format("Unexpected byte value ''{0}'' at index {1}, reading string of length {2}. Read so far: ''{3}''. Possibly corrupt index file: ''{4}''", //$NON-NLS-1$
+											b, i, length, new String(word), indexFile.getAbsolutePath()));
 			}
 		}
 
@@ -1908,7 +1892,16 @@ public class DiskIndex
 	{
 		char[] array = signature.toCharArray();
 
+		// If this string is longer than we can store in 2 bytes (16 bits, which is 65535), we'll overflow/break!
 		int length = array.length;
+		if (length >= 65535)
+		{
+			throw new IOException(
+					MessageFormat
+							.format("Trying to write a string that is too long and will overflow the recorded length maximum. length: {0}, string: ''{2}''", //$NON-NLS-1$
+									length, signature));
+		}
+
 		stream.write((byte) ((length >>> 8) & 0xFF)); // store chars array length instead of bytes
 		stream.write((byte) (length & 0xFF)); // this will allow to read it faster
 		this.streamEnd += 2;
