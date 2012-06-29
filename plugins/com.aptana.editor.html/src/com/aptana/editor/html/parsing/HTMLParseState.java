@@ -29,7 +29,7 @@ public class HTMLParseState extends ParseState
 
 	@SuppressWarnings("nls")
 	private static final Set<String> END_FORBIDDEN_OR_EMPTY_TAGS = CollectionsUtil.newSet("area", "base", "basefont",
-			"br", "col", "frame", "hr", "img", "input", "isindex", "link", "meta", "param");
+			"br", "col", "frame", "hr", "img", "input", "isindex", "link", "meta", "param", "track");
 
 	private Type fDocumentType;
 
@@ -51,7 +51,6 @@ public class HTMLParseState extends ParseState
 	{
 		this(source, 0);
 	}
-
 
 	public HTMLParseState(String source, int startingOffset)
 	{
