@@ -404,6 +404,10 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		{
 			return getPluginPreferenceStore();
 		}
+		else if (ICommandElementsProvider.class == adapter)
+		{
+			return getCommandElementsProvider();
+		}
 
 		if (this.fThemeableEditorFindBarExtension != null)
 		{
