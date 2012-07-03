@@ -43,6 +43,12 @@ public class ParseNode extends Node implements IParseNode
 		{
 			return fRange;
 		}
+
+		@Override
+		public String toString()
+		{
+			return getName();
+		}
 	}
 
 	protected static final IParseNode[] NO_CHILDREN = new IParseNode[0];

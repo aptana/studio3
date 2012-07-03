@@ -9,6 +9,7 @@ package com.aptana.editor.html.validator;
 
 import java.util.List;
 
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 
 import com.aptana.core.build.AbstractBuildParticipant;
@@ -124,6 +125,30 @@ public class HTMLParseErrorValidatorTest extends AbstractValidatorTestCase
 		assertEquals("Error was not found on expected line", 5, item.getLineNumber());
 		assertEquals("Error message did not match expected error message", "Syntax Error: unexpected token \"}\"",
 				item.getMessage());
+	}
+
+	public void testInvalidClosingTag() throws CoreException
+	{
+		// @formatter:off
+		String text = "<html>\n" +
+				"    <head>\n" +
+				"        <title>\n" +
+				"        <title>\n" +
+				"    <head>\n" +
+				"    <body>  \n" +  
+				"<p>\n" +
+				"<p>\n" +
+				"    <body>\n" +
+				"</html>\n";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		// body tag is optional, so no warnings about end tags
+		// p tag end is optional, so no warning about that
+		assertContainsProblem(items, "Missing end tag </title>", IMarker.SEVERITY_WARNING, 3, 26, 7);
+		assertContainsProblem(items, "Missing end tag </head>", IMarker.SEVERITY_WARNING, 2, 11, 6);
+		assertContainsProblem(items, "<title> is probably intended as </title>", IMarker.SEVERITY_WARNING, 4, 42, 7);
+		assertContainsProblem(items, "<head> is probably intended as </head>", IMarker.SEVERITY_WARNING, 5, 54, 6);
 	}
 
 	protected List<IProblem> getParseErrors(String source) throws CoreException
