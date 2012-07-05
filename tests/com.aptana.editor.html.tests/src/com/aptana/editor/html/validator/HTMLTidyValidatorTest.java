@@ -389,16 +389,6 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 		assertContainsProblem(items, "unescaped & which should be written as &amp;", IMarker.SEVERITY_WARNING, 7, 79, 1);
 	}
 
-	protected void assertContainsProblem(List<IProblem> items, String msg, int severity, int line, int offset,
-			int length)
-	{
-		IProblem problem = assertContains(items, msg);
-		assertEquals("severity", severity, problem.getSeverity());
-		assertEquals("offset", offset, problem.getOffset());
-		assertEquals("length", length, problem.getLength());
-		assertEquals("lineNumber", line, problem.getLineNumber());
-	}
-
 	public void testEntityNotEndingInSemicolon() throws CoreException
 	{
 		// @formatter:off

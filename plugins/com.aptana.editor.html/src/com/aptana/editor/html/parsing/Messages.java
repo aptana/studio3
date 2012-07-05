@@ -18,6 +18,8 @@ public class Messages extends NLS
 	public static String HTMLParser_unexpected_error;
 	public static String HTMLParser_ERR_TagMissingEnd;
 
+	public static String HTMLParser_OpenTagIntendedAsClosed;
+
 	static
 	{
 		// initialize resource bundle

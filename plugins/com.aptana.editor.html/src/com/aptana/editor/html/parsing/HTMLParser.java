@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -10,7 +10,10 @@ package com.aptana.editor.html.parsing;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -50,18 +53,18 @@ import com.aptana.parsing.util.ParseUtil;
 
 public class HTMLParser extends AbstractParser
 {
+	private static final IParseNode[] NO_PARSE_NODES = new IParseNode[0];
 	public static final HTMLNode[] NO_HTML_NODES = new HTMLNode[0];
 	private static final String ATTR_TYPE = "type"; //$NON-NLS-1$
 	private static final String ATTR_LANG = "language"; //$NON-NLS-1$
 
-	@SuppressWarnings("nls")
-	private static final String[] CSS_VALID_TYPE_ATTR = new String[] { "text/css" };
-	@SuppressWarnings("nls")
-	private static final String[] JS_VALID_TYPE_ATTR = new String[] { "application/javascript",
-			"application/ecmascript", "application/x-javascript", "application/x-ecmascript", "text/javascript",
-			"text/ecmascript", "text/jscript" };
-	@SuppressWarnings("nls")
-	private static final String[] JS_VALID_LANG_ATTR = new String[] { "JavaScript" };
+	private static final String[] CSS_VALID_TYPE_ATTR = new String[] { "text/css" }; //$NON-NLS-1$
+
+	private static final String[] JS_VALID_TYPE_ATTR = new String[] { "application/javascript", //$NON-NLS-1$
+			"application/ecmascript", "application/x-javascript", "application/x-ecmascript", "text/javascript", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			"text/ecmascript", "text/jscript" }; //$NON-NLS-1$ //$NON-NLS-2$
+
+	private static final String[] JS_VALID_LANG_ATTR = new String[] { "JavaScript" }; //$NON-NLS-1$
 
 	private HTMLParserScanner fScanner;
 	private HTMLParseState fParseState;
@@ -80,8 +83,7 @@ public class HTMLParser extends AbstractParser
 	/**
 	 * parse
 	 */
-	protected synchronized void parse(IParseState parseState, WorkingParseResult working)
-			throws java.lang.Exception
+	protected synchronized void parse(IParseState parseState, WorkingParseResult working) throws java.lang.Exception
 	{
 		fMonitor = parseState.getProgressMonitor();
 		fScanner = new HTMLParserScanner();
@@ -302,7 +304,7 @@ public class HTMLParser extends AbstractParser
 			{
 			}
 		}
-		return new IParseNode[0];
+		return NO_PARSE_NODES;
 	}
 
 	private void processComment()
@@ -325,6 +327,7 @@ public class HTMLParser extends AbstractParser
 
 	private void processEndTag()
 	{
+		boolean addErrors = false;
 		String tagName = HTMLUtils.stripTagEndings(fCurrentSymbol.value.toString());
 		List<HTMLElementNode> elementsToClose = new ArrayList<HTMLElementNode>();
 		if (fCurrentElement instanceof HTMLElementNode
@@ -350,25 +353,21 @@ public class HTMLParser extends AbstractParser
 
 			if (hasOpenTag)
 			{
+				addErrors = true;
 				// found the match, so closes it as well as all the open elements above
 				if (fCurrentElement instanceof HTMLElementNode)
 				{
 					elementsToClose.add((HTMLElementNode) fCurrentElement);
-					addMissingEndTagError((HTMLElementNode) fCurrentElement);
 				}
 
+				// Work our way from back of stack to front, marking unclosed elements
 				for (int j = fElementStack.size() - 1; j >= i; --j)
 				{
 					node = fElementStack.get(j);
 					if (node instanceof HTMLElementNode)
 					{
-						elementsToClose.add((HTMLElementNode) node);
-
-						// Only add error if it's not the opening tag for the current tagName
-						if (!((HTMLElementNode) node).getName().equalsIgnoreCase(tagName))
-						{
-							addMissingEndTagError((HTMLElementNode) node);
-						}
+						HTMLElementNode elementNode = (HTMLElementNode) node;
+						elementsToClose.add(elementNode);
 					}
 				}
 			}
@@ -379,23 +378,42 @@ public class HTMLParser extends AbstractParser
 			}
 		}
 
-		HTMLElementNode element;
 		int currentStart = fCurrentSymbol.getStart();
 		int currentEnd = fCurrentSymbol.getEnd();
 		int size = elementsToClose.size();
+		Collections.reverse(elementsToClose);
+		Set<String> missingEndTagNames = new HashSet<String>(size);
 		for (int i = 0; i < size; ++i)
 		{
-			element = elementsToClose.get(i);
-			// adjusts the ending offset of the element to include the entire block
-			if (i < size - 1)
+			HTMLElementNode element = elementsToClose.get(i);
+
+			if (addErrors)
 			{
-				element.setLocation(element.getStartingOffset(), currentStart - 1);
-				element.setEndNode(currentStart - 1, currentStart - 1);
+				String elementName = element.getName();
+				// Only add error if it's not the opening tag for the current tagName
+				if (!elementName.equalsIgnoreCase(tagName))
+				{
+					if (missingEndTagNames.contains(elementName))
+					{
+						addMissingLikelyMistypedEndTagError(element);
+					}
+					else
+					{
+						addMissingEndTagError(element);
+						missingEndTagNames.add(elementName);
+					}
+				}
 			}
-			else
+			// adjusts the ending offset of the element to include the entire block
+			if (i == 0)
 			{
 				element.setLocation(element.getStartingOffset(), currentEnd);
 				element.setEndNode(currentStart, currentEnd);
+			}
+			else
+			{
+				element.setLocation(element.getStartingOffset(), currentStart - 1);
+				element.setEndNode(currentStart - 1, currentStart - 1);
 			}
 			closeElement();
 		}
@@ -407,6 +425,17 @@ public class HTMLParser extends AbstractParser
 		{
 			fWorkingParseResult.addError(new ParseError(IHTMLConstants.CONTENT_TYPE_HTML, node.getStartingOffset(),
 					node.getLength(), MessageFormat.format(Messages.HTMLParser_missing_end_tag_error, node.getName()),
+					IParseError.Severity.WARNING));
+		}
+	}
+
+	private void addMissingLikelyMistypedEndTagError(HTMLElementNode node)
+	{
+		if (fParseState.getCloseTagType(node.getName()) != IHTMLTagInfo.END_OPTIONAL)
+		{
+			fWorkingParseResult.addError(new ParseError(IHTMLConstants.CONTENT_TYPE_HTML, node.getStartingOffset(),
+					node.getLength(),
+					MessageFormat.format(Messages.HTMLParser_OpenTagIntendedAsClosed, node.getName()),
 					IParseError.Severity.WARNING));
 		}
 	}
@@ -519,12 +548,11 @@ public class HTMLParser extends AbstractParser
 		}
 	}
 
-
 	private void processText(String source)
 	{
 		// checks text node that starts with "<"
 		String text = fCurrentSymbol.value.toString().trim();
-		if (text.startsWith("<")) //$NON-NLS-1$
+		if (text.length() > 0 && text.charAt(0) == '<')
 		{
 			// this means we have an open < tag that doesn't have a closing >
 			fWorkingParseResult.addError(new ParseError(IHTMLConstants.CONTENT_TYPE_HTML, fCurrentSymbol.getStart(),

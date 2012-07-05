@@ -91,6 +91,16 @@ public abstract class AbstractValidatorTestCase extends TestCase
 		return null;
 	}
 
+	protected void assertContainsProblem(List<IProblem> items, String msg, int severity, int line, int offset,
+			int length)
+	{
+		IProblem problem = assertContains(items, msg);
+		assertEquals("severity", severity, problem.getSeverity());
+		assertEquals("offset", offset, problem.getOffset());
+		assertEquals("length", length, problem.getLength());
+		assertEquals("lineNumber", line, problem.getLineNumber());
+	}
+
 	protected List<IProblem> getProblems(List<IProblem> items, final String message)
 	{
 		return CollectionsUtil.filter(items, new IFilter<IProblem>()
