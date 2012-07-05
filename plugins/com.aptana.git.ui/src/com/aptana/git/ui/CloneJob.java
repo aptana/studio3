@@ -345,7 +345,7 @@ public class CloneJob extends Job
 				prefs.putBoolean(IPreferenceConstants.AUTO_ATTACH_REPOS, false);
 				try
 				{
-					prefs.sync();
+					prefs.flush();
 				}
 				catch (BackingStoreException e)
 				{
@@ -361,7 +361,7 @@ public class CloneJob extends Job
 				prefs.remove(IPreferenceConstants.AUTO_ATTACH_REPOS);
 				try
 				{
-					prefs.sync();
+					prefs.flush();
 				}
 				catch (BackingStoreException e)
 				{
