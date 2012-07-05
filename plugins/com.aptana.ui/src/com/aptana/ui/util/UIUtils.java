@@ -16,6 +16,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
@@ -47,6 +48,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.services.IEvaluationService;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.ui.UIPlugin;
 
@@ -366,9 +368,9 @@ public final class UIUtils
 	 *            Something that gets run if the message dialog return code is Window.OK
 	 */
 	public static void showMessageDialogFromBgThread(final int kind, final String title, final String message,
-			final Runnable runnable)
+			final ISafeRunnable runnable)
 	{
-		UIJob job = new UIJob("Modal Message Dialog Job")
+		UIJob job = new UIJob("Modal Message Dialog Job") //$NON-NLS-1$
 		{
 
 			@Override
@@ -388,7 +390,14 @@ public final class UIUtils
 					{
 						if (runnable != null)
 						{
-							runnable.run();
+							try
+							{
+								runnable.run();
+							}
+							catch (Exception e)
+							{
+								IdeLog.logError(UIPlugin.getDefault(), e);
+							}
 						}
 					}
 				}
