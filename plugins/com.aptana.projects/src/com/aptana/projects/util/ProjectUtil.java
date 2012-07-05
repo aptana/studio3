@@ -55,6 +55,10 @@ public class ProjectUtil
 			try
 			{
 				description = workspace.loadProjectDescription(dotProjectPath);
+				if (Platform.getLocation().isPrefixOf(projectPath))
+				{
+					description.setLocation(null);
+				}
 			}
 			catch (CoreException e)
 			{
