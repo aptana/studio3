@@ -23,6 +23,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -46,6 +47,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.services.IEvaluationService;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.ui.UIPlugin;
 
 /**
@@ -349,6 +351,52 @@ public final class UIUtils
 		{
 			showErrorDialog(title, message);
 		}
+	}
+
+	/**
+	 * Schedules a message dialog to be displayed safely in the UI thread
+	 * 
+	 * @param kind
+	 *            MessageDialog constants indicating the kind
+	 * @param title
+	 *            MessageDialog title
+	 * @param message
+	 *            MessageDialog message
+	 * @param runnable
+	 *            Something that gets run if the message dialog return code is Window.OK
+	 */
+	public static void showMessageDialogFromBgThread(final int kind, final String title, final String message,
+			final Runnable runnable)
+	{
+		UIJob job = new UIJob("Modal Message Dialog Job")
+		{
+
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor)
+			{
+				// If the system dialog is shown, then the active shell would be null
+				if (Display.getDefault().getActiveShell() == null)
+				{
+					if (!monitor.isCanceled())
+					{
+						schedule(1000);
+					}
+				}
+				else if (!monitor.isCanceled())
+				{
+					if (MessageDialog.open(kind, UIUtils.getActiveShell(), title, message, SWT.NONE))
+					{
+						if (runnable != null)
+						{
+							runnable.run();
+						}
+					}
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		job.setSystem(!EclipseUtil.showSystemJobs());
+		job.schedule();
 	}
 
 	private static void showErrorDialog(String title, String message)
