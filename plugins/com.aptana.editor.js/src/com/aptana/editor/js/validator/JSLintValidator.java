@@ -288,6 +288,10 @@ public class JSLintValidator extends AbstractBuildParticipant
 							int actual = character - 1;
 							for (int x = 0; x < actual; x++)
 							{
+								if (rawLine.length() >= x)
+								{
+									break;
+								}
 								char c = rawLine.charAt(x);
 								if (c == '\t')
 								{
