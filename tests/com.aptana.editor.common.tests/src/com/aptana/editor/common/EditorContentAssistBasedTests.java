@@ -107,6 +107,35 @@ public abstract class EditorContentAssistBasedTests<T extends CommonContentAssis
 	}
 
 	/**
+	 * Sets up the test context, TextViewer and then grabs the proposals at a given offset.
+	 * 
+	 * @param resource
+	 * @param offset
+	 * @return
+	 */
+	protected ICompletionProposal[] getProposals(String resource, int offset)
+	{
+		this.setupTestContext(resource);
+
+		ITextViewer viewer = new TextViewer(UIUtils.getActiveShell(), SWT.NONE);
+		viewer.setDocument(this.document);
+
+		// get proposals
+		return this.processor.computeCompletionProposals(viewer, offset, '\0', false);
+	}
+
+	protected ICompletionProposal[] getProposals(String resource)
+	{
+		// we can't call method aboce, because cursorsOfssets is set in this setupTestContext call
+		this.setupTestContext(resource);
+
+		ITextViewer viewer = new TextViewer(UIUtils.getActiveShell(), SWT.NONE);
+		viewer.setDocument(this.document);
+
+		return this.processor.computeCompletionProposals(viewer, this.cursorOffsets.iterator().next(), '\0', false);
+	}
+
+	/**
 	 * checkProposals
 	 * 
 	 * @param resource
@@ -125,7 +154,7 @@ public abstract class EditorContentAssistBasedTests<T extends CommonContentAssis
 			ICompletionProposal[] proposals = this.processor.computeCompletionProposals(viewer, offset, '\0', false);
 
 			// build a list of display names
-			ArrayList<String> names = new ArrayList<String>();
+			ArrayList<String> names = new ArrayList<String>(proposals.length);
 
 			for (ICompletionProposal proposal : proposals)
 			{

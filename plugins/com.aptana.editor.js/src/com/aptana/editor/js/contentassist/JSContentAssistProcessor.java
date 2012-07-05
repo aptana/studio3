@@ -29,6 +29,7 @@ import beaver.Scanner;
 
 import com.aptana.core.IFilter;
 import com.aptana.core.util.ArrayUtil;
+import com.aptana.core.util.ChainedFilter;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
@@ -99,11 +100,30 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	private static final Image JS_FUNCTION = JSPlugin.getImage("/icons/js_function.png"); //$NON-NLS-1$
 	private static final Image JS_PROPERTY = JSPlugin.getImage("/icons/js_property.png"); //$NON-NLS-1$
 	private static final Image JS_KEYWORD = JSPlugin.getImage("/icons/keyword.png"); //$NON-NLS-1$
+
+	/**
+	 * Filters out internal properties.
+	 */
 	private static final IFilter<PropertyElement> isVisibleFilter = new IFilter<PropertyElement>()
 	{
 		public boolean include(PropertyElement item)
 		{
 			return !item.isInternal();
+		}
+	};
+
+	/**
+	 * Filters out functions that are constructors.
+	 */
+	private static final IFilter<PropertyElement> isNotConstructorFilter = new IFilter<PropertyElement>()
+	{
+		public boolean include(PropertyElement item)
+		{
+			if (!(item instanceof FunctionElement))
+			{
+				return true;
+			}
+			return !((FunctionElement) item).isConstructor();
 		}
 	};
 
@@ -501,6 +521,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param typeName
 	 * @param offset
 	 */
+	@SuppressWarnings("unchecked")
 	protected void addTypeProperties(Set<ICompletionProposal> proposals, String typeName, int offset)
 	{
 		Index index = getIndex();
@@ -514,8 +535,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		// add properties and methods
 		List<PropertyElement> properties = indexHelper.getTypeMembers(index, allTypes);
 		URI projectURI = getProjectURI();
-
-		for (PropertyElement property : CollectionsUtil.filter(properties, isVisibleFilter))
+		for (PropertyElement property : CollectionsUtil.filter(properties, new ChainedFilter<PropertyElement>(
+				isNotConstructorFilter, isVisibleFilter)))
 		{
 			addProposal(proposals, property, offset, projectURI, null);
 		}

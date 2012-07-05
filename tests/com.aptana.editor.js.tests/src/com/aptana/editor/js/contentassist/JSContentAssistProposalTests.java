@@ -606,6 +606,30 @@ public class JSContentAssistProposalTests extends JSEditorBasedTests
 		// @formatter:on
 	}
 
+	public void testDontShowStringConstructorOffInstance()
+	{
+		ICompletionProposal[] proposals = getProposals("contentAssist/string-constructor-off-instance.js");
+
+		assertDoesntContain(proposals, "String", "Object");
+		assertContains(proposals, "charAt", "indexOf", "toLowerCase");
+	}
+
+	public void testInstanceMethodDefinedOnPrototypeOffInstance()
+	{
+		ICompletionProposal[] proposals = getProposals("contentAssist/instance-method-off-instance.js");
+
+		assertDoesntContain(proposals, "download");
+		assertContains(proposals, "play");
+	}
+
+	public void testDontShowStaticMethodOffInstance()
+	{
+		ICompletionProposal[] proposals = getProposals("contentAssist/static-method-off-instance.js");
+
+		assertDoesntContain(proposals, "play");
+		assertContains(proposals, "download");
+	}
+
 	// https://jira.appcelerator.org/browse/APSTUD-4017
 	public void testOffersCAOnMultipleTypesInferredForSameVariable() throws Exception
 	{
