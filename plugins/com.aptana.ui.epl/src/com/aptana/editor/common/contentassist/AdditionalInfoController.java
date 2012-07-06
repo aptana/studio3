@@ -825,24 +825,25 @@ class AdditionalInfoController extends AbstractInformationControlManager
 		 */
 		public void focusLost(FocusEvent e)
 		{
-			Display d = fSubjectControl.getDisplay();
-			d.asyncExec(new Runnable()
+			if (fSubjectControl != null && !fSubjectControl.isDisposed())
 			{
-				// Without the asyncExec, mouse clicks to the workbench window are swallowed.
-				public void run()
+				fSubjectControl.getDisplay().asyncExec(new Runnable()
 				{
-					if ((fProposalTable == null || !fProposalTable.isFocusControl())
-							&& (fInformationControlToClose == null || !fInformationControlToClose.isFocusControl()))
+					// Without the asyncExec, mouse clicks to the workbench window are swallowed.
+					public void run()
 					{
-						if (fProposalTable != null)
+						if ((fProposalTable == null || !fProposalTable.isFocusControl())
+								&& (fInformationControlToClose == null || !fInformationControlToClose.isFocusControl()))
 						{
-							fProposalTable.getShell().dispose();
+							if (fProposalTable != null)
+							{
+								fProposalTable.getShell().dispose();
+							}
+							hideInformationControl();
 						}
-						hideInformationControl();
 					}
-				}
-			});
+				});
+			}
 		}
-
 	}
 }
