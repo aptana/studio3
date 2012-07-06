@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: com.aptana.formatter.epl;singleton:=true
-Bundle-Version: 3.0.0.qualifier
+Bundle-Version: 3.2.0.qualifier
 Bundle-Activator: com.aptana.formatter.epl.FormatterPlugin
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.ui,
