@@ -25,6 +25,8 @@ import org.eclipse.jface.text.IInformationControlExtension3;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension3;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension5;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
@@ -523,6 +525,7 @@ class AdditionalInfoController extends AbstractInformationControlManager
 	AdditionalInfoController(IInformationControlCreator creator, int delay)
 	{
 		super(creator);
+		setCloser(new Closer());
 		fDelay = delay;
 		setAnchor(ANCHOR_RIGHT);
 		setFallbackAnchors(new Anchor[] { ANCHOR_RIGHT, ANCHOR_LEFT, ANCHOR_BOTTOM });
@@ -734,5 +737,112 @@ class AdditionalInfoController extends AbstractInformationControlManager
 	public IInformationControl getCurrentInformationControl2()
 	{
 		return getInternalAccessor().getCurrentInformationControl();
+	}
+
+	/**
+	 * Internal information control closer. Listens to several events issued by its subject control and closes the
+	 * information control when necessary.
+	 */
+	class Closer implements IInformationControlCloser, FocusListener
+	{
+
+		/** The subject control. */
+		private Control fSubjectControl;
+		/** The information control. */
+		private IInformationControl fInformationControlToClose;
+		/** Indicates whether this closer is active. */
+		private boolean fIsActive = false;
+
+		/*
+		 * @see IInformationControlCloser#setSubjectControl(Control)
+		 */
+		public void setSubjectControl(Control control)
+		{
+			fSubjectControl = control;
+		}
+
+		/*
+		 * @see IInformationControlCloser#setInformationControl(IInformationControl)
+		 */
+		public void setInformationControl(IInformationControl control)
+		{
+			fInformationControlToClose = control;
+		}
+
+		/*
+		 * @see IInformationControlCloser#start(Rectangle)
+		 */
+		public void start(Rectangle informationArea)
+		{
+			if (fIsActive)
+			{
+				return;
+			}
+			fIsActive = true;
+
+			if (fSubjectControl != null && !fSubjectControl.isDisposed())
+			{
+				fSubjectControl.addFocusListener(this);
+			}
+
+			if (fInformationControlToClose != null)
+			{
+				fInformationControlToClose.addFocusListener(this);
+			}
+		}
+
+		/*
+		 * @see IInformationControlCloser#stop()
+		 */
+		public void stop()
+		{
+
+			if (!fIsActive)
+			{
+				return;
+			}
+			fIsActive = false;
+
+			if (fInformationControlToClose != null)
+			{
+				fInformationControlToClose.removeFocusListener(this);
+			}
+			if (fSubjectControl != null && !fSubjectControl.isDisposed())
+			{
+				fSubjectControl.removeFocusListener(this);
+			}
+		}
+
+		/*
+		 * @see FocusListener#focusGained(FocusEvent)
+		 */
+		public void focusGained(FocusEvent e)
+		{
+		}
+
+		/*
+		 * @see FocusListener#focusLost(FocusEvent)
+		 */
+		public void focusLost(FocusEvent e)
+		{
+			Display d = fSubjectControl.getDisplay();
+			d.asyncExec(new Runnable()
+			{
+				// Without the asyncExec, mouse clicks to the workbench window are swallowed.
+				public void run()
+				{
+					if ((fProposalTable == null || !fProposalTable.isFocusControl())
+							&& (fInformationControlToClose == null || !fInformationControlToClose.isFocusControl()))
+					{
+						if (fProposalTable != null)
+						{
+							fProposalTable.getShell().dispose();
+						}
+						hideInformationControl();
+					}
+				}
+			});
+		}
+
 	}
 }
