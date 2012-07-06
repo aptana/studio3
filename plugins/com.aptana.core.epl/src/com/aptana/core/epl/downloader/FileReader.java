@@ -192,7 +192,14 @@ public final class FileReader extends FileTransferJob implements IFileTransferLi
 			{
 				if (theMonitor.isCanceled())
 				{
-					source.cancel();
+					try
+					{
+						source.cancel();
+					}
+					catch (Exception e)
+					{
+						// ignores the exception generated when canceling
+					}
 					return;
 				}
 
@@ -528,11 +535,14 @@ public final class FileReader extends FileTransferJob implements IFileTransferLi
 		{
 			try
 			{
-				if (aStream instanceof OutputStream) {
+				if (aStream instanceof OutputStream)
+				{
 					OutputStream stream = (OutputStream) aStream;
 					stream.flush();
 					stream.close();
-				} else if (aStream instanceof InputStream) {
+				}
+				else if (aStream instanceof InputStream)
+				{
 					((InputStream) aStream).close();
 				}
 			}
