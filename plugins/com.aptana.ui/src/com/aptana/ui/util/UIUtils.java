@@ -24,6 +24,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
@@ -370,6 +371,34 @@ public final class UIUtils
 	public static void showMessageDialogFromBgThread(final int kind, final String title, final String message,
 			final ISafeRunnable runnable)
 	{
+		showMessageDialogFromBgThread(new SafeMessageDialogRunnable()
+		{
+
+			public void run() throws Exception
+			{
+				if (runnable != null)
+				{
+					runnable.run();
+				}
+			}
+
+			public int openMessageDialog()
+			{
+				return MessageDialog.open(kind, UIUtils.getActiveShell(), title, message, SWT.NONE) ? Window.OK
+						: Window.CANCEL;
+			}
+		}, Window.OK);
+	}
+
+	/**
+	 * Schedules a message dialog to be displayed safely in the UI thread
+	 * 
+	 * @param runnable
+	 *            Something that gets run if the message dialog return code is Window.OK
+	 */
+	public static void showMessageDialogFromBgThread(final SafeMessageDialogRunnable runnable,
+			final int runnableCondition)
+	{
 		UIJob job = new UIJob("Modal Message Dialog Job") //$NON-NLS-1$
 		{
 
@@ -386,18 +415,15 @@ public final class UIUtils
 				}
 				else if (!monitor.isCanceled())
 				{
-					if (MessageDialog.open(kind, UIUtils.getActiveShell(), title, message, SWT.NONE))
+					if (runnable.openMessageDialog() == runnableCondition)
 					{
-						if (runnable != null)
+						try
 						{
-							try
-							{
-								runnable.run();
-							}
-							catch (Exception e)
-							{
-								IdeLog.logError(UIPlugin.getDefault(), e);
-							}
+							runnable.run();
+						}
+						catch (Exception e)
+						{
+							IdeLog.logError(UIPlugin.getDefault(), e);
 						}
 					}
 				}
