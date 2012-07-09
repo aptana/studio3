@@ -396,6 +396,20 @@ public final class UIUtils
 	 * @param runnable
 	 *            Something that gets run if the message dialog return code is Window.OK
 	 */
+	public static void showMessageDialogFromBgThread(final SafeMessageDialogRunnable runnable)
+	{
+		showMessageDialogFromBgThread(runnable, Window.OK);
+	}
+
+	/**
+	 * Schedules a message dialog to be displayed safely in the UI thread
+	 * 
+	 * @param runnable
+	 *            Something that gets run if the message dialog return code is Window.OK
+	 * @param runnableCondition
+	 *            The return code from SafeMessageDialogRunnable.openMessageDialog() that would trigger
+	 *            SafeMessageDialogRunnable.run()
+	 */
 	public static void showMessageDialogFromBgThread(final SafeMessageDialogRunnable runnable,
 			final int runnableCondition)
 	{

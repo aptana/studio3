@@ -10,10 +10,24 @@ package com.aptana.ui.util;
 import org.eclipse.jface.util.SafeRunnable;
 
 /**
+ * A Runnable that opens a MessageDialog and performs an operation
+ * 
  * @author Nam Le <nle@appcelerator.com>
- *
  */
 public abstract class SafeMessageDialogRunnable extends SafeRunnable
 {
+	/**
+	 * Opens a MessageDialog and returns the return code
+	 * 
+	 * @return
+	 */
 	public abstract int openMessageDialog();
+
+	/**
+	 * No-op
+	 */
+	public void run() throws Exception
+	{
+		// No-op
+	}
 }

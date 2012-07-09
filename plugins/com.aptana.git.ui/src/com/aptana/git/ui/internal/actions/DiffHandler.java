@@ -23,7 +23,6 @@ import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.ui.PlatformUI;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.git.core.IDebugScopes;
@@ -33,6 +32,8 @@ import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.git.ui.DiffFormatter;
 import com.aptana.git.ui.GitUIPlugin;
 import com.aptana.git.ui.actions.Messages;
+import com.aptana.ui.util.SafeMessageDialogRunnable;
+import com.aptana.ui.util.UIUtils;
 
 public class DiffHandler extends AbstractGitHandler
 {
@@ -136,10 +137,9 @@ public class DiffHandler extends AbstractGitHandler
 		}
 
 		final String finalDiff = diff;
-		PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
+		UIUtils.showMessageDialogFromBgThread(new SafeMessageDialogRunnable()
 		{
-
-			public void run()
+			public int openMessageDialog()
 			{
 				MessageDialog dialog = new MessageDialog(getShell(), Messages.GitProjectView_GitDiffDialogTitle, null,
 						"", 0, new String[] { IDialogConstants.OK_LABEL }, 0) //$NON-NLS-1$
@@ -161,7 +161,7 @@ public class DiffHandler extends AbstractGitHandler
 						return true;
 					}
 				};
-				dialog.open();
+				return dialog.open();
 			}
 		});
 
