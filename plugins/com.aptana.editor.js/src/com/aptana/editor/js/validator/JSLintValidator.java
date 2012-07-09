@@ -285,10 +285,11 @@ public class JSLintValidator extends AbstractBuildParticipant
 							IRegion lineInfo = doc.getLineInformation(line - 1);
 							int realOffset = lineInfo.getOffset();
 							String rawLine = doc.get(realOffset, lineInfo.getLength());
+							int lineLength = rawLine.length();
 							int actual = character - 1;
 							for (int x = 0; x < actual; x++)
 							{
-								if (rawLine.length() >= x)
+								if (lineLength <= x)
 								{
 									break;
 								}
