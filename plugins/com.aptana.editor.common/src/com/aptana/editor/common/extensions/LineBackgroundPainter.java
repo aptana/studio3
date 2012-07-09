@@ -195,8 +195,12 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 					{
 						return false; // don't redraw the highlight line
 					}
-					fLastSelection = selection;
-					return true; // selection changed
+
+					if (overlaps(fCurrentLine, modelCaret))
+					{
+						fLastSelection = selection;
+						return true; // selection changed
+					}
 				}
 				fLastSelection = selection;
 				// Update the current and last lines
