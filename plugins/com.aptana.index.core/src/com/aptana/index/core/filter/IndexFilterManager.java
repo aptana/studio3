@@ -132,7 +132,7 @@ public class IndexFilterManager
 		prefs.put(IPreferenceConstants.FILTERED_INDEX_URIS, value);
 		try
 		{
-			prefs.sync();
+			prefs.flush();
 		}
 		catch (BackingStoreException e1)
 		{
