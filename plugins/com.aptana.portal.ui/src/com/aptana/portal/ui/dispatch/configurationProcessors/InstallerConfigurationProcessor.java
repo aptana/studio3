@@ -22,9 +22,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Display;
-import com.aptana.jetty.util.epl.ajax.JSON;
 import org.osgi.framework.Version;
 
 import com.aptana.configurations.processor.AbstractConfigurationProcessor;
@@ -34,8 +31,10 @@ import com.aptana.core.util.InputStreamGobbler;
 import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.VersionUtil;
 import com.aptana.ide.core.io.downloader.DownloadManager;
+import com.aptana.jetty.util.epl.ajax.JSON;
 import com.aptana.portal.ui.IPortalPreferences;
 import com.aptana.portal.ui.PortalUIPlugin;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * Basic, abstract implementation, of a processor that deals with installing software.
@@ -247,13 +246,7 @@ public abstract class InstallerConfigurationProcessor extends AbstractConfigurat
 	 */
 	public void displayMessageInUIThread(final int kind, final String title, final String message)
 	{
-		Display.getDefault().syncExec(new Runnable()
-		{
-			public void run()
-			{
-				MessageDialog.open(kind, null, title, message, SWT.NONE);
-			}
-		});
+		UIUtils.showMessageDialogFromBgThread(kind, title, message, null);
 	}
 
 	/**
