@@ -366,11 +366,11 @@ public class SubmitTicketDialog extends TitleAreaDialog
 	}
 
 	@Override
-	protected Control createButtonBar(Composite parent)
+	protected void createButtonsForButtonBar(Composite parent)
 	{
-		Control buttons = super.createButtonBar(parent);
+		createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL, false);
+		createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
 		getButton(IDialogConstants.OK_ID).setEnabled(false);
-		return buttons;
 	}
 
 	@Override
