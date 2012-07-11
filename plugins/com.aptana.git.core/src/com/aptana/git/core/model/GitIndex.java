@@ -37,6 +37,7 @@ import org.eclipse.core.runtime.jobs.Job;
 
 import com.aptana.core.IFilter;
 import com.aptana.core.IMap;
+import com.aptana.core.ShellExecutable;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.CollectionsUtil;
@@ -476,7 +477,8 @@ public class GitIndex
 		{
 			commitMessage = commitMessage.replace("\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		IStatus result = repository.execute(GitRepository.ReadWrite.WRITE, "commit", "-m", commitMessage); //$NON-NLS-1$ //$NON-NLS-2$
+		IStatus result = repository.execute(GitRepository.ReadWrite.WRITE, repository.workingDirectory(),
+				ShellExecutable.getEnvironment(repository.workingDirectory()), "commit", "-m", commitMessage); //$NON-NLS-1$ //$NON-NLS-2$
 		return result != null && result.isOK();
 	}
 
@@ -554,7 +556,8 @@ public class GitIndex
 		{
 			try
 			{
-				return IOUtil.read(new FileInputStream(workingDirectory().append(file.path).toFile()), IOUtil.UTF_8); // $codepro.audit.disable closeWhereCreated
+				return IOUtil.read(new FileInputStream(workingDirectory().append(file.path).toFile()), IOUtil.UTF_8); // $codepro.audit.disable
+																														// closeWhereCreated
 			}
 			catch (FileNotFoundException e)
 			{
