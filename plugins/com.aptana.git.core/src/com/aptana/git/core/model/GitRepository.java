@@ -1286,7 +1286,8 @@ public class GitRepository
 
 		try
 		{
-			return IOUtil.read(new FileInputStream(gitFile(CONFIG_FILENAME))); // $codepro.audit.disable closeWhereCreated
+			return IOUtil.read(new FileInputStream(gitFile(CONFIG_FILENAME))); // $codepro.audit.disable
+																				// closeWhereCreated
 		}
 		catch (FileNotFoundException e)
 		{
@@ -1462,7 +1463,7 @@ public class GitRepository
 		return execute(readOrWrite, workingDirectory(), GitExecutable.getEnvironment(), args);
 	}
 
-	private IStatus execute(ReadWrite readOrWrite, IPath workingDir, Map<String, String> env, String... args)
+	IStatus execute(ReadWrite readOrWrite, IPath workingDir, Map<String, String> env, String... args)
 	{
 		boolean acquired = false;
 		switch (readOrWrite)
