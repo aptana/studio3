@@ -15,6 +15,7 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
 import org.eclipse.ui.IEditorPart;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.contentassist.CommonTextHover;
 import com.aptana.editor.common.hover.CustomBrowserInformationControl;
 import com.aptana.editor.css.parsing.ast.CSSSimpleSelectorNode;
@@ -101,10 +102,14 @@ public class CSSElementSelectorHover extends CommonTextHover implements ITextHov
 		{
 			CSSSimpleSelectorNode node = (CSSSimpleSelectorNode) activeNode;
 			// Verify that this is an HTML element selector
-			ElementElement element = new HTMLIndexQueryHelper().getElement(node.getTypeSelector().toLowerCase());
-			if (element != null)
+			String typeSelector = node.getTypeSelector();
+			if (!StringUtil.isEmpty(typeSelector))
 			{
-				return new Region(node.getStartingOffset(), node.getLength());
+				ElementElement element = new HTMLIndexQueryHelper().getElement(typeSelector.toLowerCase());
+				if (element != null)
+				{
+					return new Region(node.getStartingOffset(), node.getLength());
+				}
 			}
 		}
 
@@ -116,5 +121,4 @@ public class CSSElementSelectorHover extends CommonTextHover implements ITextHov
 	{
 		// do nothing for now
 	}
-
 }

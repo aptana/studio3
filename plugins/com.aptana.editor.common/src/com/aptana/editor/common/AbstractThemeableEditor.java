@@ -827,11 +827,16 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	@Override
 	protected void handlePreferenceStoreChanged(PropertyChangeEvent event)
 	{
+		super.handlePreferenceStoreChanged(event);
+		if (this.fThemeableEditorColorsExtension == null)
+		{
+			return;
+		}
+		this.fThemeableEditorColorsExtension.handlePreferenceStoreChanged(event);
+
 		// Add case when the global editor settings have changed
 		String property = event.getProperty();
 
-		super.handlePreferenceStoreChanged(event);
-		this.fThemeableEditorColorsExtension.handlePreferenceStoreChanged(event);
 		if (property.equals(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_LINE_NUMBER_RULER))
 		{
 			((CommonLineNumberChangeRulerColumn) fLineNumberRulerColumn).showLineNumbers(isLineNumberVisible());
@@ -1105,7 +1110,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	{
 		synchronized (modificationStampLock)
 		{
-			//Reset our cache when a new input is set.
+			// Reset our cache when a new input is set.
 			lastModificationStamp = IDocumentExtension4.UNKNOWN_MODIFICATION_STAMP;
 			lastAstForModificationStamp = null;
 

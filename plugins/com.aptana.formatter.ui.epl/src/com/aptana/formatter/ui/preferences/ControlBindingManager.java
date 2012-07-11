@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.StringUtil;
 import com.aptana.formatter.IDebugScopes;
 import com.aptana.formatter.preferences.IFieldValidator;
 import com.aptana.formatter.preferences.IPreferenceDelegate;
@@ -408,7 +409,10 @@ public class ControlBindingManager
 			final Spinner spinner = it.next();
 			final Object key = spinnerControls.get(spinner);
 			String value = preferenceDelegate.getString(key);
-			spinner.setSelection(Integer.parseInt(value));
+			if (!StringUtil.isEmpty(value))
+			{
+				spinner.setSelection(Integer.parseInt(value));
+			}
 		}
 	}
 
