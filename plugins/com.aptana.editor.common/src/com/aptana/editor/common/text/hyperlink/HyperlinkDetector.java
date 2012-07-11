@@ -8,6 +8,7 @@
 package com.aptana.editor.common.text.hyperlink;
 
 import java.net.URI;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +25,7 @@ import org.eclipse.ui.IEditorPart;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.IDebugScopes;
 import com.aptana.editor.common.outline.PathResolverProvider;
 import com.aptana.editor.common.resolver.IPathResolver;
 
@@ -87,7 +89,9 @@ public class HyperlinkDetector extends URLHyperlinkDetector
 			}
 			catch (Exception e)
 			{
-				IdeLog.logWarning(CommonEditorPlugin.getDefault(), e);
+				IdeLog.logInfo(CommonEditorPlugin.getDefault(),
+						MessageFormat.format("Failed to resolve ''{0}'' as hyperlink url", value), e, //$NON-NLS-1$
+						IDebugScopes.DEBUG);
 			}
 			return null;
 		}

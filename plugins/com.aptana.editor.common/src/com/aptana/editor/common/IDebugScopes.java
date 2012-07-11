@@ -15,6 +15,12 @@ package com.aptana.editor.common;
  */
 public interface IDebugScopes
 {
+
+	/**
+	 * General debug scope
+	 */
+	String DEBUG = CommonEditorPlugin.PLUGIN_ID + "/debug"; //$NON-NLS-1$
+
 	/**
 	 * Items related to the presentation process
 	 */

@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.URI;
+import java.text.MessageFormat;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
@@ -23,6 +24,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.IDebugScopes;
 
 /**
  * Resolves paths that may be relative to a base URI (filesystem, remote, etc)
@@ -125,7 +127,8 @@ public class URIResolver implements IPathResolver
 		}
 		catch (CoreException e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
+			IdeLog.logInfo(CommonEditorPlugin.getDefault(),
+					MessageFormat.format("Failed to resolve ''{0}'' as hyperlink url", path), e, IDebugScopes.DEBUG); //$NON-NLS-1$
 		}
 
 		return null;
