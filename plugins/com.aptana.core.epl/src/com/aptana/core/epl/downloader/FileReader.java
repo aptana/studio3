@@ -122,8 +122,9 @@ public final class FileReader extends FileTransferJob implements IFileTransferLi
 					return Status.CANCEL_STATUS;
 				}
 				if (theMonitor != null && theMonitor.isCanceled())
-					if (connectEvent != null)
-						connectEvent.cancel();
+				{
+					return Status.CANCEL_STATUS;
+				}
 			}
 			return Status.OK_STATUS;
 		}
@@ -192,14 +193,7 @@ public final class FileReader extends FileTransferJob implements IFileTransferLi
 			{
 				if (theMonitor.isCanceled())
 				{
-					try
-					{
-						source.cancel();
-					}
-					catch (Exception e)
-					{
-						// ignores the exception generated when canceling
-					}
+					completeTransfer(event);
 					return;
 				}
 
@@ -224,13 +218,23 @@ public final class FileReader extends FileTransferJob implements IFileTransferLi
 		}
 		else if (event instanceof IIncomingFileTransferReceiveDoneEvent)
 		{
-			if (closeStreamWhenFinished)
-				hardClose(theOutputStream);
-
-			if (exception == null)
-				exception = ((IIncomingFileTransferReceiveDoneEvent) event).getException();
-			onDone(((IIncomingFileTransferReceiveDoneEvent) event).getSource());
+			completeTransfer(event);
 		}
+	}
+
+	protected void completeTransfer(IFileTransferEvent event)
+	{
+		if (closeStreamWhenFinished)
+		{
+			hardClose(theOutputStream);
+		}
+
+		if (exception == null && event instanceof IIncomingFileTransferReceiveDoneEvent)
+		{
+			exception = ((IIncomingFileTransferReceiveDoneEvent) event).getException();
+		}
+
+		onDone(((IIncomingFileTransferEvent) event).getSource());
 	}
 
 	public InputStream read(URI url, final IProgressMonitor monitor) throws CoreException, IOException
