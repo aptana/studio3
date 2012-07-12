@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -26,6 +26,7 @@ import org.eclipse.ui.ide.IDE;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.URLEncoder;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.IDebugScopes;
 
 public class URIHyperlink extends URLHyperlink
 {
@@ -73,7 +74,8 @@ public class URIHyperlink extends URLHyperlink
 		}
 		catch (Exception e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
+			IdeLog.logInfo(CommonEditorPlugin.getDefault(),
+					MessageFormat.format("Unable to open the url ''{0}'' in an editor", uri), e, IDebugScopes.DEBUG); //$NON-NLS-1$
 			if (wrapped)
 			{
 				super.open();
