@@ -10,10 +10,11 @@ public class InternalBuildTests extends TestCase
 	public static Test suite()
 	{
 		TestSuite suite = new TestSuite(InternalBuildTests.class.getName());
-		//$JUnit-BEGIN$
+		// $JUnit-BEGIN$
+		suite.addTestSuite(BuildParticipantWorkingCopyTest.class);
 		suite.addTestSuite(BuildParticipantManagerTest.class);
 		suite.addTestSuite(IndexBuildParticipantTest.class);
-		//$JUnit-END$
+		// $JUnit-END$
 		return suite;
 	}
 
