@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -283,7 +283,7 @@ public class OpenTagCloser implements VerifyKeyListener
 			toCheck = toCheck.substring(0, toCheck.length() - 1);
 		}
 		// Don't close self-closing tags, or tags with no tag name in them
-		if (tagContents.length() == 0 || toCheck.charAt(0) == '/')
+		if (tagContents.length() == 0 || toCheck.length() == 0 || toCheck.charAt(0) == '/')
 		{
 			return null;
 		}
