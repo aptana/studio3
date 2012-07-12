@@ -12,7 +12,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 
-import com.aptana.core.build.AbstractBuildParticipant;
+import com.aptana.core.build.IBuildParticipant;
 import com.aptana.core.build.IProblem;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.JSPlugin;
@@ -22,7 +22,7 @@ public class JSStyleValidatorTest extends JSLintValidatorTest
 {
 
 	@Override
-	protected AbstractBuildParticipant createValidator()
+	protected IBuildParticipant createValidator()
 	{
 		return new JSStyleValidator()
 		{

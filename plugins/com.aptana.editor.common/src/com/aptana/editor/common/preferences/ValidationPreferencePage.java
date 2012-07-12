@@ -7,13 +7,10 @@
  */
 package com.aptana.editor.common.preferences;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -23,13 +20,10 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.IInputValidator;
-import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferencePageContainer;
@@ -44,52 +38,48 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
-import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
 
+import com.aptana.build.ui.BuildUIPlugin;
+import com.aptana.build.ui.preferences.IBuildParticipantPreferenceCompositeFactory;
 import com.aptana.buildpath.core.BuildPathCorePlugin;
 import com.aptana.core.IFilter;
 import com.aptana.core.IMap;
-import com.aptana.core.build.AbstractBuildParticipant;
 import com.aptana.core.build.IBuildParticipant;
 import com.aptana.core.build.IBuildParticipantManager;
-import com.aptana.core.util.ArrayUtil;
+import com.aptana.core.build.IBuildParticipantWorkingCopy;
 import com.aptana.core.util.CollectionsUtil;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
-import com.aptana.index.core.build.BuildContext;
 import com.aptana.ui.util.UIUtils;
-import com.aptana.ui.widgets.CListTable;
 
 public class ValidationPreferencePage extends PreferencePage implements IWorkbenchPreferencePage
 {
 
-	// TODO Move this to a buildpath.ui plugin!
+	// TODO Move this class to the build.ui plugin. Not sure how we'd handle doing the forced reconcile.
 	/**
 	 * Property names for columns.
 	 */
@@ -97,10 +87,11 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 	private static final String BUILD = "build"; //$NON-NLS-1$
 	private static final String RECONCILE = "reconcile"; //$NON-NLS-1$
 
-	private ListViewer contentTypesViewer;
 	private TableViewer validatorsViewer;
-	private CListTable filterViewer;
-	private List<ParticipantChanges> participants;
+	private Control filterComp;
+
+	private List<IBuildParticipantWorkingCopy> participants;
+	private Composite sash;
 
 	private final class ApplyChangesAndBuildJob extends Job
 	{
@@ -133,9 +124,9 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 
 				sub.subTask(Messages.ValidationPreferencePage_ApplyingChangesToParticipants);
 				// apply the changes in participants!
-				for (ParticipantChanges change : participants)
+				for (IBuildParticipantWorkingCopy change : participants)
 				{
-					change.apply();
+					change.doSave();
 				}
 				sub.worked(10);
 
@@ -217,178 +208,35 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 		}
 	}
 
-	private class ParticipantChanges implements IBuildParticipant
-	{
-		private IBuildParticipant wrapped;
-		private Boolean enabledForBuild;
-		private Boolean enabledForReconcile;
-		private List<String> filters;
-		private IScopeContext context;
-
-		public ParticipantChanges(IBuildParticipant wrapped)
-		{
-			this.wrapped = wrapped;
-		}
-
-		public void clean(IProject project, IProgressMonitor monitor)
-		{
-			wrapped.clean(project, monitor);
-		}
-
-		public void buildStarting(IProject project, int kind, IProgressMonitor monitor)
-		{
-			wrapped.buildStarting(project, kind, monitor);
-		}
-
-		public void buildEnding(IProgressMonitor monitor)
-		{
-			wrapped.buildEnding(monitor);
-		}
-
-		public int getPriority()
-		{
-			return wrapped.getPriority();
-		}
-
-		public void buildFile(BuildContext context, IProgressMonitor monitor)
-		{
-			wrapped.buildFile(context, monitor);
-		}
-
-		public void deleteFile(BuildContext context, IProgressMonitor monitor)
-		{
-			wrapped.deleteFile(context, monitor);
-		}
-
-		public Set<IContentType> getContentTypes()
-		{
-			return wrapped.getContentTypes();
-		}
-
-		public String getName()
-		{
-			return wrapped.getName();
-		}
-
-		public String getId()
-		{
-			return wrapped.getId();
-		}
-
-		public boolean isEnabled(BuildType type)
-		{
-			switch (type)
-			{
-				case BUILD:
-					if (enabledForBuild != null)
-					{
-						return enabledForBuild;
-					}
-					break;
-
-				case RECONCILE:
-					if (enabledForReconcile != null)
-					{
-						return enabledForReconcile;
-					}
-					break;
-
-				default:
-					break;
-			}
-			return wrapped.isEnabled(type);
-		}
-
-		public void setEnabled(BuildType type, boolean enabled)
-		{
-			switch (type)
-			{
-				case BUILD:
-					enabledForBuild = enabled;
-					break;
-
-				case RECONCILE:
-					enabledForReconcile = enabled;
-					break;
-				default:
-					break;
-			}
-		}
-
-		public void restoreDefaults()
-		{
-			wrapped.restoreDefaults();
-			enabledForBuild = null;
-			enabledForReconcile = null;
-			filters = null;
-		}
-
-		public boolean isRequired()
-		{
-			return wrapped.isRequired();
-		}
-
-		public List<String> getFilters()
-		{
-			if (filters != null)
-			{
-				return filters;
-			}
-			return wrapped.getFilters();
-		}
-
-		public boolean isEnabled(IProject project)
-		{
-			return wrapped.isEnabled(project);
-		}
-
-		public void setFilters(IScopeContext context, String... filters)
-		{
-			this.context = context;
-			this.filters = CollectionsUtil.newList(filters);
-		}
-
-		public boolean needsRebuild()
-		{
-			return enabledForBuild != null || (filters != null && wrapped.isEnabled(BuildType.BUILD));
-		}
-
-		public void apply()
-		{
-			if (enabledForBuild != null)
-			{
-				wrapped.setEnabled(BuildType.BUILD, enabledForBuild);
-				enabledForBuild = null;
-			}
-			if (enabledForReconcile != null)
-			{
-				wrapped.setEnabled(BuildType.RECONCILE, enabledForReconcile);
-				enabledForReconcile = null;
-			}
-			if (filters != null)
-			{
-				((AbstractBuildParticipant) wrapped).setFilters(context, filters.toArray(new String[filters.size()]));
-				filters = null;
-				context = null;
-			}
-
-		}
-
-		public boolean needsReconcile()
-		{
-			return enabledForReconcile != null || (filters != null && wrapped.isEnabled(BuildType.RECONCILE));
-		}
-	}
-
 	public ValidationPreferencePage()
 	{
 		super();
-		this.participants = CollectionsUtil.map(getBuildParticipantManager().getAllBuildParticipants(),
-				new IMap<IBuildParticipant, ParticipantChanges>()
+
+		List<IBuildParticipant> participants = getBuildParticipantManager().getAllBuildParticipants();
+		// TODO Filter out all the participants that are required and have no name
+		participants = CollectionsUtil.filter(participants, new IFilter<IBuildParticipant>()
+		{
+			public boolean include(IBuildParticipant item)
+			{
+				return !item.isRequired() && !StringUtil.isEmpty(item.getName());
+			}
+		});
+		// Now sort them by name
+		Collections.sort(participants, new Comparator<IBuildParticipant>()
+		{
+			public int compare(IBuildParticipant o1, IBuildParticipant o2)
+			{
+				return StringUtil.compare(o1.getName(), o2.getName());
+			}
+		});
+
+		// Now map them into objects we can track changes on
+		this.participants = CollectionsUtil.map(participants,
+				new IMap<IBuildParticipant, IBuildParticipantWorkingCopy>()
 				{
-					public ParticipantChanges map(IBuildParticipant item)
+					public IBuildParticipantWorkingCopy map(IBuildParticipant item)
 					{
-						return new ParticipantChanges(item);
+						return item.getWorkingCopy();
 					}
 				});
 	}
@@ -401,66 +249,37 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 	@Override
 	protected Control createContents(Composite parent)
 	{
-		SashForm sash = new SashForm(parent, SWT.HORIZONTAL);
+		sash = new Composite(parent, SWT.NONE);
+		sash.setLayout(new GridLayout());
 		sash.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 
-		// the left side
-		contentTypesViewer = new ListViewer(sash, SWT.BORDER | SWT.SINGLE);
-		contentTypesViewer.getControl().setLayoutData(GridDataFactory.fillDefaults().create());
-		contentTypesViewer.setContentProvider(ArrayContentProvider.getInstance());
-		contentTypesViewer.setLabelProvider(new LabelProvider()
-		{
+		Control validators = createValidators(sash);
+		validators.setLayoutData(GridDataFactory.fillDefaults().create());
 
-			@Override
-			public String getText(Object element)
-			{
-				if (element instanceof IContentType)
-				{
-					return ((IContentType) element).getName();
-				}
-				return super.getText(element);
-			}
-		});
-		// Filter out content types that have no optional participants
-		contentTypesViewer.addFilter(new EmptyContentTypeParticipantListFilter());
-
-		List<IContentType> contentTypes = new ArrayList<IContentType>(getContentTypes());
-		Collections.sort(contentTypes, new Comparator<IContentType>()
-		{
-
-			public int compare(IContentType o1, IContentType o2)
-			{
-				return o1.getName().compareToIgnoreCase(o2.getName());
-			}
-		});
-		contentTypesViewer.setInput(contentTypes);
-
-		contentTypesViewer.addSelectionChangedListener(new ISelectionChangedListener()
-		{
-
-			public void selectionChanged(SelectionChangedEvent event)
-			{
-				// updates the validators and filter expressions to the newly selected language
-				if (validatorsViewer != null)
-				{
-					updateValidators();
-					updateFilterExpressions();
-				}
-			}
-		});
-
-		// the right side
-		Composite rightComp = new Composite(sash, SWT.NONE);
-		rightComp.setLayout(GridLayoutFactory.fillDefaults().create());
-
-		Control validators = createValidators(rightComp);
-		validators.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
-
-		Control filter = createFiltersComposite(rightComp);
-		filter.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
-
-		sash.setWeights(new int[] { 1, 3 });
+		createFiltersComposite();
 		return sash;
+	}
+
+	/**
+	 * Dynamically replaces the composite containing the options for a given participant.
+	 */
+	private void createFiltersComposite()
+	{
+		if ((filterComp != null) && (!filterComp.isDisposed()))
+		{
+			filterComp.dispose();
+		}
+		filterComp = getBuildParticipantPreferenceCompositeFactory().createPreferenceComposite(sash,
+				getSelectedBuildParticipant());
+		filterComp.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
+
+		getShell().pack(true);
+		sash.layout(true);
+	}
+
+	protected IBuildParticipantPreferenceCompositeFactory getBuildParticipantPreferenceCompositeFactory()
+	{
+		return BuildUIPlugin.getDefault().getBuildParticipantPreferenceCompositeFactory();
 	}
 
 	protected IBuildParticipantManager getBuildParticipantManager()
@@ -504,7 +323,7 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 
 	private boolean needsReconcile()
 	{
-		for (ParticipantChanges change : participants)
+		for (IBuildParticipantWorkingCopy change : participants)
 		{
 			if (change.needsReconcile())
 			{
@@ -538,7 +357,7 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 	 */
 	private boolean promptForRebuild()
 	{
-		for (ParticipantChanges change : participants)
+		for (IBuildParticipantWorkingCopy change : participants)
 		{
 			if (change.needsRebuild())
 			{
@@ -552,21 +371,16 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 	{
 		Group group = new Group(parent, SWT.NONE);
 		group.setText(Messages.ValidationPreferencePage_LBL_Validators);
-		group.setLayout(GridLayoutFactory.fillDefaults().margins(4, 4).create());
-
-		Label label = new Label(group, SWT.WRAP);
-		label.setLayoutData(GridDataFactory.fillDefaults().hint(300, 70).create());
-		label.setText(Messages.ValidationPreferencePage_EnablingValidatorWarning);
+		group.setLayout(GridLayoutFactory.swtDefaults().margins(4, 4).create());
 
 		Table table = new Table(group, SWT.SINGLE | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
-
-		GridData gridData = new GridData(GridData.FILL_BOTH);
-		gridData.grabExcessVerticalSpace = true;
-		gridData.horizontalSpan = 3;
-		table.setLayoutData(gridData);
-
+		table.setLayoutData(GridDataFactory.fillDefaults().hint(300, 70).grab(true, false).create());
 		table.setLinesVisible(true);
 		table.setHeaderVisible(true);
+
+		ControlDecoration decoration = new ControlDecoration(group, SWT.TOP | SWT.CENTER);
+		decoration.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_LCL_LINKTO_HELP));
+		decoration.setDescriptionText(Messages.ValidationPreferencePage_EnablingValidatorWarning);
 
 		// set up columns
 		// Name column
@@ -614,178 +428,24 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 		});
 
 		// Now set input
-		updateValidators();
+		validatorsViewer.setInput(this.participants);
 
 		return group;
 	}
 
-	private Control createFiltersComposite(Composite parent)
-	{
-		Group group = new Group(parent, SWT.NONE);
-		group.setText(Messages.ValidationPreferencePage_LBL_Filter);
-		group.setLayout(GridLayoutFactory.fillDefaults().margins(4, 4).create());
-
-		filterViewer = new CListTable(group, SWT.NONE);
-		filterViewer.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
-		filterViewer.setDescription(Messages.ValidationPreferencePage_Filter_SelectParticipant);
-		final IInputValidator inputValidator = new IInputValidator()
-		{
-
-			public String isValid(String newText)
-			{
-				if (StringUtil.isEmpty(newText))
-				{
-					return Messages.ValidationPreferencePage_ERR_EmptyExpression;
-				}
-				return null;
-			}
-		};
-		filterViewer.addListener(new CListTable.Listener()
-		{
-
-			public Object addItem()
-			{
-				InputDialog dialog = new InputDialog(getShell(), Messages.ValidationPreferencePage_Ignore_Title,
-						Messages.ValidationPreferencePage_Ignore_Message, null, inputValidator);
-				if (dialog.open() == Window.OK)
-				{
-					return dialog.getValue();
-				}
-				return null;
-			}
-
-			public Object editItem(Object item)
-			{
-				String expression = item.toString();
-				InputDialog dialog = new InputDialog(getShell(), Messages.ValidationPreferencePage_Ignore_Title,
-						Messages.ValidationPreferencePage_Ignore_Message, expression, inputValidator);
-				if (dialog.open() == Window.OK)
-				{
-					return dialog.getValue();
-				}
-				// the dialog is canceled; returns the original item
-				return item;
-			}
-
-			public void itemsChanged(List<Object> rawFilters)
-			{
-				// Store the new filter expressions in our temporary copy
-				@SuppressWarnings("cast")
-				ParticipantChanges participant = (ParticipantChanges) getSelectedBuildParticipant();
-				String[] filters = new String[rawFilters.size()];
-				int i = 0;
-				for (Object item : rawFilters)
-				{
-					filters[i++] = item.toString();
-				}
-				participant.setFilters(EclipseUtil.instanceScope(), filters);
-			}
-		});
-		filterViewer.setEnabled(false);
-
-		return group;
-	}
-
-	protected Set<IContentType> getContentTypes()
-	{
-		return getBuildParticipantManager().getContentTypes();
-	}
-
-	private void updateValidators()
-	{
-		IContentType selected = getSelectedContentType();
-		if (selected == null)
-		{
-			validatorsViewer.setInput(Collections.emptyList());
-		}
-		else
-		{
-			validatorsViewer.setInput(getBuildParticipants(selected.getId()));
-		}
-	}
-
-	private List<IBuildParticipant> getBuildParticipants(String contentTypeId)
-	{
-		List<IBuildParticipant> participantsForContentType = getBuildParticipantManager().filterParticipants(
-				this.participants, contentTypeId);
-		// removes the ones that don't have a name defined
-		return CollectionsUtil.filter(participantsForContentType, new IFilter<IBuildParticipant>()
-		{
-
-			public boolean include(IBuildParticipant participant)
-			{
-				return !StringUtil.isEmpty(participant.getName());
-			}
-		});
-	}
-
-	private ParticipantChanges getSelectedBuildParticipant()
+	private IBuildParticipantWorkingCopy getSelectedBuildParticipant()
 	{
 		IStructuredSelection selection = (IStructuredSelection) validatorsViewer.getSelection();
 		if (selection.isEmpty())
 		{
 			return null;
 		}
-		return (ParticipantChanges) selection.getFirstElement();
+		return (IBuildParticipantWorkingCopy) selection.getFirstElement();
 	}
 
 	private void updateFilterExpressions()
 	{
-		IBuildParticipant participant = getSelectedBuildParticipant();
-		if (participant != null)
-		{
-			filterViewer.setEnabled(true);
-			filterViewer.setDescription(Messages.ValidationPreferencePage_Filter_Description);
-			List<String> expressions = participant.getFilters();
-			filterViewer.setItems(expressions.toArray());
-		}
-		else
-		{
-			filterViewer.setEnabled(false);
-			filterViewer.setDescription(Messages.ValidationPreferencePage_Filter_SelectParticipant);
-			filterViewer.setItems(ArrayUtil.NO_OBJECTS);
-		}
-	}
-
-	private IContentType getSelectedContentType()
-	{
-		IStructuredSelection selection = (IStructuredSelection) contentTypesViewer.getSelection();
-		if (selection.isEmpty())
-		{
-			return null;
-		}
-		return (IContentType) selection.getFirstElement();
-	}
-
-	/**
-	 * This filters the content type list to only those who have at least one non-required build participant (so we can
-	 * change it's enablement).
-	 * 
-	 * @author cwilliams
-	 */
-	private final class EmptyContentTypeParticipantListFilter extends ViewerFilter
-	{
-		@Override
-		public boolean select(Viewer viewer, Object parentElement, Object element)
-		{
-			if (element instanceof IContentType)
-			{
-				IContentType type = (IContentType) element;
-				List<IBuildParticipant> participants = getBuildParticipants(type.getId());
-				if (CollectionsUtil.isEmpty(participants))
-				{
-					return false;
-				}
-				for (IBuildParticipant participant : participants)
-				{
-					if (!participant.isRequired())
-					{
-						return true;
-					}
-				}
-			}
-			return false;
-		}
+		createFiltersComposite();
 	}
 
 	/**
@@ -808,7 +468,7 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 			{
 				element = ((TableItem) element).getData();
 			}
-			IBuildParticipant participant = (IBuildParticipant) element;
+			IBuildParticipantWorkingCopy participant = (IBuildParticipantWorkingCopy) element;
 			if (BUILD.equals(property))
 			{
 				participant.setEnabled(IBuildParticipant.BuildType.BUILD, ((Boolean) value).booleanValue());

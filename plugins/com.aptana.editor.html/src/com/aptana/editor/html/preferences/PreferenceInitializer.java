@@ -11,6 +11,7 @@ import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
 import com.aptana.core.build.IBuildParticipant.BuildType;
+import com.aptana.core.build.PreferenceUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.validator.HTMLParserValidator;
@@ -41,39 +42,12 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		// mark occurrences
 		// prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.EDITOR_MARK_OCCURRENCES, true);
 
-		// Set validator to be on by default for reconcile
-		HTMLTidyValidator tidyValidator = new HTMLTidyValidator()
-		{
-			@Override
-			public String getId()
-			{
-				return ID;
-			}
+		// Set Tidy validator to be on by default for reconcile
+		prefs.putBoolean(PreferenceUtil.getEnablementPreferenceKey(HTMLTidyValidator.ID, BuildType.BUILD), false);
+		prefs.putBoolean(PreferenceUtil.getEnablementPreferenceKey(HTMLTidyValidator.ID, BuildType.RECONCILE), true);
 
-			@Override
-			protected String getPreferenceNode()
-			{
-				return HTMLPlugin.PLUGIN_ID;
-			}
-		};
-		prefs.putBoolean(tidyValidator.getEnablementPreferenceKey(BuildType.BUILD), false);
-		prefs.putBoolean(tidyValidator.getEnablementPreferenceKey(BuildType.RECONCILE), true);
-
-		HTMLParserValidator parseValidator = new HTMLParserValidator()
-		{
-			@Override
-			public String getId()
-			{
-				return ID;
-			}
-
-			@Override
-			protected String getPreferenceNode()
-			{
-				return HTMLPlugin.PLUGIN_ID;
-			}
-		};
-		prefs.putBoolean(parseValidator.getEnablementPreferenceKey(BuildType.BUILD), true);
-		prefs.putBoolean(parseValidator.getEnablementPreferenceKey(BuildType.RECONCILE), true);
+		// Set Parser Errors to be on by default for both
+		prefs.putBoolean(PreferenceUtil.getEnablementPreferenceKey(HTMLParserValidator.ID, BuildType.BUILD), true);
+		prefs.putBoolean(PreferenceUtil.getEnablementPreferenceKey(HTMLParserValidator.ID, BuildType.RECONCILE), true);
 	}
 }

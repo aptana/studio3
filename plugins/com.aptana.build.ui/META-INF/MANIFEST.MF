@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %Bundle-Name
+Bundle-SymbolicName: com.aptana.build.ui;singleton:=true
+Bundle-Version: 3.0.0.qualifier
+Bundle-Activator: com.aptana.build.ui.BuildUIPlugin
+Bundle-Vendor: %Bundle-Vendor
+Require-Bundle: org.eclipse.core.runtime,
+ com.aptana.buildpath.core;visibility:=reexport,
+ com.aptana.core,
+ org.eclipse.ui,
+ com.aptana.ui
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-ActivationPolicy: lazy
+Export-Package: com.aptana.build.ui,
+ com.aptana.build.ui.preferences

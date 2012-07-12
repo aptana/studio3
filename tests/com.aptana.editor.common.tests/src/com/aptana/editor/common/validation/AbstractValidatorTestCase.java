@@ -22,7 +22,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 
 import com.aptana.core.IFilter;
 import com.aptana.core.IMap;
-import com.aptana.core.build.AbstractBuildParticipant;
+import com.aptana.core.build.IBuildParticipant;
 import com.aptana.core.build.IProblem;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
@@ -33,7 +33,7 @@ import com.aptana.parsing.IParseState;
 public abstract class AbstractValidatorTestCase extends TestCase
 {
 
-	protected AbstractBuildParticipant fValidator;
+	protected IBuildParticipant fValidator;
 
 	@Override
 	protected void setUp() throws Exception
@@ -45,11 +45,15 @@ public abstract class AbstractValidatorTestCase extends TestCase
 	@Override
 	protected void tearDown() throws Exception
 	{
-		fValidator = null;
+		if (fValidator != null)
+		{
+			fValidator.restoreDefaults();
+			fValidator = null;
+		}
 		super.tearDown();
 	}
 
-	protected abstract AbstractBuildParticipant createValidator();
+	protected abstract IBuildParticipant createValidator();
 
 	protected List<IProblem> getParseErrors(String source, IParseState ps, String markerType) throws CoreException
 	{

@@ -300,5 +300,12 @@
             id="com.aptana.editor.js.contentMergeViewer">
       </viewer>
    </extension>
+   <extension
+         point="com.aptana.build.ui.buildParticipantPreferenceComposite">
+      <preferenceComposite
+            buildParticipantId="com.aptana.editor.js.validator.JSLintValidator"
+            class="com.aptana.editor.js.validator.JSLintValidatorPreferenceCompositeFactory">
+      </preferenceComposite>
+   </extension>
 
 </plugin>

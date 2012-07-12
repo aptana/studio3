@@ -136,7 +136,7 @@ public class JSLocationIdentifier extends JSTreeWalker
 			// set containing statement
 			this._statementNode = ((JSNode) this._targetNode).getContainingStatementNode();
 
-			// NOTE: We can't simply grab the AST since this will fail with JS
+			// NOTE: We can't simply grab the AST since this will fail when JS
 			// is embedded in other languages. In those cases, we'll get the
 			// root node for the host language and not for JS
 
