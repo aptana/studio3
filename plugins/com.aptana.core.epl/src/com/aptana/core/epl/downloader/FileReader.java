@@ -8,6 +8,7 @@
  *  Contributors:
  * 	Cloudsmith Inc - initial API and implementation
  * 	IBM Corporation - ongoing development
+ *  Appcelerator - deadlock fix 2012
  ******************************************************************************/
 package com.aptana.core.epl.downloader;
 
