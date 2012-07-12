@@ -12,13 +12,13 @@ import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
@@ -34,17 +34,21 @@ import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
+import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.buildpath.core.BuildPathCorePlugin;
 import com.aptana.core.IFilter;
 import com.aptana.core.build.AbstractBuildParticipant;
 import com.aptana.core.build.IProblem;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StreamUtil;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.index.core.build.BuildContext;
+import com.aptana.jetty.util.epl.ajax.JSON;
 
 /**
  * Runs the code against JSLint inside Rhino, then parses out the reported errors/warnings.
@@ -54,6 +58,11 @@ import com.aptana.index.core.build.BuildContext;
 public class JSLintValidator extends AbstractBuildParticipant
 {
 	/**
+	 * Preference key used to store the JSLint options as JSON.
+	 */
+	public static final String JS_LINT_OPTIONS = "jsLintOptions"; //$NON-NLS-1$
+
+	/**
 	 * The unique ID of this validator/build participant.
 	 */
 	public static final String ID = "com.aptana.editor.js.validator.JSLintValidator"; //$NON-NLS-1$
@@ -62,24 +71,6 @@ public class JSLintValidator extends AbstractBuildParticipant
 	private static JSLint JS_LINT_SCRIPT;
 
 	private static ContextFactory contextFactory = new ContextFactory();
-
-	private static Map<String, Object> DEFAULT_OPTION = new HashMap<String, Object>();
-	static
-	{
-		// Set default aptana options
-		DEFAULT_OPTION.put("laxLineEnd", true); //$NON-NLS-1$
-		DEFAULT_OPTION.put("undef", true); //$NON-NLS-1$
-		DEFAULT_OPTION.put("browser", true); //$NON-NLS-1$
-		DEFAULT_OPTION.put("jscript", true); //$NON-NLS-1$
-		DEFAULT_OPTION.put("debug", true); //$NON-NLS-1$
-		DEFAULT_OPTION.put("maxerr", 100000); //$NON-NLS-1$
-		DEFAULT_OPTION.put("white", true); //$NON-NLS-1$
-		DEFAULT_OPTION.put(
-				"predef", new NativeArray(new String[] { "Ti", "Titanium", "alert", "require", "exports", "native", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
-						"implements" })); //$NON-NLS-1$
-	}
-
-	private Map<String, Object> options;
 
 	public JSLintValidator()
 	{
@@ -93,7 +84,6 @@ public class JSLintValidator extends AbstractBuildParticipant
 			return;
 		}
 
-		intializeOptions();
 		List<IProblem> problems = Collections.emptyList();
 		String sourcePath = context.getURI().toString();
 		try
@@ -106,7 +96,6 @@ public class JSLintValidator extends AbstractBuildParticipant
 					MessageFormat.format("Failed to parse {0} with JSLint", sourcePath), e); //$NON-NLS-1$
 		}
 
-		this.options = null;
 		context.putProblems(IJSConstants.JSLINT_PROBLEM_MARKER_TYPE, problems);
 	}
 
@@ -128,7 +117,7 @@ public class JSLintValidator extends AbstractBuildParticipant
 			return Collections.emptyList();
 		}
 
-		script.runLint(source, this.options);
+		script.runLint(source, getOptions());
 
 		List<IProblem> collected = script.getProblems(source, path);
 		final List<String> filters = getFilters();
@@ -190,21 +179,6 @@ public class JSLintValidator extends AbstractBuildParticipant
 		finally
 		{
 			Context.exit();
-		}
-	}
-
-	public void setOption(String propertyName, Object value)
-	{
-		intializeOptions();
-		this.options.put(propertyName, value);
-	}
-
-	private void intializeOptions()
-	{
-		if (this.options == null)
-		{
-			this.options = new HashMap<String, Object>();
-			this.options.putAll(DEFAULT_OPTION);
 		}
 	}
 
@@ -409,5 +383,49 @@ public class JSLintValidator extends AbstractBuildParticipant
 		{
 			return Collections.unmodifiableList(items);
 		}
+	}
+
+	/**
+	 * @deprecated Remove as this is only used by testing, and we should be able to set the options in another way!
+	 * @param optionsAsJSON
+	 * @throws IllegalStateException
+	 *             if the JSON is un-parseable.
+	 */
+	protected void setJSONOptions(String optionsAsJSON) throws IllegalStateException
+	{
+		JSON.parse(optionsAsJSON);
+		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(getPreferenceNode());
+		prefs.put(JS_LINT_OPTIONS, optionsAsJSON);
+		try
+		{
+			prefs.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			IdeLog.logError(BuildPathCorePlugin.getDefault(), e);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private Map<String, Object> getOptions()
+	{
+		return (Map<String, Object>) JSON.parse(getPreferenceString(JS_LINT_OPTIONS));
+	}
+
+	@Override
+	public void restoreDefaults()
+	{
+		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(getPreferenceNode());
+		prefs.remove(JS_LINT_OPTIONS);
+		try
+		{
+			prefs.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			IdeLog.logError(BuildPathCorePlugin.getDefault(), e);
+		}
+
+		super.restoreDefaults();
 	}
 }

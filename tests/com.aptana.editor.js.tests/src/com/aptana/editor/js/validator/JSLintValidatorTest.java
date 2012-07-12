@@ -9,18 +9,21 @@ package com.aptana.editor.js.validator;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 
-import com.aptana.core.build.AbstractBuildParticipant;
+import com.aptana.core.build.IBuildParticipant;
+import com.aptana.core.build.IBuildParticipantWorkingCopy;
 import com.aptana.core.build.IProblem;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.editor.common.validation.AbstractValidatorTestCase;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.parsing.JSParseState;
+import com.aptana.jetty.util.epl.ajax.JSON;
 
 public class JSLintValidatorTest extends AbstractValidatorTestCase
 {
@@ -40,7 +43,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 	}
 
 	@Override
-	protected AbstractBuildParticipant createValidator()
+	protected IBuildParticipant createValidator()
 	{
 		return new JSLintValidator()
 		{
@@ -770,7 +773,14 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 
 	protected void setOption(String optionName, boolean value)
 	{
-		((JSLintValidator) fValidator).setOption(optionName, value);
+		String json = fValidator.getPreferenceString(JSLintValidator.JS_LINT_OPTIONS);
+		Map object = (Map) JSON.parse(json);
+		object.put(optionName, value);
+		json = JSON.toString(object);
+
+		IBuildParticipantWorkingCopy wc = fValidator.getWorkingCopy();
+		wc.setPreference(JSLintValidator.JS_LINT_OPTIONS, json);
+		fValidator = wc.doSave();
 	}
 
 	public void testDangerousComment3() throws CoreException
@@ -1784,8 +1794,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Move 'var' declarations to the top of the function.", 1, IMarker.SEVERITY_ERROR,
-				5);
+		assertProblemExists(items, "Move 'var' declarations to the top of the function.", 1, IMarker.SEVERITY_ERROR, 5);
 	}
 
 	public void testNameFunction() throws CoreException
@@ -2040,8 +2049,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Expected parameter (value) in set value function.", 8, IMarker.SEVERITY_ERROR,
-				145);
+		assertProblemExists(items, "Expected parameter (value) in set value function.", 8, IMarker.SEVERITY_ERROR, 145);
 	}
 
 	public void testParameterSetA2() throws CoreException
@@ -2062,8 +2070,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Expected parameter (value) in set value function.", 8, IMarker.SEVERITY_ERROR,
-				145);
+		assertProblemExists(items, "Expected parameter (value) in set value function.", 8, IMarker.SEVERITY_ERROR, 145);
 	}
 
 	public void testRadix() throws CoreException
@@ -2079,8 +2086,8 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 	public void testReadOnly() throws CoreException
 	{
 		Set<String> predefineds = CollectionsUtil.newSet("Array", "Boolean", "Date", "decodeURI", "decodeURIComponent",
-				"encodeURI", "encodeURIComponent", "Error", "EvalError", "Function", "isFinite", "isNaN",
-				"JSON", "Math", "Number", "Object", "parseInt", "parseFloat", "RangeError", "ReferenceError", "RegExp",
+				"encodeURI", "encodeURIComponent", "Error", "EvalError", "Function", "isFinite", "isNaN", "JSON",
+				"Math", "Number", "Object", "parseInt", "parseFloat", "RangeError", "ReferenceError", "RegExp",
 				"String", "SyntaxError", "TypeError", "URIError");
 		for (String predefined : predefineds)
 		{

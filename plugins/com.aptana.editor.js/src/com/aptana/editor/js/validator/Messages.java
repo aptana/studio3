@@ -16,6 +16,12 @@ public class Messages extends NLS
 
 	public static String JSLintValidator_ERR_FailToGetJSLint;
 
+	public static String JSLintValidatorPreferenceCompositeFactory_OptionsMsg;
+
+	public static String JSLintValidatorPreferenceCompositeFactory_OptionsParseError;
+
+	public static String JSLintValidatorPreferenceCompositeFactory_OptionsTitle;
+
 	public static String JSStyleValidator_AdsafeA;
 	public static String JSStyleValidator_ALabel;
 	public static String JSStyleValidator_AlreadyDefined;
