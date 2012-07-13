@@ -1082,15 +1082,22 @@ public class CompletionProposalPopup implements IContentAssistListener
 			fProposalShell.dispose();
 		}
 
-		if (projectScopeNode != null)
+		try
 		{
-			projectScopeNode.removePreferenceChangeListener(prefListener);
-			projectScopeNode = null;
+			if (projectScopeNode != null)
+			{
+				projectScopeNode.removePreferenceChangeListener(prefListener);
+				projectScopeNode = null;
+			}
+			if (instanceScopeNode != null)
+			{
+				instanceScopeNode.removePreferenceChangeListener(prefListener);
+				instanceScopeNode = null;
+			}
 		}
-		if (instanceScopeNode != null)
+		catch (IllegalStateException e)
 		{
-			instanceScopeNode.removePreferenceChangeListener(prefListener);
-			instanceScopeNode = null;
+			// ignores
 		}
 		if (fPopupCloser != null)
 		{

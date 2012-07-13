@@ -228,7 +228,7 @@ public class AbstractFoldingEditor extends AbstractDecoratedTextEditor implement
 				}
 				return;
 			}
-			catch (CoreException e)
+			catch (Exception e)
 			{
 				// ignore
 			}
@@ -274,7 +274,14 @@ public class AbstractFoldingEditor extends AbstractDecoratedTextEditor implement
 		}
 		finally
 		{
-			super.dispose();
+			try
+			{
+				super.dispose();
+			}
+			catch (Exception e)
+			{
+				// ignores
+			}
 		}
 	}
 
