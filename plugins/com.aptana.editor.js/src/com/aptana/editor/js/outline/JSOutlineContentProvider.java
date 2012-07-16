@@ -29,6 +29,7 @@ import com.aptana.editor.js.outline.JSOutlineItem.Type;
 import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
+import com.aptana.parsing.lexer.IRange;
 
 public class JSOutlineContentProvider extends CommonOutlineContentProvider
 {
@@ -368,7 +369,16 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 
 		String fullpath = reference.toString();
 		JSOutlineItem item = fItemsByScope.get(fullpath);
-		if (item == null || item.getType() != Type.FUNCTION || !name.equals(item.getLabel()))
+		boolean addToMap = (item == null || item.getType() != Type.FUNCTION);
+		if (!addToMap)
+		{
+			IRange range = item.getSourceRange();
+			if (range instanceof IParseNode)
+			{
+				addToMap = !name.equals(((IParseNode) range).getText());
+			}
+		}
+		if (addToMap)
 		{
 			String text;
 			if (name.endsWith(FUNCTION_LITERAL + ")")) //$NON-NLS-1$
