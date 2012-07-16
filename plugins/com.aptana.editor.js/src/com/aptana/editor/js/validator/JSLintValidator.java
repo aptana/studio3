@@ -99,7 +99,7 @@ public class JSLintValidator extends AbstractBuildParticipant
 		try
 		{
 			problems = parseWithLint(context.getContents(), sourcePath);
-		}
+			}
 		catch (Exception e)
 		{
 			IdeLog.logError(JSPlugin.getDefault(),
@@ -138,7 +138,7 @@ public class JSLintValidator extends AbstractBuildParticipant
 			public boolean include(IProblem item)
 			{
 				return !isIgnored(item.getMessage(), filters);
-			}
+		}
 		});
 	}
 
@@ -148,9 +148,9 @@ public class JSLintValidator extends AbstractBuildParticipant
 	 * @return
 	 */
 	private synchronized JSLint getJSLintScript()
-	{
-		if (JS_LINT_SCRIPT == null)
 		{
+		if (JS_LINT_SCRIPT == null)
+			{
 			URL url = FileLocator.find(JSPlugin.getDefault().getBundle(), Path.fromPortableString(JSLINT_FILENAME),
 					null);
 			if (url != null)
@@ -161,8 +161,8 @@ public class JSLintValidator extends AbstractBuildParticipant
 					if (source != null)
 					{
 						JS_LINT_SCRIPT = getJSLintScript(source);
-					}
-				}
+			}
+		}
 				catch (IOException e)
 				{
 					IdeLog.logError(JSPlugin.getDefault(), Messages.JSLintValidator_ERR_FailToGetJSLint, e);
@@ -231,85 +231,85 @@ public class JSLintValidator extends AbstractBuildParticipant
 					Function lintFunc = (Function) scope.get("JSLINT", scope); //$NON-NLS-1$
 
 					Object errorObject = lintFunc.get("errors", scope); //$NON-NLS-1$
-					if (!(errorObject instanceof NativeArray))
-					{
+		if (!(errorObject instanceof NativeArray))
+		{
 						return null;
-					}
+		}
 
-					NativeArray errorArray = (NativeArray) errorObject;
-					Object[] ids = errorArray.getIds();
-					if (ArrayUtil.isEmpty(ids))
-					{
+		NativeArray errorArray = (NativeArray) errorObject;
+		Object[] ids = errorArray.getIds();
+		if (ArrayUtil.isEmpty(ids))
+		{
 						return null;
-					}
+		}
 
-					boolean lastIsError = false;
+		boolean lastIsError = false;
 					NativeObject last = (NativeObject) errorArray.get(Integer.parseInt(ids[ids.length - 1].toString()),
 							scope);
-					if (last == null)
-					{
-						lastIsError = true;
-					}
+		if (last == null)
+		{
+			lastIsError = true;
+		}
 
-					IDocument doc = null; // Lazily init document object to query about lines/offsets
-					for (int i = 0; i < ids.length; ++i)
-					{
-						// Grab the warning/error
-						NativeObject object = (NativeObject) errorArray.get(Integer.parseInt(ids[i].toString()), scope);
-						if (object == null)
-						{
-							continue;
-						}
+		IDocument doc = null; // Lazily init document object to query about lines/offsets
+		for (int i = 0; i < ids.length; ++i)
+		{
+			// Grab the warning/error
+			NativeObject object = (NativeObject) errorArray.get(Integer.parseInt(ids[i].toString()), scope);
+			if (object == null)
+			{
+				continue;
+			}
 
-						// Grab the line of the error. Skip if we already recorded an error on this line (why?)
-						int line = (int) Double.parseDouble(object.get("line", scope).toString()); //$NON-NLS-1$
+			// Grab the line of the error. Skip if we already recorded an error on this line (why?)
+			int line = (int) Double.parseDouble(object.get("line", scope).toString()); //$NON-NLS-1$
 
-						// Grab the details of the error. If user has set up filters to ignore it, move on
-						String reason = object.get("reason", scope).toString().trim(); //$NON-NLS-1$
+			// Grab the details of the error. If user has set up filters to ignore it, move on
+			String reason = object.get("reason", scope).toString().trim(); //$NON-NLS-1$
 
-						// lazy init of document to query for offsets/line info
-						if (doc == null)
-						{
-							doc = new Document(source);
-						}
+			// lazy init of document to query for offsets/line info
+			if (doc == null)
+			{
+				doc = new Document(source);
+			}
 
-						// Translate the column reported into the absolute offset from start of doc
-						int character = (int) Double.parseDouble(object.get("character", scope).toString()); //$NON-NLS-1$
-						try
-						{
+			// Translate the column reported into the absolute offset from start of doc
+			int character = (int) Double.parseDouble(object.get("character", scope).toString()); //$NON-NLS-1$
+			try
+			{
 							// JSLint reports the offset as column on the given line, and counts tab characters as 4
 							// columns
 							// We account for that by adding the offset of the line start, and reducing the column count
 							// on
-							// tabs
-							IRegion lineInfo = doc.getLineInformation(line - 1);
-							int realOffset = lineInfo.getOffset();
-							String rawLine = doc.get(realOffset, lineInfo.getLength());
+				// tabs
+				IRegion lineInfo = doc.getLineInformation(line - 1);
+				int realOffset = lineInfo.getOffset();
+				String rawLine = doc.get(realOffset, lineInfo.getLength());
 							int lineLength = rawLine.length();
-							int actual = character - 1;
-							for (int x = 0; x < actual; x++)
-							{
+				int actual = character - 1;
+				for (int x = 0; x < actual; x++)
+				{
 								if (lineLength <= x)
 								{
 									break;
 								}
-								char c = rawLine.charAt(x);
-								if (c == '\t')
-								{
-									actual -= 3;
-								}
-								realOffset++;
-							}
-							character = realOffset;
-						}
-						catch (BadLocationException e)
-						{
-							// ignore
-						}
+					char c = rawLine.charAt(x);
+					if (c == '\t')
+					{
+						actual -= 3;
+					}
+					realOffset++;
+				}
+				character = realOffset;
+			}
+			catch (BadLocationException e)
+			{
+				// ignore
+			}
 
-						// Now record the error
-						if (i == ids.length - 2 && lastIsError)
-						{
+			// Now record the error
+			if (i == ids.length - 2 && lastIsError)
+			{
 							// If this starts with "Stopping", convert the last warning to an error and skip this.
 							if (reason.startsWith("Stopping")) //$NON-NLS-1$
 							{
@@ -319,26 +319,26 @@ public class JSLintValidator extends AbstractBuildParticipant
 							}
 							else
 							{
-								items.add(createError(reason, line, character, 1, path));
-							}
+					items.add(createError(reason, line, character, 1, path));
+				}
 						}
-						else
-						{
-							items.add(createWarning(reason, line, character, 1, path));
-						}
-					}
+			else
+			{
+				items.add(createWarning(reason, line, character, 1, path));
+			}
+		}
 					return null;
 				}
 			});
-			return items;
-		}
+		return items;
+	}
 
 		void runLint(final String source, final Map<String, Object> options)
-		{
+	{
 			contextFactory.call(new ContextAction()
-			{
+		{
 				public Object run(Context cx)
-				{
+			{
 					Object[] args = new Object[] { source, optionsAsJavaScriptObject(options) };
 					Function lintFunc = (Function) scope.get("JSLINT", scope); //$NON-NLS-1$
 					// PC: we ignore the result, because i have found that with some versions, there might
@@ -347,10 +347,10 @@ public class JSLintValidator extends AbstractBuildParticipant
 					return null;
 				}
 			});
-		}
+				}
 
 		private Scriptable optionsAsJavaScriptObject(final Map<String, Object> options)
-		{
+				{
 			return (Scriptable) contextFactory.call(new ContextAction()
 			{
 				public Object run(Context cx)
@@ -361,17 +361,17 @@ public class JSLintValidator extends AbstractBuildParticipant
 						String key = entry.getKey();
 						Object value = javaToJS(entry.getValue(), opts);
 						opts.put(key, opts, value);
-					}
-					return opts;
 				}
+					return opts;
+			}
 			});
 		}
 
 		Object javaToJS(Object o, Scriptable scope)
-		{
+	{
 			Class<?> cls = o.getClass();
 			if (cls.isArray())
-			{
+		{
 				return new NativeArray((Object[]) o);
 			}
 
@@ -395,13 +395,13 @@ public class JSLintValidator extends AbstractBuildParticipant
 		}
 
 		public void warning(String message, String sourceURI, int line, String lineText, int lineOffset)
-		{
+	{
 			items.add(createWarning(message, line, lineOffset, 1, sourceURI));
-		}
+	}
 
 		public EvaluatorException runtimeError(String message, String sourceURI, int line, String lineText,
 				int lineOffset)
-		{
+	{
 			return new EvaluatorException(message, sourceURI, line, lineText, lineOffset);
 		}
 
@@ -409,5 +409,5 @@ public class JSLintValidator extends AbstractBuildParticipant
 		{
 			return Collections.unmodifiableList(items);
 		}
-	}
+		}
 }
