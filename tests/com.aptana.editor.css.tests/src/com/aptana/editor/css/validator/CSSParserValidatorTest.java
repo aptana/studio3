@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.CoreException;
 import com.aptana.core.build.IBuildParticipant;
 import com.aptana.core.build.IProblem;
 import com.aptana.editor.common.validation.AbstractValidatorTestCase;
+import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.ICSSConstants;
 import com.aptana.parsing.ParseState;
 
@@ -23,7 +24,14 @@ public class CSSParserValidatorTest extends AbstractValidatorTestCase
 	@Override
 	protected IBuildParticipant createValidator()
 	{
-		return new CSSParserValidator();
+		return new CSSParserValidator()
+		{
+			@Override
+			protected String getPreferenceNode()
+			{
+				return CSSPlugin.PLUGIN_ID;
+			}
+		};
 	}
 
 	@Override

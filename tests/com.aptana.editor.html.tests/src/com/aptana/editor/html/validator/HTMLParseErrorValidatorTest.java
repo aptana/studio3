@@ -16,6 +16,7 @@ import com.aptana.core.build.IBuildParticipant;
 import com.aptana.core.build.IProblem;
 import com.aptana.editor.common.validation.AbstractValidatorTestCase;
 import com.aptana.editor.css.ICSSConstants;
+import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.IHTMLConstants;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.js.IJSConstants;
@@ -25,7 +26,14 @@ public class HTMLParseErrorValidatorTest extends AbstractValidatorTestCase
 	@Override
 	protected IBuildParticipant createValidator()
 	{
-		return new HTMLParserValidator();
+		return new HTMLParserValidator()
+		{
+			@Override
+			protected String getPreferenceNode()
+			{
+				return HTMLPlugin.PLUGIN_ID;
+			}
+		};
 	}
 
 	@Override
