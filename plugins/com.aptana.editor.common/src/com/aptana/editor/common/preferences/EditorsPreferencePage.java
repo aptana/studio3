@@ -58,6 +58,11 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 		addField(new BooleanFieldEditor(IPreferenceConstants.EDITOR_WRAP_SELECTION,
 				Messages.EditorsPreferencePage_Wrap_Selection, group));
 
+		group = AptanaPreferencePage.createGroup(appearanceComposite, Messages.EditorsPreferencePage_saveActionsGroup);
+
+		addField(new BooleanFieldEditor(IPreferenceConstants.EDITOR_REMOVE_TRAILING_WHITESPACE,
+				Messages.EditorsPreferencePage_saveActionRemoveWhitespaceCharacters, group));
+
 		// In Studio 2.0, commenting out until requested, or it's determined we have enough available space
 		// addField(new RadioGroupFieldEditor(AbstractTextEditor.PREFERENCE_NAVIGATION_SMART_HOME_END,
 		// Messages.EditorsPreferencePage_HomeEndBehavior, 1, new String[][] {

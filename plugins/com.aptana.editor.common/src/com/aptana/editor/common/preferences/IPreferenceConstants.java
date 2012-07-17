@@ -136,4 +136,10 @@ public interface IPreferenceConstants
 	 */
 	public static final String ENABLED_SPELLING_SCOPES = CommonEditorPlugin.PLUGIN_ID + ".enabledSpellingScopes"; //$NON-NLS-1$
 
+	/**
+	 * The preference key used to enable and disable the save-action for removing trailing whitespace.
+	 */
+	public static final String EDITOR_REMOVE_TRAILING_WHITESPACE = CommonEditorPlugin.PLUGIN_ID
+			+ ".removeTrailingWhitespace"; //$NON-NLS-1$
+
 }

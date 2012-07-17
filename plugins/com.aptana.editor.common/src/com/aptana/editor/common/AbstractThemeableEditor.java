@@ -12,6 +12,8 @@ import java.text.MessageFormat;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import org.eclipse.core.filebuffers.FileBuffers;
+import org.eclipse.core.filebuffers.manipulation.RemoveTrailingWhitespaceOperation;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
@@ -635,6 +637,20 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	@Override
 	public void doSave(IProgressMonitor progressMonitor)
 	{
+		if (getPreferenceStore().getBoolean(IPreferenceConstants.EDITOR_REMOVE_TRAILING_WHITESPACE))
+		{
+			// Remove any trailing spaces
+			RemoveTrailingWhitespaceOperation removeSpacesOperation = new RemoveTrailingWhitespaceOperation();
+			try
+			{
+				removeSpacesOperation.run(FileBuffers.getTextFileBufferManager().getTextFileBuffer(getDocument()),
+						progressMonitor);
+			}
+			catch (Exception e)
+			{
+				IdeLog.logError(CommonEditorPlugin.getDefault(), "Error while removing the trailing whitespaces.", e); //$NON-NLS-1$
+			}
+		}
 		if (getEditorInput() instanceof UntitledFileStorageEditorInput)
 		{
 			// forces to show save as dialog on untitled file

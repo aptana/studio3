@@ -47,10 +47,14 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		// wrap selection
 		prefs.putBoolean(IPreferenceConstants.EDITOR_WRAP_SELECTION, true);
 
+		// save-action for removing the trailing whitespace
+		prefs.putBoolean(IPreferenceConstants.EDITOR_REMOVE_TRAILING_WHITESPACE, false);
+
 		// enable folding
 		prefs.putBoolean(IPreferenceConstants.EDITOR_ENABLE_FOLDING, true);
 
 		// default scopes for spell checking
-		prefs.put(IPreferenceConstants.ENABLED_SPELLING_SCOPES, "comment.block.documentation,comment.line,comment.block"); //$NON-NLS-1$
+		prefs.put(IPreferenceConstants.ENABLED_SPELLING_SCOPES,
+				"comment.block.documentation,comment.line,comment.block"); //$NON-NLS-1$
 	}
 }
