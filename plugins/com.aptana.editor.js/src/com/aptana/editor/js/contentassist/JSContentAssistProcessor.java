@@ -498,6 +498,9 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			// myFunc = function(){...}
 			// myFunc.prototype.foo = function(){...}
 			IParseNode parent = currentFunctionNode.getParent();
+			if(parent.getNodeType() == IJSNodeTypes.ASSIGN){
+				parent = parent.getParent();
+			}
 			IParseNode[] children = parent.getChildren();
 			functionsToAnalyze = new LinkedList<JSFunctionNode>();
 			for (int i = 0; i < children.length; i++)

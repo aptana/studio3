@@ -524,6 +524,19 @@ public class JSContentAssistProposalTests extends JSEditorBasedTests
 				);
 		// @formatter:on
 	}
+	
+	public void testThisInFunctionAndPrototypes2()
+	{
+		// @formatter:off
+		this.checkProposals(
+				"contentAssist/functions-prototype-with-this-2.js",
+				"name",
+				"id",
+				"company",
+				"zipcode"
+				);
+		// @formatter:on
+	}
 
 	public void testUnnamedFunctionWithThis()
 	{
