@@ -39,6 +39,7 @@ import com.aptana.editor.common.util.EditorUtil;
 import com.aptana.formatter.ui.FormatterMessages;
 import com.aptana.formatter.ui.IFormatterControlManager;
 import com.aptana.formatter.ui.IFormatterModifyDialog;
+import com.aptana.ui.preferences.ScrolledPageContent;
 
 public abstract class FormatterModifyTabPage implements IFormatterModifiyTabPage
 {

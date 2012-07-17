@@ -70,7 +70,7 @@ public class CoffeeTaskDetectorTest extends TestCase
 			assertEquals(2, task.getOffset());
 			assertEquals(19, task.getLength());
 			assertEquals(IMarker.PRIORITY_NORMAL, task.getPriority());
-			assertEquals(IMarker.SEVERITY_INFO, task.getSeverity());
+			assertEquals(IMarker.SEVERITY_INFO, task.getSeverity().intValue());
 			assertEquals(coffeeFile.toURI().toString(), task.getSourcePath());
 		}
 		finally

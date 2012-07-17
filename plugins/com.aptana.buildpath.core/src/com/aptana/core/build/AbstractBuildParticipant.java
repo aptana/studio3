@@ -461,6 +461,11 @@ public abstract class AbstractBuildParticipant implements IBuildParticipant, IEx
 		return Platform.getPreferencesService().getBoolean(getPreferenceNode(), prefKey, false, CONTEXTS);
 	}
 
+	public int getPreferenceInt(String prefKey, int defaultValue)
+	{
+		return Platform.getPreferencesService().getInt(getPreferenceNode(), prefKey, defaultValue, CONTEXTS);
+	}
+
 	public IBuildParticipantWorkingCopy getWorkingCopy()
 	{
 		return new BuildParticipantWorkingCopy(this, getPreferenceNode());

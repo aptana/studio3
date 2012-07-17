@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -9,12 +9,55 @@ package com.aptana.core.build;
 
 import java.util.Map;
 
+import org.eclipse.core.resources.IMarker;
+
 /**
  * @author Ingo Muschenetz
  * @author Chris Williams
  */
 public interface IProblem
 {
+
+	enum Severity
+	{
+		// @formatter:off
+		IGNORE(-1, Messages.IProblem_Ignore),
+		INFO(IMarker.SEVERITY_INFO, Messages.IProblem_Info),
+		WARNING(IMarker.SEVERITY_WARNING, Messages.IProblem_Warning),
+		ERROR(IMarker.SEVERITY_ERROR, Messages.IProblem_Error);
+		// @formatter:on
+
+		private int num;
+		private String label;
+
+		Severity(int num, String label)
+		{
+			this.num = num;
+			this.label = label;
+		}
+
+		public int intValue()
+		{
+			return this.num;
+		}
+
+		public static Severity create(int value)
+		{
+			for (Severity s : values())
+			{
+				if (s.num == value)
+				{
+					return s;
+				}
+			}
+			return Severity.WARNING;
+		}
+
+		public String label()
+		{
+			return label;
+		}
+	}
 
 	/**
 	 * A unique id used to identify the exact problem type. Used to associate specific problems with quick fixes.
@@ -62,7 +105,7 @@ public interface IProblem
 	 * 
 	 * @return the severity
 	 */
-	int getSeverity();
+	Severity getSeverity();
 
 	/**
 	 * Gets the priority of the task (typically unused for errors/warnings).

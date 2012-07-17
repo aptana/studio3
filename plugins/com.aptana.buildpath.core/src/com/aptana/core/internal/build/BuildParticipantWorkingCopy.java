@@ -265,9 +265,9 @@ public class BuildParticipantWorkingCopy implements IBuildParticipantWorkingCopy
 
 	public String getPreferenceString(String prefKey)
 	{
-		if (this.preferences != null && this.preferences.containsKey(prefKey))
+		if (preferences != null && preferences.containsKey(prefKey))
 		{
-			return (String) this.preferences.get(prefKey);
+			return (String) preferences.get(prefKey);
 		}
 
 		return ((AbstractBuildParticipant) wrapped).getPreferenceString(prefKey);
@@ -275,9 +275,9 @@ public class BuildParticipantWorkingCopy implements IBuildParticipantWorkingCopy
 
 	public boolean getPreferenceBoolean(String prefKey)
 	{
-		if (this.preferences != null && this.preferences.containsKey(prefKey))
+		if (preferences != null && preferences.containsKey(prefKey))
 		{
-			return (Boolean) this.preferences.get(prefKey);
+			return (Boolean) preferences.get(prefKey);
 		}
 
 		return wrapped.getPreferenceBoolean(prefKey);
@@ -285,15 +285,25 @@ public class BuildParticipantWorkingCopy implements IBuildParticipantWorkingCopy
 
 	public void setPreference(String prefKey, Object value)
 	{
-		if (this.preferences == null)
+		if (preferences == null)
 		{
-			this.preferences = new HashMap<String, Object>();
+			preferences = new HashMap<String, Object>();
 		}
-		this.preferences.put(prefKey, value);
+		preferences.put(prefKey, value);
 	}
 
 	public IBuildParticipantWorkingCopy getWorkingCopy()
 	{
 		return this;
+	}
+
+	public int getPreferenceInt(String prefKey, int defaultValue)
+	{
+		if (preferences != null && preferences.containsKey(prefKey))
+		{
+			return (Integer) preferences.get(prefKey);
+		}
+
+		return wrapped.getPreferenceInt(prefKey, defaultValue);
 	}
 }

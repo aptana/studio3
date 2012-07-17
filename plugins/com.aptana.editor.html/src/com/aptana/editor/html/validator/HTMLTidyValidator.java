@@ -20,18 +20,22 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
-import org.eclipse.jface.text.IDocument;
 import org.jaxen.JaxenException;
+import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.buildpath.core.BuildPathCorePlugin;
 import com.aptana.core.IFilter;
 import com.aptana.core.IMap;
 import com.aptana.core.build.AbstractBuildParticipant;
 import com.aptana.core.build.IProblem;
+import com.aptana.core.build.Problem;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.IHTMLConstants;
@@ -65,7 +69,7 @@ import com.aptana.parsing.xpath.ParseNodeXPath;
 public class HTMLTidyValidator extends AbstractBuildParticipant
 {
 	public static final String ID = "com.aptana.editor.html.validator.TidyValidator"; //$NON-NLS-1$
-	
+
 	private static final String BOOLEAN_TYPE = "Boolean"; //$NON-NLS-1$
 
 	private static final Pattern DOCTYPE_PATTERN = Pattern
@@ -81,6 +85,87 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 	private static ParseNodeXPath BODY_TAG;
 	private static ParseNodeXPath NOFRAMES_TAG;
 	private static ParseNodeXPath HTML_CHILDREN;
+
+	public enum ProblemCategory
+	{
+		// @formatter:off
+		Doctype("!DOCTYPE"),
+		Entities("Entities"),
+		Elements("Elements"),
+		Attributes("Attributes");
+		// @formatter:on
+
+		private String label;
+
+		ProblemCategory(String label)
+		{
+			this.label = label;
+		}
+
+		public String label()
+		{
+			return label;
+		}
+	}
+
+	public enum ProblemType
+	{
+		// @formatter:off
+		DeprecatedAttribute(ProblemCategory.Attributes, 256, "Deprecated Attributes"),
+		DeprecatedElement(ProblemCategory.Elements, 257, "Deprecated Elements"),
+		DoctypeAfterElements(ProblemCategory.Doctype, 258, Messages.HTMLTidyValidator_DoctypeAfterElements),
+		ElementNotEmptyOrClosed(ProblemCategory.Elements, 259, "Unclosed elements"),
+		ElementNotInsideNoFrames(ProblemCategory.Elements, 260, "Elements outside <noframes>"),
+		ElementNotRecognized(ProblemCategory.Elements, 261, "Unrecognized elements"),
+		EntityMissingSemicolon(ProblemCategory.Entities, 262, "Entity missing trailing semicolon"),
+		IdNameAttributeMismatch(ProblemCategory.Attributes, 263, Messages.HTMLTidyValidator_IdNameAttributeMismatch),
+		InsertImplicitNoFrames(ProblemCategory.Elements, 264, Messages.HTMLTidyValidator_InsertImplicitNoFrames),
+		InsertMissingTitle(ProblemCategory.Elements, 265, "Missing <title> element"),
+		InvalidAttributeValue(ProblemCategory.Attributes, 266, "Invalid attribute values"),
+		MalformedDoctype(ProblemCategory.Doctype, 267, "Malformed !DOCTYPE"),
+		MissingCloseTag(ProblemCategory.Elements, 268, "Missing close tags"),
+		MissingDoctype(ProblemCategory.Doctype, 269, Messages.HTMLTidyValidator_MissingDoctype),
+		MissingNoFrames(ProblemCategory.Elements, 270, Messages.HTMLTidyValidator_MissingNoFrames),
+		NonUniqueIdValue(ProblemCategory.Attributes, 271, "Non-unique id attribute value"),
+		ProprietaryAttribute(ProblemCategory.Attributes, 272, "Proprietary attributes"),
+		RepeatedFrameset(ProblemCategory.Elements, 273, Messages.HTMLTidyValidator_RepeatedFrameset),
+		TrimEmptyElement(ProblemCategory.Elements, 274, "Trim empty elements"),
+		UnescapedAmpersand(ProblemCategory.Entities, 275, "Unescaped ampersand (&& which should be &&amp;)"),
+		UnknownEntity(ProblemCategory.Entities, 276, "Unescaped or unknown entity"),
+		UppercaseDoctype(ProblemCategory.Doctype, 277, Messages.HTMLTidyValidator_UppercaseDoctype);
+		// @formatter:on
+
+		private int id;
+		private String description;
+		private ProblemCategory category;
+
+		ProblemType(ProblemCategory category, int id, String description)
+		{
+			this.category = category;
+			this.id = id;
+			this.description = description;
+		}
+
+		public ProblemCategory category()
+		{
+			return this.category;
+		}
+
+		public String description()
+		{
+			return description;
+		}
+
+		public int getId()
+		{
+			return id;
+		}
+
+		public String getPrefKey()
+		{
+			return "problem_" + getId(); //$NON-NLS-1$
+		}
+	}
 
 	static
 	{
@@ -125,6 +210,10 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 
 	private boolean foundTitle;
 
+	private String sourcePath;
+
+	private Document doc;
+
 	public void deleteFile(BuildContext context, IProgressMonitor monitor)
 	{
 		if (context == null)
@@ -147,7 +236,7 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 
 		try
 		{
-			String sourcePath = context.getURI().toString();
+			sourcePath = context.getURI().toString();
 			Collection<IProblem> problems = new ArrayList<IProblem>();
 			try
 			{
@@ -157,15 +246,15 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 				{
 					// TODO Can't we ask the context for line number of an offset so we don't duplicate the source? Or
 					// maybe just ask for IDocument?
-					IDocument doc = new Document(source);
-					problems.addAll(validateDoctype(sourcePath, doc));
+					doc = new Document(source);
+					problems.addAll(validateDoctype());
 
 					IParseRootNode ast = context.getAST();
 					if (ast != null)
 					{
 						foundTitle = false;
-						problems.addAll(validateFrames(ast, doc, sourcePath));
-						problems.addAll(validateAST(ast, doc, sourcePath));
+						problems.addAll(validateFrames(ast));
+						problems.addAll(validateAST(ast));
 						if (!foundTitle)
 						{
 							problems.add(createWarning(Messages.HTMLTidyValidator_InsertMissingTitle, 1, 0, 0,
@@ -185,7 +274,7 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 			{
 				public boolean include(IProblem item)
 				{
-					return !isIgnored(item.getMessage(), filters);
+					return item != null && !isIgnored(item.getMessage(), filters);
 				}
 			});
 			context.putProblems(IHTMLConstants.TIDY_PROBLEM, problems);
@@ -193,6 +282,8 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 		finally
 		{
 			// clean up caches!
+			doc = null;
+			sourcePath = null;
 			fElementsMap = null;
 			fAttributesMap = null;
 			fEntityMap = null;
@@ -209,7 +300,7 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 	 * @param sourcePath
 	 * @return
 	 */
-	private Collection<IProblem> checkLink(HTMLElementNode aNode, IDocument doc, String sourcePath)
+	private Collection<IProblem> checkLink(HTMLElementNode aNode)
 	{
 		String id = aNode.getAttributeValue("id"); //$NON-NLS-1$
 		String name = aNode.getAttributeValue("name"); //$NON-NLS-1$
@@ -219,8 +310,8 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 			{
 				int offset = aNode.getStartingOffset();
 				int length = aNode.getLength();
-				return CollectionsUtil.newList(createError(Messages.HTMLTidyValidator_IdNameAttributeMismatch,
-						doc.getLineOfOffset(offset) + 1, offset, length, sourcePath));
+				return CollectionsUtil.newList(createProblem(ProblemType.IdNameAttributeMismatch,
+						Messages.HTMLTidyValidator_IdNameAttributeMismatch, offset, length));
 			}
 			catch (BadLocationException e)
 			{
@@ -231,7 +322,7 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 	}
 
 	@SuppressWarnings("unchecked")
-	private Collection<IProblem> validateFrames(IParseRootNode ast, IDocument doc, String sourcePath)
+	private Collection<IProblem> validateFrames(IParseRootNode ast)
 	{
 		Collection<IProblem> problems = new ArrayList<IProblem>();
 
@@ -251,8 +342,8 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 						IRange range = framesetNode.getNameNode().getNameRange();
 						int offset = range.getStartingOffset();
 						int length = range.getLength();
-						problems.add(createWarning(Messages.HTMLTidyValidator_RepeatedFrameset,
-								doc.getLineOfOffset(offset) + 1, offset, length, sourcePath));
+						problems.add(createProblem(ProblemType.RepeatedFrameset,
+								Messages.HTMLTidyValidator_RepeatedFrameset, offset, length));
 					}
 				}
 
@@ -271,8 +362,8 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 					{
 						IRange range = bodyNode.iterator().next().getNameNode().getNameRange();
 						int offset = range.getStartingOffset();
-						problems.add(createWarning(Messages.HTMLTidyValidator_InsertImplicitNoFrames,
-								doc.getLineOfOffset(offset) + 1, offset, range.getLength(), sourcePath));
+						problems.add(createProblem(ProblemType.InsertImplicitNoFrames,
+								Messages.HTMLTidyValidator_InsertImplicitNoFrames, offset, range.getLength()));
 					}
 					else
 					{
@@ -280,9 +371,9 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 						if (invalidContentNode != null)
 						{
 							IRange range = invalidContentNode.getNameNode().getNameRange();
-							problems.add(createWarning(Messages.HTMLTidyValidator_MissingNoFrames,
-									doc.getLineOfOffset(range.getStartingOffset()) + 1, range.getStartingOffset(),
-									range.getLength(), sourcePath));
+							problems.add(createProblem(ProblemType.MissingNoFrames,
+									Messages.HTMLTidyValidator_MissingNoFrames, range.getStartingOffset(),
+									range.getLength()));
 						}
 					}
 				}
@@ -292,11 +383,9 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 					if (invalidContentNode != null)
 					{
 						IRange range = invalidContentNode.getNameNode().getNameRange();
-						problems.add(createWarning(MessageFormat.format(
+						problems.add(createProblem(ProblemType.ElementNotInsideNoFrames, MessageFormat.format(
 								Messages.HTMLTidyValidator_ElementNotInsideNoFrames,
-								invalidContentNode.getElementName()),
-								doc.getLineOfOffset(range.getStartingOffset()) + 1, range.getStartingOffset(), range
-										.getLength(), sourcePath));
+								invalidContentNode.getElementName()), range.getStartingOffset(), range.getLength()));
 					}
 				}
 			}
@@ -346,7 +435,7 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 		return null;
 	}
 
-	private Collection<IProblem> validateAST(IParseRootNode root, final IDocument doc, final String sourcePath)
+	private Collection<IProblem> validateAST(IParseRootNode root)
 	{
 		final Collection<IProblem> problems = new ArrayList<IProblem>();
 
@@ -354,7 +443,7 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 		{
 			public boolean include(IParseNode node)
 			{
-				problems.addAll(handleNode(node, doc, sourcePath));
+				problems.addAll(handleNode(node));
 				return true;
 			}
 		});
@@ -362,7 +451,7 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 		return problems;
 	}
 
-	private Collection<IProblem> handleNode(IParseNode node, IDocument doc, String sourcePath)
+	private Collection<IProblem> handleNode(IParseNode node)
 	{
 		if (!(node instanceof HTMLNode))
 		{
@@ -372,20 +461,20 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 		{
 			case IHTMLNodeTypes.ELEMENT:
 			case IHTMLNodeTypes.SPECIAL:
-				return validateElement((HTMLElementNode) node, doc, sourcePath);
+				return validateElement((HTMLElementNode) node);
 
 			case IHTMLNodeTypes.COMMENT:
-				return validateComment((HTMLCommentNode) node, doc, sourcePath);
+				return validateComment((HTMLCommentNode) node);
 
 			case IHTMLNodeTypes.TEXT:
-				return validateTextContent((HTMLTextNode) node, doc, sourcePath);
+				return validateTextContent((HTMLTextNode) node);
 
 			default:
 				return Collections.emptyList();
 		}
 	}
 
-	private Collection<IProblem> validateElement(HTMLElementNode element, IDocument doc, String sourcePath)
+	private Collection<IProblem> validateElement(HTMLElementNode element)
 	{
 		List<IProblem> problems = new ArrayList<IProblem>(2);
 		try
@@ -403,23 +492,22 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 				// This is an unknown tag!
 				int offset = element.getStartingOffset();
 				int length = element.getLength();
-				problems.add(createWarning(
-						MessageFormat.format(Messages.HTMLTidyValidator_ElementNotRecognized, tagName),
-						doc.getLineOfOffset(offset) + 1, offset, length, sourcePath));
+				problems.add(createProblem(ProblemType.ElementNotRecognized,
+						MessageFormat.format(Messages.HTMLTidyValidator_ElementNotRecognized, tagName), offset, length));
 			}
 			else
 			{
 				// Known tag
-				problems.addAll(validateAttributes(element, doc, sourcePath));
+				problems.addAll(validateAttributes(element));
 
 				// Check if it is deprecated
 				String deprecated = ee.getDeprecated();
 				if (!StringUtil.isEmpty(deprecated))
 				{
 					int offset = element.getStartingOffset();
-					problems.add(createWarning(
+					problems.add(createProblem(ProblemType.DeprecatedElement,
 							MessageFormat.format(Messages.HTMLTidyValidator_DeprecatedElement, tagName, deprecated),
-							doc.getLineOfOffset(offset) + 1, offset, element.getLength(), sourcePath));
+							offset, element.getLength()));
 				}
 
 				// Check for empty tags that shouldn't be
@@ -429,9 +517,9 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 					if (!"script".equals(tagName) || StringUtil.isEmpty(element.getAttributeValue("src"))) //$NON-NLS-1$ //$NON-NLS-2$
 					{
 						int offset = element.getStartingOffset();
-						problems.add(createWarning(
-								MessageFormat.format(Messages.HTMLTidyValidator_TrimEmptyElement, tagName),
-								doc.getLineOfOffset(offset) + 1, offset, element.getLength(), sourcePath));
+						problems.add(createProblem(ProblemType.TrimEmptyElement,
+								MessageFormat.format(Messages.HTMLTidyValidator_TrimEmptyElement, tagName), offset,
+								element.getLength()));
 					}
 				}
 
@@ -439,9 +527,9 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 				if (HTMLParseState.isEmptyTagType(tagName) && !ArrayUtil.isEmpty(element.getChildren()))
 				{
 					int offset = element.getStartingOffset();
-					problems.add(createWarning(
-							MessageFormat.format(Messages.HTMLTidyValidator_ElementNotEmptyOrClosed, tagName),
-							doc.getLineOfOffset(offset) + 1, offset, element.getLength(), sourcePath));
+					problems.add(createProblem(ProblemType.ElementNotEmptyOrClosed,
+							MessageFormat.format(Messages.HTMLTidyValidator_ElementNotEmptyOrClosed, tagName), offset,
+							element.getLength()));
 				}
 
 				// We can't "find" missing end tags, because our parser fixes this inline.
@@ -465,8 +553,7 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 	 * @return
 	 * @throws BadLocationException
 	 */
-	private Collection<IProblem> validateAttributes(HTMLElementNode element, IDocument doc, String sourcePath)
-			throws BadLocationException
+	private Collection<IProblem> validateAttributes(HTMLElementNode element) throws BadLocationException
 	{
 		IParseNodeAttribute[] attributes = element.getAttributes();
 		if (ArrayUtil.isEmpty(attributes))
@@ -479,7 +566,7 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 
 		if ("a".equalsIgnoreCase(tagName)) //$NON-NLS-1$
 		{
-			problems.addAll(checkLink(element, doc, sourcePath));
+			problems.addAll(checkLink(element));
 		}
 
 		for (IParseNodeAttribute attr : attributes)
@@ -492,10 +579,9 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 				if (fIds.contains(attrValue))
 				{
 					int offset = element.getStartingOffset();
-					problems.add(createWarning(
+					problems.add(createProblem(ProblemType.NonUniqueIdValue,
 							MessageFormat.format(Messages.HTMLTidyValidator_NonUniqueIdValue, tagName, attrValue),
-							doc.getLineOfOffset(offset) + 1, offset, element.getNameNode().getNameRange().getLength(),
-							sourcePath));
+							offset, element.getNameNode().getNameRange().getLength()));
 				}
 				else
 				{
@@ -511,9 +597,9 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 				{
 					// Unrecognized attribute!
 					int offset = element.getStartingOffset();
-					problems.add(createWarning(MessageFormat.format(Messages.HTMLTidyValidator_ProprietaryAttribute,
-							tagName, attrName, attrValue), doc.getLineOfOffset(offset) + 1, offset, element
-							.getNameNode().getNameRange().getLength(), sourcePath));
+					problems.add(createProblem(ProblemType.ProprietaryAttribute, MessageFormat.format(
+							Messages.HTMLTidyValidator_ProprietaryAttribute, tagName, attrName, attrValue), offset,
+							element.getNameNode().getNameRange().getLength()));
 				}
 				continue;
 			}
@@ -523,9 +609,9 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 			if (!StringUtil.isEmpty(deprecated))
 			{
 				int offset = element.getStartingOffset();
-				problems.add(createWarning(MessageFormat.format(Messages.HTMLTidyValidator_DeprecatedAttribute,
-						tagName, attrName, attrValue), doc.getLineOfOffset(offset) + 1, offset, element.getNameNode()
-						.getNameRange().getLength(), sourcePath));
+				problems.add(createProblem(ProblemType.DeprecatedAttribute, MessageFormat.format(
+						Messages.HTMLTidyValidator_DeprecatedAttribute, tagName, attrName, attrValue), offset, element
+						.getNameNode().getNameRange().getLength()));
 			}
 
 			// verify the value for the attribute
@@ -533,7 +619,8 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 			if (!CollectionsUtil.isEmpty(values))
 			{
 				boolean validAttribute = false;
-				// If attribute is a boolean one, valid values are empty string, no value, or case-insensitive match with
+				// If attribute is a boolean one, valid values are empty string, no value, or case-insensitive match
+				// with
 				// the attribute name.
 				if (BOOLEAN_TYPE.equalsIgnoreCase(ae.getType()))
 				{
@@ -554,16 +641,16 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 				if (!validAttribute)
 				{
 					int offset = element.getStartingOffset();
-					problems.add(createWarning(MessageFormat.format(Messages.HTMLTidyValidator_InvalidAttributeValue,
-							tagName, attrName, attrValue), doc.getLineOfOffset(offset) + 1, offset, element
-							.getNameNode().getNameRange().getLength(), sourcePath));
+					problems.add(createProblem(ProblemType.InvalidAttributeValue, MessageFormat.format(
+							Messages.HTMLTidyValidator_InvalidAttributeValue, tagName, attrName, attrValue), offset,
+							element.getNameNode().getNameRange().getLength()));
 				}
 			}
 		}
 		return problems;
 	}
 
-	private Collection<IProblem> validateComment(HTMLCommentNode comment, IDocument doc, String sourcePath)
+	private Collection<IProblem> validateComment(HTMLCommentNode comment)
 	{
 		// String text = comment.getText();
 		// TODO malformed_comment=Warning: adjacent hyphens within comment
@@ -573,7 +660,7 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 		return Collections.emptyList();
 	}
 
-	private Collection<IProblem> validateTextContent(HTMLTextNode textNode, IDocument doc, String sourcePath)
+	private Collection<IProblem> validateTextContent(HTMLTextNode textNode)
 	{
 		String text = textNode.getText();
 		if (StringUtil.isEmpty(text) || text.indexOf('&') == -1)
@@ -591,23 +678,25 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 				String entity = m.group(1);
 				if (entity == null)
 				{
-					problems.add(createWarning(Messages.HTMLTidyValidator_UnescapedAmpersand,
-							doc.getLineOfOffset(offset) + 1, offset, 1, sourcePath));
+					problems.add(createProblem(ProblemType.UnescapedAmpersand,
+							Messages.HTMLTidyValidator_UnescapedAmpersand, offset, 1));
 				}
 				else if (!entity.endsWith(";")) //$NON-NLS-1$
 				{
 					EntityElement entityEl = getEntity('&' + entity + ';');
 					String msg;
+					ProblemType type;
 					if (entityEl != null)
 					{
+						type = ProblemType.EntityMissingSemicolon;
 						msg = MessageFormat.format(Messages.HTMLTidyValidator_EntityMissingSemicolon, entity);
 					}
 					else
 					{
+						type = ProblemType.UnknownEntity;
 						msg = MessageFormat.format(Messages.HTMLTidyValidator_UnknownEntity, entity);
 					}
-					problems.add(createWarning(msg, doc.getLineOfOffset(offset) + 1, offset, entity.length() + 1,
-							sourcePath));
+					problems.add(createProblem(type, msg, offset, entity.length() + 1));
 				}
 			}
 			catch (BadLocationException e)
@@ -697,23 +786,21 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 	/**
 	 * Validates the DOCTYPE declaration.
 	 * 
-	 * @param sourcePath
-	 * @param doc
 	 * @return
 	 */
-	private Collection<IProblem> validateDoctype(String sourcePath, IDocument doc)
+	private Collection<IProblem> validateDoctype()
 	{
 		String source = doc.get();
-		int doctypeIndex = source.indexOf("<!DOCTYPE"); //$NON-NLS-1$
-		if (doctypeIndex == -1)
-		{
-			return CollectionsUtil
-					.newList(createWarning(Messages.HTMLTidyValidator_MissingDoctype, 1, 0, 0, sourcePath));
-		}
-
 		Collection<IProblem> problems = new ArrayList<IProblem>(2);
 		try
 		{
+			int doctypeIndex = source.indexOf("<!DOCTYPE"); //$NON-NLS-1$
+			if (doctypeIndex == -1)
+			{
+				return CollectionsUtil.newList(createProblem(ProblemType.MissingDoctype,
+						Messages.HTMLTidyValidator_MissingDoctype, 0, 0));
+			}
+
 			Matcher m = DOCTYPE_PATTERN.matcher(source);
 			if (m.find())
 			{
@@ -726,8 +813,8 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 						int offsetUppercase = m.start(4);
 						if (!systemStr.equals("SYSTEM")) //$NON-NLS-1$
 						{
-							problems.add(createWarning(Messages.HTMLTidyValidator_UppercaseDoctype,
-									doc.getLineOfOffset(offsetUppercase) + 1, offsetUppercase, 6, sourcePath));
+							problems.add(createProblem(ProblemType.UppercaseDoctype,
+									Messages.HTMLTidyValidator_UppercaseDoctype, offsetUppercase, 6));
 						}
 					}
 
@@ -737,32 +824,32 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 						int offsetUppercase = m.start(5);
 						if (!publicStr.equals("PUBLIC")) //$NON-NLS-1$
 						{
-							problems.add(createWarning(Messages.HTMLTidyValidator_UppercaseDoctype,
-									doc.getLineOfOffset(offsetUppercase) + 1, offsetUppercase, 6, sourcePath));
+							problems.add(createProblem(ProblemType.UppercaseDoctype,
+									Messages.HTMLTidyValidator_UppercaseDoctype, offsetUppercase, 6));
 						}
 
 						String w3cStr = m.group(6);
 						offsetUppercase = m.start(6);
 						if (!w3cStr.equals("W3C")) //$NON-NLS-1$
 						{
-							problems.add(createWarning(Messages.HTMLTidyValidator_UppercaseDoctype,
-									doc.getLineOfOffset(offsetUppercase) + 1, offsetUppercase, 3, sourcePath));
+							problems.add(createProblem(ProblemType.UppercaseDoctype,
+									Messages.HTMLTidyValidator_UppercaseDoctype, offsetUppercase, 3));
 						}
 
 						String dtdStr = m.group(7);
 						offsetUppercase = m.start(7);
 						if (!dtdStr.equals("DTD")) //$NON-NLS-1$
 						{
-							problems.add(createWarning(Messages.HTMLTidyValidator_UppercaseDoctype,
-									doc.getLineOfOffset(offsetUppercase) + 1, offsetUppercase, 3, sourcePath));
+							problems.add(createProblem(ProblemType.UppercaseDoctype,
+									Messages.HTMLTidyValidator_UppercaseDoctype, offsetUppercase, 3));
 						}
 
 						String enStr = m.group(8);
 						offsetUppercase = m.start(8);
 						if (!enStr.equals("EN")) //$NON-NLS-1$
 						{
-							problems.add(createWarning(Messages.HTMLTidyValidator_UppercaseDoctype,
-									doc.getLineOfOffset(offsetUppercase) + 1, offsetUppercase, 2, sourcePath));
+							problems.add(createProblem(ProblemType.UppercaseDoctype,
+									Messages.HTMLTidyValidator_UppercaseDoctype, offsetUppercase, 2));
 						}
 					}
 				}
@@ -770,16 +857,16 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 			else
 			{
 				// Malformed Doctype
-				problems.add(createWarning(Messages.HTMLTidyValidator_MalformedDoctype,
-						doc.getLineOfOffset(doctypeIndex) + 1, doctypeIndex, 9, sourcePath));
+				problems.add(createProblem(ProblemType.MalformedDoctype, Messages.HTMLTidyValidator_MalformedDoctype,
+						doctypeIndex, 9));
 			}
 
 			// Check if doctype is after any tags...
 			String before = source.substring(0, doctypeIndex);
 			if (!StringUtil.isEmpty(before))
 			{
-				problems.add(createWarning(Messages.HTMLTidyValidator_DoctypeAfterElements,
-						doc.getLineOfOffset(doctypeIndex) + 1, doctypeIndex, 9, sourcePath));
+				problems.add(createProblem(ProblemType.DoctypeAfterElements,
+						Messages.HTMLTidyValidator_DoctypeAfterElements, doctypeIndex, 9));
 			}
 		}
 		catch (BadLocationException e)
@@ -787,5 +874,57 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 			IdeLog.logError(HTMLPlugin.getDefault(), e);
 		}
 		return problems;
+	}
+
+	/**
+	 * Creates a problem of the given type, unless the user has set to ignore the given type. Looks up the severity
+	 * based on the user's preferences. Defaults to {@link IProblem.Severity#WARNING}
+	 * 
+	 * @param type
+	 * @param message
+	 * @param offset
+	 * @param length
+	 * @return
+	 * @throws BadLocationException
+	 */
+	private IProblem createProblem(ProblemType type, String message, int offset, int length)
+			throws BadLocationException
+	{
+		IProblem.Severity severity = getSeverity(type);
+		if (severity == IProblem.Severity.IGNORE)
+		{
+			return null;
+		}
+		int lineNumber = doc.getLineOfOffset(offset) + 1;
+		IProblem problem = new Problem(severity.intValue(), message, offset, length, lineNumber, sourcePath);
+		problem.setAttribute(ID, type.id);
+		return problem;
+	}
+
+	private IProblem.Severity getSeverity(ProblemType type)
+	{
+		int num = getPreferenceInt(type.getPrefKey(), IProblem.Severity.WARNING.intValue());
+		return IProblem.Severity.create(num);
+	}
+
+	@Override
+	public void restoreDefaults()
+	{
+		// Wipe the user prefs for the problem severities
+		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(getPreferenceNode());
+		for (ProblemType type : ProblemType.values())
+		{
+			prefs.remove(type.getPrefKey());
+		}
+		try
+		{
+			prefs.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			IdeLog.logError(BuildPathCorePlugin.getDefault(), e);
+		}
+		// Let super class handle cleaning up enablement and filters
+		super.restoreDefaults();
 	}
 }

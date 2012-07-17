@@ -101,7 +101,7 @@ public class CSSValidatorTest extends AbstractValidatorTestCase
 
 		// makes sure it's just a warning unrelated to the src
 		IProblem item = items.get(0);
-		assertEquals(IMarker.SEVERITY_WARNING, item.getSeverity());
+		assertEquals(IMarker.SEVERITY_WARNING, item.getSeverity().intValue());
 	}
 
 	public void testCSS3AtRule() throws CoreException

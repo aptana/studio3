@@ -141,7 +141,22 @@ public interface IBuildParticipant
 	 */
 	public IBuildParticipantWorkingCopy getWorkingCopy();
 
+	/**
+	 * @param prefKey
+	 * @return
+	 */
 	public String getPreferenceString(String prefKey);
 
+	/**
+	 * @param prefKey
+	 * @return
+	 */
 	public boolean getPreferenceBoolean(String prefKey);
+
+	/**
+	 * @param prefKey
+	 * @param defaultValue
+	 * @return
+	 */
+	public int getPreferenceInt(String prefKey, int defaultValue);
 }

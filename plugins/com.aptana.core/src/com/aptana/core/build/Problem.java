@@ -73,9 +73,9 @@ public class Problem implements IProblem
 		return message;
 	}
 
-	public int getSeverity()
+	public Severity getSeverity()
 	{
-		return severity;
+		return IProblem.Severity.create(severity);
 	}
 
 	public String getSourcePath()
@@ -88,7 +88,7 @@ public class Problem implements IProblem
 		Map<String, Object> attributes = new HashMap<String, Object>();
 		attributes.putAll(getAttributes());
 
-		attributes.put(IMarker.SEVERITY, getSeverity());
+		attributes.put(IMarker.SEVERITY, getSeverity().intValue());
 		int length = getLength();
 		if (length > 0)
 		{

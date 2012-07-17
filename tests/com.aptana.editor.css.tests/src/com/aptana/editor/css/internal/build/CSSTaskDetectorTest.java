@@ -75,7 +75,7 @@ public class CSSTaskDetectorTest extends TestCase
 			assertEquals(11, task.getOffset());
 			assertEquals(12, task.getLength());
 			assertEquals(IMarker.PRIORITY_NORMAL, task.getPriority());
-			assertEquals(IMarker.SEVERITY_INFO, task.getSeverity());
+			assertEquals(IMarker.SEVERITY_INFO, task.getSeverity().intValue());
 			assertEquals(coffeeFile.toURI().toString(), task.getSourcePath());
 
 			// Now "delete" the file, make sure it wipes the tasks.

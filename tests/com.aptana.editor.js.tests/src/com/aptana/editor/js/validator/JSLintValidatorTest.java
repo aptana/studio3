@@ -28,14 +28,6 @@ import com.aptana.jetty.util.epl.ajax.JSON;
 public class JSLintValidatorTest extends AbstractValidatorTestCase
 {
 
-	protected void assertProblem(IProblem item, String msg, int line, int severity, int offset)
-	{
-		assertEquals("message", msg, item.getMessage());
-		assertEquals("line", line, item.getLineNumber());
-		assertEquals("severity", severity, item.getSeverity());
-		assertEquals("offset", offset, item.getOffset());
-	}
-
 	protected void assertProblemExists(List<IProblem> items, String msg, int line, int severity, int offset)
 	{
 		IProblem item = assertContains(items, msg);

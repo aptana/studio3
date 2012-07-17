@@ -75,7 +75,7 @@ public class AbstractBuildParticipantTest extends TestCase
 		assertEquals(linenumber, error.getLineNumber());
 		assertEquals(offset, error.getOffset());
 		assertEquals(sourcePath, error.getSourcePath());
-		assertEquals(IMarker.SEVERITY_ERROR, error.getSeverity());
+		assertEquals(IMarker.SEVERITY_ERROR, error.getSeverity().intValue());
 		assertEquals(IMarker.PRIORITY_NORMAL, error.getPriority());
 	}
 
@@ -93,7 +93,7 @@ public class AbstractBuildParticipantTest extends TestCase
 		assertEquals(linenumber, error.getLineNumber());
 		assertEquals(offset, error.getOffset());
 		assertEquals(sourcePath, error.getSourcePath());
-		assertEquals(IMarker.SEVERITY_WARNING, error.getSeverity());
+		assertEquals(IMarker.SEVERITY_WARNING, error.getSeverity().intValue());
 		assertEquals(IMarker.PRIORITY_NORMAL, error.getPriority());
 	}
 
@@ -111,7 +111,7 @@ public class AbstractBuildParticipantTest extends TestCase
 		assertEquals(linenumber, error.getLineNumber());
 		assertEquals(offset, error.getOffset());
 		assertEquals(sourcePath, error.getSourcePath());
-		assertEquals(IMarker.SEVERITY_INFO, error.getSeverity());
+		assertEquals(IMarker.SEVERITY_INFO, error.getSeverity().intValue());
 		assertEquals(IMarker.PRIORITY_NORMAL, error.getPriority());
 	}
 
@@ -130,7 +130,7 @@ public class AbstractBuildParticipantTest extends TestCase
 		assertEquals(linenumber, error.getLineNumber());
 		assertEquals(offset, error.getOffset());
 		assertEquals(sourcePath, error.getSourcePath());
-		assertEquals(IMarker.SEVERITY_INFO, error.getSeverity());
+		assertEquals(IMarker.SEVERITY_INFO, error.getSeverity().intValue());
 		assertEquals(priority, error.getPriority());
 	}
 

@@ -95,14 +95,25 @@ public abstract class AbstractValidatorTestCase extends TestCase
 		return null;
 	}
 
+	protected void assertProblem(IProblem item, String msg, int line, int severity, int offset)
+	{
+		assertEquals("message", msg, item.getMessage());
+		assertEquals("line", line, item.getLineNumber());
+		assertEquals("severity", severity, item.getSeverity().intValue());
+		assertEquals("offset", offset, item.getOffset());
+	}
+
+	protected void assertProblem(IProblem item, String msg, int line, int severity, int offset, int length)
+	{
+		assertProblem(item, msg, line, severity, offset);
+		assertEquals("length", length, item.getLength());
+	}
+
 	protected void assertContainsProblem(List<IProblem> items, String msg, int severity, int line, int offset,
 			int length)
 	{
 		IProblem problem = assertContains(items, msg);
-		assertEquals("severity", severity, problem.getSeverity());
-		assertEquals("offset", offset, problem.getOffset());
-		assertEquals("length", length, problem.getLength());
-		assertEquals("lineNumber", line, problem.getLineNumber());
+		assertProblem(problem, msg, line, severity, offset, length);
 	}
 
 	protected List<IProblem> getProblems(List<IProblem> items, final String message)

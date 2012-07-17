@@ -7,7 +7,7 @@
  *
  
  *******************************************************************************/
-package com.aptana.formatter.ui.preferences;
+package com.aptana.ui.preferences;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -20,6 +20,11 @@ public class ScrolledPageContent extends SharedScrolledComposite
 {
 
 	private FormToolkit fToolkit;
+
+	public ScrolledPageContent(Composite parent)
+	{
+		this(parent, SWT.V_SCROLL | SWT.H_SCROLL);
+	}
 
 	public ScrolledPageContent(Composite parent, int style)
 	{

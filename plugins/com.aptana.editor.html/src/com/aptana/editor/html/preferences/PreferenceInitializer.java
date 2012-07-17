@@ -11,6 +11,7 @@ import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
 import com.aptana.core.build.IBuildParticipant.BuildType;
+import com.aptana.core.build.IProblem;
 import com.aptana.core.build.PreferenceUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.html.HTMLPlugin;
@@ -45,6 +46,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		// Set Tidy validator to be on by default for reconcile
 		prefs.putBoolean(PreferenceUtil.getEnablementPreferenceKey(HTMLTidyValidator.ID, BuildType.BUILD), false);
 		prefs.putBoolean(PreferenceUtil.getEnablementPreferenceKey(HTMLTidyValidator.ID, BuildType.RECONCILE), true);
+		prefs.putInt(HTMLTidyValidator.ProblemType.IdNameAttributeMismatch.getPrefKey(),
+				IProblem.Severity.ERROR.intValue());
 
 		// Set Parser Errors to be on by default for both
 		prefs.putBoolean(PreferenceUtil.getEnablementPreferenceKey(HTMLParserValidator.ID, BuildType.BUILD), true);
