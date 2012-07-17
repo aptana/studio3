@@ -7,7 +7,9 @@
  */
 package com.aptana.editor.common.text.hyperlink;
 
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -96,7 +98,7 @@ public class HyperlinkDetector extends URLHyperlinkDetector
 			return null;
 		}
 
-		List<IHyperlink> ours = new ArrayList<IHyperlink>();
+		List<IHyperlink> ours = new ArrayList<IHyperlink>(result.length);
 		for (IHyperlink link : result)
 		{
 			// Wrap in our own hyperlink impl, so we can try to open file in editor
@@ -110,9 +112,17 @@ public class HyperlinkDetector extends URLHyperlinkDetector
 					ours.add(wrapped);
 				}
 			}
-			catch (Exception e)
+			catch (URISyntaxException use)
 			{
-				IdeLog.logWarning(CommonEditorPlugin.getDefault(), e);
+				IdeLog.logInfo(
+						CommonEditorPlugin.getDefault(),
+						MessageFormat.format("Failed to resolve URI: {0}", hyperlink.getURLString()), use, IDebugScopes.DEBUG); //$NON-NLS-1$
+			}
+			catch (MalformedURLException mue)
+			{
+				IdeLog.logInfo(
+						CommonEditorPlugin.getDefault(),
+						MessageFormat.format("Failed to resolve URI: {0}", hyperlink.getURLString()), mue, IDebugScopes.DEBUG); //$NON-NLS-1$
 			}
 		}
 		if (ours.isEmpty())
