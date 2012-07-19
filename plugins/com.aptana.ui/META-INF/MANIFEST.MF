@@ -29,3 +29,4 @@ Export-Package: com.aptana.ui,
  com.aptana.ui.util,
  com.aptana.ui.widgets
 Eclipse-ExtensibleAPI: true
+Import-Package: org.eclipse.ui.internal.browser
