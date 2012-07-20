@@ -58,6 +58,7 @@
                         <adapt
                               type="org.eclipse.core.resources.IResource">
                            <test
+                                 forcePluginActivation="true"
                                  property="com.aptana.deploy.project.isDeployable"
                                  value="true">
                            </test>
@@ -76,6 +77,7 @@
                         <adapt
                               type="org.eclipse.core.resources.IResource">
                            <test
+                                 forcePluginActivation="true"
                                  property="com.aptana.deploy.project.isDeployable"
                                  value="true">
                            </test>
