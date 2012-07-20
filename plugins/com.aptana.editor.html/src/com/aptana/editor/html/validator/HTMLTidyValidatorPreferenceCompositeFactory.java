@@ -11,6 +11,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
@@ -116,7 +117,7 @@ public class HTMLTidyValidatorPreferenceCompositeFactory implements IBuildPartic
 		label1.setText(type.description());
 		label1.setLayoutData(new GridData(GridData.BEGINNING, GridData.CENTER, true, false));
 
-		Combo combo = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
+		final Combo combo = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
 		combo.add(IProblem.Severity.IGNORE.label());
 		combo.add(IProblem.Severity.INFO.label());
 		combo.add(IProblem.Severity.WARNING.label());
@@ -132,7 +133,25 @@ public class HTMLTidyValidatorPreferenceCompositeFactory implements IBuildPartic
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				participant.setPreference(prefKey, e.text);
+				String text = combo.getText();
+				int severity = IProblem.Severity.WARNING.intValue();
+				if (IProblem.Severity.IGNORE.label().equals(text))
+				{
+					severity = -1;
+				}
+				else if (IProblem.Severity.INFO.label().equals(text))
+				{
+					severity = IMarker.SEVERITY_INFO;
+				}
+				else if (IProblem.Severity.WARNING.label().equals(text))
+				{
+					severity = IMarker.SEVERITY_WARNING;
+				}
+				else if (IProblem.Severity.ERROR.label().equals(text))
+				{
+					severity = IMarker.SEVERITY_ERROR;
+				}
+				participant.setPreference(prefKey, severity);
 			}
 		});
 		combo.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL));
