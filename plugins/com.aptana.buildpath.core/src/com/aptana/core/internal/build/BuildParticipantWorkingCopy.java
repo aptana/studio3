@@ -241,7 +241,7 @@ public class BuildParticipantWorkingCopy implements IBuildParticipantWorkingCopy
 			{
 				prefs.putDouble(entry.getKey(), (Double) value);
 			}
-			else
+			else if (value != null)
 			{
 				prefs.put(entry.getKey(), value.toString());
 			}

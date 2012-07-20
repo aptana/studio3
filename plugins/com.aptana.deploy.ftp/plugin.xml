@@ -45,6 +45,7 @@
                         <adapt
                               type="org.eclipse.core.resources.IResource">
                            <test
+                                 forcePluginActivation="true"
                                  property="com.aptana.deploy.project.isDeployType"
                                  value="com.aptana.deploy.ftp.provider">
                            </test>
@@ -63,6 +64,7 @@
                         <adapt
                               type="org.eclipse.core.resources.IResource">
                            <test
+                                 forcePluginActivation="true"
                                  property="com.aptana.deploy.project.isDeployType"
                                  value="com.aptana.deploy.ftp.provider">
                            </test>
