@@ -384,7 +384,7 @@ public final class UIUtils
 
 			public int openMessageDialog()
 			{
-				return MessageDialog.open(kind, UIUtils.getActiveShell(), title, message, SWT.NONE) ? Window.OK
+				return MessageDialog.open(kind, UIUtils.getActiveWorkbenchWindow().getShell(), title, message, SWT.NONE) ? Window.OK
 						: Window.CANCEL;
 			}
 		}, Window.OK);
