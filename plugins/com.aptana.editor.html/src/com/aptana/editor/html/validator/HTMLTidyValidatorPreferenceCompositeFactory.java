@@ -31,6 +31,7 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import com.aptana.build.ui.preferences.IBuildParticipantPreferenceCompositeFactory;
 import com.aptana.core.build.IBuildParticipantWorkingCopy;
 import com.aptana.core.build.IProblem;
+import com.aptana.core.build.IProblem.Severity;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.editor.html.validator.HTMLTidyValidator.ProblemCategory;
 import com.aptana.editor.html.validator.HTMLTidyValidator.ProblemType;
@@ -134,24 +135,8 @@ public class HTMLTidyValidatorPreferenceCompositeFactory implements IBuildPartic
 			public void widgetSelected(SelectionEvent e)
 			{
 				String text = combo.getText();
-				int severity = IProblem.Severity.WARNING.intValue();
-				if (IProblem.Severity.IGNORE.label().equals(text))
-				{
-					severity = -1;
-				}
-				else if (IProblem.Severity.INFO.label().equals(text))
-				{
-					severity = IMarker.SEVERITY_INFO;
-				}
-				else if (IProblem.Severity.WARNING.label().equals(text))
-				{
-					severity = IMarker.SEVERITY_WARNING;
-				}
-				else if (IProblem.Severity.ERROR.label().equals(text))
-				{
-					severity = IMarker.SEVERITY_ERROR;
-				}
-				participant.setPreference(prefKey, severity);
+				Severity severity = IProblem.Severity.create(text);
+				participant.setPreference(prefKey, severity.intValue());
 			}
 		});
 		combo.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL));
