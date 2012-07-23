@@ -93,10 +93,6 @@ public class LazyBuildParticipant extends AbstractBuildParticipant
 	@Override
 	public void restoreDefaults()
 	{
-		if (participant != null)
-		{
-			participant.restoreDefaults();
-		}
-		super.restoreDefaults();
+		getParticipant().restoreDefaults();
 	}
 }
