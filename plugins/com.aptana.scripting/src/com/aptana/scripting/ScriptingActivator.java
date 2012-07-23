@@ -66,8 +66,6 @@ public class ScriptingActivator extends Plugin
 		return RunType.CURRENT_THREAD;
 	}
 
-	private FileTypeAssociationListener fileTypeListener;
-
 	/**
 	 * The constructor
 	 */
@@ -91,10 +89,6 @@ public class ScriptingActivator extends Plugin
 			protected IStatus run(IProgressMonitor monitor)
 			{
 				BundleManager manager = BundleManager.getInstance();
-
-				// register file association listener
-				fileTypeListener = new FileTypeAssociationListener();
-				manager.addBundleVisibilityListener(fileTypeListener);
 
 				// TODO: Make this an extension point so plugins can contribute these
 				// grabbing instances register listeners
@@ -138,13 +132,6 @@ public class ScriptingActivator extends Plugin
 		try
 		{
 			BundleMonitor.getInstance().endMonitoring();
-
-			if (fileTypeListener != null)
-			{
-				fileTypeListener.cleanup();
-				BundleManager.getInstance().removeBundleVisibilityListener(fileTypeListener);
-				fileTypeListener = null;
-			}
 
 			FileWatcherRegistrant.shutdown();
 			// FIXME Clean up the bundle manager singleton!
