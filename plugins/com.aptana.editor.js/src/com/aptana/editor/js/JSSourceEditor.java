@@ -222,6 +222,9 @@ public class JSSourceEditor extends AbstractThemeableEditor
 
 		public IContext getContext(Object target)
 		{
+			if (target instanceof IParseNode) {
+				return new JSHelpContext(editorPart, (IParseNode) target);
+			}
 			ISelection selection = editorPart.getSelectionProvider().getSelection();
 			if (selection.isEmpty())
 			{

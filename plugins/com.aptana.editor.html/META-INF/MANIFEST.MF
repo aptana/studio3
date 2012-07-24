@@ -26,6 +26,7 @@ Require-Bundle: com.aptana.jetty.util.epl,
  com.aptana.editor.xml,
  com.aptana.preview;visibility:=reexport,
  com.aptana.build.ui,
+ com.aptana.ui.epl,
  org.eclipse.ui.forms
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy

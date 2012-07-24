@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.help.ui.internal.views.HelpView;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
@@ -57,8 +58,11 @@ import com.aptana.ui.UIPlugin;
  * @author Max Stepanov
  * @author cwilliams
  */
+@SuppressWarnings("restriction")
 public final class UIUtils
 {
+
+	private static final String HELP_VIEW_ID = "org.eclipse.help.ui.HelpView"; //$NON-NLS-1$
 
 	/**
 	 * By default, show tooltips for 3 seconds.
@@ -514,7 +518,6 @@ public final class UIUtils
 		return AbstractUIPlugin.imageDescriptorFromPlugin(pluginId, path);
 	}
 
-	@SuppressWarnings("restriction")
 	public static boolean getCoolBarVisibility()
 	{
 		IWorkbench workbench = PlatformUI.getWorkbench();
@@ -529,7 +532,6 @@ public final class UIUtils
 		return true;
 	}
 
-	@SuppressWarnings("restriction")
 	public static void setCoolBarVisibility(boolean visible)
 	{
 		IWorkbenchWindow activeWorkbenchWindow = getActiveWorkbenchWindow();
@@ -546,6 +548,36 @@ public final class UIUtils
 				ICommandService cmdService = (ICommandService) activePart.getSite().getService(ICommandService.class);
 				cmdService.refreshElements("org.eclipse.ui.ToggleCoolbarAction", null); //$NON-NLS-1$
 			}
+		}
+	}
+
+	/**
+	 * Opens the internal HelpView and address it to the given doc url.
+	 * 
+	 * @param url
+	 */
+	public static void openHelp(String url)
+	{
+		IWorkbenchPage page = getActivePage();
+		if (page != null)
+		{
+			try
+			{
+				IViewPart part = page.showView(HELP_VIEW_ID);
+				if (part != null)
+				{
+					HelpView view = (HelpView) part;
+					view.showHelp(url);
+				}
+			}
+			catch (PartInitException e)
+			{
+				IdeLog.logError(UIPlugin.getDefault(), e);
+			}
+		}
+		else
+		{
+			IdeLog.logWarning(UIPlugin.getDefault(), "Could not open the help view. Active page was null."); //$NON-NLS-1$
 		}
 	}
 }

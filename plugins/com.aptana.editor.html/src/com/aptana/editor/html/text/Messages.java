@@ -5,18 +5,14 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.js.text;
+package com.aptana.editor.html.text;
 
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS
 {
-	private static final String BUNDLE_NAME = "com.aptana.editor.js.text.messages"; //$NON-NLS-1$
-
-	public static String JSTextHover_openDeclarationTooltip;
-
-	public static String JSTextHover_openDocsTooltip;
-
+	private static final String BUNDLE_NAME = "com.aptana.editor.html.text.messages"; //$NON-NLS-1$
+	public static String HTMLTextHover_openDomReferenceAction;
 	static
 	{
 		// initialize resource bundle
