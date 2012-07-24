@@ -11,6 +11,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
@@ -30,6 +31,7 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import com.aptana.build.ui.preferences.IBuildParticipantPreferenceCompositeFactory;
 import com.aptana.core.build.IBuildParticipantWorkingCopy;
 import com.aptana.core.build.IProblem;
+import com.aptana.core.build.IProblem.Severity;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.editor.html.validator.HTMLTidyValidator.ProblemCategory;
 import com.aptana.editor.html.validator.HTMLTidyValidator.ProblemType;
@@ -116,7 +118,7 @@ public class HTMLTidyValidatorPreferenceCompositeFactory implements IBuildPartic
 		label1.setText(type.description());
 		label1.setLayoutData(new GridData(GridData.BEGINNING, GridData.CENTER, true, false));
 
-		Combo combo = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
+		final Combo combo = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
 		combo.add(IProblem.Severity.IGNORE.label());
 		combo.add(IProblem.Severity.INFO.label());
 		combo.add(IProblem.Severity.WARNING.label());
@@ -132,7 +134,9 @@ public class HTMLTidyValidatorPreferenceCompositeFactory implements IBuildPartic
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				participant.setPreference(prefKey, e.text);
+				String text = combo.getText();
+				Severity severity = IProblem.Severity.create(text);
+				participant.setPreference(prefKey, severity.intValue());
 			}
 		});
 		combo.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL));

@@ -257,8 +257,15 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 						problems.addAll(validateAST(ast));
 						if (!foundTitle)
 						{
-							problems.add(createWarning(Messages.HTMLTidyValidator_InsertMissingTitle, 1, 0, 0,
-									sourcePath));
+							try
+							{
+								problems.add(createProblem(ProblemType.InsertMissingTitle,
+										Messages.HTMLTidyValidator_InsertMissingTitle, 0, 0));
+							}
+							catch (BadLocationException e)
+							{
+								IdeLog.logError(HTMLPlugin.getDefault(), e);
+							}
 						}
 					}
 				}

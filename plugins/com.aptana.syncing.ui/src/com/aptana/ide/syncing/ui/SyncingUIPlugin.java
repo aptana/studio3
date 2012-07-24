@@ -7,6 +7,9 @@
  */
 package com.aptana.ide.syncing.ui;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IExecutionListener;
@@ -15,6 +18,7 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -26,18 +30,22 @@ import org.osgi.framework.BundleContext;
 
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IConnectionPoint;
+import com.aptana.ide.core.io.WorkspaceConnectionPoint;
 import com.aptana.ide.core.io.events.ConnectionPointEvent;
 import com.aptana.ide.core.io.events.IConnectionPointListener;
 import com.aptana.ide.syncing.core.ISiteConnection;
+import com.aptana.ide.syncing.core.SiteConnectionUtils;
 import com.aptana.ide.syncing.core.SyncingPlugin;
 import com.aptana.ide.syncing.core.events.ISiteConnectionListener;
 import com.aptana.ide.syncing.core.events.SiteConnectionEvent;
+import com.aptana.ide.syncing.ui.actions.DownloadAction;
 import com.aptana.ide.syncing.ui.actions.Sync;
 import com.aptana.ide.syncing.ui.editors.EditorUtils;
 import com.aptana.ide.syncing.ui.navigator.ProjectSitesManager;
 import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants.SyncDirection;
 import com.aptana.ide.syncing.ui.preferences.SyncPreferenceUtil;
 import com.aptana.ide.ui.io.IOUIPlugin;
+import com.aptana.ide.ui.io.IUniformFileStoreEditorInput;
 import com.aptana.ui.util.UIUtils;
 
 /**
@@ -139,7 +147,8 @@ public class SyncingUIPlugin extends AbstractUIPlugin
 		private static final String COMMAND_SAVE = "org.eclipse.ui.file.save"; //$NON-NLS-1$
 		private static final String COMMAND_SAVE_ALL = "org.eclipse.ui.file.saveAll"; //$NON-NLS-1$
 
-		private IEditorPart[] editorsToUpload;
+		private List<IFileEditorInput> editorInputsToUpload = new ArrayList<IFileEditorInput>();
+		private List<IUniformFileStoreEditorInput> editorInputsToDownload = new ArrayList<IUniformFileStoreEditorInput>();
 
 		public void notHandled(String commandId, NotHandledException exception)
 		{
@@ -154,20 +163,36 @@ public class SyncingUIPlugin extends AbstractUIPlugin
 			// if we see a save command
 			if (COMMAND_SAVE.equals(commandId) || COMMAND_SAVE_ALL.equals(commandId))
 			{
-				if (editorsToUpload != null)
+				for (IFileEditorInput input : editorInputsToUpload)
 				{
-					for (IEditorPart editor : editorsToUpload)
+					// for upload, checks if the file belongs to a project auto-synced to a remote connection
+					IProject project = ((IFileEditorInput) input).getFile().getProject();
+					if (SyncPreferenceUtil.isAutoSync(project)
+							&& SyncPreferenceUtil.getAutoSyncDirection(project) != SyncDirection.DOWNLOAD)
 					{
-						IEditorInput input = editor.getEditorInput();
-						if (input instanceof IFileEditorInput)
+						Sync.uploadEditor(input);
+					}
+				}
+
+				for (IUniformFileStoreEditorInput input : editorInputsToDownload)
+				{
+					// for download, finds all the projects that connect to the remote connection that contains the file
+					// and checks if each has auto-sync turned on
+					ISiteConnection[] sites = SiteConnectionUtils.findSitesWithDestination(input);
+					for (ISiteConnection site : sites)
+					{
+						IConnectionPoint source = site.getSource();
+						if (source instanceof WorkspaceConnectionPoint)
 						{
-							// for upload, checks if the active editor belongs to a project auto-synced to a FTP
-							// connection
-							IProject project = ((IFileEditorInput) input).getFile().getProject();
+							IProject project = ((WorkspaceConnectionPoint) source).getResource().getProject();
 							if (SyncPreferenceUtil.isAutoSync(project)
-									&& SyncPreferenceUtil.getAutoSyncDirection(project) != SyncDirection.DOWNLOAD)
+									&& SyncPreferenceUtil.getAutoSyncDirection(project) != SyncDirection.UPLOAD)
 							{
-								Sync.uploadEditor(input);
+								DownloadAction action = new DownloadAction();
+								action.setActivePart(null, PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+										.getActivePage().getActivePart());
+								action.setSelection(new StructuredSelection(input), false);
+								action.run(null);
 							}
 						}
 					}
@@ -177,17 +202,38 @@ public class SyncingUIPlugin extends AbstractUIPlugin
 
 		public void preExecute(String commandId, ExecutionEvent event)
 		{
+			IEditorPart[] editorsToTransfer = null;
+			editorInputsToUpload.clear();
+			editorInputsToDownload.clear();
+
 			if (COMMAND_SAVE.equals(commandId))
 			{
-				editorsToUpload = new IEditorPart[] { UIUtils.getActiveEditor() };
+				editorsToTransfer = new IEditorPart[] { UIUtils.getActiveEditor() };
 			}
 			else if (COMMAND_SAVE_ALL.equals(commandId))
 			{
-				editorsToUpload = UIUtils.getDirtyEditors();
+				editorsToTransfer = UIUtils.getDirtyEditors();
 			}
-			else
+			if (editorsToTransfer != null)
 			{
-				editorsToUpload = null;
+				for (IEditorPart editor : editorsToTransfer)
+				{
+					IEditorInput input = editor.getEditorInput();
+					if (input instanceof IFileEditorInput)
+					{
+						// it is a project file, so belongs to the upload list
+						editorInputsToUpload.add((IFileEditorInput) input);
+					}
+					else if (input instanceof IUniformFileStoreEditorInput)
+					{
+						IUniformFileStoreEditorInput editorInput = (IUniformFileStoreEditorInput) input;
+						if (editorInput.isRemote())
+						{
+							// it is a remote file, so belongs to the download list
+							editorInputsToDownload.add(editorInput);
+						}
+					}
+				}
 			}
 		}
 	};

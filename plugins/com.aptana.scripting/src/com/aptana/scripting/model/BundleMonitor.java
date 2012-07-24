@@ -8,6 +8,7 @@
 package com.aptana.scripting.model;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.text.MessageFormat;
 import java.util.regex.Pattern;
 
@@ -34,10 +35,20 @@ import com.aptana.scripting.ScriptingActivator;
 
 public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVisitor, JNotifyListener
 {
+	private final class CacheFileFilter implements FilenameFilter
+	{
+		public boolean accept(File dir, String name)
+		{
+			return name.startsWith("cache") && name.endsWith(".yml"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+	}
+
 	// @formatter:off
 	// TODO: use constants from BundleManager for bundles, commands, and snippets directory names
 	private static final Pattern USER_BUNDLE_PATTERN = Pattern.compile(
 			".+?[/\\\\]bundle\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
+	private static final Pattern USER_LOCALIZATIONS_PATTERN = Pattern.compile(
+			".+?[/\\\\]config/locales/[^/\\\\]+\\.yml$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
 	private static final Pattern USER_FILE_PATTERN = Pattern.compile(
 			".+?[/\\\\](?:commands|snippets|templates|samples)/[^/\\\\]+\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
 	private static final Pattern BUNDLE_PATTERN = Pattern.compile("/.+?/bundle\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
@@ -92,7 +103,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 					IResourceChangeEvent.PRE_DELETE | IResourceChangeEvent.POST_CHANGE);
 
 			// Make sure the user bundles directory exists
-			String userBundlesPath = BundleManager.getInstance().getUserBundlesPath();
+			String userBundlesPath = getBundleManager().getUserBundlesPath();
 			File bundleDirectory = new File(userBundlesPath);
 			boolean directoryExists = true;
 
@@ -191,7 +202,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 				this.showFileEvent(MessageFormat.format("File created: {0},{1}", rootPath, name)); //$NON-NLS-1$
 			}
 
-			BundleManager manager = BundleManager.getInstance();
+			BundleManager manager = getBundleManager();
 			File file = new File(rootPath, name);
 
 			if (USER_BUNDLE_PATTERN.matcher(name).matches())
@@ -242,7 +253,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 			{
 				this.showFileEvent(MessageFormat.format("File deleted: {0},{1}", rootPath, name)); //$NON-NLS-1$
 			}
-			BundleManager manager = BundleManager.getInstance();
+			BundleManager manager = getBundleManager();
 			File file = new File(rootPath, name);
 
 			if (USER_BUNDLE_PATTERN.matcher(name).matches())
@@ -266,6 +277,11 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 		}
 	}
 
+	protected BundleManager getBundleManager()
+	{
+		return BundleManager.getInstance();
+	}
+
 	/**
 	 * fileModified
 	 * 
@@ -283,7 +299,24 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 			}
 			File file = new File(rootPath, name);
 
-			BundleManager.getInstance().reloadScript(file);
+			getBundleManager().reloadScript(file);
+		}
+		else if (isUserLocalizationFile(rootPath, name))
+		{
+			if (IdeLog.isTraceEnabled(ScriptingActivator.getDefault(), IDebugScopes.SHOW_BUNDLE_MONITOR_FILE_EVENTS))
+			{
+				this.showFileEvent(MessageFormat.format("Localization file modified: {0},{1}", rootPath, name)); //$NON-NLS-1$
+			}
+			File file = new File(rootPath, name);
+			// We need to reload localizations! Wipe the cache files and then reload the bundle
+			BundleManager manager = getBundleManager();
+			File bundleDirectory = manager.getBundleDirectory(file);
+			for (File localeFile : bundleDirectory.listFiles(new CacheFileFilter()))
+			{
+				localeFile.delete();
+			}
+			manager.unloadBundle(bundleDirectory);
+			manager.loadBundle(bundleDirectory);
 		}
 		else
 		{
@@ -296,6 +329,18 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 
 		// used by unit tests
 		this.notifyAll();
+	}
+
+	private boolean isUserLocalizationFile(String rootPath, String name)
+	{
+		if (USER_LOCALIZATIONS_PATTERN.matcher(name).matches())
+		{
+			// only return true if the script is part of an existing bundle.
+			File script = new File(rootPath, name);
+			return isScriptInExistingBundle(script);
+		}
+
+		return false;
 	}
 
 	/**
@@ -323,7 +368,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	 * @param delta
 	 * @return
 	 */
-	private static boolean isProjectBundleFile(IResourceDelta delta)
+	private boolean isProjectBundleFile(IResourceDelta delta)
 	{
 		String fullProjectPath = delta.getFullPath().toString();
 		boolean result = false;
@@ -356,7 +401,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 		return result;
 	}
 
-	private static boolean isProjectBundleFile(IFile file)
+	private boolean isProjectBundleFile(IFile file)
 	{
 		String fullProjectPath = file.getFullPath().toString();
 
@@ -382,9 +427,9 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	 * @param script
 	 * @return
 	 */
-	private static boolean isScriptInExistingBundle(File script)
+	private boolean isScriptInExistingBundle(File script)
 	{
-		BundleManager manager = BundleManager.getInstance();
+		BundleManager manager = getBundleManager();
 		File bundleDirectory = manager.getBundleDirectory(script);
 
 		return manager.hasBundleAtPath(bundleDirectory);
@@ -428,7 +473,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 
 		if (resource != null && resource.getLocation() != null)
 		{
-			BundleManager manager = BundleManager.getInstance();
+			BundleManager manager = getBundleManager();
 			File file = resource.getLocation().toFile();
 			String fullProjectPath = delta.getFullPath().toString();
 
@@ -524,7 +569,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	 */
 	private void reloadDependentScripts(File file)
 	{
-		BundleManager manager = BundleManager.getInstance();
+		BundleManager manager = getBundleManager();
 		String fullPath = file.getAbsolutePath();
 		LibraryCrossReference xref = LibraryCrossReference.getInstance();
 
@@ -565,7 +610,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 
 	private void handleProjectDeleteEvent(IResource resource)
 	{
-		BundleManager manager = BundleManager.getInstance();
+		BundleManager manager = getBundleManager();
 		if (resource instanceof IFile)
 		{
 			IFile file = (IFile) resource;

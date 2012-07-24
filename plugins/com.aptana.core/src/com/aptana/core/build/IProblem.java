@@ -53,6 +53,18 @@ public interface IProblem
 			return Severity.WARNING;
 		}
 
+		public static Severity create(String value)
+		{
+			for (Severity s : values())
+			{
+				if (s.label.equals(value))
+				{
+					return s;
+				}
+			}
+			return Severity.WARNING;
+		}
+
 		public String label()
 		{
 			return label;

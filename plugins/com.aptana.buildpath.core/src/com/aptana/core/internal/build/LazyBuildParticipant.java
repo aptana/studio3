@@ -89,4 +89,10 @@ public class LazyBuildParticipant extends AbstractBuildParticipant
 		// FIXME is there any way to avoid instantiating here?
 		return getParticipant().isRequired();
 	}
+
+	@Override
+	public void restoreDefaults()
+	{
+		getParticipant().restoreDefaults();
+	}
 }
