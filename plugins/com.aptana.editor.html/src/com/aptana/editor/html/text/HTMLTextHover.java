@@ -24,6 +24,7 @@ import org.eclipse.jface.text.Region;
 import org.eclipse.ui.IEditorPart;
 
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.contentassist.CommonTextHover;
 import com.aptana.editor.common.hover.CustomBrowserInformationControl;
 import com.aptana.editor.common.hover.DocumentationBrowserInformationControlInput;
@@ -95,7 +96,7 @@ public class HTMLTextHover extends CommonTextHover implements ITextHover, ITextH
 		{
 			return null;
 		}
-		activeNodeName = activeNode.getNameNode().getName();
+		activeNodeName = (activeNode.getNameNode() != null) ? activeNode.getNameNode().getName() : StringUtil.EMPTY;
 		BaseElement element = getMatchingElement(textViewer, hoverRegion, (HTMLElementNode) activeNode);
 
 		// To avoid duplicating work, we generate the header and documentation together here
@@ -331,12 +332,11 @@ public class HTMLTextHover extends CommonTextHover implements ITextHover, ITextH
 			if (attribute != null)
 			{
 				// Open the element's DOM page with an anchor to the attribute
-				url = MessageFormat
-						.format("/com.aptana.documentation/html/reference/api/{0}.html?visibility=basic#{0}.{1}", name, attribute); //$NON-NLS-1$
+				url = MessageFormat.format("{0}{1}.html?visibility=basic#{1}.{2}", BASE_HELP_DOCS_URL, name, attribute); //$NON-NLS-1$
 			}
 			else
 			{
-				url = MessageFormat.format("/com.aptana.documentation/html/reference/api/{0}.html", name); //$NON-NLS-1$
+				url = MessageFormat.format("{0}{1}.html", BASE_HELP_DOCS_URL, name); //$NON-NLS-1$
 			}
 			UIUtils.openHelp(url);
 		}

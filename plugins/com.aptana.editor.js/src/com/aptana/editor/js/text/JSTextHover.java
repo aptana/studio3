@@ -274,19 +274,17 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 			String url;
 			if (ObjectUtil.areEqual(resolvedReturnType, name) || ObjectUtil.areEqual(name, owningType))
 			{
-				url = MessageFormat.format("/com.aptana.documentation/html/reference/api/{0}.html", name); //$NON-NLS-1$
+				url = MessageFormat.format("{0}{1}.html", BASE_HELP_DOCS_URL, name); //$NON-NLS-1$
 			}
 			else if (!StringUtil.isEmpty(resolvedReturnType))
 			{
-				url = MessageFormat.format(
-						"/com.aptana.documentation/html/reference/api/{0}.html?visibility=basic#{0}.{1}", //$NON-NLS-1$
-						resolvedReturnType, name);
+				url = MessageFormat.format("{0}{1}.html?visibility=basic#{1}.{2}", //$NON-NLS-1$
+						BASE_HELP_DOCS_URL, resolvedReturnType, name);
 			}
 			else
 			{
-				url = MessageFormat.format(
-						"/com.aptana.documentation/html/reference/api/{0}.html?visibility=basic#{0}.{1}", //$NON-NLS-1$
-						owningType, name);
+				url = MessageFormat.format("{0}{1}.html?visibility=basic#{1}.{2}", //$NON-NLS-1$
+						BASE_HELP_DOCS_URL, owningType, name);
 			}
 			UIUtils.openHelp(url);
 		}
