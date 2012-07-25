@@ -298,6 +298,12 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		return super.getSourceViewer();
 	}
 
+	public final SourceViewerConfiguration getISourceViewerConfiguration()
+	{
+		return super.getSourceViewerConfiguration();
+
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.extensions.IThemeableEditor#getIVerticalRuler()
@@ -1135,11 +1141,24 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	}
 
 	/**
+	 * @return the parse node for the current contents of this editor to be used during a reconcile. This means that the
+	 *         AST generated will be used for updating the outline and updating the folding structure (subclasses may
+	 *         override -- i.e.: in the JS editor, if folding is enabled, the ast will need to be generated with
+	 *         comments).
+	 */
+	public IParseRootNode getReconcileAST()
+	{
+		return getAST();
+	}
+
+	/**
 	 * Note: this was deprecated and is restored as this has a faster cache based on the document time (so, this is the
 	 * preferred way of getting the ast based on the full document for the editor).
 	 * 
 	 * @return the parse node for this editor.
 	 * @note this call may lock until the parser finishes generating the ast.
+	 * @note override doGetAST if something needs to be customized and the document-based cache maintained (i.e.: php
+	 *       may need to override this method as the parse depends on the grammar version which may change).
 	 */
 	public IParseRootNode getAST()
 	{
@@ -1165,7 +1184,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 				}
 			}
 			// Don't synchronize the actual parse!
-			IParseRootNode ast = ParserPoolFactory.parse(getContentType(), document.get()).getRootNode();
+			IParseRootNode ast = doGetAST(document);
 
 			synchronized (modificationStampLock)
 			{
@@ -1179,6 +1198,14 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 			IdeLog.logTrace(CommonEditorPlugin.getDefault(), e.getMessage(), e, IDebugScopes.AST);
 		}
 		return null;
+	}
+
+	/**
+	 * Override this method to calculate the ast (while maintaining the document time based cache).
+	 */
+	protected IParseRootNode doGetAST(IDocument document) throws Exception
+	{
+		return ParserPoolFactory.parse(getContentType(), document.get()).getRootNode();
 	}
 
 	/**
