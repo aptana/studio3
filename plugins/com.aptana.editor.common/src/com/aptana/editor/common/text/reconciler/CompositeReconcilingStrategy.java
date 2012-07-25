@@ -23,7 +23,7 @@ public class CompositeReconcilingStrategy implements IReconcilingStrategy, IReco
 {
 
 	/** The list of internal reconciling strategies. */
-	private IReconcilingStrategy[] fStrategies;
+	private final IReconcilingStrategy[] fStrategies;
 
 	/**
 	 * Creates composite reconciling strategy.

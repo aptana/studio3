@@ -101,8 +101,8 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		}
 		synchronized (fPositionsLock)
 		{
-		fPositions.clear();
-	}
+			fPositions.clear();
+		}
 	}
 
 	protected AbstractThemeableEditor getEditor()
@@ -221,9 +221,9 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 			{
 				// Create a copy to pass to updateFoldingStructure, as it may take more time there.
 				positions = new HashMap<ProjectionAnnotation, Position>(fPositions);
-		}
+			}
 			editor.updateFoldingStructure(positions);
-	}
+		}
 	}
 
 	private void reconcile(boolean initialReconcile)
@@ -239,14 +239,14 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		AbstractThemeableEditor editor = fEditor;
 		if (editor != null)
 		{
-			ast = editor.getAST();
+			ast = editor.getReconcileAST();
 
 			// The call to get the ast can get a long time, so, let's check our field again.
 			editor = fEditor;
 			if (editor != null)
 			{
 				editor.refreshOutline(ast);
-		}
+			}
 		}
 		monitor.worked(5);
 
@@ -271,6 +271,14 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		}
 
 		runParticipants(monitor.newChild(75));
+	}
+
+	public Map<ProjectionAnnotation, Position> getPositions()
+	{
+		synchronized (fPositionsLock)
+		{
+			return new HashMap<ProjectionAnnotation, Position>(fPositions);
+		}
 	}
 
 	/**
