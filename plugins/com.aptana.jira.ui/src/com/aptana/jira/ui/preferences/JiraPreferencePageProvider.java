@@ -183,7 +183,7 @@ public class JiraPreferencePageProvider extends AbstractAccountPageProvider
 	private Composite createLogoutComponents(Composite parent)
 	{
 		Composite logoutComp = new Composite(parent, SWT.NONE);
-		logoutComp.setLayout(GridLayoutFactory.swtDefaults().spacing(0, 5).numColumns(3).create());
+		logoutComp.setLayout(GridLayoutFactory.swtDefaults().numColumns(3).create());
 
 		Label label = new Label(logoutComp, SWT.NONE);
 		label.setText(StringUtil.makeFormLabel(Messages.JiraPreferencePageProvider_LBL_User));
