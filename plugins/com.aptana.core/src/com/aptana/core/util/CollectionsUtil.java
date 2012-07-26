@@ -124,6 +124,33 @@ public class CollectionsUtil
 	}
 
 	/**
+	 * Searches the collection for the first element that matches the filter.<br>
+	 * <br>
+	 * Note that this method is not thread safe. Users of this method will need to maintain type safety against the
+	 * collection
+	 * 
+	 * @param collection
+	 *            A collection to search
+	 * @param filter
+	 *            A filter that determines which item to return
+	 * @return Returns the first <T> that matches the filter
+	 */
+	public static <T> T find(Collection<T> collection, IFilter<T> filter)
+	{
+		if (collection != null && filter != null)
+		{
+			for (T item : collection)
+			{
+				if (filter.include(item))
+				{
+					return item;
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * Generate a new list containing items from the specified collection that the filter determines should be included.
 	 * If the specified filter is null, then all items are added to the result list. If the specified collection is null
 	 * then an empty list is returned.<br>
