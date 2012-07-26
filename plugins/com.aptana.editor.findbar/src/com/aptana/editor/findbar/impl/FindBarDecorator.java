@@ -255,7 +255,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		public void keyPressed(KeyEvent e)
 		{
 			boolean isCommandCtrl = e.stateMask == SWT.MOD1;
-			boolean isCKey = e.character == 'A' || e.character == 'a'; //$NON-NLS-1$ //$NON-NLS-2$
+			boolean isCKey = e.character == 'A' || e.character == 'a';
 
 			if (isCommandCtrl && isCKey)
 			{
@@ -484,9 +484,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 				findButton.setEnabled(!StringUtil.isEmpty(textFind.getText()));
 				if (countMatches.getSelection())
 				{
-					FindBarDecorator.findBarConfiguration.toggle(countMatchesOption.preferencesKey);
-					countMatches.setText(StringUtil.EMPTY);
-
+					showCountTotal();
 					countMatches.getParent().getParent().layout(new Control[] { countMatches.getParent() });
 				}
 			}
@@ -1596,7 +1594,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 			if (isWholeWord && !isRegEx && isWord(convertedText))
 			{
 				isRegEx = true;
-				convertedText = REGEX_WORD_BOUNDARY + convertedText + REGEX_WORD_BOUNDARY; //$NON-NLS-1$ //$NON-NLS-2$
+				convertedText = REGEX_WORD_BOUNDARY + convertedText + REGEX_WORD_BOUNDARY;
 			}
 
 			IStatusLineManager statusLineManager = (IStatusLineManager) textEditor.getAdapter(IStatusLineManager.class);
