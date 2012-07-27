@@ -606,7 +606,7 @@ public final class UIUtils
 			}
 			else
 			{
-				IdeLog.logWarning(UIPlugin.getDefault(), "Unable to resolve the Help URL for " + url); //$NON-NLS-1$
+				IdeLog.logError(UIPlugin.getDefault(), "Unable to resolve the Help URL for " + url); //$NON-NLS-1$
 				return false;
 			}
 		}
@@ -644,7 +644,6 @@ public final class UIUtils
 			}
 			catch (PartInitException e)
 			{
-				// TODO Auto-generated catch block
 				IdeLog.logError(UIPlugin.getDefault(), "Error opening the help", e); //$NON-NLS-1$
 				return false;
 			}
