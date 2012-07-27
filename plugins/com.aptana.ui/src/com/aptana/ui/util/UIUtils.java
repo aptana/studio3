@@ -9,6 +9,7 @@
 package com.aptana.ui.util;
 
 import java.net.URI;
+import java.net.URL;
 
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.filesystem.URIUtil;
@@ -44,7 +45,9 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.eclipse.ui.commands.ICommandService;
+import org.eclipse.ui.help.IWorkbenchHelpSystem;
 import org.eclipse.ui.internal.WorkbenchWindow;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.progress.UIJob;
@@ -68,6 +71,8 @@ public final class UIUtils
 	 * By default, show tooltips for 3 seconds.
 	 */
 	public static final int DEFAULT_TOOLTIP_TIME = 3000;
+
+	private static final String INTERNAL_HELP_BROWSER_ID = "internal_help_browser"; //$NON-NLS-1$
 
 	/**
 	 * 
@@ -579,5 +584,72 @@ public final class UIUtils
 		{
 			IdeLog.logWarning(UIPlugin.getDefault(), "Could not open the help view. Active page was null."); //$NON-NLS-1$
 		}
+	}
+
+	/**
+	 * Opens the internal help in the Studio's internal browser.
+	 * 
+	 * @param url
+	 * @return A boolean value indicating a successful operations or not.
+	 */
+	public static boolean openHelpInBrowser(String url)
+	{
+		IWorkbench workbench = PlatformUI.getWorkbench();
+		if (workbench != null)
+		{
+			IWorkbenchHelpSystem helpSystem = workbench.getHelpSystem();
+			URL resolvedURL = helpSystem.resolve(url, true);
+			if (resolvedURL != null)
+			{
+				return openInBroswer(resolvedURL, true, IWorkbenchBrowserSupport.AS_EDITOR
+						| IWorkbenchBrowserSupport.STATUS);
+			}
+			else
+			{
+				IdeLog.logWarning(UIPlugin.getDefault(), "Unable to resolve the Help URL for " + url); //$NON-NLS-1$
+				return false;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Open a URL in a browser.
+	 * 
+	 * @param url
+	 * @param internal
+	 *            In case true, the system will try to open the internal browser if it's available.
+	 * @param style
+	 *            the Browser's style, in case an internal browser is requested.
+	 * @return A boolean value indicating a successful operations or not.
+	 */
+	public static boolean openInBroswer(URL url, boolean internal, int style)
+	{
+		IWorkbench workbench = PlatformUI.getWorkbench();
+		if (workbench != null)
+		{
+			IWorkbenchBrowserSupport support = PlatformUI.getWorkbench().getBrowserSupport();
+			try
+			{
+				if (internal && support.isInternalWebBrowserAvailable())
+				{
+
+					support.createBrowser(style, INTERNAL_HELP_BROWSER_ID, null, null).openURL(url);
+
+				}
+				else
+				{
+					support.getExternalBrowser().openURL(url);
+				}
+			}
+			catch (PartInitException e)
+			{
+				// TODO Auto-generated catch block
+				IdeLog.logError(UIPlugin.getDefault(), "Error opening the help", e); //$NON-NLS-1$
+				return false;
+			}
+			return true;
+		}
+		return false;
 	}
 }
