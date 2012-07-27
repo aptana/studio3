@@ -480,7 +480,8 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 				findButton.setEnabled(!isTextFindEmpty());
 				if (countMatches.getSelection())
 				{
-					showCountTotal();
+					FindBarDecorator.findBarConfiguration.toggle(countMatchesOption.preferencesKey);
+					countMatches.setText(StringUtil.EMPTY);
 					countMatches.getParent().getParent().layout(new Control[] { countMatches.getParent() });
 				}
 			}
