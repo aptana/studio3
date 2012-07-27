@@ -15,7 +15,6 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.internal.text.html.BrowserInformationControlInput;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IInputChangedListener;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.ITextHoverExtension2;
@@ -250,6 +249,8 @@ public class HTMLTextHover extends CommonTextHover implements ITextHover, ITextH
 	@Override
 	public void populateToolbarActions(ToolBarManager tbm, CustomBrowserInformationControl iControl)
 	{
+		// @formatter:off
+		/*
 		final OpenDOMReferenceAction openReferenceAction = new OpenDOMReferenceAction(iControl);
 		tbm.add(openReferenceAction);
 		IInputChangedListener inputChangeListener = new IInputChangedListener()
@@ -264,6 +265,8 @@ public class HTMLTextHover extends CommonTextHover implements ITextHover, ITextH
 			}
 		};
 		iControl.addInputChangeListener(inputChangeListener);
+		*/
+		// @formatter:on
 	}
 
 	/**
