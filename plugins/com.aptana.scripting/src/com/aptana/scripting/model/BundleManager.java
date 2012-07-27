@@ -9,6 +9,7 @@ package com.aptana.scripting.model;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FilenameFilter;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -116,8 +117,12 @@ public class BundleManager
 					if (useCache)
 					{
 						showBundleLoadInfo("attempting to read cache: " + bundleDirectory); //$NON-NLS-1$
-
-						be = getCacher().load(bundleDirectory, bundleScripts, sub.newChild(bundleScripts.size()));
+						// include the localization files in the arg we pass here, so that we blow out the cache if
+						// translations change!
+						List<File> filesTocheckTimestamp = new ArrayList<File>(bundleScripts);
+						filesTocheckTimestamp.addAll(localizationFiles(bundleDirectory));
+						be = getCacher().load(bundleDirectory, filesTocheckTimestamp,
+								sub.newChild(bundleScripts.size()));
 					}
 					if (be != null)
 					{
@@ -226,6 +231,8 @@ public class BundleManager
 	private static final String COMMANDS_DIRECTORY_NAME = "commands"; //$NON-NLS-1$
 	private static final String TEMPLATES_DIRECTORY_NAME = "templates"; //$NON-NLS-1$
 	private static final String SAMPLES_DIRECTORY_NAME = "samples"; //$NON-NLS-1$
+	private static final String CONFIG_DIRECTORY_NAME = "config"; //$NON-NLS-1$
+	private static final String LOCALES_DIRECTORY_NAME = "locales"; //$NON-NLS-1$
 
 	// constant to indicated we have no file instances
 	private static final File[] NO_FILES = new File[0];
@@ -1351,6 +1358,35 @@ public class BundleManager
 		}
 
 		return result;
+	}
+
+	/**
+	 * Return a list of all the *.yml localization files that need to be processed in a specified bundle directory.
+	 * 
+	 * @param bundleDirectory
+	 *            The bundle directory used to search for localization files
+	 * @return A list of all *.yml files in the specified bundle's locales folder.
+	 */
+	protected List<File> localizationFiles(File bundleDirectory)
+	{
+		if (isValidBundleDirectory(bundleDirectory))
+		{
+			// check for yml files inside "config/locales" directory
+			File directory = new File(new File(bundleDirectory, CONFIG_DIRECTORY_NAME), LOCALES_DIRECTORY_NAME);
+			if (directory != null && directory.exists() && directory.canRead())
+			{
+				File[] ymlFiles = directory.listFiles(new FilenameFilter()
+				{
+
+					public boolean accept(File dir, String name)
+					{
+						return name.endsWith(".yml"); //$NON-NLS-1$
+					}
+				});
+				return Arrays.asList(ymlFiles);
+			}
+		}
+		return Collections.emptyList();
 	}
 
 	/**

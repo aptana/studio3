@@ -119,19 +119,19 @@ public class BundleCacher
 	public BundleCacher()
 	{
 		listener = new BundleCacheInvalidatingLoadCycleListener();
-		BundleManager.getInstance().addLoadCycleListener(listener);
+		getBundleManager().addLoadCycleListener(listener);
 	}
 
 	protected File getBundleDir(File script)
 	{
-		return BundleManager.getInstance().getBundleDirectory(script);
+		return getBundleManager().getBundleDirectory(script);
 	}
 
 	public void dispose()
 	{
 		if (listener != null)
 		{
-			BundleManager.getInstance().removeLoadCycleListener(listener);
+			getBundleManager().removeLoadCycleListener(listener);
 		}
 		listener = null;
 	}
@@ -139,7 +139,12 @@ public class BundleCacher
 	public void cache(File bundleDirectory, IProgressMonitor monitor)
 	{
 		// grab the bundle model
-		cache(BundleManager.getInstance().getBundleFromPath(bundleDirectory));
+		cache(getBundleManager().getBundleFromPath(bundleDirectory));
+	}
+
+	protected BundleManager getBundleManager()
+	{
+		return BundleManager.getInstance();
 	}
 
 	protected boolean cache(BundleElement be)
@@ -366,7 +371,7 @@ public class BundleCacher
 		Set<File> files = getFiles(be, sub.newChild(30));
 		for (File file : files)
 		{
-			BundleManager.getInstance().fireScriptLoadedEvent(file);
+			getBundleManager().fireScriptLoadedEvent(file);
 			sub.worked(100 / files.size());
 		}
 		sub.done();
@@ -437,8 +442,8 @@ public class BundleCacher
 			{
 				sub.subTask(MessageFormat.format(Messages.BundleCacher_ComparingTimestampSubTaskName,
 						file.getAbsolutePath()));
-				// TODO Just update the cache with the updated files/diff!
-				if (file.lastModified() > lastMod)
+				// assume if there's exactly the same value then we should be safe and reload
+				if (file.lastModified() >= lastMod)
 				{
 					// One of the files is newer, don't load cache! This will reload everything from disk and rewrite
 					// the cache
