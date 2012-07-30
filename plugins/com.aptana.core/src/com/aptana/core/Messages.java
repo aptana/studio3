@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -48,5 +48,10 @@ public final class Messages extends NLS
 	public static String CoreStrings_Off;
 
 	public static String CorePlugin_MD5_generation_error;
+
+	public static String IProblem_Error;
+	public static String IProblem_Ignore;
+	public static String IProblem_Info;
+	public static String IProblem_Warning;
 
 }

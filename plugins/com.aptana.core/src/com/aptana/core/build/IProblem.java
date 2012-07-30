@@ -10,6 +10,7 @@ package com.aptana.core.build;
 import java.util.Map;
 
 import org.eclipse.core.resources.IMarker;
+import com.aptana.core.Messages;
 
 /**
  * @author Ingo Muschenetz
