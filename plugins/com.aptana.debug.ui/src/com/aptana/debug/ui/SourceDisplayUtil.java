@@ -13,6 +13,7 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IStorage;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.debug.core.model.ILineBreakpoint;
@@ -35,6 +36,7 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.IUniformResource;
 import com.aptana.core.resources.IUniformResourceMarker;
 import com.aptana.core.resources.UniformResourceStorage;
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.debug.ui.internal.UniformResourceStorageEditorInput;
 import com.aptana.ui.util.UIUtils;
 
@@ -42,9 +44,11 @@ import com.aptana.ui.util.UIUtils;
  * @author Max Stepanov
  */
 @SuppressWarnings("restriction")
-public final class SourceDisplayUtil {
+public final class SourceDisplayUtil
+{
 
-	private SourceDisplayUtil() {
+	private SourceDisplayUtil()
+	{
 	}
 
 	/**
@@ -53,36 +57,54 @@ public final class SourceDisplayUtil {
 	 * @param element
 	 * @return IEditorInput
 	 */
-	public static IEditorInput getEditorInput(Object element) {
-		if (element instanceof IFile) {
+	public static IEditorInput getEditorInput(Object element)
+	{
+		if (element instanceof IFile)
+		{
 			return new FileEditorInput((IFile) element);
 		}
-		if (element instanceof ILineBreakpoint) {
+		if (element instanceof ILineBreakpoint)
+		{
 			IMarker marker = ((ILineBreakpoint) element).getMarker();
-			if (marker instanceof IUniformResourceMarker) {
+			if (marker instanceof IUniformResourceMarker)
+			{
 				IUniformResource resource = ((IUniformResourceMarker) marker).getUniformResource();
 				element = resource.getAdapter(IStorage.class); // $codepro.audit.disable questionableAssignment
-				if (element == null) {
+				if (element == null)
+				{
 					element = resource; // $codepro.audit.disable questionableAssignment
 				}
-			} else {
+			}
+			else
+			{
 				return new FileEditorInput((IFile) marker.getResource());
 			}
 		}
-		if (element instanceof IFileStore) {
-			return new FileStoreEditorInput((IFileStore) element);
+		if (element instanceof IFileStore)
+		{
+			IFileStore fileStore = (IFileStore) element;
+			IFile[] files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(fileStore.toURI());
+			if (ArrayUtil.isEmpty(files))
+			{
+				return new FileStoreEditorInput(fileStore);
+			}
+			return new FileEditorInput(files[0]);
 		}
-		if (element instanceof UniformResourceStorage) {
-			if (((UniformResourceStorage) element).getFullPath() != null) {
+		if (element instanceof UniformResourceStorage)
+		{
+			if (((UniformResourceStorage) element).getFullPath() != null)
+			{
 				// TODO return new LocalFileStorageEditorInput((UniformResourceStorage) element);
 				element.hashCode();
 			}
-			if (((UniformResourceStorage) element).exists()) {
+			if (((UniformResourceStorage) element).exists())
+			{
 				return new UniformResourceStorageEditorInput((UniformResourceStorage) element);
 			}
 			return null;
 		}
-		if (element instanceof IAdaptable) {
+		if (element instanceof IAdaptable)
+		{
 			return (IEditorInput) ((IAdaptable) element).getAdapter(IEditorInput.class);
 		}
 		return null;
@@ -95,12 +117,15 @@ public final class SourceDisplayUtil {
 	 * @param element
 	 * @return String
 	 */
-	public static String getEditorId(IEditorInput input, Object element) {
-		try {
+	public static String getEditorId(IEditorInput input, Object element)
+	{
+		try
+		{
 			/*
 			 * Use configured HTMLEditor for all externally loaded files
 			 */
-			if (input instanceof UniformResourceStorageEditorInput) {
+			if (input instanceof UniformResourceStorageEditorInput)
+			{
 				UniformResourceStorage storage = (UniformResourceStorage) ((UniformResourceStorageEditorInput) input)
 						.getStorage();
 				URI uri = storage.getURI();
@@ -111,7 +136,9 @@ public final class SourceDisplayUtil {
 			}
 			IEditorDescriptor descriptor = IDE.getEditorDescriptor(input.getName());
 			return descriptor.getId();
-		} catch (PartInitException e) {
+		}
+		catch (PartInitException e)
+		{
 			return null;
 		}
 	}
@@ -123,7 +150,8 @@ public final class SourceDisplayUtil {
 	 * @param lineNumber
 	 * @throws PartInitException
 	 */
-	public static void openInEditor(IEditorInput input, int lineNumber) throws PartInitException {
+	public static void openInEditor(IEditorInput input, int lineNumber) throws PartInitException
+	{
 		openInEditor(UIUtils.getActivePage(), input, lineNumber);
 	}
 
@@ -135,7 +163,8 @@ public final class SourceDisplayUtil {
 	 * @param lineNumber
 	 * @throws PartInitException
 	 */
-	public static void openInEditor(IWorkbenchPage page, IEditorInput input, int lineNumber) throws PartInitException {
+	public static void openInEditor(IWorkbenchPage page, IEditorInput input, int lineNumber) throws PartInitException
+	{
 		IEditorPart editorPart = IDE.openEditor(page, input, getEditorId(input, null));
 		revealLineInEditor(editorPart, lineNumber);
 	}
@@ -146,35 +175,50 @@ public final class SourceDisplayUtil {
 	 * @param editorPart
 	 * @param lineNumber
 	 */
-	public static void revealLineInEditor(IEditorPart editorPart, int lineNumber) {
-		if (lineNumber > 0) {
+	public static void revealLineInEditor(IEditorPart editorPart, int lineNumber)
+	{
+		if (lineNumber > 0)
+		{
 			ITextEditor textEditor = null;
-			if (editorPart instanceof ITextEditor) {
+			if (editorPart instanceof ITextEditor)
+			{
 				textEditor = (ITextEditor) editorPart;
-			} else {
+			}
+			else
+			{
 				textEditor = (ITextEditor) editorPart.getAdapter(ITextEditor.class);
 			}
-			if (textEditor != null) {
+			if (textEditor != null)
+			{
 				IDocumentProvider provider = textEditor.getDocumentProvider();
-				try {
+				try
+				{
 					provider.connect(textEditor.getEditorInput());
-				} catch (CoreException e) {
+				}
+				catch (CoreException e)
+				{
 					e.getCause();
 					return;
 				}
 				IDocument document = provider.getDocument(textEditor.getEditorInput());
-				try {
+				try
+				{
 					IRegion line = document.getLineInformation(lineNumber - 1); // documents start at 0
 					textEditor.selectAndReveal(line.getOffset(), line.getLength());
-				} catch (BadLocationException e) {
+				}
+				catch (BadLocationException e)
+				{
 					IdeLog.logWarning(DebugUiPlugin.getDefault(), e);
-				} finally {
+				}
+				finally
+				{
 					provider.disconnect(document);
 				}
 			}
 		}
 		IWorkbenchPage page = editorPart.getSite().getPage();
-		if (!page.isPartVisible(editorPart)) {
+		if (!page.isPartVisible(editorPart))
+		{
 			page.activate(editorPart);
 		}
 	}
@@ -185,15 +229,18 @@ public final class SourceDisplayUtil {
 	 * @param input
 	 * @return IEditorPart
 	 */
-	public static IEditorPart findEditor(IEditorInput input) {
+	public static IEditorPart findEditor(IEditorInput input)
+	{
 		return UIUtils.getActivePage().findEditor(input);
 	}
 
-	public static void displaySource(Object context, boolean forceSourceLookup) {
+	public static void displaySource(Object context, boolean forceSourceLookup)
+	{
 		displaySource(context, UIUtils.getActivePage(), forceSourceLookup);
 	}
 
-	public static void displaySource(Object context, IWorkbenchPage page, boolean forceSourceLookup) {
+	public static void displaySource(Object context, IWorkbenchPage page, boolean forceSourceLookup)
+	{
 		SourceLookupManager.getDefault().displaySource(context, page, forceSourceLookup);
 	}
 }
