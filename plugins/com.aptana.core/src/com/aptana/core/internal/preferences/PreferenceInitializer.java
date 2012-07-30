@@ -84,7 +84,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 								}
 								catch (BackingStoreException e)
 								{
-									// ignore
+									IdeLog.logError(CorePlugin.getDefault(),
+											"Failed to store boolean to avoid overriding auto-refresh setting", e); //$NON-NLS-1$
 								}
 								ResourcesPlugin.getPlugin().getPluginPreferences().removePropertyChangeListener(this);
 							}

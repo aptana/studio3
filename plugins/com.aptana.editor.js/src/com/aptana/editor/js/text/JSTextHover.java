@@ -286,7 +286,7 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 				url = MessageFormat.format("{0}{1}.html?visibility=basic#{1}.{2}", //$NON-NLS-1$
 						BASE_HELP_DOCS_URL, owningType, name);
 			}
-			UIUtils.openHelp(url);
+			UIUtils.openHelpInBrowser(url);
 		}
 	}
 }
