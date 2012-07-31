@@ -606,7 +606,8 @@ public class CommandElement extends AbstractBundleElement
 
 				if (rubyObject.respondsTo(TO_ENV_METHOD_NAME))
 				{
-					Ruby runtime = ScriptingEngine.getInstance().getScriptingContainer().getRuntime();
+					Ruby runtime = ScriptingEngine.getInstance().getInitializedScriptingContainer().getProvider()
+							.getRuntime();
 					ThreadContext threadContext = runtime.getCurrentContext();
 
 					try

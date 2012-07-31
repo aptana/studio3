@@ -73,7 +73,7 @@ public class ScriptLoadJob extends AbstractScriptRunner
 	 */
 	protected IStatus run(IProgressMonitor monitor)
 	{
-		ScriptingContainer container = ScriptingEngine.getInstance().getScriptingContainer();
+		ScriptingContainer container = ScriptingEngine.getInstance().getInitializedScriptingContainer();
 		Ruby runtime = container.getProvider().getRuntime();
 		Object result = null;
 

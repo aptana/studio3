@@ -52,6 +52,7 @@ public class ScriptingEngine
 	private List<String> _loadPaths;
 	private List<String> _frameworkFiles;
 	private RunType _runType;
+	private boolean initialized;
 
 	/**
 	 * ScriptingEngine
@@ -93,12 +94,12 @@ public class ScriptingEngine
 
 			result.setHomeDirectory(jrubyHome.getAbsolutePath());
 
-			// TODO Generate two containers? A global one for loading bundles, a threadsafe one for executing commands/snippets/etc?
+			// TODO Generate two containers? A global one for loading bundles, a threadsafe one for executing
+			// commands/snippets/etc?
 			// Pre-load 'ruble' framework files!
 			List<String> loadPaths = result.getLoadPaths();
 			loadPaths.addAll(0, getContributedLoadPaths());
 			result.setLoadPaths(loadPaths);
-			result.runScriptlet("require 'ruble'"); //$NON-NLS-1$
 		}
 		catch (IOException e)
 		{
@@ -167,8 +168,7 @@ public class ScriptingEngine
 	}
 
 	/**
-	 * getFrameworkFiles 
-	 * Used by "ruble.rb" DO NOT REMOVE!
+	 * getFrameworkFiles Used by "ruble.rb" DO NOT REMOVE!
 	 * 
 	 * @return
 	 */
@@ -282,5 +282,16 @@ public class ScriptingEngine
 		}
 
 		return (async && this._runType != RunType.CURRENT_THREAD) ? null : job.getReturnValue();
+	}
+
+	public synchronized ScriptingContainer getInitializedScriptingContainer()
+	{
+		ScriptingContainer sc = getScriptingContainer();
+		if (!initialized)
+		{
+			sc.runScriptlet("require 'ruble'"); //$NON-NLS-1$
+			initialized = true;
+		}
+		return sc;
 	}
 }

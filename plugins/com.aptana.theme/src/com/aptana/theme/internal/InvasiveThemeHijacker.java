@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -14,6 +14,7 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
@@ -70,6 +71,7 @@ import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.eclipse.ui.views.contentoutline.ContentOutline;
 import org.eclipse.ui.views.navigator.IResourceNavigator;
 import org.eclipse.ui.views.properties.PropertySheet;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 import org.osgi.service.prefs.BackingStoreException;
 
@@ -94,6 +96,14 @@ import com.aptana.ui.util.UIUtils;
 public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPreferenceChangeListener, IStartup,
 		IPageChangedListener
 {
+
+	/**
+	 * Constants of eclipse plugin/bundle ids and their root preference nodes.
+	 */
+	private static final String ORG_ECLIPSE_WST_JSDT_UI = "org.eclipse.wst.jsdt.ui"; //$NON-NLS-1$
+	private static final String ORG_ECLIPSE_JDT_UI = "org.eclipse.jdt.ui"; //$NON-NLS-1$
+	private static final String ORG_ECLIPSE_ANT_UI = "org.eclipse.ant.ui"; //$NON-NLS-1$
+	private static final String ORG_ECLIPSE_PDE_UI = "org.eclipse.pde.ui"; //$NON-NLS-1$
 
 	private ISelectionChangedListener pageListener;
 	private Map<IViewPart, IQueryListener> queryListeners = new HashMap<IViewPart, IQueryListener>(3);
@@ -540,6 +550,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 		setHyperlinkValues(theme, EclipseUtil.instanceScope().getNode("org.eclipse.ui.workbench"), revertToDefaults); //$NON-NLS-1$
 		setHyperlinkValues(theme, EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID), revertToDefaults);
 
+		// FIXME only set these if egit or mercurial are installed!
 		setGitAndMercurialValues(theme,
 				EclipseUtil.instanceScope().getNode("org.eclipse.ui.workbench"), revertToDefaults); //$NON-NLS-1$
 
@@ -553,9 +564,13 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 		}
 
 		// PDE
-		IEclipsePreferences pdePrefs = EclipseUtil.instanceScope().getNode("org.eclipse.pde.ui"); //$NON-NLS-1$
-		setGeneralEditorValues(theme, pdePrefs, revertToDefaults);
-		setPDEEditorValues(theme, pdePrefs, revertToDefaults);
+		Bundle pde = Platform.getBundle(ORG_ECLIPSE_PDE_UI);
+		if (pde != null)
+		{
+			IEclipsePreferences pdePrefs = EclipseUtil.instanceScope().getNode(ORG_ECLIPSE_PDE_UI);
+			setGeneralEditorValues(theme, pdePrefs, revertToDefaults);
+			setPDEEditorValues(theme, pdePrefs, revertToDefaults);
+		}
 
 		if (monitor.isCanceled())
 		{
@@ -563,20 +578,31 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 		}
 
 		// Ant
-		IEclipsePreferences antPrefs = EclipseUtil.instanceScope().getNode("org.eclipse.ant.ui"); //$NON-NLS-1$
-		setGeneralEditorValues(theme, antPrefs, revertToDefaults);
-		setAntEditorValues(theme, antPrefs, revertToDefaults);
-
+		Bundle ant = Platform.getBundle(ORG_ECLIPSE_ANT_UI);
+		if (ant != null)
+		{
+			IEclipsePreferences antPrefs = EclipseUtil.instanceScope().getNode(ORG_ECLIPSE_ANT_UI);
+			setGeneralEditorValues(theme, antPrefs, revertToDefaults);
+			setAntEditorValues(theme, antPrefs, revertToDefaults);
+		}
 		if (monitor.isCanceled())
 		{
 			return;
 		}
 
 		// JDT
-		applyThemetoJDT(theme, revertToDefaults);
+		Bundle jdt = Platform.getBundle(ORG_ECLIPSE_JDT_UI);
+		if (jdt != null)
+		{
+			applyThemetoJDT(theme, revertToDefaults);
+		}
 
 		// WST
-		applyThemetoWST(theme, revertToDefaults);
+		Bundle wstBundle = Platform.getBundle(ORG_ECLIPSE_WST_JSDT_UI);
+		if (wstBundle != null)
+		{
+			applyThemetoWST(theme, revertToDefaults);
+		}
 	}
 
 	protected void applyThemetoWST(Theme theme, boolean revertToDefaults)
@@ -621,7 +647,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 
 	protected void applyToWST_JSDTEditor(Theme theme, boolean revertToDefaults)
 	{
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode("org.eclipse.wst.jsdt.ui"); //$NON-NLS-1$
+		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(ORG_ECLIPSE_WST_JSDT_UI);
 		setGeneralEditorValues(theme, prefs, revertToDefaults);
 
 		// TODO Add mapping for parameter variables, "functions" (which might be function calls)?
@@ -733,7 +759,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 	protected void applyThemetoJDT(Theme theme, boolean revertToDefaults)
 	{
 		// Now set for JDT...
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode("org.eclipse.jdt.ui"); //$NON-NLS-1$
+		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(ORG_ECLIPSE_JDT_UI);
 		setGeneralEditorValues(theme, prefs, revertToDefaults);
 
 		// Set prefs for JDT so it's various tokens get colors that match up to our theme!

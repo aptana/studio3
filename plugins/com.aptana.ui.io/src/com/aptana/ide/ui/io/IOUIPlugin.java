@@ -96,45 +96,9 @@ public class IOUIPlugin extends AbstractUIPlugin
 
 	private Map<IEditorInput, Job> saveRemoteJobs;
 
-	private IConnectionPointListener connectionListener = new IConnectionPointListener()
-	{
+	private IConnectionPointListener connectionListener;
 
-		public void connectionPointChanged(ConnectionPointEvent event)
-		{
-			IConnectionPoint connection = event.getConnectionPoint();
-			IConnectionPointManager manager = CoreIOPlugin.getConnectionPointManager();
-			ConnectionPointType type = manager.getType(connection);
-			if (type == null)
-			{
-				return;
-			}
-
-			switch (event.getKind())
-			{
-				case ConnectionPointEvent.POST_ADD:
-					refreshNavigatorViewAndSelect(manager.getConnectionPointCategory(type.getCategory().getId()),
-							connection);
-					break;
-				case ConnectionPointEvent.POST_DELETE:
-					refreshNavigatorView(manager.getConnectionPointCategory(type.getCategory().getId()));
-					break;
-				case ConnectionPointEvent.POST_CHANGE:
-					refreshNavigatorView(connection);
-			}
-		}
-
-	};
-
-	private IPreferenceChangeListener themeChangeListener = new IPreferenceChangeListener()
-	{
-		public void preferenceChange(PreferenceChangeEvent event)
-		{
-			if (event.getKey().equals(IThemeManager.THEME_CHANGED))
-			{
-				ImageUtils.themeChanged();
-			}
-		}
-	};
+	private IPreferenceChangeListener themeChangeListener;
 
 	private final IPartListener fPartListener = new IPartListener()
 	{
@@ -227,10 +191,64 @@ public class IOUIPlugin extends AbstractUIPlugin
 	{
 		super.start(context);
 		plugin = this;
-		saveRemoteJobs = new HashMap<IEditorInput, Job>();
-		CoreIOPlugin.getConnectionPointManager().addConnectionPointListener(connectionListener);
-		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(themeChangeListener);
-		addPartListener();
+		Job job = new Job("Initializing IOUI Plugion") //$NON-NLS-1$
+		{
+
+			@Override
+			protected IStatus run(IProgressMonitor monitor)
+			{
+				connectionListener = new IConnectionPointListener()
+				{
+
+					public void connectionPointChanged(ConnectionPointEvent event)
+					{
+						IConnectionPoint connection = event.getConnectionPoint();
+						IConnectionPointManager manager = CoreIOPlugin.getConnectionPointManager();
+						ConnectionPointType type = manager.getType(connection);
+						if (type == null)
+						{
+							return;
+						}
+
+						switch (event.getKind())
+						{
+							case ConnectionPointEvent.POST_ADD:
+								refreshNavigatorViewAndSelect(
+										manager.getConnectionPointCategory(type.getCategory().getId()), connection);
+								break;
+							case ConnectionPointEvent.POST_DELETE:
+								refreshNavigatorView(manager.getConnectionPointCategory(type.getCategory().getId()));
+								break;
+							case ConnectionPointEvent.POST_CHANGE:
+								refreshNavigatorView(connection);
+						}
+					}
+
+				};
+				CoreIOPlugin.getConnectionPointManager().addConnectionPointListener(connectionListener);
+
+				themeChangeListener = new IPreferenceChangeListener()
+				{
+					public void preferenceChange(PreferenceChangeEvent event)
+					{
+						if (event.getKey().equals(IThemeManager.THEME_CHANGED))
+						{
+							ImageUtils.themeChanged();
+						}
+					}
+				};
+				EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID)
+						.addPreferenceChangeListener(themeChangeListener);
+
+				saveRemoteJobs = new HashMap<IEditorInput, Job>();
+				addPartListener();
+
+				return Status.OK_STATUS;
+			}
+
+		};
+		job.setSystem(!EclipseUtil.showSystemJobs());
+		job.schedule();
 	}
 
 	/**
@@ -238,8 +256,17 @@ public class IOUIPlugin extends AbstractUIPlugin
 	 */
 	public void stop(BundleContext context) throws Exception
 	{
-		CoreIOPlugin.getConnectionPointManager().removeConnectionPointListener(connectionListener);
-		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(themeChangeListener);
+		if (connectionListener != null)
+		{
+			CoreIOPlugin.getConnectionPointManager().removeConnectionPointListener(connectionListener);
+			connectionListener = null;
+		}
+		if (themeChangeListener != null)
+		{
+			EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID)
+					.removePreferenceChangeListener(themeChangeListener);
+			themeChangeListener = null;
+		}
 		removePartListener();
 		if (saveRemoteJobs != null)
 		{

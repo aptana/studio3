@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -29,7 +29,6 @@ import org.eclipse.jface.viewers.BaseLabelProvider;
 import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.ILightweightLabelDecorator;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
-import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.team.ui.ISharedImages;
 import org.eclipse.team.ui.TeamImages;
@@ -59,49 +58,15 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 		IGitRepositoryListener, IGitRepositoriesListener
 {
 
+	public static final String UNTRACKED_IMAGE = "icons/ovr/untracked.gif"; //$NON-NLS-1$
+	public static final String STAGED_ADDED_IMAGE = "icons/ovr/staged_added.gif"; //$NON-NLS-1$
+	public static final String STAGED_REMOVED_IMAGE = "icons/ovr/staged_removed.gif"; //$NON-NLS-1$
+
 	private static final String DIRTY_PREFIX = "* "; //$NON-NLS-1$
 	private static final String DECORATOR_ID = "com.aptana.git.ui.internal.GitLightweightDecorator"; //$NON-NLS-1$
 
-	/**
-	 * Define a cached image descriptor which only creates the image data once
-	 */
-	private static class CachedImageDescriptor extends ImageDescriptor
-	{
-		ImageDescriptor descriptor;
-
-		ImageData data;
-
-		CachedImageDescriptor(ImageDescriptor descriptor)
-		{
-			this.descriptor = descriptor;
-		}
-
-		public ImageData getImageData()
-		{
-			if (data == null)
-			{
-				data = descriptor.getImageData();
-			}
-			return data;
-		}
-	}
-
 	private static ImageDescriptor conflictImage;
-	private static ImageDescriptor untrackedImage;
-	private static ImageDescriptor stagedAddedImage;
-	private static ImageDescriptor stagedRemovedImage;
 	private static UIJob refreshJob;
-
-	static
-	{
-		conflictImage = new CachedImageDescriptor(TeamImages.getImageDescriptor(ISharedImages.IMG_CONFLICT_OVR));
-		untrackedImage = new CachedImageDescriptor(ImageDescriptor.createFromURL(GitUIPlugin.getDefault().getBundle()
-				.getEntry("icons/ovr/untracked.gif"))); //$NON-NLS-1$
-		stagedAddedImage = new CachedImageDescriptor(ImageDescriptor.createFromURL(GitUIPlugin.getDefault().getBundle()
-				.getEntry("icons/ovr/staged_added.gif"))); //$NON-NLS-1$
-		stagedRemovedImage = new CachedImageDescriptor(ImageDescriptor.createFromURL(GitUIPlugin.getDefault()
-				.getBundle().getEntry("icons/ovr/staged_removed.gif"))); //$NON-NLS-1$
-	}
 
 	private IPreferenceChangeListener fThemeChangeListener;
 	private Map<RepoBranch, TimestampedString> cache;
@@ -209,11 +174,11 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 			decoration.setBackgroundColor(GitColors.redBG());
 			if (changed.getStatus() == ChangedFile.Status.NEW)
 			{
-				overlay = untrackedImage;
+				overlay = untrackedImage();
 			}
 			else if (changed.getStatus() == ChangedFile.Status.UNMERGED)
 			{
-				overlay = conflictImage;
+				overlay = conflictImage();
 			}
 		}
 		else if (changed.hasStagedChanges())
@@ -222,16 +187,40 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 			decoration.setBackgroundColor(GitColors.greenBG());
 			if (changed.getStatus() == ChangedFile.Status.DELETED)
 			{
-				overlay = stagedRemovedImage;
+				overlay = stagedRemovedImage();
 			}
 			else if (changed.getStatus() == ChangedFile.Status.NEW)
 			{
-				overlay = stagedAddedImage;
+				overlay = stagedAddedImage();
 			}
 		}
 		decoration.addPrefix(DIRTY_PREFIX);
 		if (overlay != null)
 			decoration.addOverlay(overlay);
+	}
+
+	private ImageDescriptor conflictImage()
+	{
+		if (conflictImage == null)
+		{
+			conflictImage = new CachedImageDescriptor(TeamImages.getImageDescriptor(ISharedImages.IMG_CONFLICT_OVR));
+		}
+		return conflictImage;
+	}
+
+	private ImageDescriptor stagedRemovedImage()
+	{
+		return GitUIPlugin.getDefault().getImageRegistry().getDescriptor(STAGED_REMOVED_IMAGE);
+	}
+
+	private ImageDescriptor stagedAddedImage()
+	{
+		return GitUIPlugin.getDefault().getImageRegistry().getDescriptor(STAGED_ADDED_IMAGE);
+	}
+
+	private ImageDescriptor untrackedImage()
+	{
+		return GitUIPlugin.getDefault().getImageRegistry().getDescriptor(UNTRACKED_IMAGE);
 	}
 
 	private void decorateProject(IDecoration decoration, final IResource resource)

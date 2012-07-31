@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -8,7 +8,11 @@
 package com.aptana.ui;
 
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
@@ -44,8 +48,8 @@ public class UIPlugin extends AbstractUIPlugin
 	private IPreferenceChangeListener autoBuildListener;
 
 	private final IPerspectiveListener perspectiveListener = new PerspectiveChangeResetListener(
-			WebPerspectiveFactory.ID, PLUGIN_ID,
-			IPreferenceConstants.PERSPECTIVE_VERSION, WebPerspectiveFactory.VERSION);
+			WebPerspectiveFactory.ID, PLUGIN_ID, IPreferenceConstants.PERSPECTIVE_VERSION,
+			WebPerspectiveFactory.VERSION);
 
 	private boolean hasMainWindowActivated = false;
 
@@ -95,9 +99,20 @@ public class UIPlugin extends AbstractUIPlugin
 	{
 		super.start(context);
 		plugin = this;
-		updateInitialPerspectiveVersion();
-		addPerspectiveListener();
-		addAutoBuildListener();
+
+		Job job = new Job("Initializing UI Plugin") //$NON-NLS-1$
+		{
+			@Override
+			protected IStatus run(IProgressMonitor monitor)
+			{
+				updateInitialPerspectiveVersion();
+				addPerspectiveListener();
+				addAutoBuildListener();
+				return Status.OK_STATUS;
+			}
+		};
+		job.setSystem(!EclipseUtil.showSystemJobs());
+		job.schedule();
 	}
 
 	/*
@@ -106,10 +121,16 @@ public class UIPlugin extends AbstractUIPlugin
 	 */
 	public void stop(BundleContext context) throws Exception
 	{
-		removePerspectiveListener();
-		removeAutoBuildListener();
-		plugin = null;
-		super.stop(context);
+		try
+		{
+			removePerspectiveListener();
+			removeAutoBuildListener();
+		}
+		finally
+		{
+			plugin = null;
+			super.stop(context);
+		}
 	}
 
 	/**
@@ -167,6 +188,7 @@ public class UIPlugin extends AbstractUIPlugin
 		{
 			IEclipsePreferences node = EclipseUtil.instanceScope().getNode(ResourcesPlugin.PI_RESOURCES);
 			node.removePreferenceChangeListener(autoBuildListener);
+			autoBuildListener = null;
 		}
 	}
 
