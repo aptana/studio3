@@ -26,6 +26,12 @@ import com.aptana.core.logging.IdeLog;
  */
 public class JVMInfo
 {
+	private static final String PROGRAM_FILES_X86_ENV = "ProgramFiles(x86)"; //$NON-NLS-1$
+	private static final String PROGRAM_W6432_ENV = "ProgramW6432"; //$NON-NLS-1$
+	private static final String PROGRAM_FILES_ENV = "ProgramFiles"; //$NON-NLS-1$
+	private static final String JAVAC = "javac"; //$NON-NLS-1$
+	private static final String VERSION_CMD = "-version"; //$NON-NLS-1$
+
 	private static final String JAVA_6_SPECIFICATION = "1.6"; //$NON-NLS-1$
 
 	protected boolean isJDKInstalled;
@@ -240,7 +246,7 @@ public class JVMInfo
 			}
 		}
 		// Check if we have an installed JDK. We start by a simple check by executing a javac -version command.
-		String javacFile = (Platform.OS_WIN32.equals(Platform.getOS())) ? "javac.exe" : "javac"; //$NON-NLS-1$ //$NON-NLS-2$
+		String javacFile = (Platform.OS_WIN32.equals(Platform.getOS())) ? JAVAC + ".exe" : JAVAC; //$NON-NLS-1$
 		isJDKInstalled = hasJavac(javacFile);
 		IPath javaPath = null;
 		IPath javacPath = null;
@@ -249,16 +255,9 @@ public class JVMInfo
 			// Replicate the Android's "find_java.bat" checks
 			javaPath = new Path("Java"); //$NON-NLS-1$
 			javacPath = new Path("bin").append(javacFile); //$NON-NLS-1$
-			String env = System.getenv("ProgramFiles"); //$NON-NLS-1$
+			String env = System.getenv(PROGRAM_FILES_ENV);
 			// if ProgramFiles not defined, do a 64bit check
-			if (env == null)
-			{
-				isJDKInstalled = hasJavac64(javaPath, javacPath);
-			}
-			else
-			{
-				isJDKInstalled = hasJavac6432(javaPath, javacPath);
-			}
+			isJDKInstalled = (env == null) ? hasJavac64(javaPath, javacPath) : hasJavac6432(javaPath, javacPath);
 			if (!isJDKInstalled)
 			{
 				isJDKInstalled = hasJavac64(javaPath, javacPath);
@@ -274,7 +273,7 @@ public class JVMInfo
 
 	private boolean hasJavac6432(IPath javaPath, IPath javacPath)
 	{
-		String env6432 = System.getenv("ProgramW6432"); //$NON-NLS-1$
+		String env6432 = System.getenv(PROGRAM_W6432_ENV);
 		if (env6432 != null)
 		{
 			return hasJavac(Path.fromOSString(env6432).append(javaPath).toFile().listFiles(), javacPath);
@@ -287,8 +286,8 @@ public class JVMInfo
 	 */
 	private boolean hasJavac64(IPath javaPath, IPath javacPath)
 	{
-		String env64 = System.getenv("ProgramW6432"); //$NON-NLS-1$
-		if (env64 == null || env64.equals(System.getenv("ProgramFiles"))) //$NON-NLS-1$
+		String env64 = System.getenv(PROGRAM_W6432_ENV);
+		if (env64 == null || env64.equals(System.getenv(PROGRAM_FILES_ENV)))
 		{
 			return hasJavac32(javaPath, javacPath);
 		}
@@ -301,7 +300,7 @@ public class JVMInfo
 	private boolean hasJavac32(IPath javaPath, IPath javacPath)
 	{
 		// Check for the "default" 32-bit version if it's not the same path
-		String env32 = System.getenv("ProgramFiles(x86)"); //$NON-NLS-1$
+		String env32 = System.getenv(PROGRAM_FILES_X86_ENV);
 		if (env32 == null)
 		{
 			// Fail. Note that the batch file also defines a check 'if "%ProgramFiles(x86)%"=="%ProgramFiles%" goto
@@ -339,17 +338,17 @@ public class JVMInfo
 	 */
 	private boolean hasJavac(String javacPath)
 	{
-		if (!javacPath.startsWith("javac") && !new File(javacPath).exists()) //$NON-NLS-1$
+		if (!javacPath.startsWith(JAVAC) && !new File(javacPath).exists())
 		{
 			return false;
 		}
-		ProcessBuilder pb = new ProcessBuilder(javacPath, "-version"); //$NON-NLS-1$
+		ProcessBuilder pb = new ProcessBuilder(javacPath, VERSION_CMD);
 		pb.redirectErrorStream(true);
 		try
 		{
 			Process process = pb.start();
 			String output = ProcessUtil.outputForProcess(process);
-			return output.startsWith("javac"); //$NON-NLS-1$
+			return output.startsWith(JAVAC);
 		}
 		catch (IOException e)
 		{
