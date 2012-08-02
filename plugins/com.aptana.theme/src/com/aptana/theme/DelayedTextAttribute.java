@@ -12,15 +12,15 @@ import org.eclipse.swt.SWT;
 public class DelayedTextAttribute
 {
 
-	private RGBa foreground;
-	private RGBa background;
-	private int fontStyle;
+	public final RGBa foreground;
+	public final RGBa background;
+	public final int style;
 
 	public DelayedTextAttribute(RGBa foreground, RGBa background, int style)
 	{
 		this.foreground = foreground;
 		this.background = background;
-		this.fontStyle = style;
+		this.style = style;
 	}
 
 	public DelayedTextAttribute(RGBa foreground)
@@ -28,31 +28,16 @@ public class DelayedTextAttribute
 		this(foreground, null, SWT.NORMAL);
 	}
 
-	public RGBa getForeground()
-	{
-		return foreground;
-	}
-
-	public RGBa getBackground()
-	{
-		return background;
-	}
-
-	public int getStyle()
-	{
-		return fontStyle;
-	}
-
 	@Override
 	public String toString()
 	{
 		StringBuilder builder = new StringBuilder();
-		builder.append("Foreground: ").append(getForeground()); //$NON-NLS-1$
-		if (getBackground() != null)
+		builder.append("Foreground: ").append(foreground); //$NON-NLS-1$
+		if (background != null)
 		{
-			builder.append(", Background: ").append(getBackground()); //$NON-NLS-1$
+			builder.append(", Background: ").append(background); //$NON-NLS-1$
 		}
-		builder.append(", Style: ").append(getStyle()); //$NON-NLS-1$
+		builder.append(", Style: ").append(style); //$NON-NLS-1$
 		return builder.toString();
 	}
 

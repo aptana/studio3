@@ -289,4 +289,5 @@ public class ThemeTest extends TestCase
 		ThemeRule rule = theme.winningRule(scope);
 		assertEquals("CSS: Tag", rule.getName());
 	}
+
 }
