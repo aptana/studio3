@@ -14,10 +14,6 @@
       %copyright
    </copyright>
 
-   <license url="%licenseURL">
-      %license
-   </license>
-
    <includes
          id="com.aptana.ide.feature.libraries.subscription"
          version="0.0.0"/>
