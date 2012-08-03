@@ -171,33 +171,32 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 	{
 		super.addPages();
 
-		validateProjectTemplate(getProjectTemplateTypes());
-
-		addPage(mainPage = createMainPage());
+		TemplateType[] templateTypes = getProjectTemplateTypes();
+		validateProjectTemplate(templateTypes);
 
 		List<String> steps = new ArrayList<String>();
 		List<IStepIndicatorWizardPage> stepPages = new ArrayList<IStepIndicatorWizardPage>();
 
+		// Add the template selection page
+		List<IProjectTemplate> templates = ProjectsPlugin.getDefault().getTemplatesManager()
+				.getTemplates(templateTypes);
+		if (templates.size() > 0 && selectedTemplate == null)
+		{
+			addPage(templatesPage = new ProjectTemplateSelectionPage(TEMPLATE_SELECTION_PAGE_NAME, templates));
+			stepPages.add(templatesPage);
+			steps.add(templatesPage.getStepName());
+		}
+
+		// Add the main page where we set up the project name/location
+		addPage(mainPage = createMainPage());
 		if (mainPage instanceof IStepIndicatorWizardPage)
 		{
 			stepPages.add((IStepIndicatorWizardPage) mainPage);
 			steps.add(((IStepIndicatorWizardPage) mainPage).getStepName());
 		}
 
-		List<IProjectTemplate> templates = ProjectsPlugin.getDefault().getTemplatesManager()
-				.getTemplates(getProjectTemplateTypes());
-		if (templates.size() > 0 && selectedTemplate == null)
-		{
-			addPage(templatesPage = new ProjectTemplateSelectionPage(TEMPLATE_SELECTION_PAGE_NAME, templates));
-			if (templatesPage instanceof IStepIndicatorWizardPage)
-			{
-				stepPages.add((IStepIndicatorWizardPage) templatesPage);
-				steps.add(((IStepIndicatorWizardPage) templatesPage).getStepName());
-			}
-		}
-
+		// Set up the steps
 		stepNames = steps.toArray(new String[steps.size()]);
-
 		if (stepNames.length > 1)
 		{
 			for (IStepIndicatorWizardPage page : stepPages)
