@@ -177,15 +177,19 @@ public abstract class IOUtil
 			if (monitor != null)
 			{
 				// Batch up operations so we don't constantly update the progress monitor
-				int totalFiles = source.list().length;
+				int totalFiles = countFiles(source);
 				updateSize = determineProgressBatchUpdateCount(totalFiles);
-
-				monitor = SubMonitor.convert(monitor, totalFiles / updateSize);
+				int totalWork = totalFiles / updateSize;
+				if (totalFiles % updateSize > 0)
+				{
+					totalWork++;
+				}
+				monitor = SubMonitor.convert(monitor, totalWork);
 			}
 
 			try
 			{
-				return copyDirectory(source, destination, monitor, 0, updateSize, cancelable);
+				return copyDirectory(source, destination, monitor, new int[] { 0 }, updateSize, cancelable);
 			}
 			catch (IOException e)
 			{
@@ -195,6 +199,22 @@ public abstract class IOUtil
 		}
 
 		return new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, IStatus.ERROR, Messages.IOUtil_Source_Not_Directory_Error, null);
+	}
+
+	private static int countFiles(File source)
+	{
+		String[] list = source.list();
+		int count = list.length;
+		for (String file : list)
+		{
+			File child = new File(source, file);
+			if (child.isDirectory())
+			{
+				count += countFiles(child);
+			}
+		}
+
+		return count;
 	}
 
 	/**
@@ -212,7 +232,7 @@ public abstract class IOUtil
 	 * @param cancelable
 	 * @throws IOException
 	 */
-	private static IStatus copyDirectory(File source, File destination, IProgressMonitor monitor, int count,
+	private static IStatus copyDirectory(File source, File destination, IProgressMonitor monitor, int[] count,
 			int updateSize, boolean cancelable) throws IOException
 	{
 		if (monitor != null)
@@ -222,8 +242,8 @@ public abstract class IOUtil
 				return new Status(IStatus.CANCEL, CorePlugin.PLUGIN_ID, IStatus.CANCEL, StringUtil.EMPTY, null);
 			}
 
-			count++;
-			if (updateSize == 1 || count % updateSize == 0)
+			count[0]++;
+			if (updateSize < 2 || count[0] % updateSize == 0)
 			{
 				monitor.setTaskName(MessageFormat.format(Messages.IOUtil_Copy_Label, destination.toString()));
 				monitor.worked(1);
@@ -304,7 +324,7 @@ public abstract class IOUtil
 	 */
 	public static IStatus copyDirectory(File source, File destination) throws IOException
 	{
-		return copyDirectory(source, destination, null, 0, 0, false);
+		return copyDirectory(source, destination, null, new int[] { 0 }, 0, false);
 	}
 
 	/**
@@ -523,7 +543,7 @@ public abstract class IOUtil
 
 		if (numberOfUpdates > 1000)
 		{
-			updateSize = 20;
+			updateSize = 25;
 		}
 		else if (numberOfUpdates > 100)
 		{
