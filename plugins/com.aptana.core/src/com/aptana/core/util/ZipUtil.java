@@ -147,7 +147,7 @@ public final class ZipUtil
 
 	/**
 	 * Extract specified list of entries from zip file to local path. File that exist in the destination path will be
-	 * overwritten if the <code>overwrite</code> flag is <code>true</code>.
+	 * overwritten if the <code>overwrite</code> flag is <code>true</code>. Only updates the monitor at given intervals
 	 * 
 	 * @param zip
 	 * @param entries
@@ -162,8 +162,10 @@ public final class ZipUtil
 			IProgressMonitor monitor) throws IOException
 	{
 		Collection collection = Collections.list(entries);
+		int size = collection.size();
+		int groupSize = IOUtil.determineProgressBatchUpdateCount(size);
 
-		SubMonitor subMonitor = SubMonitor.convert(monitor, Messages.ZipUtil_default_extract_label, collection.size());
+		SubMonitor subMonitor = SubMonitor.convert(monitor, Messages.ZipUtil_default_extract_label, size / groupSize);
 		try
 		{
 			/* Create directories first */
@@ -210,6 +212,7 @@ public final class ZipUtil
 			}
 			byte[] buffer = new byte[0x1000];
 			int n;
+			int count = 0;
 			/* Extract files */
 			for (Object i : collection)
 			{
@@ -219,8 +222,13 @@ public final class ZipUtil
 				IdeLog.logInfo(
 						CorePlugin.getDefault(),
 						MessageFormat.format("Extracting {0} as {1}", name, file.getAbsolutePath()), IDebugScopes.ZIPUTIL); //$NON-NLS-1$
-				subMonitor.setTaskName(Messages.ZipUtil_extract_prefix_label + name);
-				subMonitor.worked(1);
+
+				if (groupSize == 1 || (++count % groupSize == 0))
+				{
+					subMonitor.setTaskName(Messages.ZipUtil_extract_prefix_label + name);
+					subMonitor.worked(1);
+				}
+
 				if (!entry.isDirectory())
 				{
 					if (file.exists())
