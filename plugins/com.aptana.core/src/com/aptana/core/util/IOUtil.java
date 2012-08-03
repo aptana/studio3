@@ -190,11 +190,11 @@ public abstract class IOUtil
 			catch (IOException e)
 			{
 				return new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, IStatus.ERROR,
-						"Error occurred during directory copy", e);
+						Messages.IOUtil_Directory_Copy_Error, e);
 			}
 		}
 
-		return new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, IStatus.ERROR, "Source not a directory", null);
+		return new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, IStatus.ERROR, Messages.IOUtil_Source_Not_Directory_Error, null);
 	}
 
 	/**
@@ -225,7 +225,7 @@ public abstract class IOUtil
 			count++;
 			if (updateSize == 1 || count % updateSize == 0)
 			{
-				monitor.setTaskName(MessageFormat.format("Copying {0}", destination.toString()));
+				monitor.setTaskName(MessageFormat.format(Messages.IOUtil_Copy_Label, destination.toString()));
 				monitor.worked(1);
 			}
 		}

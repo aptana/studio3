@@ -22,13 +22,19 @@ public class Messages extends NLS
 	{
 	}
 
+	public static String IOUtil_Copy_Label;
+
 	public static String IOUtil_Destination_Directory_Not_Writable;
 
 	public static String IOUtil_Destination_Directory_Uncreatable;
 
 	public static String IOUtil_Destination_Is_Not_A_Directory;
 
+	public static String IOUtil_Directory_Copy_Error;
+
 	public static String IOUtil_Source_Directory_Not_Readable;
+
+	public static String IOUtil_Source_Not_Directory_Error;
 
 	public static String IOUtil_Unable_To_Copy_Because;
 
