@@ -223,7 +223,7 @@ public final class ZipUtil
 						CorePlugin.getDefault(),
 						MessageFormat.format("Extracting {0} as {1}", name, file.getAbsolutePath()), IDebugScopes.ZIPUTIL); //$NON-NLS-1$
 
-				if (groupSize == 1 || (++count % groupSize == 0))
+				if (groupSize < 2 || (++count % groupSize == 0))
 				{
 					subMonitor.setTaskName(Messages.ZipUtil_extract_prefix_label + name);
 					subMonitor.worked(1);
