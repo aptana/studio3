@@ -379,10 +379,6 @@ public abstract class IOUtil
 		{
 			copy(in, out);
 		}
-
-		destination.setWritable(source.canWrite());
-		destination.setExecutable(source.canExecute());
-		destination.setReadable(source.canRead());
 	}
 
 	/**
