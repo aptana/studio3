@@ -21,10 +21,14 @@ import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.text.MessageFormat;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
@@ -305,7 +309,15 @@ public abstract class IOUtil
 		}
 		else
 		{
-			copyFile(source, destination);
+			IFileStore src = EFS.getLocalFileSystem().fromLocalFile(source);
+			try
+			{
+				src.move(EFS.getLocalFileSystem().fromLocalFile(destination), EFS.OVERWRITE, new NullProgressMonitor());
+			}
+			catch (CoreException e)
+			{
+				return new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, IStatus.ERROR, e.getMessage(), e);
+			}
 		}
 
 		return Status.OK_STATUS;
