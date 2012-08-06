@@ -163,6 +163,14 @@ public class JVMInfo
 		else
 		{
 			javaHome = System.getProperty("java.home"); //$NON-NLS-1$
+			if (!StringUtil.isEmpty(javaHome))
+			{
+				IPath path = Path.fromOSString(javaHome);
+				if (path.lastSegment().equals("jre")) //$NON-NLS-1$
+				{
+					javaHome = path.removeLastSegments(1).toString();
+				}
+			}
 			if (isValidJavaHome(javaHome))
 			{
 				this.javaHome = javaHome;
