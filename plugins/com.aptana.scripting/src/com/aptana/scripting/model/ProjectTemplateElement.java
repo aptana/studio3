@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -10,7 +10,11 @@ package com.aptana.scripting.model;
 import java.io.File;
 import java.net.URL;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IStatus;
+
 import com.aptana.core.projects.templates.IProjectTemplate;
+import com.aptana.core.projects.templates.ProjectTemplate;
 import com.aptana.core.projects.templates.TemplateType;
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
@@ -124,35 +128,7 @@ public class ProjectTemplateElement extends AbstractBundleElement implements IPr
 	 */
 	protected void printBody(SourcePrinter printer, boolean includeBlocks)
 	{
-		printBody(printer, includeBlocks, this);
-	}
-
-	/**
-	 * Prints the interior body of the template element
-	 * 
-	 * @param printer
-	 * @param includeBlocks
-	 * @param template
-	 */
-	public static void printBody(SourcePrinter printer, boolean includeBlocks, IProjectTemplate template)
-	{
-		printer.printWithIndent("path: ").println(template.getPath()); //$NON-NLS-1$
-		printer.printWithIndent("name: ").println(template.getDisplayName()); //$NON-NLS-1$
-		printer.printWithIndent("location: ").println(template.getLocation()); //$NON-NLS-1$
-		printer.printWithIndent("id: ").println(template.getId()); //$NON-NLS-1$
-		printer.printWithIndent("type: ").println(template.getType().name()); //$NON-NLS-1$
-		printer.printWithIndent("replaceParameters: ").println(Boolean.toString(template.isReplacingParameters())); //$NON-NLS-1$
-
-		if (template.getDescription() != null)
-		{
-			printer.printWithIndent("description: ").println(template.getDescription()); //$NON-NLS-1$
-		}
-
-		if (template.getIconURL() != null)
-		{
-			printer.printWithIndent("iconURL: ").println(template.getIconURL().toString()); //$NON-NLS-1$
-		}
-
+		ProjectTemplate.printBody(printer, includeBlocks, this);
 	}
 
 	/**
@@ -277,5 +253,16 @@ public class ProjectTemplateElement extends AbstractBundleElement implements IPr
 		{
 			setId(displayName);
 		}
+	}
+
+	public IStatus apply(IProject project, boolean promptForOverwrite)
+	{
+		return createProjectTemplate().apply(project, promptForOverwrite);
+	}
+
+	protected ProjectTemplate createProjectTemplate()
+	{
+		return new ProjectTemplate(getLocation(), getType(), getDisplayName(), isReplacingParameters(),
+				getDescription(), getIconURL(), getId());
 	}
 }

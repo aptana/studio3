@@ -1,17 +1,14 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.projects.internal.wizards;
 
-import java.io.File;
 import java.util.Set;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.swt.widgets.Shell;
@@ -32,7 +29,7 @@ public class OverwriteFilesSelectionDialog extends ListSelectionDialog
 	/**
 	 * @param keySet
 	 */
-	public OverwriteFilesSelectionDialog(Set<IFile> files, String message)
+	public OverwriteFilesSelectionDialog(Set<IPath> files, String message)
 	{
 		super(UIUtils.getActiveShell(), files, ArrayContentProvider.getInstance(), new LabelProvider(), message);
 		setInitialSelections(files.toArray(new Object[files.size()]));
@@ -60,9 +57,8 @@ public class OverwriteFilesSelectionDialog extends ListSelectionDialog
 		protected String decorateText(String input, Object element)
 		{
 			// Add the full path for the element
-			IResource resource = (IResource) element;
-			IPath projectRelativePath = resource.getProjectRelativePath().removeLastSegments(1);
-			return projectRelativePath.toOSString() + File.separatorChar + resource.getName();
+			IPath resource = (IPath) element;
+			return resource.toOSString();
 		}
 	}
 }

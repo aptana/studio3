@@ -7,29 +7,18 @@
  */
 package com.aptana.projects.wizards;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
-import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResourceStatus;
@@ -40,25 +29,19 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.dialogs.ContainerGenerator;
 import org.eclipse.ui.dialogs.WizardNewProjectReferencePage;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.ide.undo.CreateProjectOperation;
 import org.eclipse.ui.ide.undo.WorkspaceUndoUtil;
-import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.statushandlers.IStatusAdapterConstants;
 import org.eclipse.ui.statushandlers.StatusAdapter;
 import org.eclipse.ui.statushandlers.StatusManager;
@@ -68,15 +51,12 @@ import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.projects.templates.IProjectTemplate;
 import com.aptana.core.projects.templates.TemplateType;
-import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ProcessStatus;
 import com.aptana.core.util.ResourceUtil;
-import com.aptana.core.util.replace.SimpleTextPatternReplacer;
 import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.ui.CloneJob;
 import com.aptana.projects.ProjectsPlugin;
 import com.aptana.projects.internal.wizards.Messages;
-import com.aptana.projects.internal.wizards.OverwriteFilesSelectionDialog;
 import com.aptana.ui.util.UIUtils;
 import com.aptana.usage.FeatureEvent;
 import com.aptana.usage.StudioAnalytics;
@@ -429,7 +409,7 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 			doBasicCreateProject(newProject, description, sub.newChild(75));
 			if (!applySourcedProjectFilesAfterProjectCreated() && selectedTemplate != null && !isCloneFromGit())
 			{
-				extractZip(selectedTemplate, newProject, true);
+				selectedTemplate.apply(newProject, true);
 			}
 		}
 
@@ -449,6 +429,7 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 
 	protected boolean isCloneFromGit()
 	{
+		// FIXME Move this logic into the IProjectTemplate#apply method?
 		return selectedTemplate != null && !selectedTemplate.getLocation().endsWith(".zip"); //$NON-NLS-1$
 	}
 
@@ -523,300 +504,6 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 		catch (ExecutionException e)
 		{
 			throw new InvocationTargetException(e);
-		}
-	}
-
-	/**
-	 * @param template
-	 * @param project
-	 * @param preExistingResources
-	 *            A possible conflicting list of resources that the extraction should notify about to the user.
-	 */
-	public static void extractZip(IProjectTemplate template, IProject project, Set<IPath> preExistingResources)
-	{
-		extractZip(new File(template.getDirectory(), template.getLocation()), project, !preExistingResources.isEmpty(),
-				preExistingResources, template.isReplacingParameters());
-	}
-
-	public static void extractZip(IProjectTemplate template, IProject project, boolean promptForOverwrite)
-	{
-		Set<IPath> emptySet = Collections.emptySet();
-		extractZip(new File(template.getDirectory(), template.getLocation()), project, promptForOverwrite, emptySet,
-				template.isReplacingParameters());
-	}
-
-	/**
-	 * Extracts a zip into a given project.
-	 * 
-	 * @param zipPath
-	 * @param project
-	 * @param promptForOverwrite
-	 *            Indicate that we should display a prompt in case the zip overwrites some of the existing project
-	 *            files.
-	 * @param preExistingResources
-	 *            A defined list of resources that will be used when prompting for overwrite conflicts. In case of an
-	 *            empty list, the function will prompt on any overwritten file.
-	 * @param isReplacingParameters
-	 */
-	public static void extractZip(final File zipPath, final IProject project, boolean promptForOverwrite,
-			Set<IPath> preExistingResources, final boolean isReplacingParameters)
-	{
-		if (!zipPath.exists())
-		{
-			return;
-		}
-
-		ZipFile zipFile = null;
-		try
-		{
-			final Map<IFile, ZipEntry> conflicts = new HashMap<IFile, ZipEntry>();
-			zipFile = new ZipFile(zipPath, ZipFile.OPEN_READ);
-			Enumeration<? extends ZipEntry> entries = zipFile.entries();
-			ZipEntry entry;
-			while (entries.hasMoreElements())
-			{
-				entry = entries.nextElement();
-
-				if (entry.isDirectory())
-				{
-					IFolder newFolder = project.getFolder(Path.fromOSString(entry.getName()));
-					if (!newFolder.exists())
-					{
-						newFolder.create(true, true, null);
-					}
-				}
-				else
-				{
-					IFile newFile = project.getFile(Path.fromOSString(entry.getName()));
-					if (newFile.exists())
-					{
-						if (promptForOverwrite)
-						{
-							// Add to the list of conflicts only when we didn't get any pre-existing list of
-							// possible conflicting files, or when the pre-existing list of paths contains the
-							// current file path.
-							if (preExistingResources == null || preExistingResources.isEmpty()
-									|| preExistingResources.contains(newFile.getLocation()))
-							{
-								conflicts.put(newFile, entry);
-								// Remove the file for now. We will add it again if the user agrees the
-								// overwrite it.
-							}
-							else
-							{
-								// The file exists right now, but was not in the pre-existing resources we check
-								// against, so we just need to set it with the new content.
-								newFile.setContents(
-										getInputStream(zipFile, entry, newFile, project, isReplacingParameters), true,
-										true, null);
-							}
-						}
-						else
-						{
-							newFile.setContents(
-									getInputStream(zipFile, entry, newFile, project, isReplacingParameters), true,
-									true, null);
-						}
-					}
-					else
-					{
-						try
-						{
-							// makes sure the parent path is created
-							(new ContainerGenerator(newFile.getParent().getFullPath())).generateContainer(null);
-							newFile.create(getInputStream(zipFile, entry, newFile, project, isReplacingParameters),
-									true, null);
-						}
-						catch (CoreException re)
-						{
-							if (re.getStatus().getCode() == IResourceStatus.CASE_VARIANT_EXISTS
-									&& re.getStatus() instanceof IResourceStatus)
-							{
-								IResourceStatus rs = (IResourceStatus) re.getStatus();
-								IFile newVariantFile = project.getParent().getFile(rs.getPath());
-								newVariantFile.setContents(
-										getInputStream(zipFile, entry, newVariantFile, project, isReplacingParameters),
-										true, true, null);
-							}
-							else
-							{
-								IdeLog.logError(ProjectsPlugin.getDefault(), Messages.NewProjectWizard_ZipFailure, re);
-							}
-						}
-					}
-				}
-			}
-			// Check if we had any conflicts. If so, display a dialog to let the user mark which
-			// files he/she wishes to keep, and which would be overwritten by the Zip's content.
-			if (!conflicts.isEmpty())
-			{
-				final ZipFile finalZipFile = zipFile;
-				UIJob openDialogJob = new UIJob(Messages.OverwriteFilesSelectionDialog_overwriteFilesTitle)
-				{
-					public IStatus runInUIThread(IProgressMonitor monitor)
-					{
-						OverwriteFilesSelectionDialog overwriteFilesSelectionDialog = new OverwriteFilesSelectionDialog(
-								conflicts.keySet(), Messages.NewProjectWizard_filesOverwriteMessage);
-						if (overwriteFilesSelectionDialog.open() == Window.OK)
-						{
-							try
-							{
-								Object[] overwrittenFiles = overwriteFilesSelectionDialog.getResult();
-								// Overwrite the selected files only.
-								for (Object file : overwrittenFiles)
-								{
-									IFile iFile = (IFile) file;
-									iFile.setContents(
-											getInputStream(finalZipFile, conflicts.get(file), iFile, project,
-													isReplacingParameters), true, true, null);
-								}
-							}
-							catch (Exception e)
-							{
-								IdeLog.logError(ProjectsPlugin.getDefault(),
-										MessageFormat.format(Messages.NewProjectWizard_ERR_UnzipFile, zipPath), e);
-							}
-						}
-						return Status.OK_STATUS;
-					}
-				};
-				openDialogJob.setSystem(true);
-				openDialogJob.schedule();
-				openDialogJob.join();
-			}
-		}
-		catch (CoreException e)
-		{
-			IdeLog.logError(ProjectsPlugin.getDefault(), e);
-		}
-		catch (Exception e)
-		{
-			IdeLog.logError(ProjectsPlugin.getDefault(),
-					MessageFormat.format(Messages.NewProjectWizard_ERR_UnzipFile, zipPath), e);
-		}
-		finally
-		{
-			if (zipFile != null)
-			{
-				try
-				{
-					zipFile.close();
-				}
-				catch (IOException e)
-				{
-					// ignores
-				}
-			}
-		}
-	}
-
-	/**
-	 * Returns an input stream for a zip entry. The returned input stream may be a stream that was generated after
-	 * processing the file for template-variables.
-	 * 
-	 * @param zipFile
-	 * @param entry
-	 *            A zip entry
-	 * @param file
-	 *            An {@link IFile} reference.
-	 * @param project
-	 *            An {@link IProject} reference.
-	 * @param isReplacingParameters
-	 * @return An input stream for the content.
-	 * @throws IOException
-	 * @throws CoreException
-	 */
-	private static InputStream getInputStream(ZipFile zipFile, ZipEntry entry, IFile file, IProject project,
-			boolean isReplacingParameters) throws IOException, CoreException
-	{
-		if (!isSupportedFile(file))
-		{
-			return zipFile.getInputStream(entry);
-		}
-		String content = null;
-		if (isReplacingParameters)
-		{
-			try
-			{
-				// read and do template substitution
-				content = applyTemplateVariables(zipFile.getInputStream(entry), file, project);
-			}
-			catch (Exception e)
-			{
-				IdeLog.logError(ProjectsPlugin.getDefault(),
-						"Error applying a template. Trying to write the file as is, without template evaluation.", e); //$NON-NLS-1$
-			}
-		}
-		if (content == null)
-		{
-			// In case we should not evaluate template tags, or had a previous error, read without template
-			// substitution.
-			content = IOUtil.read(zipFile.getInputStream(entry));
-		}
-		return new ByteArrayInputStream(content.getBytes(IOUtil.UTF_8));
-	}
-
-	/**
-	 * Returns true if the given file can be evaluated for template-variables.<br>
-	 * There is no good way of detecting what is binary and what is not, so we decide what is supported according to the
-	 * existing editor's supported content types (file extensions).
-	 * 
-	 * @param file
-	 * @return True if the file can be processed; False, otherwise.
-	 */
-	private static boolean isSupportedFile(IFile file)
-	{
-		IContentType contentType = Platform.getContentTypeManager().findContentTypeFor(file.getName());
-		return PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName(), contentType) != null;
-	}
-
-	/**
-	 * Apply the project-template variables on the files that were extracted as the project contents.
-	 * 
-	 * @param inputStream
-	 * @param file
-	 * @param project
-	 * @return A string content of the {@link InputStream}, <b>after</b> the variables substitution.
-	 * @throws CoreException
-	 */
-	private static String applyTemplateVariables(InputStream inputStream, IFile file, IProject project)
-			throws CoreException
-	{
-		SimpleTextPatternReplacer replacer = new SimpleTextPatternReplacer();
-
-		try
-		{
-			IPath absoluteFilePath = file.getLocation();
-			String filePathString = absoluteFilePath.toOSString();
-
-			replacer.addPattern("${TM_NEW_FILE_BASENAME}", absoluteFilePath.removeFileExtension().lastSegment()); //$NON-NLS-1$
-			replacer.addPattern("${TM_NEW_FILE}", filePathString); //$NON-NLS-1$
-			replacer.addPattern("${TM_NEW_FILE_DIRECTORY}", absoluteFilePath.removeLastSegments(1).toOSString()); //$NON-NLS-1$
-			replacer.addPattern("${TM_PROJECTNAME}", project.getName()); //$NON-NLS-1$
-			Calendar calendar = Calendar.getInstance();
-			replacer.addPattern("${TIME}", calendar.getTime().toString()); //$NON-NLS-1$
-			replacer.addPattern("${YEAR}", Integer.toString(calendar.get(Calendar.YEAR))); //$NON-NLS-1$
-
-			String text = IOUtil.read(inputStream);
-			return replacer.searchAndReplace(text);
-		}
-		catch (Exception e)
-		{
-			throw new CoreException(new Status(IStatus.ERROR, ProjectsPlugin.PLUGIN_ID,
-					Messages.NewProjectWizard_templateVariableApplyError));
-		}
-		finally
-		{
-			if (inputStream != null)
-			{
-				try
-				{
-					inputStream.close();
-				}
-				catch (IOException e)
-				{
-				}
-			}
 		}
 	}
 

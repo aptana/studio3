@@ -24,7 +24,6 @@ public class Messages extends NLS
 	public static String NewProjectWizard_InternalError;
 	public static String NewProjectWizard_ProjectPage_Description;
 	public static String NewProjectWizard_ProjectPage_Title;
-	public static String NewProjectWizard_templateVariableApplyError;
 	public static String NewProjectWizard_Title;
 	public static String NewProjectWizard_Step_Lbl;
 	public static String NewProjectWizard_Warning_DirectoryExists;
