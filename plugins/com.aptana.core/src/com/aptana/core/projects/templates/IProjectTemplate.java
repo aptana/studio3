@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -9,6 +9,9 @@ package com.aptana.core.projects.templates;
 
 import java.io.File;
 import java.net.URL;
+
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IStatus;
 
 /**
  * A project template interface.
@@ -79,4 +82,12 @@ public interface IProjectTemplate
 	 * @return True, if tags-substitution should occur when importing; False, otherwise.
 	 */
 	public boolean isReplacingParameters();
+
+	/**
+	 * Applies the template to a given project. Returns an error IStatus if there was an issue.
+	 * 
+	 * @param project
+	 * @param promptForOverwrite
+	 */
+	public IStatus apply(IProject project, boolean promptForOverwrite);
 }

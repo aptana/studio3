@@ -8,11 +8,10 @@
 package com.aptana.samples.ui.project;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.text.MessageFormat;
-import java.util.Collections;
-import java.util.Set;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
@@ -26,6 +25,7 @@ import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
@@ -50,6 +50,7 @@ import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.FileUtil;
+import com.aptana.core.util.ZipUtil;
 import com.aptana.git.ui.CloneJob;
 import com.aptana.projects.internal.wizards.AbstractNewProjectWizard;
 import com.aptana.projects.util.ProjectUtil;
@@ -220,12 +221,16 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 			{
 				doBasicCreateProject(newProjectHandle, description);
 
-				Set<IPath> emptySet = Collections.emptySet();
-				AbstractNewProjectWizard.extractZip(new File(sample.getLocation()), newProjectHandle, true, emptySet,
-						false);
+				// FIXME Move the logic for extracting/applying samples to IProjectSample! See IProjectTemplate!
+				ZipUtil.extract(new File(sample.getLocation()), newProjectHandle.getLocation(),
+						ZipUtil.Conflict.PROMPT, new NullProgressMonitor());
 
 				doPostProjectCreation(newProjectHandle);
 			}
+		}
+		catch (IOException e)
+		{
+			return null;
 		}
 		catch (CoreException e)
 		{

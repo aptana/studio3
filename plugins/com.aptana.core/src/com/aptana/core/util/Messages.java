@@ -44,6 +44,8 @@ public class Messages extends NLS
 
 	public static String URLUtil_EvenNumberUrlParameters;
 
+	public static String ZipUtil_ConflictsError;
+
 	public static String ZipUtil_default_extract_label;
 
 	public static String ZipUtil_ERR_NoWritePermission;

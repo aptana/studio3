@@ -209,4 +209,13 @@
             name="%category.sample.web.name">
       </category>
    </extension>
+   <extension
+         point="org.eclipse.debug.core.statusHandlers">
+      <statusHandler
+            class="com.aptana.projects.templates.ConflictStatusHandler"
+            code="128"
+            id="com.aptana.projects.conflictsStatusHandler"
+            plugin="com.aptana.core">
+      </statusHandler>
+   </extension>
 </plugin>

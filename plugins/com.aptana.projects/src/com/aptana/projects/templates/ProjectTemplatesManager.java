@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.Platform;
 import org.osgi.framework.Bundle;
 
 import com.aptana.core.projects.templates.IProjectTemplate;
+import com.aptana.core.projects.templates.ProjectTemplate;
 import com.aptana.core.projects.templates.TemplateType;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
@@ -63,7 +64,6 @@ public class ProjectTemplatesManager
 			{
 				ProjectTemplateElement template = (ProjectTemplateElement) element;
 				removeTemplate(template);
-				fireTemplateRemoved(template);
 			}
 		}
 
@@ -73,7 +73,6 @@ public class ProjectTemplatesManager
 			{
 				ProjectTemplateElement template = (ProjectTemplateElement) element;
 				addTemplate(template);
-				fireTemplateAdded(template);
 			}
 		}
 	};
@@ -156,7 +155,7 @@ public class ProjectTemplatesManager
 					public Set<String> getSupportElementNames()
 					{
 						return CollectionsUtil.newSet(ELEMENT_TEMPLATEINFO);
-	}
+					}
 				});
 	}
 
@@ -234,7 +233,7 @@ public class ProjectTemplatesManager
 		}
 	}
 
-	private void addTemplate(IProjectTemplate template)
+	public void addTemplate(IProjectTemplate template)
 	{
 		TemplateType type = template.getType();
 		List<IProjectTemplate> templates = projectTemplates.get(type);
@@ -244,15 +243,17 @@ public class ProjectTemplatesManager
 			projectTemplates.put(type, templates);
 		}
 		templates.add(template);
+		fireTemplateAdded(template);
 	}
 
-	private void removeTemplate(IProjectTemplate template)
+	public void removeTemplate(IProjectTemplate template)
 	{
 		TemplateType type = template.getType();
 		List<IProjectTemplate> templates = projectTemplates.get(type);
 		if (templates != null)
 		{
 			templates.remove(template);
+			fireTemplateRemoved(template);
 		}
 	}
 

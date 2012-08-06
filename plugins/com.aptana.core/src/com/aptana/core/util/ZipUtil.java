@@ -7,7 +7,6 @@
  */
 package com.aptana.core.util;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -19,16 +18,23 @@ import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.zip.ZipException;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.debug.core.IStatusHandler;
 
 import com.aptana.core.CorePlugin;
 import com.aptana.core.IDebugScopes;
@@ -39,8 +45,27 @@ import com.aptana.core.logging.IdeLog;
  */
 public final class ZipUtil
 {
+	/**
+	 * What to do in case we run into a conflict in extracting a file to a destination (a file already exists).
+	 * 
+	 * @author cwilliams
+	 */
+	public enum Conflict
+	{
+		OVERWRITE, PROMPT, SKIP;
+	}
 
 	private static final int ATTR_SYMLINK = 0xA000;
+
+	/**
+	 * Special error code for conflicts in zip extraction!
+	 */
+	private static final int ERR_CONFLICTS = 128;
+
+	/**
+	 * Destination directory doesn't have write permissions.
+	 */
+	private static final int ERR_NoWritePermission = 130;
 
 	/**
 	 * 
@@ -80,6 +105,34 @@ public final class ZipUtil
 	}
 
 	/**
+	 * @param file
+	 * @param location
+	 * @param prompt
+	 * @param monitor
+	 */
+	public static IStatus extract(File file, IPath location, Conflict prompt, IProgressMonitor monitor)
+			throws IOException
+	{
+		return extract(file, location.toFile(), prompt, null, monitor);
+	}
+
+	/**
+	 * @param zipFile
+	 * @param destinationPath
+	 * @param overwrite
+	 * @param transformer
+	 * @param monitor
+	 * @return
+	 * @throws IOException
+	 */
+	public static IStatus extract(File zipFile, File destinationPath, Conflict overwrite,
+			IInputStreamTransformer transformer, IProgressMonitor monitor) throws IOException
+	{
+		ZipFile zip = new ZipFile(zipFile);
+		return extract(zip, zip.getEntries(), destinationPath, overwrite, transformer, monitor);
+	}
+
+	/**
 	 * Extract zip file into specified local path. By default, file that exist in the destination path will not be
 	 * overwritten.
 	 * 
@@ -88,7 +141,7 @@ public final class ZipUtil
 	 * @param monitor
 	 * @throws IOException
 	 */
-	public static IStatus extract(ZipFile zip, File destinationPath, IProgressMonitor monitor) throws IOException
+	private static IStatus extract(ZipFile zip, File destinationPath, IProgressMonitor monitor) throws IOException
 	{
 		return extract(zip, zip.getEntries(), destinationPath, monitor);
 	}
@@ -103,14 +156,15 @@ public final class ZipUtil
 	 * @param monitor
 	 * @throws IOException
 	 */
-	public static IStatus extract(ZipFile zip, File destinationPath, boolean overwrite, IProgressMonitor monitor)
+	private static IStatus extract(ZipFile zip, File destinationPath, boolean overwrite, IProgressMonitor monitor)
 			throws IOException
 	{
-		return extract(zip, zip.getEntries(), destinationPath, overwrite, monitor);
+		return extract(zip, zip.getEntries(), destinationPath, overwrite ? Conflict.OVERWRITE : Conflict.SKIP, null,
+				monitor);
 	}
 
 	/**
-	 * Open iput stream for specified zip entry.
+	 * Open input stream for specified zip entry.
 	 * 
 	 * @param zipFile
 	 * @param path
@@ -139,10 +193,10 @@ public final class ZipUtil
 	 * @throws IOException
 	 */
 	@SuppressWarnings("rawtypes")
-	public static IStatus extract(ZipFile zip, Enumeration entries, File destinationPath, IProgressMonitor monitor)
+	private static IStatus extract(ZipFile zip, Enumeration entries, File destinationPath, IProgressMonitor monitor)
 			throws IOException
 	{
-		return extract(zip, entries, destinationPath, false, monitor);
+		return extract(zip, entries, destinationPath, Conflict.SKIP, null, monitor);
 	}
 
 	/**
@@ -158,145 +212,313 @@ public final class ZipUtil
 	 * @throws IOException
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static IStatus extract(ZipFile zip, Enumeration entries, File destinationPath, boolean overwrite,
-			IProgressMonitor monitor) throws IOException
+	private static IStatus extract(ZipFile zip, Enumeration entries, File destinationPath, Conflict overwrite,
+			IInputStreamTransformer transformer, IProgressMonitor monitor) throws IOException
 	{
 		Collection collection = Collections.list(entries);
-
+		MultiStatus multiStatus = new MultiStatus(CorePlugin.PLUGIN_ID, 0, null, null);
 		SubMonitor subMonitor = SubMonitor.convert(monitor, Messages.ZipUtil_default_extract_label, collection.size());
 		try
 		{
-			/* Create directories first */
+			// Create directories first
 			for (Object i : collection)
 			{
 				ZipEntry entry = (ZipEntry) i;
-				String name = entry.getName();
-				File file = new File(destinationPath, name);
-				if (entry.isDirectory())
+				createDirectory(entry, destinationPath);
+				if (subMonitor.isCanceled())
 				{
-					if (!file.exists())
-					{
-						IdeLog.logInfo(
-								CorePlugin.getDefault(),
-								MessageFormat.format("Creating directory {0}", file.getAbsolutePath()), IDebugScopes.ZIPUTIL); //$NON-NLS-1$
-						file.mkdirs();
-					}
-					if (!IOUtil.isWritableDirectory(file))
-					{
-						return new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, MessageFormat.format(
-								Messages.ZipUtil_ERR_NoWritePermission, file));
-					}
+					return Status.CANCEL_STATUS;
 				}
-				else if (name.indexOf('/') != -1)
+			}
+
+			// Extract files
+			Set<IPath> conflicts = new HashSet<IPath>();
+			for (Object i : collection)
+			{
+				ZipEntry entry = (ZipEntry) i;
+				IStatus fileStatus = extractEntry(zip, entry, destinationPath, transformer, overwrite,
+						subMonitor.newChild(1));
+				// We need to add entries to a conflict list if we can't overwrite them!
+				if (fileStatus.getCode() == ERR_CONFLICTS)
 				{
-					File parent = file.getParentFile();
-					if (!parent.exists())
-					{
-						IdeLog.logInfo(
-								CorePlugin.getDefault(),
-								MessageFormat.format("Creating directory {0}", parent.getAbsolutePath()), IDebugScopes.ZIPUTIL); //$NON-NLS-1$
-						parent.mkdirs();
-					}
-					if (!IOUtil.isWritableDirectory(parent))
-					{
-						return new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, MessageFormat.format(
-								Messages.ZipUtil_ERR_NoWritePermission, parent));
-					}
+					conflicts.add(Path.fromPortableString(entry.getName()));
+				}
+				else
+				{
+					multiStatus.merge(fileStatus);
 				}
 				if (subMonitor.isCanceled())
 				{
 					return Status.CANCEL_STATUS;
 				}
 			}
-			byte[] buffer = new byte[0x1000];
-			int n;
-			/* Extract files */
-			for (Object i : collection)
+
+			// Now handle the conflicts, prompt to see if user wants to overwrite
+			if (overwrite == Conflict.PROMPT && !conflicts.isEmpty())
 			{
-				ZipEntry entry = (ZipEntry) i;
-				String name = entry.getName();
-				File file = new File(destinationPath, name);
-				IdeLog.logInfo(
-						CorePlugin.getDefault(),
-						MessageFormat.format("Extracting {0} as {1}", name, file.getAbsolutePath()), IDebugScopes.ZIPUTIL); //$NON-NLS-1$
-				subMonitor.setTaskName(Messages.ZipUtil_extract_prefix_label + name);
-				subMonitor.worked(1);
-				if (!entry.isDirectory())
+				IStatus status = new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, ERR_CONFLICTS,
+						Messages.ZipUtil_ConflictsError, null);
+				IStatusHandler handler = DebugPlugin.getDefault().getStatusHandler(status);
+				if (handler != null)
 				{
-					if (file.exists())
+					Object result = handler.handleStatus(status, conflicts);
+					if (result instanceof IPath[])
 					{
-						if (overwrite)
+						// extract the entries!
+						IPath[] toOverwrite = (IPath[]) result;
+						for (IPath file : toOverwrite)
 						{
-							IdeLog.logInfo(
-									CorePlugin.getDefault(),
-									MessageFormat.format(
-											"Deleting a file/directory before overwrite {0}", file.getAbsolutePath()), IDebugScopes.ZIPUTIL); //$NON-NLS-1$
-							FileUtil.deleteRecursively(file);
-						}
-						else
-						{
-							continue;
-						}
-					}
-					file.getParentFile().mkdirs();
-					if (!file.createNewFile())
-					{
-						IdeLog.logWarning(
-								CorePlugin.getDefault(),
-								MessageFormat.format("Cannot create the file {0}", file.getAbsolutePath()), IDebugScopes.ZIPUTIL); //$NON-NLS-1$
-						continue;
-					}
-					boolean symlink = isSymlink(entry);
-					if (symlink)
-					{
-						IdeLog.logInfo(
-								CorePlugin.getDefault(),
-								MessageFormat.format("Deleting symlink {0}", file.getAbsolutePath()), IDebugScopes.ZIPUTIL); //$NON-NLS-1$
-						file.delete();
-					}
-					OutputStream out = symlink ? new ByteArrayOutputStream() : new FileOutputStream(file);
-					InputStream in = zip.getInputStream(entry);
-					while ((n = in.read(buffer)) > 0)
-					{
-						out.write(buffer, 0, n);
-					}
-					in.close();
-					out.close();
-					if (!Platform.OS_WIN32.equals(Platform.getOS()))
-					{
-						if (entry.getUnixMode() != 0)
-						{
-							try
+							ZipEntry entry = zip.getEntry(file.toPortableString());
+							multiStatus.merge(extractEntry(zip, entry, destinationPath, transformer,
+									Conflict.OVERWRITE, subMonitor));
+							if (subMonitor.isCanceled())
 							{
-								Runtime.getRuntime()
-										.exec(new String[] {
-												"chmod", Integer.toOctalString(entry.getUnixMode() & 0x0FFF), file.getAbsolutePath() }); //$NON-NLS-1$
-							}
-							catch (Exception ignore)
-							{
+								return Status.CANCEL_STATUS;
 							}
 						}
-						if (symlink)
-						{
-							String target = new String(((ByteArrayOutputStream) out).toByteArray(), IOUtil.UTF_8);
-							Runtime.getRuntime()
-									.exec(new String[] {
-											"ln", "-s", new File(destinationPath, target).getAbsolutePath(), file.getAbsolutePath() }); //$NON-NLS-1$ //$NON-NLS-2$
-						}
 					}
-				}
-				if (subMonitor.isCanceled())
-				{
-					return Status.CANCEL_STATUS;
 				}
 			}
-			return Status.OK_STATUS;
+
+			return multiStatus;
+		}
+		catch (CoreException ce)
+		{
+			return ce.getStatus();
 		}
 		finally
 		{
 			subMonitor.done();
 			ZipFile.closeQuietly(zip);
 		}
+	}
+
+	/**
+	 * Attempts to ensure the destination directory structure is generated. If there's a problem with write permissions,
+	 * a {@link CoreException} is thrown.
+	 * 
+	 * @param entry
+	 * @param destinationPath
+	 * @throws CoreException
+	 */
+	private static void createDirectory(ZipEntry entry, File destinationPath) throws CoreException
+	{
+		String name = entry.getName();
+		File file = new File(destinationPath, name);
+		if (entry.isDirectory())
+		{
+			createDirectoryIfNecessary(file);
+		}
+		else if (name.indexOf('/') != -1)
+		{
+			createDirectoryIfNecessary(file.getParentFile());
+		}
+	}
+
+	/**
+	 * If the directory doesn't exist, we attempt to create it. If the directory is not writable, we throw a
+	 * {@link CoreException}
+	 * 
+	 * @param file
+	 * @throws CoreException
+	 */
+	private static void createDirectoryIfNecessary(File file) throws CoreException
+	{
+		if (!file.exists())
+		{
+			if (IdeLog.isInfoEnabled(CorePlugin.getDefault(), IDebugScopes.ZIPUTIL))
+			{
+				IdeLog.logInfo(CorePlugin.getDefault(),
+						MessageFormat.format("Creating directory {0}", file.getAbsolutePath()), IDebugScopes.ZIPUTIL); //$NON-NLS-1$
+			}
+			file.mkdirs(); // FIXME Should we throw a CoreException here?
+		}
+		if (!IOUtil.isWritableDirectory(file))
+		{
+			throw new CoreException(new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, ERR_NoWritePermission,
+					MessageFormat.format(Messages.ZipUtil_ERR_NoWritePermission, file), null));
+		}
+	}
+
+	/**
+	 * Do the dirty work of actually extracting a {@link ZipEntry} to it's destination.
+	 * 
+	 * @param zip
+	 * @param entry
+	 * @param destinationPath
+	 * @param transformer
+	 * @param conflicts
+	 * @param howToResolve
+	 * @param monitor
+	 * @return
+	 */
+	private static IStatus extractEntry(ZipFile zip, ZipEntry entry, File destinationPath,
+			IInputStreamTransformer transformer, Conflict howToResolve, IProgressMonitor monitor)
+	{
+		// Return early since this is only supposed to handle files.
+		if (entry.isDirectory())
+		{
+			return Status.OK_STATUS;
+		}
+
+		SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
+		String name = entry.getName();
+		File file = new File(destinationPath, name);
+		if (IdeLog.isInfoEnabled(CorePlugin.getDefault(), IDebugScopes.ZIPUTIL))
+		{
+			IdeLog.logInfo(CorePlugin.getDefault(),
+					MessageFormat.format("Extracting {0} as {1}", name, file.getAbsolutePath()), IDebugScopes.ZIPUTIL); //$NON-NLS-1$
+		}
+		subMonitor.setTaskName(Messages.ZipUtil_extract_prefix_label + name);
+		subMonitor.worked(2);
+		try
+		{
+			if (file.exists())
+			{
+				switch (howToResolve)
+				{
+					case OVERWRITE:
+						if (IdeLog.isInfoEnabled(CorePlugin.getDefault(), IDebugScopes.ZIPUTIL))
+						{
+							IdeLog.logInfo(
+									CorePlugin.getDefault(),
+									MessageFormat.format(
+											"Deleting a file/directory before overwrite {0}", file.getAbsolutePath()), IDebugScopes.ZIPUTIL); //$NON-NLS-1$
+						}
+						FileUtil.deleteRecursively(file);
+						break;
+
+					case SKIP:
+						return Status.OK_STATUS;
+
+					case PROMPT:
+						return new Status(IStatus.INFO, CorePlugin.PLUGIN_ID, ERR_CONFLICTS, name, null);
+				}
+			}
+			subMonitor.setWorkRemaining(95);
+
+			extractFile(zip, entry, destinationPath, file, transformer, subMonitor.newChild(95));
+		}
+
+		finally
+		{
+			subMonitor.done();
+		}
+
+		return Status.OK_STATUS;
+	}
+
+	/**
+	 * Extracts the {@link ZipEntry} to disk.
+	 * 
+	 * @param zip
+	 * @param entry
+	 * @param destinationPath
+	 * @param file
+	 * @param transformer
+	 * @param monitor
+	 * @return
+	 */
+	private static IStatus extractFile(ZipFile zip, ZipEntry entry, File destinationPath, File file,
+			IInputStreamTransformer transformer, IProgressMonitor monitor)
+	{
+		if (isSymlink(entry))
+		{
+			return extractSymlink(zip, entry, destinationPath, file);
+		}
+
+		// handle non-symlinks
+		OutputStream out = null;
+		InputStream in = null;
+		try
+		{
+			file.getParentFile().mkdirs();
+			// Run an IInputStreamTransformer on the input here if it's not a symlink!
+			in = zip.getInputStream(entry);
+			if (transformer != null)
+			{
+				in = transformer.transform(in, Path.fromPortableString(entry.getName()));
+			}
+			out = new FileOutputStream(file);
+			// TODO Can we pass in an IProgressMonitor to get progress here?
+			IOUtil.pipe(in, out);
+		}
+		catch (ZipException e)
+		{
+			return new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, 0, MessageFormat.format(
+					"Error getting input stream for zip entry {0}", entry.getName()), e); //$NON-NLS-1$
+		}
+		catch (IOException e)
+		{
+			// TODO
+			return new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, 0, MessageFormat.format(
+					"IOException while extracting file {0}", file.getAbsolutePath()), e); //$NON-NLS-1$
+		}
+		finally
+		{
+			if (in != null)
+			{
+				try
+				{
+					in.close();
+				}
+				catch (IOException ignore)
+				{
+				}
+			}
+			if (out != null)
+			{
+				try
+				{
+					out.close();
+				}
+				catch (IOException ignore)
+				{
+				}
+			}
+		}
+
+		// Set permissions
+		if (!PlatformUtil.isWindows() && entry.getUnixMode() != 0)
+		{
+			return ProcessUtil.runInBackground(
+					"chmod", null, Integer.toOctalString(entry.getUnixMode() & 0x0FFF), file.getAbsolutePath()); //$NON-NLS-1$
+		}
+		return Status.OK_STATUS;
+	}
+
+	/**
+	 * On non-Windows OSes, we generate a symlink using "ln -s". On Windows, does nothing.
+	 * 
+	 * @param zip
+	 * @param entry
+	 * @param destinationPath
+	 * @param file
+	 * @return
+	 */
+	private static IStatus extractSymlink(ZipFile zip, ZipEntry entry, File destinationPath, File file)
+	{
+		if (!PlatformUtil.isWindows())
+		{
+			try
+			{
+				file.getParentFile().mkdirs();
+				String target = IOUtil.read(zip.getInputStream(entry), IOUtil.UTF_8);
+				return ProcessUtil.runInBackground(
+						"ln", null, "-s", new File(destinationPath, target).getAbsolutePath(), file.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			catch (ZipException e)
+			{
+				return new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, 0, MessageFormat.format(
+						"Error getting input stream for zip entry {0}", entry.getName()), e); //$NON-NLS-1$
+			}
+			catch (IOException e)
+			{
+				return new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, 0, MessageFormat.format(
+						"IOException while extracting file {0}", file.getAbsolutePath()), e); //$NON-NLS-1$
+			}
+		}
+		return Status.OK_STATUS;
 	}
 
 	/**
@@ -366,5 +588,16 @@ public final class ZipUtil
 	private static boolean isSymlink(ZipEntry entry)
 	{
 		return (entry.getUnixMode() & ATTR_SYMLINK) == ATTR_SYMLINK;
+	}
+
+	/**
+	 * Transforms the {@link InputStream} from the raw version we get from a {@link ZipEntry} to the ultimate contents
+	 * we write to the file.
+	 * 
+	 * @author cwilliams
+	 */
+	public static interface IInputStreamTransformer
+	{
+		public InputStream transform(InputStream in, IPath relativePath);
 	}
 }
