@@ -21,7 +21,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Status;
 
 @SuppressWarnings("nls")
 public class ZipUtilTest extends TestCase
@@ -54,7 +53,7 @@ public class ZipUtilTest extends TestCase
 
 		try
 		{
-			assertEquals(Status.OK_STATUS, ZipUtil.extract(resourceFile, destinationDir, new NullProgressMonitor()));
+			assertTrue(ZipUtil.extract(resourceFile, destinationDir, new NullProgressMonitor()).isOK());
 
 			File[] files = destinationDir.listFiles();
 			assertEquals("Unzipped contents to not match expected number of files", TOP_ENTRIES.size(), files.length);
@@ -94,10 +93,9 @@ public class ZipUtilTest extends TestCase
 		try
 		{
 			// Extract once.
-			assertEquals(Status.OK_STATUS, ZipUtil.extract(resourceFile, destinationDir, new NullProgressMonitor()));
+			assertTrue(ZipUtil.extract(resourceFile, destinationDir, new NullProgressMonitor()).isOK());
 			// Extract again, with an overwrite mode.
-			assertEquals(Status.OK_STATUS,
-					ZipUtil.extract(resourceFile, destinationDir, true, new NullProgressMonitor()));
+			assertTrue(ZipUtil.extract(resourceFile, destinationDir, true, new NullProgressMonitor()).isOK());
 
 			File[] files = destinationDir.listFiles();
 			assertEquals("Unzipped contents to not match expected number of files", TOP_ENTRIES.size(), files.length);
@@ -143,10 +141,9 @@ public class ZipUtilTest extends TestCase
 		try
 		{
 			// Extract once.
-			assertEquals(Status.OK_STATUS, ZipUtil.extract(resourceFile, destinationDir, new NullProgressMonitor()));
+			assertTrue(ZipUtil.extract(resourceFile, destinationDir, new NullProgressMonitor()).isOK());
 			// Extract again, with an overwrite mode.
-			assertEquals(Status.OK_STATUS,
-					ZipUtil.extract(overwriteResourceFile, destinationDir, true, new NullProgressMonitor()));
+			assertTrue(ZipUtil.extract(overwriteResourceFile, destinationDir, true, new NullProgressMonitor()).isOK());
 
 			File[] files = destinationDir.listFiles();
 			assertEquals("Unzipped contents to not match expected number of files", TOP_OVERWRITE_ENTRIES.size(),
@@ -198,10 +195,9 @@ public class ZipUtilTest extends TestCase
 		try
 		{
 			// Extract once.
-			assertEquals(Status.OK_STATUS, ZipUtil.extract(resourceFile, destinationDir, new NullProgressMonitor()));
+			assertTrue(ZipUtil.extract(resourceFile, destinationDir, new NullProgressMonitor()).isOK());
 			// Extract again, with an overwrite mode.
-			assertEquals(Status.OK_STATUS,
-					ZipUtil.extract(overwriteResourceFile, destinationDir, true, new NullProgressMonitor()));
+			assertTrue(ZipUtil.extract(overwriteResourceFile, destinationDir, true, new NullProgressMonitor()).isOK());
 
 			File[] files = destinationDir.listFiles();
 			assertEquals("Unzipped contents to not match expected number of files", 2, files.length);
@@ -230,7 +226,7 @@ public class ZipUtilTest extends TestCase
 
 		try
 		{
-			assertEquals(Status.OK_STATUS, ZipUtil.extract(resourceFile, destinationDir, new NullProgressMonitor()));
+			assertTrue(ZipUtil.extract(resourceFile, destinationDir, new NullProgressMonitor()).isOK());
 
 			File[] files = destinationDir.listFiles();
 			assertEquals("Unzipped contents to not match expected number of files", TOP_ENTRIES_SYMLINK.size(),
@@ -272,7 +268,7 @@ public class ZipUtilTest extends TestCase
 
 		try
 		{
-			assertEquals(Status.OK_STATUS, ZipUtil.extract(resourceFile, destinationDir, new NullProgressMonitor()));
+			assertTrue(ZipUtil.extract(resourceFile, destinationDir, new NullProgressMonitor()).isOK());
 
 			File[] files = destinationDir.listFiles();
 			assertEquals("Unzipped contents to not match expected number of files", TOP_ENTRIES.size(), files.length);
@@ -297,7 +293,7 @@ public class ZipUtilTest extends TestCase
 
 			assertTrue("Compression failed", ZipUtil.compress(zipFilePath.toOSString(), paths));
 
-			assertEquals(Status.OK_STATUS, ZipUtil.extract(resourceFile, destinationDir2, new NullProgressMonitor()));
+			assertTrue(ZipUtil.extract(resourceFile, destinationDir2, new NullProgressMonitor()).isOK());
 
 			zipFilePath.toFile().delete();
 
