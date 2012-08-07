@@ -139,8 +139,16 @@ public class GitHistoryPage extends HistoryPage
 				}
 				repo.lazyReload();
 				subMonitor.worked(5);
-				revList.walkRevisionListWithSpecifier(new GitRevSpecifier(ref, "--", resourcePath.toOSString()), //$NON-NLS-1$
-						subMonitor.newChild(95));
+				GitRevSpecifier rev;
+				if (resourcePath.isEmpty())
+				{
+					rev = new GitRevSpecifier(ref);
+				}
+				else
+				{
+					rev = new GitRevSpecifier(ref, "--", resourcePath.toOSString()); //$NON-NLS-1$
+				}
+				revList.walkRevisionListWithSpecifier(rev, subMonitor.newChild(95));
 				final List<GitCommit> commits = revList.getCommits();
 				Display.getDefault().asyncExec(new Runnable()
 				{

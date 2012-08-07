@@ -41,6 +41,36 @@ public class GitRepositoryTest extends GitTestCase
 		assertNotNull(repo);
 	}
 
+	public void testRepoRelativePath() throws Throwable
+	{
+		IProject project = null;
+		try
+		{
+			GitRepository repo = createRepo();
+			IPath repoPath = repo.workingDirectory();
+
+			String projectName = repoPath.lastSegment();
+
+			IWorkspace workspace = ResourcesPlugin.getWorkspace();
+			IProjectDescription description = workspace.newProjectDescription(projectName);
+			description.setLocation(repoPath);
+
+			project = workspace.getRoot().getProject(projectName);
+			project.create(description, null);
+			project.open(null);
+
+			IPath relativePath = repo.relativePath(project);
+			assertTrue("Expected relative path of root of repo to be empty", relativePath.isEmpty());
+		}
+		finally
+		{
+			if (project != null)
+			{
+				project.delete(true, null);
+			}
+		}
+	}
+
 	public void testAddFileStageUnstageAndCommit() throws Exception
 	{
 		GitRepository repo = createRepo();
