@@ -14,12 +14,15 @@ import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.LocationAdapter;
 import org.eclipse.swt.browser.LocationEvent;
+import org.eclipse.swt.browser.OpenWindowListener;
 import org.eclipse.swt.browser.ProgressAdapter;
 import org.eclipse.swt.browser.ProgressEvent;
 import org.eclipse.swt.browser.TitleEvent;
 import org.eclipse.swt.browser.TitleListener;
+import org.eclipse.swt.browser.WindowEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
@@ -31,6 +34,7 @@ import org.eclipse.ui.part.EditorPart;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.BrowserNotifier;
 import com.aptana.portal.ui.dispatch.IBrowserNotificationConstants;
@@ -39,6 +43,7 @@ import com.aptana.portal.ui.internal.BrowserFunctionWrapper;
 import com.aptana.portal.ui.internal.BrowserViewerWrapper;
 import com.aptana.portal.ui.internal.BrowserWrapper;
 import com.aptana.portal.ui.internal.startpage.IStartPageUISystemProperties;
+import com.aptana.ui.util.WorkbenchBrowserUtil;
 
 /**
  * A portal browser editor.
@@ -91,7 +96,37 @@ public abstract class AbstractPortalBrowserEditor extends EditorPart
 	public void createPartControl(Composite parent)
 	{
 		browserViewer = createBrowserViewer(parent);
-		browser = new BrowserWrapper(browserViewer.getBrowser());
+		final Browser browserControl = (Browser) browserViewer.getBrowser();
+		browser = new BrowserWrapper(browserControl);
+
+		// Add a listener for new browser windows. If new ones are opened, close it and open in an external browser
+		browserControl.addOpenWindowListener(new OpenWindowListener()
+		{
+			public void open(WindowEvent event)
+			{
+				final Browser newBrowser = event.browser;
+				if (newBrowser != browserControl)
+				{
+					newBrowser.addLocationListener(new LocationAdapter()
+					{
+
+						public void changing(LocationEvent event)
+						{
+							String url = event.location;
+							if (!StringUtil.isEmpty(url))
+							{
+								// Close the browser that was opened
+								newBrowser.getShell().close();
+
+								// Open the external browser
+								WorkbenchBrowserUtil.launchExternalBrowser(url);
+							}
+						}
+					});
+				}
+			}
+		});
+
 		browser.setJavascriptEnabled(true);
 
 		// Usually, we would just listen to a location change. However, since IE
@@ -159,8 +194,9 @@ public abstract class AbstractPortalBrowserEditor extends EditorPart
 	{
 		if (Platform.ARCH_X86.equals(Platform.getOSArch()))
 		{
-			return /*Platform.OS_WIN32.equals(Platform.getOS())  || Platform.OS_MACOSX.equals(Platform.getOS()) 
-					||*/ Platform.OS_LINUX.equals(Platform.getOS());
+			return /*
+					 * Platform.OS_WIN32.equals(Platform.getOS()) || Platform.OS_MACOSX.equals(Platform.getOS()) ||
+					 */Platform.OS_LINUX.equals(Platform.getOS());
 		}
 		else if (Platform.ARCH_X86_64.equals(Platform.getOSArch()))
 		{
