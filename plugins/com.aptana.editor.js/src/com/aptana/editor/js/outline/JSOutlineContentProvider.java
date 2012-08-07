@@ -25,6 +25,7 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.outline.CommonOutlineContentProvider;
 import com.aptana.editor.common.outline.CommonOutlineItem;
+import com.aptana.editor.common.outline.CommonOutlinePageInput;
 import com.aptana.editor.js.outline.JSOutlineItem.Type;
 import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
 import com.aptana.parsing.ast.IParseNode;
@@ -77,7 +78,8 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 	@Override
 	public Object[] getChildren(Object parentElement)
 	{
-		if (parentElement instanceof AbstractThemeableEditor || parentElement instanceof ParseRootNode)
+		if (parentElement instanceof AbstractThemeableEditor || parentElement instanceof ParseRootNode
+				|| parentElement instanceof CommonOutlinePageInput)
 		{
 			fItemsByScope.clear();
 			fLastAddedItem = null;
