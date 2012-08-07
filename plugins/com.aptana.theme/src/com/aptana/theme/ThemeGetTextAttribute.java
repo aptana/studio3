@@ -10,6 +10,7 @@ package com.aptana.theme;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jface.text.TextAttribute;
@@ -17,6 +18,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 
+import com.aptana.core.util.ImmutableTuple;
 import com.aptana.scope.IScopeSelector;
 import com.aptana.scope.ScopeSelector;
 
@@ -42,6 +44,9 @@ import com.aptana.scope.ScopeSelector;
 	 * A cache to memoize the ultimate TextAttribute generated for a given fully qualified scope.
 	 */
 	private final Map<String, TextAttribute> cacheGetTextAttribute;
+	private static volatile ImmutableTuple<ScopeSelector, DelayedTextAttribute>[] scopeToAttribute;
+	private static volatile ImmutableTuple<ScopeSelector, DelayedTextAttribute>[] scopeToAttributeLight;
+	private static volatile ImmutableTuple<ScopeSelector, DelayedTextAttribute>[] scopeToAttributeDark;
 
 	/**
 	 * A cache to memoize internally gotten delayed text attributes.
@@ -57,9 +62,10 @@ import com.aptana.scope.ScopeSelector;
 		this.cacheGetTextAttribute = new HashMap<String, TextAttribute>();
 		this.cacheDelayedGetTextAttribute = new HashMap<String, DelayedTextAttribute>();
 
-		selectors = new ArrayList<IScopeSelector>();
+		List<ThemeRule> tokens = theme.getTokens();
+		selectors = new ArrayList<IScopeSelector>(tokens.size());
 
-		for (ThemeRule rule : theme.getTokens())
+		for (ThemeRule rule : tokens)
 		{
 			if (rule.isSeparator())
 			{
@@ -155,100 +161,120 @@ import com.aptana.scope.ScopeSelector;
 			}
 			return attr;
 		}
+		if (scopeToAttribute == null)
+		{
+			initializeScopeToAttribute();
+		}
 
-		// Some tokens are special. They have fallbacks even if not in the theme! Looks like bundles can contribute
-		// them?
-		if (new ScopeSelector("markup.changed").matches(scope)) //$NON-NLS-1$
+		for (ImmutableTuple<ScopeSelector, DelayedTextAttribute> tup : scopeToAttribute)
 		{
-			return new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(248, 205, 14), SWT.NORMAL);
-		}
-		if (new ScopeSelector("markup.deleted").matches(scope)) //$NON-NLS-1$
-		{
-			return new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(255, 86, 77), SWT.NORMAL);
-		}
-		if (new ScopeSelector("markup.inserted").matches(scope)) //$NON-NLS-1$
-		{
-			return new DelayedTextAttribute(new RGBa(0, 0, 0), new RGBa(128, 250, 120), SWT.NORMAL);
-		}
-		if (new ScopeSelector("markup.underline").matches(scope)) //$NON-NLS-1$
-		{
-			return new DelayedTextAttribute(null, null, TextAttribute.UNDERLINE);
-		}
-		if (new ScopeSelector("markup.bold").matches(scope)) //$NON-NLS-1$
-		{
-			return new DelayedTextAttribute(null, null, SWT.BOLD);
-		}
-		if (new ScopeSelector("markup.italic").matches(scope)) //$NON-NLS-1$
-		{
-			return new DelayedTextAttribute(null, null, SWT.ITALIC);
-		}
-		if (new ScopeSelector("meta.diff.index").matches(scope) || new ScopeSelector("meta.diff.range").matches(scope) || new ScopeSelector("meta.separator.diff").matches(scope)) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		{
-			return new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(65, 126, 218), SWT.ITALIC);
-		}
-		if (new ScopeSelector("meta.diff.header").matches(scope)) //$NON-NLS-1$
-		{
-			return new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(103, 154, 233), SWT.NORMAL);
-		}
-		if (new ScopeSelector("meta.separator").matches(scope)) //$NON-NLS-1$
-		{
-			return new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(52, 103, 209), SWT.NORMAL);
+			if (tup.o1.matches(scope))
+			{
+				return tup.o2;
+			}
 		}
 		if (theme.hasDarkBG())
 		{
-			if (new ScopeSelector("console.error").matches(scope)) //$NON-NLS-1$
+			for (ImmutableTuple<ScopeSelector, DelayedTextAttribute> tup : scopeToAttributeDark)
 			{
-				return new DelayedTextAttribute(new RGBa(255, 0, 0), null, SWT.NORMAL);
-			}
-			if (new ScopeSelector("console.input").matches(scope)) //$NON-NLS-1$
-			{
-				return new DelayedTextAttribute(new RGBa(95, 175, 176), null, SWT.NORMAL);
-			}
-			if (new ScopeSelector("console.prompt").matches(scope)) //$NON-NLS-1$
-			{
-				return new DelayedTextAttribute(new RGBa(131, 132, 161), null, SWT.NORMAL);
-			}
-			if (new ScopeSelector("console.warning").matches(scope)) //$NON-NLS-1$
-			{
-				return new DelayedTextAttribute(new RGBa(255, 215, 0), null, SWT.NORMAL);
-			}
-			if (new ScopeSelector("console.debug").matches(scope)) //$NON-NLS-1$
-			{
-				return new DelayedTextAttribute(new RGBa(255, 236, 139), null, SWT.NORMAL);
-			}
-			if (new ScopeSelector("hyperlink").matches(scope)) //$NON-NLS-1$
-			{
-				return new DelayedTextAttribute(new RGBa(84, 143, 160), null, SWT.NORMAL);
+				if (tup.o1.matches(scope))
+				{
+					return tup.o2;
+				}
 			}
 		}
 		else
 		{
-			if (new ScopeSelector("console.error").matches(scope)) //$NON-NLS-1$
+			for (ImmutableTuple<ScopeSelector, DelayedTextAttribute> tup : scopeToAttributeLight)
 			{
-				return new DelayedTextAttribute(new RGBa(255, 0, 0), null, SWT.NORMAL);
-			}
-			if (new ScopeSelector("console.input").matches(scope)) //$NON-NLS-1$
-			{
-				return new DelayedTextAttribute(new RGBa(63, 127, 95), null, SWT.NORMAL);
-			}
-			if (new ScopeSelector("console.prompt").matches(scope)) //$NON-NLS-1$
-			{
-				return new DelayedTextAttribute(new RGBa(42, 0, 255), null, SWT.NORMAL);
-			}
-			if (new ScopeSelector("console.warning").matches(scope)) //$NON-NLS-1$
-			{
-				return new DelayedTextAttribute(new RGBa(205, 102, 0), null, SWT.NORMAL);
-			}
-			if (new ScopeSelector("console.debug").matches(scope)) //$NON-NLS-1$
-			{
-				return new DelayedTextAttribute(new RGBa(93, 102, 102), null, SWT.NORMAL);
-			}
-			if (new ScopeSelector("hyperlink").matches(scope)) //$NON-NLS-1$
-			{
-				return new DelayedTextAttribute(new RGBa(13, 17, 113), null, SWT.NORMAL);
+				if (tup.o1.matches(scope))
+				{
+					return tup.o2;
+				}
 			}
 		}
+
 		return new DelayedTextAttribute(new RGBa(defaultFG));
+	}
+
+	@SuppressWarnings("unchecked")
+	private void initializeScopeToAttribute()
+	{
+		// Some tokens are special. They have fallbacks even if not in the theme! Looks like bundles can contribute
+		// them?
+
+		scopeToAttribute = new ImmutableTuple[] {
+				new ImmutableTuple<ScopeSelector, DelayedTextAttribute>(new ScopeSelector("markup.changed"), //$NON-NLS-1$
+						new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(248, 205, 14), SWT.NORMAL)),
+
+				new ImmutableTuple<ScopeSelector, DelayedTextAttribute>(new ScopeSelector("markup.deleted"), //$NON-NLS-1$
+						new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(255, 86, 77), SWT.NORMAL)),
+
+				new ImmutableTuple<ScopeSelector, DelayedTextAttribute>(new ScopeSelector("markup.inserted"), //$NON-NLS-1$
+						new DelayedTextAttribute(new RGBa(0, 0, 0), new RGBa(128, 250, 120), SWT.NORMAL)),
+
+				new ImmutableTuple<ScopeSelector, DelayedTextAttribute>(new ScopeSelector("markup.underline"), //$NON-NLS-1$
+						new DelayedTextAttribute(null, null, TextAttribute.UNDERLINE)),
+
+				new ImmutableTuple<ScopeSelector, DelayedTextAttribute>(new ScopeSelector("markup.bold"), //$NON-NLS-1$
+						new DelayedTextAttribute(null, null, SWT.BOLD)),
+
+				new ImmutableTuple<ScopeSelector, DelayedTextAttribute>(new ScopeSelector("markup.italic"), //$NON-NLS-1$
+						new DelayedTextAttribute(null, null, SWT.ITALIC)),
+
+				// note: meta.diff.index, meta.diff.range and meta.separator.diff return the same thing.
+				new ImmutableTuple<ScopeSelector, DelayedTextAttribute>(new ScopeSelector("meta.diff.index"), //$NON-NLS-1$
+						new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(65, 126, 218), SWT.ITALIC)),
+
+				new ImmutableTuple<ScopeSelector, DelayedTextAttribute>(new ScopeSelector("meta.diff.range"), //$NON-NLS-1$
+						new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(65, 126, 218), SWT.ITALIC)),
+
+				new ImmutableTuple<ScopeSelector, DelayedTextAttribute>(new ScopeSelector("meta.separator.diff"), //$NON-NLS-1$
+						new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(65, 126, 218), SWT.ITALIC)),
+
+				new ImmutableTuple<ScopeSelector, DelayedTextAttribute>(new ScopeSelector("meta.diff.header"), //$NON-NLS-1$
+						new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(103, 154, 233), SWT.NORMAL)),
+
+				new ImmutableTuple<ScopeSelector, DelayedTextAttribute>(new ScopeSelector("meta.separator"), //$NON-NLS-1$
+						new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(52, 103, 209), SWT.NORMAL)) };
+
+		scopeToAttributeDark = new ImmutableTuple[] {
+				new ImmutableTuple<ScopeSelector, DelayedTextAttribute>(new ScopeSelector("console.error"), //$NON-NLS-1$
+						new DelayedTextAttribute(new RGBa(255, 0, 0), null, SWT.NORMAL)),
+
+				new ImmutableTuple<ScopeSelector, DelayedTextAttribute>(new ScopeSelector("console.input"), //$NON-NLS-1$
+						new DelayedTextAttribute(new RGBa(95, 175, 176), null, SWT.NORMAL)),
+
+				new ImmutableTuple<ScopeSelector, DelayedTextAttribute>(new ScopeSelector("console.prompt"), //$NON-NLS-1$
+						new DelayedTextAttribute(new RGBa(131, 132, 161), null, SWT.NORMAL)),
+
+				new ImmutableTuple<ScopeSelector, DelayedTextAttribute>(new ScopeSelector("console.warning"), //$NON-NLS-1$
+						new DelayedTextAttribute(new RGBa(255, 215, 0), null, SWT.NORMAL)),
+
+				new ImmutableTuple<ScopeSelector, DelayedTextAttribute>(new ScopeSelector("console.debug"), //$NON-NLS-1$
+						new DelayedTextAttribute(new RGBa(255, 236, 139), null, SWT.NORMAL)),
+
+				new ImmutableTuple<ScopeSelector, DelayedTextAttribute>(new ScopeSelector("hyperlink"), //$NON-NLS-1$
+						new DelayedTextAttribute(new RGBa(84, 143, 160), null, SWT.NORMAL)) };
+
+		scopeToAttributeLight = new ImmutableTuple[] {
+				new ImmutableTuple<ScopeSelector, DelayedTextAttribute>(new ScopeSelector("console.error"), //$NON-NLS-1$
+						new DelayedTextAttribute(new RGBa(255, 0, 0), null, SWT.NORMAL)),
+
+				new ImmutableTuple<ScopeSelector, DelayedTextAttribute>(new ScopeSelector("console.input"), //$NON-NLS-1$
+						new DelayedTextAttribute(new RGBa(63, 127, 95), null, SWT.NORMAL)),
+
+				new ImmutableTuple<ScopeSelector, DelayedTextAttribute>(new ScopeSelector("console.prompt"), //$NON-NLS-1$
+						new DelayedTextAttribute(new RGBa(42, 0, 255), null, SWT.NORMAL)),
+
+				new ImmutableTuple<ScopeSelector, DelayedTextAttribute>(new ScopeSelector("console.warning"), //$NON-NLS-1$
+						new DelayedTextAttribute(new RGBa(205, 102, 0), null, SWT.NORMAL)),
+
+				new ImmutableTuple<ScopeSelector, DelayedTextAttribute>(new ScopeSelector("console.debug"), //$NON-NLS-1$
+						new DelayedTextAttribute(new RGBa(93, 102, 102), null, SWT.NORMAL)),
+
+				new ImmutableTuple<ScopeSelector, DelayedTextAttribute>(new ScopeSelector("hyperlink"), //$NON-NLS-1$
+						new DelayedTextAttribute(new RGBa(13, 17, 113), null, SWT.NORMAL)) };
 	}
 
 	private TextAttribute toTextAttribute(DelayedTextAttribute delayedOrTextAttr, boolean forceColor)
