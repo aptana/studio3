@@ -11,6 +11,8 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.jface.text.AbstractDocument;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.BadPositionCategoryException;
@@ -27,10 +29,12 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.ICommonConstants;
 import com.aptana.editor.common.IDebugScopes;
+import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.Theme;
@@ -47,19 +51,9 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 {
 
 	/**
-	 * Command line property we can set to change the max number of columns to color per-line.
-	 */
-	private static final String STUDIO_MAX_COLORED_COLUMNS = "studio.maxColoredColumns"; //$NON-NLS-1$
-
-	/**
-	 * Default value for max # of columns per-line to color.
-	 */
-	private static final int DEFAULT_MAX_COLS = 200;
-
-	/**
 	 * If we've gone past this column number on a given line, we no longer return styles/colors
 	 */
-	private static int MAX_CHARS_PER_LINE_COLORED = DEFAULT_MAX_COLS;
+	private final int maxLinesToColor;
 
 	/**
 	 * Constant for no positions.
@@ -74,25 +68,13 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 	private int fEndOfLine;
 	private int fEndOffset;
 
-	static
-	{
-		try
-		{
-			String maxColsVal = System.getProperty(STUDIO_MAX_COLORED_COLUMNS);
-			if (!StringUtil.isEmpty(maxColsVal))
-			{
-				MAX_CHARS_PER_LINE_COLORED = Integer.parseInt(maxColsVal);
-			}
-		}
-		catch (NumberFormatException e)
-		{
-			// ignore
-		}
-	}
-
 	public ThemeingDamagerRepairer(ITokenScanner scanner)
 	{
 		super(scanner);
+		maxLinesToColor = Platform.getPreferencesService().getInt(CommonEditorPlugin.PLUGIN_ID,
+				IPreferenceConstants.EDITOR_MAX_COLORED_COLUMNS,
+				IPreferenceConstants.EDITOR_MAX_COLORED_COLUMNS_DEFAULT,
+				new IScopeContext[] { EclipseUtil.instanceScope(), EclipseUtil.defaultScope() });
 	}
 
 	@Override
@@ -420,7 +402,15 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 	{
 		IRegion lastLine = fDocument.getLineInformationOfOffset(offset);
 		fEndOfLine = lastLine.getOffset() + lastLine.getLength();
-		fEndOffset = lastLine.getOffset() + Math.min(MAX_CHARS_PER_LINE_COLORED, lastLine.getLength());
+		fEndOffset = lastLine.getOffset();
+		if (maxLinesToColor < 0)
+		{
+			fEndOffset += lastLine.getLength();
+		}
+		else
+		{
+			fEndOffset += Math.min(maxLinesToColor, lastLine.getLength());
+		}
 	}
 
 	protected Theme getCurrentTheme()

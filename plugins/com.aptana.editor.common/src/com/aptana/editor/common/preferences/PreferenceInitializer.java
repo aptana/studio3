@@ -12,6 +12,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
 import com.aptana.core.ICorePreferenceConstants;
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
 
@@ -51,6 +52,24 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		prefs.putBoolean(IPreferenceConstants.EDITOR_ENABLE_FOLDING, true);
 
 		// default scopes for spell checking
-		prefs.put(IPreferenceConstants.ENABLED_SPELLING_SCOPES, "comment.block.documentation,comment.line,comment.block"); //$NON-NLS-1$
+		prefs.put(IPreferenceConstants.ENABLED_SPELLING_SCOPES,
+				"comment.block.documentation,comment.line,comment.block"); //$NON-NLS-1$
+
+		// Set the default max cap on # of columns to color per line (a perf fix).
+		int maxCols = IPreferenceConstants.EDITOR_MAX_COLORED_COLUMNS_DEFAULT;
+		try
+		{
+			// Load up the command line value for max columns colored
+			String maxColsVal = System.getProperty(IPreferenceConstants.EDITOR_MAX_COLORED_COLUMNS);
+			if (!StringUtil.isEmpty(maxColsVal))
+			{
+				maxCols = Integer.parseInt(maxColsVal);
+			}
+		}
+		catch (NumberFormatException e)
+		{
+			// ignore
+		}
+		prefs.putInt(IPreferenceConstants.EDITOR_MAX_COLORED_COLUMNS, maxCols);
 	}
 }

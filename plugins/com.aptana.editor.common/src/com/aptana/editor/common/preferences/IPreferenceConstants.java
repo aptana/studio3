@@ -38,6 +38,12 @@ public interface IPreferenceConstants
 	public String CHARACTER_PAIR_COLOR = CommonEditorPlugin.PLUGIN_ID + ".characterPairColor"; //$NON-NLS-1$
 
 	/**
+	 * Command line property name/pref key we can set to change the max number of columns to color per-line.
+	 */
+	public static final String EDITOR_MAX_COLORED_COLUMNS = "studio.maxColoredColumns"; //$NON-NLS-1$
+	public static final int EDITOR_MAX_COLORED_COLUMNS_DEFAULT = 200;
+
+	/**
 	 * Pref key for linking the outline view with the active editor
 	 */
 	public static final String LINK_OUTLINE_WITH_EDITOR = CommonEditorPlugin.PLUGIN_ID + ".linkOutlineWithEditor"; //$NON-NLS-1$
@@ -135,5 +141,11 @@ public interface IPreferenceConstants
 	 * The preference key used to list enabled scopes for spelling.
 	 */
 	public static final String ENABLED_SPELLING_SCOPES = CommonEditorPlugin.PLUGIN_ID + ".enabledSpellingScopes"; //$NON-NLS-1$
+
+	/**
+	 * The preference key used to enable and disable the save-action for removing trailing whitespace.
+	 */
+	public static final String EDITOR_REMOVE_TRAILING_WHITESPACE = CommonEditorPlugin.PLUGIN_ID
+			+ ".removeTrailingWhitespace"; //$NON-NLS-1$
 
 }
