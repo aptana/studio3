@@ -38,6 +38,12 @@ public interface IPreferenceConstants
 	public String CHARACTER_PAIR_COLOR = CommonEditorPlugin.PLUGIN_ID + ".characterPairColor"; //$NON-NLS-1$
 
 	/**
+	 * Command line property name/pref key we can set to change the max number of columns to color per-line.
+	 */
+	public static final String EDITOR_MAX_COLORED_COLUMNS = "studio.maxColoredColumns"; //$NON-NLS-1$
+	public static final int EDITOR_MAX_COLORED_COLUMNS_DEFAULT = 200;
+
+	/**
 	 * Pref key for linking the outline view with the active editor
 	 */
 	public static final String LINK_OUTLINE_WITH_EDITOR = CommonEditorPlugin.PLUGIN_ID + ".linkOutlineWithEditor"; //$NON-NLS-1$

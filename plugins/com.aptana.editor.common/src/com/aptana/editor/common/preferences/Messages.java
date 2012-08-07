@@ -67,6 +67,8 @@ public class Messages extends NLS
 	public static String EditorsPreferencePage_HomeEndBehavior;
 	public static String EditorsPreferencePage_JumpsStartEnd;
 	public static String EditorsPreferencePage_MarkOccurrences;
+
+	public static String EditorsPreferencePage_MaxColumnsLabel;
 	public static String EditorsPreferencePage_PreferenceDescription;
 	public static String EditorsPreferencePage_ToggleBetween;
 	public static String EditorsPreferencePage_Typing;
@@ -75,6 +77,8 @@ public class Messages extends NLS
 	public static String EditorsPreferencePage_saveActionRemoveWhitespaceCharacters;
 
 	public static String EditorsPreferencePage_saveActionsGroup;
+
+	public static String EditorsPreferencePage_SyntaxColoring;
 
 	public static String EditorsPreferencePage_Wrap_Selection;
 

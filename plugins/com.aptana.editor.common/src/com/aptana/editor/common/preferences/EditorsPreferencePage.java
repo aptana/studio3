@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -9,6 +9,7 @@ package com.aptana.editor.common.preferences;
 
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -47,29 +48,29 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 	public void createFieldEditors()
 	{
 		Composite appearanceComposite = getFieldEditorParent();
-		Composite group = AptanaPreferencePage.createGroup(appearanceComposite, Messages.EditorsPreferencePage_Typing);
 
+		// Typing
+		Composite group = AptanaPreferencePage.createGroup(appearanceComposite, Messages.EditorsPreferencePage_Typing);
 		addField(new BooleanFieldEditor(IPreferenceConstants.ENABLE_CHARACTER_PAIR_COLORING,
 				Messages.EditorsPreferencePage_Colorize_Matching_Character_Pairs, group));
-
 		addField(new BooleanFieldEditor(IPreferenceConstants.EDITOR_PEER_CHARACTER_CLOSE,
 				Messages.EditorsPreferencePage_Close_Matching_Character_Pairs, group));
-
 		addField(new BooleanFieldEditor(IPreferenceConstants.EDITOR_WRAP_SELECTION,
 				Messages.EditorsPreferencePage_Wrap_Selection, group));
 
+		// Save Actions
 		group = AptanaPreferencePage.createGroup(appearanceComposite, Messages.EditorsPreferencePage_saveActionsGroup);
-
 		addField(new BooleanFieldEditor(IPreferenceConstants.EDITOR_REMOVE_TRAILING_WHITESPACE,
 				Messages.EditorsPreferencePage_saveActionRemoveWhitespaceCharacters, group));
 
-		// In Studio 2.0, commenting out until requested, or it's determined we have enough available space
-		// addField(new RadioGroupFieldEditor(AbstractTextEditor.PREFERENCE_NAVIGATION_SMART_HOME_END,
-		// Messages.EditorsPreferencePage_HomeEndBehavior, 1, new String[][] {
-		//								{ Messages.EditorsPreferencePage_ToggleBetween, "true" }, //$NON-NLS-1$
-		//								{ Messages.EditorsPreferencePage_JumpsStartEnd, "false" } }, //$NON-NLS-1$
-		// appearanceComposite, true));
+		// Syntax coloring
+		group = AptanaPreferencePage.createGroup(appearanceComposite, Messages.EditorsPreferencePage_SyntaxColoring);
+		IntegerFieldEditor colEditor = new IntegerFieldEditor(IPreferenceConstants.EDITOR_MAX_COLORED_COLUMNS,
+				Messages.EditorsPreferencePage_MaxColumnsLabel, group, 5);
+		colEditor.setValidRange(-1, Integer.MAX_VALUE);
+		addField(colEditor);
 
+		// Word Wrap
 		addField(new BooleanFieldEditor(IPreferenceConstants.ENABLE_WORD_WRAP,
 				Messages.EditorsPreferencePage_Enable_WordWrap, appearanceComposite));
 
