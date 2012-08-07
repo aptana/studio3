@@ -1550,11 +1550,6 @@ public class GitRepository
 		{
 			resourcePath = resourcePath.makeRelativeTo(workingDirectory);
 		}
-		// What if we have some trailing slash or something?
-		if (resourcePath.isEmpty())
-		{
-			resourcePath = Path.fromOSString(currentBranch());
-		}
 		return resourcePath;
 	}
 
@@ -1673,7 +1668,15 @@ public class GitRepository
 
 	private IPath gitDirPath()
 	{
-		return Path.fromOSString(new File(fileURL).getAbsolutePath());
+		File file = new File(fileURL);
+		try
+		{
+			return Path.fromOSString(file.getCanonicalPath());
+		}
+		catch (IOException e)
+		{
+			return Path.fromOSString(file.getAbsolutePath());
+		}
 	}
 
 	public void firePullEvent()
