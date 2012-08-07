@@ -12,6 +12,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.text.MessageFormat;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -25,6 +26,7 @@ import org.eclipse.osgi.util.NLS;
 import com.aptana.core.epl.downloader.FileReader;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.ide.core.io.CoreIOPlugin;
+import com.aptana.ide.core.io.IDebugScopes;
 
 /**
  * A single content download request.
@@ -91,6 +93,10 @@ public class ContentDownloadRequest
 		// perform the download
 		try
 		{
+			IdeLog.logInfo(CoreIOPlugin.getDefault(),
+					MessageFormat.format("Downloading {0} to {1}", this.url.toURI(), this.saveTo.getCanonicalPath()), //$NON-NLS-1$
+					IDebugScopes.DOWNLOAD);
+
 			// Use ECF FileTransferJob implementation to get the remote file.
 			FileReader reader = new FileReader(null);
 			FileOutputStream anOutputStream = new FileOutputStream(this.saveTo);
@@ -105,6 +111,9 @@ public class ContentDownloadRequest
 			{
 				throw new CoreException(result);
 			}
+
+			IdeLog.logInfo(CoreIOPlugin.getDefault(),
+					MessageFormat.format("File {0} downloaded sucessfully", this.url.toURI()), IDebugScopes.DOWNLOAD); //$NON-NLS-1$
 		}
 		catch (Throwable t)
 		{
