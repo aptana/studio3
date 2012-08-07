@@ -118,8 +118,8 @@ public abstract class AbstractPortalBrowserEditor extends EditorPart
 								// Close the browser that was opened
 								newBrowser.getShell().close();
 
-								// Open the external browser
-								WorkbenchBrowserUtil.launchExternalBrowser(url);
+								// Open in browser
+								WorkbenchBrowserUtil.openURL(url);
 							}
 						}
 					});
