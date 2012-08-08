@@ -7,6 +7,8 @@
  */
 package com.aptana.editor.common.preferences;
 
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IntegerFieldEditor;
@@ -19,6 +21,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.ui.preferences.AptanaPreferencePage;
 
@@ -65,8 +68,10 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 
 		// Syntax coloring
 		group = AptanaPreferencePage.createGroup(appearanceComposite, Messages.EditorsPreferencePage_SyntaxColoring);
+		group.setLayout(GridLayoutFactory.swtDefaults().create());
+		group.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
 		IntegerFieldEditor colEditor = new IntegerFieldEditor(IPreferenceConstants.EDITOR_MAX_COLORED_COLUMNS,
-				Messages.EditorsPreferencePage_MaxColumnsLabel, group, 5);
+				StringUtil.makeFormLabel(Messages.EditorsPreferencePage_MaxColumnsLabel), group);
 		colEditor.setValidRange(-1, Integer.MAX_VALUE);
 		addField(colEditor);
 
