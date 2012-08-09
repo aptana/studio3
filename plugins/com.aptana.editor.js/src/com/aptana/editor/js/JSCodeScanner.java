@@ -8,7 +8,6 @@
 package com.aptana.editor.js;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
@@ -23,6 +22,7 @@ import org.eclipse.jface.text.rules.Token;
 import beaver.Symbol;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.editor.js.parsing.JSFlexScanner;
 import com.aptana.editor.js.parsing.Terminals;
 import com.aptana.editor.js.parsing.lexer.JSScopeType;
@@ -65,52 +65,17 @@ public class JSCodeScanner implements ITokenScanner
 	// Note: replicating behavior old rule-based scanner, but this should probably be source token?
 	private static final Token COLON_TOKEN = new Token(null);
 
-	private static final Set<String> CONSTANTS = new HashSet<String>();
-	private static final Set<String> VARIABLES = new HashSet<String>();
-	private static final Set<String> OTHER_KEYWORDS = new HashSet<String>();
-	private static final Set<String> SUPPORT_CLASSES = new HashSet<String>();
-	private static final Set<String> FIREBUG_FUNCTONS = new HashSet<String>();
-	private static final Set<String> KEYWORD_CONTROL_FUTURE = new HashSet<String>();
-	private static final Set<String> STORAGE_TYPES = new HashSet<String>();
-	private static final Set<String> STORAGE_MODIFEERS = new HashSet<String>();
-	private static final Set<String> SUPPORT_DOM_CONSTANT = new HashSet<String>();
-
-	// Fill our constant sets.
-	static
-	{
-		CONSTANTS.add("Infinity"); //$NON-NLS-1$
-		CONSTANTS.add("NaN"); //$NON-NLS-1$
-		CONSTANTS.add("undefined"); //$NON-NLS-1$
-
-		VARIABLES.add("super"); //$NON-NLS-1$
-		VARIABLES.add("this"); //$NON-NLS-1$
-
-		OTHER_KEYWORDS.add("debugger"); //$NON-NLS-1$
-
-		FIREBUG_FUNCTONS.add("log"); //$NON-NLS-1$
-
-		for (String s : JSLanguageConstants.SUPPORT_CLASSES)
-		{
-			SUPPORT_CLASSES.add(s);
-		}
-
-		for (String s : JSLanguageConstants.KEYWORD_CONTROL_FUTURE)
-		{
-			KEYWORD_CONTROL_FUTURE.add(s);
-		}
-		for (String s : JSLanguageConstants.STORAGE_TYPES)
-		{
-			STORAGE_TYPES.add(s);
-		}
-		for (String s : JSLanguageConstants.STORAGE_MODIFIERS)
-		{
-			STORAGE_MODIFEERS.add(s);
-		}
-		for (String s : JSLanguageConstants.SUPPORT_DOM_CONSTANTS)
-		{
-			SUPPORT_DOM_CONSTANT.add(s);
-		}
-	}
+	private static final Set<String> CONSTANTS = CollectionsUtil.newSet("Infinity", "NaN", "undefined"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	private static final Set<String> VARIABLES = CollectionsUtil.newSet("super", "this"); //$NON-NLS-1$//$NON-NLS-2$
+	private static final Set<String> OTHER_KEYWORDS = CollectionsUtil.newSet("debugger"); //$NON-NLS-1$
+	private static final Set<String> SUPPORT_CLASSES = CollectionsUtil.newSet(JSLanguageConstants.SUPPORT_CLASSES);
+	private static final Set<String> FIREBUG_FUNCTONS = CollectionsUtil.newSet("log"); //$NON-NLS-1$
+	private static final Set<String> KEYWORD_CONTROL_FUTURE = CollectionsUtil
+			.newSet(JSLanguageConstants.KEYWORD_CONTROL_FUTURE);
+	private static final Set<String> STORAGE_TYPES = CollectionsUtil.newSet(JSLanguageConstants.STORAGE_TYPES);
+	private static final Set<String> STORAGE_MODIFEERS = CollectionsUtil.newSet(JSLanguageConstants.STORAGE_MODIFIERS);
+	private static final Set<String> SUPPORT_DOM_CONSTANT = CollectionsUtil
+			.newSet(JSLanguageConstants.SUPPORT_DOM_CONSTANTS);
 
 	private enum State
 	{
