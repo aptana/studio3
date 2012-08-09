@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -17,12 +17,13 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.ui.IStorageEditorInput;
+import org.eclipse.ui.IURIEditorInput;
 import org.eclipse.ui.editors.text.ILocationProvider;
 import org.eclipse.ui.editors.text.ILocationProviderExtension;
 
 @SuppressWarnings("rawtypes")
 public class UntitledFileStorageEditorInput implements IStorageEditorInput, ILocationProvider,
-		ILocationProviderExtension
+		ILocationProviderExtension, IURIEditorInput
 {
 
 	private URI uri;
@@ -87,7 +88,7 @@ public class UntitledFileStorageEditorInput implements IStorageEditorInput, ILoc
 
 			public IPath getFullPath()
 			{
-				return null;
+				return URIUtil.toPath(uri);
 			}
 
 			public String getName()
