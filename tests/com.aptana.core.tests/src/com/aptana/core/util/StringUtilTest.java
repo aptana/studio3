@@ -374,6 +374,13 @@ public class StringUtilTest extends TestCase
 		assertEquals("test&test1", StringUtil.join("&", test));
 	}
 
+	public void testJoinCharArray()
+	{
+		char[] test = new char[] { 'a', 'b', 'c' };
+
+		assertEquals("a b c", StringUtil.join(" ", test));
+	}
+
 	public void testJoinArrayWithNull()
 	{
 		assertNull(StringUtil.join("&", (String[]) null));

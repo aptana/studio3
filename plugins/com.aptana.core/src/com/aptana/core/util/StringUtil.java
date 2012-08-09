@@ -383,6 +383,25 @@ public class StringUtil
 	}
 
 	/**
+	 * Create a string by concatenating the elements of a collection using a delimiter between each item
+	 * 
+	 * @param delimiter
+	 *            The text to place between each element in the array
+	 * @param items
+	 *            The array of chars
+	 * @return The resulting string
+	 */
+	public static String join(String delimiter, char... items)
+	{
+		String[] strings = new String[items.length];
+		for (int i = 0; i < items.length; i++)
+		{
+			strings[i] = new String(items, i, 1);
+		}
+		return join(delimiter, strings);
+	}
+
+	/**
 	 * Create a string by concatenating the elements of a string array using a delimiter between each item
 	 * 
 	 * @param delimiter

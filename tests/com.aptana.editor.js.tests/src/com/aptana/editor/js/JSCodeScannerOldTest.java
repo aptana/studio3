@@ -7,19 +7,31 @@
  */
 package com.aptana.editor.js;
 
+import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.Token;
 
+import com.aptana.core.IFilter;
+import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.tests.AbstractTokenScannerTestCase;
 
-public class JSCodeScannerTest extends AbstractTokenScannerTestCase
+/**
+ * This test is kept working with the old scanner (which was moved only for tests). {@link JSCodeScannerJFlexTest}
+ * should be used for the tests related to the JS JFlex scanner.
+ */
+public class JSCodeScannerOldTest extends AbstractTokenScannerTestCase
 {
+	@SuppressWarnings("deprecation")
 	@Override
 	protected ITokenScanner createTokenScanner()
 	{
-		return new JSCodeScanner();
+		return new JSCodeScannerOld();
 	}
 
 	protected void enumerateLists(String[][] lists, String tokenType)
@@ -89,6 +101,26 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(Token.WHITESPACE, 9, 1);
 		assertToken(getToken("constant.numeric.js"), 10, 1);
 		assertToken(getToken("punctuation.terminator.statement.js"), 11, 1);
+
+		scanner.setRange(document, 4, document.getLength() - 4);
+		assertToken(getToken("source.js"), 4, 3);
+		assertToken(Token.WHITESPACE, 7, 1);
+		assertToken(getToken("keyword.operator.js"), 8, 1);
+		assertToken(Token.WHITESPACE, 9, 1);
+		assertToken(getToken("constant.numeric.js"), 10, 1);
+		assertToken(getToken("punctuation.terminator.statement.js"), 11, 1);
+
+	}
+
+	public void testStartWithWhitespace() throws Exception
+	{
+		String src = " / ";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+		assertToken(Token.WHITESPACE, 0, 1);
+		assertToken(src.substring(0, 2), getToken("keyword.operator.js"), 1, 1);
+		assertToken(Token.WHITESPACE, 2, 1);
+		assertToken(Token.EOF, 3, 0);
 	}
 
 	public void testOperatorTokens()
@@ -213,18 +245,40 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 
 	public void testPrototypeSnippet()
 	{
-		String src = "var Class = {\n" + "  create: function() {\n"
-				+ "    var parent = null, properties = $A(arguments);\n"
-				+ "    if (Object.isFunction(properties[0]))\n" + "      parent = properties.shift();\n" + "    \n"
-				+ "    function klass() {\n" + "      this.initialize.apply(this, arguments);\n" + "    }\n" + "    \n"
-				+ "    Object.extend(klass, Class.Methods);\n" + "    klass.superclass = parent;\n"
-				+ "    klass.subclasses = [];\n" + "    \n" + "    if (parent) {\n"
-				+ "      var subclass = function() { };\n" + "      subclass.prototype = parent.prototype;\n"
-				+ "      klass.prototype = new subclass;\n" + "      parent.subclasses.push(klass);\n" + "    }\n"
-				+ "    \n" + "    for (var i = 0; i < properties.length; i++)\n"
-				+ "      klass.addMethods(properties[i]);\n" + "    \n" + "    if (!klass.prototype.initialize)\n"
-				+ "      klass.prototype.initialize = Prototype.emptyFunction;\n" + "    \n"
-				+ "    klass.prototype.constructor = klass;\n" + "    \n" + "    return klass;\n" + "  }\n" + "};";
+		//@formatter:off
+		String src = 
+		  "var Class = {\n" 
+		+ "  create: function() {\n"
+		+ "    var parent = null, properties = $A(arguments);\n"
+		+ "    if (Object.isFunction(properties[0]))\n" 
+		+ "      parent = properties.shift();\n" 
+		+ "    \n"
+		+ "    function klass() {\n" 
+		+ "      this.initialize.apply(this, arguments);\n" 
+		+ "    }\n" 
+		+ "    \n"
+		+ "    Object.extend(klass, Class.Methods);\n" 
+		+ "    klass.superclass = parent;\n"
+		+ "    klass.subclasses = [];\n" 
+		+ "    \n" 
+		+ "    if (parent) {\n"
+		+ "      var subclass = function() { };\n" 
+		+ "      subclass.prototype = parent.prototype;\n"
+		+ "      klass.prototype = new subclass;\n" 
+		+ "      parent.subclasses.push(klass);\n" 
+		+ "    }\n"
+		+ "    \n" 
+		+ "    for (var i = 0; i < properties.length; i++)\n"
+		+ "      klass.addMethods(properties[i]);\n" 
+		+ "    \n" 
+		+ "    if (!klass.prototype.initialize)\n"
+		+ "      klass.prototype.initialize = Prototype.emptyFunction;\n" 
+		+ "    \n"
+		+ "    klass.prototype.constructor = klass;\n" 
+		+ "    \n" 
+		+ "    return klass;\n" 
+		+ "  }\n" + "};";
+		//@formatter:on
 		IDocument document = new Document(src);
 		scanner.setRange(document, 0, src.length());
 		// line 1
@@ -408,4 +462,216 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertEquals(Token.EOF, scanner.nextToken());
 	}
 
+	//@formatter:off
+	/**
+	 * Although the rules at the JSCodeScanner tries to match against "support functions" such as dom manipulation, none
+	 * of them actually match, so, this test is just to make sure this is the expected behavior for now (may need to be
+	 * revisited).
+	 * 
+	 * Note: just aAdding exception just for the 'log' function that was properly gotten as a firebug function.
+	 */
+	//@formatter:on
+	public void testSupportFunctions() throws Exception
+	{
+		Object[] tokens = new Object[] { "meta.delimiter.method.period.js", "source.js", "meta.brace.round.js",
+				"meta.brace.round.js", "null", "source.js", "meta.delimiter.method.period.js", "source.js", "null",
+				"source.js", "null" };
+
+		Object[] tokensLog = new Object[] { "support.function.js.firebug", "meta.brace.round.js",
+				"meta.brace.round.js", "null", "source.js", "support.function.js.firebug", "null", "source.js", "null", };
+
+		Object[] tokensLog2 = new Object[] { "meta.delimiter.method.period.js", "support.function.js.firebug",
+				"meta.brace.round.js", "meta.brace.round.js", "null", "source.js", "meta.delimiter.method.period.js",
+				"support.function.js.firebug", "null", "source.js", "null", };
+
+		String arrays[][] = new String[][] { JSLanguageConstants.SUPPORT_FUNCTIONS,
+				JSLanguageConstants.EVENT_HANDLER_FUNCTIONS, JSLanguageConstants.DOM_FUNCTIONS,
+				JSLanguageConstants.FIREBUG_FUNCTIONS, JSLanguageConstants.SUPPORT_CONSTANTS, };
+
+		for (String[] strings : arrays)
+		{
+			for (String string : strings)
+			{
+				// Handle odd cases in the constants.
+				if (string.contains(".") || string.equals("undefined"))
+				{
+					continue;
+				}
+				String src = MessageFormat.format(".{0}() a.{0} {0}", string);
+				IDocument document = new Document(src);
+				scanner.setRange(document, 0, src.length());
+				if (string.equals("log"))
+				{
+					try
+					{
+						assertTokensMsg("Tested: " + src, tokensLog);
+					}
+					catch (AssertionError e)
+					{
+						// The flex-based scanner will properly detect the dots in this case, so, we also check this
+						// as an acceptable solution.
+						scanner.setRange(document, 0, src.length());
+						assertTokensMsg("Tested: " + src, tokensLog2);
+					}
+
+				}
+				else
+				{
+					assertTokensMsg("Tested: " + src, tokens);
+				}
+			}
+		}
+
+	}
+
+	public void testKeywordOperators() throws Exception
+	{
+		String src = StringUtil.join(" ", JSLanguageConstants.KEYWORD_OPERATORS);
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+		assertTokens("keyword.operator.js", "null", "keyword.operator.js", "null", "keyword.operator.js", "null",
+				"keyword.operator.js", "null", "keyword.operator.js", "null", "keyword.operator.js", "null");
+
+	}
+
+	public void testOperators() throws Exception
+	{
+
+		String src = StringUtil.join(" ", JSLanguageConstants.OPERATORS);
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+		assertTokens("keyword.operator.js", "null", "keyword.operator.js", "null", "keyword.operator.js", "null",
+				"keyword.operator.js", "null", "keyword.operator.js", "null", "keyword.operator.js", "null",
+				"keyword.operator.js", "null", "keyword.operator.js", "null", "keyword.operator.js", "null",
+				"keyword.operator.js", "null", "keyword.operator.js", "null", "keyword.operator.js", "null",
+				"keyword.operator.js", "null", "keyword.operator.js", "null", "keyword.operator.js", "null",
+				"keyword.operator.js", "null", "keyword.operator.js", "null", "keyword.operator.js", "null",
+				"keyword.operator.js", "null", "keyword.operator.js", "null", "keyword.operator.js", "null",
+				"keyword.operator.js", "null", "keyword.operator.js", "null", "keyword.operator.js", "null");
+	}
+
+	public void testSingleCharacterOperators() throws Exception
+	{
+
+		String src = StringUtil.join(" ", JSLanguageConstants.SINGLE_CHARACTER_OPERATORS);
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+		assertTokens("keyword.operator.js", "null", "keyword.operator.js", "null", "keyword.operator.js", "null",
+				"keyword.operator.js", "null", "keyword.operator.js", "null", "keyword.operator.js", "null",
+				"keyword.operator.js", "null", "keyword.operator.js", "null", "keyword.operator.js", "null",
+				"keyword.operator.js", "null", "keyword.operator.js", "null", "keyword.operator.js", "null",
+				"keyword.operator.js", "null", "keyword.operator.js", "null");
+	}
+
+	public void testKeyWordControl() throws Exception
+	{
+
+		String src = StringUtil.join(" ", JSLanguageConstants.KEYWORD_CONTROL);
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+		assertTokens("keyword.control.js", "null", "keyword.control.js", "null", "keyword.control.js", "null",
+				"keyword.control.js", "null", "keyword.control.js", "null", "keyword.control.js", "null",
+				"keyword.control.js", "null", "keyword.control.js", "null", "keyword.control.js", "null",
+				"keyword.control.js", "null", "keyword.control.js", "null", "keyword.control.js", "null",
+				"keyword.control.js", "null", "keyword.control.js", "null", "keyword.control.js", "null");
+	}
+
+	public void testKeyWordControlFuture() throws Exception
+	{
+
+		String src = StringUtil.join(" ", JSLanguageConstants.KEYWORD_CONTROL_FUTURE);
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+		assertTokens("keyword.control.js", "null", "keyword.control.js", "null", "keyword.control.js", "null");
+	}
+
+	public void testStorageTypes() throws Exception
+	{
+
+		String[] storageTypes = JSLanguageConstants.STORAGE_TYPES;
+		Collection<String> lst = CollectionsUtil.filter(Arrays.asList(storageTypes), new IFilter<String>()
+		{
+
+			public boolean include(String item)
+			{
+				if (item.equals("function")) // Removing function as it has other implications (and is tested
+												// elsewhere).
+				{
+					return false;
+				}
+				return true;
+			}
+		});
+		storageTypes = lst.toArray(new String[0]);
+		String src = StringUtil.join(" ", storageTypes);
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+		assertTokensMsg("Tested: " + src, "storage.type.js", "null", "storage.type.js", "null", "storage.type.js",
+				"null", "storage.type.js", "null", "storage.type.js", "null", "storage.type.js", "null",
+				"storage.type.js", "null", "storage.type.js", "null", "storage.type.js", "null", "storage.type.js",
+				"null", "storage.type.js", "null", "storage.type.js", "null", "storage.type.js", "null");
+	}
+
+	public void testStorageModifiers() throws Exception
+	{
+
+		String[] storageTypes = JSLanguageConstants.STORAGE_MODIFIERS;
+		String src = StringUtil.join(" ", storageTypes);
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+		Object[] expected = new Object[] { "storage.modifier.js", "null", "storage.modifier.js", "null",
+				"storage.modifier.js", "null", "storage.modifier.js", "null", "storage.modifier.js", "null",
+				"storage.modifier.js", "null", "storage.modifier.js", "null", "storage.modifier.js", "null",
+				"storage.modifier.js", "null", "storage.modifier.js", "null", "storage.modifier.js", "null",
+				"storage.modifier.js", "null", "storage.modifier.js", "null", "storage.modifier.js", "null" };
+		try
+		{
+			assertTokensMsg("Tested: " + src, expected);
+		}
+		catch (AssertionError e)
+		{
+			expected[0] = "storage.type.js"; // The JS-JFlex grammar maps const directly as Terminal.VAR, so, add
+												// exception for it.
+			scanner.setRange(document, 0, src.length());
+			assertTokensMsg("Tested: " + src, expected);
+		}
+	}
+
+	public void testSupportClasses() throws Exception
+	{
+		String src = StringUtil.join(" ", JSLanguageConstants.SUPPORT_CLASSES);
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+		assertTokens("support.class.js", "null", "support.class.js", "null", "support.class.js", "null",
+				"support.class.js", "null", "support.class.js", "null", "support.class.js", "null", "support.class.js",
+				"null", "support.class.js", "null", "support.class.js", "null", "support.class.js", "null",
+				"support.class.js", "null", "support.class.js", "null", "support.class.js", "null", "support.class.js",
+				"null", "support.class.js", "null", "support.class.js", "null", "support.class.js", "null",
+				"support.class.js", "null", "support.class.js", "null", "support.class.js", "null", "support.class.js",
+				"null", "support.class.js", "null", "support.class.js", "null", "support.class.js", "null",
+				"support.class.js", "null", "support.class.js", "null", "support.class.js", "null", "support.class.js",
+				"null", "support.class.js", "null", "support.class.js", "null", "support.class.js", "null",
+				"support.class.js", "null", "support.class.js", "null", "support.class.js", "null", "support.class.js",
+				"null", "support.class.js", "null", "support.class.js", "null", "support.class.js", "null",
+				"support.class.js", "null", "support.class.js", "null", "support.class.js", "null", "support.class.js",
+				"null", "support.class.js", "null", "support.class.js", "null", "support.class.js", "null",
+				"support.class.js", "null", "support.class.js", "null", "support.class.js", "null", "support.class.js",
+				"null");
+	}
+
+	public void testSupportDomConstants() throws Exception
+	{
+		String src = StringUtil.join(" ", JSLanguageConstants.SUPPORT_DOM_CONSTANTS);
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+		assertTokens("support.constant.dom.js", "null", "support.constant.dom.js", "null", "support.constant.dom.js",
+				"null", "support.constant.dom.js", "null", "support.constant.dom.js", "null",
+				"support.constant.dom.js", "null", "support.constant.dom.js", "null", "support.constant.dom.js",
+				"null", "support.constant.dom.js", "null", "support.constant.dom.js", "null",
+				"support.constant.dom.js", "null", "support.constant.dom.js", "null", "support.constant.dom.js",
+				"null", "support.constant.dom.js", "null", "support.constant.dom.js", "null",
+				"support.constant.dom.js", "null", "support.constant.dom.js", "null", "support.constant.dom.js",
+				"null", "support.constant.dom.js", "null", "support.constant.dom.js", "null",
+				"support.constant.dom.js", "null", "support.constant.dom.js", "null");
+	}
 }
