@@ -230,7 +230,7 @@ public class SubmitTicketDialog extends TitleAreaDialog
 		label.setText(StringUtil.makeFormLabel(Messages.SubmitTicketDialog_LBL_StepsToReproduce));
 		label.setLayoutData(GridDataFactory.swtDefaults().align(SWT.BEGINNING, SWT.BEGINNING).create());
 
-		reproduceText = new Text(main, SWT.BORDER | SWT.MULTI);
+		reproduceText = new Text(main, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL);
 		reproduceText.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).hint(SWT.DEFAULT, 100).create());
 		reproduceText.addModifyListener(modifyListener);
 		TraverseListener traverseListener = new TraverseListener()
@@ -248,7 +248,7 @@ public class SubmitTicketDialog extends TitleAreaDialog
 		label.setText(StringUtil.makeFormLabel(Messages.SubmitTicketDialog_LBL_ActualResult));
 		label.setLayoutData(GridDataFactory.swtDefaults().align(SWT.BEGINNING, SWT.BEGINNING).create());
 
-		actualResultText = new Text(main, SWT.BORDER | SWT.MULTI);
+		actualResultText = new Text(main, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL);
 		actualResultText.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).hint(SWT.DEFAULT, 50).create());
 		actualResultText.addModifyListener(modifyListener);
 		actualResultText.addTraverseListener(traverseListener);
@@ -258,7 +258,7 @@ public class SubmitTicketDialog extends TitleAreaDialog
 		label.setText(StringUtil.makeFormLabel(Messages.SubmitTicketDialog_LBL_ExpectedResult));
 		label.setLayoutData(GridDataFactory.swtDefaults().align(SWT.BEGINNING, SWT.BEGINNING).create());
 
-		expectedResultText = new Text(main, SWT.BORDER | SWT.MULTI);
+		expectedResultText = new Text(main, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL);
 		expectedResultText
 				.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).hint(SWT.DEFAULT, 50).create());
 		expectedResultText.addModifyListener(modifyListener);
