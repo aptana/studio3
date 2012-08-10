@@ -100,33 +100,36 @@ public abstract class AbstractPortalBrowserEditor extends EditorPart
 		browser = new BrowserWrapper(browserControl);
 
 		// Add a listener for new browser windows. If new ones are opened, close it and open in an external browser
-		browserControl.addOpenWindowListener(new OpenWindowListener()
+		if (!Platform.OS_WIN32.equals(Platform.getOS()))
 		{
-			public void open(WindowEvent event)
+			browserControl.addOpenWindowListener(new OpenWindowListener()
 			{
-				final Browser newBrowser = event.browser;
-				if (newBrowser != browserControl)
+				public void open(WindowEvent event)
 				{
-					newBrowser.addLocationListener(new LocationAdapter()
+					final Browser newBrowser = event.browser;
+					if (newBrowser != browserControl)
 					{
-
-						public void changing(LocationEvent event)
+						newBrowser.addLocationListener(new LocationAdapter()
 						{
-							String url = event.location;
-							if (!StringUtil.isEmpty(url))
+
+							public void changing(LocationEvent event)
 							{
-								// Close the browser that was opened
-								newBrowser.getShell().close();
+								String url = event.location;
+								if (!StringUtil.isEmpty(url))
+								{
+									// Close the browser that was opened
+									newBrowser.getShell().close();
 
-								// Open in browser
-								WorkbenchBrowserUtil.openURL(url);
+									// Open in browser
+									WorkbenchBrowserUtil.openURL(url);
+								}
 							}
-						}
-					});
+						});
+					}
 				}
-			}
-		});
-
+			});
+		}
+		
 		browser.setJavascriptEnabled(true);
 
 		// Usually, we would just listen to a location change. However, since IE
