@@ -368,9 +368,29 @@ public class JVMInfo
 				// We found a valid javac, so we can also set up a detected JAVA_HOME in case we can't detect a valid
 				// one from the system's environment.
 				IPath javac = Path.fromOSString(javacPath).removeLastSegments(1);
+				if (Platform.OS_WIN32.equals(Platform.getOS()) && javac.segmentCount() == 0)
+				{
+					// Try to run the 'where' command on Windows to detect the full javac location.
+					try
+					{
+						pb = new ProcessBuilder("where", JAVAC); //$NON-NLS-1$
+						pb.redirectErrorStream(true);
+						process = pb.start();
+						output = ProcessUtil.outputForProcess(process);
+						if (!StringUtil.isEmpty(output) && (new File(output).exists()))
+						{
+							javac = Path.fromOSString(output).removeLastSegments(1);
+						}
+					}
+					catch (IOException e)
+					{
+						IdeLog.logWarning(CorePlugin.getDefault(),
+								"Failed to detect the Java Home by calling 'where' on the 'javac'", e); //$NON-NLS-1$
+					}
+				}
 				if ("bin".equals(javac.lastSegment())) //$NON-NLS-1$
 				{
-					javac = Path.fromOSString(javacPath).removeLastSegments(1);
+					javac = javac.removeLastSegments(1);
 					if (isValidJavaHome(javac.toString()))
 					{
 						detectedJavaHome = javac.toString();
