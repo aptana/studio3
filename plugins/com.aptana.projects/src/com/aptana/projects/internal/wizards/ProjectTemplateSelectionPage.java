@@ -59,7 +59,7 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 	private IProjectTemplate[] fTemplates;
 	private IProjectTemplate fSelectedTemplate;
 
-	private static ImageDescriptor wizardDesc = ProjectsPlugin.getImageDescriptor("/icons/protect_template_blank.png"); //$NON-NLS-1$
+	private static ImageDescriptor wizardDesc = ProjectsPlugin.getImageDescriptor("/icons/project_template_blank.png"); //$NON-NLS-1$
 	private Image defaultTemplateImage = null;
 	private Map<Object, Image> templateImages;
 
