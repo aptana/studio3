@@ -166,7 +166,7 @@ public class JVMInfo
 			if (!StringUtil.isEmpty(javaHome))
 			{
 				IPath path = Path.fromOSString(javaHome);
-				if (path.lastSegment().equals("jre")) //$NON-NLS-1$
+				if (path.lastSegment().startsWith("jre")) //$NON-NLS-1$
 				{
 					javaHome = path.removeLastSegments(1).toString();
 				}
