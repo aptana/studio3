@@ -37,7 +37,10 @@ public class JVMInfo
 	protected boolean isJDKInstalled;
 	protected boolean is32bit;
 	protected String javaVersion;
+	// The JAVA_HOME value that will be used as an alternative in case the system does not point to a valid one.
 	protected String javaHome;
+	// A JAVA_HOME that was detected when looking for the javac command.
+	private String detectedJavaHome;
 	protected int javaUpdateVersion;
 	protected IPath javacPath;
 	private static JVMInfo instance;
@@ -137,8 +140,8 @@ public class JVMInfo
 	{
 		try
 		{
-			resolveJavaHome();
 			parseJavaVersion();
+			resolveJavaHome();
 		}
 		catch (Exception e)
 		{
@@ -159,6 +162,10 @@ public class JVMInfo
 		{
 
 			this.javaHome = javaHome;
+		}
+		else if (!StringUtil.isEmpty(detectedJavaHome))
+		{
+			this.javaHome = detectedJavaHome;
 		}
 		else
 		{
@@ -356,7 +363,22 @@ public class JVMInfo
 		{
 			Process process = pb.start();
 			String output = ProcessUtil.outputForProcess(process);
-			return output.startsWith(JAVAC);
+			if (output.startsWith(JAVAC))
+			{
+				// We found a valid javac, so we can also set up a detected JAVA_HOME in case we can't detect a valid
+				// one from the system's environment.
+				IPath javac = Path.fromOSString(javacPath).removeLastSegments(1);
+				if ("bin".equals(javac.lastSegment())) //$NON-NLS-1$
+				{
+					javac = Path.fromOSString(javacPath).removeLastSegments(1);
+					if (isValidJavaHome(javac.toString()))
+					{
+						detectedJavaHome = javac.toString();
+					}
+				}
+
+				return true;
+			}
 		}
 		catch (IOException e)
 		{
