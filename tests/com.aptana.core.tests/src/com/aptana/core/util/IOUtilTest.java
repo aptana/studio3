@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
 
@@ -165,7 +166,7 @@ public class IOUtilTest extends TestCase
 		assertEquals("line one\r\nline two\r\nline three\r\n", IOUtil.read(stream, "UTF-8"));
 	}
 
-	public void testCopyDirectory() throws IOException
+	public void testCopyDirectory() throws Exception
 	{
 		URL resourceURL = Platform.getBundle(BUNDLE_ID).getEntry(RESOURCE_DIR);
 		File resourceFolder = ResourceUtil.resourcePathToFile(resourceURL);
@@ -176,7 +177,7 @@ public class IOUtilTest extends TestCase
 		try
 		{
 			IOUtil.copyDirectory(source, dest);
-			assertTrue(compareDirectory(source, dest));
+			assertDirectory(source, dest);
 		}
 		finally
 		{
@@ -193,7 +194,15 @@ public class IOUtilTest extends TestCase
 		File dest = new File(resourceFolder, "test.js");
 
 		IOUtil.copyDirectory(source, dest);
-		assertFalse(compareDirectory(source, dest));
+		try
+		{
+			assertDirectory(source, dest);
+			fail("Expected directories to not match");
+		}
+		catch (AssertionError ae)
+		{
+			// expected
+		}
 	}
 
 	public void testCopyFromNonReadableDirectory() throws Exception
@@ -211,14 +220,18 @@ public class IOUtilTest extends TestCase
 			{
 				Runtime.getRuntime().exec(new String[] { "chmod", "333", source.getAbsolutePath() }).waitFor(); //$NON-NLS-1$
 				IOUtil.copyDirectory(source, dest);
-				assertFalse(compareDirectory(source, dest));
+				assertDirectory(source, dest);
+				fail("Expected directories to not match");
+			}
+			catch (AssertionError ae)
+			{
+				// expected
 			}
 			finally
 			{
 				FileUtil.deleteRecursively(dest);
 				Runtime.getRuntime().exec(new String[] { "chmod", "755", source.getAbsolutePath() }).waitFor(); //$NON-NLS-1$
 			}
-
 		}
 	}
 
@@ -235,7 +248,12 @@ public class IOUtilTest extends TestCase
 			dest.mkdir();
 			dest.setReadOnly();
 			IOUtil.copyDirectory(source, dest);
-			assertFalse(compareDirectory(source, dest));
+			assertDirectory(source, dest);
+			fail("Expected directories to not match");
+		}
+		catch (AssertionError ae)
+		{
+			// expected
 		}
 		finally
 		{
@@ -256,7 +274,12 @@ public class IOUtilTest extends TestCase
 			dest.mkdir();
 			dest.setReadOnly();
 			IOUtil.copyDirectory(source, new File(dest, "testdir2"));
-			assertFalse(compareDirectory(source, dest));
+			assertDirectory(source, dest);
+			fail("Expected directories to not match");
+		}
+		catch (AssertionError ae)
+		{
+			// expected
 		}
 		finally
 		{
@@ -359,38 +382,28 @@ public class IOUtilTest extends TestCase
 		}
 	}
 
-	private boolean compareDirectory(File directory1, File directory2)
+	private void assertDirectory(File directory1, File directory2)
 	{
-		if (!directory1.isDirectory() || !directory2.isDirectory())
-		{
-			return false;
-		}
-
-		List<String> fileNames = Arrays.asList(directory2.list());
+		assertTrue(MessageFormat.format("{0} is not a directory", directory1.getAbsolutePath()),
+				directory1.isDirectory());
+		assertTrue(MessageFormat.format("{0} is not a directory", directory2.getAbsolutePath()),
+				directory2.isDirectory());
 
 		List<File> fileList1 = Arrays.asList(directory1.listFiles());
 		List<File> fileList2 = Arrays.asList(directory2.listFiles());
+		assertEquals(MessageFormat.format("Expected same # of children in dirs {0} and {1}",
+				directory1.getAbsolutePath(), directory2.getAbsolutePath()), fileList1.size(), fileList2.size());
 
-		if (fileList1.size() != fileList2.size())
-		{
-			return false;
-		}
-
+		List<String> fileNames = Arrays.asList(directory2.list());
 		for (File file : fileList1)
 		{
-			if (!fileNames.contains(file.getName()))
-			{
-				return false;
-			}
+			assertTrue("{0} doesn't contain", fileNames.contains(file.getName()));
 
 			File file2 = fileList2.get(fileNames.indexOf(file.getName()));
 
 			if (file.isDirectory())
 			{
-				if (!compareDirectory(file, file2))
-				{
-					return false;
-				}
+				assertDirectory(file, file2);
 			}
 			else
 			{
@@ -398,16 +411,16 @@ public class IOUtilTest extends TestCase
 				{
 					if (!compareFiles(file, file2))
 					{
-						return false;
+						fail(MessageFormat.format("Files {0} and {1} don't match", file.getAbsolutePath(),
+								file2.getAbsolutePath()));
 					}
 				}
 				catch (FileNotFoundException e)
 				{
-					return false;
+					fail(e.getMessage());
 				}
 			}
 		}
-		return true;
 	}
 
 	private boolean compareFiles(File file1, File file2) throws FileNotFoundException

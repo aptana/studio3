@@ -312,7 +312,7 @@ public abstract class IOUtil
 			IFileStore src = EFS.getLocalFileSystem().fromLocalFile(source);
 			try
 			{
-				src.move(EFS.getLocalFileSystem().fromLocalFile(destination), EFS.OVERWRITE, new NullProgressMonitor());
+				src.copy(EFS.getLocalFileSystem().fromLocalFile(destination), EFS.OVERWRITE, new NullProgressMonitor());
 			}
 			catch (CoreException e)
 			{
