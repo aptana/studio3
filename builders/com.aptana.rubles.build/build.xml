@@ -25,7 +25,7 @@
 			<param name="bundle.name" value="xml.ruble" />
 		</antcall>
 		<antcall target="merge-bundle">
-			<param name="bundle.name" value="workpress.ruble" />
+			<param name="bundle.name" value="wordpress.ruble" />
 		</antcall>
 		<antcall target="merge-bundle">
 			<param name="bundle.name" value="text.ruble" />
