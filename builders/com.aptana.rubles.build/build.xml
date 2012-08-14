@@ -145,6 +145,7 @@
 			<arg value="-c" />
 			<arg value="git push" />
 		</exec>
+		<delete dir="${buildDirectory}/${bundle.name}" quiet="true" />
 	</target>
 
 </project>
