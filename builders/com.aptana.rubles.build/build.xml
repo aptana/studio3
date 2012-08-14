@@ -112,10 +112,10 @@
 
 	<target name="merge-bundle">
 		<delete dir="${bundle.name}" failonerror="true" />
-		<echo message="git clone git://github.com/aptana/${bundle.name}.git ${bundle.name}" />
+		<echo message="git clone git@github.com:aptana/${bundle.name}.git ${bundle.name}" />
 		<exec executable="/bin/bash" dir="${buildDirectory}" failonerror="true">
 			<arg value="-c" />
-			<arg value="git clone git://github.com/aptana/${bundle.name}.git ${bundle.name}" />
+			<arg value="git clone git@github.com:aptana/${bundle.name}.git ${bundle.name}" />
 		</exec>
 		<!-- checkouts the source branch -->
 		<echo message="git checkout ${bundle.branch.source}">
