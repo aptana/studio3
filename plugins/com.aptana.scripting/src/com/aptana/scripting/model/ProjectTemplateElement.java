@@ -262,7 +262,7 @@ public class ProjectTemplateElement extends AbstractBundleElement implements IPr
 
 	protected ProjectTemplate createProjectTemplate()
 	{
-		return new ProjectTemplate(getLocation(), getType(), getDisplayName(), isReplacingParameters(),
-				getDescription(), getIconURL(), getId());
+		return new ProjectTemplate((new File(getDirectory(), getLocation())).getAbsolutePath(), getType(),
+				getDisplayName(), isReplacingParameters(), getDescription(), getIconURL(), getId());
 	}
 }
