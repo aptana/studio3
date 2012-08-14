@@ -117,6 +117,13 @@
 			<arg value="-c" />
 			<arg value="git clone git://github.com/aptana/${bundle.name}.git ${bundle.name}" />
 		</exec>
+		<!-- checkouts the source branch -->
+		<echo message="git checkout ${bundle.branch.source}">
+		</echo>
+		<exec executable="/bin/bash" dir="${buildDirectory}/${bundle.name}" failonerror="true">
+			<arg value="-c" />
+			<arg value="git checkout ${bundle.branch.source}" />
+		</exec>
 		<!-- checkouts the destination branch -->
 		<echo message="git checkout ${bundle.branch.destination}">
 		</echo>
