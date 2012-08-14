@@ -139,11 +139,11 @@
 			<arg value="git merge ${bundle.branch.source}" />
 		</exec>
 		<!-- push the destination branch -->
-		<echo message="git push ${bundle.branch.destination}">
+		<echo message="git push">
 		</echo>
 		<exec executable="/bin/bash" dir="${buildDirectory}/${bundle.name}" failonerror="true">
 			<arg value="-c" />
-			<arg value="git push ${bundle.branch.destination}" />
+			<arg value="git push" />
 		</exec>
 	</target>
 
