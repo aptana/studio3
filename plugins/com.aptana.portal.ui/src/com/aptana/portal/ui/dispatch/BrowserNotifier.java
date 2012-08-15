@@ -20,9 +20,9 @@ import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.ui.progress.UIJob;
-import com.aptana.jetty.util.epl.ajax.JSON;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.jetty.util.epl.ajax.JSON;
 import com.aptana.portal.ui.IDebugScopes;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.browserNotifications.AbstractBrowserNotification;
@@ -40,7 +40,7 @@ public class BrowserNotifier
 {
 	// The JavaScript notification string pattern.
 	// We replace the {0} with the generated JSON string.
-	private static final String NOTIFICATION_PATTERN = "eventsDispatcher.notify(''{0}'');"; //$NON-NLS-1$
+	private static final String NOTIFICATION_PATTERN = "if (typeof(eventsDispatcher) !== 'undefined') eventsDispatcher.notify(''{0}'');"; //$NON-NLS-1$
 	private static final String DATA_PATTERN_PREFIX = '\"' + IBrowserNotificationConstants.EVENT_DATA + "\":"; //$NON-NLS-1$
 	private static BrowserNotifier instance = null;
 	private Map<String, BrowserWrapper> browsers;
