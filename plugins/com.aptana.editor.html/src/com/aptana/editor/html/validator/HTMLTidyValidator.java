@@ -11,6 +11,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,8 @@ import com.aptana.editor.html.contentassist.model.ElementElement;
 import com.aptana.editor.html.contentassist.model.EntityElement;
 import com.aptana.editor.html.contentassist.model.EventElement;
 import com.aptana.editor.html.contentassist.model.ValueElement;
+import com.aptana.editor.html.parsing.HTMLDocumentTypes;
+import com.aptana.editor.html.parsing.HTMLDocumentTypes.Type;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.ast.HTMLCommentNode;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
@@ -64,8 +67,11 @@ import com.aptana.parsing.xpath.ParseNodeXPath;
  */
 public class HTMLTidyValidator extends AbstractBuildParticipant
 {
+	private static final EnumSet<Type> XHTML_TYPES = EnumSet.of(Type.XHTML_1_0_FRAMESET, Type.XHTML_1_0_STRICT,
+			Type.XHTML_1_0_TRANSITIONAL, Type.XHTML_1_1_STRICT);
+
 	public static final String ID = "com.aptana.editor.html.validator.TidyValidator"; //$NON-NLS-1$
-	
+
 	private static final String BOOLEAN_TYPE = "Boolean"; //$NON-NLS-1$
 
 	private static final Pattern DOCTYPE_PATTERN = Pattern
@@ -125,6 +131,8 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 
 	private boolean foundTitle;
 
+	private Type docType;
+
 	public void deleteFile(BuildContext context, IProgressMonitor monitor)
 	{
 		if (context == null)
@@ -155,6 +163,7 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 				String source = context.getContents();
 				if (!StringUtil.isEmpty(source))
 				{
+					docType = HTMLDocumentTypes.getType(source);
 					// TODO Can't we ask the context for line number of an offset so we don't duplicate the source? Or
 					// maybe just ask for IDocument?
 					IDocument doc = new Document(source);
@@ -509,11 +518,15 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 				EventElement event = getEvent(attrName);
 				if (event == null)
 				{
-					// Unrecognized attribute!
-					int offset = element.getStartingOffset();
-					problems.add(createWarning(MessageFormat.format(Messages.HTMLTidyValidator_ProprietaryAttribute,
-							tagName, attrName, attrValue), doc.getLineOfOffset(offset) + 1, offset, element
-							.getNameNode().getNameRange().getLength(), sourcePath));
+					if (!XHTML_TYPES.contains(docType))
+					{
+						// Unrecognized attribute!
+						int offset = element.getStartingOffset();
+						problems.add(createWarning(MessageFormat.format(
+								Messages.HTMLTidyValidator_ProprietaryAttribute, tagName, attrName, attrValue), doc
+								.getLineOfOffset(offset) + 1, offset, element.getNameNode().getNameRange().getLength(),
+								sourcePath));
+					}
 				}
 				continue;
 			}
@@ -533,7 +546,8 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 			if (!CollectionsUtil.isEmpty(values))
 			{
 				boolean validAttribute = false;
-				// If attribute is a boolean one, valid values are empty string, no value, or case-insensitive match with
+				// If attribute is a boolean one, valid values are empty string, no value, or case-insensitive match
+				// with
 				// the attribute name.
 				if (BOOLEAN_TYPE.equalsIgnoreCase(ae.getType()))
 				{
@@ -776,7 +790,7 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 
 			// Check if doctype is after any tags...
 			String before = source.substring(0, doctypeIndex);
-			if (!StringUtil.isEmpty(before))
+			if (!StringUtil.isEmpty(before) && !XHTML_TYPES.contains(docType))
 			{
 				problems.add(createWarning(Messages.HTMLTidyValidator_DoctypeAfterElements,
 						doc.getLineOfOffset(doctypeIndex) + 1, doctypeIndex, 9, sourcePath));
