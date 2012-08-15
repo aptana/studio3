@@ -103,6 +103,7 @@ public class ProjectTemplate implements IProjectTemplate
 	private String id;
 	private URL iconURL;
 	private boolean isReplacingParameters;
+	private int priority;
 
 	/**
 	 * Constructs a new ProjectTemplate
@@ -114,9 +115,28 @@ public class ProjectTemplate implements IProjectTemplate
 	 * @param description
 	 * @param iconURL
 	 * @param id
+	 * @param priority
 	 */
 	public ProjectTemplate(String path, TemplateType type, String name, boolean isReplacingParameters,
 			String description, URL iconURL, String id)
+	{
+		this(path, type, name, isReplacingParameters, description, iconURL, id, 0);
+	}
+
+	/**
+	 * Constructs a new ProjectTemplate
+	 * 
+	 * @param path
+	 * @param type
+	 * @param name
+	 * @param isReplacingParameters
+	 * @param description
+	 * @param iconURL
+	 * @param id
+	 * @param priority
+	 */
+	public ProjectTemplate(String path, TemplateType type, String name, boolean isReplacingParameters,
+			String description, URL iconURL, String id, int priority)
 	{
 		this.type = type;
 		this.path = path;
@@ -125,6 +145,7 @@ public class ProjectTemplate implements IProjectTemplate
 		this.description = description;
 		this.iconURL = iconURL;
 		this.id = id;
+		this.priority = priority;
 	}
 
 	/*
@@ -188,6 +209,11 @@ public class ProjectTemplate implements IProjectTemplate
 	public URL getIconURL()
 	{
 		return iconURL;
+	}
+
+	public int getPriority()
+	{
+		return priority;
 	}
 
 	/*
