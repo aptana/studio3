@@ -27,6 +27,7 @@ public class ProjectTemplateElement extends AbstractBundleElement implements IPr
 	private String fId;
 	private String fIconPath;
 	private URL fIconURL;
+	private int fPriority;
 
 	/**
 	 * ProjectTemplate
@@ -211,6 +212,16 @@ public class ProjectTemplateElement extends AbstractBundleElement implements IPr
 		return fIconPath;
 	}
 
+	public int getPriority()
+	{
+		return fPriority;
+	}
+
+	public void setPriority(int priority)
+	{
+		fPriority = priority;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.core.projects.templates.IProjectTemplate#isReplacingParameters()
@@ -263,6 +274,6 @@ public class ProjectTemplateElement extends AbstractBundleElement implements IPr
 	protected ProjectTemplate createProjectTemplate()
 	{
 		return new ProjectTemplate((new File(getDirectory(), getLocation())).getAbsolutePath(), getType(),
-				getDisplayName(), isReplacingParameters(), getDescription(), getIconURL(), getId());
+				getDisplayName(), isReplacingParameters(), getDescription(), getIconURL(), getId(), getPriority());
 	}
 }

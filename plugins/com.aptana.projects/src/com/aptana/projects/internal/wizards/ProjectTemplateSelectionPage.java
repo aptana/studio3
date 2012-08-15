@@ -8,6 +8,8 @@
 package com.aptana.projects.internal.wizards;
 
 import java.net.URL;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,15 +30,13 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
 import com.aptana.core.projects.templates.IProjectTemplate;
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.projects.ProjectsPlugin;
 import com.aptana.ui.widgets.StepIndicatorComposite;
@@ -46,13 +46,12 @@ import com.aptana.ui.widgets.StepIndicatorComposite;
  * 
  * @author Nam Le <nle@appcelerator.com>
  */
-public class ProjectTemplateSelectionPage extends WizardPage implements SelectionListener, ISelectionChangedListener,
+public class ProjectTemplateSelectionPage extends WizardPage implements ISelectionChangedListener,
 		IStepIndicatorWizardPage
 {
 	public static final String COMMAND_PROJECT_FROM_TEMPLATE_PROJECT_TEMPLATE_NAME = "projectTemplateId"; //$NON-NLS-1$
 	public static final String COMMAND_PROJECT_FROM_TEMPLATE_NEW_WIZARD_ID = "newWizardId"; //$NON-NLS-1$
 
-	private Button fUseTemplateButton;
 	private TableViewer fTemplateSelectionViewer;
 	private Label fPreviewText;
 
@@ -76,6 +75,16 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 		}
 		else
 		{
+			// sorts the list by priority
+			Collections.sort(templates, new Comparator<IProjectTemplate>()
+			{
+
+				public int compare(IProjectTemplate o1, IProjectTemplate o2)
+				{
+					return o1.getPriority() - o2.getPriority();
+				}
+
+			});
 			fTemplates = templates.toArray(new IProjectTemplate[templates.size()]);
 		}
 		setTitle(Messages.ProjectTemplateSelectionPage_Title);
@@ -85,7 +94,7 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 
 	public IProjectTemplate getSelectedTemplate()
 	{
-		return fUseTemplateButton.getSelection() ? fSelectedTemplate : null;
+		return fSelectedTemplate;
 	}
 
 	public void createControl(Composite parent)
@@ -119,8 +128,6 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 		stepIndicatorComposite = new StepIndicatorComposite(main, stepNames);
 		stepIndicatorComposite.setSelection(getStepName());
 
-		createTop(main);
-
 		Label label = new Label(main, SWT.NONE);
 		label.setText(Messages.ProjectTemplateSelectionPage_AvailableTemplates_TXT);
 		label.setLayoutData(GridDataFactory.swtDefaults().create());
@@ -136,66 +143,29 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 
 		fPreviewText = new Label(sashForm, SWT.WRAP | SWT.READ_ONLY);
 
+		// auto-selects the first one
+		if (!ArrayUtil.isEmpty(fTemplates))
+		{
+			fTemplateSelectionViewer.setSelection(new StructuredSelection(fTemplates[0]));
+			setSelectedTemplate(fTemplates[0]);
+		}
+
 		Dialog.applyDialogFont(main);
 		setControl(main);
 	}
 
-	public void widgetSelected(SelectionEvent e)
-	{
-		Object source = e.getSource();
-		if (source == fUseTemplateButton)
-		{
-			boolean selected = fUseTemplateButton.getSelection();
-			if (selected)
-			{
-				if (fTemplates.length > 0)
-				{
-					fTemplateSelectionViewer.setSelection(new StructuredSelection(fTemplates[0]));
-				}
-			}
-			else
-			{
-				fTemplateSelectionViewer.getTable().deselectAll();
-				fPreviewText.setText(StringUtil.EMPTY);
-			}
-		}
-	}
-
-	public void widgetDefaultSelected(SelectionEvent e)
-	{
-	}
-
 	public void selectionChanged(SelectionChangedEvent event)
 	{
-		if (!fUseTemplateButton.getSelection())
-		{
-			fUseTemplateButton.setSelection(true);
-		}
-
-		// change the preview text according to the template selection
-		fSelectedTemplate = null;
 		StructuredSelection selection = (StructuredSelection) event.getSelection();
-		String text = null;
-		if (!selection.isEmpty())
-		{
-			fSelectedTemplate = (IProjectTemplate) selection.getFirstElement();
-			text = fSelectedTemplate.getDescription();
-		}
-		fPreviewText.setText(text == null ? StringUtil.EMPTY : text);
+		setSelectedTemplate(selection.isEmpty() ? null : (IProjectTemplate) selection.getFirstElement());
 	}
 
-	/**
-	 * Creates an option to turn off using a template for the project.
-	 * 
-	 * @param parent
-	 *            the parent composite
-	 */
-	protected void createTop(Composite parent)
+	private void setSelectedTemplate(IProjectTemplate template)
 	{
-		fUseTemplateButton = new Button(parent, SWT.CHECK);
-		fUseTemplateButton.setText(Messages.ProjectTemplateSelectionPage_UseTemplate_TXT);
-		fUseTemplateButton.setLayoutData(GridDataFactory.swtDefaults().create());
-		fUseTemplateButton.addSelectionListener(this);
+		// change the preview text according to the template selection
+		String text = (template == null) ? null : template.getDescription();
+		fPreviewText.setText(text == null ? StringUtil.EMPTY : text);
+		fSelectedTemplate = template;
 	}
 
 	/**
