@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -15,23 +15,26 @@ import java.net.URISyntaxException;
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IProcess;
 
 import com.aptana.core.resources.IUniformResource;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.SocketUtil;
+import com.aptana.debug.core.IDebugScopes;
 
 /**
  * @author Max Stepanov
  */
-public final class DebugUtil {
+public final class DebugUtil
+{
 
 	private static final int DEFAULT_PORT = 8999;
 
 	private static final int SOCKET_TIMEOUT = 30000;
 
-	private DebugUtil() {
+	private DebugUtil()
+	{
 	}
 
 	/**
@@ -41,16 +44,22 @@ public final class DebugUtil {
 	 * @param adapterType
 	 * @return Object
 	 */
-	public static Object findAdapter(IAdaptable adaptableObject, Class<?> adapterType) {
+	public static Object findAdapter(IAdaptable adaptableObject, Class<?> adapterType)
+	{
 		Object result = null;
-		if (adaptableObject != null) {
+		if (adaptableObject != null)
+		{
 			result = adaptableObject.getAdapter(adapterType);
-			if (result == null) {
+			if (result == null)
+			{
 				ILaunch launch = (ILaunch) adaptableObject.getAdapter(ILaunch.class);
-				if (launch != null) {
-					for (IProcess process : launch.getProcesses()) {
+				if (launch != null)
+				{
+					for (IProcess process : launch.getProcesses())
+					{
 						result = process.getAdapter(adapterType);
-						if (result != null) {
+						if (result != null)
+						{
 							break;
 						}
 					}
@@ -66,30 +75,42 @@ public final class DebugUtil {
 	 * @param element
 	 * @return path
 	 */
-	public static String getPath(Object element) {
-		if (element instanceof IUniformResource) {
+	public static String getPath(Object element)
+	{
+		if (element instanceof IUniformResource)
+		{
 			IUniformResource resource = (IUniformResource) element;
 			IPath path = (IPath) resource.getAdapter(IPath.class);
-			if (path == null) {
+			if (path == null)
+			{
 				IStorage storage = (IStorage) resource.getAdapter(IStorage.class);
-				if (storage != null) {
+				if (storage != null)
+				{
 					path = (IPath) storage.getAdapter(IPath.class);
 				}
 			}
-			if (path != null) {
+			if (path != null)
+			{
 				return path.toOSString();
-			} else {
+			}
+			else
+			{
 				return resource.getURI().toString();
 			}
 		}
-		if (element instanceof String) {
-			try {
+		if (element instanceof String)
+		{
+			try
+			{
 				element = new URI((String) element); // $codepro.audit.disable questionableAssignment
-			} catch (URISyntaxException ignore) {
+			}
+			catch (URISyntaxException ignore)
+			{
 				ignore.getCause();
 			}
 		}
-		if (element instanceof URI) {
+		if (element instanceof URI)
+		{
 			URI uri = (URI) element;
 			if ("file".equals(uri.getScheme())) //$NON-NLS-1$
 			{
@@ -100,24 +121,28 @@ public final class DebugUtil {
 		return null;
 	}
 
-	public static int getDebuggerPort() {
+	public static int getDebuggerPort()
+	{
 		int port = SocketUtil.findFreePort(null);
-		if ("true".equals(Platform.getDebugOption("com.aptana.debug.core/debugger_debug"))) { //$NON-NLS-1$ //$NON-NLS-2$
+		if (EclipseUtil.isDebugOptionEnabled((IDebugScopes.DEBUG)))
+		{
 			port = 2525;
 		}
-		if (port == -1) {
+		if (port == -1)
+		{
 			port = DEFAULT_PORT;
 		}
 		return port;
 	}
 
-	public static ServerSocket allocateServerSocket(int port) throws IOException {
+	public static ServerSocket allocateServerSocket(int port) throws IOException
+	{
 		ServerSocket socket = new ServerSocket(port);
 		socket.setReuseAddress(true);
-		if (!"true".equals(Platform.getDebugOption("com.aptana.debug.core/debugger_debug"))) { //$NON-NLS-1$ //$NON-NLS-2$
+		if (!EclipseUtil.isDebugOptionEnabled((IDebugScopes.DEBUG)))
+		{
 			socket.setSoTimeout(SOCKET_TIMEOUT);
 		}
 		return socket;
 	}
-
 }
