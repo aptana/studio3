@@ -1207,15 +1207,9 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 			return;
 		}
 		ITextSelection textSelection = (ITextSelection) selection;
-		String currentSelectedText = textSelection.getText();
 		String comboText = textFind.getText();
 		if (comboText.length() == 0)
 		{
-			return;
-		}
-		if (!createFindPattern().matcher(currentSelectedText).matches())
-		{
-			statusLineManager.setMessage(true, Messages.FindBarDecorator_MSG_ReplaceNeedsToMatchSelectedText, null);
 			return;
 		}
 		setFindText(comboText);
