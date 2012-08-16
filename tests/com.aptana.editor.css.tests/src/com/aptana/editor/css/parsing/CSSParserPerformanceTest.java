@@ -42,27 +42,27 @@ public class CSSParserPerformanceTest extends PerformanceTestCase
 	{
 		parseTest("wp-admin.css", 330);
 	}
-	
+
 	public void testWordpressAdminDev() throws Exception
 	{
 		parseTest("wp-admin.dev.css", 1250);
 	}
-	
+
 	public void testFromMetadata() throws Exception
 	{
 		parseTest("from-metadata.css", 50);
 	}
-	
+
 	public void testGithubFormatted() throws Exception
 	{
 		parseTest("github-formatted.css", 25);
 	}
-	
+
 	public void testGithubMinimized() throws Exception
 	{
 		parseTest("github-minimized.css", 25);
 	}
-	
+
 	private void parseTest(String fileName, int iterations) throws Exception
 	{
 		InputStream stream = FileLocator.openStream(Platform.getBundle("com.aptana.editor.css.tests"),

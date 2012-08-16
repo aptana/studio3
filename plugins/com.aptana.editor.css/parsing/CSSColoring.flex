@@ -11,24 +11,22 @@ package com.aptana.editor.css.parsing;
 import java.io.Reader;
 import java.io.StringReader;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import beaver.Symbol;
-import beaver.Scanner;
-
+import com.aptana.editor.css.parsing.lexer.CSSTokenTypeSymbol;
 import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 
-@SuppressWarnings({"unused", "nls"})
+import beaver.Scanner;
 
+
+@SuppressWarnings({"unused", "nls"})
 %%
 
-%class CSSFlexScanner
+%public
+%class CSSColoringFlexScanner
 %extends Scanner
-%type Symbol
+%type CSSTokenTypeSymbol
 %yylexthrow Scanner.Exception
 %eofval{
-	return newToken(Terminals.EOF, "end-of-file");
+	return newToken(CSSTokenType.EOF, "end-of-file");
 %eofval}
 %unicode
 %ignorecase
@@ -40,13 +38,8 @@ import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 
 %{
 	// last token used for look behind. Also needed when implementing the ITokenScanner interface
-	private Symbol _lastToken;
-
-	// flag indicating if we should collect comments or not
-	private boolean _collectComments = true;
-
-	// comment collections, by type
-	private List<Symbol> _comments = new ArrayList<Symbol>();
+	private CSSTokenTypeSymbol _lastToken;
+	private CSSTokenTypeSymbol lookAhead;
 
 	// curly brace nesting level
 	private int _nestingLevel;
@@ -54,54 +47,60 @@ import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 	// a flag indicating we're inside of a @media block
 	private boolean _inMedia;
 
-	public CSSFlexScanner()
+	public CSSColoringFlexScanner()
 	{
 		this((Reader) null);
 	}
 
-	public Symbol getLastToken()
+	public CSSTokenTypeSymbol getLastToken()
 	{
 		return _lastToken;
 	}
 
-	public List<Symbol> getComments()
+
+    private CSSTokenTypeSymbol newTokenAndLookAhead(CSSTokenType current, CSSTokenType next, int lookAheadLen)
+    {
+        int right = yychar + yylength() - 1 - lookAheadLen;
+        String txt = yytext();
+        CSSTokenTypeSymbol currentSymbol = new CSSTokenTypeSymbol(
+            current, yychar, right, txt.substring(0, txt.length()-lookAheadLen));
+        
+        CSSTokenTypeSymbol nextSymbol = new CSSTokenTypeSymbol(
+            next, right+1, right + lookAheadLen, txt.substring(txt.length()-lookAheadLen, txt.length()));
+            
+        lookAhead = nextSymbol;
+        return currentSymbol;
+    }
+    
+	private CSSTokenTypeSymbol newToken(CSSTokenType id, Object value)
 	{
-		return _comments;
+		return new CSSTokenTypeSymbol(id, yychar, yychar + yylength() - 1, value);
 	}
 
-	private Symbol newToken(CSSTokenType type, Object value)
+	public CSSTokenTypeSymbol nextToken() throws java.io.IOException, Scanner.Exception
 	{
-		return newToken(type.getIndex(), value);
-	}
-
-	private Symbol newToken(short id, Object value)
-	{
-		return new Symbol(id, yychar, yychar + yylength() - 1, value);
-	}
-
-	public Symbol nextToken() throws java.io.IOException, Scanner.Exception
-	{
-		try
-		{
-			// get next token
-			_lastToken = yylex();
-		} 
-		catch (Scanner.Exception e)
-		{
-			// create default token type
-			String text = yytext();
-			int end = yychar + text.length() - 1;
-
-			_lastToken = new Symbol(CSSTokenType.EOF.getIndex(), yychar, end, text);
-		}
-
+	    if(lookAhead != null){
+	       _lastToken = lookAhead;
+	       lookAhead = null;
+        }
+        else{
+    		try
+    		{
+    			// get next token
+    			_lastToken = yylex();
+    		} 
+    		catch (Scanner.Exception e)
+    		{
+    			// create default token type
+    			String text = yytext();
+    			int end = yychar + text.length() - 1;
+    
+    			_lastToken = new CSSTokenTypeSymbol(CSSTokenType.EOF, yychar, end, text);
+    		}
+        }
 		return _lastToken;
 	}
 
-	public void setCollectComments(boolean flag)
-	{
-		_collectComments = flag;
-	}
 
 	public void setSource(String source)
 	{
@@ -110,14 +109,8 @@ import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 		// clear last token
 		_lastToken = null;
 
-		// reset comment collection list
-		_comments.clear();
-
 		// reset nesting level
 		_nestingLevel = 0;
-
-		// reset media flag
-		_inMedia = false;
 	}
 %}
 
@@ -144,30 +137,30 @@ nl							= \r|\n|\r\n|\f
 
 <YYINITIAL> {
 	{s}							{ /* ignore */ }
-	{comment}					{ _comments.add(newToken(CSSTokenType.COMMENT, yytext())); }
+	{comment}					{ /* ignore */ }
 
 	{single_quoted_string}		{ return newToken(CSSTokenType.SINGLE_QUOTED_STRING, yytext()); }
 	{double_quoted_string}		{ return newToken(CSSTokenType.DOUBLE_QUOTED_STRING, yytext()); }
 	{bad_single_quoted_string}	{ return newToken(CSSTokenType.SINGLE_QUOTED_STRING, yytext()); }
 	{bad_double_quoted_string}	{ return newToken(CSSTokenType.DOUBLE_QUOTED_STRING, yytext()); }
 
-	{num}"em"					{ return newToken(CSSTokenType.EMS, yytext()); }
-	{num}"ex"					{ return newToken(CSSTokenType.EXS, yytext()); }
-	{num}"px"					{ return newToken(CSSTokenType.LENGTH, yytext()); }
-	{num}"cm"					{ return newToken(CSSTokenType.LENGTH, yytext()); }
-	{num}"mm"					{ return newToken(CSSTokenType.LENGTH, yytext()); }
-	{num}"in"					{ return newToken(CSSTokenType.LENGTH, yytext()); }
-	{num}"pt"					{ return newToken(CSSTokenType.LENGTH, yytext()); }
-	{num}"pc"					{ return newToken(CSSTokenType.LENGTH, yytext()); }
-	{num}"deg"					{ return newToken(CSSTokenType.ANGLE, yytext()); }
-	{num}"rad"					{ return newToken(CSSTokenType.ANGLE, yytext()); }
-	{num}"grad"					{ return newToken(CSSTokenType.ANGLE, yytext()); }
-	{num}"ms"					{ return newToken(CSSTokenType.TIME, yytext()); }
-	{num}"s"					{ return newToken(CSSTokenType.TIME, yytext()); }
-	{num}"hz"					{ return newToken(CSSTokenType.FREQUENCY, yytext()); }
-	{num}"khz"					{ return newToken(CSSTokenType.FREQUENCY, yytext()); }
-//	{num}{identifier}			{ return newToken(CSSTokenType.DIMENSION, yytext()); }
-	{num}%						{ return newToken(CSSTokenType.PERCENTAGE, yytext()); }
+	{num}"em"					{ return newTokenAndLookAhead(CSSTokenType.NUMBER, CSSTokenType.EMS, 2); }
+	{num}"ex"					{ return newTokenAndLookAhead(CSSTokenType.NUMBER, CSSTokenType.EXS, 2); }
+	{num}"px"					{ return newTokenAndLookAhead(CSSTokenType.NUMBER, CSSTokenType.LENGTH, 2); }
+	{num}"cm"					{ return newTokenAndLookAhead(CSSTokenType.NUMBER, CSSTokenType.LENGTH, 2); }
+	{num}"mm"					{ return newTokenAndLookAhead(CSSTokenType.NUMBER, CSSTokenType.LENGTH, 2); }
+	{num}"in"					{ return newTokenAndLookAhead(CSSTokenType.NUMBER, CSSTokenType.LENGTH, 2); }
+	{num}"pt"					{ return newTokenAndLookAhead(CSSTokenType.NUMBER, CSSTokenType.LENGTH, 2); }
+	{num}"pc"					{ return newTokenAndLookAhead(CSSTokenType.NUMBER, CSSTokenType.LENGTH, 2); }
+	{num}"deg"					{ return newTokenAndLookAhead(CSSTokenType.NUMBER, CSSTokenType.ANGLE, 3); }
+	{num}"rad"					{ return newTokenAndLookAhead(CSSTokenType.NUMBER, CSSTokenType.ANGLE, 3); }
+	{num}"grad"					{ return newTokenAndLookAhead(CSSTokenType.NUMBER, CSSTokenType.ANGLE, 4); }
+	{num}"ms"					{ return newTokenAndLookAhead(CSSTokenType.NUMBER, CSSTokenType.TIME, 2); }
+	{num}"s"					{ return newTokenAndLookAhead(CSSTokenType.NUMBER, CSSTokenType.TIME, 1); }
+	{num}"hz"					{ return newTokenAndLookAhead(CSSTokenType.NUMBER, CSSTokenType.FREQUENCY, 2); }
+	{num}"khz"					{ return newTokenAndLookAhead(CSSTokenType.NUMBER, CSSTokenType.FREQUENCY, 3); }
+//	{num}{identifier}			{ return newTokenAndLookAhead(CSSTokenType.NUMBER, CSSTokenType.DIMENSION, calculate??); }
+	{num}%						{ return newTokenAndLookAhead(CSSTokenType.NUMBER, CSSTokenType.PERCENTAGE, 1); }
 	{num}						{ return newToken(CSSTokenType.NUMBER, yytext()); }
 	
 	"."{name}					{
@@ -276,7 +269,6 @@ nl							= \r|\n|\r\n|\f
 	"="							{ return newToken(CSSTokenType.EQUAL, yytext()); }
 	"-"							{ return newToken(CSSTokenType.MINUS, yytext()); }
 
-	"url("[^)]*")"				{ return newToken(CSSTokenType.URL, yytext()); }
 
 	{identifier}				{ return newToken(CSSTokenType.IDENTIFIER, yytext()); }
 }

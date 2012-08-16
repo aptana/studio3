@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -11,7 +11,6 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.rules.FastPartitioner;
-import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.Token;
 
@@ -19,16 +18,11 @@ import com.aptana.editor.common.tests.AbstractTokenScannerTestCase;
 
 public class CSSCodeScannerTest extends AbstractTokenScannerTestCase
 {
+	@SuppressWarnings("deprecation")
 	@Override
 	protected ITokenScanner createTokenScanner()
 	{
-		return new CSSCodeScanner()
-		{
-			protected IToken createToken(String string)
-			{
-				return CSSCodeScannerTest.this.getToken(string);
-			};
-		};
+		return new CSSCodeScannerRuleBased();
 	}
 
 	public void testH1Through6()
@@ -44,6 +38,26 @@ public class CSSCodeScannerTest extends AbstractTokenScannerTestCase
 		}
 	}
 
+	public void testNum()
+	{
+		String src = "10em;";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("constant.numeric.css"), 0, 2);
+		assertToken(getToken("keyword.other.unit.css"), 2, 2);
+		assertToken(getToken("punctuation.terminator.rule.css"), 4, 1);
+	}
+
+	public void testImportant() throws Exception
+	{
+		String src = "!  impORtant what!impORtantwhat\n!impORtant\n!important something";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+		assertTokens("", "null", "source.css", "null", "source.css", "", "source.css", "null", "", "source.css",
+				"null", "", "source.css", "null", "source.css", "null");
+	}
+
 	public void testIdentifierWithKeyword()
 	{
 		String src = "table-row-group";
@@ -51,6 +65,27 @@ public class CSSCodeScannerTest extends AbstractTokenScannerTestCase
 		scanner.setRange(document, 0, src.length());
 
 		assertToken(getToken("source.css"), 0, 15);
+	}
+
+	public void testBrowserSpecificPropertyNames2()
+	{
+		String src = "body {\n-moz-border-radius: 4px;\n" + "-webkit-border-radius: 4px";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+		assertTokens("meta.selector.css entity.name.tag.css", "meta.selector.css",
+				"meta.property-list.css punctuation.section.property-list.css", "meta.property-list.css",
+				"meta.property-list.css meta.property-name.css support.type.property-name.css",
+				"meta.property-list.css meta.property-value.css punctuation.separator.key-value.css",
+				"meta.property-list.css meta.property-value.css",
+				"meta.property-list.css meta.property-value.css constant.numeric.css",
+				"meta.property-list.css meta.property-value.css keyword.other.unit.css",
+				"meta.property-list.css meta.property-value.css punctuation.terminator.rule.css",
+				"meta.property-list.css",
+				"meta.property-list.css meta.property-name.css support.type.property-name.css",
+				"meta.property-list.css meta.property-value.css punctuation.separator.key-value.css",
+				"meta.property-list.css meta.property-value.css",
+				"meta.property-list.css meta.property-value.css constant.numeric.css",
+				"meta.property-list.css meta.property-value.css keyword.other.unit.css", "null");
 	}
 
 	public void testBrowserSpecificPropertyNames()
@@ -88,6 +123,22 @@ public class CSSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("meta.property-value.css punctuation.section.function.css"), 15, 1);
 	}
 
+	public void testURLFunctionArgWithNoString2()
+	{
+		String src = "background: url(/images/blah_header.jpg)";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertTokens("meta.property-name.css support.type.property-name.css",
+				"meta.property-value.css punctuation.separator.key-value.css", "meta.property-value.css",
+				"meta.property-value.css support.function.misc.css",
+				"meta.property-value.css punctuation.section.function.css",
+				"meta.property-value.css punctuation.slash.css", "meta.property-value.css source.css",
+				"meta.property-value.css punctuation.slash.css", "meta.property-value.css source.css",
+				"meta.selector.css meta.property-value.css entity.other.attribute-name.class.css",
+				"meta.selector.css meta.property-value.css punctuation.section.function.css", "null");
+	}
+
 	public void testSmallCaps()
 	{
 		String src = "small { font: small-caps; }";
@@ -107,6 +158,22 @@ public class CSSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("meta.property-list.css meta.property-value.css punctuation.terminator.rule.css"), 24, 1);
 		assertToken(getToken("meta.property-list.css"), 25, 1);
 		assertToken(getToken("meta.property-list.css punctuation.section.property-list.css"), 26, 1);
+	}
+
+	public void testSmallCaps2()
+	{
+		String src = "background: url(/images/blah_header.jpg)";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertTokens("meta.property-name.css support.type.property-name.css",
+				"meta.property-value.css punctuation.separator.key-value.css", "meta.property-value.css",
+				"meta.property-value.css support.function.misc.css",
+				"meta.property-value.css punctuation.section.function.css",
+				"meta.property-value.css punctuation.slash.css", "meta.property-value.css source.css",
+				"meta.property-value.css punctuation.slash.css", "meta.property-value.css source.css",
+				"meta.selector.css meta.property-value.css entity.other.attribute-name.class.css",
+				"meta.selector.css meta.property-value.css punctuation.section.function.css", "null");
 	}
 
 	public void testCSSEmTag()
@@ -131,6 +198,25 @@ public class CSSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("meta.property-list.css meta.property-value.css keyword.other.unit.css"), 42, 2); // "em"
 		assertToken(getToken("meta.property-list.css meta.property-value.css punctuation.terminator.rule.css"), 44, 1);
 		assertToken(getToken("meta.property-list.css punctuation.section.property-list.css"), 45, 1);
+	}
+
+	public void testCSSEmTag2()
+	{
+		// the preceding elements are to make sure "em" does not corrupt the rest of tokenizing
+		String src = "textarea.JScript, textarea.HTML {height:10em;}";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+		assertTokens("meta.selector.css entity.name.tag.css",
+				"meta.selector.css entity.other.attribute-name.class.css",
+				"meta.selector.css punctuation.separator.css", "meta.selector.css",
+				"meta.selector.css entity.name.tag.css", "meta.selector.css entity.other.attribute-name.class.css",
+				"meta.selector.css", "meta.property-list.css punctuation.section.property-list.css",
+				"meta.property-list.css meta.property-name.css support.type.property-name.css",
+				"meta.property-list.css meta.property-value.css punctuation.separator.key-value.css",
+				"meta.property-list.css meta.property-value.css constant.numeric.css",
+				"meta.property-list.css meta.property-value.css keyword.other.unit.css",
+				"meta.property-list.css meta.property-value.css punctuation.terminator.rule.css",
+				"meta.property-list.css punctuation.section.property-list.css", "null");
 	}
 
 	public void testBasicTokenizing()
@@ -161,6 +247,212 @@ public class CSSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("meta.property-list.css meta.property-value.css punctuation.terminator.rule.css"), 41, 1);
 		assertToken(getToken("meta.property-list.css"), 42, 1);
 		assertToken(getToken("meta.property-list.css punctuation.section.property-list.css"), 43, 1);
+	}
+
+	public void testBasicTokenizing3()
+	{
+		String src = "html { color: red; background-color: #333; }";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertTokens("meta.selector.css entity.name.tag.css", "meta.selector.css",
+				"meta.property-list.css punctuation.section.property-list.css", "meta.property-list.css",
+				"meta.property-list.css meta.property-name.css support.type.property-name.css",
+				"meta.property-list.css meta.property-value.css punctuation.separator.key-value.css",
+				"meta.property-list.css meta.property-value.css",
+				"meta.property-list.css meta.property-value.css support.constant.color.w3c-standard-color-name.css",
+				"meta.property-list.css meta.property-value.css punctuation.terminator.rule.css",
+				"meta.property-list.css",
+				"meta.property-list.css meta.property-name.css support.type.property-name.css",
+				"meta.property-list.css meta.property-value.css punctuation.separator.key-value.css",
+				"meta.property-list.css meta.property-value.css",
+				"meta.property-list.css meta.property-value.css constant.other.color.rgb-value.css",
+				"meta.property-list.css meta.property-value.css punctuation.terminator.rule.css",
+				"meta.property-list.css", "meta.property-list.css punctuation.section.property-list.css", "null");
+	}
+
+	public void testBasicTokenizing4()
+	{
+		String src = "body {\n" + // 1
+				"  background-image: url();\n" + // 2
+				"  background-position-x: left;\n" + // 3
+				"  background-position-y: top;\n" + // 4
+				"  background-repeat: repeat-x;\n" + // 5
+				"  font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;\n" + // 6
+				"}\n" + // 7
+				"\n" + // 8
+				".main {\n" + // 9
+				"  border: 1px dotted #222222;\n" + // 10
+				"  margin: 5px;\n" + // 11
+				"}\n" + // 12
+				"\n" + // 13
+				".header {\n" + // 14
+				"  background-color: #FFFFFF;\n" + // 15
+				"  color: #444444;\n" + // 16
+				"  font-size: xx-large;\n" + // 17
+				"}\n" + // 18
+				"\n" + // 19
+				".menu {\n" + // 20
+				"  border-top: 2px solid #FC7F22;\n" + // 21
+				"  background-color: #3B3B3B;\n" + // 22
+				"  color: #FFFFFF;\n" + // 23
+				"  text-align: right;\n" + // 24
+				"  vertical-align: right;\n" + // 25
+				"  font-size: small;\n" + // 26
+				"}\n" + // 27
+				"\n" + // 28
+				".menu a {\n" + // 29
+				"  color: #DDDDDD;\n" + // 30
+				"  text-decoration: none;\n" + // 31
+				"}\n"; // 32
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertTokens("meta.selector.css entity.name.tag.css", "meta.selector.css",
+				"meta.property-list.css punctuation.section.property-list.css", "meta.property-list.css",
+				"meta.property-list.css meta.property-name.css support.type.property-name.css",
+				"meta.property-list.css meta.property-value.css punctuation.separator.key-value.css",
+				"meta.property-list.css meta.property-value.css",
+				"meta.property-list.css meta.property-value.css support.function.misc.css",
+				"meta.property-list.css meta.property-value.css punctuation.section.function.css",
+				"meta.property-list.css meta.property-value.css punctuation.section.function.css",
+				"meta.property-list.css meta.property-value.css punctuation.terminator.rule.css",
+				"meta.property-list.css",
+				"meta.property-list.css meta.property-name.css support.type.property-name.css",
+				"meta.property-list.css meta.property-value.css punctuation.separator.key-value.css",
+				"meta.property-list.css meta.property-value.css",
+				"meta.property-list.css meta.property-value.css support.constant.property-value.css",
+				"meta.property-list.css meta.property-value.css punctuation.terminator.rule.css",
+				"meta.property-list.css",
+				"meta.property-list.css meta.property-name.css support.type.property-name.css",
+				"meta.property-list.css meta.property-value.css punctuation.separator.key-value.css",
+				"meta.property-list.css meta.property-value.css",
+				"meta.property-list.css meta.property-value.css support.constant.property-value.css",
+				"meta.property-list.css meta.property-value.css punctuation.terminator.rule.css",
+				"meta.property-list.css",
+				"meta.property-list.css meta.property-name.css support.type.property-name.css",
+				"meta.property-list.css meta.property-value.css punctuation.separator.key-value.css",
+				"meta.property-list.css meta.property-value.css",
+				"meta.property-list.css meta.property-value.css support.constant.property-value.css",
+				"meta.property-list.css meta.property-value.css punctuation.terminator.rule.css",
+				"meta.property-list.css",
+				"meta.property-list.css meta.property-name.css support.type.property-name.css",
+				"meta.property-list.css meta.property-value.css punctuation.separator.key-value.css",
+				"meta.property-list.css meta.property-value.css",
+				"meta.property-list.css meta.property-value.css support.constant.font-name.css",
+				"meta.property-list.css meta.property-value.css punctuation.separator.css",
+				"meta.property-list.css meta.property-value.css",
+				"meta.property-list.css meta.property-value.css support.constant.font-name.css",
+				"meta.property-list.css meta.property-value.css punctuation.separator.css",
+				"meta.property-list.css meta.property-value.css",
+				"meta.property-list.css meta.property-value.css support.constant.font-name.css",
+				"meta.property-list.css meta.property-value.css punctuation.separator.css",
+				"meta.property-list.css meta.property-value.css",
+				"meta.property-list.css meta.property-value.css support.constant.font-name.css",
+				"meta.property-list.css meta.property-value.css punctuation.separator.css",
+				"meta.property-list.css meta.property-value.css",
+				"meta.property-list.css meta.property-value.css support.constant.font-name.css",
+				"meta.property-list.css meta.property-value.css punctuation.terminator.rule.css",
+				"meta.property-list.css", "meta.property-list.css punctuation.section.property-list.css", "null",
+				"meta.selector.css entity.other.attribute-name.class.css", "meta.selector.css",
+				"meta.property-list.css punctuation.section.property-list.css", "meta.property-list.css",
+				"meta.property-list.css meta.property-name.css support.type.property-name.css",
+				"meta.property-list.css meta.property-value.css punctuation.separator.key-value.css",
+				"meta.property-list.css meta.property-value.css",
+				"meta.property-list.css meta.property-value.css constant.numeric.css",
+				"meta.property-list.css meta.property-value.css keyword.other.unit.css",
+				"meta.property-list.css meta.property-value.css",
+				"meta.property-list.css meta.property-value.css support.constant.property-value.css",
+				"meta.property-list.css meta.property-value.css",
+				"meta.property-list.css meta.property-value.css constant.other.color.rgb-value.css",
+				"meta.property-list.css meta.property-value.css punctuation.terminator.rule.css",
+				"meta.property-list.css",
+				"meta.property-list.css meta.property-name.css support.type.property-name.css",
+				"meta.property-list.css meta.property-value.css punctuation.separator.key-value.css",
+				"meta.property-list.css meta.property-value.css",
+				"meta.property-list.css meta.property-value.css constant.numeric.css",
+				"meta.property-list.css meta.property-value.css keyword.other.unit.css",
+				"meta.property-list.css meta.property-value.css punctuation.terminator.rule.css",
+				"meta.property-list.css", "meta.property-list.css punctuation.section.property-list.css", "null",
+				"meta.selector.css entity.other.attribute-name.class.css", "meta.selector.css",
+				"meta.property-list.css punctuation.section.property-list.css", "meta.property-list.css",
+				"meta.property-list.css meta.property-name.css support.type.property-name.css",
+				"meta.property-list.css meta.property-value.css punctuation.separator.key-value.css",
+				"meta.property-list.css meta.property-value.css",
+				"meta.property-list.css meta.property-value.css constant.other.color.rgb-value.css",
+				"meta.property-list.css meta.property-value.css punctuation.terminator.rule.css",
+				"meta.property-list.css",
+				"meta.property-list.css meta.property-name.css support.type.property-name.css",
+				"meta.property-list.css meta.property-value.css punctuation.separator.key-value.css",
+				"meta.property-list.css meta.property-value.css",
+				"meta.property-list.css meta.property-value.css constant.other.color.rgb-value.css",
+				"meta.property-list.css meta.property-value.css punctuation.terminator.rule.css",
+				"meta.property-list.css",
+				"meta.property-list.css meta.property-name.css support.type.property-name.css",
+				"meta.property-list.css meta.property-value.css punctuation.separator.key-value.css",
+				"meta.property-list.css meta.property-value.css",
+				"meta.property-list.css meta.property-value.css support.constant.property-value.css",
+				"meta.property-list.css meta.property-value.css punctuation.terminator.rule.css",
+				"meta.property-list.css", "meta.property-list.css punctuation.section.property-list.css", "null",
+				"meta.selector.css entity.other.attribute-name.class.css", "meta.selector.css",
+				"meta.property-list.css punctuation.section.property-list.css", "meta.property-list.css",
+				"meta.property-list.css meta.property-name.css support.type.property-name.css",
+				"meta.property-list.css meta.property-value.css punctuation.separator.key-value.css",
+				"meta.property-list.css meta.property-value.css",
+				"meta.property-list.css meta.property-value.css constant.numeric.css",
+				"meta.property-list.css meta.property-value.css keyword.other.unit.css",
+				"meta.property-list.css meta.property-value.css",
+				"meta.property-list.css meta.property-value.css support.constant.property-value.css",
+				"meta.property-list.css meta.property-value.css",
+				"meta.property-list.css meta.property-value.css constant.other.color.rgb-value.css",
+				"meta.property-list.css meta.property-value.css punctuation.terminator.rule.css",
+				"meta.property-list.css",
+				"meta.property-list.css meta.property-name.css support.type.property-name.css",
+				"meta.property-list.css meta.property-value.css punctuation.separator.key-value.css",
+				"meta.property-list.css meta.property-value.css",
+				"meta.property-list.css meta.property-value.css constant.other.color.rgb-value.css",
+				"meta.property-list.css meta.property-value.css punctuation.terminator.rule.css",
+				"meta.property-list.css",
+				"meta.property-list.css meta.property-name.css support.type.property-name.css",
+				"meta.property-list.css meta.property-value.css punctuation.separator.key-value.css",
+				"meta.property-list.css meta.property-value.css",
+				"meta.property-list.css meta.property-value.css constant.other.color.rgb-value.css",
+				"meta.property-list.css meta.property-value.css punctuation.terminator.rule.css",
+				"meta.property-list.css",
+				"meta.property-list.css meta.property-name.css support.type.property-name.css",
+				"meta.property-list.css meta.property-value.css punctuation.separator.key-value.css",
+				"meta.property-list.css meta.property-value.css",
+				"meta.property-list.css meta.property-value.css support.constant.property-value.css",
+				"meta.property-list.css meta.property-value.css punctuation.terminator.rule.css",
+				"meta.property-list.css",
+				"meta.property-list.css meta.property-name.css support.type.property-name.css",
+				"meta.property-list.css meta.property-value.css punctuation.separator.key-value.css",
+				"meta.property-list.css meta.property-value.css",
+				"meta.property-list.css meta.property-value.css support.constant.property-value.css",
+				"meta.property-list.css meta.property-value.css punctuation.terminator.rule.css",
+				"meta.property-list.css",
+				"meta.property-list.css meta.property-name.css support.type.property-name.css",
+				"meta.property-list.css meta.property-value.css punctuation.separator.key-value.css",
+				"meta.property-list.css meta.property-value.css",
+				"meta.property-list.css meta.property-value.css entity.name.tag.css",
+				"meta.property-list.css meta.property-value.css punctuation.terminator.rule.css",
+				"meta.property-list.css", "meta.property-list.css punctuation.section.property-list.css",
+				"meta.selector.css", "meta.selector.css entity.other.attribute-name.class.css", "meta.selector.css",
+				"meta.selector.css entity.name.tag.css", "meta.selector.css",
+				"meta.property-list.css punctuation.section.property-list.css", "meta.property-list.css",
+				"meta.property-list.css meta.property-name.css support.type.property-name.css",
+				"meta.property-list.css meta.property-value.css punctuation.separator.key-value.css",
+				"meta.property-list.css meta.property-value.css",
+				"meta.property-list.css meta.property-value.css constant.other.color.rgb-value.css",
+				"meta.property-list.css meta.property-value.css punctuation.terminator.rule.css",
+				"meta.property-list.css",
+				"meta.property-list.css meta.property-name.css support.type.property-name.css",
+				"meta.property-list.css meta.property-value.css punctuation.separator.key-value.css",
+				"meta.property-list.css meta.property-value.css",
+				"meta.property-list.css meta.property-value.css support.constant.property-value.css",
+				"meta.property-list.css meta.property-value.css punctuation.terminator.rule.css",
+				"meta.property-list.css", "meta.property-list.css punctuation.section.property-list.css", "null",
+				"null");
 	}
 
 	public void testBasicTokenizing2()
@@ -365,8 +657,7 @@ public class CSSCodeScannerTest extends AbstractTokenScannerTestCase
 				22, 11);
 		assertToken(
 				getToken("meta.at-rule.media.css meta.property-list.css meta.property-value.css punctuation.separator.key-value.css"),
-				33,
-				1);
+				33, 1);
 		assertToken(getToken("meta.at-rule.media.css meta.property-list.css meta.property-value.css"), 34, 1);
 		// sans-serif
 		assertToken(
@@ -385,6 +676,37 @@ public class CSSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("meta.property-list.css"), 56, 1);
 		assertToken(getToken("meta.property-list.css punctuation.section.property-list.css"), 57, 1); // }
 		assertToken(Token.WHITESPACE, 58, 1);
+	}
+
+	public void testMediaWithRules2()
+	{
+		String src = "@media screen {\n" + //
+				"  * { font-family: sans-serif }\n" + //
+				"}\n" + //
+				"body { } "; //
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+		assertTokens(
+				"meta.at-rule.media.css keyword.control.at-rule.media.css",
+				"meta.at-rule.media.css",
+				"meta.at-rule.media.css support.constant.media.css",
+				"meta.at-rule.media.css",
+				"meta.at-rule.media.css punctuation.section.at-rule.media.css",
+				"meta.at-rule.media.css",
+				"meta.at-rule.media.css meta.selector.css entity.name.tag.wildcard.css",
+				"meta.at-rule.media.css meta.selector.css",
+				"meta.at-rule.media.css meta.property-list.css punctuation.section.property-list.css",
+				"meta.at-rule.media.css meta.property-list.css",
+				"meta.at-rule.media.css meta.property-list.css meta.property-name.css support.type.property-name.css",
+				"meta.at-rule.media.css meta.property-list.css meta.property-value.css punctuation.separator.key-value.css",
+				"meta.at-rule.media.css meta.property-list.css meta.property-value.css",
+				"meta.at-rule.media.css meta.property-list.css meta.property-value.css support.constant.font-name.css",
+				"meta.at-rule.media.css meta.property-list.css meta.property-value.css",
+				"meta.at-rule.media.css meta.property-list.css punctuation.section.property-list.css",
+				"meta.at-rule.media.css", "meta.at-rule.media.css punctuation.section.at-rule.media.css", "null",
+				"meta.selector.css entity.name.tag.css", "meta.selector.css",
+				"meta.property-list.css punctuation.section.property-list.css", "meta.property-list.css",
+				"meta.property-list.css punctuation.section.property-list.css", "null", "null");
 	}
 
 	public void testCurliesInStringsBeforePartition()

@@ -20,6 +20,7 @@ import org.eclipse.jface.text.rules.BufferedRuleBasedScanner;
 import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.IWordDetector;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
@@ -37,22 +38,51 @@ import com.aptana.editor.css.internal.text.rules.KeywordIdentifierDetector;
 import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 
 /**
- * CSSCodeScanner
+ * CSSCodeScannerRuleBased Note: this class is deprecated but still kept around because SassCodeScanner uses it (but
+ * {@link CSSCodeScannerFlex} should be used instead if possible as it's considerably faster).
  */
+@Deprecated
 @SuppressWarnings("nls")
-public class CSSCodeScanner extends BufferedRuleBasedScanner
+public class CSSCodeScannerRuleBased extends BufferedRuleBasedScanner
 {
-	private static final String KEYWORD_MEDIA = "@media";
+	/* default */static final class VendorPropertyWordRule extends ExtendedWordRule
+	{
+		private VendorPropertyWordRule(IWordDetector detector, IToken defaultToken, boolean ignoreCase)
+		{
+			super(detector, defaultToken, ignoreCase);
+		}
 
-	private static final String[] DEPRECATED_COLORS = new String[] { "aliceblue", "antiquewhite", "aquamarine",
-			"azure", "beige", "bisque", "blanchedalmond", "blueviolet", "brown", "burlywood", "cadetblue",
-			"chartreuse", "chocolate", "coral", "cornflowerblue", "cornsilk", "crimson", "cyan", "darkblue",
-			"darkcyan", "darkgoldenrod", "darkgray", "darkgreen", "darkgrey", "darkkhaki", "darkmagenta",
-			"darkolivegreen", "darkorange", "darkorchid", "darkred", "darksalmon", "darkseagreen", "darkslateblue",
-			"darkslategray", "darkslategrey", "darkturquoise", "darkviolet", "deeppink", "deepskyblue", "dimgray",
-			"dimgrey", "dodgerblue", "firebrick", "floralwhite", "forestgreen", "gainsboro", "ghostwhite", "gold",
-			"goldenrod", "greenyellow", "grey", "honeydew", "hotpink", "indianred", "indigo", "ivory", "khaki",
-			"lavender", "lavenderblush", "lawngreen", "lemonchiffon", "lightblue", "lightcoral", "lightcyan",
+		@Override
+		public boolean wordOK(String word, ICharacterScanner scanner)
+		{
+			// Table 1. Vendor Extension Prefixes
+			// Prefix Organisation
+			// -ms- Microsoft
+			// mso- Microsoft Office
+			// -moz- Mozilla Foundation (Gecko-based browsers)
+			// -o- Opera Software
+			// -atsc- Advanced Television Standards Committee
+			// -wap- The WAP Forum
+			// -webkit- Safari (and other WebKit-based browsers)
+			// -khtml-
+
+			return word.startsWith("-moz-") || word.startsWith("-webkit-") || word.startsWith("-ms-")
+					|| word.startsWith("-o-") || word.startsWith("-atsc-") || word.startsWith("-khtml-")
+					|| word.startsWith("-wap-");
+		}
+	}
+
+	public static final String KEYWORD_MEDIA = "@media";
+
+	public static final String[] DEPRECATED_COLORS = new String[] { "aliceblue", "antiquewhite", "aquamarine", "azure",
+			"beige", "bisque", "blanchedalmond", "blueviolet", "brown", "burlywood", "cadetblue", "chartreuse",
+			"chocolate", "coral", "cornflowerblue", "cornsilk", "crimson", "cyan", "darkblue", "darkcyan",
+			"darkgoldenrod", "darkgray", "darkgreen", "darkgrey", "darkkhaki", "darkmagenta", "darkolivegreen",
+			"darkorange", "darkorchid", "darkred", "darksalmon", "darkseagreen", "darkslateblue", "darkslategray",
+			"darkslategrey", "darkturquoise", "darkviolet", "deeppink", "deepskyblue", "dimgray", "dimgrey",
+			"dodgerblue", "firebrick", "floralwhite", "forestgreen", "gainsboro", "ghostwhite", "gold", "goldenrod",
+			"greenyellow", "grey", "honeydew", "hotpink", "indianred", "indigo", "ivory", "khaki", "lavender",
+			"lavenderblush", "lawngreen", "lemonchiffon", "lightblue", "lightcoral", "lightcyan",
 			"lightgoldenrodyellow", "lightgray", "lightgreen", "lightgrey", "lightpink", "lightsalmon",
 			"lightseagreen", "lightskyblue", "lightslategray", "lightslategrey", "lightsteelblue", "lightyellow",
 			"limegreen", "linen", "magenta", "mediumaquamarine", "mediumblue", "mediumorchid", "mediumpurple",
@@ -63,14 +93,14 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 			"seagreen", "seashell", "sienna", "skyblue", "slateblue", "slategray", "slategrey", "snow", "springgreen",
 			"steelblue", "tan", "thistle", "tomato", "turquoise", "violet", "wheat", "whitesmoke", "yellowgreen" };
 
-	private static final String[] STANDARD_COLORS = { "aqua", "black", "blue", "fuchsia", "gray", "green", "lime",
+	public static final String[] STANDARD_COLORS = { "aqua", "black", "blue", "fuchsia", "gray", "green", "lime",
 			"maroon", "navy", "olive", "orange", "purple", "red", "silver", "teal", "white", "yellow" };
 
-	private static final String[] MEDIA = { "all", "aural", "braille", "embossed", "handheld", "print", "projection",
+	public static final String[] MEDIA = { "all", "aural", "braille", "embossed", "handheld", "print", "projection",
 			"screen", "tty", "tv" };
 
 	// FIXME Turn "em" back on when we can add hack to determine if we're inside or outside a rule
-	private static final String[] HTML_TAGS = { "a", "abbr", "acronym", "address", "area", "b", "base", "big",
+	public static final String[] HTML_TAGS = { "a", "abbr", "acronym", "address", "area", "b", "base", "big",
 			"blockquote", "body", "br", "button", "caption", "cite", "code", "col", "colgroup", "dd", "del", "details",
 			"dfn", "div", "dl", "dt", /* "em", */"embed", "fieldset", "figcaption", "figure", "form", "frame",
 			"frameset", "head", "hr", "html", "h1", "h2", "h3", "h4", "h5", "h6", "i", "iframe", "img", "input", "ins",
@@ -80,9 +110,9 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 			"thead", "time", "title", "tr", "tt", "ul", "var", "header", "nav", "section", "article", "footer",
 			"aside", "audio", "video", "canvas", "hgroup" };
 
-	private static final String[] FUNCTIONS = { "rgba", "rgb", "url", "attr", "counters", "counter", "linear-gradient" };
+	public static final String[] FUNCTIONS = { "rgba", "rgb", "url", "attr", "counters", "counter", "linear-gradient" };
 
-	private static final String[] PROPERTY_NAMES = { "alignment-adjust", "alignment-baseline", "azimuth",
+	public static final String[] PROPERTY_NAMES = { "alignment-adjust", "alignment-baseline", "azimuth",
 			"background-attachment", "background-clip", "background-color", "background-image", "background-origin",
 			"background-position-x", "background-position-y", "background-position", "background-quantity",
 			"background-repeat", "background-size", "background-spacing", "background", "behavior",
@@ -113,7 +143,7 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 			"user-select", "vertical-align", "visibility", "voice-family", "volume", "weight", "white-space", "widows",
 			"width", "word-break", "word-spacing", "word-wrap", "z-index", "zoom" };
 
-	private static final String[] PROPERTY_VALUES = { "absolute", "all-scroll", "always", "armenian", "auto",
+	public static final String[] PROPERTY_VALUES = { "absolute", "all-scroll", "always", "armenian", "auto",
 			"baseline", "below", "bidi-override", "blink", "block", "bold", "bolder", "border-box", "both", "bottom",
 			"break-all", "break-word", "capitalize", "center", "char", "circle", "cjk-ideographic", "col-resize",
 			"collapse", "content-box", "crosshair", "dashed", "decimal-leading-zero", "decimal", "default", "disabled",
@@ -134,11 +164,11 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 			"vertical", "visible", "w-resize", "wait", "whitespace", "xx-large", "xx-small", "x-small", "x-large",
 			"zero" };
 
-	private static final String[] FONT_NAMES = { "arial", "clean", "century", "comic", "courier", "garamond", "geneva",
+	public static final String[] FONT_NAMES = { "arial", "clean", "century", "comic", "courier", "garamond", "geneva",
 			"georgia", "helvetica", "impact", "lucida", "monaco", "symbol", "system", "tahoma", "times", "trebuchet",
 			"utopia", "verdana", "webdings", "sans-serif", "serif", "monospace" };
 
-	private static final Pattern CURLY_MEDIA_PATTERN = Pattern.compile("([{}]|" + KEYWORD_MEDIA + ")");
+	public static final Pattern CURLY_MEDIA_PATTERN = Pattern.compile("([{}]|" + KEYWORD_MEDIA + ")");
 
 	/**
 	 * Keep the level of curlies...
@@ -151,7 +181,7 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 	/**
 	 * CodeScanner
 	 */
-	public CSSCodeScanner()
+	public CSSCodeScannerRuleBased()
 	{
 		List<IRule> rules = createRules();
 
@@ -341,6 +371,9 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		return new Token(scope);
 	}
 
+	public static final VendorPropertyWordRule VENDOR_WORD_RULE = new VendorPropertyWordRule(
+			new IdentifierWithPrefixDetector('-'), new Token(CSSTokenType.PROPERTY), true);
+
 	/**
 	 * createVendorPropertyRules
 	 * 
@@ -348,27 +381,7 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 	 */
 	private ExtendedWordRule createVendorPropertyRules()
 	{
-		return new ExtendedWordRule(new IdentifierWithPrefixDetector('-'), createToken(CSSTokenType.PROPERTY), true)
-		{
-			@Override
-			protected boolean wordOK(String word, ICharacterScanner scanner)
-			{
-				// Table 1. Vendor Extension Prefixes
-				// Prefix Organisation
-				// -ms- Microsoft
-				// mso- Microsoft Office
-				// -moz- Mozilla Foundation (Gecko-based browsers)
-				// -o- Opera Software
-				// -atsc- Advanced Television Standards Committee
-				// -wap- The WAP Forum
-				// -webkit- Safari (and other WebKit-based browsers)
-				// -khtml-
-
-				return word.startsWith("-moz-") || word.startsWith("-webkit-") || word.startsWith("-ms-")
-						|| word.startsWith("-o-") || word.startsWith("-atsc-") || word.startsWith("-khtml-")
-						|| word.startsWith("-wap-");
-			}
-		};
+		return VENDOR_WORD_RULE;
 	}
 
 	/**

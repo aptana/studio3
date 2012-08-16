@@ -38,7 +38,8 @@ import com.aptana.editor.css.contentassist.CSSContentAssistProcessor;
 /**
  * @author Max Stepanov
  */
-public class CSSSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration {
+public class CSSSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration
+{
 
 	public final static String PREFIX = "__css_"; //$NON-NLS-1$
 	public final static String DEFAULT = PREFIX + IDocument.DEFAULT_CONTENT_TYPE;
@@ -46,7 +47,8 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 	public final static String STRING_DOUBLE = PREFIX + "string_double"; //$NON-NLS-1$
 	public final static String MULTILINE_COMMENT = PREFIX + "multiline_comment"; //$NON-NLS-1$
 
-	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, MULTILINE_COMMENT, STRING_SINGLE, STRING_DOUBLE };
+	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, MULTILINE_COMMENT, STRING_SINGLE,
+			STRING_DOUBLE };
 
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { ICSSConstants.CONTENT_TYPE_CSS } };
 
@@ -59,35 +61,43 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 
 	private static CSSSourceConfiguration instance;
 
-	static {
+	static
+	{
 		IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
 		c.addTranslation(new QualifiedContentType(ICSSConstants.CONTENT_TYPE_CSS), new QualifiedContentType(
 				ICSSConstants.CSS_SCOPE));
 		c.addTranslation(new QualifiedContentType(MULTILINE_COMMENT), new QualifiedContentType(
 				ICSSConstants.CSS_COMMENT_BLOCK_SCOPE));
-		c.addTranslation(new QualifiedContentType(STRING_DOUBLE), new QualifiedContentType(ICSSConstants.CSS_STRING_SCOPE));
-		c.addTranslation(new QualifiedContentType(STRING_SINGLE), new QualifiedContentType(ICSSConstants.CSS_STRING_SCOPE));
+		c.addTranslation(new QualifiedContentType(STRING_DOUBLE), new QualifiedContentType(
+				ICSSConstants.CSS_STRING_SCOPE));
+		c.addTranslation(new QualifiedContentType(STRING_SINGLE), new QualifiedContentType(
+				ICSSConstants.CSS_STRING_SCOPE));
 	}
 
-	public static CSSSourceConfiguration getDefault() {
-		if (instance == null) {
+	public static CSSSourceConfiguration getDefault()
+	{
+		if (instance == null)
+		{
 			instance = new CSSSourceConfiguration();
 		}
 		return instance;
 	}
 
-	private CSSSourceConfiguration() {
+	private CSSSourceConfiguration()
+	{
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#getContentTypes()
 	 */
-	public String[] getContentTypes() {
+	public String[] getContentTypes()
+	{
 		return CONTENT_TYPES;
 	}
 
-	public String[][] getTopContentTypes() {
+	public String[][] getTopContentTypes()
+	{
 		return TOP_CONTENT_TYPES;
 	}
 
@@ -95,7 +105,8 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#getPartitioningRules()
 	 */
-	public IPredicateRule[] getPartitioningRules() {
+	public IPredicateRule[] getPartitioningRules()
+	{
 		return partitioningRules;
 	}
 
@@ -103,7 +114,8 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#createSubPartitionScanner()
 	 */
-	public ISubPartitionScanner createSubPartitionScanner() {
+	public ISubPartitionScanner createSubPartitionScanner()
+	{
 		return new SubPartitionScanner(partitioningRules, CONTENT_TYPES, getToken(DEFAULT));
 	}
 
@@ -111,8 +123,10 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#getDocumentContentType(java.lang.String)
 	 */
-	public String getDocumentContentType(String contentType) {
-		if (contentType.startsWith(PREFIX)) {
+	public String getDocumentContentType(String contentType)
+	{
+		if (contentType.startsWith(PREFIX))
+		{
 			return ICSSConstants.CONTENT_TYPE_CSS;
 		}
 		return null;
@@ -120,10 +134,13 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text.presentation.PresentationReconciler, org.eclipse.jface.text.source.ISourceViewer)
+	 * @see
+	 * com.aptana.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text.presentation
+	 * .PresentationReconciler, org.eclipse.jface.text.source.ISourceViewer)
 	 */
-	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer) {
-		DefaultDamagerRepairer dr = new ThemeingDamagerRepairer(new CSSCodeScanner());
+	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer)
+	{
+		DefaultDamagerRepairer dr = new ThemeingDamagerRepairer(new CSSCodeScannerFlex());
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
 
@@ -145,24 +162,30 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.ISourceViewerConfiguration#getContentAssistProcessor(com.aptana.editor.common.AbstractThemeableEditor, java.lang.String)
+	 * @see com.aptana.editor.common.ISourceViewerConfiguration#getContentAssistProcessor(com.aptana.editor.common.
+	 * AbstractThemeableEditor, java.lang.String)
 	 */
-	public IContentAssistProcessor getContentAssistProcessor(AbstractThemeableEditor editor, String contentType) {
-		if (IDocument.DEFAULT_CONTENT_TYPE.equals(contentType) || CSSSourceConfiguration.DEFAULT.equals(contentType)) {
+	public IContentAssistProcessor getContentAssistProcessor(AbstractThemeableEditor editor, String contentType)
+	{
+		if (IDocument.DEFAULT_CONTENT_TYPE.equals(contentType) || CSSSourceConfiguration.DEFAULT.equals(contentType))
+		{
 			return new CSSContentAssistProcessor(editor);
 		}
 		return null;
 	}
 
-	private ITokenScanner getCommentScanner() {
+	private ITokenScanner getCommentScanner()
+	{
 		return new CommentScanner(getToken(ICSSConstants.CSS_COMMENT_BLOCK_SCOPE));
 	}
 
-	private ITokenScanner getStringScanner() {
+	private ITokenScanner getStringScanner()
+	{
 		return new SingleTokenScanner(getToken(ICSSConstants.CSS_STRING_SCOPE));
 	}
 
-	private static IToken getToken(String tokenName) {
+	private static IToken getToken(String tokenName)
+	{
 		return CommonUtil.getToken(tokenName);
 	}
 

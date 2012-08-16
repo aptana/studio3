@@ -47,7 +47,12 @@ public abstract class AbstractTokenScannerTestCase extends TestCase
 
 	protected void assertToken(String msg, IToken token, int offset, int length)
 	{
-		assertEquals("Token scope doesn't match", token.getData(), scanner.nextToken().getData());
+		IToken nextToken = scanner.nextToken();
+		if (nextToken == null)
+		{
+			fail("Not expecting null token!");
+		}
+		assertEquals("Token scope doesn't match", token.getData(), nextToken.getData());
 		assertEquals("Offsets don't match", offset, scanner.getTokenOffset());
 		assertEquals("Lengths don't match", length, scanner.getTokenLength());
 	}

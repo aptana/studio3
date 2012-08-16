@@ -12,17 +12,14 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 
-import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IToken;
-import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.Token;
 
 import beaver.Symbol;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.editor.common.parsing.AbstractFlexTokenScanner;
 import com.aptana.editor.js.parsing.JSFlexScanner;
 import com.aptana.editor.js.parsing.Terminals;
 import com.aptana.editor.js.parsing.lexer.JSScopeType;
@@ -30,7 +27,7 @@ import com.aptana.editor.js.parsing.lexer.JSScopeType;
 /**
  * Code scanner for Javascript based on JFlex.
  */
-public class JSCodeScanner implements ITokenScanner
+public class JSCodeScanner extends AbstractFlexTokenScanner
 {
 	private static final Token UNDEFINED_TOKEN = new Token(JSScopeType.UNDEFINED.getScope());
 	private static final Token NUMBER_TOKEN = new Token(JSScopeType.NUMBER.getScope());
@@ -87,121 +84,22 @@ public class JSCodeScanner implements ITokenScanner
 	 */
 	private State fCurrentState = State.DEFAULT;
 
-	/**
-	 * JFlex-based scanner.
-	 */
-	private final JSFlexScanner fScanner = new JSFlexScanner();
-
-	/**
-	 * Queue used to put symbols we look-ahead
-	 */
-	private Queue<Symbol> fQueue = new LinkedList<Symbol>();
-
-	/**
-	 * Offset set (needed to properly return the ranges as our offset will be relative to this position).
-	 */
-	private int fOffset;
-
-	/**
-	 * Start with -1 offset so that whitespace token emulation works when document starts with spaces.
-	 */
-	private Symbol fLastSymbol = new Symbol((short) -1, -1, -1);
-
-	/**
-	 * Offset of the token found (relative to fOffset).
-	 */
-	private int fTokenOffset;
-
-	/**
-	 * Length of the token found.
-	 */
-	private int fTokenLen;
-
-	/**
-	 * Whether the last returned token was a 'generated' whitespace token.
-	 */
-	private boolean fLastWasWhitespace = false;
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.text.rules.ITokenScanner#setRange(org.eclipse.jface.text.IDocument, int, int)
-	 */
-	public void setRange(IDocument document, int offset, int length)
+	public JSCodeScanner()
 	{
-		fLastWasWhitespace = false;
-		Assert.isLegal(document != null);
-		final int documentLength = document.getLength();
-
-		// Check the range
-		Assert.isLegal(offset > -1);
-		Assert.isLegal(length > -1);
-		Assert.isLegal(offset + length <= documentLength);
-
-		this.fOffset = offset;
-
-		try
-		{
-			fScanner.setSource(document.get(offset, length));
-		}
-		catch (BadLocationException e)
-		{
-			IdeLog.logError(JSPlugin.getDefault(), e);
-		}
+		super(new JSFlexScanner());
 	}
 
-	/**
-	 * Gathers the next token based on the JSScanner. Note that it does some manipulations to create whitespace tokens
-	 * (which the jflex js scanner does not return).
-	 * 
-	 * @see org.eclipse.jface.text.rules.ITokenScanner#nextToken()
-	 */
-	public IToken nextToken()
+	protected void setSource(String string)
 	{
-		try
-		{
-			Symbol symbol;
-			if (fLastWasWhitespace)
-			{
-				symbol = fLastSymbol;
-				fLastWasWhitespace = false;
-			}
-			else
-			{
-
-				symbol = fQueue.poll();
-				if (symbol == null)
-				{
-					symbol = fScanner.nextToken();
-				}
-				// Emulate whitespace token creation.
-				if (symbol.getStart() > fLastSymbol.getEnd() + 1)
-				{
-					fTokenOffset = fLastSymbol.getEnd() + 1;
-					fTokenLen = symbol.getStart() - fLastSymbol.getEnd() - 1;
-					fLastSymbol = symbol;
-					fLastWasWhitespace = true;
-					return Token.WHITESPACE;
-				}
-				else
-				{
-					fLastWasWhitespace = false;
-				}
-			}
-
-			fTokenOffset = symbol.getStart();
-			fTokenLen = symbol.getEnd() - symbol.getStart() + 1;
-			IToken ret = mapToken(symbol);
-			fLastSymbol = symbol;
-			return ret;
-		}
-		catch (Exception e)
-		{
-			IdeLog.logError(JSPlugin.getDefault(), e);
-			return UNDEFINED_TOKEN;
-		}
+		((JSFlexScanner) fScanner).setSource(string);
 	}
 
-	private IToken mapToken(Symbol token) throws IOException, beaver.Scanner.Exception
+	protected IToken getUndefinedToken()
+	{
+		return UNDEFINED_TOKEN;
+	}
+
+	protected IToken mapToken(Symbol token) throws IOException, beaver.Scanner.Exception
 	{
 		switch (token.getId())
 		{
@@ -344,7 +242,7 @@ public class JSCodeScanner implements ITokenScanner
 					// We have to do a look-ahead for this use-case.
 
 					// This is a queue with a copy of the tokens we've already looked ahead at this time.
-					Queue<Symbol> tempQueue = fQueue.peek() != null ? new LinkedList<Symbol>(fQueue) : null;
+					Queue<Symbol> tempQueue = fLookAheadQueue.peek() != null ? new LinkedList<Symbol>(fLookAheadQueue) : null;
 
 					while (true)
 					{
@@ -439,44 +337,6 @@ public class JSCodeScanner implements ITokenScanner
 				IdeLog.logWarning(JSPlugin.getDefault(), msg);
 		}
 		return UNDEFINED_TOKEN;
-	}
-
-	private Symbol lookAhead(Queue<Symbol> tempQueue) throws IOException, beaver.Scanner.Exception
-	{
-		Symbol nextToken;
-		if (tempQueue == null)
-		{
-			nextToken = fScanner.nextToken();
-			fQueue.add(nextToken);
-			return nextToken;
-		}
-
-		nextToken = tempQueue.poll();
-		if (nextToken != null)
-		{
-			return nextToken;
-		}
-		nextToken = fScanner.nextToken();
-		fQueue.add(nextToken);
-		return nextToken;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.text.rules.ITokenScanner#getTokenOffset()
-	 */
-	public int getTokenOffset()
-	{
-		return fOffset + fTokenOffset;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.text.rules.ITokenScanner#getTokenLength()
-	 */
-	public int getTokenLength()
-	{
-		return fTokenLen;
 	}
 
 }
