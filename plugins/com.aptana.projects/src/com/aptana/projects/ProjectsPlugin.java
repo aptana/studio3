@@ -16,6 +16,7 @@ import org.osgi.framework.BundleContext;
 
 import com.aptana.core.projects.templates.ProjectTemplate;
 import com.aptana.core.projects.templates.TemplateType;
+import com.aptana.projects.templates.IDefaultProjectTemplate;
 import com.aptana.projects.templates.ProjectTemplatesManager;
 
 /**
@@ -32,7 +33,7 @@ public class ProjectsPlugin extends AbstractUIPlugin
 
 	private ProjectTemplatesManager templatesManager;
 
-	private static class DefaultWebProjectTemplate extends ProjectTemplate
+	private static class DefaultWebProjectTemplate extends ProjectTemplate implements IDefaultProjectTemplate
 	{
 
 		private static final String ID = "com.aptana.projects.web.default"; //$NON-NLS-1$

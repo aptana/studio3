@@ -59,6 +59,7 @@ import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.ui.CloneJob;
 import com.aptana.projects.ProjectsPlugin;
 import com.aptana.projects.internal.wizards.Messages;
+import com.aptana.projects.templates.IDefaultProjectTemplate;
 import com.aptana.ui.util.UIUtils;
 import com.aptana.usage.FeatureEvent;
 import com.aptana.usage.StudioAnalytics;
@@ -162,7 +163,7 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 		// Add the template selection page
 		List<IProjectTemplate> templates = ProjectsPlugin.getDefault().getTemplatesManager()
 				.getTemplates(templateTypes);
-		if (templates.size() > 0 && selectedTemplate == null)
+		if (hasNonDefaultTemplates(templates) && selectedTemplate == null)
 		{
 			addPage(templatesPage = new ProjectTemplateSelectionPage(TEMPLATE_SELECTION_PAGE_NAME, templates));
 			stepPages.add(templatesPage);
@@ -601,5 +602,17 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 	{
 		new ProjectTemplate(zipPath.getAbsolutePath(), null, "", isReplacingParameters, "", null, "").apply(project, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				promptForOverwrite);
+	}
+
+	private static boolean hasNonDefaultTemplates(List<IProjectTemplate> templates)
+	{
+		for (IProjectTemplate template : templates)
+		{
+			if (!(template instanceof IDefaultProjectTemplate))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 }
