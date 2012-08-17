@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -37,6 +37,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
+import com.aptana.core.IMap;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
@@ -78,6 +79,9 @@ import com.aptana.webserver.core.WebServerCorePlugin;
 
 public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 {
+	private static final String CLASS = "class"; //$NON-NLS-1$
+	private static final String ID = "id"; //$NON-NLS-1$
+
 	private static final String DOCTYPE_PRECEDING_TEXT = "!"; //$NON-NLS-1$
 
 	private static final class URIPathProposal extends CommonCompletionProposal
@@ -372,21 +376,22 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	private List<ICompletionProposal> addAttributeValueProposals(int offset, String elementName, String attributeName)
 	{
-		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
 		AttributeElement attribute = this._queryHelper.getAttribute(elementName, attributeName);
-
 		if (attribute != null)
 		{
-			for (ValueElement value : attribute.getValues())
-			{
-				String name = value.getName();
-				Image icon = ATTRIBUTE_ICON;
-				String description = value.getDescription();
+			final Image[] userAgents = UserAgentManager.getInstance().getUserAgentImages(getProject(),
+					getActiveUserAgentIds());
+			final IRange range = _replaceRange != null ? _replaceRange : new Range(offset, offset - 1);
 
-				this.addProposal(proposals, name, icon, description, getActiveUserAgentIds(), offset);
-			}
+			return CollectionsUtil.map(attribute.getValues(), new IMap<ValueElement, ICompletionProposal>()
+			{
+				public ICompletionProposal map(ValueElement value)
+				{
+					return new HTMLAttributeValueProposal(value, range, userAgents);
+				}
+			});
 		}
-		return proposals;
+		return Collections.emptyList();
 	}
 
 	/**
@@ -399,7 +404,6 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	private List<ICompletionProposal> addAttributeValueProposals(ILexemeProvider<HTMLTokenType> lexemeProvider,
 			int offset)
 	{
-		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
 		String attributeName = this.getAttributeName(lexemeProvider, offset);
 
 		if (attributeName != null && attributeName.length() > 0)
@@ -412,7 +416,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					if (this._currentLexeme.getLength() >= 2)
 					{
 						Range range = null;
-						if ("id".equals(attributeName) || "class".equals(attributeName)) { //$NON-NLS-1$//$NON-NLS-2$
+						if (ID.equals(attributeName) || CLASS.equals(attributeName))
+						{
 							range = HTMLUtils.getAttributeValueRange(this._currentLexeme, offset);
 						}
 						if (range == null)
@@ -437,29 +442,33 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					break;
 
 				default:
+					// If the current lexeme and the attribute name don't match, make the replacement null
+					if (!_currentLexeme.getText().equals(attributeName))
+					{
+						this._replaceRange = null;
+					}
 					break;
 			}
 
-			if (attributeName.equals("id")) //$NON-NLS-1$
+			if (attributeName.equals(ID))
 			{
-				proposals.addAll(this.addIDProposals(offset));
+				return addIDProposals(offset);
 			}
-			else if ("class".equals(attributeName)) //$NON-NLS-1$
+			else if (CLASS.equals(attributeName))
 			{
-				proposals.addAll(this.addClassProposals(offset));
+				return addClassProposals(offset);
 			}
 			else if ("src".equals(attributeName) || "href".equals(attributeName)) //$NON-NLS-1$ //$NON-NLS-2$
 			{
-				proposals.addAll(this.addURIPathProposals(offset));
+				return addURIPathProposals(offset);
 			}
 			else
 			{
 				String elementName = this.getElementName(lexemeProvider, offset);
-
-				proposals.addAll(this.addAttributeValueProposals(offset, elementName, attributeName));
+				return addAttributeValueProposals(offset, elementName, attributeName);
 			}
 		}
-		return proposals;
+		return Collections.emptyList();
 	}
 
 	/**
