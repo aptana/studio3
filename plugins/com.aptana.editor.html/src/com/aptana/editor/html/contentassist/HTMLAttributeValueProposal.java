@@ -1,0 +1,79 @@
+/**
+ * Aptana Studio
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
+package com.aptana.editor.html.contentassist;
+
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.swt.graphics.Image;
+
+import com.aptana.editor.common.contentassist.CommonCompletionProposal;
+import com.aptana.editor.html.HTMLPlugin;
+import com.aptana.editor.html.contentassist.index.IHTMLIndexConstants;
+import com.aptana.editor.html.contentassist.model.ValueElement;
+import com.aptana.parsing.lexer.IRange;
+
+public class HTMLAttributeValueProposal extends CommonCompletionProposal
+{
+
+	private static final Image ATTRIBUTE_ICON = HTMLPlugin.getImage("/icons/attribute.png"); //$NON-NLS-1$
+
+	public HTMLAttributeValueProposal(ValueElement value, IRange range, Image[] userAgents)
+	{
+		super(value.getName(), range.getStartingOffset(), range.getLength(), value.getName().length(), ATTRIBUTE_ICON,
+				value.getName(), null, value.getDescription());
+		setFileLocation(IHTMLIndexConstants.CORE);
+		setUserAgentImages(userAgents);
+	}
+
+	public void apply(ITextViewer viewer, char trigger, int stateMask, int offset)
+	{
+		try
+		{
+			IDocument document = viewer.getDocument();
+			// Handle wrapping in quotes if necessary
+			char prevChar = document.getChar(offset - 1);
+			switch (prevChar)
+			{
+				case '\'':
+				case '"':
+					// We're fine
+					break;
+
+				default:
+					// Add wrapping quotes
+					_replacementString = "\"" + _replacementString + "\""; //$NON-NLS-1$ //$NON-NLS-2$
+					break;
+			}
+			// handle adding trailing space if necessary
+			char nextChar = document.getChar(offset + _replacementLength);
+			switch (nextChar)
+			{
+				case '\'':
+				case '"':
+				case ' ':
+				case '\t':
+				case '>':
+				case '/':
+					// We're fine
+					break;
+
+				default:
+					// Add a space
+					_replacementString += " "; //$NON-NLS-1$
+					break;
+			}
+
+		}
+		catch (BadLocationException e)
+		{
+			// ignore
+		}
+		super.apply(viewer, trigger, stateMask, offset);
+	}
+}
