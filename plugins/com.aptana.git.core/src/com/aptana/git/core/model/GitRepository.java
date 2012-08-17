@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -1044,7 +1044,7 @@ public class GitRepository
 	{
 		if (index == null)
 		{
-			index = new GitIndex(this, workingDirectory());
+			index = new GitIndex(this);
 		}
 		return index;
 	}
@@ -1546,6 +1546,11 @@ public class GitRepository
 	{
 		IPath workingDirectory = workingDirectory();
 		IPath resourcePath = theResource.getLocation();
+		// What if the resource is a project, we get null for default locations!
+		if (theResource instanceof IProject && resourcePath == null)
+		{
+			resourcePath = ResourcesPlugin.getWorkspace().getRoot().getLocation().append(theResource.getName());
+		}
 		if (workingDirectory.isPrefixOf(resourcePath))
 		{
 			resourcePath = resourcePath.makeRelativeTo(workingDirectory);
@@ -1582,7 +1587,7 @@ public class GitRepository
 
 	void dispose()
 	{
-		// clean up any listeners/etc!
+		// clean up any file watchers
 		if (fileWatcherIds != null)
 		{
 			for (Integer fileWatcherId : fileWatcherIds)
@@ -1598,6 +1603,13 @@ public class GitRepository
 			}
 		}
 		fileWatcherIds = null;
+		// stop running any jobs in the index!
+		if (index != null)
+		{
+			index.dispose();
+			index = null;
+		}
+		// clear up the listeners to this repo
 		if (listeners != null)
 		{
 			synchronized (listeners)
@@ -1606,9 +1618,9 @@ public class GitRepository
 				listeners = null;
 			}
 		}
+
 		_headRef = null;
 		hasChanged = false;
-		index = null;
 		refs = null;
 		branches = null;
 	}
