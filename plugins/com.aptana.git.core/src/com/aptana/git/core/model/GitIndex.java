@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
 
 import com.aptana.core.IFilter;
@@ -71,10 +72,8 @@ public class GitIndex
 
 	private Vector<ChangedFile> files;
 
-	GitIndex(GitRepository repository, IPath workingDirectory)
+	GitIndex(GitRepository repository)
 	{
-		super();
-
 		Assert.isNotNull(repository, "GitIndex requires a repository"); //$NON-NLS-1$
 		this.repository = repository;
 	}
@@ -100,6 +99,12 @@ public class GitIndex
 					}
 					refresh(monitor);
 					return Status.OK_STATUS;
+				}
+
+				@Override
+				public boolean belongsTo(Object family)
+				{
+					return family == GitIndex.this;
 				}
 			};
 			indexRefreshJob.setSystem(!EclipseUtil.showSystemJobs());
@@ -741,6 +746,12 @@ public class GitIndex
 				refresh(true, paths, monitor);
 				return Status.OK_STATUS;
 			}
+
+			@Override
+			public boolean belongsTo(Object family)
+			{
+				return family == GitIndex.this;
+			}
 		};
 		job.setSystem(!EclipseUtil.showSystemJobs());
 		job.schedule();
@@ -758,6 +769,12 @@ public class GitIndex
 			this.index = index;
 			this.repo = index.repository;
 			this.filePaths = filePaths;
+		}
+
+		@Override
+		public boolean belongsTo(Object family)
+		{
+			return family == index;
 		}
 
 		protected List<String> linesFromNotification(String string)
@@ -950,7 +967,15 @@ public class GitIndex
 				args.add("--"); //$NON-NLS-1$
 				args.addAll(filePaths);
 			}
+			if (monitor != null && monitor.isCanceled())
+			{
+				return Status.CANCEL_STATUS;
+			}
 			IStatus result = repo.execute(GitRepository.ReadWrite.READ, args.toArray(new String[args.size()]));
+			if (monitor != null && monitor.isCanceled())
+			{
+				return Status.CANCEL_STATUS;
+			}
 			if (result != null && result.isOK())
 			{
 				readStagedFiles(result.getMessage());
@@ -983,7 +1008,15 @@ public class GitIndex
 				args.add("--"); //$NON-NLS-1$
 				args.addAll(filePaths);
 			}
+			if (monitor != null && monitor.isCanceled())
+			{
+				return Status.CANCEL_STATUS;
+			}
 			IStatus result = repo.execute(GitRepository.ReadWrite.READ, args.toArray(new String[args.size()]));
+			if (monitor != null && monitor.isCanceled())
+			{
+				return Status.CANCEL_STATUS;
+			}
 			if (result != null && result.isOK())
 			{
 				readUnstagedFiles(result.getMessage());
@@ -1017,7 +1050,15 @@ public class GitIndex
 				args.add("--"); //$NON-NLS-1$
 				args.addAll(filePaths);
 			}
+			if (monitor != null && monitor.isCanceled())
+			{
+				return Status.CANCEL_STATUS;
+			}
 			IStatus result = repo.execute(GitRepository.ReadWrite.READ, args.toArray(new String[args.size()]));
+			if (monitor != null && monitor.isCanceled())
+			{
+				return Status.CANCEL_STATUS;
+			}
 			if (result != null && result.isOK())
 			{
 				readOtherFiles(result.getMessage());
@@ -1048,6 +1089,16 @@ public class GitIndex
 			}
 
 			addFilesFromDictionary(dictionary, false, false);
+		}
+	}
+
+	void dispose()
+	{
+		// Cancel any jobs we're running in the index!
+		IJobManager jobManager = Job.getJobManager();
+		if (jobManager != null)
+		{
+			jobManager.cancel(this);
 		}
 	}
 }

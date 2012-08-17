@@ -36,7 +36,7 @@ public class GitIndexTest extends GitTestCase
 		ChangedFile changedFile = new ChangedFile(fileName, Status.UNMERGED);
 		changedFile.hasUnstagedChanges = true;
 		blah.add(changedFile);
-		GitIndex index = new GitIndex(repo, repo.workingDirectory());
+		GitIndex index = new GitIndex(repo);
 		index.changedFiles = blah;
 
 		assertTrue(index.hasUnresolvedMergeConflicts());
@@ -81,7 +81,7 @@ public class GitIndexTest extends GitTestCase
 		writer.write("Hello World!");
 		writer.close();
 
-		GitIndex index = new GitIndex(repo, repo.workingDirectory());
+		GitIndex index = new GitIndex(repo);
 
 		// Commit the new file
 		index.stageFiles(index.changedFiles());

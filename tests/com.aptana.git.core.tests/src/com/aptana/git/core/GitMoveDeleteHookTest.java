@@ -15,7 +15,9 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.team.IResourceTree;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -29,6 +31,8 @@ import org.jmock.lib.legacy.ClassImposteriser;
 
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.core.model.GitRepositoryManager;
+import com.aptana.git.core.model.IGitRepositoryManager;
 
 public class GitMoveDeleteHookTest extends TestCase
 {
@@ -38,6 +42,7 @@ public class GitMoveDeleteHookTest extends TestCase
 	private IFolder folder;
 	private IProject project;
 	private GitRepository repo;
+	private GitRepositoryManager repoManager;
 	private GitMoveDeleteHook hook;
 
 	protected void setUp() throws Exception
@@ -54,6 +59,7 @@ public class GitMoveDeleteHookTest extends TestCase
 		folder = context.mock(IFolder.class);
 		project = context.mock(IProject.class);
 		repo = context.mock(GitRepository.class);
+		repoManager = context.mock(GitRepositoryManager.class);
 		hook = new GitMoveDeleteHook()
 		{
 			@Override
@@ -574,5 +580,172 @@ public class GitMoveDeleteHookTest extends TestCase
 
 	// TODO Add tests for moving files
 	// TODO Add tests for moving folders
-	// TODO Add tests for moving projects
+
+	public void testMoveProjectWhenProjectRootIsRootOfRepo() throws Exception
+	{
+		hook = new GitMoveDeleteHook()
+		{
+			@Override
+			protected GitRepository getAttachedGitRepository(IProject project)
+			{
+				return repo;
+			}
+
+			@Override
+			protected IGitRepositoryManager getGitRepositoryManager()
+			{
+				return repoManager;
+			}
+		};
+		final IProjectDescription description = ResourcesPlugin.getWorkspace().newProjectDescription("newName");
+		context.checking(new Expectations()
+		{
+			{
+				oneOf(repo).workingDirectory();
+				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root" + File.separator
+						+ "project")));
+
+				oneOf(project).getLocation();
+				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root" + File.separator
+						+ "project")));
+
+				// Verify we remove our git support
+				oneOf(repoManager).removeRepository(project);
+
+				// Let eclipse do the actual moving of files/project
+				oneOf(tree).standardMoveProject(with(same(project)), with(same(description)),
+						with(equal(IResource.FORCE)), with(any(NullProgressMonitor.class)));
+
+				// then we re-attach our support
+				oneOf(repoManager).attachExisting(with(same(project)), with(any(NullProgressMonitor.class)));
+
+				// Don't ever try to move files ourselves
+				never(repo).moveFile(with(any(Path.class)), with(any(Path.class)));
+			}
+		});
+
+		assertTrue(hook.moveProject(tree, project, description, IResource.FORCE, new NullProgressMonitor()));
+		context.assertIsSatisfied();
+	}
+
+	public void testMoveProjectWithNoGitRepoPunts() throws Exception
+	{
+		hook = new GitMoveDeleteHook()
+		{
+			@Override
+			protected GitRepository getAttachedGitRepository(IProject project)
+			{
+				return null;
+			}
+		};
+		final IProjectDescription description = ResourcesPlugin.getWorkspace().newProjectDescription("newName");
+		assertFalse(hook.moveProject(tree, project, description, IResource.FORCE, new NullProgressMonitor()));
+	}
+
+	public void testMoveProjectWhenProjectIsChildOfRepoRoot() throws Exception
+	{
+		hook = new GitMoveDeleteHook()
+		{
+			@Override
+			protected GitRepository getAttachedGitRepository(IProject project)
+			{
+				return repo;
+			}
+
+			@Override
+			protected boolean hasNoCommittedFiles(IPath source, GitRepository repo)
+			{
+				return false;
+			}
+
+			@Override
+			protected IGitRepositoryManager getGitRepositoryManager()
+			{
+				return repoManager;
+			}
+		};
+		final IProjectDescription description = ResourcesPlugin.getWorkspace().newProjectDescription("newName");
+		description.setLocation(Path.fromPortableString("/some/root/newName"));
+		context.checking(new Expectations()
+		{
+			{
+				oneOf(repo).workingDirectory();
+				will(returnValue(Path.fromPortableString("/some/root")));
+
+				oneOf(project).getLocation();
+				will(returnValue(Path.fromPortableString("/some/root/project")));
+
+				// Verify we NEVER remove our git support
+				never(repoManager).removeRepository(project);
+
+				// We DO NOT let eclipse do the actual moving of files/project
+				never(tree).standardMoveProject(with(same(project)), with(same(description)),
+						with(equal(IResource.FORCE)), with(any(NullProgressMonitor.class)));
+
+				// We grab the relative path of the project to root of repo
+				oneOf(repo).relativePath(project);
+				will(returnValue(Path.fromPortableString("project")));
+
+				// We treat the moving of the project as a moved subfolder of git
+				oneOf(repo).moveFile(with(equal(Path.fromPortableString("project"))),
+						with(equal(Path.fromPortableString("newName"))));
+				will(returnValue(Status.OK_STATUS));
+
+				// We let eclipse know we moved the project
+				oneOf(tree).movedProjectSubtree(project, description);
+			}
+		});
+
+		assertTrue(hook.moveProject(tree, project, description, IResource.FORCE, new NullProgressMonitor()));
+		context.assertIsSatisfied();
+	}
+
+	public void testMoveProjectWhenProjectIsChildOfRepoRootAndDestinationIsOutsideRepo() throws Exception
+	{
+		hook = new GitMoveDeleteHook()
+		{
+			@Override
+			protected GitRepository getAttachedGitRepository(IProject project)
+			{
+				return repo;
+			}
+
+			@Override
+			protected boolean hasNoCommittedFiles(IPath source, GitRepository repo)
+			{
+				return false;
+			}
+
+			@Override
+			protected IGitRepositoryManager getGitRepositoryManager()
+			{
+				return repoManager;
+			}
+		};
+		final IProjectDescription description = ResourcesPlugin.getWorkspace().newProjectDescription("newName");
+		description.setLocation(Path.fromPortableString("/usr/elsewhere/newName"));
+		context.checking(new Expectations()
+		{
+			{
+				oneOf(repo).workingDirectory();
+				will(returnValue(Path.fromPortableString("/some/root")));
+
+				oneOf(project).getLocation();
+				will(returnValue(Path.fromPortableString("/some/root/project")));
+
+				// Verify we remove our git support
+				oneOf(repoManager).removeRepository(project);
+
+				// We let eclipse do the actual moving of files/project
+				oneOf(tree).standardMoveProject(with(same(project)), with(same(description)),
+						with(equal(IResource.FORCE)), with(any(NullProgressMonitor.class)));
+
+				// We never re-attach
+				never(repoManager).attachExisting(with(same(project)), with(any(NullProgressMonitor.class)));
+			}
+		});
+
+		assertTrue(hook.moveProject(tree, project, description, IResource.FORCE, new NullProgressMonitor()));
+		context.assertIsSatisfied();
+	}
 }
