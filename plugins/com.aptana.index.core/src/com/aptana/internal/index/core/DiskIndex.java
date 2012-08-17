@@ -1902,7 +1902,7 @@ public class DiskIndex
 		{
 			throw new IOException(
 					MessageFormat
-							.format("Trying to write a string that is too long and will overflow the recorded length maximum. length: {0}, string: ''{2}''", //$NON-NLS-1$
+							.format("Trying to write a string that is too long and will overflow the recorded length maximum. length: {0}, string: ''{1}''", //$NON-NLS-1$
 									length, signature));
 		}
 
