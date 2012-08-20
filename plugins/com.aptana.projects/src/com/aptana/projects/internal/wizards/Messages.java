@@ -30,6 +30,12 @@ public class Messages extends NLS
 	public static String NewProjectWizard_ZipFailure;
 	public static String AbstractNewProjectWizard_CloningFromGitMsg;
 
+	public static String AbstractNewProjectWizard_ProjectListener_NoDescriptor_Error;
+
+	public static String AbstractNewProjectWizard_ProjectListener_TaskName;
+
+	public static String AbstractNewProjectWizard_ProjectListenerErrorTitle;
+
 	public static String OverwriteFilesSelectionDialog_overwriteFilesTitle;
 
 	public static String ProjectTemplateSelectionPage_AvailableTemplates_TXT;
