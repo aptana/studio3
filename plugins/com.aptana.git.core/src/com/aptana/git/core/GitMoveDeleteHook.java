@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -16,6 +16,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.team.IMoveDeleteHook;
 import org.eclipse.core.resources.team.IResourceTree;
 import org.eclipse.core.runtime.CoreException;
@@ -36,7 +37,6 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 	static final Status CANNOT_MODIFY_REPO = new Status(IStatus.ERROR, GitPlugin.getPluginId(), 0,
 			Messages.GitMoveDeleteHook_CannotModifyRepository_ErrorMessage, null);
 	private static final boolean I_AM_DONE = true;
-	private static final boolean FINISH_FOR_ME = false;
 
 	public boolean deleteFile(final IResourceTree tree, final IFile file, final int updateFlags, // NO_UCD
 			final IProgressMonitor monitor)
@@ -313,9 +313,81 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 	public boolean moveProject(final IResourceTree tree, final IProject source, final IProjectDescription description,
 			final int updateFlags, final IProgressMonitor monitor)
 	{
-		// TODO: We should be able to do this without too much effort when the
-		// projects belong to the same Git repository.
-		return FINISH_FOR_ME;
+		GitRepository repo = getAttachedGitRepository(source);
+		if (repo == null)
+		{
+			// no git support attached, just let eclipse handle moving this project.
+			return false;
+		}
+
+		IPath workingDirectory = repo.workingDirectory();
+
+		// Project root = git root, so unattach, move, re-attach
+		if (workingDirectory.equals(source.getLocation()))
+		{
+			// Unattach our git support and stop all actions on this repo!
+			getGitRepositoryManager().removeRepository(source);
+
+			// Move the project in a standard way
+			tree.standardMoveProject(source, description, updateFlags, monitor);
+
+			// Now re-attach our git support to the new location?
+			try
+			{
+				getGitRepositoryManager().attachExisting(source, monitor);
+			}
+			catch (CoreException e)
+			{
+				// ignore
+			}
+
+			return true;
+		}
+
+		IPath destPath = description.getLocation();
+		// location may be null for default location!
+		if (destPath == null)
+		{
+			destPath = ResourcesPlugin.getWorkspace().getRoot().getLocation().append(description.getName());
+		}
+
+		// What if the destination is not under the repo? Unattach our support, move it and return
+		if (!workingDirectory.isPrefixOf(destPath))
+		{
+			// Unattach our git support and stop all actions on this repo!
+			getGitRepositoryManager().removeRepository(source);
+
+			// Move the project in a standard way
+			tree.standardMoveProject(source, description, updateFlags, monitor);
+			return true;
+		}
+		destPath = destPath.makeRelativeTo(workingDirectory);
+
+		// Moving project underneath repo root to another location under repo, handle like moving a folder.
+		IPath sourcePath = getRepoRelativePath(source, repo);
+		// If source folder contains no already committed files, we need to punt!
+		if (hasNoCommittedFiles(sourcePath, repo))
+		{
+			return false;
+		}
+
+		// Honor the KEEP LOCAL HISTORY update flag!
+		if ((updateFlags & IResource.KEEP_HISTORY) == IResource.KEEP_HISTORY)
+		{
+			addFilesToLocalHistoryRecursively(tree, source);
+		}
+
+		IStatus status = repo.moveFile(sourcePath, destPath);
+		// Call tree.failed if failed, call tree.movedProjectSubtree if success
+		if (status.isOK())
+		{
+			tree.movedProjectSubtree(source, description);
+		}
+		else
+		{
+			tree.failed(status);
+		}
+		return true;
 	}
 
 	private boolean cannotModifyRepository(final IResourceTree tree)
@@ -334,7 +406,7 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 		return getGitRepositoryManager().getAttached(project);
 	}
 
-	private IGitRepositoryManager getGitRepositoryManager()
+	protected IGitRepositoryManager getGitRepositoryManager()
 	{
 		return GitPlugin.getDefault().getGitRepositoryManager();
 	}

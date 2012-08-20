@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -818,6 +818,21 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 
 		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
 		assertTrue(proposals.length > 0);
+	}
+
+	public void testAPSTUD5017()
+	{
+		String document = "<video autoplay=|preload=\"none\"></video>";
+		int offset = HTMLTestUtil.findCursorOffset(document);
+		fDocument = HTMLTestUtil.createDocument(document, true);
+		ITextViewer viewer = createTextViewer(fDocument);
+
+		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
+		assertTrue(proposals.length >= 1); // "autoplay"
+		// insert the "autoplay" proposal
+		AssertUtil.assertProposalFound("autoplay", proposals);
+		AssertUtil.assertProposalApplies("<video autoplay=\"autoplay\" preload=\"none\"></video>", fDocument, "autoplay",
+				proposals, offset, null);
 	}
 
 	public void testRelativeHREFFileProposals() throws Exception
