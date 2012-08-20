@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.osgi.util.NLS;
@@ -59,6 +60,8 @@ import com.aptana.git.ui.CloneJob;
 import com.aptana.projects.ProjectsPlugin;
 import com.aptana.projects.util.ProjectUtil;
 import com.aptana.projects.internal.wizards.Messages;
+import com.aptana.projects.listeners.IStudioProjectListener;
+import com.aptana.projects.listeners.StudioProjectListenersManager;
 import com.aptana.projects.templates.IDefaultProjectTemplate;
 import com.aptana.ui.util.UIUtils;
 import com.aptana.usage.FeatureEvent;
@@ -231,7 +234,57 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 
 				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
 				{
-					createNewProject(monitor);
+					SubMonitor subMonitor = SubMonitor.convert(monitor, 5);
+					createNewProject(subMonitor.newChild(4));
+
+					// Perform post project hooks
+					try
+					{
+						IStudioProjectListener[] projectListeners = new IStudioProjectListener[0];
+						IProjectDescription description = newProject.getDescription();
+						if (description != null)
+						{
+							projectListeners = StudioProjectListenersManager.getManager().getProjectListeners(
+									description.getNatureIds());
+						}
+
+						int listenerSize = projectListeners.length;
+						SubMonitor hookMonitor = SubMonitor.convert(subMonitor.newChild(1),
+								Messages.AbstractNewProjectWizard_ProjectListener_TaskName, Math.max(1, listenerSize));
+
+						for (IStudioProjectListener projectListener : projectListeners)
+						{
+							if (projectListener != null)
+							{
+								final IStatus status = projectListener.projectCreated(newProject,
+										hookMonitor.newChild(1));
+
+								// Show a dialog if there are failures
+								if (status != null && status.matches(IStatus.ERROR))
+								{
+									UIUtils.getDisplay().syncExec(new Runnable()
+									{
+										public void run()
+										{
+											MessageDialog.openError(UIUtils.getActiveWorkbenchWindow().getShell(),
+													Messages.AbstractNewProjectWizard_ProjectListenerErrorTitle,
+													status.getMessage());
+										}
+									});
+								}
+							}
+						}
+
+					}
+					catch (CoreException e)
+					{
+						throw new InvocationTargetException(e,
+								Messages.AbstractNewProjectWizard_ProjectListener_NoDescriptor_Error);
+					}
+					finally
+					{
+						subMonitor.done();
+					}
 				}
 			});
 			success = true;

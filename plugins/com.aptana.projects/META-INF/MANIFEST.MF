@@ -27,5 +27,6 @@ Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.projects,
  com.aptana.projects.internal.wizards,
+ com.aptana.projects.listeners,
  com.aptana.projects.templates,
  com.aptana.projects.util
