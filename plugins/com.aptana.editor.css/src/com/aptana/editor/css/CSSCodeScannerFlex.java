@@ -322,6 +322,7 @@ public class CSSCodeScannerFlex extends AbstractFlexTokenScanner
 		// Media META scope
 		if (this.fInMedia)
 		{
+			// Note: 56 is the size of the largest CSSTokenType scope.
 			builder = new StringBuilder(56);
 			builder.append(CSSTokenType.META_MEDIA.getScope()).append(' ');
 		}
