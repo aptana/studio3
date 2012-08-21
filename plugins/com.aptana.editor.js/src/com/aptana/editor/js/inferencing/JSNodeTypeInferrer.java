@@ -638,19 +638,17 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 			}
 			else
 			{
-				properties = this._queryHelper.getGlobals(this._index, name);
-
-				if (CollectionsUtil.isEmpty(properties))
+				// Check the local scope for type first
+				JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(this._scope, this._index, this._location);
+				PropertyElement property = symbolInferrer.getSymbolPropertyElement(name);
+				if (property != null)
 				{
-					JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(this._scope, this._index,
-							this._location);
-
-					PropertyElement property = symbolInferrer.getSymbolPropertyElement(name);
-
-					if (property != null)
-					{
-						properties = CollectionsUtil.newList(property);
-					}
+					properties = CollectionsUtil.newList(property);
+				}
+				else
+				{
+					// Now check the globals
+					properties = this._queryHelper.getGlobals(this._index, name);
 				}
 			}
 		}
