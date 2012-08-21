@@ -1,6 +1,5 @@
 Manifest-Version: 1.0
-Require-Bundle: org.eclipse.swt,
- org.eclipse.ui,
+Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.expressions
 Bundle-Vendor: %Bundle-Vendor
