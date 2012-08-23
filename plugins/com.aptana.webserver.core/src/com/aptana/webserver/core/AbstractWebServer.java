@@ -136,4 +136,19 @@ public abstract class AbstractWebServer implements IExecutableExtension, IServer
 	{
 		return CollectionsUtil.newSet(ILaunchManager.RUN_MODE);
 	}
+
+	public boolean canRestart()
+	{
+		return true;
+	}
+
+	public boolean canStart()
+	{
+		return true;
+	}
+
+	public boolean canStop()
+	{
+		return true;
+	}
 }
