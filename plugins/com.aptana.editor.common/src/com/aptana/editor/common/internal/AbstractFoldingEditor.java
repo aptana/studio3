@@ -138,39 +138,56 @@ public class AbstractFoldingEditor extends AbstractDecoratedTextEditor implement
 		return viewer;
 	}
 
+	private static final Object lockUpdateFoldingStructure = new Object();
+
+	//@formatter:off
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.IFoldingEditor#updateFoldingStructure(java.util.Map)
+	 * @see com.aptana.editor.common.IFoldingEditor#updateFoldingStructure(java.util.Map) 
+	 * 
+	 * Note: this object was previously synchronized on the editor and could enter in a deadlock in 
+	 * a race condition because of that.
+	 * 
+	 * Summary: 
+	 *  - here, we'd lock the editor here and when updating the positions we'd lock the document
+	 * 	- in a document change, we'd lock the document, fire a dirty state, which would try to do
+	 *    an enableSanityChecking() which is synchronized on the editor and would lead into a deadlock.
+	 * 
+	 * @see: APSTUD-7330 Deadlock when updating folding structure.
 	 */
-	public synchronized void updateFoldingStructure(Map<ProjectionAnnotation, Position> annotations)
+	//@formatter:on
+	public void updateFoldingStructure(Map<ProjectionAnnotation, Position> annotations)
 	{
-		List<Annotation> deletions = new ArrayList<Annotation>();
-		Collection<Position> additions = annotations.values();
-		ProjectionAnnotationModel currentModel = getAnnotationModel();
-		if (currentModel == null)
+		synchronized (lockUpdateFoldingStructure)
 		{
-			return;
-		}
-		for (@SuppressWarnings("rawtypes")
-		Iterator iter = currentModel.getAnnotationIterator(); iter.hasNext();)
-		{
-			Object annotation = iter.next();
-			if (annotation instanceof ProjectionAnnotation)
+			List<Annotation> deletions = new ArrayList<Annotation>();
+			Collection<Position> additions = annotations.values();
+			ProjectionAnnotationModel currentModel = getAnnotationModel();
+			if (currentModel == null)
 			{
-				Position position = currentModel.getPosition((Annotation) annotation);
-				if (additions.contains(position))
+				return;
+			}
+			for (@SuppressWarnings("rawtypes")
+			Iterator iter = currentModel.getAnnotationIterator(); iter.hasNext();)
+			{
+				Object annotation = iter.next();
+				if (annotation instanceof ProjectionAnnotation)
 				{
-					additions.remove(position);
-				}
-				else
-				{
-					deletions.add((Annotation) annotation);
+					Position position = currentModel.getPosition((Annotation) annotation);
+					if (additions.contains(position))
+					{
+						additions.remove(position);
+					}
+					else
+					{
+						deletions.add((Annotation) annotation);
+					}
 				}
 			}
-		}
-		if (annotations.size() != 0 || deletions.size() != 0)
-		{
-			currentModel.modifyAnnotations(deletions.toArray(new Annotation[deletions.size()]), annotations, null);
+			if (annotations.size() != 0 || deletions.size() != 0)
+			{
+				currentModel.modifyAnnotations(deletions.toArray(new Annotation[deletions.size()]), annotations, null);
+			}
 		}
 	}
 
