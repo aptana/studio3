@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -47,7 +47,7 @@ public class ServerTester extends PropertyTester
 			{
 				return false;
 			}
-			return server.getAvailableModes().contains(ILaunchManager.RUN_MODE);
+			return server.getAvailableModes().contains(ILaunchManager.RUN_MODE) && server.canStart();
 		}
 		if (CAN_DEBUG.equals(property))
 		{
@@ -55,7 +55,7 @@ public class ServerTester extends PropertyTester
 			{
 				return false;
 			}
-			return server.getAvailableModes().contains(ILaunchManager.DEBUG_MODE);
+			return server.getAvailableModes().contains(ILaunchManager.DEBUG_MODE) && server.canStart();
 		}
 		if (CAN_PROFILE.equals(property))
 		{
@@ -63,15 +63,15 @@ public class ServerTester extends PropertyTester
 			{
 				return false;
 			}
-			return server.getAvailableModes().contains(ILaunchManager.PROFILE_MODE);
+			return server.getAvailableModes().contains(ILaunchManager.PROFILE_MODE) && server.canStart();
 		}
 		else if (CAN_STOP.equals(property))
 		{
-			return server.getState() == State.STARTED;
+			return server.getState() == State.STARTED && server.canStop();
 		}
 		else if (CAN_RESTART.equals(property))
 		{
-			return server.getState() == State.STARTED;
+			return server.getState() == State.STARTED && server.canRestart();
 		}
 		else if (CAN_DELETE.equals(property) || CAN_EDIT.equals(property))
 		{
