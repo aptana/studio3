@@ -81,7 +81,7 @@ public class FindBarVisibilityControl
 			{
 				for (FindBarDecorator d : decs)
 				{
-					d.hideFindBar();
+					d.hideFindBar(d == requester);
 				}
 			}
 		}

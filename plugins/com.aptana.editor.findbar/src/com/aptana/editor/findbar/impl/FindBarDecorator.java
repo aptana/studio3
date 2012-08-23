@@ -1295,8 +1295,11 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	/**
 	 * Note: this method should NEVER be called directly. Always use setVisible (the visibility control is the only
 	 * place that should reference this method).
+	 * 
+	 * @param updateFocus
+	 *            indicates if the focus should be given to the editor
 	 */
-	/* default */void hideFindBar()
+	/* default */void hideFindBar(boolean updateFocus)
 	{
 		if (findBarGridData.exclude == false)
 		{
@@ -1309,7 +1312,10 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 			removeComboSearchOnTextChangeListener();
 			statusLineManager.setMessage(false, StringUtil.EMPTY, null);
 		}
-		textEditor.setFocus();
+		if (updateFocus)
+		{
+			textEditor.setFocus();
+		}
 		if (disableWhenHidden != null)
 		{
 			for (Control w : disableWhenHidden)
@@ -1338,7 +1344,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	 * place that should reference this method).
 	 * 
 	 * @param updateFocus
-	 *            determines whether the focus show be given to the combo.
+	 *            indicates if the focus should be given to the combo
 	 */
 	/* default */void showFindBar(boolean updateFocus)
 	{
