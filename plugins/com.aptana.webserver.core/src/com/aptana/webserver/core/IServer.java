@@ -71,6 +71,13 @@ public interface IServer extends IURIMapper, Identifiable
 	public void loadState(IMemento memento);
 
 	/**
+	 * This method returns whether the server is in a state where it can be stopped
+	 * 
+	 * @return
+	 */
+	public boolean canStop();
+
+	/**
 	 * This method runs synchronously. Wrap calls in a Job if you want async behavior.
 	 * 
 	 * @param force
@@ -80,6 +87,13 @@ public interface IServer extends IURIMapper, Identifiable
 	public IStatus stop(boolean force, IProgressMonitor monitor);
 
 	/**
+	 * This method returns whether the server is in a state where it can be restarted
+	 * 
+	 * @return
+	 */
+	public boolean canRestart();
+
+	/**
 	 * This method runs synchronously. Wrap calls in a Job if you want async behavior.
 	 * 
 	 * @param mode
@@ -87,6 +101,13 @@ public interface IServer extends IURIMapper, Identifiable
 	 *            optional progress monitor
 	 */
 	public IStatus restart(String mode, IProgressMonitor monitor);
+
+	/**
+	 * This method returns whether the server is in a state where it can be started
+	 * 
+	 * @return
+	 */
+	public boolean canStart();
 
 	/**
 	 * This method runs synchronously. Wrap calls in a Job if you want async behavior.

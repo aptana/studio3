@@ -47,7 +47,7 @@ public class ServerTester extends PropertyTester
 			{
 				return false;
 			}
-			return server.getAvailableModes().contains(ILaunchManager.RUN_MODE);
+			return server.getAvailableModes().contains(ILaunchManager.RUN_MODE) && server.canStart();
 		}
 		if (CAN_DEBUG.equals(property))
 		{
@@ -55,7 +55,7 @@ public class ServerTester extends PropertyTester
 			{
 				return false;
 			}
-			return server.getAvailableModes().contains(ILaunchManager.DEBUG_MODE);
+			return server.getAvailableModes().contains(ILaunchManager.DEBUG_MODE) && server.canStart();
 		}
 		if (CAN_PROFILE.equals(property))
 		{
@@ -63,15 +63,15 @@ public class ServerTester extends PropertyTester
 			{
 				return false;
 			}
-			return server.getAvailableModes().contains(ILaunchManager.PROFILE_MODE);
+			return server.getAvailableModes().contains(ILaunchManager.PROFILE_MODE) && server.canStart();
 		}
 		else if (CAN_STOP.equals(property))
 		{
-			return server.getState() == State.STARTED;
+			return server.getState() == State.STARTED && server.canStop();
 		}
 		else if (CAN_RESTART.equals(property))
 		{
-			return server.getState() == State.STARTED;
+			return server.getState() == State.STARTED && server.canRestart();
 		}
 		else if (CAN_DELETE.equals(property) || CAN_EDIT.equals(property))
 		{

@@ -18,6 +18,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.ISources;
@@ -195,31 +196,35 @@ public class ServersView extends ViewPart implements IServerChangeListener
 
 	public void configurationChanged(final ServerChangeEvent event)
 	{
-		UIUtils.getDisplay().syncExec(new Runnable()
+		Display display = UIUtils.getDisplay();
+		if (!display.isDisposed())
 		{
-			public void run()
+			display.syncExec(new Runnable()
 			{
-				switch (event.getKind())
+				public void run()
 				{
-					case ADDED:
-						serverTableViewer.add(event.getServer());
-						break;
-					case REMOVED:
-						serverTableViewer.remove(event.getServer());
-					case UPDATED:
-						serverTableViewer.update(event.getServer(), null);
-						// force commands evaluating selection for enablement/handling to get re-evaluated
-						IEvaluationService service = (IEvaluationService) getViewSite().getService(
-								IEvaluationService.class);
-						if (service != null)
-						{
-							service.requestEvaluation(ISources.ACTIVE_CURRENT_SELECTION_NAME);
-						}
-					default:
-						break;
+					switch (event.getKind())
+					{
+						case ADDED:
+							serverTableViewer.add(event.getServer());
+							break;
+						case REMOVED:
+							serverTableViewer.remove(event.getServer());
+						case UPDATED:
+							serverTableViewer.update(event.getServer(), null);
+							// force commands evaluating selection for enablement/handling to get re-evaluated
+							IEvaluationService service = (IEvaluationService) getViewSite().getService(
+									IEvaluationService.class);
+							if (service != null)
+							{
+								service.requestEvaluation(ISources.ACTIVE_CURRENT_SELECTION_NAME);
+							}
+						default:
+							break;
+					}
 				}
-			}
-		});
+			});
+		}
 	}
 
 }
