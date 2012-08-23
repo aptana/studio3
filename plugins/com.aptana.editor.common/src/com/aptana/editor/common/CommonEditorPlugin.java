@@ -44,6 +44,7 @@ import org.eclipse.ui.progress.UIJob;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.CorePlugin;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
@@ -79,8 +80,8 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	private static final String COMMAND_ID = "com.aptana.editor.common.commands.toggleOutline"; //$NON-NLS-1$
 	private static final String COMMAND_STATE = "org.eclipse.ui.commands.toggleState"; //$NON-NLS-1$
 
-	private static final String UID = Platform.getPreferencesService().getString(UsagePlugin.PLUGIN_ID,
-			IPreferenceConstants.P_IDE_ID, null, null);
+	private static final String UID = CorePlugin.getDefault() != null ? Platform.getPreferencesService().getString(
+			UsagePlugin.PLUGIN_ID, IPreferenceConstants.P_IDE_ID, null, null) : null;
 
 	// The shared instance
 	private static CommonEditorPlugin plugin;

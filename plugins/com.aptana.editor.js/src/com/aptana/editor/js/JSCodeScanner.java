@@ -91,6 +91,9 @@ public class JSCodeScanner extends AbstractFlexTokenScanner
 
 	protected void setSource(String string)
 	{
+		// It shouldn't really collect comments anyways as we're just processing the default partition,
+		// so, this is just a safety measure.
+		((JSFlexScanner) fScanner).setCollectComments(false);
 		((JSFlexScanner) fScanner).setSource(string);
 	}
 
@@ -242,7 +245,8 @@ public class JSCodeScanner extends AbstractFlexTokenScanner
 					// We have to do a look-ahead for this use-case.
 
 					// This is a queue with a copy of the tokens we've already looked ahead at this time.
-					Queue<Symbol> tempQueue = fLookAheadQueue.peek() != null ? new LinkedList<Symbol>(fLookAheadQueue) : null;
+					Queue<Symbol> tempQueue = fLookAheadQueue.peek() != null ? new LinkedList<Symbol>(fLookAheadQueue)
+							: null;
 
 					while (true)
 					{

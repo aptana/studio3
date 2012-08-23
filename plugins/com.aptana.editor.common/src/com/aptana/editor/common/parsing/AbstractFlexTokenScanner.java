@@ -35,7 +35,7 @@ public abstract class AbstractFlexTokenScanner implements ITokenScanner
 	/**
 	 * Queue used to put symbols we look-ahead
 	 */
-	protected Queue<Symbol> fLookAheadQueue = new LinkedList<Symbol>();
+	protected final Queue<Symbol> fLookAheadQueue = new LinkedList<Symbol>();
 
 	/**
 	 * Offset set (needed to properly return the ranges as our offset will be relative to this position).
@@ -75,6 +75,7 @@ public abstract class AbstractFlexTokenScanner implements ITokenScanner
 	 */
 	public void setRange(IDocument document, int offset, int length)
 	{
+		fLookAheadQueue.clear();
 		fLastWasWhitespace = false;
 		Assert.isLegal(document != null);
 		final int documentLength = document.getLength();

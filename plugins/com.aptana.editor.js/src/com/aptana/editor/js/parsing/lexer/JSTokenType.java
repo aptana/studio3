@@ -102,7 +102,9 @@ public enum JSTokenType implements ITypePredicate
 	SINGLELINE_COMMENT("SINGLELINE_COMMENT", 1024), //$NON-NLS-1$
 	MULTILINE_COMMENT("MULTILINE_COMMENT", 1025), //$NON-NLS-1$
 	SDOC("SDOC", 1026), //$NON-NLS-1$
-	VSDOC("VSDOC", 1027); //$NON-NLS-1$
+	VSDOC("VSDOC", 1027), //$NON-NLS-1$
+	STRING_SINGLE("STRING_SINGLE", Terminals.STRING), //$NON-NLS-1$
+	STRING_DOUBLE("STRING_DOUBLE", Terminals.STRING); //$NON-NLS-1$
 
 	private static Map<String, JSTokenType> NAME_MAP;
 	private static Map<Short, JSTokenType> ID_MAP;

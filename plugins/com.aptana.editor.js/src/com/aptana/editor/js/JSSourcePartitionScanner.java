@@ -12,7 +12,14 @@ import org.eclipse.jface.text.BadLocationException;
 
 import com.aptana.editor.common.text.rules.SourceConfigurationPartitionScanner;
 
-public class JSSourcePartitionScanner extends SourceConfigurationPartitionScanner implements IRegexpDivisionDisambiguator
+/**
+ * JSSourcePartitionScannerJFlex should be used instead. Still keeping around for tests from rules as the
+ * JSSourceConfiguration.partitioningRules are still actually used on
+ * com.aptana.editor.js.JSSourceConfiguration.createSubPartitionScanner() (needed for HTMLSubPartitionScanner)
+ */
+@Deprecated
+public class JSSourcePartitionScanner extends SourceConfigurationPartitionScanner implements
+		IRegexpDivisionDisambiguator
 {
 	/**
 	 * JSSourcePartitionScanner

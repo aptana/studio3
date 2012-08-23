@@ -21,7 +21,7 @@ public class JSDocumentProvider extends SimpleDocumentProvider
 	@Override
 	public IPartitionTokenScanner createPartitionScanner()
 	{
-		return new JSSourcePartitionScanner();
+		return new JSSourcePartitionScannerJFlex();
 	}
 
 	/*

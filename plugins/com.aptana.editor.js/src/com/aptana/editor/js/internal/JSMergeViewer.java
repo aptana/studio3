@@ -18,7 +18,7 @@ import com.aptana.editor.common.ExtendedFastPartitioner;
 import com.aptana.editor.common.viewer.CommonMergeViewer;
 import com.aptana.editor.js.JSSourceConfiguration;
 import com.aptana.editor.js.JSSourceEditor;
-import com.aptana.editor.js.JSSourcePartitionScanner;
+import com.aptana.editor.js.JSSourcePartitionScannerJFlex;
 import com.aptana.editor.js.JSSourceViewerConfiguration;
 
 /**
@@ -34,7 +34,7 @@ public class JSMergeViewer extends CommonMergeViewer
 	@Override
 	protected IDocumentPartitioner getDocumentPartitioner()
 	{
-		IDocumentPartitioner partitioner = new ExtendedFastPartitioner(new JSSourcePartitionScanner(),
+		IDocumentPartitioner partitioner = new ExtendedFastPartitioner(new JSSourcePartitionScannerJFlex(),
 				JSSourceConfiguration.getDefault().getContentTypes());
 		return partitioner;
 	}
