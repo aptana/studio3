@@ -1352,7 +1352,10 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		{
 			for (Control w : disableWhenHidden)
 			{
-				w.setEnabled(true);
+				if (w != null && !w.isDisposed())
+				{
+					w.setEnabled(true);
+				}
 			}
 		}
 
