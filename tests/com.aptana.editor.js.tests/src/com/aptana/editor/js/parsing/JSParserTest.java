@@ -1046,6 +1046,24 @@ public class JSParserTest extends TestCase
 		assertParseResult("switch (id) {case Ti.}", "switch (id) {case Ti.: }" + EOL);
 	}
 
+	public void testUnclosedString() throws Exception
+	{
+		assertParseResult("var string = 'something", "var string = " + EOL);
+		assertParseErrors("Syntax Error: unexpected token \"'\"");
+	}
+
+	public void testUnclosedComment() throws Exception
+	{
+		assertParseResult("var thing; /* comment", "var thing;" + EOL + EOL);
+		assertParseErrors("Syntax Error: unexpected token \"/\"");
+	}
+
+	public void testUnclosedRegexp() throws Exception
+	{
+		assertParseResult("var regexp = /;", EOL);
+		assertParseErrors("Syntax Error: unexpected token \"/\"", "Syntax Error: unexpected token \";\"");
+	}
+
 	/**
 	 * This method is not being used for formal testing, but it's useful to determine how effective
 	 * {@link ParseNode#trimToSize()} is.

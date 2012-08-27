@@ -1739,6 +1739,71 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 				IMarker.SEVERITY_WARNING, 13);
 	}
 
+	public void testMissingA1() throws CoreException
+	{
+		String text = "new Array";
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Missing '()'.", 1, IMarker.SEVERITY_WARNING, 4);
+	}
+
+	public void testMissingA1OK() throws CoreException
+	{
+		String text = "new Array();";
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "Missing '()'.");
+	}
+
+	public void testMissingA2() throws CoreException
+	{
+		String text = "switch (1) {\n}";
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Missing 'case'.", 2, IMarker.SEVERITY_WARNING, 13);
+	}
+
+	public void testMissingA3() throws CoreException
+	{
+		// @formatter:off
+		String text = "var obj = (function () {\n" +
+			        "    var a;\n" +
+			        "    return {\n" +
+			        "        get a() {\n" +
+			        "            return a;\n" +
+			        "        },\n" +
+			        "\n" +
+			        "        set a(value) {\n" +
+			        "        }\n" +
+			        "    };\n" +
+				    "}());";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Missing 'throw'.", 9, IMarker.SEVERITY_WARNING, 132);
+	}
+
+	public void testMissingProperty() throws CoreException
+	{
+		// @formatter:off
+		String text = "var obj = (function () {\n" +
+				"        var a;\n" +
+				"        return {\n" +
+				"            get () {\n" +
+				"                return a;\n" +
+				"            },\n" +
+				"            \n" +
+				"            set a(value) {\n" +
+				"                a = 'prepender: ' + value;\n" +
+				"            }\n" +
+				"        };\n" +
+				"    }());";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Missing property name.", 4, IMarker.SEVERITY_ERROR, 73);
+	}
+
 	public void testMoveInvocation() throws CoreException
 	{
 		// @formatter:off
@@ -2147,6 +2212,19 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		List<IProblem> items = getParseErrors(text);
 		assertProblemExists(items, "Expected to see a statement and instead saw a block.", 2, IMarker.SEVERITY_WARNING,
 				14);
+	}
+
+	public void testStatementBlock2() throws CoreException
+	{
+		// @formatter:off
+		String text = "function foo() {\n" +
+				"{}\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Expected to see a statement and instead saw a block.", 2, IMarker.SEVERITY_WARNING,
+				18);
 	}
 
 	public void testStrangeLoop1() throws CoreException

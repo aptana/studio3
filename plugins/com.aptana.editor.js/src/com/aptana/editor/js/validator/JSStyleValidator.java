@@ -734,7 +734,7 @@ public class JSStyleValidator extends AbstractBuildParticipant
 		// Check if we can combine var decls
 		if (currentFunction().vars && !option(Option.VARS))
 		{
-			problems.add(createWarning(Messages.JSStyleValidator_CombineVar, node));
+			problems.add(createWarning(Messages.JSStyleValidator_CombineVar, node.getFirstChild()));
 		}
 		else if (!inGlobalFunct())
 		{
@@ -839,6 +839,13 @@ public class JSStyleValidator extends AbstractBuildParticipant
 	private void enterSwitch(JSSwitchNode node)
 	{
 		checkCondition(node.getExpression());
+		int childrenCount = node.getChildCount();
+		if (childrenCount <= 1)
+		{
+			this.problems
+					.add(createWarning(
+							MessageFormat.format(Messages.JSStyleValidator_MissingA, "case"), node.getRightBrace().getStart(), 1)); //$NON-NLS-1$
+		}
 	}
 
 	private void enterLogicalOr(JSBinaryBooleanOperatorNode node)
@@ -924,6 +931,12 @@ public class JSStyleValidator extends AbstractBuildParticipant
 	{
 		// Push new scope onto the stack!
 		this.scopeStack.push((Scope) currentScope().clone());
+
+		if (!node.hasChildren())
+		{
+			problems.add(createWarning(Messages.JSStyleValidator_StatementBlock, node.getStartingOffset() + 1,
+					node.getLength() - 1));
+		}
 	}
 
 	private void exitStatements(IParseNode node)
@@ -1129,6 +1142,10 @@ public class JSStyleValidator extends AbstractBuildParticipant
 			{
 				problems.add(createWarning(Messages.JSStyleValidator_AssignException, left));
 			}
+			if (predefineds.contains(name))
+			{
+				problems.add(createError(Messages.JSStyleValidator_ReadOnly, node.getRightHandSide()));
+			}
 			// Make a note that we're assigning to this variable.
 			currentFunction().varAssigned(name);
 		}
@@ -1159,7 +1176,7 @@ public class JSStyleValidator extends AbstractBuildParticipant
 		{
 			JSAssignmentNode assign = (JSAssignmentNode) value;
 			IParseNode left = assign.getLeftHandSide();
-			problems.add(createWarning(
+			problems.add(createError(
 					MessageFormat.format(Messages.JSStyleValidator_VarANot, left.getNameNode().getName()), left));
 		}
 		// Check for assignment of 'undefined'
@@ -1401,6 +1418,13 @@ public class JSStyleValidator extends AbstractBuildParticipant
 		{
 			problems.add(createWarning(Messages.JSStyleValidator_WeirdNew, node));
 		}
+
+		// Check to see if the construct has no parens!
+		IParseNode args = node.getArguments();
+		if (args instanceof JSEmptyNode)
+		{
+			problems.add(createWarning(MessageFormat.format(Messages.JSStyleValidator_MissingA, "()"), expressionNode)); //$NON-NLS-1$
+		}
 	}
 
 	private void enterGetElement(JSGetElementNode node)
@@ -1505,7 +1529,7 @@ public class JSStyleValidator extends AbstractBuildParticipant
 		}
 		if ("__iterator__".equals(name) || "__proto__".equals(name)) //$NON-NLS-1$ //$NON-NLS-2$
 		{
-			problems.add(createWarning(MessageFormat.format(Messages.JSStyleValidator_ReservedA, name), node));
+			problems.add(createError(MessageFormat.format(Messages.JSStyleValidator_ReservedA, name), node));
 		}
 		else if (!option(Option.NOMEN) && name.length() > 0
 				&& (name.charAt(0) == '_' || name.charAt(name.length() - 1) == '_'))
@@ -1787,6 +1811,11 @@ public class JSStyleValidator extends AbstractBuildParticipant
 		return createWarning(msg, node.getStartingOffset(), node.getLength());
 	}
 
+	protected IProblem createError(String msg, IParseNode node)
+	{
+		return createError(msg, node.getStartingOffset(), node.getLength());
+	}
+
 	protected IProblem createWarningAtEndOfNode(String msg, IParseNode node)
 	{
 		return createWarning(msg, node.getEndingOffset() + 1, 1);
@@ -1804,6 +1833,20 @@ public class JSStyleValidator extends AbstractBuildParticipant
 			// ignore
 		}
 		return createWarning(msg, line, start, length, sourcePath);
+	}
+
+	protected IProblem createError(String msg, int start, int length)
+	{
+		int line = -1;
+		try
+		{
+			line = doc.getLineOfOffset(start) + 1;
+		}
+		catch (BadLocationException e)
+		{
+			// ignore
+		}
+		return createError(msg, line, start, length, sourcePath);
 	}
 
 	void setOption(String optionName, boolean value)

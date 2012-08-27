@@ -321,6 +321,16 @@ public class JSStyleValidatorTest extends JSLintValidatorTest
 		// TODO Implement!
 	}
 
+	public void testMissingA3() throws CoreException
+	{
+		// TODO Implement! Our parser doesn't support getter/setter syntax yet!
+	}
+
+	public void testMissingProperty() throws CoreException
+	{
+		// TODO Implement! Our parser doesn't support getter/setter syntax yet!
+	}
+
 	public void testMoveInvocation() throws CoreException
 	{
 		// TODO Implement!
@@ -377,11 +387,6 @@ public class JSStyleValidatorTest extends JSLintValidatorTest
 	}
 
 	public void testSlashEqual() throws CoreException
-	{
-		// TODO Implement!
-	}
-
-	public void testStatementBlock() throws CoreException
 	{
 		// TODO Implement!
 	}
