@@ -25,52 +25,73 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPart;
 
 import com.aptana.core.resources.IUniformResource;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.js.debug.core.model.JSDebugModel;
 
 /**
  * @author Max Stepanov
  */
-public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
+public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget
+{
 	/**
 	 * @see org.eclipse.debug.ui.actions.IToggleBreakpointsTarget#toggleLineBreakpoints(org.eclipse.ui.IWorkbenchPart,
 	 *      org.eclipse.jface.viewers.ISelection)
 	 */
-	public void toggleLineBreakpoints(final IWorkbenchPart part, final ISelection selection) throws CoreException {
-		Job job = new Job(Messages.ToggleBreakpointAdapter_ToggleLineBreakpoint) {
-			protected IStatus run(IProgressMonitor monitor) {
-				if (selection instanceof ITextSelection) {
-					if (monitor.isCanceled()) {
+	public void toggleLineBreakpoints(final IWorkbenchPart part, final ISelection selection) throws CoreException
+	{
+		Job job = new Job(Messages.ToggleBreakpointAdapter_ToggleLineBreakpoint)
+		{
+			protected IStatus run(IProgressMonitor monitor)
+			{
+				if (selection instanceof ITextSelection)
+				{
+					if (monitor.isCanceled())
+					{
 						return Status.CANCEL_STATUS;
 					}
 					IEditorPart editorPart = (IEditorPart) part;
 					IEditorInput editorInput = editorPart.getEditorInput();
 					IResource resource = (IResource) editorInput.getAdapter(IFile.class);
 					IUniformResource uniformResource = null;
-					if (resource == null) {
+					if (resource == null)
+					{
 						uniformResource = (IUniformResource) editorInput.getAdapter(IUniformResource.class);
-						if (uniformResource == null) {
+						if (uniformResource == null)
+						{
 							return Status.CANCEL_STATUS;
 						}
 					}
 					ITextSelection textSelection = (ITextSelection) selection;
 					int lineNumber = textSelection.getStartLine() + 1;
 					ILineBreakpoint breakpoint;
-					if (resource != null) {
+					if (resource != null)
+					{
 						breakpoint = JSDebugModel.lineBreakpointExists(resource, lineNumber);
-					} else {
+					}
+					else
+					{
 						breakpoint = JSDebugModel.lineBreakpointExists(uniformResource, lineNumber);
 					}
-					try {
-						if (breakpoint != null) {
+					try
+					{
+						if (breakpoint != null)
+						{
 							breakpoint.delete();
-						} else if (canToggleLineBreakpoint(part, selection)) {
-							if (resource != null) {
+						}
+						else if (canToggleLineBreakpoint(part, selection))
+						{
+							if (resource != null)
+							{
 								JSDebugModel.createLineBreakpoint(resource, lineNumber);
-							} else {
+							}
+							else
+							{
 								JSDebugModel.createLineBreakpoint(uniformResource, lineNumber);
 							}
 						}
-					} catch (CoreException e) {
+					}
+					catch (CoreException e)
+					{
 						return e.getStatus();
 					}
 				}
@@ -78,7 +99,7 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 			}
 		};
 		job.setPriority(Job.INTERACTIVE);
-		job.setSystem(true);
+		EclipseUtil.setSystemForJob(job);
 		job.schedule();
 	}
 
@@ -86,25 +107,35 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 	 * @see org.eclipse.debug.ui.actions.IToggleBreakpointsTarget#canToggleLineBreakpoints(org.eclipse.ui.IWorkbenchPart,
 	 *      org.eclipse.jface.viewers.ISelection)
 	 */
-	public boolean canToggleLineBreakpoints(IWorkbenchPart part, ISelection selection) {
+	public boolean canToggleLineBreakpoints(IWorkbenchPart part, ISelection selection)
+	{
 		return selection instanceof ITextSelection;
 	}
 
-	private boolean canToggleLineBreakpoint(IWorkbenchPart part, ISelection selection) {
-		if (selection instanceof ITextSelection) {
+	private boolean canToggleLineBreakpoint(IWorkbenchPart part, ISelection selection)
+	{
+		if (selection instanceof ITextSelection)
+		{
 			IEditorInput editorInput = ((IEditorPart) part).getEditorInput();
 			Object resource = editorInput.getAdapter(IFile.class);
-			if (resource == null) {
+			if (resource == null)
+			{
 				resource = editorInput.getAdapter(IUniformResource.class);
 			}
-			if (resource != null) {
+			if (resource != null)
+			{
 				int lineNumber = ((ITextSelection) selection).getStartLine() + 1;
-				if (resource instanceof IFile) {
-					if (JSDebugModel.lineBreakpointExists((IResource) resource, lineNumber) != null) {
+				if (resource instanceof IFile)
+				{
+					if (JSDebugModel.lineBreakpointExists((IResource) resource, lineNumber) != null)
+					{
 						return true;
 					}
-				} else {
-					if (JSDebugModel.lineBreakpointExists((IUniformResource) resource, lineNumber) != null) {
+				}
+				else
+				{
+					if (JSDebugModel.lineBreakpointExists((IUniformResource) resource, lineNumber) != null)
+					{
 						return true;
 					}
 				}
@@ -133,7 +164,8 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 	 * @see org.eclipse.debug.ui.actions.IToggleBreakpointsTarget#toggleMethodBreakpoints(org.eclipse.ui.IWorkbenchPart,
 	 *      org.eclipse.jface.viewers.ISelection)
 	 */
-	public void toggleMethodBreakpoints(IWorkbenchPart part, ISelection selection) throws CoreException {
+	public void toggleMethodBreakpoints(IWorkbenchPart part, ISelection selection) throws CoreException
+	{
 		// TODO Auto-generated method stub
 
 	}
@@ -142,7 +174,8 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 	 * @see org.eclipse.debug.ui.actions.IToggleBreakpointsTarget#canToggleMethodBreakpoints(org.eclipse.ui.IWorkbenchPart,
 	 *      org.eclipse.jface.viewers.ISelection)
 	 */
-	public boolean canToggleMethodBreakpoints(IWorkbenchPart part, ISelection selection) {
+	public boolean canToggleMethodBreakpoints(IWorkbenchPart part, ISelection selection)
+	{
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -151,7 +184,8 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 	 * @see org.eclipse.debug.ui.actions.IToggleBreakpointsTarget#toggleWatchpoints(org.eclipse.ui.IWorkbenchPart,
 	 *      org.eclipse.jface.viewers.ISelection)
 	 */
-	public void toggleWatchpoints(IWorkbenchPart part, ISelection selection) throws CoreException {
+	public void toggleWatchpoints(IWorkbenchPart part, ISelection selection) throws CoreException
+	{
 		// TODO Auto-generated method stub
 
 	}
@@ -160,7 +194,8 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 	 * @see org.eclipse.debug.ui.actions.IToggleBreakpointsTarget#canToggleWatchpoints(org.eclipse.ui.IWorkbenchPart,
 	 *      org.eclipse.jface.viewers.ISelection)
 	 */
-	public boolean canToggleWatchpoints(IWorkbenchPart part, ISelection selection) {
+	public boolean canToggleWatchpoints(IWorkbenchPart part, ISelection selection)
+	{
 		// TODO Auto-generated method stub
 		return false;
 	}

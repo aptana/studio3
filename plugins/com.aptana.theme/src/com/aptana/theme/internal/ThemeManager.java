@@ -126,7 +126,7 @@ public class ThemeManager implements IThemeManager
 											return Status.OK_STATUS;
 										}
 									};
-									job.setSystem(!EclipseUtil.showSystemJobs());
+									EclipseUtil.setSystemForJob(job);
 									job.setPriority(Job.DECORATE);
 									job.schedule();
 								}

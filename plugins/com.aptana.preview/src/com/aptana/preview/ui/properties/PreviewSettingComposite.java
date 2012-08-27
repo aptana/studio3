@@ -41,6 +41,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.dialogs.ListDialog;
 
 import com.aptana.core.CoreStrings;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.preview.PreviewPlugin;
 import com.aptana.ui.IPropertyDialog;
@@ -325,7 +326,7 @@ public class PreviewSettingComposite extends Composite implements SelectionListe
 				return Status.OK_STATUS;
 			}
 		};
-		job.setSystem(true);
+		EclipseUtil.setSystemForJob(job);
 		job.schedule();
 	}
 

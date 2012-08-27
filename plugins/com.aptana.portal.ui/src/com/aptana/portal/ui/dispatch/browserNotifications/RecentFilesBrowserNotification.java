@@ -18,6 +18,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.progress.UIJob;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.IBrowserNotificationConstants;
 
@@ -64,7 +65,7 @@ public class RecentFilesBrowserNotification extends AbstractBrowserNotification
 				return Status.OK_STATUS;
 			}
 		};
-		job.setSystem(true);
+		EclipseUtil.setSystemForJob(job);
 		job.schedule();
 	}
 
@@ -94,7 +95,7 @@ public class RecentFilesBrowserNotification extends AbstractBrowserNotification
 				return Status.OK_STATUS;
 			}
 		};
-		job.setSystem(true);
+		EclipseUtil.setSystemForJob(job);
 		job.schedule();
 	}
 

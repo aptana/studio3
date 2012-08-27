@@ -324,7 +324,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 			}
 		};
 
-		job.setSystem(true);
+		EclipseUtil.setSystemForJob(job);
 		job.schedule(2000);
 	}
 

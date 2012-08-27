@@ -53,12 +53,14 @@ import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.debug.core.sourcelookup.ISourceLookupDirector;
+import org.eclipse.equinox.internal.security.storage.friends.InternalExchangeUtils;
 import org.osgi.framework.Constants;
 
 import com.aptana.core.IURIMapper;
 import com.aptana.core.io.efs.EFSUtils;
 import com.aptana.core.resources.IUniformResource;
 import com.aptana.core.resources.IUniformResourceMarker;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.debug.core.DebugCorePlugin;
 import com.aptana.debug.core.DetailFormatter;
@@ -206,7 +208,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	private Job updateContentJob = new Job("Debugger Content Update") { //$NON-NLS-1$
 		{
 			setPriority(Job.INTERACTIVE);
-			setSystem(true);
+			EclipseUtil.setSystemForJob(this);
 		}
 
 		@Override

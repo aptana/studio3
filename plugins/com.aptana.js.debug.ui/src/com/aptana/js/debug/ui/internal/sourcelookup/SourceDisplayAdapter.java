@@ -38,6 +38,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.debug.ui.SourceDisplayUtil;
 import com.aptana.js.debug.core.model.IJSScriptElement;
 import com.aptana.js.debug.core.model.ISourceLink;
@@ -47,7 +48,8 @@ import com.aptana.js.debug.ui.JSDebugUIPlugin;
  * @author Max Stepanov
  */
 @SuppressWarnings("restriction")
-public class SourceDisplayAdapter implements ISourceDisplay {
+public class SourceDisplayAdapter implements ISourceDisplay
+{
 
 	private static final String DEFAULT_SOURCE_LOCATOR_ID = "com.aptana.js.debug.core.sourceLookupDirector"; //$NON-NLS-1$
 	private static final String DEFAULT_SOURCE_PATH_COMPUTER_ID = "com.aptana.debug.core.sourcePathComputer"; //$NON-NLS-1$
@@ -60,11 +62,14 @@ public class SourceDisplayAdapter implements ISourceDisplay {
 	private SourceDisplayJob fSourceDisplayJob = new SourceDisplayJob();
 	private ISourceLocator fDefaultSourceLocator;
 
-	private SourceDisplayAdapter() {
+	private SourceDisplayAdapter()
+	{
 	}
 
-	public static synchronized SourceDisplayAdapter getInstance() {
-		if (fInstance == null) {
+	public static synchronized SourceDisplayAdapter getInstance()
+	{
+		if (fInstance == null)
+		{
 			fInstance = new SourceDisplayAdapter();
 		}
 		return fInstance;
@@ -74,36 +79,46 @@ public class SourceDisplayAdapter implements ISourceDisplay {
 	 * @see org.eclipse.debug.ui.sourcelookup.ISourceDisplay#displaySource(java.lang.Object,
 	 * org.eclipse.ui.IWorkbenchPage, boolean)
 	 */
-	public void displaySource(Object element, IWorkbenchPage page, boolean forceSourceLookup) {
+	public void displaySource(Object element, IWorkbenchPage page, boolean forceSourceLookup)
+	{
 		fSourceLookupJob.setLookupInfo(element,
 				element instanceof IDebugElement ? getSourceLocator((IDebugElement) element) : null, page);
 		fSourceLookupJob.schedule();
 	}
 
-	private ISourceLocator getSourceLocator(IDebugElement debugElement) {
+	private ISourceLocator getSourceLocator(IDebugElement debugElement)
+	{
 		ISourceLocator sourceLocator = null;
-		if (debugElement.getDebugTarget() == null) {
-			if (debugElement instanceof ISourceLink) {
+		if (debugElement.getDebugTarget() == null)
+		{
+			if (debugElement instanceof ISourceLink)
+			{
 				sourceLocator = getDefaultSourceLocator();
 			}
 			return sourceLocator;
 		}
 		ILaunch launch = debugElement.getLaunch();
-		if (launch != null) {
+		if (launch != null)
+		{
 			sourceLocator = launch.getSourceLocator();
 		}
 		return sourceLocator;
 	}
 
-	private ISourceLocator getDefaultSourceLocator() {
-		if (fDefaultSourceLocator == null) {
-			try {
+	private ISourceLocator getDefaultSourceLocator()
+	{
+		if (fDefaultSourceLocator == null)
+		{
+			try
+			{
 				fDefaultSourceLocator = DebugPlugin.getDefault().getLaunchManager()
 						.newSourceLocator(DEFAULT_SOURCE_LOCATOR_ID);
-				if (fDefaultSourceLocator instanceof ISourceLookupDirector) {
+				if (fDefaultSourceLocator instanceof ISourceLookupDirector)
+				{
 					ISourceLookupDirector sourceLookupDirector = (ISourceLookupDirector) fDefaultSourceLocator;
 					sourceLookupDirector.initializeParticipants();
-					sourceLookupDirector.setSourceContainers(new ISourceContainer[] { new DefaultSourceContainer() {
+					sourceLookupDirector.setSourceContainers(new ISourceContainer[] { new DefaultSourceContainer()
+					{
 
 						/*
 						 * (non-Javadoc)
@@ -111,13 +126,16 @@ public class SourceDisplayAdapter implements ISourceDisplay {
 						 * DefaultSourceContainer#createSourceContainers()
 						 */
 						@Override
-						protected ISourceContainer[] createSourceContainers() throws CoreException {
+						protected ISourceContainer[] createSourceContainers() throws CoreException
+						{
 							ISourcePathComputer sourcePathComputer = null;
 							ISourceLookupDirector director = getDirector();
-							if (director != null) {
+							if (director != null)
+							{
 								sourcePathComputer = director.getSourcePathComputer();
 							}
-							if (sourcePathComputer != null) {
+							if (sourcePathComputer != null)
+							{
 								return sourcePathComputer.computeSourceContainers(null, null);
 							}
 
@@ -129,14 +147,17 @@ public class SourceDisplayAdapter implements ISourceDisplay {
 							.getSourcePathComputer(DEFAULT_SOURCE_PATH_COMPUTER_ID);
 					sourceLookupDirector.setSourcePathComputer(sourcePathComputer);
 				}
-			} catch (CoreException e) {
+			}
+			catch (CoreException e)
+			{
 				IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 			}
 		}
 		return fDefaultSourceLocator;
 	}
 
-	private class SourceLookupJob extends Job {
+	private class SourceLookupJob extends Job
+	{
 
 		private Object fTarget;
 		private ISourceLocator fLocator;
@@ -145,13 +166,15 @@ public class SourceDisplayAdapter implements ISourceDisplay {
 		/**
 		 * Constructs a new source lookup job.
 		 */
-		protected SourceLookupJob() {
+		protected SourceLookupJob()
+		{
 			super("Debug Source Lookup"); //$NON-NLS-1$
 			setPriority(Job.INTERACTIVE);
-			setSystem(true);
+			EclipseUtil.setSystemForJob(this);
 		}
 
-		public void setLookupInfo(Object target, ISourceLocator locator, IWorkbenchPage page) {
+		public void setLookupInfo(Object target, ISourceLocator locator, IWorkbenchPage page)
+		{
 			fTarget = target;
 			fLocator = locator;
 			fPage = page;
@@ -161,17 +184,21 @@ public class SourceDisplayAdapter implements ISourceDisplay {
 		 * (non-Javadoc)
 		 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime. IProgressMonitor)
 		 */
-		protected IStatus run(IProgressMonitor monitor) {
-			if (!monitor.isCanceled()) {
+		protected IStatus run(IProgressMonitor monitor)
+		{
+			if (!monitor.isCanceled())
+			{
 				Object lookupObject = fTarget;
 				ISourceLocator lookupLocator = fLocator;
 
 				if (lookupObject != null && lookupLocator != null
-						&& (!(lookupObject instanceof IStackFrame) || !((IStackFrame) lookupObject).isTerminated())) {
+						&& (!(lookupObject instanceof IStackFrame) || !((IStackFrame) lookupObject).isTerminated()))
+				{
 					ISourceLookupResult result = null;
 					result = DebugUITools.lookupSource(lookupObject, lookupLocator);
 					if (!monitor.isCanceled() && fPage != null
-							&& (!(lookupObject instanceof IStackFrame) || !((IStackFrame) lookupObject).isTerminated())) {
+							&& (!(lookupObject instanceof IStackFrame) || !((IStackFrame) lookupObject).isTerminated()))
+					{
 						fSourceDisplayJob.setDisplayInfo(result, fPage);
 						fSourceDisplayJob.schedule();
 					}
@@ -183,21 +210,24 @@ public class SourceDisplayAdapter implements ISourceDisplay {
 
 	}
 
-	private static class SourceDisplayJob extends UIJob {
+	private static class SourceDisplayJob extends UIJob
+	{
 
 		private ISourceLookupResult fResult;
 		private IWorkbenchPage fPage;
 
-		protected SourceDisplayJob() {
+		protected SourceDisplayJob()
+		{
 			super("Debug Source Display"); //$NON-NLS-1$
-			setSystem(true);
+			EclipseUtil.setSystemForJob(this);
 			setPriority(Job.INTERACTIVE);
 		}
 
 		/**
 		 * Constructs a new source display job
 		 */
-		public synchronized void setDisplayInfo(ISourceLookupResult result, IWorkbenchPage page) {
+		public synchronized void setDisplayInfo(ISourceLookupResult result, IWorkbenchPage page)
+		{
 			fResult = result;
 			fPage = page;
 		}
@@ -206,16 +236,20 @@ public class SourceDisplayAdapter implements ISourceDisplay {
 		 * (non-Javadoc)
 		 * @see org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime .IProgressMonitor)
 		 */
-		public IStatus runInUIThread(IProgressMonitor monitor) {
+		public IStatus runInUIThread(IProgressMonitor monitor)
+		{
 			ISourceLookupResult result = null;
 			IWorkbenchPage page = null;
-			synchronized (this) {
+			synchronized (this)
+			{
 				result = fResult;
 				page = fPage;
 				setDisplayInfo(null, null);
 			}
-			if (!monitor.isCanceled() && result != null && page != null) {
-				if (result.getEditorInput() == null) {
+			if (!monitor.isCanceled() && result != null && page != null)
+			{
+				if (result.getEditorInput() == null)
+				{
 					MessageDialog.openError(page.getWorkbenchWindow().getShell(),
 							Messages.getString("SourceDisplayAdapter.Error_Opening_Source"), //$NON-NLS-1$
 							MessageFormat.format(Messages.getString("SourceDisplayAdapter.Source_Not_Located"), //$NON-NLS-1$
@@ -223,7 +257,8 @@ public class SourceDisplayAdapter implements ISourceDisplay {
 					return Status.CANCEL_STATUS;
 				}
 				// Workaround for http://support.aptana.com/asap/browse/STU-3818
-				if (result.getArtifact() instanceof ISourceLink) {
+				if (result.getArtifact() instanceof ISourceLink)
+				{
 					boolean oldReuseValue = DebugUIPlugin.getDefault().getPreferenceStore()
 							.getBoolean(IDebugUIConstants.PREF_REUSE_EDITOR);
 					DebugUIPlugin.getDefault().getPreferenceStore()
@@ -231,15 +266,20 @@ public class SourceDisplayAdapter implements ISourceDisplay {
 					DebugUITools.displaySource(result, page);
 					DebugUIPlugin.getDefault().getPreferenceStore()
 							.setValue(IDebugUIConstants.PREF_REUSE_EDITOR, oldReuseValue);
-				} else {
+				}
+				else
+				{
 					DebugUITools.displaySource(result, page);
 				}
-				if (result.getArtifact() instanceof IJSScriptElement) {
+				if (result.getArtifact() instanceof IJSScriptElement)
+				{
 					int lineNumber = ((IJSScriptElement) result.getArtifact()).getBaseLine();
 					IEditorInput editorInput = result.getEditorInput();
-					if (editorInput != null && lineNumber > 0) {
+					if (editorInput != null && lineNumber > 0)
+					{
 						IEditorPart editorPart = SourceDisplayUtil.findEditor(editorInput);
-						if (editorPart != null) {
+						if (editorPart != null)
+						{
 							SourceDisplayUtil.revealLineInEditor(editorPart, lineNumber);
 						}
 					}
@@ -252,13 +292,16 @@ public class SourceDisplayAdapter implements ISourceDisplay {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static class Factory implements IAdapterFactory {
+	public static class Factory implements IAdapterFactory
+	{
 
 		/*
 		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
 		 */
-		public Object getAdapter(Object adaptableObject, Class adapterType) {
-			if (ISourceDisplay.class.equals(adapterType)) {
+		public Object getAdapter(Object adaptableObject, Class adapterType)
+		{
+			if (ISourceDisplay.class.equals(adapterType))
+			{
 				return SourceDisplayAdapter.getInstance();
 			}
 			return null;
@@ -267,7 +310,8 @@ public class SourceDisplayAdapter implements ISourceDisplay {
 		/*
 		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapterList()
 		 */
-		public Class[] getAdapterList() {
+		public Class[] getAdapterList()
+		{
 			return new Class[] { ISourceDisplay.class };
 		}
 

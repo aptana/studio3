@@ -125,7 +125,7 @@ public class CoreIOPlugin extends Plugin
 			}
 
 		};
-		job.setSystem(!EclipseUtil.showSystemJobs());
+		EclipseUtil.setSystemForJob(job);
 		job.schedule();
 	}
 

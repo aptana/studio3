@@ -174,7 +174,7 @@ class GitResourceListener implements IResourceChangeListener
 		{
 			super(name);
 			this.projectsToAttach = projectsToAttach;
-			setSystem(!EclipseUtil.showSystemJobs());
+			EclipseUtil.setSystemForJob(this);
 			setPriority(Job.SHORT);
 		}
 

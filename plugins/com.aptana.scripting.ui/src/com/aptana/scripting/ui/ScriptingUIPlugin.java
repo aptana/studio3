@@ -100,7 +100,7 @@ public class ScriptingUIPlugin extends AbstractUIPlugin
 				return Status.OK_STATUS;
 			}
 		};
-		startupJob.setSystem(!EclipseUtil.showSystemJobs());
+		EclipseUtil.setSystemForJob(startupJob);
 		startupJob.schedule();
 	}
 

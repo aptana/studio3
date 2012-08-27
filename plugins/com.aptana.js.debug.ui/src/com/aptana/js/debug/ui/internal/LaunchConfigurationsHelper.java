@@ -42,6 +42,7 @@ import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.core.CoreStrings;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.js.debug.core.ILaunchConfigurationConstants;
 import com.aptana.js.debug.core.JSLaunchConfigurationDelegate;
@@ -56,12 +57,15 @@ import com.aptana.ui.util.WorkbenchBrowserUtil;
  * @author Max Stepanov
  */
 @SuppressWarnings("restriction")
-public final class LaunchConfigurationsHelper {
+public final class LaunchConfigurationsHelper
+{
 
-	private LaunchConfigurationsHelper() {
+	private LaunchConfigurationsHelper()
+	{
 	}
 
-	public static void doCheckDefaultLaunchConfigurations() {
+	public static void doCheckDefaultLaunchConfigurations()
+	{
 		JSLaunchConfigurationDelegate.setCheckFirefoxLocationListener(new Listener()
 		{
 
@@ -74,7 +78,8 @@ public final class LaunchConfigurationsHelper {
 		UIJob job = new UIJob("Checking default launch configuration") { //$NON-NLS-1$
 
 			@Override
-			public IStatus runInUIThread(IProgressMonitor monitor) {
+			public IStatus runInUIThread(IProgressMonitor monitor)
+			{
 				new LaunchConfigurationsHelper().checkDefaultLaunchConfiguration();
 				WorkbenchCloseListener.init();
 				return Status.OK_STATUS;
@@ -82,11 +87,12 @@ public final class LaunchConfigurationsHelper {
 
 		};
 		job.setRule(PopupSchedulingRule.INSTANCE);
-		job.setSystem(true);
+		EclipseUtil.setSystemForJob(job);
 		job.schedule();
 	}
 
-	private void checkDefaultLaunchConfiguration() {
+	private void checkDefaultLaunchConfiguration()
+	{
 		Stack<ILaunchConfiguration> defaultConfigurations = new Stack<ILaunchConfiguration>();
 		ILaunchConfiguration configuration;
 		LaunchConfigurationManager manager = DebugUIPlugin.getDefault().getLaunchConfigurationManager();
@@ -94,122 +100,154 @@ public final class LaunchConfigurationsHelper {
 
 		/* Firefox */
 		configuration = getOrCreateDefaultLaunchConfiguration(JSLaunchConfigurationHelper.FIREFOX);
-		if (configuration != null) {
+		if (configuration != null)
+		{
 			defaultConfigurations.push(configuration);
 		}
 
 		/* IE */
-		if (Platform.OS_WIN32.equals(Platform.getOS())) {
+		if (Platform.OS_WIN32.equals(Platform.getOS()))
+		{
 			configuration = getOrCreateDefaultLaunchConfiguration(JSLaunchConfigurationHelper.INTERNET_EXPLORER);
-			if (configuration != null) {
+			if (configuration != null)
+			{
 				defaultConfigurations.push(configuration);
 			}
 		}
 
-		for (ILaunchConfiguration i : history) {
-			for (Iterator<ILaunchConfiguration> j = defaultConfigurations.iterator(); j.hasNext();) {
-				if (i.equals(j.next())) {
+		for (ILaunchConfiguration i : history)
+		{
+			for (Iterator<ILaunchConfiguration> j = defaultConfigurations.iterator(); j.hasNext();)
+			{
+				if (i.equals(j.next()))
+				{
 					j.remove();
 					break;
 				}
 			}
 		}
-		while (!defaultConfigurations.empty()) {
+		while (!defaultConfigurations.empty())
+		{
 			configuration = (ILaunchConfiguration) defaultConfigurations.pop();
 			setRecentLaunchHistory(IDebugUIConstants.ID_RUN_LAUNCH_GROUP, configuration);
 			setRecentLaunchHistory(IDebugUIConstants.ID_DEBUG_LAUNCH_GROUP, configuration);
 		}
 	}
 
-	private void setRecentLaunchHistory(String groupId, final ILaunchConfiguration configuration) {
+	private void setRecentLaunchHistory(String groupId, final ILaunchConfiguration configuration)
+	{
 		LaunchConfigurationManager manager = DebugUIPlugin.getDefault().getLaunchConfigurationManager();
 		LaunchHistory history = manager.getLaunchHistory(groupId);
 
 		/* Launch history hack */
-		history.launchAdded(new ILaunch() {
+		history.launchAdded(new ILaunch()
+		{
 
-			public ILaunchConfiguration getLaunchConfiguration() {
+			public ILaunchConfiguration getLaunchConfiguration()
+			{
 				return configuration;
 			}
 
 			/* All other methods are stubs */
-			public Object[] getChildren() {
+			public Object[] getChildren()
+			{
 				return null;
 			}
 
-			public IDebugTarget getDebugTarget() {
+			public IDebugTarget getDebugTarget()
+			{
 				return null;
 			}
 
-			public IProcess[] getProcesses() {
+			public IProcess[] getProcesses()
+			{
 				return null;
 			}
 
-			public IDebugTarget[] getDebugTargets() {
+			public IDebugTarget[] getDebugTargets()
+			{
 				return null;
 			}
 
-			public void addDebugTarget(IDebugTarget target) {
+			public void addDebugTarget(IDebugTarget target)
+			{
 			}
 
-			public void removeDebugTarget(IDebugTarget target) {
+			public void removeDebugTarget(IDebugTarget target)
+			{
 			}
 
-			public void addProcess(IProcess process) {
+			public void addProcess(IProcess process)
+			{
 			}
 
-			public void removeProcess(IProcess process) {
+			public void removeProcess(IProcess process)
+			{
 			}
 
-			public ISourceLocator getSourceLocator() {
+			public ISourceLocator getSourceLocator()
+			{
 				return null;
 			}
 
-			public void setSourceLocator(ISourceLocator sourceLocator) {
+			public void setSourceLocator(ISourceLocator sourceLocator)
+			{
 			}
 
-			public String getLaunchMode() {
+			public String getLaunchMode()
+			{
 				return null;
 			}
 
-			public void setAttribute(String key, String value) {
+			public void setAttribute(String key, String value)
+			{
 			}
 
-			public String getAttribute(String key) {
+			public String getAttribute(String key)
+			{
 				return null;
 			}
 
-			public boolean hasChildren() {
+			public boolean hasChildren()
+			{
 				return false;
 			}
 
-			public boolean canTerminate() {
+			public boolean canTerminate()
+			{
 				return false;
 			}
 
-			public boolean isTerminated() {
+			public boolean isTerminated()
+			{
 				return false;
 			}
 
-			public void terminate() throws DebugException {
+			public void terminate() throws DebugException
+			{
 			}
 
 			@SuppressWarnings("rawtypes")
-			public Object getAdapter(Class adapter) {
+			public Object getAdapter(Class adapter)
+			{
 				return null;
 			}
 		});
 
 	}
 
-	private ILaunchConfiguration getOrCreateDefaultLaunchConfiguration(String nature) {
+	private ILaunchConfiguration getOrCreateDefaultLaunchConfiguration(String nature)
+	{
 		ILaunchConfigurationType configType = getLaunchConfigType();
 		ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
-		try {
+		try
+		{
 			ILaunchConfiguration[] configs = manager.getLaunchConfigurations(configType);
-			for (ILaunchConfiguration config : configs) {
+			for (ILaunchConfiguration config : configs)
+			{
 				if (nature.equals(config.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_BROWSER_NATURE,
-						StringUtil.EMPTY))) {
+						StringUtil.EMPTY)))
+				{
 					if (JSLaunchConfigurationHelper.FIREFOX.equals(nature))
 					{
 						String browserExecutable = config.getAttribute(
@@ -229,21 +267,27 @@ public final class LaunchConfigurationsHelper {
 			JSLaunchConfigurationHelper.setDefaults(wc, nature);
 
 			return wc.doSave();
-		} catch (CoreException e) {
+		}
+		catch (CoreException e)
+		{
 			IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 		}
 		return null;
 	}
 
-	private ILaunchConfigurationType getLaunchConfigType() {
+	private ILaunchConfigurationType getLaunchConfigType()
+	{
 		ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
 		return manager.getLaunchConfigurationType(ILaunchConfigurationConstants.ID_JS_APPLICATION);
 	}
 
-	public static String showBrowserNotFoundDialog(final boolean download) {
+	public static String showBrowserNotFoundDialog(final boolean download)
+	{
 		final String[] path = new String[] { null };
-		UIUtils.getDisplay().syncExec(new Runnable() {
-			public void run() {
+		UIUtils.getDisplay().syncExec(new Runnable()
+		{
+			public void run()
+			{
 				MessageDialogWithToggle md = new MessageDialogWithToggle(UIUtils.getActiveShell(),
 						Messages.Startup_Notification, null, Messages.Startup_StudioRequiresFirefox,
 						MessageDialog.INFORMATION, new String[] { StringUtil.ellipsify(CoreStrings.BROWSE),
@@ -253,18 +297,21 @@ public final class LaunchConfigurationsHelper {
 				md.setPrefStore(JSDebugUIPlugin.getDefault().getPreferenceStore());
 
 				int returnCode = md.open();
-				switch (returnCode) {
+				switch (returnCode)
+				{
 					case IDialogConstants.INTERNAL_ID:
 						FileDialog fileDialog = new FileDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow()
 								.getShell(), SWT.OPEN);
-						if (Platform.OS_WIN32.equals(Platform.getOS())) {
+						if (Platform.OS_WIN32.equals(Platform.getOS()))
+						{
 							fileDialog.setFilterExtensions(new String[] { "*.exe" }); //$NON-NLS-1$
 							fileDialog.setFilterNames(new String[] { Messages.Startup_ExecutableFiles });
 						}
 						path[0] = fileDialog.open();
 						break;
 					case IDialogConstants.INTERNAL_ID + 1:
-						if (download) {
+						if (download)
+						{
 							WorkbenchBrowserUtil.launchExternalBrowser("http://www.getfirefox.com"); //$NON-NLS-1$
 						}
 						path[0] = StringUtil.EMPTY;

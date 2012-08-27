@@ -999,7 +999,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 							return Status.OK_STATUS;
 						}
 					};
-					linkWithEditorJob.setSystem(true);
+					EclipseUtil.setSystemForJob(linkWithEditorJob);
 					linkWithEditorJob.schedule();
 				}
 			}

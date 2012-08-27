@@ -247,7 +247,7 @@ public class IOUIPlugin extends AbstractUIPlugin
 			}
 
 		};
-		job.setSystem(!EclipseUtil.showSystemJobs());
+		EclipseUtil.setSystemForJob(job);
 		job.schedule();
 	}
 

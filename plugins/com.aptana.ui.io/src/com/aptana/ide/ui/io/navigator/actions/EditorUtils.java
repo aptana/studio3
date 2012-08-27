@@ -28,6 +28,7 @@ import org.eclipse.ui.texteditor.AbstractTextEditor;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ArrayUtil;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ide.ui.io.IUniformFileStoreEditorInput;
 import com.aptana.ide.ui.io.internal.UniformFileStoreEditorInputFactory;
@@ -130,7 +131,7 @@ public class EditorUtils
 						return Status.OK_STATUS;
 					}
 				};
-				openEditor.setSystem(true);
+				EclipseUtil.setSystemForJob(openEditor);
 				openEditor.schedule();
 				return Status.OK_STATUS;
 			}

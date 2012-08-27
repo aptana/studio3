@@ -48,6 +48,7 @@ import org.eclipse.ui.dialogs.PatternFilter;
 import org.eclipse.ui.progress.WorkbenchJob;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
@@ -294,7 +295,7 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 				return Status.OK_STATUS;
 			}
 		};
-		fFilterRefreshJob.setSystem(true);
+		EclipseUtil.setSystemForJob(fFilterRefreshJob);
 	}
 
 	public void refresh(IParseRootNode ast)

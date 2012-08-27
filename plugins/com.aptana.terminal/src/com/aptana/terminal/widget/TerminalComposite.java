@@ -30,6 +30,7 @@ import org.eclipse.tm.internal.terminal.provisional.api.TerminalConnectorExtensi
 import org.eclipse.tm.internal.terminal.provisional.api.TerminalState;
 import org.eclipse.ui.progress.UIJob;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.terminal.connector.LocalTerminalConnector;
 import com.aptana.terminal.internal.IProcessListener;
 import com.aptana.terminal.internal.TerminalCloseHelper;
@@ -86,7 +87,7 @@ public class TerminalComposite extends Composite {
 				return Status.OK_STATUS;
 			}
 		};
-		job.setSystem(true);
+		EclipseUtil.setSystemForJob(job);
 		job.schedule(100);
 	}
 

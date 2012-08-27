@@ -107,7 +107,7 @@ public class GitIndex
 					return family == GitIndex.this;
 				}
 			};
-			indexRefreshJob.setSystem(!EclipseUtil.showSystemJobs());
+			EclipseUtil.setSystemForJob(indexRefreshJob);
 		}
 		else
 		{
@@ -189,10 +189,9 @@ public class GitIndex
 		this.files = new Vector<ChangedFile>();
 
 		// Schedule all the jobs
-		boolean setSystem = !EclipseUtil.showSystemJobs();
 		for (Job toSchedule : jobs)
 		{
-			toSchedule.setSystem(setSystem);
+			EclipseUtil.setSystemForJob(toSchedule);
 			toSchedule.setPriority(Job.SHORT);
 			toSchedule.schedule();
 		}
@@ -753,7 +752,7 @@ public class GitIndex
 				return family == GitIndex.this;
 			}
 		};
-		job.setSystem(!EclipseUtil.showSystemJobs());
+		EclipseUtil.setSystemForJob(job);
 		job.schedule();
 	}
 

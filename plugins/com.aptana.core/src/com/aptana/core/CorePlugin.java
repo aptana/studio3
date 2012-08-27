@@ -76,7 +76,14 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 				return Status.OK_STATUS;
 			}
 		};
-		job.setSystem(true);
+		try
+		{
+			job.setSystem(true);
+		}
+		catch (IllegalStateException e)
+		{
+			// ignore
+		}
 		job.schedule();
 	}
 

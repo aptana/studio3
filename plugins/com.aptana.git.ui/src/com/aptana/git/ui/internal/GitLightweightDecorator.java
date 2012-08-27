@@ -401,7 +401,7 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 					return Status.OK_STATUS;
 				}
 			};
-			refreshJob.setSystem(true);
+			EclipseUtil.setSystemForJob(refreshJob);
 		}
 		refreshJob.cancel();
 		refreshJob.schedule(50);

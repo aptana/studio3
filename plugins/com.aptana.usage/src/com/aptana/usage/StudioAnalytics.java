@@ -106,7 +106,7 @@ public class StudioAnalytics
 				return Status.OK_STATUS;
 			}
 		};
-		job.setSystem(!EclipseUtil.showSystemJobs());
+		EclipseUtil.setSystemForJob(job);
 		job.setPriority(Job.BUILD);
 		job.schedule();
 

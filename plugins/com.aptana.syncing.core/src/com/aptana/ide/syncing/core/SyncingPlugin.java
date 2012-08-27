@@ -127,7 +127,7 @@ public class SyncingPlugin extends Plugin
 				return Status.OK_STATUS;
 			}
 		};
-		job.setSystem(!EclipseUtil.showSystemJobs());
+		EclipseUtil.setSystemForJob(job);
 		job.schedule();
 	}
 

@@ -66,6 +66,7 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
@@ -883,7 +884,7 @@ public class CommandExecutionUtils
 						}
 					};
 					hideJob.setPriority(Job.INTERACTIVE);
-					hideJob.setSystem(true);
+					EclipseUtil.setSystemForJob(hideJob);
 					hideJob.schedule(DELAY);
 
 					shell.addShellListener(new ShellAdapter()

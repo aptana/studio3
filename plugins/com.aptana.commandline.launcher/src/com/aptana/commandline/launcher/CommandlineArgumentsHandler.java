@@ -39,6 +39,7 @@ import org.eclipse.ui.progress.WorkbenchJob;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.IProjectContext;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.FileUtil;
 
 /**
@@ -75,7 +76,7 @@ public class CommandlineArgumentsHandler
 				return Status.OK_STATUS;
 			}
 		};
-		workbenchJob.setSystem(true);
+		EclipseUtil.setSystemForJob(workbenchJob);
 		workbenchJob.setPriority(WorkbenchJob.INTERACTIVE);
 		workbenchJob.schedule();
 

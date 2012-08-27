@@ -82,6 +82,7 @@ import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.core.io.efs.EFSUtils;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.ConnectionPointType;
@@ -385,7 +386,14 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 
 		};
 		disconnectJob.setPriority(Job.INTERACTIVE);
-		disconnectJob.setSystem(false);
+		try
+		{
+			disconnectJob.setSystem(false);
+		}
+		catch (IllegalStateException ise)
+		{
+			// ignore
+		}
 		disconnectJob.schedule();
 		close();
 	}
@@ -1427,7 +1435,14 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 
 		};
 		buildSmartSync.setPriority(Job.LONG);
-		buildSmartSync.setSystem(false);
+		try
+		{
+			buildSmartSync.setSystem(false);
+		}
+		catch (IllegalStateException ise)
+		{
+			// ignore
+		}
 		buildSmartSync.schedule();
 	}
 
@@ -1902,7 +1917,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 				}
 			}
 		};
-		updateEndJob.setSystem(true);
+		EclipseUtil.setSystemForJob(updateEndJob);
 		updateEndJob.schedule();
 	}
 

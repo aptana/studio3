@@ -15,11 +15,12 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import com.aptana.jetty.util.epl.ajax.JSON;
 
 import com.aptana.configurations.processor.ConfigurationStatus;
 import com.aptana.configurations.processor.IConfigurationProcessor;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.EclipseUtil;
+import com.aptana.jetty.util.epl.ajax.JSON;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.BrowserNotifier;
 import com.aptana.portal.ui.dispatch.IBrowserNotificationConstants;
@@ -73,7 +74,7 @@ public class StudioUpdateController extends AbstractActionController
 					return Status.OK_STATUS;
 				}
 			};
-			computationJob.setSystem(true);
+			EclipseUtil.setSystemForJob(computationJob);
 			computationJob.schedule();
 			return IBrowserNotificationConstants.JSON_OK;
 		}
@@ -113,7 +114,7 @@ public class StudioUpdateController extends AbstractActionController
 					return Status.OK_STATUS;
 				}
 			};
-			computationJob.setSystem(true);
+			EclipseUtil.setSystemForJob(computationJob);
 			computationJob.schedule();
 			return IBrowserNotificationConstants.JSON_OK;
 		}

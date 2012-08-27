@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.InstanceScope;
@@ -362,6 +363,18 @@ public class EclipseUtil
 		}
 		return Platform.getPreferencesService().getBoolean(CorePlugin.PLUGIN_ID,
 				ICorePreferenceConstants.PREF_SHOW_SYSTEM_JOBS, false, null);
+	}
+
+	public static void setSystemForJob(Job job)
+	{
+		try
+		{
+			job.setSystem(!showSystemJobs());
+		}
+		catch (IllegalStateException e)
+		{
+			// ignore
+		}
 	}
 
 	/**

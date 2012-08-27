@@ -281,7 +281,7 @@ public class CommonPresentationReconciler extends PresentationReconciler
 				}
 			};
 			job.setPriority(Job.DECORATE);
-			job.setSystem(!EclipseUtil.showSystemJobs());
+			EclipseUtil.setSystemForJob(job);
 		}
 		if (!delayedRegions.isEmpty())
 		{

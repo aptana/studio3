@@ -543,7 +543,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 				return Status.OK_STATUS;
 			}
 		};
-		job.setSystem(true);
+		EclipseUtil.setSystemForJob(job);
 		job.setPriority(Job.BUILD);
 		job.schedule(250);
 

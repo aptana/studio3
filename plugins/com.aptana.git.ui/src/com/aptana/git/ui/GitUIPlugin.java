@@ -99,7 +99,7 @@ public class GitUIPlugin extends AbstractUIPlugin
 				return Status.OK_STATUS;
 			}
 		};
-		job.setSystem(true);
+		EclipseUtil.setSystemForJob(job);
 		job.schedule();
 	}
 

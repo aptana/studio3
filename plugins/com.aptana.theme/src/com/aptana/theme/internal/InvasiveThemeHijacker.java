@@ -113,7 +113,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 	public InvasiveThemeHijacker()
 	{
 		super("Installing invasive theme hijacker!"); //$NON-NLS-1$
-		setSystem(!EclipseUtil.showSystemJobs());
+		EclipseUtil.setSystemForJob(this);
 	}
 
 	protected boolean applyToViews()
