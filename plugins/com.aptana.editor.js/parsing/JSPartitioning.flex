@@ -11,14 +11,12 @@ package com.aptana.editor.js.parsing;
 import java.io.Reader;
 import java.io.StringReader;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import beaver.Symbol;
 import beaver.Scanner;
 
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import com.aptana.editor.js.parsing.JSTokenTypeSymbol;
+import com.aptana.editor.common.parsing.ForceReturnException;
 
 %%
 
@@ -101,7 +99,8 @@ import com.aptana.editor.js.parsing.JSTokenTypeSymbol;
                 case IDENTIFIER:
                 case NUMBER:
                 case REGEX:
-                case STRING:
+                case STRING_SINGLE:
+                case STRING_DOUBLE:
                 case RPAREN:
                 case PLUS_PLUS:
                 case MINUS_MINUS:

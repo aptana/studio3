@@ -14,7 +14,7 @@ import org.eclipse.jface.text.rules.IPartitionTokenScanner;
 import com.aptana.editor.common.IPartitioningConfiguration;
 
 public class JSSourcePartitionScannerJFlexTest extends JSSourcePartitionScannerTest
-// public class JSSourcePartitionScannerJFlexTest extends TestCase
+// public class JSSourcePartitionScannerJFlexTest extends AbstractPartitionTestCase
 {
 
 	protected IPartitionTokenScanner createPartitionScanner()
@@ -290,6 +290,13 @@ public class JSSourcePartitionScannerJFlexTest extends JSSourcePartitionScannerT
 
 		assertPartitions(doc, "__js_sdoc_comment:0:18", "__dftl_partition_content_type:18:41",
 				"__js_sdoc_comment:41:122", "__dftl_partition_content_type:122:");
+	}
+
+	public void testFlexUnfinished() throws Exception
+	{
+		String source = "" + "myObject = {\n" + "	/**|\"key\": function(one, two, three) {}\n" + "}\n" + "";
+		assertPartitions(source, "__dftl_partition_content_type:0:14", "__js_sdoc_comment:14:");
+
 	}
 
 	protected String[] getContentTypes()
