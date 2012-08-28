@@ -25,6 +25,7 @@ public class AllTests
 		suite.addTestSuite(JSRegexScannerTest.class);
 		suite.addTestSuite(JSSingleQuotedStringScannerTest.class);
 		suite.addTestSuite(JSSourcePartitionScannerTest.class);
+		suite.addTestSuite(JSSourcePartitionScannerJFlexTest.class);
 		// $JUnit-END$
 		return suite;
 	}

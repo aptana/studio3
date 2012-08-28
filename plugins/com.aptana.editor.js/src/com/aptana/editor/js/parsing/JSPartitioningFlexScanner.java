@@ -19,6 +19,7 @@ import java.util.List;
 import beaver.Symbol;
 import beaver.Scanner;
 
+import com.aptana.editor.common.parsing.ForceReturnException;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import com.aptana.editor.js.parsing.JSTokenTypeSymbol;
 

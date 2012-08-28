@@ -7,14 +7,13 @@
  */
 package com.aptana.editor.js;
 
-import junit.framework.TestCase;
-
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.rules.FastPartitioner;
 import org.eclipse.jface.text.rules.IPartitionTokenScanner;
 
+import com.aptana.editor.common.AbstractPartitionTestCase;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IPartitioningConfiguration;
 
@@ -22,7 +21,7 @@ import com.aptana.editor.common.IPartitioningConfiguration;
  * @author Chris
  * @author Sandip
  */
-public class JSSourcePartitionScannerTest extends TestCase
+public class JSSourcePartitionScannerTest extends AbstractPartitionTestCase
 {
 	private IDocumentPartitioner partitioner;
 
@@ -50,6 +49,12 @@ public class JSSourcePartitionScannerTest extends TestCase
 	protected IPartitionTokenScanner createPartitionScanner()
 	{
 		return new JSSourcePartitionScanner();
+	}
+
+	@Override
+	protected String[] getContentTypes()
+	{
+		return JSSourceConfiguration.getDefault().getContentTypes();
 	}
 
 	private String getContentType(String content, int offset)

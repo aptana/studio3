@@ -7,16 +7,10 @@
  */
 package com.aptana.editor.js;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.rules.FastPartitioner;
 import org.eclipse.jface.text.rules.IPartitionTokenScanner;
 
-import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.IPartitioningConfiguration;
 
 public class JSSourcePartitionScannerJFlexTest extends JSSourcePartitionScannerTest
@@ -298,67 +292,11 @@ public class JSSourcePartitionScannerJFlexTest extends JSSourcePartitionScannerT
 				"__js_sdoc_comment:41:122", "__dftl_partition_content_type:122:");
 	}
 
-	protected void assertPartitions(String content, String... expected) throws BadLocationException
+	protected String[] getContentTypes()
 	{
-		IDocument document = configDoc(content);
-		assertPartitions(document, expected);
-	}
-
-	private IDocument configDoc(String content)
-	{
-		IDocument document = new Document(content);
 		IPartitioningConfiguration configuration = JSSourceConfiguration.getDefault();
-
-		FastPartitioner partitioner = new FastPartitioner(createPartitionScanner(), configuration.getContentTypes());
-		partitioner.connect(document);
-		document.setDocumentPartitioner(partitioner);
-		return document;
-	}
-
-	protected void assertPartitions(IDocument document, String... expected) throws BadLocationException
-	{
-		String lastContentType = null;
-
-		List<String> found = new ArrayList<String>();
-		StringBuilder builder = new StringBuilder();
-		for (int i = 0; i < document.getLength(); i++)
-		{
-			String contentType = document.getContentType(i);
-			if (lastContentType == null)
-			{
-
-				builder.append("\"");
-				builder.append(contentType);
-				builder.append(':');
-				builder.append(i);
-				builder.append(':');
-
-			}
-			else if (!lastContentType.equals(contentType))
-			{
-				builder.append(i);
-				builder.append("\",");
-				found.add(builder.toString());
-				builder = new StringBuilder();
-				builder.append("\"");
-				builder.append(contentType);
-				builder.append(':');
-				builder.append(i);
-				builder.append(':');
-			}
-
-			lastContentType = contentType;
-		}
-		builder.append("\",");
-		found.add(builder.toString());
-
-		List<String> expectedList = new ArrayList<String>();
-		for (String expectedToken : expected)
-		{
-			expectedList.add("\"" + expectedToken + "\",");
-		}
-
-		assertEquals(StringUtil.join("\n", expectedList), StringUtil.join("\n", found));
+		String[] contentTypes = configuration.getContentTypes();
+		return contentTypes;
 	}
 
 }

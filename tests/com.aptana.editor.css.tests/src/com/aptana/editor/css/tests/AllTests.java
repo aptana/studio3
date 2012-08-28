@@ -12,6 +12,7 @@ import junit.framework.TestSuite;
 
 import com.aptana.editor.css.CSSCodeScannerTest;
 import com.aptana.editor.css.CSSEditorTest;
+import com.aptana.editor.css.CSSSourcePartitionScannerFlexTest;
 import com.aptana.editor.css.CSSSourcePartitionScannerTest;
 import com.aptana.editor.css.internal.build.CSSTaskDetectorTest;
 import com.aptana.editor.css.internal.text.CSSFoldingComputerTest;
@@ -28,6 +29,7 @@ public class AllTests
 		suite.addTestSuite(CSSEditorTest.class);
 		suite.addTestSuite(CSSFoldingComputerTest.class);
 		suite.addTestSuite(CSSSourcePartitionScannerTest.class);
+		suite.addTestSuite(CSSSourcePartitionScannerFlexTest.class);
 		suite.addTest(ValidatorTests.suite());
 		suite.addTest(com.aptana.editor.css.parsing.AllTests.suite());
 		suite.addTest(com.aptana.editor.css.outline.AllTests.suite());

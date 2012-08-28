@@ -854,7 +854,7 @@ public class CSSCodeScannerTest extends AbstractTokenScannerTestCase
 
 	protected void partition(IDocument document)
 	{
-		IDocumentPartitioner partitioner = new FastPartitioner(new CSSSourcePartitionScanner(),
+		IDocumentPartitioner partitioner = new FastPartitioner(new CSSSourcePartitionScannerJFlex(),
 				CSSSourceConfiguration.CONTENT_TYPES);
 		partitioner.connect(document);
 		document.setDocumentPartitioner(partitioner);

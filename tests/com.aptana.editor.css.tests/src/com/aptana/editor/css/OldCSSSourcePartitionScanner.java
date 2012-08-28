@@ -9,10 +9,16 @@ package com.aptana.editor.css;
 
 import com.aptana.editor.common.text.rules.SourceConfigurationPartitionScanner;
 
-public class CSSSourcePartitionScanner extends SourceConfigurationPartitionScanner {
-	
-	public CSSSourcePartitionScanner() {
+/**
+ * Kept only for tests.
+ */
+@Deprecated
+public class OldCSSSourcePartitionScanner extends SourceConfigurationPartitionScanner
+{
+
+	public OldCSSSourcePartitionScanner()
+	{
 		super(CSSSourceConfiguration.getDefault());
 	}
-	
+
 }

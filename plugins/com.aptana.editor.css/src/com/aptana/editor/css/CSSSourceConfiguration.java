@@ -63,15 +63,18 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 
 	static
 	{
-		IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
-		c.addTranslation(new QualifiedContentType(ICSSConstants.CONTENT_TYPE_CSS), new QualifiedContentType(
-				ICSSConstants.CSS_SCOPE));
-		c.addTranslation(new QualifiedContentType(MULTILINE_COMMENT), new QualifiedContentType(
-				ICSSConstants.CSS_COMMENT_BLOCK_SCOPE));
-		c.addTranslation(new QualifiedContentType(STRING_DOUBLE), new QualifiedContentType(
-				ICSSConstants.CSS_STRING_SCOPE));
-		c.addTranslation(new QualifiedContentType(STRING_SINGLE), new QualifiedContentType(
-				ICSSConstants.CSS_STRING_SCOPE));
+		if (CommonEditorPlugin.getDefault() != null)
+		{
+			IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
+			c.addTranslation(new QualifiedContentType(ICSSConstants.CONTENT_TYPE_CSS), new QualifiedContentType(
+					ICSSConstants.CSS_SCOPE));
+			c.addTranslation(new QualifiedContentType(MULTILINE_COMMENT), new QualifiedContentType(
+					ICSSConstants.CSS_COMMENT_BLOCK_SCOPE));
+			c.addTranslation(new QualifiedContentType(STRING_DOUBLE), new QualifiedContentType(
+					ICSSConstants.CSS_STRING_SCOPE));
+			c.addTranslation(new QualifiedContentType(STRING_SINGLE), new QualifiedContentType(
+					ICSSConstants.CSS_STRING_SCOPE));
+		}
 	}
 
 	public static CSSSourceConfiguration getDefault()

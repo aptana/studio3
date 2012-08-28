@@ -28,6 +28,11 @@
         	outdir="../src/com/aptana/editor/css/parsing" 
         	nobak="on"/>
     	
+        <jflex 
+        	file="CSSPartitioning.flex" 
+        	outdir="../src/com/aptana/editor/css/parsing" 
+        	nobak="on"/>
+    	
 	    <beaver 
 	    	file             = "CSS.grammar"
 	        destdir          = "../src"
