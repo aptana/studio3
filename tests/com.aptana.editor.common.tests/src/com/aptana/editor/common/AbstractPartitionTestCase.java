@@ -33,36 +33,34 @@ public abstract class AbstractPartitionTestCase extends TestCase
 
 		List<String> found = new ArrayList<String>();
 		StringBuilder builder = new StringBuilder();
-		for (int i = 0; i < document.getLength(); i++)
+		int length = document.getLength();
+		for (int i = 0; i < length; i++)
 		{
 			String contentType = document.getContentType(i);
 			if (lastContentType == null)
 			{
-
-				builder.append("\"");
-				builder.append(contentType);
-				builder.append(':');
-				builder.append(i);
-				builder.append(':');
-
+				// On the first content type found, start the string:
+				// "__css_string_single:0:"
+				builder.append("\"").append(contentType).append(':').append(i).append(':');
 			}
 			else if (!lastContentType.equals(contentType))
 			{
-				builder.append(i);
-				builder.append("\",");
+				// When the content type changes it, finish the string: "__css_string_single:0:5", add it
+				// and start a new one (i.e.: "__css_string_single:0:5", "__dftl_partition_content_type:5:")
+				builder.append(i).append("\",");
 				found.add(builder.toString());
+
 				builder = new StringBuilder();
-				builder.append("\"");
-				builder.append(contentType);
-				builder.append(':');
-				builder.append(i);
-				builder.append(':');
+				builder.append("\"").append(contentType).append(':').append(i).append(':');
 			}
 
 			lastContentType = contentType;
 		}
 		builder.append("\",");
 		found.add(builder.toString());
+
+		// Now, transform the expected in a list to be transformed in a string with new-lines (which
+		// will be used to actually do the comparison).
 
 		List<String> expectedList = new ArrayList<String>();
 		for (String expectedToken : expected)

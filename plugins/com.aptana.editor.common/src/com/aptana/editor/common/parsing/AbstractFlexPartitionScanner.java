@@ -28,8 +28,23 @@ import com.aptana.editor.common.CommonEditorPlugin;
 public abstract class AbstractFlexPartitionScanner extends AbstractFlexTokenScanner implements IPartitionTokenScanner
 {
 
+	private final static class TokenOffsetAndLen
+	{
+		public final int offset;
+		public final int len;
+		public final IToken token;
+
+		public TokenOffsetAndLen(IToken token, int offset, int len)
+		{
+			this.token = token;
+			this.offset = offset;
+			this.len = len;
+		}
+
+	}
+
 	private static final Token DEFAULT_CONTENT_TYPE_TOKEN = new Token(IDocument.DEFAULT_CONTENT_TYPE);
-	protected final Queue<Object[]> preCalculatedTokenOffsetAndLen = new LinkedList<Object[]>();
+	protected final Queue<TokenOffsetAndLen> preCalculatedTokenOffsetAndLen = new LinkedList<TokenOffsetAndLen>();
 
 	protected AbstractFlexPartitionScanner(Scanner scanner)
 	{
@@ -61,20 +76,20 @@ public abstract class AbstractFlexPartitionScanner extends AbstractFlexTokenScan
 	@Override
 	public IToken nextToken()
 	{
-		Object[] next = preCalculatedTokenOffsetAndLen.poll();
+		TokenOffsetAndLen next = preCalculatedTokenOffsetAndLen.poll();
 		if (next != null)
 		{
-			fTokenOffset = (Integer) next[1];
-			fTokenLen = (Integer) next[2];
-			return (IToken) next[0];
+			fTokenOffset = next.offset;
+			fTokenLen = next.len;
+			return next.token;
 		}
 		try
 		{
 			Symbol symbol;
-			symbol = (Symbol) fLookAheadQueue.poll();
+			symbol = fLookAheadQueue.poll();
 			if (symbol == null)
 			{
-				symbol = (Symbol) fScanner.nextToken();
+				symbol = fScanner.nextToken();
 			}
 
 			Symbol symbolStart = symbol;
@@ -93,10 +108,10 @@ public abstract class AbstractFlexPartitionScanner extends AbstractFlexTokenScan
 				// Ok, we haven't returned, so, let's get the next symbol and mark that the return token should be the
 				// default.
 				returnDefaultContentType = true;
-				symbol = (Symbol) fLookAheadQueue.poll();
+				symbol = fLookAheadQueue.poll();
 				if (symbol == null)
 				{
-					symbol = (Symbol) fScanner.nextToken();
+					symbol = fScanner.nextToken();
 				}
 			}
 		}
@@ -142,7 +157,7 @@ public abstract class AbstractFlexPartitionScanner extends AbstractFlexTokenScan
 	{
 		if (returnDefaultContentType)
 		{
-			preCalculatedTokenOffsetAndLen.add(new Object[] { matchedToken, symbol.getStart(), tokenLen });
+			preCalculatedTokenOffsetAndLen.add(new TokenOffsetAndLen(matchedToken, symbol.getStart(), tokenLen));
 			fTokenLen = symbol.getStart() - symbolStart.getStart();
 			return DEFAULT_CONTENT_TYPE_TOKEN;
 		}
