@@ -8,6 +8,7 @@ alert(b + c + d);
 }
 var c = a ? 10:20;
 var bb = {"a":1,"b":2,"c":3};
+var aa = (a + c) + 3;
 
 for(var  i = 0, j = 0; i < 8 && j >= 0; i++, -- j) {
     alert ("(a " + a+ ",j " + j + ")");

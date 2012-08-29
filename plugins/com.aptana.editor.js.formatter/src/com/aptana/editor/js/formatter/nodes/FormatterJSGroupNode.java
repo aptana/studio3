@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -58,11 +58,47 @@ public class FormatterJSGroupNode extends FormatterBlockWithBeginEndNode
 				indentFixed = true;
 			}
 		}
+		int spacesBeforeBody = getSpacesBeforeBody();
+		if (spacesBeforeBody > 0)
+		{
+			writeSpaces(visitor, context, spacesBeforeBody);
+		}
 		super.acceptBody(context, visitor);
+		int spacesAfterBody = getSpacesAfterBody();
+		if (spacesAfterBody > 0)
+		{
+			writeSpaces(visitor, context, spacesAfterBody);
+		}
 		if (indentFixed)
 		{
 			context.incIndent();
 		}
+	}
+
+	/**
+	 * @return The amount of spaces that we should insert before the body.
+	 */
+	private int getSpacesBeforeBody()
+	{
+		return getInt(JSFormatterConstants.SPACES_AFTER_OPENING_PARENTHESES);
+	}
+
+	/**
+	 * @return The amount of spaces that we should insert after the body.
+	 */
+	private int getSpacesAfterBody()
+	{
+		return getInt(JSFormatterConstants.SPACES_BEFORE_CLOSING_PARENTHESES);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.AbstractFormatterNode#getSpacesCountBefore()
+	 */
+	@Override
+	public int getSpacesCountBefore()
+	{
+		return getInt(JSFormatterConstants.SPACES_BEFORE_OPENING_PARENTHESES);
 	}
 
 	/*

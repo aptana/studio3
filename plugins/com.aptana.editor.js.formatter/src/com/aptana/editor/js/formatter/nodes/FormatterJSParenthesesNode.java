@@ -101,7 +101,7 @@ public class FormatterJSParenthesesNode extends FormatterBlockWithBeginEndNode
 				case LOOP_PARENTHESIS:
 					return getInt(JSFormatterConstants.SPACES_BEFORE_OPENING_LOOP_PARENTHESES);
 				default:
-					return 0;
+					return getInt(JSFormatterConstants.SPACES_BEFORE_OPENING_PARENTHESES);
 			}
 		}
 		return super.getSpacesCountBefore();
@@ -208,7 +208,7 @@ public class FormatterJSParenthesesNode extends FormatterBlockWithBeginEndNode
 			case LOOP_PARENTHESIS:
 				return getInt(JSFormatterConstants.SPACES_AFTER_OPENING_LOOP_PARENTHESES);
 			default:
-				return 0;
+				return getInt(JSFormatterConstants.SPACES_AFTER_OPENING_PARENTHESES);
 		}
 	}
 
@@ -235,7 +235,7 @@ public class FormatterJSParenthesesNode extends FormatterBlockWithBeginEndNode
 			case LOOP_PARENTHESIS:
 				return getInt(JSFormatterConstants.SPACES_BEFORE_CLOSING_LOOP_PARENTHESES);
 			default:
-				return 0;
+				return getInt(JSFormatterConstants.SPACES_BEFORE_CLOSING_PARENTHESES);
 		}
 	}
 }
