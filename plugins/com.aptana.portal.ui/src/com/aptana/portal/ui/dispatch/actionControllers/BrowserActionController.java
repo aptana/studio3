@@ -30,6 +30,7 @@ import com.aptana.portal.ui.browser.PortalBrowserEditor;
 import com.aptana.portal.ui.dispatch.IBrowserNotificationConstants;
 import com.aptana.portal.ui.internal.Portal;
 import com.aptana.ui.BrowserManager;
+import com.aptana.ui.util.WorkbenchBrowserUtil;
 
 /**
  * An action controller for browser-related actions.
@@ -55,6 +56,30 @@ public class BrowserActionController extends AbstractActionController
 			url = getURL(attributes);
 		}
 		Portal.getInstance().openPortal(url, PortalBrowserEditor.WEB_BROWSER_EDITOR_ID, false, null);
+		return IBrowserNotificationConstants.JSON_OK;
+	}
+
+	/**
+	 * Opens an internal/external browser with the URL that is given in the attributes. The browser selection follows
+	 * the Studio's browsers setting.
+	 * 
+	 * @param attributes
+	 *            We expect for an array that contains a single string URL.
+	 * @return {@link IBrowserNotificationConstants#JSON_OK} or a {@link IBrowserNotificationConstants#JSON_ERROR}
+	 */
+	@ControllerAction
+	public Object openURL(Object attributes)
+	{
+		URL url = getURL(attributes);
+		if (url == null)
+		{
+			return IBrowserNotificationConstants.JSON_ERROR;
+		}
+		boolean ok = WorkbenchBrowserUtil.openURL(url.toString()) != null;
+		if (!ok)
+		{
+			return IBrowserNotificationConstants.JSON_ERROR;
+		}
 		return IBrowserNotificationConstants.JSON_OK;
 	}
 
