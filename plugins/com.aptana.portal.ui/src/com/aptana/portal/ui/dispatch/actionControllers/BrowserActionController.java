@@ -66,6 +66,7 @@ public class BrowserActionController extends AbstractActionController
 	 * @param attributes
 	 *            We expect for an array that contains a single string URL.
 	 * @return {@link IBrowserNotificationConstants#JSON_OK} or a {@link IBrowserNotificationConstants#JSON_ERROR}
+	 * @since Aptana Studio 3.3.0
 	 */
 	@ControllerAction
 	public Object openURL(Object attributes)
