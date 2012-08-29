@@ -19,4 +19,5 @@ public interface IUIConstants
 	public static final String DELETE_ICON = "/icons/delete.gif"; //$NON-NLS-1$
 	public static final String ADD_ICON = "/icons/add.gif"; //$NON-NLS-1$
 	public static final String EDIT_ICON = "/icons/pencil.gif"; //$NON-NLS-1$
+	public static final String PROGRESS_ICON = "/icons/progress.gif"; //$NON-NLS-1$
 }
