@@ -94,9 +94,6 @@ public class TextCanvas extends GridCanvas {
 		fCellCanvasModel.addCellCanvasModelListener(new ITextCanvasModelListener(){
 			public void rangeChanged(int col, int line, int width, int height) {
 				repaintRange(col,line,width,height);
-				for (int i = line; i < line + height; i++) {
-					searchLineForHyperlinks(i);
-				}
 			}
 			public void dimensionsChanged(int cols, int rows) {
 				calculateGrid();
@@ -436,9 +433,6 @@ public class TextCanvas extends GridCanvas {
 			fCellCanvasModel.setCursorEnabled(fCursorEnabled);
 		}
 
-	}
-	
-	protected void searchLineForHyperlinks(int line) {
 	}
 
 	protected IHyperlink findHyperlink(Point cellCoords) {

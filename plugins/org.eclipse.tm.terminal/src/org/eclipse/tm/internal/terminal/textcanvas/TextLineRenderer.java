@@ -27,7 +27,7 @@ import org.eclipse.tm.terminal.model.Style;
  *
  */
 public class TextLineRenderer implements ILinelRenderer {
-	private final ITextCanvasModel fModel;
+	protected final ITextCanvasModel fModel;
 	protected StyleMap fStyleMap=new StyleMap();
 	public TextLineRenderer(TextCanvas c, ITextCanvasModel model) {
 		fModel=model;
@@ -96,7 +96,7 @@ public class TextLineRenderer implements ILinelRenderer {
 		return Display.getCurrent().getSystemColor(SWT.COLOR_LIST_SELECTION_TEXT);
 	}
 
-	private void fillBackground(GC gc, int x, int y, int width, int height) {
+	protected void fillBackground(GC gc, int x, int y, int width, int height) {
 		Color bg=gc.getBackground();
 		gc.setBackground(getDefaultBackgroundColor());
 		gc.fillRectangle (x,y,width,height);
@@ -109,7 +109,7 @@ public class TextLineRenderer implements ILinelRenderer {
 		return fStyleMap.getBackgroundColor(null);
 	}
 	
-	private void drawCursor(ITextCanvasModel model, GC gc, int row, int x, int y, int colFirst) {
+	protected void drawCursor(ITextCanvasModel model, GC gc, int row, int x, int y, int colFirst) {
 		if(!model.isCursorOn())
 			return;
 		int cursorLine=model.getCursorLine();
@@ -129,7 +129,7 @@ public class TextLineRenderer implements ILinelRenderer {
 			}
 		}
 	}
-	private void drawText(GC gc, int x, int y, int colFirst, int col, String text) {
+	protected void drawText(GC gc, int x, int y, int colFirst, int col, String text) {
 		int offset=(col-colFirst)*getCellWidth();
 		if(fStyleMap.isFontProportional()) {
 			// draw the background
@@ -149,7 +149,7 @@ public class TextLineRenderer implements ILinelRenderer {
 			gc.drawString(text,x+offset,y,false);
 		}
 	}
-	private void underlineText(GC gc, int x, int y, int colFirst, int col, String text) {
+	protected void underlineText(GC gc, int x, int y, int colFirst, int col, String text) {
 		int offset=(col-colFirst)*getCellWidth();
 		if(fStyleMap.isFontProportional()) {
 			for (int i = 0; i < text.length(); i++) {
@@ -164,7 +164,7 @@ public class TextLineRenderer implements ILinelRenderer {
 			gc.drawLine(x+offset, fStyleMap.getFontHeight() + y - 2, (fStyleMap.getFontWidth() * text.length()) + x+offset, fStyleMap.getFontHeight() + y - 2);
 		}
 	}
-	private void setupGC(GC gc, Style style) {
+	protected void setupGC(GC gc, Style style) {
 		Color c=fStyleMap.getForegrondColor(style);
 		if(c!=gc.getForeground()) {
 			gc.setForeground(c);
@@ -178,7 +178,7 @@ public class TextLineRenderer implements ILinelRenderer {
 			gc.setFont(f);
 		}
 	}
-	ITerminalTextDataReadOnly getTerminalText() {
+	protected ITerminalTextDataReadOnly getTerminalText() {
 		return fModel.getTerminalText();
 	}
 	public void onFontChange() {
