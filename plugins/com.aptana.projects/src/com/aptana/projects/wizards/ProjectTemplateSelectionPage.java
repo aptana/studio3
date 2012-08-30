@@ -11,25 +11,26 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.RowDataFactory;
+import org.eclipse.jface.layout.RowLayoutFactory;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.widgets.Composite;
@@ -40,6 +41,7 @@ import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.projects.ProjectsPlugin;
 import com.aptana.projects.internal.wizards.Messages;
+import com.aptana.ui.util.SWTUtils;
 import com.aptana.ui.widgets.StepIndicatorComposite;
 
 /**
@@ -47,21 +49,24 @@ import com.aptana.ui.widgets.StepIndicatorComposite;
  * 
  * @author Nam Le <nle@appcelerator.com>
  */
-public class ProjectTemplateSelectionPage extends WizardPage implements ISelectionChangedListener,
-		IStepIndicatorWizardPage
+public class ProjectTemplateSelectionPage extends WizardPage implements IStepIndicatorWizardPage
 {
 	public static final String COMMAND_PROJECT_FROM_TEMPLATE_PROJECT_TEMPLATE_NAME = "projectTemplateId"; //$NON-NLS-1$
 	public static final String COMMAND_PROJECT_FROM_TEMPLATE_NEW_WIZARD_ID = "newWizardId"; //$NON-NLS-1$
 
-	private TableViewer fTemplateSelectionViewer;
-	private Label fPreviewText;
+	private static final int IMAGE_SIZE = 48;
+
+	private Label previewImage;
+	private Label previewLabel;
+	private Label previewDescription;
 
 	private IProjectTemplate[] fTemplates;
 	private IProjectTemplate fSelectedTemplate;
 
 	private static ImageDescriptor wizardDesc = ProjectsPlugin.getImageDescriptor("/icons/project_template_blank.png"); //$NON-NLS-1$
 	private Image defaultTemplateImage = null;
-	private Map<Object, Image> templateImages;
+	private Map<IProjectTemplate, Image> templateImages;
+	private Map<Composite, IProjectTemplate> templateControlMap;
 
 	protected StepIndicatorComposite stepIndicatorComposite;
 	protected String[] stepNames;
@@ -90,7 +95,8 @@ public class ProjectTemplateSelectionPage extends WizardPage implements ISelecti
 		}
 		setTitle(Messages.ProjectTemplateSelectionPage_Title);
 		setDescription(Messages.ProjectTemplateSelectionPage_Description);
-		templateImages = new HashMap<Object, Image>();
+		templateImages = new HashMap<IProjectTemplate, Image>();
+		templateControlMap = new LinkedHashMap<Composite, IProjectTemplate>();
 	}
 
 	public IProjectTemplate getSelectedTemplate()
@@ -133,21 +139,12 @@ public class ProjectTemplateSelectionPage extends WizardPage implements ISelecti
 		label.setText(Messages.ProjectTemplateSelectionPage_AvailableTemplates_TXT);
 		label.setLayoutData(GridDataFactory.swtDefaults().create());
 
-		SashForm sashForm = new SashForm(main, SWT.HORIZONTAL);
-		sashForm.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
+		Composite templateList = createTemplatesList(main);
+		templateList.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 
-		fTemplateSelectionViewer = new TableViewer(sashForm, SWT.BORDER);
-		fTemplateSelectionViewer.setContentProvider(new ListContentProvider());
-		fTemplateSelectionViewer.setLabelProvider(new ListLabelProvider());
-		fTemplateSelectionViewer.setInput(fTemplates);
-		fTemplateSelectionViewer.addSelectionChangedListener(this);
-
-		fPreviewText = new Label(sashForm, SWT.WRAP | SWT.READ_ONLY);
-
-		// auto-selects the first one
+		// auto-selects the first template if there is one
 		if (!ArrayUtil.isEmpty(fTemplates))
 		{
-			fTemplateSelectionViewer.setSelection(new StructuredSelection(fTemplates[0]));
 			setSelectedTemplate(fTemplates[0]);
 		}
 
@@ -155,112 +152,151 @@ public class ProjectTemplateSelectionPage extends WizardPage implements ISelecti
 		setControl(main);
 	}
 
-	public void selectionChanged(SelectionChangedEvent event)
+	private Composite createTemplatesList(Composite parent)
 	{
-		StructuredSelection selection = (StructuredSelection) event.getSelection();
-		setSelectedTemplate(selection.isEmpty() ? null : (IProjectTemplate) selection.getFirstElement());
+		Composite main = new Composite(parent, SWT.BORDER);
+		main.setLayout(GridLayoutFactory.fillDefaults().create());
+		Color background = main.getDisplay().getSystemColor(SWT.COLOR_WHITE);
+		main.setBackground(background);
+
+		Composite templatesList = new Composite(main, SWT.NONE);
+		templatesList.setLayout(RowLayoutFactory.swtDefaults().extendedMargins(3, 3, 10, 3).spacing(15).fill(true)
+				.create());
+		templatesList.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).hint(450, 250).create());
+		templatesList.setBackground(background);
+
+		for (IProjectTemplate template : fTemplates)
+		{
+			final Composite templateControl = new Composite(templatesList, SWT.NONE);
+			templateControl.setLayout(GridLayoutFactory.fillDefaults().create());
+			templateControl.setLayoutData(RowDataFactory.swtDefaults().hint(95, SWT.DEFAULT).create());
+			templateControl.setBackground(background);
+
+			Label image = new Label(templateControl, SWT.CENTER);
+			image.setImage(getImage(template));
+			image.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).align(SWT.CENTER, SWT.CENTER).create());
+			Label text = new Label(templateControl, SWT.CENTER | SWT.WRAP);
+			text.setText(template.getDisplayName());
+			text.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).align(SWT.CENTER, SWT.BEGINNING)
+					.create());
+
+			MouseAdapter mouseAdapter = new MouseAdapter()
+			{
+
+				@Override
+				public void mouseDown(MouseEvent e)
+				{
+					setSelectedTemplate(templateControlMap.get(templateControl));
+				}
+			};
+			templateControl.addMouseListener(mouseAdapter);
+			image.addMouseListener(mouseAdapter);
+			text.addMouseListener(mouseAdapter);
+
+			templateControlMap.put(templateControl, template);
+		}
+
+		Label separator = new Label(main, SWT.SEPARATOR | SWT.HORIZONTAL);
+		separator.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
+
+		Composite descriptionComp = createTemplateDescription(main);
+		descriptionComp.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).hint(SWT.DEFAULT, 110).create());
+
+		return main;
+	}
+
+	protected Composite createTemplateDescription(Composite parent)
+	{
+		Composite main = new Composite(parent, SWT.NONE);
+		main.setLayout(GridLayoutFactory.swtDefaults().extendedMargins(5, 0, 0, 0).numColumns(2).create());
+		main.setBackground(main.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+
+		previewImage = new Label(main, SWT.CENTER);
+		previewImage.setLayoutData(GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.CENTER).create());
+		previewLabel = new Label(main, SWT.LEFT);
+		previewLabel.setLayoutData(GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false)
+				.create());
+		FontData[] fontData = SWTUtils.resizeFont(previewLabel.getFont(), 2);
+		for (FontData data : fontData)
+		{
+			data.setStyle(data.getStyle() | SWT.BOLD);
+		}
+		final Font previewFont = new Font(previewLabel.getDisplay(), fontData);
+		previewLabel.setFont(previewFont);
+		previewLabel.addDisposeListener(new DisposeListener()
+		{
+
+			public void widgetDisposed(DisposeEvent e)
+			{
+				previewFont.dispose();
+			}
+		});
+
+		previewDescription = new Label(main, SWT.WRAP);
+		previewDescription.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).span(2, 1).create());
+
+		return main;
 	}
 
 	private void setSelectedTemplate(IProjectTemplate template)
 	{
-		// change the preview text according to the template selection
+		// make the corresponding template control appear selected
+		Set<Composite> templateControls = templateControlMap.keySet();
+		for (Composite composite : templateControls)
+		{
+			if (templateControlMap.get(composite) == template)
+			{
+				composite.setBackground(composite.getDisplay().getSystemColor(SWT.COLOR_LIST_SELECTION));
+			}
+			else
+			{
+				composite.setBackground(composite.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+			}
+		}
+		// update the preview area according to the template selection
+		previewImage.setImage(getImage(template));
+		previewLabel.setText(template.getDisplayName());
 		String text = (template == null) ? null : template.getDescription();
-		fPreviewText.setText(text == null ? StringUtil.EMPTY : text);
+		previewDescription.setText(text == null ? StringUtil.EMPTY : text);
 		fSelectedTemplate = template;
 	}
 
-	/**
-	 * The content provider for the templates table
-	 */
-	private class ListContentProvider implements IStructuredContentProvider
+	private Image getImage(IProjectTemplate template)
 	{
-
-		public Object[] getElements(Object inputElement)
+		Image image = templateImages.get(template);
+		if (image == null)
 		{
-			return fTemplates;
-		}
-
-		public void dispose()
-		{
-		}
-
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput)
-		{
-		}
-	}
-
-	/**
-	 * The label provider for the templates table
-	 */
-	private class ListLabelProvider extends LabelProvider
-	{
-		private static final int IMAGE_SIZE = 48;
-
-		/*
-		 * (non-Javadoc)
-		 * @see org.eclipse.jface.viewers.LabelProvider#getImage(java.lang.Object)
-		 */
-		@Override
-		public Image getImage(Object element)
-		{
-			Image image = templateImages.get(element);
-			if (image == null)
+			// Resolve and load the image
+			URL iconPath = template.getIconURL();
+			if (iconPath != null)
 			{
-				if (element instanceof IProjectTemplate)
+				ImageDescriptor descriptor = ImageDescriptor.createFromURL(iconPath);
+				if (descriptor != null)
 				{
-					// Resolve and load the image
-					IProjectTemplate template = (IProjectTemplate) element;
-					URL iconPath = template.getIconURL();
-					if (iconPath != null)
+					image = descriptor.createImage();
+					if (image != null)
 					{
-						ImageDescriptor descriptor = ImageDescriptor.createFromURL(iconPath);
-						if (descriptor != null)
+						// Scale the image to 48x48 in case it's not.
+						ImageData imageData = image.getImageData();
+						if (imageData.x != IMAGE_SIZE || imageData.y != IMAGE_SIZE)
 						{
-							image = descriptor.createImage();
-							if (image != null)
-							{
-								// Scale the image to 48x48 in case it's not.
-								ImageData imageData = image.getImageData();
-								if (imageData.x != IMAGE_SIZE || imageData.y != IMAGE_SIZE)
-								{
-									// dispose the previous one
-									image.dispose();
-									// Scale the image data and create a new image
-									imageData = imageData.scaledTo(IMAGE_SIZE, IMAGE_SIZE);
-									image = ImageDescriptor.createFromImageData(imageData).createImage();
-								}
-							}
-
+							// dispose the previous one
+							image.dispose();
+							// Scale the image data and create a new image
+							imageData = imageData.scaledTo(IMAGE_SIZE, IMAGE_SIZE);
+							image = ImageDescriptor.createFromImageData(imageData).createImage();
 						}
 					}
-					if (image == null)
-					{
-						image = defaultTemplateImage;
-					}
-					templateImages.put(element, image);
-				}
-				else
-				{
-					image = defaultTemplateImage;
-				}
-			}
-			return image;
-		}
 
-		/*
-		 * (non-Javadoc)
-		 * @see org.eclipse.jface.viewers.LabelProvider#getText(java.lang.Object)
-		 */
-		@Override
-		public String getText(Object element)
-		{
-			if (element instanceof IProjectTemplate)
-			{
-				IProjectTemplate template = (IProjectTemplate) element;
-				return template.getDisplayName();
+				}
 			}
-			return super.getText(element);
+			if (image == null)
+			{
+				image = defaultTemplateImage;
+			}
+			templateImages.put(template, image);
 		}
+		return image;
 	}
 
 	public void initStepIndicator(String[] stepNames)
