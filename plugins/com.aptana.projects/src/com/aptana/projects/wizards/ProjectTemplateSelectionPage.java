@@ -41,6 +41,7 @@ import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.projects.ProjectsPlugin;
 import com.aptana.projects.internal.wizards.Messages;
+import com.aptana.projects.templates.IDefaultProjectTemplate;
 import com.aptana.ui.util.SWTUtils;
 import com.aptana.ui.widgets.StepIndicatorComposite;
 
@@ -81,15 +82,15 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 		}
 		else
 		{
-			// sorts the list by priority
+			// sorts the list by priority first and then alphabetically
 			Collections.sort(templates, new Comparator<IProjectTemplate>()
 			{
 
 				public int compare(IProjectTemplate o1, IProjectTemplate o2)
 				{
-					return o1.getPriority() - o2.getPriority();
+					int result = o1.getPriority() - o2.getPriority();
+					return (result == 0) ? o1.getDisplayName().compareToIgnoreCase(o2.getDisplayName()) : result;
 				}
-
 			});
 			fTemplates = templates.toArray(new IProjectTemplate[templates.size()]);
 		}
@@ -142,10 +143,23 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 		Composite templateList = createTemplatesList(main);
 		templateList.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 
-		// auto-selects the first template if there is one
+		// auto-selects the default template if there is one; otherwise selects the first one in the list
 		if (!ArrayUtil.isEmpty(fTemplates))
 		{
-			setSelectedTemplate(fTemplates[0]);
+			boolean foundDefault = false;
+			for (IProjectTemplate template : fTemplates)
+			{
+				if (template instanceof IDefaultProjectTemplate)
+				{
+					foundDefault = true;
+					setSelectedTemplate(template);
+					break;
+				}
+			}
+			if (!foundDefault)
+			{
+				setSelectedTemplate(fTemplates[0]);
+			}
 		}
 
 		Dialog.applyDialogFont(main);

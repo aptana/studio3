@@ -41,7 +41,7 @@ public class ProjectsPlugin extends AbstractUIPlugin
 		public DefaultWebProjectTemplate()
 		{
 			super("default.zip", TemplateType.WEB, Messages.ProjectsPlugin_DefaultWebProjectTemplate_Name, //$NON-NLS-1$
-					false, Messages.ProjectsPlugin_DefaultWebProjectTemplate_Description, null, ID, -1);
+					false, Messages.ProjectsPlugin_DefaultWebProjectTemplate_Description, null, ID, 1);
 		}
 
 		@Override
