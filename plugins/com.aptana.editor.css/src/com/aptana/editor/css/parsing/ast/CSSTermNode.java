@@ -9,7 +9,7 @@ package com.aptana.editor.css.parsing.ast;
 
 public class CSSTermNode extends CSSExpressionNode
 {
-	private String fTerm;
+	private final String fTerm;
 
 	/**
 	 * CSSTermNode

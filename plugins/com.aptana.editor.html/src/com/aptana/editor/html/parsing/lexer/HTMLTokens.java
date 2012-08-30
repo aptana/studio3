@@ -34,11 +34,22 @@ public class HTMLTokens
 			"STRING", "COMMENT", "DOCTYPE", "STYLE_END", "SCRIPT_END", "CDATA" };
 	private static final String NAME_UNKNOWN = "UNKNOWN"; //$NON-NLS-1$
 
-	private static Map<String, Short> nameIndexMap;
+	private static final Map<String, Short> nameIndexMap = new HashMap<String, Short>(NAMES.length, 0.3f);
+
+	/*
+	 * Initialize structure statically
+	 */
+	static
+	{
+		short index = 0;
+		for (String name : NAMES)
+		{
+			nameIndexMap.put(name, index++);
+		}
+	}
 
 	public static String getTokenName(short token)
 	{
-		init();
 		if (token < 0 || token > MAXIMUM)
 		{
 			return NAME_UNKNOWN;
@@ -48,22 +59,8 @@ public class HTMLTokens
 
 	public static short getToken(String tokenName)
 	{
-		init();
 		Short token = nameIndexMap.get(tokenName);
 		return (token == null) ? UNKNOWN : token;
-	}
-
-	private static void init()
-	{
-		if (nameIndexMap == null)
-		{
-			nameIndexMap = new HashMap<String, Short>();
-			short index = 0;
-			for (String name : NAMES)
-			{
-				nameIndexMap.put(name, index++);
-			}
-		}
 	}
 
 	private HTMLTokens()

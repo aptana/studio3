@@ -14,11 +14,11 @@ import com.aptana.parsing.lexer.IRange;
  */
 public class ParseNodeAttribute implements IParseNodeAttribute
 {
-	private IParseNode _parent;
-	private String _name;
-	private String _value;
-	private IRange _nameRange;
-	private IRange _valueRange;
+	private final IParseNode _parent;
+	private final String _name;
+	private final String _value;
+	private final IRange _nameRange;
+	private final IRange _valueRange;
 
 	/**
 	 * ParseNodeAttribute

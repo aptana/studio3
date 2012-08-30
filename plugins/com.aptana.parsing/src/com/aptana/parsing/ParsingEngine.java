@@ -11,6 +11,7 @@ import java.text.MessageFormat;
 
 import org.eclipse.core.runtime.Assert;
 
+import com.aptana.core.epl.util.ILRUCacheable;
 import com.aptana.core.epl.util.LRUCacheWithSoftPrunedValues;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
@@ -33,7 +34,7 @@ public class ParsingEngine
 	/**
 	 * Internal class to help in the synchronization of the parsing results.
 	 */
-	private static class CacheValue
+	private static class CacheValue implements ILRUCacheable
 	{
 		/**
 		 * Key for the state.
@@ -55,15 +56,26 @@ public class ParsingEngine
 		 */
 		private volatile boolean fResultGotten = false;
 
+		private final int fcacheFootprint;
+
+		public int getCacheFootprint()
+		{
+			return fcacheFootprint;
+		}
+
 		/**
 		 * @param parseStateKey
 		 *            the key for which the parse will be done.
-		 * @param parseState
-		 *            the state for which the parse will be done.
+		 * @param cacheFootprint
+		 *            the size that this cache value should occupy in the cache (i.e.: number of chars in source being
+		 *            parsed. Note it's done based on the number of chars and not on the generated AST because we have
+		 *            to add the result to the cache before the AST is actually computed -- as it's used as the
+		 *            synchronization mechanism so that we don't have 2 simultaneous parses for the same content).
 		 */
-		public CacheValue(IParseStateCacheKey parseStateKey)
+		public CacheValue(IParseStateCacheKey parseStateKey, int cacheFootprint)
 		{
 			fCachedParseStateKey = parseStateKey;
+			this.fcacheFootprint = cacheFootprint;
 		}
 
 		/**
@@ -113,6 +125,7 @@ public class ParsingEngine
 				fLock.notifyAll();
 			}
 		}
+
 	}
 
 	/**
@@ -131,11 +144,38 @@ public class ParsingEngine
 	 */
 	private final Object fParseCacheLock = new Object();
 
+	/**
+	 * Default for fMinimunNumberOfCharsToEnterCache.
+	 */
+	public static final int MINIMUN_NUMBER_OF_CHARS_TO_ENTER_CACHE = 3 * 1024; // at least a 3k file to be worthy of the
+																				// cache
+
+	/**
+	 * The maximum number of chars for a reference that will be kept as strong references (after this limit they're
+	 * added as soft references). As a reference, jquery is 252k.
+	 */
+	public static final int MAXIMUN_NUMBER_OF_CHARS_IN_STRONG_REFERENCES_CACHE = 400 * 1024; // a 400kb file (with
+																								// strong references)
+
+	/**
+	 * If the parse would be too fast, don't even add it to the cache, as the cost of having it in the cache and having
+	 * many misses is higher than not having it at the cache in the first place.
+	 */
+	private final int fMinimunNumberOfCharsToEnterCache;
+
+	protected ParsingEngine(IParserPoolProvider parserPoolProvider, int cacheSize, int minCacheElementSize)
+	{
+		// Create a cache with N 'strong' references but still keep pruned values as soft references.
+		// Cache size based on the number of chars.
+		fParseCache = new LRUCacheWithSoftPrunedValues<IParseStateCacheKey, CacheValue>(cacheSize);
+		fParserPoolProvider = parserPoolProvider;
+		fMinimunNumberOfCharsToEnterCache = minCacheElementSize;
+	}
+
 	public ParsingEngine(IParserPoolProvider parserPoolProvider)
 	{
-		// Create a cache with N 'strong' references but still keep prunned values as soft references.
-		fParseCache = new LRUCacheWithSoftPrunedValues<IParseStateCacheKey, CacheValue>(15);
-		fParserPoolProvider = parserPoolProvider;
+		this(parserPoolProvider, MAXIMUN_NUMBER_OF_CHARS_IN_STRONG_REFERENCES_CACHE,
+				MINIMUN_NUMBER_OF_CHARS_TO_ENTER_CACHE);
 	}
 
 	public void dispose()
@@ -166,25 +206,34 @@ public class ParsingEngine
 			}
 
 			String source = parseState.getSource();
+			ParsingPlugin plugin = ParsingPlugin.getDefault();
 			if (source == null)
 			{
 				// If we don't have the source, we're not able to do a parse in the first place.
-				IdeLog.logError(ParsingPlugin.getDefault(), Messages.ParserPoolFactory_Expecting_Source,
-						IDebugScopes.PARSING);
+				IdeLog.logError(plugin, Messages.ParserPoolFactory_Expecting_Source, IDebugScopes.PARSING);
 				return ParseResult.EMPTY;
 			}
+
+			int sourceLen = source.length();
+			if (sourceLen < fMinimunNumberOfCharsToEnterCache)
+			{
+				// If the source is small, don't even use the cache, just do a parse.
+				// Note: if it's too big, it'll end up entering the 'soft' cache.
+				return noCacheParse(contentTypeId, parseState);
+			}
+
 			IParseStateCacheKey newParseStateKey = parseState.getCacheKey(contentTypeId);
 			CacheValue cacheValue = null;
+			IParserPool pool = null;
+			IParser parser = null;
 			LRUCacheWithSoftPrunedValues<IParseStateCacheKey, CacheValue> parseCache = fParseCache;
 			if (parseCache == null)
 			{
 				return ParseResult.EMPTY; // already disposed.
 			}
 
-			IParserPool pool = null;
-			IParser parser = null;
 			boolean getResultFromCache = false;
-			boolean traceEnabled = IdeLog.isTraceEnabled(ParsingPlugin.getDefault(), IDebugScopes.PARSING);
+			boolean traceEnabled = plugin != null && IdeLog.isTraceEnabled(plugin, IDebugScopes.PARSING);
 			try
 			{
 				synchronized (fParseCacheLock)
@@ -196,7 +245,7 @@ public class ParsingEngine
 
 						if (traceEnabled)
 						{
-							IdeLog.logTrace(ParsingPlugin.getDefault(),
+							IdeLog.logTrace(plugin,
 									MessageFormat.format("Parsing cache hit for key {0}", newParseStateKey), //$NON-NLS-1$
 									IDebugScopes.PARSING);
 						}
@@ -211,7 +260,7 @@ public class ParsingEngine
 						{
 							if (traceEnabled)
 							{
-								IdeLog.logTrace(ParsingPlugin.getDefault(),
+								IdeLog.logTrace(plugin,
 										MessageFormat.format("Parsing cache miss for key {0}", newParseStateKey), //$NON-NLS-1$
 										IDebugScopes.PARSING);
 							}
@@ -220,7 +269,7 @@ public class ParsingEngine
 						{
 							if (traceEnabled)
 							{
-								IdeLog.logTrace(ParsingPlugin.getDefault(), MessageFormat.format(
+								IdeLog.logTrace(plugin, MessageFormat.format(
 										"Parsing cache hit for key {0}, but reparse required", newParseStateKey), //$NON-NLS-1$
 										IDebugScopes.PARSING);
 							}
@@ -234,11 +283,11 @@ public class ParsingEngine
 						// won't yield a correct return anyways).
 						if (pool == null)
 						{
-							if (IdeLog.isInfoEnabled(ParsingPlugin.getDefault(), null))
+							if (IdeLog.isInfoEnabled(plugin, null))
 							{
 								String message = MessageFormat.format(
 										Messages.ParserPoolFactory_Cannot_Acquire_Parser_Pool, contentTypeId);
-								IdeLog.logInfo(ParsingPlugin.getDefault(), message, IDebugScopes.PARSING);
+								IdeLog.logInfo(plugin, message, IDebugScopes.PARSING);
 							}
 							return ParseResult.EMPTY;
 						}
@@ -247,14 +296,14 @@ public class ParsingEngine
 						{
 							String message = MessageFormat.format(Messages.ParserPoolFactory_Cannot_Acquire_Parser,
 									contentTypeId);
-							IdeLog.logError(ParsingPlugin.getDefault(), message, IDebugScopes.PARSING);
+							IdeLog.logError(plugin, message, IDebugScopes.PARSING);
 							return ParseResult.EMPTY;
 						}
 
 						// Ok, we're in a state where either there's no one parsing or the currently cached value does
 						// not match the one in the cache for this key (i.e.: parse without comments and later with
 						// comments).
-						cacheValue = new CacheValue(newParseStateKey);
+						cacheValue = new CacheValue(newParseStateKey, sourceLen);
 						parseCache.put(newParseStateKey, cacheValue);
 						// Important: after we put it here (in the situation getResultFromCache), we MUST have a result
 						// cacheValue.setResult(), otherwise we may end up with a listener waiting eternally for a
@@ -300,9 +349,9 @@ public class ParsingEngine
 				{
 					try
 					{
-						if (IdeLog.isTraceEnabled(ParsingPlugin.getDefault(), IDebugScopes.PARSING))
+						if (traceEnabled)
 						{
-							IdeLog.logTrace(ParsingPlugin.getDefault(), MessageFormat.format(
+							IdeLog.logTrace(plugin, MessageFormat.format(
 									"Parsing content type {0}, length {1}, source ''{2}''", contentTypeId, //$NON-NLS-1$
 									parseState.getSource().length(), StringUtil.truncate(parseState.getSource(), 100)
 											.replaceAll("\\r|\\n", " ")), //$NON-NLS-1$ //$NON-NLS-2$
@@ -339,6 +388,38 @@ public class ParsingEngine
 			parseState.clearEditState();
 		}
 
+	}
+
+	private ParseResult noCacheParse(String contentTypeId, IParseState parseState) throws Exception
+	{
+		IParserPool pool = null;
+		IParser parser = null;
+		pool = fParserPoolProvider.getParserPool(contentTypeId);
+		if (pool == null)
+		{
+			if (IdeLog.isInfoEnabled(ParsingPlugin.getDefault(), null))
+			{
+				String message = MessageFormat.format(Messages.ParserPoolFactory_Cannot_Acquire_Parser_Pool,
+						contentTypeId);
+				IdeLog.logInfo(ParsingPlugin.getDefault(), message, IDebugScopes.PARSING);
+			}
+			return ParseResult.EMPTY;
+		}
+		parser = pool.checkOut();
+		if (parser == null)
+		{
+			String message = MessageFormat.format(Messages.ParserPoolFactory_Cannot_Acquire_Parser, contentTypeId);
+			IdeLog.logError(ParsingPlugin.getDefault(), message, IDebugScopes.PARSING);
+			return ParseResult.EMPTY;
+		}
+		try
+		{
+			return parser.parse(parseState);
+		}
+		finally
+		{
+			pool.checkIn(parser);
+		}
 	}
 
 }

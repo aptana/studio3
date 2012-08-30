@@ -53,7 +53,7 @@ import com.aptana.parsing.util.ParseUtil;
 
 public class HTMLParser extends AbstractParser
 {
-	private static final IParseNode[] NO_PARSE_NODES = new IParseNode[0];
+	public static final IParseNode[] NO_PARSE_NODES = new IParseNode[0];
 	public static final HTMLNode[] NO_HTML_NODES = new HTMLNode[0];
 	private static final String ATTR_TYPE = "type"; //$NON-NLS-1$
 	private static final String ATTR_LANG = "language"; //$NON-NLS-1$
@@ -119,10 +119,6 @@ public class HTMLParser extends AbstractParser
 
 			parseAll(source);
 			root.setCommentNodes(fCommentNodes.toArray(new IParseNode[fCommentNodes.size()]));
-
-			// trim the tree
-			ParseUtil.trimToSize(root);
-			working.setParseResult(root);
 		}
 		finally
 		{
@@ -136,6 +132,10 @@ public class HTMLParser extends AbstractParser
 			fParseState = null;
 			fCommentNodes = null;
 		}
+
+		// trim the tree and set the result only after clearing for garbage collection.
+		ParseUtil.trimToSize(root);
+		working.setParseResult(root);
 	}
 
 	protected void processSymbol(Symbol symbol, String source) throws IOException, Exception

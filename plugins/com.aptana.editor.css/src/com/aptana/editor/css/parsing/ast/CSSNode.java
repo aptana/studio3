@@ -14,7 +14,7 @@ import com.aptana.parsing.ast.ParseRootNode;
 
 public class CSSNode extends ParseNode
 {
-	private short fType;
+	private final short fType;
 
 	/**
 	 * CSSNode
@@ -36,9 +36,9 @@ public class CSSNode extends ParseNode
 	public CSSNode(short type, int start, int end)
 	{
 		super(ICSSConstants.CONTENT_TYPE_CSS);
-		
+
 		fType = type;
-		
+
 		this.setLocation(start, end);
 	}
 
@@ -52,7 +52,7 @@ public class CSSNode extends ParseNode
 		// sub-classes must override this method so their types will be
 		// recognized properly
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.ast.ParseNode#equals(java.lang.Object)
@@ -71,7 +71,7 @@ public class CSSNode extends ParseNode
 		// move up to nearest statement
 		IParseNode result = this;
 		IParseNode parent = result.getParent();
-		
+
 		while (parent != null)
 		{
 			// TODO: need to test for specific "statement" node types
@@ -85,7 +85,7 @@ public class CSSNode extends ParseNode
 				parent = parent.getParent();
 			}
 		}
-		
+
 		return result;
 	}
 
