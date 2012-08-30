@@ -160,7 +160,7 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 		main.setBackground(background);
 
 		Composite templatesList = new Composite(main, SWT.NONE);
-		templatesList.setLayout(RowLayoutFactory.swtDefaults().extendedMargins(3, 3, 10, 3).spacing(15).fill(true)
+		templatesList.setLayout(RowLayoutFactory.swtDefaults().extendedMargins(5, 5, 5, 5).spacing(10).fill(true)
 				.create());
 		templatesList.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).hint(450, 250).create());
 		templatesList.setBackground(background);
@@ -168,7 +168,7 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 		for (IProjectTemplate template : fTemplates)
 		{
 			final Composite templateControl = new Composite(templatesList, SWT.NONE);
-			templateControl.setLayout(GridLayoutFactory.fillDefaults().create());
+			templateControl.setLayout(GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 5, 5).create());
 			templateControl.setLayoutData(RowDataFactory.swtDefaults().hint(95, SWT.DEFAULT).create());
 			templateControl.setBackground(background);
 
@@ -208,7 +208,7 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 	protected Composite createTemplateDescription(Composite parent)
 	{
 		Composite main = new Composite(parent, SWT.NONE);
-		main.setLayout(GridLayoutFactory.swtDefaults().extendedMargins(5, 0, 0, 0).numColumns(2).create());
+		main.setLayout(GridLayoutFactory.swtDefaults().extendedMargins(7, 0, 0, 0).numColumns(2).create());
 		main.setBackground(main.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 
 		previewImage = new Label(main, SWT.CENTER);
