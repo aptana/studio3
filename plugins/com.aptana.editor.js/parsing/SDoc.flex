@@ -100,6 +100,7 @@ Identifier = ([:jletter:]|\$)([:jletterdigit:]|[$.])*
 	"@extends"			{ return newToken(SDocTokenType.EXTENDS, yytext()); }
 	"@internal"			{ return newToken(SDocTokenType.INTERNAL, yytext()); }
 	"@method"			{ return newToken(SDocTokenType.METHOD, yytext()); }
+	"@module"			{ return newToken(SDocTokenType.MODULE, yytext()); }
 	"@namespace"		{ return newToken(SDocTokenType.NAMESPACE, yytext()); }
 	"@overview"			{ return newToken(SDocTokenType.OVERVIEW, yytext()); }
 	"@param"			{ return newToken(SDocTokenType.PARAM, yytext()); }

@@ -11,11 +11,11 @@
             Hardcoded for now as we don't have JFlex on our distribution (so, needs to be
             updated to the proper path if someone else needs to re-generate the parser again).
             -->
-            <pathelement location="C:/Users/Fabio/Downloads/jflex-1.4.3/jflex/lib/JFlex.jar" />
+            <pathelement location="../../beaver/JFlex.jar" />
         </classpath>
     </taskdef>
 
-    <taskdef name="beaver" classname="beaver.comp.run.AntTask" classpath="../../../plugins/beaver/bin"/>
+    <taskdef name="beaver" classname="beaver.comp.run.AntTask" classpath="../../beaver/bin"/>
 
     <target name="build">
         <jflex 

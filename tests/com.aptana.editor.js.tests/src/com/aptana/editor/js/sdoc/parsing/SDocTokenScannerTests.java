@@ -244,6 +244,13 @@ public class SDocTokenScannerTests extends TestCase
 		lexemeTypeTests(source, SDocTokenType.METHOD);
 	}
 
+	public void testModule()
+	{
+		String source = "@module";
+
+		lexemeTypeTests(source, SDocTokenType.MODULE);
+	}
+
 	/**
 	 * testNamespace
 	 */
