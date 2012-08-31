@@ -226,11 +226,14 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 	{
 		Composite main = new Composite(parent, SWT.NONE);
 		main.setLayout(GridLayoutFactory.swtDefaults().extendedMargins(7, 0, 0, 0).numColumns(2).create());
-		main.setBackground(main.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+		Color background = main.getDisplay().getSystemColor(SWT.COLOR_WHITE);
+		main.setBackground(background);
 
 		previewImage = new Label(main, SWT.CENTER);
+		previewImage.setBackground(background);
 		previewImage.setLayoutData(GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.CENTER).create());
 		previewLabel = new Label(main, SWT.LEFT);
+		previewLabel.setBackground(background);
 		previewLabel.setLayoutData(GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false)
 				.create());
 		FontData[] fontData = SWTUtils.resizeFont(previewLabel.getFont(), 2);
@@ -250,6 +253,7 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 		});
 
 		previewDescription = new Label(main, SWT.WRAP);
+		previewDescription.setBackground(background);
 		previewDescription.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).span(2, 1).create());
 
 		return main;
