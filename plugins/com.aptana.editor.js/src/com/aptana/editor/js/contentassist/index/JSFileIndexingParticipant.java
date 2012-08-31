@@ -17,6 +17,7 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
 import org.jaxen.JaxenException;
 import org.jaxen.XPath;
@@ -28,6 +29,7 @@ import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
+import com.aptana.editor.js.inferencing.JSPropertyCollection;
 import com.aptana.editor.js.inferencing.JSScope;
 import com.aptana.editor.js.inferencing.JSSymbolTypeInferrer;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
@@ -295,6 +297,9 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		// process requires
 		processRequires(index, ast, location);
 
+		// process module API exports
+		processModule(index, ast, location);
+
 		sub.done();
 	}
 
@@ -340,6 +345,98 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 				indexWriter.writeRequires(index, paths, location);
 			}
 		}
+	}
+
+	/**
+	 * @param index
+	 * @param ast
+	 * @param location
+	 */
+	protected void processModule(Index index, IParseNode ast, URI location)
+	{
+		JSScope globals = getGlobals(ast);
+		if (globals == null)
+		{
+			return;
+		}
+		// The module top-level id should be based on the path from "the conceptual module name space root."
+		// Should we assume the project/index root?
+		URI relativeToRoot = index.getRelativeDocumentPath(location);
+		String moduleId = Path.fromPortableString(relativeToRoot.getPath()).removeFileExtension().toPortableString();
+
+		// Create a type for this module...
+		TypeElement moduleType = new TypeElement();
+		moduleType.setHasAllUserAgents();
+		moduleType.setName(moduleId);
+
+		// Create a type for the "module instance", which is "module.exports"
+		TypeElement moduleExportsType = new TypeElement();
+		moduleExportsType.setHasAllUserAgents();
+		moduleExportsType.setName(moduleType.getName() + ".exports"); //$NON-NLS-1$
+
+		// Grab the defined "module" variable from the file
+		JSPropertyCollection module = globals.getSymbol("module"); //$NON-NLS-1$
+		if (module != null)
+		{
+			JSSymbolTypeInferrer infer = new JSSymbolTypeInferrer(globals, index, location);
+			// Now grab "module.exports" and attach that property to our hand-generated module type from above
+			PropertyElement exports = infer.getSymbolPropertyElement(module, "exports"); //$NON-NLS-1$
+			moduleType.addProperty(exports);
+
+			// Now copy over the type info from the module.exports property to the hand-generated module instance
+			for (String type : exports.getTypeNames())
+			{
+				// TODO Where should we strip out the type info on the elements in the collection? This doesn't seem
+				// like the right place, maybe we should do it in CA processor, or index query helper's get ancestor
+				// names?
+				if (type.startsWith("Array<")) //$NON-NLS-1$
+				{
+					type = "Array"; //$NON-NLS-1$
+				}
+				moduleExportsType.addParentType(type);
+			}
+		}
+		else
+		{
+			// There's no "module" object, so let's look for properties hanging off "exports" var.
+			JSPropertyCollection exports = globals.getSymbol("exports"); //$NON-NLS-1$
+			if (exports == null)
+			{
+				// Doesn't look like there's any CommonJS kung-fu here. No module.exports or exports objects
+				return;
+			}
+			// Grab all properties hanging off "exports" and attach them to our hand-generate "module.exports" module
+			// instance type.
+			JSSymbolTypeInferrer infer = new JSSymbolTypeInferrer(globals, index, location);
+			List<String> properties = exports.getPropertyNames();
+			for (String property : properties)
+			{
+				PropertyElement propElement = infer.getSymbolPropertyElement(exports, property);
+				moduleExportsType.addProperty(propElement);
+			}
+		}
+
+		// Now we also add special properties that modules define
+		// Add an id property to the module instance (module.exports)!
+		PropertyElement idElement = new PropertyElement();
+		idElement.setIsInstanceProperty(true);
+		idElement.setHasAllUserAgents();
+		idElement.setName("id"); //$NON-NLS-1$
+		idElement.addType("String"); //$NON-NLS-1$
+		idElement.setDescription(moduleId); // Just pass in the actual value?
+		moduleExportsType.addProperty(idElement);
+		// Add a uri property to the module instance (module.exports)!
+		PropertyElement uriElement = new PropertyElement();
+		uriElement.setIsInstanceProperty(true);
+		uriElement.setHasAllUserAgents();
+		uriElement.setName("uri"); //$NON-NLS-1$
+		uriElement.addType("String"); //$NON-NLS-1$
+		uriElement.setDescription(location.toString()); // Just pass in the actual value?
+		moduleExportsType.addProperty(uriElement);
+
+		// Now write our hand-generated module type and module instance type.
+		indexWriter.writeType(index, moduleExportsType, location);
+		indexWriter.writeType(index, moduleType, location);
 	}
 
 	/**

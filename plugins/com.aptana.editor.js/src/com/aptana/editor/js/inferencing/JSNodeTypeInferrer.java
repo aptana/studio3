@@ -22,6 +22,7 @@ import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
 import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
+import com.aptana.editor.js.parsing.ast.JSArgumentsNode;
 import com.aptana.editor.js.parsing.ast.JSArrayNode;
 import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
 import com.aptana.editor.js.parsing.ast.JSBinaryArithmeticOperatorNode;
@@ -689,6 +690,31 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 
 		if (child instanceof JSNode)
 		{
+			if (child instanceof JSIdentifierNode && "require".equals(child.getNameNode().getName())) //$NON-NLS-1$
+			{
+				// it's a requires!
+				JSArgumentsNode args = (JSArgumentsNode) node.getArguments();
+				IParseNode[] children = args.getChildren();
+				for (IParseNode arg : children)
+				{
+					if (arg instanceof JSStringNode)
+					{
+						JSStringNode string = (JSStringNode) arg;
+						String text = string.getText();
+						// strip quotes
+						if (text.startsWith("'") || text.startsWith("\"")) //$NON-NLS-1$ //$NON-NLS-2$
+						{
+							text = text.substring(1, text.length() - 1);
+						}
+
+						// Handle resolving absolute versus relative module ids!
+						URI resolved = _location.resolve(text);
+						URI relative = _index.getRelativeDocumentPath(resolved);
+						this.addType(relative.getPath() + ".exports"); //$NON-NLS-1$
+					}
+				}
+			}
+
 			List<String> types = this.getTypes(child);
 
 			// NOTE: This is a special case for functions used as a RHS of assignments or as part of a property chain.

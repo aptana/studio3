@@ -24,6 +24,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewer;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
@@ -36,8 +37,6 @@ import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.tests.JSEditorBasedTests;
 import com.aptana.index.core.IFileStoreIndexingParticipant;
 import com.aptana.index.core.Index;
-import com.aptana.index.core.IndexManager;
-import com.aptana.index.core.IndexPlugin;
 import com.aptana.index.core.build.BuildContext;
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.BundleManager;
@@ -48,6 +47,57 @@ import com.aptana.scripting.model.SnippetElement;
  */
 public class JSContentAssistProposalTests extends JSEditorBasedTests
 {
+
+	private TestProject project;
+
+	@Override
+	protected void setUp() throws Exception
+	{
+		super.setUp();
+	}
+
+	@Override
+	protected void tearDown() throws Exception
+	{
+		if (project != null)
+		{
+			getIndexManager().removeIndex(project.getURI());
+			project.delete();
+		}
+		super.tearDown();
+	}
+
+	private TestProject createTestProject() throws CoreException
+	{
+		return new TestProject(getName(), new String[] { "com.aptana.projects.webnature" });
+	}
+
+	private void index(IFile... files) throws CoreException
+	{
+		IFileStoreIndexingParticipant part = createIndexer();
+		if (part != null)
+		{
+			for (IFile file : files)
+			{
+				part.index(new BuildContext(file), getIndexManager().getIndex(file.getProject().getLocationURI()), null);
+			}
+		}
+	}
+
+	private ICompletionProposal[] openAndGetProposals(IFile file, int offset) throws PartInitException
+	{
+		// open JS editor on file
+		editor = (ITextEditor) EditorTestHelper.openInEditor(file, "com.aptana.editor.js", true);
+		ISourceViewer viewer = ((AbstractThemeableEditor) editor).getISourceViewer();
+
+		EditorTestHelper.joinReconciler((SourceViewer) viewer, 100L, 2000L, 100L);
+
+		// get proposals after "rocker."
+		this.processor = new JSContentAssistProcessor((AbstractThemeableEditor) editor);
+		ICompletionProposal[] proposals = processor.computeCompletionProposals(viewer, offset, '\0', false);
+		return proposals;
+	}
+
 	protected void assertAutoActivation(String sourceWithCursors, boolean expectedResult)
 	{
 		IFileStore fileStore = createFileStore("proposal_tests", "js", sourceWithCursors);
@@ -257,70 +307,49 @@ public class JSContentAssistProposalTests extends JSEditorBasedTests
 	 */
 	public void testAPSTUD2944() throws Exception
 	{
-		final String projectName = "APSTUD2944";
-		final String fileName = "apstud2944.js";
-		final String initialContents = "function delete_me() {}\n";
-		final String workingContents = "function foo() { var eight = 8; }";
+		// Create a test project and file
+		project = createTestProject();
+		IFile file = project.createFile("apstud2944.js", "function delete_me() {}\n");
 
-		TestProject project = null;
-		try
-		{
-			// Create a test project and file
-			project = new TestProject(projectName, new String[] { "com.aptana.projects.webnature" });
-			IFile file = project.createFile(fileName, initialContents);
+		// open JS editor on file
+		editor = (ITextEditor) EditorTestHelper.openInEditor(file, "com.aptana.editor.js", true);
+		ISourceViewer viewer = ((AbstractThemeableEditor) editor).getISourceViewer();
 
-			// open JS editor on file
-			editor = (ITextEditor) EditorTestHelper.openInEditor(file, "com.aptana.editor.js", true);
-			ISourceViewer viewer = ((AbstractThemeableEditor) editor).getISourceViewer();
+		EditorTestHelper.joinReconciler((SourceViewer) viewer, 100L, 2000L, 100L);
 
-			EditorTestHelper.joinReconciler((SourceViewer) viewer, 100L, 2000L, 100L);
+		// Verify initial contents
+		Index index = getIndexManager().getIndex(project.getURI());
 
-			// Verify initial contents
-			Index index = getIndexManager().getIndex(project.getURI());
+		JSIndexQueryHelper _indexHelper = new JSIndexQueryHelper();
+		List<PropertyElement> projectGlobals = _indexHelper.getProjectGlobals(index);
+		assertContainsFunctions(projectGlobals, "delete_me");
+		assertDoesntContainFunctions(projectGlobals, "foo");
 
-			JSIndexQueryHelper _indexHelper = new JSIndexQueryHelper();
-			List<PropertyElement> projectGlobals = _indexHelper.getProjectGlobals(index);
-			assertContainsFunctions(projectGlobals, "delete_me");
-			assertDoesntContainFunctions(projectGlobals, "foo");
+		// Set the working copy contents to some new valid JS
+		IDocument document = EditorTestHelper.getDocument(editor);
+		document.set("function foo() { var eight = 8; }");
 
-			// Set the working copy contents to some new valid JS
-			IDocument document = EditorTestHelper.getDocument(editor);
-			document.set(workingContents);
+		// Wait for reconcile
+		EditorTestHelper.joinReconciler((SourceViewer) viewer, 100L, 2000L, 100L);
 
-			// Wait for reconcile
-			EditorTestHelper.joinReconciler((SourceViewer) viewer, 100L, 2000L, 100L);
+		// get proposals at end of document
+		this.processor = new JSContentAssistProcessor((AbstractThemeableEditor) editor);
+		ICompletionProposal[] proposals = processor.computeCompletionProposals(viewer, 33, '\0', false);
 
-			// get proposals at end of document
-			this.processor = new JSContentAssistProcessor((AbstractThemeableEditor) editor);
-			ICompletionProposal[] proposals = processor.computeCompletionProposals(viewer, 33, '\0', false);
+		// verify that CA contains elements from unsaved JS in document!
+		assertContains(proposals, "foo");
+		assertDoesntContain(proposals, "delete_me");
 
-			// verify that CA contains elements from unsaved JS in document!
-			assertContains(proposals, "foo");
-			assertDoesntContain(proposals, "delete_me");
+		// TODO Verify "eight" is in CA inside foo?
 
-			// TODO Verify "eight" is in CA inside foo?
+		// Close the editor without saving, make sure we end up indexing underlying content again!
+		EditorTestHelper.closeEditor(editor);
 
-			// Close the editor without saving, make sure we end up indexing underlying content again!
-			EditorTestHelper.closeEditor(editor);
+		Thread.sleep(1000); // FIXME Is there anyway to tell when indexing happens and is finished?
 
-			Thread.sleep(1000); // FIXME Is there anyway to tell when indexing happens and is finished?
-
-			// Now verify that our index reflects the file's contents and not the unsaved contents of the editor.
-			assertContainsFunctions(projectGlobals, "delete_me");
-			assertDoesntContainFunctions(projectGlobals, "foo");
-		}
-		finally
-		{
-			if (project != null)
-			{
-				project.delete();
-			}
-		}
-	}
-
-	protected IndexManager getIndexManager()
-	{
-		return IndexPlugin.getDefault().getIndexManager();
+		// Now verify that our index reflects the file's contents and not the unsaved contents of the editor.
+		assertContainsFunctions(projectGlobals, "delete_me");
+		assertDoesntContainFunctions(projectGlobals, "foo");
 	}
 
 	/**
@@ -524,7 +553,7 @@ public class JSContentAssistProposalTests extends JSEditorBasedTests
 				);
 		// @formatter:on
 	}
-	
+
 	public void testThisInFunctionAndPrototypes2()
 	{
 		// @formatter:off
@@ -573,42 +602,20 @@ public class JSContentAssistProposalTests extends JSEditorBasedTests
 
 	public void testAPSTUD4538() throws Exception
 	{
-		final String projectName = "APSTUD4538";
 		final String fileName = "apstud4538.js";
-		final String initialContents = "function foo() {}\n";
 
-		TestProject project = null;
-		try
-		{
-			// Create a test project and file
-			project = new TestProject(projectName, new String[] { "com.aptana.projects.webnature" });
-			IFile file = project.createFile(fileName, initialContents);
+		project = createTestProject();
+		IFile file = project.createFile(fileName, "function foo() {}\n");
 
-			// open JS editor on file
-			editor = (ITextEditor) EditorTestHelper.openInEditor(file, "com.aptana.editor.js", true);
-			ISourceViewer viewer = ((AbstractThemeableEditor) editor).getISourceViewer();
+		ICompletionProposal[] proposals = openAndGetProposals(file, 18);
 
-			EditorTestHelper.joinReconciler((SourceViewer) viewer, 100L, 2000L, 100L);
+		// find proposal for "foo" function
+		ICompletionProposal prop = findProposal(proposals, "foo");
+		assertNotNull("Failed to find 'foo' function proposal in CA", prop);
 
-			// get proposals at end of document
-			this.processor = new JSContentAssistProcessor((AbstractThemeableEditor) editor);
-			ICompletionProposal[] proposals = processor.computeCompletionProposals(viewer, 18, '\0', false);
-
-			// find proposal for "foo" function
-			ICompletionProposal prop = findProposal(proposals, "foo");
-			assertNotNull("Failed to find 'foo' function proposal in CA", prop);
-
-			// Verify that the file location is the filename, not the owning type.
-			ICommonCompletionProposal p2 = (ICommonCompletionProposal) prop;
-			assertEquals("Expected 'location' to show filename, not owning type", fileName, p2.getFileLocation());
-		}
-		finally
-		{
-			if (project != null)
-			{
-				project.delete();
-			}
-		}
+		// Verify that the file location is the filename, not the owning type.
+		ICommonCompletionProposal p2 = (ICommonCompletionProposal) prop;
+		assertEquals("Expected 'location' to show filename, not owning type", fileName, p2.getFileLocation());
 	}
 
 	public void testParameterInsideFunction()
@@ -670,54 +677,130 @@ public class JSContentAssistProposalTests extends JSEditorBasedTests
 	// https://jira.appcelerator.org/browse/APSTUD-4017
 	public void testOffersCAOnMultipleTypesInferredForSameVariable() throws Exception
 	{
-		TestProject project = null;
-		try
-		{
-			// Create a test project and files
-			project = new TestProject("APSTUD4017", new String[] { "com.aptana.projects.webnature" });
-			IFile number = project.createFile("apstud4017_number.js", "var abc = 10;");
-			IFile string = project.createFile("apstud4017_string.js", "var abc = \"hello\";");
+		project = createTestProject();
 
-			// Index the files
-			index(number, string);
+		IFile number = project.createFile("apstud4017_number.js", "var abc = 10;");
+		IFile string = project.createFile("apstud4017_string.js", "var abc = \"hello\";");
+		index(number, string);
 
-			// Now create a third file to open in the editor
-			IFile file = project.createFile("apstud4017.js", "abc.");
+		IFile file = project.createFile("apstud4017.js", "abc.");
+		ICompletionProposal[] proposals = openAndGetProposals(file, 4);
 
-			// open JS editor on file
-			editor = (ITextEditor) EditorTestHelper.openInEditor(file, "com.aptana.editor.js", true);
-			ISourceViewer viewer = ((AbstractThemeableEditor) editor).getISourceViewer();
-
-			EditorTestHelper.joinReconciler((SourceViewer) viewer, 100L, 2000L, 100L);
-
-			// get proposals after "abc."
-			this.processor = new JSContentAssistProcessor((AbstractThemeableEditor) editor);
-			ICompletionProposal[] proposals = processor.computeCompletionProposals(viewer, 4, '\0', false);
-
-			// make sure we get Number proposals (from first file's defining type as number)
-			assertContains(proposals, "toFixed", "toExponential", "toPrecision");
-			// make sure we get String proposals (from second file's defining type as string)
-			assertContains(proposals, "charAt", "concat", "indexOf", "length", "toUpperCase", "toLowerCase");
-		}
-		finally
-		{
-			if (project != null)
-			{
-				project.delete();
-			}
-		}
+		// make sure we get Number proposals (from first file's defining type as number)
+		assertContains(proposals, "toFixed", "toExponential", "toPrecision");
+		// make sure we get String proposals (from second file's defining type as string)
+		assertContains(proposals, "charAt", "concat", "indexOf", "length", "toUpperCase", "toLowerCase");
 	}
 
-	protected void index(IFile... files) throws CoreException
+	public void testExportsWithNameFunctionAsProperty() throws Exception
 	{
-		IFileStoreIndexingParticipant part = createIndexer();
-		if (part != null)
-		{
-			for (IFile file : files)
-			{
-				part.index(new BuildContext(file), getIndexManager().getIndex(file.getProject().getLocationURI()), null);
-			}
-		}
+		project = createTestProject();
+
+		IFile module = project.createFile("module_name.js", "exports.name = function() {\n"
+				+ "    console.log('My name is Lemmy Kilmister');\n" + "};\n");
+		index(module);
+
+		IFile file = project.createFile("client0.js", "var rocker = require('module_name');\nrocker.");
+		ICompletionProposal[] proposals = openAndGetProposals(file, 44);
+
+		// make sure we get "name" as a proposal
+		assertContains(proposals, "name");
 	}
 
+	public void testModuleExportsAsInstanceOfArray() throws Exception
+	{
+		project = createTestProject();
+
+		IFile module = project
+				.createFile("module.js",
+						"module.exports = ['Lemmy Kilmister', 'Ozzy Osbourne', 'Ronnie James Dio', 'Steven Tyler', 'Mick Jagger'];\n");
+		index(module);
+
+		IFile file = project.createFile("client1.js", "var rocker = require('module');\nrocker.");
+		ICompletionProposal[] proposals = openAndGetProposals(file, 39);
+
+		// make sure we get proposals we'd get for an array
+		assertContains(proposals, "length", "push", "pop", "slice", "unshift", "join");
+	}
+
+	public void testModuleExportsWithNameFunctionAsProperty() throws Exception
+	{
+		project = createTestProject();
+
+		IFile module = project.createFile("lemmy.js", "module.exports.rock_me = function() {\n"
+				+ "    console.log('My name is Lemmy Kilmister');\n" + "};\n");
+		index(module);
+
+		IFile file = project.createFile("client2.js", "var rocker = require('lemmy');\nrocker.");
+		ICompletionProposal[] proposals = openAndGetProposals(file, 38);
+
+		// make sure we get "rock_me" as a proposal
+		assertContains(proposals, "rock_me");
+	}
+
+	public void testModuleInstanceHasIdAndURIProperty() throws Exception
+	{
+		project = createTestProject();
+
+		IFile module = project.createFile("module2.js", "module.exports.something = function() {\n"
+				+ "    console.log('My name is Lemmy Kilmister');\n" + "};\n");
+		index(module);
+
+		IFile file = project.createFile("client3.js", "var rocker = require('module2');\nrocker.");
+		ICompletionProposal[] proposals = openAndGetProposals(file, 40);
+
+		// make sure we get "id" and "uri" as proposals
+		assertContains(proposals, "id", "uri", "something");
+	}
+
+	public void testRelativeSiblingModuleReference() throws Exception
+	{
+		project = createTestProject();
+
+		IFile module = project.createFile("relative.js", "module.exports.relative_func = function() {\n"
+				+ "    console.log('My name is Lemmy Kilmister');\n" + "};\n");
+		index(module);
+
+		IFile file = project.createFile("client.js", "var r = require('./relative');\nr.");
+		ICompletionProposal[] proposals = openAndGetProposals(file, 33);
+
+		// make sure we get "relative_func" as a proposal
+		assertContains(proposals, "relative_func");
+	}
+
+	public void testRelativeUpFolderModuleReference() throws Exception
+	{
+		project = createTestProject();
+		project.createFolder("a");
+		project.createFolder("a/b");
+		project.createFolder("a/b/c");
+
+		IFile module = project.createFile("a/b/relative.js", "module.exports.relative_func2 = function() {\n"
+				+ "    console.log('My name is Lemmy Kilmister');\n" + "};\n");
+		index(module);
+
+		IFile file = project.createFile("a/b/c/client.js", "var r = require('../relative');\nr.");
+		ICompletionProposal[] proposals = openAndGetProposals(file, 34);
+
+		// make sure we get "relative_func2" as a proposal
+		assertContains(proposals, "relative_func2");
+	}
+
+	public void testAbsoluteNestedModuleReference() throws Exception
+	{
+		project = createTestProject();
+		project.createFolder("a");
+		project.createFolder("a/b");
+		project.createFolder("a/b/c");
+
+		IFile module = project.createFile("a/b/c/d.js", "module.exports.nested_func = function() {\n"
+				+ "    console.log('My name is Lemmy Kilmister');\n" + "};\n");
+		index(module);
+
+		IFile file = project.createFile("nested.js", "var r = require('a/b/c/d');\nr.");
+		ICompletionProposal[] proposals = openAndGetProposals(file, 30);
+
+		// make sure we get "nested_func" as a proposal
+		assertContains(proposals, "nested_func");
+	}
 }
