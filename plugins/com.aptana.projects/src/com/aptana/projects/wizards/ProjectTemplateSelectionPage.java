@@ -34,6 +34,7 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
 import com.aptana.core.projects.templates.IProjectTemplate;
@@ -188,9 +189,11 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 
 			Label image = new Label(templateControl, SWT.CENTER);
 			image.setImage(getImage(template));
+			image.setBackground(background);
 			image.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).align(SWT.CENTER, SWT.CENTER).create());
 			Label text = new Label(templateControl, SWT.CENTER | SWT.WRAP);
 			text.setText(template.getDisplayName());
+			text.setBackground(background);
 			text.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).align(SWT.CENTER, SWT.BEGINNING)
 					.create());
 
@@ -258,13 +261,20 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 		Set<Composite> templateControls = templateControlMap.keySet();
 		for (Composite composite : templateControls)
 		{
+			Color background;
 			if (templateControlMap.get(composite) == template)
 			{
-				composite.setBackground(composite.getDisplay().getSystemColor(SWT.COLOR_LIST_SELECTION));
+				background = composite.getDisplay().getSystemColor(SWT.COLOR_LIST_SELECTION);
 			}
 			else
 			{
-				composite.setBackground(composite.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+				background = composite.getDisplay().getSystemColor(SWT.COLOR_WHITE);
+			}
+			composite.setBackground(background);
+			Control[] children = composite.getChildren();
+			for (Control childComp : children)
+			{
+				childComp.setBackground(background);
 			}
 		}
 		// update the preview area according to the template selection
