@@ -23,6 +23,8 @@ import org.jaxen.JaxenException;
 import org.jaxen.XPath;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.ArrayUtil;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.editor.js.IDebugScopes;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
@@ -32,14 +34,21 @@ import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.inferencing.JSPropertyCollection;
 import com.aptana.editor.js.inferencing.JSScope;
 import com.aptana.editor.js.inferencing.JSSymbolTypeInferrer;
+import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
+import com.aptana.editor.js.parsing.ast.JSCommentNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSInvokeNode;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
 import com.aptana.editor.js.parsing.ast.JSStringNode;
+import com.aptana.editor.js.sdoc.model.DocumentationBlock;
+import com.aptana.editor.js.sdoc.model.Tag;
+import com.aptana.editor.js.sdoc.model.TagType;
+import com.aptana.editor.js.sdoc.parsing.SDocParser;
 import com.aptana.index.core.AbstractFileIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.build.BuildContext;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.xpath.ParseNodeXPath;
 
 public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
@@ -298,7 +307,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		processRequires(index, ast, location);
 
 		// process module API exports
-		processModule(index, ast, location);
+		processModule(context, index, ast, location);
 
 		sub.done();
 	}
@@ -352,17 +361,15 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 	 * @param ast
 	 * @param location
 	 */
-	protected void processModule(Index index, IParseNode ast, URI location)
+	protected void processModule(BuildContext context, Index index, IParseNode ast, URI location)
 	{
 		JSScope globals = getGlobals(ast);
 		if (globals == null)
 		{
 			return;
 		}
-		// The module top-level id should be based on the path from "the conceptual module name space root."
-		// Should we assume the project/index root?
-		URI relativeToRoot = index.getRelativeDocumentPath(location);
-		String moduleId = Path.fromPortableString(relativeToRoot.getPath()).removeFileExtension().toPortableString();
+
+		String moduleId = getModuleId(context, index, ast, location);
 
 		// Create a type for this module...
 		TypeElement moduleType = new TypeElement();
@@ -437,6 +444,57 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		// Now write our hand-generated module type and module instance type.
 		indexWriter.writeType(index, moduleExportsType, location);
 		indexWriter.writeType(index, moduleType, location);
+	}
+
+	/**
+	 * Attempts to determine the id of the module defined in the file. We look for @module tags for an explicit
+	 * declaration. Otherwise we assume an id based on the relative path to the project/index root.
+	 * 
+	 * @param context
+	 * @param index
+	 * @param ast
+	 * @param location
+	 * @return
+	 */
+	private String getModuleId(BuildContext context, Index index, IParseNode ast, URI location)
+	{
+		// We need to search for @module tag to get the declared module id!
+		IParseRootNode root = (IParseRootNode) ast;
+		IParseNode[] comments = root.getCommentNodes();
+		if (!ArrayUtil.isEmpty(comments))
+		{
+			for (IParseNode comment : comments)
+			{
+				if (comment instanceof JSCommentNode)
+				{
+					JSCommentNode commentNode = (JSCommentNode) comment;
+					if (commentNode.getNodeType() == IJSNodeTypes.SDOC_COMMENT)
+					{
+						SDocParser parser = new SDocParser();
+						try
+						{
+							String source = context.getContents().substring(commentNode.getStart(),
+									commentNode.getEnd() + 1);
+							DocumentationBlock result = (DocumentationBlock) parser.parse(source);
+							List<Tag> moduleTags = result.getTags(TagType.MODULE);
+							if (!CollectionsUtil.isEmpty(moduleTags))
+							{
+								return moduleTags.get(0).getText();
+							}
+						}
+						catch (Exception e)
+						{
+							// ignore errors parsing SDoc comments
+						}
+					}
+				}
+			}
+		}
+
+		// The module top-level id should be based on the path from "the conceptual module name space root."
+		// Should we assume the project/index root?
+		URI relativeToRoot = index.getRelativeDocumentPath(location);
+		return Path.fromPortableString(relativeToRoot.getPath()).removeFileExtension().toPortableString();
 	}
 
 	/**

@@ -803,4 +803,41 @@ public class JSContentAssistProposalTests extends JSEditorBasedTests
 		// make sure we get "nested_func" as a proposal
 		assertContains(proposals, "nested_func");
 	}
+
+	public void testModuleIdDefinedByDocTag() throws Exception
+	{
+		project = createTestProject();
+		project.createFolder("a");
+		project.createFolder("a/b");
+		project.createFolder("a/b/c");
+
+		IFile module = project.createFile("a/b/c/d.js",
+				"/** @module my/id */\nmodule.exports.my_id_func = function() {\n"
+						+ "    console.log('My name is Lemmy Kilmister');\n" + "};\n");
+		index(module);
+
+		IFile file = project.createFile("nested.js", "var r = require('my/id');\nr.");
+		ICompletionProposal[] proposals = openAndGetProposals(file, 28);
+
+		// make sure we get "my_id_func" as a proposal
+		assertContains(proposals, "my_id_func");
+	}
+
+	public void testModuleIdDefinedByDocTagDoesntGetPickedUpByItsPath() throws Exception
+	{
+		project = createTestProject();
+		project.createFolder("a");
+		project.createFolder("a/b");
+		project.createFolder("a/b/c");
+
+		IFile module = project.createFile("a/b/c/d.js",
+				"/** @module my/id */\nmodule.exports.my_id_func = function() {\n"
+						+ "    console.log('My name is Lemmy Kilmister');\n" + "};\n");
+		index(module);
+
+		IFile file = project.createFile("nested.js", "var r = require('a/b/c/d');\nr.");
+		ICompletionProposal[] proposals = openAndGetProposals(file, 28);
+
+		assertDoesntContain(proposals, "my_id_func");
+	}
 }

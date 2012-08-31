@@ -1,17 +1,10 @@
-/**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
 package com.aptana.editor.js.sdoc.parsing;
 
 /**
- * This class lists terminals used by the grammar specified in "SDoc.grammar".
+ * This class lists terminals used by the
+ * grammar specified in "SDoc.grammar".
  */
-public class Terminals // $codepro.audit.disable convertClassToInterface
-{ // $codepro.audit.disable convertClassToInterface
+public class Terminals {
 	static public final short EOF = 0;
 	static public final short IDENTIFIER = 1;
 	static public final short RCURLY = 2;
@@ -44,14 +37,15 @@ public class Terminals // $codepro.audit.disable convertClassToInterface
 	static public final short EXAMPLE = 29;
 	static public final short INTERNAL = 30;
 	static public final short METHOD = 31;
-	static public final short OVERVIEW = 32;
-	static public final short PRIVATE = 33;
-	static public final short SEE = 34;
-	static public final short UNKNOWN = 35;
-	static public final short END_DOCUMENTATION = 36;
-	static public final short ARROW = 37;
-	static public final short LESS_THAN = 38;
-	static public final short GREATER_THAN = 39;
-	static public final short ELLIPSIS = 40;
-	static public final short START_DOCUMENTATION = 41;
+	static public final short MODULE = 32;
+	static public final short OVERVIEW = 33;
+	static public final short PRIVATE = 34;
+	static public final short SEE = 35;
+	static public final short UNKNOWN = 36;
+	static public final short END_DOCUMENTATION = 37;
+	static public final short ARROW = 38;
+	static public final short LESS_THAN = 39;
+	static public final short GREATER_THAN = 40;
+	static public final short ELLIPSIS = 41;
+	static public final short START_DOCUMENTATION = 42;
 }

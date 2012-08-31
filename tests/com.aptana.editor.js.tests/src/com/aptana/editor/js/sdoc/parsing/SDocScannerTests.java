@@ -47,8 +47,8 @@ public class SDocScannerTests extends TestCase
 	 * 
 	 * @param source
 	 * @param types
-	 * @throws Exception 
-	 * @throws IOException 
+	 * @throws Exception
+	 * @throws IOException
 	 */
 	protected void lexemeTypeTests(String source, SDocTokenType... types)
 	{
@@ -60,7 +60,7 @@ public class SDocScannerTests extends TestCase
 			try
 			{
 				Symbol symbol = this._scanner.nextToken();
-				
+
 				assertEquals(symbol.value + " at index " + i, type.getIndex(), symbol.getId());
 			}
 			catch (Exception e)
@@ -69,414 +69,316 @@ public class SDocScannerTests extends TestCase
 			}
 		}
 	}
-	
+
 	/**
 	 * testLeftBracket
 	 */
 	public void testLeftBracket()
 	{
 		String source = "[";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.LBRACKET
-		);
+
+		lexemeTypeTests(source, SDocTokenType.LBRACKET);
 	}
-	
+
 	/**
 	 * testRightBracket
 	 */
 	public void testRightBracket()
 	{
 		String source = "]";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.RBRACKET
-		);
+
+		lexemeTypeTests(source, SDocTokenType.RBRACKET);
 	}
-	
+
 	/**
 	 * testStartDocumentation
 	 */
 	public void testStartDocumentation()
 	{
 		String source = "/**";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.START_DOCUMENTATION
-		);
+
+		lexemeTypeTests(source, SDocTokenType.START_DOCUMENTATION);
 	}
-	
+
 	/**
 	 * testEndDocumentation
 	 */
 	public void testEndDocumentation()
 	{
 		String source = "*/";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.END_DOCUMENTATION
-		);
+
+		lexemeTypeTests(source, SDocTokenType.END_DOCUMENTATION);
 	}
-	
+
 	/**
 	 * testAdvanced
 	 */
 	public void testAdvanced()
 	{
 		String source = "@advanced";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.ADVANCED
-		);
+
+		lexemeTypeTests(source, SDocTokenType.ADVANCED);
 	}
-	
+
 	/**
 	 * testAlias
 	 */
 	public void testAlias()
 	{
 		String source = "@alias";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.ALIAS
-		);
+
+		lexemeTypeTests(source, SDocTokenType.ALIAS);
 	}
-	
+
 	/**
 	 * testAuthor
 	 */
 	public void testAuthor()
 	{
 		String source = "@author";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.AUTHOR
-		);
+
+		lexemeTypeTests(source, SDocTokenType.AUTHOR);
 	}
-	
+
 	/**
 	 * testClassDescription
 	 */
 	public void testClassDescription()
 	{
 		String source = "@classDescription";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.CLASS_DESCRIPTION
-		);
+
+		lexemeTypeTests(source, SDocTokenType.CLASS_DESCRIPTION);
 	}
-	
+
 	/**
 	 * testConstructor
 	 */
 	public void testConstructor()
 	{
 		String source = "@constructor";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.CONSTRUCTOR
-		);
+
+		lexemeTypeTests(source, SDocTokenType.CONSTRUCTOR);
 	}
-	
+
 	/**
 	 * testExample
 	 */
 	public void testExample()
 	{
 		String source = "@example";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.EXAMPLE
-		);
+
+		lexemeTypeTests(source, SDocTokenType.EXAMPLE);
 	}
-	
+
 	/**
 	 * testException
 	 */
 	public void testException()
 	{
 		String source = "@exception";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.EXCEPTION
-		);
+
+		lexemeTypeTests(source, SDocTokenType.EXCEPTION);
 	}
-	
+
 	/**
 	 * testExtends
 	 */
 	public void testExtends()
 	{
 		String source = "@extends";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.EXTENDS
-		);
+
+		lexemeTypeTests(source, SDocTokenType.EXTENDS);
 	}
-	
+
 	/**
 	 * testInternal
 	 */
 	public void testInternal()
 	{
 		String source = "@internal";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.INTERNAL
-		);
+
+		lexemeTypeTests(source, SDocTokenType.INTERNAL);
 	}
-	
+
 	/**
 	 * testMethod
 	 */
 	public void testMethod()
 	{
 		String source = "@method";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.METHOD
-		);
+
+		lexemeTypeTests(source, SDocTokenType.METHOD);
 	}
-	
+
+	public void testModule()
+	{
+		String source = "@module";
+
+		lexemeTypeTests(source, SDocTokenType.MODULE);
+	}
+
 	/**
 	 * testNamespace
 	 */
 	public void testNamespace()
 	{
 		String source = "@namespace";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.NAMESPACE
-		);
+
+		lexemeTypeTests(source, SDocTokenType.NAMESPACE);
 	}
-	
+
 	/**
 	 * testOverview
 	 */
 	public void testOverview()
 	{
 		String source = "@overview";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.OVERVIEW
-		);
+
+		lexemeTypeTests(source, SDocTokenType.OVERVIEW);
 	}
-	
+
 	/**
 	 * testParam
 	 */
 	public void testParam()
 	{
 		String source = "@param";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.PARAM
-		);
+
+		lexemeTypeTests(source, SDocTokenType.PARAM);
 	}
-	
+
 	/**
 	 * testPrivate
 	 */
 	public void testPrivate()
 	{
 		String source = "@private";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.PRIVATE
-		);
+
+		lexemeTypeTests(source, SDocTokenType.PRIVATE);
 	}
-	
+
 	/**
 	 * testProperty
 	 */
 	public void testProperty()
 	{
 		String source = "@property";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.PROPERTY
-		);
+
+		lexemeTypeTests(source, SDocTokenType.PROPERTY);
 	}
-	
+
 	/**
 	 * testReturn
 	 */
 	public void testReturn()
 	{
 		String source = "@return";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.RETURN
-		);
+
+		lexemeTypeTests(source, SDocTokenType.RETURN);
 	}
-	
+
 	/**
 	 * testSee
 	 */
 	public void testSee()
 	{
 		String source = "@see";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.SEE
-		);
+
+		lexemeTypeTests(source, SDocTokenType.SEE);
 	}
-	
+
 	/**
 	 * testUserTag
 	 */
 	public void testUserTag()
 	{
 		String source = "@myCustomTag";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.UNKNOWN
-		);
+
+		lexemeTypeTests(source, SDocTokenType.UNKNOWN);
 	}
-	
+
 	/**
 	 * testNoTypes
 	 */
 	public void testNoTypes()
 	{
 		String source = "{}";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.LCURLY,
-			SDocTokenType.RCURLY
-		);
+
+		lexemeTypeTests(source, SDocTokenType.LCURLY, SDocTokenType.RCURLY);
 	}
-	
+
 	/**
 	 * testSimpleType
 	 */
 	public void testSimpleType()
 	{
 		String source = "{Number}";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.LCURLY,
-			SDocTokenType.IDENTIFIER,
-			SDocTokenType.RCURLY
-		);
+
+		lexemeTypeTests(source, SDocTokenType.LCURLY, SDocTokenType.IDENTIFIER, SDocTokenType.RCURLY);
 	}
-	
+
 	/**
 	 * testGenericArrayType
 	 */
 	public void testGenericArrayType()
 	{
 		String source = "{Array<String>}";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.LCURLY,
-			SDocTokenType.ARRAY,
-			SDocTokenType.LESS_THAN,
-			SDocTokenType.IDENTIFIER,
-			SDocTokenType.GREATER_THAN,
-			SDocTokenType.RCURLY
-		);
+
+		lexemeTypeTests(source, SDocTokenType.LCURLY, SDocTokenType.ARRAY, SDocTokenType.LESS_THAN,
+				SDocTokenType.IDENTIFIER, SDocTokenType.GREATER_THAN, SDocTokenType.RCURLY);
 	}
-	
+
 	/**
 	 * testFuntionType
 	 */
 	public void testFuntionType()
 	{
 		String source = "{Function(String)->Boolean}";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.LCURLY,
-			SDocTokenType.FUNCTION,
-			SDocTokenType.LPAREN,
-			SDocTokenType.IDENTIFIER,
-			SDocTokenType.RPAREN,
-			SDocTokenType.ARROW,
-			SDocTokenType.IDENTIFIER,
-			SDocTokenType.RCURLY
-		);
+
+		lexemeTypeTests(source, SDocTokenType.LCURLY, SDocTokenType.FUNCTION, SDocTokenType.LPAREN,
+				SDocTokenType.IDENTIFIER, SDocTokenType.RPAREN, SDocTokenType.ARROW, SDocTokenType.IDENTIFIER,
+				SDocTokenType.RCURLY);
 	}
-	
+
 	/**
 	 * testFuntionType2
 	 */
 	public void testFuntionType2()
 	{
 		String source = "{Function(String):Boolean}";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.LCURLY,
-			SDocTokenType.FUNCTION,
-			SDocTokenType.LPAREN,
-			SDocTokenType.IDENTIFIER,
-			SDocTokenType.RPAREN,
-			SDocTokenType.COLON,
-			SDocTokenType.IDENTIFIER,
-			SDocTokenType.RCURLY
-		);
+
+		lexemeTypeTests(source, SDocTokenType.LCURLY, SDocTokenType.FUNCTION, SDocTokenType.LPAREN,
+				SDocTokenType.IDENTIFIER, SDocTokenType.RPAREN, SDocTokenType.COLON, SDocTokenType.IDENTIFIER,
+				SDocTokenType.RCURLY);
 	}
-	
+
 	/**
 	 * testSampleBlock
 	 */
 	public void testSampleBlock()
 	{
-		String source =
-			"/**\n" +
-			" * This is a sample block\n" +
-			" *\n" +
-			" * @param {Number} count\n" +
-			" *   The number of times to do something\n" +
-			" */";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.START_DOCUMENTATION,	// /**
-			SDocTokenType.TEXT,					// This
-			SDocTokenType.TEXT,					// is
-			SDocTokenType.TEXT,					// a
-			SDocTokenType.TEXT,					// sample
-			SDocTokenType.TEXT,					// block
-			SDocTokenType.PARAM,				// @param
-			SDocTokenType.LCURLY,				// {
-			SDocTokenType.IDENTIFIER,			// Number
-			SDocTokenType.RCURLY,				// }
-			SDocTokenType.TEXT,					// count
-			SDocTokenType.TEXT,					// The
-			SDocTokenType.TEXT,					// number
-			SDocTokenType.TEXT,					// of
-			SDocTokenType.TEXT,					// times
-			SDocTokenType.TEXT,					// to
-			SDocTokenType.TEXT,					// do
-			SDocTokenType.TEXT,					// something
-			SDocTokenType.END_DOCUMENTATION		// */
+		String source = "/**\n" + " * This is a sample block\n" + " *\n" + " * @param {Number} count\n"
+				+ " *   The number of times to do something\n" + " */";
+
+		lexemeTypeTests(source, SDocTokenType.START_DOCUMENTATION, // /**
+				SDocTokenType.TEXT, // This
+				SDocTokenType.TEXT, // is
+				SDocTokenType.TEXT, // a
+				SDocTokenType.TEXT, // sample
+				SDocTokenType.TEXT, // block
+				SDocTokenType.PARAM, // @param
+				SDocTokenType.LCURLY, // {
+				SDocTokenType.IDENTIFIER, // Number
+				SDocTokenType.RCURLY, // }
+				SDocTokenType.TEXT, // count
+				SDocTokenType.TEXT, // The
+				SDocTokenType.TEXT, // number
+				SDocTokenType.TEXT, // of
+				SDocTokenType.TEXT, // times
+				SDocTokenType.TEXT, // to
+				SDocTokenType.TEXT, // do
+				SDocTokenType.TEXT, // something
+				SDocTokenType.END_DOCUMENTATION // */
 		);
 	}
 }
