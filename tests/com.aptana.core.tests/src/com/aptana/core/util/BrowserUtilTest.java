@@ -36,7 +36,7 @@ public class BrowserUtilTest extends TestCase
 	 * Test that prints what's found in the current machine (used for debugging purposes as it may be hard to predict
 	 * the environment used to run the tests).
 	 */
-	public void __testFindBrowserManual() throws Exception
+	public void testFindBrowserManual() throws Exception
 	{
 		List<BrowserInfo> browsers = BrowserUtil.discoverInstalledBrowsers();
 		for (BrowserInfo info : browsers)

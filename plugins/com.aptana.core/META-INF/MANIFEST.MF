@@ -22,5 +22,6 @@ Export-Package: com.aptana.core,
  com.aptana.core.projects.templates,
  com.aptana.core.resources,
  com.aptana.core.util,
- com.aptana.core.util.replace
+ com.aptana.core.util.replace,
+ com.aptana.plist
 Eclipse-ExtensibleAPI: true

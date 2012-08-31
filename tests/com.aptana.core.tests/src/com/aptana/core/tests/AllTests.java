@@ -10,7 +10,10 @@ package com.aptana.core.tests;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import ch.randelshofer.quaqua.util.BinaryPListParserTest;
+
 import com.aptana.core.util.AllUtilTests;
+import com.aptana.plist.xml.XMLPListParserTest;
 
 public class AllTests
 {
@@ -20,6 +23,8 @@ public class AllTests
 		TestSuite suite = new TestSuite("Test for com.aptana.core.tests");
 		// $JUnit-BEGIN$
 		suite.addTestSuite(IdeLogTest.class);
+		suite.addTestSuite(BinaryPListParserTest.class);
+		suite.addTestSuite(XMLPListParserTest.class);
 		suite.addTest(AllUtilTests.suite());
 		// $JUnit-END$
 		return suite;
