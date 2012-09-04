@@ -30,11 +30,75 @@ public class VersionUtilTest extends TestCase
 		assertTrue(VersionUtil.compareVersions("1.3.0.v20100106-170", "1.3.0.v20100518-1140") < 0);
 		assertTrue(VersionUtil.compareVersions("1.3.0.v20100518-1140", "1.3.0.v20100106-170") > 0);
 		assertTrue(VersionUtil.compareVersions("v20100101-900", "v20100101-1200") > 0);
-		
+
 		assertTrue(VersionUtil.compareVersions("1.12.127", "1.12.82") > 0);
 		assertTrue(VersionUtil.compareVersions("1.2.3.1000a", "1.2.3.1000b") < 0);
 		assertTrue(VersionUtil.compareVersions("1.12", "1.12") == 0);
 		assertTrue(VersionUtil.compareVersions("1.12", "1.12.0") < 0);
 		assertTrue(VersionUtil.compareVersions("1.12.0", "1.12") > 0);
+	}
+
+	/**
+	 * Version ranges tests.
+	 * 
+	 * @throws Exception
+	 */
+	public void testVersionRanges() throws Exception
+	{
+		assertTrue("Expected empty version values to be compatible",
+				VersionUtil.isCompatibleVersions(new String[] {}, new String[] {}));
+		assertTrue("Expected compatible versions",
+				VersionUtil.isCompatibleVersions(new String[] { "1.0" }, new String[] { "1\\.0" }));
+		assertTrue("Expected compatible versions",
+				VersionUtil.isCompatibleVersions(new String[] { "1.0" }, new String[] { "[1.0, 2.0)" }));
+		assertTrue("Expected compatible versions",
+				VersionUtil.isCompatibleVersions(new String[] { "1.0", "2.0" }, new String[] { "[1.0, 2.0)" }));
+		assertTrue("Expected compatible versions",
+				VersionUtil.isCompatibleVersions(new String[] { "1.0", "2.0" }, new String[] { "[1.0, 2.0]" }));
+		assertTrue("Expected compatible versions",
+				VersionUtil.isCompatibleVersions(new String[] { "1.0", "2.0", "2.1" }, new String[] { "[1.0, 2.0]" }));
+		assertTrue("Expected compatible versions", VersionUtil.isCompatibleVersions(new String[] { "1.0.1", "2.0",
+				"2.1" }, new String[] { "[1.0.0, 2.0]" }));
+		assertTrue(
+				"Expected compatible versions",
+				VersionUtil.isCompatibleVersions(new String[] { "1.0", "2.0", "2.1" }, new String[] { "[1.0, 2.0)",
+						"2\\.1" }));
+		assertTrue(
+				"Expected compatible versions",
+				VersionUtil.isCompatibleVersions(new String[] { "Android 2.1-update1",
+						"Google APIs Android 2.1-update1", "Android 2.2" }, new String[] { "[2.1, 2.2]" }));
+		assertTrue(
+				"Expected compatible versions",
+				VersionUtil.isCompatibleVersions(new String[] { "Android 2.1-update1",
+						"Google APIs Android 2.1-update1", "Android 2.2" }, new String[] { "[2.1, 2.2)" }));
+		assertTrue(
+				"Expected compatible versions",
+				VersionUtil.isCompatibleVersions(new String[] { "Android 2.1-update1",
+						"Google APIs Android 2.1-update1", "Android 2.2" }, new String[] { "2\\.1", "2\\.2" }));
+		assertTrue(
+				"Expected compatible versions",
+				VersionUtil.isCompatibleVersions(new String[] { "Android 2.1-update1",
+						"Google APIs Android 2.1-update1", "Android 2.2" }, new String[] { "Android\\s*2\\.1.*",
+						"Android\\s*2\\.2.*" }));
+
+		assertFalse(
+				"Expected compatible versions",
+				VersionUtil.isCompatibleVersions(new String[] { "Android 2.1-update1",
+						"Google APIs Android 2.1-update1", "Android 2.2" }, new String[] { "Android\\s*2\\.1.*",
+						"Android\\s*2\\.2.*", "Android\\s*2\\.3.*" }));
+		assertFalse(
+				"Expected compatible versions",
+				VersionUtil.isCompatibleVersions(new String[] { "Android 2.1-update1",
+						"Google APIs Android 2.1-update1", "Android 2.2" }, new String[] { "2\\.3", "2\\.2" }));
+		assertFalse(
+				"Expected incompatible versions",
+				VersionUtil.isCompatibleVersions(new String[] { "1.0", "2.0", "2.1" }, new String[] { "[1.0, 2.1]",
+						"2\\.2" }));
+		assertFalse("Expected incompatible versions", VersionUtil.isCompatibleVersions(new String[] { "1.0.1", "2.0.0",
+				"2.1.0" }, new String[] { "[1.0.2, 2.0.0)" }));
+		assertFalse("Expected incompatible versions",
+				VersionUtil.isCompatibleVersions(new String[] { "1.0" }, new String[] { "[1.0, 2.0)", "3\\.0" }));
+		assertFalse("Expected incompatible versions",
+				VersionUtil.isCompatibleVersions(new String[] { "1.0" }, new String[] { "(1.0, 2.0)" }));
 	}
 }
