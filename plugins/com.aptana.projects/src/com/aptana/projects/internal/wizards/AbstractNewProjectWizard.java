@@ -266,9 +266,14 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 									{
 										public void run()
 										{
+											String message = status.getMessage();
+											if (status instanceof ProcessStatus)
+											{
+												message = ((ProcessStatus) status).getStdErr();
+											}
 											MessageDialog.openError(UIUtils.getActiveWorkbenchWindow().getShell(),
 													Messages.AbstractNewProjectWizard_ProjectListenerErrorTitle,
-													status.getMessage());
+													message);
 										}
 									});
 								}
@@ -611,6 +616,11 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 				}
 			}
 		}
+	}
+
+	protected IPath getDestinationPath()
+	{
+		return destPath;
 	}
 
 	/**
