@@ -22,9 +22,10 @@ public class ParseRootNode extends ParseNode implements IParseRootNode
 		this.start = start;
 		this.end = end;
 
-		List<IParseNode> nodes = new ArrayList<IParseNode>(children.length);
+		int len = children.length;
+		List<IParseNode> nodes = new ArrayList<IParseNode>(len);
 		// Micro-optimization (using old for to save on speed/memory).
-		for (int i = 0; i < children.length; i++)
+		for (int i = 0; i < len; i++)
 		{
 			Symbol child = children[i];
 			if (child instanceof IParseNode)

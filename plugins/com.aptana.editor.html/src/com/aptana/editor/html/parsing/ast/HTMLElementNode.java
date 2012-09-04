@@ -51,12 +51,12 @@ public class HTMLElementNode extends HTMLNode
 	/**
 	 * Note: lazily-initialized to save on memory.
 	 */
-	private List<IParseNode> fCSSStyleNodes;
+	private ArrayList<IParseNode> fCSSStyleNodes;
 
 	/**
 	 * Note: lazily-initialized to save on memory.
 	 */
-	private List<IParseNode> fJSAttributeNodes;
+	private ArrayList<IParseNode> fJSAttributeNodes;
 
 	private boolean fIsSelfClosing;
 
@@ -93,6 +93,20 @@ public class HTMLElementNode extends HTMLNode
 		// this behavior right now
 		this.fStartNodeOffset = tagSymbol.getStart();
 		this.fStartNodeEnd = tagSymbol.getEnd();
+	}
+
+	@Override
+	public void trimToSize()
+	{
+		super.trimToSize();
+		if (fCSSStyleNodes != null)
+		{
+			fCSSStyleNodes.trimToSize();
+		}
+		if (fJSAttributeNodes != null)
+		{
+			fJSAttributeNodes.trimToSize();
+		}
 	}
 
 	@Override

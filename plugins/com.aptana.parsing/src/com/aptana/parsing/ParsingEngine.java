@@ -147,35 +147,42 @@ public class ParsingEngine
 	/**
 	 * Default for fMinimunNumberOfCharsToEnterCache.
 	 */
-	public static final int MINIMUN_NUMBER_OF_CHARS_TO_ENTER_CACHE = 3 * 1024; // at least a 3k file to be worthy of the
+	public static final int MINIMUM_NUMBER_OF_CHARS_TO_ENTER_CACHE = 3 * 1024; // at least a 3k file to be worthy of the
 																				// cache
 
 	/**
 	 * The maximum number of chars for a reference that will be kept as strong references (after this limit they're
 	 * added as soft references). As a reference, jquery is 252k.
 	 */
-	public static final int MAXIMUN_NUMBER_OF_CHARS_IN_STRONG_REFERENCES_CACHE = 400 * 1024; // a 400kb file (with
+	public static final int MAXIMUM_NUMBER_OF_CHARS_IN_STRONG_REFERENCES_CACHE = 400 * 1024; // a 400kb file (with
 																								// strong references)
 
 	/**
 	 * If the parse would be too fast, don't even add it to the cache, as the cost of having it in the cache and having
 	 * many misses is higher than not having it at the cache in the first place.
 	 */
-	private final int fMinimunNumberOfCharsToEnterCache;
+	private final int fMinimumNumberOfCharsToEnterCache;
 
+	/**
+	 * Create a cache with N 'strong' references but still keep pruned values as soft references. Cache size based on
+	 * the number of chars.
+	 * 
+	 * @param cacheSize
+	 *            the maximum number of strong-references kept (in chars)
+	 * @param minCacheElementSize
+	 *            if an element does not have at least this size (in chars), it won't even enter the cache.
+	 */
 	protected ParsingEngine(IParserPoolProvider parserPoolProvider, int cacheSize, int minCacheElementSize)
 	{
-		// Create a cache with N 'strong' references but still keep pruned values as soft references.
-		// Cache size based on the number of chars.
 		fParseCache = new LRUCacheWithSoftPrunedValues<IParseStateCacheKey, CacheValue>(cacheSize);
 		fParserPoolProvider = parserPoolProvider;
-		fMinimunNumberOfCharsToEnterCache = minCacheElementSize;
+		fMinimumNumberOfCharsToEnterCache = minCacheElementSize;
 	}
 
 	public ParsingEngine(IParserPoolProvider parserPoolProvider)
 	{
-		this(parserPoolProvider, MAXIMUN_NUMBER_OF_CHARS_IN_STRONG_REFERENCES_CACHE,
-				MINIMUN_NUMBER_OF_CHARS_TO_ENTER_CACHE);
+		this(parserPoolProvider, MAXIMUM_NUMBER_OF_CHARS_IN_STRONG_REFERENCES_CACHE,
+				MINIMUM_NUMBER_OF_CHARS_TO_ENTER_CACHE);
 	}
 
 	public void dispose()
@@ -215,7 +222,7 @@ public class ParsingEngine
 			}
 
 			int sourceLen = source.length();
-			if (sourceLen < fMinimunNumberOfCharsToEnterCache)
+			if (sourceLen < fMinimumNumberOfCharsToEnterCache)
 			{
 				// If the source is small, don't even use the cache, just do a parse.
 				// Note: if it's too big, it'll end up entering the 'soft' cache.
@@ -224,8 +231,6 @@ public class ParsingEngine
 
 			IParseStateCacheKey newParseStateKey = parseState.getCacheKey(contentTypeId);
 			CacheValue cacheValue = null;
-			IParserPool pool = null;
-			IParser parser = null;
 			LRUCacheWithSoftPrunedValues<IParseStateCacheKey, CacheValue> parseCache = fParseCache;
 			if (parseCache == null)
 			{
@@ -234,6 +239,8 @@ public class ParsingEngine
 
 			boolean getResultFromCache = false;
 			boolean traceEnabled = plugin != null && IdeLog.isTraceEnabled(plugin, IDebugScopes.PARSING);
+			IParserPool pool = null;
+			IParser parser = null;
 			try
 			{
 				synchronized (fParseCacheLock)

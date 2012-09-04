@@ -23,9 +23,6 @@ public class CSSDeclarationNode extends CSSNode
 
 	/**
 	 * CSSDeclarationNode
-	 * 
-	 * @param start
-	 * @param end
 	 */
 	protected CSSDeclarationNode()
 	{

@@ -164,7 +164,8 @@ public class ParseUtil
 				{
 					IParseNode[] commentNodes = ((ParseRootNode) node).getCommentNodes();
 					// Micro-optimization (using old for to save on speed/memory).
-					for (int i = 0; i < commentNodes.length; i++)
+					int len = commentNodes.length;
+					for (int i = 0; i < len; i++)
 					{
 						queue.offer(commentNodes[i]);
 					}
@@ -172,7 +173,8 @@ public class ParseUtil
 
 				IParseNode[] children = current.getChildren();
 				// Micro-optimization (using old for to save on speed/memory).
-				for (int i = 0; i < children.length; i++)
+				int len = children.length;
+				for (int i = 0; i < len; i++)
 				{
 					IParseNode child = children[i];
 					queue.offer(child);
@@ -268,7 +270,8 @@ public class ParseUtil
 						IParseNode[] commentNodes = ((ParseRootNode) node).getCommentNodes();
 
 						// Micro-optimization (using old for to save on speed/memory).
-						for (int j = 0; j < commentNodes.length; j++)
+						int len = commentNodes.length;
+						for (int j = 0; j < len; j++)
 						{
 							IParseNode commentNode = commentNodes[j];
 							queue.add(i++, new QueueEntry(commentNode, true));
@@ -279,7 +282,8 @@ public class ParseUtil
 					IParseNode[] children = current.node.getChildren();
 
 					// Micro-optimization (using old for to save on speed/memory).
-					for (int j = 0; j < children.length; j++)
+					int len = children.length;
+					for (int j = 0; j < len; j++)
 					{
 						IParseNode child = children[j];
 						queue.add(i++, new QueueEntry(child, true));
