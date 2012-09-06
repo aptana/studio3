@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<fragment>
+   <extension
+         point="com.aptana.core.launchLifecycleListener">
+      <launch_lifecycle_listener
+            class="com.aptana.core.launch.TestLaunchLifecycleListener">
+      </launch_lifecycle_listener>
+   </extension>
+   <extension
+         point="com.aptana.core.launchLifecycleListener">
+      <launch_lifecycle_listener
+            class="com.aptana.core.launch.TestLaunchLifecycleListenerP2"
+            launchConfigurationTypeId="com.aptana.core.tests.launchLifecycleLaunchConfigurationTest"
+            priority="2">
+      </launch_lifecycle_listener>
+   </extension>
+   <extension
+         point="com.aptana.core.launchLifecycleListener">
+      <launch_lifecycle_listener
+            class="com.aptana.core.launch.TestLaunchLifecycleListenerIgnored"
+            launchConfigurationTypeId="ignoredType">
+      </launch_lifecycle_listener>
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.launchConfigurationTypes">
+      <launchConfigurationType
+            delegate="com.aptana.core.launch.TestLaunchLifecycleLaunchDelegate"
+            id="com.aptana.core.tests.launchLifecycleLaunchConfigurationTest"
+            modes="run"
+            name="TestLaunch"
+            public="false">
+      </launchConfigurationType>
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.launchDelegates">
+      <launchDelegate
+            delegate="com.aptana.core.launch.TestLaunchLifecycleLaunchDelegate"
+            id="com.aptana.core.launch.TestLaunchLifecycleLaunchDelegate"
+            type="com.aptana.core.tests.launchLifecycleLaunchConfigurationTest">
+      </launchDelegate>
+   </extension>
+
+</fragment>

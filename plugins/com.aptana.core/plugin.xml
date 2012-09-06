@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension-point id="launchLifecycleListener" name="%extension-point.launch-lifecycle-listener.name" schema="schema/launch_lifecycle_listener.exsd"/>
    <extension
          id="problem"
          name="%problem.marker.name"
