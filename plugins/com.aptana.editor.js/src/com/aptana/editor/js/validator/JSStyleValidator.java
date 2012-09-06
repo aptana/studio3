@@ -932,7 +932,7 @@ public class JSStyleValidator extends AbstractBuildParticipant
 		// Push new scope onto the stack!
 		this.scopeStack.push((Scope) currentScope().clone());
 
-		if (!node.hasChildren())
+		if (!node.hasChildren() && !(node.getParent() instanceof JSWhileNode))
 		{
 			problems.add(createWarning(Messages.JSStyleValidator_StatementBlock, node.getStartingOffset() + 1,
 					node.getLength() - 1));
@@ -1142,10 +1142,18 @@ public class JSStyleValidator extends AbstractBuildParticipant
 			{
 				problems.add(createWarning(Messages.JSStyleValidator_AssignException, left));
 			}
-			if (predefineds.contains(name))
+			if (currentScope().get(name) != null)
+			{
+				if (predefineds.contains(name))
+				{
+					problems.add(createWarning(Messages.JSStyleValidator_ReadOnly, node.getRightHandSide()));
+				}
+			}
+			else
 			{
 				problems.add(createError(Messages.JSStyleValidator_ReadOnly, node.getRightHandSide()));
 			}
+
 			// Make a note that we're assigning to this variable.
 			currentFunction().varAssigned(name);
 		}
@@ -1176,8 +1184,11 @@ public class JSStyleValidator extends AbstractBuildParticipant
 		{
 			JSAssignmentNode assign = (JSAssignmentNode) value;
 			IParseNode left = assign.getLeftHandSide();
-			problems.add(createError(
-					MessageFormat.format(Messages.JSStyleValidator_VarANot, left.getNameNode().getName()), left));
+			if (left instanceof JSIdentifierNode)
+			{
+				problems.add(createError(
+						MessageFormat.format(Messages.JSStyleValidator_VarANot, left.getNameNode().getName()), left));
+			}
 		}
 		// Check for assignment of 'undefined'
 		else if ("undefined".equals(value.getNameNode().getName())) //$NON-NLS-1$

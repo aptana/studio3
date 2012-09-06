@@ -139,6 +139,24 @@ public abstract class AbstractValidatorTestCase extends TestCase
 		}
 	}
 
+	protected void assertProblemExists(List<IProblem> items, String msg, int line, int severity, int offset)
+	{
+		IProblem item = assertContains(items, msg);
+		assertProblem(item, msg, line, severity, offset);
+	}
+
+	protected void assertCountOfProblems(List<IProblem> items, int count, final String msg)
+	{
+		List<IProblem> filtered = CollectionsUtil.filter(items, new IFilter<IProblem>()
+		{
+			public boolean include(IProblem item)
+			{
+				return msg.equals(item.getMessage());
+			}
+		});
+		assertEquals(MessageFormat.format("number of problems of type {0}", msg), count, filtered.size());
+	}
+
 	/**
 	 * "js", "css", "txt", "rb", etc.
 	 * 

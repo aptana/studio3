@@ -28,12 +28,6 @@ import com.aptana.jetty.util.epl.ajax.JSON;
 public class JSLintValidatorTest extends AbstractValidatorTestCase
 {
 
-	protected void assertProblemExists(List<IProblem> items, String msg, int line, int severity, int offset)
-	{
-		IProblem item = assertContains(items, msg);
-		assertProblem(item, msg, line, severity, offset);
-	}
-
 	@Override
 	protected IBuildParticipant createValidator()
 	{
@@ -2202,7 +2196,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 				IMarker.SEVERITY_ERROR, 3);
 	}
 
-	public void testStatementBlock() throws CoreException
+	public void testStatementBlock1() throws CoreException
 	{
 		// @formatter:off
 		String text = "var foo = 1;\n" +
@@ -2225,6 +2219,35 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		List<IProblem> items = getParseErrors(text);
 		assertProblemExists(items, "Expected to see a statement and instead saw a block.", 2, IMarker.SEVERITY_WARNING,
 				18);
+		assertCountOfProblems(items, 1, "Expected to see a statement and instead saw a block.");
+	}
+
+	public void testStatementBlockOK1() throws CoreException
+	{
+		// @formatter:off
+		String text = "var event;\n" +
+					  "while (event = events.shift()) {\n" +
+					  "	\n" +
+					  "}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "Expected to see a statement and instead saw a block.");
+	}
+
+	public void testStatementBlockOK2() throws CoreException
+	{
+		// @formatter:off
+		String text = "var event;\n" +
+					  "while (event = events.shift()) {\n" +
+					  "	{}\n" +
+					  "}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Expected to see a statement and instead saw a block.", 3, IMarker.SEVERITY_WARNING,
+				46);
+		assertCountOfProblems(items, 1, "Expected to see a statement and instead saw a block.");
 	}
 
 	public void testStrangeLoop1() throws CoreException
@@ -2676,6 +2699,17 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		assertProblemExists(items, "'foo' was used before it was defined.", 3, IMarker.SEVERITY_WARNING, 58);
 	}
 
+	public void testUsedBeforeA2() throws CoreException
+	{
+		setOption("undef", false);
+		// @formatter:off
+		String text = "var Events = Backbone.Events = {};";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "'Backbone' was used before it was defined.", 1, IMarker.SEVERITY_WARNING, 13);
+	}
+
 	public void testUsedBeforeAOK1() throws CoreException
 	{
 		// @formatter:off
@@ -2810,6 +2844,14 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 
 		List<IProblem> items = getParseErrors(text);
 		assertProblemExists(items, "Variable blah was not declared correctly.", 1, IMarker.SEVERITY_ERROR, 12);
+	}
+
+	public void testVarANot_OK() throws CoreException
+	{
+		String text = "var Events = Backbone.Events = {};";
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "Variable  was not declared correctly.");
 	}
 
 	public void testWeirdAssignment() throws CoreException
