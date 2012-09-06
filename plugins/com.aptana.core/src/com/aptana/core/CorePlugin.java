@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChang
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.osgi.framework.BundleContext;
 
+import com.aptana.core.launch.LaunchLifecycleRegistry;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
@@ -68,6 +69,7 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
+				LaunchLifecycleRegistry.getInstance().addLaunchListener();
 				// Perhaps don't enable this if platform is already in -debug mode?
 				//
 				// Place after context & plugin assignments, as this relies on both existing already
@@ -78,6 +80,7 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 		};
 		job.setSystem(true);
 		job.schedule();
+
 	}
 
 	/**
@@ -115,6 +118,7 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 		{
 			// Don't listen to debug changes anymore
 			EclipseUtil.instanceScope().getNode(CorePlugin.PLUGIN_ID).removePreferenceChangeListener(this);
+			LaunchLifecycleRegistry.getInstance().removeLaunchListener();
 		}
 		finally
 		{
