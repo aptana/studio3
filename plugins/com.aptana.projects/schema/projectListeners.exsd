@@ -54,6 +54,9 @@
                <documentation>
                   The project listener only gets run for the specific project nature. If no project nature is specified, the project listener is run for all studio projects
                </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="org.eclipse.core.resources.natures/@id"/>
+               </appinfo>
             </annotation>
          </attribute>
          <attribute name="class" type="string" use="required">
