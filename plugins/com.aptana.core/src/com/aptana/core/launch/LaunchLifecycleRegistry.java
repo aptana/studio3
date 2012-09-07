@@ -22,6 +22,7 @@ import org.eclipse.debug.core.ILaunchesListener2;
 
 import com.aptana.core.CorePlugin;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.StringUtil;
 
 /**
  * Class used to properly call extension points related to com.aptana.core.launchLifecycleListener.
@@ -204,15 +205,16 @@ public class LaunchLifecycleRegistry
 						ILaunchLifecycleListener listener = (ILaunchLifecycleListener) iConfigurationElement
 								.createExecutableExtension("class"); //$NON-NLS-1$
 						String priorityStr = iConfigurationElement.getAttribute(LAUNCH_LIFECYCLE_PRIORITY_ATTRIBUTE);
-						int priority;
-						try
+						int priority = 5;
+						if (!StringUtil.isEmpty(priorityStr))
 						{
-							priority = Integer.parseInt(priorityStr);
-						}
-						catch (NumberFormatException e)
-						{
-							priority = 5;
-							IdeLog.logError(CorePlugin.getDefault(), e);
+							try
+							{
+								priority = Integer.parseInt(priorityStr);
+							}
+							catch (NumberFormatException e)
+							{
+							}
 						}
 						lst.add(new PriorityAndListener(listener, priority));
 					}
@@ -239,5 +241,4 @@ public class LaunchLifecycleRegistry
 			}
 		}
 	}
-
 }
