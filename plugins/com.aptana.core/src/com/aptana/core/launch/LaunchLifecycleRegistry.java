@@ -67,7 +67,7 @@ public class LaunchLifecycleRegistry
 	/**
 	 * Adds the launch listener to the debug plugin launch manager.
 	 */
-	public void addLaunchListener()
+	public void installLaunchListener()
 	{
 		try
 		{
@@ -82,7 +82,7 @@ public class LaunchLifecycleRegistry
 	/**
 	 * Removes the launch listener from the debug plugin launch manager.
 	 */
-	public void removeLaunchListener()
+	public void uninstallLaunchListener()
 	{
 		try
 		{
