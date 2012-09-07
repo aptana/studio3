@@ -69,7 +69,7 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
-				LaunchLifecycleRegistry.getInstance().addLaunchListener();
+				LaunchLifecycleRegistry.getInstance().installLaunchListener();
 				// Perhaps don't enable this if platform is already in -debug mode?
 				//
 				// Place after context & plugin assignments, as this relies on both existing already
@@ -78,14 +78,7 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 				return Status.OK_STATUS;
 			}
 		};
-		try
-		{
-			job.setSystem(true);
-		}
-		catch (IllegalStateException e)
-		{
-			// ignore
-		}
+		EclipseUtil.setSystemForJob(job);
 		job.schedule();
 
 	}
@@ -125,7 +118,7 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 		{
 			// Don't listen to debug changes anymore
 			EclipseUtil.instanceScope().getNode(CorePlugin.PLUGIN_ID).removePreferenceChangeListener(this);
-			LaunchLifecycleRegistry.getInstance().removeLaunchListener();
+			LaunchLifecycleRegistry.getInstance().uninstallLaunchListener();
 		}
 		finally
 		{

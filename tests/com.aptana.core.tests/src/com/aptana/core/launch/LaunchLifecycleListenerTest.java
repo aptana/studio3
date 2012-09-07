@@ -67,7 +67,6 @@ public class LaunchLifecycleListenerTest extends TestCase
 				"LAUNCH_LISTENER:BEFORE\n" +
 				"ON_LAUNCH_DELEGATE\n" +
 				"END_LAUNCH\n" +
-				
 				"START_TERMINATE\n" +
 				"LAUNCH_LISTENER:AFTER:P2\n" +
 				"LAUNCH_LISTENER:AFTER\n" +
