@@ -205,6 +205,16 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 				{
 					setSelectedTemplate(templateControlMap.get(templateControl));
 				}
+
+				@Override
+				public void mouseDoubleClick(MouseEvent e)
+				{
+					// Treat double-click like selecting the template and clicking "Next"
+					if (canFlipToNextPage())
+					{
+						getContainer().showPage(getNextPage());
+					}
+				}
 			};
 			templateControl.addMouseListener(mouseAdapter);
 			image.addMouseListener(mouseAdapter);
