@@ -15,24 +15,39 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 
+import com.aptana.ui.util.UIUtils;
+
 /**
  * @author Kevin Lindsey
+ * @author Fabio Zadrozny
  */
 public class ColorManager implements ISharedTextColors
 {
-	protected Map<RGB, Color> _colorsByRGB = new HashMap<RGB, Color>(7);
+	protected final Map<RGB, Color> _colorsByRGB = new HashMap<RGB, Color>(7);
 
-	public synchronized void dispose()
+	public void dispose()
 	{
-		for (Color c : this._colorsByRGB.values())
+		// Note: the dispose must always be run in the UI thread (note that we don't fail if this function
+		// is not called from the UI-thread, we simply run it asynchronously later on).
+		UIUtils.runInUIThread(new Runnable()
 		{
-			c.dispose();
-		}
-		this._colorsByRGB.clear();
+			public void run()
+			{
+				for (Color c : _colorsByRGB.values())
+				{
+					c.dispose();
+				}
+				_colorsByRGB.clear();
+			}
+		});
 	}
 
-	public synchronized Color getColor(RGB rgb)
+	/**
+	 * @note this method must be called from the UI thread.
+	 */
+	public Color getColor(RGB rgb)
 	{
+		UIUtils.assertUIThread();
 		Color color = this._colorsByRGB.get(rgb);
 		if (color == null)
 		{

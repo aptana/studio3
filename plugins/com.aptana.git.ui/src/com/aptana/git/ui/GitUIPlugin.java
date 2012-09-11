@@ -157,15 +157,16 @@ public class GitUIPlugin extends AbstractUIPlugin
 
 	public static Image getImage(String string)
 	{
-		if (getDefault().getImageRegistry().get(string) == null)
+		ImageRegistry imageRegistry = getDefault().getImageRegistry();
+		if (imageRegistry.get(string) == null)
 		{
 			ImageDescriptor id = imageDescriptorFromPlugin(getPluginId(), string);
 			if (id != null)
 			{
-				getDefault().getImageRegistry().put(string, id);
+				imageRegistry.put(string, id);
 			}
 		}
-		return getDefault().getImageRegistry().get(string);
+		return imageRegistry.get(string);
 	}
 
 	private final class GitInstallationValidatorJob extends UIJob
@@ -279,15 +280,20 @@ public class GitUIPlugin extends AbstractUIPlugin
 
 		protected void forceColors()
 		{
-			final RGB greenBG = GitColors.greenBG().getRGB();
-			final String greenBGString = StringConverter.asString(greenBG);
-			final RGB redBG = GitColors.redBG().getRGB();
-			final String redBGString = StringConverter.asString(redBG);
-			PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
+
+			UIUtils.runInUIThread(new Runnable()
 			{
+
+				String greenBGString;
+				String redBGString;
 
 				public void run()
 				{
+					RGB greenBG = GitColors.greenBG().getRGB();
+					greenBGString = StringConverter.asString(greenBG);
+					RGB redBG = GitColors.redBG().getRGB();
+					redBGString = StringConverter.asString(redBG);
+
 					JFaceResources.getColorRegistry().put("CONFLICTING_COLOR", redBG); //$NON-NLS-1$
 					JFaceResources.getColorRegistry().put("RESOLVED_COLOR", greenBG); //$NON-NLS-1$
 					setQuickDiffColors(EclipseUtil.instanceScope().getNode("com.aptana.editor.common")); //$NON-NLS-1$
@@ -333,7 +339,6 @@ public class GitUIPlugin extends AbstractUIPlugin
 				new CachedImageDescriptor(imageDescriptorFromPlugin(PLUGIN_ID,
 						GitLightweightDecorator.STAGED_REMOVED_IMAGE)));
 		reg.put(GitLightweightDecorator.UNTRACKED_IMAGE,
-				new CachedImageDescriptor(imageDescriptorFromPlugin(PLUGIN_ID,
-						GitLightweightDecorator.UNTRACKED_IMAGE)));
+				new CachedImageDescriptor(imageDescriptorFromPlugin(PLUGIN_ID, GitLightweightDecorator.UNTRACKED_IMAGE)));
 	}
 }

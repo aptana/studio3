@@ -15,6 +15,7 @@ import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ISafeRunnable;
@@ -650,5 +651,30 @@ public final class UIUtils
 			return true;
 		}
 		return false;
+	}
+
+	/**
+	 * Runs the passed runnable in the UI thread. If the current thread is an UI-thread, runs it now, otherwise it's run
+	 * asynchronously in the UI thread.
+	 */
+	public static void runInUIThread(Runnable runnable)
+	{
+		Display display = Display.getCurrent();
+		if (display == null)
+		{
+			Display.getDefault().asyncExec(runnable);
+		}
+		else
+		{
+			runnable.run();
+		}
+	}
+
+	/**
+	 * Throws an AssertionError if the current thread is not the UI thread.
+	 */
+	public static void assertUIThread()
+	{
+		Assert.isTrue(Display.getCurrent() != null, "Function must be called from UI-thread."); //$NON-NLS-1$
 	}
 }
