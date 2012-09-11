@@ -280,4 +280,25 @@ public class FileUtil
 		}
 		return 1;
 	}
+
+	/**
+	 * A simple check that the directory path is a valid one for the current OS. The check does not test for existence
+	 * or write permissions, just for the path structure by using {@link File#getCanonicalPath()}.
+	 * 
+	 * @param path
+	 * @return <code>true</code> if the given path is a valid one; <code>false</code> otherwise.
+	 */
+	public static boolean isValidDirectory(String path)
+	{
+		File file = new File(path);
+		try
+		{
+			file.getCanonicalPath();
+			return true;
+		}
+		catch (IOException e)
+		{
+			return false;
+		}
+	}
 }
