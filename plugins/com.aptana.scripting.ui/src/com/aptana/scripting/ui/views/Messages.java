@@ -98,6 +98,7 @@ public class Messages extends NLS
 	public static String ProjectTemplateNode_Project_Template_Name;
 	public static String ProjectTemplateNode_Project_Template_Path;
 	public static String ProjectTemplateNode_Project_Template_Scope;
+	public static String ProjectTemplateNode_Project_Template_Tags;
 
 	public static String ProjectTemplatesNode_Project_Templates_Count;
 	public static String ProjectTemplatesNode_Projects_Templates;

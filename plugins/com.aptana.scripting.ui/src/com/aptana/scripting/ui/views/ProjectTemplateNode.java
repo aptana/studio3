@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -12,6 +12,7 @@ import java.util.Set;
 
 import org.eclipse.swt.graphics.Image;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.scripting.model.ProjectTemplateElement;
 import com.aptana.scripting.ui.ScriptingUIPlugin;
 
@@ -68,6 +69,13 @@ class ProjectTemplateNode extends BaseNode<ProjectTemplateNode.Property>
 			public Object getPropertyValue(ProjectTemplateNode node)
 			{
 				return node.projectTemplate.getIcon();
+			}
+		},
+		TAGS(Messages.ProjectTemplateNode_Project_Template_Tags)
+		{
+			public Object getPropertyValue(ProjectTemplateNode node)
+			{
+				return StringUtil.join(",", node.projectTemplate.getTags()); //$NON-NLS-1$
 			}
 		};
 

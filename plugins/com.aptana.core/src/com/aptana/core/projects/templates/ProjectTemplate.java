@@ -14,7 +14,9 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -30,8 +32,10 @@ import org.eclipse.core.runtime.content.IContentTypeManager;
 
 import com.aptana.core.CorePlugin;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.SourcePrinter;
+import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.ZipUtil;
 import com.aptana.core.util.ZipUtil.IInputStreamTransformer;
 import com.aptana.core.util.replace.SimpleTextPatternReplacer;
@@ -104,6 +108,7 @@ public class ProjectTemplate implements IProjectTemplate
 	private URL iconURL;
 	private boolean isReplacingParameters;
 	private int priority;
+	private List<String> tags;
 
 	/**
 	 * Constructs a new ProjectTemplate
@@ -120,7 +125,7 @@ public class ProjectTemplate implements IProjectTemplate
 	public ProjectTemplate(String path, TemplateType type, String name, boolean isReplacingParameters,
 			String description, URL iconURL, String id)
 	{
-		this(path, type, name, isReplacingParameters, description, iconURL, id, 0);
+		this(path, type, name, isReplacingParameters, description, iconURL, id, 0, null);
 	}
 
 	/**
@@ -136,7 +141,7 @@ public class ProjectTemplate implements IProjectTemplate
 	 * @param priority
 	 */
 	public ProjectTemplate(String path, TemplateType type, String name, boolean isReplacingParameters,
-			String description, URL iconURL, String id, int priority)
+			String description, URL iconURL, String id, int priority, List<String> tags)
 	{
 		this.type = type;
 		this.path = path;
@@ -146,6 +151,7 @@ public class ProjectTemplate implements IProjectTemplate
 		this.iconURL = iconURL;
 		this.id = id;
 		this.priority = priority;
+		this.tags = CollectionsUtil.isEmpty(tags) ? null : new ArrayList<String>(tags);
 	}
 
 	/*
@@ -216,6 +222,11 @@ public class ProjectTemplate implements IProjectTemplate
 		return priority;
 	}
 
+	public List<String> getTags()
+	{
+		return tags;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.core.projects.templates.IProjectTemplate#isReplacingParameters()
@@ -271,6 +282,10 @@ public class ProjectTemplate implements IProjectTemplate
 			printer.printWithIndent("iconURL: ").println(template.getIconURL().toString()); //$NON-NLS-1$
 		}
 
+		if (CollectionsUtil.isEmpty(template.getTags()))
+		{
+			printer.printlnWithIndent("tags: ").println(StringUtil.join(",", template.getTags())); //$NON-NLS-1$ //$NON-NLS-2$
+		}
 	}
 
 	/*
