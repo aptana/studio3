@@ -43,7 +43,7 @@ public class ProjectsPlugin extends AbstractUIPlugin
 		{
 			super("default.zip", TemplateType.WEB, Messages.ProjectsPlugin_DefaultWebProjectTemplate_Name, //$NON-NLS-1$
 					false, Messages.ProjectsPlugin_DefaultWebProjectTemplate_Description, null, ID, 1, CollectionsUtil
-							.newList(Messages.ProjectsPlugin_Tag_Web));
+							.newList("Web")); //$NON-NLS-1$
 		}
 
 		@Override

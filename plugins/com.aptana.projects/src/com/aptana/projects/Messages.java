@@ -15,7 +15,6 @@ public class Messages extends NLS
 
 	public static String ProjectsPlugin_DefaultWebProjectTemplate_Description;
 	public static String ProjectsPlugin_DefaultWebProjectTemplate_Name;
-	public static String ProjectsPlugin_Tag_Web;
 
 	static
 	{

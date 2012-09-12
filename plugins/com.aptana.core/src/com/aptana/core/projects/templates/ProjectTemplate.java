@@ -282,7 +282,7 @@ public class ProjectTemplate implements IProjectTemplate
 			printer.printWithIndent("iconURL: ").println(template.getIconURL().toString()); //$NON-NLS-1$
 		}
 
-		if (CollectionsUtil.isEmpty(template.getTags()))
+		if (!CollectionsUtil.isEmpty(template.getTags()))
 		{
 			printer.printlnWithIndent("tags: ").println(StringUtil.join(",", template.getTags())); //$NON-NLS-1$ //$NON-NLS-2$
 		}
