@@ -8,6 +8,7 @@
 package com.aptana.projects.wizards;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -83,8 +84,9 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 		}
 		else
 		{
+			List<IProjectTemplate> modifiableTemplates = new ArrayList<IProjectTemplate>(templates);
 			// sorts the list by priority first and then alphabetically
-			Collections.sort(templates, new Comparator<IProjectTemplate>()
+			Collections.sort(modifiableTemplates, new Comparator<IProjectTemplate>()
 			{
 
 				public int compare(IProjectTemplate o1, IProjectTemplate o2)
