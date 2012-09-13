@@ -33,4 +33,23 @@ public class CSSCodeScannerFlexTest extends CSSCodeScannerTest
 				"support.constant.property-value.css", "source.css", "null", "support.constant.property-value.css",
 				"null", "support.constant.property-value.css", "null", "source.css", "null");
 	}
+
+	public void testNotConstruct() throws Exception
+	{
+		String src = "svg:not(:root) {overflow: hidden;}";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+		assertTokens("source.css", "meta.property-value.css punctuation.separator.key-value.css",
+				"meta.property-value.css keyword.control.not.css",
+				"meta.property-value.css punctuation.section.function.css",
+				"meta.property-value.css punctuation.separator.key-value.css", "meta.property-value.css source.css",
+				"meta.property-value.css punctuation.section.function.css", "meta.property-value.css",
+				"meta.property-list.css meta.property-value.css punctuation.section.property-list.css",
+				"meta.property-list.css meta.property-value.css meta.property-name.css support.type.property-name.css",
+				"meta.property-list.css meta.property-value.css punctuation.separator.key-value.css",
+				"meta.property-list.css meta.property-value.css",
+				"meta.property-list.css meta.property-value.css support.constant.property-value.css",
+				"meta.property-list.css meta.property-value.css punctuation.terminator.rule.css",
+				"meta.property-list.css punctuation.section.property-list.css", "null");
+	}
 }

@@ -61,12 +61,11 @@ import beaver.Scanner;
     private CSSTokenTypeSymbol newTokenAndLookAhead(CSSTokenType current, CSSTokenType next, int lookAheadLen)
     {
         int right = yychar + yylength() - 1 - lookAheadLen;
-        String txt = yytext();
         CSSTokenTypeSymbol currentSymbol = new CSSTokenTypeSymbol(
-            current, yychar, right, txt.substring(0, txt.length()-lookAheadLen));
+            current, yychar, right, "");
         
         CSSTokenTypeSymbol nextSymbol = new CSSTokenTypeSymbol(
-            next, right+1, right + lookAheadLen, txt.substring(txt.length()-lookAheadLen, txt.length()));
+            next, right+1, right + lookAheadLen, "");
             
         lookAhead = nextSymbol;
         return currentSymbol;
@@ -92,10 +91,9 @@ import beaver.Scanner;
     		catch (Scanner.Exception e)
     		{
     			// create default token type
-    			String text = yytext();
-    			int end = yychar + text.length() - 1;
+    			int end = yychar + yylength() - 1;
     
-    			_lastToken = new CSSTokenTypeSymbol(CSSTokenType.EOF, yychar, end, text);
+    			_lastToken = new CSSTokenTypeSymbol(CSSTokenType.EOF, yychar, end, "");
     		}
         }
 		return _lastToken;
@@ -139,11 +137,13 @@ nl							= \r|\n|\r\n|\f
 	{s}							{ /* ignore */ }
 	{comment}					{ /* ignore */ }
 
-	{single_quoted_string}		{ return newToken(CSSTokenType.SINGLE_QUOTED_STRING, yytext()); }
-	{double_quoted_string}		{ return newToken(CSSTokenType.DOUBLE_QUOTED_STRING, yytext()); }
-	{bad_single_quoted_string}	{ return newToken(CSSTokenType.SINGLE_QUOTED_STRING, yytext()); }
-	{bad_double_quoted_string}	{ return newToken(CSSTokenType.DOUBLE_QUOTED_STRING, yytext()); }
+	{single_quoted_string}		{ return newToken(CSSTokenType.SINGLE_QUOTED_STRING, ""); }
+	{double_quoted_string}		{ return newToken(CSSTokenType.DOUBLE_QUOTED_STRING, ""); }
+	{bad_single_quoted_string}	{ return newToken(CSSTokenType.SINGLE_QUOTED_STRING, ""); }
+	{bad_double_quoted_string}	{ return newToken(CSSTokenType.DOUBLE_QUOTED_STRING, ""); }
 
+	"not"                      { return newToken(CSSTokenType.NOT, ""); }
+	
 	{num}"em"					{ return newTokenAndLookAhead(CSSTokenType.NUMBER, CSSTokenType.EMS, 2); }
 	{num}"ex"					{ return newTokenAndLookAhead(CSSTokenType.NUMBER, CSSTokenType.EXS, 2); }
 	{num}"px"					{ return newTokenAndLookAhead(CSSTokenType.NUMBER, CSSTokenType.LENGTH, 2); }
@@ -161,7 +161,7 @@ nl							= \r|\n|\r\n|\f
 	{num}"khz"					{ return newTokenAndLookAhead(CSSTokenType.NUMBER, CSSTokenType.FREQUENCY, 3); }
 //	{num}{identifier}			{ return newTokenAndLookAhead(CSSTokenType.NUMBER, CSSTokenType.DIMENSION, calculate??); }
 	{num}%						{ return newTokenAndLookAhead(CSSTokenType.NUMBER, CSSTokenType.PERCENTAGE, 1); }
-	{num}						{ return newToken(CSSTokenType.NUMBER, yytext()); }
+	{num}						{ return newToken(CSSTokenType.NUMBER, ""); }
 	
 	"."{name}					{
 									CSSTokenType type;
@@ -174,8 +174,9 @@ nl							= \r|\n|\r\n|\f
 									{
 										boolean numbers = true;
 										String text = yytext();
+										int len = text.length();
 
-										for (int i = 1; i < text.length(); i++)
+										for (int i = 1; i < len; i++)
 										{
 											char c = text.charAt(i);
 
@@ -189,7 +190,7 @@ nl							= \r|\n|\r\n|\f
 										type = (numbers) ? CSSTokenType.NUMBER : CSSTokenType.CLASS;
 									}
 
-									return newToken(type, yytext());
+									return newToken(type, "");
 								}
 	"#"{name}					{
 									CSSTokenType type;
@@ -202,8 +203,9 @@ nl							= \r|\n|\r\n|\f
 									{
 										boolean numbers = true;
 										String text = yytext();
+										int len = text.length();
 
-										for (int i = 1; i < text.length(); i++)
+										for (int i = 1; i < len; i++)
 										{
 											char c = text.charAt(i);
 
@@ -217,33 +219,33 @@ nl							= \r|\n|\r\n|\f
 										type = (numbers) ? CSSTokenType.RGB : CSSTokenType.ID;
 									}
 
-									return newToken(type, yytext());
+									return newToken(type, "");
 								}
 
-	"@import"					{ return newToken(CSSTokenType.IMPORT, yytext()); }
-	"@page"						{ return newToken(CSSTokenType.PAGE, yytext()); }
-	"@media"					{ _inMedia = true; return newToken(CSSTokenType.MEDIA_KEYWORD, yytext()); }
-	"@charset"					{ return newToken(CSSTokenType.CHARSET, yytext()); }
-	"@font-face"				{ return newToken(CSSTokenType.FONTFACE, yytext()); }
-	"@namespace"				{ return newToken(CSSTokenType.NAMESPACE, yytext()); }
-	"@-moz-document"			{ return newToken(CSSTokenType.MOZ_DOCUMENT, yytext()); }
-	"@"{name}					{ return newToken(CSSTokenType.AT_RULE, yytext()); }
+	"@import"					{ return newToken(CSSTokenType.IMPORT, ""); }
+	"@page"						{ return newToken(CSSTokenType.PAGE, ""); }
+	"@media"					{ _inMedia = true; return newToken(CSSTokenType.MEDIA_KEYWORD, ""); }
+	"@charset"					{ return newToken(CSSTokenType.CHARSET, ""); }
+	"@font-face"				{ return newToken(CSSTokenType.FONTFACE, ""); }
+	"@namespace"				{ return newToken(CSSTokenType.NAMESPACE, ""); }
+	"@-moz-document"			{ return newToken(CSSTokenType.MOZ_DOCUMENT, ""); }
+	"@"{name}					{ return newToken(CSSTokenType.AT_RULE, ""); }
 
-	"!"({s}|{comment})*"important"	{ return newToken(CSSTokenType.IMPORTANT, yytext()); }
+	"!"({s}|{comment})*"important"	{ return newToken(CSSTokenType.IMPORTANT, ""); }
 
-//	"<!--"						{ return newToken(CSSTokenType.CDO, yytext()); }
-//	"-->"						{ return newToken(CSSTokenType.CDC, yytext()); }
-	"~="						{ return newToken(CSSTokenType.INCLUDES, yytext()); }
-	"|="						{ return newToken(CSSTokenType.DASHMATCH, yytext()); }
-	"^="						{ return newToken(CSSTokenType.BEGINS_WITH, yytext()); }
-	"$="						{ return newToken(CSSTokenType.ENDS_WITH, yytext()); }
+//	"<!--"						{ return newToken(CSSTokenType.CDO, ""); }
+//	"-->"						{ return newToken(CSSTokenType.CDC, ""); }
+	"~="						{ return newToken(CSSTokenType.INCLUDES, ""); }
+	"|="						{ return newToken(CSSTokenType.DASHMATCH, ""); }
+	"^="						{ return newToken(CSSTokenType.BEGINS_WITH, ""); }
+	"$="						{ return newToken(CSSTokenType.ENDS_WITH, ""); }
 
-	":"							{ return newToken(CSSTokenType.COLON, yytext()); }
-	";"							{ return newToken(CSSTokenType.SEMICOLON, yytext()); }
+	":"							{ return newToken(CSSTokenType.COLON, ""); }
+	";"							{ return newToken(CSSTokenType.SEMICOLON, ""); }
 	"{"							{
 									_nestingLevel++;
 
-									return newToken(CSSTokenType.LCURLY, yytext());
+									return newToken(CSSTokenType.LCURLY, "");
 								}
 	"}"							{
 									_nestingLevel--;
@@ -254,23 +256,23 @@ nl							= \r|\n|\r\n|\f
 										_inMedia = false;
 									}
 
-									return newToken(CSSTokenType.RCURLY, yytext());
+									return newToken(CSSTokenType.RCURLY, "");
 								}
-	"("							{ return newToken(CSSTokenType.LPAREN, yytext()); }
-	")"							{ return newToken(CSSTokenType.RPAREN, yytext()); }
-	"%"							{ return newToken(CSSTokenType.PERCENTAGE, yytext()); }
-	"["							{ return newToken(CSSTokenType.LBRACKET, yytext()); }
-	"]"							{ return newToken(CSSTokenType.RBRACKET, yytext()); }
-	","							{ return newToken(CSSTokenType.COMMA, yytext()); }
-	"+"							{ return newToken(CSSTokenType.PLUS, yytext()); }
-	"*"							{ return newToken(CSSTokenType.STAR, yytext()); }
-	">"							{ return newToken(CSSTokenType.GREATER, yytext()); }
-	"/"							{ return newToken(CSSTokenType.SLASH, yytext()); }
-	"="							{ return newToken(CSSTokenType.EQUAL, yytext()); }
-	"-"							{ return newToken(CSSTokenType.MINUS, yytext()); }
+	"("							{ return newToken(CSSTokenType.LPAREN, ""); }
+	")"							{ return newToken(CSSTokenType.RPAREN, ""); }
+	"%"							{ return newToken(CSSTokenType.PERCENTAGE, ""); }
+	"["							{ return newToken(CSSTokenType.LBRACKET, ""); }
+	"]"							{ return newToken(CSSTokenType.RBRACKET, ""); }
+	","							{ return newToken(CSSTokenType.COMMA, ""); }
+	"+"							{ return newToken(CSSTokenType.PLUS, ""); }
+	"*"							{ return newToken(CSSTokenType.STAR, ""); }
+	">"							{ return newToken(CSSTokenType.GREATER, ""); }
+	"/"							{ return newToken(CSSTokenType.SLASH, ""); }
+	"="							{ return newToken(CSSTokenType.EQUAL, ""); }
+	"-"							{ return newToken(CSSTokenType.MINUS, ""); }
 
 
 	{identifier}				{ return newToken(CSSTokenType.IDENTIFIER, yytext()); }
 }
 
-.|\n	{ return newToken(CSSTokenType.ERROR, yytext()); }
+.|\n	{ return newToken(CSSTokenType.ERROR, ""); }

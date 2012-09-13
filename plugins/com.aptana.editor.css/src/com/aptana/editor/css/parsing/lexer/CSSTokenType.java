@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -42,6 +42,7 @@ public enum CSSTokenType implements ITypePredicate
 	VALUE("support.constant.property-value.css", Terminals.IDENTIFIER), //$NON-NLS-1$
 
 	// Stuff for the parser only:
+	NOT("keyword.control.not.css", Terminals.NOT), //$NON-NLS-1$
 	EOF("", Terminals.EOF), //$NON-NLS-1$
 	LBRACKET("punctuation.bracket.css", Terminals.LBRACKET), //$NON-NLS-1$
 	URL(".css", Terminals.URL), //$NON-NLS-1$
@@ -140,7 +141,7 @@ public enum CSSTokenType implements ITypePredicate
 	{
 		return this._scope;
 	}
-	
+
 	public short getShort()
 	{
 		return beaverId;
