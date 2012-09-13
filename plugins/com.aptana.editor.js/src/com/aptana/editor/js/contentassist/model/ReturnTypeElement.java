@@ -9,14 +9,23 @@ package com.aptana.editor.js.contentassist.model;
 
 import java.text.MessageFormat;
 import java.util.Map;
+import java.util.regex.Pattern;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ObjectUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.editor.js.JSPlugin;
 import com.aptana.jetty.util.epl.ajax.JSON.Convertible;
 import com.aptana.jetty.util.epl.ajax.JSON.Output;
 
 public class ReturnTypeElement implements Convertible
 {
+	/**
+	 * try to do some validation on type name, because somehow we're getting very whacked-out type names in our index
+	 * strings for some users. See https://jira.appcelerator.org/browse/APSTUD-7366
+	 */
+	private static final Pattern TYPE_NAME_PATTERN = Pattern.compile("[\\$a-zA-Z\\-_]+[\\.\\w\\$\\-/<>]*"); //$NON-NLS-1$
+
 	private static final String DESCRIPTION_PROPERTY = "description"; //$NON-NLS-1$
 	private static final String TYPE_PROPERTY = "type"; //$NON-NLS-1$
 
@@ -119,7 +128,33 @@ public class ReturnTypeElement implements Convertible
 	 */
 	public void setType(String type)
 	{
-		this._type = type;
+		this._type = validateTypeName(type);
+	}
+
+	String validateTypeName(String type)
+	{
+		if (StringUtil.isEmpty(type))
+		{
+			IdeLog.logError(JSPlugin.getDefault(), new IllegalArgumentException(
+					"Null or Empty type name attempting to be recorded for a return type.")); //$NON-NLS-1$
+			return StringUtil.EMPTY;
+		}
+
+		if (!TYPE_NAME_PATTERN.matcher(type).matches())
+		{
+			IdeLog.logError(
+					JSPlugin.getDefault(),
+					new IllegalArgumentException(MessageFormat.format(
+							"Bad type name being set, something is going haywire: ''{0}''", type))); //$NON-NLS-1$
+
+			int index = type.indexOf(',');
+			if (index != -1)
+			{
+				return type.substring(0, index);
+			}
+			return StringUtil.EMPTY;
+		}
+		return type;
 	}
 
 	/*
@@ -129,6 +164,7 @@ public class ReturnTypeElement implements Convertible
 	public void toJSON(Output out)
 	{
 		out.add(TYPE_PROPERTY, this.getType());
+		// TODO To shrink string size, don't write out empty descriptions?
 		out.add(DESCRIPTION_PROPERTY, this.getDescription());
 	}
 
