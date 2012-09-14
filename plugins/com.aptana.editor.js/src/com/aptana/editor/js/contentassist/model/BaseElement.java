@@ -426,6 +426,7 @@ public abstract class BaseElement<P extends Enum<P> & IPropertyInformation<? ext
 	public void toJSON(Output out)
 	{
 		out.add(NAME_PROPERTY, this.getName());
+		// TODO To shrink string size, don't write out empty descriptions?
 		out.add(DESCRIPTION_PROPERTY, this.getDescription());
 		out.add(SINCE_PROPERTY, this.getSinceList());
 
