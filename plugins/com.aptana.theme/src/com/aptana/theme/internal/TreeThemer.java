@@ -335,7 +335,8 @@ class TreeThemer extends ControlThemer
 					public void run()
 					{
 						Font font = getFont();
-						if (font != null)
+						if (font != null && !tree.isDisposed()) // as it's asynchronous, make sure it wasn't disposed in
+																// the meanhile.
 						{
 							tree.setFont(font);
 

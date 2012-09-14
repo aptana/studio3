@@ -16,11 +16,13 @@ public class ThemeTests
 	public static Test suite()
 	{
 		TestSuite suite = new TestSuite(ThemeTests.class.getName());
-		//$JUnit-BEGIN$
+		// $JUnit-BEGIN$
 		suite.addTestSuite(TextmateImporterTest.class);
 		suite.addTestSuite(ThemeExporterTest.class);
 		suite.addTestSuite(ThemeTest.class);
-		//$JUnit-END$
+		suite.addTestSuite(ColorManagerTest.class);
+		suite.addTestSuite(ThemeManagerTest.class);
+		// $JUnit-END$
 		return suite;
 	}
 
