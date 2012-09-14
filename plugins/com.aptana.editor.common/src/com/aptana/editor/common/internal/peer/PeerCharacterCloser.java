@@ -7,6 +7,7 @@
  */
 package com.aptana.editor.common.internal.peer;
 
+import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -344,9 +345,11 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 			}
 			return stackLevel != 0;
 		}
-		catch (BadLocationException e)
+		catch (Exception e)
 		{
-			// ignore
+			IdeLog.logWarning(CommonEditorPlugin.getDefault(), MessageFormat.format(
+					"Failed to determine if we have an unclosed pair. Open: ''{0}'', close: ''{1}'', offset: {2}", //$NON-NLS-1$
+					openingChar, closingCharacter, offset), e);
 		}
 		return false;
 	}
@@ -584,7 +587,8 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 						// position comes
 						// after change - shift
 						position.setOffset(offset + deltaLength);
-					} else if (end <= eventOffset)
+					}
+					else if (end <= eventOffset)
 					{
 						// position comes way before change -
 						// leave alone
