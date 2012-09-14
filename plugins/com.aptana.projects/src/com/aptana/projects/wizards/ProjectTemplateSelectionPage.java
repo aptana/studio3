@@ -9,6 +9,7 @@ package com.aptana.projects.wizards;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -23,6 +24,15 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.RowDataFactory;
 import org.eclipse.jface.layout.RowLayoutFactory;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
@@ -37,9 +47,12 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableItem;
 
 import com.aptana.core.projects.templates.IProjectTemplate;
 import com.aptana.core.util.ArrayUtil;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.projects.ProjectsPlugin;
 import com.aptana.projects.internal.wizards.Messages;
@@ -52,13 +65,17 @@ import com.aptana.ui.widgets.StepIndicatorComposite;
  * 
  * @author Nam Le <nle@appcelerator.com>
  */
-public class ProjectTemplateSelectionPage extends WizardPage implements IStepIndicatorWizardPage
+public class ProjectTemplateSelectionPage extends WizardPage implements IStepIndicatorWizardPage,
+		ISelectionChangedListener
 {
 	public static final String COMMAND_PROJECT_FROM_TEMPLATE_PROJECT_TEMPLATE_NAME = "projectTemplateId"; //$NON-NLS-1$
 	public static final String COMMAND_PROJECT_FROM_TEMPLATE_NEW_WIZARD_ID = "newWizardId"; //$NON-NLS-1$
 
 	private static final int IMAGE_SIZE = 48;
+	private static final String TAG_ALL = "All"; //$NON-NLS-1$
 
+	private TableViewer tagsListViewer;
+	private Composite templatesListComposite;
 	private Label previewImage;
 	private Label previewLabel;
 	private Label previewDescription;
@@ -70,6 +87,7 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 	private Image defaultTemplateImage = null;
 	private Map<IProjectTemplate, Image> templateImages;
 	private Map<Composite, IProjectTemplate> templateControlMap;
+	private Map<String, List<IProjectTemplate>> templateTagsMap;
 
 	protected StepIndicatorComposite stepIndicatorComposite;
 	protected String[] stepNames;
@@ -101,6 +119,8 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 		setDescription(Messages.ProjectTemplateSelectionPage_Description);
 		templateImages = new HashMap<IProjectTemplate, Image>();
 		templateControlMap = new LinkedHashMap<Composite, IProjectTemplate>();
+		templateTagsMap = new HashMap<String, List<IProjectTemplate>>();
+		populateTagsMap();
 	}
 
 	public IProjectTemplate getSelectedTemplate()
@@ -146,22 +166,34 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 		Composite templateList = createTemplatesList(main);
 		templateList.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 
-		// auto-selects the default template if there is one; otherwise selects the first one in the list
+		// go through each tag and auto-select the first default template found; otherwise selects the first template in
+		// the first tag
 		if (!ArrayUtil.isEmpty(fTemplates))
 		{
 			boolean foundDefault = false;
-			for (IProjectTemplate template : fTemplates)
+			TableItem[] items = tagsListViewer.getTable().getItems();
+			for (TableItem item : items)
 			{
-				if (template instanceof IDefaultProjectTemplate)
+				String tag = item.getText();
+				List<IProjectTemplate> templates = templateTagsMap.get(tag);
+				for (IProjectTemplate template : templates)
 				{
-					foundDefault = true;
-					setSelectedTemplate(template);
+					if (template instanceof IDefaultProjectTemplate)
+					{
+						foundDefault = true;
+						setSelectedTemplate(tag, template);
+						break;
+					}
+				}
+				if (foundDefault)
+				{
 					break;
 				}
 			}
 			if (!foundDefault)
 			{
-				setSelectedTemplate(fTemplates[0]);
+				String tag = items[0].getText();
+				setSelectedTemplate(tag, templateTagsMap.get(tag).get(0));
 			}
 		}
 
@@ -169,66 +201,93 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 		setControl(main);
 	}
 
+	public void selectionChanged(SelectionChangedEvent event)
+	{
+		ISelection selection = tagsListViewer.getSelection();
+		if (!selection.isEmpty() && selection instanceof IStructuredSelection)
+		{
+			String tag = (String) ((IStructuredSelection) selection).getFirstElement();
+			setSelectedTemplate(tag, templateTagsMap.get(tag).get(0));
+		}
+	}
+
 	private Composite createTemplatesList(Composite parent)
 	{
-		Composite main = new Composite(parent, SWT.BORDER);
-		main.setLayout(GridLayoutFactory.fillDefaults().create());
+		Composite main = new Composite(parent, SWT.NONE);
+		main.setLayout(GridLayoutFactory.fillDefaults().spacing(0, 0).numColumns(2).create());
 		Color background = main.getDisplay().getSystemColor(SWT.COLOR_WHITE);
 		main.setBackground(background);
 
-		Composite templatesList = new Composite(main, SWT.NONE);
-		templatesList.setLayout(RowLayoutFactory.swtDefaults().extendedMargins(5, 5, 5, 5).spacing(10).fill(true)
-				.create());
-		templatesList.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).hint(450, 250).create());
-		templatesList.setBackground(background);
+		// the left side is the list of template tags
+		Composite templateTags = new Composite(main, SWT.BORDER);
+		templateTags.setLayout(GridLayoutFactory.swtDefaults().create());
+		// having 2 or fewer tags means there is at most one tag outside the default "All tag", and in that case we
+		// don't show the left column
+		boolean exclude = templateTagsMap.size() <= 2;
+		templateTags.setLayoutData(GridDataFactory.fillDefaults().grab(false, true).hint(150, SWT.DEFAULT)
+				.exclude(exclude).create());
+		templateTags.setBackground(background);
 
-		for (IProjectTemplate template : fTemplates)
+		List<String> tags = new ArrayList<String>(templateTagsMap.keySet());
+		Collections.sort(tags);
+		tagsListViewer = new TableViewer(templateTags, SWT.SINGLE | SWT.FULL_SELECTION);
+		tagsListViewer.setContentProvider(ArrayContentProvider.getInstance());
+		tagsListViewer.setLabelProvider(new LabelProvider()
 		{
-			final Composite templateControl = new Composite(templatesList, SWT.NONE);
-			templateControl.setLayout(GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 5, 5).create());
-			templateControl.setLayoutData(RowDataFactory.swtDefaults().hint(95, SWT.DEFAULT).create());
-			templateControl.setBackground(background);
 
-			Label image = new Label(templateControl, SWT.CENTER);
-			image.setImage(getImage(template));
-			image.setBackground(background);
-			image.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).align(SWT.CENTER, SWT.CENTER).create());
-			Label text = new Label(templateControl, SWT.CENTER | SWT.WRAP);
-			text.setText(template.getDisplayName());
-			text.setBackground(background);
-			text.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).align(SWT.CENTER, SWT.BEGINNING)
-					.create());
-
-			MouseAdapter mouseAdapter = new MouseAdapter()
+			@Override
+			public Image getImage(Object element)
 			{
-
-				@Override
-				public void mouseDown(MouseEvent e)
+				if (element instanceof String)
 				{
-					setSelectedTemplate(templateControlMap.get(templateControl));
+					return ProjectsPlugin.getDefault().getTemplatesManager().getImageForTag((String) element);
 				}
+				return super.getImage(element);
+			}
+		});
+		tagsListViewer.setInput(tags);
+		tagsListViewer.setComparator(new ViewerComparator()
+		{
 
-				@Override
-				public void mouseDoubleClick(MouseEvent e)
-				{
-					// Treat double-click like selecting the template and clicking "Next"
-					if (canFlipToNextPage())
-					{
-						getContainer().showPage(getNextPage());
-					}
-				}
-			};
-			templateControl.addMouseListener(mouseAdapter);
-			image.addMouseListener(mouseAdapter);
-			text.addMouseListener(mouseAdapter);
+			@Override
+			public int category(Object element)
+			{
+				// make sure the "All" tag appears at the bottom
+				return TAG_ALL.equals(element) ? 1 : 0;
+			}
+		});
+		Table tagsList = tagsListViewer.getTable();
+		tagsList.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
+		tagsList.setBackground(background);
+		FontData[] fontData = SWTUtils.resizeFont(tagsList.getFont(), 2);
+		final Font tagFont = new Font(tagsList.getDisplay(), fontData);
+		tagsList.setFont(tagFont);
+		tagsList.addDisposeListener(new DisposeListener()
+		{
 
-			templateControlMap.put(templateControl, template);
-		}
+			public void widgetDisposed(DisposeEvent e)
+			{
+				tagFont.dispose();
+			}
+		});
+		tagsListViewer.addSelectionChangedListener(this);
 
-		Label separator = new Label(main, SWT.SEPARATOR | SWT.HORIZONTAL);
+		// the right side has the list of templates for the selected tag and the details on the selected template
+		Composite rightComp = new Composite(main, SWT.BORDER);
+		rightComp.setLayout(GridLayoutFactory.fillDefaults().create());
+		rightComp.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
+		rightComp.setBackground(background);
+
+		templatesListComposite = new Composite(rightComp, SWT.NONE);
+		templatesListComposite.setLayout(RowLayoutFactory.swtDefaults().extendedMargins(5, 5, 5, 5).spacing(10)
+				.fill(true).create());
+		templatesListComposite.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).hint(450, 250).create());
+		templatesListComposite.setBackground(background);
+
+		Label separator = new Label(rightComp, SWT.SEPARATOR | SWT.HORIZONTAL);
 		separator.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
 
-		Composite descriptionComp = createTemplateDescription(main);
+		Composite descriptionComp = createTemplateDescription(rightComp);
 		descriptionComp.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).hint(SWT.DEFAULT, 110).create());
 
 		return main;
@@ -271,6 +330,66 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 		return main;
 	}
 
+	private void setSelectedTag(String tag)
+	{
+		tagsListViewer.removeSelectionChangedListener(this);
+		tagsListViewer.setSelection(new StructuredSelection(tag));
+		tagsListViewer.addSelectionChangedListener(this);
+		// re-construct the list of templates shown on the right
+		Control[] children = templatesListComposite.getChildren();
+		for (Control templateControl : children)
+		{
+			templateControl.dispose();
+		}
+		templateControlMap.clear();
+
+		List<IProjectTemplate> templates = templateTagsMap.get(tag);
+		Color background = templatesListComposite.getBackground();
+		for (IProjectTemplate template : templates)
+		{
+			final Composite templateControl = new Composite(templatesListComposite, SWT.NONE);
+			templateControl.setLayout(GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 5, 5).create());
+			templateControl.setLayoutData(RowDataFactory.swtDefaults().hint(95, SWT.DEFAULT).create());
+			templateControl.setBackground(background);
+
+			Label image = new Label(templateControl, SWT.CENTER);
+			image.setImage(getImage(template));
+			image.setBackground(background);
+			image.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).align(SWT.CENTER, SWT.CENTER).create());
+			Label text = new Label(templateControl, SWT.CENTER | SWT.WRAP);
+			text.setText(template.getDisplayName());
+			text.setBackground(background);
+			text.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).align(SWT.CENTER, SWT.BEGINNING)
+					.create());
+
+			MouseAdapter mouseAdapter = new MouseAdapter()
+			{
+
+				@Override
+				public void mouseDown(MouseEvent e)
+				{
+					setSelectedTemplate(templateControlMap.get(templateControl));
+				}
+
+				@Override
+				public void mouseDoubleClick(MouseEvent e)
+				{
+					// Treat double-click like selecting the template and clicking "Next"
+					if (canFlipToNextPage())
+					{
+						getContainer().showPage(getNextPage());
+					}
+				}
+			};
+			templateControl.addMouseListener(mouseAdapter);
+			image.addMouseListener(mouseAdapter);
+			text.addMouseListener(mouseAdapter);
+
+			templateControlMap.put(templateControl, template);
+		}
+		templatesListComposite.layout(true, true);
+	}
+
 	private void setSelectedTemplate(IProjectTemplate template)
 	{
 		// make the corresponding template control appear selected
@@ -299,6 +418,12 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 		String text = (template == null) ? null : template.getDescription();
 		previewDescription.setText(text == null ? StringUtil.EMPTY : text);
 		fSelectedTemplate = template;
+	}
+
+	private void setSelectedTemplate(String tag, IProjectTemplate template)
+	{
+		setSelectedTag(tag);
+		setSelectedTemplate(template);
 	}
 
 	private Image getImage(IProjectTemplate template)
@@ -337,6 +462,30 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 			templateImages.put(template, image);
 		}
 		return image;
+	}
+
+	private void populateTagsMap()
+	{
+		templateTagsMap.clear();
+		for (IProjectTemplate template : fTemplates)
+		{
+			List<String> tags = template.getTags();
+			if (!CollectionsUtil.isEmpty(tags))
+			{
+				for (String tag : tags)
+				{
+					List<IProjectTemplate> tagTemplates = templateTagsMap.get(tag);
+					if (tagTemplates == null)
+					{
+						tagTemplates = new ArrayList<IProjectTemplate>();
+						templateTagsMap.put(tag, tagTemplates);
+					}
+					tagTemplates.add(template);
+				}
+			}
+		}
+		// add an "All" tag to hold the full list of templates
+		templateTagsMap.put(TAG_ALL, Arrays.asList(fTemplates));
 	}
 
 	public void initStepIndicator(String[] stepNames)
