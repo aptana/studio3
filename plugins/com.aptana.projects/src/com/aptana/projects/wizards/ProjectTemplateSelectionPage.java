@@ -57,6 +57,7 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.projects.ProjectsPlugin;
 import com.aptana.projects.internal.wizards.Messages;
 import com.aptana.projects.templates.IDefaultProjectTemplate;
+import com.aptana.projects.templates.ProjectTemplatesManager;
 import com.aptana.ui.util.SWTUtils;
 import com.aptana.ui.widgets.StepIndicatorComposite;
 
@@ -65,8 +66,7 @@ import com.aptana.ui.widgets.StepIndicatorComposite;
  * 
  * @author Nam Le <nle@appcelerator.com>
  */
-public class ProjectTemplateSelectionPage extends WizardPage implements IStepIndicatorWizardPage,
-		ISelectionChangedListener
+public class ProjectTemplateSelectionPage extends WizardPage implements IStepIndicatorWizardPage
 {
 	public static final String COMMAND_PROJECT_FROM_TEMPLATE_PROJECT_TEMPLATE_NAME = "projectTemplateId"; //$NON-NLS-1$
 	public static final String COMMAND_PROJECT_FROM_TEMPLATE_NEW_WIZARD_ID = "newWizardId"; //$NON-NLS-1$
@@ -91,6 +91,20 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 
 	protected StepIndicatorComposite stepIndicatorComposite;
 	protected String[] stepNames;
+
+	private ISelectionChangedListener tagSelectionChangedListener = new ISelectionChangedListener()
+	{
+
+		public void selectionChanged(SelectionChangedEvent event)
+		{
+			ISelection selection = tagsListViewer.getSelection();
+			if (!selection.isEmpty() && selection instanceof IStructuredSelection)
+			{
+				String tag = (String) ((IStructuredSelection) selection).getFirstElement();
+				setSelectedTemplate(tag, templateTagsMap.get(tag).get(0));
+			}
+		}
+	};
 
 	public ProjectTemplateSelectionPage(String pageName, List<IProjectTemplate> templates)
 	{
@@ -201,16 +215,6 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 		setControl(main);
 	}
 
-	public void selectionChanged(SelectionChangedEvent event)
-	{
-		ISelection selection = tagsListViewer.getSelection();
-		if (!selection.isEmpty() && selection instanceof IStructuredSelection)
-		{
-			String tag = (String) ((IStructuredSelection) selection).getFirstElement();
-			setSelectedTemplate(tag, templateTagsMap.get(tag).get(0));
-		}
-	}
-
 	private Composite createTemplatesList(Composite parent)
 	{
 		Composite main = new Composite(parent, SWT.NONE);
@@ -240,7 +244,7 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 			{
 				if (element instanceof String)
 				{
-					return ProjectsPlugin.getDefault().getTemplatesManager().getImageForTag((String) element);
+					return getProjectTemplatesManager().getImageForTag((String) element);
 				}
 				return super.getImage(element);
 			}
@@ -270,7 +274,7 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 				tagFont.dispose();
 			}
 		});
-		tagsListViewer.addSelectionChangedListener(this);
+		tagsListViewer.addSelectionChangedListener(tagSelectionChangedListener);
 
 		// the right side has the list of templates for the selected tag and the details on the selected template
 		Composite rightComp = new Composite(main, SWT.BORDER);
@@ -332,9 +336,9 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 
 	private void setSelectedTag(String tag)
 	{
-		tagsListViewer.removeSelectionChangedListener(this);
+		tagsListViewer.removeSelectionChangedListener(tagSelectionChangedListener);
 		tagsListViewer.setSelection(new StructuredSelection(tag));
-		tagsListViewer.addSelectionChangedListener(this);
+		tagsListViewer.addSelectionChangedListener(tagSelectionChangedListener);
 		// re-construct the list of templates shown on the right
 		Control[] children = templatesListComposite.getChildren();
 		for (Control templateControl : children)
@@ -496,5 +500,10 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 	public String getStepName()
 	{
 		return getTitle();
+	}
+
+	protected ProjectTemplatesManager getProjectTemplatesManager()
+	{
+		return ProjectsPlugin.getDefault().getTemplatesManager();
 	}
 }
