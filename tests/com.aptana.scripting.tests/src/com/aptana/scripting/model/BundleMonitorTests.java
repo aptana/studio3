@@ -15,6 +15,7 @@ import junit.framework.TestCase;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
+import com.aptana.core.util.FileUtil;
 import com.aptana.scripting.TestUtils;
 
 public abstract class BundleMonitorTests extends TestCase
@@ -53,7 +54,7 @@ public abstract class BundleMonitorTests extends TestCase
 
 		// setup application and user bundles paths
 		List<String> applicationBundlesPaths = this._manager.getApplicationBundlesPaths();
-		String userBundlesPath = new File(new File(System.getProperty("java.io.tmpdir")), "bundles").getAbsolutePath();
+		String userBundlesPath = new File(FileUtil.getTempDirectory().toOSString(), "bundles").getAbsolutePath();
 		BundleManager.getInstance(applicationBundlesPaths.get(0), userBundlesPath);
 
 		// monitoring is turned on by an early startup job, so let's make sure it

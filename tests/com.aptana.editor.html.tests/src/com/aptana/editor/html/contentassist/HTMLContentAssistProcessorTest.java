@@ -32,6 +32,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.part.FileEditorInput;
 
+import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.contentassist.ILexemeProvider;
@@ -454,7 +455,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 			protected URI getURI()
 			{
 				// Shouldn't be necessary...
-				return new File(System.getProperty("java.io.tmpdir"), "file.html").toURI();
+				return new File(FileUtil.getTempDirectory().toOSString(), "file.html").toURI();
 			}
 		};
 
@@ -477,7 +478,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 			protected URI getURI()
 			{
 				// Shouldn't be necessary...
-				return new File(System.getProperty("java.io.tmpdir"), "file.html").toURI();
+				return new File(FileUtil.getTempDirectory().toOSString(), "file.html").toURI();
 			}
 		};
 

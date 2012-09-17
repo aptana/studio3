@@ -15,6 +15,8 @@ import junit.framework.TestCase;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 
+import com.aptana.core.util.FileUtil;
+
 public class CloakingUtilsTest extends TestCase
 {
 
@@ -33,7 +35,7 @@ public class CloakingUtilsTest extends TestCase
 
 	public void testDirectory() throws IOException
 	{
-		File dir = new File(System.getProperty("java.io.tmpdir"), "cloaking");
+		File dir = new File(FileUtil.getTempDirectory().toOSString(), "cloaking");
 		dir.mkdir();
 		dir.deleteOnExit();
 		IFileStore fileStore = EFS.getLocalFileSystem().fromLocalFile(dir);
@@ -47,7 +49,7 @@ public class CloakingUtilsTest extends TestCase
 
 	public void testRegex() throws IOException
 	{
-		File dir = new File(System.getProperty("java.io.tmpdir"), "cloaking");
+		File dir = new File(FileUtil.getTempDirectory().toOSString(), "cloaking");
 		dir.mkdir();
 		dir.deleteOnExit();
 		File file = File.createTempFile("test", "txt", dir);

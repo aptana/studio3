@@ -35,7 +35,7 @@ public class IOUtilTest extends TestCase
 	private static final String RESOURCE_DIR = "resources";
 	private static final String TEST_DIR = "copyTest";
 
-	private static final String tempDir = System.getProperty("java.io.tmpdir");
+	private static final String tempDir = FileUtil.getTempDirectory().toOSString();
 
 	private Mockery context = new Mockery()
 	{

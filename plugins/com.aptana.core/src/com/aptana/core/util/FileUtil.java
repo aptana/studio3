@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
 import com.aptana.core.CorePlugin;
@@ -27,6 +28,11 @@ public class FileUtil
 
 	private FileUtil()
 	{
+	}
+
+	public static IPath getTempDirectory()
+	{
+		return Path.fromOSString(System.getProperty("java.io.tmpdir")); //$NON-NLS-1$
 	}
 
 	public static boolean isDirectoryAccessible(File directory)

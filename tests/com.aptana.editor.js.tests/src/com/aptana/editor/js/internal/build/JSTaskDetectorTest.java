@@ -47,7 +47,7 @@ public class JSTaskDetectorTest extends TestCase
 			// @formatter:on
 
 			// Generate some files to index!
-			tmpDir = new File(System.getProperty("java.io.tmpdir"), "testJSTask_" + System.currentTimeMillis());
+			tmpDir = new File(FileUtil.getTempDirectory().toOSString(), "testJSTask_" + System.currentTimeMillis());
 			tmpDir.mkdirs();
 
 			File coffeeFile = new File(tmpDir, "index_me.js");

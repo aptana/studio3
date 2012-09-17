@@ -42,7 +42,7 @@ public class CoffeeFileIndexingParticipantTest extends TestCase
 			String src = "# TODO This is a task\n";
 
 			// Generate some files to index!
-			tmpDir = new File(System.getProperty("java.io.tmpdir"), "testIndexWithNullIFileStore"
+			tmpDir = new File(FileUtil.getTempDirectory().toOSString(), "testIndexWithNullIFileStore"
 					+ System.currentTimeMillis());
 			tmpDir.mkdirs();
 
@@ -75,7 +75,7 @@ public class CoffeeFileIndexingParticipantTest extends TestCase
 			String src = "# TODO This is a task\n";
 
 			// Generate some files to index!
-			tmpDir = new File(System.getProperty("java.io.tmpdir"), "testIndexWithNullIndex"
+			tmpDir = new File(FileUtil.getTempDirectory().toOSString(), "testIndexWithNullIndex"
 					+ System.currentTimeMillis());
 			tmpDir.mkdirs();
 
@@ -101,7 +101,7 @@ public class CoffeeFileIndexingParticipantTest extends TestCase
 			String src = "\n";
 
 			// Generate some files to index!
-			tmpDir = new File(System.getProperty("java.io.tmpdir"), "testIndexWithEmptyContent"
+			tmpDir = new File(FileUtil.getTempDirectory().toOSString(), "testIndexWithEmptyContent"
 					+ System.currentTimeMillis());
 			tmpDir.mkdirs();
 

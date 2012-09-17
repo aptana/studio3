@@ -25,6 +25,7 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.ide.FileStoreEditorInput;
 
 import com.aptana.core.io.efs.SyncUtils;
+import com.aptana.core.util.FileUtil;
 
 public class UniformFileStoreEditorInputFactory implements IElementFactory
 {
@@ -103,7 +104,7 @@ public class UniformFileStoreEditorInputFactory implements IElementFactory
 				prefix.append('_');
 			}
 			String prefixStr = prefix.toString();
-			File destDir = new File(System.getProperty("java.io.tmpdir"), prefixStr); //$NON-NLS-1$
+			File destDir = new File(FileUtil.getTempDirectory().toOSString(), prefixStr);
 			destDir.mkdirs();
 			file = File.createTempFile(prefixStr, fileStore.getName(), destDir);
 		}

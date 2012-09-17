@@ -47,7 +47,7 @@ public class ProcessUtilTest extends TestCase
 	public void testDoRunWithWorkingDirandCustomEnv() throws Exception
 	{
 		final List<String> command = new ArrayList<String>();
-		final IPath workingDir = Path.fromOSString(System.getProperty("java.io.tmpdir"));
+		final IPath workingDir = FileUtil.getTempDirectory();
 		final Map<String, String> env = new HashMap<String, String>();
 		env.put("custom_key", "custom_value");
 

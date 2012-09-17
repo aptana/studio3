@@ -117,4 +117,9 @@ public class ReconcileContext extends BuildContext
 		return contentType;
 	}
 
+	@Override
+	public boolean isReconcile()
+	{
+		return true;
+	}
 }

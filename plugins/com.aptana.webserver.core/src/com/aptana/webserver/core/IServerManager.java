@@ -11,6 +11,8 @@ import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 
+import com.aptana.core.IFilter;
+
 /**
  * Manages IServers. Allows adding/removing and finding by name. Deals with persisting the servers under the hood.
  * 
@@ -39,6 +41,14 @@ public interface IServerManager
 	 * @return
 	 */
 	public List<IServer> getServers();
+
+	/**
+	 * Grab the list of servers matching the filter.
+	 * 
+	 * @param filter
+	 * @return
+	 */
+	public List<IServer> getServers(IFilter<IServer> filter);
 
 	/**
 	 * Add changes listener

@@ -43,7 +43,7 @@ public class CoffeeTaskDetectorTest extends TestCase
 			String src = "# TODO This is a task\n";
 
 			// Generate some files to index!
-			tmpDir = new File(System.getProperty("java.io.tmpdir"), "testCoffeeTask_" + System.currentTimeMillis());
+			tmpDir = new File(FileUtil.getTempDirectory().toOSString(), "testCoffeeTask_" + System.currentTimeMillis());
 			tmpDir.mkdirs();
 
 			File coffeeFile = new File(tmpDir, "index_me.coffee");
@@ -88,7 +88,7 @@ public class CoffeeTaskDetectorTest extends TestCase
 			String src = "\n";
 
 			// Generate some files to index!
-			tmpDir = new File(System.getProperty("java.io.tmpdir"), "testCoffeeTaskWithEmptyContent"
+			tmpDir = new File(FileUtil.getTempDirectory().toOSString(), "testCoffeeTaskWithEmptyContent"
 					+ System.currentTimeMillis());
 			tmpDir.mkdirs();
 

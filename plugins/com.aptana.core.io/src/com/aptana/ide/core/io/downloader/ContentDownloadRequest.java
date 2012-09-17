@@ -24,6 +24,7 @@ import org.eclipse.osgi.util.NLS;
 
 import com.aptana.core.epl.downloader.FileReader;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.FileUtil;
 import com.aptana.ide.core.io.CoreIOPlugin;
 
 /**
@@ -123,7 +124,7 @@ public class ContentDownloadRequest
 	 */
 	protected static File getTempFile(URL url) throws CoreException
 	{
-		String tempPath = System.getProperty("java.io.tmpdir");//$NON-NLS-1$
+		String tempPath = FileUtil.getTempDirectory().toOSString();
 		try
 		{
 			IPath path = Path.fromOSString(url.toURI().getPath());

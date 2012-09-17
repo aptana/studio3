@@ -28,9 +28,11 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
 
+import com.aptana.core.IFilter;
 import com.aptana.core.epl.IMemento;
 import com.aptana.core.epl.XMLMemento;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.webserver.core.IServer;
 import com.aptana.webserver.core.IServerChangeListener;
@@ -281,7 +283,7 @@ public final class ServerManager implements IServerManager
 		return Collections.unmodifiableList(serverConfigurations);
 	}
 
-	public IServer findServerByName(String name)
+	public IServer findServerByName(final String name)
 	{
 		if (StringUtil.isEmpty(name))
 		{
@@ -292,17 +294,29 @@ public final class ServerManager implements IServerManager
 		{
 			return server;
 		}
+
+		List<IServer> matches = getServers(new IFilter<IServer>()
+		{
+			public boolean include(IServer item)
+			{
+				return name.equals(item.getName());
+			}
+		});
+		if (matches.isEmpty())
+		{
+			return null;
+		}
+		return matches.get(0);
+	}
+
+	public List<IServer> getServers(IFilter<IServer> filter)
+	{
+		List<IServer> matches;
 		synchronized (serverConfigurations)
 		{
-			for (IServer i : serverConfigurations)
-			{
-				if (name.equals(i.getName()))
-				{
-					return i;
-				}
-			}
+			matches = CollectionsUtil.filter(serverConfigurations, filter);
 		}
-		return null;
+		return Collections.unmodifiableList(matches);
 	}
 
 	/*

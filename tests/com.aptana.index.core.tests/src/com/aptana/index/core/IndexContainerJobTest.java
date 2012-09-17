@@ -32,8 +32,7 @@ public class IndexContainerJobTest extends TestCase
 	protected void setUp() throws Exception
 	{
 		super.setUp();
-		String tmpDirString = System.getProperty("java.io.tmpdir");
-		tmpDir = new File(tmpDirString, "index_container");
+		tmpDir = new File(FileUtil.getTempDirectory().toOSString(), "index_container");
 		tmpDir.mkdirs();
 	}
 

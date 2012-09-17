@@ -48,7 +48,7 @@ public class CSSTaskDetectorTest extends TestCase
 			// @formatter:on
 
 			// Generate some files to index!
-			tmpDir = new File(System.getProperty("java.io.tmpdir"), "testIndex_" + System.currentTimeMillis());
+			tmpDir = new File(FileUtil.getTempDirectory().toOSString(), "testIndex_" + System.currentTimeMillis());
 			tmpDir.mkdirs();
 
 			File coffeeFile = new File(tmpDir, "index_me.css");

@@ -42,6 +42,7 @@ import com.amazon.s3.ListAllMyBucketsResponse;
 import com.amazon.s3.ListBucketResponse;
 import com.amazon.s3.ListEntry;
 import com.amazon.s3.Response;
+import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.ide.core.io.CoreIOPlugin;
 
@@ -378,7 +379,8 @@ class S3FileStore extends FileStore
 		{
 			return userInfo.split(":")[1]; //$NON-NLS-1$
 		}
-		return new String(getOrPromptPassword(MessageFormat.format(Messages.S3FileStore_Authentication, getAccessKey()),
+		return new String(getOrPromptPassword(
+				MessageFormat.format(Messages.S3FileStore_Authentication, getAccessKey()),
 				Messages.S3FileStore_EnterAccessKey));
 	}
 
@@ -528,7 +530,8 @@ class S3FileStore extends FileStore
 					}
 					if (!info.isDirectory())
 					{
-						throw S3FileSystemPlugin.coreException(EFS.ERROR_INTERNAL, Messages.S3FileStore_ParentNotADirectory,
+						throw S3FileSystemPlugin.coreException(EFS.ERROR_INTERNAL,
+								Messages.S3FileStore_ParentNotADirectory,
 								new FileNotFoundException(path.toPortableString()));
 					}
 				}
@@ -606,7 +609,7 @@ class S3FileStore extends FileStore
 				{
 					if (myInfo.isDirectory())
 					{
-						File tmpDir = new File(System.getProperty("java.io.tmpdir")); //$NON-NLS-1$
+						File tmpDir = FileUtil.getTempDirectory().toFile();
 						result = getUniqueDirectory(tmpDir);
 					}
 					else
@@ -655,9 +658,8 @@ class S3FileStore extends FileStore
 				IFileInfo destInfo = destination.fetchInfo();
 				if (destInfo.exists())
 				{
-					throw S3FileSystemPlugin.coreException(EFS.ERROR_INTERNAL,
-							Messages.S3FileStore_DestinationExists, new FileNotFoundException(
-									s3Dest.path.toPortableString()));
+					throw S3FileSystemPlugin.coreException(EFS.ERROR_INTERNAL, Messages.S3FileStore_DestinationExists,
+							new FileNotFoundException(s3Dest.path.toPortableString()));
 				}
 			}
 

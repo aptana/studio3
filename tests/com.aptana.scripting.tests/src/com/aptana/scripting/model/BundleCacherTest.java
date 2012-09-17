@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.jruby.RubyRegexp;
 
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.FileUtil;
 import com.aptana.scope.ScopeSelector;
 
 public class BundleCacherTest extends TestCase
@@ -326,8 +327,7 @@ public class BundleCacherTest extends TestCase
 
 	protected void createBundleDirectory()
 	{
-		String tmpDir = System.getProperty("java.io.tmpdir");
-		bundleDirectory = new File(new File(tmpDir), "bundle_cache_test_" + System.currentTimeMillis());
+		bundleDirectory = new File(FileUtil.getTempDirectory().toOSString(), "bundle_cache_test_" + System.currentTimeMillis());
 		bundleDirectory.mkdirs();
 		assertTrue("Failed to create test bundle directory", bundleDirectory.exists());
 	}

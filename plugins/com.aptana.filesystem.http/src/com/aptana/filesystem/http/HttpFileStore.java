@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.FileUtil;
 
 public class HttpFileStore extends FileStore
 {
@@ -149,7 +150,7 @@ public class HttpFileStore extends FileStore
 		SubMonitor sub = SubMonitor.convert(monitor);
 
 		// Try to grab copied cache file based on URL!
-		File tmpDir = new File(System.getProperty("java.io.tmpdir")); //$NON-NLS-1$
+		File tmpDir = FileUtil.getTempDirectory().toFile();
 		File cached = new File(tmpDir, getPath(uri));
 		if (cached.exists())
 		{

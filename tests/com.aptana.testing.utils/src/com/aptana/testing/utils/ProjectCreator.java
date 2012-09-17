@@ -8,7 +8,6 @@
 package com.aptana.testing.utils;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
@@ -16,6 +15,8 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+
+import com.aptana.core.util.FileUtil;
 
 /**
  * @deprecated Combine with TestProject
@@ -32,21 +33,7 @@ abstract public class ProjectCreator
 			// because we're already under a git repo!
 			IProjectDescription desc = ResourcesPlugin.getWorkspace().newProjectDescription(projectName);
 
-			File tmpDir;
-			try
-			{
-				File tmpfile = File.createTempFile(projectName, null);
-				tmpDir = tmpfile.getParentFile();
-			}
-			catch (IOException e)
-			{
-				String tmpDirString = System.getProperty("java.io.tmpdir");
-				if (tmpDirString == null || tmpDirString.trim().length() == 0)
-				{
-					tmpDirString = "/tmp";
-				}
-				tmpDir = new File(tmpDirString);
-			}
+			File tmpDir = FileUtil.getTempDirectory().toFile();
 			File projectDir = new File(tmpDir, projectName);
 			desc.setLocation(new Path(projectDir.getAbsolutePath()));
 			project.create(desc, new NullProgressMonitor());

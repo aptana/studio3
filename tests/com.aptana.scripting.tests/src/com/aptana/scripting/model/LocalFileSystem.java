@@ -10,6 +10,8 @@ package com.aptana.scripting.model;
 import java.io.File;
 import java.io.FileWriter;
 
+import com.aptana.core.util.FileUtil;
+
 public class LocalFileSystem implements IBundleFileSystem
 {
 	/*
@@ -46,11 +48,8 @@ public class LocalFileSystem implements IBundleFileSystem
 	 * @see com.aptana.scripting.model.IBundleFileSystem#createProject(java.lang.String)
 	 */
 	public Object createProject(String name) throws Exception
-	{
-		String tempDirectory = System.getProperty("java.io.tmpdir");
-		File result = new File(tempDirectory);
-		
-		return result;
+	{		
+		return FileUtil.getTempDirectory().toFile();
 	}
 
 	/*
