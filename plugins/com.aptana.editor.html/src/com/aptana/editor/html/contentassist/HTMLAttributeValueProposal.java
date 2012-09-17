@@ -37,36 +37,51 @@ public class HTMLAttributeValueProposal extends CommonCompletionProposal
 		{
 			IDocument document = viewer.getDocument();
 			// Handle wrapping in quotes if necessary
-			char prevChar = document.getChar(offset - 1);
+			char prevChar = document.getChar(_replacementOffset - 1);
+			char quote = '"';
 			switch (prevChar)
 			{
 				case '\'':
+					quote = '\'';
+					break;
 				case '"':
 					// We're fine
 					break;
 
 				default:
 					// Add wrapping quotes
-					_replacementString = "\"" + _replacementString + "\""; //$NON-NLS-1$ //$NON-NLS-2$
+					_replacementString = "\"" + _replacementString; //$NON-NLS-1$
 					break;
 			}
 			// handle adding trailing space if necessary
-			char nextChar = document.getChar(offset + _replacementLength);
-			switch (nextChar)
+			int nextCharIndex = _replacementOffset + _replacementLength;
+			if (nextCharIndex >= document.getLength())
 			{
-				case '\'':
-				case '"':
-				case ' ':
-				case '\t':
-				case '>':
-				case '/':
-					// We're fine
-					break;
+				// Add a close quote when we're against the EOF
+				_replacementString += quote;
+			}
+			else
+			{
+				char nextChar = document.getChar(nextCharIndex);
+				switch (nextChar)
+				{
+					case '\'':
+					case '"':
+						// no need to add quote
+						break;
+					case ' ':
+					case '\t':
+					case '>':
+					case '/':
+						// add close quote
+						_replacementString += quote;
+						break;
 
-				default:
-					// Add a space
-					_replacementString += " "; //$NON-NLS-1$
-					break;
+					default:
+						// Add a close quote and then a space
+						_replacementString += quote + " "; //$NON-NLS-1$
+						break;
+				}
 			}
 
 		}
