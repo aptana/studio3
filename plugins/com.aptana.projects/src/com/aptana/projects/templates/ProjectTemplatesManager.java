@@ -87,7 +87,6 @@ public class ProjectTemplatesManager
 	public ProjectTemplatesManager()
 	{
 		projectTemplates = new HashMap<TemplateType, List<IProjectTemplate>>();
-		templateTagsImageRegistry = new ImageRegistry(UIUtils.getDisplay());
 		templateListeners = new ArrayList<IProjectTemplateListener>();
 		readExtensionRegistry();
 		loadTemplatesFromBundles();
@@ -149,12 +148,38 @@ public class ProjectTemplatesManager
 
 	public Image getImageForTag(String tag)
 	{
-		return templateTagsImageRegistry.get(tag);
+		ImageRegistry reg = getImageRegistry();
+		if (reg != null)
+		{
+			return reg.get(tag);
+		}
+		return null;
 	}
 
 	public void putImageForTag(String tag, ImageDescriptor imageDescriptor)
 	{
-		templateTagsImageRegistry.put(tag, imageDescriptor);
+		ImageRegistry reg = getImageRegistry();
+		if (reg != null)
+		{
+			reg.put(tag, imageDescriptor);
+		}
+	}
+
+	protected ImageRegistry getImageRegistry()
+	{
+		try
+		{
+			if (templateTagsImageRegistry == null)
+			{
+				templateTagsImageRegistry = new ImageRegistry(UIUtils.getDisplay());
+			}
+			return templateTagsImageRegistry;
+		}
+		catch (IllegalStateException e)
+		{
+			// ignore - heppsn when headless in tests
+		}
+		return null;
 	}
 
 	private void readExtensionRegistry()
