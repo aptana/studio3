@@ -218,7 +218,7 @@ public class GitIndexTest extends GitTestCase
 		{
 			public boolean include(ChangedFile item)
 			{
-				return CollectionsUtil.newSet("file1.txt", "file3.txt", "file5.txt").contains(item.path);
+				return CollectionsUtil.newSet("file1.txt", "file3.txt", "file5.txt").contains(item.portablePath);
 			}
 		});
 		assertStageFiles(repo.index(), toStage);
@@ -228,7 +228,7 @@ public class GitIndexTest extends GitTestCase
 		{
 			public boolean include(ChangedFile item)
 			{
-				return CollectionsUtil.newSet("file2.txt").contains(item.path);
+				return CollectionsUtil.newSet("file2.txt").contains(item.portablePath);
 			}
 		});
 		assertUnstageFiles(repo.index(), toUnstage);
@@ -301,7 +301,7 @@ public class GitIndexTest extends GitTestCase
 		{
 			public boolean include(ChangedFile item)
 			{
-				return CollectionsUtil.newSet("file1.txt", "file3.txt", "file5.txt").contains(item.path);
+				return CollectionsUtil.newSet("file1.txt", "file3.txt", "file5.txt").contains(item.portablePath);
 			}
 		});
 		assertStageFiles(repo.index(), toStage);
@@ -311,7 +311,7 @@ public class GitIndexTest extends GitTestCase
 		{
 			public boolean include(ChangedFile item)
 			{
-				return CollectionsUtil.newSet("file2.txt").contains(item.path);
+				return CollectionsUtil.newSet("file2.txt").contains(item.portablePath);
 			}
 		});
 		assertUnstageFiles(repo.index(), toUnstage);
@@ -340,7 +340,7 @@ public class GitIndexTest extends GitTestCase
 
 			public boolean include(ChangedFile item)
 			{
-				return ObjectUtil.areEqual(item.path, path) && item.hasStagedChanges == hasStaged
+				return ObjectUtil.areEqual(item.portablePath, path) && item.hasStagedChanges == hasStaged
 						&& item.hasUnstagedChanges == hasUnstaged && item.status == status;
 			}
 		});

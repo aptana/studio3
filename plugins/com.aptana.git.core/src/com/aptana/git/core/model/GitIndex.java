@@ -237,7 +237,7 @@ public class GitIndex
 				{
 					public boolean include(ChangedFile item)
 					{
-						return !filePathStrings.contains(item.path);
+						return !filePathStrings.contains(item.portablePath);
 					}
 				});
 			}
@@ -538,7 +538,7 @@ public class GitIndex
 		String parameter = "-U" + contextLines; //$NON-NLS-1$
 		if (staged)
 		{
-			String indexPath = ":0:" + file.path; //$NON-NLS-1$
+			String indexPath = ":0:" + file.portablePath; //$NON-NLS-1$
 
 			if (file.status == ChangedFile.Status.NEW)
 			{
@@ -547,7 +547,7 @@ public class GitIndex
 			}
 
 			IStatus result = repository.execute(GitRepository.ReadWrite.READ, "diff-index", parameter, "--cached", //$NON-NLS-1$ //$NON-NLS-2$
-					GitRepository.HEAD, "--", file.path); //$NON-NLS-1$
+					GitRepository.HEAD, "--", file.portablePath); //$NON-NLS-1$
 			if (result == null || !result.isOK())
 			{
 				return null;
@@ -560,7 +560,7 @@ public class GitIndex
 		{
 			try
 			{
-				return IOUtil.read(new FileInputStream(workingDirectory().append(file.path).toFile()), IOUtil.UTF_8); // $codepro.audit.disable
+				return IOUtil.read(new FileInputStream(workingDirectory().append(file.portablePath).toFile()), IOUtil.UTF_8); // $codepro.audit.disable
 																														// closeWhereCreated
 			}
 			catch (FileNotFoundException e)
@@ -569,7 +569,7 @@ public class GitIndex
 			}
 		}
 
-		IStatus result = repository.execute(GitRepository.ReadWrite.READ, "diff-files", parameter, "--", file.path); //$NON-NLS-1$ //$NON-NLS-2$
+		IStatus result = repository.execute(GitRepository.ReadWrite.READ, "diff-files", parameter, "--", file.portablePath); //$NON-NLS-1$ //$NON-NLS-2$
 		return result.getMessage();
 	}
 
@@ -830,7 +830,7 @@ public class GitIndex
 				{
 					synchronized (dictionary)
 					{
-						List<String> fileStatus = dictionary.get(file.path);
+						List<String> fileStatus = dictionary.get(file.portablePath);
 						// Object found, this is still a cached / uncached thing
 						if (fileStatus != null)
 						{
@@ -867,7 +867,7 @@ public class GitIndex
 							}
 
 							// We handled this file, remove it from the dictionary
-							dictionary.remove(file.path);
+							dictionary.remove(file.portablePath);
 						}
 						else
 						{
