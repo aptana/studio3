@@ -306,12 +306,12 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 
 	public void testDontOverwriteTagEnd1()
 	{
-		assertCompletionCorrect("<div dir=\"|></div>", '\t', 2, "ltr", "<div dir=\"ltr></div>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		assertCompletionCorrect("<div dir=\"|></div>", '\t', 2, "ltr", "<div dir=\"ltr\"></div>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	public void testDontOverwriteTagEnd2()
 	{
-		assertCompletionCorrect("<br dir=\"|/>", '\t', 2, "ltr", "<br dir=\"ltr/>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		assertCompletionCorrect("<br dir=\"|/>", '\t', 2, "ltr", "<br dir=\"ltr\"/>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -832,9 +832,114 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		assertTrue(proposals.length >= 1); // "autoplay"
 		// insert the "autoplay" proposal
 		AssertUtil.assertProposalFound("autoplay", proposals);
-		AssertUtil.assertProposalApplies("<video autoplay=\"autoplay\" preload=\"none\"></video>", fDocument, "autoplay",
+		AssertUtil.assertProposalApplies("<video autoplay=\"autoplay\" preload=\"none\"></video>", fDocument,
+				"autoplay", proposals, offset, null);
+	}
+
+	public void testAtrributeValueMidValueNoCloseQuoteAtEOF()
+	{
+		String document = "<script type=\"te|";
+		int offset = HTMLTestUtil.findCursorOffset(document);
+		fDocument = HTMLTestUtil.createDocument(document, true);
+		ITextViewer viewer = createTextViewer(fDocument);
+
+		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
+		assertTrue(proposals.length >= 1); // "text/javascript"
+		// insert the "text/javascript" proposal
+		AssertUtil.assertProposalFound("text/javascript", proposals);
+		AssertUtil.assertProposalApplies("<script type=\"text/javascript\" ", fDocument, "text/javascript", proposals,
+				offset, null);
+	}
+
+	public void testAtrributeValueMidValueWithExistingQuotes()
+	{
+		String document = "<script type=\"te|\"";
+		int offset = HTMLTestUtil.findCursorOffset(document);
+		fDocument = HTMLTestUtil.createDocument(document, true);
+		ITextViewer viewer = createTextViewer(fDocument);
+
+		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
+		assertTrue(proposals.length >= 1); // "text/javascript"
+		// insert the "text/javascript" proposal
+		AssertUtil.assertProposalFound("text/javascript", proposals);
+		AssertUtil.assertProposalApplies("<script type=\"text/javascript\"", fDocument, "text/javascript", proposals,
+				offset, null);
+	}
+
+	public void testAtrributeValueNoValueWithExistingQuotes()
+	{
+		String document = "<script type=\"|\"";
+		int offset = HTMLTestUtil.findCursorOffset(document);
+		fDocument = HTMLTestUtil.createDocument(document, true);
+		ITextViewer viewer = createTextViewer(fDocument);
+
+		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
+		assertTrue(proposals.length >= 1); // "text/javascript"
+		// insert the "text/javascript" proposal
+		AssertUtil.assertProposalFound("text/javascript", proposals);
+		AssertUtil.assertProposalApplies("<script type=\"text/javascript\"", fDocument, "text/javascript", proposals,
+				offset, null);
+	}
+
+	public void testAtrributeValueNoValueNoQuotes()
+	{
+		String document = "<script type=|";
+		int offset = HTMLTestUtil.findCursorOffset(document);
+		fDocument = HTMLTestUtil.createDocument(document, true);
+		ITextViewer viewer = createTextViewer(fDocument);
+
+		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
+		assertTrue(proposals.length >= 1); // "text/javascript"
+		// insert the "text/javascript" proposal
+		AssertUtil.assertProposalFound("text/javascript", proposals);
+		AssertUtil.assertProposalApplies("<script type=\"text/javascript\"", fDocument, "text/javascript", proposals,
+				offset, null);
+	}
+
+	public void testAtrributeValueNoValueLeadingSingleQuoteTrailingGT()
+	{
+		String document = "<script type='|>";
+		int offset = HTMLTestUtil.findCursorOffset(document);
+		fDocument = HTMLTestUtil.createDocument(document, true);
+		ITextViewer viewer = createTextViewer(fDocument);
+
+		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
+		assertTrue(proposals.length >= 1); // "text/javascript"
+		// insert the "text/javascript" proposal
+		AssertUtil.assertProposalFound("text/javascript", proposals);
+		AssertUtil.assertProposalApplies("<script type='text/javascript'>", fDocument, "text/javascript", proposals,
+				offset, null);
+	}
+
+	public void testAtrributeValueNoValueWrappingSingleQuoteTrailingAttributeName()
+	{
+		String document = "<script type='|'id='1'>";
+		int offset = HTMLTestUtil.findCursorOffset(document);
+		fDocument = HTMLTestUtil.createDocument(document, true);
+		ITextViewer viewer = createTextViewer(fDocument);
+
+		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
+		assertTrue(proposals.length >= 1); // "text/javascript"
+		// insert the "text/javascript" proposal
+		AssertUtil.assertProposalFound("text/javascript", proposals);
+		AssertUtil.assertProposalApplies("<script type='text/javascript'id='1'>", fDocument, "text/javascript",
 				proposals, offset, null);
 	}
+
+	// public void testAtrributeValueNoValueLeadingSingleQuoteTrailingAttributeName()
+	// {
+	// String document = "<script type='|id='1'>";
+	// int offset = HTMLTestUtil.findCursorOffset(document);
+	// fDocument = HTMLTestUtil.createDocument(document, true);
+	// ITextViewer viewer = createTextViewer(fDocument);
+	//
+	// ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
+	// assertTrue(proposals.length >= 1); // "text/javascript"
+	// // insert the "text/javascript" proposal
+	// AssertUtil.assertProposalFound("text/javascript", proposals);
+	// AssertUtil.assertProposalApplies("<script type='text/javascript' id='1'>", fDocument, "text/javascript",
+	// proposals, offset, null);
+	// }
 
 	public void testRelativeHREFFileProposals() throws Exception
 	{
