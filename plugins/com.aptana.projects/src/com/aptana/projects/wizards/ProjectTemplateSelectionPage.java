@@ -442,7 +442,7 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 				ImageDescriptor descriptor = ImageDescriptor.createFromURL(iconPath);
 				if (descriptor != null)
 				{
-					image = descriptor.createImage();
+					image = descriptor.createImage(false);
 					if (image != null)
 					{
 						// Scale the image to 48x48 in case it's not.
