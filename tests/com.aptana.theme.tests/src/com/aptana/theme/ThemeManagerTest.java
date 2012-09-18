@@ -102,7 +102,14 @@ public class ThemeManagerTest extends TestCase implements ILogListener
 		long initial = System.currentTimeMillis();
 		while (!executed)
 		{
-			display.readAndDispatch();
+			try
+			{
+				display.readAndDispatch();
+			}
+			catch (Exception e)
+			{
+				// ignore
+			}
 			if (System.currentTimeMillis() - initial > MAX_TIMEOUT_FOR_CONDITION)
 			{
 				fail("Condition did not occurr in specified time.");
