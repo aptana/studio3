@@ -41,7 +41,7 @@ class ControlThemer implements IControlThemer
 	protected static final boolean isWindows = Platform.getOS().equals(Platform.OS_WIN32);
 	protected static final boolean isMacOSX = Platform.getOS().equals(Platform.OS_MACOSX);
 	protected static final boolean isCocoa = Platform.getWS().equals(Platform.WS_COCOA);
-	protected static final boolean isUbuntu = PlatformUtil.isOSName("Ubuntu"); //$NON-NLS-1$
+	protected static final boolean isUbuntu = PlatformUtil.isOSName("Ubuntu") || PlatformUtil.isOSName("LinuxMint"); //$NON-NLS-1$
 
 	private Control control;
 	private Color defaultBg;
