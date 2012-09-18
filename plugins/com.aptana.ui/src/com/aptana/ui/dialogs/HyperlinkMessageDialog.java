@@ -86,7 +86,7 @@ public class HyperlinkMessageDialog extends MessageDialog
 		{
 			public void widgetSelected(SelectionEvent e)
 			{
-				WorkbenchBrowserUtil.launchExternalBrowser(e.text);
+				openLink(e);
 			}
 		});
 		return messageArea;
@@ -108,6 +108,11 @@ public class HyperlinkMessageDialog extends MessageDialog
 		});
 
 		return button;
+	}
+
+	protected void openLink(SelectionEvent e)
+	{
+		WorkbenchBrowserUtil.launchExternalBrowser(e.text);
 	}
 
 	public static boolean open(int kind, Shell parent, String title, String message, int style)

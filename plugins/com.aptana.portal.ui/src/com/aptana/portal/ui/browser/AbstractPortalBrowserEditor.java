@@ -15,9 +15,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.LocationAdapter;
@@ -29,13 +27,9 @@ import org.eclipse.swt.browser.TitleEvent;
 import org.eclipse.swt.browser.TitleListener;
 import org.eclipse.swt.browser.WindowEvent;
 import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
@@ -53,6 +47,7 @@ import com.aptana.portal.ui.internal.BrowserFunctionWrapper;
 import com.aptana.portal.ui.internal.BrowserViewerWrapper;
 import com.aptana.portal.ui.internal.BrowserWrapper;
 import com.aptana.portal.ui.internal.startpage.IStartPageUISystemProperties;
+import com.aptana.ui.dialogs.HyperlinkMessageDialog;
 import com.aptana.ui.util.UIUtils;
 import com.aptana.ui.util.WorkbenchBrowserUtil;
 
@@ -66,7 +61,7 @@ import com.aptana.ui.util.WorkbenchBrowserUtil;
 public abstract class AbstractPortalBrowserEditor extends EditorPart
 {
 
-	private static final String BROWSER_DOCS = "http://docs.appcelerator.com/titanium/2.1/index.html#!/guide/Troubleshooting_a_Studio_Install_on_Linux"; //$NON-NLS-1$
+	private static final String BROWSER_DOCS = "http://go.aptana.com/troubleshooting_linux"; //$NON-NLS-1$
 
 	private static final String BROWSER_SWT = "swt"; //$NON-NLS-1$
 	private static final String BROWSER_CHROMIUM = "chromium"; //$NON-NLS-1$
@@ -187,44 +182,15 @@ public abstract class AbstractPortalBrowserEditor extends EditorPart
 		catch (SWTError e)
 		{
 			// Open a dialog pointing user at docs for workaround
-			// http://docs.appcelerator.com/titanium/2.1/index.html#!/guide/Troubleshooting_a_Studio_Install_on_Linux
-			MessageDialog dialog = new MessageDialog(UIUtils.getActiveShell(),
-					Messages.AbstractPortalBrowserEditor_ErrorTitle, null, null, MessageDialog.ERROR,
-					new String[] { IDialogConstants.OK_LABEL }, 0)
+			HyperlinkMessageDialog dialog = new HyperlinkMessageDialog(UIUtils.getActiveShell(),
+					Messages.AbstractPortalBrowserEditor_ErrorTitle, null,
+					Messages.AbstractPortalBrowserEditor_ErrorMsg, MessageDialog.ERROR,
+					new String[] { IDialogConstants.OK_LABEL }, 0, null)
 			{
-				protected Control createMessageArea(Composite composite)
+				@Override
+				protected void openLink(SelectionEvent e)
 				{
-					// create composite
-					// create image
-					Image image = getImage();
-					if (image != null)
-					{
-						imageLabel = new Label(composite, SWT.NULL);
-						image.setBackground(imageLabel.getBackground());
-						imageLabel.setImage(image);
-						// addAccessibleListeners(imageLabel, image);
-						GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.BEGINNING).applyTo(imageLabel);
-					}
-					// create message
-					Link link = new Link(composite, SWT.WRAP);
-					link.setText(Messages.AbstractPortalBrowserEditor_ErrorMsg);
-					GridDataFactory
-							.fillDefaults()
-							.align(SWT.FILL, SWT.BEGINNING)
-							.grab(true, false)
-							.hint(convertHorizontalDLUsToPixels(IDialogConstants.MINIMUM_MESSAGE_AREA_WIDTH),
-									SWT.DEFAULT).applyTo(link);
-					link.addSelectionListener(new SelectionAdapter()
-					{
-						@Override
-						public void widgetSelected(SelectionEvent e)
-						{
-							// Open the link!
-							WorkbenchBrowserUtil.launchExternalBrowser(BROWSER_DOCS);
-						}
-					});
-
-					return composite;
+					WorkbenchBrowserUtil.launchExternalBrowser(BROWSER_DOCS);
 				}
 			};
 			dialog.open();
