@@ -93,14 +93,7 @@ public class GitCommit
 
 	public String getComment()
 	{
-
-		if (comment == null)
-		{
-			return getSubject();
-		}
-		StringBuilder builder = new StringBuilder(getSubject());
-		builder.append("\n\n").append(comment); //$NON-NLS-1$
-		return builder.toString();
+		return comment;
 	}
 
 	@Override

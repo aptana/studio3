@@ -148,23 +148,26 @@ public class GitHistoryPage extends HistoryPage
 				{
 					rev = new GitRevSpecifier(ref, "--", resourcePath.toOSString()); //$NON-NLS-1$
 				}
-				revList.walkRevisionListWithSpecifier(rev, subMonitor.newChild(95));
-				final List<GitCommit> commits = revList.getCommits();
-				Display.getDefault().asyncExec(new Runnable()
+				IStatus result = revList.walkRevisionListWithSpecifier(rev, subMonitor.newChild(95));
+				if (result != null && result.isOK())
 				{
-
-					public void run()
+					final List<GitCommit> commits = revList.getCommits();
+					Display.getDefault().asyncExec(new Runnable()
 					{
-						graph.setCommits(commits);
-						if (getControl() != null && !getControl().isDisposed())
+
+						public void run()
 						{
-							getSite().getPage().activate((IWorkbenchPart) getHistoryView());
-							((IViewPart) getHistoryView()).getViewSite().getActionBars().updateActionBars();
+							graph.setCommits(commits);
+							if (getControl() != null && !getControl().isDisposed())
+							{
+								getSite().getPage().activate((IWorkbenchPart) getHistoryView());
+								((IViewPart) getHistoryView()).getViewSite().getActionBars().updateActionBars();
+							}
 						}
-					}
-				});
+					});
+				}
 				subMonitor.done();
-				return Status.OK_STATUS;
+				return result;
 			}
 		};
 		job.setUser(true);
@@ -399,7 +402,7 @@ public class GitHistoryPage extends HistoryPage
 		String comment = commit.getComment();
 		// Auto convert references to URLs into links
 		comment = comment.replaceAll("http://(.+)", "<a href=\"$0\" target=\"_blank\">http://$1</a>"); //$NON-NLS-1$ //$NON-NLS-2$
-		comment = comment.replaceAll("\\n", "<br />"); // Convert newlines into breakreads //$NON-NLS-1$ //$NON-NLS-2$
+		comment = comment.replaceAll(StringUtil.LINE_SPLITTER_REGEX, "<br />"); // Convert newlines into breakreads //$NON-NLS-1$
 		variables.put("\\{comment\\}", comment); //$NON-NLS-1$
 
 		String avatar = StringUtil.EMPTY;

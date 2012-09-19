@@ -1,12 +1,13 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.git.core.model;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -15,14 +16,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.IOUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.IDebugScopes;
 
@@ -68,20 +70,24 @@ public class GitRevList
 		long start = System.currentTimeMillis();
 		List<GitCommit> revisions = new ArrayList<GitCommit>();
 
-		String formatString = "--pretty=format:%H\01%e\01%an\01%ae\01%s\01%b\01%P\01%at"; //$NON-NLS-1$
-		boolean showSign = ((rev == null) ? false : rev.hasLeftRight());
-		if (showSign)
-			formatString += "\01%m"; //$NON-NLS-1$
-
-		List<String> arguments = new ArrayList<String>();
-		arguments.add("log"); //$NON-NLS-1$
-		arguments.add("-z"); //$NON-NLS-1$
-		arguments.add("--early-output"); //$NON-NLS-1$
-		arguments.add("--topo-order"); //$NON-NLS-1$
-		arguments.add("--children"); //$NON-NLS-1$
+		// @formatter:off
+		List<String> arguments = CollectionsUtil.newList(
+			"log", //$NON-NLS-1$
+			"-z", //$NON-NLS-1$
+			"--early-output", //$NON-NLS-1$
+			"--topo-order", //$NON-NLS-1$
+			"--children"); //$NON-NLS-1$
+		// @formatter:on
 		if (max > 0)
 		{
 			arguments.add("-" + max); // only last N revs //$NON-NLS-1$
+		}
+
+		String formatString = "--pretty=format:%H\01%e\01%an\01%ae\01%B\01%P\01%at"; //$NON-NLS-1$
+		boolean showSign = ((rev == null) ? false : rev.hasLeftRight());
+		if (showSign)
+		{
+			formatString += "\01%m"; //$NON-NLS-1$
 		}
 		arguments.add(formatString);
 
@@ -94,8 +100,6 @@ public class GitRevList
 			arguments.addAll(rev.parameters());
 		}
 
-		IPath directory = repository.workingDirectory();
-
 		if (subMonitor.isCanceled())
 		{
 			return Status.CANCEL_STATUS;
@@ -107,13 +111,14 @@ public class GitRevList
 			return new Status(
 					IStatus.ERROR,
 					GitPlugin.getPluginId(),
-					"Failed to acquire read lock on the git repository. A long-running operation that writes to the repo is running (i.e. pull). Please ensure that has finished before trying again.");
+					"Failed to acquire read lock on the git repository. A long-running operation that writes to the repo is running (i.e. pull). Please ensure that has finished before trying again."); //$NON-NLS-1$
 		}
 
 		try
 		{
 			// FIXME Move this into GitRepository, so we can set up lock/monitor on it!
-			Process p = GitExecutable.instance().run(directory, arguments.toArray(new String[arguments.size()]));
+			Process p = GitExecutable.instance().run(repository.workingDirectory(),
+					arguments.toArray(new String[arguments.size()]));
 			InputStream stream = p.getInputStream();
 
 			int num = 0;
@@ -154,8 +159,8 @@ public class GitRevList
 
 				String author = getline(stream, '\1', encoding);
 				String authorEmail = getline(stream, '\1', encoding);
-				String subject = getline(stream, '\1', encoding);
 				String body = getline(stream, '\1', encoding);
+				String subject = StringUtil.LINE_SPLITTER.split(body)[0];
 				String parentString = getline(stream, '\1');
 				if (parentString != null && parentString.length() != 0)
 				{
@@ -322,7 +327,7 @@ public class GitRevList
 
 	private byte[] read(InputStream stream, char c)
 	{
-		List<Byte> list = new ArrayList<Byte>();
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		while (true)
 		{
 			try
@@ -337,24 +342,18 @@ public class GitRevList
 				{
 					break;
 				}
-				list.add((byte) read);
+				out.write(read);
 			}
 			catch (IOException e)
 			{
 				break;
 			}
 		}
-		byte[] bytes = new byte[list.size()];
-		int i = 0;
-		for (Byte by : list)
-		{
-			bytes[i++] = by.byteValue();
-		}
-		return bytes;
+		return out.toByteArray();
 	}
 
 	public List<GitCommit> getCommits()
 	{
-		return Collections.unmodifiableList(this.commits);
+		return Collections.unmodifiableList(CollectionsUtil.getListValue(this.commits));
 	}
 }
