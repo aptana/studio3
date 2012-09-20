@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.osgi.framework.Version;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
@@ -69,7 +70,14 @@ public class GitRevList
 		SubMonitor subMonitor = SubMonitor.convert(monitor, units);
 		long start = System.currentTimeMillis();
 		List<GitCommit> revisions = new ArrayList<GitCommit>();
-
+		GitExecutable gitExe = GitExecutable.instance();
+		Version v = gitExe.version();
+		// Git format doesn't support %B until 1.7.3+
+		boolean useRaw = false;
+		if (v.compareTo(Version.parseVersion("1.7.3")) >= 0) //$NON-NLS-1$
+		{
+			useRaw = true;
+		}
 		// @formatter:off
 		List<String> arguments = CollectionsUtil.newList(
 			"log", //$NON-NLS-1$
@@ -83,7 +91,15 @@ public class GitRevList
 			arguments.add("-" + max); // only last N revs //$NON-NLS-1$
 		}
 
-		String formatString = "--pretty=format:%H\01%e\01%an\01%ae\01%B\01%P\01%at"; //$NON-NLS-1$
+		String formatString;
+		if (useRaw)
+		{
+			formatString = "--pretty=format:%H\01%e\01%an\01%ae\01%B\01%P\01%at"; //$NON-NLS-1$
+		}
+		else
+		{
+			formatString = "--pretty=format:%H\01%e\01%an\01%ae\01%s\01%b\01%P\01%at"; //$NON-NLS-1$
+		}
 		boolean showSign = ((rev == null) ? false : rev.hasLeftRight());
 		if (showSign)
 		{
@@ -117,8 +133,7 @@ public class GitRevList
 		try
 		{
 			// FIXME Move this into GitRepository, so we can set up lock/monitor on it!
-			Process p = GitExecutable.instance().run(repository.workingDirectory(),
-					arguments.toArray(new String[arguments.size()]));
+			Process p = gitExe.run(repository.workingDirectory(), arguments.toArray(new String[arguments.size()]));
 			InputStream stream = p.getInputStream();
 
 			int num = 0;
@@ -159,8 +174,20 @@ public class GitRevList
 
 				String author = getline(stream, '\1', encoding);
 				String authorEmail = getline(stream, '\1', encoding);
-				String body = getline(stream, '\1', encoding);
-				String subject = StringUtil.LINE_SPLITTER.split(body)[0];
+
+				String subject;
+				String body;
+				if (useRaw)
+				{
+					body = getline(stream, '\1', encoding);
+					subject = StringUtil.LINE_SPLITTER.split(body)[0];
+				}
+				else
+				{
+					subject = getline(stream, '\1', encoding);
+					body = getline(stream, '\1', encoding);
+				}
+
 				String parentString = getline(stream, '\1');
 				if (parentString != null && parentString.length() != 0)
 				{
