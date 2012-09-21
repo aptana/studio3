@@ -49,6 +49,9 @@ public class ReturnTypeElementTest extends TestCase
 
 		// Invalid type string we're seeing in logs for https://jira.appcelerator.org/browse/APSTUD-7366
 		assertInvalid("Number", "Number,Object,Array,Function");
+
+		// Legacy array type used in our metadata https://jira.appcelerator.org/browse/APSTUD-7438
+		assertInvalid("Array<Anchor>", "Anchor[]");
 	}
 
 	private void assertInvalid(String fixed, String typeName)

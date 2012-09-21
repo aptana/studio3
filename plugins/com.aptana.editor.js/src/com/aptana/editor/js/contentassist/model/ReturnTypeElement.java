@@ -15,6 +15,8 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ObjectUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSPlugin;
+import com.aptana.editor.js.JSTypeConstants;
+import com.aptana.editor.js.inferencing.JSTypeUtil;
 import com.aptana.jetty.util.epl.ajax.JSON.Convertible;
 import com.aptana.jetty.util.epl.ajax.JSON.Output;
 
@@ -142,6 +144,13 @@ public class ReturnTypeElement implements Convertible
 
 		if (!TYPE_NAME_PATTERN.matcher(type).matches())
 		{
+			// Look for Array types in "bad" format
+			if (type.endsWith(JSTypeConstants.ARRAY_LITERAL))
+			{
+				// convert to Array<Type>
+				return validateTypeName(JSTypeUtil.createGenericArrayType(JSTypeUtil.getArrayElementType(type)));
+			}
+
 			IdeLog.logError(
 					JSPlugin.getDefault(),
 					new IllegalArgumentException(MessageFormat.format(

@@ -248,8 +248,12 @@ public class JSTypeUtil
 				// chop off the signature to continue processing the type
 				typeName = typeName.substring(0, delimiter); // $codepro.audit.disable questionableAssignment
 			}
-
-			function.addType(typeName);
+			// Function could possibly have multiple types defined beyond just one!
+			String[] types = typeName.split(JSTypeConstants.RETURN_TYPE_DELIMITER);
+			for (String type : types)
+			{
+				function.addType(type);
+			}
 		}
 	}
 

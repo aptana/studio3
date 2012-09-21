@@ -21,6 +21,7 @@ import com.aptana.core.IMap;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.RegexUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.model.EventElement;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
@@ -330,6 +331,13 @@ public class JSIndexReader extends IndexReader
 	 */
 	private String getMemberPattern(List<String> typeNames)
 	{
+		typeNames = CollectionsUtil.map(typeNames, new IMap<String, String>()
+		{
+			public String map(String item)
+			{
+				return stripGenericsFromType(item);
+			}
+		});
 		String typePattern = RegexUtil.createQuotedListPattern(typeNames);
 
 		return MessageFormat.format("^{1}{0}", new Object[] { this.getDelimiter(), typePattern }); //$NON-NLS-1$
@@ -344,7 +352,23 @@ public class JSIndexReader extends IndexReader
 	 */
 	private String getMemberPattern(String typeName, String memberName)
 	{
-		return MessageFormat.format("{1}{0}{2}{0}", new Object[] { this.getDelimiter(), typeName, memberName }); //$NON-NLS-1$
+		return MessageFormat.format(
+				"{1}{0}{2}{0}", new Object[] { this.getDelimiter(), stripGenericsFromType(typeName), memberName }); //$NON-NLS-1$
+	}
+
+	/**
+	 * Looks for Array<?> and removes the type information for members.
+	 * 
+	 * @param typeName
+	 * @return
+	 */
+	private String stripGenericsFromType(String typeName)
+	{
+		if (typeName.startsWith(JSTypeConstants.GENERIC_ARRAY_OPEN))
+		{
+			return JSTypeConstants.ARRAY_TYPE;
+		}
+		return typeName;
 	}
 
 	/**
@@ -487,7 +511,7 @@ public class JSIndexReader extends IndexReader
 
 		if (index != null && !StringUtil.isEmpty(typeName))
 		{
-			String pattern = typeName + this.getDelimiter();
+			String pattern = stripGenericsFromType(typeName) + this.getDelimiter();
 
 			// @formatter:off
 			List<QueryResult> types = index.query(

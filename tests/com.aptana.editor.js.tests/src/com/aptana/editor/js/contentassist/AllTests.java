@@ -20,6 +20,7 @@ public class AllTests
 		// $JUnit-BEGIN$
 		suite.addTestSuite(JSContentAssistProposalTests.class);
 		suite.addTestSuite(JSContextInfoTests.class);
+		suite.addTestSuite(JSIndexQueryHelperTest.class);
 		suite.addTestSuite(JSUserAgentCachingTests.class);
 		suite.addTestSuite(JSUserAgentFilteringTests.class);
 		suite.addTestSuite(LocationTests.class);

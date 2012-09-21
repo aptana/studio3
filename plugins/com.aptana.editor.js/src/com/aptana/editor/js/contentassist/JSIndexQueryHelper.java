@@ -19,8 +19,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-import com.aptana.jetty.util.epl.ajax.JSON;
-
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSTypeConstants;
@@ -32,6 +30,7 @@ import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.IndexPlugin;
+import com.aptana.jetty.util.epl.ajax.JSON;
 
 public class JSIndexQueryHelper
 {
@@ -315,12 +314,12 @@ public class JSIndexQueryHelper
 		List<TypeElement> indexTypes = this._reader.getType(index, typeName, includeMembers);
 		List<TypeElement> builtinTypes = this._reader.getType(getIndex(), typeName, includeMembers);
 
-		if (indexTypes != null)
+		if (!CollectionsUtil.isEmpty(indexTypes))
 		{
 			result.addAll(indexTypes);
 		}
 
-		if (builtinTypes != null)
+		if (!CollectionsUtil.isEmpty(builtinTypes))
 		{
 			result.addAll(builtinTypes);
 		}
