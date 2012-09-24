@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -34,6 +34,7 @@ import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.browser.WebBrowserEditorInput;
@@ -73,12 +74,14 @@ public class Portal
 	protected static final String PHP_NATURE = "com.aptana.editor.php.phpnature"; //$NON-NLS-1$
 	protected static final String WEB_NATURE = "com.aptana.projects.webnature"; //$NON-NLS-1$
 	protected static final String PYDEV_NATURE = "org.python.pydev.pythonNature"; //$NON-NLS-1$
-	private AbstractPortalBrowserEditor portalBrowser;
+
+	private Map<IWorkbenchWindow, AbstractPortalBrowserEditor> portalBrowsers;
 	private static Portal instance;
 
 	// Private constructor
 	private Portal()
 	{
+		portalBrowsers = new HashMap<IWorkbenchWindow, AbstractPortalBrowserEditor>();
 	}
 
 	/**
@@ -148,13 +151,10 @@ public class Portal
 			{
 				url = getDefaultURL();
 			}
-			else
+			else if (!isConnected(url))
 			{
-				if (!isConnected(url))
-				{
-					URL localURL = FileLocator.toFileURL(Portal.class.getResource(BASE_LOCAL_URL));
-					url = URLUtil.appendParameters(localURL, new String[] { "url", url.toString() }); //$NON-NLS-1$
-				}
+				URL localURL = FileLocator.toFileURL(Portal.class.getResource(BASE_LOCAL_URL));
+				url = URLUtil.appendParameters(localURL, new String[] { "url", url.toString() }); //$NON-NLS-1$
 			}
 			Map<String, String> parameters = getURLParametersForProject(PortalUIPlugin.getActiveProject());
 			if (additionalParameters != null)
@@ -168,25 +168,30 @@ public class Portal
 			IdeLog.logError(PortalUIPlugin.getDefault(), e);
 			return;
 		}
-		if (portalBrowser != null && !portalBrowser.isDisposed())
-		{
-			// Refresh the URL, bring to front, and return
-			IEditorSite editorSite = portalBrowser.getEditorSite();
-			IWorkbenchPart part = editorSite.getPart();
-			editorSite.getPage().activate(part);
-			portalBrowser.setURL(url);
-			return;
-		}
+
 		final URL finalURL = url;
-		Job job = new UIJob("Launching Aptana Portal...") //$NON-NLS-1$
+		Job job = new UIJob("Launching the Studio portal...") //$NON-NLS-1$
 		{
 			public IStatus runInUIThread(IProgressMonitor monitor)
 			{
+				final IWorkbenchWindow workbenchWindow = UIUtils.getActiveWorkbenchWindow();
+				AbstractPortalBrowserEditor portalBrowser = portalBrowsers.get(workbenchWindow);
+				if (portalBrowser != null && !portalBrowser.isDisposed())
+				{
+					// Refresh the URL, bring to front, and return
+					IEditorSite editorSite = portalBrowser.getEditorSite();
+					IWorkbenchPart part = editorSite.getPart();
+					editorSite.getPage().activate(part);
+					portalBrowser.setURL(finalURL);
+					return Status.OK_STATUS;
+				}
+
 				WebBrowserEditorInput input = new WebBrowserEditorInput(finalURL, 0, PortalUIPlugin.PORTAL_ID);
 				IWorkbenchPage page = UIUtils.getActivePage();
 				if (page == null)
 				{
-					IdeLog.logError(PortalUIPlugin.getDefault(), "Cannot open Aptana Portal. No active workbench-page."); //$NON-NLS-1$
+					IdeLog.logError(PortalUIPlugin.getDefault(),
+							"Cannot open the Studio portal page. No active workbench page is found."); //$NON-NLS-1$
 					return Status.CANCEL_STATUS;
 				}
 				if (!bringToTop)
@@ -210,7 +215,7 @@ public class Portal
 						{
 							// catch any exception here
 							IdeLog.logError(PortalUIPlugin.getDefault(),
-									"Could not open the Aptana portal as a 'non-focused' editor", e); //$NON-NLS-1$
+									"Could not open the Studio portal as a 'non-focused' editor", e); //$NON-NLS-1$
 						}
 					}
 				}
@@ -223,12 +228,22 @@ public class Portal
 					}
 					if (portalBrowser != null)
 					{
-						portalBrowser.addDisposeListener(new PortalDisposeListener());
+						portalBrowser.addDisposeListener(new DisposeListener()
+						{
+							public void widgetDisposed(DisposeEvent e)
+							{
+								portalBrowsers.remove(workbenchWindow);
+							}
+						});
 					}
 				}
 				catch (PartInitException e)
 				{
-					IdeLog.logError(PortalUIPlugin.getDefault(), "Cannot open Aptana Portal", e); //$NON-NLS-1$
+					IdeLog.logError(PortalUIPlugin.getDefault(), "Failed to open the Studio portal", e); //$NON-NLS-1$
+				}
+				if (portalBrowser != null)
+				{
+					portalBrowsers.put(workbenchWindow, portalBrowser);
 				}
 				return Status.OK_STATUS;
 			}
@@ -429,17 +444,5 @@ public class Portal
 		return MessageFormat.format(
 				"{0}{1}{2}", StringUtil.pad(Integer.toHexString(rgb.red), 2, '0'), StringUtil.pad(Integer //$NON-NLS-1$
 						.toHexString(rgb.green), 2, '0'), StringUtil.pad(Integer.toHexString(rgb.blue), 2, '0'));
-	}
-
-	/**
-	 * Listen to the portal disposal and do some cleanup.
-	 */
-	private class PortalDisposeListener implements DisposeListener
-	{
-		public void widgetDisposed(DisposeEvent e)
-		{
-			portalBrowser = null;
-		}
-
 	}
 }
