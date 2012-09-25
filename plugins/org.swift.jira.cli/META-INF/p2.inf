@@ -1,5 +1,0 @@
- instructions.install = \
-    chmod(targetDir:@artifact,targetFile:jira.bat,permissions:755);\
-    chmod(targetDir:@artifact,targetFile:jira.sh,permissions:755);
- instructions.install.import= \
-    org.eclipse.equinox.p2.touchpoint.eclipse.chmod

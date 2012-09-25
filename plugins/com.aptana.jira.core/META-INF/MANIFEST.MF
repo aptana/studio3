@@ -6,8 +6,12 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: com.aptana.jira.core.JiraCorePlugin
 Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.eclipse.equinox.security,
- com.aptana.core
+ com.aptana.core,
+ com.aptana.jetty.util.epl,
+ org.apache.commons.httpclient,
+ org.apache.httpcomponents.httpcore
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.jira.core
 Eclipse-ExtensibleAPI: true
+Bundle-ClassPath: .

@@ -17,8 +17,12 @@ public class Messages extends NLS
 	public static String JiraIssueType_Feature;
 	public static String JiraIssueType_Improvement;
 
+	public static String JiraManager_BadCredentialsErrMsg;
+
 	public static String JiraManager_ERR_NoJiraExecutable;
 	public static String JiraManager_ERR_NotLoggedIn;
+
+	public static String JiraManager_UnknownErrMsg;
 
 	public static String JiraIssueSeverity_Blocker;
 	public static String JiraIssueSeverity_Major;

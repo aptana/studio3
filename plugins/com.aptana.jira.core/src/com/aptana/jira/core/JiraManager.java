@@ -8,64 +8,64 @@
 package com.aptana.jira.core;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.text.MessageFormat;
-import java.util.StringTokenizer;
+import java.util.Map;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import org.eclipse.core.runtime.FileLocator;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
+import org.apache.commons.httpclient.auth.AuthScope;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.multipart.FilePart;
+import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
+import org.apache.commons.httpclient.methods.multipart.Part;
+import org.eclipse.core.internal.preferences.Base64;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
-import org.eclipse.equinox.security.storage.StorageException;
 import org.osgi.framework.Version;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
-import com.aptana.core.util.ProcessStatus;
-import com.aptana.core.util.ProcessUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.jetty.util.epl.ajax.JSON;
 
 /**
+ * @author cwilliams
  * @author Michael Xia (mxia@appcelerator.com)
  */
 public class JiraManager
 {
 
-	private static final String LIBRARY_PLUGIN_ID = "org.swift.jira.cli"; //$NON-NLS-1$
-	private static final String JIRA_WIN = "jira.bat"; //$NON-NLS-1$
-	private static final String JIRA_UNIX = "jira.sh"; //$NON-NLS-1$
+	/**
+	 * Authorization header name. Used for Basic Auth over HTTP/S.
+	 */
+	private static final String AUTHORIZATION_HEADER = "Authorization"; //$NON-NLS-1$
 
-	private static final String PARAM_ACTION = "-a"; //$NON-NLS-1$
-	private static final String PARAM_USERNAME = "-u"; //$NON-NLS-1$
-	private static final String PARAM_PASSWORD = "-p"; //$NON-NLS-1$
-	private static final String PARAM_PROJECT = "--project"; //$NON-NLS-1$
-	private static final String PARAM_VERSION = "--affectsVersions"; //$NON-NLS-1$
-	private static final String PARAM_TYPE = "--type"; //$NON-NLS-1$
-	private static final String PARAM_SUMMARY = "--summary"; //$NON-NLS-1$
-	//private static final String PARAM_DESCRIPTION = "--description"; //$NON-NLS-1$
-	private static final String PARAM_ISSUE = "--issue"; //$NON-NLS-1$
-	private static final String PARAM_FILE = "--file"; //$NON-NLS-1$
-	private static final String PARAM_ENVIRONMENT = "--environment"; //$NON-NLS-1$
-	private static final String ACTION_LOGIN = "login"; //$NON-NLS-1$
-	private static final String ACTION_CREATE_ISSUE = "createIssue"; //$NON-NLS-1$
-	private static final String ACTION_ADD_ATTACHMENT = "addAttachment"; //$NON-NLS-1$
+	/**
+	 * User agent header name. Used to identify studio as the "client".
+	 */
+	private static final String USER_AGENT = "User-Agent"; //$NON-NLS-1$
 
+	/**
+	 * Content Type Accept header. Tells JIRA we can accept given content types. We default to JSON.
+	 */
+	private static final String ACCEPT_HEADER = "Accept"; //$NON-NLS-1$
+	private static final String ACCEPT_CONTENT_TYPES = "application/json"; //$NON-NLS-1$
+	private static final String CONTENT_TYPE = "Content-Type"; //$NON-NLS-1$
+
+	/**
+	 * Secure Storage
+	 */
 	private static final String SECURE_PREF_NODE = "com.aptana.jira.core"; //$NON-NLS-1$
 	private static final String USERNAME = "username"; //$NON-NLS-1$
 	private static final String PASSWORD = "password"; //$NON-NLS-1$
-
-	private static final Pattern PATTERN_SUCCESS = Pattern.compile("(.*) created with id (.*). URL: (.*)"); //$NON-NLS-1$
-	private static final String FAILED_REASON_START = "Exception: "; //$NON-NLS-1$
 
 	/**
 	 * Project Keys for Aptana and Titanium
@@ -73,10 +73,22 @@ public class JiraManager
 	static final String APTANA_STUDIO = "APSTUD"; //$NON-NLS-1$
 	static final String TITANIUM_COMMUNITY = "TC"; //$NON-NLS-1$
 
-	private static IPath jiraExecutable;
+	/**
+	 * Ticket field names.
+	 */
+	private static final String PARAM_ENVIRONMENT = "environment"; //$NON-NLS-1$
+	private static final String PARAM_VERSION = "versions"; //$NON-NLS-1$
+
 	// could override using setProjectInfo()
 	private static String projectName = "Aptana Studio"; //$NON-NLS-1$
 	private static String projectKey = APTANA_STUDIO;
+
+	/**
+	 * REST API URLs
+	 */
+	private static final String HOST_NAME = "jira.appcelerator.org"; //$NON-NLS-1$
+	private static final String HOST_URL = "http://" + HOST_NAME; //$NON-NLS-1$
+	private static final String REST_API_ENDPOINT = HOST_URL + "/rest/api/2/"; //$NON-NLS-1$
 
 	private JiraUser user;
 
@@ -104,48 +116,64 @@ public class JiraManager
 	 */
 	public void login(String username, String password) throws JiraException
 	{
-		IPath jiraExecutable = getJiraExecutable();
-		if (jiraExecutable == null)
+		HttpURLConnection connection = null;
+		try
 		{
-			throw new JiraException(Messages.JiraManager_ERR_NoJiraExecutable);
-		}
-		IStatus status = ProcessUtil.runInBackground(jiraExecutable.toOSString(), jiraExecutable.removeLastSegments(1),
-				PARAM_ACTION, ACTION_LOGIN, PARAM_USERNAME, username, PARAM_PASSWORD, password);
-		if (status != null)
-		{
-			String output = StringUtil.EMPTY;
-			if (status instanceof ProcessStatus)
+			connection = createConnection(getUserURL(username), username, password);
+			int code = connection.getResponseCode();
+			if (code == HttpURLConnection.HTTP_OK)
 			{
-				output = ((ProcessStatus) status).getStdErr();
-			}
-			if (StringUtil.isEmpty(output))
-			{
-				output = status.getMessage();
-			}
-			output = output.trim();
-			StringTokenizer tk = new StringTokenizer(output);
-			if (tk.countTokens() == 1)
-			{
-				// a valid token is returned; the login is successful
-				user = new JiraUser(username, password);
-				// save the credentials
+				this.user = new JiraUser(username, password);
 				saveCredentials();
+				return;
 			}
-			else
+
+			if (code == HttpURLConnection.HTTP_UNAUTHORIZED || code == HttpURLConnection.HTTP_FORBIDDEN)
 			{
-				// an error
-				int index = output.lastIndexOf(FAILED_REASON_START);
-				if (index > -1)
-				{
-					String reason = output.substring(index + FAILED_REASON_START.length()).trim();
-					throw new JiraException(reason);
-				}
-				else
-				{
-					throw new JiraException(output);
-				}
+				throw new JiraException(Messages.JiraManager_BadCredentialsErrMsg);
+			}
+			throw new JiraException(Messages.JiraManager_UnknownErrMsg);
+		}
+		catch (Exception e)
+		{
+			throw new JiraException(e.getMessage(), e);
+		}
+		finally
+		{
+			if (connection != null)
+			{
+				connection.disconnect();
 			}
 		}
+	}
+
+	/**
+	 * The URL to get details on a user.
+	 * 
+	 * @param username
+	 * @return
+	 */
+	protected String getUserURL(String username)
+	{
+		return REST_API_ENDPOINT + "user?username=" + username; //$NON-NLS-1$
+	}
+
+	@SuppressWarnings("restriction")
+	protected HttpURLConnection createConnection(String urlString, String username, String password)
+			throws MalformedURLException, IOException
+	{
+		HttpURLConnection connection;
+		URL url = new URL(urlString);
+		connection = (HttpURLConnection) url.openConnection();
+		connection.setRequestProperty(USER_AGENT, getProjectVersion());
+		connection.setRequestProperty(ACCEPT_HEADER, ACCEPT_CONTENT_TYPES);
+		connection.setRequestProperty(CONTENT_TYPE, ACCEPT_CONTENT_TYPES);
+		connection.setUseCaches(false);
+		connection.setAllowUserInteraction(false);
+		String usernamePassword = username + ":" + password; //$NON-NLS-1$
+		connection.setRequestProperty(AUTHORIZATION_HEADER,
+				"Basic " + new String(Base64.encode(usernamePassword.getBytes()))); //$NON-NLS-1$
+		return connection;
 	}
 
 	/**
@@ -191,39 +219,101 @@ public class JiraManager
 		{
 			throw new JiraException(Messages.JiraManager_ERR_NotLoggedIn);
 		}
-		IPath jiraExecutable = getJiraExecutable();
 
-		File desc = File.createTempFile("jira-description", ".txt"); //$NON-NLS-1$ //$NON-NLS-2$
-		desc.deleteOnExit();
-		Charset charset = Charset.forName(IOUtil.UTF_8);
-		OutputStreamWriter w = new OutputStreamWriter(new FileOutputStream(desc), charset);
-		w.write(description);
-		w.close();
-
-		// @formatter:off
-		String output = ProcessUtil.outputForCommand(jiraExecutable.toOSString(), jiraExecutable.removeLastSegments(1),
-				PARAM_ACTION, ACTION_CREATE_ISSUE,
-				PARAM_USERNAME, user.getUsername(),
-				PARAM_PASSWORD, user.getPassword(),
-				PARAM_PROJECT, projectKey,
-				// If we're submitting against TC, we can't do version, we need to stuff that into the Environment
-				(TITANIUM_COMMUNITY.equals(projectKey) ? PARAM_ENVIRONMENT : PARAM_VERSION), getProjectVersion(),
-				PARAM_TYPE, type.getParameterValue(projectKey),
-				PARAM_SUMMARY, summary.replaceAll("\"", "'"),  //$NON-NLS-1$//$NON-NLS-2$
-				PARAM_FILE, desc.getAbsolutePath(),
-				"--custom", severity.getParameterValue() //$NON-NLS-1$
-				);
-		// @formatter:on
-		Matcher m = PATTERN_SUCCESS.matcher(output);
-		if (m.find())
+		HttpURLConnection connection = null;
+		try
 		{
-			String issueName = m.group(1);
-			String issueId = m.group(2);
-			String issueUrl = m.group(3);
-			return new JiraIssue(issueName, issueId, issueUrl);
+			connection = createConnection(getCreateIssueURL(), user.getUsername(), user.getPassword());
+			connection.setRequestMethod("POST"); //$NON-NLS-1$
+			connection.setDoOutput(true);
+			String severityJSON;
+			String versionString;
+			if ((TITANIUM_COMMUNITY.equals(projectKey) && type == JiraIssueType.IMPROVEMENT)
+					|| (!TITANIUM_COMMUNITY.equals(projectKey) && type != JiraIssueType.BUG))
+			{
+				// Improvements in TC don't get Severities, nor do Story or Improvements in Aptana Studio!
+				severityJSON = StringUtil.EMPTY;
+			}
+			else
+			{
+				severityJSON = severity.getParameterValue() + ",\n"; //$NON-NLS-1$
+			}
+
+			// If we're submitting against TC, we can't do version, we need to stuff that into the Environment
+			if (TITANIUM_COMMUNITY.equals(projectKey))
+			{
+				versionString = MessageFormat.format("\"{0}\": \"{1}\"", PARAM_ENVIRONMENT, getProjectVersion()); //$NON-NLS-1$
+			}
+			else
+			{
+				versionString = "\"" + PARAM_VERSION + "\": [{\"name\": \"" + getProjectVersion() + "\"}]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			}
+			// @formatter:off
+			String data = "{\n" + //$NON-NLS-1$
+			"    \"fields\": {\n" + //$NON-NLS-1$
+			"       \"project\":\n" + //$NON-NLS-1$
+			"       { \n" + //$NON-NLS-1$
+			"          \"key\": \"" + projectKey + "\"\n" + //$NON-NLS-1$ //$NON-NLS-2$
+			"       },\n" + //$NON-NLS-1$
+			"       \"summary\": \"" + summary.replaceAll("\"", "'") + "\",\n" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			"       \"description\": \"" + description.replaceAll("\"", "'").replaceAll("\n", Matcher.quoteReplacement("\\n")) + "\",\n" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+			"       \"issuetype\": {\n" + //$NON-NLS-1$
+			"          \"name\": \"" + type.getParameterValue(projectKey) + "\"\n" + //$NON-NLS-1$ //$NON-NLS-2$
+			"       },\n" + //$NON-NLS-1$
+			severityJSON +
+			"       " + versionString + "\n" + //$NON-NLS-1$ //$NON-NLS-2$
+			"   }\n" + //$NON-NLS-1$
+			"}"; //$NON-NLS-1$
+			// @formatter:on
+
+			OutputStream out = connection.getOutputStream();
+			IOUtil.write(out, data);
+			out.close();
+
+			int responseCode = connection.getResponseCode();
+			if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_CREATED)
+			{
+				String output = IOUtil.read(connection.getInputStream());
+				return createIssueFromJSON(output);
+			}
+			// failed to create the ticket
+			// TODO Parse the response as JSON!
+			throw new JiraException(IOUtil.read(connection.getErrorStream()));
 		}
-		// failed to create the ticket
-		throw new JiraException(output);
+		catch (JiraException je)
+		{
+			throw je;
+		}
+		catch (Exception e)
+		{
+			throw new JiraException(e.getMessage(), e);
+		}
+		finally
+		{
+			if (connection != null)
+			{
+				connection.disconnect();
+			}
+		}
+	}
+
+	/**
+	 * @param output
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	protected JiraIssue createIssueFromJSON(String output)
+	{
+		Map<String, Object> map = (Map<String, Object>) JSON.parse(output);
+		String issueKey = (String) map.get("key"); //$NON-NLS-1$
+		String issueId = (String) map.get("id"); //$NON-NLS-1$
+		String issueUrl = HOST_URL + "/browse/" + issueKey; //$NON-NLS-1$
+		return new JiraIssue(issueKey, issueId, issueUrl);
+	}
+
+	protected String getCreateIssueURL()
+	{
+		return REST_API_ENDPOINT + "issue"; //$NON-NLS-1$
 	}
 
 	/**
@@ -245,15 +335,55 @@ public class JiraManager
 		{
 			throw new JiraException(Messages.JiraManager_ERR_NotLoggedIn);
 		}
-		IPath jiraExecutable = getJiraExecutable();
 
-		String output = ProcessUtil.outputForCommand(jiraExecutable.toOSString(), jiraExecutable.removeLastSegments(1),
-				PARAM_ACTION, ACTION_ADD_ATTACHMENT, PARAM_USERNAME, user.getUsername(), PARAM_PASSWORD,
-				user.getPassword(), PARAM_ISSUE, issue.getId(), PARAM_FILE, path.toOSString());
-		if (!StringUtil.isEmpty(output) && output.indexOf("added to") < 0) //$NON-NLS-1$
+		// Use Apache HTTPClient to POST the file
+		HttpClient httpclient = new HttpClient();
+		UsernamePasswordCredentials creds = new UsernamePasswordCredentials(user.getUsername(), user.getPassword());
+		httpclient.getState().setCredentials(new AuthScope(HOST_NAME, 80), creds);
+		httpclient.getParams().setAuthenticationPreemptive(true);
+		PostMethod filePost = null;
+		try
 		{
-			throw new JiraException(output);
+			filePost = new PostMethod(createAttachmentURL(issue));
+			File file = path.toFile();
+			// MUST USE "file" AS THE NAME!!!
+			Part[] parts = { new FilePart("file", file) }; //$NON-NLS-1$
+			filePost.setRequestEntity(new MultipartRequestEntity(parts, filePost.getParams()));
+			filePost.setContentChunked(true);
+			filePost.setDoAuthentication(true);
+			// Special header to tell JIRA not to do XSFR checking
+			filePost.setRequestHeader("X-Atlassian-Token", "nocheck"); //$NON-NLS-1$ //$NON-NLS-2$
+
+			int responseCode = httpclient.executeMethod(filePost);
+			if (responseCode != HttpURLConnection.HTTP_OK && responseCode != HttpURLConnection.HTTP_CREATED)
+			{
+				// TODO This is a JSON response that we should parse out "errorMessages" value(s) (its an array of
+				// strings).
+				throw new JiraException(filePost.getResponseBodyAsString());
+			}
+			String json = filePost.getResponseBodyAsString();
+			IdeLog.logInfo(JiraCorePlugin.getDefault(), json);
 		}
+		catch (JiraException e)
+		{
+			throw e;
+		}
+		catch (Exception e)
+		{
+			throw new JiraException(e.getMessage(), e);
+		}
+		finally
+		{
+			if (filePost != null)
+			{
+				filePost.releaseConnection();
+			}
+		}
+	}
+
+	protected String createAttachmentURL(JiraIssue issue)
+	{
+		return REST_API_ENDPOINT + "issue/" + issue.getName() + "/attachments"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
@@ -288,7 +418,7 @@ public class JiraManager
 				user = new JiraUser(username, password);
 			}
 		}
-		catch (StorageException e)
+		catch (Exception e)
 		{
 			IdeLog.logError(JiraCorePlugin.getDefault(), "Failed to load Jira user credentials", e); //$NON-NLS-1$
 		}
@@ -309,38 +439,7 @@ public class JiraManager
 		}
 	}
 
-	private static IPath getJiraExecutable()
-	{
-		if (jiraExecutable == null)
-		{
-			IPath path;
-			try
-			{
-				if (Platform.OS_WIN32.equals(Platform.getOS()))
-				{
-					path = Path.fromOSString(JIRA_WIN);
-				}
-				else
-				{
-					path = Path.fromOSString(JIRA_UNIX);
-				}
-				URL url = FileLocator.find(Platform.getBundle(LIBRARY_PLUGIN_ID), path, null);
-				if (url != null)
-				{
-					url = FileLocator.toFileURL(url);
-					jiraExecutable = Path.fromOSString(url.getFile());
-				}
-			}
-			catch (Exception e)
-			{
-				IdeLog.logError(JiraCorePlugin.getDefault(),
-						MessageFormat.format("Failed to find plugin {0}", LIBRARY_PLUGIN_ID), e); //$NON-NLS-1$
-			}
-		}
-		return jiraExecutable;
-	}
-
-	private static String getProjectVersion()
+	private String getProjectVersion()
 	{
 		String versionStr = EclipseUtil.getStudioVersion();
 		// we don't need the qualifier
@@ -349,7 +448,7 @@ public class JiraManager
 				version.getMicro());
 	}
 
-	private static ISecurePreferences getSecurePreferences()
+	protected ISecurePreferences getSecurePreferences()
 	{
 		return SecurePreferencesFactory.getDefault().node(SECURE_PREF_NODE);
 	}

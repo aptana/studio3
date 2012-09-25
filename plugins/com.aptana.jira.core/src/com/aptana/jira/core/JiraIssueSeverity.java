@@ -35,6 +35,6 @@ public enum JiraIssueSeverity
 
 	public String getParameterValue()
 	{
-		return "customfield_10090:" + parameterValue; //$NON-NLS-1$
+		return "\"customfield_10090\": { \"value\": \"" + parameterValue + "\" }"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }
