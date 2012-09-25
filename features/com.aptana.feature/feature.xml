@@ -702,12 +702,6 @@
          unpack="false"/>
 
    <plugin
-         id="org.swift.jira.cli"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
          id="com.aptana.jetty.util.epl"
          download-size="0"
          install-size="0"
