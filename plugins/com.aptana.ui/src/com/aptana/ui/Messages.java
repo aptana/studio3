@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -14,6 +14,7 @@ public class Messages extends NLS
 
 	private static final String BUNDLE_NAME = "com.aptana.ui.messages"; //$NON-NLS-1$
 
+	public static String DialogUtils_doNotShowMessageAgain;
 	public static String DialogUtils_HideMessage;
 
 	public static String IDialogConstants_LBL_Apply;

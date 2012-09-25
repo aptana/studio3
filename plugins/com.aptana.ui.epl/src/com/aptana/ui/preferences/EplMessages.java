@@ -17,6 +17,9 @@ public class EplMessages extends NLS
 	public static String GenericRootPage_noAvailablePages;
 	public static String GenericRootPage_preferences;
 
+	public static String GenericRootPreferencePage_resetMessagesButtonLabel;
+	public static String GenericRootPreferencePage_resetMessagesLabelText;
+
 	public static String PropertyAndPreferencePage_configureProjectSettings;
 	public static String PropertyAndPreferencePage_configureWorkspaceSettings;
 	public static String PropertyAndPreferencePage_enableProjectSpecific;
