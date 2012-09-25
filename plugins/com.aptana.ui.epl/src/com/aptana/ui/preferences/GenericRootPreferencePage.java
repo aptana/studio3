@@ -128,19 +128,26 @@ public abstract class GenericRootPreferencePage extends PreferencePage implement
 				link.setLayoutData(gd);
 			}
 		}
-		// Add the reset messages button.
-		Composite resetComposite = new Composite(composite, SWT.NONE);
-		resetComposite.setLayout(GridLayoutFactory.fillDefaults().numColumns(2).create());
-		final Button resetBt = new Button(resetComposite, SWT.PUSH);
-		resetBt.setText(EplMessages.GenericRootPreferencePage_resetMessagesButtonLabel);
-		Label resetLabel = new Label(resetComposite, SWT.WRAP);
-		resetLabel.setLayoutData(GridDataFactory.fillDefaults().hint(300, SWT.DEFAULT).create());
-		resetLabel.setText(EplMessages.GenericRootPreferencePage_resetMessagesLabelText);
+
+		Group dialogsResetGroup = new Group(composite, SWT.NONE);
+		dialogsResetGroup.setLayout(GridLayoutFactory.fillDefaults().numColumns(2).create());
+		dialogsResetGroup.setLayoutData(GridDataFactory.fillDefaults()
+				.hint(SWT.DEFAULT, convertVerticalDLUsToPixels(20)).create());
+		dialogsResetGroup.setText(EplMessages.GenericRootPreferencePage_dialogsGroup);
+
+		Label label = new Label(dialogsResetGroup, SWT.WRAP);
+		label.setText(EplMessages.GenericRootPreferencePage_clearMessagesLabelText);
+		label.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).align(SWT.FILL, SWT.CENTER)
+				.hint(convertVerticalDLUsToPixels(50), SWT.DEFAULT).create());
+
+		final Button clearBt = new Button(dialogsResetGroup, SWT.PUSH);
+		clearBt.setText(EplMessages.GenericRootPreferencePage_clearMessagesButtonLabel);
+		clearBt.setLayoutData(new GridData(GridData.FILL, GridData.BEGINNING, false, false));
 		// enable the 'reset' button only if there are dialogs to reset.
 		final IEclipsePreferences prefs = (EclipseUtil.defaultScope()).getNode(UIEplPlugin.PLUGIN_ID);
 		String messages = prefs.get(IEplPreferenceConstants.HIDDEN_MESSAGES, null);
-		resetBt.setEnabled(!StringUtil.isEmpty(messages));
-		resetBt.addSelectionListener(new SelectionAdapter()
+		clearBt.setEnabled(!StringUtil.isEmpty(messages));
+		clearBt.addSelectionListener(new SelectionAdapter()
 		{
 			public void widgetSelected(SelectionEvent e)
 			{
@@ -148,7 +155,7 @@ public abstract class GenericRootPreferencePage extends PreferencePage implement
 				{
 					prefs.remove(IEplPreferenceConstants.HIDDEN_MESSAGES);
 					prefs.flush();
-					resetBt.setEnabled(false);
+					clearBt.setEnabled(false);
 				}
 				catch (Exception ex)
 				{
