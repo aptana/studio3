@@ -130,9 +130,9 @@ public abstract class GenericRootPreferencePage extends PreferencePage implement
 		}
 
 		Group dialogsResetGroup = new Group(composite, SWT.NONE);
-		dialogsResetGroup.setLayout(GridLayoutFactory.fillDefaults().numColumns(2).create());
+		dialogsResetGroup.setLayout(GridLayoutFactory.swtDefaults().numColumns(2).create());
 		dialogsResetGroup.setLayoutData(GridDataFactory.fillDefaults()
-				.hint(SWT.DEFAULT, convertVerticalDLUsToPixels(20)).create());
+				.create());
 		dialogsResetGroup.setText(EplMessages.GenericRootPreferencePage_dialogsGroup);
 
 		Label label = new Label(dialogsResetGroup, SWT.WRAP);
