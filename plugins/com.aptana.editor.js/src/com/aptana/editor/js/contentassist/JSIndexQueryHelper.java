@@ -41,12 +41,14 @@ public class JSIndexQueryHelper
 	 */
 	public static Index getIndex()
 	{
-		return getIndexManager().getIndex(URI.create(IJSIndexConstants.METADATA_INDEX_LOCATION));
+		IndexManager manager = getIndexManager();
+		return manager == null ? null : manager.getIndex(URI.create(IJSIndexConstants.METADATA_INDEX_LOCATION));
 	}
 
 	protected static IndexManager getIndexManager()
 	{
-		return IndexPlugin.getDefault().getIndexManager();
+		IndexPlugin plugin = IndexPlugin.getDefault();
+		return plugin == null ? null : plugin.getIndexManager();
 	}
 
 	private JSIndexReader _reader;
