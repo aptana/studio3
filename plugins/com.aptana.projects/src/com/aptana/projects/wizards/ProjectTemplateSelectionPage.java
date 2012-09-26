@@ -225,8 +225,8 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 		// the left side is the list of template tags
 		Composite templateTags = new Composite(main, SWT.BORDER);
 		templateTags.setLayout(GridLayoutFactory.swtDefaults().create());
-		// If there's only the "All" tag, don't both showing the left column.
-		boolean exclude = templateTagsMap.size() <= 1;
+		// If there are only the "All" tag and one other tag, don't both showing the left column.
+		boolean exclude = templateTagsMap.size() <= 2;
 		templateTags.setLayoutData(GridDataFactory.fillDefaults().grab(false, true).hint(150, SWT.DEFAULT)
 				.exclude(exclude).create());
 		templateTags.setBackground(background);
