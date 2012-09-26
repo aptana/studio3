@@ -50,6 +50,9 @@ import com.aptana.theme.ThemePlugin;
 
 public abstract class AbstractFormatterPreferencePage extends AbstractConfigurationBlockPropertyAndPreferencePage
 {
+
+	public static final String ID = "com.aptana.formatter.common"; //$NON-NLS-1$
+
 	private static final Job[] NO_BUILD_JOBS = new Job[0];
 
 	protected class FormatterSelectionBlock extends AbstractFormatterSelectionBlock
@@ -216,7 +219,7 @@ public abstract class AbstractFormatterPreferencePage extends AbstractConfigurat
 
 	protected String getPreferencePageId()
 	{
-		return null;
+		return ID;
 	}
 
 	protected String getProjectHelpId()
@@ -228,5 +231,4 @@ public abstract class AbstractFormatterPreferencePage extends AbstractConfigurat
 	{
 		return null;
 	}
-
 }
