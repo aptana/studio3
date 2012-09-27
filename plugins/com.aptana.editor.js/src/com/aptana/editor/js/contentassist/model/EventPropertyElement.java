@@ -11,11 +11,10 @@ import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
 
-import com.aptana.jetty.util.epl.ajax.JSON.Output;
-
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.ui.views.IPropertyInformation;
+import com.aptana.jetty.util.epl.ajax.JSON.Output;
 
 /**
  * EventProperty
@@ -36,6 +35,13 @@ public class EventPropertyElement extends BaseElement<EventPropertyElement.Prope
 			public Object getPropertyValue(EventPropertyElement node)
 			{
 				return node.getType();
+			}
+		},
+		DEPRECATED(Messages.TypeElement_Deprecated)
+		{
+			public Object getPropertyValue(EventPropertyElement node)
+			{
+				return node.isDeprecated();
 			}
 		};
 
@@ -64,8 +70,11 @@ public class EventPropertyElement extends BaseElement<EventPropertyElement.Prope
 	}
 
 	private static final String TYPE_PROPERTY = "type"; //$NON-NLS-1$
+	private static final String DEPRECATED_PROPERTY = "deprecated"; //$NON-NLS-1$
 
 	private String _type;
+
+	private boolean _deprecated;
 
 	/**
 	 * EventProperty
@@ -85,6 +94,7 @@ public class EventPropertyElement extends BaseElement<EventPropertyElement.Prope
 		super.fromJSON(object);
 
 		this.setType(StringUtil.getStringValue(object.get(TYPE_PROPERTY)));
+		this.setIsDeprecated(Boolean.TRUE == object.get(DEPRECATED_PROPERTY)); // $codepro.audit.disable useEquals
 	}
 
 	/*
@@ -114,6 +124,26 @@ public class EventPropertyElement extends BaseElement<EventPropertyElement.Prope
 		this._type = type;
 	}
 
+	/**
+	 * isDeprecated
+	 * 
+	 * @return
+	 */
+	public boolean isDeprecated()
+	{
+		return this._deprecated;
+	}
+
+	/**
+	 * setIsDeprecated
+	 * 
+	 * @param value
+	 */
+	public void setIsDeprecated(boolean value)
+	{
+		this._deprecated = value;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.contentassist.model.BaseElement#toJSON(com.aptana.jetty.util.epl.ajax.JSON.Output)
@@ -124,6 +154,7 @@ public class EventPropertyElement extends BaseElement<EventPropertyElement.Prope
 		super.toJSON(out);
 
 		out.add(TYPE_PROPERTY, this.getType());
+		out.add(DEPRECATED_PROPERTY, this.isDeprecated());
 	}
 
 	/**

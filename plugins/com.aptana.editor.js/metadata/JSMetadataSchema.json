@@ -193,6 +193,12 @@
 					"optional": true
 				},
 				{
+					"name": "deprecated",
+					"type": "Boolean",
+					"description": "A flag indicating if this property has been deprecated",
+					"optional": true
+				},
+				{
 					"name": "userAgents",
 					"type": "Array<UserAgent>",
 					"description": "A list of user agents where this property is defined",
@@ -248,6 +254,12 @@
 					"name": "description",
 					"type": "String",
 					"description": "A description of the property",
+					"optional": true
+				},
+				{
+					"name": "deprecated",
+					"type": "Boolean",
+					"description": "A flag indicating if this function has been deprecated",
 					"optional": true
 				},
 				{
@@ -340,6 +352,12 @@
 					"optional": true
 				},
 				{
+					"name": "deprecated",
+					"type": "Boolean",
+					"description": "A flag indicating if this event has been deprecated",
+					"optional": true
+				},
+				{
 					"name": "properties",
 					"type": "Array<EventProperty>",
 					"description": "A list of properties describing this event",
@@ -360,6 +378,12 @@
 					"name": "description",
 					"type": "String",
 					"description": "A description of the event property",
+					"optional": true
+				},
+				{
+					"name": "deprecated",
+					"type": "Boolean",
+					"description": "A flag indicating if this event property has been deprecated",
 					"optional": true
 				},
 				{

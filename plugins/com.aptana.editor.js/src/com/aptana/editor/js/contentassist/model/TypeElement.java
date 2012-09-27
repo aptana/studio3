@@ -11,7 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.aptana.core.IFilter;
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.ObjectUtil;
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.IndexUtil;
@@ -317,6 +319,17 @@ public class TypeElement extends BaseElement<TypeElement.Property>
 	public List<EventElement> getEvents()
 	{
 		return CollectionsUtil.getListValue(this._events);
+	}
+
+	public EventElement getEvent(final String eventName)
+	{
+		return CollectionsUtil.find(getEvents(), new IFilter<EventElement>()
+		{
+			public boolean include(EventElement item)
+			{
+				return item != null && ObjectUtil.areEqual(eventName, item.getName());
+			}
+		});
 	}
 
 	/**
