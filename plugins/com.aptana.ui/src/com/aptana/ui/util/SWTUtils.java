@@ -347,4 +347,24 @@ public class SWTUtils
 		label.setForeground(isValid ? null : errorColor);
 		label.setFont(isValid ? null : errorFont);
 	}
+
+	/**
+	 * Sets the visibility of a control. Includes setting of the include property of the layoutData (if available)
+	 * 
+	 * @param visible
+	 */
+	public static void setVisiblity(Control control, boolean visible)
+	{
+		if (control == null)
+		{
+			return;
+		}
+
+		control.setVisible(visible);
+		Object layoutData = control.getLayoutData();
+		if (layoutData instanceof GridData)
+		{
+			((GridData) layoutData).exclude = !visible;
+		}
+	}
 }

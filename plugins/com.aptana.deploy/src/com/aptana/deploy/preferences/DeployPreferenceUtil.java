@@ -112,9 +112,9 @@ public class DeployPreferenceUtil
 				id = mapTypeToId(getDeployType(container.getProject()));
 			}
 		}
-		catch (CoreException e)
+		catch (Exception e)
 		{
-			IdeLog.logError(DeployPlugin.getDefault(), e);
+			IdeLog.logWarning(DeployPlugin.getDefault(), e);
 		}
 		return id;
 	}
