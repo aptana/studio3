@@ -144,7 +144,7 @@ public abstract class GenericRootPreferencePage extends PreferencePage implement
 		clearBt.setText(EplMessages.GenericRootPreferencePage_clearMessagesButtonLabel);
 		clearBt.setLayoutData(new GridData(GridData.FILL, GridData.BEGINNING, false, false));
 		// enable the 'reset' button only if there are dialogs to reset.
-		final IEclipsePreferences prefs = (EclipseUtil.defaultScope()).getNode(UIEplPlugin.PLUGIN_ID);
+		final IEclipsePreferences prefs = (EclipseUtil.instanceScope()).getNode(UIEplPlugin.PLUGIN_ID);
 		String messages = prefs.get(IEplPreferenceConstants.HIDDEN_MESSAGES, null);
 		clearBt.setEnabled(!StringUtil.isEmpty(messages));
 		clearBt.addSelectionListener(new SelectionAdapter()

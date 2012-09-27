@@ -103,7 +103,7 @@ public final class DialogUtils
 	 */
 	public static int openIgnoreMessageDialogInformation(Shell shell, String title, String message, String dialogKey)
 	{
-		final IEclipsePreferences prefs = (EclipseUtil.defaultScope()).getNode(UIEplPlugin.PLUGIN_ID);
+		final IEclipsePreferences prefs = (EclipseUtil.instanceScope()).getNode(UIEplPlugin.PLUGIN_ID);
 		String[] keys = prefs.get(IEplPreferenceConstants.HIDDEN_MESSAGES, StringUtil.EMPTY).split(","); //$NON-NLS-1$
 		Set<String> keysSet = CollectionsUtil.newSet(keys);
 		if (keysSet.contains(dialogKey))
