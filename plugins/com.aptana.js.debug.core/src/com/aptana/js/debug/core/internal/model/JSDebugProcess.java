@@ -213,7 +213,7 @@ public final class JSDebugProcess extends PlatformObject implements IProcess {
 		if (target != null) {
 			return target.isTerminated();
 		}
-		return false;
+		return processTerminated;
 	}
 
 	/*
@@ -295,7 +295,10 @@ public final class JSDebugProcess extends PlatformObject implements IProcess {
 	}
 
 	private void terminateProcess() throws DebugException {
-		if (process != null && !processTerminated && killProcessOnTerminate) {
+		if (process == null) {
+			processTerminated = true;
+		}
+		else if (!processTerminated && killProcessOnTerminate) {
 			process.destroy();
 			for (int attempts = 0; attempts < MAX_WAIT_FOR_DEATH_ATTEMPTS; ++attempts) {
 				try {
