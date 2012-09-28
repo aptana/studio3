@@ -33,6 +33,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.internal.browser.BrowserViewer;
 import org.eclipse.ui.internal.browser.WebBrowserEditorInput;
 import org.eclipse.ui.part.EditorPart;
 
@@ -114,35 +115,41 @@ public abstract class AbstractPortalBrowserEditor extends EditorPart
 
 			// Add a listener for new browser windows. If new ones are opened, close it and open in an external
 			// browser
-			if (!Platform.OS_WIN32.equals(Platform.getOS()))
+			browserControl.addOpenWindowListener(new OpenWindowListener()
 			{
-				browserControl.addOpenWindowListener(new OpenWindowListener()
+				public void open(WindowEvent event)
 				{
-					public void open(WindowEvent event)
+					Browser newBrowser = event.browser;
+					final BrowserViewer browserContainer = new BrowserViewer(browserControl.getShell(), browserControl
+							.getStyle());
+					event.browser = browserContainer.getBrowser();
+
+					// Close the new browser window that was opened by previous listener
+					newBrowser.getShell().close();
+					event.required = true; // avoid opening new windows.
+
+	
+					if (newBrowser != browserControl)
 					{
-						final Browser newBrowser = event.browser;
-						if (newBrowser != browserControl)
+						LocationAdapter locationAdapter = new LocationAdapter()
 						{
-							newBrowser.addLocationListener(new LocationAdapter()
+
+							public void changing(LocationEvent event)
 							{
-
-								public void changing(LocationEvent event)
+								final String url = event.location;
+								if (!StringUtil.isEmpty(url))
 								{
-									String url = event.location;
-									if (!StringUtil.isEmpty(url))
-									{
-										// Close the browser that was opened
-										newBrowser.getShell().close();
-
-										// Open in browser
-										WorkbenchBrowserUtil.openURL(url);
-									}
+									WorkbenchBrowserUtil.openURL(url);
 								}
-							});
-						}
+								// The location change listener has to be removed as it might
+								// be triggered again when we open new browser editor tab.
+								browserContainer.getBrowser().removeLocationListener(this);
+							}
+						};
+						browserContainer.getBrowser().addLocationListener(locationAdapter);
 					}
-				});
-			}
+				}
+			});
 
 			browser.setJavascriptEnabled(true);
 
