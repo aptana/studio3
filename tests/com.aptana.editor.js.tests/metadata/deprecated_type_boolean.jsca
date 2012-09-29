@@ -1,0 +1,18 @@
+{
+	"types": [
+		{
+			"name": "Titanium.DEPRECATED",
+			"deprecated": true,
+			"properties": [
+				{
+					"name": "Property", 
+                    "isInternal": false, 
+                    "isInstanceProperty": false,
+                    "type": "Number", 
+                    "isClassProperty": true, 
+                    "description": "<p>Used with <a href=\"Titanium.XML.Node.nodeType\">nodeType</a> to identify an\n<a href=\"Titanium.XML.Attr\">Attr</a> node.<br />\n</p>"
+				}
+			]
+		}
+	]
+}

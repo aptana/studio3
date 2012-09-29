@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the Eclipse Public License (EPL).
  * Please see the license-epl.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -13,6 +13,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceNode;
 import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.preference.PreferencePage;
@@ -22,6 +25,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
@@ -31,6 +35,11 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
+
+import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.StringUtil;
+import com.aptana.ui.epl.UIEplPlugin;
 
 /**
  * The generic root preferences page is designed to create simple preferences links that represents all the pages that
@@ -57,7 +66,7 @@ public abstract class GenericRootPreferencePage extends PreferencePage implement
 	/**
 	 * Creates the links.
 	 */
-	@SuppressWarnings( { "unchecked" })
+	@SuppressWarnings({ "unchecked" })
 	protected Control createContents(Composite parent)
 	{
 		// pageNameToId = null
@@ -119,6 +128,42 @@ public abstract class GenericRootPreferencePage extends PreferencePage implement
 				link.setLayoutData(gd);
 			}
 		}
+
+		Group dialogsResetGroup = new Group(composite, SWT.NONE);
+		dialogsResetGroup.setLayout(GridLayoutFactory.swtDefaults().numColumns(2).create());
+		dialogsResetGroup.setLayoutData(GridDataFactory.fillDefaults()
+				.create());
+		dialogsResetGroup.setText(EplMessages.GenericRootPreferencePage_dialogsGroup);
+
+		Label label = new Label(dialogsResetGroup, SWT.WRAP);
+		label.setText(EplMessages.GenericRootPreferencePage_clearMessagesLabelText);
+		label.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).align(SWT.FILL, SWT.CENTER)
+				.hint(convertVerticalDLUsToPixels(50), SWT.DEFAULT).create());
+
+		final Button clearBt = new Button(dialogsResetGroup, SWT.PUSH);
+		clearBt.setText(EplMessages.GenericRootPreferencePage_clearMessagesButtonLabel);
+		clearBt.setLayoutData(new GridData(GridData.FILL, GridData.BEGINNING, false, false));
+		// enable the 'reset' button only if there are dialogs to reset.
+		final IEclipsePreferences prefs = (EclipseUtil.instanceScope()).getNode(UIEplPlugin.PLUGIN_ID);
+		String messages = prefs.get(IEplPreferenceConstants.HIDDEN_MESSAGES, null);
+		clearBt.setEnabled(!StringUtil.isEmpty(messages));
+		clearBt.addSelectionListener(new SelectionAdapter()
+		{
+			public void widgetSelected(SelectionEvent e)
+			{
+				try
+				{
+					prefs.remove(IEplPreferenceConstants.HIDDEN_MESSAGES);
+					prefs.flush();
+					clearBt.setEnabled(false);
+				}
+				catch (Exception ex)
+				{
+					IdeLog.logError(UIEplPlugin.getDefault(), ex);
+				}
+			}
+		});
+
 		Point point = composite.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
 		gd = new GridData();
 		composite.setLayoutData(gd);

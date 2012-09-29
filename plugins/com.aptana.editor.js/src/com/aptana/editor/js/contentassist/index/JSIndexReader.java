@@ -137,6 +137,13 @@ public class JSIndexReader extends IndexReader
 		}
 		column++;
 
+		// deprecated
+		if (column < columns.length)
+		{
+			result.setIsDeprecated(columns[column].equals("1")); //$NON-NLS-1$
+		}
+		column++;
+
 		// documents
 		for (String document : type.getDocuments())
 		{

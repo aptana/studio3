@@ -16,9 +16,9 @@ public enum JiraIssueType
 {
 
 	// @formatter:off
-	BUG(Messages.JiraIssueType_Bug, "bug"),
-	FEATURE(Messages.JiraIssueType_Feature, JiraManager.APTANA_STUDIO, "story", JiraManager.TITANIUM_COMMUNITY, "New Feature"),
-	IMPROVEMENT(Messages.JiraIssueType_Improvement, "improvement");
+	BUG(Messages.JiraIssueType_Bug, "Bug"),
+	FEATURE(Messages.JiraIssueType_Feature, JiraManager.APTANA_STUDIO, "Story", JiraManager.TITANIUM_COMMUNITY, "New Feature"),
+	IMPROVEMENT(Messages.JiraIssueType_Improvement, "Improvement");
 	// @formatter:on
 
 	private String displayName;

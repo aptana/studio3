@@ -23,7 +23,6 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferencePageContainer;
@@ -48,6 +47,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -210,8 +210,6 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 
 	public ValidationPreferencePage()
 	{
-		super();
-
 		List<IBuildParticipant> participants = getBuildParticipantManager().getAllBuildParticipants();
 		// TODO Filter out all the participants that are required and have no name
 		participants = CollectionsUtil.filter(participants, new IFilter<IBuildParticipant>()
@@ -369,18 +367,27 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 
 	private Control createValidators(Composite parent)
 	{
-		Group group = new Group(parent, SWT.NONE);
-		group.setText(Messages.ValidationPreferencePage_LBL_Validators);
+		Composite main = new Composite(parent, SWT.NONE);
+		main.setLayout(GridLayoutFactory.fillDefaults().spacing(0, 0).create());
+
+		Composite labelComp = new Composite(main, SWT.NONE);
+		labelComp.setLayout(GridLayoutFactory.fillDefaults().extendedMargins(5, 0, 0, 0).numColumns(2)
+				.spacing(2, SWT.DEFAULT).create());
+		labelComp.setLayoutData(GridDataFactory.swtDefaults().grab(true, false).create());
+		Label label = new Label(labelComp, SWT.NONE);
+		label.setText(Messages.ValidationPreferencePage_LBL_Validators);
+		Label helpImage = new Label(labelComp, SWT.NONE);
+		helpImage.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_LCL_LINKTO_HELP));
+		helpImage.setToolTipText(Messages.ValidationPreferencePage_EnablingValidatorWarning);
+
+		Group group = new Group(main, SWT.NONE);
 		group.setLayout(GridLayoutFactory.swtDefaults().margins(4, 4).create());
+		group.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
 
 		Table table = new Table(group, SWT.SINGLE | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
-		table.setLayoutData(GridDataFactory.fillDefaults().hint(300, 70).grab(true, false).create());
+		table.setLayoutData(GridDataFactory.fillDefaults().hint(300, 100).grab(true, false).create());
 		table.setLinesVisible(true);
 		table.setHeaderVisible(true);
-
-		ControlDecoration decoration = new ControlDecoration(group, SWT.TOP | SWT.CENTER);
-		decoration.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_LCL_LINKTO_HELP));
-		decoration.setDescriptionText(Messages.ValidationPreferencePage_EnablingValidatorWarning);
 
 		// set up columns
 		// Name column
@@ -430,7 +437,7 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 		// Now set input
 		validatorsViewer.setInput(this.participants);
 
-		return group;
+		return main;
 	}
 
 	private IBuildParticipantWorkingCopy getSelectedBuildParticipant()

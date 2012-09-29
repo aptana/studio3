@@ -791,4 +791,20 @@ public class StringUtil
 		int i = string.indexOf('.');
 		return (i != -1 ? string.substring(0, i) : string);
 	}
+
+	/**
+	 * Strips leading and trailing single/double quotes from a string. Assumes there is a trailing quote if there is
+	 * aleading quote.
+	 * 
+	 * @param text
+	 * @return
+	 */
+	public static String stripQuotes(String text)
+	{
+		if (text.length() >= 2 && (text.charAt(0) == '\'' || text.charAt(0) == '"'))
+		{
+			return text.substring(1, text.length() - 1);
+		}
+		return text;
+	}
 }

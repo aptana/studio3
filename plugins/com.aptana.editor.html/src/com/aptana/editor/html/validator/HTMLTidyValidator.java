@@ -816,6 +816,10 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 			int doctypeIndex = source.indexOf("<!DOCTYPE"); //$NON-NLS-1$
 			if (doctypeIndex == -1)
 			{
+				doctypeIndex = source.indexOf("<!doctype"); //$NON-NLS-1$
+			}
+			if (doctypeIndex == -1)
+			{
 				return CollectionsUtil.newList(createProblem(ProblemType.MissingDoctype,
 						Messages.HTMLTidyValidator_MissingDoctype, 0, 0));
 			}

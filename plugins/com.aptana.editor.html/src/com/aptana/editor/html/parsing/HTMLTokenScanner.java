@@ -39,7 +39,9 @@ public class HTMLTokenScanner extends RuleBasedScanner
 		rules.add(new PartitionerSwitchingIgnoreRule(new MultiLineRule(
 				"<!--", "-->", createToken(getTokenName(HTMLTokens.COMMENT)), (char) 0, true))); //$NON-NLS-1$ //$NON-NLS-2$
 		// DOCTYPE
-		rules.add(new MultiLineRule("<!DOCTYPE ", ">", createToken(getTokenName(HTMLTokens.DOCTYPE)))); //$NON-NLS-1$ //$NON-NLS-2$
+		IToken token = createToken(getTokenName(HTMLTokens.DOCTYPE));
+		rules.add(new MultiLineRule("<!DOCTYPE ", ">", token)); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new MultiLineRule("<!doctype ", ">", token)); //$NON-NLS-1$ //$NON-NLS-2$
 		// CDATA
 		rules.add(new MultiLineRule("<![CDATA[", "]]>", createToken(getTokenName(HTMLTokens.CDATA)))); //$NON-NLS-1$ //$NON-NLS-2$
 		// script
@@ -55,7 +57,7 @@ public class HTMLTokenScanner extends RuleBasedScanner
 		rules.add(generalTagRule = new HTMLParserTagRule(createToken(getTokenName(HTMLTokens.START_TAG))));
 
 		// text
-		IToken token = createToken(getTokenName(HTMLTokens.TEXT));
+		token = createToken(getTokenName(HTMLTokens.TEXT));
 		rules.add(new WordRule(new WordDetector(), token));
 
 		setRules(rules.toArray(new IRule[rules.size()]));

@@ -24,6 +24,7 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.index.IJSIndexConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexReader;
+import com.aptana.editor.js.contentassist.model.EventElement;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
@@ -41,12 +42,14 @@ public class JSIndexQueryHelper
 	 */
 	public static Index getIndex()
 	{
-		return getIndexManager().getIndex(URI.create(IJSIndexConstants.METADATA_INDEX_LOCATION));
+		IndexManager manager = getIndexManager();
+		return manager == null ? null : manager.getIndex(URI.create(IJSIndexConstants.METADATA_INDEX_LOCATION));
 	}
 
 	protected static IndexManager getIndexManager()
 	{
-		return IndexPlugin.getDefault().getIndexManager();
+		IndexPlugin plugin = IndexPlugin.getDefault();
+		return plugin == null ? null : plugin.getIndexManager();
 	}
 
 	private JSIndexReader _reader;
@@ -79,7 +82,7 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	protected List<FunctionElement> getFunctions(Index index, String typeName, String methodName)
+	public List<FunctionElement> getFunctions(Index index, String typeName, String methodName)
 	{
 		return this._reader.getFunctions(index, typeName, methodName);
 	}
@@ -507,5 +510,10 @@ public class JSIndexQueryHelper
 		}
 
 		return result;
+	}
+
+	public List<EventElement> getEvents(Index index, String owningType, String eventName)
+	{
+		return this._reader.getEvents(index, owningType, eventName);
 	}
 }

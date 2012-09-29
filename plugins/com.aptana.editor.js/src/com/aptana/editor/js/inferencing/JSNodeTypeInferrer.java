@@ -64,7 +64,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	private JSIndexQueryHelper _queryHelper;
 
 	/**
-	 * JSTypeWalker
+	 * JSNodeTypeInferrer
 	 * 
 	 * @param scope
 	 * @param projectIndex
@@ -72,10 +72,21 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	 */
 	public JSNodeTypeInferrer(JSScope scope, Index projectIndex, URI location)
 	{
+		this(scope, projectIndex, location, new JSIndexQueryHelper());
+	}
+
+	/**
+	 * @param scope
+	 * @param projectIndex
+	 * @param location
+	 * @param queryHelper
+	 */
+	public JSNodeTypeInferrer(JSScope scope, Index projectIndex, URI location, JSIndexQueryHelper queryHelper)
+	{
 		this._scope = scope;
 		this._index = projectIndex;
 		this._location = location;
-		this._queryHelper = new JSIndexQueryHelper();
+		this._queryHelper = queryHelper;
 	}
 
 	/**
@@ -255,7 +266,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		if (node instanceof JSNode)
 		{
 			// create new nested walker
-			JSNodeTypeInferrer walker = new JSNodeTypeInferrer(scope, this._index, this._location);
+			JSNodeTypeInferrer walker = new JSNodeTypeInferrer(scope, this._index, this._location, this._queryHelper);
 
 			// collect types
 			walker.visit((JSNode) node);

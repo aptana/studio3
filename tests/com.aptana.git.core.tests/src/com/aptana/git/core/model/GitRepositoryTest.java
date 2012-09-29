@@ -23,6 +23,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.osgi.framework.Version;
 
 import com.aptana.core.util.IOUtil;
 
@@ -192,8 +193,17 @@ public class GitRepositoryTest extends GitTestCase
 		List<GitCommit> commits = list.getCommits();
 		assertEquals("commit list size", 1, commits.size());
 		GitCommit commit = commits.get(0);
-		assertEquals("subject", "Subject of the commit.", commit.getSubject());
-		assertEquals("comment", commitMessage, commit.getComment());
+
+		Version v = GitExecutable.instance().version();
+		if (v.compareTo(Version.parseVersion("1.7.3")) < 0)
+		{
+			assertEquals("subject", commitMessage, commit.getSubject());
+		}
+		else
+		{
+			assertEquals("subject", "Subject of the commit.", commit.getSubject());
+			assertEquals("comment", commitMessage, commit.getComment());
+		}
 	}
 
 	public void testDeleteFile() throws Throwable
