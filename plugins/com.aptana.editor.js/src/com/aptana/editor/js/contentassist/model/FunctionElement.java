@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -8,16 +8,18 @@
 package com.aptana.editor.js.contentassist.model;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.aptana.jetty.util.epl.ajax.JSON.Output;
-
+import com.aptana.core.IMap;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSTypeConstants;
+import com.aptana.editor.js.inferencing.JSTypeUtil;
 import com.aptana.index.core.IndexUtil;
+import com.aptana.jetty.util.epl.ajax.JSON.Output;
 
 public class FunctionElement extends PropertyElement
 {
@@ -195,14 +197,13 @@ public class FunctionElement extends PropertyElement
 	 */
 	public List<String> getExceptionTypes()
 	{
-		List<String> result = new ArrayList<String>();
-
-		for (ExceptionElement exception : this.getExceptions())
+		return CollectionsUtil.map(getExceptions(), new IMap<ExceptionElement, String>()
 		{
-			result.add(exception.getType());
-		}
-
-		return result;
+			public String map(ExceptionElement exception)
+			{
+				return exception.getType();
+			}
+		});
 	}
 
 	/**
@@ -212,14 +213,13 @@ public class FunctionElement extends PropertyElement
 	 */
 	public List<String> getParameterNames()
 	{
-		List<String> result = new ArrayList<String>();
-
-		for (ParameterElement parameter : this.getParameters())
+		return CollectionsUtil.map(getParameters(), new IMap<ParameterElement, String>()
 		{
-			result.add(parameter.getName());
-		}
-
-		return result;
+			public String map(ParameterElement parameter)
+			{
+				return parameter.getName();
+			}
+		});
 	}
 
 	/**
@@ -239,14 +239,13 @@ public class FunctionElement extends PropertyElement
 	 */
 	public List<String> getParameterTypes()
 	{
-		List<String> result = new ArrayList<String>();
-
-		for (ParameterElement parameter : this.getParameters())
+		return CollectionsUtil.map(getParameters(), new IMap<ParameterElement, String>()
 		{
-			result.add(StringUtil.join(JSTypeConstants.PARAMETER_TYPE_DELIMITER, parameter.getTypes()));
-		}
-
-		return result;
+			public String map(ParameterElement parameter)
+			{
+				return StringUtil.join(JSTypeConstants.PARAMETER_TYPE_DELIMITER, parameter.getTypes());
+			}
+		});
 	}
 
 	/**
@@ -266,14 +265,13 @@ public class FunctionElement extends PropertyElement
 	 */
 	public List<String> getReturnTypeNames()
 	{
-		List<String> result = new ArrayList<String>();
-
-		for (ReturnTypeElement type : this.getReturnTypes())
+		return CollectionsUtil.map(getReturnTypes(), new IMap<ReturnTypeElement, String>()
 		{
-			result.add(type.getType());
-		}
-
-		return result;
+			public String map(ReturnTypeElement type)
+			{
+				return type.getType();
+			}
+		});
 	}
 
 	/**
@@ -287,46 +285,13 @@ public class FunctionElement extends PropertyElement
 	}
 
 	/**
-	 * getSignature
-	 * 
-	 * @return
-	 */
-	public String getSignature()
-	{
-		StringBuilder buffer = new StringBuilder();
-		boolean first = true;
-
-		// include actual type in custom notation, if not a function
-		List<String> types = this.getTypeNames();
-
-		if (types != null && types.size() > 0)
-		{
-			buffer.append(StringUtil.join(JSTypeConstants.RETURN_TYPE_DELIMITER, types));
-		}
-		else
-		{
-			buffer.append(JSTypeConstants.FUNCTION_TYPE);
-		}
-
-		// include return types
-		for (ReturnTypeElement returnType : this.getReturnTypes())
-		{
-			buffer.append(first ? JSTypeConstants.FUNCTION_SIGNATURE_DELIMITER : JSTypeConstants.RETURN_TYPE_DELIMITER);
-			buffer.append(returnType.getType());
-			first = false;
-		}
-
-		return buffer.toString();
-	}
-
-	/**
 	 * hasExceptions
 	 * 
 	 * @return
 	 */
 	public boolean hasExceptions()
 	{
-		return this._exceptions != null && !this._exceptions.isEmpty();
+		return !CollectionsUtil.isEmpty(_exceptions);
 	}
 
 	/**
@@ -336,7 +301,7 @@ public class FunctionElement extends PropertyElement
 	 */
 	public boolean hasParameters()
 	{
-		return this._parameters != null && !this._parameters.isEmpty();
+		return !CollectionsUtil.isEmpty(_parameters);
 	}
 
 	/**
@@ -435,7 +400,7 @@ public class FunctionElement extends PropertyElement
 
 		printer.print(JSTypeConstants.FUNCTION_SIGNATURE_DELIMITER);
 
-		if (returnTypes != null && !returnTypes.isEmpty())
+		if (!CollectionsUtil.isEmpty(returnTypes))
 		{
 			printer.print(StringUtil.join(JSTypeConstants.RETURN_TYPE_DELIMITER, returnTypes));
 		}
@@ -456,5 +421,36 @@ public class FunctionElement extends PropertyElement
 		SourcePrinter printer = new SourcePrinter();
 		toSource(printer);
 		return printer.toString();
+	}
+
+	/**
+	 * Returns the type names, with "Function" always included. Function may include <ReturnType1,ReturnType2...>
+	 * appended. FIXME Can we just use this to replace the getTypeNames method from PropertyElement?
+	 * 
+	 * @return
+	 */
+	public List<String> getSignatureTypes()
+	{
+		List<String> types = new ArrayList<String>(getTypeNames());
+		// Remove "Function" because we're going to rebuild using return types
+		Iterator<String> iter = types.iterator();
+		while (iter.hasNext())
+		{
+			if (iter.next().startsWith(JSTypeConstants.FUNCTION_TYPE))
+			{
+				iter.remove();
+				break;
+			}
+		}
+		// Build the Function type with return types
+		types.add(JSTypeUtil.toFunctionType(getReturnTypeNames()));
+		return types;
+	}
+
+	@Override
+	public List<String> getTypeNames()
+	{
+		// TODO Replace with getSignatureTypes impl?
+		return super.getTypeNames();
 	}
 }

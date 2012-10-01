@@ -16,7 +16,7 @@ public class DocumentationTests extends InferencingTestsBase
 	 */
 	public void testFunctionReturnType()
 	{
-		this.lastStatementTypeTests(Path.fromPortableString("inferencing/return-type-documentation.js"), "Function:Number");
+		this.lastStatementTypeTests(Path.fromPortableString("inferencing/return-type-documentation.js"), "Function<Number>");
 	}
 	
 	/**
@@ -24,7 +24,7 @@ public class DocumentationTests extends InferencingTestsBase
 	 */
 	public void testFunctionReturnTypes()
 	{		
-		this.lastStatementTypeTests(Path.fromPortableString("inferencing/return-types-documentation.js"), "Function:Number,RegExp");
+		this.lastStatementTypeTests(Path.fromPortableString("inferencing/return-types-documentation.js"), "Function<Number,RegExp>");
 	}
 	
 	/**

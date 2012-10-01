@@ -23,7 +23,6 @@ import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.inferencing.JSNodeTypeInferrer;
 import com.aptana.editor.js.inferencing.JSScope;
 import com.aptana.editor.js.inferencing.JSTypeMapper;
-import com.aptana.editor.js.inferencing.JSTypeUtil;
 import com.aptana.editor.js.parsing.JSFlexLexemeProvider;
 import com.aptana.editor.js.parsing.JSFlexScanner;
 import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
@@ -446,9 +445,7 @@ public class ParseUtil
 				if (lhs instanceof JSNode)
 				{
 					JSNodeTypeInferrer typeWalker = new JSNodeTypeInferrer(localScope, projectIndex, fileURI);
-
 					typeWalker.visit((JSNode) lhs);
-
 					typeList = typeWalker.getTypes();
 				}
 
@@ -462,19 +459,12 @@ public class ParseUtil
 					type = JSTypeMapper.getInstance().getMappedType(type);
 
 					// FIXME: (hopefully temporary) hack to fixup static properties on $ and jQuery
-					if ("Function:jQuery".equals(type) && lhs instanceof JSIdentifierNode && ("$".equals(lhs.getText()) || "jQuery".equals(lhs.getText()))) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					if (JSTypeConstants.FUNCTION_JQUERY.equals(type)
+							&& lhs instanceof JSIdentifierNode
+							&& (JSTypeConstants.DOLLAR.equals(lhs.getText()) || JSTypeConstants.JQUERY.equals(lhs
+									.getText())))
 					{
-						result.add("Class<jQuery>"); //$NON-NLS-1$
-					}
-					else if (JSTypeUtil.isFunctionPrefix(type))
-					{
-						String functionType = JSTypeUtil.getFunctionSignatureType(type);
-
-						result.add(functionType);
-					}
-					else if (type.startsWith(JSTypeConstants.GENERIC_ARRAY_OPEN))
-					{
-						result.add(JSTypeConstants.ARRAY_TYPE);
+						result.add(JSTypeConstants.CLASS_JQUERY);
 					}
 					else
 					{

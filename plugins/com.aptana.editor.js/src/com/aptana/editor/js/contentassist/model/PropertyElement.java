@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.aptana.core.IMap;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.ObjectUtil;
 import com.aptana.core.util.SourcePrinter;
@@ -307,14 +308,13 @@ public class PropertyElement extends BaseElement<PropertyElement.Property>
 	 */
 	public List<String> getTypeNames()
 	{
-		List<String> result = new ArrayList<String>();
-
-		for (ReturnTypeElement type : this.getTypes())
+		return CollectionsUtil.map(getTypes(), new IMap<ReturnTypeElement, String>()
 		{
-			result.add(type.getType());
-		}
-
-		return result;
+			public String map(ReturnTypeElement item)
+			{
+				return item.getType();
+			}
+		});
 	}
 
 	/**

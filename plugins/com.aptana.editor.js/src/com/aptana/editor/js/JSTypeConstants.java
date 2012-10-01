@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -9,6 +9,8 @@ package com.aptana.editor.js;
 
 import java.text.MessageFormat;
 import java.util.regex.Pattern;
+
+import com.aptana.editor.js.inferencing.JSTypeUtil;
 
 public class JSTypeConstants
 {
@@ -23,6 +25,14 @@ public class JSTypeConstants
 	public static final String STRING_TYPE = "String"; //$NON-NLS-1$
 	public static final String WINDOW_TYPE = "Window"; //$NON-NLS-1$
 	public static final String USER_TYPE = "UserType"; //$NON-NLS-1$
+
+	/**
+	 * jQuery specific constants.
+	 */
+	public static final String JQUERY = "jQuery"; //$NON-NLS-1$
+	public static final String FUNCTION_JQUERY = JSTypeUtil.toFunctionType(JQUERY);
+	public static final String CLASS_JQUERY = JSTypeUtil.toClassType(JQUERY);
+	public static final String DOLLAR = "$"; //$NON-NLS-1$
 
 	public static final String NO_TYPE = "none"; //$NON-NLS-1$
 	public static final String UNDEFINED_TYPE = "undefined"; //$NON-NLS-1$
