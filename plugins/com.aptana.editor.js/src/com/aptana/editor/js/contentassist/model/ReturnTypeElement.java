@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -9,25 +9,15 @@ package com.aptana.editor.js.contentassist.model;
 
 import java.text.MessageFormat;
 import java.util.Map;
-import java.util.regex.Pattern;
 
-import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ObjectUtil;
 import com.aptana.core.util.StringUtil;
-import com.aptana.editor.js.JSPlugin;
-import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.inferencing.JSTypeUtil;
 import com.aptana.jetty.util.epl.ajax.JSON.Convertible;
 import com.aptana.jetty.util.epl.ajax.JSON.Output;
 
 public class ReturnTypeElement implements Convertible
 {
-	/**
-	 * try to do some validation on type name, because somehow we're getting very whacked-out type names in our index
-	 * strings for some users. See https://jira.appcelerator.org/browse/APSTUD-7366
-	 */
-	private static final Pattern TYPE_NAME_PATTERN = Pattern.compile("[\\$a-zA-Z\\-_]+[\\.\\w\\$\\-/<>]*"); //$NON-NLS-1$
-
 	private static final String DESCRIPTION_PROPERTY = "description"; //$NON-NLS-1$
 	private static final String TYPE_PROPERTY = "type"; //$NON-NLS-1$
 
@@ -130,40 +120,7 @@ public class ReturnTypeElement implements Convertible
 	 */
 	public void setType(String type)
 	{
-		this._type = validateTypeName(type);
-	}
-
-	String validateTypeName(String type)
-	{
-		if (StringUtil.isEmpty(type))
-		{
-			IdeLog.logError(JSPlugin.getDefault(), new IllegalArgumentException(
-					"Null or Empty type name attempting to be recorded for a return type.")); //$NON-NLS-1$
-			return StringUtil.EMPTY;
-		}
-
-		if (!TYPE_NAME_PATTERN.matcher(type).matches())
-		{
-			// Look for Array types in "bad" format
-			if (type.endsWith(JSTypeConstants.ARRAY_LITERAL))
-			{
-				// convert to Array<Type>
-				return validateTypeName(JSTypeUtil.createGenericArrayType(JSTypeUtil.getArrayElementType(type)));
-			}
-
-			IdeLog.logError(
-					JSPlugin.getDefault(),
-					new IllegalArgumentException(MessageFormat.format(
-							"Bad type name being set, something is going haywire: ''{0}''", type))); //$NON-NLS-1$
-
-			int index = type.indexOf(',');
-			if (index != -1)
-			{
-				return type.substring(0, index);
-			}
-			return StringUtil.EMPTY;
-		}
-		return type;
+		this._type = JSTypeUtil.validateTypeName(type);
 	}
 
 	/*

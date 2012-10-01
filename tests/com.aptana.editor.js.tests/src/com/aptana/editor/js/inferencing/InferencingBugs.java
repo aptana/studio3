@@ -9,9 +9,14 @@ package com.aptana.editor.js.inferencing;
 
 import java.util.List;
 
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.Path;
+
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexReader;
 import com.aptana.editor.js.contentassist.index.JSIndexWriter;
+import com.aptana.editor.js.contentassist.model.FunctionElement;
+import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
 
 /**
@@ -32,5 +37,32 @@ public class InferencingBugs extends InferencingTestsBase
 
 		// NOTE: The bug caused an exception in JSIndexReader#getType, so we wouldn't even get here
 		assertNotNull(type2);
+	}
+
+	public void testOverloadedVarTypesWithFunction()
+	{
+		IFileStore store = getFileStore(Path.fromPortableString("inferencing/shCore.js"));
+		String source = getContent(store);
+
+		JSScope globals = getGlobals(source);
+		JSScope scope = globals.getScopeAtOffset(1125);
+
+		JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(scope, getIndex(), getLocation());
+		PropertyElement property = symbolInferrer.getSymbolPropertyElement("m");
+		FunctionElement function = (FunctionElement) property;
+
+		// When we had the bad type names being generated, we returned:
+		// [Function, Array, Object, Boolean, String, Number]
+		List<String> typeNames = property.getTypeNames();
+		assertTrue(typeNames.contains("Function"));
+
+		// Bad behavior would return:
+		// [Number, Function, Object, String, RegExp, Array, Window, Boolean, Array<Function, Boolean>, ]
+
+		// This is what we return now, but I'm not sure it's right...
+		List<String> returnTypeNames = function.getReturnTypeNames();
+		assertTrue(returnTypeNames.contains("Number"));
+		assertTrue(returnTypeNames.contains("Function<Object,Number>"));
+		assertTrue(returnTypeNames.contains("Object"));
 	}
 }

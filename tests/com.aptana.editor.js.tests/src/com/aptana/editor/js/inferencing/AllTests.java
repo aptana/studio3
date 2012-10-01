@@ -21,6 +21,7 @@ public class AllTests
 		suite.addTestSuite(DynamicTypeInferencingTests.class);
 		suite.addTestSuite(FunctionInferencingTests.class);
 		suite.addTestSuite(InferencingBugs.class);
+		suite.addTestSuite(JSTypeUtilTest.class);
 		suite.addTestSuite(ObjectInferencingTests.class);
 		suite.addTestSuite(OperatorInferencingTests.class);
 		suite.addTestSuite(PrimitiveInferencingTests.class);

@@ -56,6 +56,7 @@ import com.aptana.core.projects.templates.ProjectTemplate;
 import com.aptana.core.projects.templates.TemplateType;
 import com.aptana.core.util.ProcessStatus;
 import com.aptana.core.util.ResourceUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.ui.CloneJob;
 import com.aptana.projects.ProjectsPlugin;
@@ -371,6 +372,18 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 	{
 		Map<String, String> payload = new HashMap<String, String>();
 		payload.put("name", newProject.getName()); //$NON-NLS-1$
+		if (selectedTemplate != null)
+		{
+			String id = selectedTemplate.getId();
+			if (StringUtil.isEmpty(id))
+			{
+				payload.put("template", "custom.template-" + selectedTemplate.getDisplayName()); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			else
+			{
+				payload.put("template", id); //$NON-NLS-1$
+			}
+		}
 		return payload;
 	}
 

@@ -1,15 +1,17 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.ide.ui.io;
 
+import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 
 import com.aptana.core.io.efs.EFSUtils;
@@ -29,7 +31,14 @@ public class Utils
 			IResource resource = (IResource) ((IAdaptable) adaptable).getAdapter(IResource.class);
 			if (resource != null)
 			{
-				return EFSUtils.getFileStore(resource);
+				try
+				{
+					return EFS.getStore(resource.getLocationURI());
+				}
+				catch (CoreException e)
+				{
+					return EFSUtils.getFileStore(resource);
+				}
 			}
 		}
 		return FileSystemUtils.getFileStore(adaptable);

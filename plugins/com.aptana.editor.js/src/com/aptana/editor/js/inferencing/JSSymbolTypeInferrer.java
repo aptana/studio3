@@ -442,10 +442,10 @@ public class JSSymbolTypeInferrer
 
 				String propertyType = subType.getName();
 
-				if (!returnTypes.isEmpty())
+				// FIXME What if propertyType is already Function<Something> here?!
+				if (!JSTypeUtil.isFunctionPrefix(propertyType) && !returnTypes.isEmpty())
 				{
-					propertyType += JSTypeConstants.FUNCTION_SIGNATURE_DELIMITER
-							+ StringUtil.join(JSTypeConstants.RETURN_TYPE_DELIMITER, returnTypes);
+					propertyType += JSTypeUtil.toFunctionType(returnTypes);
 				}
 
 				// reset list to contain only this newly generated type
@@ -514,7 +514,7 @@ public class JSSymbolTypeInferrer
 					}
 					else
 					{
-						types.add(f.getSignature());
+						types.addAll(f.getSignatureTypes());
 					}
 				}
 				else
@@ -523,10 +523,7 @@ public class JSSymbolTypeInferrer
 
 					JSTypeUtil.applyDocumentation(p, value, docs);
 
-					for (ReturnTypeElement typeElement : p.getTypes())
-					{
-						types.add(typeElement.getType());
-					}
+					types.addAll(p.getTypeNames());
 				}
 			}
 			else
