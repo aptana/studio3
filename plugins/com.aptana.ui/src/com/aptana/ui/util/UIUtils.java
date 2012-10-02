@@ -57,6 +57,7 @@ import org.eclipse.ui.services.IEvaluationService;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.ui.UIPlugin;
+import com.aptana.ui.dialogs.GenericInfoPopupDialog;
 
 /**
  * @author Max Stepanov
@@ -394,6 +395,13 @@ public final class UIUtils
 
 			public int openMessageDialog()
 			{
+				if (kind == MessageDialog.INFORMATION)
+				{
+					// for info messages, we show the toast popup
+					GenericInfoPopupDialog dialog = new GenericInfoPopupDialog(UIUtils.getActiveWorkbenchWindow()
+							.getShell(), title, message);
+					return dialog.open();
+				}
 				return MessageDialog.open(kind, UIUtils.getActiveWorkbenchWindow().getShell(), title, message, SWT.NONE) ? Window.OK
 						: Window.CANCEL;
 			}
