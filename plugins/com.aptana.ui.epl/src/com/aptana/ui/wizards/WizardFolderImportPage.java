@@ -89,7 +89,10 @@ import org.eclipse.ui.wizards.datatransfer.IImportStructureProvider;
 import org.eclipse.ui.wizards.datatransfer.ImportOperation;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ResourceUtil;
+import com.aptana.core.util.StringUtil;
+import com.aptana.ui.epl.UIEplPlugin;
 import com.aptana.ui.properties.NaturesLabelProvider;
 
 /**
@@ -364,7 +367,46 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 				setErrorMessage(EplMessages.WizardFolderImportPage_ERR_ProjectNameExists);
 				return false;
 			}
+
+			// Set a warning message if the imported project already contain certain project natures.
+			IPath path = Path.fromOSString(directoryPathField.getText());
+			IPath dotProjectPath = path.append(IProjectDescription.DESCRIPTION_FILE_NAME);
+
+			IProjectDescription description = null;
+			if (dotProjectPath.toFile().exists())
+			{
+				try
+				{
+					description = IDEWorkbenchPlugin.getPluginWorkspace().loadProjectDescription(dotProjectPath);
+					if (description != null && description.getNatureIds().length > 0)
+					{
+						String delimiter = StringUtil.EMPTY; //$NON-NLS-1$
+						StringBuilder natures = new StringBuilder();
+						for (String natureId : description.getNatureIds())
+						{
+							String nature = fLabelProvider.getText(natureId);
+							if (StringUtil.isEmpty(nature))
+							{
+								nature = natureId;
+							}
+							natures.append(delimiter).append(nature);
+							delimiter = ", "; //$NON-NLS-1$
+						}
+						// set the natures checked in the nature table as they are the most relevant ones.
+						fTableViewer.setCheckedElements(description.getNatureIds());
+						setMessage(EplMessages.WizardFolderImportPage_override_project_nature + natures.toString(),
+								WARNING);
+						setErrorMessage(null);
+						return true;
+					}
+				}
+				catch (CoreException e)
+				{
+					IdeLog.logWarning(UIEplPlugin.getDefault(), "Error reading project description for " + name, e); //$NON-NLS-1$
+				}
+			}
 		}
+		setMessage(null);
 		setErrorMessage(null);
 		return true;
 	}
