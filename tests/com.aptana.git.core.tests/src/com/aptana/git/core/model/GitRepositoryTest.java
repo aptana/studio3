@@ -197,7 +197,7 @@ public class GitRepositoryTest extends GitTestCase
 		Version v = GitExecutable.instance().version();
 		if (v.compareTo(Version.parseVersion("1.7.3")) < 0)
 		{
-			assertEquals("subject", commitMessage, commit.getSubject());
+			assertEquals("subject", "Subject of the commit.   - Did something   - did something else", commit.getSubject());
 		}
 		else
 		{
