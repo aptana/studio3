@@ -180,6 +180,25 @@ public class SWTUtils
 	}
 
 	/**
+	 * Returns a version of the specified FontData, resized by the requested size.
+	 * 
+	 * @param fontData
+	 *            the font-data to resize
+	 * @param size
+	 *            the font size
+	 * @return resized font data
+	 */
+	public static FontData[] resizeFont(FontData[] fontData, int size)
+	{
+		for (FontData data : fontData)
+		{
+			data.setHeight(data.getHeight() + size);
+		}
+
+		return fontData;
+	}
+
+	/**
 	 * Bolds a font.
 	 * 
 	 * @param font
