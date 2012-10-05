@@ -479,7 +479,7 @@ public class JSTypeUtil
 				return validateTypeName(JSTypeUtil.createGenericArrayType(JSTypeUtil.getArrayElementType(type)));
 			}
 
-			IdeLog.logError(
+			IdeLog.logWarning(
 					JSPlugin.getDefault(),
 					new IllegalArgumentException(MessageFormat.format(
 							"Bad type name being set, something is going haywire: ''{0}''", type))); //$NON-NLS-1$
