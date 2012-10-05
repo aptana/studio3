@@ -58,4 +58,14 @@ public class ProcessStatus extends Status
 		return this.stdout;
 	}
 
+	/**
+	 * Returns an {@link IStatus} with the message holding the output of stderr.
+	 * 
+	 * @return
+	 */
+	public IStatus getStdErrStatus()
+	{
+		return new Status(getSeverity(), getPlugin(), getCode(), getStdErr(), null);
+	}
+
 }

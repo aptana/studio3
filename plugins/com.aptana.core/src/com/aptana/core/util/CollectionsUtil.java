@@ -708,4 +708,28 @@ public class CollectionsUtil
 
 		return map;
 	}
+
+	/**
+	 * See http://ruby-doc.org/core-1.9.3/Enumerable.html#method-i-inject This is a method that operates over a
+	 * collection, executing the block for each element and carrying along a "collector". This allows us to build up an
+	 * object by operating on each element of a collection. Typically this would be used to generate sums of values, or
+	 * concatenate a string, or run math operations.
+	 * 
+	 * @param collection
+	 * @param collector
+	 * @param block
+	 * @return
+	 */
+	public static <K, V> K inject(Collection<V> collection, K collector, IInjectBlock<V, K> block)
+	{
+		if (isEmpty(collection))
+		{
+			return collector;
+		}
+		for (V item : collection)
+		{
+			collector = block.execute(collector, item);
+		}
+		return collector;
+	}
 }
