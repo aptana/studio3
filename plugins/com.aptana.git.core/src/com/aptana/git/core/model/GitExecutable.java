@@ -7,11 +7,9 @@
  */
 package com.aptana.git.core.model;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,9 +37,8 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.ExecutableUtil;
-import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.PlatformUtil;
-import com.aptana.core.util.ProcessStatus;
+import com.aptana.core.util.ProcessRunnable;
 import com.aptana.core.util.ProcessUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.git.core.GitPlugin;
@@ -160,7 +157,7 @@ public class GitExecutable
 					GitPlugin.getDefault(),
 					MessageFormat
 							.format("You entered a custom git path in the Preferences pane, but this path is not a valid git v{0} or higher binary. We're going to use the default search paths instead", //$NON-NLS-1$
-							MIN_GIT_VERSION), IDebugScopes.DEBUG);
+									MIN_GIT_VERSION), IDebugScopes.DEBUG);
 		}
 		return null;
 	}
@@ -549,89 +546,39 @@ public class GitExecutable
 	 * 
 	 * @author cwilliams
 	 */
-	static class CloneRunnable implements Runnable
+	static class CloneRunnable extends ProcessRunnable
 	{
-		private Process p;
-		private IProgressMonitor monitor;
-		private IStatus status;
+
+		private int lastPercent;
 
 		CloneRunnable(Process p, IProgressMonitor monitor)
 		{
-			this.p = p;
-			this.monitor = convertMonitor(monitor);
-			this.status = Status.OK_STATUS;
+			super(p, monitor);
 		}
 
-		protected IProgressMonitor convertMonitor(IProgressMonitor monitor)
+		@Override
+		protected void handleLine(String line)
 		{
-			return SubMonitor.convert(monitor, 100);
-		}
+			super.handleLine(line);
 
-		public IStatus getResult()
-		{
-			return status;
+			// Read in the line and see if we can sniff progress
+			Matcher m = CLONE_PERCENT_PATTERN.matcher(line);
+			if (m.find())
+			{
+				String percent = m.group(1);
+				int percentInt = Integer.parseInt(percent);
+				if (percentInt > lastPercent)
+				{
+					monitor.worked(percentInt - lastPercent);
+					lastPercent = percentInt;
+				}
+			}
 		}
 
 		public void run()
 		{
-			// Only sniff for "receiving objects", which is the meat of the operation
-			BufferedReader br = null;
-			int lastPercent = 0;
-			try
-			{
-				StringBuilder builder = new StringBuilder();
-				br = new BufferedReader(new InputStreamReader(p.getErrorStream(), IOUtil.UTF_8));
-				String line = null;
-				while ((line = br.readLine()) != null) // $codepro.audit.disable assignmentInCondition
-				{
-					if (monitor.isCanceled())
-					{
-						p.destroy();
-						this.status = Status.CANCEL_STATUS;
-						return;
-					}
-					monitor.subTask(line);
-					builder.append(line).append('\n');
-					// Else, read in the line and see if we can sniff progress
-					Matcher m = CLONE_PERCENT_PATTERN.matcher(line);
-					if (m.find())
-					{
-						String percent = m.group(1);
-						int percentInt = Integer.parseInt(percent);
-						if (percentInt > lastPercent)
-						{
-							monitor.worked(percentInt - lastPercent);
-							lastPercent = percentInt;
-						}
-					}
-				}
-
-				String stdout = IOUtil.read(p.getInputStream(), IOUtil.UTF_8);
-				if (builder.length() > 0)
-				{
-					builder.deleteCharAt(builder.length() - 1);
-				}
-				this.status = new ProcessStatus(p.waitFor(), stdout, builder.toString());
-			}
-			catch (Exception e)
-			{
-				IdeLog.logError(GitPlugin.getDefault(), e, IDebugScopes.DEBUG);
-				this.status = new Status(IStatus.ERROR, GitPlugin.getPluginId(), e.getMessage(), e);
-			}
-			finally
-			{
-				if (br != null)
-				{
-					try
-					{
-						br.close();
-					}
-					catch (Exception e)
-					{
-					}
-				}
-				monitor.done();
-			}
+			lastPercent = 0;
+			super.run();
 		}
 	}
 }
