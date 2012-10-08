@@ -17,6 +17,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.core.ILaunch;
 
 import com.aptana.debug.core.util.DebugUtil;
 import com.aptana.js.debug.core.internal.ProtocolLogger;
@@ -28,10 +29,10 @@ import com.aptana.js.debug.core.internal.model.DebugConnection;
  */
 public class V8DebugConnection extends DebugConnection {
 
-	public static DebugConnection createConnection(V8DebugHost debugHost, ProtocolLogger logger) throws CoreException {
+	public static DebugConnection createConnection(V8DebugHost debugHost, ProtocolLogger logger, ILaunch launch) throws CoreException {
 		try {
 			ServerSocket listenSocket = DebugUtil.allocateServerSocket(0);
-			debugHost.start(listenSocket.getLocalSocketAddress());
+			debugHost.start(listenSocket.getLocalSocketAddress(), launch);
 			Socket socket = listenSocket.accept();
 			if (socket != null) {
 				socket.setSoTimeout(V8DebugHost.SOCKET_TIMEOUT);
