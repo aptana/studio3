@@ -241,7 +241,7 @@ public abstract class AbstractPortalBrowserEditor extends EditorPart
 		}
 		else if (Platform.ARCH_X86_64.equals(Platform.getOSArch()))
 		{
-			return Platform.OS_LINUX.equals(Platform.getOS());
+			return false;//Platform.OS_LINUX.equals(Platform.getOS());
 		}
 		return false;
 	}
