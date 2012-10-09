@@ -53,8 +53,6 @@ public class UIPlugin extends AbstractUIPlugin
 
 	private boolean hasMainWindowActivated = false;
 
-	private boolean hasMainWindowActivated = false;
-
 	private final IWindowListener windowListener = new IWindowListener()
 	{
 
