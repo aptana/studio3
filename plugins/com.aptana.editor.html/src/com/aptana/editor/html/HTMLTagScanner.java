@@ -27,7 +27,7 @@ import com.aptana.editor.common.text.rules.ExtendedWordRule;
 import com.aptana.editor.common.text.rules.MultiCharacterRule;
 import com.aptana.editor.common.text.rules.QueuedRuleBasedScanner;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
-import com.aptana.editor.css.CSSCodeScanner;
+import com.aptana.editor.css.CSSCodeScannerFlex;
 import com.aptana.editor.html.internal.text.rules.AttributeNameWordDetector;
 import com.aptana.editor.html.internal.text.rules.BrokenStringRule;
 import com.aptana.editor.html.internal.text.rules.TagNameWordDetector;
@@ -71,7 +71,7 @@ public class HTMLTagScanner extends QueuedRuleBasedScanner
 	private final IToken attributeScriptToken = createToken(HTMLTokenType.ATTR_SCRIPT);
 	private final IToken equalToken = createToken(HTMLTokenType.EQUAL);
 
-	private ITokenScanner cssTokenScanner = new CSSCodeScanner();
+	private ITokenScanner cssTokenScanner = new CSSCodeScannerFlex();
 	private ITokenScanner jsTokenScanner = new JSCodeScanner();
 
 	private Stack<IToken> tokenHistory = new Stack<IToken>();

@@ -154,10 +154,36 @@ public class AnalyticsInfoManager
 			if (analytics.overridesId != null && analyticsMap.containsKey(analytics.overridesId))
 			{
 				// replaces the overridden analytics info
-				analyticsMap.put(analytics.overridesId, analytics);
+				String override = findOverride(analytics.overridesId, analyticsMap);
+
+				if (override != null)
+				{
+					analyticsMap.put(override, analytics);
+				}
 			}
 		}
 		fAnalyticsMap = new HashMap<String, AnalyticsInfoManager.Analytics>(analyticsMap);
+	}
+
+	private static String findOverride(String analyticsId, Map<String, Analytics> analyticsMap)
+	{
+		Map<String, Analytics> tempMap = new HashMap<String, AnalyticsInfoManager.Analytics>(analyticsMap);
+		if (analyticsId != null && analyticsMap.containsKey(analyticsId))
+		{
+			Analytics analytics = tempMap.remove(analyticsId);
+			if (analytics != null)
+			{
+				if (analytics.overridesId != null)
+				{
+					String tempOverride = findOverride(analytics.overridesId, tempMap);
+					analyticsId = tempOverride != null ? tempOverride : analytics.overridesId;
+				}
+
+				return analyticsId;
+			}
+		}
+
+		return null;
 	}
 
 	private static class Analytics

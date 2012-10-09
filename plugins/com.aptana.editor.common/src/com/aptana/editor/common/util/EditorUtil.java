@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -13,6 +13,8 @@ import java.net.URI;
 import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IStorage;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
@@ -23,9 +25,12 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IPathEditorInput;
+import org.eclipse.ui.IStorageEditorInput;
 import org.eclipse.ui.IURIEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.editors.text.ILocationProvider;
+import org.eclipse.ui.editors.text.ILocationProviderExtension;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
@@ -231,6 +236,36 @@ public class EditorUtil
 			{
 				IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
 				return fileEditorInput.getFile().getLocationURI();
+			}
+			try
+			{
+				if (editorInput instanceof IStorageEditorInput)
+				{
+					IStorageEditorInput storageEditorInput = (IStorageEditorInput) editorInput;
+					IStorage storage = storageEditorInput.getStorage();
+					if (storage != null)
+					{
+						IPath path = storage.getFullPath();
+						if (path != null)
+						{
+							return URIUtil.toURI(path);
+						}
+					}
+				}
+			}
+			catch (CoreException e)
+			{
+				IdeLog.logError(CommonEditorPlugin.getDefault(), e);
+			}
+			if (editorInput instanceof ILocationProviderExtension)
+			{
+				ILocationProviderExtension lpe = (ILocationProviderExtension) editorInput;
+				return lpe.getURI(null);
+			}
+			if (editorInput instanceof ILocationProvider)
+			{
+				ILocationProvider lp = (ILocationProvider) editorInput;
+				return URIUtil.toURI(lp.getPath(null));
 			}
 		}
 

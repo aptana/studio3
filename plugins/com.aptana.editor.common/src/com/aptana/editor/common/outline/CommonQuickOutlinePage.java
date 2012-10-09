@@ -57,6 +57,7 @@ import org.eclipse.ui.progress.WorkbenchJob;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.parsing.ast.IParseNode;
@@ -206,11 +207,11 @@ class CommonQuickOutlinePage extends ContentOutlinePage
 
 		// create filter refresh job
 		this._filterRefreshJob = this.createRefreshJob();
-		this._filterRefreshJob.setSystem(true);
+		EclipseUtil.setSystemForJob(this._filterRefreshJob);
 
 		// create delayed update job
 		this._delayedRefreshJob = this.createDelayedRefreshJob();
-		this._delayedRefreshJob.setSystem(true);
+		EclipseUtil.setSystemForJob(this._delayedRefreshJob);
 
 		// create document change listener and add to editor
 		this.createDocumentListener();

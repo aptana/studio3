@@ -300,6 +300,18 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 
 		int offset = fScanner.getTokenOffset();
 		int length = fScanner.getTokenLength();
+		if (offset < 0)
+		{
+			offset = 0;
+			IdeLog.logError(CommonEditorPlugin.getDefault(), MessageFormat.format(
+					"Scanner {0} returned a token with invalid offset: {1}", fScanner.getClass().getName(), offset)); //$NON-NLS-1$
+		}
+		if (length < 0)
+		{
+			length = 0;
+			IdeLog.logError(CommonEditorPlugin.getDefault(), MessageFormat.format(
+					"Scanner {0} returned a token with invalid length: {1}", fScanner.getClass().getName(), length)); //$NON-NLS-1$
+		}
 
 		// Continuing same scope as last position, expand to merge them
 		if (fLastPosition != null && fLastPosition.getType().equals(tokenLevelScope))

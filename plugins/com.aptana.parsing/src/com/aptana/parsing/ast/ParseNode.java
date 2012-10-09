@@ -26,12 +26,14 @@ public class ParseNode extends Node implements IParseNode
 	protected static final class NameNode implements INameNode
 	{
 		private final String fName;
-		private final IRange fRange;
+		private final int fStart;
+		private final int fEnd;
 
 		public NameNode(String name, int start, int end)
 		{
-			fName = name;
-			fRange = new Range(start, end);
+			this.fName = name;
+			this.fStart = start;
+			this.fEnd = end;
 		}
 
 		public String getName()
@@ -41,7 +43,15 @@ public class ParseNode extends Node implements IParseNode
 
 		public IRange getNameRange()
 		{
-			return fRange;
+			// Memory-optimization: don't store the range, only the start/end and create the range
+			// when needed.
+			return new Range(fStart, fEnd);
+		}
+
+		@Override
+		public String toString()
+		{
+			return getName();
 		}
 
 		@Override

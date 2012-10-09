@@ -13,6 +13,7 @@ public class ValidatorTests extends TestCase
 		//$JUnit-BEGIN$
 		suite.addTestSuite(JSLintValidatorTest.class);
 		suite.addTestSuite(JSParserValidatorTest.class);
+		suite.addTestSuite(JSStyleValidatorTest.class);
 		//$JUnit-END$
 		return suite;
 	}

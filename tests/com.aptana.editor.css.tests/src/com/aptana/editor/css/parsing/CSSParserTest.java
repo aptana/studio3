@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -17,6 +17,8 @@ import junit.framework.TestCase;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+
+import beaver.Symbol;
 
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.IOUtil;
@@ -39,6 +41,7 @@ import com.aptana.parsing.ast.ParseNode;
 /**
  * @author Kevin Lindsey
  * @author Michael Xia
+ * @author Fabio Zadrozny
  */
 public class CSSParserTest extends TestCase
 {
@@ -46,11 +49,28 @@ public class CSSParserTest extends TestCase
 
 	private CSSParser fParser;
 	private CSSFlexScanner fScanner;
+	private boolean expectToRecoverFromErrors = false;
+	private boolean recoveredFromError = false;
 
 	@Override
 	protected void setUp() throws Exception
 	{
-		fParser = new CSSParser();
+		fParser = new CSSParser()
+		{
+			@Override
+			protected void recoverFromError(Symbol token, TokenStream in) throws IOException, Exception
+			{
+				if (expectToRecoverFromErrors)
+				{
+					recoveredFromError = true;
+					super.recoverFromError(token, in);
+				}
+				else
+				{
+					throw new AssertionError("We should not have errors in the tests.");
+				}
+			}
+		};
 		fScanner = new CSSFlexScanner();
 	}
 
@@ -993,6 +1013,7 @@ public class CSSParserTest extends TestCase
 	{
 		String src = "h1      , h2      , h3 {color   : #AA2808\ncolor   : #AA2808}";
 		IParseState parseState = new ParseState(src);
+		this.expectToRecoverFromErrors = true;
 		ParseResult result = fParser.parse(parseState);
 
 		assertTrue("Could not find parse errors in parse state", !result.getErrors().isEmpty());
@@ -1063,6 +1084,76 @@ public class CSSParserTest extends TestCase
 	public void testMozDocument() throws Exception
 	{
 		parseTest("@-moz-document url-prefix() { .g-section {overflow: hidden;}}" + EOL);
+	}
+
+	/**
+	 * APSTUD-4757
+	 * 
+	 * @throws Exception
+	 */
+	public void testNotSupport() throws Exception
+	{
+		parseTest("audio:not([controls]) {height: 0;}" + EOL);
+	}
+
+	/**
+	 * APSTUD-4757
+	 * 
+	 * @throws Exception
+	 */
+	public void testNotSupportSvg() throws Exception
+	{
+		parseTest("svg:not(:root) {overflow: hidden;}" + EOL);
+	}
+
+	/**
+	 * APSTUD-4757
+	 * 
+	 * @throws Exception
+	 */
+	public void testNotSupport1() throws Exception
+	{
+		parseTest("html:not(:link) :not(:visited) {overflow: hidden;}" + EOL);
+	}
+
+	/**
+	 * APSTUD-4757
+	 * 
+	 * @throws Exception
+	 */
+	public void testNotSupport2() throws Exception
+	{
+		parseTest("html:not(:link) :visited {overflow: hidden;}" + EOL);
+	}
+
+	/**
+	 * APSTUD-4757
+	 * 
+	 * @throws Exception
+	 */
+	public void testNotSupport3() throws Exception
+	{
+		parseTest("a:not(*) {overflow: hidden;}" + EOL);
+	}
+
+	/**
+	 * APSTUD-4757
+	 * 
+	 * @throws Exception
+	 */
+	public void testExpectedSyntaxError() throws Exception
+	{
+		parseErrorTest("svg:not(:root :bar) {overflow: hidden;}" + EOL);
+	}
+
+	/**
+	 * APSTUD-4757
+	 * 
+	 * @throws Exception
+	 */
+	public void testNotDoubleNegationError() throws Exception
+	{
+		parseErrorTest("svg:not(:not(:root)) {overflow: hidden;}" + EOL);
 	}
 
 	/**
@@ -1167,9 +1258,27 @@ public class CSSParserTest extends TestCase
 	 * @param source
 	 * @throws Exception
 	 */
+	protected void parseErrorTest(String source) throws Exception
+	{
+		expectToRecoverFromErrors = true;
+		fScanner.setSource(source);
+		fParser.parse(fScanner);
+		assertTrue("Expected error and it did not happen.", recoveredFromError);
+	}
+
+	/**
+	 * parseTest
+	 * 
+	 * @param source
+	 * @throws Exception
+	 */
 	protected void parseTest(String source) throws Exception
 	{
 		parseTest(source, source);
+		if (expectToRecoverFromErrors)
+		{
+			assertTrue("Expected error and it did not happen.", recoveredFromError);
+		}
 	}
 
 	/**

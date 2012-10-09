@@ -5,28 +5,25 @@ Bundle-SymbolicName: com.aptana.editor.js;singleton:=true
 Bundle-Version: 3.0.3.qualifier
 Bundle-Activator: com.aptana.editor.js.JSPlugin
 Bundle-Vendor: %providerName
-Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.core.resources,
- org.eclipse.jface.text,
- org.eclipse.ui,
+Require-Bundle: org.mozilla.rhino,
+ json.simple;bundle-version="1.0.0",
+ com.aptana.jetty.util.epl,
+ org.eclipse.help,
+ com.aptana.core;bundle-version="3.0.4",
+ beaver,
+ com.aptana.parsing,
+ com.aptana.index.core,
+ com.aptana.buildpath.core,
  org.eclipse.ui.editors,
  org.eclipse.ui.ide,
  org.eclipse.ui.views,
- com.aptana.core;bundle-version="3.0.4",
- com.aptana.index.core,
- com.aptana.index.core.ui,
- com.aptana.ui,
- com.aptana.editor.common,
- com.aptana.parsing,
- beaver,
- com.aptana.theme,
- com.aptana.jetty.util.epl,
- org.mozilla.rhino,
- json.simple;bundle-version="1.0.0",
- com.aptana.buildpath.core,
  org.eclipse.compare,
  com.aptana.ui.epl,
- org.eclipse.help
+ com.aptana.ui,
+ com.aptana.theme,
+ com.aptana.index.core.ui,
+ com.aptana.editor.common,
+ com.aptana.build.ui
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin

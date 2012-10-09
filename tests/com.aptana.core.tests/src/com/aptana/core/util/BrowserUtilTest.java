@@ -9,9 +9,9 @@ package com.aptana.core.util;
 
 import java.util.List;
 
-import com.aptana.core.util.BrowserUtil.BrowserInfo;
-
 import junit.framework.TestCase;
+
+import com.aptana.core.util.IBrowserUtil.BrowserInfo;
 
 public class BrowserUtilTest extends TestCase
 {
@@ -23,13 +23,27 @@ public class BrowserUtilTest extends TestCase
 		{
 			for (BrowserInfo info : browsers)
 			{
-				if (info.browserName.equals("Internet Explorer"))
+				if (info.getName().equals("Internet Explorer"))
 				{
 					return;
 				}
 			}
 			fail("Could not find Internet Explorer on windows platform!");
 		}
-
 	}
+
+	/**
+	 * Test that prints what's found in the current machine (used for debugging purposes as it may be hard to predict
+	 * the environment used to run the tests).
+	 */
+	public void testFindBrowserManual() throws Exception
+	{
+		List<BrowserInfo> browsers = BrowserUtil.discoverInstalledBrowsers();
+		for (BrowserInfo info : browsers)
+		{
+			System.out.println(String.format("%s (%s)  - %s", info.getName(), BrowserUtil.getBrowserVersion(info),
+					info.getLocation()));
+		}
+	}
+
 }

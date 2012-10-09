@@ -180,6 +180,25 @@ public class SWTUtils
 	}
 
 	/**
+	 * Returns a version of the specified FontData, resized by the requested size.
+	 * 
+	 * @param fontData
+	 *            the font-data to resize
+	 * @param size
+	 *            the font size
+	 * @return resized font data
+	 */
+	public static FontData[] resizeFont(FontData[] fontData, int size)
+	{
+		for (FontData data : fontData)
+		{
+			data.setHeight(data.getHeight() + size);
+		}
+
+		return fontData;
+	}
+
+	/**
 	 * Bolds a font.
 	 * 
 	 * @param font
@@ -346,5 +365,25 @@ public class SWTUtils
 	{
 		label.setForeground(isValid ? null : errorColor);
 		label.setFont(isValid ? null : errorFont);
+	}
+
+	/**
+	 * Sets the visibility of a control. Includes setting of the include property of the layoutData (if available)
+	 * 
+	 * @param visible
+	 */
+	public static void setVisiblity(Control control, boolean visible)
+	{
+		if (control == null)
+		{
+			return;
+		}
+
+		control.setVisible(visible);
+		Object layoutData = control.getLayoutData();
+		if (layoutData instanceof GridData)
+		{
+			((GridData) layoutData).exclude = !visible;
+		}
 	}
 }

@@ -33,7 +33,7 @@ public class WriterOutputStreamTest extends TestCase
 	protected void setUp() throws Exception
 	{
 		super.setUp();
-		testFile = new File(System.getProperty("java.io.tmpdir"), "resources/test.txt");
+		testFile = new File(FileUtil.getTempDirectory().toOSString(), "resources/test.txt");
 		testFile.getParentFile().mkdirs();
 	}
 

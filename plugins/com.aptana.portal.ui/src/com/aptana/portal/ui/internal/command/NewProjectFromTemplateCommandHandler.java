@@ -20,8 +20,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.wizards.IWizardDescriptor;
 import org.eclipse.ui.wizards.IWizardRegistry;
 
-import com.aptana.projects.internal.wizards.AbstractNewProjectWizard;
-import com.aptana.projects.internal.wizards.ProjectTemplateSelectionPage;
+import com.aptana.projects.wizards.AbstractNewProjectWizard;
+import com.aptana.projects.wizards.ProjectTemplateSelectionPage;
 import com.aptana.ui.util.UIUtils;
 
 /**

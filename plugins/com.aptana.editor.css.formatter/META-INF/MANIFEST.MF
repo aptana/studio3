@@ -5,18 +5,16 @@ Bundle-SymbolicName: com.aptana.editor.css.formatter;singleton:=true
 Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.editor.css.formatter.CSSFormatterPlugin
 Bundle-Vendor: %providerName
-Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime,
+Require-Bundle: com.aptana.core,
+ com.aptana.parsing,
  org.eclipse.jface.text,
+ org.eclipse.ui,
  org.eclipse.ui.forms,
+ com.aptana.ui.epl,
  com.aptana.formatter.epl;bundle-version="3.2.0",
  com.aptana.formatter.ui.epl,
- com.aptana.parsing,
- com.aptana.ui.epl,
  com.aptana.editor.common,
- com.aptana.editor.css,
- com.aptana.core,
- org.eclipse.ui.editors
+ com.aptana.editor.css
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin

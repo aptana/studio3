@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -22,10 +22,11 @@ public class AllTests
 		suite.addTestSuite(JSFoldingComputerTest.class);
 		suite.addTest(com.aptana.editor.js.AllTests.suite());
 		suite.addTest(com.aptana.editor.js.contentassist.AllTests.suite());
+		suite.addTest(com.aptana.editor.js.folding.AllTests.suite());
 		suite.addTest(com.aptana.editor.js.index.AllTests.suite());
 		suite.addTest(com.aptana.editor.js.inferencing.AllTests.suite());
 		suite.addTest(com.aptana.editor.js.internal.build.AllTests.suite());
-		suite.addTest(com.aptana.editor.js.internal.text.AllTests.suite());		
+		suite.addTest(com.aptana.editor.js.internal.text.AllTests.suite());
 		suite.addTest(com.aptana.editor.js.outline.AllTests.suite());
 		suite.addTest(com.aptana.editor.js.parsing.AllTests.suite());
 		suite.addTest(com.aptana.editor.js.sdoc.parsing.AllTests.suite());

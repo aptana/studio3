@@ -345,8 +345,8 @@ public class JSParser extends Parser implements IParser {
         parse(parseState, working);
         return working.getImmutableResult();
     }
-    
-    
+
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.IParser#parse(com.aptana.parsing.IParseState)

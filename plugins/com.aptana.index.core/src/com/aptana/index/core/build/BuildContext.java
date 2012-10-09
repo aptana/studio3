@@ -288,4 +288,9 @@ public class BuildContext
 			return new ByteArrayInputStream(ArrayUtil.NO_BYTES);
 		}
 	}
+
+	public boolean isReconcile()
+	{
+		return false;
+	}
 }

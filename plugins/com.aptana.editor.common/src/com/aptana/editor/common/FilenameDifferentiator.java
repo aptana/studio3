@@ -57,7 +57,7 @@ class FilenameDifferentiator extends UIJob implements IPartListener
 	public FilenameDifferentiator()
 	{
 		super("Install filename differentiator"); //$NON-NLS-1$
-		setSystem(!EclipseUtil.showSystemJobs());
+		EclipseUtil.setSystemForJob(this);
 		baseNames = new HashMap<String, Set<IEditorPart>>();
 	}
 

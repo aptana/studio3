@@ -39,6 +39,7 @@ import com.aptana.core.projects.templates.IProjectTemplate;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.projects.ProjectsPlugin;
+import com.aptana.projects.wizards.IStepIndicatorWizardPage;
 import com.aptana.ui.widgets.StepIndicatorComposite;
 
 /**

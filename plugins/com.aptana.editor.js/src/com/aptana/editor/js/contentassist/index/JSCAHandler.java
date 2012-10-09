@@ -978,7 +978,23 @@ public class JSCAHandler implements IContextHandler
 				break;
 
 			case DEPRECATED:
-				if (currentType != null)
+				if (currentEventProperty != null)
+				{
+					currentEventProperty.setIsDeprecated(currentBoolean);
+				}
+				else if (currentEvent != null)
+				{
+					currentEvent.setIsDeprecated(currentBoolean);
+				}
+				else if (currentProperty != null)
+				{
+					currentProperty.setIsDeprecated(currentBoolean);
+				}
+				else if (currentFunction != null)
+				{
+					currentFunction.setIsDeprecated(currentBoolean);
+				}
+				else if (currentType != null)
 				{
 					currentType.setIsDeprecated(currentBoolean);
 				}

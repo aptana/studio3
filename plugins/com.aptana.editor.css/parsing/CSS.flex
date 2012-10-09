@@ -19,6 +19,8 @@ import beaver.Scanner;
 
 import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 
+@SuppressWarnings({"unused", "nls"})
+
 %%
 
 %class CSSFlexScanner
@@ -149,6 +151,8 @@ nl							= \r|\n|\r\n|\f
 	{bad_single_quoted_string}	{ return newToken(CSSTokenType.SINGLE_QUOTED_STRING, yytext()); }
 	{bad_double_quoted_string}	{ return newToken(CSSTokenType.DOUBLE_QUOTED_STRING, yytext()); }
 
+	"not"					    { return newToken(CSSTokenType.NOT, yytext()); }
+	
 	{num}"em"					{ return newToken(CSSTokenType.EMS, yytext()); }
 	{num}"ex"					{ return newToken(CSSTokenType.EXS, yytext()); }
 	{num}"px"					{ return newToken(CSSTokenType.LENGTH, yytext()); }

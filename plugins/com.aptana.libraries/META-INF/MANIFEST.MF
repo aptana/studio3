@@ -9,6 +9,8 @@ Bundle-ClassPath: .,
  uuid.jar,
  WinRegistry-4.4.jar
 Export-Package: at.jta,
+ ch.randelshofer.quaqua.util;x-friends:="com.aptana.core",
+ com.aptana.plist,
  com.eaio.uuid,
  org.apache.derby.authentication,
  org.apache.derby.catalog,

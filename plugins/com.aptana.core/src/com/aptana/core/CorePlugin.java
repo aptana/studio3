@@ -76,7 +76,7 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 				return Status.OK_STATUS;
 			}
 		};
-		job.setSystem(!EclipseUtil.showSystemJobs());
+		EclipseUtil.setSystemForJob(job);
 		job.schedule();
 	}
 

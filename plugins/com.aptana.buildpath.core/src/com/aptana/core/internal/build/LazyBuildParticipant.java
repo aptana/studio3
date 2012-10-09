@@ -24,7 +24,7 @@ import com.aptana.index.core.build.BuildContext;
  * 
  * @author cwilliams
  */
-class LazyBuildParticipant extends AbstractBuildParticipant
+public class LazyBuildParticipant extends AbstractBuildParticipant
 {
 
 	private IConfigurationElement ice;
@@ -41,7 +41,7 @@ class LazyBuildParticipant extends AbstractBuildParticipant
 		getParticipant().clean(project, monitor);
 	}
 
-	protected synchronized IBuildParticipant getParticipant()
+	public synchronized IBuildParticipant getParticipant()
 	{
 		if (participant == null)
 		{
@@ -81,5 +81,18 @@ class LazyBuildParticipant extends AbstractBuildParticipant
 	public boolean isEnabled(BuildType type)
 	{
 		return getParticipant().isEnabled(type);
+	}
+
+	@Override
+	public boolean isRequired()
+	{
+		// FIXME is there any way to avoid instantiating here?
+		return getParticipant().isRequired();
+	}
+
+	@Override
+	public void restoreDefaults()
+	{
+		getParticipant().restoreDefaults();
 	}
 }

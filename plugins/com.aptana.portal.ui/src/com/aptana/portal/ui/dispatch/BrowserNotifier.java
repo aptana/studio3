@@ -22,6 +22,7 @@ import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.jetty.util.epl.ajax.JSON;
 import com.aptana.portal.ui.IDebugScopes;
 import com.aptana.portal.ui.PortalUIPlugin;
@@ -277,7 +278,7 @@ public class BrowserNotifier
 				return Status.OK_STATUS;
 			}
 		};
-		uiJob.setSystem(true);
+		EclipseUtil.setSystemForJob(uiJob);
 		uiJob.schedule();
 	}
 

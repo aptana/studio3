@@ -19,7 +19,7 @@ public class DTDParseRootNode extends ParseRootNode
 	 */
 	public DTDParseRootNode()
 	{
-		this(new Symbol[0]);
+		this(null);
 	}
 
 	/**
@@ -29,12 +29,7 @@ public class DTDParseRootNode extends ParseRootNode
 	 */
 	public DTDParseRootNode(Symbol[] children)
 	{
-		super( //
-			IDTDConstants.CONTENT_TYPE_DTD, //
-			children, //
-			(children != null && children.length > 0) ? children[0].getStart() : 0, //
-			(children != null && children.length > 0) ? children[0].getEnd() : 0 //
-		);
+		super(IDTDConstants.CONTENT_TYPE_DTD, children);
 	}
 
 	/*

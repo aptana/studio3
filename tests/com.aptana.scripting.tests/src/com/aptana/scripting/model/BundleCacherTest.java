@@ -13,6 +13,8 @@ import junit.framework.TestCase;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.jruby.RubyRegexp;
 
+import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.FileUtil;
 import com.aptana.scope.ScopeSelector;
 
 public class BundleCacherTest extends TestCase
@@ -219,6 +221,61 @@ public class BundleCacherTest extends TestCase
 		// @formatter:on
 	}
 
+	public void testNewerTranslationFileBlowsAwayCache() throws Exception
+	{
+		// @formatter:off
+		String fileContents = "require 'ruble'\n\n" 
+			+ "bundle do |b|\n" 
+			+ "  b.menu t(:bundle_name) do |m|\n"
+			+ "    m.scope = ['text.html']\n" 
+			+ "    m.command 'Documentation for Tag'\n" 
+			+ "    m.separator\n"
+			+ "    m.menu 'Entities' do |e|\n" 
+			+ "      e.command 'Convert Character / Selection to Entities'\n"
+			+ "    end\n" 
+			+ "  end\n" 
+			+ "end\n";
+		// @formatter:on
+
+		createBundleDirectory();
+
+		// Write a translation file
+		File enYML = writeFile("config/locales/en.yml", "en:\n  bundle_name: 'HTML'\n");
+		assertTrue("Failed to write test en.yml to disk", enYML.exists());
+
+		// Now add a bundle.rb file and have it use the translation
+		File bundleRB = writeFile("bundle.rb", fileContents);
+		assertTrue("Failed to write test bundle.rb to disk", bundleRB.exists());
+
+		// Load up the bundle
+		bundleManager.loadScript(bundleRB, false);
+		nonCached = bundleManager.getBundleFromPath(bundleDirectory);
+		assertNotNull("Failed to load the test bundle into memory from file", nonCached);
+		String nonCachedString = nonCached.toSource(false); // Store it's representation
+
+		// Now generate a cached YAML serialized version of this...
+		cacher.cache(bundleDirectory, new NullProgressMonitor());
+
+		bundleManager.reset();
+
+		// Now lets load it back in
+		List<File> bundleFiles = CollectionsUtil.newList(bundleRB, enYML);
+		deserialized = cacher.load(bundleDirectory, bundleFiles, new NullProgressMonitor(), true);
+		assertNotNull("Failed to deserialize the test bundle from YAML", deserialized);
+		String deserializedString = deserialized.toSource(false);
+
+		// verify that our raw and cached version match
+		assertEquals("Desearialized bundle doesn't match original", nonCachedString, deserializedString);
+		Thread.sleep(1000);
+		// OK, all good, now let's update the translations
+		enYML = writeFile("config/locales/en.yml", "en:\n  bundle_name: 'New HTML'\n");
+
+		// Now lets load it back in and verify that the cache is blown because translation file is newer than cache
+		bundleFiles = CollectionsUtil.newList(bundleRB, enYML);
+		BundleElement loaded = cacher.load(bundleDirectory, bundleFiles, new NullProgressMonitor(), false);
+		assertNull("Expected to not get anything from cache since we updated the translations.", loaded);
+	}
+
 	/**
 	 * Compares the bundle generated from loading it from disk through JRuby versus loading from cache YAML file through
 	 * SnakeYAML. The elements in-memory should have the same structure (tested by comparing toString()).
@@ -260,6 +317,7 @@ public class BundleCacherTest extends TestCase
 	protected File writeFile(String fileName, String fileContents) throws IOException
 	{
 		File file = new File(bundleDirectory, fileName);
+		file.getParentFile().mkdirs();
 		FileWriter writer = new FileWriter(file);
 		writer.write(fileContents);
 		writer.close();
@@ -269,8 +327,7 @@ public class BundleCacherTest extends TestCase
 
 	protected void createBundleDirectory()
 	{
-		String tmpDir = System.getProperty("java.io.tmpdir");
-		bundleDirectory = new File(new File(tmpDir), "bundle_cache_test_" + System.currentTimeMillis());
+		bundleDirectory = new File(FileUtil.getTempDirectory().toOSString(), "bundle_cache_test_" + System.currentTimeMillis());
 		bundleDirectory.mkdirs();
 		assertTrue("Failed to create test bundle directory", bundleDirectory.exists());
 	}

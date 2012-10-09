@@ -16,6 +16,7 @@ import java.util.List;
 
 import beaver.Symbol;
 
+import com.aptana.core.epl.util.LRUCache;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
@@ -131,7 +132,7 @@ public class ScopeSelector extends Symbol implements IScopeSelector
 		}
 	}
 
-	private ISelectorNode _root;
+	private final ISelectorNode _root;
 	private List<Integer> matchResults;
 
 	/**
@@ -139,6 +140,21 @@ public class ScopeSelector extends Symbol implements IScopeSelector
 	 * some other locations - so this value is computed by concatenating children nodes repeatedly.
 	 */
 	private String fString;
+
+	/**
+	 * Cache used to hold the results for a selector.
+	 */
+	private static final LRUCache<String, ISelectorNode> cacheParse = new LRUCache<String, ISelectorNode>(200);
+
+	/**
+	 * Lock to access cacheParse.
+	 */
+	private static final Object lock = new Object();
+
+	/**
+	 * Entry to signal null in the cache when a parse returns null.
+	 */
+	private static final SelectorNode NULL_SELECTOR = new SelectorNode();
 
 	/**
 	 * ScopeSelector
@@ -157,7 +173,26 @@ public class ScopeSelector extends Symbol implements IScopeSelector
 	 */
 	public ScopeSelector(String selector)
 	{
-		this.parse(selector);
+		synchronized (lock)
+		{
+			ISelectorNode node = cacheParse.get(selector);
+			if (node == null)
+			{
+				node = parse(selector);
+				if (node == null)
+				{
+					// Handle the case for parse() returning null (because get() may return null as a default value but
+					// we want to cache that the return was null too).
+					node = NULL_SELECTOR;
+				}
+				cacheParse.put(selector, node);
+			}
+			if (node == NULL_SELECTOR) // Check if it's the same instance.
+			{
+				node = null;
+			}
+			this._root = node;
+		}
 	}
 
 	public int compareTo(IScopeSelector o)
@@ -176,6 +211,10 @@ public class ScopeSelector extends Symbol implements IScopeSelector
 		return false;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.scope.IScopeSelector#getMatchResults()
+	 */
 	public List<Integer> getMatchResults()
 	{
 		if (matchResults == null)
@@ -191,7 +230,7 @@ public class ScopeSelector extends Symbol implements IScopeSelector
 	 * 
 	 * @return
 	 */
-	ISelectorNode getRoot()
+	public ISelectorNode getRoot()
 	{
 		return this._root;
 	}
@@ -276,18 +315,18 @@ public class ScopeSelector extends Symbol implements IScopeSelector
 		return result;
 	}
 
-	private void parse(String selector)
+	private static ISelectorNode parse(String selector)
 	{
 		ScopeParser parser = new ScopeParser();
 
 		// clear current root
-		this._root = null;
+		ISelectorNode root = null;
 
 		if (!StringUtil.isEmpty(selector))
 		{
 			try
 			{
-				this._root = parser.parse(selector);
+				root = parser.parse(selector);
 			}
 			catch (Exception e)
 			{
@@ -302,6 +341,7 @@ public class ScopeSelector extends Symbol implements IScopeSelector
 				IdeLog.logError(ScriptingActivator.getDefault(), message);
 			}
 		}
+		return root;
 	}
 
 	/*

@@ -9,6 +9,10 @@ package com.aptana.core.projects.templates;
 
 import java.io.File;
 import java.net.URL;
+import java.util.List;
+
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IStatus;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IStatus;
@@ -81,6 +85,11 @@ public interface IProjectTemplate
 	 * @return the priority that indicates the order in which the templates should appear in a list
 	 */
 	public int getPriority();
+
+	/**
+	 * @return the list of tags
+	 */
+	public List<String> getTags();
 
 	/**
 	 * Returns true if the template should evaluate and substitute the template-tags when imported to the workspace.

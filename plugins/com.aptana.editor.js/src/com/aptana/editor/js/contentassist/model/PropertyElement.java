@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.aptana.core.IMap;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.ObjectUtil;
 import com.aptana.core.util.SourcePrinter;
@@ -88,6 +89,13 @@ public class PropertyElement extends BaseElement<PropertyElement.Property>
 			{
 				return StringUtil.join(", ", node.getDocuments()); //$NON-NLS-1$
 			}
+		},
+		DEPRECATED(Messages.TypeElement_Deprecated)
+		{
+			public Object getPropertyValue(PropertyElement node)
+			{
+				return node.isDeprecated();
+			}
 		};
 
 		private String header;
@@ -120,6 +128,7 @@ public class PropertyElement extends BaseElement<PropertyElement.Property>
 	private static final String IS_INSTANCE_PROPERTY = "isInstanceProperty"; //$NON-NLS-1$
 	private static final String IS_CLASS_PROPERTY = "isClassProperty"; //$NON-NLS-1$
 	private static final String OWNING_TYPE_PROPERTY = "owningType"; //$NON-NLS-1$
+	private static final String DEPRECATED_PROPERTY = "deprecated"; //$NON-NLS-1$
 
 	private String _owningType;
 	private boolean _isInstanceProperty;
@@ -127,6 +136,7 @@ public class PropertyElement extends BaseElement<PropertyElement.Property>
 	private boolean _isInternal;
 	private List<ReturnTypeElement> _types;
 	private List<String> _examples;
+	private boolean _deprecated;
 
 	/**
 	 * PropertyElement
@@ -254,6 +264,7 @@ public class PropertyElement extends BaseElement<PropertyElement.Property>
 		this.setIsClassProperty(Boolean.TRUE == object.get(IS_CLASS_PROPERTY)); // $codepro.audit.disable useEquals
 		this.setIsInstanceProperty(Boolean.TRUE == object.get(IS_INSTANCE_PROPERTY)); // $codepro.audit.disable
 																						// useEquals
+		this.setIsDeprecated(Boolean.TRUE == object.get(DEPRECATED_PROPERTY)); // $codepro.audit.disable useEquals
 		this.setIsInternal(Boolean.TRUE == object.get(IS_INTERNAL_PROPERTY)); // $codepro.audit.disable useEquals
 
 		this._types = IndexUtil.createList(object.get(TYPES_PROPERTY), ReturnTypeElement.class);
@@ -297,14 +308,13 @@ public class PropertyElement extends BaseElement<PropertyElement.Property>
 	 */
 	public List<String> getTypeNames()
 	{
-		List<String> result = new ArrayList<String>();
-
-		for (ReturnTypeElement type : this.getTypes())
+		return CollectionsUtil.map(getTypes(), new IMap<ReturnTypeElement, String>()
 		{
-			result.add(type.getType());
-		}
-
-		return result;
+			public String map(ReturnTypeElement item)
+			{
+				return item.getType();
+			}
+		});
 	}
 
 	/**
@@ -386,6 +396,26 @@ public class PropertyElement extends BaseElement<PropertyElement.Property>
 	{
 		this._owningType = type;
 	}
+	
+	/**
+	 * isDeprecated
+	 * 
+	 * @return
+	 */
+	public boolean isDeprecated()
+	{
+		return this._deprecated;
+	}
+
+	/**
+	 * setIsDeprecated
+	 * 
+	 * @param value
+	 */
+	public void setIsDeprecated(boolean value)
+	{
+		this._deprecated = value;
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -400,6 +430,7 @@ public class PropertyElement extends BaseElement<PropertyElement.Property>
 		out.add(IS_CLASS_PROPERTY, this.isClassProperty());
 		out.add(IS_INSTANCE_PROPERTY, this.isInstanceProperty());
 		out.add(IS_INTERNAL_PROPERTY, this.isInternal());
+		out.add(DEPRECATED_PROPERTY, this.isDeprecated());
 		out.add(TYPES_PROPERTY, this.getTypes());
 		out.add(EXAMPLES_PROPERTY, this.getExamples());
 	}

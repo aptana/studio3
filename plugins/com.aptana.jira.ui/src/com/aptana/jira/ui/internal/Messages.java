@@ -15,6 +15,7 @@ public class Messages extends NLS
 
 	public static String SubmitTicketDialog_DefaultMessage;
 	public static String SubmitTicketDialog_ERR_EmptyActualResult;
+	public static String SubmitTicketDialog_ERR_EmptyExpectedResult;
 	public static String SubmitTicketDialog_ERR_EmptyStepsToReproduce;
 	public static String SubmitTicketDialog_ERR_EmptySummary;
 	public static String SubmitTicketDialog_ERR_EmptyType;

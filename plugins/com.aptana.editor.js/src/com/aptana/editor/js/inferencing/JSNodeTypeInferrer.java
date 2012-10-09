@@ -15,13 +15,12 @@ import java.util.List;
 import java.util.Set;
 
 import com.aptana.core.util.CollectionsUtil;
-import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
-import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
 import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
+import com.aptana.editor.js.parsing.ast.JSArgumentsNode;
 import com.aptana.editor.js.parsing.ast.JSArrayNode;
 import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
 import com.aptana.editor.js.parsing.ast.JSBinaryArithmeticOperatorNode;
@@ -63,7 +62,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	private JSIndexQueryHelper _queryHelper;
 
 	/**
-	 * JSTypeWalker
+	 * JSNodeTypeInferrer
 	 * 
 	 * @param scope
 	 * @param projectIndex
@@ -71,10 +70,21 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	 */
 	public JSNodeTypeInferrer(JSScope scope, Index projectIndex, URI location)
 	{
+		this(scope, projectIndex, location, new JSIndexQueryHelper());
+	}
+
+	/**
+	 * @param scope
+	 * @param projectIndex
+	 * @param location
+	 * @param queryHelper
+	 */
+	public JSNodeTypeInferrer(JSScope scope, Index projectIndex, URI location, JSIndexQueryHelper queryHelper)
+	{
 		this._scope = scope;
 		this._index = projectIndex;
 		this._location = location;
-		this._queryHelper = new JSIndexQueryHelper();
+		this._queryHelper = queryHelper;
 	}
 
 	/**
@@ -140,7 +150,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 			{
 				this._types = new ArrayList<String>();
 			}
-
+			type = JSTypeUtil.validateTypeName(type);
 			if (!this._types.contains(type))
 			{
 				this._types.add(type);
@@ -220,14 +230,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	 */
 	public List<String> getTypes()
 	{
-		List<String> result = this._types;
-
-		if (result == null)
-		{
-			result = Collections.emptyList();
-		}
-
-		return result;
+		return CollectionsUtil.getListValue(_types);
 	}
 
 	/**
@@ -254,7 +257,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		if (node instanceof JSNode)
 		{
 			// create new nested walker
-			JSNodeTypeInferrer walker = new JSNodeTypeInferrer(scope, this._index, this._location);
+			JSNodeTypeInferrer walker = new JSNodeTypeInferrer(scope, this._index, this._location, this._queryHelper);
 
 			// collect types
 			walker.visit((JSNode) node);
@@ -420,21 +423,19 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 
 			for (String typeName : types)
 			{
-				int index = typeName.indexOf(':');
-
-				if (index != -1)
-				{
-					for (String returnTypeName : typeName.substring(index + 1).split(",")) //$NON-NLS-1$
-					{
-						returnTypes.add(returnTypeName);
-					}
-				}
-				else if (typeName.startsWith(JSTypeConstants.GENERIC_CLASS_OPEN))
+				if (typeName.startsWith(JSTypeConstants.GENERIC_CLASS_OPEN))
 				{
 					returnTypes.add(JSTypeUtil.getClassType(typeName));
 				}
 				else
 				{
+					// FIXME If this is a function that returns a type, assume that function is a constructor and we've
+					// defined the type as Function<Type>.
+					// This is where the properties for that type are going to be hung.
+					// That may not be "right". We may want to unwrap the function's return type and use that as the
+					// type we're dealing with.
+					// in that case, we need to change JSSymbolTypeInferrer#generateType to also unwrap Function<Type>
+					// properly.
 					returnTypes.add(typeName);
 				}
 			}
@@ -492,26 +493,15 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 			}
 		}
 
-		String type;
+		// If we couldn't infer a return type and we had a return
+		// expression, then have it return Object
+		if (foundReturnExpression && types.isEmpty())
+		{
+			types.add(JSTypeConstants.OBJECT_TYPE);
+		}
 
 		// build function type, including return values
-		if (!types.isEmpty())
-		{
-			type = JSTypeConstants.FUNCTION_TYPE + JSTypeConstants.FUNCTION_SIGNATURE_DELIMITER
-					+ StringUtil.join(",", types); //$NON-NLS-1$
-		}
-		else if (foundReturnExpression)
-		{
-			// If we couldn't infer a return type and we had a return
-			// expression, then have it return Object
-			type = JSTypeConstants.FUNCTION_TYPE + JSTypeConstants.FUNCTION_SIGNATURE_DELIMITER
-					+ JSTypeConstants.OBJECT_TYPE;
-		}
-		else
-		{
-			type = JSTypeConstants.FUNCTION_TYPE;
-		}
-
+		String type = JSTypeUtil.toFunctionType(types);
 		this.addType(type);
 	}
 
@@ -563,15 +553,13 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 			{
 				// Fix up type names as might be necessary
 				typeName = JSTypeMapper.getInstance().getMappedType(typeName);
-
-				if ("Function:jQuery".equals(typeName) && lhs instanceof JSIdentifierNode && ("$".equals(lhs.getText()) || "jQuery".equals(lhs.getText()))) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				// TODO Combine with similar code from ParseUtil.getParentObjectTypes
+				if (JSTypeConstants.FUNCTION_JQUERY.equals(typeName)
+						&& lhs instanceof JSIdentifierNode
+						&& (JSTypeConstants.DOLLAR.equals(lhs.getText()) || JSTypeConstants.JQUERY
+								.equals(lhs.getText())))
 				{
-					typeName = "Class<jQuery>"; //$NON-NLS-1$
-				}
-
-				if (JSTypeUtil.isFunctionPrefix(typeName))
-				{
-					typeName = JSTypeUtil.getFunctionSignatureType(typeName);
+					typeName = JSTypeConstants.CLASS_JQUERY;
 				}
 
 				// lookup up rhs name in type and add that value's type here
@@ -584,14 +572,16 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 						if (property instanceof FunctionElement)
 						{
 							FunctionElement function = (FunctionElement) property;
-
-							this.addType(function.getSignature());
+							for (String type : function.getSignatureTypes())
+							{
+								this.addType(type);
+							}
 						}
 						else
 						{
-							for (ReturnTypeElement typeElement : property.getTypes())
+							for (String type : property.getTypeNames())
 							{
-								this.addType(typeElement.getType());
+								this.addType(type);
 							}
 						}
 					}
@@ -638,27 +628,28 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 			}
 			else
 			{
-				properties = this._queryHelper.getGlobals(this._index, name);
-
-				if (CollectionsUtil.isEmpty(properties))
+				// Check the local scope for type first
+				JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(this._scope, this._index, this._location);
+				PropertyElement property = symbolInferrer.getSymbolPropertyElement(name);
+				if (property != null)
 				{
-					JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(this._scope, this._index,
-							this._location);
-
-					PropertyElement property = symbolInferrer.getSymbolPropertyElement(name);
-
-					if (property != null)
-					{
-						properties = CollectionsUtil.newList(property);
-					}
+					// We found a match in the local scope
+					properties = CollectionsUtil.newList(property);
+				}
+				else
+				{
+					// No match in the local scope, query the globals in index
+					properties = this._queryHelper.getGlobals(this._index, name);
 				}
 			}
 		}
 		else
 		{
+			// Scope says it doesn't has a symbol with that name, so query the globals in index
 			properties = this._queryHelper.getGlobals(this._index, name);
 		}
 
+		// Hopefully we found at least one match...
 		if (properties != null)
 		{
 			for (PropertyElement property : properties)
@@ -666,14 +657,16 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 				if (property instanceof FunctionElement)
 				{
 					FunctionElement function = (FunctionElement) property;
-
-					this.addType(function.getSignature());
+					for (String type : function.getSignatureTypes())
+					{
+						this.addType(type);
+					}
 				}
 				else
 				{
-					for (ReturnTypeElement typeElement : property.getTypes())
+					for (String type : property.getTypeNames())
 					{
-						this.addType(typeElement.getType());
+						this.addType(type);
 					}
 				}
 			}
@@ -691,6 +684,32 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 
 		if (child instanceof JSNode)
 		{
+			// TODO hang the "require" string as a constant somewhere!
+			if (child instanceof JSIdentifierNode && "require".equals(child.getNameNode().getName())) //$NON-NLS-1$
+			{
+				// it's a requires!
+				JSArgumentsNode args = (JSArgumentsNode) node.getArguments();
+				IParseNode[] children = args.getChildren();
+				for (IParseNode arg : children)
+				{
+					if (arg instanceof JSStringNode)
+					{
+						JSStringNode string = (JSStringNode) arg;
+						String text = string.getText();
+						// strip quotes TODO Use util method to strip quotes!
+						if (text.startsWith("'") || text.startsWith("\"")) //$NON-NLS-1$ //$NON-NLS-2$
+						{
+							text = text.substring(1, text.length() - 1);
+						}
+
+						// Handle resolving absolute versus relative module ids!
+						URI resolved = _location.resolve(text);
+						URI relative = _index.getRelativeDocumentPath(resolved);
+						this.addType(relative.getPath() + ".exports"); //$NON-NLS-1$
+					}
+				}
+			}
+
 			List<String> types = this.getTypes(child);
 
 			// NOTE: This is a special case for functions used as a RHS of assignments or as part of a property chain.
@@ -724,11 +743,10 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 
 			for (String typeName : types)
 			{
-				int index = typeName.indexOf(':');
-
-				if (index != -1)
+				if (JSTypeUtil.isFunctionPrefix(typeName))
 				{
-					for (String returnTypeName : typeName.substring(index + 1).split(",")) //$NON-NLS-1$
+					List<String> returnTypes = JSTypeUtil.getFunctionSignatureReturnTypeNames(typeName);
+					for (String returnTypeName : returnTypes)
 					{
 						this.addType(returnTypeName);
 					}

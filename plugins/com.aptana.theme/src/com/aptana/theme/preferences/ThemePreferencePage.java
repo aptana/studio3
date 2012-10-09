@@ -27,7 +27,6 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
-import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.preference.ColorSelector;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -439,13 +438,13 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				{
 					TableItem item = (TableItem) event.item;
 					ThemeRule token = (ThemeRule) item.getData();
-					if ((token.getTextAttribute().getStyle() & TextAttribute.UNDERLINE) != 0)
+					if ((token.getTextAttribute().style & TextAttribute.UNDERLINE) != 0)
 					{
 						int y = event.getBounds().y + event.getBounds().height - 6;
 						int x2 = event.getBounds().width;
 						Color oldFG = event.gc.getForeground();
 						Color fg;
-						RGBa rgb = token.getTextAttribute().getForeground();
+						RGBa rgb = token.getTextAttribute().foreground;
 						if (rgb == null)
 						{
 							fg = ThemePlugin.getDefault().getColorManager().getColor(getTheme().getForeground());
@@ -581,7 +580,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			{
 				ThemeRule token = (ThemeRule) element;
 				// TODO How do we handle alpha?
-				RGBa fg = token.getTextAttribute().getForeground();
+				RGBa fg = token.getTextAttribute().foreground;
 				if (fg == null)
 					return ThemePlugin.getDefault().getColorManager().getColor(getTheme().getForeground());
 				return ThemePlugin.getDefault().getColorManager().getColor(fg.toRGB());
@@ -591,7 +590,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			{
 				ThemeRule token = (ThemeRule) element;
 				// TODO How do we handle alpha?
-				RGBa bg = token.getTextAttribute().getBackground();
+				RGBa bg = token.getTextAttribute().background;
 				if (bg == null)
 					return ThemePlugin.getDefault().getColorManager().getColor(getTheme().getBackground());
 				return ThemePlugin.getDefault().getColorManager().getColor(bg.toRGB());
@@ -600,9 +599,9 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			public Font getFont(Object element)
 			{
 				ThemeRule token = (ThemeRule) element;
-				if (token.getTextAttribute().getStyle() == 0) // TODO Limit to only checking for bold or italic
+				if (token.getTextAttribute().style == 0) // TODO Limit to only checking for bold or italic
 					return fFont;
-				return lazyFont(fFont, token.getTextAttribute().getStyle());
+				return lazyFont(fFont, token.getTextAttribute().style);
 			}
 		});
 
@@ -915,11 +914,11 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				case 0:
 					return commit.getName();
 				case 1:
-					return commit.getTextAttribute().getForeground() == null ? "" : commit.getTextAttribute().getForeground() //$NON-NLS-1$
-									.toString();
+					return commit.getTextAttribute().foreground == null ? "" : commit.getTextAttribute().foreground //$NON-NLS-1$
+							.toString();
 				case 2:
-					return commit.getTextAttribute().getBackground() == null ? "" : commit.getTextAttribute().getBackground() //$NON-NLS-1$
-									.toString();
+					return commit.getTextAttribute().background == null ? "" : commit.getTextAttribute().background //$NON-NLS-1$
+							.toString();
 				default:
 					return ""; //$NON-NLS-1$
 			}
@@ -961,13 +960,13 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		for (int i = 0; i < items.length; i++)
 		{
 			ThemeRule rule = (ThemeRule) items[i].getData();
-			if (rule.getTextAttribute().getForeground() != null)
+			if (rule.getTextAttribute().foreground != null)
 			{
-				createButton(table, items[i], 1, rule.getTextAttribute().getForeground());
+				createButton(table, items[i], 1, rule.getTextAttribute().foreground);
 			}
-			if (rule.getTextAttribute().getBackground() != null)
+			if (rule.getTextAttribute().background != null)
 			{
-				createButton(table, items[i], 2, rule.getTextAttribute().getBackground());
+				createButton(table, items[i], 2, rule.getTextAttribute().background);
 			}
 			createFontStyle(table, items[i], rule.getTextAttribute());
 		}
@@ -988,9 +987,9 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 	private void createFontStyle(final Table table, final TableItem item, DelayedTextAttribute text)
 	{
-		boolean isBold = (text.getStyle() & SWT.BOLD) != 0;
-		boolean isItalic = (text.getStyle() & SWT.ITALIC) != 0;
-		boolean isUnderline = (text.getStyle() & TextAttribute.UNDERLINE) != 0;
+		boolean isBold = (text.style & SWT.BOLD) != 0;
+		boolean isItalic = (text.style & SWT.ITALIC) != 0;
+		boolean isUnderline = (text.style & TextAttribute.UNDERLINE) != 0;
 		TableEditor editor = new TableEditor(table);
 		Composite buttons = new Composite(table, SWT.NONE);
 		GridLayout grid = new GridLayout(3, true);

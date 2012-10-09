@@ -102,7 +102,13 @@ public enum JSTokenType implements ITypePredicate
 	SINGLELINE_COMMENT("SINGLELINE_COMMENT", 1024), //$NON-NLS-1$
 	MULTILINE_COMMENT("MULTILINE_COMMENT", 1025), //$NON-NLS-1$
 	SDOC("SDOC", 1026), //$NON-NLS-1$
-	VSDOC("VSDOC", 1027); //$NON-NLS-1$
+	VSDOC("VSDOC", 1027), //$NON-NLS-1$
+
+	// Note: STRING_SINGLE and STRING_DOUBLE do not map to Terminals.STRING because they should not
+	// override it later on in the mappings (also, they are just needed for the coloring scanner and
+	// not outside of that scope).
+	STRING_SINGLE("STRING_SINGLE", 1028), //$NON-NLS-1$
+	STRING_DOUBLE("STRING_DOUBLE", 1029); //$NON-NLS-1$
 
 	private static Map<String, JSTokenType> NAME_MAP;
 	private static Map<Short, JSTokenType> ID_MAP;

@@ -61,6 +61,8 @@ import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -162,9 +164,11 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 	/* default */Text textFind;
 	ToolItem findHistory;
+	int lastFindHistory;
 
 	/* default */Text textReplace;
 	ToolItem replaceHistory;
+	int lastReplaceHistory;
 
 	ToolItem caseSensitive;
 	ToolItem wholeWord;
@@ -263,28 +267,18 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 			}
 			else if (e.character == SWT.TAB)
 			{
-				if (e.stateMask == 0)
+				if (e.stateMask == 0 || e.stateMask == SWT.SHIFT)
 				{
 					e.doit = false;
-					((Text) e.widget).traverse(SWT.TRAVERSE_TAB_NEXT);
-				}
-				else if (e.stateMask == SWT.SHIFT)
-				{
-					e.doit = false;
-					((Text) e.widget).traverse(SWT.TRAVERSE_TAB_PREVIOUS);
+					((Text) e.widget).traverse(e.stateMask == 0 ? SWT.TRAVERSE_TAB_NEXT : SWT.TRAVERSE_TAB_PREVIOUS);
 				}
 			}
-			else if (e.keyCode == SWT.ARROW_DOWN && e.stateMask == SWT.MOD1)
+			else if ((e.keyCode == SWT.ARROW_DOWN || e.keyCode == SWT.ARROW_UP) && e.stateMask == SWT.MOD1)
 			{
 				e.doit = false;
-				if (e.widget == textFind)
-				{
-					createHistoryMenu(findHistory, FindBarEntriesHelper.PREFERENCE_NAME_FIND, null);
-				}
-				else
-				{
-					createHistoryMenu(replaceHistory, FindBarEntriesHelper.PREFERENCE_NAME_REPLACE, null);
-				}
+				String preferenceName = (e.widget == textFind) ? FindBarEntriesHelper.PREFERENCE_NAME_FIND
+						: FindBarEntriesHelper.PREFERENCE_NAME_REPLACE;
+				insertHistory(preferenceName, e.keyCode == SWT.ARROW_DOWN);
 			}
 		}
 	};
@@ -406,6 +400,8 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		scopeMap.put(FindScope.OPEN_FILES, FindBarPlugin.ICON_SEARCH_OPEN_FILES);
 		scopeMap.put(FindScope.ENCLOSING_PROJECT, FindBarPlugin.ICON_SEARCH_PROJECT);
 		scopeMap.put(FindScope.WORKSPACE, FindBarPlugin.ICON_SEARCH_WORKSPACE);
+
+		resetHistoryCounters();
 	}
 
 	public Composite createFindBarComposite(Composite parent)
@@ -481,12 +477,31 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 			public void modifyText(ModifyEvent e)
 			{
-				findButton.setEnabled(!StringUtil.isEmpty(textFind.getText()));
+				findButton.setEnabled(!isTextFindEmpty());
 				if (countMatches.getSelection())
 				{
 					FindBarDecorator.findBarConfiguration.toggle(countMatchesOption.preferencesKey);
 					countMatches.setText(StringUtil.EMPTY);
 					countMatches.getParent().getParent().layout(new Control[] { countMatches.getParent() });
+				}
+			}
+		});
+		textFind.addTraverseListener(new TraverseListener()
+		{
+
+			public void keyTraversed(TraverseEvent e)
+			{
+				if (e.detail == SWT.TRAVERSE_TAB_PREVIOUS)
+				{
+					if (replaceAll.isEnabled())
+					{
+						replaceAll.setFocus();
+					}
+					else
+					{
+						textReplace.setFocus();
+					}
+					e.doit = false;
 				}
 			}
 		});
@@ -545,10 +560,14 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 		countMatchesOption.createToolItem(optionsToolBar);
 
+		searchComposite.setTabList(new Control[] { findButtonComposite });
+
+		findBarTabOrder.add(textFind);
+		findBarTabOrder.add(textReplace);
+
 		close = createLabel(findBar, CLOSE, true, CLOSE_ENTER);
 		close.setToolTipText(Messages.FindBarDecorator_TOOLTIP_HideFindBar);
 		close.setLayoutData(GridDataFactory.swtDefaults().align(SWT.END, SWT.BEGINNING).create());
-		findBarTabOrder.add(close);
 
 		disableWhenHidden = new Control[] { textFind, textReplace, optionsToolBar, close, findButton, replaceFind,
 				replace, replaceAll };
@@ -745,17 +764,28 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 		if (!CollectionsUtil.isEmpty(loadEntries))
 		{
+			int i = 0;
 			for (final String item : loadEntries)
 			{
-				MenuItem menuItem = new MenuItem(menu, SWT.NONE);
+				final MenuItem menuItem = new MenuItem(menu, SWT.NONE);
+				menuItem.setData(Integer.valueOf(i));
 				menuItem.setText(StringUtil.truncate(NEWLINE_SANITIZER.searchAndReplace(item), 30));
 				menuItem.addSelectionListener(new SelectionAdapter()
 				{
 					public void widgetSelected(SelectionEvent e)
 					{
+						if (FindBarEntriesHelper.PREFERENCE_NAME_REPLACE.equals(preferenceName))
+						{
+							lastReplaceHistory = (Integer) menuItem.getData();
+						}
+						else
+						{
+							lastFindHistory = (Integer) menuItem.getData();
+						}
 						updateTextAfterHistorySelection(item, preferenceName);
 					};
 				});
+				i++;
 			}
 		}
 		else
@@ -767,6 +797,34 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		menu.setLocation(point.x, point.y);
 		menu.setVisible(true);
 		return menu;
+	}
+
+	private void insertHistory(String preferenceName, boolean isNext)
+	{
+		List<String> loadEntries = findBarEntriesHelper.loadEntries(preferenceName);
+		boolean isReplace = FindBarEntriesHelper.PREFERENCE_NAME_REPLACE.equals(preferenceName);
+		int currentIndex = isReplace ? lastReplaceHistory : lastFindHistory;
+		currentIndex = currentIndex + (isNext ? -1 : 1);
+		if (currentIndex >= loadEntries.size())
+		{
+			currentIndex = 0;
+		}
+		else if (currentIndex < 0)
+		{
+			currentIndex = loadEntries.size() - 1;
+		}
+
+		String text = loadEntries.get(currentIndex);
+		updateTextAfterHistorySelection(text, preferenceName);
+
+		if (isReplace)
+		{
+			lastReplaceHistory = currentIndex;
+		}
+		else
+		{
+			lastFindHistory = currentIndex;
+		}
 	}
 
 	private void updateTextAfterHistorySelection(String text, String preferenceName)
@@ -1111,7 +1169,13 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 	private boolean isTextFindValid()
 	{
-		return !DISABLED_COLOR.equals(textFind.getForeground()) && !StringUtil.isEmpty(textFind.getText());
+		return !DISABLED_COLOR.equals(textFind.getForeground()) && !isTextFindEmpty();
+	}
+
+	private boolean isTextFindEmpty()
+	{
+		String findText = textFind.getText();
+		return findText == null || findText.length() == 0;
 	}
 
 	private IFindReplaceTarget getFindReplaceTarget()
@@ -1231,8 +1295,11 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	/**
 	 * Note: this method should NEVER be called directly. Always use setVisible (the visibility control is the only
 	 * place that should reference this method).
+	 * 
+	 * @param updateFocus
+	 *            indicates if the focus should be given to the editor
 	 */
-	/* default */void hideFindBar()
+	/* default */void hideFindBar(boolean updateFocus)
 	{
 		if (findBarGridData.exclude == false)
 		{
@@ -1245,7 +1312,10 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 			removeComboSearchOnTextChangeListener();
 			statusLineManager.setMessage(false, StringUtil.EMPTY, null);
 		}
-		textEditor.setFocus();
+		if (updateFocus)
+		{
+			textEditor.setFocus();
+		}
 		if (disableWhenHidden != null)
 		{
 			for (Control w : disableWhenHidden)
@@ -1274,7 +1344,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	 * place that should reference this method).
 	 * 
 	 * @param updateFocus
-	 *            determines whether the focus show be given to the combo.
+	 *            indicates if the focus should be given to the combo
 	 */
 	/* default */void showFindBar(boolean updateFocus)
 	{
@@ -1282,7 +1352,10 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		{
 			for (Control w : disableWhenHidden)
 			{
-				w.setEnabled(true);
+				if (w != null && !w.isDisposed())
+				{
+					w.setEnabled(true);
+				}
 			}
 		}
 
@@ -1374,6 +1447,13 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	private void setFindText(String findText, final Text text, String preferenceName)
 	{
 		findBarEntriesHelper.addEntry(findText, preferenceName);
+		resetHistoryCounters();
+	}
+
+	private void resetHistoryCounters()
+	{
+		lastFindHistory = -1;
+		lastReplaceHistory = -1;
 	}
 
 	private static final int TOO_MANY = Integer.getInteger(FindBarDecorator.class.getName() + ".TOO_MANY", 100); //$NON-NLS-1$
@@ -1394,7 +1474,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 		int currentCount = 0;
 		int total = 0;
-		if (!StringUtil.isEmpty(textFind.getText()))
+		if (isTextFindValid())
 		{
 			String text = sourceViewer.getDocument().get();
 			Pattern pattern = createFindPattern();

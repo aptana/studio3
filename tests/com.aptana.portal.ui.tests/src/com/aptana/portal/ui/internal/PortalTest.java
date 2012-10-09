@@ -54,7 +54,7 @@ public class PortalTest extends TestCase
 	{
 		URL localFileURL = new File("").toURI().toURL(); //$NON-NLS-1$
 		URL googleServer = new URL("http://www.google.com"); //$NON-NLS-1$
-		URL offlineServer = new URL("http://fff.appceler.com"); //$NON-NLS-1$
+		URL offlineServer = new URL("http://fff.appceler.abc"); //$NON-NLS-1$
 		URL baseServer = new URL("http://www.msn.com"); //$NON-NLS-1$
 
 		Portal fixture = Portal.getInstance();

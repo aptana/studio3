@@ -2,7 +2,7 @@
 <feature
       id="com.aptana.feature"
       label="%featureName"
-      version="3.2.4.qualifier"
+      version="3.3.0.qualifier"
       provider-name="%providerName"
       plugin="com.aptana.branding">
 
@@ -369,13 +369,6 @@
          unpack="false"/>
 
    <plugin
-         id="com.aptana.plist"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="com.aptana.editor.markdown"
          download-size="0"
          install-size="0"
@@ -717,6 +710,20 @@
 
    <plugin
          id="com.aptana.deploy.epl"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.js.debug.v8.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.build.ui"
          download-size="0"
          install-size="0"
          version="0.0.0"

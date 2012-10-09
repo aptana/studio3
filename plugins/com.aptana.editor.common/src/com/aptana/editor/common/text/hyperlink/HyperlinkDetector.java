@@ -26,6 +26,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IDebugScopes;
 import com.aptana.editor.common.outline.PathResolverProvider;
@@ -46,7 +47,9 @@ public class HyperlinkDetector extends URLHyperlinkDetector
 			IDocument document = textViewer.getDocument();
 			int offset = region.getOffset();
 			if (document == null)
+			{
 				return null;
+			}
 
 			// Assume it's a src attribute value, try and grab it...
 			IRegion lineInfo;
@@ -72,12 +75,16 @@ public class HyperlinkDetector extends URLHyperlinkDetector
 				value = line.substring(beforeIndex + 1, afterIndex);
 				hyperLinkRegion = new Region(lineInfo.getOffset() + beforeIndex + 1, value.length());
 			}
-			if (value == null || value.trim().length() == 0)
+			if (StringUtil.isEmpty(value))
 			{
 				return null;
 			}
 			// Now try and resolve the value as a URI...
 			IEditorPart part = (IEditorPart) getAdapter(IEditorPart.class);
+			if (part == null)
+			{
+				return null;
+			}
 			IEditorInput input = part.getEditorInput();
 			IPathResolver resolver = PathResolverProvider.getResolver(input);
 			try

@@ -12,10 +12,11 @@ import java.util.List;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 
-import com.aptana.core.build.AbstractBuildParticipant;
+import com.aptana.core.build.IBuildParticipant;
 import com.aptana.core.build.IProblem;
 import com.aptana.editor.common.validation.AbstractValidatorTestCase;
 import com.aptana.editor.css.ICSSConstants;
+import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.IHTMLConstants;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.js.IJSConstants;
@@ -23,9 +24,16 @@ import com.aptana.editor.js.IJSConstants;
 public class HTMLParseErrorValidatorTest extends AbstractValidatorTestCase
 {
 	@Override
-	protected AbstractBuildParticipant createValidator()
+	protected IBuildParticipant createValidator()
 	{
-		return new HTMLParserValidator();
+		return new HTMLParserValidator()
+		{
+			@Override
+			protected String getPreferenceNode()
+			{
+				return HTMLPlugin.PLUGIN_ID;
+			}
+		};
 	}
 
 	@Override

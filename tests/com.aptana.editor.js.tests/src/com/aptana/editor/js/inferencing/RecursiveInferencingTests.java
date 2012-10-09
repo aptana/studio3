@@ -84,4 +84,12 @@ public class RecursiveInferencingTests extends InferencingTestsBase
 	{
 		this.lastStatementTypeTests(Path.fromPortableString("inferencing/chaining.js"), "Utils.create.utilsSelf");
 	}
+
+	/*
+	 * APSTUD-4864 JS Type Inferencing fails to check local scope for variable type before checking globals
+	 */
+	public void testReturnSelfVarDefinedInLocalScopeBeforeConsultingGlobals() throws Exception
+	{
+		this.lastStatementTypeTests(Path.fromPortableString("inferencing/chaining-self.js"), "Utils.create.self");
+	}
 }

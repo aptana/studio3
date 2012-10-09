@@ -38,6 +38,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.ide.security.linux.Activator;
 
@@ -233,7 +234,7 @@ public class PasswordProvider extends org.eclipse.equinox.security.storage.provi
 		}
 		catch (BadPaddingException e)
 		{
-			Activator.logError(Messages.PasswordProvider_ERR_BadPadding, e);
+			IdeLog.logWarning(Activator.getDefault(), Messages.PasswordProvider_ERR_BadPadding, e);
 		}
 		catch (UnsupportedEncodingException e)
 		{
@@ -268,7 +269,7 @@ public class PasswordProvider extends org.eclipse.equinox.security.storage.provi
 		}
 		catch (BadPaddingException e)
 		{
-			Activator.logError(Messages.PasswordProvider_ERR_BadPadding, e);
+			IdeLog.logWarning(Activator.getDefault(), Messages.PasswordProvider_ERR_BadPadding, e);
 		}
 		return null;
 	}

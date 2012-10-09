@@ -88,13 +88,36 @@ public class CSSValidator extends AbstractBuildParticipant
 	private static final String[] FILTERED_MESSAGES = { "unrecognized media only", "linear-gradient" };
 
 	@SuppressWarnings("nls")
-	public static final String[] DEFAULT_FILTERS = new String[] { ".*Unknown pseudo-element.*",
-			"Property\\s*[-_].*doesn't exist.*", ".*-moz-.*", ".*-o-*", ".*opacity.*", ".*overflow-.*",
-			".*accelerator.*", ".*background-position-.*", ".*filter.*", ".*ime-mode.*", ".*layout-.*",
-			".*line-break.*", ".*page.*", ".*ruby-.*", ".*scrollbar-.*", ".*text-align-.*", ".*text-justify.*",
-			".*text-overflow.*", ".*text-shadow.*", ".*text-underline-position.*", ".*word-spacing.*", ".*word-wrap.*",
-			".*writing-mode.*", ".*zoom.*", ".*Parse Error.*", ".*-webkit-.*", ".*rgba.*is not a .* value.*",
-			".*Too many values or values are not recognized.*" };
+	public static final String[] DEFAULT_FILTERS = new String[] {
+			".*Unknown pseudo-element.*",
+			"Property\\s*[-_].*doesn't exist.*",
+			".*-moz-.*",
+			".*-o-*",
+			".*opacity.*",
+			".*overflow-.*",
+			".*accelerator.*",
+			".*background-position-.*",
+			".*filter.*",
+			".*ime-mode.*",
+			".*layout-.*",
+			".*line-break.*",
+			".*page.*",
+			".*ruby-.*",
+			".*scrollbar-.*",
+			".*text-align-.*",
+			".*text-justify.*",
+			".*text-overflow.*",
+			".*text-shadow.*",
+			".*text-underline-position.*",
+			".*word-spacing.*",
+			".*word-wrap.*",
+			".*writing-mode.*",
+			".*zoom.*",
+			".*Parse Error.*",
+			".*-webkit-.*",
+			".*rgba.*is not a .* value.*",
+			".*Too many values or values are not recognized.*",
+			Pattern.quote("Value Error : background (http://www.w3.org/TR/REC-CSS2/colors.html#propdef-background) , is an incorrect operator :") };
 
 	static
 	{

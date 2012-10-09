@@ -9,6 +9,11 @@ package com.aptana.scripting.model;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IStatus;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IStatus;
@@ -16,6 +21,7 @@ import org.eclipse.core.runtime.IStatus;
 import com.aptana.core.projects.templates.IProjectTemplate;
 import com.aptana.core.projects.templates.ProjectTemplate;
 import com.aptana.core.projects.templates.TemplateType;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
 
@@ -28,6 +34,7 @@ public class ProjectTemplateElement extends AbstractBundleElement implements IPr
 	private String fIconPath;
 	private URL fIconURL;
 	private int fPriority;
+	private List<String> fTags;
 
 	/**
 	 * ProjectTemplate
@@ -114,6 +121,14 @@ public class ProjectTemplateElement extends AbstractBundleElement implements IPr
 		return fType.toString();
 	}
 
+	/**
+	 * @return the tags
+	 */
+	public List<String> getTags()
+	{
+		return CollectionsUtil.getListValue(fTags);
+	}
+
 	@Override
 	public int hashCode()
 	{
@@ -177,6 +192,15 @@ public class ProjectTemplateElement extends AbstractBundleElement implements IPr
 	public void setType(TemplateType type)
 	{
 		fType = type;
+	}
+
+	/**
+	 * @param tags
+	 *            the tags to set
+	 */
+	public void setTags(List<String> tags)
+	{
+		fTags = CollectionsUtil.isEmpty(tags) ? null : new ArrayList<String>(tags);
 	}
 
 	/*
@@ -274,6 +298,7 @@ public class ProjectTemplateElement extends AbstractBundleElement implements IPr
 	protected ProjectTemplate createProjectTemplate()
 	{
 		return new ProjectTemplate((new File(getDirectory(), getLocation())).getAbsolutePath(), getType(),
-				getDisplayName(), isReplacingParameters(), getDescription(), getIconURL(), getId(), getPriority());
+				getDisplayName(), isReplacingParameters(), getDescription(), getIconURL(), getId(), getPriority(),
+				getTags());
 	}
 }

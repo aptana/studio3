@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -94,7 +94,19 @@ public class ThemeRule
 
 	public boolean isSeparator()
 	{
-		return getScopeSelector().equals(EMPTY_SCOPE);
+		IScopeSelector scopeSelector = getScopeSelector();
+		if (scopeSelector.equals(EMPTY_SCOPE))
+		{
+			return true;
+		}
+		if ("dont.match".equals(scopeSelector.toString())) //$NON-NLS-1$
+		{
+			// Special case: our themes use dont.match for titles
+			// See: abstract_theme_dark.properties and abstract_theme_light.properties
+			return true;
+
+		}
+		return false;
 	}
 
 	public ThemeRule setName(String newName)
@@ -109,17 +121,17 @@ public class ThemeRule
 
 	public ThemeRule updateFontStyle(int style)
 	{
-		return setTextAttribute(getTextAttribute().getForeground(), getTextAttribute().getBackground(), style);
+		return setTextAttribute(getTextAttribute().foreground, getTextAttribute().background, style);
 	}
 
 	public ThemeRule updateFG(RGBa fg)
 	{
-		return setTextAttribute(fg, getTextAttribute().getBackground(), getTextAttribute().getStyle());
+		return setTextAttribute(fg, getTextAttribute().background, getTextAttribute().style);
 	}
 
 	public ThemeRule updateBG(RGBa bg)
 	{
-		return setTextAttribute(getTextAttribute().getForeground(), bg, getTextAttribute().getStyle());
+		return setTextAttribute(getTextAttribute().foreground, bg, getTextAttribute().style);
 	}
 
 	public ThemeRule setScopeSelector(ScopeSelector scopeSelector)

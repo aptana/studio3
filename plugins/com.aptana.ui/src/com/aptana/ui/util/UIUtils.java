@@ -9,17 +9,20 @@
 package com.aptana.ui.util;
 
 import java.net.URI;
+import java.net.URL;
 
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.help.ui.internal.views.HelpView;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
@@ -43,7 +46,9 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.eclipse.ui.commands.ICommandService;
+import org.eclipse.ui.help.IWorkbenchHelpSystem;
 import org.eclipse.ui.internal.WorkbenchWindow;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.progress.UIJob;
@@ -52,18 +57,24 @@ import org.eclipse.ui.services.IEvaluationService;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.ui.UIPlugin;
+import com.aptana.ui.dialogs.GenericInfoPopupDialog;
 
 /**
  * @author Max Stepanov
  * @author cwilliams
  */
+@SuppressWarnings("restriction")
 public final class UIUtils
 {
+
+	private static final String HELP_VIEW_ID = "org.eclipse.help.ui.HelpView"; //$NON-NLS-1$
 
 	/**
 	 * By default, show tooltips for 3 seconds.
 	 */
 	public static final int DEFAULT_TOOLTIP_TIME = 3000;
+
+	private static final String INTERNAL_HELP_BROWSER_ID = "internal_help_browser"; //$NON-NLS-1$
 
 	/**
 	 * 
@@ -384,6 +395,13 @@ public final class UIUtils
 
 			public int openMessageDialog()
 			{
+				if (kind == MessageDialog.INFORMATION)
+				{
+					// for info messages, we show the toast popup
+					GenericInfoPopupDialog dialog = new GenericInfoPopupDialog(UIUtils.getActiveWorkbenchWindow()
+							.getShell(), title, message);
+					return dialog.open();
+				}
 				return MessageDialog.open(kind, UIUtils.getActiveWorkbenchWindow().getShell(), title, message, SWT.NONE) ? Window.OK
 						: Window.CANCEL;
 			}
@@ -444,7 +462,7 @@ public final class UIUtils
 				return Status.OK_STATUS;
 			}
 		};
-		job.setSystem(!EclipseUtil.showSystemJobs());
+		EclipseUtil.setSystemForJob(job);
 		job.schedule();
 	}
 
@@ -514,7 +532,6 @@ public final class UIUtils
 		return AbstractUIPlugin.imageDescriptorFromPlugin(pluginId, path);
 	}
 
-	@SuppressWarnings("restriction")
 	public static boolean getCoolBarVisibility()
 	{
 		IWorkbench workbench = PlatformUI.getWorkbench();
@@ -529,7 +546,6 @@ public final class UIUtils
 		return true;
 	}
 
-	@SuppressWarnings("restriction")
 	public static void setCoolBarVisibility(boolean visible)
 	{
 		IWorkbenchWindow activeWorkbenchWindow = getActiveWorkbenchWindow();
@@ -547,5 +563,126 @@ public final class UIUtils
 				cmdService.refreshElements("org.eclipse.ui.ToggleCoolbarAction", null); //$NON-NLS-1$
 			}
 		}
+	}
+
+	/**
+	 * Opens the internal HelpView and address it to the given doc url.
+	 * 
+	 * @param url
+	 */
+	public static void openHelp(String url)
+	{
+		IWorkbenchPage page = getActivePage();
+		if (page != null)
+		{
+			try
+			{
+				IViewPart part = page.showView(HELP_VIEW_ID);
+				if (part != null)
+				{
+					HelpView view = (HelpView) part;
+					view.showHelp(url);
+				}
+			}
+			catch (PartInitException e)
+			{
+				IdeLog.logError(UIPlugin.getDefault(), e);
+			}
+		}
+		else
+		{
+			IdeLog.logWarning(UIPlugin.getDefault(), "Could not open the help view. Active page was null."); //$NON-NLS-1$
+		}
+	}
+
+	/**
+	 * Opens the internal help in the Studio's internal browser.
+	 * 
+	 * @param url
+	 * @return A boolean value indicating a successful operations or not.
+	 */
+	public static boolean openHelpInBrowser(String url)
+	{
+		IWorkbench workbench = PlatformUI.getWorkbench();
+		if (workbench != null)
+		{
+			IWorkbenchHelpSystem helpSystem = workbench.getHelpSystem();
+			URL resolvedURL = helpSystem.resolve(url, true);
+			if (resolvedURL != null)
+			{
+				return openInBroswer(resolvedURL, true, IWorkbenchBrowserSupport.AS_EDITOR
+						| IWorkbenchBrowserSupport.STATUS);
+			}
+			else
+			{
+				IdeLog.logError(UIPlugin.getDefault(), "Unable to resolve the Help URL for " + url); //$NON-NLS-1$
+				return false;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Open a URL in a browser.
+	 * 
+	 * @param url
+	 * @param internal
+	 *            In case true, the system will try to open the internal browser if it's available.
+	 * @param style
+	 *            the Browser's style, in case an internal browser is requested.
+	 * @return A boolean value indicating a successful operations or not.
+	 */
+	public static boolean openInBroswer(URL url, boolean internal, int style)
+	{
+		IWorkbench workbench = PlatformUI.getWorkbench();
+		if (workbench != null)
+		{
+			IWorkbenchBrowserSupport support = PlatformUI.getWorkbench().getBrowserSupport();
+			try
+			{
+				if (internal && support.isInternalWebBrowserAvailable())
+				{
+
+					support.createBrowser(style, INTERNAL_HELP_BROWSER_ID, null, null).openURL(url);
+
+				}
+				else
+				{
+					support.getExternalBrowser().openURL(url);
+				}
+			}
+			catch (PartInitException e)
+			{
+				IdeLog.logError(UIPlugin.getDefault(), "Error opening the help", e); //$NON-NLS-1$
+				return false;
+			}
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Runs the passed runnable in the UI thread. If the current thread is an UI-thread, runs it now, otherwise it's run
+	 * asynchronously in the UI thread.
+	 */
+	public static void runInUIThread(Runnable runnable)
+	{
+		Display display = Display.getCurrent();
+		if (display == null)
+		{
+			Display.getDefault().asyncExec(runnable);
+		}
+		else
+		{
+			runnable.run();
+		}
+	}
+
+	/**
+	 * Throws an AssertionError if the current thread is not the UI thread.
+	 */
+	public static void assertUIThread()
+	{
+		Assert.isTrue(Display.getCurrent() != null, "Function must be called from UI-thread."); //$NON-NLS-1$
 	}
 }

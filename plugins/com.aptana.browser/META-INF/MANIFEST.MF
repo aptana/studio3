@@ -5,15 +5,13 @@ Bundle-SymbolicName: com.aptana.browser;singleton:=true
 Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.browser.BrowserPlugin
 Bundle-Vendor: %Bundle-Vendor
-Require-Bundle: org.eclipse.core.runtime,
+Require-Bundle: com.aptana.core,
  org.eclipse.ui,
- com.aptana.swt.webkitbrowser;visibility:=reexport,
  org.eclipse.ui.browser,
- com.aptana.core
+ com.aptana.swt.webkitbrowser;visibility:=reexport
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.browser,
- com.aptana.browser.internal,
  com.aptana.browser.parts,
  com.aptana.browser.support
 Eclipse-ExtensibleAPI: true

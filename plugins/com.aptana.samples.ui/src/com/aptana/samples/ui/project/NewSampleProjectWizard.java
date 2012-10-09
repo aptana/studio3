@@ -50,10 +50,10 @@ import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.FileUtil;
+import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.ZipUtil;
 import com.aptana.git.ui.CloneJob;
-import com.aptana.projects.internal.wizards.AbstractNewProjectWizard;
-import com.aptana.projects.util.ProjectUtil;
+import com.aptana.projects.wizards.AbstractNewProjectWizard;
 import com.aptana.samples.handlers.ISampleProjectHandler;
 import com.aptana.samples.model.IProjectSample;
 import com.aptana.samples.ui.SamplesUIPlugin;
@@ -206,7 +206,7 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 			location = mainPage.getLocationURI();
 		}
 
-		IProjectDescription description = ProjectUtil.getProjectDescription(mainPage.getLocationPath(),
+		IProjectDescription description = ResourceUtil.getProjectDescription(mainPage.getLocationPath(),
 				sample.getNatures(), ArrayUtil.NO_STRINGS);
 		description.setName(newProjectHandle.getName());
 		description.setLocationURI(location);
@@ -222,8 +222,7 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 				doBasicCreateProject(newProjectHandle, description);
 
 				// FIXME Move the logic for extracting/applying samples to IProjectSample! See IProjectTemplate!
-				ZipUtil.extract(new File(sample.getLocation()), newProjectHandle.getLocation(),
-						ZipUtil.Conflict.PROMPT, new NullProgressMonitor());
+				ZipUtil.extract(new File(sample.getLocation()), newProjectHandle.getLocation(), ZipUtil.Conflict.PROMPT, new NullProgressMonitor());
 
 				doPostProjectCreation(newProjectHandle);
 			}

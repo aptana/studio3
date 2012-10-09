@@ -12,13 +12,13 @@ import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
@@ -35,16 +35,21 @@ import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
+import org.osgi.service.prefs.BackingStoreException;
+
+import com.aptana.buildpath.core.BuildPathCorePlugin;
 import com.aptana.core.IFilter;
 import com.aptana.core.build.AbstractBuildParticipant;
 import com.aptana.core.build.IProblem;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StreamUtil;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.index.core.build.BuildContext;
+import com.aptana.jetty.util.epl.ajax.JSON;
 
 /**
  * Runs the code against JSLint inside Rhino, then parses out the reported errors/warnings.
@@ -54,6 +59,11 @@ import com.aptana.index.core.build.BuildContext;
 public class JSLintValidator extends AbstractBuildParticipant
 {
 	/**
+	 * Preference key used to store the JSLint options as JSON.
+	 */
+	public static final String JS_LINT_OPTIONS = "jsLintOptions"; //$NON-NLS-1$
+
+	/**
 	 * The unique ID of this validator/build participant.
 	 */
 	public static final String ID = "com.aptana.editor.js.validator.JSLintValidator"; //$NON-NLS-1$
@@ -62,24 +72,6 @@ public class JSLintValidator extends AbstractBuildParticipant
 	private static JSLint JS_LINT_SCRIPT;
 
 	private static ContextFactory contextFactory = new ContextFactory();
-
-	private static Map<String, Object> DEFAULT_OPTION = new HashMap<String, Object>();
-	static
-	{
-		// Set default aptana options
-		DEFAULT_OPTION.put("laxLineEnd", true); //$NON-NLS-1$
-		DEFAULT_OPTION.put("undef", true); //$NON-NLS-1$
-		DEFAULT_OPTION.put("browser", true); //$NON-NLS-1$
-		DEFAULT_OPTION.put("jscript", true); //$NON-NLS-1$
-		DEFAULT_OPTION.put("debug", true); //$NON-NLS-1$
-		DEFAULT_OPTION.put("maxerr", 100000); //$NON-NLS-1$
-		DEFAULT_OPTION.put("white", true); //$NON-NLS-1$
-		DEFAULT_OPTION.put(
-				"predef", new NativeArray(new String[] { "Ti", "Titanium", "alert", "require", "exports", "native", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
-						"implements" })); //$NON-NLS-1$
-	}
-
-	private Map<String, Object> options;
 
 	public JSLintValidator()
 	{
@@ -93,20 +85,18 @@ public class JSLintValidator extends AbstractBuildParticipant
 			return;
 		}
 
-		intializeOptions();
 		List<IProblem> problems = Collections.emptyList();
 		String sourcePath = context.getURI().toString();
 		try
 		{
 			problems = parseWithLint(context.getContents(), sourcePath);
-			}
+		}
 		catch (Exception e)
 		{
 			IdeLog.logError(JSPlugin.getDefault(),
 					MessageFormat.format("Failed to parse {0} with JSLint", sourcePath), e); //$NON-NLS-1$
 		}
 
-		this.options = null;
 		context.putProblems(IJSConstants.JSLINT_PROBLEM_MARKER_TYPE, problems);
 	}
 
@@ -128,7 +118,7 @@ public class JSLintValidator extends AbstractBuildParticipant
 			return Collections.emptyList();
 		}
 
-		script.runLint(source, this.options);
+		script.runLint(source, getOptions());
 
 		List<IProblem> collected = script.getProblems(source, path);
 		final List<String> filters = getFilters();
@@ -138,7 +128,7 @@ public class JSLintValidator extends AbstractBuildParticipant
 			public boolean include(IProblem item)
 			{
 				return !isIgnored(item.getMessage(), filters);
-		}
+			}
 		});
 	}
 
@@ -148,9 +138,9 @@ public class JSLintValidator extends AbstractBuildParticipant
 	 * @return
 	 */
 	private synchronized JSLint getJSLintScript()
-		{
+	{
 		if (JS_LINT_SCRIPT == null)
-			{
+		{
 			URL url = FileLocator.find(JSPlugin.getDefault().getBundle(), Path.fromPortableString(JSLINT_FILENAME),
 					null);
 			if (url != null)
@@ -161,8 +151,8 @@ public class JSLintValidator extends AbstractBuildParticipant
 					if (source != null)
 					{
 						JS_LINT_SCRIPT = getJSLintScript(source);
-			}
-		}
+					}
+				}
 				catch (IOException e)
 				{
 					IdeLog.logError(JSPlugin.getDefault(), Messages.JSLintValidator_ERR_FailToGetJSLint, e);
@@ -193,21 +183,6 @@ public class JSLintValidator extends AbstractBuildParticipant
 		}
 	}
 
-	public void setOption(String propertyName, Object value)
-	{
-		intializeOptions();
-		this.options.put(propertyName, value);
-	}
-
-	private void intializeOptions()
-	{
-		if (this.options == null)
-		{
-			this.options = new HashMap<String, Object>();
-			this.options.putAll(DEFAULT_OPTION);
-		}
-	}
-
 	class JSLint
 	{
 		private ContextFactory contextFactory;
@@ -231,85 +206,85 @@ public class JSLintValidator extends AbstractBuildParticipant
 					Function lintFunc = (Function) scope.get("JSLINT", scope); //$NON-NLS-1$
 
 					Object errorObject = lintFunc.get("errors", scope); //$NON-NLS-1$
-		if (!(errorObject instanceof NativeArray))
-		{
+					if (!(errorObject instanceof NativeArray))
+					{
 						return null;
-		}
+					}
 
-		NativeArray errorArray = (NativeArray) errorObject;
-		Object[] ids = errorArray.getIds();
-		if (ArrayUtil.isEmpty(ids))
-		{
+					NativeArray errorArray = (NativeArray) errorObject;
+					Object[] ids = errorArray.getIds();
+					if (ArrayUtil.isEmpty(ids))
+					{
 						return null;
-		}
+					}
 
-		boolean lastIsError = false;
+					boolean lastIsError = false;
 					NativeObject last = (NativeObject) errorArray.get(Integer.parseInt(ids[ids.length - 1].toString()),
 							scope);
-		if (last == null)
-		{
-			lastIsError = true;
-		}
+					if (last == null)
+					{
+						lastIsError = true;
+					}
 
-		IDocument doc = null; // Lazily init document object to query about lines/offsets
-		for (int i = 0; i < ids.length; ++i)
-		{
-			// Grab the warning/error
-			NativeObject object = (NativeObject) errorArray.get(Integer.parseInt(ids[i].toString()), scope);
-			if (object == null)
-			{
-				continue;
-			}
+					IDocument doc = null; // Lazily init document object to query about lines/offsets
+					for (int i = 0; i < ids.length; ++i)
+					{
+						// Grab the warning/error
+						NativeObject object = (NativeObject) errorArray.get(Integer.parseInt(ids[i].toString()), scope);
+						if (object == null)
+						{
+							continue;
+						}
 
-			// Grab the line of the error. Skip if we already recorded an error on this line (why?)
-			int line = (int) Double.parseDouble(object.get("line", scope).toString()); //$NON-NLS-1$
+						// Grab the line of the error. Skip if we already recorded an error on this line (why?)
+						int line = (int) Double.parseDouble(object.get("line", scope).toString()); //$NON-NLS-1$
 
-			// Grab the details of the error. If user has set up filters to ignore it, move on
-			String reason = object.get("reason", scope).toString().trim(); //$NON-NLS-1$
+						// Grab the details of the error. If user has set up filters to ignore it, move on
+						String reason = object.get("reason", scope).toString().trim(); //$NON-NLS-1$
 
-			// lazy init of document to query for offsets/line info
-			if (doc == null)
-			{
-				doc = new Document(source);
-			}
+						// lazy init of document to query for offsets/line info
+						if (doc == null)
+						{
+							doc = new Document(source);
+						}
 
-			// Translate the column reported into the absolute offset from start of doc
-			int character = (int) Double.parseDouble(object.get("character", scope).toString()); //$NON-NLS-1$
-			try
-			{
+						// Translate the column reported into the absolute offset from start of doc
+						int character = (int) Double.parseDouble(object.get("character", scope).toString()); //$NON-NLS-1$
+						try
+						{
 							// JSLint reports the offset as column on the given line, and counts tab characters as 4
 							// columns
 							// We account for that by adding the offset of the line start, and reducing the column count
 							// on
-				// tabs
-				IRegion lineInfo = doc.getLineInformation(line - 1);
-				int realOffset = lineInfo.getOffset();
-				String rawLine = doc.get(realOffset, lineInfo.getLength());
+							// tabs
+							IRegion lineInfo = doc.getLineInformation(line - 1);
+							int realOffset = lineInfo.getOffset();
+							String rawLine = doc.get(realOffset, lineInfo.getLength());
 							int lineLength = rawLine.length();
-				int actual = character - 1;
-				for (int x = 0; x < actual; x++)
-				{
+							int actual = character - 1;
+							for (int x = 0; x < actual; x++)
+							{
 								if (lineLength <= x)
 								{
 									break;
 								}
-					char c = rawLine.charAt(x);
-					if (c == '\t')
-					{
-						actual -= 3;
-					}
-					realOffset++;
-				}
-				character = realOffset;
-			}
-			catch (BadLocationException e)
-			{
-				// ignore
-			}
+								char c = rawLine.charAt(x);
+								if (c == '\t')
+								{
+									actual -= 3;
+								}
+								realOffset++;
+							}
+							character = realOffset;
+						}
+						catch (BadLocationException e)
+						{
+							// ignore
+						}
 
-			// Now record the error
-			if (i == ids.length - 2 && lastIsError)
-			{
+						// Now record the error
+						if (i == ids.length - 2 && lastIsError)
+						{
 							// If this starts with "Stopping", convert the last warning to an error and skip this.
 							if (reason.startsWith("Stopping")) //$NON-NLS-1$
 							{
@@ -319,26 +294,26 @@ public class JSLintValidator extends AbstractBuildParticipant
 							}
 							else
 							{
-					items.add(createError(reason, line, character, 1, path));
-				}
+								items.add(createError(reason, line, character, 1, path));
+							}
 						}
-			else
-			{
-				items.add(createWarning(reason, line, character, 1, path));
-			}
-		}
+						else
+						{
+							items.add(createWarning(reason, line, character, 1, path));
+						}
+					}
 					return null;
 				}
 			});
-		return items;
-	}
+			return items;
+		}
 
 		void runLint(final String source, final Map<String, Object> options)
-	{
-			contextFactory.call(new ContextAction()
 		{
-				public Object run(Context cx)
+			contextFactory.call(new ContextAction()
 			{
+				public Object run(Context cx)
+				{
 					Object[] args = new Object[] { source, optionsAsJavaScriptObject(options) };
 					Function lintFunc = (Function) scope.get("JSLINT", scope); //$NON-NLS-1$
 					// PC: we ignore the result, because i have found that with some versions, there might
@@ -347,10 +322,10 @@ public class JSLintValidator extends AbstractBuildParticipant
 					return null;
 				}
 			});
-				}
+		}
 
 		private Scriptable optionsAsJavaScriptObject(final Map<String, Object> options)
-				{
+		{
 			return (Scriptable) contextFactory.call(new ContextAction()
 			{
 				public Object run(Context cx)
@@ -361,17 +336,17 @@ public class JSLintValidator extends AbstractBuildParticipant
 						String key = entry.getKey();
 						Object value = javaToJS(entry.getValue(), opts);
 						opts.put(key, opts, value);
-				}
+					}
 					return opts;
-			}
+				}
 			});
 		}
 
 		Object javaToJS(Object o, Scriptable scope)
-	{
+		{
 			Class<?> cls = o.getClass();
 			if (cls.isArray())
-		{
+			{
 				return new NativeArray((Object[]) o);
 			}
 
@@ -395,13 +370,13 @@ public class JSLintValidator extends AbstractBuildParticipant
 		}
 
 		public void warning(String message, String sourceURI, int line, String lineText, int lineOffset)
-	{
+		{
 			items.add(createWarning(message, line, lineOffset, 1, sourceURI));
-	}
+		}
 
 		public EvaluatorException runtimeError(String message, String sourceURI, int line, String lineText,
 				int lineOffset)
-	{
+		{
 			return new EvaluatorException(message, sourceURI, line, lineText, lineOffset);
 		}
 
@@ -409,5 +384,49 @@ public class JSLintValidator extends AbstractBuildParticipant
 		{
 			return Collections.unmodifiableList(items);
 		}
+	}
+
+	/**
+	 * @deprecated Remove as this is only used by testing, and we should be able to set the options in another way!
+	 * @param optionsAsJSON
+	 * @throws IllegalStateException
+	 *             if the JSON is un-parseable.
+	 */
+	protected void setJSONOptions(String optionsAsJSON) throws IllegalStateException
+	{
+		JSON.parse(optionsAsJSON);
+		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(getPreferenceNode());
+		prefs.put(JS_LINT_OPTIONS, optionsAsJSON);
+		try
+		{
+			prefs.flush();
 		}
+		catch (BackingStoreException e)
+		{
+			IdeLog.logError(BuildPathCorePlugin.getDefault(), e);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private Map<String, Object> getOptions()
+	{
+		return (Map<String, Object>) JSON.parse(getPreferenceString(JS_LINT_OPTIONS));
+	}
+
+	@Override
+	public void restoreDefaults()
+	{
+		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(getPreferenceNode());
+		prefs.remove(JS_LINT_OPTIONS);
+		try
+		{
+			prefs.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			IdeLog.logError(BuildPathCorePlugin.getDefault(), e);
+		}
+
+		super.restoreDefaults();
+	}
 }

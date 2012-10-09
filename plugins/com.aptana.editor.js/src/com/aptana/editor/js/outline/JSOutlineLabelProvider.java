@@ -19,6 +19,8 @@ import com.aptana.editor.js.outline.JSOutlineItem.Type;
 
 public class JSOutlineLabelProvider extends CommonOutlineLabelProvider
 {
+	// TODO Centralize with JSModelFormatter if we can. This doesn't know about statics/deprecation/etc. I guess that'd
+	// mean we'd need to convert the node to a metadata/indexing BaseElement
 	private static final Image ARRAY_ICON = JSPlugin.getImage("icons/array-literal.png"); //$NON-NLS-1$
 	private static final Image BOOLEAN_ICON = JSPlugin.getImage("icons/boolean.png"); //$NON-NLS-1$
 	private static final Image FUNCTION_ICON = JSPlugin.getImage("icons/js_function.png"); //$NON-NLS-1$

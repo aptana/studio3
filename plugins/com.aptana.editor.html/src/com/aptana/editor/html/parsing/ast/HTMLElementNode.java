@@ -25,6 +25,7 @@ import com.aptana.editor.html.preferences.IPreferenceConstants;
 import com.aptana.parsing.ast.INameNode;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseNodeAttribute;
+import com.aptana.parsing.ast.ParseNode;
 import com.aptana.parsing.ast.ParseNodeAttribute;
 import com.aptana.parsing.lexer.IRange;
 
@@ -34,11 +35,29 @@ public class HTMLElementNode extends HTMLNode
 	private static final String ID = "id"; //$NON-NLS-1$
 	private static final String CLASS = "class"; //$NON-NLS-1$
 
-	private INameNode fNameNode;
-	private INameNode fEndNode;
+	private final String fTag; // i.e.: name
+
+	private int fStartNodeOffset;
+	private int fStartNodeEnd;
+
+	private int fEndNodeOffset;
+	private int fEndNodeEnd;
+
+	/**
+	 * Note: lazily-initialized to save on memory.
+	 */
 	private Map<String, IParseNodeAttribute> fAttributes;
-	private List<IParseNode> fCSSStyleNodes;
-	private List<IParseNode> fJSAttributeNodes;
+
+	/**
+	 * Note: lazily-initialized to save on memory.
+	 */
+	private ArrayList<IParseNode> fCSSStyleNodes;
+
+	/**
+	 * Note: lazily-initialized to save on memory.
+	 */
+	private ArrayList<IParseNode> fJSAttributeNodes;
+
 	private boolean fIsSelfClosing;
 
 	public HTMLElementNode(Symbol tagSymbol, int start, int end)
@@ -69,35 +88,56 @@ public class HTMLElementNode extends HTMLNode
 			{
 			}
 		}
-		// FIXME this is actually the range of the entire start tag. I'd "fix" it, but I think a lot of code relies on this behavior right now
-		fNameNode = new NameNode(tag, tagSymbol.getStart(), tagSymbol.getEnd());
-		fAttributes = new HashMap<String, IParseNodeAttribute>(2);
-		fCSSStyleNodes = new ArrayList<IParseNode>();
-		fJSAttributeNodes = new ArrayList<IParseNode>();
+		this.fTag = tag;
+		// FIXME this is actually the range of the entire start tag. I'd "fix" it, but I think a lot of code relies on
+		// this behavior right now
+		this.fStartNodeOffset = tagSymbol.getStart();
+		this.fStartNodeEnd = tagSymbol.getEnd();
+	}
+
+	@Override
+	public void trimToSize()
+	{
+		super.trimToSize();
+		if (fCSSStyleNodes != null)
+		{
+			fCSSStyleNodes.trimToSize();
+		}
+		if (fJSAttributeNodes != null)
+		{
+			fJSAttributeNodes.trimToSize();
+		}
 	}
 
 	@Override
 	public void addOffset(int offset)
 	{
-		IRange range = fNameNode.getNameRange();
-		fNameNode = new NameNode(fNameNode.getName(), range.getStartingOffset() + offset, range.getEndingOffset()
-				+ offset);
+		fStartNodeOffset += offset;
+		fStartNodeEnd += offset;
 		super.addOffset(offset);
 	}
 
 	public void addCSSStyleNode(IParseNode node)
 	{
+		if (fCSSStyleNodes == null)
+		{
+			fCSSStyleNodes = new ArrayList<IParseNode>(3);
+		}
 		fCSSStyleNodes.add(node);
 	}
 
 	public void addJSAttributeNode(IParseNode node)
 	{
+		if (fJSAttributeNodes == null)
+		{
+			fJSAttributeNodes = new ArrayList<IParseNode>(3);
+		}
 		fJSAttributeNodes.add(node);
 	}
 
 	public String getName()
 	{
-		return fNameNode.getName();
+		return this.fTag;
 	}
 
 	@Override
@@ -109,7 +149,7 @@ public class HTMLElementNode extends HTMLNode
 	@Override
 	public INameNode getNameNode()
 	{
-		return fNameNode;
+		return new NameNode(fTag, fStartNodeOffset, fStartNodeEnd);
 	}
 
 	/*
@@ -121,7 +161,7 @@ public class HTMLElementNode extends HTMLNode
 	{
 		IParseNode result = super.getNodeAtOffset(offset);
 
-		if (result == this)
+		if (result == this && fJSAttributeNodes != null)
 		{
 			for (IParseNode node : fJSAttributeNodes)
 			{
@@ -133,7 +173,7 @@ public class HTMLElementNode extends HTMLNode
 			}
 		}
 
-		if (result == this)
+		if (result == this && fCSSStyleNodes != null)
 		{
 			for (IParseNode node : fCSSStyleNodes)
 			{
@@ -175,10 +215,13 @@ public class HTMLElementNode extends HTMLNode
 			}
 			else
 			{
-				IParseNodeAttribute value = fAttributes.get(attribute);
-				if (value != null)
+				if (fAttributes != null)
 				{
-					text.append(' ').append(value.getValue());
+					IParseNodeAttribute value = fAttributes.get(attribute);
+					if (value != null)
+					{
+						text.append(' ').append(value.getValue());
+					}
 				}
 			}
 		}
@@ -197,6 +240,10 @@ public class HTMLElementNode extends HTMLNode
 
 	public String getAttributeValue(String name)
 	{
+		if (fAttributes == null)
+		{
+			return null;
+		}
 		IParseNodeAttribute attr = fAttributes.get(name);
 		if (attr == null)
 		{
@@ -207,26 +254,39 @@ public class HTMLElementNode extends HTMLNode
 
 	public void setAttribute(String name, String value, IRange nameRegion, IRange valueRegion)
 	{
+		if (fAttributes == null)
+		{
+			fAttributes = new HashMap<String, IParseNodeAttribute>(2);
+		}
 		fAttributes.put(name, new ParseNodeAttribute(this, name, value, nameRegion, valueRegion));
 	}
 
 	public INameNode getEndNode()
 	{
-		return fEndNode;
+		return new NameNode(fTag, fEndNodeOffset, fEndNodeEnd);
 	}
 
 	public void setEndNode(int start, int end)
 	{
-		fEndNode = new NameNode(fNameNode.getName(), start, end);
+		fEndNodeOffset = start;
+		fEndNodeEnd = end;
 	}
 
 	public IParseNode[] getCSSStyleNodes()
 	{
+		if (fCSSStyleNodes == null)
+		{
+			return HTMLParser.NO_PARSE_NODES;
+		}
 		return fCSSStyleNodes.toArray(new IParseNode[fCSSStyleNodes.size()]);
 	}
 
 	public IParseNode[] getJSAttributeNodes()
 	{
+		if (fJSAttributeNodes == null)
+		{
+			return HTMLParser.NO_PARSE_NODES;
+		}
 		return fJSAttributeNodes.toArray(new IParseNode[fJSAttributeNodes.size()]);
 	}
 
@@ -244,7 +304,15 @@ public class HTMLElementNode extends HTMLNode
 		}
 
 		HTMLElementNode other = (HTMLElementNode) obj;
-		return getName().equals(other.getName()) && fAttributes.equals(other.fAttributes);
+		if (!getName().equals(other.getName()))
+		{
+			return false;
+		}
+		if (fAttributes == null || other.fAttributes == null)
+		{
+			return fAttributes == other.fAttributes;
+		}
+		return fAttributes.equals(other.fAttributes);
 	}
 
 	@Override
@@ -252,7 +320,7 @@ public class HTMLElementNode extends HTMLNode
 	{
 		int hash = super.hashCode();
 		hash = 31 * hash + getName().hashCode();
-		hash = 31 * hash + fAttributes.hashCode();
+		hash = 31 * hash + (fAttributes != null ? fAttributes.hashCode() : 1);
 		return hash;
 	}
 
@@ -264,9 +332,12 @@ public class HTMLElementNode extends HTMLNode
 		if (name.length() > 0)
 		{
 			text.append('<').append(name);
-			for (IParseNodeAttribute attr : fAttributes.values())
+			if (fAttributes != null)
 			{
-				text.append(' ').append(attr.getName()).append("=\"").append(attr.getValue()).append('"'); //$NON-NLS-1$
+				for (IParseNodeAttribute attr : fAttributes.values())
+				{
+					text.append(' ').append(attr.getName()).append("=\"").append(attr.getValue()).append('"'); //$NON-NLS-1$
+				}
 			}
 			text.append('>');
 			IParseNode[] children = getChildren();
@@ -301,6 +372,10 @@ public class HTMLElementNode extends HTMLNode
 	@Override
 	public IParseNodeAttribute[] getAttributes()
 	{
+		if (fAttributes == null)
+		{
+			return ParseNode.NO_ATTRIBUTES;
+		}
 		return fAttributes.values().toArray(new IParseNodeAttribute[fAttributes.size()]);
 	}
 

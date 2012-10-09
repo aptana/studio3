@@ -1,29 +1,27 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.editor.css;
 
-import junit.framework.TestCase;
-
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
+import org.eclipse.jface.text.rules.FastPartitioner;
+import org.eclipse.jface.text.rules.IPartitionTokenScanner;
 
-import com.aptana.editor.common.ExtendedFastPartitioner;
-import com.aptana.editor.common.IExtendedPartitioner;
-import com.aptana.editor.common.NullPartitionerSwitchStrategy;
-import com.aptana.editor.common.text.rules.CompositePartitionScanner;
-import com.aptana.editor.common.text.rules.NullSubPartitionScanner;
+import com.aptana.editor.common.AbstractPartitionTestCase;
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.IPartitioningConfiguration;
 
 /**
  * @author Chris
  * @author Sandip
  */
-public class CSSSourcePartitionScannerTest extends TestCase
+public class CSSSourcePartitionScannerTest extends AbstractPartitionTestCase
 {
 
 	private IDocumentPartitioner partitioner;
@@ -41,19 +39,32 @@ public class CSSSourcePartitionScannerTest extends TestCase
 		super.tearDown();
 	}
 
+	@Override
+	protected IPartitionTokenScanner createPartitionScanner()
+	{
+		return new OldCSSSourcePartitionScanner();
+	}
+
+	@Override
+	protected String[] getContentTypes()
+	{
+		return CSSSourceConfiguration.getDefault().getContentTypes();
+	}
+
 	private String getContentType(String content, int offset)
 	{
 		if (partitioner == null)
 		{
+			// NOTE: the following is based on SimpleDocumentProvider#connect(Object)
 			IDocument document = new Document(content);
-			CompositePartitionScanner partitionScanner = new CompositePartitionScanner(CSSSourceConfiguration
-					.getDefault().createSubPartitionScanner(), new NullSubPartitionScanner(),
-					new NullPartitionerSwitchStrategy());
-			partitioner = new ExtendedFastPartitioner(partitionScanner, CSSSourceConfiguration.getDefault()
-					.getContentTypes());
-			partitionScanner.setPartitioner((IExtendedPartitioner) partitioner);
+			IPartitioningConfiguration configuration = CSSSourceConfiguration.getDefault();
+
+			partitioner = new FastPartitioner(createPartitionScanner(), configuration.getContentTypes());
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);
+
+			CommonEditorPlugin.getDefault().getDocumentScopeManager().registerConfiguration(document, configuration);
+
 		}
 		return partitioner.getContentType(offset);
 	}
@@ -65,13 +76,13 @@ public class CSSSourcePartitionScannerTest extends TestCase
 		// 0123456789012345678901234567890123456 78901234567890
 		" /* This is CSS comment on one Line */ \n";
 
-		assertContentType(CSSSourceConfiguration.DEFAULT, source, 0);
+		assertContentType(IDocument.DEFAULT_CONTENT_TYPE, source, 0);
 		for (int i = 1; i <= 37; i++)
 		{
 			assertContentType(CSSSourceConfiguration.MULTILINE_COMMENT, source, i);
 		}
-		assertContentType(CSSSourceConfiguration.DEFAULT, source, 38);
-		assertContentType(CSSSourceConfiguration.DEFAULT, source, 39);
+		assertContentType(IDocument.DEFAULT_CONTENT_TYPE, source, 38);
+		assertContentType(IDocument.DEFAULT_CONTENT_TYPE, source, 39);
 	}
 
 	public void testPartitioningOfCommentSpanningSingleLine()
@@ -85,7 +96,7 @@ public class CSSSourcePartitionScannerTest extends TestCase
 		{
 			assertContentType(CSSSourceConfiguration.MULTILINE_COMMENT, source, i);
 		}
-		assertContentType(CSSSourceConfiguration.DEFAULT, source, 37);
+		assertContentType(IDocument.DEFAULT_CONTENT_TYPE, source, 37);
 	}
 
 	public void testPartitioningOfCommentSpanningMultipleLines()
@@ -99,7 +110,7 @@ public class CSSSourcePartitionScannerTest extends TestCase
 		{
 			assertContentType(CSSSourceConfiguration.MULTILINE_COMMENT, source, i);
 		}
-		assertContentType(CSSSourceConfiguration.DEFAULT, source, 49);
+		assertContentType(IDocument.DEFAULT_CONTENT_TYPE, source, 49);
 	}
 
 	public void testPartitioningOfSingleQuotedString()
@@ -112,7 +123,7 @@ public class CSSSourcePartitionScannerTest extends TestCase
 		{
 			assertContentType(CSSSourceConfiguration.STRING_SINGLE, source, i);
 		}
-		assertContentType(CSSSourceConfiguration.DEFAULT, source, 37);
+		assertContentType(IDocument.DEFAULT_CONTENT_TYPE, source, 37);
 	}
 
 	public void testPartitioningOfEmptySingleQuotedString()
@@ -125,7 +136,7 @@ public class CSSSourcePartitionScannerTest extends TestCase
 		{
 			assertContentType(CSSSourceConfiguration.STRING_SINGLE, source, i);
 		}
-		assertContentType(CSSSourceConfiguration.DEFAULT, source, 2);
+		assertContentType(IDocument.DEFAULT_CONTENT_TYPE, source, 2);
 	}
 
 	public void testPartitioningOfSingleQuotedStringWithEscape()
@@ -139,7 +150,7 @@ public class CSSSourcePartitionScannerTest extends TestCase
 		{
 			assertContentType(CSSSourceConfiguration.STRING_SINGLE, source, i);
 		}
-		assertContentType(CSSSourceConfiguration.DEFAULT, source, 53);
+		assertContentType(IDocument.DEFAULT_CONTENT_TYPE, source, 53);
 	}
 
 	public void testPartitioningOfSingleQuotedStringWithDoubleQuote()
@@ -153,7 +164,7 @@ public class CSSSourcePartitionScannerTest extends TestCase
 		{
 			assertContentType(CSSSourceConfiguration.STRING_SINGLE, source, i);
 		}
-		assertContentType(CSSSourceConfiguration.DEFAULT, source, 58);
+		assertContentType(IDocument.DEFAULT_CONTENT_TYPE, source, 58);
 	}
 
 	public void testPartitioningOfDoubleQuotedString()
@@ -166,7 +177,7 @@ public class CSSSourcePartitionScannerTest extends TestCase
 		{
 			assertContentType(CSSSourceConfiguration.STRING_DOUBLE, source, i);
 		}
-		assertContentType(CSSSourceConfiguration.DEFAULT, source, 37);
+		assertContentType(IDocument.DEFAULT_CONTENT_TYPE, source, 37);
 	}
 
 	public void testPartitioningOfEmptyDoubleQuotedString()
@@ -179,7 +190,7 @@ public class CSSSourcePartitionScannerTest extends TestCase
 		{
 			assertContentType(CSSSourceConfiguration.STRING_DOUBLE, source, i);
 		}
-		assertContentType(CSSSourceConfiguration.DEFAULT, source, 2);
+		assertContentType(IDocument.DEFAULT_CONTENT_TYPE, source, 2);
 	}
 
 	public void testPartitioningOfDoubleQuotedStringWithEscape()
@@ -193,7 +204,7 @@ public class CSSSourcePartitionScannerTest extends TestCase
 		{
 			assertContentType(CSSSourceConfiguration.STRING_DOUBLE, source, i);
 		}
-		assertContentType(CSSSourceConfiguration.DEFAULT, source, 53);
+		assertContentType(IDocument.DEFAULT_CONTENT_TYPE, source, 53);
 	}
 
 	public void testPartitioningOfDoubleQuotedStringWithSingleQuote()
@@ -207,7 +218,7 @@ public class CSSSourcePartitionScannerTest extends TestCase
 		{
 			assertContentType(CSSSourceConfiguration.STRING_DOUBLE, source, i);
 		}
-		assertContentType(CSSSourceConfiguration.DEFAULT, source, 58);
+		assertContentType(IDocument.DEFAULT_CONTENT_TYPE, source, 58);
 	}
 
 	public void testPartitioningOfAllPartitions()
@@ -217,20 +228,20 @@ public class CSSSourcePartitionScannerTest extends TestCase
 		// 0123456789012345678901234567890123456 78901234567890
 		" /* */ /**/ ' ' \" \" \n";
 
-		assertContentType(CSSSourceConfiguration.DEFAULT, source, 0);
+		assertContentType(IDocument.DEFAULT_CONTENT_TYPE, source, 0);
 		assertContentType(CSSSourceConfiguration.MULTILINE_COMMENT, source, 1);
 		assertContentType(CSSSourceConfiguration.MULTILINE_COMMENT, source, 5);
-		assertContentType(CSSSourceConfiguration.DEFAULT, source, 6);
+		assertContentType(IDocument.DEFAULT_CONTENT_TYPE, source, 6);
 		assertContentType(CSSSourceConfiguration.MULTILINE_COMMENT, source, 7);
 		assertContentType(CSSSourceConfiguration.MULTILINE_COMMENT, source, 10);
-		assertContentType(CSSSourceConfiguration.DEFAULT, source, 11);
+		assertContentType(IDocument.DEFAULT_CONTENT_TYPE, source, 11);
 		assertContentType(CSSSourceConfiguration.STRING_SINGLE, source, 12);
 		assertContentType(CSSSourceConfiguration.STRING_SINGLE, source, 14);
-		assertContentType(CSSSourceConfiguration.DEFAULT, source, 15);
+		assertContentType(IDocument.DEFAULT_CONTENT_TYPE, source, 15);
 		assertContentType(CSSSourceConfiguration.STRING_DOUBLE, source, 16);
 		assertContentType(CSSSourceConfiguration.STRING_DOUBLE, source, 18);
-		assertContentType(CSSSourceConfiguration.DEFAULT, source, 19);
-		assertContentType(CSSSourceConfiguration.DEFAULT, source, 20);
+		assertContentType(IDocument.DEFAULT_CONTENT_TYPE, source, 19);
+		assertContentType(IDocument.DEFAULT_CONTENT_TYPE, source, 20);
 	}
 
 }

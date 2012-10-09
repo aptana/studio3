@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
 import com.aptana.core.diagnostic.IDiagnosticLog;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ui.diagnostic.DiagnosticManager;
 import com.aptana.ui.dialogs.DiagnosticDialog;
@@ -48,7 +49,7 @@ public class DiagnosticHandler extends AbstractHandler
 				return Status.OK_STATUS;
 			}
 		};
-		job.setSystem(true);
+		EclipseUtil.setSystemForJob(job);
 		job.schedule();
 
 		return null;

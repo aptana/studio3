@@ -22,7 +22,7 @@ public class JSONParseRootNode extends ParseRootNode
 	 */
 	public JSONParseRootNode()
 	{
-		this(new Symbol[0]);
+		this(null);
 	}
 
 	/**
@@ -34,11 +34,7 @@ public class JSONParseRootNode extends ParseRootNode
 	 */
 	public JSONParseRootNode(Symbol[] children)
 	{
-		super( //
-			IJSONConstants.CONTENT_TYPE_JSON, //
-			children, //
-			(children != null && children.length > 0) ? children[0].getStart() : 0, //
-			(children != null && children.length > 0) ? children[children.length - 1].getEnd() : 0);
+		super(IJSONConstants.CONTENT_TYPE_JSON, children);
 	}
 
 	/**

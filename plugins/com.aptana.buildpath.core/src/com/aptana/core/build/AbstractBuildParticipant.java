@@ -34,6 +34,7 @@ import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.buildpath.core.BuildPathCorePlugin;
+import com.aptana.core.internal.build.BuildParticipantWorkingCopy;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.TaskTag;
 import com.aptana.core.util.CollectionsUtil;
@@ -51,6 +52,8 @@ import com.aptana.parsing.ast.IParseNode;
 public abstract class AbstractBuildParticipant implements IBuildParticipant, IExecutableExtension
 {
 
+	private static final IScopeContext[] CONTEXTS = new IScopeContext[] { EclipseUtil.instanceScope(),
+			EclipseUtil.defaultScope() };
 	public static final String FILTER_DELIMITER = "####"; //$NON-NLS-1$
 	private static final Pattern filterSplitter = Pattern.compile(FILTER_DELIMITER);
 
@@ -76,7 +79,7 @@ public abstract class AbstractBuildParticipant implements IBuildParticipant, IEx
 	/**
 	 * We lazily compile the filters into {@link Pattern}s as we try to match them.
 	 */
-	private Map<String, Pattern> compiledFilters = new HashMap<String, Pattern>();
+	private Map<String, Pattern> compiledFilters;
 
 	public int getPriority()
 	{
@@ -113,32 +116,13 @@ public abstract class AbstractBuildParticipant implements IBuildParticipant, IEx
 		{
 			return true;
 		}
-		return Platform.getPreferencesService().getBoolean(getPreferenceNode(), getEnablementPreferenceKey(type),
-				false, new IScopeContext[] { EclipseUtil.instanceScope(), EclipseUtil.defaultScope() });
+
+		return getPreferenceBoolean(getEnablementPreferenceKey(type));
 	}
 
-	public void setEnabled(BuildType type, boolean enabled)
+	private String getEnablementPreferenceKey(BuildType type)
 	{
-		if (isRequired())
-		{
-			return;
-		}
-
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(getPreferenceNode());
-		prefs.putBoolean(getEnablementPreferenceKey(type), enabled);
-		try
-		{
-			prefs.flush();
-		}
-		catch (BackingStoreException e)
-		{
-			IdeLog.logError(BuildPathCorePlugin.getDefault(), e);
-		}
-	}
-
-	public String getEnablementPreferenceKey(BuildType type)
-	{
-		return MessageFormat.format("{0}_{1}_enabled", getId(), type.name().toLowerCase()); //$NON-NLS-1$
+		return PreferenceUtil.getEnablementPreferenceKey(getId(), type);
 	}
 
 	public void restoreDefaults()
@@ -169,8 +153,8 @@ public abstract class AbstractBuildParticipant implements IBuildParticipant, IEx
 		{
 			return Collections.emptyList();
 		}
-		String rawFilters = Platform.getPreferencesService().getString(getPreferenceNode(), getFiltersPreferenceKey(),
-				null, new IScopeContext[] { EclipseUtil.instanceScope(), EclipseUtil.defaultScope() });
+
+		String rawFilters = getPreferenceString(getFiltersPreferenceKey());
 		if (StringUtil.isEmpty(rawFilters))
 		{
 			return Collections.emptyList();
@@ -178,28 +162,9 @@ public abstract class AbstractBuildParticipant implements IBuildParticipant, IEx
 		return Arrays.asList(filterSplitter.split(rawFilters));
 	}
 
-	public void setFilters(IScopeContext context, String... filters)
+	private String getFiltersPreferenceKey()
 	{
-		if (isRequired())
-		{
-			return; // currently required can't be edited.
-		}
-
-		IEclipsePreferences prefs = context.getNode(getPreferenceNode());
-		prefs.put(getFiltersPreferenceKey(), StringUtil.join(FILTER_DELIMITER, filters));
-		try
-		{
-			prefs.flush();
-		}
-		catch (BackingStoreException e)
-		{
-			IdeLog.logError(BuildPathCorePlugin.getDefault(), e);
-		}
-	}
-
-	protected String getFiltersPreferenceKey()
-	{
-		return MessageFormat.format("{0}_filters", getId()); //$NON-NLS-1$
+		return PreferenceUtil.getFiltersKey(getId());
 	}
 
 	/**
@@ -356,6 +321,12 @@ public abstract class AbstractBuildParticipant implements IBuildParticipant, IEx
 		return new Problem(IMarker.SEVERITY_ERROR, message, offset, length, lineNumber, sourcePath);
 	}
 
+	/**
+	 * @deprecated
+	 * @param items
+	 * @param line
+	 * @return
+	 */
 	protected boolean hasErrorOrWarningOnLine(List<IProblem> items, int line)
 	{
 		if (items == null)
@@ -451,8 +422,17 @@ public abstract class AbstractBuildParticipant implements IBuildParticipant, IEx
 		return false;
 	}
 
-	protected boolean isIgnored(String message, List<String> expressions)
+	protected synchronized boolean isIgnored(String message, List<String> expressions)
 	{
+		if (CollectionsUtil.isEmpty(expressions))
+		{
+			return false;
+		}
+
+		if (compiledFilters == null)
+		{
+			compiledFilters = new HashMap<String, Pattern>(expressions.size());
+		}
 		for (String expression : expressions)
 		{
 			// Lazily compile the filter expressions into Patterns
@@ -469,5 +449,25 @@ public abstract class AbstractBuildParticipant implements IBuildParticipant, IEx
 		}
 
 		return false;
+	}
+
+	public String getPreferenceString(String prefKey)
+	{
+		return Platform.getPreferencesService().getString(getPreferenceNode(), prefKey, null, CONTEXTS);
+	}
+
+	public boolean getPreferenceBoolean(String prefKey)
+	{
+		return Platform.getPreferencesService().getBoolean(getPreferenceNode(), prefKey, false, CONTEXTS);
+	}
+
+	public int getPreferenceInt(String prefKey, int defaultValue)
+	{
+		return Platform.getPreferencesService().getInt(getPreferenceNode(), prefKey, defaultValue, CONTEXTS);
+	}
+
+	public IBuildParticipantWorkingCopy getWorkingCopy()
+	{
+		return new BuildParticipantWorkingCopy(this, getPreferenceNode());
 	}
 }

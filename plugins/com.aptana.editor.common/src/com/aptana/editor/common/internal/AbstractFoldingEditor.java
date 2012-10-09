@@ -17,7 +17,6 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -31,7 +30,10 @@ import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotationModel;
 import org.eclipse.jface.text.source.projection.ProjectionSupport;
 import org.eclipse.jface.text.source.projection.ProjectionViewer;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
@@ -39,7 +41,9 @@ import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.IDocumentProviderExtension;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IFoldingEditor;
 import com.aptana.index.core.IndexFilesOfProjectJob;
 import com.aptana.index.core.RemoveIndexOfFilesOfProjectJob;
@@ -52,6 +56,66 @@ public class AbstractFoldingEditor extends AbstractDecoratedTextEditor implement
 	 */
 	public AbstractFoldingEditor()
 	{
+
+		// Hack because we cannot override org.eclipse.ui.texteditor.AbstractTextEditor.getSelectionChangedListener().
+		ISelectionChangedListener selectionChangedListener = new ISelectionChangedListener()
+		{
+
+			private Runnable fRunnable = new Runnable()
+			{
+				public void run()
+				{
+					ISourceViewer sourceViewer = getSourceViewer();
+					// check whether editor has not been disposed yet
+					if (sourceViewer != null && sourceViewer.getDocument() != null)
+					{
+						updateSelectionDependentActions();
+					}
+				}
+			};
+
+			private Display fDisplay;
+
+			public void selectionChanged(SelectionChangedEvent event)
+			{
+				Display current = Display.getCurrent();
+				if (current != null)
+				{
+					// Don't execute asynchronously if we're in a thread that has a display.
+					// Fix for: https://jira.appcelerator.org/browse/APSTUD-3061 (the rationale
+					// is that the actions were not being enabled because they were previously
+					// updated in an async call).
+					// Ideally, if this is really the root case of that issue, this code should
+					// be provided back to Eclipse.org as part of the bug:
+					// https://bugs.eclipse.org/bugs/show_bug.cgi?id=368354
+					// but just patching getSelectionChangedListener() properly.
+					fRunnable.run();
+				}
+				else
+				{
+					if (fDisplay == null)
+					{
+						fDisplay = getSite().getShell().getDisplay();
+					}
+					fDisplay.asyncExec(fRunnable);
+				}
+				handleCursorPositionChanged();
+			}
+		};
+
+		try
+		{
+			// Hack to change private field fSelectionChangedListener
+			Field field = AbstractTextEditor.class.getDeclaredField("fSelectionChangedListener"); //$NON-NLS-1$
+			field.setAccessible(true);
+			field.set(this, selectionChangedListener);
+		}
+		catch (Exception e)
+		{
+			// Should not really happen, but let's not fail if it happens.
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
+		}
+
 	}
 
 	public void createPartControl(Composite parent)
@@ -74,39 +138,56 @@ public class AbstractFoldingEditor extends AbstractDecoratedTextEditor implement
 		return viewer;
 	}
 
+	private static final Object lockUpdateFoldingStructure = new Object();
+
+	//@formatter:off
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.IFoldingEditor#updateFoldingStructure(java.util.Map)
+	 * @see com.aptana.editor.common.IFoldingEditor#updateFoldingStructure(java.util.Map) 
+	 * 
+	 * Note: this object was previously synchronized on the editor and could enter in a deadlock in 
+	 * a race condition because of that.
+	 * 
+	 * Summary: 
+	 *  - here, we'd lock the editor here and when updating the positions we'd lock the document
+	 * 	- in a document change, we'd lock the document, fire a dirty state, which would try to do
+	 *    an enableSanityChecking() which is synchronized on the editor and would lead into a deadlock.
+	 * 
+	 * @see: APSTUD-7330 Deadlock when updating folding structure.
 	 */
-	public synchronized void updateFoldingStructure(Map<ProjectionAnnotation, Position> annotations)
+	//@formatter:on
+	public void updateFoldingStructure(Map<ProjectionAnnotation, Position> annotations)
 	{
-		List<Annotation> deletions = new ArrayList<Annotation>();
-		Collection<Position> additions = annotations.values();
-		ProjectionAnnotationModel currentModel = getAnnotationModel();
-		if (currentModel == null)
+		synchronized (lockUpdateFoldingStructure)
 		{
-			return;
-		}
-		for (@SuppressWarnings("rawtypes")
-		Iterator iter = currentModel.getAnnotationIterator(); iter.hasNext();)
-		{
-			Object annotation = iter.next();
-			if (annotation instanceof ProjectionAnnotation)
+			List<Annotation> deletions = new ArrayList<Annotation>();
+			Collection<Position> additions = annotations.values();
+			ProjectionAnnotationModel currentModel = getAnnotationModel();
+			if (currentModel == null)
 			{
-				Position position = currentModel.getPosition((Annotation) annotation);
-				if (additions.contains(position))
+				return;
+			}
+			for (@SuppressWarnings("rawtypes")
+			Iterator iter = currentModel.getAnnotationIterator(); iter.hasNext();)
+			{
+				Object annotation = iter.next();
+				if (annotation instanceof ProjectionAnnotation)
 				{
-					additions.remove(position);
-				}
-				else
-				{
-					deletions.add((Annotation) annotation);
+					Position position = currentModel.getPosition((Annotation) annotation);
+					if (additions.contains(position))
+					{
+						additions.remove(position);
+					}
+					else
+					{
+						deletions.add((Annotation) annotation);
+					}
 				}
 			}
-		}
-		if (annotations.size() != 0 || deletions.size() != 0)
-		{
-			currentModel.modifyAnnotations(deletions.toArray(new Annotation[deletions.size()]), annotations, null);
+			if (annotations.size() != 0 || deletions.size() != 0)
+			{
+				currentModel.modifyAnnotations(deletions.toArray(new Annotation[deletions.size()]), annotations, null);
+			}
 		}
 	}
 
@@ -163,7 +244,7 @@ public class AbstractFoldingEditor extends AbstractDecoratedTextEditor implement
 				}
 				return;
 			}
-			catch (CoreException e)
+			catch (Exception e)
 			{
 				// ignore
 			}
@@ -209,7 +290,14 @@ public class AbstractFoldingEditor extends AbstractDecoratedTextEditor implement
 		}
 		finally
 		{
-			super.dispose();
+			try
+			{
+				super.dispose();
+			}
+			catch (Exception e)
+			{
+				// ignores
+			}
 		}
 	}
 
@@ -223,4 +311,5 @@ public class AbstractFoldingEditor extends AbstractDecoratedTextEditor implement
 		}
 		return null;
 	}
+
 }

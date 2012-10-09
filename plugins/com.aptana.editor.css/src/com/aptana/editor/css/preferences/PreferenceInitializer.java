@@ -11,9 +11,13 @@ import java.text.MessageFormat;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.build.AbstractBuildParticipant;
+import com.aptana.core.build.PreferenceUtil;
 import com.aptana.core.build.IBuildParticipant.BuildType;
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.ICSSConstants;
@@ -44,41 +48,13 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		// mark occurrences
 		// prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.EDITOR_MARK_OCCURRENCES, true);
 
-		// Set validator to be on by default for reconcile
-		CSSValidator validator = new CSSValidator()
-		{
-			@Override
-			public String getId()
-			{
-				return ID;
-			}
-
-			@Override
-			protected String getPreferenceNode()
-			{
-				return CSSPlugin.PLUGIN_ID;
-			}
-		};
-		prefs.putBoolean(validator.getEnablementPreferenceKey(BuildType.BUILD), false);
-		prefs.putBoolean(validator.getEnablementPreferenceKey(BuildType.RECONCILE), true);
-		validator.setFilters(EclipseUtil.defaultScope(), CSSValidator.DEFAULT_FILTERS);
-
-		CSSParserValidator parseValidator = new CSSParserValidator()
-		{
-			@Override
-			public String getId()
-			{
-				return ID;
-			}
-
-			@Override
-			protected String getPreferenceNode()
-			{
-				return CSSPlugin.PLUGIN_ID;
-			}
-		};
-		prefs.putBoolean(parseValidator.getEnablementPreferenceKey(BuildType.BUILD), true);
-		prefs.putBoolean(parseValidator.getEnablementPreferenceKey(BuildType.RECONCILE), true);
+		// Set CSS Stylesheet validator to be on by default for reconcile, off for build, use default set of filters.
+		prefs.putBoolean(PreferenceUtil.getEnablementPreferenceKey(CSSValidator.ID, BuildType.BUILD),
+				false);
+		prefs.putBoolean(
+				PreferenceUtil.getEnablementPreferenceKey(CSSValidator.ID, BuildType.RECONCILE), true);
+		prefs.put(PreferenceUtil.getFiltersKey(CSSValidator.ID),
+				StringUtil.join(AbstractBuildParticipant.FILTER_DELIMITER, CSSValidator.DEFAULT_FILTERS));
 
 		// Migrate the old filter prefs to new
 		IEclipsePreferences cepPrefs = EclipseUtil.instanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
@@ -87,9 +63,24 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		String oldFilters = cepPrefs.get(oldKey, null);
 		if (oldFilters != null)
 		{
-			String[] oldFilterArray = oldFilters.split(CSSValidator.FILTER_DELIMITER);
-			validator.setFilters(EclipseUtil.instanceScope(), oldFilterArray);
-			cepPrefs.remove(oldKey);
+			try
+			{
+				IEclipsePreferences newPrefs = EclipseUtil.instanceScope().getNode(CSSPlugin.PLUGIN_ID);
+				newPrefs.put(PreferenceUtil.getFiltersKey(CSSValidator.ID), oldFilters);
+				newPrefs.flush();
+				cepPrefs.remove(oldKey);
+			}
+			catch (BackingStoreException e)
+			{
+				// ignore
+			}
 		}
+
+		// Set up CSS Parser validator to be on for build and reconcile
+		prefs.putBoolean(
+				PreferenceUtil.getEnablementPreferenceKey(CSSParserValidator.ID, BuildType.BUILD), true);
+		prefs.putBoolean(
+				PreferenceUtil.getEnablementPreferenceKey(CSSParserValidator.ID, BuildType.BUILD), true);
+
 	}
 }

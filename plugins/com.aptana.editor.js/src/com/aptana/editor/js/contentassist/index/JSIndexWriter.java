@@ -206,7 +206,8 @@ public class JSIndexWriter extends IndexWriter
 				IJSIndexConstants.DELIMITER,
 				type.getName(),
 				parentType,
-				type.getDescription()
+				type.getDescription(),
+				type.isDeprecated() ? '1' : '0'
 			);
 			// @formatter:on
 

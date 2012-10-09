@@ -22,6 +22,8 @@ import org.eclipse.debug.core.model.IWatchExpressionDelegate;
 import org.eclipse.debug.core.model.IWatchExpressionListener;
 import org.eclipse.debug.core.model.IWatchExpressionResult;
 
+import com.aptana.core.util.EclipseUtil;
+
 /**
  * @author Max Stepanov
  */
@@ -47,7 +49,7 @@ public class WatchExpressionDelegate implements IWatchExpressionDelegate {
 		public EvaluationJob(JSDebugTarget target, String expression, IDebugElement context,
 				IWatchExpressionListener listener) {
 			super(Messages.WatchExpressionDelegate_ExpressionEvaluation);
-			setSystem(true);
+			EclipseUtil.setSystemForJob(this);
 			this.target = target;
 			this.expression = expression;
 			this.context = context;

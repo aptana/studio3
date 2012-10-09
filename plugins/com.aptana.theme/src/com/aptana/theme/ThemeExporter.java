@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -79,13 +79,13 @@ public class ThemeExporter
 			buffer.append("      <dict>\n");
 
 			DelayedTextAttribute attr = rule.getTextAttribute();
-			RGBa color = attr.getForeground();
+			RGBa color = attr.foreground;
 			if (color != null)
 			{
 				buffer.append("        <key>foreground</key>\n");
 				buffer.append("        <string>").append(Theme.toHex(color)).append("</string>\n");
 			}
-			color = attr.getBackground();
+			color = attr.background;
 			if (color != null)
 			{
 				buffer.append("        <key>background</key>\n");
@@ -94,7 +94,7 @@ public class ThemeExporter
 
 			// Spit out italic, bold, etc
 			StringBuilder value = new StringBuilder();
-			int style = attr.getStyle();
+			int style = attr.style;
 			if ((style & SWT.ITALIC) != 0)
 			{
 				value.append("italic").append(',');

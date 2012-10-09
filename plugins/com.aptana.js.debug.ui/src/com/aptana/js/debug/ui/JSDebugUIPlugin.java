@@ -49,7 +49,8 @@ import com.aptana.ui.util.UIUtils;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class JSDebugUIPlugin extends AbstractUIPlugin {
+public class JSDebugUIPlugin extends AbstractUIPlugin
+{
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "com.aptana.js.debug.ui"; //$NON-NLS-1$
@@ -63,30 +64,38 @@ public class JSDebugUIPlugin extends AbstractUIPlugin {
 	/**
 	 * The constructor
 	 */
-	public JSDebugUIPlugin() {
+	public JSDebugUIPlugin()
+	{
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
 	 */
-	public void start(BundleContext context) throws Exception {
+	public void start(BundleContext context) throws Exception
+	{
 		super.start(context);
 		plugin = this;
-		if (debugEventListener == null) {
-			debugEventListener = new IDebugEventSetListener() {
-				public void handleDebugEvents(DebugEvent[] events) {
-					for (DebugEvent event : events) {
-						if ((event.getSource() instanceof IJSDebugTarget) && (event.getKind() == DebugEvent.TERMINATE)) {
+		if (debugEventListener == null)
+		{
+			debugEventListener = new IDebugEventSetListener()
+			{
+				public void handleDebugEvents(DebugEvent[] events)
+				{
+					for (DebugEvent event : events)
+					{
+						if ((event.getSource() instanceof IJSDebugTarget) && (event.getKind() == DebugEvent.TERMINATE))
+						{
 							WorkbenchJob job = new WorkbenchJob("Close Temporary Debug Editors") { //$NON-NLS-1$
-								public IStatus runInUIThread(IProgressMonitor monitor) {
+								public IStatus runInUIThread(IProgressMonitor monitor)
+								{
 									closeDebugEditors();
 									return Status.OK_STATUS;
 								}
 
 							};
 							job.setPriority(Job.INTERACTIVE);
-							job.setSystem(true);
+							EclipseUtil.setSystemForJob(job);
 							job.schedule();
 						}
 					}
@@ -102,7 +111,8 @@ public class JSDebugUIPlugin extends AbstractUIPlugin {
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
-	public void stop(BundleContext context) throws Exception {
+	public void stop(BundleContext context) throws Exception
+	{
 		DebugPlugin.getDefault().removeDebugEventListener(debugEventListener);
 		plugin = null;
 		super.stop(context);
@@ -113,7 +123,8 @@ public class JSDebugUIPlugin extends AbstractUIPlugin {
 	 * 
 	 * @return the shared instance
 	 */
-	public static JSDebugUIPlugin getDefault() {
+	public static JSDebugUIPlugin getDefault()
+	{
 		return plugin;
 	}
 
@@ -124,14 +135,16 @@ public class JSDebugUIPlugin extends AbstractUIPlugin {
 	 *            the path
 	 * @return the image descriptor
 	 */
-	public static ImageDescriptor getImageDescriptor(String path) {
+	public static ImageDescriptor getImageDescriptor(String path)
+	{
 		return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
 	}
 
 	/**
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#createImageRegistry()
 	 */
-	protected ImageRegistry createImageRegistry() {
+	protected ImageRegistry createImageRegistry()
+	{
 		return DebugUIImages.getImageRegistry();
 	}
 
@@ -140,42 +153,54 @@ public class JSDebugUIPlugin extends AbstractUIPlugin {
 	 * 
 	 * @return IDebugModelPresentation
 	 */
-	public IDebugModelPresentation getModelPresentation() {
-		if (fUtilPresentation == null) {
+	public IDebugModelPresentation getModelPresentation()
+	{
+		if (fUtilPresentation == null)
+		{
 			fUtilPresentation = DebugUITools.newDebugModelPresentation(IJSDebugConstants.ID_DEBUG_MODEL);
 		}
 		return fUtilPresentation;
 	}
 
-	private void registerAsFirebugEditor() {
+	private void registerAsFirebugEditor()
+	{
 		IPath launcher = EclipseUtil.getApplicationLauncher();
-		if (launcher != null) {
+		if (launcher != null)
+		{
 			FirebugUtil.registerEditor(CommonMessages.ProductShortName, CommonMessages.ProductName, launcher,
 					StringUtil.EMPTY);
 		}
 	}
 
-	private void closeDebugEditors() {
+	private void closeDebugEditors()
+	{
 		IWorkbenchPage page = UIUtils.getActivePage();
-		if (page != null) {
+		if (page != null)
+		{
 			IEditorReference[] editorRefs = page.getEditorReferences();
 			List<IEditorReference> closeEditors = new ArrayList<IEditorReference>();
-			for (IEditorReference ref : editorRefs) {
-				try {
+			for (IEditorReference ref : editorRefs)
+			{
+				try
+				{
 					IEditorInput input = ref.getEditorInput();
 					UniformResourceStorage storage = (UniformResourceStorage) input
 							.getAdapter(UniformResourceStorage.class);
-					if (storage != null) {
+					if (storage != null)
+					{
 						URI uri = storage.getURI();
 						if ("dbgsource".equals(uri.getScheme())) { //$NON-NLS-1$
 							closeEditors.add(ref);
 						}
 					}
-				} catch (PartInitException e) {
+				}
+				catch (PartInitException e)
+				{
 					IdeLog.logError(getDefault(), e);
 				}
 			}
-			if (!closeEditors.isEmpty()) {
+			if (!closeEditors.isEmpty())
+			{
 				page.closeEditors((IEditorReference[]) closeEditors.toArray(new IEditorReference[closeEditors.size()]),
 						false);
 			}

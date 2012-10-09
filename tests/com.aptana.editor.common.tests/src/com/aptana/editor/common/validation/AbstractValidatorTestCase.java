@@ -22,7 +22,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 
 import com.aptana.core.IFilter;
 import com.aptana.core.IMap;
-import com.aptana.core.build.AbstractBuildParticipant;
+import com.aptana.core.build.IBuildParticipant;
 import com.aptana.core.build.IProblem;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
@@ -33,7 +33,7 @@ import com.aptana.parsing.IParseState;
 public abstract class AbstractValidatorTestCase extends TestCase
 {
 
-	protected AbstractBuildParticipant fValidator;
+	protected IBuildParticipant fValidator;
 
 	@Override
 	protected void setUp() throws Exception
@@ -45,11 +45,15 @@ public abstract class AbstractValidatorTestCase extends TestCase
 	@Override
 	protected void tearDown() throws Exception
 	{
-		fValidator = null;
+		if (fValidator != null)
+		{
+			fValidator.restoreDefaults();
+			fValidator = null;
+		}
 		super.tearDown();
 	}
 
-	protected abstract AbstractBuildParticipant createValidator();
+	protected abstract IBuildParticipant createValidator();
 
 	protected List<IProblem> getParseErrors(String source, IParseState ps, String markerType) throws CoreException
 	{
@@ -91,14 +95,25 @@ public abstract class AbstractValidatorTestCase extends TestCase
 		return null;
 	}
 
+	protected void assertProblem(IProblem item, String msg, int line, int severity, int offset)
+	{
+		assertEquals("message", msg, item.getMessage());
+		assertEquals("line", line, item.getLineNumber());
+		assertEquals("severity", severity, item.getSeverity().intValue());
+		assertEquals("offset", offset, item.getOffset());
+	}
+
+	protected void assertProblem(IProblem item, String msg, int line, int severity, int offset, int length)
+	{
+		assertProblem(item, msg, line, severity, offset);
+		assertEquals("length", length, item.getLength());
+	}
+
 	protected void assertContainsProblem(List<IProblem> items, String msg, int severity, int line, int offset,
 			int length)
 	{
 		IProblem problem = assertContains(items, msg);
-		assertEquals("severity", severity, problem.getSeverity());
-		assertEquals("offset", offset, problem.getOffset());
-		assertEquals("length", length, problem.getLength());
-		assertEquals("lineNumber", line, problem.getLineNumber());
+		assertProblem(problem, msg, line, severity, offset, length);
 	}
 
 	protected List<IProblem> getProblems(List<IProblem> items, final String message)
@@ -122,6 +137,24 @@ public abstract class AbstractValidatorTestCase extends TestCase
 				return;
 			}
 		}
+	}
+
+	protected void assertProblemExists(List<IProblem> items, String msg, int line, int severity, int offset)
+	{
+		IProblem item = assertContains(items, msg);
+		assertProblem(item, msg, line, severity, offset);
+	}
+
+	protected void assertCountOfProblems(List<IProblem> items, int count, final String msg)
+	{
+		List<IProblem> filtered = CollectionsUtil.filter(items, new IFilter<IProblem>()
+		{
+			public boolean include(IProblem item)
+			{
+				return msg.equals(item.getMessage());
+			}
+		});
+		assertEquals(MessageFormat.format("number of problems of type {0}", msg), count, filtered.size());
 	}
 
 	/**

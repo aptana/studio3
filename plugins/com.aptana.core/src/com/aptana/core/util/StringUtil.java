@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -383,6 +383,25 @@ public class StringUtil
 	}
 
 	/**
+	 * Create a string by concatenating the elements of a collection using a delimiter between each item
+	 * 
+	 * @param delimiter
+	 *            The text to place between each element in the array
+	 * @param items
+	 *            The array of chars
+	 * @return The resulting string
+	 */
+	public static String join(String delimiter, char... items)
+	{
+		String[] strings = new String[items.length];
+		for (int i = 0; i < items.length; i++)
+		{
+			strings[i] = new String(items, i, 1);
+		}
+		return join(delimiter, strings);
+	}
+
+	/**
 	 * Create a string by concatenating the elements of a string array using a delimiter between each item
 	 * 
 	 * @param delimiter
@@ -714,4 +733,78 @@ public class StringUtil
 	{
 	}
 
+	/**
+	 * Splits some string given some char (that char will not appear in the returned strings) Empty strings are also
+	 * never added.
+	 * 
+	 * @note: Returned strings will be a substring of the original string (and thus will keep its full internal array
+	 *        alive).
+	 */
+	public static List<String> split(String string, char toSplit)
+	{
+		ArrayList<String> ret = new ArrayList<String>();
+		int len = string.length();
+		int last = 0;
+		char c = 0;
+
+		for (int i = 0; i < len; i++)
+		{
+			c = string.charAt(i);
+			if (c == toSplit)
+			{
+				if (last != i)
+				{
+					ret.add(string.substring(last, i));
+				}
+				while (c == toSplit && i < len - 1)
+				{
+					i++;
+					c = string.charAt(i);
+				}
+				last = i;
+			}
+		}
+		if (c != toSplit)
+		{
+			if (last == 0 && len > 0)
+			{
+				ret.add(string); // it is equal to the original (no char to split)
+
+			}
+			else if (last < len)
+			{
+				ret.add(string.substring(last, len));
+
+			}
+		}
+		ret.trimToSize(); // Save some memory.
+		return ret;
+	}
+
+	public static List<String> dotSplit(String string)
+	{
+		return split(string, '.');
+	}
+
+	public static String dotFirst(String string)
+	{
+		int i = string.indexOf('.');
+		return (i != -1 ? string.substring(0, i) : string);
+	}
+
+	/**
+	 * Strips leading and trailing single/double quotes from a string. Assumes there is a trailing quote if there is
+	 * aleading quote.
+	 * 
+	 * @param text
+	 * @return
+	 */
+	public static String stripQuotes(String text)
+	{
+		if (text.length() >= 2 && (text.charAt(0) == '\'' || text.charAt(0) == '"'))
+		{
+			return text.substring(1, text.length() - 1);
+		}
+		return text;
+	}
 }

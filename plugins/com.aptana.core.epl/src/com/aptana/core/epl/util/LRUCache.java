@@ -176,7 +176,7 @@ public class LRUCache<K, V> {
 	 * If the value is not in the cache, returns null
 	 *
 	 * @param key Hash table key of object to retrieve
-	 * @return Retreived object, or null if object does not exist
+	 * @return Retrieved object, or null if object does not exist
 	 */
 	public V get(K key) {
 

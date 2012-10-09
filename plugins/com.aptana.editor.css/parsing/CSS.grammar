@@ -1,4 +1,5 @@
 // java -jar beaver.jar -T -w CSS.grammar
+// Note: the official grammar may be found at: http://www.w3.org/TR/css3-selectors/
 %package "com.aptana.editor.css.parsing";
 
 %class "CSSParser";
@@ -20,13 +21,13 @@
 
 %terminals AT_RULE, CHARSET, IMPORT, MEDIA_KEYWORD, PAGE, FONTFACE, NAMESPACE, LPAREN;
 %terminals SEMICOLON, COLON, COMMA, LCURLY, RCURLY, LBRACKET, RBRACKET, RPAREN, SLASH;
-%terminals MINUS, PLUS, EQUAL, STAR, GREATER;
+%terminals NOT, MINUS, PLUS, EQUAL, STAR, GREATER;
 %terminals IDENTIFIER, STRING, URL, NUMBER, CLASS, LENGTH, EMS, EXS, ANGLE, TIME, FREQUENCY, COLOR, PERCENTAGE;
 %terminals IMPORTANT, PROPERTY, SELECTOR, HASH, INCLUDES, DASHMATCH, BEGINS_WITH, ENDS_WITH;
 %terminals MOZ_DOCUMENT;
 
 %typeof IDENTIFIER, PROPERTY, STRING, URL, NUMBER, PERCENTAGE, LENGTH, EMS, EXS, ANGLE, TIME, FREQUENCY, COLOR = "String";
-%typeof HASH, CLASS, LBRACKET, RBRACKET, COLON, COMMA, PLUS, STAR, GREATER, AT_RULE = "String";
+%typeof HASH, NOT, CLASS, LBRACKET, RBRACKET, COLON, COMMA, PLUS, STAR, GREATER, AT_RULE = "String";
 %typeof Statement = "CSSNode";
 %typeof Declaration = "CSSDeclarationNode";
 %typeof Declarations = "List<CSSDeclarationNode>";
@@ -55,6 +56,7 @@
 
 		public void syntaxError(Symbol token)
 		{
+		    //System.out.println("Error at: "+token.value);
 			if (token == null || fWorking == null)
 			{
 				return;
@@ -590,6 +592,26 @@ SimpleSelector
 		{:
 			return new CSSSimpleSelectorNode(a);
 		:}
+		
+	|  TypeOrUniversalSelector.t COLON.c1 NOT.n LPAREN AttributeSelector.s RPAREN
+        {:
+            return new CSSSimpleSelectorNode(t + c1 + n + "(" + s + ")");
+        :}
+        
+	|  COLON.c1 NOT.n LPAREN AttributeSelector.s RPAREN
+        {:
+            return new CSSSimpleSelectorNode(c1 + n + "(" + s + ")");
+        :}
+        
+	|  TypeOrUniversalSelector.t COLON.c1 NOT.n LPAREN TypeOrUniversalSelector.s RPAREN
+        {:
+            return new CSSSimpleSelectorNode(t + c1 + n + "(" + s + ")");
+        :}
+        
+	|  COLON.c1 NOT.n LPAREN TypeOrUniversalSelector.s RPAREN
+        {:
+            return new CSSSimpleSelectorNode(c1 + n + "(" + s + ")");
+        :}
 	;
 
 AttributeSelectors

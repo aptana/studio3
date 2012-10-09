@@ -16,6 +16,20 @@ public class Messages extends NLS
 
 	public static String JSLintValidator_ERR_FailToGetJSLint;
 
+	public static String JSLintValidatorPreferenceCompositeFactory_OptionsMsg;
+	public static String JSLintValidatorPreferenceCompositeFactory_OptionsParseError;
+	public static String JSLintValidatorPreferenceCompositeFactory_OptionsTitle;
+
+	public static String JSParserValidator_EventDeprecated;
+
+	public static String JSParserValidator_Function;
+
+	public static String JSParserValidator_GenericDeprecated;
+
+	public static String JSParserValidator_Property;
+
+	public static String JSParserValidator_TypeDeprecated;
+
 	public static String JSStyleValidator_AdsafeA;
 	public static String JSStyleValidator_ALabel;
 	public static String JSStyleValidator_AlreadyDefined;
@@ -40,12 +54,15 @@ public class Messages extends NLS
 	public static String JSStyleValidator_ImpliedEvil;
 	public static String JSStyleValidator_InsecureA;
 	public static String JSStyleValidator_LeadingDecimalA;
+	public static String JSStyleValidator_MissingA;
 	public static String JSStyleValidator_MoveInvocation;
 	public static String JSStyleValidator_NotAConstructor;
 	public static String JSStyleValidator_NotGreater;
 	public static String JSStyleValidator_ParameterArgumentsA;
 	public static String JSStyleValidator_Radix;
+	public static String JSStyleValidator_ReadOnly;
 	public static String JSStyleValidator_ReservedA;
+	public static String JSStyleValidator_StatementBlock;
 	public static String JSStyleValidator_StrangeLoop;
 	public static String JSStyleValidator_Subscript;
 	public static String JSStyleValidator_Sync;

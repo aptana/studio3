@@ -42,6 +42,7 @@ public class PerformanceTests
 		suite.addTest(com.aptana.editor.json.tests.PerformanceTests.suite());
 		suite.addTest(com.aptana.editor.xml.tests.PerformanceTests.suite());
 		suite.addTest(com.aptana.git.core.tests.PerformanceTests.suite());
+		suite.addTest(com.aptana.theme.tests.PerformanceTests.suite());
 		// $JUnit-END$
 		return suite;
 	}

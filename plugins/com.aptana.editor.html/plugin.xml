@@ -275,4 +275,11 @@
          </contentType>
       </hover>
    </extension>
+   <extension
+         point="com.aptana.build.ui.buildParticipantPreferenceComposite">
+      <preferenceComposite
+            buildParticipantId="com.aptana.editor.html.validator.TidyValidator"
+            class="com.aptana.editor.html.validator.HTMLTidyValidatorPreferenceCompositeFactory">
+      </preferenceComposite>
+   </extension>
 </plugin>

@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -19,19 +19,19 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-import com.aptana.jetty.util.epl.ajax.JSON;
-
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.index.IJSIndexConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexReader;
+import com.aptana.editor.js.contentassist.model.EventElement;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.IndexPlugin;
+import com.aptana.jetty.util.epl.ajax.JSON;
 
 public class JSIndexQueryHelper
 {
@@ -42,12 +42,14 @@ public class JSIndexQueryHelper
 	 */
 	public static Index getIndex()
 	{
-		return getIndexManager().getIndex(URI.create(IJSIndexConstants.METADATA_INDEX_LOCATION));
+		IndexManager manager = getIndexManager();
+		return manager == null ? null : manager.getIndex(URI.create(IJSIndexConstants.METADATA_INDEX_LOCATION));
 	}
 
 	protected static IndexManager getIndexManager()
 	{
-		return IndexPlugin.getDefault().getIndexManager();
+		IndexPlugin plugin = IndexPlugin.getDefault();
+		return plugin == null ? null : plugin.getIndexManager();
 	}
 
 	private JSIndexReader _reader;
@@ -80,7 +82,7 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	protected List<FunctionElement> getFunctions(Index index, String typeName, String methodName)
+	public List<FunctionElement> getFunctions(Index index, String typeName, String methodName)
 	{
 		return this._reader.getFunctions(index, typeName, methodName);
 	}
@@ -296,7 +298,7 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	protected List<PropertyElement> getProperties(Index index, String typeName, String propertyName)
+	public List<PropertyElement> getProperties(Index index, String typeName, String propertyName)
 	{
 		return this._reader.getProperties(index, typeName, propertyName);
 	}
@@ -315,12 +317,12 @@ public class JSIndexQueryHelper
 		List<TypeElement> indexTypes = this._reader.getType(index, typeName, includeMembers);
 		List<TypeElement> builtinTypes = this._reader.getType(getIndex(), typeName, includeMembers);
 
-		if (indexTypes != null)
+		if (!CollectionsUtil.isEmpty(indexTypes))
 		{
 			result.addAll(indexTypes);
 		}
 
-		if (builtinTypes != null)
+		if (!CollectionsUtil.isEmpty(builtinTypes))
 		{
 			result.addAll(builtinTypes);
 		}
@@ -508,5 +510,10 @@ public class JSIndexQueryHelper
 		}
 
 		return result;
+	}
+
+	public List<EventElement> getEvents(Index index, String owningType, String eventName)
+	{
+		return this._reader.getEvents(index, owningType, eventName);
 	}
 }

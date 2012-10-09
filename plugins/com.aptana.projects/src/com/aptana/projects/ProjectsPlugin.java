@@ -16,6 +16,7 @@ import org.osgi.framework.BundleContext;
 
 import com.aptana.core.projects.templates.ProjectTemplate;
 import com.aptana.core.projects.templates.TemplateType;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.projects.templates.IDefaultProjectTemplate;
 import com.aptana.projects.templates.ProjectTemplatesManager;
 
@@ -41,7 +42,8 @@ public class ProjectsPlugin extends AbstractUIPlugin
 		public DefaultWebProjectTemplate()
 		{
 			super("default.zip", TemplateType.WEB, Messages.ProjectsPlugin_DefaultWebProjectTemplate_Name, //$NON-NLS-1$
-					false, Messages.ProjectsPlugin_DefaultWebProjectTemplate_Description, null, ID, -1);
+					false, Messages.ProjectsPlugin_DefaultWebProjectTemplate_Description, null, ID, 1, CollectionsUtil
+							.newList("Web")); //$NON-NLS-1$
 		}
 
 		@Override

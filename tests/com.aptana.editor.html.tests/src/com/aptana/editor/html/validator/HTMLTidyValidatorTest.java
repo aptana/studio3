@@ -7,15 +7,16 @@
  */
 package com.aptana.editor.html.validator;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 
-import com.aptana.core.build.AbstractBuildParticipant;
+import com.aptana.core.build.IBuildParticipant;
+import com.aptana.core.build.IBuildParticipantWorkingCopy;
 import com.aptana.core.build.IProblem;
 import com.aptana.editor.common.validation.AbstractValidatorTestCase;
+import com.aptana.editor.html.HTMLMetadataLoader;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.IHTMLConstants;
 import com.aptana.editor.html.parsing.HTMLParseState;
@@ -23,15 +24,39 @@ import com.aptana.editor.html.parsing.HTMLParseState;
 public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 {
 	@Override
-	protected AbstractBuildParticipant createValidator()
+	protected IBuildParticipant createValidator()
 	{
-		return new HTMLTidyValidatorInternal();
+		return new HTMLTidyValidator()
+		{
+			@Override
+			protected String getPreferenceNode()
+			{
+				return HTMLPlugin.PLUGIN_ID;
+			}
+
+			@Override
+			public String getId()
+			{
+				return ID;
+			}
+		};
 	}
 
 	@Override
 	protected String getFileExtension()
 	{
 		return "html";
+	}
+
+	@Override
+	protected void setUp() throws Exception
+	{
+		super.setUp();
+
+		// Wait for HTML metadata to be loaded.
+		HTMLMetadataLoader loader = new HTMLMetadataLoader();
+		loader.schedule();
+		loader.join();
 	}
 
 	public void testOKDoctype() throws CoreException
@@ -90,6 +115,76 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 
 		List<IProblem> items = getParseErrors(text);
 		assertTrue(items.size() > 0);
+		assertContainsProblem(items, "SYSTEM, PUBLIC, W3C, DTD, EN must be upper case", IMarker.SEVERITY_WARNING, 1,
+				26, 3);
+	}
+
+	public void testUsesSeverityAssignedByUser() throws CoreException
+	{
+		String text = "<!DOCTYPE HTML PUBLIC \"-//w3c//DTD HTML 4.01//EN\"\n"
+				+ "	\"http://www.w3.org/TR/html4/strict.dtd\">";
+
+		List<IProblem> items = getParseErrors(text);
+		// Defaults to Warning
+		assertContainsProblem(items, "SYSTEM, PUBLIC, W3C, DTD, EN must be upper case", IMarker.SEVERITY_WARNING, 1,
+				26, 3);
+
+		// Set to ignore
+		IBuildParticipantWorkingCopy wc = fValidator.getWorkingCopy();
+		wc.setPreference(HTMLTidyValidator.ProblemType.UppercaseDoctype.getPrefKey(),
+				IProblem.Severity.IGNORE.intValue());
+		wc.doSave();
+
+		// Isn't reported
+		items = getParseErrors(text);
+		assertDoesntContain(items, "SYSTEM, PUBLIC, W3C, DTD, EN must be upper case");
+
+		// Set to Error
+		wc = fValidator.getWorkingCopy();
+		wc.setPreference(HTMLTidyValidator.ProblemType.UppercaseDoctype.getPrefKey(),
+				IProblem.Severity.ERROR.intValue());
+		wc.doSave();
+
+		// Reports as error
+		items = getParseErrors(text);
+		assertContainsProblem(items, "SYSTEM, PUBLIC, W3C, DTD, EN must be upper case", IMarker.SEVERITY_ERROR, 1, 26,
+				3);
+
+		// Set to Info
+		wc = fValidator.getWorkingCopy();
+		wc.setPreference(HTMLTidyValidator.ProblemType.UppercaseDoctype.getPrefKey(), IProblem.Severity.INFO.intValue());
+		wc.doSave();
+
+		// Reports as info
+		items = getParseErrors(text);
+		assertContainsProblem(items, "SYSTEM, PUBLIC, W3C, DTD, EN must be upper case", IMarker.SEVERITY_INFO, 1, 26, 3);
+	}
+
+	public void testRestoreDefaultsResetsProblemSeverities() throws CoreException
+	{
+		String text = "<!DOCTYPE HTML PUBLIC \"-//w3c//DTD HTML 4.01//EN\"\n"
+				+ "	\"http://www.w3.org/TR/html4/strict.dtd\">";
+
+		List<IProblem> items = getParseErrors(text);
+		// Defaults to Warning
+		assertContainsProblem(items, "SYSTEM, PUBLIC, W3C, DTD, EN must be upper case", IMarker.SEVERITY_WARNING, 1,
+				26, 3);
+
+		// Set to ignore
+		IBuildParticipantWorkingCopy wc = fValidator.getWorkingCopy();
+		wc.setPreference(HTMLTidyValidator.ProblemType.UppercaseDoctype.getPrefKey(),
+				IProblem.Severity.IGNORE.intValue());
+		wc.doSave();
+
+		// Isn't reported
+		items = getParseErrors(text);
+		assertDoesntContain(items, "SYSTEM, PUBLIC, W3C, DTD, EN must be upper case");
+
+		// Restore Defaults
+		fValidator.restoreDefaults();
+
+		items = getParseErrors(text);
+		// Defaults to Warning
 		assertContainsProblem(items, "SYSTEM, PUBLIC, W3C, DTD, EN must be upper case", IMarker.SEVERITY_WARNING, 1,
 				26, 3);
 	}
@@ -657,7 +752,9 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 			"</HTML>\n";
 		// @formatter:on
 
-		((HTMLTidyValidatorInternal) fValidator).addFilter(".*should trim empty.*");
+		IBuildParticipantWorkingCopy wc = fValidator.getWorkingCopy();
+		wc.setFilters(".*should trim empty.*");
+		wc.doSave();
 		List<IProblem> items = getParseErrors(text);
 		assertDoesntContain(items, "should trim empty <script>");
 	}
@@ -665,38 +762,5 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 	protected List<IProblem> getParseErrors(String source) throws CoreException
 	{
 		return getParseErrors(source, new HTMLParseState(source), IHTMLConstants.TIDY_PROBLEM);
-	}
-
-	class HTMLTidyValidatorInternal extends HTMLTidyValidator
-	{
-		private List<String> filters = new ArrayList<String>();
-
-		@Override
-		protected String getPreferenceNode()
-		{
-			return HTMLPlugin.PLUGIN_ID;
-		}
-
-		@Override
-		public String getId()
-		{
-			return ID;
-		}
-
-		public void addFilter(String filter)
-		{
-			filters.add(filter);
-		}
-
-		public void clearFilters()
-		{
-			filters.clear();
-		}
-
-		@Override
-		public List<String> getFilters()
-		{
-			return filters;
-		}
 	}
 }

@@ -266,6 +266,60 @@ public class CollectionsUtilTest extends TestCase
 		assertEquals(list, CollectionsUtil.newInOrderSet("item1", "item2"));
 	}
 
+	public void testCollectionFind()
+	{
+		List<String> list = CollectionsUtil.newList("a", "ab", "ba", "b", "bc", "cb");
+		IFilter<String> selectWithA = new IFilter<String>()
+		{
+			public boolean include(String item)
+			{
+				return (item != null && item.contains("a"));
+			}
+		};
+		String found = CollectionsUtil.find(list, selectWithA);
+
+		assertNotNull(found);
+		assertEquals("Should have found first 'a'", "a", found);
+	}
+
+	public void testCollectionFind2()
+	{
+		List<String> list = CollectionsUtil.newList("a", "ab", "ba", "b", "bc", "cb");
+		IFilter<String> selectWithA = new IFilter<String>()
+		{
+			public boolean include(String item)
+			{
+				return (item != null && item.startsWith("b"));
+			}
+		};
+		String found = CollectionsUtil.find(list, selectWithA);
+
+		assertNotNull(found);
+		assertEquals("Should have found 'ba'", "ba", found);
+	}
+
+	public void testCollectionFindNullCollection()
+	{
+		IFilter<String> selectWithA = new IFilter<String>()
+		{
+			public boolean include(String item)
+			{
+				return (item != null && item.contains("a"));
+			}
+		};
+		String found = CollectionsUtil.find(null, selectWithA);
+
+		assertNull(found);
+	}
+
+	public void testCollectionFindNullFilter()
+	{
+		List<String> list = CollectionsUtil.newList("a", "ab", "ba", "b", "bc", "cb");
+		String found = CollectionsUtil.find(list, null);
+
+		assertNull(found);
+	}
+
 	public void testCollectionFilter()
 	{
 		List<String> list = CollectionsUtil.newList("a", "ab", "ba", "b", "bc", "cb");

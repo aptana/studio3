@@ -19,6 +19,7 @@ public enum TagType
 	EXTENDS("@extends"), //$NON-NLS-1$
 	INTERNAL("@internal"), //$NON-NLS-1$
 	METHOD("@method"), //$NON-NLS-1$
+	MODULE("@module"), //$NON-NLS-1$
 	NAMESPACE("@namespace"), //$NON-NLS-1$
 	OVERVIEW("@overview"), //$NON-NLS-1$
 	PARAM("@param"), //$NON-NLS-1$

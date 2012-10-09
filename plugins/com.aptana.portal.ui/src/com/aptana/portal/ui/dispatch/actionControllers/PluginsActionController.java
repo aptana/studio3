@@ -16,10 +16,11 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ui.progress.UIJob;
-import com.aptana.jetty.util.epl.ajax.JSON;
 
 import com.aptana.configurations.processor.ConfigurationStatus;
 import com.aptana.configurations.processor.IConfigurationProcessor;
+import com.aptana.core.util.EclipseUtil;
+import com.aptana.jetty.util.epl.ajax.JSON;
 import com.aptana.portal.ui.dispatch.BrowserNotifier;
 import com.aptana.portal.ui.dispatch.IBrowserNotificationConstants;
 
@@ -75,7 +76,7 @@ public class PluginsActionController extends AbstractActionController
 						return Status.OK_STATUS;
 					}
 				};
-				sendOkJob.setSystem(true);
+				EclipseUtil.setSystemForJob(sendOkJob);
 				sendOkJob.schedule();
 				return Status.OK_STATUS;
 			}
@@ -137,7 +138,9 @@ public class PluginsActionController extends AbstractActionController
 	 * string that contains the list of plugins/features IDs that were found. It's up to the caller to determine it the
 	 * list contains the requested item (plugin). If it's not in the list, it's not installed.
 	 * 
-	 * @param lookup Expected an multi-dimensional Object array with rows that contain: plugin-id, min-version, update-site, feature-id.
+	 * @param lookup
+	 *            Expected an multi-dimensional Object array with rows that contain: plugin-id, min-version,
+	 *            update-site, feature-id.
 	 * @return A JSON status for the given plugin(s)
 	 */
 	@ControllerAction

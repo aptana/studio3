@@ -124,6 +124,33 @@ public class CollectionsUtil
 	}
 
 	/**
+	 * Searches the collection for the first element that matches the filter.<br>
+	 * <br>
+	 * Note that this method is not thread safe. Users of this method will need to maintain type safety against the
+	 * collection
+	 * 
+	 * @param collection
+	 *            A collection to search
+	 * @param filter
+	 *            A filter that determines which item to return
+	 * @return Returns the first <T> that matches the filter
+	 */
+	public static <T> T find(Collection<T> collection, IFilter<T> filter)
+	{
+		if (collection != null && filter != null)
+		{
+			for (T item : collection)
+			{
+				if (filter.include(item))
+				{
+					return item;
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * Generate a new list containing items from the specified collection that the filter determines should be included.
 	 * If the specified filter is null, then all items are added to the result list. If the specified collection is null
 	 * then an empty list is returned.<br>
@@ -680,5 +707,29 @@ public class CollectionsUtil
 		}
 
 		return map;
+	}
+
+	/**
+	 * See http://ruby-doc.org/core-1.9.3/Enumerable.html#method-i-inject This is a method that operates over a
+	 * collection, executing the block for each element and carrying along a "collector". This allows us to build up an
+	 * object by operating on each element of a collection. Typically this would be used to generate sums of values, or
+	 * concatenate a string, or run math operations.
+	 * 
+	 * @param collection
+	 * @param collector
+	 * @param block
+	 * @return
+	 */
+	public static <K, V> K inject(Collection<V> collection, K collector, IInjectBlock<V, K> block)
+	{
+		if (isEmpty(collection))
+		{
+			return collector;
+		}
+		for (V item : collection)
+		{
+			collector = block.execute(collector, item);
+		}
+		return collector;
 	}
 }

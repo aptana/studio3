@@ -10,8 +10,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
 
+import com.aptana.core.util.FileUtil;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.ChangedFile.Status;
 
@@ -47,8 +47,7 @@ public abstract class GitTestCase extends TestCase
 	{
 		if (fPath == null)
 		{
-			String tmpDirString = System.getProperty("java.io.tmpdir");
-			fPath = new Path(tmpDirString).append("git_repo" + System.currentTimeMillis());
+			fPath = FileUtil.getTempDirectory().append("git_repo" + System.currentTimeMillis());
 		}
 		return fPath;
 	}

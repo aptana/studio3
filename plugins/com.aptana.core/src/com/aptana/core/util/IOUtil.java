@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -21,9 +21,17 @@ import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.text.MessageFormat;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.core.CorePlugin;
 import com.aptana.core.logging.IdeLog;
@@ -150,18 +158,102 @@ public abstract class IOUtil
 	}
 
 	/**
-	 * Recursively copy one directory to a new destination directory. If a file is passed in instead of a directory,
-	 * this method will delegate to copyFile to perform the copy. Various tests for existence, readability, and
+	 * Recursively copy one directory to a new destination directory while showing progress. If a file is passed in
+	 * instead of a directory, this method will return an error. Various tests for existence, readability, and
 	 * writability are performed before copying. If any of these tests fail, the copy be aborted. Note that this means
 	 * that if a failure occurs somewhere in a descendant file/directory, all files up to that point will exist, but no
 	 * files after that point will be copied.
 	 * 
 	 * @param source
 	 * @param destination
+	 * @param monitor
+	 * @param cancelable
 	 * @throws IOException
 	 */
-	public static void copyDirectory(File source, File destination) throws IOException
+	public static IStatus copyDirectoryWithProgress(File source, File destination, IProgressMonitor monitor,
+			boolean cancelable)
 	{
+		if (source.isDirectory())
+		{
+			int updateSize = 2;
+
+			// Setup the progress monitor
+			if (monitor != null)
+			{
+				// Batch up operations so we don't constantly update the progress monitor
+				int totalFiles = countFiles(source);
+				updateSize = determineProgressBatchUpdateCount(totalFiles);
+				int totalWork = totalFiles / updateSize;
+				if (totalFiles % updateSize > 0)
+				{
+					totalWork++;
+				}
+				monitor = SubMonitor.convert(monitor, totalWork);
+			}
+
+			try
+			{
+				return copyDirectory(source, destination, monitor, new int[] { 0 }, updateSize, cancelable);
+			}
+			catch (IOException e)
+			{
+				return new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, IStatus.ERROR,
+						Messages.IOUtil_Directory_Copy_Error, e);
+			}
+		}
+
+		return new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, IStatus.ERROR, Messages.IOUtil_Source_Not_Directory_Error, null);
+	}
+
+	private static int countFiles(File source)
+	{
+		String[] list = source.list();
+		int count = list.length;
+		for (String file : list)
+		{
+			File child = new File(source, file);
+			if (child.isDirectory())
+			{
+				count += countFiles(child);
+			}
+		}
+
+		return count;
+	}
+
+	/**
+	 * Recursively copy one directory to a new destination directory while showing progress. If a file is passed in
+	 * instead of a directory, this method will delegate to copyFile to perform the copy. Various tests for existence,
+	 * readability, and writability are performed before copying. If any of these tests fail, the copy be aborted. Note
+	 * that this means that if a failure occurs somewhere in a descendant file/directory, all files up to that point
+	 * will exist, but no files after that point will be copied.
+	 * 
+	 * @param source
+	 * @param destination
+	 * @param monitor
+	 * @param count
+	 * @param updateSize
+	 * @param cancelable
+	 * @throws IOException
+	 */
+	private static IStatus copyDirectory(File source, File destination, IProgressMonitor monitor, int[] count,
+			int updateSize, boolean cancelable) throws IOException
+	{
+		if (monitor != null)
+		{
+			if (cancelable && monitor.isCanceled())
+			{
+				return new Status(IStatus.CANCEL, CorePlugin.PLUGIN_ID, IStatus.CANCEL, StringUtil.EMPTY, null);
+			}
+
+			count[0]++;
+			if (updateSize < 2 || count[0] % updateSize == 0)
+			{
+				monitor.setTaskName(MessageFormat.format(Messages.IOUtil_Copy_Label, destination.toString()));
+				monitor.worked(1);
+			}
+		}
+
 		if (source.isDirectory())
 		{
 			String error = null;
@@ -193,7 +285,12 @@ public abstract class IOUtil
 				// copy all files in the source directory
 				for (String filename : source.list())
 				{
-					copyDirectory(new File(source, filename), new File(destination, filename));
+					IStatus status = copyDirectory(new File(source, filename), new File(destination, filename),
+							monitor, count, updateSize, cancelable);
+					if (status != null && !status.isOK())
+					{
+						return status;
+					}
 				}
 			}
 			else
@@ -206,12 +303,40 @@ public abstract class IOUtil
 						);
 
 				IdeLog.logError(CorePlugin.getDefault(), message);
+
+				return new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, IStatus.ERROR, message, null);
 			}
 		}
 		else
 		{
-			copyFile(source, destination);
+			IFileStore src = EFS.getLocalFileSystem().fromLocalFile(source);
+			try
+			{
+				src.copy(EFS.getLocalFileSystem().fromLocalFile(destination), EFS.OVERWRITE, new NullProgressMonitor());
+			}
+			catch (CoreException e)
+			{
+				return new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, IStatus.ERROR, e.getMessage(), e);
+			}
 		}
+
+		return Status.OK_STATUS;
+	}
+
+	/**
+	 * Recursively copy one directory to a new destination directory. If a file is passed in instead of a directory,
+	 * this method will delegate to copyFile to perform the copy. Various tests for existence, readability, and
+	 * writability are performed before copying. If any of these tests fail, the copy be aborted. Note that this means
+	 * that if a failure occurs somewhere in a descendant file/directory, all files up to that point will exist, but no
+	 * files after that point will be copied.
+	 * 
+	 * @param source
+	 * @param destination
+	 * @throws IOException
+	 */
+	public static IStatus copyDirectory(File source, File destination) throws IOException
+	{
+		return copyDirectory(source, destination, null, new int[] { 0 }, 0, false);
 	}
 
 	/**
@@ -415,6 +540,29 @@ public abstract class IOUtil
 				// ignore
 			}
 		}
+	}
+
+	/**
+	 * Used for IProgressMonitor updates. Determines how many updates to batch up before actually notifying the
+	 * IProgressMonitor.
+	 * 
+	 * @param numberOfUpdates
+	 * @return
+	 */
+	public static int determineProgressBatchUpdateCount(int numberOfUpdates)
+	{
+		int updateSize = 2;
+
+		if (numberOfUpdates > 1000)
+		{
+			updateSize = 25;
+		}
+		else if (numberOfUpdates > 100)
+		{
+			updateSize = 5;
+		}
+
+		return updateSize;
 	}
 
 	/**

@@ -13,6 +13,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.parsing.ast.JSNode;
@@ -179,14 +180,7 @@ public class JSPropertyCollection
 	 */
 	public List<String> getTypes()
 	{
-		List<String> result = types;
-
-		if (result == null)
-		{
-			result = Collections.emptyList();
-		}
-
-		return result;
+		return CollectionsUtil.getListValue(types);
 	}
 
 	/**
@@ -196,14 +190,7 @@ public class JSPropertyCollection
 	 */
 	public List<JSNode> getValues()
 	{
-		List<JSNode> result = values;
-
-		if (result == null)
-		{
-			result = Collections.emptyList();
-		}
-
-		return result;
+		return CollectionsUtil.getListValue(values);
 	}
 
 	/**
@@ -213,14 +200,7 @@ public class JSPropertyCollection
 	 */
 	public boolean hasProperties()
 	{
-		boolean result = false;
-
-		if (properties != null)
-		{
-			result = !properties.isEmpty();
-		}
-
-		return result;
+		return !CollectionsUtil.isEmpty(properties);
 	}
 
 	/**

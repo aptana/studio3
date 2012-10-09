@@ -1,8 +1,6 @@
 package com.aptana.core.build;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -10,8 +8,6 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import com.aptana.buildpath.core.BuildPathCorePlugin;
-import com.aptana.core.build.IBuildParticipant.BuildType;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.index.core.build.BuildContext;
 import com.aptana.parsing.ast.ParseNode;
 
@@ -79,7 +75,7 @@ public class AbstractBuildParticipantTest extends TestCase
 		assertEquals(linenumber, error.getLineNumber());
 		assertEquals(offset, error.getOffset());
 		assertEquals(sourcePath, error.getSourcePath());
-		assertEquals(IMarker.SEVERITY_ERROR, error.getSeverity());
+		assertEquals(IMarker.SEVERITY_ERROR, error.getSeverity().intValue());
 		assertEquals(IMarker.PRIORITY_NORMAL, error.getPriority());
 	}
 
@@ -97,7 +93,7 @@ public class AbstractBuildParticipantTest extends TestCase
 		assertEquals(linenumber, error.getLineNumber());
 		assertEquals(offset, error.getOffset());
 		assertEquals(sourcePath, error.getSourcePath());
-		assertEquals(IMarker.SEVERITY_WARNING, error.getSeverity());
+		assertEquals(IMarker.SEVERITY_WARNING, error.getSeverity().intValue());
 		assertEquals(IMarker.PRIORITY_NORMAL, error.getPriority());
 	}
 
@@ -115,7 +111,7 @@ public class AbstractBuildParticipantTest extends TestCase
 		assertEquals(linenumber, error.getLineNumber());
 		assertEquals(offset, error.getOffset());
 		assertEquals(sourcePath, error.getSourcePath());
-		assertEquals(IMarker.SEVERITY_INFO, error.getSeverity());
+		assertEquals(IMarker.SEVERITY_INFO, error.getSeverity().intValue());
 		assertEquals(IMarker.PRIORITY_NORMAL, error.getPriority());
 	}
 
@@ -134,51 +130,8 @@ public class AbstractBuildParticipantTest extends TestCase
 		assertEquals(linenumber, error.getLineNumber());
 		assertEquals(offset, error.getOffset());
 		assertEquals(sourcePath, error.getSourcePath());
-		assertEquals(IMarker.SEVERITY_INFO, error.getSeverity());
+		assertEquals(IMarker.SEVERITY_INFO, error.getSeverity().intValue());
 		assertEquals(priority, error.getPriority());
-	}
-
-	public void testCanToggleEnablement() throws Exception
-	{
-		assertFalse(participant.isRequired());
-		assertFalse(participant.isEnabled(BuildType.BUILD));
-		assertFalse(participant.isEnabled(BuildType.RECONCILE));
-		participant.setEnabled(BuildType.BUILD, true);
-		assertTrue(participant.isEnabled(BuildType.BUILD));
-		assertFalse(participant.isEnabled(BuildType.RECONCILE));
-		participant.setEnabled(BuildType.RECONCILE, true);
-		assertTrue(participant.isEnabled(BuildType.BUILD));
-		assertTrue(participant.isEnabled(BuildType.RECONCILE));
-		participant.setEnabled(BuildType.RECONCILE, false);
-		assertTrue(participant.isEnabled(BuildType.BUILD));
-		assertFalse(participant.isEnabled(BuildType.RECONCILE));
-		participant.restoreDefaults();
-		assertFalse(participant.isEnabled(BuildType.BUILD));
-		assertFalse(participant.isEnabled(BuildType.RECONCILE));
-	}
-
-	public void testChangeFilters() throws Exception
-	{
-		assertEquals(Collections.emptyList(), participant.getFilters());
-
-		assertSetFilters(".*-me-.*", ".*-webkit-.*");
-		assertSetFilters(".*-webkit-.*");
-
-		participant.restoreDefaults();
-		assertEquals(Collections.emptyList(), participant.getFilters());
-
-		assertSetFilters(".*-me-.*", ".*-webkit-.*");
-	}
-
-	protected void assertSetFilters(String... filters)
-	{
-		participant.setFilters(EclipseUtil.instanceScope(), filters);
-		List<String> filtersList = participant.getFilters();
-		assertEquals(filters.length, filtersList.size());
-		for (int i = 0; i < filters.length; i++)
-		{
-			assertEquals(filters[i], filtersList.get(i));
-		}
 	}
 
 	public void testProcessCommentNode() throws Exception

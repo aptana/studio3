@@ -5,22 +5,21 @@ Bundle-SymbolicName: com.aptana.theme;singleton:=true
 Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.theme.ThemePlugin
 Bundle-Vendor: %providerName
-Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime,
+Require-Bundle: org.eclipse.core.runtime,
+ com.aptana.core,
+ com.aptana.parsing,
+ com.aptana.scripting,
  org.eclipse.jface.text,
+ org.eclipse.ui,
  org.eclipse.ui.console,
  org.eclipse.ui.editors,
  org.eclipse.ui.workbench.texteditor,
- com.aptana.scripting,
  org.eclipse.debug.ui,
- org.eclipse.ui.ide,
  org.eclipse.ui.views,
  org.eclipse.team.ui,
- com.aptana.ui,
- com.aptana.core,
+ org.eclipse.ui.ide,
  org.eclipse.search;resolution:=optional,
- com.aptana.plist,
- com.aptana.parsing
+ com.aptana.ui
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.theme,

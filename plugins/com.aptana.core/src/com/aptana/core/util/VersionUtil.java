@@ -7,9 +7,14 @@
  */
 package com.aptana.core.util;
 
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
+import org.eclipse.osgi.service.resolver.VersionRange;
 import org.osgi.framework.Version;
 
 import com.aptana.core.CorePlugin;
@@ -91,6 +96,168 @@ public final class VersionUtil
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Check if the installed versions falls in the required versions. The strings in the required versions may include
+	 * an 'inclusive'/'exclusive' ranges in a form of [a,b), [a,b] or (a,b].<br>
+	 * The compatibility check will match an exact version when the required version appears as-is (e.g. <i>"1.0"</i>),
+	 * and will perform a range check when the requirement appears as a range (e.g. <i>"[1.0, 2.3)"</i>).<br>
+	 * <b>Every</b> item in the <i>required</i> list of versions have to have a match in the <i>installed</i> versions
+	 * in order to have this method return <code>true</code>.
+	 * 
+	 * @param installedVersions
+	 *            An array of installed versions.
+	 * @param requiredVersions
+	 *            An array of required versions. Each item can represent a version, or a range of versions (e.g. "a",
+	 *            "a.b", "a.b.c", "[a, b)", "[a.b, c.e]" etc).
+	 * @return <code>true</code> in case the installed versions match the required versions.
+	 */
+	public static boolean isCompatibleVersions(String[] installedVersions, String[] requiredVersions)
+	{
+		if (installedVersions == null || requiredVersions == null)
+		{
+			return requiredVersions != null && requiredVersions.length > 0;
+		}
+		// Hold the installed versions as Version instances
+		Map<String, Version> installed = new HashMap<String, Version>();
+		for (String installedVer : installedVersions)
+		{
+			try
+			{
+				Version version = getVersion(installedVer);
+				if (version != null)
+				{
+					installed.put(installedVer, version);
+				}
+				else
+				{
+					installed.put(installedVer, Version.emptyVersion);
+				}
+			}
+			catch (Exception e)
+			{
+				IdeLog.logWarning(CorePlugin.getDefault(),
+						MessageFormat.format("Error parsing the installed version {0}", installedVer)); //$NON-NLS-1$
+			}
+		}
+		// We need to match every version/version-range in the required versions array.
+		for (String required : requiredVersions)
+		{
+			// We check if the required version starts with '[' or '('. If so, we treat it as a range of versions and
+			// create a VersionRange instance for it. Otherwise, we treat it as a regex pattern.
+			// Note that the JSON content will have to pass a valid syntax for the Java Pattern class. In any other
+			// case, we log an error and ignore it.
+			if (isRange(required))
+			{
+				if (!isCompatibleVersionsRange(installed, required))
+				{
+					return false;
+				}
+			}
+			else if (!isCompatibleVersionsRegex(installed, required))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Returns <code>true</code> in case the given version is in the given version range.
+	 * 
+	 * @param version
+	 * @param versionRange
+	 * @return <code>true</code> if the given version match the version range.
+	 */
+	public static boolean isCompatibleVersions(String version, String versionRange)
+	{
+		return isCompatibleVersions(new String[] { version }, new String[] { versionRange });
+	}
+
+	private static boolean isCompatibleVersionsRegex(Map<String, Version> installed, String required)
+	{
+		// compile the regex.
+		Pattern pattern = null;
+		try
+		{
+			pattern = Pattern.compile(required);
+		}
+		catch (PatternSyntaxException e)
+		{
+			IdeLog.logError(CorePlugin.getDefault(), MessageFormat.format(
+					"The required version '{0}' should be defined as a regular-expression", required)); //$NON-NLS-1$
+			return false;
+		}
+
+		// Do a match on the installed-versions original String values
+		for (String installedVersion : installed.keySet())
+		{
+			Matcher matcher = pattern.matcher(installedVersion);
+			if (matcher.find())
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * @param installed
+	 * @param matchCount
+	 * @param required
+	 * @return
+	 */
+	private static boolean isCompatibleVersionsRange(Map<String, Version> installed, String required)
+	{
+		VersionRange versionRange = new VersionRange(required);
+		for (Version installedVersion : installed.values())
+		{
+			if (versionRange.isIncluded(installedVersion))
+			{
+				// Found a match for the requirement
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Check if the given version string represents a range of versions. For example, "[a, b]" or "[a, b)"...
+	 * 
+	 * @param versionString
+	 * @return True, if the given string is a range representation.
+	 */
+	protected static boolean isRange(String versionString)
+	{
+		versionString = versionString.trim();
+		if (versionString.charAt(0) == '[' || versionString.charAt(0) == '(')
+		{
+			int comma = versionString.indexOf(',');
+			if (comma < 0)
+			{
+				return false;
+			}
+			char last = versionString.charAt(versionString.length() - 1);
+			if (last != ']' && last != ')')
+			{
+				return false;
+			}
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Extract a Version out of a given version string. We are looking for a pattern that will match a version in a form
+	 * of a.b.c (or less).
+	 * 
+	 * @param installedVer
+	 * @return The 'synthesized' version of the given version string; <code>null</code> if no version was detected.
+	 */
+	public static Version getVersion(String version)
+	{
+		return VersionUtil.parseVersion(version);
 	}
 
 }

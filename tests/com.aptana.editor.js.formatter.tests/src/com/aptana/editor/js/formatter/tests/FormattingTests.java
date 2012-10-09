@@ -1,6 +1,9 @@
 package com.aptana.editor.js.formatter.tests;
 
+import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
+
 import com.aptana.editor.common.formatting.AbstractFormatterTestCase;
+import com.aptana.editor.js.JSPlugin;
 
 public class FormattingTests extends AbstractFormatterTestCase
 {
@@ -17,6 +20,15 @@ public class FormattingTests extends AbstractFormatterTestCase
 	private static String FORMATTER_FACTORY_ID = "com.aptana.editor.js.formatterFactory"; //$NON-NLS-1$
 	private static String TEST_BUNDLE_ID = "com.aptana.editor.js.formatter.tests"; //$NON-NLS-1$
 	private static String FILE_TYPE = "js"; //$NON-NLS-1$
+
+	@Override
+	protected void setUpSuite() throws Exception
+	{
+		// force JS plugin to load and ensure we use spaces for tabs!
+		JSPlugin.getDefault().getPreferenceStore()
+				.setDefault(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS, true);
+		super.setUpSuite();
+	}
 
 	/*
 	 * (non-Javadoc)

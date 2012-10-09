@@ -162,14 +162,21 @@ public class ParseUtil
 			{
 				if (current instanceof ParseRootNode)
 				{
-					for (IParseNode commentNode : ((ParseRootNode) node).getCommentNodes())
+					IParseNode[] commentNodes = ((ParseRootNode) node).getCommentNodes();
+					// Micro-optimization (using old for to save on speed/memory).
+					int len = commentNodes.length;
+					for (int i = 0; i < len; i++)
 					{
-						queue.offer(commentNode);
+						queue.offer(commentNodes[i]);
 					}
 				}
 
-				for (IParseNode child : current)
+				IParseNode[] children = current.getChildren();
+				// Micro-optimization (using old for to save on speed/memory).
+				int len = children.length;
+				for (int i = 0; i < len; i++)
 				{
+					IParseNode child = children[i];
 					queue.offer(child);
 				}
 			}
@@ -260,15 +267,25 @@ public class ParseUtil
 					if (current.node instanceof ParseRootNode)
 					{
 						// Insert the children to front of the list, in-order
-						for (IParseNode commentNode : ((ParseRootNode) node).getCommentNodes())
+						IParseNode[] commentNodes = ((ParseRootNode) node).getCommentNodes();
+
+						// Micro-optimization (using old for to save on speed/memory).
+						int len = commentNodes.length;
+						for (int j = 0; j < len; j++)
 						{
+							IParseNode commentNode = commentNodes[j];
 							queue.add(i++, new QueueEntry(commentNode, true));
 						}
 					}
 
 					// Insert the children to front of the list, in-order
-					for (IParseNode child : current.node)
+					IParseNode[] children = current.node.getChildren();
+
+					// Micro-optimization (using old for to save on speed/memory).
+					int len = children.length;
+					for (int j = 0; j < len; j++)
 					{
+						IParseNode child = children[j];
 						queue.add(i++, new QueueEntry(child, true));
 					}
 					// This sticks the exit of the node at the end?

@@ -86,7 +86,7 @@ public class ImmutableTupleN
 	@Override
 	public String toString()
 	{
-		return this.getClass().getName() + "[" + StringUtil.join(", ", tuple) + "]";
+		return this.getClass().getName() + "[" + StringUtil.join(", ", tuple) + "]"; //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	/**

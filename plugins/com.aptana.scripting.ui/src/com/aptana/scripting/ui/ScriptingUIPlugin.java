@@ -1,17 +1,25 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.scripting.ui;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
+
+import com.aptana.core.util.EclipseUtil;
+import com.aptana.scripting.ui.internal.KeybindingsManager;
+import com.aptana.scripting.ui.internal.listeners.ExecutionListenerRegistrant;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -19,6 +27,12 @@ import org.osgi.framework.BundleContext;
 public class ScriptingUIPlugin extends AbstractUIPlugin
 {
 	public static final String PLUGIN_ID = "com.aptana.scripting.ui"; //$NON-NLS-1$
+
+	/**
+	 * Context id set by workbench part to indicate they are scripting aware.
+	 */
+	public static final String SCRIPTING_CONTEXT_ID = "com.aptana.scripting.context"; //$NON-NLS-1$
+
 	private static ScriptingUIPlugin plugin;
 
 	/**
@@ -72,6 +86,22 @@ public class ScriptingUIPlugin extends AbstractUIPlugin
 	{
 		super.start(context);
 		plugin = this;
+
+		Job startupJob = new Job("Start Ruble bundle manager") //$NON-NLS-1$
+		{
+			@Override
+			protected IStatus run(IProgressMonitor monitor)
+			{
+				ExecutionListenerRegistrant.getInstance();
+
+				// install key binding Manager
+				KeybindingsManager.install();
+
+				return Status.OK_STATUS;
+			}
+		};
+		EclipseUtil.setSystemForJob(startupJob);
+		startupJob.schedule();
 	}
 
 	/*
@@ -80,8 +110,20 @@ public class ScriptingUIPlugin extends AbstractUIPlugin
 	 */
 	public void stop(BundleContext context) throws Exception // $codepro.audit.disable declaredExceptions
 	{
-		plugin = null;
-		super.stop(context);
+		try
+		{
+			KeybindingsManager.uninstall();
+			ExecutionListenerRegistrant.shutdown();
+		}
+		catch (Exception e)
+		{
+			// ignore
+		}
+		finally
+		{
+			plugin = null;
+			super.stop(context);
+		}
 	}
 
 	/**

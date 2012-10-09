@@ -5,30 +5,25 @@ Bundle-SymbolicName: com.aptana.editor.common;singleton:=true
 Bundle-Version: 3.0.3.qualifier
 Bundle-Activator: com.aptana.editor.common.CommonEditorPlugin
 Bundle-Vendor: %providerName
-Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.core.resources,
- org.eclipse.jface.text,
- org.eclipse.ui,
- org.eclipse.ui.editors,
- org.eclipse.ui.console,
- org.eclipse.ui.ide,
- org.eclipse.ui.views,
- org.eclipse.ui.workbench.texteditor,
- com.aptana.scripting,
+Require-Bundle: org.jruby,
  com.aptana.core;bundle-version="3.0.4",
- com.aptana.ui.epl,
- com.aptana.parsing,
- com.aptana.editor.findbar,
- org.jruby,
+ com.aptana.buildpath.core;visibility:=reexport,
+ com.aptana.scripting,
+ org.eclipse.ui.editors;visibility:=reexport,
+ org.eclipse.ui.console,
+ org.eclipse.ui.views,
+ org.eclipse.compare,
+ org.eclipse.ui.workbench.texteditor,
+ org.eclipse.ui.ide,
  com.aptana.usage,
- com.aptana.index.core,
+ com.aptana.ui.epl,
  com.aptana.ui,
- com.aptana.theme,
+ com.aptana.editor.findbar,
+ com.aptana.theme;visibility:=reexport,
+ com.aptana.scripting.ui,
  com.aptana.formatter.epl,
- org.eclipse.core.expressions,
  com.aptana.editor.epl;visibility:=reexport,
- com.aptana.buildpath.core,
- org.eclipse.compare
+ com.aptana.build.ui
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin

@@ -48,7 +48,7 @@ public class CSSTaskDetectorTest extends TestCase
 			// @formatter:on
 
 			// Generate some files to index!
-			tmpDir = new File(System.getProperty("java.io.tmpdir"), "testIndex_" + System.currentTimeMillis());
+			tmpDir = new File(FileUtil.getTempDirectory().toOSString(), "testIndex_" + System.currentTimeMillis());
 			tmpDir.mkdirs();
 
 			File coffeeFile = new File(tmpDir, "index_me.css");
@@ -75,7 +75,7 @@ public class CSSTaskDetectorTest extends TestCase
 			assertEquals(11, task.getOffset());
 			assertEquals(12, task.getLength());
 			assertEquals(IMarker.PRIORITY_NORMAL, task.getPriority());
-			assertEquals(IMarker.SEVERITY_INFO, task.getSeverity());
+			assertEquals(IMarker.SEVERITY_INFO, task.getSeverity().intValue());
 			assertEquals(coffeeFile.toURI().toString(), task.getSourcePath());
 
 			// Now "delete" the file, make sure it wipes the tasks.

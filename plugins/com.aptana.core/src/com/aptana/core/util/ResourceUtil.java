@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
@@ -29,6 +30,7 @@ import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IScopeContext;
@@ -503,5 +505,111 @@ public class ResourceUtil
 	{
 		return file == null || !file.exists() || file.isTeamPrivateMember(IResource.CHECK_ANCESTORS)
 				|| file.isDerived(IResource.CHECK_ANCESTORS);
+	}
+
+	/**
+	 * Returns <code>true</code> if the given project is not <code>null</code> and is accessible.
+	 * 
+	 * @param project
+	 * @return <code>true</code> if accessible; <code>false</code> otherwise.
+	 * @see IProject#isAccessible()
+	 */
+	public static boolean isAccessible(IProject project)
+	{
+		return project != null && project.isAccessible();
+	}
+
+	/**
+	 * @param projectPath
+	 *            the project location
+	 * @param natureIds
+	 *            the list of required natures
+	 * @param builderIds
+	 *            the list of required builders
+	 * @return a project description for the project that includes the list of required natures and builders
+	 */
+	public static IProjectDescription getProjectDescription(IPath projectPath, String[] natureIds, String[] builderIds)
+	{
+		if (projectPath == null)
+		{
+			return null;
+		}
+
+		IProjectDescription description = null;
+		IPath dotProjectPath = projectPath.append(IProjectDescription.DESCRIPTION_FILE_NAME);
+		File dotProjectFile = dotProjectPath.toFile();
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		if (dotProjectFile.exists())
+		{
+			// loads description from the existing .project file
+			try
+			{
+				description = workspace.loadProjectDescription(dotProjectPath);
+				if (Platform.getLocation().isPrefixOf(projectPath))
+				{
+					description.setLocation(null);
+				}
+			}
+			catch (CoreException e)
+			{
+				IdeLog.logWarning(CorePlugin.getDefault(), "Failed to load the existing .project file.", e); //$NON-NLS-1$
+			}
+		}
+		if (description == null)
+		{
+			// creates a new project description
+			description = workspace.newProjectDescription(projectPath.lastSegment());
+			if (Platform.getLocation().isPrefixOf(projectPath))
+			{
+				description.setLocation(null);
+			}
+			else
+			{
+				description.setLocation(projectPath);
+			}
+		}
+
+		// adds the required natures to the project description
+		if (!ArrayUtil.isEmpty(natureIds))
+		{
+			Set<String> natures = CollectionsUtil.newInOrderSet(natureIds);
+			CollectionsUtil.addToSet(natures, description.getNatureIds());
+			description.setNatureIds(natures.toArray(new String[natures.size()]));
+		}
+
+		// adds the required builders to the project description
+		if (!ArrayUtil.isEmpty(builderIds))
+		{
+			ICommand[] existingBuilders = description.getBuildSpec();
+			List<ICommand> builders = CollectionsUtil.newList(existingBuilders);
+			for (String builderId : builderIds)
+			{
+				if (!hasBuilder(builderId, existingBuilders))
+				{
+					ICommand newBuilder = description.newCommand();
+					newBuilder.setBuilderName(builderId);
+					builders.add(newBuilder);
+				}
+			}
+			description.setBuildSpec(builders.toArray(new ICommand[builders.size()]));
+		}
+
+		return description;
+	}
+
+	private static boolean hasBuilder(String builderName, ICommand[] builders)
+	{
+		if (StringUtil.isEmpty(builderName))
+		{
+			return false;
+		}
+		for (ICommand builder : builders)
+		{
+			if (builderName.equals(builder.getBuilderName()))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 }

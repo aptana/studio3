@@ -6,8 +6,8 @@ import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
+import com.aptana.buildpath.core.BuildPathCorePlugin;
 import com.aptana.core.build.IBuildParticipant.BuildType;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.index.core.build.BuildContext;
 
 public class RequiredBuildParticipantTest extends TestCase
@@ -32,8 +32,12 @@ public class RequiredBuildParticipantTest extends TestCase
 		assertTrue(participant.isRequired());
 		assertTrue(participant.isEnabled(BuildType.BUILD));
 		assertTrue(participant.isEnabled(BuildType.RECONCILE));
-		participant.setEnabled(BuildType.BUILD, false);
-		participant.setEnabled(BuildType.RECONCILE, false);
+
+		IBuildParticipantWorkingCopy wc = participant.getWorkingCopy();
+		wc.setEnabled(BuildType.BUILD, false);
+		wc.setEnabled(BuildType.RECONCILE, false);
+		wc.doSave();
+
 		assertTrue(participant.isEnabled(BuildType.BUILD));
 		assertTrue(participant.isEnabled(BuildType.RECONCILE));
 	}
@@ -43,13 +47,21 @@ public class RequiredBuildParticipantTest extends TestCase
 		assertTrue(participant.isRequired());
 		assertEquals(Collections.emptyList(), participant.getFilters());
 
+		IBuildParticipantWorkingCopy wc = participant.getWorkingCopy();
 		String[] filters = new String[] { ".*-wbkit-.*" };
-		participant.setFilters(EclipseUtil.instanceScope(), filters);
+		wc.setFilters(filters);
+		wc.doSave();
+
 		assertEquals(Collections.emptyList(), participant.getFilters());
 	}
 
 	private static final class TestParticipant extends RequiredBuildParticipant
 	{
+		protected String getPreferenceNode()
+		{
+			return BuildPathCorePlugin.PLUGIN_ID;
+		}
+
 		public void buildFile(BuildContext context, IProgressMonitor monitor)
 		{
 			// no-op

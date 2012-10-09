@@ -17,6 +17,9 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.swt.graphics.Image;
 import org.osgi.framework.Bundle;
 
 import com.aptana.core.projects.templates.IProjectTemplate;
@@ -33,6 +36,7 @@ import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.ElementVisibilityListener;
 import com.aptana.scripting.model.ProjectTemplateElement;
 import com.aptana.scripting.model.filters.IModelFilter;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * Project templates manager for templates contributions through the <code>"projectTemplates"</code> extension point.
@@ -54,6 +58,7 @@ public class ProjectTemplatesManager
 	private static final String ATTR_REPLACE_PARAMETERS = "replaceParameters"; //$NON-NLS-1$
 
 	private Map<TemplateType, List<IProjectTemplate>> projectTemplates;
+	private ImageRegistry templateTagsImageRegistry;
 
 	private ElementVisibilityListener elementListener = new ElementVisibilityListener()
 	{
@@ -139,6 +144,42 @@ public class ProjectTemplatesManager
 			templates.addAll(getTemplatesForType(type));
 		}
 		return templates;
+	}
+
+	public Image getImageForTag(String tag)
+	{
+		ImageRegistry reg = getImageRegistry();
+		if (reg != null)
+		{
+			return reg.get(tag);
+		}
+		return null;
+	}
+
+	public void putImageForTag(String tag, ImageDescriptor imageDescriptor)
+	{
+		ImageRegistry reg = getImageRegistry();
+		if (reg != null)
+		{
+			reg.put(tag, imageDescriptor);
+		}
+	}
+
+	protected ImageRegistry getImageRegistry()
+	{
+		try
+		{
+			if (templateTagsImageRegistry == null)
+			{
+				templateTagsImageRegistry = new ImageRegistry(UIUtils.getDisplay());
+			}
+			return templateTagsImageRegistry;
+		}
+		catch (IllegalStateException e)
+		{
+			// ignore - heppsn when headless in tests
+		}
+		return null;
 	}
 
 	private void readExtensionRegistry()

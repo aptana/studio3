@@ -27,9 +27,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.Index;
+import com.aptana.index.core.IndexPlugin;
 import com.aptana.index.core.QueryResult;
 import com.aptana.index.core.SearchPattern;
 
@@ -1100,13 +1102,15 @@ public class DiskIndex
 			}
 			catch (OutOfMemoryError oom)
 			{
+				// Here we hope that those string allocation will not throw another OutOfMemoryError...
 				// DEBUG
 				oom.printStackTrace();
+				String error = MessageFormat
+						.format("Index error in readCategoryTable. \nfile = {0} \noffset = {1} \n size = {2}", this.indexFile, offset, size); //$NON-NLS-1$
 				System.err.println("-------------------- DEBUG --------------------"); //$NON-NLS-1$
-				System.err.println("file = " + this.indexFile); //$NON-NLS-1$
-				System.err.println("offset = " + offset); //$NON-NLS-1$
-				System.err.println("size = " + size); //$NON-NLS-1$
+				System.err.println(error);
 				System.err.println("--------------------   END   --------------------"); //$NON-NLS-1$
+				IdeLog.logError(IndexPlugin.getDefault(), error, oom);
 				throw oom;
 			}
 
@@ -1639,26 +1643,37 @@ public class DiskIndex
 
 		for (Map.Entry<String, Object> entry : wordsToDocs.entrySet())
 		{
-			writeString(stream, entry.getKey());
-
-			if (longArrays.containsKey(entry.getKey()))
+			try
 			{
-				writeStreamInt(stream, largeArraySize); // mark to identify that an offset follows
-				writeStreamInt(stream, longArrays.get(entry.getKey()).intValue()); // offset in the file of the array of
-				// document numbers
-			}
-			else
-			{
-				List<Integer> documentNumbers = (List<Integer>) entry.getValue();
+				writeString(stream, entry.getKey());
 
-				if (documentNumbers.size() == 1)
+				if (longArrays.containsKey(entry.getKey()))
 				{
-					writeStreamInt(stream, -documentNumbers.get(0));
+					writeStreamInt(stream, largeArraySize); // mark to identify that an offset follows
+					writeStreamInt(stream, longArrays.get(entry.getKey()).intValue()); // offset in the file of the
+																						// array of
+					// document numbers
 				}
 				else
 				{
-					writeDocumentNumbers(documentNumbers, stream);
+					List<Integer> documentNumbers = (List<Integer>) entry.getValue();
+
+					if (documentNumbers.size() == 1)
+					{
+						writeStreamInt(stream, -documentNumbers.get(0));
+					}
+					else
+					{
+						writeDocumentNumbers(documentNumbers, stream);
+					}
 				}
+			}
+			catch (IOException ioe)
+			{
+				// We may have run into the JS indexing issue: https://jira.appcelerator.org/browse/APSTUD-7366
+				IdeLog.logError(IndexPlugin.getDefault(), ioe);
+				// To limit the damage, we're going to effectively skip writing one entry into the index. This will
+				// break our knowledge of some property/type in JS but will allow indexing to continue.
 			}
 		}
 	}
@@ -1898,8 +1913,8 @@ public class DiskIndex
 		{
 			throw new IOException(
 					MessageFormat
-							.format("Trying to write a string that is too long and will overflow the recorded length maximum. length: {0}, string: ''{1}''", //$NON-NLS-1$
-									length, signature));
+							.format("Trying to write a string that is too long and will overflow the recorded length maximum. index file: {0},  length: {1}, string: ''{2}''", //$NON-NLS-1$
+									indexFile.getAbsolutePath(), length, signature));
 		}
 
 		stream.write((byte) ((length >>> 8) & 0xFF)); // store chars array length instead of bytes

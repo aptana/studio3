@@ -5,10 +5,9 @@ Bundle-SymbolicName: com.aptana.git.core;singleton:=true
 Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.git.core.GitPlugin
 Bundle-Vendor: %Bundle-Vendor
-Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.team.core,
+Require-Bundle: org.eclipse.team.core;visibility:=reexport,
  org.eclipse.debug.core,
- org.eclipse.core.filesystem,
+ org.eclipse.core.filesystem;visibility:=reexport,
  com.aptana.core,
  com.aptana.filewatcher
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

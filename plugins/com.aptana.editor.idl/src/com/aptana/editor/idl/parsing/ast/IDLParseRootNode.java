@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -19,7 +19,7 @@ public class IDLParseRootNode extends ParseRootNode
 	 */
 	public IDLParseRootNode()
 	{
-		this(new Symbol[0]);
+		this(null);
 	}
 
 	/**
@@ -29,12 +29,7 @@ public class IDLParseRootNode extends ParseRootNode
 	 */
 	public IDLParseRootNode(Symbol[] children)
 	{
-		super( //
-			IIDLConstants.CONTENT_TYPE_IDL, //
-			children, //
-			(children != null && children.length > 0) ? children[0].getStart() : 0, //
-			(children != null && children.length > 0) ? children[0].getEnd() : 0 //
-		);
+		super(IIDLConstants.CONTENT_TYPE_IDL, children);
 	}
 
 	/*

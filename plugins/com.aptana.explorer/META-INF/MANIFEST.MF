@@ -5,25 +5,20 @@ Bundle-SymbolicName: com.aptana.explorer;singleton:=true
 Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.explorer.ExplorerPlugin
 Bundle-Vendor: %Bundle-Vendor
-Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.core.resources,
- org.eclipse.core.expressions,
- org.eclipse.team.core,
- com.aptana.core,
+Require-Bundle: com.aptana.core,
  com.aptana.git.core,
  org.jruby,
  com.aptana.index.core,
+ com.aptana.scripting,
  com.aptana.deploy,
- org.eclipse.ui,
- org.eclipse.search,
  org.eclipse.ui.navigator,
  org.eclipse.ui.navigator.resources,
  org.eclipse.ui.ide,
+ org.eclipse.search,
  com.aptana.ui,
  com.aptana.git.ui,
- com.aptana.scripting,
- com.aptana.editor.html,
  com.aptana.theme,
+ com.aptana.editor.html,
  com.aptana.deploy.ui
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy

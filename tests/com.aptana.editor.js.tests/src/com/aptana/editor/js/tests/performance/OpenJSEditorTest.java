@@ -23,6 +23,7 @@ import org.eclipse.ui.PartInitException;
 import org.osgi.framework.Bundle;
 
 import com.aptana.core.build.IBuildParticipant.BuildType;
+import com.aptana.core.build.PreferenceUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.editor.epl.tests.EditorTestHelper;
@@ -68,14 +69,14 @@ public class OpenJSEditorTest extends OpenEditorTest
 	{
 		// ensure sequence
 		TestSuite suite = new TestSuite(OpenJSEditorTest.class.getName());
-//		suite.addTest(new OpenJSEditorTest("testOpenTiMobile"));
-//		suite.addTest(new OpenJSEditorTest("testOpenDojo"));
+		// suite.addTest(new OpenJSEditorTest("testOpenTiMobile"));
+		// suite.addTest(new OpenJSEditorTest("testOpenDojo"));
 		suite.addTest(new OpenJSEditorTest("testOpenDojoMinified"));
-//		suite.addTest(new OpenJSEditorTest("testOpenTinyMCE"));
+		// suite.addTest(new OpenJSEditorTest("testOpenTinyMCE"));
 		// suite.addTest(new OpenJSEditorTest("testOpenExtMinifiedFoldingOnOutlineOn"));
 		// suite.addTest(new OpenJSEditorTest("testOpenExtMinifiedFoldingOnOutlineOff"));
-//		suite.addTest(new OpenJSEditorTest("testOpenExtDevFoldingOnOutlineOn"));
-//		suite.addTest(new OpenJSEditorTest("testOpenExtDevFoldingOnOutlineOff"));
+		// suite.addTest(new OpenJSEditorTest("testOpenExtDevFoldingOnOutlineOn"));
+		// suite.addTest(new OpenJSEditorTest("testOpenExtDevFoldingOnOutlineOff"));
 		return new Setup(suite);
 	}
 
@@ -89,16 +90,8 @@ public class OpenJSEditorTest extends OpenEditorTest
 		IEclipsePreferences prefs = (EclipseUtil.instanceScope()).getNode(JSPlugin.PLUGIN_ID);
 
 		// Turn off all JS validators!!!!
-		JSLintValidator jsLintValidator = new JSLintValidator()
-		{
-			@Override
-			public String getId()
-			{
-				return ID;
-			}
-		};
-		prefs.putBoolean(jsLintValidator.getEnablementPreferenceKey(BuildType.BUILD), false);
-		prefs.putBoolean(jsLintValidator.getEnablementPreferenceKey(BuildType.RECONCILE), false);
+		prefs.putBoolean(PreferenceUtil.getEnablementPreferenceKey(JSLintValidator.ID, BuildType.BUILD), false);
+		prefs.putBoolean(PreferenceUtil.getEnablementPreferenceKey(JSLintValidator.ID, BuildType.BUILD), false);
 
 		EditorTestHelper.runEventQueue();
 		setWarmUpRuns(WARM_UP_RUNS);

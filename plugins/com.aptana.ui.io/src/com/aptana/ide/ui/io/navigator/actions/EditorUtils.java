@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -10,6 +10,8 @@ package com.aptana.ide.ui.io.navigator.actions;
 import java.text.MessageFormat;
 
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -25,6 +27,8 @@ import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.ArrayUtil;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ide.ui.io.IUniformFileStoreEditorInput;
 import com.aptana.ide.ui.io.internal.UniformFileStoreEditorInputFactory;
@@ -64,7 +68,7 @@ public class EditorUtils
 
 			protected IStatus run(IProgressMonitor monitor)
 			{
-				IEditorInput editorInput;
+				final IEditorInput editorInput;
 				try
 				{
 					editorInput = UniformFileStoreEditorInputFactory.getUniformEditorInput(fileStore, monitor);
@@ -77,7 +81,6 @@ public class EditorUtils
 							MessageFormat.format("Unable to open file {0}", fileStore.toString()), e); //$NON-NLS-1$
 					return Status.CANCEL_STATUS;
 				}
-				final IEditorInput finalEditorInput = editorInput;
 
 				UIJob openEditor = new UIJob(MessageFormat.format(Messages.EditorUtils_OpeningEditor,
 						fileStore.toString()))
@@ -90,19 +93,30 @@ public class EditorUtils
 							IWorkbenchPage page = UIUtils.getActivePage();
 							if (page != null)
 							{
-								String name;
-								if (finalEditorInput instanceof IUniformFileStoreEditorInput)
+								IEditorPart editorPart;
+								IFile file = findFileInWorkspace(fileStore);
+								if (file == null)
 								{
-									name = ((IUniformFileStoreEditorInput) finalEditorInput).getFileStore().getName();
+									// a non-workspace file
+									String name;
+									if (editorInput instanceof IUniformFileStoreEditorInput)
+									{
+										name = ((IUniformFileStoreEditorInput) editorInput).getFileStore().getName();
+									}
+									else
+									{
+										name = editorInput.getName();
+									}
+									String editorId = (editorDescriptor == null) ? IDE.getEditorDescriptor(name)
+											.getId() : editorDescriptor.getId();
+									int matchFlags = IWorkbenchPage.MATCH_INPUT | IWorkbenchPage.MATCH_ID;
+									editorPart = page.openEditor(editorInput, editorId, true, matchFlags);
 								}
 								else
 								{
-									name = finalEditorInput.getName();
+									// a workspace file
+									editorPart = IDE.openEditor(page, file);
 								}
-								String editorId = (editorDescriptor == null) ? IDE.getEditorDescriptor(name).getId()
-										: editorDescriptor.getId();
-								int matchFlags = IWorkbenchPage.MATCH_INPUT | IWorkbenchPage.MATCH_ID;
-								IEditorPart editorPart = page.openEditor(finalEditorInput, editorId, true, matchFlags);
 								if (textSelection != null && editorPart instanceof AbstractTextEditor)
 								{
 									AbstractTextEditor editor = (AbstractTextEditor) editorPart;
@@ -117,12 +131,21 @@ public class EditorUtils
 						return Status.OK_STATUS;
 					}
 				};
-				openEditor.setSystem(true);
+				EclipseUtil.setSystemForJob(openEditor);
 				openEditor.schedule();
 				return Status.OK_STATUS;
 			}
 		};
 		job.schedule();
+	}
 
+	private static IFile findFileInWorkspace(IFileStore fileStore)
+	{
+		if (fileStore == null)
+		{
+			return null;
+		}
+		IFile[] files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(fileStore.toURI());
+		return ArrayUtil.isEmpty(files) ? null : files[0];
 	}
 }

@@ -12,6 +12,13 @@ import java.text.MessageFormat;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Path;
 
+/**
+ * A value object representing a changed file in a git repo. There can be a large number of these and they can be
+ * constantly sorted/hashed/compared - so we try to use direct field references over accessors. We also pre-generate
+ * both a portable and OS-specific version of the relative path once.
+ * 
+ * @author cwilliams
+ */
 public class ChangedFile implements Comparable<ChangedFile>
 {
 
@@ -28,8 +35,7 @@ public class ChangedFile implements Comparable<ChangedFile>
 	 */
 	public ChangedFile(ChangedFile other)
 	{
-		this.path = other.path;
-		this.status = other.status;
+		this(other.portablePath, other.status);
 		this.hasStagedChanges = other.hasStagedChanges;
 		this.hasUnstagedChanges = other.hasUnstagedChanges;
 		this.commitBlobMode = other.commitBlobMode;
@@ -38,11 +44,13 @@ public class ChangedFile implements Comparable<ChangedFile>
 
 	public ChangedFile(String path, Status status)
 	{
-		this.path = path;
+		this.portablePath = path;
 		this.status = status;
+		this.osPath = Path.fromPortableString(path).toOSString();
 	}
 
-	String path;
+	private String osPath;
+	String portablePath;
 	Status status;
 	boolean hasStagedChanges;
 	boolean hasUnstagedChanges;
@@ -52,7 +60,7 @@ public class ChangedFile implements Comparable<ChangedFile>
 	// FIXME Use IPath
 	public String getPath()
 	{
-		return new Path(path).toOSString();
+		return osPath;
 	}
 
 	public Status getStatus()
@@ -86,27 +94,27 @@ public class ChangedFile implements Comparable<ChangedFile>
 				"File is not new, but doesn't have an index entry!"); //$NON-NLS-1$
 		if (commitBlobSHA == null)
 		{
-			return MessageFormat.format("0 0000000000000000000000000000000000000000\t{0}\0", path); //$NON-NLS-1$
+			return MessageFormat.format("0 0000000000000000000000000000000000000000\t{0}\0", portablePath); //$NON-NLS-1$
 		}
 
-		return MessageFormat.format("{0} {1}\t{2}\0", commitBlobMode, commitBlobSHA, path); //$NON-NLS-1$
+		return MessageFormat.format("{0} {1}\t{2}\0", commitBlobMode, commitBlobSHA, portablePath); //$NON-NLS-1$
 	}
 
 	@Override
 	public String toString()
 	{
-		return MessageFormat
-				.format("{0} {1} (Staged? {2}, Unstaged? {3})", getStatus(), getPath(), hasStagedChanges(), hasUnstagedChanges()); //$NON-NLS-1$
+		return MessageFormat.format(
+				"{0} {1} (Staged? {2}, Unstaged? {3})", status, osPath, hasStagedChanges, hasUnstagedChanges); //$NON-NLS-1$
 	}
 
 	public boolean hasUnmergedChanges()
 	{
-		return getStatus().equals(Status.UNMERGED);
+		return status == Status.UNMERGED;
 	}
 
 	public int compareTo(ChangedFile o)
 	{
-		return getPath().compareTo(o.getPath());
+		return portablePath.compareTo(o.portablePath);
 	}
 
 	@Override
@@ -116,7 +124,7 @@ public class ChangedFile implements Comparable<ChangedFile>
 		{
 			ChangedFile other = (ChangedFile) obj;
 			return (hasStagedChanges == other.hasStagedChanges) && (hasUnstagedChanges == other.hasUnstagedChanges)
-					&& status.equals(other.status) && getPath().equals(other.getPath());
+					&& (status == other.status) && (portablePath == other.portablePath);
 		}
 		return false;
 	}
@@ -126,8 +134,8 @@ public class ChangedFile implements Comparable<ChangedFile>
 	{
 		int hash = 31 + Boolean.valueOf(hasStagedChanges).hashCode();
 		hash = hash * 31 + Boolean.valueOf(hasUnstagedChanges).hashCode();
-		hash = hash * 31 + getStatus().hashCode();
-		hash = hash * 31 + getPath().hashCode();
+		hash = hash * 31 + status.hashCode();
+		hash = hash * 31 + portablePath.hashCode();
 		return hash;
 	}
 }

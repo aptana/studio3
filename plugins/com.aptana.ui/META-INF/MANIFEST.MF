@@ -5,21 +5,18 @@ Bundle-SymbolicName: com.aptana.ui;singleton:=true
 Bundle-Version: 3.1.4.qualifier
 Bundle-Activator: com.aptana.ui.UIPlugin
 Bundle-Vendor: %providerName
-Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.core.resources,
- org.eclipse.core.expressions,
- org.eclipse.core.filesystem,
- org.eclipse.ui,
+Require-Bundle: com.aptana.core;bundle-version="3.0.4",
+ com.aptana.buildpath.core,
+ com.aptana.index.core,
+ org.eclipse.jface.text;visibility:=reexport,
+ org.eclipse.ui;visibility:=reexport,
+ org.eclipse.help.ui,
  org.eclipse.ui.ide,
  org.eclipse.ui.navigator,
  org.eclipse.ui.console,
  org.eclipse.search,
  org.eclipse.debug.ui,
- org.eclipse.jface.text,
- com.aptana.core;bundle-version="3.0.4",
- com.aptana.ui.epl,
- com.aptana.buildpath.core,
- com.aptana.index.core
+ com.aptana.ui.epl
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.ui,
@@ -32,3 +29,4 @@ Export-Package: com.aptana.ui,
  com.aptana.ui.util,
  com.aptana.ui.widgets
 Eclipse-ExtensibleAPI: true
+Import-Package: org.eclipse.ui.internal.browser

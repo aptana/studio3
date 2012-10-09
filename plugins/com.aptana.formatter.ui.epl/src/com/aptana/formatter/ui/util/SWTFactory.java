@@ -32,7 +32,7 @@ import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.events.IExpansionListener;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 
-import com.aptana.formatter.ui.preferences.ScrolledPageContent;
+import com.aptana.ui.preferences.ScrolledPageContent;
 import com.aptana.ui.util.UIUtils;
 
 /**

@@ -23,77 +23,94 @@ import com.aptana.core.util.EclipseUtil;
 
 /**
  * @author Max Stepanov
- *
  */
-public class DeferredTreeSelectionExpander extends JobChangeAdapter {
+public class DeferredTreeSelectionExpander extends JobChangeAdapter
+{
 
 	private DeferredTreeContentManager deferredTreeContentManager;
 	private AbstractTreeViewer viewer;
 	private TreePath treePath;
 	private int currentSegment;
 	private Job job;
-	
+
 	/**
 	 * 
 	 */
-	public DeferredTreeSelectionExpander(DeferredTreeContentManager dtContentManager, AbstractTreeViewer treeViewer) {
+	public DeferredTreeSelectionExpander(DeferredTreeContentManager dtContentManager, AbstractTreeViewer treeViewer)
+	{
 		this.deferredTreeContentManager = dtContentManager;
 		this.viewer = treeViewer;
 		job = new UIJob("Expand tree job") { //$NON-NLS-1$
 			@Override
-			public IStatus runInUIThread(IProgressMonitor monitor) {
-				if (treePath == null) {
+			public IStatus runInUIThread(IProgressMonitor monitor)
+			{
+				if (treePath == null)
+				{
 					return Status.CANCEL_STATUS;
 				}
-				if (viewer.getExpandedState(subTreePath(treePath, currentSegment))) {
+				if (viewer.getExpandedState(subTreePath(treePath, currentSegment)))
+				{
 					deferredTreeContentManager.addUpdateCompleteListener(DeferredTreeSelectionExpander.this);
 					TreePath subTreePath = subTreePath(treePath, ++currentSegment);
-					while (viewer.getExpandedState(subTreePath)) {
-					    // already expanded; go to the next level
-					    subTreePath = subTreePath(treePath, ++currentSegment);
+					while (viewer.getExpandedState(subTreePath))
+					{
+						// already expanded; go to the next level
+						subTreePath = subTreePath(treePath, ++currentSegment);
 					}
 					viewer.expandToLevel(subTreePath, 1);
-		            if (!deferredTreeContentManager.isDeferredAdapter(treePath.getSegment(currentSegment - 1))) {
-		                DeferredTreeSelectionExpander.this.done(null);
-		            }
+					if (!deferredTreeContentManager.isDeferredAdapter(treePath.getSegment(currentSegment - 1)))
+					{
+						DeferredTreeSelectionExpander.this.done(null);
+					}
 				}
 				return Status.OK_STATUS;
 			}
 		};
-		job.setSystem(!EclipseUtil.showSystemJobs());
+		EclipseUtil.setSystemForJob(job);
 		job.setPriority(Job.INTERACTIVE);
 	}
 
-	public void setSelection(TreePath treePath) {
+	public void setSelection(TreePath treePath)
+	{
 		this.treePath = treePath;
-		if (treePath.getSegmentCount() > 1) {
+		if (treePath.getSegmentCount() > 1)
+		{
 			deferredTreeContentManager.addUpdateCompleteListener(this);
 			viewer.expandToLevel(subTreePath(treePath, currentSegment = 1), 1);
-			if (!deferredTreeContentManager.isDeferredAdapter(treePath.getSegment(currentSegment - 1))) {
-			    done(null);
+			if (!deferredTreeContentManager.isDeferredAdapter(treePath.getSegment(currentSegment - 1)))
+			{
+				done(null);
 			}
-		} else {
+		}
+		else
+		{
 			viewer.setSelection(new TreeSelection(treePath));
 			treePath = null; // $codepro.audit.disable questionableAssignment
 		}
 	}
-	
-	public boolean isDone() {
+
+	public boolean isDone()
+	{
 		return treePath == null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.core.runtime.jobs.JobChangeAdapter#done(org.eclipse.core.runtime.jobs.IJobChangeEvent)
 	 */
 	@Override
-	public void done(IJobChangeEvent event) {
+	public void done(IJobChangeEvent event)
+	{
 		deferredTreeContentManager.addUpdateCompleteListener(null);
-		if (treePath == null) {
+		if (treePath == null)
+		{
 			return;
 		}
 		viewer.reveal(subTreePath(treePath, currentSegment));
-		if (currentSegment+1 < treePath.getSegmentCount()) {
-			if (job.getState() == Job.RUNNING || job.cancel()) {
+		if (currentSegment + 1 < treePath.getSegmentCount())
+		{
+			if (job.getState() == Job.RUNNING || job.cancel())
+			{
 				job.schedule(500);
 			}
 			return;
@@ -101,13 +118,15 @@ public class DeferredTreeSelectionExpander extends JobChangeAdapter {
 		viewer.setSelection(new TreeSelection(treePath));
 		treePath = null;
 	}
-	
-	private static TreePath subTreePath(TreePath treePath, int segments) {
+
+	private static TreePath subTreePath(TreePath treePath, int segments)
+	{
 		Object[] list = new Object[segments];
-		for (int i = 0; i < list.length; ++i) {
+		for (int i = 0; i < list.length; ++i)
+		{
 			list[i] = treePath.getSegment(i);
 		}
 		return new TreePath(list);
 	}
-	
+
 }

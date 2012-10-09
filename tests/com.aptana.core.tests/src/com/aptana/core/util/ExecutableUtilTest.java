@@ -20,7 +20,7 @@ import org.eclipse.core.runtime.Platform;
 
 public class ExecutableUtilTest extends TestCase
 {
-	private static final String tempDir = System.getProperty("java.io.tmpdir");
+	private static final String tempDir = FileUtil.getTempDirectory().toOSString();
 
 	public void testFindExecutableFile()
 	{

@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -19,7 +19,6 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.aptana.projects.internal.wizards.PromoteToProjectWizard;
-import com.aptana.ui.util.SWTUtils;
 import com.aptana.ui.util.UIUtils;
 
 public class PromoteToProjectHandler extends AbstractHandler
@@ -57,8 +56,6 @@ public class PromoteToProjectHandler extends AbstractHandler
 
 			PromoteToProjectWizard wizard = new PromoteToProjectWizard(path);
 			WizardDialog dialog = new WizardDialog(UIUtils.getActiveShell(), wizard);
-			dialog.create();
-			SWTUtils.center(UIUtils.getActiveShell(), dialog.getShell());
 			dialog.open();
 		}
 

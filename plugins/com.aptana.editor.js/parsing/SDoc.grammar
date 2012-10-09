@@ -95,7 +95,7 @@
 %terminals COMMA, PIPE, LPAREN, RPAREN, LESS_THAN, GREATER_THAN, ARROW, ELLIPSIS;
 %terminals START_DOCUMENTATION, END_DOCUMENTATION, TEXT;
 %terminals ADVANCED, ALIAS, AUTHOR, CLASS_DESCRIPTION, CONSTRUCTOR, EXAMPLE, EXCEPTION;
-%terminals EXTENDS, INTERNAL, METHOD, NAMESPACE, OVERVIEW, PARAM, RETURN, SEE, UNKNOWN;
+%terminals EXTENDS, INTERNAL, METHOD, MODULE, NAMESPACE, OVERVIEW, PARAM, RETURN, SEE, UNKNOWN;
 %terminals IDENTIFIER, ARRAY, FUNCTION, PRIVATE, PROPERTY;
 %terminals TYPE, CLASS;
 
@@ -207,6 +207,10 @@ Tag
 	|	METHOD Text.text?
 		{:
 			return new MethodTag((String) text.value);
+		:}
+	|	MODULE Text.text?
+		{:
+			return new ModuleTag((String) text.value);
 		:}
 	|	NAMESPACE LCURLY Namespace.name RCURLY Text.text?
 		{:

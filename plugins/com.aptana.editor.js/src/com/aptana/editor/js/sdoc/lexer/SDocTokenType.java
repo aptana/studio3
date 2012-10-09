@@ -49,6 +49,7 @@ public enum SDocTokenType
 	EXAMPLE(Terminals.EXAMPLE),
 	INTERNAL(Terminals.INTERNAL),
 	METHOD(Terminals.METHOD),
+	MODULE(Terminals.MODULE),
 	OVERVIEW(Terminals.OVERVIEW),
 	PRIVATE(Terminals.PRIVATE),
 	SEE(Terminals.SEE),

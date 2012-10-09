@@ -9,6 +9,7 @@ package com.aptana.core.util;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -373,6 +374,13 @@ public class StringUtilTest extends TestCase
 		assertEquals("test&test1", StringUtil.join("&", test));
 	}
 
+	public void testJoinCharArray()
+	{
+		char[] test = new char[] { 'a', 'b', 'c' };
+
+		assertEquals("a b c", StringUtil.join(" ", test));
+	}
+
 	public void testJoinArrayWithNull()
 	{
 		assertNull(StringUtil.join("&", (String[]) null));
@@ -627,5 +635,48 @@ public class StringUtilTest extends TestCase
 	public void testRepeat() throws Exception
 	{
 		assertEquals("ttt", StringUtil.repeat('t', 3));
+	}
+
+	public void testSplit() throws Exception
+	{
+		String[] split = StringUtil.split("aaa bb  ", ' ').toArray(new String[0]);
+		assertTrue(Arrays.equals(new String[] { "aaa", "bb" }, split));
+
+		split = StringUtil.split("|||", '|').toArray(new String[0]);
+		assertTrue(Arrays.equals(new String[] {}, split));
+
+		split = StringUtil.split("|a||", '|').toArray(new String[0]);
+		assertTrue(Arrays.equals(new String[] { "a" }, split));
+
+		split = StringUtil.split("  aaa  bb   ", ' ').toArray(new String[0]);
+		assertTrue(Arrays.equals(new String[] { "aaa", "bb" }, split));
+
+		split = StringUtil.split("aaa  bb", ' ').toArray(new String[0]);
+		assertTrue(Arrays.equals(new String[] { "aaa", "bb" }, split));
+
+		split = StringUtil.split("aaa  bb  ", ' ').toArray(new String[0]);
+		assertTrue(Arrays.equals(new String[] { "aaa", "bb" }, split));
+
+		split = StringUtil.split("aaa ", ' ').toArray(new String[0]);
+		assertTrue(Arrays.equals(new String[] { "aaa" }, split));
+
+		split = StringUtil.split(" aaa", ' ').toArray(new String[0]);
+		assertTrue(Arrays.equals(new String[] { "aaa" }, split));
+
+		split = StringUtil.split("aaa", ' ').toArray(new String[0]);
+		assertTrue(Arrays.equals(new String[] { "aaa" }, split));
+
+		split = StringUtil.split(" aaa   ", ' ').toArray(new String[0]);
+		assertTrue(Arrays.equals(new String[] { "aaa" }, split));
+	}
+
+	public void testDotFirst() throws Exception
+	{
+		assertEquals("aa", StringUtil.dotFirst("aa.bb"));
+		assertEquals("", StringUtil.dotFirst(".bb"));
+		assertEquals("aa", StringUtil.dotFirst("aa."));
+		assertEquals("aa", StringUtil.dotFirst("aa..."));
+		assertEquals("", StringUtil.dotFirst(""));
+		assertEquals("aa", StringUtil.dotFirst("aa"));
 	}
 }

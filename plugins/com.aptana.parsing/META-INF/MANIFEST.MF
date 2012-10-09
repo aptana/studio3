@@ -5,10 +5,9 @@ Bundle-SymbolicName: com.aptana.parsing;singleton:=true
 Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.parsing.ParsingPlugin
 Bundle-Vendor: %providerName
-Require-Bundle: org.eclipse.core.runtime,
- beaver;visibility:=reexport,
- com.aptana.core,
+Require-Bundle: beaver;visibility:=reexport,
  json.simple,
+ com.aptana.core,
  com.aptana.core.epl
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy

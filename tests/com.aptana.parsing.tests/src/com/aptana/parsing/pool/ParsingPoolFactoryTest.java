@@ -206,7 +206,10 @@ public class ParsingPoolFactoryTest extends TestCase
 
 		parserPool = new ParserPool(parser);
 
-		parsingEngine = new ParsingEngine(new ParserPoolProvider(parserPool));
+		parsingEngine = new ParsingEngine(new ParserPoolProvider(parserPool), 200, 0)
+		{
+			// Note: empty body (class just created to access protected constructor).
+		};
 
 		parseRootNode = new ParseRootNode("test", new Symbol[0], 0, 0);
 	};
@@ -373,16 +376,19 @@ public class ParsingPoolFactoryTest extends TestCase
 		contentTypeToPool.put("mainContent", new ParserPool(mainParser));
 		contentTypeToPool.put("subContent", new ParserPool(subParser));
 
-		parsingEngine = new ParsingEngine(new ParserPoolProvider(contentTypeToPool));
+		parsingEngine = new ParsingEngine(new ParserPoolProvider(contentTypeToPool), 4, 0)
+		{
+			// Empty body just to access protected constructor.
+		};
 
 		// Change the cache for a cache with an auxiliary cache that's predictable.
-		Field declaredField = parsingEngine.getClass().getDeclaredField("fParseCache");
+		Field declaredField = ParsingEngine.class.getDeclaredField("fParseCache");
 		declaredField.setAccessible(true);
 		Map auxiliaryCache = new HashMap();
 		Constructor<LRUCacheWithSoftPrunedValues> constructor = LRUCacheWithSoftPrunedValues.class
 				.getDeclaredConstructor(int.class, Map.class);
 		constructor.setAccessible(true);
-		LRUCacheWithSoftPrunedValues cache = constructor.newInstance(1, auxiliaryCache);
+		LRUCacheWithSoftPrunedValues cache = constructor.newInstance(4, auxiliaryCache);
 		declaredField.set(parsingEngine, cache);
 
 		mainParser.setParsingEngine(parsingEngine);

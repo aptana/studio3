@@ -418,6 +418,10 @@ public class SubmitTicketDialog extends TitleAreaDialog
 		{
 			message = Messages.SubmitTicketDialog_ERR_EmptyActualResult;
 		}
+		else if (StringUtil.isEmpty(expectedResultText.getText()))
+		{
+			message = Messages.SubmitTicketDialog_ERR_EmptyExpectedResult;
+		}
 
 		setErrorMessage(message);
 		if (message == null)

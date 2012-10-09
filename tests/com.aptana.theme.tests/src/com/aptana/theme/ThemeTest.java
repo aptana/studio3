@@ -93,6 +93,7 @@ public class ThemeTest extends TestCase
 		assertEquals(new RGB(0, 0, 0), theme.getForegroundAsRGB("constant.language.js"));
 		assertEquals(new RGB(255, 0, 0), theme.getTextAttribute("constant.language.js").getBackground().getRGB());
 		assertEquals(new RGB(255, 0, 0), theme.getBackgroundAsRGB("constant.language.js"));
+
 	}
 
 	public void testAddingTokens()
@@ -289,4 +290,5 @@ public class ThemeTest extends TestCase
 		ThemeRule rule = theme.winningRule(scope);
 		assertEquals("CSS: Tag", rule.getName());
 	}
+
 }

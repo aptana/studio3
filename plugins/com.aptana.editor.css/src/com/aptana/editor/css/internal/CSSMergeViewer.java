@@ -18,7 +18,7 @@ import com.aptana.editor.common.ExtendedFastPartitioner;
 import com.aptana.editor.common.viewer.CommonMergeViewer;
 import com.aptana.editor.css.CSSSourceConfiguration;
 import com.aptana.editor.css.CSSSourceEditor;
-import com.aptana.editor.css.CSSSourcePartitionScanner;
+import com.aptana.editor.css.CSSSourcePartitionScannerJFlex;
 import com.aptana.editor.css.CSSSourceViewerConfiguration;
 
 /**
@@ -34,7 +34,7 @@ public class CSSMergeViewer extends CommonMergeViewer
 	@Override
 	protected IDocumentPartitioner getDocumentPartitioner()
 	{
-		IDocumentPartitioner partitioner = new ExtendedFastPartitioner(new CSSSourcePartitionScanner(),
+		IDocumentPartitioner partitioner = new ExtendedFastPartitioner(new CSSSourcePartitionScannerJFlex(),
 				CSSSourceConfiguration.getDefault().getContentTypes());
 		return partitioner;
 	}

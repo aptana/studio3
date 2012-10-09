@@ -30,14 +30,17 @@ import org.eclipse.tm.internal.terminal.textcanvas.ITextCanvasModel;
 
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
+import com.aptana.terminal.internal.hyperlink.HyperlinkManager;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.ThemePlugin;
 
-public class VT100TerminalControl extends org.eclipse.tm.internal.terminal.emulator.VT100TerminalControl {
+public class VT100TerminalControl extends org.eclipse.tm.internal.terminal.emulator.VT100TerminalControl
+{
 
 	private static final Set<Character> IGNORE_ALT_WITH_KEYS = new HashSet<Character>();
 
-	static {
+	static
+	{
 		for (char c : "@#\\|[]{}".toCharArray()) { //$NON-NLS-1$
 			IGNORE_ALT_WITH_KEYS.add(c);
 		}
@@ -45,15 +48,21 @@ public class VT100TerminalControl extends org.eclipse.tm.internal.terminal.emula
 
 	private IPreferenceChangeListener preferenceChangeListener;
 	private IPropertyChangeListener propertyChangeListener;
+	private HyperlinkManager hyperlinkManager;
 
-	public VT100TerminalControl(ITerminalListener target, Composite wndParent, ITerminalConnector[] connectors) {
+	public VT100TerminalControl(ITerminalListener target, Composite wndParent, ITerminalConnector[] connectors)
+	{
 		super(target, wndParent, connectors);
 		getRootControl().setBackground(ThemedTextLineRenderer.getStyleMap().getBackgroundColor());
-		preferenceChangeListener = new IPreferenceChangeListener() {
-			public void preferenceChange(PreferenceChangeEvent event) {
-				if (IThemeManager.THEME_CHANGED.equals(event.getKey())) {
+		preferenceChangeListener = new IPreferenceChangeListener()
+		{
+			public void preferenceChange(PreferenceChangeEvent event)
+			{
+				if (IThemeManager.THEME_CHANGED.equals(event.getKey()))
+				{
 					Control control = getRootControl();
-					if (!control.isDisposed()) {
+					if (!control.isDisposed())
+					{
 						control.setBackground(ThemedTextLineRenderer.getStyleMap().getBackgroundColor());
 						getCtlText().redraw();
 					}
@@ -62,20 +71,27 @@ public class VT100TerminalControl extends org.eclipse.tm.internal.terminal.emula
 		};
 		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID)
 				.addPreferenceChangeListener(preferenceChangeListener);
-		propertyChangeListener = new IPropertyChangeListener() {
-			public void propertyChange(PropertyChangeEvent event) {
-				if (JFaceResources.TEXT_FONT.equals(event.getProperty())) {
+		propertyChangeListener = new IPropertyChangeListener()
+		{
+			public void propertyChange(PropertyChangeEvent event)
+			{
+				if (JFaceResources.TEXT_FONT.equals(event.getProperty()))
+				{
 					setFont(JFaceResources.getTextFont());
 				}
 			}
 		};
 		JFaceResources.getFontRegistry().addListener(propertyChangeListener);
-		getCtlText().addMouseListener(new MouseAdapter() {
-			public void mouseDown(MouseEvent e) {
-				if (e.button == 2) { // paste clipboard selection
+		getCtlText().addMouseListener(new MouseAdapter()
+		{
+			public void mouseDown(MouseEvent e)
+			{
+				if (e.button == 2)
+				{ // paste clipboard selection
 					String text = (String) getClipboard().getContents(TextTransfer.getInstance(),
 							DND.SELECTION_CLIPBOARD);
-					if (text != null && text.length() > 0) {
+					if (text != null && text.length() > 0)
+					{
 						pasteString(text);
 					}
 				}
@@ -88,8 +104,10 @@ public class VT100TerminalControl extends org.eclipse.tm.internal.terminal.emula
 	 * @see org.eclipse.tm.internal.terminal.emulator.VT100TerminalControl#setEncoding(java.lang.String)
 	 */
 	@Override
-	public void setEncoding(String encoding) throws UnsupportedEncodingException {
-		if (encoding == null) {
+	public void setEncoding(String encoding) throws UnsupportedEncodingException
+	{
+		if (encoding == null)
+		{
 			encoding = IOUtil.UTF_8; // $codepro.audit.disable questionableAssignment
 		}
 		super.setEncoding(encoding);
@@ -100,8 +118,10 @@ public class VT100TerminalControl extends org.eclipse.tm.internal.terminal.emula
 	 * @see org.eclipse.tm.internal.terminal.emulator.VT100TerminalControl#sendChar(char, boolean)
 	 */
 	@Override
-	protected void sendChar(char chKey, boolean altKeyPressed) {
-		if (altKeyPressed && IGNORE_ALT_WITH_KEYS.contains(chKey)) {
+	protected void sendChar(char chKey, boolean altKeyPressed)
+	{
+		if (altKeyPressed && IGNORE_ALT_WITH_KEYS.contains(chKey))
+		{
 			altKeyPressed = false; // $codepro.audit.disable questionableAssignment
 		}
 		super.sendChar(chKey, altKeyPressed);
@@ -112,7 +132,8 @@ public class VT100TerminalControl extends org.eclipse.tm.internal.terminal.emula
 	 * @see org.eclipse.tm.internal.terminal.emulator.VT100TerminalControl#disposeTerminal()
 	 */
 	@Override
-	public void disposeTerminal() {
+	public void disposeTerminal()
+	{
 		JFaceResources.getFontRegistry().removeListener(propertyChangeListener);
 		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID)
 				.removePreferenceChangeListener(preferenceChangeListener);
@@ -128,8 +149,9 @@ public class VT100TerminalControl extends org.eclipse.tm.internal.terminal.emula
 	 */
 	@Override
 	protected org.eclipse.tm.internal.terminal.textcanvas.TextCanvas createTextCanvas(Composite parent,
-			ITextCanvasModel canvasModel, ILinelRenderer linelRenderer) {
-		return new TextCanvas(parent, canvasModel, SWT.NONE, linelRenderer);
+			ITextCanvasModel canvasModel, ILinelRenderer linelRenderer)
+	{
+		return new TextCanvas(parent, canvasModel, SWT.NONE, linelRenderer, hyperlinkManager);
 	}
 
 	/*
@@ -139,8 +161,9 @@ public class VT100TerminalControl extends org.eclipse.tm.internal.terminal.emula
 	 * .textcanvas.ITextCanvasModel)
 	 */
 	@Override
-	protected ILinelRenderer createLineRenderer(ITextCanvasModel model) {
-		return new ThemedTextLineRenderer(model);
+	protected ILinelRenderer createLineRenderer(ITextCanvasModel model)
+	{
+		return new ThemedTextLineRenderer(model, hyperlinkManager = new HyperlinkManager(model.getTerminalText()));
 	}
 
 }

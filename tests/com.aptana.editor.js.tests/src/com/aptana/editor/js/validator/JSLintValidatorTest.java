@@ -9,38 +9,27 @@ package com.aptana.editor.js.validator;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 
-import com.aptana.core.build.AbstractBuildParticipant;
+import com.aptana.core.build.IBuildParticipant;
+import com.aptana.core.build.IBuildParticipantWorkingCopy;
 import com.aptana.core.build.IProblem;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.editor.common.validation.AbstractValidatorTestCase;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.parsing.JSParseState;
+import com.aptana.jetty.util.epl.ajax.JSON;
 
 public class JSLintValidatorTest extends AbstractValidatorTestCase
 {
 
-	protected void assertProblem(IProblem item, String msg, int line, int severity, int offset)
-	{
-		assertEquals("message", msg, item.getMessage());
-		assertEquals("line", line, item.getLineNumber());
-		assertEquals("severity", severity, item.getSeverity());
-		assertEquals("offset", offset, item.getOffset());
-	}
-
-	protected void assertProblemExists(List<IProblem> items, String msg, int line, int severity, int offset)
-	{
-		IProblem item = assertContains(items, msg);
-		assertProblem(item, msg, line, severity, offset);
-	}
-
 	@Override
-	protected AbstractBuildParticipant createValidator()
+	protected IBuildParticipant createValidator()
 	{
 		return new JSLintValidator()
 		{
@@ -770,7 +759,14 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 
 	protected void setOption(String optionName, boolean value)
 	{
-		((JSLintValidator) fValidator).setOption(optionName, value);
+		String json = fValidator.getPreferenceString(JSLintValidator.JS_LINT_OPTIONS);
+		Map object = (Map) JSON.parse(json);
+		object.put(optionName, value);
+		json = JSON.toString(object);
+
+		IBuildParticipantWorkingCopy wc = fValidator.getWorkingCopy();
+		wc.setPreference(JSLintValidator.JS_LINT_OPTIONS, json);
+		fValidator = wc.doSave();
 	}
 
 	public void testDangerousComment3() throws CoreException
@@ -1737,6 +1733,71 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 				IMarker.SEVERITY_WARNING, 13);
 	}
 
+	public void testMissingA1() throws CoreException
+	{
+		String text = "new Array";
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Missing '()'.", 1, IMarker.SEVERITY_WARNING, 4);
+	}
+
+	public void testMissingA1OK() throws CoreException
+	{
+		String text = "new Array();";
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "Missing '()'.");
+	}
+
+	public void testMissingA2() throws CoreException
+	{
+		String text = "switch (1) {\n}";
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Missing 'case'.", 2, IMarker.SEVERITY_WARNING, 13);
+	}
+
+	public void testMissingA3() throws CoreException
+	{
+		// @formatter:off
+		String text = "var obj = (function () {\n" +
+			        "    var a;\n" +
+			        "    return {\n" +
+			        "        get a() {\n" +
+			        "            return a;\n" +
+			        "        },\n" +
+			        "\n" +
+			        "        set a(value) {\n" +
+			        "        }\n" +
+			        "    };\n" +
+				    "}());";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Missing 'throw'.", 9, IMarker.SEVERITY_WARNING, 132);
+	}
+
+	public void testMissingProperty() throws CoreException
+	{
+		// @formatter:off
+		String text = "var obj = (function () {\n" +
+				"        var a;\n" +
+				"        return {\n" +
+				"            get () {\n" +
+				"                return a;\n" +
+				"            },\n" +
+				"            \n" +
+				"            set a(value) {\n" +
+				"                a = 'prepender: ' + value;\n" +
+				"            }\n" +
+				"        };\n" +
+				"    }());";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Missing property name.", 4, IMarker.SEVERITY_ERROR, 73);
+	}
+
 	public void testMoveInvocation() throws CoreException
 	{
 		// @formatter:off
@@ -1784,8 +1845,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Move 'var' declarations to the top of the function.", 1, IMarker.SEVERITY_ERROR,
-				5);
+		assertProblemExists(items, "Move 'var' declarations to the top of the function.", 1, IMarker.SEVERITY_ERROR, 5);
 	}
 
 	public void testNameFunction() throws CoreException
@@ -2040,8 +2100,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Expected parameter (value) in set value function.", 8, IMarker.SEVERITY_ERROR,
-				145);
+		assertProblemExists(items, "Expected parameter (value) in set value function.", 8, IMarker.SEVERITY_ERROR, 145);
 	}
 
 	public void testParameterSetA2() throws CoreException
@@ -2062,8 +2121,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Expected parameter (value) in set value function.", 8, IMarker.SEVERITY_ERROR,
-				145);
+		assertProblemExists(items, "Expected parameter (value) in set value function.", 8, IMarker.SEVERITY_ERROR, 145);
 	}
 
 	public void testRadix() throws CoreException
@@ -2079,8 +2137,8 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 	public void testReadOnly() throws CoreException
 	{
 		Set<String> predefineds = CollectionsUtil.newSet("Array", "Boolean", "Date", "decodeURI", "decodeURIComponent",
-				"encodeURI", "encodeURIComponent", "Error", "EvalError", "Function", "isFinite", "isNaN",
-				"JSON", "Math", "Number", "Object", "parseInt", "parseFloat", "RangeError", "ReferenceError", "RegExp",
+				"encodeURI", "encodeURIComponent", "Error", "EvalError", "Function", "isFinite", "isNaN", "JSON",
+				"Math", "Number", "Object", "parseInt", "parseFloat", "RangeError", "ReferenceError", "RegExp",
 				"String", "SyntaxError", "TypeError", "URIError");
 		for (String predefined : predefineds)
 		{
@@ -2138,7 +2196,7 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 				IMarker.SEVERITY_ERROR, 3);
 	}
 
-	public void testStatementBlock() throws CoreException
+	public void testStatementBlock1() throws CoreException
 	{
 		// @formatter:off
 		String text = "var foo = 1;\n" +
@@ -2148,6 +2206,48 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		List<IProblem> items = getParseErrors(text);
 		assertProblemExists(items, "Expected to see a statement and instead saw a block.", 2, IMarker.SEVERITY_WARNING,
 				14);
+	}
+
+	public void testStatementBlock2() throws CoreException
+	{
+		// @formatter:off
+		String text = "function foo() {\n" +
+				"{}\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Expected to see a statement and instead saw a block.", 2, IMarker.SEVERITY_WARNING,
+				18);
+		assertCountOfProblems(items, 1, "Expected to see a statement and instead saw a block.");
+	}
+
+	public void testStatementBlockOK1() throws CoreException
+	{
+		// @formatter:off
+		String text = "var event;\n" +
+					  "while (event = events.shift()) {\n" +
+					  "	\n" +
+					  "}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "Expected to see a statement and instead saw a block.");
+	}
+
+	public void testStatementBlockOK2() throws CoreException
+	{
+		// @formatter:off
+		String text = "var event;\n" +
+					  "while (event = events.shift()) {\n" +
+					  "	{}\n" +
+					  "}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Expected to see a statement and instead saw a block.", 3, IMarker.SEVERITY_WARNING,
+				46);
+		assertCountOfProblems(items, 1, "Expected to see a statement and instead saw a block.");
 	}
 
 	public void testStrangeLoop1() throws CoreException
@@ -2599,6 +2699,17 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		assertProblemExists(items, "'foo' was used before it was defined.", 3, IMarker.SEVERITY_WARNING, 58);
 	}
 
+	public void testUsedBeforeA2() throws CoreException
+	{
+		setOption("undef", false);
+		// @formatter:off
+		String text = "var Events = Backbone.Events = {};";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "'Backbone' was used before it was defined.", 1, IMarker.SEVERITY_WARNING, 13);
+	}
+
 	public void testUsedBeforeAOK1() throws CoreException
 	{
 		// @formatter:off
@@ -2733,6 +2844,14 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 
 		List<IProblem> items = getParseErrors(text);
 		assertProblemExists(items, "Variable blah was not declared correctly.", 1, IMarker.SEVERITY_ERROR, 12);
+	}
+
+	public void testVarANot_OK() throws CoreException
+	{
+		String text = "var Events = Backbone.Events = {};";
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "Variable  was not declared correctly.");
 	}
 
 	public void testWeirdAssignment() throws CoreException

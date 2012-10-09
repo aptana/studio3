@@ -35,6 +35,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.ILaunch;
 import org.osgi.framework.Constants;
 
 import com.aptana.core.logging.IdeLog;
@@ -160,10 +161,10 @@ public abstract class AbstractDebugHost {
 	protected abstract Object getSyncObject();
 	protected abstract boolean isConnected();
 	protected abstract boolean isDebugging();
-	protected abstract void initSession() throws CoreException;
+	protected abstract void initSession(ILaunch launch) throws CoreException;
 	protected abstract void terminateSession();
 
-	public final void start(final SocketAddress serverAddress) throws CoreException {
+	public final void start(final SocketAddress serverAddress, ILaunch launch) throws CoreException {
 		new Thread("Aptana: Debugger Bridge") { //$NON-NLS-1$
 			public void run() {
 				Object syncObject = getSyncObject();
@@ -195,7 +196,7 @@ public abstract class AbstractDebugHost {
 				terminate();
 			}
 		}.start();
-		initSession();
+		initSession(launch);
 	}
 
 	/**

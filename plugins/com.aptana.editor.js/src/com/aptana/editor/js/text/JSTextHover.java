@@ -1,12 +1,13 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.editor.js.text;
 
+import java.text.MessageFormat;
 import java.util.List;
 
 import org.eclipse.jface.action.Action;
@@ -23,6 +24,8 @@ import org.eclipse.ui.IEditorPart;
 
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.ObjectUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.contentassist.CommonTextHover;
 import com.aptana.editor.common.hover.CustomBrowserInformationControl;
@@ -31,16 +34,17 @@ import com.aptana.editor.js.contentassist.JSLocationIdentifier;
 import com.aptana.editor.js.contentassist.JSModelFormatter;
 import com.aptana.editor.js.contentassist.LocationType;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
+import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
 import com.aptana.editor.js.hyperlink.JSHyperlinkDetector;
 import com.aptana.editor.js.internal.JSModelUtil;
 import com.aptana.index.core.Index;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.ui.epl.UIEplPlugin;
+import com.aptana.ui.util.UIUtils;
 
 @SuppressWarnings("restriction")
 public class JSTextHover extends CommonTextHover implements ITextHover, ITextHoverExtension2
 {
-
 	private String fDocs;
 	private String fHeader;
 
@@ -112,7 +116,9 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 	public void populateToolbarActions(ToolBarManager tbm, CustomBrowserInformationControl iControl)
 	{
 		final OpenDeclarationAction openDeclarationAction = new OpenDeclarationAction(iControl);
+		final OpenHelpAction openHelpAction = new OpenHelpAction(iControl);
 		tbm.add(openDeclarationAction);
+		tbm.add(openHelpAction);
 		IInputChangedListener inputChangeListener = new IInputChangedListener()
 		{
 			public void inputChanged(Object newInput)
@@ -120,6 +126,7 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 				if (newInput instanceof BrowserInformationControlInput)
 				{
 					openDeclarationAction.update();
+					openHelpAction.update();
 				}
 			}
 		};
@@ -215,6 +222,71 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 			// We already know that this hyperlink is valid. A check was made at the update call.
 			iControl.dispose();
 			hyperlinks[0].open();
+		}
+	}
+
+	public class OpenHelpAction extends Action
+	{
+		private static final String IMG_OPEN_HELP = "icons/full/elcl16/open_browser.gif"; //$NON-NLS-1$
+		private static final String IMG_OPEN_HELP_DISABLED = "icons/full/dlcl16/open_browser.gif"; //$NON-NLS-1$
+		private CustomBrowserInformationControl iControl;
+		private List<PropertyElement> properties;
+
+		public OpenHelpAction(CustomBrowserInformationControl iControl)
+		{
+			setText(Messages.JSTextHover_openDocsTooltip);
+			setImageDescriptor(UIEplPlugin.imageDescriptorFromPlugin(UIEplPlugin.PLUGIN_ID, IMG_OPEN_HELP));
+			setDisabledImageDescriptor(UIEplPlugin.imageDescriptorFromPlugin(UIEplPlugin.PLUGIN_ID,
+					IMG_OPEN_HELP_DISABLED));
+			this.iControl = iControl;
+		}
+
+		/**
+		 * Update the action
+		 */
+		void update()
+		{
+			properties = null;
+			BrowserInformationControlInput input = iControl.getInput();
+			if (input instanceof DocumentationBrowserInformationControlInput)
+			{
+				Object inputElement = input.getInputElement();
+				if (inputElement instanceof IParseNode)
+				{
+					properties = JSModelUtil.getProperties((AbstractThemeableEditor) getEditor(),
+							(IParseNode) inputElement);
+				}
+			}
+			setEnabled(!CollectionsUtil.isEmpty(properties));
+		}
+
+		public void run()
+		{
+			iControl.dispose();
+			// Resolve the help path. We already know that the properties are not empty, so we just grab the
+			// first one.
+			PropertyElement element = properties.get(0);
+			String owningType = element.getOwningType();
+			String name = element.getName();
+			List<ReturnTypeElement> types = element.getTypes();
+			String resolvedReturnType = (CollectionsUtil.isEmpty(types) ? null : JSModelFormatter
+					.getTypeDisplayName(types.get(0).getType()));
+			String url;
+			if (ObjectUtil.areEqual(resolvedReturnType, name) || ObjectUtil.areEqual(name, owningType))
+			{
+				url = MessageFormat.format("{0}{1}.html", BASE_HELP_DOCS_URL, name); //$NON-NLS-1$
+			}
+			else if (!StringUtil.isEmpty(resolvedReturnType))
+			{
+				url = MessageFormat.format("{0}{1}.html?visibility=basic#{1}.{2}", //$NON-NLS-1$
+						BASE_HELP_DOCS_URL, resolvedReturnType, name);
+			}
+			else
+			{
+				url = MessageFormat.format("{0}{1}.html?visibility=basic#{1}.{2}", //$NON-NLS-1$
+						BASE_HELP_DOCS_URL, owningType, name);
+			}
+			UIUtils.openHelpInBrowser(url);
 		}
 	}
 }

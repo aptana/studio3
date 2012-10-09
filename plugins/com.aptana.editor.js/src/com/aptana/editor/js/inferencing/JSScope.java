@@ -199,7 +199,7 @@ public class JSScope
 	}
 
 	/**
-	 * getSymbol
+	 * Searches local scope up parents for a symbol with the given name.
 	 * 
 	 * @param name
 	 * @return

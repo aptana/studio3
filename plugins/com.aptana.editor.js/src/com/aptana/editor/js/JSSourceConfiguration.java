@@ -70,15 +70,24 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 
 	static
 	{
-		IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
-		c.addTranslation(new QualifiedContentType(IJSConstants.CONTENT_TYPE_JS), new QualifiedContentType("source.js")); //$NON-NLS-1$
-		c.addTranslation(new QualifiedContentType(STRING_DOUBLE), new QualifiedContentType("string.quoted.double.js")); //$NON-NLS-1$
-		c.addTranslation(new QualifiedContentType(STRING_SINGLE), new QualifiedContentType("string.quoted.single.js")); //$NON-NLS-1$
-		c.addTranslation(new QualifiedContentType(JS_REGEXP), new QualifiedContentType("string.regexp.js")); //$NON-NLS-1$
-		c.addTranslation(new QualifiedContentType(JS_SINGLELINE_COMMENT), new QualifiedContentType(
-				"comment.line.double-slash.js")); //$NON-NLS-1$
-		c.addTranslation(new QualifiedContentType(JS_MULTILINE_COMMENT), new QualifiedContentType("comment.block.js")); //$NON-NLS-1$
-		c.addTranslation(new QualifiedContentType(JS_DOC), new QualifiedContentType("comment.block.documentation.js")); //$NON-NLS-1$
+		CommonEditorPlugin plugin = CommonEditorPlugin.getDefault();
+		if (plugin != null) // may be null running test-cases.
+		{
+			IContentTypeTranslator c = plugin.getContentTypeTranslator();
+			c.addTranslation(new QualifiedContentType(IJSConstants.CONTENT_TYPE_JS), new QualifiedContentType(
+					"source.js")); //$NON-NLS-1$
+			c.addTranslation(new QualifiedContentType(STRING_DOUBLE), new QualifiedContentType(
+					"string.quoted.double.js")); //$NON-NLS-1$
+			c.addTranslation(new QualifiedContentType(STRING_SINGLE), new QualifiedContentType(
+					"string.quoted.single.js")); //$NON-NLS-1$
+			c.addTranslation(new QualifiedContentType(JS_REGEXP), new QualifiedContentType("string.regexp.js")); //$NON-NLS-1$
+			c.addTranslation(new QualifiedContentType(JS_SINGLELINE_COMMENT), new QualifiedContentType(
+					"comment.line.double-slash.js")); //$NON-NLS-1$
+			c.addTranslation(new QualifiedContentType(JS_MULTILINE_COMMENT), new QualifiedContentType(
+					"comment.block.js")); //$NON-NLS-1$
+			c.addTranslation(new QualifiedContentType(JS_DOC), new QualifiedContentType(
+					"comment.block.documentation.js")); //$NON-NLS-1$
+		}
 	}
 
 	private JSSourceConfiguration()

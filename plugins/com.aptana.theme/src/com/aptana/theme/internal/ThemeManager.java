@@ -126,7 +126,7 @@ public class ThemeManager implements IThemeManager
 											return Status.OK_STATUS;
 										}
 									};
-									job.setSystem(!EclipseUtil.showSystemJobs());
+									EclipseUtil.setSystemForJob(job);
 									job.setPriority(Job.DECORATE);
 									job.schedule();
 								}
@@ -218,7 +218,17 @@ public class ThemeManager implements IThemeManager
 		setCompareColors("com.aptana.editor.common", true); //$NON-NLS-1$
 		setCompareColors("org.eclipse.ui.editors", ThemePlugin.applyToAllEditors()); //$NON-NLS-1$
 
-		notifyThemeChangeListeners(theme);
+		// We notify in UI-thread because of APSTUD-7392
+		// (in practice this almost always happens in the UI thread anyways, but it's
+		// possible that at some circumstance this happens from a background thread).
+		UIUtils.runInUIThread(new Runnable()
+		{
+
+			public void run()
+			{
+				notifyThemeChangeListeners(fCurrentTheme);
+			}
+		});
 
 		forceFontsUpToDate();
 	}

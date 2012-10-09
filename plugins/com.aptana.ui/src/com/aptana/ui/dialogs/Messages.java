@@ -17,6 +17,8 @@ public class Messages extends NLS
 	public static String DiagnosticDialog_copy_clipboard_label;
 	public static String DiagnosticDialog_run_diagnostic_title;
 
+	public static String MinimizableWizardDialog_hideLabel;
+
 	public static String ProjectSelectionDialog_Message;
 	public static String ProjectSelectionDialog_Title;
 

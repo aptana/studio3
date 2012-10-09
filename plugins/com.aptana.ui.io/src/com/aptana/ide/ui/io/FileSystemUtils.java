@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.TreePath;
 
 import com.aptana.core.io.vfs.IExtendedFileInfo;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.ProgressMonitorInterrupter;
 import com.aptana.ide.ui.io.internal.FetchFileInfoJob;
 import com.aptana.ide.ui.io.internal.FetchFileInfoStatus;
@@ -104,7 +105,7 @@ public final class FileSystemUtils {
 	public static IFileInfo fetchFileInfo(IFileStore fileStore, int options) throws OperationCanceledException {
 		Job job = new FetchFileInfoJob(fileStore, options);
 		job.setPriority(Job.SHORT);
-		job.setSystem(true);
+		EclipseUtil.setSystemForJob(job);
 		job.schedule();
 		try {
 			job.join();

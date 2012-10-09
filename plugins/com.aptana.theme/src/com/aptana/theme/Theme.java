@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -16,7 +16,6 @@ import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.InvalidPropertiesFormatException;
@@ -39,6 +38,7 @@ import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.scope.IScopeSelector;
+import com.aptana.scope.ISelectorNode;
 import com.aptana.scope.ScopeSelector;
 import com.aptana.theme.internal.OrderedProperties;
 import com.aptana.theme.internal.ThemeManager;
@@ -84,22 +84,25 @@ public class Theme
 	private RGB searchResultBG;
 
 	/**
-	 * Used for recursion in getDelayedTextAttribute to avoid matching same rule on scope twice
+	 * Access to get the text attribute. May cache internal information, so, must be recreated when the theme changes.
 	 */
-	private IScopeSelector lastSelectorMatch;
-
-	/**
-	 * A cache to memoize the ultimate TextAttribute generated for a given fully qualified scope.
-	 */
-	private Map<String, TextAttribute> cache;
+	private ThemeGetTextAttribute themeGetTextAttribute;
 
 	public Theme(ColorManager colormanager, Properties props)
 	{
 		this.colorManager = colormanager;
 		coloringRules = new ArrayList<ThemeRule>();
-		cache = new HashMap<String, TextAttribute>();
 		parseProps(props);
 		storeDefaults();
+	}
+
+	private ThemeGetTextAttribute obtainGetThemeTextAttribute()
+	{
+		if (themeGetTextAttribute == null)
+		{
+			themeGetTextAttribute = new ThemeGetTextAttribute(this);
+		}
+		return themeGetTextAttribute;
 	}
 
 	private void parseProps(Properties props)
@@ -279,147 +282,19 @@ public class Theme
 
 	public TextAttribute getTextAttribute(String scope)
 	{
-		if (cache.containsKey(scope))
-		{
-			return cache.get(scope);
-		}
-		lastSelectorMatch = null;
-		TextAttribute ta = toTextAttribute(getDelayedTextAttribute(scope), true);
-		cache.put(scope, ta);
-		return ta;
+		ThemeGetTextAttribute themeGetTextAttribute = obtainGetThemeTextAttribute();
+		return themeGetTextAttribute.getTextAttribute(scope);
 	}
 
 	ThemeRule winningRule(String scope)
 	{
-		IScopeSelector match = findMatch(scope);
+		ThemeGetTextAttribute themeGetTextAttribute = obtainGetThemeTextAttribute();
+		IScopeSelector match = themeGetTextAttribute.findMatch(scope);
 		if (match == null)
 		{
 			return null;
 		}
 		return getRuleForSelector(match);
-	}
-
-	private DelayedTextAttribute getDelayedTextAttribute(String scope)
-	{
-		IScopeSelector match = findMatch(scope);
-		if (match != null)
-		{
-			// This is to avoid matching the same selector multiple times when recursing up the scope! Basically our
-			// match may have been many steps up our scope, not at the end!
-			if (lastSelectorMatch != null && lastSelectorMatch.equals(match))
-			{
-				// We just matched the same rule! We need to recurse from parent scope!
-				return getParent(scope);
-			}
-			lastSelectorMatch = match;
-			ThemeRule rule = getRuleForSelector(match);
-			DelayedTextAttribute attr = rule.getTextAttribute();
-
-			// if our coloring has no background, we should use parent's. If it has some opacity (alpha != 255), we
-			// need to alpha blend
-			if (attr.getBackground() == null || !attr.getBackground().isFullyOpaque())
-			{
-				// Need to merge bg color up the scope!
-				DelayedTextAttribute parentAttr = getParent(scope);
-				// Now do actual merge
-				attr = merge(attr, parentAttr);
-			}
-			return attr;
-		}
-
-		// Some tokens are special. They have fallbacks even if not in the theme! Looks like bundles can contribute
-		// them?
-		if (new ScopeSelector("markup.changed").matches(scope)) //$NON-NLS-1$
-		{
-			return new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(248, 205, 14), SWT.NORMAL);
-		}
-		if (new ScopeSelector("markup.deleted").matches(scope)) //$NON-NLS-1$
-		{
-			return new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(255, 86, 77), SWT.NORMAL);
-		}
-		if (new ScopeSelector("markup.inserted").matches(scope)) //$NON-NLS-1$
-		{
-			return new DelayedTextAttribute(new RGBa(0, 0, 0), new RGBa(128, 250, 120), SWT.NORMAL);
-		}
-		if (new ScopeSelector("markup.underline").matches(scope)) //$NON-NLS-1$
-		{
-			return new DelayedTextAttribute(null, null, TextAttribute.UNDERLINE);
-		}
-		if (new ScopeSelector("markup.bold").matches(scope)) //$NON-NLS-1$
-		{
-			return new DelayedTextAttribute(null, null, SWT.BOLD);
-		}
-		if (new ScopeSelector("markup.italic").matches(scope)) //$NON-NLS-1$
-		{
-			return new DelayedTextAttribute(null, null, SWT.ITALIC);
-		}
-		if (new ScopeSelector("meta.diff.index").matches(scope) || new ScopeSelector("meta.diff.range").matches(scope) || new ScopeSelector("meta.separator.diff").matches(scope)) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		{
-			return new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(65, 126, 218), SWT.ITALIC);
-		}
-		if (new ScopeSelector("meta.diff.header").matches(scope)) //$NON-NLS-1$
-		{
-			return new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(103, 154, 233), SWT.NORMAL);
-		}
-		if (new ScopeSelector("meta.separator").matches(scope)) //$NON-NLS-1$
-		{
-			return new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(52, 103, 209), SWT.NORMAL);
-		}
-		if (hasDarkBG())
-		{
-			if (new ScopeSelector("console.error").matches(scope)) //$NON-NLS-1$
-			{
-				return new DelayedTextAttribute(new RGBa(255, 0, 0), null, SWT.NORMAL);
-			}
-			if (new ScopeSelector("console.input").matches(scope)) //$NON-NLS-1$
-			{
-				return new DelayedTextAttribute(new RGBa(95, 175, 176), null, SWT.NORMAL);
-			}
-			if (new ScopeSelector("console.prompt").matches(scope)) //$NON-NLS-1$
-			{
-				return new DelayedTextAttribute(new RGBa(131, 132, 161), null, SWT.NORMAL);
-			}
-			if (new ScopeSelector("console.warning").matches(scope)) //$NON-NLS-1$
-			{
-				return new DelayedTextAttribute(new RGBa(255, 215, 0), null, SWT.NORMAL);
-			}
-			if (new ScopeSelector("console.debug").matches(scope)) //$NON-NLS-1$
-			{
-				return new DelayedTextAttribute(new RGBa(255, 236, 139), null, SWT.NORMAL);
-			}
-			if (new ScopeSelector("hyperlink").matches(scope)) //$NON-NLS-1$
-			{
-				return new DelayedTextAttribute(new RGBa(84, 143, 160), null, SWT.NORMAL);
-			}
-		}
-		else
-		{
-			if (new ScopeSelector("console.error").matches(scope)) //$NON-NLS-1$
-			{
-				return new DelayedTextAttribute(new RGBa(255, 0, 0), null, SWT.NORMAL);
-			}
-			if (new ScopeSelector("console.input").matches(scope)) //$NON-NLS-1$
-			{
-				return new DelayedTextAttribute(new RGBa(63, 127, 95), null, SWT.NORMAL);
-			}
-			if (new ScopeSelector("console.prompt").matches(scope)) //$NON-NLS-1$
-			{
-				return new DelayedTextAttribute(new RGBa(42, 0, 255), null, SWT.NORMAL);
-			}
-			if (new ScopeSelector("console.warning").matches(scope)) //$NON-NLS-1$
-			{
-				return new DelayedTextAttribute(new RGBa(205, 102, 0), null, SWT.NORMAL);
-			}
-			if (new ScopeSelector("console.debug").matches(scope)) //$NON-NLS-1$
-			{
-				return new DelayedTextAttribute(new RGBa(93, 102, 102), null, SWT.NORMAL);
-			}
-			if (new ScopeSelector("hyperlink").matches(scope)) //$NON-NLS-1$
-			{
-				return new DelayedTextAttribute(new RGBa(13, 17, 113), null, SWT.NORMAL);
-			}
-		}
-		return new DelayedTextAttribute(new RGBa(defaultFG));
 	}
 
 	public ThemeRule getRuleForSelector(IScopeSelector match)
@@ -440,80 +315,6 @@ public class Theme
 			}
 		}
 		return null;
-	}
-
-	protected DelayedTextAttribute getParent(String scope)
-	{
-		DelayedTextAttribute parentAttr = null;
-		int index = scope.lastIndexOf(' ');
-		if (index != -1)
-		{
-			String subType = scope.substring(0, index);
-			parentAttr = getDelayedTextAttribute(subType);
-		}
-		if (parentAttr == null)
-		{
-			// If we never find a parent, use default bg
-			parentAttr = new DelayedTextAttribute(new RGBa(defaultFG), new RGBa(defaultBG), 0);
-		}
-		return parentAttr;
-	}
-
-	private IScopeSelector findMatch(String scope)
-	{
-		Collection<IScopeSelector> selectors = new ArrayList<IScopeSelector>();
-		for (ThemeRule rule : coloringRules)
-		{
-			if (rule.isSeparator())
-			{
-				continue;
-			}
-			selectors.add(rule.getScopeSelector());
-		}
-		return ScopeSelector.bestMatch(selectors, scope);
-	}
-
-	private DelayedTextAttribute merge(DelayedTextAttribute childAttr, DelayedTextAttribute parentAttr)
-	{
-		return new DelayedTextAttribute(merge(childAttr.getForeground(), parentAttr.getForeground(), defaultFG), merge(
-				childAttr.getBackground(), parentAttr.getBackground(), defaultBG), childAttr.getStyle()
-				| parentAttr.getStyle());
-	}
-
-	private RGBa merge(RGBa top, RGBa bottom, RGB defaultParent)
-	{
-		if (top == null && bottom == null)
-		{
-			return new RGBa(defaultParent);
-		}
-		if (top == null) // for some reason there is no top.
-		{
-			return bottom;
-		}
-		if (top.isFullyOpaque()) // top has no transparency, just return it
-		{
-			return top;
-		}
-		if (bottom == null) // there is no parent, merge onto default FG/BG for theme
-		{
-			return new RGBa(alphaBlend(defaultParent, top.toRGB(), top.getAlpha()));
-		}
-		return new RGBa(alphaBlend(bottom.toRGB(), top.toRGB(), top.getAlpha()));
-	}
-
-	private TextAttribute toTextAttribute(DelayedTextAttribute attr, boolean forceColor)
-	{
-		Color fg = null;
-		if (attr.getForeground() != null || forceColor)
-		{
-			fg = colorManager.getColor(merge(attr.getForeground(), null, defaultFG).toRGB());
-		}
-		Color bg = null;
-		if (attr.getBackground() != null || forceColor)
-		{
-			bg = colorManager.getColor(merge(attr.getBackground(), null, defaultBG).toRGB());
-		}
-		return new TextAttribute(fg, bg, attr.getStyle());
 	}
 
 	/**
@@ -630,17 +431,17 @@ public class Theme
 			}
 			StringBuilder value = new StringBuilder();
 			DelayedTextAttribute attr = rule.getTextAttribute();
-			RGBa color = attr.getForeground();
+			RGBa color = attr.foreground;
 			if (color != null)
 			{
 				value.append(toHex(color)).append(DELIMETER);
 			}
-			color = attr.getBackground();
+			color = attr.background;
 			if (color != null)
 			{
 				value.append(toHex(color)).append(DELIMETER);
 			}
-			int style = attr.getStyle();
+			int style = attr.style;
 			if ((style & SWT.ITALIC) != 0)
 			{
 				value.append(ITALIC).append(DELIMETER);
@@ -938,7 +739,7 @@ public class Theme
 
 	private void wipeCache()
 	{
-		cache.clear();
+		this.themeGetTextAttribute = null;
 	}
 
 	public void updateLineHighlight(RGB newColor)
@@ -1163,4 +964,42 @@ public class Theme
 		return ThemePlugin.getDefault().getColorManager();
 	}
 
+	/**
+	 * Helper function just to print information on the theme.
+	 */
+	public void printSummary(boolean complete)
+	{
+		Map<String, Integer> counts = new HashMap<String, Integer>();
+		int total = 0;
+		for (ThemeRule rule : getTokens())
+		{
+			if (rule.isSeparator())
+			{
+				continue;
+			}
+			total += 1;
+			ISelectorNode root = ((ScopeSelector) rule.getScopeSelector()).getRoot();
+			Class<? extends ISelectorNode> class1 = root.getClass();
+			Integer i = counts.get(class1.getName());
+			if (i == null)
+			{
+				i = 0;
+			}
+			counts.put(class1.getName(), i + 1);
+
+			if (complete)
+			{
+				System.out.println();
+				System.out.println(rule);
+				System.out.println(root.toString());
+				System.out.println(class1);
+			}
+		}
+		System.out.println("Theme: " + this.getName()); //$NON-NLS-1$
+		System.out.println("Non-separator rules: " + total); //$NON-NLS-1$
+		for (Map.Entry<String, Integer> entry : counts.entrySet())
+		{
+			System.out.println(entry.getKey() + ": " + entry.getValue()); //$NON-NLS-1$
+		}
+	}
 }

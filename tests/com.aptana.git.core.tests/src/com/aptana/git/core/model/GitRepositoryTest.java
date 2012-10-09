@@ -23,6 +23,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.osgi.framework.Version;
 
 import com.aptana.core.util.IOUtil;
 
@@ -152,6 +153,56 @@ public class GitRepositoryTest extends GitTestCase
 			{
 				stream.close();
 			}
+		}
+	}
+
+	public void testMultipleLineCommitMessage() throws Throwable
+	{
+		GitRepository repo = createRepo();
+		GitIndex index = repo.index();
+		assertTrue(index.changedFiles().isEmpty());
+
+		// Actually add a file to the location
+		FileWriter writer = new FileWriter(fileToAdd());
+		writer.write("Hello World!");
+		writer.close();
+		// refresh the index
+		assertRefresh();
+
+		// Now there should be a single file that's been changed!
+		List<ChangedFile> changed = index.changedFiles();
+		assertEquals("Repository changed file listing should contain one entry for the new file, but does not", 1,
+				changed.size());
+
+		// Hold onto filename/path for getting it's history later.
+		ChangedFile file = changed.get(0);
+		String filePath = file.getPath();
+
+		// stage
+		assertStageFiles(index, changed);
+		assertNewStagedFile(changed.get(0));
+
+		// commit
+		final String commitMessage = "Subject of the commit.\n  - Did something\n  - did something else\n";
+		assertCommit(index, commitMessage);
+
+		GitRevList list = new GitRevList(repo);
+		IStatus result = list.walkRevisionListWithSpecifier(new GitRevSpecifier(filePath), new NullProgressMonitor());
+		assertTrue(result.isOK());
+
+		List<GitCommit> commits = list.getCommits();
+		assertEquals("commit list size", 1, commits.size());
+		GitCommit commit = commits.get(0);
+
+		Version v = GitExecutable.instance().version();
+		if (v.compareTo(Version.parseVersion("1.7.3")) < 0)
+		{
+			assertEquals("subject", "Subject of the commit.   - Did something   - did something else", commit.getSubject());
+		}
+		else
+		{
+			assertEquals("subject", "Subject of the commit.", commit.getSubject());
+			assertEquals("comment", commitMessage, commit.getComment());
 		}
 	}
 

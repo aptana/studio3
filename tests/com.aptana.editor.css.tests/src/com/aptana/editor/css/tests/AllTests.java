@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -10,8 +10,10 @@ package com.aptana.editor.css.tests;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import com.aptana.editor.css.CSSCodeScannerFlexTest;
 import com.aptana.editor.css.CSSCodeScannerTest;
 import com.aptana.editor.css.CSSEditorTest;
+import com.aptana.editor.css.CSSSourcePartitionScannerFlexTest;
 import com.aptana.editor.css.CSSSourcePartitionScannerTest;
 import com.aptana.editor.css.internal.build.CSSTaskDetectorTest;
 import com.aptana.editor.css.internal.text.CSSFoldingComputerTest;
@@ -25,9 +27,11 @@ public class AllTests
 		TestSuite suite = new TestSuite("Test for com.aptana.editor.css.tests");
 		// $JUnit-BEGIN$
 		suite.addTestSuite(CSSCodeScannerTest.class);
+		suite.addTestSuite(CSSCodeScannerFlexTest.class);
 		suite.addTestSuite(CSSEditorTest.class);
 		suite.addTestSuite(CSSFoldingComputerTest.class);
 		suite.addTestSuite(CSSSourcePartitionScannerTest.class);
+		suite.addTestSuite(CSSSourcePartitionScannerFlexTest.class);
 		suite.addTest(ValidatorTests.suite());
 		suite.addTest(com.aptana.editor.css.parsing.AllTests.suite());
 		suite.addTest(com.aptana.editor.css.outline.AllTests.suite());

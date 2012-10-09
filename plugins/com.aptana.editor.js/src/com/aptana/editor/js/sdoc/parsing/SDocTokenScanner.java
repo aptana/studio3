@@ -143,6 +143,7 @@ public class SDocTokenScanner extends RuleBasedScanner
 		tagRules.addWord("@extends", getToken(SDocTokenType.EXTENDS));
 		tagRules.addWord("@internal", getToken(SDocTokenType.INTERNAL));
 		tagRules.addWord("@method", getToken(SDocTokenType.METHOD));
+		tagRules.addWord("@module", getToken(SDocTokenType.MODULE));
 		tagRules.addWord("@namespace", getToken(SDocTokenType.NAMESPACE));
 		tagRules.addWord("@overview", getToken(SDocTokenType.OVERVIEW));
 		tagRules.addWord("@param", getToken(SDocTokenType.PARAM));

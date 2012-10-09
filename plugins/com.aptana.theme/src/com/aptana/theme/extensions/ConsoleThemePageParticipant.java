@@ -10,6 +10,7 @@ package com.aptana.theme.extensions;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IConsolePageParticipant;
 import org.eclipse.ui.console.IOConsoleOutputStream;
@@ -17,6 +18,7 @@ import org.eclipse.ui.console.TextConsole;
 import org.eclipse.ui.part.IPageBookViewPage;
 
 import com.aptana.theme.ConsoleThemer;
+import com.aptana.theme.ThemePlugin;
 
 /**
  * Will set the colors for any console created that has the "themeConsoleStreamToColor" properly set.
@@ -26,6 +28,7 @@ public class ConsoleThemePageParticipant implements IConsolePageParticipant
 
 	public static final String THEME_CONSOLE_STREAM_TO_COLOR_ATTRIBUTE = "themeConsoleStreamToColor"; //$NON-NLS-1$
 	private ConsoleThemer extension;
+	private IPageBookViewPage page;
 
 	/*
 	 * (non-Javadoc)
@@ -53,6 +56,7 @@ public class ConsoleThemePageParticipant implements IConsolePageParticipant
 				this.extension = new ConsoleThemer(textConsole, (Map) themeConsoleStreamToColor);
 			}
 		}
+		this.page = page;
 	}
 
 	/*
@@ -61,6 +65,14 @@ public class ConsoleThemePageParticipant implements IConsolePageParticipant
 	 */
 	public void activated()
 	{
+		if (page != null && ThemePlugin.applyToViews())
+		{
+			Control control = page.getControl();
+			if (control != null && !control.isDisposed())
+			{
+				ThemePlugin.getDefault().getControlThemerFactory().apply(control);
+			}
+		}
 	}
 
 	/*

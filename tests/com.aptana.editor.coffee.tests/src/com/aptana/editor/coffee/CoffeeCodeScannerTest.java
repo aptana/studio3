@@ -258,4 +258,13 @@ public class CoffeeCodeScannerTest extends AbstractTokenScannerTestCase
 		// @cart
 		assertToken(getToken("variable.other.readwrite.instance.coffee"), 40, 5);
 	}
+
+	public void testInstanceVariableWithUnderscoresAndNumbers()
+	{
+		String src = "@scale_3d_effect";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("variable.other.readwrite.instance.coffee"), 0, 16);
+	}
 }

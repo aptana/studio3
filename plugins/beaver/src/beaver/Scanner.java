@@ -10,8 +10,6 @@ package beaver;
 
 import java.io.IOException;
 
-
-
 /**
  * Defines an interface expected by a generated parser.
  */

@@ -222,6 +222,9 @@ public class JSSourceEditor extends AbstractThemeableEditor
 
 		public IContext getContext(Object target)
 		{
+			if (target instanceof IParseNode) {
+				return new JSHelpContext(editorPart, (IParseNode) target);
+			}
 			ISelection selection = editorPart.getSelectionProvider().getSelection();
 			if (selection.isEmpty())
 			{
@@ -279,6 +282,11 @@ public class JSSourceEditor extends AbstractThemeableEditor
 
 		setSourceViewerConfiguration(new JSSourceViewerConfiguration(getPreferenceStore(), this));
 		setDocumentProvider(JSPlugin.getDefault().getJSDocumentProvider());
+	}
+
+	public JSSourceViewerConfiguration getJSSourceViewerConfiguration()
+	{
+		return (JSSourceViewerConfiguration) super.getSourceViewerConfiguration();
 	}
 
 	/*
@@ -358,14 +366,40 @@ public class JSSourceEditor extends AbstractThemeableEditor
 		return IJSConstants.CONTENT_TYPE_JS;
 	}
 
+	/**
+	 * Overridden to collect comments if folding is enabled.
+	 */
 	@Override
-	public IParseRootNode getAST()
+	public IParseRootNode getReconcileAST()
+	{
+		try
+		{
+			// For reconcile, we need to collect the comments if folding will need it.
+			IDocument document = getDocument();
+			boolean collectComments = this.isFoldingEnabled();
+			if (!collectComments)
+			{
+				// Take advantage of the document-time based cache if possible.
+				return getAST();
+			}
+			JSParseState parseState = new JSParseState(document.get(), 0, collectComments, collectComments);
+			return ParserPoolFactory.parse(getContentType(), parseState).getRootNode();
+		}
+		catch (Exception e)
+		{
+			IdeLog.logTrace(JSPlugin.getDefault(), "Failed to parse JS editor contents", e, //$NON-NLS-1$
+					com.aptana.parsing.IDebugScopes.PARSING);
+		}
+		return null;
+	}
+
+	@Override
+	protected IParseRootNode doGetAST(IDocument document)
 	{
 		try
 		{
 			// Don't attach or collect comments for hovers/outline
-			IDocument document = getDocument();
-			JSParseState parseState = new JSParseState(document.get());
+			JSParseState parseState = new JSParseState(document.get(), 0, false, false);
 			return ParserPoolFactory.parse(getContentType(), parseState).getRootNode();
 		}
 		catch (Exception e)

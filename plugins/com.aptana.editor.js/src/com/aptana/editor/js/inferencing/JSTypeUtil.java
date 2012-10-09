@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -9,6 +9,7 @@ package com.aptana.editor.js.inferencing;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
@@ -48,6 +50,12 @@ import com.aptana.parsing.ast.IParseNode;
 
 public class JSTypeUtil
 {
+	/**
+	 * try to do some validation on type name, because somehow we're getting very whacked-out type names in our index
+	 * strings for some users. See https://jira.appcelerator.org/browse/APSTUD-7366
+	 */
+	private static final Pattern TYPE_NAME_PATTERN = Pattern.compile("[\\$a-zA-Z\\-_]+[\\.\\w\\$\\-/<>]*"); //$NON-NLS-1$
+
 	private static final Set<String> FILTERED_TYPES;
 
 	/**
@@ -227,7 +235,8 @@ public class JSTypeUtil
 	}
 
 	/**
-	 * applySignature
+	 * Takes a "Type,..,Function<ReturnType,ReturnType,...>" type string and unwraps it to apply the type information to
+	 * the function and the return type info as well.
 	 * 
 	 * @param function
 	 * @param typeName
@@ -236,25 +245,72 @@ public class JSTypeUtil
 	{
 		if (function != null && typeName != null)
 		{
-			int delimiter = typeName.indexOf(JSTypeConstants.FUNCTION_SIGNATURE_DELIMITER);
-
-			if (delimiter != -1)
+			// Look for "Function"
+			int index = findFunctionType(typeName);
+			if (index != -1)
 			{
-				for (String returnType : typeName.substring(delimiter + 1).split(JSTypeConstants.RETURN_TYPE_DELIMITER))
+				// Grab substring up to that point, split by commas. Add the values as types.
+				String types = typeName.substring(0, index);
+				for (String type : types.split(JSTypeConstants.RETURN_TYPE_DELIMITER))
+				{
+					if (type.length() > 0)
+					{
+						function.addType(type);
+					}
+				}
+				// Always make sure "Function" type is added to a function.
+				function.addType(JSTypeConstants.FUNCTION_TYPE);
+				// Grab from "Function" to end of string, extract return types and add them
+				String functionWithReturnTypes = typeName.substring(index);
+				for (String returnType : getFunctionSignatureReturnTypeNames(functionWithReturnTypes))
 				{
 					function.addReturnType(returnType);
 				}
-
-				// chop off the signature to continue processing the type
-				typeName = typeName.substring(0, delimiter); // $codepro.audit.disable questionableAssignment
 			}
-
-			function.addType(typeName);
 		}
 	}
 
+	private static int findFunctionType(String typeName)
+	{
+		// Don't look inside <>!
+		int index = -1;
+		while (true)
+		{
+			// look for Function again start at index + 1
+			index = typeName.indexOf(JSTypeConstants.FUNCTION_TYPE, index + 1);
+			if (index == -1)
+			{
+				return -1;
+			}
+			if (getStack(typeName, '<', '>', index) == 0)
+			{
+				return index;
+			}
+		}
+	}
+
+	private static int getStack(String string, final char open, char close, int offset)
+	{
+		int stack = 0;
+		int end = Math.min(offset, string.length());
+		for (int i = 0; i < end; i++)
+		{
+			char c = string.charAt(i);
+			if (c == open)
+			{
+				stack++;
+			}
+			else if (c == close)
+			{
+				stack--;
+			}
+		}
+		return stack;
+	}
+
 	/**
-	 * createGenericArrayType
+	 * Wraps a given type with "Array<" and ">", effectively creating the type string used to denote an Array holding
+	 * items of type {@code elementType}
 	 * 
 	 * @param elementType
 	 * @return
@@ -265,7 +321,8 @@ public class JSTypeUtil
 	}
 
 	/**
-	 * getArrayElementType
+	 * Attempts to determine what type the members of an Array are. Handles syntax like "Anchor[]", "Array&lt;Object>".
+	 * A simple "Array" assumes members are of type "Object". Null or empty string returns null.
 	 * 
 	 * @param type
 	 * @return
@@ -295,7 +352,7 @@ public class JSTypeUtil
 	}
 
 	/**
-	 * getClassType
+	 * Unwraps the type in a "Class&lt;TypeName>" type string.
 	 * 
 	 * @param typeName
 	 * @return
@@ -314,82 +371,127 @@ public class JSTypeUtil
 	}
 
 	/**
-	 * getFunctionSignatureReturnTypeNames
+	 * Wraps the given type in between "Class<" and ">".
+	 * 
+	 * @param typeName
+	 * @return
+	 */
+	public static String toClassType(String typeName)
+	{
+		return JSTypeConstants.GENERIC_CLASS_OPEN + typeName + JSTypeConstants.GENERIC_CLOSE;
+	}
+
+	/**
+	 * Given a type string starting with "Function&lt;" and ending in ">". We parse out the string between the brackets
+	 * and split it by commas. This should extract the return types of a function.
 	 * 
 	 * @param typeName
 	 * @return
 	 */
 	public static List<String> getFunctionSignatureReturnTypeNames(String typeName)
 	{
-		List<String> result;
-
-		int index = typeName.indexOf(JSTypeConstants.FUNCTION_SIGNATURE_DELIMITER);
-
-		if (index != -1)
-		{
-			String returnTypesString = typeName.substring(index + 1);
-
-			result = new ArrayList<String>();
-
-			for (String returnType : returnTypesString.split(JSTypeConstants.RETURN_TYPE_DELIMITER))
-			{
-				result.add(returnType);
-			}
-		}
-		else
-		{
-			result = Collections.emptyList();
-		}
-
-		return result;
-	}
-
-	/**
-	 * getFunctionSignatureType
-	 * 
-	 * @param typeName
-	 * @return
-	 */
-	public static String getFunctionSignatureType(String typeName)
-	{
-		String result = typeName;
-
-		if (typeName != null)
-		{
-			int delimiter = typeName.indexOf(JSTypeConstants.FUNCTION_SIGNATURE_DELIMITER);
-
-			if (delimiter != -1)
-			{
-				// chop off the signature to continue processing the type
-				result = typeName.substring(0, delimiter);
-			}
-		}
-
-		return result;
-	}
-
-	/**
-	 * getFunctionType
-	 * 
-	 * @param typeName
-	 * @return
-	 */
-	public static String getFunctionType(String typeName)
-	{
-		String result = typeName;
-
 		if (typeName != null && typeName.startsWith(JSTypeConstants.GENERIC_FUNCTION_OPEN))
 		{
 			int startingIndex = JSTypeConstants.GENERIC_FUNCTION_OPEN.length();
-			int endingIndex = typeName.indexOf(JSTypeConstants.GENERIC_CLOSE, startingIndex);
+			int endingIndex = typeName.lastIndexOf(JSTypeConstants.GENERIC_CLOSE);
 
 			if (endingIndex != -1)
 			{
-				result = typeName.substring(startingIndex, endingIndex);
+				String returnTypes = typeName.substring(startingIndex, endingIndex);
+				// If no comma in the string, can we just skip ahead to return the string in a list?
+				if (returnTypes.indexOf(',') == -1)
+				{
+					return CollectionsUtil.newList(returnTypes);
+				}
+
+				// Split the return types up. We need to track the pairs of <>
+				List<String> returnTypeNames = new ArrayList<String>();
+				int length = returnTypes.length();
+				int pointer = 0;
+				int stack = 0;
+				for (int i = 0; i < length; i++)
+				{
+					char c = returnTypes.charAt(i);
+					switch (c)
+					{
+						case '<':
+							stack++;
+							break;
+						case '>':
+							stack--;
+							break;
+						case ',':
+							if (stack == 0)
+							{
+								returnTypeNames.add(returnTypes.substring(pointer, i));
+								pointer = i + 1;
+							}
+							break;
+
+						default:
+							break;
+					}
+				}
+				returnTypeNames.add(returnTypes.substring(pointer));
+				return returnTypeNames;
 			}
 		}
 
-		return result;
+		return Collections.emptyList();
+	}
+
+	/**
+	 * This method attempts to "fix" bad type names. This is a good starting point for tracking down busted type names,
+	 * but ultimately the meat is in the JSNodeTypeInferrer and JSSymbolTypeInferrer.
+	 * 
+	 * @param type
+	 * @return
+	 */
+	public static String validateTypeName(String type)
+	{
+		if (StringUtil.isEmpty(type))
+		{
+			IdeLog.logError(JSPlugin.getDefault(), new IllegalArgumentException(
+					"Null or Empty type name attempting to be recorded for a return type.")); //$NON-NLS-1$
+			return StringUtil.EMPTY;
+		}
+
+		// Function<>, Array<>, or Class<> type.
+		int genericOpenIndex = type.indexOf('<');
+		if (genericOpenIndex != -1)
+		{
+			// ideally we'd verify the types inside! We need to split out the types like in
+			// getFunctionSignatureReturnTypeNames and validate each element.
+			if (type.charAt(type.length() - 1) != '>')
+			{
+				String baseType = type.substring(0, genericOpenIndex);
+				IdeLog.logError(JSPlugin.getDefault(),
+						new IllegalArgumentException(MessageFormat.format("{0} type missing end '>'", baseType))); //$NON-NLS-1$
+				return baseType;
+			}
+		}
+		else if (!TYPE_NAME_PATTERN.matcher(type).matches())
+		{
+			// Look for Array types in "bad" format
+			if (type.endsWith(JSTypeConstants.ARRAY_LITERAL))
+			{
+				// convert to Array<Type>
+				return validateTypeName(JSTypeUtil.createGenericArrayType(JSTypeUtil.getArrayElementType(type)));
+			}
+
+			IdeLog.logWarning(
+					JSPlugin.getDefault(),
+					new IllegalArgumentException(MessageFormat.format(
+							"Bad type name being set, something is going haywire: ''{0}''", type))); //$NON-NLS-1$
+
+			int index = type.indexOf(',');
+			if (index != -1)
+			{
+				return type.substring(0, index);
+			}
+			return StringUtil.EMPTY;
+		}
+		return type;
 	}
 
 	/**
@@ -483,7 +585,7 @@ public class JSTypeUtil
 	}
 
 	/**
-	 * getUniqueTypeName
+	 * Generates a random unique type name.
 	 * 
 	 * @return
 	 */
@@ -505,7 +607,7 @@ public class JSTypeUtil
 	}
 
 	/**
-	 * isFunctionPrefix
+	 * Does this type string look like it's a function that returns types?
 	 * 
 	 * @param type
 	 * @return
@@ -524,22 +626,31 @@ public class JSTypeUtil
 		return result;
 	}
 
+	public static String toFunctionType(Collection<String> returnTypes)
+	{
+		if (CollectionsUtil.isEmpty(returnTypes))
+		{
+			return JSTypeConstants.FUNCTION_TYPE;
+		}
+		return JSTypeConstants.GENERIC_FUNCTION_OPEN
+				+ StringUtil.join(JSTypeConstants.RETURN_TYPE_DELIMITER, returnTypes) + JSTypeConstants.GENERIC_CLOSE;
+	}
+
 	/**
-	 * toFunctionType
+	 * Wraps the given string (assumed to be a single type name, or a list of return types delimited by
+	 * {@link JSTypeConstants#RETURN_TYPE_DELIMITER}) in between "Function<" and ">". Use {@link #toFunctionType(List)}
+	 * if you have a collection of type names.
 	 * 
 	 * @param type
 	 * @return
 	 */
 	public static String toFunctionType(String type)
 	{
-		String result = type;
-
-		if (!isFunctionPrefix(type))
+		if (type == null || type.length() == 0)
 		{
-			result = JSTypeConstants.GENERIC_FUNCTION_OPEN + type + JSTypeConstants.GENERIC_CLOSE;
+			return JSTypeConstants.FUNCTION_TYPE;
 		}
-
-		return result;
+		return JSTypeConstants.GENERIC_FUNCTION_OPEN + type + JSTypeConstants.GENERIC_CLOSE;
 	}
 
 	/**

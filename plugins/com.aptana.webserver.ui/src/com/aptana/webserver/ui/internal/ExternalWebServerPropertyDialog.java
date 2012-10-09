@@ -317,7 +317,11 @@ public class ExternalWebServerPropertyDialog extends TitleAreaDialog implements 
 	private void validate()
 	{
 		boolean valid = isValid();
-		getButton(OK).setEnabled(valid);
+		Button okButton = getButton(OK);
+		if (okButton != null)
+		{
+			okButton.setEnabled(valid);
+		}
 	}
 
 	protected void addListeners()

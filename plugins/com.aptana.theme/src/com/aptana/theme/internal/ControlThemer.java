@@ -38,8 +38,8 @@ import com.aptana.theme.preferences.IPreferenceConstants;
 class ControlThemer implements IControlThemer
 {
 
-	protected static final boolean isWindows = Platform.getOS().equals(Platform.OS_WIN32);
-	protected static final boolean isMacOSX = Platform.getOS().equals(Platform.OS_MACOSX);
+	protected static final boolean isWindows = PlatformUtil.isWindows();
+	protected static final boolean isMacOSX = PlatformUtil.isMac();
 	protected static final boolean isCocoa = Platform.getWS().equals(Platform.WS_COCOA);
 	protected static final boolean isUbuntu = PlatformUtil.isOSName("Ubuntu"); //$NON-NLS-1$
 

@@ -9,10 +9,12 @@ package com.aptana.editor.js.contentassist;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -64,6 +66,7 @@ import com.aptana.editor.js.parsing.ast.JSParseRootNode;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import com.aptana.index.core.Index;
 import com.aptana.parsing.ParserPoolFactory;
+import com.aptana.parsing.ast.INameNode;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Lexeme;
@@ -456,17 +459,84 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	protected void addThisProperties(Set<ICompletionProposal> proposals, int offset)
 	{
 		// find containing function or JSParseRootNode
-		IParseNode node = getActiveASTNode(offset);
+		IParseNode activeNode = getActiveASTNode(offset);
 
-		while (!(node instanceof JSFunctionNode) && !(node instanceof JSParseRootNode))
+		while (!(activeNode instanceof JSFunctionNode))
 		{
-			node = node.getParent();
+			activeNode = activeNode.getParent();
+			if (activeNode instanceof JSParseRootNode)
+			{
+				// If we've gotten to the root, just bail out.
+				return;
+			}
+		}
+		JSFunctionNode currentFunctionNode = (JSFunctionNode) activeNode;
+
+		String functionName = getFunctionName(currentFunctionNode);
+
+		if (functionName != null)
+		{
+			functionName = StringUtil.dotFirst(functionName).trim();
+			if (functionName.length() == 0)
+			{
+				// Empty name
+				functionName = null;
+			}
 		}
 
-		if (node instanceof JSFunctionNode)
+		List<JSFunctionNode> functionsToAnalyze;
+		if (functionName == null)
 		{
-			JSFunctionNode function = (JSFunctionNode) node;
+			// Unable to get a name for the current function: don't try to find any other
+			// JS prototypes.
+			functionsToAnalyze = Arrays.asList(currentFunctionNode);
+		}
+		else
+		{
+			// We want to match the following:
+			// myFunc function(){...}
+			// myFunc = function(){...}
+			// myFunc.prototype.foo = function(){...}
+			IParseNode parent = currentFunctionNode.getParent();
+			if(parent.getNodeType() == IJSNodeTypes.ASSIGN){
+				parent = parent.getParent();
+			}
+			IParseNode[] children = parent.getChildren();
+			functionsToAnalyze = new LinkedList<JSFunctionNode>();
+			for (int i = 0; i < children.length; i++)
+			{
+				String childName = null;
+				IParseNode childNode = children[i];
+				JSFunctionNode jsFunctionNode = null;
+				if (childNode instanceof JSFunctionNode)
+				{
+					jsFunctionNode = (JSFunctionNode) childNode;
+					childName = jsFunctionNode.getNameNode().getName();
 
+				}
+				else if (childNode.getNodeType() == IJSNodeTypes.ASSIGN)
+				{
+					JSAssignmentNode assignmentNode = (JSAssignmentNode) childNode;
+					IParseNode rightHandSide = assignmentNode.getRightHandSide();
+					if (rightHandSide instanceof JSFunctionNode)
+					{
+						jsFunctionNode = (JSFunctionNode) rightHandSide;
+						childName = getAssignmentLeftNodeName(assignmentNode);
+					}
+				}
+
+				if (childName != null && jsFunctionNode != null)
+				{
+					if (StringUtil.dotFirst(childName).equals(functionName))
+					{
+						functionsToAnalyze.add(jsFunctionNode);
+					}
+				}
+			}
+		}
+
+		for (JSFunctionNode function : functionsToAnalyze)
+		{
 			// collect all this.property assignments
 			ThisAssignmentCollector collector = new ThisAssignmentCollector();
 			((JSNode) function.getBody()).accept(collector);
@@ -512,6 +582,52 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				}
 			}
 		}
+	}
+
+	/**
+	 * Given a function node, discover its name either declared directly or through a parent assign to the function
+	 * (i.e.: myFunc function(){} or myFunc = function(){...}). May return null if unable to get the name.
+	 */
+	private String getFunctionName(JSFunctionNode currentFunctionNode)
+	{
+		String functionName = null;
+		// Discover the name context name of where we are (function or assign to function).
+		INameNode nameNode = currentFunctionNode.getNameNode();
+		if (nameNode.getName().length() == 0)
+		{
+			IParseNode functionParent = currentFunctionNode.getParent();
+			if (functionParent.getNodeType() == IJSNodeTypes.ASSIGN)
+			{
+				functionName = getAssignmentLeftNodeName((JSAssignmentNode) functionParent);
+			}
+		}
+		else
+		{
+			// Found as: myFunc function(){...}
+			functionName = nameNode.getName();
+		}
+		return functionName;
+	}
+
+	//@formatter:off 
+	/**
+	 * @return the left-hand side name we can discover in an assign
+	 * I.e.: something as: 
+	 * 
+	 * myFunc = function(){...}
+	 * myFunc.prototype.foo = function(){...} 
+	 * 
+	 * Will return myFunc / myFunc.prototype.foo
+	 */
+	//@formatter:on
+	private String getAssignmentLeftNodeName(JSAssignmentNode assignmentNode)
+	{
+		IParseNode leftHandSide = assignmentNode.getLeftHandSide();
+		if (leftHandSide.getNodeType() == IJSNodeTypes.GET_PROPERTY)
+		{
+			return leftHandSide.toString();
+		}
+		return null;
 	}
 
 	/**

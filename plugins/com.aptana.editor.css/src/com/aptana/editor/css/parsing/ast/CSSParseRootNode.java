@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -18,14 +18,12 @@ import com.aptana.parsing.ast.ParseRootNode;
 public class CSSParseRootNode extends ParseRootNode
 {
 
-	private static final Symbol[] NO_SYMBOLS = new Symbol[0];
-
 	/**
 	 * CSSParseRootNode
 	 */
 	public CSSParseRootNode()
 	{
-		this(NO_SYMBOLS);
+		this(null);
 	}
 
 	/**
@@ -35,11 +33,7 @@ public class CSSParseRootNode extends ParseRootNode
 	 */
 	public CSSParseRootNode(Symbol[] children)
 	{
-		super( //
-				ICSSConstants.CONTENT_TYPE_CSS, //
-				(children != null) ? children : NO_SYMBOLS, //
-				(children != null && children.length > 0) ? children[0].getStart() : 0, //
-				(children != null && children.length > 0) ? children[children.length - 1].getEnd() : 0);
+		super(ICSSConstants.CONTENT_TYPE_CSS, children);
 	}
 
 	public void accept(CSSTreeWalker walker)

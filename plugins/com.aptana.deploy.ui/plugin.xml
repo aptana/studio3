@@ -95,6 +95,7 @@
                   style="push">
                <visibleWhen
                      checkEnabled="false">
+                  <or>
                   <with
                         variable="selection">
                      <iterate
@@ -118,6 +119,33 @@
                         </and>
                      </iterate>
                   </with>
+                  <and>
+                     <with
+                           variable="activePart">
+                        <instanceof
+                              value="org.eclipse.ui.IEditorPart">
+                        </instanceof>
+                     </with>
+                     <with
+                           variable="activeEditorInput">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <not>
+                              <or>
+                                 <test
+                                       property="org.eclipse.core.resources.projectNature"
+                                       value="com.appcelerator.titanium.desktop.nature">
+                                 </test>
+                                 <test
+                                       property="org.eclipse.core.resources.projectNature"
+                                       value="com.appcelerator.titanium.mobile.nature">
+                                 </test>
+                              </or>
+                           </not>
+                        </adapt>
+                     </with>
+                  </and>
+                  </or>
                </visibleWhen>
             </command>
          </menuContribution>

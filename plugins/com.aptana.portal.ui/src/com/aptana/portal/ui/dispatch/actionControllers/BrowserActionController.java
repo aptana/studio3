@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,26 +20,23 @@ import java.util.Set;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
-import org.eclipse.ui.internal.browser.BrowserDescriptorWorkingCopy;
-import org.eclipse.ui.internal.browser.BrowserManager;
-import org.eclipse.ui.internal.browser.IBrowserDescriptor;
 
 import com.aptana.configurations.processor.ConfigurationStatus;
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.BrowserUtil;
-import com.aptana.core.util.BrowserUtil.BrowserInfo;
+import com.aptana.core.util.IBrowserUtil.BrowserInfo;
 import com.aptana.jetty.util.epl.ajax.JSON;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.browser.PortalBrowserEditor;
 import com.aptana.portal.ui.dispatch.IBrowserNotificationConstants;
 import com.aptana.portal.ui.internal.Portal;
+import com.aptana.ui.BrowserManager;
+import com.aptana.ui.util.WorkbenchBrowserUtil;
 
 /**
  * An action controller for browser-related actions.
  * 
  * @author Shalom Gibly <sgibly@appcelerator.com>
  */
-@SuppressWarnings("restriction")
 public class BrowserActionController extends AbstractActionController
 {
 	// ////////////////////////// Actions /////////////////////////////
@@ -58,6 +56,31 @@ public class BrowserActionController extends AbstractActionController
 			url = getURL(attributes);
 		}
 		Portal.getInstance().openPortal(url, PortalBrowserEditor.WEB_BROWSER_EDITOR_ID, false, null);
+		return IBrowserNotificationConstants.JSON_OK;
+	}
+
+	/**
+	 * Opens an internal/external browser with the URL that is given in the attributes. The browser selection follows
+	 * the Studio's browsers setting.
+	 * 
+	 * @param attributes
+	 *            We expect for an array that contains a single string URL.
+	 * @return {@link IBrowserNotificationConstants#JSON_OK} or a {@link IBrowserNotificationConstants#JSON_ERROR}
+	 * @since Aptana Studio 3.3.0
+	 */
+	@ControllerAction
+	public Object openURL(Object attributes)
+	{
+		URL url = getURL(attributes);
+		if (url == null)
+		{
+			return IBrowserNotificationConstants.JSON_ERROR;
+		}
+		boolean ok = WorkbenchBrowserUtil.openURL(url.toString()) != null;
+		if (!ok)
+		{
+			return IBrowserNotificationConstants.JSON_ERROR;
+		}
 		return IBrowserNotificationConstants.JSON_OK;
 	}
 
@@ -148,7 +171,14 @@ public class BrowserActionController extends AbstractActionController
 	@ControllerAction
 	public Object getConfiguredBrowsers()
 	{
-		return JSON.toString(getCurrentBrowsers());
+		Map<String, String> browsers = new HashMap<String, String>(6);
+		List<BrowserInfo> webBrowsers = BrowserManager.getInstance().getWebBrowsers();
+		for (BrowserInfo descriptor : webBrowsers)
+		{
+			browsers.put(resolveBrowserLocation(descriptor.getLocation()), descriptor.getName());
+		}
+
+		return JSON.toString(browsers);
 	}
 
 	/**
@@ -171,40 +201,13 @@ public class BrowserActionController extends AbstractActionController
 	@ControllerAction
 	public Object configureBrowsers()
 	{
-		Map<String, String> currentBrowsers = getCurrentBrowsers();
-		List<BrowserInfo> discoverInstalledBrowsers = BrowserUtil.discoverInstalledBrowsers();
 		Map<String, String> result = new HashMap<String, String>(6);
-		for (BrowserInfo browserInfo : discoverInstalledBrowsers)
+		Collection<BrowserInfo> browsersFound = BrowserManager.getInstance().searchMoreBrowsers();
+		for (BrowserInfo browserInfo : browsersFound)
 		{
-			String browserLocation = resolveBrowserLocation(browserInfo.browserLocation);
-			if (!currentBrowsers.containsKey(browserLocation))
-			{
-				currentBrowsers.put(browserLocation, browserInfo.browserName);
-				BrowserDescriptorWorkingCopy workingCopy = new BrowserDescriptorWorkingCopy();
-				workingCopy.setName(browserInfo.browserName);
-				workingCopy.setLocation(browserInfo.browserLocation);
-				workingCopy.save();
-				result.put(browserLocation, browserInfo.browserName);
-			}
+			result.put(resolveBrowserLocation(browserInfo.getLocation()), browserInfo.getName());
 		}
 		return JSON.toString(result);
-	}
-
-	/**
-	 * Returns the locations and names for all the current browsers that the Eclipse BrowserManager knows about.
-	 * 
-	 * @return A map of all the known browsers (location to name mapping).
-	 */
-	@SuppressWarnings({ "unchecked" })
-	private static Map<String, String> getCurrentBrowsers()
-	{
-		Map<String, String> browsers = new HashMap<String, String>(6);
-		List<IBrowserDescriptor> webBrowsers = BrowserManager.getInstance().getWebBrowsers();
-		for (IBrowserDescriptor descriptor : webBrowsers)
-		{
-			browsers.put(resolveBrowserLocation(descriptor.getLocation()), descriptor.getName());
-		}
-		return browsers;
 	}
 
 	/**

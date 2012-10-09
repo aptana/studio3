@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -13,24 +13,33 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.SWTError;
+import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.LocationAdapter;
 import org.eclipse.swt.browser.LocationEvent;
+import org.eclipse.swt.browser.OpenWindowListener;
 import org.eclipse.swt.browser.ProgressAdapter;
 import org.eclipse.swt.browser.ProgressEvent;
 import org.eclipse.swt.browser.TitleEvent;
 import org.eclipse.swt.browser.TitleListener;
+import org.eclipse.swt.browser.WindowEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.internal.browser.BrowserViewer;
 import org.eclipse.ui.internal.browser.WebBrowserEditorInput;
 import org.eclipse.ui.part.EditorPart;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.BrowserNotifier;
 import com.aptana.portal.ui.dispatch.IBrowserNotificationConstants;
@@ -39,6 +48,9 @@ import com.aptana.portal.ui.internal.BrowserFunctionWrapper;
 import com.aptana.portal.ui.internal.BrowserViewerWrapper;
 import com.aptana.portal.ui.internal.BrowserWrapper;
 import com.aptana.portal.ui.internal.startpage.IStartPageUISystemProperties;
+import com.aptana.ui.dialogs.HyperlinkMessageDialog;
+import com.aptana.ui.util.UIUtils;
+import com.aptana.ui.util.WorkbenchBrowserUtil;
 
 /**
  * A portal browser editor.
@@ -49,6 +61,8 @@ import com.aptana.portal.ui.internal.startpage.IStartPageUISystemProperties;
 @SuppressWarnings("restriction")
 public abstract class AbstractPortalBrowserEditor extends EditorPart
 {
+
+	private static final String BROWSER_DOCS = "http://go.aptana.com/troubleshooting_linux"; //$NON-NLS-1$
 
 	private static final String BROWSER_SWT = "swt"; //$NON-NLS-1$
 	private static final String BROWSER_CHROMIUM = "chromium"; //$NON-NLS-1$
@@ -84,48 +98,110 @@ public abstract class AbstractPortalBrowserEditor extends EditorPart
 	 */
 	public void addDisposeListener(DisposeListener listener)
 	{
-		browser.addDisposeListener(listener);
+		if (browser != null)
+		{
+			browser.addDisposeListener(listener);
+		}
 	}
 
 	@Override
 	public void createPartControl(Composite parent)
 	{
-		browserViewer = createBrowserViewer(parent);
-		browser = new BrowserWrapper(browserViewer.getBrowser());
-		browser.setJavascriptEnabled(true);
-
-		// Usually, we would just listen to a location change. However, since IE
-		// does not
-		// behave well with notifying us when hitting refresh (F5), we have to
-		// do it on
-		// a title change (which should work for all browsers)
-		browser.addTitleListener(new PortalTitleListener());
-
-		// Register a location listener anyway, just to make sure that the
-		// functions are
-		// removed when we have a location change.
-		// The title-listener will place them back in when the TitleEvent is
-		// fired.
-		browser.addProgressListener(new ProgressAdapter()
+		try
 		{
-			public void completed(ProgressEvent event)
-			{
-				browser.addLocationListener(new LocationAdapter()
-				{
-					public void changed(LocationEvent event)
-					{
-						// browser.removeLocationListener(this);
-						refreshBrowserRegistration();
+			browserViewer = createBrowserViewer(parent);
+			final Browser browserControl = (Browser) browserViewer.getBrowser();
+			browser = new BrowserWrapper(browserControl);
 
+			// Add a listener for new browser windows. If new ones are opened, close it and open in an external
+			// browser
+			browserControl.addOpenWindowListener(new OpenWindowListener()
+			{
+				public void open(WindowEvent event)
+				{
+					Browser newBrowser = event.browser;
+					final BrowserViewer browserContainer = new BrowserViewer(browserControl.getShell(), browserControl
+							.getStyle());
+					event.browser = browserContainer.getBrowser();
+
+					// Close the new browser window that was opened by previous listener
+					newBrowser.getShell().close();
+					event.required = true; // avoid opening new windows.
+
+	
+					if (newBrowser != browserControl)
+					{
+						LocationAdapter locationAdapter = new LocationAdapter()
+						{
+
+							public void changing(LocationEvent event)
+							{
+								final String url = event.location;
+								if (!StringUtil.isEmpty(url))
+								{
+									WorkbenchBrowserUtil.openURL(url);
+								}
+								// The location change listener has to be removed as it might
+								// be triggered again when we open new browser editor tab.
+								browserContainer.getBrowser().removeLocationListener(this);
+							}
+						};
+						browserContainer.getBrowser().addLocationListener(locationAdapter);
 					}
-				});
-			}
-		});
-		browser.setUrl(initialURL);
-		// Register this browser to receive notifications from any
-		// Browser-Notifier that was
-		// added to do so through the browserInteractions extension point.
-		BrowserNotifier.getInstance().registerBrowser(getSite().getId(), browser);
+				}
+			});
+
+			browser.setJavascriptEnabled(true);
+
+			// Usually, we would just listen to a location change. However, since IE
+			// does not
+			// behave well with notifying us when hitting refresh (F5), we have to
+			// do it on
+			// a title change (which should work for all browsers)
+			browser.addTitleListener(new PortalTitleListener());
+
+			// Register a location listener anyway, just to make sure that the
+			// functions are
+			// removed when we have a location change.
+			// The title-listener will place them back in when the TitleEvent is
+			// fired.
+			browser.addProgressListener(new ProgressAdapter()
+			{
+				public void completed(ProgressEvent event)
+				{
+					browser.addLocationListener(new LocationAdapter()
+					{
+						public void changed(LocationEvent event)
+						{
+							// browser.removeLocationListener(this);
+							refreshBrowserRegistration();
+
+						}
+					});
+				}
+			});
+			browser.setUrl(initialURL);
+			// Register this browser to receive notifications from any
+			// Browser-Notifier that was
+			// added to do so through the browserInteractions extension point.
+			BrowserNotifier.getInstance().registerBrowser(getSite().getId(), browser);
+		}
+		catch (SWTError e)
+		{
+			// Open a dialog pointing user at docs for workaround
+			HyperlinkMessageDialog dialog = new HyperlinkMessageDialog(UIUtils.getActiveShell(),
+					Messages.AbstractPortalBrowserEditor_ErrorTitle, null,
+					Messages.AbstractPortalBrowserEditor_ErrorMsg, MessageDialog.ERROR,
+					new String[] { IDialogConstants.OK_LABEL }, 0, null)
+			{
+				@Override
+				protected void openLink(SelectionEvent e)
+				{
+					WorkbenchBrowserUtil.launchExternalBrowser(BROWSER_DOCS);
+				}
+			};
+			dialog.open();
+		}
 	}
 
 	private static BrowserViewerWrapper createBrowserViewer(Composite parent)
@@ -159,12 +235,13 @@ public abstract class AbstractPortalBrowserEditor extends EditorPart
 	{
 		if (Platform.ARCH_X86.equals(Platform.getOSArch()))
 		{
-			return /*Platform.OS_WIN32.equals(Platform.getOS())  || Platform.OS_MACOSX.equals(Platform.getOS()) 
-					||*/ Platform.OS_LINUX.equals(Platform.getOS());
+			return /*
+					 * Platform.OS_WIN32.equals(Platform.getOS()) || Platform.OS_MACOSX.equals(Platform.getOS()) ||
+					 */Platform.OS_LINUX.equals(Platform.getOS());
 		}
 		else if (Platform.ARCH_X86_64.equals(Platform.getOSArch()))
 		{
-			return Platform.OS_LINUX.equals(Platform.getOS());
+			return false;//Platform.OS_LINUX.equals(Platform.getOS());
 		}
 		return false;
 	}
@@ -247,7 +324,10 @@ public abstract class AbstractPortalBrowserEditor extends EditorPart
 	@Override
 	public void setFocus()
 	{
-		browser.setFocus();
+		if (browser != null)
+		{
+			browser.setFocus();
+		}
 	}
 
 	public boolean isDisposed()

@@ -196,7 +196,7 @@ public class FileUtilTest extends TestCase
 
 	public void testCountFilesWithDirectory() throws Exception
 	{
-		File dir = new File(System.getProperty("java.io.tmpdir"), "count_dir_" + System.currentTimeMillis());
+		File dir = new File(FileUtil.getTempDirectory().toOSString(), "count_dir_" + System.currentTimeMillis());
 		try
 		{
 			dir.mkdirs();
@@ -215,7 +215,7 @@ public class FileUtilTest extends TestCase
 
 	public void testCountFilesWithMultipleDirectories() throws Exception
 	{
-		File dir = new File(System.getProperty("java.io.tmpdir"), "count_dir_" + System.currentTimeMillis());
+		File dir = new File(FileUtil.getTempDirectory().toOSString(), "count_dir_" + System.currentTimeMillis());
 		try
 		{
 			dir.mkdirs();
@@ -243,7 +243,7 @@ public class FileUtilTest extends TestCase
 
 	public void testCountFilesWithMultipleDirectoriesAndSymlinkLoop() throws Exception
 	{
-		File dir = new File(System.getProperty("java.io.tmpdir"), "count_dir_" + System.currentTimeMillis());
+		File dir = new File(FileUtil.getTempDirectory().toOSString(), "count_dir_" + System.currentTimeMillis());
 		try
 		{
 			dir.mkdirs();

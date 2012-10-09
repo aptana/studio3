@@ -543,7 +543,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 				return Status.OK_STATUS;
 			}
 		};
-		job.setSystem(true);
+		EclipseUtil.setSystemForJob(job);
 		job.setPriority(Job.BUILD);
 		job.schedule(250);
 
@@ -900,7 +900,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 				delta.accept(new IResourceDeltaVisitor()
 				{
 
-					public boolean visit(IResourceDelta delta) throws CoreException
+					public boolean visit(final IResourceDelta delta) throws CoreException
 					{
 						IResource resource = delta.getResource();
 						if (resource.getType() == IResource.FILE || resource.getType() == IResource.FOLDER)
@@ -918,16 +918,14 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 									|| (delta.getKind() == IResourceDelta.CHANGED
 											&& (delta.getFlags() & IResourceDelta.OPEN) != 0 && resource.isAccessible()))
 							{
-								// Add to the projects menu and then switch to
-								// it!
+								// Add to the projects menu and then switch to it!
 								final String projectName = resource.getName();
 								Display.getDefault().asyncExec(new Runnable()
 								{
 
 									public void run()
 									{
-										// Construct the menu item to for this
-										// project
+										// Construct the menu item to for this project
 										// Insert in alphabetical order
 										int index = projectsMenu.getItemCount();
 										MenuItem[] items = projectsMenu.getItems();
@@ -954,7 +952,8 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 										final MenuItem projectNameMenuItem = new MenuItem(projectsMenu, SWT.RADIO,
 												index);
 										projectNameMenuItem.setText(projectName);
-										projectNameMenuItem.setSelection(true);
+										projectNameMenuItem.setImage(PlatformUI.getWorkbench().getSharedImages()
+												.getImage(org.eclipse.ui.ide.IDE.SharedImages.IMG_OBJ_PROJECT));
 										projectNameMenuItem.addSelectionListener(new SelectionAdapter()
 										{
 											public void widgetSelected(SelectionEvent e)
@@ -965,8 +964,14 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 														.getProject(projectName));
 											}
 										});
-										setActiveProject(ResourcesPlugin.getWorkspace().getRoot()
-												.getProject(projectName));
+										// only switch the active project if a project is added, not when a project is
+										// opened
+										if (delta.getKind() == IResourceDelta.ADDED)
+										{
+											projectNameMenuItem.setSelection(true);
+											setActiveProject(ResourcesPlugin.getWorkspace().getRoot()
+													.getProject(projectName));
+										}
 										projectToolItem.getParent().pack(true);
 									}
 								});
@@ -974,7 +979,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 							else if (delta.getKind() == IResourceDelta.REMOVED
 									|| (delta.getKind() == IResourceDelta.CHANGED
 											&& (delta.getFlags() & IResourceDelta.OPEN) != 0 && !resource
-											.isAccessible()))
+												.isAccessible()))
 							{
 								// Remove from menu and if it was the active
 								// project, switch away from it!

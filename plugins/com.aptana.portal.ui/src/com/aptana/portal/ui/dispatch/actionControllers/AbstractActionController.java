@@ -18,6 +18,7 @@ import com.aptana.configurations.processor.ConfigurationProcessorsRegistry;
 import com.aptana.configurations.processor.IConfigurationProcessor;
 import com.aptana.configurations.processor.IConfigurationProcessorListener;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.jetty.util.epl.ajax.JSON;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.BrowserNotifier;
 import com.aptana.portal.ui.dispatch.IActionController;
@@ -139,6 +140,19 @@ public abstract class AbstractActionController implements IActionController, ICo
 	public void setConfigurationProcessorId(String id)
 	{
 		configurationProcessorID = id;
+	}
+
+	/**
+	 * Basic action that exists on every action-controller and returns a list of supported actions.
+	 * 
+	 * @return A JSON array containing the supported action-names.
+	 * @since Aptana Studio 3.3.0
+	 */
+	@ControllerAction
+	public Object listActions()
+	{
+		Set<String> keySet = getActionsMap().keySet();
+		return JSON.toString(keySet.toArray(new String[keySet.size()]));
 	}
 
 	/**

@@ -221,8 +221,10 @@
 		<p2.mirror destination="file:${repoBaseLocation}/mirrored">
 			<source location="${libraries-com.p2.repo}" />
 			<source location="${webkit.p2.repo}" />
+			<!-- <source location="${patch.p2.repo}" /> -->
 			<iu id="com.aptana.ide.feature.libraries.subscription.feature.group" />
 			<iu id="com.aptana.webkitbrowser.feature.group" />
+			<!-- <iu id="org.eclipse.ui.workbench.patch.feature.feature.group" /> -->
 		</p2.mirror>
 	</target>
 
@@ -237,7 +239,7 @@
 	<!-- ===================================================================== -->
 	<!-- Steps to do to publish the build results -->
 	<!-- ===================================================================== -->
-	<target name="publish" depends="wipe.deploy.dir, publish.javadocs">
+	<target name="publish" depends="wipe.deploy.dir, publish.javadocs" unless="dont.deploy">
 		<!-- grab final version -->
 		<property file="${buildDirectory}/finalFeaturesVersions.properties" />
 		<propertycopy name="finalVersion" from="${topLevelElementId}" />
@@ -256,7 +258,7 @@
 	</target>
 
 	<!-- Wipe and rebuild the deploy directory. -->
-	<target name="wipe.deploy.dir">
+	<target name="wipe.deploy.dir" unless="dont.deploy">
 		<delete dir="${deploy.dir}" failonerror="false" />
 		<mkdir dir="${deploy.dir}" />
 	</target>
@@ -264,7 +266,7 @@
 	<!-- ===================================================================== -->
 	<!-- Steps to do to generate Javadocs -->
 	<!-- ===================================================================== -->
-	<target name="publish.javadocs" if="generate.javadocs">
+	<target name="publish.javadocs" if="generate.javadocs" unless="dont.deploy">
 		<!-- Hack together the classpath for our plugins -->
 		<path id="javadoc.classpath">
 			<!-- Eclipse plugins -->

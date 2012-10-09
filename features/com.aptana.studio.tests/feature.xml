@@ -49,7 +49,6 @@
       <import plugin="com.aptana.syncing.core"/>
       <import plugin="com.aptana.syncing.ui"/>
       <import plugin="com.aptana.theme"/>
-      <import plugin="com.aptana.plist"/>
       <import plugin="com.aptana.editor.markdown"/>
       <import plugin="com.aptana.org.eclipse.tm.terminal" version="3.0.100" match="greaterOrEqual"/>
       <import plugin="com.aptana.filesystem.s3"/>
@@ -228,14 +227,6 @@
 
    <plugin
          id="com.aptana.theme.tests"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="com.aptana.plist.tests"
          download-size="0"
          install-size="0"
          version="0.0.0"

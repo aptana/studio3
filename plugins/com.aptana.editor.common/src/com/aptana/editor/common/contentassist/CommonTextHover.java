@@ -33,6 +33,7 @@ import com.aptana.theme.ThemePlugin;
 
 public abstract class CommonTextHover extends AbstractDocumentationHover
 {
+	protected static final String BASE_HELP_DOCS_URL = "/com.aptana.documentation/html/reference/api/"; //$NON-NLS-1$
 	private static ThemeListener themeListener = new ThemeListener();
 
 	/**

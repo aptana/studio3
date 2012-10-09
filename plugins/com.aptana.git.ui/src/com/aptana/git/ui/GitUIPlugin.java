@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -23,9 +23,11 @@ import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.progress.UIJob;
@@ -38,7 +40,9 @@ import com.aptana.git.core.IDebugScopes;
 import com.aptana.git.core.IPreferenceConstants;
 import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.PortableGit;
+import com.aptana.git.ui.internal.CachedImageDescriptor;
 import com.aptana.git.ui.internal.GitColors;
+import com.aptana.git.ui.internal.GitLightweightDecorator;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.ThemePlugin;
 import com.aptana.ui.IDialogConstants;
@@ -77,21 +81,25 @@ public class GitUIPlugin extends AbstractUIPlugin
 		plugin = this;
 
 		// Listen for theme changes and force the quick diff colors to match our git diff colors.
-		themeChangeListener = new QuickDiffColorer();
 		Job job = new Job("Run any work in a delayed job to avoid slowing startup!") //$NON-NLS-1$
 		{
-			
+
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
-				EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(themeChangeListener);
+				if (themeChangeListener == null)
+				{
+					themeChangeListener = new QuickDiffColorer();
+				}
+				EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID)
+						.addPreferenceChangeListener(themeChangeListener);
 				themeChangeListener.forceColors();
 
 				checkHasGit();
 				return Status.OK_STATUS;
 			}
 		};
-		job.setSystem(true);
+		EclipseUtil.setSystemForJob(job);
 		job.schedule();
 	}
 
@@ -149,15 +157,16 @@ public class GitUIPlugin extends AbstractUIPlugin
 
 	public static Image getImage(String string)
 	{
-		if (getDefault().getImageRegistry().get(string) == null)
+		ImageRegistry imageRegistry = getDefault().getImageRegistry();
+		if (imageRegistry.get(string) == null)
 		{
 			ImageDescriptor id = imageDescriptorFromPlugin(getPluginId(), string);
 			if (id != null)
 			{
-				getDefault().getImageRegistry().put(string, id);
+				imageRegistry.put(string, id);
 			}
 		}
-		return getDefault().getImageRegistry().get(string);
+		return imageRegistry.get(string);
 	}
 
 	private final class GitInstallationValidatorJob extends UIJob
@@ -271,11 +280,22 @@ public class GitUIPlugin extends AbstractUIPlugin
 
 		protected void forceColors()
 		{
-			PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
+
+			UIUtils.runInUIThread(new Runnable()
 			{
+
+				String greenBGString;
+				String redBGString;
 
 				public void run()
 				{
+					RGB greenBG = GitColors.greenBG().getRGB();
+					greenBGString = StringConverter.asString(greenBG);
+					RGB redBG = GitColors.redBG().getRGB();
+					redBGString = StringConverter.asString(redBG);
+
+					JFaceResources.getColorRegistry().put("CONFLICTING_COLOR", redBG); //$NON-NLS-1$
+					JFaceResources.getColorRegistry().put("RESOLVED_COLOR", greenBG); //$NON-NLS-1$
 					setQuickDiffColors(EclipseUtil.instanceScope().getNode("com.aptana.editor.common")); //$NON-NLS-1$
 					if (ThemePlugin.applyToAllEditors())
 					{
@@ -285,15 +305,13 @@ public class GitUIPlugin extends AbstractUIPlugin
 
 				protected void setQuickDiffColors(IEclipsePreferences prefs)
 				{
-					prefs.put("changeIndicationColor", StringConverter.asString(GitColors.greenBG().getRGB())); //$NON-NLS-1$
-					prefs.put("additionIndicationColor", StringConverter.asString(GitColors.greenBG().getRGB())); //$NON-NLS-1$
-					prefs.put("deletionIndicationColor", StringConverter.asString(GitColors.redBG().getRGB())); //$NON-NLS-1$
+					prefs.put("changeIndicationColor", greenBGString); //$NON-NLS-1$
+					prefs.put("additionIndicationColor", greenBGString); //$NON-NLS-1$
+					prefs.put("deletionIndicationColor", redBGString); //$NON-NLS-1$
 					// APSTUD-4152
 					// See ThemeManager#setCurrentTheme() for outgoing/incoming diff/compare colors
-					JFaceResources.getColorRegistry().put("CONFLICTING_COLOR", GitColors.redBG().getRGB()); //$NON-NLS-1$
-					JFaceResources.getColorRegistry().put("RESOLVED_COLOR", GitColors.greenBG().getRGB()); //$NON-NLS-1$
-					prefs.put("CONFLICTING_COLOR", StringConverter.asString(GitColors.redBG().getRGB())); //$NON-NLS-1$
-					prefs.put("RESOLVED_COLOR", StringConverter.asString(GitColors.greenBG().getRGB())); //$NON-NLS-1$
+					prefs.put("CONFLICTING_COLOR", redBGString); //$NON-NLS-1$
+					prefs.put("RESOLVED_COLOR", greenBGString); //$NON-NLS-1$
 
 					try
 					{
@@ -306,5 +324,21 @@ public class GitUIPlugin extends AbstractUIPlugin
 				}
 			});
 		}
+	}
+
+	@Override
+	protected void initializeImageRegistry(ImageRegistry reg)
+	{
+		super.initializeImageRegistry(reg);
+
+		// Set up the images we use for git decorations
+		reg.put(GitLightweightDecorator.STAGED_ADDED_IMAGE,
+				new CachedImageDescriptor(imageDescriptorFromPlugin(PLUGIN_ID,
+						GitLightweightDecorator.STAGED_ADDED_IMAGE)));
+		reg.put(GitLightweightDecorator.STAGED_REMOVED_IMAGE,
+				new CachedImageDescriptor(imageDescriptorFromPlugin(PLUGIN_ID,
+						GitLightweightDecorator.STAGED_REMOVED_IMAGE)));
+		reg.put(GitLightweightDecorator.UNTRACKED_IMAGE,
+				new CachedImageDescriptor(imageDescriptorFromPlugin(PLUGIN_ID, GitLightweightDecorator.UNTRACKED_IMAGE)));
 	}
 }

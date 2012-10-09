@@ -47,6 +47,14 @@ module Ruble
       @jobj.description
     end
     
+    def tags=(tags)
+      @jobj.tags = tags
+    end
+    
+    def tags
+      @tags.tags
+    end
+
     class << self
       def define_template(name, &block)
         log_info("loading project template #{name}")

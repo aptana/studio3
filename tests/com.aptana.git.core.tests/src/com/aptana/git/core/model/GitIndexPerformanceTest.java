@@ -76,6 +76,51 @@ public class GitIndexPerformanceTest extends GitTestCase
 		}
 	}
 
+	public void testRefreshWithListeners() throws Exception
+	{
+		GitRepository repo = getRepo();
+		repo.addListener(new IGitRepositoryListener()
+		{
+
+			public void pushed(PushEvent e)
+			{
+			}
+
+			public void pulled(PullEvent e)
+			{
+			}
+
+			public void indexChanged(IndexChangedEvent e)
+			{
+			}
+
+			public void branchRemoved(BranchRemovedEvent e)
+			{
+			}
+
+			public void branchChanged(BranchChangedEvent e)
+			{
+			}
+
+			public void branchAdded(BranchAddedEvent e)
+			{
+			}
+		});
+		// Write 1000 small files to the repo
+		writeFiles(repo.workingDirectory(), 1000);
+
+		GitIndex index = repo.index();
+		for (int i = 0; i < 120; i++)
+		{
+			startMeasuring();
+			index.refresh(null);
+			stopMeasuring();
+			writeFiles(repo.workingDirectory(), 1000);
+		}
+		commitMeasurements();
+		assertPerformance();
+	}
+
 	protected void startMeasuring()
 	{
 		fPerformanceMeter.start();

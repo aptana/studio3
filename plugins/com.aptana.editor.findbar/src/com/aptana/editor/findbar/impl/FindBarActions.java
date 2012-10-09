@@ -685,6 +685,9 @@ public class FindBarActions
 					dec.searchSelection);
 			updateTooltip(SHOW_OPTIONS_COMMAND_ID, Messages.FindBarDecorator_LABEL_ShowOptions, dec.options);
 
+			String prevHistoryKey = KeySequence.getInstance(KeyStroke.getInstance(SWT.MOD1, SWT.ARROW_UP)).toString();
+			String nextHistoryKey = KeySequence.getInstance(KeyStroke.getInstance(SWT.MOD1, SWT.ARROW_DOWN)).toString();
+
 			List<TriggerSequence> bindings = fCommandToBinding.get(FOCUS_REPLACE_COMMAND_ID);
 			if (!CollectionsUtil.isEmpty(bindings))
 			{
@@ -701,7 +704,8 @@ public class FindBarActions
 					triggers.add(StringUtil.EMPTY);
 				}
 
-				triggers.add(KeySequence.getInstance(KeyStroke.getInstance(SWT.MOD1, SWT.ARROW_DOWN)).toString());
+				triggers.add(prevHistoryKey);
+				triggers.add(nextHistoryKey);
 
 				dec.textReplace.setToolTipText(MessageFormat.format(Messages.FindBarActions_TOOLTIP_FocusReplaceCombo,
 						triggers.toArray(new Object[triggers.size()])));
@@ -723,7 +727,8 @@ public class FindBarActions
 					triggers.add(StringUtil.EMPTY);
 				}
 
-				triggers.add(KeySequence.getInstance(KeyStroke.getInstance(SWT.MOD1, SWT.ARROW_DOWN)).toString());
+				triggers.add(prevHistoryKey);
+				triggers.add(nextHistoryKey);
 
 				dec.textFind.setToolTipText(MessageFormat.format(Messages.FindBarActions_TOOLTIP_FocusFindCombo,
 						triggers.toArray(new Object[triggers.size()])));

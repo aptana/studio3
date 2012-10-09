@@ -14,20 +14,23 @@ import com.aptana.parsing.lexer.Range;
 
 public class CSSDeclarationNode extends CSSNode
 {
-	private String fIdentifier;
-	private String fStatus;
-	private IRange fStatusRange;
+	private final String fIdentifier;
+	private final String fStatus;
+	// Memory-optimization: only store start/end and create Range when needed.
+	private final int fStatusStart;
+	private final int fStatusEnd;
 	private boolean fHasSemicolon;
 
 	/**
 	 * CSSDeclarationNode
-	 * 
-	 * @param start
-	 * @param end
 	 */
 	protected CSSDeclarationNode()
 	{
 		super(ICSSNodeTypes.DECLARATION);
+		fStatus = null;
+		fIdentifier = null;
+		fStatusStart = 0;
+		fStatusEnd = -1;
 	}
 
 	/**
@@ -57,7 +60,14 @@ public class CSSDeclarationNode extends CSSNode
 		if (status != null)
 		{
 			fStatus = status.value.toString();
-			fStatusRange = new Range(status.getStart(), status.getEnd());
+			fStatusStart = status.getStart();
+			fStatusEnd = status.getEnd();
+		}
+		else
+		{
+			fStatusStart = 0;
+			fStatusEnd = -1;
+			fStatus = null;
 		}
 
 		this.setChildren(new CSSNode[] { value });
@@ -136,7 +146,7 @@ public class CSSDeclarationNode extends CSSNode
 	 */
 	public IRange getStatusRange()
 	{
-		return (fStatusRange != null) ? fStatusRange : Range.EMPTY;
+		return (fStatus != null) ? new Range(fStatusStart, fStatusEnd) : Range.EMPTY;
 	}
 
 	/*

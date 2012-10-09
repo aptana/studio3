@@ -7,13 +7,13 @@
  */
 package com.aptana.editor.js;
 
-import junit.framework.TestCase;
-
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.rules.FastPartitioner;
+import org.eclipse.jface.text.rules.IPartitionTokenScanner;
 
+import com.aptana.editor.common.AbstractPartitionTestCase;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IPartitioningConfiguration;
 
@@ -21,7 +21,7 @@ import com.aptana.editor.common.IPartitioningConfiguration;
  * @author Chris
  * @author Sandip
  */
-public class JSSourcePartitionScannerTest extends TestCase
+public class JSSourcePartitionScannerTest extends AbstractPartitionTestCase
 {
 	private IDocumentPartitioner partitioner;
 
@@ -35,7 +35,8 @@ public class JSSourcePartitionScannerTest extends TestCase
 			contentType = IDocument.DEFAULT_CONTENT_TYPE;
 		}
 
-		assertEquals("Content type doesn't match expectations for: " + code.charAt(offset), contentType, getContentType(code, offset));
+		assertEquals("Content type doesn't match expectations for: " + code.charAt(offset), contentType,
+				getContentType(code, offset));
 	}
 
 	@Override
@@ -43,6 +44,17 @@ public class JSSourcePartitionScannerTest extends TestCase
 	{
 		partitioner = null;
 		super.tearDown();
+	}
+
+	protected IPartitionTokenScanner createPartitionScanner()
+	{
+		return new JSSourcePartitionScanner();
+	}
+
+	@Override
+	protected String[] getContentTypes()
+	{
+		return JSSourceConfiguration.getDefault().getContentTypes();
 	}
 
 	private String getContentType(String content, int offset)
@@ -53,7 +65,7 @@ public class JSSourcePartitionScannerTest extends TestCase
 			IDocument document = new Document(content);
 			IPartitioningConfiguration configuration = JSSourceConfiguration.getDefault();
 
-			partitioner = new FastPartitioner(new JSSourcePartitionScanner(), configuration.getContentTypes());
+			partitioner = new FastPartitioner(createPartitionScanner(), configuration.getContentTypes());
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);
 

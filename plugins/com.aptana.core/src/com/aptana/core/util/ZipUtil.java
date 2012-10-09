@@ -201,7 +201,7 @@ public final class ZipUtil
 
 	/**
 	 * Extract specified list of entries from zip file to local path. File that exist in the destination path will be
-	 * overwritten if the <code>overwrite</code> flag is <code>true</code>.
+	 * overwritten if the <code>overwrite</code> flag is <code>true</code>. Only updates the monitor at given intervals
 	 * 
 	 * @param zip
 	 * @param entries

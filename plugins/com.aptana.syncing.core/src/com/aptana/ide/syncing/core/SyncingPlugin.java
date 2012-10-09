@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -15,11 +15,17 @@ import org.eclipse.core.resources.ISavedState;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.osgi.framework.BundleContext;
 
 import com.aptana.core.CorePlugin;
+import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.EclipseUtil;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -50,55 +56,79 @@ public class SyncingPlugin extends Plugin
 		super.start(context);
 		plugin = this;
 
-		ISavedState lastState = ResourcesPlugin.getWorkspace().addSaveParticipant(this, new WorkspaceSaveParticipant());
-		if (lastState != null)
+		Job job = new Job("Initializing Syncing plugin") //$NON-NLS-1$
 		{
-			IPath location = lastState.lookup(new Path(SiteConnectionManager.STATE_FILENAME));
-			if (location != null)
+			protected IStatus run(IProgressMonitor monitor)
 			{
-				SiteConnectionManager.getInstance().loadState(getStateLocation().append(location));
-			}
-			location = lastState.lookup(new Path(DefaultSiteConnection.STATE_FILENAME));
-			if (location != null)
-			{
-				DefaultSiteConnection.getInstance().loadState(getStateLocation().append(location));
-			}
-		}
 
-		// For 1.5 compatibility
-		lastState = ResourcesPlugin.getWorkspace().addSaveParticipant(CorePlugin.getDefault(), new ISaveParticipant()
-		{
+				try
+				{
+					ISavedState lastState = ResourcesPlugin.getWorkspace().addSaveParticipant(getDefault(),
+							new WorkspaceSaveParticipant());
+					if (lastState != null)
+					{
+						IPath location = lastState.lookup(new Path(SiteConnectionManager.STATE_FILENAME));
+						if (location != null)
+						{
+							SiteConnectionManager.getInstance().loadState(getStateLocation().append(location));
+						}
+						location = lastState.lookup(new Path(DefaultSiteConnection.STATE_FILENAME));
+						if (location != null)
+						{
+							DefaultSiteConnection.getInstance().loadState(getStateLocation().append(location));
+						}
+					}
 
-			public void doneSaving(ISaveContext context)
-			{
-			}
+					// For 1.5 compatibility
+					lastState = ResourcesPlugin.getWorkspace().addSaveParticipant(CorePlugin.getDefault(),
+							new ISaveParticipant()
+							{
 
-			public void prepareToSave(ISaveContext context) throws CoreException
-			{
-			}
+								public void doneSaving(ISaveContext context)
+								{
+								}
 
-			public void rollback(ISaveContext context)
-			{
-			}
+								public void prepareToSave(ISaveContext context) throws CoreException
+								{
+								}
 
-			public void saving(ISaveContext context) throws CoreException
-			{
-			}
-		});
-		if (lastState != null)
-		{
-			IPath location = lastState.lookup(new Path("save")); //$NON-NLS-1$
-			if (location != null)
-			{
-				IPath absoluteLocation = CorePlugin.getDefault().getStateLocation().append(location);
-				// only loads it once
-				SiteConnectionManager.getInstance().loadState(absoluteLocation);
-				File file = absoluteLocation.toFile();
-				if (!file.renameTo(new File(absoluteLocation.toOSString() + ".bak"))) { //$NON-NLS-1$
-					file.delete();
+								public void rollback(ISaveContext context)
+								{
+								}
+
+								public void saving(ISaveContext context) throws CoreException
+								{
+								}
+							});
+					if (lastState != null)
+					{
+						IPath location = lastState.lookup(new Path("save")); //$NON-NLS-1$
+						if (location != null)
+						{
+							IPath absoluteLocation = CorePlugin.getDefault().getStateLocation().append(location);
+							// only loads it once
+							SiteConnectionManager.getInstance().loadState(absoluteLocation);
+							File file = absoluteLocation.toFile();
+							if (!file.renameTo(new File(absoluteLocation.toOSString() + ".bak"))) { //$NON-NLS-1$
+								file.delete();
+							}
+						}
+					}
 				}
+				catch (IllegalStateException e)
+				{
+					IdeLog.logError(getDefault(), e);
+				}
+				catch (CoreException e)
+				{
+					IdeLog.logError(getDefault(), e);
+				}
+
+				return Status.OK_STATUS;
 			}
-		}
+		};
+		EclipseUtil.setSystemForJob(job);
+		job.schedule();
 	}
 
 	/*

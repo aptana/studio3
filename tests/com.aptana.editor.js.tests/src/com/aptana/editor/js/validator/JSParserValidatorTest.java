@@ -11,19 +11,27 @@ import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 
-import com.aptana.core.build.AbstractBuildParticipant;
+import com.aptana.core.build.IBuildParticipant;
 import com.aptana.core.build.IProblem;
 import com.aptana.editor.common.validation.AbstractValidatorTestCase;
 import com.aptana.editor.js.IJSConstants;
+import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.parsing.JSParseState;
 
 public class JSParserValidatorTest extends AbstractValidatorTestCase
 {
 
 	@Override
-	protected AbstractBuildParticipant createValidator()
+	protected IBuildParticipant createValidator()
 	{
-		return new JSParserValidator();
+		return new JSParserValidator()
+		{
+			@Override
+			protected String getPreferenceNode()
+			{
+				return JSPlugin.PLUGIN_ID;
+			}
+		};
 	}
 
 	@Override

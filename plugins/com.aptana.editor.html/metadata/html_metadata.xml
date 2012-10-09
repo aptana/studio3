@@ -9296,7 +9296,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.0+"/>
       </browsers>
-      <description>Embedded Scalabale Vector Graphics content.</description>
+      <description>Embedded Scalable Vector Graphics content.</description>
       <event-refs>
         <event-ref name="onabort"/>
         <event-ref name="onblur"/>

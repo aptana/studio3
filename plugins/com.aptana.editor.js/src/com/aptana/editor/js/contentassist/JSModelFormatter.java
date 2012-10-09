@@ -19,6 +19,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.jface.viewers.DecorationOverlayIcon;
+import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.swt.graphics.Image;
 
 import com.aptana.core.IFilter;
@@ -51,6 +55,9 @@ public class JSModelFormatter
 	// used for mixed types
 	private static final Image PROPERTY = JSPlugin.getImage("/icons/js_property.png"); //$NON-NLS-1$
 	private static final String PROTOTYPE_PROPERTY = "." + JSTypeConstants.PROTOTYPE_PROPERTY; //$NON-NLS-1$
+	private static final ImageDescriptor STATIC_OVERLAY = JSPlugin.getImageDescriptor("icons/overlays/static.png"); //$NON-NLS-1$
+	private static final ImageDescriptor DEPRECATED_OVERLAY = JSPlugin
+			.getImageDescriptor("icons/overlays/deprecated.gif"); //$NON-NLS-1$
 
 	/**
 	 * static initializer
@@ -287,8 +294,13 @@ public class JSModelFormatter
 	 */
 	public Image getImage(PropertyElement property)
 	{
-		Image result = (property instanceof FunctionElement) ? TYPE_IMAGE_MAP.get(JSTypeConstants.FUNCTION_TYPE)
-				: PROPERTY;
+		String key = "property"; //$NON-NLS-1$
+		Image result = PROPERTY;
+		if (property instanceof FunctionElement)
+		{
+			key = "function"; //$NON-NLS-1$
+			result = TYPE_IMAGE_MAP.get(JSTypeConstants.FUNCTION_TYPE);
+		}
 
 		if (property != null)
 		{
@@ -301,23 +313,56 @@ public class JSModelFormatter
 				if (TYPE_IMAGE_MAP.containsKey(type))
 				{
 					result = TYPE_IMAGE_MAP.get(type);
+					key = type;
 				}
 				else if (type.startsWith(JSTypeConstants.DYNAMIC_CLASS_PREFIX))
 				{
 					result = TYPE_IMAGE_MAP.get(JSTypeConstants.OBJECT_TYPE);
+					key = "object"; //$NON-NLS-1$
 				}
 				else if (type.startsWith(JSTypeConstants.FUNCTION_TYPE))
 				{
 					result = TYPE_IMAGE_MAP.get(JSTypeConstants.FUNCTION_TYPE);
+					key = "function"; //$NON-NLS-1$
 				}
 				else if (type.endsWith(JSTypeConstants.ARRAY_LITERAL))
 				{
 					result = TYPE_IMAGE_MAP.get(JSTypeConstants.ARRAY_TYPE);
+					key = "array"; //$NON-NLS-1$
 				}
 			}
+			if (property.isClassProperty())
+			{
+				key += ".static"; //$NON-NLS-1$
+				result = addOverlay(result, STATIC_OVERLAY, IDecoration.TOP_RIGHT, key);
+			}
+			if (property.isDeprecated())
+			{
+				key += ".deprecated"; //$NON-NLS-1$
+				result = addOverlay(result, DEPRECATED_OVERLAY, IDecoration.TOP_LEFT, key);
+			}
+		}
+		return result;
+	}
+
+	private Image addOverlay(Image base, ImageDescriptor overlay, int location, String key)
+	{
+		ImageRegistry reg = getImageRegistry();
+		Image cached = reg.get(key);
+		if (cached != null)
+		{
+			return cached;
 		}
 
+		DecorationOverlayIcon decorator = new DecorationOverlayIcon(base, overlay, location);
+		Image result = decorator.createImage();
+		reg.put(key, result);
 		return result;
+	}
+
+	protected ImageRegistry getImageRegistry()
+	{
+		return JSPlugin.getDefault().getImageRegistry();
 	}
 
 	/**
@@ -641,7 +686,12 @@ public class JSModelFormatter
 				{
 					// strip p elements and bold any items that look like open tags with dotted local names
 					stripAndBold.setUseHTML(useHTML);
-					String desc = stripAndBold.searchAndReplace(property.getDescription());
+					String desc = property.getDescription();
+					if (property.isDeprecated())
+					{
+						desc = "<b>Deprecated</b><br>" + desc; //$NON-NLS-1$
+					}
+					desc = stripAndBold.searchAndReplace(desc);
 
 					if (!StringUtil.isEmpty(desc))
 					{

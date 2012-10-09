@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.test.performance.PerformanceTestCase;
 
@@ -24,7 +25,7 @@ import com.aptana.editor.epl.tests.EditorTestHelper;
 
 public class JSCodeScannerPerformanceTest extends PerformanceTestCase
 {
-	private JSCodeScanner fScanner;
+	private ITokenScanner fScanner;
 
 	@Override
 	protected void setUp() throws Exception

@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -12,6 +12,7 @@ import java.util.Map;
 
 import com.aptana.core.util.ObjectUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.editor.js.inferencing.JSTypeUtil;
 import com.aptana.jetty.util.epl.ajax.JSON.Convertible;
 import com.aptana.jetty.util.epl.ajax.JSON.Output;
 
@@ -119,7 +120,7 @@ public class ReturnTypeElement implements Convertible
 	 */
 	public void setType(String type)
 	{
-		this._type = type;
+		this._type = JSTypeUtil.validateTypeName(type);
 	}
 
 	/*
@@ -129,6 +130,7 @@ public class ReturnTypeElement implements Convertible
 	public void toJSON(Output out)
 	{
 		out.add(TYPE_PROPERTY, this.getType());
+		// TODO To shrink string size, don't write out empty descriptions?
 		out.add(DESCRIPTION_PROPERTY, this.getDescription());
 	}
 

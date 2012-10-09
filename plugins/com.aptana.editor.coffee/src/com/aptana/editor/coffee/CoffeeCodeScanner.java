@@ -461,7 +461,7 @@ public class CoffeeCodeScanner extends QueuedRuleBasedScanner
 
 		public boolean isWordPart(char c)
 		{
-			return Character.isLetter(c) || c == '_' || c == '$';
+			return Character.isLetterOrDigit(c) || c == '_' || c == '$';
 		}
 	}
 

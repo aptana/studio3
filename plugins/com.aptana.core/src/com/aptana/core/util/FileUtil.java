@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
 import com.aptana.core.CorePlugin;
@@ -27,6 +28,11 @@ public class FileUtil
 
 	private FileUtil()
 	{
+	}
+
+	public static IPath getTempDirectory()
+	{
+		return Path.fromOSString(System.getProperty("java.io.tmpdir")); //$NON-NLS-1$
 	}
 
 	public static boolean isDirectoryAccessible(File directory)
@@ -279,5 +285,26 @@ public class FileUtil
 			IdeLog.logError(CorePlugin.getDefault(), e);
 		}
 		return 1;
+	}
+
+	/**
+	 * A simple check that the directory path is a valid one for the current OS. The check does not test for existence
+	 * or write permissions, just for the path structure by using {@link File#getCanonicalPath()}.
+	 * 
+	 * @param path
+	 * @return <code>true</code> if the given path is a valid one; <code>false</code> otherwise.
+	 */
+	public static boolean isValidDirectory(String path)
+	{
+		File file = new File(path);
+		try
+		{
+			file.getCanonicalPath();
+			return true;
+		}
+		catch (IOException e)
+		{
+			return false;
+		}
 	}
 }

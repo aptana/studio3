@@ -91,14 +91,7 @@ public class BundleChangeReconcileTrigger implements LoadCycleListener
 		// basically only make us run once if we get hit multiple times in a row. We'll still probably run a few
 		// times, but this should cut it down a lot.
 		job.cancel();
-		try
-		{
-			job.setSystem(!EclipseUtil.showSystemJobs());
-		}
-		catch (IllegalStateException ise)
-		{
-			// ignore
-		}
+		EclipseUtil.setSystemForJob(job);
 		job.schedule(750);
 	}
 

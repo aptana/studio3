@@ -33,6 +33,7 @@ import org.osgi.framework.Version;
 
 import com.aptana.configurations.processor.ConfigurationStatus;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.VersionUtil;
 import com.aptana.portal.ui.PortalUIPlugin;
@@ -282,7 +283,7 @@ public class JavaScriptLibraryInstallProcessor extends InstallerConfigurationPro
 				}
 			}
 		};
-		job.setSystem(true);
+		EclipseUtil.setSystemForJob(job);
 		job.schedule();
 		try
 		{

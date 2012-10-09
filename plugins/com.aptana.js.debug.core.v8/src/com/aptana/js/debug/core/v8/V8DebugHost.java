@@ -58,6 +58,7 @@ import org.chromium.sdk.util.GenericCallback;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.debug.core.ILaunch;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.js.debug.core.internal.Util;
@@ -1260,12 +1261,12 @@ public class V8DebugHost extends AbstractDebugHost {
 	 * @see com.aptana.js.debug.core.internal.model.AbstractDebugHost#initSession()
 	 */
 	@Override
-	protected void initSession() throws CoreException {
+	protected void initSession(ILaunch launch) throws CoreException {
 		initLogger(V8DebugPlugin.getDefault(), "v8hostdebugger"); //$NON-NLS-1$
 		try {
 			long endTime = System.currentTimeMillis() + V8_CONNECT_TIMEOUT;
 			boolean attached = false;
-			while (System.currentTimeMillis() <= endTime) {
+			while (System.currentTimeMillis() <= endTime && !launch.isTerminated()) {
 				try {
 					vm = BrowserFactory.getInstance().createStandalone(v8SocketAddress, Platform.inDevelopmentMode() ? new ConnectionLoggerImpl(System.out) : null);
 					vm.attach(debugEventListener);
@@ -1276,6 +1277,11 @@ public class V8DebugHost extends AbstractDebugHost {
 				} catch (IOException e) {
 				}
 				Thread.sleep(500);
+			}
+			if (launch.isTerminated()) {
+				closeLogger();
+				terminate();
+				return;
 			}
 			if (!attached) {
 				vm = BrowserFactory.getInstance().createStandalone(v8SocketAddress, Platform.inDevelopmentMode() ? new ConnectionLoggerImpl(System.out) : null);

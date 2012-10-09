@@ -12,6 +12,8 @@ import java.text.MessageFormat;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import org.eclipse.core.filebuffers.FileBuffers;
+import org.eclipse.core.filebuffers.manipulation.RemoveTrailingWhitespaceOperation;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
@@ -114,11 +116,12 @@ import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.scripting.ScriptingActivator;
-import com.aptana.scripting.keybindings.ICommandElementsProvider;
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.CommandResult;
 import com.aptana.scripting.model.InvocationType;
 import com.aptana.scripting.model.SnippetElement;
+import com.aptana.scripting.ui.ICommandElementsProvider;
+import com.aptana.scripting.ui.ScriptingUIPlugin;
 import com.aptana.theme.ThemePlugin;
 import com.aptana.ui.util.UIUtils;
 
@@ -295,6 +298,12 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		return super.getSourceViewer();
 	}
 
+	public final SourceViewerConfiguration getISourceViewerConfiguration()
+	{
+		return super.getSourceViewerConfiguration();
+
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.extensions.IThemeableEditor#getIVerticalRuler()
@@ -334,7 +343,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		fThemeListener = new PropertyChangeListener();
 		ThemePlugin.getDefault().getPreferenceStore().addPropertyChangeListener(fThemeListener);
 		this.fThemeableEditorFindBarExtension.activateContexts(new String[] { ScriptingActivator.EDITOR_CONTEXT_ID,
-				ScriptingActivator.SCRIPTING_CONTEXT_ID });
+				ScriptingUIPlugin.SCRIPTING_CONTEXT_ID });
 
 		if (isWordWrapEnabled())
 		{
@@ -634,6 +643,20 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	@Override
 	public void doSave(IProgressMonitor progressMonitor)
 	{
+		if (getPreferenceStore().getBoolean(IPreferenceConstants.EDITOR_REMOVE_TRAILING_WHITESPACE))
+		{
+			// Remove any trailing spaces
+			RemoveTrailingWhitespaceOperation removeSpacesOperation = new RemoveTrailingWhitespaceOperation();
+			try
+			{
+				removeSpacesOperation.run(FileBuffers.getTextFileBufferManager().getTextFileBuffer(getDocument()),
+						progressMonitor);
+			}
+			catch (Exception e)
+			{
+				IdeLog.logError(CommonEditorPlugin.getDefault(), "Error while removing the trailing whitespaces.", e); //$NON-NLS-1$
+			}
+		}
 		if (getEditorInput() instanceof UntitledFileStorageEditorInput)
 		{
 			// forces to show save as dialog on untitled file
@@ -826,11 +849,16 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	@Override
 	protected void handlePreferenceStoreChanged(PropertyChangeEvent event)
 	{
+		super.handlePreferenceStoreChanged(event);
+		if (this.fThemeableEditorColorsExtension == null)
+		{
+			return;
+		}
+		this.fThemeableEditorColorsExtension.handlePreferenceStoreChanged(event);
+
 		// Add case when the global editor settings have changed
 		String property = event.getProperty();
 
-		super.handlePreferenceStoreChanged(event);
-		this.fThemeableEditorColorsExtension.handlePreferenceStoreChanged(event);
 		if (property.equals(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_LINE_NUMBER_RULER))
 		{
 			((CommonLineNumberChangeRulerColumn) fLineNumberRulerColumn).showLineNumbers(isLineNumberVisible());
@@ -971,7 +999,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 							return Status.OK_STATUS;
 						}
 					};
-					linkWithEditorJob.setSystem(true);
+					EclipseUtil.setSystemForJob(linkWithEditorJob);
 					linkWithEditorJob.schedule();
 				}
 			}
@@ -1104,7 +1132,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	{
 		synchronized (modificationStampLock)
 		{
-			//Reset our cache when a new input is set.
+			// Reset our cache when a new input is set.
 			lastModificationStamp = IDocumentExtension4.UNKNOWN_MODIFICATION_STAMP;
 			lastAstForModificationStamp = null;
 
@@ -1113,11 +1141,24 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	}
 
 	/**
+	 * @return the parse node for the current contents of this editor to be used during a reconcile. This means that the
+	 *         AST generated will be used for updating the outline and updating the folding structure (subclasses may
+	 *         override -- i.e.: in the JS editor, if folding is enabled, the ast will need to be generated with
+	 *         comments).
+	 */
+	public IParseRootNode getReconcileAST()
+	{
+		return getAST();
+	}
+
+	/**
 	 * Note: this was deprecated and is restored as this has a faster cache based on the document time (so, this is the
 	 * preferred way of getting the ast based on the full document for the editor).
 	 * 
 	 * @return the parse node for this editor.
 	 * @note this call may lock until the parser finishes generating the ast.
+	 * @note override doGetAST if something needs to be customized and the document-based cache maintained (i.e.: php
+	 *       may need to override this method as the parse depends on the grammar version which may change).
 	 */
 	public IParseRootNode getAST()
 	{
@@ -1143,7 +1184,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 				}
 			}
 			// Don't synchronize the actual parse!
-			IParseRootNode ast = ParserPoolFactory.parse(getContentType(), document.get()).getRootNode();
+			IParseRootNode ast = doGetAST(document);
 
 			synchronized (modificationStampLock)
 			{
@@ -1157,6 +1198,14 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 			IdeLog.logTrace(CommonEditorPlugin.getDefault(), e.getMessage(), e, IDebugScopes.AST);
 		}
 		return null;
+	}
+
+	/**
+	 * Override this method to calculate the ast (while maintaining the document time based cache).
+	 */
+	protected IParseRootNode doGetAST(IDocument document) throws Exception
+	{
+		return ParserPoolFactory.parse(getContentType(), document.get()).getRootNode();
 	}
 
 	/**

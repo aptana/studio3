@@ -21,7 +21,7 @@ public class CSSDocumentProvider extends SimpleDocumentProvider
 	@Override
 	public IPartitionTokenScanner createPartitionScanner()
 	{
-		return new CSSSourcePartitionScanner();
+		return new CSSSourcePartitionScannerJFlex();
 	}
 
 	/*

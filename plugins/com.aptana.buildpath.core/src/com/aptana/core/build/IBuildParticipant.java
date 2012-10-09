@@ -106,13 +106,6 @@ public interface IBuildParticipant
 	public boolean isEnabled(BuildType type);
 
 	/**
-	 * Change enablement if possible.
-	 * 
-	 * @param enabled
-	 */
-	public void setEnabled(BuildType type, boolean enabled);
-
-	/**
 	 * Tells the participant to restore it's default enablement state and possibly reset any participant specified
 	 * settings (like filters for warnings).
 	 */
@@ -140,4 +133,30 @@ public interface IBuildParticipant
 	 * @return
 	 */
 	public boolean isEnabled(IProject project);
+
+	/**
+	 * Gets a working copy so we can modify preferences/attributes and apply them all at once.
+	 * 
+	 * @return
+	 */
+	public IBuildParticipantWorkingCopy getWorkingCopy();
+
+	/**
+	 * @param prefKey
+	 * @return
+	 */
+	public String getPreferenceString(String prefKey);
+
+	/**
+	 * @param prefKey
+	 * @return
+	 */
+	public boolean getPreferenceBoolean(String prefKey);
+
+	/**
+	 * @param prefKey
+	 * @param defaultValue
+	 * @return
+	 */
+	public int getPreferenceInt(String prefKey, int defaultValue);
 }
