@@ -19,12 +19,17 @@ import org.eclipse.core.resources.ISavedState;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.osgi.framework.BundleContext;
 
 import com.aptana.core.io.efs.EFSUtils;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.webserver.internal.core.ServerManager;
 import com.aptana.webserver.internal.core.builtin.LocalWebServer;
 
@@ -52,16 +57,37 @@ public class WebServerCorePlugin extends Plugin
 	{
 		super.start(context);
 		plugin = this;
-		ISavedState lastState = ResourcesPlugin.getWorkspace().addSaveParticipant(PLUGIN_ID,
-				new WorkspaceSaveParticipant());
-		if (lastState != null)
+
+		Job job = new Job("Restoring saved state of servers") //$NON-NLS-1$
 		{
-			IPath location = lastState.lookup(new Path(ServerManager.STATE_FILENAME));
-			if (location != null)
+			protected IStatus run(IProgressMonitor monitor)
 			{
-				((ServerManager) getServerManager()).loadState(getStateLocation().append(location));
+				try
+				{
+					ISavedState lastState = ResourcesPlugin.getWorkspace().addSaveParticipant(PLUGIN_ID,
+							new WorkspaceSaveParticipant());
+					if (lastState != null)
+					{
+						IPath location = lastState.lookup(new Path(ServerManager.STATE_FILENAME));
+						if (location != null)
+						{
+							((ServerManager) getServerManager()).loadState(getStateLocation().append(location));
+						}
+					}
+					return Status.OK_STATUS;
+				}
+				catch (IllegalStateException e)
+				{
+					return new Status(IStatus.ERROR, WebServerCorePlugin.PLUGIN_ID, e.getMessage(), e);
+				}
+				catch (CoreException e)
+				{
+					return e.getStatus();
+				}
 			}
-		}
+		};
+		EclipseUtil.setSystemForJob(job);
+		job.schedule();
 	}
 
 	/*
@@ -70,14 +96,22 @@ public class WebServerCorePlugin extends Plugin
 	 */
 	public void stop(BundleContext context) throws Exception
 	{
-		ResourcesPlugin.getWorkspace().removeSaveParticipant(PLUGIN_ID);
-		plugin = null;
-		serverManager = null;
-		if (defaultWebServer != null)
+		try
 		{
-			defaultWebServer.stop(true, new NullProgressMonitor());
+			ResourcesPlugin.getWorkspace().removeSaveParticipant(PLUGIN_ID);
+
+			serverManager = null;
+			if (defaultWebServer != null)
+			{
+				defaultWebServer.stop(true, new NullProgressMonitor());
+				defaultWebServer = null;
+			}
 		}
-		super.stop(context);
+		finally
+		{
+			plugin = null;
+			super.stop(context);
+		}
 	}
 
 	/**
