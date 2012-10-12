@@ -121,7 +121,7 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 		{
 			case IResource.PROJECT:
 				decorateProject(decoration, resource);
-				// fall through intentionally!
+				//$FALL-THROUGH$
 			case IResource.FOLDER: // $codepro.audit.disable nonTerminatedCaseClause
 				decorateFolder(decoration, resource);
 				break;
