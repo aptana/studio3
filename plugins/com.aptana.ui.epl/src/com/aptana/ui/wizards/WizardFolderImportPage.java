@@ -103,6 +103,7 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 		SelectionListener
 {
 	private static final String APTANA_WEB_NATURE = "com.aptana.projects.webnature"; //$NON-NLS-1$
+	private static final String ALLOY_NATURE = "com.appcelerator.titanium.alloy.core.nature"; //$NON-NLS-1$
 
 	/**
 	 * An internal class for projects
@@ -370,6 +371,11 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 
 			// Set a warning message if the imported project already contain certain project natures.
 			IPath path = Path.fromOSString(directoryPathField.getText());
+			boolean hasAlloyNature = hasAlloyNature(path);
+			if (hasAlloyNature)
+			{
+				updatePrimaryNature(ALLOY_NATURE);
+			}
 			IPath dotProjectPath = path.append(IProjectDescription.DESCRIPTION_FILE_NAME);
 
 			IProjectDescription description = null;
@@ -392,8 +398,16 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 							natures.append(delimiter).append(nature);
 							delimiter = ", "; //$NON-NLS-1$
 						}
+						String[] natureIds = description.getNatureIds();
+						if (hasAlloyNature) 
+						{
+							String[] oldNatures = natureIds;
+							natureIds = new String[description.getNatureIds().length+1];
+							System.arraycopy(oldNatures, 0, natureIds, 1, oldNatures.length);
+							natureIds[0] = ALLOY_NATURE;
+						}
 						// set the natures checked in the nature table as they are the most relevant ones.
-						fTableViewer.setCheckedElements(description.getNatureIds());
+						fTableViewer.setCheckedElements(natureIds);
 						setMessage(EplMessages.WizardFolderImportPage_override_project_nature + natures.toString(),
 								WARNING);
 						setErrorMessage(null);
@@ -409,6 +423,23 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 		setMessage(null);
 		setErrorMessage(null);
 		return true;
+	}
+
+	/*
+	 * The same functionality is available in Alloy plugin to verify whether a
+	 * project specified in a path contains alloy nature. However, since we can
+	 * not depend on alloy plugin from this wizard, this has to be hard-coded at
+	 * this moment.
+	 */
+	private boolean hasAlloyNature(IPath path)
+	{
+		File alloyConfigFile = path.append("app").append("views").append("index.xml").toFile(); //$NON-NLS-1$ //$NON-NLS-2$  //$NON-NLS-3$
+		if (alloyConfigFile.exists())
+		{
+			// Do we need to get the root element of this XML file to check whether it is 'Alloy' ?
+			return true;
+		}
+		return false;
 	}
 
 	/**
