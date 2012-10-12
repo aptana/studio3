@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.text.MessageFormat;
 import java.util.Locale;
@@ -66,7 +67,7 @@ import com.aptana.webserver.core.WebServerCorePlugin;
 	}
 
 	private void handleRequest(HttpRequest request, HttpResponse response, boolean head) throws HttpException,
-		IOException
+		IOException, CoreException, URISyntaxException
 	{
 		String target = URLDecoder.decode(request.getRequestLine().getUri(), HTTP.UTF_8);
 		URI uri = URIUtil.fromString(target);
