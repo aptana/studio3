@@ -538,6 +538,7 @@ public class GitExecutable
 
 	protected Process run(Map<String, String> env, String... args) throws IOException, CoreException
 	{
+		env.put(ProcessUtil.REDIRECT_ERROR_STREAM, StringUtil.EMPTY);
 		return ProcessUtil.run(path().toOSString(), null, env, args);
 	}
 
