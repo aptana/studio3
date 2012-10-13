@@ -49,11 +49,13 @@ public class ProcessRunnable implements Runnable
 
 	public void run()
 	{
+		StringBuilder builder = new StringBuilder();
 		BufferedReader br = null;
 		try
 		{
-			StringBuilder builder = new StringBuilder();
-			br = new BufferedReader(new InputStreamReader(p.getErrorStream(), IOUtil.UTF_8));
+			// Since error stream is directed into input stream, we just need to read
+			// through only input stream.
+			br = new BufferedReader(new InputStreamReader(p.getInputStream(), IOUtil.UTF_8));
 			String line = null;
 			while ((line = br.readLine()) != null) // $codepro.audit.disable assignmentInCondition
 			{
@@ -68,12 +70,12 @@ public class ProcessRunnable implements Runnable
 				handleLine(line);
 			}
 
-			String stdout = IOUtil.read(p.getInputStream(), IOUtil.UTF_8);
+//			String stdout = IOUtil.read(p.getInputStream(), IOUtil.UTF_8);
 			if (builder.length() > 0)
 			{
 				builder.deleteCharAt(builder.length() - 1);
 			}
-			this.status = new ProcessStatus(p.waitFor(), stdout, builder.toString());
+			this.status = new ProcessStatus(p.waitFor(), builder.toString(), builder.toString());
 		}
 		catch (Exception e)
 		{
