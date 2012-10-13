@@ -35,6 +35,11 @@ public class ProcessUtil
 	public static final String TEXT_TO_OBFUSCATE = "textToObfuscate"; //$NON-NLS-1$
 
 	private static ProcessUtil fgInstance;
+	/*
+	 * When this flag is set in the environment for the process, it hints
+	 * to redirect the error stream to redirect to output stream itself.
+	 */
+	public static String REDIRECT_ERROR_STREAM = "redirectErrorStream"; //$NON-NLS-1$
 
 	protected ProcessUtil()
 	{
@@ -308,6 +313,10 @@ public class ProcessUtil
 				message = message.replaceAll(textToObfuscate, StringUtil.repeat('*', textToObfuscate.length()));
 			}
 			logInfo(StringUtil.format(Messages.ProcessUtil_RunningProcess, new Object[] { message, path, map }));
+		}
+		if (environment != null && environment.containsKey(REDIRECT_ERROR_STREAM))
+		{
+			processBuilder.redirectErrorStream(true);
 		}
 		return startProcess(processBuilder);
 	}
