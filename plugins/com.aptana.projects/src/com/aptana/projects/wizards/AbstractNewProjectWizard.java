@@ -36,6 +36,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
@@ -54,6 +55,7 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.core.projects.templates.IProjectTemplate;
 import com.aptana.core.projects.templates.ProjectTemplate;
 import com.aptana.core.projects.templates.TemplateType;
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.ProcessStatus;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
@@ -180,6 +182,23 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 		{
 			stepPages.add((IStepIndicatorWizardPage) mainPage);
 			steps.add(((IStepIndicatorWizardPage) mainPage).getStepName());
+		}
+
+		// Add contributed pages
+		ProjectWizardContributionManager projectWizardContributionManager = ProjectsPlugin.getDefault()
+				.getProjectWizardContributionManager();
+		IWizardPage[] extraPages = projectWizardContributionManager.createPages(getProjectNatures());
+		if (!ArrayUtil.isEmpty(extraPages))
+		{
+			for (IWizardPage page : extraPages)
+			{
+				addPage(page);
+				if (page instanceof IStepIndicatorWizardPage)
+				{
+					stepPages.add((IStepIndicatorWizardPage) page);
+					steps.add(((IStepIndicatorWizardPage) page).getStepName());
+				}
+			}
 		}
 
 		// Set up the steps
