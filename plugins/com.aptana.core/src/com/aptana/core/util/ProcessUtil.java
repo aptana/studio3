@@ -36,8 +36,8 @@ public class ProcessUtil
 
 	private static ProcessUtil fgInstance;
 	/*
-	 * When this flag is set in the environment for the process, it hints
-	 * to redirect the error stream to redirect to output stream itself.
+	 * When this flag is set in the environment for the process, it hints to redirect the error stream to redirect to
+	 * output stream itself.
 	 */
 	public static String REDIRECT_ERROR_STREAM = "redirectErrorStream"; //$NON-NLS-1$
 
@@ -297,6 +297,7 @@ public class ProcessUtil
 		if (environment != null && !environment.isEmpty())
 		{
 			map = new TreeMap<String, String>(environment);
+			map.remove(TEXT_TO_OBFUSCATE);
 			processBuilder.environment().putAll(environment);
 		}
 		if (isInfoLoggingEnabled())
