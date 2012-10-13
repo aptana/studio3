@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -86,6 +86,11 @@ public class ProcessUtil
 		return runInBackground(command, workingDir, null, args);
 	}
 
+	public static IStatus runInBackground(String command, String textToObfuscate, IPath workingDir, String... args)
+	{
+		return runInBackground(command, textToObfuscate, workingDir, null, args);
+	}
+
 	/**
 	 * Runs a command in the workingDir with the passed in arguments. Returns an IStatus. Exit code of the process is
 	 * stored in the IStatuse.getCode(). Output is stored in IStatus.getMessage(). A non-zero exit code makes it an
@@ -104,6 +109,12 @@ public class ProcessUtil
 	public static IStatus runInBackground(String command, IPath workingDir, Map<String, String> env, String... args)
 	{
 		return runInBackground(command, workingDir, null, env, args);
+	}
+
+	public static IStatus runInBackground(String command, String textToObfuscate, IPath workingDir,
+			Map<String, String> env, String... args)
+	{
+		return runInBackground(command, textToObfuscate, workingDir, null, env, args);
 	}
 
 	public static String outputForProcess(Process process)
@@ -141,7 +152,8 @@ public class ProcessUtil
 				// Using the UTF-8 will not work for all cases.
 				writerThread = new OutputStreamThread(process.getOutputStream(), input, IOUtil.UTF_8);
 			}
-			InputStreamGobbler readerGobbler = new InputStreamGobbler(process.getInputStream(), lineSeparator, IOUtil.UTF_8);
+			InputStreamGobbler readerGobbler = new InputStreamGobbler(process.getInputStream(), lineSeparator,
+					IOUtil.UTF_8);
 			InputStreamGobbler errorGobbler = new InputStreamGobbler(process.getErrorStream(), lineSeparator, null);
 
 			// Start the threads
@@ -194,9 +206,15 @@ public class ProcessUtil
 	public static IStatus runInBackground(String command, IPath workingDirectory, String input,
 			Map<String, String> environment, String... arguments)
 	{
+		return runInBackground(command, null, workingDirectory, input, environment, arguments);
+	}
+
+	public static IStatus runInBackground(String command, String textToObfuscate, IPath workingDirectory, String input,
+			Map<String, String> environment, String... arguments)
+	{
 		try
 		{
-			Process p = run(command, workingDirectory, environment, arguments);
+			Process p = run(command, textToObfuscate, workingDirectory, environment, arguments);
 			return processData(p, input);
 		}
 		catch (IOException e)
@@ -227,9 +245,31 @@ public class ProcessUtil
 	public static Process run(String command, IPath workingDirectory, Map<String, String> environment,
 			String... arguments) throws IOException, CoreException
 	{
+		return run(command, null, workingDirectory, environment, arguments);
+	}
+
+	/**
+	 * Launches the process and returns a handle to the active Process.
+	 * 
+	 * @param command
+	 *            The executable/script to run
+	 * @param textToObfuscate
+	 * @param workingDirectory
+	 *            The working directory to use for the process.
+	 * @param environment
+	 *            Environment variable map to use for the process.
+	 * @param arguments
+	 *            A List of String arguments to the command.
+	 * @return
+	 * @throws IOException
+	 * @throws CoreException
+	 */
+	public static Process run(String command, String textToObfuscate, IPath workingDirectory,
+			Map<String, String> environment, String... arguments) throws IOException, CoreException
+	{
 		List<String> commands = new ArrayList<String>(Arrays.asList(arguments));
 		commands.add(0, command);
-		return run(commands, workingDirectory, environment);
+		return run(commands, textToObfuscate, workingDirectory, environment);
 	}
 
 	/**
@@ -267,7 +307,13 @@ public class ProcessUtil
 	public static Process run(List<String> command, IPath workingDirectory, Map<String, String> environment)
 			throws IOException, CoreException
 	{
-		return ProcessUtil.instance().doRun(command, workingDirectory, environment);
+		return run(command, null, workingDirectory, environment);
+	}
+
+	private static Process run(List<String> command, String textToObfuscate, IPath workingDirectory,
+			Map<String, String> environment) throws IOException, CoreException
+	{
+		return ProcessUtil.instance().doRun(command, textToObfuscate, workingDirectory, environment);
 	}
 
 	/**
@@ -282,6 +328,23 @@ public class ProcessUtil
 	 */
 	protected Process doRun(List<String> command, IPath workingDirectory, Map<String, String> environment)
 			throws IOException, CoreException
+	{
+		return doRun(command, null, workingDirectory, environment);
+	}
+
+	/**
+	 * Instance method so that we can test this class! Not meant to be called outside tests
+	 * 
+	 * @param command
+	 * @param workingDirectory
+	 * @param environment
+	 * @param password
+	 * @return
+	 * @throws IOException
+	 * @throws CoreException
+	 */
+	private Process doRun(List<String> command, String textToObfuscate, IPath workingDirectory,
+			Map<String, String> environment) throws IOException, CoreException
 	{
 		ProcessBuilder processBuilder = createProcessBuilder(command);
 		if (workingDirectory != null)
@@ -302,9 +365,12 @@ public class ProcessUtil
 			{
 				path = processBuilder.directory().getAbsolutePath();
 			}
-			logInfo(StringUtil.format(Messages.ProcessUtil_RunningProcess,
-					new Object[] { StringUtil.join("\" \"", command), //$NON-NLS-1$
-							path, map }));
+			String message = StringUtil.join("\" \"", command); //$NON-NLS-1$
+			if (!StringUtil.isEmpty(textToObfuscate))
+			{
+				message = message.replaceAll(textToObfuscate, StringUtil.repeat('*', textToObfuscate.length()));
+			}
+			logInfo(StringUtil.format(Messages.ProcessUtil_RunningProcess, new Object[] { message, path, map }));
 		}
 		if (environment != null && environment.containsKey(REDIRECT_ERROR_STREAM))
 		{
