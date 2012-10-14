@@ -85,7 +85,7 @@ public class AptanaDB
 			}
 			catch (SQLException e)
 			{
-				IdeLog.logError(UsagePlugin.getDefault(), Messages.AptanaDB_Error_Execute_Query, e);
+				IdeLog.logWarning(UsagePlugin.getDefault(), Messages.AptanaDB_Error_Execute_Query, e);
 			}
 			finally
 			{
