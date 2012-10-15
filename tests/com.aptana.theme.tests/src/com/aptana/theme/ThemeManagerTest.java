@@ -18,6 +18,7 @@ import org.eclipse.core.internal.runtime.RuntimeLog;
 import org.eclipse.core.runtime.ILogListener;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.PartInitException;
 
 import com.aptana.theme.internal.ThemeManager;
 import com.aptana.ui.util.UIUtils;
@@ -86,6 +87,14 @@ public class ThemeManagerTest extends TestCase implements ILogListener
 			{
 				if (s.getSeverity() >= IStatus.ERROR)
 				{
+					if (s.getException() instanceof PartInitException)
+					{
+						PartInitException e = (PartInitException) s.getException();
+						if (e.getMessage().startsWith("Unable to open editor, unknown editor ID:"))
+						{
+							continue;
+						}
+					}
 					throw new RuntimeException(s.getException());
 				}
 			}
