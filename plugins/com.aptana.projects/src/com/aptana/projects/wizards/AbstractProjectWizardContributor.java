@@ -7,22 +7,22 @@
  */
 package com.aptana.projects.wizards;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
+
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 
 public abstract class AbstractProjectWizardContributor implements IProjectWizardContributor
 {
+	public static final String ATTRIBUTE_NATURE_ID = "natureId"; //$NON-NLS-1$
+	private String natureId = StringUtil.EMPTY;
 
-	String natureId = StringUtil.EMPTY;
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.projects.wizards.IProjectWizardContributor#setNatureId(java.lang.String)
-	 */
-	public void setNatureId(String natureId)
+	public void setInitializationData(IConfigurationElement config, String propertyName, Object data)
+			throws CoreException
 	{
-		this.natureId = natureId;
+		natureId = config.getAttribute(ATTRIBUTE_NATURE_ID);
 	}
 
 	/*

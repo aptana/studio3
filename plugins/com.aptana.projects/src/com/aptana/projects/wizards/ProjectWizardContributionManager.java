@@ -25,45 +25,18 @@ import com.aptana.projects.ProjectsPlugin;
  */
 public class ProjectWizardContributionManager
 {
+	private static final String ATTRIBUTE_DEPENDENT_BUNDLE = "dependentBundle"; //$NON-NLS-1$
+	private static final String ATTRIBUTE_CLASS = "class"; //$NON-NLS-1$
 	private static final String EXTENSION_POINT_NAME = "projectWizardContributors"; //$NON-NLS-1$
-	private List<IProjectWizardContributor> contributors = new ArrayList<IProjectWizardContributor>();
+	private List<IProjectWizardContributor> contributors;
 
 	public ProjectWizardContributionManager()
 	{
-		contributors.clear();
-		IExtensionRegistry registry = Platform.getExtensionRegistry();
-		IConfigurationElement[] elements = registry.getConfigurationElementsFor(ProjectsPlugin.PLUGIN_ID,
-				EXTENSION_POINT_NAME);
-
-		for (int i = 0; i < elements.length; i++)
-		{
-			final IConfigurationElement element = elements[i];
-			try
-			{
-				IProjectWizardContributor contributorObject = (IProjectWizardContributor) element
-						.createExecutableExtension("class"); //$NON-NLS-1$
-				if (contributorObject == null)
-				{
-					continue;
-				}
-
-				String bundleId = element.getAttribute("dependentBundle"); //$NON-NLS-1$
-				if (bundleId != null && Platform.getBundle(bundleId) == null)
-				{
-					continue;
-				}
-				contributorObject.setNatureId(element.getAttribute("natureId")); //$NON-NLS-1$
-				contributors.add(contributorObject);
-			}
-			catch (CoreException e)
-			{
-				IdeLog.logError(ProjectsPlugin.getDefault(), e);
-			}
-		}
 	}
 
 	public IWizardPage[] createPages(String[] natureIds)
 	{
+		loadExtensions();
 		List<IWizardPage> pages = new ArrayList<IWizardPage>();
 		for (IProjectWizardContributor contributor : contributors)
 		{
@@ -80,5 +53,40 @@ public class ProjectWizardContributionManager
 		}
 
 		return pages.toArray(new IWizardPage[pages.size()]);
+	}
+
+	private synchronized void loadExtensions()
+	{
+		if (contributors == null)
+		{
+			IExtensionRegistry registry = Platform.getExtensionRegistry();
+			IConfigurationElement[] elements = registry.getConfigurationElementsFor(ProjectsPlugin.PLUGIN_ID,
+					EXTENSION_POINT_NAME);
+			contributors = new ArrayList<IProjectWizardContributor>(elements.length);
+			for (IConfigurationElement element : elements)
+			{
+				try
+				{
+					String bundleId = element.getAttribute(ATTRIBUTE_DEPENDENT_BUNDLE);
+					if (bundleId != null && Platform.getBundle(bundleId) == null)
+					{
+						continue;
+					}
+
+					IProjectWizardContributor contributorObject = (IProjectWizardContributor) element
+							.createExecutableExtension(ATTRIBUTE_CLASS);
+					if (contributorObject == null)
+					{
+						continue;
+					}
+
+					contributors.add(contributorObject);
+				}
+				catch (CoreException e)
+				{
+					IdeLog.logError(ProjectsPlugin.getDefault(), e);
+				}
+			}
+		}
 	}
 }

@@ -86,6 +86,7 @@ public class ProjectsPlugin extends AbstractUIPlugin
 			templatesManager.dispose();
 			templatesManager = null;
 		}
+		projectWizardContributionManager = null;
 		super.stop(context);
 	}
 

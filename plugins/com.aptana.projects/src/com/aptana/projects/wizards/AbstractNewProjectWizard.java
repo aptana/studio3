@@ -10,8 +10,8 @@ package com.aptana.projects.wizards;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -163,8 +163,7 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 		TemplateType[] templateTypes = getProjectTemplateTypes();
 		validateProjectTemplate(templateTypes);
 
-		List<String> steps = new ArrayList<String>();
-		List<IStepIndicatorWizardPage> stepPages = new ArrayList<IStepIndicatorWizardPage>();
+		LinkedHashMap<String, IStepIndicatorWizardPage> stepPages = new LinkedHashMap<String, IStepIndicatorWizardPage>();
 
 		// Add the template selection page
 		List<IProjectTemplate> templates = ProjectsPlugin.getDefault().getTemplatesManager()
@@ -172,16 +171,14 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 		if (hasNonDefaultTemplates(templates) && selectedTemplate == null)
 		{
 			addPage(templatesPage = new ProjectTemplateSelectionPage(TEMPLATE_SELECTION_PAGE_NAME, templates));
-			stepPages.add(templatesPage);
-			steps.add(templatesPage.getStepName());
+			stepPages.put(templatesPage.getStepName(), templatesPage);
 		}
 
 		// Add the main page where we set up the project name/location
 		addPage(mainPage = createMainPage());
 		if (mainPage instanceof IStepIndicatorWizardPage)
 		{
-			stepPages.add((IStepIndicatorWizardPage) mainPage);
-			steps.add(((IStepIndicatorWizardPage) mainPage).getStepName());
+			stepPages.put(((IStepIndicatorWizardPage) mainPage).getStepName(), (IStepIndicatorWizardPage) mainPage);
 		}
 
 		// Add contributed pages
@@ -195,17 +192,16 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 				addPage(page);
 				if (page instanceof IStepIndicatorWizardPage)
 				{
-					stepPages.add((IStepIndicatorWizardPage) page);
-					steps.add(((IStepIndicatorWizardPage) page).getStepName());
+					stepPages.put(((IStepIndicatorWizardPage) page).getStepName(), (IStepIndicatorWizardPage) page);
 				}
 			}
 		}
 
 		// Set up the steps
-		stepNames = steps.toArray(new String[steps.size()]);
+		stepNames = stepPages.keySet().toArray(new String[stepPages.size()]);
 		if (stepNames.length > 1)
 		{
-			for (IStepIndicatorWizardPage page : stepPages)
+			for (IStepIndicatorWizardPage page : stepPages.values())
 			{
 				page.initStepIndicator(stepNames);
 			}

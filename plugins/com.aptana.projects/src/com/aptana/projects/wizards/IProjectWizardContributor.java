@@ -7,12 +7,13 @@
  */
 package com.aptana.projects.wizards;
 
+import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.jface.wizard.IWizardPage;
 
 /**
  * @author Nam Le <nle@appcelerator.com>
  */
-public interface IProjectWizardContributor
+public interface IProjectWizardContributor extends IExecutableExtension
 {
 
 	/**
@@ -23,17 +24,17 @@ public interface IProjectWizardContributor
 	public IWizardPage createWizardPage();
 
 	/**
-	 * Sets the nature id associated with this contributor
-	 * 
-	 * @param natureId
-	 */
-	public void setNatureId(String natureId);
-
-	/**
 	 * Returns the check whether this nature ids passed matches the contributor natureid
 	 * 
 	 * @param natureIds
 	 * @return
 	 */
 	public boolean hasNatureId(String[] natureIds);
+
+	/**
+	 * Performs the work to finish the wizard
+	 * 
+	 * @return
+	 */
+	public boolean performWizardFinish();
 }
