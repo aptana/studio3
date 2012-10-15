@@ -10,8 +10,8 @@ package com.aptana.projects.wizards;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,6 +36,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
@@ -54,6 +55,7 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.core.projects.templates.IProjectTemplate;
 import com.aptana.core.projects.templates.ProjectTemplate;
 import com.aptana.core.projects.templates.TemplateType;
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.ProcessStatus;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
@@ -161,8 +163,7 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 		TemplateType[] templateTypes = getProjectTemplateTypes();
 		validateProjectTemplate(templateTypes);
 
-		List<String> steps = new ArrayList<String>();
-		List<IStepIndicatorWizardPage> stepPages = new ArrayList<IStepIndicatorWizardPage>();
+		LinkedHashMap<String, IStepIndicatorWizardPage> stepPages = new LinkedHashMap<String, IStepIndicatorWizardPage>();
 
 		// Add the template selection page
 		List<IProjectTemplate> templates = ProjectsPlugin.getDefault().getTemplatesManager()
@@ -170,23 +171,37 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 		if (hasNonDefaultTemplates(templates) && selectedTemplate == null)
 		{
 			addPage(templatesPage = new ProjectTemplateSelectionPage(TEMPLATE_SELECTION_PAGE_NAME, templates));
-			stepPages.add(templatesPage);
-			steps.add(templatesPage.getStepName());
+			stepPages.put(templatesPage.getStepName(), templatesPage);
 		}
 
 		// Add the main page where we set up the project name/location
 		addPage(mainPage = createMainPage());
 		if (mainPage instanceof IStepIndicatorWizardPage)
 		{
-			stepPages.add((IStepIndicatorWizardPage) mainPage);
-			steps.add(((IStepIndicatorWizardPage) mainPage).getStepName());
+			stepPages.put(((IStepIndicatorWizardPage) mainPage).getStepName(), (IStepIndicatorWizardPage) mainPage);
+		}
+
+		// Add contributed pages
+		ProjectWizardContributionManager projectWizardContributionManager = ProjectsPlugin.getDefault()
+				.getProjectWizardContributionManager();
+		IWizardPage[] extraPages = projectWizardContributionManager.createPages(getProjectNatures());
+		if (!ArrayUtil.isEmpty(extraPages))
+		{
+			for (IWizardPage page : extraPages)
+			{
+				addPage(page);
+				if (page instanceof IStepIndicatorWizardPage)
+				{
+					stepPages.put(((IStepIndicatorWizardPage) page).getStepName(), (IStepIndicatorWizardPage) page);
+				}
+			}
 		}
 
 		// Set up the steps
-		stepNames = steps.toArray(new String[steps.size()]);
+		stepNames = stepPages.keySet().toArray(new String[stepPages.size()]);
 		if (stepNames.length > 1)
 		{
-			for (IStepIndicatorWizardPage page : stepPages)
+			for (IStepIndicatorWizardPage page : stepPages.values())
 			{
 				page.initStepIndicator(stepNames);
 			}
@@ -237,6 +252,11 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 				{
 					SubMonitor subMonitor = SubMonitor.convert(monitor, 5);
 					createNewProject(subMonitor.newChild(4));
+
+					// Allow the project contributors to do work
+					ProjectWizardContributionManager projectWizardContributionManager = ProjectsPlugin.getDefault()
+							.getProjectWizardContributionManager();
+					projectWizardContributionManager.performProjectFinish();
 
 					// Perform post project hooks
 					try

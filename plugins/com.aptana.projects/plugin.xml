@@ -3,6 +3,7 @@
 <plugin>
    <extension-point id="projectTemplates" name="%extension-point.project.templates.name" schema="schema/projectTemplates.exsd"/>
    <extension-point id="projectListeners" name="%extension-point.project.listeners.name" schema="schema/projectListeners.exsd"/>
+   <extension-point id="projectWizardContributors" name="%extension-point.project.contributors.name" schema="schema/projectWizardContributors.exsd"/>
    <extension
          id="webnature"
          name="%extension.webnature.name"

@@ -19,6 +19,7 @@ import com.aptana.core.projects.templates.TemplateType;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.projects.templates.IDefaultProjectTemplate;
 import com.aptana.projects.templates.ProjectTemplatesManager;
+import com.aptana.projects.wizards.ProjectWizardContributionManager;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -33,6 +34,7 @@ public class ProjectsPlugin extends AbstractUIPlugin
 	private static ProjectsPlugin plugin;
 
 	private ProjectTemplatesManager templatesManager;
+	private ProjectWizardContributionManager projectWizardContributionManager;
 
 	private static class DefaultWebProjectTemplate extends ProjectTemplate implements IDefaultProjectTemplate
 	{
@@ -84,6 +86,7 @@ public class ProjectsPlugin extends AbstractUIPlugin
 			templatesManager.dispose();
 			templatesManager = null;
 		}
+		projectWizardContributionManager = null;
 		super.stop(context);
 	}
 
@@ -117,5 +120,15 @@ public class ProjectsPlugin extends AbstractUIPlugin
 			templatesManager = new ProjectTemplatesManager();
 		}
 		return templatesManager;
+	}
+
+	public synchronized ProjectWizardContributionManager getProjectWizardContributionManager()
+	{
+		if (projectWizardContributionManager == null)
+		{
+			projectWizardContributionManager = new ProjectWizardContributionManager();
+		}
+
+		return projectWizardContributionManager;
 	}
 }
