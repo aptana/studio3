@@ -8,6 +8,7 @@
 package com.aptana.core.util;
 
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -29,10 +30,12 @@ public class ProcessRunnable implements Runnable
 	private Process p;
 	protected IProgressMonitor monitor;
 	private IStatus status;
+	private boolean isErrRedirected;
 
-	public ProcessRunnable(Process p, IProgressMonitor monitor)
+	public ProcessRunnable(Process p, IProgressMonitor monitor, boolean isErrRedirected)
 	{
 		this.p = p;
+		this.isErrRedirected = isErrRedirected;
 		this.monitor = convertMonitor(monitor);
 		this.status = Status.OK_STATUS;
 	}
@@ -53,9 +56,14 @@ public class ProcessRunnable implements Runnable
 		BufferedReader br = null;
 		try
 		{
-			// Since error stream is directed into input stream, we just need to read
-			// through only input stream.
-			br = new BufferedReader(new InputStreamReader(p.getInputStream(), IOUtil.UTF_8));
+			InputStream errorStream = p.getErrorStream();
+			if (isErrRedirected)
+			{
+				// Since error stream is directed into input stream, we just need to read
+				// through only input stream.
+				errorStream = p.getInputStream();
+			}
+			br = new BufferedReader(new InputStreamReader(errorStream, IOUtil.UTF_8));
 			String line = null;
 			while ((line = br.readLine()) != null) // $codepro.audit.disable assignmentInCondition
 			{
@@ -70,12 +78,16 @@ public class ProcessRunnable implements Runnable
 				handleLine(line);
 			}
 
-//			String stdout = IOUtil.read(p.getInputStream(), IOUtil.UTF_8);
+			String stdout = builder.toString();
+			if (!isErrRedirected)
+			{
+				stdout = IOUtil.read(p.getInputStream(), IOUtil.UTF_8);
+			}
 			if (builder.length() > 0)
 			{
 				builder.deleteCharAt(builder.length() - 1);
 			}
-			this.status = new ProcessStatus(p.waitFor(), builder.toString(), builder.toString());
+			this.status = new ProcessStatus(p.waitFor(), stdout, builder.toString());
 		}
 		catch (Exception e)
 		{
