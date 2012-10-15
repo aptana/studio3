@@ -12,6 +12,7 @@ import java.net.URL;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 
 import org.eclipse.core.resources.IProject;
@@ -105,4 +106,11 @@ public interface IProjectTemplate
 	 * @param promptForOverwrite
 	 */
 	public IStatus apply(IProject project, boolean promptForOverwrite);
+
+	/**
+	 * Returns the template's index files that will be opened when a project is created.
+	 * 
+	 * @return An {@link IPath} array of index files to open (can be <code>null</code>).
+	 */
+	public IPath[] getIndexFiles();
 }
