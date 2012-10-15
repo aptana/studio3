@@ -7,6 +7,7 @@
  */
 package com.aptana.projects.wizards;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.wizard.IWizardPage;
@@ -37,5 +38,5 @@ public interface IProjectWizardContributor extends IExecutableExtension
 	 * 
 	 * @return
 	 */
-	public IStatus performWizardFinish();
+	public IStatus performWizardFinish(IProject project);
 }

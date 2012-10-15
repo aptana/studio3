@@ -7,6 +7,7 @@
  */
 package com.aptana.projects.wizards;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IStatus;
@@ -41,7 +42,7 @@ public abstract class AbstractProjectWizardContributor implements IProjectWizard
 		return CollectionsUtil.newList(natureIds).contains(natureId);
 	}
 
-	public IStatus performWizardFinish()
+	public IStatus performWizardFinish(IProject project)
 	{
 		return Status.OK_STATUS;
 	}

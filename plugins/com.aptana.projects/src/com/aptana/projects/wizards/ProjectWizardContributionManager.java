@@ -10,6 +10,7 @@ package com.aptana.projects.wizards;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
@@ -92,12 +93,12 @@ public class ProjectWizardContributionManager
 		}
 	}
 
-	public IStatus performProjectFinish()
+	public IStatus performProjectFinish(IProject project)
 	{
 		loadExtensions();
 		for (IProjectWizardContributor contributor : contributors)
 		{
-			IStatus status = contributor.performWizardFinish();
+			IStatus status = contributor.performWizardFinish(project);
 			if (status != null && !status.isOK())
 			{
 				return status;

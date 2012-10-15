@@ -256,7 +256,7 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 					// Allow the project contributors to do work
 					ProjectWizardContributionManager projectWizardContributionManager = ProjectsPlugin.getDefault()
 							.getProjectWizardContributionManager();
-					projectWizardContributionManager.performProjectFinish();
+					projectWizardContributionManager.performProjectFinish(newProject);
 
 					// Perform post project hooks
 					try
