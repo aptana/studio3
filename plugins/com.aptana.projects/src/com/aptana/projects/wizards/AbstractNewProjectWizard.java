@@ -253,6 +253,11 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 					SubMonitor subMonitor = SubMonitor.convert(monitor, 5);
 					createNewProject(subMonitor.newChild(4));
 
+					// Allow the project contributors to do work
+					ProjectWizardContributionManager projectWizardContributionManager = ProjectsPlugin.getDefault()
+							.getProjectWizardContributionManager();
+					projectWizardContributionManager.performProjectFinish();
+
 					// Perform post project hooks
 					try
 					{

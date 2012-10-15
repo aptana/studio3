@@ -13,7 +13,9 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.wizard.IWizardPage;
 
 import com.aptana.core.logging.IdeLog;
@@ -88,5 +90,20 @@ public class ProjectWizardContributionManager
 				}
 			}
 		}
+	}
+
+	public IStatus performProjectFinish()
+	{
+		loadExtensions();
+		for (IProjectWizardContributor contributor : contributors)
+		{
+			IStatus status = contributor.performWizardFinish();
+			if (status != null && !status.isOK())
+			{
+				return status;
+			}
+		}
+
+		return Status.OK_STATUS;
 	}
 }
