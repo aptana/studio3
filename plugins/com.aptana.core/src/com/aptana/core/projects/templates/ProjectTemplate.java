@@ -315,6 +315,17 @@ public class ProjectTemplate implements IProjectTemplate
 	}
 
 	/**
+	 * Returns the index files to open after a project creation. The default implementation returns <code>null</code>,
+	 * and subclasses should overwrite when needed.
+	 * 
+	 * @see com.aptana.core.projects.templates.IProjectTemplate#getIndexFiles()
+	 */
+	public IPath[] getIndexFiles()
+	{
+		return null;
+	}
+
+	/**
 	 * Returns true if the given file can be evaluated for template-variables.<br>
 	 * There is no good way of detecting what is binary and what is not, so we decide what is supported by checking if
 	 * the content type is a sub-type of text.

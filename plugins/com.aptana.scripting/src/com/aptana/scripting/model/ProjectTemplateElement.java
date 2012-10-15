@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 
 import com.aptana.core.projects.templates.IProjectTemplate;
@@ -290,6 +291,12 @@ public class ProjectTemplateElement extends AbstractBundleElement implements IPr
 	public IStatus apply(IProject project, boolean promptForOverwrite)
 	{
 		return createProjectTemplate().apply(project, promptForOverwrite);
+	}
+
+	public IPath[] getIndexFiles()
+	{
+		// default behavior
+		return null;
 	}
 
 	protected ProjectTemplate createProjectTemplate()
