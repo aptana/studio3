@@ -256,7 +256,20 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 					// Allow the project contributors to do work
 					ProjectWizardContributionManager projectWizardContributionManager = ProjectsPlugin.getDefault()
 							.getProjectWizardContributionManager();
-					projectWizardContributionManager.performProjectFinish(newProject);
+					final IStatus contributorStatus = projectWizardContributionManager.performProjectFinish(newProject);
+					if (contributorStatus != null && !contributorStatus.isOK())
+					{
+						// Show the error. Should we cancel project creation?
+						UIUtils.getDisplay().syncExec(new Runnable()
+						{
+							public void run()
+							{
+								MessageDialog.openError(UIUtils.getActiveWorkbenchWindow().getShell(),
+										Messages.AbstractNewProjectWizard_ProjectListenerErrorTitle,
+										contributorStatus.getMessage());
+							}
+						});
+					}
 
 					// Perform post project hooks
 					try
