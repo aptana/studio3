@@ -7,13 +7,20 @@
  */
 package com.aptana.editor.js.parsing.ast;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import beaver.Symbol;
 
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.sdoc.model.DocumentationBlock;
+import com.aptana.editor.js.sdoc.parsing.SDocParser;
+import com.aptana.editor.js.vsdoc.parsing.VSDocReader;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
@@ -25,7 +32,10 @@ public class JSNode extends ParseNode
 
 	private short fType;
 	private boolean fSemicolonIncluded;
+
 	private DocumentationBlock fDocumentation;
+	private Symbol fPreDocumentationComment;
+	private Symbol fPostDocumentationComment;
 
 	/**
 	 * static initializer
@@ -149,13 +159,114 @@ public class JSNode extends ParseNode
 	}
 
 	/**
-	 * getDocumentation
+	 * getDocumentation: lazily computes the documentation from the attached node if it's still not computed.
 	 * 
 	 * @return
 	 */
 	public DocumentationBlock getDocumentation()
 	{
+		if (this.fDocumentation == null)
+		{
+			Symbol comment = fPreDocumentationComment;
+			if (comment != null)
+			{
+				updateDocumentationFromSDoc(comment);
+			}
+			else
+			{
+				Symbol doc = fPostDocumentationComment;
+				if (doc != null)
+				{
+					updateDocumentationFromVSDoc(doc);
+				}
+			}
+		}
 		return this.fDocumentation;
+	}
+
+	private void updateDocumentationFromVSDoc(Symbol doc)
+	{
+		VSDocReader parser = new VSDocReader();
+
+		ByteArrayInputStream input = null;
+
+		try
+		{
+			List<Symbol> lines = (List<Symbol>) doc.value;
+			String source = this.buildVSDocXML(lines);
+
+			input = new ByteArrayInputStream(source.getBytes());
+
+			parser.loadXML(input);
+
+			DocumentationBlock result = parser.getBlock();
+
+			if (result != null)
+			{
+				if (lines.size() > 0)
+				{
+					result.setRange(lines.get(0).getStart(), lines.get(lines.size() - 1).getEnd());
+				}
+
+				setDocumentation(result);
+			}
+		}
+		catch (java.lang.Exception e)
+		{
+		}
+		finally
+		{
+			try
+			{
+				if (input != null)
+				{
+					input.close();
+				}
+			}
+			catch (IOException e)
+			{
+			}
+		}
+	}
+
+	private void updateDocumentationFromSDoc(Symbol comment)
+	{
+		SDocParser parser = new SDocParser();
+		try
+		{
+			Object result = parser.parse((String) comment.value, comment.getStart());
+
+			if (result instanceof DocumentationBlock)
+			{
+				setDocumentation((DocumentationBlock) result);
+			}
+		}
+		catch (java.lang.Exception e)
+		{
+		}
+	}
+
+	/**
+	 * buildVSDocXML
+	 * 
+	 * @param lines
+	 * @return
+	 */
+	private String buildVSDocXML(List<Symbol> lines)
+	{
+		StringBuffer buffer = new StringBuffer();
+		buffer.append("<docs>\n"); //$NON-NLS-1$
+
+		for (Symbol line : lines)
+		{
+			String text = (String) line.value;
+
+			buffer.append(text.substring(3));
+		}
+
+		buffer.append("</docs>"); //$NON-NLS-1$
+
+		return buffer.toString();
 	}
 
 	/*
@@ -213,13 +324,37 @@ public class JSNode extends ParseNode
 	}
 
 	/**
+	 * Pre documentation (i.e.: sdoc format).
+	 */
+	public void setPreDocumentation(Symbol comment)
+	{
+		this.fPreDocumentationComment = comment;
+		this.fPostDocumentationComment = null;
+		this.fDocumentation = null;
+	}
+
+	/**
+	 * Post documentation (i.e.: vsdoc format).
+	 * 
+	 * @param comment
+	 */
+	public void setPostDocumentation(Symbol comment)
+	{
+		this.fPreDocumentationComment = null;
+		this.fPostDocumentationComment = comment;
+		this.fDocumentation = null;
+	}
+
+	/**
 	 * setDocumentation
 	 * 
 	 * @param block
 	 */
 	public void setDocumentation(DocumentationBlock block)
 	{
-		fDocumentation = block;
+		this.fDocumentation = block;
+		this.fPreDocumentationComment = null;
+		this.fPostDocumentationComment = null;
 	}
 
 	/**
@@ -254,4 +389,5 @@ public class JSNode extends ParseNode
 
 		return walker.getText();
 	}
+
 }

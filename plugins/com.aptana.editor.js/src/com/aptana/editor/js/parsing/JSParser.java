@@ -198,129 +198,107 @@ public class JSParser extends Parser implements IParser {
 	private final List<IRecoveryStrategy> recoveryStrategies;
 	private JSFlexScanner fScanner;
 
-	/**
-	 * attachPostDocumentationBlocks
-	 * 
-	 * @param root
-	 * @param source
-	 */
-	private void attachPostDocumentationBlocks(JSParseRootNode root, String source)
-	{
-		// process each post-documentation block
-		for (DocumentationBlock block : this.parsePostDocumentationBlocks())
-		{
-			int index = block.getStart() - 1;
+    /**
+     * attachPostDocumentationBlocks
+     * 
+     * @param root
+     * @param source
+     */
+    private void attachPostDocumentationBlocks(JSParseRootNode root, String source)
+    {
+        // process each post-documentation block
+        for (Symbol block : this.fScanner.getVSDocComments())
+        {
+            int index = block.getStart() - 1;
 
-			while (index >= 0 && Character.isWhitespace(source.charAt(index)))
-			{
-				index--;
-			}
+            while (index >= 0 && Character.isWhitespace(source.charAt(index)))
+            {
+                index--;
+            }
 
-			IParseNode node = root.getNodeAtOffset(index);
+            IParseNode node = root.getNodeAtOffset(index);
 
-			if (node instanceof JSNode)
-			{
-				switch (node.getNodeType())
-				{
-					case IJSNodeTypes.STATEMENTS:
-						IParseNode parent = node.getParent();
+            if (node instanceof JSNode)
+            {
+                switch (node.getNodeType())
+                {
+                    case IJSNodeTypes.STATEMENTS:
+                        IParseNode parent = node.getParent();
 
-						if (parent.getNodeType() == IJSNodeTypes.FUNCTION)
-						{
-							((JSNode) parent).setDocumentation(block);
-						}
-						break;
+                        if (parent.getNodeType() == IJSNodeTypes.FUNCTION)
+                        {
+                            ((JSNode) parent).setPostDocumentation(block);
+                        }
+                        break;
 
-					default:
-						((JSNode) node).setDocumentation(block);
-						break;
-				}
-			}
-		}
-	}
+                    default:
+                        ((JSNode) node).setPostDocumentation(block);
+                        break;
+                }
+            }
+        }
+    }
 
-	/**
-	 * attachPreDocumentationBlocks
-	 * 
-	 * @param root
-	 * @param source
-	 */
-	private void attachPreDocumentationBlocks(JSParseRootNode root, String source)
-	{
-		// process each pre-documentation block
-		for (DocumentationBlock block : this.parsePreDocumentationBlocks())
-		{
-			int index = block.getEnd() + 1;
+    /**
+     * attachPreDocumentationBlocks
+     * 
+     * @param root
+     * @param source
+     */
+    private void attachPreDocumentationBlocks(JSParseRootNode root, String source)
+    {
+        // process each pre-documentation block
+        List<Symbol> sDocComments = fScanner.getSDocComments();
+        for (Symbol comment : sDocComments)
+        {
+            int index = comment.getEnd() + 1;
 
-			while (index < source.length() && Character.isWhitespace(source.charAt(index)))
-			{
-				index++;
-			}
+            while (index < source.length() && Character.isWhitespace(source.charAt(index)))
+            {
+                index++;
+            }
 
-			IParseNode node = root.getNodeAtOffset(index);
+            IParseNode node = root.getNodeAtOffset(index);
 
-			if (node instanceof JSNode)
-			{
-				if (node instanceof JSGroupNode && node.getFirstChild() instanceof JSFunctionNode)
-				{
-					((JSNode) node.getFirstChild()).setDocumentation(block);
-				}
-				else if (node instanceof JSIdentifierNode && node.getParent() instanceof JSNameValuePairNode)
-				{
-					// associate documentation with property's value
-					JSNameValuePairNode entry = (JSNameValuePairNode) node.getParent();
-					((JSNode) entry.getValue()).setDocumentation(block);
-				}
-				else
-				{
-					IParseNode statement = ((JSNode) node).getContainingStatementNode();
+            if (node instanceof JSNode)
+            {
+                if (node instanceof JSGroupNode && node.getFirstChild() instanceof JSFunctionNode)
+                {
+                    ((JSNode) node.getFirstChild()).setPreDocumentation(comment);
+                }
+                else if (node instanceof JSIdentifierNode && node.getParent() instanceof JSNameValuePairNode)
+                {
+                    // associate documentation with property's value
+                    JSNameValuePairNode entry = (JSNameValuePairNode) node.getParent();
+                    ((JSNode) entry.getValue()).setPreDocumentation(comment);
+                }
+                else
+                {
+                    IParseNode statement = ((JSNode) node).getContainingStatementNode();
 
-					if (statement instanceof JSAssignmentNode)
-					{
-						((JSNode) statement.getLastChild()).setDocumentation(block);
-					}
-					else
-					{
-						switch (node.getNodeType())
-						{
-							case IJSNodeTypes.VAR:
-								// associate documentation with first declared variable's value
-								JSVarNode varNode = (JSVarNode) node;
-								((JSNode) varNode.getFirstChild().getLastChild()).setDocumentation(block);
-								break;
+                    if (statement instanceof JSAssignmentNode)
+                    {
+                        ((JSNode) statement.getLastChild()).setPreDocumentation(comment);
+                    }
+                    else
+                    {
+                        switch (node.getNodeType())
+                        {
+                            case IJSNodeTypes.VAR:
+                                // associate documentation with first declared variable's value
+                                JSVarNode varNode = (JSVarNode) node;
+                                ((JSNode) varNode.getFirstChild().getLastChild()).setPreDocumentation(comment);
+                                break;
 
-							default:
-								((JSNode) node).setDocumentation(block);
-								break;
-						}
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * buildVSDocXML
-	 *
-	 * @param lines
-	 * @return
-	 */
-	private String buildVSDocXML(List<Symbol> lines)
-	{
-		StringBuffer buffer = new StringBuffer();
-		buffer.append("<docs>\n");
-
-		for (Symbol line : lines)
-		{
-			String text = (String) line.value;
-
-			buffer.append(text.substring(3));
-		}
-
-		buffer.append("</docs>");
-
-		return buffer.toString();
-	}
+                            default:
+                                ((JSNode) node).setPreDocumentation(comment);
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+    }
 
 	/**
 	 * getNextSymbolIndex
@@ -382,40 +360,16 @@ public class JSParser extends Parser implements IParser {
 			// parse
 			JSParseRootNode result = (JSParseRootNode) parse(fScanner);
 
-			if (attachComments)
-			{
-				// attach documentation
-				attachPreDocumentationBlocks(result, source);
-				attachPostDocumentationBlocks(result, source);
-			}
 
-			if (collectComments)
-			{
-				// create a list of all comments and attach to root node
-				List<JSCommentNode> comments = new ArrayList<JSCommentNode>();
+            if (attachComments)
+            {
+                attachComments(source, result);
+            }
 
-				for (Symbol symbol : fScanner.getSDocComments())
-				{
-					comments.add(new JSCommentNode(IJSNodeTypes.SDOC_COMMENT, symbol.getStart(), symbol.getEnd()));
-				}
-
-				for (Symbol symbol : fScanner.getVSDocComments())
-				{
-					comments.add(new JSCommentNode(IJSNodeTypes.VSDOC_COMMENT, symbol.getStart(), symbol.getEnd()));
-				}
-
-				for (Symbol symbol : fScanner.getSingleLineComments())
-				{
-					comments.add(new JSCommentNode(IJSNodeTypes.SINGLE_LINE_COMMENT, symbol.getStart(), symbol.getEnd()));
-				}
-
-				for (Symbol symbol : fScanner.getMultiLineComments())
-				{
-					comments.add(new JSCommentNode(IJSNodeTypes.MULTI_LINE_COMMENT, symbol.getStart(), symbol.getEnd()));
-				}
-
-				result.setCommentNodes(comments.toArray(new IParseNode[comments.size()]));
-			}
+            if (collectComments)
+            {
+                collectComments(result);
+            }
 
 			// update node offsets
 			int start = parseState.getStartingOffset();
@@ -441,90 +395,48 @@ public class JSParser extends Parser implements IParser {
 		}
 	}
 
-	/**
-	 * parsePostDocumentationBlocks
-	 * 
-	 * @return
-	 */
-	protected List<DocumentationBlock> parsePostDocumentationBlocks()
-	{
-		VSDocReader parser = new VSDocReader();
-		List<DocumentationBlock> blocks = new ArrayList<DocumentationBlock>();
+	
+    private void attachComments(String source, JSParseRootNode result)
+    {
+        // attach documentation
+        attachPreDocumentationBlocks(result, source);
+        attachPostDocumentationBlocks(result, source);
+    }
 
-		for (Symbol doc : fScanner.getVSDocComments())
-		{
-			ByteArrayInputStream input = null;
+    private void collectComments(JSParseRootNode result)
+    {
+        // create a list of all comments and attach to root node
 
-			try
-			{
-				List<Symbol> lines = (List<Symbol>) doc.value;
-				String source = this.buildVSDocXML(lines);
+        List<Symbol> sDocComments = fScanner.getSDocComments();
+        List<Symbol> vsDocComments = fScanner.getVSDocComments();
+        List<Symbol> singleLineComments = fScanner.getSingleLineComments();
+        List<Symbol> multiLineComments = fScanner.getMultiLineComments();
 
-				input = new ByteArrayInputStream(source.getBytes());
+        List<JSCommentNode> comments = new ArrayList<JSCommentNode>(sDocComments.size() + vsDocComments.size()
+                + singleLineComments.size() + multiLineComments.size());
 
-				parser.loadXML(input);
+        for (Symbol symbol : sDocComments)
+        {
+            comments.add(new JSCommentNode(IJSNodeTypes.SDOC_COMMENT, symbol.getStart(), symbol.getEnd()));
+        }
 
-				DocumentationBlock result = parser.getBlock(); 
+        for (Symbol symbol : vsDocComments)
+        {
+            comments.add(new JSCommentNode(IJSNodeTypes.VSDOC_COMMENT, symbol.getStart(), symbol.getEnd()));
+        }
 
-				if (result != null)
-				{
-					if (lines.size() > 0)
-					{
-						result.setRange(lines.get(0).getStart(), lines.get(lines.size() - 1).getEnd());
-					}
+        for (Symbol symbol : singleLineComments)
+        {
+            comments.add(new JSCommentNode(IJSNodeTypes.SINGLE_LINE_COMMENT, symbol.getStart(), symbol.getEnd()));
+        }
 
-					blocks.add(result);
-				}
-			}
-			catch (java.lang.Exception e)
-			{
-			}
-			finally
-			{
-				try
-				{
-					if (input != null)
-					{
-						input.close();
-					}
-				}
-				catch (IOException e)
-				{
-				}
-			}
-		}
+        for (Symbol symbol : multiLineComments)
+        {
+            comments.add(new JSCommentNode(IJSNodeTypes.MULTI_LINE_COMMENT, symbol.getStart(), symbol.getEnd()));
+        }
 
-		return blocks;
-	}
-
-	/**
-	 * parsePreDocumentationBlocks
-	 * 
-	 * @return
-	 */
-	protected List<DocumentationBlock> parsePreDocumentationBlocks()
-	{
-		SDocParser parser = new SDocParser();
-		List<DocumentationBlock> blocks = new ArrayList<DocumentationBlock>();
-
-		for (Symbol doc : fScanner.getSDocComments())
-		{
-			try
-			{
-				Object result = parser.parse((String) doc.value, doc.getStart());
-
-				if (result instanceof DocumentationBlock)
-				{
-					blocks.add((DocumentationBlock) result);
-				}
-			}
-			catch (java.lang.Exception e)
-			{
-			}
-		}
-
-		return blocks;
-	}
+        result.setCommentNodes(comments.toArray(new IParseNode[comments.size()]));
+    }
 
 	/*
 	 * (non-Javadoc)
