@@ -122,13 +122,6 @@ class TreeThemer extends ControlThemer
 						gc.fillRectangle(toColor);
 					}
 
-					// FIX For Windows, the selection color doesn't extend past bounds of the tree item, so here we
-					// draw from right end of item to full width of tree, so selection bg color is full width of view
-					if (!isWindows)
-					{
-						return;
-					}
-
 					// FIX for TISTUD-426: http://jira.appcelerator.org/browse/TISTUD-426
 					// HACK to grab cell editors of tree views (specifically Variables view) and set their control's fg
 					// explicitly!
@@ -150,6 +143,13 @@ class TreeThemer extends ControlThemer
 								}
 							}
 						}
+					}
+
+					// FIX For Windows, the selection color doesn't extend past bounds of the tree item, so here we
+					// draw from right end of item to full width of tree, so selection bg color is full width of view
+					if (!isWindows)
+					{
+						return;
 					}
 
 					TreeItem[] items = tree.getSelection();
