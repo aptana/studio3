@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.jface.dialogs.Dialog;
@@ -37,6 +38,8 @@ import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Color;
@@ -211,8 +214,85 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 			}
 		}
 
+		// Let left/right arrow keys traverse "list" of templates
+		KeyListener keyListener = new KeyListener()
+		{
+			public void keyReleased(KeyEvent e)
+			{
+			}
+
+			public void keyPressed(KeyEvent e)
+			{
+				if (e.keyCode == SWT.ARROW_RIGHT)
+				{
+					setSelectedTemplate(getNextTemplate(fSelectedTemplate));
+				}
+				else if (e.keyCode == SWT.ARROW_LEFT)
+				{
+					setSelectedTemplate(getPreviousTemplate(fSelectedTemplate));
+				}
+			}
+		};
+		// When template list has focus this takes effect
+		templatesListComposite.addKeyListener(keyListener);
+		// When tag list has focus, still let left/right key listener work
+		tagsListViewer.getTable().addKeyListener(keyListener);
+		tagsListViewer.getTable().setFocus();
+
 		Dialog.applyDialogFont(main);
 		setControl(main);
+	}
+
+	private int getTemplateIndex(IProjectTemplate template)
+	{
+		Control[] children = templatesListComposite.getChildren();
+		for (Entry<Composite, IProjectTemplate> entry : templateControlMap.entrySet())
+		{
+			if (entry.getValue().equals(template))
+			{
+				Composite comp = entry.getKey();
+				for (int i = 0; i < children.length; i++)
+				{
+					if (comp == children[i])
+					{
+						return i;
+					}
+				}
+			}
+		}
+		return -1;
+	}
+
+	protected IProjectTemplate getPreviousTemplate(IProjectTemplate selectedTemplate)
+	{
+		int index = getTemplateIndex(selectedTemplate);
+		if (index == -1)
+		{
+			return selectedTemplate;
+		}
+		Control[] children = templatesListComposite.getChildren();
+		int prevIndex = index - 1;
+		if (prevIndex < 0)
+		{
+			prevIndex = children.length - 1;
+		}
+		return templateControlMap.get(children[prevIndex]);
+	}
+
+	protected IProjectTemplate getNextTemplate(IProjectTemplate selectedTemplate)
+	{
+		int index = getTemplateIndex(selectedTemplate);
+		if (index == -1)
+		{
+			return selectedTemplate;
+		}
+		Control[] children = templatesListComposite.getChildren();
+		int nextIndex = index + 1;
+		if (nextIndex >= children.length)
+		{
+			nextIndex = 0;
+		}
+		return templateControlMap.get(children[nextIndex]);
 	}
 
 	private Composite createTemplatesList(Composite parent)
