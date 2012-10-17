@@ -14,6 +14,7 @@ import org.eclipse.ui.PlatformUI;
 
 import com.aptana.ide.core.io.auth.IAuthenticationManager;
 import com.aptana.ide.core.io.auth.IAuthenticationPrompt;
+import com.aptana.ui.dialogs.PasswordPromptDialog;
 
 /**
  * @author Max Stepanov
