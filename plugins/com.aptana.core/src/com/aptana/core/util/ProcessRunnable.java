@@ -27,9 +27,9 @@ import com.aptana.core.logging.IdeLog;
  */
 public class ProcessRunnable implements Runnable
 {
-	private Process p;
+	protected Process p;
 	protected IProgressMonitor monitor;
-	private IStatus status;
+	protected IStatus status;
 	private boolean isErrRedirected;
 
 	public ProcessRunnable(Process p, IProgressMonitor monitor, boolean isErrRedirected)
