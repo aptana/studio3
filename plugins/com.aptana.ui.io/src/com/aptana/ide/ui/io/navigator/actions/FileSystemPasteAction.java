@@ -10,7 +10,11 @@ package com.aptana.ide.ui.io.navigator.actions;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.util.LocalSelectionTransfer;
@@ -23,6 +27,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.BaseSelectionListenerAction;
 
+import com.aptana.core.io.efs.EFSUtils;
+import com.aptana.ide.ui.io.FileSystemUtils;
 import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ide.ui.io.Utils;
 import com.aptana.ide.ui.io.actions.CopyFilesOperation;
@@ -106,7 +112,7 @@ public class FileSystemPasteAction extends BaseSelectionListenerAction {
 
         IFileStore fileStore;
         for (Object element : elements) {
-            fileStore = Utils.getFileStore(element);
+            fileStore = getFileStore(element);
             if (fileStore != null) {
             	if (!Utils.isDirectory(fileStore))
             	{
@@ -150,4 +156,21 @@ public class FileSystemPasteAction extends BaseSelectionListenerAction {
         }
         return false;
     }
+
+	private static IFileStore getFileStore(Object adaptable)
+	{
+		if (adaptable instanceof IAdaptable)
+		{
+			IResource resource = (IResource) ((IAdaptable) adaptable).getAdapter(IResource.class);
+			try
+			{
+				return EFS.getStore(resource.getLocationURI());
+			}
+			catch (CoreException e)
+			{
+				return EFSUtils.getFileStore(resource);
+			}
+		}
+		return FileSystemUtils.getFileStore(adaptable);
+	}
 }
