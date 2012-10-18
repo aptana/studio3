@@ -10,6 +10,7 @@ package com.aptana.core.util;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -56,6 +57,7 @@ public class ProcessRunnable implements Runnable
 		BufferedReader br = null;
 		try
 		{
+			preRunActions(p.getOutputStream());
 			InputStream errorStream = p.getErrorStream();
 			if (isErrRedirected)
 			{
@@ -113,5 +115,10 @@ public class ProcessRunnable implements Runnable
 	protected void handleLine(String line)
 	{
 		monitor.subTask(line);
+	}
+
+	protected void preRunActions(OutputStream outStream)
+	{
+
 	}
 }
