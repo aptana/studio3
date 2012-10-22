@@ -220,6 +220,11 @@ public class EclipseUtil
 		{
 			// ignores
 		}
+		if (StringUtil.isEmpty(version))
+		{
+			// falls back to the branding plugin version
+			return getStudioVersion();
+		}
 		return version;
 	}
 
@@ -233,8 +238,7 @@ public class EclipseUtil
 		{
 			return bundle.getVersion().toString();
 		}
-		// falls back to the about box
-		return getProductVersion();
+		return StringUtil.EMPTY;
 	}
 
 	/**
