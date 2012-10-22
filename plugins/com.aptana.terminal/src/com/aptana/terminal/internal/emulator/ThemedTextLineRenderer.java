@@ -9,6 +9,7 @@
 
 package com.aptana.terminal.internal.emulator;
 
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
@@ -18,7 +19,11 @@ import org.eclipse.tm.internal.terminal.textcanvas.TextLineRenderer;
 import org.eclipse.tm.terminal.model.LineSegment;
 import org.eclipse.tm.terminal.model.Style;
 
+import com.aptana.core.util.ArrayUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.terminal.internal.hyperlink.HyperlinkManager;
+import com.aptana.theme.ColorManager;
+import com.aptana.theme.IThemeManager;
 import com.aptana.theme.Theme;
 import com.aptana.theme.ThemePlugin;
 
@@ -43,7 +48,7 @@ import com.aptana.theme.ThemePlugin;
 		fStyleMap = getStyleMap();
 	}
 
-	static ThemedStyleMap getStyleMap()
+	synchronized static ThemedStyleMap getStyleMap()
 	{
 		if (sThemedStyleMap == null)
 		{
@@ -55,15 +60,25 @@ import com.aptana.theme.ThemePlugin;
 	@Override
 	protected Color getSelectionBackground()
 	{
-		Theme theme = ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
-		return ThemePlugin.getDefault().getColorManager().getColor(theme.getSelectionAgainstBG());
+		Theme theme = getThemeManager().getCurrentTheme();
+		return getColorManager().getColor(theme.getSelectionAgainstBG());
 	}
 
 	@Override
 	protected Color getSelectionForeground()
 	{
-		Theme theme = ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
-		return ThemePlugin.getDefault().getColorManager().getColor(theme.getForeground());
+		Theme theme = getThemeManager().getCurrentTheme();
+		return getColorManager().getColor(theme.getForeground());
+	}
+
+	protected IThemeManager getThemeManager()
+	{
+		return ThemePlugin.getDefault().getThemeManager();
+	}
+
+	protected ColorManager getColorManager()
+	{
+		return ThemePlugin.getDefault().getColorManager();
 	}
 
 	public void drawLine(ITextCanvasModel model, GC gc, int line, int x, int y, int colFirst, int colLast)
@@ -86,15 +101,27 @@ import com.aptana.theme.ThemePlugin;
 				drawText(gc, x, y, colFirst, segment.getColumn(), text);
 				drawCursor(model, gc, line, x, y, colFirst);
 			}
-			char[] c = getTerminalText().getChars(line);
+
+			char[] chars = model.getTerminalText().getChars(line);
 			IHyperlink[] links = this.hyperlinkManager.searchLineForHyperlinks(line);
-			if (links != null && links.length > 0)
+			if (!ArrayUtil.isEmpty(links))
 			{
 				for (IHyperlink link : links)
 				{
-					String text = new String(c, link.getHyperlinkRegion().getOffset(), link.getHyperlinkRegion()
-							.getLength());
-					underlineText(gc, x, y, colFirst, link.getHyperlinkRegion().getOffset(), text);
+					IRegion region = link.getHyperlinkRegion();
+					String text = StringUtil.EMPTY;
+					if (chars != null)
+					{
+						try
+						{
+							text = new String(chars, region.getOffset(), region.getLength());
+						}
+						catch (Exception e)
+						{
+							// ignore errors?
+						}
+					}
+					underlineText(gc, x, y, colFirst, region.getOffset(), text);
 				}
 			}
 			if (fModel.hasLineSelection(line))
@@ -103,18 +130,26 @@ import com.aptana.theme.ThemePlugin;
 				gc.setBackground(getSelectionBackground());
 				Point start = model.getSelectionStart();
 				Point end = model.getSelectionEnd();
-				char[] chars = model.getTerminalText().getChars(line);
+
 				if (chars == null)
+				{
 					return;
+				}
 				int offset = 0;
 				if (start.y == line)
+				{
 					offset = start.x;
+				}
 				offset = Math.max(offset, colFirst);
 				int len;
 				if (end.y == line)
+				{
 					len = end.x - offset + 1;
+				}
 				else
+				{
 					len = chars.length - offset + 1;
+				}
 				len = Math.min(len, chars.length - offset);
 				if (len > 0)
 				{
