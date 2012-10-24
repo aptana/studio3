@@ -148,6 +148,8 @@ public class GitExecutableTest extends TestCase
 		context.checking(new Expectations()
 		{
 			{
+				allowing(process).getOutputStream();
+
 				oneOf(process).getInputStream();
 				will(returnValue(new ByteArrayInputStream(stdOutText.getBytes())));
 
@@ -204,6 +206,8 @@ public class GitExecutableTest extends TestCase
 		context.checking(new Expectations()
 		{
 			{
+				allowing(process).getOutputStream();
+
 				oneOf(process).getInputStream();
 				will(returnValue(new ByteArrayInputStream(stdOutText.getBytes())));
 
@@ -262,6 +266,8 @@ public class GitExecutableTest extends TestCase
 		context.checking(new Expectations()
 		{
 			{
+				allowing(process).getOutputStream();
+
 				oneOf(process).getInputStream();
 				will(returnValue(new ByteArrayInputStream(stdOutText.getBytes())));
 
