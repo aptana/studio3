@@ -57,7 +57,7 @@ public class ProcessRunnable implements Runnable
 		BufferedReader br = null;
 		try
 		{
-			preRunActions(p.getOutputStream());
+			preRunActions();
 			InputStream errorStream = p.getErrorStream();
 			if (isErrRedirected)
 			{
@@ -117,8 +117,8 @@ public class ProcessRunnable implements Runnable
 		monitor.subTask(line);
 	}
 
-	protected void preRunActions(OutputStream outStream)
+	protected void preRunActions()
 	{
-
+		// no-op
 	}
 }

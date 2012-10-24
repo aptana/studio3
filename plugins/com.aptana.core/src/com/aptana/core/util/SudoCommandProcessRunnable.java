@@ -7,7 +7,6 @@
  */
 package com.aptana.core.util;
 
-import java.io.OutputStream;
 import java.io.PrintWriter;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -28,13 +27,13 @@ public class SudoCommandProcessRunnable extends ProcessRunnable
 
 	}
 
-	public void preRunActions(OutputStream outStream)
+	public void preRunActions()
 	{
 		if (password == null || password.length == 0)
 		{
 			return;
 		}
-		PrintWriter pwdWriter = new PrintWriter(outStream);
+		PrintWriter pwdWriter = new PrintWriter(p.getOutputStream());
 		pwdWriter.println(password); // writes the password to the prompt.
 		pwdWriter.flush();
 	}
