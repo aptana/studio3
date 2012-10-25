@@ -27,8 +27,7 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.ui.UIPlugin;
 
 /**
- * Note: Moved from com.aptana.ide.ui.io.auth package to re-use it
- * in different plugins.
+ * Note: Moved from com.aptana.ide.ui.io.auth package to re-use it in different plugins.
  * 
  * @author Max Stepanov
  */
@@ -62,6 +61,7 @@ public class PasswordPromptDialog extends TitleAreaDialog
 		this.title = title;
 		this.message = message;
 		savePasswordPrompt = savePrompt;
+		setHelpAvailable(false);
 	}
 
 	/**
