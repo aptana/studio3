@@ -186,7 +186,7 @@ public abstract class AbstractPortalBrowserEditor extends EditorPart
 			// added to do so through the browserInteractions extension point.
 			BrowserNotifier.getInstance().registerBrowser(getSite().getId(), browser);
 		}
-		catch (SWTError e)
+		catch (Throwable e)
 		{
 			// Open a dialog pointing user at docs for workaround
 			HyperlinkMessageDialog dialog = new HyperlinkMessageDialog(UIUtils.getActiveShell(),
