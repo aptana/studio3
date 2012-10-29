@@ -21,11 +21,16 @@ public class Messages extends NLS
 
 	public static String ProjectSelectionDialog_Message;
 	public static String ProjectSelectionDialog_Title;
-	
+
 	public static String PasswordPromptDialog_Login;
 	public static String PasswordPromptDialog_Password;
 	public static String PasswordPromptDialog_SavePassword;
 	public static String PasswordPromptDialog_UserName;
+
+	public static String SudoPasswordPromptDialog_MessagePrompt_Prefix;
+	public static String SudoPasswordPromptDialog_MessagePrompt_Suffix;
+	public static String SudoPasswordPromptDialog_User;
+	public static String SudoPasswordPromptDialog_Password;
 
 	static
 	{
