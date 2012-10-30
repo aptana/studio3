@@ -8,6 +8,7 @@
 package com.aptana.editor.js.text;
 
 import java.text.MessageFormat;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.jface.action.Action;
@@ -67,7 +68,7 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 			// and then getHeader and getDocumentation just return the values.
 			AbstractThemeableEditor editorPart = getEditor(textViewer);
 
-			List<PropertyElement> properties = JSModelUtil.getProperties(editorPart, activeNode);
+			Collection<PropertyElement> properties = JSModelUtil.getProperties(editorPart, activeNode);
 			if (!CollectionsUtil.isEmpty(properties))
 			{
 				Index index = getIndex(editorPart);
@@ -230,7 +231,7 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 		private static final String IMG_OPEN_HELP = "icons/full/elcl16/open_browser.gif"; //$NON-NLS-1$
 		private static final String IMG_OPEN_HELP_DISABLED = "icons/full/dlcl16/open_browser.gif"; //$NON-NLS-1$
 		private CustomBrowserInformationControl iControl;
-		private List<PropertyElement> properties;
+		private Collection<PropertyElement> properties;
 
 		public OpenHelpAction(CustomBrowserInformationControl iControl)
 		{
@@ -265,7 +266,7 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 			iControl.dispose();
 			// Resolve the help path. We already know that the properties are not empty, so we just grab the
 			// first one.
-			PropertyElement element = properties.get(0);
+			PropertyElement element = properties.iterator().next();
 			String owningType = element.getOwningType();
 			String name = element.getName();
 			List<ReturnTypeElement> types = element.getTypes();

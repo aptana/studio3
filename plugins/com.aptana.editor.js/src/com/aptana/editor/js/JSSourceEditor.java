@@ -102,7 +102,7 @@ public class JSSourceEditor extends AbstractThemeableEditor
 
 			private AbstractThemeableEditor editor;
 			private final IParseNode node;
-			private List<PropertyElement> fProperties;
+			private Collection<PropertyElement> fProperties;
 
 			private JSHelpContext(AbstractThemeableEditor editor, IParseNode node)
 			{

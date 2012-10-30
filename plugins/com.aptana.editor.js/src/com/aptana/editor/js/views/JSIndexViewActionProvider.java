@@ -1,12 +1,13 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.editor.js.views;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
@@ -75,7 +76,7 @@ public class JSIndexViewActionProvider implements IActionProvider
 
 						Index index = getIndexManager().getIndex(project.getLocationURI());
 						JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
-						List<TypeElement> types = queryHelper.getTypes(index, typeNames.get(0), true);
+						Collection<TypeElement> types = queryHelper.getTypes(index, typeNames.get(0), true);
 						List<ClassElement> classes = JSTypeUtil.typesToClasses(types);
 
 						if (!CollectionsUtil.isEmpty(classes))

@@ -661,7 +661,7 @@ public class JSTypeUtil
 	 * @param types
 	 * @return
 	 */
-	public static List<ClassElement> typesToClasses(List<TypeElement> types)
+	public static List<ClassElement> typesToClasses(Collection<TypeElement> types)
 	{
 		List<ClassElement> classes = new ArrayList<ClassElement>();
 

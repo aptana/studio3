@@ -174,7 +174,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	private void addCoreGlobals(Set<ICompletionProposal> proposals, int offset)
 	{
-		List<PropertyElement> globals = indexHelper.getCoreGlobals();
+		Collection<PropertyElement> globals = indexHelper.getCoreGlobals();
 
 		if (!CollectionsUtil.isEmpty(globals))
 		{
@@ -222,7 +222,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 				for (String type : param.getTypes())
 				{
-					List<PropertyElement> properties = indexHelper.getTypeProperties(getIndex(), type);
+					Collection<PropertyElement> properties = indexHelper.getTypeProperties(getIndex(), type);
 
 					for (PropertyElement property : CollectionsUtil.filter(properties, isVisibleFilter))
 					{
@@ -241,7 +241,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	private void addProjectGlobals(Set<ICompletionProposal> proposals, int offset)
 	{
-		List<PropertyElement> projectGlobals = indexHelper.getProjectGlobals(getIndex());
+		Collection<PropertyElement> projectGlobals = indexHelper.getGlobals(getIndex());
 
 		if (!CollectionsUtil.isEmpty(projectGlobals))
 		{
@@ -489,7 +489,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			// myFunc = function(){...}
 			// myFunc.prototype.foo = function(){...}
 			IParseNode parent = currentFunctionNode.getParent();
-			if(parent.getNodeType() == IJSNodeTypes.ASSIGN){
+			if (parent.getNodeType() == IJSNodeTypes.ASSIGN)
+			{
 				parent = parent.getParent();
 			}
 			IParseNode[] children = parent.getChildren();
@@ -640,7 +641,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		allTypes.add(0, typeName);
 
 		// add properties and methods
-		List<PropertyElement> properties = indexHelper.getTypeMembers(index, allTypes);
+		Collection<PropertyElement> properties = indexHelper.getTypeMembers(index, allTypes);
 		URI projectURI = getProjectURI();
 		for (PropertyElement property : CollectionsUtil.filter(properties, new ChainedFilter<PropertyElement>(
 				isNotConstructorFilter, isVisibleFilter)))
@@ -972,7 +973,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 			if (typeName != null && methodName != null)
 			{
-				List<PropertyElement> properties = indexHelper.getTypeMembers(getIndex(), typeName, methodName);
+				Collection<PropertyElement> properties = indexHelper.getTypeMembers(getIndex(), typeName, methodName);
 
 				if (properties != null)
 				{

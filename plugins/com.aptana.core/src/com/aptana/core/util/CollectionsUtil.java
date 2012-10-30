@@ -646,7 +646,7 @@ public class CollectionsUtil
 	 *            Collection #2
 	 * @return Collection with items from both lists
 	 */
-	public static <T> Collection<T> union(Collection<T> collection1, Collection<T> collection2)
+	public static <T> Collection<T> union(Collection<? extends T> collection1, Collection<? extends T> collection2)
 	{
 		if (isEmpty(collection1))
 		{

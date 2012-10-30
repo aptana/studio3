@@ -435,7 +435,7 @@ public class JSHyperlinkCollector extends JSTreeWalker
 
 			for (String typeName : types)
 			{
-				List<PropertyElement> members = queryHelper.getTypeMembers(index, typeName, node.getText());
+				Collection<PropertyElement> members = queryHelper.getTypeMembers(index, typeName, node.getText());
 
 				elements.addAll(members);
 			}
@@ -452,7 +452,7 @@ public class JSHyperlinkCollector extends JSTreeWalker
 	 * @param node
 	 *            The JS node that refers to each of the property elements
 	 */
-	protected void processPropertyElements(List<PropertyElement> elements, JSIdentifierNode node)
+	protected void processPropertyElements(Collection<PropertyElement> elements, JSIdentifierNode node)
 	{
 		URI projectURI = EditorUtil.getProjectURI(editor);
 		IRegion region = getNodeRegion(node);
@@ -511,7 +511,7 @@ public class JSHyperlinkCollector extends JSTreeWalker
 	protected void processVariable(JSIdentifierNode node)
 	{
 		JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
-		List<PropertyElement> elements = queryHelper.getGlobals(EditorUtil.getIndex(editor), node.getText());
+		Collection<PropertyElement> elements = queryHelper.getGlobals(EditorUtil.getIndex(editor), node.getText());
 
 		processPropertyElements(elements, node);
 	}
