@@ -161,7 +161,7 @@ public class JSCAIndexingTests extends JSEditorBasedTests
 		assertTypes(index, "SimpleType");
 
 		// check for global
-		Collection<PropertyElement> global = queryHelper.getGlobals(index, "SimpleType");
+		Collection<PropertyElement> global = queryHelper.getGlobals(index, null, null, "SimpleType");
 		assertNotNull(global);
 		assertFalse(global.isEmpty());
 	}
@@ -174,7 +174,7 @@ public class JSCAIndexingTests extends JSEditorBasedTests
 		assertTypes(index, "SimpleType");
 
 		// check for global
-		Collection<PropertyElement> global = queryHelper.getGlobals(index, "SimpleType");
+		Collection<PropertyElement> global = queryHelper.getGlobals(index, null, null, "SimpleType");
 		assertNotNull(global);
 		assertTrue(global.isEmpty());
 	}
@@ -200,7 +200,7 @@ public class JSCAIndexingTests extends JSEditorBasedTests
 		assertTypes(index, "com", "com.aptana", "com.aptana.SimpleType");
 
 		// check for global
-		Collection<PropertyElement> global = queryHelper.getGlobals(index, "com");
+		Collection<PropertyElement> global = queryHelper.getGlobals(index, null, null, "com");
 		assertNotNull(global);
 		assertTrue(global.isEmpty());
 	}

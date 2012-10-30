@@ -511,7 +511,8 @@ public class JSHyperlinkCollector extends JSTreeWalker
 	protected void processVariable(JSIdentifierNode node)
 	{
 		JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
-		Collection<PropertyElement> elements = queryHelper.getGlobals(EditorUtil.getIndex(editor), node.getText());
+		Collection<PropertyElement> elements = queryHelper.getGlobals(EditorUtil.getIndex(editor),
+				EditorUtil.getProject(editor), EditorUtil.getFileName(editor), node.getText());
 
 		processPropertyElements(elements, node);
 	}
