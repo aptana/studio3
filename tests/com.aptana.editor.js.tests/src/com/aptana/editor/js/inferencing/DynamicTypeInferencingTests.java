@@ -49,7 +49,7 @@ public class DynamicTypeInferencingTests extends InferencingTestsBase
 		indexer.indexTree(store, source, index, (JSParseRootNode) root);
 
 		JSIndexQueryHelper helper = new JSIndexQueryHelper();
-		Collection<PropertyElement> globals = helper.getGlobals(index, "one");
+		Collection<PropertyElement> globals = helper.getGlobals(index, null, file.getName(), "one");
 		assertEquals(1, globals.size());
 		PropertyElement global = globals.iterator().next();
 

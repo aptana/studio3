@@ -15,7 +15,13 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
+
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.URIUtil;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
@@ -564,7 +570,8 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 				}
 
 				// lookup up rhs name in type and add that value's type here
-				Collection<PropertyElement> properties = this._queryHelper.getTypeMembers(this._index, typeName, memberName);
+				Collection<PropertyElement> properties = this._queryHelper.getTypeMembers(this._index, typeName,
+						memberName);
 
 				if (properties != null)
 				{
@@ -640,14 +647,14 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 				else
 				{
 					// No match in the local scope, query the globals in index
-					properties = this._queryHelper.getGlobals(this._index, name);
+					properties = this._queryHelper.getGlobals(this._index, getProject(), getFileName(), name);
 				}
 			}
 		}
 		else
 		{
 			// Scope says it doesn't has a symbol with that name, so query the globals in index
-			properties = this._queryHelper.getGlobals(this._index, name);
+			properties = this._queryHelper.getGlobals(this._index, getProject(), getFileName(), name);
 		}
 
 		// Hopefully we found at least one match...
@@ -672,6 +679,27 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 				}
 			}
 		}
+	}
+
+	protected String getFileName()
+	{
+		return URIUtil.getFileName(_location);
+	}
+
+	protected IProject getProject()
+	{
+		URI root = _index.getRoot();
+		IPath containerPath = org.eclipse.core.filesystem.URIUtil.toPath(root);
+		if (containerPath == null)
+		{
+			return null;
+		}
+		IContainer container = ResourcesPlugin.getWorkspace().getRoot().getContainerForLocation(containerPath);
+		if (container == null)
+		{
+			return null;
+		}
+		return container.getProject();
 	}
 
 	/*

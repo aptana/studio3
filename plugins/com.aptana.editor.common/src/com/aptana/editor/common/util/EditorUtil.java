@@ -272,6 +272,12 @@ public class EditorUtil
 		return null;
 	}
 
+	public static String getFileName(IEditorPart editor)
+	{
+		URI uri = getURI(editor);
+		return com.aptana.core.util.URIUtil.getFileName(uri);
+	}
+
 	/**
 	 * Open a file in an editor and return the opened editor part.<br>
 	 * This method will try to open the file in an internal editor, unless there is no editor descriptor assigned to

@@ -9,6 +9,7 @@ package com.aptana.editor.js.inferencing;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -19,10 +20,17 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.content.IContentType;
+
+import com.aptana.core.IFilter;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.model.ClassElement;
@@ -707,5 +715,58 @@ public class JSTypeUtil
 	 */
 	private JSTypeUtil()
 	{
+	}
+
+	public static String getGlobalType(IProject project, String fileName)
+	{
+		// If the file is HTML/PHP/ERB, assume Window. We cheat by checking if _not_ associated with JS
+		if (fileName != null)
+		{
+			IContentType type = Platform.getContentTypeManager().getContentType(IJSConstants.CONTENT_TYPE_JS);
+			if (!type.isAssociatedWith(fileName) && !fileName.endsWith("jsca") && !fileName.endsWith("json") //$NON-NLS-1$ //$NON-NLS-2$
+					&& !fileName.endsWith("sdocml")) //$NON-NLS-1$
+			{
+				return JSTypeConstants.WINDOW_TYPE;
+			}
+		}
+
+		// If project is Node.ACS or TiMobile, assume Global
+		// FIXME Use an extension point or something for this?
+		if (project != null)
+		{
+			try
+			{
+				String[] natureIds = project.getDescription().getNatureIds();
+				String matchingNature = CollectionsUtil.find(Arrays.asList(natureIds), new IFilter<String>()
+				{
+					public boolean include(String item)
+					{
+						return item.startsWith("com.appcelerator."); //$NON-NLS-1$
+					}
+				});
+				if (matchingNature != null)
+				{
+					return JSTypeConstants.GLOBAL_TYPE;
+				}
+			}
+			catch (CoreException e)
+			{
+				IdeLog.logInfo(JSPlugin.getDefault(), "Failed to get project description", e, null); //$NON-NLS-1$
+			}
+		}
+
+		// Otherwise default to Window.
+		return JSTypeConstants.WINDOW_TYPE;
+	}
+
+	public static TypeElement createGlobalType(String globalTypeName)
+	{
+		TypeElement window = new TypeElement();
+		window.setName(globalTypeName);
+		if (JSTypeConstants.WINDOW_TYPE.equals(globalTypeName))
+		{
+			window.addParentType(JSTypeConstants.GLOBAL_TYPE);
+		}
+		return window;
 	}
 }
