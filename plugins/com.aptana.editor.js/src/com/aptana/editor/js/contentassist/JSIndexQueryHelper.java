@@ -9,6 +9,7 @@ package com.aptana.editor.js.contentassist;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -68,9 +69,9 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public List<PropertyElement> getCoreGlobals()
+	public Collection<PropertyElement> getCoreGlobals()
 	{
-		return this.getMembers(getIndex(), JSTypeConstants.WINDOW_TYPE);
+		return getGlobals(getIndex());
 	}
 
 	/**
@@ -121,12 +122,11 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public List<PropertyElement> getGlobals(Index index, String name)
+	public Collection<PropertyElement> getGlobals(Index index, String name)
 	{
-		List<PropertyElement> indexGlobals = this.getMembers(index, JSTypeConstants.WINDOW_TYPE, name);
-		List<PropertyElement> builtinGlobals = this.getMembers(getIndex(), JSTypeConstants.WINDOW_TYPE, name);
-
-		return new ArrayList<PropertyElement>(CollectionsUtil.union(indexGlobals, builtinGlobals));
+		Collection<PropertyElement> indexGlobals = getMembers(index, JSTypeConstants.WINDOW_TYPE, name);
+		Collection<PropertyElement> builtinGlobals = getMembers(getIndex(), JSTypeConstants.WINDOW_TYPE, name);
+		return CollectionsUtil.union(indexGlobals, builtinGlobals);
 	}
 
 	/**
@@ -178,23 +178,10 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	protected List<PropertyElement> getMembers(Index index, String typeName, String memberName)
+	protected Collection<PropertyElement> getMembers(Index index, String typeName, String memberName)
 	{
-		List<PropertyElement> result = new ArrayList<PropertyElement>();
-		List<FunctionElement> functions = this.getFunctions(index, typeName, memberName);
-		List<PropertyElement> properties = this.getProperties(index, typeName, memberName);
-
-		if (functions != null)
-		{
-			result.addAll(functions);
-		}
-
-		if (properties != null)
-		{
-			result.addAll(properties);
-		}
-
-		return result;
+		return CollectionsUtil.union(getFunctions(index, typeName, memberName),
+				getProperties(index, typeName, memberName));
 	}
 
 	/**
@@ -205,23 +192,9 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	protected List<PropertyElement> getMembers(Index index, List<String> typeNames)
+	protected Collection<PropertyElement> getMembers(Index index, List<String> typeNames)
 	{
-		List<PropertyElement> result = new ArrayList<PropertyElement>();
-		List<FunctionElement> functions = this.getFunctions(index, typeNames);
-		List<PropertyElement> properties = this.getProperties(index, typeNames);
-
-		if (functions != null)
-		{
-			result.addAll(functions);
-		}
-
-		if (properties != null)
-		{
-			result.addAll(properties);
-		}
-
-		return result;
+		return CollectionsUtil.union(getFunctions(index, typeNames), getProperties(index, typeNames));
 	}
 
 	/**
@@ -232,35 +205,21 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	protected List<PropertyElement> getMembers(Index index, String typeName)
+	protected Collection<PropertyElement> getMembers(Index index, String typeName)
 	{
-		List<PropertyElement> result = new ArrayList<PropertyElement>();
-		List<FunctionElement> functions = this.getFunctions(index, typeName);
-		List<PropertyElement> properties = this.getProperties(index, typeName);
-
-		if (functions != null)
-		{
-			result.addAll(functions);
-		}
-
-		if (properties != null)
-		{
-			result.addAll(properties);
-		}
-
-		return result;
+		return CollectionsUtil.union(getFunctions(index, typeName), getProperties(index, typeName));
 	}
 
 	/**
-	 * getProjectGlobals
+	 * Gets all the members defined on Window or Global in the given Index.
 	 * 
 	 * @param index
-	 * @param fields
 	 * @return
 	 */
-	public List<PropertyElement> getProjectGlobals(Index index)
+	public Collection<PropertyElement> getGlobals(Index index)
 	{
-		return this.getMembers(index, JSTypeConstants.WINDOW_TYPE);
+		return this
+				.getMembers(index, CollectionsUtil.newList(JSTypeConstants.WINDOW_TYPE, JSTypeConstants.GLOBAL_TYPE));
 	}
 
 	/**
@@ -311,23 +270,10 @@ public class JSIndexQueryHelper
 	 * @param includeMembers
 	 * @return
 	 */
-	public List<TypeElement> getTypes(Index index, String typeName, boolean includeMembers)
+	public Collection<TypeElement> getTypes(Index index, String typeName, boolean includeMembers)
 	{
-		List<TypeElement> result = new ArrayList<TypeElement>();
-		List<TypeElement> indexTypes = this._reader.getType(index, typeName, includeMembers);
-		List<TypeElement> builtinTypes = this._reader.getType(getIndex(), typeName, includeMembers);
-
-		if (!CollectionsUtil.isEmpty(indexTypes))
-		{
-			result.addAll(indexTypes);
-		}
-
-		if (!CollectionsUtil.isEmpty(builtinTypes))
-		{
-			result.addAll(builtinTypes);
-		}
-
-		return result;
+		return CollectionsUtil.union(_reader.getType(index, typeName, includeMembers),
+				_reader.getType(getIndex(), typeName, includeMembers));
 	}
 
 	/**
@@ -351,7 +297,7 @@ public class JSIndexQueryHelper
 		while (!queue.isEmpty())
 		{
 			String name = queue.poll();
-			List<TypeElement> typeList = this.getTypes(index, name, false);
+			Collection<TypeElement> typeList = this.getTypes(index, name, false);
 
 			if (typeList != null)
 			{
@@ -385,23 +331,10 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public List<PropertyElement> getTypeMembers(Index index, String typeName, String memberName)
+	public Collection<PropertyElement> getTypeMembers(Index index, String typeName, String memberName)
 	{
-		List<PropertyElement> result = new ArrayList<PropertyElement>();
-		List<PropertyElement> indexMembers = this.getMembers(index, typeName, memberName);
-		List<PropertyElement> builtinMembers = this.getMembers(getIndex(), typeName, memberName);
-
-		if (indexMembers != null)
-		{
-			result.addAll(indexMembers);
-		}
-
-		if (builtinMembers != null)
-		{
-			result.addAll(builtinMembers);
-		}
-
-		return result;
+		return CollectionsUtil.union(getMembers(index, typeName, memberName),
+				getMembers(getIndex(), typeName, memberName));
 	}
 
 	/**
@@ -412,23 +345,9 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public List<PropertyElement> getTypeMembers(Index index, List<String> typeNames)
+	public Collection<PropertyElement> getTypeMembers(Index index, List<String> typeNames)
 	{
-		List<PropertyElement> result = new ArrayList<PropertyElement>();
-		List<PropertyElement> projectMembers = this.getMembers(index, typeNames);
-		List<PropertyElement> globalMembers = this.getMembers(getIndex(), typeNames);
-
-		if (projectMembers != null)
-		{
-			result.addAll(projectMembers);
-		}
-
-		if (globalMembers != null)
-		{
-			result.addAll(globalMembers);
-		}
-
-		return result;
+		return CollectionsUtil.union(getMembers(index, typeNames), getMembers(getIndex(), typeNames));
 	}
 
 	/**
@@ -439,23 +358,9 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public List<PropertyElement> getTypeMembers(Index index, String typeName)
+	public Collection<PropertyElement> getTypeMembers(Index index, String typeName)
 	{
-		List<PropertyElement> result = new ArrayList<PropertyElement>();
-		List<PropertyElement> projectMembers = this.getMembers(index, typeName);
-		List<PropertyElement> globalMembers = this.getMembers(getIndex(), typeName);
-
-		if (projectMembers != null)
-		{
-			result.addAll(projectMembers);
-		}
-
-		if (globalMembers != null)
-		{
-			result.addAll(globalMembers);
-		}
-
-		return result;
+		return CollectionsUtil.union(getMembers(index, typeName), getMembers(getIndex(), typeName));
 	}
 
 	/**
@@ -465,23 +370,9 @@ public class JSIndexQueryHelper
 	 * @param typeName
 	 * @return
 	 */
-	public List<PropertyElement> getTypeProperties(Index index, String typeName)
+	public Collection<PropertyElement> getTypeProperties(Index index, String typeName)
 	{
-		List<PropertyElement> result = new ArrayList<PropertyElement>();
-		List<PropertyElement> projectProperties = this.getProperties(index, typeName);
-		List<PropertyElement> globalProperties = this.getProperties(getIndex(), typeName);
-
-		if (projectProperties != null)
-		{
-			result.addAll(projectProperties);
-		}
-
-		if (globalProperties != null)
-		{
-			result.addAll(globalProperties);
-		}
-
-		return result;
+		return CollectionsUtil.union(getProperties(index, typeName), getProperties(getIndex(), typeName));
 	}
 
 	/**
@@ -502,14 +393,12 @@ public class JSIndexQueryHelper
 	 */
 	public List<TypeElement> getTypes(Index index)
 	{
-		List<TypeElement> result = Collections.emptyList();
-
 		if (index != null)
 		{
-			result = this._reader.getTypes(index, true);
+			return _reader.getTypes(index, true);
 		}
 
-		return result;
+		return Collections.emptyList();
 	}
 
 	public List<EventElement> getEvents(Index index, String owningType, String eventName)

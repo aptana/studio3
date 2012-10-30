@@ -22,6 +22,7 @@ import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
 import org.eclipse.swt.SWT;
 import org.eclipse.ui.IEditorInput;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.ui.util.UIUtils;
 
 public abstract class EditorContentAssistBasedTests<T extends CommonContentAssistProcessor> extends EditorBasedTests
@@ -175,8 +176,10 @@ public abstract class EditorContentAssistBasedTests<T extends CommonContentAssis
 
 			if (enforceOrder || enforceSize)
 			{
-				assertEquals("Length of expected proposal list and actual proposal list did not match.",
-						displayNames.length, names.size());
+
+				assertEquals("Length of expected proposal list and actual proposal list did not match. Non-overlapping: "
+						+ (CollectionsUtil.getNonOverlapping(Arrays.asList(displayNames), names)), displayNames.length,
+						names.size());
 			}
 
 			// this only really makes sense with enforce size

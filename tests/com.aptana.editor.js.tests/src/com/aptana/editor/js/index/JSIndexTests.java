@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -21,7 +22,6 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import com.aptana.jetty.util.epl.ajax.JSON;
 
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.IOUtil;
@@ -44,6 +44,7 @@ import com.aptana.index.core.IndexReader;
 import com.aptana.index.core.QueryResult;
 import com.aptana.index.core.SearchPattern;
 import com.aptana.index.core.build.BuildContext;
+import com.aptana.jetty.util.epl.ajax.JSON;
 import com.aptana.parsing.ast.IParseRootNode;
 
 public class JSIndexTests extends TestCase
@@ -437,11 +438,11 @@ public class JSIndexTests extends TestCase
 			indexParticipant.processParseResults(myContext, index, ast, new NullProgressMonitor());
 			JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
 
-			List<PropertyElement> types = queryHelper.getGlobals(index, "abc");
+			Collection<PropertyElement> types = queryHelper.getGlobals(index, "abc");
 			assertNotNull(types);
 			assertTrue("Expected at least a single property for 'abc'", !types.isEmpty());
 
-			PropertyElement property = types.get(0);
+			PropertyElement property = types.iterator().next();
 			assertTrue("Expected a FunctionElement", property instanceof FunctionElement);
 
 			FunctionElement function = (FunctionElement) property;
@@ -472,11 +473,11 @@ public class JSIndexTests extends TestCase
 			indexParticipant.processParseResults(myContext, index, ast, new NullProgressMonitor());
 			JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
 
-			List<PropertyElement> types = queryHelper.getGlobals(index, "abc");
+			Collection<PropertyElement> types = queryHelper.getGlobals(index, "abc");
 			assertNotNull(types);
 			assertTrue("Expected at least a single property for 'abc'", !types.isEmpty());
 
-			PropertyElement property = types.get(0);
+			PropertyElement property = types.iterator().next();
 			assertTrue("Expected a FunctionElement", property instanceof FunctionElement);
 
 			FunctionElement function = (FunctionElement) property;

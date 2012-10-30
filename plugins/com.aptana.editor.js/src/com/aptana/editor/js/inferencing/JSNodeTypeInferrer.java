@@ -9,6 +9,7 @@ package com.aptana.editor.js.inferencing;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -442,7 +443,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 
 			for (String typeName : returnTypes)
 			{
-				List<PropertyElement> properties = this._queryHelper.getTypeMembers(this._index, typeName,
+				Collection<PropertyElement> properties = this._queryHelper.getTypeMembers(this._index, typeName,
 						JSTypeConstants.PROTOTYPE_PROPERTY);
 
 				if (properties != null)
@@ -563,7 +564,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 				}
 
 				// lookup up rhs name in type and add that value's type here
-				List<PropertyElement> properties = this._queryHelper.getTypeMembers(this._index, typeName, memberName);
+				Collection<PropertyElement> properties = this._queryHelper.getTypeMembers(this._index, typeName, memberName);
 
 				if (properties != null)
 				{
@@ -613,7 +614,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	public void visit(JSIdentifierNode node)
 	{
 		String name = node.getText();
-		List<PropertyElement> properties = null;
+		Collection<PropertyElement> properties = null;
 
 		if (this._scope != null && this._scope.hasSymbol(name))
 		{

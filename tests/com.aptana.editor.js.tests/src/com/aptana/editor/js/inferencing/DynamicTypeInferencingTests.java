@@ -9,6 +9,7 @@ package com.aptana.editor.js.inferencing;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.filesystem.EFS;
@@ -48,18 +49,18 @@ public class DynamicTypeInferencingTests extends InferencingTestsBase
 		indexer.indexTree(store, source, index, (JSParseRootNode) root);
 
 		JSIndexQueryHelper helper = new JSIndexQueryHelper();
-		List<PropertyElement> globals = helper.getGlobals(index, "one");
+		Collection<PropertyElement> globals = helper.getGlobals(index, "one");
 		assertEquals(1, globals.size());
-		PropertyElement global = globals.get(0);
+		PropertyElement global = globals.iterator().next();
 
 		List<ReturnTypeElement> returnTypes = global.getTypes();
 		assertEquals(1, returnTypes.size());
 		ReturnTypeElement returnType = returnTypes.get(0);
 		assertEquals("one", returnType.getType());
 
-		List<TypeElement> types = helper.getTypes(index, "one", true);
+		Collection<TypeElement> types = helper.getTypes(index, "one", true);
 		assertEquals(1, types.size());
-		TypeElement type = types.get(0);
+		TypeElement type = types.iterator().next();
 		assertEquals("one", type.getName());
 		List<PropertyElement> properties = type.getProperties();
 		assertEquals(1, properties.size());

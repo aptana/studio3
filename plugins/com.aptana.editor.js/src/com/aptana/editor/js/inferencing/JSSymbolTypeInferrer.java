@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -9,6 +9,7 @@ package com.aptana.editor.js.inferencing;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -27,7 +28,6 @@ import com.aptana.editor.js.contentassist.index.JSIndexWriter;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.ParameterElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
-import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
@@ -399,7 +399,7 @@ public class JSSymbolTypeInferrer
 
 		// grab property elements for all collected types
 		List<String> typesAndAncestors = new ArrayList<String>(ancestors);
-		List<PropertyElement> typeMembers = helper.getTypeMembers(index, typesAndAncestors);
+		Collection<PropertyElement> typeMembers = helper.getTypeMembers(index, typesAndAncestors);
 
 		// generate map of property name to its property element
 		Map<String, PropertyElement> propertyMap = new HashMap<String, PropertyElement>();
