@@ -7,6 +7,7 @@
  */
 package com.aptana.editor.js.internal;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class JSModelUtil
 	{
 	}
 
-	public static List<PropertyElement> getProperties(AbstractThemeableEditor editor, IParseNode node)
+	public static Collection<PropertyElement> getProperties(AbstractThemeableEditor editor, IParseNode node)
 	{
 		// We add one because for var assignments, JSLI decrements by one, pushing us before the var name and returning
 		// no results.
@@ -66,7 +67,7 @@ public class JSModelUtil
 
 				if (typeName != null && methodName != null)
 				{
-					List<PropertyElement> properties = queryHelper.getTypeMembers(index, typeName, methodName);
+					Collection<PropertyElement> properties = queryHelper.getTypeMembers(index, typeName, methodName);
 					// filter to only functions
 					return CollectionsUtil.filter(properties, new IFilter<PropertyElement>()
 					{

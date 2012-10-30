@@ -10,6 +10,7 @@ package com.aptana.editor.js.contentassist.index;
 import java.net.URI;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -510,9 +511,9 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 	 * @param symbols
 	 * @param location
 	 */
-	private List<PropertyElement> processWindowAssignments(Index index, JSScope symbols, URI location)
+	private Collection<PropertyElement> processWindowAssignments(Index index, JSScope symbols, URI location)
 	{
-		List<PropertyElement> result = Collections.emptyList();
+		Collection<PropertyElement> result = Collections.emptyList();
 
 		if (symbols != null)
 		{

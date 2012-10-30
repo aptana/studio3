@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -173,8 +174,6 @@ public class JSIndexReader extends IndexReader
 	 */
 	public List<EventElement> getEvents(Index index, List<String> owningTypes)
 	{
-		List<EventElement> result = new ArrayList<EventElement>();
-
 		if (index != null && !CollectionsUtil.isEmpty(owningTypes))
 		{
 			// read events
@@ -186,7 +185,7 @@ public class JSIndexReader extends IndexReader
 			);
 			// @formatter:on
 
-			result = CollectionsUtil.map(events, new IMap<QueryResult, EventElement>()
+			return CollectionsUtil.map(events, new IMap<QueryResult, EventElement>()
 			{
 				public EventElement map(QueryResult item)
 				{
@@ -195,7 +194,7 @@ public class JSIndexReader extends IndexReader
 			});
 		}
 
-		return result;
+		return Collections.emptyList();
 	}
 
 	/**
@@ -222,8 +221,6 @@ public class JSIndexReader extends IndexReader
 	 */
 	public List<EventElement> getEvents(Index index, String owningType, String eventName)
 	{
-		List<EventElement> result = new ArrayList<EventElement>();
-
 		if (index != null && !StringUtil.isEmpty(owningType) && !StringUtil.isEmpty(eventName))
 		{
 			// read events
@@ -235,7 +232,7 @@ public class JSIndexReader extends IndexReader
 			);
 			// @formatter:on
 
-			result = CollectionsUtil.map(events, new IMap<QueryResult, EventElement>()
+			return CollectionsUtil.map(events, new IMap<QueryResult, EventElement>()
 			{
 				public EventElement map(QueryResult item)
 				{
@@ -244,7 +241,7 @@ public class JSIndexReader extends IndexReader
 			});
 		}
 
-		return result;
+		return Collections.emptyList();
 	}
 
 	/**
@@ -257,8 +254,6 @@ public class JSIndexReader extends IndexReader
 	 */
 	public List<FunctionElement> getFunctions(Index index, List<String> owningTypes)
 	{
-		List<FunctionElement> result = new ArrayList<FunctionElement>();
-
 		if (index != null && !CollectionsUtil.isEmpty(owningTypes))
 		{
 			// read functions
@@ -270,7 +265,7 @@ public class JSIndexReader extends IndexReader
 			);
 			// @formatter:on
 
-			result = CollectionsUtil.map(functions, new IMap<QueryResult, FunctionElement>()
+			return CollectionsUtil.map(functions, new IMap<QueryResult, FunctionElement>()
 			{
 				public FunctionElement map(QueryResult item)
 				{
@@ -279,7 +274,7 @@ public class JSIndexReader extends IndexReader
 			});
 		}
 
-		return result;
+		return Collections.emptyList();
 	}
 
 	/**
@@ -306,8 +301,6 @@ public class JSIndexReader extends IndexReader
 	 */
 	public List<FunctionElement> getFunctions(Index index, String owningType, String propertyName)
 	{
-		List<FunctionElement> result = new ArrayList<FunctionElement>();
-
 		if (index != null && !StringUtil.isEmpty(owningType) && !StringUtil.isEmpty(propertyName))
 		{
 			// @formatter:off
@@ -318,7 +311,7 @@ public class JSIndexReader extends IndexReader
 			);
 			// @formatter:on
 
-			result = CollectionsUtil.map(functions, new IMap<QueryResult, FunctionElement>()
+			return CollectionsUtil.map(functions, new IMap<QueryResult, FunctionElement>()
 			{
 				public FunctionElement map(QueryResult item)
 				{
@@ -327,7 +320,7 @@ public class JSIndexReader extends IndexReader
 			});
 		}
 
-		return result;
+		return Collections.emptyList();
 	}
 
 	/**
@@ -388,8 +381,6 @@ public class JSIndexReader extends IndexReader
 	 */
 	public List<PropertyElement> getProperties(Index index, List<String> owningTypes)
 	{
-		List<PropertyElement> result = new ArrayList<PropertyElement>();
-
 		if (index != null && !CollectionsUtil.isEmpty(owningTypes))
 		{
 			// read properties
@@ -401,7 +392,7 @@ public class JSIndexReader extends IndexReader
 			);
 			// @formatter:on
 
-			result = CollectionsUtil.map(properties, new IMap<QueryResult, PropertyElement>()
+			return CollectionsUtil.map(properties, new IMap<QueryResult, PropertyElement>()
 			{
 				public PropertyElement map(QueryResult item)
 				{
@@ -410,7 +401,7 @@ public class JSIndexReader extends IndexReader
 			});
 		}
 
-		return result;
+		return Collections.emptyList();
 	}
 
 	/**
@@ -437,8 +428,6 @@ public class JSIndexReader extends IndexReader
 	 */
 	public List<PropertyElement> getProperties(Index index, String owningType, String propertyName)
 	{
-		List<PropertyElement> result = new ArrayList<PropertyElement>();
-
 		if (index != null && !StringUtil.isEmpty(owningType) && !StringUtil.isEmpty(propertyName))
 		{
 			// @formatter:off
@@ -449,7 +438,7 @@ public class JSIndexReader extends IndexReader
 			);
 			// @formatter:on
 
-			result = CollectionsUtil.map(properties, new IMap<QueryResult, PropertyElement>()
+			return CollectionsUtil.map(properties, new IMap<QueryResult, PropertyElement>()
 			{
 				public PropertyElement map(QueryResult item)
 				{
@@ -458,7 +447,7 @@ public class JSIndexReader extends IndexReader
 			});
 		}
 
-		return result;
+		return Collections.emptyList();
 	}
 
 	/**
@@ -558,13 +547,9 @@ public class JSIndexReader extends IndexReader
 	 * @return
 	 * @throws IOException
 	 */
-	public List<PropertyElement> getTypeProperties(Index index, String typeName)
+	public Collection<PropertyElement> getTypeProperties(Index index, String typeName)
 	{
-		List<PropertyElement> properties = this.getProperties(index, typeName);
-
-		properties.addAll(this.getFunctions(index, typeName));
-
-		return properties;
+		return CollectionsUtil.union(getProperties(index, typeName), getFunctions(index, typeName));
 	}
 
 	/**

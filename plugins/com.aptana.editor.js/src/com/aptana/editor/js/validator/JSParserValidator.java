@@ -405,10 +405,10 @@ public class JSParserValidator extends AbstractBuildParticipant
 	protected String checkTypeForDeprecation(IParseNode node, JSScope globalScope)
 	{
 		String typeName = getTypeName(node, globalScope);
-		List<TypeElement> types = fQueryHelper.getTypes(fIndex, typeName, false);
+		Collection<TypeElement> types = fQueryHelper.getTypes(fIndex, typeName, false);
 		if (types.size() == 1) // FIXME If not empty, mark if all types are deprecated.
 		{
-			TypeElement theProp = types.get(0);
+			TypeElement theProp = types.iterator().next();
 			if (theProp.isDeprecated())
 			{
 				// Mark a warning!

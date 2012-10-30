@@ -54,7 +54,7 @@ public class JSCAIndexingTests extends JSEditorBasedTests
 	{
 		for (String propertyName : propertyNames)
 		{
-			List<PropertyElement> property = queryHelper.getTypeMembers(index, typeName, propertyName);
+			Collection<PropertyElement> property = queryHelper.getTypeMembers(index, typeName, propertyName);
 
 			assertNotNull(typeName + "." + propertyName + " does not exist", property);
 			assertFalse(typeName + "." + propertyName + " does not exist", property.isEmpty());
@@ -65,7 +65,7 @@ public class JSCAIndexingTests extends JSEditorBasedTests
 	{
 		for (String typeName : typeNames)
 		{
-			List<TypeElement> type = queryHelper.getTypes(index, typeName, false);
+			Collection<TypeElement> type = queryHelper.getTypes(index, typeName, false);
 
 			assertNotNull(type);
 			assertFalse(type.isEmpty());
@@ -79,11 +79,11 @@ public class JSCAIndexingTests extends JSEditorBasedTests
 
 	protected TypeElement assertTypeInIndex(Index index, String typeName, boolean includeMembers)
 	{
-		List<TypeElement> types = queryHelper.getTypes(index, typeName, includeMembers);
+		Collection<TypeElement> types = queryHelper.getTypes(index, typeName, includeMembers);
 		assertNotNull("There should be at least one type for " + typeName, types);
 		assertEquals("There should be one type for " + typeName, 1, types.size());
 
-		return types.get(0);
+		return types.iterator().next();
 	}
 
 	protected void assertUserAgents(List<String> actual, String... expected)
@@ -161,7 +161,7 @@ public class JSCAIndexingTests extends JSEditorBasedTests
 		assertTypes(index, "SimpleType");
 
 		// check for global
-		List<PropertyElement> global = queryHelper.getGlobals(index, "SimpleType");
+		Collection<PropertyElement> global = queryHelper.getGlobals(index, "SimpleType");
 		assertNotNull(global);
 		assertFalse(global.isEmpty());
 	}
@@ -174,7 +174,7 @@ public class JSCAIndexingTests extends JSEditorBasedTests
 		assertTypes(index, "SimpleType");
 
 		// check for global
-		List<PropertyElement> global = queryHelper.getGlobals(index, "SimpleType");
+		Collection<PropertyElement> global = queryHelper.getGlobals(index, "SimpleType");
 		assertNotNull(global);
 		assertTrue(global.isEmpty());
 	}
@@ -200,7 +200,7 @@ public class JSCAIndexingTests extends JSEditorBasedTests
 		assertTypes(index, "com", "com.aptana", "com.aptana.SimpleType");
 
 		// check for global
-		List<PropertyElement> global = queryHelper.getGlobals(index, "com");
+		Collection<PropertyElement> global = queryHelper.getGlobals(index, "com");
 		assertNotNull(global);
 		assertTrue(global.isEmpty());
 	}
@@ -405,7 +405,8 @@ public class JSCAIndexingTests extends JSEditorBasedTests
 				"metadata/invoke_deprecated_function2.js");
 		assertEquals(1, theProblems.size());
 		IProblem problem = theProblems.iterator().next();
-		assertProblem(1, 0, 26, IProblem.Severity.WARNING, "The function deprecatedToplevelFunction is deprecated", problem);
+		assertProblem(1, 0, 26, IProblem.Severity.WARNING, "The function deprecatedToplevelFunction is deprecated",
+				problem);
 	}
 
 	// qualified reference to function called using ['name'] notation

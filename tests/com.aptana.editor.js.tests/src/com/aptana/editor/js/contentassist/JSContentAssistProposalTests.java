@@ -321,7 +321,7 @@ public class JSContentAssistProposalTests extends JSEditorBasedTests
 		Index index = getIndexManager().getIndex(project.getURI());
 
 		JSIndexQueryHelper _indexHelper = new JSIndexQueryHelper();
-		List<PropertyElement> projectGlobals = _indexHelper.getProjectGlobals(index);
+		Collection<PropertyElement> projectGlobals = _indexHelper.getGlobals(index);
 		assertContainsFunctions(projectGlobals, "delete_me");
 		assertDoesntContainFunctions(projectGlobals, "foo");
 
@@ -365,8 +365,8 @@ public class JSContentAssistProposalTests extends JSEditorBasedTests
 	 */
 	public void testStringDPrefix()
 	{
-		this.checkProposals("contentAssist/d-prefix.js", true, true, "default", "defaultStatus", "delete", "do",
-				"document", "Date");
+		this.checkProposals("contentAssist/d-prefix.js", true, true, "decodeURI", "decodeURIComponent", "default",
+				"defaultStatus", "delete", "do", "document", "Date");
 	}
 
 	/**
