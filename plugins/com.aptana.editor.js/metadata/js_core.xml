@@ -13,8 +13,6 @@
 	    <constructors>
 	      <constructor visibility="internal">
 	        <description>Creates a new instance of the Arguments array.</description>
-	        <parameters/>
-	        <exceptions/>
 	        <return-types>
 	          <return-type type="Arguments"/>
 	        </return-types>
@@ -111,7 +109,6 @@ var result = makeFactorialFunc()(5); // returns 120 (5 * 4 * 3 * 2 * 1)
         </references>
       </property>
     </properties>
-    <methods/>
 	<references>
     	<reference name="Function"/>
     </references>
@@ -260,6 +257,28 @@ var result = makeFactorialFunc()(5); // returns 120 (5 * 4 * 3 * 2 * 1)
 	</property>
 	</properties>
     <methods>
+      <method name="isArray" scope="static">
+		<parameters>
+			<parameter name="arg" type="Object" usage="required">
+				<description>Element to search for in the array.</description>
+			</parameter>
+		</parameters>
+		<return-types>
+			<return-type type="Boolean"/>
+		</return-types>
+		<availability>
+			<specification name="ECMAScript v5.1"/>
+		</availability>
+		<description>Returns a Boolean indicating if the arg is an Array.</description>
+		<browsers>
+			<browser platform="IE" version="9.0+"/>
+			<browser platform="Mozilla" version="4.0+"/>
+			<browser platform="Opera" version="10.5+" />
+			<browser platform="Chrome" version="7.0+" />
+			<browser platform="Safari" version="5.0+" />
+		</browsers>
+		<return-description>Returns the Boolean value true if the argument is an object whose class internal property is "Array"; otherwise it returns false.</return-description>
+	  </method>
       <method name="concat">
         <description>
           Returns a new array comprised of this array joined
@@ -279,7 +298,6 @@ var result = makeFactorialFunc()(5); // returns 120 (5 * 4 * 3 * 2 * 1)
             <description>Arrays and/or values to concatenate to this array.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <references>
           <reference name="Array.join"/>
           <reference name="Array.push"/>
@@ -323,7 +341,7 @@ alphaNumeric = alpha.concat(1, 2, 3); // creates array ["a", "b", "c", 1, 2, 3]&
       </method>
       <method name="every">
 		<parameters>
-			<parameter name="callback" type="Function" usage="required">
+			<parameter name="callback" type="Function(Object,Number,Array):Boolean" usage="required">
 				<description>Function that tests each element of an array.</description>
 			</parameter>
 			<parameter name="thisObject" type="Function" usage="zero-or-more">
@@ -333,9 +351,13 @@ alphaNumeric = alpha.concat(1, 2, 3); // creates array ["a", "b", "c", 1, 2, 3]&
 		<return-types>
 			<return-type type="Boolean"/>
 		</return-types>
+		<exceptions>
+			<exception type="TypeError"/>
+		</exceptions>
 		<availability>
 			<specification name="JavaScript 1.6"/>
 			<specification name="Gecko 1.8b2"/>
+			<specification name="ECMAScript v5.1"/>
 		</availability>
 		<example>&lt;h3&gt;Example: Testing size of all array elements &lt;/h3&gt;
 &lt;p&gt;The following example tests whether all elements in the array are bigger than 10.&lt;/p&gt;
@@ -354,8 +376,11 @@ passed = [12, 54, 18, 130, 44].every(isBigEnough);
 &lt;/p&gt;&lt;p&gt;The range of elements processed by &lt;code&gt;every&lt;/code&gt; is set before the first invocation of &lt;code&gt;callback&lt;/code&gt;.  Elements which are appended to the array after the call to &lt;code&gt;every&lt;/code&gt; begins will not be visited by &lt;code&gt;callback&lt;/code&gt;.  If existing elements of the array are changed, or deleted, their value as passed to &lt;code&gt;callback&lt;/code&gt; will be the value at the time &lt;code&gt;every&lt;/code&gt; visits them; elements that are deleted will have the value &lt;code&gt;undefined&lt;/code&gt;.&lt;/p&gt;</remarks>
 		<description>Returns true if every element in an array meets the specified criteria.</description>
 		<browsers>
-			<browser platform="Mozilla" version="1.0+"/>
-			<browser platform="Netscape" version="3.0+"/>
+			<browser platform="IE" version="9.0+"/>
+			<browser platform="Mozilla" version="3.0+"/>			
+			<browser platform="Safari" version="3.2+"/>
+			<browser platform="Chrome" version="5.0+"/>
+			<browser platform="Opera" version="10.1+"/>
 		</browsers>
 		<return-description>Returns true if every element in an array meets the specified criteria.</return-description>
 	</method>
@@ -364,7 +389,7 @@ passed = [12, 54, 18, 130, 44].every(isBigEnough);
 				<parameter name="callback" type="Function" usage="required">
 					<description>Function that tests each element of an array.</description>
 				</parameter>
-				<parameter name="thisObject" type="Function" usage="zero-or-more">
+				<parameter name="thisObject" type="Function" usage="optional">
 					<description>Object to use as this when executing callback.</description>
 				</parameter>
 			</parameters>
@@ -374,7 +399,13 @@ passed = [12, 54, 18, 130, 44].every(isBigEnough);
 			<availability>
 				<specification name="JavaScript 1.6"/>
 				<specification name="Gecko 1.8b2"/>
+				<specification name="ECMAScript v5.1"/>
 			</availability>
+			<exceptions>
+				<exception type="TypeError">
+					<description>If callback argument is not callable.</description>
+				</exception>
+			</exceptions>
 			<example>&lt;h3&gt;Example: Filtering out all small values&lt;/h3&gt;
 &lt;p&gt;The following example uses &lt;code&gt;filter&lt;/code&gt; to create a filtered array that has all elements with values less than 10 removed.&lt;/p&gt;
 &lt;pre&gt;function isBigEnough(element, index, array) {
@@ -389,26 +420,35 @@ filtered = [12, 5, 8, 130, 44].filter(isBigEnough);&lt;/pre&gt;</example>
 &lt;p&gt;The range of elements processed by &lt;code&gt;filter&lt;/code&gt; is set before the first invocation of &lt;code&gt;callback&lt;/code&gt;. Elements which are appended to the array after the call to &lt;code&gt;filter&lt;/code&gt; begins will not be visited by &lt;code&gt;callback&lt;/code&gt;. If existing elements of the array are changed, or deleted, their value as passed to&lt;code&gt;callback&lt;/code&gt; will be the value at the time &lt;code&gt;filter&lt;/code&gt; visits them; elements that are deleted will have the value &lt;code&gt;undefined&lt;/code&gt;.</remarks>
 			<description>Creates a new array with all elements that meet the specified criteria.</description>
 			<browsers>
-				<browser platform="Mozilla" version="1.0+"/>
-				<browser platform="Netscape" version="3.0+"/>
+				<browser platform="IE" version="9.0+"/>
+				<browser platform="Mozilla" version="3.0+"/>			
+				<browser platform="Safari" version="3.2+"/>
+				<browser platform="Chrome" version="5.0+"/>
+				<browser platform="Opera" version="10.1+"/>
 			</browsers>
 			<return-description>Returns a new array containing elements that met the specified criteria.</return-description>
 		</method>
 		<method name="forEach">
 			<parameters>
-				<parameter name="callBack" type="Function" usage="required">
+				<parameter name="callback" type="Function" usage="required">
 					<description>Function to call once on each array element.</description>
 				</parameter>
-				<parameter name="thisObject" type="Object" usage="zero-or-more">
+				<parameter name="thisObject" type="Object" usage="optional">
 					<description>Object to use as this when executing callback.</description>
 				</parameter>
 			</parameters>
 			<return-types>
-				<return-type type="Object"></return-type>
+				<return-type type="undefined"/>
 			</return-types>
+			<exceptions>
+				<exception type="TypeError">
+					<description>It callback is not callable.</description>
+				</exception>
+			</exceptions>
 			<availability>
 				<specification name="JavaScript 1.6"/>
 				<specification name="Gecko 1.8b2"/>
+				<specification name="ECMAScript v5.1"/>
 			</availability>
 			<example>&lt;h3&gt;Example: Printing the contents of an array&lt;/h3&gt;
 &lt;p&gt;The following code prints a line for each element in an array (and presumes the presence of a &lt;code&gt;print&lt;/code&gt; function to call!):&lt;/p&gt;
@@ -454,14 +494,17 @@ print(writer.toString());
 </remarks>
 			<description>Executes the specified function once for each element in an array.</description>
 			<browsers>
-				<browser platform="Mozilla" version="1.0+"/>
-				<browser platform="Netscape" version="3.0+"/>
+				<browser platform="IE" version="9.0+"/>
+				<browser platform="Mozilla" version="3.0+"/>			
+				<browser platform="Safari" version="3.2+"/>
+				<browser platform="Chrome" version="5.0+"/>
+				<browser platform="Opera" version="10.1+"/>
 			</browsers>
 			<return-description>Returns the result of callback for each element.</return-description>
 		</method>
 		<method name="indexOf">
 		<parameters>
-			<parameter name="searchElement" type="Object" usage="optional">
+			<parameter name="searchElement" type="Object" usage="required">
 				<description>Element to search for in the array.</description>
 			</parameter>
 			<parameter name="fromIndex" type="Number" usage="optional">
@@ -477,6 +520,7 @@ print(writer.toString());
 		<availability>
 			<specification name="JavaScript 1.6"/>
 			<specification name="Gecko 1.8b2"/>
+			<specification name="ECMAScript v5.1"/>
 		</availability>
 		<example>&lt;h3&gt;Example: Using indexOf&lt;/h3&gt;
 &lt;p&gt;The following example uses &lt;code&gt;indexOf&lt;/code&gt; to locate values in an array.&lt;/p&gt;
@@ -500,8 +544,11 @@ while (idx != -1) {
 		</remarks>
 		<description>Returns the first index number at which the specified element can be found in the array. Returns -1 if the element is not present.</description>
 		<browsers>
-			<browser platform="Mozilla" version="1.0+"/>
-			<browser platform="Netscape" version="3.0+"/>
+			<browser platform="IE" version="9.0+"/>
+			<browser platform="Mozilla" version="3.0+"/>			
+			<browser platform="Safari" version="3.2+"/>
+			<browser platform="Chrome" version="5.0+"/>
+			<browser platform="Opera" version="10.1+"/>
 		</browsers>
 		<return-description>Returns the first index number at which the specified element can be found in the array, or -1 if it is not present.</return-description>
 	</method>
@@ -521,7 +568,6 @@ while (idx != -1) {
             <description>Specifies a string to separate each element of the array. The separator is converted to a string if necessary. If omitted, the array elements are sparated with a comma.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <references>
           <reference name="String.split"/>
           <reference name="reverse"/>
@@ -550,7 +596,7 @@ myVar3=a.join(" + ") // assigns "Wind + Rain + Fire" to myVar3&lt;/pre&gt;
       </method>
       <method name="lastIndexOf">
 		<parameters>
-			<parameter name="searchElement" type="Object" usage="optional">
+			<parameter name="searchElement" type="Object" usage="required">
 				<description>Element to search for in the array.</description>
 			</parameter>
 			<parameter name="fromIndex" type="Number" usage="optional">
@@ -566,6 +612,7 @@ myVar3=a.join(" + ") // assigns "Wind + Rain + Fire" to myVar3&lt;/pre&gt;
 		<availability>
 			<specification name="JavaScript 1.6"/>
 			<specification name="Gecko 1.8b2"/>
+			<specification name="ECMAScript v5.1"/>
 		</availability>
 		<example>
 		&lt;h3&gt;Example: Using lastIndexOf&lt;/h3&gt;
@@ -599,26 +646,35 @@ while (idx != -1) {
 		&lt;p&gt;For the &lt;code&gt;fromIndex&lt;/code&gt; parameter, if the specified &lt;code&gt;fromIndex&lt;/code&gt; is greater than or equal to the length of the array, &lt;code&gt;lastIndexOf&lt;/code&gt; does not search the array and returns -1. If the specified &lt;code&gt;fromIndex&lt;/code&gt; is negative, the search start position is the offset from the start  of the array; however, the array is still searched from back to front.&lt;/p&gt;</remarks>
 		<description>Searches an array backwards starting from fromIndex and returns the last index number at which the specified element can be found in the array. Returns -1 if the element is not present.</description>
 		<browsers>
-			<browser platform="Mozilla" version="1.0+"/>
-			<browser platform="Netscape" version="3.0+"/>
+			<browser platform="IE" version="9.0+"/>
+			<browser platform="Mozilla" version="3.0+"/>			
+			<browser platform="Safari" version="3.2+"/>
+			<browser platform="Chrome" version="5.0+"/>
+			<browser platform="Opera" version="10.1+"/>
 		</browsers>
 		<return-description>Returns the last index number at which the specified element can be found in the array. Returns -1 if the element is not present.</return-description>
 	</method>
 	<method name="map">
 		<parameters>
-		<parameter name="callBack" type="Function" usage="required">
+		<parameter name="callback" type="Function" usage="required">
 			<description>Function that creates an element of the new Array from an element of the current one.</description>
 		</parameter>
-		<parameter name="thisObject" type="Object" usage="zero-or-more">
+		<parameter name="thisObject" type="Object" usage="optional">
 			<description>Object to use as this when executing callback.</description>
 		</parameter>
 		</parameters>
 		<return-types>
 			<return-type type="Array" />
 		</return-types>
+		<exceptions>
+			<exception type="TypeError">
+				<description>If callback is not callable.</description>
+			</exception>
+		</exceptions>
 		<availability>
 			<specification name="JavaScript 1.6"/>
 			<specification name="Gecko 1.8b2"/>
+			<specification name="ECMAScript v5.1"/>
 		</availability>
 		<example>&lt;h3&gt;Example: Upper-casing the strings in an array &lt;/h3&gt;
 &lt;p&gt;The following code creates a new array which contains upper-case versions of all the strings in the original.&lt;/p&gt;
@@ -648,8 +704,11 @@ roots = numbers.map(Math.sqrt);
 &lt;/p&gt;&lt;p&gt;The range of elements processed by &lt;code&gt;map&lt;/code&gt; is set before the first invocation of &lt;code&gt;callback&lt;/code&gt;.  Elements which are appended to the array after the call to &lt;code&gt;map&lt;/code&gt; begins will not be visited by &lt;code&gt;callback&lt;/code&gt;.  If existing elements of the array are changed, or deleted, their value as passed to &lt;code&gt;callback&lt;/code&gt; will be the value at the time &lt;code&gt;map&lt;/code&gt; visits them; elements that are deleted will have the value &lt;code&gt;undefined&lt;/code&gt;.&lt;/p&gt;</remarks>
 		<description>Creates a new array with the results of calling a provided function on every element in this array.</description>
 		<browsers>
-			<browser platform="Mozilla" version="1.0+"/>
-			<browser platform="Netscape" version="3.0+"/>
+			<browser platform="IE" version="9.0+"/>
+			<browser platform="Mozilla" version="3.0+"/>			
+			<browser platform="Safari" version="3.2+"/>
+			<browser platform="Chrome" version="5.0+"/>
+			<browser platform="Opera" version="10.1+"/>
 		</browsers>
 		<return-description>Returns a new array.</return-description>
 	</method>
@@ -667,9 +726,6 @@ roots = numbers.map(Math.sqrt);
 			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
-        <return-description/>
-        <parameters/>
-        <exceptions/>
         <return-types>
           <return-type type="Object"/>
         </return-types>
@@ -709,7 +765,6 @@ popped = myFish.pop();&lt;/pre&gt;
             <description>The elements to add to the end of the array.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -735,6 +790,74 @@ pushed = myFish.push("drum", "lion");&lt;/pre&gt;
           analogous to the &lt;code&gt;push&lt;/code&gt; function in Perl 4 (not Perl 5).&lt;/p&gt;
         </remarks>
       </method>
+      <method name="reduce">
+			<parameters>
+				<parameter name="callback" type="Function(Object,Object,Number,Array)" usage="required">
+					<description>Function called once for each element of an array, in ascending order.</description>
+				</parameter>
+				<parameter name="initialValue" type="Object" usage="optional">
+					<description>Initial value to use for accumulator.</description>
+				</parameter>
+			</parameters>
+			<return-types>
+				<return-type type="Object"/>
+			</return-types>
+			<availability>
+				<specification name="JavaScript 1.6"/>
+				<specification name="Gecko 1.8b2"/>
+				<specification name="ECMAScript v5.1"/>
+			</availability>
+			<exceptions>
+				<exception type="TypeError">
+					<description>If callback argument is not callable.</description>
+				</exception>
+			</exceptions>
+			<remarks>&lt;p&gt;&lt;span class="nh"&gt;NOTE&lt;/span&gt; The &lt;code&gt;reduce&lt;/code&gt; function is intentionally generic; it does not require that its
+          &lt;b&gt;this&lt;/b&gt; value be an Array object. Therefore it can be transferred to other kinds of objects for use as a method.
+          Whether the &lt;code&gt;reduce&lt;/code&gt; function can be applied successfully to a host object is implementation-dependent.&lt;/p&gt;</remarks>
+			<browsers>
+				<browser platform="IE" version="9.0+"/>
+				<browser platform="Mozilla" version="3.0+"/>			
+				<browser platform="Safari" version="4.0+"/>
+				<browser platform="Chrome" version="5.0+"/>
+				<browser platform="Opera" version="10.5+"/>
+			</browsers>
+			<return-description>Returns an accumulated value generated by calling callback function on each element fo the array, in ascending order.</return-description>
+		</method>
+		<method name="reduceRight">
+			<parameters>
+				<parameter name="callback" type="Function(Object,Object,Number,Array)" usage="required">
+					<description>Function called once for each element of an array, in descending order.</description>
+				</parameter>
+				<parameter name="initialValue" type="Object" usage="optional">
+					<description>Initial value to use for accumulator.</description>
+				</parameter>
+			</parameters>
+			<return-types>
+				<return-type type="Object"/>
+			</return-types>
+			<availability>
+				<specification name="JavaScript 1.6"/>
+				<specification name="Gecko 1.8b2"/>
+				<specification name="ECMAScript v5.1"/>
+			</availability>
+			<exceptions>
+				<exception type="TypeError">
+					<description>If callback argument is not callable.</description>
+				</exception>
+			</exceptions>
+			<remarks>&lt;p&gt;&lt;span class="nh"&gt;NOTE&lt;/span&gt; The &lt;code&gt;reduceRight&lt;/code&gt; function is intentionally generic; it does not require that its
+          &lt;b&gt;this&lt;/b&gt; value be an Array object. Therefore it can be transferred to other kinds of objects for use as a method.
+          Whether the &lt;code&gt;reduceRight&lt;/code&gt; function can be applied successfully to a host object is implementation-dependent.&lt;/p&gt;</remarks>
+			<browsers>
+				<browser platform="IE" version="9.0+"/>
+				<browser platform="Mozilla" version="3.0+"/>			
+				<browser platform="Safari" version="4.0+"/>
+				<browser platform="Chrome" version="5.0+"/>
+				<browser platform="Opera" version="10.5+"/>
+			</browsers>
+			<return-description>Returns an accumulated value generated by calling callback function on each element fo the array, in descending order.</return-description>
+		</method>
       <method name="reverse">
         <description>
           Transposes the elements of an array: the first array
@@ -750,8 +873,6 @@ pushed = myFish.push("drum", "lion");&lt;/pre&gt;
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the array with its elements reversed.</return-description>
-        <parameters/>
-        <exceptions/>
         <return-types>
           <return-type type="Array"/>
         </return-types>
@@ -789,8 +910,6 @@ myArray.reverse()&lt;/pre&gt;&lt;p&gt;This code changes &lt;code&gt;myArray&lt;/
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the element removed from the array.</return-description>
-        <parameters/>
-        <exceptions/>
         <return-types>
           <return-type type="Object"/>
         </return-types>
@@ -838,7 +957,6 @@ Removed this element: angel&lt;/pre&gt;
             <description>Zero-based index at which to end extraction. slice extracts up to but not including end.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <references>
           <reference name="Array.splice"/>
         </references>
@@ -905,11 +1023,11 @@ newCar[0].color = purple&lt;/pre&gt;
       </method>
       <method name="some">
 		<parameters>
-			<parameter name="searchElement" type="Object" usage="optional">
-				<description>Element to search for in the array.</description>
+			<parameter name="callback" type="Function(Object,Number,Array):Boolean" usage="required">
+				<description>callback should be a function that accepts three arguments and returns a value that is coercible to the Boolean value true or false.</description>
 			</parameter>
-			<parameter name="fromIndex" type="Number" usage="optional">
-				<description>Index number to begin searching the array backwards from. Default is the last element in the array, which searches the whole array.</description>
+			<parameter name="thisArg" type="Object" usage="optional">
+				<description>If a thisArg parameter is provided, it will be used as the this value for each invocation of callback. If it is not provided, undefined is used instead.</description>
 			</parameter>
 		</parameters>
 		<return-types>
@@ -918,7 +1036,13 @@ newCar[0].color = purple&lt;/pre&gt;
 		<availability>
 			<specification name="JavaScript 1.6"/>
 			<specification name="Gecko 1.8b2"/>
+			<specification name="EMCAScript v5.1"/>
 		</availability>
+		<exceptions>
+			<exception type="TypeError">
+				<description>If callback is not a Function, a TypeError is thrown.</description>
+			</exception>
+		</exceptions>
 		<example>&lt;h3&gt;Example: Testing size of all array elements &lt;/h3&gt;
 &lt;p&gt;The following example tests whether some element in the array is bigger than 10.&lt;/p&gt;
 &lt;pre&gt;function isBigEnough(element, index, array) {
@@ -939,8 +1063,11 @@ passed = [12, 5, 8, 1, 44].some(isBigEnough);
 &lt;p&gt;The range of elements processed by &lt;code&gt;some&lt;/code&gt; is set before the first invocation of &lt;code&gt;callback&lt;/code&gt;.  Elements that are appended to the array after the call to &lt;code&gt;some&lt;/code&gt; begins will not be visited by &lt;code&gt;callback&lt;/code&gt;.  If an existing, unvisited element of the array is changed or deleted by &lt;code&gt;callback&lt;/code&gt;, its value passed to the visiting &lt;code&gt;callback&lt;/code&gt; will be the value at the time that &lt;code&gt;some&lt;/code&gt; visits that element's index; elements that are deleted before being visited will have the value &lt;code&gt;undefined&lt;/code&gt;.&lt;/p&gt;</remarks>
 		<description>Returns true if some element in the array passes the test implemented by the provided function.</description>
 		<browsers>
-			<browser platform="Mozilla" version="1.0+"/>
-			<browser platform="Netscape" version="4.0+"/>
+			<browser platform="IE" version="9.0+"/>
+			<browser platform="Mozilla" version="3.0+"/>			
+			<browser platform="Safari" version="3.2+"/>
+			<browser platform="Chrome" version="5.0+"/>
+			<browser platform="Opera" version="10.1+"/>
 		</browsers>
 		<return-description>Returns true if some element in the array passes the test implemented by the provided function.</return-description>
 	</method>
@@ -961,7 +1088,6 @@ passed = [12, 5, 8, 1, 44].some(isBigEnough);
             <description>Specifies a function that defines the sort order. If omitted, the array is sorted lexicographically (in dictionary order) according to the string conversion of each element.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Array"/>
         </return-types>
@@ -1101,7 +1227,6 @@ ant, zebra, undefined, undefined, undefined, undefined&lt;/pre&gt;
             <description>The elements to add to the array. If you don't specify any elements, splice simply removes elements from the array.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <references>
           <reference name="Array.slice"/>
         </references>
@@ -1171,7 +1296,6 @@ removed is: ["angel", "clown"]&lt;/pre&gt;
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a localized string version of the array.</return-description>
-        <parameters/>
         <exceptions>
           <exception type="TypeError">
             <description>Throws TypeError if toLocaleString is called on an object that is not an array.</description>
@@ -1235,7 +1359,6 @@ alpha.toSource() //returns ["a", "b", "c"]&lt;/pre&gt;</example>
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a string version of the array with its elements separated by commas.</return-description>
-        <parameters/>
         <exceptions>
           <exception type="TypeError">
             <description>Throws TypeError if toString is called on an object that is not an array.</description>
@@ -1288,7 +1411,6 @@ myVar=monthNames.toString() // assigns "Jan,Feb,Mar,Apr" to myVar&lt;/pre&gt;&lt
             <description>The elements to add to the front of the array.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -1472,7 +1594,6 @@ myArray = myRe.exec("cdbBdbsbz");&lt;/pre&gt;&lt;p&gt;The properties and element
             <description>The initial value of the Boolean object. The value is converted to a boolean value, if necessary. If value is omitted or is 0, -0, null, false, NaN, undefined, or the empty string (""), the object has an initial value of false. All other values, including any object or the string "false", create an object with an initial value of true.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Boolean"/>
         </return-types>
@@ -1566,8 +1687,6 @@ myArray = myRe.exec("cdbBdbsbz");&lt;/pre&gt;&lt;p&gt;The properties and element
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a string representation of the specified Boolean object.</return-description>
-        <parameters/>
-        <exceptions/>
         <return-types>
           <return-type type="String"/>
         </return-types>
@@ -1606,7 +1725,6 @@ var myVar=flag.toString()&lt;/pre&gt;
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the primitive value of a Boolean object.</return-description>
-        <parameters/>
         <exceptions>
           <exception type="TypeError">
             <description>Throws TypeError if the object is not a Boolean.</description>
@@ -1773,8 +1891,6 @@ s = new Boolean(myString);      //initial value of true&lt;/pre&gt;&lt;p&gt;Do n
           Returns the day of the month for the specified date
           according to local time.
         </return-description>
-        <parameters/>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -1816,8 +1932,6 @@ day = Xmas95.getDate()&lt;/pre&gt;
           Returns the day of the week for the specified date
           according to local time.
         </return-description>
-        <parameters/>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -1861,8 +1975,6 @@ weekday = Xmas95.getDay();&lt;/pre&gt;
           Returns the year of the specified date according to
           local time.
         </return-description>
-        <parameters/>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -1909,8 +2021,6 @@ yr = Today.getFullYear();&lt;/pre&gt;
           Returns the hour for the specified date according to
           local time.
         </return-description>
-        <parameters/>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -1952,8 +2062,6 @@ hours = Xmas95.getHours()&lt;/pre&gt;
           Returns the milliseconds in the specified date
           according to local time.
         </return-description>
-        <parameters/>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -1991,12 +2099,7 @@ ms = Today.getMilliseconds();&lt;/pre&gt;
 			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
-        <return-description>
-          Returns the minutes in the specified date according to
-          local time.
-        </return-description>
-        <parameters/>
-        <exceptions/>
+        <return-description>Returns the minutes in the specified date according to local time.</return-description>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -2034,12 +2137,7 @@ minutes = Xmas95.getMinutes()&lt;/pre&gt;
 			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
-        <return-description>
-          Returns the month in the specified date according to
-          local time.
-        </return-description>
-        <parameters/>
-        <exceptions/>
+        <return-description>Returns the month in the specified date according to local time.</return-description>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -2078,12 +2176,7 @@ month = Xmas95.getMonth()&lt;/pre&gt;
 			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
-        <return-description>
-          Returns the seconds in the specified date according to
-          local time.
-        </return-description>
-        <parameters/>
-        <exceptions/>
+        <return-description>Returns the seconds in the specified date according to local time.</return-description>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -2121,12 +2214,7 @@ secs = Xmas95.getSeconds()&lt;/pre&gt;
 			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
-        <return-description>
-          Returns the numeric value corresponding to the time
-          for the specified date according to universal time.
-        </return-description>
-        <parameters/>
-        <exceptions/>
+        <return-description>Returns the numeric value corresponding to the time for the specified date according to universal time.</return-description>
         <references>
           <reference name="parse"/>
           <reference name="Global.UTC"/>
@@ -2170,12 +2258,7 @@ sameAsBigDay.setTime(theBigDay.getTime())&lt;/pre&gt;
 			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
-        <return-description>
-          Returns the time-zone offset in minutes for the
-          current locale.
-        </return-description>
-        <parameters/>
-        <exceptions/>
+        <return-description>Returns the time-zone offset in minutes for the current locale.</return-description>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -2206,12 +2289,7 @@ currentTimeZoneOffsetInHours = x.getTimezoneOffset()/60&lt;/pre&gt;
 			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
-        <return-description>
-          Returns the day (date) of the month in the specified
-          date according to universal time.
-        </return-description>
-        <parameters/>
-        <exceptions/>
+        <return-description>Returns the day (date) of the month in the specified date according to universal time.</return-description>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -2250,12 +2328,7 @@ d = Today.getUTCDate();&lt;/pre&gt;
 			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
-        <return-description>
-          Returns the day of the week in the specified date
-          according to universal time.
-        </return-description>
-        <parameters/>
-        <exceptions/>
+        <return-description>Returns the day of the week in the specified date according to universal time.</return-description>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -2296,12 +2369,7 @@ weekday = Today.getUTCDay()&lt;/pre&gt;
 			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
-        <return-description>
-          Returns the year in the specified date according to
-          universal time.
-        </return-description>
-        <parameters/>
-        <exceptions/>
+        <return-description>Returns the year in the specified date according to universal time.</return-description>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -2340,12 +2408,7 @@ yr = Today.getUTCFullYear();&lt;/pre&gt;
 			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
-        <return-description>
-          Returns the hours in the specified date according to
-          universal time.
-        </return-description>
-        <parameters/>
-        <exceptions/>
+        <return-description>Returns the hours in the specified date according to universal time.</return-description>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -2383,12 +2446,7 @@ hrs = Today.getUTCHours();&lt;/pre&gt;
 			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
-        <return-description>
-          Returns the milliseconds in the specified date
-          according to universal time.
-        </return-description>
-        <parameters/>
-        <exceptions/>
+        <return-description>Returns the milliseconds in the specified date according to universal time.</return-description>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -2426,12 +2484,7 @@ ms = Today.getUTCMilliseconds();&lt;/pre&gt;
 			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
-        <return-description>
-          Returns the minutes in the specified date according to
-          universal time.
-        </return-description>
-        <parameters/>
-        <exceptions/>
+        <return-description>Returns the minutes in the specified date according to universal time.</return-description>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -2469,12 +2522,7 @@ min = Today.getUTCMinutes();&lt;/pre&gt;
 			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
-        <return-description>
-          Returns the month of the specified date according to
-          universal time.
-        </return-description>
-        <parameters/>
-        <exceptions/>
+        <return-description>Returns the month of the specified date according to universal time.</return-description>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -2513,12 +2561,7 @@ mon = Today.getUTCMonth();&lt;/pre&gt;
 			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
-        <return-description>
-          Returns the seconds in the specified date according to
-          universal time.
-        </return-description>
-        <parameters/>
-        <exceptions/>
+        <return-description>Returns the seconds in the specified date according to universal time.</return-description>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -2556,12 +2599,7 @@ sec = Today.getUTCSeconds();&lt;/pre&gt;
 			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
-        <return-description>
-          Returns the year in the specified date according to
-          local time.
-        </return-description>
-        <parameters/>
-        <exceptions/>
+        <return-description>Returns the year in the specified date according to local time.</return-description>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -2614,15 +2652,17 @@ year = Xmas.getYear() // returns 95&lt;/pre&gt;
 			<return-type type="Number"/>
 		</return-types>
 		<availability>
-			<specification name=""/>
+			<specification name="ECMAScript v5.1"/>
 		</availability>
-		<example></example>
-		<remarks>SpiderMonkey extension to ECMAScript standard. Supported by Mozilla only.</remarks>
 		<description>Returns the number of milliseconds passed since 1970-01-01 00:00:00 UTC.</description>
 		<browsers>
-			<browser platform="Mozilla" version="1.0+"/>
+			<browser platform="IE" version="9.0+"/>
+			<browser platform="Mozilla" version="3.5+"/>
+			<browser platform="Opera" version="10.5+" />
+			<browser platform="Chrome" version="7.0+" />
+			<browser platform="Safari" version="5.0+" />
 		</browsers>
-			<return-description>Returns the number of milliseconds passed since 1970-01-01 00:00:00 UTC.</return-description>
+		<return-description>Returns the number of milliseconds passed since 1970-01-01 00:00:00 UTC.</return-description>
 	</method>
 	
 	<method name="parse" scope="static">
@@ -2639,16 +2679,12 @@ year = Xmas.getYear() // returns 95&lt;/pre&gt;
 			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
-        <return-description>
-          Returns the number of milliseconds since January 1, 1970,
-          00:00:00, local time.
-        </return-description>
+        <return-description>Returns the number of milliseconds since January 1, 1970, 00:00:00, local time.</return-description>
         <parameters>
           <parameter name="dateString" type="String" usage="required">
             <description>A string representing a date.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <references>
           <reference name="Date"/>
           <reference name="Date.setTime"/>
@@ -2710,7 +2746,6 @@ year = Xmas.getYear() // returns 95&lt;/pre&gt;
             <description>An integer from 1 to 31, representing the day of the month.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -2757,7 +2792,6 @@ theBigDay.setDate(24)&lt;/pre&gt;
             <description>An integer between 1 and 31 representing the day of the month. If you specify the dayValue parameter, you must also specify the monthValue.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -2817,7 +2851,6 @@ theBigDay.setFullYear(1997);&lt;/pre&gt;
             <description>A number between 0 and 999, representing the milliseconds. If you specify the msValue parameter, you must also specify the minutesValue and secondsValue.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -2867,7 +2900,6 @@ theBigDay.setFullYear(1997);&lt;/pre&gt;
             <description>A number between 0 and 999, representing the milliseconds.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -2918,7 +2950,6 @@ theBigDay.setMilliseconds(100);&lt;/pre&gt;
             <description>A number between 0 and 999, representing the milliseconds. If you specify the msValue parameter, you must also specify the minutesValue and secondsValue.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -2971,7 +3002,6 @@ theBigDay.setMilliseconds(100);&lt;/pre&gt;
             <description>An integer from 1 to 31, representing the day of the month.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -3021,7 +3051,6 @@ theBigDay.setMilliseconds(100);&lt;/pre&gt;
             <description>A number between 0 and 999, representing the milliseconds.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -3069,7 +3098,6 @@ theBigDay.setMilliseconds(100);&lt;/pre&gt;
             <description>An integer representing the number of milliseconds since 1 January 1970, 00:00:00.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -3111,7 +3139,6 @@ sameAsBigDay.setTime(theBigDay.getTime());&lt;/pre&gt;
             <description>An integer from 1 to 31, representing the day of the month.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -3164,7 +3191,6 @@ theBigDay.setUTCDate(20);&lt;/pre&gt;
             <description>An integer between 1 and 31 representing the day of the month. If you specify the dayValue parameter, you must also specify the monthValue.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -3223,7 +3249,6 @@ theBigDay.setUTCFullYear(1997);&lt;/pre&gt;
             <description>A number between 0 and 999, representing the milliseconds. If you specify the msValue parameter, you must also specify the minutesValue and secondsValue.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -3274,7 +3299,6 @@ theBigDay.setUTCHours(8);&lt;/pre&gt;
             <description>A number between 0 and 999, representing the milliseconds.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -3325,7 +3349,6 @@ theBigDay.setUTCMilliseconds(500);&lt;/pre&gt;
             <description>A number between 0 and 999, representing the milliseconds. If you specify the msValue parameter, you must also specify the minutesValue and secondsValue.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -3379,7 +3402,6 @@ theBigDay.setUTCMinutes(43);&lt;/pre&gt;
             <description>An integer from 1 to 31, representing the day of the month.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -3430,7 +3452,6 @@ theBigDay.setUTCMonth(11);&lt;/pre&gt;
             <description>A number between 0 and 999, representing the milliseconds.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -3479,7 +3500,6 @@ theBigDay.setUTCSeconds(20);&lt;/pre&gt;
             <description>An integer.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -3525,8 +3545,6 @@ theBigDay.setYear(2000)&lt;/pre&gt;
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a string version of the Date object expressed in local time.</return-description>
-        <parameters/>
-        <exceptions/>
         <references>
           <reference name="Date.toLocaleDateString"/>
           <reference name="Date.toLocaleString"/>
@@ -3555,8 +3573,6 @@ theBigDay.setYear(2000)&lt;/pre&gt;
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a string version of the Date object expressed in GMT time.</return-description>
-        <parameters/>
-        <exceptions/>
         <references>
           <reference name="Date.toUTCString"/>
           <reference name="toLocaleString"/>
@@ -3601,8 +3617,6 @@ theBigDay.setYear(2000)&lt;/pre&gt;
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a string version of the Date object expressed in local time and formatted to local conventions.</return-description>
-        <parameters/>
-        <exceptions/>
         <references>
           <reference name="Date.toDateString"/>
           <reference name="Date.toLocaleString"/>
@@ -3663,8 +3677,6 @@ today.toLocaleDateString()&lt;/pre&gt;&lt;p&gt;In this example, &lt;code&gt;toLo
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a string version of the date expressed in local time and formatted to local conventions.</return-description>
-        <parameters/>
-        <exceptions/>
         <references>
           <reference name="Date.toLocaleDateString"/>
           <reference name="Date.toLocaleTimeString"/>
@@ -3721,8 +3733,6 @@ today.toLocaleString();&lt;/pre&gt;&lt;p&gt;In this example, &lt;code&gt;toLocal
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a string representation of the time portion of a Date object, expressed in local time and formatted according to local conventions.</return-description>
-        <parameters/>
-        <exceptions/>
         <references>
           <reference name="Date.toDateString"/>
           <reference name="Date.toLocaleDateString"/>
@@ -3811,8 +3821,6 @@ today.toLocaleTimeString()&lt;/pre&gt;&lt;p&gt;In this example, &lt;code&gt;toLo
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a string representing the specified Date object.</return-description>
-        <parameters/>
-        <exceptions/>
         <references>
           <reference name="Date.parse"/>
           <reference name="Date.toDateString"/>
@@ -3859,8 +3867,6 @@ myVar=x.toString();   //assigns a value to myVar similar to:
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a string representation of the time portion of a Date object, expressed in local time.</return-description>
-        <parameters/>
-        <exceptions/>
         <references>
           <reference name="Date.toString"/>
           <reference name="Date.toDateString"/>
@@ -3892,8 +3898,6 @@ myVar=x.toString();   //assigns a value to myVar similar to:
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a string representatin of the date, expressed in UTC time.</return-description>
-        <parameters/>
-        <exceptions/>
         <references>
           <reference name="Date.toLocaleString"/>
           <reference name="Date.toString"/>
@@ -3958,7 +3962,6 @@ UTCstring = Today.toUTCString();&lt;/pre&gt;
             <description>An integer between 0 and 999 representing the milliseconds.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <references>
           <reference name="Date"/>
           <reference name="Date.parse"/>
@@ -4010,8 +4013,6 @@ UTCstring = Today.toUTCString();&lt;/pre&gt;
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the value of a Date object in milliseconds.</return-description>
-        <parameters/>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -4035,6 +4036,77 @@ myVar = x.valueOf();      //assigns -424713600000 to myVar&lt;/pre&gt;&lt;p&gt;&
           getTime method.&lt;/p&gt;&lt;p&gt;This method is usually called internally by JavaScript
           and not explicitly in code.&lt;/p&gt;
         </remarks>
+      </method>
+      
+      <method name="toUTCString">
+        <description>
+          Converts a date to a string, using the universal time
+          convention.
+        </description>
+		<browsers>
+			<browser platform="IE" version="4.0+"/>
+			<browser platform="Mozilla" version="1.0+"/>
+			<browser platform="Netscape" version="4.06+"/>
+			<browser platform="Opera" version="7.0+" />
+			<browser platform="Chrome" version="5.0+" />
+			<browser platform="Safari" version="1.0+" />
+		</browsers>
+        <return-description>Returns a string representatin of the date, expressed in UTC time.</return-description>
+        <references>
+          <reference name="Date.toLocaleString"/>
+          <reference name="Date.toString"/>
+        </references>
+        <return-types>
+          <return-type type="String"/>
+        </return-types>
+        <availability>
+          <specification name="JavaScript 1.2"/>
+          <specification name="JScript 3.0"/>
+          <specification name="ECMAScript v1"/>
+        </availability>
+        <example>
+          &lt;h3&gt;Using &lt;code&gt;toUTCString&lt;/code&gt;&lt;/h3&gt;&lt;pre&gt;var UTCstring;
+Today = new Date();
+UTCstring = Today.toUTCString();&lt;/pre&gt;
+        </example>
+        <remarks>
+          &lt;p&gt;The value returned by &lt;code&gt;toUTCString&lt;/code&gt; is a
+          readable string formatted according to UTC convention.
+          The format of the return value may vary according to the
+          platform.&lt;/p&gt;
+        </remarks>
+      </method>
+      
+	  <method name="toISOString">
+        <description>
+         This function returns a String value represent the instance in time represented by this Date object.
+        </description>
+		<browsers>
+			<browser platform="IE" version="9.0+"/>
+			<browser platform="Mozilla" version="3.5+"/>
+			<browser platform="Opera" version="10.5+" />
+			<browser platform="Chrome" version="5.0+" />
+			<browser platform="Safari" version="4.0+" />
+		</browsers>
+        <return-description>Returns a String value represent the instance in time represented by this Date object.</return-description>
+        <return-types>
+          <return-type type="String"/>
+        </return-types>
+        <availability>
+          <specification name="ECMAScript v5.1"/>
+        </availability>
+        <example>var date = new Date("2009-05-21T16:06:05.000Z");
+// Prints 2009-05-21T16:06:05.000Z
+print( date.toISOString() );
+        </example>
+        <remarks>
+          The format of the String is the Date Time string format defined in 15.9.1.15. All fields are present in the String. The time zone is always UTC, denoted by the suffix Z. If the time value of this object is not a finite Number a RangeError exception is thrown.
+        </remarks>
+        <exceptions>
+        	<exception type="RangeError">
+        		<description>If the time value of this object is not a finite Number a RangeError exception is thrown.</description>
+        	</exception>
+        </exceptions>
       </method>
     </methods>
     <references>
@@ -4202,7 +4274,6 @@ timeDifference = timeB - timeA;&lt;/pre&gt;
             <description>Error message.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Error"/>
         </return-types>
@@ -4436,7 +4507,6 @@ timeDifference = timeB - timeA;&lt;/pre&gt;
             <description>An error message associated with the EvalError object.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="EvalError"/>
         </return-types>
@@ -4445,8 +4515,6 @@ timeDifference = timeB - timeA;&lt;/pre&gt;
     <properties>
       <property name="message" type="String" access="read-write">
         <description>An error message associated with the EvalError object.</description>
-        <availability/>
-
       </property>
       <property name="name" type="String" access="read-write">
         <description>Name of the EvalError object.</description>
@@ -4455,11 +4523,8 @@ timeDifference = timeB - timeA;&lt;/pre&gt;
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="6.0+"/>
 		</browsers>
-        <availability/>
-
       </property>
     </properties>
-    <methods/>
     <references>
       <reference name="Error"/>
       <reference name="Error.message"/>
@@ -4470,9 +4535,7 @@ timeDifference = timeB - timeA;&lt;/pre&gt;
       <specification name="JScript 5.5"/>
       <specification name="ECMAScript v3"/>
     </availability>
-    <remarks/>
   </class>
-  
   
   <class type="Function" superclass="Object">
     <description>
@@ -4968,11 +5031,7 @@ car = new prod_dept("honda", 5000, "auto");&lt;/pre&gt;
 			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
-        <return-description>
-          Returns a string representing the source code of the
-          function.
-        </return-description>
-        <parameters/>
+        <return-description>Returns a string representing the source code of the function.</return-description>
         <exceptions>
           <exception type="TypeError">
             <description>Throws a TypeError if the method is invoked on an object that is not a Function.</description>
@@ -5048,6 +5107,43 @@ theDog = new Dog("Gabby","Lab","chocolate","girl")&lt;/pre&gt;&lt;p&gt;Any time 
 		</browsers>
 		<return-description>Returns a string representing the source code of the function.</return-description>
 	</method>
+	
+	<method name="bind">
+        <description>The bind method takes one or more arguments, thisArg and (optionally) arg1, arg2, etc, and returns a new function object.</description>
+        <parameters>
+          <parameter name="thisArg" type="Function" usage="required">
+            <description>Parameter for the calling object.</description>
+          </parameter>
+          <parameter name="arg1, arg2, ..." type="Object" usage="zero-or-more">
+            <description>Arguments for the object.</description>
+          </parameter>
+        </parameters>
+		<browsers>
+			<browser platform="IE" version="9.0+"/>
+			<browser platform="Mozilla" version="4.0+"/>
+			<browser platform="Opera" version="12.0+" />
+			<browser platform="Chrome" version="7.0+" />
+			<browser platform="Safari" version="6.0+" />
+		</browsers>
+        <return-types>
+          <return-type type="Function"/>
+        </return-types>
+        <availability>
+          <specification name="ECMAScript v5.1"/>
+        </availability>
+        <example>var obj = {
+  method: function(name){
+    this.name = name;
+  }
+};
+setTimeout( obj.method.bind(obj, "John"), 100 );</example>
+        <remarks>Function objects created using Function.prototype.bind do not have a prototype property or the [[Code]], [[FormalParameters]], and [[Scope]] internal properties.</remarks>
+        <exceptions>
+        	<exception type="TypeError">
+        		<description>If &lt;b&gt;this&lt;/b&gt; is not callable, a TypeError exception is thrown.</description>
+        	</exception>
+        </exceptions>
+      </method>
 </methods>
     <references>
       <reference name="Arguments"/>
@@ -5098,12 +5194,6 @@ if (myAge &amp;gt;= 39)
 		<browser platform="Opera" version="7.0+" />
 	</browsers>
 	<constructors>
-		<constructor>
-			<description>The Global object does not have a constructor.</description>
-	        <return-types>
-	          <return-type type="Object"/>
-	        </return-types>
-		</constructor>
 	</constructors>
 	<properties>
 		<property name="Infinity" type="Infinity" scope="static">
@@ -5756,13 +5846,9 @@ if (isNaN(floatValue)) {
 		<browser platform="Chrome" version="5.0+" />
 		<browser platform="Safari" version="1.0+" />
 	</browsers>
-    <constructors/>
     <properties>
       <property name="E" type="Number" scope="static" access="read-write">
-        <description>
-          Euler's constant and the base of natural logarithms,
-          approximately 2.718.
-        </description>
+        <description>Euler's constant and the base of natural logarithms, approximately 2.718.</description>
 		<browsers>
 			<browser platform="IE" version="3.0+"/>
 			<browser platform="Mozilla" version="1.0+"/>
@@ -5776,7 +5862,6 @@ if (isNaN(floatValue)) {
           <specification name="JScript 1.0"/>
           <specification name="ECMAScript v1"/>
         </availability>
-
         <example>
           &lt;h3&gt;Using &lt;code&gt;Math.E&lt;/code&gt;&lt;/h3&gt;&lt;p&gt;The following function returns Euler's constant:&lt;/p&gt;&lt;pre&gt;function getEuler() {
    return Math.E
@@ -6017,7 +6102,6 @@ if (isNaN(floatValue)) {
             <description>A number.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -6056,7 +6140,6 @@ if (isNaN(floatValue)) {
             <description>A number.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -6108,7 +6191,6 @@ if (isNaN(floatValue)) {
             <description>A number.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -6161,7 +6243,6 @@ if (isNaN(floatValue)) {
             <description>A number.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -6220,7 +6301,6 @@ if (isNaN(floatValue)) {
             <description>Number.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -6283,7 +6363,6 @@ if (isNaN(floatValue)) {
             <description>A number.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -6326,7 +6405,6 @@ if (isNaN(floatValue)) {
             <description>A number.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -6385,7 +6463,6 @@ if (isNaN(floatValue)) {
             <description>A number.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -6427,16 +6504,12 @@ if (isNaN(floatValue)) {
 			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
-        <return-description>
-          Returns the largest integer less than or equal to a
-          number.
-        </return-description>
+        <return-description>Returns the largest integer less than or equal to a number.</return-description>
         <parameters>
           <parameter name="x" type="Number" usage="required">
             <description>A number.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -6464,10 +6537,7 @@ if (isNaN(floatValue)) {
       </method>
       
 	  <method name="log" scope="static">
-        <description>
-          Returns the natural logarithm (base E) of
-          a number.
-        </description>
+        <description>Returns the natural logarithm (base E) of a number.</description>
 		<browsers>
 			<browser platform="IE" version="3.0+"/>
 			<browser platform="Mozilla" version="1.0+"/>
@@ -6482,7 +6552,6 @@ if (isNaN(floatValue)) {
             <description>A number.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -6533,7 +6602,6 @@ if (isNaN(floatValue)) {
             <description>Number.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -6573,8 +6641,6 @@ if (isNaN(floatValue)) {
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the smaller of two numbers.</return-description>
-        <parameters/>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -6614,8 +6680,6 @@ if (isNaN(floatValue)) {
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns base to the exponent power, that is, baseexponent.</return-description>
-        <parameters/>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -6657,12 +6721,7 @@ if (isNaN(floatValue)) {
 			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
-        <return-description>
-          Returns a pseudo-random number in the range [0,1)
-          -- that is, between 0 (inclusive) and 1 (exclusive).
-        </return-description>
-        <parameters/>
-        <exceptions/>
+        <return-description>Returns a pseudo-random number in the range [0,1) -- that is, between 0 (inclusive) and 1 (exclusive).</return-description>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -6698,16 +6757,12 @@ function getRandom() {
 			<browser platform="Chrome" version="5.0+" />
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
-        <return-description>
-          Returns the value of a number rounded to the nearest
-          integer.
-        </return-description>
+        <return-description>Returns the value of a number rounded to the nearest integer.</return-description>
         <parameters>
           <parameter name="x" type="Number" usage="required">
             <description>A number.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -6757,7 +6812,6 @@ x=Math.round(-20.51)&lt;/pre&gt;
             <description>A number.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -6807,7 +6861,6 @@ x=Math.round(-20.51)&lt;/pre&gt;
             <description>A number.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -6849,7 +6902,6 @@ x=Math.round(-20.51)&lt;/pre&gt;
             <description>A number.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -6929,7 +6981,6 @@ x=Math.round(-20.51)&lt;/pre&gt;
             <description>The numeric value of the object being created.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -6938,10 +6989,7 @@ x=Math.round(-20.51)&lt;/pre&gt;
     <properties>
       
 	  <property name="MAX_VALUE" type="Number" scope="static" access="read">
-        <description>
-          The maximum numeric value representable in
-          JavaScript.
-        </description>
+        <description>The maximum numeric value representable in JavaScript.</description>
 		<browsers>
 			<browser platform="IE" version="4.0+"/>
 			<browser platform="Mozilla" version="1.0+"/>
@@ -7101,6 +7149,24 @@ if (month &amp;lt; 1 || month &amp;gt; 12) {
         </references>
     </property>
     
+     <property name="EPSILON" type="Number" scope="static" access="read">
+        <description>The value of Number.EPSILON is the difference between 1 and the smallest value greater than 1 that is representable as a Number value, which is approximately 2.2204460492503130808472633361816 x 10-16.</description>
+		<browsers>
+		</browsers>
+        <availability>
+          <specification name="ECMAScript v6"/>
+        </availability>
+    </property>
+    
+    <property name="MAX_INTEGER" type="Number" scope="static" access="read">
+        <description>The value of Number.MAX_INTEGER is the largest integer value that can be represented as a Number value without losing precision, which is 9007199254740991.</description>
+		<browsers>
+		</browsers>
+        <availability>
+          <specification name="ECMAScript v6"/>
+        </availability>
+    </property>
+    
 	<property name="constructor" type="Object">
 		<availability>
 			<specification name="JavaScript 1.1"/>
@@ -7136,6 +7202,95 @@ if (month &amp;lt; 1 || month &amp;gt; 12) {
 </properties>
 
 <methods>
+	<method name="isFinite" scope="static">
+        <description>Determine whether the type of and the passed value itself is a finite number.</description>
+		<browsers>
+			<browser platform="Mozilla" version="16.0+"/>
+			<browser platform="Chrome" version="19.0+" />
+			<browser platform="Node" version="0.8+" />
+		</browsers>
+        <return-description>Returns a boolean indicating if the argument is finite.</return-description>
+        <parameters>
+          <parameter name="testValue" type="Object" usage="required">
+            <description>Possible number to check against positive and negative Infinity.</description>
+          </parameter>
+        </parameters>
+        <references>
+          <reference name="Number.isNaN"/>
+          <reference name="Number.NaN"/>
+        </references>
+        <return-types>
+          <return-type type="Boolean"/>
+        </return-types>
+        <availability>
+          <specification name="ECMAScript v6"/>
+        </availability>
+      </method>
+      <method name="isInteger" scope="static">
+        <description>Determine whether the type of the passed value is "number" and the passed value is an integer.</description>
+		<browsers>
+			<browser platform="Mozilla" version="16.0+"/>
+		</browsers>
+        <return-description>Returns a boolean indicating if the argument is an integer.</return-description>
+        <parameters>
+          <parameter name="testValue" type="Object" usage="required">
+            <description>Possible number to check if it is an Integer.</description>
+          </parameter>
+        </parameters>
+        <references>
+          <reference name="Number.isFinite"/>
+          <reference name="Number.isNaN"/>
+        </references>
+        <return-types>
+          <return-type type="Boolean"/>
+        </return-types>
+        <availability>
+          <specification name="ECMAScript v6"/>
+        </availability>
+      </method>
+	<method name="isNaN" scope="static">
+        <description>Unlike all other possible values in JavaScript, it is not possible to rely on the equality operators (== and ===) to determine whether a value is NaN or not, because both NaN == NaN and NaN === NaN evaluate to false. Hence, the necessity of the Number.isNaN function.
+
+In comparison to the globabl isNaN function, this method doesn't suffer the problem of forcefully converting the parameter to a number. This means it is safe to pass even values that would convert to NaN, but aren't actually the same value as NaN. This means only values of the type number, that are also NaN, return true.</description>
+		<browsers>
+			<browser platform="Mozilla" version="15.0+"/>
+			<browser platform="Chrome" version="19.0+" />
+			<browser platform="Node" version="0.8+" />
+		</browsers>
+        <return-description>Returns a boolean indicating if the argument is NaN.</return-description>
+        <parameters>
+          <parameter name="testValue" type="Object" usage="required">
+            <description>Possible number to check against NaN.</description>
+          </parameter>
+        </parameters>
+        <references>
+          <reference name="Number.NaN"/>
+        </references>
+        <return-types>
+          <return-type type="Boolean"/>
+        </return-types>
+        <availability>
+          <specification name="ECMAScript v6"/>
+        </availability>
+        <example>Number.isNaN(NaN); // true
+Number.isNaN(Number.NaN); // true
+Number.isNaN(0 / 0) // true
+ 
+// everything else: false
+Number.isNaN(undefined);
+Number.isNaN({});     
+ 
+Number.isNaN(true);
+Number.isNaN(null);
+Number.isNaN(37);
+ 
+Number.isNaN("37");
+Number.isNaN("37.37");
+Number.isNaN("");
+Number.isNaN(" ");
+Number.isNaN("NaN");
+Number.isNaN("blabla"); // e.g. this would have been true with isNaN</example>
+      </method>
       <method name="toExponential">
         <description>Returns a string representing the number in exponential notation.</description>
 		<browsers>
@@ -7213,7 +7368,27 @@ if (month &amp;lt; 1 || month &amp;gt; 12) {
           <specification name="JScript 5.5, ECMAScript v3"/>
         </availability>
       </method>
-      
+      <method name="toInteger" scope="static">
+        <description>Evaluate the passed value and convert it to a integer (or Infinity).</description>
+		<browsers>
+			<browser platform="Mozilla" version="16.0+"/>
+		</browsers>
+        <return-description>Returns an Integer value (or Infinity).</return-description>
+        <parameters>
+          <parameter name="testValue" type="Object" usage="required">
+            <description>Possible number to coerce to an Integer.</description>
+          </parameter>
+        </parameters>
+        <references>
+          <reference name="Number.isInteger"/>
+        </references>
+        <return-types>
+          <return-type type="Number"/>
+        </return-types>
+        <availability>
+          <specification name="ECMAScript v6"/>
+        </availability>
+      </method>
 	  <method name="toLocaleString">
         <description>Returns a string representing the number that follows local formatting conventions.</description>
 		<browsers>
@@ -7225,7 +7400,6 @@ if (month &amp;lt; 1 || month &amp;gt; 12) {
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a string representation of a number that follows local formatting conventions.</return-description>
-        <parameters/>
         <exceptions>
           <exception type="TypeError">
             <description>Throws TypeError if the method is invoked on an object that is not a Number.</description>
@@ -7348,7 +7522,6 @@ if (month &amp;lt; 1 || month &amp;gt; 12) {
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the primitive value of the specified object.</return-description>
-        <parameters/>
         <exceptions>
           <exception type="TypeError">
             <description>Throws TypeError if the method is invoked on an object that is not a Number.</description>
@@ -7431,7 +7604,6 @@ document.write(x + "&amp;lt;BR&amp;gt;");&lt;/pre&gt;&lt;p&gt;You can convert an
             <description>Specifies a JavaScript primitive type (String, Number, or Boolean) to be converted to a String, Number, or Boolean object.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Object"/>
           <return-type type="Number"/>
@@ -7460,7 +7632,6 @@ document.write(x + "&amp;lt;BR&amp;gt;");&lt;/pre&gt;&lt;p&gt;You can convert an
         <references>
           <reference name="Object.toString"/>
         </references>
-        <remarks/>
       </property>
       
 	  <property name="prototype" type="Object" access="read-write">
@@ -7480,7 +7651,6 @@ document.write(x + "&amp;lt;BR&amp;gt;");&lt;/pre&gt;&lt;p&gt;You can convert an
         <references>
           <reference name="Function.prototype"/>
         </references>
-        <remarks/>
       </property>
     </properties>
     
@@ -7540,7 +7710,6 @@ document.write(x + "&amp;lt;BR&amp;gt;");&lt;/pre&gt;&lt;p&gt;You can convert an
             <description>The name of the property to check for.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <references>
           <reference name="Function.prototype"/>
           <reference name="Object.propertyIsEnumerable"/>
@@ -7553,8 +7722,6 @@ document.write(x + "&amp;lt;BR&amp;gt;");&lt;/pre&gt;&lt;p&gt;You can convert an
           <specification name="JScript 5.5"/>
           <specification name="ECMAScript v3"/>
         </availability>
-        <example/>
-        <remarks/>
       </method>
       
 	  <method name="isPrototypeOf">
@@ -7571,7 +7738,6 @@ document.write(x + "&amp;lt;BR&amp;gt;");&lt;/pre&gt;&lt;p&gt;You can convert an
             <description>The object to compare the original object to.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <references>
           <reference name="Function.prototype"/>
           <reference name="Object.constructor"/>
@@ -7584,8 +7750,6 @@ document.write(x + "&amp;lt;BR&amp;gt;");&lt;/pre&gt;&lt;p&gt;You can convert an
           <specification name="JScript 5.5"/>
           <specification name="ECMAScript v3"/>
         </availability>
-        <example/>
-        <remarks/>
       </method>
       
 	  <method name="propertyIsEnumerable">
@@ -7602,7 +7766,6 @@ document.write(x + "&amp;lt;BR&amp;gt;");&lt;/pre&gt;&lt;p&gt;You can convert an
             <description>Name of the property to check.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <references>
           <reference name="Function.prototype"/>
           <reference name="Object.hasOwnProperty"/>
@@ -7615,8 +7778,6 @@ document.write(x + "&amp;lt;BR&amp;gt;");&lt;/pre&gt;&lt;p&gt;You can convert an
           <specification name="JScript 5.5"/>
           <specification name="ECMAScript v3"/>
         </availability>
-        <example/>
-        <remarks/>
       </method>
       
 	  <method name="toLocaleString">
@@ -7630,8 +7791,6 @@ document.write(x + "&amp;lt;BR&amp;gt;");&lt;/pre&gt;&lt;p&gt;You can convert an
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a localized string representation of an object.</return-description>
-        <parameters/>
-        <exceptions/>
         <references>
           <reference name="Array.toLocaleString"/>
           <reference name="Date.toLocaleString"/>
@@ -7646,7 +7805,6 @@ document.write(x + "&amp;lt;BR&amp;gt;");&lt;/pre&gt;&lt;p&gt;You can convert an
           <specification name="JScript 5.5"/>
           <specification name="ECMAScript v3"/>
         </availability>
-        <remarks/>
       </method>
       
 	  <method name="toSource">
@@ -7704,8 +7862,6 @@ theDog = new Dog("Gabby","Lab","chocolate","girl")&lt;/pre&gt;
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a string representing the specified object.</return-description>
-        <parameters/>
-        <exceptions/>
         <references>
           <reference name="Object.constructor"/>
           <reference name="Object.toLocaleString"/>
@@ -7799,8 +7955,6 @@ o.toString // returns [object Object]&lt;/pre&gt;
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the primitive value of the specified object</return-description>
-        <parameters/>
-        <exceptions/>
         <references>
           <reference name="Object.toString"/>
         </references>
@@ -7898,6 +8052,481 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
 		<return-description>Returns an object with the watch property set.</return-description>
 	</method>
 	
+	<method name="create" scope="static">
+		<parameters>
+			<parameter name="o" type="Object" usage="required">
+				<description>The prototype of the object created.</description>
+			</parameter>
+			<parameter name="properties" type="Object" usage="optional">
+				<description>Name of the function to call.</description>
+			</parameter>
+		</parameters>
+		<references>
+			<reference name="defineProperties"/>
+		</references>
+		<return-types>
+			<return-type type="Object"/>
+		</return-types>
+		<availability>
+			<specification name="ECMAScript v5.1"/>
+		</availability>
+		<example>function User(){}
+User.prototype.name = "Anonymous";
+User.prototype.url = "http://google.com/";
+var john = Object.create(new User(), {
+  name: { value: "John", writable: false },
+  url: { value: "http://google.com/" }
+});
+
+print( john.name );
+// John
+
+john.name = "Ted"; // Exception if in strict mode </example>
+		<description>The create function creates a new object with a specified prototype.</description>
+		<browsers>
+			<browser platform="IE" version="9.0+"/>
+			<browser platform="Mozilla" version="4.0+"/>
+			<browser platform="Opera" version="12.0+" />
+			<browser platform="Safari" version="5.0+"/>
+			<browser platform="Chrome" version="5.0+"/>
+		</browsers>
+	</method>
+	
+	<method name="defineProperty" scope="static">
+		<parameters>
+			<parameter name="o" type="Object" usage="required">
+				<description>The object to define the property on.</description>
+			</parameter>
+			<parameter name="p" type="String" usage="required">
+				<description>The name of the property.</description>
+			</parameter>
+			<parameter name="attributes" type="Object" usage="required">
+				<description>The property descriptor.</description>
+			</parameter>
+		</parameters>
+		<references>
+			<reference name="defineProperties"/>
+		</references>
+		<return-types>
+			<return-type type="Object"/>
+		</return-types>
+		<availability>
+			<specification name="ECMAScript v5.1"/>
+		</availability>
+		<example>var obj = {};
+Object.defineProperty( obj, "value", {
+  value: true,
+  writable: false,
+  enumerable: true,
+  configurable: true
+});
+
+(function(){
+  var name = "John";
+  
+  Object.defineProperty( obj, "name", {
+    get: function(){ return name; },
+    set: function(value){ name = value; }
+  });
+})();
+
+print( obj.value )
+// true
+
+print( obj.name );
+// John
+
+obj.name = "Ted";
+print( obj.name );
+// Ted
+
+for ( var prop in obj ) {
+  print( prop );
+}
+// value
+// name
+
+obj.value = false; // Exception if in strict mode
+
+Object.defineProperty( obj, "value", {
+  writable: true,
+  configurable: false
+});
+
+obj.value = false;
+print( obj.value );
+// false
+
+delete obj.value; // Exception </example>
+		<description>The defineProperty function is used to add an own property and/or update the attributes of an existing own property of an object.</description>
+		<browsers>
+			<browser platform="IE" version="8.0+"/>
+			<browser platform="Mozilla" version="4.0+"/>
+			<browser platform="Opera" version="12.0+" />
+			<browser platform="Safari" version="5.0+"/>
+			<browser platform="Chrome" version="5.0+"/>
+		</browsers>
+		<return-description>The object passed in as the first argument is returned.</return-description>
+	</method>
+	
+	<method name="defineProperties" scope="static">
+		<parameters>
+			<parameter name="obj" type="Object" usage="required">
+				<description>The object to define the properties on.</description>
+			</parameter>
+			<parameter name="props" type="String" usage="required">
+				<description>The set of property descriptors.</description>
+			</parameter>
+		</parameters>
+		<references>
+			<reference name="defineProperty"/>
+			<reference name="create"/>
+		</references>
+		<return-types>
+			<return-type type="Object"/>
+		</return-types>
+		<availability>
+			<specification name="ECMAScript v5.1"/>
+		</availability>
+		<example>var obj = {};
+Object.defineProperties(obj, {
+  "value": {
+    value: true,
+    writable: false
+  },
+  "name": {
+    value: "John",
+    writable: false
+  }
+});</example>
+		<description>The defineProperties function is used to add own properties and/or update the attributes of existing own properties of an object.</description>
+		<browsers>
+			<browser platform="IE" version="9.0+"/>
+			<browser platform="Mozilla" version="4.0+"/>
+			<browser platform="Opera" version="12.0+" />
+			<browser platform="Safari" version="5.0+"/>
+			<browser platform="Chrome" version="5.0+"/>
+		</browsers>
+		<return-description>The object passed in as the first argument is returned.</return-description>
+	</method>
+	
+	<method name="seal" scope="static">
+		<parameters>
+			<parameter name="obj" type="Object" usage="required">
+				<description>The object to seal from changes to it's properties.</description>
+			</parameter>
+		</parameters>
+		<references>
+			<reference name="freeze"/>
+			<reference name="isSealed"/>
+		</references>
+		<return-types>
+			<return-type type="Object"/>
+		</return-types>
+		<availability>
+			<specification name="ECMAScript v5.1"/>
+		</availability>
+		<description>Sealing an object prevents other code from deleting, or changing the descriptors of, any of the object's properties - and from adding new properties.</description>
+		<remarks>You would seal an object if you want its existing properties to stay intact, without allowing for new additions, but while still allowing the user to write to or edit the properties.</remarks>
+		<browsers>
+			<browser platform="IE" version="9.0+"/>
+			<browser platform="Mozilla" version="4.0+"/>
+			<browser platform="Opera" version="12.0+" />
+			<browser platform="Safari" version="5.1+"/>
+			<browser platform="Chrome" version="6.0+"/>
+		</browsers>
+		<return-description>The object passed in as the first argument is returned.</return-description>
+	</method>
+	
+	<method name="isSealed" scope="static">
+		<parameters>
+			<parameter name="obj" type="Object" usage="required">
+				<description>The object to check if it is sealed from changes to it's properties.</description>
+			</parameter>
+		</parameters>
+		<references>
+			<reference name="seal"/>
+			<reference name="isFrozen"/>
+		</references>
+		<return-types>
+			<return-type type="Boolean"/>
+		</return-types>
+		<availability>
+			<specification name="ECMAScript v5.1"/>
+		</availability>
+		<description>Sealing an object prevents other code from deleting, or changing the descriptors of, any of the object's properties - and from adding new properties.</description>
+		<remarks>You would seal an object if you want its existing properties to stay intact, without allowing for new additions, but while still allowing the user to write to or edit the properties.</remarks>
+		<browsers>
+			<browser platform="IE" version="9.0+"/>
+			<browser platform="Mozilla" version="4.0+"/>
+			<browser platform="Opera" version="12.0+" />
+			<browser platform="Safari" version="5.1+"/>
+			<browser platform="Chrome" version="6.0+"/>
+		</browsers>
+		<return-description>The object passed in as the first argument is returned.</return-description>
+	</method>
+	
+	<method name="freeze" scope="static">
+		<parameters>
+			<parameter name="obj" type="Object" usage="required">
+				<description>The object to freeze from changes/edits to it's properties.</description>
+			</parameter>
+		</parameters>
+		<references>
+			<reference name="seal"/>
+			<reference name="isFrozen"/>
+		</references>
+		<return-types>
+			<return-type type="Object"/>
+		</return-types>
+		<availability>
+			<specification name="ECMAScript v5.1"/>
+		</availability>
+		<description>Freezing an object is nearly identical to sealing it but with the addition of making the properties un-editable.</description>
+		<remarks>Freezing an object is the ultimate form of lock-down. Once an object has been frozen it cannot be unfrozen - nor can it be tampered in any manner. This is the best way to make sure that your objects will stay exactly as you left them, indefinitely.</remarks>
+		<browsers>
+			<browser platform="IE" version="9.0+"/>
+			<browser platform="Mozilla" version="4.0+"/>
+			<browser platform="Opera" version="12.0+" />
+			<browser platform="Safari" version="5.1+"/>
+			<browser platform="Chrome" version="6.0+"/>
+		</browsers>
+		<return-description>The object passed in as the first argument is returned.</return-description>
+	</method>
+	
+	<method name="isFrozen" scope="static">
+		<parameters>
+			<parameter name="obj" type="Object" usage="required">
+				<description>The object to check if it is frozen from changes/edits to it's properties.</description>
+			</parameter>
+		</parameters>
+		<references>
+			<reference name="freeze"/>
+			<reference name="isFrozen"/>
+		</references>
+		<return-types>
+			<return-type type="Boolean"/>
+		</return-types>
+		<availability>
+			<specification name="ECMAScript v5.1"/>
+		</availability>
+		<description>Freezing an object is nearly identical to sealing it but with the addition of making the properties un-editable.</description>
+		<remarks>Freezing an object is the ultimate form of lock-down. Once an object has been frozen it cannot be unfrozen - nor can it be tampered in any manner. This is the best way to make sure that your objects will stay exactly as you left them, indefinitely.</remarks>
+		<browsers>
+			<browser platform="IE" version="9.0+"/>
+			<browser platform="Mozilla" version="4.0+"/>
+			<browser platform="Opera" version="12.0+" />
+			<browser platform="Safari" version="5.1+"/>
+			<browser platform="Chrome" version="6.0+"/>
+		</browsers>
+		<return-description>The object passed in as the first argument is returned.</return-description>
+	</method>
+	
+	<method name="preventExtensions" scope="static">
+		<parameters>
+			<parameter name="obj" type="Object" usage="required">
+				<description>The object to prevent from having new properties added.</description>
+			</parameter>
+		</parameters>
+		<references>
+			<reference name="isExtensible"/>
+		</references>
+		<return-types>
+			<return-type type="Object"/>
+		</return-types>
+		<availability>
+			<specification name="ECMAScript v5.1"/>
+		</availability>
+		<example>var obj = {};
+obj.name = "John";
+print( obj.name );
+// John
+
+print( Object.isExtensible( obj ) );
+// true
+
+Object.preventExtensions( obj );
+
+obj.url = "http://ejohn.org/"; // Exception in strict mode
+
+print( Object.isExtensible( obj ) );
+// false </example>
+		<description>preventExtensions locks down an object and prevents and future property additions from occurring.</description>
+		<browsers>
+			<browser platform="IE" version="9.0+"/>
+			<browser platform="Mozilla" version="4.0+"/>
+			<browser platform="Opera" version="12.0+" />
+			<browser platform="Safari" version="5.1+"/>
+			<browser platform="Chrome" version="6.0+"/>
+		</browsers>
+		<return-description>The object passed in as the first argument is returned.</return-description>
+	</method>
+	
+	<method name="isExtensible" scope="static">
+		<parameters>
+			<parameter name="obj" type="Object" usage="required">
+				<description>The object to check if it is prevented from having new properties added.</description>
+			</parameter>
+		</parameters>
+		<references>
+			<reference name="preventExtensions"/>
+		</references>
+		<return-types>
+			<return-type type="Boolean"/>
+		</return-types>
+		<availability>
+			<specification name="ECMAScript v5.1"/>
+		</availability>
+		<example>var obj = {};
+obj.name = "John";
+print( obj.name );
+// John
+
+print( Object.isExtensible( obj ) );
+// true
+
+Object.preventExtensions( obj );
+
+obj.url = "http://ejohn.org/"; // Exception in strict mode
+
+print( Object.isExtensible( obj ) );
+// false </example>
+		<description>isExtensible is a way to determine the current extensibility of an object.</description>
+		<browsers>
+			<browser platform="IE" version="9.0+"/>
+			<browser platform="Mozilla" version="4.0+"/>
+			<browser platform="Opera" version="12.0+" />
+			<browser platform="Safari" version="5.1+"/>
+			<browser platform="Chrome" version="6.0+"/>
+		</browsers>
+		<return-description>The object passed in as the first argument is returned.</return-description>
+	</method>
+	
+	<method name="keys" scope="static">
+		<parameters>
+			<parameter name="obj" type="Object" usage="required">
+				<description>The object to freeze from changes/edits to it's properties.</description>
+			</parameter>
+		</parameters>
+		<references>
+			<reference name="seal"/>
+			<reference name="isFrozen"/>
+		</references>
+		<return-types>
+			<return-type type="Array[String]"/>
+		</return-types>
+		<availability>
+			<specification name="ECMAScript v5.1"/>
+		</availability>
+		<example>var obj = { name: "John", url: "http://ejohn.org/" };
+print( Object.keys(obj).join(", ") );
+// name, url </example>
+		<description>Returns an array of strings representing all the enumerable property names of the object. This is identical to the method included in Prototype.js.</description>
+		<browsers>
+			<browser platform="IE" version="9.0+"/>
+			<browser platform="Mozilla" version="4.0+"/>
+			<browser platform="Opera" version="12.0+" />
+			<browser platform="Safari" version="5.0+"/>
+			<browser platform="Chrome" version="6.0+"/>
+		</browsers>
+		<return-description>An array of the property names of the passed in object.</return-description>
+	</method>
+	
+	<method name="getPrototypeOf" scope="static">
+		<parameters>
+			<parameter name="obj" type="Object" usage="required">
+				<description>The object on which we get the prototype property.</description>
+			</parameter>
+		</parameters>
+		<return-types>
+			<return-type type="Object"/>
+		</return-types>
+		<availability>
+			<specification name="ECMAScript v5.1"/>
+		</availability>
+		<example>function Person(){}
+Person.prototype.kick = function(type){
+  alert(type + " kick!");
+}
+
+function Norris(){}
+
+// Inherit properties from Person
+Norris.prototype = new Person();
+
+Norris.prototype.kick = function(){
+  Object.getPrototypeOf(this).kick("Roundhouse");
+};</example>
+		<description>Returns the prototype internal property of the passed in object.</description>
+		<browsers>
+			<browser platform="IE" version="9.0+"/>
+			<browser platform="Mozilla" version="3.5+"/>
+			<browser platform="Opera" version="12.0+" />
+			<browser platform="Safari" version="5.0+"/>
+			<browser platform="Chrome" version="5.0+"/>
+		</browsers>
+	</method>
+	
+	<method name="getOwnPropertyDescriptor" scope="static">
+		<parameters>
+			<parameter name="obj" type="Object" usage="required">
+				<description>The object on which we get the prototype descriptor.</description>
+			</parameter>
+			<parameter name="prop" type="String" usage="required">
+				<description>The name of the property we're accessing the descriptor for.</description>
+			</parameter>
+		</parameters>
+		<return-types>
+			<return-type type="Object"/>
+		</return-types>
+		<availability>
+			<specification name="ECMAScript v5.1"/>
+		</availability>
+		<example>var obj = { foo: "test" };
+print(JSON.stringify( 
+  Object.getOwnPropertyDescriptor( obj, "foo" )
+));
+// {"value": "test", "writable": true, 
+//  "enumerable": true, "configurable": true} 
+ </example>
+		<description>This method allows you to access the descriptor of a property. This method is the only way to get at this information (it is, otherwise, not available to the user - these don't exist as visible properties on the property, they're stored internally in the ECMAScript engine).</description>
+		<browsers>
+			<browser platform="IE" version="8.0+"/>
+			<browser platform="Mozilla" version="3.5+"/>
+			<browser platform="Opera" version="12.0+" />
+			<browser platform="Safari" version="5.0+"/>
+			<browser platform="Chrome" version="5.0+"/>
+		</browsers>
+	</method>
+	
+	<method name="getOwnPropertyNames" scope="static">
+		<parameters>
+			<parameter name="obj" type="Object" usage="required">
+				<description>The object on which we get the list of property names.</description>
+			</parameter>
+		</parameters>
+		<references>
+			<reference name="keys"/>
+		</references>
+		<return-types>
+			<return-type type="Array[String]"/>
+		</return-types>
+		<availability>
+			<specification name="ECMAScript v5.1"/>
+		</availability>
+		<example>var obj = { name: "John", surname: "Doe" };
+print( Object.getOwnPropertyNames(obj).join(", ") ); // surname, name </example>
+		<description>Nearly identical to Object.keys but returns all property names of the object (not just the enumerable ones).
+
+An implementation isn't possible with regular ECMAScript since non-enumerable properties can't be enumerated. The output and usage is otherwise identical to Object.keys.</description>
+		<browsers>
+			<browser platform="IE" version="9.0+"/>
+			<browser platform="Mozilla" version="3.5+"/>
+			<browser platform="Opera" version="12.0+" />
+			<browser platform="Safari" version="5.0+"/>
+			<browser platform="Chrome" version="5.0+"/>
+		</browsers>
+	</method>
 </methods>
     <references>
       <reference name="Array"/>
@@ -7929,7 +8558,6 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
             <description>An error message associated with the RangeError.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="RangeError"/>
         </return-types>
@@ -7943,7 +8571,6 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="6.0+"/>
 		</browsers>
-        <availability/>
     </property>
       
 	<property name="name" type="String" access="read-write">
@@ -7953,10 +8580,8 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="6.0+"/>
 		</browsers>
-        <availability/>
       </property>
     </properties>
-    <methods/>
     <references>
       <reference name="Error"/>
       <reference name="Error.message"/>
@@ -7967,7 +8592,6 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
       <specification name="JScript 5.5"/>
       <specification name="ECMAScript v3"/>
     </availability>
-    <remarks/>
   </class>
   
   <class type="ReferenceError" superclass="Error">
@@ -7985,7 +8609,6 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
             <description>An error message associated with the ReferenceError.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="ReferenceError"/>
         </return-types>
@@ -7999,7 +8622,6 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="6.0+"/>
 		</browsers>
-        <availability/>
       </property>
       
 	  <property name="name" type="String" access="read-write">
@@ -8009,10 +8631,8 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
 			<browser platform="Mozilla" version="1.0+"/>
 			<browser platform="Netscape" version="6.0+"/>
 		</browsers>
-        <availability/>
       </property>
     </properties>
-    <methods/>
     <references>
       <reference name="Error"/>
       <reference name="Error.message"/>
@@ -8023,7 +8643,6 @@ o.p changed from undefined to 4&lt;/pre&gt;</example>
       <specification name="JScript 5.5"/>
       <specification name="ECMAScript v3"/>
     </availability>
-    <remarks/>
   </class>
   
   <class type="RegExp" superclass="Object">
@@ -8582,7 +9201,6 @@ Found ab. Next match starts at 9. &lt;/pre&gt;
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a string representing the specified object.</return-description>
-        <parameters/>
         <exceptions>
           <exception type="TypeError">
             <description>Throws TypeError if the method is invoked on an object that is not a RegExp.</description>
@@ -8810,7 +9428,6 @@ re = /\w+/&lt;/pre&gt;&lt;h3&gt;Special characters in regular expressions&lt;/h3
             <description>Any string.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="String"/>
         </return-types>
@@ -9077,7 +9694,6 @@ document.write("&amp;lt;P&amp;gt;" + worldString.strike())
             <description>An integer between 0 and 1 less than the length of the string.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <references>
           <reference name="String.charCodeAt"/>
           <reference name="String.indexOf"/>
@@ -9132,7 +9748,6 @@ The character at index 4 is e &lt;/pre&gt;
             <description>An integer between 0 and 1 less than the length of the string. The default value is 0.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <references>
           <reference name="String.charAt"/>
           <reference name="String.fromCharCode"/>
@@ -9172,7 +9787,6 @@ The character at index 4 is e &lt;/pre&gt;
             <description>Strings to concatenate to this string.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <references>
           <reference name="Array.concat"/>
         </references>
@@ -9195,6 +9809,64 @@ s4=s1.concat(s2,s3) // returns "Oh what a beautiful mornin'."&lt;/pre&gt;
           strings and returns a new string. Changes to the text in
           one string do not affect the other string.</remarks>
       </method>
+      
+      <method name="contains">
+		<references>
+			<reference name="indexOf"/>
+		</references>
+		<parameters>
+			<parameter name="searchString" type="String" usage="required">
+            	<description>A string to be searched for within this string.</description>
+          	</parameter>
+          	<parameter name="position" type="Number" usage="optional">
+            	<description>The position in this string at which to begin searching for searchString; defaults to 0.</description>
+          	</parameter>
+		</parameters>
+		<return-types>
+			<return-type type="Boolean"/>
+		</return-types>
+		<availability>
+			<specification name="ECMAScript v6"/>
+		</availability>
+		<example>var str = "To be, or not to be, that is the question.";
+ 
+print(str.contains("To be"));    // true
+print(str.contains("question")); // true
+print(str.contains("To be", 1)); // false</example>
+		<description>This method lets you determine whether or not a string contains another string.</description>
+		<browsers>
+			<browser platform="Mozilla" version="17.0+"/>
+		</browsers>
+	</method>
+      
+      <method name="endsWith">
+		<references>
+			<reference name="startsWith"/>
+		</references>
+		<parameters>
+			<parameter name="searchString" type="String" usage="required">
+            	<description>The characters to be searched for at the end of this string.</description>
+          	</parameter>
+          	<parameter name="position" type="Number" usage="optional">
+            	<description>Search within this string as if this string were only this long; defaults to this string's actual length, clamped within the range established by this string's length.</description>
+          	</parameter>
+		</parameters>
+		<return-types>
+			<return-type type="Boolean"/>
+		</return-types>
+		<availability>
+			<specification name="ECMAScript v6"/>
+		</availability>
+		<example>var str = "To be, or not to be, that is the question.";
+ 
+print( str.endsWith("question") );  // true
+print( str.endsWith("to be") );     // false
+print( str.endsWith("to be", 19) ); // true</example>
+		<description>Determines whether a string ends with the characters of another string, returning true or false as appropriate.</description>
+		<browsers>
+			<browser platform="Mozilla" version="17.0+"/>
+		</browsers>
+	</method>
       
 	  <method name="fixed">
 		<availability>
@@ -9345,7 +10017,6 @@ document.write("&amp;lt;P&amp;gt;" + worldString.fontsize(7))
             <description>A sequence of numbers that are Unicode values.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <references>
           <reference name="String.charCodeAt"/>
         </references>
@@ -9394,7 +10065,6 @@ document.write("&amp;lt;P&amp;gt;" + worldString.fontsize(7))
             <description>The location within the calling string to start the search from. It can be any integer between 0 and the length of the string. The default value is 0.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -9545,7 +10215,6 @@ document.write("&amp;lt;P&amp;gt;" + worldString.strike())
             <description>The location within the calling string to start the search from. It can be any integer between 0 and the length of the string. The default value is the length of the string.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -9647,7 +10316,6 @@ document.write("Click to return to " + hotText.link(URL))
             <description>A string to be compared locale-wise to the string object.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Number"/>
         </return-types>
@@ -9674,7 +10342,6 @@ document.write("Click to return to " + hotText.link(URL))
             <description>Name of the regular expression. It can be a variable name or a literal.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <references>
           <reference name="RegExp"/>
           <reference name="RegExp.exec"/>
@@ -9749,7 +10416,6 @@ document.write(newArray);
             <description>A function to be invoked after the match has been performed.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <references>
           <reference name="RegExp"/>
           <reference name="RegExp.exec"/>
@@ -9868,7 +10534,6 @@ document.write(newstr)
             <description>Name of the regular expression. It can be a variable name or a literal.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <references>
           <reference name="RegExp"/>
           <reference name="RegExp.exec"/>
@@ -9926,7 +10591,6 @@ document.write(newstr)
             <description>The zero-based index at which to end extraction. If omitted, slice extracts to the end of the string.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <references>
           <reference name="Array.slice"/>
           <reference name="String.substring"/>
@@ -10019,7 +10683,6 @@ document.write("&amp;lt;P&amp;gt;" + worldString.fontsize(7))
             <description>Integer specifying a limit on the number of splits to be found.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="Array"/>
         </return-types>
@@ -10118,6 +10781,35 @@ document.write(splits)
           returns.&lt;/li&gt;&lt;/ul&gt;
         </remarks>
       </method>
+      
+      <method name="startsWith">
+		<references>
+			<reference name="endsWith"/>
+		</references>
+		<parameters>
+			<parameter name="searchString" type="String" usage="required">
+            	<description>The characters to be searched for at the start of this string.</description>
+          	</parameter>
+          	<parameter name="position" type="Number" usage="optional">
+            	<description>The position in this string at which to begin searching for searchString; defaults to 0.</description>
+          	</parameter>
+		</parameters>
+		<return-types>
+			<return-type type="Boolean"/>
+		</return-types>
+		<availability>
+			<specification name="ECMAScript v6"/>
+		</availability>
+		<example>var str = "To be, or not to be, that is the question.";
+ 
+print(str.startsWith("To be"));         // true
+print(str.startsWith("not to be"));     // false
+print(str.startsWith("not to be", 10)); // true</example>
+		<description>This method lets you determine whether or not a string begins with another string.</description>
+		<browsers>
+			<browser platform="Mozilla" version="17.0+"/>
+		</browsers>
+	</method>
       
 	  <method name="strike">
 		<references>
@@ -10230,7 +10922,6 @@ document.write("&amp;lt;P&amp;gt;This is what a " + subText.sub() + " looks like
             <description>The number of characters to extract.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <return-types>
           <return-type type="String"/>
         </return-types>
@@ -10294,7 +10985,6 @@ document.writeln("(20, 2): ", str.substr(20,2));&lt;/pre&gt;&lt;p&gt;This script
             <description>An integer between 0 and the length of the string.</description>
           </parameter>
         </parameters>
-        <exceptions/>
         <references>
           <reference name="String.charAt"/>
           <reference name="String.indexOf"/>
@@ -10466,8 +11156,6 @@ document.write("&amp;lt;P&amp;gt;This is what a " + subText.sub() + " looks like
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns the calling string value converted to lowercase.</return-description>
-        <parameters/>
-        <exceptions/>
         <return-types>
           <return-type type="String"/>
         </return-types>
@@ -10502,7 +11190,6 @@ document.write(upperText.toLowerCase())&lt;/pre&gt;
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
         <return-description>Returns a string representing the specified object.</return-description>
-        <parameters/>
         <exceptions>
           <exception type="TypeError">
             <description>TypeError is thrown if the specified object is not a String.</description>
@@ -10556,6 +11243,24 @@ document.write(lowerText.toUpperCase())&lt;/pre&gt;</example>
 		<return-description>Returns the string value converted to all uppercase.</return-description>
 	</method>
 	
+	<method name="trim">
+        <description>Returns a string with leading and trailing whitespace removed.</description>
+		<browsers>
+			<browser platform="IE" version="9.0+"/>
+			<browser platform="Mozilla" version="3.5+"/>
+			<browser platform="Opera" version="10.5+" />
+			<browser platform="Chrome" version="5.0+" />
+			<browser platform="Safari" version="5.0+" />
+		</browsers>
+        <return-types>
+          <return-type type="String"/>
+        </return-types>
+        <availability>
+          <specification name="ECMAScript v5.1"/>
+        </availability>
+        <remarks>The trim function is intentionally generic; it does not require that its this value be a String object. Therefore, it can be transferred to other kinds of objects for use as a method.</remarks>
+      </method>
+	
     <method name="valueOf">
 		<references>
 			<reference name="toString"/>
@@ -10573,12 +11278,9 @@ document.write(lowerText.toUpperCase())&lt;/pre&gt;</example>
 
 &lt;pre&gt;x = new String("Hello world");
 alert(x.valueOf())          // Displays "Hello world"&lt;/pre&gt;</example>
-		<remarks>
-		&lt;p&gt;The &lt;code&gt;valueOf&lt;/code&gt; method of &lt;code&gt;String&lt;/code&gt; returns the primitive value of a String object as a string data type. This value is equivalent to String.toString.&lt;/p&gt;
+		<remarks>&lt;p&gt;The &lt;code&gt;valueOf&lt;/code&gt; method of &lt;code&gt;String&lt;/code&gt; returns the primitive value of a String object as a string data type. This value is equivalent to String.toString.&lt;/p&gt;
 
-&lt;p&gt;This method is usually called internally by JavaScript and not explicitly in code.&lt;/p&gt;
-
-		</remarks>
+&lt;p&gt;This method is usually called internally by JavaScript and not explicitly in code.&lt;/p&gt;</remarks>
 		<description>Returns the primitive value of a String object.</description>
 		<browsers>
 			<browser platform="IE" version="3.0+"/>
@@ -10589,13 +11291,13 @@ alert(x.valueOf())          // Displays "Hello world"&lt;/pre&gt;</example>
 			<browser platform="Safari" version="1.0+" />
 		</browsers>
 		<return-description>Returns the primitive value of a String object.</return-description>
-	</method>
-	</methods>
     <availability>
       <specification name="JavaScript 1.0"/>
       <specification name="JScript 1.0"/>
       <specification name="ECMAScript v1"/>
     </availability>
+   </method>
+  </methods>
   </class>
 
 <class type="SyntaxError" superclass="Error">
@@ -10652,8 +11354,6 @@ alert(x.valueOf())          // Displays "Hello world"&lt;/pre&gt;</example>
 				</browsers>
 			</property>
 		</properties>
-		
-		<methods/>
 		<references>
 			<reference name="Error"/>
 			<reference name="Error.message"/>
@@ -10664,8 +11364,7 @@ alert(x.valueOf())          // Displays "Hello world"&lt;/pre&gt;</example>
 			<specification name="JScript 5.5"/>
 			<specification name="ECMAScript v3"/>
 		</availability>
-		<remarks>Can be thrown by the &lt;eval&gt; method, &lt;Function&gt; constructor, and the &lt;RegExp&gt;
-		constructor.</remarks>
+		<remarks>Can be thrown by the &lt;eval&gt; method, &lt;Function&gt; constructor, and the &lt;RegExp&gt; constructor.</remarks>
 		<interfaces>
 			<interface type=""/>
 		</interfaces>
@@ -10725,8 +11424,6 @@ alert(x.valueOf())          // Displays "Hello world"&lt;/pre&gt;</example>
 			</browsers>
 		</property>
 	</properties>
-	
-	<methods/>
 	<references>
 		<reference name="Error"/>
 		<reference name="Error.message"/>
@@ -10796,9 +11493,6 @@ alert(x.valueOf())          // Displays "Hello world"&lt;/pre&gt;</example>
 			</browsers>
 		</property>
 	</properties>
-	
-	<methods/>
-	
 	<references>
 		<reference name="Error"/>
 		<reference name="Error.message"/>
@@ -10809,9 +11503,93 @@ alert(x.valueOf())          // Displays "Hello world"&lt;/pre&gt;</example>
 		<specification name="JScript 5.5"/>
 		<specification name="ECMAScript v3"/>
 	</availability>
-	<remarks></remarks>
 	<interfaces>
 		<interface type=""/>
 	</interfaces>
 </class>
+
+  <class type="JSON" superclass="Object">
+	<description>The JSON object is a single object that contains two functions, parse and stringify, that are used to parse and construct JSON texts. The JSON Data Interchange Format is described in RFC 4627 &lt;a href="http://www.ietf.org/rfc/rfc4627.txt"&gt;http://www.ietf.org/rfc/rfc4627.txt&lt;/a&gt;. The JSON interchange format used in this specification is exactly that described by RFC 4627 with two exceptions:
+
+The top level JSONText production of the ECMAScript JSON grammar may consist of any JSONValue rather than being restricted to being a JSONObject or a JSONArray as specified by RFC 4627.
+
+Conforming implementations of JSON.parse and JSON.stringify must support the exact interchange format described in this specification without any deletions or extensions to the format. This differs from RFC 4627 which permits a JSON parser to accept non-JSON forms and extensions.</description>
+	<browsers>
+		<browser platform="IE" version="8.0+"/>
+		<browser platform="Mozilla" version="4.0+"/>
+		<browser platform="Opera" version="10.5+" />
+		<browser platform="Chrome" version="5.0+" />
+		<browser platform="Safari" version="4.0+" />
+	</browsers>
+	<methods>
+		<method name="parse" scope="static">
+			<parameters>
+				<parameter name="text" type="String" usage="required">
+					<description>A JSON-formatted String.</description>
+				</parameter>
+				<parameter name="reviver" type="Function(String,Object):Object" usage="optional">
+					<description>The optional reviver parameter is a function that takes two parameters, (key and value). It can filter and transform the results. It is called with each of the key/value pairs produced by the parse, and its return value is used instead of the original value. If it returns what it received, the structure is not modified. If it returns undefined then the property is deleted from the result.</description>
+				</parameter>
+			</parameters>
+			<return-types>
+				<return-type type="Object"/>
+			</return-types>
+			<availability>
+				<specification name="ECMAScript v5.1"/>
+			</availability>
+			<remarks>
+				&lt;p&gt;The &lt;code&gt;parse&lt;/code&gt; function parses a JSON text (a JSON-formatted String) and produces an ECMAScript value. The JSON
+      format is a restricted form of ECMAScript literal. JSON objects are realized as ECMAScript objects. JSON arrays are realized
+      as ECMAScript arrays. JSON strings, numbers, booleans, and null are realized as ECMAScript Strings, Numbers, Booleans, and
+      &lt;b&gt;null&lt;/b&gt;. JSON uses a more limited set of white space characters than &lt;span class="nt"&gt;WhiteSpace&lt;/span&gt; and allows
+      Unicode code points U+2028 and U+2029 to directly appear in &lt;span class="nt"&gt;JSONString&lt;/span&gt; literals without using an
+      escape sequence. The process of parsing is similar to &lt;a href="#sec-11.1.4"&gt;11.1.4&lt;/a&gt; and &lt;a href="#sec-11.1.5"&gt;11.1.5&lt;/a&gt;
+      as constrained by the JSON grammar.&lt;/p&gt;</remarks>
+			<description>The parse function parses a JSON text (a JSON-formatted String) and produces an ECMAScript value.</description>
+			<browsers>
+				<browser platform="IE" version="8.0+"/>
+				<browser platform="Mozilla" version="4.0+"/>
+				<browser platform="Opera" version="10.5+" />
+				<browser platform="Chrome" version="5.0+" />
+				<browser platform="Safari" version="4.0+" />
+			</browsers>
+			<return-description>Returns an ECMAScript value.</return-description>
+		</method>
+		<method name="stringify" scope="static">
+			<parameters>
+				<parameter name="value" type="Object" usage="required">
+					<description>an ECMAScript value, which is usually an object or array, although it can also be a String, Boolean, Number or null.</description>
+				</parameter>
+				<parameter name="replacer" type="Array[String],Array[Number],Function:String" usage="optional">
+					<description>The optional replacer parameter is either a function that alters the way objects and arrays are stringified, or an array of Strings and Numbers that acts as a white list for selecting the object properties that will be stringified.</description>
+				</parameter>
+				<parameter name="space" type="String,Number" usage="optional">
+					<description>The optional space parameter is a String or Number that allows the result to have white space injected into it to improve human readability.</description>
+				</parameter>
+			</parameters>
+			<return-types>
+				<return-type type="Object"/>
+			</return-types>
+			<availability>
+				<specification name="ECMAScript v5.1"/>
+			</availability>
+			<remarks>&lt;p&gt;The &lt;code&gt;stringify&lt;/code&gt; function returns a String in JSON format representing an ECMAScript value. It can take three
+      parameters. The first parameter is required. The &lt;var&gt;value&lt;/var&gt; parameter is an ECMAScript value, which is usually an
+      object or array, although it can also be a String, Boolean, Number or &lt;b&gt;null&lt;/b&gt;. The optional &lt;var&gt;replacer&lt;/var&gt;
+      parameter is either a function that alters the way objects and arrays are stringified, or an array of Strings and Numbers
+      that acts as a white list for selecting the object properties that will be stringified. The optional &lt;var&gt;space&lt;/var&gt;
+      parameter is a String or Number that allows the result to have white space injected into it to improve human
+      readability.&lt;/p&gt;</remarks>
+			<description>The stringify function returns a String in JSON format representing an ECMAScript valuee.</description>
+			<browsers>
+				<browser platform="IE" version="8.0+"/>
+				<browser platform="Mozilla" version="4.0+"/>
+				<browser platform="Opera" version="10.5+" />
+				<browser platform="Chrome" version="5.0+" />
+				<browser platform="Safari" version="4.0+" />
+			</browsers>
+			<return-description>Returns a String in JSON format representing an ECMAScript value.</return-description>
+		</method>
+	</methods>
+  </class>
 </javascript>

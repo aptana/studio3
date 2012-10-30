@@ -847,6 +847,21 @@ public class JSMetadataReader extends MetadataReader
 	 */
 	public void exitDeprecated(String ns, String name, String qname)
 	{
+		// TODO Get text and save that as some sort of deprecation comment!
+		boolean deprecated = true;
+
+		if (currentProperty != null)
+		{
+			currentProperty.setIsDeprecated(deprecated);
+		}
+		else if (currentFunction != null)
+		{
+			currentFunction.setIsDeprecated(deprecated);
+		}
+		else if (currentType != null)
+		{
+			currentType.setIsDeprecated(deprecated);
+		}
 	}
 
 	/**
