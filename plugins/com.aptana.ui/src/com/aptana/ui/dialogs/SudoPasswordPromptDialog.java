@@ -68,7 +68,7 @@ public class SudoPasswordPromptDialog extends Dialog
 	@Override
 	protected void okPressed()
 	{
-		password = pwdText.getTextChars();
+		password = pwdText.getText().toCharArray();
 		super.okPressed();
 	}
 
