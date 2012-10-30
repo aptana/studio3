@@ -25,34 +25,52 @@ import com.aptana.js.debug.core.internal.model.DebugConnection;
 
 /**
  * @author Max Stepanov
- *
  */
-public class V8DebugConnection extends DebugConnection {
+public class V8DebugConnection extends DebugConnection
+{
 
-	public static DebugConnection createConnection(V8DebugHost debugHost, ProtocolLogger logger, ILaunch launch) throws CoreException {
-		try {
+	public static DebugConnection createConnection(V8DebugHost debugHost, ProtocolLogger logger, ILaunch launch)
+			throws CoreException
+	{
+		try
+		{
 			ServerSocket listenSocket = DebugUtil.allocateServerSocket(0);
-			debugHost.start(listenSocket.getLocalSocketAddress(), launch);
-			Socket socket = listenSocket.accept();
-			if (socket != null) {
-				socket.setSoTimeout(V8DebugHost.SOCKET_TIMEOUT);
-				return new V8DebugConnection(socket,
-						new InputStreamReader(socket.getInputStream()),
-						new OutputStreamWriter(socket.getOutputStream()),
-						logger);
-			}
+			return createConnection(debugHost, logger, launch, listenSocket);
 		}
-		catch (IOException e) {
+		catch (IOException e)
+		{
 			throwDebugException(e);
 		}
 		return null;
 	}
-	
+
+	public static DebugConnection createConnection(V8DebugHost debugHost, ProtocolLogger logger, ILaunch launch,
+			ServerSocket listenSocket) throws CoreException
+	{
+		try
+		{
+			debugHost.start(listenSocket.getLocalSocketAddress(), launch);
+			Socket socket = listenSocket.accept();
+			if (socket != null)
+			{
+				socket.setSoTimeout(V8DebugHost.SOCKET_TIMEOUT);
+				return new V8DebugConnection(socket, new InputStreamReader(socket.getInputStream()),
+						new OutputStreamWriter(socket.getOutputStream()), logger);
+			}
+		}
+		catch (IOException e)
+		{
+			throwDebugException(e);
+		}
+		return null;
+	}
+
 	/**
 	 * @param reader
 	 * @param writer
 	 */
-	private V8DebugConnection(Socket socket, Reader reader, Writer writer, ProtocolLogger logger) {
+	private V8DebugConnection(Socket socket, Reader reader, Writer writer, ProtocolLogger logger)
+	{
 		super(socket, reader, writer, logger);
 	}
 
