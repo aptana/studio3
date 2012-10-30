@@ -13,7 +13,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 
 public class URIUtil
@@ -137,5 +139,20 @@ public class URIUtil
 		}
 		// TODO Log output if failed?
 		return false;
+	}
+
+	public static String getFileName(URI uri)
+	{
+		if (uri == null)
+		{
+			return null;
+		}
+		String uriPath = uri.getPath();
+		IPath path = Path.fromPortableString(uriPath);
+		if (path == null)
+		{
+			return null;
+		}
+		return path.lastSegment();
 	}
 }

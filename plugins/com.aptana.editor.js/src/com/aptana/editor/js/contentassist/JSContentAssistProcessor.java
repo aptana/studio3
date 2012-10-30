@@ -43,7 +43,6 @@ import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.JSLanguageConstants;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSSourceConfiguration;
-import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.index.IJSIndexConstants;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.ParameterElement;
@@ -51,6 +50,7 @@ import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.inferencing.JSNodeTypeInferrer;
 import com.aptana.editor.js.inferencing.JSPropertyCollection;
 import com.aptana.editor.js.inferencing.JSScope;
+import com.aptana.editor.js.inferencing.JSTypeUtil;
 import com.aptana.editor.js.parsing.JSFlexLexemeProvider;
 import com.aptana.editor.js.parsing.JSFlexScanner;
 import com.aptana.editor.js.parsing.JSParseState;
@@ -174,7 +174,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	private void addCoreGlobals(Set<ICompletionProposal> proposals, int offset)
 	{
-		Collection<PropertyElement> globals = indexHelper.getCoreGlobals();
+		Collection<PropertyElement> globals = indexHelper.getCoreGlobals(getProject(), getFilename());
 
 		if (!CollectionsUtil.isEmpty(globals))
 		{
@@ -241,7 +241,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	private void addProjectGlobals(Set<ICompletionProposal> proposals, int offset)
 	{
-		Collection<PropertyElement> projectGlobals = indexHelper.getGlobals(getIndex());
+		Collection<PropertyElement> projectGlobals = indexHelper.getGlobals(getIndex(), getProject(), getFilename());
 
 		if (!CollectionsUtil.isEmpty(projectGlobals))
 		{
@@ -948,7 +948,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				case IN_VARIABLE_NAME:
 				{
-					typeName = JSTypeConstants.WINDOW_TYPE;
+					typeName = JSTypeUtil.getGlobalType(getProject(), getFilename());
 					methodName = node.getParent().getFirstChild().getText();
 					break;
 				}

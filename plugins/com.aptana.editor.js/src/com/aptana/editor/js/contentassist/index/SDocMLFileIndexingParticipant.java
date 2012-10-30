@@ -54,7 +54,8 @@ public class SDocMLFileIndexingParticipant extends AbstractFileIndexingParticipa
 
 				// create new Window type for this file
 				JSIndexReader jsir = new JSIndexReader();
-				List<TypeElement> windows = jsir.getType(index, JSTypeConstants.WINDOW_TYPE, true);
+				String globalTypeName = JSTypeUtil.getGlobalType(context.getProject(), context.getName());
+				List<TypeElement> windows = jsir.getType(index, globalTypeName, true);
 				TypeElement window;
 
 				if (!CollectionsUtil.isEmpty(windows))
@@ -63,8 +64,7 @@ public class SDocMLFileIndexingParticipant extends AbstractFileIndexingParticipa
 				}
 				else
 				{
-					window = new TypeElement();
-					window.setName(JSTypeConstants.WINDOW_TYPE);
+					window = JSTypeUtil.createGlobalType(globalTypeName);
 				}
 
 				// process results

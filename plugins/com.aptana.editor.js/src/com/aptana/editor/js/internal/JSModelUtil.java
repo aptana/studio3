@@ -11,6 +11,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.core.resources.IProject;
+
 import com.aptana.core.IFilter;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
@@ -45,7 +47,9 @@ public class JSModelUtil
 			{
 				JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
 				Index index = EditorUtil.getIndex(editor);
-				return queryHelper.getGlobals(index, node.getText());
+				IProject project = EditorUtil.getProject(editor);
+				String fileName = EditorUtil.getFileName(editor);
+				return queryHelper.getGlobals(index, project, fileName, node.getText());
 			}
 
 			case IN_PROPERTY_NAME:

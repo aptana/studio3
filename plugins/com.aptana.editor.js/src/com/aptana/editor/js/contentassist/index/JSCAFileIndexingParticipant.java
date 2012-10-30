@@ -24,6 +24,7 @@ import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.model.AliasElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
+import com.aptana.editor.js.inferencing.JSTypeUtil;
 import com.aptana.index.core.AbstractFileIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.build.BuildContext;
@@ -75,7 +76,8 @@ public class JSCAFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 			// create new Window type for this file
 			JSIndexReader jsir = new JSIndexReader();
-			List<TypeElement> windows = jsir.getType(index, JSTypeConstants.WINDOW_TYPE, true);
+			String globalTypeName = JSTypeUtil.getGlobalType(context.getProject(), context.getName());
+			List<TypeElement> windows = jsir.getType(index, globalTypeName, true);
 			TypeElement window;
 
 			if (!CollectionsUtil.isEmpty(windows))
@@ -84,8 +86,7 @@ public class JSCAFileIndexingParticipant extends AbstractFileIndexingParticipant
 			}
 			else
 			{
-				window = new TypeElement();
-				window.setName(JSTypeConstants.WINDOW_TYPE);
+				window = JSTypeUtil.createGlobalType(globalTypeName);
 			}
 
 			// process results

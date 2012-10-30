@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
+import org.eclipse.core.resources.IProject;
+
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSTypeConstants;
@@ -29,6 +31,7 @@ import com.aptana.editor.js.contentassist.model.EventElement;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
+import com.aptana.editor.js.inferencing.JSTypeUtil;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.IndexPlugin;
@@ -66,12 +69,14 @@ public class JSIndexQueryHelper
 	/**
 	 * getCoreGlobals
 	 * 
+	 * @param fileName
+	 * @param project
 	 * @param fields
 	 * @return
 	 */
-	public Collection<PropertyElement> getCoreGlobals()
+	public Collection<PropertyElement> getCoreGlobals(IProject project, String fileName)
 	{
-		return getGlobals(getIndex());
+		return getGlobals(getIndex(), project, fileName);
 	}
 
 	/**
@@ -115,17 +120,25 @@ public class JSIndexQueryHelper
 	}
 
 	/**
-	 * getGlobals
+	 * Attempts to get a specific member off the global type. Attempts to determine the correct global type to query
+	 * based on the project and filename passed in (Global or Window)
 	 * 
 	 * @param index
-	 * @param name
-	 * @param fields
+	 *            the index to query
+	 * @param project
+	 *            The project we're currently working with
+	 * @param fileName
+	 *            The name of the file we're working on
+	 * @param memberName
+	 *            The name of the member of global we're trying to query for.
 	 * @return
 	 */
-	public Collection<PropertyElement> getGlobals(Index index, String name)
+	public Collection<PropertyElement> getGlobals(Index index, IProject project, String fileName, String memberName)
 	{
-		Collection<PropertyElement> indexGlobals = getMembers(index, JSTypeConstants.WINDOW_TYPE, name);
-		Collection<PropertyElement> builtinGlobals = getMembers(getIndex(), JSTypeConstants.WINDOW_TYPE, name);
+		// Need to search Global or Window!
+		String globalTypeName = JSTypeUtil.getGlobalType(project, fileName);
+		Collection<PropertyElement> indexGlobals = getMembers(index, globalTypeName, memberName);
+		Collection<PropertyElement> builtinGlobals = getMembers(getIndex(), globalTypeName, memberName);
 		return CollectionsUtil.union(indexGlobals, builtinGlobals);
 	}
 
@@ -214,12 +227,19 @@ public class JSIndexQueryHelper
 	 * Gets all the members defined on Window or Global in the given Index.
 	 * 
 	 * @param index
+	 * @param fileName
+	 * @param project
 	 * @return
 	 */
-	public Collection<PropertyElement> getGlobals(Index index)
+	public Collection<PropertyElement> getGlobals(Index index, IProject project, String fileName)
 	{
-		return this
-				.getMembers(index, CollectionsUtil.newList(JSTypeConstants.WINDOW_TYPE, JSTypeConstants.GLOBAL_TYPE));
+		String globalType = JSTypeUtil.getGlobalType(project, fileName);
+		if (JSTypeConstants.WINDOW_TYPE.equals(globalType))
+		{
+			return this.getMembers(index,
+					CollectionsUtil.newList(JSTypeConstants.WINDOW_TYPE, JSTypeConstants.GLOBAL_TYPE));
+		}
+		return this.getMembers(index, globalType);
 	}
 
 	/**
