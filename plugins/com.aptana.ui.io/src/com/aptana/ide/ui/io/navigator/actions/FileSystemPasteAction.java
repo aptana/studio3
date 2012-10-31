@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
@@ -32,143 +33,185 @@ import com.aptana.ide.ui.io.FileSystemUtils;
 import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ide.ui.io.Utils;
 import com.aptana.ide.ui.io.actions.CopyFilesOperation;
+import com.aptana.ide.ui.io.navigator.FileSystemObject;
 
 /**
  * @author Michael Xia (mxia@aptana.com)
  */
-public class FileSystemPasteAction extends BaseSelectionListenerAction {
+public class FileSystemPasteAction extends BaseSelectionListenerAction
+{
 
-    /**
-     * The id of this action
-     */
-    public static final String ID = IOUIPlugin.PLUGIN_ID + ".PasteAction"; //$NON-NLS-1$
+	/**
+	 * The id of this action
+	 */
+	public static final String ID = IOUIPlugin.PLUGIN_ID + ".PasteAction"; //$NON-NLS-1$
 
-    private static final IFileStore[] NO_FILES = new IFileStore[0];
-    /**
-     * The shell in which to show any dialogs
-     */
-    private Shell fShell;
+	private static final IFileStore[] NO_FILES = new IFileStore[0];
+	/**
+	 * The shell in which to show any dialogs
+	 */
+	private Shell fShell;
 
-    /**
-     * System clipboard
-     */
-    private Clipboard fClipboard;
+	private List<Object> selectedFiles;
 
-    private IFileStore[] fClipboardData;
-    private List<IFileStore> fDestFileStores;
+	/**
+	 * System clipboard
+	 */
+	private Clipboard fClipboard;
 
-    public FileSystemPasteAction(Shell shell, Clipboard clipboard) {
-        super(Messages.FileSystemPasteAction_TXT);
-        fShell = shell;
-        fClipboard = clipboard;
-        fDestFileStores = new ArrayList<IFileStore>();
+	private IFileStore[] fClipboardData;
+	private List<IFileStore> fDestFileStores;
 
-        setToolTipText(Messages.FileSystemPasteAction_TTP);
-        setId(ID);
-        PlatformUI.getWorkbench().getHelpSystem().setHelp(this, "HelpId"); //$NON-NLS-1$
-    }
+	public FileSystemPasteAction(Shell shell, Clipboard clipboard)
+	{
+		super(Messages.FileSystemPasteAction_TXT);
+		fShell = shell;
+		fClipboard = clipboard;
+		fDestFileStores = new ArrayList<IFileStore>();
+		selectedFiles = new ArrayList<Object>();
 
-    @Override
-    public void run() {
-        // try file transfer
-        JobChangeAdapter jobAdapter = new JobChangeAdapter() {
+		setToolTipText(Messages.FileSystemPasteAction_TTP);
+		setId(ID);
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(this, "HelpId"); //$NON-NLS-1$
+	}
 
-            @Override
-            public void done(IJobChangeEvent event) {
-            	for (IFileStore fileStore : fDestFileStores)
-            	{
-            		IOUIPlugin.refreshNavigatorView(fileStore);
-            	}
-            }
-        };
-        if (fClipboardData != null && fClipboardData.length > 0 && fDestFileStores.size() > 0) {
-            CopyFilesOperation operation = new CopyFilesOperation(fShell);
-            operation.copyFiles(fClipboardData, fDestFileStores.get(0), jobAdapter);
-            return;
-        }
+	@Override
+	public void run()
+	{
+		// try file transfer
+		JobChangeAdapter jobAdapter = new JobChangeAdapter()
+		{
 
-        // try other transfer
-        FileTransfer fileTransfer = FileTransfer.getInstance();
-        String[] fileData = (String[]) fClipboard.getContents(fileTransfer);
+			@Override
+			public void done(IJobChangeEvent event)
+			{
+				for (Object file : selectedFiles)
+				{
+					IOUIPlugin.refreshNavigatorView(file);
+				}
+			}
+		};
+		if (fClipboardData != null && fClipboardData.length > 0 && fDestFileStores.size() > 0)
+		{
+			CopyFilesOperation operation = new CopyFilesOperation(fShell);
+			operation.copyFiles(fClipboardData, fDestFileStores.get(0), jobAdapter);
+			return;
+		}
 
-        if (fileData != null && fileData.length > 0 && fDestFileStores.size() > 0) {
-            CopyFilesOperation operation = new CopyFilesOperation(fShell);
-            operation.copyFiles(fileData, fDestFileStores.get(0), jobAdapter);
-        }
-    }
+		// try other transfer
+		FileTransfer fileTransfer = FileTransfer.getInstance();
+		String[] fileData = (String[]) fClipboard.getContents(fileTransfer);
 
-    @Override
-    protected boolean updateSelection(IStructuredSelection selection) {
-        fDestFileStores.clear();
-        fClipboardData = NO_FILES;
-        if (!super.updateSelection(selection)) {
-            return false;
-        }
+		if (fileData != null && fileData.length > 0 && fDestFileStores.size() > 0)
+		{
+			CopyFilesOperation operation = new CopyFilesOperation(fShell);
+			operation.copyFiles(fileData, fDestFileStores.get(0), jobAdapter);
+		}
+	}
 
-        if (selection == null || selection.isEmpty()) {
-            return false;
-        }
-        Object[] elements = selection.toArray();
+	@Override
+	protected boolean updateSelection(IStructuredSelection selection)
+	{
+		fDestFileStores.clear();
+		selectedFiles.clear();
+		fClipboardData = NO_FILES;
+		if (!super.updateSelection(selection))
+		{
+			return false;
+		}
 
-        IFileStore fileStore;
-        for (Object element : elements) {
-            fileStore = getFileStore(element);
-            if (fileStore != null) {
-            	if (!Utils.isDirectory(fileStore))
-            	{
-            		fileStore = fileStore.getParent();
-            	}
-                fDestFileStores.add(fileStore);
-            }
-        }
-        if (fDestFileStores.size() == 0) {
-            return false;
-        }
+		if (selection == null || selection.isEmpty())
+		{
+			return false;
+		}
+		Object[] elements = selection.toArray();
 
-        fShell.getDisplay().syncExec(new Runnable() {
+		IFileStore fileStore;
+		for (Object element : elements)
+		{
+			fileStore = getFileStore(element);
+			if (fileStore != null)
+			{
+				if (!Utils.isDirectory(fileStore))
+				{
+					fileStore = fileStore.getParent();
+				}
+				fDestFileStores.add(fileStore);
 
-            public void run() {
-                // clipboard must have files
-                LocalSelectionTransfer transfer = LocalSelectionTransfer.getTransfer();
-                Object contents = fClipboard.getContents(transfer);
-                if (contents instanceof StructuredSelection) {
-                    Object[] elements = ((StructuredSelection) contents).toArray();
-                    List<IFileStore> fileStores = new ArrayList<IFileStore>();
-                    for (Object element : elements) {
-                        if (element instanceof IFileStore) {
-                            fileStores.add((IFileStore) element);
-                        }
-                    }
-                    fClipboardData = fileStores.toArray(new IFileStore[fileStores.size()]);
-                }
-            }
-        });
-        if (fClipboardData.length > 0) {
-            return true;
-        }
+				if (element instanceof IAdaptable)
+				{
+					IResource resource = (IResource) ((IAdaptable) element).getAdapter(IResource.class);
+					if (resource != null)
+					{
+						selectedFiles.add((resource instanceof IContainer) ? resource : resource.getParent());
+					}
+					else
+					{
+						selectedFiles.add(new FileSystemObject(fileStore, FileSystemUtils.getFileInfo(fileStore)));
+					}
+				}
+			}
+		}
+		if (fDestFileStores.size() == 0)
+		{
+			return false;
+		}
 
-        TransferData[] transfers = fClipboard.getAvailableTypes();
-        FileTransfer fileTransfer = FileTransfer.getInstance();
-        for (int i = 0; i < transfers.length; ++i) {
-            if (fileTransfer.isSupportedType(transfers[i])) {
-                return true;
-            }
-        }
-        return false;
-    }
+		fShell.getDisplay().syncExec(new Runnable()
+		{
+
+			public void run()
+			{
+				// clipboard must have files
+				LocalSelectionTransfer transfer = LocalSelectionTransfer.getTransfer();
+				Object contents = fClipboard.getContents(transfer);
+				if (contents instanceof StructuredSelection)
+				{
+					Object[] elements = ((StructuredSelection) contents).toArray();
+					List<IFileStore> fileStores = new ArrayList<IFileStore>();
+					for (Object element : elements)
+					{
+						if (element instanceof IFileStore)
+						{
+							fileStores.add((IFileStore) element);
+						}
+					}
+					fClipboardData = fileStores.toArray(new IFileStore[fileStores.size()]);
+				}
+			}
+		});
+		if (fClipboardData.length > 0)
+		{
+			return true;
+		}
+
+		TransferData[] transfers = fClipboard.getAvailableTypes();
+		FileTransfer fileTransfer = FileTransfer.getInstance();
+		for (int i = 0; i < transfers.length; ++i)
+		{
+			if (fileTransfer.isSupportedType(transfers[i]))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 
 	private static IFileStore getFileStore(Object adaptable)
 	{
 		if (adaptable instanceof IAdaptable)
 		{
 			IResource resource = (IResource) ((IAdaptable) adaptable).getAdapter(IResource.class);
-			try
+			if (resource != null)
 			{
-				return EFS.getStore(resource.getLocationURI());
-			}
-			catch (CoreException e)
-			{
-				return EFSUtils.getFileStore(resource);
+				try
+				{
+					return EFS.getStore(resource.getLocationURI());
+				}
+				catch (CoreException e)
+				{
+					return EFSUtils.getFileStore(resource);
+				}
 			}
 		}
 		return FileSystemUtils.getFileStore(adaptable);
