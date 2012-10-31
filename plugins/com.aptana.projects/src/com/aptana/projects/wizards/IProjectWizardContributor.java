@@ -11,6 +11,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.swt.widgets.Composite;
 
 /**
  * @author Nam Le <nle@appcelerator.com>
@@ -24,6 +25,13 @@ public interface IProjectWizardContributor extends IExecutableExtension
 	 * @return
 	 */
 	public IWizardPage createWizardPage();
+
+	/**
+	 * Responsible for contributing UI to the project creation page of the wizard
+	 * 
+	 * @param parent
+	 */
+	public void appendProjectCreationPage(Composite parent);
 
 	/**
 	 * Returns the check whether this nature ids passed matches the contributor natureid
