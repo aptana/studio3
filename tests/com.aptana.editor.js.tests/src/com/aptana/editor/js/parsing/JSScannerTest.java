@@ -615,6 +615,20 @@ public class JSScannerTest extends TestCase
 		);
 		// @formatter:on
 	}
+	
+	public void testRegex4()
+	{
+		// @formatter:off
+		assertTokenTypes(
+			"var r = /h\\d/i;",
+			JSTokenType.VAR,
+			JSTokenType.IDENTIFIER,
+			JSTokenType.EQUAL,
+			JSTokenType.REGEX,
+			JSTokenType.SEMICOLON
+		);
+		// @formatter:on
+	}
 
 	public void testNotRegex()
 	{

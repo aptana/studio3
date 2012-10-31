@@ -1,11 +1,16 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.editor.js;
+
+import java.util.Set;
+
+import com.aptana.core.util.ArrayUtil;
+import com.aptana.core.util.CollectionsUtil;
 
 public class JSLanguageConstants
 {
@@ -155,12 +160,24 @@ public class JSLanguageConstants
 			"borderTopWidth", "borderLeftWidth", "bufferDepth", "below", "backgroundColor", "backgroundImage", };
 
 	@SuppressWarnings("nls")
-	public static String[] GRAMMAR_KEYWORDS = { "function", "var", "void", "true", "false", "null", "this" };
+	private static String[] GRAMMAR_KEYWORDS = { "function", "var", "void", "true", "false", "null", "this" };
+
+	/**
+	 * All keywords
+	 */
+	public static final Set<String> KEYWORDS = CollectionsUtil.newSet(ArrayUtil.flatten(
+			JSLanguageConstants.KEYWORD_OPERATORS, JSLanguageConstants.GRAMMAR_KEYWORDS,
+			JSLanguageConstants.KEYWORD_CONTROL));
 
 	/**
 	 * JSLanguageConstants
 	 */
 	private JSLanguageConstants()
 	{
+	}
+
+	public static boolean isKeyword(String string)
+	{
+		return KEYWORDS.contains(string);
 	}
 }
