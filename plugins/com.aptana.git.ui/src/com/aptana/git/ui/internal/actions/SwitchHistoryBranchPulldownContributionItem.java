@@ -1,12 +1,14 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.git.ui.internal.actions;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.SortedSet;
 
 import org.eclipse.core.resources.IResource;
@@ -20,8 +22,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.team.ui.TeamUI;
 import org.eclipse.team.ui.history.IHistoryPage;
 import org.eclipse.team.ui.history.IHistoryView;
-import org.eclipse.ui.menus.IWorkbenchContribution;
-import org.eclipse.ui.services.IServiceLocator;
+import org.eclipse.ui.actions.CompoundContributionItem;
 
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRef;
@@ -34,41 +35,17 @@ import com.aptana.git.ui.internal.history.GitHistoryPage;
  * 
  * @author cwilliams
  */
-public class SwitchHistoryBranchPulldownContributionItem extends ContributionItem implements IWorkbenchContribution
+public class SwitchHistoryBranchPulldownContributionItem extends CompoundContributionItem
 {
 
 	public SwitchHistoryBranchPulldownContributionItem()
 	{
+		super();
 	}
 
 	public SwitchHistoryBranchPulldownContributionItem(String id)
 	{
 		super(id);
-	}
-
-	@Override
-	public void fill(Menu menu, int index)
-	{
-		GitHistoryPage historyPage = getHistoryPage();
-		if (historyPage == null)
-		{
-			return;
-		}
-
-		IResource resource = (IResource) historyPage.getInput();
-		String currentRef = historyPage.getCurrentRef();
-
-		IGitRepositoryManager manager = GitPlugin.getDefault().getGitRepositoryManager();
-		GitRepository repo = manager.getAttached(resource.getProject());
-
-		SortedSet<GitRef> refs = repo.simpleRefs();
-		for (GitRef ref : refs)
-		{
-			String refName = ref.shortName();
-			boolean enabled = !currentRef.equals(refName);
-			IContributionItem item = new SwitchRefContributionItem(resource, refName, enabled);
-			item.fill(menu, menu.getItemCount());
-		}
 	}
 
 	protected GitHistoryPage getHistoryPage()
@@ -82,17 +59,13 @@ public class SwitchHistoryBranchPulldownContributionItem extends ContributionIte
 		return null;
 	}
 
-	public void initialize(IServiceLocator serviceLocator)
-	{
-		// ignore
-	}
-
 	private void switchRef(IResource manager, String refName)
 	{
 		GitHistoryPage page = getHistoryPage();
 		if (page != null)
 		{
 			page.setRef(refName);
+			// TODO This menu needs to be rebuilt!
 		}
 	}
 
@@ -130,5 +103,32 @@ public class SwitchHistoryBranchPulldownContributionItem extends ContributionIte
 				}
 			});
 		}
+	}
+
+	@Override
+	protected IContributionItem[] getContributionItems()
+	{
+		GitHistoryPage historyPage = getHistoryPage();
+		if (historyPage == null)
+		{
+			return new IContributionItem[0];
+		}
+
+		IResource resource = (IResource) historyPage.getInput();
+		String currentRef = historyPage.getCurrentRef();
+
+		IGitRepositoryManager manager = GitPlugin.getDefault().getGitRepositoryManager();
+		GitRepository repo = manager.getAttached(resource.getProject());
+
+		SortedSet<GitRef> refs = repo.simpleRefs();
+		List<IContributionItem> items = new ArrayList<IContributionItem>(refs.size());
+		for (GitRef ref : refs)
+		{
+			String refName = ref.shortName();
+			boolean enabled = !currentRef.equals(refName);
+			IContributionItem item = new SwitchRefContributionItem(resource, refName, enabled);
+			items.add(item);
+		}
+		return items.toArray(new IContributionItem[items.size()]);
 	}
 }
