@@ -21,7 +21,10 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IProcess;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.team.ui.history.IHistoryPage;
+import org.eclipse.team.ui.history.IHistoryView;
 import org.eclipse.ui.ISources;
 
 import com.aptana.core.logging.IdeLog;
@@ -31,41 +34,33 @@ import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.git.ui.GitUIPlugin;
 import com.aptana.git.ui.internal.Launcher;
+import com.aptana.git.ui.internal.history.GitHistoryPage;
 
 public class CherryPickHandler extends AbstractHandler
 {
 
-	private boolean enabled;
-
-	@Override
-	public boolean isEnabled()
-	{
-		return enabled;
-	}
-
-	@Override
-	public void setEnabled(Object evaluationContext)
-	{
-		if (evaluationContext instanceof IEvaluationContext)
-		{
-			GitCommit commit = getCommit((IEvaluationContext) evaluationContext);
-			enabled = (commit != null);
-			return;
-		}
-		enabled = false;
-	}
-
 	private GitCommit getCommit(IEvaluationContext evaluationContext)
 	{
-		IEvaluationContext context = (IEvaluationContext) evaluationContext;
-		Object raw = context.getVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME);
-		if (raw instanceof IStructuredSelection)
+		ISelection selection = null;
+		Object part = evaluationContext.getVariable(ISources.ACTIVE_PART_NAME);
+		if (part instanceof IHistoryView)
 		{
-			IStructuredSelection selection = (IStructuredSelection) raw;
-			Object selected = selection.getFirstElement();
-			if (selected instanceof GitCommit)
+			IHistoryView view = (IHistoryView) part;
+			IHistoryPage page = view.getHistoryPage();
+			if (page instanceof GitHistoryPage)
 			{
-				return (GitCommit) selected;
+				GitHistoryPage ghp = (GitHistoryPage) page;
+				selection = ghp.getSelectionProvider().getSelection();
+
+				if (selection instanceof IStructuredSelection)
+				{
+					IStructuredSelection ss = (IStructuredSelection) selection;
+					Object selected = ss.getFirstElement();
+					if (selected instanceof GitCommit)
+					{
+						return (GitCommit) selected;
+					}
+				}
 			}
 		}
 		return null;
