@@ -188,13 +188,16 @@ public class FileSystemCopyAction extends BaseSelectionListenerAction
 		if (adaptable instanceof IAdaptable)
 		{
 			IResource resource = (IResource) ((IAdaptable) adaptable).getAdapter(IResource.class);
-			try
+			if (resource != null)
 			{
-				return EFS.getStore(resource.getLocationURI());
-			}
-			catch (CoreException e)
-			{
-				return EFSUtils.getFileStore(resource);
+				try
+				{
+					return EFS.getStore(resource.getLocationURI());
+				}
+				catch (CoreException e)
+				{
+					return EFSUtils.getFileStore(resource);
+				}
 			}
 		}
 		return FileSystemUtils.getFileStore(adaptable);
