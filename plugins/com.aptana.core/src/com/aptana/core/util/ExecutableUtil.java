@@ -190,7 +190,7 @@ public final class ExecutableUtil
 			return false;
 		}
 		File file = path.toFile();
-		if (file == null || !file.exists())
+		if (file == null || !file.exists() || file.isDirectory())
 		{
 			return false;
 		}
