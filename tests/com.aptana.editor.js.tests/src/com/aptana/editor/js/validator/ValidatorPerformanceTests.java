@@ -13,6 +13,7 @@ public class ValidatorPerformanceTests extends TestCase
 		//$JUnit-BEGIN$
 		suite.addTestSuite(JSStyleValidatorPerformanceTest.class);
 		suite.addTestSuite(JSLintValidatorPerformanceTest.class);
+		suite.addTestSuite(JSParserValidatorPerformanceTest.class);
 		//$JUnit-END$
 		return suite;
 	}

@@ -23,6 +23,7 @@ import com.aptana.editor.js.parsing.JSParserPerformanceTest;
 import com.aptana.editor.js.parsing.JSScannerPerformanceTest;
 import com.aptana.editor.js.sdoc.parsing.SDocParserPerformanceTest;
 import com.aptana.editor.js.tests.performance.OpenJSEditorTest;
+import com.aptana.editor.js.validator.ValidatorPerformanceTests;
 
 public class PerformanceTests
 {
@@ -48,6 +49,7 @@ public class PerformanceTests
 		suite.addTestSuite(JSScannerPerformanceTest.class);
 		suite.addTestSuite(JSSourcePartitionScannerPerformanceTest.class);
 		suite.addTestSuite(SDocParserPerformanceTest.class);
+		suite.addTest(ValidatorPerformanceTests.suite());
 		suite.addTest(OpenJSEditorTest.suite());
 		// $JUnit-END$
 		return suite;
