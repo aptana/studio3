@@ -30,7 +30,6 @@ import org.eclipse.swt.graphics.Image;
 import beaver.Scanner;
 
 import com.aptana.core.IFilter;
-import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.ChainedFilter;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
@@ -130,14 +129,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 	};
 
-	// @formatter:off
-	private static String[] KEYWORDS = ArrayUtil.flatten(
-		JSLanguageConstants.KEYWORD_OPERATORS,
-		JSLanguageConstants.GRAMMAR_KEYWORDS,
-		JSLanguageConstants.KEYWORD_CONTROL
-	);
-	// @formatter:on
-
 	private static Set<String> AUTO_ACTIVATION_PARTITION_TYPES;
 	{
 		AUTO_ACTIVATION_PARTITION_TYPES = CollectionsUtil.newSet(JSSourceConfiguration.DEFAULT,
@@ -200,7 +191,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	private void addKeywords(Set<ICompletionProposal> proposals, int offset)
 	{
-		for (String name : KEYWORDS)
+		for (String name : JSLanguageConstants.KEYWORDS)
 		{
 			// TODO Create a KeywordProposal class that lazily generates description, etc?
 			String description = StringUtil.format(Messages.JSContentAssistProcessor_KeywordDescription, name);
