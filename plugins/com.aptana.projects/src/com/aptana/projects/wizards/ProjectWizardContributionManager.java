@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.swt.widgets.Composite;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ArrayUtil;
@@ -56,6 +57,20 @@ public class ProjectWizardContributionManager
 		}
 
 		return pages.toArray(new IWizardPage[pages.size()]);
+	}
+
+	public void contributeProjectCreationPage(String[] natureIds, Composite parent)
+	{
+		loadExtensions();
+		for (IProjectWizardContributor contributor : contributors)
+		{
+			if (!ArrayUtil.isEmpty(natureIds) && !contributor.hasNatureId(natureIds))
+			{
+				continue;
+			}
+
+			contributor.appendProjectCreationPage(parent);
+		}
 	}
 
 	private synchronized void loadExtensions()

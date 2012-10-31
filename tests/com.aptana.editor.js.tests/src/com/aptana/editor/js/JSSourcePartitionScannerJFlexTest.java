@@ -122,6 +122,46 @@ public class JSSourcePartitionScannerJFlexTest extends JSSourcePartitionScannerT
 		assertPartitions(source, "__dftl_partition_content_type:0:");
 	}
 
+	public void testTISTUD2678() throws BadLocationException
+	{
+		String source = "var I = F.selectors = {\r\n	filters : {\r\n		header : function(T) {\r\n			return /h\\d/i.test(T.nodeName);\r\n		},\r\n		text: function(T) {\r\n			return \"text\" === T.type;\r\n		}\r\n	}\r\n};";
+
+		assertPartitions(source, "__dftl_partition_content_type:0:75", "__js_regexp:75:81",
+				"__dftl_partition_content_type:81:140", "__js_string_double:140:146",
+				"__dftl_partition_content_type:146:");
+	}
+
+	public void testTISTUD2678_1() throws BadLocationException
+	{
+		String source = "var r = /h\\d/i;\r\n\"text\" === T.type;";
+
+		assertPartitions(source, "__dftl_partition_content_type:0:8", "__js_regexp:8:14",
+				"__dftl_partition_content_type:14:17", "__js_string_double:17:23", "__dftl_partition_content_type:23:");
+	}
+
+	public void testTISTUD2678_2() throws BadLocationException
+	{
+		String source = "function(T) { return /h\\d/i.test(T.nodeName); };\r\nfunction(T) { return \"text\" === T.type;};";
+
+		assertPartitions(source, "__dftl_partition_content_type:0:21", "__js_regexp:21:27",
+				"__dftl_partition_content_type:27:71", "__js_string_double:71:77", "__dftl_partition_content_type:77:");
+	}
+
+	public void testTISTUD2678_3() throws BadLocationException
+	{
+		String source = "/h\\d/i.test(T.nodeName);";
+
+		assertPartitions(source, "__js_regexp:0:6", "__dftl_partition_content_type:6:");
+	}
+
+	public void testTISTUD2678_4() throws BadLocationException
+	{
+		String source = "return /h\\d/i.test(T.nodeName);";
+
+		assertPartitions(source, "__dftl_partition_content_type:0:7", "__js_regexp:7:13",
+				"__dftl_partition_content_type:13:");
+	}
+
 	public void testFlexString() throws BadLocationException
 	{
 		String source = "var string = \"aaa\"";
