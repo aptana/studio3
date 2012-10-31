@@ -7,42 +7,44 @@
  */
 package com.aptana.editor.js.validator;
 
-import java.io.File;
-import java.net.URL;
+import java.io.InputStream;
 
-import org.eclipse.core.filesystem.EFS;
-import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.test.performance.PerformanceTestCase;
 
 import com.aptana.core.build.AbstractBuildParticipant;
-import com.aptana.core.util.ResourceUtil;
+import com.aptana.core.util.IOUtil;
+import com.aptana.editor.common.tests.util.TestProject;
 import com.aptana.editor.epl.tests.EditorTestHelper;
 import com.aptana.editor.js.JSPlugin;
-import com.aptana.editor.js.parsing.JSParser;
-import com.aptana.index.core.FileStoreBuildContext;
+import com.aptana.index.core.RebuildIndexJob;
 import com.aptana.index.core.build.BuildContext;
-import com.aptana.parsing.IParseState;
-import com.aptana.parsing.ParseResult;
-import com.aptana.parsing.WorkingParseResult;
 
 public class JSParserValidatorPerformanceTest extends PerformanceTestCase
 {
 	private AbstractBuildParticipant validator;
+	private TestProject project;
 
 	@Override
 	protected void setUp() throws Exception
 	{
 		super.setUp();
 
+		project = new TestProject("jsparservalidator", new String[] { "com.aptana.projects.webnature" });
 		validator = createValidator();
 	}
 
 	@Override
 	protected void tearDown() throws Exception
 	{
+		if (project != null)
+		{
+			project.delete();
+			project = null;
+		}
 		validator = null;
 		super.tearDown();
 	}
@@ -69,29 +71,18 @@ public class JSParserValidatorPerformanceTest extends PerformanceTestCase
 	protected void perfValidate(String filename, int iterations) throws Exception
 	{
 		// read in the file
-		URL url = FileLocator.find(Platform.getBundle("com.aptana.editor.js.tests"),
-				Path.fromPortableString("performance/" + filename), null);
-		File file = ResourceUtil.resourcePathToFile(url);
-		IFileStore fileStore = EFS.getStore(file.toURI());
+		InputStream in = FileLocator.openStream(Platform.getBundle("com.aptana.editor.js.tests"),
+				Path.fromPortableString("performance/" + filename), false);
+		IFile file = project.createFile("3.min.js", IOUtil.read(in));
+		RebuildIndexJob job = new RebuildIndexJob(project.getURI());
+		job.run(null);
 
 		// Ok now actually validate the thing, the real work
 		for (int i = 0; i < iterations; i++)
 		{
 			EditorTestHelper.joinBackgroundActivities();
 
-			BuildContext context = new FileStoreBuildContext(fileStore)
-			{
-				@Override
-				protected ParseResult parse(String contentType, IParseState parseState, WorkingParseResult working)
-						throws Exception
-				{
-					if (reparseEveryTime())
-					{
-						return new JSParser().parse(parseState);
-					}
-					return super.parse(contentType, parseState, working);
-				}
-			};
+			BuildContext context = new BuildContext(file);
 			// Don't measure reading in string...
 			context.getContents();
 
@@ -110,6 +101,6 @@ public class JSParserValidatorPerformanceTest extends PerformanceTestCase
 
 	public void testThreeMinJS() throws Exception
 	{
-		perfValidate("three.min.js", 10);
+		perfValidate("three.min.js", 1);
 	}
 }
