@@ -143,41 +143,44 @@ public class JSParserValidator extends AbstractBuildParticipant
 			if (fIndex != null)
 			{
 				JSParseRootNode rootNode = (JSParseRootNode) context.getAST();
-				final JSScope globalScope = rootNode.getGlobals();
-				this.fQueryHelper = new JSIndexQueryHelper();
-				ParseUtil.treeApply(rootNode, new IFilter<IParseNode>()
+				if (rootNode != null)
 				{
-					public boolean include(IParseNode node)
+					final JSScope globalScope = rootNode.getGlobals();
+					this.fQueryHelper = new JSIndexQueryHelper();
+					ParseUtil.treeApply(rootNode, new IFilter<IParseNode>()
 					{
-						// instantiating a type
-						if (node instanceof JSConstructNode)
+						public boolean include(IParseNode node)
 						{
-							JSConstructNode constructNode = (JSConstructNode) node;
-							checkTypeForDeprecation(constructNode.getExpression(), globalScope);
-						}
-						// function call
-						else if (node instanceof JSInvokeNode)
-						{
-							JSInvokeNode invokeNode = (JSInvokeNode) node;
-							IParseNode expr = invokeNode.getExpression();
-							if (expr instanceof JSIdentifierNode)
+							// instantiating a type
+							if (node instanceof JSConstructNode)
 							{
-								JSIdentifierNode ident = (JSIdentifierNode) expr;
-
-								checkFunctionOrProperty(JSTypeConstants.WINDOW_TYPE, ident, true);
+								JSConstructNode constructNode = (JSConstructNode) node;
+								checkTypeForDeprecation(constructNode.getExpression(), globalScope);
 							}
-							// Calls accessing functions by dot or ['name'] are handled below
+							// function call
+							else if (node instanceof JSInvokeNode)
+							{
+								JSInvokeNode invokeNode = (JSInvokeNode) node;
+								IParseNode expr = invokeNode.getExpression();
+								if (expr instanceof JSIdentifierNode)
+								{
+									JSIdentifierNode ident = (JSIdentifierNode) expr;
+
+									checkFunctionOrProperty(JSTypeConstants.WINDOW_TYPE, ident, true);
+								}
+								// Calls accessing functions by dot or ['name'] are handled below
+							}
+							// property access via dot notation. // Property access via ['property'] notation.
+							else if ((node instanceof JSGetPropertyNode) || (node instanceof JSGetElementNode))
+							{
+								JSBinaryOperatorNode getPropertyNode = (JSBinaryOperatorNode) node;
+								checkForDeprecations(getPropertyNode, globalScope,
+										(getPropertyNode.getParent() instanceof JSInvokeNode));
+							}
+							return true;
 						}
-						// property access via dot notation. // Property access via ['property'] notation.
-						else if ((node instanceof JSGetPropertyNode) || (node instanceof JSGetElementNode))
-						{
-							JSBinaryOperatorNode getPropertyNode = (JSBinaryOperatorNode) node;
-							checkForDeprecations(getPropertyNode, globalScope,
-									(getPropertyNode.getParent() instanceof JSInvokeNode));
-						}
-						return true;
-					}
-				});
+					});
+				}
 			}
 		}
 		catch (Exception e)
@@ -199,7 +202,7 @@ public class JSParserValidator extends AbstractBuildParticipant
 
 	/**
 	 * Checks a property or function invocation for deprecation. First checks owning type/receiver, then checks the
-	 * actuall property/function.
+	 * actually property/function.
 	 * 
 	 * @param getPropertyNode
 	 * @param globalScope
