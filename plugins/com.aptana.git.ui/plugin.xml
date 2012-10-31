@@ -1123,6 +1123,7 @@
             name="%switch.history.branch.name">
       </command>
       <command
+            categoryId="com.aptana.git.ui.category"
             id="com.aptana.git.ui.command.cherry-pick"
             name="%command.cherry-pick.name">
       </command>
@@ -1177,13 +1178,49 @@
             class="com.aptana.git.ui.internal.actions.CherryPickHandler"
             commandId="com.aptana.git.ui.command.cherry-pick">
          <enabledWhen>
-               <iterate
-                     ifEmpty="false"
-                     operator="and">
-                  <instanceof
-                        value="com.aptana.git.core.model.GitCommit">
-                  </instanceof>
-               </iterate>
+	         <and>
+	         	<with variable="activePart">
+	         		<instanceof
+	                      value="org.eclipse.team.ui.history.IHistoryView">
+	                </instanceof>
+	         	</with>
+	      <!--   	 <with variable="selection">
+	             	<count value="1">
+	             	</count>
+	            	<iterate
+	                   ifEmpty="false"
+	                   operator="and">
+	                	<instanceof
+	                      value="com.aptana.git.core.model.GitCommit">
+	                	</instanceof>
+	             	</iterate> 
+	            </with>-->
+          	</and>
+        </enabledWhen>
+      </handler>
+      <handler
+            class="com.aptana.git.ui.internal.actions.NoOpHandler"
+            commandId="com.aptana.git.ui.history.switch_branch">
+         <enabledWhen>
+	         <and>
+	         	<with variable="activePart">
+	         		<instanceof
+	                      value="org.eclipse.team.ui.history.IHistoryView">
+	                </instanceof>
+	         	</with>
+	        	  <!--   	FIXME This doesn't work properly, on first opening the view it doesn't show as enabled. But if I focus back on editor and then back, it gets enabled.
+	        	   <with variable="selection">
+	             	<count value="1">
+	             	</count>
+	            	<iterate
+	                   ifEmpty="false"
+	                   operator="and">
+	                	<instanceof
+	                      value="com.aptana.git.core.model.GitCommit">
+	                	</instanceof>
+	             	</iterate> 
+	            </with>-->
+          	</and>
         </enabledWhen>
       </handler>
    </extension>
