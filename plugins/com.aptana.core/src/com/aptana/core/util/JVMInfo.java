@@ -210,7 +210,6 @@ public class JVMInfo
 
 	private void parseJavaVersion()
 	{
-
 		String specificationVersion = System.getProperty("java.specification.version"); //$NON-NLS-1$
 		if (specificationVersion != null)
 		{
@@ -362,12 +361,13 @@ public class JVMInfo
 		try
 		{
 			Process process = pb.start();
+			IPath javac = null;
 			String output = ProcessUtil.outputForProcess(process);
 			if (output.startsWith(JAVAC))
 			{
 				// We found a valid javac, so we can also set up a detected JAVA_HOME in case we can't detect a valid
 				// one from the system's environment.
-				IPath javac = Path.fromOSString(javacPath).removeLastSegments(1);
+				javac = Path.fromOSString(javacPath).removeLastSegments(1);
 				if (Platform.OS_WIN32.equals(Platform.getOS()) && javac.segmentCount() == 0)
 				{
 					// Try to run the 'where' command on Windows to detect the full javac location.
@@ -397,7 +397,7 @@ public class JVMInfo
 					}
 				}
 
-				return true;
+				return javac != null && javac.segmentCount() > 0;
 			}
 		}
 		catch (IOException e)
