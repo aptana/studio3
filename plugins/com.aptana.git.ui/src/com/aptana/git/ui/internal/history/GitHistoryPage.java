@@ -232,7 +232,6 @@ public class GitHistoryPage extends HistoryPage
 				"<html><head></head><body style=\"background-color: {0};\"></body></html>", toHex(getBackground()))); //$NON-NLS-1$
 
 		getHistoryPageSite().setSelectionProvider(getSelectionProvider());
-		getHistoryPageSite().getPart().getSite().setSelectionProvider(getSelectionProvider());
 
 		hookContextMenu(graph);
 	}
