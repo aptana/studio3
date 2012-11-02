@@ -638,24 +638,24 @@
             category="com.aptana.ui.AptanaPreferencePage"
             class="com.aptana.editor.common.preferences.EditorsPreferencePage"
             id="com.aptana.editor.common.preferences.EditorsPreferencePage"
-            name="%page.editors.name"/>
+            name="%page.editors.name Editors"/>
       <page
             category="com.aptana.ui.AptanaPreferencePage"
             class="com.aptana.editor.common.preferences.TasksPreferencePage"
             id="com.aptana.editor.common.preferences.TasksPreferencePage"
-            name="%page.tasks.name">
+            name="%page.tasks.name Tasks">
       </page>
       <page
             category="com.aptana.ui.AptanaPreferencePage"
             class="com.aptana.editor.common.preferences.ValidationPreferencePage"
             id="com.aptana.editor.common.ValidationPreferencePage"
-            name="%page.validation.name">
+            name="%page.validation.name Validation">
       </page>
       <page
             category="com.aptana.ui.AptanaPreferencePage"
             class="com.aptana.editor.common.spelling.SpellingPreferencePage"
             id="com.aptana.editor.common.spelling"
-            name="%page.spelling.name">
+            name="%page.spelling.name Spelling">
          <keywordReference
                id="org.eclipse.ui.editors.spelling">
          </keywordReference>
@@ -664,7 +664,7 @@
             category="com.aptana.ui.AptanaPreferencePage"
             class="com.aptana.editor.common.preferences.ContentAssistPreferencePage"
             id="com.aptana.editor.common.contentAssistPreferencePage"
-            name="%content.assist.pref.page.title">
+            name="%content.assist.pref.page.title Content Assist">
       </page>            
    </extension>
    <extension
