@@ -9,6 +9,8 @@ package com.aptana.editor.js.parsing.ast;
 
 import beaver.Symbol;
 
+import com.aptana.editor.js.JSLanguageConstants;
+
 public class JSFalseNode extends JSPrimitiveNode
 {
 	/**
@@ -20,7 +22,7 @@ public class JSFalseNode extends JSPrimitiveNode
 	 */
 	public JSFalseNode()
 	{
-		super(IJSNodeTypes.FALSE, "false"); //$NON-NLS-1$
+		super(IJSNodeTypes.FALSE, JSLanguageConstants.FALSE);
 	}
 
 	/**

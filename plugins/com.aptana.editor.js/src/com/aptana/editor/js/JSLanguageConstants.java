@@ -14,6 +14,11 @@ import com.aptana.core.util.CollectionsUtil;
 
 public class JSLanguageConstants
 {
+	public static final String TRUE = "true"; //$NON-NLS-1$
+	public static final String FALSE = "false"; //$NON-NLS-1$
+	public static final String THIS = "this"; //$NON-NLS-1$
+	public static final String NULL = "null"; //$NON-NLS-1$
+
 	@SuppressWarnings("nls")
 	public static final String[] KEYWORD_OPERATORS = new String[] { "delete", "instanceof", "in", "new", "typeof",
 			"with" };
@@ -160,7 +165,7 @@ public class JSLanguageConstants
 			"borderTopWidth", "borderLeftWidth", "bufferDepth", "below", "backgroundColor", "backgroundImage", };
 
 	@SuppressWarnings("nls")
-	private static String[] GRAMMAR_KEYWORDS = { "function", "var", "void", "true", "false", "null", "this" };
+	private static String[] GRAMMAR_KEYWORDS = { "function", "var", "void", TRUE, FALSE, NULL, THIS };
 
 	/**
 	 * All keywords

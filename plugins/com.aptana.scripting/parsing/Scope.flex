@@ -6,6 +6,8 @@ import java.io.StringReader;
 import beaver.Symbol;
 import beaver.Scanner;
 
+import com.aptana.core.util.StringUtil;
+
 import com.aptana.scope.parsing.ScopeTokenType;
 
 %%
@@ -30,7 +32,6 @@ import com.aptana.scope.parsing.ScopeTokenType;
 
 	private Symbol newToken(ScopeTokenType type, Object value)
 	{
-		//System.out.println(type + ":~" + yytext() + "~");
 		return newToken(type.getIndex(), value);
 	}
 
@@ -90,12 +91,12 @@ Identifier = {Word}(\.{Word})*
 	{LineTerminator}+	{ /* ignore */ }
 
 	// operators and punctuators
-	","					{ return newToken(ScopeTokenType.COMMA,     yytext()); }
-	"|"					{ return newToken(ScopeTokenType.PIPE,      yytext()); }
-	"&"					{ return newToken(ScopeTokenType.AMPERSAND, yytext()); }
-	"("					{ return newToken(ScopeTokenType.LPAREN,    yytext()); }
-	")"					{ return newToken(ScopeTokenType.RPAREN,    yytext()); }
-	"-"					{ return newToken(ScopeTokenType.MINUS,     yytext()); }
+	","					{ return newToken(ScopeTokenType.COMMA,     StringUtil.EMPTY); }
+	"|"					{ return newToken(ScopeTokenType.PIPE,      StringUtil.EMPTY); }
+	"&"					{ return newToken(ScopeTokenType.AMPERSAND, StringUtil.EMPTY); }
+	"("					{ return newToken(ScopeTokenType.LPAREN,    StringUtil.EMPTY); }
+	")"					{ return newToken(ScopeTokenType.RPAREN,    StringUtil.EMPTY); }
+	"-"					{ return newToken(ScopeTokenType.MINUS,     StringUtil.EMPTY); }
 
 	// identifiers
 	{Identifier}		{ return newToken(ScopeTokenType.IDENTIFIER, yytext()); }

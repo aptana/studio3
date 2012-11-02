@@ -17,6 +17,8 @@ import java.util.List;
 import beaver.Symbol;
 import beaver.Scanner;
 
+import com.aptana.core.util.StringUtil;
+
 import com.aptana.editor.css.parsing.lexer.CSSTokenTypeSymbol;
 import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 import com.aptana.editor.common.parsing.ForceReturnException;
@@ -85,13 +87,13 @@ import com.aptana.editor.common.parsing.ForceReturnException;
                 while (!eof);
 
                 _lastToken = new CSSTokenTypeSymbol((CSSTokenType) forceReturnException.type, start, start + zzEndRead
-                        - 1, "");
+                        - 1, StringUtil.EMPTY);
                 yyclose();
             }
             else
             {
                 int end = yychar + yylength() - 1;
-                _lastToken = new CSSTokenTypeSymbol(CSSTokenType.EOF, yychar, end, "");
+                _lastToken = new CSSTokenTypeSymbol(CSSTokenType.EOF, yychar, end, StringUtil.EMPTY);
             }
 		}
 
@@ -111,7 +113,7 @@ import com.aptana.editor.common.parsing.ForceReturnException;
 %%
 
 <YYINITIAL> {
-	"/*" ~"*/"		               { return newToken(CSSTokenType.COMMENT, ""); }
+	"/*" ~"*/"		               { return newToken(CSSTokenType.COMMENT, StringUtil.EMPTY); }
 	                                
 	                                
     "/"                            {  
@@ -129,11 +131,11 @@ import com.aptana.editor.common.parsing.ForceReturnException;
                                         }
                                    }
 
-	'([^\\'\r\n]|\\[^])*'		   { return newToken(CSSTokenType.SINGLE_QUOTED_STRING, ""); }
-	'([^\\'\r\n]|\\[^])*(\n)	   { return newToken(CSSTokenType.SINGLE_QUOTED_STRING, ""); }
+	'([^\\'\r\n]|\\[^])*'		   { return newToken(CSSTokenType.SINGLE_QUOTED_STRING, StringUtil.EMPTY); }
+	'([^\\'\r\n]|\\[^])*(\n)	   { return newToken(CSSTokenType.SINGLE_QUOTED_STRING, StringUtil.EMPTY); }
 	
-	\"([^\\\"\r\n]|\\[^])*\"	   { return newToken(CSSTokenType.DOUBLE_QUOTED_STRING, ""); }
-	\"([^\\\"\r\n]|\\[^])*(\n)	   { return newToken(CSSTokenType.DOUBLE_QUOTED_STRING, ""); }
+	\"([^\\\"\r\n]|\\[^])*\"	   { return newToken(CSSTokenType.DOUBLE_QUOTED_STRING, StringUtil.EMPTY); }
+	\"([^\\\"\r\n]|\\[^])*(\n)	   { return newToken(CSSTokenType.DOUBLE_QUOTED_STRING, StringUtil.EMPTY); }
 	
 }
 

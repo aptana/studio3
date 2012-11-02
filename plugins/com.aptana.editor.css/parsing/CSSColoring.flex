@@ -11,6 +11,8 @@ package com.aptana.editor.css.parsing;
 import java.io.Reader;
 import java.io.StringReader;
 
+import com.aptana.core.util.StringUtil;
+
 import com.aptana.editor.css.parsing.lexer.CSSTokenTypeSymbol;
 import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 
@@ -137,12 +139,12 @@ nl							= \r|\n|\r\n|\f
 	{s}							{ /* ignore */ }
 	{comment}					{ /* ignore */ }
 
-	{single_quoted_string}		{ return newToken(CSSTokenType.SINGLE_QUOTED_STRING, ""); }
-	{double_quoted_string}		{ return newToken(CSSTokenType.DOUBLE_QUOTED_STRING, ""); }
-	{bad_single_quoted_string}	{ return newToken(CSSTokenType.SINGLE_QUOTED_STRING, ""); }
-	{bad_double_quoted_string}	{ return newToken(CSSTokenType.DOUBLE_QUOTED_STRING, ""); }
+	{single_quoted_string}		{ return newToken(CSSTokenType.SINGLE_QUOTED_STRING, StringUtil.EMPTY); }
+	{double_quoted_string}		{ return newToken(CSSTokenType.DOUBLE_QUOTED_STRING, StringUtil.EMPTY); }
+	{bad_single_quoted_string}	{ return newToken(CSSTokenType.SINGLE_QUOTED_STRING, StringUtil.EMPTY); }
+	{bad_double_quoted_string}	{ return newToken(CSSTokenType.DOUBLE_QUOTED_STRING, StringUtil.EMPTY); }
 
-	"not"                      { return newToken(CSSTokenType.NOT, ""); }
+	"not"                      { return newToken(CSSTokenType.NOT, StringUtil.EMPTY); }
 	
 	{num}"em"					{ return newTokenAndLookAhead(CSSTokenType.NUMBER, CSSTokenType.EMS, 2); }
 	{num}"ex"					{ return newTokenAndLookAhead(CSSTokenType.NUMBER, CSSTokenType.EXS, 2); }
@@ -161,7 +163,7 @@ nl							= \r|\n|\r\n|\f
 	{num}"khz"					{ return newTokenAndLookAhead(CSSTokenType.NUMBER, CSSTokenType.FREQUENCY, 3); }
 //	{num}{identifier}			{ return newTokenAndLookAhead(CSSTokenType.NUMBER, CSSTokenType.DIMENSION, calculate??); }
 	{num}%						{ return newTokenAndLookAhead(CSSTokenType.NUMBER, CSSTokenType.PERCENTAGE, 1); }
-	{num}						{ return newToken(CSSTokenType.NUMBER, ""); }
+	{num}						{ return newToken(CSSTokenType.NUMBER, StringUtil.EMPTY); }
 	
 	"."{name}					{
 									CSSTokenType type;
@@ -190,7 +192,7 @@ nl							= \r|\n|\r\n|\f
 										type = (numbers) ? CSSTokenType.NUMBER : CSSTokenType.CLASS;
 									}
 
-									return newToken(type, "");
+									return newToken(type, StringUtil.EMPTY);
 								}
 	"#"{name}					{
 									CSSTokenType type;
@@ -219,33 +221,33 @@ nl							= \r|\n|\r\n|\f
 										type = (numbers) ? CSSTokenType.RGB : CSSTokenType.ID;
 									}
 
-									return newToken(type, "");
+									return newToken(type, StringUtil.EMPTY);
 								}
 
-	"@import"					{ return newToken(CSSTokenType.IMPORT, ""); }
-	"@page"						{ return newToken(CSSTokenType.PAGE, ""); }
-	"@media"					{ _inMedia = true; return newToken(CSSTokenType.MEDIA_KEYWORD, ""); }
-	"@charset"					{ return newToken(CSSTokenType.CHARSET, ""); }
-	"@font-face"				{ return newToken(CSSTokenType.FONTFACE, ""); }
-	"@namespace"				{ return newToken(CSSTokenType.NAMESPACE, ""); }
-	"@-moz-document"			{ return newToken(CSSTokenType.MOZ_DOCUMENT, ""); }
-	"@"{name}					{ return newToken(CSSTokenType.AT_RULE, ""); }
+	"@import"					{ return newToken(CSSTokenType.IMPORT, StringUtil.EMPTY); }
+	"@page"						{ return newToken(CSSTokenType.PAGE, StringUtil.EMPTY); }
+	"@media"					{ _inMedia = true; return newToken(CSSTokenType.MEDIA_KEYWORD, StringUtil.EMPTY); }
+	"@charset"					{ return newToken(CSSTokenType.CHARSET, StringUtil.EMPTY); }
+	"@font-face"				{ return newToken(CSSTokenType.FONTFACE, StringUtil.EMPTY); }
+	"@namespace"				{ return newToken(CSSTokenType.NAMESPACE, StringUtil.EMPTY); }
+	"@-moz-document"			{ return newToken(CSSTokenType.MOZ_DOCUMENT, StringUtil.EMPTY); }
+	"@"{name}					{ return newToken(CSSTokenType.AT_RULE, StringUtil.EMPTY); }
 
-	"!"({s}|{comment})*"important"	{ return newToken(CSSTokenType.IMPORTANT, ""); }
+	"!"({s}|{comment})*"important"	{ return newToken(CSSTokenType.IMPORTANT, StringUtil.EMPTY); }
 
-//	"<!--"						{ return newToken(CSSTokenType.CDO, ""); }
-//	"-->"						{ return newToken(CSSTokenType.CDC, ""); }
-	"~="						{ return newToken(CSSTokenType.INCLUDES, ""); }
-	"|="						{ return newToken(CSSTokenType.DASHMATCH, ""); }
-	"^="						{ return newToken(CSSTokenType.BEGINS_WITH, ""); }
-	"$="						{ return newToken(CSSTokenType.ENDS_WITH, ""); }
+//	"<!--"						{ return newToken(CSSTokenType.CDO, StringUtil.EMPTY); }
+//	"-->"						{ return newToken(CSSTokenType.CDC, StringUtil.EMPTY); }
+	"~="						{ return newToken(CSSTokenType.INCLUDES, StringUtil.EMPTY); }
+	"|="						{ return newToken(CSSTokenType.DASHMATCH, StringUtil.EMPTY); }
+	"^="						{ return newToken(CSSTokenType.BEGINS_WITH, StringUtil.EMPTY); }
+	"$="						{ return newToken(CSSTokenType.ENDS_WITH, StringUtil.EMPTY); }
 
-	":"							{ return newToken(CSSTokenType.COLON, ""); }
-	";"							{ return newToken(CSSTokenType.SEMICOLON, ""); }
+	":"							{ return newToken(CSSTokenType.COLON, StringUtil.EMPTY); }
+	";"							{ return newToken(CSSTokenType.SEMICOLON, StringUtil.EMPTY); }
 	"{"							{
 									_nestingLevel++;
 
-									return newToken(CSSTokenType.LCURLY, "");
+									return newToken(CSSTokenType.LCURLY, StringUtil.EMPTY);
 								}
 	"}"							{
 									_nestingLevel--;
@@ -256,23 +258,23 @@ nl							= \r|\n|\r\n|\f
 										_inMedia = false;
 									}
 
-									return newToken(CSSTokenType.RCURLY, "");
+									return newToken(CSSTokenType.RCURLY, StringUtil.EMPTY);
 								}
-	"("							{ return newToken(CSSTokenType.LPAREN, ""); }
-	")"							{ return newToken(CSSTokenType.RPAREN, ""); }
-	"%"							{ return newToken(CSSTokenType.PERCENTAGE, ""); }
-	"["							{ return newToken(CSSTokenType.LBRACKET, ""); }
-	"]"							{ return newToken(CSSTokenType.RBRACKET, ""); }
-	","							{ return newToken(CSSTokenType.COMMA, ""); }
-	"+"							{ return newToken(CSSTokenType.PLUS, ""); }
-	"*"							{ return newToken(CSSTokenType.STAR, ""); }
-	">"							{ return newToken(CSSTokenType.GREATER, ""); }
-	"/"							{ return newToken(CSSTokenType.SLASH, ""); }
-	"="							{ return newToken(CSSTokenType.EQUAL, ""); }
-	"-"							{ return newToken(CSSTokenType.MINUS, ""); }
+	"("							{ return newToken(CSSTokenType.LPAREN, StringUtil.EMPTY); }
+	")"							{ return newToken(CSSTokenType.RPAREN, StringUtil.EMPTY); }
+	"%"							{ return newToken(CSSTokenType.PERCENTAGE, StringUtil.EMPTY); }
+	"["							{ return newToken(CSSTokenType.LBRACKET, StringUtil.EMPTY); }
+	"]"							{ return newToken(CSSTokenType.RBRACKET, StringUtil.EMPTY); }
+	","							{ return newToken(CSSTokenType.COMMA, StringUtil.EMPTY); }
+	"+"							{ return newToken(CSSTokenType.PLUS, StringUtil.EMPTY); }
+	"*"							{ return newToken(CSSTokenType.STAR, StringUtil.EMPTY); }
+	">"							{ return newToken(CSSTokenType.GREATER, StringUtil.EMPTY); }
+	"/"							{ return newToken(CSSTokenType.SLASH, StringUtil.EMPTY); }
+	"="							{ return newToken(CSSTokenType.EQUAL, StringUtil.EMPTY); }
+	"-"							{ return newToken(CSSTokenType.MINUS, StringUtil.EMPTY); }
 
 
 	{identifier}				{ return newToken(CSSTokenType.IDENTIFIER, yytext()); }
 }
 
-.|\n	{ return newToken(CSSTokenType.ERROR, ""); }
+.|\n	{ return newToken(CSSTokenType.ERROR, StringUtil.EMPTY); }
