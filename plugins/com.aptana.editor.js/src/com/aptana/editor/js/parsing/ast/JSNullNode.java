@@ -7,6 +7,8 @@
  */
 package com.aptana.editor.js.parsing.ast;
 
+import com.aptana.editor.js.JSLanguageConstants;
+
 import beaver.Symbol;
 
 public class JSNullNode extends JSPrimitiveNode
@@ -16,7 +18,7 @@ public class JSNullNode extends JSPrimitiveNode
 	 */
 	public JSNullNode()
 	{
-		super(IJSNodeTypes.NULL, "null"); //$NON-NLS-1$
+		super(IJSNodeTypes.NULL, JSLanguageConstants.NULL);
 	}
 
 	/**

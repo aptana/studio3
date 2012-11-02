@@ -9,6 +9,8 @@ package com.aptana.editor.js.parsing.ast;
 
 import beaver.Symbol;
 
+import com.aptana.editor.js.JSLanguageConstants;
+
 public class JSThisNode extends JSPrimitiveNode
 {
 	/**
@@ -16,7 +18,7 @@ public class JSThisNode extends JSPrimitiveNode
 	 */
 	public JSThisNode()
 	{
-		super(IJSNodeTypes.THIS, "this"); //$NON-NLS-1$
+		super(IJSNodeTypes.THIS, JSLanguageConstants.THIS);
 	}
 
 	/**

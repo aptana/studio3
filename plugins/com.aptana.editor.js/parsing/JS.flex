@@ -17,6 +17,8 @@ import java.util.List;
 import beaver.Symbol;
 import beaver.Scanner;
 
+import com.aptana.core.util.StringUtil;
+
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
 
 %%
@@ -238,71 +240,71 @@ Regex = "/" ({CharClass}|{Character})+ "/" [a-z]*
 	{Strings}		{ return newToken(Terminals.STRING, yytext()); }
 
 	// keywords
-	"break"			{ return newToken(Terminals.BREAK, yytext()); }
-	"case"			{ return newToken(Terminals.CASE, yytext()); }
-	"catch"			{ return newToken(Terminals.CATCH, yytext()); }
-	"const"			{ return newToken(Terminals.VAR, yytext()); }
-	"continue"		{ return newToken(Terminals.CONTINUE, yytext()); }
-	"default"		{ return newToken(Terminals.DEFAULT, yytext()); }
-	"delete"		{ return newToken(Terminals.DELETE, yytext()); }
-	"do"			{ return newToken(Terminals.DO, yytext()); }
-	"else"			{ return newToken(Terminals.ELSE, yytext()); }
-	"false"			{ return newToken(Terminals.FALSE, yytext()); }
-	"finally"		{ return newToken(Terminals.FINALLY, yytext()); }
-	"for"			{ return newToken(Terminals.FOR, yytext()); }
-	"function"		{ return newToken(Terminals.FUNCTION, yytext()); }
-	"if"			{ return newToken(Terminals.IF, yytext()); }
-	"instanceof"	{ return newToken(Terminals.INSTANCEOF, yytext()); }
-	"in"			{ return newToken(Terminals.IN, yytext()); }
-	"new"			{ return newToken(Terminals.NEW, yytext()); }
-	"null"			{ return newToken(Terminals.NULL, yytext()); }
-	"return"		{ return newToken(Terminals.RETURN, yytext()); }
-	"switch"		{ return newToken(Terminals.SWITCH, yytext()); }
-	"this"			{ return newToken(Terminals.THIS, yytext()); }
-	"throw"			{ return newToken(Terminals.THROW, yytext()); }
-	"true"			{ return newToken(Terminals.TRUE, yytext()); }
-	"try"			{ return newToken(Terminals.TRY, yytext()); }
-	"typeof"		{ return newToken(Terminals.TYPEOF, yytext()); }
-	"var"			{ return newToken(Terminals.VAR, yytext()); }
-	"void"			{ return newToken(Terminals.VOID, yytext()); }
-	"while"			{ return newToken(Terminals.WHILE, yytext()); }
-	"with"			{ return newToken(Terminals.WITH, yytext()); }
+	"break"			{ return newToken(Terminals.BREAK, StringUtil.EMPTY); }
+	"case"			{ return newToken(Terminals.CASE, StringUtil.EMPTY); }
+	"catch"			{ return newToken(Terminals.CATCH, StringUtil.EMPTY); }
+	"const"			{ return newToken(Terminals.VAR, StringUtil.EMPTY); }
+	"continue"		{ return newToken(Terminals.CONTINUE, StringUtil.EMPTY); }
+	"default"		{ return newToken(Terminals.DEFAULT, StringUtil.EMPTY); }
+	"delete"		{ return newToken(Terminals.DELETE, StringUtil.EMPTY); }
+	"do"			{ return newToken(Terminals.DO, StringUtil.EMPTY); }
+	"else"			{ return newToken(Terminals.ELSE, StringUtil.EMPTY); }
+	"false"			{ return newToken(Terminals.FALSE, StringUtil.EMPTY); }
+	"finally"		{ return newToken(Terminals.FINALLY, StringUtil.EMPTY); }
+	"for"			{ return newToken(Terminals.FOR, StringUtil.EMPTY); }
+	"function"		{ return newToken(Terminals.FUNCTION, StringUtil.EMPTY); }
+	"if"			{ return newToken(Terminals.IF, StringUtil.EMPTY); }
+	"instanceof"	{ return newToken(Terminals.INSTANCEOF, StringUtil.EMPTY); }
+	"in"			{ return newToken(Terminals.IN, StringUtil.EMPTY); }
+	"new"			{ return newToken(Terminals.NEW, StringUtil.EMPTY); }
+	"null"			{ return newToken(Terminals.NULL, StringUtil.EMPTY); }
+	"return"		{ return newToken(Terminals.RETURN, StringUtil.EMPTY); }
+	"switch"		{ return newToken(Terminals.SWITCH, StringUtil.EMPTY); }
+	"this"			{ return newToken(Terminals.THIS, StringUtil.EMPTY); }
+	"throw"			{ return newToken(Terminals.THROW, StringUtil.EMPTY); }
+	"true"			{ return newToken(Terminals.TRUE, StringUtil.EMPTY); }
+	"try"			{ return newToken(Terminals.TRY, StringUtil.EMPTY); }
+	"typeof"		{ return newToken(Terminals.TYPEOF, StringUtil.EMPTY); }
+	"var"			{ return newToken(Terminals.VAR, StringUtil.EMPTY); }
+	"void"			{ return newToken(Terminals.VOID, StringUtil.EMPTY); }
+	"while"			{ return newToken(Terminals.WHILE, StringUtil.EMPTY); }
+	"with"			{ return newToken(Terminals.WITH, StringUtil.EMPTY); }
 
 	// identifiers
 	{Identifier}	{ return newToken(Terminals.IDENTIFIER, yytext()); }
 
 	// operators
-	">>>="			{ return newToken(Terminals.GREATER_GREATER_GREATER_EQUAL, yytext()); }
-	">>>"			{ return newToken(Terminals.GREATER_GREATER_GREATER, yytext()); }
+	">>>="			{ return newToken(Terminals.GREATER_GREATER_GREATER_EQUAL, StringUtil.EMPTY); }
+	">>>"			{ return newToken(Terminals.GREATER_GREATER_GREATER, StringUtil.EMPTY); }
 
-	"<<="			{ return newToken(Terminals.LESS_LESS_EQUAL, yytext()); }
-	"<<"			{ return newToken(Terminals.LESS_LESS, yytext()); }
-	"<="			{ return newToken(Terminals.LESS_EQUAL, yytext()); }
-	"<"				{ return newToken(Terminals.LESS, yytext()); }
+	"<<="			{ return newToken(Terminals.LESS_LESS_EQUAL, null); }
+	"<<"			{ return newToken(Terminals.LESS_LESS, StringUtil.EMPTY); }
+	"<="			{ return newToken(Terminals.LESS_EQUAL, StringUtil.EMPTY); }
+	"<"				{ return newToken(Terminals.LESS, StringUtil.EMPTY); }
 
-	">>="			{ return newToken(Terminals.GREATER_GREATER_EQUAL, yytext()); }
-	">>"			{ return newToken(Terminals.GREATER_GREATER, yytext()); }
-	">="			{ return newToken(Terminals.GREATER_EQUAL, yytext()); }
-	">"				{ return newToken(Terminals.GREATER, yytext()); }
+	">>="			{ return newToken(Terminals.GREATER_GREATER_EQUAL, StringUtil.EMPTY); }
+	">>"			{ return newToken(Terminals.GREATER_GREATER, StringUtil.EMPTY); }
+	">="			{ return newToken(Terminals.GREATER_EQUAL, StringUtil.EMPTY); }
+	">"				{ return newToken(Terminals.GREATER, StringUtil.EMPTY); }
 
-	"==="			{ return newToken(Terminals.EQUAL_EQUAL_EQUAL, yytext()); }
-	"=="			{ return newToken(Terminals.EQUAL_EQUAL, yytext()); }
-	"="				{ return newToken(Terminals.EQUAL, yytext()); }
+	"==="			{ return newToken(Terminals.EQUAL_EQUAL_EQUAL, StringUtil.EMPTY); }
+	"=="			{ return newToken(Terminals.EQUAL_EQUAL, StringUtil.EMPTY); }
+	"="				{ return newToken(Terminals.EQUAL, StringUtil.EMPTY); }
 
-	"!=="			{ return newToken(Terminals.EXCLAMATION_EQUAL_EQUAL, yytext()); }
-	"!="			{ return newToken(Terminals.EXCLAMATION_EQUAL, yytext()); }
-	"!"				{ return newToken(Terminals.EXCLAMATION, yytext()); }
+	"!=="			{ return newToken(Terminals.EXCLAMATION_EQUAL_EQUAL, StringUtil.EMPTY); }
+	"!="			{ return newToken(Terminals.EXCLAMATION_EQUAL, StringUtil.EMPTY); }
+	"!"				{ return newToken(Terminals.EXCLAMATION, StringUtil.EMPTY); }
 
-	"&&"			{ return newToken(Terminals.AMPERSAND_AMPERSAND, yytext()); }
-	"&="			{ return newToken(Terminals.AMPERSAND_EQUAL, yytext()); }
-	"&"				{ return newToken(Terminals.AMPERSAND, yytext()); }
+	"&&"			{ return newToken(Terminals.AMPERSAND_AMPERSAND, StringUtil.EMPTY); }
+	"&="			{ return newToken(Terminals.AMPERSAND_EQUAL, StringUtil.EMPTY); }
+	"&"				{ return newToken(Terminals.AMPERSAND, StringUtil.EMPTY); }
 
-	"||"			{ return newToken(Terminals.PIPE_PIPE, yytext()); }
-	"|="			{ return newToken(Terminals.PIPE_EQUAL, yytext()); }
-	"|"				{ return newToken(Terminals.PIPE, yytext()); }
+	"||"			{ return newToken(Terminals.PIPE_PIPE, StringUtil.EMPTY); }
+	"|="			{ return newToken(Terminals.PIPE_EQUAL, StringUtil.EMPTY); }
+	"|"				{ return newToken(Terminals.PIPE, StringUtil.EMPTY); }
 
-	"*="			{ return newToken(Terminals.STAR_EQUAL, yytext()); }
-	"*"				{ return newToken(Terminals.STAR, yytext()); }
+	"*="			{ return newToken(Terminals.STAR_EQUAL, StringUtil.EMPTY); }
+	"*"				{ return newToken(Terminals.STAR, StringUtil.EMPTY); }
 
 	"/"				{
 						yypushback(1);
@@ -316,42 +318,42 @@ Regex = "/" ({CharClass}|{Character})+ "/" [a-z]*
 						}
 					}
 
-	"%="			{ return newToken(Terminals.PERCENT_EQUAL, yytext()); }
-	"%"				{ return newToken(Terminals.PERCENT, yytext()); }
+	"%="			{ return newToken(Terminals.PERCENT_EQUAL, StringUtil.EMPTY); }
+	"%"				{ return newToken(Terminals.PERCENT, StringUtil.EMPTY); }
 
-	"--"			{ return newToken(Terminals.MINUS_MINUS, yytext()); }
-	"-="			{ return newToken(Terminals.MINUS_EQUAL, yytext()); }
-	"-"				{ return newToken(Terminals.MINUS, yytext()); }
+	"--"			{ return newToken(Terminals.MINUS_MINUS, StringUtil.EMPTY); }
+	"-="			{ return newToken(Terminals.MINUS_EQUAL, StringUtil.EMPTY); }
+	"-"				{ return newToken(Terminals.MINUS, StringUtil.EMPTY); }
 
-	"++"			{ return newToken(Terminals.PLUS_PLUS, yytext()); }
-	"+="			{ return newToken(Terminals.PLUS_EQUAL, yytext()); }
-	"+"				{ return newToken(Terminals.PLUS, yytext()); }
+	"++"			{ return newToken(Terminals.PLUS_PLUS, StringUtil.EMPTY); }
+	"+="			{ return newToken(Terminals.PLUS_EQUAL, StringUtil.EMPTY); }
+	"+"				{ return newToken(Terminals.PLUS, StringUtil.EMPTY); }
 
-	"^="			{ return newToken(Terminals.CARET_EQUAL, yytext()); }
-	"^"				{ return newToken(Terminals.CARET, yytext()); }
+	"^="			{ return newToken(Terminals.CARET_EQUAL, StringUtil.EMPTY); }
+	"^"				{ return newToken(Terminals.CARET, StringUtil.EMPTY); }
  
-	"?"				{ return newToken(Terminals.QUESTION, yytext()); }
-	"~"				{ return newToken(Terminals.TILDE, yytext()); }
-	";"				{ return newToken(Terminals.SEMICOLON, yytext()); }
-	"("				{ return newToken(Terminals.LPAREN, yytext()); }
-	")"				{ return newToken(Terminals.RPAREN, yytext()); }
-	"["				{ return newToken(Terminals.LBRACKET, yytext()); }
-	"]"				{ return newToken(Terminals.RBRACKET, yytext()); }
-	"{"				{ return newToken(Terminals.LCURLY, yytext()); }
-	"}"				{ return newToken(Terminals.RCURLY, yytext()); }
-	","				{ return newToken(Terminals.COMMA, yytext()); }
-	":"				{ return newToken(Terminals.COLON, yytext()); }
-	"."				{ return newToken(Terminals.DOT, yytext()); }
+	"?"				{ return newToken(Terminals.QUESTION, StringUtil.EMPTY); }
+	"~"				{ return newToken(Terminals.TILDE, StringUtil.EMPTY); }
+	";"				{ return newToken(Terminals.SEMICOLON, StringUtil.EMPTY); }
+	"("				{ return newToken(Terminals.LPAREN, StringUtil.EMPTY); }
+	")"				{ return newToken(Terminals.RPAREN, StringUtil.EMPTY); }
+	"["				{ return newToken(Terminals.LBRACKET, StringUtil.EMPTY); }
+	"]"				{ return newToken(Terminals.RBRACKET, StringUtil.EMPTY); }
+	"{"				{ return newToken(Terminals.LCURLY, StringUtil.EMPTY); }
+	"}"				{ return newToken(Terminals.RCURLY, StringUtil.EMPTY); }
+	","				{ return newToken(Terminals.COMMA, StringUtil.EMPTY); }
+	":"				{ return newToken(Terminals.COLON, StringUtil.EMPTY); }
+	"."				{ return newToken(Terminals.DOT, StringUtil.EMPTY); }
 }
 
 <DIVISION> {
 	"/="			{
 						yybegin(YYINITIAL);
-						return newToken(Terminals.FORWARD_SLASH_EQUAL, yytext());
+						return newToken(Terminals.FORWARD_SLASH_EQUAL, StringUtil.EMPTY);
 					}
 	"/"				{
 						yybegin(YYINITIAL);
-						return newToken(Terminals.FORWARD_SLASH, yytext());
+						return newToken(Terminals.FORWARD_SLASH, StringUtil.EMPTY);
 					}
 }
 
@@ -362,11 +364,11 @@ Regex = "/" ({CharClass}|{Character})+ "/" [a-z]*
 					}
 	"/="			{
 						yybegin(YYINITIAL);
-						return newToken(Terminals.FORWARD_SLASH_EQUAL, yytext());
+						return newToken(Terminals.FORWARD_SLASH_EQUAL, StringUtil.EMPTY);
 					}
 	"/"				{
 						yybegin(YYINITIAL);
-						return newToken(Terminals.FORWARD_SLASH, yytext());
+						return newToken(Terminals.FORWARD_SLASH, StringUtil.EMPTY);
 					}
 }
 

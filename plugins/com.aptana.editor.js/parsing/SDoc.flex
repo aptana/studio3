@@ -6,6 +6,8 @@ import java.io.StringReader;
 import beaver.Symbol;
 import beaver.Scanner;
 
+import com.aptana.core.util.StringUtil;
+
 import com.aptana.editor.js.sdoc.lexer.SDocTokenType;
 
 %%
@@ -90,36 +92,36 @@ Identifier = ([:jletter:]|\$)([:jletterdigit:]|[$.])*
 	{LineTerminator}+			{ /* ignore */ }
 
 	// keywords
-	"@advanced"			{ return newToken(SDocTokenType.ADVANCED, yytext()); }
-	"@alias"			{ return newToken(SDocTokenType.ALIAS, yytext()); }
-	"@author"			{ return newToken(SDocTokenType.AUTHOR, yytext()); }
-	"@classDescription"	{ return newToken(SDocTokenType.CLASS_DESCRIPTION, yytext()); }
-	"@constructor"		{ return newToken(SDocTokenType.CONSTRUCTOR, yytext()); }
-	"@example"			{ return newToken(SDocTokenType.EXAMPLE, yytext()); }
-	"@exception"		{ return newToken(SDocTokenType.EXCEPTION, yytext()); }
-	"@extends"			{ return newToken(SDocTokenType.EXTENDS, yytext()); }
-	"@internal"			{ return newToken(SDocTokenType.INTERNAL, yytext()); }
-	"@method"			{ return newToken(SDocTokenType.METHOD, yytext()); }
-	"@module"			{ return newToken(SDocTokenType.MODULE, yytext()); }
-	"@namespace"		{ return newToken(SDocTokenType.NAMESPACE, yytext()); }
-	"@overview"			{ return newToken(SDocTokenType.OVERVIEW, yytext()); }
-	"@param"			{ return newToken(SDocTokenType.PARAM, yytext()); }
-	"@private"			{ return newToken(SDocTokenType.PRIVATE, yytext()); }
-	"@property"			{ return newToken(SDocTokenType.PROPERTY, yytext()); }
-	"@return"			{ return newToken(SDocTokenType.RETURN, yytext()); }
-	"@see"				{ return newToken(SDocTokenType.SEE, yytext()); }
-	"@type"				{ return newToken(SDocTokenType.TYPE, yytext()); }
+	"@advanced"			{ return newToken(SDocTokenType.ADVANCED, StringUtil.EMPTY); }
+	"@alias"			{ return newToken(SDocTokenType.ALIAS, StringUtil.EMPTY); }
+	"@author"			{ return newToken(SDocTokenType.AUTHOR, StringUtil.EMPTY); }
+	"@classDescription"	{ return newToken(SDocTokenType.CLASS_DESCRIPTION, StringUtil.EMPTY); }
+	"@constructor"		{ return newToken(SDocTokenType.CONSTRUCTOR, StringUtil.EMPTY); }
+	"@example"			{ return newToken(SDocTokenType.EXAMPLE, StringUtil.EMPTY); }
+	"@exception"		{ return newToken(SDocTokenType.EXCEPTION, StringUtil.EMPTY); }
+	"@extends"			{ return newToken(SDocTokenType.EXTENDS, StringUtil.EMPTY); }
+	"@internal"			{ return newToken(SDocTokenType.INTERNAL, StringUtil.EMPTY); }
+	"@method"			{ return newToken(SDocTokenType.METHOD, StringUtil.EMPTY); }
+	"@module"			{ return newToken(SDocTokenType.MODULE, StringUtil.EMPTY); }
+	"@namespace"		{ return newToken(SDocTokenType.NAMESPACE, StringUtil.EMPTY); }
+	"@overview"			{ return newToken(SDocTokenType.OVERVIEW, StringUtil.EMPTY); }
+	"@param"			{ return newToken(SDocTokenType.PARAM, StringUtil.EMPTY); }
+	"@private"			{ return newToken(SDocTokenType.PRIVATE, StringUtil.EMPTY); }
+	"@property"			{ return newToken(SDocTokenType.PROPERTY, StringUtil.EMPTY); }
+	"@return"			{ return newToken(SDocTokenType.RETURN, StringUtil.EMPTY); }
+	"@see"				{ return newToken(SDocTokenType.SEE, StringUtil.EMPTY); }
+	"@type"				{ return newToken(SDocTokenType.TYPE, StringUtil.EMPTY); }
 
 	"@"[:letter:]*		{ return newToken(SDocTokenType.UNKNOWN, yytext()); }
 
 	// operators and punctuators
-	"#"					{ return newToken(SDocTokenType.POUND, yytext()); }
-	"["					{ return newToken(SDocTokenType.LBRACKET, yytext()); }
-	"]"					{ return newToken(SDocTokenType.RBRACKET, yytext()); }
-	"{"					{ yybegin(TYPES); return newToken(SDocTokenType.LCURLY, yytext()); }
-	"}"					{ return newToken(SDocTokenType.RCURLY, yytext()); }
-	"/**"				{ return newToken(SDocTokenType.START_DOCUMENTATION, yytext()); }
-	"*/"				{ return newToken(SDocTokenType.END_DOCUMENTATION, yytext()); }
+	"#"					{ return newToken(SDocTokenType.POUND, StringUtil.EMPTY); }
+	"["					{ return newToken(SDocTokenType.LBRACKET, StringUtil.EMPTY); }
+	"]"					{ return newToken(SDocTokenType.RBRACKET, StringUtil.EMPTY); }
+	"{"					{ yybegin(TYPES); return newToken(SDocTokenType.LCURLY, StringUtil.EMPTY); }
+	"}"					{ return newToken(SDocTokenType.RCURLY, StringUtil.EMPTY); }
+	"/**"				{ return newToken(SDocTokenType.START_DOCUMENTATION, StringUtil.EMPTY); }
+	"*/"				{ return newToken(SDocTokenType.END_DOCUMENTATION, StringUtil.EMPTY); }
 
 	// text
 	[^ \t\r\n{\[\]#]+	{ return newToken(SDocTokenType.TEXT, yytext()); }
@@ -131,27 +133,27 @@ Identifier = ([:jletter:]|\$)([:jletterdigit:]|[$.])*
 	{LineTerminator}+	{ /* ignore */ }
 
 	// keywords
-	Array			{ return newToken(SDocTokenType.ARRAY, yytext()); }
-	Function		{ return newToken(SDocTokenType.FUNCTION, yytext()); }
-	Class			{ return newToken(SDocTokenType.CLASS, yytext()); }
+	Array			{ return newToken(SDocTokenType.ARRAY, StringUtil.EMPTY); }
+	Function		{ return newToken(SDocTokenType.FUNCTION, StringUtil.EMPTY); }
+	Class			{ return newToken(SDocTokenType.CLASS, StringUtil.EMPTY); }
 
 	// identifiers
 	{Identifier}	{ return newToken(SDocTokenType.IDENTIFIER, yytext()); }
 
 	// operators and punctuation
-	"("				{ return newToken(SDocTokenType.LPAREN, yytext()); }
-	")"				{ return newToken(SDocTokenType.RPAREN, yytext()); }
-	"{"				{ return newToken(SDocTokenType.LCURLY, yytext()); }
-	"}"				{ yybegin(YYINITIAL); return newToken(SDocTokenType.RCURLY, yytext()); }
-	"["				{ return newToken(SDocTokenType.LBRACKET, yytext()); }
-	"]"				{ return newToken(SDocTokenType.RBRACKET, yytext()); }
-	"<"				{ return newToken(SDocTokenType.LESS_THAN, yytext()); }
-	">"				{ return newToken(SDocTokenType.GREATER_THAN, yytext()); }
-	":"				{ return newToken(SDocTokenType.COLON, yytext()); }
-	","				{ return newToken(SDocTokenType.COMMA, yytext()); }
-	"|"				{ return newToken(SDocTokenType.PIPE, yytext()); }
-	"..."			{ return newToken(SDocTokenType.ELLIPSIS, yytext()); }
-	"->"			{ return newToken(SDocTokenType.ARROW, yytext()); }
+	"("				{ return newToken(SDocTokenType.LPAREN, StringUtil.EMPTY); }
+	")"				{ return newToken(SDocTokenType.RPAREN, StringUtil.EMPTY); }
+	"{"				{ return newToken(SDocTokenType.LCURLY, StringUtil.EMPTY); }
+	"}"				{ yybegin(YYINITIAL); return newToken(SDocTokenType.RCURLY, StringUtil.EMPTY); }
+	"["				{ return newToken(SDocTokenType.LBRACKET, StringUtil.EMPTY); }
+	"]"				{ return newToken(SDocTokenType.RBRACKET, StringUtil.EMPTY); }
+	"<"				{ return newToken(SDocTokenType.LESS_THAN, StringUtil.EMPTY); }
+	">"				{ return newToken(SDocTokenType.GREATER_THAN, StringUtil.EMPTY); }
+	":"				{ return newToken(SDocTokenType.COLON, StringUtil.EMPTY); }
+	","				{ return newToken(SDocTokenType.COMMA, StringUtil.EMPTY); }
+	"|"				{ return newToken(SDocTokenType.PIPE, StringUtil.EMPTY); }
+	"..."			{ return newToken(SDocTokenType.ELLIPSIS, StringUtil.EMPTY); }
+	"->"			{ return newToken(SDocTokenType.ARROW, StringUtil.EMPTY); }
 }
 
 .|\n			{ return newToken(SDocTokenType.ERROR, yytext()); }
