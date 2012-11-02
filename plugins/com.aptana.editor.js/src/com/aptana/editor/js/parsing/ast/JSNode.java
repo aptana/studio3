@@ -28,6 +28,11 @@ public class JSNode extends ParseNode
 	private DocumentationBlock fDocumentation;
 
 	/**
+	 * We memoize the hashcode because it recursively asks for hash of children!
+	 */
+	private int fHash;
+
+	/**
 	 * static initializer
 	 */
 	static
@@ -196,10 +201,42 @@ public class JSNode extends ParseNode
 	@Override
 	public int hashCode()
 	{
-		int hash = getNodeType();
-		hash = 31 * hash + (getSemicolonIncluded() ? 1 : 0);
-		hash = 31 * hash + Arrays.hashCode(getChildren());
-		return hash;
+		if (fHash == -1)
+		{
+			int hash = getNodeType();
+			hash = 31 * hash + (getSemicolonIncluded() ? 1 : 0);
+			hash = 31 * hash + Arrays.hashCode(getChildren());
+			fHash = hash;
+		}
+		return fHash;
+	}
+
+	@Override
+	public void addChild(IParseNode child)
+	{
+		super.addChild(child);
+		fHash = -1;
+	}
+
+	@Override
+	public void setChildren(IParseNode[] children)
+	{
+		super.setChildren(children);
+		fHash = -1;
+	}
+
+	@Override
+	public void replaceChild(int index, IParseNode child) throws IndexOutOfBoundsException
+	{
+		super.replaceChild(index, child);
+		fHash = -1;
+	}
+
+	@Override
+	public void trimToSize()
+	{
+		super.trimToSize();
+		fHash = -1;
 	}
 
 	/**
@@ -230,6 +267,7 @@ public class JSNode extends ParseNode
 	protected void setNodeType(short type)
 	{
 		fType = type;
+		fHash = -1;
 	}
 
 	/**
@@ -240,6 +278,7 @@ public class JSNode extends ParseNode
 	public void setSemicolonIncluded(boolean included)
 	{
 		fSemicolonIncluded = included;
+		fHash = -1;
 	}
 
 	/*
