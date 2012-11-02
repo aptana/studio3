@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -181,7 +180,7 @@ public class JSIndexReader extends IndexReader
 			List<QueryResult> events = index.query(
 				new String[] { IJSIndexConstants.EVENT },
 				this.getMemberPattern(owningTypes),
-				SearchPattern.REGEX_MATCH
+				SearchPattern.REGEX_MATCH | SearchPattern.CASE_SENSITIVE
 			);
 			// @formatter:on
 
@@ -261,7 +260,7 @@ public class JSIndexReader extends IndexReader
 			List<QueryResult> functions = index.query(
 				new String[] { IJSIndexConstants.FUNCTION },
 				this.getMemberPattern(owningTypes),
-				SearchPattern.REGEX_MATCH
+				SearchPattern.REGEX_MATCH | SearchPattern.CASE_SENSITIVE
 			);
 			// @formatter:on
 
@@ -388,7 +387,7 @@ public class JSIndexReader extends IndexReader
 			List<QueryResult> properties = index.query(
 				new String[] { IJSIndexConstants.PROPERTY },
 				this.getMemberPattern(owningTypes),
-				SearchPattern.REGEX_MATCH
+				SearchPattern.REGEX_MATCH | SearchPattern.CASE_SENSITIVE
 			);
 			// @formatter:on
 
@@ -513,7 +512,7 @@ public class JSIndexReader extends IndexReader
 			List<QueryResult> types = index.query(
 				new String[] { IJSIndexConstants.TYPE },
 				pattern,
-				SearchPattern.PREFIX_MATCH
+				SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE
 			);
 			// @formatter:on
 
@@ -537,19 +536,6 @@ public class JSIndexReader extends IndexReader
 		}
 
 		return result;
-	}
-
-	/**
-	 * getTypeProperties
-	 * 
-	 * @param index
-	 * @param typeName
-	 * @return
-	 * @throws IOException
-	 */
-	public Collection<PropertyElement> getTypeProperties(Index index, String typeName)
-	{
-		return CollectionsUtil.union(getProperties(index, typeName), getFunctions(index, typeName));
 	}
 
 	/**

@@ -30,6 +30,8 @@ Bundle-Localization: plugin
 Export-Package: com.aptana.editor.js,
  com.aptana.editor.js.contentassist,
  com.aptana.editor.js.contentassist.index,
+ com.aptana.editor.js.contentassist.model,
+ com.aptana.editor.js.inferencing,
  com.aptana.editor.js.internal.build;x-friends:="com.aptana.editor.html",
  com.aptana.editor.js.internal.text;x-friends:="com.aptana.editor.html",
  com.aptana.editor.js.outline,

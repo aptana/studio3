@@ -73,7 +73,7 @@ public class JSParserValidatorPerformanceTest extends PerformanceTestCase
 		// read in the file
 		InputStream in = FileLocator.openStream(Platform.getBundle("com.aptana.editor.js.tests"),
 				Path.fromPortableString("performance/" + filename), false);
-		IFile file = project.createFile("3.min.js", IOUtil.read(in));
+		IFile file = project.createFile(filename, IOUtil.read(in));
 		RebuildIndexJob job = new RebuildIndexJob(project.getURI());
 		job.run(null);
 

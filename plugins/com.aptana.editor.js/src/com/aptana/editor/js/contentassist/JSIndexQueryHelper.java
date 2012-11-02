@@ -193,6 +193,7 @@ public class JSIndexQueryHelper
 	 */
 	protected Collection<PropertyElement> getMembers(Index index, String typeName, String memberName)
 	{
+		// FIXME Search both categories at once?
 		return CollectionsUtil.union(getFunctions(index, typeName, memberName),
 				getProperties(index, typeName, memberName));
 	}
@@ -207,6 +208,7 @@ public class JSIndexQueryHelper
 	 */
 	protected Collection<PropertyElement> getMembers(Index index, List<String> typeNames)
 	{
+		// FIXME Search both categories at once?
 		return CollectionsUtil.union(getFunctions(index, typeNames), getProperties(index, typeNames));
 	}
 
@@ -220,6 +222,7 @@ public class JSIndexQueryHelper
 	 */
 	protected Collection<PropertyElement> getMembers(Index index, String typeName)
 	{
+		// FIXME Search both categories at once?
 		return CollectionsUtil.union(getFunctions(index, typeName), getProperties(index, typeName));
 	}
 
