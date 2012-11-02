@@ -20,16 +20,6 @@ public class Messages extends NLS
 	public static String JSLintValidatorPreferenceCompositeFactory_OptionsParseError;
 	public static String JSLintValidatorPreferenceCompositeFactory_OptionsTitle;
 
-	public static String JSParserValidator_EventDeprecated;
-
-	public static String JSParserValidator_Function;
-
-	public static String JSParserValidator_GenericDeprecated;
-
-	public static String JSParserValidator_Property;
-
-	public static String JSParserValidator_TypeDeprecated;
-
 	public static String JSStyleValidator_AdsafeA;
 	public static String JSStyleValidator_ALabel;
 	public static String JSStyleValidator_AlreadyDefined;

@@ -43,9 +43,9 @@ public class JSSymbolTypeInferrer
 {
 	private static final String NO_TYPE = StringUtil.EMPTY;
 
-	private Index index;
-	private JSScope activeScope;
-	private URI location;
+	private final Index index;
+	private final JSScope activeScope;
+	private final URI location;
 
 	private JSIndexWriter writer;
 
