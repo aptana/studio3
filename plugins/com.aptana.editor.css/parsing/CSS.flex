@@ -17,8 +17,6 @@ import java.util.List;
 import beaver.Symbol;
 import beaver.Scanner;
 
-import com.aptana.core.util.StringUtil;
-
 import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 
 @SuppressWarnings({"unused", "nls"})
@@ -153,7 +151,7 @@ nl							= \r|\n|\r\n|\f
 	{bad_single_quoted_string}	{ return newToken(CSSTokenType.SINGLE_QUOTED_STRING, yytext()); }
 	{bad_double_quoted_string}	{ return newToken(CSSTokenType.DOUBLE_QUOTED_STRING, yytext()); }
 
-	"not"					    { return newToken(CSSTokenType.NOT, StringUtil.EMPTY); }
+	"not"					    { return newToken(CSSTokenType.NOT, yytext()); }
 	
 	{num}"em"					{ return newToken(CSSTokenType.EMS, yytext()); }
 	{num}"ex"					{ return newToken(CSSTokenType.EXS, yytext()); }
@@ -231,30 +229,30 @@ nl							= \r|\n|\r\n|\f
 									return newToken(type, yytext());
 								}
 
-	"@import"					{ return newToken(CSSTokenType.IMPORT, StringUtil.EMPTY); }
-	"@page"						{ return newToken(CSSTokenType.PAGE, StringUtil.EMPTY); }
-	"@media"					{ _inMedia = true; return newToken(CSSTokenType.MEDIA_KEYWORD, StringUtil.EMPTY); }
-	"@charset"					{ return newToken(CSSTokenType.CHARSET, StringUtil.EMPTY); }
-	"@font-face"				{ return newToken(CSSTokenType.FONTFACE, StringUtil.EMPTY); }
-	"@namespace"				{ return newToken(CSSTokenType.NAMESPACE, StringUtil.EMPTY); }
-	"@-moz-document"			{ return newToken(CSSTokenType.MOZ_DOCUMENT, StringUtil.EMPTY); }
+	"@import"					{ return newToken(CSSTokenType.IMPORT, yytext()); }
+	"@page"						{ return newToken(CSSTokenType.PAGE, yytext()); }
+	"@media"					{ _inMedia = true; return newToken(CSSTokenType.MEDIA_KEYWORD, yytext()); }
+	"@charset"					{ return newToken(CSSTokenType.CHARSET, yytext()); }
+	"@font-face"				{ return newToken(CSSTokenType.FONTFACE, yytext()); }
+	"@namespace"				{ return newToken(CSSTokenType.NAMESPACE, yytext()); }
+	"@-moz-document"			{ return newToken(CSSTokenType.MOZ_DOCUMENT, yytext()); }
 	"@"{name}					{ return newToken(CSSTokenType.AT_RULE, yytext()); }
 
 	"!"({s}|{comment})*"important"	{ return newToken(CSSTokenType.IMPORTANT, yytext()); }
 
-//	"<!--"						{ return newToken(CSSTokenType.CDO, StringUtil.EMPTY); }
-//	"-->"						{ return newToken(CSSTokenType.CDC, StringUtil.EMPTY); }
-	"~="						{ return newToken(CSSTokenType.INCLUDES, StringUtil.EMPTY); }
-	"|="						{ return newToken(CSSTokenType.DASHMATCH, StringUtil.EMPTY); }
-	"^="						{ return newToken(CSSTokenType.BEGINS_WITH, StringUtil.EMPTY); }
-	"$="						{ return newToken(CSSTokenType.ENDS_WITH, StringUtil.EMPTY); }
+//	"<!--"						{ return newToken(CSSTokenType.CDO, yytext()); }
+//	"-->"						{ return newToken(CSSTokenType.CDC, yytext()); }
+	"~="						{ return newToken(CSSTokenType.INCLUDES, yytext()); }
+	"|="						{ return newToken(CSSTokenType.DASHMATCH, yytext()); }
+	"^="						{ return newToken(CSSTokenType.BEGINS_WITH, yytext()); }
+	"$="						{ return newToken(CSSTokenType.ENDS_WITH, yytext()); }
 
-	":"							{ return newToken(CSSTokenType.COLON, StringUtil.EMPTY); }
-	";"							{ return newToken(CSSTokenType.SEMICOLON, StringUtil.EMPTY); }
+	":"							{ return newToken(CSSTokenType.COLON, yytext()); }
+	";"							{ return newToken(CSSTokenType.SEMICOLON, yytext()); }
 	"{"							{
 									_nestingLevel++;
 
-									return newToken(CSSTokenType.LCURLY, StringUtil.EMPTY);
+									return newToken(CSSTokenType.LCURLY, yytext());
 								}
 	"}"							{
 									_nestingLevel--;
@@ -265,20 +263,20 @@ nl							= \r|\n|\r\n|\f
 										_inMedia = false;
 									}
 
-									return newToken(CSSTokenType.RCURLY, StringUtil.EMPTY);
+									return newToken(CSSTokenType.RCURLY, yytext());
 								}
-	"("							{ return newToken(CSSTokenType.LPAREN, StringUtil.EMPTY); }
-	")"							{ return newToken(CSSTokenType.RPAREN, StringUtil.EMPTY); }
-	"%"							{ return newToken(CSSTokenType.PERCENTAGE, StringUtil.EMPTY); }
-	"["							{ return newToken(CSSTokenType.LBRACKET, StringUtil.EMPTY); }
-	"]"							{ return newToken(CSSTokenType.RBRACKET, StringUtil.EMPTY); }
-	","							{ return newToken(CSSTokenType.COMMA, StringUtil.EMPTY); }
-	"+"							{ return newToken(CSSTokenType.PLUS, StringUtil.EMPTY); }
-	"*"							{ return newToken(CSSTokenType.STAR, StringUtil.EMPTY); }
-	">"							{ return newToken(CSSTokenType.GREATER, StringUtil.EMPTY); }
-	"/"							{ return newToken(CSSTokenType.SLASH, StringUtil.EMPTY); }
-	"="							{ return newToken(CSSTokenType.EQUAL, StringUtil.EMPTY); }
-	"-"							{ return newToken(CSSTokenType.MINUS, StringUtil.EMPTY); }
+	"("							{ return newToken(CSSTokenType.LPAREN, yytext()); }
+	")"							{ return newToken(CSSTokenType.RPAREN, yytext()); }
+	"%"							{ return newToken(CSSTokenType.PERCENTAGE, yytext()); }
+	"["							{ return newToken(CSSTokenType.LBRACKET, yytext()); }
+	"]"							{ return newToken(CSSTokenType.RBRACKET, yytext()); }
+	","							{ return newToken(CSSTokenType.COMMA, yytext()); }
+	"+"							{ return newToken(CSSTokenType.PLUS, yytext()); }
+	"*"							{ return newToken(CSSTokenType.STAR, yytext()); }
+	">"							{ return newToken(CSSTokenType.GREATER, yytext()); }
+	"/"							{ return newToken(CSSTokenType.SLASH, yytext()); }
+	"="							{ return newToken(CSSTokenType.EQUAL, yytext()); }
+	"-"							{ return newToken(CSSTokenType.MINUS, yytext()); }
 
 	"url("[^)]*")"				{ return newToken(CSSTokenType.URL, yytext()); }
 
