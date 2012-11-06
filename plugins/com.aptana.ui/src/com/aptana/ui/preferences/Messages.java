@@ -31,6 +31,8 @@ public class Messages extends NLS
 	public static String TroubleshootingPreferencePage_Level_All;
 	public static String TroubleshootingPreferencePage_Level_Errors;
 	public static String TroubleshootingPreferencePage_Level_Warnings;
+	public static String TroubleshootingPreferencePage_SelectAll;
+	public static String TroubleshootingPreferencePage_SelectNone;
 	public static String TroubleshootingPreferencePage_ShowHiddenProcesses;
 	public static String TroubleshootingPreferencePage_TroubleshootingPageHeader;
 
