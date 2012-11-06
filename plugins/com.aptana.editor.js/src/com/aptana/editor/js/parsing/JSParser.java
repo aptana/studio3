@@ -357,19 +357,31 @@ public class JSParser extends Parser implements IParser {
 
 		try
 		{
-			// parse
-			JSParseRootNode result = (JSParseRootNode) parse(fScanner);
+			JSParseRootNode result;
+			try
+			{
+				// parse
+				result = (JSParseRootNode) parse(fScanner);
 
+				if (attachComments)
+				{
+					attachComments(source, result);
+				}
 
-            if (attachComments)
-            {
-                attachComments(source, result);
-            }
-
-            if (collectComments)
-            {
-                collectComments(result);
-            }
+				if (collectComments)
+				{
+					collectComments(result);
+				}
+			}
+			finally
+			{
+				// clear scanner for garbage collection
+				if (fScanner != null)
+				{
+					fScanner.yyclose();
+					fScanner = null;
+				}
+			}
 
 			// update node offsets
 			int start = parseState.getStartingOffset();
@@ -389,8 +401,6 @@ public class JSParser extends Parser implements IParser {
 		}
 		finally
 		{
-			// clear scanner for garbage collection
-			fScanner = null;
 			fWorking = null;
 		}
 	}

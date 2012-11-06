@@ -7,6 +7,7 @@
  */
 package com.aptana.editor.js.parsing.ast;
 
+import com.aptana.core.util.ObjectUtil;
 import com.aptana.parsing.ast.IParseNodeAttribute;
 import com.aptana.parsing.ast.ParseNodeAttribute;
 
@@ -50,8 +51,7 @@ public abstract class JSPrimitiveNode extends JSNode
 		{
 			return false;
 		}
-
-		return getText().equals(((JSPrimitiveNode) obj).getText());
+		return ObjectUtil.areEqual(getText(), ((JSPrimitiveNode) obj).getText());
 	}
 
 	/*
@@ -71,6 +71,7 @@ public abstract class JSPrimitiveNode extends JSNode
 	@Override
 	public int hashCode()
 	{
-		return 31 * super.hashCode() + getText().hashCode();
+		String text = getText();
+		return 31 * super.hashCode() + ((text == null) ? 0 : text.hashCode());
 	}
 }
