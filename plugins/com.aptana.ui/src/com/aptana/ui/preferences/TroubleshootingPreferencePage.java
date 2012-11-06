@@ -24,9 +24,11 @@ import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
@@ -148,6 +150,32 @@ public class TroubleshootingPreferencePage extends FieldEditorPreferencePage imp
 		{
 			categoryViewer.getTable().setEnabled(true);
 		}
+
+		Composite buttonComp = new Composite(composite, SWT.NONE);
+		buttonComp.setLayout(GridLayoutFactory.fillDefaults().numColumns(2).create());
+		buttonComp.setLayoutData(GridDataFactory.fillDefaults().create());
+
+		Button selectAllButton = new Button(buttonComp, SWT.BORDER);
+		selectAllButton.setText(Messages.TroubleshootingPreferencePage_SelectAll);
+		selectAllButton.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				categoryViewer.setAllChecked(true);
+			}
+		});
+
+		Button selectNoneButton = new Button(buttonComp, SWT.BORDER);
+		selectNoneButton.setText(Messages.TroubleshootingPreferencePage_SelectNone);
+		selectNoneButton.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				categoryViewer.setAllChecked(false);
+			}
+		});
 	}
 
 	/**
