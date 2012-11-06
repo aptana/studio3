@@ -17,6 +17,7 @@ import java.util.Map;
 
 import beaver.Symbol;
 
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.sdoc.model.DocumentationBlock;
 import com.aptana.editor.js.sdoc.parsing.SDocParser;
@@ -108,7 +109,10 @@ public class JSNode extends ParseNode
 		setNodeType(type);
 
 		// store children
-		this.setChildren(children);
+		if (!ArrayUtil.isEmpty(children))
+		{
+			setChildren(children);
+		}
 	}
 
 	public String getLanguage()

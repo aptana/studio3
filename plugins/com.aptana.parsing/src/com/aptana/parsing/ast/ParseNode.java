@@ -17,6 +17,7 @@ import beaver.spec.ast.TreeWalker;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.SourcePrinter;
+import com.aptana.core.util.StringUtil;
 import com.aptana.parsing.ParsingPlugin;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Range;
@@ -538,7 +539,7 @@ public abstract class ParseNode extends Node implements IParseNode
 	 */
 	public String getText()
 	{
-		return ""; //$NON-NLS-1$
+		return StringUtil.EMPTY;
 	}
 
 	/*
