@@ -36,7 +36,6 @@ import com.aptana.editor.js.inferencing.JSPropertyCollection;
 import com.aptana.editor.js.inferencing.JSScope;
 import com.aptana.editor.js.inferencing.JSSymbolTypeInferrer;
 import com.aptana.editor.js.inferencing.JSTypeUtil;
-import com.aptana.editor.js.parsing.JSParseState;
 import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSCommentNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
@@ -207,7 +206,8 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		if (globals != null)
 		{
 			// create new Window type for this file
-			TypeElement type = JSTypeUtil.createGlobalType(JSTypeUtil.getGlobalType(context.getProject(), context.getName()));
+			TypeElement type = JSTypeUtil.createGlobalType(JSTypeUtil.getGlobalType(context.getProject(),
+					context.getName()));
 
 			// add declared variables and functions from the global scope
 			if (IdeLog.isTraceEnabled(JSPlugin.getDefault(), IDebugScopes.INDEXING_STEPS))

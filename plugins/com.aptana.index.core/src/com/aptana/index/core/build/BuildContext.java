@@ -36,7 +36,6 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.IDebugScopes;
 import com.aptana.index.core.IndexPlugin;
 import com.aptana.parsing.IParseState;
-import com.aptana.parsing.IParseStateCacheKey;
 import com.aptana.parsing.ParseResult;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ParserPoolFactory;
@@ -51,7 +50,6 @@ public class BuildContext
 
 	private IFile file;
 	protected Map<String, Collection<IProblem>> problems;
-	private IParseStateCacheKey fParseStateCacheKey;
 	private ParseResult fParseResult;
 
 	private String fContents;
@@ -104,21 +102,13 @@ public class BuildContext
 	{
 		try
 		{
-			String contentType = getContentType();
-			IParseStateCacheKey newCacheKey = parseState.getCacheKey(contentType);
-			if (fParseResult != null && fParseStateCacheKey != null
-					&& !fParseStateCacheKey.requiresReparse(newCacheKey))
-			{
-				return fParseResult;
-			}
-			fParseStateCacheKey = newCacheKey;
 			// FIXME What if we fail to parse? Should we catch and log that exception here and return null?
 			try
 			{
 				// FIXME The parsers need to throw a specific SyntaxException or something for us to differentiate
 				// between those and IO errors!
 				WorkingParseResult working = new WorkingParseResult();
-				fParseResult = parse(contentType, parseState, working);
+				fParseResult = parse(getContentType(), parseState, working);
 			}
 			catch (CoreException e)
 			{
@@ -153,7 +143,6 @@ public class BuildContext
 	public synchronized void resetAST()
 	{
 		fParseResult = null;
-		fParseStateCacheKey = null;
 	}
 
 	public synchronized String getContents()
