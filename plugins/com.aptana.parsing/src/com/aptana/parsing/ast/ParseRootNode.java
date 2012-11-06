@@ -12,11 +12,9 @@ import java.util.List;
 
 import beaver.Symbol;
 
-public class ParseRootNode extends ParseNode implements IParseRootNode
+public abstract class ParseRootNode extends ParseNode implements IParseRootNode
 {
 	private IParseNode[] fComments;
-
-	private static final IParseNode[] NO_PARSE_NODES = new IParseNode[0];
 
 	/**
 	 * Constructor to be used if the start will be the start of the first node and the end the end of the last node.
@@ -24,15 +22,15 @@ public class ParseRootNode extends ParseNode implements IParseRootNode
 	 * @param children
 	 *            may be null (in which case it's considered as having no children with start = end = 0.
 	 */
-	protected ParseRootNode(String language, Symbol[] children)
+	protected ParseRootNode(Symbol[] children)
 	{
-		super(language);
+		super();
 		int start = 0;
 		int end = 0;
 		final IParseNode[] parseNodes;
 		if (children == null || children.length == 0)
 		{
-			parseNodes = NO_PARSE_NODES;
+			parseNodes = NO_CHILDREN;
 		}
 		else
 		{
@@ -40,7 +38,7 @@ public class ParseRootNode extends ParseNode implements IParseRootNode
 			int nodesLen = nodes.size();
 			if (nodesLen == 0)
 			{
-				parseNodes = NO_PARSE_NODES;
+				parseNodes = NO_CHILDREN;
 			}
 			else
 			{
@@ -52,9 +50,9 @@ public class ParseRootNode extends ParseNode implements IParseRootNode
 		initialize(parseNodes, start, end);
 	}
 
-	public ParseRootNode(String language, Symbol[] children, int start, int end)
+	public ParseRootNode(Symbol[] children, int start, int end)
 	{
-		super(language);
+		super();
 		List<IParseNode> nodes = filterParseNodesList(children);
 		initialize(nodes.toArray(new IParseNode[nodes.size()]), start, end);
 	}

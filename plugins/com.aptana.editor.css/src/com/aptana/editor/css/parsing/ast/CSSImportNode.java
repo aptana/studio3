@@ -22,10 +22,16 @@ public class CSSImportNode extends CSSNode
 	 */
 	public CSSImportNode(String uri, CSSTextNode... mediaList)
 	{
-		super(ICSSNodeTypes.IMPORT);
+		super();
 
 		fUriStr = uri;
 		fMediaList = mediaList;
+	}
+
+	@Override
+	public short getNodeType()
+	{
+		return ICSSNodeTypes.IMPORT;
 	}
 
 	@Override

@@ -26,7 +26,7 @@ public class CSSDeclarationNode extends CSSNode
 	 */
 	protected CSSDeclarationNode()
 	{
-		super(ICSSNodeTypes.DECLARATION);
+		super();
 		fStatus = null;
 		fIdentifier = null;
 		fStatusStart = 0;
@@ -53,7 +53,7 @@ public class CSSDeclarationNode extends CSSNode
 	 */
 	public CSSDeclarationNode(String identifier, CSSExpressionNode value, Symbol status)
 	{
-		super(ICSSNodeTypes.DECLARATION);
+		super();
 
 		fIdentifier = identifier;
 
@@ -71,6 +71,12 @@ public class CSSDeclarationNode extends CSSNode
 		}
 
 		this.setChildren(new CSSNode[] { value });
+	}
+
+	@Override
+	public short getNodeType()
+	{
+		return ICSSNodeTypes.DECLARATION;
 	}
 
 	/*

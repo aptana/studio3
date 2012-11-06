@@ -17,6 +17,8 @@ import java.util.List;
 import beaver.Symbol;
 import beaver.Scanner;
 
+import org.eclipse.core.internal.utils.StringPool;
+
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
 
 %%
@@ -39,6 +41,8 @@ import com.aptana.editor.js.parsing.lexer.JSTokenType;
 %{
 	// last token used for look behind. Also needed when implementing the ITokenScanner interface
 	private Symbol _lastToken;
+	
+	private StringPool _stringPool;
 
 	// flag indicating if we should collect comments or not
 	private boolean _collectComments = true;
@@ -85,6 +89,16 @@ import com.aptana.editor.js.parsing.lexer.JSTokenType;
 	private Symbol newToken(JSTokenType type, Object value)
 	{
 		return newToken(type.getIndex(), value);
+	}
+
+	private Symbol newToken(JSTokenType type)
+	{
+		return newToken(type.getIndex(), type.getName());
+	}
+	
+	private String pool(String value)
+	{
+		return _stringPool.add(value);
 	}
 
 	private Symbol newToken(short id, Object value)
@@ -159,6 +173,8 @@ import com.aptana.editor.js.parsing.lexer.JSTokenType;
 	{
 		yyreset(new StringReader(source));
 
+		_stringPool = new StringPool();
+
 		// clear last token
 		_lastToken = null;
 
@@ -232,77 +248,77 @@ Regex = "/" ({CharClass}|{Character})+ "/" [a-z]*
 						}
 
 	// numbers
-	{Number}		{ return newToken(Terminals.NUMBER, yytext()); }
+	{Number}		{ return newToken(Terminals.NUMBER, pool(yytext())); }
 
 	// strings
-	{Strings}		{ return newToken(Terminals.STRING, yytext()); }
+	{Strings}		{ return newToken(Terminals.STRING, pool(yytext())); }
 
 	// keywords
-	"break"			{ return newToken(Terminals.BREAK, yytext()); }
-	"case"			{ return newToken(Terminals.CASE, yytext()); }
-	"catch"			{ return newToken(Terminals.CATCH, yytext()); }
-	"const"			{ return newToken(Terminals.VAR, yytext()); }
-	"continue"		{ return newToken(Terminals.CONTINUE, yytext()); }
-	"default"		{ return newToken(Terminals.DEFAULT, yytext()); }
-	"delete"		{ return newToken(Terminals.DELETE, yytext()); }
-	"do"			{ return newToken(Terminals.DO, yytext()); }
-	"else"			{ return newToken(Terminals.ELSE, yytext()); }
-	"false"			{ return newToken(Terminals.FALSE, yytext()); }
-	"finally"		{ return newToken(Terminals.FINALLY, yytext()); }
-	"for"			{ return newToken(Terminals.FOR, yytext()); }
-	"function"		{ return newToken(Terminals.FUNCTION, yytext()); }
-	"if"			{ return newToken(Terminals.IF, yytext()); }
-	"instanceof"	{ return newToken(Terminals.INSTANCEOF, yytext()); }
-	"in"			{ return newToken(Terminals.IN, yytext()); }
-	"new"			{ return newToken(Terminals.NEW, yytext()); }
-	"null"			{ return newToken(Terminals.NULL, yytext()); }
-	"return"		{ return newToken(Terminals.RETURN, yytext()); }
-	"switch"		{ return newToken(Terminals.SWITCH, yytext()); }
-	"this"			{ return newToken(Terminals.THIS, yytext()); }
-	"throw"			{ return newToken(Terminals.THROW, yytext()); }
-	"true"			{ return newToken(Terminals.TRUE, yytext()); }
-	"try"			{ return newToken(Terminals.TRY, yytext()); }
-	"typeof"		{ return newToken(Terminals.TYPEOF, yytext()); }
-	"var"			{ return newToken(Terminals.VAR, yytext()); }
-	"void"			{ return newToken(Terminals.VOID, yytext()); }
-	"while"			{ return newToken(Terminals.WHILE, yytext()); }
-	"with"			{ return newToken(Terminals.WITH, yytext()); }
+	"break"			{ return newToken(JSTokenType.BREAK); }
+	"case"			{ return newToken(JSTokenType.CASE); }
+	"catch"			{ return newToken(JSTokenType.CATCH); }
+	"const"			{ return newToken(JSTokenType.VAR); }
+	"continue"		{ return newToken(JSTokenType.CONTINUE); }
+	"default"		{ return newToken(JSTokenType.DEFAULT); }
+	"delete"		{ return newToken(JSTokenType.DELETE); }
+	"do"			{ return newToken(JSTokenType.DO); }
+	"else"			{ return newToken(JSTokenType.ELSE); }
+	"false"			{ return newToken(JSTokenType.FALSE); }
+	"finally"		{ return newToken(JSTokenType.FINALLY); }
+	"for"			{ return newToken(JSTokenType.FOR); }
+	"function"		{ return newToken(JSTokenType.FUNCTION); }
+	"if"			{ return newToken(JSTokenType.IF); }
+	"instanceof"	{ return newToken(JSTokenType.INSTANCEOF); }
+	"in"			{ return newToken(JSTokenType.IN); }
+	"new"			{ return newToken(JSTokenType.NEW); }
+	"null"			{ return newToken(JSTokenType.NULL); }
+	"return"		{ return newToken(JSTokenType.RETURN); }
+	"switch"		{ return newToken(JSTokenType.SWITCH); }
+	"this"			{ return newToken(JSTokenType.THIS); }
+	"throw"			{ return newToken(JSTokenType.THROW); }
+	"true"			{ return newToken(JSTokenType.TRUE); }
+	"try"			{ return newToken(JSTokenType.TRY); }
+	"typeof"		{ return newToken(JSTokenType.TYPEOF); }
+	"var"			{ return newToken(JSTokenType.VAR); }
+	"void"			{ return newToken(JSTokenType.VOID); }
+	"while"			{ return newToken(JSTokenType.WHILE); }
+	"with"			{ return newToken(JSTokenType.WITH); }
 
 	// identifiers
-	{Identifier}	{ return newToken(Terminals.IDENTIFIER, yytext()); }
+	{Identifier}	{ return newToken(Terminals.IDENTIFIER, pool(yytext())); }
 
 	// operators
-	">>>="			{ return newToken(Terminals.GREATER_GREATER_GREATER_EQUAL, yytext()); }
-	">>>"			{ return newToken(Terminals.GREATER_GREATER_GREATER, yytext()); }
+	">>>="			{ return newToken(JSTokenType.GREATER_GREATER_GREATER_EQUAL); }
+	">>>"			{ return newToken(JSTokenType.GREATER_GREATER_GREATER); }
 
-	"<<="			{ return newToken(Terminals.LESS_LESS_EQUAL, yytext()); }
-	"<<"			{ return newToken(Terminals.LESS_LESS, yytext()); }
-	"<="			{ return newToken(Terminals.LESS_EQUAL, yytext()); }
-	"<"				{ return newToken(Terminals.LESS, yytext()); }
+	"<<="			{ return newToken(JSTokenType.LESS_LESS_EQUAL); }
+	"<<"			{ return newToken(JSTokenType.LESS_LESS); }
+	"<="			{ return newToken(JSTokenType.LESS_EQUAL); }
+	"<"				{ return newToken(JSTokenType.LESS); }
 
-	">>="			{ return newToken(Terminals.GREATER_GREATER_EQUAL, yytext()); }
-	">>"			{ return newToken(Terminals.GREATER_GREATER, yytext()); }
-	">="			{ return newToken(Terminals.GREATER_EQUAL, yytext()); }
-	">"				{ return newToken(Terminals.GREATER, yytext()); }
+	">>="			{ return newToken(JSTokenType.GREATER_GREATER_EQUAL); }
+	">>"			{ return newToken(JSTokenType.GREATER_GREATER); }
+	">="			{ return newToken(JSTokenType.GREATER_EQUAL); }
+	">"				{ return newToken(JSTokenType.GREATER); }
 
-	"==="			{ return newToken(Terminals.EQUAL_EQUAL_EQUAL, yytext()); }
-	"=="			{ return newToken(Terminals.EQUAL_EQUAL, yytext()); }
-	"="				{ return newToken(Terminals.EQUAL, yytext()); }
+	"==="			{ return newToken(JSTokenType.EQUAL_EQUAL_EQUAL); }
+	"=="			{ return newToken(JSTokenType.EQUAL_EQUAL); }
+	"="				{ return newToken(JSTokenType.EQUAL); }
 
-	"!=="			{ return newToken(Terminals.EXCLAMATION_EQUAL_EQUAL, yytext()); }
-	"!="			{ return newToken(Terminals.EXCLAMATION_EQUAL, yytext()); }
-	"!"				{ return newToken(Terminals.EXCLAMATION, yytext()); }
+	"!=="			{ return newToken(JSTokenType.EXCLAMATION_EQUAL_EQUAL); }
+	"!="			{ return newToken(JSTokenType.EXCLAMATION_EQUAL); }
+	"!"				{ return newToken(JSTokenType.EXCLAMATION); }
 
-	"&&"			{ return newToken(Terminals.AMPERSAND_AMPERSAND, yytext()); }
-	"&="			{ return newToken(Terminals.AMPERSAND_EQUAL, yytext()); }
-	"&"				{ return newToken(Terminals.AMPERSAND, yytext()); }
+	"&&"			{ return newToken(JSTokenType.AMPERSAND_AMPERSAND); }
+	"&="			{ return newToken(JSTokenType.AMPERSAND_EQUAL); }
+	"&"				{ return newToken(JSTokenType.AMPERSAND); }
 
-	"||"			{ return newToken(Terminals.PIPE_PIPE, yytext()); }
-	"|="			{ return newToken(Terminals.PIPE_EQUAL, yytext()); }
-	"|"				{ return newToken(Terminals.PIPE, yytext()); }
+	"||"			{ return newToken(JSTokenType.PIPE_PIPE); }
+	"|="			{ return newToken(JSTokenType.PIPE_EQUAL); }
+	"|"				{ return newToken(JSTokenType.PIPE); }
 
-	"*="			{ return newToken(Terminals.STAR_EQUAL, yytext()); }
-	"*"				{ return newToken(Terminals.STAR, yytext()); }
+	"*="			{ return newToken(JSTokenType.STAR_EQUAL); }
+	"*"				{ return newToken(JSTokenType.STAR); }
 
 	"/"				{
 						yypushback(1);
@@ -316,57 +332,57 @@ Regex = "/" ({CharClass}|{Character})+ "/" [a-z]*
 						}
 					}
 
-	"%="			{ return newToken(Terminals.PERCENT_EQUAL, yytext()); }
-	"%"				{ return newToken(Terminals.PERCENT, yytext()); }
+	"%="			{ return newToken(JSTokenType.PERCENT_EQUAL); }
+	"%"				{ return newToken(JSTokenType.PERCENT); }
 
-	"--"			{ return newToken(Terminals.MINUS_MINUS, yytext()); }
-	"-="			{ return newToken(Terminals.MINUS_EQUAL, yytext()); }
-	"-"				{ return newToken(Terminals.MINUS, yytext()); }
+	"--"			{ return newToken(JSTokenType.MINUS_MINUS); }
+	"-="			{ return newToken(JSTokenType.MINUS_EQUAL); }
+	"-"				{ return newToken(JSTokenType.MINUS); }
 
-	"++"			{ return newToken(Terminals.PLUS_PLUS, yytext()); }
-	"+="			{ return newToken(Terminals.PLUS_EQUAL, yytext()); }
-	"+"				{ return newToken(Terminals.PLUS, yytext()); }
+	"++"			{ return newToken(JSTokenType.PLUS_PLUS); }
+	"+="			{ return newToken(JSTokenType.PLUS_EQUAL); }
+	"+"				{ return newToken(JSTokenType.PLUS); }
 
-	"^="			{ return newToken(Terminals.CARET_EQUAL, yytext()); }
-	"^"				{ return newToken(Terminals.CARET, yytext()); }
+	"^="			{ return newToken(JSTokenType.CARET_EQUAL); }
+	"^"				{ return newToken(JSTokenType.CARET); }
  
-	"?"				{ return newToken(Terminals.QUESTION, yytext()); }
-	"~"				{ return newToken(Terminals.TILDE, yytext()); }
-	";"				{ return newToken(Terminals.SEMICOLON, yytext()); }
-	"("				{ return newToken(Terminals.LPAREN, yytext()); }
-	")"				{ return newToken(Terminals.RPAREN, yytext()); }
-	"["				{ return newToken(Terminals.LBRACKET, yytext()); }
-	"]"				{ return newToken(Terminals.RBRACKET, yytext()); }
-	"{"				{ return newToken(Terminals.LCURLY, yytext()); }
-	"}"				{ return newToken(Terminals.RCURLY, yytext()); }
-	","				{ return newToken(Terminals.COMMA, yytext()); }
-	":"				{ return newToken(Terminals.COLON, yytext()); }
-	"."				{ return newToken(Terminals.DOT, yytext()); }
+	"?"				{ return newToken(JSTokenType.QUESTION); }
+	"~"				{ return newToken(JSTokenType.TILDE); }
+	";"				{ return newToken(JSTokenType.SEMICOLON); }
+	"("				{ return newToken(JSTokenType.LPAREN); }
+	")"				{ return newToken(JSTokenType.RPAREN); }
+	"["				{ return newToken(JSTokenType.LBRACKET); }
+	"]"				{ return newToken(JSTokenType.RBRACKET); }
+	"{"				{ return newToken(JSTokenType.LCURLY); }
+	"}"				{ return newToken(JSTokenType.RCURLY); }
+	","				{ return newToken(JSTokenType.COMMA); }
+	":"				{ return newToken(JSTokenType.COLON); }
+	"."				{ return newToken(JSTokenType.DOT); }
 }
 
 <DIVISION> {
 	"/="			{
 						yybegin(YYINITIAL);
-						return newToken(Terminals.FORWARD_SLASH_EQUAL, yytext());
+						return newToken(JSTokenType.FORWARD_SLASH_EQUAL);
 					}
 	"/"				{
 						yybegin(YYINITIAL);
-						return newToken(Terminals.FORWARD_SLASH, yytext());
+						return newToken(JSTokenType.FORWARD_SLASH);
 					}
 }
 
 <REGEX> {
 	{Regex}			{
 						yybegin(YYINITIAL);
-						return newToken(Terminals.REGEX, yytext());
+						return newToken(Terminals.REGEX, pool(yytext()));
 					}
 	"/="			{
 						yybegin(YYINITIAL);
-						return newToken(Terminals.FORWARD_SLASH_EQUAL, yytext());
+						return newToken(JSTokenType.FORWARD_SLASH_EQUAL);
 					}
 	"/"				{
 						yybegin(YYINITIAL);
-						return newToken(Terminals.FORWARD_SLASH, yytext());
+						return newToken(JSTokenType.FORWARD_SLASH);
 					}
 }
 

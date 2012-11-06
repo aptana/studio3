@@ -32,9 +32,14 @@ public class JSONNode extends ParseNode
 	 */
 	public JSONNode(JSONNodeType type)
 	{
-		super(IJSONConstants.CONTENT_TYPE_JSON);
+		super();
 
 		this._type = type;
+	}
+
+	public String getLanguage()
+	{
+		return IJSONConstants.CONTENT_TYPE_JSON;
 	}
 
 	/**
@@ -47,7 +52,7 @@ public class JSONNode extends ParseNode
 		// sub-classes must override this method so their types will be
 		// recognized properly
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.ast.ParseNode#getNodeType()

@@ -23,7 +23,7 @@ public class XMLNode extends ParseNode
 	 */
 	public XMLNode(XMLNodeType type, int start, int end)
 	{
-		super(IXMLConstants.CONTENT_TYPE_XML);
+		super();
 
 		fType = type;
 		this.setLocation(start, end);
@@ -42,6 +42,11 @@ public class XMLNode extends ParseNode
 		this(type, start, end);
 
 		setChildren(children);
+	}
+
+	public String getLanguage()
+	{
+		return IXMLConstants.CONTENT_TYPE_XML;
 	}
 
 	/*

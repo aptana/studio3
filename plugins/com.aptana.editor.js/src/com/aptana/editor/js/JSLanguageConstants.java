@@ -18,10 +18,80 @@ public class JSLanguageConstants
 	public static final String FALSE = "false"; //$NON-NLS-1$
 	public static final String THIS = "this"; //$NON-NLS-1$
 	public static final String NULL = "null"; //$NON-NLS-1$
+	public static final String GREATER_EQUAL = ">="; //$NON-NLS-1$
+	public static final String CATCH = "catch"; //$NON-NLS-1$
+	public static final String FUNCTION = "function"; //$NON-NLS-1$
+	public static final String INSTANCEOF = "instanceof"; //$NON-NLS-1$
+	public static final String PLUS = "+"; //$NON-NLS-1$
+	public static final String TRY = "try"; //$NON-NLS-1$
+	public static final String DELETE = "delete"; //$NON-NLS-1$
+	public static final String VAR = "var"; //$NON-NLS-1$
+	public static final String AMPERSAND_AMPERSAND = "&&"; //$NON-NLS-1$
+	public static final String EQUAL = "="; //$NON-NLS-1$
+	public static final String CARET_EQUAL = "^="; //$NON-NLS-1$
+	public static final String PLUS_EQUAL = "+="; //$NON-NLS-1$
+	public static final String MINUS = "-"; //$NON-NLS-1$
+	public static final String COLON = ":"; //$NON-NLS-1$
+	public static final String WHILE = "while"; //$NON-NLS-1$
+	public static final String PIPE_EQUAL = "|="; //$NON-NLS-1$
+	public static final String TYPEOF = "typeof"; //$NON-NLS-1$
+	public static final String SWITCH = "switch"; //$NON-NLS-1$
+	public static final String RBRACKET = "]"; //$NON-NLS-1$
+	public static final String FINALLY = "finally"; //$NON-NLS-1$
+	public static final String LPAREN = "("; //$NON-NLS-1$
+	public static final String RCURLY = "}"; //$NON-NLS-1$
+	public static final String TILDE = "~"; //$NON-NLS-1$
+	public static final String DOT = "."; //$NON-NLS-1$
+	public static final String LESS_EQUAL = "<="; //$NON-NLS-1$
+	public static final String FORWARD_SLASH_EQUAL = "/="; //$NON-NLS-1$
+	public static final String CASE = "case"; //$NON-NLS-1$
+	public static final String EXCLAMATION = "!"; //$NON-NLS-1$
+	public static final String PLUS_PLUS = "++"; //$NON-NLS-1$
+	public static final String CARET = "^"; //$NON-NLS-1$
+	public static final String LBRACKET = "["; //$NON-NLS-1$
+	public static final String EQUAL_EQUAL = "=="; //$NON-NLS-1$
+	public static final String DO = "do"; //$NON-NLS-1$
+	public static final String RETURN = "return"; //$NON-NLS-1$
+	public static final String QUESTION = "?"; //$NON-NLS-1$
+	public static final String PERCENT = "%"; //$NON-NLS-1$
+	public static final String EXCLAMATION_EQUAL = "!="; //$NON-NLS-1$
+	public static final String MINUS_MINUS = "--"; //$NON-NLS-1$
+	public static final String IF = "if"; //$NON-NLS-1$
+	public static final String DEFAULT = "default"; //$NON-NLS-1$
+	public static final String NEW = "new"; //$NON-NLS-1$
+	public static final String PERCENT_EQUAL = "%="; //$NON-NLS-1$
+	public static final String EXCLAMATION_EQUAL_EQUAL = "!=="; //$NON-NLS-1$
+	public static final String WITH = "with"; //$NON-NLS-1$
+	public static final String AMPERSAND = "&"; //$NON-NLS-1$
+	public static final String SEMICOLON = ";"; //$NON-NLS-1$
+	public static final String AMPERSAND_EQUAL = "&="; //$NON-NLS-1$
+	public static final String LCURLY = "{"; //$NON-NLS-1$
+	public static final String GREATER = ">"; //$NON-NLS-1$
+	public static final String PIPE = "|"; //$NON-NLS-1$
+	public static final String LESS = "<"; //$NON-NLS-1$
+	public static final String LESS_LESS_EQUAL = "<<="; //$NON-NLS-1$
+	public static final String CONTINUE = "continue"; //$NON-NLS-1$
+	public static final String COMMA = "comma"; //$NON-NLS-1$
+	public static final String VOID = "void"; //$NON-NLS-1$
+	public static final String EQUAL_EQUAL_EQUAL = "==="; //$NON-NLS-1$
+	public static final String ELSE = "else"; //$NON-NLS-1$
+	public static final String STAR_EQUAL = "*="; //$NON-NLS-1$
+	public static final String PIPE_PIPE = "||"; //$NON-NLS-1$
+	public static final String THROW = "throw"; //$NON-NLS-1$
+	public static final String BREAK = "break"; //$NON-NLS-1$
+	public static final String LESS_LESS = "<<"; //$NON-NLS-1$
+	public static final String STAR = "*"; //$NON-NLS-1$
+	public static final String MINUS_EQUAL = "-="; //$NON-NLS-1$
+	public static final String RPAREN = ")"; //$NON-NLS-1$
+	public static final String GREATER_GREATER = ">>"; //$NON-NLS-1$
+	public static final String GREATER_GREATER_GREATER_EQUAL = ">>>="; //$NON-NLS-1$
+	public static final String FORWARD_SLASH = "/"; //$NON-NLS-1$
+	public static final String GREATER_GREATER_GREATER = ">>>"; //$NON-NLS-1$
+	public static final String FOR = "for"; //$NON-NLS-1$
+	public static final String IN = "in"; //$NON-NLS-1$
+	public static final String GREATER_GREATER_EQUAL = ">>="; //$NON-NLS-1$
 
-	@SuppressWarnings("nls")
-	public static final String[] KEYWORD_OPERATORS = new String[] { "delete", "instanceof", "in", "new", "typeof",
-			"with" };
+	public static final String[] KEYWORD_OPERATORS = new String[] { DELETE, INSTANCEOF, IN, NEW, TYPEOF, WITH };
 	@SuppressWarnings("nls")
 	public static final String[] SUPPORT_FUNCTIONS = new String[] { "small", "savePreferences", "slice", "sqrt",
 			"shift", "showModelessDialog", "showModalDialog", "showHelp", "scrollX", "scrollByPages", "scrollByLines",
@@ -75,16 +145,17 @@ public class JSLanguageConstants
 			"removeNamedItem", "removeChild", "removeAttributeNode", "removeAttribute", "remove", "getNamedItem",
 			"getElementsByName", "getElementsByTagName", "getElementById", "getAttributeNode", "getAttribute", "blur" };
 
-	@SuppressWarnings("nls")
-	public static final String[] OPERATORS = { ">>>=", ">>>", "<<=", ">>=", "===", "!==", ">>", "<<", "!=", "<=", ">=",
-			"==", "--", "++", "&&", "||", "*=", "/=", "%=", "+=", "-=", "&=", "|=", "^=" };
+	public static final String[] OPERATORS = { GREATER_GREATER_GREATER_EQUAL, GREATER_GREATER_GREATER, LESS_LESS_EQUAL,
+			GREATER_GREATER_EQUAL, EQUAL_EQUAL_EQUAL, EXCLAMATION_EQUAL_EQUAL, GREATER_GREATER, LESS_LESS,
+			EXCLAMATION_EQUAL, LESS_EQUAL, GREATER_EQUAL, EQUAL_EQUAL, MINUS_MINUS, PLUS_PLUS, AMPERSAND_AMPERSAND,
+			PIPE_PIPE, STAR_EQUAL, FORWARD_SLASH_EQUAL, PERCENT_EQUAL, PLUS_EQUAL, MINUS_EQUAL, AMPERSAND_EQUAL,
+			PIPE_EQUAL, CARET_EQUAL };
 
 	public static final char[] SINGLE_CHARACTER_OPERATORS = { '?', '!', '%', '&', '*', '-', '+', '~', '=', '<', '>',
 			'^', '|', '/' };
 
-	@SuppressWarnings("nls")
-	public static final String[] KEYWORD_CONTROL = new String[] { "break", "case", "catch", "continue", "default",
-			"do", "else", "finally", "for", "if", "return", "switch", "throw", "try", "while" };
+	public static final String[] KEYWORD_CONTROL = new String[] { BREAK, CASE, CATCH, CONTINUE, DEFAULT, DO, ELSE,
+			FINALLY, FOR, IF, RETURN, SWITCH, THROW, TRY, WHILE };
 
 	@SuppressWarnings("nls")
 	public static final String[] SUPPORT_CLASSES = new String[] { "Anchor", "Applet", "Area", "Array", "Boolean",
@@ -164,8 +235,7 @@ public class JSLanguageConstants
 			"LN2", "LOG10E", "LOG2E", "bottom", "borderRightWidth", "borderBottomWidth", "borderStyle", "borderColor",
 			"borderTopWidth", "borderLeftWidth", "bufferDepth", "below", "backgroundColor", "backgroundImage", };
 
-	@SuppressWarnings("nls")
-	private static String[] GRAMMAR_KEYWORDS = { "function", "var", "void", TRUE, FALSE, NULL, THIS };
+	private static String[] GRAMMAR_KEYWORDS = { FUNCTION, VAR, VOID, TRUE, FALSE, NULL, THIS };
 
 	/**
 	 * All keywords
