@@ -189,11 +189,14 @@ public class JSNode extends ParseNode
 	 */
 	public DocumentationBlock getDocumentation()
 	{
+		// no comment
 		if (fDoc == null)
 		{
 			return null;
 		}
+
 		short docType = getDocType();
+		// convert to DocumentationBlock lazily
 		if (docType != DOC_BLOCK)
 		{
 			if (docType == PRE_DOC)
@@ -205,7 +208,14 @@ public class JSNode extends ParseNode
 				updateDocumentationFromVSDoc(fDoc);
 			}
 		}
-		return (DocumentationBlock) this.fDoc;
+		// If we were successful, return the block
+		if (fDoc instanceof DocumentationBlock)
+		{
+			return (DocumentationBlock) fDoc;
+		}
+
+		// otherwise return null
+		return null;
 	}
 
 	private void updateDocumentationFromVSDoc(Symbol doc)
