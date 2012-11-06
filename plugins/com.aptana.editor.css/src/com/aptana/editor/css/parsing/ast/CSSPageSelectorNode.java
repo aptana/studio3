@@ -20,9 +20,15 @@ public class CSSPageSelectorNode extends CSSNode
 	 */
 	public CSSPageSelectorNode(String identifier)
 	{
-		super(ICSSNodeTypes.PAGE_SELECTOR);
+		super();
 
 		fText = identifier;
+	}
+
+	@Override
+	public short getNodeType()
+	{
+		return ICSSNodeTypes.PAGE_SELECTOR;
 	}
 
 	/*

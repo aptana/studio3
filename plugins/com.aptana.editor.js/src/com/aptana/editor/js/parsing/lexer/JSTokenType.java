@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -11,6 +11,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.aptana.editor.js.JSLanguageConstants;
 import com.aptana.editor.js.parsing.Terminals;
 import com.aptana.parsing.lexer.ITypePredicate;
 
@@ -18,86 +19,86 @@ public enum JSTokenType implements ITypePredicate
 {
 	UNDEFINED("UNDEFINED", -1), //$NON-NLS-1$
 	EOF("EOF", Terminals.EOF), //$NON-NLS-1$
-	LPAREN("(", Terminals.LPAREN), //$NON-NLS-1$
+	LPAREN(JSLanguageConstants.LPAREN, Terminals.LPAREN),
 	IDENTIFIER("IDENTIFIER", Terminals.IDENTIFIER), //$NON-NLS-1$
-	LCURLY("{", Terminals.LCURLY), //$NON-NLS-1$
-	LBRACKET("[", Terminals.LBRACKET), //$NON-NLS-1$
-	PLUS_PLUS("++", Terminals.PLUS_PLUS), //$NON-NLS-1$
-	MINUS_MINUS("--", Terminals.MINUS_MINUS), //$NON-NLS-1$
+	LCURLY(JSLanguageConstants.LCURLY, Terminals.LCURLY),
+	LBRACKET(JSLanguageConstants.LBRACKET, Terminals.LBRACKET),
+	PLUS_PLUS(JSLanguageConstants.PLUS_PLUS, Terminals.PLUS_PLUS),
+	MINUS_MINUS(JSLanguageConstants.MINUS_MINUS, Terminals.MINUS_MINUS),
 	STRING("STRING", Terminals.STRING), //$NON-NLS-1$
 	NUMBER("NUMBER", Terminals.NUMBER), //$NON-NLS-1$
-	MINUS("-", Terminals.MINUS), //$NON-NLS-1$
-	PLUS("+", Terminals.PLUS), //$NON-NLS-1$
-	FUNCTION("function", Terminals.FUNCTION), //$NON-NLS-1$
-	THIS("this", Terminals.THIS), //$NON-NLS-1$
-	NEW("new", Terminals.NEW), //$NON-NLS-1$
-	NULL("null", Terminals.NULL), //$NON-NLS-1$
-	TRUE("true", Terminals.TRUE), //$NON-NLS-1$
-	FALSE("false", Terminals.FALSE), //$NON-NLS-1$
+	MINUS(JSLanguageConstants.MINUS, Terminals.MINUS),
+	PLUS(JSLanguageConstants.PLUS, Terminals.PLUS),
+	FUNCTION(JSLanguageConstants.FUNCTION, Terminals.FUNCTION),
+	THIS(JSLanguageConstants.THIS, Terminals.THIS),
+	NEW(JSLanguageConstants.NEW, Terminals.NEW),
+	NULL(JSLanguageConstants.NULL, Terminals.NULL),
+	TRUE(JSLanguageConstants.TRUE, Terminals.TRUE),
+	FALSE(JSLanguageConstants.FALSE, Terminals.FALSE),
 	REGEX("REGEX", Terminals.REGEX), //$NON-NLS-1$
-	DELETE("delete", Terminals.DELETE), //$NON-NLS-1$
-	EXCLAMATION("!", Terminals.EXCLAMATION), //$NON-NLS-1$
-	TILDE("~", Terminals.TILDE), //$NON-NLS-1$
-	TYPEOF("typeof", Terminals.TYPEOF), //$NON-NLS-1$
-	VOID("void", Terminals.VOID), //$NON-NLS-1$
-	SEMICOLON(";", Terminals.SEMICOLON), //$NON-NLS-1$
-	COMMA(",", Terminals.COMMA), //$NON-NLS-1$
-	VAR("var", Terminals.VAR), //$NON-NLS-1$
-	WHILE("while", Terminals.WHILE), //$NON-NLS-1$
-	FOR("for", Terminals.FOR), //$NON-NLS-1$
-	DO("do", Terminals.DO), //$NON-NLS-1$
-	SWITCH("switch", Terminals.SWITCH), //$NON-NLS-1$
-	IF("if", Terminals.IF), //$NON-NLS-1$
-	CONTINUE("continue", Terminals.CONTINUE), //$NON-NLS-1$
-	BREAK("break", Terminals.BREAK), //$NON-NLS-1$
-	WITH("with", Terminals.WITH), //$NON-NLS-1$
-	RETURN("return", Terminals.RETURN), //$NON-NLS-1$
-	THROW("throw", Terminals.THROW), //$NON-NLS-1$
-	TRY("try", Terminals.TRY), //$NON-NLS-1$
-	RPAREN(")", Terminals.RPAREN), //$NON-NLS-1$
-	ELSE("else", Terminals.ELSE), //$NON-NLS-1$
-	RCURLY("}", Terminals.RCURLY), //$NON-NLS-1$
-	COLON(":", Terminals.COLON), //$NON-NLS-1$
-	RBRACKET("]", Terminals.RBRACKET), //$NON-NLS-1$
-	IN("in", Terminals.IN), //$NON-NLS-1$
-	EQUAL("=", Terminals.EQUAL), //$NON-NLS-1$
-	CASE("case", Terminals.CASE), //$NON-NLS-1$
-	DOT(".", Terminals.DOT), //$NON-NLS-1$
-	LESS_LESS("<<", Terminals.LESS_LESS), //$NON-NLS-1$
-	GREATER_GREATER(">>", Terminals.GREATER_GREATER), //$NON-NLS-1$
-	GREATER_GREATER_GREATER(">>>", Terminals.GREATER_GREATER_GREATER), //$NON-NLS-1$
-	LESS("<", Terminals.LESS), //$NON-NLS-1$
-	GREATER(">", Terminals.GREATER), //$NON-NLS-1$
-	LESS_EQUAL("<=", Terminals.LESS_EQUAL), //$NON-NLS-1$
-	GREATER_EQUAL(">=", Terminals.GREATER_EQUAL), //$NON-NLS-1$
-	INSTANCEOF("instanceof", Terminals.INSTANCEOF), //$NON-NLS-1$
-	EQUAL_EQUAL("==", Terminals.EQUAL_EQUAL), //$NON-NLS-1$
-	EXCLAMATION_EQUAL("!=", Terminals.EXCLAMATION_EQUAL), //$NON-NLS-1$
-	EQUAL_EQUAL_EQUAL("===", Terminals.EQUAL_EQUAL_EQUAL), //$NON-NLS-1$
-	EXCLAMATION_EQUAL_EQUAL("!==", Terminals.EXCLAMATION_EQUAL_EQUAL), //$NON-NLS-1$
-	AMPERSAND("&", Terminals.AMPERSAND), //$NON-NLS-1$
-	CARET("^", Terminals.CARET), //$NON-NLS-1$
-	PIPE("|", Terminals.PIPE), //$NON-NLS-1$
-	AMPERSAND_AMPERSAND("&&", Terminals.AMPERSAND_AMPERSAND), //$NON-NLS-1$
-	STAR_EQUAL("*=", Terminals.STAR_EQUAL), //$NON-NLS-1$
-	FORWARD_SLASH_EQUAL("/=", Terminals.FORWARD_SLASH_EQUAL), //$NON-NLS-1$
-	PERCENT_EQUAL("%=", Terminals.PERCENT_EQUAL), //$NON-NLS-1$
-	PLUS_EQUAL("+=", Terminals.PLUS_EQUAL), //$NON-NLS-1$
-	MINUS_EQUAL("-=", Terminals.MINUS_EQUAL), //$NON-NLS-1$
-	LESS_LESS_EQUAL("<<=", Terminals.LESS_LESS_EQUAL), //$NON-NLS-1$
-	GREATER_GREATER_EQUAL(">>=", Terminals.GREATER_GREATER_EQUAL), //$NON-NLS-1$
-	GREATER_GREATER_GREATER_EQUAL(">>>=", Terminals.GREATER_GREATER_GREATER_EQUAL), //$NON-NLS-1$
-	AMPERSAND_EQUAL("&=", Terminals.AMPERSAND_EQUAL), //$NON-NLS-1$
-	CARET_EQUAL("^=", Terminals.CARET_EQUAL), //$NON-NLS-1$
-	PIPE_EQUAL("|=", Terminals.PIPE_EQUAL), //$NON-NLS-1$
-	STAR("*", Terminals.STAR), //$NON-NLS-1$
-	FORWARD_SLASH("/", Terminals.FORWARD_SLASH), //$NON-NLS-1$
-	PERCENT("%", Terminals.PERCENT), //$NON-NLS-1$
-	QUESTION("?", Terminals.QUESTION), //$NON-NLS-1$
-	PIPE_PIPE("||", Terminals.PIPE_PIPE), //$NON-NLS-1$
-	DEFAULT("default", Terminals.DEFAULT), //$NON-NLS-1$
-	FINALLY("finally", Terminals.FINALLY), //$NON-NLS-1$
-	CATCH("catch", Terminals.CATCH), //$NON-NLS-1$
+	DELETE(JSLanguageConstants.DELETE, Terminals.DELETE),
+	EXCLAMATION(JSLanguageConstants.EXCLAMATION, Terminals.EXCLAMATION),
+	TILDE(JSLanguageConstants.TILDE, Terminals.TILDE),
+	TYPEOF(JSLanguageConstants.TYPEOF, Terminals.TYPEOF),
+	VOID(JSLanguageConstants.VOID, Terminals.VOID),
+	SEMICOLON(JSLanguageConstants.SEMICOLON, Terminals.SEMICOLON),
+	COMMA(JSLanguageConstants.COMMA, Terminals.COMMA),
+	VAR(JSLanguageConstants.VAR, Terminals.VAR),
+	WHILE(JSLanguageConstants.WHILE, Terminals.WHILE),
+	FOR(JSLanguageConstants.FOR, Terminals.FOR),
+	DO(JSLanguageConstants.DO, Terminals.DO),
+	SWITCH(JSLanguageConstants.SWITCH, Terminals.SWITCH),
+	IF(JSLanguageConstants.IF, Terminals.IF),
+	CONTINUE(JSLanguageConstants.CONTINUE, Terminals.CONTINUE),
+	BREAK(JSLanguageConstants.BREAK, Terminals.BREAK),
+	WITH(JSLanguageConstants.WITH, Terminals.WITH),
+	RETURN(JSLanguageConstants.RETURN, Terminals.RETURN),
+	THROW(JSLanguageConstants.THROW, Terminals.THROW),
+	TRY(JSLanguageConstants.TRY, Terminals.TRY),
+	RPAREN(JSLanguageConstants.RPAREN, Terminals.RPAREN),
+	ELSE(JSLanguageConstants.ELSE, Terminals.ELSE),
+	RCURLY(JSLanguageConstants.RCURLY, Terminals.RCURLY),
+	COLON(JSLanguageConstants.COLON, Terminals.COLON),
+	RBRACKET(JSLanguageConstants.RBRACKET, Terminals.RBRACKET),
+	IN(JSLanguageConstants.IN, Terminals.IN),
+	EQUAL(JSLanguageConstants.EQUAL, Terminals.EQUAL),
+	CASE(JSLanguageConstants.CASE, Terminals.CASE),
+	DOT(JSLanguageConstants.DOT, Terminals.DOT),
+	LESS_LESS(JSLanguageConstants.LESS_LESS, Terminals.LESS_LESS),
+	GREATER_GREATER(JSLanguageConstants.GREATER_GREATER, Terminals.GREATER_GREATER),
+	GREATER_GREATER_GREATER(JSLanguageConstants.GREATER_GREATER_GREATER, Terminals.GREATER_GREATER_GREATER),
+	LESS(JSLanguageConstants.LESS, Terminals.LESS),
+	GREATER(JSLanguageConstants.GREATER, Terminals.GREATER),
+	LESS_EQUAL(JSLanguageConstants.LESS_EQUAL, Terminals.LESS_EQUAL),
+	GREATER_EQUAL(JSLanguageConstants.GREATER_EQUAL, Terminals.GREATER_EQUAL),
+	INSTANCEOF(JSLanguageConstants.INSTANCEOF, Terminals.INSTANCEOF),
+	EQUAL_EQUAL(JSLanguageConstants.EQUAL_EQUAL, Terminals.EQUAL_EQUAL),
+	EXCLAMATION_EQUAL(JSLanguageConstants.EXCLAMATION_EQUAL, Terminals.EXCLAMATION_EQUAL),
+	EQUAL_EQUAL_EQUAL(JSLanguageConstants.EQUAL_EQUAL_EQUAL, Terminals.EQUAL_EQUAL_EQUAL),
+	EXCLAMATION_EQUAL_EQUAL(JSLanguageConstants.EXCLAMATION_EQUAL_EQUAL, Terminals.EXCLAMATION_EQUAL_EQUAL),
+	AMPERSAND(JSLanguageConstants.AMPERSAND, Terminals.AMPERSAND),
+	CARET(JSLanguageConstants.CARET, Terminals.CARET),
+	PIPE(JSLanguageConstants.PIPE, Terminals.PIPE),
+	AMPERSAND_AMPERSAND(JSLanguageConstants.AMPERSAND_AMPERSAND, Terminals.AMPERSAND_AMPERSAND),
+	STAR_EQUAL(JSLanguageConstants.STAR_EQUAL, Terminals.STAR_EQUAL),
+	FORWARD_SLASH_EQUAL(JSLanguageConstants.FORWARD_SLASH_EQUAL, Terminals.FORWARD_SLASH_EQUAL),
+	PERCENT_EQUAL(JSLanguageConstants.PERCENT_EQUAL, Terminals.PERCENT_EQUAL),
+	PLUS_EQUAL(JSLanguageConstants.PLUS_EQUAL, Terminals.PLUS_EQUAL),
+	MINUS_EQUAL(JSLanguageConstants.MINUS_EQUAL, Terminals.MINUS_EQUAL),
+	LESS_LESS_EQUAL(JSLanguageConstants.LESS_LESS_EQUAL, Terminals.LESS_LESS_EQUAL),
+	GREATER_GREATER_EQUAL(JSLanguageConstants.GREATER_GREATER_EQUAL, Terminals.GREATER_GREATER_EQUAL),
+	GREATER_GREATER_GREATER_EQUAL(JSLanguageConstants.GREATER_GREATER_GREATER_EQUAL, Terminals.GREATER_GREATER_GREATER_EQUAL),
+	AMPERSAND_EQUAL(JSLanguageConstants.AMPERSAND_EQUAL, Terminals.AMPERSAND_EQUAL),
+	CARET_EQUAL(JSLanguageConstants.CARET_EQUAL, Terminals.CARET_EQUAL),
+	PIPE_EQUAL(JSLanguageConstants.PIPE_EQUAL, Terminals.PIPE_EQUAL),
+	STAR(JSLanguageConstants.STAR, Terminals.STAR),
+	FORWARD_SLASH(JSLanguageConstants.FORWARD_SLASH, Terminals.FORWARD_SLASH),
+	PERCENT(JSLanguageConstants.PERCENT, Terminals.PERCENT),
+	QUESTION(JSLanguageConstants.QUESTION, Terminals.QUESTION),
+	PIPE_PIPE(JSLanguageConstants.PIPE_PIPE, Terminals.PIPE_PIPE),
+	DEFAULT(JSLanguageConstants.DEFAULT, Terminals.DEFAULT),
+	FINALLY(JSLanguageConstants.FINALLY, Terminals.FINALLY),
+	CATCH(JSLanguageConstants.CATCH, Terminals.CATCH),
 
 	SINGLELINE_COMMENT("SINGLELINE_COMMENT", 1024), //$NON-NLS-1$
 	MULTILINE_COMMENT("MULTILINE_COMMENT", 1025), //$NON-NLS-1$

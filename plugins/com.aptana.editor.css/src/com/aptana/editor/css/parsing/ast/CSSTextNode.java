@@ -20,9 +20,15 @@ public class CSSTextNode extends CSSNode
 	 */
 	public CSSTextNode(String text)
 	{
-		super(ICSSNodeTypes.TEXT);
-		
+		super();
+
 		fText = text;
+	}
+
+	@Override
+	public short getNodeType()
+	{
+		return ICSSNodeTypes.TEXT;
 	}
 
 	/*

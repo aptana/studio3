@@ -33,7 +33,12 @@ public class JSParseRootNode extends ParseRootNode
 	 */
 	public JSParseRootNode(Symbol[] children)
 	{
-		super(IJSConstants.CONTENT_TYPE_JS, children);
+		super(children);
+	}
+
+	public String getLanguage()
+	{
+		return IJSConstants.CONTENT_TYPE_JS;
 	}
 
 	/**

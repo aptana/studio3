@@ -139,7 +139,14 @@ public class AbstractBuildParticipantTest extends TestCase
 		String filePath = "example.js";
 		String source = "/*\n * TODO This is a task */\n";
 		int initialOffset = 0;
-		ParseNode commentNode = new ParseNode("javascript");
+		ParseNode commentNode = new ParseNode()
+		{
+
+			public String getLanguage()
+			{
+				return "javascript";
+			}
+		};
 		commentNode.setLocation(0, source.length());
 		String commentEnding = "*/";
 		Collection<IProblem> problems = participant.processCommentNode(filePath, source, initialOffset, commentNode,

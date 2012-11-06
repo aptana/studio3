@@ -5,38 +5,27 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.coffee.parsing.ast;
+package com.aptana.editor.html.parsing;
 
 import beaver.Symbol;
 
-import com.aptana.editor.coffee.ICoffeeConstants;
+import com.aptana.editor.html.IHTMLConstants;
 import com.aptana.parsing.ast.ParseRootNode;
 
 /**
- * CoffeeParseRootNode
+ * @author cwilliams
  */
-public class CoffeeParseRootNode extends ParseRootNode
+public class HTMLParseRootNode extends ParseRootNode
 {
-	/**
-	 * CoffeeParseRootNode
-	 */
-	public CoffeeParseRootNode()
-	{
-		this((Symbol[]) null);
-	}
 
-	/**
-	 * CoffeeParseRootNode
-	 * 
-	 * @param children
-	 */
-	public CoffeeParseRootNode(Symbol... children)
+	HTMLParseRootNode(int start, int end)
 	{
-		super(children);
+		super(new Symbol[0], start, end);
 	}
 
 	public String getLanguage()
 	{
-		return ICoffeeConstants.CONTENT_TYPE_COFFEE;
+		return IHTMLConstants.CONTENT_TYPE_HTML;
 	}
+
 }

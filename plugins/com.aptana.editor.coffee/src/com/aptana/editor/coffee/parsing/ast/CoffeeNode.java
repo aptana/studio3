@@ -30,9 +30,14 @@ public class CoffeeNode extends ParseNode
 
 	public CoffeeNode(short type, int start, int end)
 	{
-		super(ICoffeeConstants.CONTENT_TYPE_COFFEE);
+		super();
 		this.fType = type;
 		setLocation(start, end);
+	}
+
+	public String getLanguage()
+	{
+		return ICoffeeConstants.CONTENT_TYPE_COFFEE;
 	}
 
 	/*

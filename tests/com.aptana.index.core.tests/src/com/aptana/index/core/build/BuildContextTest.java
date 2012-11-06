@@ -31,7 +31,13 @@ public class BuildContextTest extends TestCase
 	{
 		final int[] reparses = new int[] { 0 };
 		final String[] content = new String[] { "" };
-		final ParseRootNode parseRootNode = new ParseRootNode("test", new Symbol[0], 0, 0);
+		final ParseRootNode parseRootNode = new ParseRootNode(new Symbol[0], 0, 0)
+		{
+			public String getLanguage()
+			{
+				return "test";
+			}
+		};
 		BuildContext buildContext = new BuildContext(null)
 		{
 			@Override
@@ -41,7 +47,8 @@ public class BuildContextTest extends TestCase
 			}
 
 			@Override
-			protected ParseResult parse(String contentType, IParseState parseState, WorkingParseResult working) throws Exception
+			protected ParseResult parse(String contentType, IParseState parseState, WorkingParseResult working)
+					throws Exception
 			{
 				reparses[0] += 1;
 				working.addError(new ParseError("language", new Symbol(1), null));
@@ -65,7 +72,7 @@ public class BuildContextTest extends TestCase
 
 		parseState = new ParseState(buildContext.getContents());
 		ast = parseResult.getRootNode(); // This time it's cached.
-		assertEquals(1, parseResult.getErrors().size()); //errors must be copied
+		assertEquals(1, parseResult.getErrors().size()); // errors must be copied
 		assertEquals(parseRootNode, ast);
 		assertEquals(1, reparses[0]);
 

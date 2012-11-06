@@ -27,10 +27,16 @@ public class CSSMediaNode extends CSSNode
 	 */
 	public CSSMediaNode(CSSTextNode[] medias, CSSNode... statements)
 	{
-		super(ICSSNodeTypes.MEDIA);
+		super();
 
 		fMedias = medias;
 		setChildren(statements);
+	}
+
+	@Override
+	public short getNodeType()
+	{
+		return ICSSNodeTypes.MEDIA;
 	}
 
 	/*

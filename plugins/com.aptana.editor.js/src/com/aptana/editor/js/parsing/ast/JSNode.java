@@ -27,15 +27,29 @@ import com.aptana.parsing.ast.ParseRootNode;
 
 public class JSNode extends ParseNode
 {
+	private static final int NODE_TYPE_MASK = 255; // 8 bits
+	private static final int DOC_TYPE_MASK = 0x3; // two bits
+
 	protected static final short DEFAULT_TYPE = IJSNodeTypes.EMPTY;
 	private static Map<Short, String> TYPE_NAME_MAP;
 
-	private short fType;
-	private boolean fSemicolonIncluded;
+	/**
+	 * Here we try to be smarter about storing docs. Since we can only have doc of one type at a time, we remove the
+	 * pre/post/block fields and replace with a field to hold the doc and a field to hold the type. This should save us
+	 * 4-bytes per-node.
+	 */
+	private static final short PRE_DOC = 0;
+	private static final short POST_DOC = 1;
+	private static final byte DOC_BLOCK = 2;
 
-	private DocumentationBlock fDocumentation;
-	private Symbol fPreDocumentationComment;
-	private Symbol fPostDocumentationComment;
+	private Symbol fDoc;
+
+	/**
+	 * A super-optimization. We compress the type of documentation we store in fDoc, the type of node we store for
+	 * getNodeType, and the boolean flag for if a semicolon is included. First bit is used for determining if semicolon
+	 * is included. Next 2 bits are for determining documentation node type. Next 8 bits are for node type.
+	 */
+	private int typeFlags = 0;
 
 	/**
 	 * We memoize the hashcode because it recursively asks for hash of children!
@@ -88,13 +102,18 @@ public class JSNode extends ParseNode
 	 */
 	protected JSNode(short type, JSNode... children)
 	{
-		super(IJSConstants.CONTENT_TYPE_JS);
+		super();
 
 		// set node type
-		this.fType = type;
+		setNodeType(type);
 
 		// store children
 		this.setChildren(children);
+	}
+
+	public String getLanguage()
+	{
+		return IJSConstants.CONTENT_TYPE_JS;
 	}
 
 	/**
@@ -170,23 +189,23 @@ public class JSNode extends ParseNode
 	 */
 	public DocumentationBlock getDocumentation()
 	{
-		if (this.fDocumentation == null)
+		if (fDoc == null)
 		{
-			Symbol comment = fPreDocumentationComment;
-			if (comment != null)
+			return null;
+		}
+		short docType = getDocType();
+		if (docType != DOC_BLOCK)
+		{
+			if (docType == PRE_DOC)
 			{
-				updateDocumentationFromSDoc(comment);
+				updateDocumentationFromSDoc(fDoc);
 			}
 			else
 			{
-				Symbol doc = fPostDocumentationComment;
-				if (doc != null)
-				{
-					updateDocumentationFromVSDoc(doc);
-				}
+				updateDocumentationFromVSDoc(fDoc);
 			}
 		}
-		return this.fDocumentation;
+		return (DocumentationBlock) this.fDoc;
 	}
 
 	private void updateDocumentationFromVSDoc(Symbol doc)
@@ -292,7 +311,14 @@ public class JSNode extends ParseNode
 	 */
 	public short getNodeType()
 	{
-		return fType;
+		// we need the 4th - 12th bits (8 bits)
+		return (short) ((typeFlags >>> 3) & NODE_TYPE_MASK);
+	}
+
+	public short getDocType()
+	{
+		// we need the 2nd and 3rd bits
+		return (short) ((typeFlags >>> 1) & DOC_TYPE_MASK);
 	}
 
 	/**
@@ -302,7 +328,8 @@ public class JSNode extends ParseNode
 	 */
 	public boolean getSemicolonIncluded()
 	{
-		return fSemicolonIncluded;
+		// we need the 1st bit
+		return (typeFlags & 0x1) == 1;
 	}
 
 	/*
@@ -365,9 +392,8 @@ public class JSNode extends ParseNode
 	 */
 	public void setPreDocumentation(Symbol comment)
 	{
-		this.fPreDocumentationComment = comment;
-		this.fPostDocumentationComment = null;
-		this.fDocumentation = null;
+		this.fDoc = comment;
+		setDocType(PRE_DOC);
 	}
 
 	/**
@@ -377,9 +403,8 @@ public class JSNode extends ParseNode
 	 */
 	public void setPostDocumentation(Symbol comment)
 	{
-		this.fPreDocumentationComment = null;
-		this.fPostDocumentationComment = comment;
-		this.fDocumentation = null;
+		this.fDoc = comment;
+		setDocType(POST_DOC);
 	}
 
 	/**
@@ -389,9 +414,13 @@ public class JSNode extends ParseNode
 	 */
 	public void setDocumentation(DocumentationBlock block)
 	{
-		this.fDocumentation = block;
-		this.fPreDocumentationComment = null;
-		this.fPostDocumentationComment = null;
+		this.fDoc = block;
+		setDocType(DOC_BLOCK);
+	}
+
+	private void setDocType(short docBlock)
+	{
+		typeFlags |= ((docBlock & DOC_TYPE_MASK) << 1);
 	}
 
 	/**
@@ -401,7 +430,7 @@ public class JSNode extends ParseNode
 	 */
 	protected void setNodeType(short type)
 	{
-		fType = type;
+		typeFlags |= (type << 3);
 		fHash = -1;
 	}
 
@@ -412,7 +441,7 @@ public class JSNode extends ParseNode
 	 */
 	public void setSemicolonIncluded(boolean included)
 	{
-		fSemicolonIncluded = included;
+		typeFlags |= (included ? 0x1 : 0x0);
 		fHash = -1;
 	}
 

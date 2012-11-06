@@ -21,9 +21,15 @@ public class CSSCharSetNode extends CSSNode
 	 */
 	public CSSCharSetNode(String encoding)
 	{
-		super(ICSSNodeTypes.CHAR_SET);
+		super();
 
 		fEncoding = encoding;
+	}
+
+	@Override
+	public short getNodeType()
+	{
+		return ICSSNodeTypes.CHAR_SET;
 	}
 
 	/*
