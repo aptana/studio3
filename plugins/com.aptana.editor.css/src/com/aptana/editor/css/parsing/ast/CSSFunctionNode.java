@@ -19,7 +19,7 @@ public class CSSFunctionNode extends CSSExpressionNode
 	 */
 	public CSSFunctionNode(String name, CSSExpressionNode expression)
 	{
-		super(ICSSNodeTypes.FUNCTION);
+		super();
 
 		fName = name;
 
@@ -27,6 +27,12 @@ public class CSSFunctionNode extends CSSExpressionNode
 		{
 			setChildren(new CSSNode[] { expression });
 		}
+	}
+
+	@Override
+	public short getNodeType()
+	{
+		return ICSSNodeTypes.FUNCTION;
 	}
 
 	@Override

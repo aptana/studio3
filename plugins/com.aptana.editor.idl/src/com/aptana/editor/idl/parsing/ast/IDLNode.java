@@ -29,9 +29,14 @@ public class IDLNode extends ParseNode
 	 */
 	public IDLNode(IDLNodeType type)
 	{
-		super(IIDLConstants.CONTENT_TYPE_IDL);
+		super();
 
 		this._type = type;
+	}
+
+	public String getLanguage()
+	{
+		return IIDLConstants.CONTENT_TYPE_IDL;
 	}
 
 	/**

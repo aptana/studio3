@@ -211,7 +211,13 @@ public class ParsingPoolFactoryTest extends TestCase
 			// Note: empty body (class just created to access protected constructor).
 		};
 
-		parseRootNode = new ParseRootNode("test", new Symbol[0], 0, 0);
+		parseRootNode = new ParseRootNode(new Symbol[0], 0, 0)
+		{
+			public String getLanguage()
+			{
+				return "test";
+			}
+		};
 	};
 
 	public void testParserPoolFactory() throws Exception
@@ -346,7 +352,13 @@ public class ParsingPoolFactoryTest extends TestCase
 			this.parsingEngine.parse("subContent", new ParseState("sub1"));
 			this.parsingEngine.parse("subContent", new ParseState("sub2"));
 			this.parsingEngine.parse("subContent", new ParseState("sub3"));
-			working.setParseResult(new ParseRootNode("main", new Symbol[0], 0, 0));
+			working.setParseResult(new ParseRootNode(new Symbol[0], 0, 0)
+			{
+				public String getLanguage()
+				{
+					return "main";
+				}
+			});
 		}
 
 		public void setParsingEngine(ParsingEngine parsingEngine)
@@ -361,7 +373,13 @@ public class ParsingPoolFactoryTest extends TestCase
 
 		protected void parse(IParseState parseState, WorkingParseResult working) throws Exception
 		{
-			working.setParseResult(new ParseRootNode("sub", new Symbol[0], 0, 0));
+			working.setParseResult(new ParseRootNode(new Symbol[0], 0, 0)
+			{
+				public String getLanguage()
+				{
+					return "sub";
+				}
+			});
 		}
 
 	}

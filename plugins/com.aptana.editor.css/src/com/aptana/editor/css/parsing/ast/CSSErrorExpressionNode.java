@@ -17,7 +17,13 @@ public class CSSErrorExpressionNode extends CSSExpressionNode
 	 */
 	public CSSErrorExpressionNode()
 	{
-		super(ICSSNodeTypes.EXPRESSION);
+		super();
+	}
+
+	@Override
+	public short getNodeType()
+	{
+		return ICSSNodeTypes.EXPRESSION;
 	}
 
 	/*

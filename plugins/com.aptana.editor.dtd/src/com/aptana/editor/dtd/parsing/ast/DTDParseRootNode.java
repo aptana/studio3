@@ -29,7 +29,12 @@ public class DTDParseRootNode extends ParseRootNode
 	 */
 	public DTDParseRootNode(Symbol[] children)
 	{
-		super(IDTDConstants.CONTENT_TYPE_DTD, children);
+		super(children);
+	}
+
+	public String getLanguage()
+	{
+		return IDTDConstants.CONTENT_TYPE_DTD;
 	}
 
 	/*

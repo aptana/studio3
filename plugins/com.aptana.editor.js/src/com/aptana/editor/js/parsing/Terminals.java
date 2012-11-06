@@ -1,17 +1,10 @@
-/**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
 package com.aptana.editor.js.parsing;
 
 /**
- * This class lists terminals used by the grammar specified in "JS.grammar".
+ * This class lists terminals used by the
+ * grammar specified in "JS.grammar".
  */
-public class Terminals // $codepro.audit.disable convertClassToInterface
-{ // $codepro.audit.disable convertClassToInterface
+public class Terminals {
 	static public final short EOF = 0;
 	static public final short LPAREN = 1;
 	static public final short IDENTIFIER = 2;

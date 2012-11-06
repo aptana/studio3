@@ -21,9 +21,14 @@ public class YAMLParseRootNode extends ParseRootNode
 
 	public YAMLParseRootNode(Node yamlRoot, IParseState parseState)
 	{
-		super(IYAMLConstants.CONTENT_TYPE_YAML, new Symbol[0], parseState.getStartingOffset(), parseState
-				.getStartingOffset() + parseState.getSource().length());
+		super(new Symbol[0], parseState.getStartingOffset(), parseState.getStartingOffset()
+				+ parseState.getSource().length());
 		traverse(yamlRoot, parseState);
+	}
+
+	public String getLanguage()
+	{
+		return IYAMLConstants.CONTENT_TYPE_YAML;
 	}
 
 	private void traverse(Node yamlRoot, IParseState parseState)

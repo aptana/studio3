@@ -19,7 +19,7 @@ public class CSSList extends CSSNode
 	 */
 	public CSSList()
 	{
-		super(ICSSNodeTypes.LIST);
+		super();
 	}
 
 	/**
@@ -30,6 +30,12 @@ public class CSSList extends CSSNode
 	 */
 	public CSSList(int start, int end)
 	{
-		super(ICSSNodeTypes.LIST, start, end);
+		super(start, end);
+	}
+
+	@Override
+	public short getNodeType()
+	{
+		return ICSSNodeTypes.LIST;
 	}
 }

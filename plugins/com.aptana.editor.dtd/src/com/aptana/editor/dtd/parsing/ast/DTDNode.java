@@ -29,9 +29,14 @@ public class DTDNode extends ParseNode
 	 */
 	protected DTDNode(DTDNodeType type)
 	{
-		super(IDTDConstants.CONTENT_TYPE_DTD);
+		super();
 
 		this._type = type;
+	}
+
+	public String getLanguage()
+	{
+		return IDTDConstants.CONTENT_TYPE_DTD;
 	}
 
 	/**

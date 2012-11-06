@@ -21,9 +21,14 @@ public class TextNode extends ParseNode
 
 	public TextNode(String text)
 	{
-		super(StringUtil.EMPTY);
+		super();
 
 		this.text = text;
+	}
+
+	public String getLanguage()
+	{
+		return StringUtil.EMPTY;
 	}
 
 	/*

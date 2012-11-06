@@ -20,9 +20,15 @@ public class CSSCommentNode extends CSSNode
 	 */
 	public CSSCommentNode(String text, int start, int end)
 	{
-		super(ICSSNodeTypes.COMMENT, start, end);
+		super(start, end);
 
 		fText = text;
+	}
+
+	@Override
+	public short getNodeType()
+	{
+		return ICSSNodeTypes.COMMENT;
 	}
 
 	/*

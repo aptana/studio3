@@ -18,9 +18,15 @@ public class CSSTermNode extends CSSExpressionNode
 	 */
 	public CSSTermNode(String term)
 	{
-		super(ICSSNodeTypes.TERM);
+		super();
 
 		fTerm = term;
+	}
+
+	@Override
+	public short getNodeType()
+	{
+		return ICSSNodeTypes.TERM;
 	}
 
 	/*

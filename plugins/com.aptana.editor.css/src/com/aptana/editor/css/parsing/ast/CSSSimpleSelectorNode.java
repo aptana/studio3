@@ -47,11 +47,17 @@ public class CSSSimpleSelectorNode extends CSSNode
 	 */
 	public CSSSimpleSelectorNode(String typeSelector, CSSAttributeSelectorNode[] attributeSelectors)
 	{
-		super(ICSSNodeTypes.SIMPLE_SELECTOR);
+		super();
 
 		fTypeSelector = typeSelector;
 
 		this.setChildren(attributeSelectors);
+	}
+
+	@Override
+	public short getNodeType()
+	{
+		return ICSSNodeTypes.SIMPLE_SELECTOR;
 	}
 
 	/*
