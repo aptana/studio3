@@ -21,6 +21,7 @@ import java.util.Map;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -33,6 +34,9 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChange
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
@@ -57,6 +61,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.actions.OpenResourceAction;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.navigator.resources.ProjectExplorer;
@@ -123,22 +128,7 @@ public class IOUIPlugin extends AbstractUIPlugin
 		{
 			if (part instanceof ProjectExplorer)
 			{
-				CommonViewer viewer = ((ProjectExplorer) part).getCommonViewer();
-				viewer.setComparer(new FileSystemElementComparer());
-				final Tree tree = viewer.getTree();
-				tree.addMouseListener(new MouseAdapter()
-				{
-
-					@Override
-					public void mouseDown(MouseEvent e)
-					{
-						if (tree.getItem(new Point(e.x, e.y)) == null)
-						{
-							tree.deselectAll();
-							tree.notifyListeners(SWT.Selection, new Event());
-						}
-					}
-				});
+				handleProjectExplorerListeners(part);
 			}
 			else if (part instanceof IEditorPart)
 			{
@@ -146,6 +136,46 @@ public class IOUIPlugin extends AbstractUIPlugin
 			}
 		}
 	};
+
+	private void handleProjectExplorerListeners(final IWorkbenchPart part)
+	{
+		CommonViewer viewer = ((ProjectExplorer) part).getCommonViewer();
+		viewer.setComparer(new FileSystemElementComparer());
+		final Tree tree = viewer.getTree();
+		viewer.addDoubleClickListener(new IDoubleClickListener()
+		{
+			public void doubleClick(DoubleClickEvent event)
+			{
+				IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+				Object element = selection.getFirstElement();
+
+				if (selection.size() == 1 && (element instanceof IResource)
+						&& ((IResource) element).getType() == IResource.PROJECT)
+				{
+					OpenResourceAction openResourceAction = new OpenResourceAction(PlatformUI.getWorkbench()
+							.getActiveWorkbenchWindow());
+					openResourceAction.selectionChanged((IStructuredSelection) event.getViewer().getSelection());
+					if (openResourceAction.isEnabled())
+					{
+						openResourceAction.run();
+					}
+				}
+
+			}
+		});
+		tree.addMouseListener(new MouseAdapter()
+		{
+			@Override
+			public void mouseDown(MouseEvent e)
+			{
+				if (tree.getItem(new Point(e.x, e.y)) == null)
+				{
+					tree.deselectAll();
+					tree.notifyListeners(SWT.Selection, new Event());
+				}
+			}
+		});
+	}
 
 	private final IWindowListener fWindowListener = new IWindowListener()
 	{
@@ -437,6 +467,21 @@ public class IOUIPlugin extends AbstractUIPlugin
 			IPartService partService;
 			for (IWorkbenchWindow window : windows)
 			{
+				final IWorkbenchWindow workbenchWindow = window;
+				UIUtils.getDisplay().syncExec(new Runnable()
+				{
+					public void run()
+					{
+						IViewPart projectExplorer = null;
+						if ((projectExplorer = workbenchWindow.getActivePage()
+								.findView(IPageLayout.ID_PROJECT_EXPLORER)) != null)
+						{
+							// If the project explorer view is already opened at this time, then
+							// we need to explicitly add the listener to it.
+							handleProjectExplorerListeners(projectExplorer);
+						}
+					}
+				});
 				partService = window.getPartService();
 				if (partService != null)
 				{
