@@ -220,4 +220,11 @@
             plugin="com.aptana.core">
       </statusHandler>
    </extension>
+   <extension
+         point="com.aptana.ui.epl.primaryNatureContributors">
+      <contributor
+            class="com.aptana.projects.WebProjectPrimaryNatureContributor"
+            natureId="com.aptana.projects.webnature">
+      </contributor>
+   </extension>
 </plugin>
