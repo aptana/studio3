@@ -21,6 +21,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
@@ -157,6 +158,23 @@ public class SWTUtils
 			return JFaceResources.getImage(computedName);
 		}
 		return null;
+	}
+
+	public static Image scaleImage(Image image, double maxWidth, double maxHeight) throws Exception
+	{
+		ImageData imageData = image.getImageData();
+		if (imageData.width > maxWidth || imageData.height > maxHeight)
+		{
+			// scale the image
+			double scaleX = maxWidth / imageData.width;
+			double scaleY = maxHeight / imageData.height;
+			double scale = Math.min(scaleX, scaleY);
+			imageData = imageData.scaledTo((int) Math.round(imageData.width * scale),
+					(int) Math.round(imageData.height * scale));
+			image.dispose();
+			image = new Image(UIUtils.getDisplay(), imageData);
+		}
+		return image;
 	}
 
 	/**
