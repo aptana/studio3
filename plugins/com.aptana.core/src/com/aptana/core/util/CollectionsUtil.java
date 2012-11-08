@@ -262,6 +262,23 @@ public class CollectionsUtil
 	}
 
 	/**
+	 * This is a convenience method to return the first element from a list. If the list is empty, then null is
+	 * returned.
+	 * 
+	 * @param list
+	 * @return
+	 */
+	public static <T> T getFirstElement(List<T> list)
+	{
+		if (!isEmpty(list))
+		{
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
 	 * Given two collections of elements of type <T>, return a collection with the items which only appear in one
 	 * collection or the other
 	 * 

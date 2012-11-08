@@ -710,4 +710,29 @@ public class CollectionsUtilTest extends TestCase
 		assertEquals(Integer.valueOf(2), cache.get("2"));
 		assertEquals(Integer.valueOf(3), cache.get("3"));
 	}
+
+	public void testFirstElementEmpty()
+	{
+		List<String> strings = new ArrayList<String>();
+		String firstElement = CollectionsUtil.getFirstElement(strings);
+		assertNull(firstElement);
+	}
+
+	public void testFirstElementNullElement()
+	{
+		String firstElement = CollectionsUtil.getFirstElement(CollectionsUtil.newList((String) null));
+		assertNull(firstElement);
+	}
+
+	public void testFirstElementNullList()
+	{
+		assertNull(CollectionsUtil.getFirstElement(null));
+	}
+
+	public void testFirstElementList()
+	{
+		List<Integer> numbers = CollectionsUtil.newList(1, 2, 3);
+		Integer firstElement = CollectionsUtil.getFirstElement(numbers);
+		assertEquals(new Integer(1), firstElement);
+	}
 }
