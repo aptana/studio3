@@ -155,7 +155,7 @@ public class TroubleshootingPreferencePage extends FieldEditorPreferencePage imp
 		buttonComp.setLayout(GridLayoutFactory.fillDefaults().numColumns(2).create());
 		buttonComp.setLayoutData(GridDataFactory.fillDefaults().create());
 
-		Button selectAllButton = new Button(buttonComp, SWT.BORDER);
+		Button selectAllButton = new Button(buttonComp, SWT.PUSH);
 		selectAllButton.setText(Messages.TroubleshootingPreferencePage_SelectAll);
 		selectAllButton.addSelectionListener(new SelectionAdapter()
 		{
@@ -166,7 +166,7 @@ public class TroubleshootingPreferencePage extends FieldEditorPreferencePage imp
 			}
 		});
 
-		Button selectNoneButton = new Button(buttonComp, SWT.BORDER);
+		Button selectNoneButton = new Button(buttonComp, SWT.PUSH);
 		selectNoneButton.setText(Messages.TroubleshootingPreferencePage_SelectNone);
 		selectNoneButton.addSelectionListener(new SelectionAdapter()
 		{
