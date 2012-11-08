@@ -29,7 +29,12 @@ public class IDLParseRootNode extends ParseRootNode
 	 */
 	public IDLParseRootNode(Symbol[] children)
 	{
-		super(IIDLConstants.CONTENT_TYPE_IDL, children);
+		super(children);
+	}
+
+	public String getLanguage()
+	{
+		return IIDLConstants.CONTENT_TYPE_IDL;
 	}
 
 	/*

@@ -20,9 +20,15 @@ public class CSSSelectorNode extends CSSNode
 	 */
 	public CSSSelectorNode(CSSSimpleSelectorNode... simpleSelectors)
 	{
-		super(ICSSNodeTypes.SELECTOR);
+		super();
 
 		this.setChildren(simpleSelectors);
+	}
+
+	@Override
+	public short getNodeType()
+	{
+		return ICSSNodeTypes.SELECTOR;
 	}
 
 	/*

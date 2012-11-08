@@ -23,10 +23,16 @@ public class CSSAtRuleNode extends CSSNode
 	 */
 	public CSSAtRuleNode(String name, String id)
 	{
-		super(ICSSNodeTypes.AT_RULE);
+		super();
 
 		fName = name;
 		fId = id;
+	}
+
+	@Override
+	public short getNodeType()
+	{
+		return ICSSNodeTypes.AT_RULE;
 	}
 
 	@Override

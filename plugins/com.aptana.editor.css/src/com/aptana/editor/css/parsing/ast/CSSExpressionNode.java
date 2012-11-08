@@ -7,17 +7,14 @@
  */
 package com.aptana.editor.css.parsing.ast;
 
-public class CSSExpressionNode extends CSSNode
+public abstract class CSSExpressionNode extends CSSNode
 {
 	/**
 	 * CSSExpressionNode
-	 * 
-	 * @param start
-	 * @param end
 	 */
-	protected CSSExpressionNode(short type)
+	protected CSSExpressionNode()
 	{
-		super(type);
+		super();
 	}
 
 	/*

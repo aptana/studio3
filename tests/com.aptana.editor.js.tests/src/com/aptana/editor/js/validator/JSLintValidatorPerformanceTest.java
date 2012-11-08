@@ -126,10 +126,6 @@ public class JSLintValidatorPerformanceTest extends PerformanceTestCase
 
 	public void testValidateTiMobile() throws Exception
 	{
-		if (validator instanceof JSLintValidator)
-		{
-			fail("JSLint takes 12min for TiMobile. Sparing you the time.");
-		}
 		perfValidate("timobile.js", 10);
 	}
 

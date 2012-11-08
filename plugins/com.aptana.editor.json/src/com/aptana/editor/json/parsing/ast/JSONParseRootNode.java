@@ -34,7 +34,12 @@ public class JSONParseRootNode extends ParseRootNode
 	 */
 	public JSONParseRootNode(Symbol[] children)
 	{
-		super(IJSONConstants.CONTENT_TYPE_JSON, children);
+		super(children);
+	}
+
+	public String getLanguage()
+	{
+		return IJSONConstants.CONTENT_TYPE_JSON;
 	}
 
 	/**

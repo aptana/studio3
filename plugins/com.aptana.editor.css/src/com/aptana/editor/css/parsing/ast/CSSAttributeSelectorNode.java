@@ -19,7 +19,7 @@ public class CSSAttributeSelectorNode extends CSSNode
 	 */
 	public CSSAttributeSelectorNode(CSSExpressionNode function)
 	{
-		super(ICSSNodeTypes.ATTRIBUTE_SELECTOR);
+		super();
 
 		setChildren(new CSSNode[] { function });
 	}
@@ -33,9 +33,15 @@ public class CSSAttributeSelectorNode extends CSSNode
 	 */
 	public CSSAttributeSelectorNode(String text)
 	{
-		super(ICSSNodeTypes.ATTRIBUTE_SELECTOR);
+		super();
 
 		fAttributeText = text;
+	}
+
+	@Override
+	public short getNodeType()
+	{
+		return ICSSNodeTypes.ATTRIBUTE_SELECTOR;
 	}
 
 	/*

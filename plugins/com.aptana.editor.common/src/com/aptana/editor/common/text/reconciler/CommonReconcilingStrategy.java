@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.text.BadLocationException;
@@ -360,10 +361,24 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		IFile file = getFile();
 		if (file != null)
 		{
-			return new ReconcileContext(editor.getContentType(), file, fDocument.get());
+			return new ReconcileContext(editor.getContentType(), file, fDocument.get())
+			{
+				@Override
+				public IParseRootNode getAST() throws CoreException
+				{
+					return fEditor.getAST();
+				}
+			};
 		}
 
-		return new ReconcileContext(editor.getContentType(), EditorUtil.getURI(editor), fDocument.get());
+		return new ReconcileContext(editor.getContentType(), EditorUtil.getURI(editor), fDocument.get())
+		{
+			@Override
+			public IParseRootNode getAST() throws CoreException
+			{
+				return fEditor.getAST();
+			}
+		};
 	}
 
 	private List<IBuildParticipant> filterToEnabled(List<IBuildParticipant> participants)

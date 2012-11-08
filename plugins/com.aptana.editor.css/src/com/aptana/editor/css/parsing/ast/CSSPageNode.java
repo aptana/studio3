@@ -34,12 +34,18 @@ public class CSSPageNode extends CSSNode
 	 */
 	public CSSPageNode(List<CSSDeclarationNode> declarations)
 	{
-		super(ICSSNodeTypes.PAGE);
+		super();
 
 		if (declarations != null)
 		{
 			setChildren(declarations.toArray(new CSSDeclarationNode[declarations.size()]));
 		}
+	}
+
+	@Override
+	public short getNodeType()
+	{
+		return ICSSNodeTypes.PAGE;
 	}
 
 	@Override

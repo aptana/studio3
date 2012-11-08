@@ -17,11 +17,12 @@ import beaver.spec.ast.TreeWalker;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.SourcePrinter;
+import com.aptana.core.util.StringUtil;
 import com.aptana.parsing.ParsingPlugin;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Range;
 
-public class ParseNode extends Node implements IParseNode
+public abstract class ParseNode extends Node implements IParseNode
 {
 	protected static final class NameNode implements INameNode
 	{
@@ -61,18 +62,12 @@ public class ParseNode extends Node implements IParseNode
 	private IParseNode[] fChildren;
 	private IParseNode fParent;
 	private int fChildrenCount;
-	private String fLanguage;
-
-	private boolean fFilteredFromOutline;
 
 	/**
 	 * ParseBaseNode
-	 * 
-	 * @param language
 	 */
-	public ParseNode(String language)
+	public ParseNode()
 	{
-		fLanguage = language;
 		fChildren = NO_CHILDREN;
 	}
 
@@ -380,15 +375,6 @@ public class ParseNode extends Node implements IParseNode
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.IParseNode#getLanguage()
-	 */
-	public String getLanguage()
-	{
-		return fLanguage;
-	}
-
-	/*
-	 * (non-Javadoc)
 	 * @see com.aptana.parsing.lexer.IRange#getLength()
 	 */
 	public int getLength()
@@ -553,7 +539,7 @@ public class ParseNode extends Node implements IParseNode
 	 */
 	public String getText()
 	{
-		return ""; //$NON-NLS-1$
+		return StringUtil.EMPTY;
 	}
 
 	/*
@@ -576,7 +562,7 @@ public class ParseNode extends Node implements IParseNode
 
 	public boolean isFilteredFromOutline()
 	{
-		return fFilteredFromOutline;
+		return false;
 	}
 
 	/*
@@ -721,11 +707,6 @@ public class ParseNode extends Node implements IParseNode
 	public void setParent(IParseNode parent)
 	{
 		fParent = parent;
-	}
-
-	public void setFilteredFromOutline(boolean filtered)
-	{
-		fFilteredFromOutline = filtered;
 	}
 
 	/*

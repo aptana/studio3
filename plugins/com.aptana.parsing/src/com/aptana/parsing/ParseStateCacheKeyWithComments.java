@@ -67,4 +67,11 @@ public class ParseStateCacheKeyWithComments implements IParseStateCacheKey
 		}
 		return false;
 	}
+
+	@Override
+	public String toString()
+	{
+		return this.getClass().getName()
+				+ "[attach: " + fAttachComments + ", collect: " + fCollectComments + ", parent: " + fParentCacheKey.toString() + "]"; //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+	}
 }

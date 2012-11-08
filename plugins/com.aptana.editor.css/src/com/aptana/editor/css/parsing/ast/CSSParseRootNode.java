@@ -33,7 +33,12 @@ public class CSSParseRootNode extends ParseRootNode
 	 */
 	public CSSParseRootNode(Symbol[] children)
 	{
-		super(ICSSConstants.CONTENT_TYPE_CSS, children);
+		super(children);
+	}
+
+	public String getLanguage()
+	{
+		return ICSSConstants.CONTENT_TYPE_CSS;
 	}
 
 	public void accept(CSSTreeWalker walker)

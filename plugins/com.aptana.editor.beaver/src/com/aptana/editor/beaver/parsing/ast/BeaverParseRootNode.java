@@ -22,9 +22,14 @@ public class BeaverParseRootNode extends ParseRootNode
 
 	public BeaverParseRootNode(GrammarTreeRoot root)
 	{
-		super(IBeaverConstants.CONTENT_TYPE_BEAVER, new Symbol[0], 0, 0);
+		super(new Symbol[0], 0, 0);
 
 		this.root = root;
+	}
+
+	public String getLanguage()
+	{
+		return IBeaverConstants.CONTENT_TYPE_BEAVER;
 	}
 
 	public GrammarTreeRoot getRoot()

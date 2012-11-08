@@ -37,11 +37,17 @@ public class CSSRuleNode extends CSSNode
 	 */
 	public CSSRuleNode(List<CSSSelectorNode> selectors, List<CSSDeclarationNode> declarations)
 	{
-		super(ICSSNodeTypes.RULE);
+		super();
 
 		fSelectors = selectors.toArray(new CSSSelectorNode[selectors.size()]);
 		fDeclarations = (declarations != null) ? declarations.toArray(new CSSDeclarationNode[declarations.size()])
 				: NO_DECLARATIONS;
+	}
+
+	@Override
+	public short getNodeType()
+	{
+		return ICSSNodeTypes.RULE;
 	}
 
 	/*

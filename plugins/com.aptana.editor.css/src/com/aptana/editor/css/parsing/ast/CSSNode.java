@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -12,34 +12,33 @@ import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
 
-public class CSSNode extends ParseNode
+public abstract class CSSNode extends ParseNode
 {
-	private final short fType;
 
 	/**
 	 * CSSNode
-	 * 
-	 * @param type
 	 */
-	protected CSSNode(short type)
+	protected CSSNode()
 	{
-		this(type, 0, 0);
+		this(0, 0);
 	}
 
 	/**
 	 * CSSNode
 	 * 
-	 * @param type
 	 * @param start
 	 * @param end
 	 */
-	public CSSNode(short type, int start, int end)
+	public CSSNode(int start, int end)
 	{
-		super(ICSSConstants.CONTENT_TYPE_CSS);
-
-		fType = type;
+		super();
 
 		this.setLocation(start, end);
+	}
+
+	public String getLanguage()
+	{
+		return ICSSConstants.CONTENT_TYPE_CSS;
 	}
 
 	/**
@@ -94,10 +93,7 @@ public class CSSNode extends ParseNode
 	 * @see com.aptana.parsing.ast.ParseNode#getNodeType()
 	 */
 	@Override
-	public short getNodeType()
-	{
-		return fType;
-	}
+	public abstract short getNodeType();
 
 	/*
 	 * (non-Javadoc)

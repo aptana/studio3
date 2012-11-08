@@ -30,10 +30,16 @@ public class CSSNamespaceNode extends CSSNode
 	 */
 	public CSSNamespaceNode(String prefix, String uri)
 	{
-		super(ICSSNodeTypes.NAMESPACE);
+		super();
 
 		fPrefix = prefix;
 		fUriStr = uri;
+	}
+
+	@Override
+	public short getNodeType()
+	{
+		return ICSSNodeTypes.NAMESPACE;
 	}
 
 	/*

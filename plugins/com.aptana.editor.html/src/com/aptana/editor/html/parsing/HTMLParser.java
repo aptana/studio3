@@ -105,14 +105,7 @@ public class HTMLParser extends AbstractParser
 		fScanner.setSource(source);
 
 		int startingOffset = fParseState.getStartingOffset();
-
-		ParseRootNode root = new ParseRootNode( //
-				IHTMLConstants.CONTENT_TYPE_HTML, //
-				NO_HTML_NODES, //
-				startingOffset, //
-				startingOffset + source.length() - 1 //
-		);
-
+		ParseRootNode root = new HTMLParseRootNode(startingOffset, startingOffset + source.length() - 1);
 		try
 		{
 			fCurrentElement = root;

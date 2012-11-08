@@ -33,7 +33,7 @@ public class CSSMozDocument extends CSSNode
 	 */
 	public CSSMozDocument()
 	{
-		super(ICSSNodeTypes.MOZ_DOCUMENT);
+		super();
 	}
 
 	/**
@@ -45,7 +45,13 @@ public class CSSMozDocument extends CSSNode
 	 */
 	public CSSMozDocument(int start, int end)
 	{
-		super(ICSSNodeTypes.MOZ_DOCUMENT, start, end);
+		super(start, end);
+	}
+	
+	@Override
+	public short getNodeType()
+	{
+		return ICSSNodeTypes.MOZ_DOCUMENT;
 	}
 
 	/*

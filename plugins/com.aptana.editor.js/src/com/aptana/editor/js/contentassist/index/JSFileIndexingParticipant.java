@@ -36,7 +36,6 @@ import com.aptana.editor.js.inferencing.JSPropertyCollection;
 import com.aptana.editor.js.inferencing.JSScope;
 import com.aptana.editor.js.inferencing.JSSymbolTypeInferrer;
 import com.aptana.editor.js.inferencing.JSTypeUtil;
-import com.aptana.editor.js.parsing.JSParseState;
 import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSCommentNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
@@ -50,7 +49,6 @@ import com.aptana.editor.js.sdoc.parsing.SDocParser;
 import com.aptana.index.core.AbstractFileIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.build.BuildContext;
-import com.aptana.parsing.ParseResult;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.xpath.ParseNodeXPath;
@@ -116,11 +114,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		try
 		{
 			sub.subTask(getIndexingMessage(index, context.getURI()));
-			// Enforce collecting and attaching comments since they are used to gather type information for
-			// params/function return types.
-			JSParseState parseState = new JSParseState(context.getContents(), 0, true, true);
-			ParseResult result = context.getAST(parseState);
-			processParseResults(context, index, result.getRootNode(), sub.newChild(20));
+			processParseResults(context, index, context.getAST(), sub.newChild(20));
 		}
 		catch (CoreException ce)
 		{
@@ -212,7 +206,8 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		if (globals != null)
 		{
 			// create new Window type for this file
-			TypeElement type = JSTypeUtil.createGlobalType(JSTypeUtil.getGlobalType(context.getProject(), context.getName()));
+			TypeElement type = JSTypeUtil.createGlobalType(JSTypeUtil.getGlobalType(context.getProject(),
+					context.getName()));
 
 			// add declared variables and functions from the global scope
 			if (IdeLog.isTraceEnabled(JSPlugin.getDefault(), IDebugScopes.INDEXING_STEPS))

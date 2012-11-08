@@ -31,12 +31,18 @@ public class CSSFontFaceNode extends CSSNode
 	 */
 	public CSSFontFaceNode(List<CSSDeclarationNode> declarations)
 	{
-		super(ICSSNodeTypes.FONTFACE);
+		super();
 
 		if (declarations != null)
 		{
 			setChildren(declarations.toArray(new CSSDeclarationNode[declarations.size()]));
 		}
+	}
+
+	@Override
+	public short getNodeType()
+	{
+		return ICSSNodeTypes.FONTFACE;
 	}
 
 	/*
