@@ -131,7 +131,7 @@ public class ConfigurationStatus implements Convertible
 	 * 
 	 * @param status
 	 */
-	public void setAdditionlStatus(IStatus status)
+	public void setAdditionalStatus(IStatus status)
 	{
 		this.additionalStatus = status;
 	}
