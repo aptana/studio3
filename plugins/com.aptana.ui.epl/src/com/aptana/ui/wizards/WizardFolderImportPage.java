@@ -92,6 +92,8 @@ import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.projects.primary.natures.IPrimaryNatureContributor;
+import com.aptana.projects.primary.natures.PrimaryNaturesManager;
 import com.aptana.ui.epl.UIEplPlugin;
 import com.aptana.ui.properties.NaturesLabelProvider;
 
@@ -103,7 +105,6 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 		SelectionListener
 {
 	private static final String APTANA_WEB_NATURE = "com.aptana.projects.webnature"; //$NON-NLS-1$
-	private static final String ALLOY_NATURE = "com.appcelerator.titanium.alloy.core.nature"; //$NON-NLS-1$
 
 	/**
 	 * An internal class for projects
@@ -178,9 +179,12 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 	private static String previouslyBrowsedDirectory = ""; //$NON-NLS-1$
 
 	private Button browseDirectoriesButton;
+	private Map<String, IPrimaryNatureContributor> natureContributors;
 
 	/**
 	 * Creates a new project creation wizard page.
+	 * 
+	 * @param natureContributors
 	 */
 	public WizardFolderImportPage()
 	{
@@ -194,11 +198,7 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 	 */
 	public WizardFolderImportPage(String pageName)
 	{
-		super(pageName);
-		setPageComplete(false);
-		setTitle(EplMessages.WizardFolderImportPage_ExistingFolderAsNewProject);
-		fNatureDescriptions = new HashMap<String, String>();
-
+		this(pageName, EplMessages.WizardFolderImportPage_ExistingFolderAsNewProject, null);
 	}
 
 	/**
@@ -211,6 +211,33 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 	public WizardFolderImportPage(String pageName, String title, ImageDescriptor titleImage)
 	{
 		super(pageName, title, titleImage);
+		setPageComplete(false);
+		fNatureDescriptions = new HashMap<String, String>();
+	}
+
+	private void setPrimaryNatureFromContributions(IPath projectPath)
+	{
+		int highestPrimaryNatureRank = -1;
+		String potentialPrimaryNature = null;
+		for (String natureId : natureContributors.keySet())
+		{
+			IPrimaryNatureContributor primaryNatureContributor = natureContributors.get(natureId);
+			int primaryNatureRank = primaryNatureContributor.getPrimaryNatureRank(projectPath);
+			if (primaryNatureRank > highestPrimaryNatureRank)
+			{
+				potentialPrimaryNature = natureId;
+				highestPrimaryNatureRank = primaryNatureRank;
+			}
+		}
+		if (StringUtil.isEmpty(potentialPrimaryNature))
+		{
+			// Initially check off web nature if there are no potential ones.
+			updatePrimaryNature(APTANA_WEB_NATURE);
+		}
+		else
+		{
+			updatePrimaryNature(potentialPrimaryNature);
+		}
 	}
 
 	/**
@@ -244,13 +271,13 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 		Dialog.applyDialogFont(workArea);
 
 		fLabelProvider = new NaturesLabelProvider(fNatureDescriptions);
-		// Initially check off web nature
-		updatePrimaryNature(APTANA_WEB_NATURE);
 
 		Label l = new Label(workArea, SWT.NONE);
 		l.setText(EplMessages.WizardFolderImportPage_project_type_title);
 
 		// Table for project natures
+
+		natureContributors = PrimaryNaturesManager.getManager().getContributorsMap();
 
 		Composite tableComposite = new Composite(workArea, SWT.NONE);
 		tableComposite.setLayout(GridLayoutFactory.fillDefaults().numColumns(2).create());
@@ -268,7 +295,6 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 		fTableViewer.setLabelProvider(getLabelProvider());
 		fTableViewer.setComparator(getViewerComperator());
 		fTableViewer.setInput(ResourcesPlugin.getWorkspace());
-		fTableViewer.setCheckedElements(new String[] { fPrimaryNature });
 		fTableViewer.addCheckStateListener(this);
 		fTableViewer.addSelectionChangedListener(new ISelectionChangedListener()
 		{
@@ -287,6 +313,8 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 		updateButtons();
 
 		setPageComplete(validate());
+		setPrimaryNatureFromContributions(null);
+		fTableViewer.setCheckedElements(new String[] { fPrimaryNature });
 	}
 
 	/**
@@ -369,13 +397,10 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 				return false;
 			}
 
-			// Set a warning message if the imported project already contain certain project natures.
 			IPath path = Path.fromOSString(directoryPathField.getText());
-			boolean hasAlloyNature = hasAlloyNature(path);
-			if (hasAlloyNature)
-			{
-				updatePrimaryNature(ALLOY_NATURE);
-			}
+			setPrimaryNatureFromContributions(path);
+
+			// Set a warning message if the imported project already contain certain project natures.
 			IPath dotProjectPath = path.append(IProjectDescription.DESCRIPTION_FILE_NAME);
 
 			IProjectDescription description = null;
@@ -399,12 +424,12 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 							delimiter = ", "; //$NON-NLS-1$
 						}
 						String[] natureIds = description.getNatureIds();
-						if (hasAlloyNature) 
+						if (natureIds.length > 0 && !natureIds[0].equals(fPrimaryNature))
 						{
 							String[] oldNatures = natureIds;
-							natureIds = new String[description.getNatureIds().length+1];
+							natureIds = new String[description.getNatureIds().length + 1];
 							System.arraycopy(oldNatures, 0, natureIds, 1, oldNatures.length);
-							natureIds[0] = ALLOY_NATURE;
+							natureIds[0] = fPrimaryNature;
 						}
 						// set the natures checked in the nature table as they are the most relevant ones.
 						fTableViewer.setCheckedElements(natureIds);
@@ -423,23 +448,6 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 		setMessage(null);
 		setErrorMessage(null);
 		return true;
-	}
-
-	/*
-	 * The same functionality is available in Alloy plugin to verify whether a
-	 * project specified in a path contains alloy nature. However, since we can
-	 * not depend on alloy plugin from this wizard, this has to be hard-coded at
-	 * this moment.
-	 */
-	private boolean hasAlloyNature(IPath path)
-	{
-		File alloyConfigFile = path.append("app").append("views").append("index.xml").toFile(); //$NON-NLS-1$ //$NON-NLS-2$  //$NON-NLS-3$
-		if (alloyConfigFile.exists())
-		{
-			// Do we need to get the root element of this XML file to check whether it is 'Alloy' ?
-			return true;
-		}
-		return false;
 	}
 
 	/**
@@ -823,6 +831,7 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 	{
 		fPrimaryNature = nature;
 		fLabelProvider.setPrimaryNature(fPrimaryNature);
+		fTableViewer.refresh();
 	}
 
 	/**
