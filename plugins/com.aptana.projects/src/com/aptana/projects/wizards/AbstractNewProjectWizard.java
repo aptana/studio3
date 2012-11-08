@@ -251,7 +251,7 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 							catch (InvocationTargetException e)
 							{
 								throw new CoreException(new Status(IStatus.ERROR, ProjectsPlugin.PLUGIN_ID, 0, e
-										.getMessage(), e));
+										.getTargetException().getMessage(), e));
 							}
 
 							// Perform post project hooks
