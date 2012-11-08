@@ -22,6 +22,9 @@ public class Messages extends NLS
 
 	public static String QuickMenuDialog_NoMatchesFound;
 
+	public static String Sudo_AuthenticationDialog_Title;
+	public static String Sudo_Invalid_Password_Prompt;
+
 	public static String UIPlugin_automaticBuildsWarningMessage;
 	public static String UIPlugin_automaticBuildsWarningTitle;
 
