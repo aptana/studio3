@@ -12,6 +12,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.swt.widgets.Composite;
 
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.CollectionsUtil;
@@ -45,5 +47,15 @@ public abstract class AbstractProjectWizardContributor implements IProjectWizard
 	public IStatus performWizardFinish(IProject project)
 	{
 		return Status.OK_STATUS;
+	}
+
+	public void finalizeWizardPage(IWizardPage page)
+	{
+		// No-op
+	}
+
+	public void appendProjectCreationPage(Composite parent)
+	{
+		// No-op
 	}
 }

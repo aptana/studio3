@@ -59,6 +59,23 @@ public class ProjectWizardContributionManager
 		return pages.toArray(new IWizardPage[pages.size()]);
 	}
 
+	public void finalizeWizardPages(IWizardPage[] pages, String[] natureIds)
+	{
+		loadExtensions();
+		for (IWizardPage page : pages)
+		{
+			for (IProjectWizardContributor contributor : contributors)
+			{
+				if (!ArrayUtil.isEmpty(natureIds) && !contributor.hasNatureId(natureIds))
+				{
+					continue;
+				}
+
+				contributor.finalizeWizardPage(page);
+			}
+		}
+	}
+
 	public void contributeProjectCreationPage(String[] natureIds, Composite parent)
 	{
 		loadExtensions();

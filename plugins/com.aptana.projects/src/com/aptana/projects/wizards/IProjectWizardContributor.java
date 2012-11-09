@@ -27,6 +27,13 @@ public interface IProjectWizardContributor extends IExecutableExtension
 	public IWizardPage createWizardPage();
 
 	/**
+	 * Performs any specific finalization on all wizard pages
+	 * 
+	 * @param page
+	 */
+	public void finalizeWizardPage(IWizardPage page);
+
+	/**
 	 * Responsible for contributing UI to the project creation page of the wizard
 	 * 
 	 * @param parent
