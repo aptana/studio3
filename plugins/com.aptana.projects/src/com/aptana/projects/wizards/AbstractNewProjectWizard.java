@@ -208,6 +208,9 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 				page.initStepIndicator(stepNames);
 			}
 		}
+
+		// Finalize pages using contributors
+		projectWizardContributionManager.finalizeWizardPages(getPages(), getProjectNatures());
 	}
 
 	protected IWizardProjectCreationPage createMainPage()
