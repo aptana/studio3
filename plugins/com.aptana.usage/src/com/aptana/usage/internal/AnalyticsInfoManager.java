@@ -7,7 +7,9 @@
  */
 package com.aptana.usage.internal;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -154,18 +156,19 @@ public class AnalyticsInfoManager
 			if (analytics.overridesId != null && analyticsMap.containsKey(analytics.overridesId))
 			{
 				// replaces the overridden analytics info
-				String override = findOverride(analytics.overridesId, analyticsMap);
+				List<String> overriddenIds = new ArrayList<String>();
+				findOverriddenIds(overriddenIds, analytics.overridesId, analyticsMap);
 
-				if (override != null)
+				for (String id : overriddenIds)
 				{
-					analyticsMap.put(override, analytics);
+					analyticsMap.put(id, analytics);
 				}
 			}
 		}
 		fAnalyticsMap = new HashMap<String, AnalyticsInfoManager.Analytics>(analyticsMap);
 	}
 
-	private static String findOverride(String analyticsId, Map<String, Analytics> analyticsMap)
+	private static void findOverriddenIds(List<String> result, String analyticsId, Map<String, Analytics> analyticsMap)
 	{
 		Map<String, Analytics> tempMap = new HashMap<String, AnalyticsInfoManager.Analytics>(analyticsMap);
 		if (analyticsId != null && analyticsMap.containsKey(analyticsId))
@@ -173,17 +176,14 @@ public class AnalyticsInfoManager
 			Analytics analytics = tempMap.remove(analyticsId);
 			if (analytics != null)
 			{
+				result.add(analyticsId);
+				// checks if the overridden analytics overides another
 				if (analytics.overridesId != null)
 				{
-					String tempOverride = findOverride(analytics.overridesId, tempMap);
-					analyticsId = tempOverride != null ? tempOverride : analytics.overridesId;
+					findOverriddenIds(result, analytics.overridesId, tempMap);
 				}
-
-				return analyticsId;
 			}
 		}
-
-		return null;
 	}
 
 	private static class Analytics
