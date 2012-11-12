@@ -366,7 +366,11 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 				@Override
 				public IParseRootNode getAST() throws CoreException
 				{
-					return fEditor.getAST();
+					if (fEditor != null)
+					{
+						return fEditor.getAST();
+					}
+					return super.getAST();
 				}
 			};
 		}
@@ -376,7 +380,11 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 			@Override
 			public IParseRootNode getAST() throws CoreException
 			{
-				return fEditor.getAST();
+				if (fEditor != null)
+				{
+					return fEditor.getAST();
+				}
+				return super.getAST();
 			}
 		};
 	}
