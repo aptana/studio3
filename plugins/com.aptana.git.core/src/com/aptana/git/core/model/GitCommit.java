@@ -8,9 +8,26 @@
 package com.aptana.git.core.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+
+import org.eclipse.core.internal.refresh.RefreshManager;
+import org.eclipse.core.internal.resources.Workspace;
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
+
+import com.aptana.core.IMap;
+import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.StringUtil;
+import com.aptana.git.core.model.GitRepository.ReadWrite;
 
 /**
  * Represents a commit in the repo.
@@ -113,26 +130,47 @@ public class GitCommit
 	public synchronized List<Diff> getDiff()
 	{
 		if (diffs == null)
+		{
 			diffs = Diff.create(this);
+		}
 		return diffs;
+	}
+
+	private List<IResource> affectedResources()
+	{
+		IPath wd = repository.workingDirectory();
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		final IContainer container = root.getContainerForLocation(wd);
+		return CollectionsUtil.map(affectedPaths(), new IMap<IPath, IResource>()
+		{
+
+			public IResource map(IPath item)
+			{
+				return container.findMember(item);
+			}
+		});
 	}
 
 	public GitCommit getFirstParent()
 	{
-		if (parents() == null || parents().isEmpty())
+		if (CollectionsUtil.isEmpty(parents()))
+		{
 			return null;
+		}
 		return new GitCommit(repository, parentShas.get(0));
 	}
 
 	public boolean hasParent()
 	{
-		return parentShas != null && !parentShas.isEmpty();
+		return !CollectionsUtil.isEmpty(parentShas);
 	}
 
 	public int parentCount()
 	{
-		if (parentShas == null || parentShas.isEmpty())
+		if (CollectionsUtil.isEmpty(parentShas))
+		{
 			return 0;
+		}
 		return parentShas.size();
 	}
 
@@ -159,7 +197,9 @@ public class GitCommit
 	public int refCount()
 	{
 		if (!hasRefs())
+		{
 			return 0;
+		}
 		return getRefs().size();
 	}
 
@@ -188,5 +228,48 @@ public class GitCommit
 	public int hashCode()
 	{
 		return 31 * sha.hashCode() + repository.hashCode();
+	}
+
+	/**
+	 * Returns the collection of relative paths for files/folders affected by the commit.
+	 * 
+	 * @return
+	 */
+	private Collection<IPath> affectedPaths()
+	{
+		// TODO memoize?
+		// git show --pretty="format:" --name-only bd61ad98
+		// git diff-tree --name-only -r <commit-ish>
+		IPath wd = repository.workingDirectory();
+		IStatus status = repository.execute(ReadWrite.READ, wd, null, "diff-tree", "--name-only", "-r", sha); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (!status.isOK())
+		{
+			return Collections.emptyList();
+		}
+		String output = status.getMessage();
+		List<String> lines = Arrays.asList(StringUtil.LINE_SPLITTER.split(output));
+		lines = lines.subList(1, lines.size());
+		return CollectionsUtil.map(lines, new IMap<String, IPath>()
+		{
+			public IPath map(String line)
+			{
+				return Path.fromPortableString(line);
+			}
+		});
+	}
+
+	/**
+	 * Schedules a job to refresh the affected files for this commit.
+	 */
+	@SuppressWarnings("restriction")
+	public void refreshAffectedFiles()
+	{
+		Workspace w = (Workspace) ResourcesPlugin.getWorkspace();
+		RefreshManager rm = w.getRefreshManager();
+		List<IResource> affectedResources = affectedResources();
+		for (IResource r : affectedResources)
+		{
+			rm.refresh(r);
+		}
 	}
 }

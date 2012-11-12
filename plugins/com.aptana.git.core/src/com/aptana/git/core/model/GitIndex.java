@@ -560,8 +560,9 @@ public class GitIndex
 		{
 			try
 			{
-				return IOUtil.read(new FileInputStream(workingDirectory().append(file.portablePath).toFile()), IOUtil.UTF_8); // $codepro.audit.disable
-																														// closeWhereCreated
+				return IOUtil.read(new FileInputStream(workingDirectory().append(file.portablePath).toFile()),
+						IOUtil.UTF_8); // $codepro.audit.disable
+				// closeWhereCreated
 			}
 			catch (FileNotFoundException e)
 			{
@@ -569,7 +570,8 @@ public class GitIndex
 			}
 		}
 
-		IStatus result = repository.execute(GitRepository.ReadWrite.READ, "diff-files", parameter, "--", file.portablePath); //$NON-NLS-1$ //$NON-NLS-2$
+		IStatus result = repository.execute(GitRepository.ReadWrite.READ,
+				"diff-files", parameter, "--", file.portablePath); //$NON-NLS-1$ //$NON-NLS-2$
 		return result.getMessage();
 	}
 
@@ -731,6 +733,13 @@ public class GitIndex
 		return filtered;
 	}
 
+	/**
+	 * Aschedules a job to refresh the passed in filepaths. paths are expected to be relative to the repo root/working
+	 * dir!
+	 * 
+	 * @param paths
+	 *            A {@link Collection} of relative {@link IPath} - relative to the {@link #workingDirectory()}
+	 */
 	public void refreshAsync(final Collection<IPath> paths)
 	{
 		Job job = new Job("Refreshing git index") //$NON-NLS-1$

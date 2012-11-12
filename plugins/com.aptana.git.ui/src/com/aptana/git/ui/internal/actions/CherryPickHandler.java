@@ -131,6 +131,7 @@ public class CherryPickHandler extends AbstractHandler
 								.format("cherry-pick {0} returned non-zero exit value. wd: {1}", commit.sha(), currentRepo.workingDirectory()); //$NON-NLS-1$
 						IdeLog.logWarning(GitUIPlugin.getDefault(), msg);
 					}
+					commit.refreshAffectedFiles();
 				}
 				catch (CoreException e)
 				{
