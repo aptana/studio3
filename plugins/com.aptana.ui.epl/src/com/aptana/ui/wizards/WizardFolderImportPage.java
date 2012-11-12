@@ -179,7 +179,7 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 	private static String previouslyBrowsedDirectory = ""; //$NON-NLS-1$
 
 	private Button browseDirectoriesButton;
-	private Map<String, IPrimaryNatureContributor> natureContributors;
+	private Map<String, IPrimaryNatureContributor> natureContributors = new HashMap<String, IPrimaryNatureContributor>();
 
 	/**
 	 * Creates a new project creation wizard page.
@@ -262,20 +262,12 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 		workArea.setLayoutData(new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
 
 		createProjectsRoot(workArea);
-		if (directoryPath != null)
-		{
-			directoryPathField.setText(directoryPath);
-			setProjectName();
-			setPageComplete(true);
-		}
-		Dialog.applyDialogFont(workArea);
 
+		Dialog.applyDialogFont(workArea);
 		fLabelProvider = new NaturesLabelProvider(fNatureDescriptions);
 
 		Label l = new Label(workArea, SWT.NONE);
 		l.setText(EplMessages.WizardFolderImportPage_project_type_title);
-
-		// Table for project natures
 
 		natureContributors = PrimaryNaturesManager.getManager().getContributorsMap();
 
@@ -283,6 +275,7 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 		tableComposite.setLayout(GridLayoutFactory.fillDefaults().numColumns(2).create());
 		tableComposite.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 
+		// Table for project natures
 		fTableViewer = CheckboxTableViewer.newCheckList(tableComposite, SWT.TOP | SWT.BORDER);
 		Table table = fTableViewer.getTable();
 		table.setLinesVisible(true);
@@ -315,6 +308,13 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 		setPageComplete(validate());
 		setPrimaryNatureFromContributions(null);
 		fTableViewer.setCheckedElements(new String[] { fPrimaryNature });
+
+		if (directoryPath != null)
+		{
+			directoryPathField.setText(directoryPath);
+			setProjectName();
+			setPageComplete(true);
+		}
 	}
 
 	/**
