@@ -16,8 +16,10 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorInput;
@@ -343,5 +345,49 @@ public class EditorUtil
 	{
 		IProject project = getProject(editor);
 		return (project == null) ? null : project.getLocationURI();
+	}
+
+	/**
+	 * Finds the editor for the specified file in the specified project and prompts a save if the editor is dirty
+	 * 
+	 * @param project
+	 * @param fileName
+	 * @param promptQuestion
+	 * @return
+	 */
+	public static boolean verifySaveEditor(final IProject project, final String fileName, final String promptQuestion)
+	{
+		final boolean[] result = new boolean[] { true };
+		UIUtils.getDisplay().syncExec(new Runnable()
+		{
+			public void run()
+			{
+				IEditorPart[] dirtyEditors = UIUtils.getDirtyEditors();
+				if (dirtyEditors != null && dirtyEditors.length > 0)
+				{
+					IFile tiappFile = project.getFile(fileName);
+					// Try to locate the tiapp resource
+					for (IEditorPart editor : dirtyEditors)
+					{
+						IFile file = (IFile) (editor.getEditorInput().getAdapter(IFile.class));
+						if (file != null && file.equals(tiappFile))
+						{
+							// prompt for save
+							if (MessageDialog.openQuestion(UIUtils.getActiveShell(), Messages.EditorUtil_VerfiySavePromptTitle_lbl, promptQuestion))
+							{
+								editor.doSave(new NullProgressMonitor());
+							}
+							else
+							{
+								result[0] = false;
+							}
+							break;
+						}
+					}
+				}
+			}
+		});
+
+		return result[0];
 	}
 }
