@@ -141,6 +141,10 @@ public class GitCommit
 		IPath wd = repository.workingDirectory();
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		final IContainer container = root.getContainerForLocation(wd);
+		if (container == null)
+		{
+			return Collections.emptyList();
+		}
 		return CollectionsUtil.map(affectedPaths(), new IMap<IPath, IResource>()
 		{
 
