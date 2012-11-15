@@ -200,6 +200,19 @@ public class SWTUtils
 	}
 
 	/**
+	 * Convenience method for disposing of a control
+	 * 
+	 * @param control
+	 */
+	public static void disposeContorl(Control control)
+	{
+		if (control != null & !control.isDisposed())
+		{
+			control.dispose();
+		}
+	}
+
+	/**
 	 * Returns a version of the specified font, resized by the requested size.
 	 * 
 	 * @param font
