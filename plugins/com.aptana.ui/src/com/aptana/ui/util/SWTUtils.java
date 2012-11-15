@@ -204,9 +204,9 @@ public class SWTUtils
 	 * 
 	 * @param control
 	 */
-	public static void disposeContorl(Control control)
+	public static void disposeControl(Control control)
 	{
-		if (control != null & !control.isDisposed())
+		if (control != null && !control.isDisposed())
 		{
 			control.dispose();
 		}
