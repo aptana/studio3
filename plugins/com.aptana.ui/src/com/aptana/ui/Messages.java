@@ -43,6 +43,8 @@ public class Messages extends NLS
 	public static String EclipseDiagnosticLog_vm_args;
 	public static String EclipseDiagnosticLog_workspace_dir;
 
+	public static String SudoManager_MessagePrompt;
+
 	static
 	{
 		// initialize resource bundle

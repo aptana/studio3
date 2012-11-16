@@ -88,7 +88,7 @@ public class SudoManager
 	 * @return
 	 * @throws CoreException
 	 */
-	public char[] getPassword(final String message) throws CoreException
+	public char[] getPassword() throws CoreException
 	{
 		final IStatus[] status = new IStatus[] { Status.OK_STATUS };
 		if (validPassword.length == 0)
@@ -100,9 +100,9 @@ public class SudoManager
 					try
 					{
 						boolean retry;
+						String promptMessage = Messages.SudoManager_MessagePrompt;
 						do
 						{
-							String promptMessage = message;
 							retry = false;
 							SudoPasswordPromptDialog sudoDialog = new SudoPasswordPromptDialog(UIUtils
 									.getActiveWorkbenchWindow(), promptMessage);

@@ -47,11 +47,6 @@ public class SudoPasswordPromptDialog extends Dialog
 	private String promptMessage;
 	private static final String SECURITY_IMAGE = "/icons/full/security.png"; //$NON-NLS-1$
 
-	public SudoPasswordPromptDialog(IShellProvider parentShell)
-	{
-		this(parentShell, Messages.SudoPasswordPromptDialog_MessagePrompt_Prefix);
-	}
-
 	public SudoPasswordPromptDialog(IShellProvider parentShell, String promptMessage)
 	{
 		super(parentShell);
@@ -100,7 +95,6 @@ public class SudoPasswordPromptDialog extends Dialog
 
 		// ----------------------------------------------------------
 		// Composite for the header and prompt message.
-		// Composite parent = new Composite(shell, SWT.None);
 		parent.setLayout(GridLayoutFactory.swtDefaults().numColumns(2).equalWidth(false).create());
 		parent.setFont(msgPromptFont);
 
@@ -140,9 +134,10 @@ public class SudoPasswordPromptDialog extends Dialog
 		nameLbl.setLayoutData(GridDataFactory.swtDefaults().grab(true, false).align(SWT.END, SWT.BEGINNING).create());
 		nameLbl.setFont(authDetails.getFont());
 
-		Text nameText = new Text(fieldsComp, SWT.BORDER);
+		Text nameText = new Text(fieldsComp, SWT.BORDER | SWT.READ_ONLY);
 		nameText.setLayoutData(GridDataFactory.swtDefaults().grab(true, true).align(SWT.FILL, SWT.FILL).create());
 		nameText.setText(System.getProperty("user.name")); //$NON-NLS-1$
+		nameText.setForeground(parent.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 
 		Label pwdLbl = new Label(labels, SWT.None);
 		pwdLbl.setText(StringUtil.makeFormLabel(Messages.SudoPasswordPromptDialog_Password));
