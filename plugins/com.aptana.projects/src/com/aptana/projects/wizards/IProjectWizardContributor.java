@@ -9,6 +9,7 @@ package com.aptana.projects.wizards;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IExecutableExtension;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.widgets.Composite;
@@ -49,9 +50,11 @@ public interface IProjectWizardContributor extends IExecutableExtension
 	public boolean hasNatureId(String[] natureIds);
 
 	/**
-	 * Performs the work to finish the wizard
+	 * Performs the work to finish the wizard. Provides an optional monitor to record progress
 	 * 
+	 * @param project
+	 * @param monitor
 	 * @return
 	 */
-	public IStatus performWizardFinish(IProject project);
+	public IStatus performWizardFinish(IProject project, IProgressMonitor monitor);
 }

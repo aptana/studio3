@@ -365,6 +365,29 @@ public class SWTUtils
 	 */
 	public static void resizeControlWidthInGrid(Collection<Control> controls)
 	{
+		resizeControlSizeInGrid(controls, false, true);
+	}
+
+	/**
+	 * Evaluates each of the controls and determines the largest width. Then sets each control with the largest width.
+	 * Each control must have a GridData as its layout data
+	 * 
+	 * @param controls
+	 */
+	public static void resizeControlHeightInGrid(Collection<Control> controls)
+	{
+		resizeControlSizeInGrid(controls, true, false);
+	}
+
+	/**
+	 * Evaluates each of the controls and determines the largest width. Then sets each control with the largest width.
+	 * Each control must have a GridData as its layout data
+	 * 
+	 * @param controls
+	 */
+	private static void resizeControlSizeInGrid(Collection<Control> controls, boolean resizeHeight, boolean resizeWidth)
+	{
+		int largestHeight = SWT.DEFAULT;
 		int largestWidth = SWT.DEFAULT;
 		List<GridData> gridDatas = new ArrayList<GridData>();
 		for (Control control : controls)
@@ -375,16 +398,30 @@ public class SWTUtils
 				GridData gridData = (GridData) layoutData;
 				gridDatas.add(gridData);
 
-				if (gridData.widthHint > largestWidth)
+				if (resizeHeight && gridData.heightHint > largestHeight)
+				{
+					largestHeight = gridData.heightHint;
+				}
+				else if (resizeWidth && gridData.widthHint > largestWidth)
 				{
 					largestWidth = gridData.widthHint;
 				}
 				else
 				{
-					int preferredX = control.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
-					if (preferredX > largestWidth)
+					Point preferredSize = control.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+					if (resizeHeight)
 					{
-						largestWidth = preferredX;
+						if (preferredSize.y > largestHeight)
+						{
+							largestHeight = preferredSize.y;
+						}
+					}
+					else if (resizeWidth)
+					{
+						if (preferredSize.x > largestWidth)
+						{
+							largestWidth = preferredSize.x;
+						}
 					}
 				}
 			}
@@ -392,7 +429,14 @@ public class SWTUtils
 
 		for (GridData gridData : gridDatas)
 		{
-			gridData.widthHint = largestWidth;
+			if (resizeHeight)
+			{
+				gridData.heightHint = largestHeight;
+			}
+			else if (resizeWidth)
+			{
+				gridData.widthHint = largestWidth;
+			}
 		}
 	}
 

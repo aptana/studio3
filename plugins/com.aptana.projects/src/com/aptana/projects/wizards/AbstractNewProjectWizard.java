@@ -260,7 +260,7 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 
 						public void run(IProgressMonitor monitor) throws CoreException
 						{
-							SubMonitor subMonitor = SubMonitor.convert(monitor, 5);
+							SubMonitor subMonitor = SubMonitor.convert(monitor, 6);
 							try
 							{
 								createNewProject(subMonitor.newChild(4));
@@ -274,8 +274,8 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 							// Allow the project contributors to do work
 							ProjectWizardContributionManager projectWizardContributionManager = ProjectsPlugin
 									.getDefault().getProjectWizardContributionManager();
-							final IStatus contributorStatus = projectWizardContributionManager
-									.performProjectFinish(newProject);
+							final IStatus contributorStatus = projectWizardContributionManager.performProjectFinish(
+									newProject, subMonitor.newChild(1));
 							if (contributorStatus != null && !contributorStatus.isOK())
 							{
 								// FIXME This UI code shouldn't be here, throw an exception up and handle it!

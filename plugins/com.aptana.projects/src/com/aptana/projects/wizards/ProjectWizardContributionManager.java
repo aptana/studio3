@@ -14,6 +14,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
@@ -125,12 +126,12 @@ public class ProjectWizardContributionManager
 		}
 	}
 
-	public IStatus performProjectFinish(IProject project)
+	public IStatus performProjectFinish(IProject project, IProgressMonitor monitor)
 	{
 		loadExtensions();
 		for (IProjectWizardContributor contributor : contributors)
 		{
-			IStatus status = contributor.performWizardFinish(project);
+			IStatus status = contributor.performWizardFinish(project, monitor);
 			if (status != null && !status.isOK())
 			{
 				return status;
