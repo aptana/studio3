@@ -27,7 +27,6 @@ public class Messages extends NLS
 	public static String PasswordPromptDialog_SavePassword;
 	public static String PasswordPromptDialog_UserName;
 
-	public static String SudoPasswordPromptDialog_MessagePrompt_Prefix;
 	public static String SudoPasswordPromptDialog_MessagePrompt_Suffix;
 	public static String SudoPasswordPromptDialog_User;
 	public static String SudoPasswordPromptDialog_Password;
