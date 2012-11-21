@@ -30,7 +30,7 @@ import com.aptana.editor.epl.tests.EditorTestHelper;
 import com.aptana.editor.epl.tests.OpenEditorTest;
 import com.aptana.editor.epl.tests.ResourceTestHelper;
 import com.aptana.editor.js.JSPlugin;
-import com.aptana.editor.js.validator.JSLintValidator;
+import com.aptana.js.internal.core.build.JSLintValidator;
 
 public class OpenJSEditorTest extends OpenEditorTest
 {

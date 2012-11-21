@@ -28,10 +28,10 @@ import com.aptana.editor.coffee.parsing.lexer.CoffeeScanner;
 import com.aptana.editor.common.text.rules.CharacterMapRule;
 import com.aptana.editor.common.text.rules.QueuedRuleBasedScanner;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
-import com.aptana.editor.js.JSLanguageConstants;
 import com.aptana.editor.js.text.rules.JSIdentifierDetector;
 import com.aptana.editor.js.text.rules.JSNumberRule;
 import com.aptana.editor.js.text.rules.JSOperatorDetector;
+import com.aptana.js.core.JSLanguageConstants;
 
 public class CoffeeCodeScanner extends QueuedRuleBasedScanner
 {

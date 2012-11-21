@@ -17,13 +17,13 @@ import com.aptana.core.IFilter;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.util.EditorUtil;
-import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.JSLocationIdentifier;
 import com.aptana.editor.js.contentassist.ParseUtil;
-import com.aptana.editor.js.contentassist.model.FunctionElement;
-import com.aptana.editor.js.contentassist.model.PropertyElement;
-import com.aptana.editor.js.parsing.ast.JSGetPropertyNode;
 import com.aptana.index.core.Index;
+import com.aptana.js.core.index.JSIndexQueryHelper;
+import com.aptana.js.core.model.FunctionElement;
+import com.aptana.js.core.model.PropertyElement;
+import com.aptana.js.core.parsing.ast.JSGetPropertyNode;
 import com.aptana.parsing.ast.IParseNode;
 
 public class JSModelUtil

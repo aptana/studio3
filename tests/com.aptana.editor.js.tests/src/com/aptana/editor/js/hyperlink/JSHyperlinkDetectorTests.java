@@ -12,14 +12,14 @@ import org.eclipse.jface.text.hyperlink.IHyperlink;
 
 import com.aptana.core.util.ObjectUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.js.contentassist.index.JSFileIndexingParticipant;
-import com.aptana.editor.js.tests.JSEditorBasedTests;
+import com.aptana.editor.js.tests.JSEditorBasedTestCase;
 import com.aptana.index.core.IFileStoreIndexingParticipant;
+import com.aptana.js.core.index.JSFileIndexingParticipant;
 
 /**
  * JSHyperlinkDetectorTests
  */
-public class JSHyperlinkDetectorTests extends JSEditorBasedTests
+public class JSHyperlinkDetectorTests extends JSEditorBasedTestCase
 {
 	@Override
 	protected IFileStoreIndexingParticipant createIndexer()

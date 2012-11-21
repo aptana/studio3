@@ -10,7 +10,7 @@ package com.aptana.editor.js.outline;
 /**
  * @author Kevin Lindsey
  */
-public class BlockItemsTest extends BaseOutlineItemTest
+public class BlockItemsTest extends OutlineItemTestCase
 {
 
 	public void testVarArrayInFunction()

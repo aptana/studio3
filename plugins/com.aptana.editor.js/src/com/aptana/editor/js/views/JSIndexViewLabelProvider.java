@@ -17,13 +17,13 @@ import org.eclipse.swt.graphics.Image;
 
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.contentassist.JSModelFormatter;
-import com.aptana.editor.js.contentassist.model.BaseElement;
-import com.aptana.editor.js.contentassist.model.ClassElement;
-import com.aptana.editor.js.contentassist.model.ClassGroupElement;
-import com.aptana.editor.js.contentassist.model.EventElement;
-import com.aptana.editor.js.contentassist.model.FunctionElement;
-import com.aptana.editor.js.contentassist.model.JSElement;
-import com.aptana.editor.js.contentassist.model.PropertyElement;
+import com.aptana.js.core.model.BaseElement;
+import com.aptana.js.core.model.ClassElement;
+import com.aptana.js.core.model.ClassGroupElement;
+import com.aptana.js.core.model.EventElement;
+import com.aptana.js.core.model.FunctionElement;
+import com.aptana.js.core.model.JSElement;
+import com.aptana.js.core.model.PropertyElement;
 
 /**
  * JSIndexViewLabelProvider
@@ -166,7 +166,7 @@ public class JSIndexViewLabelProvider implements ILabelProvider, ILabelDecorator
 		}
 		else if (element instanceof BaseElement)
 		{
-			result = ((BaseElement<?>) element).getName();
+			result = ((BaseElement) element).getName();
 		}
 
 		return result;

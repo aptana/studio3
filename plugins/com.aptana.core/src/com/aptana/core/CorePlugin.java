@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChang
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.osgi.framework.BundleContext;
 
+import com.aptana.core.internal.UserAgentManager;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
@@ -44,6 +45,8 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 	private static CorePlugin plugin;
 
 	private BundleContext context;
+
+	private UserAgentManager fUserAgentManager;
 
 	/**
 	 * The constructor
@@ -76,7 +79,9 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 				return Status.OK_STATUS;
 			}
 		};
-		EclipseUtil.setSystemForJob(job);
+		// DO NOT CALL EclipseUtil.setSystemForJob!!! It breaks startup by causing plugin loading issues in
+		// resources.core plugin
+		job.setSystem(true);
 		job.schedule();
 	}
 
@@ -115,6 +120,11 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 		{
 			// Don't listen to debug changes anymore
 			EclipseUtil.instanceScope().getNode(CorePlugin.PLUGIN_ID).removePreferenceChangeListener(this);
+
+			if (fUserAgentManager != null)
+			{
+				fUserAgentManager = null;
+			}
 		}
 		finally
 		{
@@ -209,5 +219,14 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 			IdeLog.logError(getDefault(), e);
 		}
 		return null;
+	}
+
+	public synchronized IUserAgentManager getUserAgentManager()
+	{
+		if (fUserAgentManager == null)
+		{
+			fUserAgentManager = new UserAgentManager();
+		}
+		return fUserAgentManager;
 	}
 }

@@ -12,10 +12,10 @@ import java.util.List;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 
+import com.aptana.buildpath.core.tests.AbstractValidatorTestCase;
 import com.aptana.core.build.IBuildParticipant;
 import com.aptana.core.build.IBuildParticipantWorkingCopy;
 import com.aptana.core.build.IProblem;
-import com.aptana.editor.common.validation.AbstractValidatorTestCase;
 import com.aptana.editor.html.HTMLMetadataLoader;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.IHTMLConstants;

@@ -7,12 +7,12 @@
  */
 package com.aptana.editor.js.contentassist;
 
-import com.aptana.editor.js.parsing.ast.JSIdentifierNode;
-import com.aptana.editor.js.parsing.ast.JSNameValuePairNode;
-import com.aptana.editor.js.parsing.ast.JSNode;
-import com.aptana.editor.js.parsing.ast.JSParseRootNode;
-import com.aptana.editor.js.parsing.ast.JSStringNode;
-import com.aptana.editor.js.parsing.ast.JSTreeWalker;
+import com.aptana.js.core.parsing.ast.JSIdentifierNode;
+import com.aptana.js.core.parsing.ast.JSNameValuePairNode;
+import com.aptana.js.core.parsing.ast.JSNode;
+import com.aptana.js.core.parsing.ast.JSParseRootNode;
+import com.aptana.js.core.parsing.ast.JSStringNode;
+import com.aptana.js.core.parsing.ast.JSTreeWalker;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Range;

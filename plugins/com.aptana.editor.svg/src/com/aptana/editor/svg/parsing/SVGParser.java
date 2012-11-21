@@ -8,10 +8,10 @@
 package com.aptana.editor.svg.parsing;
 
 import com.aptana.editor.css.ICSSConstants;
-import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.xml.parsing.XMLParser;
 import com.aptana.editor.xml.parsing.ast.XMLElementNode;
 import com.aptana.editor.xml.parsing.lexer.XMLTokenType;
+import com.aptana.js.core.IJSConstants;
 import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
 

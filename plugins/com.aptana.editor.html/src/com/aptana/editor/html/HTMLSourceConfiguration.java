@@ -38,10 +38,10 @@ import com.aptana.editor.css.CSSSourceConfiguration;
 import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.html.contentassist.HTMLContentAssistProcessor;
 import com.aptana.editor.html.internal.text.rules.DocTypeRule;
-import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.JSSourceConfiguration;
 import com.aptana.editor.svg.ISVGConstants;
 import com.aptana.editor.svg.SVGSourceConfiguration;
+import com.aptana.js.core.IJSConstants;
 
 /**
  * @author Max Stepanov

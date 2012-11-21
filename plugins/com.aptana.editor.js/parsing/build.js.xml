@@ -19,34 +19,8 @@
 
     <target name="build">
         <jflex 
-            file="JS.flex" 
-            outdir="../src/com/aptana/editor/js/parsing" 
-            nobak="on"/>
-        
-        <jflex 
             file="JSPartitioning.flex" 
             outdir="../src/com/aptana/editor/js/parsing" 
             nobak="on"/>
-        
-        <jflex 
-            file="SDoc.flex" 
-            outdir="../src/com/aptana/editor/js/sdoc/parsing" 
-            nobak="on"/>
-        
-        <beaver 
-            file             = "JS.grammar"
-            destdir          = "../src"
-            exportTerminals  = "yes"
-            useSwitch        = "yes"/>
-        
-        <beaver 
-            file             = "SDoc.grammar"
-            destdir          = "../src"
-            exportTerminals  = "yes"
-            useSwitch        = "yes"/>
-        
     </target>
-                
-                
-    
 </project>

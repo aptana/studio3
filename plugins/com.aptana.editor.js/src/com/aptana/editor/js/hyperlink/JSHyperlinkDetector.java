@@ -18,7 +18,7 @@ import org.eclipse.jface.text.hyperlink.IHyperlink;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.js.parsing.ast.JSParseRootNode;
+import com.aptana.js.core.parsing.ast.JSParseRootNode;
 import com.aptana.parsing.ast.IParseNode;
 
 public class JSHyperlinkDetector extends AbstractHyperlinkDetector

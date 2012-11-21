@@ -18,8 +18,8 @@ import com.aptana.editor.common.ExtendedFastPartitioner;
 import com.aptana.editor.common.viewer.CommonMergeViewer;
 import com.aptana.editor.js.JSSourceConfiguration;
 import com.aptana.editor.js.JSSourceEditor;
-import com.aptana.editor.js.JSSourcePartitionScannerJFlex;
 import com.aptana.editor.js.JSSourceViewerConfiguration;
+import com.aptana.editor.js.text.JSSourcePartitionScannerJFlex;
 
 /**
  * @author cwilliams

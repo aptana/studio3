@@ -40,6 +40,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 
 import com.aptana.core.CoreStrings;
+import com.aptana.core.IUserAgent;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.CollectionsUtil;
@@ -49,7 +50,6 @@ import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.editor.common.contentassist.UserAgentFilterType;
 import com.aptana.editor.common.contentassist.UserAgentManager;
-import com.aptana.editor.common.contentassist.UserAgentManager.UserAgent;
 import com.aptana.ui.preferences.AptanaPreferencePage;
 import com.aptana.ui.preferences.PropertyAndPreferenceFieldEditorPage;
 
@@ -65,7 +65,7 @@ public class ContentAssistPreferencePage extends PropertyAndPreferenceFieldEdito
 	private String activeNatureID;
 	private CheckboxTableViewer categoryViewer;
 	private SortedMap<String, String> natureIDsByName;
-	private Map<String, UserAgent[]> userAgentsByNatureID;
+	private Map<String, IUserAgent[]> userAgentsByNatureID;
 
 	/**
 	 * UserAgentPreferencePage
@@ -307,7 +307,7 @@ public class ContentAssistPreferencePage extends PropertyAndPreferenceFieldEdito
 		createFilterSelector(parent);
 		UserAgentManager manager = UserAgentManager.getInstance();
 		// initialize nature to user agent map
-		userAgentsByNatureID = new HashMap<String, UserAgent[]>();
+		userAgentsByNatureID = new HashMap<String, IUserAgent[]>();
 		if (isProjectPreferencePage())
 		{
 			try
@@ -366,13 +366,13 @@ public class ContentAssistPreferencePage extends PropertyAndPreferenceFieldEdito
 			@Override
 			public int compare(Viewer viewer, Object e1, Object e2)
 			{
-				if (e1 instanceof UserAgent && e2 instanceof UserAgent)
+				if (e1 instanceof IUserAgent && e2 instanceof IUserAgent)
 				{
-					UserAgent ua1 = (UserAgent) e1;
-					UserAgent ua2 = (UserAgent) e2;
+					IUserAgent ua1 = (IUserAgent) e1;
+					IUserAgent ua2 = (IUserAgent) e2;
 
-					String uaName1 = StringUtil.getStringValue(ua1.name);
-					String uaName2 = StringUtil.getStringValue(ua2.name);
+					String uaName1 = StringUtil.getStringValue(ua1.getName());
+					String uaName2 = StringUtil.getStringValue(ua2.getName());
 
 					return uaName1.compareToIgnoreCase(uaName2);
 				}
@@ -404,14 +404,14 @@ public class ContentAssistPreferencePage extends PropertyAndPreferenceFieldEdito
 	 * 
 	 * @return
 	 */
-	protected UserAgent[] getSelectedUserAgents()
+	protected IUserAgent[] getSelectedUserAgents()
 	{
 		Object[] elements = categoryViewer.getCheckedElements();
-		UserAgent[] userAgents = new UserAgent[elements.length];
+		IUserAgent[] userAgents = new IUserAgent[elements.length];
 
 		for (int i = 0; i < elements.length; i++)
 		{
-			userAgents[i] = (UserAgent) elements[i];
+			userAgents[i] = (IUserAgent) elements[i];
 		}
 
 		return userAgents;
@@ -424,7 +424,7 @@ public class ContentAssistPreferencePage extends PropertyAndPreferenceFieldEdito
 	@Override
 	protected void performDefaults()
 	{
-		userAgentsByNatureID = new HashMap<String, UserAgent[]>();
+		userAgentsByNatureID = new HashMap<String, IUserAgent[]>();
 
 		UserAgentManager manager = UserAgentManager.getInstance();
 
@@ -454,15 +454,15 @@ public class ContentAssistPreferencePage extends PropertyAndPreferenceFieldEdito
 		IProject project = getProject();
 		if (project == null)
 		{
-			for (Map.Entry<String, UserAgent[]> entry : userAgentsByNatureID.entrySet())
+			for (Map.Entry<String, IUserAgent[]> entry : userAgentsByNatureID.entrySet())
 			{
 				String natureID = entry.getKey();
-				UserAgent[] userAgents = entry.getValue();
+				IUserAgent[] userAgents = entry.getValue();
 				String[] userAgentIDs = new String[userAgents.length];
 
 				for (int i = 0; i < userAgents.length; i++)
 				{
-					userAgentIDs[i] = userAgents[i].ID;
+					userAgentIDs[i] = userAgents[i].getID();
 				}
 
 				manager.setActiveUserAgents(natureID, userAgentIDs);
@@ -475,11 +475,11 @@ public class ContentAssistPreferencePage extends PropertyAndPreferenceFieldEdito
 			// Write changes to preferences (project-scope).
 			if (activeNatureID != null && !CollectionsUtil.isEmpty(userAgentsByNatureID))
 			{
-				UserAgent[] userAgents = userAgentsByNatureID.get(activeNatureID);
+				IUserAgent[] userAgents = userAgentsByNatureID.get(activeNatureID);
 				String[] userAgentIDs = new String[userAgents.length];
 				for (int i = 0; i < userAgents.length; i++)
 				{
-					userAgentIDs[i] = userAgents[i].ID;
+					userAgentIDs[i] = userAgents[i].getID();
 				}
 				manager.savePreference(project,
 						CollectionsUtil.newTypedMap(String.class, String[].class, activeNatureID, userAgentIDs));
@@ -506,7 +506,7 @@ public class ContentAssistPreferencePage extends PropertyAndPreferenceFieldEdito
 	{
 		String name = natureCombo.getText();
 		String natureID = natureIDsByName.get(name);
-		UserAgent[] userAgents = userAgentsByNatureID.get(natureID);
+		IUserAgent[] userAgents = userAgentsByNatureID.get(natureID);
 
 		categoryViewer.setCheckedElements(userAgents != null ? userAgents : UserAgentManager.NO_USER_AGENTS);
 	}
@@ -572,7 +572,7 @@ public class ContentAssistPreferencePage extends PropertyAndPreferenceFieldEdito
 		 */
 		public Image getColumnImage(Object element, int columnIndex)
 		{
-			return UserAgentManager.getInstance().getImage(((UserAgentManager.UserAgent) element).enabledIconPath);
+			return UserAgentManager.getInstance().getImage(((IUserAgent) element).getEnabledIconPath());
 		}
 
 		/**
@@ -580,7 +580,7 @@ public class ContentAssistPreferencePage extends PropertyAndPreferenceFieldEdito
 		 */
 		public String getColumnText(Object element, int columnIndex)
 		{
-			return ((UserAgentManager.UserAgent) element).name;
+			return ((IUserAgent) element).getName();
 		}
 	}
 }

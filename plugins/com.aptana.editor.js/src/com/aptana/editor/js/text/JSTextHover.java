@@ -34,11 +34,11 @@ import com.aptana.editor.common.hover.DocumentationBrowserInformationControlInpu
 import com.aptana.editor.js.contentassist.JSLocationIdentifier;
 import com.aptana.editor.js.contentassist.JSModelFormatter;
 import com.aptana.editor.js.contentassist.LocationType;
-import com.aptana.editor.js.contentassist.model.PropertyElement;
-import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
 import com.aptana.editor.js.hyperlink.JSHyperlinkDetector;
 import com.aptana.editor.js.internal.JSModelUtil;
 import com.aptana.index.core.Index;
+import com.aptana.js.core.model.PropertyElement;
+import com.aptana.js.core.model.ReturnTypeElement;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.ui.epl.UIEplPlugin;
 import com.aptana.ui.util.UIUtils;

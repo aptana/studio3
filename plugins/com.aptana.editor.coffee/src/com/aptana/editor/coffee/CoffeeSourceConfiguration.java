@@ -33,7 +33,7 @@ import com.aptana.editor.common.text.rules.CommentScanner;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
-import com.aptana.editor.js.JSEscapeSequenceScanner;
+import com.aptana.editor.js.text.JSEscapeSequenceScanner;
 import com.aptana.editor.js.text.rules.JSRegExpRule;
 
 /**

@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -8,10 +8,8 @@
 package com.aptana.editor.common.contentassist;
 
 import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,22 +20,19 @@ import java.util.Set;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
-import org.osgi.framework.Bundle;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.CorePlugin;
+import com.aptana.core.IUserAgent;
+import com.aptana.core.IUserAgentManager;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ArrayUtil;
-import com.aptana.core.util.CollectionsUtil;
-import com.aptana.core.util.ConfigurationElementDispatcher;
 import com.aptana.core.util.EclipseUtil;
-import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
@@ -45,121 +40,13 @@ import com.aptana.editor.common.IDebugScopes;
 import com.aptana.ui.epl.UIEplPlugin;
 import com.aptana.ui.util.UIUtils;
 
-public class UserAgentManager
+public class UserAgentManager implements IUserAgentManager
 {
-	/**
-	 * A class used to process default-user-agents elements in our user agent extension point
-	 */
-	private class DefaultUserAgentsProcessor implements IConfigurationElementProcessor
-	{
-		public void processElement(IConfigurationElement element)
-		{
-			String natureID = element.getAttribute(ATTR_NATURE_ID);
-
-			for (IConfigurationElement ref : element.getChildren(ELEMENT_USER_AGENT_REF))
-			{
-				String userAgentID = ref.getAttribute(ATTR_USER_AGENT_ID);
-
-				addDefaultUserAgentID(natureID, userAgentID);
-			}
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * @see com.aptana.core.util.IConfigurationElementProcessor#getSupportElementNames()
-		 */
-		public Set<String> getSupportElementNames()
-		{
-			return CollectionsUtil.newSet(ELEMENT_DEFAULT_USER_AGENTS);
-		}
-	}
-
-	/**
-	 * A user agent container
-	 */
-	public static class UserAgent implements Comparable<UserAgent>
-	{
-		public final String ID;
-		public final String name;
-		public final String enabledIconPath;
-		public final String disabledIconPath;
-
-		public UserAgent(String ID, String name, String enabledIconPath, String disabledIconPath)
-		{
-			this.ID = ID;
-			this.name = name;
-			this.enabledIconPath = enabledIconPath;
-			this.disabledIconPath = disabledIconPath;
-		}
-
-		public int compareTo(UserAgent o)
-		{
-			String name = (o != null) ? o.name : StringUtil.EMPTY;
-
-			return this.name.compareToIgnoreCase(name);
-		}
-	}
-
-	/**
-	 * A class used to process user-agent elements in our user agent extension point
-	 */
-	private class UserAgentProcessor implements IConfigurationElementProcessor
-	{
-		public void processElement(IConfigurationElement element)
-		{
-			String agentID = element.getAttribute(ATTR_ID);
-
-			if (agentID != null)
-			{
-				Bundle bundle = Platform.getBundle(element.getNamespaceIdentifier());
-
-				String agentIconPath = element.getAttribute(ATTR_ICON);
-				if (agentIconPath != null)
-				{
-					URL url = bundle.getEntry(agentIconPath);
-					agentIconPath = ResourceUtil.resourcePathToString(url);
-				}
-
-				String agentIconDisabledPath = element.getAttribute(ATTR_ICON_DISABLED);
-				if (agentIconDisabledPath != null)
-				{
-					URL url = bundle.getEntry(agentIconDisabledPath);
-					agentIconDisabledPath = ResourceUtil.resourcePathToString(url);
-				}
-
-				String agentName = element.getAttribute(ATTR_NAME);
-				USER_AGENTS_BY_ID.put(agentID, new UserAgent(agentID, agentName, agentIconPath, agentIconDisabledPath));
-			}
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * @see com.aptana.core.util.IConfigurationElementProcessor#getSupportElementNames()
-		 */
-		public Set<String> getSupportElementNames()
-		{
-			return CollectionsUtil.newSet(ELEMENT_USER_AGENT);
-		}
-	}
-
-	public static final UserAgent[] NO_USER_AGENTS = new UserAgent[0];
 
 	/**
 	 * A reference to the singleton UserAgentManager object
 	 */
 	private static UserAgentManager INSTANCE;
-
-	/**
-	 * A purposely malformed nature id used by the user agent extension point to define a list of default user agents
-	 * for unrecognized nature ids
-	 */
-	private static final String OTHER_NATURE_ID = "<other>"; //$NON-NLS-1$
-
-	/**
-	 * A list of user agents to use as a default in the cases when we don't have a default set for a given nature id and
-	 * we don't have a special "other" default list. Most likely this will never be used
-	 */
-	private static final String[] LAST_RESORT_DEFAULT_USER_AGENT = new String[] { "IE", "Mozilla", "Chrome" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 	/**
 	 * The delimiter used between a list of user agent ids in the preference value
@@ -177,62 +64,12 @@ public class UserAgentManager
 	private static final String NAME_VALUE_SEPARATOR = ":"; //$NON-NLS-1$
 
 	/**
-	 * A mapping of user agent ID to its corresponding UserAgent instance. This is a global map and contains all user
-	 * agents known at runtime
-	 */
-	private static final Map<String, UserAgent> USER_AGENTS_BY_ID = new HashMap<String, UserAgent>();
-
-	/**
-	 * A mapping of nature ID to a list of user agent ids. The user agent id list contains the ids which are considered
-	 * to be the default user agents for the given nature. The user agent list is defined via the default-user-agents
-	 * element in the userAgent extension point
-	 */
-	private static Map<String, Set<String>> DEFAULT_USER_AGENT_IDS = new HashMap<String, Set<String>>();
-
-	/**
 	 * A mapping of nature ID to an array of user agent ids. The user agent id array contains the ids which are
 	 * currently active for the given nature. This is mainly a in-memory cache of the string representation in the
 	 * preference key. This structure is generated by {@link #loadPreference()} and is converted to a preference key
 	 * value via {@link #savePreference()}
 	 */
 	private static Map<String, String[]> ACTIVE_USER_AGENTS_BY_NATURE_ID;
-
-	/**
-	 * The extension point id for the user agent extension
-	 */
-	private static final String USERAGENT_ID = "userAgent"; //$NON-NLS-1$
-
-	// user-agent element and its attributes
-	private static final String ELEMENT_USER_AGENT = "user-agent"; //$NON-NLS-1$
-	private static final String ATTR_NAME = "name"; //$NON-NLS-1$
-	private static final String ATTR_ID = "id"; //$NON-NLS-1$
-	private static final String ATTR_ICON = "icon"; //$NON-NLS-1$
-	private static final String ATTR_ICON_DISABLED = "icon-disabled"; //$NON-NLS-1$
-
-	// default-user-agents element and its attributes
-	private static final String ELEMENT_DEFAULT_USER_AGENTS = "default-user-agents"; //$NON-NLS-1$
-	private static final String ELEMENT_USER_AGENT_REF = "user-agent-ref"; //$NON-NLS-1$
-	private static final String ATTR_NATURE_ID = "nature-id"; //$NON-NLS-1$
-	private static final String ATTR_USER_AGENT_ID = "user-agent-id"; //$NON-NLS-1$
-
-	/**
-	 * Add a user agent ID to the list of IDs for a given nature. These IDs are considered to be default user agents for
-	 * that nature.
-	 * 
-	 * @param natureID
-	 *            The nature ID to which to associate the user agent ID
-	 * @param userAgentID
-	 *            The user agent ID to associate with the given natureID. Adding duplicated user agent ids is OK
-	 */
-	private static void addDefaultUserAgentID(String natureID, String userAgentID)
-	{
-		if (!DEFAULT_USER_AGENT_IDS.containsKey(natureID))
-		{
-			DEFAULT_USER_AGENT_IDS.put(natureID, new HashSet<String>());
-		}
-
-		DEFAULT_USER_AGENT_IDS.get(natureID).add(userAgentID);
-	}
 
 	/**
 	 * Grab the singleton instance of the UserAgentManager. This method is responsible for creating the instance if it
@@ -245,7 +82,6 @@ public class UserAgentManager
 		if (INSTANCE == null)
 		{
 			INSTANCE = new UserAgentManager();
-			INSTANCE.loadExtension();
 			INSTANCE.loadPreference();
 		}
 
@@ -306,7 +142,7 @@ public class UserAgentManager
 	 * @param project
 	 * @return An array of project nature ids.
 	 */
-	public static String[] getProjectNatures(IProject project)
+	private static String[] getProjectNatures(IProject project)
 	{
 		String[] natureIDs = ArrayUtil.NO_STRINGS;
 		try
@@ -330,7 +166,7 @@ public class UserAgentManager
 	 *            An array of nature IDs to process
 	 * @return Returns an array of user agent IDs
 	 */
-	public String[] getActiveUserAgentIDs(String... natureIDs)
+	private String[] getActiveUserAgentIDs(String... natureIDs)
 	{
 		return getActiveUserAgentIDs(ACTIVE_USER_AGENTS_BY_NATURE_ID, natureIDs);
 	}
@@ -367,7 +203,7 @@ public class UserAgentManager
 	 * 
 	 * @return Returns an array array of UserAgent instances
 	 */
-	public UserAgent[] getActiveUserAgents(IProject project)
+	public IUserAgent[] getActiveUserAgents(IProject project)
 	{
 		return getUserAgentsByID(getActiveUserAgentIDs(project));
 	}
@@ -378,7 +214,7 @@ public class UserAgentManager
 	 * 
 	 * @return Returns an array array of UserAgent instances
 	 */
-	public UserAgent[] getActiveUserAgents(String... natureIDs)
+	public IUserAgent[] getActiveUserAgents(String... natureIDs)
 	{
 		return getUserAgentsByID(getActiveUserAgentIDs(natureIDs));
 	}
@@ -388,11 +224,9 @@ public class UserAgentManager
 	 * 
 	 * @return Returns an array of UserAgent instances
 	 */
-	public UserAgent[] getAllUserAgents()
+	public IUserAgent[] getAllUserAgents()
 	{
-		Collection<UserAgent> userAgents = USER_AGENTS_BY_ID.values();
-
-		return userAgents.toArray(new UserAgent[userAgents.size()]);
+		return CorePlugin.getDefault().getUserAgentManager().getAllUserAgents();
 	}
 
 	/**
@@ -403,53 +237,22 @@ public class UserAgentManager
 	 * @param natureID
 	 *            The nature ID to use when looking up the default user agent ID list
 	 * @return Returns an array of user agent IDs
+	 * @deprecated
 	 */
 	public String[] getDefaultUserAgentIDs(String natureID)
 	{
-		String[] result;
-
-		if (DEFAULT_USER_AGENT_IDS.containsKey(natureID))
+		IUserAgent[] agents = getDefaultUserAgents(natureID);
+		String[] result = new String[agents.length];
+		for (int i = 0; i < agents.length; i++)
 		{
-			// get default list defined specifically for this nature
-			Set<String> userAgentIDs = DEFAULT_USER_AGENT_IDS.get(natureID);
-
-			result = userAgentIDs.toArray(new String[userAgentIDs.size()]);
+			result[i] = agents[i].getID();
 		}
-		else if (DEFAULT_USER_AGENT_IDS.containsKey(OTHER_NATURE_ID))
-		{
-			// use default list for "other" nature if we didn't get a recognizable nature
-			Set<String> userAgentIDs = DEFAULT_USER_AGENT_IDS.get(OTHER_NATURE_ID);
-
-			result = userAgentIDs.toArray(new String[userAgentIDs.size()]);
-		}
-		else
-		{
-			// use our "last resort" default list if we didn't have an "other" list
-			result = LAST_RESORT_DEFAULT_USER_AGENT;
-		}
-
 		return result;
 	}
 
-	/**
-	 * Returns a list of UserAgent instances which are the default user agents for the specified nature. Internally,
-	 * this method uses {@link #getDefaultUserAgentIDs(String)}
-	 * 
-	 * @param natureID
-	 *            The nature ID to use when looking up the default UserAgent list
-	 * @return Returns an array of UserAgent instances
-	 */
-	public UserAgent[] getDefaultUserAgents(String natureID)
+	public IUserAgent[] getDefaultUserAgents(String natureID)
 	{
-		UserAgent[] result = NO_USER_AGENTS;
-		String[] userAgentIDs = getDefaultUserAgentIDs(natureID);
-
-		if (userAgentIDs != null)
-		{
-			result = getUserAgentsByID(userAgentIDs);
-		}
-
-		return result;
+		return CorePlugin.getDefault().getUserAgentManager().getDefaultUserAgents(natureID);
 	}
 
 	/**
@@ -503,7 +306,7 @@ public class UserAgentManager
 	 */
 	public Image[] getUserAgentImages(IProject project, String... userAgents)
 	{
-		UserAgent[] activeUserAgents = getActiveUserAgents(project);
+		IUserAgent[] activeUserAgents = getActiveUserAgents(project);
 		Set<String> enabledAgents;
 		if (userAgents == null)
 		{
@@ -519,14 +322,14 @@ public class UserAgentManager
 
 		for (int i = 0; i < activeUserAgents.length; i++)
 		{
-			UserAgent userAgent = activeUserAgents[i];
+			IUserAgent userAgent = activeUserAgents[i];
 
 			if (userAgent != null)
 			{
 				// @formatter:off
-				result[i] = (enabledAgents.contains(userAgent.ID))
-					? getImage(userAgent.enabledIconPath)
-					: getImage(userAgent.disabledIconPath);
+				result[i] = (enabledAgents.contains(userAgent.getID()))
+					? getImage(userAgent.getEnabledIconPath())
+					: getImage(userAgent.getDisabledIconPath());
 				// @formatter:on
 			}
 		}
@@ -541,16 +344,15 @@ public class UserAgentManager
 	 *            An array of user agent ids
 	 * @return Returns an array of UserAgent instances
 	 */
-	public UserAgent[] getUserAgentsByID(String... ids)
+	private IUserAgent[] getUserAgentsByID(String... ids)
 	{
-		List<UserAgent> result = new ArrayList<UserAgent>();
+		List<IUserAgent> result = new ArrayList<IUserAgent>();
 
 		if (ids != null && ids.length > 0)
 		{
 			for (String id : ids)
 			{
-				UserAgent userAgent = USER_AGENTS_BY_ID.get(id);
-
+				IUserAgent userAgent = getUserAgentById(id);
 				if (userAgent != null)
 				{
 					result.add(userAgent);
@@ -558,30 +360,12 @@ public class UserAgentManager
 			}
 		}
 
-		return result.toArray(new UserAgent[result.size()]);
+		return result.toArray(new IUserAgent[result.size()]);
 	}
 
-	/**
-	 * Process the userAgent extension point. This populates the global list of known UserAgents and populates the
-	 * default user agent list per nature. This is expected to be run only once and is called when the singleton
-	 * instance is created.
-	 */
-	private void loadExtension()
+	public IUserAgent getUserAgentById(String id)
 	{
-		// @formatter:off
-		// configure dispatcher for each element type we process
-		ConfigurationElementDispatcher dispatcher = new ConfigurationElementDispatcher(
-			new UserAgentProcessor(),
-			new DefaultUserAgentsProcessor()
-		);
-
-		// configure dispatcher for each element type we process
-		EclipseUtil.processConfigurationElements(
-			CommonEditorPlugin.PLUGIN_ID,
-			USERAGENT_ID,
-			dispatcher
-		);
-		// @formatter:on
+		return CorePlugin.getDefault().getUserAgentManager().getUserAgentById(id);
 	}
 
 	/**
@@ -590,7 +374,7 @@ public class UserAgentManager
 	 * (and it shouldn't be), then this method will need to be invoked to update the in-memory cache of
 	 * nature/user-agent info.
 	 */
-	public void loadPreference()
+	void loadPreference()
 	{
 		// Grab preference value. We use a ChainedPreferenceStore to be able to migrate the preference location from the
 		// UIEplPlugin to the CommonEditorPlugin (the new location that we will use to save the
@@ -660,32 +444,20 @@ public class UserAgentManager
 		return result;
 	}
 
-	/**
-	 * Save the current in-memory cache of nature/user-agent info to the UserAgentManager preference key. Note that
-	 * changes made to the cache via {@link #setActiveUserAgents(String, String[])} will not be automatically reflected
-	 * in the preference key value. This method needs to be called to make those changes persist between Studio
-	 * sessions.<br>
-	 * This method should be called when saving the workspace-scope settings. For a project-specific scope, use
-	 * {@link #savePreference(IProject, Map)}.
-	 * 
-	 * @see #savePreference(IProject, Map)
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.IUserAgentPreferenceManager#savePreference()
 	 */
 	public void savePreference()
 	{
 		savePreference(null, ACTIVE_USER_AGENTS_BY_NATURE_ID);
 	}
 
-	/**
-	 * Save the current in-memory cache of nature/user-agent info to the UserAgentManager preference key. Note that
-	 * changes made to the cache via {@link #setActiveUserAgents(String, String[])} will not be automatically reflected
-	 * in the preference key value. This method needs to be called to make those changes persist between Studio
-	 * sessions.
-	 * 
-	 * @param project
-	 *            An {@link IProject}. Non <code>null</code> when saved for a specific project. <code>null</code> when
-	 *            the settings are saved as a workspace-level.
-	 * @param natureIdToUserAgents
-	 *            A map that holds mapping between nature-ids to user-agents.
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.editor.common.contentassist.IUserAgentPreferenceManager#savePreference(org.eclipse.core.resources.
+	 * IProject, java.util.Map)
 	 */
 	public void savePreference(IProject project, Map<String, String[]> natureIdToUserAgents)
 	{
@@ -733,10 +505,11 @@ public class UserAgentManager
 		}
 	}
 
-	/**
-	 * Clear a project-specific User-Agents setting for a given project.
-	 * 
-	 * @param project
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.editor.common.contentassist.IUserAgentPreferenceManager#clearPreferences(org.eclipse.core.resources
+	 * .IProject)
 	 */
 	public void clearPreferences(IProject project)
 	{

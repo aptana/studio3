@@ -24,8 +24,8 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.test.performance.PerformanceTestCase;
 
 import com.aptana.core.build.UnifiedBuilder;
+import com.aptana.core.tests.TestProject;
 import com.aptana.core.util.ResourceUtil;
-import com.aptana.editor.common.tests.util.TestProject;
 import com.aptana.editor.js.JSPlugin;
 
 public class JSBuildPerformanceTest extends PerformanceTestCase

@@ -8,11 +8,11 @@
 package com.aptana.editor.js.formatter.nodes;
 
 import com.aptana.editor.js.formatter.JSFormatterConstants;
-import com.aptana.editor.js.parsing.ast.JSArgumentsNode;
-import com.aptana.editor.js.parsing.ast.JSBinaryOperatorNode;
-import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
+import com.aptana.js.core.parsing.ast.IJSNodeTypes;
+import com.aptana.js.core.parsing.ast.JSArgumentsNode;
+import com.aptana.js.core.parsing.ast.JSBinaryOperatorNode;
 import com.aptana.parsing.ast.IParseNode;
 
 /**

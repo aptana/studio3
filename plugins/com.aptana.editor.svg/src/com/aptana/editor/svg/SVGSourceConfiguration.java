@@ -34,13 +34,13 @@ import com.aptana.editor.common.text.rules.TagRule;
 import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
 import com.aptana.editor.css.CSSSourceConfiguration;
 import com.aptana.editor.css.ICSSConstants;
-import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.JSSourceConfiguration;
 import com.aptana.editor.svg.contentassist.SVGContentAssistProcessor;
 import com.aptana.editor.xml.IXMLConstants;
 import com.aptana.editor.xml.XMLScanner;
 import com.aptana.editor.xml.XMLSourceConfiguration;
 import com.aptana.editor.xml.XMLTagScanner;
+import com.aptana.js.core.IJSConstants;
 
 /**
  * SVGSourceConfiguration

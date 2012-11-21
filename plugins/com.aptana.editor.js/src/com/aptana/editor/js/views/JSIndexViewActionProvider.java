@@ -17,16 +17,16 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 
 import com.aptana.core.util.CollectionsUtil;
-import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
-import com.aptana.editor.js.contentassist.model.ClassElement;
-import com.aptana.editor.js.contentassist.model.PropertyElement;
-import com.aptana.editor.js.contentassist.model.TypeElement;
-import com.aptana.editor.js.inferencing.JSTypeUtil;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.IndexPlugin;
 import com.aptana.index.core.ui.views.IActionProvider;
 import com.aptana.index.core.ui.views.IndexView;
+import com.aptana.js.core.index.JSIndexQueryHelper;
+import com.aptana.js.core.inferencing.JSTypeUtil;
+import com.aptana.js.core.model.ClassElement;
+import com.aptana.js.core.model.PropertyElement;
+import com.aptana.js.core.model.TypeElement;
 
 /**
  * JSIndexViewActionProvider

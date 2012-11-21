@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.aptana.core.util.StringUtil;
-import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
+import com.aptana.js.core.parsing.ast.IJSNodeTypes;
 import com.aptana.parsing.ast.IParseNode;
 
 /**

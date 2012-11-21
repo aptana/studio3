@@ -34,7 +34,7 @@ import com.aptana.editor.html.internal.text.rules.TagNameWordDetector;
 import com.aptana.editor.html.internal.text.rules.TagWordRule;
 import com.aptana.editor.html.parsing.HTMLUtils;
 import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
-import com.aptana.editor.js.JSCodeScanner;
+import com.aptana.editor.js.text.JSCodeScanner;
 
 /**
  * @author Max Stepanov

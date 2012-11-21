@@ -1,0 +1,72 @@
+/**
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
+package com.aptana.js.core.index;
+
+public interface IJSIndexConstants
+{
+	// the content format version of the JS index files
+	// 0.1 - Initial version
+	// 0.11 - Use UUIDs for foreign keys
+	// 0.12 - FunctionElements have types and returnTypes now
+	// 0.13 - Fix UserAgent foreign keys
+	// 0.14 - Fix to StringUtil.join to not include null values in final string
+	// 0.15 - Write user agent list from UserAgentManager to index as well
+	// 0.16 - Change field order when writing properties and functions (search optimization)
+	// 0.17 - Modified static properties in DOM files, changing them to instance where appropriate.
+	// 0.18 - Window now inherits from Global
+	// 0.19 - Fix Document.forms type in dom_2.xml
+	// 0.20 - Added Error class as a property of Window
+	// 0.21 - Using JSON for property and function content assist model elements
+	// 0.22 - Add events, examples, remarks, and a deprecated flag to type elements
+	// 0.23 - Fix Window.Math property
+	// 0.24 - Fix String.fromCharCode
+	// 0.25 - Fix document.body type
+	// 0.26 - Fix parsing of arrays in this format: IDENT LPAREN RPAREN
+	// 0.27 - Add isInternal property to type elements
+	// 0.28 - Include events when reading/writing types from/to indexes. Generate "user type" names from context, if
+	// possible
+	// 0.29 - Update some DOM 2 content for Document
+	// 0.30 - Update some DOM 0 content for Window
+	// 0.31 - Added "requires" to index
+	// 0.32 - Transfer user agents from JSCA types to the properties that point to them
+	// 0.33 - Include function parameter and return values when they're not defined in sdoc comments
+	// 0.34 - Include initial ECMAScript 5.1 changes
+	public static final double INDEX_VERSION = 0.34;
+
+	// for debugging, comment the line above, and uncomment the following
+	// public static final double INDEX_VERSION = new Random().nextDouble() * 1e6;
+
+	// general constants
+	static final String PREFIX = "js."; //$NON-NLS-1$
+	static final String METADATA_FILE_LOCATION = PREFIX + "metadata"; //$NON-NLS-1$
+	static final String METADATA_INDEX_LOCATION = "metadata:/js"; //$NON-NLS-1$
+	static final String DELIMITER = "\0"; //$NON-NLS-1$
+	static final String SUB_DELIMITER = ","; //$NON-NLS-1$
+	static final String CORE = "JS Core"; //$NON-NLS-1$
+	static final String NESTED_TYPE_SEPARATOR = "#"; //$NON-NLS-1$
+
+	// index categories
+	static final String TYPE = PREFIX + "type"; //$NON-NLS-1$
+	static final String FUNCTION = PREFIX + "function"; //$NON-NLS-1$
+	static final String PROPERTY = PREFIX + "property"; //$NON-NLS-1$
+	static final String EVENT = PREFIX + "event"; //$NON-NLS-1$
+	static final String REQUIRE = PREFIX + "require"; //$NON-NLS-1$
+
+	// @formatter:off
+	static final String[] ALL_CATEGORIES = new String[]
+	{
+		TYPE,
+		FUNCTION,
+		PROPERTY,
+		EVENT
+	};
+	// @formatter:on
+
+	// special values
+	static final String NO_ENTRY = "-1"; //$NON-NLS-1$
+}

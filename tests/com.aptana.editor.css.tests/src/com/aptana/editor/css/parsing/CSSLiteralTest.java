@@ -10,8 +10,8 @@ package com.aptana.editor.css.parsing;
 import java.util.List;
 
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.ListCrossProduct;
 import com.aptana.core.util.StringUtil;
-import com.aptana.editor.common.tests.util.ListCrossProduct;
 import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 
 public class CSSLiteralTest extends CSSTokensTest

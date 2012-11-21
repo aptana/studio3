@@ -32,12 +32,12 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.part.FileEditorInput;
 
+import com.aptana.core.tests.TestProject;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.contentassist.ILexemeProvider;
 import com.aptana.editor.common.tests.util.AssertUtil;
-import com.aptana.editor.common.tests.util.TestProject;
 import com.aptana.editor.html.BadDocument;
 import com.aptana.editor.html.HTMLMetadataLoader;
 import com.aptana.editor.html.HTMLPlugin;

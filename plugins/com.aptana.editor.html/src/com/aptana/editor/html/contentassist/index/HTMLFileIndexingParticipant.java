@@ -24,11 +24,11 @@ import com.aptana.editor.css.contentassist.index.CSSFileIndexingParticipant;
 import com.aptana.editor.css.contentassist.index.ICSSIndexConstants;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
-import com.aptana.editor.js.IJSConstants;
-import com.aptana.editor.js.contentassist.index.JSFileIndexingParticipant;
 import com.aptana.index.core.AbstractFileIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.build.BuildContext;
+import com.aptana.js.core.IJSConstants;
+import com.aptana.js.core.index.JSFileIndexingParticipant;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.util.ParseUtil;
 

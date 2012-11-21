@@ -19,11 +19,8 @@ public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.editor.js.messages"; //$NON-NLS-1$
 
-	public static String JSMetadataLoader_Rebuilding_Project_Indexes;
-	public static String JSMetadataLoader_RebuildingProjectIndexError_Message;
-	public static String JSMetadataLoader_RebuildingProjectIndexError_Title;
-	public static String Loading_Metadata;
 	public static String openDeclaration_label;
+
 	private static ResourceBundle fResourceBundle;
 
 	static

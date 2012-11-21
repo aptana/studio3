@@ -14,17 +14,17 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.text.AbstractFoldingComputer;
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.js.JSPlugin;
-import com.aptana.editor.js.parsing.ast.JSArgumentsNode;
-import com.aptana.editor.js.parsing.ast.JSArrayNode;
-import com.aptana.editor.js.parsing.ast.JSCommentNode;
-import com.aptana.editor.js.parsing.ast.JSForNode;
-import com.aptana.editor.js.parsing.ast.JSFunctionNode;
-import com.aptana.editor.js.parsing.ast.JSGroupNode;
-import com.aptana.editor.js.parsing.ast.JSObjectNode;
-import com.aptana.editor.js.parsing.ast.JSParametersNode;
-import com.aptana.editor.js.parsing.ast.JSStatementsNode;
-import com.aptana.editor.js.parsing.ast.JSSwitchNode;
 import com.aptana.editor.js.preferences.IPreferenceConstants;
+import com.aptana.js.core.parsing.ast.JSArgumentsNode;
+import com.aptana.js.core.parsing.ast.JSArrayNode;
+import com.aptana.js.core.parsing.ast.JSCommentNode;
+import com.aptana.js.core.parsing.ast.JSForNode;
+import com.aptana.js.core.parsing.ast.JSFunctionNode;
+import com.aptana.js.core.parsing.ast.JSGroupNode;
+import com.aptana.js.core.parsing.ast.JSObjectNode;
+import com.aptana.js.core.parsing.ast.JSParametersNode;
+import com.aptana.js.core.parsing.ast.JSStatementsNode;
+import com.aptana.js.core.parsing.ast.JSSwitchNode;
 import com.aptana.parsing.ast.IParseNode;
 
 public class JSFoldingComputer extends AbstractFoldingComputer implements IFoldingComputer

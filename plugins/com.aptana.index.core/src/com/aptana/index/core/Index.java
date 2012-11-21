@@ -703,6 +703,10 @@ public class Index
 				System.gc(); // reclaim space if the MemoryIndex was very BIG
 			}
 		}
+		catch (Exception e)
+		{
+			IdeLog.logError(IndexPlugin.getDefault(), e);
+		}
 		finally
 		{
 			if (lock)

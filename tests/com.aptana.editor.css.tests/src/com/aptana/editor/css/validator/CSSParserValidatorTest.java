@@ -11,9 +11,9 @@ import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 
+import com.aptana.buildpath.core.tests.AbstractValidatorTestCase;
 import com.aptana.core.build.IBuildParticipant;
 import com.aptana.core.build.IProblem;
-import com.aptana.editor.common.validation.AbstractValidatorTestCase;
 import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.ICSSConstants;
 import com.aptana.parsing.ParseState;

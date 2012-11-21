@@ -21,8 +21,8 @@ import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLNode;
 import com.aptana.editor.html.parsing.ast.HTMLTextNode;
-import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.outline.JSOutlineLabelProvider;
+import com.aptana.js.core.IJSConstants;
 
 public class HTMLOutlineLabelProvider extends CompositeOutlineLabelProvider
 {

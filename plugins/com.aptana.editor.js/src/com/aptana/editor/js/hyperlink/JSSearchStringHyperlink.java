@@ -15,9 +15,9 @@ import org.eclipse.jface.text.IRegion;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.ObjectUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
-import com.aptana.editor.js.parsing.ast.JSIdentifierNode;
-import com.aptana.editor.js.parsing.ast.JSParseRootNode;
+import com.aptana.js.core.parsing.ast.IJSNodeTypes;
+import com.aptana.js.core.parsing.ast.JSIdentifierNode;
+import com.aptana.js.core.parsing.ast.JSParseRootNode;
 import com.aptana.parsing.ast.IParseNode;
 
 /**

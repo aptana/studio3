@@ -14,9 +14,9 @@ import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.common.outline.CompositeOutlineContentProvider;
 import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.css.outline.CSSOutlineContentProvider;
-import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.outline.JSOutlineContentProvider;
 import com.aptana.editor.xml.parsing.ast.XMLElementNode;
+import com.aptana.js.core.IJSConstants;
 import com.aptana.parsing.ast.IParseNode;
 
 /**

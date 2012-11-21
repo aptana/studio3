@@ -33,7 +33,7 @@ import com.aptana.editor.epl.tests.EditorTestHelper;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSSourceEditor;
 import com.aptana.editor.js.JSSourceViewerConfiguration;
-import com.aptana.editor.js.parsing.ast.JSCommentNode;
+import com.aptana.js.core.parsing.ast.JSCommentNode;
 import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ParsingEngine;
 import com.aptana.parsing.ast.IParseNode;

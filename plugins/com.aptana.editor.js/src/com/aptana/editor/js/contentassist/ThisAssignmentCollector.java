@@ -10,10 +10,10 @@ package com.aptana.editor.js.contentassist;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
-import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
-import com.aptana.editor.js.parsing.ast.JSFunctionNode;
-import com.aptana.editor.js.parsing.ast.JSTreeWalker;
+import com.aptana.js.core.parsing.ast.IJSNodeTypes;
+import com.aptana.js.core.parsing.ast.JSAssignmentNode;
+import com.aptana.js.core.parsing.ast.JSFunctionNode;
+import com.aptana.js.core.parsing.ast.JSTreeWalker;
 import com.aptana.parsing.ast.IParseNode;
 
 /**

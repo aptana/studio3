@@ -13,10 +13,10 @@ import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.common.outline.CompositeOutlineLabelProvider;
 import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.css.outline.CSSOutlineLabelProvider;
-import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.outline.JSOutlineLabelProvider;
 import com.aptana.editor.svg.SVGPlugin;
 import com.aptana.editor.xml.parsing.ast.XMLNode;
+import com.aptana.js.core.IJSConstants;
 
 /**
  * SVGOutlineLabelProvider

@@ -14,8 +14,8 @@ import junit.framework.TestCase;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 
+import com.aptana.core.IUserAgent;
 import com.aptana.core.util.ResourceUtil;
-import com.aptana.editor.common.contentassist.UserAgentManager.UserAgent;
 import com.aptana.ui.epl.UIEplPlugin;
 
 /**
@@ -73,7 +73,7 @@ public class UserAgentManagerTests extends TestCase
 
 	public void assertIDs(String natureID, String... expectedUserAgentIDs)
 	{
-		UserAgent[] userAgents = manager.getActiveUserAgents(natureID);
+		IUserAgent[] userAgents = manager.getActiveUserAgents(natureID);
 
 		assertNotNull(userAgents);
 
@@ -86,9 +86,9 @@ public class UserAgentManagerTests extends TestCase
 
 		// create actual set
 		Set<String> actual = new HashSet<String>();
-		for (UserAgent userAgent : userAgents)
+		for (IUserAgent userAgent : userAgents)
 		{
-			actual.add(userAgent.ID);
+			actual.add(userAgent.getID());
 		}
 
 		assertEquals(expected, actual);

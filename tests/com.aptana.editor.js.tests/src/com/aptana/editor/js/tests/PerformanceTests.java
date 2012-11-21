@@ -14,16 +14,16 @@ import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.editor.js.JSCodeScannerPerformanceTest;
 import com.aptana.editor.js.JSPlugin;
-import com.aptana.editor.js.JSSourcePartitionScannerPerformanceTest;
 import com.aptana.editor.js.contentassist.JSBuildPerformanceTest;
+import com.aptana.editor.js.contentassist.JSContentAssistProcessorPerformanceTest;
 import com.aptana.editor.js.contentassist.JSIndexingPerformanceTest;
-import com.aptana.editor.js.parsing.JSParserPerformanceTest;
-import com.aptana.editor.js.parsing.JSScannerPerformanceTest;
-import com.aptana.editor.js.sdoc.parsing.SDocParserPerformanceTest;
+import com.aptana.editor.js.tests.performance.JSLintValidatorPerformanceTest;
+import com.aptana.editor.js.tests.performance.JSParserValidatorPerformanceTest;
+import com.aptana.editor.js.tests.performance.JSStyleValidatorPerformanceTest;
 import com.aptana.editor.js.tests.performance.OpenJSEditorTest;
-import com.aptana.editor.js.validator.ValidatorPerformanceTests;
+import com.aptana.editor.js.text.JSCodeScannerPerformanceTest;
+import com.aptana.editor.js.text.JSSourcePartitionScannerPerformanceTest;
 
 public class PerformanceTests
 {
@@ -42,14 +42,17 @@ public class PerformanceTests
 			}
 		};
 		// $JUnit-BEGIN$
+		// content assist
 		suite.addTestSuite(JSBuildPerformanceTest.class);
-		suite.addTestSuite(JSCodeScannerPerformanceTest.class);
+		suite.addTestSuite(JSContentAssistProcessorPerformanceTest.class);
 		suite.addTestSuite(JSIndexingPerformanceTest.class);
-		suite.addTestSuite(JSParserPerformanceTest.class);
-		suite.addTestSuite(JSScannerPerformanceTest.class);
+		// Text/Coloring/Partitioning
+		suite.addTestSuite(JSCodeScannerPerformanceTest.class);
 		suite.addTestSuite(JSSourcePartitionScannerPerformanceTest.class);
-		suite.addTestSuite(SDocParserPerformanceTest.class);
-		suite.addTest(ValidatorPerformanceTests.suite());
+		// General/Validation
+		suite.addTestSuite(JSLintValidatorPerformanceTest.class);
+		suite.addTestSuite(JSParserValidatorPerformanceTest.class);
+		suite.addTestSuite(JSStyleValidatorPerformanceTest.class);
 		suite.addTest(OpenJSEditorTest.suite());
 		// $JUnit-END$
 		return suite;

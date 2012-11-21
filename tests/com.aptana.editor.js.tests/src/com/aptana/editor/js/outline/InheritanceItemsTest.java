@@ -10,7 +10,7 @@ package com.aptana.editor.js.outline;
 /**
  * @author Kevin Lindsey
  */
-public class InheritanceItemsTest extends BaseOutlineItemTest
+public class InheritanceItemsTest extends OutlineItemTestCase
 {
 
 	private void testInheritance(String source)

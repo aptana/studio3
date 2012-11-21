@@ -36,7 +36,7 @@ import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
 import com.aptana.editor.html.parsing.ast.HTMLTextNode;
 import com.aptana.editor.html.parsing.ast.IHTMLNodeTypes;
 import com.aptana.editor.html.parsing.lexer.HTMLTokens;
-import com.aptana.editor.js.IJSConstants;
+import com.aptana.js.core.IJSConstants;
 import com.aptana.parsing.AbstractParser;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ParseResult;

@@ -24,13 +24,13 @@ import org.eclipse.test.performance.PerformanceTestCase;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.js.JSPlugin;
-import com.aptana.editor.js.contentassist.index.JSFileIndexingParticipant;
-import com.aptana.editor.js.parsing.JSParser;
-import com.aptana.editor.js.parsing.ast.JSParseRootNode;
 import com.aptana.index.core.FileStoreBuildContext;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.IndexPlugin;
+import com.aptana.js.core.index.JSFileIndexingParticipant;
+import com.aptana.js.core.parsing.JSParser;
+import com.aptana.js.core.parsing.ast.JSParseRootNode;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ParseResult;
 import com.aptana.parsing.ParseState;
