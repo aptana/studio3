@@ -311,7 +311,7 @@ public class ProcessUtil
 			String textToObfuscate = (environment == null) ? null : environment.get(TEXT_TO_OBFUSCATE);
 			if (!StringUtil.isEmpty(textToObfuscate))
 			{
-				message = message.replaceAll(textToObfuscate, StringUtil.repeat('*', textToObfuscate.length()));
+				message = message.replace(textToObfuscate, StringUtil.repeat('*', textToObfuscate.length()));
 			}
 			logInfo(StringUtil.format(Messages.ProcessUtil_RunningProcess, new Object[] { message, path, map }));
 		}
