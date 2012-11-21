@@ -114,6 +114,10 @@
                                        property="org.eclipse.core.resources.projectNature"
                                        value="com.appcelerator.titanium.mobile.nature">
                                  </test>
+                                 <test
+                                       property="org.eclipse.core.resources.projectNature"
+                                       value="com.appcelerator.titanium.acs.core.nodejsnature">
+                                 </test>
                               </or>
                            </not>
                         </and>
