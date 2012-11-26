@@ -10,16 +10,49 @@ package com.aptana.editor.xml.parsing.lexer;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.aptana.core.util.StringUtil;
+import com.aptana.editor.xml.internal.IXMLScopes;
 import com.aptana.parsing.lexer.ITypePredicate;
 
 public enum XMLTokenType implements ITypePredicate
 {
-	UNDEFINED, EOF, COMMENT, STRING, DOCTYPE, CDATA, DECLARATION, START_TAG, END_TAG, TEXT,
+
+	UNDEFINED(""),
+	EOF("eof"),
+	COMMENT(IXMLScopes.COMMENT_BLOCK_XML),
+//	STRING,
+	DOCTYPE(IXMLScopes.META_TAG_SGML_DOCTYPE_XML),
+	CDATA(IXMLScopes.STRING_UNQUOTED_CDATA_XML),
+	DECLARATION(IXMLScopes.META_TAG_PREPROCESSOR_XML),
+	START_TAG(IXMLScopes.PUNCTUATION_DEFINITION_TAG_XML),
+	END_TAG(IXMLScopes.PUNCTUATION_DEFINITION_TAG_XML),
+	TEXT(IXMLScopes.TEXT_XML),
 
 	// for the parser
-	TAG_SELF_CLOSE, ATTRIBUTE, EQUAL, VALUE, SINGLE_QUOTED_STRING, DOUBLE_QUOTED_STRING, META, OTHER;
+	TAG_SELF_CLOSE(IXMLScopes.PUNCTUATION_DEFINITION_TAG_XML),
+	ATTRIBUTE(IXMLScopes.ENTITY_OTHER_ATTRIBUTE_NAME_XML),
+	EQUAL(IXMLScopes.PUNCTUATION_SEPARATOR_KEY_VALUE_XML),
+	VALUE("attr_value"), // used by attribute scanner to mark the value
+	SINGLE_QUOTED_STRING(IXMLScopes.STRING_QUOTED_SINGLE_XML),
+	DOUBLE_QUOTED_STRING(IXMLScopes.STRING_QUOTED_DOUBLE_XML),
+	TAG_NAME(IXMLScopes.ENTITY_NAME_TAG_XML),
+	OTHER("attr_unused_scope"); // used by attribute scanner to mark something other than attr name or value
 
 	private static Map<Short, XMLTokenType> fTokens = new HashMap<Short, XMLTokenType>();
+	static
+	{
+		for (XMLTokenType token : XMLTokenType.values())
+		{
+			fTokens.put(token.getIndex(), token);
+		}
+	}
+
+	private String scope;
+
+	private XMLTokenType(String scope)
+	{
+		this.scope = scope;
+	}
 
 	/**
 	 * getToken
@@ -30,17 +63,6 @@ public enum XMLTokenType implements ITypePredicate
 	public static XMLTokenType getToken(short index)
 	{
 		return fTokens.get(index);
-	}
-
-	/**
-	 * static initializer
-	 */
-	static
-	{
-		for (XMLTokenType token : XMLTokenType.values())
-		{
-			fTokens.put(token.getIndex(), token);
-		}
 	}
 
 	/**
@@ -59,5 +81,22 @@ public enum XMLTokenType implements ITypePredicate
 	public boolean isDefined()
 	{
 		return (this != UNDEFINED);
+	}
+
+	public String getScope()
+	{
+		return scope;
+	}
+
+	public static XMLTokenType getByScope(String scope)
+	{
+		for (XMLTokenType type : values())
+		{
+			if (type.getScope().equals(scope))
+			{
+				return type;
+			}
+		}
+		return null;
 	}
 }

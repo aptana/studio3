@@ -62,6 +62,10 @@ public class XMLLexemeProvider extends LexemeProvider<XMLTokenType>
 	@Override
 	protected XMLTokenType getTypeFromData(Object data)
 	{
-		return (XMLTokenType) data;
+		if (data instanceof XMLTokenType)
+		{
+			return (XMLTokenType) data;
+		}
+		return XMLTokenType.getByScope(data.toString());
 	}
 }
