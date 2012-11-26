@@ -70,7 +70,7 @@ public class JSLintValidatorPerformanceTest extends PerformanceTestCase
 	protected void perfValidate(String filename, int iterations) throws Exception
 	{
 		// read in the file
-		URL url = FileLocator.find(Platform.getBundle("com.aptana.editor.js.tests"),
+		URL url = FileLocator.find(Platform.getBundle(JSCorePlugin.PLUGIN_ID),
 				Path.fromPortableString("performance/" + filename), null);
 		File file = ResourceUtil.resourcePathToFile(url);
 		IFileStore fileStore = EFS.getStore(file.toURI());

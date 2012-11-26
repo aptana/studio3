@@ -25,7 +25,7 @@ import com.aptana.editor.common.ExtendedFastPartitioner;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.epl.tests.EditorTestHelper;
 import com.aptana.editor.js.JSSourceConfiguration;
-import com.aptana.editor.js.text.JSSourcePartitionScannerJFlex;
+import com.aptana.js.core.JSCorePlugin;
 
 public class JSSourcePartitionScannerPerformanceTest extends PerformanceTestCase
 {
@@ -99,7 +99,7 @@ public class JSSourcePartitionScannerPerformanceTest extends PerformanceTestCase
 
 	protected String readFile(String fileName) throws IOException
 	{
-		InputStream stream = FileLocator.openStream(Platform.getBundle("com.aptana.editor.js.tests"),
+		InputStream stream = FileLocator.openStream(Platform.getBundle(JSCorePlugin.PLUGIN_ID),
 				Path.fromPortableString("performance/" + fileName), false);
 		return IOUtil.read(stream);
 	}

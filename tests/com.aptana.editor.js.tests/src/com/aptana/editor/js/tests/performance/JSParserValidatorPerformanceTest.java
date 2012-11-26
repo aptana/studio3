@@ -72,7 +72,7 @@ public class JSParserValidatorPerformanceTest extends PerformanceTestCase
 	protected void perfValidate(String filename, int iterations) throws Exception
 	{
 		// read in the file
-		InputStream in = FileLocator.openStream(Platform.getBundle("com.aptana.editor.js.tests"),
+		InputStream in = FileLocator.openStream(Platform.getBundle(JSCorePlugin.PLUGIN_ID),
 				Path.fromPortableString("performance/" + filename), false);
 		IFile file = project.createFile(filename, IOUtil.read(in));
 		RebuildIndexJob job = new RebuildIndexJob(project.getURI());

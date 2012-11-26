@@ -26,7 +26,7 @@ import org.eclipse.test.performance.PerformanceTestCase;
 import com.aptana.core.build.UnifiedBuilder;
 import com.aptana.core.tests.TestProject;
 import com.aptana.core.util.ResourceUtil;
-import com.aptana.editor.js.JSPlugin;
+import com.aptana.js.core.JSCorePlugin;
 
 public class JSBuildPerformanceTest extends PerformanceTestCase
 {
@@ -70,7 +70,7 @@ public class JSBuildPerformanceTest extends PerformanceTestCase
 
 	public void testBuildJaxer() throws Exception
 	{
-		URL url = FileLocator.find(Platform.getBundle(JSPlugin.PLUGIN_ID), new Path("performance/jaxer"), null);
+		URL url = FileLocator.find(Platform.getBundle(JSCorePlugin.PLUGIN_ID), new Path("performance/jaxer"), null);
 		IFileStore fileStore = EFS.getStore(ResourceUtil.resourcePathToURI(url));
 		IFileStore destination = EFS.getStore(project.getURI());
 		fileStore.copy(destination, EFS.NONE, new NullProgressMonitor());

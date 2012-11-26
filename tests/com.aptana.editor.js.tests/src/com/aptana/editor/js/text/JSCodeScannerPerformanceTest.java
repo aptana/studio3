@@ -23,6 +23,7 @@ import org.eclipse.test.performance.PerformanceTestCase;
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.epl.tests.EditorTestHelper;
 import com.aptana.editor.js.text.JSCodeScanner;
+import com.aptana.js.core.JSCorePlugin;
 
 public class JSCodeScannerPerformanceTest extends PerformanceTestCase
 {
@@ -88,7 +89,7 @@ public class JSCodeScannerPerformanceTest extends PerformanceTestCase
 
 	protected IDocument createDocument(String fileName) throws IOException
 	{
-		InputStream stream = FileLocator.openStream(Platform.getBundle("com.aptana.editor.js.tests"),
+		InputStream stream = FileLocator.openStream(Platform.getBundle(JSCorePlugin.PLUGIN_ID),
 				Path.fromPortableString("performance/" + fileName), false);
 		return new Document(IOUtil.read(stream));
 	}
