@@ -292,7 +292,7 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
 
-		// Index files contributed to projetc build path
+		// Index files contributed to project build path
 		IProject project = getProjectHandle();
 		URI uri = project.getLocationURI();
 		Set<IFileStore> contributedFiles = getContributedFiles(uri);
@@ -324,9 +324,10 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 		}
 
 		SubMonitor sub = SubMonitor.convert(monitor, 15 * files.size());
+		IProject project = getProjectHandle();
 		for (IFileStore file : files)
 		{
-			BuildContext context = new FileStoreBuildContext(file);
+			BuildContext context = new FileStoreBuildContext(project, file);
 			sub.worked(1);
 
 			List<IBuildParticipant> filteredParticipants = getBuildParticipantManager().filterParticipants(

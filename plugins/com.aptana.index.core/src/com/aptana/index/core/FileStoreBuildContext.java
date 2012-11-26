@@ -32,20 +32,27 @@ import com.aptana.index.core.build.BuildContext;
  */
 public class FileStoreBuildContext extends BuildContext
 {
-
+	private IProject project;
 	private IFileStore fileStore;
 
 	public FileStoreBuildContext(IFileStore fileStore)
 	{
+		this(null, fileStore);
+	}
+
+	public FileStoreBuildContext(IProject project, IFileStore fileStore)
+	{
 		super();
 		Assert.isNotNull(fileStore, "fileStore cannot be null"); //$NON-NLS-1$
 		this.fileStore = fileStore;
+		this.project = project;
+		// TODO If file is actually in workspace under the project, handle grabbing pointer to IFile?
 	}
 
 	@Override
 	public IProject getProject()
 	{
-		return null;
+		return this.project;
 	}
 
 	@Override
@@ -71,13 +78,13 @@ public class FileStoreBuildContext extends BuildContext
 	{
 		// ignore. Shouldn't be any markers generated on external resources, or during indexing
 	}
-	
+
 	@Override
 	public String getCharset() throws CoreException
 	{
 		return null;
 	}
-	
+
 	@Override
 	public InputStream openInputStream(IProgressMonitor monitor) throws CoreException
 	{
