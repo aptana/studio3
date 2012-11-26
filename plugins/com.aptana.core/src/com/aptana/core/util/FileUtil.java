@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.provider.FileSystem;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -37,11 +39,11 @@ public class FileUtil
 
 	public static boolean isDirectoryAccessible(File directory)
 	{
-		if (directory == null)
+		if (directory == null || !directory.isDirectory())
 		{
 			return false;
 		}
-		return ExecutableUtil.isExecutable(Path.fromOSString(directory.getAbsolutePath()));
+		return directory.list() != null;
 	}
 
 	/**
