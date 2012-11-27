@@ -25,8 +25,22 @@ import com.aptana.core.ShellExecutable;
 public class PathUtil
 {
 
+	private static final String PATHS_SEPERATOR = ":"; //$NON-NLS-1$
+	private static final String UNIX_SEPERATOR = "/"; //$NON-NLS-1$
 	private static final Pattern MINGW_PATH_REGEXP = Pattern.compile("^/(.)/(.*)"); //$NON-NLS-1$
 	private static final Pattern CYGWWIN_PATH_REGEXP = Pattern.compile("^/cygdrive/(.)/(.*)"); //$NON-NLS-1$
+
+	/**
+	 * Converts windows based paths to unix format path. For instance, C:\Program Files (x86)\Java\jdk1.6.0_34\jre\bin
+	 * is converted to /c/Program Files (x86)/Java/jdk1.6.0_34/jre/bin
+	 */
+	public static String convertToUnixFormatPath(String windowsPath)
+	{
+		String unixPath = windowsPath.replace(PATHS_SEPERATOR, StringUtil.EMPTY); // Remove colon from the path.
+		unixPath = unixPath.replace('\\', '/');
+		unixPath = StringUtil.concat(UNIX_SEPERATOR, unixPath, UNIX_SEPERATOR);
+		return unixPath;
+	}
 
 	/**
 	 * This method is intended to take the raw value of PATH and convert it to Windows format.
