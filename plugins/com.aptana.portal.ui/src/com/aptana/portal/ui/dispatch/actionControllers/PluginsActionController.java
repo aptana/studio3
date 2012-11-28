@@ -42,8 +42,8 @@ public class PluginsActionController extends AbstractActionController
 	 * dispatch($H({
 	 *     controller : 'portal.plugins',
 	 *     action : "openPluginsDialog",
-	 *     args : [["http://preview.appcelerator.com/appcelerator/studio/acs/update/rc"], {
-	 *         "feature_id" : "com.appcelerator.titanium.acs.feature"
+	 *     args : [["http://appcelerator.com/appcelerator/studio/update/rc"], {
+	 *         "feature_id" : "com.aptana.feature"
 	 *     }].toJSON()
 	 * }).toJSON());
 	 * </pre>
