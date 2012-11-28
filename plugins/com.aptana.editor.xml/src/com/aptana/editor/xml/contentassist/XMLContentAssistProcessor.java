@@ -660,6 +660,11 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	LocationType getCoarseLocationType(IDocument document, ILexemeProvider<XMLTokenType> lexemeProvider, int offset)
 	{
+		if (_currentLexeme == null)
+		{
+			return LocationType.ERROR;
+		}
+
 		switch (_currentLexeme.getType())
 		{
 			case DOCTYPE:
