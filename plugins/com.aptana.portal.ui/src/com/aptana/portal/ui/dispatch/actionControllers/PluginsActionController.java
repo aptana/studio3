@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -36,6 +36,17 @@ public class PluginsActionController extends AbstractActionController
 	 * Opens the Eclipse P2 Plug-ins dialog.<br>
 	 * When the dialog is closed, in case we have valid list of plugins to work with, the method will call
 	 * {@link #computeInstalledPlugins(Object)} and return its result.
+	 * 
+	 * <pre>
+	 * Example:
+	 * dispatch($H({
+	 *     controller : 'portal.plugins',
+	 *     action : "openPluginsDialog",
+	 *     args : [["http://preview.appcelerator.com/appcelerator/studio/acs/update/rc"], {
+	 *         "feature_id" : "com.appcelerator.titanium.acs.feature"
+	 *     }].toJSON()
+	 * }).toJSON());
+	 * </pre>
 	 * 
 	 * @param attributes
 	 *            A multi-dimensional array of size 2 which contains an optional update-site URL and an optional plugins
