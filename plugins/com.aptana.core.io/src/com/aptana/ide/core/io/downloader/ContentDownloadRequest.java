@@ -98,13 +98,16 @@ public class ContentDownloadRequest
 			reader.readInto(this.url.toURI(), anOutputStream, 0, monitor);
 			// check that job ended ok - throw exceptions otherwise
 			IStatus result = reader.getResult();
-			if (result.getSeverity() == IStatus.CANCEL)
+			if (result != null)
 			{
-				throw new UserCancelledException();
-			}
-			if (!result.isOK())
-			{
-				throw new CoreException(result);
+				if (result.getSeverity() == IStatus.CANCEL)
+				{
+					throw new UserCancelledException();
+				}
+				if (!result.isOK())
+				{
+					throw new CoreException(result);
+				}
 			}
 		}
 		catch (Throwable t)
