@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.runtime.CoreException;
@@ -31,8 +32,10 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.ExecutableUtil;
+import com.aptana.core.util.PathUtil;
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.ProcessUtil;
 import com.aptana.core.util.ResourceUtil;
@@ -62,6 +65,7 @@ public final class ShellExecutable {
 	};
 
 	public static final String PATH_SEPARATOR = ":"; //$NON-NLS-1$
+	private static final String PATH = "PATH"; //$NON-NLS-1$
 
 	private static final String SH_EXE = "sh.exe"; //$NON-NLS-1$
 	private static final String BASH = "bash"; //$NON-NLS-1$
@@ -72,6 +76,7 @@ public final class ShellExecutable {
 	private static IPath shellRCPath = null;
 	private static Map<String, String> shellEnvironment;
 	private static Map<IPath, Map<String, String>> workingDirToEnvCache = new HashMap<IPath, Map<String, String>>();
+	private static List<String> newPathLocations = new ArrayList<String>(5);
 
 	/**
 	 * 
@@ -181,6 +186,37 @@ public final class ShellExecutable {
 		return shellEnvironment;
 	}
 
+	/**
+	 * Updates PATH environment variable in all corresponding PATH references.
+	 * For instance, this might be holding separate environment variables for global, 
+	 * workspace location and temporary locations.
+	 * @param newPaths
+	 */
+	public synchronized static void updatePathEnvironment (String... newPaths)
+	{
+		newPathLocations.addAll(Arrays.asList(newPaths));
+		for (IPath locationKey : workingDirToEnvCache.keySet())
+		{
+			updatePathForLocationKey(locationKey);
+		}
+	}
+
+	private static void updatePathForLocationKey(IPath locationKey)
+	{
+		if (PlatformUtil.isWindows() && !CollectionsUtil.isEmpty(newPathLocations)
+				&& workingDirToEnvCache.get(locationKey) != null)
+		{
+			String resultPath = workingDirToEnvCache.get(locationKey).get(PATH);
+
+			for (String newPath : newPathLocations)
+			{
+				resultPath = StringUtil.join(PATH_SEPARATOR, resultPath,
+						PathUtil.convertToUnixFormatPath(PlatformUtil.expandEnvironmentStrings(newPath)));
+			}
+			workingDirToEnvCache.get(locationKey).put(PATH, PathUtil.convertPATH(resultPath));
+		}
+	}
+
 	public synchronized static Map<String, String> getEnvironment(IPath workingDirectory) {
 		if (workingDirectory == null && shellEnvironment != null) {
 			return shellEnvironment;
@@ -226,6 +262,7 @@ public final class ShellExecutable {
 				return System.getenv();
 			}
 			workingDirToEnvCache.put(workingDirectory, result);
+			updatePathForLocationKey (workingDirectory);
 		}
 		return workingDirToEnvCache.get(workingDirectory);
 	}

@@ -278,19 +278,19 @@
       <page
             class="com.aptana.ui.preferences.AptanaPreferencePage"
             id="com.aptana.ui.AptanaPreferencePage"
-            name="%page.name">
+            name="%page.name Aptana Studio">
       </page>
       <page
             category="com.aptana.ui.AptanaPreferencePage"
             class="com.aptana.ui.preferences.TroubleshootingPreferencePage"
             id="com.aptana.ui.TroubleshootingPreferencePage"
-            name="%page.troubleshooting.name">
+            name="%page.troubleshooting.name Troubleshooting">
       </page>
       <page
             category="com.aptana.ui.AptanaPreferencePage"
             class="com.aptana.ui.preferences.AccountsPreferencePage"
             id="com.aptana.ui.accountsPreferencePage"
-            name="%page.accounts.name">
+            name="%page.accounts.name Accounts">
       </page>
    </extension>
    <extension
