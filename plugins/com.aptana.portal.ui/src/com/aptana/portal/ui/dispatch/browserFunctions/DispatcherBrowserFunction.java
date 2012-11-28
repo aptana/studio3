@@ -10,9 +10,9 @@ package com.aptana.portal.ui.dispatch.browserFunctions;
 import java.text.MessageFormat;
 import java.util.Map;
 
-import com.aptana.jetty.util.epl.ajax.JSON;
-
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.ArrayUtil;
+import com.aptana.jetty.util.epl.ajax.JSON;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.BrowserInteractionRegistry;
 import com.aptana.portal.ui.dispatch.BrowserNotifier;
@@ -97,6 +97,12 @@ public class DispatcherBrowserFunction implements IBrowserFunctionHandler
 					// This allows the JavaScript side to pass the arguments as an array,
 					// or as a simple value.
 					args = new Object[] { args };
+				}
+				// Check if all arguments are null. In case they are, nullify the args (see TISTUD-2594).
+				else if (ArrayUtil.isAllNulls((Object[]) args))
+				{
+					// Check if all arguments are null. In case they are, nullify the args (see TISTUD-2594).
+					args = null;
 				}
 			}
 		}
