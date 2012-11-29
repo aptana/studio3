@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -19,11 +19,17 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 
+import com.aptana.core.IFilter;
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.URIUtil;
 import com.aptana.index.core.Index;
+import com.aptana.index.core.QueryResult;
+import com.aptana.index.core.SearchPattern;
 import com.aptana.js.core.JSTypeConstants;
+import com.aptana.js.core.index.IJSIndexConstants;
 import com.aptana.js.core.index.JSIndexQueryHelper;
 import com.aptana.js.core.model.FunctionElement;
 import com.aptana.js.core.model.PropertyElement;
@@ -726,17 +732,15 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 					if (arg instanceof JSStringNode)
 					{
 						JSStringNode string = (JSStringNode) arg;
-						String text = string.getText();
-						// strip quotes TODO Use util method to strip quotes!
-						if (text.startsWith("'") || text.startsWith("\"")) //$NON-NLS-1$ //$NON-NLS-2$
-						{
-							text = text.substring(1, text.length() - 1);
-						}
+						String text = StringUtil.stripQuotes(string.getText());
 
-						// Handle resolving absolute versus relative module ids!
-						URI resolved = _location.resolve(text);
-						URI relative = _index.getRelativeDocumentPath(resolved);
-						this.addType(relative.getPath() + ".exports"); //$NON-NLS-1$
+						IRequireResolver resolver = getResolver();
+						IPath absolutePath = resolver.resolve(text);
+						String typeName = getModuleType(text, absolutePath);
+						if (typeName != null)
+						{
+							this.addType(typeName);
+						}
 					}
 				}
 			}
@@ -784,6 +788,47 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 				}
 			}
 		}
+	}
+
+	protected IRequireResolver getResolver()
+	{
+		// TODO We need to be able to switch the resolution algorithm based on the project/location
+		// - NodeJS (paths are resolved by searching for node_modules dirs, then searching node
+		// locations)
+		// - CommonJS (paths are resolved against a "module namespace root")
+		// - Titanium (paths are resolved like CommonJs with Resources as namespace root, but so are
+		// platform-specific subdirs. Also search modules - project and global in SDK)
+		return new CommonJSResolver(Path.fromPortableString(_location.getPath()).removeLastSegments(1),
+				Path.fromPortableString(_index.getRoot().getPath()));
+	}
+
+	/**
+	 * Determines the name of the type holding the object exported for the module.
+	 * 
+	 * @param moduleId
+	 * @param absolutePath
+	 * @return
+	 */
+	private String getModuleType(String moduleId, IPath absolutePath)
+	{
+		// Look up our mapping from generated type names to documents
+		List<QueryResult> results = _index.query(new String[] { IJSIndexConstants.MODULE_DEFINITION }, "*",
+				SearchPattern.PATTERN_MATCH);
+		final String fileURI = absolutePath.toFile().toURI().toString();
+		// Find the module declared in the file we resolved to...
+		QueryResult match = CollectionsUtil.find(results, new IFilter<QueryResult>()
+		{
+			public boolean include(QueryResult item)
+			{
+				return item.getDocuments().contains(fileURI);
+			}
+		});
+		if (match == null)
+		{
+			return null;
+		}
+		// Now use the stored generated type name...
+		return match.getWord() + ".exports"; //$NON-NLS-1$
 	}
 
 	/*

@@ -603,6 +603,21 @@ public class JSTypeUtil
 	}
 
 	/**
+	 * Used to generate a unique type name to hold module definitions.
+	 * 
+	 * @param string
+	 * @return
+	 */
+	public static String getUniqueTypeName(String string)
+	{
+		if (string == null)
+		{
+			return "$module_" + UUID.randomUUID(); //$NON-NLS-1$
+		}
+		return "$module_" + UUID.nameUUIDFromBytes(string.getBytes()); //$NON-NLS-1$
+	}
+
+	/**
 	 * isClassType
 	 * 
 	 * @param typeName

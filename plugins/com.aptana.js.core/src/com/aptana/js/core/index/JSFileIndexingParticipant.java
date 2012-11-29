@@ -12,9 +12,8 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.UUID;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -40,9 +39,7 @@ import com.aptana.js.core.model.TypeElement;
 import com.aptana.js.core.parsing.ast.IJSNodeTypes;
 import com.aptana.js.core.parsing.ast.JSCommentNode;
 import com.aptana.js.core.parsing.ast.JSFunctionNode;
-import com.aptana.js.core.parsing.ast.JSInvokeNode;
 import com.aptana.js.core.parsing.ast.JSParseRootNode;
-import com.aptana.js.core.parsing.ast.JSStringNode;
 import com.aptana.js.internal.core.index.JSIndexWriter;
 import com.aptana.js.internal.core.inferencing.JSSymbolTypeInferrer;
 import com.aptana.js.internal.core.parsing.sdoc.SDocParser;
@@ -56,7 +53,6 @@ import com.aptana.parsing.xpath.ParseNodeXPath;
 public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 {
 	private static XPath LAMBDAS_IN_SCOPE;
-	private static XPath REQUIRE_INVOCATIONS;
 
 	private JSIndexWriter indexWriter;
 
@@ -66,15 +62,6 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		{
 			LAMBDAS_IN_SCOPE = new ParseNodeXPath(
 					"invoke[position() = 1]/group/function|invoke[position() = 1]/function"); //$NON-NLS-1$
-		}
-		catch (JaxenException e)
-		{
-			IdeLog.logError(JSCorePlugin.getDefault(), e);
-		}
-
-		try
-		{
-			REQUIRE_INVOCATIONS = new ParseNodeXPath("//invoke[identifier[position() = 1 and @value = 'require']]"); //$NON-NLS-1$
 		}
 		catch (JaxenException e)
 		{
@@ -304,57 +291,10 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 			indexWriter.writeType(index, type, location);
 		}
 
-		// process requires
-		processRequires(index, ast, location);
-
 		// process module API exports
 		processModule(context, index, ast, location);
 
 		sub.done();
-	}
-
-	/**
-	 * @param ast
-	 */
-	protected void processRequires(Index index, IParseNode ast, URI location)
-	{
-		Object queryResult = null;
-
-		// grab all 'require("...")' invocations
-		try
-		{
-			queryResult = (REQUIRE_INVOCATIONS != null) ? REQUIRE_INVOCATIONS.evaluate(ast) : null;
-		}
-		catch (JaxenException e)
-		{
-			IdeLog.logError(JSCorePlugin.getDefault(), e);
-		}
-
-		// process results, if any
-		if (queryResult != null)
-		{
-			Set<String> paths = new HashSet<String>();
-
-			@SuppressWarnings("unchecked")
-			List<JSInvokeNode> invocations = (List<JSInvokeNode>) queryResult;
-
-			for (JSInvokeNode invocation : invocations)
-			{
-				IParseNode arguments = invocation.getArguments();
-				IParseNode firstArgument = (arguments != null) ? arguments.getFirstChild() : null;
-				String text = (firstArgument instanceof JSStringNode) ? firstArgument.getText() : null;
-
-				if (text != null && text.length() >= 2)
-				{
-					paths.add(text.substring(1, text.length() - 1));
-				}
-			}
-
-			if (!paths.isEmpty())
-			{
-				indexWriter.writeRequires(index, paths, location);
-			}
-		}
 	}
 
 	/**
@@ -370,12 +310,14 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 			return;
 		}
 
-		String moduleId = getModuleId(context, index, ast, location);
+		// Autogenerate some unique type name to hold the module's exports
+		// Then record the mapping between the filepath and the generated type's name
+		String moduleTypeName = JSTypeUtil.getUniqueTypeName(location.toString());
 
 		// Create a type for this module...
 		TypeElement moduleType = new TypeElement();
 		moduleType.setHasAllUserAgents();
-		moduleType.setName(moduleId);
+		moduleType.setName(moduleTypeName);
 
 		// Create a type for the "module instance", which is "module.exports"
 		TypeElement moduleExportsType = new TypeElement();
@@ -397,9 +339,9 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 				// TODO Where should we strip out the type info on the elements in the collection? This doesn't seem
 				// like the right place, maybe we should do it in CA processor, or index query helper's get ancestor
 				// names?
-				if (type.startsWith("Array<")) //$NON-NLS-1$
+				if (type.startsWith(JSTypeConstants.GENERIC_ARRAY_OPEN))
 				{
-					type = "Array"; //$NON-NLS-1$
+					type = JSTypeConstants.ARRAY_TYPE;
 				}
 				moduleExportsType.addParentType(type);
 			}
@@ -413,7 +355,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 				// Doesn't look like there's any CommonJS kung-fu here. No module.exports or exports objects
 				return;
 			}
-			// Grab all properties hanging off "exports" and attach them to our hand-generate "module.exports" module
+			// Grab all properties hanging off "exports" and attach them to our hand-generated "module.exports" module
 			// instance type.
 			JSSymbolTypeInferrer infer = new JSSymbolTypeInferrer(globals, index, location);
 			List<String> properties = exports.getPropertyNames();
@@ -430,7 +372,8 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		idElement.setIsInstanceProperty(true);
 		idElement.setHasAllUserAgents();
 		idElement.setName("id"); //$NON-NLS-1$
-		idElement.addType("String"); //$NON-NLS-1$
+		idElement.addType(JSTypeConstants.STRING_TYPE);
+		String moduleId = getModuleId(context, index, ast, location);
 		idElement.setDescription(moduleId); // Just pass in the actual value?
 		moduleExportsType.addProperty(idElement);
 		// Add a uri property to the module instance (module.exports)!
@@ -438,13 +381,16 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		uriElement.setIsInstanceProperty(true);
 		uriElement.setHasAllUserAgents();
 		uriElement.setName("uri"); //$NON-NLS-1$
-		uriElement.addType("String"); //$NON-NLS-1$
+		uriElement.addType(JSTypeConstants.STRING_TYPE);
 		uriElement.setDescription(location.toString()); // Just pass in the actual value?
 		moduleExportsType.addProperty(uriElement);
 
 		// Now write our hand-generated module type and module instance type.
 		indexWriter.writeType(index, moduleExportsType, location);
 		indexWriter.writeType(index, moduleType, location);
+
+		// Record a mapping for the auto-generated type name we're recording (so we can look it up by the filepath)
+		index.addEntry(IJSIndexConstants.MODULE_DEFINITION, moduleTypeName, location);
 	}
 
 	/**
@@ -494,6 +440,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 		// The module top-level id should be based on the path from "the conceptual module name space root."
 		// Should we assume the project/index root?
+		// FIXME Do a look up based on what NodeModuleResolver does to determine the relative path...
 		URI relativeToRoot = index.getRelativeDocumentPath(location);
 		return Path.fromPortableString(relativeToRoot.getPath()).removeFileExtension().toPortableString();
 	}

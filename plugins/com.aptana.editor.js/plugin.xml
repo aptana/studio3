@@ -134,4 +134,13 @@
             class="com.aptana.editor.js.validator.JSLintValidatorPreferenceCompositeFactory">
       </preferenceComposite>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="com.aptana.ui.AptanaPreferencePage"
+            class="com.aptana.editor.js.preferences.NodePreferencePage"
+            id="com.aptana.editor.js.nodejs.page"
+            name="%node.pref_page.name">
+      </page>
+   </extension>
 </plugin>

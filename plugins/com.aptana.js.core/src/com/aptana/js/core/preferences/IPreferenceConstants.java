@@ -7,6 +7,9 @@
  */
 package com.aptana.js.core.preferences;
 
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
+
 public interface IPreferenceConstants
 {
 
@@ -19,5 +22,10 @@ public interface IPreferenceConstants
 	 * Preference key used to store the JSLint options as JSON.
 	 */
 	public static final String JS_LINT_OPTIONS = "jsLintOptions"; //$NON-NLS-1$
+
+	/**
+	 * Path to NodeJS' binary. Stored as OS string. Convert to {@link IPath} using {@link Path#fromOSString(String)}
+	 */
+	public static final String NODEJS_EXECUTABLE_PATH = "nodejs_path"; //$NON-NLS-1$
 
 }

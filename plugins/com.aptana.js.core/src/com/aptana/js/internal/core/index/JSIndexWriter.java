@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -9,11 +9,9 @@ package com.aptana.js.internal.core.index;
 
 import java.net.URI;
 import java.text.MessageFormat;
-import java.util.Collection;
 import java.util.List;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexWriter;
@@ -144,22 +142,6 @@ public class JSIndexWriter extends IndexWriter
 		}
 
 		index.addEntry(IJSIndexConstants.PROPERTY, value, location);
-	}
-
-	/**
-	 * writeRequires
-	 * 
-	 * @param index
-	 * @param paths
-	 */
-	public void writeRequires(Index index, Collection<String> paths, URI location)
-	{
-		if (index != null && !CollectionsUtil.isEmpty(paths))
-		{
-			String value = StringUtil.join(IJSIndexConstants.SUB_DELIMITER, paths);
-
-			index.addEntry(IJSIndexConstants.REQUIRE, value, location);
-		}
 	}
 
 	/**

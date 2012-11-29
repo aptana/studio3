@@ -11,7 +11,11 @@ import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.jobs.Job;
 import org.osgi.framework.BundleContext;
 
+import com.aptana.js.core.node.INodeJSService;
+import com.aptana.js.core.node.INodePackageManager;
 import com.aptana.js.internal.core.index.JSMetadataLoader;
+import com.aptana.js.internal.core.node.NodeJSService;
+import com.aptana.js.internal.core.node.NodePackageManager;
 
 /**
  * @author cwilliams
@@ -21,6 +25,9 @@ public class JSCorePlugin extends Plugin
 	public static final String PLUGIN_ID = "com.aptana.js.core"; //$NON-NLS-1$
 
 	private static JSCorePlugin PLUGIN;
+
+	private INodeJSService fNodeService;
+	private INodePackageManager fNpm;
 
 	/**
 	 * Returns the shared instance
@@ -43,7 +50,33 @@ public class JSCorePlugin extends Plugin
 
 	public void stop(BundleContext context) throws Exception // $codepro.audit.disable declaredExceptions
 	{
-		PLUGIN = null;
-		super.stop(context);
+		try
+		{
+			fNodeService = null;
+			fNpm = null;
+		}
+		finally
+		{
+			PLUGIN = null;
+			super.stop(context);
+		}
+	}
+
+	public synchronized INodeJSService getNodeJSService()
+	{
+		if (fNodeService == null)
+		{
+			fNodeService = new NodeJSService();
+		}
+		return fNodeService;
+	}
+
+	public synchronized INodePackageManager getNodePackageManager()
+	{
+		if (fNpm == null)
+		{
+			fNpm = new NodePackageManager();
+		}
+		return fNpm;
 	}
 }
