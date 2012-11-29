@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 
+import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
@@ -60,6 +61,7 @@ public abstract class InferencingTestsBase extends TestCase
 	}
 
 	private JSIndexReader reader;
+	private File dir;
 
 	/**
 	 * getContent
@@ -242,9 +244,15 @@ public abstract class InferencingTestsBase extends TestCase
 	 * 
 	 * @return
 	 */
-	protected URI getLocation()
+	protected synchronized URI getLocation()
 	{
-		return URI.create("inference_file.js");
+		if (dir == null)
+		{
+			IPath tmpDir = FileUtil.getTempDirectory().append(getName() + System.currentTimeMillis());
+			dir = tmpDir.toFile();
+			assertTrue(dir.mkdirs());
+		}
+		return new File(dir, "inference_file.js").toURI();
 	}
 
 	/**
@@ -384,7 +392,7 @@ public abstract class InferencingTestsBase extends TestCase
 
 		reader = new JSIndexReader();
 		loadJSMetadata();
-//		EditorTestHelper.joinBackgroundActivities();
+		// EditorTestHelper.joinBackgroundActivities();
 	}
 
 	/**
@@ -439,16 +447,26 @@ public abstract class InferencingTestsBase extends TestCase
 	@Override
 	protected void tearDown() throws Exception
 	{
-		reader = null;
-
-		URI indexURI = getIndexURI();
-
-		if (indexURI != null)
+		try
 		{
-			getIndexManager().removeIndex(indexURI);
+			if (dir != null)
+			{
+				FileUtil.deleteRecursively(dir);
+				dir = null;
+			}
+			
+			URI indexURI = getIndexURI();
+			if (indexURI != null)
+			{
+				getIndexManager().removeIndex(indexURI);
+			}
 		}
+		finally
+		{
+			reader = null;
 
-		super.tearDown();
+			super.tearDown();
+		}
 	}
 
 	protected IndexManager getIndexManager()

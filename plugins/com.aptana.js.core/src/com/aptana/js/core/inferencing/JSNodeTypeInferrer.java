@@ -798,8 +798,15 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		// - CommonJS (paths are resolved against a "module namespace root")
 		// - Titanium (paths are resolved like CommonJs with Resources as namespace root, but so are
 		// platform-specific subdirs. Also search modules - project and global in SDK)
-		return new CommonJSResolver(Path.fromPortableString(_location.getPath()).removeLastSegments(1),
-				Path.fromPortableString(_index.getRoot().getPath()));
+		try
+		{
+			return new CommonJSResolver(Path.fromPortableString(_location.getPath()).removeLastSegments(1),
+					Path.fromPortableString(_index.getRoot().getPath()));
+		}
+		catch (Exception e)
+		{
+			return new NullRequireResolver();
+		}
 	}
 
 	/**
@@ -811,6 +818,11 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	 */
 	private String getModuleType(String moduleId, IPath absolutePath)
 	{
+		if (absolutePath == null || absolutePath.isEmpty() || StringUtil.isEmpty(moduleId))
+		{
+			return null;
+		}
+
 		// Look up our mapping from generated type names to documents
 		List<QueryResult> results = _index.query(new String[] { IJSIndexConstants.MODULE_DEFINITION }, "*",
 				SearchPattern.PATTERN_MATCH);
