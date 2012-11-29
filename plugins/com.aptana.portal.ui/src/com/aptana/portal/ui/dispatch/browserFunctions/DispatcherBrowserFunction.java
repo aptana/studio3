@@ -11,7 +11,6 @@ import java.text.MessageFormat;
 import java.util.Map;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.ArrayUtil;
 import com.aptana.jetty.util.epl.ajax.JSON;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.BrowserInteractionRegistry;
@@ -99,7 +98,7 @@ public class DispatcherBrowserFunction implements IBrowserFunctionHandler
 					args = new Object[] { args };
 				}
 				// Check if all arguments are null. In case they are, nullify the args (see TISTUD-2594).
-				else if (ArrayUtil.isAllNulls((Object[]) args))
+				if (isAllNulls((Object[]) args))
 				{
 					// Check if all arguments are null. In case they are, nullify the args (see TISTUD-2594).
 					args = null;
@@ -141,5 +140,21 @@ public class DispatcherBrowserFunction implements IBrowserFunctionHandler
 	protected Object dispatch(IActionController controller, String action, Object arguments)
 	{
 		return controller.invokeAction(action, arguments);
+	}
+
+	private static boolean isAllNulls(Object[] array)
+	{
+		if (array == null)
+		{
+			return true;
+		}
+		for (Object obj : array)
+		{
+			if (obj != null && !"null".equals(obj.toString())) //$NON-NLS-1$
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 }
