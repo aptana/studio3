@@ -7,6 +7,8 @@
  */
 package com.aptana.ui;
 
+import java.text.MessageFormat;
+
 import org.eclipse.core.runtime.Platform;
 
 import com.aptana.core.diagnostic.IDiagnosticLog;
@@ -22,16 +24,24 @@ public class EclipseDiagnosticLog implements IDiagnosticLog
 	{
 		StringBuilder buf = new StringBuilder();
 
+		// --- OS ---
 		// Host OS
 		buf.append(Messages.EclipseDiagnosticLog_host_os);
 		buf.append(System.getProperty("os.name")); //$NON-NLS-1$
+		buf.append(NEW_LINE);
+
+		// Host Version
+		buf.append(Messages.EclipseDiagnosticLog_os_version);
+		buf.append(System.getProperty("os.version")); //$NON-NLS-1$
 		buf.append(NEW_LINE);
 
 		// OS arch
 		buf.append(Messages.EclipseDiagnosticLog_os_arch);
 		buf.append(Platform.getOSArch());
 		buf.append(NEW_LINE);
+		buf.append(NEW_LINE);
 
+		// --- JRE ---
 		// JRE version
 		buf.append(Messages.EclipseDiagnosticLog_jre_version);
 		buf.append(System.getProperty("java.version")); //$NON-NLS-1$
@@ -46,14 +56,11 @@ public class EclipseDiagnosticLog implements IDiagnosticLog
 		buf.append(Messages.EclipseDiagnosticLog_jre_home);
 		buf.append(System.getProperty("java.home")); //$NON-NLS-1$
 		buf.append(NEW_LINE);
-
-		// Install Directory
-		buf.append(Messages.EclipseDiagnosticLog_install_dir);
-		buf.append(Platform.getInstallLocation().getURL());
 		buf.append(NEW_LINE);
 
-		// Eclipse version
-		buf.append(Messages.EclipseDiagnosticLog_version);
+		// -- Product/RCP ---
+		// Eclipse/Studio/Product version
+		buf.append(MessageFormat.format(Messages.EclipseDiagnosticLog_version, Platform.getProduct().getName()));
 		String version = EclipseUtil.getProductVersion();
 		if (!StringUtil.isEmpty(version))
 		{
@@ -61,15 +68,20 @@ public class EclipseDiagnosticLog implements IDiagnosticLog
 		}
 		buf.append(NEW_LINE);
 
-		// VM arguments
-		buf.append(Messages.EclipseDiagnosticLog_vm_args);
-		String property = System.getProperty("eclipse.vmargs"); //$NON-NLS-1$
-		buf.append((property == null) ? StringUtil.EMPTY : property);
+		// Install Directory
+		buf.append(Messages.EclipseDiagnosticLog_install_dir);
+		buf.append(Platform.getInstallLocation().getURL());
 		buf.append(NEW_LINE);
 
 		// workspace area
 		buf.append(Messages.EclipseDiagnosticLog_workspace_dir);
 		buf.append(Platform.getInstanceLocation().getURL());
+		buf.append(NEW_LINE);
+
+		// VM arguments
+		buf.append(Messages.EclipseDiagnosticLog_vm_args);
+		String property = System.getProperty("eclipse.vmargs"); //$NON-NLS-1$
+		buf.append((property == null) ? StringUtil.EMPTY : property);
 		buf.append(NEW_LINE);
 
 		// Language

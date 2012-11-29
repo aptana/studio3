@@ -221,7 +221,7 @@ public class IOUIPlugin extends AbstractUIPlugin
 	{
 		super.start(context);
 		plugin = this;
-		Job job = new Job("Initializing IOUI Plugion") //$NON-NLS-1$
+		Job job = new Job(MessageFormat.format("Initializing {0} Plugin", PLUGIN_ID)) //$NON-NLS-1$
 		{
 
 			@Override
