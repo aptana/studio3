@@ -5379,7 +5379,6 @@ if (typeof x == 'undefined') {
                 </availability>
                 <description>A function responsible for creating new instances of URIError objects</description>
             </property>
-            -->
              <property name="Math" type="Class&lt;Math&gt;" access="read-only" visibility="basic">
                 <availability>
                     <specification name="JavaScript" version="1.0"/>
