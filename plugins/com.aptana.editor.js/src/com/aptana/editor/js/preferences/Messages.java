@@ -24,6 +24,8 @@ public class Messages extends NLS
 	public static String NodePreferencePage_LocationLabel;
 	public static String NodePreferencePage_NotDetected;
 
+	public static String NodePreferencePage_SourceLocationLabel;
+
 	static
 	{
 		// initialize resource bundle

@@ -80,4 +80,12 @@ public interface INodeJSService
 	public void addListener(Listener listener);
 
 	public void removeListener(Listener listener);
+
+	/**
+	 * Checks validity of the given path as a point to a NodeJS source directory.
+	 * 
+	 * @param path
+	 * @return
+	 */
+	public IStatus validateSourcePath(IPath path);
 }

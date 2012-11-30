@@ -10,6 +10,7 @@ package com.aptana.editor.js.preferences;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.preference.DirectoryFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.FileFieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -45,15 +46,10 @@ public class NodePreferencePage extends FieldEditorPreferencePage implements IWo
 				Messages.NodePreferencePage_LocationLabel, true, FileFieldEditor.VALIDATE_ON_KEY_STROKE,
 				getFieldEditorParent())
 		{
-			@Override
-			protected boolean checkState()
-			{
-				boolean ok = super.checkState();
-				if (!ok)
-				{
-					return false;
-				}
 
+			@Override
+			protected boolean doCheckState()
+			{
 				// Now check that the executable is ok
 				String text = getTextControl().getText();
 				if (!StringUtil.isEmpty(text))
@@ -61,12 +57,11 @@ public class NodePreferencePage extends FieldEditorPreferencePage implements IWo
 					IStatus status = getNodeService().acceptBinary(Path.fromOSString(text));
 					if (!status.isOK())
 					{
-						showErrorMessage(status.getMessage());
+						setErrorMessage(status.getMessage());
 						return false;
 					}
 				}
 
-				clearErrorMessage();
 				return true;
 			}
 		};
@@ -75,6 +70,33 @@ public class NodePreferencePage extends FieldEditorPreferencePage implements IWo
 		sfe = new StringFieldEditor(
 				"some_non_existent_pref_key", Messages.NodePreferencePage_DetectedPathLabel, fep = getFieldEditorParent()); //$NON-NLS-1$
 		addField(sfe);
+
+		// Node Source location
+		DirectoryFieldEditor sourceEditor = new DirectoryFieldEditor(IPreferenceConstants.NODEJS_SOURCE_PATH,
+				Messages.NodePreferencePage_SourceLocationLabel, getFieldEditorParent())
+		{
+
+			@Override
+			protected boolean doCheckState()
+			{
+
+				// Now check that the dir is ok
+				String text = getTextControl().getText();
+				if (!StringUtil.isEmpty(text))
+				{
+					IPath path = Path.fromOSString(text);
+					IStatus status = getNodeService().validateSourcePath(path);
+					if (!status.isOK())
+					{
+						setErrorMessage(status.getMessage());
+						return false;
+					}
+				}
+
+				return true;
+			}
+		};
+		addField(sourceEditor);
 	}
 
 	@Override

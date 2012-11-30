@@ -20,16 +20,18 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 
 import com.aptana.core.ShellExecutable;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.PathUtil;
-import com.aptana.core.util.PlatformUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.jetty.util.epl.ajax.JSON;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.core.inferencing.IRequireResolver;
+import com.aptana.js.core.preferences.IPreferenceConstants;
 
 /**
  * See http://nodejs.org/api/modules.html#modules_all_together
@@ -45,8 +47,8 @@ public class NodeModuleResolver implements IRequireResolver
 	private static final String INDEX_JS = "index.js"; //$NON-NLS-1$
 	private static final String PACKAGE_JSON = "package.json"; //$NON-NLS-1$
 
-	// FIXME This is a hack. I copy-pasted from node source's lib dir file listing to here.
-	// We need to actually get a pointer to node's source and look this up!
+	// This is a hack. I copy-pasted from node source's lib dir file listing to here. This is just a way of falling back
+	// if we can't actually get the listing from the node src install itself.
 	@SuppressWarnings("nls")
 	private static final Set<String> CORE_MODULES = CollectionsUtil.newSet("_debugger", "_linklist", "assert",
 			"buffer_ieee754", "buffer", "child_process", "cluster", "console", "constants", "crypto", "dgram", "dns",
@@ -100,17 +102,39 @@ public class NodeModuleResolver implements IRequireResolver
 
 	private IPath coreModule(String text)
 	{
-		return nodeSrcPath().append("lib").append(text + ".js"); //$NON-NLS-1$//$NON-NLS-2$
+		IPath node = nodeSrcPath();
+		if (node == null)
+		{
+			return null;
+		}
+		return node.append("lib").append(text + ".js"); //$NON-NLS-1$//$NON-NLS-2$
 	}
 
 	private IPath nodeSrcPath()
 	{
-		// FIXME User must set this in prefs!
-		return Path.fromOSString(PlatformUtil.expandEnvironmentStrings("~/Downloads/node-v0.8.14")); //$NON-NLS-1$
+		String value = Platform.getPreferencesService().getString(JSCorePlugin.PLUGIN_ID,
+				IPreferenceConstants.NODEJS_SOURCE_PATH, null, null);
+		if (StringUtil.isEmpty(value))
+		{
+			return null;
+		}
+		return Path.fromOSString(value);
 	}
 
 	private boolean isCore(String text)
 	{
+		IPath node = nodeSrcPath();
+		if (node != null)
+		{
+			String[] files = node.append("lib").toFile().list(); //$NON-NLS-1$
+			for (String file : files)
+			{
+				if (file.equals(text + ".js")) //$NON-NLS-1$
+				{
+					return true;
+				}
+			}
+		}
 		return CORE_MODULES.contains(text);
 	}
 

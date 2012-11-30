@@ -47,7 +47,10 @@ import com.aptana.js.core.node.INodeJSService;
 public class NodeJSService implements INodeJSService
 {
 
+	private static final String LIB = "lib"; //$NON-NLS-1$
+
 	private static final String APPDATA_NPM_PATH = "%APPDATA%\\npm"; //$NON-NLS-1$
+
 	/**
 	 * common locations for node installation!
 	 */
@@ -293,5 +296,28 @@ public class NodeJSService implements INodeJSService
 		{
 			listener.nodeJSInstalled();
 		}
+	}
+
+	public IStatus validateSourcePath(IPath path)
+	{
+		if (path == null || path.isEmpty())
+		{
+			return new Status(Status.ERROR, JSCorePlugin.PLUGIN_ID, Messages.NodeJSService_EmptySourcePath);
+		}
+
+		if (!path.toFile().isDirectory())
+		{
+			return new Status(Status.ERROR, JSCorePlugin.PLUGIN_ID, INodeJSService.ERR_DOES_NOT_EXIST,
+					MessageFormat.format(Messages.NodeJSService_NoDirectory_0, path), null);
+		}
+
+		if (!path.append(LIB).toFile().isDirectory())
+		{
+			return new Status(Status.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
+					Messages.NodeJSService_InvalidLocation_0, LIB));
+		}
+		// TODO Any other things we want to check for to "prove" it's a NodeJS source install?
+
+		return Status.OK_STATUS;
 	}
 }

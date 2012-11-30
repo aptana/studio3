@@ -28,4 +28,10 @@ public interface IPreferenceConstants
 	 */
 	public static final String NODEJS_EXECUTABLE_PATH = "nodejs_path"; //$NON-NLS-1$
 
+	/**
+	 * Path to NodeJS' source directory. Stored as OS string. Convert to {@link IPath} using
+	 * {@link Path#fromOSString(String)}
+	 */
+	public static final String NODEJS_SOURCE_PATH = "nodejs_source_path"; //$NON-NLS-1$
+
 }

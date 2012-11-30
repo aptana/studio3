@@ -16,11 +16,14 @@ public class Messages extends NLS
 	public static String NodeJSService_BadURLError;
 	public static String NodeJSService_CannotInstallOnLinuxMsg;
 	public static String NodeJSService_CouldntGetVersionError;
+	public static String NodeJSService_EmptySourcePath;
 	public static String NodeJSService_FileDoesntExistError;
 	public static String NodeJSService_InstallFailedError;
 	public static String NodeJSService_InstallingJobTitle;
 	public static String NodeJSService_InstallPrompt;
+	public static String NodeJSService_InvalidLocation_0;
 	public static String NodeJSService_InvalidVersionError;
+	public static String NodeJSService_NoDirectory_0;
 	public static String NodeJSService_NullPathError;
 
 	public static String NodePackageManager_ERR_NPMNotInstalled;
