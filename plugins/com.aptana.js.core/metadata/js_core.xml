@@ -5289,6 +5289,108 @@ if (typeof x == 'undefined') {
 			</browsers>
 		</property>
 		
+		<property name="Array" type="Class&lt;Array&gt;" access="read-only" visibility="basic">
+                <availability>
+                    <specification name="JavaScript" version="1.1"/>
+                </availability>
+                <description>A function responsible for creating new instances of Array objects</description>
+            </property>
+            <property name="Boolean" type="Class&lt;Boolean&gt;" access="read-only" visibility="basic">
+                <availability>
+                    <specification name="JavaScript" version="1.1"/>
+                </availability>
+                <description>A function responsible for creating new instances of Boolean objects</description>
+            </property>
+            <property name="Date" type="Class&lt;Date&gt;" access="read-only" visibility="basic">
+                <availability>
+                    <specification name="JavaScript" version="1.1"/>
+                </availability>
+                <description>A function responsible for creating new instances of Date objects</description>
+            </property>
+            <property name="Error" type="Class&lt;Error&gt;" access="read-only" visibility="basic">
+                <availability>
+                    <specification name="JavaScript" version="1.5"/>
+                </availability>
+                <description>A function responsible for creating new instances of Error objects</description>
+            </property>
+            <property name="Function" type="Class&lt;Function&gt;" access="read-only" visibility="basic">
+                <availability>
+                    <specification name="JavaScript" version="1.0"/>
+                </availability>
+                <description>A function responsible for creating new instances of Function objects</description>
+            </property>
+            <property name="Number" type="Class&lt;Number&gt;" access="read-only" visibility="basic">
+                <availability>
+                    <specification name="JavaScript" version="1.1"/>
+                </availability>
+                <description>A function responsible for creating new instances of Number objects</description>
+            </property>
+            <property name="Object" type="Class&lt;Object&gt;" access="read-only" visibility="basic">
+                <availability>
+                    <specification name="JavaScript" version="1.0"/>
+                </availability>
+                <description>A function responsible for creating new instances of Object objects</description>
+            </property>
+            <property name="RegExp" type="Class&lt;RegExp&gt;" access="read-only" visibility="basic">
+                <availability>
+                    <specification name="JavaScript" version="1.2"/>
+                </availability>
+                <description>A function responsible for creating new instances of RegExp objects</description>
+            </property>
+            <property name="String" type="Class&lt;String&gt;" access="read-only" visibility="basic">
+                <availability>
+                    <specification name="JavaScript" version="1.0"/>
+                </availability>
+                <description>A function responsible for creating new instances of String objects</description>
+            </property>       
+            <property name="EvalError" type="Class&lt;EvalError&gt;" access="read-only" visibility="basic">
+                <availability>
+                    <specification name="JavaScript" version="1.0"/>
+                </availability>
+                <description>A function responsible for creating new instances of EvalError objects</description>
+            </property>
+            <property name="RangeError" type="Class&lt;RangeError&gt;" access="read-only" visibility="basic">
+                <availability>
+                    <specification name="JavaScript" version="1.0"/>
+                </availability>
+                <description>A function responsible for creating new instances of RangeError objects</description>
+            </property>
+            <property name="ReferenceError" type="Class&lt;ReferenceError&gt;" access="read-only" visibility="basic">
+                <availability>
+                    <specification name="JavaScript" version="1.0"/>
+                </availability>
+                <description>A function responsible for creating new instances of ReferenceError objects</description>
+            </property>
+             <property name="SyntaxError" type="Class&lt;SyntaxError&gt;" access="read-only" visibility="basic">
+                <availability>
+                    <specification name="JavaScript" version="1.0"/>
+                </availability>
+                <description>A function responsible for creating new instances of SyntaxError objects</description>
+            </property>
+             <property name="TypeError" type="Class&lt;TypeError&gt;" access="read-only" visibility="basic">
+                <availability>
+                    <specification name="JavaScript" version="1.0"/>
+                </availability>
+                <description>A function responsible for creating new instances of TypeError objects</description>
+            </property>
+             <property name="URIError" type="Class&lt;URIError&gt;" access="read-only" visibility="basic">
+                <availability>
+                    <specification name="JavaScript" version="1.0"/>
+                </availability>
+                <description>A function responsible for creating new instances of URIError objects</description>
+            </property>
+             <property name="Math" type="Class&lt;Math&gt;" access="read-only" visibility="basic">
+                <availability>
+                    <specification name="JavaScript" version="1.0"/>
+                </availability>
+                <description>A function responsible for creating new instances of Math objects</description>
+            </property>
+             <property name="JSON" type="Class&lt;JSON&gt;" access="read-only" visibility="basic">
+                <availability>
+                    <specification name="ECMAScript v5"/>
+                </availability>
+                <description>A function responsible for creating new instances of JSON objects</description>
+            </property>
 		</properties>
 		
 		<methods>
