@@ -36,7 +36,8 @@ public interface IJSIndexConstants
 	// 0.32 - Transfer user agents from JSCA types to the properties that point to them
 	// 0.33 - Include function parameter and return values when they're not defined in sdoc comments
 	// 0.34 - Include initial ECMAScript 5.1 changes
-	public static final double INDEX_VERSION = 0.34;
+	// 0.35 - Add JS Core types as properties of Global
+	public static final double INDEX_VERSION = 0.35;
 
 	// for debugging, comment the line above, and uncomment the following
 	// public static final double INDEX_VERSION = new Random().nextDouble() * 1e6;
