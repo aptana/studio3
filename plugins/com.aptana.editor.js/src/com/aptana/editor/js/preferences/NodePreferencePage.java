@@ -43,8 +43,8 @@ public class NodePreferencePage extends FieldEditorPreferencePage implements IWo
 	{
 		// Node Executable location
 		FileFieldEditor fileEditor = new FileFieldEditor(IPreferenceConstants.NODEJS_EXECUTABLE_PATH,
-				Messages.NodePreferencePage_LocationLabel, true, FileFieldEditor.VALIDATE_ON_KEY_STROKE,
-				getFieldEditorParent())
+				StringUtil.makeFormLabel(Messages.NodePreferencePage_LocationLabel), true,
+				FileFieldEditor.VALIDATE_ON_KEY_STROKE, getFieldEditorParent())
 		{
 
 			@Override
@@ -68,18 +68,17 @@ public class NodePreferencePage extends FieldEditorPreferencePage implements IWo
 		addField(fileEditor);
 
 		sfe = new StringFieldEditor(
-				"some_non_existent_pref_key", Messages.NodePreferencePage_DetectedPathLabel, fep = getFieldEditorParent()); //$NON-NLS-1$
+				"some_non_existent_pref_key", StringUtil.makeFormLabel(Messages.NodePreferencePage_DetectedPathLabel), fep = getFieldEditorParent()); //$NON-NLS-1$
 		addField(sfe);
 
 		// Node Source location
 		DirectoryFieldEditor sourceEditor = new DirectoryFieldEditor(IPreferenceConstants.NODEJS_SOURCE_PATH,
-				Messages.NodePreferencePage_SourceLocationLabel, getFieldEditorParent())
+				StringUtil.makeFormLabel(Messages.NodePreferencePage_SourceLocationLabel), getFieldEditorParent())
 		{
 
 			@Override
 			protected boolean doCheckState()
 			{
-
 				// Now check that the dir is ok
 				String text = getTextControl().getText();
 				if (!StringUtil.isEmpty(text))
