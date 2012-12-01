@@ -17,9 +17,13 @@ import java.util.Set;
 
 import org.eclipse.ui.internal.browser.BrowserDescriptorWorkingCopy;
 import org.eclipse.ui.internal.browser.IBrowserDescriptor;
+import org.eclipse.ui.internal.browser.IBrowserDescriptorWorkingCopy;
 
 import com.aptana.core.util.BrowserUtil;
+import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.IBrowserUtil.BrowserInfo;
+import com.aptana.core.util.PlatformUtil;
+import com.aptana.core.util.StringUtil;
 
 /**
  * This is the BrowserManager counterpart to be used in Aptana Studio instead of the Eclipse BrowserManager. It wraps up
@@ -32,6 +36,10 @@ public class BrowserManager implements IBrowserProvider
 {
 
 	private static IBrowserProvider instance;
+
+	private static final String SAFARI_APP = "Safari.app"; //$NON-NLS-1$
+	private static final String SAFARI_PARAMS = "-a safari "; //$NON-NLS-1$
+	private static String openCommandPath; //$NON-NLS-1$
 
 	public static synchronized IBrowserProvider getInstance()
 	{
@@ -110,6 +118,7 @@ public class BrowserManager implements IBrowserProvider
 			// forces a save on the new list of browsers
 			eclipseBrowserManager.setCurrentWebBrowser(eclipseBrowserManager.getCurrentWebBrowser());
 		}
+		verifyBrowserConfigurations();
 		return browsersFound;
 	}
 
@@ -143,5 +152,28 @@ public class BrowserManager implements IBrowserProvider
 	public String getBrowserVersion(BrowserInfo info)
 	{
 		return BrowserUtil.getBrowserVersion(info);
+	}
+
+	public void verifyBrowserConfigurations()
+	{
+		if (PlatformUtil.isMac())
+		{
+			if (StringUtil.isEmpty(openCommandPath))
+			{
+				openCommandPath = ExecutableUtil.find("open", false, null).toOSString(); //$NON-NLS-1$
+			}
+			List<IBrowserDescriptor> browsers = org.eclipse.ui.internal.browser.BrowserManager.getInstance()
+					.getWebBrowsers();
+			for (IBrowserDescriptor browser : browsers)
+			{
+				if (browser.getLocation() != null && browser.getLocation().contains(SAFARI_APP))
+				{
+					IBrowserDescriptorWorkingCopy safariWorkingcopy = browser.getWorkingCopy();
+					safariWorkingcopy.setLocation(openCommandPath);
+					safariWorkingcopy.setParameters(SAFARI_PARAMS);
+					safariWorkingcopy.save();
+				}
+			}
+		}
 	}
 }
