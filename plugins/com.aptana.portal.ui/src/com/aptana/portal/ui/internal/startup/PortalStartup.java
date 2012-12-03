@@ -84,7 +84,7 @@ public class PortalStartup implements IStartup
 							final IResource resource = delta.getResource();
 							if (resource instanceof IProject && ((IProject) resource).getNature(TITANIUM_MOBILE_NATURE) != null)
 							{
-								IEclipsePreferences prefs = EclipseUtil.defaultScope()
+								IEclipsePreferences prefs = EclipseUtil.instanceScope()
 										.getNode(PortalUIPlugin.PLUGIN_ID);
 								prefs.put(IPortalPreferences.RECENTLY_CREATED_PROJECT, resource.getName());
 								try

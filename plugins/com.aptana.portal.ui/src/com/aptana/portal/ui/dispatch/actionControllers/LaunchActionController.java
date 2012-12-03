@@ -205,7 +205,7 @@ public class LaunchActionController extends AbstractActionController
 		if (StringUtil.isEmpty(projectName))
 		{
 			// Launch previously created project.
-			projectName = EclipseUtil.defaultScope().getNode(PortalUIPlugin.PLUGIN_ID)
+			projectName = EclipseUtil.instanceScope().getNode(PortalUIPlugin.PLUGIN_ID)
 					.get(IPortalPreferences.RECENTLY_CREATED_PROJECT, null);
 			if (StringUtil.isEmpty(projectName))
 			{

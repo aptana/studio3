@@ -36,6 +36,6 @@ public interface IPortalPreferences
 	/**
 	 * The preference key used to hold the recently created project.
 	 */
-	String RECENTLY_CREATED_PROJECT = PortalUIPlugin.PLUGIN_ID + "recently_created_project"; //$NON-NLS-1$
+	String RECENTLY_CREATED_PROJECT = "recently_created_project"; //$NON-NLS-1$
 
 }
