@@ -1306,7 +1306,7 @@ public class BundleManager
 				}
 			}
 
-			if (result == BundlePrecedence.PROJECT && path.startsWith(this.userBundlesPath))
+			if (result == BundlePrecedence.PROJECT && this.userBundlesPath != null && path.startsWith(this.userBundlesPath))
 			{
 				result = BundlePrecedence.USER;
 			}
