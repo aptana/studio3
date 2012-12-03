@@ -285,7 +285,7 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	protected List<ICompletionProposal> addElementProposals(ILexemeProvider<XMLTokenType> lexemeProvider, int offset)
 	{
-		List<ElementElement> elements = this._queryHelper.getElements();
+		List<ElementElement> elements = getElements(lexemeProvider, offset);
 		// return early if no elements
 		if (elements == null)
 		{
@@ -382,6 +382,11 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 		}
 
 		return proposals;
+	}
+
+	protected List<ElementElement> getElements(ILexemeProvider<XMLTokenType> lexemeProvider, int offset)
+	{
+		return this._queryHelper.getElements();
 	}
 
 	/**

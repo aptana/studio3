@@ -511,35 +511,7 @@ public class JSIndexReader extends IndexReader
 	 */
 	public List<String> getTypeNames(Index index)
 	{
-		List<String> result = new ArrayList<String>();
-
-		if (index != null)
-		{
-			// @formatter:off
-			List<QueryResult> types = index.query(
-				new String[] { IJSIndexConstants.TYPE },
-				"*", //$NON-NLS-1$
-				SearchPattern.PATTERN_MATCH
-			);
-			// @formatter:on
-
-			if (types != null)
-			{
-				for (QueryResult type : types)
-				{
-					String word = type.getWord();
-					int delimiterIndex = word.indexOf(getDelimiter());
-
-					if (delimiterIndex != -1)
-					{
-						result.add(new String(word.substring(0, delimiterIndex)));
-					}
-					// else warn?
-				}
-			}
-		}
-
-		return result;
+		return getTypeNames(index, "*", SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE); //$NON-NLS-1$
 	}
 
 	/**
@@ -605,5 +577,37 @@ public class JSIndexReader extends IndexReader
 
 		// build pattern for all types
 		return "(" + StringUtil.join("|", quotedOwningTypes) + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
+	public List<String> getTypeNames(Index index, String pattern, int matchFlags)
+	{
+		List<String> result = new ArrayList<String>();
+
+		if (index != null)
+		{
+			// @formatter:off
+			List<QueryResult> types = index.query(
+				new String[] { IJSIndexConstants.TYPE },
+				pattern, matchFlags
+			);
+			// @formatter:on
+
+			if (types != null)
+			{
+				for (QueryResult type : types)
+				{
+					String word = type.getWord();
+					int delimiterIndex = word.indexOf(getDelimiter());
+
+					if (delimiterIndex != -1)
+					{
+						result.add(new String(word.substring(0, delimiterIndex)));
+					}
+					// else warn?
+				}
+			}
+		}
+
+		return result;
 	}
 }
