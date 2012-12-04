@@ -163,6 +163,12 @@
             notificationTarget="*">
       </browserNotification>
       <browserNotification
+            class="com.aptana.portal.ui.dispatch.browserNotifications.ProjectCreationBrowserNotification"
+            id="com.aptana.portal.ui.projectCreateNotification"
+            name="Project Create Notifier"
+            notificationTarget="*">
+      </browserNotification>
+      <browserNotification
             class="com.aptana.portal.ui.dispatch.browserNotifications.TemplatesNotification"
             id="com.aptana.portal.ui.templatesNotification"
             name="Templates Notifier"
