@@ -1142,16 +1142,17 @@ public class JSStyleValidator extends AbstractBuildParticipant
 			{
 				problems.add(createWarning(Messages.JSStyleValidator_AssignException, left));
 			}
-			if (currentScope().get(name) != null)
+
+			if (predefineds.contains(name))
 			{
-				if (predefineds.contains(name))
+				if (currentScope().get(name) != null)
 				{
 					problems.add(createWarning(Messages.JSStyleValidator_ReadOnly, node.getRightHandSide()));
 				}
-			}
-			else
-			{
-				problems.add(createError(Messages.JSStyleValidator_ReadOnly, node.getRightHandSide()));
+				else
+				{
+					problems.add(createError(Messages.JSStyleValidator_ReadOnly, node.getRightHandSide()));
+				}
 			}
 
 			// Make a note that we're assigning to this variable.
