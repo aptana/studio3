@@ -3129,4 +3129,15 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 		List<IProblem> items = getParseErrors(text);
 		assertProblemExists(items, "document.write can be a form of eval.", 2, IMarker.SEVERITY_WARNING, 24);
 	}
+
+	public void testTISTUD2925() throws CoreException
+	{
+		// @formatter:off
+		String text = "var child = spawn(cmd.shift(), cmd);\n" +
+					  "re = new RegExp('(\\u001b\\\\[\\\\d+m)?\\\\[?(' + logger.getLevels().join('|') + ')\\\\]?\\s*(\\u001b\\\\[\\\\d+m)?(.*)', 'i');";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "Read only.");
+	}
 }
