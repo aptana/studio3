@@ -87,7 +87,12 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 
 		IProject project = getProjectHandle();
 
-		List<IBuildParticipant> participants = getBuildParticipantManager().getAllBuildParticipants();
+		IBuildParticipantManager manager = getBuildParticipantManager();
+		if (manager == null)
+		{
+			return;
+		}
+		List<IBuildParticipant> participants = manager.getAllBuildParticipants();
 		participants = filterToEnabled(participants, project);
 
 		SubMonitor sub = SubMonitor.convert(monitor, participants.size() + 2);
@@ -140,7 +145,12 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 
 		// Keep these build participant instances and use them in the build process, rather than grabbing new ones
 		// in sub-methods. We do pre- and post- setups on them, so we need to retain instances.
-		List<IBuildParticipant> participants = getBuildParticipantManager().getAllBuildParticipants();
+		IBuildParticipantManager manager = getBuildParticipantManager();
+		if (manager == null)
+		{
+			return new IProject[0];
+		}
+		List<IBuildParticipant> participants = manager.getAllBuildParticipants();
 		participants = filterToEnabled(participants, project);
 		buildStarting(participants, kind, sub.newChild(10));
 
@@ -254,8 +264,13 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 		{
 			BuildContext context = new BuildContext(file);
 			sub.worked(1);
-			List<IBuildParticipant> filteredParticipants = getBuildParticipantManager().filterParticipants(
-					participants, context.getContentType());
+			IBuildParticipantManager manager = getBuildParticipantManager();
+			if (manager == null)
+			{
+				return;
+			}
+			List<IBuildParticipant> filteredParticipants = manager.filterParticipants(participants,
+					context.getContentType());
 			sub.worked(5);
 			deleteFile(context, filteredParticipants, sub.newChild(10));
 		}
@@ -279,7 +294,8 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 
 	protected IBuildParticipantManager getBuildParticipantManager()
 	{
-		return BuildPathCorePlugin.getDefault().getBuildParticipantManager();
+		BuildPathCorePlugin plugin = BuildPathCorePlugin.getDefault();
+		return (plugin == null) ? null : plugin.getBuildParticipantManager();
 	}
 
 	/**
@@ -330,8 +346,13 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 			BuildContext context = new FileStoreBuildContext(project, file);
 			sub.worked(1);
 
-			List<IBuildParticipant> filteredParticipants = getBuildParticipantManager().filterParticipants(
-					participants, context.getContentType());
+			IBuildParticipantManager manager = getBuildParticipantManager();
+			if (manager == null)
+			{
+				return;
+			}
+			List<IBuildParticipant> filteredParticipants = manager.filterParticipants(participants,
+					context.getContentType());
 			sub.worked(2);
 
 			buildFile(context, filteredParticipants, sub.newChild(12));
@@ -430,8 +451,13 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 			BuildContext context = new BuildContext(file);
 			sub.worked(1);
 
-			List<IBuildParticipant> filteredParticipants = getBuildParticipantManager().filterParticipants(
-					participants, context.getContentType());
+			IBuildParticipantManager manager = getBuildParticipantManager();
+			if (manager == null)
+			{
+				return;
+			}
+			List<IBuildParticipant> filteredParticipants = manager.filterParticipants(participants,
+					context.getContentType());
 			sub.worked(2);
 
 			buildFile(context, filteredParticipants, sub.newChild(12));
