@@ -7,6 +7,7 @@
  */
 package com.aptana.js.internal.core.node;
 
+import java.io.File;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -78,6 +79,10 @@ public class NodePackageManager implements INodePackageManager
 	private static final String INSTALL = "install"; //$NON-NLS-1$
 	private static final String LIST = "list"; //$NON-NLS-1$
 
+	private IPath npmPath;
+
+	private Boolean isNpmConfigWritable;
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.appcelerator.titanium.nodejs.core.INodePackageManager#install(com.appcelerator.titanium.nodejs.core.
@@ -100,7 +105,7 @@ public class NodePackageManager implements INodePackageManager
 			List<String> args = new ArrayList<String>(8);
 			if (global)
 			{
-				if (PlatformUtil.isMac() || PlatformUtil.isLinux())
+				if ((PlatformUtil.isMac() || PlatformUtil.isLinux()) && password.length > 0)
 				{
 					args.add("sudo"); //$NON-NLS-1$
 					args.add("-S"); //$NON-NLS-1$
@@ -189,17 +194,21 @@ public class NodePackageManager implements INodePackageManager
 
 	public IPath findNPM()
 	{
-		List<IPath> commonLocations;
-		if (PlatformUtil.isWindows())
+		if (npmPath == null)
 		{
-			commonLocations = CollectionsUtil.newList(Path.fromOSString(PlatformUtil
-					.expandEnvironmentStrings(APPDATA_NPM_EXE)));
+			List<IPath> commonLocations;
+			if (PlatformUtil.isWindows())
+			{
+				commonLocations = CollectionsUtil.newList(Path.fromOSString(PlatformUtil
+						.expandEnvironmentStrings(APPDATA_NPM_EXE)));
+			}
+			else
+			{
+				commonLocations = CollectionsUtil.newList(Path.fromOSString(USR_LOCAL_BIN_NPM));
+			}
+			npmPath = ExecutableUtil.find(NPM, true, commonLocations);
 		}
-		else
-		{
-			commonLocations = CollectionsUtil.newList(Path.fromOSString(USR_LOCAL_BIN_NPM));
-		}
-		return ExecutableUtil.find(NPM, true, commonLocations);
+		return npmPath;
 	}
 
 	public Set<String> list(boolean global) throws CoreException
@@ -358,5 +367,26 @@ public class NodePackageManager implements INodePackageManager
 					"Failed to get value of npm config key {0}", key)));
 		}
 		return status.getMessage().trim();
+	}
+
+	public boolean isNpmConfigWritable()
+	{
+		if (isNpmConfigWritable == null)
+		{
+			try
+			{
+				String nodePrefixValue = getConfigValue("prefix"); //$NON-NLS-1$
+				File destinationFolder = new File(nodePrefixValue);
+				isNpmConfigWritable = destinationFolder.canWrite();
+			}
+			catch (CoreException e)
+			{
+				// something wrong with getting prefix - this can be ignored safely as we
+				// fall back to using default mechanism.
+				isNpmConfigWritable = false;
+			}
+		}
+		return isNpmConfigWritable;
+
 	}
 }
