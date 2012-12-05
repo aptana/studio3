@@ -9,6 +9,7 @@ package com.aptana.editor.dtd;
 
 import org.eclipse.jface.text.rules.IPartitionTokenScanner;
 
+import com.aptana.dtd.core.IDTDConstants;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.SimpleDocumentProvider;
 

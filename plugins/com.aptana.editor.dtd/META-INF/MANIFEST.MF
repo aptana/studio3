@@ -8,18 +8,17 @@ Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
  org.eclipse.core.filesystem,
+ beaver,
+ com.aptana.parsing,
+ com.aptana.dtd.core;visibility:=reexport,
  org.eclipse.jface.text,
  org.eclipse.ui,
  org.eclipse.ui.editors,
- beaver,
- com.aptana.parsing,
  com.aptana.theme,
  com.aptana.editor.common,
  org.eclipse.compare
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.editor.dtd,
- com.aptana.editor.dtd.parsing,
- com.aptana.editor.dtd.parsing.ast,
  com.aptana.editor.dtd.text.rules;x-friends:="com.aptana.editor.xml"
 Eclipse-ExtensibleAPI: true

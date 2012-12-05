@@ -16,12 +16,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.aptana.editor.dtd.IDTDConstants;
-import com.aptana.editor.dtd.parsing.ast.DTDAttListDeclNode;
-import com.aptana.editor.dtd.parsing.ast.DTDAttributeNode;
-import com.aptana.editor.dtd.parsing.ast.DTDElementDeclNode;
-import com.aptana.editor.dtd.parsing.ast.DTDParseRootNode;
-import com.aptana.editor.dtd.parsing.ast.DTDTreeWalker;
+import com.aptana.dtd.core.IDTDConstants;
+import com.aptana.dtd.core.parsing.ast.DTDAttListDeclNode;
+import com.aptana.dtd.core.parsing.ast.DTDAttributeNode;
+import com.aptana.dtd.core.parsing.ast.DTDElementDeclNode;
+import com.aptana.dtd.core.parsing.ast.DTDParseRootNode;
+import com.aptana.dtd.core.parsing.ast.DTDTreeWalker;
 import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;

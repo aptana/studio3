@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="DTD parsers build" default="build">
+    <description>
+            Builds the DTD related parsers.
+    </description>
+
+    <taskdef name="jflex" classname="JFlex.anttask.JFlexTask">
+        <classpath>
+           <!-- 
+           Note: Path must be updated to proper JFlex location for building it.
+            Hardcoded for now as we don't have JFlex on our distribution (so, needs to be
+            updated to the proper path if someone else needs to re-generate the parser again).
+            -->
+            <pathelement location="../../beaver/JFlex.jar" />
+        </classpath>
+    </taskdef>
+
+    <taskdef name="beaver" classname="beaver.comp.run.AntTask" classpath="../../beaver/bin"/>
+
+    <target name="build">
+        <jflex 
+            file="DTD.flex" 
+            outdir="../src/com/aptana/dtd/core/parsing" 
+            nobak="on"/>
+        
+        <beaver 
+            file             = "DTD.grammar"
+            destdir          = "../src"
+            exportTerminals  = "yes"
+            useSwitch        = "yes"/>
+        
+    </target>
+</project>

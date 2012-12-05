@@ -35,6 +35,7 @@ public class CoreTests
 		suite.addTest(com.aptana.git.core.tests.AllGitCoreTests.suite());
 		suite.addTest(com.aptana.index.core.tests.AllIndexCoreTests.suite());
 		suite.addTest(com.aptana.parsing.tests.AllTests.suite());
+		suite.addTest(com.aptana.dtd.core.tests.AllTests.suite());
 		suite.addTest(com.aptana.js.core.tests.AllJSCoreTests.suite());
 		suite.addTest(com.aptana.samples.tests.AllTests.suite());
 		suite.addTest(com.aptana.scripting.tests.AllTests.suite());
