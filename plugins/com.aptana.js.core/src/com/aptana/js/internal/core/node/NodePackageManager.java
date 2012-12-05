@@ -79,6 +79,8 @@ public class NodePackageManager implements INodePackageManager
 	private static final String INSTALL = "install"; //$NON-NLS-1$
 	private static final String LIST = "list"; //$NON-NLS-1$
 
+	private static final String NPM_CONFIG_PREFIX = "NPM_CONFIG_PREFIX"; //$NON-NLS-1$
+
 	private IPath npmPath;
 
 	private Boolean isNpmConfigWritable;
@@ -388,5 +390,28 @@ public class NodePackageManager implements INodePackageManager
 		}
 		return isNpmConfigWritable;
 
+	}
+
+	public List<IPath> getPackagesInstallLocations()
+	{
+		List<IPath> installLocations = new ArrayList<IPath>(2);
+		String BIN_DIR = "/bin/"; //$NON-NLS-1$
+		try
+		{
+			String npmConfigPrefixPath = ShellExecutable.getEnvironment().get(NPM_CONFIG_PREFIX);
+			if (npmConfigPrefixPath != null)
+			{
+				installLocations.add(Path.fromOSString(npmConfigPrefixPath + BIN_DIR));
+			}
+			npmConfigPrefixPath = getConfigValue("prefix"); //$NON-NLS-1$
+			if (npmConfigPrefixPath != null)
+			{
+				installLocations.add(Path.fromOSString(npmConfigPrefixPath + BIN_DIR));
+			}
+		}
+		catch (CoreException e)
+		{
+		}
+		return installLocations;
 	}
 }

@@ -7,6 +7,7 @@
  */
 package com.aptana.js.core.node;
 
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
@@ -79,6 +80,8 @@ public interface INodePackageManager
 	public String getConfigValue(String key) throws CoreException;
 
 	boolean isNpmConfigWritable();
+
+	public List<IPath> getPackagesInstallLocations();
 
 	// TODO Uninstall
 	// TODO Update
