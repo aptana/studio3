@@ -38,8 +38,9 @@ import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.xml.internal.text.XMLFoldingComputer;
 import com.aptana.editor.xml.outline.XMLOutlineContentProvider;
 import com.aptana.editor.xml.outline.XMLOutlineLabelProvider;
-import com.aptana.editor.xml.parsing.ast.XMLElementNode;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.xml.core.IXMLConstants;
+import com.aptana.xml.core.parsing.ast.XMLElementNode;
 
 @SuppressWarnings("restriction")
 public class XMLEditor extends AbstractThemeableEditor
@@ -215,14 +216,14 @@ public class XMLEditor extends AbstractThemeableEditor
 				{
 					// TODO Compare versus last positions, if they're the same don't wipe out the old ones and add new
 					// ones!
-					occurrences.put(new Annotation(IXMLConstants.TAG_PAIR_OCCURRENCE_ID, false, null), new Position(
-							match.getOffset(), match.getLength()));
+					occurrences.put(new Annotation(IXMLEditorConstants.TAG_PAIR_OCCURRENCE_ID, false, null),
+							new Position(match.getOffset(), match.getLength()));
 
 					try
 					{
 						// The current tag we're in!
 						ITypedRegion partition = document.getPartition(offset);
-						occurrences.put(new Annotation(IXMLConstants.TAG_PAIR_OCCURRENCE_ID, false, null),
+						occurrences.put(new Annotation(IXMLEditorConstants.TAG_PAIR_OCCURRENCE_ID, false, null),
 								new Position(partition.getOffset(), partition.getLength()));
 					}
 					catch (BadLocationException e)

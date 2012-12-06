@@ -11,8 +11,8 @@ import org.eclipse.jface.text.IDocument;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.text.AbstractFoldingComputer;
-import com.aptana.editor.xml.parsing.ast.XMLNode;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.xml.core.parsing.ast.XMLNode;
 
 public class XMLFoldingComputer extends AbstractFoldingComputer
 {

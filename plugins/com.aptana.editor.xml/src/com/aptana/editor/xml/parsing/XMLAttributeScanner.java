@@ -22,8 +22,8 @@ import org.eclipse.jface.text.rules.WordRule;
 import com.aptana.editor.common.text.rules.CharacterMapRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
 import com.aptana.editor.dtd.text.rules.DTDNameDetector;
-import com.aptana.editor.xml.parsing.lexer.XMLTokenType;
 import com.aptana.editor.xml.text.rules.XMLAttributeRule;
+import com.aptana.xml.core.parsing.XMLTokenType;
 
 class XMLAttributeScanner extends RuleBasedScanner
 {

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            base-type="org.eclipse.core.runtime.xml"
+            file-extensions="xsl"
+            id="com.aptana.contenttype.xsl"
+            name="%content-type.xsl.name"
+            priority="normal">
+      </content-type>
+   </extension>
+   <extension
+         point="com.aptana.parsing.parser">
+      <parser
+            class="com.aptana.xml.core.parsing.XMLParser"
+            content-type="org.eclipse.core.runtime.xml">
+      </parser>
+   </extension>
+</plugin>

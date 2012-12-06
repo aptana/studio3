@@ -8,6 +8,7 @@ Require-Bundle: com.aptana.core,
  beaver,
  com.aptana.parsing,
  com.aptana.index.core,
+ com.aptana.xml.core;visibility:=reexport,
  org.eclipse.ui.editors,
  org.eclipse.ui.views,
  org.eclipse.compare,
@@ -19,11 +20,7 @@ Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-Localization: plugin
 Export-Package: com.aptana.editor.xml,
  com.aptana.editor.xml.contentassist;x-friends:="com.aptana.editor.svg,com.appcelerator.titanium.alloy.ui",
- com.aptana.editor.xml.contentassist.index;x-friends:="com.aptana.editor.svg,com.appcelerator.titanium.alloy.ui",
- com.aptana.editor.xml.contentassist.model;x-friends:="com.aptana.editor.svg,com.appcelerator.titanium.alloy.ui",
  com.aptana.editor.xml.parsing;x-friends:="com.aptana.editor.svg",
- com.aptana.editor.xml.parsing.ast,
- com.aptana.editor.xml.parsing.lexer;x-friends:="com.aptana.editor.svg",
  com.aptana.editor.xml.text.rules
 Bundle-Activator: com.aptana.editor.xml.XMLPlugin
 Bundle-ActivationPolicy: lazy

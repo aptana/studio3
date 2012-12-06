@@ -37,15 +37,16 @@ import com.aptana.editor.common.contentassist.ILexemeProvider;
 import com.aptana.editor.xml.XMLPlugin;
 import com.aptana.editor.xml.XMLSourceConfiguration;
 import com.aptana.editor.xml.XMLTagScanner;
-import com.aptana.editor.xml.contentassist.index.IXMLIndexConstants;
-import com.aptana.editor.xml.contentassist.model.AttributeElement;
-import com.aptana.editor.xml.contentassist.model.ElementElement;
-import com.aptana.editor.xml.contentassist.model.ValueElement;
-import com.aptana.editor.xml.parsing.lexer.XMLLexemeProvider;
-import com.aptana.editor.xml.parsing.lexer.XMLTokenType;
+import com.aptana.editor.xml.internal.XMLLexemeProvider;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Lexeme;
 import com.aptana.parsing.lexer.Range;
+import com.aptana.xml.core.index.IXMLIndexConstants;
+import com.aptana.xml.core.index.XMLIndexQueryHelper;
+import com.aptana.xml.core.model.AttributeElement;
+import com.aptana.xml.core.model.ElementElement;
+import com.aptana.xml.core.model.ValueElement;
+import com.aptana.xml.core.parsing.XMLTokenType;
 
 public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 {

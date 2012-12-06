@@ -37,7 +37,7 @@ public class PerformanceTests
 		suite.addTest(com.aptana.js.core.tests.PerformanceTests.suite());
 		suite.addTest(com.aptana.scripting.tests.PerformanceTests.suite());
 		suite.addTest(com.aptana.editor.common.tests.PerformanceTests.suite());
-		suite.addTest(com.aptana.editor.xml.tests.PerformanceTests.suite());
+		suite.addTest(com.aptana.xml.core.tests.PerformanceTests.suite());
 		suite.addTest(com.aptana.editor.css.tests.PerformanceTests.suite());
 		suite.addTest(com.aptana.editor.js.tests.PerformanceTests.suite());
 		suite.addTest(com.aptana.editor.html.tests.PerformanceTests.suite());

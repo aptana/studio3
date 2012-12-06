@@ -23,12 +23,12 @@ import com.aptana.editor.common.text.rules.BreakingMultiLineRule;
 import com.aptana.editor.common.text.rules.CharacterMapRule;
 import com.aptana.editor.common.text.rules.MultiCharacterRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
-import com.aptana.editor.xml.internal.IXMLScopes;
-import com.aptana.editor.xml.parsing.lexer.XMLTokenType;
 import com.aptana.editor.xml.text.rules.AttributeNameWordDetector;
 import com.aptana.editor.xml.text.rules.BrokenStringRule;
 import com.aptana.editor.xml.text.rules.TagNameWordDetector;
 import com.aptana.editor.xml.text.rules.TagWordRule;
+import com.aptana.xml.core.IXMLScopes;
+import com.aptana.xml.core.parsing.XMLTokenType;
 
 public class XMLTagScanner extends RuleBasedScanner implements IXMLScopes
 {

@@ -15,8 +15,8 @@ import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.css.outline.CSSOutlineLabelProvider;
 import com.aptana.editor.js.outline.JSOutlineLabelProvider;
 import com.aptana.editor.svg.SVGPlugin;
-import com.aptana.editor.xml.parsing.ast.XMLNode;
 import com.aptana.js.core.IJSConstants;
+import com.aptana.xml.core.parsing.ast.XMLNode;
 
 /**
  * SVGOutlineLabelProvider

@@ -18,7 +18,7 @@ import com.aptana.editor.common.CommonUtil;
 import com.aptana.editor.common.text.rules.EntityRule;
 import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
-import com.aptana.editor.xml.internal.IXMLScopes;
+import com.aptana.xml.core.IXMLScopes;
 
 public class XMLScanner extends RuleBasedScanner implements IXMLScopes
 {

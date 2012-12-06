@@ -35,8 +35,9 @@ import com.aptana.editor.common.text.rules.TagRule;
 import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
 import com.aptana.editor.dtd.DTDSourceConfiguration;
 import com.aptana.editor.xml.contentassist.XMLContentAssistProcessor;
-import com.aptana.editor.xml.internal.IXMLScopes;
 import com.aptana.editor.xml.internal.text.rules.DocTypeRule;
+import com.aptana.xml.core.IXMLConstants;
+import com.aptana.xml.core.IXMLScopes;
 
 /**
  * @author Max Stepanov

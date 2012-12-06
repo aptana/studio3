@@ -27,13 +27,6 @@
       </initializer>
    </extension>
    <extension
-         point="com.aptana.parsing.parser">
-      <parser
-            class="com.aptana.editor.xml.parsing.XMLParser"
-            content-type="org.eclipse.core.runtime.xml">
-      </parser>
-   </extension>
-   <extension
          point="org.eclipse.ui.editors.markerAnnotationSpecification">
       <specification
             annotationType="com.aptana.xml.tagPair.occurrences"
@@ -76,16 +69,6 @@
             id="com.aptana.editor.xml.preferences.XMLPreferencePage"
             name="%page.preference.name">
       </page>
-   </extension>
-   <extension
-         point="org.eclipse.core.contenttype.contentTypes">
-      <content-type
-            base-type="org.eclipse.core.runtime.xml"
-            file-extensions="xsl"
-            id="com.aptana.contenttype.xsl"
-            name="%content-type.xsl.name"
-            priority="normal">
-      </content-type>
    </extension>
    <extension
          point="org.eclipse.compare.contentMergeViewers">

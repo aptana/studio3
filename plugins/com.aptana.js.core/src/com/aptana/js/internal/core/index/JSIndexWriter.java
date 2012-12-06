@@ -115,7 +115,7 @@ public class JSIndexWriter extends IndexWriter
 	 * @param property
 	 * @param location
 	 */
-	protected void writeProperty(Index index, PropertyElement property, URI location)
+	public void writeProperty(Index index, PropertyElement property, URI location)
 	{
 		// @formatter:off
 		String value = StringUtil.join(

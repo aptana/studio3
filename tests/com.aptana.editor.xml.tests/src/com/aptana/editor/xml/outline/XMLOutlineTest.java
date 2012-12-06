@@ -10,8 +10,8 @@ package com.aptana.editor.xml.outline;
 import junit.framework.TestCase;
 
 import com.aptana.editor.xml.XMLPlugin;
-import com.aptana.editor.xml.parsing.XMLParser;
 import com.aptana.parsing.ParseState;
+import com.aptana.xml.core.parsing.XMLParser;
 
 public class XMLOutlineTest extends TestCase
 {
