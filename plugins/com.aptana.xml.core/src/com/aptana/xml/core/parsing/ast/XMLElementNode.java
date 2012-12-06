@@ -16,6 +16,7 @@ import beaver.Symbol;
 
 import com.aptana.core.IMap;
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.ObjectUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.parsing.ast.INameNode;
 import com.aptana.parsing.ast.IParseNode;
@@ -79,7 +80,7 @@ public class XMLElementNode extends XMLNode
 			return false;
 		}
 
-		return getName().equals(((XMLElementNode) obj).getName());
+		return ObjectUtil.areEqual(getName(), ((XMLElementNode) obj).getName());
 	}
 
 	/**
@@ -160,7 +161,8 @@ public class XMLElementNode extends XMLNode
 	@Override
 	public int hashCode()
 	{
-		return 31 * super.hashCode() + getName().hashCode();
+		String name = getName();
+		return 31 * super.hashCode() + (name == null ? 1 : getName().hashCode());
 	}
 
 	/**
@@ -198,24 +200,22 @@ public class XMLElementNode extends XMLNode
 	@Override
 	public String toString()
 	{
-		StringBuilder text = new StringBuilder();
 		String name = getName();
-
-		if (name.length() > 0)
+		if (StringUtil.isEmpty(name))
 		{
-			text.append('<').append(name);
-			text.append('>');
-
-			IParseNode[] children = getChildren();
-
-			for (IParseNode child : children)
-			{
-				text.append(child);
-			}
-
-			text.append("</").append(name).append('>'); //$NON-NLS-1$
+			return StringUtil.EMPTY;
 		}
 
+		StringBuilder text = new StringBuilder();
+		text.append('<').append(name).append('>');
+
+		IParseNode[] children = getChildren();
+		for (IParseNode child : children)
+		{
+			text.append(child);
+		}
+
+		text.append("</").append(name).append('>'); //$NON-NLS-1$
 		return text.toString();
 	}
 }
