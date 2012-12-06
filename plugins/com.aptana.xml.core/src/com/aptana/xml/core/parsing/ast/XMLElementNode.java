@@ -106,6 +106,10 @@ public class XMLElementNode extends XMLNode
 	@Override
 	public IParseNodeAttribute[] getAttributes()
 	{
+		if (CollectionsUtil.isEmpty(fAttributes))
+		{
+			return NO_ATTRIBUTES;
+		}
 		final XMLElementNode self = this;
 		List<IParseNodeAttribute> attributes = CollectionsUtil.map(fAttributes.entrySet(),
 				new IMap<Map.Entry<String, String>, IParseNodeAttribute>()
