@@ -22,7 +22,7 @@ public class WebPerspectiveFactory implements IPerspectiveFactory
 	 */
 	public static final int VERSION = 103;
 
-	private static final String APP_EXPLORER_ID = "com.aptana.explorer.view"; //$NON-NLS-1$
+	public static final String APP_EXPLORER_ID = "com.aptana.explorer.view"; //$NON-NLS-1$
 
 	public void createInitialLayout(IPageLayout layout)
 	{

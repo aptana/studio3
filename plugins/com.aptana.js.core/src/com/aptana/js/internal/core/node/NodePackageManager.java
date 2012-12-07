@@ -46,6 +46,9 @@ import com.aptana.js.core.node.INodePackageManager;
 public class NodePackageManager implements INodePackageManager
 {
 
+	private static final String BIN = "/bin/"; //$NON-NLS-1$
+	private static final String LIB = "/lib/"; //$NON-NLS-1$
+
 	/**
 	 * Argument to {@code COLOR} switch/config option so that ANSI colors aren't used in output.
 	 */
@@ -371,6 +374,16 @@ public class NodePackageManager implements INodePackageManager
 		return status.getMessage().trim();
 	}
 
+	private boolean isDirectoryWritable(String dirName)
+	{
+		if (StringUtil.isEmpty(dirName))
+		{
+			return false;
+		}
+		File destinationFolder = new File(dirName);
+		return destinationFolder.canWrite();
+	}
+
 	public boolean isNpmConfigWritable()
 	{
 		if (isNpmConfigWritable == null)
@@ -378,8 +391,11 @@ public class NodePackageManager implements INodePackageManager
 			try
 			{
 				String nodePrefixValue = getConfigValue("prefix"); //$NON-NLS-1$
-				File destinationFolder = new File(nodePrefixValue);
-				isNpmConfigWritable = destinationFolder.canWrite();
+				isNpmConfigWritable = isDirectoryWritable(nodePrefixValue);
+
+				isNpmConfigWritable &= isDirectoryWritable(nodePrefixValue + BIN);
+				isNpmConfigWritable &= isDirectoryWritable(nodePrefixValue + LIB);
+
 			}
 			catch (CoreException e)
 			{
@@ -395,18 +411,17 @@ public class NodePackageManager implements INodePackageManager
 	public List<IPath> getPackagesInstallLocations()
 	{
 		List<IPath> installLocations = new ArrayList<IPath>(2);
-		String BIN_DIR = "/bin/"; //$NON-NLS-1$
 		try
 		{
 			String npmConfigPrefixPath = ShellExecutable.getEnvironment().get(NPM_CONFIG_PREFIX);
 			if (npmConfigPrefixPath != null)
 			{
-				installLocations.add(Path.fromOSString(npmConfigPrefixPath + BIN_DIR));
+				installLocations.add(Path.fromOSString(npmConfigPrefixPath + BIN));
 			}
 			npmConfigPrefixPath = getConfigValue("prefix"); //$NON-NLS-1$
 			if (npmConfigPrefixPath != null)
 			{
-				installLocations.add(Path.fromOSString(npmConfigPrefixPath + BIN_DIR));
+				installLocations.add(Path.fromOSString(npmConfigPrefixPath + BIN));
 			}
 		}
 		catch (CoreException e)

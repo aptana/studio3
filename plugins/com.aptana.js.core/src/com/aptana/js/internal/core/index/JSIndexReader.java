@@ -29,6 +29,7 @@ import com.aptana.js.core.model.FunctionElement;
 import com.aptana.js.core.model.PropertyElement;
 import com.aptana.js.core.model.TypeElement;
 
+// TODO Combine with JSIndexQueryHelper! They're both doing the same thing, but Query helper adds the JS Core index in to calls!
 public class JSIndexReader extends IndexReader
 {
 	/**
