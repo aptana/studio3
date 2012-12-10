@@ -30,6 +30,7 @@ import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.ProcessRunnable;
+import com.aptana.core.util.ProcessStatus;
 import com.aptana.core.util.ProcessUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.SudoCommandProcessRunnable;
@@ -149,6 +150,16 @@ public class NodeJSService implements INodeJSService
 			// Report the status from the installer.
 			if (!status.isOK())
 			{
+				String message;
+				if (status instanceof ProcessStatus)
+				{
+					message = ((ProcessStatus) status).getStdErr();
+				}
+				else
+				{
+					message = status.getMessage();
+				}
+				IdeLog.logError(JSCorePlugin.getDefault(), "Failed to install NodeJS: " + message); //$NON-NLS-1$
 				return new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, Messages.NodeJSService_InstallFailedError);
 			}
 			if (PlatformUtil.isWindows())
