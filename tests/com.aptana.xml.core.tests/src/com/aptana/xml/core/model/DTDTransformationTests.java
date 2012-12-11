@@ -22,6 +22,8 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
+import com.aptana.core.IMap;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.xml.core.XMLCorePlugin;
@@ -51,7 +53,7 @@ public class DTDTransformationTests extends TestCase
 
 		return result;
 	}
-	
+
 	/**
 	 * getContent
 	 * 
@@ -61,10 +63,10 @@ public class DTDTransformationTests extends TestCase
 	protected String getContent(String resource)
 	{
 		File file = this.getFile(new Path(resource));
-		
+
 		return this.getContent(file);
 	}
-	
+
 	/**
 	 * getFile
 	 * 
@@ -97,7 +99,7 @@ public class DTDTransformationTests extends TestCase
 
 		return result;
 	}
-	
+
 	/**
 	 * attributesTest
 	 * 
@@ -107,12 +109,12 @@ public class DTDTransformationTests extends TestCase
 	protected void attributesTest(String source, String element, String... attributes)
 	{
 		DTDTransformer transformer = new DTDTransformer();
-		
+
 		transformer.transform(source);
-		
-		// find target element 
+
+		// find target element
 		ElementElement targetElement = null;
-		
+
 		for (ElementElement e : transformer.getElements())
 		{
 			if (e.getName().equals(element))
@@ -121,25 +123,25 @@ public class DTDTransformationTests extends TestCase
 				break;
 			}
 		}
-		
+
 		assertNotNull(targetElement);
-		//assertEquals(attributes.length, targetElement.getAttributes().size());
-		
+		// assertEquals(attributes.length, targetElement.getAttributes().size());
+
 		// generate set of attribute name
 		Set<String> names = new HashSet<String>();
-		
+
 		for (String name : targetElement.getAttributes())
 		{
 			names.add(name);
 		}
-		
+
 		// assert
 		for (String name : attributes)
 		{
 			assertTrue("Did not find attribute: " + name, names.contains(name));
 		}
 	}
-	
+
 	/**
 	 * elementsTest
 	 * 
@@ -149,95 +151,73 @@ public class DTDTransformationTests extends TestCase
 	protected void elementsTest(String source, String... elements)
 	{
 		DTDTransformer transformer = new DTDTransformer();
-		
+
 		transformer.transform(source);
-		
+
 		// gather element names for easy lookup
-		Set<String> names = new HashSet<String>();
-		
-		for (ElementElement element : transformer.getElements())
-		{
-			names.add(element.getName());
-		}
-		
+		Set<String> names = new HashSet<String>(CollectionsUtil.map(transformer.getElements(),
+				new IMap<ElementElement, String>()
+				{
+					public String map(ElementElement item)
+					{
+						return item.getName();
+					}
+				}));
+
 		// assert the element name list
 		for (String name : elements)
 		{
 			assertTrue("Did not find element: " + name, names.contains(name));
 		}
 	}
-	
+
 	/**
 	 * testSingleElement
 	 */
 	public void testSingleElement()
 	{
 		String source = this.getContent("DTD/singleElement.dtd");
-		
-		this.elementsTest(
-			source,
-			"svg"
-		);
+
+		this.elementsTest(source, "svg");
 	}
-	
+
 	/**
 	 * testMultipleElements
 	 */
 	public void testMultipleElements()
 	{
 		String source = this.getContent("DTD/multipleElements.dtd");
-		
-		this.elementsTest(
-			source,
-			"svg",
-			"circle",
-			"ellipse",
-			"rectangle",
-			"path"
-		);
+
+		this.elementsTest(source, "svg", "circle", "ellipse", "rectangle", "path");
 	}
-	
+
 	/**
 	 * testSingleAttribute
 	 */
 	public void testSingleAttribute()
 	{
 		String source = this.getContent("DTD/elementAttribute.dtd");
-		
-		this.attributesTest(
-			source,
-			"svg",
-			"x"
-		);
+
+		this.attributesTest(source, "svg", "x");
 	}
-	
+
 	/**
 	 * testMultipleAttributes
 	 */
 	public void testMultipleAttributes()
 	{
 		String source = this.getContent("DTD/multipleElementAttributes.dtd");
-		
-		this.attributesTest(
-			source,
-			"svg",
-			"x",
-			"y",
-			"width",
-			"height"
-		);
+
+		this.attributesTest(source, "svg", "x", "y", "width", "height");
 	}
-	
+
 	/**
 	 * testSVGDTD
 	 */
 	public void testSVGDTD()
 	{
 		String source = this.getContent("DTD/svg11-flat.dtd");
-		
-		this.elementsTest(
-			source,
-			"svg"
-		);
+
+		this.elementsTest(source, "svg");
 	}
 }

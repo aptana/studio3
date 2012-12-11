@@ -1,19 +1,18 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.editor.xml.contentassist;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jface.text.BadLocationException;
@@ -28,12 +27,14 @@ import org.eclipse.jface.text.rules.Token;
 import org.eclipse.swt.graphics.Image;
 
 import com.aptana.core.IMap;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.common.contentassist.ILexemeProvider;
+import com.aptana.editor.xml.TagUtil;
 import com.aptana.editor.xml.XMLPlugin;
 import com.aptana.editor.xml.XMLSourceConfiguration;
 import com.aptana.editor.xml.XMLTagScanner;
@@ -50,6 +51,38 @@ import com.aptana.xml.core.parsing.XMLTokenType;
 
 public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 {
+	private final class AttributeProposalMapper implements IMap<String, ICompletionProposal>
+	{
+		private final String suffix;
+		private final ElementElement element;
+		private final int length;
+		private final int theOffset;
+
+		private AttributeProposalMapper(String suffix, ElementElement element, int length, int theOffset)
+		{
+			this.suffix = suffix;
+			this.element = element;
+			this.length = length;
+			this.theOffset = theOffset;
+		}
+
+		public ICompletionProposal map(String attribute)
+		{
+			String replaceString = attribute + suffix;
+			int[] positions;
+			if (suffix.length() == 0)
+			{
+				positions = new int[] { replaceString.length() };
+			}
+			else
+			{
+				positions = new int[] { replaceString.length() - 1, replaceString.length() };
+			}
+			AttributeElement attr = _queryHelper.getAttribute(element.getName(), attribute);
+			return new XMLAttributeProposal(attr, replaceString, theOffset, length, positions);
+		}
+	}
+
 	/**
 	 * LocationType
 	 */
@@ -62,17 +95,15 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 		IN_DOCTYPE,
 		IN_COMMENT,
 		IN_TEXT,
-		IN_ELEMENT_NAME,
 
 		// fine-grain locations
+		IN_ELEMENT_NAME,
 		IN_ATTRIBUTE_NAME,
 		IN_ATTRIBUTE_VALUE
 	};
 
-	private static final Image ELEMENT_ICON = XMLPlugin.getImage("/icons/element.png"); //$NON-NLS-1$
-	private static final Image ATTRIBUTE_ICON = XMLPlugin.getImage("/icons/attribute.png"); //$NON-NLS-1$
-
-	protected Map<String, LocationType> locationMap;
+	static final Image ELEMENT_ICON = XMLPlugin.getImage("/icons/element.png"); //$NON-NLS-1$
+	static final Image ATTRIBUTE_ICON = XMLPlugin.getImage("/icons/attribute.png"); //$NON-NLS-1$
 
 	private XMLIndexQueryHelper _queryHelper;
 	private Lexeme<XMLTokenType> _currentLexeme;
@@ -80,7 +111,7 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 	private IDocument _document;
 
 	/**
-	 * HTMLIndexContentAssistProcessor
+	 * XMLIndexContentAssistProcessor
 	 * 
 	 * @param editor
 	 */
@@ -89,8 +120,6 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 		super(editor);
 
 		this._queryHelper = createQueryHelper();
-
-		this.buildLocationMap();
 	}
 
 	protected XMLIndexQueryHelper createQueryHelper()
@@ -104,17 +133,14 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param lexemeProvider
 	 * @param offset
 	 */
-	protected List<ICompletionProposal> addAttributeProposals(ILexemeProvider<XMLTokenType> lexemeProvider,
-			final int offset)
+	protected List<ICompletionProposal> addAttributeProposals(ILexemeProvider<XMLTokenType> lexemeProvider, int offset)
 	{
-		ElementElement element = getElement(lexemeProvider, offset);
-
+		final ElementElement element = getElement(lexemeProvider, offset);
 		if (element == null)
 		{
 			return Collections.emptyList();
 		}
 
-		int length = 2;
 		String postfix = "=\"\""; //$NON-NLS-1$
 		switch (this._currentLexeme.getType())
 		{
@@ -125,7 +151,6 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 				{
 					this._replaceRange = this._currentLexeme = lexemeProvider.getLexeme(index - 1);
 					postfix = StringUtil.EMPTY;
-					length = 0;
 				}
 				break;
 
@@ -140,29 +165,24 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 				if (nextlexeme != null && nextlexeme.getType() == XMLTokenType.EQUAL)
 				{
 					postfix = StringUtil.EMPTY;
-					length = 0;
 				}
 				break;
 		}
 
-		final int theLength = length;
-		final String suffix = postfix;
-		return CollectionsUtil.map(element.getAttributes(), new IMap<String, ICompletionProposal>()
+		int replaceLength = 0;
+		if (this._replaceRange != null)
 		{
-
-			public ICompletionProposal map(String attribute)
-			{
-				return createProposal(attribute, attribute + suffix, ATTRIBUTE_ICON, null, null, getCoreLocation(),
-						offset, attribute.length() + theLength);
-			}
-		});
+			offset = this._replaceRange.getStartingOffset();
+			replaceLength = this._replaceRange.getLength();
+		}
+		return CollectionsUtil.map(element.getAttributes(), new AttributeProposalMapper(postfix, element,
+				replaceLength, offset));
 	}
 
 	protected ElementElement getElement(ILexemeProvider<XMLTokenType> lexemeProvider, final int offset)
 	{
 		String elementName = getElementName(lexemeProvider, offset);
-		ElementElement element = this._queryHelper.getElement(elementName);
-		return element;
+		return this._queryHelper.getElement(elementName);
 	}
 
 	/**
@@ -295,6 +315,8 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 
 		boolean close = true;
 		int replaceLength = 0;
+		int replaceOffset = offset;
+
 		if (this._currentLexeme.getType() == XMLTokenType.END_TAG) // '|>
 		{
 			replaceLength = 1; // replace the '>'
@@ -313,7 +335,7 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 
 			if (nextLexeme != null) // && !nextLexeme.equals(_currentLexeme))
 			{
-				offset = _currentLexeme.getStartingOffset();
+				replaceOffset = _currentLexeme.getStartingOffset();
 				replaceLength = _currentLexeme.getLength();
 
 				if (!nextLexeme.equals(this._currentLexeme))
@@ -332,57 +354,81 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 			}
 		}
 
+		// TODO If user doesn't want tags closed for them, then don't do it!
+		// boolean addCloseTag = XMLPlugin.getDefault().getPreferenceStore()
+		// .getBoolean(IPreferenceConstants.XML_AUTO_CLOSE_TAG_PAIRS);
+		boolean addCloseTag = true;
+
+		String documentText = _document.get();
+
 		// Generate proposals.
 		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
 		for (ElementElement element : elements)
 		{
-			String replaceString = element.getName();
-			int cursorPosition = replaceString.length();
-
+			StringBuilder replacement = new StringBuilder(element.getName());
+			List<Integer> positions = new ArrayList<Integer>();
+			int cursorPosition = replacement.length();
 			if (close)
 			{
 				if (element.getName().charAt(0) == '!') // don't close DOCTYPE with a slash
 				{
-					replaceString += " >"; //$NON-NLS-1$
 					cursorPosition += 1;
+					// Don't add ">" unless we know we need it! Look at next Lexeme!
+					int index = lexemeProvider.getLexemeIndex(_currentLexeme.getStartingOffset());
+					Lexeme<XMLTokenType> nextLexeme = lexemeProvider.getLexeme(index + 1);
+					if (nextLexeme == null || nextLexeme.getType() == XMLTokenType.START_TAG)
+					{
+						replacement.append(" >"); //$NON-NLS-1$
+					}
+				}
+				else if (isEmptyTagType(element))
+				{
+					replacement.append(" />"); //$NON-NLS-1$
+					// TODO Depending on tag, we should stick cursor inside the tag or after the end of tag. Right
+					// now it's stuck at end of tag
+					positions.add(cursorPosition + " />".length());
 				}
 				else
 				{
 					// If the tag doesn't exist in the doc, we get back that it's closed. We need to copy the
 					// document and insert the tag into it
-					IDocument doc = new Document(_document.get());
-
+					IDocument doc = new Document(documentText);
 					try
 					{
-						doc.replace(offset, replaceLength, element.getName() + ">"); //$NON-NLS-1$
+						doc.replace(replaceOffset, replaceLength, element.getName() + ">"); //$NON-NLS-1$
 					}
 					catch (BadLocationException e)
 					{
-						// ignore
+						IdeLog.logWarning(XMLPlugin.getDefault(), MessageFormat.format(
+								"Error replacing document text at offset {0} with text {1}", replaceOffset, //$NON-NLS-1$
+								element.getName() + ">"), e); //$NON-NLS-1$
 					}
-
-					// if (!OpenTagCloser.tagClosed(doc, element.getName()))
-					// {
-					//							replaceString += "></" + element.getName() + ">"; //$NON-NLS-1$ //$NON-NLS-2$
-					// // TODO Depending on the tag, we should add a "tabstop" inside the open part of the tag
-					// cursorPosition += 1;
-					// }
-					// else
-					// {
-					//							replaceString += ">"; //$NON-NLS-1$
-					// cursorPosition += 1;
-					// }
+					if (addCloseTag && !TagUtil.tagClosed(doc, element.getName()))
+					{
+						replacement.append("></").append(element.getName()).append('>'); //$NON-NLS-1$
+						positions.add(cursorPosition + 1); // between tags
+						positions.add(cursorPosition + 4 + element.getName().length()); // after close tag
+					}
+					else
+					{
+						replacement.append('>');
+						positions.add(cursorPosition + 1);
+					}
 				}
 			}
-
-			CommonCompletionProposal proposal = new CommonCompletionProposal(replaceString, offset, replaceLength,
-					cursorPosition, ELEMENT_ICON, element.getName(), null, element.getDescription());
-
-			proposal.setFileLocation(this.getCoreLocation());
+			positions.add(0, cursorPosition);
+			CommonCompletionProposal proposal = new XMLTagProposal(replacement.toString(), replaceOffset,
+					replaceLength, element, positions.toArray(new Integer[positions.size()]));
 			proposals.add(proposal);
 		}
 
 		return proposals;
+	}
+
+	private boolean isEmptyTagType(ElementElement element)
+	{
+		// TODO Once we have somewhere we can look this info up, do so
+		return false;
 	}
 
 	protected List<ElementElement> getElements(ILexemeProvider<XMLTokenType> lexemeProvider, int offset)
@@ -421,22 +467,6 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 		CommonCompletionProposal proposal = createProposal(name, image, description, userAgents, fileLocation, offset);
 		// add it to the list
 		proposals.add(proposal);
-	}
-
-	/**
-	 * buildLocationMap
-	 */
-	protected void buildLocationMap()
-	{
-		locationMap = new HashMap<String, LocationType>();
-		locationMap.put(XMLSourceConfiguration.DEFAULT, LocationType.IN_TEXT);
-		locationMap.put(XMLSourceConfiguration.COMMENT, LocationType.IN_COMMENT);
-		locationMap.put(XMLSourceConfiguration.CDATA, LocationType.IN_TEXT);
-		locationMap.put(XMLSourceConfiguration.PRE_PROCESSOR, LocationType.IN_TEXT);
-		// locationMap.put(XMLSourceConfiguration.XML_DOCTYPE, LocationType.IN_DOCTYPE);
-		locationMap.put(XMLSourceConfiguration.TAG, LocationType.IN_OPEN_TAG);
-
-		locationMap.put(IDocument.DEFAULT_CONTENT_TYPE, LocationType.IN_TEXT);
 	}
 
 	/**
@@ -549,41 +579,51 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 		// tokenize the current document
 		this._document = viewer.getDocument();
 
-		ILexemeProvider<XMLTokenType> lexemeProvider = this.createLexemeProvider(_document, offset);
+		ILexemeProvider<XMLTokenType> lexemeProvider = createLexemeProvider(_document, (offset > 0) ? offset - 1
+				: offset);
 
 		// store a reference to the lexeme at the current position
-		this._replaceRange = this._currentLexeme = lexemeProvider.getFloorLexeme(offset);
+		Lexeme<XMLTokenType> tempLexeme = lexemeProvider.getLexemeFromOffset(offset);
+		if (tempLexeme != null)
+		{
+			this._replaceRange = this._currentLexeme = tempLexeme;
+		}
+		else
+		{
+			this._replaceRange = null;
+			this._currentLexeme = lexemeProvider.getFloorLexeme(offset);
+		}
 
 		// first step is to determine if we're inside an open tag, close tag, text, etc.
-		LocationType location = getCoarseLocationType(this._document, lexemeProvider, offset);
+		LocationType location = getCoarseLocationType(lexemeProvider, offset);
 
-		List<ICompletionProposal> result;
+		List<ICompletionProposal> result = Collections.emptyList();
 		switch (location)
 		{
 			case IN_OPEN_TAG:
-			case IN_ELEMENT_NAME:
-				result = addElementProposals(lexemeProvider, offset);
-				break;
+				LocationType fineLocation = getFineTagLocationType(lexemeProvider, offset);
+				switch (fineLocation)
+				{
+					case IN_ELEMENT_NAME:
+						result = addElementProposals(lexemeProvider, offset);
+						break;
 
-			case IN_ATTRIBUTE_NAME:
-				result = addAttributeProposals(lexemeProvider, offset);
-				break;
+					case IN_ATTRIBUTE_NAME:
+						result = addAttributeProposals(lexemeProvider, offset);
+						break;
 
-			case IN_ATTRIBUTE_VALUE:
-				result = addAttributeValueProposals(lexemeProvider, offset);
+					case IN_ATTRIBUTE_VALUE:
+						result = addAttributeValueProposals(lexemeProvider, offset);
+						break;
+				}
 				break;
 
 			case IN_CLOSE_TAG:
 				result = addCloseTagProposals(lexemeProvider, offset);
 				break;
 
-			case IN_TEXT:
-				result = Collections.emptyList();
-				break;
-
 			default:
-				result = Collections.emptyList();
-				break;
+				return NO_PROPOSALS;
 		}
 
 		if (!CollectionsUtil.isEmpty(result))
@@ -664,7 +704,59 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @return
 	 */
-	LocationType getCoarseLocationType(IDocument document, ILexemeProvider<XMLTokenType> lexemeProvider, int offset)
+	private LocationType getCoarseLocationType(ILexemeProvider<XMLTokenType> lexemeProvider, int offset)
+	{
+		if (_currentLexeme == null)
+		{
+			return LocationType.ERROR;
+		}
+
+		Lexeme<XMLTokenType> lexeme = _currentLexeme;
+		int index = lexemeProvider.getLexemeIndex(lexeme.getStartingOffset());
+		while (true)
+		{
+			switch (lexeme.getType())
+			{
+				case DOCTYPE:
+					return LocationType.IN_DOCTYPE;
+
+				case COMMENT:
+					return LocationType.IN_COMMENT;
+
+				case CDATA:
+				case TEXT:
+					return LocationType.IN_TEXT;
+
+				case START_TAG: // '<' or '</'
+					// Could be open or close tag!
+					if (lexeme.getText().endsWith("/")) //$NON-NLS-1$
+					{
+						return LocationType.IN_CLOSE_TAG;
+					}
+					return LocationType.IN_OPEN_TAG;
+
+				case TAG_SELF_CLOSE: // '/>'
+					return LocationType.IN_OPEN_TAG;
+
+				default:
+				case TAG_NAME:
+				case END_TAG: // '>'
+					// Backtrack to see if we're in open or close tag...
+					break;
+			}
+
+			index--; // go back one lexeme and retry
+			if (index < 0)
+			{
+				break;
+			}
+			lexeme = lexemeProvider.getLexeme(index);
+		}
+
+		return LocationType.ERROR;
+	}
+
+	private LocationType getFineTagLocationType(ILexemeProvider<XMLTokenType> lexemeProvider, int offset)
 	{
 		if (_currentLexeme == null)
 		{
@@ -673,36 +765,88 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 
 		switch (_currentLexeme.getType())
 		{
-			case DOCTYPE:
-				return LocationType.IN_DOCTYPE;
-			case COMMENT:
-				return LocationType.IN_COMMENT;
-			case START_TAG:
-				return LocationType.IN_OPEN_TAG;
-			case END_TAG:
+			case START_TAG: // '<' or '</'
+				return LocationType.IN_ELEMENT_NAME;
+
+			case END_TAG: // '>'
+			case TAG_SELF_CLOSE: // '/>'
+				// we need to backtrack to determine if we're in attribute
+				// name/value/element name (or even outside the end of the tag!)
+				int index = lexemeProvider.getLexemeIndex(offset);
+				Lexeme<XMLTokenType> previous = lexemeProvider.getLexeme(index - 1);
+				if (previous == null)
+				{
+					return LocationType.ERROR;
+				}
+				switch (previous.getType())
+				{
+					case SINGLE_QUOTED_STRING:
+					case DOUBLE_QUOTED_STRING:
+						return LocationType.IN_ATTRIBUTE_NAME;
+
+					case EQUAL:
+						return LocationType.IN_ATTRIBUTE_VALUE;
+
+					case START_TAG:
+						return LocationType.IN_ELEMENT_NAME;
+
+					case TAG_NAME:
+						// If there's no space between previous lexeme and current, it's continuation of element name
+						if (previous.isContiguousWith(_currentLexeme))
+						{
+							// Extend the replacement back?
+							this._replaceRange = this._currentLexeme = previous;
+							return LocationType.IN_ELEMENT_NAME;
+						}
+						return LocationType.IN_ATTRIBUTE_NAME;
+
+					case ATTRIBUTE:
+						// If there's no space between previous lexeme and current, it's continuation of attribute name
+						if (previous.isContiguousWith(_currentLexeme))
+						{
+							// Extend the replacement back?
+							this._replaceRange = this._currentLexeme = previous;
+						}
+						return LocationType.IN_ATTRIBUTE_NAME;
+
+					default:
+						break;
+				}
 				return LocationType.IN_ATTRIBUTE_NAME;
-			case CDATA:
-			case TEXT:
-				return LocationType.IN_TEXT;
-			case TAG_SELF_CLOSE:
-				return LocationType.IN_CLOSE_TAG;
+
 			case ATTRIBUTE:
 				return LocationType.IN_ATTRIBUTE_NAME;
 			case EQUAL:
+				if (offset == _currentLexeme.getStartingOffset())
+				{
+					// before equal sign. look back to see if we're on attribute name?
+					return LocationType.IN_ATTRIBUTE_NAME;
+				}
+				return LocationType.IN_ATTRIBUTE_VALUE;
 			case SINGLE_QUOTED_STRING:
 			case DOUBLE_QUOTED_STRING:
-				return LocationType.IN_ATTRIBUTE_VALUE;
-			case TAG_NAME:
+				// Are we past end of string in whitespace?
 				if (offset > _currentLexeme.getEndingOffset() + 1)
 				{
-					_replaceRange = null;
+					return LocationType.IN_ATTRIBUTE_NAME;
+				}
+				return LocationType.IN_ATTRIBUTE_VALUE;
+			case TAG_NAME:
+				// Are we past end of element name in whitespace?
+				if (offset > _currentLexeme.getEndingOffset() + 1)
+				{
 					return LocationType.IN_ATTRIBUTE_NAME;
 				}
 				return LocationType.IN_ELEMENT_NAME;
 
 			default:
+			case CDATA:
+			case TEXT:
+			case DOCTYPE:
+			case COMMENT:
 				return LocationType.ERROR;
 		}
+
 	}
 
 	/**
@@ -740,11 +884,11 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 
 		if (result != null)
 		{
-			if (result.startsWith("<"))
+			if (result.startsWith("<")) //$NON-NLS-1$
 			{
 				result = result.substring(1);
 			}
-			if (result.endsWith(">"))
+			if (result.endsWith(">")) //$NON-NLS-1$
 			{
 				result = result.substring(0, result.length() - 1);
 			}
@@ -792,13 +936,6 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 					{
 						continue;
 					}
-
-					// String elementName = parts[0].toLowerCase();
-					//
-					// if (!unclosedElements.contains(elementName) && !OpenTagCloser.tagClosed(_document, elementName))
-					// {
-					// unclosedElements.add(elementName);
-					// }
 				}
 			}
 		}
@@ -818,4 +955,34 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		return XMLPlugin.PLUGIN_ID;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#triggerAdditionalAutoActivation(char, int,
+	 * org.eclipse.jface.text.IDocument, int)
+	 */
+	public boolean isValidAutoActivationLocation(char c, int keyCode, IDocument document, int offset)
+	{
+		ILexemeProvider<XMLTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
+
+		// first step is to determine if we're inside an open tag, close tag, text, etc.
+		LocationType location = getCoarseLocationType(lexemeProvider, offset);
+
+		switch (location)
+		{
+			case IN_OPEN_TAG:
+				// If we are inside an open tag and typing space or tab, assume we're wanting to add attributes
+				if (c == ' ' || c == '\t')
+				{
+					return true;
+				}
+				// If that's not the case, check if we are actually typing the attribute name
+				LocationType fineLocation = getFineTagLocationType(lexemeProvider, offset);
+				return (fineLocation == LocationType.IN_ATTRIBUTE_NAME)
+						|| (fineLocation == LocationType.IN_ATTRIBUTE_VALUE);
+			default:
+				return false;
+		}
+	}
+
 }

@@ -10,9 +10,15 @@ package com.aptana.dtd.core.parsing;
 
 import java.io.Reader;
 import java.io.StringReader;
+import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import beaver.Symbol;
 import beaver.Scanner;
@@ -39,6 +45,10 @@ import org.eclipse.core.internal.utils.StringPool;
 %{
 	// last token used for look behind. Also needed when implementing the ITokenScanner interface
 	private Symbol _lastToken;
+	private List<Symbol> tokenQueue = new ArrayList<Symbol>();
+	
+	private static final Pattern ENTITY = Pattern.compile("%([^; \\t\\n]+);"); //$NON-NLS-1$
+	private Map<String, String> _entities;
 	
 	private StringPool _stringPool;
 
@@ -74,6 +84,11 @@ import org.eclipse.core.internal.utils.StringPool;
 
 	public Symbol nextToken() throws java.io.IOException, Scanner.Exception
 	{
+		if (!tokenQueue.isEmpty())
+		{
+			return tokenQueue.remove(0);
+		}
+
 		try
 		{
 			// get next token
@@ -99,6 +114,91 @@ import org.eclipse.core.internal.utils.StringPool;
 
 		// clear last token
 		_lastToken = null;
+		tokenQueue.clear();
+	}
+	
+	String getValue(String key)
+	{
+		String result = null;
+
+		if (this._entities != null)
+		{
+			result = this._entities.get(key);
+		}
+
+		return result;
+	}
+	
+	void register(String key, String value)
+	{
+		if (this._entities == null)
+		{
+			this._entities = new HashMap<String, String>();
+		}
+
+		// According to the XML 1.1 Specification in Section 4.2:
+		// If the same entity is declared more than once, the first declaration encountered is binding;
+		// at user option, an XML processor may issue a warning if entities are declared multiple times.
+		if (this._entities.containsKey(key) == false)
+		{
+			this._entities.put(key, value);
+		}
+	}
+	
+	Symbol registered(String peRef) throws IOException, Exception
+	{
+		// grab key minus the leading '%' and trailing ';'
+		String key = peRef.substring(1, peRef.length() - 1);
+
+		// grab entity's value
+		String text = getValue(key);
+
+		if (text == null)
+		{
+			return newToken(Terminals.PE_REF, peRef);
+		}
+
+		// create new scanner
+		// We need to continue to scan tokens until EOF, not just one token!
+		DTDScanner nested = new DTDScanner();
+		nested.setSource(text);
+		nested._entities = _entities;
+		Symbol s;
+		while (true)
+		{
+			s = nested.nextToken();
+			if (s.getId() == Terminals.EOF)
+			{
+				break;
+			}
+			s = new Symbol(s.getId(), s.getStart() + yychar, s.getEnd() + yychar, s.value);
+			tokenQueue.add(s);
+		}
+
+		return tokenQueue.remove(0);
+	}
+	
+	Symbol handleString(String text)
+	{
+		StringBuffer buffer = new StringBuffer();
+		Matcher m = ENTITY.matcher(text);
+
+		while (m.find())
+		{
+			String name = m.group(1);
+			String newText = this.getValue(name);
+
+			if (newText == null)
+			{
+				newText = name;
+			}
+
+			m.appendReplacement(buffer, newText);
+		}
+
+		m.appendTail(buffer);
+
+		return newToken(Terminals.STRING, pool(buffer.toString()));
 	}
 %}
 
@@ -108,8 +208,10 @@ Whitespace = {LineTerminator} | [ \t\f]
 NMToken = [:a-zA-Z_\-\.0-9]+
 Identifier = [:a-zA-Z_][:a-zA-Z_\-\.0-9]*
 
-DoubleQuotedString = \"([^\\\"\r\n]|\\[^])*\"
-SingleQuotedString = '([^\\'\r\n]|\\[^])*'
+//DoubleQuotedString = \"([^\\\"\r\n]|\\[^])*\"
+DoubleQuotedString = "\"" ~"\""
+//SingleQuotedString = '([^\\'\r\n]|\\[^])*'
+SingleQuotedString = "'" ~"'"
 Strings = {DoubleQuotedString} | {SingleQuotedString}
 
 Comment = "<!--" ~"-->"
@@ -129,7 +231,7 @@ PeRef = [%&] {Identifier} ";"
 	{Pi}			{ return newToken(Terminals.PI, pool(yytext())); }
 
 	// strings
-	{Strings}		{ return newToken(Terminals.STRING, pool(yytext())); }
+	{Strings}		{ return handleString(yytext()); }
 
 	// keywords
 	"<!["			{ return newToken(DTDTokenType.SECTION_START); }
@@ -160,7 +262,7 @@ PeRef = [%&] {Identifier} ";"
 	"SYSTEM"		{ return newToken(DTDTokenType.SYSTEM, pool("SYSTEM")); }
 
 	// Entity references
-	{PeRef}			{ return newToken(DTDTokenType.PE_REF); }
+	{PeRef}			{  return registered(yytext()); }
 	
 	// characters
 	">"				{ return newToken(DTDTokenType.GREATER_THAN); }

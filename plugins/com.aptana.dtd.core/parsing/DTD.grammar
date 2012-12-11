@@ -483,7 +483,7 @@ PEDecl
 	=	ENTITY PERCENT NAME.n STRING.s GREATER_THAN
 		{:
 			String value = s.substring(1, s.length() - 1);
-			// this._scanner.register(n, value);
+			this._scanner.register(n, value);
 
 			return new DTDParsedEntityDeclNode(n);
 		:}

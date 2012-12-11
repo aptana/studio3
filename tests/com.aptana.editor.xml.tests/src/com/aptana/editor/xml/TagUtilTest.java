@@ -9,6 +9,8 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 
+import com.aptana.editor.xml.tests.XMLTestUtil;
+
 public class TagUtilTest extends TestCase
 {
 	/**

@@ -51,7 +51,7 @@ public class XMLIndexQueryHelper
 	 */
 	public AttributeElement getAttribute(String elementName, String attributeName)
 	{
-		return null;
+		return this._reader.getAttribute(getIndex(), elementName, attributeName);
 	}
 
 	/**

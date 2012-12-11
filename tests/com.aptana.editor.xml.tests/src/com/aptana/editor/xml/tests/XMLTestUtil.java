@@ -5,7 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.html;
+package com.aptana.editor.xml.tests;
 
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
@@ -18,10 +18,12 @@ import com.aptana.editor.common.contentassist.ILexemeProvider;
 import com.aptana.editor.common.tests.BadDocument;
 import com.aptana.editor.common.text.rules.CompositePartitionScanner;
 import com.aptana.editor.common.text.rules.NullSubPartitionScanner;
-import com.aptana.editor.html.parsing.lexer.HTMLLexemeProvider;
-import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
+import com.aptana.editor.xml.XMLSourceConfiguration;
+import com.aptana.editor.xml.XMLTagScanner;
+import com.aptana.editor.xml.internal.XMLLexemeProvider;
+import com.aptana.xml.core.parsing.XMLTokenType;
 
-public class HTMLTestUtil
+public class XMLTestUtil
 {
 
 	/**
@@ -38,9 +40,9 @@ public class HTMLTestUtil
 			source = source.replaceAll("\\|", "");
 		}
 
-		CompositePartitionScanner partitionScanner = new CompositePartitionScanner(HTMLSourceConfiguration.getDefault()
+		CompositePartitionScanner partitionScanner = new CompositePartitionScanner(XMLSourceConfiguration.getDefault()
 				.createSubPartitionScanner(), new NullSubPartitionScanner(), new NullPartitionerSwitchStrategy());
-		IDocumentPartitioner partitioner = new ExtendedFastPartitioner(partitionScanner, HTMLSourceConfiguration
+		IDocumentPartitioner partitioner = new ExtendedFastPartitioner(partitionScanner, XMLSourceConfiguration
 				.getDefault().getContentTypes());
 		partitionScanner.setPartitioner((IExtendedPartitioner) partitioner);
 
@@ -65,9 +67,9 @@ public class HTMLTestUtil
 			source = source.replaceAll("\\|", "");
 		}
 
-		CompositePartitionScanner partitionScanner = new CompositePartitionScanner(HTMLSourceConfiguration.getDefault()
+		CompositePartitionScanner partitionScanner = new CompositePartitionScanner(XMLSourceConfiguration.getDefault()
 				.createSubPartitionScanner(), new NullSubPartitionScanner(), new NullPartitionerSwitchStrategy());
-		IDocumentPartitioner partitioner = new ExtendedFastPartitioner(partitionScanner, HTMLSourceConfiguration
+		IDocumentPartitioner partitioner = new ExtendedFastPartitioner(partitionScanner, XMLSourceConfiguration
 				.getDefault().getContentTypes());
 		partitionScanner.setPartitioner((IExtendedPartitioner) partitioner);
 
@@ -85,14 +87,14 @@ public class HTMLTestUtil
 	 * @param offset
 	 * @return
 	 */
-	public static ILexemeProvider<HTMLTokenType> createLexemeProvider(IDocument document, int offset)
+	public static ILexemeProvider<XMLTokenType> createLexemeProvider(IDocument document, int offset)
 	{
 		int documentLength = document.getLength();
 
 		// account for last position returning an empty IDocument default partition
 		int lexemeProviderOffset = (offset >= documentLength) ? documentLength - 1 : offset;
 
-		return new HTMLLexemeProvider(document, lexemeProviderOffset, new HTMLTagScanner());
+		return new XMLLexemeProvider(document, lexemeProviderOffset, new XMLTagScanner());
 	}
 
 	/**

@@ -16,6 +16,7 @@ import com.aptana.editor.xml.XMLEditorTest;
 import com.aptana.editor.xml.XMLPartitionScannerTest;
 import com.aptana.editor.xml.XMLScannerTest;
 import com.aptana.editor.xml.XMLTagScannerTest;
+import com.aptana.editor.xml.contentassist.XMLContentAssistProcessorTest;
 import com.aptana.editor.xml.internal.text.XMLFoldingComputerTest;
 import com.aptana.editor.xml.outline.XMLOutlineTest;
 
@@ -27,6 +28,7 @@ public class AllTests
 		TestSuite suite = new TestSuite(AllTests.class.getName());
 		// $JUnit-BEGIN$
 		suite.addTestSuite(TagUtilTest.class);
+		suite.addTestSuite(XMLContentAssistProcessorTest.class);
 		suite.addTestSuite(XMLPartitionScannerTest.class);
 		suite.addTestSuite(XMLScannerTest.class);
 		suite.addTestSuite(XMLFoldingComputerTest.class);

@@ -1,15 +1,12 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.html.contentassist;
+package com.aptana.editor.xml.contentassist;
 
-import java.util.List;
-
-import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
@@ -21,17 +18,16 @@ import org.eclipse.jface.text.link.LinkedModeUI.IExitPolicy;
 import org.eclipse.jface.text.link.LinkedPosition;
 import org.eclipse.jface.text.link.LinkedPositionGroup;
 import org.eclipse.swt.events.VerifyEvent;
-import org.eclipse.swt.graphics.Image;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
-import com.aptana.editor.common.contentassist.UserAgentManager;
-import com.aptana.editor.html.HTMLPlugin;
-import com.aptana.editor.html.contentassist.index.IHTMLIndexConstants;
-import com.aptana.editor.html.contentassist.model.ElementElement;
+import com.aptana.editor.xml.XMLPlugin;
+import com.aptana.xml.core.index.IXMLIndexConstants;
+import com.aptana.xml.core.model.ElementElement;
 
-class HTMLTagProposal extends CommonCompletionProposal
+// TODO Combine with HTMLTagProposal!
+public class XMLTagProposal extends CommonCompletionProposal
 {
 
 	private Integer[] _positions;
@@ -44,20 +40,14 @@ class HTMLTagProposal extends CommonCompletionProposal
 	 * @param replacementOffset
 	 * @param replacementLength
 	 * @param element
-	 * @param project
 	 * @param positions
 	 */
-	HTMLTagProposal(String replacementString, int replacementOffset, int replacementLength, ElementElement element,
-			IProject project, Integer... positions)
+	XMLTagProposal(String replacementString, int replacementOffset, int replacementLength, ElementElement element,
+			Integer... positions)
 	{
 		super(replacementString, replacementOffset, replacementLength, positions[0],
-				HTMLContentAssistProcessor.ELEMENT_ICON, element.getName(), null, element.getDescription());
-		setFileLocation(IHTMLIndexConstants.CORE);
-
-		List<String> userAgentList = element.getUserAgentNames();
-		String[] userAgents = userAgentList.toArray(new String[userAgentList.size()]);
-		Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(project, userAgents);
-		setUserAgentImages(userAgentIcons);
+				XMLContentAssistProcessor.ELEMENT_ICON, element.getName(), null, element.getDescription());
+		setFileLocation(IXMLIndexConstants.CORE);
 
 		this._positions = positions;
 	}
@@ -110,7 +100,7 @@ class HTMLTagProposal extends CommonCompletionProposal
 			}
 			catch (BadLocationException e)
 			{
-				IdeLog.logError(HTMLPlugin.getDefault(), e);
+				IdeLog.logError(XMLPlugin.getDefault(), e);
 			}
 		}
 	}

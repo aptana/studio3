@@ -574,7 +574,7 @@ public class DTDParser extends Parser implements IParser {
 					final String s = (String) _symbol_s.value;
 					
 			String value = s.substring(1, s.length() - 1);
-			// this._scanner.register(n, value);
+			this._scanner.register(n, value);
 
 			return new DTDParsedEntityDeclNode(n);
 			}
