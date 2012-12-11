@@ -9,7 +9,7 @@ package com.aptana.xml.core.parsing;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -148,7 +148,8 @@ public class XMLParser extends AbstractParser
 	 */
 	protected Map<String, String> parseAttributes() throws beaver.Scanner.Exception, IOException
 	{
-		Map<String, String> result = new HashMap<String, String>();
+		// NOTE: use linked hash map to preserve add order
+		Map<String, String> result = new LinkedHashMap<String, String>();
 		String name = null;
 		// Keep advancing until we hit EOF or GREATER or SLASH_GREATER
 		while (true)
