@@ -33,6 +33,7 @@ import com.aptana.xml.core.index.IKeyProvider;
 import com.aptana.xml.core.index.XMLIndexWriter;
 import com.aptana.xml.core.index.XMLKeyProvider;
 import com.aptana.xml.core.model.AttributeElement;
+import com.aptana.xml.core.model.DTDTransformException;
 import com.aptana.xml.core.model.DTDTransformer;
 import com.aptana.xml.core.model.ElementElement;
 
@@ -97,6 +98,10 @@ public class SVGMetadataLoader extends Job
 			index.save();
 		}
 		catch (IOException e)
+		{
+			IdeLog.logError(SVGPlugin.getDefault(), e);
+		}
+		catch (DTDTransformException e)
 		{
 			IdeLog.logError(SVGPlugin.getDefault(), e);
 		}

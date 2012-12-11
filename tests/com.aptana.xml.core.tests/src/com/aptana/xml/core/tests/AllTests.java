@@ -10,7 +10,7 @@ package com.aptana.xml.core.tests;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import com.aptana.xml.core.model.DTDTransformationTests;
+import com.aptana.xml.core.model.DTDTransformerTest;
 import com.aptana.xml.core.parsing.XMLParserTest;
 
 public class AllTests
@@ -21,7 +21,7 @@ public class AllTests
 		TestSuite suite = new TestSuite(AllTests.class.getName());
 		// $JUnit-BEGIN$
 		suite.addTestSuite(XMLParserTest.class);
-		suite.addTestSuite(DTDTransformationTests.class);
+		suite.addTestSuite(DTDTransformerTest.class);
 		// $JUnit-END$
 		return suite;
 	}

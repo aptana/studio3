@@ -1,12 +1,13 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.xml.core.model;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.dtd.core.IDTDConstants;
 import com.aptana.dtd.core.parsing.ast.DTDAttListDeclNode;
 import com.aptana.dtd.core.parsing.ast.DTDAttributeNode;
@@ -96,34 +98,44 @@ public class DTDTransformer
 
 	/**
 	 * transform
+	 * 
+	 * @throws DTDTransformException
 	 */
-	public void transform(String source)
+	public void transform(String source) throws DTDTransformException
 	{
-		IParseRootNode root = this.parse(source);
-
-		if (root instanceof DTDParseRootNode)
+		try
 		{
-			NodeCollector collector = new NodeCollector();
+			IParseRootNode root = this.parse(source);
 
-			collector.visit((DTDParseRootNode) root);
-
-			this._elements = collector.getElements();
-			Collections.sort(this._elements, new Comparator<ElementElement>()
+			if (root instanceof DTDParseRootNode)
 			{
-				public int compare(ElementElement o1, ElementElement o2)
-				{
-					return o1.getName().compareTo(o2.getName());
-				}
-			});
+				NodeCollector collector = new NodeCollector();
+				collector.visit((DTDParseRootNode) root);
 
-			this._attributes = collector.getAttributes();
-			Collections.sort(this._attributes, new Comparator<AttributeElement>()
-			{
-				public int compare(AttributeElement o1, AttributeElement o2)
+				this._elements = collector.getElements();
+				Collections.sort(this._elements, new Comparator<ElementElement>()
 				{
-					return o1.getName().compareTo(o2.getName());
-				}
-			});
+					public int compare(ElementElement o1, ElementElement o2)
+					{
+						return o1.getName().compareTo(o2.getName());
+					}
+				});
+
+				// wrap to ensure no null value, sort
+				this._attributes = collector.getAttributes();
+				Collections.sort(this._attributes, new Comparator<AttributeElement>()
+				{
+					public int compare(AttributeElement o1, AttributeElement o2)
+					{
+						return o1.getName().compareTo(o2.getName());
+					}
+				});
+			}
+		}
+		catch (Exception e)
+		{
+			// Failed to parse
+			throw new DTDTransformException(MessageFormat.format("Failed to parse DTD source: {0}", source), e);
 		}
 	}
 
@@ -134,7 +146,7 @@ public class DTDTransformer
 	 */
 	public List<AttributeElement> getAttributes()
 	{
-		return this._attributes;
+		return CollectionsUtil.getListValue(this._attributes);
 	}
 
 	/**
@@ -144,7 +156,7 @@ public class DTDTransformer
 	 */
 	public List<ElementElement> getElements()
 	{
-		return this._elements;
+		return CollectionsUtil.getListValue(this._elements);
 	}
 
 	/**
@@ -152,19 +164,10 @@ public class DTDTransformer
 	 * 
 	 * @param source
 	 * @return
+	 * @throws Exception
 	 */
-	protected IParseRootNode parse(String source)
+	protected IParseRootNode parse(String source) throws Exception
 	{
-		IParseRootNode result = null;
-
-		try
-		{
-			result = ParserPoolFactory.parse(IDTDConstants.CONTENT_TYPE_DTD, source).getRootNode();
-		}
-		catch (Exception e)
-		{
-		}
-
-		return result;
+		return ParserPoolFactory.parse(IDTDConstants.CONTENT_TYPE_DTD, source).getRootNode();
 	}
 }
