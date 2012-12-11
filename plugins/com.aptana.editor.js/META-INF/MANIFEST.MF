@@ -24,7 +24,8 @@ Require-Bundle: org.mozilla.rhino,
  com.aptana.theme,
  com.aptana.index.core.ui,
  com.aptana.editor.common,
- com.aptana.build.ui
+ com.aptana.build.ui,
+ com.aptana.core.io
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin

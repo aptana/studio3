@@ -21,7 +21,11 @@ public class Messages extends NLS
 	public static String JSPreferencePage_fold_arrays_label;
 
 	public static String NodePreferencePage_DetectedPathLabel;
+
+	public static String NodePreferencePage_downloadButtonText;
 	public static String NodePreferencePage_LocationLabel;
+
+	public static String NodePreferencePage_nodejsDirSelectionMessage;
 	public static String NodePreferencePage_NotDetected;
 
 	public static String NodePreferencePage_SourceLocationLabel;
