@@ -50,7 +50,7 @@ import com.aptana.ui.util.UIUtils;
 
 public class NodePreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage
 {
-	public static final String NODE_JS_SOURCE_URL = "http://nodejs.org/dist/v0.8.3/node-v0.8.3.tar.gz"; //$NON-NLS-1$
+	public static final String NODE_JS_SOURCE_URL = "http://go.aptana.com/nodejs-source"; //$NON-NLS-1$
 	public static final String NODE_JS_ROOT_NAME = "node-v0.8.3"; //$NON-NLS-1$
 
 	public static final String ID = "com.aptana.editor.js.nodejs.page"; //$NON-NLS-1$
@@ -194,10 +194,8 @@ public class NodePreferencePage extends FieldEditorPreferencePage implements IWo
 						IStatus status = dm.start(monitor);
 						if (status.isOK())
 						{
-							// We got the source code. Now we need to extract it and set the value in the text
-							// field
-							// (or the
-							// preferences, in case the dialog was closed).
+							// We got the source code. Now we need to extract it and set the value in the text field (or
+							// the preferences, in case the dialog was closed).
 							String[] contentPaths = dm.getContentsLocations();
 							status = TarUtil.extractTGZFile(Path.fromOSString(contentPaths[0]), selectedDir);
 							if (status.isOK())
