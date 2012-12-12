@@ -48,9 +48,46 @@ public final class VersionUtil
 	 */
 	public static int compareVersions(String left, String right)
 	{
+		return compareVersions(left, right, true);
+	}
+
+	/**
+	 * Compare version strings of the form A.B.C.D... Version strings can contain integers or strings. It will attempt
+	 * to compare individual '.'-delineated segments using an integer-based comparison first, and then will fall back to
+	 * strings if the integer comparison fails.
+	 * 
+	 * @param left
+	 * @param right
+	 * @param isStrict
+	 *            Specifies whether the versions should be formatted as "x.x.x" prior to the comparision
+	 * @return positive if left > right, zero if left == right, negative otherwise
+	 */
+	public static int compareVersions(String left, String right, boolean isStrict)
+	{
 		int result;
 		String[] lparts = VERSION_DOT_PATTERN.split(left);
 		String[] rparts = VERSION_DOT_PATTERN.split(right);
+
+		// Make versions equal length
+		if (!isStrict && lparts.length != rparts.length)
+		{
+			int diff = Math.abs(lparts.length - rparts.length);
+			String[] moreParts = new String[diff];
+			for (int i = 0; i < moreParts.length; i++)
+			{
+				moreParts[i] = "0"; //$NON-NLS-1$
+			}
+
+			if (lparts.length < rparts.length)
+			{
+				lparts = ArrayUtil.flatten(lparts, moreParts);
+			}
+			else
+			{
+				rparts = ArrayUtil.flatten(rparts, moreParts);
+			}
+		}
+
 		for (int i = 0; i < lparts.length && i < rparts.length; ++i)
 		{
 			try

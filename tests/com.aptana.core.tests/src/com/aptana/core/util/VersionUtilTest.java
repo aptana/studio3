@@ -38,6 +38,34 @@ public class VersionUtilTest extends TestCase
 		assertTrue(VersionUtil.compareVersions("1.12.0", "1.12") > 0);
 	}
 
+	public void testCompareVersionsNotStrict()
+	{
+		assertTrue(VersionUtil.compareVersions("2.0", "1.0", false) > 0);
+		assertTrue(VersionUtil.compareVersions("2.10", "2.2", false) > 0);
+		assertTrue(VersionUtil.compareVersions("2.1a", "2.1b", false) < 0);
+
+		// Firebug-specific version #s
+		assertTrue(VersionUtil.compareVersions("1.7X.0a1", "1.7X.0a1", false) == 0);
+		assertTrue(VersionUtil.compareVersions("1.7X.0a1", "1.7X.0a2", false) < 0);
+		assertTrue(VersionUtil.compareVersions("1.7X.0a2", "1.7X.0a1", false) > 0);
+		assertTrue(VersionUtil.compareVersions("1.2.1b1", "1.2.1", false) > 0);
+		assertTrue(VersionUtil.compareVersions("1.2.1", "1.2.1b1", false) < 0);
+
+		assertTrue(VersionUtil.compareVersions("1.7X", "1.7X.0", false) > 0);
+
+		// Eclipse-style version #s
+		assertTrue(VersionUtil.compareVersions("1.3.0.v20100106-170", "1.3.0.v20100106-170", false) == 0);
+		assertTrue(VersionUtil.compareVersions("1.3.0.v20100106-170", "1.3.0.v20100518-1140", false) < 0);
+		assertTrue(VersionUtil.compareVersions("1.3.0.v20100518-1140", "1.3.0.v20100106-170", false) > 0);
+		assertTrue(VersionUtil.compareVersions("v20100101-900", "v20100101-1200", false) > 0);
+
+		assertTrue(VersionUtil.compareVersions("1.12.127", "1.12.82", false) > 0);
+		assertTrue(VersionUtil.compareVersions("1.2.3.1000a", "1.2.3.1000b", false) < 0);
+		assertTrue(VersionUtil.compareVersions("1.12", "1.12", false) == 0);
+		assertTrue(VersionUtil.compareVersions("1.12", "1.12.0", false) == 0);
+		assertTrue(VersionUtil.compareVersions("1.12.0", "1.12", false) == 0);
+	}
+
 	/**
 	 * Version ranges tests.
 	 * 
