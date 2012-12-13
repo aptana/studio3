@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.Platform;
 
 import com.aptana.core.ShellExecutable;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.PathUtil;
 import com.aptana.core.util.StringUtil;
@@ -113,11 +114,14 @@ public class NodeModuleResolver extends AbstractRequireResolver
 		if (node != null)
 		{
 			String[] files = node.append(LIB).toFile().list();
-			for (String file : files)
+			if (!ArrayUtil.isEmpty(files))
 			{
-				if (file.equals(text + ".js")) //$NON-NLS-1$
+				for (String file : files)
 				{
-					return true;
+					if (file.equals(text + ".js")) //$NON-NLS-1$
+					{
+						return true;
+					}
 				}
 			}
 		}
