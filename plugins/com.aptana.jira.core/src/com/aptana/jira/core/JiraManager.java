@@ -87,7 +87,7 @@ public class JiraManager
 	 * REST API URLs
 	 */
 	private static final String HOST_NAME = "jira.appcelerator.org"; //$NON-NLS-1$
-	private static final String HOST_URL = "http://" + HOST_NAME; //$NON-NLS-1$
+	private static final String HOST_URL = "https://" + HOST_NAME; //$NON-NLS-1$
 	private static final String REST_API_ENDPOINT = HOST_URL + "/rest/api/2/"; //$NON-NLS-1$
 
 	private JiraUser user;
