@@ -149,7 +149,10 @@ public abstract class InferencingTestsBase extends TestCase
 	 */
 	protected URI getIndexURI()
 	{
-		return URI.create("inference.testing");
+		IPath dir = FileUtil.getTempDirectory().append(getName());
+		dir.toFile().mkdirs();
+		dir.toFile().deleteOnExit();
+		return dir.toFile().toURI();
 	}
 
 	/**
