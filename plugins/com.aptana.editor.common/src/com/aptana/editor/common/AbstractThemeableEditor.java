@@ -1193,7 +1193,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 				return lastAstForModificationStamp;
 			}
 		}
-		catch (Exception e)
+		catch (Throwable e)
 		{
 			IdeLog.logTrace(CommonEditorPlugin.getDefault(), e.getMessage(), e, IDebugScopes.AST);
 		}
