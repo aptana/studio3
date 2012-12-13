@@ -7,6 +7,7 @@
  */
 package com.aptana.js.core.inferencing;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
@@ -19,25 +20,17 @@ import org.eclipse.core.runtime.Path;
 public class CommonJSResolver implements IRequireResolver
 {
 
-	private IPath moduleNamespaceRoot;
-	private IPath currentLocation;
-
-	public CommonJSResolver(IPath currentLocation, IPath moduleNamespaceRoot)
+	public IPath resolve(String moduleId, IProject project, IPath currentLocation, IPath indexRoot)
 	{
 		if (!currentLocation.toFile().isDirectory())
 		{
 			throw new IllegalArgumentException("current location must be a directory"); //$NON-NLS-1$
 		}
-		if (!moduleNamespaceRoot.toFile().isDirectory())
+		if (!indexRoot.toFile().isDirectory())
 		{
 			throw new IllegalArgumentException("module namespace root must be a directory"); //$NON-NLS-1$
 		}
-		this.currentLocation = currentLocation;
-		this.moduleNamespaceRoot = moduleNamespaceRoot;
-	}
 
-	public IPath resolve(String moduleId)
-	{
 		IPath modulePath = Path.fromPortableString(moduleId);
 		if (modulePath.getFileExtension() == null)
 		{
@@ -48,8 +41,14 @@ public class CommonJSResolver implements IRequireResolver
 			// relative
 			return currentLocation.append(modulePath);
 		}
-		// absolute
-		return moduleNamespaceRoot.append(modulePath);
+		// absolute, so resolve releative to index root
+		return indexRoot.append(modulePath);
+	}
+
+	public boolean applies(IProject project, IPath currentDirectory, IPath indexRoot)
+	{
+		// CommonJS will be our fallback. Should always apply.
+		return true;
 	}
 
 }

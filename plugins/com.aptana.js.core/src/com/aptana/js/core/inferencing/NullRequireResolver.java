@@ -7,14 +7,19 @@
  */
 package com.aptana.js.core.inferencing;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 
 class NullRequireResolver implements IRequireResolver
 {
-
-	public IPath resolve(String moduleId)
+	public IPath resolve(String moduleId, IProject project, IPath currentDirectory, IPath indexRoot)
 	{
 		return null;
+	}
+
+	public boolean applies(IProject project, IPath currentDirectory, IPath indexRoot)
+	{
+		return true;
 	}
 
 }

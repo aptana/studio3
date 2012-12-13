@@ -734,8 +734,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 						JSStringNode string = (JSStringNode) arg;
 						String text = StringUtil.stripQuotes(string.getText());
 
-						IRequireResolver resolver = getResolver();
-						IPath absolutePath = resolver.resolve(text);
+						IPath absolutePath = resolve(text);
 						String typeName = getModuleType(text, absolutePath);
 						if (typeName != null)
 						{
@@ -790,23 +789,10 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		}
 	}
 
-	protected IRequireResolver getResolver()
+	protected IPath resolve(String moduleId)
 	{
-		// TODO We need to be able to switch the resolution algorithm based on the project/location
-		// - NodeJS (paths are resolved by searching for node_modules dirs, then searching node
-		// locations)
-		// - CommonJS (paths are resolved against a "module namespace root")
-		// - Titanium (paths are resolved like CommonJs with Resources as namespace root, but so are
-		// platform-specific subdirs. Also search modules - project and global in SDK)
-		try
-		{
-			return new CommonJSResolver(Path.fromPortableString(_location.getPath()).removeLastSegments(1),
-					Path.fromPortableString(_index.getRoot().getPath()));
-		}
-		catch (Exception e)
-		{
-			return new NullRequireResolver();
-		}
+		return RequireResolverFactory.resolve(moduleId, getProject(), Path.fromPortableString(_location.getPath())
+				.removeLastSegments(1), Path.fromPortableString(_index.getRoot().getPath()));
 	}
 
 	/**
@@ -824,7 +810,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		}
 
 		// Look up our mapping from generated type names to documents
-		List<QueryResult> results = _index.query(new String[] { IJSIndexConstants.MODULE_DEFINITION }, "*",
+		List<QueryResult> results = _index.query(new String[] { IJSIndexConstants.MODULE_DEFINITION }, "*", //$NON-NLS-1$
 				SearchPattern.PATTERN_MATCH);
 		final String fileURI = absolutePath.toFile().toURI().toString();
 		// Find the module declared in the file we resolved to...

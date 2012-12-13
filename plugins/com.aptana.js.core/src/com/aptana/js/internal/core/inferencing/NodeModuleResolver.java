@@ -14,23 +14,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.core.filesystem.EFS;
-import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 
 import com.aptana.core.ShellExecutable;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
-import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.PathUtil;
 import com.aptana.core.util.StringUtil;
-import com.aptana.jetty.util.epl.ajax.JSON;
 import com.aptana.js.core.JSCorePlugin;
-import com.aptana.js.core.inferencing.IRequireResolver;
+import com.aptana.js.core.inferencing.AbstractRequireResolver;
 import com.aptana.js.core.preferences.IPreferenceConstants;
 
 /**
@@ -38,14 +34,12 @@ import com.aptana.js.core.preferences.IPreferenceConstants;
  * 
  * @author cwilliams
  */
-public class NodeModuleResolver implements IRequireResolver
+public class NodeModuleResolver extends AbstractRequireResolver
 {
 
+	private static final String LIB = "lib"; //$NON-NLS-1$
 	private static final String NODE_MODULES = "node_modules"; //$NON-NLS-1$
-	private static final String MAIN = "main"; //$NON-NLS-1$
-	private static final String INDEX_NODE = "index.node"; //$NON-NLS-1$
-	private static final String INDEX_JS = "index.js"; //$NON-NLS-1$
-	private static final String PACKAGE_JSON = "package.json"; //$NON-NLS-1$
+	private static final String NODE = "node"; //$NON-NLS-1$
 
 	// This is a hack. I copy-pasted from node source's lib dir file listing to here. This is just a way of falling back
 	// if we can't actually get the listing from the node src install itself.
@@ -58,23 +52,15 @@ public class NodeModuleResolver implements IRequireResolver
 
 	private IPath location;
 
-	/**
-	 * @param location
-	 * @throws IllegalArgumentException
-	 */
-	public NodeModuleResolver(IPath location) throws IllegalArgumentException
+	public IPath resolve(String moduleId, IProject project, IPath location, IPath indexRoot)
 	{
 		if (!location.toFile().isDirectory())
 		{
 			throw new IllegalArgumentException("location must be a directory"); //$NON-NLS-1$
 		}
 		this.location = location;
-	}
 
-	public IPath resolve(String moduleId)
-	{
 		IPath result = null;
-		// TODO handle core modules - we need node's source to do so!
 		if (isCore(moduleId))
 		{
 			return coreModule(moduleId);
@@ -84,10 +70,10 @@ public class NodeModuleResolver implements IRequireResolver
 		{
 			IPath relative = location.append(moduleId);
 
-			result = loadAsFile(relative);
+			result = loadAsFile(relative, NODE);
 			if (result == null)
 			{
-				result = loadAsDirectory(relative);
+				result = loadAsDirectory(relative, NODE);
 			}
 		}
 
@@ -107,7 +93,7 @@ public class NodeModuleResolver implements IRequireResolver
 		{
 			return null;
 		}
-		return node.append("lib").append(text + ".js"); //$NON-NLS-1$//$NON-NLS-2$
+		return node.append(LIB).append(text).addFileExtension(JS);
 	}
 
 	private IPath nodeSrcPath()
@@ -126,7 +112,7 @@ public class NodeModuleResolver implements IRequireResolver
 		IPath node = nodeSrcPath();
 		if (node != null)
 		{
-			String[] files = node.append("lib").toFile().list(); //$NON-NLS-1$
+			String[] files = node.append(LIB).toFile().list();
 			for (String file : files)
 			{
 				if (file.equals(text + ".js")) //$NON-NLS-1$
@@ -138,76 +124,15 @@ public class NodeModuleResolver implements IRequireResolver
 		return CORE_MODULES.contains(text);
 	}
 
-	private IPath loadAsFile(IPath x)
-	{
-		File file = x.toFile();
-		if (file.isFile())
-		{
-			return x;
-		}
-
-		IPath js = x.addFileExtension("js"); //$NON-NLS-1$
-		if (js.toFile().isFile())
-		{
-			return js;
-		}
-
-		IPath node = x.addFileExtension("node"); //$NON-NLS-1$
-		if (node.toFile().isFile())
-		{
-			return node;
-		}
-
-		return null;
-	}
-
-	private IPath loadAsDirectory(IPath x)
-	{
-		File packageJSON = x.append(PACKAGE_JSON).toFile();
-		if (packageJSON.isFile())
-		{
-			try
-			{
-				IFileStore fileStore = EFS.getStore(packageJSON.toURI());
-				String rawJSON = IOUtil.read(fileStore.openInputStream(EFS.NONE, new NullProgressMonitor()));
-				@SuppressWarnings("rawtypes")
-				Map json = (Map) JSON.parse(rawJSON);
-				String mainFile = (String) json.get(MAIN);
-				IPath m = x.append(mainFile);
-				IPath result = loadAsFile(m);
-				if (result != null)
-				{
-					return result;
-				}
-			}
-			catch (CoreException e)
-			{
-				IdeLog.log(JSCorePlugin.getDefault(), e.getStatus());
-			}
-		}
-		File indexJS = x.append(INDEX_JS).toFile();
-		if (indexJS.isFile())
-		{
-			return x.append(INDEX_JS);
-		}
-
-		File indexNode = x.append(INDEX_NODE).toFile();
-		if (indexNode.isFile())
-		{
-			return x.append(INDEX_NODE);
-		}
-		return null;
-	}
-
 	private IPath loadNodeModules(String x, IPath start)
 	{
 		List<IPath> dirs = nodeModulesPaths(start);
 		for (IPath dir : dirs)
 		{
-			IPath path = loadAsFile(dir.append(x));
+			IPath path = loadAsFile(dir.append(x), NODE);
 			if (path == null)
 			{
-				path = loadAsDirectory(dir.append(x));
+				path = loadAsDirectory(dir.append(x), NODE);
 			}
 			if (path != null)
 			{
@@ -276,13 +201,20 @@ public class NodeModuleResolver implements IRequireResolver
 		{
 			String nodePrefixValue = JSCorePlugin.getDefault().getNodePackageManager().getConfigValue("prefix"); //$NON-NLS-1$
 			IPath nodePrefix = Path.fromOSString(nodePrefixValue);
-			dirs.add(nodePrefix.append("lib").append("node")); //$NON-NLS-1$ //$NON-NLS-2$
+			dirs.add(nodePrefix.append(LIB).append(NODE));
 		}
 		catch (CoreException e)
 		{
 			IdeLog.logError(JSCorePlugin.getDefault(), e);
 		}
 		return dirs;
+	}
+
+	public boolean applies(IProject project, IPath currentDirectory, IPath indexRoot)
+	{
+		// TODO This applies to projects that use node modules. What are those? Alloy? Node.ACS? Regular Web projects?
+		// Is there some way to tell if a project is hooked up to node?
+		return true;
 	}
 
 }

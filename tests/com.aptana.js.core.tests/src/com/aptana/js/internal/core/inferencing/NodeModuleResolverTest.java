@@ -15,8 +15,11 @@ import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.IPath;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.IOUtil;
+import com.aptana.js.core.JSCorePlugin;
+import com.aptana.js.core.preferences.IPreferenceConstants;
 
 @SuppressWarnings("nls")
 public class NodeModuleResolverTest extends TestCase
@@ -38,7 +41,7 @@ public class NodeModuleResolverTest extends TestCase
 		assertTrue(dir.toFile().mkdirs());
 
 		// Hook up the resolver to it
-		resolver = new NodeModuleResolver(dir);
+		resolver = new NodeModuleResolver();
 	}
 
 	protected void tearDown() throws Exception
@@ -53,9 +56,26 @@ public class NodeModuleResolverTest extends TestCase
 		}
 	}
 
-	public void testResolveCoreModule()
+	public void testResolveCoreModule() throws Exception
 	{
-		fail("Not yet implemented - Need ability to set path to node source");
+		IPath nodeSrc = FileUtil.getTempDirectory().append("node_src");
+		IPath lib = nodeSrc.append("lib");
+		lib.toFile().mkdirs();
+
+		try
+		{
+			EclipseUtil.defaultScope().getNode(JSCorePlugin.PLUGIN_ID)
+					.put(IPreferenceConstants.NODEJS_SOURCE_PATH, nodeSrc.toOSString());
+
+			IPath expected = lib.append("http.js");
+			expected.toFile().createNewFile();
+
+			assertEquals(expected, resolver.resolve("http", null, dir, null));
+		}
+		finally
+		{
+			FileUtil.deleteRecursively(lib.toFile());
+		}
 	}
 
 	public void testResolveRelativeJSFile() throws Exception
@@ -63,8 +83,8 @@ public class NodeModuleResolverTest extends TestCase
 		IPath expected = dir.append("sibling.js");
 		expected.toFile().createNewFile();
 
-		assertEquals(expected, resolver.resolve("./sibling"));
-		assertEquals(expected, resolver.resolve("/sibling"));
+		assertEquals(expected, resolver.resolve("./sibling", null, dir, null));
+		assertEquals(expected, resolver.resolve("/sibling", null, dir, null));
 	}
 
 	public void testResolveRelativeNodeFile() throws Exception
@@ -72,16 +92,16 @@ public class NodeModuleResolverTest extends TestCase
 		IPath expected = dir.append("sibling.node");
 		expected.toFile().createNewFile();
 
-		assertEquals(expected, resolver.resolve("./sibling"));
-		assertEquals(expected, resolver.resolve("/sibling"));
+		assertEquals(expected, resolver.resolve("./sibling", null, dir, null));
+		assertEquals(expected, resolver.resolve("/sibling", null, dir, null));
 	}
 
 	public void testResolveRelativeDirectory() throws Exception
 	{
 		IPath expected = createNodeDirectory(dir, "sibling", "main.js");
 
-		assertEquals(expected, resolver.resolve("./sibling"));
-		assertEquals(expected, resolver.resolve("/sibling"));
+		assertEquals(expected, resolver.resolve("./sibling", null, dir, null));
+		assertEquals(expected, resolver.resolve("/sibling", null, dir, null));
 	}
 
 	public void testResolveJSFileUnderNodeModules() throws Exception
@@ -104,9 +124,9 @@ public class NodeModuleResolverTest extends TestCase
 		file2.toFile().createNewFile();
 
 		// Finds file in first "node_modules"
-		assertEquals(expected, resolver.resolve("file"));
+		assertEquals(expected, resolver.resolve("file", null, dir, null));
 		// Finds file in second "node_modules" (one directory level higher)
-		assertEquals(file2, resolver.resolve("file2"));
+		assertEquals(file2, resolver.resolve("file2", null, dir, null));
 	}
 
 	public void testResolveDirectoryUnderNodeModules() throws Exception
@@ -125,9 +145,9 @@ public class NodeModuleResolverTest extends TestCase
 		IPath file2 = createNodeDirectory(superNodeModules, "file2", "main.js");
 
 		// Finds file in first "node_modules"
-		assertEquals(expected, resolver.resolve("file"));
+		assertEquals(expected, resolver.resolve("file", null, dir, null));
 		// Finds file in second "node_modules" (one directory level higher)
-		assertEquals(file2, resolver.resolve("file2"));
+		assertEquals(file2, resolver.resolve("file2", null, dir, null));
 	}
 
 	// TODO Add test for "node" file underneath node_modules dir above the current location
