@@ -51,7 +51,7 @@ public class VersionUtilTest extends TestCase
 		assertTrue(VersionUtil.compareVersions("1.2.1b1", "1.2.1", false) > 0);
 		assertTrue(VersionUtil.compareVersions("1.2.1", "1.2.1b1", false) < 0);
 
-		assertTrue(VersionUtil.compareVersions("1.7X", "1.7X.0", false) > 0);
+		assertTrue(VersionUtil.compareVersions("1.7X", "1.7X.0", false) == 0);
 
 		// Eclipse-style version #s
 		assertTrue(VersionUtil.compareVersions("1.3.0.v20100106-170", "1.3.0.v20100106-170", false) == 0);
