@@ -200,4 +200,12 @@
                priority="55">
          </resolver>
       </extension>
+      <extension
+            point="com.aptana.buildpath.core.buildPaths">
+         <contributor
+               class="com.aptana.js.internal.core.build.NodeJSSourceContributor"
+               id="com.aptana.js.core.build.NodeJSSourceContributor"
+               name="%contributor.nodejs.name">
+         </contributor>
+      </extension>
 </plugin>

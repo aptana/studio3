@@ -35,8 +35,11 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
+import org.eclipse.core.runtime.jobs.Job;
 
 import com.aptana.buildpath.core.BuildPathCorePlugin;
+import com.aptana.buildpath.core.BuildPathManager;
+import com.aptana.buildpath.core.IBuildPathEntry;
 import com.aptana.core.CorePlugin;
 import com.aptana.core.IDebugScopes;
 import com.aptana.core.IFilter;
@@ -49,6 +52,7 @@ import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.index.core.FileStoreBuildContext;
 import com.aptana.index.core.IIndexFileContributor;
+import com.aptana.index.core.IndexContainerJob;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.IndexPlugin;
 import com.aptana.index.core.build.BuildContext;
@@ -315,6 +319,16 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 		sub.worked(5);
 		buildContributedFiles(participants, contributedFiles, sub.newChild(10));
 
+		// TODO Ask the project for it's build path entries, then schedule jobs to index them
+		// I think we just want to make sure we index them, not run the full build participant stuff
+		// Set<IBuildPathEntry> entries = BuildPathManager.getInstance().getBuildPaths(project);
+		// for (IBuildPathEntry entry : entries)
+		// {
+		// URI path = entry.getPath();
+		// // FIXME What if the path is to a JSCA file? We need the concept of indexing a single file!
+		// new IndexContainerJob(path).schedule(Job.BUILD);
+		// }
+
 		// Now index the actual files in the project
 		CollectingResourceVisitor visitor = new CollectingResourceVisitor();
 		project.accept(visitor);
@@ -374,6 +388,9 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 	 */
 	protected Set<IFileStore> getContributedFiles(URI container)
 	{
+		// FIXME This shoves all contributed files into the same index as the project!
+		// We want the notion of a project referring to build path entries that are maintained in their own indices,
+		// which we can share across projects!
 		Set<IFileStore> result = new HashSet<IFileStore>();
 
 		IndexManager manager = getIndexManager();
