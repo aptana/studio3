@@ -105,11 +105,11 @@ public class BuildPathManager
 	 * @param project
 	 * @param entry
 	 */
-	public void addBuildPath(IProject project, BuildPathEntry entry)
+	public void addBuildPath(IProject project, IBuildPathEntry entry)
 	{
 		if (project != null && entry != null)
 		{
-			Set<BuildPathEntry> buildPaths = getBuildPaths(project);
+			Set<IBuildPathEntry> buildPaths = getBuildPaths(project);
 
 			if (!buildPaths.contains(entry))
 			{
@@ -167,9 +167,9 @@ public class BuildPathManager
 	 * 
 	 * @return
 	 */
-	public Set<BuildPathEntry> getBuildPaths()
+	public Set<IBuildPathEntry> getBuildPaths()
 	{
-		Set<BuildPathEntry> result = new HashSet<BuildPathEntry>();
+		Set<IBuildPathEntry> result = new HashSet<IBuildPathEntry>();
 
 		// Add static paths, if we have any
 		if (buildPaths != null)
@@ -189,9 +189,9 @@ public class BuildPathManager
 	 * @param project
 	 * @return
 	 */
-	public Set<BuildPathEntry> getBuildPaths(IProject project)
+	public Set<IBuildPathEntry> getBuildPaths(IProject project)
 	{
-		Set<BuildPathEntry> result = new HashSet<BuildPathEntry>();
+		Set<IBuildPathEntry> result = new HashSet<IBuildPathEntry>();
 
 		try
 		{
@@ -260,17 +260,17 @@ public class BuildPathManager
 	 * 
 	 * @return
 	 */
-	private Set<BuildPathEntry> getDynamicBuildPaths()
+	private Set<IBuildPathEntry> getDynamicBuildPaths()
 	{
-		Set<BuildPathEntry> result;
+		Set<IBuildPathEntry> result;
 
 		if (contributors != null)
 		{
-			result = new HashSet<BuildPathEntry>();
+			result = new HashSet<IBuildPathEntry>();
 
 			for (IBuildPathContributor contributor : contributors)
 			{
-				List<BuildPathEntry> files = contributor.getBuildPathEntries();
+				List<IBuildPathEntry> files = contributor.getBuildPathEntries();
 
 				if (files != null)
 				{
@@ -304,13 +304,13 @@ public class BuildPathManager
 	 * @param entry
 	 * @return
 	 */
-	public boolean hasBuildPath(IProject project, BuildPathEntry entry)
+	public boolean hasBuildPath(IProject project, IBuildPathEntry entry)
 	{
 		boolean result = false;
 
 		if (project != null && entry != null)
 		{
-			Set<BuildPathEntry> buildPathSet = getBuildPaths(project);
+			Set<IBuildPathEntry> buildPathSet = getBuildPaths(project);
 
 			result = buildPathSet.contains(entry);
 		}
@@ -477,11 +477,11 @@ public class BuildPathManager
 	 * @param project
 	 * @param entry
 	 */
-	public void removeBuildPath(IProject project, BuildPathEntry entry)
+	public void removeBuildPath(IProject project, IBuildPathEntry entry)
 	{
 		if (project != null && entry != null)
 		{
-			Set<BuildPathEntry> entries = getBuildPaths(project);
+			Set<IBuildPathEntry> entries = getBuildPaths(project);
 
 			if (entries.contains(entry))
 			{
@@ -512,13 +512,13 @@ public class BuildPathManager
 	 * @param project
 	 * @param entries
 	 */
-	public void setBuildPaths(IProject project, Collection<BuildPathEntry> entries)
+	public void setBuildPaths(IProject project, Collection<IBuildPathEntry> entries)
 	{
 		if (project != null && entries != null)
 		{
 			List<String> nameAndPaths = new ArrayList<String>();
 
-			for (BuildPathEntry entry : entries)
+			for (IBuildPathEntry entry : entries)
 			{
 				String nameAndPath = entry.getDisplayName() + NAME_AND_PATH_DELIMITER + entry.getPath();
 
@@ -527,6 +527,8 @@ public class BuildPathManager
 
 			String value = StringUtil.join(BUILD_PATH_ENTRY_DELIMITER, nameAndPaths);
 
+			// FIXME This severely limits the value's size, which we could run into over time! It also does not make the
+			// value portable across users/workspaces
 			try
 			{
 				project.setPersistentProperty(getBuildPathPropertyName(), value);

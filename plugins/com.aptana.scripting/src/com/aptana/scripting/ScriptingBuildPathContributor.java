@@ -15,6 +15,7 @@ import java.util.Set;
 
 import com.aptana.buildpath.core.BuildPathEntry;
 import com.aptana.buildpath.core.IBuildPathContributor;
+import com.aptana.buildpath.core.IBuildPathEntry;
 import com.aptana.scripting.model.BuildPathElement;
 import com.aptana.scripting.model.BundleEntry;
 import com.aptana.scripting.model.BundleManager;
@@ -28,10 +29,10 @@ public class ScriptingBuildPathContributor implements IBuildPathContributor
 	 * (non-Javadoc)
 	 * @see com.aptana.buildpath.core.IBuildPathContributor#contribute()
 	 */
-	public List<BuildPathEntry> getBuildPathEntries()
+	public List<IBuildPathEntry> getBuildPathEntries()
 	{
 		BundleManager manager = BundleManager.getInstance();
-		Set<BuildPathEntry> result = new HashSet<BuildPathEntry>();
+		Set<IBuildPathEntry> result = new HashSet<IBuildPathEntry>();
 
 		for (String name : manager.getBundleNames())
 		{
@@ -46,6 +47,6 @@ public class ScriptingBuildPathContributor implements IBuildPathContributor
 			}
 		}
 
-		return new ArrayList<BuildPathEntry>(result);
+		return new ArrayList<IBuildPathEntry>(result);
 	}
 }

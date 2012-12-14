@@ -68,6 +68,8 @@ public class Messages extends NLS
 	public static String JSStyleValidator_WrapRegexp;
 	public static String JSStyleValidator_WriteIsWrong;
 
+	public static String NodeJSSourceContributor_Name;
+
 	static
 	{
 		// initialize resource bundle

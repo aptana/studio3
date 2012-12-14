@@ -17,11 +17,12 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.index.core.IIndexFileContributor;
+import com.aptana.index.core.IndexUtil;
 
 public class BuildPathIndexContributor implements IIndexFileContributor
 {
@@ -44,19 +45,29 @@ public class BuildPathIndexContributor implements IIndexFileContributor
 			if (container instanceof IProject)
 			{
 				IProject project = (IProject) container;
-				Set<BuildPathEntry> entries = BuildPathManager.getInstance().getBuildPaths(project);
+				Set<IBuildPathEntry> entries = BuildPathManager.getInstance().getBuildPaths(project);
 
 				if (entries != null)
 				{
-					for (BuildPathEntry entry : entries)
+					for (IBuildPathEntry entry : entries)
 					{
 						try
 						{
 							IFileStore fileStore = EFS.getStore(entry.getPath());
-
-							result.add(fileStore);
+							if (fileStore != null)
+							{
+								// What if this points at a folder/dir? Traverse and grab all contents recursively?
+								if (fileStore.fetchInfo().isDirectory())
+								{
+									result.addAll(IndexUtil.getAllFiles(fileStore, new NullProgressMonitor()));
+								}
+								else
+								{
+									result.add(fileStore);
+								}
+							}
 						}
-						catch (CoreException e)
+						catch (Throwable e)
 						{
 							IdeLog.logError(BuildPathCorePlugin.getDefault(), e);
 						}
@@ -64,7 +75,6 @@ public class BuildPathIndexContributor implements IIndexFileContributor
 				}
 			}
 		}
-
 		return result;
 	}
 }

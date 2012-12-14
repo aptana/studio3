@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.filesystem.EFS;
-import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -26,18 +25,17 @@ import org.eclipse.core.runtime.SubMonitor;
 import com.aptana.core.IFilter;
 import com.aptana.core.IMap;
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.CollectionsUtil;
 
 public class IndexContainerJob extends IndexRequestJob
 {
 
-	protected IndexContainerJob(URI containerURI)
+	public IndexContainerJob(URI containerURI)
 	{
 		super(containerURI);
 	}
 
-	protected IndexContainerJob(String name, URI containerURI)
+	public IndexContainerJob(String name, URI containerURI)
 	{
 		super(name, containerURI);
 	}
@@ -62,7 +60,7 @@ public class IndexContainerJob extends IndexRequestJob
 		try
 		{
 			// Collect the full set of files in the project...
-			Set<IFileStore> files = addFiles(getContainerFileStore(), sub.newChild(100));
+			Set<IFileStore> files = IndexUtil.getAllFiles(getContainerFileStore(), sub.newChild(100));
 			if (sub.isCanceled())
 			{
 				return Status.CANCEL_STATUS;
@@ -135,69 +133,6 @@ public class IndexContainerJob extends IndexRequestJob
 	protected IFileStore getContainerFileStore() throws CoreException
 	{
 		return EFS.getStore(getContainerURI());
-	}
-
-	/**
-	 * Given an {@link IFileStore}, we traverse to add all files underneath it. This method is recursive, traversing
-	 * into sub-directories. TODO Combine with logic from EFSUtils in core.io!
-	 * 
-	 * @param file
-	 * @param monitor
-	 * @return
-	 */
-	private Set<IFileStore> addFiles(IFileStore file, IProgressMonitor monitor)
-	{
-		// TODO We should likely call IFileSystem.fetchTree and use that if it doesn't return null (because that is more
-		// efficient in some schemes)!
-		SubMonitor sub = SubMonitor.convert(monitor, 10);
-		Set<IFileStore> files = new HashSet<IFileStore>();
-		try
-		{
-			if (file == null)
-			{
-				return files;
-			}
-			IFileInfo info = file.fetchInfo(EFS.NONE, sub.newChild(1));
-			if (!info.exists())
-			{
-				return files;
-			}
-			// We know it exists...
-			if (info.isDirectory())
-			{
-				try
-				{
-					// Now try to dive into directory and add all children recursively
-					IFileStore[] fileList = file.childStores(EFS.NONE, sub.newChild(2));
-					if (ArrayUtil.isEmpty(fileList))
-					{
-						return files;
-					}
-					for (IFileStore child : fileList)
-					{
-						files.addAll(addFiles(child, sub.newChild(7)));
-					}
-				}
-				catch (CoreException e)
-				{
-					IdeLog.logError(IndexPlugin.getDefault(), e);
-				}
-			}
-			else
-			{
-				// it's a file that exists, base case, add it.
-				files.add(file);
-			}
-		}
-		catch (CoreException e)
-		{
-			IdeLog.logError(IndexPlugin.getDefault(), e);
-		}
-		finally
-		{
-			sub.done();
-		}
-		return files;
 	}
 
 	// TODO Combine this with RemoveFilesOfIndexJob logic?

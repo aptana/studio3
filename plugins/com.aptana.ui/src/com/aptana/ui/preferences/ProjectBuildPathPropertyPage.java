@@ -40,6 +40,7 @@ import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 
 import com.aptana.buildpath.core.BuildPathEntry;
 import com.aptana.buildpath.core.BuildPathManager;
+import com.aptana.buildpath.core.IBuildPathEntry;
 import com.aptana.index.core.RebuildIndexJob;
 
 public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkbenchPropertyPage
@@ -65,8 +66,8 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 		project = (IProject) getElement().getAdapter(IResource.class);
 
 		// get entire list and selected items in that list
-		Set<BuildPathEntry> entries = getBuildPathEntries(project);
-		Set<BuildPathEntry> selectedEntries = getSelectedBuildPathEntries(project);
+		Set<IBuildPathEntry> entries = getBuildPathEntries(project);
+		Set<IBuildPathEntry> selectedEntries = getSelectedBuildPathEntries(project);
 
 		// top-level composite
 		Composite composite = new Composite(parent, SWT.NONE);
@@ -136,7 +137,7 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 	 * @param project
 	 * @return
 	 */
-	private Set<BuildPathEntry> getBuildPathEntries(IProject project)
+	private Set<IBuildPathEntry> getBuildPathEntries(IProject project)
 	{
 		return BuildPathManager.getInstance().getBuildPaths();
 	}
@@ -147,7 +148,7 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 	 * @param project
 	 * @return
 	 */
-	private Set<BuildPathEntry> getSelectedBuildPathEntries(IProject project)
+	private Set<IBuildPathEntry> getSelectedBuildPathEntries(IProject project)
 	{
 		return BuildPathManager.getInstance().getBuildPaths(project);
 	}
@@ -244,21 +245,21 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 	public boolean performOk()
 	{
 		Object[] items = tableViewer.getCheckedElements();
-		List<BuildPathEntry> entries = new ArrayList<BuildPathEntry>();
+		List<IBuildPathEntry> entries = new ArrayList<IBuildPathEntry>();
 
 		for (Object item : items)
 		{
-			if (item instanceof BuildPathEntry)
+			if (item instanceof IBuildPathEntry)
 			{
-				entries.add((BuildPathEntry) item);
+				entries.add((IBuildPathEntry) item);
 			}
 		}
 
 		BuildPathManager manager = BuildPathManager.getInstance();
 
 		// determine if the selection has changed
-		Set<BuildPathEntry> currentEntries = manager.getBuildPaths(project);
-		Set<BuildPathEntry> newEntries = new HashSet<BuildPathEntry>(entries);
+		Set<IBuildPathEntry> currentEntries = manager.getBuildPaths(project);
+		Set<IBuildPathEntry> newEntries = new HashSet<IBuildPathEntry>(entries);
 
 		if (!newEntries.equals(currentEntries))
 		{
