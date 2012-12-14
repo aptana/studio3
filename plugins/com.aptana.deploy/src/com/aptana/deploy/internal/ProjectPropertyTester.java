@@ -33,7 +33,7 @@ class DeployValues
 	{
 		if (arg == null)
 		{
-			return null;
+			return false;
 		}
 		return deployTypeValues.get(arg);
 	}
