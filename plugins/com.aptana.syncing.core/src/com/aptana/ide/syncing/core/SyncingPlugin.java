@@ -128,7 +128,7 @@ public class SyncingPlugin extends Plugin
 			}
 		};
 		EclipseUtil.setSystemForJob(job);
-		job.schedule();
+		job.schedule(1000);
 	}
 
 	/*
