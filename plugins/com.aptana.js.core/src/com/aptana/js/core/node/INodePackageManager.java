@@ -79,8 +79,6 @@ public interface INodePackageManager
 
 	public String getConfigValue(String key) throws CoreException;
 
-	boolean isNpmConfigWritable();
-
 	public List<IPath> getPackagesInstallLocations();
 
 	// TODO Uninstall

@@ -47,7 +47,6 @@ public class NodePackageManager implements INodePackageManager
 {
 
 	private static final String BIN = "/bin/"; //$NON-NLS-1$
-	private static final String LIB = "/lib/"; //$NON-NLS-1$
 
 	/**
 	 * Argument to {@code COLOR} switch/config option so that ANSI colors aren't used in output.
@@ -86,8 +85,6 @@ public class NodePackageManager implements INodePackageManager
 
 	private IPath npmPath;
 
-	private Boolean isNpmConfigWritable;
-
 	/*
 	 * (non-Javadoc)
 	 * @see com.appcelerator.titanium.nodejs.core.INodePackageManager#install(com.appcelerator.titanium.nodejs.core.
@@ -110,7 +107,7 @@ public class NodePackageManager implements INodePackageManager
 			List<String> args = new ArrayList<String>(8);
 			if (global)
 			{
-				if ((PlatformUtil.isMac() || PlatformUtil.isLinux()) && password.length > 0)
+				if (PlatformUtil.isMac() || PlatformUtil.isLinux())
 				{
 					args.add("sudo"); //$NON-NLS-1$
 					args.add("-S"); //$NON-NLS-1$
@@ -372,40 +369,6 @@ public class NodePackageManager implements INodePackageManager
 					"Failed to get value of npm config key {0}", key)));
 		}
 		return status.getMessage().trim();
-	}
-
-	private boolean isDirectoryWritable(String dirName)
-	{
-		if (StringUtil.isEmpty(dirName))
-		{
-			return false;
-		}
-		File destinationFolder = new File(dirName);
-		return destinationFolder.canWrite();
-	}
-
-	public boolean isNpmConfigWritable()
-	{
-		if (isNpmConfigWritable == null)
-		{
-			try
-			{
-				String nodePrefixValue = getConfigValue("prefix"); //$NON-NLS-1$
-				isNpmConfigWritable = isDirectoryWritable(nodePrefixValue);
-
-				isNpmConfigWritable &= isDirectoryWritable(nodePrefixValue + BIN);
-				isNpmConfigWritable &= isDirectoryWritable(nodePrefixValue + LIB);
-
-			}
-			catch (CoreException e)
-			{
-				// something wrong with getting prefix - this can be ignored safely as we
-				// fall back to using default mechanism.
-				isNpmConfigWritable = false;
-			}
-		}
-		return isNpmConfigWritable;
-
 	}
 
 	public List<IPath> getPackagesInstallLocations()

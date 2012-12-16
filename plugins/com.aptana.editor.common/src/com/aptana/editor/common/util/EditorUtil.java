@@ -9,6 +9,8 @@ package com.aptana.editor.common.util;
 
 import java.io.File;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.resources.IFile;
@@ -39,6 +41,7 @@ import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
@@ -348,7 +351,8 @@ public class EditorUtil
 	}
 
 	/**
-	 * Finds the editor for the specified file in the specified project and prompts a save if the editor is dirty
+	 * Finds the editor for the specified file in the specified project and prompts a save if the editor is dirty. If
+	 * the fileName is empty, it will save all dirty project files
 	 * 
 	 * @param project
 	 * @param fileName
@@ -363,25 +367,45 @@ public class EditorUtil
 			public void run()
 			{
 				IEditorPart[] dirtyEditors = UIUtils.getDirtyEditors();
+				List<IEditorPart> applicableEditors = new ArrayList<IEditorPart>();
 				if (dirtyEditors != null && dirtyEditors.length > 0)
 				{
-					IFile tiappFile = project.getFile(fileName);
-					// Try to locate the tiapp resource
+					IFile projectFile = null;
+
+					if (!StringUtil.isEmpty(fileName))
+					{
+						projectFile = project.getFile(fileName);
+
+						// If the file doesn't exist, then it doesn't need to be saved
+						if (projectFile == null || !projectFile.exists())
+						{
+							return;
+						}
+					}
+
 					for (IEditorPart editor : dirtyEditors)
 					{
 						IFile file = (IFile) (editor.getEditorInput().getAdapter(IFile.class));
-						if (file != null && file.equals(tiappFile))
+						if (file != null && (projectFile == null || file.equals(projectFile)))
 						{
-							// prompt for save
-							if (MessageDialog.openQuestion(UIUtils.getActiveShell(), Messages.EditorUtil_VerfiySavePromptTitle_lbl, promptQuestion))
+							applicableEditors.add(editor);
+						}
+					}
+
+					if (!CollectionsUtil.isEmpty(applicableEditors))
+					{
+						// prompt for save
+						if (MessageDialog.openQuestion(UIUtils.getActiveShell(),
+								Messages.EditorUtil_VerfiySavePromptTitle_lbl, promptQuestion))
+						{
+							for (IEditorPart editor : applicableEditors)
 							{
 								editor.doSave(new NullProgressMonitor());
 							}
-							else
-							{
-								result[0] = false;
-							}
-							break;
+						}
+						else
+						{
+							result[0] = false;
 						}
 					}
 				}
