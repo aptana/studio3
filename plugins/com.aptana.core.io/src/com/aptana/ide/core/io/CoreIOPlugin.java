@@ -76,6 +76,28 @@ public class CoreIOPlugin extends Plugin
 		super.start(context);
 		plugin = this;
 
+		try
+		{
+			ISavedState lastState = ResourcesPlugin.getWorkspace().addSaveParticipant(getDefault(),
+					new WorkspaceSaveParticipant());
+			if (lastState != null)
+			{
+				IPath location = lastState.lookup(new Path(ConnectionPointManager.STATE_FILENAME));
+				if (location != null)
+				{
+					ConnectionPointManager.getInstance().loadState(getStateLocation().append(location));
+				}
+			}
+		}
+		catch (IllegalStateException e)
+		{
+			IdeLog.logError(getDefault(), e);
+		}
+		catch (CoreException e)
+		{
+			IdeLog.logError(getDefault(), e);
+		}
+
 		// Run startup things in a job
 		Job job = new Job("Initializing Core IO plugin") //$NON-NLS-1$
 		{
@@ -83,28 +105,6 @@ public class CoreIOPlugin extends Plugin
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
-				try
-				{
-					ISavedState lastState = ResourcesPlugin.getWorkspace().addSaveParticipant(getDefault(),
-							new WorkspaceSaveParticipant());
-					if (lastState != null)
-					{
-						IPath location = lastState.lookup(new Path(ConnectionPointManager.STATE_FILENAME));
-						if (location != null)
-						{
-							ConnectionPointManager.getInstance().loadState(getStateLocation().append(location));
-						}
-					}
-				}
-				catch (IllegalStateException e)
-				{
-					IdeLog.logError(getDefault(), e);
-				}
-				catch (CoreException e)
-				{
-					IdeLog.logError(getDefault(), e);
-				}
-
 				deleteListener = new DeleteResourceShortcutListener();
 				ResourcesPlugin.getWorkspace().addResourceChangeListener(deleteListener,
 						IResourceChangeEvent.POST_CHANGE);
