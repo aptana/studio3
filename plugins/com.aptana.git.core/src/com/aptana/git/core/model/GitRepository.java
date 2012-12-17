@@ -58,6 +58,7 @@ import org.eclipse.core.runtime.jobs.Job;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ArrayUtil;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
@@ -1090,7 +1091,7 @@ public class GitRepository
 
 	void fireIndexChangeEvent(Collection<ChangedFile> preChangeFiles, Collection<ChangedFile> changedFiles)
 	{
-		if (listeners == null || listeners.isEmpty())
+		if (CollectionsUtil.isEmpty(listeners))
 		{
 			return;
 		}

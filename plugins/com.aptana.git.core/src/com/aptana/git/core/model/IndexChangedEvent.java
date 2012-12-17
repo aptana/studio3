@@ -21,16 +21,13 @@ import com.aptana.core.util.CollectionsUtil;
 public class IndexChangedEvent extends RepositoryEvent
 {
 
-	private Collection<ChangedFile> postChangeFiles;
-	private Collection<ChangedFile> preChangeFiles;
 	private Collection<ChangedFile> diff;
 
 	IndexChangedEvent(GitRepository repository, Collection<ChangedFile> preChangeFiles,
 			Collection<ChangedFile> postChangeFiles)
 	{
 		super(repository);
-		this.preChangeFiles = preChangeFiles;
-		this.postChangeFiles = postChangeFiles;
+		this.diff = CollectionsUtil.getNonOverlapping(preChangeFiles, postChangeFiles);
 	}
 
 	protected boolean hasDiff()
@@ -44,24 +41,22 @@ public class IndexChangedEvent extends RepositoryEvent
 
 		GitRepository repo = getRepository();
 		IPath workingDirectory = repo.workingDirectory();
-		Set<IResource> files = new HashSet<IResource>();
+		Set<IResource> files = new HashSet<IResource>(changedFiles.size());
 		for (ChangedFile changedFile : changedFiles)
 		{
 			IPath path = workingDirectory.append(changedFile.getPath()).makeAbsolute();
 			IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(path);
 			if (file == null)
+			{
 				continue;
+			}
 			files.add(file);
 		}
 		return files;
 	}
 
-	private synchronized Collection<ChangedFile> getDiff()
+	private Collection<ChangedFile> getDiff()
 	{
-		if (diff == null)
-		{
-			diff = CollectionsUtil.getNonOverlapping(preChangeFiles, postChangeFiles);
-		}
 		return diff;
 	}
 
