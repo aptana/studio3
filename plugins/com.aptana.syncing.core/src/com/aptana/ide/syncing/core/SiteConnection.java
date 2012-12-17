@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.PlatformObject;
 
 import com.aptana.core.epl.IMemento;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.ide.core.io.ConnectionPointType;
 import com.aptana.ide.core.io.ConnectionPointUtils;
 import com.aptana.ide.core.io.CoreIOPlugin;
@@ -193,12 +194,23 @@ import com.aptana.ide.core.io.IConnectionPoint;
 		{
 			URI uri = URI.create(child.getTextData());
 			sourceConnectionPoint = ConnectionPointUtils.findConnectionPoint(uri);
+			if (sourceConnectionPoint == null)
+			{
+				IdeLog.logWarning(SyncingPlugin.getDefault(), "Failed to load source connection point from URI " + uri, //$NON-NLS-1$
+						IDebugScopes.DEBUG);
+			}
 		}
 		child = memento.getChild(ELEMENT_DESTINATION);
 		if (child != null)
 		{
 			URI uri = URI.create(child.getTextData());
 			destinationConnectionPoint = ConnectionPointUtils.findConnectionPoint(uri);
+			if (destinationConnectionPoint == null)
+			{
+				IdeLog.logWarning(SyncingPlugin.getDefault(),
+						"Failed to load destination connection point from URI " + uri, //$NON-NLS-1$
+						IDebugScopes.DEBUG);
+			}
 		}
 		child = memento.getChild(ELEMENT_EXCLUDES);
 		if (child != null)

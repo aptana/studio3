@@ -155,6 +155,12 @@ import com.aptana.ide.syncing.core.events.SiteConnectionEvent;
 					{
 						newConnections.add(siteConnection);
 					}
+					else
+					{
+						IdeLog.logWarning(SyncingPlugin.getDefault(),
+								"Failed to load the site connection due to either source or destination being invalid", //$NON-NLS-1$
+								IDebugScopes.DEBUG);
+					}
 				}
 			}
 			catch (IOException e)
