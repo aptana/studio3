@@ -11,7 +11,6 @@ import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.eclipse.help.IContext;
@@ -222,7 +221,8 @@ public class JSSourceEditor extends AbstractThemeableEditor
 
 		public IContext getContext(Object target)
 		{
-			if (target instanceof IParseNode) {
+			if (target instanceof IParseNode)
+			{
 				return new JSHelpContext(editorPart, (IParseNode) target);
 			}
 			ISelection selection = editorPart.getSelectionProvider().getSelection();
@@ -372,25 +372,7 @@ public class JSSourceEditor extends AbstractThemeableEditor
 	@Override
 	public IParseRootNode getReconcileAST()
 	{
-		try
-		{
-			// For reconcile, we need to collect the comments if folding will need it.
-			IDocument document = getDocument();
-			boolean collectComments = this.isFoldingEnabled();
-			if (!collectComments)
-			{
-				// Take advantage of the document-time based cache if possible.
-				return getAST();
-			}
-			JSParseState parseState = new JSParseState(document.get(), 0, collectComments, collectComments);
-			return ParserPoolFactory.parse(getContentType(), parseState).getRootNode();
-		}
-		catch (Exception e)
-		{
-			IdeLog.logTrace(JSPlugin.getDefault(), "Failed to parse JS editor contents", e, //$NON-NLS-1$
-					com.aptana.parsing.IDebugScopes.PARSING);
-		}
-		return null;
+		return doGetAST(getDocument());
 	}
 
 	@Override
@@ -399,7 +381,7 @@ public class JSSourceEditor extends AbstractThemeableEditor
 		try
 		{
 			// Don't attach or collect comments for hovers/outline
-			JSParseState parseState = new JSParseState(document.get(), 0, false, false);
+			JSParseState parseState = new JSParseState(document.get(), 0, true, true);
 			return ParserPoolFactory.parse(getContentType(), parseState).getRootNode();
 		}
 		catch (Exception e)

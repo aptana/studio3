@@ -23,6 +23,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResourceStatus;
+import org.eclipse.core.resources.IWorkspaceRunnable;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
@@ -235,61 +237,76 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 
 				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
 				{
-					SubMonitor subMonitor = SubMonitor.convert(monitor, 5);
-					createNewProject(subMonitor.newChild(4));
 
-					// Perform post project hooks
-					try
+					IWorkspaceRunnable runnable = new IWorkspaceRunnable()
 					{
-						IStudioProjectListener[] projectListeners = new IStudioProjectListener[0];
-						IProjectDescription description = newProject.getDescription();
-						if (description != null)
-						{
-							projectListeners = StudioProjectListenersManager.getManager().getProjectListeners(
-									description.getNatureIds());
-						}
 
-						int listenerSize = projectListeners.length;
-						SubMonitor hookMonitor = SubMonitor.convert(subMonitor.newChild(1),
-								Messages.AbstractNewProjectWizard_ProjectListener_TaskName, Math.max(1, listenerSize));
-
-						for (IStudioProjectListener projectListener : projectListeners)
+						public void run(IProgressMonitor monitor) throws CoreException
 						{
-							if (projectListener != null)
+							SubMonitor subMonitor = SubMonitor.convert(monitor, 5);
+							try
 							{
-								final IStatus status = projectListener.projectCreated(newProject,
-										hookMonitor.newChild(1));
+								createNewProject(subMonitor.newChild(4));
+							}
+							catch (InvocationTargetException e)
+							{
+								throw new CoreException(new Status(IStatus.ERROR, ProjectsPlugin.PLUGIN_ID, 0, e
+										.getTargetException().getMessage(), e));
+							}
 
-								// Show a dialog if there are failures
-								if (status != null && status.matches(IStatus.ERROR))
+							// Perform post project hooks
+
+							IStudioProjectListener[] projectListeners = new IStudioProjectListener[0];
+							IProjectDescription description = newProject.getDescription();
+							if (description != null)
+							{
+								projectListeners = StudioProjectListenersManager.getManager().getProjectListeners(
+										description.getNatureIds());
+							}
+
+							int listenerSize = projectListeners.length;
+							SubMonitor hookMonitor = SubMonitor.convert(subMonitor.newChild(1),
+									Messages.AbstractNewProjectWizard_ProjectListener_TaskName,
+									Math.max(1, listenerSize));
+
+							for (IStudioProjectListener projectListener : projectListeners)
+							{
+								if (projectListener != null)
 								{
-									UIUtils.getDisplay().syncExec(new Runnable()
+									final IStatus status = projectListener.projectCreated(newProject,
+											hookMonitor.newChild(1));
+
+									// Show a dialog if there are failures
+									if (status != null && status.matches(IStatus.ERROR))
 									{
-										public void run()
+										// FIXME This UI code shouldn't be here, throw an exception up and handle it!
+										UIUtils.getDisplay().syncExec(new Runnable()
 										{
-											String message = status.getMessage();
-											if (status instanceof ProcessStatus)
+											public void run()
 											{
-												message = ((ProcessStatus) status).getStdErr();
+												String message = status.getMessage();
+												if (status instanceof ProcessStatus)
+												{
+													message = ((ProcessStatus) status).getStdErr();
+												}
+												MessageDialog.openError(UIUtils.getActiveWorkbenchWindow().getShell(),
+														Messages.AbstractNewProjectWizard_ProjectListenerErrorTitle,
+														message);
 											}
-											MessageDialog.openError(UIUtils.getActiveWorkbenchWindow().getShell(),
-													Messages.AbstractNewProjectWizard_ProjectListenerErrorTitle,
-													message);
-										}
-									});
+										});
+									}
 								}
 							}
 						}
-
+					};
+					try
+					{
+						ResourcesPlugin.getWorkspace().run(runnable, monitor);
 					}
 					catch (CoreException e)
 					{
 						throw new InvocationTargetException(e,
 								Messages.AbstractNewProjectWizard_ProjectListener_NoDescriptor_Error);
-					}
-					finally
-					{
-						subMonitor.done();
 					}
 				}
 			});
