@@ -305,11 +305,11 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 		fMakePrimaryButton = createButton(EplMessages.WizardFolderImportPage_make_primary_label, buttons);
 		updateButtons();
 
-		setPageComplete(validate());
+		setPageComplete(false);
 		setPrimaryNatureFromContributions(null);
 		fTableViewer.setCheckedElements(new String[] { fPrimaryNature });
 
-		if (directoryPath != null)
+		if (!StringUtil.isEmpty(directoryPath))
 		{
 			directoryPathField.setText(directoryPath);
 			setProjectName();
@@ -411,7 +411,7 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 					description = IDEWorkbenchPlugin.getPluginWorkspace().loadProjectDescription(dotProjectPath);
 					if (description != null && description.getNatureIds().length > 0)
 					{
-						String delimiter = StringUtil.EMPTY; //$NON-NLS-1$
+						String delimiter = StringUtil.EMPTY;
 						StringBuilder natures = new StringBuilder();
 						for (String natureId : description.getNatureIds())
 						{
