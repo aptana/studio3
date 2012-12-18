@@ -26,6 +26,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.osgi.framework.Version;
 
+import com.aptana.core.CorePlugin;
+import com.aptana.core.IDebugScopes;
 import com.aptana.core.IMap;
 import com.aptana.core.ShellExecutable;
 import com.aptana.core.logging.IdeLog;
@@ -63,7 +65,7 @@ public class NodePackageManager implements INodePackageManager
 	/**
 	 * Common install location for Windows
 	 */
-	private static final String APPDATA_NPM_EXE = "%APPDATA%\\npm.exe"; //$NON-NLS-1$
+	private static final String APPDATA_NPM = "%APPDATA%\\npm"; //$NON-NLS-1$
 
 	/**
 	 * Coommon install location for Mac/Linux
@@ -202,7 +204,15 @@ public class NodePackageManager implements INodePackageManager
 			if (PlatformUtil.isWindows())
 			{
 				commonLocations = CollectionsUtil.newList(Path.fromOSString(PlatformUtil
-						.expandEnvironmentStrings(APPDATA_NPM_EXE)));
+						.expandEnvironmentStrings(APPDATA_NPM)));
+				IPath nodePath = JSCorePlugin.getDefault().getNodeJSService().getValidExecutable();
+				if (nodePath != null)
+				{
+
+					nodePath = nodePath.removeLastSegments(1);// Remove file extension.
+					commonLocations.add(nodePath);
+					ShellExecutable.updatePathEnvironment(PlatformUtil.expandEnvironmentStrings(APPDATA_NPM));
+				}
 			}
 			else
 			{
