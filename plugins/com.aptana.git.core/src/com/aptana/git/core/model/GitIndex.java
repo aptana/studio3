@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -33,6 +35,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
@@ -151,15 +154,18 @@ public class GitIndex
 				}));
 
 		// If we don't run this, we end up showing files as unstaged when they're no longer modified!
-		IStatus result = repository.execute(GitRepository.ReadWrite.WRITE, "update-index", "-q", //$NON-NLS-1$ //$NON-NLS-2$
+		repository.forceWrite(); // Do we only want to try the lock if we're in UI thread?
+		IStatus result = GitExecutable.instance().runInBackground(repository.workingDirectory(), "update-index", "-q", //$NON-NLS-1$ //$NON-NLS-2$
 				"--unmerged", "--ignore-missing", "--refresh"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		repository.exitWriteProcess();
 		if (result == null) // couldn't even execute!
 		{
 			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), "Failed to execute git update-index"); //$NON-NLS-1$
 		}
 		if (!result.isOK())
 		{
-			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), result.getMessage());
+			return new Status(IStatus.ERROR, GitPlugin.getPluginId(),
+					"Unable to run update-index: " + result.getMessage()); //$NON-NLS-1$
 		}
 
 		Set<Callable<IStatus>> jobs = new HashSet<Callable<IStatus>>(3);
@@ -177,6 +183,8 @@ public class GitIndex
 		this.files = new Vector<ChangedFile>();
 
 		// Schedule all the jobs
+		MultiStatus errors = new MultiStatus(GitPlugin.PLUGIN_ID, 1,
+				"Errors occurred while grabbing changed file listings", null); //$NON-NLS-1$
 		try
 		{
 			List<Future<IStatus>> futures = es.invokeAll(jobs);
@@ -184,7 +192,6 @@ public class GitIndex
 			// Now wait for them to finish
 			for (Future<IStatus> future : futures)
 			{
-				// TODO Grab their result status?
 				while (!future.isDone())
 				{
 					if (monitor != null && monitor.isCanceled())
@@ -192,6 +199,25 @@ public class GitIndex
 						future.cancel(true);
 					}
 					Thread.yield();
+				}
+
+				// When done, get their result
+				try
+				{
+					IStatus futureResult = future.get();
+					if (!futureResult.isOK())
+					{
+						errors.merge(futureResult);
+					}
+				}
+				catch (CancellationException ce)
+				{
+					// ignore
+				}
+				catch (ExecutionException e)
+				{
+					Throwable t = e.getCause();
+					errors.merge(new Status(IStatus.ERROR, GitPlugin.PLUGIN_ID, t.getMessage(), t));
 				}
 			}
 		}
@@ -241,6 +267,10 @@ public class GitIndex
 
 		postIndexChange(preRefresh, this.changedFiles);
 		sub.done();
+		if (!errors.isOK())
+		{
+			return errors;
+		}
 		return Status.OK_STATUS;
 	}
 
@@ -461,8 +491,7 @@ public class GitIndex
 		}
 		else
 		{
-			// FIXME Can we eliminate this? We should get a file event via the watcher which will cause a refresh!
-			refresh(new NullProgressMonitor()); // TODO Run async if we can!
+			refresh(new NullProgressMonitor());
 		}
 		return true;
 	}

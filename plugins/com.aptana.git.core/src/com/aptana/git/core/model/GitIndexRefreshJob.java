@@ -71,6 +71,7 @@ class GitIndexRefreshJob extends Job
 					throw new OperationCanceledException();
 				}
 
+				// FIXME What if the refresh fails? Should we retry? Can we?
 				IStatus status;
 				if (refreshAll.compareAndSet(true, false))
 				{

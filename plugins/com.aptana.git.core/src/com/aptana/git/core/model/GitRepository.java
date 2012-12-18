@@ -2229,4 +2229,14 @@ public class GitRepository
 		}
 		return execute(GitRepository.ReadWrite.WRITE, "remote", "add", remoteName, url); //$NON-NLS-1$ //$NON-NLS-2$
 	}
+
+	void forceRead()
+	{
+		monitor.readLock().lock();
+	}
+
+	void forceWrite()
+	{
+		monitor.writeLock().lock();
+	}
 }
