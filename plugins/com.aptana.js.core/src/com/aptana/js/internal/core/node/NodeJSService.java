@@ -226,7 +226,7 @@ public class NodeJSService implements INodeJSService
 					MessageFormat.format(Messages.NodeJSService_FileDoesntExistError, path), null);
 		}
 
-		String version = ProcessUtil.outputForCommand(path.toOSString(), null, "-v"); //$NON-NLS-1$
+		String version = getVersion(path);
 		if (version == null)
 		{
 			return new Status(Status.ERROR, JSCorePlugin.PLUGIN_ID, ERR_NOT_EXECUTABLE, MessageFormat.format(
@@ -330,5 +330,14 @@ public class NodeJSService implements INodeJSService
 		// TODO Any other things we want to check for to "prove" it's a NodeJS source install?
 
 		return Status.OK_STATUS;
+	}
+
+	public String getVersion(IPath path)
+	{
+		if (path == null)
+		{
+			return null;
+		}
+		return ProcessUtil.outputForCommand(path.toOSString(), null, "-v"); //$NON-NLS-1$
 	}
 }

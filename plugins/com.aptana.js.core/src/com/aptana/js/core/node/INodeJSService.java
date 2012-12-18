@@ -88,4 +88,6 @@ public interface INodeJSService
 	 * @return
 	 */
 	public IStatus validateSourcePath(IPath path);
+
+	public String getVersion(IPath path);
 }
