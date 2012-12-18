@@ -285,7 +285,7 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 		fMakePrimaryButton = createButton(EplMessages.WizardFolderImportPage_make_primary_label, buttons);
 		updateButtons();
 
-		setPageComplete(validate());
+		setPageComplete(false);
 	}
 
 	/**
@@ -380,7 +380,7 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 					description = IDEWorkbenchPlugin.getPluginWorkspace().loadProjectDescription(dotProjectPath);
 					if (description != null && description.getNatureIds().length > 0)
 					{
-						String delimiter = StringUtil.EMPTY; //$NON-NLS-1$
+						String delimiter = StringUtil.EMPTY;
 						StringBuilder natures = new StringBuilder();
 						for (String natureId : description.getNatureIds())
 						{
@@ -475,9 +475,10 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 
 	private void setProjectName()
 	{
-		if (directoryPathField.getText() != null)
+		String text = directoryPathField.getText();
+		if (!StringUtil.isEmpty(text))
 		{
-			IPath path = new Path(directoryPathField.getText());
+			IPath path = new Path(text);
 			if (path.segmentCount() > 0)
 			{
 				projectNameField.setText(path.lastSegment());
@@ -752,7 +753,7 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 	public void setDirectoryPath(String directoryPath)
 	{
 		this.directoryPath = directoryPath;
-		if (directoryPathField != null)
+		if (directoryPathField != null && !StringUtil.isEmpty(directoryPath))
 		{
 			directoryPathField.setText(directoryPath);
 			setProjectName();
