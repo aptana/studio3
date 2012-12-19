@@ -37,4 +37,10 @@ public interface IBrowserProvider
 	 * @return the version of the given browser.
 	 */
 	String getBrowserVersion(BrowserInfo info);
+
+	/**
+	 * It verifies and changes the default location/params for Safari on Mac OS so that the path is interpreted
+	 * correctly.
+	 */
+	void verifyBrowserConfigurations();
 }
