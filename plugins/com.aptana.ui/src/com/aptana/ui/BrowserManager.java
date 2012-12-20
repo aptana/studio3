@@ -15,15 +15,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.ui.internal.browser.BrowserDescriptorWorkingCopy;
 import org.eclipse.ui.internal.browser.IBrowserDescriptor;
 import org.eclipse.ui.internal.browser.IBrowserDescriptorWorkingCopy;
 
 import com.aptana.core.util.BrowserUtil;
 import com.aptana.core.util.ExecutableUtil;
-import com.aptana.core.util.PlatformUtil;
-import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.IBrowserUtil.BrowserInfo;
+import com.aptana.core.util.PlatformUtil;
 
 /**
  * This is the BrowserManager counterpart to be used in Aptana Studio instead of the Eclipse BrowserManager. It wraps up
@@ -51,7 +51,11 @@ public class BrowserManager implements IBrowserProvider
 
 	private BrowserManager()
 	{
-		openCommandPath = ExecutableUtil.find("open", false, null).toOSString(); //$NON-NLS-1$
+		IPath commandPath = ExecutableUtil.find("open", false, null); //$NON-NLS-1$
+		if (commandPath != null)
+		{
+			openCommandPath = commandPath.toOSString();
+		}
 	}
 
 	private String getRealPath(String loc)
