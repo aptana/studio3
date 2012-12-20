@@ -7,6 +7,7 @@
  */
 package com.aptana.js.core;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -15,8 +16,10 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.IndexContainerJob;
+import com.aptana.js.core.node.INodePackageManager;
 import com.aptana.js.core.preferences.IPreferenceConstants;
 import com.aptana.js.internal.core.index.JSMetadataLoader;
 
@@ -38,19 +41,32 @@ class JSCoreStartupJob extends Job
 		// index NodeJS!
 		String value = Platform.getPreferencesService().getString(JSCorePlugin.PLUGIN_ID,
 				IPreferenceConstants.NODEJS_SOURCE_PATH, null, null);
-		if (StringUtil.isEmpty(value))
+		if (!StringUtil.isEmpty(value))
 		{
-			return Status.OK_STATUS;
+			IPath path = Path.fromOSString(value).append("lib"); //$NON-NLS-1$
+			new IndexContainerJob(path.toFile().toURI()).schedule(Job.BUILD);
 		}
-		IPath path = Path.fromOSString(value).append("lib"); //$NON-NLS-1$
 
-		new IndexContainerJob(path.toFile().toURI()).schedule(Job.BUILD);
+		// Index the NPM packages
+		INodePackageManager npm = JSCorePlugin.getDefault().getNodePackageManager();
+		if (npm != null)
+		{
+			try
+			{
+				IPath path = npm.getModulesPath();
+				new IndexContainerJob(path.toFile().toURI()).schedule(Job.BUILD);
+			}
+			catch (CoreException e)
+			{
+				IdeLog.logError(JSCorePlugin.getDefault(), e);
+			}
+		}
 
 		// How do we tie this back to a project? We really need to have a project hold a list of classpath
 		// entries/containers
 		// and using that we can grab the list of indices we need to query (and their order)
 		// and also what needs to be indexed.
-		// We have the conecpt of build path entries, but it's not quite all the way there.
+		// We have the concept of build path entries, but it's not quite all the way there.
 
 		return Status.OK_STATUS;
 	}

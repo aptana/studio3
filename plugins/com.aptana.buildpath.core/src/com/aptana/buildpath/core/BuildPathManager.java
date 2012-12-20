@@ -107,6 +107,8 @@ public class BuildPathManager
 	 */
 	public void addBuildPath(IProject project, IBuildPathEntry entry)
 	{
+		// TODO Index the entry. Just ask for the path, get the index, request we re-index it (IndexContainerJob)
+		// We obviously also want to record the entry for the project as we currently do
 		if (project != null && entry != null)
 		{
 			Set<IBuildPathEntry> buildPaths = getBuildPaths(project);

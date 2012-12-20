@@ -79,7 +79,21 @@ public interface INodePackageManager
 
 	public String getConfigValue(String key) throws CoreException;
 
-	public List<IPath> getPackagesInstallLocations();
+	/**
+	 * Returns the location where node packages' binary scripts get installed.
+	 * 
+	 * @return
+	 * @throws CoreException
+	 */
+	public IPath getBinariesPath() throws CoreException;
+
+	/**
+	 * Returns the location where node modules get installed.
+	 * 
+	 * @return
+	 * @throws CoreException
+	 */
+	public IPath getModulesPath() throws CoreException;
 
 	// TODO Uninstall
 	// TODO Update

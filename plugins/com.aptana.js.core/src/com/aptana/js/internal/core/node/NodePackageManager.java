@@ -7,7 +7,6 @@
  */
 package com.aptana.js.internal.core.node;
 
-import java.io.File;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -26,8 +25,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.osgi.framework.Version;
 
-import com.aptana.core.CorePlugin;
-import com.aptana.core.IDebugScopes;
 import com.aptana.core.IMap;
 import com.aptana.core.ShellExecutable;
 import com.aptana.core.logging.IdeLog;
@@ -48,7 +45,23 @@ import com.aptana.js.core.node.INodePackageManager;
 public class NodePackageManager implements INodePackageManager
 {
 
-	private static final String BIN = "/bin/"; //$NON-NLS-1$
+	/**
+	 * Config value holding location where we install bianries/modules.
+	 */
+	private static final String PREFIX = "prefix"; //$NON-NLS-1$
+
+	/**
+	 * ENV variable that can override prefix config value.
+	 */
+	private static final String NPM_CONFIG_PREFIX = "NPM_CONFIG_PREFIX"; //$NON-NLS-1$
+
+	/**
+	 * Folder where modules live.
+	 */
+	private static final String NODE_MODULES = "node_modules"; //$NON-NLS-1$
+
+	private static final String BIN = "bin"; //$NON-NLS-1$
+	private static final String LIB = "lib"; //$NON-NLS-1$
 
 	/**
 	 * Argument to {@code COLOR} switch/config option so that ANSI colors aren't used in output.
@@ -82,8 +95,6 @@ public class NodePackageManager implements INodePackageManager
 	 */
 	private static final String INSTALL = "install"; //$NON-NLS-1$
 	private static final String LIST = "list"; //$NON-NLS-1$
-
-	private static final String NPM_CONFIG_PREFIX = "NPM_CONFIG_PREFIX"; //$NON-NLS-1$
 
 	private IPath npmPath;
 
@@ -262,7 +273,7 @@ public class NodePackageManager implements INodePackageManager
 			{
 				// The paths we get are locations on disk. We can tell a module's name by looking for a path
 				// that is a child of 'nod_modules', i.e. "/usr/local/lib/node_modules/alloy"
-				if ("node_modules".equals(path.segment(path.segmentCount() - 2))) //$NON-NLS-1$
+				if (NODE_MODULES.equals(path.segment(path.segmentCount() - 2))) //$NON-NLS-1$
 				{
 					installed.add(path.lastSegment());
 				}
@@ -381,25 +392,47 @@ public class NodePackageManager implements INodePackageManager
 		return status.getMessage().trim();
 	}
 
-	public List<IPath> getPackagesInstallLocations()
+	// When in global mode, executables are linked into {prefix}/bin on Unix, or directly into {prefix} on Windows.
+	public IPath getBinariesPath() throws CoreException
 	{
-		List<IPath> installLocations = new ArrayList<IPath>(2);
-		try
+		IPath prefix = configPrefix();
+		if (prefix == null)
 		{
-			String npmConfigPrefixPath = ShellExecutable.getEnvironment().get(NPM_CONFIG_PREFIX);
-			if (npmConfigPrefixPath != null)
-			{
-				installLocations.add(Path.fromOSString(npmConfigPrefixPath + BIN));
-			}
-			npmConfigPrefixPath = getConfigValue("prefix"); //$NON-NLS-1$
-			if (npmConfigPrefixPath != null)
-			{
-				installLocations.add(Path.fromOSString(npmConfigPrefixPath + BIN));
-			}
+			return null;
 		}
-		catch (CoreException e)
+
+		if (PlatformUtil.isWindows())
 		{
+			return prefix;
 		}
-		return installLocations;
+		return prefix.append(BIN);
+	}
+
+	// Global installs on Unix systems go to {prefix}/lib/node_modules. Global installs on Windows go to
+	// {prefix}/node_modules (that is, no lib folder.)
+	public IPath getModulesPath() throws CoreException
+	{
+		IPath prefix = configPrefix();
+		if (prefix == null)
+		{
+			return null;
+		}
+
+		if (PlatformUtil.isWindows())
+		{
+			return prefix.append(NODE_MODULES);
+		}
+		return prefix.append(LIB).append(NODE_MODULES);
+	}
+
+	private IPath configPrefix() throws CoreException
+	{
+		String npmConfigPrefixPath = ShellExecutable.getEnvironment().get(NPM_CONFIG_PREFIX);
+		if (npmConfigPrefixPath != null)
+		{
+			return Path.fromOSString(npmConfigPrefixPath);
+		}
+
+		return Path.fromOSString(getConfigValue(PREFIX));
 	}
 }

@@ -164,11 +164,12 @@ public class NodeModuleResolver extends AbstractRequireResolver
 		{
 			if (NODE_MODULES.equals(parts[i]))
 			{
+				i--;
 				continue;
 			}
 			IPath dir = start.removeLastSegments(start.segmentCount() - i).append(NODE_MODULES);
 			dirs.add(dir);
-			i = i - 1;
+			i--;
 		}
 
 		// Search global folders, see http://nodejs.org/api/modules.html#modules_loading_from_the_global_folders

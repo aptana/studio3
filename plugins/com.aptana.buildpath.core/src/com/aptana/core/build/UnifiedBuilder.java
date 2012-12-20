@@ -35,11 +35,8 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
-import org.eclipse.core.runtime.jobs.Job;
 
 import com.aptana.buildpath.core.BuildPathCorePlugin;
-import com.aptana.buildpath.core.BuildPathManager;
-import com.aptana.buildpath.core.IBuildPathEntry;
 import com.aptana.core.CorePlugin;
 import com.aptana.core.IDebugScopes;
 import com.aptana.core.IFilter;
@@ -52,7 +49,6 @@ import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.index.core.FileStoreBuildContext;
 import com.aptana.index.core.IIndexFileContributor;
-import com.aptana.index.core.IndexContainerJob;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.IndexPlugin;
 import com.aptana.index.core.build.BuildContext;
@@ -243,6 +239,8 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 			ResourceCollector collector = new ResourceCollector();
 			delta.accept(collector);
 
+			// TODO Ask for project build paths and see if any of those have changed? If so, update index for them
+
 			// Notify of the removed files
 			removeFiles(participants, collector.removedFiles, sub.newChild(25));
 
@@ -315,19 +313,12 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 		// Index files contributed to project build path
 		IProject project = getProjectHandle();
 		URI uri = project.getLocationURI();
+		// TODO Remove contributed files?
 		Set<IFileStore> contributedFiles = getContributedFiles(uri);
 		sub.worked(5);
 		buildContributedFiles(participants, contributedFiles, sub.newChild(10));
 
-		// TODO Ask the project for it's build path entries, then schedule jobs to index them
-		// I think we just want to make sure we index them, not run the full build participant stuff
-		// Set<IBuildPathEntry> entries = BuildPathManager.getInstance().getBuildPaths(project);
-		// for (IBuildPathEntry entry : entries)
-		// {
-		// URI path = entry.getPath();
-		// // FIXME What if the path is to a JSCA file? We need the concept of indexing a single file!
-		// new IndexContainerJob(path).schedule(Job.BUILD);
-		// }
+		// TODO Ask for a project's build paths. Iterate through to update their indexing?
 
 		// Now index the actual files in the project
 		CollectingResourceVisitor visitor = new CollectingResourceVisitor();

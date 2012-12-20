@@ -7,9 +7,11 @@
  */
 package com.aptana.js.internal.core.build;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
@@ -17,8 +19,10 @@ import org.eclipse.core.runtime.Platform;
 import com.aptana.buildpath.core.BuildPathEntry;
 import com.aptana.buildpath.core.IBuildPathContributor;
 import com.aptana.buildpath.core.IBuildPathEntry;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.js.core.JSCorePlugin;
+import com.aptana.js.core.node.INodePackageManager;
 import com.aptana.js.core.preferences.IPreferenceConstants;
 
 public class NodeJSSourceContributor implements IBuildPathContributor
@@ -26,18 +30,37 @@ public class NodeJSSourceContributor implements IBuildPathContributor
 
 	public List<IBuildPathEntry> getBuildPathEntries()
 	{
+		List<IBuildPathEntry> entries = new ArrayList<IBuildPathEntry>(2);
+
+		// Add paths for NPM packages
+		INodePackageManager npm = getNodePackageManager();
+		if (npm != null)
+		{
+			try
+			{
+				IPath path = npm.getModulesPath();
+				entries.add(new BuildPathEntry(MessageFormat.format("NPM Packages: {0}", path), path.toFile().toURI()));
+			}
+			catch (CoreException e)
+			{
+				IdeLog.logError(JSCorePlugin.getDefault(), e);
+			}
+		}
+
 		String value = Platform.getPreferencesService().getString(JSCorePlugin.PLUGIN_ID,
 				IPreferenceConstants.NODEJS_SOURCE_PATH, null, null);
-		if (StringUtil.isEmpty(value))
+		if (!StringUtil.isEmpty(value))
 		{
-			return null;
+			IPath nodeSrcPath = Path.fromOSString(value);
+			IPath path = nodeSrcPath.append("lib"); //$NON-NLS-1$	
+			entries.add(new BuildPathEntry(Messages.NodeJSSourceContributor_Name, path.toFile().toURI()));
 		}
-		IPath nodeSrcPath = Path.fromOSString(value);
-
-		IPath path = nodeSrcPath.append("lib"); //$NON-NLS-1$
-		List<IBuildPathEntry> entries = new ArrayList<IBuildPathEntry>(1);
-		entries.add(new BuildPathEntry(Messages.NodeJSSourceContributor_Name, path.toFile().toURI()));
 		return entries;
+	}
+
+	protected INodePackageManager getNodePackageManager()
+	{
+		return JSCorePlugin.getDefault().getNodePackageManager();
 	}
 
 }
