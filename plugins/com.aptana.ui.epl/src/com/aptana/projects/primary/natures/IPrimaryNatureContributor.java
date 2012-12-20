@@ -7,12 +7,12 @@
  */
 package com.aptana.projects.primary.natures;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 
 /**
- * 
  * @author pinnamuri
- *
  */
 public interface IPrimaryNatureContributor
 {
@@ -20,23 +20,30 @@ public interface IPrimaryNatureContributor
 	 * Indicates not an eligible one for being Primary
 	 */
 	public int NOT_PRIMARY = 0;
-	
+
 	/**
 	 * Indicates eligible for being primary
 	 */
 	public int CAN_BE_PRIMARY = 1;
-	
+
 	/**
 	 * Indicates it has to be primary nature for the given project
 	 */
 	public int IS_PRIMARY = 2;
-	
+
 	/**
-	 * Gets the primary nature rank based on the project type,
-	 * current perspective and may be, other conditions.
+	 * Gets the primary nature rank based on the project type, current perspective and may be, other conditions.
 	 * 
 	 * @param projectPath
 	 * @return
 	 */
-	public int getPrimaryNatureRank (IPath projectPath);
+	public int getPrimaryNatureRank(IPath projectPath);
+
+	/**
+	 * Perform extra configuration tasks on a project that is being created/imported using this nature contributor.
+	 * 
+	 * @param project
+	 * @throws CoreException
+	 */
+	public void configure(IProject project) throws CoreException;
 }

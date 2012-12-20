@@ -13,6 +13,7 @@ package com.aptana.ui.wizards;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -532,11 +533,32 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 	public IProject createProject()
 	{
 		String projectPath = directoryPathField.getText();
-		File project = new File(projectPath);
-		if (project.exists())
+		File projectFile = new File(projectPath);
+		if (projectFile.exists())
 		{
-			ProjectRecord pr = new ProjectRecord(project, projectNameField.getText());
-			return createExistingProject(pr);
+			ProjectRecord pr = new ProjectRecord(projectFile, projectNameField.getText());
+			IProject project = createExistingProject(pr);
+
+			// Configure the project by its natures
+			Object[] checkedNatures = fTableViewer.getCheckedElements();
+			for (Object natureId : checkedNatures)
+			{
+				IPrimaryNatureContributor contributor = natureContributors.get(natureId);
+				if (contributor != null)
+				{
+					try
+					{
+						contributor.configure(project);
+					}
+					catch (CoreException e)
+					{
+						IdeLog.logError(UIEplPlugin.getDefault(),
+								MessageFormat.format("Error configurating project ''{0}'' while importing it", //$NON-NLS-1$
+										project.getName()), e);
+					}
+				}
+			}
+			return project;
 		}
 		return null;
 	}

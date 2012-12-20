@@ -9,9 +9,10 @@ package com.aptana.projects;
 
 import org.eclipse.core.runtime.IPath;
 
+import com.aptana.projects.primary.natures.AbstractPrimaryNatureContributor;
 import com.aptana.projects.primary.natures.IPrimaryNatureContributor;
 
-public class WebProjectPrimaryNatureContributor implements IPrimaryNatureContributor
+public class WebProjectPrimaryNatureContributor extends AbstractPrimaryNatureContributor
 {
 	private static final String WEB_PERSPECTIVE_ID = "com.aptana.ui.WebPerspective"; //$NON-NLS-1$
 
