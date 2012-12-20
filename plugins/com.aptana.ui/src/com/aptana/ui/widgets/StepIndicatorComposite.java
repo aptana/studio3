@@ -179,6 +179,7 @@ public class StepIndicatorComposite extends Composite
 			stepLabel.setBackground(this.selection ? selectedColor : normalColor);
 			stepLabel.setForeground(this.selection ? selectedTextColor : null);
 			stepLabel.setFont(this.selection ? selectedTextFont : null);
+			((GridData) stepLabel.getLayoutData()).widthHint = stepLabel.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
 			stepDecorator.redraw();
 		}
 
