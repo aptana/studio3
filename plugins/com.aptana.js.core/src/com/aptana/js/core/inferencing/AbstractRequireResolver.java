@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.IOUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.jetty.util.epl.ajax.JSON;
 import com.aptana.js.core.JSCorePlugin;
 
@@ -66,11 +67,15 @@ public abstract class AbstractRequireResolver implements IRequireResolver
 				@SuppressWarnings("rawtypes")
 				Map json = (Map) JSON.parse(rawJSON);
 				String mainFile = (String) json.get(MAIN);
-				IPath m = x.append(mainFile);
-				IPath result = loadAsFile(m);
-				if (result != null)
+				if (!StringUtil.isEmpty(mainFile))
 				{
-					return result;
+					// package.json may not have a 'main' property set
+					IPath m = x.append(mainFile);
+					IPath result = loadAsFile(m);
+					if (result != null)
+					{
+						return result;
+					}
 				}
 			}
 			catch (CoreException e)
@@ -79,6 +84,7 @@ public abstract class AbstractRequireResolver implements IRequireResolver
 			}
 		}
 
+		// If package.json doesn't point to a main file, fall back to index.js
 		List<String> ext = CollectionsUtil.newList(extensions);
 		ext.add(0, JS);
 

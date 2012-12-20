@@ -204,9 +204,11 @@ public class NodeModuleResolver extends AbstractRequireResolver
 		// Grab node_prefix setting!
 		try
 		{
-			String nodePrefixValue = JSCorePlugin.getDefault().getNodePackageManager().getConfigValue("prefix"); //$NON-NLS-1$
-			IPath nodePrefix = Path.fromOSString(nodePrefixValue);
-			dirs.add(nodePrefix.append(LIB).append(NODE));
+			IPath modulesPath = JSCorePlugin.getDefault().getNodePackageManager().getModulesPath();
+			if (modulesPath != null)
+			{
+				dirs.add(modulesPath);
+			}
 		}
 		catch (CoreException e)
 		{
