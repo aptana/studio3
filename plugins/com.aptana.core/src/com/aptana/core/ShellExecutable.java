@@ -242,12 +242,15 @@ public final class ShellExecutable
 		{
 			String resultPath = workingDirToEnvCache.get(locationKey).get(PATH);
 
-			for (String newPath : newPathLocations)
+			if (resultPath != null)
 			{
-				resultPath = StringUtil.join(PATH_SEPARATOR, resultPath,
-						PathUtil.convertToUnixFormatPath(PlatformUtil.expandEnvironmentStrings(newPath)));
+				for (String newPath : newPathLocations)
+				{
+					resultPath = StringUtil.join(PATH_SEPARATOR, resultPath,
+							PathUtil.convertToUnixFormatPath(PlatformUtil.expandEnvironmentStrings(newPath)));
+				}
+				workingDirToEnvCache.get(locationKey).put(PATH, PathUtil.convertPATH(resultPath));
 			}
-			workingDirToEnvCache.get(locationKey).put(PATH, PathUtil.convertPATH(resultPath));
 		}
 	}
 
