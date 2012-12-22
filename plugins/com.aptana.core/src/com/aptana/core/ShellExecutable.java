@@ -221,12 +221,12 @@ public final class ShellExecutable
 	}
 
 	/**
-	 * Updates PATH environment variable in all corresponding PATH references.
-	 * For instance, this might be holding separate environment variables for global, 
-	 * workspace location and temporary locations.
+	 * Updates PATH environment variable in all corresponding PATH references. For instance, this might be holding
+	 * separate environment variables for global, workspace location and temporary locations.
+	 * 
 	 * @param newPaths
 	 */
-	public synchronized static void updatePathEnvironment (String... newPaths)
+	public synchronized static void updatePathEnvironment(String... newPaths)
 	{
 		newPathLocations.addAll(Arrays.asList(newPaths));
 		for (IPath locationKey : workingDirToEnvCache.keySet())
@@ -247,12 +247,20 @@ public final class ShellExecutable
 				resultPath = StringUtil.join(PATH_SEPARATOR, resultPath,
 						PathUtil.convertToUnixFormatPath(PlatformUtil.expandEnvironmentStrings(newPath)));
 			}
-			workingDirToEnvCache.get(locationKey).put(PATH, PathUtil.convertPATH(resultPath));
+			resultPath = PathUtil.convertPATH(resultPath);
+			// Remove duplicates.
+			List<String> pathLocations = StringUtil.split(resultPath, File.pathSeparatorChar);
+			CollectionsUtil.removeDuplicates(pathLocations);
+			resultPath = StringUtil.join(String.valueOf(File.pathSeparatorChar), pathLocations);
+
+			workingDirToEnvCache.get(locationKey).put(PATH, resultPath);
 		}
 	}
 
-	public synchronized static Map<String, String> getEnvironment(IPath workingDirectory) {
-		if (workingDirectory == null && shellEnvironment != null) {
+	public synchronized static Map<String, String> getEnvironment(IPath workingDirectory)
+	{
+		if (workingDirectory == null && shellEnvironment != null)
+		{
 			return shellEnvironment;
 		}
 
@@ -310,7 +318,7 @@ public final class ShellExecutable
 				return System.getenv();
 			}
 			workingDirToEnvCache.put(workingDirectory, result);
-			updatePathForLocationKey (workingDirectory);
+			updatePathForLocationKey(workingDirectory);
 		}
 		return workingDirToEnvCache.get(workingDirectory);
 	}
