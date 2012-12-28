@@ -12,15 +12,19 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStreamMonitor;
 
+import com.aptana.core.util.IOUtil;
 import com.aptana.debug.core.IDebugCoreConstants;
 import com.aptana.debug.core.IExtendedStreamsProxy;
 
 /**
  * @author Max Stepanov
  */
-public class StreamsProxy implements IExtendedStreamsProxy {
+public class StreamsProxy implements IExtendedStreamsProxy
+{
 
 	private final Map<String, OutputStreamMonitor> monitorMap = new HashMap<String, OutputStreamMonitor>();
 
@@ -30,28 +34,46 @@ public class StreamsProxy implements IExtendedStreamsProxy {
 	 * @param outIn
 	 * @param errIn
 	 */
-	public StreamsProxy(InputStream outIn, InputStream errIn) {
-		monitorMap.put(IDebugCoreConstants.ID_STANDARD_OUTPUT_STREAM, new OutputStreamMonitor(outIn, null));
-		monitorMap.put(IDebugCoreConstants.ID_STANDARD_ERROR_STREAM, new OutputStreamMonitor(errIn, null));
-		for (OutputStreamMonitor monitor : monitorMap.values()) {
+	public StreamsProxy(InputStream outIn, InputStream errIn, IProcess process)
+	{
+		String encoding = getEncoding(process);
+		monitorMap.put(IDebugCoreConstants.ID_STANDARD_OUTPUT_STREAM, createStreamMonitor(outIn, encoding, process));
+		monitorMap.put(IDebugCoreConstants.ID_STANDARD_ERROR_STREAM, createStreamMonitor(errIn, encoding, process));
+		for (OutputStreamMonitor monitor : monitorMap.values())
+		{
 			monitor.startMonitoring();
 		}
 	}
 
-	public StreamsProxy(Map<String, InputStream> streams) {
-		for (Map.Entry<String, InputStream> entry : streams.entrySet()) {
-			monitorMap.put(entry.getKey(), new OutputStreamMonitor(entry.getValue(), null));
+	public StreamsProxy(Map<String, InputStream> streams, IProcess process)
+	{
+		String encoding = getEncoding(process);
+		for (Map.Entry<String, InputStream> entry : streams.entrySet())
+		{
+			monitorMap.put(entry.getKey(), createStreamMonitor(entry.getValue(), encoding, process));
 		}
-		for (OutputStreamMonitor monitor : monitorMap.values()) {
+		for (OutputStreamMonitor monitor : monitorMap.values())
+		{
 			monitor.startMonitoring();
 		}
+	}
+
+	private String getEncoding(IProcess process)
+	{
+		String encoding = process.getLaunch().getAttribute(DebugPlugin.ATTR_CONSOLE_ENCODING);
+		if (encoding == null)
+		{
+			encoding = IOUtil.UTF_8;
+		}
+		return encoding;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.debug.core.IExtendedStreamsProxy#getStreamMonitor(java.lang .String)
 	 */
-	public IStreamMonitor getStreamMonitor(String streamIdentifier) {
+	public IStreamMonitor getStreamMonitor(String streamIdentifier)
+	{
 		return monitorMap.get(streamIdentifier);
 	}
 
@@ -59,28 +81,46 @@ public class StreamsProxy implements IExtendedStreamsProxy {
 	 * (non-Javadoc)
 	 * @see com.aptana.debug.core.IExtendedStreamsProxy#getStreamIdentifers()
 	 */
-	public String[] getStreamIdentifers() {
+	public String[] getStreamIdentifers()
+	{
 		return monitorMap.keySet().toArray(new String[monitorMap.size()]);
 	}
 
 	/*
 	 * @see org.eclipse.debug.core.model.IStreamsProxy#getErrorStreamMonitor()
 	 */
-	public IStreamMonitor getErrorStreamMonitor() {
+	public IStreamMonitor getErrorStreamMonitor()
+	{
 		return getStreamMonitor(IDebugCoreConstants.ID_STANDARD_ERROR_STREAM);
 	}
 
 	/*
 	 * @see org.eclipse.debug.core.model.IStreamsProxy#getOutputStreamMonitor()
 	 */
-	public IStreamMonitor getOutputStreamMonitor() {
+	public IStreamMonitor getOutputStreamMonitor()
+	{
 		return getStreamMonitor(IDebugCoreConstants.ID_STANDARD_OUTPUT_STREAM);
 	}
 
 	/*
 	 * @see org.eclipse.debug.core.model.IStreamsProxy#write(java.lang.String)
 	 */
-	public void write(String input) throws IOException {
+	public void write(String input) throws IOException
+	{
 		throw new IOException("not supported"); //$NON-NLS-1$
 	}
+
+	/**
+	 * Instantiates and returns an {@link OutputStreamMonitor}.
+	 * 
+	 * @param stream
+	 * @param encoding
+	 * @param process
+	 * @return an {@link OutputStreamMonitor}
+	 */
+	protected OutputStreamMonitor createStreamMonitor(InputStream stream, String encoding, IProcess process)
+	{
+		return new OutputStreamMonitor(stream, encoding);
+	}
+
 }

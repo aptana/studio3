@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -25,7 +25,8 @@ import com.aptana.debug.core.sourcelookup.RemoteSourceCacheManager;
  * 
  * @author Max Stepanov
  */
-public class DebugCorePlugin extends Plugin {
+public class DebugCorePlugin extends Plugin
+{
 	/**
 	 * ID
 	 */
@@ -36,11 +37,13 @@ public class DebugCorePlugin extends Plugin {
 
 	private UniformResourceBreakpointChangeNotifier breakpointHelper;
 	private RemoteSourceCacheManager remoteSourceCacheManager;
+	private LogLevelFilterManager logLevelFilterManager;
 
 	/**
 	 * The constructor.
 	 */
-	public DebugCorePlugin() {
+	public DebugCorePlugin()
+	{
 	}
 
 	/**
@@ -49,7 +52,8 @@ public class DebugCorePlugin extends Plugin {
 	 * @param context
 	 * @throws Exception
 	 */
-	public void start(BundleContext context) throws Exception {
+	public void start(BundleContext context) throws Exception
+	{
 		super.start(context);
 		plugin = this;
 		breakpointHelper = new UniformResourceBreakpointChangeNotifier();
@@ -62,7 +66,8 @@ public class DebugCorePlugin extends Plugin {
 	 * @param context
 	 * @throws Exception
 	 */
-	public void stop(BundleContext context) throws Exception {
+	public void stop(BundleContext context) throws Exception
+	{
 		breakpointHelper.cleanup();
 		DebugPlugin.getDefault().removeDebugEventListener(remoteSourceCacheManager);
 		super.stop(context);
@@ -74,11 +79,13 @@ public class DebugCorePlugin extends Plugin {
 	 * 
 	 * @return DebugCorePlugin
 	 */
-	public static DebugCorePlugin getDefault() {
+	public static DebugCorePlugin getDefault()
+	{
 		return plugin;
 	}
 
-	public RemoteSourceCacheManager getRemoteSourceCacheManager() {
+	public RemoteSourceCacheManager getRemoteSourceCacheManager()
+	{
 		return remoteSourceCacheManager;
 	}
 
@@ -87,19 +94,38 @@ public class DebugCorePlugin extends Plugin {
 	 * 
 	 * @param sourceElement
 	 */
-	public static void openInEditor(Object sourceElement) {
+	public static void openInEditor(Object sourceElement)
+	{
 		IEditorOpenAdapter adapter = (IEditorOpenAdapter) getDefault().getContributedAdapter(IEditorOpenAdapter.class);
-		if (adapter != null) {
+		if (adapter != null)
+		{
 			adapter.openInEditor(sourceElement);
 		}
 	}
 
-	private Object getContributedAdapter(Class<?> clazz) {
+	/**
+	 * Returns a {@link LogLevelFilterManager}.
+	 * 
+	 * @return A {@link LogLevelFilterManager}
+	 */
+	public LogLevelFilterManager getLogLevelFilterManager()
+	{
+		if (logLevelFilterManager == null)
+		{
+			logLevelFilterManager = new LogLevelFilterManager();
+		}
+		return logLevelFilterManager;
+	}
+
+	private Object getContributedAdapter(Class<?> clazz)
+	{
 		Object adapter = null;
 		IAdapterManager manager = Platform.getAdapterManager();
-		if (manager.hasAdapter(this, clazz.getName())) {
+		if (manager.hasAdapter(this, clazz.getName()))
+		{
 			adapter = manager.getAdapter(this, clazz.getName());
-			if (adapter == null) {
+			if (adapter == null)
+			{
 				adapter = manager.loadAdapter(this, clazz.getName());
 			}
 		}

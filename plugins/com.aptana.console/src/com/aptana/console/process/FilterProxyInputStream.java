@@ -10,7 +10,7 @@ import java.nio.charset.IllegalCharsetNameException;
 
 import com.aptana.core.util.ArrayUtil;
 
-/* package */ class FilterProxyInputStream extends InputStream {
+public class FilterProxyInputStream extends InputStream {
 
 	private static final char CR = '\n';
 	
@@ -19,7 +19,7 @@ import com.aptana.core.util.ArrayUtil;
 	private final BufferedReader reader;
 	private Charset charset;
 
-	protected FilterProxyInputStream(InputStream in, String encoding, IProcessOutputFilter processOutputFilter) {
+	public FilterProxyInputStream(InputStream in, String encoding, IProcessOutputFilter processOutputFilter) {
 		super();
 		this.processOutputFilter = processOutputFilter;
 		charset = Charset.defaultCharset();

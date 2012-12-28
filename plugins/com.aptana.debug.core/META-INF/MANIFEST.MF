@@ -7,7 +7,8 @@ Bundle-Activator: com.aptana.debug.core.DebugCorePlugin
 Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.eclipse.debug.core;visibility:=reexport,
  com.aptana.core;bundle-version="3.0.4",
- com.aptana.core.io
+ com.aptana.core.io,
+ com.aptana.console
 Eclipse-LazyStart: true
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.debug.core;

@@ -38,7 +38,7 @@ import com.aptana.js.debug.core.model.xhr.IXHRService;
 /**
  * @author Max Stepanov
  */
-public final class JSDebugProcess extends PlatformObject implements IProcess {
+public class JSDebugProcess extends PlatformObject implements IProcess {
 
 	private static final int MAX_WAIT_FOR_DEATH_ATTEMPTS = 10;
 	private static final int TIME_TO_WAIT_FOR_THREAD_DEATH = 500; // ms
@@ -148,12 +148,22 @@ public final class JSDebugProcess extends PlatformObject implements IProcess {
 				for (Entry<String, PipedOutputStream> entry : streams.entrySet()) {
 					inputs.put(entry.getKey(), new PipedInputStream(entry.getValue()));
 				}
-				streamsProxy = new StreamsProxy(inputs);
+				streamsProxy = createStreamsProxy(inputs);
 			} catch (IOException e) {
 				JSDebugPlugin.log(e);
 			}
 		}
 		return streamsProxy;
+	}
+
+	/**
+	 * Creates a {@link StreamsProxy} instance. Subclasses may overwrite.
+	 * 
+	 * @param inputs
+	 * @return A {@link StreamsProxy}
+	 */
+	protected StreamsProxy createStreamsProxy(Map<String, InputStream> inputs) {
+		return new StreamsProxy(inputs, this);
 	}
 
 	/*
