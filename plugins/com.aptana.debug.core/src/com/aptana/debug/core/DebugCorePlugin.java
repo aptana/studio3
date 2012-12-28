@@ -69,6 +69,7 @@ public class DebugCorePlugin extends Plugin
 	public void stop(BundleContext context) throws Exception
 	{
 		breakpointHelper.cleanup();
+		logLevelFilterManager = null;
 		DebugPlugin.getDefault().removeDebugEventListener(remoteSourceCacheManager);
 		super.stop(context);
 		plugin = null;
@@ -108,7 +109,7 @@ public class DebugCorePlugin extends Plugin
 	 * 
 	 * @return A {@link LogLevelFilterManager}
 	 */
-	public LogLevelFilterManager getLogLevelFilterManager()
+	public synchronized LogLevelFilterManager getLogLevelFilterManager()
 	{
 		if (logLevelFilterManager == null)
 		{
