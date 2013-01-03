@@ -395,7 +395,7 @@ public class NodePackageManager implements INodePackageManager
 	// When in global mode, executables are linked into {prefix}/bin on Unix, or directly into {prefix} on Windows.
 	public IPath getBinariesPath() throws CoreException
 	{
-		IPath prefix = configPrefix();
+		IPath prefix = getConfigPrefixPath();
 		if (prefix == null)
 		{
 			return null;
@@ -412,7 +412,7 @@ public class NodePackageManager implements INodePackageManager
 	// {prefix}/node_modules (that is, no lib folder.)
 	public IPath getModulesPath() throws CoreException
 	{
-		IPath prefix = configPrefix();
+		IPath prefix = getConfigPrefixPath();
 		if (prefix == null)
 		{
 			return null;
@@ -425,7 +425,7 @@ public class NodePackageManager implements INodePackageManager
 		return prefix.append(LIB).append(NODE_MODULES);
 	}
 
-	private IPath configPrefix() throws CoreException
+	public IPath getConfigPrefixPath() throws CoreException
 	{
 		String npmConfigPrefixPath = ShellExecutable.getEnvironment().get(NPM_CONFIG_PREFIX);
 		if (npmConfigPrefixPath != null)
