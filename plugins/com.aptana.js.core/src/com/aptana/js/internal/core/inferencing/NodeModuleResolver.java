@@ -19,11 +19,15 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 
 import com.aptana.core.ShellExecutable;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.PathUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.js.core.JSCorePlugin;
@@ -52,6 +56,17 @@ public class NodeModuleResolver extends AbstractRequireResolver
 			"util", "vm", "zlib");
 
 	private IPath location;
+
+	/**
+	 * Cache the path to NPM modules directory. There's no way to bust the cache and update it, currently.
+	 */
+	private IPath fModulesPath;
+
+	/**
+	 * Cache the node src path, listen for changes to update it
+	 */
+	private IPreferenceChangeListener fNodeSrcPathListener;
+	private IPath fNodeSrcPath;
 
 	public IPath resolve(String moduleId, IProject project, IPath location, IPath indexRoot)
 	{
@@ -97,15 +112,45 @@ public class NodeModuleResolver extends AbstractRequireResolver
 		return node.append(LIB).append(text).addFileExtension(JS);
 	}
 
-	private IPath nodeSrcPath()
+	protected synchronized IPath nodeSrcPath()
 	{
-		String value = Platform.getPreferencesService().getString(JSCorePlugin.PLUGIN_ID,
-				IPreferenceConstants.NODEJS_SOURCE_PATH, null, null);
-		if (StringUtil.isEmpty(value))
+		// Cache value and hook pref listener
+		if (fNodeSrcPathListener == null)
 		{
-			return null;
+			fNodeSrcPathListener = new IEclipsePreferences.IPreferenceChangeListener()
+			{
+				public void preferenceChange(PreferenceChangeEvent event)
+				{
+					if (IPreferenceConstants.NODEJS_SOURCE_PATH.equals(event.getKey()))
+					{
+						String value = (String) event.getNewValue();
+						if (StringUtil.isEmpty(value))
+						{
+							fNodeSrcPath = null;
+						}
+						else
+						{
+							fNodeSrcPath = Path.fromOSString(value);
+						}
+					}
+				}
+			};
+			EclipseUtil.instanceScope().getNode(JSCorePlugin.PLUGIN_ID)
+					.addPreferenceChangeListener(fNodeSrcPathListener);
+
+			String value = Platform.getPreferencesService().getString(JSCorePlugin.PLUGIN_ID,
+					IPreferenceConstants.NODEJS_SOURCE_PATH, null, null);
+			if (StringUtil.isEmpty(value))
+			{
+				fNodeSrcPath = null;
+			}
+			else
+			{
+				fNodeSrcPath = Path.fromOSString(value);
+			}
 		}
-		return Path.fromOSString(value);
+
+		return fNodeSrcPath;
 	}
 
 	private boolean isCore(String text)
@@ -204,7 +249,7 @@ public class NodeModuleResolver extends AbstractRequireResolver
 		// Grab node_prefix setting!
 		try
 		{
-			IPath modulesPath = JSCorePlugin.getDefault().getNodePackageManager().getModulesPath();
+			IPath modulesPath = getModulesPath();
 			if (modulesPath != null)
 			{
 				dirs.add(modulesPath);
@@ -215,6 +260,15 @@ public class NodeModuleResolver extends AbstractRequireResolver
 			IdeLog.logError(JSCorePlugin.getDefault(), e);
 		}
 		return dirs;
+	}
+
+	protected synchronized IPath getModulesPath() throws CoreException
+	{
+		if (fModulesPath == null)
+		{
+			fModulesPath = JSCorePlugin.getDefault().getNodePackageManager().getModulesPath();
+		}
+		return fModulesPath;
 	}
 
 	public boolean applies(IProject project, IPath currentDirectory, IPath indexRoot)
