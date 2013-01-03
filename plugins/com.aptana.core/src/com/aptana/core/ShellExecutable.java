@@ -1,11 +1,10 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-
 package com.aptana.core;
 
 import java.io.File;
@@ -208,13 +207,13 @@ public final class ShellExecutable
 				IPath shellPath = getPath();
 				if (shellPath == null)
 				{
-					return System.getenv();
+					return new HashMap<String, String>(System.getenv());
 				}
 				shellEnvironment = getEnvironment(null);
 			}
 			catch (CoreException e)
 			{
-				return System.getenv();
+				return new HashMap<String, String>(System.getenv());
 			}
 		}
 		return shellEnvironment;
@@ -315,7 +314,7 @@ public final class ShellExecutable
 			{
 				// Grabbing the environment from shell failed, just use env we
 				// have in JVM, but don't cache it!
-				return System.getenv();
+				return new HashMap<String, String>(System.getenv());
 			}
 			workingDirToEnvCache.put(workingDirectory, result);
 			updatePathForLocationKey(workingDirectory);
@@ -380,7 +379,7 @@ public final class ShellExecutable
 
 	private synchronized static Map<String, String> toShellEnvironment(Map<String, String> environment)
 	{
-		environment.put(APTANA_VERSION, CorePlugin.getAptanaStudioVersion());
+		environment.put(APTANA_VERSION, EclipseUtil.getStudioVersion());
 		if (initializing)
 		{
 			return environment;
@@ -438,5 +437,4 @@ public final class ShellExecutable
 		shellEnvironment = null;
 		workingDirToEnvCache.clear();
 	}
-
 }
