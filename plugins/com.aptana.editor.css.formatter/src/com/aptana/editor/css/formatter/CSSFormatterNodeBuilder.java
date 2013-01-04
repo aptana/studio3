@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -11,6 +11,19 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.regex.Pattern;
 
+import com.aptana.css.core.parsing.ast.CSSDeclarationNode;
+import com.aptana.css.core.parsing.ast.CSSErrorDeclarationNode;
+import com.aptana.css.core.parsing.ast.CSSExpressionNode;
+import com.aptana.css.core.parsing.ast.CSSFontFaceNode;
+import com.aptana.css.core.parsing.ast.CSSMediaNode;
+import com.aptana.css.core.parsing.ast.CSSNode;
+import com.aptana.css.core.parsing.ast.CSSPageNode;
+import com.aptana.css.core.parsing.ast.CSSPageSelectorNode;
+import com.aptana.css.core.parsing.ast.CSSRuleNode;
+import com.aptana.css.core.parsing.ast.CSSSelectorNode;
+import com.aptana.css.core.parsing.ast.CSSTermListNode;
+import com.aptana.css.core.parsing.ast.CSSTextNode;
+import com.aptana.css.core.parsing.ast.ICSSNodeTypes;
 import com.aptana.editor.css.formatter.nodes.FormatterCSSAtRuleNode;
 import com.aptana.editor.css.formatter.nodes.FormatterCSSBlockNode;
 import com.aptana.editor.css.formatter.nodes.FormatterCSSDeclarationPropertyNode;
@@ -19,19 +32,6 @@ import com.aptana.editor.css.formatter.nodes.FormatterCSSParenthesesNode;
 import com.aptana.editor.css.formatter.nodes.FormatterCSSPunctuationNode;
 import com.aptana.editor.css.formatter.nodes.FormatterCSSRootNode;
 import com.aptana.editor.css.formatter.nodes.FormatterCSSSelectorNode;
-import com.aptana.editor.css.parsing.ast.CSSDeclarationNode;
-import com.aptana.editor.css.parsing.ast.CSSErrorDeclarationNode;
-import com.aptana.editor.css.parsing.ast.CSSExpressionNode;
-import com.aptana.editor.css.parsing.ast.CSSFontFaceNode;
-import com.aptana.editor.css.parsing.ast.CSSMediaNode;
-import com.aptana.editor.css.parsing.ast.CSSNode;
-import com.aptana.editor.css.parsing.ast.CSSPageNode;
-import com.aptana.editor.css.parsing.ast.CSSPageSelectorNode;
-import com.aptana.editor.css.parsing.ast.CSSRuleNode;
-import com.aptana.editor.css.parsing.ast.CSSSelectorNode;
-import com.aptana.editor.css.parsing.ast.CSSTermListNode;
-import com.aptana.editor.css.parsing.ast.CSSTextNode;
-import com.aptana.editor.css.parsing.ast.ICSSNodeTypes;
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.nodes.AbstractFormatterNodeBuilder;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
@@ -555,7 +555,7 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		{
 			endsWithComma = true;
 		}
-		
+
 		if (document.charAt(forwardSlashLocation) == '/')
 		{
 			endsWithSlash = true;

@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -16,14 +16,13 @@ public class AllTests
 	public static Test suite()
 	{
 		TestSuite suite = new TestSuite("Test for com.aptana.editor.css.contentassist");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(FineLocationTests.class);
+		// $JUnit-BEGIN$
 		suite.addTestSuite(CoarseLocationTests.class);
-		suite.addTestSuite(RangeTests.class);
-		suite.addTestSuite(MetadataTests.class);
 		suite.addTestSuite(CSSContentAssistProposalTests.class);
 		suite.addTestSuite(CSSTextHoverTests.class);
-		//$JUnit-END$
+		suite.addTestSuite(FineLocationTests.class);
+		suite.addTestSuite(RangeTests.class);
+		// $JUnit-END$
 		return suite;
 	}
 

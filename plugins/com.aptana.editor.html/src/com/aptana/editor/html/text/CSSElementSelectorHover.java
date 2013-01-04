@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -16,9 +16,9 @@ import org.eclipse.jface.text.Region;
 import org.eclipse.ui.IEditorPart;
 
 import com.aptana.core.util.StringUtil;
+import com.aptana.css.core.parsing.ast.CSSSimpleSelectorNode;
 import com.aptana.editor.common.contentassist.CommonTextHover;
 import com.aptana.editor.common.hover.CustomBrowserInformationControl;
-import com.aptana.editor.css.parsing.ast.CSSSimpleSelectorNode;
 import com.aptana.editor.html.contentassist.HTMLIndexQueryHelper;
 import com.aptana.editor.html.contentassist.HTMLModelFormatter;
 import com.aptana.editor.html.contentassist.model.ElementElement;

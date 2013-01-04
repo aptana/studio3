@@ -13,7 +13,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import com.aptana.core.build.IProblem;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.IOUtil;
-import com.aptana.editor.css.contentassist.index.CSSFileIndexingParticipant;
+import com.aptana.css.core.index.CSSFileIndexingParticipant;
 import com.aptana.index.core.FileStoreBuildContext;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;

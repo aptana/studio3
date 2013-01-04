@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -22,22 +22,23 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.IEditorPart;
 
 import com.aptana.core.util.StringUtil;
+import com.aptana.css.core.CSSColors;
+import com.aptana.css.core.index.CSSIndexQueryHelper;
+import com.aptana.css.core.model.BaseElement;
+import com.aptana.css.core.model.ICSSMetadataElement;
+import com.aptana.css.core.model.PropertyElement;
+import com.aptana.css.core.model.PseudoClassElement;
+import com.aptana.css.core.model.PseudoElementElement;
+import com.aptana.css.core.parsing.ast.CSSAttributeSelectorNode;
+import com.aptana.css.core.parsing.ast.CSSDeclarationNode;
+import com.aptana.css.core.parsing.ast.CSSFunctionNode;
+import com.aptana.css.core.parsing.ast.CSSNode;
+import com.aptana.css.core.parsing.ast.CSSTermListNode;
+import com.aptana.css.core.parsing.ast.ICSSNodeTypes;
 import com.aptana.editor.common.contentassist.CommonTextHover;
 import com.aptana.editor.common.hover.CustomBrowserInformationControl;
-import com.aptana.editor.css.CSSColors;
-import com.aptana.editor.css.contentassist.CSSIndexQueryHelper;
-import com.aptana.editor.css.contentassist.model.BaseElement;
-import com.aptana.editor.css.contentassist.model.ICSSMetadataElement;
-import com.aptana.editor.css.contentassist.model.PropertyElement;
-import com.aptana.editor.css.contentassist.model.PseudoClassElement;
-import com.aptana.editor.css.contentassist.model.PseudoElementElement;
+import com.aptana.editor.css.CSSColorsUI;
 import com.aptana.editor.css.internal.text.CSSModelFormatter;
-import com.aptana.editor.css.parsing.ast.CSSAttributeSelectorNode;
-import com.aptana.editor.css.parsing.ast.CSSDeclarationNode;
-import com.aptana.editor.css.parsing.ast.CSSFunctionNode;
-import com.aptana.editor.css.parsing.ast.CSSNode;
-import com.aptana.editor.css.parsing.ast.CSSTermListNode;
-import com.aptana.editor.css.parsing.ast.ICSSNodeTypes;
 import com.aptana.parsing.ast.IParseNode;
 
 public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHoverExtension, ITextHoverExtension2
@@ -302,11 +303,11 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 		IRegion region = new Region(cssNode.getStartingOffset(), cssNode.getLength());
 		if (text.charAt(0) == '#')
 		{
-			return new RegionInfo(region, CSSColors.hexToRGB(text));
+			return new RegionInfo(region, CSSColorsUI.hexToRGB(text));
 		}
 		else if (CSSColors.namedColorExists(text))
 		{
-			return new RegionInfo(region, CSSColors.namedColorToRGB(text));
+			return new RegionInfo(region, CSSColorsUI.namedColorToRGB(text));
 		}
 		return new RegionInfo(region, text);
 	}

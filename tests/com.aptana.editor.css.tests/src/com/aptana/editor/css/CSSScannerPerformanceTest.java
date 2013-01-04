@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -15,8 +15,8 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.test.performance.PerformanceTestCase;
 
 import com.aptana.core.util.IOUtil;
+import com.aptana.css.core.parsing.CSSTokenType;
 import com.aptana.editor.css.parsing.CSSScanner;
-import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 
 public class CSSScannerPerformanceTest extends PerformanceTestCase
 {

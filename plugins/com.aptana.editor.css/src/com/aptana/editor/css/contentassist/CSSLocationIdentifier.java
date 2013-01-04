@@ -7,7 +7,7 @@
  */
 package com.aptana.editor.css.contentassist;
 
-import com.aptana.editor.css.parsing.ast.CSSTreeWalker;
+import com.aptana.css.core.parsing.ast.CSSTreeWalker;
 
 /**
  * CSSLocationIdentifier
