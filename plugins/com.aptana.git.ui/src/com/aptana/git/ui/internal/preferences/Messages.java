@@ -16,6 +16,20 @@ public class Messages extends NLS
 	public static String GitExecutableLocationPage_CalculatePullIndicatorLabel;
 	public static String GitExecutableLocationPage_InvalidLocationErrorMessage;
 	public static String GitExecutableLocationPage_LocationLabel;
+	public static String GithubAccountPageProvider_EmptyPassword;
+	public static String GithubAccountPageProvider_EmptyUsername;
+	public static String GithubAccountPageProvider_InvalidInputTitle;
+	public static String GithubAccountPageProvider_LoginFailed;
+	public static String GithubAccountPageProvider_Logout_LBL;
+	public static String GithubAccountPageProvider_Name;
+	public static String GithubAccountPageProvider_Password_LBL;
+	public static String GithubAccountPageProvider_Signup_LBL;
+	public static String GithubAccountPageProvider_SuccessMsg;
+	public static String GithubAccountPageProvider_SuccessTitle;
+	public static String GithubAccountPageProvider_User_LBL;
+	public static String GithubAccountPageProvider_Username_LBL;
+	public static String GithubAccountPageProvider_Validate_LBL;
+	public static String GithubAccountPageProvider_ValidatingCredentials;
 	public static String GitPreferencePage_IgnoreMissingGitLabel;
 	static
 	{

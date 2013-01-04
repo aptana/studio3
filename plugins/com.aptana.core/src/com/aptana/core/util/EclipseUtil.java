@@ -51,6 +51,11 @@ import com.aptana.core.logging.IdeLog;
 public class EclipseUtil
 {
 
+	/**
+	 * Default product name
+	 */
+	private static final String APTANA_STUDIO = "Aptana Studio"; //$NON-NLS-1$
+
 	protected static final class LauncherFilter implements FilenameFilter
 	{
 
@@ -185,6 +190,20 @@ public class EclipseUtil
 		}
 		return bundle.getHeaders().get(org.osgi.framework.Constants.BUNDLE_VERSION).toString(); // $codepro.audit.disable
 																								// com.instantiations.assist.eclipse.analysis.unnecessaryToString
+	}
+
+	public static String getProductName()
+	{
+		IProduct product = Platform.getProduct();
+		if (product != null)
+		{
+			String name = product.getName();
+			if (!StringUtil.isEmpty(name))
+			{
+				return name;
+			}
+		}
+		return APTANA_STUDIO;
 	}
 
 	/**
