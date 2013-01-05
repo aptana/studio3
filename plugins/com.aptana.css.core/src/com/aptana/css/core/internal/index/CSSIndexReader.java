@@ -27,6 +27,8 @@ import com.aptana.index.core.SearchPattern;
 
 public class CSSIndexReader extends IndexReader
 {
+	private static final String WILD_CARD_CHAR = "*"; //$NON-NLS-1$
+
 	/**
 	 * createElement
 	 * 
@@ -94,8 +96,7 @@ public class CSSIndexReader extends IndexReader
 		{
 			List<QueryResult> items = index.query( //
 					new String[] { ICSSIndexConstants.ELEMENT }, //
-					"*", //$NON-NLS-1$
-					SearchPattern.PATTERN_MATCH //
+					WILD_CARD_CHAR, SearchPattern.PATTERN_MATCH //
 					);
 
 			if (items != null)
@@ -152,8 +153,7 @@ public class CSSIndexReader extends IndexReader
 		{
 			List<QueryResult> properties = index.query( //
 					new String[] { ICSSIndexConstants.PROPERTY }, //
-					"*", //$NON-NLS-1$
-					SearchPattern.PATTERN_MATCH //
+					WILD_CARD_CHAR, SearchPattern.PATTERN_MATCH //
 					);
 
 			if (properties != null)
@@ -218,8 +218,7 @@ public class CSSIndexReader extends IndexReader
 		{
 			List<QueryResult> pseudoClasses = index.query( //
 					new String[] { ICSSIndexConstants.PSUEDO_CLASS }, //
-					"*", //$NON-NLS-1$
-					SearchPattern.PATTERN_MATCH //
+					WILD_CARD_CHAR, SearchPattern.PATTERN_MATCH //
 					);
 
 			if (pseudoClasses != null)
@@ -249,8 +248,7 @@ public class CSSIndexReader extends IndexReader
 		{
 			List<QueryResult> pseudoElements = index.query( //
 					new String[] { ICSSIndexConstants.PSUEDO_ELEMENT }, //
-					"*", //$NON-NLS-1$
-					SearchPattern.PATTERN_MATCH //
+					WILD_CARD_CHAR, SearchPattern.PATTERN_MATCH //
 					);
 
 			if (pseudoElements != null)
@@ -286,7 +284,7 @@ public class CSSIndexReader extends IndexReader
 
 		if (index != null && !StringUtil.isEmpty(category))
 		{
-			String pattern = "*"; //$NON-NLS-1$
+			String pattern = WILD_CARD_CHAR;
 			List<QueryResult> items = index.query(new String[] { category }, pattern, SearchPattern.PATTERN_MATCH);
 			if (items != null && items.size() > 0)
 			{
@@ -295,7 +293,7 @@ public class CSSIndexReader extends IndexReader
 				for (QueryResult item : items)
 				{
 					Set<String> paths = item.getDocuments();
-					String path = (paths != null && !paths.isEmpty()) ? paths.iterator().next() : ""; //$NON-NLS-1$
+					String path = (paths != null && !paths.isEmpty()) ? paths.iterator().next() : StringUtil.EMPTY;
 
 					result.put(item.getWord(), path);
 				}

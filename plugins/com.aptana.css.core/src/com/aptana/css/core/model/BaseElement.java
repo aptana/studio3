@@ -38,7 +38,7 @@ public abstract class BaseElement implements ICSSMetadataElement, Convertible, I
 	 */
 	public void addDocument(String document)
 	{
-		if (document != null && document.length() > 0)
+		if (!StringUtil.isEmpty(document))
 		{
 			if (this._documents == null)
 			{
@@ -124,9 +124,10 @@ public abstract class BaseElement implements ICSSMetadataElement, Convertible, I
 	 */
 	public List<String> getUserAgentNames()
 	{
-		List<String> result = new ArrayList<String>();
+		List<UserAgentElement> userAgents = getUserAgents();
+		List<String> result = new ArrayList<String>(userAgents.size());
 
-		for (UserAgentElement ua : this.getUserAgents())
+		for (UserAgentElement ua : userAgents)
 		{
 			result.add(ua.getPlatform());
 		}
