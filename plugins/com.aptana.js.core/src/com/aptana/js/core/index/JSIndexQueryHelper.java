@@ -152,13 +152,22 @@ public class JSIndexQueryHelper
 	{
 		// Need to search Global or Window!
 		String globalTypeName = JSTypeUtil.getGlobalType(project, fileName);
+		List<String> types = CollectionsUtil.newList(JSTypeConstants.GLOBAL_TYPE);
+		if (JSTypeConstants.WINDOW_TYPE.equals(globalTypeName))
+		{
+			types.add(0, JSTypeConstants.WINDOW_TYPE);
+		}
 
 		ArrayList<PropertyElement> properties = new ArrayList<PropertyElement>();
-		for (Index index : indices)
+		for (String type : types)
 		{
-			// FIXME Search both categories at once?
-			properties.addAll(_reader.getFunctions(index, globalTypeName, memberName));
-			properties.addAll(_reader.getProperties(index, globalTypeName, memberName));
+			// TODO Search all types at once
+			for (Index index : indices)
+			{
+				// FIXME Search both categories at once?
+				properties.addAll(_reader.getFunctions(index, type, memberName));
+				properties.addAll(_reader.getProperties(index, type, memberName));
+			}
 		}
 
 		return properties;
@@ -431,6 +440,34 @@ public class JSIndexQueryHelper
 		}
 		properties.trimToSize();
 		return properties;
+	}
+
+	/**
+	 * Searches for a given method off a base type and it's ancestors in the type hierarchy. Returns the first match
+	 * found.
+	 * 
+	 * @param typeName
+	 *            The base type we're searching. We search this type and then if we fail to find a match, we search up
+	 *            it's hierarchy in-order.
+	 * @param methodName
+	 *            The name of the method/function we're trying to find.
+	 * @return null if no such method found, otherwise first instance we find.
+	 */
+	public FunctionElement findFunctionInHierarchy(String typeName, String methodName)
+	{
+		List<String> types = getTypeAncestorNames(typeName);
+		types.add(0, typeName);
+		for (String type : types)
+		{
+			// TODO Can we search against all the types simultaneously, then order results by hierarchy and return
+			// first match? This would drop number of queries from N to 1...
+			Collection<FunctionElement> functions = getFunctions(type, methodName);
+			if (!CollectionsUtil.isEmpty(functions))
+			{
+				return functions.iterator().next();
+			}
+		}
+		return null;
 	}
 
 }

@@ -168,7 +168,7 @@ public class JSCAIndexingTest extends JSEditorBasedTestCase
 		assertTypes(index, "com", "com.aptana", "com.aptana.SimpleType");
 
 		// check for properties
-		assertProperties(index, "Window", "com");
+		assertProperties(index, "Global", "com");
 		assertProperties(index, "com", "aptana");
 		assertProperties(index, "com.aptana", "SimpleType");
 	}
@@ -194,7 +194,7 @@ public class JSCAIndexingTest extends JSEditorBasedTestCase
 		assertTypes(index, "com", "com.aptana", "com.aptana.SimpleType", "com.aptana.SimpleType2");
 
 		// check for properties
-		assertProperties(index, "Window", "com");
+		assertProperties(index, "Global", "com");
 		assertProperties(index, "com", "aptana");
 		assertProperties(index, "com.aptana", "SimpleType2");
 	}

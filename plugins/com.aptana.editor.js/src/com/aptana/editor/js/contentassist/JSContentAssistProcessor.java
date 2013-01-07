@@ -913,73 +913,63 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	private FunctionElement getFunctionElement(ITextViewer viewer, int offset)
 	{
-		JSArgumentsNode node = getArgumentsNode(offset);
-		FunctionElement result = null;
-
 		// process arguments node as long as we're not to the left of the opening parenthesis
-		if (node != null)
+		JSArgumentsNode node = getArgumentsNode(offset);
+		if (node == null)
 		{
-			// save current replace range. A bit hacky but better than adding a flag into getLocation's signature
-			IRange range = replaceRange;
-
-			// grab the content assist location type for the symbol before the arguments list
-			int functionOffset = node.getStartingOffset();
-			LocationType location = getLocationType(viewer.getDocument(), functionOffset);
-
-			// restore replace range
-			replaceRange = range;
-
-			// init type and method names
-			String typeName = null;
-			String methodName = null;
-
-			switch (location)
-			{
-				case IN_VARIABLE_NAME:
-				{
-					typeName = JSTypeUtil.getGlobalType(getProject(), getFilename());
-					methodName = node.getParent().getFirstChild().getText();
-					break;
-				}
-
-				case IN_PROPERTY_NAME:
-				{
-					JSGetPropertyNode propertyNode = ParseUtil.getGetPropertyNode(node,
-							((JSNode) node).getContainingStatementNode());
-					List<String> types = getParentObjectTypes(propertyNode, offset);
-
-					if (types.size() > 0)
-					{
-						typeName = types.get(0);
-						methodName = propertyNode.getLastChild().getText();
-					}
-					break;
-				}
-
-				default:
-					break;
-			}
-
-			if (typeName != null && methodName != null)
-			{
-				Collection<PropertyElement> properties = getQueryHelper().getTypeMembers(typeName, methodName);
-
-				if (properties != null)
-				{
-					// TODO: Should we do anything special if there is more than one function?
-					for (PropertyElement property : properties)
-					{
-						if (property instanceof FunctionElement)
-						{
-							result = (FunctionElement) property;
-							break;
-						}
-					}
-				}
-			}
+			return null;
 		}
 
-		return result;
+		// save current replace range. A bit hacky but better than adding a flag into getLocation's signature
+		IRange range = replaceRange;
+
+		// grab the content assist location type for the symbol before the arguments list
+		int functionOffset = node.getStartingOffset();
+		LocationType location = getLocationType(viewer.getDocument(), functionOffset);
+
+		// restore replace range
+		replaceRange = range;
+
+		// init type and method names
+		String typeName = null;
+		String methodName = null;
+
+		switch (location)
+		{
+			case IN_VARIABLE_NAME:
+			{
+				typeName = JSTypeUtil.getGlobalType(getProject(), getFilename());
+				methodName = node.getParent().getFirstChild().getText();
+				break;
+			}
+
+			case IN_PROPERTY_NAME:
+			{
+				JSGetPropertyNode propertyNode = ParseUtil.getGetPropertyNode(node,
+						((JSNode) node).getContainingStatementNode());
+				List<String> types = getParentObjectTypes(propertyNode, offset);
+
+				if (types.size() > 0)
+				{
+					typeName = types.get(0);
+					methodName = propertyNode.getLastChild().getText();
+				}
+				break;
+			}
+
+			default:
+				break;
+		}
+
+		if (typeName != null && methodName != null)
+		{
+			// TODO Extract this out to a method on query helper? Seems like something we'd do pretty often - search for
+			// a function up the typer hierarchy, returning when we find our first match
+			JSIndexQueryHelper helper = getQueryHelper();
+			return helper.findFunctionInHierarchy(typeName, methodName);
+		}
+
+		return null;
 	}
 
 	/**
