@@ -7,6 +7,9 @@
  */
 package com.aptana.git.core.github;
 
+import java.util.List;
+
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 
 public interface IGithubManager
@@ -17,5 +20,7 @@ public interface IGithubManager
 	public IStatus login(String username, String password);
 
 	public IStatus logout();
+
+	public List<String> getRepos() throws CoreException;
 
 }

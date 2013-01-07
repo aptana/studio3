@@ -12,6 +12,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.internal.preferences.Base64;
 import org.eclipse.core.runtime.CoreException;
@@ -206,6 +208,58 @@ public class GithubManager implements IGithubManager
 	protected ISecurePreferences getSecurePreferences()
 	{
 		return SecurePreferencesFactory.getDefault().node(SECURE_PREF_NODE);
+	}
+
+	public List<String> getRepos() throws CoreException
+	{
+		if (user == null)
+		{
+			throw new CoreException(new Status(IStatus.ERROR, GitPlugin.PLUGIN_ID, -1,
+					"No user is logged in for Github", null));
+		}
+		HttpURLConnection connection = null;
+		try
+		{
+			connection = createConnection(BASE_URL + "user/repos", user.getUsername(), user.getPassword()); //$NON-NLS-1$
+			int code = connection.getResponseCode();
+			String response;
+			if (code == HttpURLConnection.HTTP_OK)
+			{
+				// If user entered an email address we can't use that in building URLs. Let's parse the response and
+				// grab the actual username
+				response = IOUtil.read(connection.getInputStream());
+				JSONParser parser = new JSONParser();
+				@SuppressWarnings("unchecked")
+				List<JSONObject> result = (List<JSONObject>) parser.parse(response);
+				List<String> repoURLs = new ArrayList<String>(result.size());
+				for (JSONObject repo : result)
+				{
+					repoURLs.add((String) repo.get("ssh_url"));
+				}
+				return repoURLs;
+			}
+			// read error message from response
+			response = IOUtil.read(connection.getErrorStream());
+			JSONParser parser = new JSONParser();
+			JSONObject result = (JSONObject) parser.parse(response);
+			String msg = (String) result.get("message"); //$NON-NLS-1$
+			throw new CoreException(new Status(IStatus.ERROR, GitPlugin.PLUGIN_ID, code, msg, null));
+		}
+		catch (CoreException ce)
+		{
+			throw ce;
+		}
+		catch (Exception e)
+		{
+			throw new CoreException(new Status(IStatus.ERROR, GitPlugin.PLUGIN_ID, -1, null, e));
+		}
+		finally
+		{
+			if (connection != null)
+			{
+				connection.disconnect();
+			}
+		}
 	}
 
 }

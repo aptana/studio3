@@ -9,8 +9,12 @@ package com.aptana.git.ui.internal.wizards;
 
 import java.io.File;
 import java.text.MessageFormat;
+import java.util.List;
 
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -18,17 +22,22 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import com.aptana.core.CoreStrings;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.git.core.GitPlugin;
+import com.aptana.git.core.github.IGithubManager;
+import com.aptana.git.core.github.IGithubUser;
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.ui.internal.preferences.GithubAccountPageProvider;
 
 class RepositorySelectionPage extends WizardPage
 {
@@ -37,6 +46,8 @@ class RepositorySelectionPage extends WizardPage
 	private Text source;
 	private String sourceURI;
 	private String destination;
+	private GithubAccountPageProvider userInfoProvider;
+	private Control userInfoControl;
 
 	protected RepositorySelectionPage()
 	{
@@ -47,19 +58,69 @@ class RepositorySelectionPage extends WizardPage
 
 	public void createControl(Composite parent)
 	{
-		Composite composite = new Composite(parent, SWT.NONE);
-		composite.setLayout(new GridLayout(3, false));
+		Composite main = new Composite(parent, SWT.NONE);
+		main.setLayout(GridLayoutFactory.swtDefaults().numColumns(2).create());
+		main.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 
-		Label sourceLabel = new Label(composite, SWT.NONE);
-		sourceLabel.setText(Messages.RepositorySelectionPage_SourceURI_Label);
+		GridDataFactory gdf = GridDataFactory.swtDefaults().hint(300, SWT.DEFAULT);
 
-		source = new Text(composite, SWT.BORDER | SWT.SINGLE);
-		GridData data = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
-		data.horizontalSpan = 2;
-		data.widthHint = 300;
-		source.setLayoutData(data);
-		String username = System.getProperty("user.name"); //$NON-NLS-1$
-		if (username == null || username.length() == 0)
+		// adds control for login credentials
+		userInfoProvider = new GithubAccountPageProvider();
+		userInfoControl = userInfoProvider.createContents(main);
+		userInfoControl.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).span(2, 1).create());
+
+		IGithubManager manager = GitPlugin.getDefault().getGithubManager();
+		IGithubUser user = manager.getUser();
+
+		// Button and combo for github
+		Button fromGithub = new Button(main, SWT.RADIO);
+		fromGithub.setText("Github: ");
+		fromGithub.setEnabled(user != null);
+		fromGithub.setSelection(user != null);
+
+		// Add pulldown for repos
+		final Combo repos = new Combo(main, SWT.READ_ONLY | SWT.SINGLE);
+		repos.setLayoutData(gdf.create());
+		if (user != null)
+		{
+			try
+			{
+				List<String> repoList = manager.getRepos();
+				if (!CollectionsUtil.isEmpty(repoList))
+				{
+					for (String repoURI : repoList)
+					{
+						repos.add(repoURI);
+					}
+					repos.addSelectionListener(new SelectionAdapter()
+					{
+						@Override
+						public void widgetSelected(SelectionEvent e)
+						{
+							String sourceURI = repos.getText();
+							String workspacePath = generateDestinationPath(sourceURI);
+							directoryText.setText(workspacePath);
+							checkPage();
+						}
+					});
+					repos.select(0);
+				}
+			}
+			catch (CoreException e1)
+			{
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+
+		Button fromURI = new Button(main, SWT.RADIO);
+		fromURI.setText(Messages.RepositorySelectionPage_SourceURI_Label);
+		fromURI.setSelection(user == null);
+
+		source = new Text(main, SWT.BORDER | SWT.SINGLE);
+		source.setLayoutData(gdf.create());
+		String username = user == null ? System.getProperty("user.name") : user.getUsername(); //$NON-NLS-1$
+		if (StringUtil.isEmpty(username))
 		{
 			username = "user"; //$NON-NLS-1$
 		}
@@ -73,30 +134,24 @@ class RepositorySelectionPage extends WizardPage
 				{
 					// Try to stick to a default of a project under workspace matching the last path of the remote git
 					// repo
-					String workspacePath = ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString();
-					int index = sourceURI.lastIndexOf(GitRepository.GIT_DIR);
-					if (index == -1)
-					{
-						index = sourceURI.length();
-					}
-					int slash = sourceURI.lastIndexOf('/', index);
-					if (slash != -1)
-					{
-						workspacePath += File.separator + sourceURI.substring(slash + 1, index);
-					}
+					String workspacePath = generateDestinationPath(sourceURI);
 					directoryText.setText(workspacePath);
 				}
 				checkPage();
 			}
 		});
 
-		Label dest = new Label(composite, SWT.NONE);
+		// TODO Add a separator here?
+
+		Label dest = new Label(main, SWT.NONE);
 		dest.setText(Messages.RepositorySelectionPage_Destination_Label);
 
-		directoryText = new Text(composite, SWT.BORDER | SWT.SINGLE);
-		data = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
-		data.widthHint = 300;
-		directoryText.setLayoutData(data);
+		Composite comp = new Composite(main, SWT.NONE);
+		comp.setLayout(GridLayoutFactory.swtDefaults().numColumns(2).create());
+		comp.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
+
+		directoryText = new Text(comp, SWT.BORDER | SWT.SINGLE);
+		directoryText.setLayoutData(gdf.create());
 		directoryText.addModifyListener(new ModifyListener()
 		{
 			public void modifyText(final ModifyEvent e)
@@ -105,9 +160,9 @@ class RepositorySelectionPage extends WizardPage
 			}
 		});
 
-		final Button b = new Button(composite, SWT.PUSH);
-		b.setText(StringUtil.ellipsify(CoreStrings.BROWSE));
-		b.addSelectionListener(new SelectionAdapter()
+		final Button destinationButton = new Button(comp, SWT.PUSH);
+		destinationButton.setText(StringUtil.ellipsify(CoreStrings.BROWSE));
+		destinationButton.addSelectionListener(new SelectionAdapter()
 		{
 			public void widgetSelected(final SelectionEvent e)
 			{
@@ -122,11 +177,13 @@ class RepositorySelectionPage extends WizardPage
 				}
 				final String r = d.open();
 				if (r != null)
+				{
 					directoryText.setText(r);
+				}
 			}
 		});
 
-		setControl(composite);
+		setControl(main);
 	}
 
 	/**
@@ -202,5 +259,21 @@ class RepositorySelectionPage extends WizardPage
 	public String getDestination()
 	{
 		return destination;
+	}
+
+	protected String generateDestinationPath(String sourceURI)
+	{
+		String workspacePath = ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString();
+		int index = sourceURI.lastIndexOf(GitRepository.GIT_DIR);
+		if (index == -1)
+		{
+			index = sourceURI.length();
+		}
+		int slash = sourceURI.lastIndexOf('/', index);
+		if (slash != -1)
+		{
+			workspacePath += File.separator + sourceURI.substring(slash + 1, index);
+		}
+		return workspacePath;
 	}
 }
