@@ -48,8 +48,8 @@ public class DynamicTypeInferencingTest extends InferencingTestsBase
 		Indexer indexer = new Indexer();
 		indexer.indexTree(store, source, index, (JSParseRootNode) root);
 
-		JSIndexQueryHelper helper = new JSIndexQueryHelper();
-		Collection<PropertyElement> globals = helper.getGlobals(index, null, file.getName(), "one");
+		JSIndexQueryHelper helper = new JSIndexQueryHelper(index);
+		Collection<PropertyElement> globals = helper.getGlobals(file.getName(), "one");
 		assertEquals(1, globals.size());
 		PropertyElement global = globals.iterator().next();
 
@@ -58,7 +58,7 @@ public class DynamicTypeInferencingTest extends InferencingTestsBase
 		ReturnTypeElement returnType = returnTypes.get(0);
 		assertEquals("one", returnType.getType());
 
-		Collection<TypeElement> types = helper.getTypes(index, "one", true);
+		Collection<TypeElement> types = helper.getTypes("one", true);
 		assertEquals(1, types.size());
 		TypeElement type = types.iterator().next();
 		assertEquals("one", type.getName());

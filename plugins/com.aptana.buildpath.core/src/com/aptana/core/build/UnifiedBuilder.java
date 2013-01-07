@@ -37,6 +37,8 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 
 import com.aptana.buildpath.core.BuildPathCorePlugin;
+import com.aptana.buildpath.core.BuildPathManager;
+import com.aptana.buildpath.core.IBuildPathEntry;
 import com.aptana.core.CorePlugin;
 import com.aptana.core.IDebugScopes;
 import com.aptana.core.IFilter;
@@ -49,6 +51,8 @@ import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.index.core.FileStoreBuildContext;
 import com.aptana.index.core.IIndexFileContributor;
+import com.aptana.index.core.IndexContainerJob;
+import com.aptana.index.core.IndexFileJob;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.IndexPlugin;
 import com.aptana.index.core.build.BuildContext;
@@ -239,13 +243,13 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 			ResourceCollector collector = new ResourceCollector();
 			delta.accept(collector);
 
-			// TODO Ask for project build paths and see if any of those have changed? If so, update index for them
+			indexProjectBuildPaths(sub.newChild(25));
 
 			// Notify of the removed files
-			removeFiles(participants, collector.removedFiles, sub.newChild(25));
+			removeFiles(participants, collector.removedFiles, sub.newChild(5));
 
 			// Now build the new/updated files
-			buildFiles(participants, collector.updatedFiles, sub.newChild(75));
+			buildFiles(participants, collector.updatedFiles, sub.newChild(70));
 		}
 		catch (CoreException e)
 		{
@@ -310,24 +314,63 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
 
-		// Index files contributed to project build path
+		indexProjectBuildPaths(sub.newChild(50));
+
+		// Index files contributed...
+		// TODO Remove these special "contributed" files?
 		IProject project = getProjectHandle();
 		URI uri = project.getLocationURI();
-		// TODO Remove contributed files?
 		Set<IFileStore> contributedFiles = getContributedFiles(uri);
-		sub.worked(5);
-		buildContributedFiles(participants, contributedFiles, sub.newChild(10));
-
-		// TODO Ask for a project's build paths. Iterate through to update their indexing?
+		sub.worked(2);
+		buildContributedFiles(participants, contributedFiles, sub.newChild(6));
 
 		// Now index the actual files in the project
 		CollectingResourceVisitor visitor = new CollectingResourceVisitor();
 		project.accept(visitor);
 		visitor.files.trimToSize(); // shrink it down to size when we're done
-		sub.worked(5);
-		buildFiles(participants, visitor.files, sub.newChild(80));
+		sub.worked(2);
+		buildFiles(participants, visitor.files, sub.newChild(40));
 
 		sub.done();
+	}
+
+	/**
+	 * Grabs the list of {@link IBuildPathEntry}s for a project and make sure the indices for them are up-to-date.
+	 * 
+	 * @param monitor
+	 */
+	private void indexProjectBuildPaths(IProgressMonitor monitor)
+	{
+		IProject project = getProjectHandle();
+		Set<IBuildPathEntry> entries = getBuildPathManager().getBuildPaths(project);
+		SubMonitor sub = SubMonitor.convert(monitor, entries.size());
+		for (IBuildPathEntry entry : entries)
+		{
+			try
+			{
+				IFileStore fileStore = EFS.getStore(entry.getPath());
+				if (fileStore != null)
+				{
+					if (fileStore.fetchInfo().isDirectory())
+					{
+						new IndexContainerJob(entry.getDisplayName(), entry.getPath()).run(sub.newChild(1));
+					}
+					else
+					{
+						new IndexFileJob(entry.getDisplayName(), entry.getPath()).run(sub.newChild(1));
+					}
+				}
+			}
+			catch (Throwable e)
+			{
+				IdeLog.logError(BuildPathCorePlugin.getDefault(), e);
+			}
+		}
+	}
+
+	protected BuildPathManager getBuildPathManager()
+	{
+		return BuildPathManager.getInstance();
 	}
 
 	/**

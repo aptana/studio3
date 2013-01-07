@@ -54,7 +54,7 @@ public class JSMetadataIndexWriterTest extends TestCase
 	 */
 	private Index getIndex()
 	{
-		return JSIndexQueryHelper.getIndex();
+		return JSIndexQueryHelper.getJSCoreIndex();
 	}
 
 	/**

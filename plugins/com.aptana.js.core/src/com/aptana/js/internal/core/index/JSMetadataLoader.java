@@ -155,8 +155,8 @@ public class JSMetadataLoader extends MetadataLoader<JSMetadataReader>
 	@Override
 	protected void writeIndex(JSMetadataReader reader)
 	{
-		// remove old index
-		getIndexManager().removeIndex(URI.create(IJSIndexConstants.METADATA_INDEX_LOCATION));
+		// reset old index. This basically wipes it without deleting it. This way any current refs to it won't be broken
+		getIndexManager().resetIndex(URI.create(IJSIndexConstants.METADATA_INDEX_LOCATION));
 
 		JSIndexWriter indexer = new JSIndexWriter();
 
@@ -188,6 +188,6 @@ public class JSMetadataLoader extends MetadataLoader<JSMetadataReader>
 	@Override
 	protected Index getIndex()
 	{
-		return JSIndexQueryHelper.getIndex();
+		return JSIndexQueryHelper.getJSCoreIndex();
 	}
 }

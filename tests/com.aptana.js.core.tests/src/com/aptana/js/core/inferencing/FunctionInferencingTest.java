@@ -23,6 +23,7 @@ import com.aptana.js.core.index.JSFileIndexingParticipant;
 import com.aptana.js.core.index.JSIndexQueryHelper;
 import com.aptana.js.core.model.PropertyElement;
 import com.aptana.js.core.model.TypeElement;
+import com.aptana.js.internal.core.index.JSIndexReader;
 
 public class FunctionInferencingTest extends InferencingTestsBase
 {
@@ -91,8 +92,8 @@ public class FunctionInferencingTest extends InferencingTestsBase
 			part.index(new BuildContext(number), index, null);
 
 			// Now query for types
-			JSIndexQueryHelper helper = new JSIndexQueryHelper();
-			List<TypeElement> types = helper.getTypes(index);
+			JSIndexReader helper = new JSIndexReader();
+			List<TypeElement> types = helper.getTypes(index, true);
 			Map<String, TypeElement> blah = CollectionsUtil.mapFromValues(types, new IMap<TypeElement, String>()
 			{
 				public String map(TypeElement item)

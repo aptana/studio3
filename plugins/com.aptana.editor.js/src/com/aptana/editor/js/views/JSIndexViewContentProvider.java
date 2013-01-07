@@ -54,7 +54,7 @@ public class JSIndexViewContentProvider implements ITreeContentProvider
 
 			// @formatter:off
 			result = CollectionsUtil.newList(
-				new ClassGroupElement(Messages.JSIndexViewContentProvider_WorkspaceGroupLabel, JSIndexQueryHelper.getIndex()),
+				new ClassGroupElement(Messages.JSIndexViewContentProvider_WorkspaceGroupLabel, JSIndexQueryHelper.getJSCoreIndex()),
 				new ClassGroupElement(Messages.JSIndexViewContentProvider_ProjectGroupLabel, root.getIndex())
 			);
 			// @formatter:on

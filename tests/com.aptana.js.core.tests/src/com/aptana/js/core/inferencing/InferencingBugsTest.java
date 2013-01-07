@@ -13,6 +13,7 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.Path;
 
 import com.aptana.js.core.JSTypeConstants;
+import com.aptana.js.core.index.JSIndexQueryHelper;
 import com.aptana.js.core.inferencing.JSScope;
 import com.aptana.js.core.model.FunctionElement;
 import com.aptana.js.core.model.PropertyElement;
@@ -49,7 +50,7 @@ public class InferencingBugsTest extends InferencingTestsBase
 		JSScope globals = getGlobals(source);
 		JSScope scope = globals.getScopeAtOffset(1125);
 
-		JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(scope, getIndex(), getLocation());
+		JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(scope, getIndex(), getLocation(), new JSIndexQueryHelper(getIndex()));
 		PropertyElement property = symbolInferrer.getSymbolPropertyElement("m");
 		FunctionElement function = (FunctionElement) property;
 

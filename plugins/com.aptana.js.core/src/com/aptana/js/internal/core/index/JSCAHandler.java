@@ -398,6 +398,13 @@ public class JSCAHandler implements IContextHandler
 		// NOTE: It is assumed that the "name" property is always the first property on a type. This allows us to do the
 		// following.
 
+		// If type is a property explicitly hanging off Global, strip the name down
+		String globalPrefix = JSTypeConstants.GLOBAL_TYPE + "."; //$NON-NLS-1$
+		if (currentString.startsWith(globalPrefix))
+		{
+			currentString = currentString.substring(globalPrefix.length());
+		}
+
 		if (typesByName.containsKey(currentString))
 		{
 			// Use existing type if we've already created one for the current name

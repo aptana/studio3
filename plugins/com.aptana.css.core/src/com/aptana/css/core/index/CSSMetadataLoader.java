@@ -105,7 +105,7 @@ public class CSSMetadataLoader extends MetadataLoader<CSSMetadataReader>
 	protected void writeIndex(CSSMetadataReader reader)
 	{
 		// remove old index
-		getIndexManager().removeIndex(URI.create(ICSSIndexConstants.METADATA_INDEX_LOCATION));
+		getIndexManager().resetIndex(URI.create(ICSSIndexConstants.METADATA_INDEX_LOCATION));
 
 		CSSIndexWriter indexer = new CSSIndexWriter();
 

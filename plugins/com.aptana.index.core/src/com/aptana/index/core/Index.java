@@ -302,7 +302,7 @@ public class Index
 
 	private MemoryIndex memoryIndex;
 	private DiskIndex diskIndex;
-	private ReadWriteLock monitor;
+	ReadWriteLock monitor;
 	private URI containerURI;
 
 	/**
@@ -728,5 +728,17 @@ public class Index
 	public URI getRelativeDocumentPath(URI path)
 	{
 		return containerURI.relativize(path);
+	}
+
+	/**
+	 * Reset memory and disk indexes.
+	 * 
+	 * @throws IOException
+	 */
+	public void reset() throws IOException
+	{
+		this.memoryIndex = new MemoryIndex();
+		this.diskIndex = new DiskIndex(this.diskIndex.indexFile.getCanonicalPath());
+		this.diskIndex.initialize(false/* do not reuse the index file */);
 	}
 }

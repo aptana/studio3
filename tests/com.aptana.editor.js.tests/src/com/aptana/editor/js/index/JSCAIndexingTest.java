@@ -34,6 +34,7 @@ import com.aptana.js.core.index.JSCAFileIndexingParticipant;
 import com.aptana.js.core.index.JSIndexQueryHelper;
 import com.aptana.js.core.model.PropertyElement;
 import com.aptana.js.core.model.TypeElement;
+import com.aptana.js.internal.core.index.JSIndexReader;
 
 /**
  * JSCAIndexingTests
@@ -41,14 +42,13 @@ import com.aptana.js.core.model.TypeElement;
 public class JSCAIndexingTest extends JSEditorBasedTestCase
 {
 
-	private JSIndexQueryHelper queryHelper;
 	private URI uri;
 
 	private void assertProperties(Index index, String typeName, String... propertyNames)
 	{
 		for (String propertyName : propertyNames)
 		{
-			Collection<PropertyElement> property = queryHelper.getTypeMembers(index, typeName, propertyName);
+			Collection<PropertyElement> property = new JSIndexQueryHelper(index).getTypeMembers(typeName, propertyName);
 
 			assertNotNull(typeName + "." + propertyName + " does not exist", property);
 			assertFalse(typeName + "." + propertyName + " does not exist", property.isEmpty());
@@ -59,7 +59,7 @@ public class JSCAIndexingTest extends JSEditorBasedTestCase
 	{
 		for (String typeName : typeNames)
 		{
-			Collection<TypeElement> type = queryHelper.getTypes(index, typeName, false);
+			Collection<TypeElement> type = new JSIndexReader().getType(index, typeName, false);
 
 			assertNotNull(type);
 			assertFalse(type.isEmpty());
@@ -73,7 +73,7 @@ public class JSCAIndexingTest extends JSEditorBasedTestCase
 
 	private TypeElement assertTypeInIndex(Index index, String typeName, boolean includeMembers)
 	{
-		Collection<TypeElement> types = queryHelper.getTypes(index, typeName, includeMembers);
+		Collection<TypeElement> types = new JSIndexReader().getType(index, typeName, includeMembers);
 		assertNotNull("There should be at least one type for " + typeName, types);
 		assertEquals("There should be one type for " + typeName, 1, types.size());
 
@@ -115,7 +115,6 @@ public class JSCAIndexingTest extends JSEditorBasedTestCase
 	{
 		super.setUp();
 
-		queryHelper = new JSIndexQueryHelper();
 		uri = null;
 	}
 
@@ -132,8 +131,6 @@ public class JSCAIndexingTest extends JSEditorBasedTestCase
 			uri = null;
 		}
 
-		queryHelper = null;
-
 		super.tearDown();
 	}
 
@@ -145,7 +142,7 @@ public class JSCAIndexingTest extends JSEditorBasedTestCase
 		assertTypes(index, "SimpleType");
 
 		// check for global
-		Collection<PropertyElement> global = queryHelper.getGlobals(index, null, null, "SimpleType");
+		Collection<PropertyElement> global = new JSIndexQueryHelper(index).getGlobals(null, "SimpleType");
 		assertNotNull(global);
 		assertFalse(global.isEmpty());
 	}
@@ -158,7 +155,7 @@ public class JSCAIndexingTest extends JSEditorBasedTestCase
 		assertTypes(index, "SimpleType");
 
 		// check for global
-		Collection<PropertyElement> global = queryHelper.getGlobals(index, null, null, "SimpleType");
+		Collection<PropertyElement> global = new JSIndexQueryHelper(index).getGlobals(null, "SimpleType");
 		assertNotNull(global);
 		assertTrue(global.isEmpty());
 	}
@@ -184,7 +181,7 @@ public class JSCAIndexingTest extends JSEditorBasedTestCase
 		assertTypes(index, "com", "com.aptana", "com.aptana.SimpleType");
 
 		// check for global
-		Collection<PropertyElement> global = queryHelper.getGlobals(index, null, null, "com");
+		Collection<PropertyElement> global = new JSIndexQueryHelper(index).getGlobals(null, "com");
 		assertNotNull(global);
 		assertTrue(global.isEmpty());
 	}

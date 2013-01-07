@@ -109,7 +109,7 @@ public class HTMLMetadataLoader extends MetadataLoader<HTMLMetadataReader>
 	protected void writeIndex(HTMLMetadataReader reader)
 	{
 		// remove old index
-		getIndexManager().removeIndex(URI.create(IHTMLIndexConstants.METADATA_INDEX_LOCATION));
+		getIndexManager().resetIndex(URI.create(IHTMLIndexConstants.METADATA_INDEX_LOCATION));
 
 		HTMLIndexWriter indexer = new HTMLIndexWriter();
 

@@ -17,7 +17,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 
 import com.aptana.core.util.CollectionsUtil;
-import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.IndexPlugin;
 import com.aptana.index.core.ui.views.IActionProvider;
@@ -74,9 +73,8 @@ public class JSIndexViewActionProvider implements IActionProvider
 					{
 						IProject project = (IProject) input;
 
-						Index index = getIndexManager().getIndex(project.getLocationURI());
-						JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
-						Collection<TypeElement> types = queryHelper.getTypes(index, typeNames.get(0), true);
+						JSIndexQueryHelper queryHelper = new JSIndexQueryHelper(project);
+						Collection<TypeElement> types = queryHelper.getTypes(typeNames.get(0), true);
 						List<ClassElement> classes = JSTypeUtil.typesToClasses(types);
 
 						if (!CollectionsUtil.isEmpty(classes))

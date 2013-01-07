@@ -22,6 +22,7 @@ import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.text.JSFlexLexemeProvider;
 import com.aptana.index.core.Index;
 import com.aptana.js.core.JSTypeConstants;
+import com.aptana.js.core.index.JSIndexQueryHelper;
 import com.aptana.js.core.inferencing.JSNodeTypeInferrer;
 import com.aptana.js.core.inferencing.JSScope;
 import com.aptana.js.core.inferencing.JSTypeMapper;
@@ -417,7 +418,7 @@ public class ParseUtil
 	}
 
 	/**
-	 * getParentObjectTypes
+	 * Infers types for the receiver in a getProperty call. (receiver.property)
 	 * 
 	 * @param projectIndex
 	 * @param fileURI
@@ -425,14 +426,16 @@ public class ParseUtil
 	 * @param getPropertyNode
 	 * @param offset
 	 * @return
+	 * FIXME This is ugly stuff. Can I refactor to what makes sense and properly holds onto an index query helper?
 	 */
-	public static List<String> getParentObjectTypes(Index projectIndex, URI fileURI, IParseNode targetNode,
+	public static List<String> getReceiverTypeNames(JSIndexQueryHelper queryHelper, Index projectIndex, URI fileURI, IParseNode targetNode,
 			JSGetPropertyNode getPropertyNode, int offset)
 	{
 		List<String> result = new ArrayList<String>();
 
 		if (getPropertyNode != null)
 		{
+			// collect the scope for the target node
 			JSScope localScope = ParseUtil.getScopeAtOffset(targetNode, offset);
 
 			if (localScope != null)
@@ -441,10 +444,10 @@ public class ParseUtil
 
 				// lookup in current file
 				IParseNode lhs = getPropertyNode.getLeftHandSide();
-
+				// Infer types for the receiver
 				if (lhs instanceof JSNode)
 				{
-					JSNodeTypeInferrer typeWalker = new JSNodeTypeInferrer(localScope, projectIndex, fileURI);
+					JSNodeTypeInferrer typeWalker = new JSNodeTypeInferrer(localScope, projectIndex, fileURI, queryHelper);
 					typeWalker.visit((JSNode) lhs);
 					typeList = typeWalker.getTypes();
 				}

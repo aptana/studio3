@@ -15,6 +15,8 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.Path;
 
+import com.aptana.index.core.Index;
+import com.aptana.js.core.index.JSIndexQueryHelper;
 import com.aptana.js.core.inferencing.JSNodeTypeInferrer;
 import com.aptana.js.core.inferencing.JSPropertyCollection;
 import com.aptana.js.core.inferencing.JSScope;
@@ -100,7 +102,8 @@ public class ScopeTest extends FileContentBasedTestCase
 
 		for (JSNode node : nodes)
 		{
-			JSNodeTypeInferrer typeWalker = new JSNodeTypeInferrer(symbols, null, null);
+			JSNodeTypeInferrer typeWalker = new JSNodeTypeInferrer(symbols, null, null, new JSIndexQueryHelper(
+					(Index) null));
 
 			typeWalker.visit(node);
 

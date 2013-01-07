@@ -45,7 +45,7 @@ public class IndexBuildParticipant extends RequiredBuildParticipant
 			{
 				logTrace(MessageFormat.format("Cleaning index for project ''{0}'' ({1})", project.getName(), uri)); //$NON-NLS-1$
 			}
-			getIndexManager().removeIndex(uri);
+			getIndexManager().resetIndex(uri);
 		}
 		index_trace_enabled = IdeLog.isTraceEnabled(BuildPathCorePlugin.getDefault(), IDebugScopes.BUILDER_INDEXER);
 		advanced_trace_enabled = IdeLog.isTraceEnabled(BuildPathCorePlugin.getDefault(), IDebugScopes.BUILDER_ADVANCED);
