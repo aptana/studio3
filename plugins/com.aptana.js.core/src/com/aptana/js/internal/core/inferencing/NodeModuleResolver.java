@@ -58,11 +58,6 @@ public class NodeModuleResolver extends AbstractRequireResolver
 	private IPath location;
 
 	/**
-	 * Cache the path to NPM modules directory. There's no way to bust the cache and update it, currently.
-	 */
-	private IPath fModulesPath;
-
-	/**
 	 * Cache the node src path, listen for changes to update it
 	 */
 	private IPreferenceChangeListener fNodeSrcPathListener;
@@ -264,11 +259,7 @@ public class NodeModuleResolver extends AbstractRequireResolver
 
 	protected synchronized IPath getModulesPath() throws CoreException
 	{
-		if (fModulesPath == null)
-		{
-			fModulesPath = JSCorePlugin.getDefault().getNodePackageManager().getModulesPath();
-		}
-		return fModulesPath;
+		return JSCorePlugin.getDefault().getNodePackageManager().getModulesPath();
 	}
 
 	public boolean applies(IProject project, IPath currentDirectory, IPath indexRoot)

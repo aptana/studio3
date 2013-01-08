@@ -98,6 +98,11 @@ public class NodePackageManager implements INodePackageManager
 
 	private IPath npmPath;
 
+	/**
+	 * Cached value for NPM's "prefix" config value (where modules get installed).
+	 */
+	private IPath fConfigPrefixPath;
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.appcelerator.titanium.nodejs.core.INodePackageManager#install(com.appcelerator.titanium.nodejs.core.
@@ -425,14 +430,20 @@ public class NodePackageManager implements INodePackageManager
 		return prefix.append(LIB).append(NODE_MODULES);
 	}
 
-	public IPath getConfigPrefixPath() throws CoreException
+	public synchronized IPath getConfigPrefixPath() throws CoreException
 	{
-		String npmConfigPrefixPath = ShellExecutable.getEnvironment().get(NPM_CONFIG_PREFIX);
-		if (npmConfigPrefixPath != null)
+		if (fConfigPrefixPath == null)
 		{
-			return Path.fromOSString(npmConfigPrefixPath);
+			String npmConfigPrefixPath = ShellExecutable.getEnvironment().get(NPM_CONFIG_PREFIX);
+			if (npmConfigPrefixPath != null)
+			{
+				fConfigPrefixPath = Path.fromOSString(npmConfigPrefixPath);
+			}
+			else
+			{
+				fConfigPrefixPath = Path.fromOSString(getConfigValue(PREFIX));
+			}
 		}
-
-		return Path.fromOSString(getConfigValue(PREFIX));
+		return fConfigPrefixPath;
 	}
 }
