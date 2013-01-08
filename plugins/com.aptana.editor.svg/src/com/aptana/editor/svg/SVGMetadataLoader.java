@@ -69,7 +69,7 @@ public class SVGMetadataLoader extends Job
 			URI metadataLocation = URI.create(keyProvider.getMetadataLocation());
 
 			// remove old index
-			getIndexManager().removeIndex(metadataLocation);
+			getIndexManager().resetIndex(metadataLocation);
 
 			// grab DTD source
 			InputStream stream = FileLocator.openStream(Platform.getBundle(SVGPlugin.PLUGIN_ID), new Path(SVG_DTD),

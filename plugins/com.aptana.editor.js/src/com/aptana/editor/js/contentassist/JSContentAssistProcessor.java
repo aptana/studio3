@@ -41,6 +41,7 @@ import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.common.util.EditorUtil;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSSourceConfiguration;
+import com.aptana.editor.js.internal.JSModelUtil;
 import com.aptana.editor.js.text.JSFlexLexemeProvider;
 import com.aptana.index.core.Index;
 import com.aptana.js.core.IJSConstants;
@@ -150,8 +151,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	public JSContentAssistProcessor(AbstractThemeableEditor editor)
 	{
 		super(editor);
-
-		indexHelper = new JSIndexQueryHelper();
 	}
 
 	/**
@@ -165,25 +164,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		this(editor);
 
 		this.activeRange = activeRange;
-	}
-
-	/**
-	 * addCoreGlobals
-	 * 
-	 * @param proposals
-	 * @param offset
-	 */
-	private void addCoreGlobals(Set<ICompletionProposal> proposals, int offset)
-	{
-		Collection<PropertyElement> globals = indexHelper.getCoreGlobals(getProject(), getFilename());
-
-		if (!CollectionsUtil.isEmpty(globals))
-		{
-			for (PropertyElement property : CollectionsUtil.filter(globals, isVisibleFilter))
-			{
-				addProposal(proposals, property, offset, null, Messages.JSContentAssistProcessor_KeywordLocation);
-			}
-		}
 	}
 
 	/**
@@ -223,7 +203,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 				for (String type : param.getTypes())
 				{
-					Collection<PropertyElement> properties = indexHelper.getTypeProperties(getIndex(), type);
+					Collection<PropertyElement> properties = getQueryHelper().getTypeProperties(type);
 
 					for (PropertyElement property : CollectionsUtil.filter(properties, isVisibleFilter))
 					{
@@ -240,9 +220,9 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param proposals
 	 * @param offset
 	 */
-	private void addProjectGlobals(Set<ICompletionProposal> proposals, int offset)
+	private void addGlobals(Set<ICompletionProposal> proposals, int offset)
 	{
-		Collection<PropertyElement> projectGlobals = indexHelper.getGlobals(getIndex(), getProject(), getFilename());
+		Collection<PropertyElement> projectGlobals = getQueryHelper().getGlobals(getFilename());
 
 		if (!CollectionsUtil.isEmpty(projectGlobals))
 		{
@@ -251,6 +231,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 			for (PropertyElement property : CollectionsUtil.filter(projectGlobals, isVisibleFilter))
 			{
+				// TODO Use Messages.JSContentAssistProcessor_KeywordLocation for core stuff!
 				String location = null;
 				List<String> documents = property.getDocuments();
 				if (!CollectionsUtil.isEmpty(documents))
@@ -554,7 +535,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 						IParseNode rhs = assignment.getRightHandSide();
 						String name = lhs.getLastChild().getText();
 
-						JSNodeTypeInferrer nodeInferrer = new JSNodeTypeInferrer(localScope, index, location);
+						JSNodeTypeInferrer nodeInferrer = new JSNodeTypeInferrer(localScope, index, location,
+								getQueryHelper());
 						((JSNode) rhs).accept(nodeInferrer);
 						List<String> types = nodeInferrer.getTypes();
 
@@ -633,16 +615,14 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	@SuppressWarnings("unchecked")
 	protected void addTypeProperties(Set<ICompletionProposal> proposals, String typeName, int offset)
 	{
-		Index index = getIndex();
-
 		// grab all ancestors of the specified type
-		List<String> allTypes = indexHelper.getTypeAncestorNames(index, typeName);
+		List<String> allTypes = getQueryHelper().getTypeAncestorNames(typeName);
 
 		// include the type in the list as well
 		allTypes.add(0, typeName);
 
 		// add properties and methods
-		Collection<PropertyElement> properties = indexHelper.getTypeMembers(index, allTypes);
+		Collection<PropertyElement> properties = getQueryHelper().getTypeMembers(allTypes);
 		URI projectURI = getProjectURI();
 		for (PropertyElement property : CollectionsUtil.filter(properties, new ChainedFilter<PropertyElement>(
 				isNotConstructorFilter, isVisibleFilter)))
@@ -660,7 +640,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	@Override
 	public IContextInformation[] computeContextInformation(ITextViewer viewer, int offset)
 	{
-		List<IContextInformation> result = new ArrayList<IContextInformation>();
+		List<IContextInformation> result = new ArrayList<IContextInformation>(2);
 		FunctionElement function = getFunctionElement(viewer, offset);
 
 		if (function != null)
@@ -756,8 +736,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			case IN_GLOBAL:
 			case IN_CONSTRUCTOR:
 				addKeywords(result, offset);
-				addCoreGlobals(result, offset);
-				addProjectGlobals(result, offset);
+				addGlobals(result, offset);
 				addSymbolsInScope(result, offset);
 				break;
 
@@ -794,6 +773,15 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 
 		return resultList;
+	}
+
+	protected JSIndexQueryHelper getQueryHelper()
+	{
+		if (indexHelper == null)
+		{
+			indexHelper = JSModelUtil.createQueryHelper(editor);
+		}
+		return indexHelper;
 	}
 
 	/**
@@ -925,73 +913,63 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	private FunctionElement getFunctionElement(ITextViewer viewer, int offset)
 	{
-		JSArgumentsNode node = getArgumentsNode(offset);
-		FunctionElement result = null;
-
 		// process arguments node as long as we're not to the left of the opening parenthesis
-		if (node != null)
+		JSArgumentsNode node = getArgumentsNode(offset);
+		if (node == null)
 		{
-			// save current replace range. A bit hacky but better than adding a flag into getLocation's signature
-			IRange range = replaceRange;
-
-			// grab the content assist location type for the symbol before the arguments list
-			int functionOffset = node.getStartingOffset();
-			LocationType location = getLocationType(viewer.getDocument(), functionOffset);
-
-			// restore replace range
-			replaceRange = range;
-
-			// init type and method names
-			String typeName = null;
-			String methodName = null;
-
-			switch (location)
-			{
-				case IN_VARIABLE_NAME:
-				{
-					typeName = JSTypeUtil.getGlobalType(getProject(), getFilename());
-					methodName = node.getParent().getFirstChild().getText();
-					break;
-				}
-
-				case IN_PROPERTY_NAME:
-				{
-					JSGetPropertyNode propertyNode = ParseUtil.getGetPropertyNode(node,
-							((JSNode) node).getContainingStatementNode());
-					List<String> types = getParentObjectTypes(propertyNode, offset);
-
-					if (types.size() > 0)
-					{
-						typeName = types.get(0);
-						methodName = propertyNode.getLastChild().getText();
-					}
-					break;
-				}
-
-				default:
-					break;
-			}
-
-			if (typeName != null && methodName != null)
-			{
-				Collection<PropertyElement> properties = indexHelper.getTypeMembers(getIndex(), typeName, methodName);
-
-				if (properties != null)
-				{
-					// TODO: Should we do anything special if there is more than one function?
-					for (PropertyElement property : properties)
-					{
-						if (property instanceof FunctionElement)
-						{
-							result = (FunctionElement) property;
-							break;
-						}
-					}
-				}
-			}
+			return null;
 		}
 
-		return result;
+		// save current replace range. A bit hacky but better than adding a flag into getLocation's signature
+		IRange range = replaceRange;
+
+		// grab the content assist location type for the symbol before the arguments list
+		int functionOffset = node.getStartingOffset();
+		LocationType location = getLocationType(viewer.getDocument(), functionOffset);
+
+		// restore replace range
+		replaceRange = range;
+
+		// init type and method names
+		String typeName = null;
+		String methodName = null;
+
+		switch (location)
+		{
+			case IN_VARIABLE_NAME:
+			{
+				typeName = JSTypeUtil.getGlobalType(getProject(), getFilename());
+				methodName = node.getParent().getFirstChild().getText();
+				break;
+			}
+
+			case IN_PROPERTY_NAME:
+			{
+				JSGetPropertyNode propertyNode = ParseUtil.getGetPropertyNode(node,
+						((JSNode) node).getContainingStatementNode());
+				List<String> types = getParentObjectTypes(propertyNode, offset);
+
+				if (types.size() > 0)
+				{
+					typeName = types.get(0);
+					methodName = propertyNode.getLastChild().getText();
+				}
+				break;
+			}
+
+			default:
+				break;
+		}
+
+		if (typeName != null && methodName != null)
+		{
+			// TODO Extract this out to a method on query helper? Seems like something we'd do pretty often - search for
+			// a function up the typer hierarchy, returning when we find our first match
+			JSIndexQueryHelper helper = getQueryHelper();
+			return helper.findFunctionInHierarchy(typeName, methodName);
+		}
+
+		return null;
 	}
 
 	/**
@@ -1223,7 +1201,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	protected List<String> getParentObjectTypes(JSGetPropertyNode node, int offset)
 	{
-		return ParseUtil.getParentObjectTypes(getIndex(), getURI(), targetNode, node, offset);
+		return ParseUtil.getReceiverTypeNames(getQueryHelper(), getIndex(), getURI(), targetNode, node, offset);
 	}
 
 	/*

@@ -21,15 +21,11 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
-import com.aptana.core.IFilter;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.URIUtil;
 import com.aptana.index.core.Index;
-import com.aptana.index.core.QueryResult;
-import com.aptana.index.core.SearchPattern;
 import com.aptana.js.core.JSTypeConstants;
-import com.aptana.js.core.index.IJSIndexConstants;
 import com.aptana.js.core.index.JSIndexQueryHelper;
 import com.aptana.js.core.model.FunctionElement;
 import com.aptana.js.core.model.PropertyElement;
@@ -77,22 +73,14 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	private JSIndexQueryHelper _queryHelper;
 
 	/**
-	 * JSNodeTypeInferrer
-	 * 
 	 * @param scope
 	 * @param projectIndex
+	 *            The current index we're dealing with.
 	 * @param location
-	 */
-	public JSNodeTypeInferrer(JSScope scope, Index projectIndex, URI location)
-	{
-		this(scope, projectIndex, location, new JSIndexQueryHelper());
-	}
-
-	/**
-	 * @param scope
-	 * @param projectIndex
-	 * @param location
+	 *            The current file/location we're dealing with.
 	 * @param queryHelper
+	 *            the query helper. The object we can ask for types/functions/etc. Contains knowledge of the build
+	 *            paths.
 	 */
 	public JSNodeTypeInferrer(JSScope scope, Index projectIndex, URI location, JSIndexQueryHelper queryHelper)
 	{
@@ -457,7 +445,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 
 			for (String typeName : returnTypes)
 			{
-				Collection<PropertyElement> properties = this._queryHelper.getTypeMembers(this._index, typeName,
+				Collection<PropertyElement> properties = this._queryHelper.getTypeMembers(typeName,
 						JSTypeConstants.PROTOTYPE_PROPERTY);
 
 				if (properties != null)
@@ -578,8 +566,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 				}
 
 				// lookup up rhs name in type and add that value's type here
-				Collection<PropertyElement> properties = this._queryHelper.getTypeMembers(this._index, typeName,
-						memberName);
+				Collection<PropertyElement> properties = this._queryHelper.getTypeMembers(typeName, memberName);
 
 				if (properties != null)
 				{
@@ -645,7 +632,8 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 			else
 			{
 				// Check the local scope for type first
-				JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(this._scope, this._index, this._location);
+				JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(this._scope, this._index,
+						this._location, this._queryHelper);
 				PropertyElement property = symbolInferrer.getSymbolPropertyElement(name);
 				if (property != null)
 				{
@@ -655,14 +643,14 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 				else
 				{
 					// No match in the local scope, query the globals in index
-					properties = this._queryHelper.getGlobals(this._index, getProject(), getFileName(), name);
+					properties = this._queryHelper.getGlobals(getFileName(), name);
 				}
 			}
 		}
 		else
 		{
 			// Scope says it doesn't has a symbol with that name, so query the globals in index
-			properties = this._queryHelper.getGlobals(this._index, getProject(), getFileName(), name);
+			properties = this._queryHelper.getGlobals(getFileName(), name);
 		}
 
 		// Hopefully we found at least one match...
@@ -732,10 +720,10 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 					if (arg instanceof JSStringNode)
 					{
 						JSStringNode string = (JSStringNode) arg;
-						String text = StringUtil.stripQuotes(string.getText());
+						String moduleId = StringUtil.stripQuotes(string.getText());
 
-						IPath absolutePath = resolve(text);
-						String typeName = getModuleType(text, absolutePath);
+						IPath absolutePath = resolve(moduleId);
+						String typeName = _queryHelper.getModuleType(absolutePath);
 						if (typeName != null)
 						{
 							this.addType(typeName);
@@ -795,40 +783,6 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 				.removeLastSegments(1), Path.fromPortableString(_index.getRoot().getPath()));
 	}
 
-	/**
-	 * Determines the name of the type holding the object exported for the module.
-	 * 
-	 * @param moduleId
-	 * @param absolutePath
-	 * @return
-	 */
-	private String getModuleType(String moduleId, IPath absolutePath)
-	{
-		if (absolutePath == null || absolutePath.isEmpty() || StringUtil.isEmpty(moduleId))
-		{
-			return null;
-		}
-
-		// Look up our mapping from generated type names to documents
-		List<QueryResult> results = _index.query(new String[] { IJSIndexConstants.MODULE_DEFINITION }, "*", //$NON-NLS-1$
-				SearchPattern.PATTERN_MATCH);
-		final String fileURI = absolutePath.toFile().toURI().toString();
-		// Find the module declared in the file we resolved to...
-		QueryResult match = CollectionsUtil.find(results, new IFilter<QueryResult>()
-		{
-			public boolean include(QueryResult item)
-			{
-				return item.getDocuments().contains(fileURI);
-			}
-		});
-		if (match == null)
-		{
-			return null;
-		}
-		// Now use the stored generated type name...
-		return match.getWord() + ".exports"; //$NON-NLS-1$
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSNumberNode)
@@ -856,7 +810,8 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 			symbol.addValue(node);
 
 			// infer type
-			JSSymbolTypeInferrer inferrer = new JSSymbolTypeInferrer(this._scope, this._index, this._location);
+			JSSymbolTypeInferrer inferrer = new JSSymbolTypeInferrer(this._scope, this._index, this._location,
+					this._queryHelper);
 			Set<String> types = new LinkedHashSet<String>();
 
 			inferrer.processProperties(symbol, types);

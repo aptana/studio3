@@ -53,6 +53,8 @@ public class JSSymbolTypeInferrer
 
 	private JSIndexWriter writer;
 
+	private JSIndexQueryHelper queryHelper;
+
 	/**
 	 * generateType
 	 * 
@@ -130,17 +132,19 @@ public class JSSymbolTypeInferrer
 	}
 
 	/**
-	 * JSSymbolTypeInferrer
-	 * 
 	 * @param activeScope
 	 * @param index
 	 * @param location
+	 *            The current file/location
+	 * @param queryHelper
+	 *            The query helper that knows the build path order. We can lookup types/etc from it.
 	 */
-	public JSSymbolTypeInferrer(JSScope activeScope, Index index, URI location)
+	public JSSymbolTypeInferrer(JSScope activeScope, Index index, URI location, JSIndexQueryHelper queryHelper)
 	{
 		this.index = index;
 		this.activeScope = activeScope;
 		this.location = location;
+		this.queryHelper = queryHelper;
 	}
 
 	/**
@@ -390,20 +394,18 @@ public class JSSymbolTypeInferrer
 	 */
 	private Map<String, PropertyElement> getTypePropertyMap(Set<String> types)
 	{
-		JSIndexQueryHelper helper = new JSIndexQueryHelper();
-
 		// create a unique set of type names and their ancestor types
 		Set<String> ancestors = new HashSet<String>();
 
 		for (String type : types)
 		{
 			ancestors.add(type);
-			ancestors.addAll(helper.getTypeAncestorNames(index, type));
+			ancestors.addAll(queryHelper.getTypeAncestorNames(type));
 		}
 
 		// grab property elements for all collected types
 		List<String> typesAndAncestors = new ArrayList<String>(ancestors);
-		Collection<PropertyElement> typeMembers = helper.getTypeMembers(index, typesAndAncestors);
+		Collection<PropertyElement> typeMembers = queryHelper.getTypeMembers(typesAndAncestors);
 
 		// generate map of property name to its property element
 		Map<String, PropertyElement> propertyMap = new HashMap<String, PropertyElement>();
@@ -507,7 +509,7 @@ public class JSSymbolTypeInferrer
 
 					if (!docs.hasTag(TagType.RETURN))
 					{
-						JSNodeTypeInferrer inferrer = new JSNodeTypeInferrer(activeScope, index, location);
+						JSNodeTypeInferrer inferrer = new JSNodeTypeInferrer(activeScope, index, location, queryHelper);
 
 						// infer return type
 						property.addType(JSTypeConstants.FUNCTION_TYPE);
@@ -533,7 +535,7 @@ public class JSSymbolTypeInferrer
 			else
 			{
 				// infer the node's type
-				JSNodeTypeInferrer inferrer = new JSNodeTypeInferrer(activeScope, index, location);
+				JSNodeTypeInferrer inferrer = new JSNodeTypeInferrer(activeScope, index, location, queryHelper);
 
 				if (value instanceof JSObjectNode)
 				{

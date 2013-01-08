@@ -55,19 +55,17 @@ public class SDocMLFileIndexingParticipant extends AbstractFileIndexingParticipa
 				reader.loadXML(stream, context.getURI().toString());
 				sub.worked(45);
 
-				// create new Window type for this file
+				// create new Global type for this file
 				JSIndexReader jsir = new JSIndexReader();
-				String globalTypeName = JSTypeUtil.getGlobalType(context.getProject(), context.getName());
-				List<TypeElement> windows = jsir.getType(index, globalTypeName, true);
-				TypeElement window;
-
-				if (!CollectionsUtil.isEmpty(windows))
+				List<TypeElement> globalTypes = jsir.getType(index, JSTypeConstants.GLOBAL_TYPE, true);
+				TypeElement globalTypeElement;
+				if (!CollectionsUtil.isEmpty(globalTypes))
 				{
-					window = windows.get(windows.size() - 1);
+					globalTypeElement = globalTypes.get(globalTypes.size() - 1);
 				}
 				else
 				{
-					window = JSTypeUtil.createGlobalType(globalTypeName);
+					globalTypeElement = JSTypeUtil.createGlobalType(JSTypeConstants.GLOBAL_TYPE);
 				}
 
 				// process results
@@ -100,7 +98,7 @@ public class SDocMLFileIndexingParticipant extends AbstractFileIndexingParticipa
 							{
 								// remove the constructor and make it a global function
 								type.removeProperty(constructor);
-								window.addProperty(constructor);
+								globalTypeElement.addProperty(constructor);
 							}
 
 							// wrap the type name in Function<> and update the property owningType references to
@@ -116,7 +114,7 @@ public class SDocMLFileIndexingParticipant extends AbstractFileIndexingParticipa
 						}
 						else
 						{
-							PropertyElement property = window.getProperty(typeName);
+							PropertyElement property = globalTypeElement.getProperty(typeName);
 
 							if (property == null)
 							{
@@ -126,7 +124,7 @@ public class SDocMLFileIndexingParticipant extends AbstractFileIndexingParticipa
 								property.addType(typeName);
 								property.setHasAllUserAgents();
 
-								window.addProperty(property);
+								globalTypeElement.addProperty(property);
 							}
 						}
 					}
@@ -140,7 +138,7 @@ public class SDocMLFileIndexingParticipant extends AbstractFileIndexingParticipa
 					String typeName = alias.getType();
 
 					// NOTE: we currently assume we can only alias types that were encountered in this sdocml file
-					PropertyElement property = window.getProperty(typeName);
+					PropertyElement property = globalTypeElement.getProperty(typeName);
 
 					if (property != null)
 					{
@@ -165,11 +163,11 @@ public class SDocMLFileIndexingParticipant extends AbstractFileIndexingParticipa
 						property.addType(typeName);
 					}
 
-					window.addProperty(property);
+					globalTypeElement.addProperty(property);
 				}
 
 				// write global type info
-				indexer.writeType(index, window, location);
+				indexer.writeType(index, globalTypeElement, location);
 			}
 			catch (Throwable e)
 			{

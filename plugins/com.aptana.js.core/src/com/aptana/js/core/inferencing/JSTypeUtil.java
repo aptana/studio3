@@ -734,6 +734,11 @@ public class JSTypeUtil
 
 	public static String getGlobalType(IProject project, String fileName)
 	{
+		// How are we really supposed to determine this? for PHP/HTML/ERB we _know_ it's Window. For JS/JSCA/SDOCML, we
+		// don't really ever know.
+		// For now, we can just assume any types defined in files hang off "Global", but when looking up APIs we need to
+		// determine the correct one...
+
 		// If the file is HTML/PHP/ERB, assume Window. We cheat by checking if _not_ associated with JS
 		if (fileName != null)
 		{

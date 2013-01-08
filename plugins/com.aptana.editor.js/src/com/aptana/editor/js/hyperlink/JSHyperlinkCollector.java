@@ -29,6 +29,7 @@ import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.contentassist.JSLocationIdentifier;
 import com.aptana.editor.js.contentassist.LocationType;
 import com.aptana.editor.js.contentassist.ParseUtil;
+import com.aptana.editor.js.internal.JSModelUtil;
 import com.aptana.index.core.Index;
 import com.aptana.js.core.index.JSIndexQueryHelper;
 import com.aptana.js.core.inferencing.JSPropertyCollection;
@@ -71,6 +72,8 @@ public class JSHyperlinkCollector extends JSTreeWalker
 	 * A collection of hyperlinks recognized by this instance
 	 */
 	private Set<IJSHyperlink> hyperlinks = new TreeSet<IJSHyperlink>();
+
+	private JSIndexQueryHelper indexHelper;
 
 	/**
 	 * JSHyperlinkCollector
@@ -389,7 +392,7 @@ public class JSHyperlinkCollector extends JSTreeWalker
 		{
 			// determine location type at the offset
 			JSLocationIdentifier identifier = new JSLocationIdentifier(offset, node);
-			((JSParseRootNode) ast).accept(identifier);
+			ast.accept(identifier);
 			LocationType type = identifier.getType();
 
 			switch (type)
@@ -425,23 +428,30 @@ public class JSHyperlinkCollector extends JSTreeWalker
 	protected void processProperty(JSIdentifierNode node, JSGetPropertyNode propertyNode)
 	{
 		List<PropertyElement> elements = new ArrayList<PropertyElement>();
+		JSIndexQueryHelper queryHelper = createQueryHelper();
 		Index index = EditorUtil.getIndex(editor);
 		URI editorURI = EditorUtil.getURI(editor);
-		List<String> types = ParseUtil.getParentObjectTypes(index, editorURI, node, propertyNode, offset);
-
+		List<String> types = ParseUtil.getReceiverTypeNames(queryHelper, index, editorURI, node, propertyNode, offset);
 		if (!CollectionsUtil.isEmpty(types))
 		{
-			JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
-
 			for (String typeName : types)
 			{
-				Collection<PropertyElement> members = queryHelper.getTypeMembers(index, typeName, node.getText());
+				Collection<PropertyElement> members = queryHelper.getTypeMembers(typeName, node.getText());
 
 				elements.addAll(members);
 			}
 		}
 
 		processPropertyElements(elements, node);
+	}
+
+	protected synchronized JSIndexQueryHelper createQueryHelper()
+	{
+		if (indexHelper == null)
+		{
+			indexHelper = JSModelUtil.createQueryHelper(editor);
+		}
+		return indexHelper;
 	}
 
 	/**
@@ -510,9 +520,8 @@ public class JSHyperlinkCollector extends JSTreeWalker
 	 */
 	protected void processVariable(JSIdentifierNode node)
 	{
-		JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
-		Collection<PropertyElement> elements = queryHelper.getGlobals(EditorUtil.getIndex(editor),
-				EditorUtil.getProject(editor), EditorUtil.getFileName(editor), node.getText());
+		JSIndexQueryHelper queryHelper = createQueryHelper();
+		Collection<PropertyElement> elements = queryHelper.getGlobals(EditorUtil.getFileName(editor), node.getText());
 
 		processPropertyElements(elements, node);
 	}

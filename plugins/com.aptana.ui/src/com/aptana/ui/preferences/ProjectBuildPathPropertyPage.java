@@ -265,10 +265,11 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 		{
 			BuildPathManager.getInstance().setBuildPaths(project, entries);
 
-			// rebuild project index
-			RebuildIndexJob job = new RebuildIndexJob(project.getLocationURI());
-
-			job.run(new NullProgressMonitor());
+//			// FIXME We shouldn't be doing this in the UI thread! Prompt to rebuild after like we do with validators!
+//			// rebuild project index
+//			RebuildIndexJob job = new RebuildIndexJob(project.getLocationURI());
+//
+//			job.run(new NullProgressMonitor());
 		}
 
 		return true;

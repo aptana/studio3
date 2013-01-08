@@ -80,17 +80,15 @@ public class JSCAFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 			// create new Window type for this file
 			JSIndexReader jsir = new JSIndexReader();
-			String globalTypeName = JSTypeUtil.getGlobalType(context.getProject(), context.getName());
-			List<TypeElement> windows = jsir.getType(index, globalTypeName, true);
-			TypeElement window;
-
-			if (!CollectionsUtil.isEmpty(windows))
+			List<TypeElement> globalTypes = jsir.getType(index, JSTypeConstants.GLOBAL_TYPE, true);
+			TypeElement global;
+			if (!CollectionsUtil.isEmpty(globalTypes))
 			{
-				window = windows.get(windows.size() - 1);
+				global = globalTypes.get(globalTypes.size() - 1);
 			}
 			else
 			{
-				window = JSTypeUtil.createGlobalType(globalTypeName);
+				global = JSTypeUtil.createGlobalType(JSTypeConstants.GLOBAL_TYPE);
 			}
 
 			// process results
@@ -107,7 +105,7 @@ public class JSCAFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 				if (isGlobalProperty(type))
 				{
-					PropertyElement property = window.getProperty(typeName);
+					PropertyElement property = global.getProperty(typeName);
 
 					if (property == null)
 					{
@@ -116,7 +114,7 @@ public class JSCAFileIndexingParticipant extends AbstractFileIndexingParticipant
 						property.setName(typeName);
 						property.addType(typeName);
 
-						window.addProperty(property);
+						global.addProperty(property);
 					}
 				}
 			}
@@ -128,13 +126,13 @@ public class JSCAFileIndexingParticipant extends AbstractFileIndexingParticipant
 				property.setName(alias.getName());
 				property.addType(alias.getType());
 
-				window.addProperty(property);
+				global.addProperty(property);
 			}
 
 			// write global type info
-			if (window.hasProperties())
+			if (global.hasProperties())
 			{
-				indexer.writeType(index, window, location);
+				indexer.writeType(index, global, location);
 			}
 		}
 		catch (Throwable e)
