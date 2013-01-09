@@ -97,7 +97,6 @@ class RepositorySelectionPage extends WizardPage
 		setDescription(Messages.RepositorySelectionPage_Description);
 	}
 
-	@SuppressWarnings("unused")
 	public void createControl(Composite parent)
 	{
 		Composite main = new Composite(parent, SWT.NONE);
@@ -116,7 +115,7 @@ class RepositorySelectionPage extends WizardPage
 
 		// Button and combo for github
 		fromGithub = new Button(main, SWT.RADIO);
-		fromGithub.setText("Github: ");
+		fromGithub.setText(StringUtil.makeFormLabel(Messages.RepositorySelectionPage_LBL_Github));
 		fromGithub.setEnabled(user != null);
 		fromGithub.setSelection(user != null);
 		fromGithub.addSelectionListener(new SelectionAdapter()
@@ -125,6 +124,7 @@ class RepositorySelectionPage extends WizardPage
 			public void widgetSelected(SelectionEvent e)
 			{
 				updateSourceURI();
+				updateEnablement();
 			}
 		});
 
@@ -171,6 +171,7 @@ class RepositorySelectionPage extends WizardPage
 			public void widgetSelected(SelectionEvent e)
 			{
 				updateSourceURI();
+				updateEnablement();
 			}
 		});
 
@@ -190,7 +191,7 @@ class RepositorySelectionPage extends WizardPage
 			}
 		});
 
-		Label filler2 = new Label(main, SWT.NONE);
+		new Label(main, SWT.NONE);
 
 		// TODO Add a separator here?
 
@@ -207,22 +208,22 @@ class RepositorySelectionPage extends WizardPage
 			}
 		});
 
-		final Button destinationButton = new Button(main, SWT.PUSH);
+		Button destinationButton = new Button(main, SWT.PUSH);
 		destinationButton.setText(StringUtil.ellipsify(CoreStrings.BROWSE));
 		destinationButton.addSelectionListener(new SelectionAdapter()
 		{
 			public void widgetSelected(final SelectionEvent e)
 			{
-				final FileDialog d;
-
-				d = new FileDialog(getShell(), SWT.APPLICATION_MODAL | SWT.SAVE);
-				if (destinationText.getText().length() > 0)
+				FileDialog d = new FileDialog(getShell(), SWT.APPLICATION_MODAL | SWT.SAVE);
+				String text = destinationText.getText();
+				if (!StringUtil.isEmpty(text))
 				{
-					final File file = new File(destinationText.getText()).getAbsoluteFile();
+					File file = new File(text).getAbsoluteFile();
 					d.setFilterPath(file.getParent());
 					d.setFileName(file.getName());
 				}
-				final String r = d.open();
+
+				String r = d.open();
 				if (r != null)
 				{
 					destinationText.setText(r);
@@ -231,6 +232,9 @@ class RepositorySelectionPage extends WizardPage
 		});
 
 		updateSourceURI();
+		updateEnablement();
+		setErrorMessage(null);
+
 		setControl(main);
 	}
 
@@ -250,7 +254,7 @@ class RepositorySelectionPage extends WizardPage
 
 	protected void updateURI(String uri)
 	{
-		this.sourceURI = uri;
+		sourceURI = uri;
 		if (sourceURI != null)
 		{
 			// Try to stick to a default of a project under workspace matching the last path of the remote git
@@ -273,14 +277,14 @@ class RepositorySelectionPage extends WizardPage
 			return;
 		}
 
-		final String dstpath = destinationText.getText();
-		if (dstpath.length() == 0)
+		String dstpath = destinationText.getText();
+		if (StringUtil.isEmpty(dstpath))
 		{
 			setErrorMessage(Messages.RepositorySelectionPage_DestinatioNRequired_Message);
 			setPageComplete(false);
 			return;
 		}
-		final File absoluteFile = new File(dstpath).getAbsoluteFile();
+		File absoluteFile = new File(dstpath).getAbsoluteFile();
 		if (!isEmptyDir(absoluteFile))
 		{
 			setErrorMessage(NLS.bind(Messages.RepositorySelectionPage_DirectoryExists_ErrorMessage,
@@ -302,7 +306,7 @@ class RepositorySelectionPage extends WizardPage
 		setPageComplete(true);
 	}
 
-	private static boolean isEmptyDir(final File dir)
+	private static boolean isEmptyDir(File dir)
 	{
 		if (!dir.exists())
 		{
@@ -318,7 +322,7 @@ class RepositorySelectionPage extends WizardPage
 	// this is actually just an optimistic heuristic - should be named
 	// isThereHopeThatCanCreateSubdir() as probably there is no 100% reliable
 	// way to check that in Java for Windows
-	private static boolean canCreateSubdir(final File parent)
+	private static boolean canCreateSubdir(File parent)
 	{
 		if (parent == null)
 		{
@@ -355,5 +359,12 @@ class RepositorySelectionPage extends WizardPage
 			workspacePath += File.separator + uri.substring(slash + 1, index);
 		}
 		return workspacePath;
+	}
+
+	private void updateEnablement()
+	{
+		boolean isFromGithub = fromGithub.getSelection();
+		githubReposCombo.setEnabled(isFromGithub);
+		sourceURIText.setEnabled(!isFromGithub);
 	}
 }

@@ -33,8 +33,10 @@ import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.github.IGithubManager;
 import com.aptana.git.core.github.IGithubUser;
 
+@SuppressWarnings("restriction")
 public class GithubManager implements IGithubManager
 {
+
 	// TODO Add support to get the list of orgs for a user
 	// http://developer.github.com/v3/orgs/
 	// TODO Add support to get the list of repos for the user:
@@ -65,6 +67,9 @@ public class GithubManager implements IGithubManager
 	private static final String SECURE_PREF_NODE = GitPlugin.PLUGIN_ID;
 	private static final String USERNAME = "username"; //$NON-NLS-1$
 	private static final String PASSWORD = "password"; //$NON-NLS-1$
+
+	private static final String ATTR_SSH_URL = "ssh_url"; //$NON-NLS-1$
+	private static final String ATTR_MESSAGE = "message"; //$NON-NLS-1$
 
 	private IGithubUser user;
 
@@ -103,7 +108,7 @@ public class GithubManager implements IGithubManager
 			response = IOUtil.read(connection.getErrorStream());
 			JSONParser parser = new JSONParser();
 			JSONObject result = (JSONObject) parser.parse(response);
-			String msg = (String) result.get("message"); //$NON-NLS-1$
+			String msg = (String) result.get(ATTR_MESSAGE);
 			return new Status(IStatus.ERROR, GitPlugin.PLUGIN_ID, code, msg, null);
 		}
 		catch (CoreException ce)
@@ -123,7 +128,6 @@ public class GithubManager implements IGithubManager
 		}
 	}
 
-	@SuppressWarnings("restriction")
 	protected HttpURLConnection createConnection(String urlString, String username, String password)
 			throws MalformedURLException, IOException
 	{
@@ -215,7 +219,7 @@ public class GithubManager implements IGithubManager
 		if (user == null)
 		{
 			throw new CoreException(new Status(IStatus.ERROR, GitPlugin.PLUGIN_ID, -1,
-					"No user is logged in for Github", null));
+					Messages.GithubManager_ERR_Github_NotLoggedIn, null));
 		}
 		HttpURLConnection connection = null;
 		try
@@ -234,7 +238,7 @@ public class GithubManager implements IGithubManager
 				List<String> repoURLs = new ArrayList<String>(result.size());
 				for (JSONObject repo : result)
 				{
-					repoURLs.add((String) repo.get("ssh_url"));
+					repoURLs.add((String) repo.get(ATTR_SSH_URL));
 				}
 				return repoURLs;
 			}
@@ -242,7 +246,7 @@ public class GithubManager implements IGithubManager
 			response = IOUtil.read(connection.getErrorStream());
 			JSONParser parser = new JSONParser();
 			JSONObject result = (JSONObject) parser.parse(response);
-			String msg = (String) result.get("message"); //$NON-NLS-1$
+			String msg = (String) result.get(ATTR_MESSAGE);
 			throw new CoreException(new Status(IStatus.ERROR, GitPlugin.PLUGIN_ID, code, msg, null));
 		}
 		catch (CoreException ce)
