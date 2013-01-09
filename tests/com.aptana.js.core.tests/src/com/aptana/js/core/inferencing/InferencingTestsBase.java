@@ -39,6 +39,7 @@ import com.aptana.index.core.build.BuildContext;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.core.JSTypeConstants;
 import com.aptana.js.core.index.JSFileIndexingParticipant;
+import com.aptana.js.core.index.JSIndexQueryHelper;
 import com.aptana.js.core.model.PropertyElement;
 import com.aptana.js.core.model.TypeElement;
 import com.aptana.js.core.parsing.JSParser;
@@ -300,7 +301,7 @@ public abstract class InferencingTestsBase extends TestCase
 	 */
 	protected List<String> getTypes(JSScope globals, JSNode node)
 	{
-		JSNodeTypeInferrer walker = new JSNodeTypeInferrer(globals, getIndex(), getLocation());
+		JSNodeTypeInferrer walker = new JSNodeTypeInferrer(globals, getIndex(), getLocation(), new JSIndexQueryHelper(getIndex()));
 
 		node.accept(walker);
 
@@ -319,7 +320,7 @@ public abstract class InferencingTestsBase extends TestCase
 
 		for (IParseNode node : nodes)
 		{
-			JSNodeTypeInferrer walker = new JSNodeTypeInferrer(globals, getIndex(), getLocation());
+			JSNodeTypeInferrer walker = new JSNodeTypeInferrer(globals, getIndex(), getLocation(), new JSIndexQueryHelper(getIndex()));
 
 			assertTrue(node instanceof JSNode);
 

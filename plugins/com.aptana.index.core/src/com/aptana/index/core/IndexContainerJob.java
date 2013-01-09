@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the Eclipse Public License (EPL).
  * Please see the license-epl.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -27,6 +27,13 @@ import com.aptana.core.IMap;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 
+/**
+ * This class takes the URI of a container. It collects all the files underneath the container recursively, and then
+ * attempts to index the diff since our last index. this involves wiping entries for files/documents that no longer
+ * exist, and re-indexing files that have been modified since the last time we modified our index file.
+ * 
+ * @author cwilliams
+ */
 public class IndexContainerJob extends IndexRequestJob
 {
 

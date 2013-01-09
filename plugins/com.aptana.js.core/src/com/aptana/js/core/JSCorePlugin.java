@@ -8,11 +8,11 @@
 package com.aptana.js.core;
 
 import org.eclipse.core.runtime.Plugin;
-import org.eclipse.core.runtime.jobs.Job;
 import org.osgi.framework.BundleContext;
 
 import com.aptana.js.core.node.INodeJSService;
 import com.aptana.js.core.node.INodePackageManager;
+import com.aptana.js.internal.core.index.JSMetadataLoader;
 import com.aptana.js.internal.core.node.NodeJSService;
 import com.aptana.js.internal.core.node.NodePackageManager;
 
@@ -43,8 +43,7 @@ public class JSCorePlugin extends Plugin
 		super.start(context);
 		PLUGIN = this;
 
-		Job job = new JSCoreStartupJob();
-		job.schedule();
+		new JSMetadataLoader().schedule();
 	}
 
 	public void stop(BundleContext context) throws Exception // $codepro.audit.disable declaredExceptions

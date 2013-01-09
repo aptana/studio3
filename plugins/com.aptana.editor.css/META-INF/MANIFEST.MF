@@ -2,18 +2,15 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: com.aptana.editor.css;singleton:=true
-Bundle-Version: 3.0.3.qualifier
+Bundle-Version: 3.1.0.qualifier
 Bundle-Activator: com.aptana.editor.css.CSSPlugin
 Bundle-Vendor: %providerName
-Require-Bundle: com.aptana.jetty.util.epl,
- org.w3c.css,
- com.aptana.core;bundle-version="3.0.4",
- com.aptana.buildpath.core,
- com.aptana.scripting,
- org.eclipse.ui.editors,
- org.eclipse.ui.views,
+Require-Bundle: org.eclipse.ui.views,
  org.eclipse.ui.workbench.texteditor,
  org.eclipse.compare,
+ com.aptana.core;bundle-version="3.0.4",
+ com.aptana.scripting,
+ com.aptana.css.core;visibility:=reexport,
  com.aptana.ui,
  com.aptana.index.core.ui;bundle-version="3.0.0",
  com.aptana.editor.common
@@ -22,12 +19,8 @@ Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: com.aptana.editor.css,
  com.aptana.editor.css.contentassist;x-friends:="com.aptana.editor.html,com.aptana.editor.erb,com.aptana.editor.svg",
- com.aptana.editor.css.contentassist.index,
- com.aptana.editor.css.internal.build;x-friends:="com.aptana.editor.html",
  com.aptana.editor.css.internal.text;x-friends:="com.aptana.editor.html",
  com.aptana.editor.css.outline,
  com.aptana.editor.css.parsing,
- com.aptana.editor.css.parsing.ast,
  com.aptana.editor.css.text
 Eclipse-ExtensibleAPI: true
-Eclipse-RegisterBuddy: org.w3c.css

@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -12,9 +12,9 @@ import org.eclipse.jface.text.rules.Token;
 
 import beaver.Symbol;
 
+import com.aptana.css.core.parsing.CSSTokenTypeSymbol;
 import com.aptana.editor.common.parsing.AbstractFlexPartitionScanner;
 import com.aptana.editor.css.parsing.CSSPartitionFlexScanner;
-import com.aptana.editor.css.parsing.lexer.CSSTokenTypeSymbol;
 
 /**
  * A partition scanner for CSS code.

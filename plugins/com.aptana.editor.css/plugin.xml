@@ -17,39 +17,10 @@
       </editor>
    </extension>
    <extension
-         point="org.eclipse.core.contenttype.contentTypes">
-      <content-type
-            base-type="org.eclipse.core.runtime.text"
-            file-extensions="css"
-            id="com.aptana.contenttype.css"
-            name="%content-type.css.name"
-            priority="normal">
-      </content-type>
-   </extension>
-   <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
             class="com.aptana.editor.css.preferences.PreferenceInitializer">
       </initializer>
-   </extension>
-   <extension
-         point="com.aptana.index.core.fileIndexingParticipants">
-      <fileIndexingParticipant
-            class="com.aptana.editor.css.contentassist.index.CSSFileIndexingParticipant"
-            id="com.aptana.editor.css.indexer"
-            name="CSS Indexer"
-            priority="50">
-         <contentTypeBinding
-               contentTypeId="com.aptana.contenttype.css">
-         </contentTypeBinding>
-      </fileIndexingParticipant>
-   </extension>
-   <extension
-         point="com.aptana.parsing.parser">
-      <parser
-            class="com.aptana.editor.css.parsing.CSSParser"
-            content-type="com.aptana.contenttype.css">
-      </parser>
    </extension>
    <extension
          point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectors">
@@ -78,26 +49,6 @@
       </factory>
    </extension>
    <extension
-         id="problem"
-         name="%marker.css.name"
-         point="org.eclipse.core.resources.markers">
-      <super
-            type="com.aptana.core.problem">
-      </super>
-      <persistent
-            value="true">
-      </persistent>
-      <attribute
-            name="id">
-      </attribute>
-      <attribute
-            name="flags">
-      </attribute>
-      <attribute
-            name="arguments">
-      </attribute>
-   </extension>
-   <extension
          point="com.aptana.editor.common.textHovers">
       <hover
             class="com.aptana.editor.css.text.CSSTextHover"
@@ -107,53 +58,6 @@
                type="com.aptana.contenttype.css">
          </contentType>
       </hover>
-   </extension>
-   <extension
-         point="com.aptana.buildpath.core.buildParticipants">
-      <participant
-            class="com.aptana.editor.css.internal.build.CSSTaskDetector"
-            id="com.aptana.editor.css.CSSTaskDetector"
-            name="%css.task.detector.name"
-            priority="50">
-         <contentTypeBinding
-               contentTypeId="com.aptana.contenttype.css">
-         </contentTypeBinding>
-         <projectNatureBinding
-               natureId="com.aptana.projects.webnature">
-         </projectNatureBinding>
-      </participant>
-      <participant
-            class="com.aptana.editor.css.validator.CSSValidator"
-            id="com.aptana.editor.css.validator.W3CValidator"
-            name="%validator.css.name"
-            priority="49">
-         <contentTypeBinding
-               contentTypeId="com.aptana.contenttype.css">
-         </contentTypeBinding>
-         <projectNatureBinding
-               natureId="com.aptana.projects.webnature">
-         </projectNatureBinding>
-      </participant>
-      <participant
-            class="com.aptana.editor.css.validator.CSSParserValidator"
-            id="com.aptana.editor.css.validator.CSSParserValidator"
-            name="%validator.parser.name"
-            priority="60">
-         <contentTypeBinding
-               contentTypeId="com.aptana.contenttype.css">
-         </contentTypeBinding>
-         <projectNatureBinding
-               natureId="com.aptana.projects.webnature">
-         </projectNatureBinding>
-      </participant>
-   </extension>
-   <extension
-         id="w3c_problem"
-         name="%marker.w3c.name"
-         point="org.eclipse.core.resources.markers">
-      <super
-            type="com.aptana.editor.css.problem">
-      </super>
    </extension>
    <extension
          point="org.eclipse.compare.contentMergeViewers">

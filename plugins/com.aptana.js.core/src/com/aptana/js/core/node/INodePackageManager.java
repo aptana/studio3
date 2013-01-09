@@ -7,7 +7,6 @@
  */
 package com.aptana.js.core.node;
 
-import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
@@ -94,6 +93,15 @@ public interface INodePackageManager
 	 * @throws CoreException
 	 */
 	public IPath getModulesPath() throws CoreException;
+
+	/**
+	 * Returns the prefix path of npm. The prefix path can be configured either in the environment variable
+	 * NPM_CONFIG_PREFIX, or through the 'prefix' attribute from the npm configuration file.
+	 * 
+	 * @return
+	 * @throws CoreException
+	 */
+	public IPath getConfigPrefixPath() throws CoreException;
 
 	// TODO Uninstall
 	// TODO Update

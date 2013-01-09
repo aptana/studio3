@@ -93,7 +93,7 @@ public class JSIndexTest extends TestCase
 	 */
 	protected Index getIndex()
 	{
-		return JSIndexQueryHelper.getIndex();
+		return JSIndexQueryHelper.getJSCoreIndex();
 	}
 
 	protected IndexManager getIndexManager()
@@ -361,9 +361,9 @@ public class JSIndexTest extends TestCase
 			Index index = getIndex();
 
 			indexParticipant.processParseResults(myContext, index, ast, new NullProgressMonitor());
-			JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
+			JSIndexReader queryHelper = new JSIndexReader();
 
-			List<TypeElement> types = queryHelper.getTypes(index);
+			List<TypeElement> types = queryHelper.getTypes(index, true);
 			assertNotNull(types);
 			assertEquals("Expected 3 types", 3, types.size());
 
@@ -373,7 +373,7 @@ public class JSIndexTest extends TestCase
 			// make sure we get the same results
 			index = getIndex();
 			indexParticipant.processParseResults(myContext, index, ast, new NullProgressMonitor());
-			types = queryHelper.getTypes(index);
+			types = queryHelper.getTypes(index, true);
 			assertNotNull(types);
 			assertEquals("Expected 3 types", 3, types.size());
 		}
@@ -397,9 +397,9 @@ public class JSIndexTest extends TestCase
 			Index index = getIndex();
 
 			indexParticipant.processParseResults(myContext, index, ast, new NullProgressMonitor());
-			JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
+			JSIndexQueryHelper queryHelper = new JSIndexQueryHelper(index);
 
-			Collection<PropertyElement> types = queryHelper.getGlobals(index, null, "functionDocsWithoutReturn.js",
+			Collection<PropertyElement> types = queryHelper.getGlobals("functionDocsWithoutReturn.js",
 					"abc");
 			assertNotNull(types);
 			assertTrue("Expected at least a single property for 'abc'", !types.isEmpty());
@@ -433,9 +433,9 @@ public class JSIndexTest extends TestCase
 			Index index = getIndex();
 
 			indexParticipant.processParseResults(myContext, index, ast, new NullProgressMonitor());
-			JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
+			JSIndexQueryHelper queryHelper = new JSIndexQueryHelper(index);
 
-			Collection<PropertyElement> types = queryHelper.getGlobals(index, null, "functionDocsWithoutParam.js",
+			Collection<PropertyElement> types = queryHelper.getGlobals("functionDocsWithoutParam.js",
 					"abc");
 			assertNotNull(types);
 			assertTrue("Expected at least a single property for 'abc'", !types.isEmpty());

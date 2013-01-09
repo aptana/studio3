@@ -18,6 +18,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
@@ -35,6 +37,8 @@ import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.index.core.IndexContainerJob;
+import com.aptana.index.core.IndexFileJob;
 
 /**
  * BuildPathManager
@@ -107,8 +111,6 @@ public class BuildPathManager
 	 */
 	public void addBuildPath(IProject project, IBuildPathEntry entry)
 	{
-		// TODO Index the entry. Just ask for the path, get the index, request we re-index it (IndexContainerJob)
-		// We obviously also want to record the entry for the project as we currently do
 		if (project != null && entry != null)
 		{
 			Set<IBuildPathEntry> buildPaths = getBuildPaths(project);
@@ -118,7 +120,38 @@ public class BuildPathManager
 				buildPaths.add(entry);
 
 				setBuildPaths(project, buildPaths);
+
+				index(entry);
 			}
+		}
+	}
+
+	/**
+	 * If a build path entry is added, we schedule a job to make sure the entry gets indexed (or it's index is
+	 * up-to-date).
+	 * 
+	 * @param entry
+	 */
+	private void index(IBuildPathEntry entry)
+	{
+		try
+		{
+			IFileStore fileStore = EFS.getStore(entry.getPath());
+			if (fileStore != null)
+			{
+				if (fileStore.fetchInfo().isDirectory())
+				{
+					new IndexContainerJob(entry.getDisplayName(), entry.getPath()).schedule();
+				}
+				else
+				{
+					new IndexFileJob(entry.getDisplayName(), entry.getPath()).schedule();
+				}
+			}
+		}
+		catch (Throwable e)
+		{
+			IdeLog.logError(BuildPathCorePlugin.getDefault(), e);
 		}
 	}
 
@@ -191,6 +224,7 @@ public class BuildPathManager
 	 * @param project
 	 * @return
 	 */
+	// FIXME We need this to be a list, because order matters!
 	public Set<IBuildPathEntry> getBuildPaths(IProject project)
 	{
 		Set<IBuildPathEntry> result = new HashSet<IBuildPathEntry>();
@@ -490,6 +524,8 @@ public class BuildPathManager
 				entries.remove(entry);
 
 				setBuildPaths(project, entries);
+
+				// TODO Remove the index for it? Don't we need to see if no other references to it are out there?
 			}
 		}
 	}

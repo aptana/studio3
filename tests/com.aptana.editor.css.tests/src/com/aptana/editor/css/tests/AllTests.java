@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -15,9 +15,7 @@ import com.aptana.editor.css.CSSCodeScannerTest;
 import com.aptana.editor.css.CSSEditorTest;
 import com.aptana.editor.css.CSSSourcePartitionScannerFlexTest;
 import com.aptana.editor.css.CSSSourcePartitionScannerTest;
-import com.aptana.editor.css.internal.build.CSSTaskDetectorTest;
 import com.aptana.editor.css.internal.text.CSSFoldingComputerTest;
-import com.aptana.editor.css.validator.ValidatorTests;
 
 public class AllTests
 {
@@ -32,12 +30,8 @@ public class AllTests
 		suite.addTestSuite(CSSFoldingComputerTest.class);
 		suite.addTestSuite(CSSSourcePartitionScannerTest.class);
 		suite.addTestSuite(CSSSourcePartitionScannerFlexTest.class);
-		suite.addTest(ValidatorTests.suite());
-		suite.addTest(com.aptana.editor.css.parsing.AllTests.suite());
 		suite.addTest(com.aptana.editor.css.outline.AllTests.suite());
 		suite.addTest(com.aptana.editor.css.contentassist.AllTests.suite());
-		suite.addTest(com.aptana.editor.css.contentassist.index.IndexTests.suite());
-		suite.addTestSuite(CSSTaskDetectorTest.class);
 		// $JUnit-END$
 		return suite;
 	}

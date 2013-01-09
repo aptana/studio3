@@ -321,9 +321,8 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 		// Verify initial contents
 		Index index = getIndexManager().getIndex(project.getURI());
 
-		JSIndexQueryHelper _indexHelper = new JSIndexQueryHelper();
-		Collection<PropertyElement> projectGlobals = _indexHelper.getGlobals(index, project.getInnerProject(),
-				"apstud2944.js");
+		JSIndexQueryHelper _indexHelper = new JSIndexQueryHelper(project.getInnerProject());
+		Collection<PropertyElement> projectGlobals = _indexHelper.getGlobals("apstud2944.js");
 		assertContainsFunctions(projectGlobals, "delete_me");
 		assertDoesntContainFunctions(projectGlobals, "foo");
 

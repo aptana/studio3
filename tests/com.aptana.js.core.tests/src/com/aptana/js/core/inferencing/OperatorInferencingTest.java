@@ -9,6 +9,7 @@ package com.aptana.js.core.inferencing;
 
 import java.util.List;
 
+import com.aptana.js.core.index.JSIndexQueryHelper;
 import com.aptana.js.core.inferencing.JSPropertyCollection;
 import com.aptana.js.core.inferencing.JSScope;
 import com.aptana.js.internal.core.inferencing.JSSymbolTypeInferrer;
@@ -31,7 +32,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 
 		// NOTE: getting property elements of all symbols in the specified scope
 		// as a side-effect caches each JSObject's type values.
-		JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(globals, null, null);
+		JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(globals, null, null, new JSIndexQueryHelper(getIndex()));
 		symbolInferrer.getScopeProperties();
 
 		List<String> symbolTypes = object.getTypes();

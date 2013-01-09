@@ -182,12 +182,6 @@
       </super>
    </extension>
       <extension
-         point="org.eclipse.core.runtime.preferences">
-      <initializer
-            class="com.aptana.js.internal.core.preferences.PreferenceInitializer">
-      </initializer>
-   </extension>
-      <extension
             point="com.aptana.js.core.requireResolvers">
          <resolver
                class="com.aptana.js.core.inferencing.CommonJSResolver"

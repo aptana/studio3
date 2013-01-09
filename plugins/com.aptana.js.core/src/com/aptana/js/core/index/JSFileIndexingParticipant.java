@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -55,6 +54,8 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 	private static XPath LAMBDAS_IN_SCOPE;
 
 	private JSIndexWriter indexWriter;
+
+	private JSIndexQueryHelper queryHelper;
 
 	static
 	{
@@ -171,6 +172,8 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 80);
 
+		queryHelper = new JSIndexQueryHelper(context.getProject());
+
 		// build symbol tables
 		URI location = context.getURI();
 
@@ -192,9 +195,11 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		// process globals
 		if (globals != null)
 		{
-			// create new Window type for this file
-			TypeElement type = JSTypeUtil.createGlobalType(JSTypeUtil.getGlobalType(context.getProject(),
-					context.getName()));
+			// TODO Should we have a big if/else that switches between this style of indexing and module indexing based
+			// on if there's a module or exports property?
+
+			// create new Global type for this file
+			TypeElement globalType = JSTypeUtil.createGlobalType(JSTypeConstants.GLOBAL_TYPE);
 
 			// add declared variables and functions from the global scope
 			if (IdeLog.isTraceEnabled(JSCorePlugin.getDefault(), IDebugScopes.INDEXING_STEPS))
@@ -210,11 +215,11 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 				IdeLog.logTrace(JSCorePlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
 			}
 
-			JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(globals, index, location);
+			JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(globals, index, location, queryHelper);
 
 			for (PropertyElement property : symbolInferrer.getScopeProperties())
 			{
-				type.addProperty(property);
+				globalType.addProperty(property);
 			}
 
 			// include any assignments to Window
@@ -233,7 +238,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 			for (PropertyElement property : processWindowAssignments(index, globals, location))
 			{
-				type.addProperty(property);
+				globalType.addProperty(property);
 			}
 
 			// process window assignments in lambdas (self-invoking functions)
@@ -252,7 +257,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 			for (PropertyElement property : processLambdas(index, globals, ast, location))
 			{
-				type.addProperty(property);
+				globalType.addProperty(property);
 			}
 
 			// associate all user agents with these properties
@@ -269,7 +274,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 				IdeLog.logTrace(JSCorePlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
 			}
 
-			for (PropertyElement property : type.getProperties())
+			for (PropertyElement property : globalType.getProperties())
 			{
 				property.setHasAllUserAgents();
 			}
@@ -288,7 +293,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 				IdeLog.logTrace(JSCorePlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
 			}
 
-			indexWriter.writeType(index, type, location);
+			indexWriter.writeType(index, globalType, location);
 		}
 
 		// process module API exports
@@ -328,7 +333,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		JSPropertyCollection module = globals.getSymbol("module"); //$NON-NLS-1$
 		if (module != null)
 		{
-			JSSymbolTypeInferrer infer = new JSSymbolTypeInferrer(globals, index, location);
+			JSSymbolTypeInferrer infer = new JSSymbolTypeInferrer(globals, index, location, queryHelper);
 			// Now grab "module.exports" and attach that property to our hand-generated module type from above
 			PropertyElement exports = infer.getSymbolPropertyElement(module, "exports"); //$NON-NLS-1$
 			moduleType.addProperty(exports);
@@ -357,7 +362,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 			}
 			// Grab all properties hanging off "exports" and attach them to our hand-generated "module.exports" module
 			// instance type.
-			JSSymbolTypeInferrer infer = new JSSymbolTypeInferrer(globals, index, location);
+			JSSymbolTypeInferrer infer = new JSSymbolTypeInferrer(globals, index, location, queryHelper);
 			List<String> properties = exports.getPropertyNames();
 			for (String property : properties)
 			{
@@ -460,18 +465,16 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		{
 			if (symbols.hasLocalSymbol(JSTypeConstants.WINDOW_PROPERTY))
 			{
-				JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(symbols, index, location);
+				JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(symbols, index, location, queryHelper);
 				PropertyElement property = symbolInferrer.getSymbolPropertyElement(JSTypeConstants.WINDOW_PROPERTY);
 
 				if (property != null)
 				{
 					List<String> typeNames = property.getTypeNames();
 
-					if (typeNames != null && !typeNames.isEmpty())
+					if (!CollectionsUtil.isEmpty(typeNames))
 					{
-						JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
-
-						result = queryHelper.getTypeMembers(index, typeNames);
+						result = queryHelper.getTypeMembers(typeNames);
 					}
 				}
 			}

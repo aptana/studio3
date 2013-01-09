@@ -9,18 +9,18 @@ package com.aptana.editor.css.outline;
 
 import org.eclipse.swt.graphics.Image;
 
+import com.aptana.css.core.parsing.ast.CSSAtRuleNode;
+import com.aptana.css.core.parsing.ast.CSSCharSetNode;
+import com.aptana.css.core.parsing.ast.CSSDeclarationNode;
+import com.aptana.css.core.parsing.ast.CSSFontFaceNode;
+import com.aptana.css.core.parsing.ast.CSSImportNode;
+import com.aptana.css.core.parsing.ast.CSSMediaNode;
+import com.aptana.css.core.parsing.ast.CSSNamespaceNode;
+import com.aptana.css.core.parsing.ast.CSSNode;
+import com.aptana.css.core.parsing.ast.CSSPageNode;
+import com.aptana.css.core.parsing.ast.CSSSelectorNode;
 import com.aptana.editor.common.outline.CommonOutlineLabelProvider;
 import com.aptana.editor.css.CSSPlugin;
-import com.aptana.editor.css.parsing.ast.CSSAtRuleNode;
-import com.aptana.editor.css.parsing.ast.CSSCharSetNode;
-import com.aptana.editor.css.parsing.ast.CSSDeclarationNode;
-import com.aptana.editor.css.parsing.ast.CSSFontFaceNode;
-import com.aptana.editor.css.parsing.ast.CSSImportNode;
-import com.aptana.editor.css.parsing.ast.CSSMediaNode;
-import com.aptana.editor.css.parsing.ast.CSSNamespaceNode;
-import com.aptana.editor.css.parsing.ast.CSSNode;
-import com.aptana.editor.css.parsing.ast.CSSPageNode;
-import com.aptana.editor.css.parsing.ast.CSSSelectorNode;
 
 public class CSSOutlineLabelProvider extends CommonOutlineLabelProvider
 {

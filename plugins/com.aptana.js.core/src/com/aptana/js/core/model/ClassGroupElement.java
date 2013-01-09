@@ -14,7 +14,6 @@ import java.util.Set;
 import com.aptana.index.core.CategoryInfo;
 import com.aptana.index.core.Index;
 import com.aptana.js.core.index.IJSIndexConstants;
-import com.aptana.js.core.index.JSIndexQueryHelper;
 import com.aptana.js.core.inferencing.JSTypeUtil;
 import com.aptana.js.internal.core.index.JSIndexReader;
 
@@ -77,8 +76,8 @@ public class ClassGroupElement extends BaseElement
 	{
 		if (classes == null)
 		{
-			JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
-			List<TypeElement> types = queryHelper.getTypes(index);
+			JSIndexReader reader = new JSIndexReader();
+			List<TypeElement> types = reader.getTypes(index, true);
 
 			classes = JSTypeUtil.typesToClasses(types);
 		}

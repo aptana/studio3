@@ -72,6 +72,7 @@
       <import plugin="com.aptana.jira.core"/>
       <import plugin="com.aptana.js.core"/>
       <import plugin="com.aptana.dtd.core"/>
+      <import plugin="com.aptana.css.core"/>
    </requires>
 
    <plugin
@@ -432,6 +433,14 @@
 
    <plugin
          id="com.aptana.xml.core.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.css.core.tests"
          download-size="0"
          install-size="0"
          version="0.0.0"

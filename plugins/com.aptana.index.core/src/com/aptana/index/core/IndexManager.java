@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.ReadWriteLock;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -29,6 +30,7 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
+import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.filter.IIndexFilterParticipant;
 
 public class IndexManager
@@ -123,7 +125,9 @@ public class IndexManager
 	}
 
 	/**
-	 * Removes the index for a given path. This is a no-op if the index did not exist.
+	 * Removes the index for a given path. This is a no-op if the index did not exist. DO NOT USE THIS IF YOU'RE
+	 * RE-INDEXING THE CONTENTS! IT WILL BREAK ANY CURRENT REFS TO THIS INDEX. USE {@link #resetIndex(URI)}! This method
+	 * is used to remove indices entirely when we do not plan re-use them (i.e. the project it represented was deleted)
 	 */
 	public synchronized void removeIndex(URI path)
 	{
@@ -335,5 +339,62 @@ public class IndexManager
 		}
 
 		return filterParticipants;
+	}
+
+	/**
+	 * Resets the index for a given path. Returns true if the index was reset, false otherwise.
+	 */
+	public synchronized boolean resetIndex(URI path)
+	{
+
+		try
+		{
+			Index index = getIndex(path);
+
+			if (index != null)
+			{
+				index.reset();
+				return true;
+			}
+
+			return recreateIndex(path) != null;
+		}
+		catch (IOException e)
+		{
+			// The file could not be created. Possible reason: the project has been deleted.
+			IdeLog.logError(IndexPlugin.getDefault(), e);
+			return false;
+		}
+	}
+
+	/**
+	 * Recreates the index for a given path, keeping the same read-write monitor. Returns the new empty index or null if
+	 * it didn't exist before. Warning: Does not check whether index is consistent (not being used)
+	 */
+	public synchronized Index recreateIndex(URI path)
+	{
+		try
+		{
+			// Path is already canonical
+			Index index = getIndex(path);
+
+			ReadWriteLock monitor = index == null ? null : index.monitor;
+
+			index = new Index(path, false);
+			indexes.put(path, index);
+			index.monitor = monitor;
+			return index;
+		}
+		catch (IOException e)
+		{
+			// The file could not be created. Possible reason: the project has been deleted.
+			IdeLog.logError(IndexPlugin.getDefault(), e);
+			return null;
+		}
+	}
+
+	public String toString()
+	{
+		return "[" + StringUtil.join(", ", indexes.values()) + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 }

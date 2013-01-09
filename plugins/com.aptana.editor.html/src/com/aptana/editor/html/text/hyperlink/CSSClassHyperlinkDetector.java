@@ -21,9 +21,9 @@ import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.css.core.index.ICSSIndexConstants;
 import com.aptana.editor.common.text.hyperlink.EditorSearchHyperlink;
 import com.aptana.editor.common.text.hyperlink.IndexQueryingHyperlinkDetector;
-import com.aptana.editor.css.contentassist.index.ICSSIndexConstants;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.QueryResult;

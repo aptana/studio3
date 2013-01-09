@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
@@ -115,7 +116,7 @@ public class SWTUtils
 	}
 
 	/**
-	 * Finds and caches the iamge from the image descriptor for this particular plugin.
+	 * Finds and caches the image from the image descriptor for this particular plugin.
 	 * 
 	 * @param plugin
 	 *            the plugin to search
@@ -126,6 +127,20 @@ public class SWTUtils
 	public static Image getImage(AbstractUIPlugin plugin, String path)
 	{
 		return getImage(plugin.getBundle(), path);
+	}
+
+	/**
+	 * Finds and caches the image from the complete image path.
+	 * 
+	 * @param computedPath
+	 *            Represents the complete path of icon (BUNDLE_NAME/ICON_PATH)
+	 * @return the image, or null if not found
+	 */
+	public static Image getImage(IPath computedPath)
+	{
+		String bundleSymbolicName = computedPath.segment(0);
+		String iconPath = computedPath.removeFirstSegments(1).toOSString();
+		return getImage(bundleSymbolicName, iconPath);
 	}
 
 	/**
@@ -144,14 +159,19 @@ public class SWTUtils
 			path = "/" + path; //$NON-NLS-1$
 		}
 
-		String computedName = bundle.getSymbolicName() + path;
+		return getImage(bundle.getSymbolicName(), path);
+	}
+
+	private static Image getImage(String bundleSymbolicName, String path)
+	{
+		String computedName = bundleSymbolicName + path;
 		Image image = JFaceResources.getImage(computedName);
 		if (image != null)
 		{
 			return image;
 		}
 
-		ImageDescriptor id = AbstractUIPlugin.imageDescriptorFromPlugin(bundle.getSymbolicName(), path);
+		ImageDescriptor id = AbstractUIPlugin.imageDescriptorFromPlugin(bundleSymbolicName, path);
 		if (id != null)
 		{
 			JFaceResources.getImageRegistry().put(computedName, id);

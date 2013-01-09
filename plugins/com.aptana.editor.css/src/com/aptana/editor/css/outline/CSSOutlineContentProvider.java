@@ -10,15 +10,15 @@ package com.aptana.editor.css.outline;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.aptana.css.core.parsing.ast.CSSCommentNode;
+import com.aptana.css.core.parsing.ast.CSSDeclarationNode;
+import com.aptana.css.core.parsing.ast.CSSFunctionNode;
+import com.aptana.css.core.parsing.ast.CSSRuleNode;
+import com.aptana.css.core.parsing.ast.CSSSelectorNode;
+import com.aptana.css.core.parsing.ast.CSSTermListNode;
+import com.aptana.css.core.parsing.ast.CSSTermNode;
 import com.aptana.editor.common.outline.CommonOutlineContentProvider;
 import com.aptana.editor.common.outline.CommonOutlineItem;
-import com.aptana.editor.css.parsing.ast.CSSCommentNode;
-import com.aptana.editor.css.parsing.ast.CSSDeclarationNode;
-import com.aptana.editor.css.parsing.ast.CSSFunctionNode;
-import com.aptana.editor.css.parsing.ast.CSSRuleNode;
-import com.aptana.editor.css.parsing.ast.CSSSelectorNode;
-import com.aptana.editor.css.parsing.ast.CSSTermListNode;
-import com.aptana.editor.css.parsing.ast.CSSTermNode;
 import com.aptana.parsing.ast.IParseNode;
 
 public class CSSOutlineContentProvider extends CommonOutlineContentProvider

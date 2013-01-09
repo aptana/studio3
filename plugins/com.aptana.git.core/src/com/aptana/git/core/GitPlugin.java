@@ -26,9 +26,11 @@ import org.osgi.framework.BundleContext;
 
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.ResourceUtil;
+import com.aptana.git.core.github.IGithubManager;
 import com.aptana.git.core.model.GitCommit;
 import com.aptana.git.core.model.GitRepositoryManager;
 import com.aptana.git.core.model.IGitRepositoryManager;
+import com.aptana.git.internal.core.github.GithubManager;
 import com.aptana.git.internal.core.storage.CommitFileRevision;
 
 /**
@@ -47,6 +49,8 @@ public class GitPlugin extends Plugin
 	private IResourceChangeListener fGitResourceListener;
 
 	private GitRepositoryManager fGitRepoManager;
+
+	private GithubManager fGithubManager;
 
 	/**
 	 * The constructor
@@ -103,6 +107,7 @@ public class GitPlugin extends Plugin
 		finally
 		{
 			fGitRepoManager = null;
+			fGithubManager = null;
 			plugin = null;
 			super.stop(context);
 		}
@@ -139,7 +144,8 @@ public class GitPlugin extends Plugin
 	{
 		if (Platform.OS_WIN32.equals(Platform.getOS()))
 		{
-			File sshwFile = ResourceUtil.resourcePathToFile(FileLocator.find(getBundle(), Path.fromPortableString("$os$/sshw.exe"), null)); //$NON-NLS-1$
+			File sshwFile = ResourceUtil.resourcePathToFile(FileLocator.find(getBundle(),
+					Path.fromPortableString("$os$/sshw.exe"), null)); //$NON-NLS-1$
 			if (sshwFile.isFile())
 			{
 				return Path.fromOSString(sshwFile.getAbsolutePath());
@@ -191,5 +197,14 @@ public class GitPlugin extends Plugin
 			fGitRepoManager = new GitRepositoryManager();
 		}
 		return fGitRepoManager;
+	}
+
+	public synchronized IGithubManager getGithubManager()
+	{
+		if (fGithubManager == null)
+		{
+			fGithubManager = new GithubManager();
+		}
+		return fGithubManager;
 	}
 }

@@ -1224,4 +1224,11 @@
         </enabledWhen>
       </handler>
    </extension>
+   <extension
+         point="com.aptana.ui.accountsPreferencePage">
+      <provider
+            class="com.aptana.git.ui.internal.preferences.GithubAccountPageProvider"
+            priority="50">
+      </provider>
+   </extension>
 </plugin>

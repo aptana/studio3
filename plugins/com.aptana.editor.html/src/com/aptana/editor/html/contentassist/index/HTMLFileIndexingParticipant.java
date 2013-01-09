@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -17,11 +17,11 @@ import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.core.IFilter;
 import com.aptana.core.util.StringUtil;
+import com.aptana.css.core.ICSSConstants;
+import com.aptana.css.core.index.CSSFileIndexingParticipant;
+import com.aptana.css.core.index.ICSSIndexConstants;
 import com.aptana.editor.common.resolver.IPathResolver;
 import com.aptana.editor.common.resolver.URIResolver;
-import com.aptana.editor.css.ICSSConstants;
-import com.aptana.editor.css.contentassist.index.CSSFileIndexingParticipant;
-import com.aptana.editor.css.contentassist.index.ICSSIndexConstants;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
 import com.aptana.index.core.AbstractFileIndexingParticipant;

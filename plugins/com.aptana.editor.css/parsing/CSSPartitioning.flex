@@ -1,7 +1,7 @@
 // $codepro.audit.disable
 /**
  * Aptana Studio
- * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -11,16 +11,12 @@ package com.aptana.editor.css.parsing;
 import java.io.Reader;
 import java.io.StringReader;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import beaver.Symbol;
 import beaver.Scanner;
 
 import com.aptana.core.util.StringUtil;
-
-import com.aptana.editor.css.parsing.lexer.CSSTokenTypeSymbol;
-import com.aptana.editor.css.parsing.lexer.CSSTokenType;
+import com.aptana.css.core.parsing.CSSTokenTypeSymbol;
+import com.aptana.css.core.parsing.CSSTokenType;
 import com.aptana.editor.common.parsing.ForceReturnException;
 
 @SuppressWarnings({"unused", "nls"})
