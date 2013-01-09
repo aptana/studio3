@@ -28,4 +28,13 @@ public interface IStudioProjectListener
 	 *            optional monitor for the task
 	 */
 	public IStatus projectCreated(IProject project, IProgressMonitor monitor);
+
+	/**
+	 * This method will be called after a studio project is changed.
+	 * 
+	 * @param event
+	 * @param monitor
+	 * @return
+	 */
+	public IStatus projectChanged(IStudioProjectChangeEvent event, IProgressMonitor monitor);
 }
