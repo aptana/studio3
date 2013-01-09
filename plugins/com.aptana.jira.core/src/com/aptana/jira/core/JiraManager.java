@@ -339,7 +339,7 @@ public class JiraManager
 		// Use Apache HTTPClient to POST the file
 		HttpClient httpclient = new HttpClient();
 		UsernamePasswordCredentials creds = new UsernamePasswordCredentials(user.getUsername(), user.getPassword());
-		httpclient.getState().setCredentials(new AuthScope(HOST_NAME, 80), creds);
+		httpclient.getState().setCredentials(new AuthScope(HOST_NAME, 443), creds);
 		httpclient.getParams().setAuthenticationPreemptive(true);
 		PostMethod filePost = null;
 		try
