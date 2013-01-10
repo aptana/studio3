@@ -134,6 +134,7 @@ class RepositorySelectionPage extends WizardPage
 						fromGithub.setEnabled(false);
 						fromGithub.setSelection(false);
 						fromURI.setSelection(true);
+						updateEnablement();
 					}
 				});
 			}
