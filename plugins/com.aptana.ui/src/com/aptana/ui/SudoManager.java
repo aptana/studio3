@@ -68,6 +68,10 @@ public class SudoManager
 				validPassword = password;
 				return true;
 			}
+			else
+			{
+				IdeLog.log(UIPlugin.getDefault(), status);
+			}
 		}
 		catch (IOException e)
 		{
