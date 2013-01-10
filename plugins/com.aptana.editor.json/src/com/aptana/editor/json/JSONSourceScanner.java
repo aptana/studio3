@@ -8,6 +8,7 @@
 package com.aptana.editor.json;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
@@ -83,10 +84,9 @@ public class JSONSourceScanner extends AbstractFlexTokenScanner
 			case Terminals.EOF:
 				return Token.EOF;
 			default:
-				String msg = "JSONSourceScanner: Token not mapped: " + token.getId() + ">>" + token.value + "<<"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				IdeLog.logWarning(JSONPlugin.getDefault(), msg);
+				IdeLog.logWarning(JSONPlugin.getDefault(), MessageFormat.format(
+						"JSONSourceScanner: Token not mapped: {0}>>{1}<<", token.getId(), token.value)); //$NON-NLS-1$
 		}
 		return UNDEFINED_TOKEN;
 	}
-
 }
