@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -12,8 +12,8 @@ import org.eclipse.swt.graphics.Image;
 
 import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.json.JSONPlugin;
-import com.aptana.editor.json.parsing.ast.JSONEntryNode;
-import com.aptana.editor.json.parsing.ast.JSONNode;
+import com.aptana.json.core.parsing.ast.JSONEntryNode;
+import com.aptana.json.core.parsing.ast.JSONNode;
 import com.aptana.parsing.ast.IParseNode;
 
 /**

@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -13,23 +13,23 @@ import com.aptana.editor.json.formatter.nodes.JSONArrayFormatNode;
 import com.aptana.editor.json.formatter.nodes.JSONEntryFormatNode;
 import com.aptana.editor.json.formatter.nodes.JSONObjectFormatNode;
 import com.aptana.editor.json.formatter.nodes.JSONRootFormatNode;
-import com.aptana.editor.json.parsing.ast.JSONArrayNode;
-import com.aptana.editor.json.parsing.ast.JSONEntryNode;
-import com.aptana.editor.json.parsing.ast.JSONFalseNode;
-import com.aptana.editor.json.parsing.ast.JSONNode;
-import com.aptana.editor.json.parsing.ast.JSONNullNode;
-import com.aptana.editor.json.parsing.ast.JSONNumberNode;
-import com.aptana.editor.json.parsing.ast.JSONObjectNode;
-import com.aptana.editor.json.parsing.ast.JSONParseRootNode;
-import com.aptana.editor.json.parsing.ast.JSONStringNode;
-import com.aptana.editor.json.parsing.ast.JSONTreeWalker;
-import com.aptana.editor.json.parsing.ast.JSONTrueNode;
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.nodes.AbstractFormatterNodeBuilder;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.formatter.nodes.IFormatterTextNode;
 import com.aptana.formatter.nodes.FormatterEmptyNode;
+import com.aptana.json.core.parsing.ast.JSONArrayNode;
+import com.aptana.json.core.parsing.ast.JSONEntryNode;
+import com.aptana.json.core.parsing.ast.JSONFalseNode;
+import com.aptana.json.core.parsing.ast.JSONNode;
+import com.aptana.json.core.parsing.ast.JSONNullNode;
+import com.aptana.json.core.parsing.ast.JSONNumberNode;
+import com.aptana.json.core.parsing.ast.JSONObjectNode;
+import com.aptana.json.core.parsing.ast.JSONParseRootNode;
+import com.aptana.json.core.parsing.ast.JSONStringNode;
+import com.aptana.json.core.parsing.ast.JSONTreeWalker;
+import com.aptana.json.core.parsing.ast.JSONTrueNode;
 import com.aptana.parsing.ast.IParseNode;
 
 /**
