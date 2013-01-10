@@ -40,6 +40,7 @@ import com.aptana.git.core.github.IGithubUser;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.GitUIPlugin;
 import com.aptana.git.ui.internal.preferences.GithubAccountPageProvider;
+import com.aptana.ui.util.UIUtils;
 
 class RepositorySelectionPage extends WizardPage
 {
@@ -109,6 +110,34 @@ class RepositorySelectionPage extends WizardPage
 		userInfoProvider = new GithubAccountPageProvider();
 		userInfoControl = userInfoProvider.createContents(main);
 		userInfoControl.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).span(3, 1).create());
+		userInfoProvider.addListener(new GithubAccountPageProvider.GithubListener()
+		{
+
+			public void loggedIn()
+			{
+				UIUtils.getDisplay().asyncExec(new Runnable()
+				{
+
+					public void run()
+					{
+						fromGithub.setEnabled(true);
+					}
+				});
+			}
+
+			public void loggedOut()
+			{
+				UIUtils.getDisplay().asyncExec(new Runnable()
+				{
+					public void run()
+					{
+						fromGithub.setEnabled(false);
+						fromGithub.setSelection(false);
+						fromURI.setSelection(true);
+					}
+				});
+			}
+		});
 
 		IGithubManager manager = GitPlugin.getDefault().getGithubManager();
 		IGithubUser user = manager.getUser();

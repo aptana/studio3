@@ -49,6 +49,14 @@ import com.aptana.ui.util.WorkbenchBrowserUtil;
 
 public class GithubAccountPageProvider extends AbstractAccountPageProvider
 {
+
+	public static interface GithubListener
+	{
+		public void loggedIn();
+
+		public void loggedOut();
+	}
+
 	private static final String SIGNUP_URL = "https://github.com/"; //$NON-NLS-1$
 
 	private Group main;
@@ -61,13 +69,17 @@ public class GithubAccountPageProvider extends AbstractAccountPageProvider
 	private Label userLabel;
 	private Button logoutButton;
 
+	private List<GithubListener> listeners;
+
 	public GithubAccountPageProvider()
 	{
+		listeners = new ArrayList<GithubListener>();
 	}
 
 	public GithubAccountPageProvider(IProgressMonitor progressMonitor)
 	{
 		super(progressMonitor);
+		listeners = new ArrayList<GithubListener>();
 	}
 
 	public Control createContents(Composite parent)
@@ -83,6 +95,19 @@ public class GithubAccountPageProvider extends AbstractAccountPageProvider
 		logoutComposite.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).exclude(isLoggedOut).create());
 
 		return main;
+	}
+
+	public void addListener(GithubListener listener)
+	{
+		if (!listeners.contains(listener))
+		{
+			listeners.add(listener);
+		}
+	}
+
+	public void removeListener(GithubListener listener)
+	{
+		listeners.remove(listener);
 	}
 
 	private Composite createLoginComponents(Composite parent)
@@ -295,6 +320,7 @@ public class GithubAccountPageProvider extends AbstractAccountPageProvider
 									layout();
 								}
 							});
+							fireLoggedInEvent();
 						}
 						else
 						{
@@ -340,6 +366,7 @@ public class GithubAccountPageProvider extends AbstractAccountPageProvider
 		passwordText.setText(StringUtil.EMPTY);
 		usernameText.setFocus();
 		layout();
+		fireLoggedOutEvent();
 	}
 
 	private void layout()
@@ -362,6 +389,22 @@ public class GithubAccountPageProvider extends AbstractAccountPageProvider
 		passwordText.setEnabled(!locked);
 		testButton.setEnabled(!locked);
 		createAccountButton.setEnabled(!locked);
+	}
+
+	private void fireLoggedInEvent()
+	{
+		for (GithubListener listener : listeners)
+		{
+			listener.loggedIn();
+		}
+	}
+
+	private void fireLoggedOutEvent()
+	{
+		for (GithubListener listener : listeners)
+		{
+			listener.loggedOut();
+		}
 	}
 
 	private static int getButtonWidthHint(Button button)
