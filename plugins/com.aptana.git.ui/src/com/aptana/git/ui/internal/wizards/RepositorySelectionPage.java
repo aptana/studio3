@@ -121,6 +121,9 @@ class RepositorySelectionPage extends WizardPage
 					public void run()
 					{
 						fromGithub.setEnabled(true);
+						reloadGithubRepos();
+						updateSourceURIText();
+						updateSourceURI();
 					}
 				});
 			}
@@ -131,16 +134,19 @@ class RepositorySelectionPage extends WizardPage
 				{
 					public void run()
 					{
+						reloadGithubRepos();
 						fromGithub.setEnabled(false);
 						fromGithub.setSelection(false);
 						fromURI.setSelection(true);
 						updateEnablement();
+						updateSourceURIText();
+						updateSourceURI();
 					}
 				});
 			}
 		});
 
-		IGithubManager manager = GitPlugin.getDefault().getGithubManager();
+		IGithubManager manager = getGithubManager();
 		IGithubUser user = manager.getUser();
 
 		// Button and combo for github
@@ -161,33 +167,7 @@ class RepositorySelectionPage extends WizardPage
 		// Add pulldown for repos
 		githubReposCombo = new Combo(main, SWT.READ_ONLY | SWT.SINGLE);
 		githubReposCombo.setLayoutData(inputData.create());
-		if (user != null)
-		{
-			try
-			{
-				List<String> repoList = manager.getRepos();
-				if (!CollectionsUtil.isEmpty(repoList))
-				{
-					for (String repoURI : repoList)
-					{
-						githubReposCombo.add(repoURI);
-					}
-					githubReposCombo.addSelectionListener(new SelectionAdapter()
-					{
-						@Override
-						public void widgetSelected(SelectionEvent e)
-						{
-							updateURI(githubReposCombo.getText());
-						}
-					});
-					githubReposCombo.select(0);
-				}
-			}
-			catch (CoreException e1)
-			{
-				IdeLog.logError(GitUIPlugin.getDefault(), e1);
-			}
-		}
+		reloadGithubRepos();
 
 		new Label(main, SWT.NONE); // spacer
 
@@ -207,12 +187,7 @@ class RepositorySelectionPage extends WizardPage
 
 		sourceURIText = new Text(main, SWT.BORDER | SWT.SINGLE);
 		sourceURIText.setLayoutData(inputData.create());
-		String username = (user == null) ? System.getProperty(USER_NAME) : user.getUsername();
-		if (StringUtil.isEmpty(username))
-		{
-			username = USER;
-		}
-		sourceURIText.setMessage(MessageFormat.format(DEFAULT_GIT_URI, username));
+		updateSourceURIText();
 		sourceURIText.addModifyListener(new ModifyListener()
 		{
 			public void modifyText(final ModifyEvent e)
@@ -266,6 +241,17 @@ class RepositorySelectionPage extends WizardPage
 		setErrorMessage(null);
 
 		setControl(main);
+	}
+
+	private void updateSourceURIText()
+	{
+		IGithubUser user = getGithubManager().getUser();
+		String username = (user == null) ? System.getProperty(USER_NAME) : user.getUsername();
+		if (StringUtil.isEmpty(username))
+		{
+			username = USER;
+		}
+		sourceURIText.setMessage(MessageFormat.format(DEFAULT_GIT_URI, username));
 	}
 
 	protected void updateSourceURI()
@@ -334,6 +320,48 @@ class RepositorySelectionPage extends WizardPage
 
 		setErrorMessage(null);
 		setPageComplete(true);
+	}
+
+	private void reloadGithubRepos()
+	{
+		IGithubManager manager = getGithubManager();
+		IGithubUser user = manager.getUser();
+		if (user == null)
+		{
+			githubReposCombo.removeAll();
+		}
+		else
+		{
+			try
+			{
+				List<String> repoList = getGithubManager().getRepos();
+				if (!CollectionsUtil.isEmpty(repoList))
+				{
+					for (String repoURI : repoList)
+					{
+						githubReposCombo.add(repoURI);
+					}
+					githubReposCombo.addSelectionListener(new SelectionAdapter()
+					{
+						@Override
+						public void widgetSelected(SelectionEvent e)
+						{
+							updateURI(githubReposCombo.getText());
+						}
+					});
+					githubReposCombo.select(0);
+				}
+			}
+			catch (CoreException e)
+			{
+				IdeLog.logError(GitUIPlugin.getDefault(), e);
+			}
+		}
+	}
+
+	private IGithubManager getGithubManager()
+	{
+		return GitPlugin.getDefault().getGithubManager();
 	}
 
 	private static boolean isEmptyDir(File dir)
