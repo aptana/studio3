@@ -5,7 +5,7 @@
 
 %import "java.util.ArrayList";
 
-%import "com.aptana.editor.json.parsing.ast.*";
+%import "com.aptana.json.core.parsing.ast.*";
 %import "com.aptana.parsing.IParseState";
 %import "com.aptana.parsing.IParser";
 %import "com.aptana.parsing.ast.IParseNode";
