@@ -26,7 +26,7 @@ public interface INodeJSService
 	public static final String LINUX_DOCS_URL = "http://go.aptana.com/Installing+Node.js"; //$NON-NLS-1$
 	public static final String UPGRADE_URL = "http://go.aptana.com/Upgrading+Node.js"; //$NON-NLS-1$
 
-	public static final String MIN_NODE_VERSION = "0.6.0"; //$NON-NLS-1$
+	public static final String MIN_NODE_VERSION = "0.8.13"; //$NON-NLS-1$
 
 	/**
 	 * Error codes returned by {@link #acceptBinary(IPath)}
