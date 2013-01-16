@@ -224,7 +224,6 @@ public class NodePackageManager implements INodePackageManager
 				IPath nodePath = JSCorePlugin.getDefault().getNodeJSService().getValidExecutable();
 				if (nodePath != null)
 				{
-
 					nodePath = nodePath.removeLastSegments(1);// Remove file extension.
 					commonLocations.add(nodePath);
 					ShellExecutable.updatePathEnvironment(PlatformUtil.expandEnvironmentStrings(APPDATA_NPM));
@@ -234,7 +233,11 @@ public class NodePackageManager implements INodePackageManager
 			{
 				commonLocations = CollectionsUtil.newList(Path.fromOSString(USR_LOCAL_BIN_NPM));
 			}
-			npmPath = ExecutableUtil.find(NPM, true, commonLocations);
+			IPath path = ExecutableUtil.find(NPM, true, commonLocations);
+			if (path != null && path.toFile().exists())
+			{
+				npmPath = path;
+			}
 		}
 		return npmPath;
 	}
@@ -278,7 +281,7 @@ public class NodePackageManager implements INodePackageManager
 			{
 				// The paths we get are locations on disk. We can tell a module's name by looking for a path
 				// that is a child of 'nod_modules', i.e. "/usr/local/lib/node_modules/alloy"
-				if (NODE_MODULES.equals(path.segment(path.segmentCount() - 2))) //$NON-NLS-1$
+				if (NODE_MODULES.equals(path.segment(path.segmentCount() - 2)))
 				{
 					installed.add(path.lastSegment());
 				}
