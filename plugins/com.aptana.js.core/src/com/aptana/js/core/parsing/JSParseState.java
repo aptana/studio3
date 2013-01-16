@@ -78,7 +78,7 @@ public class JSParseState extends ParseState
 	 */
 	public boolean collectComments()
 	{
-		return getCurrentCommentContext().attachComments;
+		return getCurrentCommentContext().collectComments;
 	}
 
 	/**
