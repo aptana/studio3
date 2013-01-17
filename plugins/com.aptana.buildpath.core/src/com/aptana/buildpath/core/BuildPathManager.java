@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -14,7 +14,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -96,7 +96,7 @@ public class BuildPathManager
 		{
 			if (buildPaths == null)
 			{
-				buildPaths = new HashSet<BuildPathEntry>();
+				buildPaths = new LinkedHashSet<BuildPathEntry>();
 			}
 
 			buildPaths.add(entry);
@@ -204,7 +204,7 @@ public class BuildPathManager
 	 */
 	public Set<IBuildPathEntry> getBuildPaths()
 	{
-		Set<IBuildPathEntry> result = new HashSet<IBuildPathEntry>();
+		Set<IBuildPathEntry> result = new LinkedHashSet<IBuildPathEntry>();
 
 		// Add static paths, if we have any
 		if (buildPaths != null)
@@ -227,7 +227,7 @@ public class BuildPathManager
 	// FIXME We need this to be a list, because order matters!
 	public Set<IBuildPathEntry> getBuildPaths(IProject project)
 	{
-		Set<IBuildPathEntry> result = new HashSet<IBuildPathEntry>();
+		Set<IBuildPathEntry> result = new LinkedHashSet<IBuildPathEntry>();
 
 		try
 		{
@@ -302,7 +302,7 @@ public class BuildPathManager
 
 		if (contributors != null)
 		{
-			result = new HashSet<IBuildPathEntry>();
+			result = new LinkedHashSet<IBuildPathEntry>();
 
 			for (IBuildPathContributor contributor : contributors)
 			{
