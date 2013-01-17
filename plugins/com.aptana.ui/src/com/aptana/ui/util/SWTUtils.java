@@ -233,6 +233,16 @@ public class SWTUtils
 	}
 
 	/**
+	 * Convenience method for checking to see if a control is not disposed
+	 * 
+	 * @param control
+	 */
+	public static boolean isControlDisposed(Control control)
+	{
+		return (control != null) ? control.isDisposed() : true;
+	}
+
+	/**
 	 * Returns a version of the specified font, resized by the requested size.
 	 * 
 	 * @param font
