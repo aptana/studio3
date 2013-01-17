@@ -25,7 +25,7 @@ public interface IProjectWizardContributor extends IExecutableExtension
 	 * 
 	 * @return
 	 */
-	public IWizardPage createWizardPage();
+	public IWizardPage createWizardPage(Object data);
 
 	/**
 	 * Performs any specific finalization on all wizard pages
