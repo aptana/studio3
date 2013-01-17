@@ -159,6 +159,7 @@ public class UserAgentManager implements IUserAgentManager
 
 	public IUserAgent getUserAgentById(String id)
 	{
+		lazyLoad();
 		return fUserAgents.get(id);
 	}
 }
