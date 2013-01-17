@@ -39,7 +39,7 @@ public class ProjectWizardContributionManager
 	{
 	}
 
-	public IWizardPage[] createPages(String[] natureIds)
+	public IWizardPage[] createPages(Object data, String[] natureIds)
 	{
 		loadExtensions();
 		List<IWizardPage> pages = new ArrayList<IWizardPage>();
@@ -50,7 +50,7 @@ public class ProjectWizardContributionManager
 				continue;
 			}
 
-			IWizardPage wizardPage = contributor.createWizardPage();
+			IWizardPage wizardPage = contributor.createWizardPage(data);
 			if (wizardPage != null)
 			{
 				pages.add(wizardPage);

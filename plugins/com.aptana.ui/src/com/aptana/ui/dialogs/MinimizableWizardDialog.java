@@ -17,6 +17,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
+import com.aptana.ui.util.SWTUtils;
+
 /**
  * A {@link WizardDialog} implementation that allows replacing the "Finish" button with a "Hide" button, and has a
  * default behavior for hiding the wizard. By default, the wizard will be hidden, and a toast will appear on the bottom
@@ -160,6 +162,23 @@ public class MinimizableWizardDialog extends WizardDialog
 		if (button != null)
 		{
 			button.setText(hideOnFinish ? Messages.MinimizableWizardDialog_hideLabel : IDialogConstants.FINISH_LABEL);
+		}
+	}
+
+	/**
+	 * Updates the next and previous buttons since finish was already clicked
+	 */
+	public void disableButtonsOnFinish()
+	{
+		int[] ids = new int[] { IDialogConstants.NEXT_ID, IDialogConstants.BACK_ID };
+
+		for (int id : ids)
+		{
+			Button button = getButton(id);
+			if (!SWTUtils.isControlDisposed(button))
+			{
+				button.setEnabled(false);
+			}
 		}
 	}
 }

@@ -100,6 +100,9 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 	// Specifies the steps to use in step indicator composite
 	protected String[] stepNames;
 
+	// Specifies abstract data that has to be passed between wizard pages for validation.
+	protected Object data = new Object();
+
 	/**
 	 * Constructs a new Web Project Wizard.
 	 */
@@ -186,7 +189,7 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 		// Add contributed pages
 		ProjectWizardContributionManager projectWizardContributionManager = ProjectsPlugin.getDefault()
 				.getProjectWizardContributionManager();
-		IWizardPage[] extraPages = projectWizardContributionManager.createPages(getProjectNatures());
+		IWizardPage[] extraPages = projectWizardContributionManager.createPages(data, getProjectNatures());
 		if (!ArrayUtil.isEmpty(extraPages))
 		{
 			for (IWizardPage page : extraPages)
