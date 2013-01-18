@@ -346,12 +346,23 @@ public final class UIUtils
 	 */
 	public static boolean showView(String viewID)
 	{
+		return showView(viewID, IWorkbenchPage.VIEW_ACTIVATE);
+	}
+
+	/**
+	 * Shows the view specified
+	 * 
+	 * @param viewID
+	 * @return whether the view was shown
+	 */
+	public static boolean showView(String viewID, int mode)
+	{
 		IWorkbenchPage activePage = getActivePage();
 		if (activePage != null)
 		{
 			try
 			{
-				return activePage.showView(viewID) != null;
+				return activePage.showView(viewID, null, mode) != null;
 			}
 			catch (PartInitException e)
 			{
