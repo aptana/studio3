@@ -16,14 +16,14 @@
 
 package com.aptana.ui.dialogs;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.MessageFormat;
 
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.osgi.util.TextProcessor;
@@ -46,32 +46,28 @@ import org.eclipse.ui.internal.ide.dialogs.IDEResourceInfoUtils;
 import org.eclipse.ui.internal.ide.filesystem.FileSystemConfiguration;
 import org.eclipse.ui.internal.ide.filesystem.FileSystemSupportRegistry;
 
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.StringUtil;
 
 /**
- * ProjectContentsLocationArea is a convenience class for area that handle entry
- * of locations using URIs.
+ * ProjectContentsLocationArea is a convenience class for area that handle entry of locations using URIs.
  * 
  * @since 3.2
- * 
  */
-public class ProjectContentsLocationArea {
+public class ProjectContentsLocationArea
+{
 	/**
-	 * IErrorMessageReporter is an interface for type that allow message
-	 * reporting.
-	 * 
+	 * IErrorMessageReporter is an interface for type that allow message reporting.
 	 */
-	public interface IErrorMessageReporter {
+	public interface IErrorMessageReporter
+	{
 		/**
 		 * Report the error message
 		 * 
 		 * @param errorMessage
-		 *            String or <code>null</code>. If the errorMessage is
-		 *            null then clear any error state.
+		 *            String or <code>null</code>. If the errorMessage is null then clear any error state.
 		 * @param infoOnly
-		 *            the message is an informational message, but the dialog
-		 *            cannot continue
-		 * 
+		 *            the message is an informational message, but the dialog cannot continue
 		 */
 		public void reportError(String errorMessage, boolean infoOnly);
 	}
@@ -109,8 +105,8 @@ public class ProjectContentsLocationArea {
 	 * @param composite
 	 * @param startProject
 	 */
-	public ProjectContentsLocationArea(IErrorMessageReporter reporter,
-			Composite composite, IProject startProject) {
+	public ProjectContentsLocationArea(IErrorMessageReporter reporter, Composite composite, IProject startProject)
+	{
 
 		errorReporter = reporter;
 		projectName = startProject.getName();
@@ -120,10 +116,11 @@ public class ProjectContentsLocationArea {
 
 	/**
 	 * Set the project to base the contents off of.
-	 *
+	 * 
 	 * @param existingProject
 	 */
-	public void setExistingProject(IProject existingProject) {
+	public void setExistingProject(IProject existingProject)
+	{
 		projectName = existingProject.getName();
 		this.existingProject = existingProject;
 	}
@@ -134,8 +131,8 @@ public class ProjectContentsLocationArea {
 	 * @param reporter
 	 * @param composite
 	 */
-	public ProjectContentsLocationArea(IErrorMessageReporter reporter,
-			Composite composite) {
+	public ProjectContentsLocationArea(IErrorMessageReporter reporter, Composite composite)
+	{
 		errorReporter = reporter;
 
 		// If it is a new project always start enabled
@@ -148,7 +145,8 @@ public class ProjectContentsLocationArea {
 	 * @param composite
 	 * @param defaultEnabled
 	 */
-	private void createContents(Composite composite, boolean defaultEnabled) {
+	private void createContents(Composite composite, boolean defaultEnabled)
+	{
 
 		int columns = 4;
 
@@ -160,8 +158,7 @@ public class ProjectContentsLocationArea {
 		projectGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		useDefaultsButton = new Button(projectGroup, SWT.CHECK | SWT.RIGHT);
-		useDefaultsButton
-				.setText(IDEWorkbenchMessages.ProjectLocationSelectionDialog_useDefaultLabel);
+		useDefaultsButton.setText(IDEWorkbenchMessages.ProjectLocationSelectionDialog_useDefaultLabel);
 		useDefaultsButton.setSelection(defaultEnabled);
 		GridData buttonData = new GridData();
 		buttonData.horizontalSpan = columns;
@@ -169,18 +166,22 @@ public class ProjectContentsLocationArea {
 
 		createUserEntryArea(projectGroup, defaultEnabled);
 
-		useDefaultsButton.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
+		useDefaultsButton.addSelectionListener(new SelectionAdapter()
+		{
+			public void widgetSelected(SelectionEvent e)
+			{
 				boolean useDefaults = useDefaultsButton.getSelection();
 
-				if (useDefaults) {
+				if (useDefaults)
+				{
 					userPath = locationPathField.getText();
-					locationPathField.setText(TextProcessor
-							.process(getDefaultPathDisplayString()));
+					locationPathField.setText(TextProcessor.process(getDefaultPathDisplayString()));
 				}
 				String error = checkValidLocation();
-				errorReporter.reportError(error,
-						error != null && error.equals(IDEWorkbenchMessages.WizardNewProjectCreationPage_projectLocationEmpty));
+				errorReporter.reportError(
+						error,
+						error != null
+								&& error.equals(IDEWorkbenchMessages.WizardNewProjectCreationPage_projectLocationEmpty));
 				setUserAreaEnabled(!useDefaults);
 			}
 		});
@@ -188,12 +189,12 @@ public class ProjectContentsLocationArea {
 	}
 
 	/**
-	 * Return whether or not we are currently showing the default location for
-	 * the project.
+	 * Return whether or not we are currently showing the default location for the project.
 	 * 
 	 * @return boolean
 	 */
-	public boolean isDefault() {
+	public boolean isDefault()
+	{
 		return useDefaultsButton.getSelection();
 	}
 
@@ -203,11 +204,11 @@ public class ProjectContentsLocationArea {
 	 * @param composite
 	 * @param defaultEnabled
 	 */
-	private void createUserEntryArea(Composite composite, boolean defaultEnabled) {
+	private void createUserEntryArea(Composite composite, boolean defaultEnabled)
+	{
 		// location label
 		locationLabel = new Label(composite, SWT.NONE);
-		locationLabel
-				.setText(IDEWorkbenchMessages.ProjectLocationSelectionDialog_locationLabel);
+		locationLabel.setText(IDEWorkbenchMessages.ProjectLocationSelectionDialog_locationLabel);
 
 		// project location entry field
 		locationPathField = new Text(composite, SWT.BORDER);
@@ -219,33 +220,40 @@ public class ProjectContentsLocationArea {
 		// browse button
 		browseButton = new Button(composite, SWT.PUSH);
 		browseButton.setText(BROWSE_LABEL);
-		browseButton.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
+		browseButton.addSelectionListener(new SelectionAdapter()
+		{
+			public void widgetSelected(SelectionEvent event)
+			{
 				handleLocationBrowseButtonPressed();
 			}
 		});
 
 		createFileSystemSelection(composite);
 
-		if (defaultEnabled) {
-			locationPathField.setText(TextProcessor
-					.process(getDefaultPathDisplayString()));
-		} else {
-			if (existingProject == null) {
+		if (defaultEnabled)
+		{
+			locationPathField.setText(TextProcessor.process(getDefaultPathDisplayString()));
+		}
+		else
+		{
+			if (existingProject == null)
+			{
 				locationPathField.setText(IDEResourceInfoUtils.EMPTY_STRING);
-			} else {
-				locationPathField.setText(TextProcessor.process(existingProject
-						.getLocation().toOSString()));
+			}
+			else
+			{
+				locationPathField.setText(TextProcessor.process(existingProject.getLocation().toOSString()));
 			}
 		}
 
-		locationPathField.addModifyListener(new ModifyListener() {
+		locationPathField.addModifyListener(new ModifyListener()
+		{
 			/*
 			 * (non-Javadoc)
-			 * 
 			 * @see org.eclipse.swt.events.ModifyListener#modifyText(org.eclipse.swt.events.ModifyEvent)
 			 */
-			public void modifyText(ModifyEvent e) {
+			public void modifyText(ModifyEvent e)
+			{
 				errorReporter.reportError(checkValidLocation(), false);
 			}
 		});
@@ -256,10 +264,12 @@ public class ProjectContentsLocationArea {
 	 * 
 	 * @param composite
 	 */
-	private void createFileSystemSelection(Composite composite) {
+	private void createFileSystemSelection(Composite composite)
+	{
 
 		// Always use the default if that is all there is.
-		if (FileSystemSupportRegistry.getInstance().hasOneFileSystem()) {
+		if (FileSystemSupportRegistry.getInstance().hasOneFileSystem())
+		{
 			return;
 		}
 
@@ -270,20 +280,22 @@ public class ProjectContentsLocationArea {
 	}
 
 	/**
-	 * Return the path we are going to display. If it is a file URI then remove
-	 * the file prefix.
+	 * Return the path we are going to display. If it is a file URI then remove the file prefix.
 	 * 
 	 * @return String
 	 */
-	private String getDefaultPathDisplayString() {
+	private String getDefaultPathDisplayString()
+	{
 
 		URI defaultURI = null;
-		if (existingProject != null) {
+		if (existingProject != null)
+		{
 			defaultURI = existingProject.getLocationURI();
 		}
 
 		// Handle files specially. Assume a file if there is no project to query
-		if (defaultURI == null || defaultURI.getScheme().equals(FILE_SCHEME)) {
+		if (defaultURI == null || defaultURI.getScheme().equals(FILE_SCHEME))
+		{
 			return Platform.getLocation().append(projectName).toOSString();
 		}
 		return defaultURI.toString();
@@ -295,77 +307,85 @@ public class ProjectContentsLocationArea {
 	 * 
 	 * @param enabled
 	 */
-	private void setUserAreaEnabled(boolean enabled) {
+	private void setUserAreaEnabled(boolean enabled)
+	{
 
 		locationLabel.setEnabled(enabled);
 		locationPathField.setEnabled(enabled);
 		browseButton.setEnabled(enabled);
-		if (fileSystemSelectionArea != null) {
+		if (fileSystemSelectionArea != null)
+		{
 			fileSystemSelectionArea.setEnabled(enabled);
 		}
 	}
 
 	/**
-	 * Return the browse button. Usually referenced in order to set the layout
-	 * data for a dialog.
+	 * Return the browse button. Usually referenced in order to set the layout data for a dialog.
 	 * 
 	 * @return Button
 	 */
-	public Button getBrowseButton() {
+	public Button getBrowseButton()
+	{
 		return browseButton;
 	}
 
-	private IDialogSettings getDialogSettings() {
+	private IDialogSettings getDialogSettings()
+	{
 		IDialogSettings ideDialogSettings = IDEWorkbenchPlugin.getDefault().getDialogSettings();
 		IDialogSettings result = ideDialogSettings.getSection(getClass().getName());
-		if (result == null) {
+		if (result == null)
+		{
 			result = ideDialogSettings.addNewSection(getClass().getName());
 		}
 		return result;
 	}
-	
+
 	/**
 	 * Open an appropriate directory browser
 	 */
-	private void handleLocationBrowseButtonPressed() {
+	private void handleLocationBrowseButtonPressed()
+	{
 
 		String selectedDirectory = null;
 		String dirName = getPathFromLocationField();
 
-		if (!dirName.equals(IDEResourceInfoUtils.EMPTY_STRING)) {
+		if (!dirName.equals(IDEResourceInfoUtils.EMPTY_STRING))
+		{
 			IFileInfo info;
 			info = IDEResourceInfoUtils.getFileInfo(dirName);
 
 			if (info == null || !(info.exists()))
 				dirName = IDEResourceInfoUtils.EMPTY_STRING;
-		} else {
+		}
+		else
+		{
 			String value = getDialogSettings().get(SAVED_LOCATION_ATTR);
-			if (value != null) {
+			if (value != null)
+			{
 				dirName = value;
 			}
 		}
 
 		FileSystemConfiguration config = getSelectedConfiguration();
-		if (config== null || config.equals(
-				FileSystemSupportRegistry.getInstance()
-						.getDefaultConfiguration())) {
-			DirectoryDialog dialog = new DirectoryDialog(locationPathField
-					.getShell(), SWT.SHEET);
-			dialog
-					.setMessage(IDEWorkbenchMessages.ProjectLocationSelectionDialog_directoryLabel);
+		if (config == null || config.equals(FileSystemSupportRegistry.getInstance().getDefaultConfiguration()))
+		{
+			DirectoryDialog dialog = new DirectoryDialog(locationPathField.getShell(), SWT.SHEET);
+			dialog.setMessage(IDEWorkbenchMessages.ProjectLocationSelectionDialog_directoryLabel);
 
 			dialog.setFilterPath(dirName);
 
 			selectedDirectory = dialog.open();
 
-		} else {
-			URI uri = getSelectedConfiguration().getContributor()
-					.browseFileSystem(dirName, browseButton.getShell());
+		}
+		else
+		{
+			URI uri = getSelectedConfiguration().getContributor().browseFileSystem(dirName, browseButton.getShell());
 			if (uri != null)
 				selectedDirectory = uri.toString();
 		}
 
-		if (selectedDirectory != null) {
+		if (selectedDirectory != null)
+		{
 			updateLocationField(selectedDirectory);
 			getDialogSettings().put(SAVED_LOCATION_ATTR, selectedDirectory);
 		}
@@ -376,7 +396,8 @@ public class ProjectContentsLocationArea {
 	 * 
 	 * @param selectedPath
 	 */
-	private void updateLocationField(String selectedPath) {
+	private void updateLocationField(String selectedPath)
+	{
 		locationPathField.setText(TextProcessor.process(selectedPath));
 	}
 
@@ -385,48 +406,60 @@ public class ProjectContentsLocationArea {
 	 * 
 	 * @return the path or the field's text if the path is invalid
 	 */
-	private String getPathFromLocationField() {
+	private String getPathFromLocationField()
+	{
 		URI fieldURI;
-		try {
+		try
+		{
 			fieldURI = new URI(locationPathField.getText());
-		} catch (URISyntaxException e) {
+		}
+		catch (URISyntaxException e)
+		{
 			return locationPathField.getText();
 		}
-		String path= fieldURI.getPath();
+		String path = fieldURI.getPath();
 		return path != null ? path : locationPathField.getText();
 	}
 
 	/**
-	 * Check if the entry in the widget location is valid. If it is valid return
-	 * null. Otherwise return a string that indicates the problem.
+	 * Check if the entry in the widget location is valid. If it is valid return null. Otherwise return a string that
+	 * indicates the problem.
 	 * 
 	 * @return String
 	 */
-	public String checkValidLocation() {
+	public String checkValidLocation()
+	{
 
 		String locationFieldContents = locationPathField.getText();
-		if (locationFieldContents.length() == 0) {
+		if (locationFieldContents.length() == 0)
+		{
 			return IDEWorkbenchMessages.WizardNewProjectCreationPage_projectLocationEmpty;
 		}
 
 		URI newPath = getProjectLocationURI();
-		if (newPath == null) {
+		if (newPath == null)
+		{
 			return IDEWorkbenchMessages.ProjectLocationSelectionDialog_locationError;
 		}
 
-		if (existingProject != null) {
+		if (existingProject != null)
+		{
 			URI projectPath = existingProject.getLocationURI();
-			if (projectPath != null && URIUtil.equals(projectPath, newPath)) {
+			if (projectPath != null && URIUtil.equals(projectPath, newPath))
+			{
 				return IDEWorkbenchMessages.ProjectLocationSelectionDialog_locationIsSelf;
 			}
 		}
 
-		if (!isDefault()) {
-			IStatus locationStatus = ResourcesPlugin.getWorkspace()
-					.validateProjectLocationURI(existingProject, newPath);
-
-			if (!locationStatus.isOK()) {
-				return locationStatus.getMessage();
+		if (!isDefault())
+		{
+			File newLocation = new File(locationFieldContents);
+			if (newLocation.exists())
+			{
+				if (!ArrayUtil.isEmpty(newLocation.list()))
+				{
+					return MessageFormat.format(EplMessages.ProjectContentsLocationArea_NonEmptyDirectory, newLocation);
+				}
 			}
 		}
 
@@ -438,28 +471,29 @@ public class ProjectContentsLocationArea {
 	 * 
 	 * @return URI or <code>null</code> if it is not valid.
 	 */
-	public URI getProjectLocationURI() {
+	public URI getProjectLocationURI()
+	{
 
 		FileSystemConfiguration configuration = getSelectedConfiguration();
-		if (configuration == null) {
+		if (configuration == null)
+		{
 			return null;
 		}
 
-		return configuration.getContributor().getURI(
-				locationPathField.getText());
+		return configuration.getContributor().getURI(locationPathField.getText());
 
 	}
 
 	/**
 	 * Return the selected contributor
 	 * 
-	 * @return FileSystemConfiguration or <code>null</code> if it cannot be
-	 *         determined.
+	 * @return FileSystemConfiguration or <code>null</code> if it cannot be determined.
 	 */
-	private FileSystemConfiguration getSelectedConfiguration() {
-		if (fileSystemSelectionArea == null) {
-			return FileSystemSupportRegistry.getInstance()
-					.getDefaultConfiguration();
+	private FileSystemConfiguration getSelectedConfiguration()
+	{
+		if (fileSystemSelectionArea == null)
+		{
+			return FileSystemSupportRegistry.getInstance().getDefaultConfiguration();
 		}
 
 		return fileSystemSelectionArea.getSelectedConfiguration();
@@ -469,26 +503,28 @@ public class ProjectContentsLocationArea {
 	 * Set the text to the default or clear it if not using the defaults.
 	 * 
 	 * @param newName
-	 *            the name of the project to use. If <code>null</code> use the
-	 *            existing project name.
+	 *            the name of the project to use. If <code>null</code> use the existing project name.
 	 */
-	public void updateProjectName(String newName) {
+	public void updateProjectName(String newName)
+	{
 		projectName = newName;
-		if (isDefault()) {
-			locationPathField.setText(TextProcessor
-					.process(getDefaultPathDisplayString()));
+		if (isDefault())
+		{
+			locationPathField.setText(TextProcessor.process(getDefaultPathDisplayString()));
 		}
 
 	}
 
 	/**
-	 * Return the location for the project. If we are using defaults then return
-	 * the workspace root so that core creates it with default values.
+	 * Return the location for the project. If we are using defaults then return the workspace root so that core creates
+	 * it with default values.
 	 * 
 	 * @return String
 	 */
-	public String getProjectLocation() {
-		if (isDefault()) {
+	public String getProjectLocation()
+	{
+		if (isDefault())
+		{
 			return Platform.getLocation().toOSString();
 		}
 		return locationPathField.getText();
