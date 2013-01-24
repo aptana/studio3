@@ -12,7 +12,6 @@ import java.net.URL;
 import java.text.MessageFormat;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.browser.Browser;
@@ -22,6 +21,7 @@ import org.eclipse.swt.browser.TitleEvent;
 import org.eclipse.swt.browser.TitleListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
@@ -171,14 +171,12 @@ public final class PreviewEditorPart extends EditorPart implements IReusableEdit
 
 	private Browser createBrowser(Composite parent, int style)
 	{
-		if (Platform.OS_LINUX.equals(Platform.getOS()))
+		Control browser = new WebBrowserViewer(parent, style).getBrowser();
+		if (browser instanceof Browser)
 		{
-			return new BrowserViewer(parent, style).getBrowser();
+			return (Browser) browser;
 		}
-		else
-		{
-			return (Browser) new WebBrowserViewer(parent, style).getBrowser();
-		}
+		return new BrowserViewer(parent, style).getBrowser();
 	}
 
 	/*
