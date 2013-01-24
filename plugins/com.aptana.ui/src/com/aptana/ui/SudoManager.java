@@ -38,6 +38,8 @@ public class SudoManager
 	private String SUDO_INPUT_PWD = "-S"; //$NON-NLS-1$
 	private String ECHO_MESSAGE = "SUCCESS"; //$NON-NLS-1$
 
+	private static int MAX_ATTEMPTS = 3;
+
 	public SudoManager()
 	{
 	}
@@ -104,9 +106,11 @@ public class SudoManager
 					try
 					{
 						boolean retry;
+						int retryAttempts = 0;
 						String promptMessage = Messages.SudoManager_MessagePrompt;
 						do
 						{
+							retryAttempts++;
 							retry = false;
 							SudoPasswordPromptDialog sudoDialog = new SudoPasswordPromptDialog(UIUtils
 									.getActiveWorkbenchWindow(), promptMessage);
@@ -117,7 +121,12 @@ public class SudoManager
 							}
 							promptMessage = Messages.Sudo_Invalid_Password_Prompt;
 						}
-						while (retry);
+						while (retry && retryAttempts < MAX_ATTEMPTS);
+						if (validPassword.length == 0 && retryAttempts >= MAX_ATTEMPTS)
+						{
+							// User has exceeded the max attempts to provide the password.
+							throw new CoreException(Status.CANCEL_STATUS);
+						}
 					}
 					catch (CoreException e)
 					{
