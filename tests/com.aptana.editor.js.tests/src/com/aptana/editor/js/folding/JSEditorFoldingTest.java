@@ -96,7 +96,7 @@ public class JSEditorFoldingTest extends TestCase
 			Collection<Position> values = positions.values();
 			checkFound(values, 0, 20);
 			checkFound(values, 20, 32);
-			assertComments(editor.getReconcileAST(), true);
+			assertComments(editor.getAST(), true);
 
 			setFoldingEnabled(false);
 
@@ -112,7 +112,7 @@ public class JSEditorFoldingTest extends TestCase
 			commonStrategy.fullReconcile();
 			positions = commonStrategy.getPositions();
 			assertEquals(0, positions.size());
-			assertComments(editor.getReconcileAST(), false);
+			assertComments(editor.getAST(), true);
 		}
 		finally
 		{
