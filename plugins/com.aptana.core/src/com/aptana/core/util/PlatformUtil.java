@@ -72,7 +72,7 @@ public final class PlatformUtil
 
 	public enum PlatformOs
 	{
-		WINDOWS, MAC, LINUX
+		WINDOWS, MAC, LINUX, WINDOWS_8
 	};
 
 	/**
@@ -118,6 +118,15 @@ public final class PlatformUtil
 				tempPlatform = PlatformOs.LINUX;
 			}
 		}
+		if (tempPlatform == PlatformOs.WINDOWS)
+		{
+			String ver = System.getProperty("os.version"); //$NON-NLS-1$
+			float versionNo = Float.parseFloat(ver);
+			if (versionNo > 6.1)
+			{
+				tempPlatform = PlatformOs.WINDOWS_8;
+			}
+		}
 		platform = tempPlatform; // assign final variable.
 	}
 
@@ -143,6 +152,12 @@ public final class PlatformUtil
 	public static boolean isLinux()
 	{
 		return platform == PlatformOs.LINUX;
+	}
+
+	public static boolean isWindows8()
+	{
+		return platform == PlatformOs.WINDOWS_8;
+
 	}
 
 	/**
