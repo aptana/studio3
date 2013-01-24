@@ -111,6 +111,7 @@ import com.aptana.editor.common.scripting.commands.CommandExecutionUtils;
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.common.text.reconciler.RubyRegexpFolder;
 import com.aptana.editor.common.viewer.CommonProjectionViewer;
+import com.aptana.parsing.ParseResult;
 import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
@@ -272,7 +273,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	/**
 	 * Used to cache the last ast for a document.
 	 */
-	private IParseRootNode lastAstForModificationStamp;
+	private ParseResult lastAstForModificationStamp;
 
 	/**
 	 * Lock used to cache the last ast for a document.
@@ -1141,17 +1142,6 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	}
 
 	/**
-	 * @return the parse node for the current contents of this editor to be used during a reconcile. This means that the
-	 *         AST generated will be used for updating the outline and updating the folding structure (subclasses may
-	 *         override -- i.e.: in the JS editor, if folding is enabled, the ast will need to be generated with
-	 *         comments).
-	 */
-	public IParseRootNode getReconcileAST()
-	{
-		return getAST();
-	}
-
-	/**
 	 * Note: this was deprecated and is restored as this has a faster cache based on the document time (so, this is the
 	 * preferred way of getting the ast based on the full document for the editor).
 	 * 
@@ -1162,40 +1152,10 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	 */
 	public IParseRootNode getAST()
 	{
-		try
+		ParseResult pr = getParseResult();
+		if (pr != null)
 		{
-			IDocument document = getDocument();
-			if (document == null)
-			{
-				return null;
-			}
-			long modificationStamp = IDocumentExtension4.UNKNOWN_MODIFICATION_STAMP;
-			if (document instanceof IDocumentExtension4)
-			{
-				synchronized (modificationStampLock)
-				{
-					IDocumentExtension4 iDocumentExtension = (IDocumentExtension4) document;
-					modificationStamp = iDocumentExtension.getModificationStamp();
-					if (modificationStamp != IDocumentExtension4.UNKNOWN_MODIFICATION_STAMP
-							&& modificationStamp == lastModificationStamp)
-					{
-						return lastAstForModificationStamp;
-					}
-				}
-			}
-			// Don't synchronize the actual parse!
-			IParseRootNode ast = doGetAST(document);
-
-			synchronized (modificationStampLock)
-			{
-				lastAstForModificationStamp = ast;
-				lastModificationStamp = modificationStamp;
-				return lastAstForModificationStamp;
-			}
-		}
-		catch (Throwable e)
-		{
-			IdeLog.logTrace(CommonEditorPlugin.getDefault(), e.getMessage(), e, IDebugScopes.AST);
+			return pr.getRootNode();
 		}
 		return null;
 	}
@@ -1203,9 +1163,9 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	/**
 	 * Override this method to calculate the ast (while maintaining the document time based cache).
 	 */
-	protected IParseRootNode doGetAST(IDocument document) throws Exception
+	protected ParseResult doGetAST(IDocument document) throws Exception
 	{
-		return ParserPoolFactory.parse(getContentType(), document.get()).getRootNode();
+		return ParserPoolFactory.parse(getContentType(), document.get());
 	}
 
 	/**
@@ -1381,6 +1341,46 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 				}
 			}
 		});
+	}
+
+	public ParseResult getParseResult()
+	{
+		try
+		{
+			IDocument document = getDocument();
+			if (document == null)
+			{
+				return null;
+			}
+			long modificationStamp = IDocumentExtension4.UNKNOWN_MODIFICATION_STAMP;
+			if (document instanceof IDocumentExtension4)
+			{
+				synchronized (modificationStampLock)
+				{
+					IDocumentExtension4 iDocumentExtension = (IDocumentExtension4) document;
+					modificationStamp = iDocumentExtension.getModificationStamp();
+					if (modificationStamp != IDocumentExtension4.UNKNOWN_MODIFICATION_STAMP
+							&& modificationStamp == lastModificationStamp)
+					{
+						return lastAstForModificationStamp;
+					}
+				}
+			}
+			// Don't synchronize the actual parse!
+			ParseResult ast = doGetAST(document);
+
+			synchronized (modificationStampLock)
+			{
+				lastAstForModificationStamp = ast;
+				lastModificationStamp = modificationStamp;
+				return lastAstForModificationStamp;
+			}
+		}
+		catch (Throwable e)
+		{
+			IdeLog.logTrace(CommonEditorPlugin.getDefault(), e.getMessage(), e, IDebugScopes.AST);
+		}
+		return null;
 	}
 
 }

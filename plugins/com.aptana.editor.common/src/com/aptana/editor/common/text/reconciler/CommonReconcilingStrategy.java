@@ -7,6 +7,7 @@
  */
 package com.aptana.editor.common.text.reconciler;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +45,8 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.ICommonAnnotationModel;
 import com.aptana.editor.common.util.EditorUtil;
+import com.aptana.parsing.ParseResult;
+import com.aptana.parsing.ast.IParseError;
 import com.aptana.parsing.ast.IParseRootNode;
 
 public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconcilingStrategyExtension,
@@ -240,7 +243,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		AbstractThemeableEditor editor = fEditor;
 		if (editor != null)
 		{
-			ast = editor.getReconcileAST();
+			ast = editor.getAST();
 
 			// The call to get the ast can get a long time, so, let's check our field again.
 			editor = fEditor;
@@ -371,6 +374,20 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 						return fEditor.getAST();
 					}
 					return super.getAST();
+				}
+
+				@Override
+				public Collection<IParseError> getParseErrors()
+				{
+					if (fEditor != null)
+					{
+						ParseResult pr = fEditor.getParseResult();
+						if (pr != null)
+						{
+							return pr.getErrors();
+						}
+					}
+					return super.getParseErrors();
 				}
 			};
 		}
