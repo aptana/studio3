@@ -19,8 +19,10 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
+import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -154,6 +156,15 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 		tableViewer.setCheckedElements(selectedEntries.toArray());
 		tableViewer.setComparator(new CheckPriorityComparator());
 
+		tableViewer.addCheckStateListener(new ICheckStateListener()
+		{
+
+			public void checkStateChanged(CheckStateChangedEvent event)
+			{
+				tableViewer.refresh();
+			}
+		});
+
 		return composite;
 	}
 
@@ -254,7 +265,8 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 				if (item.getChecked())
 				{
 					upButton.setEnabled(selectionIndex != 0);
-					downButton.setEnabled(selectionIndex < table.getItemCount() - 1);
+					downButton.setEnabled(selectionIndex < table.getItemCount() - 1
+							&& selectionIndex < tableViewer.getCheckedElements().length - 1);
 					if (!selectedEntries.contains(data))
 					{
 						selectedEntries.add(data);
