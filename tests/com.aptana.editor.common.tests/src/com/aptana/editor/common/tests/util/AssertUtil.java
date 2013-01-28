@@ -46,7 +46,7 @@ public class AssertUtil
 			ICompletionProposal[] proposals, int offset, Point point)
 	{
 		assertProposalApplies(document, proposal, proposals, offset, point);
-		TestCase.assertEquals(expected, document.get());
+		TestCase.assertEquals("Document contents after proposal don't match expectations", expected, document.get());
 	}
 
 	/**
@@ -88,9 +88,9 @@ public class AssertUtil
 
 			if (point != null)
 			{
-				Point pt = viewer.getSelectedRange();
-				TestCase.assertEquals(point.x, pt.x);
-				TestCase.assertEquals(point.y, pt.y);
+				Point pt = p.getSelection(document);
+				TestCase.assertEquals("Start of post-proposal selection/cursor position doesn't match", point.x, pt.x);
+				TestCase.assertEquals("Length of post-proposal selection/cursor position doesn't match", point.y, pt.y);
 			}
 
 		}
@@ -105,7 +105,7 @@ public class AssertUtil
 	public static void assertProposalFound(String proposal, ICompletionProposal[] proposals)
 	{
 		ICompletionProposal p = findProposal(proposal, proposals);
-		TestCase.assertNotNull(MessageFormat.format("Proposal {0} not found in list", proposal), p);
+		TestCase.assertNotNull(MessageFormat.format("Proposal {0} not found in list: {1}", proposal, StringUtil.join(", ", proposals)), p);
 	}
 
 	/**

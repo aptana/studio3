@@ -620,7 +620,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 
 		// looking for .testclass#a#b
 		ICompletionProposal[] proposals = processor.doComputeCompletionProposals(viewer, offset, '\t', false);
-		AssertUtil.assertProposalApplies(document, ".testclass", proposals, offset, new Point(0, 0));
+		AssertUtil.assertProposalApplies(document, ".testclass", proposals, offset, null);
 
 		// test for #a
 		offset = document.getLength() - 1;
@@ -628,7 +628,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 		offset++;
 
 		proposals = processor.doComputeCompletionProposals(viewer, offset, '\t', false);
-		AssertUtil.assertProposalApplies(document, "#a", proposals, offset, new Point(0, 0));
+		AssertUtil.assertProposalApplies(document, "#a", proposals, offset, null);
 
 		// test for #b
 		offset = document.getLength() - 1;
@@ -636,7 +636,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 		offset++;
 
 		proposals = processor.doComputeCompletionProposals(viewer, offset, '\t', false);
-		AssertUtil.assertProposalApplies(document, "#b", proposals, offset, new Point(0, 0));
+		AssertUtil.assertProposalApplies(document, "#b", proposals, offset, null);
 
 	}
 
@@ -700,7 +700,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 		offset += toInsert.length() - 1; // cursor before }
 
 		ICompletionProposal[] proposals = processor.doComputeCompletionProposals(viewer, offset, '\t', false);
-		AssertUtil.assertProposalApplies(document, "#CCCCCC", proposals, offset, new Point(0, 0));
+		AssertUtil.assertProposalApplies(document, "#CCCCCC", proposals, offset, null);
 	}
 
 	/**
@@ -718,7 +718,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 		offset += toInsert.length() - 1; // cursor before }
 
 		ICompletionProposal[] proposals = processor.doComputeCompletionProposals(viewer, offset, '\t', false);
-		AssertUtil.assertProposalApplies(document, "#CCCCCC", proposals, offset, new Point(0, 0));
+		AssertUtil.assertProposalApplies(document, "#CCCCCC", proposals, offset, null);
 	}
 
 	public void testCreateLexemeProviderEmptyDocument()
@@ -943,7 +943,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	 */
 	protected void assertCompletionCorrect(String source, char trigger, String proposalToChoose, String postCompletion)
 	{
-		assertCompletionCorrect(source, trigger, -1, proposalToChoose, postCompletion, new Point(0, 0));
+		assertCompletionCorrect(source, trigger, -1, proposalToChoose, postCompletion, null);
 	}
 
 	/**

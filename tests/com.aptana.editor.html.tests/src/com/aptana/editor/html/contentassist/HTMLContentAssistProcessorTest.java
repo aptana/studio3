@@ -507,7 +507,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		AssertUtil.assertProposalFound("root.css", proposals);
 		AssertUtil.assertProposalFound("folder", proposals);
 		AssertUtil.assertProposalApplies("<link rel='stylesheet' href='/folder' />", document, "folder", proposals,
-				offset, new Point(0, 0));
+				offset, null);
 
 		WebServerCorePlugin.getDefault().getServerManager().remove(server);
 		project.delete();
@@ -529,7 +529,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 
 		AssertUtil.assertProposalFound("railsfile.html", proposals);
 		AssertUtil.assertProposalApplies("<link rel='stylesheet' href='/railsfile.html' />", document,
-				"railsfile.html", proposals, offset, new Point(0, 0));
+				"railsfile.html", proposals, offset, null);
 
 		project.delete();
 
@@ -565,7 +565,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		assertEquals(1, proposals.length);
 		AssertUtil.assertProposalFound("inside_folder.css", proposals);
 		AssertUtil.assertProposalApplies("<link rel='stylesheet' href='" + fileUri + "/inside_folder.css' />",
-				fDocument, "inside_folder.css", proposals, offset, new Point(0, 0));
+				fDocument, "inside_folder.css", proposals, offset, null);
 
 		project.delete();
 	}
@@ -601,7 +601,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 
 		AssertUtil.assertProposalFound("inside_folder.css", proposals);
 		AssertUtil.assertProposalApplies("<link rel='stylesheet' href='" + fileUri + "/inside_folder.css' />",
-				fDocument, "inside_folder.css", proposals, offset, new Point(0, 0));
+				fDocument, "inside_folder.css", proposals, offset, null);
 
 		project.delete();
 
@@ -758,7 +758,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		ICompletionProposal[] proposals = processor.doComputeCompletionProposals(viewer, offset, '\t', false);
 
 		AssertUtil.assertProposalFound(proposalToChoose, proposals);
-		AssertUtil.assertProposalApplies(expected, document, proposalToChoose, proposals, offset, new Point(0, 0));
+		AssertUtil.assertProposalApplies(expected, document, proposalToChoose, proposals, offset, null);
 
 		project.delete();
 	}
@@ -909,6 +909,21 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		AssertUtil.assertProposalFound("text/javascript", proposals);
 		AssertUtil.assertProposalApplies("<script type='text/javascript'>", fDocument, "text/javascript", proposals,
 				offset, null);
+	}
+
+	public void testAtrributeValuePartialValueNoLeadingQuote()
+	{
+		String document = "<link rel=alt| />";
+		int offset = HTMLTestUtil.findCursorOffset(document);
+		fDocument = HTMLTestUtil.createDocument(document, true);
+		ITextViewer viewer = createTextViewer(fDocument);
+
+		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
+		assertTrue(proposals.length >= 1); // "alternate"
+		// insert the "alternate" proposal
+		AssertUtil.assertProposalFound("alternate", proposals);
+		AssertUtil.assertProposalApplies("<link rel=\"alternate\" />", fDocument, "alternate", proposals, offset,
+				new Point(21, 0));
 	}
 
 	public void testAtrributeValueNoValueWrappingSingleQuoteTrailingAttributeName()

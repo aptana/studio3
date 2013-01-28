@@ -297,8 +297,9 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 	public void apply(ITextViewer viewer, char trigger, int stateMask, int offset)
 	{
 		IDocument document = viewer.getDocument();
-		boolean validPrefix = isValidPrefix(getPrefix(document, offset), getDisplayString(), true);
-		boolean validPrefixCaseSensitive = isValidPrefix(getPrefix(document, offset), getDisplayString(), false);
+		String prefix = getPrefix(document, offset);
+		boolean validPrefix = isValidPrefix(prefix, getDisplayString(), true);
+		boolean prefixMatchesReplacementExactly = isValidPrefix(prefix, _replacementString, false);
 
 		boolean addedTrigger = false;
 		char[] triggers = getTriggerCharacters();
@@ -313,9 +314,14 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 			}
 		}
 
+		// FIXME If we've modified the replacement string to add optional leading/trailing characters (like quotes) this
+		// breaks insertion behavior
+		// This is happening in HTMLAttributeValueProposal and TSSElementSelectorProposal when we complete a partial
+		// prefix value without a leading quote
+
 		// It seems plausible this logic could be simplified
 		int shift = 0;
-		if (validPrefix && validPrefixCaseSensitive)
+		if (validPrefix && prefixMatchesReplacementExactly)
 		{
 			shift = offset - this._replacementOffset;
 		}
@@ -325,7 +331,7 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 			int length = Math.max(0, this._replacementLength - shift);
 			String toReplace = this._replacementString.substring(shift);
 
-			if (!validPrefix || validPrefix && !validPrefixCaseSensitive)
+			if (!validPrefix || validPrefix && !prefixMatchesReplacementExactly)
 			{
 				offset = this._replacementOffset;
 			}

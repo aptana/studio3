@@ -445,7 +445,16 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					// If the current lexeme and the attribute name don't match, make the replacement null
 					if (!_currentLexeme.getText().equals(attributeName))
 					{
-						this._replaceRange = null;
+						// We need to set replacement to null if we're up in front of the next attribute name, but to
+						// current lexeme otherwise
+						if (offset <= _currentLexeme.getStartingOffset())
+						{
+							this._replaceRange = null;
+						}
+						else
+						{
+							this._replaceRange = _currentLexeme;
+						}
 					}
 					break;
 			}
