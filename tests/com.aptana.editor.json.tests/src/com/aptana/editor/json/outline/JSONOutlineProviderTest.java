@@ -12,6 +12,7 @@ import junit.framework.TestCase;
 import com.aptana.editor.json.JSONPlugin;
 import com.aptana.json.core.parsing.JSONParser;
 import com.aptana.parsing.IParseState;
+import com.aptana.parsing.ParseResult;
 import com.aptana.parsing.ParseState;
 
 public class JSONOutlineProviderTest extends TestCase
@@ -41,9 +42,9 @@ public class JSONOutlineProviderTest extends TestCase
 	{
 		String source = "{\n\"name\": \"Product\",\n\"properties\": {\n\"required\": true,\n\"width\": 1024,\n\"optional\": null,\n\"days\": [\"Sunday\", \"Saturday\"]\n}\n}";
 		IParseState parseState = new ParseState(source);
-		Object result = fParser.parse(parseState);
+		ParseResult result = fParser.parse(parseState);
 
-		Object[] children = fContentProvider.getChildren(result);
+		Object[] children = fContentProvider.getChildren(result.getRootNode());
 		assertEquals(1, children.length);
 		assertEquals("<Object>: Product", fLabelProvider.getText(children[0]));
 		assertEquals(JSONPlugin.getImage("icons/object-literal.png"), fLabelProvider.getImage(children[0]));
