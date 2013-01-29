@@ -90,4 +90,11 @@ public interface INodeJSService
 	public IStatus validateSourcePath(IPath path);
 
 	public String getVersion(IPath path);
+
+	/**
+	 * Checks whether NodeJS is already installed on the machine.
+	 * 
+	 * @return true if NodeJS is already available on the machine.
+	 */
+	public boolean isInstalled();
 }
