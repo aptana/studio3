@@ -34,19 +34,16 @@ public class AssertUtil
 	}
 
 	/**
-	 * Assert that the proposal correctly inserts into the document
-	 * 
-	 * @param expected
+	 * @deprecated Use {@link #assertProposalApplies(String, IDocument, String, ICompletionProposal[], int, Point)}
 	 * @param document
 	 * @param proposal
 	 * @param proposals
 	 * @param offset
 	 */
-	public static void assertProposalApplies(String expected, IDocument document, String proposal,
-			ICompletionProposal[] proposals, int offset, Point point)
+	public static void assertProposalApplies(IDocument document, String proposal, ICompletionProposal[] proposals,
+			int offset)
 	{
-		assertProposalApplies(document, proposal, proposals, offset, point);
-		TestCase.assertEquals("Document contents after proposal don't match expectations", expected, document.get());
+		assertProposalApplies(null, document, proposal, proposals, offset, null);
 	}
 
 	/**
@@ -58,8 +55,8 @@ public class AssertUtil
 	 * @param proposals
 	 * @param offset
 	 */
-	public static void assertProposalApplies(IDocument document, String proposal, ICompletionProposal[] proposals,
-			int offset, Point point)
+	public static void assertProposalApplies(String expected, IDocument document, String proposal,
+			ICompletionProposal[] proposals, int offset, Point point)
 	{
 		if (proposal != null)
 		{
@@ -86,6 +83,12 @@ public class AssertUtil
 					((ICompletionProposalExtension2) p).validate(document, offset, null));
 			((ICompletionProposalExtension2) p).apply(viewer, '\t', SWT.NONE, offset);
 
+			if (expected != null)
+			{
+				TestCase.assertEquals("Document contents after proposal don't match expectations", expected,
+						document.get());
+			}
+
 			if (point != null)
 			{
 				Point pt = p.getSelection(document);
@@ -105,7 +108,9 @@ public class AssertUtil
 	public static void assertProposalFound(String proposal, ICompletionProposal[] proposals)
 	{
 		ICompletionProposal p = findProposal(proposal, proposals);
-		TestCase.assertNotNull(MessageFormat.format("Proposal {0} not found in list: {1}", proposal, StringUtil.join(", ", proposals)), p);
+		TestCase.assertNotNull(
+				MessageFormat.format("Proposal {0} not found in list: {1}", proposal, StringUtil.join(", ", proposals)),
+				p);
 	}
 
 	/**

@@ -377,7 +377,9 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 	public boolean validate(IDocument document, int offset, DocumentEvent event)
 	{
 		if (offset < this._replacementOffset)
+		{
 			return false;
+		}
 
 		int overlapIndex = getDisplayString().length() - _replacementString.length();
 		overlapIndex = Math.max(0, overlapIndex);
@@ -413,7 +415,7 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 		catch (BadLocationException x)
 		{
 		}
-		return ""; //$NON-NLS-1$
+		return StringUtil.EMPTY;
 	}
 
 	/**

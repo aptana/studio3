@@ -620,7 +620,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 
 		// looking for .testclass#a#b
 		ICompletionProposal[] proposals = processor.doComputeCompletionProposals(viewer, offset, '\t', false);
-		AssertUtil.assertProposalApplies(document, ".testclass", proposals, offset, null);
+		AssertUtil.assertProposalApplies(document, ".testclass", proposals, offset);
 
 		// test for #a
 		offset = document.getLength() - 1;
@@ -628,7 +628,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 		offset++;
 
 		proposals = processor.doComputeCompletionProposals(viewer, offset, '\t', false);
-		AssertUtil.assertProposalApplies(document, "#a", proposals, offset, null);
+		AssertUtil.assertProposalApplies(document, "#a", proposals, offset);
 
 		// test for #b
 		offset = document.getLength() - 1;
@@ -636,7 +636,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 		offset++;
 
 		proposals = processor.doComputeCompletionProposals(viewer, offset, '\t', false);
-		AssertUtil.assertProposalApplies(document, "#b", proposals, offset, null);
+		AssertUtil.assertProposalApplies(document, "#b", proposals, offset);
 
 	}
 
@@ -700,7 +700,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 		offset += toInsert.length() - 1; // cursor before }
 
 		ICompletionProposal[] proposals = processor.doComputeCompletionProposals(viewer, offset, '\t', false);
-		AssertUtil.assertProposalApplies(document, "#CCCCCC", proposals, offset, null);
+		AssertUtil.assertProposalApplies(document, "#CCCCCC", proposals, offset);
 	}
 
 	/**
@@ -718,7 +718,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 		offset += toInsert.length() - 1; // cursor before }
 
 		ICompletionProposal[] proposals = processor.doComputeCompletionProposals(viewer, offset, '\t', false);
-		AssertUtil.assertProposalApplies(document, "#CCCCCC", proposals, offset, null);
+		AssertUtil.assertProposalApplies(document, "#CCCCCC", proposals, offset);
 	}
 
 	public void testCreateLexemeProviderEmptyDocument()

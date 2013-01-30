@@ -512,7 +512,7 @@ public class JSIndexReader extends IndexReader
 	 */
 	public List<String> getTypeNames(Index index)
 	{
-		return getTypeNames(index, "*", SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE); //$NON-NLS-1$
+		return getTypeNames(index, "*", SearchPattern.PATTERN_MATCH); //$NON-NLS-1$
 	}
 
 	/**
