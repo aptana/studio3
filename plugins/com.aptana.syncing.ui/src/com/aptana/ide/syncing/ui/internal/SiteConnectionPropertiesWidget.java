@@ -745,20 +745,20 @@ public class SiteConnectionPropertiesWidget extends Composite implements ModifyL
 			}
 			if (remoteRadio.getSelection())
 			{
-				IConnectionPoint connectionPoint = (IConnectionPoint) ((IStructuredSelection) remotesViewer
-						.getSelection()).getFirstElement();
-				if (connectionPoint == null)
+				Object element = ((IStructuredSelection) remotesViewer.getSelection()).getFirstElement();
+				if (!(element instanceof IConnectionPoint))
 				{
 					return Messages.SiteConnectionPropertiesWidget_ERR_NoRemote;
 				}
 			}
 			else if (projectRadio.getSelection())
 			{
-				IProject project = (IProject) ((IStructuredSelection) projectViewer.getSelection()).getFirstElement();
-				if (project == null)
+				Object element = ((IStructuredSelection) projectViewer.getSelection()).getFirstElement();
+				if (!(element instanceof IProject))
 				{
 					return Messages.SiteConnectionPropertiesWidget_ERR_NoProject;
 				}
+				IProject project = (IProject) element;
 				IPath path = Path.fromPortableString(projectFolderText.getText());
 				if (!(project.findMember(path) instanceof IContainer))
 				{
