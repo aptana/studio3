@@ -11,6 +11,7 @@ import java.text.MessageFormat;
 
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -144,6 +145,11 @@ public class EditorUtils
 		if (fileStore == null)
 		{
 			return null;
+		}
+		IResource resource = (IResource) fileStore.getAdapter(IResource.class);
+		if (resource instanceof IFile)
+		{
+			return (IFile) resource;
 		}
 		IFile[] files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(fileStore.toURI());
 		return ArrayUtil.isEmpty(files) ? null : files[0];
