@@ -166,7 +166,7 @@ public class DefaultAnalyticsEventHandler implements IAnalyticsEventHandler
 			connection = (HttpURLConnection) url.openConnection();
 			if (user != null)
 			{
-				connection.setRequestProperty("Cookie", user.getCookie() + "; uid=" + user.getUID()); //$NON-NLS-1$ //$NON-NLS-2$
+				connection.setRequestProperty("Cookie", user.getCookie() + "; uid=" + user.getGUID()); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			connection.setRequestProperty("User-Agent", AnalyticsEvent.getUserAgent()); //$NON-NLS-1$
 			connection.setDoOutput(true);
