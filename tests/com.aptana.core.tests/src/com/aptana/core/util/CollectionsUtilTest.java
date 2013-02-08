@@ -183,6 +183,60 @@ public class CollectionsUtilTest extends TestCase
 		}
 	}
 
+	public void testAddToListListSubclass()
+	{
+		Number doubleOne = 1.0;
+		Number intOne = 1;
+		Float floatOne = 1.0f;
+
+		// generate initial set
+		List<Number> list = CollectionsUtil.newList(doubleOne, intOne);
+
+		// add sub-type of Number
+		CollectionsUtil.addToList(list, CollectionsUtil.newList(floatOne));
+
+		assertEquals("The list should have only three items", 3, list.size());
+		assertEquals("Double 1.0 should be at index 0", 0, list.indexOf(doubleOne));
+		assertEquals("Integer 1 should be at index 1", 1, list.indexOf(intOne));
+		assertEquals("Float 1.0f should be at index 2", 2, list.indexOf(floatOne));
+	}
+
+	public void testAddToListList()
+	{
+		List<String> list = CollectionsUtil.newList("a", "b");
+		assertNotNull(list);
+
+		CollectionsUtil.addToList(list, CollectionsUtil.newList("c"));
+		assertEquals("The list should have only three items", 3, list.size());
+		assertEquals("'a' should be at index 0", 0, list.indexOf("a"));
+		assertEquals("'b' should be at index 1", 1, list.indexOf("b"));
+		assertEquals("'c' should be at index 2", 2, list.indexOf("c"));
+	}
+
+	public void testAddToListListNullItems()
+	{
+		List<String> list = CollectionsUtil.newList("a", "b");
+		assertNotNull(list);
+
+		List<String> items = null;
+		CollectionsUtil.addToList(list, items);
+		assertEquals("The list should have only three items", 2, list.size());
+		assertEquals("'a' should be at index 0", 0, list.indexOf("a"));
+		assertEquals("'b' should be at index 1", 1, list.indexOf("b"));
+	}
+
+	public void testAddToListListNullList()
+	{
+		try
+		{
+			CollectionsUtil.addToList(null, CollectionsUtil.newList("a", "b", "c"));
+		}
+		catch (Throwable t)
+		{
+			fail(t.getMessage());
+		}
+	}
+
 	public void testNewSet()
 	{
 		Set<String> set = CollectionsUtil.newSet("item1", "item2");

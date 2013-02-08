@@ -58,6 +58,29 @@ public class CollectionsUtil
 	}
 
 	/**
+	 * Add a varargs list of items to the specified list. If the list or items array are null, then no action is
+	 * performed. Note that the destination list has no requirements other than it must be a List of the source item's
+	 * type. This allows the destination to be used, for example, as an accumulator.<br>
+	 * <br>
+	 * Note that this method is not thread safe. Users of this method will need to maintain type safety against the
+	 * list.
+	 * 
+	 * @param list
+	 *            A list to which items will be added
+	 * @param items
+	 *            A list of items to add
+	 */
+	public static final <T, U extends T> List<T> addToList(List<T> list, List<U> items)
+	{
+		if (list != null && items != null)
+		{
+			list.addAll(items);
+		}
+
+		return list;
+	}
+
+	/**
 	 * Add a varargs list of items into a set. If the set or items are null then no action is performed. Note that the
 	 * destination set has no requirements other than it must be a Set of the source item's type. This allows the
 	 * destination to be used, for example, as an accumulator.<br>
