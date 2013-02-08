@@ -14,6 +14,7 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -73,7 +74,7 @@ public class GithubAccountPageProvider extends AbstractAccountPageProvider
 
 	public GithubAccountPageProvider()
 	{
-		listeners = new ArrayList<GithubListener>();
+		this(new NullProgressMonitor());
 	}
 
 	public GithubAccountPageProvider(IProgressMonitor progressMonitor)
@@ -97,17 +98,26 @@ public class GithubAccountPageProvider extends AbstractAccountPageProvider
 		return main;
 	}
 
-	public void addListener(GithubListener listener)
+	public boolean addListener(GithubListener listener)
 	{
+		if (listener == null)
+		{
+			return false;
+		}
 		if (!listeners.contains(listener))
 		{
-			listeners.add(listener);
+			return listeners.add(listener);
 		}
+		return false;
 	}
 
-	public void removeListener(GithubListener listener)
+	public boolean removeListener(GithubListener listener)
 	{
-		listeners.remove(listener);
+		if (listener == null)
+		{
+			return false;
+		}
+		return listeners.remove(listener);
 	}
 
 	private Composite createLoginComponents(Composite parent)
@@ -142,13 +152,7 @@ public class GithubAccountPageProvider extends AbstractAccountPageProvider
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				if (login(true))
-				{
-					// shows a success message
-					MessageDialog.openInformation(UIUtils.getActiveShell(),
-							Messages.GithubAccountPageProvider_SuccessTitle,
-							Messages.GithubAccountPageProvider_SuccessMsg);
-				}
+				login(true);
 			}
 		});
 
