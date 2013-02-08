@@ -19,4 +19,6 @@ public interface IAnalyticsUser
 	public String getUID();
 
 	public boolean isOnline();
+
+	public String getGUID();
 }
