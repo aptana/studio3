@@ -12,6 +12,7 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.git.ui.internal.preferences.messages"; //$NON-NLS-1$
+
 	public static String GitExecutableLocationPage_AutoAttachProjectsLabel;
 	public static String GitExecutableLocationPage_CalculatePullIndicatorLabel;
 	public static String GitExecutableLocationPage_InvalidLocationErrorMessage;
@@ -24,13 +25,12 @@ public class Messages extends NLS
 	public static String GithubAccountPageProvider_Name;
 	public static String GithubAccountPageProvider_Password_LBL;
 	public static String GithubAccountPageProvider_Signup_LBL;
-	public static String GithubAccountPageProvider_SuccessMsg;
-	public static String GithubAccountPageProvider_SuccessTitle;
 	public static String GithubAccountPageProvider_User_LBL;
 	public static String GithubAccountPageProvider_Username_LBL;
 	public static String GithubAccountPageProvider_Validate_LBL;
 	public static String GithubAccountPageProvider_ValidatingCredentials;
 	public static String GitPreferencePage_IgnoreMissingGitLabel;
+
 	static
 	{
 		// initialize resource bundle
