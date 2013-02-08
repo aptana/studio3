@@ -10,7 +10,6 @@ package com.aptana.core.util;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -31,7 +30,7 @@ public class ProcessRunnable implements Runnable
 	protected Process p;
 	protected IProgressMonitor monitor;
 	protected IStatus status;
-	private boolean isErrRedirected;
+	protected boolean isErrRedirected;
 
 	public ProcessRunnable(Process p, IProgressMonitor monitor, boolean isErrRedirected)
 	{
