@@ -697,14 +697,14 @@ public class StringUtilTest extends TestCase
 
 	public void testLastIndexOf() throws Exception
 	{
-		assertEquals(4, StringUtil.lastIndexOf("abcdabcd", 0, 'a'));
+		assertEquals("Should find from fromIndex inclusively", 0, StringUtil.lastIndexOf("abcdabcd", 0, 'a'));
 		assertEquals(-1, StringUtil.lastIndexOf("abcdabcd", 0, 'z'));
 		assertEquals(0, StringUtil.lastIndexOf("abcdabcd", 3, 'a'));
 		assertEquals(-1, StringUtil.lastIndexOf("abcdabcd", -1, 'a'));
 		assertEquals("abcdabcd".lastIndexOf('a', -1), StringUtil.lastIndexOf("abcdabcd", -1, 'a'));
 		assertEquals("abcdabcd".lastIndexOf('a', 100), StringUtil.lastIndexOf("abcdabcd", 100, 'a'));
 
-		assertEquals(6, StringUtil.lastIndexOf("abcdabcd", 0, 'a', 'c'));
+		assertEquals(0, StringUtil.lastIndexOf("abcdabcd", 0, 'a', 'c'));
 		assertEquals(-1, StringUtil.lastIndexOf("abcdabcd", 0, 'z', 'x', 'y'));
 		assertEquals(4, StringUtil.lastIndexOf("abcdabcd", 6, 'a', 'd'));
 		assertEquals("search should be inclusive of index given", 7, StringUtil.lastIndexOf("abcdabcd", 7, 'a', 'd'));

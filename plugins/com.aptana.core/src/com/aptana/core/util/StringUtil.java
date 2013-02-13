@@ -855,6 +855,12 @@ public class StringUtil
 		return -1;
 	}
 
+	/**
+	 * @see String#lastIndexOf(int)
+	 * @param string
+	 * @param chars
+	 * @return
+	 */
 	public static int lastIndexOf(String string, char... chars)
 	{
 		if (string == null)
@@ -864,7 +870,14 @@ public class StringUtil
 		return lastIndexOf(string, string.length() - 1, chars);
 	}
 
-	public static int lastIndexOf(String string, int offset, char... chars)
+	/**
+	 * @see String#lastIndexOf(String, int)
+	 * @param string
+	 * @param fromIndex
+	 * @param chars
+	 * @return
+	 */
+	public static int lastIndexOf(String string, int fromIndex, char... chars)
 	{
 		if (chars == null || chars.length == 0)
 		{
@@ -875,12 +888,12 @@ public class StringUtil
 		{
 			return -1;
 		}
-		else if (offset >= length)
+		else if (fromIndex >= length)
 		{
-			offset = length - 1;
+			fromIndex = length - 1;
 		}
 
-		for (int i = offset; i >= 0; i--)
+		for (int i = fromIndex; i >= 0; i--)
 		{
 			char c = string.charAt(i);
 			for (char x : chars)
