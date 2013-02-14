@@ -26,7 +26,7 @@ import com.aptana.core.logging.IdeLog;
 public final class VersionUtil
 {
 	// Match x.y and x.y.z
-	private static final String VERSION_SPLIT_PATTERN = "(\\d+)\\.(\\d+)(\\.(\\d+))?"; //$NON-NLS-1$
+	private static final String VERSION_SPLIT_PATTERN = "(\\d+)\\.(\\d+)(([a-zA-Z0-9_\\-]+)|(\\.(\\d+)(\\.?[a-zA-Z0-9_\\-]+)?))?"; //$NON-NLS-1$
 	// Match any dot separated string
 	private static Pattern VERSION_DOT_PATTERN = Pattern.compile("\\."); //$NON-NLS-1$
 
@@ -113,7 +113,7 @@ public final class VersionUtil
 	 * Parse the raw output and return a {@link Version} instance out of it.
 	 * 
 	 * @param rawOutput
-	 * @return A {@link Version} instance. Null if the output did not contain a parsable version number.
+	 * @return A {@link Version} instance. Null if the output did not contain a parseable version number.
 	 */
 	public static Version parseVersion(String rawOutput)
 	{
@@ -121,7 +121,38 @@ public final class VersionUtil
 		Matcher matcher = pattern.matcher(rawOutput);
 		if (matcher.find())
 		{
-			String version = matcher.group();
+			String major = matcher.group(1);
+			String minor = matcher.group(2);
+			String micro;
+			String qualifier;
+			if (matcher.group(5) != null)
+			{
+				// We have 3 parts with an optional qualifier
+				micro = matcher.group(6);
+				qualifier = matcher.group(7);
+			}
+			else
+			{ // We have a major and minor with optional qualifier
+				qualifier = matcher.group(4);
+				micro = "0"; //$NON-NLS-1$
+			}
+			String version = major + '.' + minor + '.' + micro;
+			if (!StringUtil.isEmpty(qualifier))
+			{
+				char c = qualifier.charAt(0);
+				switch (c)
+				{
+					case '-':
+					case '_':
+					case '.':
+						qualifier = qualifier.substring(1);
+						break;
+
+					default:
+						break;
+				}
+				version = version + '.' + qualifier;
+			}
 			try
 			{
 				return Version.parseVersion(version);
