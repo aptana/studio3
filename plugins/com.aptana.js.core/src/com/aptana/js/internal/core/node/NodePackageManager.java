@@ -36,6 +36,7 @@ import com.aptana.core.util.ProcessStatus;
 import com.aptana.core.util.ProcessUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.SudoCommandProcessRunnable;
+import com.aptana.core.util.VersionUtil;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.core.node.INodePackageManager;
 
@@ -350,7 +351,7 @@ public class NodePackageManager implements INodePackageManager
 			{
 				output = output.substring(0, space);
 			}
-			return Version.parseVersion(output);
+			return VersionUtil.parseVersion(output);
 		}
 		return null;
 	}
@@ -376,7 +377,7 @@ public class NodePackageManager implements INodePackageManager
 		Matcher m = VERSION_PATTERN.matcher(message);
 		if (m.find())
 		{
-			return Version.parseVersion(m.group(1));
+			return VersionUtil.parseVersion(m.group(1));
 		}
 		return null;
 	}
