@@ -47,6 +47,7 @@ import org.osgi.framework.Version;
 import com.aptana.configurations.processor.AbstractConfigurationProcessor;
 import com.aptana.configurations.processor.ConfigurationStatus;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.VersionUtil;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.eclipse36.PortalUI36Plugin;
 
@@ -100,7 +101,7 @@ public class PluginsConfigurationProcessor extends AbstractConfigurationProcesso
 		configurationStatus.setStatus(ConfigurationStatus.PROCESSING);
 		// TODO - Save the status in case of an error or completion.
 		String pluginId = attributesMap.get(PLUGIN_ID_ATTR);
-		Version pluginVersion = Version.parseVersion(attributesMap.get(PLUGIN_VERSION_ATTR));
+		Version pluginVersion = VersionUtil.parseVersion(attributesMap.get(PLUGIN_VERSION_ATTR));
 		Map<String, Map<String, String>> bundleData = new HashMap<String, Map<String, String>>();
 		Bundle[] bundles = WorkbenchPlugin.getDefault().getBundles();
 		boolean found = false;
