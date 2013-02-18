@@ -55,6 +55,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.projects.templates.IProjectTemplate;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.CollectionsUtil;
@@ -163,11 +164,14 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 					defaultTemplateImage.dispose();
 					defaultTemplateImage = null;
 				}
-				for (Image image : templateImages.values())
+				if (templateImages != null)
 				{
-					if (!image.isDisposed())
+					for (Image image : templateImages.values())
 					{
-						image.dispose();
+						if (image != null && !image.isDisposed())
+						{
+							image.dispose();
+						}
 					}
 				}
 				templateImages = null;
@@ -535,24 +539,30 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 			URL iconPath = template.getIconURL();
 			if (iconPath != null)
 			{
-				ImageDescriptor descriptor = ImageDescriptor.createFromURL(iconPath);
-				if (descriptor != null)
+				try
 				{
-					image = descriptor.createImage(false);
-					if (image != null)
+					ImageDescriptor descriptor = ImageDescriptor.createFromURL(iconPath);
+					if (descriptor != null)
 					{
-						// Scale the image to 48x48 in case it's not.
-						ImageData imageData = image.getImageData();
-						if (imageData.x != IMAGE_SIZE || imageData.y != IMAGE_SIZE)
+						image = descriptor.createImage(false);
+						if (image != null)
 						{
-							// dispose the previous one
-							image.dispose();
-							// Scale the image data and create a new image
-							imageData = imageData.scaledTo(IMAGE_SIZE, IMAGE_SIZE);
-							image = ImageDescriptor.createFromImageData(imageData).createImage();
+							// Scale the image to 48x48 in case it's not.
+							ImageData imageData = image.getImageData();
+							if (imageData.x != IMAGE_SIZE || imageData.y != IMAGE_SIZE)
+							{
+								// dispose the previous one
+								image.dispose();
+								// Scale the image data and create a new image
+								imageData = imageData.scaledTo(IMAGE_SIZE, IMAGE_SIZE);
+								image = ImageDescriptor.createFromImageData(imageData).createImage();
+							}
 						}
 					}
-
+				}
+				catch (Exception e)
+				{
+					IdeLog.logWarning(ProjectsPlugin.getDefault(), "Failed to retrieve the template's image: " + e); //$NON-NLS-1$
 				}
 			}
 			if (image == null)
