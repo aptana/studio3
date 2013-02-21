@@ -31,6 +31,8 @@ import org.eclipse.jface.text.source.ISourceViewerExtension2;
 import org.eclipse.jface.text.source.projection.AnnotationBag;
 import org.eclipse.ui.texteditor.SimpleMarkerAnnotation;
 
+import com.aptana.core.util.StringUtil;
+
 /**
  * A common annotation hover implementation that follows the {@link DefaultAnnotationHover}. The main difference between
  * those implementations is that multiple markers descriptions will appear in order. That is, in case there are multiple
@@ -82,7 +84,7 @@ public class CommonAnnotationHover implements IAnnotationHover
 			{
 				Annotation annotation = javaAnnotations.iterator().next();
 				String message = annotation.getText();
-				if (message != null && message.trim().length() > 0)
+				if (!StringUtil.isEmpty(message))
 				{
 					return formatSingleMessage(message);
 				}
@@ -96,7 +98,7 @@ public class CommonAnnotationHover implements IAnnotationHover
 				{
 					Annotation annotation = e.next();
 					String message = annotation.getText();
-					if (message != null && message.trim().length() > 0)
+					if (!StringUtil.isEmpty(message))
 						messages.add(message.trim());
 				}
 
