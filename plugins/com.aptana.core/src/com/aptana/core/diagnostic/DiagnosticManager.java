@@ -1,11 +1,11 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ui.diagnostic;
+package com.aptana.core.diagnostic;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -17,13 +17,12 @@ import java.util.Set;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 
-import com.aptana.core.diagnostic.IDiagnosticLog;
+import com.aptana.core.CorePlugin;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.StringUtil;
-import com.aptana.ui.UIPlugin;
 
 /**
  * @author Michael Xia (mxia@appcelerator.com)
@@ -65,7 +64,7 @@ public class DiagnosticManager
 	{
 		final List<DiagnosticLog> result = new ArrayList<DiagnosticLog>();
 
-		EclipseUtil.processConfigurationElements(UIPlugin.PLUGIN_ID, EXTENSION_NAME,
+		EclipseUtil.processConfigurationElements(CorePlugin.PLUGIN_ID, EXTENSION_NAME,
 				new IConfigurationElementProcessor()
 				{
 
@@ -86,13 +85,13 @@ public class DiagnosticManager
 							}
 							else
 							{
-								IdeLog.logError(UIPlugin.getDefault(), MessageFormat.format(
+								IdeLog.logError(CorePlugin.getDefault(), MessageFormat.format(
 										"The class {0} does not implement IDiagnosticLog.", classStr)); //$NON-NLS-1$
 							}
 						}
 						catch (CoreException e)
 						{
-							IdeLog.logError(UIPlugin.getDefault(), e);
+							IdeLog.logError(CorePlugin.getDefault(), e);
 						}
 						if (logClass == null)
 						{
@@ -109,7 +108,7 @@ public class DiagnosticManager
 							}
 							catch (NumberFormatException e)
 							{
-								IdeLog.logWarning(UIPlugin.getDefault(),
+								IdeLog.logWarning(CorePlugin.getDefault(),
 										"The priority for diagnosticLog needs to be an integer.", e); //$NON-NLS-1$
 							}
 						}

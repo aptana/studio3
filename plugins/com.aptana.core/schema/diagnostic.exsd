@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="com.aptana.ui" xmlns="http://www.w3.org/2001/XMLSchema">
+<schema targetNamespace="com.aptana.core" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="com.aptana.ui" id="diagnostic" name="diagnostic"/>
+         <meta.schema plugin="com.aptana.core" id="diagnostic" name="diagnostic"/>
       </appinfo>
       <documentation>
          This extenstion point allows contribution to the output shown from running the &quot;Run Diagnostic Tests...&quot; command.
@@ -55,7 +55,7 @@
                   The class that contributes to what is displayed in the diagnostic logs.  Class must be of type IDiagnosticLog, or it will be omitted.
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":com.aptana.ui.IDiagnosticLog"/>
+                  <meta.attribute kind="java" basedOn=":com.aptana.core.diagnostic.IDiagnosticLog"/>
                </appinfo>
             </annotation>
          </attribute>
@@ -94,7 +94,6 @@
 &lt;/extension&gt;
 &lt;/pre&gt;
 &lt;/p&gt;
-
       </documentation>
    </annotation>
 

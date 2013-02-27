@@ -202,4 +202,11 @@
                name="%contributor.nodejs.name">
          </contributor>
       </extension>
+         <extension
+         point="com.aptana.core.diagnostic">
+      <diagnosticLog
+            class="com.aptana.js.internal.core.JSDiagnosticLog"
+            priority="60">
+      </diagnosticLog>
+   </extension>
 </plugin>

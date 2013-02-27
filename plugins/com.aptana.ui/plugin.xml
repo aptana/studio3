@@ -3,8 +3,8 @@
 <plugin>
    <extension-point id="propertyDialogs" name="%extension-point.propertydialogs.name" schema="schema/propertyDialogs.exsd"/>
    <extension-point id="imageAssociations" name="%extension-point.imageassociations.name" schema="schema/imageAssociations.exsd"/>
-   <extension-point id="diagnostic" name="%extension-point.diagnostic.name" schema="schema/diagnostic.exsd"/>
    <extension-point id="accountsPreferencePage" name="%extension-point.accounts.name" schema="schema/accountsPreferencePage.exsd"/>
+
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
@@ -377,7 +377,7 @@
       </page>
    </extension>
    <extension
-         point="com.aptana.ui.diagnostic">
+         point="com.aptana.core.diagnostic">
       <diagnosticLog
             class="com.aptana.ui.EclipseDiagnosticLog"
             priority="0">

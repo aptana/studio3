@@ -143,11 +143,4 @@
             name="%node.pref_page.name">
       </page>
    </extension>
-   <extension
-         point="com.aptana.ui.diagnostic">
-      <diagnosticLog
-            class="com.aptana.editor.js.internal.JSDiagnosticLog"
-            priority="50">
-      </diagnosticLog>
-   </extension>
 </plugin>
