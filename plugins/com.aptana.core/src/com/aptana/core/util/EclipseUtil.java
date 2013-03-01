@@ -50,11 +50,15 @@ import com.aptana.core.logging.IdeLog;
 @SuppressWarnings("restriction")
 public class EclipseUtil
 {
+	/**
+	 * Default prefix for Studio
+	 */
+	private static final String APTANA_STUDIO_PREFIX = "Aptana"; //$NON-NLS-1$
 
 	/**
 	 * Default product name
 	 */
-	private static final String APTANA_STUDIO = "Aptana Studio"; //$NON-NLS-1$
+	private static final String APTANA_STUDIO = MessageFormat.format("{0} Studio", APTANA_STUDIO_PREFIX); //$NON-NLS-1$
 
 	protected static final class LauncherFilter implements FilenameFilter
 	{
@@ -258,6 +262,20 @@ public class EclipseUtil
 			return bundle.getVersion().toString();
 		}
 		return StringUtil.EMPTY;
+	}
+
+	public static String getStudioPrefix()
+	{
+		IProduct product = Platform.getProduct();
+		if (product != null)
+		{
+			String name = product.getProperty("studioPrefix"); //$NON-NLS-1$
+			if (!StringUtil.isEmpty(name))
+			{
+				return name;
+			}
+		}
+		return APTANA_STUDIO_PREFIX;
 	}
 
 	/**
