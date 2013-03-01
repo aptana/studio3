@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -526,6 +527,20 @@ public class CollectionsUtil
 	public static final <T> Map<T, T> newMap(T... items)
 	{
 		return addToMap(new HashMap<T, T>(items != null ? items.length / 2 : 0), items);
+	}
+
+	/**
+	 * Convert a list of items into a Set. An empty set is returned if items is null
+	 * 
+	 * @param <T>
+	 *            Any type of object
+	 * @param items
+	 *            A variable length list of items of type T
+	 * @return Returns a new HashSet<T> or an empty set
+	 */
+	public static final <T> Map<T, T> newInOrderMap(T... items)
+	{
+		return addToMap(new LinkedHashMap<T, T>(items != null ? items.length / 2 : 0), items);
 	}
 
 	/**
