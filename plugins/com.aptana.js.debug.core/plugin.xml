@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension-point id="jsConnectionInitializers" name="JS session connection initailizer" schema="schema/jsConnectionInitializers.exsd"/>
    <extension
          point="org.eclipse.debug.core.breakpoints">
       <breakpoint
@@ -55,6 +56,15 @@
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer class="com.aptana.js.debug.core.internal.preferences.JSDebugPreferenceInitializer"/>
+   </extension>
+   <extension
+         point="com.aptana.js.debug.core.jsConnectionInitializers">
+      <connectionInitializer
+            class="com.aptana.js.debug.core.internal.model.DebugConnection"
+            id="com.aptana.js.debug.core.debugConnectionInitializer"
+            mode="debug"
+            priority="50">
+      </connectionInitializer>
    </extension>
 
 </plugin>

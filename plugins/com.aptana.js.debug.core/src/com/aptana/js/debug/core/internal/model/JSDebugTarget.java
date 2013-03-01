@@ -53,7 +53,6 @@ import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.debug.core.sourcelookup.ISourceLookupDirector;
-import org.eclipse.equinox.internal.security.storage.friends.InternalExchangeUtils;
 import org.osgi.framework.Constants;
 
 import com.aptana.core.IURIMapper;
@@ -72,6 +71,8 @@ import com.aptana.js.debug.core.ILaunchConfigurationConstants;
 import com.aptana.js.debug.core.JSDebugPlugin;
 import com.aptana.js.debug.core.internal.Util;
 import com.aptana.js.debug.core.internal.model.xhr.XHRService;
+import com.aptana.js.debug.core.model.IJSConnection;
+import com.aptana.js.debug.core.model.IJSDebugConnectionHandler;
 import com.aptana.js.debug.core.model.IJSDebugTarget;
 import com.aptana.js.debug.core.model.IJSExceptionBreakpoint;
 import com.aptana.js.debug.core.model.IJSLineBreakpoint;
@@ -184,7 +185,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	private static final int XOR_MASK = 0xFFF;
 
 	private static boolean checkUpdate = true;
-	private DebugConnection connection;
+	private IJSConnection connection;
 	private int stepFilterMask = 0;
 	private String[] stepFilters = null;
 
@@ -249,7 +250,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	 * @param debugMode
 	 * @throws CoreException
 	 */
-	public JSDebugTarget(ILaunch launch, IProcess process, IURIMapper uriMapper, DebugConnection connection,
+	public JSDebugTarget(ILaunch launch, IProcess process, IURIMapper uriMapper, IJSConnection connection,
 			boolean debugMode) throws CoreException {
 		this(launch, null, process, uriMapper, connection, debugMode);
 	}
@@ -267,7 +268,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	 * @throws CoreException
 	 */
 	public JSDebugTarget(ILaunch launch, String label, IProcess process, IURIMapper uriMapper,
-			DebugConnection connection, boolean debugMode) throws CoreException {
+			IJSConnection connection, boolean debugMode) throws CoreException {
 		super(null);
 		this.launch = launch;
 		this.label = label;
@@ -294,7 +295,11 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 		}
 	}
 
-	/* package */DebugConnection getConnection() {
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.js.debug.core.model.IJSDebugTarget#getConnection()
+	 */
+	public IJSConnection getConnection() {
 		return connection;
 	}
 
@@ -1758,7 +1763,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 		return (IJSScriptElement[]) topScriptElements.values().toArray(new IJSScriptElement[topScriptElements.size()]);
 	}
 
-	private class DebugConnectionHandler implements DebugConnection.IHandler {
+	private class DebugConnectionHandler implements IJSDebugConnectionHandler {
 
 		/*
 		 * (non-Javadoc)
