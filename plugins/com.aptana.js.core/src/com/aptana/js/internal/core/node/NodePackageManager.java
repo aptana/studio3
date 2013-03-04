@@ -302,6 +302,20 @@ public class NodePackageManager implements INodePackageManager
 
 	public boolean isInstalled(String packageName) throws CoreException
 	{
+		try
+		{
+			Version version = getInstalledVersion(packageName);
+			if (version != null)
+			{
+				return true;
+			}
+		}
+		catch (CoreException e)
+		{
+			IdeLog.logInfo(JSCorePlugin.getDefault(), MessageFormat.format(
+					"Error getting the installed version of package {0}; falling back to use ''npm list''", //$NON-NLS-1$
+					packageName));
+		}
 		Set<String> listing = list(true);
 		return listing.contains(packageName);
 	}

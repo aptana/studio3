@@ -7,6 +7,7 @@
  */
 package com.aptana.scripting.ui;
 
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -18,6 +19,7 @@ import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.scripting.ScriptLogListener;
 import com.aptana.scripting.ScriptLogger;
 import com.aptana.theme.ConsoleThemer;
@@ -65,8 +67,8 @@ public class ScriptingConsole
 		{
 			// create our scripting console so the getters can create streams
 			// from it
-			console = new MessageConsole(Messages.ScriptingConsole_SCRIPTING_CONSOLE_NAME,
-					ScriptingUIPlugin.getImageDescriptor(CONSOLE_ICON_PATH));
+			console = new MessageConsole(MessageFormat.format(Messages.ScriptingConsole_SCRIPTING_CONSOLE_NAME,
+					EclipseUtil.getStudioPrefix()), ScriptingUIPlugin.getImageDescriptor(CONSOLE_ICON_PATH));
 
 			// create the message stream color map so the getters can populate
 			// it
