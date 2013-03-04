@@ -14,6 +14,12 @@ import org.eclipse.debug.core.DebugException;
 
 import com.aptana.js.debug.core.internal.ProtocolLogger;
 
+/**
+ * Represents a socket connection to a JavaScript application. This can be a debug connection, profile connection and
+ * such. See the "jsConnectionInitializers" extension point.
+ * 
+ * @author sgibly@appcelerator.com.
+ */
 public interface IJSConnection
 {
 	/**
@@ -27,19 +33,60 @@ public interface IJSConnection
 	 */
 	void initialize(Socket socket, ProtocolLogger logger) throws IOException;
 
+	/**
+	 * Returns the connection's {@link Socket}.
+	 * 
+	 * @return A {@link Socket}
+	 */
 	Socket getSocket();
 
+	/**
+	 * Returns if this connection is alive (e.g. connected).
+	 * 
+	 * @return <code>true</code> if the connection is alive; <code>false</code> otherwise.
+	 */
 	boolean isConnected();
 
+	/**
+	 * Sends a string command via the connection's output stream.
+	 * 
+	 * @param command
+	 * @throws DebugException
+	 */
 	void sendCommand(String command) throws DebugException;
 
+	/**
+	 * Sends a string command and wait for response via the connection's output stream.
+	 * 
+	 * @param command
+	 * @return
+	 * @throws DebugException
+	 */
 	String[] sendCommandAndWait(String command) throws DebugException;
 
+	/**
+	 * Returns if this connection was terminated.s
+	 * 
+	 * @return <code>true</code> if it was terminated; <code>false</code> otherwise.s
+	 */
 	boolean isTerminated();
 
+	/**
+	 * Starts the connection with a given handler.s
+	 * 
+	 * @param connectionHandler
+	 */
 	void start(IJSDebugConnectionHandler connectionHandler);
 
+	/**
+	 * Stop the connection.
+	 */
 	void stop();
 
+	/**
+	 * Dispose any resources that were held in the connection instance.
+	 * 
+	 * @throws IOException
+	 */
 	void dispose() throws IOException;
 }

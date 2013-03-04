@@ -7,9 +7,20 @@
  */
 package com.aptana.js.debug.core.model;
 
+/**
+ * A JavaScript debug connection handler interface.
+ */
 public interface IJSDebugConnectionHandler
 {
+	/**
+	 * Handle a connection message
+	 * 
+	 * @param message
+	 */
 	void handleMessage(String message);
 
+	/**
+	 * Handle connection shutdown
+	 */
 	void handleShutdown();
 }

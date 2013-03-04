@@ -46,7 +46,7 @@ public class JSConnectionInitializersRegistry
 		load();
 	}
 
-	public static IJSConnection getConnection(String mode, Socket socket, ProtocolLogger logger)
+	public synchronized static IJSConnection getConnection(String mode, Socket socket, ProtocolLogger logger)
 	{
 		if (instance == null)
 		{
