@@ -130,6 +130,22 @@ public class SWTUtils
 	}
 
 	/**
+	 * Finds and caches the image from the image descriptor for this particular plugin.
+	 * 
+	 * @param plugin
+	 *            the plugin to search
+	 * @param path
+	 *            the path to the image
+	 * @param descriptor
+	 *            optional descriptor to use if the image doesn't exist
+	 * @return the image, or null if not found
+	 */
+	public static Image getImage(AbstractUIPlugin plugin, String path, ImageDescriptor descriptor)
+	{
+		return getImage(plugin.getBundle(), path, descriptor);
+	}
+
+	/**
 	 * Finds and caches the image from the complete image path.
 	 * 
 	 * @param computedPath
@@ -154,15 +170,25 @@ public class SWTUtils
 	 */
 	public static Image getImage(Bundle bundle, String path)
 	{
+		return getImage(bundle, path, null);
+	}
+
+	private static Image getImage(Bundle bundle, String path, ImageDescriptor id)
+	{
 		if (path.charAt(0) != '/')
 		{
 			path = "/" + path; //$NON-NLS-1$
 		}
 
-		return getImage(bundle.getSymbolicName(), path);
+		return getImage(bundle.getSymbolicName(), path, id);
 	}
 
 	private static Image getImage(String bundleSymbolicName, String path)
+	{
+		return getImage(bundleSymbolicName, path, null);
+	}
+
+	private static Image getImage(String bundleSymbolicName, String path, ImageDescriptor id)
 	{
 		String computedName = bundleSymbolicName + path;
 		Image image = JFaceResources.getImage(computedName);
@@ -171,7 +197,11 @@ public class SWTUtils
 			return image;
 		}
 
-		ImageDescriptor id = AbstractUIPlugin.imageDescriptorFromPlugin(bundleSymbolicName, path);
+		if (id == null)
+		{
+			id = AbstractUIPlugin.imageDescriptorFromPlugin(bundleSymbolicName, path);
+		}
+
 		if (id != null)
 		{
 			JFaceResources.getImageRegistry().put(computedName, id);
