@@ -104,6 +104,8 @@ public class EclipseUtil
 	// uses branding plugin for retrieving the version
 	private static String versionPluginId = "com.aptana.branding"; //$NON-NLS-1$
 
+	private static String fgPrefix;
+
 	private EclipseUtil()
 	{
 	}
@@ -264,18 +266,23 @@ public class EclipseUtil
 		return StringUtil.EMPTY;
 	}
 
-	public static String getStudioPrefix()
+	public synchronized static String getStudioPrefix()
 	{
-		IProduct product = Platform.getProduct();
-		if (product != null)
+		// Cache this value!
+		if (fgPrefix == null)
 		{
-			String name = product.getProperty("studioPrefix"); //$NON-NLS-1$
-			if (!StringUtil.isEmpty(name))
+			fgPrefix = APTANA_STUDIO_PREFIX;
+			IProduct product = Platform.getProduct();
+			if (product != null)
 			{
-				return name;
+				String name = product.getProperty("studioPrefix"); //$NON-NLS-1$
+				if (!StringUtil.isEmpty(name))
+				{
+					fgPrefix = name;
+				}
 			}
 		}
-		return APTANA_STUDIO_PREFIX;
+		return fgPrefix;
 	}
 
 	/**
