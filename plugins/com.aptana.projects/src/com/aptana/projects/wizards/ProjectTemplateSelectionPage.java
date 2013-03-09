@@ -204,7 +204,9 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 				List<IProjectTemplate> templates = templateTagsMap.get(tag);
 				for (IProjectTemplate template : templates)
 				{
-					if (template instanceof IDefaultProjectTemplate)
+					if (template instanceof IDefaultProjectTemplate
+							|| (!StringUtil.isEmpty(template.getDisplayName()) && template.getDisplayName().contains(
+									"Default"))) //$NON-NLS-1$
 					{
 						foundDefault = true;
 						setSelectedTemplate(tag, template);
