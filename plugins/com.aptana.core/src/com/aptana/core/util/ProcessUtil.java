@@ -292,12 +292,12 @@ public class ProcessUtil
 		{
 			processBuilder.directory(workingDirectory.toFile());
 		}
-
+		// Make sure we don't keep the text in the env map!
+		String textToObfuscate = (environment == null) ? null : environment.remove(TEXT_TO_OBFUSCATE);
 		TreeMap<String, String> map = null;
 		if (environment != null && !environment.isEmpty())
 		{
 			map = new TreeMap<String, String>(environment);
-			map.remove(TEXT_TO_OBFUSCATE);
 			processBuilder.environment().putAll(environment);
 		}
 		if (isInfoLoggingEnabled())
@@ -309,7 +309,6 @@ public class ProcessUtil
 			}
 
 			String message;
-			String textToObfuscate = (environment == null) ? null : environment.get(TEXT_TO_OBFUSCATE);
 			if (!StringUtil.isEmpty(textToObfuscate))
 			{
 				List<String> commandMessage = new ArrayList<String>();
