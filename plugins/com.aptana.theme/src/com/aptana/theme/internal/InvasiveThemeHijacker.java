@@ -338,6 +338,10 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 		else if (view instanceof IDebugView)
 		{
 			IDebugView debug = (IDebugView) view;
+			if (view.getClass().getName().endsWith("PerformanceSnapshotView"))
+			{
+				return;
+			}
 			Viewer viewer = debug.getViewer();
 			hookTheme(viewer, revertToDefaults);
 			return;
