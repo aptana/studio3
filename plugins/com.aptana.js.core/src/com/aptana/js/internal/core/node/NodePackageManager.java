@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2012 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2012-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -9,6 +9,7 @@ package com.aptana.js.internal.core.node;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.net.proxy.IProxyData;
+import org.eclipse.core.net.proxy.IProxyService;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -140,6 +143,7 @@ public class NodePackageManager implements INodePackageManager
 				args.add(npmPath.toOSString());
 			}
 			CollectionsUtil.addToList(args, INSTALL, packageName, COLOR, FALSE);
+			args.addAll(proxySettings());
 
 			Map<String, String> environment = ShellExecutable.getEnvironment();
 			environment.put(ProcessUtil.REDIRECT_ERROR_STREAM, StringUtil.EMPTY);
@@ -211,6 +215,58 @@ public class NodePackageManager implements INodePackageManager
 		{
 			sub.done();
 		}
+	}
+
+	/**
+	 * This will return a list of arguments for proxy settings (if we have any, otherwise an empty list).
+	 */
+	private List<String> proxySettings()
+	{
+		IProxyService service = JSCorePlugin.getDefault().getProxyService();
+		if (service == null)
+		{
+			return Collections.emptyList();
+		}
+
+		List<String> proxyArgs = new ArrayList<String>();
+		IProxyData httpData = service.getProxyData(IProxyData.HTTP_PROXY_TYPE);
+		if (httpData != null && httpData.getHost() != null)
+		{
+			CollectionsUtil.addToList(proxyArgs, "--proxy", buildProxyURL(httpData)); //$NON-NLS-1$
+		}
+		IProxyData httpsData = service.getProxyData(IProxyData.HTTPS_PROXY_TYPE);
+		if (httpsData != null && httpsData.getHost() != null)
+		{
+			CollectionsUtil.addToList(proxyArgs, "--https-proxy", buildProxyURL(httpsData)); //$NON-NLS-1$
+		}
+		return proxyArgs;
+	}
+
+	/**
+	 * Given proxy data, we try to convert that back into a full URL
+	 * 
+	 * @param data
+	 * @return
+	 */
+	private String buildProxyURL(IProxyData data)
+	{
+		StringBuilder builder = new StringBuilder();
+		builder.append(data.getType().toLowerCase());
+		builder.append("://"); //$NON-NLS-1$
+		if (!StringUtil.isEmpty(data.getUserId()))
+		{
+			builder.append(data.getUserId());
+			builder.append(':');
+			builder.append(data.getPassword());
+			builder.append('@');
+		}
+		builder.append(data.getHost());
+		if (data.getPort() != -1)
+		{
+			builder.append(':');
+			builder.append(data.getPort());
+		}
+		return builder.toString();
 	}
 
 	public IPath findNPM()
@@ -380,8 +436,11 @@ public class NodePackageManager implements INodePackageManager
 			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID,
 					Messages.NodePackageManager_ERR_NPMNotInstalled));
 		}
+		List<String> args = CollectionsUtil.newList("view", packageName, "version");//$NON-NLS-1$ //$NON-NLS-2$
+		args.addAll(proxySettings());
+
 		IStatus status = ProcessUtil.runInBackground(npmPath.toOSString(), null, ShellExecutable.getEnvironment(),
-				"view", packageName, "version"); //$NON-NLS-1$ //$NON-NLS-2$
+				args.toArray(new String[args.size()]));
 		if (!status.isOK())
 		{
 			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(

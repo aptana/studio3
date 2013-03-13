@@ -1,14 +1,16 @@
 /**
  * Aptana Studio
- * Copyright (c) 2012 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2012-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.js.core;
 
+import org.eclipse.core.net.proxy.IProxyService;
 import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
+import org.osgi.util.tracker.ServiceTracker;
 
 import com.aptana.js.core.node.INodeJSService;
 import com.aptana.js.core.node.INodePackageManager;
@@ -28,6 +30,8 @@ public class JSCorePlugin extends Plugin
 	private INodeJSService fNodeService;
 	private INodePackageManager fNpm;
 
+	private ServiceTracker<IProxyService, IProxyService> proxyTracker;
+
 	/**
 	 * Returns the shared instance
 	 * 
@@ -43,18 +47,29 @@ public class JSCorePlugin extends Plugin
 		super.start(context);
 		PLUGIN = this;
 
+		// Load JS Metadata in background
 		new JSMetadataLoader().schedule();
+
+		// Hook up tracker to proxy service
+		proxyTracker = new ServiceTracker<IProxyService, IProxyService>(getBundle().getBundleContext(),
+				IProxyService.class, null);
+		proxyTracker.open();
 	}
 
 	public void stop(BundleContext context) throws Exception // $codepro.audit.disable declaredExceptions
 	{
 		try
 		{
-			fNodeService = null;
-			fNpm = null;
+			if (proxyTracker != null)
+			{
+				proxyTracker.close();
+			}
 		}
 		finally
 		{
+			proxyTracker = null;
+			fNodeService = null;
+			fNpm = null;
 			PLUGIN = null;
 			super.stop(context);
 		}
@@ -76,5 +91,10 @@ public class JSCorePlugin extends Plugin
 			fNpm = new NodePackageManager();
 		}
 		return fNpm;
+	}
+
+	public IProxyService getProxyService()
+	{
+		return proxyTracker.getService();
 	}
 }
