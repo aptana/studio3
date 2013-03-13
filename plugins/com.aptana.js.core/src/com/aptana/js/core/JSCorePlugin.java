@@ -21,6 +21,7 @@ import com.aptana.js.internal.core.node.NodePackageManager;
 /**
  * @author cwilliams
  */
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class JSCorePlugin extends Plugin
 {
 	public static final String PLUGIN_ID = "com.aptana.js.core"; //$NON-NLS-1$
@@ -30,7 +31,7 @@ public class JSCorePlugin extends Plugin
 	private INodeJSService fNodeService;
 	private INodePackageManager fNpm;
 
-	private ServiceTracker<IProxyService, IProxyService> proxyTracker;
+	private ServiceTracker proxyTracker;
 
 	/**
 	 * Returns the shared instance
@@ -51,8 +52,7 @@ public class JSCorePlugin extends Plugin
 		new JSMetadataLoader().schedule();
 
 		// Hook up tracker to proxy service
-		proxyTracker = new ServiceTracker<IProxyService, IProxyService>(getBundle().getBundleContext(),
-				IProxyService.class, null);
+		proxyTracker = new ServiceTracker(getBundle().getBundleContext(), IProxyService.class, null);
 		proxyTracker.open();
 	}
 
@@ -95,6 +95,6 @@ public class JSCorePlugin extends Plugin
 
 	public IProxyService getProxyService()
 	{
-		return proxyTracker.getService();
+		return (IProxyService) proxyTracker.getService();
 	}
 }
