@@ -8,9 +8,11 @@
 package com.aptana.js.debug.core.model;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.ILaunch;
 
 import com.aptana.js.debug.core.internal.ProtocolLogger;
 
@@ -23,15 +25,32 @@ import com.aptana.js.debug.core.internal.ProtocolLogger;
 public interface IJSConnection
 {
 	/**
-	 * Initialize this connection with a socket and a protocol logger.
+	 * Initialize this connection with a socket and a protocol logger. This method may block until a connection is made,
+	 * or until it timeout. In case of a timeout, an exception will be thrown to indicate a failure.
 	 * 
 	 * @param socket
 	 *            A {@link Socket}
 	 * @param logger
 	 *            A {@link ProtocolLogger} (can be <code>null</code>)
+	 * @param launch
+	 *            An {@link ILaunch} (can be <code>null</code>)
 	 * @throws IOException
 	 */
-	void initialize(Socket socket, ProtocolLogger logger) throws IOException;
+	void initialize(Socket socket, ProtocolLogger logger, ILaunch launch) throws IOException;
+
+	/**
+	 * Initialize this connection with an {@link InetSocketAddress} and a protocol logger. This method may block until a
+	 * connection is made, or until it timeout. In case of a timeout, an exception will be thrown to indicate a failure.
+	 * 
+	 * @param inetSocketAddress
+	 *            An {@link InetSocketAddress}
+	 * @param logger
+	 *            A {@link ProtocolLogger} (can be <code>null</code>)
+	 * @param launch
+	 *            An {@link ILaunch} (can be <code>null</code>)
+	 * @throws IOException
+	 */
+	void initialize(InetSocketAddress inetSocketAddress, ProtocolLogger logger, ILaunch launch) throws IOException;
 
 	/**
 	 * Returns the connection's {@link Socket}.
@@ -89,4 +108,5 @@ public interface IJSConnection
 	 * @throws IOException
 	 */
 	void dispose() throws IOException;
+
 }

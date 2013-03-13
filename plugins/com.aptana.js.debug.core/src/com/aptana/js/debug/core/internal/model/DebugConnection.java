@@ -12,6 +12,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
@@ -22,6 +23,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.ILaunch;
 
 import com.aptana.js.debug.core.JSDebugPlugin;
 import com.aptana.js.debug.core.internal.ProtocolLogger;
@@ -85,12 +87,30 @@ public class DebugConnection implements IJSConnection
 	{
 	}
 
-	public void initialize(Socket socket, ProtocolLogger logger) throws IOException
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.js.debug.core.model.IJSConnection#initialize(java.net.Socket,
+	 * com.aptana.js.debug.core.internal.ProtocolLogger, org.eclipse.debug.core.ILaunch)
+	 */
+	public void initialize(Socket socket, ProtocolLogger logger, ILaunch launch) throws IOException
 	{
 		this.socket = socket;
 		this.reader = new InputStreamReader(socket.getInputStream());
 		this.writer = new OutputStreamWriter(socket.getOutputStream());
 		this.logger = logger;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.js.debug.core.model.IJSConnection#initialize(java.net.InetSocketAddress,
+	 * com.aptana.js.debug.core.internal.ProtocolLogger, org.eclipse.debug.core.ILaunch)
+	 */
+	public void initialize(InetSocketAddress inetSocketAddress, ProtocolLogger logger, ILaunch launch)
+			throws IOException
+	{
+		Socket socket = new Socket();
+		socket.connect(inetSocketAddress);
+		initialize(socket, logger, launch);
 	}
 
 	protected DebugConnection(Socket socket, Reader reader, Writer writer, ProtocolLogger logger)
