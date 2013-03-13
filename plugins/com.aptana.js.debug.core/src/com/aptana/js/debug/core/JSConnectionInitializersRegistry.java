@@ -69,45 +69,46 @@ public class JSConnectionInitializersRegistry
 		return instance.createJSConnection(mode, inetSocketAddress, logger, launch);
 	}
 
-	private IJSConnection createJSConnection(final String mode, final Socket socket, final ProtocolLogger logger,
-			final ILaunch launch)
+	private IJSConnection createJSConnection(String mode, Socket socket, ProtocolLogger logger, ILaunch launch)
 	{
-		final IConfigurationElement element = jsConnections.get(mode);
-		if (element == null)
+		final IJSConnection ijsConnection = getConnection(mode);
+		if (ijsConnection != null)
 		{
-			return null;
+			try
+			{
+				ijsConnection.initialize(socket, logger, launch);
+			}
+
+			catch (Exception e)
+			{
+				IdeLog.logError(JSDebugPlugin.getDefault(), MessageFormat.format("Error initializing a {0} connection", //$NON-NLS-1$
+						mode), e);
+			}
 		}
-		final IJSConnection[] connection = new IJSConnection[1];
-		SafeRunner.run(new ISafeRunnable()
-		{
-
-			public void run() throws Exception
-			{
-				connection[0] = (IJSConnection) element.createExecutableExtension(CLASS_ATTR);
-				connection[0].initialize(socket, logger, launch);
-			}
-
-			public void handleException(Throwable exception)
-			{
-				if (exception instanceof CoreException)
-				{
-					IdeLog.logError(JSDebugPlugin.getDefault(),
-							MessageFormat.format("Error loading an IJSConnection - id={0}", //$NON-NLS-1$
-									element.getAttribute(ID_ATTR)), exception);
-				}
-				else
-				{
-					IdeLog.logError(JSDebugPlugin.getDefault(),
-							MessageFormat.format("Error initializing a {0} connection", //$NON-NLS-1$
-									mode), exception);
-				}
-			}
-		});
-		return connection[0];
+		return ijsConnection;
 	}
 
-	private IJSConnection createJSConnection(final String mode, final InetSocketAddress inetSocketAddress,
-			final ProtocolLogger logger, final ILaunch launch)
+	private IJSConnection createJSConnection(String mode, InetSocketAddress inetSocketAddress, ProtocolLogger logger,
+			ILaunch launch)
+	{
+		final IJSConnection ijsConnection = getConnection(mode);
+		if (ijsConnection != null)
+		{
+			try
+			{
+				ijsConnection.initialize(inetSocketAddress, logger, launch);
+			}
+
+			catch (Exception e)
+			{
+				IdeLog.logError(JSDebugPlugin.getDefault(), MessageFormat.format("Error initializing a {0} connection", //$NON-NLS-1$
+						mode), e);
+			}
+		}
+		return ijsConnection;
+	}
+
+	private IJSConnection getConnection(final String mode)
 	{
 		final IConfigurationElement element = jsConnections.get(mode);
 		if (element == null)
@@ -121,7 +122,6 @@ public class JSConnectionInitializersRegistry
 			public void run() throws Exception
 			{
 				connection[0] = (IJSConnection) element.createExecutableExtension(CLASS_ATTR);
-				connection[0].initialize(inetSocketAddress, logger, launch);
 			}
 
 			public void handleException(Throwable exception)
@@ -131,12 +131,6 @@ public class JSConnectionInitializersRegistry
 					IdeLog.logError(JSDebugPlugin.getDefault(),
 							MessageFormat.format("Error loading an IJSConnection - id={0}", //$NON-NLS-1$
 									element.getAttribute(ID_ATTR)), exception);
-				}
-				else
-				{
-					IdeLog.logError(JSDebugPlugin.getDefault(),
-							MessageFormat.format("Error initializing a {0} connection", //$NON-NLS-1$
-									mode), exception);
 				}
 			}
 		});
