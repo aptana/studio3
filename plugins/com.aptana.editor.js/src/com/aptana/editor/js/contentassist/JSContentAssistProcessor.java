@@ -131,11 +131,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 	};
 
-	private static Set<String> AUTO_ACTIVATION_PARTITION_TYPES;
-	{
-		AUTO_ACTIVATION_PARTITION_TYPES = CollectionsUtil.newSet(JSSourceConfiguration.DEFAULT,
-				IDocument.DEFAULT_CONTENT_TYPE);
-	}
+	private static Set<String> AUTO_ACTIVATION_PARTITION_TYPES = CollectionsUtil.newSet(JSSourceConfiguration.DEFAULT,
+			IDocument.DEFAULT_CONTENT_TYPE);
 
 	private JSIndexQueryHelper indexHelper;
 	private IParseNode targetNode;
