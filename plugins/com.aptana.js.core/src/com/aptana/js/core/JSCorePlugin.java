@@ -52,7 +52,7 @@ public class JSCorePlugin extends Plugin
 		new JSMetadataLoader().schedule();
 
 		// Hook up tracker to proxy service
-		proxyTracker = new ServiceTracker(getBundle().getBundleContext(), IProxyService.class, null);
+		proxyTracker = new ServiceTracker(getBundle().getBundleContext(), IProxyService.class.getName(), null);
 		proxyTracker.open();
 	}
 
