@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2012 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2012-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -37,9 +37,26 @@ public interface IProjectWizardContributor extends IExecutableExtension
 	/**
 	 * Responsible for contributing UI to the project creation page of the wizard
 	 * 
+	 * @param data
+	 * @param page
 	 * @param parent
 	 */
-	public void appendProjectCreationPage(Composite parent);
+	public void appendProjectCreationPage(Object data, IWizardPage page, Composite parent);
+
+	/**
+	 * Called to update the UI for the contributor
+	 * 
+	 * @param data
+	 */
+	public void updateProjectCreationPage(Object data);
+
+	/**
+	 * Validates the project settings
+	 * 
+	 * @param data
+	 * @return
+	 */
+	public IStatus validateProjectCreationPage(Object data);
 
 	/**
 	 * Returns the check whether this nature ids passed matches the contributor natureid

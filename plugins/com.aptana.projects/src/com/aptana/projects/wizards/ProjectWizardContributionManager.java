@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2012 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2012-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -77,7 +77,7 @@ public class ProjectWizardContributionManager
 		}
 	}
 
-	public void contributeProjectCreationPage(String[] natureIds, Composite parent)
+	public void contributeProjectCreationPage(String[] natureIds, Object data, IWizardPage page, Composite parent)
 	{
 		loadExtensions();
 		for (IProjectWizardContributor contributor : contributors)
@@ -87,8 +87,42 @@ public class ProjectWizardContributionManager
 				continue;
 			}
 
-			contributor.appendProjectCreationPage(parent);
+			contributor.appendProjectCreationPage(data, page, parent);
 		}
+	}
+
+	public void updateProject(Object data, String[] natureIds)
+	{
+		loadExtensions();
+		for (IProjectWizardContributor contributor : contributors)
+		{
+			if (!ArrayUtil.isEmpty(natureIds) && !contributor.hasNatureId(natureIds))
+			{
+				continue;
+			}
+
+			contributor.updateProjectCreationPage(data);
+		}
+	}
+
+	public IStatus validateProject(Object data, String[] natureIds)
+	{
+		loadExtensions();
+		for (IProjectWizardContributor contributor : contributors)
+		{
+			if (!ArrayUtil.isEmpty(natureIds) && !contributor.hasNatureId(natureIds))
+			{
+				continue;
+			}
+
+			IStatus status = contributor.validateProjectCreationPage(data);
+			if (status.matches(IStatus.ERROR))
+			{
+				return status;
+			}
+		}
+
+		return Status.OK_STATUS;
 	}
 
 	private synchronized void loadExtensions()
