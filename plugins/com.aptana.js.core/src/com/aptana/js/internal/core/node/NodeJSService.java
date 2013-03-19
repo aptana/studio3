@@ -138,6 +138,7 @@ public class NodeJSService implements INodeJSService
 			else
 			{
 				Process p = ProcessUtil.run("sudo", Path.ROOT,//$NON-NLS-1$
+						"-S", "--",//$NON-NLS-1$ //$NON-NLS-2$
 						"/usr/sbin/installer", "-pkg", file.getAbsolutePath(), "-target", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						"/"); //$NON-NLS-1$
 				ProcessRunnable runnable = new SudoCommandProcessRunnable(p, sub.newChild(95), true, password);
