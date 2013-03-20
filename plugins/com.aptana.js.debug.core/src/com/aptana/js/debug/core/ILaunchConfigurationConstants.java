@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -10,7 +10,8 @@ package com.aptana.js.debug.core;
 /**
  * Launch configuration constants
  */
-public interface ILaunchConfigurationConstants {
+public interface ILaunchConfigurationConstants
+{
 	/**
 	 * ID_JS_APPLICATION
 	 */
@@ -70,6 +71,11 @@ public interface ILaunchConfigurationConstants {
 	 * CONFIGURATION_INCLUDE_PROJECT_NAME
 	 */
 	String CONFIGURATION_APPEND_PROJECT_NAME = "appendProjectName"; //$NON-NLS-1$
+
+	/**
+	 * Attribute used to store the name of the project being launched.
+	 */
+	String ATTR_PROJECT_NAME = "ATTR_PROJECT_NAME"; //$NON-NLS-1$
 
 	/**
 	 * CONFIGURATION_HTTP_GET_QUERY
