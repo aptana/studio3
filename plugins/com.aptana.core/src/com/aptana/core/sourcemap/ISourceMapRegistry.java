@@ -16,7 +16,6 @@ import org.eclipse.core.resources.IProject;
  */
 public interface ISourceMapRegistry
 {
-	static final String DEFAULT_SOURCE_MAPPER_ID = "com.appcelerator.titanium.core.defaultSourceMap"; //$NON-NLS-1$
 	static final String MAP_LOCATION_PREFIX_ATTR = "mapLocationPrefix"; //$NON-NLS-1$
 	static final String ORIGINAL_LOCATION_PREFIX_ATTR = "originalLocationPrefix"; //$NON-NLS-1$
 	static final String GENERATED_LOCATION_PREFIX_ATTR = "generatedLocationPrefix"; //$NON-NLS-1$

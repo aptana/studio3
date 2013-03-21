@@ -72,14 +72,14 @@
                   An ISourceMap implementation.
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":com.appcelerator.titanium.core.sourcemap.ISourceMap"/>
+                  <meta.attribute kind="java" basedOn=":com.aptana.core.sourcemap.ISourceMap"/>
                </appinfo>
             </annotation>
          </attribute>
          <attribute name="projectNatureId" type="string" use="required">
             <annotation>
                <documentation>
-                  A project-nature ID that this sourcemae is assigned for.
+                  A project-nature ID that this sourcemap is assigned for.
                </documentation>
                <appinfo>
                   <meta.attribute kind="identifier" basedOn="org.eclipse.core.resources.natures/@point"/>

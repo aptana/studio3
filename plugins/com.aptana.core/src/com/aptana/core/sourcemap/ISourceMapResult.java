@@ -7,6 +7,8 @@
  */
 package com.aptana.core.sourcemap;
 
+import org.eclipse.core.runtime.IPath;
+
 /**
  * Represents a source map result.
  * 
@@ -19,7 +21,7 @@ public interface ISourceMapResult
 	 * 
 	 * @return A file path
 	 */
-	String getFile();
+	IPath getFile();
 
 	/**
 	 * Returns the mapped line number.
