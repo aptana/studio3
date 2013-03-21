@@ -1,3 +1,10 @@
+/**
+ * Aptana Studio
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the Eclipse Public License (EPL).
+ * Please see the license-epl.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.decorator;
 
 import java.util.HashSet;
@@ -23,13 +30,13 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.epl.EditorEplPlugin;
 
 /**
  * Listens to resource deltas and filters for marker changes of type IMarker.PROBLEM Viewers showing error ticks should
  * register as listener to this type.
  */
-@SuppressWarnings({ "unchecked", "rawtypes" })
 public class ProblemMarkerManager implements IResourceChangeListener, IAnnotationModelListener
 {
 
@@ -39,9 +46,9 @@ public class ProblemMarkerManager implements IResourceChangeListener, IAnnotatio
 	private static class ProjectErrorVisitor implements IResourceDeltaVisitor
 	{
 
-		private HashSet fChangedElements;
+		private Set<IResource> fChangedElements;
 
-		public ProjectErrorVisitor(HashSet changedElements)
+		public ProjectErrorVisitor(Set<IResource> changedElements)
 		{
 			fChangedElements = changedElements;
 		}
@@ -87,11 +94,15 @@ public class ProblemMarkerManager implements IResourceChangeListener, IAnnotatio
 					{
 						int kind = markerDeltas[i].getKind();
 						if (kind == IResourceDelta.ADDED || kind == IResourceDelta.REMOVED)
+						{
 							return true;
+						}
 						int severity = markerDeltas[i].getAttribute(IMarker.SEVERITY, -1);
 						int newSeverity = markerDeltas[i].getMarker().getAttribute(IMarker.SEVERITY, -1);
 						if (newSeverity != severity)
+						{
 							return true;
+						}
 					}
 				}
 			}
@@ -101,16 +112,16 @@ public class ProblemMarkerManager implements IResourceChangeListener, IAnnotatio
 
 	private ListenerList fListeners;
 
-	private Set fResourcesWithMarkerChanges;
-	private Set fResourcesWithAnnotationChanges;
+	private Set<IResource> fResourcesWithMarkerChanges;
+	private Set<IResource> fResourcesWithAnnotationChanges;
 
 	private UIJob fNotifierJob;
 
 	public ProblemMarkerManager()
 	{
 		fListeners = new ListenerList();
-		fResourcesWithMarkerChanges = new HashSet();
-		fResourcesWithAnnotationChanges = new HashSet();
+		fResourcesWithMarkerChanges = new HashSet<IResource>();
+		fResourcesWithAnnotationChanges = new HashSet<IResource>();
 	}
 
 	/*
@@ -118,7 +129,7 @@ public class ProblemMarkerManager implements IResourceChangeListener, IAnnotatio
 	 */
 	public void resourceChanged(IResourceChangeEvent event)
 	{
-		HashSet changedElements = new HashSet();
+		Set<IResource> changedElements = new HashSet<IResource>();
 
 		try
 		{
@@ -214,7 +225,7 @@ public class ProblemMarkerManager implements IResourceChangeListener, IAnnotatio
 					return Status.OK_STATUS;
 				}
 			};
-			fNotifierJob.setSystem(true);
+			EclipseUtil.setSystemForJob(fNotifierJob);
 		}
 		fNotifierJob.schedule();
 	}

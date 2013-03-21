@@ -1,3 +1,10 @@
+/**
+ * Aptana Studio
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the Eclipse Public License (EPL).
+ * Please see the license-epl.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.decorator;
 
 import org.eclipse.core.resources.IMarker;
@@ -20,8 +27,8 @@ import com.aptana.editor.epl.EditorEplPlugin;
 public class ProblemsLabelDecorator implements ILightweightLabelDecorator
 {
 
-	private static final int ERROR = 0;
-	private static final int WARNING = 1;
+	private static final int ERROR = IMarker.SEVERITY_ERROR;
+	private static final int WARNING = IMarker.SEVERITY_WARNING;
 	private ListenerList fListeners;
 	private IProblemChangedListener fProblemChangedListener;
 
@@ -206,12 +213,12 @@ public class ProblemsLabelDecorator implements ILightweightLabelDecorator
 			for (int i = 0; i < markers.length && info != ERROR; i++)
 			{
 				IMarker curr = markers[i];
-				int priority = curr.getAttribute(IMarker.SEVERITY, -1);
-				if (priority == IMarker.SEVERITY_WARNING)
+				int severity = curr.getAttribute(IMarker.SEVERITY, -1);
+				if (severity == IMarker.SEVERITY_WARNING)
 				{
 					info = WARNING;
 				}
-				else if (priority == IMarker.SEVERITY_ERROR)
+				else if (severity == IMarker.SEVERITY_ERROR)
 				{
 					info = ERROR;
 				}
