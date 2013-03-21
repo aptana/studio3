@@ -36,6 +36,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
@@ -325,6 +326,32 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 		{
 			IdeLog.logError(JSDebugPlugin.getDefault(), e);
 		}
+	}
+
+	/**
+	 * Computes and returns an {@link ISourceMapResult} for the given source URL and line.
+	 * 
+	 * @param generatedLocation
+	 * @param sourceLine
+	 * @return an {@link ISourceMapResult}. <code>null</code> if there is not mapping.
+	 */
+	public ISourceMapResult getOriginalMappedLocation(URI generatedLocation, int sourceLine)
+	{
+		if (sourceMap == null || generatedLocation == null || sourceLine < 0)
+		{
+			return null;
+		}
+		try
+		{
+			IResource resource = ResourcesPlugin.getWorkspace().getRoot()
+					.findMember(Path.fromOSString(generatedLocation.getPath()));
+			return sourceMap.getOriginalMapping(resource, sourceLine);
+		}
+		catch (Exception e)
+		{
+			IdeLog.logError(JSDebugPlugin.getDefault(), e);
+		}
+		return null;
 	}
 
 	/*

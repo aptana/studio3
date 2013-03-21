@@ -71,6 +71,25 @@ public interface ISourceMap extends IExecutableExtension
 	ISourceMapResult getOriginalMapping(IResource resource, int lineNumber, int columnNumber) throws Exception;
 
 	/**
+	 * Initializes the source map with an {@link IResource} that will be used to locate the map file, and returns an
+	 * {@link ISourceMapResult} that represents the location of the original code. Note that in case the original file
+	 * name in the result is the same as the generated file name, there is no mapping, and the returned value will be
+	 * <code>null</code>. This method will compute the first non-white character position in the given line and will try
+	 * to locate the mapping by that.
+	 * 
+	 * @param resource
+	 *            an {@link IResource} that will be used to locate the map file
+	 * @param lineNumber
+	 *            1-based line number
+	 * @return An {@link ISourceMapResult}; <code>null</code> if there is no mapping.
+	 * @throws Exception
+	 * @throws Exception
+	 * @see #initialize(IResource)
+	 * @see #getOriginalMapping(IResource, int, int)
+	 */
+	ISourceMapResult getOriginalMapping(IResource resource, int lineNumber) throws Exception;
+
+	/**
 	 * Returns an {@link ISourceMapResult} that represents the location of the original code. Note that in case the
 	 * original file name in the result is the same as the generated file name, there is no mapping, and the returned
 	 * value will be <code>null</code>.
