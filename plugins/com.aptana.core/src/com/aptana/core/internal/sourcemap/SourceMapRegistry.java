@@ -80,6 +80,7 @@ public class SourceMapRegistry implements ISourceMapRegistry
 		{
 			return null;
 		}
+		lazyLoad();
 		// Use the primary nature ID to load the registered ISourceMap that deals with it.
 		IConfigurationElement element = sourceMappers.get(projectNatureId);
 		if (element == null)
