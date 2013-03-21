@@ -115,6 +115,12 @@ public class NodePackageManager implements INodePackageManager
 	public IStatus install(String packageName, String displayName, boolean global, char[] password,
 			IProgressMonitor monitor)
 	{
+		return install(packageName, displayName, global, password, null, monitor);
+	}
+
+	public IStatus install(String packageName, String displayName, boolean global, char[] password,
+			IPath workingDirectory, IProgressMonitor monitor)
+	{
 		SubMonitor sub = SubMonitor.convert(monitor,
 				MessageFormat.format(Messages.NodePackageManager_InstallingTaskName, displayName), 100);
 		try
@@ -148,8 +154,8 @@ public class NodePackageManager implements INodePackageManager
 			Map<String, String> environment = ShellExecutable.getEnvironment();
 			environment.put(ProcessUtil.REDIRECT_ERROR_STREAM, StringUtil.EMPTY);
 
-			Process p = ProcessUtil.run(args.get(0), null, environment,
-					args.subList(1, args.size()).toArray(new String[args.size() - 1]));
+			Process p = ProcessUtil.run(args.get(0), workingDirectory, environment, args.subList(1, args.size())
+					.toArray(new String[args.size() - 1]));
 			sub.worked(5);
 
 			ProcessRunnable runnable;
