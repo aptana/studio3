@@ -36,8 +36,8 @@ public class GenericInfoPopupDialog extends PopupDialog
 
 	private static final int POPUP_OFFSET = 20;
 
-	private String message;
-	private MouseListener clickListener;
+	protected String message;
+	protected MouseListener clickListener;
 
 	public GenericInfoPopupDialog(Shell parentShell, String title, String message)
 	{
