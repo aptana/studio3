@@ -1,13 +1,12 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.editor.common.contentassist;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -22,6 +21,7 @@ import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
@@ -38,7 +38,6 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IDebugScopes;
 import com.aptana.ui.epl.UIEplPlugin;
-import com.aptana.ui.util.UIUtils;
 
 public class UserAgentManager implements IUserAgentManager
 {
@@ -255,14 +254,17 @@ public class UserAgentManager implements IUserAgentManager
 		return CorePlugin.getDefault().getUserAgentManager().getDefaultUserAgents(natureID);
 	}
 
-	/**
-	 * Return an icon for the given path
-	 * 
-	 * @param iconPath
-	 *            The path to the icon image
-	 * @return Returns an Image or null
-	 */
-	public Image getImage(String iconPath)
+	public Image getDisabledIcon(IUserAgent agent)
+	{
+		return getImage(agent, agent.getDisabledIconPath());
+	}
+
+	public Image getEnabledIcon(IUserAgent agent)
+	{
+		return getImage(agent, agent.getEnabledIconPath());
+	}
+
+	private Image getImage(IUserAgent agent, String iconPath)
 	{
 		Image result = null;
 
@@ -272,21 +274,14 @@ public class UserAgentManager implements IUserAgentManager
 			{
 				imageRegistry = new ImageRegistry();
 			}
-
-			File file = new File(iconPath);
-
-			if (file.exists())
+			String key = agent.getID() + '_' + iconPath;
+			result = imageRegistry.get(key);
+			if (result == null)
 			{
-				String iconFilename = file.getAbsolutePath();
-
-				result = imageRegistry.get(iconFilename);
-
-				if (result == null)
-				{
-					result = new Image(UIUtils.getDisplay(), iconFilename);
-					imageRegistry.put(iconFilename, result);
-				}
+				ImageDescriptor desc = CommonEditorPlugin.imageDescriptorFromPlugin(agent.getContributor(), iconPath);
+				imageRegistry.put(key, desc);
 			}
+			result = imageRegistry.get(key);
 		}
 
 		return result;
@@ -326,11 +321,8 @@ public class UserAgentManager implements IUserAgentManager
 
 			if (userAgent != null)
 			{
-				// @formatter:off
-				result[i] = (enabledAgents.contains(userAgent.getID()))
-					? getImage(userAgent.getEnabledIconPath())
-					: getImage(userAgent.getDisabledIconPath());
-				// @formatter:on
+				boolean isEnabled = enabledAgents.contains(userAgent.getID());
+				result[i] = isEnabled ? getEnabledIcon(userAgent) : getDisabledIcon(userAgent);
 			}
 		}
 
