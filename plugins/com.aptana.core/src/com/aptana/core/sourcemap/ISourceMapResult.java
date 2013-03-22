@@ -24,13 +24,6 @@ public interface ISourceMapResult
 	IPath getFile();
 
 	/**
-	 * Sets the file path for this result
-	 * 
-	 * @param path
-	 */
-	void setFile(IPath path);
-
-	/**
 	 * Returns the mapped line number.
 	 * 
 	 * @return line number (1 based)
