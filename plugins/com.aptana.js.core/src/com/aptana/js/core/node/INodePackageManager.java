@@ -42,6 +42,24 @@ public interface INodePackageManager
 			IProgressMonitor monitor);
 
 	/**
+	 * Installs a package.
+	 * 
+	 * @param packageName
+	 *            The name of the npm package to install
+	 * @param displayName
+	 *            The UI string to use for the name of the package
+	 * @param global
+	 *            Whether to install globally
+	 * @param password
+	 *            The password to pass to sudo if installing globally on Mac/Linux/Unix
+	 * @param workingDirectory
+	 * @param monitor
+	 * @return
+	 */
+	public IStatus install(String packageName, String displayName, boolean global, char[] password,
+			IPath workingDirectory, IProgressMonitor monitor);
+
+	/**
 	 * Lists the installed packages.
 	 * 
 	 * @param global

@@ -572,7 +572,8 @@ public class ContentAssistPreferencePage extends PropertyAndPreferenceFieldEdito
 		 */
 		public Image getColumnImage(Object element, int columnIndex)
 		{
-			return UserAgentManager.getInstance().getImage(((IUserAgent) element).getEnabledIconPath());
+			IUserAgent agent = (IUserAgent) element;
+			return UserAgentManager.getInstance().getEnabledIcon(agent);
 		}
 
 		/**
