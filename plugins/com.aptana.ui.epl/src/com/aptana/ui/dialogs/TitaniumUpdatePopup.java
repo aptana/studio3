@@ -7,6 +7,8 @@
  */
 package com.aptana.ui.dialogs;
 
+import java.text.MessageFormat;
+
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.swt.SWT;
@@ -26,14 +28,15 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.ui.epl.UIEplPlugin;
 
 /**
  * TitaniumUpdatePopup is a more simple version of AutomaticUpdatesPopup that has been modified for Titanium Updates.
+ * FIXME Move to com.appcelerator.titanium.update?
  * 
  * @author ayeung
  */
-
 public class TitaniumUpdatePopup extends PopupDialog
 {
 	MouseListener clickListener;
@@ -43,7 +46,7 @@ public class TitaniumUpdatePopup extends PopupDialog
 	public TitaniumUpdatePopup(Shell parentShell, final Runnable updateAction)
 	{
 		super(parentShell, PopupDialog.INFOPOPUPRESIZE_SHELLSTYLE | SWT.MODELESS, false, true, true, false, false,
-				EplMessages.TitaniumUpdatePopup_update_title, null);
+				MessageFormat.format(EplMessages.TitaniumUpdatePopup_update_title, EclipseUtil.getStudioPrefix()), null);
 
 		clickListener = new MouseAdapter()
 		{
@@ -67,7 +70,8 @@ public class TitaniumUpdatePopup extends PopupDialog
 
 		// The "click to update" label
 		Label infoLabel = new Label(dialogArea, SWT.NONE);
-		infoLabel.setText(EplMessages.TitaniumUpdatePopup_update_detail);
+		infoLabel.setText(MessageFormat.format(EplMessages.TitaniumUpdatePopup_update_detail,
+				EclipseUtil.getStudioPrefix()));
 		infoLabel.setLayoutData(new GridData(GridData.FILL_BOTH));
 		infoLabel.addMouseListener(clickListener);
 
