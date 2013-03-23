@@ -77,7 +77,7 @@ public final class DialogUtils
 			String key)
 	{
 		String value = store.getString(key);
-		if (!shouldShowDialog(key) || value != MessageDialogWithToggle.PROMPT)
+		if (!shouldShowDialog(key))
 		{
 			return value == MessageDialogWithToggle.ALWAYS ? IDialogConstants.YES_ID : IDialogConstants.NO_ID;
 		}
