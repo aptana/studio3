@@ -13,7 +13,7 @@ import java.util.Set;
 import org.eclipse.jface.text.rules.IWordDetector;
 
 import com.aptana.core.util.StringUtil;
-import com.aptana.editor.js.JSLanguageConstants;
+import com.aptana.js.core.JSLanguageConstants;
 
 /**
  * Special "word" detector for finding JS operators.

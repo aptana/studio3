@@ -24,6 +24,7 @@ import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.graphics.Image;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.html.HTMLPlugin;
@@ -67,7 +68,7 @@ class HTMLTagProposal extends CommonCompletionProposal
 		super.apply(viewer, trigger, stateMask, offset);
 
 		// See if there are any positions that should be linked. Last is always exit, first is cursor position
-		if (_positions != null && _positions.length > 0)
+		if (!ArrayUtil.isEmpty(_positions))
 		{
 			IDocument document = viewer.getDocument();
 			boolean validPrefix = isValidPrefix(getPrefix(document, offset), getDisplayString());

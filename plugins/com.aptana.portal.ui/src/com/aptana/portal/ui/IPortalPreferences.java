@@ -32,4 +32,10 @@ public interface IPortalPreferences
 	 * Holds the last Studio version that existed when the start page was opened
 	 */
 	String LAST_KNOWN_STUDIO_VERSION = "last_known_studio_version"; //$NON-NLS-1$
+
+	/**
+	 * The preference key used to hold the recently created project.
+	 */
+	String RECENTLY_CREATED_PROJECT = "recently_created_project"; //$NON-NLS-1$
+
 }

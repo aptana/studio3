@@ -21,6 +21,7 @@ Export-Package: com.aptana.core,
  com.aptana.core.logging,
  com.aptana.core.projects.templates,
  com.aptana.core.resources,
+ com.aptana.core.sourcemap,
  com.aptana.core.util,
  com.aptana.core.util.replace,
  com.aptana.plist

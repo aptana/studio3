@@ -13,12 +13,11 @@ package com.aptana.editor.css.parsing;
 import java.io.Reader;
 import java.io.StringReader;
 
-import com.aptana.core.util.StringUtil;
-
-import com.aptana.editor.css.parsing.lexer.CSSTokenTypeSymbol;
-import com.aptana.editor.css.parsing.lexer.CSSTokenType;
-
 import beaver.Scanner;
+
+import com.aptana.core.util.StringUtil;
+import com.aptana.css.core.parsing.CSSTokenType;
+import com.aptana.css.core.parsing.CSSTokenTypeSymbol;
 
 
 @SuppressWarnings({"unused", "nls"})

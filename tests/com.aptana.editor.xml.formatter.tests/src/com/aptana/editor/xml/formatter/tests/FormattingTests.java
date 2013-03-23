@@ -1,6 +1,7 @@
 package com.aptana.editor.xml.formatter.tests;
 
 import com.aptana.editor.common.formatting.AbstractFormatterTestCase;
+import com.aptana.editor.xml.XMLPlugin;
 
 public class FormattingTests extends AbstractFormatterTestCase
 {
@@ -17,6 +18,13 @@ public class FormattingTests extends AbstractFormatterTestCase
 	private static String FORMATTER_FACTORY_ID = "com.aptana.editor.xml.formatterFactory"; //$NON-NLS-1$
 	private static String TEST_BUNDLE_ID = "com.aptana.editor.xml.formatter.tests"; //$NON-NLS-1$
 	private static String FILE_TYPE = "xml"; //$NON-NLS-1$
+
+	@Override
+	protected void setUpSuite() throws Exception
+	{
+		XMLPlugin.getDefault();
+		super.setUpSuite();
+	}
 
 	/*
 	 * (non-Javadoc)

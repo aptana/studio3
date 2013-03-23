@@ -1,0 +1,165 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="com.aptana.core" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="com.aptana.core" id="useragent" name="UserAgent"/>
+      </appinfo>
+      <documentation>
+         This extension point is used to define various aspects of user agents used within Studio.
+
+The user-agent element is used to define user agents, their display names, and the icons used to display them. Each user-agent defines a unique ID to allow other items to refer to them. All user-agent element entries will appear in the preference page associated with user agent selection for code assist, allowing the given user agent to be active/inactive in the code assist popups for HTML, JS, CSS, and other languages.
+
+This extension point also allows for a set of user agents to be defined and associated with a nature by nature id. The user agent selection preference page uses the set defined in default-user-agents as the list to revert to when the &quot;Restore Defaults&quot; button is pressed.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
+      <complexType>
+         <choice minOccurs="1" maxOccurs="unbounded">
+            <element ref="user-agent"/>
+            <element ref="default-user-agents"/>
+         </choice>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="user-agent">
+      <annotation>
+         <appinfo>
+            <meta.element icon="icon"/>
+         </appinfo>
+         <documentation>
+            An element used to describe a user agent. A user agent consists of a unique ID, a display name, and an icon. Icons need to be defined for enable and disabled states.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  A unique ID used to reference the user agent defined by this element.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The display name of the user agent that is used when a text value is needed in the UI.
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="icon" type="string" use="required">
+            <annotation>
+               <documentation>
+                  An icon used to represent this user agent in the UI
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="resource"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="icon-disabled" type="string" use="required">
+            <annotation>
+               <documentation>
+                  An icon used to represent this user agent in the UI specifically when the item is disabled
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="resource"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="default-user-agents">
+      <annotation>
+         <documentation>
+            An element used to define the set of user agents that should be considered the default user agent list for a given nature. Note that the multiple entries for the same nature results in a list that is the union of all entries.
+         </documentation>
+      </annotation>
+      <complexType>
+         <choice minOccurs="1" maxOccurs="unbounded">
+            <element ref="user-agent-ref"/>
+         </choice>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  A description of the default user agent set being defined by this element. Most likely this will refer to the nature to which this default set is associated. A special value of &lt;other&gt; may be used to define the default list for unknown nature ids.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="nature-id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The id of the nature for which this element defines a default set of user agents
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="user-agent-ref">
+      <annotation>
+         <documentation>
+            An element used to refer to a user agent defined by a user-agent element. The reference is made using the user-agent id as the reference value.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="user-agent-id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The ID of a user-agent element to which this element refers
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="com.aptana.core.userAgent/user-agent/@id"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="since"/>
+      </appinfo>
+      <documentation>
+         Aptana 1.1
+      </documentation>
+   </annotation>
+
+
+
+
+
+</schema>

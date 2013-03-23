@@ -12,8 +12,8 @@ import org.eclipse.swt.graphics.Image;
 
 import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.xml.XMLPlugin;
-import com.aptana.editor.xml.parsing.ast.XMLElementNode;
 import com.aptana.parsing.ast.IParseNodeAttribute;
+import com.aptana.xml.core.parsing.ast.XMLElementNode;
 
 public class XMLOutlineLabelProvider extends LabelProvider
 {

@@ -62,11 +62,11 @@ public final class ShellExecutable
 	};
 
 	public static final String PATH_SEPARATOR = ":"; //$NON-NLS-1$
+	private static final String PATH = "PATH"; //$NON-NLS-1$
 
 	private static final String SH_EXE = "sh.exe"; //$NON-NLS-1$
 	private static final String BASH = "bash"; //$NON-NLS-1$
 	private static final String RCFILE = "$os$/.aptanarc"; //$NON-NLS-1$
-	private static final String PATH = "path"; //$NON-NLS-1$
 
 	private static boolean initializing = false;
 	private static IPath shellPath = null;
@@ -241,15 +241,18 @@ public final class ShellExecutable
 		{
 			String resultPath = workingDirToEnvCache.get(locationKey).get(PATH);
 
-			if (resultPath != null)
+			for (String newPath : newPathLocations)
 			{
-				for (String newPath : newPathLocations)
-				{
-					resultPath = StringUtil.join(PATH_SEPARATOR, resultPath,
-							PathUtil.convertToUnixFormatPath(PlatformUtil.expandEnvironmentStrings(newPath)));
-				}
-				workingDirToEnvCache.get(locationKey).put(PATH, PathUtil.convertPATH(resultPath));
+				resultPath = StringUtil.join(PATH_SEPARATOR, resultPath,
+						PathUtil.convertToUnixFormatPath(PlatformUtil.expandEnvironmentStrings(newPath)));
 			}
+			resultPath = PathUtil.convertPATH(resultPath);
+			// Remove duplicates.
+			List<String> pathLocations = StringUtil.split(resultPath, File.pathSeparatorChar);
+			CollectionsUtil.removeDuplicates(pathLocations);
+			resultPath = StringUtil.join(String.valueOf(File.pathSeparatorChar), pathLocations);
+
+			workingDirToEnvCache.get(locationKey).put(PATH, resultPath);
 		}
 	}
 

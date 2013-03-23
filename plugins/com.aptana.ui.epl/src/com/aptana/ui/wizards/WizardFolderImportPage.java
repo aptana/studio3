@@ -13,6 +13,7 @@ package com.aptana.ui.wizards;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -92,6 +93,8 @@ import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.projects.primary.natures.IPrimaryNatureContributor;
+import com.aptana.projects.primary.natures.PrimaryNaturesManager;
 import com.aptana.ui.epl.UIEplPlugin;
 import com.aptana.ui.properties.NaturesLabelProvider;
 
@@ -177,9 +180,12 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 	private static String previouslyBrowsedDirectory = ""; //$NON-NLS-1$
 
 	private Button browseDirectoriesButton;
+	private Map<String, IPrimaryNatureContributor> natureContributors = new HashMap<String, IPrimaryNatureContributor>();
 
 	/**
 	 * Creates a new project creation wizard page.
+	 * 
+	 * @param natureContributors
 	 */
 	public WizardFolderImportPage()
 	{
@@ -193,11 +199,7 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 	 */
 	public WizardFolderImportPage(String pageName)
 	{
-		super(pageName);
-		setPageComplete(false);
-		setTitle(EplMessages.WizardFolderImportPage_ExistingFolderAsNewProject);
-		fNatureDescriptions = new HashMap<String, String>();
-
+		this(pageName, EplMessages.WizardFolderImportPage_ExistingFolderAsNewProject, null);
 	}
 
 	/**
@@ -210,6 +212,33 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 	public WizardFolderImportPage(String pageName, String title, ImageDescriptor titleImage)
 	{
 		super(pageName, title, titleImage);
+		setPageComplete(false);
+		fNatureDescriptions = new HashMap<String, String>();
+	}
+
+	private void setPrimaryNatureFromContributions(IPath projectPath)
+	{
+		int highestPrimaryNatureRank = -1;
+		String potentialPrimaryNature = null;
+		for (String natureId : natureContributors.keySet())
+		{
+			IPrimaryNatureContributor primaryNatureContributor = natureContributors.get(natureId);
+			int primaryNatureRank = primaryNatureContributor.getPrimaryNatureRank(projectPath);
+			if (primaryNatureRank > highestPrimaryNatureRank)
+			{
+				potentialPrimaryNature = natureId;
+				highestPrimaryNatureRank = primaryNatureRank;
+			}
+		}
+		if (StringUtil.isEmpty(potentialPrimaryNature))
+		{
+			// Initially check off web nature if there are no potential ones.
+			updatePrimaryNature(APTANA_WEB_NATURE);
+		}
+		else
+		{
+			updatePrimaryNature(potentialPrimaryNature);
+		}
 	}
 
 	/**
@@ -234,27 +263,20 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 		workArea.setLayoutData(new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
 
 		createProjectsRoot(workArea);
-		if (directoryPath != null)
-		{
-			directoryPathField.setText(directoryPath);
-			setProjectName();
-			setPageComplete(true);
-		}
-		Dialog.applyDialogFont(workArea);
 
+		Dialog.applyDialogFont(workArea);
 		fLabelProvider = new NaturesLabelProvider(fNatureDescriptions);
-		// Initially check off web nature
-		updatePrimaryNature(APTANA_WEB_NATURE);
 
 		Label l = new Label(workArea, SWT.NONE);
 		l.setText(EplMessages.WizardFolderImportPage_project_type_title);
 
-		// Table for project natures
+		natureContributors = PrimaryNaturesManager.getManager().getContributorsMap();
 
 		Composite tableComposite = new Composite(workArea, SWT.NONE);
 		tableComposite.setLayout(GridLayoutFactory.fillDefaults().numColumns(2).create());
 		tableComposite.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 
+		// Table for project natures
 		fTableViewer = CheckboxTableViewer.newCheckList(tableComposite, SWT.TOP | SWT.BORDER);
 		Table table = fTableViewer.getTable();
 		table.setLinesVisible(true);
@@ -267,7 +289,6 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 		fTableViewer.setLabelProvider(getLabelProvider());
 		fTableViewer.setComparator(getViewerComperator());
 		fTableViewer.setInput(ResourcesPlugin.getWorkspace());
-		fTableViewer.setCheckedElements(new String[] { fPrimaryNature });
 		fTableViewer.addCheckStateListener(this);
 		fTableViewer.addSelectionChangedListener(new ISelectionChangedListener()
 		{
@@ -286,6 +307,15 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 		updateButtons();
 
 		setPageComplete(false);
+		setPrimaryNatureFromContributions(null);
+		fTableViewer.setCheckedElements(new String[] { fPrimaryNature });
+
+		if (!StringUtil.isEmpty(directoryPath))
+		{
+			directoryPathField.setText(directoryPath);
+			setProjectName();
+			setPageComplete(true);
+		}
 	}
 
 	/**
@@ -368,8 +398,10 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 				return false;
 			}
 
-			// Set a warning message if the imported project already contain certain project natures.
 			IPath path = Path.fromOSString(directoryPathField.getText());
+			setPrimaryNatureFromContributions(path);
+
+			// Set a warning message if the imported project already contain certain project natures.
 			IPath dotProjectPath = path.append(IProjectDescription.DESCRIPTION_FILE_NAME);
 
 			IProjectDescription description = null;
@@ -392,8 +424,16 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 							natures.append(delimiter).append(nature);
 							delimiter = ", "; //$NON-NLS-1$
 						}
+						String[] natureIds = description.getNatureIds();
+						if (natureIds.length > 0 && !natureIds[0].equals(fPrimaryNature))
+						{
+							String[] oldNatures = natureIds;
+							natureIds = new String[description.getNatureIds().length + 1];
+							System.arraycopy(oldNatures, 0, natureIds, 1, oldNatures.length);
+							natureIds[0] = fPrimaryNature;
+						}
 						// set the natures checked in the nature table as they are the most relevant ones.
-						fTableViewer.setCheckedElements(description.getNatureIds());
+						fTableViewer.setCheckedElements(natureIds);
 						setMessage(EplMessages.WizardFolderImportPage_override_project_nature + natures.toString(),
 								WARNING);
 						setErrorMessage(null);
@@ -494,11 +534,32 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 	public IProject createProject()
 	{
 		String projectPath = directoryPathField.getText();
-		File project = new File(projectPath);
-		if (project.exists())
+		File projectFile = new File(projectPath);
+		if (projectFile.exists())
 		{
-			ProjectRecord pr = new ProjectRecord(project, projectNameField.getText());
-			return createExistingProject(pr);
+			ProjectRecord pr = new ProjectRecord(projectFile, projectNameField.getText());
+			IProject project = createExistingProject(pr);
+
+			// Configure the project by its natures
+			Object[] checkedNatures = fTableViewer.getCheckedElements();
+			for (Object natureId : checkedNatures)
+			{
+				IPrimaryNatureContributor contributor = natureContributors.get(natureId);
+				if (contributor != null)
+				{
+					try
+					{
+						contributor.configure(project);
+					}
+					catch (CoreException e)
+					{
+						IdeLog.logError(UIEplPlugin.getDefault(),
+								MessageFormat.format("Error configurating project ''{0}'' while importing it", //$NON-NLS-1$
+										project.getName()), e);
+					}
+				}
+			}
+			return project;
 		}
 		return null;
 	}
@@ -793,6 +854,7 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 	{
 		fPrimaryNature = nature;
 		fLabelProvider.setPrimaryNature(fPrimaryNature);
+		fTableViewer.refresh();
 	}
 
 	/**

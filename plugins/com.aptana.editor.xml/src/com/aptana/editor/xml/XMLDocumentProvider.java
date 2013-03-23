@@ -18,20 +18,22 @@ import com.aptana.editor.common.IExtendedPartitioner;
 import com.aptana.editor.common.NullPartitionerSwitchStrategy;
 import com.aptana.editor.common.text.rules.CompositePartitionScanner;
 import com.aptana.editor.common.text.rules.NullSubPartitionScanner;
+import com.aptana.xml.core.IXMLConstants;
 
 /**
- * 
  * @author Max Stepanov
- *
  */
-public class XMLDocumentProvider extends CommonDocumentProvider {
+public class XMLDocumentProvider extends CommonDocumentProvider
+{
 
 	@Override
-	public void connect(Object element) throws CoreException {
+	public void connect(Object element) throws CoreException
+	{
 		super.connect(element);
 
 		IDocument document = getDocument(element);
-		if (document != null) {
+		if (document != null)
+		{
 			CompositePartitionScanner partitionScanner = new CompositePartitionScanner(XMLSourceConfiguration
 					.getDefault().createSubPartitionScanner(), new NullSubPartitionScanner(),
 					new NullPartitionerSwitchStrategy());
@@ -40,8 +42,8 @@ public class XMLDocumentProvider extends CommonDocumentProvider {
 			partitionScanner.setPartitioner((IExtendedPartitioner) partitioner);
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);
-			CommonEditorPlugin.getDefault().getDocumentScopeManager().registerConfiguration(document,
-					XMLSourceConfiguration.getDefault());
+			CommonEditorPlugin.getDefault().getDocumentScopeManager()
+					.registerConfiguration(document, XMLSourceConfiguration.getDefault());
 		}
 	}
 
@@ -49,7 +51,8 @@ public class XMLDocumentProvider extends CommonDocumentProvider {
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.CommonDocumentProvider#getDefaultContentType(java.lang.String)
 	 */
-	protected String getDefaultContentType(String filename) {
+	protected String getDefaultContentType(String filename)
+	{
 		return IXMLConstants.CONTENT_TYPE_XML;
 	}
 

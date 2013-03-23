@@ -1,0 +1,709 @@
+// java -jar beaver.jar -T -w CSS.grammar
+// Note: the official grammar may be found at: http://www.w3.org/TR/css3-selectors/
+%package "com.aptana.css.core.parsing";
+
+%class "CSSParser";
+
+%import "java.util.ArrayList";
+%import "java.util.List";
+%import "com.aptana.css.core.ICSSConstants";
+%import "com.aptana.css.core.parsing.ast.*";
+%import "com.aptana.parsing.IParseState";
+%import "com.aptana.parsing.IParser";
+%import "com.aptana.parsing.ast.IParseError";
+%import "com.aptana.parsing.ast.ParseError";
+%import "com.aptana.parsing.ast.IParseRootNode";
+%import "com.aptana.parsing.ast.ParseRootNode";
+%import "com.aptana.parsing.util.ParseUtil";
+%import "com.aptana.parsing.ast.IParseNode";
+%import "com.aptana.parsing.WorkingParseResult";
+%import "com.aptana.parsing.ParseResult";
+
+%terminals AT_RULE, CHARSET, IMPORT, MEDIA_KEYWORD, PAGE, FONTFACE, NAMESPACE, LPAREN;
+%terminals SEMICOLON, COLON, COMMA, LCURLY, RCURLY, LBRACKET, RBRACKET, RPAREN, SLASH;
+%terminals NOT, MINUS, PLUS, EQUAL, STAR, GREATER;
+%terminals IDENTIFIER, STRING, URL, NUMBER, CLASS, LENGTH, EMS, EXS, ANGLE, TIME, FREQUENCY, COLOR, PERCENTAGE;
+%terminals IMPORTANT, PROPERTY, SELECTOR, HASH, INCLUDES, DASHMATCH, BEGINS_WITH, ENDS_WITH;
+%terminals MOZ_DOCUMENT;
+
+%typeof IDENTIFIER, PROPERTY, STRING, URL, NUMBER, PERCENTAGE, LENGTH, EMS, EXS, ANGLE, TIME, FREQUENCY, COLOR = "String";
+%typeof HASH, NOT, CLASS, LBRACKET, RBRACKET, COLON, COMMA, PLUS, STAR, GREATER, AT_RULE = "String";
+%typeof Statement = "CSSNode";
+%typeof Declaration = "CSSDeclarationNode";
+%typeof Declarations = "List<CSSDeclarationNode>";
+%typeof Expression, Function, Term = "CSSExpressionNode";
+%typeof ImportWord, Identifier, IdentiferOrString, Separator, Primitive, TypeOrUniversalSelector, AttributeValueOperator = "String";
+%typeof AttributeSelector = "CSSAttributeSelectorNode";
+%typeof List = "List<CSSTextNode>";
+%typeof Selectors = "List<CSSSelectorNode>";
+%typeof Selector = "CSSSelectorNode";
+%typeof SimpleSelector = "CSSSimpleSelectorNode";
+%typeof Combinator = "String";
+%typeof Rule = "CSSRuleNode";
+%typeof Rules, FunctionList = "CSSList";
+
+%implements "IParser";
+
+%embed {:
+	private WorkingParseResult fWorking;
+
+	// Collect the errors into a list of IParseErrors
+	private class CSSEvents extends Events
+	{
+		public void scannerError(Scanner.Exception e)
+		{
+		}
+
+		public void syntaxError(Symbol token)
+		{
+		    //System.out.println("Error at: "+token.value);
+			if (token == null || fWorking == null)
+			{
+				return;
+			}
+			fWorking.addError(new ParseError(ICSSConstants.CONTENT_TYPE_CSS, token, IParseError.Severity.ERROR));
+		}
+
+		public void unexpectedTokenRemoved(Symbol token)
+		{
+		}
+
+		public void missingTokenInserted(Symbol token)
+		{
+		}
+
+		public void misspelledTokenReplaced(Symbol token)
+		{
+		}
+
+		public void errorPhraseRemoved(Symbol error)
+		{
+		}
+	}
+
+    public synchronized ParseResult parse(IParseState parseState) throws java.lang.Exception
+    {
+        WorkingParseResult working = new WorkingParseResult();
+        parse(parseState, working);
+        return working.getImmutableResult();
+    }
+
+
+	protected synchronized void parse(IParseState parseState, WorkingParseResult working) throws java.lang.Exception
+	{
+		fWorking = working;
+        try
+        {
+    		// grab source
+    		String source = parseState.getSource();
+    
+    		// create scanner and send source to it
+    		CSSFlexScanner scanner = new CSSFlexScanner();
+    		scanner.setSource(source);
+    
+    		// parse
+    		ParseRootNode result = (ParseRootNode) parse(scanner);
+    
+    		// attach comments to parse root node
+    		List<Symbol> comments = scanner.getComments();
+    		List<CSSCommentNode> commentNodes = new ArrayList<CSSCommentNode>(comments.size());
+    
+    		for (Symbol comment : comments)
+    		{
+    			// @formatter:off
+    			CSSCommentNode commentNode = new CSSCommentNode(
+    				source.substring(comment.getStart(), comment.getEnd() + 1),
+    				comment.getStart(),
+    				comment.getEnd()
+    			);
+    			// @formatter:on
+    
+    			commentNodes.add(commentNode);
+    		}
+    
+    		result.setCommentNodes(commentNodes.toArray(new IParseNode[commentNodes.size()]));
+    
+    		// update node offsets
+    		int start = parseState.getStartingOffset();
+    		int length = source.length();
+    
+    		// align root with zero-based offset
+    		result.setLocation(0, length - 1);
+    
+    		if (start != 0)
+    		{
+    			// shift all offsets to the correct position
+    			ParseUtil.addOffset(result, start);
+    		}
+    
+    		// store results in the parse state
+    		fWorking.setParseResult(result);
+        }
+        finally
+        {
+    		fWorking = null;
+		}
+
+	}
+:};
+
+%init {:
+		report = new CSSEvents();
+:};
+
+%goal Program;
+
+Program
+	=	Statements.p
+		{:
+			return new CSSParseRootNode(p);
+		:}
+	|	{:
+			return new CSSParseRootNode();
+		:}
+	;
+
+Statements
+	=	Statements Statement
+	|	Statement
+	;
+
+Statement
+	=	CharSet
+	|	Import
+	|	Media
+	|	Page
+	|	FontFace
+	|	Namespace
+	|	AtRule
+	|	Rule
+	|	MozDocument
+	;
+
+CharSet
+	=	CHARSET STRING.s SEMICOLON
+		{:
+			return new CSSCharSetNode(s);
+		:}
+	;
+
+Import
+	=	IMPORT ImportWord.s SEMICOLON
+		{:
+			return new CSSImportNode(s);
+		:}
+	|	IMPORT ImportWord.s List.w SEMICOLON
+		{:
+			return new CSSImportNode(s, w.toArray(new CSSTextNode[w.size()]));
+		:}
+	;
+
+Media
+	=	MEDIA_KEYWORD MediaExprs.m LCURLY RCURLY
+		{:
+			List<CSSTextNode> list = new ArrayList<CSSTextNode>();
+
+			for (Symbol symbol : m)
+			{
+				CSSTextNode text = new CSSTextNode((String) symbol.value);
+
+				text.setLocation(symbol.getStart(), symbol.getEnd());
+				list.add(text);
+			}
+
+			return new CSSMediaNode(list.toArray(new CSSTextNode[list.size()]));
+		:}
+	|	MEDIA_KEYWORD MediaExprs.m LCURLY Statements.s RCURLY
+		{:
+			List<CSSTextNode> list = new ArrayList<CSSTextNode>();
+
+			for (Symbol symbol : m)
+			{
+				CSSTextNode text = new CSSTextNode((String) symbol.value);
+
+				text.setLocation(symbol.getStart(), symbol.getEnd());
+				list.add(text);
+			}
+
+			return new CSSMediaNode(list.toArray(new CSSTextNode[list.size()]), s);
+		:}
+	;
+
+MediaExprs
+	=	MediaExprs MediaExpr
+	|	MediaExpr
+	;
+
+MediaExpr
+	=	IDENTIFIER
+	|	PROPERTY
+	|	COLOR
+	|	COLON
+	|	RCURLY
+	|	STRING
+	|	LBRACKET
+	|	CLASS
+	|	HASH
+	|	SEMICOLON
+	|	URL
+	|	STAR
+	|	SELECTOR
+	|	COMMA
+	|	NUMBER
+	|	PERCENTAGE
+	|	LENGTH
+	|	EMS
+	|	EXS
+	|	ANGLE
+	|	TIME
+	|	FREQUENCY
+	|	PAGE
+	|	AT_RULE
+	|	CHARSET
+	|	MEDIA_KEYWORD
+	|	FONTFACE
+	|	NAMESPACE
+	|	IMPORT
+	|	RBRACKET
+	|	LPAREN
+	|	PLUS
+	|	SLASH
+	|	MINUS
+	|	RPAREN
+	|	IMPORTANT
+	|	GREATER
+	|	EQUAL
+	|	INCLUDES
+	|	DASHMATCH
+	;
+
+Page
+	=	PAGE LCURLY RCURLY
+		{:
+			return new CSSPageNode();
+		:}
+	|	PAGE LCURLY Declarations.d RCURLY
+		{:
+			return new CSSPageNode(d);
+		:}
+	|	PAGE COLON IDENTIFIER.s LCURLY RCURLY
+		{:
+			CSSPageSelectorNode pageSelector = new CSSPageSelectorNode(s);
+			CSSPageNode result = new CSSPageNode();
+
+			pageSelector.setLocation(_symbol_s.getStart(), _symbol_s.getEnd());
+			result.setSelector(pageSelector);
+
+			return result;
+		:}
+	|	PAGE COLON IDENTIFIER.s LCURLY Declarations.d RCURLY
+		{:
+			CSSPageSelectorNode pageSelector = new CSSPageSelectorNode(s);
+			CSSPageNode result = new CSSPageNode(d);
+
+			pageSelector.setLocation(_symbol_s.getStart(), _symbol_s.getEnd());
+			result.setSelector(pageSelector);
+
+			return result;
+		:}
+	;
+
+FontFace
+	=	FONTFACE LCURLY RCURLY
+		{:
+			return new CSSFontFaceNode();
+		:}
+	|	FONTFACE LCURLY Declarations.d RCURLY
+		{:
+			return new CSSFontFaceNode(d);
+		:}
+	;
+
+Namespace
+	=	NAMESPACE ImportWord.w SEMICOLON
+		{:
+			return new CSSNamespaceNode(w);
+		:}
+	|	NAMESPACE IDENTIFIER.i ImportWord.w SEMICOLON
+		{:
+			return new CSSNamespaceNode(i, w);
+		:}
+	;
+
+AtRule
+	=	AT_RULE.a STRING.s SEMICOLON
+		{:
+			return new CSSAtRuleNode(a, s);
+		:}
+	;
+
+// TODO: We probably want some collection nodes, one to hold selectors and one to hold
+// declarations. Since these would be true CSSNodes, parent relationships would be setup
+// properly during parsing. However, until then, we need to wire up the parents here
+Rules
+	=	Rules.rs Rule.r
+		{:
+			rs.addChild(r);
+			
+			return rs;
+		:}
+	|	Rule.r
+		{:
+			CSSList list = new CSSList();
+			
+			list.addChild(r);
+			
+			return list;
+		:}
+	;
+
+Rule
+	=	Selectors.s LCURLY RCURLY
+		{:
+			CSSRuleNode result = new CSSRuleNode(s);
+
+			for (CSSSelectorNode selector : s)
+			{
+				selector.setParent(result);
+			}
+
+			return result;
+		:}
+	|	Selectors.s LCURLY Declarations.d RCURLY
+		{:
+			CSSRuleNode result = new CSSRuleNode(s, d);
+
+			for (CSSSelectorNode selector : s)
+			{
+				selector.setParent(result);
+			}
+
+			CSSSelectorNode firstSelector = s.get(0);
+
+			for (CSSDeclarationNode declaration : d)
+			{
+				declaration.setParent(firstSelector);
+			}
+
+			return result;
+		:}
+	|	error
+	;
+
+MozDocument
+	=	MOZ_DOCUMENT FunctionList.fs LCURLY RCURLY
+		{:
+			CSSMozDocument doc = new CSSMozDocument();
+			
+			doc.addChild(fs);
+			doc.addChild(new CSSList());
+			
+			return doc;
+		:}
+	|	MOZ_DOCUMENT FunctionList.fs LCURLY Rules.rs RCURLY
+		{:
+			CSSMozDocument doc = new CSSMozDocument();
+			
+			doc.addChild(fs);
+			doc.addChild(rs);
+			
+			return doc;
+		:}
+	;
+
+FunctionList
+	=	FunctionList.fs COMMA Function.f
+		{:
+			fs.addChild(f);
+			
+			return fs;
+		:}
+	|	Function.f
+		{:
+			CSSList list = new CSSList();
+			
+			list.addChild(f);
+			
+			return list;
+		:}
+	;
+
+Function
+	=	Identifier.i LPAREN RPAREN
+		{:
+			return new CSSFunctionNode(i, null);
+		:}
+	|	Identifier.i LPAREN Expression.e RPAREN
+		{:
+			return new CSSFunctionNode(i, e);
+		:}
+	;
+
+List
+	=	List COMMA IDENTIFIER.i
+	{:
+		List<CSSTextNode> list = (List<CSSTextNode>) _symbols[offset + 1].value;
+		CSSTextNode text = new CSSTextNode(i);
+
+		text.setLocation(_symbol_i.getStart(), _symbol_i.getEnd());
+		list.add(text);
+
+		return _symbols[offset + 1];
+	:}
+	|	IDENTIFIER.i
+	{:
+		List<CSSTextNode> list = new ArrayList<CSSTextNode>();
+		CSSTextNode text = new CSSTextNode(i);
+
+		text.setLocation(_symbol_i.getStart(), _symbol_i.getEnd());
+		list.add(text);
+
+		return new Symbol(list);
+	:}
+	;
+
+Declarations
+	=   Declaration.d
+		{:
+			List<CSSDeclarationNode> list = new ArrayList<CSSDeclarationNode>();
+
+			list.add(d);
+
+			return new Symbol(list);
+		:}
+	|   Declaration.d SEMICOLON.s
+		{:
+			List<CSSDeclarationNode> list = new ArrayList<CSSDeclarationNode>();
+
+			d.setHasSemicolon(s);
+			list.add(d);
+
+			return new Symbol(list);
+		:}
+	|   Declarations.ds Declaration.d
+		{:
+			ds.add(d);
+
+			return _symbols[offset + 1];
+		:}
+	|   Declarations.ds Declaration.d SEMICOLON.s
+		{:
+			d.setHasSemicolon(s);
+			ds.add(d);
+
+			return _symbols[offset + 1];
+		:}
+	;
+
+Declaration
+	=   Identifier.i COLON Expression.e
+		{:
+			return new CSSDeclarationNode(i, e);
+		:}
+	|   Identifier.i COLON Expression.e IMPORTANT.s
+		{:
+			return new CSSDeclarationNode(i, e, s);
+		:}
+	|   STAR.a Identifier.i COLON Expression.e
+		{:
+			return new CSSDeclarationNode(a + i, e);
+		:}
+	|   STAR.a Identifier.i COLON Expression.e IMPORTANT.s
+		{:
+			return new CSSDeclarationNode(a + i, e, s);
+		:}
+	|   error
+		{:
+			return new CSSErrorDeclarationNode();
+		:}
+	;
+
+Expression
+	=	Expression.e Separator.s Term.t
+		{:
+			return new CSSTermListNode(e, t, s);
+		:}
+	|	Expression.e Term.t
+		{:
+			return new CSSTermListNode(e, t);
+		:}
+	|	Term
+	|	error
+		{:
+			return new CSSErrorExpressionNode();
+		:}
+	;
+
+Term
+	=	Primitive.p
+		{:
+			return new CSSTermNode(p);
+		:}
+	|	Function
+	;
+
+Selectors
+	=	Selectors.ss Combinator.c Selector.s
+		{:
+			CSSSelectorNode lastSelector = ss.get(ss.size() - 1);
+			lastSelector.setCombinator(c);
+
+			ss.add(s);
+
+			return _symbols[offset + 1];
+		:}
+	|	Selector.s
+		{:
+			List<CSSSelectorNode> list = new ArrayList<CSSSelectorNode>();
+
+			list.add(s);
+
+			return new Symbol(list);
+		:}
+	;
+
+Selector
+	=	Selector.s SimpleSelector.ss
+		{:
+			s.addChild(ss);
+
+			return s;
+		:}
+	|	SimpleSelector.ss
+		{:
+			CSSSelectorNode selector = new CSSSelectorNode();
+
+			selector.addChild(ss);
+
+			return selector;
+		:}
+	;
+
+SimpleSelector
+	=	TypeOrUniversalSelector.t AttributeSelectors.a
+		{:
+			return new CSSSimpleSelectorNode(t, a);
+		:}
+	|	TypeOrUniversalSelector.t
+		{:
+			return new CSSSimpleSelectorNode(t);
+		:}
+	|	AttributeSelectors.a
+		{:
+			return new CSSSimpleSelectorNode(a);
+		:}
+		
+	|  TypeOrUniversalSelector.t COLON.c1 NOT.n LPAREN AttributeSelector.s RPAREN
+        {:
+            return new CSSSimpleSelectorNode(t + c1 + n + "(" + s + ")");
+        :}
+        
+	|  COLON.c1 NOT.n LPAREN AttributeSelector.s RPAREN
+        {:
+            return new CSSSimpleSelectorNode(c1 + n + "(" + s + ")");
+        :}
+        
+	|  TypeOrUniversalSelector.t COLON.c1 NOT.n LPAREN TypeOrUniversalSelector.s RPAREN
+        {:
+            return new CSSSimpleSelectorNode(t + c1 + n + "(" + s + ")");
+        :}
+        
+	|  COLON.c1 NOT.n LPAREN TypeOrUniversalSelector.s RPAREN
+        {:
+            return new CSSSimpleSelectorNode(c1 + n + "(" + s + ")");
+        :}
+	;
+
+AttributeSelectors
+	=	AttributeSelectors AttributeSelector
+	|	AttributeSelector
+	;
+
+AttributeSelector
+	=	CLASS.c
+		{:
+			return new CSSAttributeSelectorNode(c);
+		:}
+	|	COLON.c Identifier.i
+		{:
+			return new CSSAttributeSelectorNode(c + i);
+		:}
+	|	COLON.c1 COLON.c2 Identifier.i
+		{:
+			return new CSSAttributeSelectorNode(c1 + c2 + i);
+		:}
+	|	COLON Function.f
+		{:
+			return new CSSAttributeSelectorNode(f);
+		:}
+	|	HASH.h
+		{:
+			return new CSSAttributeSelectorNode(h);
+		:}
+	|	LBRACKET.l Identifier.i RBRACKET.r
+		{:
+			return new CSSAttributeSelectorNode(l + i + r);
+		:}
+	|	LBRACKET.l Identifier.i AttributeValueOperator.o IdentiferOrString.s RBRACKET.r
+		{:
+			return new CSSAttributeSelectorNode(l + i + " " + o + " " + s + r);
+		:}
+	;
+
+ImportWord
+	=	STRING
+	|	URL
+	;
+
+Identifier
+	=	IDENTIFIER
+	|	PROPERTY
+	;
+
+IdentiferOrString
+	=	IDENTIFIER
+	|	STRING
+	;
+
+Separator
+	=	SLASH
+	|	COMMA
+	|	PLUS
+	|	MINUS
+	|	EQUAL
+	;
+
+Combinator
+	=	COMMA
+	|	PLUS
+	|	GREATER
+	;
+
+Primitive
+	=	NUMBER
+	|	PERCENTAGE
+	|	LENGTH
+	|	EMS
+	|	EXS
+	|	ANGLE
+	|	TIME
+	|	FREQUENCY
+	|	STRING
+	|	IDENTIFIER
+	|	URL
+	|	COLOR
+	;
+
+TypeOrUniversalSelector
+	=	IDENTIFIER
+	|	STAR
+	|	SELECTOR
+	;
+
+AttributeValueOperator
+	=	EQUAL
+	|	INCLUDES
+	|	DASHMATCH
+	|	BEGINS_WITH
+	|	ENDS_WITH
+	;

@@ -272,11 +272,11 @@ public class ThemePlugin extends AbstractUIPlugin
 	 */
 	public static synchronized boolean applyToViews()
 	{
-		return getDefault().fApplyThemeToAllViews;
+		return (plugin == null) ? false : plugin.fApplyThemeToAllViews;
 	}
 
 	public static synchronized boolean applyToAllEditors()
 	{
-		return getDefault().fApplyThemeToAllEditors;
+		return (plugin == null) ? false : plugin.fApplyThemeToAllEditors;
 	}
 }

@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -13,8 +13,8 @@ import junit.framework.TestCase;
 
 import org.eclipse.jface.text.IDocument;
 
+import com.aptana.css.core.parsing.CSSTokenType;
 import com.aptana.editor.common.contentassist.ILexemeProvider;
-import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 
 public class CoarseLocationTests extends TestCase
 {
@@ -26,28 +26,24 @@ public class CoarseLocationTests extends TestCase
 	 * @param endingOffset
 	 * @param expectedLocation
 	 */
-	protected void coarseLocationTests(String source, LocationTypeRange ... ranges)
+	protected void coarseLocationTests(String source, LocationTypeRange... ranges)
 	{
 		IDocument document = TestUtil.createDocument(source);
 		CSSContentAssistProcessor processor = new CSSContentAssistProcessor(null);
-		
+
 		for (LocationTypeRange range : ranges)
 		{
 			for (int offset = range.startingOffset; offset <= range.endingOffset; offset++)
 			{
 				ILexemeProvider<CSSTokenType> lexemeProvider = processor.createLexemeProvider(document, offset);
 				LocationType location = processor.getCoarseLocationType(lexemeProvider, offset);
-				String message = MessageFormat.format(
-					"Expected {0} at location {1} of ''{2}''",
-					range.location.toString(),
-					Integer.toString(offset),
-					source
-				);
+				String message = MessageFormat.format("Expected {0} at location {1} of ''{2}''",
+						range.location.toString(), Integer.toString(offset), source);
 				assertEquals(message, range.location, location);
 			}
 		}
 	}
-	
+
 	// @formatter:off
 
 	/**

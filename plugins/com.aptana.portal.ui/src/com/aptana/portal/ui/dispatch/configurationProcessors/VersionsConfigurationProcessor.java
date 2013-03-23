@@ -105,7 +105,7 @@ public class VersionsConfigurationProcessor extends AbstractConfigurationProcess
 				Version version = VersionUtil.parseVersion(commandResult.toString());
 				if (version != null)
 				{
-					Version minVersion = Version.parseVersion(attrItems.get(app));
+					Version minVersion = VersionUtil.parseVersion(attrItems.get(app));
 					String compatibility = (version.compareTo(minVersion) >= 0) ? COMPATIBILITY_OK
 							: COMPATIBILITY_UPDATE;
 					Map<String, String> versionInfo = new HashMap<String, String>(4);

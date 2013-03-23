@@ -13,16 +13,12 @@ package com.aptana.editor.css.parsing;
 import java.io.Reader;
 import java.io.StringReader;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import beaver.Symbol;
 import beaver.Scanner;
+import beaver.Symbol;
 
 import com.aptana.core.util.StringUtil;
-
-import com.aptana.editor.css.parsing.lexer.CSSTokenTypeSymbol;
-import com.aptana.editor.css.parsing.lexer.CSSTokenType;
+import com.aptana.css.core.parsing.CSSTokenType;
+import com.aptana.css.core.parsing.CSSTokenTypeSymbol;
 import com.aptana.editor.common.parsing.ForceReturnException;
 
 @SuppressWarnings({"unused", "nls"})

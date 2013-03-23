@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
@@ -21,6 +22,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
@@ -114,7 +116,7 @@ public class SWTUtils
 	}
 
 	/**
-	 * Finds and caches the iamge from the image descriptor for this particular plugin.
+	 * Finds and caches the image from the image descriptor for this particular plugin.
 	 * 
 	 * @param plugin
 	 *            the plugin to search
@@ -128,6 +130,36 @@ public class SWTUtils
 	}
 
 	/**
+	 * Finds and caches the image from the image descriptor for this particular plugin.
+	 * 
+	 * @param plugin
+	 *            the plugin to search
+	 * @param path
+	 *            the path to the image
+	 * @param descriptor
+	 *            optional descriptor to use if the image doesn't exist
+	 * @return the image, or null if not found
+	 */
+	public static Image getImage(AbstractUIPlugin plugin, String path, ImageDescriptor descriptor)
+	{
+		return getImage(plugin.getBundle(), path, descriptor);
+	}
+
+	/**
+	 * Finds and caches the image from the complete image path.
+	 * 
+	 * @param computedPath
+	 *            Represents the complete path of icon (BUNDLE_NAME/ICON_PATH)
+	 * @return the image, or null if not found
+	 */
+	public static Image getImage(IPath computedPath)
+	{
+		String bundleSymbolicName = computedPath.segment(0);
+		String iconPath = computedPath.removeFirstSegments(1).toOSString();
+		return getImage(bundleSymbolicName, iconPath);
+	}
+
+	/**
 	 * Finds and caches the image from the image descriptor for this particular bundle.
 	 * 
 	 * @param bundle
@@ -138,25 +170,106 @@ public class SWTUtils
 	 */
 	public static Image getImage(Bundle bundle, String path)
 	{
+		return getImage(bundle, path, null);
+	}
+
+	private static Image getImage(Bundle bundle, String path, ImageDescriptor id)
+	{
 		if (path.charAt(0) != '/')
 		{
 			path = "/" + path; //$NON-NLS-1$
 		}
 
-		String computedName = bundle.getSymbolicName() + path;
+		return getImage(bundle.getSymbolicName(), path, id);
+	}
+
+	private static Image getImage(String bundleSymbolicName, String path)
+	{
+		return getImage(bundleSymbolicName, path, null);
+	}
+
+	private static Image getImage(String bundleSymbolicName, String path, ImageDescriptor id)
+	{
+		String computedName = bundleSymbolicName + path;
 		Image image = JFaceResources.getImage(computedName);
 		if (image != null)
 		{
 			return image;
 		}
 
-		ImageDescriptor id = AbstractUIPlugin.imageDescriptorFromPlugin(bundle.getSymbolicName(), path);
+		if (id == null)
+		{
+			id = AbstractUIPlugin.imageDescriptorFromPlugin(bundleSymbolicName, path);
+		}
+
 		if (id != null)
 		{
 			JFaceResources.getImageRegistry().put(computedName, id);
 			return JFaceResources.getImage(computedName);
 		}
 		return null;
+	}
+
+	/**
+	 * Scales the image based on the width and height, and maintains the aspect ratio
+	 * 
+	 * @param image
+	 * @param maxWidth
+	 * @param maxHeight
+	 * @return
+	 * @throws Exception
+	 */
+	public static Image scaleImage(Image image, double maxWidth, double maxHeight) throws Exception
+	{
+		ImageData imageData = image.getImageData();
+		if (imageData.width > maxWidth || imageData.height > maxHeight)
+		{
+			// scale the image
+			double scaleX = maxWidth / imageData.width;
+			double scaleY = maxHeight / imageData.height;
+			double scale = Math.min(scaleX, scaleY);
+			imageData = imageData.scaledTo((int) Math.round(imageData.width * scale),
+					(int) Math.round(imageData.height * scale));
+			image.dispose();
+			image = new Image(UIUtils.getDisplay(), imageData);
+		}
+		return image;
+	}
+
+	/**
+	 * Convenience method for disposing of an image
+	 * 
+	 * @param image
+	 */
+	public static void disposeImage(Image image)
+	{
+		if (image != null && !image.isDisposed())
+		{
+			image.dispose();
+		}
+	}
+
+	/**
+	 * Convenience method for disposing of a control
+	 * 
+	 * @param control
+	 */
+	public static void disposeControl(Control control)
+	{
+		if (control != null && !control.isDisposed())
+		{
+			control.dispose();
+		}
+	}
+
+	/**
+	 * Convenience method for checking to see if a control is not disposed
+	 * 
+	 * @param control
+	 */
+	public static boolean isControlDisposed(Control control)
+	{
+		return (control != null) ? control.isDisposed() : true;
 	}
 
 	/**
@@ -312,6 +425,29 @@ public class SWTUtils
 	 */
 	public static void resizeControlWidthInGrid(Collection<Control> controls)
 	{
+		resizeControlSizeInGrid(controls, false, true);
+	}
+
+	/**
+	 * Evaluates each of the controls and determines the largest width. Then sets each control with the largest width.
+	 * Each control must have a GridData as its layout data
+	 * 
+	 * @param controls
+	 */
+	public static void resizeControlHeightInGrid(Collection<Control> controls)
+	{
+		resizeControlSizeInGrid(controls, true, false);
+	}
+
+	/**
+	 * Evaluates each of the controls and determines the largest width. Then sets each control with the largest width.
+	 * Each control must have a GridData as its layout data
+	 * 
+	 * @param controls
+	 */
+	private static void resizeControlSizeInGrid(Collection<Control> controls, boolean resizeHeight, boolean resizeWidth)
+	{
+		int largestHeight = SWT.DEFAULT;
 		int largestWidth = SWT.DEFAULT;
 		List<GridData> gridDatas = new ArrayList<GridData>();
 		for (Control control : controls)
@@ -322,16 +458,30 @@ public class SWTUtils
 				GridData gridData = (GridData) layoutData;
 				gridDatas.add(gridData);
 
-				if (gridData.widthHint > largestWidth)
+				if (resizeHeight && gridData.heightHint > largestHeight)
+				{
+					largestHeight = gridData.heightHint;
+				}
+				else if (resizeWidth && gridData.widthHint > largestWidth)
 				{
 					largestWidth = gridData.widthHint;
 				}
 				else
 				{
-					int preferredX = control.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
-					if (preferredX > largestWidth)
+					Point preferredSize = control.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+					if (resizeHeight)
 					{
-						largestWidth = preferredX;
+						if (preferredSize.y > largestHeight)
+						{
+							largestHeight = preferredSize.y;
+						}
+					}
+					else if (resizeWidth)
+					{
+						if (preferredSize.x > largestWidth)
+						{
+							largestWidth = preferredSize.x;
+						}
 					}
 				}
 			}
@@ -339,7 +489,14 @@ public class SWTUtils
 
 		for (GridData gridData : gridDatas)
 		{
-			gridData.widthHint = largestWidth;
+			if (resizeHeight)
+			{
+				gridData.heightHint = largestHeight;
+			}
+			else if (resizeWidth)
+			{
+				gridData.widthHint = largestWidth;
+			}
 		}
 	}
 

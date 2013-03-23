@@ -14,12 +14,12 @@ import org.eclipse.test.performance.Performance;
 import org.eclipse.test.performance.PerformanceMeter;
 import org.eclipse.test.performance.PerformanceTestCase;
 
-import com.aptana.editor.js.contentassist.index.JSFileIndexingParticipant;
-import com.aptana.editor.js.tests.JSEditorBasedTests;
+import com.aptana.editor.js.tests.JSEditorBasedTestCase;
 import com.aptana.index.core.IFileStoreIndexingParticipant;
+import com.aptana.js.core.index.JSFileIndexingParticipant;
 import com.aptana.ui.util.UIUtils;
 
-public class JSContentAssistProcessorPerformanceTest extends JSEditorBasedTests
+public class JSContentAssistProcessorPerformanceTest extends JSEditorBasedTestCase
 {
 	private PerformanceMeter fPerformanceMeter;
 

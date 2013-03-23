@@ -92,7 +92,7 @@ public class StepIndicatorComposite extends Composite
 			});
 
 			stepLabel = new Label(stepComposite, SWT.NONE);
-			stepLabel.setText(MessageFormat.format(" {0} ", stepName)); //$NON-NLS-1$
+			stepLabel.setText(MessageFormat.format("  {0}  ", stepName)); //$NON-NLS-1$
 			stepLabel.setLayoutData(GridDataFactory.swtDefaults().grab(false, false).align(SWT.CENTER, SWT.CENTER)
 					.create());
 			((GridData) stepLabel.getLayoutData()).widthHint = stepLabel.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;

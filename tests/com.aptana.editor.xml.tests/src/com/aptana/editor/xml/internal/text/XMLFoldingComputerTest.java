@@ -19,10 +19,10 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
 
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
-import com.aptana.editor.xml.parsing.XMLParser;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
+import com.aptana.xml.core.parsing.XMLParser;
 
 public class XMLFoldingComputerTest extends TestCase
 {

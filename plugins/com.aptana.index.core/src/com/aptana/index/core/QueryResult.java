@@ -7,12 +7,15 @@
  */
 package com.aptana.index.core;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import com.aptana.core.util.StringUtil;
 
 public class QueryResult
 {
@@ -58,6 +61,13 @@ public class QueryResult
 	public void addDocumentTable(Map<String, Object> wordsToDocNumbers)
 	{
 		documentTables.add(wordsToDocNumbers);
+	}
+
+	@Override
+	public String toString()
+	{
+		return MessageFormat
+				.format("[word: ''{0}'', documents: {1}]", getWord(), StringUtil.join(", ", getDocuments())); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 }

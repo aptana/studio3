@@ -15,7 +15,8 @@ import org.eclipse.debug.core.model.IValue;
 /**
  * @author Max Stepanov
  */
-public interface IJSDebugTarget extends IDebugTarget, IStepFilters {
+public interface IJSDebugTarget extends IDebugTarget, IStepFilters
+{
 	/**
 	 * getTopScriptElements
 	 * 
@@ -91,4 +92,11 @@ public interface IJSDebugTarget extends IDebugTarget, IStepFilters {
 	 * @return value the attribute value, or <code>null</code> if undefined
 	 */
 	String getAttribute(String key);
+
+	/**
+	 * Returns the {@link IJSConnection} attached to this target.
+	 * 
+	 * @return An {@link IJSConnection}
+	 */
+	IJSConnection getConnection();
 }

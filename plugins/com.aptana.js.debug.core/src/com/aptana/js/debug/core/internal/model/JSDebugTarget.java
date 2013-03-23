@@ -28,12 +28,15 @@ import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IMarkerDelta;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
@@ -53,13 +56,17 @@ import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.debug.core.sourcelookup.ISourceLookupDirector;
-import org.eclipse.equinox.internal.security.storage.friends.InternalExchangeUtils;
 import org.osgi.framework.Constants;
 
+import com.aptana.core.CorePlugin;
 import com.aptana.core.IURIMapper;
 import com.aptana.core.io.efs.EFSUtils;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.IUniformResource;
 import com.aptana.core.resources.IUniformResourceMarker;
+import com.aptana.core.sourcemap.ISourceMap;
+import com.aptana.core.sourcemap.ISourceMapRegistry;
+import com.aptana.core.sourcemap.ISourceMapResult;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.debug.core.DebugCorePlugin;
@@ -72,6 +79,8 @@ import com.aptana.js.debug.core.ILaunchConfigurationConstants;
 import com.aptana.js.debug.core.JSDebugPlugin;
 import com.aptana.js.debug.core.internal.Util;
 import com.aptana.js.debug.core.internal.model.xhr.XHRService;
+import com.aptana.js.debug.core.model.IJSConnection;
+import com.aptana.js.debug.core.model.IJSDebugConnectionHandler;
 import com.aptana.js.debug.core.model.IJSDebugTarget;
 import com.aptana.js.debug.core.model.IJSExceptionBreakpoint;
 import com.aptana.js.debug.core.model.IJSLineBreakpoint;
@@ -184,7 +193,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	private static final int XOR_MASK = 0xFFF;
 
 	private static boolean checkUpdate = true;
-	private DebugConnection connection;
+	private IJSConnection connection;
 	private int stepFilterMask = 0;
 	private String[] stepFilters = null;
 
@@ -204,6 +213,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	private boolean ignoreBreakpointCreation = false;
 	private boolean contentChanged = false;
 	private int protocolVersion;
+	private ISourceMap sourceMap;
 
 	private Job updateContentJob = new Job("Debugger Content Update") { //$NON-NLS-1$
 		{
@@ -249,7 +259,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	 * @param debugMode
 	 * @throws CoreException
 	 */
-	public JSDebugTarget(ILaunch launch, IProcess process, IURIMapper uriMapper, DebugConnection connection,
+	public JSDebugTarget(ILaunch launch, IProcess process, IURIMapper uriMapper, IJSConnection connection,
 			boolean debugMode) throws CoreException {
 		this(launch, null, process, uriMapper, connection, debugMode);
 	}
@@ -267,14 +277,14 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	 * @throws CoreException
 	 */
 	public JSDebugTarget(ILaunch launch, String label, IProcess process, IURIMapper uriMapper,
-			DebugConnection connection, boolean debugMode) throws CoreException {
+			IJSConnection connection, boolean debugMode) throws CoreException {
 		super(null);
 		this.launch = launch;
 		this.label = label;
 		this.process = process;
 		this.connection = connection;
 		this.uriMapper = uriMapper;
-
+		initSourceMapping();
 		try {
 			if (debugMode) {
 				launch.addDebugTarget(this);
@@ -294,7 +304,61 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 		}
 	}
 
-	/* package */DebugConnection getConnection() {
+	/**
+	 * Initialize the source mapping. Load any contributed source-mapper by the project that is assigned to this launch.
+	 * This loading may result in a <code>null</code> sourceMap instance in case there is no contributed mapper for the
+	 * project.
+	 */
+	private void initSourceMapping()
+	{
+		ISourceMapRegistry sourceMapRegistry = CorePlugin.getDefault().getSourceMapRegistry();
+		try
+		{
+			String projectName = launch.getLaunchConfiguration().getAttribute(
+					ILaunchConfigurationConstants.ATTR_PROJECT_NAME, (String) null);
+			if (projectName != null)
+			{
+				IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+				sourceMap = sourceMapRegistry.getSourceMap(project);
+			}
+		}
+		catch (CoreException e)
+		{
+			IdeLog.logError(JSDebugPlugin.getDefault(), e);
+		}
+	}
+
+	/**
+	 * Computes and returns an {@link ISourceMapResult} for the given source URL and line.
+	 * 
+	 * @param generatedLocation
+	 * @param sourceLine
+	 * @return an {@link ISourceMapResult}. <code>null</code> if there is not mapping.
+	 */
+	public ISourceMapResult getOriginalMappedLocation(URI generatedLocation, int sourceLine)
+	{
+		if (sourceMap == null || generatedLocation == null || sourceLine < 0)
+		{
+			return null;
+		}
+		try
+		{
+			IResource resource = ResourcesPlugin.getWorkspace().getRoot()
+					.findMember(Path.fromOSString(generatedLocation.getPath()));
+			return sourceMap.getOriginalMapping(resource, sourceLine);
+		}
+		catch (Exception e)
+		{
+			IdeLog.logError(JSDebugPlugin.getDefault(), e);
+		}
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.js.debug.core.model.IJSDebugTarget#getConnection()
+	 */
+	public IJSConnection getConnection() {
 		return connection;
 	}
 
@@ -1423,6 +1487,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 		IMarker marker = breakpoint.getMarker();
 		// URL url = null;
 		URI uri = null;
+		int lineNumber = marker.getAttribute(IMarker.LINE_NUMBER, -1);
 		String properties = StringUtil.EMPTY;
 		try {
 			URI fileName = null;
@@ -1433,6 +1498,19 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 				if (resource instanceof IWorkspaceRoot) {
 					fileName = URI.create((String) marker.getAttribute(IJSDebugConstants.BREAKPOINT_LOCATION));
 				} else {
+					// Consult the sourcemap to see if there is a need to update the file path and line number before we
+					// send this breakpoint.
+					ISourceMapResult generatedMapping = getGeneratedMapping(resource, lineNumber);
+					if (generatedMapping != null)
+					{
+						IResource mappedResource = ResourcesPlugin.getWorkspace().getRoot()
+								.findMember(resource.getProject().getFullPath().append(generatedMapping.getFile()));
+						if (mappedResource != null)
+						{
+							resource = mappedResource;
+							lineNumber = generatedMapping.getLineNumber();
+						}
+					}
 					fileName = EFSUtils.getFileStore(resource).toURI();
 				}
 			}
@@ -1454,7 +1532,6 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 		} catch (CoreException e) {
 			JSDebugPlugin.log(e);
 		}
-		int lineNumber = marker.getAttribute(IMarker.LINE_NUMBER, -1);
 		if (lineNumber == -1 || uri == null) {
 			return;
 		}
@@ -1474,16 +1551,44 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			properties = MessageFormat.format("*{0}*{1}*{2}*{3}", //$NON-NLS-1$
 					enabled ? "1" : "0", Integer.toString(hitCount), Util.encodeData(condition), suspendOnTrue); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		try {
+		try
+		{
 			String[] args = connection.sendCommandAndWait(MessageFormat.format(BREAKPOINT_0_1_2_3, operation,
 					Util.encodeData(uri.toString()), Integer.toString(lineNumber), properties));
-			if (!remove && (args == null || args.length < 2 || !(operation + 'd').equals(args[1]))) {
+			if (!remove && (args == null || args.length < 2 || !(operation + 'd').equals(args[1])))
+			{
 				breakpoint.setEnabled(false);
 			}
-		} catch (CoreException e) {
+		}
+		catch (CoreException e)
+		{
 			JSDebugPlugin.log(e);
 		}
 
+	}
+
+	/**
+	 * Returns an {@link ISourceMapResult} that holds information about the generated file and line number.
+	 * 
+	 * @param resource
+	 * @param lineNumber
+	 * @return An {@link ISourceMapResult}. <code>null</code> if there is no mapping.
+	 */
+	private ISourceMapResult getGeneratedMapping(IResource resource, int lineNumber)
+	{
+		if (sourceMap == null)
+		{
+			return null;
+		}
+		try
+		{
+			return sourceMap.getGeneratedMapping(resource, lineNumber, 1);
+		}
+		catch (Exception e)
+		{
+			IdeLog.logError(JSDebugPlugin.getDefault(), "Error initializing the sourcemap", e); //$NON-NLS-1$
+		}
+		return null;
 	}
 
 	/**
@@ -1758,7 +1863,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 		return (IJSScriptElement[]) topScriptElements.values().toArray(new IJSScriptElement[topScriptElements.size()]);
 	}
 
-	private class DebugConnectionHandler implements DebugConnection.IHandler {
+	private class DebugConnectionHandler implements IJSDebugConnectionHandler {
 
 		/*
 		 * (non-Javadoc)
@@ -1904,6 +2009,5 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 				JSDebugPlugin.log(e);
 			}
 		}
-
 	}
 }

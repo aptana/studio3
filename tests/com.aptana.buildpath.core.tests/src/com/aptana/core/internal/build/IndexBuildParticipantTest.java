@@ -137,7 +137,7 @@ public class IndexBuildParticipantTest extends TestCase
 		context.checking(new Expectations()
 		{
 			{
-				oneOf(indexManager).removeIndex(uri);
+				oneOf(indexManager).resetIndex(uri);
 			}
 		});
 

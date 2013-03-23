@@ -22,7 +22,7 @@ import com.aptana.editor.common.text.rules.TagRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
 import com.aptana.editor.common.text.rules.WordDetector;
 import com.aptana.editor.xml.internal.text.rules.DocTypeRule;
-import com.aptana.editor.xml.parsing.lexer.XMLTokenType;
+import com.aptana.xml.core.parsing.XMLTokenType;
 
 public class XMLTokenScanner extends RuleBasedScanner
 {

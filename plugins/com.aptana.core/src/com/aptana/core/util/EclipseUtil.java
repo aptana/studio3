@@ -50,6 +50,15 @@ import com.aptana.core.logging.IdeLog;
 @SuppressWarnings("restriction")
 public class EclipseUtil
 {
+	/**
+	 * Default prefix for Studio
+	 */
+	private static final String APTANA_STUDIO_PREFIX = "Aptana"; //$NON-NLS-1$
+
+	/**
+	 * Default product name
+	 */
+	private static final String APTANA_STUDIO = MessageFormat.format("{0} Studio", APTANA_STUDIO_PREFIX); //$NON-NLS-1$
 
 	protected static final class LauncherFilter implements FilenameFilter
 	{
@@ -95,6 +104,8 @@ public class EclipseUtil
 	// uses branding plugin for retrieving the version
 	private static String versionPluginId = "com.aptana.branding"; //$NON-NLS-1$
 
+	private static String fgPrefix;
+
 	private EclipseUtil()
 	{
 	}
@@ -134,6 +145,21 @@ public class EclipseUtil
 			return null;
 		}
 		return System.getProperty(option);
+	}
+
+	/**
+	 * Returns specified application/platform option. If not specified, returns null.
+	 * 
+	 * @param option
+	 * @return
+	 */
+	public static String getSystemProperty(String option, String defaultValue)
+	{
+		if (option == null)
+		{
+			return null;
+		}
+		return System.getProperty(option, defaultValue);
 	}
 
 	/**
@@ -185,6 +211,20 @@ public class EclipseUtil
 		}
 		return bundle.getHeaders().get(org.osgi.framework.Constants.BUNDLE_VERSION).toString(); // $codepro.audit.disable
 																								// com.instantiations.assist.eclipse.analysis.unnecessaryToString
+	}
+
+	public static String getProductName()
+	{
+		IProduct product = Platform.getProduct();
+		if (product != null)
+		{
+			String name = product.getName();
+			if (!StringUtil.isEmpty(name))
+			{
+				return name;
+			}
+		}
+		return APTANA_STUDIO;
 	}
 
 	/**
@@ -239,6 +279,25 @@ public class EclipseUtil
 			return bundle.getVersion().toString();
 		}
 		return StringUtil.EMPTY;
+	}
+
+	public synchronized static String getStudioPrefix()
+	{
+		// Cache this value!
+		if (fgPrefix == null)
+		{
+			fgPrefix = APTANA_STUDIO_PREFIX;
+			IProduct product = Platform.getProduct();
+			if (product != null)
+			{
+				String name = product.getProperty("studioPrefix"); //$NON-NLS-1$
+				if (!StringUtil.isEmpty(name))
+				{
+					fgPrefix = name;
+				}
+			}
+		}
+		return fgPrefix;
 	}
 
 	/**

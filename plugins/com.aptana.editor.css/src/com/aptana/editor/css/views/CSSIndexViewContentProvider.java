@@ -8,10 +8,10 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
 import com.aptana.core.util.CollectionsUtil;
-import com.aptana.editor.css.contentassist.model.CSSElement;
-import com.aptana.editor.css.contentassist.model.ClassGroupElement;
-import com.aptana.editor.css.contentassist.model.ColorGroupElement;
-import com.aptana.editor.css.contentassist.model.IdGroupElement;
+import com.aptana.css.core.model.CSSElement;
+import com.aptana.css.core.model.ClassGroupElement;
+import com.aptana.css.core.model.ColorGroupElement;
+import com.aptana.css.core.model.IdGroupElement;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.IndexPlugin;

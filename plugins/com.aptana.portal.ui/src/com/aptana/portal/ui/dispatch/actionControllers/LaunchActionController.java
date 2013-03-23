@@ -32,8 +32,10 @@ import org.eclipse.ui.progress.UIJob;
 import com.aptana.configurations.processor.ConfigurationStatus;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.jetty.util.epl.ajax.JSON;
+import com.aptana.portal.ui.IPortalPreferences;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.IBrowserNotificationConstants;
 
@@ -202,8 +204,15 @@ public class LaunchActionController extends AbstractActionController
 	{
 		if (StringUtil.isEmpty(projectName))
 		{
-			IdeLog.logError(PortalUIPlugin.getDefault(), new Exception("LaunchActionController - Missing project name")); //$NON-NLS-1$
-			return null;
+			// Launch previously created project.
+			projectName = EclipseUtil.instanceScope().getNode(PortalUIPlugin.PLUGIN_ID)
+					.get(IPortalPreferences.RECENTLY_CREATED_PROJECT, null);
+			if (StringUtil.isEmpty(projectName))
+			{
+				IdeLog.logError(PortalUIPlugin.getDefault(), new Exception(
+						"LaunchActionController - Missing project name")); //$NON-NLS-1$
+				return null;
+			}
 		}
 		IResource resource = ResourcesPlugin.getWorkspace().getRoot().findMember(projectName);
 		if (resource == null)

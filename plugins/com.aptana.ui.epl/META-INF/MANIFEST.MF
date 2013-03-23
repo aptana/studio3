@@ -5,17 +5,19 @@ Bundle-SymbolicName: com.aptana.ui.epl;singleton:=true
 Bundle-Version: 3.0.0.qualifier
 Bundle-Vendor: %providerName
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Require-Bundle: com.aptana.core;bundle-version="3.0.0",
+Require-Bundle: org.eclipse.core.filesystem,
  org.eclipse.jface.text,
  org.eclipse.ui,
  org.eclipse.ui.editors,
  org.eclipse.ui.ide,
- org.eclipse.ui.forms
+ org.eclipse.ui.forms,
+ com.aptana.core;bundle-version="3.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: com.aptana.editor.common.contentassist,
  com.aptana.editor.common.hover,
  com.aptana.editor.common.text.rules,
+ com.aptana.projects.primary.natures,
  com.aptana.ui.dialogs,
  com.aptana.ui.epl,
  com.aptana.ui.epl.scripting.snippets;x-friends:="com.aptana.editor.common",

@@ -116,7 +116,7 @@ public abstract class TextPatternReplacer
 	protected abstract String getRegexString();
 
 	/**
-	 * Return the text to replace the current match
+	 * Return the text to replace the current match.
 	 * 
 	 * @param matcher
 	 * @return
@@ -153,7 +153,11 @@ public abstract class TextPatternReplacer
 
 				while (m.find())
 				{
-					m.appendReplacement(buffer, getReplacementText(m));
+					// We have to escape any dollar sign in the replacement text before applying it. Otherwise, an
+					// IllegalArgumentException can be thrown.
+					String replacementText = getReplacementText(m);
+					replacementText = replacementText.replaceAll("\\$", "\\\\\\$"); //$NON-NLS-1$//$NON-NLS-2$
+					m.appendReplacement(buffer, replacementText);
 				}
 
 				m.appendTail(buffer);

@@ -292,7 +292,8 @@ public class ProcessUtil
 		{
 			processBuilder.directory(workingDirectory.toFile());
 		}
-
+		// Make sure we don't keep the text in the env map!
+		String textToObfuscate = (environment == null) ? null : environment.remove(TEXT_TO_OBFUSCATE);
 		TreeMap<String, String> map = null;
 		if (environment != null && !environment.isEmpty())
 		{
@@ -307,11 +308,25 @@ public class ProcessUtil
 			{
 				path = processBuilder.directory().getAbsolutePath();
 			}
-			String message = StringUtil.join("\" \"", command); //$NON-NLS-1$
-			String textToObfuscate = (environment == null) ? null : environment.get(TEXT_TO_OBFUSCATE);
+
+			String message;
 			if (!StringUtil.isEmpty(textToObfuscate))
 			{
-				message = message.replace(textToObfuscate, StringUtil.repeat('*', textToObfuscate.length()));
+				List<String> commandMessage = new ArrayList<String>();
+				for (String arg : command)
+				{
+					if (!StringUtil.isEmpty(arg)
+							&& (textToObfuscate.equals(arg) || arg.indexOf("=" + textToObfuscate) > -1)) //$NON-NLS-1$
+					{
+						arg = arg.replace(textToObfuscate, StringUtil.repeat('*', 10));
+					}
+					commandMessage.add(arg);
+				}
+				message = StringUtil.join("\" \"", commandMessage); //$NON-NLS-1$
+			}
+			else
+			{
+				message = StringUtil.join("\" \"", command); //$NON-NLS-1$
 			}
 			logInfo(StringUtil.format(Messages.ProcessUtil_RunningProcess, new Object[] { message, path, map }));
 		}

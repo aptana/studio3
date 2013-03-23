@@ -14,7 +14,7 @@ import java.net.URI;
  * a display name, used in the UI, and a path, a URI to a resource. It is expected that the URI points to a file type
  * that can be indexed.
  */
-public class BuildPathEntry
+public class BuildPathEntry implements IBuildPathEntry
 {
 	private boolean selected;
 	private String displayName;

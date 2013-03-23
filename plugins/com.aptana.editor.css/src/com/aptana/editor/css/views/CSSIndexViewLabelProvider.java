@@ -1,15 +1,23 @@
+/**
+ * Aptana Studio
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
+
 package com.aptana.editor.css.views;
 
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.graphics.Image;
 
+import com.aptana.css.core.model.BaseElement;
+import com.aptana.css.core.model.CSSElement;
+import com.aptana.css.core.model.ClassGroupElement;
+import com.aptana.css.core.model.ColorGroupElement;
+import com.aptana.css.core.model.IdGroupElement;
 import com.aptana.editor.css.CSSPlugin;
-import com.aptana.editor.css.contentassist.model.BaseElement;
-import com.aptana.editor.css.contentassist.model.CSSElement;
-import com.aptana.editor.css.contentassist.model.ClassGroupElement;
-import com.aptana.editor.css.contentassist.model.ColorGroupElement;
-import com.aptana.editor.css.contentassist.model.IdGroupElement;
 
 public class CSSIndexViewLabelProvider implements ILabelProvider
 {
@@ -52,7 +60,7 @@ public class CSSIndexViewLabelProvider implements ILabelProvider
 
 		if (element instanceof BaseElement)
 		{
-			result = ((BaseElement<?>) element).getName();
+			result = ((BaseElement) element).getName();
 		}
 		else if (element instanceof String)
 		{

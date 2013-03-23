@@ -10,8 +10,6 @@ package com.aptana.editor.js.tests;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import com.aptana.editor.js.internal.text.JSFoldingComputerTest;
-
 public class AllTests
 {
 
@@ -19,20 +17,16 @@ public class AllTests
 	{
 		TestSuite suite = new TestSuite("All tests for com.aptana.editor.js");
 		// $JUnit-BEGIN$
-		suite.addTestSuite(JSFoldingComputerTest.class);
-		suite.addTest(com.aptana.editor.js.AllTests.suite());
-		suite.addTest(com.aptana.editor.js.contentassist.AllTests.suite());
-		suite.addTest(com.aptana.editor.js.folding.AllTests.suite());
-		suite.addTest(com.aptana.editor.js.index.AllTests.suite());
-		suite.addTest(com.aptana.editor.js.inferencing.AllTests.suite());
-		suite.addTest(com.aptana.editor.js.internal.build.AllTests.suite());
-		suite.addTest(com.aptana.editor.js.internal.text.AllTests.suite());
-		suite.addTest(com.aptana.editor.js.outline.AllTests.suite());
-		suite.addTest(com.aptana.editor.js.parsing.AllTests.suite());
-		suite.addTest(com.aptana.editor.js.sdoc.parsing.AllTests.suite());
-		suite.addTest(com.aptana.editor.js.vsdoc.parsing.AllTests.suite());
-		suite.addTest(com.aptana.editor.js.text.AllTests.suite());
-		suite.addTest(com.aptana.editor.js.validator.ValidatorTests.suite());
+		suite.addTest(com.aptana.editor.js.EditorJSTests.suite());
+		suite.addTest(com.aptana.editor.js.contentassist.ContentAssistTests.suite());
+		suite.addTest(com.aptana.editor.js.folding.FoldingTests.suite());
+		suite.addTest(com.aptana.editor.js.hyperlink.HyperlinkTests.suite());
+		suite.addTest(com.aptana.editor.js.index.IndexTests.suite());
+		suite.addTest(com.aptana.editor.js.inferencing.InferencingTests.suite());
+		suite.addTest(com.aptana.editor.js.internal.text.InternalTextTests.suite());
+		suite.addTest(com.aptana.editor.js.outline.OutlineTests.suite());
+		suite.addTest(com.aptana.editor.js.sdoc.parsing.SDocParsingTests.suite());
+		suite.addTest(com.aptana.editor.js.text.TextTests.suite());
 		// $JUnit-END$
 		return suite;
 	}

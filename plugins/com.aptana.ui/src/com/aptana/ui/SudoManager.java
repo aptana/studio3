@@ -60,7 +60,7 @@ public class SudoManager
 			environment.put(ProcessUtil.REDIRECT_ERROR_STREAM, StringUtil.EMPTY);
 			Process p = ProcessUtil.run(SUDO, null, environment, new String[] { SUDO_INPUT_PWD, ECHO, ECHO_MESSAGE });
 			ProcessRunnable runnable = new SudoProcessRunnable(p, password, ECHO_MESSAGE);
-			Thread t = new Thread(runnable);
+			Thread t = new Thread(runnable, "SudoManager authentication thread"); //$NON-NLS-1$
 			t.start();
 			t.join();
 

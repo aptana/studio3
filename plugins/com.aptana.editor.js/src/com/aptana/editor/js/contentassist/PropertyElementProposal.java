@@ -7,7 +7,7 @@ import org.eclipse.jface.text.contentassist.ICompletionProposalExtension5;
 import org.eclipse.swt.graphics.Image;
 
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
-import com.aptana.editor.js.contentassist.model.PropertyElement;
+import com.aptana.js.core.model.PropertyElement;
 
 public class PropertyElementProposal extends CommonCompletionProposal implements ICompletionProposalExtension5
 {

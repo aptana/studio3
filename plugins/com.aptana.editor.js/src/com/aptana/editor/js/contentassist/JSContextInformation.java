@@ -13,7 +13,7 @@ import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationExtension;
 import org.eclipse.swt.graphics.Image;
 
-import com.aptana.editor.js.contentassist.model.FunctionElement;
+import com.aptana.js.core.model.FunctionElement;
 
 /**
  * @author klindsey

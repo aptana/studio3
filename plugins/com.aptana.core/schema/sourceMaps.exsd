@@ -1,0 +1,150 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="sourceMaps.exsd" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="sourceMaps.exsd" id="sourceMaps" name="Source Maps"/>
+      </appinfo>
+      <documentation>
+         This extension point allows adding ISourceMap implementations. An ISourceMap can be used to map original source offsets into a generated source offset, and vice versa.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="sourceMap" minOccurs="1" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="sourceMap">
+      <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  An ISourceMap implementation.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":com.aptana.core.sourcemap.ISourceMap"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="projectNatureId" type="string" use="required">
+            <annotation>
+               <documentation>
+                  A project-nature ID that this sourcemap is assigned for.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="org.eclipse.core.resources.natures/@point"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="mapLocationPrefix" type="string">
+            <annotation>
+               <documentation>
+                  A project-relative path for the location of the map files that will be used and loaded by this sourcemap.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="originalLocationPrefix" type="string">
+            <annotation>
+               <documentation>
+                  A project-relative path for the location of the original files this sourcemap maps.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="generatedLocationPrefix" type="string">
+            <annotation>
+               <documentation>
+                  A project-relative path for the location of the generated files this sourcemap maps.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="since"/>
+      </appinfo>
+      <documentation>
+         [Enter the first release in which this extension point appears.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="examples"/>
+      </appinfo>
+      <documentation>
+         [Enter extension point usage example here.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="apiinfo"/>
+      </appinfo>
+      <documentation>
+         [Enter API information here.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="implementation"/>
+      </appinfo>
+      <documentation>
+         [Enter information about supplied implementation of this extension point.]
+      </documentation>
+   </annotation>
+
+
+</schema>

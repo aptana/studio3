@@ -133,6 +133,11 @@ public interface IBrowserNotificationConstants
 	public static final String EVENT_ID_RECENT_FILES = "recentFiles"; //$NON-NLS-1$
 
 	/**
+	 * An event id for notifying a project creation event.
+	 */
+	public static final String EVENT_ID_PROJECT_CREATE = "projectCreate"; //$NON-NLS-1$
+
+	/**
 	 * An event id for notifying a change in the Gems list.
 	 */
 	public static final String EVENT_ID_GEM_LIST = "gemList"; //$NON-NLS-1$

@@ -33,7 +33,7 @@ import com.aptana.editor.epl.tests.EditorTestHelper;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSSourceEditor;
 import com.aptana.editor.js.JSSourceViewerConfiguration;
-import com.aptana.editor.js.parsing.ast.JSCommentNode;
+import com.aptana.js.core.parsing.ast.JSCommentNode;
 import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ParsingEngine;
 import com.aptana.parsing.ast.IParseNode;
@@ -96,7 +96,7 @@ public class JSEditorFoldingTest extends TestCase
 			Collection<Position> values = positions.values();
 			checkFound(values, 0, 20);
 			checkFound(values, 20, 32);
-			assertComments(editor.getReconcileAST(), true);
+			assertComments(editor.getAST(), true);
 
 			setFoldingEnabled(false);
 
@@ -112,7 +112,7 @@ public class JSEditorFoldingTest extends TestCase
 			commonStrategy.fullReconcile();
 			positions = commonStrategy.getPositions();
 			assertEquals(0, positions.size());
-			assertComments(editor.getReconcileAST(), false);
+			assertComments(editor.getAST(), true);
 		}
 		finally
 		{

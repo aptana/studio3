@@ -74,7 +74,7 @@ public abstract class SimpleSourceViewerConfiguration extends CommonSourceViewer
 	 * @see com.aptana.editor.common.CommonSourceViewerConfiguration#getContentAssistProcessor(org.eclipse.jface.text.source.ISourceViewer, java.lang.String)
 	 */
 	@Override
-	protected final IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer, String contentType) {
+	protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer, String contentType) {
 		return getSourceViewerConfiguration().getContentAssistProcessor(getEditor(), contentType);
 	}
 }

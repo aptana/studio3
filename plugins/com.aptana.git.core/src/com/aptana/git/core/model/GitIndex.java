@@ -20,6 +20,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -29,6 +35,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
@@ -42,7 +49,6 @@ import com.aptana.core.ShellExecutable;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.CollectionsUtil;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.git.core.GitPlugin;
@@ -67,15 +73,26 @@ public class GitIndex
 	List<ChangedFile> changedFiles;
 	private Object changedFilesLock = new Object();
 
-	private Job indexRefreshJob;
 	private boolean notify;
 
 	private Vector<ChangedFile> files;
+
+	/**
+	 * Service which launches the refresh commands in threads.
+	 */
+	private ExecutorService es;
+
+	/**
+	 * A job which gathers up refresh requests and runs them.
+	 */
+	private GitIndexRefreshJob refreshJob;
 
 	GitIndex(GitRepository repository)
 	{
 		Assert.isNotNull(repository, "GitIndex requires a repository"); //$NON-NLS-1$
 		this.repository = repository;
+		this.refreshJob = new GitIndexRefreshJob(this);
+		this.es = Executors.newFixedThreadPool(3);
 	}
 
 	/**
@@ -84,36 +101,10 @@ public class GitIndex
 	 */
 	synchronized void scheduleBatchRefresh()
 	{
-		// FIXME Use a smarter mechanism, like a daemon thread that blocks on a queue of requests? once we get one from
-		// queue we sleep for 250ms to batch all requests, then wipe the queue and run?
-		if (indexRefreshJob == null)
+		if (refreshJob != null)
 		{
-			indexRefreshJob = new Job("Refreshing git index") //$NON-NLS-1$
-			{
-				@Override
-				protected IStatus run(IProgressMonitor monitor)
-				{
-					if (monitor != null && monitor.isCanceled())
-					{
-						return Status.CANCEL_STATUS;
-					}
-					refresh(monitor);
-					return Status.OK_STATUS;
-				}
-
-				@Override
-				public boolean belongsTo(Object family)
-				{
-					return family == GitIndex.this;
-				}
-			};
-			EclipseUtil.setSystemForJob(indexRefreshJob);
+			refreshJob.refreshAll();
 		}
-		else
-		{
-			indexRefreshJob.cancel();
-		}
-		indexRefreshJob.schedule(250);
 	}
 
 	/**
@@ -163,18 +154,21 @@ public class GitIndex
 				}));
 
 		// If we don't run this, we end up showing files as unstaged when they're no longer modified!
-		IStatus result = repository.execute(GitRepository.ReadWrite.WRITE, "update-index", "-q", //$NON-NLS-1$ //$NON-NLS-2$
+		repository.forceWrite(); // Do we only want to try the lock if we're in UI thread?
+		IStatus result = GitExecutable.instance().runInBackground(repository.workingDirectory(), "update-index", "-q", //$NON-NLS-1$ //$NON-NLS-2$
 				"--unmerged", "--ignore-missing", "--refresh"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		repository.exitWriteProcess();
 		if (result == null) // couldn't even execute!
 		{
 			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), "Failed to execute git update-index"); //$NON-NLS-1$
 		}
 		if (!result.isOK())
 		{
-			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), result.getMessage());
+			return new Status(IStatus.ERROR, GitPlugin.getPluginId(),
+					"Unable to run update-index: " + result.getMessage()); //$NON-NLS-1$
 		}
 
-		Set<Job> jobs = new HashSet<Job>();
+		Set<Callable<IStatus>> jobs = new HashSet<Callable<IStatus>>(3);
 		jobs.add(new UntrackedFilesRefreshJob(this, filePathStrings));
 		jobs.add(new UnstagedFilesRefreshJob(this, filePathStrings));
 		jobs.add(new StagedFilesRefreshJob(this, filePathStrings));
@@ -189,23 +183,47 @@ public class GitIndex
 		this.files = new Vector<ChangedFile>();
 
 		// Schedule all the jobs
-		for (Job toSchedule : jobs)
+		MultiStatus errors = new MultiStatus(GitPlugin.PLUGIN_ID, 1,
+				"Errors occurred while grabbing changed file listings", null); //$NON-NLS-1$
+		try
 		{
-			EclipseUtil.setSystemForJob(toSchedule);
-			toSchedule.setPriority(Job.SHORT);
-			toSchedule.schedule();
+			List<Future<IStatus>> futures = es.invokeAll(jobs);
+
+			// Now wait for them to finish
+			for (Future<IStatus> future : futures)
+			{
+				while (!future.isDone())
+				{
+					if (monitor != null && monitor.isCanceled())
+					{
+						future.cancel(true);
+					}
+					Thread.yield();
+				}
+
+				// When done, get their result
+				try
+				{
+					IStatus futureResult = future.get();
+					if (!futureResult.isOK())
+					{
+						errors.merge(futureResult);
+					}
+				}
+				catch (CancellationException ce)
+				{
+					// ignore
+				}
+				catch (ExecutionException e)
+				{
+					Throwable t = e.getCause();
+					errors.merge(new Status(IStatus.ERROR, GitPlugin.PLUGIN_ID, t.getMessage(), t));
+				}
+			}
 		}
-		// Now wait for them to finish
-		for (Job toJoin : jobs)
+		catch (InterruptedException e)
 		{
-			try
-			{
-				toJoin.join();
-			}
-			catch (InterruptedException e) // $codepro.audit.disable emptyCatchClause
-			{
-				// ignore
-			}
+			IdeLog.logError(GitPlugin.getDefault(), e);
 		}
 
 		// Copy the last full list of changed files we built up on refresh. Used to pass along the delta
@@ -249,6 +267,10 @@ public class GitIndex
 
 		postIndexChange(preRefresh, this.changedFiles);
 		sub.done();
+		if (!errors.isOK())
+		{
+			return errors;
+		}
 		return Status.OK_STATUS;
 	}
 
@@ -469,8 +491,7 @@ public class GitIndex
 		}
 		else
 		{
-			// FIXME Can we eliminate this? We should get a file event via the watcher which will cause a refresh!
-			refresh(new NullProgressMonitor()); // TODO Run async if we can!
+			refresh(new NullProgressMonitor());
 		}
 		return true;
 	}
@@ -560,8 +581,9 @@ public class GitIndex
 		{
 			try
 			{
-				return IOUtil.read(new FileInputStream(workingDirectory().append(file.portablePath).toFile()), IOUtil.UTF_8); // $codepro.audit.disable
-																														// closeWhereCreated
+				return IOUtil.read(new FileInputStream(workingDirectory().append(file.portablePath).toFile()),
+						IOUtil.UTF_8); // $codepro.audit.disable
+				// closeWhereCreated
 			}
 			catch (FileNotFoundException e)
 			{
@@ -569,7 +591,8 @@ public class GitIndex
 			}
 		}
 
-		IStatus result = repository.execute(GitRepository.ReadWrite.READ, "diff-files", parameter, "--", file.portablePath); //$NON-NLS-1$ //$NON-NLS-2$
+		IStatus result = repository.execute(GitRepository.ReadWrite.READ,
+				"diff-files", parameter, "--", file.portablePath); //$NON-NLS-1$ //$NON-NLS-2$
 		return result.getMessage();
 	}
 
@@ -609,7 +632,7 @@ public class GitIndex
 	protected boolean resourceOrChildHasChanges(IResource resource)
 	{
 		List<ChangedFile> changedFiles = changedFiles();
-		if (changedFiles == null || changedFiles.isEmpty())
+		if (CollectionsUtil.isEmpty(changedFiles))
 		{
 			return false;
 		}
@@ -636,7 +659,7 @@ public class GitIndex
 	protected boolean hasUnresolvedMergeConflicts()
 	{
 		List<ChangedFile> changedFiles = changedFiles();
-		if (changedFiles.isEmpty())
+		if (CollectionsUtil.isEmpty(changedFiles))
 		{
 			return false;
 		}
@@ -654,12 +677,15 @@ public class GitIndex
 	{
 		Set<IResource> resources = new HashSet<IResource>();
 		List<ChangedFile> changedFiles = changedFiles();
-		for (ChangedFile changedFile : changedFiles)
+		if (!CollectionsUtil.isEmpty(changedFiles))
 		{
-			IResource resource = getResourceForChangedFile(changedFile);
-			if (resource != null)
+			for (ChangedFile changedFile : changedFiles)
 			{
-				resources.add(resource);
+				IResource resource = getResourceForChangedFile(changedFile);
+				if (resource != null)
+				{
+					resources.add(resource);
+				}
 			}
 		}
 		return resources;
@@ -680,15 +706,17 @@ public class GitIndex
 
 		IPath resourcePath = resource.getLocation();
 		List<ChangedFile> changedFiles = changedFiles();
-		for (ChangedFile changedFile : changedFiles)
+		if (!CollectionsUtil.isEmpty(changedFiles))
 		{
-			IPath fullPath = workingDirectory().append(changedFile.getPath());
-			if (resourcePath.equals(fullPath))
+			for (ChangedFile changedFile : changedFiles)
 			{
-				return changedFile;
+				IPath fullPath = workingDirectory().append(changedFile.getPath());
+				if (resourcePath.equals(fullPath))
+				{
+					return changedFile;
+				}
 			}
 		}
-
 		return null;
 	}
 
@@ -711,7 +739,7 @@ public class GitIndex
 		}
 
 		List<ChangedFile> changedFiles = changedFiles();
-		if (changedFiles == null || changedFiles.isEmpty())
+		if (CollectionsUtil.isEmpty(changedFiles))
 		{
 			return Collections.emptyList();
 		}
@@ -731,49 +759,32 @@ public class GitIndex
 		return filtered;
 	}
 
+	/**
+	 * Aschedules a job to refresh the passed in filepaths. paths are expected to be relative to the repo root/working
+	 * dir!
+	 * 
+	 * @param paths
+	 *            A {@link Collection} of relative {@link IPath} - relative to the {@link #workingDirectory()}
+	 */
 	public void refreshAsync(final Collection<IPath> paths)
 	{
-		Job job = new Job("Refreshing git index") //$NON-NLS-1$
+		if (refreshJob != null)
 		{
-			@Override
-			protected IStatus run(IProgressMonitor monitor)
-			{
-				if (monitor != null && monitor.isCanceled())
-				{
-					return Status.CANCEL_STATUS;
-				}
-				refresh(true, paths, monitor);
-				return Status.OK_STATUS;
-			}
-
-			@Override
-			public boolean belongsTo(Object family)
-			{
-				return family == GitIndex.this;
-			}
-		};
-		EclipseUtil.setSystemForJob(job);
-		job.schedule();
+			refreshJob.refresh(paths);
+		}
 	}
 
-	private abstract static class FilesRefreshJob extends Job
+	private abstract static class FilesRefreshJob implements Callable<IStatus>
 	{
 		protected GitRepository repo;
 		protected GitIndex index;
 		protected Set<String> filePaths;
 
-		private FilesRefreshJob(String name, GitIndex index, Set<String> filePaths)
+		private FilesRefreshJob(GitIndex index, Set<String> filePaths)
 		{
-			super(name);
 			this.index = index;
 			this.repo = index.repository;
 			this.filePaths = filePaths;
-		}
-
-		@Override
-		public boolean belongsTo(Object family)
-		{
-			return family == index;
 		}
 
 		protected List<String> linesFromNotification(String string)
@@ -952,11 +963,10 @@ public class GitIndex
 	{
 		private StagedFilesRefreshJob(GitIndex index, Set<String> filePaths)
 		{
-			super("staged files", index, filePaths); //$NON-NLS-1$
+			super(index, filePaths);
 		}
 
-		@Override
-		protected IStatus run(IProgressMonitor monitor)
+		public IStatus call() throws Exception
 		{
 			// HEAD vs filesystem
 			List<String> args = CollectionsUtil.newList("diff-index", "--cached", //$NON-NLS-1$ //$NON-NLS-2$
@@ -966,15 +976,8 @@ public class GitIndex
 				args.add("--"); //$NON-NLS-1$
 				args.addAll(filePaths);
 			}
-			if (monitor != null && monitor.isCanceled())
-			{
-				return Status.CANCEL_STATUS;
-			}
+
 			IStatus result = repo.execute(GitRepository.ReadWrite.READ, args.toArray(new String[args.size()]));
-			if (monitor != null && monitor.isCanceled())
-			{
-				return Status.CANCEL_STATUS;
-			}
 			if (result != null && result.isOK())
 			{
 				readStagedFiles(result.getMessage());
@@ -994,11 +997,10 @@ public class GitIndex
 	{
 		private UnstagedFilesRefreshJob(GitIndex index, Set<String> filePaths)
 		{
-			super("unstaged files", index, filePaths); //$NON-NLS-1$
+			super(index, filePaths);
 		}
 
-		@Override
-		protected IStatus run(IProgressMonitor monitor)
+		public IStatus call() throws Exception
 		{
 			// index vs filesystem
 			List<String> args = CollectionsUtil.newList("diff-files", "-z"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1007,15 +1009,8 @@ public class GitIndex
 				args.add("--"); //$NON-NLS-1$
 				args.addAll(filePaths);
 			}
-			if (monitor != null && monitor.isCanceled())
-			{
-				return Status.CANCEL_STATUS;
-			}
+
 			IStatus result = repo.execute(GitRepository.ReadWrite.READ, args.toArray(new String[args.size()]));
-			if (monitor != null && monitor.isCanceled())
-			{
-				return Status.CANCEL_STATUS;
-			}
 			if (result != null && result.isOK())
 			{
 				readUnstagedFiles(result.getMessage());
@@ -1035,11 +1030,10 @@ public class GitIndex
 	{
 		private UntrackedFilesRefreshJob(GitIndex index, Set<String> filePaths)
 		{
-			super("untracked files", index, filePaths); //$NON-NLS-1$
+			super(index, filePaths);
 		}
 
-		@Override
-		protected IStatus run(IProgressMonitor monitor)
+		public IStatus call() throws Exception
 		{
 			// index vs working tree (HEAD?)
 			List<String> args = CollectionsUtil.newList("ls-files", "--others", //$NON-NLS-1$ //$NON-NLS-2$
@@ -1049,15 +1043,8 @@ public class GitIndex
 				args.add("--"); //$NON-NLS-1$
 				args.addAll(filePaths);
 			}
-			if (monitor != null && monitor.isCanceled())
-			{
-				return Status.CANCEL_STATUS;
-			}
+
 			IStatus result = repo.execute(GitRepository.ReadWrite.READ, args.toArray(new String[args.size()]));
-			if (monitor != null && monitor.isCanceled())
-			{
-				return Status.CANCEL_STATUS;
-			}
 			if (result != null && result.isOK())
 			{
 				readOtherFiles(result.getMessage());
@@ -1093,6 +1080,15 @@ public class GitIndex
 
 	void dispose()
 	{
+		if (es != null)
+		{
+			es.shutdown();
+		}
+		if (refreshJob != null)
+		{
+			refreshJob.cancel();
+			refreshJob = null;
+		}
 		// Cancel any jobs we're running in the index!
 		IJobManager jobManager = Job.getJobManager();
 		if (jobManager != null)

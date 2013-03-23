@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -22,7 +22,10 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChang
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.osgi.framework.BundleContext;
 
+import com.aptana.core.internal.UserAgentManager;
+import com.aptana.core.internal.sourcemap.SourceMapRegistry;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.sourcemap.ISourceMapRegistry;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
 import com.eaio.uuid.MACAddress;
@@ -44,6 +47,9 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 	private static CorePlugin plugin;
 
 	private BundleContext context;
+
+	private UserAgentManager fUserAgentManager;
+	private ISourceMapRegistry sourceMapRegistry;
 
 	/**
 	 * The constructor
@@ -76,7 +82,9 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 				return Status.OK_STATUS;
 			}
 		};
-		EclipseUtil.setSystemForJob(job);
+		// DO NOT CALL EclipseUtil.setSystemForJob!!! It breaks startup by causing plugin loading issues in
+		// resources.core plugin
+		job.setSystem(true);
 		job.schedule();
 	}
 
@@ -111,10 +119,16 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 	 */
 	public void stop(BundleContext context) throws Exception
 	{
+		sourceMapRegistry = null;
 		try
 		{
 			// Don't listen to debug changes anymore
 			EclipseUtil.instanceScope().getNode(CorePlugin.PLUGIN_ID).removePreferenceChangeListener(this);
+
+			if (fUserAgentManager != null)
+			{
+				fUserAgentManager = null;
+			}
 		}
 		finally
 		{
@@ -131,6 +145,20 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 	public static CorePlugin getDefault()
 	{
 		return plugin;
+	}
+
+	/**
+	 * Returns the {@link ISourceMapRegistry}.
+	 * 
+	 * @return {@link ISourceMapRegistry}.
+	 */
+	public synchronized ISourceMapRegistry getSourceMapRegistry()
+	{
+		if (sourceMapRegistry == null)
+		{
+			sourceMapRegistry = new SourceMapRegistry();
+		}
+		return sourceMapRegistry;
 	}
 
 	/**
@@ -209,5 +237,14 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 			IdeLog.logError(getDefault(), e);
 		}
 		return null;
+	}
+
+	public synchronized IUserAgentManager getUserAgentManager()
+	{
+		if (fUserAgentManager == null)
+		{
+			fUserAgentManager = new UserAgentManager();
+		}
+		return fUserAgentManager;
 	}
 }

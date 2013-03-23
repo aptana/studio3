@@ -37,7 +37,7 @@ public class HTMLAttributeValueProposal extends CommonCompletionProposal
 		{
 			IDocument document = viewer.getDocument();
 			// Handle wrapping in quotes if necessary
-			char prevChar = document.getChar(_replacementOffset - 1);
+			char prevChar = _replacementOffset > 0 ? document.getChar(_replacementOffset - 1) : ' ';
 			char quote = '"';
 			switch (prevChar)
 			{
@@ -51,6 +51,7 @@ public class HTMLAttributeValueProposal extends CommonCompletionProposal
 				default:
 					// Add wrapping quotes
 					_replacementString = "\"" + _replacementString; //$NON-NLS-1$
+					_cursorPosition++;
 					break;
 			}
 			// handle adding trailing space if necessary
@@ -59,6 +60,7 @@ public class HTMLAttributeValueProposal extends CommonCompletionProposal
 			{
 				// Add a close quote when we're against the EOF
 				_replacementString += quote;
+				_cursorPosition++;
 			}
 			else
 			{
@@ -75,11 +77,13 @@ public class HTMLAttributeValueProposal extends CommonCompletionProposal
 					case '/':
 						// add close quote
 						_replacementString += quote;
+						_cursorPosition++;
 						break;
 
 					default:
 						// Add a close quote and then a space
 						_replacementString += quote + " "; //$NON-NLS-1$
+						_cursorPosition += 2;
 						break;
 				}
 			}

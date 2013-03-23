@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.text.MessageFormat;
 import java.util.Locale;
@@ -65,6 +66,61 @@ import com.aptana.webserver.core.WebServerCorePlugin;
 		this.uriMapper = uriMapper;
 	}
 
+	private void handleRequest(HttpRequest request, HttpResponse response, boolean head) throws HttpException,
+		IOException, CoreException, URISyntaxException
+	{
+		String target = URLDecoder.decode(request.getRequestLine().getUri(), HTTP.UTF_8);
+		URI uri = URIUtil.fromString(target);
+		IFileStore fileStore = uriMapper.resolve(uri);
+		IFileInfo fileInfo = fileStore.fetchInfo();
+		if (fileInfo.isDirectory())
+		{
+			fileInfo = getIndex(fileStore);
+			if (fileInfo.exists())
+			{
+				fileStore = fileStore.getChild(fileInfo.getName());
+			}
+		}
+		if (!fileInfo.exists())
+		{
+			response.setStatusCode(HttpStatus.SC_NOT_FOUND);
+			response.setEntity(createTextEntity(MessageFormat.format(
+				Messages.LocalWebServerHttpRequestHandler_FILE_NOT_FOUND, uri.getPath())));
+		}
+		else if (fileInfo.isDirectory())
+		{
+			response.setStatusCode(HttpStatus.SC_FORBIDDEN);
+			response.setEntity(createTextEntity(Messages.LocalWebServerHttpRequestHandler_FORBIDDEN));
+		}
+		else
+		{
+			response.setStatusCode(HttpStatus.SC_OK);
+			if (head)
+			{
+				response.setEntity(null);
+			}
+			else
+			{
+				File file = fileStore.toLocalFile(EFS.NONE, new NullProgressMonitor());
+				final File temporaryFile = (file == null) ? fileStore.toLocalFile(EFS.CACHE,
+					new NullProgressMonitor()) : null;
+				response.setEntity(new NFileEntity((file != null) ? file : temporaryFile, getMimeType(fileStore
+					.getName()))
+				{
+					@Override
+					public void finish()
+					{
+						super.finish();
+						if (temporaryFile != null && !temporaryFile.delete())
+						{
+							temporaryFile.deleteOnExit();
+						}
+					}
+				});
+			}
+		}
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.apache.http.protocol.HttpRequestHandler#handle(org.apache.http.HttpRequest,
@@ -78,62 +134,11 @@ import com.aptana.webserver.core.WebServerCorePlugin;
 			String method = request.getRequestLine().getMethod().toUpperCase(Locale.ENGLISH);
 			if (METHOD_GET.equals(method) || METHOD_HEAD.equals(method))
 			{
-				String target = URLDecoder.decode(request.getRequestLine().getUri(), HTTP.UTF_8);
-				URI uri = URIUtil.fromString(target);
-				IFileStore fileStore = uriMapper.resolve(uri);
-				IFileInfo fileInfo = fileStore.fetchInfo();
-				if (fileInfo.isDirectory())
-				{
-					fileInfo = getIndex(fileStore);
-					if (fileInfo.exists())
-					{
-						fileStore = fileStore.getChild(fileInfo.getName());
-					}
-				}
-				if (!fileInfo.exists())
-				{
-					response.setStatusCode(HttpStatus.SC_NOT_FOUND);
-					response.setEntity(createTextEntity(MessageFormat.format(
-							Messages.LocalWebServerHttpRequestHandler_FILE_NOT_FOUND, uri.getPath())));
-				}
-				else if (fileInfo.isDirectory())
-				{
-					response.setStatusCode(HttpStatus.SC_FORBIDDEN);
-					response.setEntity(createTextEntity(Messages.LocalWebServerHttpRequestHandler_FORBIDDEN));
-				}
-				else
-				{
-					response.setStatusCode(HttpStatus.SC_OK);
-					if (METHOD_GET.equals(method))
-					{
-						File file = fileStore.toLocalFile(EFS.NONE, new NullProgressMonitor());
-						final File temporaryFile = (file == null) ? fileStore.toLocalFile(EFS.CACHE,
-								new NullProgressMonitor()) : null;
-						response.setEntity(new NFileEntity((file != null) ? file : temporaryFile, getMimeType(fileStore
-								.getName()))
-						{
-							@Override
-							public void finish()
-							{
-								super.finish();
-								if (temporaryFile != null && !temporaryFile.delete())
-								{
-									temporaryFile.deleteOnExit();
-								}
-							}
-						});
-					}
-					else
-					{
-						response.setEntity(null);
-					}
-				}
+				handleRequest(request, response, METHOD_HEAD.equals(method));
 			}
 			else if (METHOD_POST.equals(method))
 			{
-				// TODO
-				throw new MethodNotSupportedException(MessageFormat.format(
-						Messages.LocalWebServerHttpRequestHandler_UNSUPPORTED_METHOD, method));
+				handleRequest(request, response, METHOD_HEAD.equals(method));
 			}
 			else
 			{

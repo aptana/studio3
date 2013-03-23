@@ -27,7 +27,7 @@ import com.aptana.editor.common.outline.CommonOutlineContentProvider;
 import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.common.outline.CommonOutlinePageInput;
 import com.aptana.editor.js.outline.JSOutlineItem.Type;
-import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
+import com.aptana.js.core.parsing.ast.IJSNodeTypes;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
 import com.aptana.parsing.lexer.IRange;

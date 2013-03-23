@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -8,12 +8,22 @@
 package com.aptana.index.core;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import com.aptana.jetty.util.epl.ajax.JSON.Convertible;
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileInfo;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.ArrayUtil;
+import com.aptana.core.util.CollectionsUtil;
+import com.aptana.jetty.util.epl.ajax.JSON.Convertible;
 
 /**
  * IndexUtil
@@ -100,6 +110,69 @@ public class IndexUtil
 		}
 
 		return result;
+	}
+
+	/**
+	 * Given an {@link IFileStore}, we traverse to add all files underneath it. This method is recursive, traversing
+	 * into sub-directories.
+	 * 
+	 * @param file
+	 * @param monitor
+	 * @return
+	 */
+	public static Set<IFileStore> getAllFiles(IFileStore file, IProgressMonitor monitor)
+	{
+		// TODO We should likely call IFileSystem.fetchTree and use that if it doesn't return null (because that is more
+		// efficient in some schemes)!
+		SubMonitor sub = SubMonitor.convert(monitor, 10);
+		Set<IFileStore> files = new HashSet<IFileStore>(0);
+		try
+		{
+			if (file == null)
+			{
+				return files;
+			}
+			IFileInfo info = file.fetchInfo(EFS.NONE, sub.newChild(1));
+			if (!info.exists())
+			{
+				return files;
+			}
+			// We know it exists...
+			if (info.isDirectory())
+			{
+				try
+				{
+					// Now try to dive into directory and add all children recursively
+					IFileStore[] fileList = file.childStores(EFS.NONE, sub.newChild(2));
+					if (ArrayUtil.isEmpty(fileList))
+					{
+						return files;
+					}
+					for (IFileStore child : fileList)
+					{
+						files.addAll(getAllFiles(child, sub.newChild(7)));
+					}
+				}
+				catch (CoreException e)
+				{
+					IdeLog.logError(IndexPlugin.getDefault(), e);
+				}
+			}
+			else
+			{
+				// it's a file that exists, base case, add it.
+				return CollectionsUtil.newSet(file);
+			}
+		}
+		catch (CoreException e)
+		{
+			IdeLog.logError(IndexPlugin.getDefault(), e);
+		}
+		finally
+		{
+			sub.done();
+		}
+		return files;
 	}
 
 	private IndexUtil()

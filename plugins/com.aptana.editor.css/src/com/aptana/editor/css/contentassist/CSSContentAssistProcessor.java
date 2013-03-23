@@ -33,6 +33,14 @@ import org.eclipse.swt.widgets.Display;
 
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.css.core.index.CSSIndexQueryHelper;
+import com.aptana.css.core.index.ICSSIndexConstants;
+import com.aptana.css.core.model.ElementElement;
+import com.aptana.css.core.model.PropertyElement;
+import com.aptana.css.core.model.PseudoClassElement;
+import com.aptana.css.core.model.PseudoElementElement;
+import com.aptana.css.core.model.ValueElement;
+import com.aptana.css.core.parsing.CSSTokenType;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
@@ -40,16 +48,9 @@ import com.aptana.editor.common.contentassist.CompletionProposalComparator;
 import com.aptana.editor.common.contentassist.ILexemeProvider;
 import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.css.CSSPlugin;
-import com.aptana.editor.css.contentassist.index.ICSSIndexConstants;
-import com.aptana.editor.css.contentassist.model.ElementElement;
-import com.aptana.editor.css.contentassist.model.PropertyElement;
-import com.aptana.editor.css.contentassist.model.PseudoClassElement;
-import com.aptana.editor.css.contentassist.model.PseudoElementElement;
-import com.aptana.editor.css.contentassist.model.ValueElement;
 import com.aptana.editor.css.internal.text.CSSModelFormatter;
 import com.aptana.editor.css.parsing.CSSTokenScanner;
 import com.aptana.editor.css.parsing.lexer.CSSLexemeProvider;
-import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Lexeme;
 import com.aptana.parsing.lexer.Range;
@@ -208,7 +209,8 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		if (classes != null)
 		{
 			UserAgentManager manager = UserAgentManager.getInstance();
-			String[] userAgentIds = manager.getActiveUserAgentIDs(getProject()); // classes can be used by all user agents
+			String[] userAgentIds = manager.getActiveUserAgentIDs(getProject()); // classes can be used by all user
+																					// agents
 
 			for (Entry<String, String> entry : classes.entrySet())
 			{
@@ -233,7 +235,8 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		if (ids != null)
 		{
 			UserAgentManager manager = UserAgentManager.getInstance();
-			String[] userAgentIds = manager.getActiveUserAgentIDs(getProject()); // classes can be used by all user agents
+			String[] userAgentIds = manager.getActiveUserAgentIDs(getProject()); // classes can be used by all user
+																					// agents
 
 			for (Entry<String, String> entry : ids.entrySet())
 			{

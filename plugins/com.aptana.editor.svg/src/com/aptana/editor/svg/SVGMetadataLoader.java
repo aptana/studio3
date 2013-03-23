@@ -26,15 +26,16 @@ import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.svg.contentassist.index.SVGIndexConstants;
 import com.aptana.editor.svg.preferences.IPreferenceConstants;
-import com.aptana.editor.xml.contentassist.index.IKeyProvider;
-import com.aptana.editor.xml.contentassist.index.XMLIndexWriter;
-import com.aptana.editor.xml.contentassist.index.XMLKeyProvider;
-import com.aptana.editor.xml.contentassist.model.AttributeElement;
-import com.aptana.editor.xml.contentassist.model.DTDTransformer;
-import com.aptana.editor.xml.contentassist.model.ElementElement;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.IndexPlugin;
+import com.aptana.xml.core.index.IKeyProvider;
+import com.aptana.xml.core.index.XMLIndexWriter;
+import com.aptana.xml.core.index.XMLKeyProvider;
+import com.aptana.xml.core.model.AttributeElement;
+import com.aptana.xml.core.model.DTDTransformException;
+import com.aptana.xml.core.model.DTDTransformer;
+import com.aptana.xml.core.model.ElementElement;
 
 /**
  * MetadataLoader
@@ -68,7 +69,7 @@ public class SVGMetadataLoader extends Job
 			URI metadataLocation = URI.create(keyProvider.getMetadataLocation());
 
 			// remove old index
-			getIndexManager().removeIndex(metadataLocation);
+			getIndexManager().resetIndex(metadataLocation);
 
 			// grab DTD source
 			InputStream stream = FileLocator.openStream(Platform.getBundle(SVGPlugin.PLUGIN_ID), new Path(SVG_DTD),
@@ -97,6 +98,10 @@ public class SVGMetadataLoader extends Job
 			index.save();
 		}
 		catch (IOException e)
+		{
+			IdeLog.logError(SVGPlugin.getDefault(), e);
+		}
+		catch (DTDTransformException e)
 		{
 			IdeLog.logError(SVGPlugin.getDefault(), e);
 		}

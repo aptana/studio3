@@ -12,8 +12,8 @@ import java.util.List;
 
 import com.aptana.editor.common.outline.CommonOutlineContentProvider;
 import com.aptana.editor.common.outline.CommonOutlineItem;
-import com.aptana.editor.xml.parsing.ast.XMLElementNode;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.xml.core.parsing.ast.XMLElementNode;
 
 public class XMLOutlineContentProvider extends CommonOutlineContentProvider
 {

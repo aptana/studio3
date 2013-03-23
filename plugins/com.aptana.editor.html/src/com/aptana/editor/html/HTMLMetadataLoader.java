@@ -13,7 +13,6 @@ import java.net.URI;
 import org.osgi.framework.Bundle;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.editor.common.contentassist.MetadataLoader;
 import com.aptana.editor.html.contentassist.HTMLIndexQueryHelper;
 import com.aptana.editor.html.contentassist.index.HTMLIndexWriter;
 import com.aptana.editor.html.contentassist.index.HTMLMetadataReader;
@@ -26,6 +25,7 @@ import com.aptana.editor.html.preferences.IPreferenceConstants;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.IndexPlugin;
+import com.aptana.index.core.MetadataLoader;
 
 /**
  * HTMLMetadataLoader
@@ -109,7 +109,7 @@ public class HTMLMetadataLoader extends MetadataLoader<HTMLMetadataReader>
 	protected void writeIndex(HTMLMetadataReader reader)
 	{
 		// remove old index
-		getIndexManager().removeIndex(URI.create(IHTMLIndexConstants.METADATA_INDEX_LOCATION));
+		getIndexManager().resetIndex(URI.create(IHTMLIndexConstants.METADATA_INDEX_LOCATION));
 
 		HTMLIndexWriter indexer = new HTMLIndexWriter();
 

@@ -25,6 +25,7 @@ import com.aptana.build.ui.preferences.IBuildParticipantPreferenceCompositeFacto
 import com.aptana.build.ui.preferences.ValidatorFiltersPreferenceComposite;
 import com.aptana.core.build.IBuildParticipantWorkingCopy;
 import com.aptana.jetty.util.epl.ajax.JSON;
+import com.aptana.js.core.preferences.IPreferenceConstants;
 
 public class JSLintValidatorPreferenceCompositeFactory implements IBuildParticipantPreferenceCompositeFactory
 {
@@ -53,7 +54,7 @@ public class JSLintValidatorPreferenceCompositeFactory implements IBuildParticip
 		decoration.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_DEC_FIELD_ERROR));
 		decoration.hide();
 
-		text.setText(participant.getPreferenceString(JSLintValidator.JS_LINT_OPTIONS));
+		text.setText(participant.getPreferenceString(IPreferenceConstants.JS_LINT_OPTIONS));
 		fillHoriz.hint(SWT.DEFAULT, 100).applyTo(text);
 		text.addModifyListener(new ModifyListener()
 		{
@@ -64,7 +65,7 @@ public class JSLintValidatorPreferenceCompositeFactory implements IBuildParticip
 				{
 					String optionsAsJSON = text.getText();
 					JSON.parse(optionsAsJSON);
-					participant.setPreference(JSLintValidator.JS_LINT_OPTIONS, text.getText());
+					participant.setPreference(IPreferenceConstants.JS_LINT_OPTIONS, text.getText());
 				}
 				catch (IllegalStateException e1)
 				{

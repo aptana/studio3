@@ -14,7 +14,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
 
-import com.aptana.editor.dtd.parsing.lexer.DTDTokenType;
+import com.aptana.dtd.core.parsing.DTDTokenType;
 import com.aptana.editor.dtd.text.rules.DTDTagScanner;
 
 public class DTDTagScannerTest extends TestCase {

@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -10,6 +10,7 @@ package com.aptana.editor.css.parsing.lexer;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.ITokenScanner;
 
+import com.aptana.css.core.parsing.CSSTokenType;
 import com.aptana.editor.common.contentassist.LexemeProvider;
 import com.aptana.parsing.lexer.IRange;
 
@@ -55,7 +56,8 @@ public class CSSLexemeProvider extends LexemeProvider<CSSTokenType>
 		super(document, range, scanner);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.contentassist.LexemeProvider#getTypeFromData(java.lang.Object)
 	 */
 	@Override

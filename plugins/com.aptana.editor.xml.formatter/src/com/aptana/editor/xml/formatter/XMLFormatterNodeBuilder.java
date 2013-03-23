@@ -10,9 +10,6 @@ package com.aptana.editor.xml.formatter;
 import com.aptana.editor.xml.formatter.nodes.FormatterXMLContentNode;
 import com.aptana.editor.xml.formatter.nodes.FormatterXMLElementNode;
 import com.aptana.editor.xml.formatter.nodes.FormatterXMLVoidElementNode;
-import com.aptana.editor.xml.parsing.ast.XMLElementNode;
-import com.aptana.editor.xml.parsing.ast.XMLNode;
-import com.aptana.editor.xml.parsing.ast.XMLNodeType;
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.nodes.AbstractFormatterNodeBuilder;
 import com.aptana.formatter.nodes.FormatterBlockNode;
@@ -23,6 +20,9 @@ import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.lexer.IRange;
+import com.aptana.xml.core.parsing.ast.XMLElementNode;
+import com.aptana.xml.core.parsing.ast.XMLNode;
+import com.aptana.xml.core.parsing.ast.XMLNodeType;
 
 /**
  * XML formatter node builder.<br>

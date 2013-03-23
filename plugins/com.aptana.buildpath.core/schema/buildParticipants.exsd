@@ -51,7 +51,7 @@
       <complexType>
          <sequence>
             <element ref="contentTypeBinding" minOccurs="0" maxOccurs="unbounded"/>
-            <element ref="projectNatureBinding" minOccurs="1" maxOccurs="unbounded"/>
+            <element ref="projectNatureBinding" minOccurs="0" maxOccurs="unbounded"/>
          </sequence>
          <attribute name="id" type="string" use="required">
             <annotation>

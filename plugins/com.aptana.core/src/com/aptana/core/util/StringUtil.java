@@ -793,8 +793,8 @@ public class StringUtil
 	}
 
 	/**
-	 * Strips leading and trailing single/double quotes from a string. Assumes there is a trailing quote if there is
-	 * aleading quote.
+	 * Strips leading and trailing single/double quotes from a string. Assumes there is a trailing quote if there is a
+	 * leading quote.
 	 * 
 	 * @param text
 	 * @return
@@ -806,5 +806,104 @@ public class StringUtil
 			return text.substring(1, text.length() - 1);
 		}
 		return text;
+	}
+
+	/**
+	 * This is the equivalent of {@link String#indexOf(int)} but for searching for one of many characters (not a
+	 * substring).
+	 * 
+	 * @param string
+	 *            the string to search
+	 * @param chars
+	 *            The set of characters we're looking for. If we find any of these characters we stop and return the
+	 *            index.
+	 * @return
+	 */
+	public static int indexOf(String string, char... chars)
+	{
+		return indexOf(string, 0, chars);
+	}
+
+	public static int indexOf(String string, int offset, char... chars)
+	{
+		if (chars == null || chars.length == 0)
+		{
+			return -1;
+		}
+		int length = string.length();
+		if (length == 0)
+		{
+			return -1;
+		}
+
+		if (offset < 0)
+		{
+			offset = 0;
+		}
+
+		for (int i = offset; i < length; i++)
+		{
+			char c = string.charAt(i);
+			for (char x : chars)
+			{
+				if (c == x)
+				{
+					return i;
+				}
+			}
+		}
+		return -1;
+	}
+
+	/**
+	 * @see String#lastIndexOf(int)
+	 * @param string
+	 * @param chars
+	 * @return
+	 */
+	public static int lastIndexOf(String string, char... chars)
+	{
+		if (string == null)
+		{
+			return -1;
+		}
+		return lastIndexOf(string, string.length() - 1, chars);
+	}
+
+	/**
+	 * @see String#lastIndexOf(String, int)
+	 * @param string
+	 * @param fromIndex
+	 * @param chars
+	 * @return
+	 */
+	public static int lastIndexOf(String string, int fromIndex, char... chars)
+	{
+		if (chars == null || chars.length == 0)
+		{
+			return -1;
+		}
+		int length = string.length();
+		if (length == 0)
+		{
+			return -1;
+		}
+		else if (fromIndex >= length)
+		{
+			fromIndex = length - 1;
+		}
+
+		for (int i = fromIndex; i >= 0; i--)
+		{
+			char c = string.charAt(i);
+			for (char x : chars)
+			{
+				if (c == x)
+				{
+					return i;
+				}
+			}
+		}
+		return -1;
 	}
 }
