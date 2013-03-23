@@ -11,6 +11,7 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -75,16 +76,20 @@ public final class DialogUtils
 	public static int openIgnoreMessageDialogConfirm(Shell shell, String title, String message, IPreferenceStore store,
 			String key)
 	{
-		if (!store.getString(key).equals(MessageDialogWithToggle.ALWAYS))
+		if (!shouldShowDialog(key))
 		{
-			MessageDialogWithToggle d = MessageDialogWithToggle.openYesNoQuestion(shell, title, message,
-					Messages.DialogUtils_HideMessage, false, store, key);
-			if (d.getReturnCode() == 3)
-			{
-				return MessageDialog.CANCEL;
-			}
+			String value = store.getString(key);
+			return value == MessageDialogWithToggle.ALWAYS ? IDialogConstants.YES_ID : IDialogConstants.CANCEL_ID;
 		}
-		return MessageDialog.OK;
+		MessageDialogWithToggle dialog = MessageDialogWithToggle.openYesNoQuestion(shell, title, message,
+				Messages.DialogUtils_doNotShowMessageAgain, false, store, key);
+		if (dialog.getToggleState())
+		{
+			setShouldShowDialog(key, false);
+			store.putValue(key, dialog.getReturnCode() == IDialogConstants.YES_ID ? MessageDialogWithToggle.ALWAYS
+					: MessageDialogWithToggle.NEVER);
+		}
+		return dialog.getReturnCode();
 	}
 
 	/**
