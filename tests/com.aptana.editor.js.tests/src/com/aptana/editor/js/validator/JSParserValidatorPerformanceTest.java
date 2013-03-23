@@ -16,12 +16,13 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.test.performance.PerformanceTestCase;
 
 import com.aptana.core.build.AbstractBuildParticipant;
+import com.aptana.core.tests.TestProject;
 import com.aptana.core.util.IOUtil;
-import com.aptana.editor.common.tests.util.TestProject;
 import com.aptana.editor.epl.tests.EditorTestHelper;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.index.core.RebuildIndexJob;
 import com.aptana.index.core.build.BuildContext;
+import com.aptana.js.internal.core.build.JSParserValidator;
 
 public class JSParserValidatorPerformanceTest extends PerformanceTestCase
 {
