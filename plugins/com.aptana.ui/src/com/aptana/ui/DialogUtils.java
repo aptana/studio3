@@ -76,10 +76,10 @@ public final class DialogUtils
 	public static int openIgnoreMessageDialogConfirm(Shell shell, String title, String message, IPreferenceStore store,
 			String key)
 	{
-		if (!shouldShowDialog(key))
+		String value = store.getString(key);
+		if (!shouldShowDialog(key) || value != MessageDialogWithToggle.PROMPT)
 		{
-			String value = store.getString(key);
-			return value == MessageDialogWithToggle.ALWAYS ? IDialogConstants.YES_ID : IDialogConstants.CANCEL_ID;
+			return value == MessageDialogWithToggle.ALWAYS ? IDialogConstants.YES_ID : IDialogConstants.NO_ID;
 		}
 		MessageDialogWithToggle dialog = MessageDialogWithToggle.openYesNoQuestion(shell, title, message,
 				Messages.DialogUtils_doNotShowMessageAgain, false, store, key);
