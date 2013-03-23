@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -14,10 +14,12 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
@@ -35,6 +37,8 @@ import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.index.core.IndexContainerJob;
+import com.aptana.index.core.IndexFileJob;
 
 /**
  * BuildPathManager
@@ -92,7 +96,7 @@ public class BuildPathManager
 		{
 			if (buildPaths == null)
 			{
-				buildPaths = new HashSet<BuildPathEntry>();
+				buildPaths = new LinkedHashSet<BuildPathEntry>();
 			}
 
 			buildPaths.add(entry);
@@ -105,18 +109,49 @@ public class BuildPathManager
 	 * @param project
 	 * @param entry
 	 */
-	public void addBuildPath(IProject project, BuildPathEntry entry)
+	public void addBuildPath(IProject project, IBuildPathEntry entry)
 	{
 		if (project != null && entry != null)
 		{
-			Set<BuildPathEntry> buildPaths = getBuildPaths(project);
+			Set<IBuildPathEntry> buildPaths = getBuildPaths(project);
 
 			if (!buildPaths.contains(entry))
 			{
 				buildPaths.add(entry);
 
 				setBuildPaths(project, buildPaths);
+
+				index(entry);
 			}
+		}
+	}
+
+	/**
+	 * If a build path entry is added, we schedule a job to make sure the entry gets indexed (or it's index is
+	 * up-to-date).
+	 * 
+	 * @param entry
+	 */
+	private void index(IBuildPathEntry entry)
+	{
+		try
+		{
+			IFileStore fileStore = EFS.getStore(entry.getPath());
+			if (fileStore != null)
+			{
+				if (fileStore.fetchInfo().isDirectory())
+				{
+					new IndexContainerJob(entry.getDisplayName(), entry.getPath()).schedule();
+				}
+				else
+				{
+					new IndexFileJob(entry.getDisplayName(), entry.getPath()).schedule();
+				}
+			}
+		}
+		catch (Throwable e)
+		{
+			IdeLog.logError(BuildPathCorePlugin.getDefault(), e);
 		}
 	}
 
@@ -167,9 +202,9 @@ public class BuildPathManager
 	 * 
 	 * @return
 	 */
-	public Set<BuildPathEntry> getBuildPaths()
+	public Set<IBuildPathEntry> getBuildPaths()
 	{
-		Set<BuildPathEntry> result = new HashSet<BuildPathEntry>();
+		Set<IBuildPathEntry> result = new LinkedHashSet<IBuildPathEntry>();
 
 		// Add static paths, if we have any
 		if (buildPaths != null)
@@ -189,9 +224,10 @@ public class BuildPathManager
 	 * @param project
 	 * @return
 	 */
-	public Set<BuildPathEntry> getBuildPaths(IProject project)
+	// FIXME We need this to be a list, because order matters!
+	public Set<IBuildPathEntry> getBuildPaths(IProject project)
 	{
-		Set<BuildPathEntry> result = new HashSet<BuildPathEntry>();
+		Set<IBuildPathEntry> result = new LinkedHashSet<IBuildPathEntry>();
 
 		try
 		{
@@ -260,17 +296,17 @@ public class BuildPathManager
 	 * 
 	 * @return
 	 */
-	private Set<BuildPathEntry> getDynamicBuildPaths()
+	private Set<IBuildPathEntry> getDynamicBuildPaths()
 	{
-		Set<BuildPathEntry> result;
+		Set<IBuildPathEntry> result;
 
 		if (contributors != null)
 		{
-			result = new HashSet<BuildPathEntry>();
+			result = new LinkedHashSet<IBuildPathEntry>();
 
 			for (IBuildPathContributor contributor : contributors)
 			{
-				List<BuildPathEntry> files = contributor.getBuildPathEntries();
+				List<IBuildPathEntry> files = contributor.getBuildPathEntries();
 
 				if (files != null)
 				{
@@ -304,13 +340,13 @@ public class BuildPathManager
 	 * @param entry
 	 * @return
 	 */
-	public boolean hasBuildPath(IProject project, BuildPathEntry entry)
+	public boolean hasBuildPath(IProject project, IBuildPathEntry entry)
 	{
 		boolean result = false;
 
 		if (project != null && entry != null)
 		{
-			Set<BuildPathEntry> buildPathSet = getBuildPaths(project);
+			Set<IBuildPathEntry> buildPathSet = getBuildPaths(project);
 
 			result = buildPathSet.contains(entry);
 		}
@@ -477,17 +513,19 @@ public class BuildPathManager
 	 * @param project
 	 * @param entry
 	 */
-	public void removeBuildPath(IProject project, BuildPathEntry entry)
+	public void removeBuildPath(IProject project, IBuildPathEntry entry)
 	{
 		if (project != null && entry != null)
 		{
-			Set<BuildPathEntry> entries = getBuildPaths(project);
+			Set<IBuildPathEntry> entries = getBuildPaths(project);
 
 			if (entries.contains(entry))
 			{
 				entries.remove(entry);
 
 				setBuildPaths(project, entries);
+
+				// TODO Remove the index for it? Don't we need to see if no other references to it are out there?
 			}
 		}
 	}
@@ -512,13 +550,13 @@ public class BuildPathManager
 	 * @param project
 	 * @param entries
 	 */
-	public void setBuildPaths(IProject project, Collection<BuildPathEntry> entries)
+	public void setBuildPaths(IProject project, Collection<IBuildPathEntry> entries)
 	{
 		if (project != null && entries != null)
 		{
 			List<String> nameAndPaths = new ArrayList<String>();
 
-			for (BuildPathEntry entry : entries)
+			for (IBuildPathEntry entry : entries)
 			{
 				String nameAndPath = entry.getDisplayName() + NAME_AND_PATH_DELIMITER + entry.getPath();
 
@@ -527,6 +565,8 @@ public class BuildPathManager
 
 			String value = StringUtil.join(BUILD_PATH_ENTRY_DELIMITER, nameAndPaths);
 
+			// FIXME This severely limits the value's size, which we could run into over time! It also does not make the
+			// value portable across users/workspaces
 			try
 			{
 				project.setPersistentProperty(getBuildPathPropertyName(), value);

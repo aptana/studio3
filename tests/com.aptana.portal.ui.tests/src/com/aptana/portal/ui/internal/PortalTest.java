@@ -9,9 +9,9 @@ import junit.framework.TestCase;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
+import com.aptana.core.tests.TestProject;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
-import com.aptana.editor.common.tests.util.TestProject;
 import com.aptana.portal.ui.IPortalPreferences;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.theme.IThemeManager;

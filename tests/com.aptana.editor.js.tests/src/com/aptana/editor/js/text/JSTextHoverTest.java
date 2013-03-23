@@ -14,12 +14,12 @@ import org.junit.Test;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.hover.TagStripperAndTypeBolder;
 import com.aptana.editor.common.util.EditorUtil;
-import com.aptana.editor.js.contentassist.index.JSIndexWriter;
-import com.aptana.editor.js.contentassist.model.PropertyElement;
-import com.aptana.editor.js.contentassist.model.TypeElement;
-import com.aptana.editor.js.tests.JSEditorBasedTests;
+import com.aptana.editor.js.tests.JSEditorBasedTestCase;
+import com.aptana.js.core.model.PropertyElement;
+import com.aptana.js.core.model.TypeElement;
+import com.aptana.js.internal.core.index.JSIndexWriter;
 
-public class JSTextHoverTest extends JSEditorBasedTests
+public class JSTextHoverTest extends JSEditorBasedTestCase
 {
 	private JSTextHover hover;
 

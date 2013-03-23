@@ -1,11 +1,10 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-
 package com.aptana.editor.html;
 
 import org.eclipse.jface.text.IDocument;
@@ -18,6 +17,7 @@ import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.source.ISourceViewer;
 
+import com.aptana.css.core.ICSSConstants;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.CommonUtil;
@@ -35,18 +35,18 @@ import com.aptana.editor.common.text.rules.PartitionerSwitchingIgnoreRule;
 import com.aptana.editor.common.text.rules.TagRule;
 import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
 import com.aptana.editor.css.CSSSourceConfiguration;
-import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.html.contentassist.HTMLContentAssistProcessor;
 import com.aptana.editor.html.internal.text.rules.DocTypeRule;
-import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.JSSourceConfiguration;
 import com.aptana.editor.svg.ISVGConstants;
 import com.aptana.editor.svg.SVGSourceConfiguration;
+import com.aptana.js.core.IJSConstants;
 
 /**
  * @author Max Stepanov
  */
-public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration {
+public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration
+{
 
 	public final static String PREFIX = "__html_"; //$NON-NLS-1$
 	public final static String DEFAULT = "__html" + IDocument.DEFAULT_CONTENT_TYPE; //$NON-NLS-1$
@@ -70,18 +70,17 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
 			new CaseInsensitiveMultiLineRule("<!DOCTYPE ", ">", getToken(HTML_DOCTYPE)), //$NON-NLS-1$ //$NON-NLS-2$
 			new DocTypeRule(getToken(CDATA)),
-			new PartitionerSwitchingIgnoreRule(
-					new MultiLineRule("<!--", "-->", getToken(HTML_COMMENT), (char) 0, true)), //$NON-NLS-1$ //$NON-NLS-2$
+			new PartitionerSwitchingIgnoreRule(new MultiLineRule("<!--", "-->", getToken(HTML_COMMENT), (char) 0, true)), //$NON-NLS-1$ //$NON-NLS-2$
 			new TagRule("script", new ExtendedToken(getToken(HTML_SCRIPT)), true), //$NON-NLS-1$
 			new TagRule("style", new ExtendedToken(getToken(HTML_STYLE)), true), //$NON-NLS-1$
 			new TagRule("svg", new ExtendedToken(getToken(HTML_SVG)), true), //$NON-NLS-1$
 			new TagRule("/", getToken(HTML_TAG_CLOSE)), //$NON-NLS-1$
-			new TagRule(new ExtendedToken(getToken(HTML_TAG)))
-		};
+			new TagRule(new ExtendedToken(getToken(HTML_TAG))) };
 
 	private static HTMLSourceConfiguration instance;
 
-	static {
+	static
+	{
 		IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
 		// Top-level HTML
 		c.addTranslation(new QualifiedContentType(IHTMLConstants.CONTENT_TYPE_HTML), new QualifiedContentType(
@@ -104,13 +103,15 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		c.addTranslation(new QualifiedContentType(HTML_DOCTYPE), new QualifiedContentType(
 				"meta.tag.sgml.html", "meta.tag.sgml.doctype.html")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
-	private HTMLSourceConfiguration() {
+
+	private HTMLSourceConfiguration()
+	{
 	}
 
 	public synchronized static HTMLSourceConfiguration getDefault()
 	{
-		if (instance == null) {
+		if (instance == null)
+		{
 			instance = new HTMLSourceConfiguration();
 		}
 		return instance;
@@ -118,19 +119,20 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#getContentTypes()
 	 */
-	public String[] getContentTypes() {
-		return TextUtils.combine(new String[][] { CONTENT_TYPES, JSSourceConfiguration.CONTENT_TYPES, CSSSourceConfiguration.CONTENT_TYPES, SVGSourceConfiguration.CONTENT_TYPES });
+	public String[] getContentTypes()
+	{
+		return TextUtils.combine(new String[][] { CONTENT_TYPES, JSSourceConfiguration.CONTENT_TYPES,
+				CSSSourceConfiguration.CONTENT_TYPES, SVGSourceConfiguration.CONTENT_TYPES });
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.aptana.editor.common.ITopContentTypesProvider#getTopContentTypes()
 	 */
-	public String[][] getTopContentTypes() {
+	public String[][] getTopContentTypes()
+	{
 		return TOP_CONTENT_TYPES;
 	}
 
@@ -138,7 +140,8 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#getPartitioningRules()
 	 */
-	public IPredicateRule[] getPartitioningRules() {
+	public IPredicateRule[] getPartitioningRules()
+	{
 		return partitioningRules;
 	}
 
@@ -146,7 +149,8 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#createSubPartitionScanner()
 	 */
-	public ISubPartitionScanner createSubPartitionScanner() {
+	public ISubPartitionScanner createSubPartitionScanner()
+	{
 		return new HTMLSubPartitionScanner();
 	}
 
@@ -154,20 +158,25 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#getDocumentContentType(java.lang.String)
 	 */
-	public String getDocumentContentType(String contentType) {
-		if (contentType.startsWith(PREFIX)) {
+	public String getDocumentContentType(String contentType)
+	{
+		if (contentType.startsWith(PREFIX))
+		{
 			return IHTMLConstants.CONTENT_TYPE_HTML;
 		}
 		String result = JSSourceConfiguration.getDefault().getDocumentContentType(contentType);
-		if (result != null) {
+		if (result != null)
+		{
 			return result;
 		}
 		result = CSSSourceConfiguration.getDefault().getDocumentContentType(contentType);
-		if (result != null) {
+		if (result != null)
+		{
 			return result;
 		}
 		result = SVGSourceConfiguration.getDefault().getDocumentContentType(contentType);
-		if (result != null) {
+		if (result != null)
+		{
 			return result;
 		}
 		return null;
@@ -175,9 +184,12 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text.presentation.PresentationReconciler, org.eclipse.jface.text.source.ISourceViewer)
+	 * @see
+	 * com.aptana.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text.presentation
+	 * .PresentationReconciler, org.eclipse.jface.text.source.ISourceViewer)
 	 */
-	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer) {
+	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer)
+	{
 		JSSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
 		CSSSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
 		SVGSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
@@ -220,45 +232,53 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.aptana.editor.common.ISourceViewerConfiguration#getContentAssistProcessor
+	 * @see com.aptana.editor.common.ISourceViewerConfiguration#getContentAssistProcessor
 	 * (com.aptana.editor.common.AbstractThemeableEditor, java.lang.String)
 	 */
-	public IContentAssistProcessor getContentAssistProcessor(AbstractThemeableEditor editor, String contentType) {
-		if (contentType.startsWith(JSSourceConfiguration.PREFIX)) {
+	public IContentAssistProcessor getContentAssistProcessor(AbstractThemeableEditor editor, String contentType)
+	{
+		if (contentType.startsWith(JSSourceConfiguration.PREFIX))
+		{
 			return JSSourceConfiguration.getDefault().getContentAssistProcessor(editor, contentType);
 		}
-		if (contentType.startsWith(CSSSourceConfiguration.PREFIX)) {
+		if (contentType.startsWith(CSSSourceConfiguration.PREFIX))
+		{
 			return CSSSourceConfiguration.getDefault().getContentAssistProcessor(editor, contentType);
 		}
-		if (contentType.startsWith(SVGSourceConfiguration.PREFIX)) {
+		if (contentType.startsWith(SVGSourceConfiguration.PREFIX))
+		{
 			return SVGSourceConfiguration.getDefault().getContentAssistProcessor(editor, contentType);
 		}
 		return new HTMLContentAssistProcessor(editor);
 	}
 
-	private ITokenScanner getHTMLCommentScanner() {
+	private ITokenScanner getHTMLCommentScanner()
+	{
 		return new CommentScanner(getToken("comment.block.html")); //$NON-NLS-1$
 	}
 
-	private ITokenScanner getHTMLScanner() {
+	private ITokenScanner getHTMLScanner()
+	{
 		return new HTMLScanner();
 	}
 
-	private ITokenScanner getCDATAScanner() {
+	private ITokenScanner getCDATAScanner()
+	{
 		return new SingleTokenScanner(getToken("string.unquoted.cdata.xml")); //$NON-NLS-1$
 	}
 
-	private ITokenScanner getHTMLTagScanner() {
+	private ITokenScanner getHTMLTagScanner()
+	{
 		return new HTMLTagScanner();
 	}
 
-	private ITokenScanner getDoctypeScanner() {
+	private ITokenScanner getDoctypeScanner()
+	{
 		return new HTMLDoctypeScanner();
 	}
 
-	private static IToken getToken(String tokenName) {
+	private static IToken getToken(String tokenName)
+	{
 		return CommonUtil.getToken(tokenName);
 	}
 

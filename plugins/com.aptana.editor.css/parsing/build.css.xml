@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="CSS parsers build" default="build">
+<project name="CSS partitioner build" default="build">
     <description>
-            Builds the CSS related parsers.
+            Builds the CSS partitioner.
     </description>
 
     <taskdef name="jflex" classname="JFlex.anttask.JFlexTask">
@@ -15,32 +15,18 @@
         </classpath>
     </taskdef>
 
-    <taskdef name="beaver" classname="beaver.comp.run.AntTask" classpath="../../../plugins/beaver/bin"/>
+    <taskdef name="beaver" classname="beaver.comp.run.AntTask" classpath="../../beaver/bin"/>
 
     <target name="build">
-        <jflex 
-        	file="CSS.flex" 
-        	outdir="../src/com/aptana/editor/css/parsing" 
-        	nobak="on"/>
-    	
         <jflex 
         	file="CSSColoring.flex" 
         	outdir="../src/com/aptana/editor/css/parsing" 
         	nobak="on"/>
-    	
+
         <jflex 
         	file="CSSPartitioning.flex" 
         	outdir="../src/com/aptana/editor/css/parsing" 
         	nobak="on"/>
-    	
-	    <beaver 
-	    	file             = "CSS.grammar"
-	        destdir          = "../src"
-	        exportTerminals  = "yes"
-	        useSwitch        = "yes"/>
-    	
     </target>
-        		
-        		
-	
+
 </project>

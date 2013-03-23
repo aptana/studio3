@@ -9,6 +9,8 @@ package com.aptana.editor.common.util;
 
 import java.io.File;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.resources.IFile;
@@ -16,8 +18,10 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorInput;
@@ -37,6 +41,7 @@ import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
@@ -343,5 +348,70 @@ public class EditorUtil
 	{
 		IProject project = getProject(editor);
 		return (project == null) ? null : project.getLocationURI();
+	}
+
+	/**
+	 * Finds the editor for the specified file in the specified project and prompts a save if the editor is dirty. If
+	 * the fileName is empty, it will save all dirty project files
+	 * 
+	 * @param project
+	 * @param fileName
+	 * @param promptQuestion
+	 * @return
+	 */
+	public static boolean verifySaveEditor(final IProject project, final String fileName, final String promptQuestion)
+	{
+		final boolean[] result = new boolean[] { true };
+		UIUtils.getDisplay().syncExec(new Runnable()
+		{
+			public void run()
+			{
+				IEditorPart[] dirtyEditors = UIUtils.getDirtyEditors();
+				List<IEditorPart> applicableEditors = new ArrayList<IEditorPart>();
+				if (dirtyEditors != null && dirtyEditors.length > 0)
+				{
+					IFile projectFile = null;
+
+					if (!StringUtil.isEmpty(fileName))
+					{
+						projectFile = project.getFile(fileName);
+
+						// If the file doesn't exist, then it doesn't need to be saved
+						if (projectFile == null || !projectFile.exists())
+						{
+							return;
+						}
+					}
+
+					for (IEditorPart editor : dirtyEditors)
+					{
+						IFile file = (IFile) (editor.getEditorInput().getAdapter(IFile.class));
+						if (file != null && (projectFile == null || file.equals(projectFile)))
+						{
+							applicableEditors.add(editor);
+						}
+					}
+
+					if (!CollectionsUtil.isEmpty(applicableEditors))
+					{
+						// prompt for save
+						if (MessageDialog.openQuestion(UIUtils.getActiveShell(),
+								Messages.EditorUtil_VerfiySavePromptTitle_lbl, promptQuestion))
+						{
+							for (IEditorPart editor : applicableEditors)
+							{
+								editor.doSave(new NullProgressMonitor());
+							}
+						}
+						else
+						{
+							result[0] = false;
+						}
+					}
+				}
+			}
+		});
+
+		return result[0];
 	}
 }

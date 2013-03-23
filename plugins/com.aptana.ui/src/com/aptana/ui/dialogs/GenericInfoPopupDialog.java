@@ -36,8 +36,8 @@ public class GenericInfoPopupDialog extends PopupDialog
 
 	private static final int POPUP_OFFSET = 20;
 
-	private String message;
-	private MouseListener clickListener;
+	protected String message;
+	protected MouseListener clickListener;
 
 	public GenericInfoPopupDialog(Shell parentShell, String title, String message)
 	{
@@ -71,12 +71,18 @@ public class GenericInfoPopupDialog extends PopupDialog
 		Composite main = new Composite(parent, SWT.NONE);
 		main.setLayout(GridLayoutFactory.swtDefaults().create());
 		main.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
-		main.addMouseListener(clickListener);
+		if (clickListener != null)
+		{
+			main.addMouseListener(clickListener);
+		}
 
 		Label infoLabel = new Label(main, SWT.WRAP);
 		infoLabel.setText(message);
 		infoLabel.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
-		infoLabel.addMouseListener(clickListener);
+		if (clickListener != null)
+		{
+			infoLabel.addMouseListener(clickListener);
+		}
 
 		return main;
 	}
@@ -85,7 +91,10 @@ public class GenericInfoPopupDialog extends PopupDialog
 	protected Control createTitleMenuArea(Composite parent)
 	{
 		Composite main = (Composite) super.createTitleMenuArea(parent);
-		main.addMouseListener(clickListener);
+		if (clickListener != null)
+		{
+			main.addMouseListener(clickListener);
+		}
 
 		ToolBar toolBar = new ToolBar(main, SWT.FLAT);
 		toolBar.addMouseListener(new MouseAdapter()

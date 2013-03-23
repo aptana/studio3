@@ -41,6 +41,7 @@ import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.ProcessRunnable;
 import com.aptana.core.util.ProcessUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.core.util.VersionUtil;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.IDebugScopes;
 import com.aptana.git.core.IPreferenceConstants;
@@ -453,7 +454,7 @@ public class GitExecutable
 
 		try
 		{
-			return Version.parseVersion(versionString);
+			return VersionUtil.parseVersion(versionString);
 		}
 		catch (Exception ex)
 		{

@@ -70,6 +70,9 @@
       <import plugin="com.aptana.portal.ui"/>
       <import plugin="com.aptana.buildpath.core"/>
       <import plugin="com.aptana.jira.core"/>
+      <import plugin="com.aptana.js.core"/>
+      <import plugin="com.aptana.dtd.core"/>
+      <import plugin="com.aptana.css.core"/>
    </requires>
 
    <plugin
@@ -406,6 +409,38 @@
 
    <plugin
          id="com.aptana.filesystem.http.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.js.core.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.dtd.core.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.xml.core.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.css.core.tests"
          download-size="0"
          install-size="0"
          version="0.0.0"

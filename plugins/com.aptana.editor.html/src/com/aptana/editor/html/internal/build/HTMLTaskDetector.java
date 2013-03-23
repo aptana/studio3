@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -20,13 +20,13 @@ import com.aptana.core.build.IProblem;
 import com.aptana.core.build.RequiredBuildParticipant;
 import com.aptana.core.resources.IMarkerConstants;
 import com.aptana.core.util.ArrayUtil;
-import com.aptana.editor.css.ICSSConstants;
-import com.aptana.editor.css.internal.build.CSSTaskDetector;
+import com.aptana.css.core.ICSSConstants;
+import com.aptana.css.core.build.CSSTaskDetector;
 import com.aptana.editor.html.parsing.ast.HTMLCommentNode;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
-import com.aptana.editor.js.IJSConstants;
-import com.aptana.editor.js.internal.build.JSTaskDetector;
 import com.aptana.index.core.build.BuildContext;
+import com.aptana.js.core.IJSConstants;
+import com.aptana.js.core.build.JSTaskDetector;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.util.ParseUtil;
@@ -40,7 +40,7 @@ import com.aptana.parsing.util.ParseUtil;
 public class HTMLTaskDetector extends RequiredBuildParticipant
 {
 
-	private static final String COMMENT_ENDING = "-->";
+	private static final String COMMENT_ENDING = "-->"; //$NON-NLS-1$
 	private static final String ELEMENT_SCRIPT = "script"; //$NON-NLS-1$
 	private static final String ATTRIBUTE_SRC = "src"; //$NON-NLS-1$
 

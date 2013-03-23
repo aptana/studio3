@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -10,8 +10,10 @@ package com.aptana.editor.json.outline;
 import junit.framework.TestCase;
 
 import com.aptana.editor.json.JSONPlugin;
-import com.aptana.editor.json.parsing.JSONParser;
-import com.aptana.editor.json.parsing.JSONScanner;
+import com.aptana.json.core.parsing.JSONParser;
+import com.aptana.parsing.IParseState;
+import com.aptana.parsing.ParseResult;
+import com.aptana.parsing.ParseState;
 
 public class JSONOutlineProviderTest extends TestCase
 {
@@ -19,7 +21,6 @@ public class JSONOutlineProviderTest extends TestCase
 	private JSONOutlineContentProvider fContentProvider;
 	private JSONOutlineLabelProvider fLabelProvider;
 	private JSONParser fParser;
-	private JSONScanner fScanner;
 
 	@Override
 	protected void setUp() throws Exception
@@ -27,7 +28,6 @@ public class JSONOutlineProviderTest extends TestCase
 		fContentProvider = new JSONOutlineContentProvider();
 		fLabelProvider = new JSONOutlineLabelProvider();
 		fParser = new JSONParser();
-		fScanner = new JSONScanner();
 	}
 
 	@Override
@@ -36,16 +36,15 @@ public class JSONOutlineProviderTest extends TestCase
 		fContentProvider = null;
 		fLabelProvider = null;
 		fParser = null;
-		fScanner = null;
 	}
 
 	public void testOutline() throws Exception
 	{
 		String source = "{\n\"name\": \"Product\",\n\"properties\": {\n\"required\": true,\n\"width\": 1024,\n\"optional\": null,\n\"days\": [\"Sunday\", \"Saturday\"]\n}\n}";
-		fScanner.setSource(source);
-		Object result = fParser.parse(fScanner);
+		IParseState parseState = new ParseState(source);
+		ParseResult result = fParser.parse(parseState);
 
-		Object[] children = fContentProvider.getChildren(result);
+		Object[] children = fContentProvider.getChildren(result.getRootNode());
 		assertEquals(1, children.length);
 		assertEquals("<Object>: Product", fLabelProvider.getText(children[0]));
 		assertEquals(JSONPlugin.getImage("icons/object-literal.png"), fLabelProvider.getImage(children[0]));

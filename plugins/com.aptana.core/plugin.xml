@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension-point id="userAgent" name="%extension-point.userAgent.name" schema="schema/userAgent.exsd"/>
+   <extension-point id="diagnostic" name="%extension-point.diagnostic.name" schema="schema/diagnostic.exsd"/>
+   <extension-point id="sourceMaps" name="%sourceMapsExtension.name" schema="schema/sourceMaps.exsd"/>
    <extension
          id="problem"
          name="%problem.marker.name"

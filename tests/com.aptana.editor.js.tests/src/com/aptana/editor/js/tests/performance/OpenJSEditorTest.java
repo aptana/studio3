@@ -30,7 +30,8 @@ import com.aptana.editor.epl.tests.EditorTestHelper;
 import com.aptana.editor.epl.tests.OpenEditorTest;
 import com.aptana.editor.epl.tests.ResourceTestHelper;
 import com.aptana.editor.js.JSPlugin;
-import com.aptana.editor.js.validator.JSLintValidator;
+import com.aptana.js.core.JSCorePlugin;
+import com.aptana.js.internal.core.build.JSLintValidator;
 
 public class OpenJSEditorTest extends OpenEditorTest
 {
@@ -244,7 +245,7 @@ public class OpenJSEditorTest extends OpenEditorTest
 			assertTrue("Failed to create an open project", project.isAccessible());
 
 			// Copy all project contents from under "performance"
-			Bundle bundle = Platform.getBundle("com.aptana.editor.js.tests");
+			Bundle bundle = Platform.getBundle(JSCorePlugin.PLUGIN_ID);
 			Enumeration<URL> urls = bundle.findEntries("performance", "*.js", true);
 			assertTrue("Got no performance files to copy", urls.hasMoreElements());
 			while (urls.hasMoreElements())

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
-<plugin>
-   <extension-point id="userAgent" name="%extension-point.userAgent.name" schema="schema/userAgent.exsd"/>
+<plugin>   
    <extension-point id="validator" name="%extension-point.validator.name" schema="schema/validator.exsd"/>
    <extension-point id="textHovers" name="%extension-point.textHovers.name" schema="schema/textHovers.exsd"/>
    <extension
@@ -568,7 +567,7 @@
       </target>
    </extension>
     <extension
-          point="com.aptana.editor.common.userAgent">
+          point="com.aptana.core.userAgent">
        <user-agent
              icon="icons/ie_icon.png"
              icon-disabled="icons/ie_icon_grey.png"

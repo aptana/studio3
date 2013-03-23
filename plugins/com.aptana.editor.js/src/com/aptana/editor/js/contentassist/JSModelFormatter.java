@@ -32,12 +32,12 @@ import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.hover.TagStripperAndTypeBolder;
 import com.aptana.editor.js.JSPlugin;
-import com.aptana.editor.js.JSTypeConstants;
-import com.aptana.editor.js.contentassist.model.FunctionElement;
-import com.aptana.editor.js.contentassist.model.ParameterElement;
-import com.aptana.editor.js.contentassist.model.PropertyElement;
-import com.aptana.editor.js.contentassist.model.SinceElement;
-import com.aptana.editor.js.contentassist.model.UserAgentElement;
+import com.aptana.js.core.JSTypeConstants;
+import com.aptana.js.core.model.FunctionElement;
+import com.aptana.js.core.model.ParameterElement;
+import com.aptana.js.core.model.PropertyElement;
+import com.aptana.js.core.model.SinceElement;
+import com.aptana.js.core.model.UserAgentElement;
 
 public class JSModelFormatter
 {

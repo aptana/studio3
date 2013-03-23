@@ -13,13 +13,13 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import com.aptana.core.build.IProblem;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.IOUtil;
-import com.aptana.editor.css.contentassist.index.CSSFileIndexingParticipant;
-import com.aptana.editor.js.contentassist.index.JSFileIndexingParticipant;
+import com.aptana.css.core.index.CSSFileIndexingParticipant;
 import com.aptana.index.core.FileStoreBuildContext;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.IndexPlugin;
 import com.aptana.index.core.build.BuildContext;
+import com.aptana.js.core.index.JSFileIndexingParticipant;
 
 public class HTMLFileIndexingParticipantTest extends TestCase
 {

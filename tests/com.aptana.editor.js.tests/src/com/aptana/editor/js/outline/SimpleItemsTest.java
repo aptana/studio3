@@ -10,7 +10,7 @@ package com.aptana.editor.js.outline;
 /**
  * @author Kevin Lindsey
  */
-public class SimpleItemsTest extends BaseOutlineItemTest
+public class SimpleItemsTest extends OutlineItemTestCase
 {
 
 	public void testGlobalVarArray()

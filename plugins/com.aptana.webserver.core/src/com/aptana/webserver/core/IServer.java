@@ -14,6 +14,7 @@ import java.util.Set;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.debug.core.ILaunch;
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.IProcess;
 
 import com.aptana.core.IURIMapper;
@@ -186,4 +187,6 @@ public interface IServer extends IURIMapper, Identifiable
 	 * @return
 	 */
 	public Set<String> getAvailableModes();
+
+	public IStatus start(String mode, ILaunch launch, IProgressMonitor monitor);
 }

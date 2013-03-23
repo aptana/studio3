@@ -15,11 +15,6 @@ public interface IPreferenceConstants
 	String COMMENT_INDENT_USE_STAR = "COMMENT_INDENT_USE_STAR"; //$NON-NLS-1$s
 
 	/**
-	 * The value is a double used to indicate the current format being used by the JS index categories.
-	 */
-	String JS_INDEX_VERSION = "JS_INDEX_VERSION"; //$NON-NLS-1$
-
-	/**
 	 * A pref key used to determine if comments are initially folded. Value is a boolean.
 	 */
 	String INITIALLY_FOLD_COMMENTS = "fold_comments"; //$NON-NLS-1$

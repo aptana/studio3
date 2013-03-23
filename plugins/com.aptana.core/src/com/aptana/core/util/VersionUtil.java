@@ -26,7 +26,7 @@ import com.aptana.core.logging.IdeLog;
 public final class VersionUtil
 {
 	// Match x.y and x.y.z
-	private static final String VERSION_SPLIT_PATTERN = "(\\d+)\\.(\\d+)(\\.(\\d+))?"; //$NON-NLS-1$
+	private static final String VERSION_SPLIT_PATTERN = "(\\d+)\\.(\\d+)(([a-zA-Z0-9_\\-]+)|(\\.(\\d+)(\\.?[a-zA-Z0-9_\\-]+)?))?"; //$NON-NLS-1$
 	// Match any dot separated string
 	private static Pattern VERSION_DOT_PATTERN = Pattern.compile("\\."); //$NON-NLS-1$
 
@@ -48,9 +48,46 @@ public final class VersionUtil
 	 */
 	public static int compareVersions(String left, String right)
 	{
+		return compareVersions(left, right, true);
+	}
+
+	/**
+	 * Compare version strings of the form A.B.C.D... Version strings can contain integers or strings. It will attempt
+	 * to compare individual '.'-delineated segments using an integer-based comparison first, and then will fall back to
+	 * strings if the integer comparison fails.
+	 * 
+	 * @param left
+	 * @param right
+	 * @param isStrict
+	 *            Specifies whether the versions should be formatted as "x.x.x" prior to the comparision
+	 * @return positive if left > right, zero if left == right, negative otherwise
+	 */
+	public static int compareVersions(String left, String right, boolean isStrict)
+	{
 		int result;
 		String[] lparts = VERSION_DOT_PATTERN.split(left);
 		String[] rparts = VERSION_DOT_PATTERN.split(right);
+
+		// Make versions equal length
+		if (!isStrict && lparts.length != rparts.length)
+		{
+			int diff = Math.abs(lparts.length - rparts.length);
+			String[] moreParts = new String[diff];
+			for (int i = 0; i < moreParts.length; i++)
+			{
+				moreParts[i] = "0"; //$NON-NLS-1$
+			}
+
+			if (lparts.length < rparts.length)
+			{
+				lparts = ArrayUtil.flatten(lparts, moreParts);
+			}
+			else
+			{
+				rparts = ArrayUtil.flatten(rparts, moreParts);
+			}
+		}
+
 		for (int i = 0; i < lparts.length && i < rparts.length; ++i)
 		{
 			try
@@ -76,7 +113,7 @@ public final class VersionUtil
 	 * Parse the raw output and return a {@link Version} instance out of it.
 	 * 
 	 * @param rawOutput
-	 * @return A {@link Version} instance. Null if the output did not contain a parsable version number.
+	 * @return A {@link Version} instance. Null if the output did not contain a parseable version number.
 	 */
 	public static Version parseVersion(String rawOutput)
 	{
@@ -84,7 +121,38 @@ public final class VersionUtil
 		Matcher matcher = pattern.matcher(rawOutput);
 		if (matcher.find())
 		{
-			String version = matcher.group();
+			String major = matcher.group(1);
+			String minor = matcher.group(2);
+			String micro;
+			String qualifier;
+			if (matcher.group(5) != null)
+			{
+				// We have 3 parts with an optional qualifier
+				micro = matcher.group(6);
+				qualifier = matcher.group(7);
+			}
+			else
+			{ // We have a major and minor with optional qualifier
+				qualifier = matcher.group(4);
+				micro = "0"; //$NON-NLS-1$
+			}
+			String version = major + '.' + minor + '.' + micro;
+			if (!StringUtil.isEmpty(qualifier))
+			{
+				char c = qualifier.charAt(0);
+				switch (c)
+				{
+					case '-':
+					case '_':
+					case '.':
+						qualifier = qualifier.substring(1);
+						break;
+
+					default:
+						break;
+				}
+				version = version + '.' + qualifier;
+			}
 			try
 			{
 				return Version.parseVersion(version);

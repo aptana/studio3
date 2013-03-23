@@ -16,9 +16,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.IStatus;
-
 import com.aptana.core.projects.templates.IProjectTemplate;
 import com.aptana.core.projects.templates.ProjectTemplate;
 import com.aptana.core.projects.templates.TemplateType;

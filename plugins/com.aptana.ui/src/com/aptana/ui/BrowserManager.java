@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.ui.internal.browser.BrowserDescriptorWorkingCopy;
 import org.eclipse.ui.internal.browser.IBrowserDescriptor;
 import org.eclipse.ui.internal.browser.IBrowserDescriptorWorkingCopy;
@@ -23,7 +24,6 @@ import com.aptana.core.util.BrowserUtil;
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.IBrowserUtil.BrowserInfo;
 import com.aptana.core.util.PlatformUtil;
-import com.aptana.core.util.StringUtil;
 
 /**
  * This is the BrowserManager counterpart to be used in Aptana Studio instead of the Eclipse BrowserManager. It wraps up
@@ -36,10 +36,9 @@ public class BrowserManager implements IBrowserProvider
 {
 
 	private static IBrowserProvider instance;
-
 	private static final String SAFARI_APP = "Safari.app"; //$NON-NLS-1$
 	private static final String SAFARI_PARAMS = "-a safari "; //$NON-NLS-1$
-	private static String openCommandPath; //$NON-NLS-1$
+	private static String openCommandPath;
 
 	public static synchronized IBrowserProvider getInstance()
 	{
@@ -52,7 +51,11 @@ public class BrowserManager implements IBrowserProvider
 
 	private BrowserManager()
 	{
-
+		IPath commandPath = ExecutableUtil.find("open", false, null); //$NON-NLS-1$
+		if (commandPath != null)
+		{
+			openCommandPath = commandPath.toOSString();
+		}
 	}
 
 	private String getRealPath(String loc)
@@ -67,6 +70,10 @@ public class BrowserManager implements IBrowserProvider
 		{
 			// Resolve links to see actual location
 			path = file.getCanonicalPath();
+			if (PlatformUtil.isMac() && path.contains(SAFARI_APP))
+			{
+				path = openCommandPath;
+			}
 		}
 		catch (IOException e)
 		{
@@ -154,14 +161,11 @@ public class BrowserManager implements IBrowserProvider
 		return BrowserUtil.getBrowserVersion(info);
 	}
 
+	@SuppressWarnings("restriction")
 	public void verifyBrowserConfigurations()
 	{
 		if (PlatformUtil.isMac())
 		{
-			if (StringUtil.isEmpty(openCommandPath))
-			{
-				openCommandPath = ExecutableUtil.find("open", false, null).toOSString(); //$NON-NLS-1$
-			}
 			List<IBrowserDescriptor> browsers = org.eclipse.ui.internal.browser.BrowserManager.getInstance()
 					.getWebBrowsers();
 			for (IBrowserDescriptor browser : browsers)

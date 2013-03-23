@@ -17,23 +17,6 @@
       </editor>
    </extension>
    <extension
-         point="org.eclipse.core.contenttype.contentTypes">
-      <content-type
-            base-type="org.eclipse.core.runtime.text"
-            file-extensions="json,jsca"
-            id="com.aptana.contenttype.json"
-            name="%content-type.name"
-            priority="normal">
-      </content-type>
-   </extension>
-   <extension
-         point="com.aptana.parsing.parser">
-      <parser
-            class="com.aptana.editor.json.parsing.JSONParser"
-            content-type="com.aptana.contenttype.json">
-      </parser>
-   </extension>
-   <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
             class="com.aptana.editor.json.preferences.JSONPreferenceInitializer">

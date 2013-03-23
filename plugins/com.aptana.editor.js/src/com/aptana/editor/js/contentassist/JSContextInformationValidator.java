@@ -19,9 +19,9 @@ import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.Color;
 
 import com.aptana.editor.common.contentassist.ILexemeProvider;
-import com.aptana.editor.js.parsing.JSFlexLexemeProvider;
-import com.aptana.editor.js.parsing.JSFlexScanner;
-import com.aptana.editor.js.parsing.lexer.JSTokenType;
+import com.aptana.editor.js.text.JSFlexLexemeProvider;
+import com.aptana.js.core.parsing.JSFlexScanner;
+import com.aptana.js.core.parsing.JSTokenType;
 import com.aptana.parsing.lexer.Lexeme;
 import com.aptana.theme.ColorManager;
 import com.aptana.theme.Theme;

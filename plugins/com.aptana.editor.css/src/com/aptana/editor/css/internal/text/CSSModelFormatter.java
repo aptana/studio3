@@ -22,14 +22,14 @@ import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.URIUtil;
+import com.aptana.css.core.model.ElementElement;
+import com.aptana.css.core.model.ICSSMetadataElement;
+import com.aptana.css.core.model.PropertyElement;
+import com.aptana.css.core.model.PseudoClassElement;
+import com.aptana.css.core.model.PseudoElementElement;
+import com.aptana.css.core.model.SpecificationElement;
+import com.aptana.css.core.model.UserAgentElement;
 import com.aptana.editor.common.hover.TagStripperAndTypeBolder;
-import com.aptana.editor.css.contentassist.model.ElementElement;
-import com.aptana.editor.css.contentassist.model.ICSSMetadataElement;
-import com.aptana.editor.css.contentassist.model.PropertyElement;
-import com.aptana.editor.css.contentassist.model.PseudoClassElement;
-import com.aptana.editor.css.contentassist.model.PseudoElementElement;
-import com.aptana.editor.css.contentassist.model.SpecificationElement;
-import com.aptana.editor.css.contentassist.model.UserAgentElement;
 
 /**
  * @author cwilliams

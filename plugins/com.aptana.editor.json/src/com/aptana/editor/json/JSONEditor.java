@@ -20,6 +20,7 @@ import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.json.internal.text.JSONFoldingComputer;
 import com.aptana.editor.json.outline.JSONOutlineContentProvider;
 import com.aptana.editor.json.outline.JSONOutlineLabelProvider;
+import com.aptana.json.core.IJSONConstants;
 
 @SuppressWarnings("restriction")
 public class JSONEditor extends AbstractThemeableEditor

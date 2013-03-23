@@ -28,13 +28,13 @@ import com.aptana.editor.common.text.rules.MultiCharacterRule;
 import com.aptana.editor.common.text.rules.QueuedRuleBasedScanner;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
 import com.aptana.editor.css.CSSCodeScannerFlex;
-import com.aptana.editor.html.internal.text.rules.AttributeNameWordDetector;
-import com.aptana.editor.html.internal.text.rules.BrokenStringRule;
-import com.aptana.editor.html.internal.text.rules.TagNameWordDetector;
-import com.aptana.editor.html.internal.text.rules.TagWordRule;
 import com.aptana.editor.html.parsing.HTMLUtils;
 import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
-import com.aptana.editor.js.JSCodeScanner;
+import com.aptana.editor.js.text.JSCodeScanner;
+import com.aptana.editor.xml.text.rules.AttributeNameWordDetector;
+import com.aptana.editor.xml.text.rules.BrokenStringRule;
+import com.aptana.editor.xml.text.rules.TagNameWordDetector;
+import com.aptana.editor.xml.text.rules.TagWordRule;
 
 /**
  * @author Max Stepanov

@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -8,6 +8,7 @@
 package com.aptana.js.debug.core.internal.model;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.MessageFormat;
 import java.util.Vector;
 
@@ -19,6 +20,8 @@ import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
 
+import com.aptana.core.logging.IdeLog;
+import com.aptana.core.sourcemap.ISourceMapResult;
 import com.aptana.core.util.StringUtil;
 import com.aptana.js.debug.core.JSDebugPlugin;
 import com.aptana.js.debug.core.internal.Util;
@@ -419,6 +422,21 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 				}
 				URI sourceFile = target.resolveSourceFile(Util.decodeData(subargs[j++]));
 				int sourceLine = Integer.parseInt(subargs[j++]);
+				ISourceMapResult sourceMapResult = target.getOriginalMappedLocation(sourceFile, sourceLine);
+				if (sourceMapResult != null)
+				{
+					// We have mapping, so adjust the source location and line number to represent the original
+					// location.
+					try
+					{
+						sourceFile = new URI(sourceFile.getScheme(), null, sourceMapResult.getFile().toOSString(), null);
+						sourceLine = sourceMapResult.getLineNumber();
+					}
+					catch (URISyntaxException e)
+					{
+						IdeLog.logError(JSDebugPlugin.getDefault(), e);
+					}
+				}
 				++j; // skip native flag
 				long pc = Long.parseLong(subargs[j++]);
 				int scriptTag = Integer.parseInt(subargs[j++]);

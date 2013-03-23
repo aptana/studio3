@@ -35,8 +35,10 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPathEditorInput;
 import org.eclipse.ui.IPerspectiveDescriptor;
+import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.IURIEditorInput;
 import org.eclipse.ui.IViewPart;
@@ -58,6 +60,7 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.ui.UIPlugin;
 import com.aptana.ui.dialogs.GenericInfoPopupDialog;
+import com.aptana.ui.internal.WebPerspectiveFactory;
 
 /**
  * @author Max Stepanov
@@ -236,6 +239,35 @@ public final class UIUtils
 		if (evaluationService != null)
 		{
 			return getSelectedResource(evaluationService.getCurrentState());
+		}
+		return null;
+	}
+
+	public static IProject getSelectedProjectInExplorer()
+	{
+		IProject selectedProject = getSelectedProject(WebPerspectiveFactory.APP_EXPLORER_ID);
+		if (selectedProject == null)
+		{
+			selectedProject = getSelectedProject(IPageLayout.ID_PROJECT_EXPLORER);
+		}
+		return selectedProject;
+	}
+
+	private static IProject getSelectedProject(String viewID)
+	{
+		ISelectionService service = UIUtils.getActiveWorkbenchWindow().getSelectionService();
+		IStructuredSelection structured = (IStructuredSelection) service.getSelection(viewID);
+		if (structured instanceof IStructuredSelection)
+		{
+			Object selectedObject = ((IStructuredSelection) structured).getFirstElement();
+			if (selectedObject instanceof IAdaptable)
+			{
+				IResource resource = (IResource) ((IAdaptable) selectedObject).getAdapter(IResource.class);
+				if (resource != null)
+				{
+					return resource.getProject();
+				}
+			}
 		}
 		return null;
 	}

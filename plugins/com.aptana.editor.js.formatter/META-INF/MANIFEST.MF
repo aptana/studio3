@@ -5,17 +5,18 @@ Bundle-SymbolicName: com.aptana.editor.js.formatter;singleton:=true
 Bundle-Version: 3.0.3.qualifier
 Bundle-Activator: com.aptana.editor.js.formatter.JSFormatterPlugin
 Bundle-Vendor: %Bundle-Vendor
-Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime,
+Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
+ beaver,
+ com.aptana.core;bundle-version="3.0.4",
+ com.aptana.parsing,
+ com.aptana.js.core;bundle-version="3.0.0",
  org.eclipse.jface.text,
+ org.eclipse.ui,
  org.eclipse.ui.editors,
  org.eclipse.ui.forms,
- com.aptana.core;bundle-version="3.0.4",
  com.aptana.formatter.epl;bundle-version="3.2.0",
  com.aptana.formatter.ui.epl,
- beaver,
- com.aptana.parsing,
  com.aptana.ui,
  com.aptana.ui.epl,
  com.aptana.editor.common,

@@ -221,15 +221,23 @@ public class CommonPresentationReconciler extends PresentationReconciler
 						ITextViewer viewer = textViewer;
 						if (viewer != null)
 						{
-							StyledText widget = viewer.getTextWidget();
-							if (widget != null && !widget.isDisposed())
+							try
 							{
-								viewer.changeTextPresentation(presentation[0], true);
+								StyledText widget = viewer.getTextWidget();
+								if (widget != null && !widget.isDisposed())
+								{
+									viewer.changeTextPresentation(presentation[0], true);
+								}
+								// save visible region here since UI thread access required
+								int topOffset = viewer.getTopIndexStartOffset();
+								int length = viewer.getBottomIndexEndOffset() - topOffset;
+								viewerVisibleRegion = new Region(topOffset, Math.max(length, minimalVisibleLength));
 							}
-							// save visible region here since UI thread access required
-							int topOffset = viewer.getTopIndexStartOffset();
-							int length = viewer.getBottomIndexEndOffset() - topOffset;
-							viewerVisibleRegion = new Region(topOffset, Math.max(length, minimalVisibleLength));
+							catch (Exception e)
+							{
+								IdeLog.logWarning(CommonEditorPlugin.getDefault(),
+										"Problem with processing text presentation: " + e.getMessage()); //$NON-NLS-1$
+							}
 						}
 					}
 				});

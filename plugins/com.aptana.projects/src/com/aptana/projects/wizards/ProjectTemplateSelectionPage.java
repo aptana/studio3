@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.jface.dialogs.Dialog;
@@ -35,8 +36,11 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Color;
@@ -44,12 +48,14 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.projects.templates.IProjectTemplate;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.CollectionsUtil;
@@ -68,6 +74,7 @@ import com.aptana.ui.widgets.StepIndicatorComposite;
  */
 public class ProjectTemplateSelectionPage extends WizardPage implements IStepIndicatorWizardPage
 {
+	private static final int TEMPLATES_COMPOSITE_WIDTH = 450;
 	public static final String COMMAND_PROJECT_FROM_TEMPLATE_PROJECT_TEMPLATE_NAME = "projectTemplateId"; //$NON-NLS-1$
 	public static final String COMMAND_PROJECT_FROM_TEMPLATE_NEW_WIZARD_ID = "newWizardId"; //$NON-NLS-1$
 
@@ -91,6 +98,8 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 
 	protected StepIndicatorComposite stepIndicatorComposite;
 	protected String[] stepNames;
+
+	private Composite templatesDescriptionComp;
 
 	private ISelectionChangedListener tagSelectionChangedListener = new ISelectionChangedListener()
 	{
@@ -155,11 +164,14 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 					defaultTemplateImage.dispose();
 					defaultTemplateImage = null;
 				}
-				for (Image image : templateImages.values())
+				if (templateImages != null)
 				{
-					if (!image.isDisposed())
+					for (Image image : templateImages.values())
 					{
-						image.dispose();
+						if (image != null && !image.isDisposed())
+						{
+							image.dispose();
+						}
 					}
 				}
 				templateImages = null;
@@ -192,7 +204,9 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 				List<IProjectTemplate> templates = templateTagsMap.get(tag);
 				for (IProjectTemplate template : templates)
 				{
-					if (template instanceof IDefaultProjectTemplate)
+					if (template instanceof IDefaultProjectTemplate
+							|| (!StringUtil.isEmpty(template.getDisplayName()) && template.getDisplayName().contains(
+									"Default"))) //$NON-NLS-1$
 					{
 						foundDefault = true;
 						setSelectedTemplate(tag, template);
@@ -211,8 +225,85 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 			}
 		}
 
+		// Let left/right arrow keys traverse "list" of templates
+		KeyListener keyListener = new KeyListener()
+		{
+			public void keyReleased(KeyEvent e)
+			{
+			}
+
+			public void keyPressed(KeyEvent e)
+			{
+				if (e.keyCode == SWT.ARROW_RIGHT)
+				{
+					setSelectedTemplate(getNextTemplate(fSelectedTemplate));
+				}
+				else if (e.keyCode == SWT.ARROW_LEFT)
+				{
+					setSelectedTemplate(getPreviousTemplate(fSelectedTemplate));
+				}
+			}
+		};
+		// When template list has focus this takes effect
+		templatesListComposite.addKeyListener(keyListener);
+		// When tag list has focus, still let left/right key listener work
+		tagsListViewer.getTable().addKeyListener(keyListener);
+		tagsListViewer.getTable().setFocus();
+
 		Dialog.applyDialogFont(main);
 		setControl(main);
+	}
+
+	private int getTemplateIndex(IProjectTemplate template)
+	{
+		Control[] children = templatesListComposite.getChildren();
+		for (Entry<Composite, IProjectTemplate> entry : templateControlMap.entrySet())
+		{
+			if (entry.getValue().equals(template))
+			{
+				Composite comp = entry.getKey();
+				for (int i = 0; i < children.length; i++)
+				{
+					if (comp == children[i])
+					{
+						return i;
+					}
+				}
+			}
+		}
+		return -1;
+	}
+
+	protected IProjectTemplate getPreviousTemplate(IProjectTemplate selectedTemplate)
+	{
+		int index = getTemplateIndex(selectedTemplate);
+		if (index == -1)
+		{
+			return selectedTemplate;
+		}
+		Control[] children = templatesListComposite.getChildren();
+		int prevIndex = index - 1;
+		if (prevIndex < 0)
+		{
+			prevIndex = children.length - 1;
+		}
+		return templateControlMap.get(children[prevIndex]);
+	}
+
+	protected IProjectTemplate getNextTemplate(IProjectTemplate selectedTemplate)
+	{
+		int index = getTemplateIndex(selectedTemplate);
+		if (index == -1)
+		{
+			return selectedTemplate;
+		}
+		Control[] children = templatesListComposite.getChildren();
+		int nextIndex = index + 1;
+		if (nextIndex >= children.length)
+		{
+			nextIndex = 0;
+		}
+		return templateControlMap.get(children[nextIndex]);
 	}
 
 	private Composite createTemplatesList(Composite parent)
@@ -284,7 +375,8 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 		templatesListComposite = new Composite(rightComp, SWT.NONE);
 		templatesListComposite.setLayout(RowLayoutFactory.swtDefaults().extendedMargins(5, 5, 5, 5).spacing(10)
 				.fill(true).create());
-		templatesListComposite.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).hint(450, 250).create());
+		templatesListComposite.setLayoutData(GridDataFactory.fillDefaults().grab(true, true)
+				.hint(TEMPLATES_COMPOSITE_WIDTH, 250).create());
 		templatesListComposite.setBackground(background);
 
 		Label separator = new Label(rightComp, SWT.SEPARATOR | SWT.HORIZONTAL);
@@ -296,17 +388,24 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 		return main;
 	}
 
-	protected Composite createTemplateDescription(Composite parent)
+	protected Composite createTemplateDescription(final Composite parent)
 	{
-		Composite main = new Composite(parent, SWT.NONE);
-		main.setLayout(GridLayoutFactory.swtDefaults().extendedMargins(7, 0, 0, 0).numColumns(2).create());
-		Color background = main.getDisplay().getSystemColor(SWT.COLOR_WHITE);
-		main.setBackground(background);
+		ScrolledComposite scrolledComp = new ScrolledComposite(parent, SWT.V_SCROLL);
+		scrolledComp.setLayout(new FillLayout());
+		templatesDescriptionComp = new Composite(scrolledComp, SWT.NONE);
+		templatesDescriptionComp.setLayout(GridLayoutFactory.swtDefaults().extendedMargins(7, 0, 0, 0).numColumns(2)
+				.create());
 
-		previewImage = new Label(main, SWT.CENTER);
+		scrolledComp.setContent(templatesDescriptionComp);
+
+		Color background = templatesDescriptionComp.getDisplay().getSystemColor(SWT.COLOR_WHITE);
+		scrolledComp.setBackground(background);
+		templatesDescriptionComp.setBackground(background);
+
+		previewImage = new Label(templatesDescriptionComp, SWT.CENTER);
 		previewImage.setBackground(background);
 		previewImage.setLayoutData(GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.CENTER).create());
-		previewLabel = new Label(main, SWT.LEFT);
+		previewLabel = new Label(templatesDescriptionComp, SWT.LEFT);
 		previewLabel.setBackground(background);
 		previewLabel.setLayoutData(GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false)
 				.create());
@@ -326,11 +425,12 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 			}
 		});
 
-		previewDescription = new Label(main, SWT.WRAP);
+		previewDescription = new Label(templatesDescriptionComp, SWT.WRAP);
 		previewDescription.setBackground(background);
 		previewDescription.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).span(2, 1).create());
 
-		return main;
+		templatesDescriptionComp.setSize(templatesDescriptionComp.computeSize(TEMPLATES_COMPOSITE_WIDTH, SWT.DEFAULT));
+		return scrolledComp;
 	}
 
 	private void setSelectedTag(String tag)
@@ -421,6 +521,9 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 		String text = (template == null) ? null : template.getDescription();
 		previewDescription.setText(text == null ? StringUtil.EMPTY : text);
 		fSelectedTemplate = template;
+
+		templatesDescriptionComp.layout();
+		templatesDescriptionComp.setSize(templatesDescriptionComp.computeSize(TEMPLATES_COMPOSITE_WIDTH, SWT.DEFAULT));
 	}
 
 	private void setSelectedTemplate(String tag, IProjectTemplate template)
@@ -438,24 +541,30 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 			URL iconPath = template.getIconURL();
 			if (iconPath != null)
 			{
-				ImageDescriptor descriptor = ImageDescriptor.createFromURL(iconPath);
-				if (descriptor != null)
+				try
 				{
-					image = descriptor.createImage(false);
-					if (image != null)
+					ImageDescriptor descriptor = ImageDescriptor.createFromURL(iconPath);
+					if (descriptor != null)
 					{
-						// Scale the image to 48x48 in case it's not.
-						ImageData imageData = image.getImageData();
-						if (imageData.x != IMAGE_SIZE || imageData.y != IMAGE_SIZE)
+						image = descriptor.createImage(false);
+						if (image != null)
 						{
-							// dispose the previous one
-							image.dispose();
-							// Scale the image data and create a new image
-							imageData = imageData.scaledTo(IMAGE_SIZE, IMAGE_SIZE);
-							image = ImageDescriptor.createFromImageData(imageData).createImage();
+							// Scale the image to 48x48 in case it's not.
+							ImageData imageData = image.getImageData();
+							if (imageData.x != IMAGE_SIZE || imageData.y != IMAGE_SIZE)
+							{
+								// dispose the previous one
+								image.dispose();
+								// Scale the image data and create a new image
+								imageData = imageData.scaledTo(IMAGE_SIZE, IMAGE_SIZE);
+								image = ImageDescriptor.createFromImageData(imageData).createImage();
+							}
 						}
 					}
-
+				}
+				catch (Exception e)
+				{
+					IdeLog.logWarning(ProjectsPlugin.getDefault(), "Failed to retrieve the template's image: " + e); //$NON-NLS-1$
 				}
 			}
 			if (image == null)

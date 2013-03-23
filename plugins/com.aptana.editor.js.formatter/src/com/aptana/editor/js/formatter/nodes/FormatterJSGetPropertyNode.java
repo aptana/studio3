@@ -7,10 +7,10 @@
  */
 package com.aptana.editor.js.formatter.nodes;
 
-import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
-import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
+import com.aptana.js.core.parsing.ast.IJSNodeTypes;
+import com.aptana.js.core.parsing.ast.JSNode;
 
 /**
  * JS formatter node for get-property nodes (a.b.c).

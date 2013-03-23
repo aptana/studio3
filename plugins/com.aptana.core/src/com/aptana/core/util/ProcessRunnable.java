@@ -31,7 +31,7 @@ public class ProcessRunnable implements Runnable
 	protected Process p;
 	protected IProgressMonitor monitor;
 	protected IStatus status;
-	private boolean isErrRedirected;
+	protected boolean isErrRedirected;
 
 	public ProcessRunnable(Process p, IProgressMonitor monitor, boolean isErrRedirected)
 	{

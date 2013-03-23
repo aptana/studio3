@@ -29,7 +29,6 @@ import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
 import com.aptana.core.IMap;
-import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.replace.RegexPatternReplacer;
@@ -40,14 +39,13 @@ import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.js.actions.IJSActions;
 import com.aptana.editor.js.actions.OpenDeclarationAction;
 import com.aptana.editor.js.contentassist.JSModelFormatter;
-import com.aptana.editor.js.contentassist.model.PropertyElement;
-import com.aptana.editor.js.contentassist.model.SinceElement;
 import com.aptana.editor.js.internal.JSModelUtil;
 import com.aptana.editor.js.internal.text.JSFoldingComputer;
 import com.aptana.editor.js.outline.JSOutlineContentProvider;
 import com.aptana.editor.js.outline.JSOutlineLabelProvider;
-import com.aptana.editor.js.parsing.JSParseState;
-import com.aptana.parsing.ParserPoolFactory;
+import com.aptana.js.core.IJSConstants;
+import com.aptana.js.core.model.PropertyElement;
+import com.aptana.js.core.model.SinceElement;
 import com.aptana.parsing.ast.INameNode;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
@@ -364,32 +362,6 @@ public class JSSourceEditor extends AbstractThemeableEditor
 	public String getContentType()
 	{
 		return IJSConstants.CONTENT_TYPE_JS;
-	}
-
-	/**
-	 * Overridden to collect comments if folding is enabled.
-	 */
-	@Override
-	public IParseRootNode getReconcileAST()
-	{
-		return doGetAST(getDocument());
-	}
-
-	@Override
-	protected IParseRootNode doGetAST(IDocument document)
-	{
-		try
-		{
-			// Don't attach or collect comments for hovers/outline
-			JSParseState parseState = new JSParseState(document.get(), 0, true, true);
-			return ParserPoolFactory.parse(getContentType(), parseState).getRootNode();
-		}
-		catch (Exception e)
-		{
-			IdeLog.logTrace(JSPlugin.getDefault(), "Failed to parse JS editor contents", e, //$NON-NLS-1$
-					com.aptana.parsing.IDebugScopes.PARSING);
-		}
-		return null;
 	}
 
 	@Override

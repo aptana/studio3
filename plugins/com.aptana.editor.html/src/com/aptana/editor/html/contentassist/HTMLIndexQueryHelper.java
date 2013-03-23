@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.aptana.core.util.StringUtil;
-import com.aptana.editor.css.contentassist.index.ICSSIndexConstants;
+import com.aptana.css.core.index.ICSSIndexConstants;
 import com.aptana.editor.html.contentassist.index.HTMLIndexReader;
 import com.aptana.editor.html.contentassist.index.IHTMLIndexConstants;
 import com.aptana.editor.html.contentassist.model.AttributeElement;

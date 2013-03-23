@@ -13,15 +13,16 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import com.aptana.jetty.util.epl.ajax.JSON;
-import com.aptana.jetty.util.epl.ajax.JSON.Convertible;
-import com.aptana.jetty.util.epl.ajax.JSON.Output;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.configurations.ConfigurationsPlugin;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.jetty.util.epl.ajax.JSON;
+import com.aptana.jetty.util.epl.ajax.JSON.Convertible;
+import com.aptana.jetty.util.epl.ajax.JSON.Output;
 
 /**
  * This class represents a state of a configuration.<br>
@@ -64,6 +65,7 @@ public class ConfigurationStatus implements Convertible
 	private String configurationProcessorId;
 	private AbstractConfigurationProcessor processor;
 	private Set<String> notificationSet;
+	private IStatus additionalStatus;
 
 	/**
 	 * Constructs a new ConfigurationStatus with a given status.
@@ -121,6 +123,28 @@ public class ConfigurationStatus implements Convertible
 	public String getStatus()
 	{
 		return getAttribute(STATUS);
+	}
+
+	/**
+	 * Sets an optional additional status to this {@link ConfigurationStatus} instance. This status can later be used to
+	 * display better success/failure information to the user.
+	 * 
+	 * @param status
+	 */
+	public void setAdditionalStatus(IStatus status)
+	{
+		this.additionalStatus = status;
+	}
+
+	/**
+	 * Returns additional status information that was attached to this instance.
+	 * 
+	 * @return Any additional {@link IStatus} that was attached to this {@link ConfigurationStatus} instance (can be
+	 *         <code>null</code>).
+	 */
+	public IStatus getAdditionalStatus()
+	{
+		return additionalStatus;
 	}
 
 	/**

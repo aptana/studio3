@@ -679,4 +679,36 @@ public class StringUtilTest extends TestCase
 		assertEquals("", StringUtil.dotFirst(""));
 		assertEquals("aa", StringUtil.dotFirst("aa"));
 	}
+
+	public void testIndexOf() throws Exception
+	{
+		assertEquals(0, StringUtil.indexOf("abcdabcd", 0, 'a'));
+		assertEquals(-1, StringUtil.indexOf("abcdabcd", 0, 'z'));
+		assertEquals(4, StringUtil.indexOf("abcdabcd", 1, 'a'));
+		assertEquals(-1, StringUtil.indexOf("abcdabcd", 5, 'a'));
+		assertEquals("abcdabcd".indexOf('a', -1), StringUtil.indexOf("abcdabcd", -1, 'a'));
+		assertEquals("abcdabcd".indexOf('a', 100), StringUtil.indexOf("abcdabcd", 100, 'a'));
+
+		assertEquals(2, StringUtil.indexOf("abcdabcd", 0, 'c', 'd'));
+		assertEquals(-1, StringUtil.indexOf("abcdabcd", 0, 'z', 'x', 'y'));
+		assertEquals(3, StringUtil.indexOf("abcdabcd", 1, 'a', 'd'));
+		assertEquals(3, StringUtil.indexOf("abcdabcd", 1, 'x', 'd'));
+	}
+
+	public void testLastIndexOf() throws Exception
+	{
+		assertEquals("Should find from fromIndex inclusively", 0, StringUtil.lastIndexOf("abcdabcd", 0, 'a'));
+		assertEquals(-1, StringUtil.lastIndexOf("abcdabcd", 0, 'z'));
+		assertEquals(0, StringUtil.lastIndexOf("abcdabcd", 3, 'a'));
+		assertEquals(-1, StringUtil.lastIndexOf("abcdabcd", -1, 'a'));
+		assertEquals("abcdabcd".lastIndexOf('a', -1), StringUtil.lastIndexOf("abcdabcd", -1, 'a'));
+		assertEquals("abcdabcd".lastIndexOf('a', 100), StringUtil.lastIndexOf("abcdabcd", 100, 'a'));
+
+		assertEquals(0, StringUtil.lastIndexOf("abcdabcd", 0, 'a', 'c'));
+		assertEquals(-1, StringUtil.lastIndexOf("abcdabcd", 0, 'z', 'x', 'y'));
+		assertEquals(4, StringUtil.lastIndexOf("abcdabcd", 6, 'a', 'd'));
+		assertEquals("search should be inclusive of index given", 7, StringUtil.lastIndexOf("abcdabcd", 7, 'a', 'd'));
+		assertEquals("search should be inclusive of index given", 7, StringUtil.lastIndexOf("abcdabcd", 7, 'x', 'd'));
+		assertEquals(3, StringUtil.lastIndexOf("abcdabcd", 6, 'x', 'd'));
+	}
 }

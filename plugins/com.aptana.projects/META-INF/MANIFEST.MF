@@ -5,7 +5,7 @@ Bundle-SymbolicName: com.aptana.projects;singleton:=true
 Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.projects.ProjectsPlugin
 Bundle-Vendor: %providerName
-Require-Bundle: com.aptana.core,
+Require-Bundle: com.aptana.core;visibility:=reexport,
  com.aptana.buildpath.core,
  com.aptana.scripting,
  org.eclipse.ui.ide;visibility:=reexport,

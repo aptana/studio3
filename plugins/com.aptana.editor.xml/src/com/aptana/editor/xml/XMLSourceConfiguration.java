@@ -18,8 +18,8 @@ import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.source.ISourceViewer;
 
+import com.aptana.dtd.core.IDTDConstants;
 import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.CommonUtil;
 import com.aptana.editor.common.IPartitioningConfiguration;
@@ -34,9 +34,10 @@ import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.TagRule;
 import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
 import com.aptana.editor.dtd.DTDSourceConfiguration;
-import com.aptana.editor.dtd.IDTDConstants;
-import com.aptana.editor.xml.internal.IXMLScopes;
+import com.aptana.editor.xml.contentassist.XMLContentAssistProcessor;
 import com.aptana.editor.xml.internal.text.rules.DocTypeRule;
+import com.aptana.xml.core.IXMLConstants;
+import com.aptana.xml.core.IXMLScopes;
 
 /**
  * @author Max Stepanov
@@ -192,7 +193,7 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 		{
 			return DTDSourceConfiguration.getDefault().getContentAssistProcessor(editor, contentType);
 		}
-		return new CommonContentAssistProcessor(editor);
+		return new XMLContentAssistProcessor(editor);
 	}
 
 	private ITokenScanner getCommentScanner()

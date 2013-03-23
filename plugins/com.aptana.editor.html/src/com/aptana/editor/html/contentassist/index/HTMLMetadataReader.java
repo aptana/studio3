@@ -19,7 +19,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.editor.common.contentassist.MetadataReader;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.contentassist.model.AttributeElement;
 import com.aptana.editor.html.contentassist.model.ElementElement;
@@ -28,6 +27,7 @@ import com.aptana.editor.html.contentassist.model.EventElement;
 import com.aptana.editor.html.contentassist.model.SpecificationElement;
 import com.aptana.editor.html.contentassist.model.UserAgentElement;
 import com.aptana.editor.html.contentassist.model.ValueElement;
+import com.aptana.index.core.MetadataReader;
 
 /**
  * @author Kevin Lindsey

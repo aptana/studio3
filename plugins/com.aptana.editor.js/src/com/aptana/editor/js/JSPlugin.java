@@ -7,7 +7,6 @@
  */
 package com.aptana.editor.js;
 
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
@@ -85,8 +84,6 @@ public class JSPlugin extends AbstractUIPlugin
 	{
 		super.start(context);
 		PLUGIN = this;
-		Job job = new JSMetadataLoader();
-		job.schedule();
 	}
 
 	/*

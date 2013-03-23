@@ -16,14 +16,6 @@
       </participant>
   </extension>
   <extension
-         point="com.aptana.index.core.fileContributors">
-      <contributor
-            class="com.aptana.buildpath.core.BuildPathIndexContributor"
-            id="com.aptana.buildpath.core.buildPathIndexContributor"
-            name="Build Path Index Contributor">
-      </contributor>
-  </extension>
-  <extension
        id="com.aptana.ide.core.unifiedBuilder"
        name="%builder.name"
        point="org.eclipse.core.resources.builders">

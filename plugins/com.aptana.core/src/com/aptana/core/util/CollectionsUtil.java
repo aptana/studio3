@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +53,29 @@ public class CollectionsUtil
 			{
 				((ArrayList<T>) list).trimToSize();
 			}
+		}
+
+		return list;
+	}
+
+	/**
+	 * Add a varargs list of items to the specified list. If the list or items array are null, then no action is
+	 * performed. Note that the destination list has no requirements other than it must be a List of the source item's
+	 * type. This allows the destination to be used, for example, as an accumulator.<br>
+	 * <br>
+	 * Note that this method is not thread safe. Users of this method will need to maintain type safety against the
+	 * list.
+	 * 
+	 * @param list
+	 *            A list to which items will be added
+	 * @param items
+	 *            A list of items to add
+	 */
+	public static final <T, U extends T> List<T> addToList(List<T> list, List<U> items)
+	{
+		if (list != null && items != null)
+		{
+			list.addAll(items);
 		}
 
 		return list;
@@ -259,6 +283,23 @@ public class CollectionsUtil
 		}
 
 		return set;
+	}
+
+	/**
+	 * This is a convenience method to return the first element from a list. If the list is empty, then null is
+	 * returned.
+	 * 
+	 * @param list
+	 * @return
+	 */
+	public static <T> T getFirstElement(List<T> list)
+	{
+		if (!isEmpty(list))
+		{
+			return list.get(0);
+		}
+
+		return null;
 	}
 
 	/**
@@ -486,6 +527,20 @@ public class CollectionsUtil
 	public static final <T> Map<T, T> newMap(T... items)
 	{
 		return addToMap(new HashMap<T, T>(items != null ? items.length / 2 : 0), items);
+	}
+
+	/**
+	 * Convert a list of items into a Set. An empty set is returned if items is null
+	 * 
+	 * @param <T>
+	 *            Any type of object
+	 * @param items
+	 *            A variable length list of items of type T
+	 * @return Returns a new HashSet<T> or an empty set
+	 */
+	public static final <T> Map<T, T> newInOrderMap(T... items)
+	{
+		return addToMap(new LinkedHashMap<T, T>(items != null ? items.length / 2 : 0), items);
 	}
 
 	/**

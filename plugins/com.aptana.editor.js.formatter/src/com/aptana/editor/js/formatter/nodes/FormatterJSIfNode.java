@@ -8,9 +8,9 @@
 package com.aptana.editor.js.formatter.nodes;
 
 import com.aptana.editor.js.formatter.JSFormatterConstants;
-import com.aptana.editor.js.parsing.ast.JSIfNode;
-import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
 import com.aptana.formatter.IFormatterDocument;
+import com.aptana.js.core.parsing.ast.IJSNodeTypes;
+import com.aptana.js.core.parsing.ast.JSIfNode;
 import com.aptana.parsing.ast.IParseNode;
 
 /**

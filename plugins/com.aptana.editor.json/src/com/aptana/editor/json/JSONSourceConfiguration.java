@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -27,8 +27,9 @@ import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
-import com.aptana.editor.json.parsing.lexer.JSONTokenType;
+import com.aptana.editor.json.text.rules.IJSONScopes;
 import com.aptana.editor.json.text.rules.JSONPropertyRule;
+import com.aptana.json.core.IJSONConstants;
 
 public class JSONSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration
 {
@@ -42,11 +43,11 @@ public class JSONSourceConfiguration implements IPartitioningConfiguration, ISou
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IJSONConstants.CONTENT_TYPE_JSON } };
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] { //
-		new JSONPropertyRule( //
+	new JSONPropertyRule( //
 			getToken(STRING_SINGLE), //
 			getToken(STRING_DOUBLE), //
 			getToken(PROPERTY) //
-		) //
+	) //
 	};
 
 	private static JSONSourceConfiguration instance;
@@ -66,10 +67,13 @@ public class JSONSourceConfiguration implements IPartitioningConfiguration, ISou
 		{
 			IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
 
-			c.addTranslation(new QualifiedContentType(IJSONConstants.CONTENT_TYPE_JSON), new QualifiedContentType("source.json")); //$NON-NLS-1$
-			c.addTranslation(new QualifiedContentType(PROPERTY), new QualifiedContentType(JSONTokenType.PROPERTY.getScope()));
-			c.addTranslation(new QualifiedContentType(STRING_DOUBLE), new QualifiedContentType(JSONTokenType.STRING_DOUBLE.getScope()));
-			c.addTranslation(new QualifiedContentType(STRING_SINGLE), new QualifiedContentType(JSONTokenType.STRING_SINGLE.getScope()));
+			c.addTranslation(new QualifiedContentType(IJSONConstants.CONTENT_TYPE_JSON), new QualifiedContentType(
+					IJSONScopes.SOURCE));
+			c.addTranslation(new QualifiedContentType(PROPERTY), new QualifiedContentType(IJSONScopes.PROPERTY));
+			c.addTranslation(new QualifiedContentType(STRING_DOUBLE), new QualifiedContentType(
+					IJSONScopes.STRING_DOUBLE));
+			c.addTranslation(new QualifiedContentType(STRING_SINGLE), new QualifiedContentType(
+					IJSONScopes.STRING_SINGLE));
 
 			instance = new JSONSourceConfiguration();
 		}
@@ -162,23 +166,26 @@ public class JSONSourceConfiguration implements IPartitioningConfiguration, ISou
 
 		reconciler.setDamager(dr, DEFAULT);
 		reconciler.setRepairer(dr, DEFAULT);
-		
-		ThemeingDamagerRepairer p = new ThemeingDamagerRepairer(new JSONEscapeSequenceScanner(JSONTokenType.PROPERTY.getScope()));
+
+		ThemeingDamagerRepairer p = new ThemeingDamagerRepairer(new JSONEscapeSequenceScanner(IJSONScopes.PROPERTY));
 		reconciler.setDamager(p, PROPERTY);
 		reconciler.setRepairer(p, PROPERTY);
-		
-		ThemeingDamagerRepairer dqs = new ThemeingDamagerRepairer(new JSONEscapeSequenceScanner(JSONTokenType.STRING_DOUBLE.getScope()));
+
+		ThemeingDamagerRepairer dqs = new ThemeingDamagerRepairer(new JSONEscapeSequenceScanner(
+				IJSONScopes.STRING_DOUBLE));
 		reconciler.setDamager(dqs, STRING_DOUBLE);
 		reconciler.setRepairer(dqs, STRING_DOUBLE);
-		
-		ThemeingDamagerRepairer sqs = new ThemeingDamagerRepairer(new JSONEscapeSequenceScanner(JSONTokenType.STRING_SINGLE.getScope()));
+
+		ThemeingDamagerRepairer sqs = new ThemeingDamagerRepairer(new JSONEscapeSequenceScanner(
+				IJSONScopes.STRING_SINGLE));
 		reconciler.setDamager(sqs, STRING_SINGLE);
 		reconciler.setRepairer(sqs, STRING_SINGLE);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.ISourceViewerConfiguration#getContentAssistProcessor(com.aptana.editor.common.AbstractThemeableEditor, java.lang.String)
+	 * @see com.aptana.editor.common.ISourceViewerConfiguration#getContentAssistProcessor(com.aptana.editor.common.
+	 * AbstractThemeableEditor, java.lang.String)
 	 */
 	public IContentAssistProcessor getContentAssistProcessor(AbstractThemeableEditor editor, String contentType)
 	{

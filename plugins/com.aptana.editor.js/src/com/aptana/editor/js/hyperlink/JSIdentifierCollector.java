@@ -10,8 +10,8 @@ package com.aptana.editor.js.hyperlink;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.aptana.editor.js.parsing.ast.JSIdentifierNode;
-import com.aptana.editor.js.parsing.ast.JSTreeWalker;
+import com.aptana.js.core.parsing.ast.JSIdentifierNode;
+import com.aptana.js.core.parsing.ast.JSTreeWalker;
 
 /**
  * JSIdentifierCollector

@@ -20,7 +20,6 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 
 import com.aptana.core.projects.templates.IProjectTemplate;
 import com.aptana.core.util.ArrayUtil;
@@ -30,6 +29,7 @@ import com.aptana.ui.util.SWTUtils;
 import com.aptana.ui.util.UIUtils;
 import com.aptana.ui.widgets.SelectedTemplateComposite;
 import com.aptana.ui.widgets.StepIndicatorComposite;
+import com.aptana.ui.wizards.WizardNewProjectCreationPage;
 
 /**
  * @author Shalom Gibly <sgibly@appcelerator.com>

@@ -337,7 +337,8 @@
       <actionProvider
             class="com.aptana.ide.ui.io.navigator.actions.ResourceEditActionProvider"
             id="com.aptana.ide.ui.io.navigator.actions.ResourceEditActions"
-            overrides="org.python.pydev.navigator.actions.pythonActionProvider">
+            overrides="org.eclipse.ui.navigator.resources.actions.EditActions"
+            priority="high">
          <enablement>
             <and>
                <instanceof

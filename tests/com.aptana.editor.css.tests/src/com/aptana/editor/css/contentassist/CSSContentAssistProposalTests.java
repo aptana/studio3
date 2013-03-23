@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -20,11 +20,11 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.swt.graphics.Point;
 
 import com.aptana.core.util.StringUtil;
+import com.aptana.css.core.parsing.CSSTokenType;
 import com.aptana.editor.common.contentassist.ILexemeProvider;
 import com.aptana.editor.common.tests.util.AssertUtil;
 import com.aptana.editor.css.parsing.CSSTokenScanner;
 import com.aptana.editor.css.parsing.lexer.CSSLexemeProvider;
-import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 import com.aptana.editor.css.tests.CSSEditorBasedTests;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Lexeme;
@@ -620,7 +620,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 
 		// looking for .testclass#a#b
 		ICompletionProposal[] proposals = processor.doComputeCompletionProposals(viewer, offset, '\t', false);
-		AssertUtil.assertProposalApplies(document, ".testclass", proposals, offset, new Point(0, 0));
+		AssertUtil.assertProposalApplies(document, ".testclass", proposals, offset);
 
 		// test for #a
 		offset = document.getLength() - 1;
@@ -628,7 +628,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 		offset++;
 
 		proposals = processor.doComputeCompletionProposals(viewer, offset, '\t', false);
-		AssertUtil.assertProposalApplies(document, "#a", proposals, offset, new Point(0, 0));
+		AssertUtil.assertProposalApplies(document, "#a", proposals, offset);
 
 		// test for #b
 		offset = document.getLength() - 1;
@@ -636,7 +636,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 		offset++;
 
 		proposals = processor.doComputeCompletionProposals(viewer, offset, '\t', false);
-		AssertUtil.assertProposalApplies(document, "#b", proposals, offset, new Point(0, 0));
+		AssertUtil.assertProposalApplies(document, "#b", proposals, offset);
 
 	}
 
@@ -700,7 +700,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 		offset += toInsert.length() - 1; // cursor before }
 
 		ICompletionProposal[] proposals = processor.doComputeCompletionProposals(viewer, offset, '\t', false);
-		AssertUtil.assertProposalApplies(document, "#CCCCCC", proposals, offset, new Point(0, 0));
+		AssertUtil.assertProposalApplies(document, "#CCCCCC", proposals, offset);
 	}
 
 	/**
@@ -718,7 +718,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 		offset += toInsert.length() - 1; // cursor before }
 
 		ICompletionProposal[] proposals = processor.doComputeCompletionProposals(viewer, offset, '\t', false);
-		AssertUtil.assertProposalApplies(document, "#CCCCCC", proposals, offset, new Point(0, 0));
+		AssertUtil.assertProposalApplies(document, "#CCCCCC", proposals, offset);
 	}
 
 	public void testCreateLexemeProviderEmptyDocument()
@@ -943,7 +943,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	 */
 	protected void assertCompletionCorrect(String source, char trigger, String proposalToChoose, String postCompletion)
 	{
-		assertCompletionCorrect(source, trigger, -1, proposalToChoose, postCompletion, new Point(0, 0));
+		assertCompletionCorrect(source, trigger, -1, proposalToChoose, postCompletion, null);
 	}
 
 	/**

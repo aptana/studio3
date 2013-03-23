@@ -34,7 +34,11 @@ import com.aptana.editor.common.text.rules.ResumableSingleLineRule;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
 import com.aptana.editor.js.contentassist.JSContentAssistProcessor;
+import com.aptana.editor.js.text.JSCodeScanner;
+import com.aptana.editor.js.text.JSDocScanner;
+import com.aptana.editor.js.text.JSEscapeSequenceScanner;
 import com.aptana.editor.js.text.rules.JSRegExpRule;
+import com.aptana.js.core.IJSConstants;
 
 /**
  * @author Max Stepanov

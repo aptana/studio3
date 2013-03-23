@@ -1,61 +1,89 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.editor.svg.parsing;
 
-import com.aptana.editor.css.ICSSConstants;
-import com.aptana.editor.js.IJSConstants;
-import com.aptana.editor.xml.parsing.XMLParser;
-import com.aptana.editor.xml.parsing.ast.XMLElementNode;
-import com.aptana.editor.xml.parsing.lexer.XMLTokenType;
+import java.io.IOException;
+
+import com.aptana.css.core.ICSSConstants;
+import com.aptana.js.core.IJSConstants;
+import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ParserPoolFactory;
+import com.aptana.parsing.WorkingParseResult;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.ParseNode;
+import com.aptana.xml.core.parsing.Terminals;
+import com.aptana.xml.core.parsing.XMLParser;
+import com.aptana.xml.core.parsing.ast.XMLElementNode;
 
 /**
  * SVGParser
  */
 public class SVGParser extends XMLParser
 {
+	private String fSource;
+
 	/**
 	 * advanceToCloseTag
 	 * 
 	 * @param elementName
 	 */
-	private void advanceToCloseTag(String elementName)
+	private int advanceToCloseTag(String elementName)
 	{
-		String closeTagStart = "</" + elementName; //$NON-NLS-1$
-		int length = closeTagStart.length();
-
+		int start = -1;
 		try
 		{
-			this.advance();
+			advance();
 
-			while (fCurrentLexeme.getType() != XMLTokenType.EOF)
+			while (fCurrentLexeme.getId() != Terminals.EOF)
 			{
-				if (fCurrentLexeme.getType() == XMLTokenType.END_TAG)
+				if (fCurrentLexeme.getId() == Terminals.LESS_SLASH)
 				{
-					String text = fCurrentLexeme.getText();
+					start = fCurrentLexeme.getStart() - 1;
+					advance();
+					String text = (String) fCurrentLexeme.value;
 
-					if (text.startsWith(closeTagStart))
+					if (text.equals(elementName))
 					{
-						char c = text.charAt(length);
+						// Read '>'
+						advance();
 
-						if (c == '>' || Character.isWhitespace(c))
-						{
-							break;
-						}
+						// adjusts the ending offset of current element to include the entire block
+						((ParseNode) fCurrentElement).setLocation( //
+								fCurrentElement.getStartingOffset(), //
+								fCurrentLexeme.getEnd() //
+								);
+
+						closeElement();
+
+						return start;
 					}
 				}
 
-				this.advance();
+				advance();
 			}
 		}
 		catch (Exception e)
 		{
+		}
+		return -1;
+	}
+
+	@Override
+	protected void parse(IParseState parseState, WorkingParseResult working) throws Exception
+	{
+		try
+		{
+			fSource = parseState.getSource();
+			super.parse(parseState, working);
+		}
+		finally
+		{
+			fSource = null;
 		}
 	}
 
@@ -64,20 +92,19 @@ public class SVGParser extends XMLParser
 	 * 
 	 * @param language
 	 * @param elementName
+	 * @throws IOException
+	 * @throws beaver.Scanner.Exception
 	 */
-	private void processLanguage(String language, String elementName)
+	private void processLanguage(String language, String elementName) throws beaver.Scanner.Exception, IOException
 	{
 		// grab offset after '>' in open tag
-		int startingOffset = fCurrentLexeme.getEndingOffset() + 1;
+		int startingOffset = fCurrentLexeme.getEnd() + 1;
 
 		// advance to the matching close tag
-		this.advanceToCloseTag(elementName);
-
-		// grab the offset just before '<' in the close tag
-		int endingOffset = fCurrentLexeme.getStartingOffset() - 1;
+		int endingOffset = advanceToCloseTag(elementName);
 
 		// grab the source between the open and close tag
-		String source = this.getSource(startingOffset, endingOffset - startingOffset + 1);
+		String source = getSource(startingOffset, endingOffset);
 
 		try
 		{
@@ -89,7 +116,12 @@ public class SVGParser extends XMLParser
 		{
 		}
 
-		this.processEndTag();
+		processEndTag();
+	}
+
+	private String getSource(int start, int end)
+	{
+		return fSource.substring(start, end + 1);
 	}
 
 	/*
@@ -97,7 +129,7 @@ public class SVGParser extends XMLParser
 	 * @see com.aptana.editor.xml.parsing.XMLParser#processStartTag()
 	 */
 	@Override
-	protected void processStartTag()
+	protected void processStartTag() throws beaver.Scanner.Exception, IOException
 	{
 		super.processStartTag();
 

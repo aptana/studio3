@@ -39,7 +39,8 @@ public interface IBrowserProvider
 	String getBrowserVersion(BrowserInfo info);
 
 	/**
-	 * Verifies and changes the default location/params for Safari on Mac OS so that the path is interpreted correctly.
+	 * It verifies and changes the default location/params for Safari on Mac OS so that the path is interpreted
+	 * correctly.
 	 */
 	void verifyBrowserConfigurations();
 }

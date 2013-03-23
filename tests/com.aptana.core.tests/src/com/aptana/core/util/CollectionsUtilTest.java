@@ -183,6 +183,60 @@ public class CollectionsUtilTest extends TestCase
 		}
 	}
 
+	public void testAddToListListSubclass()
+	{
+		Number doubleOne = 1.0;
+		Number intOne = 1;
+		Float floatOne = 1.0f;
+
+		// generate initial set
+		List<Number> list = CollectionsUtil.newList(doubleOne, intOne);
+
+		// add sub-type of Number
+		CollectionsUtil.addToList(list, CollectionsUtil.newList(floatOne));
+
+		assertEquals("The list should have only three items", 3, list.size());
+		assertEquals("Double 1.0 should be at index 0", 0, list.indexOf(doubleOne));
+		assertEquals("Integer 1 should be at index 1", 1, list.indexOf(intOne));
+		assertEquals("Float 1.0f should be at index 2", 2, list.indexOf(floatOne));
+	}
+
+	public void testAddToListList()
+	{
+		List<String> list = CollectionsUtil.newList("a", "b");
+		assertNotNull(list);
+
+		CollectionsUtil.addToList(list, CollectionsUtil.newList("c"));
+		assertEquals("The list should have only three items", 3, list.size());
+		assertEquals("'a' should be at index 0", 0, list.indexOf("a"));
+		assertEquals("'b' should be at index 1", 1, list.indexOf("b"));
+		assertEquals("'c' should be at index 2", 2, list.indexOf("c"));
+	}
+
+	public void testAddToListListNullItems()
+	{
+		List<String> list = CollectionsUtil.newList("a", "b");
+		assertNotNull(list);
+
+		List<String> items = null;
+		CollectionsUtil.addToList(list, items);
+		assertEquals("The list should have only three items", 2, list.size());
+		assertEquals("'a' should be at index 0", 0, list.indexOf("a"));
+		assertEquals("'b' should be at index 1", 1, list.indexOf("b"));
+	}
+
+	public void testAddToListListNullList()
+	{
+		try
+		{
+			CollectionsUtil.addToList(null, CollectionsUtil.newList("a", "b", "c"));
+		}
+		catch (Throwable t)
+		{
+			fail(t.getMessage());
+		}
+	}
+
 	public void testNewSet()
 	{
 		Set<String> set = CollectionsUtil.newSet("item1", "item2");
@@ -709,5 +763,30 @@ public class CollectionsUtilTest extends TestCase
 		assertEquals(Integer.valueOf(1), cache.get("1"));
 		assertEquals(Integer.valueOf(2), cache.get("2"));
 		assertEquals(Integer.valueOf(3), cache.get("3"));
+	}
+
+	public void testFirstElementEmpty()
+	{
+		List<String> strings = new ArrayList<String>();
+		String firstElement = CollectionsUtil.getFirstElement(strings);
+		assertNull(firstElement);
+	}
+
+	public void testFirstElementNullElement()
+	{
+		String firstElement = CollectionsUtil.getFirstElement(CollectionsUtil.newList((String) null));
+		assertNull(firstElement);
+	}
+
+	public void testFirstElementNullList()
+	{
+		assertNull(CollectionsUtil.getFirstElement(null));
+	}
+
+	public void testFirstElementList()
+	{
+		List<Integer> numbers = CollectionsUtil.newList(1, 2, 3);
+		Integer firstElement = CollectionsUtil.getFirstElement(numbers);
+		assertEquals(new Integer(1), firstElement);
 	}
 }

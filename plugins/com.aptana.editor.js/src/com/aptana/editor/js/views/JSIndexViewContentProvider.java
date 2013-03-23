@@ -16,15 +16,15 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
 import com.aptana.core.util.CollectionsUtil;
-import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
-import com.aptana.editor.js.contentassist.model.ClassElement;
-import com.aptana.editor.js.contentassist.model.ClassGroupElement;
-import com.aptana.editor.js.contentassist.model.EventElement;
-import com.aptana.editor.js.contentassist.model.JSElement;
-import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.IndexPlugin;
+import com.aptana.js.core.index.JSIndexQueryHelper;
+import com.aptana.js.core.model.ClassElement;
+import com.aptana.js.core.model.ClassGroupElement;
+import com.aptana.js.core.model.EventElement;
+import com.aptana.js.core.model.JSElement;
+import com.aptana.js.core.model.TypeElement;
 
 /**
  * JSIndexViewContentProvider
@@ -54,7 +54,7 @@ public class JSIndexViewContentProvider implements ITreeContentProvider
 
 			// @formatter:off
 			result = CollectionsUtil.newList(
-				new ClassGroupElement(Messages.JSIndexViewContentProvider_WorkspaceGroupLabel, JSIndexQueryHelper.getIndex()),
+				new ClassGroupElement(Messages.JSIndexViewContentProvider_WorkspaceGroupLabel, JSIndexQueryHelper.getJSCoreIndex()),
 				new ClassGroupElement(Messages.JSIndexViewContentProvider_ProjectGroupLabel, root.getIndex())
 			);
 			// @formatter:on

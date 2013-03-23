@@ -15,7 +15,9 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchManager;
 
 import com.aptana.core.epl.IMemento;
@@ -150,5 +152,10 @@ public abstract class AbstractWebServer implements IExecutableExtension, IServer
 	public boolean canStop()
 	{
 		return true;
+	}
+
+	public IStatus start(String mode, ILaunch launch, IProgressMonitor monitor)
+	{
+		return Status.OK_STATUS;
 	}
 }

@@ -39,7 +39,7 @@ public class DocumentScopeManagerPerformanceTest extends PerformanceTestCase
 		{
 			IWorkbenchPage page = UIUtils.getActivePage();
 			// Open a really big file, like DOJO!
-			URL url = FileLocator.find(Platform.getBundle("com.aptana.editor.js.tests"),
+			URL url = FileLocator.find(Platform.getBundle("com.aptana.js.core.tests"),
 					Path.fromPortableString("performance/dojo.js.uncompressed.js"), null);
 			file = ResourceUtil.resourcePathToFile(url);
 

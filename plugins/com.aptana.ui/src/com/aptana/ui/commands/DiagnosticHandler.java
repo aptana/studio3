@@ -17,10 +17,10 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
+import com.aptana.core.diagnostic.DiagnosticManager;
 import com.aptana.core.diagnostic.IDiagnosticLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
-import com.aptana.ui.diagnostic.DiagnosticManager;
 import com.aptana.ui.dialogs.DiagnosticDialog;
 import com.aptana.ui.util.UIUtils;
 

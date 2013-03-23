@@ -16,6 +16,7 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.util.LocalSelectionTransfer;
@@ -29,6 +30,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.BaseSelectionListenerAction;
 
 import com.aptana.core.io.efs.EFSUtils;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.ide.ui.io.FileSystemUtils;
 import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ide.ui.io.Utils;
@@ -87,7 +89,21 @@ public class FileSystemPasteAction extends BaseSelectionListenerAction
 			{
 				for (Object file : selectedFiles)
 				{
-					IOUIPlugin.refreshNavigatorView(file);
+					if (file instanceof IResource)
+					{
+						try
+						{
+							((IResource) file).refreshLocal(IResource.DEPTH_ONE, new NullProgressMonitor());
+						}
+						catch (CoreException e)
+						{
+							IdeLog.logError(IOUIPlugin.getDefault(), e);
+						}
+					}
+					else
+					{
+						IOUIPlugin.refreshNavigatorView(file);
+					}
 				}
 			}
 		};

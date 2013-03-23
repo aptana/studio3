@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -103,10 +103,7 @@ public final class DialogUtils
 	 */
 	public static int openIgnoreMessageDialogInformation(Shell shell, String title, String message, String dialogKey)
 	{
-		final IEclipsePreferences prefs = (EclipseUtil.instanceScope()).getNode(UIEplPlugin.PLUGIN_ID);
-		String[] keys = prefs.get(IEplPreferenceConstants.HIDDEN_MESSAGES, StringUtil.EMPTY).split(","); //$NON-NLS-1$
-		Set<String> keysSet = CollectionsUtil.newSet(keys);
-		if (keysSet.contains(dialogKey))
+		if (!shouldShowDialog(dialogKey))
 		{
 			return MessageDialog.CANCEL;
 		}
@@ -117,18 +114,60 @@ public final class DialogUtils
 			// check the toggle state to see if we need to add the dialog key to the list of hidden dialogs.
 			if (dialog.getToggleState())
 			{
-				keysSet.add(dialogKey);
-				prefs.put(IEplPreferenceConstants.HIDDEN_MESSAGES, StringUtil.join(",", keysSet)); //$NON-NLS-1$
-				try
-				{
-					prefs.flush();
-				}
-				catch (Exception e)
-				{
-					IdeLog.logError(UIPlugin.getDefault(), e);
-				}
+				setShouldShowDialog(dialogKey, false);
 			}
 		}
 		return dialog.getReturnCode();
+	}
+
+	/**
+	 * Checks the preference for the hidden messages to see if it contains the key in question
+	 * 
+	 * @param dialogKey
+	 * @return
+	 */
+	public static boolean shouldShowDialog(String dialogKey)
+	{
+		final IEclipsePreferences prefs = (EclipseUtil.instanceScope()).getNode(UIEplPlugin.PLUGIN_ID);
+		String[] keys = prefs.get(IEplPreferenceConstants.HIDDEN_MESSAGES, StringUtil.EMPTY).split(","); //$NON-NLS-1$
+		Set<String> keysSet = CollectionsUtil.newSet(keys);
+
+		return !keysSet.contains(dialogKey);
+	}
+
+	public static void setShouldShowDialog(String dialogKey, boolean shouldShow)
+	{
+		final IEclipsePreferences prefs = (EclipseUtil.instanceScope()).getNode(UIEplPlugin.PLUGIN_ID);
+		String[] keys = prefs.get(IEplPreferenceConstants.HIDDEN_MESSAGES, StringUtil.EMPTY).split(","); //$NON-NLS-1$
+		Set<String> keysSet = CollectionsUtil.newSet(keys);
+
+		if (shouldShow)
+		{
+			if (!keysSet.contains(dialogKey))
+			{
+				// Do nothing
+				return;
+			}
+			keysSet.remove(dialogKey);
+		}
+		else
+		{
+			if (keysSet.contains(dialogKey))
+			{
+				// Do nothing
+				return;
+			}
+			keysSet.add(dialogKey);
+		}
+
+		prefs.put(IEplPreferenceConstants.HIDDEN_MESSAGES, StringUtil.join(",", keysSet)); //$NON-NLS-1$
+		try
+		{
+			prefs.flush();
+		}
+		catch (Exception e)
+		{
+			IdeLog.logError(UIPlugin.getDefault(), e);
+		}
 	}
 }

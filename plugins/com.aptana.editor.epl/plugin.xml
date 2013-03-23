@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension point="org.eclipse.ui.decorators">
+		<decorator
+        adaptable="true"
+        class="com.aptana.editor.decorator.ProblemsLabelDecorator"
+        id="com.aptana.editor.epl.problemsDecorator"
+        label="%problem.detector.name"
+        lightweight="true"
+        location="BOTTOM_LEFT"
+        state="true">
+			<enablement>
+				<objectClass name="org.eclipse.core.resources.IResource">
+				</objectClass>
+			</enablement>
+		</decorator>
+	</extension>
+
+</plugin>

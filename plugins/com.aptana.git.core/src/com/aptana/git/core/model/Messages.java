@@ -18,6 +18,10 @@ public class Messages extends NLS // NO_UCD
 
 	public static String GitIndex_BinaryDiff_Message; // NO_UCD
 
+	public static String GitIndexRefreshJob_ErrorMsg;
+
+	public static String GitIndexRefreshJob_Name;
+
 	public static String GitRepository_ERR_BranchNotProvided;
 	public static String GitRepository_FailedAcquireLock;
 	public static String GitRepository_FailedAcquireReadLock;

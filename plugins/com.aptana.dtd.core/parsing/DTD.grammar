@@ -1,0 +1,613 @@
+%package "com.aptana.dtd.core.parsing";
+
+%class "DTDParser";
+
+%import "com.aptana.dtd.core.parsing.ast.*";
+%import "com.aptana.parsing.IParseState";
+%import "com.aptana.parsing.IParser";
+%import "com.aptana.parsing.ast.IParseNode";
+%import "com.aptana.parsing.ast.IParseRootNode";
+%import "com.aptana.parsing.WorkingParseResult";
+%import "com.aptana.parsing.ParseResult";
+
+%implements "IParser";
+
+%init {:
+        this._scanner = new DTDScanner();
+:} ;
+
+%embed {:
+
+    private DTDScanner _scanner;
+    
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.IParser#parse(com.aptana.parsing.IParseState)
+	 */
+	protected synchronized void parse(IParseState parseState, WorkingParseResult working) throws java.lang.Exception
+	{
+		this._scanner = new DTDScanner();
+
+		// send source to the scanner
+		this._scanner.setSource(parseState.getSource());
+
+		try
+		{
+			// parse
+			IParseRootNode result = (IParseRootNode) parse(this._scanner);
+			
+			// save reference to result
+			working.setParseResult(result);
+		}
+		finally
+		{
+			// loose reference for GC
+			this._scanner = null;
+		}
+	}
+	
+    public synchronized ParseResult parse(IParseState parseState) throws java.lang.Exception
+    {
+        WorkingParseResult working = new WorkingParseResult();
+        parse(parseState, working);
+        return working.getImmutableResult();
+    }
+    
+
+	protected void addChildren(IParseNode node, ArrayList children)
+	{
+		if (node != null && children != null)
+		{
+			for (Object child : children)
+			{
+				if (child instanceof IParseNode)
+				{
+					node.addChild((IParseNode) child);
+				}
+			}
+		}
+	}
+:};
+
+%terminals ELEMENT, GREATER_THAN, ATTLIST, NOTATION, PI, EMPTY, ANY;
+%terminals ENTITY, SYSTEM, PUBLIC, PCDATA, LPAREN, PIPE, RPAREN, QUESTION;
+%terminals STAR, PLUS, FIXED, IMPLIED, REQUIRED, COMMA, CDATA_TYPE, ID_TYPE, IDREF_TYPE;
+%terminals IDREFS_TYPE, ENTITY_TYPE, ENTITIES_TYPE, NMTOKEN_TYPE, NMTOKENS_TYPE, NDATA;
+%terminals NOTATION_TYPE, PE_REF, NAME, PERCENT, STRING, LBRACKET;
+%terminals COMMENT, SECTION_START, SECTION_END, IGNORE, INCLUDE, NMTOKEN;
+
+%typeof NAME, PI, STRING, IMPLIED, FIXED, REQUIRED = "String";
+%typeof Mixed, Cp, Children, Choice, Seq, AttType, NDataDecl = "DTDNode";
+%typeof Names = "ArrayList";
+
+%goal DTD;
+
+// 0
+
+DTD
+	=	Declarations.d
+	{:
+		return new DTDParseRootNode(d);
+	:}
+	|
+	{:
+		return new DTDParseRootNode();
+	:}
+	;
+
+// 1
+
+Declarations
+	=	Declarations Declaration
+	|	Declaration
+	;
+
+Declaration
+	=	MarkupDecl
+	|	PE_REF
+	|	ConditionalSect
+	;
+
+// 2
+
+MarkupDecl
+	=	ElementDecl
+	|	AttlistDecl
+	|	EntityDecl
+	|	NotationDecl
+	|	PI.p
+	{:
+		String content = p.substring(2, p.length() - 2);
+
+		return new DTDProcessingInstructionNode(content);
+	:}
+	|	COMMENT
+	;
+
+// Element declaration
+
+ElementDecl
+	=	ELEMENT NAME.n EMPTY GREATER_THAN
+		{:
+			DTDNode decl = new DTDElementDeclNode(n);
+
+			decl.addChild(new DTDEmptyNode());
+
+			return decl;
+		:}
+	|	ELEMENT NAME.n ANY GREATER_THAN
+		{:
+			DTDNode decl = new DTDElementDeclNode(n);
+
+			decl.addChild(new DTDAnyNode());
+
+			return decl;
+		:}
+	|	ELEMENT NAME.n Mixed.m GREATER_THAN
+		{:
+			DTDNode decl = new DTDElementDeclNode(n);
+
+			decl.addChild(m);
+
+			return decl;
+		:}
+	|	ELEMENT NAME.n Children.c GREATER_THAN
+		{:
+			DTDNode decl = new DTDElementDeclNode(n);
+
+			decl.addChild(c);
+
+			return decl;
+		:}
+	;
+
+Mixed
+	=	LPAREN PCDATA RPAREN STAR
+		{:
+			DTDPCDataNode data = new DTDPCDataNode();
+			DTDZeroOrMoreNode zom = new DTDZeroOrMoreNode();
+
+			zom.addChild(data);
+
+			return zom;
+		:}
+	|	LPAREN PCDATA PIPE Names.n RPAREN STAR
+		{:
+			DTDPCDataNode data = new DTDPCDataNode();
+			DTDZeroOrMoreNode zom = new DTDZeroOrMoreNode();
+
+			zom.addChild(data);
+			this.addChildren(zom, n);
+
+			return zom;
+		:}
+	|	LPAREN PCDATA RPAREN
+		{:
+			return new DTDPCDataNode();
+		:}
+	;
+
+Names
+	=	Names PIPE NAME
+		{:
+			String name = (String) _symbols[offset + 3].value;
+			DTDElementNode element = new DTDElementNode(name);
+			((ArrayList) _symbols[offset + 1].value).add(element);
+
+			return _symbols[offset + 1];
+		:}
+	|	NAME
+		{:
+			ArrayList lst = new ArrayList();
+			String name = (String) _symbols[offset + 1].value;
+			DTDElementNode element = new DTDElementNode(name);
+
+			lst.add(element);
+
+			return new Symbol(lst);
+		:}
+	;
+
+Children
+	=	Choice
+	|	Choice.c QUESTION
+		{:
+			DTDOptionalNode result = new DTDOptionalNode();
+
+			result.addChild(c);
+
+			return result;
+		:}
+	|	Choice.c STAR
+		{:
+			DTDZeroOrMoreNode result = new DTDZeroOrMoreNode();
+
+			result.addChild(c);
+
+			return result;
+		:}
+	|	Choice.c PLUS
+		{:
+			DTDOneOrMoreNode result = new DTDOneOrMoreNode();
+
+			result.addChild(c);
+
+			return result;
+		:}
+	|	Seq
+	|	Seq.s QUESTION
+		{:
+			DTDOptionalNode result = new DTDOptionalNode();
+
+			result.addChild(s);
+
+			return result;
+		:}
+	|	Seq.s STAR
+		{:
+			DTDZeroOrMoreNode result = new DTDZeroOrMoreNode();
+
+			result.addChild(s);
+
+			return result;
+		:}
+	|	Seq.s PLUS
+		{:
+			DTDOneOrMoreNode result = new DTDOneOrMoreNode();
+
+			result.addChild(s);
+
+			return result;
+		:}
+	;
+
+Choice
+	=	LPAREN Cp.c ChoiceCps RPAREN
+		{:
+			ArrayList cps = (ArrayList) _symbols[offset + 3].value;
+			DTDOrExpressionNode result = new DTDOrExpressionNode();
+
+			// pre-pend leading cp
+			cps.add(0, c);
+
+			// add all children to or-expr
+			this.addChildren(result, cps);
+
+			return result;
+		:}
+	;
+
+ChoiceCps
+	=	ChoiceCps PIPE Cp.c
+		{:
+			((ArrayList) _symbols[offset + 1].value).add(c);
+
+			return _symbols[offset + 1];
+		:}
+	|	PIPE Cp
+		{:
+			ArrayList lst = new ArrayList();
+
+			lst.add(_symbols[offset + 2]);
+
+			return new Symbol(lst);
+		:}
+	;
+
+Seq
+	=	LPAREN Cp.c RPAREN
+		{:
+			return c;
+		:}
+	|	LPAREN Cp.c SeqCps RPAREN
+		{:
+			ArrayList cps = (ArrayList) _symbols[offset + 3].value;
+			DTDAndExpressionNode result = new DTDAndExpressionNode();
+
+			// pre-pend leading cp
+			cps.add(0, c);
+
+			// add all children to or-expr
+			this.addChildren(result, cps);
+
+			return result;
+		:}
+	;
+
+SeqCps
+	=	SeqCps COMMA Cp.c
+		{:
+			((ArrayList) _symbols[offset + 1].value).add(c);
+
+			return _symbols[offset + 1];
+		:}
+	|	COMMA Cp
+		{:
+			ArrayList lst = new ArrayList();
+
+			lst.add(_symbols[offset + 2]);
+
+			return new Symbol(lst);
+		:}
+	;
+
+Cp
+	=	NAME.n
+		{:
+			return new DTDElementNode(n);
+		:}
+	|	NAME.n QUESTION
+		{:
+			DTDOptionalNode node = new DTDOptionalNode();
+
+			node.addChild(new DTDElementNode(n));
+		:}
+	|	NAME.n STAR
+		{:
+			DTDZeroOrMoreNode node = new DTDZeroOrMoreNode();
+
+			node.addChild(new DTDElementNode(n));
+		:}
+	|	NAME.n PLUS
+		{:
+			DTDOneOrMoreNode node = new DTDOneOrMoreNode();
+
+			node.addChild(new DTDElementNode(n));
+		:}
+	|	Children
+	;
+
+// Attribute declaration
+
+AttlistDecl
+	=	ATTLIST NAME.n GREATER_THAN
+		{:
+			return new DTDAttListDeclNode(n);
+		:}
+	|	ATTLIST NAME.n AttDefs GREATER_THAN
+		{:
+			Symbol _symbol_a = _symbols[offset + 3];
+			ArrayList defs = (ArrayList) _symbol_a.value;
+			DTDAttListDeclNode result = new DTDAttListDeclNode(n);
+
+			this.addChildren(result, defs);
+
+			return result;
+		:}
+	;
+
+AttDefs
+	=	AttDefs AttDef
+	|	AttDef
+	;
+
+AttDef
+	=	NAME.n AttType.t REQUIRED.m
+		{:
+			return new DTDAttributeNode(n, t, m);
+		:}
+	|	NAME.n AttType.t IMPLIED.m
+		{:
+			return new DTDAttributeNode(n, t, m);
+		:}
+	|	NAME.n AttType.t STRING.m
+		{:
+			return new DTDAttributeNode(n, t, m.substring(1, m.length() - 1));
+		:}
+	|	NAME.n AttType.t FIXED.m1 STRING.m2
+		{:
+			return new DTDAttributeNode(n, t, m1 + " " + m2.substring(1, m2.length() - 1));
+		:}
+	;
+
+AttType
+	=	CDATA_TYPE.t						// StringType
+		{:
+			return new DTDTypeNode((String) t.value);
+		:}
+	|	ID_TYPE.t							// TokenizedType
+		{:
+			return new DTDTypeNode((String) t.value);
+		:}
+	|	IDREF_TYPE.t
+		{:
+			return new DTDTypeNode((String) t.value);
+		:}
+	|	IDREFS_TYPE.t
+		{:
+			return new DTDTypeNode((String) t.value);
+		:}
+	|	ENTITY_TYPE.t
+		{:
+			return new DTDTypeNode((String) t.value);
+		:}
+	|	ENTITIES_TYPE.t
+		{:
+			return new DTDTypeNode((String) t.value);
+		:}
+	|	NMTOKEN_TYPE.t
+		{:
+			return new DTDTypeNode((String) t.value);
+		:}
+	|	NMTOKENS_TYPE.t
+		{:
+			return new DTDTypeNode((String) t.value);
+		:}
+											// EnumeratedType
+	|	NOTATION_TYPE LPAREN Names RPAREN	// NotationType
+		{:
+			// TODO: add Names
+			return new DTDNotationTypeNode();
+		:}
+	|	LPAREN NmTokens RPAREN				// Enumeration
+		{:
+			// TODO: add NmTokens
+			return new DTDEnumerationTypeNode();
+		:}
+	;
+
+NmTokens
+	=	NmTokens PIPE NMTOKEN
+	|	NmTokens PIPE NAME
+	|	NMTOKEN
+	|	NAME
+	;
+
+// Entities
+
+EntityDecl
+	=	GEDecl
+	|	PEDecl
+	;
+
+GEDecl
+	=	ENTITY NAME.n STRING GREATER_THAN
+		{:
+			return new DTDGeneralEntityDeclNode(n);
+		:}
+	|	ENTITY NAME.n ExternalID GREATER_THAN
+		{:
+			return new DTDGeneralEntityDeclNode(n);
+		:}
+	|	ENTITY NAME.n ExternalID NDataDecl.nd GREATER_THAN
+		{:
+			DTDGeneralEntityDeclNode result = new DTDGeneralEntityDeclNode(n);
+
+			result.addChild(nd);
+
+			return result;
+		:}
+	;
+
+PEDecl
+	=	ENTITY PERCENT NAME.n STRING.s GREATER_THAN
+		{:
+			String value = s.substring(1, s.length() - 1);
+			this._scanner.register(n, value);
+
+			return new DTDParsedEntityDeclNode(n);
+		:}
+	|	ENTITY PERCENT NAME.n ExternalID GREATER_THAN
+		{:
+			return new DTDParsedEntityDeclNode(n);
+		:}
+	;
+
+ExternalID
+	=	SYSTEM STRING
+	|	PUBLIC STRING STRING
+	;
+
+NDataDecl
+	=	NDATA NAME.n
+		{:
+			return new DTDNDataDeclNode(n);
+		:}
+	;
+
+// Notations
+
+NotationDecl
+	=	NOTATION NAME.n ExternalID GREATER_THAN
+		{:
+			return new DTDNotationDeclNode(n);
+		:}
+	|	NOTATION NAME.n PublicID GREATER_THAN
+		{:
+			return new DTDNotationDeclNode(n);
+		:}
+	;
+
+PublicID
+	=	PUBLIC STRING
+	;
+
+// Sections
+
+ConditionalSect
+	=	IncludeSect
+	|	IgnoreSect
+	;
+
+IncludeSect
+	=	SECTION_START INCLUDE LBRACKET SECTION_END
+		{:
+			return new DTDIncludeSectionNode();
+			:}
+	|	SECTION_START INCLUDE LBRACKET Declarations.d SECTION_END
+		{:
+			DTDIncludeSectionNode result = new DTDIncludeSectionNode();
+
+			for (Symbol s : d)
+			{
+				Object v = s.value;
+
+				if (v instanceof IParseNode)
+				{
+					result.addChild((IParseNode) v);
+				}
+			}
+
+			return result;
+		:}
+	;
+
+IgnoreSect
+	=	SECTION_START IGNORE LBRACKET SECTION_END
+		{:
+			return new DTDIgnoreSectionNode();
+		:}
+	|	SECTION_START IGNORE LBRACKET IgnoreSectionBody SECTION_END
+		{:
+			return new DTDIgnoreSectionNode();
+		:}
+	;
+
+IgnoreSectionBody
+	=	IgnoreSectionBody IgnoreToken
+	|	IgnoreSectionBody ConditionalSect
+	|	IgnoreToken
+	|	ConditionalSect
+	;
+
+IgnoreToken
+	=	ANY
+	|	ATTLIST
+	|	CDATA_TYPE
+	|	COMMA
+	|	COMMENT
+	|	ELEMENT
+	|	EMPTY
+	|	ENTITY
+	|	ENTITIES_TYPE
+	|	ENTITY_TYPE
+	|	FIXED
+	|	GREATER_THAN
+	|	ID_TYPE
+	|	IDREF_TYPE
+	|	IDREFS_TYPE
+	|	IGNORE
+	|	IMPLIED
+	|	INCLUDE
+	|	LBRACKET
+	|	LPAREN
+	|	NAME
+	|	NDATA
+	|	NMTOKEN_TYPE
+	|	NMTOKENS_TYPE
+	|	NOTATION
+	|	NOTATION_TYPE
+	|	PCDATA
+	|	PE_REF
+	|	PERCENT
+	|	PI
+	|	PIPE
+	|	PLUS
+	|	PUBLIC
+	|	QUESTION
+	|	REQUIRED
+	|	RPAREN
+	|	STAR
+	|	STRING
+	|	SYSTEM
+	;

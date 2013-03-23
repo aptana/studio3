@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -9,8 +9,63 @@ package com.aptana.core.util;
 
 import junit.framework.TestCase;
 
+import org.osgi.framework.Version;
+
 public class VersionUtilTest extends TestCase
 {
+
+	public void testParseVersionQualifierSeparatedByHyphen()
+	{
+		assertVersion(3, 0, 24, "cr", VersionUtil.parseVersion("3.0.24-cr"));
+	}
+
+	public void testParseVersionWithMajorMinorMicro()
+	{
+		assertVersion(3, 0, 24, VersionUtil.parseVersion("3.0.24"));
+		assertVersion(1, 12, 127, VersionUtil.parseVersion("1.12.127"));
+	}
+
+	public void testParseVersionWithMajorMinorMicroQualifier()
+	{
+		assertVersion(3, 0, 0, "GA", VersionUtil.parseVersion("3.0.0.GA"));
+		// Eclipse-style version #s
+		assertVersion(1, 3, 0, "v20100106-170", VersionUtil.parseVersion("1.3.0.v20100106-170"));
+		assertVersion(1, 2, 3, "1000a", VersionUtil.parseVersion("1.2.3.1000a"));
+	}
+
+	public void testParseVersionWithMajorMinorMicroQualifierWithNoLeadingSeparator()
+	{
+		assertVersion(3, 0, 0, "GA", VersionUtil.parseVersion("3.0.0GA"));
+		assertVersion(1, 2, 1, "b1", VersionUtil.parseVersion("1.2.1b1"));
+	}
+
+	public void testParseVersionWithMajorMinor()
+	{
+		assertVersion(2, 0, 0, VersionUtil.parseVersion("2.0"));
+		assertVersion(2, 10, 0, VersionUtil.parseVersion("2.10"));
+	}
+
+	public void testParseVersionWithMajorMinorQualifierWithNoSeparator()
+	{
+		assertVersion(2, 1, 0, "a", VersionUtil.parseVersion("2.1a"));
+	}
+
+	private void assertVersion(int major, int minor, int micro, Version v)
+	{
+		assertVersion(major, minor, micro, null, v);
+	}
+
+	private void assertVersion(int major, int minor, int micro, String qualifier, Version v)
+	{
+		assertNotNull(v);
+		assertEquals(major, v.getMajor());
+		assertEquals(minor, v.getMinor());
+		assertEquals(micro, v.getMicro());
+		if (qualifier != null)
+		{
+			assertEquals(qualifier, v.getQualifier());
+		}
+	}
 
 	public void testCompareVersions()
 	{
@@ -36,6 +91,34 @@ public class VersionUtilTest extends TestCase
 		assertTrue(VersionUtil.compareVersions("1.12", "1.12") == 0);
 		assertTrue(VersionUtil.compareVersions("1.12", "1.12.0") < 0);
 		assertTrue(VersionUtil.compareVersions("1.12.0", "1.12") > 0);
+	}
+
+	public void testCompareVersionsNotStrict()
+	{
+		assertTrue(VersionUtil.compareVersions("2.0", "1.0", false) > 0);
+		assertTrue(VersionUtil.compareVersions("2.10", "2.2", false) > 0);
+		assertTrue(VersionUtil.compareVersions("2.1a", "2.1b", false) < 0);
+
+		// Firebug-specific version #s
+		assertTrue(VersionUtil.compareVersions("1.7X.0a1", "1.7X.0a1", false) == 0);
+		assertTrue(VersionUtil.compareVersions("1.7X.0a1", "1.7X.0a2", false) < 0);
+		assertTrue(VersionUtil.compareVersions("1.7X.0a2", "1.7X.0a1", false) > 0);
+		assertTrue(VersionUtil.compareVersions("1.2.1b1", "1.2.1", false) > 0);
+		assertTrue(VersionUtil.compareVersions("1.2.1", "1.2.1b1", false) < 0);
+
+		assertTrue(VersionUtil.compareVersions("1.7X", "1.7X.0", false) == 0);
+
+		// Eclipse-style version #s
+		assertTrue(VersionUtil.compareVersions("1.3.0.v20100106-170", "1.3.0.v20100106-170", false) == 0);
+		assertTrue(VersionUtil.compareVersions("1.3.0.v20100106-170", "1.3.0.v20100518-1140", false) < 0);
+		assertTrue(VersionUtil.compareVersions("1.3.0.v20100518-1140", "1.3.0.v20100106-170", false) > 0);
+		assertTrue(VersionUtil.compareVersions("v20100101-900", "v20100101-1200", false) > 0);
+
+		assertTrue(VersionUtil.compareVersions("1.12.127", "1.12.82", false) > 0);
+		assertTrue(VersionUtil.compareVersions("1.2.3.1000a", "1.2.3.1000b", false) < 0);
+		assertTrue(VersionUtil.compareVersions("1.12", "1.12", false) == 0);
+		assertTrue(VersionUtil.compareVersions("1.12", "1.12.0", false) == 0);
+		assertTrue(VersionUtil.compareVersions("1.12.0", "1.12", false) == 0);
 	}
 
 	/**

@@ -37,6 +37,8 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 
 import com.aptana.buildpath.core.BuildPathCorePlugin;
+import com.aptana.buildpath.core.BuildPathManager;
+import com.aptana.buildpath.core.IBuildPathEntry;
 import com.aptana.core.CorePlugin;
 import com.aptana.core.IDebugScopes;
 import com.aptana.core.IFilter;
@@ -49,6 +51,8 @@ import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.index.core.FileStoreBuildContext;
 import com.aptana.index.core.IIndexFileContributor;
+import com.aptana.index.core.IndexContainerJob;
+import com.aptana.index.core.IndexFileJob;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.IndexPlugin;
 import com.aptana.index.core.build.BuildContext;
@@ -87,7 +91,12 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 
 		IProject project = getProjectHandle();
 
-		List<IBuildParticipant> participants = getBuildParticipantManager().getAllBuildParticipants();
+		IBuildParticipantManager manager = getBuildParticipantManager();
+		if (manager == null)
+		{
+			return;
+		}
+		List<IBuildParticipant> participants = manager.getAllBuildParticipants();
 		participants = filterToEnabled(participants, project);
 
 		SubMonitor sub = SubMonitor.convert(monitor, participants.size() + 2);
@@ -140,7 +149,12 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 
 		// Keep these build participant instances and use them in the build process, rather than grabbing new ones
 		// in sub-methods. We do pre- and post- setups on them, so we need to retain instances.
-		List<IBuildParticipant> participants = getBuildParticipantManager().getAllBuildParticipants();
+		IBuildParticipantManager manager = getBuildParticipantManager();
+		if (manager == null)
+		{
+			return new IProject[0];
+		}
+		List<IBuildParticipant> participants = manager.getAllBuildParticipants();
 		participants = filterToEnabled(participants, project);
 		buildStarting(participants, kind, sub.newChild(10));
 
@@ -229,11 +243,13 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 			ResourceCollector collector = new ResourceCollector();
 			delta.accept(collector);
 
+			indexProjectBuildPaths(sub.newChild(25));
+
 			// Notify of the removed files
-			removeFiles(participants, collector.removedFiles, sub.newChild(25));
+			removeFiles(participants, collector.removedFiles, sub.newChild(5));
 
 			// Now build the new/updated files
-			buildFiles(participants, collector.updatedFiles, sub.newChild(75));
+			buildFiles(participants, collector.updatedFiles, sub.newChild(70));
 		}
 		catch (CoreException e)
 		{
@@ -254,8 +270,13 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 		{
 			BuildContext context = new BuildContext(file);
 			sub.worked(1);
-			List<IBuildParticipant> filteredParticipants = getBuildParticipantManager().filterParticipants(
-					participants, context.getContentType());
+			IBuildParticipantManager manager = getBuildParticipantManager();
+			if (manager == null)
+			{
+				return;
+			}
+			List<IBuildParticipant> filteredParticipants = manager.filterParticipants(participants,
+					context.getContentType());
 			sub.worked(5);
 			deleteFile(context, filteredParticipants, sub.newChild(10));
 		}
@@ -279,7 +300,8 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 
 	protected IBuildParticipantManager getBuildParticipantManager()
 	{
-		return BuildPathCorePlugin.getDefault().getBuildParticipantManager();
+		BuildPathCorePlugin plugin = BuildPathCorePlugin.getDefault();
+		return (plugin == null) ? null : plugin.getBuildParticipantManager();
 	}
 
 	/**
@@ -292,21 +314,63 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
 
-		// Index files contributed to project build path
+		indexProjectBuildPaths(sub.newChild(50));
+
+		// Index files contributed...
+		// TODO Remove these special "contributed" files?
 		IProject project = getProjectHandle();
 		URI uri = project.getLocationURI();
 		Set<IFileStore> contributedFiles = getContributedFiles(uri);
-		sub.worked(5);
-		buildContributedFiles(participants, contributedFiles, sub.newChild(10));
+		sub.worked(2);
+		buildContributedFiles(participants, contributedFiles, sub.newChild(6));
 
 		// Now index the actual files in the project
 		CollectingResourceVisitor visitor = new CollectingResourceVisitor();
 		project.accept(visitor);
 		visitor.files.trimToSize(); // shrink it down to size when we're done
-		sub.worked(5);
-		buildFiles(participants, visitor.files, sub.newChild(80));
+		sub.worked(2);
+		buildFiles(participants, visitor.files, sub.newChild(40));
 
 		sub.done();
+	}
+
+	/**
+	 * Grabs the list of {@link IBuildPathEntry}s for a project and make sure the indices for them are up-to-date.
+	 * 
+	 * @param monitor
+	 */
+	private void indexProjectBuildPaths(IProgressMonitor monitor)
+	{
+		IProject project = getProjectHandle();
+		Set<IBuildPathEntry> entries = getBuildPathManager().getBuildPaths(project);
+		SubMonitor sub = SubMonitor.convert(monitor, entries.size());
+		for (IBuildPathEntry entry : entries)
+		{
+			try
+			{
+				IFileStore fileStore = EFS.getStore(entry.getPath());
+				if (fileStore != null)
+				{
+					if (fileStore.fetchInfo().isDirectory())
+					{
+						new IndexContainerJob(entry.getDisplayName(), entry.getPath()).run(sub.newChild(1));
+					}
+					else
+					{
+						new IndexFileJob(entry.getDisplayName(), entry.getPath()).run(sub.newChild(1));
+					}
+				}
+			}
+			catch (Throwable e)
+			{
+				IdeLog.logError(BuildPathCorePlugin.getDefault(), e);
+			}
+		}
+	}
+
+	protected BuildPathManager getBuildPathManager()
+	{
+		return BuildPathManager.getInstance();
 	}
 
 	/**
@@ -330,8 +394,13 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 			BuildContext context = new FileStoreBuildContext(project, file);
 			sub.worked(1);
 
-			List<IBuildParticipant> filteredParticipants = getBuildParticipantManager().filterParticipants(
-					participants, context.getContentType());
+			IBuildParticipantManager manager = getBuildParticipantManager();
+			if (manager == null)
+			{
+				return;
+			}
+			List<IBuildParticipant> filteredParticipants = manager.filterParticipants(participants,
+					context.getContentType());
 			sub.worked(2);
 
 			buildFile(context, filteredParticipants, sub.newChild(12));
@@ -353,6 +422,9 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 	 */
 	protected Set<IFileStore> getContributedFiles(URI container)
 	{
+		// FIXME This shoves all contributed files into the same index as the project!
+		// We want the notion of a project referring to build path entries that are maintained in their own indices,
+		// which we can share across projects!
 		Set<IFileStore> result = new HashSet<IFileStore>();
 
 		IndexManager manager = getIndexManager();
@@ -430,8 +502,13 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 			BuildContext context = new BuildContext(file);
 			sub.worked(1);
 
-			List<IBuildParticipant> filteredParticipants = getBuildParticipantManager().filterParticipants(
-					participants, context.getContentType());
+			IBuildParticipantManager manager = getBuildParticipantManager();
+			if (manager == null)
+			{
+				return;
+			}
+			List<IBuildParticipant> filteredParticipants = manager.filterParticipants(participants,
+					context.getContentType());
 			sub.worked(2);
 
 			buildFile(context, filteredParticipants, sub.newChild(12));

@@ -37,41 +37,9 @@
                style="push">
             <visibleWhen
                   checkEnabled="false">
-               <or>
-                  <with
-                        variable="selection">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 forcePluginActivation="true"
-                                 property="com.aptana.deploy.project.isDeployType"
-                                 value="com.aptana.deploy.ftp.provider">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-                  <and>
-                     <with
-                           variable="activePart">
-                        <instanceof
-                              value="org.eclipse.ui.IEditorPart">
-                        </instanceof>
-                     </with>
-                     <with
-                           variable="activeEditorInput">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 forcePluginActivation="true"
-                                 property="com.aptana.deploy.project.isDeployType"
-                                 value="com.aptana.deploy.ftp.provider">
-                           </test>
-                        </adapt>
-                     </with>
-                  </and>
-               </or>
+                <reference
+                     definitionId="com.aptana.deploy.openshift.isFTPDeployType">
+               </reference>
             </visibleWhen>
          </command>
          <command
@@ -79,39 +47,9 @@
                style="push">
             <visibleWhen
                   checkEnabled="false">
-               <or>
-                  <with
-                        variable="selection">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 property="com.aptana.deploy.project.isDeployType"
-                                 value="com.aptana.deploy.ftp.provider">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-                  <and>
-                     <with
-                           variable="activePart">
-                        <instanceof
-                              value="org.eclipse.ui.IEditorPart">
-                        </instanceof>
-                     </with>
-                     <with
-                           variable="activeEditorInput">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 property="com.aptana.deploy.project.isDeployType"
-                                 value="com.aptana.deploy.ftp.provider">
-                           </test>
-                        </adapt>
-                     </with>
-                  </and>
-               </or>
+                <reference
+                     definitionId="com.aptana.deploy.openshift.isFTPDeployType">
+               </reference>
             </visibleWhen>
          </command>
          <command
@@ -119,39 +57,9 @@
                style="push">
             <visibleWhen
                   checkEnabled="false">
-               <or>
-                  <with
-                        variable="selection">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 property="com.aptana.deploy.project.isDeployType"
-                                 value="com.aptana.deploy.ftp.provider">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-                  <and>
-                     <with
-                           variable="activePart">
-                        <instanceof
-                              value="org.eclipse.ui.IEditorPart">
-                        </instanceof>
-                     </with>
-                     <with
-                           variable="activeEditorInput">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 property="com.aptana.deploy.project.isDeployType"
-                                 value="com.aptana.deploy.ftp.provider">
-                           </test>
-                        </adapt>
-                     </with>
-                  </and>
-               </or>
+               <reference
+                     definitionId="com.aptana.deploy.openshift.isFTPDeployType">
+               </reference>
             </visibleWhen>
          </command>
          <menu
@@ -167,39 +75,9 @@
             </command>
             <visibleWhen
                   checkEnabled="false">
-               <or>
-                  <with
-                        variable="selection">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 property="com.aptana.deploy.project.isDeployType"
-                                 value="com.aptana.deploy.ftp.provider">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-                  <and>
-                     <with
-                           variable="activePart">
-                        <instanceof
-                              value="org.eclipse.ui.IEditorPart">
-                        </instanceof>
-                     </with>
-                     <with
-                           variable="activeEditorInput">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 property="com.aptana.deploy.project.isDeployType"
-                                 value="com.aptana.deploy.ftp.provider">
-                           </test>
-                        </adapt>
-                     </with>
-                  </and>
-               </or>
+                <reference
+                     definitionId="com.aptana.deploy.openshift.isFTPDeployType">
+               </reference>
             </visibleWhen>
          </menu>
          <separator
@@ -211,39 +89,9 @@
                style="push">
             <visibleWhen
                   checkEnabled="false">
-               <or>
-                  <with
-                        variable="selection">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 property="com.aptana.deploy.project.isDeployType"
-                                 value="com.aptana.deploy.ftp.provider">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-                  <and>
-                     <with
-                           variable="activePart">
-                        <instanceof
-                              value="org.eclipse.ui.IEditorPart">
-                        </instanceof>
-                     </with>
-                     <with
-                           variable="activeEditorInput">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 property="com.aptana.deploy.project.isDeployType"
-                                 value="com.aptana.deploy.ftp.provider">
-                           </test>
-                        </adapt>
-                     </with>
-                  </and>
-               </or>
+                <reference
+                     definitionId="com.aptana.deploy.openshift.isFTPDeployType">
+               </reference>
             </visibleWhen>
          </command>
          <command
@@ -251,39 +99,9 @@
                style="push">
             <visibleWhen
                   checkEnabled="false">
-               <or>
-                  <with
-                        variable="selection">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 property="com.aptana.deploy.project.isDeployType"
-                                 value="com.aptana.deploy.ftp.provider">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-                  <and>
-                     <with
-                           variable="activePart">
-                        <instanceof
-                              value="org.eclipse.ui.IEditorPart">
-                        </instanceof>
-                     </with>
-                     <with
-                           variable="activeEditorInput">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 property="com.aptana.deploy.project.isDeployType"
-                                 value="com.aptana.deploy.ftp.provider">
-                           </test>
-                        </adapt>
-                     </with>
-                  </and>
-               </or>
+                <reference
+                     definitionId="com.aptana.deploy.openshift.isFTPDeployType">
+               </reference>
             </visibleWhen>
          </command>
          <separator
@@ -295,7 +113,18 @@
                style="push">
             <visibleWhen
                   checkEnabled="false">
-               <or>
+               <reference
+                     definitionId="com.aptana.deploy.openshift.isFTPDeployType">
+               </reference>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+      </extension>
+<extension
+         point="org.eclipse.core.expressions.definitions">
+      <definition
+            id="com.aptana.deploy.openshift.isFTPDeployType">
+         <or>
                   <with
                         variable="selection">
                      <iterate
@@ -303,6 +132,7 @@
                         <adapt
                               type="org.eclipse.core.resources.IResource">
                            <test
+                                 forcePluginActivation="true"
                                  property="com.aptana.deploy.project.isDeployType"
                                  value="com.aptana.deploy.ftp.provider">
                            </test>
@@ -321,6 +151,7 @@
                         <adapt
                               type="org.eclipse.core.resources.IResource">
                            <test
+                                 forcePluginActivation="true"
                                  property="com.aptana.deploy.project.isDeployType"
                                  value="com.aptana.deploy.ftp.provider">
                            </test>
@@ -328,9 +159,6 @@
                      </with>
                   </and>
                </or>
-            </visibleWhen>
-         </command>
-      </menuContribution>
-      </extension>
-
+      </definition>
+   </extension>
 </plugin>

@@ -40,6 +40,8 @@ public class Messages extends NLS
 	public static String EclipseDiagnosticLog_jre_version;
 	public static String EclipseDiagnosticLog_language;
 	public static String EclipseDiagnosticLog_os_arch;
+
+	public static String EclipseDiagnosticLog_os_version;
 	public static String EclipseDiagnosticLog_vm_args;
 	public static String EclipseDiagnosticLog_workspace_dir;
 
