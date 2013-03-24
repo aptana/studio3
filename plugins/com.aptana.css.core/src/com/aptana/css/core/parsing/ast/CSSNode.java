@@ -1,10 +1,6 @@
 /**
  * Aptana Studio
-<<<<<<< HEAD:plugins/com.aptana.editor.css/src/com/aptana/editor/css/parsing/ast/CSSNode.java
- * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
-=======
  * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
->>>>>>> development:plugins/com.aptana.css.core/src/com/aptana/css/core/parsing/ast/CSSNode.java
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
