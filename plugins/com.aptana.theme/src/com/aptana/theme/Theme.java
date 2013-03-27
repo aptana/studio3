@@ -882,13 +882,13 @@ public class Theme
 		return searchResultBG;
 	}
 
-	RGB lighten(RGB color)
+	public RGB lighten(RGB color)
 	{
 		float[] hsb = color.getHSB();
 		return new RGB(hsb[0], hsb[1], Math.min(1, (float) (hsb[2] + 0.15)));
 	}
 
-	RGB darken(RGB color)
+	public RGB darken(RGB color)
 	{
 		float[] hsb = color.getHSB();
 		return new RGB(hsb[0], hsb[1], Math.max(0, (float) (hsb[2] - 0.15)));
