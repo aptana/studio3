@@ -21,6 +21,7 @@ import org.osgi.service.prefs.BackingStoreException;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.deploy.DeployPlugin;
+import com.aptana.deploy.internal.ProjectPropertyTester;
 import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 
 public class DeployPreferenceUtil
@@ -105,7 +106,7 @@ public class DeployPreferenceUtil
 		String id = null;
 		try
 		{
-			id = container.getPersistentProperty(DEPLOY_TYPE_QUALIFIED_KEY);
+			id = container.getProject().getPersistentProperty(DEPLOY_TYPE_QUALIFIED_KEY);
 			if (id == null)
 			{
 				// Add a compatibility layer with old stuff here
@@ -153,7 +154,8 @@ public class DeployPreferenceUtil
 	{
 		try
 		{
-			container.setPersistentProperty(DEPLOY_TYPE_QUALIFIED_KEY, providerId);
+			container.getProject().setPersistentProperty(DEPLOY_TYPE_QUALIFIED_KEY, providerId);
+			ProjectPropertyTester.resetCache(container);
 		}
 		catch (CoreException e)
 		{
