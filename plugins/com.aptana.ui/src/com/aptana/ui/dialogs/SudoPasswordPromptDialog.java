@@ -99,7 +99,7 @@ public class SudoPasswordPromptDialog extends Dialog
 		parent.setFont(msgPromptFont);
 
 		Label authImageLbl = new Label(parent, SWT.None);
-		final Image authImage = UIPlugin.getImageDescriptor(SECURITY_IMAGE).createImage(); //$NON-NLS-1$
+		final Image authImage = UIPlugin.getImageDescriptor(SECURITY_IMAGE).createImage();
 		authImageLbl.setImage(authImage);
 
 		Label promptMsg = new Label(parent, SWT.WRAP);
