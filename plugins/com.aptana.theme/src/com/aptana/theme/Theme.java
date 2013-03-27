@@ -884,14 +884,24 @@ public class Theme
 
 	RGB lighten(RGB color)
 	{
+		return lighten(color, (float) 0.15);
+	}
+
+	public RGB lighten(RGB color, float amount)
+	{
 		float[] hsb = color.getHSB();
-		return new RGB(hsb[0], hsb[1], Math.min(1, (float) (hsb[2] + 0.15)));
+		return new RGB(hsb[0], hsb[1], Math.min(1, hsb[2] + amount));
 	}
 
 	RGB darken(RGB color)
 	{
+		return darken(color, (float) 0.15);
+	}
+
+	public RGB darken(RGB color, float amount)
+	{
 		float[] hsb = color.getHSB();
-		return new RGB(hsb[0], hsb[1], Math.max(0, (float) (hsb[2] - 0.15)));
+		return new RGB(hsb[0], hsb[1], Math.max(0, hsb[2] - amount));
 	}
 
 	public boolean hasDarkBG()
