@@ -229,12 +229,12 @@ public class NodePackageManager implements INodePackageManager
 	private List<String> proxySettings()
 	{
 		IProxyService service = JSCorePlugin.getDefault().getProxyService();
-		if (service == null)
+		if (service == null || !service.isProxiesEnabled())
 		{
 			return Collections.emptyList();
 		}
 
-		List<String> proxyArgs = new ArrayList<String>();
+		List<String> proxyArgs = new ArrayList<String>(4);
 		IProxyData httpData = service.getProxyData(IProxyData.HTTP_PROXY_TYPE);
 		if (httpData != null && httpData.getHost() != null)
 		{
