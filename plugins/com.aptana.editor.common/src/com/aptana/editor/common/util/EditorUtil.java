@@ -355,12 +355,18 @@ public class EditorUtil
 	 * the fileName is empty, it will save all dirty project files
 	 * 
 	 * @param project
+	 *            A non-null project reference.
 	 * @param fileName
+	 *            A file name (can be null)
 	 * @param promptQuestion
 	 * @return
 	 */
 	public static boolean verifySaveEditor(final IProject project, final String fileName, final String promptQuestion)
 	{
+		if (project == null)
+		{
+			throw new IllegalArgumentException("verifySaveEditor - Project cannot be null"); //$NON-NLS-1$
+		}
 		final boolean[] result = new boolean[] { true };
 		UIUtils.getDisplay().syncExec(new Runnable()
 		{
@@ -386,9 +392,13 @@ public class EditorUtil
 					for (IEditorPart editor : dirtyEditors)
 					{
 						IFile file = (IFile) (editor.getEditorInput().getAdapter(IFile.class));
-						if (file != null && (projectFile == null || file.equals(projectFile)))
+						// We only look at dirty editors from the given project
+						if (file.getProject().equals(project))
 						{
-							applicableEditors.add(editor);
+							if (file != null && (projectFile == null || file.equals(projectFile)))
+							{
+								applicableEditors.add(editor);
+							}
 						}
 					}
 
