@@ -429,7 +429,7 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 					// location.
 					try
 					{
-						sourceFile = new URI(sourceFile.getScheme(), null, sourceMapResult.getFile().toOSString(), null);
+						sourceFile = new URI(sourceFile.getScheme(), null, sourceMapResult.getFile().toString(), null);
 						sourceLine = sourceMapResult.getLineNumber();
 					}
 					catch (URISyntaxException e)
