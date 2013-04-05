@@ -7,6 +7,8 @@
  */
 package com.aptana.js.internal.core.node;
 
+import java.io.File;
+import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,12 +22,15 @@ import java.util.regex.Pattern;
 import org.eclipse.core.net.proxy.IProxyData;
 import org.eclipse.core.net.proxy.IProxyService;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
 import com.aptana.core.IMap;
@@ -153,6 +158,37 @@ public class NodePackageManager implements INodePackageManager
 
 			Map<String, String> environment = ShellExecutable.getEnvironment();
 			environment.put(ProcessUtil.REDIRECT_ERROR_STREAM, StringUtil.EMPTY);
+
+			// HACK for TISTUD-4101
+			if (PlatformUtil.isWindows())
+			{
+				IPath pythonExe = ExecutableUtil.find("pythonw.exe", false, null); //$NON-NLS-1$
+				if (pythonExe == null)
+				{
+					// Add python to PATH
+					Bundle bundle = Platform.getBundle("com.appcelerator.titanium.python.win32"); //$NON-NLS-1$
+					if (bundle != null)
+					{
+						// Windows is wonderful, it sometimes stores in "Path" and "PATH" doesn't work
+						String pathName = "PATH"; //$NON-NLS-1$
+						if (!environment.containsKey(pathName))
+						{
+							pathName = "Path"; //$NON-NLS-1$
+						}
+						String path = environment.get(pathName);
+
+						IPath relative = new Path("."); //$NON-NLS-1$
+						URL bundleURL = FileLocator.find(bundle, relative, null);
+						URL fileURL = FileLocator.toFileURL(bundleURL);
+						File f = new File(fileURL.getPath());
+						if (f.exists())
+						{
+							path = path + File.pathSeparator + new File(f, "python").getCanonicalPath(); //$NON-NLS-1$
+							environment.put(pathName, path);
+						}
+					}
+				}
+			}
 
 			Process p = ProcessUtil.run(args.get(0), workingDirectory, environment, args.subList(1, args.size())
 					.toArray(new String[args.size() - 1]));
