@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -45,6 +45,11 @@ import com.aptana.ui.util.UIUtils;
  */
 public class ProjectTemplatesManager
 {
+	/**
+	 * A special generated tag where all templates without tags end up.
+	 */
+	public static final String TAG_OTHERS = Messages.ProjectTemplatesManager_OthersTagName;
+
 	private static final String EXTENSION_POINT = "projectTemplates"; //$NON-NLS-1$
 	private static final String ELEMENT_TEMPLATEINFO = "templateInfo"; //$NON-NLS-1$
 	private static final String ELEMENT_LOCAL = "local"; //$NON-NLS-1$
