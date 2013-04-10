@@ -485,36 +485,33 @@ public class GitIndex
 		return result;
 	}
 
-	public boolean commit(String commitMessage)
+	public IStatus commit(String commitMessage)
 	{
-		boolean success = doCommit(commitMessage);
-		if (!success)
+		IStatus status = doCommit(commitMessage);
+		if (status.isOK())
 		{
-			return false;
-		}
+			repository.hasChanged();
 
-		repository.hasChanged();
-
-		if (amend)
-		{
-			this.amend = false;
+			if (amend)
+			{
+				this.amend = false;
+			}
+			else
+			{
+				refresh(new NullProgressMonitor());
+			}
 		}
-		else
-		{
-			refresh(new NullProgressMonitor());
-		}
-		return true;
+		return status;
 	}
 
-	private boolean doCommit(String commitMessage)
+	private IStatus doCommit(String commitMessage)
 	{
 		if (Platform.OS_WIN32.equals(Platform.getOS()))
 		{
 			commitMessage = commitMessage.replace("\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		IStatus result = repository.execute(GitRepository.ReadWrite.WRITE, repository.workingDirectory(),
+		return repository.execute(GitRepository.ReadWrite.WRITE, repository.workingDirectory(),
 				ShellExecutable.getEnvironment(repository.workingDirectory()), "commit", "-m", commitMessage); //$NON-NLS-1$ //$NON-NLS-2$
-		return result != null && result.isOK();
 	}
 
 	/**

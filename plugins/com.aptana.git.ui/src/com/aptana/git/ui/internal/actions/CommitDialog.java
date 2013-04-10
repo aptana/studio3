@@ -963,15 +963,15 @@ class CommitDialog extends StatusDialog
 			// disable the buttons until commit is done
 			getButton(IDialogConstants.CANCEL_ID).setEnabled(false);
 			getButton(IDialogConstants.OK_ID).setEnabled(false);
-			boolean success = gitRepository.index().commit(getCommitMessage());
-			if (success)
+			IStatus status = gitRepository.index().commit(getCommitMessage());
+			if (status.isOK())
 			{
 				// commit worked, wipe commit message and staged files in table
 				commitMessage.setText(StringUtil.EMPTY);
 				stagedTable.removeAll();
-				// TODO Show some sort of success message?
 			}
-			// TODO What if the commit failed for some reason?!
+			updateStatus(status);
+
 			// Re-enable buttons
 			getButton(IDialogConstants.CANCEL_ID).setEnabled(true);
 			getButton(IDialogConstants.OK_ID).setEnabled(true);
