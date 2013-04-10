@@ -15,7 +15,7 @@ import java.util.Set;
 
 /**
  * @author Max Stepanov
- *
+ * TODO Merge/reuse IObjectPool? Very similar uses/implementations!
  */
 public class ExpiringMap<K, V> implements Map<K, V> {
 
