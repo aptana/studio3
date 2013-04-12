@@ -341,13 +341,6 @@
          version="0.0.0"/>
 
    <plugin
-         id="com.aptana.editor.diff"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="com.aptana.theme"
          download-size="0"
          install-size="0"
@@ -363,20 +356,6 @@
 
    <plugin
          id="com.aptana.projects"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="com.aptana.editor.markdown"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="com.aptana.editor.beaver"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -405,20 +384,6 @@
 
    <plugin
          id="com.amazon.s3"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="com.aptana.editor.svg"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="com.aptana.editor.idl"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -468,13 +433,6 @@
 
    <plugin
          id="com.aptana.formatter.ui.epl"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="com.aptana.editor.yaml"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -623,28 +581,7 @@
          unpack="false"/>
 
    <plugin
-         id="com.aptana.deploy.engineyard"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="com.aptana.deploy.ftp"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="com.aptana.deploy.heroku"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="com.aptana.deploy.capistrano"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -759,6 +696,13 @@
 
    <plugin
          id="com.aptana.json.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.editor.svg"
          download-size="0"
          install-size="0"
          version="0.0.0"
