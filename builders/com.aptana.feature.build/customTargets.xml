@@ -84,11 +84,6 @@
 			<param name="bundle.dir.name" value="shell-script.ruble" />
 			<param name="bundle.branch" value="${scs.branch.name}" />
 		</antcall>
-		<antcall target="clone-bundle">
-			<param name="bundle.name" value="coffeescript.ruble" />
-			<param name="bundle.dir.name" value="coffeescript.ruble" />
-			<param name="bundle.branch" value="${scs.branch.name}" />
-		</antcall>
 		
 		<!-- Delete the pre-generation of cache scripts repo clone -->
 		<delete dir="${scripting.plugin.dir}/bundles/studio3-sdk" failonerror="true" />
