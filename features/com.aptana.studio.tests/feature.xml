@@ -57,7 +57,6 @@
       <import plugin="com.aptana.editor.xml.formatter"/>
       <import plugin="com.aptana.editor.html.formatter"/>
       <import plugin="com.aptana.editor.js.formatter"/>
-      <import plugin="com.aptana.editor.coffee"/>
       <import plugin="org.eclipse.osgi" version="3.1.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.deploy.ftp"/>
       <import plugin="com.aptana.samples"/>
