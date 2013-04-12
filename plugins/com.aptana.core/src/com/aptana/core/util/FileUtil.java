@@ -8,12 +8,11 @@
 package com.aptana.core.util;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.filesystem.EFS;
-import org.eclipse.core.filesystem.provider.FileSystem;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -308,5 +307,43 @@ public class FileUtil
 		{
 			return false;
 		}
+	}
+
+	/**
+	 * Recursively iterate through the directories and returns the file that matches first with the given criteria.
+	 * 
+	 * @param rootDir
+	 * @param fileExtension
+	 * @param recursive
+	 * @return
+	 */
+	public static File findFile(File rootDir, final String fileExtension, boolean recursive)
+	{
+		File[] childFiles = rootDir.listFiles(new FileFilter()
+		{
+			public boolean accept(File file)
+			{
+				if (file.isDirectory())
+				{
+					return true;
+				}
+				String extension = getExtension(file.getName());
+				return fileExtension.equals(extension);
+			}
+		});
+		for (File childFile : childFiles)
+		{
+			String extension = getExtension(childFile.getName());
+			if (fileExtension.equals(extension))
+			{
+				return childFile;
+			}
+			File matchingFile = findFile(childFile, fileExtension, recursive);
+			if (matchingFile != null)
+			{
+				return matchingFile;
+			}
+		}
+		return null;
 	}
 }
