@@ -40,15 +40,12 @@ public class UITests
 		suite.addTest(com.aptana.editor.dtd.AllTests.suite());
 		suite.addTest(com.aptana.editor.html.tests.AllTests.suite());
 		suite.addTest(com.aptana.editor.html.formatter.tests.AllTests.suite());
-		suite.addTest(com.aptana.editor.idl.AllTests.suite());
 		suite.addTest(com.aptana.editor.js.tests.AllTests.suite());
 		suite.addTest(com.aptana.editor.js.formatter.tests.AllTests.suite());
 		suite.addTest(com.aptana.editor.json.tests.AllTests.suite());
-		suite.addTest(com.aptana.editor.markdown.tests.AllTests.suite());
 		// suite.addTest(com.aptana.editor.text.tests.AllTests.suite()); // TODO Add Tests for editor.text
 		suite.addTest(com.aptana.editor.xml.tests.AllTests.suite());
 		suite.addTest(com.aptana.editor.xml.formatter.tests.AllTests.suite());
-		suite.addTest(com.aptana.editor.yaml.tests.AllTests.suite());
 		// suite.addTest(com.aptana.explorer.tests.AllTests.suite()); // TODO Add Tests for explorer
 		// FIXME I think the way we do passwords causes us to have to run s3 tests in the UI!
 //		suite.addTest(com.aptana.filesystem.s3.tests.AllTests.suite());
