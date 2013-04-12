@@ -16,9 +16,9 @@ import java.util.TimerTask;
 
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PlatformUI;
-
-import com.aptana.ui.epl.UIEplPlugin;
 
 /**
  * @author seva
@@ -28,18 +28,29 @@ public class StatusLineMessageTimerManager
 	static String message;
 	static boolean isError;
 	static IStatusLineManager statusLineManager = null;
+	private static MessageTimerTask task;
 
 	static IStatusLineManager getStatusLineManager()
 	{
 		try
 		{
-			return UIEplPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor()
-					.getEditorSite().getActionBars().getStatusLineManager();
+			IWorkbenchPartSite site = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+					.getActivePart().getSite();
+			return ((IViewSite) site).getActionBars().getStatusLineManager();
 		}
-		catch (NullPointerException npe)
+		catch (Exception e)
 		{
-			return null;
+			// try to get the IStatusLineManager through an active editor
+			try
+			{
+				return PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor()
+						.getEditorSite().getActionBars().getStatusLineManager();
+			}
+			catch (Exception e1)
+			{
+			}
 		}
+		return null;
 	}
 
 	static void setMessage(String newMessage, boolean newIsError)
@@ -60,10 +71,15 @@ public class StatusLineMessageTimerManager
 	public static void setErrorMessage(String message, long timeout, boolean isError)
 	{
 		statusLineManager = getStatusLineManager();
+		System.out.println(statusLineManager);
 		if (statusLineManager != null)
 		{
 			setMessage(message, isError);
-			TimerTask task = new MessageTimerTask(statusLineManager, message, isError);
+			if (task != null)
+			{
+				task.cancel();
+			}
+			task = new MessageTimerTask(statusLineManager, message, isError);
 			(new Timer()).schedule(task, timeout);
 		}
 	}
@@ -83,7 +99,15 @@ public class StatusLineMessageTimerManager
 
 		public void run()
 		{
+			if (PlatformUI.getWorkbench().isClosing())
+			{
+				return;
+			}
 			Display display = PlatformUI.getWorkbench().getDisplay();
+			if (display.isDisposed())
+			{
+				return;
+			}
 			display.asyncExec(new Runnable()
 			{
 				public void run()
