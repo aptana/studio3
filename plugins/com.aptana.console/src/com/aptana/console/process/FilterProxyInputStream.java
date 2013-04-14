@@ -10,28 +10,34 @@ import java.nio.charset.IllegalCharsetNameException;
 
 import com.aptana.core.util.ArrayUtil;
 
-public class FilterProxyInputStream extends InputStream {
+public class FilterProxyInputStream extends InputStream
+{
 
 	private static final char CR = '\n';
-	
+	private static final int BACKSPACE = 8;
+
 	private IProcessOutputFilter processOutputFilter;
 	private ByteArrayInputStream lineBuffer;
 	private final BufferedReader reader;
 	private Charset charset;
 
-	public FilterProxyInputStream(InputStream in, String encoding, IProcessOutputFilter processOutputFilter) {
+	public FilterProxyInputStream(InputStream in, String encoding, IProcessOutputFilter processOutputFilter)
+	{
 		super();
 		this.processOutputFilter = processOutputFilter;
 		charset = Charset.defaultCharset();
-		try {
+		try
+		{
 			charset = Charset.forName(encoding);
 		}
-		catch (IllegalCharsetNameException e) {
+		catch (IllegalCharsetNameException e)
+		{
 		}
 		this.reader = new BufferedReader(new InputStreamReader(in, charset));
 	}
 
-	public void setProcessOutputFilter(IProcessOutputFilter processOutputFilter) {
+	public void setProcessOutputFilter(IProcessOutputFilter processOutputFilter)
+	{
 		this.processOutputFilter = processOutputFilter;
 	}
 
@@ -40,9 +46,15 @@ public class FilterProxyInputStream extends InputStream {
 	 * @see java.io.FilterInputStream#read()
 	 */
 	@Override
-	public int read() throws IOException {
+	public int read() throws IOException
+	{
 		fillBuffer();
-		return lineBuffer.read();
+		int ch = lineBuffer.read();
+		while (ch == BACKSPACE)
+		{
+			ch = lineBuffer.read();
+		}
+		return ch;
 	}
 
 	/*
@@ -50,22 +62,66 @@ public class FilterProxyInputStream extends InputStream {
 	 * @see java.io.InputStream#read(byte[], int, int)
 	 */
 	@Override
-	public int read(byte[] b, int off, int len) throws IOException {
+	public int read(byte[] b, int off, int len) throws IOException
+	{
+		if (b == null)
+		{
+			throw new NullPointerException();
+		}
+		else if (off < 0 || len < 0 || len > b.length - off)
+		{
+			throw new IndexOutOfBoundsException();
+		}
+		else if (len == 0)
+		{
+			return 0;
+		}
+
 		fillBuffer();
-		return lineBuffer.read(b, off, len);
+		int c = lineBuffer.read();
+		while (c == BACKSPACE)
+		{
+			c = lineBuffer.read();
+		}
+		if (c == -1)
+		{
+			return -1;
+		}
+		b[off] = (byte) c;
+
+		int i = 1;
+		for (; i < len; i++)
+		{
+			c = lineBuffer.read();
+			while (c == BACKSPACE)
+			{
+				c = lineBuffer.read();
+			}
+			if (c == -1)
+			{
+				break;
+			}
+			b[off + i] = (byte) c;
+		}
+		return i;
 	}
 
-	private void fillBuffer() throws IOException {
-		if (lineBuffer != null && lineBuffer.available() > 0) {
+	private void fillBuffer() throws IOException
+	{
+		if (lineBuffer != null && lineBuffer.available() > 0)
+		{
 			return;
 		}
 		String line = null;
-		do {
+		do
+		{
 			line = reader.readLine();
-			if (line == null) {
+			if (line == null)
+			{
 				break;
 			}
-			if (processOutputFilter != null) {
+			if (processOutputFilter != null)
+			{
 				line = processOutputFilter.filter(line);
 			}
 		}

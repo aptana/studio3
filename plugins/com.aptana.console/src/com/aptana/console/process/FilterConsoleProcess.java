@@ -58,7 +58,7 @@ public class FilterConsoleProcess extends RuntimeProcess {
 				@Override
 				protected InputStream createInputStream(InputStream in) {
 					String encoding = getLaunch().getAttribute(DebugPlugin.ATTR_CONSOLE_ENCODING);
-					return new FilterProxyInputStream(new ESCSequnceFilterInputStream(in), encoding, processOutputFilter);
+					return new FilterProxyInputStream(in, encoding, processOutputFilter);
 				}
 			};
 		}
