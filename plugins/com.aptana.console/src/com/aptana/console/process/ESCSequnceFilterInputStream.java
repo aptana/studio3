@@ -33,9 +33,6 @@ public class ESCSequnceFilterInputStream extends FilterInputStream {
 	@Override
 	public int read() throws IOException {
 		int ch =  super.read();
-		while (ch == 8) {
-			ch = super.read();
-		}
 		if (ch == 27) {
 			ch = super.read();
 			if (ch == '[') {
