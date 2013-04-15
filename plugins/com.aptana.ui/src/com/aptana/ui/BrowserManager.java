@@ -20,7 +20,9 @@ import org.eclipse.ui.internal.browser.BrowserDescriptorWorkingCopy;
 import org.eclipse.ui.internal.browser.IBrowserDescriptor;
 import org.eclipse.ui.internal.browser.IBrowserDescriptorWorkingCopy;
 
+import com.aptana.core.IMap;
 import com.aptana.core.util.BrowserUtil;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.IBrowserUtil.BrowserInfo;
 import com.aptana.core.util.PlatformUtil;
@@ -137,12 +139,13 @@ public class BrowserManager implements IBrowserProvider
 	{
 		List<IBrowserDescriptor> webBrowsers = org.eclipse.ui.internal.browser.BrowserManager.getInstance()
 				.getWebBrowsers();
-		List<BrowserInfo> browsers = new ArrayList<BrowserInfo>(webBrowsers.size());
-		for (IBrowserDescriptor browser : webBrowsers)
+		return CollectionsUtil.map(webBrowsers, new IMap<IBrowserDescriptor, BrowserInfo>()
 		{
-			browsers.add(new BrowserInfo(browser.getName(), browser.getLocation()));
-		}
-		return browsers;
+			public BrowserInfo map(IBrowserDescriptor browser)
+			{
+				return new BrowserInfo(browser.getName(), browser.getLocation());
+			}
+		});
 	}
 
 	/*
