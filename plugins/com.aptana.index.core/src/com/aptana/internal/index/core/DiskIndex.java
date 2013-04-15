@@ -1090,12 +1090,20 @@ public class DiskIndex
 			try
 			{
 				if (size < 0)
-				{ // DEBUG
-					System.err.println("-------------------- DEBUG --------------------"); //$NON-NLS-1$
-					System.err.println("file = " + this.indexFile); //$NON-NLS-1$
-					System.err.println("offset = " + offset); //$NON-NLS-1$
-					System.err.println("size = " + size); //$NON-NLS-1$
-					System.err.println("--------------------   END   --------------------"); //$NON-NLS-1$
+				{
+					// DEBUG
+					StringBuilder debug = new StringBuilder();
+					debug.append("-------------------- DEBUG --------------------\n"); //$NON-NLS-1$
+					debug.append("file = ").append(this.indexFile).append('\n'); //$NON-NLS-1$
+					debug.append("offset = ").append(offset).append('\n'); //$NON-NLS-1$
+					debug.append("size = ").append(size).append('\n'); //$NON-NLS-1$
+					debug.append("--------------------   END   --------------------\n"); //$NON-NLS-1$
+					System.err.print(debug.toString());
+					IdeLog.logError(
+							IndexPlugin.getDefault(),
+							MessageFormat.format(
+									"Size of category ''{0}'' negative:\n{1}", categoryName, debug.toString())); //$NON-NLS-1$
+					size = 0;
 				}
 
 				categoryTable = new HashMap<String, Object>(size);
@@ -1107,9 +1115,9 @@ public class DiskIndex
 				oom.printStackTrace();
 				String error = MessageFormat
 						.format("Index error in readCategoryTable. \nfile = {0} \noffset = {1} \n size = {2}", this.indexFile, offset, size); //$NON-NLS-1$
-				System.err.println("-------------------- DEBUG --------------------"); //$NON-NLS-1$
+				System.err.println("-------------------- DEBUG --------------------\n"); //$NON-NLS-1$
 				System.err.println(error);
-				System.err.println("--------------------   END   --------------------"); //$NON-NLS-1$
+				System.err.println("--------------------   END   --------------------\n"); //$NON-NLS-1$
 				IdeLog.logError(IndexPlugin.getDefault(), error, oom);
 				throw oom;
 			}
