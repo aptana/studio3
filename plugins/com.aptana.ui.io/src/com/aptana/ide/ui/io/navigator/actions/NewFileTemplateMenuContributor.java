@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
 
@@ -45,6 +46,7 @@ import org.eclipse.ui.services.IEvaluationService;
 import org.eclipse.ui.wizards.newresource.BasicNewFileResourceWizard;
 
 import com.aptana.core.util.ArrayUtil;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.editor.common.internal.scripting.NewTemplateFileWizard;
 import com.aptana.scripting.model.AbstractElement;
 import com.aptana.scripting.model.BundleManager;
@@ -60,8 +62,19 @@ import com.aptana.ui.util.UIUtils;
 public class NewFileTemplateMenuContributor extends ContributionItem
 {
 
+	// @formatter:off
 	private static final String[] APTANA_EDITOR_PREFIX = new String[] {
-			"com.aptana.editor.", "org.python.pydev.editor." }; //$NON-NLS-1$ //$NON-NLS-2$
+			"com.aptana.editor.", //$NON-NLS-1$
+			"org.python.pydev.editor." //$NON-NLS-1$
+			};
+	// @formatter:on
+
+	// @formatter:off
+	private static final Set<String> FILTERED_EDITORS = CollectionsUtil.newSet(
+			"com.aptana.editor.dtd", //$NON-NLS-1$
+			"com.aptana.editor.svg" //$NON-NLS-1$
+			);
+	// @formatter:on
 
 	private static Map<String, String> aptanaEditors;
 
@@ -80,6 +93,7 @@ public class NewFileTemplateMenuContributor extends ContributionItem
 		return true;
 	}
 
+	@SuppressWarnings("unused")
 	@Override
 	public void fill(Menu menu, int index)
 	{
@@ -99,9 +113,7 @@ public class NewFileTemplateMenuContributor extends ContributionItem
 		});
 
 		// constructs the menus
-		Map<String, List<TemplateElement>> templatesByBundle = getNewFileTemplates();
-		List<TemplateElement> templates;
-
+		final Map<String, List<TemplateElement>> templatesByBundle = getNewFileTemplates();
 		for (String filetype : editors)
 		{
 			MenuItem editorItem = new MenuItem(menu, SWT.CASCADE);
@@ -110,8 +122,8 @@ public class NewFileTemplateMenuContributor extends ContributionItem
 			Menu editorMenu = new Menu(menu);
 			editorItem.setMenu(editorMenu);
 
-			templates = templatesByBundle.get(filetype);
-			boolean hasTemplates = templates != null && templates.size() > 0;
+			List<TemplateElement> templates = templatesByBundle.get(filetype);
+			boolean hasTemplates = !CollectionsUtil.isEmpty(templates);
 			if (hasTemplates)
 			{
 				// sorts by precedence first
@@ -156,9 +168,10 @@ public class NewFileTemplateMenuContributor extends ContributionItem
 				new MenuItem(editorMenu, SWT.SEPARATOR);
 			}
 
+			// TODO If we have no templates for an editor, do we really want a blank file entry?
 			// adds a "Blank File" item
 			String fileExtension;
-			if (templates != null && templates.size() > 0)
+			if (hasTemplates)
 			{
 				fileExtension = templates.get(0).getFiletype();
 				// strips the leading *. if there is one
@@ -226,6 +239,10 @@ public class NewFileTemplateMenuContributor extends ContributionItem
 		dialog.open();
 	}
 
+	/**
+	 * @param editorType
+	 * @param fileExtension
+	 */
 	protected void createNewBlankFile(String editorType, String fileExtension)
 	{
 		final String initialFileName = "new_file." + fileExtension; //$NON-NLS-1$
@@ -276,41 +293,20 @@ public class NewFileTemplateMenuContributor extends ContributionItem
 	{
 		// finds the editors we contribute and the file extension each maps to
 		Map<String, String> editorMap = new TreeMap<String, String>();
-		IFileEditorMapping[] mappings = PlatformUI.getWorkbench().getEditorRegistry().getFileEditorMappings();
-		IEditorDescriptor[] editors;
-		IContentTypeMatcher matcher = null;
-		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-		if (projects != null && projects.length > 0)
-		{
-			try
-			{
-				matcher = projects[0].getContentTypeMatcher();
-			}
-			catch (CoreException e)
-			{
-				// ignore
-			}
-		}
-		String extension;
+		IFileEditorMapping[] mappings = getFileEditorMappings();
+		final IContentTypeMatcher matcher = getContentTypeMatcher();
 		for (IFileEditorMapping mapping : mappings)
 		{
-			editors = mapping.getEditors();
-			extension = mapping.getExtension();
-			if (matcher != null)
-			{
-				IContentType type = matcher.findContentTypeFor("new_file." + extension); //$NON-NLS-1$
-				if (type != null)
-				{
-					String[] extensions = type.getFileSpecs(IContentType.FILE_EXTENSION_SPEC);
-					if (extensions != null && extensions.length > 0)
-					{
-						extension = extensions[0];
-					}
-				}
-			}
+			IEditorDescriptor[] editors = mapping.getEditors();
+			String extension = getExtension(matcher, mapping);
 			for (IEditorDescriptor editor : editors)
 			{
 				String editorId = editor.getId();
+				if (FILTERED_EDITORS.contains(editorId))
+				{
+					continue;
+				}
+
 				for (String prefix : APTANA_EDITOR_PREFIX)
 				{
 					if (editorId.startsWith(prefix))
@@ -329,6 +325,46 @@ public class NewFileTemplateMenuContributor extends ContributionItem
 			}
 		}
 		return editorMap;
+	}
+
+	protected static String getExtension(IContentTypeMatcher matcher, IFileEditorMapping mapping)
+	{
+		String extension = mapping.getExtension();
+		if (matcher != null)
+		{
+			IContentType type = matcher.findContentTypeFor("new_file." + extension); //$NON-NLS-1$
+			if (type != null)
+			{
+				String[] extensions = type.getFileSpecs(IContentType.FILE_EXTENSION_SPEC);
+				if (!ArrayUtil.isEmpty(extensions))
+				{
+					return extensions[0];
+				}
+			}
+		}
+		return extension;
+	}
+
+	protected static IFileEditorMapping[] getFileEditorMappings()
+	{
+		return PlatformUI.getWorkbench().getEditorRegistry().getFileEditorMappings();
+	}
+
+	protected static IContentTypeMatcher getContentTypeMatcher()
+	{
+		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+		if (!ArrayUtil.isEmpty(projects))
+		{
+			try
+			{
+				return projects[0].getContentTypeMatcher();
+			}
+			catch (CoreException e)
+			{
+				// ignore
+			}
+		}
+		return null;
 	}
 
 	private static IStructuredSelection getActiveSelection()
@@ -350,8 +386,7 @@ public class NewFileTemplateMenuContributor extends ContributionItem
 
 	private Map<String, List<TemplateElement>> getNewFileTemplates()
 	{
-		Map<String, List<TemplateElement>> templatesByBundle = new TreeMap<String, List<TemplateElement>>();
-		List<CommandElement> commands = BundleManager.getInstance().getExecutableCommands(new IModelFilter()
+		List<CommandElement> commands = getBundleManager().getExecutableCommands(new IModelFilter()
 		{
 
 			public boolean include(AbstractElement element)
@@ -364,22 +399,28 @@ public class NewFileTemplateMenuContributor extends ContributionItem
 				return false;
 			}
 		});
-		if (commands != null)
+		if (CollectionsUtil.isEmpty(commands))
 		{
-			String bundleName;
-			List<TemplateElement> templates;
-			for (CommandElement command : commands)
+			return Collections.emptyMap();
+		}
+
+		Map<String, List<TemplateElement>> templatesByBundle = new TreeMap<String, List<TemplateElement>>();
+		for (CommandElement command : commands)
+		{
+			String bundleName = command.getOwningBundle().getDisplayName();
+			List<TemplateElement> templates = templatesByBundle.get(bundleName);
+			if (templates == null)
 			{
-				bundleName = command.getOwningBundle().getDisplayName();
-				templates = templatesByBundle.get(bundleName);
-				if (templates == null)
-				{
-					templates = new ArrayList<TemplateElement>();
-					templatesByBundle.put(bundleName, templates);
-				}
-				templates.add((TemplateElement) command);
+				templates = new ArrayList<TemplateElement>(1);
+				templatesByBundle.put(bundleName, templates);
 			}
+			templates.add((TemplateElement) command);
 		}
 		return templatesByBundle;
+	}
+
+	protected BundleManager getBundleManager()
+	{
+		return BundleManager.getInstance();
 	}
 }
