@@ -82,10 +82,11 @@ public class PortalStartup implements IStartup
 						if (delta.getKind() == IResourceDelta.ADDED)
 						{
 							final IResource resource = delta.getResource();
-							if (resource instanceof IProject && ((IProject) resource).getNature(TITANIUM_MOBILE_NATURE) != null)
+							if (resource instanceof IProject && resource.isAccessible()
+									&& ((IProject) resource).getNature(TITANIUM_MOBILE_NATURE) != null)
 							{
-								IEclipsePreferences prefs = EclipseUtil.instanceScope()
-										.getNode(PortalUIPlugin.PLUGIN_ID);
+								IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(
+										PortalUIPlugin.PLUGIN_ID);
 								prefs.put(IPortalPreferences.RECENTLY_CREATED_PROJECT, resource.getName());
 								try
 								{

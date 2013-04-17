@@ -19,5 +19,5 @@ public interface ISampleProjectHandler
 	 * @param project
 	 *            the newly created sample project
 	 */
-	public void projectCreated(IProject project);
+	public void projectCreated(IProject project, Object data);
 }
