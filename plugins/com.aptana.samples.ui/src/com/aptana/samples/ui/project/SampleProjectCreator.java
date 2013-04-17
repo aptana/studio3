@@ -35,6 +35,7 @@ public class SampleProjectCreator
 		wizard.init(PlatformUI.getWorkbench(), null);
 		WizardDialog dialog = new WizardDialog(UIUtils.getActiveShell(), wizard);
 		dialog.create();
+		dialog.getShell().setSize(450, 330);
 		dialog.open();
 	}
 }

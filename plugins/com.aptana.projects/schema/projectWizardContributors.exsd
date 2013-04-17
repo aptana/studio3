@@ -59,10 +59,10 @@
                </appinfo>
             </annotation>
          </attribute>
-         <attribute name="dependentBundle" type="string">
+         <attribute name="id" type="string">
             <annotation>
                <documentation>
-                  
+                  Represents unique id for the wizard contribution. If there are multiple contributors based on same id, then the contributor with highest priority is considered.
                </documentation>
             </annotation>
          </attribute>
@@ -74,6 +74,13 @@
                <appinfo>
                   <meta.attribute kind="identifier" basedOn="org.eclipse.core.resources.natures/@id"/>
                </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="priority" type="string" use="default" value="60">
+            <annotation>
+               <documentation>
+                  Indicates the priority of the wizard page contribution. The contributor with highest priority will be displayed in the wizard.
+               </documentation>
             </annotation>
          </attribute>
       </complexType>

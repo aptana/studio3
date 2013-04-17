@@ -25,6 +25,8 @@ public class Messages extends NLS
 	public static String NewSampleProjectWizard_LocationExistsMessage;
 	public static String NewSampleProjectWizard_ProjectPage_Description;
 	public static String NewSampleProjectWizard_ProjectPage_Title;
+
+	public static String NewSampleProjectWizard_ServicesError;
 	public static String NewSampleProjectWizard_Title;
 	public static String NewSampleProjectWizard_Warning_DirectoryExists;
 

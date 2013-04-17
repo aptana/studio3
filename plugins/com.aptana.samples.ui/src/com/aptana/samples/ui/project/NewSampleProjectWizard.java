@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -17,8 +17,10 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IProjectNatureDescriptor;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceStatus;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
@@ -33,11 +35,10 @@ import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.swt.widgets.Composite;
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.ide.undo.CreateProjectOperation;
 import org.eclipse.ui.ide.undo.WorkspaceUndoUtil;
@@ -53,7 +54,9 @@ import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.ZipUtil;
 import com.aptana.git.ui.CloneJob;
+import com.aptana.projects.ProjectsPlugin;
 import com.aptana.projects.wizards.AbstractNewProjectWizard;
+import com.aptana.projects.wizards.ProjectWizardContributionManager;
 import com.aptana.samples.handlers.ISampleProjectHandler;
 import com.aptana.samples.model.IProjectSample;
 import com.aptana.samples.ui.SamplesUIPlugin;
@@ -72,9 +75,11 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 	private static final String NEWPROJECT_WIZARD = "BasicNewProjectResourceWizard"; //$NON-NLS-1$
 
 	private IProjectSample sample;
-	private WizardNewProjectCreationPage mainPage;
+	private SampleNewProjectCreationPage mainPage;
 	private IProject newProject;
 	private IConfigurationElement configElement;
+
+	public String[] availableProjectNatures;
 
 	/**
 	 * A wizard to create a new sample project.
@@ -84,6 +89,12 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 	 */
 	public NewSampleProjectWizard(IProjectSample sample)
 	{
+		IProjectNatureDescriptor[] natureDescriptors = ResourcesPlugin.getWorkspace().getNatureDescriptors();
+		availableProjectNatures = new String[natureDescriptors.length];
+		for (int i = 0; i < natureDescriptors.length; i++)
+		{
+			availableProjectNatures[i] = natureDescriptors[i].getNatureId();
+		}
 		this.sample = sample;
 		initDialogSettings();
 	}
@@ -93,45 +104,7 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 	{
 		super.addPages();
 
-		mainPage = new WizardNewProjectCreationPage("basicNewProjectPage") //$NON-NLS-1$
-		{
-
-			@Override
-			public void createControl(Composite parent)
-			{
-				super.createControl(parent);
-				validatePage();
-			}
-
-			@Override
-			protected boolean validatePage()
-			{
-				boolean valid = super.validatePage();
-				if (!valid)
-				{
-					return false;
-				}
-
-				// Check if there's already a directory/files at the destination
-				IPath location = getLocationPath();
-				if (useDefaults())
-				{
-					// needs to append the project name since getLocationPath() returns the workspace path in this case
-					location = location.append(getProjectName());
-				}
-
-				File file = location.toFile();
-				if (file.exists())
-				{
-					setMessage(Messages.NewSampleProjectWizard_LocationExistsMessage, WARNING);
-					return true;
-				}
-
-				setErrorMessage(null);
-				setMessage(null);
-				return true;
-			}
-		};
+		mainPage = new SampleNewProjectCreationPage("basicNewProjectPage", availableProjectNatures); //$NON-NLS-1$
 		mainPage.setTitle(Messages.NewSampleProjectWizard_ProjectPage_Title);
 		mainPage.setDescription(Messages.NewSampleProjectWizard_ProjectPage_Description);
 		addPage(mainPage);
@@ -141,6 +114,21 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 		{
 			mainPage.setInitialProjectName(name);
 		}
+
+		// Add contributed pages
+		ProjectWizardContributionManager projectWizardContributionManager = ProjectsPlugin.getDefault()
+				.getProjectWizardContributionManager();
+		IWizardPage[] extraPages = projectWizardContributionManager.createPages(null, availableProjectNatures);
+		if (!ArrayUtil.isEmpty(extraPages))
+		{
+			for (IWizardPage page : extraPages)
+			{
+				addPage(page);
+			}
+		}
+
+		// Finalize pages using contributors
+		projectWizardContributionManager.finalizeWizardPages(getPages(), availableProjectNatures);
 	}
 
 	@Override
@@ -222,7 +210,8 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 				doBasicCreateProject(newProjectHandle, description);
 
 				// FIXME Move the logic for extracting/applying samples to IProjectSample! See IProjectTemplate!
-				ZipUtil.extract(new File(sample.getLocation()), newProjectHandle.getLocation(), ZipUtil.Conflict.PROMPT, new NullProgressMonitor());
+				ZipUtil.extract(new File(sample.getLocation()), newProjectHandle.getLocation(),
+						ZipUtil.Conflict.PROMPT, new NullProgressMonitor());
 
 				doPostProjectCreation(newProjectHandle);
 			}
@@ -327,7 +316,6 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 		Job job = new CloneJob(gitURL, path.toOSString(), true, true);
 		job.addJobChangeListener(new JobChangeAdapter()
 		{
-
 			@Override
 			public void done(IJobChangeEvent event)
 			{
@@ -349,7 +337,7 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 				doPostProjectCreation(newProject);
 			}
 		});
-		job.schedule(500);
+		job.schedule();
 	}
 
 	private void doPostProjectCreation(IProject newProject)
@@ -357,7 +345,17 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 		ISampleProjectHandler projectHandler = sample.getProjectHandler();
 		if (projectHandler != null)
 		{
-			projectHandler.projectCreated(newProject);
+			projectHandler.projectCreated(newProject, mainPage.getProjectData());
+		}
+
+		// Allow the project contributors to do work
+		ProjectWizardContributionManager projectWizardContributionManager = ProjectsPlugin.getDefault()
+				.getProjectWizardContributionManager();
+		final IStatus contributorStatus = projectWizardContributionManager.performProjectFinish(newProject,
+				new NullProgressMonitor());
+		if (contributorStatus != null && contributorStatus.getSeverity() == Status.ERROR)
+		{
+			UIUtils.showErrorMessage(Messages.NewSampleProjectWizard_ServicesError, contributorStatus.getMessage());
 		}
 	}
 
