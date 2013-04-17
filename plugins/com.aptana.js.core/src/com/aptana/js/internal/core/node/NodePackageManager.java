@@ -293,8 +293,7 @@ public class NodePackageManager implements INodePackageManager
 	private String buildProxyURL(IProxyData data)
 	{
 		StringBuilder builder = new StringBuilder();
-		builder.append(data.getType().toLowerCase());
-		builder.append("://"); //$NON-NLS-1$
+		builder.append("http://"); //$NON-NLS-1$
 		if (!StringUtil.isEmpty(data.getUserId()))
 		{
 			builder.append(data.getUserId());
