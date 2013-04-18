@@ -14,6 +14,7 @@ import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IPath;
 
 import com.aptana.core.util.ExpiringMap;
 import com.aptana.core.util.StringUtil;
@@ -79,9 +80,14 @@ public class ProjectPropertyTester extends PropertyTester
 			{
 				return false;
 			}
+			IPath location = container.getLocation();
+			if (location == null)
+			{
+				return false;
+			}
 			if ("isDeployable".equals(property)) //$NON-NLS-1$
 			{
-				DeployValues deployValues = containerCache.get(container.getLocation().toOSString());
+				DeployValues deployValues = containerCache.get(location.toOSString());
 				if (deployValues != null)
 				{
 					Boolean deployableValue = deployValues.getDeployableValue();
@@ -99,7 +105,7 @@ public class ProjectPropertyTester extends PropertyTester
 			else if ("isDeployType".equals(property)) //$NON-NLS-1$
 			{
 				String arg = (String) expectedValue;
-				DeployValues deployValues = containerCache.get(container.getLocation().toOSString());
+				DeployValues deployValues = containerCache.get(location.toOSString());
 				if (deployValues != null)
 				{
 					Boolean deployTypeValue = deployValues.getDeployTypeValue(arg);
