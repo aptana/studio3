@@ -7,7 +7,7 @@
             class="com.aptana.editor.js.JSSourceEditor"
             contributorClass="com.aptana.editor.common.CommonTextEditorActionContributor"
             default="true"
-            extensions="js,htc,jsx"
+            extensions="js,htc,jsx,chromium"
             icon="icons/js.png"
             id="com.aptana.editor.js"
             name="%editor.js.name">
