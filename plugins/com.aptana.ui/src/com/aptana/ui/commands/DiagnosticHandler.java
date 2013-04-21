@@ -17,8 +17,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
-import com.aptana.core.diagnostic.DiagnosticManager;
+import com.aptana.core.CorePlugin;
 import com.aptana.core.diagnostic.IDiagnosticLog;
+import com.aptana.core.diagnostic.IDiagnosticManager;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ui.dialogs.DiagnosticDialog;
@@ -58,7 +59,7 @@ public class DiagnosticHandler extends AbstractHandler
 	public static String getLogContent()
 	{
 		StringBuilder content = new StringBuilder();
-		List<IDiagnosticLog> logs = DiagnosticManager.getInstance().getLogs();
+		List<IDiagnosticLog> logs = getDiagnosticManager().getLogs();
 		String logText;
 		for (IDiagnosticLog log : logs)
 		{
@@ -69,5 +70,10 @@ public class DiagnosticHandler extends AbstractHandler
 			}
 		}
 		return content.toString();
+	}
+
+	protected static IDiagnosticManager getDiagnosticManager()
+	{
+		return CorePlugin.getDefault().getDiagnosticManager();
 	}
 }
