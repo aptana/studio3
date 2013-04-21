@@ -59,13 +59,13 @@ public class ContentDownloadRequest
 	 * 
 	 * @return The absolute path of the downloaded file; Null, in case the local save location was not resolved.
 	 */
-	public String getDownloadLocation()
+	public IPath getDownloadLocation()
 	{
 		if (saveTo == null)
 		{
 			return null;
 		}
-		return saveTo.getAbsolutePath();
+		return Path.fromOSString(saveTo.getAbsolutePath());
 	}
 
 	protected void setResult(IStatus result)

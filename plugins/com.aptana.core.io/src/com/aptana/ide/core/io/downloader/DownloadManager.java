@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -10,16 +10,19 @@ package com.aptana.ide.core.io.downloader;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.ide.core.io.CoreIOPlugin;
 
 /**
@@ -32,15 +35,13 @@ import com.aptana.ide.core.io.CoreIOPlugin;
 public class DownloadManager
 {
 	private List<ContentDownloadRequest> downloads;
-	private List<String> completedDownloadsPaths;
+	private List<IPath> completedDownloadsPaths;
 
 	/**
 	 * Constructs a new DownloadManager
 	 */
 	public DownloadManager()
 	{
-		downloads = new ArrayList<ContentDownloadRequest>();
-		completedDownloadsPaths = new ArrayList<String>();
 	}
 
 	/**
@@ -56,7 +57,7 @@ public class DownloadManager
 	{
 		if (url != null)
 		{
-			this.downloads.add(new ContentDownloadRequest(url));
+			addDownload(new ContentDownloadRequest(url));
 		}
 	}
 
@@ -76,8 +77,17 @@ public class DownloadManager
 	{
 		if (url != null)
 		{
-			this.downloads.add(new ContentDownloadRequest(url, saveTo));
+			addDownload(new ContentDownloadRequest(url, saveTo));
 		}
+	}
+
+	private synchronized void addDownload(ContentDownloadRequest request)
+	{
+		if (downloads == null)
+		{
+			downloads = new ArrayList<ContentDownloadRequest>(2);
+		}
+		downloads.add(request);
 	}
 
 	/**
@@ -91,14 +101,11 @@ public class DownloadManager
 	 */
 	public void addURLs(List<URL> urls) throws CoreException
 	{
-		if (urls != null)
+		if (!CollectionsUtil.isEmpty(urls))
 		{
 			for (URL url : urls)
 			{
-				if (url != null)
-				{
-					this.downloads.add(new ContentDownloadRequest(url));
-				}
+				addURL(url);
 			}
 		}
 	}
@@ -108,19 +115,21 @@ public class DownloadManager
 	 */
 	public IStatus start(IProgressMonitor monitor)
 	{
-		SubMonitor subMonitor = SubMonitor.convert(monitor, Messages.DownloadManager_downloadngContent, 1000);
+		if (CollectionsUtil.isEmpty(downloads))
+		{
+			return Status.OK_STATUS;
+		}
+
 		try
 		{
-			if (downloads.isEmpty())
-			{
-				return Status.OK_STATUS;
-			}
-			download(subMonitor);
-			return getStatus(monitor);
+			return download(monitor);
 		}
 		finally
 		{
-			subMonitor.done();
+			if (monitor != null)
+			{
+				monitor.done();
+			}
 		}
 	}
 
@@ -129,50 +138,45 @@ public class DownloadManager
 	 * 
 	 * @param monitor
 	 */
-	protected void download(SubMonitor monitor)
+	protected IStatus download(IProgressMonitor monitor)
 	{
-		int workUnits = 1000 / downloads.size();
+		SubMonitor subMonitor = SubMonitor.convert(monitor, Messages.DownloadManager_downloadingContent,
+				downloads.size());
+		MultiStatus multi = new MultiStatus(CoreIOPlugin.PLUGIN_ID, IStatus.OK, null, null);
+		completedDownloadsPaths = new ArrayList<IPath>(downloads.size());
 		for (Iterator<ContentDownloadRequest> iterator = downloads.iterator(); iterator.hasNext();)
 		{
-			ContentDownloadRequest request = iterator.next();
-			request.execute(monitor.newChild(workUnits));
-			if (request.getResult() != null && request.getResult().isOK())
+			if (subMonitor.isCanceled())
 			{
-				completedDownloadsPaths.add(request.getDownloadLocation());
-				iterator.remove();
+				// TODO Append to multi status and return that?
+				return Status.CANCEL_STATUS;
 			}
-			monitor.setWorkRemaining(downloads.size());
+
+			ContentDownloadRequest request = iterator.next();
+			request.execute(subMonitor.newChild(1));
+			IStatus result = request.getResult();
+			if (result != null)
+			{
+				if (result.isOK())
+				{
+					completedDownloadsPaths.add(request.getDownloadLocation());
+					iterator.remove();
+				}
+				multi.add(result);
+			}
+			subMonitor.setWorkRemaining(downloads.size());
 		}
+
+		return multi;
 	}
 
 	/**
 	 * Returns the location paths where the requested content was downloaded to.
 	 * 
-	 * @return A string array containing the paths for the file that were downloaded.
+	 * @return A list of IPath containing the paths for the file that were downloaded.
 	 */
-	public String[] getContentsLocations()
+	public List<IPath> getContentsLocations()
 	{
-		return completedDownloadsPaths.toArray(new String[completedDownloadsPaths.size()]);
-	}
-
-	private IStatus getStatus(IProgressMonitor monitor)
-	{
-		if (monitor != null && monitor.isCanceled())
-		{
-			return Status.CANCEL_STATUS;
-		}
-		if (downloads.isEmpty())
-		{
-			return Status.OK_STATUS;
-		}
-
-		MultiStatus result = new MultiStatus(CoreIOPlugin.PLUGIN_ID, IStatus.OK, null, null);
-		for (ContentDownloadRequest request : downloads)
-		{
-			IStatus failed = request.getResult();
-			if (failed != null && !failed.isOK())
-				result.add(failed);
-		}
-		return result;
+		return Collections.unmodifiableList(CollectionsUtil.getListValue(completedDownloadsPaths));
 	}
 }

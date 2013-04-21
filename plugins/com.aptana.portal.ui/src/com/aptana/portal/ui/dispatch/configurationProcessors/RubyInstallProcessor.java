@@ -7,16 +7,15 @@
  */
 package com.aptana.portal.ui.dispatch.configurationProcessors;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
@@ -29,6 +28,7 @@ import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.configurations.processor.ConfigurationStatus;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.ide.core.io.LockUtils;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.configurationProcessors.installer.InstallerOptionsDialog;
@@ -44,10 +44,7 @@ import com.aptana.portal.ui.dispatch.configurationProcessors.installer.Installer
 public class RubyInstallProcessor extends InstallerConfigurationProcessor
 {
 	private static final String RUBY = "Ruby"; //$NON-NLS-1$
-	private static final String DEVKIT = "DevKit"; //$NON-NLS-1$
 	protected static final String RUBY_DEFAULT_INSTALL_DIR = "C:\\Ruby"; //$NON-NLS-1$
-	protected static final String DEVKIT_FSTAB_PATH = "\\devkit\\msys\\1.0.11\\etc\\fstab"; //$NON-NLS-1$
-	protected static final String DEVKIT_FSTAB_LOCATION_PREFIX = "C:/Ruby/"; //$NON-NLS-1$
 	// The process return code for a Ruby installer cancel.
 	private static final int RUBY_INSTALLER_PROCESS_CANCEL = 5;
 	private static boolean installationInProgress;
@@ -174,13 +171,9 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 	 */
 	protected IStatus install(IProgressMonitor progressMonitor)
 	{
-		if (downloadedPaths == null || downloadedPaths[0] == null)
+		if (CollectionsUtil.isEmpty(downloadedPaths) || CollectionsUtil.getFirstElement(downloadedPaths) == null)
 		{
 			String failureMessge = Messages.InstallProcessor_couldNotLocateInstaller;
-			if (downloadedPaths != null && downloadedPaths[0] != null)
-			{
-				failureMessge = NLS.bind(Messages.InstallProcessor_couldNotLocatePackage, DEVKIT);
-			}
 			String err = NLS.bind(Messages.InstallProcessor_failedToInstall, RUBY);
 			displayMessageInUIThread(MessageDialog.ERROR, Messages.InstallProcessor_installationErrorTitle, err + ' '
 					+ failureMessge);
@@ -192,7 +185,7 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 		{
 			subMonitor
 					.beginTask(NLS.bind(Messages.InstallProcessor_installingTaskName, RUBY), IProgressMonitor.UNKNOWN);
-			final String[] installDir = new String[1];
+			final IPath[] installDir = new IPath[1];
 			Job installRubyDialog = new UIJob("Ruby installer options") //$NON-NLS-1$
 			{
 				@Override
@@ -201,13 +194,10 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 					RubyInstallerOptionsDialog dialog = new RubyInstallerOptionsDialog();
 					if (dialog.open() == Window.OK)
 					{
-						installDir[0] = dialog.getInstallDir();
+						installDir[0] = Path.fromOSString(dialog.getInstallDir());
 						return Status.OK_STATUS;
 					}
-					else
-					{
-						return Status.CANCEL_STATUS;
-					}
+					return Status.CANCEL_STATUS;
 				}
 			};
 			installRubyDialog.schedule();
@@ -230,21 +220,7 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 				return status;
 			}
 			IdeLog.logInfo(PortalUIPlugin.getDefault(), "Successfully installed Ruby into " + installDir[0]); //$NON-NLS-1$
-			// Ruby was installed successfully. Now we need to extract DevKit into the Ruby dir and change its
-			// configurations to match the installation location.
-
-			// TODO - We need to fix the DevKit installation. The DevKit team changed their installation way recently...
-
-			// status = installDevKit(installDir[0]);
-			// if (!status.isOK())
-			// {
-			// displayMessageInUIThread(MessageDialog.ERROR, Messages.InstallProcessor_installationErrorTitle, status
-			// .getMessage());
-			// return status;
-			// }
 			finalizeInstallation(installDir[0]);
-			// PortalUIPlugin.logInfo(
-			//					"Successfully installed DevKit into " + installDir[0] + ". Ruby installation completed.", null); //$NON-NLS-1$ //$NON-NLS-2$
 			return Status.OK_STATUS;
 		}
 		catch (Exception e)
@@ -265,7 +241,7 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 	 * @param installDir
 	 * @return The status of this installation
 	 */
-	protected IStatus installRuby(final String installDir)
+	protected IStatus installRuby(final IPath installDir)
 	{
 		Job job = new Job(NLS.bind(Messages.InstallProcessor_installerJobName, RUBY + ' '
 				+ Messages.InstallProcessor_installerGroupTitle))
@@ -282,15 +258,16 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 
 					// Try to get a file lock first, before running the process. This file was just downloaded, so there
 					// is a chance it's still being held by the OS or by the downloader.
-					IStatus fileLockStatus = LockUtils.waitForLockRelease(downloadedPaths[0], 10000L);
+					IPath downloadPath = downloadedPaths.get(0);
+					IStatus fileLockStatus = LockUtils.waitForLockRelease(downloadPath.toOSString(), 10000L);
 					if (!fileLockStatus.isOK())
 					{
 						return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, NLS.bind(
 								Messages.InstallProcessor_failedToInstallSeeLog, RUBY));
 					}
 
-					ProcessBuilder processBuilder = new ProcessBuilder(downloadedPaths[0],
-							"/silent", "/dir=\"" + installDir + "\"", "/tasks=\"modpath\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+					ProcessBuilder processBuilder = new ProcessBuilder(downloadPath.toOSString(),
+							"/silent", "/dir=\"" + installDir.toOSString() + "\"", "/tasks=\"modpath\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 					Process process = processBuilder.start();
 					int res = process.waitFor();
 					if (res == RUBY_INSTALLER_PROCESS_CANCEL)
@@ -307,7 +284,7 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 						return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, res, NLS.bind(
 								Messages.InstallProcessor_installationErrorMessage, RUBY, RUBY), null);
 					}
-					else if (!new File(installDir).exists())
+					else if (!installDir.toFile().exists())
 					{
 						// Just to be sure that we got everything in place
 						IdeLog.logError(PortalUIPlugin.getDefault(),
@@ -344,107 +321,16 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 	}
 
 	/**
-	 * Extract the downloaded DevKit into the install dir and configure it to work.<br>
-	 * At this stage, we assume that the install dir and the DevKit package have been verified and valid!
-	 * 
-	 * @param dir
-	 * @return The result status of the installation
-	 * @throws Exception
-	 */
-	protected IStatus installDevKit(String dir)
-	{
-		final String installDir = dir + File.separatorChar + "DevKit"; //$NON-NLS-1$
-		Job job = new Job(NLS.bind(Messages.InstallProcessor_installingTaskName, DEVKIT))
-		{
-			@Override
-			protected IStatus run(IProgressMonitor monitor)
-			{
-				try
-				{
-					SubMonitor subMonitor = SubMonitor.convert(monitor, 1000);
-					subMonitor.beginTask(
-							NLS.bind(Messages.InstallProcessor_extractingPackageTaskName, DEVKIT, installDir), 900);
-					// We get a folder status first, before unzipping into the folder. This folder was just created,
-					// so there is a chance it's still being held by the OS or by the Ruby installer.
-					IStatus folderStatus = LockUtils.waitForFolderAccess(installDir, 10000);
-					if (!folderStatus.isOK())
-					{
-						PortalUIPlugin.getDefault().getLog().log(folderStatus);
-						return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, NLS.bind(
-								Messages.InstallProcessor_failedToInstallSeeLog, DEVKIT));
-					}
-					// DevKit arrives as a 7zip package, so we use a specific Windows decoder to extract it.
-					// This extraction process follows the instructions at:
-					// http://wiki.github.com/oneclick/rubyinstaller/development-kit
-					extractWin(downloadedPaths[1], installDir);
-					subMonitor.worked(900);
-
-					subMonitor.beginTask(NLS.bind(Messages.InstallProcessor_updatingTaskName, DEVKIT), 100);
-					// Update the /devkit/msys/1.0.11/etc/fstab with the Ruby installation path
-					File fstab = new File(installDir, DEVKIT_FSTAB_PATH);
-					StringBuilder builder = new StringBuilder();
-					// read the content of the original file and update the Ruby location to the selected one. Then,
-					// save the new content and override the file.
-					String pathReplacement = installDir.replaceAll("\\\\", "/"); //$NON-NLS-1$ //$NON-NLS-2$
-					if (!pathReplacement.endsWith("/")) //$NON-NLS-1$
-					{
-						pathReplacement = pathReplacement + '/';
-					}
-					String newLine = System.getProperty("line.separator", "\n"); //$NON-NLS-1$ //$NON-NLS-2$
-					BufferedReader reader = new BufferedReader(new FileReader(fstab));
-					String line = null;
-					while ((line = reader.readLine()) != null)
-					{
-						line = line.replaceAll(DEVKIT_FSTAB_LOCATION_PREFIX, pathReplacement);
-						builder.append(line);
-						builder.append(newLine);
-					}
-					reader.close();
-					// Now save the modified content into the same file
-					FileWriter writer = new FileWriter(fstab);
-					writer.write(builder.toString());
-					writer.flush();
-					writer.close();
-					subMonitor.worked(100);
-				}
-				catch (Throwable t)
-				{
-					IdeLog.logError(PortalUIPlugin.getDefault(), "Failed to install DevKit", t); //$NON-NLS-1$
-					return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, NLS.bind(
-							Messages.InstallProcessor_failedToInstallSeeLog, DEVKIT), t);
-				}
-				finally
-				{
-					monitor.done();
-				}
-				return Status.OK_STATUS;
-			}
-		};
-		job.schedule(500);
-		try
-		{
-			job.join();
-		}
-		catch (InterruptedException e)
-		{
-			return Status.CANCEL_STATUS;
-		}
-		return job.getResult();
-	}
-
-	/**
 	 * Finalize the installation by placing a .aptana file in the installed directory, specifying some properties.
 	 * 
 	 * @param installDir
 	 */
-	protected void finalizeInstallation(String installDir)
+	protected void finalizeInstallation(IPath installDir)
 	{
-		super.finalizeInstallation(installDir);
-		File propertiesFile = new File(installDir, APTANA_PROPERTIES_FILE_NAME);
+		super.finalizeInstallation(installDir.toOSString());
+		File propertiesFile = installDir.append(APTANA_PROPERTIES_FILE_NAME).toFile();
 		Properties properties = new Properties();
 		properties.put("ruby_install", urls[0]); //$NON-NLS-1$
-		// TODO - Uncomment this once we have DevKit back
-		// properties.put("devkit_install", urls[1]); //$NON-NLS-1$
 		FileOutputStream fileOutputStream = null;
 		try
 		{

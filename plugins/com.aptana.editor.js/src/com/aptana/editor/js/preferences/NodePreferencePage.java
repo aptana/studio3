@@ -10,6 +10,7 @@ package com.aptana.editor.js.preferences;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.text.MessageFormat;
+import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -196,8 +197,8 @@ public class NodePreferencePage extends FieldEditorPreferencePage implements IWo
 						{
 							// We got the source code. Now we need to extract it and set the value in the text field (or
 							// the preferences, in case the dialog was closed).
-							String[] contentPaths = dm.getContentsLocations();
-							status = TarUtil.extractTGZFile(Path.fromOSString(contentPaths[0]), selectedDir);
+							List<IPath> contentPaths = dm.getContentsLocations();
+							status = TarUtil.extractTGZFile(contentPaths.get(0), selectedDir);
 							if (status.isOK())
 							{
 								// Set the path in the editor field
