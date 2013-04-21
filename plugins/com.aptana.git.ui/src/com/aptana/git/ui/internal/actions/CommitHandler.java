@@ -33,27 +33,9 @@ public class CommitHandler extends AbstractGitHandler
 			openError(Messages.CommitAction_MultipleRepos_Title, Messages.CommitAction_MultipleRepos_Message);
 			return null;
 		}
-		CommitDialog dialog = new CommitDialog(getShell(), theRepo);
-		if (dialog.open() == Window.OK)
-		{
-			IStatus status = theRepo.index().commit(dialog.getCommitMessage());
-			if (!status.isOK())
-			{
-				// Open a dialog/toast letting user know commit didn't happen!
-				int kind;
-				switch (status.getSeverity())
-				{
-					case IStatus.ERROR:
-						kind = MessageDialog.ERROR;
-						break;
 
-					default:
-						kind = MessageDialog.WARNING;
-						break;
-				}
-				UIUtils.showMessageDialogFromBgThread(kind, "Commit failed", status.getMessage(), null);
-			}
-		}
+		CommitDialog dialog = new CommitDialog(getShell(), theRepo);
+		dialog.open(); // dialog handles doing actual commits.
 		return null;
 	}
 

@@ -237,6 +237,9 @@ public class GitIndex
 		}
 
 		// Copy the last full list of changed files we built up on refresh. Used to pass along the delta
+		// FIXME I think the values here may have already changed! I saw a file that had staged changes but no unstaged
+		// prior to commit
+		// but here it showed true for both (which should have only gotten modified by a pre-commit hook)
 		Collection<ChangedFile> preRefresh;
 		synchronized (this.changedFilesLock)
 		{
@@ -491,16 +494,9 @@ public class GitIndex
 		if (status.isOK())
 		{
 			repository.hasChanged();
-
-			if (amend)
-			{
-				this.amend = false;
-			}
-			else
-			{
-				refresh(new NullProgressMonitor());
-			}
 		}
+		// even if a commit fails, the repository's changed files listing may have changed.
+		refresh(new NullProgressMonitor());
 		return status;
 	}
 

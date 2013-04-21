@@ -85,6 +85,7 @@ import org.eclipse.ui.handlers.IHandlerActivation;
 import org.eclipse.ui.handlers.IHandlerService;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.git.core.IDebugScopes;
 import com.aptana.git.core.model.ChangedFile;
@@ -957,29 +958,47 @@ class CommitDialog extends StatusDialog
 	@Override
 	protected void okPressed()
 	{
-		// if there are still unstaged changes don't set return code and close.
-		if (unstagedTable.getItemCount() > 0)
-		{
-			// disable the buttons until commit is done
-			getButton(IDialogConstants.CANCEL_ID).setEnabled(false);
-			getButton(IDialogConstants.OK_ID).setEnabled(false);
-			IStatus status = gitRepository.index().commit(getCommitMessage());
-			if (status.isOK())
-			{
-				// commit worked, wipe commit message and staged files in table
-				commitMessage.setText(StringUtil.EMPTY);
-				stagedTable.removeAll();
-			}
-			updateStatus(status);
+		// disable the buttons until commit is done
+		getButton(IDialogConstants.CANCEL_ID).setEnabled(false);
+		getButton(IDialogConstants.OK_ID).setEnabled(false);
 
-			// Re-enable buttons
-			getButton(IDialogConstants.CANCEL_ID).setEnabled(true);
-			getButton(IDialogConstants.OK_ID).setEnabled(true);
+		// try the commit
+		IStatus status = gitRepository.index().commit(getCommitMessage());
+		if (status.isOK())
+		{
+			// commit worked, wipe commit message
+			commitMessage.setText(StringUtil.EMPTY);
 		}
-		else
+
+		// Force a reload of the staged/unstaged file listing
+		List<ChangedFile> changedFiles = gitRepository.index().changedFiles();
+		// If there are no more staged/unstaged files and the commit went OK, close the dialog.
+		if (CollectionsUtil.isEmpty(changedFiles) && status.isOK())
 		{
 			super.okPressed();
+			return;
 		}
+
+		Collections.sort(changedFiles);
+		stagedTable.removeAll();
+		unstagedTable.removeAll();
+		for (ChangedFile file : changedFiles)
+		{
+			if (file.hasStagedChanges())
+			{
+				createTableItem(stagedTable, file, false);
+			}
+			if (file.hasUnstagedChanges())
+			{
+				createTableItem(unstagedTable, file, false);
+			}
+		}
+		// Update our status
+		updateStatus(status);
+
+		// Re-enable buttons
+		getButton(IDialogConstants.CANCEL_ID).setEnabled(true);
+		getButton(IDialogConstants.OK_ID).setEnabled(true);
 	}
 
 	public String getCommitMessage()
@@ -1070,16 +1089,20 @@ class CommitDialog extends StatusDialog
 	 */
 	private void moveItems(final boolean staged, TableItem... selected)
 	{
-		Set<ChangedFile> selectedFiles = new HashSet<ChangedFile>();
+		Set<ChangedFile> selectedFiles = new HashSet<ChangedFile>(selected.length);
 		for (TableItem item : selected)
 		{
 			ChangedFile file = getChangedFile(item);
 			if (file == null)
+			{
 				continue;
+			}
 			selectedFiles.add(file);
 		}
 		if (selectedFiles.isEmpty())
+		{
 			return;
+		}
 
 		// Actually stage or unstage the files
 		if (staged)
