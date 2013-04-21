@@ -14,7 +14,7 @@ public class Messages extends NLS
 	private static final String BUNDLE_NAME = "com.aptana.ide.core.io.downloader.messages"; //$NON-NLS-1$
 	public static String ContentDownloadRequest_downloading;
 	public static String ContentDownloadRequest_tempFilePrefix;
-	public static String DownloadManager_downloadngContent;
+	public static String DownloadManager_downloadingContent;
 	static
 	{
 		// initialize resource bundle

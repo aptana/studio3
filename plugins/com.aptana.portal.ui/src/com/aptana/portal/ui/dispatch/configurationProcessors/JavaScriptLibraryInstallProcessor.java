@@ -226,11 +226,11 @@ public class JavaScriptLibraryInstallProcessor extends InstallerConfigurationPro
 						}
 						// Copy the downloaded content into the created directory
 						List<IStatus> errors = new ArrayList<IStatus>();
-						for (String f : downloadedPaths)
+						for (IPath f : downloadedPaths)
 						{
 							try
 							{
-								File sourceLocation = new File(f);
+								File sourceLocation = f.toFile();
 								File targetLocation = new File(targetFolder, sourceLocation.getName());
 								if (targetLocation.exists())
 								{

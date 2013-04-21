@@ -12,6 +12,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
@@ -206,8 +207,8 @@ public class NodeJSService implements INodeJSService
 		{
 			throw new CoreException(status);
 		}
-		String[] locations = manager.getContentsLocations();
-		return Path.fromOSString(locations[0]).toFile();
+		List<IPath> locations = manager.getContentsLocations();
+		return locations.get(0).toFile();
 	}
 
 	/*

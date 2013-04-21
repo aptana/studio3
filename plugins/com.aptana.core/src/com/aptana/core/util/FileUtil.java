@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -15,7 +15,9 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
 
 import com.aptana.core.CorePlugin;
 import com.aptana.core.logging.IdeLog;
@@ -345,5 +347,50 @@ public class FileUtil
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Attempts to set permissions on a file. If we have permissions that include group permissions that don't match the
+	 * all value, we fallback to running native chmod. otherwise, we use the Java 6 File APIs to set owner and all
+	 * permissions using siExecutable/isReadable/isWritable.
+	 * 
+	 * @param permString
+	 *            a 3-character String using standard octal permssions. (i.e. 600, 755, 644)
+	 * @param file
+	 *            The file whose permissions we are modifying.
+	 * @return
+	 */
+	public static IStatus chmod(String permString, File file)
+	{
+		char group = permString.charAt(1);
+		char all = permString.charAt(2);
+		if (all != group)
+		{
+			// If group and all permissions don't match, force running chmod, since Java 6 APIs aren't granular enough
+			return ProcessUtil.runInBackground("chmod", null, permString, file.getAbsolutePath()); //$NON-NLS-1$
+		}
+
+		// Set 'all' permissions first, then we can override owner permissions later if they're not the same.
+		boolean isReadable = (((all >> 2) & 1) == 1);
+		boolean isWritable = (((all >> 1) & 1) == 1);
+		boolean isExecutable = ((all & 1) == 1);
+		file.setExecutable(isExecutable, false);
+		file.setWritable(isWritable, false);
+		file.setReadable(isReadable, false);
+
+		char owner = permString.charAt(0);
+		if (owner != all)
+		{
+			// Set owner permissions
+			isReadable = (((owner >> 2) & 1) == 1);
+			isWritable = (((owner >> 1) & 1) == 1);
+			isExecutable = ((owner & 1) == 1);
+			// TODO Check booleans and return error status?
+			file.setExecutable(isExecutable, true);
+			file.setWritable(isWritable, true);
+			file.setReadable(isReadable, true);
+		}
+
+		return Status.OK_STATUS;
 	}
 }

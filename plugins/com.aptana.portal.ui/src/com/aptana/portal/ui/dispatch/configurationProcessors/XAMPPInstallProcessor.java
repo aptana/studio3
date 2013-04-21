@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
@@ -35,6 +36,7 @@ import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.configurations.processor.ConfigurationStatus;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.ide.core.io.LockUtils;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.configurationProcessors.installer.InstallerOptionsDialog;
@@ -177,7 +179,7 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 	 */
 	protected IStatus install(IProgressMonitor progressMonitor)
 	{
-		if (downloadedPaths == null || downloadedPaths[0] == null)
+		if (CollectionsUtil.isEmpty(downloadedPaths) || CollectionsUtil.getFirstElement(downloadedPaths) == null)
 		{
 			String failureMessge = Messages.InstallProcessor_couldNotLocateInstaller;
 			String err = NLS.bind(Messages.InstallProcessor_failedToInstall, XAMPP);
@@ -193,7 +195,7 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 			subMonitor.beginTask(NLS.bind(Messages.InstallProcessor_installingTaskName, XAMPP),
 					IProgressMonitor.UNKNOWN);
 			final String[] installDir = new String[1];
-			Job installRubyDialog = new UIJob("Ruby installer options") //$NON-NLS-1$
+			Job installXAMPPDialog = new UIJob("XAMPP installer options") //$NON-NLS-1$
 			{
 				@Override
 				public IStatus runInUIThread(IProgressMonitor monitor)
@@ -204,21 +206,18 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 						installationAttributes.putAll(dialog.getAttributes());
 						return Status.OK_STATUS;
 					}
-					else
-					{
-						return Status.CANCEL_STATUS;
-					}
+					return Status.CANCEL_STATUS;
 				}
 			};
-			installRubyDialog.schedule();
+			installXAMPPDialog.schedule();
 			try
 			{
-				installRubyDialog.join();
+				installXAMPPDialog.join();
 			}
 			catch (InterruptedException e)
 			{
 			}
-			IStatus result = installRubyDialog.getResult();
+			IStatus result = installXAMPPDialog.getResult();
 			if (!result.isOK())
 			{
 				return result;
@@ -275,7 +274,8 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 
 					// Try to get a file lock first, before running the process. This file was just downloaded, so there
 					// is a chance it's still being held by the OS or by the downloader.
-					IStatus fileLockStatus = LockUtils.waitForLockRelease(downloadedPaths[0], 10000L);
+					IPath downloadPath = downloadedPaths.get(0);
+					IStatus fileLockStatus = LockUtils.waitForLockRelease(downloadPath.toOSString(), 10000L);
 					if (!fileLockStatus.isOK())
 					{
 						return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, NLS.bind(
@@ -284,7 +284,7 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 					// Run the XAMPP installer, as specified in this link:
 					// http://www.apachefriends.org/en/xampp-windows.html#522
 					List<String> command = new ArrayList<String>(4);
-					command.add(downloadedPaths[0]);
+					command.add(downloadPath.toOSString());
 					command.add("-d" + installDir); //$NON-NLS-1$
 					command.add("-s2"); //$NON-NLS-1$
 					if (runAutoInstallScript)
@@ -311,8 +311,7 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 					else if (!new File(installDir).exists())
 					{
 						// Just to be sure that we got everything in place
-						IdeLog.logError(
-								PortalUIPlugin.getDefault(),
+						IdeLog.logError(PortalUIPlugin.getDefault(),
 								"Failed to install XAMPP. The " + installDir + " directory was not created"); //$NON-NLS-1$ //$NON-NLS-2$
 						return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, res, NLS.bind(
 								Messages.InstallProcessor_installationError_installDirMissing, XAMPP), null);

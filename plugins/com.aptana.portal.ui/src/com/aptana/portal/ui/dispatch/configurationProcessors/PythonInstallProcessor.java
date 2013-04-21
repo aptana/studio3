@@ -36,6 +36,7 @@ import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.configurations.processor.ConfigurationStatus;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.ide.core.io.LockUtils;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.configurationProcessors.installer.InstallerOptionsDialog;
@@ -176,7 +177,7 @@ public class PythonInstallProcessor extends InstallerConfigurationProcessor
 	 */
 	protected IStatus install(IProgressMonitor progressMonitor)
 	{
-		if (downloadedPaths == null || downloadedPaths[0] == null)
+		if (CollectionsUtil.isEmpty(downloadedPaths))
 		{
 			String failureMessge = Messages.InstallProcessor_couldNotLocateInstaller;
 			String err = NLS.bind(Messages.InstallProcessor_failedToInstall, PYTHON);
@@ -192,7 +193,7 @@ public class PythonInstallProcessor extends InstallerConfigurationProcessor
 			subMonitor.beginTask(NLS.bind(Messages.InstallProcessor_installingTaskName, PYTHON),
 					IProgressMonitor.UNKNOWN);
 			final String[] installDir = new String[1];
-			Job installRubyDialog = new UIJob("Ruby installer options") //$NON-NLS-1$
+			Job installPythonDialog = new UIJob("Python installer options") //$NON-NLS-1$
 			{
 				@Override
 				public IStatus runInUIThread(IProgressMonitor monitor)
@@ -203,21 +204,18 @@ public class PythonInstallProcessor extends InstallerConfigurationProcessor
 						installationAttributes.putAll(dialog.getAttributes());
 						return Status.OK_STATUS;
 					}
-					else
-					{
-						return Status.CANCEL_STATUS;
-					}
+					return Status.CANCEL_STATUS;
 				}
 			};
-			installRubyDialog.schedule();
+			installPythonDialog.schedule();
 			try
 			{
-				installRubyDialog.join();
+				installPythonDialog.join();
 			}
 			catch (InterruptedException e)
 			{
 			}
-			IStatus result = installRubyDialog.getResult();
+			IStatus result = installPythonDialog.getResult();
 			if (!result.isOK())
 			{
 				return result;
@@ -275,7 +273,7 @@ public class PythonInstallProcessor extends InstallerConfigurationProcessor
 
 					// Try to get a file lock first, before running the process. This file was just downloaded, so there
 					// is a chance it's still being held by the OS or by the downloader.
-					IStatus fileLockStatus = LockUtils.waitForLockRelease(downloadedPaths[0], 10000L);
+					IStatus fileLockStatus = LockUtils.waitForLockRelease(downloadedPaths.get(0).toOSString(), 10000L);
 					if (!fileLockStatus.isOK())
 					{
 						return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, NLS.bind(
@@ -286,7 +284,7 @@ public class PythonInstallProcessor extends InstallerConfigurationProcessor
 					List<String> command = new ArrayList<String>(4);
 					command.add("msiexec"); //$NON-NLS-1$
 					command.add("/i"); //$NON-NLS-1$
-					command.add(downloadedPaths[0]);
+					command.add(downloadedPaths.get(0).toOSString());
 					command.add("/qr"); //$NON-NLS-1$
 					command.add("TARGETDIR=\"" + installDir + '\"'); //$NON-NLS-1$
 					if (Boolean.FALSE.toString().equals(attributesMap.get(INSTALL_FOR_ALL_USERS_ATTR)))
