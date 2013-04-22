@@ -544,6 +544,8 @@ public class StringUtil
 	}
 
 	/**
+	 * Pads the beginning of a string with a given character.
+	 * 
 	 * @param string
 	 * @param desiredLength
 	 * @param padChar

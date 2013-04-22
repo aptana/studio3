@@ -414,6 +414,7 @@ public class FileUtil
 			return result.substring(3); // chop off leading "100"
 		}
 
-		return ProcessUtil.outputForCommand("stat", null, "-c", "%a", filepath.toOSString()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		String result = ProcessUtil.outputForCommand("stat", null, "-c", "%a", filepath.toOSString()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		return StringUtil.pad(result, 3, '0');
 	}
 }
