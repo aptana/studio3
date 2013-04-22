@@ -393,4 +393,27 @@ public class FileUtil
 
 		return Status.OK_STATUS;
 	}
+
+	/**
+	 * Returns a standard octal permissions string. String should be 3 characters long and each character is a value 0 -
+	 * 7. Returns null on Windows.
+	 * 
+	 * @param filepath
+	 * @return
+	 */
+	public static String getPermissions(IPath filepath)
+	{
+		if (PlatformUtil.isWindows())
+		{
+			return null;
+		}
+		// TODO Do we want to synthesize permission strings by using isReadable/isWritable/isExecutable?
+		if (PlatformUtil.isMac())
+		{
+			String result = ProcessUtil.outputForCommand("stat", null, "-f", "%p", filepath.toOSString()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			return result.substring(3); // chop off leading "100"
+		}
+
+		return ProcessUtil.outputForCommand("stat", null, "-c", "%a", filepath.toOSString()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
 }

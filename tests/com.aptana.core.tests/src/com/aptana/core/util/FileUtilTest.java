@@ -276,7 +276,7 @@ public class FileUtilTest extends TestCase
 		}
 	}
 
-	public void testChmod() throws Exception
+	public void testChmodAndGetPermissions() throws Exception
 	{
 		if (PlatformUtil.isWindows())
 		{
@@ -292,8 +292,7 @@ public class FileUtilTest extends TestCase
 					File file = File.createTempFile("chmod", null);
 					String permString = Integer.toString(i) + Integer.toString(j) + Integer.toString(k);
 					FileUtil.chmod(permString, file);
-					assertEquals("100" + permString,
-							ProcessUtil.outputForCommand("stat", null, "-f", "%p", file.getAbsolutePath()));
+					assertEquals(permString, FileUtil.getPermissions(Path.fromOSString(file.getAbsolutePath())));
 				}
 			}
 		}
