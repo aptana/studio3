@@ -32,58 +32,59 @@
 		</exec>
 		<property name="cache.generator.script" location="${scripting.plugin.dir}/bundles/studio3-sdk/tools/bundle_cache_generator/main.rb"/>
 		<!-- TODO Checkout the correct branch of the generator scripts... -->
-
 		<!-- Grab the pre-defined set of bundles -->
-		<antcall target="clone-bundle">
-			<param name="bundle.name" value="text.ruble" />
-			<param name="bundle.dir.name" value="text.ruble" />
-			<param name="bundle.branch" value="${scs.branch.name}" />
-		</antcall>
-		<antcall target="clone-bundle">
-			<param name="bundle.name" value="source.ruble" />
-			<param name="bundle.dir.name" value="source.ruble" />
-			<param name="bundle.branch" value="${scs.branch.name}" />
-		</antcall>
-		<antcall target="clone-bundle">
-			<param name="bundle.name" value="math.ruble" />
-			<param name="bundle.dir.name" value="math.ruble" />
-			<param name="bundle.branch" value="${scs.branch.name}" />
-		</antcall>
-		<antcall target="clone-bundle">
-			<param name="bundle.name" value="html.ruble" />
-			<param name="bundle.dir.name" value="html.ruble" />
-			<param name="bundle.branch" value="${scs.branch.name}" />
-		</antcall>
-		<antcall target="clone-bundle">
-			<param name="bundle.name" value="css.ruble" />
-			<param name="bundle.dir.name" value="css.ruble" />
-			<param name="bundle.branch" value="${scs.branch.name}" />
-		</antcall>
-		<antcall target="clone-bundle">
-			<param name="bundle.name" value="js.ruble" />
-			<param name="bundle.dir.name" value="js.ruble" />
-			<param name="bundle.branch" value="${scs.branch.name}" />
-		</antcall>
-		<antcall target="clone-bundle">
-			<param name="bundle.name" value="xml.ruble" />
-			<param name="bundle.dir.name" value="xml.ruble" />
-			<param name="bundle.branch" value="${scs.branch.name}" />
-		</antcall>
-		<antcall target="clone-bundle">
-			<param name="bundle.name" value="bundle-dev.ruble" />
-			<param name="bundle.dir.name" value="bundle-development.ruble" />
-			<param name="bundle.branch" value="${scs.branch.name}" />
-		</antcall>
-		<antcall target="clone-bundle">
-			<param name="bundle.name" value="json.ruble" />
-			<param name="bundle.dir.name" value="json.ruble" />
-			<param name="bundle.branch" value="${scs.branch.name}" />
-		</antcall>
-		<antcall target="clone-bundle">
-			<param name="bundle.name" value="shell-script.ruble" />
-			<param name="bundle.dir.name" value="shell-script.ruble" />
-			<param name="bundle.branch" value="${scs.branch.name}" />
-		</antcall>
+		<parallel>
+			<antcall target="clone-bundle">
+				<param name="bundle.name" value="text.ruble" />
+				<param name="bundle.dir.name" value="text.ruble" />
+				<param name="bundle.branch" value="${scs.branch.name}" />
+			</antcall>
+			<antcall target="clone-bundle">
+				<param name="bundle.name" value="source.ruble" />
+				<param name="bundle.dir.name" value="source.ruble" />
+				<param name="bundle.branch" value="${scs.branch.name}" />
+			</antcall>
+			<antcall target="clone-bundle">
+				<param name="bundle.name" value="math.ruble" />
+				<param name="bundle.dir.name" value="math.ruble" />
+				<param name="bundle.branch" value="${scs.branch.name}" />
+			</antcall>
+			<antcall target="clone-bundle">
+				<param name="bundle.name" value="html.ruble" />
+				<param name="bundle.dir.name" value="html.ruble" />
+				<param name="bundle.branch" value="${scs.branch.name}" />
+			</antcall>
+			<antcall target="clone-bundle">
+				<param name="bundle.name" value="css.ruble" />
+				<param name="bundle.dir.name" value="css.ruble" />
+				<param name="bundle.branch" value="${scs.branch.name}" />
+			</antcall>
+			<antcall target="clone-bundle">
+				<param name="bundle.name" value="js.ruble" />
+				<param name="bundle.dir.name" value="js.ruble" />
+				<param name="bundle.branch" value="${scs.branch.name}" />
+			</antcall>
+			<antcall target="clone-bundle">
+				<param name="bundle.name" value="xml.ruble" />
+				<param name="bundle.dir.name" value="xml.ruble" />
+				<param name="bundle.branch" value="${scs.branch.name}" />
+			</antcall>
+			<antcall target="clone-bundle">
+				<param name="bundle.name" value="bundle-dev.ruble" />
+				<param name="bundle.dir.name" value="bundle-development.ruble" />
+				<param name="bundle.branch" value="${scs.branch.name}" />
+			</antcall>
+			<antcall target="clone-bundle">
+				<param name="bundle.name" value="json.ruble" />
+				<param name="bundle.dir.name" value="json.ruble" />
+				<param name="bundle.branch" value="${scs.branch.name}" />
+			</antcall>
+			<antcall target="clone-bundle">
+				<param name="bundle.name" value="shell-script.ruble" />
+				<param name="bundle.dir.name" value="shell-script.ruble" />
+				<param name="bundle.branch" value="${scs.branch.name}" />
+			</antcall>
+		</parallel>
 		
 		<!-- Delete the pre-generation of cache scripts repo clone -->
 		<delete dir="${scripting.plugin.dir}/bundles/studio3-sdk" failonerror="true" />
