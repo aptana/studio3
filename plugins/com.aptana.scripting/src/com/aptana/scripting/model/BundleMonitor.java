@@ -645,7 +645,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 			}
 			catch (CoreException e)
 			{
-				IdeLog.logError(ScriptingActivator.getDefault(), e);
+				IdeLog.logWarning(ScriptingActivator.getDefault(), e);
 			}
 		}
 	}
