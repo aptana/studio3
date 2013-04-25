@@ -19,7 +19,7 @@
 		<os family="windows" />
 	</condition>
 
-	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
 		<classpath>
 			<pathelement location="ant-contrib/ant-contrib.jar" />
 		</classpath>

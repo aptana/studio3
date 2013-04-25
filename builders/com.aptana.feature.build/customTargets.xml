@@ -1,6 +1,6 @@
 <project name="customnTargets overrides" default="noDefault">
 	<import file="${eclipse.pdebuild.templates}/headless-build/customTargets.xml"/>
-	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
 		<classpath>
 			<pathelement location="${builder}/ant-contrib/ant-contrib.jar" />
 		</classpath>
