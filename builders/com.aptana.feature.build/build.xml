@@ -50,11 +50,10 @@
 	</target>
 
 	<!-- ================================= 
-	      target: clean              
+	      target: clean
 	     ================================= -->
 	<target name="clean" depends="generate.build.properties" description="Clean up temp and build files">
 		<delete dir="${buildDirectory}" failonerror="false" />
-		<!-- TODO Do we need to clean anything up on workspace? -->
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 

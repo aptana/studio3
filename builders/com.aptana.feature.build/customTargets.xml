@@ -1,5 +1,5 @@
-<project name="customnTargets overrides" default="noDefault">
-	<import file="${eclipse.pdebuild.templates}/headless-build/customTargets.xml"/>
+<project name="customTargets overrides" default="noDefault">
+	<import file="${eclipse.pdebuild.templates}/headless-build/customTargets.xml" />
 	<taskdef resource="net/sf/antcontrib/antlib.xml">
 		<classpath>
 			<pathelement location="${builder}/ant-contrib/ant-contrib.jar" />
@@ -32,6 +32,7 @@
 		</exec>
 		<property name="cache.generator.script" location="${scripting.plugin.dir}/bundles/studio3-sdk/tools/bundle_cache_generator/main.rb"/>
 		<!-- TODO Checkout the correct branch of the generator scripts... -->
+
 		<!-- Grab the pre-defined set of bundles -->
 		<parallel>
 			<antcall target="clone-bundle">
@@ -142,8 +143,7 @@
 			<arg value="-c" />
 			<arg value="git log --max-count=1 --pretty=format:'%ct,' ." />
 		</exec>
-        <!-- FIXME Need to append this at same time as exec above! -->
-		<!-- <echo append="true" file="${bundle.timestamps.file}" message="," /> -->
+
 		<!-- Now remove the .git subdirectory -->
 		<delete dir="${scripting.plugin.dir}/bundles/${bundle.dir.name}/.git" quiet="true" />
 		
@@ -153,7 +153,7 @@
 			<arg value="${ruby.executable} -KU ${cache.generator.script} ${scripting.plugin.dir}/bundles/${bundle.dir.name}" />
 		</exec>
 	</target>
-	
+
 	<!-- ===================================================================== -->
 	<!-- Steps to do before the repositories are being processed -->
 	<!-- ===================================================================== -->
