@@ -13,6 +13,8 @@
 			<fileset dir="${buildDirectory}/plugins" defaultexcludes="false">
 			    <exclude name="*/src/**/*" />
 				<exclude name="*/@dot.log" />
+				<exclude name="*/build.xml" />
+				<exclude name="*/build.properties" />
 			</fileset>
 		</delete>
 	</target>
