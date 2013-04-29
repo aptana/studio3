@@ -67,6 +67,7 @@
           On non-Windows machines, copy eclipse and plugins/features directories to buildDirectory to set up for build
          - - - - - - - - - - - - - - - - - -->
 	<target name="copy.base" unless="is.windows">
+		<mkdir dir="${buildDirectory}" />
 		<!-- Copy over the original base eclipse to a new location.
 								Have to use exec cp to retain permissions on *nix, Mac -->
 		<exec executable="cp">
@@ -85,6 +86,7 @@
           target: copy.base.windows                      
 	     - - - - - - - - - - - - - - - - - -->
 	<target name="copy.base.windows" if="is.windows">
+		<mkdir dir="${buildDirectory}" />
 		<!-- copy eclipse -->
 		<copy todir="${baseLocation}">
 			<fileset dir="${vanilla.eclipse}" includes="**/*" defaultexcludes="false" />
