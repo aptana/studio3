@@ -9,7 +9,7 @@
 	<target name="pre.archive">
 		<antcall target="fix.broken.metadata" />
 		<!-- wipe the source plugins directory to reclaim space -->
-		<delete dir="${builDirectory}/plugins" />
+		<delete dir="${buildDirectory}/plugins" />
 	</target>
 
 	<!-- Workaround for Eclipse bug: https://bugs.eclipse.org/bugs/show_bug.cgi?id=271373 -->
