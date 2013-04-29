@@ -12,7 +12,9 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IPreferencesService;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IViewReference;
@@ -188,6 +190,36 @@ public class PortalUIPlugin extends AbstractUIPlugin
 		}
 
 		return result;
+	}
+
+	public static Image getImage(String string)
+	{
+		// We call getImageDescriptor first to load the image in case it's not loaded yet.
+		if (getImageDescriptor(string) != null)
+		{
+			return getDefault().getImageRegistry().get(string);
+		}
+		return null;
+	}
+
+	/**
+	 * Returns an image descriptor for an image-path that is under the TitaniumUIPlugin.
+	 * 
+	 * @param path
+	 * @return An {@link ImageDescriptor}; <code>null</code> if the image cannot be located.
+	 */
+	public static ImageDescriptor getImageDescriptor(String path)
+	{
+		ImageDescriptor imageDescriptor = getDefault().getImageRegistry().getDescriptor(path);
+		if (imageDescriptor == null)
+		{
+			imageDescriptor = imageDescriptorFromPlugin(PLUGIN_ID, path);
+			if (imageDescriptor != null)
+			{
+				getDefault().getImageRegistry().put(path, imageDescriptor);
+			}
+		}
+		return imageDescriptor;
 	}
 
 	@Override

@@ -7,10 +7,12 @@
  */
 package com.aptana.portal.ui.internal.startpage;
 
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 
+import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.browser.AbstractPortalBrowserEditor;
 
 /**
@@ -24,6 +26,8 @@ public class StartPageBrowserEditor extends AbstractPortalBrowserEditor
 	public static final String WEB_BROWSER_EDITOR_ID = "com.aptana.portal.ui.browser.startPage"; //$NON-NLS-1$
 	public static final String STUDIO_START_PAGE_URL = "http://content.aptana.com/aptana/my_aptana/?content=start"; //$NON-NLS-1$
 
+	private static final String TITLE_IMAGE = "icons/obj16/radrails16.png"; //$NON-NLS-1$
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.portal.ui.browser.AbstractPortalBrowserEditor#init(org.eclipse.ui.IEditorSite,
@@ -34,6 +38,12 @@ public class StartPageBrowserEditor extends AbstractPortalBrowserEditor
 	{
 		super.init(site, input);
 		setPartName(Messages.StartPageBrowserEditor_startPageTitle);
+	}
+
+	@Override
+	public Image getTitleImage()
+	{
+		return PortalUIPlugin.getImage(TITLE_IMAGE);
 	}
 
 	/*
