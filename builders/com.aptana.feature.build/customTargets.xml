@@ -1,5 +1,5 @@
-<project name="customnTargets overrides" default="noDefault">
-	<import file="${eclipse.pdebuild.templates}/headless-build/customTargets.xml"/>
+<project name="customTargets overrides" default="noDefault">
+	<import file="${eclipse.pdebuild.templates}/headless-build/customTargets.xml" />
 	<taskdef resource="net/sf/antcontrib/antlib.xml">
 		<classpath>
 			<pathelement location="${builder}/ant-contrib/ant-contrib.jar" />
@@ -32,6 +32,7 @@
 		</exec>
 		<property name="cache.generator.script" location="${scripting.plugin.dir}/bundles/studio3-sdk/tools/bundle_cache_generator/main.rb"/>
 		<!-- TODO Checkout the correct branch of the generator scripts... -->
+
 		<!-- Grab the pre-defined set of bundles -->
 		<parallel>
 			<antcall target="clone-bundle">
@@ -142,8 +143,7 @@
 			<arg value="-c" />
 			<arg value="git log --max-count=1 --pretty=format:'%ct,' ." />
 		</exec>
-        <!-- FIXME Need to append this at same time as exec above! -->
-		<!-- <echo append="true" file="${bundle.timestamps.file}" message="," /> -->
+
 		<!-- Now remove the .git subdirectory -->
 		<delete dir="${scripting.plugin.dir}/bundles/${bundle.dir.name}/.git" quiet="true" />
 		
@@ -153,7 +153,7 @@
 			<arg value="${ruby.executable} -KU ${cache.generator.script} ${scripting.plugin.dir}/bundles/${bundle.dir.name}" />
 		</exec>
 	</target>
-	
+
 	<!-- ===================================================================== -->
 	<!-- Steps to do before the repositories are being processed -->
 	<!-- ===================================================================== -->
@@ -161,17 +161,33 @@
 		<p2.mirror destination="file:${repoBaseLocation}/mirrored">
 			<source location="${libraries-com.p2.repo}" />
 			<source location="${webkit.p2.repo}" />
-			<!-- <source location="${patch.p2.repo}" /> -->
 			<iu id="com.aptana.ide.feature.libraries.subscription.feature.group" />
 			<iu id="com.aptana.webkitbrowser.feature.group" />
-			<!-- <iu id="org.eclipse.ui.workbench.patch.feature.feature.group" /> -->
 		</p2.mirror>
+	</target>
+
+	<!-- ===================================================================== -->
+	<!-- Steps to do after the repositories have been processed -->
+	<!-- ===================================================================== -->
+	<target name="postProcessRepos">
+		<!-- clean up repos now that they've been transformed. save disk space (necessary when compiling in RAM disk) -->
+		<delete dir="${repoBaseLocation}" />
+	</target>
+
+	<!-- ===================================================================== -->
+	<!-- Steps to do after running the build.xmls for the elements being built. -->
+	<!-- ===================================================================== -->
+	<target name="postProcess">
+		<!-- clean up nestedJars. save disk space (necessary when compiling in RAM disk) -->
+		<delete dir="${buildDirectory}/nestedJars" />
 	</target>
 
 	<!-- ===================================================================== -->
 	<!-- Steps to do after the build is done. -->
 	<!-- ===================================================================== -->
 	<target name="postBuild">
+		<!-- clean up buildRepo now that we've built. save disk space (necessary when compiling in RAM disk) -->
+		<delete dir="${buildDirectory}/buildRepo" />
 		<antcall target="gatherLogs" />
 		<antcall target="publish" />
 	</target>
@@ -215,8 +231,8 @@
 			</fileset>
 
 			<!-- Mirrored dependencies -->
-			<fileset dir="${repoBaseLocation}/mirrored/plugins">
-				<include name="*.jar" />
+			<fileset dir="${transformedRepoLocation}/plugins">
+				<include name="**/*.jar" />
 			</fileset>
 
 			<!-- need to include the binaries of the non-included source packages like org.jruby or org.w3c -->
@@ -230,15 +246,24 @@
 				<include name="**/*.jar" />
 			</fileset>
 		</path>
-		<!-- Now generate the javadocs for com.aptana.* packages -->
-		<javadoc destdir="${deploy.dir}/docs" packagenames="com.aptana.*" classpathref="javadoc.classpath" author="true" version="true" use="true" windowtitle="Aptana Studio API" encoding="UTF-8" maxmemory="256m">
 
+		<!-- Now generate the javadocs for com.aptana.* packages -->
+		<mkdir dir="${buildDirectory}/docs"/>
+		<javadoc destdir="${buildDirectory}/docs" packagenames="com.aptana.*" classpathref="javadoc.classpath" author="true" version="true" use="true" windowtitle="Aptana Studio API" encoding="UTF-8" maxmemory="256m">
 			<sourcepath>
 				<dirset dir="${buildDirectory}/plugins">
 					<include name="com.*/src" />
 				</dirset>
 			</sourcepath>
 		</javadoc>
+
+		<!-- clean up transformedRepos now that we no lonegr need them. save disk space (necessary when compiling in RAM disk) -->
+		<delete dir="${transformedRepoLocation}" />
+
+		<!-- Copy docs to deploy.dir -->
+		<copy todir="${deploy.dir}/docs" overwrite="true">
+			<fileset dir="${buildDirectory}/docs" />
+		</copy>
 
 		<!-- Lastly, copy over the new stylesheet and files -->
 		<copy todir="${deploy.dir}/docs" overwrite="true">
