@@ -70,13 +70,16 @@
 		<mkdir dir="${buildDirectory}" />
 		<!-- Copy over the original base eclipse to a new location.
 								Have to use exec cp to retain permissions on *nix, Mac -->
+		<echo message="Copying eclipse" level="info" />
 		<exec executable="cp">
 			<arg line="-R ${vanilla.eclipse} ${baseLocation}" />
 		</exec>
 		<!-- copy plugins and features -->
+		<echo message="Copying plugins" level="info" />
 		<exec executable="cp">
 			<arg line="-R ${workspace}/plugins ${buildDirectory}/plugins" />
 		</exec>
+		<echo message="Copying features" level="info" />
 		<exec executable="cp">
 			<arg line="-R ${workspace}/features ${buildDirectory}/features" />
 		</exec>
