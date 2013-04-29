@@ -167,6 +167,22 @@
 	</target>
 
 	<!-- ===================================================================== -->
+	<!-- Steps to do after the repositories have been processed -->
+	<!-- ===================================================================== -->
+	<target name="postProcessRepos">
+		<!-- clean up repos now that they've been transformed. save disk space (necessary when compiling in RAM disk) -->
+		<delete dir="${repoBaseLocation}" />
+	</target>
+
+	<!-- ===================================================================== -->
+	<!-- Steps to do after running the build.xmls for the elements being built. -->
+	<!-- ===================================================================== -->
+	<target name="postProcess">
+		<!-- clean up nestedJars. save disk space (necessary when compiling in RAM disk) -->
+		<delete dir="${buildDirectory}/nestedJars" />
+	</target>
+
+	<!-- ===================================================================== -->
 	<!-- Steps to do after the build is done. -->
 	<!-- ===================================================================== -->
 	<target name="postBuild">
