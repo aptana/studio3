@@ -186,6 +186,8 @@
 	<!-- Steps to do after the build is done. -->
 	<!-- ===================================================================== -->
 	<target name="postBuild">
+		<!-- clean up buildRepo now that we've built. save disk space (necessary when compiling in RAM disk) -->
+		<delete dir="${buildDirectory}/buildRepo" />
 		<antcall target="gatherLogs" />
 		<antcall target="publish" />
 	</target>
@@ -244,15 +246,24 @@
 				<include name="**/*.jar" />
 			</fileset>
 		</path>
-		<!-- Now generate the javadocs for com.aptana.* packages -->
-		<javadoc destdir="${deploy.dir}/docs" packagenames="com.aptana.*" classpathref="javadoc.classpath" author="true" version="true" use="true" windowtitle="Aptana Studio API" encoding="UTF-8" maxmemory="256m">
 
+		<!-- Now generate the javadocs for com.aptana.* packages -->
+		<mkdir dir="${buildDirectory}/docs"/>
+		<javadoc destdir="${buildDirectory}/docs" packagenames="com.aptana.*" classpathref="javadoc.classpath" author="true" version="true" use="true" windowtitle="Aptana Studio API" encoding="UTF-8" maxmemory="256m">
 			<sourcepath>
 				<dirset dir="${buildDirectory}/plugins">
 					<include name="com.*/src" />
 				</dirset>
 			</sourcepath>
 		</javadoc>
+
+		<!-- clean up transformedRepos now that we no lonegr need them. save disk space (necessary when compiling in RAM disk) -->
+		<delete dir="${transformedRepoLocation}" />
+
+		<!-- Copy docs to deploy.dir -->
+		<copy todir="${deploy.dir}/docs" overwrite="true">
+			<fileset dir="${buildDirectory}/docs" />
+		</copy>
 
 		<!-- Lastly, copy over the new stylesheet and files -->
 		<copy todir="${deploy.dir}/docs" overwrite="true">
