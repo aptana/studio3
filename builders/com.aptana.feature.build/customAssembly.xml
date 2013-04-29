@@ -10,9 +10,9 @@
 		<antcall target="fix.broken.metadata" />
 		<!-- wipe some of the source plugins directories to reclaim space -->
 		<delete>
-			<fileset dir="${buildDirectory}/plugins" defaultexcludes="true">
-			    <include name="*/src"/>
-				<include name="*/@dot" />
+			<fileset dir="${buildDirectory}/plugins" defaultexcludes="false">
+			    <exclude name="*/src/**/*" />
+				<exclude name="*/@dot.log" />
 			</fileset>
 		</delete>
 	</target>
