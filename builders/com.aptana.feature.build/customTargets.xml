@@ -221,7 +221,6 @@
 	<!-- Steps to do to generate Javadocs -->
 	<!-- ===================================================================== -->
 	<target name="publish.javadocs" if="generate.javadocs" unless="dont.deploy">
-		<!-- FIXME This won't work if we're deleting intermediate files, like repoBaseLocation and buildDirectory/plugins -->
 		<!-- Hack together the classpath for our plugins -->
 		<path id="javadoc.classpath">
 			<!-- Eclipse plugins -->
@@ -230,8 +229,8 @@
 			</fileset>
 
 			<!-- Mirrored dependencies -->
-			<fileset dir="${repoBaseLocation}/mirrored/plugins">
-				<include name="*.jar" />
+			<fileset dir="${transformedRepoLocation}/plugins">
+				<include name="**/*.jar" />
 			</fileset>
 
 			<!-- need to include the binaries of the non-included source packages like org.jruby or org.w3c -->
