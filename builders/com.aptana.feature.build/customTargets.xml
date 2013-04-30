@@ -13,15 +13,15 @@
 		<!-- Need to grab version qualifier for scripting plugin, we do that by cloning and checking 
 		last commit of each bundle vs last commit of plugin. This MUST be done before the generateScript target
 		or else the qualifier we insert into build.properties is ignored.  -->
-		<property name="scripting.plugin.dir" location="${buildDirectory}/plugins/com.aptana.scripting"/>
+		<property name="scripting.plugin" value="com.aptana.scripting"/>
+		<property name="scripting.plugin.dir" location="${buildDirectory}/plugins/${scripting.plugin}"/>
 		<property name="bundle.timestamps.file" location="${scripting.plugin.dir}/bundle_timestamps.txt"/>
 
 		<!-- Find latest commit date between this plugin and every bundle and use that as the build qualifier! -->
-		<exec executable="/bin/bash" dir="${scripting.plugin.dir}" append="true" output="${bundle.timestamps.file}">
+		<exec executable="/bin/bash" dir="${workspace}/plugins/${scripting.plugin}" append="true" output="${bundle.timestamps.file}">
 			<arg value="-c" />
-			<arg value="git log --max-count=1 --pretty=format:'%ct' ." />
+			<arg value="git log --max-count=1 --pretty=format:'%ct,' ." />
 		</exec>
-		<echo append="true" file="${bundle.timestamps.file}" message="," />
 
 		<!-- Pull down the cache pre-generation scripts -->
 		<delete dir="${scripting.plugin.dir}/bundles/studio3-sdk" failonerror="true" />
