@@ -75,8 +75,9 @@
 	<target name="generate.base" depends="copy.base.windows,copy.base">
 		<!-- Copy test fragments into plugins dir -->
 		<echo message="Copying test fragments" level="info" />
-		<copy todir="${workspace}/plugins">
-			<fileset dir="${buildDirectory}/tests">
+		<mkdir dir="${buildDirectory}/plugins" />
+		<copy todir="${buildDirectory}/plugins">
+			<fileset dir="${workspace}/tests">
 				<include name="**/*" />
 			</fileset>
 		</copy>
