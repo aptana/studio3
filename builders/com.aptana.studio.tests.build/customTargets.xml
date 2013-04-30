@@ -1,6 +1,6 @@
-<project name="customnTargets overrides" default="noDefault">
-	<import file="${eclipse.pdebuild.templates}/headless-build/customTargets.xml"/>
-	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
+<project name="customTargets overrides" default="noDefault">
+	<import file="${eclipse.pdebuild.templates}/headless-build/customTargets.xml" />
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
 		<classpath>
 			<pathelement location="${builder}/ant-contrib/ant-contrib.jar" />
 		</classpath>
@@ -23,9 +23,28 @@
 	</target>
 
 	<!-- ===================================================================== -->
+	<!-- Steps to do after the repositories have been processed -->
+	<!-- ===================================================================== -->
+	<target name="postProcessRepos">
+		<!-- clean up repos now that they've been transformed. save disk space (necessary when compiling in RAM disk) -->
+		<delete dir="${repoBaseLocation}" />
+	</target>
+
+	<!-- ===================================================================== -->
+	<!-- Steps to do after running the build.xmls for the elements being built. -->
+	<!-- ===================================================================== -->
+	<target name="postProcess">
+		<!-- clean up nestedJars. save disk space (necessary when compiling in RAM disk) -->
+		<delete dir="${buildDirectory}/nestedJars" />
+	</target>
+
+	<!-- ===================================================================== -->
 	<!-- Steps to do after the build is done. -->
 	<!-- ===================================================================== -->
 	<target name="postBuild">
+		<!-- clean up buildRepo now that we've built. save disk space (necessary when compiling in RAM disk) -->
+		<delete dir="${buildDirectory}/buildRepo" />
+		<delete dir="${transformedRepoLocation}" />
 		<antcall target="gatherLogs" />
 		<antcall target="publish" />
 	</target>
@@ -33,9 +52,7 @@
 	<!-- ===================================================================== -->
 	<!-- Steps to do to publish the build results -->
 	<!-- ===================================================================== -->
-	<target name="publish">
-		<delete dir="${deploy.dir}" failonerror="false" />
-		<mkdir dir="${deploy.dir}" />
+	<target name="publish" depends="wipe.deploy.dir" unless="dont.deploy">
 		<!-- grab final version -->
 		<property file="${buildDirectory}/finalFeaturesVersions.properties" />
 		<propertycopy name="finalVersion" from="${topLevelElementId}" />
@@ -43,5 +60,11 @@
 		<move file="${buildDirectory}/${buildType}.${build.revision}/${topLevelElementId}-${build.revision}-group.group.group.zip" tofile="${deploy.dir}/${topLevelElementId}-${finalVersion}.zip" />
 		<!-- Extract zipped p2 repo too -->
 		<unzip src="${deploy.dir}/${topLevelElementId}-${finalVersion}.zip" dest="${deploy.dir}" />
+	</target>
+
+	<!-- Wipe and rebuild the deploy directory. -->
+	<target name="wipe.deploy.dir" unless="dont.deploy">
+		<delete dir="${deploy.dir}" failonerror="false" />
+		<mkdir dir="${deploy.dir}" />
 	</target>
 </project>
