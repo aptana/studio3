@@ -91,6 +91,12 @@ public class VersionUtilTest extends TestCase
 		assertTrue(VersionUtil.compareVersions("1.12", "1.12") == 0);
 		assertTrue(VersionUtil.compareVersions("1.12", "1.12.0") < 0);
 		assertTrue(VersionUtil.compareVersions("1.12.0", "1.12") > 0);
+
+		// Compare versions that contain cr tags in version identifiers
+		assertTrue(VersionUtil.compareVersions("1.1.1-cr", "1.1.1", true, true) < 0);
+		assertTrue(VersionUtil.compareVersions("1.12.11-cr", "1.12.10", true, true) > 0);
+		assertTrue(VersionUtil.compareVersions("3.1.1-cr", "3.1.1.GA", true, true) < 0);
+		assertTrue(VersionUtil.compareVersions("3.1.3-cr", "3.1.3-cr", true, true) == 0);
 	}
 
 	public void testCompareVersionsNotStrict()

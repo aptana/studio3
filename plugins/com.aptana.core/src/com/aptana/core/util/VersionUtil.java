@@ -64,6 +64,24 @@ public final class VersionUtil
 	 */
 	public static int compareVersions(String left, String right, boolean isStrict)
 	{
+		return compareVersions(left, right, isStrict, false);
+	}
+
+	/**
+	 * Compare version strings of the form A.B.C.D... Version strings can contain integers or strings. It will attempt
+	 * to compare individual '.'-delineated segments using an integer-based comparison first, and then will fall back to
+	 * strings if the integer comparison fails.
+	 * 
+	 * @param left
+	 * @param right
+	 * @param isStrict
+	 *            Specifies whether the versions should be formatted as "x.x.x" prior to the comparision
+	 * @param handleHyphen
+	 *            Specifies whether it handle or ignore hyphen in the micro version identifier.
+	 * @return positive if left > right, zero if left == right, negative otherwise
+	 */
+	public static int compareVersions(String left, String right, boolean isStrict, boolean handleHyphen)
+	{
 		int result;
 		String[] lparts = VERSION_DOT_PATTERN.split(left);
 		String[] rparts = VERSION_DOT_PATTERN.split(right);
@@ -98,7 +116,14 @@ public final class VersionUtil
 			}
 			catch (NumberFormatException ex)
 			{
-				result = lparts[i].compareToIgnoreCase(rparts[i]);
+				if (handleHyphen)
+				{
+					result = compareVersionsWithHyphen(lparts[i], rparts[i]);
+				}
+				else
+				{
+					result = lparts[i].compareToIgnoreCase(rparts[i]);
+				}
 			}
 
 			if (result != 0)
@@ -107,6 +132,44 @@ public final class VersionUtil
 			}
 		}
 		return (lparts.length - rparts.length);
+	}
+
+	/**
+	 * Compares the identifiers with hyphen in version similar to '3.0.1-cr' with the rule that the release candidate
+	 * version '3.0.1-cr' is always less than GA version '3.0.1'.
+	 * 
+	 * @param left
+	 * @param right
+	 * @return
+	 */
+	private static int compareVersionsWithHyphen(String left, String right)
+	{
+		boolean hasLeftHyphen = false, hasRightHyphen = false;
+		int hyphenIndex = left.indexOf('-');
+		if (hyphenIndex > -1)
+		{
+			hasLeftHyphen = true;
+			left = left.substring(0, hyphenIndex);
+		}
+		hyphenIndex = right.indexOf('-');
+		if (hyphenIndex > -1)
+		{
+			hasRightHyphen = true;
+			right = right.substring(0, hyphenIndex);
+		}
+		// No need to check based on hyphen in version identifier if either both or none of them have hyphen.
+		if (left.equals(right) && hasLeftHyphen != hasRightHyphen)
+		{
+			if (hasLeftHyphen) // 1-cr < 1
+			{
+				return -1;
+			}
+			else if (hasRightHyphen) // 1 > 1-cr
+			{
+				return 1;
+			}
+		}
+		return left.compareTo(right);
 	}
 
 	/**
