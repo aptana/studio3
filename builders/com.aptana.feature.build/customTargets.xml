@@ -186,8 +186,6 @@
 	<!-- Steps to do after the build is done. -->
 	<!-- ===================================================================== -->
 	<target name="postBuild">
-		<!-- clean up buildRepo now that we've built. save disk space (necessary when compiling in RAM disk) -->
-		<delete dir="${buildDirectory}/buildRepo" />
 		<antcall target="gatherLogs" />
 		<antcall target="publish" />
 	</target>

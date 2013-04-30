@@ -7,6 +7,9 @@
 	<!--    - rootFolder : the folder containing the root files                -->
 	<!-- ===================================================================== -->
 	<target name="pre.archive">
+		<!-- Eclipse will mirror from buildRepo to tmp during "mirrorArchive" and then generate a zip
+		     So after the mirroring let's delete buildRepo to reclaim space  -->
+		<delete dir="${buildDirectory}/buildRepo" />
 		<antcall target="fix.broken.metadata" />
 		<!-- wipe some of the source plugins directories to reclaim space -->
 		<delete>
