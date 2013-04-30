@@ -147,21 +147,23 @@
 			<property name="includes" value="com*.xml" />
 			<property name="output-file" value="test-results.xml" />
 		</ant>
+		<mkdir dir="${testResultsDirectory}"/>
 		<move file="${baseLocation}/test-results.xml" todir="${testResultsDirectory}" />
 	</target>
 
 	<target name="-instrument" description="Instrument the code using EMMA. Call before running tests. Call '-coverage' to produce reports after.">
 		<emma enabled="true">
-			<instr instrpathref="instrument.classpath" mode="overwrite" metadatafile="${coverageDirectory}/metadata.emma">
+			<instr instrpathref="instrument.classpath" mode="overwrite" metadatafile="${buildDirectory}/metadata.emma">
 				<filter file="emma-filters.txt" />
 			</instr>
 		</emma>
 	</target>
 
 	<target name="-coverage" description="Produce coverage analysis docs using EMMA. Assumes '-instrument' was called before running the tests.">
+		<mkdir dir="${coverageDirectory}"/>
 		<emma enabled="true">
 			<report>
-				<fileset dir="${coverageDirectory}">
+				<fileset dir="${buildDirectory}">
 					<include name="*.emma" />
 				</fileset>
 
@@ -228,7 +230,7 @@
 			<property name="data-dir" value="${baseLocation}/junit-workspace -clean" />
 			<property name="plugin-name" value="${test.plugin}" />
 			<property name="classname" value="${test.classname}" />
-			<property name="extraVMargs" value="-ea -Demma.coverage.out.file=${coverageDirectory}/coverage.emma -Dosgi.dev=${basedir}/lib/emma.jar -Djunit.properties=${basedir}/build.properties" />
+			<property name="extraVMargs" value="-ea -Demma.coverage.out.file=${buildDirectory}/coverage.emma -Dosgi.dev=${basedir}/lib/emma.jar -Djunit.properties=${basedir}/build.properties" />
 		</ant>
 	</target>
 
@@ -244,7 +246,7 @@
 			<property name="data-dir" value="${baseLocation}/junit-workspace -clean" />
 			<property name="plugin-name" value="${test.plugin}" />
 			<property name="classname" value="${test.classname}" />
-			<property name="extraVMargs" value="-Demma.coverage.out.file=${coverageDirectory}/coverage.emma -Dosgi.dev=${basedir}/lib/emma.jar -Djunit.properties=${basedir}/build.properties" />
+			<property name="extraVMargs" value="-Demma.coverage.out.file=${buildDirectory}/coverage.emma -Dosgi.dev=${basedir}/lib/emma.jar -Djunit.properties=${basedir}/build.properties" />
 		</ant>
 	</target>
 
