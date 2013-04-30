@@ -8,6 +8,7 @@
 package com.aptana.editor.js.text;
 
 import junit.framework.Test;
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 /**
@@ -18,7 +19,15 @@ public class TextTests
 
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite("Tests for com.aptana.editor.js.text");
+		TestSuite suite = new TestSuite("Tests for com.aptana.editor.js.text")
+		{
+			@Override
+			public void runTest(Test test, TestResult result)
+			{
+				System.err.println("Running test: " + test.toString());
+				super.runTest(test, result);
+			}
+		};
 		// $JUnit-BEGIN$
 		suite.addTestSuite(JSAutoIndentStrategyTest.class);
 		suite.addTestSuite(JSCodeScannerTest.class);

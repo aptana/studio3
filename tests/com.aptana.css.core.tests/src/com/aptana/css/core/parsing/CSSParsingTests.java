@@ -32,6 +32,13 @@ public class CSSParsingTests
 					runTest(new VerifyTestedTokensTest(), result);
 				}
 			}
+
+			@Override
+			public void runTest(Test test, TestResult result)
+			{
+				System.err.println("Running test: " + test.toString());
+				super.runTest(test, result);
+			}
 		};
 
 		// $JUnit-BEGIN$

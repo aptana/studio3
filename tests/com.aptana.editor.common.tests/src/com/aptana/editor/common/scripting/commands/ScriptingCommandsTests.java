@@ -8,6 +8,7 @@
 package com.aptana.editor.common.scripting.commands;
 
 import junit.framework.Test;
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 public class ScriptingCommandsTests
@@ -15,7 +16,15 @@ public class ScriptingCommandsTests
 
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite(ScriptingCommandsTests.class.getName());
+		TestSuite suite = new TestSuite(ScriptingCommandsTests.class.getName())
+		{
+			@Override
+			public void runTest(Test test, TestResult result)
+			{
+				System.err.println("Running test: " + test.toString());
+				super.runTest(test, result);
+			}
+		};
 		//$JUnit-BEGIN$
 		suite.addTestSuite(UtilitiesTest.class);
 		suite.addTestSuite(TextEditorUtilsTest.class);

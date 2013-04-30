@@ -11,6 +11,7 @@ package com.aptana.console.tests;
 import com.aptana.console.process.FilterProxyInputStreamTest;
 
 import junit.framework.Test;
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 public class AllTests
@@ -18,7 +19,15 @@ public class AllTests
 
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite("Test for com.aptana.console.tests");
+		TestSuite suite = new TestSuite("Test for com.aptana.console.tests")
+		{
+			@Override
+			public void runTest(Test test, TestResult result)
+			{
+				System.err.println("Running test: " + test.toString());
+				super.runTest(test, result);
+			}
+		};
 		// $JUnit-BEGIN$
 		suite.addTestSuite(FilterProxyInputStreamTest.class);
 		// $JUnit-END$

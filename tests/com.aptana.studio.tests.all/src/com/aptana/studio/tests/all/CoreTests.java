@@ -21,7 +21,7 @@ public class CoreTests
 			@Override
 			public void runTest(Test test, TestResult result)
 			{
-				System.out.println("Running test: " + test.toString());
+				System.err.println("Running test: " + test.toString());
 				super.runTest(test, result);
 			}
 		};

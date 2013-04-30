@@ -8,6 +8,7 @@
 package com.aptana.editor.common.scripting.snippets;
 
 import junit.framework.Test;
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 public class SnippetsTests
@@ -15,7 +16,15 @@ public class SnippetsTests
 
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite(SnippetsTests.class.getName());
+		TestSuite suite = new TestSuite(SnippetsTests.class.getName())
+		{
+			@Override
+			public void runTest(Test test, TestResult result)
+			{
+				System.err.println("Running test: " + test.toString());
+				super.runTest(test, result);
+			}
+		};
 		// $JUnit-BEGIN$
 		suite.addTestSuite(CommandTemplateTest.class);
 		suite.addTestSuite(ExpandSnippetVerifyKeyListenerTest.class);

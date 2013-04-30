@@ -8,13 +8,22 @@
 package com.aptana.editor.js.contentassist;
 
 import junit.framework.Test;
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 public class ContentAssistTests
 {
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite("Tests for com.aptana.editor.js.contentassist");
+		TestSuite suite = new TestSuite("Tests for com.aptana.editor.js.contentassist")
+		{
+			@Override
+			public void runTest(Test test, TestResult result)
+			{
+				System.err.println("Running test: " + test.toString());
+				super.runTest(test, result);
+			}
+		};
 		// $JUnit-BEGIN$
 		suite.addTestSuite(JSContentAssistProposalTest.class);
 		suite.addTestSuite(JSContextInfoTest.class);

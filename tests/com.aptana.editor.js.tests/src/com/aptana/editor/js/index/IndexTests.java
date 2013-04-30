@@ -8,13 +8,22 @@
 package com.aptana.editor.js.index;
 
 import junit.framework.Test;
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 public class IndexTests
 {
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite("Tests for com.aptana.editor.js.index");
+		TestSuite suite = new TestSuite("Tests for com.aptana.editor.js.index")
+		{
+			@Override
+			public void runTest(Test test, TestResult result)
+			{
+				System.err.println("Running test: " + test.toString());
+				super.runTest(test, result);
+			}
+		};
 		// $JUnit-BEGIN$
 		suite.addTestSuite(JSCAIndexingTest.class);
 		suite.addTestSuite(SDocMLIndexingTest.class);

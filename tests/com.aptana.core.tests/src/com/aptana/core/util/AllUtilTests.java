@@ -8,6 +8,7 @@
 package com.aptana.core.util;
 
 import junit.framework.Test;
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 public class AllUtilTests
@@ -15,7 +16,15 @@ public class AllUtilTests
 
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite("Test for com.aptana.core.util");
+		TestSuite suite = new TestSuite("Test for com.aptana.core.util")
+		{
+			@Override
+			public void runTest(Test test, TestResult result)
+			{
+				System.err.println("Running test: " + test.toString());
+				super.runTest(test, result);
+			}
+		};
 		// $JUnit-BEGIN$
 		suite.addTestSuite(ArrayUtilTest.class);
 		suite.addTestSuite(BrowserUtilTest.class);

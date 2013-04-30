@@ -8,6 +8,7 @@
 package com.aptana.editor.common.validation;
 
 import junit.framework.Test;
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 public class ValidationTests
@@ -15,10 +16,16 @@ public class ValidationTests
 
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite(ValidationTests.class.getName());
+		TestSuite suite = new TestSuite(ValidationTests.class.getName())
+		{
+			@Override
+			public void runTest(Test test, TestResult result)
+			{
+				System.err.println("Running test: " + test.toString());
+				super.runTest(test, result);
+			}
+		};
 		// $JUnit-BEGIN$
-		// Please do not include ad-hoc performance test classes in here.
-		// They have no pass/fail and just slow down the build!
 		// $JUnit-END$
 		return suite;
 	}

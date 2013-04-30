@@ -8,6 +8,7 @@
 package com.aptana.editor.common.text.reconciler;
 
 import junit.framework.Test;
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 public class ReconcilerTests
@@ -15,14 +16,19 @@ public class ReconcilerTests
 
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite(ReconcilerTests.class.getName());
+		TestSuite suite = new TestSuite(ReconcilerTests.class.getName())
+		{
+			@Override
+			public void runTest(Test test, TestResult result)
+			{
+				System.err.println("Running test: " + test.toString());
+				super.runTest(test, result);
+			}
+		};
 		// $JUnit-BEGIN$
 		suite.addTestSuite(CommonReconcilerTest.class);
 		suite.addTestSuite(CommonReconcilingStrategyTest.class);
 		suite.addTestSuite(RubyRegexpFolderTest.class);
-		// Please do not include ad-hoc performance test classes in here.
-		// They have no pass/fail and just slow down the build!
-		// suite.addTestSuite(RubyRegexpFolderPerformanceTest.class);
 		// $JUnit-END$
 		return suite;
 	}

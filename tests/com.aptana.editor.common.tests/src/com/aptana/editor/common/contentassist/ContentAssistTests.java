@@ -8,6 +8,7 @@
 package com.aptana.editor.common.contentassist;
 
 import junit.framework.Test;
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 /**
@@ -17,7 +18,15 @@ public class ContentAssistTests
 {
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite(ContentAssistTests.class.getName());
+		TestSuite suite = new TestSuite(ContentAssistTests.class.getName())
+		{
+			@Override
+			public void runTest(Test test, TestResult result)
+			{
+				System.err.println("Running test: " + test.toString());
+				super.runTest(test, result);
+			}
+		};
 		// $JUnit-BEGIN$
 		suite.addTestSuite(CompletionProposalTest.class);
 		suite.addTestSuite(UserAgentManagerTests.class);

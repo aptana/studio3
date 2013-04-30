@@ -8,8 +8,8 @@
 package com.aptana.core.tests;
 
 import junit.framework.Test;
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
-
 import ch.randelshofer.quaqua.util.BinaryPListParserTest;
 
 import com.aptana.core.util.AllUtilTests;
@@ -20,7 +20,15 @@ public class AllTests
 
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite("Test for com.aptana.core.tests");
+		TestSuite suite = new TestSuite("Test for com.aptana.core.tests")
+		{
+			@Override
+			public void runTest(Test test, TestResult result)
+			{
+				System.err.println("Running test: " + test.toString());
+				super.runTest(test, result);
+			}
+		};
 		// $JUnit-BEGIN$
 		suite.addTestSuite(IdeLogTest.class);
 		suite.addTestSuite(BinaryPListParserTest.class);

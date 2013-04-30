@@ -8,6 +8,7 @@
 package com.aptana.editor.common.util;
 
 import junit.framework.Test;
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 public class UtilTests
@@ -15,11 +16,17 @@ public class UtilTests
 
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite(UtilTests.class.getName());
+		TestSuite suite = new TestSuite(UtilTests.class.getName())
+		{
+			@Override
+			public void runTest(Test test, TestResult result)
+			{
+				System.err.println("Running test: " + test.toString());
+				super.runTest(test, result);
+			}
+		};
 		// $JUnit-BEGIN$
 		suite.addTestSuite(EditorUtilTest.class);
-		// Please do not include ad-hoc performance test classes in here.
-		// They have no pass/fail and just slow down the build!
 		// $JUnit-END$
 		return suite;
 	}

@@ -8,6 +8,7 @@
 package com.aptana.editor.common.text.rules;
 
 import junit.framework.Test;
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 public class RulesTests
@@ -15,7 +16,15 @@ public class RulesTests
 
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite(RulesTests.class.getName());
+		TestSuite suite = new TestSuite(RulesTests.class.getName())
+		{
+			@Override
+			public void runTest(Test test, TestResult result)
+			{
+				System.err.println("Running test: " + test.toString());
+				super.runTest(test, result);
+			}
+		};
 		//$JUnit-BEGIN$
 		suite.addTestSuite(CaseInsensitiveMultiLineRuleTest.class);
 		suite.addTestSuite(TagRuleTest.class);

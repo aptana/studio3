@@ -9,6 +9,7 @@ package com.aptana.css.core.internal.build;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 public class CSSBuildParticipantsTests extends TestCase
@@ -16,7 +17,15 @@ public class CSSBuildParticipantsTests extends TestCase
 
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite(CSSBuildParticipantsTests.class.getName());
+		TestSuite suite = new TestSuite(CSSBuildParticipantsTests.class.getName())
+		{
+			@Override
+			public void runTest(Test test, TestResult result)
+			{
+				System.err.println("Running test: " + test.toString());
+				super.runTest(test, result);
+			}
+		};
 		// $JUnit-BEGIN$
 		suite.addTestSuite(CSSTaskDetectorTest.class);
 		suite.addTestSuite(CSSParserValidatorTest.class);
