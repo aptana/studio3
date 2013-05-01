@@ -85,9 +85,6 @@
             %wizard.webproject.description
          </description>
       </wizard>
-      <primaryWizard
-            id="com.aptana.ui.wizards.NewWebProject">
-      </primaryWizard>
    </extension>
    <extension
      point="org.eclipse.ui.importWizards">
@@ -102,15 +99,6 @@
      	</description>
   		</wizard>
 	</extension>   
-   <extension
-         point="org.eclipse.ui.perspectiveExtensions">
-      <perspectiveExtension
-            targetID="com.aptana.ui.WebPerspective">
-         <newWizardShortcut
-               id="com.aptana.ui.wizards.NewWebProject">
-         </newWizardShortcut>
-      </perspectiveExtension>
-   </extension>
    <extension
          point="org.eclipse.ui.navigator.navigatorContent">
       <commonFilter
