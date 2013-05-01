@@ -245,12 +245,6 @@
 			</or>
 	     </enablement>
       </commonWizard>
-      <commonWizard
-            associatedExtensionId="org.eclipse.ui.navigator.resourceContent"
-            type="new"
-            wizardId="com.aptana.ui.wizards.NewWebProject">
-         <enablement></enablement>
-      </commonWizard>
       <actionProvider
             class="com.aptana.explorer.navigator.actions.DeployActionProvider"
             id="com.aptana.explorer.navigator.actions.DeployActions">
