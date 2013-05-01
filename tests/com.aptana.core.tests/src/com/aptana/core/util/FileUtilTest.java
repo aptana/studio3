@@ -292,7 +292,8 @@ public class FileUtilTest extends TestCase
 					File file = File.createTempFile("chmod", null);
 					String permString = Integer.toString(i) + Integer.toString(j) + Integer.toString(k);
 					FileUtil.chmod(permString, file);
-					assertEquals(permString, FileUtil.getPermissions(Path.fromOSString(file.getAbsolutePath())));
+					assertEquals(Integer.parseInt(permString, 8),
+							Integer.parseInt(FileUtil.getPermissions(Path.fromOSString(file.getAbsolutePath())), 8));
 				}
 			}
 		}
