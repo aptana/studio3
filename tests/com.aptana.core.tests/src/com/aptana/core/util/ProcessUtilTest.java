@@ -11,7 +11,6 @@ import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.hamcrest.Description;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -142,6 +141,8 @@ public class ProcessUtilTest extends TestCase
 				oneOf(process).getErrorStream();
 				will(returnValue(new ByteArrayInputStream(stdErrText.getBytes())));
 
+				oneOf(process).getOutputStream();
+
 				oneOf(process).waitFor();
 				will(returnValue(exitCode));
 			}
@@ -172,6 +173,8 @@ public class ProcessUtilTest extends TestCase
 				oneOf(process).getErrorStream();
 				will(returnValue(new ByteArrayInputStream(stdErrText.getBytes())));
 
+				oneOf(process).getOutputStream();
+
 				oneOf(process).waitFor();
 				will(throwException(new InterruptedException()));
 			}
@@ -197,6 +200,8 @@ public class ProcessUtilTest extends TestCase
 
 				oneOf(process).getErrorStream();
 				will(returnValue(new ByteArrayInputStream(stdErrText.getBytes())));
+
+				oneOf(process).getOutputStream();
 
 				oneOf(process).waitFor();
 				will(returnValue(exitCode));
