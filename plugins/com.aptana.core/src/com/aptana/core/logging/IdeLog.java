@@ -7,6 +7,7 @@
  */
 package com.aptana.core.logging;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -482,9 +483,9 @@ public final class IdeLog
 				cause = "Scope not enabled."; //$NON-NLS-1$
 			}
 
-			String traceMessage = StringUtil
-					.format("(Build {0}) Skipping log of {1} {2} {3}. Cause: {4}", new String[] { EclipseUtil.getPluginVersion(plugin), //$NON-NLS-1$
-									getLabel(severity), scope, message, cause });
+			String traceMessage = MessageFormat.format(
+					"(Build {0}) Skipping log of {1} {2} {3}. Cause: {4}", EclipseUtil.getPluginVersion(plugin), //$NON-NLS-1$
+					getLabel(severity), scope, message, cause);
 
 			if (plugin != null)
 			{
@@ -619,8 +620,8 @@ public final class IdeLog
 		{
 			version = EclipseUtil.getStudioVersion();
 		}
-		return StringUtil.format("(Build {0}) {1} {2} {3}", //$NON-NLS-1$
-				new String[] { version, getLabel(severity), scope, message });
+		return MessageFormat.format("(Build {0}) {1} {2} {3}", //$NON-NLS-1$
+				version, getLabel(severity), scope, message);
 	}
 
 	/**

@@ -8,6 +8,7 @@
 package com.aptana.editor.js.contentassist;
 
 import java.net.URI;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -171,7 +172,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		for (String name : JSLanguageConstants.KEYWORDS)
 		{
 			// TODO Create a KeywordProposal class that lazily generates description, etc?
-			String description = StringUtil.format(Messages.JSContentAssistProcessor_KeywordDescription, name);
+			String description = MessageFormat.format(Messages.JSContentAssistProcessor_KeywordDescription, name);
 			addProposal(proposals, name, JS_KEYWORD, description, getActiveUserAgentIds(),
 					Messages.JSContentAssistProcessor_KeywordLocation, offset);
 		}

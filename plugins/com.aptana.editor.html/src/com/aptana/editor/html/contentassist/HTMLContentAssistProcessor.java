@@ -1690,7 +1690,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		catch (BadLocationException e)
 		{
 			IdeLog.logWarning(HTMLPlugin.getDefault(),
-					StringUtil.format(Messages.HTMLContentAssistProcessor_ErrorFetchingPartition, offset), e,
+					MessageFormat.format(Messages.HTMLContentAssistProcessor_ErrorFetchingPartition, offset), e,
 					IHTMLEditorDebugScopes.CONTENT_ASSIST);
 		}
 

@@ -7,7 +7,6 @@
  */
 package com.aptana.core.util;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -325,34 +324,16 @@ public class StringUtilTest extends TestCase
 		assertNull(StringUtil.ellipsify(null));
 	}
 
-	public void testFormatWithIntReplacement()
-	{
-		String text = "replace integer {0}";
-
-		assertEquals("replace integer 0", StringUtil.format(text, 0));
-	}
-
-	public void testFormatWithLongReplacement()
-	{
-		String text = "replace long {0}";
-
-		assertEquals("replace long 987654321", StringUtil.format(text, 987654321l));
-	}
-
 	public void testJoinCollection()
 	{
-		Collection<String> test = new ArrayList<String>();
-		test.add("test");
-		test.add("test1");
+		Collection<String> test = CollectionsUtil.newList("test", "test1");
 
 		assertEquals("test&test1", StringUtil.join("&", test));
 	}
 
 	public void testJoinList()
 	{
-		List<String> test = new ArrayList<String>();
-		test.add("test");
-		test.add("test1");
+		Collection<String> test = CollectionsUtil.newList("test", "test1");
 
 		assertEquals("test&test1", StringUtil.join("&", test));
 	}
@@ -442,28 +423,6 @@ public class StringUtilTest extends TestCase
 	{
 		assertTrue(StringUtil.isEmpty(""));
 		assertTrue(StringUtil.isEmpty(StringUtil.EMPTY));
-	}
-
-	public void testFormatString()
-	{
-		String text = "This is a test for {0}";
-		assertEquals("This is a test for some file", StringUtil.format(text, "some file"));
-	}
-
-	public void testFormatObject()
-	{
-		String text = "This is a test for {0}";
-		File file = new File("testfile");
-		assertEquals("This is a test for testfile", StringUtil.format(text, file));
-	}
-
-	public void testFormatObjectArray()
-	{
-		String text = "This is a test for {0} {1}";
-		File file = new File("testfile");
-		File file2 = new File("testfile2");
-		assertEquals("This is a test for testfile testfile2", StringUtil.format(text, new Object[] { file, file2 }));
-
 	}
 
 	public void testPad()

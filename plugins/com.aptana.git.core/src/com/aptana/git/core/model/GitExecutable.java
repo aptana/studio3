@@ -459,7 +459,7 @@ public class GitExecutable
 		catch (Exception ex)
 		{
 			IdeLog.logError(GitPlugin.getDefault(),
-					StringUtil.format(Messages.GitExecutable_UnableToParseGitVersion, versionString), ex,
+					MessageFormat.format(Messages.GitExecutable_UnableToParseGitVersion, versionString), ex,
 					IDebugScopes.DEBUG);
 			return Version.emptyVersion;
 		}

@@ -37,7 +37,6 @@ import com.aptana.core.io.vfs.IExtendedFileInfo;
 import com.aptana.core.io.vfs.IExtendedFileStore;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.FileUtil;
-import com.aptana.core.util.StringUtil;
 import com.aptana.filewatcher.FileWatcher;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.core.io.preferences.PermissionDirection;
@@ -181,8 +180,8 @@ public class Synchronizer implements ILoggable
 		}
 		catch (StringIndexOutOfBoundsException e)
 		{
-			throw new IllegalArgumentException(StringUtil.format(Messages.Synchronizer_FileNotContained, new String[] {
-					EFSUtils.getAbsolutePath(file), basePath }));
+			throw new IllegalArgumentException(MessageFormat.format(Messages.Synchronizer_FileNotContained,
+					EFSUtils.getAbsolutePath(file), basePath));
 		}
 
 		return result;
@@ -1231,7 +1230,7 @@ public class Synchronizer implements ILoggable
 							result = false;
 							IdeLog.logError(
 									SyncingPlugin.getDefault(),
-									StringUtil.format(Messages.Synchronizer_FullSyncCRCMismatches,
+									MessageFormat.format(Messages.Synchronizer_FullSyncCRCMismatches,
 											item.getRelativePath()), (Throwable) null);
 							if (!syncError(item, null, childMonitor))
 							{
@@ -1730,30 +1729,30 @@ public class Synchronizer implements ILoggable
 	private void logBeginDownloading()
 	{
 		log(FileUtil.NEW_LINE + FileUtil.NEW_LINE
-				+ StringUtil.format(Messages.Synchronizer_BeginningDownload, getTimestamp()));
+				+ MessageFormat.format(Messages.Synchronizer_BeginningDownload, getTimestamp()));
 	}
 
 	private void logBeginFullSyncing()
 	{
 		log(FileUtil.NEW_LINE + FileUtil.NEW_LINE
-				+ StringUtil.format(Messages.Synchronizer_BeginningFullSync, getTimestamp()));
+				+ MessageFormat.format(Messages.Synchronizer_BeginningFullSync, getTimestamp()));
 	}
 
 	private void logBeginUploading()
 	{
 		log(FileUtil.NEW_LINE + FileUtil.NEW_LINE
-				+ StringUtil.format(Messages.Synchronizer_BeginningUpload, getTimestamp()));
+				+ MessageFormat.format(Messages.Synchronizer_BeginningUpload, getTimestamp()));
 	}
 
 	private void logCreatedDirectory(IFileStore file)
 	{
 		log(FileUtil.NEW_LINE
-				+ StringUtil.format(Messages.Synchronizer_CreatedDirectory, EFSUtils.getAbsolutePath(file)));
+				+ MessageFormat.format(Messages.Synchronizer_CreatedDirectory, EFSUtils.getAbsolutePath(file)));
 	}
 
 	private void logDownloading(IFileStore file)
 	{
-		log(FileUtil.NEW_LINE + StringUtil.format(Messages.Synchronizer_Downloading, EFSUtils.getAbsolutePath(file)));
+		log(FileUtil.NEW_LINE + MessageFormat.format(Messages.Synchronizer_Downloading, EFSUtils.getAbsolutePath(file)));
 	}
 
 	private void logDebug(String message)
@@ -1785,7 +1784,7 @@ public class Synchronizer implements ILoggable
 
 	private void logUploading(IFileStore file)
 	{
-		log(FileUtil.NEW_LINE + StringUtil.format(Messages.Synchronizer_Uploading, EFSUtils.getAbsolutePath(file)));
+		log(FileUtil.NEW_LINE + MessageFormat.format(Messages.Synchronizer_Uploading, EFSUtils.getAbsolutePath(file)));
 	}
 
 	private void syncDone(VirtualFileSyncPair item, IProgressMonitor monitor)

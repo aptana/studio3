@@ -8,6 +8,7 @@
 package com.aptana.ide.syncing.ui.old;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,7 +19,6 @@ import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.StringUtil;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
 import com.aptana.theme.ConsoleThemer;
 import com.aptana.theme.extensions.ConsoleThemePageParticipant;
@@ -102,7 +102,7 @@ public class SyncingConsole extends MessageConsole
 		catch (Exception e)
 		{
 			IdeLog.logError(SyncingUIPlugin.getDefault(),
-					StringUtil.format(Messages.SyncingConsole_UnableToWriteToConsole, message), e);
+					MessageFormat.format(Messages.SyncingConsole_UnableToWriteToConsole, message), e);
 		}
 	}
 
