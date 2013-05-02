@@ -1,5 +1,5 @@
 /**
- * Aptana Studio
+' * Aptana Studio
  * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
@@ -13,11 +13,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -38,6 +41,8 @@ public class ProcessUtil
 {
 
 	public static final String TEXT_TO_OBFUSCATE = "textToObfuscate"; //$NON-NLS-1$
+
+	private static final String MASK = StringUtil.repeat('*', 10);
 
 	private static ProcessUtil fgInstance;
 	/*
@@ -261,21 +266,18 @@ public class ProcessUtil
 		File outFile = null, errFile = null;
 		try
 		{
-			List<String> argsList = CollectionsUtil.newList(arguments);
+
 			if (redirect)
 			{
 				outFile = File.createTempFile("studio", ".out"); //$NON-NLS-1$ //$NON-NLS-2$
 				errFile = File.createTempFile("studio", ".err"); //$NON-NLS-1$ //$NON-NLS-2$
-				CollectionsUtil.addToList(argsList,
-						new String[] { ">", outFile.getAbsolutePath(), "2>", errFile.getAbsolutePath() }); //$NON-NLS-1$ //$NON-NLS-2$
+				List<String> argsList = CollectionsUtil.newList(arguments);
+				CollectionsUtil.addToList(argsList, ">", outFile.getAbsolutePath(), "2>", errFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
 				Process p = run(command, workingDirectory, environment, argsList.toArray(new String[argsList.size()]));
 				return processData(p, outFile, errFile);
 			}
-			else
-			{
-				Process p = run(command, workingDirectory, environment, arguments);
-				return processData(p, input);
-			}
+			Process p = run(command, workingDirectory, environment, arguments);
+			return processData(p, input);
 		}
 		catch (IOException e)
 		{
@@ -417,26 +419,56 @@ public class ProcessUtil
 				path = processBuilder.directory().getAbsolutePath();
 			}
 
-			String message;
-			if (!StringUtil.isEmpty(textToObfuscate))
+			if (isInfoLoggingEnabled())
 			{
-				List<String> commandMessage = new ArrayList<String>();
-				for (String arg : command)
+				String message;
+				if (!StringUtil.isEmpty(textToObfuscate))
 				{
-					if (!StringUtil.isEmpty(arg)
-							&& (textToObfuscate.equals(arg) || arg.indexOf("=" + textToObfuscate) > -1)) //$NON-NLS-1$
+					// @formatter:off
+					// password patterns:
+					// :(password)@ 		// URLs
+					// password 			// arg value
+					// key=password 		// key pair value
+					// @formatter:on
+					final String quoted = Pattern.quote(textToObfuscate);
+					Pattern hideMePattern = Pattern.compile("[^:]+:" + quoted + "@|^" + quoted + "$|.*?=" + quoted); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					List<String> commandMessage = new ArrayList<String>(command.size());
+					for (String arg : command)
 					{
-						arg = arg.replace(textToObfuscate, StringUtil.repeat('*', 10));
+						if (!StringUtil.isEmpty(arg))
+						{
+							StringBuffer sb = new StringBuffer();
+
+							Matcher m = hideMePattern.matcher(arg);
+							while (m.find())
+							{
+								String found = m.group();
+								String replacement = MASK;
+								if (found.charAt(found.length() - 1) == '@')
+								{
+									replacement = found.substring(0, found.length() - (textToObfuscate.length() + 2))
+											+ ':' + MASK + '@';
+								}
+								else if (found.endsWith("=" + textToObfuscate)) //$NON-NLS-1$
+								{
+									replacement = found.substring(0, (found.length() - textToObfuscate.length()))
+											+ MASK;
+								}
+								m.appendReplacement(sb, replacement);
+							}
+							m.appendTail(sb);
+							arg = sb.toString();
+						}
+						commandMessage.add(arg);
 					}
-					commandMessage.add(arg);
+					message = StringUtil.join("\" \"", commandMessage); //$NON-NLS-1$
 				}
-				message = StringUtil.join("\" \"", commandMessage); //$NON-NLS-1$
+				else
+				{
+					message = StringUtil.join("\" \"", command); //$NON-NLS-1$
+				}
+				logInfo(MessageFormat.format(Messages.ProcessUtil_RunningProcess, message, path, map));
 			}
-			else
-			{
-				message = StringUtil.join("\" \"", command); //$NON-NLS-1$
-			}
-			logInfo(StringUtil.format(Messages.ProcessUtil_RunningProcess, new Object[] { message, path, map }));
 		}
 		if (environment != null && environment.containsKey(REDIRECT_ERROR_STREAM))
 		{

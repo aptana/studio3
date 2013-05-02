@@ -236,7 +236,7 @@ public class BundleCacher
 			if (!serializationSucceeded && cacheFile != null)
 			{
 				IdeLog.logWarning(ScriptingActivator.getDefault(),
-						StringUtil.format(Messages.BundleCacher_SerializationExceptionDeletingCacheFile, cacheFile));
+						MessageFormat.format(Messages.BundleCacher_SerializationExceptionDeletingCacheFile, cacheFile));
 				cacheFile.delete();
 			}
 		}

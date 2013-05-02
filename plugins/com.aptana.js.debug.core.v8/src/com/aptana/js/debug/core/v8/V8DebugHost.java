@@ -671,7 +671,7 @@ public class V8DebugHost extends AbstractDebugHost {
 			displayValue = value.getValueString();
 			break;
 		case TYPE_STRING:
-			displayValue = StringUtil.format(QUOTES_0, value.getValueString());
+			displayValue = MessageFormat.format(QUOTES_0, value.getValueString());
 			displayType = STRING;
 			break;
 		case TYPE_NULL:
@@ -688,7 +688,7 @@ public class V8DebugHost extends AbstractDebugHost {
 				flags = removeFlag(flags, 'w');
 			}
 			flags = addFlag(flags, 'o');
-			displayValue = StringUtil.format(OBJECT_0, value.asObject().getClassName());
+			displayValue = MessageFormat.format(OBJECT_0, value.asObject().getClassName());
 			displayType = value.asObject().getClassName();
 			if (computeDetails) {
 				detailValue = getObjectDetail(value.asObject());
@@ -696,7 +696,7 @@ public class V8DebugHost extends AbstractDebugHost {
 			break;
 		case TYPE_ARRAY:
 			flags = addFlag(flags, 'o');
-			displayValue = StringUtil.format(OBJECT_0, value.asObject().getClassName());
+			displayValue = MessageFormat.format(OBJECT_0, value.asObject().getClassName());
 			displayType = value.asObject().getClassName();
 			if (computeDetails) {
 				detailValue = getObjectDetail(value.asObject());
@@ -704,7 +704,7 @@ public class V8DebugHost extends AbstractDebugHost {
 			break;
 		default:
 			displayType = value.asObject().getClassName();
-			displayType = StringUtil.format("Unknown <{0}>", displayType); //$NON-NLS-1$
+			displayType = MessageFormat.format("Unknown <{0}>", displayType); //$NON-NLS-1$
 			displayValue = value.getValueString();
 			break;
 		}
