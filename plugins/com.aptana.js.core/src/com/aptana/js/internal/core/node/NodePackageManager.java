@@ -31,7 +31,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.osgi.framework.Bundle;
-import org.osgi.framework.Version;
 
 import com.aptana.core.IMap;
 import com.aptana.core.ShellExecutable;
@@ -44,7 +43,6 @@ import com.aptana.core.util.ProcessStatus;
 import com.aptana.core.util.ProcessUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.SudoCommandProcessRunnable;
-import com.aptana.core.util.VersionUtil;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.core.node.INodePackageManager;
 
@@ -411,8 +409,8 @@ public class NodePackageManager implements INodePackageManager
 	{
 		try
 		{
-			Version version = getInstalledVersion(packageName);
-			if (version != null)
+			String version = getInstalledVersion(packageName);
+			if (!StringUtil.isEmpty(version))
 			{
 				return true;
 			}
@@ -447,7 +445,7 @@ public class NodePackageManager implements INodePackageManager
 		return Path.fromOSString(lines[lines.length - 1]);
 	}
 
-	public Version getInstalledVersion(String packageName) throws CoreException
+	public String getInstalledVersion(String packageName) throws CoreException
 	{
 		IPath npmPath = findNPM();
 		if (npmPath == null)
@@ -472,12 +470,12 @@ public class NodePackageManager implements INodePackageManager
 			{
 				output = output.substring(0, space);
 			}
-			return VersionUtil.parseVersion(output);
+			return output;
 		}
 		return null;
 	}
 
-	public Version getLatestVersionAvailable(String packageName) throws CoreException
+	public String getLatestVersionAvailable(String packageName) throws CoreException
 	{
 		// get the latest version
 		// npm view titanium version
@@ -502,7 +500,7 @@ public class NodePackageManager implements INodePackageManager
 		Matcher m = VERSION_PATTERN.matcher(message);
 		if (m.find())
 		{
-			return VersionUtil.parseVersion(m.group(1));
+			return m.group(1);
 		}
 		return null;
 	}
