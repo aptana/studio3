@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2012 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2012-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -13,7 +13,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.osgi.framework.Version;
 
 /**
  * @author cwilliams
@@ -28,7 +27,7 @@ public interface INodePackageManager
 	 * Installs a package.
 	 * 
 	 * @param packageName
-	 *            The name of the npm package to install
+	 *            The name of the npm package to install
 	 * @param displayName
 	 *            The UI string to use for the name of the package
 	 * @param global
@@ -45,7 +44,7 @@ public interface INodePackageManager
 	 * Installs a package.
 	 * 
 	 * @param packageName
-	 *            The name of the npm package to install
+	 *            The name of the npm package to install
 	 * @param displayName
 	 *            The UI string to use for the name of the package
 	 * @param global
@@ -88,9 +87,9 @@ public interface INodePackageManager
 	 */
 	public IPath getModulesPath(String packageName) throws CoreException;
 
-	public Version getInstalledVersion(String packageName) throws CoreException;
+	public String getInstalledVersion(String packageName) throws CoreException;
 
-	public Version getLatestVersionAvailable(String packageName) throws CoreException;
+	public String getLatestVersionAvailable(String packageName) throws CoreException;
 
 	public IPath findNPM();
 
