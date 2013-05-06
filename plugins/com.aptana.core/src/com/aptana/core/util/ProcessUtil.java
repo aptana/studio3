@@ -430,7 +430,7 @@ public class ProcessUtil
 					// password 			// arg value
 					// key=password 		// key pair value
 					// @formatter:on
-					final String quoted = Pattern.quote(textToObfuscate);
+					String quoted = RegexUtil.quote(textToObfuscate);
 					Pattern hideMePattern = Pattern.compile("[^:]+:" + quoted + "@|^" + quoted + "$|.*?=" + quoted); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					List<String> commandMessage = new ArrayList<String>(command.size());
 					for (String arg : command)
