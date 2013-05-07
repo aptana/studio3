@@ -8,8 +8,6 @@
 
 package com.aptana.core;
 
-import org.eclipse.core.resources.ResourcesPlugin;
-
 /**
  * @author Max Stepanov
  */
@@ -28,10 +26,7 @@ public interface ICorePreferenceConstants
 	/**
 	 * A boolean to enable/disable attaching filewatchers to automatically refresh/handle edits made to project's
 	 * contents outside the IDE.
-	 * 
-	 * @deprected Use {@link ResourcesPlugin#PREF_AUTO_REFRESH}
 	 */
-	String PREF_AUTO_REFRESH_PROJECTS = "auto_refresh_projects"; //$NON-NLS-1$
 	public static final boolean DEFAULT_AUTO_REFRESH_PROJECTS = true;
 
 	/**

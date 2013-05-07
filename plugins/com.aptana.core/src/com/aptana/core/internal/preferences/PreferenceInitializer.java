@@ -55,15 +55,10 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		if (!migrated)
 		{
 			// by default, turn on auto refresh
-			boolean autoRefresh = ICorePreferenceConstants.DEFAULT_AUTO_REFRESH_PROJECTS;
-			// Check if user set a value explicitly
-			String oldValue = prefs.get(ICorePreferenceConstants.PREF_AUTO_REFRESH_PROJECTS, null);
-			if (oldValue != null)
-			{
-				// there's an explicit value set, make sure to use that.
-				autoRefresh = Boolean.valueOf(oldValue);
-			}
-			ResourcesPlugin.getPlugin().getPluginPreferences().setValue(ResourcesPlugin.PREF_AUTO_REFRESH, autoRefresh);
+			ResourcesPlugin
+					.getPlugin()
+					.getPluginPreferences()
+					.setValue(ResourcesPlugin.PREF_AUTO_REFRESH, ICorePreferenceConstants.DEFAULT_AUTO_REFRESH_PROJECTS);
 
 			// Listen for user changing auto-refresh value, when they do, don't automatically turn it on for them
 			// anymore

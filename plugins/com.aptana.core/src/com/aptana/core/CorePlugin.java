@@ -223,11 +223,11 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 
 	private static String generateMID()
 	{
+		Formatter formatter = new Formatter();
 		try
 		{
 			MessageDigest md = MessageDigest.getInstance("MD5"); //$NON-NLS-1$
 			byte[] result = md.digest(MACAddress.getMACAddress().getBytes(IOUtil.UTF_8));
-			Formatter formatter = new Formatter();
 			for (byte b : result)
 			{
 				formatter.format("%02x", b); //$NON-NLS-1$
@@ -253,6 +253,13 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 		catch (UnsupportedEncodingException e)
 		{
 			IdeLog.logError(getDefault(), e);
+		}
+		finally
+		{
+			if (formatter != null)
+			{
+				formatter.close();
+			}
 		}
 		return null;
 	}
