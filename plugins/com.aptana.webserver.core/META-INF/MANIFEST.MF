@@ -5,13 +5,11 @@ Bundle-SymbolicName: com.aptana.webserver.core;singleton:=true
 Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.webserver.core.WebServerCorePlugin
 Bundle-Vendor: %Bundle-Vendor
-Require-Bundle: org.eclipse.core.runtime,
+Require-Bundle: org.apache.httpcomponents.httpcore;bundle-version="[4.1.0,5.0.0)",
  org.eclipse.core.filesystem,
- org.eclipse.core.resources,
  com.aptana.core,
  com.aptana.core.epl;visibility:=reexport,
  com.aptana.core.io,
- org.apache.httpcomponents.httpcore;bundle-version="[4.1.0,5.0.0)",
  org.eclipse.debug.core;visibility:=reexport
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
