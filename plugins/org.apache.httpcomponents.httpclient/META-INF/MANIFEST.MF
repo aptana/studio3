@@ -198,4 +198,3 @@ Import-Package: javax.crypto,
  org.ietf.jgss
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: The Apache Software Foundation
-Require-Bundle: org.apache.httpcomponents.httpcore;bundle-version="4.1.3"
