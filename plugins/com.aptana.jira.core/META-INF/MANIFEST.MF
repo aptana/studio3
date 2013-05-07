@@ -8,8 +8,8 @@ Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.eclipse.equinox.security,
  com.aptana.core,
  com.aptana.jetty.util.epl,
- org.apache.commons.httpclient,
- org.apache.httpcomponents.httpcore
+ org.apache.httpcomponents.httpcore;bundle-version="4.0.0",
+ org.apache.httpcomponents.httpclient;bundle-version="4.0.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.jira.core
