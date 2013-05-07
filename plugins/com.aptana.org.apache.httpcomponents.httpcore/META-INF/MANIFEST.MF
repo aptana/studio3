@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Apache HttpCore OSGi bundle
-Bundle-SymbolicName: org.apache.httpcomponents.httpcore
+Bundle-SymbolicName: com.aptana.org.apache.httpcomponents.httpcore
 Bundle-Version: 4.1.4
 Bundle-ClassPath: org_apache_httpcomponents_httpcore_4.1.4.jar
 Bundle-Vendor: The Apache Software Foundation

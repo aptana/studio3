@@ -539,7 +539,7 @@
          unpack="false"/>
 
    <plugin
-         id="org.apache.httpcomponents.httpcore"
+         id="com.aptana.org.apache.httpcomponents.httpcore"
          download-size="0"
          install-size="0"
          version="0.0.0"

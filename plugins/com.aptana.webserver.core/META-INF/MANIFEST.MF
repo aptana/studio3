@@ -5,8 +5,7 @@ Bundle-SymbolicName: com.aptana.webserver.core;singleton:=true
 Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.webserver.core.WebServerCorePlugin
 Bundle-Vendor: %Bundle-Vendor
-Require-Bundle: org.apache.httpcomponents.httpcore;bundle-version="[4.1.0,5.0.0)",
- org.eclipse.core.filesystem,
+Require-Bundle: org.eclipse.core.filesystem,
  com.aptana.core,
  com.aptana.core.epl;visibility:=reexport,
  com.aptana.core.io,
@@ -17,6 +16,7 @@ Eclipse-LazyStart: true
 Export-Package: com.aptana.webserver.core,
  com.aptana.webserver.core.preferences
 Import-Package: org.apache.http,
+ org.apache.http.entity;version="4.1.4",
  org.apache.http.impl,
  org.apache.http.impl.nio,
  org.apache.http.impl.nio.reactor,
