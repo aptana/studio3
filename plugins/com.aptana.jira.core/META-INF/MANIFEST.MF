@@ -7,11 +7,23 @@ Bundle-Activator: com.aptana.jira.core.JiraCorePlugin
 Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.eclipse.equinox.security,
  com.aptana.core,
- com.aptana.jetty.util.epl,
- org.apache.httpcomponents.httpcore;bundle-version="4.0.0",
- org.apache.httpcomponents.httpclient;bundle-version="4.0.0"
+ com.aptana.jetty.util.epl
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.jira.core
 Eclipse-ExtensibleAPI: true
 Bundle-ClassPath: .
+Import-Package: org.apache.http;version="4.0.0",
+ org.apache.http.auth;version="4.0.0",
+ org.apache.http.client;version="4.0.0",
+ org.apache.http.client.methods;version="4.0.0",
+ org.apache.http.client.params;version="4.0.0",
+ org.apache.http.client.protocol;version="4.0.0",
+ org.apache.http.conn;version="4.1.3",
+ org.apache.http.entity.mime;version="4.0.0",
+ org.apache.http.entity.mime.content;version="4.0.0",
+ org.apache.http.impl.auth;version="4.0.0",
+ org.apache.http.impl.client;version="4.0.0",
+ org.apache.http.message;version="4.0.0",
+ org.apache.http.params;version="4.1.4",
+ org.apache.http.protocol;version="4.0.0"
