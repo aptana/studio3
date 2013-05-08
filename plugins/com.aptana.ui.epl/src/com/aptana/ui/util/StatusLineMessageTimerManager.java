@@ -71,7 +71,6 @@ public class StatusLineMessageTimerManager
 	public static void setErrorMessage(String message, long timeout, boolean isError)
 	{
 		statusLineManager = getStatusLineManager();
-		System.out.println(statusLineManager);
 		if (statusLineManager != null)
 		{
 			setMessage(message, isError);
