@@ -89,6 +89,8 @@ public interface INodePackageManager
 
 	public String getInstalledVersion(String packageName) throws CoreException;
 
+	public String getInstalledVersion(String packageName, boolean isGlobal, IPath workingDir) throws CoreException;
+
 	public String getLatestVersionAvailable(String packageName) throws CoreException;
 
 	public IPath findNPM();
