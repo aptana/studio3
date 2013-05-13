@@ -447,14 +447,24 @@ public class NodePackageManager implements INodePackageManager
 
 	public String getInstalledVersion(String packageName) throws CoreException
 	{
+		return getInstalledVersion(packageName, true, null);
+	}
+
+	public String getInstalledVersion(String packageName, boolean global, IPath workingDir) throws CoreException
+	{
 		IPath npmPath = findNPM();
 		if (npmPath == null)
 		{
 			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID,
 					Messages.NodePackageManager_ERR_NPMNotInstalled));
 		}
-		IStatus status = ProcessUtil.runInBackground(npmPath.toOSString(), null, ShellExecutable.getEnvironment(),
-				"ls", GLOBAL_ARG, packageName, COLOR, FALSE); //$NON-NLS-1$
+		List<String> args = CollectionsUtil.newList("ls", packageName, COLOR, FALSE); //$NON-NLS-1$
+		if (global)
+		{
+			args.add(GLOBAL_ARG);
+		}
+		IStatus status = ProcessUtil.runInBackground(npmPath.toOSString(), workingDir,
+				ShellExecutable.getEnvironment(), args.toArray(new String[args.size()]));
 		if (!status.isOK())
 		{
 			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
