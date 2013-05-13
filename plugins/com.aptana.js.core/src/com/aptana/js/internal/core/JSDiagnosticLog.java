@@ -45,13 +45,32 @@ public class JSDiagnosticLog implements IDiagnosticLog
 		{
 			String npmVersion = ProcessUtil.outputForCommand(npmPath.toOSString(), null,
 					ShellExecutable.getEnvironment(), "-v"); //$NON-NLS-1$
-			buf.append("NPM Version: ").append(npmVersion).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			buf.append("NPM Version: ").append(npmVersion).append('\n'); //$NON-NLS-1$
+
+			String highLevelPackages = getInstalledNpmPackages(npmPath);
+			buf.append(highLevelPackages);
+			buf.append('\n');
 
 			String listOutput = ProcessUtil.outputForCommand(npmPath.toOSString(), null,
 					ShellExecutable.getEnvironment(), INodePackageManager.GLOBAL_ARG, "list"); //$NON-NLS-1$
 			buf.append("Packages: ").append(listOutput).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		return buf.toString();
+	}
+
+	private String getInstalledNpmPackages(IPath npmPath)
+	{
+		String listOutput = ProcessUtil.outputForCommand(npmPath.toOSString(), null, ShellExecutable.getEnvironment(),
+				INodePackageManager.GLOBAL_ARG, "list", "--depth=0"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		// Hack : An issue in npm list command show errors or warnings because of depth option. Filter them out of the
+		// output.
+		int errIndex = listOutput.indexOf("npm ERR!"); //$NON-NLS-1$
+		if (errIndex != -1)
+		{
+			listOutput = listOutput.substring(0, errIndex);
+		}
+		return listOutput;
 	}
 
 }
