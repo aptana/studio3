@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.widgets.Composite;
 
 import com.aptana.core.util.ArrayUtil;
@@ -55,7 +56,12 @@ public abstract class AbstractProjectWizardContributor implements IProjectWizard
 		// No-op
 	}
 
-	public void appendProjectCreationPage(Object data, IWizardPage page, Composite parent)
+	public void appendProjectCreationPage(Object data, WizardPage page, Composite parent)
+	{
+		// No-op
+	}
+
+	public void appendSampleProjectCreationPage(Object data, WizardPage page, Composite parent)
 	{
 		// No-op
 	}

@@ -54,6 +54,7 @@ import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.ZipUtil;
 import com.aptana.git.ui.CloneJob;
+import com.aptana.projects.ProjectData;
 import com.aptana.projects.ProjectsPlugin;
 import com.aptana.projects.wizards.AbstractNewProjectWizard;
 import com.aptana.projects.wizards.ProjectWizardContributionManager;
@@ -345,7 +346,10 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 		ISampleProjectHandler projectHandler = sample.getProjectHandler();
 		if (projectHandler != null)
 		{
-			projectHandler.projectCreated(newProject, mainPage.getProjectData());
+			ProjectData projectData = mainPage.getProjectData();
+			// Match the App name to the project name
+			projectData.projectName = newProject.getName();
+			projectHandler.projectCreated(newProject, projectData);
 		}
 
 		// Allow the project contributors to do work
