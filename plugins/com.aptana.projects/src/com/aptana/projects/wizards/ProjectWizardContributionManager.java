@@ -9,8 +9,10 @@ package com.aptana.projects.wizards;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -21,6 +23,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.widgets.Composite;
 
 import com.aptana.core.logging.IdeLog;
@@ -82,18 +85,38 @@ public class ProjectWizardContributionManager
 		}
 	}
 
-	public void contributeProjectCreationPage(String[] natureIds, Object data, IWizardPage page, Composite parent)
+	public Set<IProjectWizardContributor> contributeSampleProjectCreationPage(String[] natureIds, Object data,
+			WizardPage page, Composite parent)
 	{
 		loadExtensions();
+		Set<IProjectWizardContributor> activeContributors = new HashSet<IProjectWizardContributor>();
 		for (IProjectWizardContributor contributor : contributors)
 		{
 			if (!ArrayUtil.isEmpty(natureIds) && !contributor.hasNatureId(natureIds))
 			{
 				continue;
 			}
+			activeContributors.add(contributor);
+			contributor.appendSampleProjectCreationPage(data, page, parent);
+		}
+		return activeContributors;
+	}
 
+	public Set<IProjectWizardContributor> contributeProjectCreationPage(String[] natureIds, Object data,
+			WizardPage page, Composite parent)
+	{
+		loadExtensions();
+		Set<IProjectWizardContributor> activeContributors = new HashSet<IProjectWizardContributor>();
+		for (IProjectWizardContributor contributor : contributors)
+		{
+			if (!ArrayUtil.isEmpty(natureIds) && !contributor.hasNatureId(natureIds))
+			{
+				continue;
+			}
+			activeContributors.add(contributor);
 			contributor.appendProjectCreationPage(data, page, parent);
 		}
+		return activeContributors;
 	}
 
 	public void updateProject(Object data, String[] natureIds)

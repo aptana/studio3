@@ -12,6 +12,7 @@ import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.widgets.Composite;
 
 /**
@@ -41,7 +42,16 @@ public interface IProjectWizardContributor extends IExecutableExtension
 	 * @param page
 	 * @param parent
 	 */
-	public void appendProjectCreationPage(Object data, IWizardPage page, Composite parent);
+	public void appendProjectCreationPage(Object data, WizardPage page, Composite parent);
+
+	/**
+	 * Responsible for contributing UI to a Sample project creation page of the wizard
+	 * 
+	 * @param data
+	 * @param page
+	 * @param parent
+	 */
+	public void appendSampleProjectCreationPage(Object data, WizardPage page, Composite parent);
 
 	/**
 	 * Called to update the UI for the contributor
