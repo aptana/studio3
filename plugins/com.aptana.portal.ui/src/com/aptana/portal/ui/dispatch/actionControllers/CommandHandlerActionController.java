@@ -15,6 +15,7 @@ import java.util.Set;
 
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
@@ -80,13 +81,19 @@ public class CommandHandlerActionController extends AbstractActionController
 				throw new CoreException(new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, "Command not found - " //$NON-NLS-1$
 						+ commandId));
 			}
-			ExecutionEvent event = null;
+			Object result = null;
 			if (arguments == null)
 			{
-				arguments = Collections.emptyMap();
+				ExecutionEvent event = new ExecutionEvent(command, Collections.emptyMap(), null,
+						handlerService.getCurrentState());
+				result = command.executeWithChecks(event);
 			}
-			event = new ExecutionEvent(command, arguments, null, handlerService.getCurrentState());
-			Object result = command.executeWithChecks(event);
+			else
+			{
+				// In Eclipse 4.x, firing off an ExecutionEvent with parameters gets the parameters dropped along the way. They need to get merged into the application context, which this code path does.
+				ParameterizedCommand pc = ParameterizedCommand.generateCommand(command, arguments);
+				result = handlerService.executeCommand(pc, null);
+			}
 			if (result != null)
 			{
 				String eventCallback = getEventCallbackName(attributes);
