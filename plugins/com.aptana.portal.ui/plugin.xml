@@ -213,6 +213,17 @@
             description="%newProjectFromTemplate.description"
             id="com.aptana.portal.ui.command.newProjectFromTemplate"
             name="%newProjectFromTemplate.name">
+         <commandParameter
+               id="newWizardId"
+               name="New Wizard ID"
+               optional="false"
+               values="org.eclipse.ui.internal.registry.WizardParameterValues$New">
+         </commandParameter>
+         <commandParameter
+               id="projectTemplateId"
+               name="Project Template ID"
+               optional="true">
+         </commandParameter>
       </command>
    </extension>
    <extension
