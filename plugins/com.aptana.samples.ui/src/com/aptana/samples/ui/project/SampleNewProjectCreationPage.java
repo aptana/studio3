@@ -44,13 +44,17 @@ class SampleNewProjectCreationPage extends WizardNewProjectCreationPage implemen
 	{
 		super.createControl(parent);
 		Composite control = (Composite) getControl();
-		ProjectWizardContributionManager projectWizardContributionManager = ProjectsPlugin.getDefault()
-				.getProjectWizardContributionManager();
+		ProjectWizardContributionManager projectWizardContributionManager = getProjectWizardContributionManager();
 		contributors = projectWizardContributionManager.contributeSampleProjectCreationPage(natures, projectData, this,
 				control);
 		contributors.addAll(projectWizardContributionManager.contributeProjectCreationPage(natures, projectData, this,
 				control));
 		validatePage();
+	}
+
+	protected ProjectWizardContributionManager getProjectWizardContributionManager()
+	{
+		return ProjectsPlugin.getDefault().getProjectWizardContributionManager();
 	}
 
 	protected ProjectData getProjectData()
