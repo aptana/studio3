@@ -11,85 +11,150 @@ package com.aptana.ui.util;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.PlatformUtil;
+import com.aptana.core.util.ProcessUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.ui.UIPlugin;
 
 /**
  * @author Max Stepanov
  */
-public final class WorkbenchBrowserUtil {
+public final class WorkbenchBrowserUtil
+{
 
 	/**
 	 * 
 	 */
-	private WorkbenchBrowserUtil() {
+	private WorkbenchBrowserUtil()
+	{
 	}
 
-	public static void launchExternalBrowser(String url) {
-		try {
+	public static void launchExternalBrowser(String url)
+	{
+		try
+		{
 			launchExternalBrowser(new URL(url));
-		} catch (MalformedURLException e) {
+		}
+		catch (MalformedURLException e)
+		{
 			IdeLog.logError(UIPlugin.getDefault(), e);
 		}
 	}
 
-	public static void launchExternalBrowser(URL url) {
+	public static void launchExternalBrowser(URL url)
+	{
 		launchExternalBrowser(url, null);
 	}
 
-	public static IWebBrowser launchExternalBrowser(String url, String browserId) {
-		try {
+	public static IWebBrowser launchExternalBrowser(String url, String browserId)
+	{
+		try
+		{
 			return launchExternalBrowser(new URL(url), browserId);
-		} catch (MalformedURLException e) {
+		}
+		catch (MalformedURLException e)
+		{
 			IdeLog.logError(UIPlugin.getDefault(), e);
 		}
 		return null;
 	}
 
-	public static IWebBrowser launchExternalBrowser(URL url, String browserId) {
+	public static IWebBrowser launchExternalBrowser(URL url, String browserId)
+	{
 		IWorkbenchBrowserSupport support = PlatformUI.getWorkbench().getBrowserSupport();
-		if (browserId != null) {
-			try {
-				IWebBrowser webBrowser = support.createBrowser(IWorkbenchBrowserSupport.AS_EXTERNAL, browserId, null, null);
-				if (webBrowser != null) {
+		if (browserId != null)
+		{
+			try
+			{
+				IWebBrowser webBrowser = support.createBrowser(IWorkbenchBrowserSupport.AS_EXTERNAL, browserId, null,
+						null);
+				if (webBrowser != null)
+				{
 					webBrowser.openURL(url);
 					return webBrowser;
 				}
-			} catch (PartInitException e) {
+			}
+			catch (PartInitException e)
+			{
 				IdeLog.logError(UIPlugin.getDefault(), e);
 			}
 		}
-		try {
+		try
+		{
 			IWebBrowser webBrowser = support.getExternalBrowser();
 			webBrowser.openURL(url);
 			return webBrowser;
-		} catch (PartInitException e) {
+		}
+		catch (Exception e)
+		{
 			IdeLog.logError(UIPlugin.getDefault(), e);
+			launchBrowserByCommand(url);
 		}
 		return null;
 	}
 
 	/**
-	 * Opens an URl with the default settings (which will typically open in an
-	 * internal browser with no toolbar/url bar/etc).
+	 * If we try to open URLs in the splash (before the platform loads), we typically fail and need a fallback mechanism
+	 * to open URLs externally.
+	 * 
+	 * @param url
+	 */
+	@SuppressWarnings("nls")
+	private static void launchBrowserByCommand(URL url)
+	{
+		// Can we fall back to running a command to load the URL?
+		if (PlatformUtil.isMac())
+		{
+			ProcessUtil.runInBackground("open", null, url.toString());
+		}
+		else if (PlatformUtil.isWindows())
+		{
+			// Windows
+			IStatus result = ProcessUtil.runInBackground("reg", null, "query",
+					"HKEY_CLASSES_ROOT\\http\\shell\\open\\command");
+			String output = result.getMessage();
+			output = output.trim();
+			int index = output.indexOf("REG_SZ");
+			output = output.substring(index + 6);
+			output = output.substring(0, output.length() - 8);
+			output = output.trim();
+			output = StringUtil.stripQuotes(output);
+			ProcessUtil.runInBackground(output, null, url.toString());
+		}
+		else
+		{
+			ProcessUtil.runInBackground("xdg-open", null, url.toString());
+		}
+	}
+
+	/**
+	 * Opens an URL with the default settings (which will typically open in an internal browser with no toolbar/url
+	 * bar/etc).
 	 * 
 	 * @param url
 	 * @return
 	 */
-	public static IWebBrowser openURL(String url) {
-		try {
+	public static IWebBrowser openURL(String url)
+	{
+		try
+		{
 			IWorkbenchBrowserSupport workbenchBrowserSupport = PlatformUI.getWorkbench().getBrowserSupport();
 			IWebBrowser webBrowser = workbenchBrowserSupport.createBrowser(null);
-			if (webBrowser != null) {
+			if (webBrowser != null)
+			{
 				webBrowser.openURL(new URL(url));
 			}
 			return webBrowser;
-		} catch (Exception e) {
+		}
+		catch (Exception e)
+		{
 			IdeLog.logError(UIPlugin.getDefault(), e);
 		}
 		return null;
