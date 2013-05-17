@@ -12,6 +12,12 @@
  *     Oakland Software Incorporated (Francis Upton) <francisu@ieee.org>
  *		    Bug 224997 [Workbench] Impossible to copy project
  *     Alena Laskavaia - fix for bug 2035
+ ********************************************************************************
+ * Aptana Studio
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the Eclipse Public License (EPL).
+ * Please see the license-epl.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
  *******************************************************************************/
 
 package com.aptana.ui.dialogs;
@@ -24,6 +30,9 @@ import java.text.MessageFormat;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.osgi.util.TextProcessor;
@@ -461,6 +470,17 @@ public class ProjectContentsLocationArea
 					return MessageFormat.format(EplMessages.ProjectContentsLocationArea_NonEmptyDirectory, newLocation);
 				}
 			}
+
+			// If default location is not selected, then the project can not be created under any child folder of
+			// workspace.
+			IPath parentLocation = Path.fromOSString(locationFieldContents).removeLastSegments(1);
+			IPath workspaceLocation = ResourcesPlugin.getWorkspace().getRoot().getLocation();
+			if (parentLocation.equals(workspaceLocation))
+			{
+				return MessageFormat.format(EplMessages.ProjectContentsLocationArea_OverlapError, newLocation,
+						existingProject.getName());
+			}
+
 		}
 
 		return null;
