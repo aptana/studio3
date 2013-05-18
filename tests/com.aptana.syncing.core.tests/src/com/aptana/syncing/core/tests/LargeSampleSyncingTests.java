@@ -8,6 +8,7 @@
 package com.aptana.syncing.core.tests;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Properties;
 
@@ -22,7 +23,6 @@ import org.eclipse.core.runtime.Path;
 
 import com.aptana.core.io.efs.EFSUtils;
 import com.aptana.core.io.vfs.IExtendedFileStore;
-import com.aptana.core.util.StringUtil;
 import com.aptana.git.core.model.GitExecutable;
 import com.aptana.ide.core.io.ConnectionContext;
 import com.aptana.ide.core.io.CoreIOPlugin;
@@ -252,17 +252,16 @@ public abstract class LargeSampleSyncingTests extends TestCase
 	{
 		String file1RelPath = EFSUtils.getRelativePath(root1, file1, null);
 		String file2RelPath = EFSUtils.getRelativePath(root2, file2, null);
-		assertEquals(StringUtil.format("File {0} and {1} not equal", new String[] { file1RelPath, file2RelPath }),
-				file1RelPath, file2RelPath);
+		assertEquals(MessageFormat.format("File {0} and {1} not equal", file1RelPath, file2RelPath), file1RelPath,
+				file2RelPath);
 		IFileInfo f1 = file1.fetchInfo(IExtendedFileStore.DETAILED, null);
 		IFileInfo f2 = file2.fetchInfo(IExtendedFileStore.DETAILED, null);
 		if (!f1.isDirectory())
 		{
 			assertEquals(
-					StringUtil.format("File {0} and {1} modification times differ", new String[] { file1RelPath,
-							file2RelPath }), f1.getLastModified(), f2.getLastModified());
-			assertEquals(
-					StringUtil.format("File {0} and {1} different sizes", new String[] { file1RelPath, file2RelPath }),
+					MessageFormat.format("File {0} and {1} modification times differ", file1RelPath, file2RelPath),
+					f1.getLastModified(), f2.getLastModified());
+			assertEquals(MessageFormat.format("File {0} and {1} different sizes", file1RelPath, file2RelPath),
 					f1.getLength(), f2.getLength());
 		}
 	}
@@ -274,7 +273,7 @@ public abstract class LargeSampleSyncingTests extends TestCase
 		IFileStore destFile = destMap.get(relPath);
 		// System.out.println("Comparing " + relPath);
 
-		assertNotNull(StringUtil.format("File {0} not found on destination", relPath), destFile);
+		assertNotNull(MessageFormat.format("File {0} not found on destination", relPath), destFile);
 		IFileInfo f1 = sourceFile.fetchInfo(IExtendedFileStore.DETAILED, null);
 		IFileInfo f2 = destFile.fetchInfo(IExtendedFileStore.DETAILED, null);
 		if (!f1.isDirectory())
@@ -283,11 +282,9 @@ public abstract class LargeSampleSyncingTests extends TestCase
 			long destFileTime = f2.getLastModified();
 			long timeDiff = destFileTime - sourceFileTime;
 
-			assertTrue(
-					StringUtil.format("File {0} is {1} seconds newer on destination", new Object[] { relPath,
-							(int) timeDiff / 1000 }), -timeTolerance <= timeDiff && timeDiff <= timeTolerance);
-			assertEquals(StringUtil.format("File {0} different sizes", new String[] { relPath }), f1.getLength(),
-					f2.getLength());
+			assertTrue(MessageFormat.format("File {0} is {1} seconds newer on destination", relPath,
+					(int) timeDiff / 1000), -timeTolerance <= timeDiff && timeDiff <= timeTolerance);
+			assertEquals(MessageFormat.format("File {0} different sizes", relPath), f1.getLength(), f2.getLength());
 		}
 	}
 

@@ -49,18 +49,14 @@
       <import plugin="com.aptana.syncing.core"/>
       <import plugin="com.aptana.syncing.ui"/>
       <import plugin="com.aptana.theme"/>
-      <import plugin="com.aptana.editor.markdown"/>
       <import plugin="com.aptana.org.eclipse.tm.terminal" version="3.0.100" match="greaterOrEqual"/>
       <import plugin="com.aptana.filesystem.s3"/>
       <import plugin="com.aptana.editor.dtd"/>
-      <import plugin="com.aptana.editor.yaml"/>
-      <import plugin="com.aptana.editor.idl"/>
       <import plugin="com.aptana.editor.css.formatter"/>
       <import plugin="com.aptana.editor.json"/>
       <import plugin="com.aptana.editor.xml.formatter"/>
       <import plugin="com.aptana.editor.html.formatter"/>
       <import plugin="com.aptana.editor.js.formatter"/>
-      <import plugin="com.aptana.editor.coffee"/>
       <import plugin="org.eclipse.osgi" version="3.1.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.deploy.ftp"/>
       <import plugin="com.aptana.samples"/>
@@ -237,14 +233,6 @@
          unpack="false"/>
 
    <plugin
-         id="com.aptana.editor.markdown.tests"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
          id="org.eclipse.test.performance"
          download-size="0"
          install-size="0"
@@ -288,22 +276,6 @@
          unpack="false"/>
 
    <plugin
-         id="com.aptana.editor.yaml.tests"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="com.aptana.editor.idl.tests"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
          id="com.aptana.editor.css.formatter.tests"
          download-size="0"
          install-size="0"
@@ -337,14 +309,6 @@
 
    <plugin
          id="com.aptana.editor.js.formatter.tests"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="com.aptana.editor.coffee.tests"
          download-size="0"
          install-size="0"
          version="0.0.0"

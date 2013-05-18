@@ -928,7 +928,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 				}
 			}
 		}
-		updatedLabel.setText(StringUtil.format(UPDATED_LABEL, updated));
+		updatedLabel.setText(MessageFormat.format(UPDATED_LABEL, updated));
 		if (deleted == 0)
 		{
 			deletedLabel.setFont(updatedLabel.getFont());
@@ -955,8 +955,8 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 			deletedLabel.setFont(boldFont);
 			deletedLabel.setForeground(deletedLabel.getDisplay().getSystemColor(SWT.COLOR_RED));
 		}
-		deletedLabel.setText(StringUtil.format(DELETED_LABEL, deleted));
-		skippedLabel.setText(StringUtil.format(SKIPPED_LABEL, skipped));
+		deletedLabel.setText(MessageFormat.format(DELETED_LABEL, deleted));
+		skippedLabel.setText(MessageFormat.format(SKIPPED_LABEL, skipped));
 		this.skipped = skipped;
 		skippedLabel.getParent().layout(true, true);
 		startSync.setEnabled(deleted + updated > 0);

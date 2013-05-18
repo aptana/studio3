@@ -9,7 +9,6 @@ package com.aptana.projects.wizards;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -79,7 +78,6 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 	public static final String COMMAND_PROJECT_FROM_TEMPLATE_NEW_WIZARD_ID = "newWizardId"; //$NON-NLS-1$
 
 	private static final int IMAGE_SIZE = 48;
-	private static final String TAG_ALL = "All"; //$NON-NLS-1$
 
 	private TableViewer tagsListViewer;
 	private Composite templatesListComposite;
@@ -316,8 +314,8 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 		// the left side is the list of template tags
 		Composite templateTags = new Composite(main, SWT.BORDER);
 		templateTags.setLayout(GridLayoutFactory.swtDefaults().create());
-		// If there are only the "All" tag and one other tag, don't both showing the left column.
-		boolean exclude = templateTagsMap.size() <= 2;
+		// If there is only one tag, don't bother showing the left column.
+		boolean exclude = templateTagsMap.size() <= 1;
 		templateTags.setLayoutData(GridDataFactory.fillDefaults().grab(false, true).hint(150, SWT.DEFAULT)
 				.exclude(exclude).create());
 		templateTags.setBackground(background);
@@ -346,8 +344,8 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 			@Override
 			public int category(Object element)
 			{
-				// make sure the "All" tag appears at the bottom
-				return TAG_ALL.equals(element) ? 1 : 0;
+				// make sure the "Others" tag appears at the bottom
+				return ProjectTemplatesManager.TAG_OTHERS.equals(element) ? 1 : 0;
 			}
 		});
 		Table tagsList = tagsListViewer.getTable();
@@ -579,6 +577,7 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 	private void populateTagsMap()
 	{
 		templateTagsMap.clear();
+		List<IProjectTemplate> others = new ArrayList<IProjectTemplate>();
 		for (IProjectTemplate template : fTemplates)
 		{
 			List<String> tags = template.getTags();
@@ -595,9 +594,16 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 					tagTemplates.add(template);
 				}
 			}
+			else
+			{
+				others.add(template);
+			}
 		}
-		// add an "All" tag to hold the full list of templates
-		templateTagsMap.put(TAG_ALL, Arrays.asList(fTemplates));
+		// add an "Others" tag to hold the list of templates with no tags assigned
+		if (!others.isEmpty())
+		{
+			templateTagsMap.put(ProjectTemplatesManager.TAG_OTHERS, others);
+		}
 	}
 
 	public void initStepIndicator(String[] stepNames)

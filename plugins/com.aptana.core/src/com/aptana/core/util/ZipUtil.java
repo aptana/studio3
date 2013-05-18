@@ -479,10 +479,11 @@ public final class ZipUtil
 		}
 
 		// Set permissions
-		if (!PlatformUtil.isWindows() && entry.getUnixMode() != 0)
+		int unixMode = entry.getUnixMode();
+		if (!PlatformUtil.isWindows() && unixMode != 0)
 		{
-			return ProcessUtil.runInBackground(
-					"chmod", null, Integer.toOctalString(entry.getUnixMode() & 0x0FFF), file.getAbsolutePath()); //$NON-NLS-1$
+			String permString = Integer.toOctalString(unixMode & 0x0FFF);
+			return FileUtil.chmod(permString, file);
 		}
 		return Status.OK_STATUS;
 	}

@@ -201,8 +201,8 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 					BundleElement bundle = snippet.getOwningBundle();
 					String bundleName = (bundle == null) ? "Unknown bundle" : bundle.getDisplayName(); //$NON-NLS-1$
 					IdeLog.logError(CommonEditorPlugin.getDefault(),
-							StringUtil.format("Error executing command {0} in bundle {1}. Command returned null.", //$NON-NLS-1$
-									new String[] { snippet.getDisplayName(), bundleName }), IDebugScopes.DRAG_DROP);
+							MessageFormat.format("Error executing command {0} in bundle {1}. Command returned null.", //$NON-NLS-1$
+									snippet.getDisplayName(), bundleName), IDebugScopes.DRAG_DROP);
 				}
 				else
 				{

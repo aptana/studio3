@@ -31,7 +31,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.osgi.framework.Bundle;
-import org.osgi.framework.Version;
 
 import com.aptana.core.IMap;
 import com.aptana.core.ShellExecutable;
@@ -44,7 +43,6 @@ import com.aptana.core.util.ProcessStatus;
 import com.aptana.core.util.ProcessUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.SudoCommandProcessRunnable;
-import com.aptana.core.util.VersionUtil;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.core.node.INodePackageManager;
 
@@ -154,9 +152,9 @@ public class NodePackageManager implements INodePackageManager
 				args.add(npmPath.toOSString());
 			}
 			CollectionsUtil.addToList(args, INSTALL, packageName, COLOR, FALSE);
-			args.addAll(proxySettings());
 
 			Map<String, String> environment = ShellExecutable.getEnvironment();
+			args.addAll(proxySettings(environment));
 			environment.put(ProcessUtil.REDIRECT_ERROR_STREAM, StringUtil.EMPTY);
 
 			// HACK for TISTUD-4101
@@ -261,25 +259,29 @@ public class NodePackageManager implements INodePackageManager
 
 	/**
 	 * This will return a list of arguments for proxy settings (if we have any, otherwise an empty list).
+	 * 
+	 * @param env
+	 *            The environment map. Passed in so we can flag passwords to obfuscate (in other words, we may modify
+	 *            the map)
 	 */
-	private List<String> proxySettings()
+	private List<String> proxySettings(Map<String, String> env)
 	{
 		IProxyService service = JSCorePlugin.getDefault().getProxyService();
-		if (service == null)
+		if (service == null || !service.isProxiesEnabled())
 		{
 			return Collections.emptyList();
 		}
 
-		List<String> proxyArgs = new ArrayList<String>();
+		List<String> proxyArgs = new ArrayList<String>(4);
 		IProxyData httpData = service.getProxyData(IProxyData.HTTP_PROXY_TYPE);
 		if (httpData != null && httpData.getHost() != null)
 		{
-			CollectionsUtil.addToList(proxyArgs, "--proxy", buildProxyURL(httpData)); //$NON-NLS-1$
+			CollectionsUtil.addToList(proxyArgs, "--proxy", buildProxyURL(httpData, env)); //$NON-NLS-1$
 		}
 		IProxyData httpsData = service.getProxyData(IProxyData.HTTPS_PROXY_TYPE);
 		if (httpsData != null && httpsData.getHost() != null)
 		{
-			CollectionsUtil.addToList(proxyArgs, "--https-proxy", buildProxyURL(httpsData)); //$NON-NLS-1$
+			CollectionsUtil.addToList(proxyArgs, "--https-proxy", buildProxyURL(httpsData, env)); //$NON-NLS-1$
 		}
 		return proxyArgs;
 	}
@@ -288,19 +290,24 @@ public class NodePackageManager implements INodePackageManager
 	 * Given proxy data, we try to convert that back into a full URL
 	 * 
 	 * @param data
+	 *            The {@link IProxyData} we're converting into a URL string.
+	 * @param env
+	 *            The environment map. Passed in so we can flag passwords to obfuscate (in other words, we may modify
+	 *            the map)
 	 * @return
 	 */
-	private String buildProxyURL(IProxyData data)
+	private String buildProxyURL(IProxyData data, Map<String, String> env)
 	{
 		StringBuilder builder = new StringBuilder();
-		builder.append(data.getType().toLowerCase());
-		builder.append("://"); //$NON-NLS-1$
+		builder.append("http://"); //$NON-NLS-1$
 		if (!StringUtil.isEmpty(data.getUserId()))
 		{
 			builder.append(data.getUserId());
 			builder.append(':');
-			builder.append(data.getPassword());
+			String password = data.getPassword();
+			builder.append(password);
 			builder.append('@');
+			env.put(ProcessUtil.TEXT_TO_OBFUSCATE, password);
 		}
 		builder.append(data.getHost());
 		if (data.getPort() != -1)
@@ -402,8 +409,8 @@ public class NodePackageManager implements INodePackageManager
 	{
 		try
 		{
-			Version version = getInstalledVersion(packageName);
-			if (version != null)
+			String version = getInstalledVersion(packageName);
+			if (!StringUtil.isEmpty(version))
 			{
 				return true;
 			}
@@ -438,7 +445,12 @@ public class NodePackageManager implements INodePackageManager
 		return Path.fromOSString(lines[lines.length - 1]);
 	}
 
-	public Version getInstalledVersion(String packageName) throws CoreException
+	public String getInstalledVersion(String packageName) throws CoreException
+	{
+		return getInstalledVersion(packageName, true, null);
+	}
+
+	public String getInstalledVersion(String packageName, boolean global, IPath workingDir) throws CoreException
 	{
 		IPath npmPath = findNPM();
 		if (npmPath == null)
@@ -446,8 +458,13 @@ public class NodePackageManager implements INodePackageManager
 			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID,
 					Messages.NodePackageManager_ERR_NPMNotInstalled));
 		}
-		IStatus status = ProcessUtil.runInBackground(npmPath.toOSString(), null, ShellExecutable.getEnvironment(),
-				"ls", GLOBAL_ARG, packageName, COLOR, FALSE); //$NON-NLS-1$
+		List<String> args = CollectionsUtil.newList("ls", packageName, COLOR, FALSE); //$NON-NLS-1$
+		if (global)
+		{
+			args.add(GLOBAL_ARG);
+		}
+		IStatus status = ProcessUtil.runInBackground(npmPath.toOSString(), workingDir,
+				ShellExecutable.getEnvironment(), args.toArray(new String[args.size()]));
 		if (!status.isOK())
 		{
 			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
@@ -463,12 +480,12 @@ public class NodePackageManager implements INodePackageManager
 			{
 				output = output.substring(0, space);
 			}
-			return VersionUtil.parseVersion(output);
+			return output;
 		}
 		return null;
 	}
 
-	public Version getLatestVersionAvailable(String packageName) throws CoreException
+	public String getLatestVersionAvailable(String packageName) throws CoreException
 	{
 		// get the latest version
 		// npm view titanium version
@@ -478,10 +495,11 @@ public class NodePackageManager implements INodePackageManager
 			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID,
 					Messages.NodePackageManager_ERR_NPMNotInstalled));
 		}
+		Map<String, String> env = ShellExecutable.getEnvironment();
 		List<String> args = CollectionsUtil.newList("view", packageName, "version");//$NON-NLS-1$ //$NON-NLS-2$
-		args.addAll(proxySettings());
+		args.addAll(proxySettings(env));
 
-		IStatus status = ProcessUtil.runInBackground(npmPath.toOSString(), null, ShellExecutable.getEnvironment(),
+		IStatus status = ProcessUtil.runInBackground(npmPath.toOSString(), null, env,
 				args.toArray(new String[args.size()]));
 		if (!status.isOK())
 		{
@@ -492,7 +510,7 @@ public class NodePackageManager implements INodePackageManager
 		Matcher m = VERSION_PATTERN.matcher(message);
 		if (m.find())
 		{
-			return VersionUtil.parseVersion(m.group(1));
+			return m.group(1);
 		}
 		return null;
 	}

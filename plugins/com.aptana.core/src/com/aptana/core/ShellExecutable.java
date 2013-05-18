@@ -240,18 +240,17 @@ public final class ShellExecutable
 				&& workingDirToEnvCache.get(locationKey) != null)
 		{
 			String resultPath = workingDirToEnvCache.get(locationKey).get(PATH);
-
+			resultPath = PathUtil.convertPATH(resultPath);
 			for (String newPath : newPathLocations)
 			{
-				resultPath = StringUtil.join(PATH_SEPARATOR, resultPath,
-						PathUtil.convertToUnixFormatPath(PlatformUtil.expandEnvironmentStrings(newPath)));
+				resultPath = StringUtil.join(File.pathSeparator, resultPath,
+						PlatformUtil.expandEnvironmentStrings(newPath));
 			}
-			resultPath = PathUtil.convertPATH(resultPath);
 			// Remove duplicates.
 			List<String> pathLocations = StringUtil.split(resultPath, File.pathSeparatorChar);
 			CollectionsUtil.removeDuplicates(pathLocations);
-			resultPath = StringUtil.join(String.valueOf(File.pathSeparatorChar), pathLocations);
 
+			resultPath = StringUtil.join(File.pathSeparator, pathLocations);
 			workingDirToEnvCache.get(locationKey).put(PATH, resultPath);
 		}
 	}

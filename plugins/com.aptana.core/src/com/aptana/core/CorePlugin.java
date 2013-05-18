@@ -22,7 +22,9 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChang
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.osgi.framework.BundleContext;
 
+import com.aptana.core.diagnostic.IDiagnosticManager;
 import com.aptana.core.internal.UserAgentManager;
+import com.aptana.core.internal.diagnostic.DiagnosticManager;
 import com.aptana.core.internal.sourcemap.SourceMapRegistry;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.sourcemap.ISourceMapRegistry;
@@ -50,6 +52,7 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 
 	private UserAgentManager fUserAgentManager;
 	private ISourceMapRegistry sourceMapRegistry;
+	private IDiagnosticManager diagnosticManager;
 
 	/**
 	 * The constructor
@@ -120,6 +123,7 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 	public void stop(BundleContext context) throws Exception
 	{
 		sourceMapRegistry = null;
+		diagnosticManager = null;
 		try
 		{
 			// Don't listen to debug changes anymore
@@ -159,6 +163,20 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 			sourceMapRegistry = new SourceMapRegistry();
 		}
 		return sourceMapRegistry;
+	}
+
+	/**
+	 * Returns the {@link IDiagnosticManager}.
+	 * 
+	 * @return {@link IDiagnosticManager}.
+	 */
+	public synchronized IDiagnosticManager getDiagnosticManager()
+	{
+		if (diagnosticManager == null)
+		{
+			diagnosticManager = new DiagnosticManager();
+		}
+		return diagnosticManager;
 	}
 
 	/**

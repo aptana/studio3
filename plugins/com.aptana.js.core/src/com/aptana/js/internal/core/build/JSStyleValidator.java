@@ -8,6 +8,7 @@
 package com.aptana.js.internal.core.build;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -1723,7 +1724,7 @@ public class JSStyleValidator extends AbstractBuildParticipant
 			}
 			try
 			{
-				BigDecimal value = new BigDecimal(text);
+				BigDecimal value = parseNumber(text);
 				if (value.compareTo(MAX_NUMBER) > 0)
 				{
 					// FIXME JSLint reports the warning _after_ the node, we should just mark the node.
@@ -1743,6 +1744,42 @@ public class JSStyleValidator extends AbstractBuildParticipant
 						MessageFormat.format("Error trying to parse JS number: ''{0}''", text), e, null); //$NON-NLS-1$
 			}
 		}
+	}
+
+	/**
+	 * Parse a JS Number. Need to look out for octal and hex representations.
+	 * 
+	 * @param text
+	 * @return
+	 */
+	private BigDecimal parseNumber(String text)
+	{
+		// Check for hex or octal strings
+		String base = text;
+		boolean negative = false;
+		if (base.charAt(0) == '-')
+		{
+			negative = true;
+			base = base.substring(1);
+		}
+		if (base.length() > 0 && base.charAt(0) == '0')
+		{
+			base = base.substring(1);
+			// hex or octal number starts with 0 (octal just 0, hex 0x)
+			int radix = 8;
+			if (base.length() > 0 && base.charAt(0) == 'x')
+			{
+				base = base.substring(2);
+				radix = 16;
+			}
+			if (negative)
+			{
+				base = '-' + base;
+			}
+			return new BigDecimal(new BigInteger(base, radix));
+		}
+
+		return new BigDecimal(text);
 	}
 
 	// Define the symbol in the current function in the current scope.

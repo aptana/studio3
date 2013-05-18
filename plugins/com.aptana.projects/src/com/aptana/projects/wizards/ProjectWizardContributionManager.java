@@ -8,7 +8,11 @@
 package com.aptana.projects.wizards;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -19,6 +23,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.widgets.Composite;
 
 import com.aptana.core.logging.IdeLog;
@@ -30,9 +35,12 @@ import com.aptana.projects.ProjectsPlugin;
  */
 public class ProjectWizardContributionManager
 {
-	private static final String ATTRIBUTE_DEPENDENT_BUNDLE = "dependentBundle"; //$NON-NLS-1$
+	private static final String ATTRIBUTE_ID = "id"; //$NON-NLS-1$
 	private static final String ATTRIBUTE_CLASS = "class"; //$NON-NLS-1$
+	private static final String ATTRIBUTE_PRIORITY = "priority"; //$NON-NLS-1$
 	private static final String EXTENSION_POINT_NAME = "projectWizardContributors"; //$NON-NLS-1$
+
+	private static final int DEFAULT_PRIORITY = 60;
 	private List<IProjectWizardContributor> contributors;
 
 	public ProjectWizardContributionManager()
@@ -77,18 +85,38 @@ public class ProjectWizardContributionManager
 		}
 	}
 
-	public void contributeProjectCreationPage(String[] natureIds, Object data, IWizardPage page, Composite parent)
+	public Set<IProjectWizardContributor> contributeSampleProjectCreationPage(String[] natureIds, Object data,
+			WizardPage page, Composite parent)
 	{
 		loadExtensions();
+		Set<IProjectWizardContributor> activeContributors = new HashSet<IProjectWizardContributor>();
 		for (IProjectWizardContributor contributor : contributors)
 		{
 			if (!ArrayUtil.isEmpty(natureIds) && !contributor.hasNatureId(natureIds))
 			{
 				continue;
 			}
+			activeContributors.add(contributor);
+			contributor.appendSampleProjectCreationPage(data, page, parent);
+		}
+		return activeContributors;
+	}
 
+	public Set<IProjectWizardContributor> contributeProjectCreationPage(String[] natureIds, Object data,
+			WizardPage page, Composite parent)
+	{
+		loadExtensions();
+		Set<IProjectWizardContributor> activeContributors = new HashSet<IProjectWizardContributor>();
+		for (IProjectWizardContributor contributor : contributors)
+		{
+			if (!ArrayUtil.isEmpty(natureIds) && !contributor.hasNatureId(natureIds))
+			{
+				continue;
+			}
+			activeContributors.add(contributor);
 			contributor.appendProjectCreationPage(data, page, parent);
 		}
+		return activeContributors;
 	}
 
 	public void updateProject(Object data, String[] natureIds)
@@ -132,17 +160,38 @@ public class ProjectWizardContributionManager
 			IExtensionRegistry registry = Platform.getExtensionRegistry();
 			IConfigurationElement[] elements = registry.getConfigurationElementsFor(ProjectsPlugin.PLUGIN_ID,
 					EXTENSION_POINT_NAME);
-			contributors = new ArrayList<IProjectWizardContributor>(elements.length);
+
+			// Gather all the configuration elements and filter the same contributors based on their priority.
+			Map<String, IConfigurationElement> registryMap = new HashMap<String, IConfigurationElement>(elements.length);
 			for (IConfigurationElement element : elements)
 			{
-				try
+				String id = element.getAttribute(ATTRIBUTE_ID);
+				if (registryMap.containsKey(id))
 				{
-					String bundleId = element.getAttribute(ATTRIBUTE_DEPENDENT_BUNDLE);
-					if (bundleId != null && Platform.getBundle(bundleId) == null)
+					IConfigurationElement currentElement = registryMap.get(id);
+					int currentPrioirty = DEFAULT_PRIORITY, newPriority = DEFAULT_PRIORITY;
+					try
+					{
+						currentPrioirty = Integer.parseInt(currentElement.getAttribute(ATTRIBUTE_PRIORITY));
+						newPriority = Integer.parseInt(element.getAttribute(ATTRIBUTE_PRIORITY));
+					}
+					catch (NumberFormatException nfe)
+					{
+						IdeLog.logError(ProjectsPlugin.getDefault(), nfe);
+					}
+					if (newPriority < currentPrioirty)
 					{
 						continue;
 					}
+				}
+				registryMap.put(id, element);
+			}
 
+			contributors = new ArrayList<IProjectWizardContributor>(registryMap.size());
+			for (IConfigurationElement element : registryMap.values())
+			{
+				try
+				{
 					IProjectWizardContributor contributorObject = (IProjectWizardContributor) element
 							.createExecutableExtension(ATTRIBUTE_CLASS);
 					if (contributorObject == null)

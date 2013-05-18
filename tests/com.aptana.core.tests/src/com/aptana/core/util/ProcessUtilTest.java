@@ -2,6 +2,7 @@ package com.aptana.core.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,7 +12,6 @@ import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.hamcrest.Description;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -142,6 +142,8 @@ public class ProcessUtilTest extends TestCase
 				oneOf(process).getErrorStream();
 				will(returnValue(new ByteArrayInputStream(stdErrText.getBytes())));
 
+				oneOf(process).getOutputStream();
+
 				oneOf(process).waitFor();
 				will(returnValue(exitCode));
 			}
@@ -172,6 +174,8 @@ public class ProcessUtilTest extends TestCase
 				oneOf(process).getErrorStream();
 				will(returnValue(new ByteArrayInputStream(stdErrText.getBytes())));
 
+				oneOf(process).getOutputStream();
+
 				oneOf(process).waitFor();
 				will(throwException(new InterruptedException()));
 			}
@@ -197,6 +201,8 @@ public class ProcessUtilTest extends TestCase
 
 				oneOf(process).getErrorStream();
 				will(returnValue(new ByteArrayInputStream(stdErrText.getBytes())));
+
+				oneOf(process).getOutputStream();
 
 				oneOf(process).waitFor();
 				will(returnValue(exitCode));
@@ -297,6 +303,100 @@ public class ProcessUtilTest extends TestCase
 		int result = ProcessUtil.waitForProcess(process, timeout, forceKill);
 		assertEquals(exitCode, result);
 		context.assertIsSatisfied();
+	}
+
+	public void testObfuscation() throws Exception
+	{
+		final List<String> logs = new ArrayList<String>();
+		Map<String, String> environment = CollectionsUtil.newMap(ProcessUtil.TEXT_TO_OBFUSCATE, "password123");
+
+		List<String> args = CollectionsUtil.newList("binary", "/User/cwilliams/path", "--password", "password123");
+		new ProcessUtil()
+		{
+			protected Process startProcess(ProcessBuilder processBuilder) throws IOException
+			{
+				return null;
+			}
+
+			protected boolean isInfoLoggingEnabled()
+			{
+				return true;
+			}
+
+			protected void logInfo(String msg)
+			{
+				logs.add(msg);
+			}
+
+		}.doRun(args, null, environment);
+
+		assertEquals(1, logs.size());
+		assertEquals(MessageFormat.format(Messages.ProcessUtil_RunningProcess,
+				"binary\" \"/User/cwilliams/path\" \"--password\" \"**********", null, null), logs.get(0));
+	}
+
+	public void testObfuscationOfProxy() throws Exception
+	{
+		final List<String> logs = new ArrayList<String>();
+		Map<String, String> environment = CollectionsUtil.newMap(ProcessUtil.TEXT_TO_OBFUSCATE, "cwilliams");
+
+		List<String> args = CollectionsUtil.newList("binary", "/User/cwilliams/path", "--proxy",
+				"http://user:cwilliams@1.2.3.4:80");
+		new ProcessUtil()
+		{
+			protected Process startProcess(ProcessBuilder processBuilder) throws IOException
+			{
+				return null;
+			}
+
+			protected boolean isInfoLoggingEnabled()
+			{
+				return true;
+			}
+
+			protected void logInfo(String msg)
+			{
+				logs.add(msg);
+			}
+
+		}.doRun(args, null, environment);
+
+		assertEquals(1, logs.size());
+		// Verify we obfuscate only in the proxy, not in the filepath!
+		assertEquals(MessageFormat.format(Messages.ProcessUtil_RunningProcess,
+				"binary\" \"/User/cwilliams/path\" \"--proxy\" \"http://user:**********@1.2.3.4:80", null, null),
+				logs.get(0));
+	}
+
+	public void testObfuscationOfKeyValuePair() throws Exception
+	{
+		final List<String> logs = new ArrayList<String>();
+		Map<String, String> environment = CollectionsUtil.newMap(ProcessUtil.TEXT_TO_OBFUSCATE, "cwilliams");
+
+		List<String> args = CollectionsUtil.newList("binary", "/User/cwilliams/path", "password=cwilliams");
+		new ProcessUtil()
+		{
+			protected Process startProcess(ProcessBuilder processBuilder) throws IOException
+			{
+				return null;
+			}
+
+			protected boolean isInfoLoggingEnabled()
+			{
+				return true;
+			}
+
+			protected void logInfo(String msg)
+			{
+				logs.add(msg);
+			}
+
+		}.doRun(args, null, environment);
+
+		assertEquals(1, logs.size());
+		// Verify we obfuscate only in the key-value pair, not in the filepath!
+		assertEquals(MessageFormat.format(Messages.ProcessUtil_RunningProcess,
+				"binary\" \"/User/cwilliams/path\" \"password=**********", null, null), logs.get(0));
 	}
 
 	private static SleepAndReturnValueAction sleepAndReturn(int sleepTime, Object value)

@@ -7,6 +7,7 @@
  */
 package com.aptana.workbench.commands;
 
+import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -39,7 +40,6 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import com.aptana.core.IScopeReference;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
-import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IEditorCommandsMenuContributor;
 import com.aptana.editor.common.ITopContentTypesProvider;
@@ -352,9 +352,9 @@ public class EditorCommandsMenuContributor extends ContributionItem
 							{
 								BundleElement bundle = command.getOwningBundle();
 								String bundleName = (bundle == null) ? "Unknown bundle" : bundle.getDisplayName(); //$NON-NLS-1$
-								IdeLog.logError(WorkbenchPlugin.getDefault(), StringUtil.format(
+								IdeLog.logError(WorkbenchPlugin.getDefault(), MessageFormat.format(
 										Messages.EditorCommandsMenuContributor_ErrorExecutingCommandNullResult,
-										new String[] { command.getDisplayName(), bundleName }));
+										command.getDisplayName(), bundleName));
 							}
 							else
 							{

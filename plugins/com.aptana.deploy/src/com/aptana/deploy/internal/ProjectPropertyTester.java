@@ -14,19 +14,22 @@ import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IPath;
 
 import com.aptana.core.util.ExpiringMap;
+import com.aptana.core.util.StringUtil;
 import com.aptana.deploy.IDeployProvider;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
+import com.aptana.deploy.util.DeployProviderUtil;
 
 class DeployValues
 {
 	private Boolean deployableValue;
 	private Map<String, Boolean> deployTypeValues;
-	
+
 	public DeployValues()
 	{
-		 deployTypeValues = new HashMap<String, Boolean>(5);
+		deployTypeValues = new HashMap<String, Boolean>(5);
 	}
 
 	public Boolean getDeployTypeValue(String arg)
@@ -77,9 +80,14 @@ public class ProjectPropertyTester extends PropertyTester
 			{
 				return false;
 			}
+			IPath location = container.getLocation();
+			if (location == null)
+			{
+				return false;
+			}
 			if ("isDeployable".equals(property)) //$NON-NLS-1$
 			{
-				DeployValues deployValues = containerCache.get(container.getLocation().toOSString());
+				DeployValues deployValues = containerCache.get(location.toOSString());
 				if (deployValues != null)
 				{
 					Boolean deployableValue = deployValues.getDeployableValue();
@@ -91,16 +99,13 @@ public class ProjectPropertyTester extends PropertyTester
 				else
 				{
 					deployValues = resetCache(container);
+					return deployValues.getDeployableValue();
 				}
-				// Check if we have an explicitly set deployment provider
-				boolean deployableValue = isDeployable(container);
-				deployValues.setDeployableValue(deployableValue);
-				return deployableValue;
 			}
 			else if ("isDeployType".equals(property)) //$NON-NLS-1$
 			{
 				String arg = (String) expectedValue;
-				DeployValues deployValues = containerCache.get(container.getLocation().toOSString());
+				DeployValues deployValues = containerCache.get(location.toOSString());
 				if (deployValues != null)
 				{
 					Boolean deployTypeValue = deployValues.getDeployTypeValue(arg);
@@ -133,25 +138,40 @@ public class ProjectPropertyTester extends PropertyTester
 		return provider != null && provider.handles(container);
 	}
 
-	private DeployValues resetCache(IContainer container)
+	public static DeployValues resetCache(IContainer container)
 	{
 		containerCache.clear();
 		DeployValues deployValues = new DeployValues();
 		containerCache.put(container.getLocation().toOSString(), deployValues);
+
+		// Check if we have an explicitly set deployment provider
+		boolean deployableValue = isDeployable(container);
+		deployValues.setDeployableValue(deployableValue);
 		return deployValues;
 	}
 
-	private boolean isDeployable(IContainer container)
+	private static boolean isDeployable(IContainer container)
 	{
 		String id = DeployPreferenceUtil.getDeployProviderId(container);
 		if (id != null)
 		{
+			if (StringUtil.EMPTY.equals(id))
+			{
+				return false;
+			}
 			return true;
 		}
-		return DeployProviderRegistry.getInstance().getProvider(container) != null;
+		IDeployProvider provider = DeployProviderRegistry.getInstance().getProvider(container);
+		if (provider != null)
+		{
+			DeployPreferenceUtil.setDeployType(container, DeployProviderUtil.getIdForProvider(provider));
+			return true;
+		}
+		DeployPreferenceUtil.setDeployType(container, StringUtil.EMPTY);
+		return false;
 	}
 
-	private static IResource getResource(Object receiver)
+	private IResource getResource(Object receiver)
 	{
 		if (receiver instanceof IResource)
 		{

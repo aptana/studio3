@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -10,10 +10,12 @@ package com.aptana.projects.templates;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
@@ -45,6 +47,11 @@ import com.aptana.ui.util.UIUtils;
  */
 public class ProjectTemplatesManager
 {
+	/**
+	 * A special generated tag where all templates without tags end up.
+	 */
+	public static final String TAG_OTHERS = Messages.ProjectTemplatesManager_OthersTagName;
+
 	private static final String EXTENSION_POINT = "projectTemplates"; //$NON-NLS-1$
 	private static final String ELEMENT_TEMPLATEINFO = "templateInfo"; //$NON-NLS-1$
 	private static final String ELEMENT_LOCAL = "local"; //$NON-NLS-1$
@@ -57,7 +64,7 @@ public class ProjectTemplatesManager
 	private static final String ATTR_ID = "id"; //$NON-NLS-1$
 	private static final String ATTR_REPLACE_PARAMETERS = "replaceParameters"; //$NON-NLS-1$
 
-	private Map<TemplateType, List<IProjectTemplate>> projectTemplates;
+	private Map<TemplateType, Set<IProjectTemplate>> projectTemplates;
 	private ImageRegistry templateTagsImageRegistry;
 
 	private ElementVisibilityListener elementListener = new ElementVisibilityListener()
@@ -86,7 +93,7 @@ public class ProjectTemplatesManager
 
 	public ProjectTemplatesManager()
 	{
-		projectTemplates = new HashMap<TemplateType, List<IProjectTemplate>>();
+		projectTemplates = new HashMap<TemplateType, Set<IProjectTemplate>>();
 		templateListeners = new ArrayList<IProjectTemplateListener>();
 		readExtensionRegistry();
 		loadTemplatesFromBundles();
@@ -121,12 +128,12 @@ public class ProjectTemplatesManager
 	 */
 	public List<IProjectTemplate> getTemplatesForType(TemplateType projectType)
 	{
-		List<IProjectTemplate> templates = projectTemplates.get(projectType);
+		Set<IProjectTemplate> templates = projectTemplates.get(projectType);
 		if (templates == null)
 		{
 			return Collections.emptyList();
 		}
-		return Collections.unmodifiableList(templates);
+		return new ArrayList<IProjectTemplate>(templates);
 	}
 
 	/**
@@ -277,10 +284,10 @@ public class ProjectTemplatesManager
 	public void addTemplate(IProjectTemplate template)
 	{
 		TemplateType type = template.getType();
-		List<IProjectTemplate> templates = projectTemplates.get(type);
+		Set<IProjectTemplate> templates = projectTemplates.get(type);
 		if (templates == null)
 		{
-			templates = new ArrayList<IProjectTemplate>();
+			templates = new TreeSet<IProjectTemplate>(new ProjectTemplateComparator());
 			projectTemplates.put(type, templates);
 		}
 		templates.add(template);
@@ -290,7 +297,7 @@ public class ProjectTemplatesManager
 	public void removeTemplate(IProjectTemplate template)
 	{
 		TemplateType type = template.getType();
-		List<IProjectTemplate> templates = projectTemplates.get(type);
+		Set<IProjectTemplate> templates = projectTemplates.get(type);
 		if (templates != null)
 		{
 			templates.remove(template);
@@ -313,4 +320,33 @@ public class ProjectTemplatesManager
 			listener.templateRemoved(template);
 		}
 	}
+
+	/**
+	 * A project template comparator that gives priority to {@link IDefaultProjectTemplate} instances first, and then
+	 * compare by the template's name.
+	 */
+	private class ProjectTemplateComparator implements Comparator<IProjectTemplate>
+	{
+		/*
+		 * (non-Javadoc)
+		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+		 */
+		public int compare(IProjectTemplate pt1, IProjectTemplate pt2)
+		{
+			boolean isPt1Default = pt1 instanceof IDefaultProjectTemplate;
+			boolean isPt2Default = pt2 instanceof IDefaultProjectTemplate;
+			// Give priority to the default. If both are defaults, give priority by name.
+			if (isPt1Default && isPt2Default || !(isPt1Default || isPt2Default))
+			{
+				return pt1.getDisplayName().compareTo(pt2.getDisplayName());
+			}
+			if (isPt1Default)
+			{
+				return -1;
+			}
+			return 1;
+		}
+
+	}
+
 }

@@ -8,6 +8,7 @@
 package com.aptana.ui;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
@@ -17,6 +18,7 @@ import org.eclipse.jface.dialogs.Dialog;
 
 import com.aptana.core.ShellExecutable;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.ProcessRunnable;
 import com.aptana.core.util.ProcessUtil;
 import com.aptana.core.util.StringUtil;
@@ -107,7 +109,8 @@ public class SudoManager
 					{
 						boolean retry;
 						int retryAttempts = 0;
-						String promptMessage = Messages.SudoManager_MessagePrompt;
+						String promptMessage = MessageFormat.format(Messages.SudoManager_MessagePrompt,
+								EclipseUtil.getStudioPrefix());
 						do
 						{
 							retryAttempts++;

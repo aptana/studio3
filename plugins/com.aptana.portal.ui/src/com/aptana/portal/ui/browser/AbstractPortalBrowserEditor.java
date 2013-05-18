@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -15,8 +15,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.swt.SWTError;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.LocationAdapter;
 import org.eclipse.swt.browser.LocationEvent;
@@ -28,7 +26,6 @@ import org.eclipse.swt.browser.TitleListener;
 import org.eclipse.swt.browser.WindowEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
@@ -71,7 +68,6 @@ public abstract class AbstractPortalBrowserEditor extends EditorPart
 	private BrowserWrapper browser;
 	private List<BrowserFunctionWrapper> browserFunctions;
 	private String initialURL;
-	private Image image;
 	private boolean disposed;
 
 	/**
@@ -128,7 +124,6 @@ public abstract class AbstractPortalBrowserEditor extends EditorPart
 					newBrowser.getShell().close();
 					event.required = true; // avoid opening new windows.
 
-	
 					if (newBrowser != browserControl)
 					{
 						LocationAdapter locationAdapter = new LocationAdapter()
@@ -237,12 +232,13 @@ public abstract class AbstractPortalBrowserEditor extends EditorPart
 		{
 			return /*
 					 * Platform.OS_WIN32.equals(Platform.getOS()) || Platform.OS_MACOSX.equals(Platform.getOS()) ||
-					 Platform.OS_LINUX.equals(Platform.getOS());*/
-					false;
+					 * Platform.OS_LINUX.equals(Platform.getOS());
+					 */
+			false;
 		}
 		else if (Platform.ARCH_X86_64.equals(Platform.getOSArch()))
 		{
-			return false;//Platform.OS_LINUX.equals(Platform.getOS());
+			return false;// Platform.OS_LINUX.equals(Platform.getOS());
 		}
 		return false;
 	}
@@ -279,7 +275,9 @@ public abstract class AbstractPortalBrowserEditor extends EditorPart
 			WebBrowserEditorInput wbei = (WebBrowserEditorInput) input;
 			initialURL = null;
 			if (wbei.getURL() != null)
+			{
 				initialURL = wbei.getURL().toExternalForm();
+			}
 			if (browser != null)
 			{
 				browser.setUrl(initialURL);
@@ -288,13 +286,6 @@ public abstract class AbstractPortalBrowserEditor extends EditorPart
 
 			setPartName(wbei.getName());
 			setTitleToolTip(wbei.getToolTipText());
-			Image oldImage = image;
-			ImageDescriptor id = wbei.getImageDescriptor();
-			image = id.createImage();
-
-			setTitleImage(image);
-			if (oldImage != null && !oldImage.isDisposed())
-				oldImage.dispose();
 		}
 	}
 
@@ -343,11 +334,6 @@ public abstract class AbstractPortalBrowserEditor extends EditorPart
 	@Override
 	public void dispose()
 	{
-		if (image != null && !image.isDisposed())
-		{
-			image.dispose();
-			image = null;
-		}
 		super.dispose();
 		disposed = true;
 	}

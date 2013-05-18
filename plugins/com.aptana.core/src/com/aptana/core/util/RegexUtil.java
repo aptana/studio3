@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -47,5 +47,21 @@ public class RegexUtil
 		}
 
 		return result;
+	}
+
+	/**
+	 * Quote a pattern string. In case the given string is already properly quoted, the same string is returned.
+	 * 
+	 * @param expression
+	 * @return A quoted string
+	 * @see Pattern#quote(String)
+	 */
+	public static String quote(String expression)
+	{
+		if (!(expression.startsWith("\\Q") && expression.endsWith("\\E"))) //$NON-NLS-1$//$NON-NLS-2$
+		{
+			return Pattern.quote(expression);
+		}
+		return expression;
 	}
 }

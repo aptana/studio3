@@ -754,7 +754,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 				{
 					relevance = ((ICommonCompletionProposal) current).getRelevance();
 				}
-				entry += StringUtil.format(
+				entry += MessageFormat.format(
 						JFaceTextMessages.getString("CompletionProposalPopup.RelevancePercentage"), relevance); //$NON-NLS-1$
 			}
 

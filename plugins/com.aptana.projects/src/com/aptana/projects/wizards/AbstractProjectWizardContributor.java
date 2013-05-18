@@ -60,6 +60,11 @@ public abstract class AbstractProjectWizardContributor implements IProjectWizard
 		// No-op
 	}
 
+	public void appendSampleProjectCreationPage(Object data, IWizardPage page, Composite parent)
+	{
+		// No-op
+	}
+
 	public IStatus validateProjectCreationPage(Object data)
 	{
 		return Status.OK_STATUS;

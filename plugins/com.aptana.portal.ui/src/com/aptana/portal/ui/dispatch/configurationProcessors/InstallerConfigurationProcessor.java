@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
@@ -27,6 +28,7 @@ import org.osgi.framework.Version;
 import com.aptana.configurations.processor.AbstractConfigurationProcessor;
 import com.aptana.configurations.processor.ConfigurationStatus;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.InputStreamGobbler;
 import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.VersionUtil;
@@ -47,7 +49,7 @@ public abstract class InstallerConfigurationProcessor extends AbstractConfigurat
 	protected static final String NAME_ATTRIBUTE = "name"; //$NON-NLS-1$
 	protected static final String INSTALL_DIR_ATTRIBUTE = "install_dir"; //$NON-NLS-1$
 
-	protected String[] downloadedPaths;
+	protected List<IPath> downloadedPaths;
 
 	/*
 	 * (non-Javadoc)
@@ -166,7 +168,7 @@ public abstract class InstallerConfigurationProcessor extends AbstractConfigurat
 	 * @param targetFolder
 	 * @return The status of that extraction result.
 	 */
-	public static IStatus extractWin(String sfxZip, String targetFolder)
+	public static IStatus extractWin(IPath sfxZip, IPath targetFolder)
 	{
 		IStatus errorStatus = new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID,
 				Messages.InstallerConfigurationProcessor_unableToExtractZip);
@@ -182,16 +184,17 @@ public abstract class InstallerConfigurationProcessor extends AbstractConfigurat
 			IdeLog.logError(PortalUIPlugin.getDefault(), "Undefined zip file or target folder", new Exception()); //$NON-NLS-1$
 			return errorStatus;
 		}
-		File destinationFolder = new File(targetFolder);
+		File destinationFolder = targetFolder.toFile();
 		if (!destinationFolder.exists() && !destinationFolder.mkdirs())
 		{
 			IdeLog.logError(PortalUIPlugin.getDefault(),
 					"Failed to create destination directory " + destinationFolder, new Exception()); //$NON-NLS-1$
 			return errorStatus;
 		}
-		ProcessBuilder processBuilder = new ProcessBuilder(sfxZip, "-o" + targetFolder, //$NON-NLS-1$
+		// TODO Use ProcessUtil!
+		ProcessBuilder processBuilder = new ProcessBuilder(sfxZip.toOSString(), "-o" + targetFolder.toOSString(), //$NON-NLS-1$
 				"-y", //$NON-NLS-1$
-				sfxZip);
+				sfxZip.toOSString());
 		processBuilder.directory(destinationFolder);
 		processBuilder.redirectErrorStream(true);
 		String output = null;
@@ -214,13 +217,10 @@ public abstract class InstallerConfigurationProcessor extends AbstractConfigurat
 			{
 				return Status.OK_STATUS;
 			}
-			else
-			{
-				IdeLog.logError(
-						PortalUIPlugin.getDefault(),
-						"Zip extraction failed. The process returned " + exitVal, new Exception("Process output:\n" + errors)); //$NON-NLS-1$ //$NON-NLS-2$
-				return errorStatus;
-			}
+			IdeLog.logError(
+					PortalUIPlugin.getDefault(),
+					"Zip extraction failed. The process returned " + exitVal, new Exception("Process output:\n" + errors)); //$NON-NLS-1$ //$NON-NLS-2$
+			return errorStatus;
 		}
 		catch (Exception e)
 		{
@@ -271,11 +271,11 @@ public abstract class InstallerConfigurationProcessor extends AbstractConfigurat
 	 */
 	protected void deleteDownloadedPaths()
 	{
-		if (downloadedPaths != null)
+		if (!CollectionsUtil.isEmpty(downloadedPaths))
 		{
-			for (String f : downloadedPaths)
+			for (IPath f : downloadedPaths)
 			{
-				File toDelete = new File(f);
+				File toDelete = f.toFile();
 				if (toDelete.exists())
 				{
 					toDelete.deleteOnExit();

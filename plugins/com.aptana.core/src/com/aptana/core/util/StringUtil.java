@@ -39,7 +39,7 @@ public class StringUtil
 	/**
 	 * regex for newline group
 	 */
-	public static final String REGEX_NEWLINE_GROUP = StringUtil.format("({0})", StringUtil.LINE_SPLITTER_REGEX); //$NON-NLS-1$
+	public static final String REGEX_NEWLINE_GROUP = MessageFormat.format("({0})", StringUtil.LINE_SPLITTER_REGEX); //$NON-NLS-1$
 
 	/**
 	 * Pattern for counting lines and splitting strings by lines.
@@ -265,67 +265,7 @@ public class StringUtil
 	}
 
 	/**
-	 * Formats the string with replacement values
-	 * 
-	 * @param str
-	 * @param replacement
-	 * @return String
-	 */
-	public static String format(String str, int replacement)
-	{
-		return MessageFormat.format(str, new Object[] { Integer.toString(replacement) });
-	}
-
-	/**
-	 * Formats the string with replacement values
-	 * 
-	 * @param str
-	 * @param replacement
-	 * @return String
-	 */
-	public static String format(String str, long replacement)
-	{
-		return MessageFormat.format(str, new Object[] { Long.toString(replacement) });
-	}
-
-	/**
-	 * Formats the string with replacement values
-	 * 
-	 * @param str
-	 * @param replacement
-	 * @return String
-	 */
-	public static String format(String str, Object replacement)
-	{
-		return MessageFormat.format(str, new Object[] { replacement.toString() });
-	}
-
-	/**
-	 * Formats the string with replacement values
-	 * 
-	 * @param str
-	 * @param replacements
-	 * @return String
-	 */
-	public static String format(String str, Object[] replacements)
-	{
-		return MessageFormat.format(str, replacements);
-	}
-
-	/**
-	 * Formats the string with replacement values
-	 * 
-	 * @param str
-	 * @param replacement
-	 * @return String
-	 */
-	public static String format(String str, String replacement)
-	{
-		return MessageFormat.format(str, new Object[] { replacement });
-	}
-
-	/**
-	 * getStringValue
+	 * For a null Object, returns {@value #EMPTY}, otherwise returns {@link Object#toString()}
 	 * 
 	 * @param object
 	 * @return
@@ -335,6 +275,12 @@ public class StringUtil
 		return (object != null) ? object.toString() : EMPTY;
 	}
 
+	/**
+	 * Determines if a string is empty, which we define as null, or having nothing but whitespace as content.
+	 * 
+	 * @param text
+	 * @return
+	 */
 	public static boolean isEmpty(String text)
 	{
 		return text == null || text.trim().length() == 0;

@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -273,6 +273,29 @@ public class FileUtilTest extends TestCase
 		finally
 		{
 			FileUtil.deleteRecursively(dir);
+		}
+	}
+
+	public void testChmodAndGetPermissions() throws Exception
+	{
+		if (PlatformUtil.isWindows())
+		{
+			return;
+		}
+
+		for (int i = 7; i >= 0; i--)
+		{
+			for (int j = 7; j >= 0; j--)
+			{
+				for (int k = 7; k >= 0; k--)
+				{
+					File file = File.createTempFile("chmod", null);
+					String permString = Integer.toString(i) + Integer.toString(j) + Integer.toString(k);
+					FileUtil.chmod(permString, file);
+					assertEquals(Integer.parseInt(permString, 8),
+							Integer.parseInt(FileUtil.getPermissions(Path.fromOSString(file.getAbsolutePath())), 8));
+				}
+			}
 		}
 	}
 }

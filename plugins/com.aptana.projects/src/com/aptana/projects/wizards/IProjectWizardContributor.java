@@ -44,6 +44,15 @@ public interface IProjectWizardContributor extends IExecutableExtension
 	public void appendProjectCreationPage(Object data, IWizardPage page, Composite parent);
 
 	/**
+	 * Responsible for contributing UI to a Sample project creation page of the wizard
+	 * 
+	 * @param data
+	 * @param page
+	 * @param parent
+	 */
+	public void appendSampleProjectCreationPage(Object data, IWizardPage page, Composite parent);
+
+	/**
 	 * Called to update the UI for the contributor
 	 * 
 	 * @param data

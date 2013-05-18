@@ -14,6 +14,8 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.debug.core.IDebugEventSetListener;
 import org.eclipse.debug.core.model.IProcess;
 
 import com.aptana.core.logging.IdeLog;
@@ -65,6 +67,10 @@ public class LogLevelFilterManager
 			{
 				filter = (ILogLevelFilter) clazz;
 				filter.setInitializationData(element, ILogLevelFilter.PROCESS_PROPERTY_NAME, process);
+				if (filter instanceof IDebugEventSetListener)
+				{
+					DebugPlugin.getDefault().addDebugEventListener((IDebugEventSetListener) filter);
+				}
 			}
 			else
 			{

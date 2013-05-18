@@ -8,6 +8,7 @@
 package com.aptana.portal.ui.internal.startpage;
 
 import java.io.File;
+import java.text.MessageFormat;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -21,7 +22,6 @@ import org.eclipse.ui.progress.UIJob;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.FileUtil;
-import com.aptana.core.util.StringUtil;
 import com.aptana.portal.ui.IDebugScopes;
 import com.aptana.portal.ui.PortalUIPlugin;
 
@@ -56,7 +56,7 @@ public class StartPageStartup implements IStartup
 					for (File file : files)
 					{
 						IdeLog.logInfo(PortalUIPlugin.getDefault(),
-								StringUtil.format("Loading:{0}", new String[] { file.getAbsolutePath() })); //$NON-NLS-1$
+								MessageFormat.format("Loading:{0}", file.getAbsolutePath())); //$NON-NLS-1$
 					}
 					return Status.CANCEL_STATUS;
 				}
