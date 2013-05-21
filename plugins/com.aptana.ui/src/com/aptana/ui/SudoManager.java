@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2012 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2012-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -15,6 +15,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.window.IShellProvider;
+import org.eclipse.swt.widgets.Shell;
 
 import com.aptana.core.ShellExecutable;
 import com.aptana.core.logging.IdeLog;
@@ -115,8 +117,14 @@ public class SudoManager
 						{
 							retryAttempts++;
 							retry = false;
-							SudoPasswordPromptDialog sudoDialog = new SudoPasswordPromptDialog(UIUtils
-									.getActiveWorkbenchWindow(), promptMessage);
+							SudoPasswordPromptDialog sudoDialog = new SudoPasswordPromptDialog(new IShellProvider()
+							{
+
+								public Shell getShell()
+								{
+									return UIUtils.getActiveShell();
+								}
+							}, promptMessage);
 							if (sudoDialog.open() == Dialog.OK && !authenticate(sudoDialog.getPassword()))
 							{
 								// Re-run the authentication dialog as long as user attempts to provide password.

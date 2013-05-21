@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2012 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2012-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -21,8 +21,8 @@ import com.aptana.core.logging.IdeLog;
 
 /**
  * Responsible for scanning the output from sudo prompt.
+ * 
  * @author pinnamuri
- *
  */
 public class SudoProcessRunnable extends ProcessRunnable
 {
@@ -49,8 +49,11 @@ public class SudoProcessRunnable extends ProcessRunnable
 			PrintWriter pwdWriter = new PrintWriter(outputStream);
 			br = new BufferedReader(new InputStreamReader(inputStream, IOUtil.UTF_8));
 			String line = null;
-			pwdWriter.println(password); // writes the password to the prompt.
-			pwdWriter.flush();
+			if (password != null)
+			{
+				pwdWriter.println(password); // writes the password to the prompt.
+				pwdWriter.flush();
+			}
 
 			int status = 1;
 
