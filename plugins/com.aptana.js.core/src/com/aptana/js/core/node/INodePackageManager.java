@@ -122,6 +122,15 @@ public interface INodePackageManager
 	 */
 	public IPath getConfigPrefixPath() throws CoreException;
 
+	/**
+	 * Clears the npm cache data. This might help to remove the conflicting dependent packages being referenced by new
+	 * installed npm packages.
+	 * 
+	 * @param monitor
+	 * @return
+	 */
+	public IStatus cleanNpmCache(IProgressMonitor monitor);
+
 	// TODO Uninstall
 	// TODO Update
 }
