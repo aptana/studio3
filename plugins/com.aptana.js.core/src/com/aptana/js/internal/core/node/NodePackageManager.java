@@ -583,4 +583,9 @@ public class NodePackageManager implements INodePackageManager
 		}
 		return fConfigPrefixPath;
 	}
+
+	public IStatus cleanNpmCache(IProgressMonitor monitor)
+	{
+		return ProcessUtil.runInBackground(NPM, null, "cache", "clean"); //$NON-NLS-1$ //$NON-NLS-2$
+	}
 }
