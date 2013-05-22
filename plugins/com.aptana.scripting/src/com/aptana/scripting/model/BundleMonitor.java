@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.StringUtil;
 import com.aptana.filewatcher.FileWatcher;
 import com.aptana.scripting.IDebugScopes;
 import com.aptana.scripting.ScriptingActivator;
@@ -98,12 +99,17 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	{
 		if (this._registered == false)
 		{
+			// Make sure the user bundles directory exists
+			String userBundlesPath = getBundleManager().getUserBundlesPath();
+			if (StringUtil.isEmpty(userBundlesPath))
+			{
+				return;
+			}
+
 			// begin monitoring resource changes
 			ResourcesPlugin.getWorkspace().addResourceChangeListener(this,
 					IResourceChangeEvent.PRE_DELETE | IResourceChangeEvent.POST_CHANGE);
 
-			// Make sure the user bundles directory exists
-			String userBundlesPath = getBundleManager().getUserBundlesPath();
 			File bundleDirectory = new File(userBundlesPath);
 			boolean directoryExists = true;
 
