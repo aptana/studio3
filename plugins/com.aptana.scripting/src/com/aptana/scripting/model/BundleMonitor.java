@@ -97,23 +97,28 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	 */
 	public synchronized void beginMonitoring() throws JNotifyException
 	{
-		if (this._registered == false)
+		if (!this._registered)
 		{
-			// Make sure the user bundles directory exists
-			String userBundlesPath = getBundleManager().getUserBundlesPath();
-			if (StringUtil.isEmpty(userBundlesPath))
-			{
-				return;
-			}
-
 			// begin monitoring resource changes
 			ResourcesPlugin.getWorkspace().addResourceChangeListener(this,
 					IResourceChangeEvent.PRE_DELETE | IResourceChangeEvent.POST_CHANGE);
 
+			this._registered = true;
+
+			// Make sure the user bundles directory exists
+			String userBundlesPath = getBundleManager().getUserBundlesPath();
+			if (StringUtil.isEmpty(userBundlesPath))
+			{
+				IdeLog.logError(ScriptingActivator.getDefault(),
+						"Unable to register listener for user bundles path. Was unable to get the user bundle path"); //$NON-NLS-1$
+				return;
+			}
+
+			// Make sure the user bundles directory exists
 			File bundleDirectory = new File(userBundlesPath);
 			boolean directoryExists = true;
 
-			if (bundleDirectory.exists() == false)
+			if (!bundleDirectory.exists())
 			{
 				directoryExists = bundleDirectory.mkdirs();
 			}
@@ -146,8 +151,6 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 
 				IdeLog.logError(ScriptingActivator.getDefault(), message);
 			}
-
-			this._registered = true;
 		}
 	}
 
