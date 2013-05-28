@@ -85,7 +85,7 @@ public class GitIndex
 
 	private boolean notify;
 
-	private Vector<ChangedFile> files;
+	private List<ChangedFile> files;
 
 	/**
 	 * Service which launches the refresh commands in threads.
@@ -145,7 +145,7 @@ public class GitIndex
 	 * @param monitor
 	 * @return
 	 */
-	synchronized IStatus refresh(boolean notify, Collection<IPath> filePaths, IProgressMonitor monitor)
+	IStatus refresh(boolean notify, Collection<IPath> filePaths, IProgressMonitor monitor)
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
 		if (sub.isCanceled())
@@ -164,10 +164,14 @@ public class GitIndex
 				}));
 
 		// If we don't run this, we end up showing files as unstaged when they're no longer modified!
-		repository.forceWrite(); // Do we only want to try the lock if we're in UI thread?
-		IStatus result = GitExecutable.instance().runInBackground(repository.workingDirectory(), "update-index", "-q", //$NON-NLS-1$ //$NON-NLS-2$
-				"--unmerged", "--ignore-missing", "--refresh"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		repository.exitWriteProcess();
+		IStatus result;
+		synchronized (this)
+		{
+			repository.forceWrite(); // Do we only want to try the lock if we're in UI thread?
+			result = GitExecutable.instance().runInBackground(repository.workingDirectory(), "update-index", "-q", //$NON-NLS-1$ //$NON-NLS-2$
+					"--unmerged", "--ignore-missing", "--refresh"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			repository.exitWriteProcess();
+		}
 		if (result == null) // couldn't even execute!
 		{
 			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), "Failed to execute git update-index"); //$NON-NLS-1$
@@ -190,7 +194,7 @@ public class GitIndex
 		}
 
 		// Now create a new temporary list so we can build it up...
-		this.files = new Vector<ChangedFile>();
+		this.files = Collections.synchronizedList(new ArrayList<ChangedFile>());
 
 		// Schedule all the jobs
 		MultiStatus errors = new MultiStatus(GitPlugin.PLUGIN_ID, 1,
