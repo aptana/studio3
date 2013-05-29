@@ -6,7 +6,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.console.process;
+package com.aptana.debug.core;
 
 import java.io.InputStream;
 import java.util.Map;

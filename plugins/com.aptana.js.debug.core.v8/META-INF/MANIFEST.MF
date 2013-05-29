@@ -9,7 +9,7 @@ Bundle-ActivationPolicy: lazy
 Require-Bundle: json.simple;bundle-version="[1.1.0,1.1.0]",
  com.aptana.core,
  com.aptana.core.io,
- com.aptana.js.debug.core
+ com.aptana.js.debug.core;visibility:=reexport
 Bundle-Activator: com.aptana.js.debug.core.v8.V8DebugPlugin
 Bundle-ClassPath: .,
  lib/lib.org.chromium.sdk.jar

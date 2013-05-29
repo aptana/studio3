@@ -7,6 +7,7 @@ Bundle-Activator: com.aptana.console.ConsolePlugin
 Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.eclipse.core.runtime,
  com.aptana.core,
+ com.aptana.debug.core,
  org.eclipse.jface.text,
  org.eclipse.ui,
  org.eclipse.debug.ui,

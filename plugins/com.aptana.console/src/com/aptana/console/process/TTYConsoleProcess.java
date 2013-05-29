@@ -14,6 +14,8 @@ import java.util.Map;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.RuntimeProcess;
 
+import com.aptana.debug.core.ProxyProcess;
+
 /**
  * @author Max Stepanov
  *

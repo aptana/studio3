@@ -1,4 +1,4 @@
-package com.aptana.console.process;
+package com.aptana.debug.core;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;

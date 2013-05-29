@@ -7,7 +7,7 @@
  */
 // $codepro.audit.disable closeWhereCreated
 
-package com.aptana.console.process;
+package com.aptana.debug.core;
 
 import java.io.InputStream;
 import java.io.OutputStream;
