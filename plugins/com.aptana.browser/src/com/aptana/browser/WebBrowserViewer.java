@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -11,6 +11,7 @@ package com.aptana.browser;
 
 import java.util.Arrays;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuCreator;
@@ -61,7 +62,7 @@ public class WebBrowserViewer extends Composite {
 
 	public static final int NAVIGATION_BAR = 1 << 0;
 
-	private WebKitBrowser browser;
+	private Browser browser;
 	private IAction backAction;
 	private IAction forwardAction;
 	private IAction stopAction;
@@ -138,7 +139,14 @@ public class WebBrowserViewer extends Composite {
 			createCommandBar(container);
 			createNavigationBar(container);
 		}
-		browser = new WebKitBrowser(browserArea, SWT.NONE);
+		if (Platform.OS_LINUX.equals(Platform.getOS()))
+		{
+			browser = new Browser(browserArea, SWT.NONE);
+		}
+		else
+		{
+			browser = new WebKitBrowser(browserArea, SWT.NONE);
+		}
 		browser.setLayoutData(GridDataFactory.fillDefaults().grab(true, true)
 				.create());
 		if (showNavigatorBar) {
@@ -189,7 +197,7 @@ public class WebBrowserViewer extends Composite {
 				shell2.layout();
 				browser2.newWindow = true;
 				if (event instanceof OpenWindowEvent) {
-					((OpenWindowEvent) event).browser = browser2.browser;
+					((OpenWindowEvent) event).browser = (WebKitBrowser) browser2.browser;
 				} else {
 					event.browser = (Browser) browser2.getBrowser();
 				}
