@@ -290,12 +290,19 @@ public class ZipUtilTest extends TestCase
 
 			IPath zipFilePath = Path.fromOSString(destinationDir2.getAbsolutePath())
 					.append(String.valueOf(System.currentTimeMillis())).addFileExtension("zip");
-
 			assertTrue("Compression failed", ZipUtil.compress(zipFilePath.toOSString(), paths));
+
+			IPath zipFilePath2 = Path.fromOSString(destinationDir2.getAbsolutePath())
+					.append(String.valueOf(System.currentTimeMillis())).addFileExtension("zip");
+			assertTrue(
+					"Compression to relative path failed",
+					ZipUtil.compress(zipFilePath2.toOSString(), paths, Path.fromOSString(paths[0])
+							.removeLastSegments(1).toOSString()));
 
 			assertTrue(ZipUtil.extract(resourceFile, destinationDir2, new NullProgressMonitor()).isOK());
 
 			zipFilePath.toFile().delete();
+			zipFilePath2.toFile().delete();
 
 			files = destinationDir2.listFiles();
 			assertEquals("Unzipped contents to not match expected number of files", TOP_ENTRIES.size(), files.length);

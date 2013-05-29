@@ -531,13 +531,25 @@ public final class ZipUtil
 	 */
 	public static boolean compress(String destination, String[] sourceFiles)
 	{
+		return compress(destination, sourceFiles, null);
+	}
+
+	/**
+	 * Creates a zipped file that contains the source files
+	 * 
+	 * @param destination
+	 * @param sourceFiles
+	 * @return
+	 */
+	public static boolean compress(String destination, String[] sourceFiles, String sourcePathRoot)
+	{
 		if (!StringUtil.isEmpty(destination))
 		{
 			try
 			{
 				ZipOutputStream output = new ZipOutputStream(new FileOutputStream(destination));
 
-				addToZip(sourceFiles, output);
+				addToZip(sourceFiles, sourcePathRoot, output);
 
 				output.close();
 				return true;
@@ -551,8 +563,8 @@ public final class ZipUtil
 		return false;
 	}
 
-	private static void addToZip(String[] sourceFiles, ZipOutputStream output) throws FileNotFoundException,
-			IOException
+	private static void addToZip(String[] sourceFiles, String sourcePathRoot, ZipOutputStream output)
+			throws FileNotFoundException, IOException
 	{
 		byte[] buffer = new byte[1024];
 		for (String file : sourceFiles)
@@ -567,12 +579,21 @@ public final class ZipUtil
 					childrenPaths[i] = children[i].getAbsolutePath();
 				}
 
-				addToZip(childrenPaths, output);
+				addToZip(childrenPaths, sourcePathRoot, output);
 			}
 			else if (content.canRead())
 			{
 				FileInputStream input = new FileInputStream(file);
-				output.putNextEntry(new java.util.zip.ZipEntry(file));
+				String name;
+				if (sourcePathRoot == null)
+				{
+					name = file;
+				}
+				else
+				{
+					name = Path.fromOSString(file).makeRelativeTo(Path.fromOSString(sourcePathRoot)).toOSString();
+				}
+				output.putNextEntry(new java.util.zip.ZipEntry(name));
 
 				int length;
 				while ((length = input.read(buffer)) > 0)
