@@ -154,7 +154,15 @@ public class NodePackageManager implements INodePackageManager
 			}
 			CollectionsUtil.addToList(args, INSTALL, packageName, COLOR, FALSE);
 
-			Map<String, String> environment = new HashMap<String, String>(System.getenv());
+			Map<String, String> environment;
+			if (PlatformUtil.isWindows())
+			{
+				environment = new HashMap<String, String>(System.getenv());
+			}
+			else
+			{
+				environment = ShellExecutable.getEnvironment();
+			}
 			args.addAll(proxySettings(environment));
 			environment.put(ProcessUtil.REDIRECT_ERROR_STREAM, StringUtil.EMPTY);
 
