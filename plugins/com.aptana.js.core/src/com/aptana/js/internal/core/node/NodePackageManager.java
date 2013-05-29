@@ -12,6 +12,7 @@ import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -153,7 +154,7 @@ public class NodePackageManager implements INodePackageManager
 			}
 			CollectionsUtil.addToList(args, INSTALL, packageName, COLOR, FALSE);
 
-			Map<String, String> environment = ShellExecutable.getEnvironment();
+			Map<String, String> environment = new HashMap<String, String>(System.getenv());
 			args.addAll(proxySettings(environment));
 			environment.put(ProcessUtil.REDIRECT_ERROR_STREAM, StringUtil.EMPTY);
 
