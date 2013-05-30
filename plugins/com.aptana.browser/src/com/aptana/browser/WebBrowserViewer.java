@@ -51,8 +51,6 @@ import com.aptana.browser.internal.BrowserBackgroundImage;
 import com.aptana.browser.internal.BrowserSize;
 import com.aptana.browser.internal.BrowserSizeCategory;
 import com.aptana.core.CoreStrings;
-import com.aptana.swt.webkitbrowser.DefaultNativeBrowser;
-import com.aptana.swt.webkitbrowser.IBrowser;
 import com.aptana.swt.webkitbrowser.OpenWindowEvent;
 import com.aptana.swt.webkitbrowser.WebKitBrowser;
 
