@@ -52,6 +52,8 @@ import com.aptana.browser.internal.BrowserBackgroundImage;
 import com.aptana.browser.internal.BrowserSize;
 import com.aptana.browser.internal.BrowserSizeCategory;
 import com.aptana.core.CoreStrings;
+import com.aptana.swt.webkitbrowser.DefaultNativeBrowser;
+import com.aptana.swt.webkitbrowser.IBrowser;
 import com.aptana.swt.webkitbrowser.OpenWindowEvent;
 import com.aptana.swt.webkitbrowser.WebKitBrowser;
 
@@ -62,7 +64,7 @@ public class WebBrowserViewer extends Composite {
 
 	public static final int NAVIGATION_BAR = 1 << 0;
 
-	private Browser browser;
+	private IBrowser browser;
 	private IAction backAction;
 	private IAction forwardAction;
 	private IAction stopAction;
@@ -141,13 +143,13 @@ public class WebBrowserViewer extends Composite {
 		}
 		if (Platform.OS_LINUX.equals(Platform.getOS()))
 		{
-			browser = new Browser(browserArea, SWT.NONE);
+			browser = new DefaultNativeBrowser(browserArea, SWT.NONE);
 		}
 		else
 		{
 			browser = new WebKitBrowser(browserArea, SWT.NONE);
 		}
-		browser.setLayoutData(GridDataFactory.fillDefaults().grab(true, true)
+		((Control) browser).setLayoutData(GridDataFactory.fillDefaults().grab(true, true)
 				.create());
 		if (showNavigatorBar) {
 			browser.addProgressListener(new ProgressListener() {
@@ -177,7 +179,7 @@ public class WebBrowserViewer extends Composite {
 		menuManager.add(backAction);
 		menuManager.add(forwardAction);
 		menuManager.add(refreshAction);
-		browser.setMenu(menuManager.createContextMenu(browser));
+		((Control) browser).setMenu(menuManager.createContextMenu((Control) browser));
 		
 		browser.addOpenWindowListener(new OpenWindowListener() {
 			public void open(WindowEvent event) {
@@ -452,11 +454,11 @@ public class WebBrowserViewer extends Composite {
 	 */
 	@Override
 	public boolean setFocus() {
-		return browser.setFocus();
+		return ((Control) browser).setFocus();
 	}
 
 	public Control getBrowser() {
-		return browser;
+		return (Control) browser;
 	}
 
 	/**
