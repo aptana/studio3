@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -19,10 +19,12 @@ import org.eclipse.swt.browser.TitleEvent;
 import org.eclipse.swt.browser.TitleListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.internal.browser.BrowserViewer;
 import org.eclipse.ui.internal.browser.WebBrowserEditorInput;
 import org.eclipse.ui.part.EditorPart;
 
@@ -38,7 +40,7 @@ public class WebBrowserEditor extends EditorPart {
 
 	public static final String EDITOR_ID = "com.aptana.browser.editors.webbrowser"; //$NON-NLS-1$
 	
-	protected WebBrowserViewer webBrowser;
+	protected Browser webBrowser;
 	private int progressWorked;
 	private String initialURL;
 	private Image image;
@@ -71,7 +73,7 @@ public class WebBrowserEditor extends EditorPart {
 			if (wbei.getURL() != null)
 				initialURL = wbei.getURL().toExternalForm();
 			if (webBrowser != null) {
-				webBrowser.setURL(initialURL);
+				webBrowser.setUrl(initialURL);
 				site.getWorkbenchWindow().getActivePage().activate(this);
 			}
 	
@@ -133,9 +135,8 @@ public class WebBrowserEditor extends EditorPart {
 		if (input == null || input.isToolbarLocal()) {
 			style |= WebBrowserViewer.NAVIGATION_BAR;
 		}
-		webBrowser = new WebBrowserViewer(parent, style);
-		Browser browser = (Browser) webBrowser.getBrowser();
-		browser.addProgressListener(new ProgressListener() {
+		webBrowser = createBrowser(parent, style);
+		webBrowser.addProgressListener(new ProgressListener() {
 			public void changed(ProgressEvent event) {
 				if (event.total == 0) {
 					return;
@@ -156,12 +157,12 @@ public class WebBrowserEditor extends EditorPart {
 				getStatusBarProgressMonitor().done();
 			}
 		});
-		browser.addTitleListener(new TitleListener() {
+		webBrowser.addTitleListener(new TitleListener() {
 			public void changed(TitleEvent event) {
 				setTitleToolTip(event.title);
 			}
 		});
-		webBrowser.setURL(initialURL);
+		webBrowser.setUrl(initialURL);
 	}
 
 	/* (non-Javadoc)
@@ -172,6 +173,16 @@ public class WebBrowserEditor extends EditorPart {
 		if (webBrowser != null) {
 			webBrowser.setFocus();
 		}
+	}
+
+	private Browser createBrowser(Composite parent, int style)
+	{
+		Control browser = new WebBrowserViewer(parent, style).getBrowser();
+		if (browser instanceof Browser)
+		{
+			return (Browser) browser;
+		}
+		return new BrowserViewer(parent, style).getBrowser();
 	}
 
 	private IProgressMonitor getStatusBarProgressMonitor() {
