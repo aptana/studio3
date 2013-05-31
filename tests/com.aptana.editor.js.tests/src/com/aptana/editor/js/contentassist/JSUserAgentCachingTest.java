@@ -23,17 +23,6 @@ import com.aptana.js.core.model.UserAgentElement;
  */
 public class JSUserAgentCachingTest extends TestCase
 {
-	/*
-	 * (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception
-	{
-		// TODO Auto-generated method stub
-		super.setUp();
-	}
-
 	protected ListCrossProduct<String> createCrossProduct(List<String>... lists)
 	{
 		ListCrossProduct<String> result = new ListCrossProduct<String>();
