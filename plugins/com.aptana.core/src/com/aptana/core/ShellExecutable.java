@@ -200,21 +200,7 @@ public final class ShellExecutable
 	{
 		if (shellEnvironment == null)
 		{
-			// If we haven't set up a shell yet, return Java's env for now.
-			try
-			{
-				// Force detection of shell. Must have one before we try "env"
-				IPath shellPath = getPath();
-				if (shellPath == null)
-				{
-					return new HashMap<String, String>(System.getenv());
-				}
-				shellEnvironment = getEnvironment(null);
-			}
-			catch (CoreException e)
-			{
-				return new HashMap<String, String>(System.getenv());
-			}
+			shellEnvironment = getEnvironment(null);
 		}
 		return shellEnvironment;
 	}
@@ -234,12 +220,21 @@ public final class ShellExecutable
 		}
 	}
 
+	public static List<String> getNewPathLocations()
+	{
+		return newPathLocations;
+	}
+
 	private static void updatePathForLocationKey(IPath locationKey)
 	{
-		if (PlatformUtil.isWindows() && !CollectionsUtil.isEmpty(newPathLocations)
-				&& workingDirToEnvCache.get(locationKey) != null)
+		Map<String, String> workingDirEnvironment = workingDirToEnvCache.get(locationKey);
+		if (PlatformUtil.isWindows() && !CollectionsUtil.isEmpty(newPathLocations) && workingDirEnvironment != null)
 		{
-			String resultPath = workingDirToEnvCache.get(locationKey).get(PATH);
+			String resultPath = workingDirEnvironment.get(PATH);
+			if (StringUtil.isEmpty(resultPath))
+			{
+				resultPath = workingDirEnvironment.get("Path");
+			}
 			resultPath = PathUtil.convertPATH(resultPath);
 			for (String newPath : newPathLocations)
 			{
@@ -251,7 +246,9 @@ public final class ShellExecutable
 			CollectionsUtil.removeDuplicates(pathLocations);
 
 			resultPath = StringUtil.join(File.pathSeparator, pathLocations);
-			workingDirToEnvCache.get(locationKey).put(PATH, resultPath);
+			workingDirEnvironment.put(PATH, resultPath);
+			// As wonderful Windows has case-sensitive Path variable to be updated.
+			workingDirEnvironment.put("Path", resultPath);// Duplicate to Path variable as well.
 		}
 	}
 
@@ -281,7 +278,7 @@ public final class ShellExecutable
 			{
 				// OK, we do have a shell.
 				String envCommand = "env"; //$NON-NLS-1$
-				if (Platform.OS_WIN32.equals(Platform.getOS()))
+				if (PlatformUtil.isWindows())
 				{
 					IPath envPath = shellPath.removeLastSegments(1).append("env.exe"); //$NON-NLS-1$
 					if (envPath.toFile().isFile())
@@ -313,7 +310,7 @@ public final class ShellExecutable
 			{
 				// Grabbing the environment from shell failed, just use env we
 				// have in JVM, but don't cache it!
-				return new HashMap<String, String>(System.getenv());
+				result = new HashMap<String, String>(System.getenv());
 			}
 			workingDirToEnvCache.put(workingDirectory, result);
 			updatePathForLocationKey(workingDirectory);
