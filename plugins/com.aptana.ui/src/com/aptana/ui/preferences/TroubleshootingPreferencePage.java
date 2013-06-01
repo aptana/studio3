@@ -254,7 +254,7 @@ public class TroubleshootingPreferencePage extends FieldEditorPreferencePage imp
 
 		store.setValue(ICorePreferenceConstants.PREF_DEBUG_COMPONENT_LIST, StringUtil.join(",", newOptions)); //$NON-NLS-1$
 
-		EclipseUtil.setBundleDebugOptions(currentOptions, true);
+		EclipseUtil.setBundleDebugOptions(newOptions, true);
 		EclipseUtil.setPlatformDebugging(toggleComponents.getBooleanValue());
 
 		return super.performOk();
