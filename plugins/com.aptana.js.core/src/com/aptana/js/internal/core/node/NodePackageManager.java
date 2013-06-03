@@ -8,6 +8,7 @@
 package com.aptana.js.internal.core.node;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
@@ -103,6 +105,7 @@ public class NodePackageManager implements INodePackageManager
 	 */
 	private static final String INSTALL = "install"; //$NON-NLS-1$
 	private static final String LIST = "list"; //$NON-NLS-1$
+	private static final String REMOVE = "remove"; //$NON-NLS-1$
 
 	private IPath npmPath;
 
@@ -125,96 +128,10 @@ public class NodePackageManager implements INodePackageManager
 	public IStatus install(String packageName, String displayName, boolean global, char[] password,
 			IPath workingDirectory, IProgressMonitor monitor)
 	{
-		SubMonitor sub = SubMonitor.convert(monitor,
-				MessageFormat.format(Messages.NodePackageManager_InstallingTaskName, displayName), 100);
 		try
 		{
-			IPath npmPath = findNPM();
-			if (npmPath == null)
-			{
-				throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID,
-						Messages.NodePackageManager_ERR_NPMNotInstalled));
-			}
-
-			List<String> args = new ArrayList<String>(8);
-			if (global)
-			{
-				if (PlatformUtil.isMac() || PlatformUtil.isLinux())
-				{
-					args.add("sudo"); //$NON-NLS-1$
-					args.add("-S"); //$NON-NLS-1$
-					args.add("--"); //$NON-NLS-1$
-				}
-				args.add(npmPath.toOSString());
-				args.add(GLOBAL_ARG);
-			}
-			else
-			{
-				args.add(npmPath.toOSString());
-			}
-			CollectionsUtil.addToList(args, INSTALL, packageName, COLOR, FALSE);
-
-			Map<String, String> environment;
-			if (PlatformUtil.isWindows())
-			{
-				environment = new HashMap<String, String>(System.getenv());
-			}
-			else
-			{
-				environment = ShellExecutable.getEnvironment();
-			}
-			args.addAll(proxySettings(environment));
-			environment.put(ProcessUtil.REDIRECT_ERROR_STREAM, StringUtil.EMPTY);
-
-			// HACK for TISTUD-4101
-			if (PlatformUtil.isWindows())
-			{
-				IPath pythonExe = ExecutableUtil.find("pythonw.exe", false, null); //$NON-NLS-1$
-				if (pythonExe == null)
-				{
-					// Add python to PATH
-					Bundle bundle = Platform.getBundle("com.appcelerator.titanium.python.win32"); //$NON-NLS-1$
-					if (bundle != null)
-					{
-						// Windows is wonderful, it sometimes stores in "Path" and "PATH" doesn't work
-						String pathName = "PATH"; //$NON-NLS-1$
-						if (!environment.containsKey(pathName))
-						{
-							pathName = "Path"; //$NON-NLS-1$
-						}
-						String path = environment.get(pathName);
-
-						IPath relative = new Path("."); //$NON-NLS-1$
-						URL bundleURL = FileLocator.find(bundle, relative, null);
-						URL fileURL = FileLocator.toFileURL(bundleURL);
-						File f = new File(fileURL.getPath());
-						if (f.exists())
-						{
-							path = path + File.pathSeparator + new File(f, "python").getCanonicalPath(); //$NON-NLS-1$
-							environment.put(pathName, path);
-						}
-					}
-				}
-			}
-
-			Process p = ProcessUtil.run(args.get(0), workingDirectory, environment, args.subList(1, args.size())
-					.toArray(new String[args.size() - 1]));
-			sub.worked(5);
-
-			ProcessRunnable runnable;
-			if (global)
-			{
-				runnable = new SudoCommandProcessRunnable(p, sub.newChild(95), true, password);
-			}
-			else
-			{
-				runnable = new ProcessRunnable(p, sub.newChild(95), true);
-			}
-			Thread t = new Thread(runnable, MessageFormat.format("{0} installer", displayName)); //$NON-NLS-1$
-			t.start();
-			t.join();
-
-			IStatus status = runnable.getResult();
+			IStatus status = runNpmInstaller(packageName, displayName, global, password, workingDirectory, INSTALL,
+					monitor);
 			if (status.getSeverity() == IStatus.CANCEL)
 			{
 				return Status.OK_STATUS;
@@ -259,10 +176,6 @@ public class NodePackageManager implements INodePackageManager
 		catch (Exception e)
 		{
 			return new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, e.getMessage(), e);
-		}
-		finally
-		{
-			sub.done();
 		}
 	}
 
@@ -541,6 +454,136 @@ public class NodePackageManager implements INodePackageManager
 					"Failed to get value of npm config key {0}", key)));
 		}
 		return status.getMessage().trim();
+	}
+
+	private IStatus runNpmInstaller(String packageName, String displayName, boolean global, char[] password,
+			IPath workingDirectory, String command, IProgressMonitor monitor) throws CoreException, IOException,
+			InterruptedException
+	{
+		SubMonitor sub = SubMonitor.convert(monitor,
+				MessageFormat.format(Messages.NodePackageManager_InstallingTaskName, displayName), 100);
+		IPath npmPath = findNPM();
+		if (npmPath == null)
+		{
+			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID,
+					Messages.NodePackageManager_ERR_NPMNotInstalled));
+		}
+		try
+		{
+			List<String> args = new ArrayList<String>(8);
+			if (global)
+			{
+				if (PlatformUtil.isMac() || PlatformUtil.isLinux())
+				{
+					args.add("sudo"); //$NON-NLS-1$
+					args.add("-S"); //$NON-NLS-1$
+					args.add("--"); //$NON-NLS-1$
+				}
+				args.add(npmPath.toOSString());
+				args.add(GLOBAL_ARG);
+			}
+			else
+			{
+				args.add(npmPath.toOSString());
+			}
+			CollectionsUtil.addToList(args, command, packageName, COLOR, FALSE);
+
+			Map<String, String> environment;
+			if (PlatformUtil.isWindows())
+			{
+				environment = new HashMap<String, String>(System.getenv());
+			}
+			else
+			{
+				environment = ShellExecutable.getEnvironment();
+			}
+			args.addAll(proxySettings(environment));
+			environment.put(ProcessUtil.REDIRECT_ERROR_STREAM, StringUtil.EMPTY);
+
+			// HACK for TISTUD-4101
+			if (PlatformUtil.isWindows())
+			{
+				IPath pythonExe = ExecutableUtil.find("pythonw.exe", false, null); //$NON-NLS-1$
+				if (pythonExe == null)
+				{
+					// Add python to PATH
+					Bundle bundle = Platform.getBundle("com.appcelerator.titanium.python.win32"); //$NON-NLS-1$
+					if (bundle != null)
+					{
+						// Windows is wonderful, it sometimes stores in "Path" and "PATH" doesn't work
+						String pathName = "PATH"; //$NON-NLS-1$
+						if (!environment.containsKey(pathName))
+						{
+							pathName = "Path"; //$NON-NLS-1$
+						}
+						String path = environment.get(pathName);
+
+						IPath relative = new Path("."); //$NON-NLS-1$
+						URL bundleURL = FileLocator.find(bundle, relative, null);
+						URL fileURL = FileLocator.toFileURL(bundleURL);
+						File f = new File(fileURL.getPath());
+						if (f.exists())
+						{
+							path = path + File.pathSeparator + new File(f, "python").getCanonicalPath(); //$NON-NLS-1$
+							environment.put(pathName, path);
+						}
+					}
+				}
+			}
+
+			Process p = ProcessUtil.run(args.get(0), workingDirectory, environment, args.subList(1, args.size())
+					.toArray(new String[args.size() - 1]));
+			sub.worked(5);
+
+			ProcessRunnable runnable;
+			if (PlatformUtil.isWindows())
+			{
+				runnable = new ProcessRunnable(p, new NullProgressMonitor(), true);
+			}
+			else
+			{
+				runnable = new SudoCommandProcessRunnable(p, new NullProgressMonitor(), true, password);
+			}
+			Thread t = new Thread(runnable, MessageFormat.format("{0} uninstaller", displayName)); //$NON-NLS-1$
+			t.start();
+			t.join();
+			return runnable.getResult();
+		}
+		finally
+		{
+			sub.done();
+		}
+	}
+
+	public IStatus uninstall(String packageName, String displayName, boolean global, char[] password,
+			IProgressMonitor monitor) throws CoreException
+	{
+		try
+		{
+			IStatus status = runNpmInstaller(packageName, displayName, global, password, null, REMOVE, monitor);
+			if (status.getSeverity() == IStatus.CANCEL)
+			{
+				return Status.OK_STATUS;
+			}
+			if (!status.isOK())
+			{
+				String message = status.getMessage();
+				IdeLog.logError(JSCorePlugin.getDefault(),
+						MessageFormat.format("Failed to uninstall {0}.\n{1}", packageName, message)); //$NON-NLS-1$
+				return new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
+						Messages.NodePackageManager_FailedInstallError, packageName));
+			}
+			return status;
+		}
+		catch (CoreException e)
+		{
+			return e.getStatus();
+		}
+		catch (Exception e)
+		{
+			return new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, e.getMessage(), e);
+		}
+
 	}
 
 	// When in global mode, executables are linked into {prefix}/bin on Unix, or directly into {prefix} on Windows.

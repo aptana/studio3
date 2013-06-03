@@ -131,6 +131,19 @@ public interface INodePackageManager
 	 */
 	public IStatus cleanNpmCache(IProgressMonitor monitor);
 
-	// TODO Uninstall
+	/**
+	 * Uninstalls a npm package.
+	 * 
+	 * @param packageName
+	 * @param displayName
+	 * @param global
+	 * @param password
+	 * @param monitor
+	 * @return
+	 * @throws CoreException
+	 */
+	IStatus uninstall(String packageName, String displayName, boolean global, char[] password, IProgressMonitor monitor)
+			throws CoreException;
+
 	// TODO Update
 }
