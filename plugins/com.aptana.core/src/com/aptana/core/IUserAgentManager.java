@@ -19,4 +19,6 @@ public interface IUserAgentManager
 	public IUserAgent[] getDefaultUserAgents(String natureID);
 
 	public IUserAgent getUserAgentById(String id);
+
+	public boolean addUserAgent(IUserAgent agent);
 }
