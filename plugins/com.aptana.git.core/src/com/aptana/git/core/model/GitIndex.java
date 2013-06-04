@@ -263,7 +263,10 @@ public class GitIndex
 					}
 				});
 			}
-			this.changedFiles.addAll(this.files);
+			if (!CollectionsUtil.isEmpty(this.files))
+			{
+				this.changedFiles.addAll(this.files);
+			}
 		}
 
 		// Don't hold onto temp list in memory!
