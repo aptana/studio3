@@ -133,6 +133,10 @@
             buildParticipantId="com.aptana.editor.js.validator.JSLintValidator"
             class="com.aptana.editor.js.validator.JSLintValidatorPreferenceCompositeFactory">
       </preferenceComposite>
+      <preferenceComposite
+            buildParticipantId="com.aptana.js.core.JSParserValidator"
+            class="com.aptana.editor.js.validator.JSParserValidatorPreferenceCompositeFactory">
+      </preferenceComposite>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">

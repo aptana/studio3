@@ -7,55 +7,13 @@
  */
 package com.aptana.parsing.ast;
 
+import com.aptana.core.build.IProblem;
+
 /**
- * @author ayeung FIXME Combine with IProblem?
+ * @author ayeung
  */
-public interface IParseError // $codepro.audit.disable consistentSuffixUsage
+public interface IParseError extends IProblem
 {
-	public enum Severity
-	{
-		WARNING(1), ERROR(2);
-
-		int code;
-
-		Severity(int code)
-		{
-			this.code = code;
-		}
-
-		public int getCode()
-		{
-			return code;
-		}
-	}
-
-	/**
-	 * The starting offset where the error is located
-	 * 
-	 * @return the starting offset of the error
-	 */
-	public int getOffset();
-
-	/**
-	 * The length of the error
-	 * 
-	 * @return the length of the error
-	 */
-	public int getLength();
-
-	/**
-	 * The message for the parse error
-	 * 
-	 * @return the error message
-	 */
-	public String getMessage();
-
-	/**
-	 * Gets the severity of the error (Either warning or error)
-	 * 
-	 * @return the severity of the error
-	 */
-	public Severity getSeverity();
 
 	/**
 	 * The language/content type where this error originated.

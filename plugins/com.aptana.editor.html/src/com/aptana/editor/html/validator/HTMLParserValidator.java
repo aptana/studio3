@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.BadLocationException;
@@ -30,7 +29,6 @@ import com.aptana.editor.html.IHTMLConstants;
 import com.aptana.index.core.build.BuildContext;
 import com.aptana.js.core.IJSConstants;
 import com.aptana.parsing.ast.IParseError;
-import com.aptana.parsing.ast.IParseError.Severity;
 
 /**
  * Attaches HTML Parser errors from our own parser to the build context.
@@ -74,8 +72,7 @@ public class HTMLParserValidator extends AbstractBuildParticipant
 				IDocument doc = new Document(source);
 				for (IParseError parseError : context.getParseErrors())
 				{
-					int severity = (parseError.getSeverity() == Severity.ERROR) ? IMarker.SEVERITY_ERROR
-							: IMarker.SEVERITY_WARNING;
+					int severity = parseError.getSeverity().intValue();
 					int line = -1;
 					try
 					{

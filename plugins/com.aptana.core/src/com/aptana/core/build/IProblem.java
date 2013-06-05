@@ -10,7 +10,9 @@ package com.aptana.core.build;
 import java.util.Map;
 
 import org.eclipse.core.resources.IMarker;
+
 import com.aptana.core.Messages;
+import com.aptana.core.util.StringUtil;
 
 /**
  * @author Ingo Muschenetz
@@ -22,24 +24,31 @@ public interface IProblem
 	enum Severity
 	{
 		// @formatter:off
-		IGNORE(-1, Messages.IProblem_Ignore),
-		INFO(IMarker.SEVERITY_INFO, Messages.IProblem_Info),
-		WARNING(IMarker.SEVERITY_WARNING, Messages.IProblem_Warning),
-		ERROR(IMarker.SEVERITY_ERROR, Messages.IProblem_Error);
+		IGNORE(-1, "ignore", Messages.IProblem_Ignore), //$NON-NLS-1$
+		INFO(IMarker.SEVERITY_INFO, "info", Messages.IProblem_Info), //$NON-NLS-1$
+		WARNING(IMarker.SEVERITY_WARNING, "warning", Messages.IProblem_Warning), //$NON-NLS-1$
+		ERROR(IMarker.SEVERITY_ERROR, "error", Messages.IProblem_Error); //$NON-NLS-1$
 		// @formatter:on
 
-		private int num;
-		private String label;
+		private final int num;
+		private final String label;
+		private final String id;
 
-		Severity(int num, String label)
+		Severity(int num, String idenitifer, String label)
 		{
 			this.num = num;
+			this.id = idenitifer;
 			this.label = label;
 		}
 
 		public int intValue()
 		{
 			return this.num;
+		}
+
+		public String id()
+		{
+			return this.id;
 		}
 
 		public static Severity create(int value)
@@ -56,14 +65,18 @@ public interface IProblem
 
 		public static Severity create(String value)
 		{
+			if (StringUtil.isEmpty(value))
+			{
+				return IGNORE;
+			}
 			for (Severity s : values())
 			{
-				if (s.label.equals(value))
+				if (s.id.equalsIgnoreCase(value))
 				{
 					return s;
 				}
 			}
-			return Severity.WARNING;
+			return IGNORE;
 		}
 
 		public String label()

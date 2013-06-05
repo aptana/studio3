@@ -12,6 +12,8 @@ import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.List;
 
+import javax.print.attribute.standard.Severity;
+
 import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.FileLocator;
@@ -32,7 +34,6 @@ import com.aptana.parsing.ParseResult;
 import com.aptana.parsing.ast.ASTUtil;
 import com.aptana.parsing.ast.INameNode;
 import com.aptana.parsing.ast.IParseError;
-import com.aptana.parsing.ast.IParseError.Severity;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseNodeAttribute;
 import com.aptana.parsing.ast.IParseRootNode;
