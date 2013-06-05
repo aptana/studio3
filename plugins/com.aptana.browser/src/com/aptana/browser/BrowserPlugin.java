@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -11,10 +11,12 @@
 
 package com.aptana.browser;
 
+import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 import com.aptana.browser.internal.BrowserConfigurationManager;
+import com.aptana.browser.support.WorkbenchBrowserSupport;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -31,6 +33,7 @@ public class BrowserPlugin extends AbstractUIPlugin
 	private static BrowserPlugin plugin;
 
 	private BrowserConfigurationManager browserConfigManager;
+	private WorkbenchBrowserSupport defaultWorkbenchBrowser;
 
 	/**
 	 * The constructor
@@ -61,6 +64,7 @@ public class BrowserPlugin extends AbstractUIPlugin
 			browserConfigManager.clear();
 			browserConfigManager = null;
 		}
+		defaultWorkbenchBrowser = null;
 		super.stop(context);
 	}
 
@@ -72,6 +76,15 @@ public class BrowserPlugin extends AbstractUIPlugin
 	public static BrowserPlugin getDefault()
 	{
 		return plugin;
+	}
+
+	public synchronized IWorkbenchBrowserSupport getBrowserSupport()
+	{
+		if (defaultWorkbenchBrowser == null)
+		{
+			defaultWorkbenchBrowser = new WorkbenchBrowserSupport();
+		}
+		return defaultWorkbenchBrowser;
 	}
 
 	public synchronized BrowserConfigurationManager getBrowserConfigurationManager()
