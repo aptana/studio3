@@ -15,6 +15,7 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.build.AbstractBuildParticipant;
 import com.aptana.core.build.IBuildParticipant.BuildType;
+import com.aptana.core.build.IProblem;
 import com.aptana.core.build.PreferenceUtil;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.EclipseUtil;
@@ -35,9 +36,12 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 	@Override
 	public void initializeDefaultPreferences()
 	{
-		IEclipsePreferences prefs = (EclipseUtil.defaultScope()).getNode(JSCorePlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = EclipseUtil.defaultScope().getNode(JSCorePlugin.PLUGIN_ID);
 
 		prefs.putDouble(IPreferenceConstants.JS_INDEX_VERSION, 0);
+
+		// Warn on missing semicolons
+		prefs.put(IPreferenceConstants.PREF_MISSING_SEMICOLON_SEVERITY, IProblem.Severity.WARNING.id());
 
 		// Set up JS Parser validator to be on for build and reconcile
 		prefs.putBoolean(PreferenceUtil.getEnablementPreferenceKey(JSParserValidator.ID, BuildType.BUILD), true);

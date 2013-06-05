@@ -28,7 +28,6 @@ import com.aptana.css.core.CSSCorePlugin;
 import com.aptana.css.core.ICSSConstants;
 import com.aptana.index.core.build.BuildContext;
 import com.aptana.parsing.ast.IParseError;
-import com.aptana.parsing.ast.IParseError.Severity;
 
 /**
  * Grabs the errors/warnings from our CSS Parser and attaches them to the build context.
@@ -70,8 +69,7 @@ public class CSSParserValidator extends AbstractBuildParticipant
 
 					public IProblem map(IParseError parseError)
 					{
-						int severity = (parseError.getSeverity() == Severity.ERROR) ? IMarker.SEVERITY_ERROR
-								: IMarker.SEVERITY_WARNING;
+						int severity = parseError.getSeverity().intValue();
 						int line = -1;
 						try
 						{

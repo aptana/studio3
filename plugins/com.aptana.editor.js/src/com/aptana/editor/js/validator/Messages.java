@@ -18,6 +18,10 @@ public class Messages extends NLS
 	public static String JSLintValidatorPreferenceCompositeFactory_OptionsParseError;
 	public static String JSLintValidatorPreferenceCompositeFactory_OptionsTitle;
 
+	public static String JSParserValidatorPreferenceCompositeFactory_MissingSemicolons;
+
+	public static String JSParserValidatorPreferenceCompositeFactory_OptionsGroup;
+
 	static
 	{
 		// initialize resource bundle

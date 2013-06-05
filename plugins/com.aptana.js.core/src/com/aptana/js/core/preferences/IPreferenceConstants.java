@@ -34,4 +34,9 @@ public interface IPreferenceConstants
 	 */
 	public static final String NODEJS_SOURCE_PATH = "nodejs_source_path"; //$NON-NLS-1$
 
+	/**
+	 * What severity do missing semicolons use?
+	 */
+	public static final String PREF_MISSING_SEMICOLON_SEVERITY = "missing_semicolon_severity"; //$NON-NLS-1$
+
 }

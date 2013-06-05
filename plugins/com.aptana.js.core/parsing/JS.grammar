@@ -3,21 +3,21 @@
 
 %class "JSParser";
 
-%import "java.io.ByteArrayInputStream";
 %import "java.io.IOException";
 %import "java.util.ArrayList";
 %import "java.util.List";
 
+%import "org.eclipse.core.runtime.Platform";
+
+%import "com.aptana.core.build.IProblem";
 %import "com.aptana.js.core.IJSConstants";
-%import "com.aptana.editor.js.parsing.ast.*";
-%import "com.aptana.editor.js.sdoc.model.DocumentationBlock";
-%import "com.aptana.editor.js.sdoc.parsing.SDocParser";
-%import "com.aptana.editor.js.vsdoc.parsing.VSDocReader";
+%import "com.aptana.js.core.JSCorePlugin";
+%import "com.aptana.js.core.parsing.ast.*";
+%import "com.aptana.js.core.preferences.IPreferenceConstants";
 %import "com.aptana.parsing.IParseState";
 %import "com.aptana.parsing.IParser";
 %import "com.aptana.parsing.IRecoveryStrategy";
 %import "com.aptana.parsing.ast.IParseNode";
-%import "com.aptana.parsing.ast.IParseRootNode";
 %import "com.aptana.parsing.ast.IParseError";
 %import "com.aptana.parsing.ast.ParseError";
 %import "com.aptana.parsing.util.ParseUtil";
@@ -373,7 +373,19 @@
 		// @formatter:off
 		recoveryStrategies = new ArrayList<IRecoveryStrategy>();
 
-		recoveryStrategies.add(new JSInsertionRecoveryStrategy(JSTokenType.SEMICOLON, ";"));
+		recoveryStrategies.add(new JSInsertionRecoveryStrategy(JSTokenType.SEMICOLON, ";")
+		{
+			public boolean recover(IParser parser, Symbol lastToken, Symbol currentToken, TokenStream in, Events report)
+					throws IOException
+			{
+				boolean recovered = super.recover(parser, lastToken, currentToken, in, report);
+				{
+					String severity = Platform.getPreferencesService().getString(JSCorePlugin.PLUGIN_ID, IPreferenceConstants.PREF_MISSING_SEMICOLON_SEVERITY, null, null);
+					fWorking.addError(new ParseError(IJSConstants.CONTENT_TYPE_JS, lastToken, Messages.JSParser_MissingSemicolonMsg, IProblem.Severity.create(severity)));
+				}
+				return recovered;
+			}
+		});
 		recoveryStrategies.add(new JSInsertionRecoveryStrategy(JSTokenType.RPAREN, ")", JSTokenType.SEMICOLON, ";"));
 		recoveryStrategies.add(new JSInsertionRecoveryStrategy(JSTokenType.IDENTIFIER, "", JSTokenType.SEMICOLON, ";", JSTokenType.DOT, JSTokenType.NEW, JSTokenType.EQUAL));
 		recoveryStrategies.add(new JSInsertionRecoveryStrategy(JSTokenType.IDENTIFIER, "", JSTokenType.DOT, JSTokenType.NEW, JSTokenType.EQUAL));

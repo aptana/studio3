@@ -9,17 +9,14 @@ package com.aptana.parsing.ast;
 
 import beaver.Symbol;
 
+import com.aptana.core.build.Problem;
+
 /**
  * @author cwilliams
  * @author ayeung
  */
-public class ParseError implements IParseError // $codepro.audit.disable consistentSuffixUsage
+public class ParseError extends Problem implements IParseError
 {
-	private Symbol fSymbol;
-	private String fMessage;
-	private final Severity fSeverity;
-	private int fOffset = 0;
-	private int fLength = 0;
 	private String fLanguage;
 
 	public ParseError(String language, Symbol symbol, Severity severity)
@@ -29,66 +26,17 @@ public class ParseError implements IParseError // $codepro.audit.disable consist
 
 	public ParseError(String language, Symbol symbol, String message, Severity severity)
 	{
-		fLanguage = language;
-		fSymbol = symbol;
-		if (message == null)
-		{
-			fMessage = buildErrorMessage(symbol);
-		}
-		else
-		{
-			fMessage = message;
-		}
-		fSeverity = severity;
-		if (fSymbol != null)
-		{
-			fOffset = fSymbol.getStart();
-			fLength = fSymbol.getEnd() - fOffset + 1;
-		}
+		this(language, symbol != null ? symbol.getStart() : 0, symbol != null ? symbol.getEnd() - symbol.getStart() + 1
+				: 0, message == null ? buildErrorMessage(symbol) : message, severity);
 	}
 
 	public ParseError(String language, int offset, int length, String message, Severity severity)
 	{
+		super(severity.intValue(), message, offset, length, -1, null);
 		fLanguage = language;
-		fSeverity = severity;
-		fMessage = message;
-		fOffset = offset;
-		fLength = length;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.IParseError#getOffset()
-	 */
-	public int getOffset()
-	{
-		return fOffset;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.IParseError#getLength()
-	 */
-	public int getLength()
-	{
-		return fLength;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.IParseError#getMessage()
-	 */
-	public String getMessage()
-	{
-		return fMessage;
-	}
-
-	public Severity getSeverity()
-	{
-		return fSeverity;
-	}
-
-	private String buildErrorMessage(Symbol token)
+	private static String buildErrorMessage(Symbol token)
 	{
 		StringBuilder builder = new StringBuilder();
 		builder.append(Messages.ParseError_syntax_error_unexpected_token);

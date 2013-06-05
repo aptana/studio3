@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.BadLocationException;
@@ -30,7 +29,6 @@ import com.aptana.index.core.build.BuildContext;
 import com.aptana.js.core.IJSConstants;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.parsing.ast.IParseError;
-import com.aptana.parsing.ast.IParseError.Severity;
 
 public class JSParserValidator extends AbstractBuildParticipant
 {
@@ -96,10 +94,8 @@ public class JSParserValidator extends AbstractBuildParticipant
 
 					public IProblem map(IParseError parseError)
 					{
-						int severity = (parseError.getSeverity() == Severity.ERROR) ? IMarker.SEVERITY_ERROR
-								: IMarker.SEVERITY_WARNING;
-						return new Problem(severity, parseError.getMessage(), parseError.getOffset(), parseError
-								.getLength(), getLine(parseError.getOffset()), fPath);
+						return new Problem(parseError.getSeverity().intValue(), parseError.getMessage(), parseError
+								.getOffset(), parseError.getLength(), getLine(parseError.getOffset()), fPath);
 					}
 				}));
 			}

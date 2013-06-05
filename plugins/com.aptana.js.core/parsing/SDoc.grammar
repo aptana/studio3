@@ -2,7 +2,6 @@
 %package "com.aptana.js.internal.core.parsing.sdoc";
 %import "java.util.List";
 %import "com.aptana.js.internal.core.parsing.sdoc.model.*";
-%import "com.aptana.core.util.StringUtil";
 %class "SDocParser";
 %embed {:
 	// suppress parser error reporting and let the custom error recovery mechanism handle it

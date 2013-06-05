@@ -18,6 +18,7 @@ import com.aptana.js.core.IJSConstants;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.core.parsing.JSParseState;
 
+@SuppressWarnings("nls")
 public class JSParserValidatorTest extends AbstractValidatorTestCase
 {
 
@@ -45,7 +46,7 @@ public class JSParserValidatorTest extends AbstractValidatorTestCase
 		String text = "var foo = function() {\nhello(\n};";
 
 		List<IProblem> items = getParseErrors(text);
-		assertEquals(1, items.size());
+		assertEquals(2, items.size());
 		IProblem item = items.get(0);
 
 		assertEquals("Error was not found on expected line", 3, item.getLineNumber());
@@ -59,6 +60,24 @@ public class JSParserValidatorTest extends AbstractValidatorTestCase
 
 		List<IProblem> items = getParseErrors(text);
 		assertEquals(0, items.size());
+	}
+
+	public void testMissingSemicolonReportsWarning() throws CoreException
+	{
+		// @formatter:off
+		String text = "var USPostalReg = /^\\d{5}(-\\d{4})?$/\n" +
+					"if (!USPostalReg.test(textFields_array[i].value)) {\n" +
+					"    inValidValue = true;\n" +
+					"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertEquals(1, items.size());
+		IProblem problem = items.get(0);
+		assertEquals("Error was not found on expected line", 1, problem.getLineNumber());
+		assertEquals("Error message did not match expected error message", "Missing semicolon",
+				problem.getMessage());
+		assertEquals(IProblem.Severity.WARNING, problem.getSeverity());
 	}
 
 	protected List<IProblem> getParseErrors(String source) throws CoreException
