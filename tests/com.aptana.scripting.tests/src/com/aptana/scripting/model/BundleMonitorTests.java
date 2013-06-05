@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.Path;
 
 import com.aptana.core.util.FileUtil;
 import com.aptana.scripting.TestUtils;
+import com.aptana.scripting.internal.model.BundleMonitor;
 
 public abstract class BundleMonitorTests extends TestCase
 {
@@ -24,9 +25,9 @@ public abstract class BundleMonitorTests extends TestCase
 	{
 		void performAction() throws Exception;
 	}
-	
+
 	private static final int POST_SLEEP = 5000;
-	
+
 	public static final String BUNDLE_NAME = "TestBundle";
 	public static final String BUNDLE_FILE_NAME = "bundle.rb";
 	public static final String COMMAND_NAME = "MyCommand";
@@ -35,6 +36,7 @@ public abstract class BundleMonitorTests extends TestCase
 
 	private BundleFileSystemService _fileSystemService;
 	private BundleManager _manager;
+	protected BundleMonitor _monitor;
 
 	/*
 	 * (non-Javadoc)
@@ -48,23 +50,22 @@ public abstract class BundleMonitorTests extends TestCase
 		this._fileSystemService = new BundleFileSystemService(this.createFileSystem());
 		this._fileSystemService.createBundleDirectory();
 
-		// store reference to bundle manager
-		this._manager = BundleManager.getInstance();
-		this._manager.reset();
-
 		// setup application and user bundles paths
 		List<String> applicationBundlesPaths = this._manager.getApplicationBundlesPaths();
 		String userBundlesPath = new File(FileUtil.getTempDirectory().toOSString(), "bundles").getAbsolutePath();
-		BundleManager.getInstance(applicationBundlesPaths.get(0), userBundlesPath);
+		this._manager = BundleManager.getInstance(applicationBundlesPaths.get(0), userBundlesPath);
+		this._manager.reset();
+
+		this._monitor = new BundleMonitor(this._manager);
 
 		// monitoring is turned on by an early startup job, so let's make sure it
 		// has been turned off before turning it on; otherwise, we'll end up
 		// monitoring the default application and user bundles directories
 		// instead of our custom paths
-		BundleMonitor.getInstance().endMonitoring();
+		_monitor.endMonitoring();
 
 		// turn on monitoring
-		BundleMonitor.getInstance().beginMonitoring();
+		_monitor.beginMonitoring();
 	}
 
 	/*
@@ -75,7 +76,7 @@ public abstract class BundleMonitorTests extends TestCase
 	{
 		try
 		{
-			BundleMonitor.getInstance().endMonitoring();
+			_monitor.endMonitoring();
 			this._fileSystemService.cleanUp();
 		}
 		finally
@@ -628,7 +629,7 @@ public abstract class BundleMonitorTests extends TestCase
 		assertEquals(1, commands.size());
 
 		this.removeCommandsDirectory();
-		
+
 		Thread.sleep(POST_SLEEP);
 
 		commands = entry.getCommands();
@@ -653,7 +654,7 @@ public abstract class BundleMonitorTests extends TestCase
 		assertEquals(1, commands.size());
 
 		this.removeSnippetsDirectory();
-		
+
 		Thread.sleep(POST_SLEEP);
 
 		commands = entry.getCommands();

@@ -7,6 +7,8 @@
  */
 package com.aptana.scripting.model;
 
+import com.aptana.scripting.internal.model.BundleMonitor;
+
 public class UserBundleMonitorTests extends BundleMonitorTests
 {
 	private static final int WAIT_TIME = 5000;
@@ -35,11 +37,11 @@ public class UserBundleMonitorTests extends BundleMonitorTests
 	protected void waitForAction(FileSystemAction action) throws Exception
 	{
 		// Thread.sleep(WAIT_TIME);
-		synchronized (BundleMonitor.getInstance())
+		synchronized (_monitor)
 		{
 			action.performAction();
 
-			BundleMonitor.getInstance().wait(WAIT_TIME);
+			_monitor.wait(WAIT_TIME);
 		}
 	}
 }

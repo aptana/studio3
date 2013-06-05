@@ -127,7 +127,7 @@ public class BundleEntry
 			{
 				String name = command.getDisplayName();
 
-				if (names.contains(name) == false)
+				if (!names.contains(name))
 				{
 					names.add(name);
 					result.add(command);
@@ -445,7 +445,7 @@ public class BundleEntry
 		}
 
 		this._name = name;
-		this._bundles = new ArrayList<BundleElement>();
+		this._bundles = Collections.synchronizedList(new ArrayList<BundleElement>());
 	}
 
 	/**
@@ -457,9 +457,11 @@ public class BundleEntry
 	private BundleEntry(String name, List<BundleElement> bundles)
 	{
 		this._name = name;
-		this._bundles = bundles;
-
-		Collections.sort(this._bundles, this._comparator);
+		this._bundles = Collections.synchronizedList(bundles);
+		synchronized (this._bundles)
+		{
+			Collections.sort(this._bundles, this._comparator);
+		}
 	}
 
 	/**
@@ -472,28 +474,23 @@ public class BundleEntry
 		// make sure we have a bundle
 		if (bundle != null)
 		{
-			VisibilityContext context = null;
-
-			synchronized (this._bundles)
+			// only go through the add process and its side-effects if we don't have this bundle already
+			if (!_bundles.contains(bundle))
 			{
-				// only go through the add process and its side-effects if we don't have this bundle already
-				if (this._bundles.contains(bundle) == false)
+				VisibilityContext context = getVisibilityContext();
+
+				// add the bundle
+				_bundles.add(bundle);
+
+				// keep bundles in canonical order
+				synchronized (_bundles)
 				{
-					context = this.getVisibilityContext();
-
-					// add the bundle
-					this._bundles.add(bundle);
-
-					// keep bundles in canonical order
-					Collections.sort(this._bundles, this._comparator);
-
-					context.updateElementContext();
+					Collections.sort(_bundles, this._comparator);
 				}
-			}
 
-			// fire visibility change events
-			if (context != null)
-			{
+				context.updateElementContext();
+				// fire visibility change events
+
 				context.fireElementVisibilityEvents();
 			}
 		}
@@ -520,20 +517,17 @@ public class BundleEntry
 	}
 
 	/**
-	 * getBundles
+	 * Returns an unmodifiable copy of the bundle list. Callers shouldn't need to worry about synchronizing access to
+	 * the list since it is a copy.
 	 * 
 	 * @return
 	 */
 	public List<BundleElement> getBundles()
 	{
-		List<BundleElement> result;
-
-		synchronized (this._bundles)
+		synchronized (_bundles)
 		{
-			result = new ArrayList<BundleElement>(this._bundles);
+			return Collections.unmodifiableList(new ArrayList<BundleElement>(_bundles));
 		}
-
-		return result;
 	}
 
 	/**
@@ -967,7 +961,7 @@ public class BundleEntry
 			// NOTE: the order of this conditional is important. We need to run
 			// the processor on the current bundle before we decide to exit when
 			// we hit a non-reference bundle
-			if (processor.processBundle(this, bundle) == false || bundle.isReference() == false)
+			if (!processor.processBundle(this, bundle) || !bundle.isReference())
 			{
 				break;
 			}
@@ -995,26 +989,16 @@ public class BundleEntry
 	 */
 	public boolean removeBundle(BundleElement bundle)
 	{
-		VisibilityContext context = null;
-		boolean result;
-
-		synchronized (this._bundles)
+		VisibilityContext context = getVisibilityContext();
+		boolean removed = _bundles.remove(bundle);
+		if (removed)
 		{
-			context = this.getVisibilityContext();
-
-			if (result = this._bundles.remove(bundle))
-			{
-				context.updateElementContext();
-			}
-		}
-
-		if (result && context != null)
-		{
+			context.updateElementContext();
 			// fire visibility change events
 			context.fireElementVisibilityEvents();
 		}
 
-		return result;
+		return removed;
 	}
 
 	/**
@@ -1024,13 +1008,6 @@ public class BundleEntry
 	 */
 	public int size()
 	{
-		int size;
-
-		synchronized (this._bundles)
-		{
-			size = this._bundles.size();
-		}
-
-		return size;
+		return _bundles.size();
 	}
 }

@@ -1,20 +1,86 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.scripting.model;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import com.aptana.scripting.ScriptLogListener;
 import com.aptana.scripting.model.filters.IModelFilter;
 
 public class BundleTests extends BundleTestBase
 {
+	/**
+	 * A runnable intended to stress test the bundle manager. We randomly add bundles (with a random precedence level
+	 * (app/user) or snippets to bundles. This should help find deadlocks in the hierarchy of objects (manager -> bundle
+	 * entries -> bundle elements -> children)
+	 * 
+	 * @author cwilliams
+	 */
+	private final class BundleLoadingRunnable implements Runnable
+	{
+
+		private int iterations;
+		private Random r = new Random();
+		private BundleManager manager = getBundleManagerInstance();
+
+		BundleLoadingRunnable(int iterations)
+		{
+			this.iterations = iterations;
+		}
+
+		public void run()
+		{
+			manager.addBundle(new BundleElement(getRandomBundlePath() + "/bundle" + System.nanoTime()));
+			for (int i = 0; i < iterations; i++)
+			{
+				switch (r.nextInt(2))
+				{
+					case 0:
+						// Pick a random bundle
+						List<String> names = manager.getBundleNames();
+						String name = names.get(r.nextInt(names.size()));
+						BundleEntry entry = manager.getBundleEntry(name);
+						// Pick a random element of the bundle (basically app, user or project level bundle)
+						List<BundleElement> elements = entry.getBundles();
+						BundleElement be = elements.get(r.nextInt(elements.size()));
+						// Add a snippet to it
+						be.addChild(new SnippetElement(be.getPath() + "/snippets/" + System.nanoTime() + ".rb"));
+						break;
+					case 1:
+						manager.addBundle(new BundleElement(getRandomBundlePath() + "/bundle" + System.nanoTime()));
+						break;
+				}
+				Thread.yield();
+			}
+		}
+
+		private String getRandomBundlePath()
+		{
+			switch (r.nextInt(2))
+			{
+				case 0:
+					List<String> paths = manager.getApplicationBundlesPaths();
+					return paths.get(r.nextInt(paths.size()));
+				case 1:
+					return manager.getUserBundlesPath();
+			}
+			return "/fake/path";
+		}
+	}
+
 	public class LogListener implements ScriptLogListener
 	{
 		List<String> errors = new LinkedList<String>();
@@ -63,7 +129,9 @@ public class BundleTests extends BundleTestBase
 			this.printErrors.clear();
 			this.traces.clear();
 		}
-	};
+	}
+
+	private boolean deadlocked;
 
 	/**
 	 * compareScopedBundles
@@ -106,7 +174,7 @@ public class BundleTests extends BundleTestBase
 	{
 		this.compareScopedBundles(bundleName, prec1, prec2, command1, command2);
 
-		BundleEntry entry = BundleTestBase.getBundleManagerInstance().getBundleEntry(bundleName);
+		BundleEntry entry = getBundleManagerInstance().getBundleEntry(bundleName);
 		List<BundleElement> bundles = entry.getBundles();
 		assertEquals(2, bundles.size());
 		entry.removeBundle(bundles.get(1));
@@ -124,7 +192,7 @@ public class BundleTests extends BundleTestBase
 	{
 		super.setUp();
 
-		BundleTestBase.getBundleManagerInstance().reset();
+		deadlocked = false;
 	}
 
 	/**
@@ -190,7 +258,7 @@ public class BundleTests extends BundleTestBase
 	{
 		String bundleName = "bundleWithSnippet";
 		BundleEntry entry = this.getBundleEntry(bundleName, BundlePrecedence.APPLICATION);
-		List<SnippetElement> snippets = BundleManager.getInstance().getSnippets(new IModelFilter()
+		List<SnippetElement> snippets = getBundleManagerInstance().getSnippets(new IModelFilter()
 		{
 
 			public boolean include(AbstractElement element)
@@ -210,7 +278,7 @@ public class BundleTests extends BundleTestBase
 	{
 		String bundleName = "bundleWithSnippet";
 		BundleEntry entry = this.getBundleEntry(bundleName, BundlePrecedence.APPLICATION);
-		List<SnippetElement> snippets = BundleManager.getInstance().getSnippets(null);
+		List<SnippetElement> snippets = getBundleManagerInstance().getSnippets(null);
 
 		assertNotNull(snippets);
 		assertEquals(1, snippets.size());
@@ -321,7 +389,7 @@ public class BundleTests extends BundleTestBase
 	{
 		// confirm first bundle loaded properly
 		this.loadBundleEntry("bundleWithSameCommand", BundlePrecedence.USER);
-		BundleEntry entry = BundleTestBase.getBundleManagerInstance().getBundleEntry("bundleWithCommand");
+		BundleEntry entry = getBundleManagerInstance().getBundleEntry("bundleWithCommand");
 		assertNotNull(entry);
 		List<CommandElement> commands = entry.getCommands();
 		assertNotNull(commands);
@@ -408,7 +476,7 @@ public class BundleTests extends BundleTestBase
 		this.loadBundleEntry(bundleName, BundlePrecedence.PROJECT);
 
 		// get bundle entry
-		BundleEntry entry = BundleTestBase.getBundleManagerInstance().getBundleEntry(bundleName);
+		BundleEntry entry = getBundleManagerInstance().getBundleEntry(bundleName);
 		assertNotNull(entry);
 	}
 
@@ -421,7 +489,7 @@ public class BundleTests extends BundleTestBase
 		this.loadBundleEntry("bundleNameWithExtension.ruble", BundlePrecedence.PROJECT);
 
 		// get bundle entry
-		BundleEntry entry = BundleTestBase.getBundleManagerInstance().getBundleEntry("bundleNameWithExtension");
+		BundleEntry entry = getBundleManagerInstance().getBundleEntry("bundleNameWithExtension");
 		assertNotNull(entry);
 	}
 
@@ -433,7 +501,7 @@ public class BundleTests extends BundleTestBase
 		String bundleName = "bundleDefinition";
 		this.loadBundleEntry(bundleName, BundlePrecedence.PROJECT);
 
-		BundleEntry entry = BundleTestBase.getBundleManagerInstance().getBundleEntry(bundleName);
+		BundleEntry entry = getBundleManagerInstance().getBundleEntry(bundleName);
 		assertNotNull(entry);
 
 		List<BundleElement> bundles = entry.getBundles();
@@ -450,7 +518,7 @@ public class BundleTests extends BundleTestBase
 		String bundleName = "bundleDefinition2";
 		this.loadBundleEntry(bundleName, BundlePrecedence.PROJECT);
 
-		BundleEntry entry = BundleTestBase.getBundleManagerInstance().getBundleEntry(bundleName);
+		BundleEntry entry = getBundleManagerInstance().getBundleEntry(bundleName);
 		assertNotNull(entry);
 
 		List<BundleElement> bundles = entry.getBundles();
@@ -466,7 +534,7 @@ public class BundleTests extends BundleTestBase
 	{
 		this.loadBundleEntry("bundleReference", BundlePrecedence.PROJECT);
 
-		BundleEntry entry = BundleTestBase.getBundleManagerInstance().getBundleEntry("MyBundle");
+		BundleEntry entry = getBundleManagerInstance().getBundleEntry("MyBundle");
 		assertNotNull(entry);
 
 		List<BundleElement> bundles = entry.getBundles();
@@ -481,7 +549,7 @@ public class BundleTests extends BundleTestBase
 		this.loadBundleEntry("bundleWithCommandReference", BundlePrecedence.APPLICATION);
 		this.loadBundleEntry("bundleWithCommandReference", BundlePrecedence.PROJECT);
 
-		BundleEntry entry = BundleTestBase.getBundleManagerInstance().getBundleEntry("bundleWithCommand");
+		BundleEntry entry = getBundleManagerInstance().getBundleEntry("bundleWithCommand");
 		assertNotNull(entry);
 
 		List<BundleElement> bundles = entry.getBundles();
@@ -491,5 +559,40 @@ public class BundleTests extends BundleTestBase
 		List<CommandElement> commands = entry.getCommands();
 		assertNotNull(commands);
 		assertEquals(3, commands.size());
+	}
+
+	public void testDeadlock() throws InterruptedException
+	{
+		// Launch a lot of threads contending for bundle manager collections
+		int numThreads = 10;
+		int iterations = 100;
+		long maxWait = (iterations * 100) + 1000;
+		List<Callable<Object>> jobs = new ArrayList<Callable<Object>>(numThreads);
+		for (int i = 0; i < numThreads; i++)
+		{
+			jobs.add(Executors.callable(new BundleLoadingRunnable(iterations)));
+		}
+		ExecutorService service = Executors.newFixedThreadPool(numThreads);
+
+		List<Future<Object>> result = service.invokeAll(jobs, maxWait, TimeUnit.MILLISECONDS);
+
+		for (Future<Object> f : result)
+		{
+			if (f.isCancelled())
+			{
+				deadlocked = true; // necessary to avoid normal teardown which would actually cause us to block forever.
+				fail("One thread failed to finish, assuming deadlock.");
+			}
+		}
+	}
+
+	@Override
+	protected void tearDown() throws Exception
+	{
+		if (deadlocked)
+		{
+			return;
+		}
+		super.tearDown();
 	}
 }
