@@ -104,7 +104,7 @@ public class DefaultAnalyticsEventHandler implements IAnalyticsEventHandler
 				return Status.OK_STATUS;
 			}
 		};
-		EclipseUtil.setSystemForJob(job);
+		job.setSystem(true);
 		job.setPriority(Job.BUILD);
 		job.schedule();
 
