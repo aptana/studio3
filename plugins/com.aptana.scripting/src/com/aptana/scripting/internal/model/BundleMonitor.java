@@ -1,11 +1,11 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.scripting.model;
+package com.aptana.scripting.internal.model;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -32,6 +32,10 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.filewatcher.FileWatcher;
 import com.aptana.scripting.IDebugScopes;
 import com.aptana.scripting.ScriptingActivator;
+import com.aptana.scripting.model.BundleManager;
+import com.aptana.scripting.model.BundlePrecedence;
+import com.aptana.scripting.model.LibraryCrossReference;
+import com.aptana.scripting.model.Messages;
 
 public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVisitor, JNotifyListener
 {
@@ -61,31 +65,16 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 			"/.+?/bundles/.+?/(?:commands|snippets|templates|samples)/[^/]+\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
 	// @formatter:on
 
-	private static BundleMonitor INSTANCE;
-
 	private boolean _registered;
 	private int _watchId;
-
-	/**
-	 * getInstance
-	 * 
-	 * @return
-	 */
-	public static BundleMonitor getInstance()
-	{
-		if (INSTANCE == null)
-		{
-			INSTANCE = new BundleMonitor();
-		}
-
-		return INSTANCE;
-	}
+	private BundleManager bm;
 
 	/**
 	 * BundleMonitor
 	 */
-	private BundleMonitor()
+	public BundleMonitor(BundleManager bm)
 	{
+		this.bm = bm;
 		this._watchId = -1;
 	}
 
@@ -154,7 +143,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	{
 		if (this._registered)
 		{
-			ResourcesPlugin.getWorkspace().removeResourceChangeListener(INSTANCE);
+			ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
 
 			if (this._watchId != -1)
 			{
@@ -279,7 +268,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 
 	protected BundleManager getBundleManager()
 	{
-		return BundleManager.getInstance();
+		return bm;
 	}
 
 	/**

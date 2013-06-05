@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -19,9 +19,9 @@ import org.osgi.framework.BundleContext;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.scripting.internal.model.BundleMonitor;
 import com.aptana.scripting.listeners.FileWatcherRegistrant;
 import com.aptana.scripting.model.BundleManager;
-import com.aptana.scripting.model.BundleMonitor;
 import com.aptana.scripting.model.RunType;
 
 /**
@@ -66,6 +66,9 @@ public class ScriptingActivator extends Plugin
 		return RunType.CURRENT_THREAD;
 	}
 
+	private BundleManager bundleManager;
+	private BundleMonitor bundleMonitor;
+
 	/**
 	 * The constructor
 	 */
@@ -88,7 +91,7 @@ public class ScriptingActivator extends Plugin
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
-				BundleManager manager = BundleManager.getInstance();
+				BundleManager manager = getBundleManager();
 
 				// TODO: Make this an extension point so plugins can contribute these
 				// grabbing instances register listeners
@@ -108,7 +111,7 @@ public class ScriptingActivator extends Plugin
 				// turn on project and file monitoring
 				try
 				{
-					BundleMonitor.getInstance().beginMonitoring();
+					getBundleMonitor().beginMonitoring();
 				}
 				catch (JNotifyException e)
 				{
@@ -131,10 +134,14 @@ public class ScriptingActivator extends Plugin
 	{
 		try
 		{
-			BundleMonitor.getInstance().endMonitoring();
+			bundleManager = null;
+			if (bundleMonitor != null)
+			{
+				bundleMonitor.endMonitoring();
+				bundleMonitor = null;
+			}
 
 			FileWatcherRegistrant.shutdown();
-			// FIXME Clean up the bundle manager singleton!
 		}
 		catch (Exception e)
 		{
@@ -145,5 +152,23 @@ public class ScriptingActivator extends Plugin
 			plugin = null;
 			super.stop(context);
 		}
+	}
+
+	private synchronized BundleMonitor getBundleMonitor()
+	{
+		if (bundleMonitor == null)
+		{
+			bundleMonitor = new BundleMonitor(getBundleManager());
+		}
+		return bundleMonitor;
+	}
+
+	public synchronized BundleManager getBundleManager()
+	{
+		if (bundleManager == null)
+		{
+			bundleManager = BundleManager.getInstance();
+		}
+		return bundleManager;
 	}
 }

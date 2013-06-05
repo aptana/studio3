@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -75,7 +75,7 @@ public class BundleElement extends AbstractElement
 
 		// it will be extremely rare to have no children, so go ahead and pre-allocate the child list. This will also
 		// allow us to lock on the list instead of maintaining a separate lock object
-		this._children = new ArrayList<AbstractBundleElement>();
+		this._children = Collections.synchronizedList(new ArrayList<AbstractBundleElement>());
 
 		// calculate the bundle scope
 		this._bundlePrecedence = BundleManager.getInstance().getBundlePrecedence(path);
@@ -90,21 +90,16 @@ public class BundleElement extends AbstractElement
 	{
 		if (element != null)
 		{
-			BundleEntry.VisibilityContext context = null;
+			// removes the equivalent element if one exists
+			_children.remove(element);
 
-			synchronized (this._children)
+			BundleEntry.VisibilityContext context = this.getVisibilityContext(element.getClass());
+
+			_children.add(element);
+
+			if (context != null)
 			{
-				// removes the equivalent element if one exists
-				this._children.remove(element);
-
-				context = this.getVisibilityContext(element.getClass());
-
-				this._children.add(element);
-
-				if (context != null)
-				{
-					context.updateElementContext();
-				}
+				context.updateElementContext();
 			}
 
 			element.setOwningBundle(this);
@@ -210,28 +205,22 @@ public class BundleElement extends AbstractElement
 	}
 
 	/**
-	 * getChildren
+	 * Returns a read-only copy of the list of children.
 	 * 
 	 * @return
 	 */
 	public List<AbstractBundleElement> getChildren()
 	{
-		List<AbstractBundleElement> result;
-
 		synchronized (this._children)
 		{
-			result = new ArrayList<AbstractBundleElement>(this._children);
+			return Collections.unmodifiableList(new ArrayList<AbstractBundleElement>(this._children));
 		}
-
-		return result;
 	}
 
 	public void setChildren(List<AbstractBundleElement> children)
 	{
-		synchronized (this._children)
-		{
-			this._children.clear();
-		}
+		this._children.clear();
+
 		if (children != null)
 		{
 			for (AbstractBundleElement child : children)
@@ -755,14 +744,7 @@ public class BundleElement extends AbstractElement
 	 */
 	public boolean hasChildren()
 	{
-		boolean result = false;
-
-		synchronized (this._children)
-		{
-			result = this._children.size() > 0;
-		}
-
-		return result;
+		return !this._children.isEmpty();
 	}
 
 	/**
@@ -866,24 +848,19 @@ public class BundleElement extends AbstractElement
 	 */
 	public void removeChild(AbstractBundleElement element)
 	{
-		boolean removed = false;
-		BundleEntry.VisibilityContext context = null;
-
 		// disassociate element with this bundle
 		element.setOwningBundle(null);
 
-		synchronized (this._children)
-		{
-			context = this.getVisibilityContext(element.getClass());
+		BundleEntry.VisibilityContext context = this.getVisibilityContext(element.getClass());
 
-			if (removed = this._children.remove(element) && context != null)
+		boolean removed = this._children.remove(element);
+		if (removed)
+		{
+			if (context != null)
 			{
 				context.updateElementContext();
 			}
-		}
 
-		if (removed)
-		{
 			// NOTE: We currently have only one element type that has children, so we special case it here. However, if
 			// more elements fall into this category, then we should introduce a removeChildren method in the element
 			// hierarchy and then call that on all element types
