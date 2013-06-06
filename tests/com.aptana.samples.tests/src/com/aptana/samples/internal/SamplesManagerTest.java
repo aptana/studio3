@@ -51,7 +51,7 @@ public class SamplesManagerTest extends TestCase
 		assertNotNull(category);
 		assertEquals("com.aptana.samples.tests.category", category.getId());
 		assertEquals("Test Samples", category.getName());
-		assertEquals("platform:/plugin/com.aptana.samples/icons/category.png", category.getIconFile());
+		assertEquals("platform:/plugin/com.aptana.samples/icons/category.png", category.getIconFile().toString());
 	}
 
 	protected SampleCategory findCategoryById(List<SampleCategory> categories, String categoryId)
