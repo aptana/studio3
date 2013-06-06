@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -688,6 +689,41 @@ public class EclipseUtil
 	public static ConfigurationScope configurationScope()
 	{
 		return new ConfigurationScope();
+	}
+
+	/**
+	 * Use this to load resources from extension points. For relative paths this will convert to a URL referencing the
+	 * enclosing plugin and resolve the path. Otherwise this will convert the string to an URL (so a resource could be
+	 * pointed at in the plugin.xml definition using http:, ftp:, data:, platform:/plugin/plugin.id URLs)
+	 * 
+	 * @param element
+	 * @param attr
+	 * @return
+	 */
+	public static URL getResourceURL(IConfigurationElement element, String attr)
+	{
+		String iconPath = element.getAttribute(attr);
+		if (iconPath == null)
+		{
+			return null;
+		}
+
+		// If iconPath doesn't specify a scheme, then try to transform to a URL
+		// RFC 3986: scheme = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
+		// This allows using data:, http:, or other custom URL schemes
+		if (!iconPath.matches("\\p{Alpha}[\\p{Alnum}+.-]*:.*")) { //$NON-NLS-1$
+			String extendingPluginId = element.getDeclaringExtension().getContributor().getName();
+			iconPath = "platform:/plugin/" + extendingPluginId + "/" + iconPath; //$NON-NLS-1$//$NON-NLS-2$
+		}
+		try
+		{
+			return new URL(iconPath);
+		}
+		catch (MalformedURLException e)
+		{
+			/* IGNORE */
+		}
+		return null;
 	}
 
 }

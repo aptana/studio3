@@ -270,14 +270,6 @@ public class SamplesManager implements ISamplesManager
 			}
 			SampleCategory category = new SampleCategory(id, name, element);
 			categories.put(id, category);
-
-			String iconFile = element.getAttribute(ATTR_ICON);
-			if (!StringUtil.isEmpty(iconFile))
-			{
-				Bundle bundle = Platform.getBundle(element.getNamespaceIdentifier());
-				URL url = bundle.getEntry(iconFile);
-				category.setIconFile(ResourceUtil.resourcePathToString(url));
-			}
 		}
 		else if (ELEMENT_SAMPLESINFO.equals(elementName))
 		{
