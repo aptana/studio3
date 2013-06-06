@@ -920,7 +920,7 @@ public class JSParserTest extends TestCase
 	public void testMissingSemicolon() throws Exception
 	{
 		assertParseResult("abc", "abc;" + EOL);
-		assertParseErrors();
+		assertParseErrors("Missing semicolon");
 	}
 
 	public void testMissingClosingParenthesis() throws Exception

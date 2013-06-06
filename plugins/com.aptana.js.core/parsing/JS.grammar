@@ -370,8 +370,11 @@
 %init {:
 		report = new JSEvents();
 
+		String severity = Platform.getPreferencesService().getString(JSCorePlugin.PLUGIN_ID, IPreferenceConstants.PREF_MISSING_SEMICOLON_SEVERITY, null, null);
+		final IProblem.Severity semicolonSeverity = IProblem.Severity.create(severity);
+
 		// @formatter:off
-		recoveryStrategies = new ArrayList<IRecoveryStrategy>();
+		recoveryStrategies = new ArrayList<IRecoveryStrategy>(10);
 
 		recoveryStrategies.add(new JSInsertionRecoveryStrategy(JSTokenType.SEMICOLON, ";")
 		{
@@ -379,9 +382,9 @@
 					throws IOException
 			{
 				boolean recovered = super.recover(parser, lastToken, currentToken, in, report);
+				if (recovered)
 				{
-					String severity = Platform.getPreferencesService().getString(JSCorePlugin.PLUGIN_ID, IPreferenceConstants.PREF_MISSING_SEMICOLON_SEVERITY, null, null);
-					fWorking.addError(new ParseError(IJSConstants.CONTENT_TYPE_JS, lastToken, Messages.JSParser_MissingSemicolonMsg, IProblem.Severity.create(severity)));
+					fWorking.addError(new ParseError(IJSConstants.CONTENT_TYPE_JS, lastToken, Messages.JSParser_MissingSemicolonMsg, semicolonSeverity));
 				}
 				return recovered;
 			}

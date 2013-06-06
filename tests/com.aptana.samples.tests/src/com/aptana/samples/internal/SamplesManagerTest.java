@@ -11,9 +11,6 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.eclipse.core.runtime.Platform;
-
-import com.aptana.core.util.ResourceUtil;
 import com.aptana.samples.ISamplesManager;
 import com.aptana.samples.SamplesPlugin;
 import com.aptana.samples.model.SampleCategory;
@@ -54,7 +51,7 @@ public class SamplesManagerTest extends TestCase
 		assertNotNull(category);
 		assertEquals("com.aptana.samples.tests.category", category.getId());
 		assertEquals("Test Samples", category.getName());
-		assertEquals(getFullPath("icons/category.png"), category.getIconFile());
+		assertEquals("platform:/plugin/com.aptana.samples/icons/category.png", category.getIconFile());
 	}
 
 	protected SampleCategory findCategoryById(List<SampleCategory> categories, String categoryId)
@@ -91,10 +88,5 @@ public class SamplesManagerTest extends TestCase
 		assertEquals("com.aptana.projects.webnature", natures[0]);
 		String[] includes = remoteSample.getIncludePaths();
 		assertEquals(0, includes.length);
-	}
-
-	private static String getFullPath(String entryPath)
-	{
-		return ResourceUtil.resourcePathToString(Platform.getBundle("com.aptana.samples").getEntry(entryPath));
 	}
 }
