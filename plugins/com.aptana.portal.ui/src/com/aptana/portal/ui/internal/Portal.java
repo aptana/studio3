@@ -50,7 +50,7 @@ import com.aptana.portal.ui.browser.AbstractPortalBrowserEditor;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.ThemePlugin;
 import com.aptana.ui.util.UIUtils;
-import com.aptana.usage.PingStartup;
+import com.aptana.usage.UsagePlugin;
 
 /**
  * The portal class is a singleton that controls the portal browser and allows interacting with it.
@@ -403,7 +403,7 @@ public class Portal
 
 	protected String getGUID()
 	{
-		return PingStartup.getApplicationId();
+		return UsagePlugin.getApplicationId();
 	}
 
 	protected char getProjectType(IProject selectedProject)

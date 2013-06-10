@@ -15,7 +15,7 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.portal.ui.IPortalPreferences;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.theme.IThemeManager;
-import com.aptana.usage.PingStartup;
+import com.aptana.usage.UsagePlugin;
 
 /**
  */
@@ -96,7 +96,7 @@ public class PortalTest extends TestCase
 	{
 		Portal fixture = Portal.getInstance();
 		String result = fixture.getGUID();
-		assertEquals(PingStartup.getApplicationId(), result);
+		assertEquals(UsagePlugin.getApplicationId(), result);
 	}
 
 	/**

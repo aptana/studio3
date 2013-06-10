@@ -5,7 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.usage;
+package com.aptana.usage.internal;
 
 import java.io.File;
 import java.sql.Connection;
@@ -19,6 +19,10 @@ import org.eclipse.osgi.service.datalocation.Location;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ResourceUtil;
+import com.aptana.usage.IDebugScopes;
+import com.aptana.usage.IResultSetHandler;
+import com.aptana.usage.Messages;
+import com.aptana.usage.UsagePlugin;
 
 /**
  * @author Kevin Lindsey

@@ -5,7 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.usage.internal;
+package com.aptana.usage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,8 +21,6 @@ import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.StringUtil;
-import com.aptana.usage.IAnalyticsUserManager;
-import com.aptana.usage.UsagePlugin;
 
 public class AnalyticsInfoManager
 {

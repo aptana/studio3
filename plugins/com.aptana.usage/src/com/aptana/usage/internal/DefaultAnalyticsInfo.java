@@ -7,6 +7,9 @@
  */
 package com.aptana.usage.internal;
 
+import com.aptana.usage.AnalyticsInfo;
+
+
 public class DefaultAnalyticsInfo extends AnalyticsInfo
 {
 

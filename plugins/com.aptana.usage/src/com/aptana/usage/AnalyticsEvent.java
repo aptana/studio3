@@ -16,16 +16,14 @@ import java.util.TimeZone;
 import java.util.UUID;
 
 import org.eclipse.core.runtime.Platform;
-import com.aptana.jetty.util.epl.ajax.JSON;
 
+import com.aptana.jetty.util.epl.ajax.JSON;
+import com.aptana.usage.internal.DefaultAnalyticsInfo;
 import com.aptana.core.CorePlugin;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
-import com.aptana.usage.internal.AnalyticsInfo;
-import com.aptana.usage.internal.AnalyticsInfoManager;
-import com.aptana.usage.internal.DefaultAnalyticsInfo;
 import com.eaio.uuid.MACAddress;
 
 public class AnalyticsEvent
