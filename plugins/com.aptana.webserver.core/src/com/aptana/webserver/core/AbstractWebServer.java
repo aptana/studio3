@@ -22,6 +22,7 @@ import org.eclipse.debug.core.ILaunchManager;
 
 import com.aptana.core.epl.IMemento;
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.ObjectUtil;
 import com.aptana.webserver.internal.core.ServerManager;
 import com.aptana.webserver.internal.core.ServerType;
 
@@ -109,8 +110,11 @@ public abstract class AbstractWebServer implements IExecutableExtension, IServer
 
 	protected void updateState(State state)
 	{
-		this.fState = state;
-		fireServerChangedEvent();
+		if (ObjectUtil.areNotEqual(state, this.fState))
+		{
+			this.fState = state;
+			fireServerChangedEvent();
+		}
 	}
 
 	protected void fireServerChangedEvent()
