@@ -307,6 +307,23 @@ public class ProcessUtilTest extends TestCase
 
 	public void testObfuscation() throws Exception
 	{
+		List<String> args = CollectionsUtil.newList("binary", "C:\\Users\\QEtester\\", "--password", "password");
+
+		assertEquals("\"binary\" \"C:\\Users\\QEtester\\\" \"--password\" \"**********\"",
+				ProcessUtil.getObfuscatedCommandString(args, "password"));
+
+		args = CollectionsUtil.newList("binary", "C:\\Users\\QEtester\\", "--password", "tester");
+		assertEquals("\"binary\" \"C:\\Users\\QEtester\\\" \"--password\" \"**********\"",
+				ProcessUtil.getObfuscatedCommandString(args, "tester"));
+
+		args = CollectionsUtil.newList("binary", "C:\\Users\\tester\\", "--password", "tester");
+		assertEquals("\"binary\" \"C:\\Users\\tester\\\" \"--password\" \"**********\"",
+				ProcessUtil.getObfuscatedCommandString(args, "tester"));
+
+	}
+
+	public void testObfuscationWithProcess() throws Exception
+	{
 		final List<String> logs = new ArrayList<String>();
 		Map<String, String> environment = CollectionsUtil.newMap(ProcessUtil.TEXT_TO_OBFUSCATE, "password123");
 
@@ -332,7 +349,7 @@ public class ProcessUtilTest extends TestCase
 
 		assertEquals(1, logs.size());
 		assertEquals(MessageFormat.format(Messages.ProcessUtil_RunningProcess,
-				"binary\" \"/User/cwilliams/path\" \"--password\" \"**********", null, null), logs.get(0));
+				"\"binary\" \"/User/cwilliams/path\" \"--password\" \"**********\"", null, null), logs.get(0));
 	}
 
 	public void testObfuscationOfProxy() throws Exception
@@ -364,7 +381,7 @@ public class ProcessUtilTest extends TestCase
 		assertEquals(1, logs.size());
 		// Verify we obfuscate only in the proxy, not in the filepath!
 		assertEquals(MessageFormat.format(Messages.ProcessUtil_RunningProcess,
-				"binary\" \"/User/cwilliams/path\" \"--proxy\" \"http://user:**********@1.2.3.4:80", null, null),
+				"\"binary\" \"/User/cwilliams/path\" \"--proxy\" \"http://user:**********@1.2.3.4:80\"", null, null),
 				logs.get(0));
 	}
 
@@ -396,7 +413,7 @@ public class ProcessUtilTest extends TestCase
 		assertEquals(1, logs.size());
 		// Verify we obfuscate only in the key-value pair, not in the filepath!
 		assertEquals(MessageFormat.format(Messages.ProcessUtil_RunningProcess,
-				"binary\" \"/User/cwilliams/path\" \"password=**********", null, null), logs.get(0));
+				"\"binary\" \"/User/cwilliams/path\" \"password=**********\"", null, null), logs.get(0));
 	}
 
 	private static SleepAndReturnValueAction sleepAndReturn(int sleepTime, Object value)

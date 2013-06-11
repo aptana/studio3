@@ -421,53 +421,8 @@ public class ProcessUtil
 
 			if (isInfoLoggingEnabled())
 			{
-				String message;
-				if (!StringUtil.isEmpty(textToObfuscate))
-				{
-					// @formatter:off
-					// password patterns:
-					// :(password)@ 		// URLs
-					// password 			// arg value
-					// key=password 		// key pair value
-					// @formatter:on
-					String quoted = RegexUtil.quote(textToObfuscate);
-					Pattern hideMePattern = Pattern.compile("[^:]+:" + quoted + "@|^" + quoted + "$|.*?=" + quoted); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-					List<String> commandMessage = new ArrayList<String>(command.size());
-					for (String arg : command)
-					{
-						if (!StringUtil.isEmpty(arg))
-						{
-							StringBuffer sb = new StringBuffer();
-
-							Matcher m = hideMePattern.matcher(arg);
-							while (m.find())
-							{
-								String found = m.group();
-								String replacement = MASK;
-								if (found.charAt(found.length() - 1) == '@')
-								{
-									replacement = found.substring(0, found.length() - (textToObfuscate.length() + 2))
-											+ ':' + MASK + '@';
-								}
-								else if (found.endsWith("=" + textToObfuscate)) //$NON-NLS-1$
-								{
-									replacement = found.substring(0, (found.length() - textToObfuscate.length()))
-											+ MASK;
-								}
-								m.appendReplacement(sb, replacement);
-							}
-							m.appendTail(sb);
-							arg = sb.toString();
-						}
-						commandMessage.add(arg);
-					}
-					message = StringUtil.join("\" \"", commandMessage); //$NON-NLS-1$
-				}
-				else
-				{
-					message = StringUtil.join("\" \"", command); //$NON-NLS-1$
-				}
-				logInfo(MessageFormat.format(Messages.ProcessUtil_RunningProcess, message, path, map));
+				logInfo(MessageFormat.format(Messages.ProcessUtil_RunningProcess,
+						getObfuscatedCommandString(command, textToObfuscate), path, map));
 			}
 		}
 		if (environment != null && environment.containsKey(REDIRECT_ERROR_STREAM))
@@ -475,6 +430,63 @@ public class ProcessUtil
 			processBuilder.redirectErrorStream(true);
 		}
 		return startProcess(processBuilder);
+	}
+
+	/**
+	 * Returns a command string after obfuscating the given text to obfuscate.
+	 * 
+	 * @param command
+	 * @param textToObfuscate
+	 * @return The obfuscated command string, wrapped in double quotes.
+	 */
+	protected static String getObfuscatedCommandString(List<String> command, String textToObfuscate)
+	{
+		String message;
+		if (!StringUtil.isEmpty(textToObfuscate))
+		{
+			// @formatter:off
+			// password patterns:
+			// :(password)@ 		// URLs
+			// password 			// arg value
+			// key=password 		// key pair value
+			// @formatter:on
+			String quoted = RegexUtil.quote(textToObfuscate);
+			Pattern hideMePattern = Pattern.compile("[^:]+:" + quoted + "@|^" + quoted + "$|.*?=" + quoted); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			List<String> commandMessage = new ArrayList<String>(command.size());
+			for (String arg : command)
+			{
+				if (!StringUtil.isEmpty(arg))
+				{
+					StringBuffer sb = new StringBuffer();
+
+					Matcher m = hideMePattern.matcher(arg);
+					while (m.find())
+					{
+						String found = m.group();
+						String replacement = MASK;
+						if (found.charAt(found.length() - 1) == '@')
+						{
+							replacement = found.substring(0, found.length() - (textToObfuscate.length() + 2)) + ':'
+									+ MASK + '@';
+						}
+						else if (found.endsWith("=" + textToObfuscate)) //$NON-NLS-1$
+						{
+							replacement = found.substring(0, (found.length() - textToObfuscate.length())) + MASK;
+						}
+						m.appendReplacement(sb, replacement);
+					}
+					m.appendTail(sb);
+					arg = sb.toString();
+				}
+				commandMessage.add(arg);
+			}
+			message = StringUtil.join("\" \"", commandMessage); //$NON-NLS-1$
+		}
+		else
+		{
+			message = StringUtil.join("\" \"", command); //$NON-NLS-1$
+		}
+		return MessageFormat.format("\"{0}\"", message); //$NON-NLS-1$
 	}
 
 	protected Process startProcess(ProcessBuilder processBuilder) throws IOException
