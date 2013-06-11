@@ -35,7 +35,7 @@ import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.ui.util.UIUtils;
 
-abstract class AbstractGitHandler extends AbstractHandler
+public abstract class AbstractGitHandler extends AbstractHandler
 {
 	private IEvaluationContext evalContext;
 	private boolean enabled;
@@ -186,7 +186,7 @@ abstract class AbstractGitHandler extends AbstractHandler
 		return resources;
 	}
 
-	protected IGitRepositoryManager getGitRepositoryManager()
+	protected static IGitRepositoryManager getGitRepositoryManager()
 	{
 		return GitPlugin.getDefault().getGitRepositoryManager();
 	}
