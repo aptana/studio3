@@ -53,7 +53,9 @@ import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.ZipUtil;
+import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.CloneJob;
+import com.aptana.git.ui.actions.DisconnectHandler;
 import com.aptana.projects.ProjectData;
 import com.aptana.projects.ProjectsPlugin;
 import com.aptana.projects.wizards.AbstractNewProjectWizard;
@@ -336,6 +338,20 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 				}
 
 				doPostProjectCreation(newProject);
+
+				// Stop tracking the git repo
+				DisconnectHandler.disconnect(newProject, null);
+				// Delete the .gitignore file and the .git folder
+				File toDelete = new File(newProject.getLocation().toFile(), GitRepository.GITIGNORE);
+				if (toDelete.exists())
+				{
+					toDelete.delete();
+				}
+				toDelete = new File(newProject.getLocation().toFile(), GitRepository.GIT_DIR);
+				if (toDelete.exists())
+				{
+					FileUtil.deleteRecursively(toDelete);
+				}
 			}
 		});
 		job.schedule();

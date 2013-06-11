@@ -193,7 +193,7 @@
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
-            defaultHandler="com.aptana.git.ui.internal.actions.DisconnectHandler"
+            defaultHandler="com.aptana.git.ui.actions.DisconnectHandler"
             id="com.aptana.git.ui.command.disconnect"
             name="%DisconnectAction_label">
       </command>
