@@ -8,8 +8,6 @@
 package com.aptana.git.ui.actions;
 
 import java.text.MessageFormat;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -51,16 +49,9 @@ public class DisconnectHandler extends AbstractGitHandler
 	@Override
 	protected Object doExecute(ExecutionEvent event) throws ExecutionException
 	{
-		Set<IProject> projects = new HashSet<IProject>();
 		for (IResource resource : getSelectedResources())
 		{
-			IProject project = resource.getProject();
-			projects.add(project);
-		}
-
-		for (final IProject project : projects)
-		{
-			disconnect(project, listener);
+			disconnect(resource.getProject(), listener);
 		}
 		return null;
 	}
