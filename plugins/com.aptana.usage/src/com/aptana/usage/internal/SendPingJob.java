@@ -1,3 +1,10 @@
+/**
+ * Aptana Studio
+ * Copyright (c) 2013 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.usage.internal;
 
 import java.util.Map;
@@ -69,7 +76,8 @@ public class SendPingJob extends Job
 		enroll();
 
 		// Hook up ping when we delete a project
-		ResourcesPlugin.getWorkspace().addResourceChangeListener(projectDeleteListener, IResourceChangeEvent.PRE_DELETE);
+		ResourcesPlugin.getWorkspace()
+				.addResourceChangeListener(projectDeleteListener, IResourceChangeEvent.PRE_DELETE);
 
 		// Send ping when we start studio
 		sendStartEvent();
@@ -191,7 +199,7 @@ public class SendPingJob extends Job
 	public void shutdown()
 	{
 		cancel();
-		
+
 		if (projectDeleteListener != null)
 		{
 			ResourcesPlugin.getWorkspace().removeResourceChangeListener(projectDeleteListener);
