@@ -17,6 +17,7 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.usage.internal.AnalyticsInfoManager;
 import com.aptana.usage.internal.AptanaDB;
 import com.aptana.usage.internal.SendPingJob;
 import com.aptana.usage.preferences.IPreferenceConstants;
@@ -36,6 +37,7 @@ public class UsagePlugin extends Plugin
 	private static UsagePlugin plugin;
 
 	private SendPingJob job;
+	private AnalyticsInfoManager fAnalyticsInfoManager;
 
 	/**
 	 * The constructor
@@ -77,6 +79,7 @@ public class UsagePlugin extends Plugin
 		}
 		finally
 		{
+			fAnalyticsInfoManager = null;
 			plugin = null;
 			super.stop(context);
 		}
@@ -143,5 +146,14 @@ public class UsagePlugin extends Plugin
 		{
 			IdeLog.logError(getDefault(), e);
 		}
+	}
+
+	public synchronized IAnalyticsInfoManager getAnalyticsInfoManager()
+	{
+		if (fAnalyticsInfoManager == null)
+		{
+			fAnalyticsInfoManager = new AnalyticsInfoManager();
+		}
+		return fAnalyticsInfoManager;
 	}
 }

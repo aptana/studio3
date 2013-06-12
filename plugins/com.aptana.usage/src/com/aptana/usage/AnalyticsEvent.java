@@ -17,13 +17,13 @@ import java.util.UUID;
 
 import org.eclipse.core.runtime.Platform;
 
-import com.aptana.jetty.util.epl.ajax.JSON;
-import com.aptana.usage.internal.DefaultAnalyticsInfo;
 import com.aptana.core.CorePlugin;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.jetty.util.epl.ajax.JSON;
+import com.aptana.usage.internal.DefaultAnalyticsInfo;
 import com.eaio.uuid.MACAddress;
 
 public class AnalyticsEvent
@@ -35,7 +35,7 @@ public class AnalyticsEvent
 	private static final AnalyticsInfo APP_INFO;
 	static
 	{
-		AnalyticsInfo info = AnalyticsInfoManager.getInstance().getInfo("com.aptana.usage.analytics"); //$NON-NLS-1$
+		AnalyticsInfo info = UsagePlugin.getDefault().getAnalyticsInfoManager().getInfo("com.aptana.usage.analytics"); //$NON-NLS-1$
 		if (info == null)
 		{
 			APP_INFO = new DefaultAnalyticsInfo();

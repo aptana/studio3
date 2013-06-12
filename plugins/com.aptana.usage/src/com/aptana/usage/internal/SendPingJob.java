@@ -29,7 +29,6 @@ import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.usage.AnalyticsEvent;
 import com.aptana.usage.AnalyticsInfo;
-import com.aptana.usage.AnalyticsInfoManager;
 import com.aptana.usage.FeatureEvent;
 import com.aptana.usage.StudioAnalytics;
 import com.aptana.usage.UsagePlugin;
@@ -98,7 +97,8 @@ public class SendPingJob extends Job
 				IPreferenceConstants.HAS_ENROLLED, false, new IScopeContext[] { scope });
 		if (!hasEnrolled)
 		{
-			AnalyticsInfo info = AnalyticsInfoManager.getInstance().getInfo("com.aptana.usage.analytics"); //$NON-NLS-1$
+			AnalyticsInfo info = UsagePlugin.getDefault().getAnalyticsInfoManager()
+					.getInfo("com.aptana.usage.analytics"); //$NON-NLS-1$
 			String guid = info.getAppGuid();
 			// only sends the enroll ping if it's Aptana Studio
 			if ((new DefaultAnalyticsInfo()).getAppGuid().equals(guid))
