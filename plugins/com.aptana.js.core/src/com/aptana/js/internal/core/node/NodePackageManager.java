@@ -28,7 +28,6 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
@@ -41,11 +40,9 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.PlatformUtil;
-import com.aptana.core.util.ProcessRunnable;
 import com.aptana.core.util.ProcessStatus;
 import com.aptana.core.util.ProcessUtil;
 import com.aptana.core.util.StringUtil;
-import com.aptana.core.util.SudoCommandProcessRunnable;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.core.node.INodePackageManager;
 
@@ -106,6 +103,8 @@ public class NodePackageManager implements INodePackageManager
 	private static final String INSTALL = "install"; //$NON-NLS-1$
 	private static final String LIST = "list"; //$NON-NLS-1$
 	private static final String REMOVE = "remove"; //$NON-NLS-1$
+	private static final String CONFIG = "config"; //$NON-NLS-1$
+	private static final String GET = "get"; //$NON-NLS-1$
 
 	private IPath npmPath;
 
@@ -128,8 +127,32 @@ public class NodePackageManager implements INodePackageManager
 	public IStatus install(String packageName, String displayName, boolean global, char[] password,
 			IPath workingDirectory, IProgressMonitor monitor)
 	{
+		String globalPrefixPath = null;
 		try
 		{
+			/*
+			 * HACK for environments with npm config prefix value set : when sudo npm -g install command is used, the
+			 * global prefix config value for the entire system overrides the global prefix value of the user. So, it
+			 * always install into /usr/lib even though user set a custom value for NPM_CONFIG_PREFIX.
+			 */
+			IPath prefixPath = getConfigPrefixPath();
+			if (prefixPath != null)
+			{
+				List<String> args = CollectionsUtil.newList(CONFIG, GET, PREFIX); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				// TODO: should cache this value as config prefix path ?
+				IStatus npmStatus = runNpmConfig(args, password, global, workingDirectory, monitor);
+				if (npmStatus.isOK())
+				{
+					String prefix = npmStatus.getMessage();
+					// Set the global prefix path only if it is not the default value.
+					if (!prefixPath.toOSString().equals(prefix))
+					{
+						globalPrefixPath = prefix;
+						setGlobalPrefixPath(password, workingDirectory, monitor, prefixPath.toOSString());
+					}
+				}
+			}
+
 			IStatus status = runNpmInstaller(packageName, displayName, global, password, workingDirectory, INSTALL,
 					monitor);
 			if (status.getSeverity() == IStatus.CANCEL)
@@ -167,6 +190,7 @@ public class NodePackageManager implements INodePackageManager
 					}
 				}
 			}
+
 			return status;
 		}
 		catch (CoreException ce)
@@ -177,6 +201,30 @@ public class NodePackageManager implements INodePackageManager
 		{
 			return new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, e.getMessage(), e);
 		}
+		finally
+		{
+			// Set the global npm prefix path to its original value.
+			if (!StringUtil.isEmpty(globalPrefixPath))
+			{
+				setGlobalPrefixPath(password, workingDirectory, monitor, globalPrefixPath);
+			}
+		}
+	}
+
+	private IStatus setGlobalPrefixPath(char[] password, IPath workingDirectory, IProgressMonitor monitor,
+			String globalPrefixPath)
+	{
+		List<String> args = CollectionsUtil.newList(CONFIG, "set", PREFIX, globalPrefixPath); //$NON-NLS-1$
+		return runNpmConfig(args, password, true, workingDirectory, monitor);
+	}
+
+	private IStatus runNpmConfig(List<String> args, char[] password, boolean global, IPath workingDirectory,
+			IProgressMonitor monitor)
+	{
+		List<String> sudoArgs = getNpmSudoArgs(global);
+		sudoArgs.addAll(args);
+		return ProcessUtil.run(CollectionsUtil.getFirstElement(sudoArgs), workingDirectory, password, null, monitor,
+				sudoArgs.subList(1, sudoArgs.size()).toArray(new String[sudoArgs.size() - 1]));
 	}
 
 	/**
@@ -447,11 +495,11 @@ public class NodePackageManager implements INodePackageManager
 					Messages.NodePackageManager_ERR_NPMNotInstalled));
 		}
 		IStatus status = ProcessUtil.runInBackground(npmPath.toOSString(), null, ShellExecutable.getEnvironment(),
-				"config", "get", key); //$NON-NLS-1$ //$NON-NLS-2$
+				CONFIG, GET, key); //$NON-NLS-1$ //$NON-NLS-2$
 		if (!status.isOK())
 		{
 			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
-					"Failed to get value of npm config key {0}", key)));
+					Messages.NodePackageManager_ConfigFailure, key)));
 		}
 		return status.getMessage().trim();
 	}
@@ -470,22 +518,7 @@ public class NodePackageManager implements INodePackageManager
 		}
 		try
 		{
-			List<String> args = new ArrayList<String>(8);
-			if (global)
-			{
-				if (PlatformUtil.isMac() || PlatformUtil.isLinux())
-				{
-					args.add("sudo"); //$NON-NLS-1$
-					args.add("-S"); //$NON-NLS-1$
-					args.add("--"); //$NON-NLS-1$
-				}
-				args.add(npmPath.toOSString());
-				args.add(GLOBAL_ARG);
-			}
-			else
-			{
-				args.add(npmPath.toOSString());
-			}
+			List<String> args = getNpmSudoArgs(global);
 			CollectionsUtil.addToList(args, command, packageName, COLOR, FALSE);
 
 			Map<String, String> environment;
@@ -531,28 +564,34 @@ public class NodePackageManager implements INodePackageManager
 				}
 			}
 
-			Process p = ProcessUtil.run(args.get(0), workingDirectory, environment, args.subList(1, args.size())
-					.toArray(new String[args.size() - 1]));
-			sub.worked(5);
-
-			ProcessRunnable runnable;
-			if (PlatformUtil.isWindows())
-			{
-				runnable = new ProcessRunnable(p, new NullProgressMonitor(), true);
-			}
-			else
-			{
-				runnable = new SudoCommandProcessRunnable(p, new NullProgressMonitor(), true, password);
-			}
-			Thread t = new Thread(runnable, MessageFormat.format("{0} uninstaller", displayName)); //$NON-NLS-1$
-			t.start();
-			t.join();
-			return runnable.getResult();
+			return ProcessUtil.run(CollectionsUtil.getFirstElement(args), workingDirectory, password, environment,
+					monitor, args.subList(1, args.size()).toArray(new String[args.size() - 1]));
 		}
 		finally
 		{
 			sub.done();
 		}
+	}
+
+	private List<String> getNpmSudoArgs(boolean global)
+	{
+		List<String> args = new ArrayList<String>(8);
+		if (global)
+		{
+			if (!PlatformUtil.isWindows())
+			{
+				args.add("sudo"); //$NON-NLS-1$
+				args.add("-S"); //$NON-NLS-1$
+				args.add("--"); //$NON-NLS-1$
+			}
+			args.add(npmPath.toOSString());
+			args.add(GLOBAL_ARG);
+		}
+		else
+		{
+			args.add(npmPath.toOSString());
+		}
+		return args;
 	}
 
 	public IStatus uninstall(String packageName, String displayName, boolean global, char[] password,

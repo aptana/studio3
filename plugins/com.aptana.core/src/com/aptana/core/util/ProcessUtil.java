@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
@@ -297,6 +298,56 @@ public class ProcessUtil
 			{
 				errFile.delete();
 			}
+		}
+	}
+
+	/**
+	 * Launches the process, pipes input to STDIN and returns an IStatus representing the result of execution. The
+	 * output of the process is displayed onto progress monitor for each line. Exit code of the process is stored in the
+	 * IStatuse.getCode(). Output is stored in IStatus.getMessage(). A non-zero exit code makes it an IStatus with ERROR
+	 * severity. Otherwise it uses OK severity.
+	 * 
+	 * @param command
+	 *            The executable/script to run
+	 * @param input
+	 *            String input to pipe to STDIN after launching the process.
+	 * @param workingDirectory
+	 *            The working directory to use for the process.
+	 * @param environment
+	 *            Environment variable map to use for the process.
+	 * @param monitor
+	 *            Progress monitor to display the output of the progress
+	 * @param arguments
+	 *            A List of String arguments to the command.
+	 * @return
+	 */
+	public static IStatus run(String command, IPath workingDirectory, char[] input, Map<String, String> environment,
+			IProgressMonitor monitor, String... args)
+	{
+		try
+		{
+			Process p = run(command, workingDirectory, environment, args);
+			ProcessRunnable runnable;
+			if (PlatformUtil.isWindows())
+			{
+				runnable = new ProcessRunnable(p, monitor, true);
+			}
+			else
+			{
+				runnable = new SudoCommandProcessRunnable(p, monitor, true, input);
+			}
+			Thread t = new Thread(runnable, "Runnable for " + command); //$NON-NLS-1$
+			t.start();
+			t.join();
+			return runnable.getResult();
+		}
+		catch (CoreException ce)
+		{
+			return ce.getStatus();
+		}
+		catch (Exception e)
+		{
+			return new Status(Status.ERROR, CorePlugin.PLUGIN_ID, e.getMessage());
 		}
 	}
 
