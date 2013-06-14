@@ -26,13 +26,12 @@ public class Messages extends NLS
 	public static String NodeJSService_NoDirectory_0;
 	public static String NodeJSService_NullPathError;
 
+	public static String NodePackageManager_ConfigFailure;
 	public static String NodePackageManager_ERR_NPMNotInstalled;
 	public static String NodePackageManager_FailedInstallError;
 	public static String NodePackageManager_FailedListingError;
 	public static String NodePackageManager_FailedListPackageError;
-
 	public static String NodePackageManager_FailedToDetermineInstalledVersion;
-
 	public static String NodePackageManager_FailedToDetermineLatestVersion;
 	public static String NodePackageManager_InstallingTaskName;
 	public static String NodePackageManager_SudoPrompt;

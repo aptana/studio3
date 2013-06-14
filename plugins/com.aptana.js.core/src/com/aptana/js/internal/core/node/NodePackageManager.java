@@ -8,6 +8,7 @@
 package com.aptana.js.internal.core.node;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -39,11 +40,9 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.PlatformUtil;
-import com.aptana.core.util.ProcessRunnable;
 import com.aptana.core.util.ProcessStatus;
 import com.aptana.core.util.ProcessUtil;
 import com.aptana.core.util.StringUtil;
-import com.aptana.core.util.SudoCommandProcessRunnable;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.core.node.INodePackageManager;
 
@@ -103,6 +102,9 @@ public class NodePackageManager implements INodePackageManager
 	 */
 	private static final String INSTALL = "install"; //$NON-NLS-1$
 	private static final String LIST = "list"; //$NON-NLS-1$
+	private static final String REMOVE = "remove"; //$NON-NLS-1$
+	private static final String CONFIG = "config"; //$NON-NLS-1$
+	private static final String GET = "get"; //$NON-NLS-1$
 
 	private IPath npmPath;
 
@@ -125,96 +127,34 @@ public class NodePackageManager implements INodePackageManager
 	public IStatus install(String packageName, String displayName, boolean global, char[] password,
 			IPath workingDirectory, IProgressMonitor monitor)
 	{
-		SubMonitor sub = SubMonitor.convert(monitor,
-				MessageFormat.format(Messages.NodePackageManager_InstallingTaskName, displayName), 100);
+		String globalPrefixPath = null;
 		try
 		{
-			IPath npmPath = findNPM();
-			if (npmPath == null)
+			/*
+			 * HACK for environments with npm config prefix value set : when sudo npm -g install command is used, the
+			 * global prefix config value for the entire system overrides the global prefix value of the user. So, it
+			 * always install into /usr/lib even though user set a custom value for NPM_CONFIG_PREFIX.
+			 */
+			IPath prefixPath = getConfigPrefixPath();
+			if (prefixPath != null)
 			{
-				throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID,
-						Messages.NodePackageManager_ERR_NPMNotInstalled));
-			}
-
-			List<String> args = new ArrayList<String>(8);
-			if (global)
-			{
-				if (PlatformUtil.isMac() || PlatformUtil.isLinux())
+				List<String> args = CollectionsUtil.newList(CONFIG, GET, PREFIX); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				// TODO: should cache this value as config prefix path ?
+				IStatus npmStatus = runNpmConfig(args, password, global, workingDirectory, monitor);
+				if (npmStatus.isOK())
 				{
-					args.add("sudo"); //$NON-NLS-1$
-					args.add("-S"); //$NON-NLS-1$
-					args.add("--"); //$NON-NLS-1$
-				}
-				args.add(npmPath.toOSString());
-				args.add(GLOBAL_ARG);
-			}
-			else
-			{
-				args.add(npmPath.toOSString());
-			}
-			CollectionsUtil.addToList(args, INSTALL, packageName, COLOR, FALSE);
-
-			Map<String, String> environment;
-			if (PlatformUtil.isWindows())
-			{
-				environment = new HashMap<String, String>(System.getenv());
-			}
-			else
-			{
-				environment = ShellExecutable.getEnvironment();
-			}
-			args.addAll(proxySettings(environment));
-			environment.put(ProcessUtil.REDIRECT_ERROR_STREAM, StringUtil.EMPTY);
-
-			// HACK for TISTUD-4101
-			if (PlatformUtil.isWindows())
-			{
-				IPath pythonExe = ExecutableUtil.find("pythonw.exe", false, null); //$NON-NLS-1$
-				if (pythonExe == null)
-				{
-					// Add python to PATH
-					Bundle bundle = Platform.getBundle("com.appcelerator.titanium.python.win32"); //$NON-NLS-1$
-					if (bundle != null)
+					String prefix = npmStatus.getMessage();
+					// Set the global prefix path only if it is not the default value.
+					if (!prefixPath.toOSString().equals(prefix))
 					{
-						// Windows is wonderful, it sometimes stores in "Path" and "PATH" doesn't work
-						String pathName = "PATH"; //$NON-NLS-1$
-						if (!environment.containsKey(pathName))
-						{
-							pathName = "Path"; //$NON-NLS-1$
-						}
-						String path = environment.get(pathName);
-
-						IPath relative = new Path("."); //$NON-NLS-1$
-						URL bundleURL = FileLocator.find(bundle, relative, null);
-						URL fileURL = FileLocator.toFileURL(bundleURL);
-						File f = new File(fileURL.getPath());
-						if (f.exists())
-						{
-							path = path + File.pathSeparator + new File(f, "python").getCanonicalPath(); //$NON-NLS-1$
-							environment.put(pathName, path);
-						}
+						globalPrefixPath = prefix;
+						setGlobalPrefixPath(password, workingDirectory, monitor, prefixPath.toOSString());
 					}
 				}
 			}
 
-			Process p = ProcessUtil.run(args.get(0), workingDirectory, environment, args.subList(1, args.size())
-					.toArray(new String[args.size() - 1]));
-			sub.worked(5);
-
-			ProcessRunnable runnable;
-			if (global)
-			{
-				runnable = new SudoCommandProcessRunnable(p, sub.newChild(95), true, password);
-			}
-			else
-			{
-				runnable = new ProcessRunnable(p, sub.newChild(95), true);
-			}
-			Thread t = new Thread(runnable, MessageFormat.format("{0} installer", displayName)); //$NON-NLS-1$
-			t.start();
-			t.join();
-
-			IStatus status = runnable.getResult();
+			IStatus status = runNpmInstaller(packageName, displayName, global, password, workingDirectory, INSTALL,
+					monitor);
 			if (status.getSeverity() == IStatus.CANCEL)
 			{
 				return Status.OK_STATUS;
@@ -250,6 +190,7 @@ public class NodePackageManager implements INodePackageManager
 					}
 				}
 			}
+
 			return status;
 		}
 		catch (CoreException ce)
@@ -262,8 +203,28 @@ public class NodePackageManager implements INodePackageManager
 		}
 		finally
 		{
-			sub.done();
+			// Set the global npm prefix path to its original value.
+			if (!StringUtil.isEmpty(globalPrefixPath))
+			{
+				setGlobalPrefixPath(password, workingDirectory, monitor, globalPrefixPath);
+			}
 		}
+	}
+
+	private IStatus setGlobalPrefixPath(char[] password, IPath workingDirectory, IProgressMonitor monitor,
+			String globalPrefixPath)
+	{
+		List<String> args = CollectionsUtil.newList(CONFIG, "set", PREFIX, globalPrefixPath); //$NON-NLS-1$
+		return runNpmConfig(args, password, true, workingDirectory, monitor);
+	}
+
+	private IStatus runNpmConfig(List<String> args, char[] password, boolean global, IPath workingDirectory,
+			IProgressMonitor monitor)
+	{
+		List<String> sudoArgs = getNpmSudoArgs(global);
+		sudoArgs.addAll(args);
+		return ProcessUtil.run(CollectionsUtil.getFirstElement(sudoArgs), workingDirectory, password, null, monitor,
+				sudoArgs.subList(1, sudoArgs.size()).toArray(new String[sudoArgs.size() - 1]));
 	}
 
 	/**
@@ -534,13 +495,134 @@ public class NodePackageManager implements INodePackageManager
 					Messages.NodePackageManager_ERR_NPMNotInstalled));
 		}
 		IStatus status = ProcessUtil.runInBackground(npmPath.toOSString(), null, ShellExecutable.getEnvironment(),
-				"config", "get", key); //$NON-NLS-1$ //$NON-NLS-2$
+				CONFIG, GET, key); //$NON-NLS-1$ //$NON-NLS-2$
 		if (!status.isOK())
 		{
 			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
-					"Failed to get value of npm config key {0}", key)));
+					Messages.NodePackageManager_ConfigFailure, key)));
 		}
 		return status.getMessage().trim();
+	}
+
+	private IStatus runNpmInstaller(String packageName, String displayName, boolean global, char[] password,
+			IPath workingDirectory, String command, IProgressMonitor monitor) throws CoreException, IOException,
+			InterruptedException
+	{
+		SubMonitor sub = SubMonitor.convert(monitor,
+				MessageFormat.format(Messages.NodePackageManager_InstallingTaskName, displayName), 100);
+		IPath npmPath = findNPM();
+		if (npmPath == null)
+		{
+			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID,
+					Messages.NodePackageManager_ERR_NPMNotInstalled));
+		}
+		try
+		{
+			List<String> args = getNpmSudoArgs(global);
+			CollectionsUtil.addToList(args, command, packageName, COLOR, FALSE);
+
+			Map<String, String> environment;
+			if (PlatformUtil.isWindows())
+			{
+				environment = new HashMap<String, String>(System.getenv());
+			}
+			else
+			{
+				environment = ShellExecutable.getEnvironment();
+			}
+			args.addAll(proxySettings(environment));
+			environment.put(ProcessUtil.REDIRECT_ERROR_STREAM, StringUtil.EMPTY);
+
+			// HACK for TISTUD-4101
+			if (PlatformUtil.isWindows())
+			{
+				IPath pythonExe = ExecutableUtil.find("pythonw.exe", false, null); //$NON-NLS-1$
+				if (pythonExe == null)
+				{
+					// Add python to PATH
+					Bundle bundle = Platform.getBundle("com.appcelerator.titanium.python.win32"); //$NON-NLS-1$
+					if (bundle != null)
+					{
+						// Windows is wonderful, it sometimes stores in "Path" and "PATH" doesn't work
+						String pathName = "PATH"; //$NON-NLS-1$
+						if (!environment.containsKey(pathName))
+						{
+							pathName = "Path"; //$NON-NLS-1$
+						}
+						String path = environment.get(pathName);
+
+						IPath relative = new Path("."); //$NON-NLS-1$
+						URL bundleURL = FileLocator.find(bundle, relative, null);
+						URL fileURL = FileLocator.toFileURL(bundleURL);
+						File f = new File(fileURL.getPath());
+						if (f.exists())
+						{
+							path = path + File.pathSeparator + new File(f, "python").getCanonicalPath(); //$NON-NLS-1$
+							environment.put(pathName, path);
+						}
+					}
+				}
+			}
+
+			return ProcessUtil.run(CollectionsUtil.getFirstElement(args), workingDirectory, password, environment,
+					monitor, args.subList(1, args.size()).toArray(new String[args.size() - 1]));
+		}
+		finally
+		{
+			sub.done();
+		}
+	}
+
+	private List<String> getNpmSudoArgs(boolean global)
+	{
+		List<String> args = new ArrayList<String>(8);
+		if (global)
+		{
+			if (!PlatformUtil.isWindows())
+			{
+				args.add("sudo"); //$NON-NLS-1$
+				args.add("-S"); //$NON-NLS-1$
+				args.add("--"); //$NON-NLS-1$
+			}
+			args.add(npmPath.toOSString());
+			args.add(GLOBAL_ARG);
+		}
+		else
+		{
+			args.add(npmPath.toOSString());
+		}
+		return args;
+	}
+
+	public IStatus uninstall(String packageName, String displayName, boolean global, char[] password,
+			IProgressMonitor monitor) throws CoreException
+	{
+		try
+		{
+			IStatus status = runNpmInstaller(packageName, displayName, global, password, null, REMOVE, monitor);
+			if (status.getSeverity() == IStatus.CANCEL)
+			{
+				return Status.OK_STATUS;
+			}
+			if (!status.isOK())
+			{
+				String message = status.getMessage();
+				IdeLog.logError(JSCorePlugin.getDefault(),
+						MessageFormat.format("Failed to uninstall {0}.\n{1}", packageName, message)); //$NON-NLS-1$
+				return new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
+						Messages.NodePackageManager_FailedInstallError, packageName));
+			}
+			return status;
+		}
+		catch (CoreException e)
+		{
+			return e.getStatus();
+		}
+		catch (Exception e)
+		{
+			return new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, e.getMessage(), e);
+		}
+
 	}
 
 	// When in global mode, executables are linked into {prefix}/bin on Unix, or directly into {prefix} on Windows.
