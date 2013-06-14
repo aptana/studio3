@@ -224,7 +224,7 @@ public class NodePackageManager implements INodePackageManager
 		List<String> sudoArgs = getNpmSudoArgs(global);
 		sudoArgs.addAll(args);
 		return ProcessUtil.run(CollectionsUtil.getFirstElement(sudoArgs), workingDirectory, password, null, monitor,
-				sudoArgs.subList(1, sudoArgs.size()).toArray(new String[sudoArgs.size() - 1]));
+				CollectionsUtil.toArray(sudoArgs, 1, sudoArgs.size()));
 	}
 
 	/**
@@ -565,7 +565,7 @@ public class NodePackageManager implements INodePackageManager
 			}
 
 			return ProcessUtil.run(CollectionsUtil.getFirstElement(args), workingDirectory, password, environment,
-					monitor, args.subList(1, args.size()).toArray(new String[args.size() - 1]));
+					monitor, CollectionsUtil.toArray(args, 1, args.size()));
 		}
 		finally
 		{

@@ -82,6 +82,21 @@ public class CollectionsUtil
 	}
 
 	/**
+	 * Converts a list to a new copy of array based on the start index and end index.
+	 * 
+	 * @param list
+	 * @param startIndex
+	 * @param endIndex
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public static final <T> T[] toArray(List<T> list, int startIndex, int endIndex)
+	{
+		List<T> subList = list.subList(startIndex, endIndex);
+		return (T[]) subList.toArray();
+	}
+
+	/**
 	 * Add a varargs list of items into a set. If the set or items are null then no action is performed. Note that the
 	 * destination set has no requirements other than it must be a Set of the source item's type. This allows the
 	 * destination to be used, for example, as an accumulator.<br>

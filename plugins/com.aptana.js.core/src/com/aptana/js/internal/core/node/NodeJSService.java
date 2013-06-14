@@ -30,11 +30,9 @@ import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.PlatformUtil;
-import com.aptana.core.util.ProcessRunnable;
 import com.aptana.core.util.ProcessStatus;
 import com.aptana.core.util.ProcessUtil;
 import com.aptana.core.util.StringUtil;
-import com.aptana.core.util.SudoCommandProcessRunnable;
 import com.aptana.core.util.VersionUtil;
 import com.aptana.ide.core.io.downloader.DownloadManager;
 import com.aptana.js.core.JSCorePlugin;
@@ -138,16 +136,10 @@ public class NodeJSService implements INodeJSService
 			}
 			else
 			{
-				Process p = ProcessUtil.run("sudo", Path.ROOT,//$NON-NLS-1$
-						"-S", "--",//$NON-NLS-1$ //$NON-NLS-2$
+				status = ProcessUtil.run("sudo", Path.ROOT,//$NON-NLS-1$
+						password, null, sub.newChild(95), "-S", "--",//$NON-NLS-1$ //$NON-NLS-2$
 						"/usr/sbin/installer", "-pkg", file.getAbsolutePath(), "-target", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						"/"); //$NON-NLS-1$
-				ProcessRunnable runnable = new SudoCommandProcessRunnable(p, sub.newChild(95), true, password);
-				Thread t = new Thread(runnable, "NodeJS installer"); //$NON-NLS-1$
-				t.start();
-				t.join();
-
-				status = runnable.getResult();
 			}
 			// Report the status from the installer.
 			if (!status.isOK())
