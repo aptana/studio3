@@ -83,6 +83,7 @@
 
 	private final List<IRecoveryStrategy> recoveryStrategies;
 	private JSFlexScanner fScanner;
+	private IProblem.Severity fSemicolonSeverity = IProblem.Severity.WARNING;
 
     /**
      * attachPostDocumentationBlocks
@@ -218,6 +219,8 @@
 	protected synchronized void parse(IParseState parseState, WorkingParseResult working) throws java.lang.Exception
 	{
 		fWorking = working;
+		String severity = Platform.getPreferencesService().getString(JSCorePlugin.PLUGIN_ID, IPreferenceConstants.PREF_MISSING_SEMICOLON_SEVERITY, null, null);
+		fSemicolonSeverity = IProblem.Severity.create(severity);
 
 		// make sure we have some source
 		String source = parseState.getSource();
@@ -380,8 +383,7 @@
 			{
 				boolean recovered = super.recover(parser, lastToken, currentToken, in, report);
 				{
-					String severity = Platform.getPreferencesService().getString(JSCorePlugin.PLUGIN_ID, IPreferenceConstants.PREF_MISSING_SEMICOLON_SEVERITY, null, null);
-					fWorking.addError(new ParseError(IJSConstants.CONTENT_TYPE_JS, lastToken, Messages.JSParser_MissingSemicolonMsg, IProblem.Severity.create(severity)));
+					fWorking.addError(new ParseError(IJSConstants.CONTENT_TYPE_JS, lastToken, Messages.JSParser_MissingSemicolonMsg, fSemicolonSeverity));
 				}
 				return recovered;
 			}
