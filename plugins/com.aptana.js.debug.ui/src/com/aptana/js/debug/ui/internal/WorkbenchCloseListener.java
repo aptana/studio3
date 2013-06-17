@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -27,38 +27,65 @@ import com.aptana.js.debug.ui.JSDebugUIPlugin;
 /**
  * @author Max Stepanov
  */
-public final class WorkbenchCloseListener implements Listener {
-	private WorkbenchCloseListener() {
+public final class WorkbenchCloseListener implements Listener
+{
+	private WorkbenchCloseListener()
+	{
 	}
 
 	/*
 	 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets. Event)
 	 */
-	public void handleEvent(Event event) {
+	public void handleEvent(Event event)
+	{
 		if (event.widget instanceof Shell && PlatformUI.getWorkbench().getWorkbenchWindowCount() == 1
-				&& PlatformUI.getWorkbench().getWorkbenchWindows()[0].getShell().equals(event.widget)) {
+				&& PlatformUI.getWorkbench().getWorkbenchWindows()[0].getShell().equals(event.widget))
+		{
 			// last workbench window is about to close
-			if (DebugOptionsManager.isDebuggerActive(JSDebugModel.getModelIdentifier())) {
+
+			String modelIdentifier = JSDebugModel.getModelIdentifier();
+			boolean debuggerActive = DebugOptionsManager.isDebuggerActive(modelIdentifier);
+			boolean profilerActive = DebugOptionsManager.isProfilerActive(modelIdentifier);
+			if (debuggerActive || profilerActive)
+			{
 				IEclipsePreferences preferences = EclipseUtil.instanceScope().getNode(JSDebugUIPlugin.PLUGIN_ID);
-				if (!preferences.getBoolean(IJSDebugUIConstants.PREF_CONFIRM_EXIT_DEBUGGER, true)) {
+				if (!preferences.getBoolean(IJSDebugUIConstants.PREF_CONFIRM_EXIT_DEBUGGER, true))
+				{
 					return;
 				}
 				event.doit = false;
-				MessageDialogWithToggle dlg = MessageDialogWithToggle.openOkCancelConfirm((Shell) event.widget,
-						Messages.WorkbenchCloseListener_ConfirmDebuggerExit,
-						Messages.WorkbenchCloseListener_DebuggerIsActive_DoYouWantToExit,
-						Messages.WorkbenchCloseListener_AlwaysExitDebuggerWithoutPrompt, false, null, null);
+				MessageDialogWithToggle dlg;
+
+				if (debuggerActive)
+				{
+					dlg = MessageDialogWithToggle.openOkCancelConfirm((Shell) event.widget,
+							Messages.WorkbenchCloseListener_ConfirmDebuggerExit,
+							Messages.WorkbenchCloseListener_DebuggerIsActive_DoYouWantToExit,
+							Messages.WorkbenchCloseListener_AlwaysExitDebuggerWithoutPrompt, false, null, null);
+				}
+				else
+				{
+					dlg = MessageDialogWithToggle.openOkCancelConfirm((Shell) event.widget,
+							Messages.WorkbenchCloseListener_ConfirmProfilerExit,
+							Messages.WorkbenchCloseListener_ProfilerIsActive_DoYouWantToExit,
+							Messages.WorkbenchCloseListener_AlwaysExitProfilerWithoutPrompt, false, null, null);
+				}
 				int returnValue = dlg.getReturnCode();
-				if (returnValue != IDialogConstants.OK_ID) {
+				if (returnValue != IDialogConstants.OK_ID)
+				{
 					// SWT hack - discard close event
 					event.type = SWT.None;
 					return;
 				}
-				if (dlg.getToggleState()) {
+				if (dlg.getToggleState())
+				{
 					preferences.putBoolean(IJSDebugUIConstants.PREF_CONFIRM_EXIT_DEBUGGER, false);
-					try {
+					try
+					{
 						preferences.flush();
-					} catch (BackingStoreException e) {
+					}
+					catch (BackingStoreException e)
+					{
 						IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 					}
 				}
@@ -66,9 +93,12 @@ public final class WorkbenchCloseListener implements Listener {
 		}
 	}
 
-	public static void init() {
-		PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
-			public void run() {
+	public static void init()
+	{
+		PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable()
+		{
+			public void run()
+			{
 				Display.getCurrent().addFilter(SWT.Close, new WorkbenchCloseListener());
 			}
 		});

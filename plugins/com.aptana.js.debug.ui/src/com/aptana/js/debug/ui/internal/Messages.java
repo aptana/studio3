@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -12,13 +12,16 @@ import org.eclipse.osgi.util.NLS;
 /**
  * @author Ingo Muschenetz
  */
-public final class Messages extends NLS {
+public final class Messages extends NLS
+{
 	private static final String BUNDLE_NAME = "com.aptana.js.debug.ui.internal.messages"; //$NON-NLS-1$
 
-	private Messages() {
+	private Messages()
+	{
 	}
 
-	static {
+	static
+	{
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
@@ -204,4 +207,8 @@ public final class Messages extends NLS {
 	 * InstallDebuggerPromptStatusHandler_ExtensionNotInstalled
 	 */
 	public static String InstallDebuggerPromptStatusHandler_ExtensionNotInstalled;
+
+	public static String WorkbenchCloseListener_ConfirmProfilerExit;
+	public static String WorkbenchCloseListener_ProfilerIsActive_DoYouWantToExit;
+	public static String WorkbenchCloseListener_AlwaysExitProfilerWithoutPrompt;
 }
