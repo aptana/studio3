@@ -89,11 +89,21 @@ public class CollectionsUtil
 	 * @param endIndex
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "cast" })
 	public static final <T> T[] toArray(List<T> list, int startIndex, int endIndex)
 	{
+		if (isEmpty(list))
+		{
+			// FIXME I think this will break at runtime!
+			return (T[]) new Object[0];
+		}
 		List<T> subList = list.subList(startIndex, endIndex);
-		return (T[]) subList.toArray();
+		return (T[]) subList.toArray((T[]) java.lang.reflect.Array.newInstance(list.get(0).getClass(), subList.size()));
+	}
+
+	public static final <T> T[] toArray(List<T> list)
+	{
+		return toArray(list, 0, list.size());
 	}
 
 	/**
