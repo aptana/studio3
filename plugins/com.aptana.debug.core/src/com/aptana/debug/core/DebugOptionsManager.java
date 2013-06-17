@@ -104,11 +104,11 @@ public final class DebugOptionsManager implements IDebugEventSetListener {
 	}
 
 	public static boolean isDebuggerActive(String modelIdentifier) {
-		return "true".equals(System.getProperty(modelIdentifier + DEBUGGER_ACTIVE_SUFFIX)); //$NON-NLS-1$
+		return Boolean.TRUE.toString().equals(System.getProperty(modelIdentifier + DEBUGGER_ACTIVE_SUFFIX));
 	}
 
 	public static boolean isProfilerActive(String modelIdentifier) {
-		return "true".equals(System.getProperty(modelIdentifier + PROFILER_ACTIVE_SUFFIX)); //$NON-NLS-1$
+		return Boolean.TRUE.toString().equals(System.getProperty(modelIdentifier + PROFILER_ACTIVE_SUFFIX));
 	}
 
 	/**
@@ -281,9 +281,9 @@ public final class DebugOptionsManager implements IDebugEventSetListener {
 					case DebugEvent.CREATE:
 						String launchMode = ((IDebugTarget) event.getSource()).getLaunch().getLaunchMode();
 						if (ILaunchManager.DEBUG_MODE.equals(launchMode)) {
-							System.setProperty(modelIdentifier + DEBUGGER_ACTIVE_SUFFIX, "true"); //$NON-NLS-1$
+							System.setProperty(modelIdentifier + DEBUGGER_ACTIVE_SUFFIX, Boolean.TRUE.toString());
 						} else if (ILaunchManager.PROFILE_MODE.equals(launchMode)) {
-							System.setProperty(modelIdentifier + PROFILER_ACTIVE_SUFFIX, "true"); //$NON-NLS-1$
+							System.setProperty(modelIdentifier + PROFILER_ACTIVE_SUFFIX, Boolean.TRUE.toString());
 						}
 						break;
 					case DebugEvent.TERMINATE:
