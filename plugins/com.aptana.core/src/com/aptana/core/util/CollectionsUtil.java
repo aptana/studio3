@@ -94,8 +94,7 @@ public class CollectionsUtil
 	{
 		if (isEmpty(list))
 		{
-			// FIXME I think this will break at runtime!
-			return (T[]) new Object[0];
+			return (T[]) list.toArray();
 		}
 		List<T> subList = list.subList(startIndex, endIndex);
 		return (T[]) subList.toArray((T[]) java.lang.reflect.Array.newInstance(list.get(0).getClass(), subList.size()));
