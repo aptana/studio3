@@ -12,14 +12,13 @@ import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.List;
 
-import javax.print.attribute.standard.Severity;
-
 import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 
+import com.aptana.core.build.IProblem;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
@@ -262,12 +261,12 @@ public class HTMLParserTest extends TestCase
 		assertEquals(2, errors.size());
 
 		IParseError divError = errors.get(0);
-		assertEquals(Severity.WARNING, divError.getSeverity());
+		assertEquals(IProblem.Severity.WARNING, divError.getSeverity());
 		assertEquals(13, divError.getOffset());
 		assertEquals(MessageFormat.format(Messages.HTMLParser_missing_end_tag_error, "div"), divError.getMessage());
 
 		IParseError titleError = errors.get(1);
-		assertEquals(Severity.WARNING, titleError.getSeverity());
+		assertEquals(IProblem.Severity.WARNING, titleError.getSeverity());
 		assertEquals(0, titleError.getOffset());
 		assertEquals(MessageFormat.format(Messages.HTMLParser_missing_end_tag_error, "title"), titleError.getMessage());
 	}
