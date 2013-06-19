@@ -79,6 +79,9 @@
          <command
                commandId="com.aptana.samples.ui.commands.import"
                style="push">
+            <visibleWhen
+                  checkEnabled="true">
+            </visibleWhen>
          </command>
       </menuContribution>
       <menuContribution
@@ -144,6 +147,13 @@
       <handler
             class="com.aptana.samples.ui.handlers.ImportSampleHandler"
             commandId="com.aptana.samples.ui.commands.import">
+         <activeWhen>
+            <iterate>
+               <instanceof
+                     value="com.aptana.samples.model.IProjectSample">
+               </instanceof>
+            </iterate>
+         </activeWhen>
       </handler>
    </extension>
    <extension
