@@ -293,7 +293,10 @@ public final class DebugOptionsManager implements IDebugEventSetListener {
 				} else {
 					IResource resource = marker.getResource();
 					if (resource instanceof IWorkspaceRoot) {
-						uri = URI.create((String) marker.getAttribute(IDebugCoreConstants.BREAKPOINT_LOCATION));
+						String bpLocation = (String) marker.getAttribute(IDebugCoreConstants.BREAKPOINT_LOCATION);
+						if(bpLocation != null) {
+							uri = URI.create(bpLocation);
+						}
 					} else {
 						uri = resource.getLocation().makeAbsolute().toFile().toURI();
 					}
