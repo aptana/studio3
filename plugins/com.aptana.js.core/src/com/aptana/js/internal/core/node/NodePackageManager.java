@@ -138,7 +138,7 @@ public class NodePackageManager implements INodePackageManager
 			IPath prefixPath = getConfigPrefixPath();
 			if (prefixPath != null)
 			{
-				List<String> args = CollectionsUtil.newList(CONFIG, GET, PREFIX); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				List<String> args = CollectionsUtil.newList(CONFIG, GET, PREFIX);
 				// TODO: should cache this value as config prefix path ?
 				IStatus npmStatus = runNpmConfig(args, password, global, workingDirectory, monitor);
 				if (npmStatus.isOK())
