@@ -12,6 +12,9 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
@@ -101,11 +104,20 @@ public class SamplesView extends ViewPart
 
 	protected TreeViewer createTreeViewer(Composite parent)
 	{
-		TreeViewer treeViewer = new TreeViewer(parent, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL);
+		final TreeViewer treeViewer = new TreeViewer(parent, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL);
 		treeViewer.setContentProvider(new SamplesViewContentProvider());
 		treeViewer.setLabelProvider(new SamplesViewLabelProvider());
 		treeViewer.setInput(getSamplesManager());
 		treeViewer.setComparator(new ViewerComparator());
+		treeViewer.addDoubleClickListener(new IDoubleClickListener()
+		{
+			public void doubleClick(DoubleClickEvent event)
+			{
+				IStructuredSelection thisSelection = (IStructuredSelection) event.getSelection();
+				Object element = thisSelection.getFirstElement();
+				treeViewer.setExpandedState(element, !treeViewer.getExpandedState(element));
+			}
+		});
 		ColumnViewerToolTipSupport.enableFor(treeViewer);
 
 		return treeViewer;
