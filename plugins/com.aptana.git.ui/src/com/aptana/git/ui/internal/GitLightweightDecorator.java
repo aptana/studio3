@@ -74,8 +74,12 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 	public GitLightweightDecorator()
 	{
 		cache = new HashMap<RepoBranch, TimestampedString>();
-		getGitRepositoryManager().addListener(this);
-		getGitRepositoryManager().addListenerToEachRepository(this);
+		IGitRepositoryManager manager = getGitRepositoryManager();
+		if (manager != null)
+		{
+			manager.addListener(this);
+			manager.addListenerToEachRepository(this);
+		}
 		fThemeChangeListener = new IPreferenceChangeListener()
 		{
 
@@ -92,7 +96,8 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 
 	protected IGitRepositoryManager getGitRepositoryManager()
 	{
-		return GitPlugin.getDefault().getGitRepositoryManager();
+		GitPlugin plugin = GitPlugin.getDefault();
+		return plugin == null ? null : plugin.getGitRepositoryManager();
 	}
 
 	public void decorate(Object element, IDecoration decoration)
