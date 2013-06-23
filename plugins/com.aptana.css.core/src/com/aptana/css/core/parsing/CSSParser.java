@@ -76,7 +76,7 @@ public class CSSParser extends Parser implements IParser {
 
 		public void syntaxError(Symbol token)
 		{
-		    System.out.println("Error at: "+token.value);
+		    // System.out.println("Error at: "+token.value);
 			if (token == null || fWorking == null)
 			{
 				return;
