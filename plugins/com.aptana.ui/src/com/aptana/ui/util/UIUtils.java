@@ -441,8 +441,12 @@ public final class UIUtils
 				if (kind == MessageDialog.INFORMATION)
 				{
 					// for info messages, we show the toast popup
-					GenericInfoPopupDialog dialog = new GenericInfoPopupDialog(UIUtils.getActiveWorkbenchWindow()
-							.getShell(), title, message);
+					IWorkbenchWindow window = UIUtils.getActiveWorkbenchWindow();
+					if (window == null)
+					{
+						return Window.CANCEL;
+					}
+					GenericInfoPopupDialog dialog = new GenericInfoPopupDialog(window.getShell(), title, message);
 					return dialog.open();
 				}
 				return MessageDialog.open(kind, UIUtils.getActiveWorkbenchWindow().getShell(), title, message, SWT.NONE) ? Window.OK

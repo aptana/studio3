@@ -136,7 +136,7 @@ public class SamplesManager implements ISamplesManager
 		sampleRefsByCategory = new HashMap<String, List<SamplesReference>>();
 		samplesById = new HashMap<String, SamplesReference>();
 		bundleSamplesByCategory = new HashMap<String, List<SamplesReference>>();
-		bundleSamplesById = new HashMap<String, SamplesReference>();
+		bundleSamplesById = Collections.synchronizedMap(new HashMap<String, SamplesReference>());
 		bundleSamples = new ArrayList<ProjectSampleElement>();
 		sampleListeners = new ArrayList<ISampleListener>();
 
@@ -414,9 +414,14 @@ public class SamplesManager implements ISamplesManager
 		bundleSamples = elements;
 
 		// removes the existing samples loaded from the rubles
-		Collection<SamplesReference> samples = new ArrayList<SamplesReference>(bundleSamplesById.values());
-		bundleSamplesByCategory.clear();
-		bundleSamplesById.clear();
+		Collection<SamplesReference> bundles = bundleSamplesById.values();
+		Collection<SamplesReference> samples;
+		synchronized (bundleSamplesById)
+		{
+			samples = new ArrayList<SamplesReference>(bundles);
+			bundleSamplesByCategory.clear();
+			bundleSamplesById.clear();
+		}
 		for (SamplesReference sample : samples)
 		{
 			fireSampleRemoved(sample);
