@@ -429,7 +429,7 @@ public class EclipseUtil
 		{
 			job.setSystem(!showSystemJobs());
 		}
-		catch (IllegalStateException e)
+		catch (Exception e)
 		{
 			// ignore
 		}
