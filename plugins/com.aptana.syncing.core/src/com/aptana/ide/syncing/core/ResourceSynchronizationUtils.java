@@ -50,7 +50,7 @@ public class ResourceSynchronizationUtils
 
 		try
 		{
-			return Boolean.parseBoolean(container.getPersistentProperty(REMEMBER_DECISION));
+			return container.isAccessible() && Boolean.parseBoolean(container.getPersistentProperty(REMEMBER_DECISION));
 		}
 		catch (CoreException e)
 		{
@@ -77,7 +77,10 @@ public class ResourceSynchronizationUtils
 
 		try
 		{
-			container.setPersistentProperty(REMEMBER_DECISION, String.valueOf(rememberMyDecision));
+			if (container.isAccessible())
+			{
+				container.setPersistentProperty(REMEMBER_DECISION, String.valueOf(rememberMyDecision));
+			}
 		}
 		catch (CoreException e)
 		{
@@ -102,7 +105,10 @@ public class ResourceSynchronizationUtils
 
 		try
 		{
-			return container.getPersistentProperty(LAST_SYNC_CONNECTION);
+			if (container.isAccessible())
+			{
+				return container.getPersistentProperty(LAST_SYNC_CONNECTION);
+			}
 		}
 		catch (CoreException e)
 		{
@@ -131,13 +137,16 @@ public class ResourceSynchronizationUtils
 
 		try
 		{
-			if (StringUtil.isEmpty(connection))
+			if (container.isAccessible())
 			{
-				container.setPersistentProperty(LAST_SYNC_CONNECTION, null);
-			}
-			else
-			{
-				container.setPersistentProperty(LAST_SYNC_CONNECTION, connection);
+				if (StringUtil.isEmpty(connection))
+				{
+					container.setPersistentProperty(LAST_SYNC_CONNECTION, null);
+				}
+				else
+				{
+					container.setPersistentProperty(LAST_SYNC_CONNECTION, connection);
+				}
 			}
 		}
 		catch (CoreException e)
