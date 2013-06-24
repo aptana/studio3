@@ -313,10 +313,13 @@ public class ContentAssistPreferencePage extends PropertyAndPreferenceFieldEdito
 			try
 			{
 				IProject project = getProject();
-				String[] aptanaNatures = ResourceUtil.getAptanaNatures(project.getDescription());
-				if (!ArrayUtil.isEmpty(aptanaNatures))
+				if (project.isAccessible())
 				{
-					userAgentsByNatureID.put(aptanaNatures[0], manager.getActiveUserAgents(project));
+					String[] aptanaNatures = ResourceUtil.getAptanaNatures(project.getDescription());
+					if (!ArrayUtil.isEmpty(aptanaNatures))
+					{
+						userAgentsByNatureID.put(aptanaNatures[0], manager.getActiveUserAgents(project));
+					}
 				}
 			}
 			catch (CoreException e)
