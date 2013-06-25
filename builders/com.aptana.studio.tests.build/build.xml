@@ -280,7 +280,7 @@
 		</condition>
 		<property name="configArgs" value="" />
 
-		<java jar="${basedir}/../eclipse.platform.releng.basebuilder/plugins/org.eclipse.equinox.launcher.jar" fork="true" maxmemory="512m" error="${buildlogs}/perfgenerror.txt" output="${buildlogs}/perfgenoutput.txt">
+		<java jar="${eclipse.perf}/eclipse.platform.releng.basebuilder/plugins/org.eclipse.equinox.launcher.jar" fork="true" maxmemory="512m" error="${buildlogs}/perfgenerror.txt" output="${buildlogs}/perfgenoutput.txt">
 			<arg line="${configArgs} -consolelog -nosplash -data ${buildDirectory}/perf-workspace -application org.eclipse.test.performance.ui.resultGenerator
 						-current ${buildId}
 						-jvm ${java.version}
