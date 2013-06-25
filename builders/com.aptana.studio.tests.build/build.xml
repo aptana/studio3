@@ -13,6 +13,9 @@
     </description>
 
 	<property file="build_local.properties" />
+	<property name="postingDirectory" value="${buildDirectory}" />
+	<property name="publishingContent" value="${basedir}/publishingFiles" />
+
 	<taskdef resource="net/sf/antcontrib/antlib.xml">
 		<classpath>
 			<pathelement location="${basedir}/ant-contrib/ant-contrib.jar" />
@@ -216,6 +219,8 @@
 		</antcall>
 
 		<antcall target="-post-test" />
+		<!-- Generate performance chart -->
+		<antcall target="generatePerformanceResults" />
 	</target>
 
 	<target name="run-ui-test">
@@ -249,7 +254,6 @@
 			<property name="extraVMargs" value="-Demma.coverage.out.file=${buildDirectory}/coverage.emma -Dosgi.dev=${basedir}/lib/emma.jar -Djunit.properties=${basedir}/build.properties" />
 		</ant>
 	</target>
-
 	<target name="run-perf-test">
 		<ant target="ui-test" antfile="${library-file}" dir="${baseLocation}">
 			<property name="timeout" value="${test.timeout}" />
@@ -263,5 +267,44 @@
 			<property name="classname" value="${test.classname}" />
 			<property name="extraVMargs" value="-XX:MaxPermSize=384m -Djunit.properties=${basedir}/build.properties -Declipse.perf.dbloc=${perf.db} -Declipse.perf.config=build=${studio.version};host=${computer.hostname};jvm=${java.version} -Dsetup.override.eclipseArgs=vm=/usr/bin/java ${extraPerfArgs}" />
 		</ant>
+	</target>
+	<target name="generatePerformanceResults">
+		<mkdir dir="${buildDirectory}/${buildLabel}/performance" />
+		<mkdir dir="${postingDirectory}/${buildLabel}/performance" />
+		<taskdef name="performanceResults" classname="org.eclipse.releng.performance.PerformanceResultHtmlGenerator" />
+		<condition property="configArgs" value="-ws gtk -arch ppc">
+			<equals arg1="${os.arch}" arg2="ppc64" />
+		</condition>
+		<condition property="configArgs" value="-ws gtk -arch x86">
+			<equals arg1="${os.arch}" arg2="i386" />
+		</condition>
+		<property name="configArgs" value="" />
+
+		<java jar="${basedir}/../eclipse.platform.releng.basebuilder/plugins/org.eclipse.equinox.launcher.jar" fork="true" maxmemory="512m" error="${buildlogs}/perfgenerror.txt" output="${buildlogs}/perfgenoutput.txt">
+			<arg line="${configArgs} -consolelog -nosplash -data ${buildDirectory}/perf-workspace -application org.eclipse.test.performance.ui.resultGenerator
+						-current ${buildId}
+						-jvm ${java.version}
+						-print
+						-output ${postingDirectory}/${buildLabel}/performance/
+						-config %hudson-ubuntu_%
+			            -dataDir ${postingDirectory}/data/v37
+						-config.properties ${eclipse.perf.config.descriptors}
+						-scenario.pattern com.%
+						-baseline 3.1.0.1330064530
+						-fingerprints"/>
+			<!-- baselines arguments are no longer necessary since bug https://bugs.eclipse.org/bugs/show_bug.cgi?id=209322 has been fixed...
+						-baseline ${eclipse.perf.ref}
+						-baseline.prefix R-3.4_200806172000
+			-->
+			<!-- add this argument to list above when there are milestone builds to highlight 
+			-highlight.latest 3.3M1_
+			-->
+			<env key="LD_LIBRARY_PATH" value="${basedir}/../org.eclipse.releng.basebuilder" />
+			<sysproperty key="eclipse.perf.dbloc" value="${perf.db}" />
+		</java>
+
+		<performanceResults xmlDirectoryName="${postingDirectory}/${buildLabel}/performance/xml" dropDirectoryName="${postingDirectory}/${buildLabel}" testResultsTemplateFileName="${publishingContent}/templateFiles/performance.php.template" testResultsHtmlFileName="performance/performance.php" hrefTestResultsTargetPath="html" testManifestFileName="${publishingContent}/performanceTestManifest.xml" />
+
+		<replace file="${postingDirectory}/${buildLabel}/performance/performance.php" token="@buildType@" value="${buildType}" />
 	</target>
 </project>

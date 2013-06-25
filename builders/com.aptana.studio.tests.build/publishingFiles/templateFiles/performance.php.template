@@ -1,0 +1,95 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" href="../../../../../default_style.css" type="text/css">
+<TITLE>Performance Results</TITLE></head>
+<body>
+<p><B><FONT FACE="Verdana" SIZE="+3">Performance Results</FONT></B><BR><BR> <TABLE BORDER=0 CELLSPACING=5 CELLPADDING=2 WIDTH="100%" > 
+<TR> <TD ALIGN=LEFT VALIGN=TOP COLSPAN="3" BGCOLOR="#0080C0"><B><FONT COLOR="#FFFFFF" FACE="Arial,Helvetica"> 
+Performance fingerprint</FONT></B></TD></TR></TABLE>
+<?php
+    $performance = dir(".");
+    $index=0;
+    $fpcount=0;
+
+    $fp_file="global_fp.php";
+    if (file_exists($fp_file)) {
+        include($fp_file);
+    }
+    while ($file = $performance->read()) {
+        if (strstr($file,".php")){
+            $parts=split(".php",$file);
+            $component=$parts[0];
+            $start=substr($component, 0, 11);
+            if ($start == "org.eclipse") {
+                $componentFps[$fpcount]=$file;
+                $fpcount++;
+            }
+        }
+    }
+?>
+<P><A NAME="unit"></A>* Missing reference data. Build used for comparison specified 
+in ending parenthesis.<BR>green: faster, less memory
+<BR>red: slower, more memory
+<BR>grey: regression with explanation. Click the bar for notes on this scenario.
+<BR>x axis: difference between current value and baseline value as percentage<BR></P>
+<TABLE BORDER=0 CELLSPACING=5 CELLPADDING=2 WIDTH="100%" > 
+<TR> <TD ALIGN=LEFT VALIGN=TOP COLSPAN="3" BGCOLOR="#0080C0"><B><FONT COLOR="#FFFFFF" FACE="Arial,Helvetica"> 
+Detailed performance data grouped by scenario prefix</FONT></B></TD></TR></TABLE>
+<?php
+
+    if (count($componentFps)==0){
+        echo "Results pending.";
+    }
+    else {
+        $type=$_SERVER['QUERY_STRING'];
+        if ($type=="") {
+            $type="fp_type=0";
+        }
+        sort($componentFps);
+
+        for ($counter=0;$counter<count($componentFps);$counter++){
+            $parts=split(".php",$componentFps[$counter]);
+            $prefix=$parts[0];
+            $href="<A HREF=\"$componentFps[$counter]?";
+            $href=$href . $type . "\">$prefix*</A><br>";
+            echo $href;
+        }
+    }
+?>
+<p><BR><BR><TABLE BORDER=0 CELLSPACING=5 CELLPADDING=2 WIDTH="100%" > <TR> <TD ALIGN=LEFT VALIGN=TOP COLSPAN="3" BGCOLOR="#0080C0"><B><FONT COLOR="#FFFFFF" FACE="Arial,Helvetica">Performance 
+Unit Test Results for <?php echo "$buildName"; ?> </FONT></B></TD></TR> </TABLE><P></P><TABLE BORDER="0"> 
+</TABLE>** test errors or failures here do not produce Red X's for now**<TABLE WIDTH="77%" BORDER="1"> 
+<TR> <TD WIDTH="81%"><B>Tests Performed</B></TD><TD WIDTH="19%"><B>Errors &amp; 
+Failures</B></TD></TR> %testresults% </TABLE><BR> <A NAME="consolelog"></A><TABLE BORDER=0 CELLSPACING=5 CELLPADDING=2 WIDTH="100%" > 
+<TR> <TD ALIGN=LEFT VALIGN=TOP COLSPAN="3" BGCOLOR="#0080C0"><B><FONT COLOR="#FFFFFF" FACE="Arial,Helvetica"> 
+Console output logs <?php echo "$buildName"; ?> </FONT></B></TD></TR></TABLE><P> 
+<?php
+	$hasNotes = false;
+	$aDirectory = dir("consolelogs");
+	$index = 0;
+	while ($anEntry = $aDirectory->read()) {
+		if ($anEntry != "." && $anEntry != "..") {
+			$logentries[$index] = $anEntry;
+			$index++;
+		}
+	}
+	
+	aDirectory.closedir();
+	sort($logentries);
+
+	for ($i = 0; $i < $index; $i++) {
+		$anEntry = $logentries[$i];
+		$line = "<td><a href=\"consolelogs/$anEntry\">$anEntry</a></td>";
+		echo "<tr>";
+		echo "$line<br>";
+		echo "</tr>";
+		$hasNotes = true;
+	}
+	
+	if (!$hasNotes) {
+		echo "<br>There are no test logs for this build.";
+	}
+	?> </P>
+</body>
+</html>
