@@ -1,0 +1,30 @@
+<contexts>
+ <context id="components" title="Components View">
+    <description>This view shows the performance results in a hierarchical tree:
+Component
+   + Scenario
+      + Test machine
+         + Build
+            + Performance numbers
+
+Typically, the Eclipse builder runs performance tests for each component after the build is made on several performance test machines. Each component defines one or several specific performance test suites made of several test (aka scenario). Several performance numbers (e.g. Elapsed Process Time and CPU Time) are stored for each scenario and all build results are available in the performance results database.
+
+This structure is roughly the same than the one used to generate performance results, hence make it easy to match the numbers in the corresponding page HTML page.</description>
+ </context>
+ <context id="builds" title="Builds view">
+    <description>This view shows the list of all the builds contained in the connected database or in the local data files if no database is connected.
+
+Different fonts are used to display build names depending on the level of knowledge about the corresponding build:
+ - gray+italic: connected to a database but no available local data
+ - gray: connected to a database and local data do not contain any information for this build
+ - black: local data contain information about this build</description>
+ </context>
+ <context id="results" title="Component Results view">
+    <description>This view show for each of the performance machine the entire results since the beginning.
+
+Each tab of this view represent a performance machine (also named config).
+The name of the machine is the name of the tab. The results are displayed in
+a table where each column represents a scenario and each line a build.
+The lines are ordered in descending order (from the most recent to the oldest build).</description>
+ </context>
+</contexts>

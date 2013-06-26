@@ -1,0 +1,7 @@
+# !/bin/sh
+
+#export dbloc=net://minsky.ottawa.ibm.com
+#required when running on Linux Motif
+export LD_LIBRARY_PATH=./../../..
+
+java -Declipse.perf.dbloc=$dbloc -jar ./../../../plugins/org.eclipse.equinox.launcher.jar -application org.eclipse.test.performance.ui.resultGenerator $*

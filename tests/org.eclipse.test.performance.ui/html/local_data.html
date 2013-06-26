@@ -1,0 +1,41 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<title>Local data</title>
+</head>
+
+<body>
+<h1>Local data</h1>
+<p>
+As the connection to the server database is too slow, local files containing
+all necessary information are written while generating performance results on
+the server.
+</p><p>
+The performance results tool then can read these files to avoid long distance
+access to data information. Of course, it's first necessary to copy these files
+on a location easily accessible from the machine where the tool is launched.
+</p><p>
+<i>Notes
+<ul>
+<li>these files are accessible for some authorized users onto
+<b>ottcvs1.ottawa.ibm.com</b> at <b>/home/users/ecperf</b> directory</li>
+<li>SFTP is necessary to copy these files from that location</li>
+</ul>
+</i>
+</p><p>
+To read the local files, select the <b>Local data -> Read...</b> menu item and
+chose the directory where the files have been copied.
+</p><p>
+<i>Notes
+<ul>
+<li>this manual read action only has to be done once, as it will be automatically
+done at the next start of the tool</li>
+<li>no verification is currently done that the local files matches
+the connected DB (if any). Mixing them should give unpredictable results!</li>
+</ul>
+</i>
+</p>
+</body>
+</html>
