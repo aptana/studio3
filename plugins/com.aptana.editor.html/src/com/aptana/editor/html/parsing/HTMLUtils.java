@@ -63,6 +63,12 @@ public class HTMLUtils
 		{
 			return false;
 		}
+		
+		// Support HTML "data-" attributes which mostly used with JavaScript
+
+		if(attributeName.matches("^(data-[a-zA-Z-])$")) {
+			return true;
+		}
 
 		// Load all events once and then generate the unique set of names for them.
 		// TODO Do we need to verify that the attribute is attached to the element?
