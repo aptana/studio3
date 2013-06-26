@@ -223,7 +223,7 @@ public class NodePackageManager implements INodePackageManager
 	{
 		List<String> sudoArgs = getNpmSudoArgs(global);
 		sudoArgs.addAll(args);
-		return ProcessUtil.run(CollectionsUtil.getFirstElement(sudoArgs), workingDirectory, password, null, monitor,
+		return ProcessUtil.run(CollectionsUtil.getFirstElement(sudoArgs), workingDirectory, password, ShellExecutable.getEnvironment(), monitor,
 				sudoArgs.subList(1, sudoArgs.size()).toArray(new String[sudoArgs.size() - 1]));
 	}
 
