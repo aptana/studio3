@@ -284,7 +284,7 @@ private void parse(String[] args) {
 			i++;
 			continue;
 		}
-		if (arg.equals("-jvm")) {
+		if (arg.equals("-vm")) {
 			jvm = args[i + 1];
 			if (jvm.startsWith("-")) {
 				System.out.println("Missing value for "+arg+" parameter");
@@ -772,8 +772,8 @@ private void printUsage() {
 		"	Used to plot current build stream historical data.  Defaults to \"N,I\".\n" +
 		"	Prefixes for values specified for the \"build\" key in the eclipse.perf.config system property. \n\n" +
 
-		"-jvm\n" +
-		"	Value specified in \"jvm\" key in eclipse.perf.config system property for current build.\n\n" +
+		"-vm\n" +
+		"	Value specified in \"vm\" key in eclipse.perf.config system property for current build.\n\n" +
 
 		"-config\n" +
 		"	Comma separated list of config names for which to generate results.\n" +
