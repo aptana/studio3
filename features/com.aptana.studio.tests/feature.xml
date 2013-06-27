@@ -240,6 +240,13 @@
          unpack="false"/>
 
    <plugin
+         id="org.eclipse.test.performance.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="true"/>
+
+   <plugin
          id="org.apache.derby"
          download-size="0"
          install-size="0"
