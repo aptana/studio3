@@ -51,7 +51,10 @@ public abstract class AbstractConfigurationBlockPropertyAndPreferencePage extend
 		super.createControl(parent);
 
 		String helpId = isProjectPreferencePage() ? getProjectHelpId() : getHelpId();
-		PlatformUI.getWorkbench().getHelpSystem().setHelp(getControl(), helpId);
+		if (helpId != null)
+		{
+			PlatformUI.getWorkbench().getHelpSystem().setHelp(getControl(), helpId);
+		}
 	}
 
 	/*
