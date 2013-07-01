@@ -15,6 +15,9 @@
 	<property file="build_local.properties" />
 	<property name="postingDirectory" value="${buildDirectory}" />
 	<property name="publishingContent" value="${basedir}/publishingFiles" />
+	<!--location for buildlogs-->
+	<property name="buildlogs" value="${postingDirectory}/${buildLabel}/buildlogs" />
+	<mkdir dir="${buildlogs}" />
 
 	<taskdef resource="net/sf/antcontrib/antlib.xml">
 		<classpath>
@@ -218,9 +221,10 @@
 			<param name="test.classname" value="com.aptana.studio.tests.all.PerformanceTests" />
 		</antcall>
 
-		<antcall target="-post-test" />
 		<!-- Generate performance chart -->
 		<antcall target="generatePerformanceResults" />
+
+		<antcall target="-post-test" />
 	</target>
 
 	<target name="run-ui-test">
@@ -268,10 +272,11 @@
 			<property name="extraVMargs" value="-XX:MaxPermSize=384m -Djunit.properties=${basedir}/build.properties -Declipse.perf.dbloc=${perf.db} -Declipse.perf.config=build=${studio.version};host=${computer.hostname};jvm=${java.version} -Dsetup.override.eclipseArgs=vm=/usr/bin/java ${extraPerfArgs}" />
 		</ant>
 	</target>
-	<target name="generatePerformanceResults">
-		<mkdir dir="${buildDirectory}/${buildLabel}/performance" />
-		<mkdir dir="${postingDirectory}/${buildLabel}/performance" />
-		<taskdef name="performanceResults" classname="org.eclipse.releng.performance.PerformanceResultHtmlGenerator" />
+	<target name="generatePerformanceResults" description="Generate performance charts">
+		<mkdir dir="${buildDirectory}/${studio.version}/performance" />
+		<mkdir dir="${postingDirectory}/${studio.version}/performance" />
+		<!--TODO run the generated performance results through the template to get better and consistent presentation of data.  
+		<taskdef name="performanceResults" classname="org.eclipse.releng.performance.PerformanceResultHtmlGenerator" /-->
 		<condition property="configArgs" value="-ws gtk -arch ppc">
 			<equals arg1="${os.arch}" arg2="ppc64" />
 		</condition>
@@ -280,17 +285,16 @@
 		</condition>
 		<property name="configArgs" value="" />
 
-		<java jar="${eclipse.perf}/eclipse.platform.releng.basebuilder/plugins/org.eclipse.equinox.launcher.jar" fork="true" maxmemory="512m" error="${buildlogs}/perfgenerror.txt" output="${buildlogs}/perfgenoutput.txt">
-			<arg line="${configArgs} -consolelog -nosplash -data ${buildDirectory}/perf-workspace -application org.eclipse.test.performance.ui.resultGenerator
-						-current ${buildId}
-						-jvm ${java.version}
+		<java jar="${baseLocation}/plugins/${launcher.plugin}.jar" fork="true" failonerror="true" dir="${baseLocation}" error="${buildlogs}/perfgenerror.txt" output="${buildlogs}/perfgenoutput.txt">
+			<arg line="-consolelog -nosplash -data ${buildDirectory}/perf-workspace -application org.eclipse.test.performance.ui.resultGenerator
+						-current ${studio.version}
 						-print
-						-output ${postingDirectory}/${buildLabel}/performance/
+						-javaVersion ${java.version}
+						-output ${postingDirectory}/${studio.version}/performance/
 						-config %hudson-ubuntu_%
-			            -dataDir ${postingDirectory}/data/v37
-						-config.properties ${eclipse.perf.config.descriptors}
-						-scenario.pattern com.%
-						-baseline 3.1.0.1330064530
+			            -dataDir ${postingDirectory}/data/studio
+						-scenario.pattern ${scenario.pattern}
+						-baseline ${baseline.version}
 						-fingerprints"/>
 			<!-- baselines arguments are no longer necessary since bug https://bugs.eclipse.org/bugs/show_bug.cgi?id=209322 has been fixed...
 						-baseline ${eclipse.perf.ref}
@@ -300,11 +304,8 @@
 			-highlight.latest 3.3M1_
 			-->
 			<env key="LD_LIBRARY_PATH" value="${basedir}/../org.eclipse.releng.basebuilder" />
+			<!--performanceResults xmlDirectoryName="${postingDirectory}/${buildLabel}/performance/xml" dropDirectoryName="${postingDirectory}/${buildLabel}" testResultsTemplateFileName="${publishingContent}/templateFiles/performance.php.template" testResultsHtmlFileName="performance/performance.php" hrefTestResultsTargetPath="html" testManifestFileName="${publishingContent}/performanceTestManifest.xml" /-->
 			<sysproperty key="eclipse.perf.dbloc" value="${perf.db}" />
 		</java>
-
-		<performanceResults xmlDirectoryName="${postingDirectory}/${buildLabel}/performance/xml" dropDirectoryName="${postingDirectory}/${buildLabel}" testResultsTemplateFileName="${publishingContent}/templateFiles/performance.php.template" testResultsHtmlFileName="performance/performance.php" hrefTestResultsTargetPath="html" testManifestFileName="${publishingContent}/performanceTestManifest.xml" />
-
-		<replace file="${postingDirectory}/${buildLabel}/performance/performance.php" token="@buildType@" value="${buildType}" />
 	</target>
 </project>
