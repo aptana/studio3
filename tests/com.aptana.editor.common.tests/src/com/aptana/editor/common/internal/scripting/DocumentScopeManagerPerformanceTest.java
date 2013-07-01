@@ -9,6 +9,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.PerformanceTestCase;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchPage;
@@ -32,6 +33,7 @@ public class DocumentScopeManagerPerformanceTest extends PerformanceTestCase
 	 */
 	public void testGetScopeAtOffsetSourceViewer() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		IDocumentScopeManager manager = CommonEditorPlugin.getDefault().getDocumentScopeManager();
 		ITextEditor editor = null;
 		File file = null;
@@ -48,7 +50,7 @@ public class DocumentScopeManagerPerformanceTest extends PerformanceTestCase
 			IDocument doc = viewer.getDocument();
 			int length = doc.getLength();
 			EditorTestHelper.closeAllEditors();
-			
+
 			IEditorReference[] refs = page.getEditorReferences();
 			assertEquals(0, refs.length);
 

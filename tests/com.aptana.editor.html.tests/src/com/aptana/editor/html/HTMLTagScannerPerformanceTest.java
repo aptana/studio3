@@ -16,6 +16,7 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
+import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.PerformanceTestCase;
 
 import com.aptana.core.util.IOUtil;
@@ -48,6 +49,7 @@ public class HTMLTagScannerPerformanceTest extends PerformanceTestCase
 
 	public void testAmazonHTML() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		// read in the file
 		InputStream stream = FileLocator.openStream(Platform.getBundle("com.aptana.editor.html.tests"),
 				Path.fromPortableString("performance/amazon.html"), false);

@@ -12,6 +12,7 @@ import java.io.InputStream;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.PerformanceTestCase;
 
 import com.aptana.core.util.IOUtil;
@@ -42,21 +43,25 @@ public class HTMLParserPerformanceTest extends PerformanceTestCase
 
 	public void testAmazonFrontPage() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		parseTest("amazon.html", 1500);
 	}
 
 	public void testReddit() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		parseTest("reddit.html", 120);
 	}
 
 	public void testRedditNoCSSNoJS() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		parseTest("reddit-no-css-no-js.html", 175);
 	}
 
 	public void testBigHTML() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		parseTest("BigHTML.html", 10);
 	}
 

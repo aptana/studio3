@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.PerformanceTestCase;
 
 import com.aptana.core.util.IOUtil;
@@ -133,6 +134,7 @@ public class JSIndexingPerformanceTest extends PerformanceTestCase
 	 */
 	public void testDojoUncompressed() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		timeIndex(10, "performance/dojo.js.uncompressed.js");
 	}
 
@@ -143,6 +145,7 @@ public class JSIndexingPerformanceTest extends PerformanceTestCase
 	 */
 	public void testExt() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		timeIndex(20, "performance/ext/ext-core.js");
 	}
 
@@ -153,6 +156,7 @@ public class JSIndexingPerformanceTest extends PerformanceTestCase
 	 */
 	public void testJaxerFiles() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		timeIndex(5, "performance/jaxer/11.2.2-1-n.js", "performance/jaxer/15.10.6.2-2.js",
 				"performance/jaxer/15.5.4.7-2.js", "performance/jaxer/15.9.5.21-3.js",
 				"performance/jaxer/ComposerCommands.js",
@@ -209,6 +213,7 @@ public class JSIndexingPerformanceTest extends PerformanceTestCase
 	 */
 	public void testTiMobile() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		timeIndex(10, "performance/timobile.js");
 	}
 
@@ -219,6 +224,7 @@ public class JSIndexingPerformanceTest extends PerformanceTestCase
 	 */
 	public void testTinyMce() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		timeIndex(50, "performance/tiny_mce.js");
 	}
 

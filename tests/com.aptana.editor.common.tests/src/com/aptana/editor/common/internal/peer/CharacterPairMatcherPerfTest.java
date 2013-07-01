@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.source.ICharacterPairMatcher;
+import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.PerformanceTestCase;
 import org.eclipse.ui.ide.IDE;
 
@@ -48,6 +49,7 @@ public class CharacterPairMatcherPerfTest extends PerformanceTestCase
 
 	public void testPairMatching() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		URL url = FileLocator.find(Platform.getBundle("com.aptana.editor.common.tests"),
 				Path.fromPortableString("performance/jquery-1.6.4.js"), null);
 		URI uri = ResourceUtil.resourcePathToURI(url);

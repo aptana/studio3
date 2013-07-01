@@ -21,6 +21,7 @@ import java.util.Queue;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.Performance;
 import org.eclipse.test.performance.PerformanceTestCase;
 
@@ -28,8 +29,7 @@ import com.aptana.core.util.IOUtil;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.core.tests.ITestFiles;
 
-public class JSParserPerformanceTest extends PerformanceTestCase
-{
+public class JSParserPerformanceTest extends PerformanceTestCase {
 
 	private JSParser fParser;
 
@@ -39,19 +39,17 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	 * @param root
 	 * @throws Exception
 	 */
-	public void assertLocalFiles(File root) throws Exception
-	{
+	public void assertLocalFiles(File root) throws Exception {
 		List<File> files = collectFiles(root);
 
-		for (File file : files)
-		{
-			if (fPerformanceMeter != null)
-			{
+		for (File file : files) {
+			if (fPerformanceMeter != null) {
 				fPerformanceMeter.dispose();
 			}
 
 			Performance performance = Performance.getDefault();
-			fPerformanceMeter = performance.createPerformanceMeter(file.getAbsolutePath());
+			fPerformanceMeter = performance.createPerformanceMeter(file
+					.getAbsolutePath());
 
 			FileInputStream fis = new FileInputStream(file);
 			String source = getSource(fis);
@@ -69,17 +67,15 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	 * @param resourceName
 	 * @throws Exception
 	 */
-	private void assertParse(int numRuns, String... resources) throws Exception
-	{
-		for (String resourceName : resources)
-		{
-			if (fPerformanceMeter != null)
-			{
+	private void assertParse(int numRuns, String... resources) throws Exception {
+		for (String resourceName : resources) {
+			if (fPerformanceMeter != null) {
 				fPerformanceMeter.dispose();
 			}
 
 			Performance performance = Performance.getDefault();
-			fPerformanceMeter = performance.createPerformanceMeter(resourceName);
+			fPerformanceMeter = performance
+					.createPerformanceMeter(resourceName);
 
 			timeParse(resourceName, numRuns);
 
@@ -94,22 +90,17 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	 * @param root
 	 * @return
 	 */
-	private List<File> collectFiles(File root)
-	{
+	private List<File> collectFiles(File root) {
 		List<File> result = new ArrayList<File>();
 		final Queue<File> directories = new LinkedList<File>();
 
 		directories.offer(root);
 
-		while (!directories.isEmpty())
-		{
+		while (!directories.isEmpty()) {
 			File directory = directories.poll();
-			File[] files = directory.listFiles(new FileFilter()
-			{
-				public boolean accept(File pathname)
-				{
-					if (pathname.isDirectory())
-					{
+			File[] files = directory.listFiles(new FileFilter() {
+				public boolean accept(File pathname) {
+					if (pathname.isDirectory()) {
 						directories.add(pathname);
 						return false;
 					}
@@ -131,8 +122,7 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	 * @return
 	 * @throws IOException
 	 */
-	private String getSource(InputStream stream) throws IOException
-	{
+	private String getSource(InputStream stream) throws IOException {
 		return IOUtil.read(stream);
 	}
 
@@ -143,31 +133,31 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	 * @return
 	 * @throws IOException
 	 */
-	private String getSource(String resourceName) throws IOException
-	{
-		InputStream stream = FileLocator.openStream(Platform.getBundle(JSCorePlugin.PLUGIN_ID), new Path(resourceName),
+	private String getSource(String resourceName) throws IOException {
+		InputStream stream = FileLocator.openStream(Platform
+				.getBundle(JSCorePlugin.PLUGIN_ID), new Path(resourceName),
 				false);
 		return getSource(stream);
 	}
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see junit.framework.TestCase#setUp()
 	 */
 	@Override
-	protected void setUp() throws Exception
-	{
+	protected void setUp() throws Exception {
 		super.setUp();
 		fParser = new JSParser();
 	}
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see junit.framework.TestCase#tearDown()
 	 */
 	@Override
-	protected void tearDown() throws Exception
-	{
+	protected void tearDown() throws Exception {
 		fParser = null;
 		super.tearDown();
 	}
@@ -177,13 +167,13 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	 * 
 	 * @throws Exception
 	 */
-	public void testDojo() throws Exception
-	{
+	public void testDojo() throws Exception {
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		assertParse(1000, ITestFiles.DOJO_FILES);
 	}
 
-	public void testDojoMinified() throws Exception
-	{
+	public void testDojoMinified() throws Exception {
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		assertParse(1000, "performance/dojo.js.minified.js");
 	}
 
@@ -192,8 +182,8 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	 * 
 	 * @throws Exception
 	 */
-	public void testExt() throws Exception
-	{
+	public void testExt() throws Exception {
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		assertParse(15, ITestFiles.EXT_FILES);
 	}
 
@@ -202,8 +192,8 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	 * 
 	 * @throws Exception
 	 */
-	public void testJaxerFiles() throws Exception
-	{
+	public void testJaxerFiles() throws Exception {
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		assertParse(50, ITestFiles.JAXER_FILES);
 	}
 
@@ -212,8 +202,8 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	 * 
 	 * @throws Exception
 	 */
-	public void testTiMobile() throws Exception
-	{
+	public void testTiMobile() throws Exception {
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		assertParse(375, ITestFiles.TIMOBILE_FILES);
 	}
 
@@ -222,8 +212,8 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	 * 
 	 * @throws Exception
 	 */
-	public void testTinyMce() throws Exception
-	{
+	public void testTinyMce() throws Exception {
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		assertParse(430, ITestFiles.TINY_MCE_FILES);
 	}
 
@@ -234,8 +224,7 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	 * @param numRuns
 	 * @throws Exception
 	 */
-	private void timeParse(String resourceName, int numRuns) throws Exception
-	{
+	private void timeParse(String resourceName, int numRuns) throws Exception {
 		this.timeParse(resourceName, getSource(resourceName), numRuns);
 	}
 
@@ -245,20 +234,16 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	 * @param resourceName
 	 * @throws Exception
 	 */
-	private void timeParse(String resourceName, String src, int numRuns) throws Exception
-	{
+	private void timeParse(String resourceName, String src, int numRuns)
+			throws Exception {
 		// apply to parse state
 		JSParseState parseState = new JSParseState(src);
 
-		for (int i = 0; i < numRuns; i++)
-		{
+		for (int i = 0; i < numRuns; i++) {
 			startMeasuring();
-			try
-			{
+			try {
 				fParser.parse(parseState);
-			}
-			catch (Exception e)
-			{
+			} catch (Exception e) {
 				fail(e.getMessage());
 			}
 			stopMeasuring();

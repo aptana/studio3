@@ -13,6 +13,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.PerformanceTestCase;
 
 import com.aptana.core.build.AbstractBuildParticipant;
@@ -102,6 +103,7 @@ public class JSParserValidatorPerformanceTest extends PerformanceTestCase
 
 	public void testThreeMinJS() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		perfValidate("three.min.js", 1);
 	}
 }

@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.PerformanceTestCase;
 
 import com.aptana.core.build.UnifiedBuilder;
@@ -70,6 +71,7 @@ public class JSBuildPerformanceTest extends PerformanceTestCase
 
 	public void testBuildJaxer() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		URL url = FileLocator.find(Platform.getBundle(JSCorePlugin.PLUGIN_ID), new Path("performance/jaxer"), null);
 		IFileStore fileStore = EFS.getStore(ResourceUtil.resourcePathToURI(url));
 		IFileStore destination = EFS.getStore(project.getURI());

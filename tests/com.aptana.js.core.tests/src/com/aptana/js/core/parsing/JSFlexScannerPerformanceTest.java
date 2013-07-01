@@ -13,6 +13,7 @@ import java.io.InputStream;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.PerformanceTestCase;
 
 import beaver.Symbol;
@@ -23,8 +24,7 @@ import com.aptana.js.core.tests.ITestFiles;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ParseState;
 
-public class JSFlexScannerPerformanceTest extends PerformanceTestCase
-{
+public class JSFlexScannerPerformanceTest extends PerformanceTestCase {
 	private JSFlexScanner fScanner;
 
 	/**
@@ -34,8 +34,7 @@ public class JSFlexScannerPerformanceTest extends PerformanceTestCase
 	 * @return
 	 * @throws IOException
 	 */
-	private String getSource(InputStream stream) throws IOException
-	{
+	private String getSource(InputStream stream) throws IOException {
 		return IOUtil.read(stream);
 	}
 
@@ -46,20 +45,20 @@ public class JSFlexScannerPerformanceTest extends PerformanceTestCase
 	 * @return
 	 * @throws IOException
 	 */
-	private String getSource(String resourceName) throws IOException
-	{
-		InputStream stream = FileLocator.openStream(Platform.getBundle(JSCorePlugin.PLUGIN_ID), new Path(resourceName),
+	private String getSource(String resourceName) throws IOException {
+		InputStream stream = FileLocator.openStream(Platform
+				.getBundle(JSCorePlugin.PLUGIN_ID), new Path(resourceName),
 				false);
 		return getSource(stream);
 	}
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see junit.framework.TestCase#setUp()
 	 */
 	@Override
-	protected void setUp() throws Exception
-	{
+	protected void setUp() throws Exception {
 		super.setUp();
 
 		fScanner = new JSFlexScanner();
@@ -68,11 +67,11 @@ public class JSFlexScannerPerformanceTest extends PerformanceTestCase
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see junit.framework.TestCase#tearDown()
 	 */
 	@Override
-	protected void tearDown() throws Exception
-	{
+	protected void tearDown() throws Exception {
 		fScanner = null;
 
 		super.tearDown();
@@ -83,13 +82,13 @@ public class JSFlexScannerPerformanceTest extends PerformanceTestCase
 	 * 
 	 * @throws Exception
 	 */
-	public void testDojo() throws Exception
-	{
+	public void testDojo() throws Exception {
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		assertScan(75, ITestFiles.DOJO_FILES);
 	}
 
-	public void testDojoMinified() throws Exception
-	{
+	public void testDojoMinified() throws Exception {
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		assertScan(500, "performance/dojo.js.minified.js");
 	}
 
@@ -98,8 +97,8 @@ public class JSFlexScannerPerformanceTest extends PerformanceTestCase
 	 * 
 	 * @throws Exception
 	 */
-	public void testExt() throws Exception
-	{
+	public void testExt() throws Exception {
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		assertScan(30, ITestFiles.EXT_FILES);
 	}
 
@@ -108,8 +107,8 @@ public class JSFlexScannerPerformanceTest extends PerformanceTestCase
 	 * 
 	 * @throws Exception
 	 */
-	public void testTiMobile() throws Exception
-	{
+	public void testTiMobile() throws Exception {
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		assertScan(50, ITestFiles.TIMOBILE_FILES);
 	}
 
@@ -118,8 +117,8 @@ public class JSFlexScannerPerformanceTest extends PerformanceTestCase
 	 * 
 	 * @throws Exception
 	 */
-	public void testTinyMce() throws Exception
-	{
+	public void testTinyMce() throws Exception {
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		assertScan(150, ITestFiles.TINY_MCE_FILES);
 	}
 
@@ -128,8 +127,8 @@ public class JSFlexScannerPerformanceTest extends PerformanceTestCase
 	 * 
 	 * @throws Exception
 	 */
-	public void testJaxerFiles() throws Exception
-	{
+	public void testJaxerFiles() throws Exception {
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		assertScan(125, ITestFiles.JAXER_FILES);
 	}
 
@@ -139,10 +138,8 @@ public class JSFlexScannerPerformanceTest extends PerformanceTestCase
 	 * @param resourceName
 	 * @throws Exception
 	 */
-	private void assertScan(int numRuns, String... resources) throws Exception
-	{
-		for (String resourceName : resources)
-		{
+	private void assertScan(int numRuns, String... resources) throws Exception {
+		for (String resourceName : resources) {
 			timeScan(resourceName, numRuns);
 		}
 		commitMeasurements();
@@ -156,8 +153,7 @@ public class JSFlexScannerPerformanceTest extends PerformanceTestCase
 	 * @param numRuns
 	 * @throws Exception
 	 */
-	private void timeScan(String resourceName, int numRuns) throws Exception
-	{
+	private void timeScan(String resourceName, int numRuns) throws Exception {
 		this.timeScan(resourceName, getSource(resourceName), numRuns);
 	}
 
@@ -167,21 +163,19 @@ public class JSFlexScannerPerformanceTest extends PerformanceTestCase
 	 * @param resourceName
 	 * @throws Exception
 	 */
-	private void timeScan(String resourceName, String src, int numRuns) throws Exception
-	{
+	private void timeScan(String resourceName, String src, int numRuns)
+			throws Exception {
 		// apply to parse state
 		IParseState parseState = new ParseState(src);
 
-		for (int i = 0; i < numRuns; i++)
-		{
+		for (int i = 0; i < numRuns; i++) {
 			startMeasuring();
 
 			fScanner.setSource(src);
 
 			Symbol symbol = fScanner.nextToken();
 
-			while (symbol != null && symbol.getId() != 0)
-			{
+			while (symbol != null && symbol.getId() != 0) {
 				symbol = fScanner.nextToken();
 			}
 
