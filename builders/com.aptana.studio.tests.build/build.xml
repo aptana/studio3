@@ -15,6 +15,9 @@
 	<property file="build_local.properties" />
 	<property name="postingDirectory" value="${buildDirectory}" />
 	<property name="publishingContent" value="${basedir}/publishingFiles" />
+	<!--location for buildlogs-->
+	<property name="buildlogs" value="${postingDirectory}/${buildLabel}/buildlogs" />
+	<mkdir dir="${buildlogs}" />
 
 	<taskdef resource="net/sf/antcontrib/antlib.xml">
 		<classpath>
@@ -290,8 +293,8 @@
 						-output ${postingDirectory}/${studio.version}/performance/
 						-config %hudson-ubuntu_%
 			            -dataDir ${postingDirectory}/data/studio
-						-scenario.pattern com.aptana.%
-						-baseline 3.1.0.1330064530
+						-scenario.pattern ${scenario.pattern}
+						-baseline ${baseline.version}
 						-fingerprints"/>
 			<!-- baselines arguments are no longer necessary since bug https://bugs.eclipse.org/bugs/show_bug.cgi?id=209322 has been fixed...
 						-baseline ${eclipse.perf.ref}
