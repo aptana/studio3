@@ -18,11 +18,11 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.Token;
+import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.PerformanceTestCase;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.epl.tests.EditorTestHelper;
-import com.aptana.editor.js.text.JSCodeScanner;
 import com.aptana.js.core.JSCorePlugin;
 
 public class JSCodeScannerPerformanceTest extends PerformanceTestCase
@@ -47,21 +47,25 @@ public class JSCodeScannerPerformanceTest extends PerformanceTestCase
 
 	public void testScanUncompressedDojo() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		perfScan("dojo.js.uncompressed.js", 50);
 	}
 
 	public void testScanMinifiedDojo() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		perfScan("dojo.js.minified.js", 70);
 	}
 
 	public void testScanTiMobile() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		perfScan("timobile.js", 15);
 	}
 
 	public void testScanTinyMCE() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		perfScan("tiny_mce.js", 20);
 	}
 

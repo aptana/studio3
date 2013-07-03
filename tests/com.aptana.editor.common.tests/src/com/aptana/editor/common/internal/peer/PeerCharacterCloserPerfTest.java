@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.PerformanceTestCase;
 
 public class PeerCharacterCloserPerfTest extends PerformanceTestCase
@@ -19,6 +20,7 @@ public class PeerCharacterCloserPerfTest extends PerformanceTestCase
 
 	public void testCheckUnpairedClose() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		PeerCharacterCloser closer = new PeerCharacterCloser(null)
 		{
 			protected List<Character> getPairs(String scope)

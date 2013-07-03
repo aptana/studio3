@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
+import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.PerformanceTestCase;
 
 import com.aptana.core.util.IOUtil;
@@ -52,21 +53,25 @@ public class JSSourcePartitionScannerPerformanceTest extends PerformanceTestCase
 
 	public void testPartitionUncompressedDojo() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		perfPartition("dojo.js.uncompressed.js", 100);
 	}
 
 	public void testPartitionMinifiedDojo() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		perfPartition("dojo.js.minified.js", 70);
 	}
 
 	public void testPartitionTiMobile() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		perfPartition("timobile.js", 30);
 	}
 
 	public void testPartitionTinyMCE() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		perfPartition("tiny_mce.js", 45);
 	}
 

@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.PerformanceTestCase;
 import org.jruby.Ruby;
 import org.jruby.RubyRegexp;
@@ -27,6 +28,7 @@ public class RubyRegexpFolderPerformanceTest extends PerformanceTestCase
 
 	public void testYUICSSFolding() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		Ruby runtime = Ruby.newInstance();
 		final RubyRegexp endFolding = RubyRegexp.newRegexp(runtime, "(?<!\\*)\\*\\*\\/|^\\s*\\}",
 				RegexpOptions.NULL_OPTIONS);

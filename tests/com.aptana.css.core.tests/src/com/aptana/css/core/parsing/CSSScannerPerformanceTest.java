@@ -12,52 +12,50 @@ import java.io.InputStream;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.PerformanceTestCase;
 
 import beaver.Symbol;
 
 import com.aptana.core.util.IOUtil;
 
-public class CSSScannerPerformanceTest extends PerformanceTestCase
-{
+public class CSSScannerPerformanceTest extends PerformanceTestCase {
 	private CSSFlexScanner fScanner;
 
 	@Override
-	protected void setUp() throws Exception
-	{
+	protected void setUp() throws Exception {
 		super.setUp();
 		fScanner = new CSSFlexScanner();
 	}
 
 	@Override
-	protected void tearDown() throws Exception
-	{
+	protected void tearDown() throws Exception {
 		fScanner = null;
 		super.tearDown();
 	}
 
-	public void testWordpressAdminCSS() throws Exception
-	{
+	public void testWordpressAdminCSS() throws Exception {
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		timeScan("wp-admin.css", 50);
 	}
 
-	public void testWordpressAdminDev() throws Exception
-	{
+	public void testWordpressAdminDev() throws Exception {
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		timeScan("wp-admin.dev.css", 50);
 	}
 
-	public void testFromMetadata() throws Exception
-	{
+	public void testFromMetadata() throws Exception {
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		timeScan("from-metadata.css", 50);
 	}
 
-	public void testGithubFormatted() throws Exception
-	{
+	public void testGithubFormatted() throws Exception {
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		timeScan("github-formatted.css", 50);
 	}
 
-	public void testGithubMinimized() throws Exception
-	{
+	public void testGithubMinimized() throws Exception {
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		timeScan("github-minimized.css", 50);
 	}
 
@@ -69,22 +67,20 @@ public class CSSScannerPerformanceTest extends PerformanceTestCase
 	 * @param numRuns
 	 * @throws Exception
 	 */
-	private void timeScan(String resourceName, int numRuns) throws Exception
-	{
-		InputStream stream = FileLocator.openStream(Platform.getBundle("com.aptana.css.core.tests"),
+	private void timeScan(String resourceName, int numRuns) throws Exception {
+		InputStream stream = FileLocator.openStream(
+				Platform.getBundle("com.aptana.css.core.tests"),
 				Path.fromPortableString("performance/" + resourceName), false);
 		String src = IOUtil.read(stream);
 
-		for (int i = 0; i < numRuns; i++)
-		{
+		for (int i = 0; i < numRuns; i++) {
 			startMeasuring();
 
 			fScanner.setSource(src);
 
 			Symbol symbol = fScanner.nextToken();
 
-			while (symbol != null && symbol.getId() != 0)
-			{
+			while (symbol != null && symbol.getId() != 0) {
 				symbol = fScanner.nextToken();
 			}
 

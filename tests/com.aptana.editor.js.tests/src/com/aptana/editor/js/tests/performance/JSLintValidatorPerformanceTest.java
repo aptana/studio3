@@ -15,6 +15,7 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.PerformanceTestCase;
 
 import com.aptana.core.build.AbstractBuildParticipant;
@@ -112,11 +113,13 @@ public class JSLintValidatorPerformanceTest extends PerformanceTestCase
 
 	public void testValidateUncompressedDojo() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		perfValidate("dojo.js.uncompressed.js", 10);
 	}
 
 	public void testValidateMinifiedDojo() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		perfValidate("dojo.js.minified.js", 10);
 	}
 
@@ -127,11 +130,13 @@ public class JSLintValidatorPerformanceTest extends PerformanceTestCase
 
 	public void testValidateTiMobile() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		perfValidate("timobile.js", 10);
 	}
 
 	public void testValidateTinyMCE() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		perfValidate("tiny_mce.js", 10);
 	}
 }

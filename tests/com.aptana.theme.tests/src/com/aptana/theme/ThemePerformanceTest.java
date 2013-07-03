@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.PerformanceTestCase;
 
 import com.aptana.core.epl.util.LRUCache;
@@ -48,6 +49,7 @@ public class ThemePerformanceTest extends PerformanceTestCase
 	@SuppressWarnings("rawtypes")
 	public void testLoadingUserBundlesWithCache() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		// Note: scopes_performance.txt was generated from opening the js editor using google.html
 		// attached to https://jira.appcelerator.org/browse/APSTUD-4015.
 

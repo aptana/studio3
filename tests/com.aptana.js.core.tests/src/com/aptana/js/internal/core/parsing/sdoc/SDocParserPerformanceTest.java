@@ -17,15 +17,16 @@ import java.util.regex.Pattern;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.PerformanceTestCase;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.core.tests.ITestFiles;
 
-public class SDocParserPerformanceTest extends PerformanceTestCase
-{
-	private static final Pattern COMMENT = Pattern.compile("/\\*\\*.*?\\*/", Pattern.DOTALL);
+public class SDocParserPerformanceTest extends PerformanceTestCase {
+	private static final Pattern COMMENT = Pattern.compile("/\\*\\*.*?\\*/",
+			Pattern.DOTALL);
 	private SDocParser fParser;
 
 	/**
@@ -35,8 +36,7 @@ public class SDocParserPerformanceTest extends PerformanceTestCase
 	 * @return
 	 * @throws IOException
 	 */
-	private String getSource(InputStream stream) throws IOException
-	{
+	private String getSource(InputStream stream) throws IOException {
 		return IOUtil.read(stream);
 	}
 
@@ -47,20 +47,20 @@ public class SDocParserPerformanceTest extends PerformanceTestCase
 	 * @return
 	 * @throws IOException
 	 */
-	private String getSource(String resourceName) throws IOException
-	{
-		InputStream stream = FileLocator.openStream(Platform.getBundle(JSCorePlugin.PLUGIN_ID), new Path(resourceName),
+	private String getSource(String resourceName) throws IOException {
+		InputStream stream = FileLocator.openStream(Platform
+				.getBundle(JSCorePlugin.PLUGIN_ID), new Path(resourceName),
 				false);
 		return getSource(stream);
 	}
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see junit.framework.TestCase#setUp()
 	 */
 	@Override
-	protected void setUp() throws Exception
-	{
+	protected void setUp() throws Exception {
 		super.setUp();
 
 		fParser = new SDocParser();
@@ -68,11 +68,11 @@ public class SDocParserPerformanceTest extends PerformanceTestCase
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see junit.framework.TestCase#tearDown()
 	 */
 	@Override
-	protected void tearDown() throws Exception
-	{
+	protected void tearDown() throws Exception {
 		fParser = null;
 		super.tearDown();
 	}
@@ -82,8 +82,8 @@ public class SDocParserPerformanceTest extends PerformanceTestCase
 	 * 
 	 * @throws Exception
 	 */
-	public void testTiMobile() throws Exception
-	{
+	public void testTiMobile() throws Exception {
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		assertParse(10, ITestFiles.TIMOBILE_FILES);
 	}
 
@@ -93,10 +93,8 @@ public class SDocParserPerformanceTest extends PerformanceTestCase
 	 * @param resourceName
 	 * @throws Exception
 	 */
-	private void assertParse(int numRuns, String... resources) throws Exception
-	{
-		for (String resourceName : resources)
-		{
+	private void assertParse(int numRuns, String... resources) throws Exception {
+		for (String resourceName : resources) {
 			timeParse(resourceName, numRuns);
 		}
 		commitMeasurements();
@@ -110,8 +108,7 @@ public class SDocParserPerformanceTest extends PerformanceTestCase
 	 * @param numRuns
 	 * @throws Exception
 	 */
-	private void timeParse(String resourceName, int numRuns) throws Exception
-	{
+	private void timeParse(String resourceName, int numRuns) throws Exception {
 		this.timeParse(resourceName, getSource(resourceName), numRuns);
 	}
 
@@ -121,13 +118,11 @@ public class SDocParserPerformanceTest extends PerformanceTestCase
 	 * @param src
 	 * @return
 	 */
-	protected List<String> collectComments(String src)
-	{
+	protected List<String> collectComments(String src) {
 		List<String> result = new ArrayList<String>();
 		Matcher m = COMMENT.matcher(src);
 
-		while (m.find())
-		{
+		while (m.find()) {
 			result.add(m.group());
 		}
 
@@ -140,23 +135,18 @@ public class SDocParserPerformanceTest extends PerformanceTestCase
 	 * @param resourceName
 	 * @throws Exception
 	 */
-	private void timeParse(String resourceName, String src, int numRuns) throws Exception
-	{
+	private void timeParse(String resourceName, String src, int numRuns)
+			throws Exception {
 		List<String> comments = collectComments(src);
 
 		// apply to parse state
-		for (int i = 0; i < numRuns; i++)
-		{
+		for (int i = 0; i < numRuns; i++) {
 			startMeasuring();
 
-			for (String comment : comments)
-			{
-				try
-				{
+			for (String comment : comments) {
+				try {
 					fParser.parse(comment);
-				}
-				catch (Exception e)
-				{
+				} catch (Exception e) {
 					// fail(e.getMessage());
 					// System.out.println("Failed\n" + comment);
 				}

@@ -1,5 +1,6 @@
 package com.aptana.scripting.model;
 
+import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.PerformanceTestCase;
 
 public class BundleLoadingPerformanceTest extends PerformanceTestCase
@@ -25,6 +26,7 @@ public class BundleLoadingPerformanceTest extends PerformanceTestCase
 
 	public void testLoadingUserBundlesWithoutCache() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		System.setProperty("use.bundle.cache", Boolean.FALSE.toString());
 		for (int i = 0; i < 25; i++)
 		{
@@ -38,6 +40,7 @@ public class BundleLoadingPerformanceTest extends PerformanceTestCase
 
 	public void testLoadingUserBundlesWithCache() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		System.setProperty("use.bundle.cache", Boolean.TRUE.toString());
 		for (int i = 0; i < 25; i++)
 		{

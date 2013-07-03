@@ -18,6 +18,7 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.Token;
+import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.PerformanceTestCase;
 
 import com.aptana.core.util.IOUtil;
@@ -44,31 +45,37 @@ public class CSSCodeScannerPerformanceTest extends PerformanceTestCase
 
 	public void testScanningFromMetadata() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		perfScan("from-metadata.css", 10);
 	}
 
 	public void testGithubFormatted() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		perfScan("github-formatted.css", 20);
 	}
 
 	public void testGithubMinimized() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		perfScan("github-minimized.css", 20);
 	}
 
 	public void testScanningWordpressAdminCSS() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		perfScan("wp-admin.css", 80);
 	}
 
 	public void testScanningWordpressAdminDevCSS() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		perfScan("wp-admin.dev.css", 30);
 	}
 
 	public void testScanningYuiCSS() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		perfScan("yui.css", 80);
 	}
 

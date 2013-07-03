@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
+import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.PerformanceTestCase;
 
 import com.aptana.core.util.IOUtil;
@@ -51,31 +52,37 @@ public class CSSSourcePartitionScannerPerformanceTest extends PerformanceTestCas
 
 	public void testScanningFromMetadata() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		perfPartition("from-metadata.css", 10);
 	}
 
 	public void testGithubFormatted() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		perfPartition("github-formatted.css", 20);
 	}
 
 	public void testGithubMinimized() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		perfPartition("github-minimized.css", 20);
 	}
 
 	public void testScanningWordpressAdminCSS() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		perfPartition("wp-admin.css", 80);
 	}
 
 	public void testScanningWordpressAdminDevCSS() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		perfPartition("wp-admin.dev.css", 30);
 	}
 
 	public void testScanningYuiCSS() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		perfPartition("yui.css", 80);
 	}
 

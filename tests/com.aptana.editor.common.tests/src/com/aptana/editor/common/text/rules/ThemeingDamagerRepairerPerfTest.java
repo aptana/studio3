@@ -8,6 +8,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.PerformanceTestCase;
 import org.eclipse.ui.ide.IDE;
 
@@ -33,6 +34,7 @@ public class ThemeingDamagerRepairerPerfTest extends PerformanceTestCase
 
 	public void testForcedRecoloringOfEntireFile() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		URL url = FileLocator.find(Platform.getBundle("com.aptana.editor.common.tests"),
 				Path.fromPortableString("performance/ext-all-debug.js"), null);
 		URI uri = ResourceUtil.resourcePathToURI(url);
@@ -51,6 +53,7 @@ public class ThemeingDamagerRepairerPerfTest extends PerformanceTestCase
 	// Add a test for edits in the file to make sure edits are as fast/faster...
 	public void testEditingFileLive() throws Exception
 	{
+		tagAsGlobalSummary(getDefaultScenarioId(), Dimension.ELAPSED_PROCESS);
 		URL url = FileLocator.find(Platform.getBundle("com.aptana.editor.common.tests"),
 				Path.fromPortableString("performance/ext-all-debug.js"), null);
 		URI uri = ResourceUtil.resourcePathToURI(url);
