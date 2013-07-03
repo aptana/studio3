@@ -7,8 +7,6 @@ import junit.framework.TestCase;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
-import com.aptana.core.logging.IdeLog;
-import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.core.parsing.JSFlexScannerPerformanceTest;
 import com.aptana.js.core.parsing.JSParserPerformanceTest;
 import com.aptana.js.internal.core.parsing.sdoc.SDocParserPerformanceTest;
@@ -24,8 +22,7 @@ public class PerformanceTests extends TestCase
 			public void runTest(Test test, TestResult result)
 			{
 				String msg = MessageFormat.format("Running test: {0}", test.toString());
-				IdeLog.logError(JSCorePlugin.getDefault(), msg);
-				System.out.println(msg);
+				System.err.println(msg);
 				super.runTest(test, result);
 			}
 		};
