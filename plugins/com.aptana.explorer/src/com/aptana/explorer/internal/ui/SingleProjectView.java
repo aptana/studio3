@@ -7,7 +7,11 @@
  */
 package com.aptana.explorer.internal.ui;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
@@ -82,6 +86,7 @@ import org.osgi.service.prefs.BackingStoreException;
 import com.aptana.core.IScopeReference;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.IProjectContext;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IExplorerUIConstants;
@@ -274,8 +279,18 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		final ToolBar projectsToolbar = new ToolBar(parent, SWT.FLAT);
 		projectToolItem = new ToolItem(projectsToolbar, SWT.DROP_DOWN);
 		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+		List<IProject> sortedProjects = CollectionsUtil.newList(projects);
+		Collections.sort(sortedProjects, new Comparator<IProject>()
+		{
+
+			public int compare(IProject o1, IProject o2)
+			{
+				return o1.getName().compareToIgnoreCase(o2.getName());
+			}
+		});
+
 		projectsMenu = new Menu(projectsToolbar);
-		for (IProject iProject : projects)
+		for (IProject iProject : sortedProjects)
 		{
 			// hide projects that don't exist
 			if (!iProject.exists())
