@@ -496,7 +496,7 @@ public class JSParser extends Parser implements IParser {
 					throws IOException
 			{
 				boolean recovered = super.recover(parser, lastToken, currentToken, in, report);
-				if (recovered)
+				if (recovered && fSemicolonSeverity != IProblem.Severity.IGNORE)
 				{
 					fWorking.addError(new ParseError(IJSConstants.CONTENT_TYPE_JS, lastToken, Messages.JSParser_MissingSemicolonMsg, fSemicolonSeverity));
 				}
