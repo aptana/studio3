@@ -2,7 +2,6 @@ package com.aptana.explorer.internal.handlers;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.core.expressions.IEvaluationContext;
@@ -22,6 +21,7 @@ import org.eclipse.ui.services.IEvaluationService;
 import org.eclipse.ui.services.IServiceLocator;
 
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.explorer.internal.ui.CaseInsensitiveProjectComparator;
 import com.aptana.explorer.internal.ui.SingleProjectView;
 
 public class SwitchProjectMenuItem extends CompoundContributionItem implements IWorkbenchContribution
@@ -43,14 +43,7 @@ public class SwitchProjectMenuItem extends CompoundContributionItem implements I
 			IProject viewProject = view.getActiveProject();
 			IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
 			List<IProject> sortedProjects = CollectionsUtil.newList(projects);
-			Collections.sort(sortedProjects, new Comparator<IProject>()
-			{
-
-				public int compare(IProject o1, IProject o2)
-				{
-					return o1.getName().compareToIgnoreCase(o2.getName());
-				}
-			});
+			Collections.sort(sortedProjects, new CaseInsensitiveProjectComparator());
 
 			for (final IProject project : sortedProjects)
 			{

@@ -7,9 +7,7 @@
  */
 package com.aptana.explorer.internal.ui;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -280,14 +278,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		projectToolItem = new ToolItem(projectsToolbar, SWT.DROP_DOWN);
 		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
 		List<IProject> sortedProjects = CollectionsUtil.newList(projects);
-		Collections.sort(sortedProjects, new Comparator<IProject>()
-		{
-
-			public int compare(IProject o1, IProject o2)
-			{
-				return o1.getName().compareToIgnoreCase(o2.getName());
-			}
-		});
+		Collections.sort(sortedProjects, new CaseInsensitiveProjectComparator());
 
 		projectsMenu = new Menu(projectsToolbar);
 		for (IProject iProject : sortedProjects)
