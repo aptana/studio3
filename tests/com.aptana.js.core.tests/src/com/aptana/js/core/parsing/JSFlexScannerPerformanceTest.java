@@ -13,7 +13,7 @@ import java.io.InputStream;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.test.performance.PerformanceTestCase;
+import org.eclipse.test.performance.GlobalTimePerformanceTestCase;
 
 import beaver.Symbol;
 
@@ -23,7 +23,7 @@ import com.aptana.js.core.tests.ITestFiles;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ParseState;
 
-public class JSFlexScannerPerformanceTest extends PerformanceTestCase
+public class JSFlexScannerPerformanceTest extends GlobalTimePerformanceTestCase
 {
 	private JSFlexScanner fScanner;
 

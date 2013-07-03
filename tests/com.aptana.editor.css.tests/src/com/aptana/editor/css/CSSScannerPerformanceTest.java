@@ -12,13 +12,13 @@ import java.io.InputStream;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.test.performance.PerformanceTestCase;
+import org.eclipse.test.performance.GlobalTimePerformanceTestCase;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.css.core.parsing.CSSTokenType;
 import com.aptana.editor.css.parsing.CSSScanner;
 
-public class CSSScannerPerformanceTest extends PerformanceTestCase
+public class CSSScannerPerformanceTest extends GlobalTimePerformanceTestCase
 {
 
 	private CSSScanner fScanner;

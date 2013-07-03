@@ -66,7 +66,6 @@ public class PerformanceTestCase extends TestCase
 	{
 		Performance performance = Performance.getDefault();
 		fPerformanceMeter = performance.createPerformanceMeter(performance.getDefaultScenarioId(this));
-		tagAsGlobalSummary(performance.getDefaultScenarioId(this), Dimension.ELAPSED_PROCESS);
 	}
 
 	/**
