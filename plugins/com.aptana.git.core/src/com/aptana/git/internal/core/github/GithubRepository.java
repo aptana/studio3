@@ -113,14 +113,19 @@ public class GithubRepository implements IGithubRepository
 			return null;
 		}
 
-		if (!hasDetailedJSON())
+		if (!json.containsKey("parent"))
 		{
-			// Replace json with this new object and set a flag indicating we have the more detailed data now!
-			this.json = (JSONObject) getAPI().get(getAPIURL());
-			this.hasDetailed = true;
+			getDetailedJSON();
 		}
 		// TODO Keep a cache of the repos inside the manager or something?
 		return new GithubRepository((JSONObject) json.get("parent"));
+	}
+
+	protected void getDetailedJSON() throws CoreException
+	{
+		// Replace json with this new object and set a flag indicating we have the more detailed data now!
+		this.json = (JSONObject) getAPI().get(getAPIURL());
+		this.hasDetailed = true;
 	}
 
 	/**
@@ -130,17 +135,12 @@ public class GithubRepository implements IGithubRepository
 	 */
 	protected String getAPIURL()
 	{
-		return "/repos/" + getOwner() + "/" + getName();
+		return "repos/" + getOwner() + "/" + getName();
 	}
 
 	protected GithubAPI getAPI()
 	{
 		return new GithubAPI(getGithubManager().getUser());
-	}
-
-	private boolean hasDetailedJSON()
-	{
-		return this.hasDetailed;
 	}
 
 	public IStatus createPullRequest(String title, String body, GitRepository repo)
@@ -156,17 +156,18 @@ public class GithubRepository implements IGithubRepository
 
 		try
 		{
+			IGithubRepository parent = getParent();
+			JSONObject blah = new JSONObject();
+			blah.put("title", title);
+			blah.put("body", body);
+			// TODO Allow user to choose branch on the fork to use as contents for PR?
+			blah.put("head", getGithubManager().getUser().getUsername() + ":" + branch);
 			// FIXME Allow user to choose the branch from parent to merge against. Default to the parent's default
 			// branch
-			String base = getParent().getDefaultBranch();
-			// TODO Allow user to choose branch on the fork to use as contents for PR?
-			String head = getGithubManager().getUser().getUsername() + ":" + branch; // Where the change
-																						// is
-			String prJSON = "{\"title\": \"" + title + "\", \"body\": \"" + body + "\", \"head\": \"" + head
-					+ "\", \"base\": \"" + base + "\"}";
+			blah.put("base", parent.getDefaultBranch());
 
 			// TODO Do something with the response?
-			getAPI().post(getAPIURL() + "/pulls", prJSON);
+			getAPI().post(((GithubRepository) parent).getAPIURL() + "/pulls", blah.toJSONString());
 		}
 		catch (CoreException e)
 		{
