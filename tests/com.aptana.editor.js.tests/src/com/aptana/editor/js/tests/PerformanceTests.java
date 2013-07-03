@@ -13,8 +13,6 @@ import junit.framework.Test;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
-import com.aptana.core.logging.IdeLog;
-import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.contentassist.JSBuildPerformanceTest;
 import com.aptana.editor.js.contentassist.JSContentAssistProcessorPerformanceTest;
 import com.aptana.editor.js.contentassist.JSIndexingPerformanceTest;
@@ -36,8 +34,7 @@ public class PerformanceTests
 			public void runTest(Test test, TestResult result)
 			{
 				String msg = MessageFormat.format("Running test: {0}", test.toString());
-				IdeLog.logError(JSPlugin.getDefault(), msg);
-				System.out.println(msg);
+				System.err.println(msg);
 				super.runTest(test, result);
 			}
 		};
