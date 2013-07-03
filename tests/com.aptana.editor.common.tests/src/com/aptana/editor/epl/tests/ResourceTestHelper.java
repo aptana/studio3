@@ -60,17 +60,13 @@ public class ResourceTestHelper
 			src.copy(destFilePath, true, null);
 			Assert.assertTrue(MessageFormat.format("src file {0} didn'get copied to destination: {1}",
 					srcFilePath.toPortableString(), destFilePath.toPortableString()), getFile(destFilePath).exists());
-			IdeLog.logError(
-					CommonEditorPlugin.getDefault(),
-					MessageFormat.format("Copied {0} to {1}", srcFilePath.toPortableString(),
-							destFilePath.toPortableString()));
+			System.err.println(MessageFormat.format("Copied {0} to {1}", srcFilePath.toPortableString(),
+					destFilePath.toPortableString()));
 		}
 		else
 		{
-			IdeLog.logError(
-					CommonEditorPlugin.getDefault(),
-					MessageFormat.format("Skipping copy of {0} to {1}, since dest already exists",
-							srcFilePath.toPortableString(), destFilePath.toPortableString()));
+			System.err.println(MessageFormat.format("Skipping copy of {0} to {1}, since dest already exists",
+					srcFilePath.toPortableString(), destFilePath.toPortableString()));
 		}
 	}
 
