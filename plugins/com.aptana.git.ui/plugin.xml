@@ -940,6 +940,22 @@
                 </reference>
              </visibleWhen>
           </command>
+          <separator
+                name="com.aptana.git.ui.separator.github"
+                visible="true">
+          </separator>
+          <command
+                commandId="com.aptana.git.ui.command.create_pull_request"
+                id="com.aptana.git.ui.actions.GithubPullRequestAction"
+                label="Create Pull Request">
+             <visibleWhen
+                   checkEnabled="true">
+                   <!-- TODO Add property tester/expression so we can test that we have a git repo, and have an 'uptream' remote -->
+                <reference
+                      definitionId="com.aptana.git.ui.hasGitRepository">
+                </reference>
+             </visibleWhen>
+          </command>
          <command
                commandId="com.aptana.git.ui.command.github.network"
                id="com.aptana.git.ui.actions.GithubNetworkAction"
@@ -1053,6 +1069,10 @@
       <image
             commandId="com.aptana.git.ui.command.cherry-pick"
             icon="icons/elcl16/cherry.gif">
+      </image>
+      <image
+            commandId="com.aptana.git.ui.command.create_pull_request"
+            icon="icons/obj16/pull_request.gif">
       </image>
    </extension>
    <extension
