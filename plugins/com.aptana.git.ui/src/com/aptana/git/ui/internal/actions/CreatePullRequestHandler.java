@@ -17,7 +17,6 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Composite;
@@ -28,6 +27,7 @@ import com.aptana.git.core.github.IGithubManager;
 import com.aptana.git.core.github.IGithubRepository;
 import com.aptana.git.core.github.IGithubUser;
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.ui.dialogs.CreatePullRequestDialog;
 import com.aptana.git.ui.internal.preferences.GithubAccountPageProvider;
 import com.aptana.ui.util.UIUtils;
 
@@ -36,6 +36,11 @@ import com.aptana.ui.util.UIUtils;
  */
 public class CreatePullRequestHandler extends AbstractGitHandler
 {
+	/**
+	 * The regexp used to parse out the repo name from a remote pointing at github
+	 */
+	private static final String GITHUB_REMOTE_REGEX = ".+?github\\.com:[^/]+?/([\\w\\-_]+)\\.git"; //$NON-NLS-1$
+
 	@Override
 	protected Object doExecute(ExecutionEvent event) throws ExecutionException
 	{
@@ -88,7 +93,7 @@ public class CreatePullRequestHandler extends AbstractGitHandler
 		}
 
 		// Ok, we have the name of the repo on github, the user has logged into github (or we know their credentials and
-		// they work), now lets' generate a pull request!
+		// they work), now let's generate a pull request!
 		IGithubRepository ghRepo;
 		try
 		{
@@ -99,17 +104,15 @@ public class CreatePullRequestHandler extends AbstractGitHandler
 			throw new ExecutionException("Unable to get repository details from github API", e);
 		}
 		// Prompt for title and body!
-		// FIXME Create a much nicer PR title/body dialog!
-		InputDialog id = new InputDialog(UIUtils.getActiveShell(), "Create Pull Request",
-				"Please enter the title of your pull request", "Example PR Title", null);
+		// TODO Pre-populate title and body with details of commit log?
+		// TODO Allow user to select different local and remote branch for PR?
+		CreatePullRequestDialog id = new CreatePullRequestDialog(UIUtils.getActiveShell());
 		if (id.open() == Window.CANCEL)
 		{
 			return null;
 		}
 
-		String title = id.getValue();
-		String body = "contents";
-		IStatus status = ghRepo.createPullRequest(title, body, repo);
+		IStatus status = ghRepo.createPullRequest(id.getTitle(), id.getBody(), repo);
 		// TODO Use toast to display result?
 		if (!status.isOK())
 		{
@@ -142,12 +145,12 @@ public class CreatePullRequestHandler extends AbstractGitHandler
 			throw new ExecutionException("Unable to get remotes for repository", e);
 		}
 
-		Pattern p = Pattern.compile(".+?github\\.com:[^/]+?/([\\w\\-_]+)\\.git");
+		Pattern p = Pattern.compile(GITHUB_REMOTE_REGEX);
 		Matcher m = p.matcher(remoteURL);
 		if (!m.find())
 		{
-			throw new ExecutionException(MessageFormat.format(
-					"Unable to extract repo name from 'origin' remote url: {0}", remoteURL));
+			throw new ExecutionException(MessageFormat.format("Unable to extract repo name from '{0}' remote url: {1}",
+					GitRepository.ORIGIN, remoteURL));
 		}
 		return m.group(1);
 	}
