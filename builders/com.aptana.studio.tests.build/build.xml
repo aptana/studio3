@@ -104,7 +104,7 @@
 		<mkdir dir="${buildDirectory}" />
 		<!-- Copy over the original base eclipse to a new location.
 								Have to use exec cp to retain permissions on *nix, Mac -->
-		<echo message="Copying eclipse" level="info" />
+		<echo message="Copying eclipse from ${vanilla.eclipse} to ${baseLocation}" level="info" />
 		<exec executable="cp">
 			<arg line="-R ${vanilla.eclipse} ${baseLocation}" />
 		</exec>
@@ -125,7 +125,7 @@
 		  target: run.director                      
 		 - - - - - - - - - - - - - - - - - -->
 	<target name="run.director" description="Runs the p2 director installs">
-		<java jar="${baseLocation}/plugins/${launcher.plugin}.jar" fork="true" failonerror="true" dir="${baseLocation}" timeout="900000">
+		<java jar="${baseLocation}/plugins/${launcher.plugin}.jar" fork="true" failonerror="true" dir="${baseLocation}" timeout="900000" error="${buildlogs}/error.txt" output="${buildlogs}/output.txt">
 			<arg line="-application org.eclipse.equinox.p2.director" />
 			<arg line="-nosplash" />
 			<arg line="-consoleLog" />
