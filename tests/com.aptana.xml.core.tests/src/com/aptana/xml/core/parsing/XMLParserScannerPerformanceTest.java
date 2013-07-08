@@ -12,13 +12,12 @@ import java.io.InputStream;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.test.performance.PerformanceTestCase;
+import org.eclipse.test.performance.GlobalTimePerformanceTestCase;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.dtd.core.parsing.Terminals;
-import com.aptana.xml.core.parsing.XMLScanner;
 
-public class XMLParserScannerPerformanceTest extends PerformanceTestCase
+public class XMLParserScannerPerformanceTest extends GlobalTimePerformanceTestCase
 {
 
 	private XMLScanner fScanner;

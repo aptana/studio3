@@ -15,7 +15,7 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.test.performance.PerformanceTestCase;
+import org.eclipse.test.performance.GlobalTimePerformanceTestCase;
 
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.editor.epl.tests.EditorTestHelper;
@@ -23,7 +23,7 @@ import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.index.core.FileStoreBuildContext;
 import com.aptana.index.core.build.BuildContext;
 
-public class HTMLTidyValidatorPerformanceTest extends PerformanceTestCase
+public class HTMLTidyValidatorPerformanceTest extends GlobalTimePerformanceTestCase
 {
 
 	private HTMLTidyValidator validator;
