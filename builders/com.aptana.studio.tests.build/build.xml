@@ -104,7 +104,7 @@
 		<mkdir dir="${buildDirectory}" />
 		<!-- Copy over the original base eclipse to a new location.
 								Have to use exec cp to retain permissions on *nix, Mac -->
-		<echo message="Copying eclipse" level="info" />
+		<echo message="Copying eclipse from ${vanilla.eclipse} to ${baseLocation}" level="info" />
 		<exec executable="cp">
 			<arg line="-R ${vanilla.eclipse} ${baseLocation}" />
 		</exec>
