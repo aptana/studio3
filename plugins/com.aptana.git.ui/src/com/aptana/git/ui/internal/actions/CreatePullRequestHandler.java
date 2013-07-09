@@ -27,7 +27,6 @@ import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.github.IGithubManager;
 import com.aptana.git.core.github.IGithubRepository;
 import com.aptana.git.core.github.IGithubUser;
-import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.GitRepository.ReadWrite;
 import com.aptana.git.ui.dialogs.CreatePullRequestDialog;
