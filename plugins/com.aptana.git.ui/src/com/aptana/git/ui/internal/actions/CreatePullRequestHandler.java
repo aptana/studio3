@@ -16,12 +16,19 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.window.DefaultToolTip;
 import org.eclipse.jface.window.Window;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Shell;
 
+import com.aptana.core.util.ProcessStatus;
 import com.aptana.core.util.StringUtil;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.github.IGithubManager;
@@ -121,12 +128,27 @@ public class CreatePullRequestHandler extends AbstractGitHandler
 			return null;
 		}
 
-		IStatus status = ghRepo.createPullRequest(id.getTitle(), id.getBody(), repo);
-		// TODO Use toast to display result?
+		final IStatus status = ghRepo.createPullRequest(id.getTitle(), id.getBody(), repo);
 		if (!status.isOK())
 		{
 			throw new ExecutionException(status.getMessage());
 		}
+		// Now show a tooltip "toast" for 3 seconds to announce success
+		final Shell shell = UIUtils.getActiveShell();
+		DefaultToolTip toolTip = new DefaultToolTip(shell)
+		{
+			@Override
+			public Point getLocation(Point size, Event event)
+			{
+				final Rectangle workbenchWindowBounds = shell.getBounds();
+				int xCoord = workbenchWindowBounds.x + workbenchWindowBounds.width - size.x - 10;
+				int yCoord = workbenchWindowBounds.y + workbenchWindowBounds.height - size.y - 10;
+				return new Point(xCoord, yCoord);
+			}
+		};
+		toolTip.setHideDelay(UIUtils.DEFAULT_TOOLTIP_TIME);
+		toolTip.setText("Successfully generated pull request.");
+		toolTip.show(new Point(0, 0));
 		return null;
 	}
 
