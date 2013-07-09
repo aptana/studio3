@@ -22,11 +22,14 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.github.IGithubManager;
 import com.aptana.git.core.github.IGithubRepository;
 import com.aptana.git.core.github.IGithubUser;
+import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.core.model.GitRepository.ReadWrite;
 import com.aptana.git.ui.dialogs.CreatePullRequestDialog;
 import com.aptana.git.ui.internal.preferences.GithubAccountPageProvider;
 import com.aptana.ui.util.UIUtils;
@@ -104,9 +107,16 @@ public class CreatePullRequestHandler extends AbstractGitHandler
 			throw new ExecutionException("Unable to get repository details from github API", e);
 		}
 		// Prompt for title and body!
-		// TODO Pre-populate title and body with details of commit log?
+		// Pre-populate title and body with details of commit log?
+
+		// .git/logs/refs/heads/<branch_name> holds the log (sort of)
+		// git log -g --pretty (when on HEAD of feature branch) shows commits
+		// This assumes we're on current branch!
+		IStatus commitsStatus = repo.execute(ReadWrite.READ, "log", "-g", "--pretty"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
 		// TODO Allow user to select different local and remote branch for PR?
-		CreatePullRequestDialog id = new CreatePullRequestDialog(UIUtils.getActiveShell());
+		CreatePullRequestDialog id = new CreatePullRequestDialog(UIUtils.getActiveShell(), repo.currentBranch(),
+				commitsStatus.isOK() ? commitsStatus.getMessage() : StringUtil.EMPTY);
 		if (id.open() == Window.CANCEL)
 		{
 			return null;
