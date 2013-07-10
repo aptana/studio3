@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -14,11 +14,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.aptana.jetty.util.epl.ajax.JSON;
-
 import com.aptana.configurations.processor.ConfigurationStatus;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
+import com.aptana.jetty.util.epl.ajax.JSON;
 import com.aptana.portal.ui.IDebugScopes;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.IBrowserNotificationConstants;
@@ -27,8 +26,8 @@ import com.aptana.portal.ui.dispatch.actionControllers.CommandHandlerActionContr
 import com.aptana.portal.ui.dispatch.actionControllers.ControllerAction;
 import com.aptana.samples.ISamplesManager;
 import com.aptana.samples.SamplesPlugin;
+import com.aptana.samples.model.IProjectSample;
 import com.aptana.samples.model.SampleCategory;
-import com.aptana.samples.model.SamplesReference;
 import com.aptana.samples.ui.SamplesUIPlugin;
 
 /**
@@ -96,7 +95,7 @@ public class SamplesActionController extends AbstractActionController
 		List<SampleCategory> categories = samplesManager.getCategories();
 		for (SampleCategory category : categories)
 		{
-			for (SamplesReference sample : samplesManager.getSamplesForCategory(category.getId()))
+			for (IProjectSample sample : samplesManager.getSamplesForCategory(category.getId()))
 			{
 				Map<String, String> sampleInfo = new HashMap<String, String>();
 				sampleInfo.put(SAMPLE_INFO.CATEGORY.toString(), category.getName());
@@ -168,7 +167,7 @@ public class SamplesActionController extends AbstractActionController
 		{
 			String message = MessageFormat
 					.format("Wrong argument type passed to SamplesActionController::importSample. Expected Object[] and got {0}", //$NON-NLS-1$
-					((attributes == null) ? "null" : attributes.getClass().getName())); //$NON-NLS-1$
+							((attributes == null) ? "null" : attributes.getClass().getName())); //$NON-NLS-1$
 			IdeLog.logError(PortalUIPlugin.getDefault(), new Exception(message));
 		}
 		return null;

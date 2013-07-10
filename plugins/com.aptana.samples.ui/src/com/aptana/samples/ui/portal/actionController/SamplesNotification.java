@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -10,17 +10,16 @@ package com.aptana.samples.ui.portal.actionController;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.aptana.jetty.util.epl.ajax.JSON;
-
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
+import com.aptana.jetty.util.epl.ajax.JSON;
 import com.aptana.portal.ui.IDebugScopes;
 import com.aptana.portal.ui.dispatch.IBrowserNotificationConstants;
 import com.aptana.portal.ui.dispatch.browserNotifications.AbstractBrowserNotification;
 import com.aptana.samples.ISampleListener;
 import com.aptana.samples.SamplesPlugin;
+import com.aptana.samples.model.IProjectSample;
 import com.aptana.samples.model.SampleCategory;
-import com.aptana.samples.model.SamplesReference;
 import com.aptana.samples.ui.SamplesUIPlugin;
 
 /**
@@ -63,7 +62,7 @@ public class SamplesNotification extends AbstractBrowserNotification
 	 * 
 	 * @param sample
 	 */
-	protected void notifyAdd(SamplesReference sample)
+	protected void notifyAdd(IProjectSample sample)
 	{
 		IdeLog.logInfo(SamplesUIPlugin.getDefault(), "Sample added. Notifying portal...", IDebugScopes.START_PAGE); //$NON-NLS-1$
 		notifyTargets(IBrowserNotificationConstants.EVENT_ID_SAMPLES, IBrowserNotificationConstants.EVENT_TYPE_ADDED,
@@ -75,7 +74,7 @@ public class SamplesNotification extends AbstractBrowserNotification
 	 * 
 	 * @param sample
 	 */
-	protected void notifyRemoved(SamplesReference sample)
+	protected void notifyRemoved(IProjectSample sample)
 	{
 		IdeLog.logInfo(SamplesUIPlugin.getDefault(), "Sample removed. Notifying portal...", IDebugScopes.START_PAGE); //$NON-NLS-1$
 		notifyTargets(IBrowserNotificationConstants.EVENT_ID_SAMPLES, IBrowserNotificationConstants.EVENT_TYPE_DELETED,
@@ -88,7 +87,7 @@ public class SamplesNotification extends AbstractBrowserNotification
 	 * @param sample
 	 * @return A JSON representation of the sample that was added or removed.
 	 */
-	protected String createSampleInfo(SamplesReference sample)
+	protected String createSampleInfo(IProjectSample sample)
 	{
 		Map<String, String> sampleInfo = new HashMap<String, String>();
 		SampleCategory category = sample.getCategory();
@@ -110,7 +109,7 @@ public class SamplesNotification extends AbstractBrowserNotification
 		{
 			listener = new ISampleListener()
 			{
-				public void sampleRemoved(SamplesReference sample)
+				public void sampleRemoved(IProjectSample sample)
 				{
 					if (isListening)
 					{
@@ -118,7 +117,7 @@ public class SamplesNotification extends AbstractBrowserNotification
 					}
 				}
 
-				public void sampleAdded(SamplesReference sample)
+				public void sampleAdded(IProjectSample sample)
 				{
 					if (isListening)
 					{

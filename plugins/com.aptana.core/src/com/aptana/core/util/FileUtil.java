@@ -71,6 +71,19 @@ public class FileUtil
 	}
 
 	/**
+	 * Returns true if the given file is a zip archive.
+	 * 
+	 * @param file
+	 * @return
+	 */
+	public static boolean isZipFile(File file)
+	{
+		String filePath = file.getAbsolutePath();
+		// TODO: should be generic to other archive formats ?
+		return filePath.toLowerCase().endsWith(".zip");
+	}
+
+	/**
 	 * Removes the "middle" part from a path to make it short enough to fit within the specified length, i.e.
 	 * c:/Documents and Settings/username/My Documents/workspace/whatever.txt would become c:/.../username/My
 	 * Documents/workspace/whatever.txt.

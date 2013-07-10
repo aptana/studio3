@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -16,6 +16,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.samples.SamplesPlugin;
+import com.aptana.samples.model.IProjectSample;
 import com.aptana.samples.model.SamplesReference;
 import com.aptana.samples.ui.project.SampleProjectCreator;
 
@@ -42,7 +43,7 @@ public class ImportSampleHandler extends AbstractHandler
 		}
 		else
 		{
-			SamplesReference samplesRef = SamplesPlugin.getDefault().getSamplesManager().getSample(id);
+			IProjectSample samplesRef = SamplesPlugin.getDefault().getSamplesManager().getSample(id);
 			if (samplesRef != null)
 			{
 				SampleProjectCreator.createSampleProject(samplesRef);
