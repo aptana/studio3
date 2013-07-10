@@ -7,20 +7,22 @@
  */
 package com.aptana.git.core.github;
 
-import java.util.List;
-
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 
+/**
+ * @author cwilliams
+ */
 public interface IGithubManager
 {
 
+	/**
+	 * Returns the currently logged in user.
+	 * 
+	 * @return
+	 */
 	public IGithubUser getUser();
 
 	public IStatus login(String username, String password);
 
 	public IStatus logout();
-
-	public List<String> getRepos() throws CoreException;
-
 }

@@ -179,7 +179,7 @@ public class GitRepository
 	/**
 	 * The default 'remote' name for git.
 	 */
-	private static final String ORIGIN = "origin"; //$NON-NLS-1$
+	public static final String ORIGIN = "origin"; //$NON-NLS-1$
 
 	public static final String GIT_DIR = ".git"; //$NON-NLS-1$
 
@@ -1310,18 +1310,37 @@ public class GitRepository
 	 */
 	public Set<String> remoteURLs()
 	{
-		Set<String> remoteURLs = new HashSet<String>();
+		try
+		{
+			return new HashSet<String>(remotePairs().values());
+		}
+		catch (CoreException e)
+		{
+			IdeLog.logError(GitPlugin.getDefault(), e);
+			return Collections.emptySet();
+		}
+	}
+
+	/**
+	 * Returns a Map from remote name to URL.
+	 * 
+	 * @return
+	 */
+	public Map<String, String> remotePairs() throws CoreException
+	{
+		Map<String, String> pairs = new HashMap<String, String>();
 		String contents = configContents();
 		if (contents != null)
 		{
 			Matcher m = fgRemoteURLPattern.matcher(contents);
 			while (m.find())
 			{
-				remoteURLs.add(m.group(3));
+				pairs.put(m.group(1), m.group(3));
 			}
+			return pairs;
 		}
-		// TODO If we can't acquire the config read lock, can we fall back to something else?
-		return remoteURLs;
+		throw new CoreException(new Status(IStatus.ERROR, GitPlugin.PLUGIN_ID,
+				"Unable to acquire read lock to read .git/config file"));
 	}
 
 	/**
@@ -2238,5 +2257,45 @@ public class GitRepository
 	void forceWrite()
 	{
 		monitor.writeLock().lock();
+	}
+
+	/**
+	 * Runs git push with any number of optional args.
+	 * 
+	 * @param args
+	 * @return
+	 */
+	public IStatus push(String... args)
+	{
+		String[] fullArgs = new String[args.length + 1];
+		fullArgs[0] = "push"; //$NON-NLS-1$
+		System.arraycopy(args, 0, fullArgs, 1, args.length);
+		IStatus result = execute(GitRepository.ReadWrite.WRITE, fullArgs);
+		if (result == null || !result.isOK())
+		{
+			return result;
+		}
+		firePushEvent();
+		return result;
+	}
+
+	/**
+	 * Runs git pull with any number of optional args.
+	 * 
+	 * @param args
+	 * @return
+	 */
+	public IStatus pull(String... args)
+	{
+		String[] fullArgs = new String[args.length + 1];
+		fullArgs[0] = "pull"; //$NON-NLS-1$
+		System.arraycopy(args, 0, fullArgs, 1, args.length);
+		IStatus result = execute(GitRepository.ReadWrite.WRITE, fullArgs);
+		if (result == null || !result.isOK())
+		{
+			return result;
+		}
+		firePullEvent();
+		return result;
 	}
 }

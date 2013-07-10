@@ -7,6 +7,13 @@
  */
 package com.aptana.git.internal.core.github;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.core.runtime.CoreException;
+import org.json.simple.JSONObject;
+
+import com.aptana.git.core.github.IGithubRepository;
 import com.aptana.git.core.github.IGithubUser;
 
 public class GithubUser implements IGithubUser
@@ -31,4 +38,21 @@ public class GithubUser implements IGithubUser
 		return password;
 	}
 
+	public List<IGithubRepository> getRepos() throws CoreException
+	{
+		@SuppressWarnings("unchecked")
+		List<JSONObject> result = (List<JSONObject>) new GithubAPI(this).get("user/repos"); //$NON-NLS-1$
+		List<IGithubRepository> repoURLs = new ArrayList<IGithubRepository>(result.size());
+		for (JSONObject repo : result)
+		{
+			repoURLs.add(new GithubRepository(repo));
+		}
+		return repoURLs;
+	}
+
+	public IGithubRepository getRepo(String repoName) throws CoreException
+	{
+		JSONObject result = (JSONObject) new GithubAPI(this).get("repos/" + username + '/' + repoName); //$NON-NLS-1$
+		return new GithubRepository(result);
+	}
 }

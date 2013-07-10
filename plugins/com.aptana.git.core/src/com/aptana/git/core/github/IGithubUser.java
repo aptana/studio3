@@ -7,6 +7,13 @@
  */
 package com.aptana.git.core.github;
 
+import java.util.List;
+
+import org.eclipse.core.runtime.CoreException;
+
+/**
+ * @author cwilliams
+ */
 public interface IGithubUser
 {
 
@@ -17,4 +24,21 @@ public interface IGithubUser
 
 	public String getPassword();
 
+	/**
+	 * Returns a List of IGithubRepository for the user.
+	 * 
+	 * @return
+	 * @throws CoreException
+	 */
+	public List<IGithubRepository> getRepos() throws CoreException;
+
+	/**
+	 * Returns a specific repo by it's name (scoped under this user). 
+	 * TODO What about repos belonging to the user's org(s)?
+	 * 
+	 * @param repoName
+	 * @return
+	 * @throws CoreException 
+	 */
+	public IGithubRepository getRepo(String repoName) throws CoreException;
 }

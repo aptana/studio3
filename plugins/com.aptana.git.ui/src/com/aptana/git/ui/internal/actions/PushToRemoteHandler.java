@@ -39,6 +39,8 @@ import com.aptana.ui.QuickMenuDialog;
 public class PushToRemoteHandler extends AbstractGitHandler
 {
 
+	// FIXME Use GitRepository.push!
+
 	@Override
 	protected Object doExecute(ExecutionEvent event) throws ExecutionException
 	{
