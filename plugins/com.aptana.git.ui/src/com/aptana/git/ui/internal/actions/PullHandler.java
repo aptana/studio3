@@ -11,6 +11,7 @@ import com.aptana.git.core.model.GitRepository;
 
 public class PullHandler extends AbstractSimpleGitCommandHandler
 {
+	// FIXME Use GitRepository.pull!
 
 	@Override
 	protected String[] getCommand()
