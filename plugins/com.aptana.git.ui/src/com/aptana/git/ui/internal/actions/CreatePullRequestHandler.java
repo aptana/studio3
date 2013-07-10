@@ -16,7 +16,6 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.window.DefaultToolTip;
@@ -28,7 +27,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
 
-import com.aptana.core.util.ProcessStatus;
 import com.aptana.core.util.StringUtil;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.github.IGithubManager;
@@ -56,7 +54,7 @@ public class CreatePullRequestHandler extends AbstractGitHandler
 		final GitRepository repo = getSelectedRepository();
 		if (repo == null)
 		{
-			throw new ExecutionException("No git repository selected");
+			throw new ExecutionException(Messages.CreatePullRequestHandler_NoRepoErr);
 		}
 		String ghRepoName = getGithubRepoName();
 
@@ -97,7 +95,7 @@ public class CreatePullRequestHandler extends AbstractGitHandler
 			user = ghManager.getUser();
 			if (user == null)
 			{
-				throw new ExecutionException("User is not logged into their Github account");
+				throw new ExecutionException(Messages.CreatePullRequestHandler_NotLoggedInErr);
 			}
 		}
 
@@ -110,7 +108,7 @@ public class CreatePullRequestHandler extends AbstractGitHandler
 		}
 		catch (CoreException e)
 		{
-			throw new ExecutionException("Unable to get repository details from github API", e);
+			throw new ExecutionException(Messages.CreatePullRequestHandler_RepoAPIErr, e);
 		}
 		// Prompt for title and body!
 		// Pre-populate title and body with details of commit log?
@@ -147,7 +145,7 @@ public class CreatePullRequestHandler extends AbstractGitHandler
 			}
 		};
 		toolTip.setHideDelay(UIUtils.DEFAULT_TOOLTIP_TIME);
-		toolTip.setText("Successfully generated pull request.");
+		toolTip.setText(Messages.CreatePullRequestHandler_SuccessMsg);
 		toolTip.show(new Point(0, 0));
 		return null;
 	}
@@ -157,7 +155,7 @@ public class CreatePullRequestHandler extends AbstractGitHandler
 		final GitRepository repo = getSelectedRepository();
 		if (repo == null)
 		{
-			throw new ExecutionException("No git repository selected");
+			throw new ExecutionException(Messages.CreatePullRequestHandler_NoRepoErr);
 		}
 
 		String remoteURL;
@@ -168,20 +166,21 @@ public class CreatePullRequestHandler extends AbstractGitHandler
 			if (remoteURL == null)
 			{
 				// FIXME Loop through and find correct remote? If we find multiple do we need to prompt?
-				throw new ExecutionException("Remote 'origin' not set up");
+				throw new ExecutionException(Messages.CreatePullRequestHandler_RemoteOriginDoesntExistErr);
 			}
 		}
 		catch (CoreException e)
 		{
-			throw new ExecutionException("Unable to get remotes for repository", e);
+			throw new ExecutionException(Messages.CreatePullRequestHandler_GetRemotesFailedErr, e);
 		}
 
 		Pattern p = Pattern.compile(GITHUB_REMOTE_REGEX);
 		Matcher m = p.matcher(remoteURL);
 		if (!m.find())
 		{
-			throw new ExecutionException(MessageFormat.format("Unable to extract repo name from '{0}' remote url: {1}",
-					GitRepository.ORIGIN, remoteURL));
+			throw new ExecutionException(MessageFormat.format(
+					Messages.CreatePullRequestHandler_ExtractRepoNameFromRemoteFailedErr, GitRepository.ORIGIN,
+					remoteURL));
 		}
 		return m.group(1);
 	}

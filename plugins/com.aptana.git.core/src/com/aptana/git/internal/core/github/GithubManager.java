@@ -26,6 +26,11 @@ public class GithubManager implements IGithubManager
 {
 
 	/**
+	 * Property keys in response JSON for login to Github API
+	 */
+	private static final String USERNAME_PROPERTY = "login"; //$NON-NLS-1$
+
+	/**
 	 * Secure Storage
 	 */
 	private static final String SECURE_PREF_NODE = GitPlugin.PLUGIN_ID;
@@ -50,8 +55,8 @@ public class GithubManager implements IGithubManager
 		try
 		{
 			// This API can take username or email address.
-			JSONObject result = (JSONObject) new GithubAPI(username, password).get("user");
-			String actualUsername = (String) result.get("login"); //$NON-NLS-1$
+			JSONObject result = (JSONObject) new GithubAPI(username, password).get("user"); //$NON-NLS-1$
+			String actualUsername = (String) result.get(USERNAME_PROPERTY);
 			this.user = new GithubUser(actualUsername, password);
 			saveCredentials();
 			return new Status(IStatus.OK, GitPlugin.PLUGIN_ID, 0, null, null);

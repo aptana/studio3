@@ -23,71 +23,44 @@ import com.aptana.git.core.model.GitRepository;
 public class GithubRepository implements IGithubRepository
 {
 
-	// @formatter:off
-//  {
-//    "id": 1296269,
-//    "owner": {
-//      "login": "octocat",
-//      "id": 1,
-//      "avatar_url": "https://github.com/images/error/octocat_happy.gif",
-//      "gravatar_id": "somehexcode",
-//      "url": "https://api.github.com/users/octocat"
-//    },
-//    "name": "Hello-World",
-//    "full_name": "octocat/Hello-World",
-//    "description": "This your first repo!",
-//    "private": false,
-//    "fork": false,
-//    "url": "https://api.github.com/repos/octocat/Hello-World",
-//    "html_url": "https://github.com/octocat/Hello-World",
-//    "clone_url": "https://github.com/octocat/Hello-World.git",
-//    "git_url": "git://github.com/octocat/Hello-World.git",
-//    "ssh_url": "git@github.com:octocat/Hello-World.git",
-//    "svn_url": "https://svn.github.com/octocat/Hello-World",
-//    "mirror_url": "git://git.example.com/octocat/Hello-World",
-//    "homepage": "https://github.com",
-//    "language": null,
-//    "forks": 9,
-//    "forks_count": 9,
-//    "watchers": 80,
-//    "watchers_count": 80,
-//    "size": 108,
-//    "master_branch": "master",
-//    "open_issues": 0,
-//    "pushed_at": "2011-01-26T19:06:43Z",
-//    "created_at": "2011-01-26T19:01:12Z",
-//    "updated_at": "2011-01-26T19:14:43Z"
-//  }
-//  @formatter:on
+	/**
+	 * Keys used in JSON describing the repository.
+	 */
+	private static final String PARENT = "parent"; //$NON-NLS-1$
+	private static final String LOGIN = "login"; //$NON-NLS-1$
+	private static final String OWNER = "owner"; //$NON-NLS-1$
+	private static final String DEFAULT_BRANCH = "default_branch"; //$NON-NLS-1$
+	private static final String FORK = "fork"; //$NON-NLS-1$
+	private static final String PRIVATE = "private"; //$NON-NLS-1$
+	private static final String NAME = "name"; //$NON-NLS-1$
+	private static final String ID = "id"; //$NON-NLS-1$
 	private static final String ATTR_SSH_URL = "ssh_url"; //$NON-NLS-1$
+
 	private JSONObject json;
-	private boolean hasDetailed;
 
 	public GithubRepository(JSONObject repo)
 	{
 		this.json = repo;
-		this.hasDetailed = false; // TODO Do a spot check of JSOn keys and check for one we only get in detailed
-									// response?
 	}
 
 	public int getID()
 	{
-		return (Integer) json.get("id");
+		return (Integer) json.get(ID);
 	}
 
 	public String getName()
 	{
-		return (String) json.get("name");
+		return (String) json.get(NAME);
 	}
 
 	public boolean isPrivate()
 	{
-		return (Boolean) json.get("private");
+		return (Boolean) json.get(PRIVATE);
 	}
 
 	public boolean isFork()
 	{
-		return (Boolean) json.get("fork");
+		return (Boolean) json.get(FORK);
 	}
 
 	public String getSSHURL()
@@ -97,13 +70,13 @@ public class GithubRepository implements IGithubRepository
 
 	public String getDefaultBranch()
 	{
-		return (String) json.get("default_branch");
+		return (String) json.get(DEFAULT_BRANCH);
 	}
 
 	public String getOwner()
 	{
-		JSONObject owner = (JSONObject) json.get("owner");
-		return (String) owner.get("login");
+		JSONObject owner = (JSONObject) json.get(OWNER);
+		return (String) owner.get(LOGIN);
 	}
 
 	public IGithubRepository getParent() throws CoreException
@@ -113,19 +86,17 @@ public class GithubRepository implements IGithubRepository
 			return null;
 		}
 
-		if (!json.containsKey("parent"))
+		if (!json.containsKey(PARENT))
 		{
 			getDetailedJSON();
 		}
 		// TODO Keep a cache of the repos inside the manager or something?
-		return new GithubRepository((JSONObject) json.get("parent"));
+		return new GithubRepository((JSONObject) json.get(PARENT));
 	}
 
 	protected void getDetailedJSON() throws CoreException
 	{
-		// Replace json with this new object and set a flag indicating we have the more detailed data now!
 		this.json = (JSONObject) getAPI().get(getAPIURL());
-		this.hasDetailed = true;
 	}
 
 	/**
@@ -135,7 +106,7 @@ public class GithubRepository implements IGithubRepository
 	 */
 	protected String getAPIURL()
 	{
-		return "repos/" + getOwner() + "/" + getName();
+		return "repos/" + getOwner() + "/" + getName(); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	protected GithubAPI getAPI()
@@ -143,12 +114,13 @@ public class GithubRepository implements IGithubRepository
 		return new GithubAPI(getGithubManager().getUser());
 	}
 
+	@SuppressWarnings("unchecked")
 	public IStatus createPullRequest(String title, String body, GitRepository repo)
 	{
 		String branch = repo.currentBranch();
 
 		// push current branch to origin first!
-		IStatus pushStatus = repo.push("origin", branch);
+		IStatus pushStatus = repo.push(GitRepository.ORIGIN, branch);
 		if (!pushStatus.isOK())
 		{
 			return pushStatus;
@@ -157,17 +129,17 @@ public class GithubRepository implements IGithubRepository
 		try
 		{
 			IGithubRepository parent = getParent();
-			JSONObject blah = new JSONObject();
-			blah.put("title", title);
-			blah.put("body", body);
+			JSONObject prObject = new JSONObject();
+			prObject.put("title", title); //$NON-NLS-1$
+			prObject.put("body", body); //$NON-NLS-1$
 			// TODO Allow user to choose branch on the fork to use as contents for PR?
-			blah.put("head", getGithubManager().getUser().getUsername() + ":" + branch);
+			prObject.put("head", getGithubManager().getUser().getUsername() + ':' + branch); //$NON-NLS-1$
 			// FIXME Allow user to choose the branch from parent to merge against. Default to the parent's default
 			// branch
-			blah.put("base", parent.getDefaultBranch());
+			prObject.put("base", parent.getDefaultBranch()); //$NON-NLS-1$
 
 			// TODO Do something with the response?
-			getAPI().post(((GithubRepository) parent).getAPIURL() + "/pulls", blah.toJSONString());
+			getAPI().post(((GithubRepository) parent).getAPIURL() + "/pulls", prObject.toJSONString()); //$NON-NLS-1$
 		}
 		catch (CoreException e)
 		{

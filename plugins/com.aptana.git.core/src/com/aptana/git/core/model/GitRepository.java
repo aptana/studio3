@@ -2295,7 +2295,7 @@ public class GitRepository
 		{
 			return result;
 		}
-		firePushEvent();
+		firePullEvent();
 		return result;
 	}
 }
