@@ -56,9 +56,9 @@ public class PullFromRemoteItem extends AbstractDynamicBranchItem
 		}
 
 		Collection<IContributionItem> contributions = new ArrayList<IContributionItem>();
-		for (final String remote : repo.remotes())
+		for (final String remoteBranch : repo.remoteBranches())
 		{
-			contributions.add(new RemoteContributionItem(repo, remote));
+			contributions.add(new RemoteContributionItem(repo, remoteBranch));
 		}
 		return contributions.toArray(new IContributionItem[contributions.size()]);
 	}
@@ -66,25 +66,25 @@ public class PullFromRemoteItem extends AbstractDynamicBranchItem
 	private static class RemoteContributionItem extends ContributionItem
 	{
 		private GitRepository repo;
-		private String remote;
+		private String remoteBranch;
 
-		RemoteContributionItem(GitRepository repo, String remote)
+		RemoteContributionItem(GitRepository repo, String remoteBranch)
 		{
 			this.repo = repo;
-			this.remote = remote;
+			this.remoteBranch = remoteBranch;
 		}
 
 		@Override
 		public void fill(Menu menu, int index)
 		{
 			MenuItem menuItem = new MenuItem(menu, SWT.PUSH, index);
-			menuItem.setText(remote);
+			menuItem.setText(remoteBranch);
 			menuItem.addSelectionListener(new SelectionAdapter()
 			{
 				public void widgetSelected(SelectionEvent e)
 				{
 					// what to do when menu is subsequently selected.
-					PullFromRemoteHandler.pullFromBranchToRemote(repo, repo.currentBranch(), remote);
+					PullFromRemoteHandler.pullFromRemoteBranch(repo, remoteBranch);
 				}
 			});
 		}

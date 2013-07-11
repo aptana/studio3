@@ -82,11 +82,11 @@ public class GitRepository
 	{
 		public int compare(String o1, String o2)
 		{
-			if (o1.contains(BRANCH_DELIMITER) && !o2.contains(BRANCH_DELIMITER))
+			if (o1.indexOf(BRANCH_DELIMITER) != -1 && o2.indexOf(BRANCH_DELIMITER) == -1)
 			{
 				return 1;
 			}
-			if (o2.contains(BRANCH_DELIMITER) && !o1.contains(BRANCH_DELIMITER))
+			if (o2.indexOf(BRANCH_DELIMITER) != -1 && o1.indexOf(BRANCH_DELIMITER) == -1)
 			{
 				return -1;
 			}
@@ -114,9 +114,9 @@ public class GitRepository
 	}
 
 	/**
-	 * Delimiter used to separate remote name and remote brnahc name.
+	 * Delimiter used to separate remote name and remote branch name.
 	 */
-	private static final String BRANCH_DELIMITER = "/"; //$NON-NLS-1$
+	public static final char BRANCH_DELIMITER = '/';
 
 	/**
 	 * Extension of temporary git lock files.
