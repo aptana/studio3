@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -19,17 +19,17 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.osgi.util.NLS;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.ui.MenuDialogItem;
 import com.aptana.ui.QuickMenuDialog;
 
 /**
- * Runs a "git push <remote> HEAD" for current branch. So if you choose 'origin' and are on branch 'master', it'd run
- * "git push origin master".
+ * Runs a "git pull <remote> <branch>". Will prompt the user to select a remote/branch combination.
  * 
  * @author cwilliams
  */
-public class PushToRemoteHandler extends AbstractGitHandler
+public class PullFromRemoteHandler extends AbstractGitHandler
 {
 
 	@Override
@@ -41,28 +41,36 @@ public class PushToRemoteHandler extends AbstractGitHandler
 			return null;
 		}
 
-		final String currentBranch = repo.currentBranch();
-		List<MenuDialogItem> remotes = new ArrayList<MenuDialogItem>();
-		for (String remote : repo.remotes())
+		List<MenuDialogItem> remoteBranches = new ArrayList<MenuDialogItem>();
+		for (String remoteBranch : repo.remoteBranches())
 		{
-			remotes.add(new MenuDialogItem(remote));
+			remoteBranches.add(new MenuDialogItem(remoteBranch));
 		}
-		if (!remotes.isEmpty())
+		if (!remoteBranches.isEmpty())
 		{
 			QuickMenuDialog dialog = new QuickMenuDialog(getShell());
-			dialog.setInput(remotes);
+			dialog.setInput(remoteBranches);
 			if (dialog.open() != -1)
 			{
-				MenuDialogItem item = remotes.get(dialog.getReturnCode());
-				pushBranchToRemote(repo, currentBranch, item.getText());
+				MenuDialogItem item = remoteBranches.get(dialog.getReturnCode());
+
+				pullFromRemoteBranch(repo, item.getText());
 			}
 		}
 		return null;
 	}
 
-	public static void pushBranchToRemote(final GitRepository repo, final String branchName, final String remoteName)
+	/**
+	 * @param repo
+	 * @param remoteBranch
+	 *            A combination of remote and branch in the form: "<remote>/<branch>"
+	 */
+	public static void pullFromRemoteBranch(final GitRepository repo, final String remoteBranch)
 	{
-		Job job = new Job(NLS.bind("git push {0} {1}", remoteName, branchName)) //$NON-NLS-1$
+		List<String> parts = StringUtil.split(remoteBranch, GitRepository.BRANCH_DELIMITER);
+		final String remote = parts.get(0);
+		final String branch = parts.get(1);
+		Job job = new Job(NLS.bind("git pull {0} {1}", remote, branch)) //$NON-NLS-1$
 		{
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
@@ -72,7 +80,8 @@ public class PushToRemoteHandler extends AbstractGitHandler
 				{
 					return Status.CANCEL_STATUS;
 				}
-				return repo.push(remoteName, branchName);
+
+				return repo.pull(remote, branch);
 			}
 		};
 		job.setUser(true);
