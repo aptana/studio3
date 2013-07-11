@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -26,7 +26,7 @@ import org.eclipse.ui.part.ViewPart;
 import com.aptana.samples.ISampleListener;
 import com.aptana.samples.ISamplesManager;
 import com.aptana.samples.SamplesPlugin;
-import com.aptana.samples.model.SamplesReference;
+import com.aptana.samples.model.IProjectSample;
 import com.aptana.theme.ThemePlugin;
 import com.aptana.ui.util.UIUtils;
 
@@ -46,12 +46,12 @@ public class SamplesView extends ViewPart
 	private ISampleListener sampleListener = new ISampleListener()
 	{
 
-		public void sampleAdded(SamplesReference sample)
+		public void sampleAdded(IProjectSample sample)
 		{
 			refresh();
 		}
 
-		public void sampleRemoved(SamplesReference sample)
+		public void sampleRemoved(IProjectSample sample)
 		{
 			refresh();
 		}
