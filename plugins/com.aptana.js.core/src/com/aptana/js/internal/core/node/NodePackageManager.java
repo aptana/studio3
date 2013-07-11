@@ -357,7 +357,8 @@ public class NodePackageManager implements INodePackageManager
 			{
 				// The paths we get are locations on disk. We can tell a module's name by looking for a path
 				// that is a child of 'nod_modules', i.e. "/usr/local/lib/node_modules/alloy"
-				if (NODE_MODULES.equals(path.segment(path.segmentCount() - 2)))
+				int count = path.segmentCount();
+				if (count >= 2 && NODE_MODULES.equals(path.segment(count - 2)))
 				{
 					installed.add(path.lastSegment());
 				}
