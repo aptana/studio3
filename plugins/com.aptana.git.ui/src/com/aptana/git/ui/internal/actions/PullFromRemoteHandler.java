@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -24,12 +24,12 @@ import com.aptana.ui.MenuDialogItem;
 import com.aptana.ui.QuickMenuDialog;
 
 /**
- * Runs a "git push <remote> HEAD" for current branch. So if you choose 'origin' and are on branch 'master', it'd run
- * "git push origin master".
+ * Runs a "git pull <remote> HEAD" for current branch. So if you choose 'origin' and are on branch 'master', it'd run
+ * "git pull origin master".
  * 
  * @author cwilliams
  */
-public class PushToRemoteHandler extends AbstractGitHandler
+public class PullFromRemoteHandler extends AbstractGitHandler
 {
 
 	@Override
@@ -54,15 +54,16 @@ public class PushToRemoteHandler extends AbstractGitHandler
 			if (dialog.open() != -1)
 			{
 				MenuDialogItem item = remotes.get(dialog.getReturnCode());
-				pushBranchToRemote(repo, currentBranch, item.getText());
+				pullFromBranchToRemote(repo, currentBranch, item.getText());
 			}
 		}
 		return null;
 	}
 
-	public static void pushBranchToRemote(final GitRepository repo, final String branchName, final String remoteName)
+	public static void pullFromBranchToRemote(final GitRepository repo, final String branchName, final String remoteName)
 	{
-		Job job = new Job(NLS.bind("git push {0} {1}", remoteName, branchName)) //$NON-NLS-1$
+
+		Job job = new Job(NLS.bind("git pull {0} {1}", remoteName, branchName)) //$NON-NLS-1$
 		{
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
@@ -72,7 +73,8 @@ public class PushToRemoteHandler extends AbstractGitHandler
 				{
 					return Status.CANCEL_STATUS;
 				}
-				return repo.push(remoteName, branchName);
+
+				return repo.pull(remoteName, branchName);
 			}
 		};
 		job.setUser(true);
