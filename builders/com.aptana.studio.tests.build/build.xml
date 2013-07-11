@@ -290,7 +290,7 @@
 						-current ${studio.version}
 						-print
 						-javaVersion ${java.version}
-						-output ${postingDirectory}/${studio.version}/performance/
+						-output ${testResultsDirectory}
 						-config %hudson-ubuntu_%
 			            -dataDir ${postingDirectory}/data/studio
 						-scenario.pattern ${scenario.pattern}
@@ -303,7 +303,7 @@
 			<!-- add this argument to list above when there are milestone builds to highlight 
 			-highlight.latest 3.3M1_
 			-->
-			<env key="LD_LIBRARY_PATH" value="${basedir}/../org.eclipse.releng.basebuilder" />
+			<env key="LD_LIBRARY_PATH" value="${baseLocation}/plugins/org.apache.derby_10.6.1/" />
 			<!--performanceResults xmlDirectoryName="${postingDirectory}/${buildLabel}/performance/xml" dropDirectoryName="${postingDirectory}/${buildLabel}" testResultsTemplateFileName="${publishingContent}/templateFiles/performance.php.template" testResultsHtmlFileName="performance/performance.php" hrefTestResultsTargetPath="html" testManifestFileName="${publishingContent}/performanceTestManifest.xml" /-->
 			<sysproperty key="eclipse.perf.dbloc" value="${perf.db}" />
 		</java>
