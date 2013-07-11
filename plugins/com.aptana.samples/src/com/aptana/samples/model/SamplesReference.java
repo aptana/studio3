@@ -1,20 +1,33 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.samples.model;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Status;
 
 import com.aptana.core.util.ArrayUtil;
+import com.aptana.core.util.FileUtil;
+import com.aptana.core.util.IOUtil;
+import com.aptana.core.util.ZipUtil;
+import com.aptana.projects.ProjectData;
+import com.aptana.samples.SamplesPlugin;
 import com.aptana.samples.handlers.ISamplePreviewHandler;
 import com.aptana.samples.handlers.ISampleProjectHandler;
 
@@ -41,8 +54,10 @@ public class SamplesReference implements IProjectSample
 	private String[] includePaths;
 	private final Map<String, URL> iconUrls;
 
+	private IPath destination;
+
 	public SamplesReference(SampleCategory category, String id, String name, String location, boolean isRemote,
-			String description, Map<String, URL> iconUrls, IConfigurationElement element)
+			String description, Map<String, URL> iconUrls, IPath destination, IConfigurationElement element)
 	{
 		this.category = category;
 		this.id = id;
@@ -50,6 +65,7 @@ public class SamplesReference implements IProjectSample
 		this.location = location;
 		this.isRemote = isRemote;
 		this.description = description;
+		this.destination = destination;
 		this.iconUrls = new HashMap<String, URL>(iconUrls);
 		configElement = element;
 		natures = ArrayUtil.NO_STRINGS;
@@ -79,6 +95,11 @@ public class SamplesReference implements IProjectSample
 	public String getLocation()
 	{
 		return location;
+	}
+
+	public IPath getDestination()
+	{
+		return destination;
 	}
 
 	public String getInfoFile()
@@ -176,5 +197,47 @@ public class SamplesReference implements IProjectSample
 		hash = hash * 31 + name.hashCode();
 		hash = hash * 31 + location.hashCode();
 		return hash;
+	}
+
+	public IStatus createNewProject(IProject project, ProjectData projectData, IProgressMonitor monitor) throws CoreException
+	{
+		copyFiles(project);
+		return Status.OK_STATUS;
+	}
+
+	/**
+	 * Copy or extract the sample project data into the newly created project.
+	 * 
+	 * @param project
+	 * @throws CoreException
+	 */
+	protected void copyFiles(IProject project) throws CoreException
+	{
+		File locationFile = new File(location);
+		IPath projectLocation = project.getLocation();
+		IPath destinationDir;
+		if (destination == null)
+		{
+			destinationDir = projectLocation;
+		}
+		else
+		{
+			destinationDir = projectLocation.append(destination);
+		}
+		try
+		{
+			if (FileUtil.isZipFile(locationFile))
+			{
+				ZipUtil.extract(locationFile, destinationDir, ZipUtil.Conflict.PROMPT, new NullProgressMonitor());
+			}
+			else
+			{
+				IOUtil.copyDirectory(locationFile, destinationDir.toFile());
+			}
+		}
+		catch (IOException e)
+		{
+			throw new CoreException(new Status(Status.ERROR, SamplesPlugin.PLUGIN_ID, e.getMessage(), e));
+		}
 	}
 }
