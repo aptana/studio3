@@ -291,7 +291,7 @@
 						-print
 						-javaVersion ${java.version}
 						-output ${testResultsDirectory}
-						-config %hudson-ubuntu_%
+						-config hudson-ubuntu_
 			            -dataDir ${postingDirectory}/data/studio
 						-scenario.pattern ${scenario.pattern}
 						-baseline ${baseline.version}

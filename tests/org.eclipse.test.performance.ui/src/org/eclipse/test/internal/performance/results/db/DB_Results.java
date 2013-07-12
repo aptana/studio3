@@ -295,7 +295,9 @@ public class DB_Results
 			"org.eclipse.swt", //$NON-NLS-1$
 			"org.eclipse.team", //$NON-NLS-1$
 			"org.eclipse.ua", //$NON-NLS-1$
-			"org.eclipse.ui" //$NON-NLS-1$
+			"org.eclipse.ui", //$NON-NLS-1$
+			"com.appcelerator.titanium", //$NON-NLS-1$
+			"com.aptana" //$NON-NLS-1$
 	};
 	private static String[] KNOWN_COMPONENTS = ECLIPSE_COMPONENTS;
 
