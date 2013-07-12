@@ -9,11 +9,11 @@ package com.aptana.git.internal.core.github;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.json.simple.JSONObject;
 
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.github.IGithubManager;
+import com.aptana.git.core.github.IGithubPullRequest;
 import com.aptana.git.core.github.IGithubRepository;
 import com.aptana.git.core.model.GitRepository;
 
@@ -115,7 +115,7 @@ public class GithubRepository implements IGithubRepository
 	}
 
 	@SuppressWarnings("unchecked")
-	public IStatus createPullRequest(String title, String body, GitRepository repo)
+	public IGithubPullRequest createPullRequest(String title, String body, GitRepository repo) throws CoreException
 	{
 		String branch = repo.currentBranch();
 
@@ -123,33 +123,33 @@ public class GithubRepository implements IGithubRepository
 		IStatus pushStatus = repo.push(GitRepository.ORIGIN, branch);
 		if (!pushStatus.isOK())
 		{
-			return pushStatus;
+			throw new CoreException(pushStatus);
 		}
 
-		try
-		{
-			IGithubRepository parent = getParent();
-			JSONObject prObject = new JSONObject();
-			prObject.put("title", title); //$NON-NLS-1$
-			prObject.put("body", body); //$NON-NLS-1$
-			// TODO Allow user to choose branch on the fork to use as contents for PR?
-			prObject.put("head", getGithubManager().getUser().getUsername() + ':' + branch); //$NON-NLS-1$
-			// FIXME Allow user to choose the branch from parent to merge against. Default to the parent's default
-			// branch
-			prObject.put("base", parent.getDefaultBranch()); //$NON-NLS-1$
+		IGithubRepository parent = getParent();
+		JSONObject prObject = new JSONObject();
+		prObject.put("title", title); //$NON-NLS-1$
+		prObject.put("body", body); //$NON-NLS-1$
+		// TODO Allow user to choose branch on the fork to use as contents for PR?
+		prObject.put("head", getGithubManager().getUser().getUsername() + ':' + branch); //$NON-NLS-1$
+		// FIXME Allow user to choose the branch from parent to merge against. Default to the parent's default
+		// branch
+		prObject.put("base", parent.getDefaultBranch()); //$NON-NLS-1$
 
-			// TODO Do something with the response?
-			getAPI().post(((GithubRepository) parent).getAPIURL() + "/pulls", prObject.toJSONString()); //$NON-NLS-1$
-		}
-		catch (CoreException e)
-		{
-			return e.getStatus();
-		}
-		return Status.OK_STATUS;
+		// TODO Do something with the response?
+		JSONObject result = (JSONObject) getAPI().post(
+				((GithubRepository) parent).getAPIURL() + "/pulls", prObject.toJSONString()); //$NON-NLS-1$
+		return new GithubPullRequest(result);
 	}
 
 	protected IGithubManager getGithubManager()
 	{
 		return GitPlugin.getDefault().getGithubManager();
+	}
+
+	@Override
+	public String toString()
+	{
+		return json.toJSONString();
 	}
 }

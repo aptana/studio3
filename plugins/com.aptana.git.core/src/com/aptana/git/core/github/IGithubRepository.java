@@ -47,10 +47,10 @@ public interface IGithubRepository
 	 *            required
 	 * @param body
 	 *            optional
-	 * @param repo 
+	 * @param repo
 	 * @return
 	 */
-	public IStatus createPullRequest(String title, String body, GitRepository repo);
+	public IGithubPullRequest createPullRequest(String title, String body, GitRepository repo) throws CoreException;
 
 	public String getDefaultBranch();
 }
