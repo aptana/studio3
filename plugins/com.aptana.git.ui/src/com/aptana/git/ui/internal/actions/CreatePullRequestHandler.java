@@ -7,6 +7,8 @@
  */
 package com.aptana.git.ui.internal.actions;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -15,28 +17,33 @@ import java.util.regex.Pattern;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.jface.window.DefaultToolTip;
 import org.eclipse.jface.window.Window;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Shell;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.github.IGithubManager;
+import com.aptana.git.core.github.IGithubPullRequest;
 import com.aptana.git.core.github.IGithubRepository;
 import com.aptana.git.core.github.IGithubUser;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.GitRepository.ReadWrite;
+import com.aptana.git.ui.GitUIPlugin;
 import com.aptana.git.ui.dialogs.CreatePullRequestDialog;
 import com.aptana.git.ui.internal.preferences.GithubAccountPageProvider;
+import com.aptana.ui.dialogs.HyperlinkInfoPopupDialog;
 import com.aptana.ui.util.UIUtils;
+import com.aptana.ui.util.WorkbenchBrowserUtil;
 
 /**
  * @author cwilliams
@@ -101,7 +108,7 @@ public class CreatePullRequestHandler extends AbstractGitHandler
 
 		// Ok, we have the name of the repo on github, the user has logged into github (or we know their credentials and
 		// they work), now let's generate a pull request!
-		IGithubRepository ghRepo;
+		final IGithubRepository ghRepo;
 		try
 		{
 			ghRepo = user.getRepo(ghRepoName);
@@ -118,35 +125,79 @@ public class CreatePullRequestHandler extends AbstractGitHandler
 		// This assumes we're on current branch!
 		IStatus commitsStatus = repo.execute(ReadWrite.READ, "log", "-g", "--pretty"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
+		String branch = repo.currentBranch();
+		String parent = "<unknown>";
+		try
+		{
+			parent = ghRepo.getParent().getOwner();
+		}
+		catch (CoreException e2)
+		{
+			IdeLog.logWarning(GitUIPlugin.getDefault(),
+					MessageFormat.format("Failed to get name of parent repo for repo: {0}", ghRepo)); //$NON-NLS-1$
+		}
+		String base = parent + ':' + branch;
+		String head = user.getUsername() + ':' + branch;
 		// TODO Allow user to select different local and remote branch for PR?
-		CreatePullRequestDialog id = new CreatePullRequestDialog(UIUtils.getActiveShell(), repo.currentBranch(),
-				commitsStatus.isOK() ? commitsStatus.getMessage() : StringUtil.EMPTY);
+		CreatePullRequestDialog id = new CreatePullRequestDialog(UIUtils.getActiveShell(), branch,
+				commitsStatus.isOK() ? commitsStatus.getMessage() : StringUtil.EMPTY, base, head);
 		if (id.open() == Window.CANCEL)
 		{
 			return null;
 		}
 
-		final IStatus status = ghRepo.createPullRequest(id.getTitle(), id.getBody(), repo);
-		if (!status.isOK())
-		{
-			throw new ExecutionException(status.getMessage());
-		}
-		// Now show a tooltip "toast" for 3 seconds to announce success
-		final Shell shell = UIUtils.getActiveShell();
-		DefaultToolTip toolTip = new DefaultToolTip(shell)
+		final String title = id.getTitle();
+		final String body = id.getBody();
+		Job job = new Job("Submitting pull request...")
 		{
 			@Override
-			public Point getLocation(Point size, Event event)
+			protected IStatus run(IProgressMonitor monitor)
 			{
-				final Rectangle workbenchWindowBounds = shell.getBounds();
-				int xCoord = workbenchWindowBounds.x + workbenchWindowBounds.width - size.x - 10;
-				int yCoord = workbenchWindowBounds.y + workbenchWindowBounds.height - size.y - 10;
-				return new Point(xCoord, yCoord);
+				try
+				{
+					final IGithubPullRequest pr = ghRepo.createPullRequest(title, body, repo);
+					// Ok we submitted a PR, let's show a popup/toast to let user know and let them click it to open it.
+					URL url = null;
+					try
+					{
+						url = pr.getURL();
+					}
+					catch (MalformedURLException e1)
+					{
+						IdeLog.logError(GitUIPlugin.getDefault(), e1);
+					}
+					final String prURL = (url == null) ? StringUtil.EMPTY : url.toString();
+					UIUtils.getDisplay().asyncExec(new Runnable()
+					{
+
+						public void run()
+						{
+							HyperlinkInfoPopupDialog toolTip = new HyperlinkInfoPopupDialog(UIUtils.getActiveShell(),
+									"PR Submitted", MessageFormat.format(Messages.CreatePullRequestHandler_SuccessMsg,
+											prURL, pr.getNumber()), new SelectionAdapter()
+									{
+										public void widgetSelected(SelectionEvent e)
+										{
+											if (!StringUtil.isEmpty(e.text))
+											{
+												WorkbenchBrowserUtil.launchExternalBrowser(e.text);
+											}
+										}
+									});
+							toolTip.open();
+						}
+					});
+				}
+				catch (CoreException e)
+				{
+					return e.getStatus();
+				}
+				return Status.OK_STATUS;
 			}
 		};
-		toolTip.setHideDelay(UIUtils.DEFAULT_TOOLTIP_TIME);
-		toolTip.setText(Messages.CreatePullRequestHandler_SuccessMsg);
-		toolTip.show(new Point(0, 0));
+		job.setUser(true);
+		job.schedule();
+
 		return null;
 	}
 
