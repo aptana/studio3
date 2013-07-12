@@ -207,9 +207,15 @@ public class BrowserUtilWindows extends BrowserUtilNull
 
 	private String getChromeVersion()
 	{
-		return getVersionFrom(new String[] { "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Google Chrome", //$NON-NLS-1$
-				"Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Google Chrome" }, "Version", //$NON-NLS-1$ //$NON-NLS-2$
-				Regor.HKEY_CURRENT_USER);
+		String[] paths = new String[] { "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Google Chrome",
+				"Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Google Chrome" }; //$NON-NLS-1$ //$NON-NLS-2$
+		String keyValue = "Version"; //$NON-NLS-1$ 
+		String version = getVersionFrom(paths, keyValue, Regor.HKEY_CURRENT_USER);
+		if (StringUtil.isEmpty(version))
+		{
+			return getVersionFrom(paths, keyValue);
+		}
+		return version;
 	}
 
 	/**
