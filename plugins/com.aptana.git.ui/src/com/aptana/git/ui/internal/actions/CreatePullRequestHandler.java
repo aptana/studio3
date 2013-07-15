@@ -126,17 +126,20 @@ public class CreatePullRequestHandler extends AbstractGitHandler
 		IStatus commitsStatus = repo.execute(ReadWrite.READ, "log", "-g", "--pretty"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		String branch = repo.currentBranch();
-		String parent = "<unknown>";
+		String parentName = "<unknown>";
+		String parentBranch = branch;
 		try
 		{
-			parent = ghRepo.getParent().getOwner();
+			IGithubRepository parentRepo = ghRepo.getParent();
+			parentName = parentRepo.getOwner();
+			parentBranch = parentRepo.getDefaultBranch();
 		}
 		catch (CoreException e2)
 		{
 			IdeLog.logWarning(GitUIPlugin.getDefault(),
 					MessageFormat.format("Failed to get name of parent repo for repo: {0}", ghRepo)); //$NON-NLS-1$
 		}
-		String base = parent + ':' + branch;
+		String base = parentName + ':' + parentBranch;
 		String head = user.getUsername() + ':' + branch;
 		// TODO Allow user to select different local and remote branch for PR?
 		CreatePullRequestDialog id = new CreatePullRequestDialog(UIUtils.getActiveShell(), branch,

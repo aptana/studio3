@@ -18,7 +18,7 @@ public interface IGithubPullRequest
 
 	public URL getURL() throws MalformedURLException;
 
-	public int getNumber();
+	public Long getNumber();
 
 	public String getTitle();
 

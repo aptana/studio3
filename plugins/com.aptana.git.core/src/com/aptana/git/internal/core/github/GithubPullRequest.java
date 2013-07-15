@@ -40,9 +40,9 @@ class GithubPullRequest implements IGithubPullRequest
 		return new URL((String) json.get(URL));
 	}
 
-	public int getNumber()
+	public Long getNumber()
 	{
-		return (Integer) json.get(NUMBER);
+		return (Long) json.get(NUMBER);
 	}
 
 	public String getTitle()
