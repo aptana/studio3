@@ -144,6 +144,47 @@ public class ProjectSampleElement extends AbstractBundleElement
 		return "project_sample"; //$NON-NLS-1$
 	}
 
+	/**
+	 * @param id
+	 *            the id of the sample
+	 */
+	public void setId(String id)
+	{
+		fSampleId = id;
+	}
+
+	/**
+	 * @param description
+	 *            the description of the sample
+	 */
+	public void setDescription(String description)
+	{
+		fDescription = description;
+	}
+
+	/**
+	 * @param location
+	 *            a remote git url or a local zip location
+	 */
+	public void setLocation(String location)
+	{
+		fLocation = location;
+	}
+
+	/**
+	 * @param categoryId
+	 *            the id of the category the sample belongs in
+	 */
+	public void setCategory(String categoryId)
+	{
+		fCategoryId = categoryId;
+	}
+
+	public void setNatures(String[] natures)
+	{
+		fProjectNatures = natures;
+	}
+
 	public IPath getDestinationPath()
 	{
 		return fDestinationPath;
