@@ -16,12 +16,41 @@ import java.net.URL;
 public interface IGithubPullRequest
 {
 
+	/**
+	 * The URL used to address the PR via the github API?
+	 * 
+	 * @return
+	 * @throws MalformedURLException
+	 */
 	public URL getURL() throws MalformedURLException;
 
+	/**
+	 * THE URL used to view the PR in a browser.
+	 * 
+	 * @return
+	 * @throws MalformedURLException
+	 */
+	public URL getHTMLURL() throws MalformedURLException;
+
+	/**
+	 * The PR number
+	 * 
+	 * @return
+	 */
 	public Long getNumber();
 
+	/**
+	 * Title of the PR
+	 * 
+	 * @return
+	 */
 	public String getTitle();
 
+	/**
+	 * Description of the PR.
+	 * 
+	 * @return
+	 */
 	public String getBody();
 
 }

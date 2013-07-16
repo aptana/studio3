@@ -126,7 +126,7 @@ public class CreatePullRequestHandler extends AbstractGitHandler
 		IStatus commitsStatus = repo.execute(ReadWrite.READ, "log", "-g", "--pretty"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		String branch = repo.currentBranch();
-		String parentName = "<unknown>";
+		String parentName = Messages.CreatePullRequestHandler_UnknownParentRepoOwnerName;
 		String parentBranch = branch;
 		try
 		{
@@ -151,19 +151,19 @@ public class CreatePullRequestHandler extends AbstractGitHandler
 
 		final String title = id.getTitle();
 		final String body = id.getBody();
-		Job job = new Job("Submitting pull request...")
+		Job job = new Job(Messages.CreatePullRequestHandler_SubmitPRJobName)
 		{
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
 				try
 				{
-					final IGithubPullRequest pr = ghRepo.createPullRequest(title, body, repo);
+					final IGithubPullRequest pr = ghRepo.createPullRequest(title, body, repo, monitor);
 					// Ok we submitted a PR, let's show a popup/toast to let user know and let them click it to open it.
 					URL url = null;
 					try
 					{
-						url = pr.getURL();
+						url = pr.getHTMLURL();
 					}
 					catch (MalformedURLException e1)
 					{
@@ -176,8 +176,9 @@ public class CreatePullRequestHandler extends AbstractGitHandler
 						public void run()
 						{
 							HyperlinkInfoPopupDialog toolTip = new HyperlinkInfoPopupDialog(UIUtils.getActiveShell(),
-									"PR Submitted", MessageFormat.format(Messages.CreatePullRequestHandler_SuccessMsg,
-											prURL, pr.getNumber()), new SelectionAdapter()
+									Messages.CreatePullRequestHandler_PRSubmittedTitle, MessageFormat.format(
+											Messages.CreatePullRequestHandler_SuccessMsg, prURL, pr.getNumber()),
+									new SelectionAdapter()
 									{
 										public void widgetSelected(SelectionEvent e)
 										{

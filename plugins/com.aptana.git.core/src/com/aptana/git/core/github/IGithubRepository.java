@@ -8,7 +8,7 @@
 package com.aptana.git.core.github;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.IProgressMonitor;
 
 import com.aptana.git.core.model.GitRepository;
 
@@ -50,7 +50,8 @@ public interface IGithubRepository
 	 * @param repo
 	 * @return
 	 */
-	public IGithubPullRequest createPullRequest(String title, String body, GitRepository repo) throws CoreException;
+	public IGithubPullRequest createPullRequest(String title, String body, GitRepository repo, IProgressMonitor monitor)
+			throws CoreException;
 
 	public String getDefaultBranch();
 }

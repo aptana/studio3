@@ -8,7 +8,9 @@
 package com.aptana.git.internal.core.github;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.SubMonitor;
 import org.json.simple.JSONObject;
 
 import com.aptana.git.core.GitPlugin;
@@ -115,17 +117,22 @@ public class GithubRepository implements IGithubRepository
 	}
 
 	@SuppressWarnings("unchecked")
-	public IGithubPullRequest createPullRequest(String title, String body, GitRepository repo) throws CoreException
+	public IGithubPullRequest createPullRequest(String title, String body, GitRepository repo, IProgressMonitor monitor)
+			throws CoreException
 	{
+		SubMonitor sub = SubMonitor.convert(monitor, Messages.GithubRepository_GeneratingPRTaskName, 100);
 		String branch = repo.currentBranch();
 
 		// push current branch to origin first!
+		sub.subTask(Messages.GithubRepository_PushingBranchSubtaskName);
 		IStatus pushStatus = repo.push(GitRepository.ORIGIN, branch);
+		sub.worked(50);
 		if (!pushStatus.isOK())
 		{
 			throw new CoreException(pushStatus);
 		}
 
+		sub.subTask(Messages.GithubRepository_SubmittingPRSubtaskName);
 		IGithubRepository parent = getParent();
 		JSONObject prObject = new JSONObject();
 		prObject.put("title", title); //$NON-NLS-1$

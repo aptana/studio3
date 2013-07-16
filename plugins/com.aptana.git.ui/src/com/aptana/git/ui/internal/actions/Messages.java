@@ -48,11 +48,17 @@ public class Messages extends NLS
 
 	public static String CreatePullRequestHandler_NotLoggedInErr;
 
+	public static String CreatePullRequestHandler_PRSubmittedTitle;
+
 	public static String CreatePullRequestHandler_RemoteOriginDoesntExistErr;
 
 	public static String CreatePullRequestHandler_RepoAPIErr;
 
+	public static String CreatePullRequestHandler_SubmitPRJobName;
+
 	public static String CreatePullRequestHandler_SuccessMsg;
+
+	public static String CreatePullRequestHandler_UnknownParentRepoOwnerName;
 
 	public static String DisconnectHandler_Job_Title;
 	public static String DisconnectProviderOperation_DisconnectJob_Title;
