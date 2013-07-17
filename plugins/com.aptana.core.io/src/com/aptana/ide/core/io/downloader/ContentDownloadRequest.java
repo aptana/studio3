@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ecf.filetransfer.UserCancelledException;
@@ -108,7 +109,7 @@ public class ContentDownloadRequest
 			{
 				if (result.getSeverity() == IStatus.CANCEL)
 				{
-					throw new UserCancelledException();
+					return Status.CANCEL_STATUS;
 				}
 				if (!result.isOK())
 				{
@@ -118,6 +119,10 @@ public class ContentDownloadRequest
 
 			IdeLog.logInfo(CoreIOPlugin.getDefault(),
 					MessageFormat.format("File {0} downloaded sucessfully", this.url.toURI()), IDebugScopes.DOWNLOAD); //$NON-NLS-1$
+		}
+		catch (OperationCanceledException e)
+		{
+			return Status.CANCEL_STATUS;
 		}
 		catch (Throwable t)
 		{
