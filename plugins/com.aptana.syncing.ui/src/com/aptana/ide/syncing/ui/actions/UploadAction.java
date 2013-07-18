@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -35,6 +35,8 @@ import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants;
 import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ide.ui.io.Utils;
 import com.aptana.ui.DialogUtils;
+import com.aptana.usage.FeatureEvent;
+import com.aptana.usage.StudioAnalytics;
 
 /**
  * @author Michael Xia (mxia@aptana.com)
@@ -136,6 +138,11 @@ public class UploadAction extends BaseSyncAction
 					IdeLog.logError(SyncingUIPlugin.getDefault(), Messages.UploadAction_ERR_FailToUpload, e);
 					return new Status(Status.ERROR, SyncingUIPlugin.PLUGIN_ID, Messages.UploadAction_ERR_FailToUpload,
 							e);
+				}
+				finally
+				{
+					StudioAnalytics.getInstance().sendEvent(
+							new FeatureEvent("remote.upload." + site.getDestination().getId(), null)); //$NON-NLS-1$
 				}
 
 				return Status.OK_STATUS;

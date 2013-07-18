@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -24,6 +24,8 @@ import com.aptana.ide.syncing.core.old.handlers.SyncEventHandlerAdapter;
 import com.aptana.ide.syncing.ui.internal.SyncUtils;
 import com.aptana.ide.syncing.ui.old.views.SmartSyncDialog;
 import com.aptana.ui.util.UIUtils;
+import com.aptana.usage.FeatureEvent;
+import com.aptana.usage.StudioAnalytics;
 
 public class SynchronizeFilesAction extends BaseSyncAction
 {
@@ -68,6 +70,11 @@ public class SynchronizeFilesAction extends BaseSyncAction
 					MessageBox error = new MessageBox(UIUtils.getActiveShell(), SWT.ICON_ERROR | SWT.OK);
 					error.setMessage(Messages.SynchronizeFilesAction_ERR_OpeningSyncDialog);
 					error.open();
+				}
+				finally
+				{
+					StudioAnalytics.getInstance().sendEvent(
+							new FeatureEvent("remote.sync." + site.getDestination().getId(), null)); //$NON-NLS-1$
 				}
 			}
 		});
