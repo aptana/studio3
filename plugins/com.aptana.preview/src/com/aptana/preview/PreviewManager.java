@@ -58,8 +58,6 @@ import com.aptana.editor.common.IEditorLinkedResources;
 import com.aptana.filewatcher.FileWatcher;
 import com.aptana.preview.internal.DefaultPreviewHandler;
 import com.aptana.preview.internal.EditorUtils;
-import com.aptana.preview.internal.PreviewEditorInput;
-import com.aptana.preview.internal.PreviewEditorPart;
 import com.aptana.preview.internal.PreviewHandlers;
 import com.aptana.ui.util.UIUtils;
 

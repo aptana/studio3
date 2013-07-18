@@ -39,7 +39,7 @@
    <extension
          point="org.eclipse.ui.editors">
       <editor
-            class="com.aptana.preview.internal.PreviewEditorPart"
+            class="com.aptana.preview.PreviewEditorPart"
             default="false"
             icon="icons/etool16/preview.png"
             id="com.aptana.preview.editor"
