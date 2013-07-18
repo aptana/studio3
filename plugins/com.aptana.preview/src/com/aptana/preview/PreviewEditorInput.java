@@ -6,15 +6,13 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.preview.internal;
+package com.aptana.preview;
 
 import java.net.URL;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
-
-import com.aptana.preview.PreviewPlugin;
 
 /**
  * @author Max Stepanov
