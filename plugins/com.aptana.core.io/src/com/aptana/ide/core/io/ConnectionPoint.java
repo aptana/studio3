@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -23,27 +23,30 @@ import org.eclipse.core.runtime.PlatformObject;
 import com.aptana.core.epl.IMemento;
 import com.aptana.core.io.vfs.VirtualConnectionManager;
 import com.aptana.core.util.StringUtil;
+import com.aptana.usage.FeatureEvent;
+import com.aptana.usage.StudioAnalytics;
 
 /**
  * Base class for all connection points
  * 
  * @author Max Stepanov
- *
  */
-public abstract class ConnectionPoint extends PlatformObject implements IConnectionPoint, IExecutableExtension {
+public abstract class ConnectionPoint extends PlatformObject implements IConnectionPoint, IExecutableExtension
+{
 
 	private static final String ELEMENT_NAME = "name"; //$NON-NLS-1$
 
 	private String id;
 	private String type;
 	private boolean dirty;
-	
+
 	private String name;
-	
+
 	/**
 	 * 
 	 */
-	protected ConnectionPoint(String type) {
+	protected ConnectionPoint(String type)
+	{
 		this.type = type;
 		setId(UUID.randomUUID().toString());
 	}
@@ -51,44 +54,56 @@ public abstract class ConnectionPoint extends PlatformObject implements IConnect
 	/**
 	 * 
 	 */
-	protected ConnectionPoint() {
+	protected ConnectionPoint()
+	{
 		this(StringUtil.EMPTY);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement, java.lang.String, java.lang.Object)
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement
+	 * , java.lang.String, java.lang.Object)
 	 */
-	public final void setInitializationData(IConfigurationElement config,
-			String propertyName, Object data) throws CoreException {
+	public final void setInitializationData(IConfigurationElement config, String propertyName, Object data)
+			throws CoreException
+	{
 		setType(config.getAttribute(ConnectionPointManager.ATT_ID));
 	}
-	
-	protected boolean isPersistent() {
+
+	protected boolean isPersistent()
+	{
 		return true;
 	}
 
-	protected void loadState(IMemento memento) {
+	protected void loadState(IMemento memento)
+	{
 		IMemento child = memento.getChild(ELEMENT_NAME);
-		if (child != null) {
+		if (child != null)
+		{
 			name = child.getTextData();
-		}		
+		}
 	}
-	
-	protected void saveState(IMemento memento) {
+
+	protected void saveState(IMemento memento)
+	{
 		memento.createChild(ELEMENT_NAME).putTextData(name);
 	}
 
 	/**
 	 * @return the id
 	 */
-	public final String getId() {
+	public final String getId()
+	{
 		return id;
 	}
 
 	/**
-	 * @param id the id to set
+	 * @param id
+	 *            the id to set
 	 */
-	public final void setId(String id) {
+	public final void setId(String id)
+	{
 		this.id = id;
 		VirtualConnectionManager.getInstance().register(this);
 	}
@@ -96,120 +111,155 @@ public abstract class ConnectionPoint extends PlatformObject implements IConnect
 	/**
 	 * @return the type
 	 */
-	public final String getType() {
+	public final String getType()
+	{
 		return type;
 	}
 
 	/**
-	 * @param type the type to set
+	 * @param type
+	 *            the type to set
 	 */
-	private final void setType(String type) {
+	private final void setType(String type)
+	{
 		this.type = type;
-	}	
-	
-	protected final void notifyChanged() {
-		dirty = true;
-	}
-	
-	/* package */ final boolean isChanged() {
-		try {
-			return dirty;
-		} finally {
-			dirty = false;
-		}		
 	}
 
-	/* (non-Javadoc)
+	protected final void notifyChanged()
+	{
+		dirty = true;
+	}
+
+	/* package */final boolean isChanged()
+	{
+		try
+		{
+			return dirty;
+		}
+		finally
+		{
+			dirty = false;
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.io.IConnectionPoint#getName()
 	 */
-	public String getName() {
+	public String getName()
+	{
 		return name;
 	}
 
 	/**
-	 * @param name the name to set
+	 * @param name
+	 *            the name to set
 	 */
-	public void setName(String name) {
+	public void setName(String name)
+	{
 		this.name = name;
 		notifyChanged();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.io.IConnectionPoint#getRootURI()
 	 */
-	public URI getRootURI() {
+	public URI getRootURI()
+	{
 		return VirtualConnectionManager.getInstance().getConnectionVirtualURI(this);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.io.IConnectionPoint#getRoot()
 	 */
-	public IFileStore getRoot() throws CoreException {
+	public IFileStore getRoot() throws CoreException
+	{
 		return EFS.getStore(getRootURI());
 	}
 
-    /* (non-Javadoc)
-     * @see com.aptana.ide.core.io.IConnectionPoint#connect(org.eclipse.core.runtime.IProgressMonitor)
-     */
-    public void connect(IProgressMonitor monitor) throws CoreException {
-        connect(false, monitor);
-    }
-
-	/* (non-Javadoc)
-	 * @see com.aptana.ide.core.io.IConnectionPoint#connect(boolean, org.eclipse.core.runtime.IProgressMonitor)
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.ide.core.io.IConnectionPoint#connect(org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public void connect(boolean force, IProgressMonitor monitor) throws CoreException {
+	public void connect(IProgressMonitor monitor) throws CoreException
+	{
+		connect(false, monitor);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.ide.core.io.IConnectionPoint#connect(boolean, org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	public void connect(boolean force, IProgressMonitor monitor) throws CoreException
+	{
+		StudioAnalytics.getInstance().sendEvent(new FeatureEvent("remote.connect." + getId(), null));
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.io.IConnectionPoint#isConnected()
 	 */
-	public boolean isConnected() {
+	public boolean isConnected()
+	{
 		return true;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.io.IConnectionPoint#canDisconnect()
 	 */
-	public boolean canDisconnect() {
+	public boolean canDisconnect()
+	{
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.io.IConnectionPoint#disconnect(org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public void disconnect(IProgressMonitor monitor) throws CoreException {
+	public void disconnect(IProgressMonitor monitor) throws CoreException
+	{
 	}
 
-    /* (non-Javadoc)
-     * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
-     */
-    @SuppressWarnings("rawtypes")
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
+	 */
+	@SuppressWarnings("rawtypes")
 	@Override
-    public Object getAdapter(Class adapter) {
-        if (IFileStore.class.equals(adapter)) {
-            try {
-                return getRoot();
-            } catch (CoreException e) {
-                return null;
-            }
-        }
-        return super.getAdapter(adapter);
-    }
+	public Object getAdapter(Class adapter)
+	{
+		if (IFileStore.class.equals(adapter))
+		{
+			try
+			{
+				return getRoot();
+			}
+			catch (CoreException e)
+			{
+				return null;
+			}
+		}
+		return super.getAdapter(adapter);
+	}
 
-    @Override
-    public String toString() {
-        return getName();
-    }
+	@Override
+	public String toString()
+	{
+		return getName();
+	}
 
-    /**
-     * Loads the connection data that has 1.5 format.
-     * 
-     * @param data
-     *            the connection data
-     * @return true if loading is successful, false otherwise
-     */
-    public boolean load15Data(String data) {
-        return false;
-    }
+	/**
+	 * Loads the connection data that has 1.5 format.
+	 * 
+	 * @param data
+	 *            the connection data
+	 * @return true if loading is successful, false otherwise
+	 */
+	public boolean load15Data(String data)
+	{
+		return false;
+	}
 }

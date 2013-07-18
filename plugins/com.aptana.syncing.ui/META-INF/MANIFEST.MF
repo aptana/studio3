@@ -15,14 +15,15 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.console,
  org.eclipse.compare,
  org.eclipse.search,
-  com.aptana.core;bundle-version="3.0.4",
+ com.aptana.core;bundle-version="3.0.4",
  com.aptana.core.io,
  com.aptana.filesystem.ftp,
  com.aptana.syncing.core,
  com.aptana.ui,
  com.aptana.ui.io,
  com.aptana.ui.ftp,
- com.aptana.theme
+ com.aptana.theme,
+ com.aptana.usage
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.ide.syncing.ui,

@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -27,7 +27,8 @@ import com.aptana.ide.core.io.IConnectionPoint15Constants;
 /**
  * @author Max Stepanov
  */
-public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConnectionPoint {
+public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConnectionPoint
+{
 
 	public static final String TYPE = TYPE_FTP;
 
@@ -55,7 +56,8 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	/**
 	 * Default constructor
 	 */
-	public FTPConnectionPoint() {
+	public FTPConnectionPoint()
+	{
 		super(TYPE);
 	}
 
@@ -64,44 +66,57 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	 * @see com.aptana.ide.core.io.ConnectionPoint#loadState(com.aptana.ide.core.io.epl.IMemento)
 	 */
 	@Override
-	protected void loadState(IMemento memento) {
+	protected void loadState(IMemento memento)
+	{
 		super.loadState(memento);
 		IMemento child = memento.getChild(ELEMENT_HOST);
-		if (child != null) {
+		if (child != null)
+		{
 			host = child.getTextData();
 		}
 		child = memento.getChild(ELEMENT_PORT);
-		if (child != null) {
-			try {
+		if (child != null)
+		{
+			try
+			{
 				port = Integer.parseInt(child.getTextData());
-			} catch (NumberFormatException e) {
+			}
+			catch (NumberFormatException e)
+			{
 			}
 		}
 		child = memento.getChild(ELEMENT_PATH);
-		if (child != null) {
+		if (child != null)
+		{
 			String text = child.getTextData();
-			if (text != null) {
+			if (text != null)
+			{
 				path = Path.fromPortableString(text);
 			}
 		}
 		child = memento.getChild(ELEMENT_LOGIN);
-		if (child != null) {
+		if (child != null)
+		{
 			login = child.getTextData();
 		}
 		child = memento.getChild(ELEMENT_PASSIVE);
-		if (child != null) {
+		if (child != null)
+		{
 			passiveMode = Boolean.parseBoolean(child.getTextData());
 		}
 		child = memento.getChild(ELEMENT_TRANSFER_TYPE);
-		if (child != null) {
+		if (child != null)
+		{
 			transferType = child.getTextData();
 		}
 		child = memento.getChild(ELEMENT_ENCODING);
-		if (child != null) {
+		if (child != null)
+		{
 			encoding = child.getTextData();
 		}
 		child = memento.getChild(ELEMENT_TIMEZONE);
-		if (child != null) {
+		if (child != null)
+		{
 			timezone = child.getTextData();
 		}
 	}
@@ -111,26 +126,33 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	 * @see com.aptana.ide.core.io.ConnectionPoint#saveState(com.aptana.ide.core.io.epl.IMemento)
 	 */
 	@Override
-	protected void saveState(IMemento memento) {
+	protected void saveState(IMemento memento)
+	{
 		super.saveState(memento);
 		memento.createChild(ELEMENT_HOST).putTextData(host);
-		if (IFTPConstants.FTP_PORT_DEFAULT != port) {
+		if (IFTPConstants.FTP_PORT_DEFAULT != port)
+		{
 			memento.createChild(ELEMENT_PORT).putTextData(Integer.toString(port));
 		}
-		if (!Path.ROOT.equals(path)) {
+		if (!Path.ROOT.equals(path))
+		{
 			memento.createChild(ELEMENT_PATH).putTextData(path.toPortableString());
 		}
-		if (login.length() != 0) {
+		if (login.length() != 0)
+		{
 			memento.createChild(ELEMENT_LOGIN).putTextData(login);
 		}
 		memento.createChild(ELEMENT_PASSIVE).putTextData(Boolean.toString(passiveMode));
-		if (!IFTPConstants.TRANSFER_TYPE_AUTO.equals(transferType)) {
+		if (!IFTPConstants.TRANSFER_TYPE_AUTO.equals(transferType))
+		{
 			memento.createChild(ELEMENT_TRANSFER_TYPE).putTextData(transferType);
 		}
-		if (!IFTPConstants.ENCODING_DEFAULT.equals(encoding)) {
+		if (!IFTPConstants.ENCODING_DEFAULT.equals(encoding))
+		{
 			memento.createChild(ELEMENT_ENCODING).putTextData(encoding);
 		}
-		if (timezone != null && timezone.length() != 0) {
+		if (timezone != null && timezone.length() != 0)
+		{
 			memento.createChild(ELEMENT_TIMEZONE).putTextData(timezone);
 		}
 	}
@@ -139,7 +161,8 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.ftp.IBaseRemoteConnectionPoint#getHost()
 	 */
-	public String getHost() {
+	public String getHost()
+	{
 		return host;
 	}
 
@@ -147,7 +170,8 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.ftp.IBaseRemoteConnectionPoint#setHost(java.lang.String)
 	 */
-	public void setHost(String host) {
+	public void setHost(String host)
+	{
 		this.host = host;
 		notifyChanged();
 		resetConnectionFileManager();
@@ -157,7 +181,8 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.ftp.IBaseRemoteConnectionPoint#getPort()
 	 */
-	public int getPort() {
+	public int getPort()
+	{
 		return port;
 	}
 
@@ -165,7 +190,8 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.ftp.IBaseRemoteConnectionPoint#setPort(int)
 	 */
-	public void setPort(int port) {
+	public void setPort(int port)
+	{
 		this.port = port;
 		notifyChanged();
 		resetConnectionFileManager();
@@ -175,7 +201,8 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.ftp.IBaseRemoteConnectionPoint#getPath()
 	 */
-	public IPath getPath() {
+	public IPath getPath()
+	{
 		return path;
 	}
 
@@ -183,7 +210,8 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.ftp.IBaseRemoteConnectionPoint#setPath(org.eclipse.core.runtime.IPath)
 	 */
-	public void setPath(IPath path) {
+	public void setPath(IPath path)
+	{
 		this.path = path.isEmpty() ? Path.ROOT : path;
 		notifyChanged();
 		resetConnectionFileManager();
@@ -193,7 +221,8 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.ftp.IBaseRemoteConnectionPoint#getLogin()
 	 */
-	public String getLogin() {
+	public String getLogin()
+	{
 		return login;
 	}
 
@@ -201,7 +230,8 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.ftp.IBaseRemoteConnectionPoint#setLogin(java.lang.String)
 	 */
-	public void setLogin(String login) {
+	public void setLogin(String login)
+	{
 		this.login = login;
 		notifyChanged();
 		resetConnectionFileManager();
@@ -211,7 +241,8 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.ftp.IBaseRemoteConnectionPoint#getPassword()
 	 */
-	public char[] getPassword() {
+	public char[] getPassword()
+	{
 		return password;
 	}
 
@@ -219,7 +250,8 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.ftp.IBaseRemoteConnectionPoint#setPassword(char[])
 	 */
-	public void setPassword(char[] password) {
+	public void setPassword(char[] password)
+	{
 		this.password = password;
 		notifyChanged();
 		resetConnectionFileManager();
@@ -228,7 +260,8 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	/**
 	 * @return the passiveMode
 	 */
-	public boolean isPassiveMode() {
+	public boolean isPassiveMode()
+	{
 		return passiveMode;
 	}
 
@@ -236,7 +269,8 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	 * @param passiveMode
 	 *            the passiveMode to set
 	 */
-	public void setPassiveMode(boolean passiveMode) {
+	public void setPassiveMode(boolean passiveMode)
+	{
 		this.passiveMode = passiveMode;
 		notifyChanged();
 		resetConnectionFileManager();
@@ -245,7 +279,8 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	/**
 	 * @return the transferType
 	 */
-	public String getTransferType() {
+	public String getTransferType()
+	{
 		return transferType;
 	}
 
@@ -253,7 +288,8 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	 * @param transferType
 	 *            the transferType to set
 	 */
-	public void setTransferType(String transferType) {
+	public void setTransferType(String transferType)
+	{
 		this.transferType = transferType;
 		notifyChanged();
 		resetConnectionFileManager();
@@ -262,7 +298,8 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	/**
 	 * @return the encoding
 	 */
-	public String getEncoding() {
+	public String getEncoding()
+	{
 		return encoding;
 	}
 
@@ -270,7 +307,8 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	 * @param encoding
 	 *            the encoding to set
 	 */
-	public void setEncoding(String encoding) {
+	public void setEncoding(String encoding)
+	{
 		this.encoding = encoding;
 		notifyChanged();
 		resetConnectionFileManager();
@@ -279,7 +317,8 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	/**
 	 * @return the timezone
 	 */
-	public String getTimezone() {
+	public String getTimezone()
+	{
 		return timezone;
 	}
 
@@ -287,7 +326,8 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	 * @param timezone
 	 *            the timezone to set
 	 */
-	public void setTimezone(String timezone) {
+	public void setTimezone(String timezone)
+	{
 		this.timezone = timezone;
 		notifyChanged();
 		resetConnectionFileManager();
@@ -298,15 +338,19 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	 * @see com.aptana.ide.core.io.ConnectionPoint#connect(boolean, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	public void connect(boolean force, IProgressMonitor monitor) throws CoreException {
-		if (!force && isConnected()) {
+	public void connect(boolean force, IProgressMonitor monitor) throws CoreException
+	{
+		if (!force && isConnected())
+		{
 			return;
 		}
 		ConnectionContext context = CoreIOPlugin.getConnectionContext(this);
-		if (context != null) {
+		if (context != null)
+		{
 			CoreIOPlugin.setConnectionContext(connectionFileManager, context);
 		}
 		getConnectionFileManager().connect(monitor);
+		super.connect(force, monitor);
 	}
 
 	/*
@@ -314,8 +358,10 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	 * @see com.aptana.ide.core.io.ConnectionPoint#disconnect(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	public void disconnect(IProgressMonitor monitor) throws CoreException {
-		if (isConnected()) {
+	public void disconnect(IProgressMonitor monitor) throws CoreException
+	{
+		if (isConnected())
+		{
 			getConnectionFileManager().disconnect(monitor);
 		}
 	}
@@ -325,7 +371,8 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	 * @see com.aptana.ide.core.io.ConnectionPoint#isConnected()
 	 */
 	@Override
-	public synchronized boolean isConnected() {
+	public synchronized boolean isConnected()
+	{
 		return connectionFileManager != null && connectionFileManager.isConnected();
 	}
 
@@ -334,7 +381,8 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	 * @see com.aptana.ide.core.io.ConnectionPoint#canDisconnect()
 	 */
 	@Override
-	public boolean canDisconnect() {
+	public boolean canDisconnect()
+	{
 		return isConnected() && true;
 	}
 
@@ -344,31 +392,39 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	 */
 	@SuppressWarnings("rawtypes")
 	@Override
-	public Object getAdapter(Class adapter) {
-		if (IConnectionFileManager.class.equals(adapter)) {
+	public Object getAdapter(Class adapter)
+	{
+		if (IConnectionFileManager.class.equals(adapter))
+		{
 			return getConnectionFileManager();
 		}
 		return super.getAdapter(adapter);
 	}
 
-	private synchronized void resetConnectionFileManager() {
+	private synchronized void resetConnectionFileManager()
+	{
 		connectionFileManager = null;
 	}
 
-	private synchronized IConnectionFileManager getConnectionFileManager() {
-		if (connectionFileManager == null) {
+	private synchronized IConnectionFileManager getConnectionFileManager()
+	{
+		if (connectionFileManager == null)
+		{
 			// find contributed first
 			connectionFileManager = (IFTPConnectionFileManager) super.getAdapter(IFTPConnectionFileManager.class);
 			if (connectionFileManager == null
-					&& Platform.getAdapterManager().hasAdapter(this, IFTPConnectionFileManager.class.getName())) {
+					&& Platform.getAdapterManager().hasAdapter(this, IFTPConnectionFileManager.class.getName()))
+			{
 				connectionFileManager = (IFTPConnectionFileManager) Platform.getAdapterManager().loadAdapter(this,
 						IFTPConnectionFileManager.class.getName());
 			}
-			if (connectionFileManager == null) {
+			if (connectionFileManager == null)
+			{
 				connectionFileManager = new FTPConnectionFileManager();
 			}
 			ConnectionContext context = CoreIOPlugin.getConnectionContext(this);
-			if (context != null) {
+			if (context != null)
+			{
 				CoreIOPlugin.setConnectionContext(connectionFileManager, context);
 			}
 			connectionFileManager
@@ -378,10 +434,12 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	}
 
 	@Override
-	public boolean load15Data(String data) {
+	public boolean load15Data(String data)
+	{
 		String[] items = data.split(IConnectionPoint15Constants.DELIMITER);
 
-		if (items.length < 7) {
+		if (items.length < 7)
+		{
 			return false;
 		}
 
@@ -389,7 +447,9 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 		setHost(items[1]);
 		if (items[2] == null || items[2].equals("")) { //$NON-NLS-1$
 			setPath(Path.ROOT);
-		} else {
+		}
+		else
+		{
 			setPath(new Path(items[2]));
 		}
 		setLogin(items[3]);
@@ -397,7 +457,8 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 		setPassiveMode(items[5].equals(Boolean.TRUE.toString()));
 		setId(items[6]);
 
-		if (items.length >= 10) {
+		if (items.length >= 10)
+		{
 			setPort(Integer.parseInt(items[9]));
 		}
 		return true;
