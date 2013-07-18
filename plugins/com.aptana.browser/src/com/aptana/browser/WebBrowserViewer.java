@@ -57,7 +57,8 @@ import com.aptana.swt.webkitbrowser.WebKitBrowser;
 /**
  * @author Max Stepanov
  */
-public class WebBrowserViewer extends Composite {
+public class WebBrowserViewer extends Composite
+{
 
 	public static final int NAVIGATION_BAR = 1 << 0;
 
@@ -83,7 +84,8 @@ public class WebBrowserViewer extends Composite {
 	 * @param parent
 	 * @param style
 	 */
-	public WebBrowserViewer(Composite parent, int style) {
+	public WebBrowserViewer(Composite parent, int style)
+	{
 		super(parent, SWT.NONE);
 		setLayout(GridLayoutFactory.fillDefaults().create());
 		createActions();
@@ -91,22 +93,27 @@ public class WebBrowserViewer extends Composite {
 
 		backgroundArea = new Composite(this, SWT.NONE);
 		backgroundArea.setLayout(GridLayoutFactory.fillDefaults().create());
-		backgroundArea.setLayoutData(GridDataFactory.fillDefaults()
-				.grab(true, true).create());
-		backgroundArea.addControlListener(new ControlListener() {
+		backgroundArea.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
+		backgroundArea.addControlListener(new ControlListener()
+		{
 
-			public void controlMoved(ControlEvent e) {
+			public void controlMoved(ControlEvent e)
+			{
 				resizeBackground();
 			}
 
-			public void controlResized(ControlEvent e) {
+			public void controlResized(ControlEvent e)
+			{
 				resizeBackground();
 			}
 		});
-		backgroundArea.addPaintListener(new PaintListener() {
+		backgroundArea.addPaintListener(new PaintListener()
+		{
 
-			public void paintControl(PaintEvent e) {
-				if (currentImage != null) {
+			public void paintControl(PaintEvent e)
+			{
+				if (currentImage != null)
+				{
 					// FIXME Why not use e.gc?
 					GC gc = new GC(backgroundArea);
 					gc.drawImage(currentImage, 0, 0);
@@ -117,47 +124,54 @@ public class WebBrowserViewer extends Composite {
 
 		browserArea = new Composite(backgroundArea, SWT.NONE);
 		browserArea.setLayout(GridLayoutFactory.fillDefaults().create());
-		browserArea.setLayoutData(GridDataFactory.fillDefaults()
-				.grab(true, true).create());
-		browserArea.addControlListener(new ControlListener() {
+		browserArea.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
+		browserArea.addControlListener(new ControlListener()
+		{
 
-			public void controlMoved(ControlEvent e) {
+			public void controlMoved(ControlEvent e)
+			{
 				resizeBrowser();
 			}
 
-			public void controlResized(ControlEvent e) {
+			public void controlResized(ControlEvent e)
+			{
 				resizeBrowser();
 			}
 		});
-		if (showNavigatorBar) {
+		if (showNavigatorBar)
+		{
 			Composite container = new Composite(browserArea, SWT.NONE);
-			container.setLayoutData(GridDataFactory.fillDefaults()
-					.grab(true, false).create());
-			container.setLayout(GridLayoutFactory.swtDefaults().numColumns(4)
-					.create());
+			container.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
+			container.setLayout(GridLayoutFactory.swtDefaults().numColumns(4).create());
 			createCommandBar(container);
 			createNavigationBar(container);
 		}
 		browser = new WebKitBrowser(browserArea, SWT.NONE);
-		browser.setLayoutData(GridDataFactory.fillDefaults().grab(true, true)
-				.create());
-		if (showNavigatorBar) {
-			browser.addProgressListener(new ProgressListener() {
-				public void changed(ProgressEvent event) {
-					if (!loadInProgress) {
+		browser.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
+		if (showNavigatorBar)
+		{
+			browser.addProgressListener(new ProgressListener()
+			{
+				public void changed(ProgressEvent event)
+				{
+					if (!loadInProgress)
+					{
 						loadInProgress = true;
 						updateNavigationButtons();
 					}
 				}
 
-				public void completed(ProgressEvent event) {
+				public void completed(ProgressEvent event)
+				{
 					loadInProgress = false;
 					updateNavigationButtons();
 				}
 			});
-			browser.addLocationListener(new LocationAdapter() {
+			browser.addLocationListener(new LocationAdapter()
+			{
 				@Override
-				public void changed(LocationEvent event) {
+				public void changed(LocationEvent event)
+				{
 					urlCombo.setText(browser.getUrl());
 					// TODO: history
 				}
@@ -165,14 +179,12 @@ public class WebBrowserViewer extends Composite {
 			updateNavigationButtons();
 		}
 
-		MenuManager menuManager = new MenuManager("#Popup"); //$NON-NLS-1$
-		menuManager.add(backAction);
-		menuManager.add(forwardAction);
-		menuManager.add(refreshAction);
-		((Control) browser).setMenu(menuManager.createContextMenu((Control) browser));
-		
-		browser.addOpenWindowListener(new OpenWindowListener() {
-			public void open(WindowEvent event) {
+		createContextMenu();
+
+		browser.addOpenWindowListener(new OpenWindowListener()
+		{
+			public void open(WindowEvent event)
+			{
 				Shell shell2 = new Shell(getShell(), SWT.SHELL_TRIM);
 				shell2.setLayout(new FillLayout());
 				shell2.setText(Messages.WebBrowserViewer_WindowShellTitle);
@@ -188,24 +200,41 @@ public class WebBrowserViewer extends Composite {
 				WebBrowserViewer browser2 = new WebBrowserViewer(shell2, style);
 				shell2.layout();
 				browser2.newWindow = true;
-				if (event instanceof OpenWindowEvent) {
+				if (event instanceof OpenWindowEvent)
+				{
 					((OpenWindowEvent) event).browser = browser2.browser;
-				} else {
+				}
+				else
+				{
 					event.browser = (Browser) browser2.getBrowser();
 				}
 			}
 		});
-		browser.addCloseWindowListener(new CloseWindowListener() {
-			public void close(WindowEvent event) {
-				if (newWindow) {
+		browser.addCloseWindowListener(new CloseWindowListener()
+		{
+			public void close(WindowEvent event)
+			{
+				if (newWindow)
+				{
 					getShell().dispose();
 				}
 			}
 		});
 	}
 
+	protected MenuManager createContextMenu()
+	{
+		MenuManager menuManager = new MenuManager("#Popup"); //$NON-NLS-1$
+		menuManager.add(backAction);
+		menuManager.add(forwardAction);
+		menuManager.add(refreshAction);
+		((Control) browser).setMenu(menuManager.createContextMenu((Control) browser));
+		return menuManager;
+	}
+
 	@Override
-	public void dispose() {
+	public void dispose()
+	{
 		disposeImage();
 		super.dispose();
 	}
@@ -214,7 +243,8 @@ public class WebBrowserViewer extends Composite {
 	 * @param listener
 	 * @see com.aptana.swt.webkitbrowser.WebKitBrowser#addProgressListener(org.eclipse.swt.browser.ProgressListener)
 	 */
-	public void addProgressListener(ProgressListener listener) {
+	public void addProgressListener(ProgressListener listener)
+	{
 		browser.addProgressListener(listener);
 	}
 
@@ -222,7 +252,8 @@ public class WebBrowserViewer extends Composite {
 	 * @param listener
 	 * @see com.aptana.swt.webkitbrowser.WebKitBrowser#removeProgressListener(org.eclipse.swt.browser.ProgressListener)
 	 */
-	public void removeProgressListener(ProgressListener listener) {
+	public void removeProgressListener(ProgressListener listener)
+	{
 		browser.removeProgressListener(listener);
 	}
 
@@ -230,7 +261,8 @@ public class WebBrowserViewer extends Composite {
 	 * @param listener
 	 * @see com.aptana.swt.webkitbrowser.WebKitBrowser#addTitleListener(org.eclipse.swt.browser.TitleListener)
 	 */
-	public void addTitleListener(TitleListener listener) {
+	public void addTitleListener(TitleListener listener)
+	{
 		browser.addTitleListener(listener);
 	}
 
@@ -238,23 +270,25 @@ public class WebBrowserViewer extends Composite {
 	 * @param listener
 	 * @see com.aptana.swt.webkitbrowser.WebKitBrowser#removeTitleListener(org.eclipse.swt.browser.TitleListener)
 	 */
-	public void removeTitleListener(TitleListener listener) {
+	public void removeTitleListener(TitleListener listener)
+	{
 		browser.removeTitleListener(listener);
 	}
 
-	private void createCommandBar(Composite parent) {
+	protected void createCommandBar(Composite parent)
+	{
 		final MenuManager menuManager = new MenuManager("#CommandMenu"); //$NON-NLS-1$
-		MenuManager sizeMenuManager = new MenuManager(
-				Messages.WebBrowserViewer_LBL_SetSize);
-		sizeMenuManager
-				.add(new Action(Messages.WebBrowserViewer_LBL_FullEditor) {
+		MenuManager sizeMenuManager = new MenuManager(Messages.WebBrowserViewer_LBL_SetSize);
+		sizeMenuManager.add(new Action(Messages.WebBrowserViewer_LBL_FullEditor)
+		{
 
-					@Override
-					public void run() {
-						currentSize = null;
-						layout();
-					}
-				});
+			@Override
+			public void run()
+			{
+				currentSize = null;
+				layout();
+			}
+		});
 		menuManager.add(sizeMenuManager);
 
 		BrowserSizeCategory[] categories = BrowserPlugin.getDefault().getBrowserConfigurationManager()
@@ -262,31 +296,34 @@ public class WebBrowserViewer extends Composite {
 		Arrays.sort(categories);
 		MenuManager categoryMenuManager;
 		BrowserSize[] sizes;
-		for (BrowserSizeCategory category : categories) {
+		for (BrowserSizeCategory category : categories)
+		{
 			// first level has the categories
 			categoryMenuManager = new MenuManager(category.getName());
 			sizeMenuManager.add(categoryMenuManager);
 
 			sizes = category.getSizes();
-			for (final BrowserSize size : sizes) {
+			for (final BrowserSize size : sizes)
+			{
 				// then shows size configurations for each category
-				categoryMenuManager.add(new Action(size.getName()) {
+				categoryMenuManager.add(new Action(size.getName())
+				{
 
 					@Override
-					public void run() {
+					public void run()
+					{
 						disposeImage();
 
 						currentSize = size;
 						boolean blackBackground = false;
 						BrowserBackgroundImage image = currentSize.getImage();
-						if (image != null) {
-							currentImage = image.getImageDescriptor()
-									.createImage();
+						if (image != null)
+						{
+							currentImage = image.getImageDescriptor().createImage();
 							blackBackground = image.isBlackBackground();
 						}
-						Color background = blackBackground ? getDisplay()
-								.getSystemColor(SWT.COLOR_BLACK) : getDisplay()
-								.getSystemColor(SWT.COLOR_WHITE);
+						Color background = blackBackground ? getDisplay().getSystemColor(SWT.COLOR_BLACK)
+								: getDisplay().getSystemColor(SWT.COLOR_WHITE);
 						setBackground(background);
 						backgroundArea.setBackground(background);
 						resizeBackground();
@@ -295,10 +332,12 @@ public class WebBrowserViewer extends Composite {
 			}
 		}
 
-		sizeMenuManager.add(new Action(Messages.WebBrowserViewer_LBL_Custom) {
+		sizeMenuManager.add(new Action(Messages.WebBrowserViewer_LBL_Custom)
+		{
 
 			@Override
-			public void run() {
+			public void run()
+			{
 				setCustomSize();
 			}
 		});
@@ -308,22 +347,26 @@ public class WebBrowserViewer extends Composite {
 		{
 
 			@Override
-			public void run() {
+			public void run()
+			{
 				// not doing anything
 			}
 		};
-		action.setImageDescriptor(ImageResource
-				.getImageDescriptor(ImageResource.IMG_ELCL_COMMAND));
-		action.setMenuCreator(new IMenuCreator() {
+		action.setImageDescriptor(ImageResource.getImageDescriptor(ImageResource.IMG_ELCL_COMMAND));
+		action.setMenuCreator(new IMenuCreator()
+		{
 
-			public void dispose() {
+			public void dispose()
+			{
 			}
 
-			public Menu getMenu(Control parent) {
+			public Menu getMenu(Control parent)
+			{
 				return menuManager.createContextMenu(parent);
 			}
 
-			public Menu getMenu(Menu parent) {
+			public Menu getMenu(Menu parent)
+			{
 				return null;
 			}
 		});
@@ -332,7 +375,8 @@ public class WebBrowserViewer extends Composite {
 		sizeToolBar.setLayoutData(GridDataFactory.fillDefaults().create());
 	}
 
-	private void createNavigationBar(Composite parent) {
+	private void createNavigationBar(Composite parent)
+	{
 		toolBarManager = new ToolBarManager(SWT.FLAT);
 		toolBarManager.add(backAction);
 		toolBarManager.add(forwardAction);
@@ -342,11 +386,12 @@ public class WebBrowserViewer extends Composite {
 		toolbar.setLayoutData(GridDataFactory.fillDefaults().create());
 
 		urlCombo = new Combo(parent, SWT.DROP_DOWN);
-		urlCombo.setLayoutData(GridDataFactory.fillDefaults().grab(true, false)
-				.create());
+		urlCombo.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
 
-		urlCombo.addListener(SWT.DefaultSelection, new Listener() {
-			public void handleEvent(Event e) {
+		urlCombo.addListener(SWT.DefaultSelection, new Listener()
+		{
+			public void handleEvent(Event e)
+			{
 				setURL(urlCombo.getText());
 			}
 		});
@@ -357,80 +402,82 @@ public class WebBrowserViewer extends Composite {
 		toolbar.setLayoutData(GridDataFactory.fillDefaults().create());
 	}
 
-	private void createActions() {
-		backAction = new Action(Messages.WebBrowserViewer_LBL_Back) {
+	protected void createActions()
+	{
+		backAction = new Action(Messages.WebBrowserViewer_LBL_Back)
+		{
 			{
 				setToolTipText(Messages.WebBrowserViewer_TTP_Back);
-				setImageDescriptor(ImageResource
-						.getImageDescriptor(ImageResource.IMG_ELCL_NAV_BACKWARD));
-				setDisabledImageDescriptor(ImageResource
-						.getImageDescriptor(ImageResource.IMG_DLCL_NAV_BACKWARD));
+				setImageDescriptor(ImageResource.getImageDescriptor(ImageResource.IMG_ELCL_NAV_BACKWARD));
+				setDisabledImageDescriptor(ImageResource.getImageDescriptor(ImageResource.IMG_DLCL_NAV_BACKWARD));
 			}
 
 			@Override
-			public void run() {
+			public void run()
+			{
 				browser.back();
 			}
 		};
-		forwardAction = new Action(Messages.WebBrowserViewer_LBL_Forward) {
+		forwardAction = new Action(Messages.WebBrowserViewer_LBL_Forward)
+		{
 			{
 				setToolTipText(Messages.WebBrowserViewer_TTP_Forward);
-				setImageDescriptor(ImageResource
-						.getImageDescriptor(ImageResource.IMG_ELCL_NAV_FORWARD));
-				setDisabledImageDescriptor(ImageResource
-						.getImageDescriptor(ImageResource.IMG_DLCL_NAV_FORWARD));
+				setImageDescriptor(ImageResource.getImageDescriptor(ImageResource.IMG_ELCL_NAV_FORWARD));
+				setDisabledImageDescriptor(ImageResource.getImageDescriptor(ImageResource.IMG_DLCL_NAV_FORWARD));
 			}
 
 			@Override
-			public void run() {
+			public void run()
+			{
 				browser.forward();
 			}
 		};
-		stopAction = new Action(Messages.WebBrowserViewer_LBL_Stop) {
+		stopAction = new Action(Messages.WebBrowserViewer_LBL_Stop)
+		{
 			{
 				setToolTipText(Messages.WebBrowserViewer_TTP_Stop);
-				setImageDescriptor(ImageResource
-						.getImageDescriptor(ImageResource.IMG_ELCL_NAV_STOP));
-				setDisabledImageDescriptor(ImageResource
-						.getImageDescriptor(ImageResource.IMG_DLCL_NAV_STOP));
+				setImageDescriptor(ImageResource.getImageDescriptor(ImageResource.IMG_ELCL_NAV_STOP));
+				setDisabledImageDescriptor(ImageResource.getImageDescriptor(ImageResource.IMG_DLCL_NAV_STOP));
 			}
 
 			@Override
-			public void run() {
+			public void run()
+			{
 				browser.stop();
 			}
 		};
-		refreshAction = new Action(CoreStrings.REFRESH) {
+		refreshAction = new Action(CoreStrings.REFRESH)
+		{
 			{
 				setToolTipText(Messages.WebBrowserViewer_TTP_Refresh);
-				setImageDescriptor(ImageResource
-						.getImageDescriptor(ImageResource.IMG_ELCL_NAV_REFRESH));
-				setDisabledImageDescriptor(ImageResource
-						.getImageDescriptor(ImageResource.IMG_DLCL_NAV_REFRESH));
+				setImageDescriptor(ImageResource.getImageDescriptor(ImageResource.IMG_ELCL_NAV_REFRESH));
+				setDisabledImageDescriptor(ImageResource.getImageDescriptor(ImageResource.IMG_DLCL_NAV_REFRESH));
 			}
 
 			@Override
-			public void run() {
+			public void run()
+			{
 				browser.refresh();
 			}
 		};
-		goAction = new Action(Messages.WebBrowserViewer_LBL_Go) {
+		goAction = new Action(Messages.WebBrowserViewer_LBL_Go)
+		{
 			{
 				setToolTipText(Messages.WebBrowserViewer_TTP_Go);
-				setImageDescriptor(ImageResource
-						.getImageDescriptor(ImageResource.IMG_ELCL_NAV_GO));
-				setDisabledImageDescriptor(ImageResource
-						.getImageDescriptor(ImageResource.IMG_DLCL_NAV_GO));
+				setImageDescriptor(ImageResource.getImageDescriptor(ImageResource.IMG_ELCL_NAV_GO));
+				setDisabledImageDescriptor(ImageResource.getImageDescriptor(ImageResource.IMG_DLCL_NAV_GO));
 			}
 
 			@Override
-			public void run() {
+			public void run()
+			{
 				browser.setUrl(urlCombo.getText());
 			}
 		};
 	}
 
-	private void updateNavigationButtons() {
+	private void updateNavigationButtons()
+	{
 		backAction.setEnabled(!loadInProgress && browser.isBackEnabled());
 		forwardAction.setEnabled(!loadInProgress && browser.isForwardEnabled());
 		stopAction.setEnabled(loadInProgress);
@@ -439,15 +486,16 @@ public class WebBrowserViewer extends Composite {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.swt.widgets.Composite#setFocus()
 	 */
 	@Override
-	public boolean setFocus() {
+	public boolean setFocus()
+	{
 		return ((Control) browser).setFocus();
 	}
 
-	public Control getBrowser() {
+	public Control getBrowser()
+	{
 		return (Control) browser;
 	}
 
@@ -456,7 +504,8 @@ public class WebBrowserViewer extends Composite {
 	 * @return
 	 * @see com.aptana.swt.webkitbrowser.WebKitBrowser#setText(java.lang.String)
 	 */
-	public boolean setText(String html) {
+	public boolean setText(String html)
+	{
 		return browser.setText(html);
 	}
 
@@ -465,12 +514,11 @@ public class WebBrowserViewer extends Composite {
 	 * @param postData
 	 * @param headers
 	 * @return
-	 * @see com.aptana.swt.webkitbrowser.WebKitBrowser#setUrl(java.lang.String,
-	 *      java.lang.String, java.lang.String[])
+	 * @see com.aptana.swt.webkitbrowser.WebKitBrowser#setUrl(java.lang.String, java.lang.String, java.lang.String[])
 	 */
 	/*
-	 * public boolean setURL(String url, String postData, String[] headers) {
-	 * return browser.setUrl(url, postData, headers); }
+	 * public boolean setURL(String url, String postData, String[] headers) { return browser.setUrl(url, postData,
+	 * headers); }
 	 */
 
 	/**
@@ -478,48 +526,56 @@ public class WebBrowserViewer extends Composite {
 	 * @return
 	 * @see com.aptana.swt.webkitbrowser.WebKitBrowser#setUrl(java.lang.String)
 	 */
-	public boolean setURL(String url) {
+	public boolean setURL(String url)
+	{
 		return browser.setUrl(url);
 	}
 
-	private void disposeImage() {
-		if (currentImage != null) {
+	private void disposeImage()
+	{
+		if (currentImage != null)
+		{
 			currentImage.dispose();
 			currentImage = null;
 		}
 	}
 
-	private void resizeBackground() {
-		if (currentSize != null) {
-			if (currentImage == null) {
-				backgroundArea.setSize(currentSize.getWidth(),
-						currentSize.getHeight());
-			} else {
+	private void resizeBackground()
+	{
+		if (currentSize != null)
+		{
+			if (currentImage == null)
+			{
+				backgroundArea.setSize(currentSize.getWidth(), currentSize.getHeight());
+			}
+			else
+			{
 				ImageData imageData = currentImage.getImageData();
 				backgroundArea.setSize(imageData.width, imageData.height);
 			}
 		}
 	}
 
-	private void resizeBrowser() {
-		if (currentSize != null) {
+	private void resizeBrowser()
+	{
+		if (currentSize != null)
+		{
 			BrowserBackgroundImage image = currentSize.getImage();
-			if (image != null) {
-				browserArea.setSize(currentSize.getWidth(),
-						currentSize.getHeight());
-				browserArea.setLocation(image.getHorizontalIndent(),
-						image.getVerticalIndent());
+			if (image != null)
+			{
+				browserArea.setSize(currentSize.getWidth(), currentSize.getHeight());
+				browserArea.setLocation(image.getHorizontalIndent(), image.getVerticalIndent());
 			}
 		}
 	}
 
-	private void setCustomSize() {
+	private void setCustomSize()
+	{
 		CustomSizeDialog dialog = new CustomSizeDialog(getShell());
-		if (dialog.open() == Window.OK) {
-			currentSize = new BrowserSize(
-					"custom", dialog.fWidth, dialog.fHeight, null, null); //$NON-NLS-1$
-			backgroundArea.setSize(currentSize.getWidth(),
-					currentSize.getHeight());
+		if (dialog.open() == Window.OK)
+		{
+			currentSize = new BrowserSize("custom", dialog.fWidth, dialog.fHeight, null, null); //$NON-NLS-1$
+			backgroundArea.setSize(currentSize.getWidth(), currentSize.getHeight());
 		}
 	}
 }
