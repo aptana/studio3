@@ -6,7 +6,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.preview.internal;
+package com.aptana.preview;
 
 import java.net.URL;
 import java.text.MessageFormat;
@@ -31,12 +31,13 @@ import org.eclipse.ui.part.EditorPart;
 
 import com.aptana.browser.WebBrowserViewer;
 import com.aptana.core.util.PlatformUtil;
+import com.aptana.preview.internal.Messages;
 
 /**
  * @author Max Stepanov
- * 
  */
-public final class PreviewEditorPart extends EditorPart implements IReusableEditor, IShowEditorInput {
+public class PreviewEditorPart extends EditorPart implements IReusableEditor, IShowEditorInput
+{
 
 	public static final String EDITOR_ID = "com.aptana.preview.editor"; //$NON-NLS-1$
 
@@ -49,31 +50,29 @@ public final class PreviewEditorPart extends EditorPart implements IReusableEdit
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @seeorg.eclipse.ui.part.EditorPart#doSave(org.eclipse.core.runtime.
-	 * IProgressMonitor)
+	 * @seeorg.eclipse.ui.part.EditorPart#doSave(org.eclipse.core.runtime. IProgressMonitor)
 	 */
 	@Override
-	public void doSave(IProgressMonitor monitor) {
+	public void doSave(IProgressMonitor monitor)
+	{
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.ui.part.EditorPart#doSaveAs()
 	 */
 	@Override
-	public void doSaveAs() {
+	public void doSaveAs()
+	{
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.part.EditorPart#init(org.eclipse.ui.IEditorSite,
-	 * org.eclipse.ui.IEditorInput)
+	 * @see org.eclipse.ui.part.EditorPart#init(org.eclipse.ui.IEditorSite, org.eclipse.ui.IEditorInput)
 	 */
 	@Override
-	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
+	public void init(IEditorSite site, IEditorInput input) throws PartInitException
+	{
 		setSite(site);
 		super.setInput(input);
 		showEditorInput();
@@ -81,12 +80,13 @@ public final class PreviewEditorPart extends EditorPart implements IReusableEdit
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.ui.part.WorkbenchPart#dispose()
 	 */
 	@Override
-	public void dispose() {
-		if (image != null && !image.isDisposed()) {
+	public void dispose()
+	{
+		if (image != null && !image.isDisposed())
+		{
 			image.dispose();
 			image = null;
 		}
@@ -94,39 +94,38 @@ public final class PreviewEditorPart extends EditorPart implements IReusableEdit
 		disposed = true;
 	}
 
-	public boolean isDisposed() {
+	public boolean isDisposed()
+	{
 		return disposed;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.ui.part.EditorPart#isDirty()
 	 */
 	@Override
-	public boolean isDirty() {
+	public boolean isDirty()
+	{
 		return false;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.ui.part.EditorPart#isSaveAsAllowed()
 	 */
 	@Override
-	public boolean isSaveAsAllowed() {
+	public boolean isSaveAsAllowed()
+	{
 		return false;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets
-	 * .Composite)
+	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets .Composite)
 	 */
 	@Override
-	public void createPartControl(Composite parent) {
+	public void createPartControl(Composite parent)
+	{
 		int style = WebBrowserViewer.NAVIGATION_BAR;
 		if (PlatformUtil.isLinux())
 		{
@@ -170,7 +169,7 @@ public final class PreviewEditorPart extends EditorPart implements IReusableEdit
 		}
 		else
 		{
-			webBrowser = new WebBrowserViewer(parent, style);
+			webBrowser = createBrowser(parent, style);
 			webBrowser.addProgressListener(new ProgressListener()
 			{
 				public void changed(ProgressEvent event)
@@ -209,25 +208,35 @@ public final class PreviewEditorPart extends EditorPart implements IReusableEdit
 		}
 	}
 
+	protected WebBrowserViewer createBrowser(Composite parent, int style)
+	{
+		return new WebBrowserViewer(parent, style);
+	}
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
 	 */
 	@Override
-	public void setFocus() {
-		if (webBrowser != null) {
+	public void setFocus()
+	{
+		if (webBrowser != null)
+		{
 			webBrowser.setFocus();
-		} else if (nativeBrowser != null) {
+		}
+		else if (nativeBrowser != null)
+		{
 			nativeBrowser.setFocus();
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.part.EditorPart#setInput(org.eclipse.ui.IEditorInput)
 	 */
 	@Override
-	public void setInput(IEditorInput input) {
+	public void setInput(IEditorInput input)
+	{
 		super.setInput(input);
 		showEditorInput();
 		firePropertyChange(PROP_INPUT);
@@ -235,29 +244,32 @@ public final class PreviewEditorPart extends EditorPart implements IReusableEdit
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.IShowEditorInput#showEditorInput(org.eclipse.ui.IEditorInput
-	 * )
+	 * @see org.eclipse.ui.IShowEditorInput#showEditorInput(org.eclipse.ui.IEditorInput )
 	 */
-	public void showEditorInput(IEditorInput editorInput) {
+	public void showEditorInput(IEditorInput editorInput)
+	{
 		setInput(editorInput);
 	}
 
-	private void showEditorInput() {
+	private void showEditorInput()
+	{
 		PreviewEditorInput pei = getPreviewEditorInput();
-		if (pei != null) {
+		if (pei != null)
+		{
 			initialURL = null;
 			URL url = pei.getURL();
 			if (url != null)
 				initialURL = url.toExternalForm();
-			if (webBrowser != null) {
+			if (webBrowser != null)
+			{
 				webBrowser.setURL(initialURL);
-			} else if (nativeBrowser != null) {
+			}
+			else if (nativeBrowser != null)
+			{
 				nativeBrowser.setUrl(initialURL);
 			}
 
-			setPartName(MessageFormat.format(Messages.PreviewEditorPart_Title, pei.getName()));
+			setPartName(getEditorInputName());
 			setTitleToolTip(pei.getToolTipText());
 			Image oldImage = image;
 			ImageDescriptor id = pei.getImageDescriptor();
@@ -269,22 +281,37 @@ public final class PreviewEditorPart extends EditorPart implements IReusableEdit
 		}
 	}
 
-	private IProgressMonitor getStatusBarProgressMonitor() {
+	protected String getEditorInputName()
+	{
+		PreviewEditorInput pei = getPreviewEditorInput();
+		if (pei != null)
+		{
+			return MessageFormat.format(Messages.PreviewEditorPart_Title, pei.getName());
+		}
+		return null;
+	}
+
+	private IProgressMonitor getStatusBarProgressMonitor()
+	{
 		IStatusLineManager statusLineManager = getEditorSite().getActionBars().getStatusLineManager();
 		return statusLineManager.getProgressMonitor();
 	}
 
-	public boolean close() {
+	public boolean close()
+	{
 		final boolean[] result = new boolean[1];
-		Display.getDefault().asyncExec(new Runnable() {
-			public void run() {
+		Display.getDefault().asyncExec(new Runnable()
+		{
+			public void run()
+			{
 				result[0] = getEditorSite().getPage().closeEditor(PreviewEditorPart.this, false);
 			}
 		});
 		return result[0];
 	}
 
-	protected PreviewEditorInput getPreviewEditorInput() {
+	protected PreviewEditorInput getPreviewEditorInput()
+	{
 		IEditorInput input = getEditorInput();
 		if (input instanceof PreviewEditorInput)
 			return (PreviewEditorInput) input;
