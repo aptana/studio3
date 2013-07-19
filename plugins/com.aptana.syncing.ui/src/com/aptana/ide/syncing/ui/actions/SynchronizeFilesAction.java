@@ -7,6 +7,9 @@
  */
 package com.aptana.ide.syncing.ui.actions;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -73,8 +76,10 @@ public class SynchronizeFilesAction extends BaseSyncAction
 				}
 				finally
 				{
+					Map<String, String> payload = new HashMap<String, String>(2);
+					payload.put("sourceType", site.getSource().getType()); //$NON-NLS-1$}
 					StudioAnalytics.getInstance().sendEvent(
-							new FeatureEvent("remote.sync." + site.getDestination().getType(), null)); //$NON-NLS-1$
+							new FeatureEvent("remote.sync." + site.getDestination().getType(), payload)); //$NON-NLS-1$
 				}
 			}
 		});
