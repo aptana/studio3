@@ -60,7 +60,6 @@ public class NodeJSService implements INodeJSService
 	private static final String PROGRAM_FILES_NODEJS_NODE_PATH = "%PROGRAMFILES%\\nodejs"; //$NON-NLS-1$
 	private static final String USR_LOCAL_BIN_NODE = "/usr/local/bin"; //$NON-NLS-1$
 
-	private static final String NODE = "node"; //$NON-NLS-1$
 	private static final String NODE_EXE = "node.exe"; //$NON-NLS-1$
 
 	private static final String MAC_NODE_URL = "http://go.aptana.com/installer_nodejs_osx"; //$NON-NLS-1$
