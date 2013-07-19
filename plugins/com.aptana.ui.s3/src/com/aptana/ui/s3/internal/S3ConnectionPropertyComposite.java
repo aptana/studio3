@@ -60,8 +60,6 @@ import com.aptana.ide.ui.io.dialogs.IDialogConstants;
 import com.aptana.ui.s3.S3UIPlugin;
 import com.aptana.ui.s3.dialogs.Messages;
 import com.aptana.ui.util.UIUtils;
-import com.aptana.usage.FeatureEvent;
-import com.aptana.usage.StudioAnalytics;
 
 /**
  * @author Max Stepanov
@@ -294,8 +292,6 @@ public class S3ConnectionPropertyComposite extends Composite implements IOptions
 		if (isNew)
 		{
 			CoreIOPlugin.getConnectionPointManager().addConnectionPoint(s3ConnectionPoint);
-			StudioAnalytics.getInstance().sendEvent(
-					new FeatureEvent("remote.new." + getConnectionPoint().getId(), null)); //$NON-NLS-1$
 		}
 		else if (s3ConnectionPoint != originalS3ConnectionPoint)
 		{

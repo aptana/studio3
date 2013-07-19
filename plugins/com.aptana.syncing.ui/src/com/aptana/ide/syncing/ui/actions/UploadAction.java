@@ -142,7 +142,7 @@ public class UploadAction extends BaseSyncAction
 				finally
 				{
 					StudioAnalytics.getInstance().sendEvent(
-							new FeatureEvent("remote.upload." + site.getDestination().getId(), null)); //$NON-NLS-1$
+							new FeatureEvent("remote.upload." + site.getDestination().getType(), null)); //$NON-NLS-1$
 				}
 
 				return Status.OK_STATUS;

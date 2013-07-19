@@ -40,6 +40,8 @@ import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.events.ConnectionPointEvent;
 import com.aptana.ide.core.io.events.IConnectionPointListener;
+import com.aptana.usage.FeatureEvent;
+import com.aptana.usage.StudioAnalytics;
 
 /**
  * @author Max Stepanov
@@ -306,6 +308,7 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
 			connections.add((ConnectionPoint) connectionPoint);
 			dirty = true;
 			broadcastEvent(new ConnectionPointEvent(this, ConnectionPointEvent.POST_ADD, connectionPoint));
+			StudioAnalytics.getInstance().sendEvent(new FeatureEvent("remote.new." + connectionPoint.getType(), null)); //$NON-NLS-1$
 		}
 	}
 
@@ -566,7 +569,7 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
 					public Set<String> getSupportElementNames()
 					{
 						return CollectionsUtil.newInOrderSet(TAG_CONNECTION_POINT_CATEGORY, TAG_CONNECTION_POINT_TYPE);
-	}
+					}
 				});
 	}
 
