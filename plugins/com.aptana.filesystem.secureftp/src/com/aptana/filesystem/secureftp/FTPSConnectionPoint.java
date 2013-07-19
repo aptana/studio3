@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.Platform;
 
 import com.aptana.core.epl.IMemento;
 import com.aptana.core.io.vfs.IConnectionFileManager;
+import com.aptana.core.util.StringUtil;
 import com.aptana.filesystem.secureftp.internal.FTPSConnectionFileManager;
 import com.aptana.ide.core.io.ConnectionContext;
 import com.aptana.ide.core.io.ConnectionPoint;
@@ -552,7 +553,8 @@ public class FTPSConnectionPoint extends ConnectionPoint implements IFTPSConnect
 
 		setName(items[0]);
 		setHost(items[1]);
-		if (items[2] == null || "".equals(items[2])) { //$NON-NLS-1$
+		if (StringUtil.isEmpty(items[2]))
+		{
 			setPath(Path.ROOT);
 		}
 		else

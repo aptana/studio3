@@ -15,24 +15,30 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 
-
 /**
  * @author Max Stepanov
- *
  */
-public interface IConnectionPoint extends IAdaptable {
+public interface IConnectionPoint extends IAdaptable
+{
 
 	public String getName();
+
 	public String getId();
 
+	public String getType();
+
 	public URI getRootURI();
+
 	public IFileStore getRoot() throws CoreException;
-	
+
 	public void connect(IProgressMonitor monitor) throws CoreException;
+
 	public void connect(boolean force, IProgressMonitor monitor) throws CoreException;
+
 	public boolean isConnected();
-	
+
 	public void disconnect(IProgressMonitor monitor) throws CoreException;
+
 	public boolean canDisconnect();
 
 }

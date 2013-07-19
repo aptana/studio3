@@ -68,8 +68,6 @@ import com.aptana.ide.ui.io.dialogs.IDialogConstants;
 import com.aptana.ui.ftp.FTPUIPlugin;
 import com.aptana.ui.ftp.dialogs.Messages;
 import com.aptana.ui.util.UIUtils;
-import com.aptana.usage.FeatureEvent;
-import com.aptana.usage.StudioAnalytics;
 
 /**
  * @author Max Stepanov
@@ -326,8 +324,6 @@ public class FTPConnectionPropertyComposite extends Composite implements IOption
 		if (isNew)
 		{
 			CoreIOPlugin.getConnectionPointManager().addConnectionPoint(ftpConnectionPoint);
-			StudioAnalytics.getInstance().sendEvent(
-					new FeatureEvent("remote.new." + getConnectionPoint().getId(), null)); //$NON-NLS-1$
 		}
 		else if (ftpConnectionPoint != originalFtpConnectionPoint) // $codepro.audit.disable useEquals
 		{

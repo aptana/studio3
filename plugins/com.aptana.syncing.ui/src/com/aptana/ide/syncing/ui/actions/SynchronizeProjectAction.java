@@ -74,7 +74,7 @@ public class SynchronizeProjectAction extends BaseSyncAction
 				finally
 				{
 					StudioAnalytics.getInstance().sendEvent(
-							new FeatureEvent("remote.sync." + site.getDestination().getId(), null)); //$NON-NLS-1$
+							new FeatureEvent("remote.sync." + site.getDestination().getType(), null)); //$NON-NLS-1$
 				}
 			}
 		});
