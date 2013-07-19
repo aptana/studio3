@@ -1,11 +1,9 @@
-package com.aptana.preview.internal;
+package com.aptana.preview;
 
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorMatchingStrategy;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.PartInitException;
-
-import com.aptana.preview.PreviewEditorInput;
 
 /**
  * Aptana Studio
