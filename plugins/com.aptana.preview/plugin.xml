@@ -43,7 +43,7 @@
             default="false"
             icon="icons/etool16/preview.png"
             id="com.aptana.preview.editor"
-            matchingStrategy="com.aptana.preview.internal.PreviewEditorMatchingStrategy"
+            matchingStrategy="com.aptana.preview.PreviewEditorMatchingStrategy"
             name="%editor.preview.name">
       </editor>
    </extension>
