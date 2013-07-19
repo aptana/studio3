@@ -9,7 +9,8 @@ Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.filesystem;visibility:=reexport,
  org.eclipse.equinox.security;visibility:=reexport,
  com.aptana.core;bundle-version="3.0.4",
- com.aptana.core.epl
+ com.aptana.core.epl,
+ com.aptana.usage
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Eclipse-LazyStart: true

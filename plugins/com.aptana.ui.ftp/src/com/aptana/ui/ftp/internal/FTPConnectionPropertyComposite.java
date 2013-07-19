@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -72,9 +72,11 @@ import com.aptana.ui.util.UIUtils;
 /**
  * @author Max Stepanov
  */
-public class FTPConnectionPropertyComposite extends Composite implements IOptionsComposite.IListener {
+public class FTPConnectionPropertyComposite extends Composite implements IOptionsComposite.IListener
+{
 
-	public static interface IListener {
+	public static interface IListener
+	{
 		public void setValid(boolean valid);
 
 		public void error(String message);
@@ -116,7 +118,8 @@ public class FTPConnectionPropertyComposite extends Composite implements IOption
 	private IListener listener;
 
 	public FTPConnectionPropertyComposite(Composite parent, int style, IBaseRemoteConnectionPoint connectionPoint,
-			IListener listener) {
+			IListener listener)
+	{
 		super(parent, style);
 		setConnectionPoint(connectionPoint);
 		this.listener = listener;
@@ -222,9 +225,11 @@ public class FTPConnectionPropertyComposite extends Composite implements IOption
 		createAdvancedOptions(optionsGroup);
 
 		optionsExpandable.setClient(optionsGroup);
-		optionsExpandable.addExpansionListener(new ExpansionAdapter() {
+		optionsExpandable.addExpansionListener(new ExpansionAdapter()
+		{
 
-			public void expansionStateChanged(ExpansionEvent e) {
+			public void expansionStateChanged(ExpansionEvent e)
+			{
 				FTPConnectionPropertyComposite.this.listener.layoutShell();
 			}
 		});
@@ -237,18 +242,23 @@ public class FTPConnectionPropertyComposite extends Composite implements IOption
 		/* -- */
 		addListeners();
 
-		passwordText.addSelectionListener(new SelectionAdapter() {
+		passwordText.addSelectionListener(new SelectionAdapter()
+		{
 			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
+			public void widgetDefaultSelected(SelectionEvent e)
+			{
 				e.doit = false;
 				testConnection();
 			}
 		});
 
-		testButton.addSelectionListener(new SelectionAdapter() {
+		testButton.addSelectionListener(new SelectionAdapter()
+		{
 			@Override
-			public void widgetSelected(SelectionEvent e) {
-				if (testConnection()) {
+			public void widgetSelected(SelectionEvent e)
+			{
+				if (testConnection())
+				{
 					MessageDialog.openInformation(
 							getShell(),
 							Messages.FTPConnectionPointPropertyDialog_Succeed_Title,
@@ -258,38 +268,47 @@ public class FTPConnectionPropertyComposite extends Composite implements IOption
 			}
 		});
 
-		browseButton.addSelectionListener(new SelectionAdapter() {
+		browseButton.addSelectionListener(new SelectionAdapter()
+		{
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(SelectionEvent e)
+			{
 				browseConnection();
 			}
 		});
 
-		if (ftpConnectionPoint == null) {
+		if (ftpConnectionPoint == null)
+		{
 			isNew = true;
 			ftpConnectionPoint = getOrCreateConnectionPoint(getConnectionPointType());
 			ftpConnectionPoint.setName(DEFAULT_NAME);
 		}
-		else {
+		else
+		{
 			originalFtpConnectionPoint = ftpConnectionPoint;
 		}
 		loadPropertiesFrom(ftpConnectionPoint);
 		connectionTested = !isNew;
 	}
 
-	public boolean completeConnection() {
-		if (DEFAULT_NAME.equals(nameText.getText())) {
+	public boolean completeConnection()
+	{
+		if (DEFAULT_NAME.equals(nameText.getText()))
+		{
 			nameText.setText(hostText.getText());
 		}
-		if (!connectionTested) {
-			if (!testConnection()) {
+		if (!connectionTested)
+		{
+			if (!testConnection())
+			{
 				MessageDialog dlg = new MessageDialog(getShell(),
 						Messages.FTPConnectionPointPropertyDialog_ConfirmTitle, null,
 						Messages.FTPConnectionPointPropertyDialog_ConfirmMessage, MessageDialog.QUESTION, new String[] {
 								IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL,
 								Messages.FTPConnectionPointPropertyDialog_LBL_Edit }, 2);
 				int code = dlg.open();
-				switch (code) {
+				switch (code)
+				{
 					case 1:
 						return true;
 					case 2:
@@ -302,7 +321,8 @@ public class FTPConnectionPropertyComposite extends Composite implements IOption
 				passwordText.getText().toCharArray(), savePasswordButton.getSelection());
 
 		boolean changed = savePropertiesTo(ftpConnectionPoint);
-		if (isNew) {
+		if (isNew)
+		{
 			CoreIOPlugin.getConnectionPointManager().addConnectionPoint(ftpConnectionPoint);
 		}
 		else if (ftpConnectionPoint != originalFtpConnectionPoint) // $codepro.audit.disable useEquals
@@ -311,57 +331,70 @@ public class FTPConnectionPropertyComposite extends Composite implements IOption
 			CoreIOPlugin.getConnectionPointManager().removeConnectionPoint(originalFtpConnectionPoint);
 			CoreIOPlugin.getConnectionPointManager().addConnectionPoint(ftpConnectionPoint);
 		}
-		else if (changed) {
+		else if (changed)
+		{
 			CoreIOPlugin.getConnectionPointManager().connectionPointChanged(ftpConnectionPoint);
 		}
 		return true;
 	}
 
-	public IBaseRemoteConnectionPoint getConnectionPoint() {
+	public IBaseRemoteConnectionPoint getConnectionPoint()
+	{
 		return ftpConnectionPoint;
 	}
 
-	public void setConnectionPoint(IBaseRemoteConnectionPoint connectionPoint) {
+	public void setConnectionPoint(IBaseRemoteConnectionPoint connectionPoint)
+	{
 		ftpConnectionPoint = connectionPoint;
 	}
 
-	public void setCanceled(boolean canceled) {
+	public void setCanceled(boolean canceled)
+	{
 		progressMonitorPart.setCanceled(canceled);
 	}
 
 	@Override
-	public void dispose() {
-		if (smallFont != null) {
+	public void dispose()
+	{
+		if (smallFont != null)
+		{
 			smallFont.dispose();
 			smallFont = null;
 		}
 		super.dispose();
 	}
 
-	public boolean isValid() {
+	public boolean isValid()
+	{
 		String message = null;
 		String name = nameText.getText().trim();
-		if (name.length() == 0) {
+		if (name.length() == 0)
+		{
 			message = Messages.FTPConnectionPointPropertyDialog_ERR_NameEmpty;
 		}
 		else if ((originalFtpConnectionPoint == null || !name.equalsIgnoreCase(originalFtpConnectionPoint.getName()))
-				&& !ConnectionPointUtils.isConnectionPointNameUnique(nameText.getText())) {
+				&& !ConnectionPointUtils.isConnectionPointNameUnique(nameText.getText()))
+		{
 			message = MessageFormat.format(Messages.FTPConnectionPointPropertyDialog_ERR_NameExists, name);
 		}
-		else if (!HOST_PATTERN.matcher(hostText.getText()).matches()) {
+		else if (!HOST_PATTERN.matcher(hostText.getText()).matches())
+		{
 			message = Messages.FTPConnectionPointPropertyDialog_ERR_InvalidHost;
 		}
-		else if (loginCombo.getText().length() == 0) {
+		else if (loginCombo.getText().length() == 0)
+		{
 			message = Messages.FTPConnectionPointPropertyDialog_ERR_NoUsername;
 		}
-		else {
+		else
+		{
 			message = advancedOptions.isValid();
 		}
 		listener.error(message);
 		return message == null;
 	}
 
-	public boolean testConnection(ConnectionContext context, final IConnectionRunnable connectRunnable) {
+	public boolean testConnection(ConnectionContext context, final IConnectionRunnable connectRunnable)
+	{
 		// WORKAROUND: getting contents after the control is disabled will return empty string if not called here
 		hostText.getText();
 		loginCombo.getText();
@@ -370,43 +403,56 @@ public class FTPConnectionPropertyComposite extends Composite implements IOption
 		lockUI(true);
 		((GridData) progressMonitorPart.getLayoutData()).exclude = false;
 		listener.layoutShell();
-		try {
+		try
+		{
 			final IBaseRemoteConnectionPoint connectionPoint = isNew ? ftpConnectionPoint
 					: (IBaseRemoteConnectionPoint) CoreIOPlugin.getConnectionPointManager().cloneConnectionPoint(
 							ftpConnectionPoint);
 			savePropertiesTo(connectionPoint);
-			if (context == null) {
+			if (context == null)
+			{
 				context = new ConnectionContext(); // $codepro.audit.disable questionableAssignment
 				context.setBoolean(ConnectionContext.QUICK_CONNECT, true);
 			}
 			context.setBoolean(ConnectionContext.NO_PASSWORD_PROMPT, true);
 			CoreIOPlugin.setConnectionContext(connectionPoint, context);
 
-			ModalContext.run(new IRunnableWithProgress() {
-				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-					try {
-						try {
-							if (connectRunnable != null) {
+			ModalContext.run(new IRunnableWithProgress()
+			{
+				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
+				{
+					try
+					{
+						try
+						{
+							if (connectRunnable != null)
+							{
 								connectRunnable.beforeConnect(connectionPoint);
 							}
 							connectionPoint.connect(monitor);
-							if (connectRunnable != null) {
+							if (connectRunnable != null)
+							{
 								connectRunnable.afterConnect(connectionPoint, monitor);
 							}
 						}
-						finally {
-							try {
+						finally
+						{
+							try
+							{
 								connectionPoint.disconnect(monitor);
 							}
-							catch (CoreException e) {
+							catch (CoreException e)
+							{
 								IdeLog.logWarning(FTPUIPlugin.getDefault(), e);
 							}
 						}
 					}
-					catch (CoreException e) {
+					catch (CoreException e)
+					{
 						throw new InvocationTargetException(e);
 					}
-					finally {
+					finally
+					{
 						CoreIOPlugin.clearConnectionContext(connectionPoint);
 						monitor.done();
 					}
@@ -415,17 +461,22 @@ public class FTPConnectionPropertyComposite extends Composite implements IOption
 
 			return connectionTested = true;
 		}
-		catch (InterruptedException e) {
+		catch (InterruptedException e)
+		{
 			e.getCause();
 		}
-		catch (InvocationTargetException e) {
+		catch (InvocationTargetException e)
+		{
 			showErrorDialog(e.getTargetException());
 		}
-		catch (CoreException e) {
+		catch (CoreException e)
+		{
 			showErrorDialog(e);
 		}
-		finally {
-			if (!progressMonitorPart.isDisposed()) {
+		finally
+		{
+			if (!progressMonitorPart.isDisposed())
+			{
 				((GridData) progressMonitorPart.getLayoutData()).exclude = true;
 				listener.layoutShell();
 				lockUI(false);
@@ -434,8 +485,10 @@ public class FTPConnectionPropertyComposite extends Composite implements IOption
 		return false;
 	}
 
-	public void validate() {
-		if (isDisposed()) {
+	public void validate()
+	{
+		if (isDisposed())
+		{
 			return;
 		}
 		boolean valid = isValid();
@@ -445,7 +498,8 @@ public class FTPConnectionPropertyComposite extends Composite implements IOption
 		listener.setValid(valid);
 	}
 
-	protected void createSiteSection(Composite parent) {
+	protected void createSiteSection(Composite parent)
+	{
 		Label label = new Label(parent, SWT.NONE);
 		label.setLayoutData(GridDataFactory
 				.swtDefaults()
@@ -460,7 +514,8 @@ public class FTPConnectionPropertyComposite extends Composite implements IOption
 						SWT.DEFAULT).grab(true, false).create());
 	}
 
-	protected void createPasswordSection(Composite parent) {
+	protected void createPasswordSection(Composite parent)
+	{
 		passwordLabel = new Label(parent, SWT.NONE);
 		passwordLabel.setLayoutData(GridDataFactory
 				.swtDefaults()
@@ -480,41 +535,51 @@ public class FTPConnectionPropertyComposite extends Composite implements IOption
 		savePasswordButton.setText(Messages.FTPConnectionPointPropertyDialog_LBL_Save);
 	}
 
-	protected void createAdvancedOptions(Composite parent) {
+	protected void createAdvancedOptions(Composite parent)
+	{
 		advancedOptions = new FTPAdvancedOptionsComposite(parent, SWT.NONE, this);
 		((Composite) advancedOptions).setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 	}
 
-	protected ConnectionPointType getConnectionPointType() {
-		if (ftpConnectionPoint != null) {
+	protected ConnectionPointType getConnectionPointType()
+	{
+		if (ftpConnectionPoint != null)
+		{
 			return CoreIOPlugin.getConnectionPointManager().getType(ftpConnectionPoint);
 		}
 		return CoreIOPlugin.getConnectionPointManager().getType(IBaseFTPConnectionPoint.TYPE_FTP);
 	}
 
-	protected IBaseRemoteConnectionPoint getOrCreateConnectionPoint(ConnectionPointType connectionPointType) {
-		if (!isNew) {
+	protected IBaseRemoteConnectionPoint getOrCreateConnectionPoint(ConnectionPointType connectionPointType)
+	{
+		if (!isNew)
+		{
 			if (CoreIOPlugin.getConnectionPointManager().getType(originalFtpConnectionPoint)
-					.equals(connectionPointType)) {
+					.equals(connectionPointType))
+			{
 				return originalFtpConnectionPoint;
 			}
 		}
-		try {
+		try
+		{
 			return (IBaseRemoteConnectionPoint) CoreIOPlugin.getConnectionPointManager().createConnectionPoint(
 					connectionPointType);
 		}
-		catch (CoreException e) {
+		catch (CoreException e)
+		{
 			IdeLog.logError(FTPUIPlugin.getDefault(), Messages.FTPConnectionPointPropertyDialog_ERR_FailedCreate, e);
 			listener.close(); // $codepro.audit.disable closeInFinally
 			throw new SWTException(e.getLocalizedMessage());
 		}
 	}
 
-	protected String getAuthId(IBaseRemoteConnectionPoint connectionPoint) {
+	protected String getAuthId(IBaseRemoteConnectionPoint connectionPoint)
+	{
 		return Policy.generateAuthId(getConnectionPointType().getType().toUpperCase(), connectionPoint);
 	}
 
-	protected void lockUI(boolean lock) {
+	protected void lockUI(boolean lock)
+	{
 		listener.lockUI(lock);
 		nameText.setEnabled(!lock);
 		hostText.setEnabled(!lock);
@@ -528,75 +593,93 @@ public class FTPConnectionPropertyComposite extends Composite implements IOption
 		advancedOptions.lockUI(lock);
 	}
 
-	protected void loadPropertiesFrom(IBaseRemoteConnectionPoint connectionPoint) {
+	protected void loadPropertiesFrom(IBaseRemoteConnectionPoint connectionPoint)
+	{
 		removeListeners();
-		try {
+		try
+		{
 			nameText.setText(valueOrEmpty(connectionPoint.getName()));
 			hostText.setText(valueOrEmpty(connectionPoint.getHost()));
 			remotePathText.setText(connectionPoint.getPath().toPortableString());
 			String login = connectionPoint.getLogin();
 			int index = loginCombo.indexOf(login);
-			if (index >= 0) {
+			if (index >= 0)
+			{
 				loginCombo.select(index);
 			}
-			else {
+			else
+			{
 				loginCombo.setText(login);
 			}
 			String authId = getAuthId(connectionPoint);
 			boolean persistent = CoreIOPlugin.getAuthenticationManager().hasPersistent(authId);
 			savePasswordButton.setSelection(persistent);
 			char[] password = connectionPoint.getPassword();
-			if (persistent && password == null) {
+			if (persistent && password == null)
+			{
 				password = CoreIOPlugin.getAuthenticationManager().getPassword(authId);
 			}
-			if (password != null) {
+			if (password != null)
+			{
 				passwordText.setText(String.copyValueOf(password));
 			}
 			advancedOptions.loadPropertiesFrom(connectionPoint);
 		}
-		finally {
+		finally
+		{
 			addListeners();
 		}
 	}
 
-	protected boolean savePropertiesTo(IBaseRemoteConnectionPoint connectionPoint) {
+	protected boolean savePropertiesTo(IBaseRemoteConnectionPoint connectionPoint)
+	{
 		boolean updated = false;
 		String name = nameText.getText().trim();
-		if (!name.equals(connectionPoint.getName())) {
+		if (!name.equals(connectionPoint.getName()))
+		{
 			connectionPoint.setName(name);
 			updated = true;
 		}
 		String host = hostText.getText();
-		if (!host.equals(connectionPoint.getHost())) {
+		if (!host.equals(connectionPoint.getHost()))
+		{
 			connectionPoint.setHost(host);
 			updated = true;
 		}
 		IPath path = Path.fromPortableString(remotePathText.getText());
-		if (!connectionPoint.getPath().equals(path)) {
+		if (!connectionPoint.getPath().equals(path))
+		{
 			connectionPoint.setPath(path);
 			updated = true;
 		}
 		String login = loginCombo.getText();
-		if (!login.equals(connectionPoint.getLogin())) {
+		if (!login.equals(connectionPoint.getLogin()))
+		{
 			connectionPoint.setLogin(login);
 			updated = true;
 		}
 		char[] password = passwordText.getText().toCharArray();
-		if (!Arrays.equals(password, connectionPoint.getPassword())) {
+		if (!Arrays.equals(password, connectionPoint.getPassword()))
+		{
 			connectionPoint.setPassword(password);
 			updated = true;
 		}
 
-		if (advancedOptions.savePropertiesTo(connectionPoint)) {
+		if (advancedOptions.savePropertiesTo(connectionPoint))
+		{
 			updated = true;
 		}
 		return updated;
 	}
 
-	protected void addListeners() {
-		if (modifyListener == null) {
-			modifyListener = new ModifyListener() {
-				public void modifyText(ModifyEvent e) {
+	protected void addListeners()
+	{
+		if (modifyListener == null)
+		{
+			modifyListener = new ModifyListener()
+			{
+				public void modifyText(ModifyEvent e)
+				{
 					validate();
 					if (e.widget != nameText) // $codepro.audit.disable useEquals
 					{
@@ -610,10 +693,13 @@ public class FTPConnectionPropertyComposite extends Composite implements IOption
 		loginCombo.addModifyListener(modifyListener);
 		passwordText.addModifyListener(modifyListener);
 		remotePathText.addModifyListener(modifyListener);
-		if (selectionListener == null) {
-			selectionListener = new SelectionAdapter() {
+		if (selectionListener == null)
+		{
+			selectionListener = new SelectionAdapter()
+			{
 				@Override
-				public void widgetSelected(SelectionEvent e) {
+				public void widgetSelected(SelectionEvent e)
+				{
 					validate();
 				}
 			};
@@ -621,64 +707,80 @@ public class FTPConnectionPropertyComposite extends Composite implements IOption
 		loginCombo.addSelectionListener(selectionListener);
 	}
 
-	protected void removeListeners() {
-		if (modifyListener != null) {
+	protected void removeListeners()
+	{
+		if (modifyListener != null)
+		{
 			nameText.removeModifyListener(modifyListener);
 			hostText.removeModifyListener(modifyListener);
 			loginCombo.removeModifyListener(modifyListener);
 			passwordText.removeModifyListener(modifyListener);
 			remotePathText.removeModifyListener(modifyListener);
 		}
-		if (selectionListener != null) {
+		if (selectionListener != null)
+		{
 			loginCombo.removeSelectionListener(selectionListener);
 		}
 	}
 
-	private boolean testConnection() {
+	private boolean testConnection()
+	{
 		return testConnection(null, null);
 	}
 
-	private void browseConnection() {
-		testConnection(null, new IConnectionRunnable() {
+	private void browseConnection()
+	{
+		testConnection(null, new IConnectionRunnable()
+		{
 
 			public void afterConnect(final IConnectionPoint connectionPoint, IProgressMonitor monitor)
-					throws CoreException, InterruptedException {
+					throws CoreException, InterruptedException
+			{
 				monitor.beginTask(Messages.FTPConnectionPointPropertyDialog_Task_Browse, IProgressMonitor.UNKNOWN);
 				monitor.subTask(""); //$NON-NLS-1$
-				UIUtils.getDisplay().syncExec(new Runnable() {
-					public void run() {
+				UIUtils.getDisplay().syncExec(new Runnable()
+				{
+					public void run()
+					{
 						showBrowseDialog(connectionPoint);
 					}
 				});
 				monitor.done();
 			}
 
-			public void beforeConnect(IConnectionPoint connectionPoint) throws CoreException, InterruptedException {
+			public void beforeConnect(IConnectionPoint connectionPoint) throws CoreException, InterruptedException
+			{
 				((IBaseRemoteConnectionPoint) connectionPoint).setPath(Path.ROOT);
 			}
 		});
 	}
 
-	private void showBrowseDialog(IConnectionPoint connectionPoint) {
+	private void showBrowseDialog(IConnectionPoint connectionPoint)
+	{
 		FileTreeSelectionDialog dlg = new FileTreeSelectionDialog(getShell(), false);
 		dlg.setTitle(MessageFormat.format(Messages.FTPConnectionPointPropertyDialog_Title_Browse,
 				((IBaseRemoteConnectionPoint) connectionPoint).getHost()));
 		dlg.setMessage(StringUtil.makeFormLabel(Messages.FTPConnectionPointPropertyDialog_Message_Browse));
 		dlg.setInput(connectionPoint);
 		String pathString = remotePathText.getText();
-		try {
+		try
+		{
 			IFileStore selection = connectionPoint.getRoot();
-			if (pathString.length() > 0) {
+			if (pathString.length() > 0)
+			{
 				selection = selection.getFileStore(Path.fromPortableString(pathString));
 			}
 			dlg.setInitialSelection(selection);
 		}
-		catch (CoreException e) {
+		catch (CoreException e)
+		{
 			IdeLog.logWarning(FTPUIPlugin.getDefault(), e);
 		}
-		if (dlg.open() == Window.OK) {
+		if (dlg.open() == Window.OK)
+		{
 			URI uri = FileSystemUtils.getURI(dlg.getFirstResult());
-			if (uri != null) {
+			if (uri != null)
+			{
 				String path = Path.fromPortableString(connectionPoint.getRootURI().relativize(uri).toString())
 						.makeAbsolute().toPortableString();
 				remotePathText.setText(path);
@@ -686,16 +788,20 @@ public class FTPConnectionPropertyComposite extends Composite implements IOption
 		}
 	}
 
-	private void showErrorDialog(Throwable e) {
+	private void showErrorDialog(Throwable e)
+	{
 		String message = Messages.FTPConnectionPointPropertyDialog_DefaultErrorMsg;
-		if (e instanceof CoreException) {
+		if (e instanceof CoreException)
+		{
 			message = ((CoreException) e).getStatus().getMessage();
 		}
 		MessageDialog.openError(getShell(), Messages.FTPConnectionPointPropertyDialog_ErrorTitle, message);
 	}
 
-	private static String valueOrEmpty(String value) {
-		if (value != null) {
+	private static String valueOrEmpty(String value)
+	{
+		if (value != null)
+		{
 			return value;
 		}
 		return ""; //$NON-NLS-1$
