@@ -264,16 +264,22 @@ public class SchemaObject implements IState, IPropertyContainer
 				String name = value.toString();
 				SchemaProperty property = this.getProperty(name);
 
-				if (property == null)
-				{
-					throw new IllegalStateException(Messages.SchemaObject_Nonexistant_Property + name);
-				}
-
 				// update internal state
 				this._currentState = ObjectState.IN_PROPERTY;
 				this._currentPropertyName = name;
-				this._currentPropertyType = property.getType();
-				this._currentPropertyTypeName = property.getTypeName();
+
+				if (property == null)
+				{
+					// FIXME Unknown property. We need to ignore and move on, but how do we know what state to
+					// transition to? It could be an array, object or primitive!
+					this._currentPropertyType = new Schema();
+					this._currentPropertyTypeName = _owningSchema.getRootTypeName();
+				}
+				else
+				{
+					this._currentPropertyType = property.getType();
+					this._currentPropertyTypeName = property.getTypeName();
+				}
 
 				// activate this type
 				context.pushType(this._currentPropertyName, this._currentPropertyType);
