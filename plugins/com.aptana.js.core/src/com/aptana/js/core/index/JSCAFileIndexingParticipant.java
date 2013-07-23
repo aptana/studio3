@@ -8,8 +8,7 @@
 package com.aptana.js.core.index;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
 
@@ -28,11 +27,11 @@ import com.aptana.js.core.inferencing.JSTypeUtil;
 import com.aptana.js.core.model.AliasElement;
 import com.aptana.js.core.model.PropertyElement;
 import com.aptana.js.core.model.TypeElement;
-import com.aptana.js.internal.core.index.JSCAHandler;
-import com.aptana.js.internal.core.index.JSCAReader;
+import com.aptana.js.internal.core.index.IJSCAModel;
+import com.aptana.js.internal.core.index.IJSCAParser;
 import com.aptana.js.internal.core.index.JSIndexReader;
 import com.aptana.js.internal.core.index.JSIndexWriter;
-import com.aptana.json.SchemaContext;
+import com.aptana.js.internal.core.index.JSCAParser;
 
 /**
  * JSCAFileIndexingParticipant
@@ -51,26 +50,22 @@ public class JSCAFileIndexingParticipant extends AbstractFileIndexingParticipant
 		{
 			sub.subTask(getIndexingMessage(index, context.getURI()));
 
-			JSCAReader reader = new JSCAReader();
-			SchemaContext schemaContext = new SchemaContext();
-			JSCAHandler handler = new JSCAHandler();
-			schemaContext.setHandler(handler);
-
-			Reader isr = null;
+			IJSCAParser parser = getJSCAParser();
+			IJSCAModel model = null;
+			InputStream is = null;
 			try
 			{
 				// parse
-				isr = new InputStreamReader(context.openInputStream(sub.newChild(5)));
-				reader.read(isr, schemaContext);
+				model = parser.parse(is = context.openInputStream(sub.newChild(5)));
 				sub.worked(45);
 			}
 			finally
 			{
-				if (isr != null)
+				if (is != null)
 				{
 					try
 					{
-						isr.close();
+						is.close();
 					}
 					catch (IOException e) // $codepro.audit.disable emptyCatchClause
 					{
@@ -93,8 +88,8 @@ public class JSCAFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 			// process results
 			JSIndexWriter indexer = new JSIndexWriter();
-			TypeElement[] types = handler.getTypes();
-			AliasElement[] aliases = handler.getAliases();
+			List<TypeElement> types = model.getTypes();
+			List<AliasElement> aliases = model.getAliases();
 			URI location = context.getURI();
 
 			for (TypeElement type : types)
@@ -145,6 +140,11 @@ public class JSCAFileIndexingParticipant extends AbstractFileIndexingParticipant
 		}
 	}
 
+	protected IJSCAParser getJSCAParser()
+	{
+		return new JSCAParser();
+	}
+
 	/**
 	 * Determine if the specified type should generate a global property
 	 * 
@@ -153,18 +153,11 @@ public class JSCAFileIndexingParticipant extends AbstractFileIndexingParticipant
 	 */
 	protected boolean isGlobalProperty(TypeElement type)
 	{
-		boolean result = false;
-
-		if (type != null)
+		if (type == null || type.isInternal())
 		{
-			if (!type.isInternal())
-			{
-				String typeName = type.getName();
-
-				result = !typeName.contains(".") && !typeName.startsWith(JSTypeConstants.GENERIC_CLASS_OPEN); //$NON-NLS-1$
-			}
+			return false;
 		}
-
-		return result;
+		String typeName = type.getName();
+		return !typeName.contains(".") && !typeName.startsWith(JSTypeConstants.GENERIC_CLASS_OPEN); //$NON-NLS-1$
 	}
 }

@@ -45,36 +45,72 @@ public class IndexUtil
 	{
 		List<T> result = null;
 
-		if (itemClass != null && object != null && object.getClass().isArray())
+		if (itemClass != null && object != null)
 		{
-			Object[] objects = (Object[]) object;
-
-			if (objects.length > 0)
+			if (object.getClass().isArray())
 			{
-				result = new ArrayList<T>();
+				Object[] objects = (Object[]) object;
 
-				// Wrap loop because if newInstance fails once, it will fail for all iterations
-				try
+				if (objects.length > 0)
 				{
-					for (Object value : (Object[]) object)
+					result = new ArrayList<T>(objects.length);
+
+					// Wrap loop because if newInstance fails once, it will fail for all iterations
+					try
 					{
-						if (value instanceof Map)
+						for (Object value : objects)
 						{
-							T v = itemClass.newInstance();
+							if (value instanceof Map)
+							{
+								T v = itemClass.newInstance();
 
-							v.fromJSON((Map) value);
+								v.fromJSON((Map) value);
 
-							result.add(v);
+								result.add(v);
+							}
 						}
 					}
+					catch (InstantiationException e)
+					{
+						IdeLog.logError(IndexPlugin.getDefault(), e);
+					}
+					catch (IllegalAccessException e)
+					{
+						IdeLog.logError(IndexPlugin.getDefault(), e);
+					}
 				}
-				catch (InstantiationException e)
+			}
+			else if (object instanceof List)
+			{
+				List objects = (List) object;
+
+				if (objects.size() > 0)
 				{
-					IdeLog.logError(IndexPlugin.getDefault(), e);
-				}
-				catch (IllegalAccessException e)
-				{
-					IdeLog.logError(IndexPlugin.getDefault(), e);
+					result = new ArrayList<T>();
+
+					// Wrap loop because if newInstance fails once, it will fail for all iterations
+					try
+					{
+						for (Object value : (List) object)
+						{
+							if (value instanceof Map)
+							{
+								T v = itemClass.newInstance();
+
+								v.fromJSON((Map) value);
+
+								result.add(v);
+							}
+						}
+					}
+					catch (InstantiationException e)
+					{
+						IdeLog.logError(IndexPlugin.getDefault(), e);
+					}
+					catch (IllegalAccessException e)
+					{
+						IdeLog.logError(IndexPlugin.getDefault(), e);
+					}
 				}
 			}
 		}

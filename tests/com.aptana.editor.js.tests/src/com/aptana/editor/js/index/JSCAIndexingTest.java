@@ -62,7 +62,7 @@ public class JSCAIndexingTest extends JSEditorBasedTestCase
 			Collection<TypeElement> type = new JSIndexReader().getType(index, typeName, false);
 
 			assertNotNull(type);
-			assertFalse(type.isEmpty());
+			assertFalse("Expected at least one type matching name: " + typeName, type.isEmpty());
 		}
 	}
 
@@ -157,7 +157,7 @@ public class JSCAIndexingTest extends JSEditorBasedTestCase
 		// check for global
 		Collection<PropertyElement> global = new JSIndexQueryHelper(index).getGlobals(null, "SimpleType");
 		assertNotNull(global);
-		assertTrue(global.isEmpty());
+		assertTrue("Expected no global property matching: 'SimpleType'", global.isEmpty());
 	}
 
 	public void testNamespacedType() throws Exception
@@ -183,7 +183,7 @@ public class JSCAIndexingTest extends JSEditorBasedTestCase
 		// check for global
 		Collection<PropertyElement> global = new JSIndexQueryHelper(index).getGlobals(null, "com");
 		assertNotNull(global);
-		assertTrue(global.isEmpty());
+		assertTrue("Expected no global property matching name 'com'", global.isEmpty());
 	}
 
 	public void testNamespacedTypeMixed() throws Exception
