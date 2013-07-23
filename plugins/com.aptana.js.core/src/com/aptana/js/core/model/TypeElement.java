@@ -206,7 +206,16 @@ public class TypeElement extends BaseElement
 		}
 
 		this.setIsDeprecated(Boolean.TRUE == object.get(DEPRECATED_PROPERTY)); // $codepro.audit.disable useEquals
-		this.setIsInternal(Boolean.TRUE == object.get(IS_INTERNAL_PROPERTY)); // $codepro.audit.disable useEquals
+
+		// JSCA holds "isInternal", but we serialize as "internal"
+		if (object.containsKey("isInternal")) //$NON-NLS-1$
+		{
+			this.setIsInternal(Boolean.TRUE == object.get("isInternal")); //$NON-NLS-1$ // $codepro.audit.disable useEquals
+		}
+		else
+		{
+			this.setIsInternal(Boolean.TRUE == object.get(IS_INTERNAL_PROPERTY)); // $codepro.audit.disable useEquals
+		}
 	}
 
 	/**
