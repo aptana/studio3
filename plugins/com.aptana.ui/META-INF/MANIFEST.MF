@@ -16,7 +16,8 @@ Require-Bundle: com.aptana.core;bundle-version="3.0.4",
  org.eclipse.ui.console,
  org.eclipse.search,
  org.eclipse.debug.ui,
- com.aptana.ui.epl
+ com.aptana.ui.epl,
+ com.aptana.usage
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.ui,
