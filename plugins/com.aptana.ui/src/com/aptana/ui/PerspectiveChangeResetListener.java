@@ -7,6 +7,8 @@
  */
 package com.aptana.ui;
 
+import java.text.MessageFormat;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
@@ -21,16 +23,20 @@ import org.eclipse.ui.progress.UIJob;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.ui.util.UIUtils;
+import com.aptana.usage.FeatureEvent;
+import com.aptana.usage.StudioAnalytics;
 
 /**
  * @author Nam Le <nle@appcelerator.com>
- *
  */
 public class PerspectiveChangeResetListener extends PerspectiveAdapter
 {
-	String pluginId, preferenceId, perspectiveId;
-	int perspectiveVersion;
+	private static final String PERSPECTIVE_ACTIVATE_EVENT = "perspective.activate.{0}"; //$NON-NLS-1$
+
+	private String pluginId, preferenceId, perspectiveId;
+	private int perspectiveVersion;
 
 	public PerspectiveChangeResetListener(String perspectiveId, String pluginId, String preferenceId,
 			int perspectiveVersion)
@@ -61,6 +67,17 @@ public class PerspectiveChangeResetListener extends PerspectiveAdapter
 					// ignores the exception
 				}
 			}
+		}
+		String perspectiveId = perspective.getId();
+		if (!StringUtil.isEmpty(perspectiveId))
+		{
+			int index = perspectiveId.lastIndexOf("."); //$NON-NLS-1$
+			if (index > -1)
+			{
+				perspectiveId = perspectiveId.substring(index + 1);
+			}
+			StudioAnalytics.getInstance().sendEvent(
+					new FeatureEvent(MessageFormat.format(PERSPECTIVE_ACTIVATE_EVENT, perspectiveId), null));
 		}
 	}
 
