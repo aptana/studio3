@@ -144,7 +144,7 @@ public class ProjectWizardContributionManager
 			}
 
 			IStatus status = contributor.validateProjectCreationPage(data);
-			if (status.matches(IStatus.ERROR))
+			if (status.matches(IStatus.ERROR | IStatus.WARNING))
 			{
 				return status;
 			}
