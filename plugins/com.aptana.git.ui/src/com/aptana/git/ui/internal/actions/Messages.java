@@ -50,6 +50,8 @@ public class Messages extends NLS
 
 	public static String CreatePullRequestHandler_PRSubmittedTitle;
 
+	public static String CreatePullRequestHandler_PullRequestTitle;
+
 	public static String CreatePullRequestHandler_RemoteOriginDoesntExistErr;
 
 	public static String CreatePullRequestHandler_RepoAPIErr;

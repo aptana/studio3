@@ -102,6 +102,8 @@ public class CreatePullRequestHandler extends AbstractGitHandler
 			user = ghManager.getUser();
 			if (user == null)
 			{
+				UIUtils.showErrorMessage(Messages.CreatePullRequestHandler_PullRequestTitle,
+						Messages.CreatePullRequestHandler_NotLoggedInErr);
 				throw new ExecutionException(Messages.CreatePullRequestHandler_NotLoggedInErr);
 			}
 		}
@@ -115,6 +117,8 @@ public class CreatePullRequestHandler extends AbstractGitHandler
 		}
 		catch (CoreException e)
 		{
+			UIUtils.showErrorMessage(Messages.CreatePullRequestHandler_PullRequestTitle,
+					Messages.CreatePullRequestHandler_RepoAPIErr);
 			throw new ExecutionException(Messages.CreatePullRequestHandler_RepoAPIErr, e);
 		}
 		// Prompt for title and body!
