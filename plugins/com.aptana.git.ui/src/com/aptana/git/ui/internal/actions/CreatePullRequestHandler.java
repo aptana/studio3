@@ -53,7 +53,7 @@ public class CreatePullRequestHandler extends AbstractGitHandler
 	/**
 	 * The regexp used to parse out the repo name from a remote pointing at github
 	 */
-	private static final String GITHUB_REMOTE_REGEX = ".+?github\\.com:[^/]+?/([\\w\\-_]+)\\.git"; //$NON-NLS-1$
+	private static final String GITHUB_REMOTE_REGEX = "((.+?github\\.com:)|((git|https)://github\\.com/))[^/]+?/(.+?)\\.git"; //$NON-NLS-1$
 
 	@Override
 	protected Object doExecute(ExecutionEvent event) throws ExecutionException
@@ -233,6 +233,11 @@ public class CreatePullRequestHandler extends AbstractGitHandler
 			throw new ExecutionException(Messages.CreatePullRequestHandler_GetRemotesFailedErr, e);
 		}
 
+		return getGithubRepoName(remoteURL);
+	}
+
+	static String getGithubRepoName(String remoteURL) throws ExecutionException
+	{
 		Pattern p = Pattern.compile(GITHUB_REMOTE_REGEX);
 		Matcher m = p.matcher(remoteURL);
 		if (!m.find())
@@ -241,7 +246,7 @@ public class CreatePullRequestHandler extends AbstractGitHandler
 					Messages.CreatePullRequestHandler_ExtractRepoNameFromRemoteFailedErr, GitRepository.ORIGIN,
 					remoteURL));
 		}
-		return m.group(1);
+		return m.group(5);
 	}
 
 	@Override
