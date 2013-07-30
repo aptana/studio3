@@ -15,6 +15,7 @@ import com.aptana.git.ui.dialogs.CreateBranchDialogTest;
 import com.aptana.git.ui.hyperlink.HyperlinkDetectorTest;
 import com.aptana.git.ui.internal.DiffFormatterTest;
 import com.aptana.git.ui.internal.GitLightweightDecoratorTest;
+import com.aptana.git.ui.internal.actions.CreatePullRequestHandlerTest;
 
 public class AllTests
 {
@@ -35,6 +36,7 @@ public class AllTests
 		suite.addTestSuite(DiffFormatterTest.class);
 		suite.addTestSuite(GitLightweightDecoratorTest.class);
 		suite.addTestSuite(HyperlinkDetectorTest.class);
+		suite.addTestSuite(CreatePullRequestHandlerTest.class);
 		// $JUnit-END$
 		return suite;
 	}
