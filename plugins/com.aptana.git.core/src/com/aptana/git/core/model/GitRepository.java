@@ -113,6 +113,24 @@ public class GitRepository
 		}
 	}
 
+	private abstract class GitRepoJob extends Job
+	{
+		private GitRepository repo;
+
+		private GitRepoJob(GitRepository repo, String name)
+		{
+			super(name);
+			this.repo = repo;
+			EclipseUtil.setSystemForJob(this);
+		}
+
+		@Override
+		public boolean belongsTo(Object family)
+		{
+			return repo.equals(family);
+		}
+	}
+
 	/**
 	 * Delimiter used to separate remote name and remote branch name.
 	 */
@@ -223,6 +241,7 @@ public class GitRepository
 			return;
 		}
 
+		final GitRepository self = this;
 		try
 		{
 			// FIXME When actions are taken through our model/UI we end up causing multiple refreshes for index changes
@@ -320,7 +339,7 @@ public class GitRepository
 
 						protected void checkForBranchChange()
 						{
-							Job job = new Job("Checking for current branch switch") //$NON-NLS-1$
+							Job job = new GitRepoJob(self, "Checking for current branch switch") //$NON-NLS-1$
 							{
 								@Override
 								protected IStatus run(IProgressMonitor monitor)
@@ -337,7 +356,6 @@ public class GitRepository
 									return Status.OK_STATUS;
 								}
 							};
-							EclipseUtil.setSystemForJob(job);
 							job.schedule();
 						}
 					}));
@@ -371,7 +389,7 @@ public class GitRepository
 										return;
 									}
 									// Remove this watcher!
-									Job job = new Job("Removing file watcher on remotes dir creation") //$NON-NLS-1$
+									Job job = new GitRepoJob(self, "Removing file watcher on remotes dir creation") //$NON-NLS-1$
 									{
 										@Override
 										protected IStatus run(IProgressMonitor monitor)
@@ -387,7 +405,6 @@ public class GitRepository
 											return Status.OK_STATUS;
 										}
 									};
-									EclipseUtil.setSystemForJob(job);
 									job.schedule();
 								}
 							}
@@ -414,7 +431,7 @@ public class GitRepository
 						branches.remove(rev);
 					}
 
-					Job job = new Job("Handle branch removal") //$NON-NLS-1$
+					Job job = new GitRepoJob(self, "Handle branch removal") //$NON-NLS-1$
 					{
 						@Override
 						protected IStatus run(IProgressMonitor monitor)
@@ -434,7 +451,6 @@ public class GitRepository
 							return Status.OK_STATUS;
 						}
 					};
-					EclipseUtil.setSystemForJob(job);
 					job.schedule();
 				}
 
@@ -448,7 +464,7 @@ public class GitRepository
 					// a branch has been added
 					addBranch(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_HEADS + name)));
 
-					Job job = new Job("Checking if HEAD changed") //$NON-NLS-1$
+					Job job = new GitRepoJob(self, "Checking if HEAD changed") //$NON-NLS-1$
 					{
 						@Override
 						protected IStatus run(IProgressMonitor monitor)
@@ -466,7 +482,6 @@ public class GitRepository
 							return Status.OK_STATUS;
 						}
 					};
-					EclipseUtil.setSystemForJob(job);
 					job.schedule();
 				}
 			}));
@@ -497,7 +512,7 @@ public class GitRepository
 							// FIXME Can't tell if we pushed or pulled unless we look at sha tree/commit list. For
 							// now,
 							// seems harmless to fire both.
-							Job job = new Job("Firing pull and push event") //$NON-NLS-1$
+							Job job = new GitRepoJob(GitRepository.this, "Firing pull and push event") //$NON-NLS-1$
 							{
 								@Override
 								protected IStatus run(IProgressMonitor monitor)
@@ -507,7 +522,6 @@ public class GitRepository
 									return Status.OK_STATUS;
 								}
 							};
-							EclipseUtil.setSystemForJob(job);
 							job.schedule();
 						}
 					}
@@ -529,7 +543,7 @@ public class GitRepository
 							// FIXME Can't tell if we pushed or pulled unless we look at sha tree/commit list. For
 							// now,
 							// seems harmless to fire both.
-							Job job = new Job("Firing pull and push event") //$NON-NLS-1$
+							Job job = new GitRepoJob(GitRepository.this, "Firing pull and push event") //$NON-NLS-1$
 							{
 								@Override
 								protected IStatus run(IProgressMonitor monitor)
@@ -539,7 +553,6 @@ public class GitRepository
 									return Status.OK_STATUS;
 								}
 							};
-							EclipseUtil.setSystemForJob(job);
 							job.schedule();
 						}
 					}
@@ -554,7 +567,7 @@ public class GitRepository
 							{
 								branches.remove(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_REMOTES + name)));
 							}
-							Job job = new Job("Firing branch removed and pull event") //$NON-NLS-1$
+							Job job = new GitRepoJob(GitRepository.this, "Firing branch removed and pull event") //$NON-NLS-1$
 							{
 								@Override
 								protected IStatus run(IProgressMonitor monitor)
@@ -564,7 +577,6 @@ public class GitRepository
 									return Status.OK_STATUS;
 								}
 							};
-							EclipseUtil.setSystemForJob(job);
 							job.schedule();
 						}
 					}
@@ -577,7 +589,7 @@ public class GitRepository
 							addBranch(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_REMOTES + name)));
 							// Since we suddenly know about a new remote branch, we probably pulled.
 
-							Job job = new Job("Firing branch added and pull event") //$NON-NLS-1$
+							Job job = new GitRepoJob(GitRepository.this, "Firing branch added and pull event") //$NON-NLS-1$
 							{
 								@Override
 								protected IStatus run(IProgressMonitor monitor)
@@ -587,7 +599,6 @@ public class GitRepository
 									return Status.OK_STATUS;
 								}
 							};
-							EclipseUtil.setSystemForJob(job);
 							job.schedule();
 						}
 					}
@@ -951,9 +962,12 @@ public class GitRepository
 			rev = headRef();
 		}
 
-		synchronized (branches)
+		if (branches != null)
 		{
-			branches.add(rev);
+			synchronized (branches)
+			{
+				branches.add(rev);
+			}
 		}
 		// TODO Fire a branchAddedEvent?
 		return rev;
@@ -1405,9 +1419,12 @@ public class GitRepository
 			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), result.getCode(), result.getMessage(), null);
 		}
 		// Remove branch in model!
-		synchronized (branches)
+		if (branches != null)
 		{
-			branches.remove(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_HEADS + branchName)));
+			synchronized (branches)
+			{
+				branches.remove(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_HEADS + branchName)));
+			}
 		}
 		fireBranchRemovedEvent(branchName);
 		return Status.OK_STATUS;
@@ -1586,20 +1603,23 @@ public class GitRepository
 	public Set<String> allSimpleRefs()
 	{
 		Set<String> allRefs = new HashSet<String>();
-		synchronized (branches)
+		if (branches != null)
 		{
-			for (GitRevSpecifier revSpec : branches)
+			synchronized (branches)
 			{
-				if (!revSpec.isSimpleRef())
+				for (GitRevSpecifier revSpec : branches)
 				{
-					continue;
+					if (!revSpec.isSimpleRef())
+					{
+						continue;
+					}
+					GitRef ref = revSpec.simpleRef();
+					if (ref == null || ref.type() == null)
+					{
+						continue;
+					}
+					allRefs.add(ref.shortName());
 				}
-				GitRef ref = revSpec.simpleRef();
-				if (ref == null || ref.type() == null)
-				{
-					continue;
-				}
-				allRefs.add(ref.shortName());
 			}
 		}
 		return allRefs;
@@ -1623,6 +1643,8 @@ public class GitRepository
 			}
 		}
 		fileWatcherIds = null;
+		// stop running any jobs related to this repo!
+		Job.getJobManager().cancel(this);
 		// stop running any jobs in the index!
 		if (index != null)
 		{
@@ -2180,22 +2202,25 @@ public class GitRepository
 	{
 		// Sort tags.
 		SortedSet<String> tags = new TreeSet<String>();
-		synchronized (branches)
+		if (branches != null)
 		{
-			for (GitRevSpecifier revSpec : branches)
+			synchronized (branches)
 			{
-				if (!revSpec.isSimpleRef())
+				for (GitRevSpecifier revSpec : branches)
 				{
-					continue;
-				}
-				GitRef ref = revSpec.simpleRef();
-				if (ref == null || ref.type() == null)
-				{
-					continue;
-				}
-				if (ref.type().equals(TYPE.TAG))
-				{
-					tags.add(ref.shortName());
+					if (!revSpec.isSimpleRef())
+					{
+						continue;
+					}
+					GitRef ref = revSpec.simpleRef();
+					if (ref == null || ref.type() == null)
+					{
+						continue;
+					}
+					if (ref.type().equals(TYPE.TAG))
+					{
+						tags.add(ref.shortName());
+					}
 				}
 			}
 		}
