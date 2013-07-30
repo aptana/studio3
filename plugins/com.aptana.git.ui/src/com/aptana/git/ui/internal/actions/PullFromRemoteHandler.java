@@ -48,7 +48,7 @@ public class PullFromRemoteHandler extends AbstractGitHandler
 		}
 		if (!remoteBranches.isEmpty())
 		{
-			QuickMenuDialog dialog = new QuickMenuDialog(getShell());
+			QuickMenuDialog dialog = new QuickMenuDialog(getShell(), Messages.PullFromRemoteHandler_PopupTitle);
 			dialog.setInput(remoteBranches);
 			if (dialog.open() != -1)
 			{

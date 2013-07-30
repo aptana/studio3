@@ -53,7 +53,7 @@ public class PushTagsHandler extends AbstractGitHandler
 		}
 		if (!remotes.isEmpty())
 		{
-			QuickMenuDialog dialog = new QuickMenuDialog(getShell());
+			QuickMenuDialog dialog = new QuickMenuDialog(getShell(), Messages.PushTagsHandler_PopupTitle);
 			dialog.setInput(remotes);
 			if (dialog.open() != -1)
 			{
