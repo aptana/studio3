@@ -66,6 +66,8 @@ import com.aptana.filewatcher.FileWatcher;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.IDebugScopes;
 import com.aptana.git.core.IPreferenceConstants;
+import com.aptana.git.core.github.IGithubManager;
+import com.aptana.git.core.github.IGithubRepository;
 import com.aptana.git.core.model.GitRef.TYPE;
 
 /**
@@ -193,6 +195,16 @@ public class GitRepository
 	 */
 	private final static Pattern fgRemoteURLPattern = Pattern
 			.compile("\\[remote \"(.+?)\"\\](\\s+[^\\[]+)?\\s+url = (.+?)\\s+"); //$NON-NLS-1$
+
+	/**
+	 * The regexp used to parse out the repo name from a remote pointing at github
+	 */
+	private static final String GITHUB_REMOTE_REGEX = ".+?github\\.com:([^/]+?)/([\\w\\-_]+)\\.git"; //$NON-NLS-1$
+
+	/**
+	 * Status code for reporting inability to find the github related remote.
+	 */
+	public static final int NO_GITHUB_REMOTE_CODE = 1235;
 
 	/**
 	 * Monitor to allow simultaneous read processes, but only one "write" process which alters the repo/index.
@@ -2297,5 +2309,71 @@ public class GitRepository
 		}
 		firePullEvent();
 		return result;
+	}
+
+	/**
+	 * Returns the Github API model for this repository. User must be logged into github API/GithubManager.
+	 * 
+	 * @return
+	 * @throws CoreException
+	 */
+	public IGithubRepository getGithubRepo() throws CoreException
+	{
+		String repoName = getGithubRepoName();
+		if (StringUtil.isEmpty(repoName))
+		{
+			throw new CoreException(new Status(IStatus.ERROR, GitPlugin.PLUGIN_ID, NO_GITHUB_REMOTE_CODE,
+					Messages.GitRepository_NoGithubRemoteAttachedErr, null));
+		}
+
+		List<String> pair = StringUtil.split(repoName, '/');
+		return getGithubManager().getRepo(pair.get(0), pair.get(1));
+	}
+
+	protected IGithubManager getGithubManager()
+	{
+		return GitPlugin.getDefault().getGithubManager();
+	}
+
+	/**
+	 * Looks at the configured remotes and tries to parse out a github.com remote from 'origin'. If found, it grabs the
+	 * name of the repo at github.
+	 * 
+	 * @return
+	 */
+	private String getGithubRepoName()
+	{
+		try
+		{
+			Map<String, String> pairs = remotePairs();
+			String remoteURL = pairs.get(GitRepository.ORIGIN);
+			if (remoteURL == null)
+			{
+				return null;
+			}
+
+			Pattern p = Pattern.compile(GITHUB_REMOTE_REGEX);
+			Matcher m = p.matcher(remoteURL);
+			if (!m.find())
+			{
+				return null;
+			}
+			// FIXME Grab the owner and the repo name? owner should be stored in group 1!
+			return m.group(1) + '/' + m.group(2);
+		}
+		catch (CoreException e)
+		{
+			return null;
+		}
+	}
+
+	/**
+	 * Does the repo look like it has a remote attached to github.com?
+	 * 
+	 * @return
+	 */
+	public boolean hasGithubRemote()
+	{
+		return getGithubRepoName() != null;
 	}
 }

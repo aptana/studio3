@@ -257,16 +257,36 @@
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
-            defaultHandler="com.aptana.git.ui.internal.actions.CreatePullRequestHandler"
-            id="com.aptana.git.ui.command.create_pull_request"
-            name="Create Pull Request">
-      </command>
-      <command
-            categoryId="com.aptana.git.ui.category"
             defaultHandler="com.aptana.git.ui.internal.actions.PullFromRemoteHandler"
             id="com.aptana.git.ui.command.pull_from_remote"
             name="%PullRemoteAction_tooltip">
       </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.CreatePullRequestHandler"
+            id="com.aptana.git.ui.command.create_pull_request"
+            name="Create Pull Request...">
+      </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.ViewPullRequestHandler"
+            id="com.aptana.git.ui.command.view_pull_request"
+            name="View Pull Request...">
+      </command>
+      <!--
+      <command
+            categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.MergePullRequestHandler"
+            id="com.aptana.git.ui.command.merge_pull_request"
+            name="Merge Pull Request...">
+      </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.DeletePullRequestHandler"
+            id="com.aptana.git.ui.command.delete_pull_request"
+            name="Delete Pull Request...">
+      </command>
+      -->
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
@@ -472,6 +492,12 @@
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M2+M3+G NUMPAD_1">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.view_pull_request"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G NUMPAD_3">
       </key>
    </extension>
    <extension
@@ -971,18 +997,72 @@
                 name="com.aptana.git.ui.separator.github"
                 visible="true">
           </separator>
-          <command
-                commandId="com.aptana.git.ui.command.create_pull_request"
-                id="com.aptana.git.ui.actions.GithubPullRequestAction"
-                label="Create Pull Request">
-             <visibleWhen
-                   checkEnabled="true">
-                   <!-- TODO Add property tester/expression so we can test that we have a git repo, and have an 'uptream' remote -->
-                <reference
-                      definitionId="com.aptana.git.ui.hasGitRepository">
-                </reference>
-             </visibleWhen>
-          </command>
+          <menu
+                icon="icons/obj16/pull_request.gif"
+                label="%pull_requests.menu.label">
+             <command
+                   commandId="com.aptana.git.ui.command.create_pull_request"
+                   id="com.aptana.git.ui.actions.GithubPullRequestAction"
+                   label="%create.branch.menu.label">
+                <visibleWhen
+                      checkEnabled="true">
+                   <reference
+                         definitionId="com.aptana.git.ui.hasGitRepository">
+                   </reference>
+                </visibleWhen>
+             </command>
+             <!--
+             <menu
+                   commandId="com.aptana.git.ui.command.delete_pull_request"
+                   id="com.aptana.git.ui.actions.DeletePullRequestAction"
+                   label="%delete.branch.menu.label"
+                   mnemonic="%menu.d.mnemonic">
+                <dynamic
+                      class="com.aptana.git.ui.actions.DeletePullRequestItem"
+                      id="com.aptana.git.ui.command.delete_pull_request.items">
+                </dynamic>
+                <visibleWhen
+                      checkEnabled="false">
+                   <reference
+                         definitionId="com.aptana.git.ui.hasGitRepository">
+                   </reference>
+                </visibleWhen>
+             </menu>
+             -->
+             <menu
+                   commandId="com.aptana.git.ui.command.view_pull_request"
+                   id="com.aptana.git.ui.actions.ViewPullRequestAction"
+                   label="View">
+                <dynamic
+                      class="com.aptana.git.ui.actions.ViewPullRequestItem"
+                      id="com.aptana.git.ui.command.view_pull_request.items">
+                </dynamic>
+                <visibleWhen
+                      checkEnabled="false">
+                   <reference
+                         definitionId="com.aptana.git.ui.hasGitRepository">
+                   </reference>
+                </visibleWhen>
+             </menu>
+             <!--
+             <menu
+                   commandId="com.aptana.git.ui.command.merge_branch"
+                   id="com.aptana.git.ui.actions.MergeBranchAction"
+                   label="%merge.menu.label"
+                   mnemonic="%menu.m.mnemonic">
+                <dynamic
+                      class="com.aptana.git.ui.actions.MergePullRequestItem"
+                      id="com.aptana.git.ui.command.merge_pull_request.items">
+                </dynamic>
+                <visibleWhen
+                      checkEnabled="false">
+                   <reference
+                         definitionId="com.aptana.git.ui.hasGitRepository">
+                   </reference>
+                </visibleWhen>
+             </menu>
+             -->
+          </menu>
          <command
                commandId="com.aptana.git.ui.command.github.network"
                id="com.aptana.git.ui.actions.GithubNetworkAction"
