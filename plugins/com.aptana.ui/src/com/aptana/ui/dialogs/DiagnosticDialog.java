@@ -39,16 +39,32 @@ public class DiagnosticDialog extends TrayDialog
 	}
 
 	/**
-	 * Appends the specified text to the text area.
+	 * Appends the specified text to the text area. This call will cause the text area to scroll to the last line.
 	 * 
 	 * @param text
 	 *            the text to append
+	 * @see #setText(String)
 	 */
 	public void append(String text)
 	{
 		if (fText != null && !fText.isDisposed() && text != null)
 		{
 			fText.append(text);
+		}
+	}
+
+	/**
+	 * Sets the specified text in the text area.
+	 * 
+	 * @param text
+	 *            the text to set
+	 * @see #append(String)
+	 */
+	public void setText(String text)
+	{
+		if (fText != null && !fText.isDisposed() && text != null)
+		{
+			fText.setText(text);
 		}
 	}
 
