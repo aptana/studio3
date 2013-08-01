@@ -44,7 +44,7 @@ public class DiagnosticHandler extends AbstractHandler
 					{
 						DiagnosticDialog dialog = new DiagnosticDialog(UIUtils.getActiveShell());
 						dialog.open();
-						dialog.append(content);
+						dialog.setText(content);
 					}
 				});
 				return Status.OK_STATUS;
