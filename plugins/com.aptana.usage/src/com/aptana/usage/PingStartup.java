@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -36,6 +36,7 @@ public class PingStartup implements IStartup
 
 	private static final String STUDIO_FIRST_RUN = "studio.first-run"; //$NON-NLS-1$
 	private static final String STUDIO_ENROLL = "ti.enroll"; //$NON-NLS-1$
+	private static final String STUDIO_START = "ti.start"; //$NON-NLS-1$
 
 	private static final Map<String, String> STUDIO_NATURE_MAP;
 	static
@@ -133,6 +134,11 @@ public class PingStartup implements IStartup
 			{
 				UsagePlugin.logError(e);
 			}
+		}
+
+		if (EclipseUtil.isTesting())
+		{
+			StudioAnalytics.getInstance().sendEvent(new AnalyticsEvent(STUDIO_START, STUDIO_START, null));
 		}
 
 		// Hook up ping when we delete a project
