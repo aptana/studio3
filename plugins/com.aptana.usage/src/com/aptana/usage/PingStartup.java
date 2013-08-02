@@ -136,7 +136,7 @@ public class PingStartup implements IStartup
 			}
 		}
 
-		if (EclipseUtil.isTesting())
+		if (!EclipseUtil.isTesting())
 		{
 			StudioAnalytics.getInstance().sendEvent(new AnalyticsEvent(STUDIO_START, STUDIO_START, null));
 		}
