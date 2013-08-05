@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ecf.core.security.IConnectContext;
+import org.eclipse.ecf.core.util.Proxy;
 import org.eclipse.ecf.filetransfer.FileTransferJob;
 import org.eclipse.ecf.filetransfer.IFileRangeSpecification;
 import org.eclipse.ecf.filetransfer.IFileTransferListener;
@@ -49,6 +50,7 @@ import org.eclipse.ecf.filetransfer.identity.FileCreateException;
 import org.eclipse.ecf.filetransfer.identity.FileIDFactory;
 import org.eclipse.ecf.filetransfer.identity.IFileID;
 import org.eclipse.ecf.filetransfer.service.IRetrieveFileTransferFactory;
+import org.eclipse.ecf.provider.filetransfer.util.ProxySetupHelper;
 import org.eclipse.osgi.util.NLS;
 
 import com.aptana.core.epl.CoreEPLPlugin;
@@ -417,6 +419,10 @@ public final class FileReader extends FileTransferJob implements IFileTransferLi
 		IRetrieveFileTransferContainerAdapter adapter = factory.newInstance();
 
 		adapter.setConnectContextForAuthentication(connectContext);
+
+		// Set the proxy settings for download if Studio is configured with proxy.
+		Proxy proxy = ProxySetupHelper.getProxy(uri.toASCIIString());
+		adapter.setProxy(proxy);
 
 		this.exception = null;
 		this.closeStreamWhenFinished = closeStreamOnFinish;
