@@ -98,7 +98,25 @@ public enum JSTokenType implements ITypePredicate
 	DEFAULT(JSLanguageConstants.DEFAULT, Terminals.DEFAULT),
 	FINALLY(JSLanguageConstants.FINALLY, Terminals.FINALLY),
 	CATCH(JSLanguageConstants.CATCH, Terminals.CATCH),
-
+	CONST("const", Terminals.CONST),
+	DEBUGGER("debugger", Terminals.DEBUGGER),
+	CLASS("class", Terminals.CLASS),
+	ENUM("enum", Terminals.ENUM),
+	EXPORT("export", Terminals.EXPORT),
+	EXTENDS("extends", Terminals.EXTENDS),
+	IMPORT("import", Terminals.IMPORT),
+	SUPER("super", Terminals.SUPER),
+	IMPLEMENTS("implements", Terminals.IMPLEMENTS),
+	INTERFACE("interface", Terminals.INTERFACE),
+	LET("let", Terminals.LET),
+	PACKAGE("package", Terminals.PACKAGE),
+	PRIVATE("private", Terminals.PRIVATE),
+	PROTECTED("protected", Terminals.PROTECTED),
+	PUBLIC("public", Terminals.PUBLIC),
+	STATIC("static", Terminals.STATIC),
+	YIELD("yield", Terminals.YIELD),
+	
+	
 	SINGLELINE_COMMENT("SINGLELINE_COMMENT", 1024), //$NON-NLS-1$
 	MULTILINE_COMMENT("MULTILINE_COMMENT", 1025), //$NON-NLS-1$
 	SDOC("SDOC", 1026), //$NON-NLS-1$
