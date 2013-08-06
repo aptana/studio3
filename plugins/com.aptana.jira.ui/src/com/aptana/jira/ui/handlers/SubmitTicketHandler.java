@@ -70,8 +70,7 @@ public class SubmitTicketHandler extends AbstractHandler
 					try
 					{
 						// Replace any Windows new-line ending with a \n.
-						String d = description.replaceAll("(\r\n|\n)", "\n"); //$NON-NLS-1$ //$NON-NLS-2$
-						issue = manager.createIssue(type, severity, summary, d);
+						issue = manager.createIssue(type, severity, summary, description.replaceAll("(\r\n|\n)", "\n")); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 					catch (final JiraException e)
 					{
