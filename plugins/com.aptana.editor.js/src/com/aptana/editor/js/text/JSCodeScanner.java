@@ -227,6 +227,22 @@ public class JSCodeScanner extends AbstractFlexTokenScanner
 			case Terminals.WHILE:
 				return CONTROL_KEYWORD_TOKEN;
 
+			case Terminals.DEBUGGER:
+			case Terminals.CLASS:
+			case Terminals.ENUM:
+			case Terminals.EXPORT:
+			case Terminals.EXTENDS:
+			case Terminals.IMPORT:
+			case Terminals.SUPER:
+			case Terminals.IMPLEMENTS:
+			case Terminals.INTERFACE:
+			case Terminals.LET:
+			case Terminals.PACKAGE:
+			case Terminals.PRIVATE:
+			case Terminals.PROTECTED:
+			case Terminals.PUBLIC:
+			case Terminals.STATIC:
+			case Terminals.YIELD:
 			case Terminals.IDENTIFIER:
 			{
 				{// Function-related handling
