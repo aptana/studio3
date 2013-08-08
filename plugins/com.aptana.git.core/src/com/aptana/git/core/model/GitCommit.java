@@ -180,6 +180,10 @@ public class GitCommit
 
 	public Collection<GitRef> getRefs()
 	{
+		if (repository.refs == null)
+		{
+			return Collections.emptyList();
+		}
 		return repository.refs.get(sha);
 	}
 
@@ -190,7 +194,7 @@ public class GitCommit
 	 */
 	public boolean hasRefs()
 	{
-		return getRefs() != null;
+		return !CollectionsUtil.isEmpty(getRefs());
 	}
 
 	/**
