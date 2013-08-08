@@ -260,96 +260,98 @@ public class JNotifyAdapterLinux implements IJNotify
 			debugLinux(name, linuxWd, linuxMask, cookie);
 		}
 		
-		
-		synchronized (_id2Data)
+		Integer iwd = _linuxWd2Wd.get(Integer.valueOf(linuxWd));
+		if (iwd == null)
 		{
-			Integer iwd = _linuxWd2Wd.get(Integer.valueOf(linuxWd));
-			if (iwd == null)
+			// This happens if an exception is thrown because used too many watches.
+			System.out.println("JNotifyAdapterLinux: warning, recieved event for an unregisted LinuxWD " + linuxWd
+					+ " ignoring...");
+			return;
+		}
+
+		WatchData watchData = _id2Data.get(iwd);
+		if (watchData != null)
+		{
+			if ((linuxMask & JNotify_linux.IN_CREATE) != 0)
 			{
-				// This happens if an exception is thrown because used too many watches.
-				System.out.println("JNotifyAdapterLinux: warning, recieved event for an unregisted LinuxWD "+ linuxWd +" ignoring...");
-				return;
-			}
-			
-			WatchData watchData = _id2Data.get(iwd);
-			if (watchData != null)
-			{
-				if ((linuxMask & JNotify_linux.IN_CREATE) != 0)
+				File newRootFile = new File(watchData._path, name);
+				if (watchData._watchSubtree)
 				{
-					File newRootFile = new File(watchData._path, name);
-					if (watchData._watchSubtree)
+					try
 					{
-						try
-						{
-							createWatch(watchData.getParentWatch(), false, newRootFile, watchData._mask, watchData._linuxMask, watchData._watchSubtree, watchData._listener);
-							// fire events for newly found directories under the new root.
-							WatchData parent = watchData.getParentWatch();
-							registerToSubTree(true, parent, newRootFile, true);
-						}
-						catch (JNotifyException e)
-						{
-							System.out.println("registerToSubTree : warning, failed to register " + newRootFile + " :" + e.getMessage());
-						}
+						createWatch(watchData.getParentWatch(), false, newRootFile, watchData._mask,
+								watchData._linuxMask, watchData._watchSubtree, watchData._listener);
+						// fire events for newly found directories under the new root.
+						WatchData parent = watchData.getParentWatch();
+						registerToSubTree(true, parent, newRootFile, true);
 					}
-					
-					// make sure user really requested to be notified on this event.
-					// (in case of recursive listening, this IN_CREATE flag is always on, even if
-					// the user is not interester in creation events).
-					if ((watchData._mask & IJNotify.FILE_CREATED) != 0)
+					catch (JNotifyException e)
 					{
-						// fire an event only if the path is not in the path2Watch,
-						// meaning no watch has been created on it.
-						if (!_autoWatchesPaths.contains(newRootFile.getPath()))
-						{
-							watchData.notifyFileCreated(name);
-						}
-						else
-						{
-							JNotify_linux.debug("Assuming already sent event for " + newRootFile.getPath());
-						}
+						System.out.println("registerToSubTree : warning, failed to register " + newRootFile + " :"
+								+ e.getMessage());
 					}
 				}
-				else
-				if ((linuxMask & JNotify_linux.IN_DELETE_SELF) != 0)
+
+				// make sure user really requested to be notified on this event.
+				// (in case of recursive listening, this IN_CREATE flag is always on, even if
+				// the user is not interester in creation events).
+				if ((watchData._mask & IJNotify.FILE_CREATED) != 0)
 				{
-					watchData.notifyFileDeleted(name);
-				}
-				else
-				if ((linuxMask & JNotify_linux.IN_DELETE)  != 0)
-				{
-					watchData.notifyFileDeleted(name);
-				}
-				else
-				if ((linuxMask & JNotify_linux.IN_ATTRIB) != 0 || (linuxMask & JNotify_linux.IN_MODIFY) != 0)
-				{
-					watchData.notifyFileModified(name);
-				}
-				else
-				if ((linuxMask & JNotify_linux.IN_MOVED_FROM) != 0)
-				{
-					watchData.renaming(cookie, name);
-				}
-				else
-				if ((linuxMask & JNotify_linux.IN_MOVED_TO) != 0)
-				{
-					watchData.notifyFileRenamed(name, cookie);
-				}
-				else
-				if ((linuxMask & JNotify_linux.IN_IGNORED) != 0)
-				{
-					_linuxWd2Wd.remove(Integer.valueOf(watchData._linuxWd));
-					_id2Data.remove(Integer.valueOf(watchData._wd));
-					if (!watchData._user)
+					// fire an event only if the path is not in the path2Watch,
+					// meaning no watch has been created on it.
+					if (!_autoWatchesPaths.contains(newRootFile.getPath()))
 					{
-						_autoWatchesPaths.remove(watchData._path);
-						watchData.removeFromParent();
+						watchData.notifyFileCreated(name);
+					}
+					else
+					{
+						JNotify_linux.debug("Assuming already sent event for " + newRootFile.getPath());
 					}
 				}
 			}
-			else
+			else if ((linuxMask & JNotify_linux.IN_DELETE_SELF) != 0)
 			{
-				System.out.println("JNotifyAdapterLinux: warning, recieved event for an unregisted WD " +  iwd + ". ignoring...");
+				watchData.notifyFileDeleted(name);
 			}
+			else if ((linuxMask & JNotify_linux.IN_DELETE) != 0)
+			{
+				watchData.notifyFileDeleted(name);
+			}
+			else if ((linuxMask & JNotify_linux.IN_ATTRIB) != 0 || (linuxMask & JNotify_linux.IN_MODIFY) != 0)
+			{
+				watchData.notifyFileModified(name);
+			}
+			else if ((linuxMask & JNotify_linux.IN_MOVED_FROM) != 0)
+			{
+				watchData.renaming(cookie, name);
+			}
+			else if ((linuxMask & JNotify_linux.IN_MOVED_TO) != 0)
+			{
+				watchData.notifyFileRenamed(name, cookie);
+			}
+			else if ((linuxMask & JNotify_linux.IN_IGNORED) != 0)
+			{
+				_linuxWd2Wd.remove(Integer.valueOf(watchData._linuxWd));
+				synchronized (_id2Data)
+				{
+					Integer watchDataId = Integer.valueOf(watchData._wd);
+					if (_id2Data.contains(watchDataId))
+					{
+						_id2Data.remove(watchDataId);
+					}
+				}
+
+				if (!watchData._user)
+				{
+					_autoWatchesPaths.remove(watchData._path);
+					watchData.removeFromParent();
+				}
+			}
+		}
+		else
+		{
+			System.out.println("JNotifyAdapterLinux: warning, recieved event for an unregisted WD " + iwd
+					+ ". ignoring...");
 		}
 	}
 
