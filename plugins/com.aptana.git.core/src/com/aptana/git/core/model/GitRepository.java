@@ -1023,6 +1023,10 @@ public class GitRepository
 			sha = components.get(2);
 		}
 
+		if (refs == null)
+		{
+			return;
+		}
 		List<GitRef> curRefs = refs.get(sha);
 		if (curRefs != null)
 		{
