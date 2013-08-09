@@ -13,6 +13,7 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.json.simple.JSONObject;
 
+import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.github.IGithubRepository;
 import com.aptana.git.core.github.IGithubUser;
 
@@ -52,7 +53,6 @@ public class GithubUser implements IGithubUser
 
 	public IGithubRepository getRepo(String repoName) throws CoreException
 	{
-		JSONObject result = (JSONObject) new GithubAPI(this).get("repos/" + username + '/' + repoName); //$NON-NLS-1$
-		return new GithubRepository(result);
+		return GitPlugin.getDefault().getGithubManager().getRepo(username, repoName);
 	}
 }

@@ -54,7 +54,7 @@ public class MergeBranchHandler extends AbstractGitHandler
 		}
 		if (!listOfMaps.isEmpty())
 		{
-			QuickMenuDialog dialog = new QuickMenuDialog(getShell());
+			QuickMenuDialog dialog = new QuickMenuDialog(getShell(), Messages.MergeBranchHandler_PopupTitle);
 			dialog.setInput(listOfMaps);
 			if (dialog.open() != -1)
 			{

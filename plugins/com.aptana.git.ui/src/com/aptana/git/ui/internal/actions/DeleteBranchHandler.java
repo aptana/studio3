@@ -55,7 +55,7 @@ public class DeleteBranchHandler extends AbstractGitHandler
 			}
 			listOfMaps.add(new MenuDialogItem(branch));
 		}
-		QuickMenuDialog dialog = new QuickMenuDialog(getShell());
+		QuickMenuDialog dialog = new QuickMenuDialog(getShell(), Messages.DeleteBranchHandler_PopupTitle);
 		dialog.setInput(listOfMaps);
 		if (dialog.open() != -1)
 		{

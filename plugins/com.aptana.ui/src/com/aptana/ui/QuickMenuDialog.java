@@ -63,7 +63,12 @@ public class QuickMenuDialog extends PopupDialog
 
 	public QuickMenuDialog(Shell parent)
 	{
-		super(parent, PopupDialog.INFOPOPUP_SHELLSTYLE, true, false, false, false, false, null, null);
+		this(parent, null);
+	}
+
+	public QuickMenuDialog(Shell parent, String title)
+	{
+		super(parent, PopupDialog.INFOPOPUP_SHELLSTYLE, true, false, false, false, false, title, null);
 	}
 
 	public void setInput(List<MenuDialogItem> items)

@@ -7,6 +7,8 @@
  */
 package com.aptana.git.core.github;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
@@ -20,14 +22,34 @@ public interface IGithubRepository
 
 	public int getID();
 
+	/**
+	 * Name of the repo.
+	 * 
+	 * @return
+	 */
 	public String getName();
 
+	/**
+	 * Is this a preivate repo?
+	 * 
+	 * @return
+	 */
 	public boolean isPrivate();
 
+	/**
+	 * Is this is a fork of another repo?
+	 * 
+	 * @return
+	 */
 	public boolean isFork();
 
 	public String getSSHURL();
 
+	/**
+	 * What org or user owns this repo?
+	 * 
+	 * @return
+	 */
 	public String getOwner();
 
 	/**
@@ -53,5 +75,18 @@ public interface IGithubRepository
 	public IGithubPullRequest createPullRequest(String title, String body, GitRepository repo, IProgressMonitor monitor)
 			throws CoreException;
 
+	/**
+	 * The default branch for this repo.
+	 * 
+	 * @return
+	 */
 	public String getDefaultBranch();
+
+	/**
+	 * Returns the list of open PRs for this repo.
+	 * 
+	 * @return
+	 * @throws CoreException 
+	 */
+	public List<IGithubPullRequest> getOpenPullRequests() throws CoreException;
 }

@@ -7,10 +7,14 @@
  */
 package com.aptana.git.internal.core.github;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.SubMonitor;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import com.aptana.git.core.GitPlugin;
@@ -158,5 +162,17 @@ public class GithubRepository implements IGithubRepository
 	public String toString()
 	{
 		return json.toJSONString();
+	}
+
+	public List<IGithubPullRequest> getOpenPullRequests() throws CoreException
+	{
+		JSONArray result = (JSONArray) getAPI().get(getAPIURL() + "/pulls"); //$NON-NLS-1$
+		List<IGithubPullRequest> prs = new ArrayList<IGithubPullRequest>(result.size());
+		for (Object blah : result)
+		{
+			JSONObject pr = (JSONObject) blah;
+			prs.add(new GithubPullRequest(pr));
+		}
+		return prs;
 	}
 }

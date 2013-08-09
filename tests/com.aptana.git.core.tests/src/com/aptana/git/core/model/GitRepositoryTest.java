@@ -13,6 +13,7 @@ import java.io.FileWriter;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -20,11 +21,13 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.osgi.framework.Version;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.IOUtil;
 
 @SuppressWarnings("nls")
@@ -197,7 +200,8 @@ public class GitRepositoryTest extends GitTestCase
 		Version v = GitExecutable.instance().version();
 		if (v.compareTo(Version.parseVersion("1.7.3")) < 0)
 		{
-			assertEquals("subject", "Subject of the commit.   - Did something   - did something else", commit.getSubject());
+			assertEquals("subject", "Subject of the commit.   - Did something   - did something else",
+					commit.getSubject());
 		}
 		else
 		{
@@ -699,5 +703,59 @@ public class GitRepositoryTest extends GitTestCase
 	protected String fileToAdd() throws Exception
 	{
 		return getRepo().workingDirectory() + File.separator + "file.txt";
+	}
+
+	public void testSSHGithubURL() throws Exception
+	{
+		GitRepository repo = new GitRepository(repoToGenerate().toFile().toURI())
+		{
+			@Override
+			public Map<String, String> remotePairs() throws CoreException
+			{
+				return CollectionsUtil.newMap(GitRepository.ORIGIN, "git@github.com:appcelerator/titanium_studio.git");
+			}
+		};
+
+		assertEquals("appcelerator/titanium_studio", repo.getGithubRepoName());
+	}
+
+	public void testHTTPSGithubURL() throws Exception
+	{
+		GitRepository repo = new GitRepository(repoToGenerate().toFile().toURI())
+		{
+			@Override
+			public Map<String, String> remotePairs() throws CoreException
+			{
+				return CollectionsUtil.newMap(GitRepository.ORIGIN,
+						"https://github.com/appcelerator/titanium_studio.git");
+			}
+		};
+		assertEquals("appcelerator/titanium_studio", repo.getGithubRepoName());
+	}
+
+	public void testPeriodInRepoName() throws Exception
+	{
+		GitRepository repo = new GitRepository(repoToGenerate().toFile().toURI())
+		{
+			@Override
+			public Map<String, String> remotePairs() throws CoreException
+			{
+				return CollectionsUtil.newMap(GitRepository.ORIGIN, "git@github.com:aptana/html.ruble.git");
+			}
+		};
+		assertEquals("aptana/html.ruble", repo.getGithubRepoName());
+	}
+
+	public void testDeprecatedGitReadOnlyGithubURL() throws Exception
+	{
+		GitRepository repo = new GitRepository(repoToGenerate().toFile().toURI())
+		{
+			@Override
+			public Map<String, String> remotePairs() throws CoreException
+			{
+				return CollectionsUtil.newMap(GitRepository.ORIGIN, "git://github.com/user/repo.git");
+			}
+		};
+		assertEquals("user/repo", repo.getGithubRepoName());
 	}
 }
