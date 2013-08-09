@@ -20,6 +20,7 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.github.IGithubManager;
+import com.aptana.git.core.github.IGithubRepository;
 import com.aptana.git.core.github.IGithubUser;
 
 public class GithubManager implements IGithubManager
@@ -135,5 +136,17 @@ public class GithubManager implements IGithubManager
 	protected ISecurePreferences getSecurePreferences()
 	{
 		return SecurePreferencesFactory.getDefault().node(SECURE_PREF_NODE);
+	}
+
+	public IGithubRepository getRepo(String owner, String repoName) throws CoreException
+	{
+		if (user == null)
+		{
+			throw new CoreException(new Status(IStatus.ERROR, GitPlugin.PLUGIN_ID, GITHUB_LOGIN_CODE,
+					Messages.GithubManager_ERR_Github_NotLoggedIn, null));
+		}
+
+		JSONObject result = (JSONObject) new GithubAPI(user).get("repos/" + owner + '/' + repoName); //$NON-NLS-1$
+		return new GithubRepository(result);
 	}
 }

@@ -48,7 +48,7 @@ public class DeleteRemoteHandler extends AbstractGitHandler
 		{
 			listOfMaps.add(new MenuDialogItem(remoteName));
 		}
-		QuickMenuDialog dialog = new QuickMenuDialog(getShell());
+		QuickMenuDialog dialog = new QuickMenuDialog(getShell(), Messages.DeleteRemoteHandler_PopupTitle);
 		dialog.setInput(listOfMaps);
 		if (dialog.open() != -1)
 		{
