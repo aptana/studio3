@@ -2370,7 +2370,7 @@ public class GitRepository
 	 * 
 	 * @return
 	 */
-	private String getGithubRepoName()
+	String getGithubRepoName()
 	{
 		try
 		{
