@@ -13,6 +13,8 @@ public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.jira.core.messages"; //$NON-NLS-1$
 
+	public static String JiraCorePlugin_LoadProjectProviders;
+
 	public static String JiraIssueType_Bug;
 	public static String JiraIssueType_Feature;
 	public static String JiraIssueType_Improvement;
