@@ -11,4 +11,10 @@
             name="Preference-based index filter">
       </filter>
    </extension>
+   <extension
+         point="org.eclipse.equinox.preferences.preferences">
+      <initializer
+            class="com.aptana.index.core.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
 </plugin>
