@@ -48,7 +48,6 @@ public class IndexFilterManager
 	/**
 	 * Unfortunately, we stored filters in the ui plugin prefs...
 	 */
-	private static final String PREF_NODE = "com.aptana.index.core.ui"; //$NON-NLS-1$
 	private static IndexFilterManager INSTANCE;
 
 	/**
@@ -128,7 +127,7 @@ public class IndexFilterManager
 		String value = StringUtil.join(ITEM_DELIMITER, uris);
 
 		// now save the file store list
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(PREF_NODE);
+		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(IndexPlugin.PLUGIN_ID);
 		prefs.put(IPreferenceConstants.FILTERED_INDEX_URIS, value);
 		try
 		{
@@ -253,8 +252,8 @@ public class IndexFilterManager
 	 */
 	private Set<IFileStore> loadFilteredItems()
 	{
-		String uris = Platform.getPreferencesService().getString(PREF_NODE, IPreferenceConstants.FILTERED_INDEX_URIS,
-				null, null);
+		String uris = Platform.getPreferencesService().getString(IndexPlugin.PLUGIN_ID,
+				IPreferenceConstants.FILTERED_INDEX_URIS, null, null);
 		if (StringUtil.isEmpty(uris))
 		{
 			// Don't return emptySet because we expect to be able to modify the return value
