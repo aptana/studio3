@@ -6,8 +6,6 @@
 
 package com.aptana.jira.core.internal;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -23,19 +21,20 @@ import com.aptana.jira.core.JiraCorePlugin;
  */
 public class JiraProjectsRegistry
 {
-	private Map<String, String> projectProviders;
+	private JiraProjectInfo projectProviderInfo;
+	private int highestPriority;
 
 	private static final String ELEMENT_TYPE = "provider"; //$NON-NLS-1$
 	private static final String PROJECT_PROVIDER_EXTENSION_POINT_ID = "jiraProjectProviders"; //$NON-NLS-1$
 	private static final String PROJECT_CODE = "projectCode"; //$NON-NLS-1$
 	private static final String PROJECT_NAME = "projectName"; //$NON-NLS-1$
+	private static final String PRIORITY = "priority"; //$NON-NLS-1$
+	private final int DEFAULT_PRIORITY = 60;
 
 	private synchronized void loadProviders()
 	{
-		if (projectProviders == null)
+		if (projectProviderInfo == null)
 		{
-			projectProviders = new HashMap<String, String>();
-
 			EclipseUtil.processConfigurationElements(JiraCorePlugin.PLUGIN_ID, PROJECT_PROVIDER_EXTENSION_POINT_ID,
 					new IConfigurationElementProcessor()
 					{
@@ -49,7 +48,21 @@ public class JiraProjectsRegistry
 								{
 									String projectName = element.getAttribute(PROJECT_NAME);
 									String projectCode = element.getAttribute(PROJECT_CODE);
-									projectProviders.put(projectName, projectCode);
+									String priorityStr = element.getAttribute(PRIORITY);
+									int priority = DEFAULT_PRIORITY;
+									try
+									{
+										priority = Integer.parseInt(priorityStr);
+									}
+									catch (NumberFormatException ignore)
+									{
+									}
+
+									if (highestPriority < priority)
+									{
+										highestPriority = priority;
+										projectProviderInfo = new JiraProjectInfo(projectName, projectCode);
+									}
 								}
 								catch (Exception e)
 								{
@@ -68,10 +81,32 @@ public class JiraProjectsRegistry
 		}
 	}
 
-	public Map<String, String> getProjectProviders()
+	public JiraProjectInfo getProjectInfo()
 	{
 		loadProviders();
-		return projectProviders;
+		return projectProviderInfo;
+	}
+
+	public class JiraProjectInfo
+	{
+		String projectName;
+		String projectCode;
+
+		public JiraProjectInfo(String projectName, String projectCode)
+		{
+			this.projectName = projectName;
+			this.projectCode = projectCode;
+		}
+
+		public String getProjectName()
+		{
+			return projectName;
+		}
+
+		public String getProjectCode()
+		{
+			return projectCode;
+		}
 	}
 
 }

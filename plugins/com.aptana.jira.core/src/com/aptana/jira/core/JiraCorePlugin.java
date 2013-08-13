@@ -7,16 +7,8 @@
  */
 package com.aptana.jira.core;
 
-import java.util.Map.Entry;
-
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.osgi.framework.BundleContext;
-
-import com.aptana.jira.core.internal.JiraProjectsRegistry;
 
 public class JiraCorePlugin extends Plugin
 {
@@ -25,7 +17,6 @@ public class JiraCorePlugin extends Plugin
 
 	private static JiraCorePlugin plugin;
 	private JiraManager fManager;
-	private JiraProjectsRegistry fProjectsRegistry;
 
 	/**
 	 * Returns the shared instance
@@ -52,21 +43,6 @@ public class JiraCorePlugin extends Plugin
 	{
 		super.start(context);
 		plugin = this;
-
-		Job projectProvidersJob = new Job(Messages.JiraCorePlugin_LoadProjectProviders)
-		{
-			@Override
-			protected IStatus run(IProgressMonitor monitor)
-			{
-				fProjectsRegistry = new JiraProjectsRegistry();
-				for (Entry<String, String> projectEntry : fProjectsRegistry.getProjectProviders().entrySet())
-				{
-					JiraManager.setProjectInfo(projectEntry.getKey(), projectEntry.getValue());
-				}
-				return Status.OK_STATUS;
-			}
-		};
-		projectProvidersJob.schedule();
 	}
 
 	/*
@@ -76,7 +52,6 @@ public class JiraCorePlugin extends Plugin
 	public void stop(BundleContext context) throws Exception
 	{
 		fManager = null;
-		fProjectsRegistry = null;
 		plugin = null;
 		super.stop(context);
 	}
