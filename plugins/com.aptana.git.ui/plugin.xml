@@ -12,6 +12,16 @@
 	    category="com.aptana.git.ui.clone.category">
 	    <description>%Git_clone_description</description>
       </wizard>
+      <wizard
+            category="com.aptana.git.ui.clone.category"
+            class="com.aptana.git.ui.internal.wizards.GithubForkWizard"
+            icon="icons/obj16/github.gif"
+            id="com.aptana.git.ui.wizards.ForkWizard"
+            name="%githubForkWizard">
+         <description>
+            %githubCloneDescription
+         </description>
+      </wizard>
    </extension>
    
    <extension point="org.eclipse.team.ui.configurationWizards">

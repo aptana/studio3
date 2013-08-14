@@ -42,4 +42,16 @@ public interface IGithubManager
 	 *             if there is no logged in user, or if there is an error in grabbing the repo (permissions/404)
 	 */
 	public IGithubRepository getRepo(String owner, String repoName) throws CoreException;
+
+	/**
+	 * Sends a request to fork the repo at owner/repoName into the account destination. If destination is null, it will
+	 * be forked to the current user's account. destination must be an organization that user has access to.
+	 * 
+	 * @param owner
+	 * @param repoName
+	 * @param destination
+	 * @throws CoreException
+	 *             if there is no logged in user, or if there is an error in grabbing the repo (permissions/404)
+	 */
+	public IGithubRepository fork(String owner, String repoName, String destination) throws CoreException;
 }
