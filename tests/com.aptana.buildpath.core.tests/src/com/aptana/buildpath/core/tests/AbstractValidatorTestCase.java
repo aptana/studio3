@@ -7,6 +7,7 @@
  */
 package com.aptana.buildpath.core.tests;
 
+import java.net.URI;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,6 +25,7 @@ import com.aptana.core.IFilter;
 import com.aptana.core.IMap;
 import com.aptana.core.build.IBuildParticipant;
 import com.aptana.core.build.IProblem;
+import com.aptana.core.build.ReconcileContext;
 import com.aptana.core.tests.TestProject;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
@@ -57,13 +59,8 @@ public abstract class AbstractValidatorTestCase extends TestCase
 
 	protected List<IProblem> getParseErrors(String source, IParseState ps, String markerType) throws CoreException
 	{
-		TestProject project = new TestProject("Test", new String[] { "com.aptana.projects.webnature" });
-		IFile file = project.createFile("parseErrorTest." + getFileExtension(), source);
-
-		BuildContext context = new BuildContext(file);
+		BuildContext context = new ReconcileContext(getContentType(), URI.create(markerType), source);
 		fValidator.buildFile(context, new NullProgressMonitor());
-
-		project.delete();
 
 		Map<String, Collection<IProblem>> problems = context.getProblems();
 		Collection<IProblem> daProblems = problems.get(markerType);
@@ -73,6 +70,8 @@ public abstract class AbstractValidatorTestCase extends TestCase
 		}
 		return new ArrayList<IProblem>(daProblems);
 	}
+
+	protected abstract String getContentType();
 
 	protected IProblem assertContains(List<IProblem> items, String message)
 	{

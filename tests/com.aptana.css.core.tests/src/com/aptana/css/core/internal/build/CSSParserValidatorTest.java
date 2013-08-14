@@ -40,6 +40,12 @@ public class CSSParserValidatorTest extends AbstractValidatorTestCase
 		return "css";
 	}
 
+	@Override
+	protected String getContentType()
+	{
+		return ICSSConstants.CONTENT_TYPE_CSS;
+	}
+
 	protected List<IProblem> getParseErrors(String source) throws CoreException
 	{
 		return getParseErrors(source, new ParseState(source), ICSSConstants.CSS_PROBLEM);

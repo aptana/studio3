@@ -44,6 +44,12 @@ public class JSParserValidatorTest extends AbstractValidatorTestCase
 		return "js";
 	}
 
+	@Override
+	protected String getContentType()
+	{
+		return IJSConstants.CONTENT_TYPE_JS;
+	}
+
 	public void testJSParseErrors() throws CoreException
 	{
 		String text = "var foo = function() {\nhello(\n};";

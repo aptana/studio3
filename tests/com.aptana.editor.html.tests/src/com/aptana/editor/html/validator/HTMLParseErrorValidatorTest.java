@@ -41,6 +41,12 @@ public class HTMLParseErrorValidatorTest extends AbstractValidatorTestCase
 	{
 		return "html";
 	}
+	
+	@Override
+	protected String getContentType()
+	{
+		return IHTMLConstants.CONTENT_TYPE_HTML;
+	}
 
 	public void testHTMLSelfClosingTagOnNonVoidElement() throws CoreException
 	{

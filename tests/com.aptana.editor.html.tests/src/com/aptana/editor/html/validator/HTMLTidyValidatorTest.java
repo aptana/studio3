@@ -49,6 +49,12 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 	}
 
 	@Override
+	protected String getContentType()
+	{
+		return IHTMLConstants.CONTENT_TYPE_HTML;
+	}
+
+	@Override
 	protected void setUp() throws Exception
 	{
 		super.setUp();
