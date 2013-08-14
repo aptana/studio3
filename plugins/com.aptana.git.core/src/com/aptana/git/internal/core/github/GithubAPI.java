@@ -141,7 +141,8 @@ class GithubAPI
 
 			int code = connection.getResponseCode();
 			JSONParser parser = new JSONParser();
-			if (code == HttpURLConnection.HTTP_CREATED)
+			// Returns 201 created for quick ops, 202 for async ops like forking
+			if (code == HttpURLConnection.HTTP_CREATED || code == HttpURLConnection.HTTP_ACCEPTED)
 			{
 				String response = IOUtil.read(connection.getInputStream());
 				return parser.parse(response);

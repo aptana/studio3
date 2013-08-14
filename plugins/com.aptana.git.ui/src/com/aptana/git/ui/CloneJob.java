@@ -58,6 +58,8 @@ public class CloneJob extends Job
 	private boolean forceRootAsProject;
 	private boolean shallowClone;
 
+	private Set<IProject> createdProjects;
+
 	public CloneJob(String sourceURI, String dest)
 	{
 		this(sourceURI, dest, false);
@@ -88,6 +90,7 @@ public class CloneJob extends Job
 		this.dest = dest;
 		this.forceRootAsProject = forceRootAsProject;
 		this.shallowClone = shallow;
+		this.createdProjects = new HashSet<IProject>();
 	}
 
 	@Override
@@ -355,6 +358,7 @@ public class CloneJob extends Job
 
 			project.create(desc, new SubProgressMonitor(monitor, 30));
 			project.open(IResource.BACKGROUND_REFRESH, new SubProgressMonitor(monitor, 50));
+			createdProjects.add(project);
 
 			if (autoAttach)
 			{
@@ -452,4 +456,13 @@ public class CloneJob extends Job
 		}
 	}
 
+	/**
+	 * Returns an unmodifiable set of IProjects that got created by this job.
+	 * 
+	 * @return
+	 */
+	public Set<IProject> getCreatedProjects()
+	{
+		return Collections.unmodifiableSet(this.createdProjects);
+	}
 }
