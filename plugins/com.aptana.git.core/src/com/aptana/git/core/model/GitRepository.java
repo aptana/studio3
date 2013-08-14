@@ -2285,9 +2285,9 @@ public class GitRepository
 	{
 		if (track)
 		{
-			return execute(GitRepository.ReadWrite.WRITE, "remote", "add", "--track", currentBranch(), remoteName, url); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			return execute(GitRepository.ReadWrite.WRITE, "remote", "add", "-f", "--track", currentBranch(), remoteName, url); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		}
-		return execute(GitRepository.ReadWrite.WRITE, "remote", "add", remoteName, url); //$NON-NLS-1$ //$NON-NLS-2$
+		return execute(GitRepository.ReadWrite.WRITE, "remote", "add", "-f", remoteName, url); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	void forceRead()
