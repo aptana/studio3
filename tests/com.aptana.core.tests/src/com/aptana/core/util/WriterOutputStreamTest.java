@@ -19,6 +19,9 @@ import java.io.OutputStreamWriter;
 import junit.framework.TestCase;
 
 /**
+ * If tests fail, it may be because the default charset is non-UTF-8. You can simulate this in your env by setting a
+ * command line JVM argument: -Dfile.encoding=US-ASCII
+ * 
  * @author Shalom
  */
 public class WriterOutputStreamTest extends TestCase
@@ -52,11 +55,13 @@ public class WriterOutputStreamTest extends TestCase
 	{
 		String toWrite = "Hello I'm a UTF-8 string that is using Umlauts - alt - älter - am ältesten";
 		// The default FileWriter encoding is already a UTF-8, so no special writers decoration is needed.
-		WriterOutputStream os = new WriterOutputStream(new FileWriter(testFile), IOUtil.UTF_8);
+		WriterOutputStream os = new WriterOutputStream(new OutputStreamWriter(new FileOutputStream(testFile),
+				IOUtil.UTF_8), IOUtil.UTF_8);
 		os.write(toWrite.getBytes(IOUtil.UTF_8));
 		os.close();
 
 		// Read back and test that the encoding is OK
+
 		BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(testFile), IOUtil.UTF_8));
 		String line = reader.readLine();
 		reader.close();
@@ -104,7 +109,7 @@ public class WriterOutputStreamTest extends TestCase
 	{
 		String shortS = "P";
 		String longS = "A B C";
-		WriterOutputStream os = new WriterOutputStream(new FileWriter(testFile), "UTF-8");
+		WriterOutputStream os = new WriterOutputStream(new FileWriter(testFile), IOUtil.UTF_8);
 		byte[] bytes = longS.getBytes();
 
 		os.write(shortS.getBytes()[0]);
