@@ -13,6 +13,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,7 +43,7 @@ public class ProcessUtil
 {
 
 	public static final String TEXT_TO_OBFUSCATE = "textToObfuscate"; //$NON-NLS-1$
-
+	protected static boolean isJava7 = VersionUtil.compareVersions("1.7", System.getProperty("java.version")) >= 0; //$NON-NLS-1$ //$NON-NLS-2$
 	private static final String MASK = StringUtil.repeat('*', 10);
 
 	private static ProcessUtil fgInstance;
@@ -267,14 +268,23 @@ public class ProcessUtil
 		File outFile = null, errFile = null;
 		try
 		{
-
 			if (redirect)
 			{
 				outFile = File.createTempFile("studio", ".out"); //$NON-NLS-1$ //$NON-NLS-2$
 				errFile = File.createTempFile("studio", ".err"); //$NON-NLS-1$ //$NON-NLS-2$
 				List<String> argsList = CollectionsUtil.newList(arguments);
 				CollectionsUtil.addToList(argsList, ">", outFile.getAbsolutePath(), "2>", errFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
-				Process p = run(command, workingDirectory, environment, argsList.toArray(new String[argsList.size()]));
+				Process p;
+				if (isJava7)
+				{
+					List<String> commands = new ArrayList<String>(Arrays.asList(arguments));
+					commands.add(0, command);
+					p = ProcessUtil.instance().doRun(commands, workingDirectory, environment, true, outFile, errFile);
+				}
+				else
+				{
+					p = run(command, workingDirectory, environment, argsList.toArray(new String[argsList.size()]));
+				}
 				return processData(p, outFile, errFile);
 			}
 			Process p = run(command, workingDirectory, environment, arguments);
@@ -449,7 +459,41 @@ public class ProcessUtil
 	protected Process doRun(List<String> command, IPath workingDirectory, Map<String, String> environment)
 			throws IOException, CoreException
 	{
+		return doRun(command, workingDirectory, environment, false, null, null);
+	}
+
+	/**
+	 * Instance method so that we can test this class! Not meant to be called outside tests
+	 * 
+	 * @param command
+	 * @param workingDirectory
+	 * @param environment
+	 * @param password
+	 * @return
+	 * @throws IOException
+	 * @throws CoreException
+	 */
+	protected Process doRun(List<String> command, IPath workingDirectory, Map<String, String> environment,
+			boolean redirect, File outFile, File errFile) throws IOException, CoreException
+	{
 		ProcessBuilder processBuilder = createProcessBuilder(command);
+		if (redirect)
+		{
+			// Another Windows HACK : redirection operators does not work on Java7. So, using reflection to invoke new
+			// Java 7 APIs to redirect output and error streams.
+			try
+			{
+				Method redirectOutputMethod = processBuilder.getClass().getMethod("redirectOutput", File.class); //$NON-NLS-1$
+				redirectOutputMethod.invoke(processBuilder, outFile);
+
+				Method redirectErrorMethod = processBuilder.getClass().getMethod("redirectError", File.class); //$NON-NLS-1$
+				redirectErrorMethod.invoke(processBuilder, errFile);
+			}
+			catch (Exception e)
+			{
+				IdeLog.logError(CorePlugin.getDefault(), e);
+			}
+		}
 		if (workingDirectory != null)
 		{
 			processBuilder.directory(workingDirectory.toFile());
