@@ -8,6 +8,7 @@
 package com.aptana.css.core.parsing;
 
 import java.util.List;
+import java.util.Random;
 
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.ListCrossProduct;
@@ -106,26 +107,14 @@ public class CSSLiteralTest extends CSSTokensTest
 	 */
 	public void testRGB2()
 	{
-		ListCrossProduct<String> crossProduct = new ListCrossProduct<String>();
-		// @formatter:off
-		List<String> hexValues = CollectionsUtil.newList(
-			"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
-			"A", "B", "C", "D", "E", "F"
-		);
-		// @formatter:on
+		Random r = new Random();
+		final int maxHex = (int) Math.pow(16, 6); // 16777216
 
-		crossProduct.addList(CollectionsUtil.newList("{#"));
-		crossProduct.addList(hexValues);
-		crossProduct.addList(hexValues);
-		crossProduct.addList(hexValues);
-		crossProduct.addList(hexValues);
-		crossProduct.addList(hexValues);
-		crossProduct.addList(hexValues);
-		crossProduct.addList(CollectionsUtil.newList("}"));
-
-		for (List<String> list : crossProduct)
+		// Spot check 10 random 6-character hex values.
+		for (int i = 0; i < 10; i++)
 		{
-			String text = StringUtil.concat(list);
+			int value = r.nextInt(maxHex);
+			String text = "{#" + StringUtil.pad(Integer.toHexString(value), 6, '0') + "}";
 
 			// @formatter:off
 			assertToken(
@@ -136,6 +125,38 @@ public class CSSLiteralTest extends CSSTokensTest
 			);
 			// @formatter:on
 		}
+
+		// Commented out for now because this takes minutes to run on build machine.
+		// ListCrossProduct<String> crossProduct = new ListCrossProduct<String>();
+//		// @formatter:off
+//		List<String> hexValues = CollectionsUtil.newList(
+//			"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+//			"A", "B", "C", "D", "E", "F"
+//		);
+//		// @formatter:on
+		//
+		// crossProduct.addList(CollectionsUtil.newList("{#"));
+		// crossProduct.addList(hexValues);
+		// crossProduct.addList(hexValues);
+		// crossProduct.addList(hexValues);
+		// crossProduct.addList(hexValues);
+		// crossProduct.addList(hexValues);
+		// crossProduct.addList(hexValues);
+		// crossProduct.addList(CollectionsUtil.newList("}"));
+		//
+		// for (List<String> list : crossProduct)
+		// {
+		// String text = StringUtil.concat(list);
+		//
+//			// @formatter:off
+//			assertToken(
+//				text,
+//				new TokenInfo(CSSTokenType.LCURLY, 0, 1),
+//				new TokenInfo(CSSTokenType.RGB, 1, text.length() - 2),
+//				new TokenInfo(CSSTokenType.RCURLY, text.length() - 1, 1)
+//			);
+//			// @formatter:on
+		// }
 	}
 
 	public void testClass()
