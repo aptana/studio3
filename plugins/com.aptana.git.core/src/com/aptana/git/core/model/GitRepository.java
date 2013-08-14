@@ -2274,7 +2274,8 @@ public class GitRepository
 	}
 
 	/**
-	 * Adds a new remote with the given name and URL. If track is specified, it will track the current branch only.
+	 * Adds a new remote with the given name and URL. If track is specified, it will track the current branch only. Will
+	 * automatically fetch the remote after adding.
 	 * 
 	 * @param remoteName
 	 * @param url
@@ -2283,11 +2284,32 @@ public class GitRepository
 	 */
 	public IStatus addRemote(String remoteName, String url, boolean track)
 	{
+		return addRemote(remoteName, url, track, true);
+	}
+
+	/**
+	 * Adds a new remote with the given name and URL. If track is specified, it will track the current branch only.
+	 * 
+	 * @param remoteName
+	 * @param url
+	 * @param track
+	 * @param fetch
+	 *            Auto-fetch after adding remote?
+	 * @return
+	 */
+	public IStatus addRemote(String remoteName, String url, boolean track, boolean fetch)
+	{
+		List<String> args = CollectionsUtil.newList("remote", "add"); //$NON-NLS-1$ //$NON-NLS-2$
+		if (fetch)
+		{
+			args.add("-f"); //$NON-NLS-1$
+		}
 		if (track)
 		{
-			return execute(GitRepository.ReadWrite.WRITE, "remote", "add", "-f", "--track", currentBranch(), remoteName, url); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			CollectionsUtil.addToList(args, "--track", currentBranch()); //$NON-NLS-1$
 		}
-		return execute(GitRepository.ReadWrite.WRITE, "remote", "add", "-f", remoteName, url); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		CollectionsUtil.addToList(args, remoteName, url);
+		return execute(GitRepository.ReadWrite.WRITE, CollectionsUtil.toArray(args));
 	}
 
 	void forceRead()

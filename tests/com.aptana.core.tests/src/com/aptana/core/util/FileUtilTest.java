@@ -10,6 +10,7 @@ package com.aptana.core.util;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Random;
 
 import junit.framework.TestCase;
 
@@ -283,18 +284,23 @@ public class FileUtilTest extends TestCase
 			return;
 		}
 
-		for (int i = 7; i >= 0; i--)
+		File file = File.createTempFile("chmod", null);
+		IPath filePath = Path.fromOSString(file.getAbsolutePath());
+		Random r = new Random();
+		try
 		{
-			for (int j = 7; j >= 0; j--)
+			// Spot check 10 permissions
+			for (int n = 0; n < 10; n++)
 			{
-				for (int k = 7; k >= 0; k--)
-				{
-					File file = File.createTempFile("chmod", null);
-					String permString = Integer.toString(i) + Integer.toString(j) + Integer.toString(k);
-					FileUtil.chmod(permString, file);
-					assertEquals(permString, FileUtil.getPermissions(Path.fromOSString(file.getAbsolutePath())));
-				}
+				int i = r.nextInt(512);
+				String permString = StringUtil.pad(Integer.toString(i, 8), 3, '0');
+				FileUtil.chmod(permString, file);
+				assertEquals(permString, FileUtil.getPermissions(filePath));
 			}
+		}
+		finally
+		{
+			file.delete();
 		}
 	}
 }

@@ -116,7 +116,10 @@ public class JiraManager
 	{
 		JiraProjectsRegistry projectsRegistry = new JiraProjectsRegistry();
 		JiraProjectInfo projectProvider = projectsRegistry.getProjectInfo();
-		setProjectInfo(projectProvider.getProjectName(), projectProvider.getProjectCode());
+		if (projectProvider != null)
+		{
+			setProjectInfo(projectProvider.getProjectName(), projectProvider.getProjectCode());
+		}
 	}
 
 	/**

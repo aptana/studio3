@@ -255,7 +255,7 @@ Regex = "/" ({CharClass}|{Character})+ "/" [a-z]*
 	"break"			{ return newToken(JSTokenType.BREAK); }
 	"case"			{ return newToken(JSTokenType.CASE); }
 	"catch"			{ return newToken(JSTokenType.CATCH); }
-	"const"			{ return newToken(JSTokenType.CONST); }
+	"const"			{ return newToken(JSTokenType.VAR); }
 	"continue"		{ return newToken(JSTokenType.CONTINUE); }
 	"debugger"		{ return newToken(JSTokenType.DEBUGGER); }
 	"default"		{ return newToken(JSTokenType.DEFAULT); }

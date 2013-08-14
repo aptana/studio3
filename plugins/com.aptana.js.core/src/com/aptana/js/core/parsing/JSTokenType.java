@@ -98,7 +98,6 @@ public enum JSTokenType implements ITypePredicate
 	DEFAULT(JSLanguageConstants.DEFAULT, Terminals.DEFAULT),
 	FINALLY(JSLanguageConstants.FINALLY, Terminals.FINALLY),
 	CATCH(JSLanguageConstants.CATCH, Terminals.CATCH),
-	CONST("const", Terminals.CONST),
 	DEBUGGER("debugger", Terminals.DEBUGGER),
 	CLASS("class", Terminals.CLASS),
 	ENUM("enum", Terminals.ENUM),

@@ -52,12 +52,12 @@ public class WriterOutputStreamTest extends TestCase
 	{
 		String toWrite = "Hello I'm a UTF-8 string that is using Umlauts - alt - älter - am ältesten";
 		// The default FileWriter encoding is already a UTF-8, so no special writers decoration is needed.
-		WriterOutputStream os = new WriterOutputStream(new FileWriter(testFile), "UTF-8");
-		os.write(toWrite.getBytes("UTF-8"));
+		WriterOutputStream os = new WriterOutputStream(new FileWriter(testFile), IOUtil.UTF_8);
+		os.write(toWrite.getBytes(IOUtil.UTF_8));
 		os.close();
 
 		// Read back and test that the encoding is OK
-		BufferedReader reader = new BufferedReader(new FileReader(testFile));
+		BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(testFile), IOUtil.UTF_8));
 		String line = reader.readLine();
 		reader.close();
 

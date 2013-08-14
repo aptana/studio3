@@ -688,7 +688,7 @@ public class GitRepositoryTest extends GitTestCase
 		// Generate remotes
 		testRemoteURLs();
 
-		IStatus status = getRepo().addRemote("newRemote", "git@github.com:user/newRemote.git", false);
+		IStatus status = getRepo().addRemote("newRemote", "git@github.com:user/newRemote.git", false, false);
 		assertTrue(status.isOK());
 
 		Set<String> remoteNames = getRepo().remotes();
