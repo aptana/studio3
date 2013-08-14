@@ -149,4 +149,22 @@ public class GithubManager implements IGithubManager
 		JSONObject result = (JSONObject) new GithubAPI(user).get("repos/" + owner + '/' + repoName); //$NON-NLS-1$
 		return new GithubRepository(result);
 	}
+
+	public IGithubRepository fork(String owner, String repoName, String destination) throws CoreException
+	{
+		if (user == null)
+		{
+			throw new CoreException(new Status(IStatus.ERROR, GitPlugin.PLUGIN_ID, GITHUB_LOGIN_CODE,
+					Messages.GithubManager_ERR_Github_NotLoggedIn, null));
+		}
+
+		String data = null;
+		if (destination != null)
+		{
+			data = "{organization: \"" + destination + "\"}"; //$NON-NLS-1$ //$NON-NLS-2$
+		}
+
+		JSONObject result = (JSONObject) new GithubAPI(user).post("repos/" + owner + '/' + repoName + "/forks", data); //$NON-NLS-1$ //$NON-NLS-2$
+		return new GithubRepository(result);
+	}
 }
