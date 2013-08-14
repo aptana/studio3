@@ -275,7 +275,7 @@ public class ProcessUtil
 				List<String> argsList = CollectionsUtil.newList(arguments);
 				CollectionsUtil.addToList(argsList, ">", outFile.getAbsolutePath(), "2>", errFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
 				Process p;
-				if (!isJava7)
+				if (isJava7)
 				{
 					List<String> commands = new ArrayList<String>(Arrays.asList(arguments));
 					commands.add(0, command);
