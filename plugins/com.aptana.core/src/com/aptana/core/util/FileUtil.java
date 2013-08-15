@@ -430,4 +430,44 @@ public class FileUtil
 		String result = ProcessUtil.outputForCommand("stat", null, "-c", "%a", filepath.toOSString()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return StringUtil.pad(result, 3, '0');
 	}
+
+	/**
+	 * Returns true if the file doesn't exist, false if it is not a directory. Otherwise checks if directory has any
+	 * files/subdirs.
+	 * 
+	 * @param dir
+	 * @return
+	 */
+	public static boolean isEmptyDir(File dir)
+	{
+		if (!dir.exists())
+		{
+			return true;
+		}
+		if (!dir.isDirectory())
+		{
+			return false;
+		}
+		return dir.listFiles().length == 0;
+	}
+
+	/**
+	 * this is actually just an optimistic heuristic - should be named isThereHopeThatCanCreateSubdir() as probably
+	 * there is no 100% reliable way to check that in Java for Windows
+	 * 
+	 * @param parent
+	 * @return
+	 */
+	public static boolean canCreateSubdir(File parent)
+	{
+		if (parent == null)
+		{
+			return true;
+		}
+		if (parent.exists())
+		{
+			return parent.isDirectory() && parent.canWrite();
+		}
+		return canCreateSubdir(parent.getParentFile());
+	}
 }

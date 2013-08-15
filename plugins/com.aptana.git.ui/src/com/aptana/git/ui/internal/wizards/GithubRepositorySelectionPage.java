@@ -28,6 +28,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import com.aptana.core.CoreStrings;
+import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.github.IGithubManager;
@@ -36,21 +37,6 @@ import com.aptana.git.ui.internal.preferences.GithubAccountPageProvider;
 
 public class GithubRepositorySelectionPage extends WizardPage
 {
-
-	/**
-	 * Template for default Git URI.
-	 */
-	private static final String DEFAULT_GIT_URI = "git://github.com/{0}/example.git"; //$NON-NLS-1$
-
-	/**
-	 * Fallback value for username if we don't have github login or a value in "user.name".
-	 */
-	private static final String USER = "user"; //$NON-NLS-1$
-
-	/**
-	 * System property containing username. If we don't know user's github login we try the value here.
-	 */
-	private static final String USER_NAME = "user.name"; //$NON-NLS-1$
 
 	/**
 	 * Location where we're cloning to.
@@ -66,11 +52,9 @@ public class GithubRepositorySelectionPage extends WizardPage
 	private Text destinationText;
 
 	private Text ownerText;
-
 	private Text repoText;
 
 	private String owner;
-
 	private String repoName;
 
 	protected GithubRepositorySelectionPage()
@@ -95,7 +79,7 @@ public class GithubRepositorySelectionPage extends WizardPage
 
 		// Owner
 		Label ownerLabel = new Label(main, SWT.NONE);
-		ownerLabel.setText("Owner:");
+		ownerLabel.setText(Messages.GithubRepositorySelectionPage_OwnerLabel);
 
 		ownerText = new Text(main, SWT.BORDER | SWT.SINGLE);
 		ownerText.setLayoutData(inputData.create());
@@ -107,13 +91,13 @@ public class GithubRepositorySelectionPage extends WizardPage
 				validate();
 			}
 		});
-		
+
 		// spacer to take up last section of grid
 		new Label(main, SWT.NONE);
 
 		// Repo
 		Label repoLabel = new Label(main, SWT.NONE);
-		repoLabel.setText("Repository Name:");
+		repoLabel.setText(Messages.GithubRepositorySelectionPage_RepoNameLabel);
 
 		repoText = new Text(main, SWT.BORDER | SWT.SINGLE);
 		repoText.setLayoutData(inputData.create());
@@ -189,14 +173,14 @@ public class GithubRepositorySelectionPage extends WizardPage
 	{
 		if (StringUtil.isEmpty(owner))
 		{
-			setErrorMessage("Owner required");
+			setErrorMessage(Messages.GithubRepositorySelectionPage_NoOwnerErr);
 			setPageComplete(false);
 			return;
 		}
 
 		if (StringUtil.isEmpty(repoName))
 		{
-			setErrorMessage("Repository name required");
+			setErrorMessage(Messages.GithubRepositorySelectionPage_NoRepoNameErr);
 			setPageComplete(false);
 			return;
 		}
@@ -209,7 +193,7 @@ public class GithubRepositorySelectionPage extends WizardPage
 			return;
 		}
 		File absoluteFile = new File(dstpath).getAbsoluteFile();
-		if (!isEmptyDir(absoluteFile))
+		if (!FileUtil.isEmptyDir(absoluteFile))
 		{
 			setErrorMessage(NLS.bind(Messages.RepositorySelectionPage_DirectoryExists_ErrorMessage,
 					absoluteFile.getPath()));
@@ -217,7 +201,7 @@ public class GithubRepositorySelectionPage extends WizardPage
 			return;
 		}
 
-		if (!canCreateSubdir(absoluteFile.getParentFile()))
+		if (!FileUtil.canCreateSubdir(absoluteFile.getParentFile()))
 		{
 			setErrorMessage(NLS.bind(Messages.RepositorySelectionPage_CannotCreateDirectory_ErrorMessage,
 					absoluteFile.getPath()));
@@ -244,35 +228,6 @@ public class GithubRepositorySelectionPage extends WizardPage
 	private IGithubManager getGithubManager()
 	{
 		return GitPlugin.getDefault().getGithubManager();
-	}
-
-	private static boolean isEmptyDir(File dir)
-	{
-		if (!dir.exists())
-		{
-			return true;
-		}
-		if (!dir.isDirectory())
-		{
-			return false;
-		}
-		return dir.listFiles().length == 0;
-	}
-
-	// this is actually just an optimistic heuristic - should be named
-	// isThereHopeThatCanCreateSubdir() as probably there is no 100% reliable
-	// way to check that in Java for Windows
-	private static boolean canCreateSubdir(File parent)
-	{
-		if (parent == null)
-		{
-			return true;
-		}
-		if (parent.exists())
-		{
-			return parent.isDirectory() && parent.canWrite();
-		}
-		return canCreateSubdir(parent.getParentFile());
 	}
 
 	public String getDestination()

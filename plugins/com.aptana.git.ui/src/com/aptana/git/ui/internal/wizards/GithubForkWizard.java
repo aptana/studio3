@@ -77,7 +77,7 @@ public class GithubForkWizard extends Wizard implements IImportWizard
 				{
 					try
 					{
-						monitor.subTask("Forking repository at Github");
+						monitor.subTask(Messages.GithubForkWizard_ForkSubTaskName);
 						IGithubRepository repo = ghManager.fork(owner, repoName, organization);
 
 						// Now clone the repo!
@@ -99,14 +99,14 @@ public class GithubForkWizard extends Wizard implements IImportWizard
 						Set<IProject> projects = job.getCreatedProjects();
 						if (!CollectionsUtil.isEmpty(projects))
 						{
-							monitor.subTask("Setting upstream remote to point at parent repository");
+							monitor.subTask(Messages.GithubForkWizard_UpstreamSubTaskName);
 							IProject project = projects.iterator().next();
 							IGitRepositoryManager grManager = GitPlugin.getDefault().getGitRepositoryManager();
 							GitRepository clonedRepo = grManager.getAttached(project);
 							if (clonedRepo != null)
 							{
 								IGithubRepository parentRepo = repo.getParent();
-								clonedRepo.addRemote("upstream", parentRepo.getSSHURL(), false);
+								clonedRepo.addRemote("upstream", parentRepo.getSSHURL(), false); //$NON-NLS-1$
 							}
 						}						
 					}
@@ -122,7 +122,7 @@ public class GithubForkWizard extends Wizard implements IImportWizard
 			if (e.getCause() instanceof CoreException)
 			{
 				CoreException ce = (CoreException) e.getCause();
-				MessageDialog.openError(getShell(), "Failed to fork repository", ce.getMessage());
+				MessageDialog.openError(getShell(), Messages.GithubForkWizard_FailedForkErr, ce.getMessage());
 			}
 			else
 			{
