@@ -335,7 +335,7 @@ class RepositorySelectionPage extends WizardPage
 		{
 			try
 			{
-				List<IGithubRepository> repoList = user.getRepos();
+				List<IGithubRepository> repoList = user.getAllRepos();
 				if (!CollectionsUtil.isEmpty(repoList))
 				{
 					for (IGithubRepository repo : repoList)
