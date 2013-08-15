@@ -59,7 +59,7 @@ public abstract class AbstractValidatorTestCase extends TestCase
 
 	protected List<IProblem> getParseErrors(String source, IParseState ps, String markerType) throws CoreException
 	{
-		BuildContext context = new ReconcileContext(getContentType(), URI.create(markerType), source);
+		BuildContext context = new ReconcileContext(getContentType(), URI.create("file:/" + markerType), source);
 		fValidator.buildFile(context, new NullProgressMonitor());
 
 		Map<String, Collection<IProblem>> problems = context.getProblems();
