@@ -46,7 +46,7 @@ public interface IGithubRepository
 	public String getSSHURL();
 
 	/**
-	 * What org or user owns this repo?
+	 * What org or user owns this repo? FIXME Return IGithubUser?
 	 * 
 	 * @return
 	 */
@@ -86,7 +86,7 @@ public interface IGithubRepository
 	 * Returns the list of open PRs for this repo.
 	 * 
 	 * @return
-	 * @throws CoreException 
+	 * @throws CoreException
 	 */
 	public List<IGithubPullRequest> getOpenPullRequests() throws CoreException;
 }

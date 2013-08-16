@@ -40,19 +40,19 @@ import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.git.ui.internal.actions.AbstractGithubHandler;
 
-public class ViewPullRequestItem extends CompoundContributionItem implements IWorkbenchContribution
+public class MergePullRequestItem extends CompoundContributionItem implements IWorkbenchContribution
 {
 
 	protected static final IContributionItem[] NO_CONTRIBUTION_ITEMS = new IContributionItem[0];
 
 	private IServiceLocator serviceLocator;
 
-	public ViewPullRequestItem()
+	public MergePullRequestItem()
 	{
 		super();
 	}
 
-	public ViewPullRequestItem(String id)
+	public MergePullRequestItem(String id)
 	{
 		super(id);
 	}
@@ -122,7 +122,7 @@ public class ViewPullRequestItem extends CompoundContributionItem implements IWo
 			Collection<IContributionItem> contributions = new ArrayList<IContributionItem>(prs.size());
 			for (final IGithubPullRequest pr : prs)
 			{
-				contributions.add(new ViewPullRequestContributionItem(pr));
+				contributions.add(new MergePullRequestContributionItem(repo, pr));
 			}
 			return contributions.toArray(new IContributionItem[contributions.size()]);
 		}
@@ -132,13 +132,15 @@ public class ViewPullRequestItem extends CompoundContributionItem implements IWo
 		}
 	}
 
-	private static class ViewPullRequestContributionItem extends ContributionItem
+	private static class MergePullRequestContributionItem extends ContributionItem
 	{
 
-		private IGithubPullRequest pr;
+		private final IGithubPullRequest pr;
+		private final GitRepository repo;
 
-		ViewPullRequestContributionItem(IGithubPullRequest pr)
+		MergePullRequestContributionItem(final GitRepository repo, final IGithubPullRequest pr)
 		{
+			this.repo = repo;
 			this.pr = pr;
 		}
 
@@ -152,7 +154,7 @@ public class ViewPullRequestItem extends CompoundContributionItem implements IWo
 				public void widgetSelected(SelectionEvent e)
 				{
 					// what to do when menu is subsequently selected.
-					AbstractGithubHandler.viewPullRequest(pr);
+					AbstractGithubHandler.mergePullRequest(repo, pr);
 				}
 			});
 		}

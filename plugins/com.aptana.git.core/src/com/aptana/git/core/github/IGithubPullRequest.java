@@ -10,6 +10,9 @@ package com.aptana.git.core.github;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+
 /**
  * @author cwilliams
  */
@@ -52,5 +55,42 @@ public interface IGithubPullRequest
 	 * @return
 	 */
 	public String getBody();
+
+	/**
+	 * Merges this PR.
+	 * 
+	 * @param commitMsg
+	 * @param monitor
+	 * @return
+	 */
+	public IStatus merge(String commitMsg, IProgressMonitor monitor);
+
+	/**
+	 * String to use to label/display the PR in the UI.
+	 * 
+	 * @return
+	 */
+	public String getDisplayString();
+
+	/**
+	 * The repository containing the changes (the source of the PR).
+	 * 
+	 * @return
+	 */
+	public IGithubRepository getHeadRepo();
+
+	/**
+	 * The repository that this PR would get applied/merged to.
+	 * 
+	 * @return
+	 */
+	public IGithubRepository getBaseRepo();
+
+	/**
+	 * The name of the branch (or ref) that contains the changes in the PR.
+	 * 
+	 * @return
+	 */
+	public String getHeadRef();
 
 }

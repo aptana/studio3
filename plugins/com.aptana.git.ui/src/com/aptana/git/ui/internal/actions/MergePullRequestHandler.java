@@ -13,17 +13,20 @@ import java.util.List;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.window.Window;
 
 import com.aptana.git.core.github.IGithubPullRequest;
 import com.aptana.git.core.github.IGithubRepository;
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.ui.dialogs.MergePullRequestDialog;
 import com.aptana.ui.MenuDialogItem;
 import com.aptana.ui.QuickMenuDialog;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * @author cwilliams
  */
-public class ViewPullRequestHandler extends AbstractGithubHandler
+public class MergePullRequestHandler extends AbstractGithubHandler
 {
 
 	@Override
@@ -51,12 +54,12 @@ public class ViewPullRequestHandler extends AbstractGithubHandler
 			}
 			if (!listOfMaps.isEmpty())
 			{
-				QuickMenuDialog dialog = new QuickMenuDialog(getShell(), Messages.ViewPullRequestHandler_PopupTitle);
+				QuickMenuDialog dialog = new QuickMenuDialog(getShell(), "Merge Pull Request");
 				dialog.setInput(listOfMaps);
 				if (dialog.open() != -1)
 				{
 					IGithubPullRequest pr = prs.get(dialog.getReturnCode());
-					viewPullRequest(pr);
+					mergePullRequest(repo, pr);
 				}
 			}
 		}
