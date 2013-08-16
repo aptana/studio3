@@ -283,13 +283,13 @@
             id="com.aptana.git.ui.command.view_pull_request"
             name="View Pull Request...">
       </command>
-      <!--
       <command
             categoryId="com.aptana.git.ui.category"
             defaultHandler="com.aptana.git.ui.internal.actions.MergePullRequestHandler"
             id="com.aptana.git.ui.command.merge_pull_request"
             name="Merge Pull Request...">
       </command>
+      <!--
       <command
             categoryId="com.aptana.git.ui.category"
             defaultHandler="com.aptana.git.ui.internal.actions.DeletePullRequestHandler"
@@ -1054,10 +1054,9 @@
                    </reference>
                 </visibleWhen>
              </menu>
-             <!--
              <menu
-                   commandId="com.aptana.git.ui.command.merge_branch"
-                   id="com.aptana.git.ui.actions.MergeBranchAction"
+                   commandId="com.aptana.git.ui.command.merge_pull_request"
+                   id="com.aptana.git.ui.actions.MergePullRequestAction"
                    label="%merge.menu.label"
                    mnemonic="%menu.m.mnemonic">
                 <dynamic
@@ -1071,7 +1070,6 @@
                    </reference>
                 </visibleWhen>
              </menu>
-             -->
           </menu>
          <command
                commandId="com.aptana.git.ui.command.github.network"

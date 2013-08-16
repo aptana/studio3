@@ -9,10 +9,18 @@ package com.aptana.git.internal.core.github;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.MessageFormat;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.json.simple.JSONObject;
 
+import com.aptana.core.util.StringUtil;
+import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.github.IGithubPullRequest;
+import com.aptana.git.core.github.IGithubRepository;
 
 /**
  * @author cwilliams
@@ -28,6 +36,10 @@ class GithubPullRequest implements IGithubPullRequest
 	private static final String NUMBER = "number"; //$NON-NLS-1$
 	private static final String TITLE = "title"; //$NON-NLS-1$
 	private static final String BODY = "body"; //$NON-NLS-1$
+	private static final String BASE2 = "base"; //$NON-NLS-1$
+	private static final String REPO = "repo"; //$NON-NLS-1$
+	private static final String HEAD = "head"; //$NON-NLS-1$
+	private static final String REF = "ref"; //$NON-NLS-1$
 
 	private JSONObject json;
 
@@ -61,4 +73,52 @@ class GithubPullRequest implements IGithubPullRequest
 		return (String) json.get(BODY);
 	}
 
+	public String getDisplayString()
+	{
+		return MessageFormat.format("#{0} - {1}", Long.toString(getNumber()), getTitle()); //$NON-NLS-1$
+	}
+
+	public IGithubRepository getHeadRepo()
+	{
+		JSONObject base = (JSONObject) json.get(HEAD);
+		return new GithubRepository((JSONObject) base.get(REPO));
+	}
+
+	public IGithubRepository getBaseRepo()
+	{
+		JSONObject base = (JSONObject) json.get(BASE2);
+		return new GithubRepository((JSONObject) base.get(REPO));
+	}
+
+	public IStatus merge(String commitMsg, IProgressMonitor monitor)
+	{
+		try
+		{
+			String input = null;
+			if (!StringUtil.isEmpty(commitMsg))
+			{
+				JSONObject json = new JSONObject();
+				json.put("commit_message", commitMsg);
+				input = json.toJSONString();
+			}
+
+			IGithubRepository baseRepo = getBaseRepo();
+
+			// TODO Grab the sha of the response so we can point to it?
+			JSONObject result = (JSONObject) new GithubAPI(GitPlugin.getDefault().getGithubManager().getUser())
+					.put(MessageFormat.format(
+							"/repos/{0}/{1}/pulls/{2}/merge", baseRepo.getOwner(), baseRepo.getName(), getNumber()), input); //$NON-NLS-1$
+			return Status.OK_STATUS;
+		}
+		catch (CoreException e)
+		{
+			return e.getStatus();
+		}
+	}
+
+	public String getHeadRef()
+	{
+		JSONObject base = (JSONObject) json.get(HEAD);
+		return (String) base.get(REF);
+	}
 }

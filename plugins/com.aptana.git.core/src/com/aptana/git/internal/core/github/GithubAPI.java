@@ -22,6 +22,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.osgi.framework.Version;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.git.core.GitPlugin;
@@ -126,48 +127,8 @@ class GithubAPI
 
 	protected Object post(String url, String data) throws CoreException
 	{
-		checkCredentials();
-		HttpURLConnection connection = null;
-		try
-		{
-			connection = createConnection(BASE_URL + url);
-			connection.setRequestMethod("POST"); //$NON-NLS-1$
-			connection.setDoInput(true);
-			connection.setDoOutput(true);
-
-			OutputStream out = connection.getOutputStream();
-			IOUtil.write(out, data);
-			out.close();
-
-			int code = connection.getResponseCode();
-			JSONParser parser = new JSONParser();
-			// Returns 201 created for quick ops, 202 for async ops like forking
-			if (code == HttpURLConnection.HTTP_CREATED || code == HttpURLConnection.HTTP_ACCEPTED)
-			{
-				String response = IOUtil.read(connection.getInputStream());
-				return parser.parse(response);
-			}
-			// read error message from response
-			String response = IOUtil.read(connection.getErrorStream());
-			JSONObject result = (JSONObject) parser.parse(response);
-			String msg = (String) result.get(ATTR_MESSAGE);
-			throw new CoreException(new Status(IStatus.ERROR, GitPlugin.PLUGIN_ID, code, msg, null));
-		}
-		catch (CoreException ce)
-		{
-			throw ce;
-		}
-		catch (Exception e)
-		{
-			throw new CoreException(new Status(IStatus.ERROR, GitPlugin.PLUGIN_ID, -1, null, e));
-		}
-		finally
-		{
-			if (connection != null)
-			{
-				connection.disconnect();
-			}
-		}
+		// Returns 201 created for quick ops, 202 for async ops like forking
+		return putOrPost(url, data, "POST", HttpURLConnection.HTTP_CREATED, HttpURLConnection.HTTP_ACCEPTED); //$NON-NLS-1$
 	}
 
 	private HttpURLConnection createConnection(String urlString) throws MalformedURLException, IOException
@@ -193,5 +154,66 @@ class GithubAPI
 		return MessageFormat.format(
 				"{0} {1}.{2}.{3}", EclipseUtil.getProductName(), version.getMajor(), version.getMinor(), //$NON-NLS-1$
 				version.getMicro());
+	}
+
+	protected Object put(String url, String data) throws CoreException
+	{
+		return putOrPost(url, data, "PUT", 200); //$NON-NLS-1$
+	}
+
+	/**
+	 * POST and PUT are nearly identical. This refactors out the common logic. Only difference is HTTP method (POST vs
+	 * PUT) and the expected HTTP return codes considered success.
+	 * 
+	 * @param url
+	 * @param data
+	 * @param method
+	 * @param successCodes
+	 * @return
+	 * @throws CoreException
+	 */
+	private Object putOrPost(String url, String data, String method, int... successCodes) throws CoreException
+	{
+		checkCredentials();
+		HttpURLConnection connection = null;
+		try
+		{
+			connection = createConnection(BASE_URL + url);
+			connection.setRequestMethod(method);
+			connection.setDoInput(true);
+			connection.setDoOutput(true);
+
+			OutputStream out = connection.getOutputStream();
+			IOUtil.write(out, data);
+			out.close();
+
+			int code = connection.getResponseCode();
+			JSONParser parser = new JSONParser();
+			if (CollectionsUtil.newSet(successCodes).contains(code))
+			{
+				String response = IOUtil.read(connection.getInputStream());
+				return parser.parse(response);
+			}
+			// read error message from response
+			String response = IOUtil.read(connection.getErrorStream());
+			JSONObject result = (JSONObject) parser.parse(response);
+			String msg = (String) result.get(ATTR_MESSAGE);
+			throw new CoreException(new Status(IStatus.ERROR, GitPlugin.PLUGIN_ID, code, msg, null));
+		}
+		catch (CoreException ce)
+		{
+			throw ce;
+		}
+		catch (Exception e)
+		{
+			throw new CoreException(new Status(IStatus.ERROR, GitPlugin.PLUGIN_ID, -1, null, e));
+		}
+		finally
+		{
+			if (connection != null)
+			{
+				connection.disconnect();
+			}
+		}
 	}
 }
