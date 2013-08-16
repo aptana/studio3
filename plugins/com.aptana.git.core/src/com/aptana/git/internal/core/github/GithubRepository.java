@@ -147,7 +147,6 @@ public class GithubRepository implements IGithubRepository
 		// branch
 		prObject.put("base", parent.getDefaultBranch()); //$NON-NLS-1$
 
-		// TODO Do something with the response?
 		JSONObject result = (JSONObject) getAPI().post(
 				((GithubRepository) parent).getAPIURL() + "/pulls", prObject.toJSONString()); //$NON-NLS-1$
 		return new GithubPullRequest(result);
