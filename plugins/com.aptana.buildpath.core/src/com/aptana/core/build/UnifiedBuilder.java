@@ -127,7 +127,15 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 				// Order is important here! If we check for enablement based on build type in prefs, the contributing
 				// plugin loads!
 				// FIXME is there any way to defer the second enablement check until after we do content type check?
-				return item != null && item.isEnabled(project) && item.isEnabled(BuildType.BUILD);
+				try
+				{
+					return item != null && item.isEnabled(project) && item.isEnabled(BuildType.BUILD);
+				}
+				catch (Exception e)
+				{
+					IdeLog.logWarning(BuildPathCorePlugin.getDefault(), e);
+					return false;
+				}
 			}
 		});
 	}
