@@ -22,7 +22,7 @@ public class AllTests
 	{
 		TestSuite suite = new TestSuite(AllTests.class.getName());
 		// $JUnit-BEGIN$
-		suite.addTestSuite(CreateBranchDialogTest.class);
+		// suite.addTestSuite(CreateBranchDialogTest.class);
 		suite.addTestSuite(DiffFormatterTest.class);
 		suite.addTestSuite(GitLightweightDecoratorTest.class);
 		suite.addTestSuite(HyperlinkDetectorTest.class);
