@@ -168,11 +168,11 @@ public class TypeElement extends BaseElement
 
 		if (object.containsKey(FUNCTIONS_PROPERTY))
 		{
-			List<PropertyElement> functions = IndexUtil.createList(object.get(FUNCTIONS_PROPERTY),
-					PropertyElement.class);
+			List<FunctionElement> functions = IndexUtil.createList(object.get(FUNCTIONS_PROPERTY),
+					FunctionElement.class);
 			if (!CollectionsUtil.isEmpty(functions))
 			{
-				for (PropertyElement function : functions)
+				for (FunctionElement function : functions)
 				{
 					this.addProperty(function);
 				}
