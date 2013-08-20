@@ -7,6 +7,10 @@
  */
 package com.aptana.samples.ui.views;
 
+import java.util.Collections;
+
+import org.eclipse.core.commands.Command;
+import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -21,12 +25,19 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.commands.ICommandService;
+import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.ViewPart;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.samples.ISampleListener;
 import com.aptana.samples.ISamplesManager;
 import com.aptana.samples.SamplesPlugin;
 import com.aptana.samples.model.IProjectSample;
+import com.aptana.samples.model.SamplesReference;
+import com.aptana.samples.ui.SamplesUIPlugin;
+import com.aptana.samples.ui.handlers.ImportSampleHandler;
 import com.aptana.theme.ThemePlugin;
 import com.aptana.ui.util.UIUtils;
 
@@ -116,6 +127,29 @@ public class SamplesView extends ViewPart
 				IStructuredSelection thisSelection = (IStructuredSelection) event.getSelection();
 				Object element = thisSelection.getFirstElement();
 				treeViewer.setExpandedState(element, !treeViewer.getExpandedState(element));
+				if (element instanceof SamplesReference)
+				{
+					// Run the import command.
+					ICommandService commandService = (ICommandService) PlatformUI.getWorkbench().getService(
+							ICommandService.class);
+					Command command = commandService.getCommand(ImportSampleHandler.COMMAND_ID);
+					if (command != null)
+					{
+						try
+						{
+							IHandlerService handlerService = (IHandlerService) PlatformUI.getWorkbench().getService(
+									IHandlerService.class);
+							ExecutionEvent ee = new ExecutionEvent(command, Collections.emptyMap(), null,
+									handlerService.getCurrentState());
+
+							command.executeWithChecks(ee);
+						}
+						catch (Exception e)
+						{
+							IdeLog.logError(SamplesUIPlugin.getDefault(), e);
+						}
+					}
+				}
 			}
 		});
 		ColumnViewerToolTipSupport.enableFor(treeViewer);

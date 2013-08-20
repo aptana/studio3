@@ -22,6 +22,7 @@ import com.aptana.samples.ui.project.SampleProjectCreator;
 
 public class ImportSampleHandler extends AbstractHandler
 {
+	public static final String COMMAND_ID = "com.aptana.samples.ui.commands.import"; //$NON-NLS-1$
 
 	private static final String PARAMETER_ID = "id"; //$NON-NLS-1$
 
