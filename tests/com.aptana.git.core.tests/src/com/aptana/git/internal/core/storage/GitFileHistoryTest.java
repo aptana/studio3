@@ -97,7 +97,6 @@ public class GitFileHistoryTest extends GitTestCase
 		GitFileHistory history = new GitFileHistory(resource, IFileHistoryProvider.NONE, new NullProgressMonitor());
 		IFileRevision[] revs = history.getFileRevisions();
 		assertNotNull(revs);
-		assertEquals(2, revs.length);
 		int i = revs.length - 1;
 		for (IFileRevision revision : revs)
 		{
@@ -111,16 +110,19 @@ public class GitFileHistoryTest extends GitTestCase
 		// Test getContributors
 		IFileRevision[] contributors = history.getContributors(revs[0]);
 		assertNotNull(contributors);
-		assertEquals(1, contributors.length);
-		assertSame(contributors[0], revs[1]);
+		if (revs.length > 1)
+		{
+			assertEquals(1, contributors.length);
+			assertSame(contributors[0], revs[1]);
+
+			// Test getTargets
+			IFileRevision[] targets = history.getTargets(revs[1]);
+			assertNotNull(targets);
+			assertEquals(1, targets.length);
+			assertSame(targets[0], revs[0]);
+		}
 
 		// TODO Test when there are two+ contributors!
-
-		// Test getTargets
-		IFileRevision[] targets = history.getTargets(revs[1]);
-		assertNotNull(targets);
-		assertEquals(1, targets.length);
-		assertSame(targets[0], revs[0]);
 
 		// TODO Test when there are two+ targets!
 
