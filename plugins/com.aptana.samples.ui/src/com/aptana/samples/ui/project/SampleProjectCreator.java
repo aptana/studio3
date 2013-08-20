@@ -11,6 +11,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.PlatformUI;
 
 import com.aptana.samples.model.IProjectSample;
+import com.aptana.ui.util.SWTUtils;
 import com.aptana.ui.util.UIUtils;
 
 /**
@@ -35,7 +36,7 @@ public class SampleProjectCreator
 		wizard.init(PlatformUI.getWorkbench(), null);
 		WizardDialog dialog = new WizardDialog(UIUtils.getActiveShell(), wizard);
 		dialog.create();
-		dialog.getShell().pack();
+		SWTUtils.centerAndPack(dialog.getShell(), UIUtils.getActiveWorkbenchWindow().getShell());
 		dialog.open();
 	}
 }

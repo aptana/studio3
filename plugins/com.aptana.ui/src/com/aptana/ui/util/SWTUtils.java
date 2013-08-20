@@ -73,8 +73,8 @@ public class SWTUtils
 	 */
 	public static void centerAndPack(Shell shell, Shell parent)
 	{
-		center(shell, parent);
 		shell.pack();
+		center(shell, parent);
 	}
 
 	/**
