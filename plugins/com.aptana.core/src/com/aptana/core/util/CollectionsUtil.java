@@ -811,4 +811,51 @@ public class CollectionsUtil
 		}
 		return collector;
 	}
+
+	/**
+	 * Partitions a collection by running the filtering operation over it. Any entries returning true will be put into
+	 * the first element of the return list. Any entries returning false will be put into the second. <br>
+	 * If the filter is empty, we return all results in the first value.<br>
+	 * If the collection is empty or null, we return a tuple holding two empty lists.
+	 * 
+	 * @param collection
+	 * @param filter
+	 * @return
+	 * @see http://ruby-doc.org/core-2.0/Enumerable.html#method-i-partition
+	 */
+	public static <T> ImmutableTuple<List<T>, List<T>> partition(Collection<T> collection, IFilter<T> filter)
+	{
+		if (isEmpty(collection))
+		{
+			// return an empty tuple
+			return new ImmutableTuple<List<T>, List<T>>(new ArrayList<T>(0), new ArrayList<T>(0));
+		}
+
+		if (filter == null)
+		{
+			return new ImmutableTuple<List<T>, List<T>>(new ArrayList<T>(collection), new ArrayList<T>(0));
+		}
+
+		// Assume even split for now
+		int size = collection.size();
+		ArrayList<T> trueResults = new ArrayList<T>(size / 2);
+		ArrayList<T> falseResults = new ArrayList<T>(size / 2);
+
+		for (T item : collection)
+		{
+			if (filter.include(item))
+			{
+				trueResults.add(item);
+			}
+			else
+			{
+				falseResults.add(item);
+			}
+		}
+		// trim up the lists
+		trueResults.trimToSize();
+		falseResults.trimToSize();
+
+		return new ImmutableTuple<List<T>, List<T>>(trueResults, falseResults);
+	}
 }

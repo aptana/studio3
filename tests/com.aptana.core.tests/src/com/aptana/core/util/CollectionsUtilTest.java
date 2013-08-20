@@ -789,4 +789,28 @@ public class CollectionsUtilTest extends TestCase
 		Integer firstElement = CollectionsUtil.getFirstElement(numbers);
 		assertEquals(new Integer(1), firstElement);
 	}
+
+	public void testCollectionPartition()
+	{
+		List<String> list = CollectionsUtil.newList("a", "ab", "ba", "b", "bc", "cb");
+		IFilter<String> selectWithA = new IFilter<String>()
+		{
+			public boolean include(String item)
+			{
+				return (item != null && item.contains("a"));
+			}
+		};
+		ImmutableTuple<List<String>, List<String>> partitioned = CollectionsUtil.partition(list, selectWithA);
+
+		assertNotNull(partitioned);
+		assertEquals("True list should contain 3 items", 3, partitioned.first.size());
+		assertTrue("True list should contain 'a'", partitioned.first.contains("a"));
+		assertTrue("True list should contain 'ab'", partitioned.first.contains("ab"));
+		assertTrue("True list should contain 'ba'", partitioned.first.contains("ba"));
+
+		assertEquals("False list should contain 3 items", 3, partitioned.second.size());
+		assertTrue("False list should contain 'b'", partitioned.second.contains("b"));
+		assertTrue("False list should contain 'bc'", partitioned.second.contains("bc"));
+		assertTrue("False list should contain 'cb'", partitioned.second.contains("cb"));
+	}
 }
