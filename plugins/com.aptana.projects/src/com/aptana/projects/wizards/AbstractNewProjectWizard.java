@@ -354,8 +354,8 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 		}
 		catch (InterruptedException e)
 		{
-			StatusManager.getManager().handle(new Status(IStatus.ERROR, ProjectsPlugin.PLUGIN_ID, e.getMessage(), e),
-					StatusManager.BLOCK);
+			// StatusManager.getManager().handle(new Status(IStatus.ERROR, ProjectsPlugin.PLUGIN_ID, e.getMessage(), e),
+			// StatusManager.BLOCK);
 		}
 		catch (InvocationTargetException e)
 		{
