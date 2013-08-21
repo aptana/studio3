@@ -142,7 +142,7 @@ public class GithubRepository implements IGithubRepository
 		prObject.put("title", title); //$NON-NLS-1$
 		prObject.put("body", body); //$NON-NLS-1$
 		// TODO Allow user to choose branch on the fork to use as contents for PR?
-		prObject.put("head", getGithubManager().getUser().getUsername() + ':' + branch); //$NON-NLS-1$
+		prObject.put("head", getOwner() + ':' + branch); //$NON-NLS-1$
 		// FIXME Allow user to choose the branch from parent to merge against. Default to the parent's default
 		// branch
 		prObject.put("base", parent.getDefaultBranch()); //$NON-NLS-1$

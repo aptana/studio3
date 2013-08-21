@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -68,6 +69,15 @@ public class CreatePullRequestHandler extends AbstractGithubHandler
 		try
 		{
 			IGithubRepository parentRepo = ghRepo.getParent();
+			if (parentRepo == null)
+			{
+				// there is no parent!
+				// TODO Maybe just let user create a PR against this repo's default branch? Requires changes to pass along head to method (and dialog)
+				// parentRepo = ghRepo;
+				MessageDialog.openError(getShell(), "No parent repository",
+						"Repository has no parent to open PRs against. Is this repo a fork?");
+				throw new ExecutionException("Repository has no parent to open PRs against. Is this repo a fork?");
+			}
 			parentName = parentRepo.getOwner();
 			parentBranch = parentRepo.getDefaultBranch();
 		}
@@ -77,7 +87,7 @@ public class CreatePullRequestHandler extends AbstractGithubHandler
 					MessageFormat.format("Failed to get name of parent repo for repo: {0}", ghRepo)); //$NON-NLS-1$
 		}
 		String base = parentName + ':' + parentBranch;
-		String head = GitPlugin.getDefault().getGithubManager().getUser().getUsername() + ':' + branch;
+		String head = ghRepo.getOwner() + ':' + branch;
 		// TODO Allow user to select different local and remote branch for PR?
 		CreatePullRequestDialog id = new CreatePullRequestDialog(UIUtils.getActiveShell(), branch,
 				commitsStatus.isOK() ? commitsStatus.getMessage() : StringUtil.EMPTY, base, head);
