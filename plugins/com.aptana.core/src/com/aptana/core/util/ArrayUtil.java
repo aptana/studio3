@@ -101,4 +101,20 @@ public class ArrayUtil
 		}
 		return array.length;
 	}
+
+	public static boolean contains(int[] array, int item)
+	{
+		if (array == null || array.length == 0)
+		{
+			return false;
+		}
+		for (int x : array)
+		{
+			if (x == item)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 }

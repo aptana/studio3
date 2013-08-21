@@ -22,7 +22,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.osgi.framework.Version;
 
-import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.git.core.GitPlugin;
@@ -158,7 +158,7 @@ class GithubAPI
 
 	protected Object put(String url, String data) throws CoreException
 	{
-		return putOrPost(url, data, "PUT", 200); //$NON-NLS-1$
+		return putOrPost(url, data, "PUT", HttpURLConnection.HTTP_OK); //$NON-NLS-1$
 	}
 
 	/**
@@ -189,7 +189,7 @@ class GithubAPI
 
 			int code = connection.getResponseCode();
 			JSONParser parser = new JSONParser();
-			if (CollectionsUtil.newSet(successCodes).contains(code))
+			if (ArrayUtil.contains(successCodes, code))
 			{
 				String response = IOUtil.read(connection.getInputStream());
 				return parser.parse(response);
