@@ -269,25 +269,25 @@
             categoryId="com.aptana.git.ui.category"
             defaultHandler="com.aptana.git.ui.internal.actions.PullFromRemoteHandler"
             id="com.aptana.git.ui.command.pull_from_remote"
-            name="%PullRemoteAction_tooltip">
+            name="%PullFromRemoteAction_tooltip">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
             defaultHandler="com.aptana.git.ui.internal.actions.CreatePullRequestHandler"
             id="com.aptana.git.ui.command.create_pull_request"
-            name="Create Pull Request...">
+            name="%CreatePullRequestAction_label">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
             defaultHandler="com.aptana.git.ui.internal.actions.ViewPullRequestHandler"
             id="com.aptana.git.ui.command.view_pull_request"
-            name="View Pull Request...">
+            name="%ViewPullRequestAction_label">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
             defaultHandler="com.aptana.git.ui.internal.actions.MergePullRequestHandler"
             id="com.aptana.git.ui.command.merge_pull_request"
-            name="Merge Pull Request...">
+            name="%MergePullRequestAction_label">
       </command>
       <!--
       <command
