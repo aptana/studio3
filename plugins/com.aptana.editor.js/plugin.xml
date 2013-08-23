@@ -130,7 +130,7 @@
    <extension
          point="com.aptana.build.ui.buildParticipantPreferenceComposite">
       <preferenceComposite
-            buildParticipantId="com.aptana.editor.js.validator.JSLintValidator"
+            buildParticipantId="com.aptana.js.core.JSLintValidator"
             class="com.aptana.editor.js.validator.JSLintValidatorPreferenceCompositeFactory">
       </preferenceComposite>
       <preferenceComposite

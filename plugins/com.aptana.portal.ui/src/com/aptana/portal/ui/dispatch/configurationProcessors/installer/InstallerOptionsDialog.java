@@ -34,6 +34,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import com.aptana.core.CoreStrings;
+import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.portal.ui.dispatch.configurationProcessors.Messages;
 
@@ -168,13 +169,13 @@ public abstract class InstallerOptionsDialog extends TitleAreaDialog
 		{
 			public void keyReleased(org.eclipse.swt.events.KeyEvent e)
 			{
-				attributes.put(INSTALL_DIR_ATTR, path.getText());
+				attributes.put(INSTALL_DIR_ATTR, PlatformUtil.expandEnvironmentStrings(path.getText().trim()));
 				validatePath();
 			}
 
 			public void keyPressed(org.eclipse.swt.events.KeyEvent e)
 			{
-				attributes.put(INSTALL_DIR_ATTR, path.getText());
+				attributes.put(INSTALL_DIR_ATTR, PlatformUtil.expandEnvironmentStrings(path.getText().trim()));
 				validatePath();
 			}
 		});
@@ -219,7 +220,7 @@ public abstract class InstallerOptionsDialog extends TitleAreaDialog
 	{
 		if (createInstallDir)
 		{
-			File f = new File(path.getText());
+			File f = new File(PlatformUtil.expandEnvironmentStrings(path.getText()));
 			if (!f.exists() && !f.mkdirs())
 			{
 				// Display an error message about the problem and return here to prevent a dialog close.
@@ -237,13 +238,14 @@ public abstract class InstallerOptionsDialog extends TitleAreaDialog
 	 */
 	protected void validatePath()
 	{
-		String pathText = path.getText();
-		if (pathText.trim().length() == 0)
+		String pathText = path.getText().trim();
+		if (pathText.length() == 0)
 		{
 			// empty path
 			setErrorMessage(Messages.InstallerOptionsDialog_emptyPathError);
 			return;
 		}
+		pathText = PlatformUtil.expandEnvironmentStrings(pathText);
 		if (!new File(pathText).exists())
 		{
 			if (createInstallDir)

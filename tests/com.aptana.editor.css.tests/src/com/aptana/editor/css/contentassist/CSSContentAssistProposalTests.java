@@ -34,7 +34,7 @@ import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.SnippetElement;
 
 /**
- * JSContentAssistProposalTests
+ * CSSContentAssistProposalTests
  */
 public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 {
