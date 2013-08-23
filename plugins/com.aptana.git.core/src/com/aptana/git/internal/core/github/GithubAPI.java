@@ -13,6 +13,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.MessageFormat;
+import java.util.Arrays;
 
 import org.eclipse.core.internal.preferences.Base64;
 import org.eclipse.core.runtime.CoreException;
@@ -196,6 +197,16 @@ class GithubAPI
 			}
 			// read error message from response
 			String response = IOUtil.read(connection.getErrorStream());
+			if (response == null)
+			{
+				throw new CoreException(
+						new Status(
+								IStatus.ERROR,
+								GitPlugin.PLUGIN_ID,
+								code,
+								MessageFormat
+										.format("Empty error response body from server. Response code: {0}, expected success codes: {1}", code, Arrays.toString(successCodes)), null)); //$NON-NLS-1$
+			}
 			JSONObject result = (JSONObject) parser.parse(response);
 			String msg = (String) result.get(ATTR_MESSAGE);
 			throw new CoreException(new Status(IStatus.ERROR, GitPlugin.PLUGIN_ID, code, msg, null));
