@@ -43,7 +43,7 @@ public class ProcessUtil
 {
 
 	public static final String TEXT_TO_OBFUSCATE = "textToObfuscate"; //$NON-NLS-1$
-	protected static boolean isJava7 = VersionUtil.compareVersions("1.7", System.getProperty("java.version")) >= 0; //$NON-NLS-1$ //$NON-NLS-2$
+	protected static boolean isJava7 = VersionUtil.compareVersions(System.getProperty("java.version"), "1.7") >= 0; //$NON-NLS-1$ //$NON-NLS-2$
 	private static final String MASK = StringUtil.repeat('*', 10);
 
 	private static ProcessUtil fgInstance;
