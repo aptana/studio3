@@ -432,7 +432,7 @@ public class GitRepository
 				@Override
 				public void fileDeleted(int wd, String rootPath, final String name)
 				{
-					if (name == null || name.endsWith(DOT_LOCK))
+					if (name == null || name.endsWith(DOT_LOCK) || branches == null)
 					{
 						return;
 					}
@@ -450,6 +450,10 @@ public class GitRepository
 						{
 							// the branch may in fact still exists
 							reloadRefs();
+							if (branches == null)
+							{
+								return Status.OK_STATUS;
+							}
 							// only fires the event if the branch is indeed removed
 							boolean contains = false;
 							synchronized (branches)
