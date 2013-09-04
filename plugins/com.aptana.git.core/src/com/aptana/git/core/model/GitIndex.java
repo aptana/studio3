@@ -167,8 +167,8 @@ public class GitIndex
 		}
 		if (!result.isOK())
 		{
-			return new Status(IStatus.ERROR, GitPlugin.getPluginId(),
-					"Unable to run update-index: " + result.getMessage()); //$NON-NLS-1$
+			IdeLog.logError(GitPlugin.getDefault(), "Unable to run update-index: " + result.getMessage()); //$NON-NLS-1$
+			return result;
 		}
 
 		Set<Callable<IStatus>> jobs = new HashSet<Callable<IStatus>>(3);
