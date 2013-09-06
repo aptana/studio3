@@ -40,6 +40,7 @@ import net.contentobjects.jnotify.JNotifyAdapter;
 import net.contentobjects.jnotify.JNotifyException;
 import net.contentobjects.jnotify.JNotifyListener;
 
+import org.apache.tools.ant.util.CollectionUtils;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -1086,40 +1087,64 @@ public class GitRepository
 
 	private void fireBranchChangeEvent(String oldBranchName, String newBranchName)
 	{
-		if (listeners == null || listeners.isEmpty())
+		if (CollectionsUtil.isEmpty(listeners))
 		{
 			return;
 		}
-		BranchChangedEvent e = new BranchChangedEvent(this, oldBranchName, newBranchName);
-		for (IGitRepositoryListener listener : listeners)
+		try
 		{
-			listener.branchChanged(e);
+			Set<IGitRepositoryListener> copy = new HashSet<IGitRepositoryListener>(listeners);
+			BranchChangedEvent e = new BranchChangedEvent(this, oldBranchName, newBranchName);
+			for (IGitRepositoryListener listener : copy)
+			{
+				listener.branchChanged(e);
+			}
+		}
+		catch (NullPointerException e)
+		{
+			// ignores
 		}
 	}
 
 	private void fireBranchRemovedEvent(String oldBranchName)
 	{
-		if (listeners == null || listeners.isEmpty())
+		if (CollectionsUtil.isEmpty(listeners))
 		{
 			return;
 		}
-		BranchRemovedEvent e = new BranchRemovedEvent(this, oldBranchName);
-		for (IGitRepositoryListener listener : listeners)
+		try
 		{
-			listener.branchRemoved(e);
+			Set<IGitRepositoryListener> copy = new HashSet<IGitRepositoryListener>(listeners);
+			BranchRemovedEvent e = new BranchRemovedEvent(this, oldBranchName);
+			for (IGitRepositoryListener listener : copy)
+			{
+				listener.branchRemoved(e);
+			}
+		}
+		catch (NullPointerException e)
+		{
+			// ignores
 		}
 	}
 
 	private void fireBranchAddedEvent(String newBranchName)
 	{
-		if (listeners == null || listeners.isEmpty())
+		if (CollectionsUtil.isEmpty(listeners))
 		{
 			return;
 		}
-		BranchAddedEvent e = new BranchAddedEvent(this, newBranchName);
-		for (IGitRepositoryListener listener : listeners)
+		try
 		{
-			listener.branchAdded(e);
+			Set<IGitRepositoryListener> copy = new HashSet<IGitRepositoryListener>(listeners);
+			BranchAddedEvent e = new BranchAddedEvent(this, newBranchName);
+			for (IGitRepositoryListener listener : copy)
+			{
+				listener.branchAdded(e);
+			}
+		}
+		catch (NullPointerException e)
+		{
+			// ignores
 		}
 	}
 
@@ -1136,9 +1161,17 @@ public class GitRepository
 		{
 			return;
 		}
-		for (IGitRepositoryListener listener : listeners)
+		try
 		{
-			listener.indexChanged(e);
+			Set<IGitRepositoryListener> copy = new HashSet<IGitRepositoryListener>(listeners);
+			for (IGitRepositoryListener listener : copy)
+			{
+				listener.indexChanged(e);
+			}
+		}
+		catch (NullPointerException npe)
+		{
+			// ignores
 		}
 	}
 
