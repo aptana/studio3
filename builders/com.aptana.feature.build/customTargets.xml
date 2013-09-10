@@ -236,7 +236,6 @@
 			<!-- need to include the binaries of the non-included source packages like org.jruby or org.w3c -->
 			<dirset dir="${buildDirectory}/plugins">
 				<include name="beaver*/bin" />
-				<include name="com.amazon.*/bin" />
 				<include name="org.*/bin" />
 				<include name="json.*/bin" />
 			</dirset>
