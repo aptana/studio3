@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -18,7 +18,6 @@ import java.util.UUID;
 import org.eclipse.core.runtime.Platform;
 
 import com.aptana.core.CorePlugin;
-import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
@@ -70,7 +69,7 @@ public class AnalyticsEvent
 		}
 		catch (Exception ex)
 		{
-			IdeLog.logError(UsagePlugin.getDefault(), "Unable to log analytics information", ex); //$NON-NLS-1$
+			UsagePlugin.logError("Unable to log analytics information: " + ex.getMessage()); //$NON-NLS-1$
 		}
 	}
 
@@ -85,7 +84,7 @@ public class AnalyticsEvent
 		}
 		catch (Exception ex)
 		{
-			IdeLog.logError(UsagePlugin.getDefault(), "Unable to log analytics information", ex); //$NON-NLS-1$
+			UsagePlugin.logError("Unable to log analytics information: " + ex.getMessage()); //$NON-NLS-1$
 		}
 	}
 

@@ -25,8 +25,10 @@ import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.CorePlugin;
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.usage.AnalyticsEvent;
 import com.aptana.usage.AnalyticsInfo;
 import com.aptana.usage.FeatureEvent;
@@ -171,14 +173,13 @@ public class SendPingJob extends Job
 					IProject project = event.getResource().getProject();
 					IProjectDescription description = project.getDescription();
 					String[] natures = description.getNatureIds();
-					String projectType;
-					for (String nature : natures)
+					if (!ArrayUtil.isEmpty(natures))
 					{
-						projectType = STUDIO_NATURE_MAP.get(nature);
-						if (projectType != null)
+						// just checking the primary nature
+						String projectType = STUDIO_NATURE_MAP.get(natures[0]);
+						if (!StringUtil.isEmpty(projectType))
 						{
 							sendProjectDeleteEvent(project, projectType);
-							break;
 						}
 					}
 				}

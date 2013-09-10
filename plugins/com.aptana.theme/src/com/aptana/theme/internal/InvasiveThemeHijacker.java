@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -50,7 +50,6 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPartListener2;
-import org.eclipse.ui.IStartup;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
@@ -93,7 +92,7 @@ import com.aptana.ui.util.UIUtils;
  * @author cwilliams
  */
 @SuppressWarnings({ "restriction", "deprecation" })
-public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPreferenceChangeListener, IStartup,
+public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPreferenceChangeListener,
 		IPageChangedListener
 {
 
@@ -108,11 +107,10 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 	private ISelectionChangedListener pageListener;
 	private Map<IViewPart, IQueryListener> queryListeners = new HashMap<IViewPart, IQueryListener>(3);
 	private boolean fIsPartListener;
-	private static boolean ranEarlyStartup = false;
 
 	public InvasiveThemeHijacker()
 	{
-		super("Installing invasive theme hijacker!"); //$NON-NLS-1$
+		super("Installing Studio theme hijacker"); //$NON-NLS-1$
 		EclipseUtil.setSystemForJob(this);
 	}
 
@@ -338,7 +336,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 		else if (view instanceof IDebugView)
 		{
 			IDebugView debug = (IDebugView) view;
-			if (view.getClass().getName().endsWith("PerformanceSnapshotView"))
+			if (view.getClass().getName().endsWith("PerformanceSnapshotView")) //$NON-NLS-1$
 			{
 				return;
 			}
@@ -1308,25 +1306,12 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 		}
 	}
 
-	/**
-	 * Schedules itself to override Java/PDE views and editors' coloring only if invasive themes are enabled.
-	 */
-	public synchronized void earlyStartup()
+	public void apply()
 	{
-		if (ranEarlyStartup)
-		{
-			return;
-		}
-		ranEarlyStartup = true;
 		if (applyToViews())
 		{
 			schedule();
 		}
-	}
-
-	public void apply()
-	{
-		earlyStartup();
 		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID);
 		prefs.addPreferenceChangeListener(this);
 	}

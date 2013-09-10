@@ -395,10 +395,4 @@
          </enablement>
       </consolePageParticipant>
    </extension>
-   <extension
-         point="org.eclipse.ui.startup">
-      <startup
-            class="com.aptana.ui.PingStartup">
-      </startup>
-   </extension>
 </plugin>

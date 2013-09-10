@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -34,6 +34,7 @@ import com.aptana.core.util.EclipseUtil;
 import com.aptana.ui.internal.WebPerspectiveFactory;
 import com.aptana.ui.preferences.IPreferenceConstants;
 import com.aptana.ui.util.UIUtils;
+import com.aptana.usage.UsagePlugin;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -113,6 +114,9 @@ public class UIPlugin extends AbstractUIPlugin
 		};
 		EclipseUtil.setSystemForJob(job);
 		job.schedule();
+
+		// force usage plugin to start
+		UsagePlugin.getDefault();
 	}
 
 	/*
