@@ -14,12 +14,6 @@
 <login>tester</login>
 <compression>AUTO</compression>
 </connection>
-<connection id="ab96e9dc-b38b-47bf-9afd-fd753f73d4b3" type="s3">
-<name>S3</name>
-<host>s3.amazonaws.com</host>
-<path>/S3</path>
-<accessKey>tester</accessKey>
-</connection>
 <connection id="a1df2047-0bf0-4642-9f06-ed89e11feca5" type="ftps">
 <name>FTPS1</name>
 <host>FTPS1</host>
