@@ -10,10 +10,13 @@ package com.aptana.ui.dialogs;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
@@ -91,6 +94,18 @@ public class MinimizableWizardDialog extends WizardDialog
 					});
 			toast.open();
 			activeShell.setVisible(false);
+
+			activeShell.addListener(SWT.Show, new Listener()
+			{
+				public void handleEvent(Event event)
+				{
+					if (toast != null)
+					{
+						// Incase if the shell is opened through other source, close the toast
+						toast.close();
+					}
+				}
+			});
 
 			activeShell.addShellListener(new ShellAdapter()
 			{
@@ -180,5 +195,10 @@ public class MinimizableWizardDialog extends WizardDialog
 				button.setEnabled(false);
 			}
 		}
+	}
+
+	public GenericInfoPopupDialog getToastPopup()
+	{
+		return toast;
 	}
 }
