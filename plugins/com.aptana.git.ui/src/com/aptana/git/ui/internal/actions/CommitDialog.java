@@ -92,6 +92,7 @@ import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.DiffFormatter;
 import com.aptana.git.ui.GitUIPlugin;
+import com.aptana.ui.util.UIUtils;
 
 class CommitDialog extends StatusDialog
 {
@@ -583,33 +584,7 @@ class CommitDialog extends StatusDialog
 				Point p = event.gc.stringExtent(text); // is text wider than available width?
 				if (p.x > width)
 				{
-					// chop string in half and drop a few characters
-					int middle = text.length() / 2;
-					String beginning = text.substring(0, middle - 1);
-					String end = text.substring(middle + 2, text.length());
-					// Now repeatedly chop off one char from each end until we fit
-					// TODO Chop each side separately? it'd take more loops, but text would fit tighter when uneven
-					// lengths work better..
-					while (event.gc.stringExtent(beginning + "..." + end).x > width) //$NON-NLS-1$
-					{
-						if (beginning.length() > 0)
-						{
-							beginning = beginning.substring(0, beginning.length() - 1);
-						}
-						else
-						{
-							break;
-						}
-						if (end.length() > 0)
-						{
-							end = end.substring(1);
-						}
-						else
-						{
-							break;
-						}
-					}
-					text = beginning + "..." + end; //$NON-NLS-1$
+					text = UIUtils.shortenText(text, width);
 				}
 				event.gc.drawText(text, event.x, event.y, true);
 
