@@ -35,6 +35,7 @@ import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.core.runtime.preferences.DefaultScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.osgi.framework.internal.core.FrameworkProperties;
 import org.eclipse.osgi.service.datalocation.Location;
@@ -42,6 +43,7 @@ import org.eclipse.osgi.service.debug.DebugOptions;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.CorePlugin;
 import com.aptana.core.ICorePreferenceConstants;
@@ -719,6 +721,28 @@ public class EclipseUtil
 			/* IGNORE */
 		}
 		return null;
+	}
+
+	/**
+	 * Migrate the existing preferences from instance scope to configuration scope.
+	 */
+	public static void migratePreference(String pluginId, String preferenceKey)
+	{
+		IEclipsePreferences prefsNode = EclipseUtil.configurationScope().getNode(pluginId);
+		if (StringUtil.EMPTY.equals(prefsNode.get(preferenceKey, StringUtil.EMPTY)))
+		{
+			String instancePrefValue = EclipseUtil.instanceScope().getNode(pluginId)
+					.get(preferenceKey, StringUtil.EMPTY);
+			prefsNode.put(preferenceKey, instancePrefValue);
+			try
+			{
+				prefsNode.flush();
+			}
+			catch (BackingStoreException e)
+			{
+				IdeLog.logWarning(CorePlugin.getDefault(), e.getMessage(), e);
+			}
+		}
 	}
 
 }
