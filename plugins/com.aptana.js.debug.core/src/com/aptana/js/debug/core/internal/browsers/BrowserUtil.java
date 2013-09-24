@@ -179,7 +179,7 @@ public final class BrowserUtil {
 				/* refresh dll file */
 				try {
 					File file = dllPath.toFile();
-					String currentDllPath = PlatformUtil.queryRegestryStringValue(
+					String currentDllPath = PlatformUtil.queryRegistryStringValue(
 							"HKCR\\CLSID\\{B8ADD4EA-ADE3-4DEB-A957-9BBD17D6D0C8}\\InprocServer32", null); //$NON-NLS-1$
 					boolean pathMatch = (currentDllPath != null && file.getAbsolutePath().compareTo(
 							new File(currentDllPath).getAbsolutePath()) == 0);
@@ -214,7 +214,7 @@ public final class BrowserUtil {
 									"/s", //$NON-NLS-1$
 									dllPath.toOSString() }, -1);
 						}
-						currentDllPath = PlatformUtil.queryRegestryStringValue(
+						currentDllPath = PlatformUtil.queryRegistryStringValue(
 								"HKCR\\CLSID\\{B8ADD4EA-ADE3-4DEB-A957-9BBD17D6D0C8}\\InprocServer32", null); //$NON-NLS-1$
 						if (currentDllPath == null
 								|| file.getAbsolutePath().compareTo(new File(currentDllPath).getAbsolutePath()) != 0) {
@@ -358,7 +358,7 @@ public final class BrowserUtil {
 			} else if (InternetExplorer.isBrowserExecutable(browserExecutable)) {
 				// XXX: temporary check if PDM is installed
 				while (true) {
-					if (PlatformUtil.queryRegestryStringValue(
+					if (PlatformUtil.queryRegistryStringValue(
 							"HKCR\\CLSID\\{04CCE2FF-A7D3-11D0-B436-00A0244A1DD2}\\InprocServer32", null) == null) { //$NON-NLS-1$
 						Boolean retry = (Boolean) prompter.handleStatus(installDebuggerPromptStatus, "nopdm"); //$NON-NLS-1$
 						if (retry != null && retry.booleanValue()) {
