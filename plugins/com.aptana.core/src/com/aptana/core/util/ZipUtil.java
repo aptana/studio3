@@ -85,6 +85,10 @@ public final class ZipUtil
 	 */
 	public static IStatus extract(File zipFile, File destinationPath, IProgressMonitor monitor) throws IOException
 	{
+		if (canDoNativeUnzip(Conflict.SKIP, null))
+		{
+			return nativeUnzip(zipFile, destinationPath, Conflict.SKIP, monitor);
+		}
 		return extract(new ZipFile(zipFile), destinationPath, monitor);
 	}
 
@@ -101,6 +105,11 @@ public final class ZipUtil
 	public static IStatus extract(File zipFile, File destinationPath, boolean overwrite, IProgressMonitor monitor)
 			throws IOException
 	{
+		Conflict whatToDo = overwrite ? Conflict.OVERWRITE : Conflict.SKIP;
+		if (canDoNativeUnzip(whatToDo, null))
+		{
+			return nativeUnzip(zipFile, destinationPath, whatToDo, monitor);
+		}
 		return extract(new ZipFile(zipFile), destinationPath, overwrite, monitor);
 	}
 
@@ -113,6 +122,10 @@ public final class ZipUtil
 	public static IStatus extract(File file, IPath location, Conflict prompt, IProgressMonitor monitor)
 			throws IOException
 	{
+		if (canDoNativeUnzip(prompt, null))
+		{
+			return nativeUnzip(file, location.toFile(), prompt, monitor);
+		}
 		return extract(file, location.toFile(), prompt, null, monitor);
 	}
 
@@ -128,8 +141,49 @@ public final class ZipUtil
 	public static IStatus extract(File zipFile, File destinationPath, Conflict overwrite,
 			IInputStreamTransformer transformer, IProgressMonitor monitor) throws IOException
 	{
+		if (canDoNativeUnzip(overwrite, transformer))
+		{
+			return nativeUnzip(zipFile, destinationPath, overwrite, monitor);
+		}
+
 		ZipFile zip = new ZipFile(zipFile);
 		return extract(zip, zip.getEntries(), destinationPath, overwrite, transformer, monitor);
+	}
+
+	/**
+	 * Are the conditions right that we can cheat and use native unzip? Must not be on Windows, be doing no
+	 * transformations on the contents and not be prompting in case of conflicts. Oh, and they have to have "unzip" on
+	 * their PATH.
+	 * 
+	 * @param whatToDo
+	 * @param transformer
+	 * @return
+	 */
+	private static boolean canDoNativeUnzip(Conflict whatToDo, IInputStreamTransformer transformer)
+	{
+		if (transformer != null || PlatformUtil.isWindows() || whatToDo == Conflict.PROMPT)
+		{
+			return false;
+		}
+		IPath unzip = ExecutableUtil.find("unzip", false, null); //$NON-NLS-1$
+		return unzip.toFile().isFile();
+	}
+
+	/**
+	 * A speed hack! Native unzip command is way faster since it can handle doing it all at once and preserve
+	 * permissions. That way we don't need to run a million chmods.
+	 * 
+	 * @return
+	 */
+	private static IStatus nativeUnzip(File zip, File destination, Conflict overwrite, IProgressMonitor monitor)
+	{
+		String overwriteFlag = "-o"; //$NON-NLS-1$
+		if (overwrite == Conflict.SKIP)
+		{
+			overwriteFlag = "-n"; //$NON-NLS-1$
+		}
+		return ProcessUtil.run("unzip", null, null, null, monitor, overwriteFlag, zip.getAbsolutePath(), "-d", //$NON-NLS-1$ //$NON-NLS-2$
+				destination.getAbsolutePath());
 	}
 
 	/**
