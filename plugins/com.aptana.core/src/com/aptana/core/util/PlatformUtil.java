@@ -554,24 +554,11 @@ public final class PlatformUtil
 	 * @param valueName
 	 * @return value of regestry key
 	 */
-	public static String queryRegestryStringValue(String keyName, String valueName)
+	public static String queryRegistryStringValue(String keyName, String valueName)
 	{
 		if (Platform.OS_WIN32.equals(Platform.getOS()))
 		{
-			long hRootKey;
-			if (keyName.startsWith("HKCR\\") || keyName.startsWith("HKEY_CLASSES_ROOT\\")) { //$NON-NLS-1$ //$NON-NLS-2$
-				hRootKey = CoreNatives.HKEY_CLASSES_ROOT;
-			}
-			else if (keyName.startsWith("HKLM\\") || keyName.startsWith("HKEY_LOCAL_MACHINE\\")) { //$NON-NLS-1$ //$NON-NLS-2$
-				hRootKey = CoreNatives.HKEY_LOCAL_MACHINE;
-			}
-			else if (keyName.startsWith("HKCU\\") || keyName.startsWith("HKEY_CURRENT_USER\\")) { //$NON-NLS-1$ //$NON-NLS-2$
-				hRootKey = CoreNatives.HKEY_CURRENT_USER;
-			}
-			else
-			{
-				throw new IllegalArgumentException("Invalid regestry key name"); //$NON-NLS-1$
-			}
+			long hRootKey = getRootKey(keyName);
 			keyName = keyName.substring(keyName.indexOf('\\') + 1);
 			long[] hKey = new long[1];
 			if (CoreNatives.RegOpenKey(hRootKey, keyName, CoreNatives.KEY_READ, hKey))
@@ -586,31 +573,18 @@ public final class PlatformUtil
 	}
 
 	/**
-	 * setRegestryStringValue
+	 * setRegistryStringValue
 	 * 
 	 * @param keyName
 	 * @param valueName
 	 * @param value
 	 * @return result of operation
 	 */
-	public static boolean setRegestryStringValue(String keyName, String valueName, String value)
+	public static boolean setRegistryStringValue(String keyName, String valueName, String value)
 	{
 		if (Platform.OS_WIN32.equals(Platform.getOS()))
 		{
-			long hRootKey;
-			if (keyName.startsWith("HKCR\\") || keyName.startsWith("HKEY_CLASSES_ROOT\\")) { //$NON-NLS-1$ //$NON-NLS-2$
-				hRootKey = CoreNatives.HKEY_CLASSES_ROOT;
-			}
-			else if (keyName.startsWith("HKLM\\") || keyName.startsWith("HKEY_LOCAL_MACHINE\\")) { //$NON-NLS-1$ //$NON-NLS-2$
-				hRootKey = CoreNatives.HKEY_LOCAL_MACHINE;
-			}
-			else if (keyName.startsWith("HKCU\\") || keyName.startsWith("HKEY_CURRENT_USER\\")) { //$NON-NLS-1$ //$NON-NLS-2$
-				hRootKey = CoreNatives.HKEY_CURRENT_USER;
-			}
-			else
-			{
-				throw new IllegalArgumentException("Invalid regestry key name"); //$NON-NLS-1$
-			}
+			long hRootKey = getRootKey(keyName);
 			keyName = keyName.substring(keyName.indexOf('\\') + 1);
 			long[] hKey = new long[1];
 			if (CoreNatives.RegCreateKey(hRootKey, keyName, CoreNatives.KEY_WRITE, hKey))
@@ -621,6 +595,25 @@ public final class PlatformUtil
 			}
 		}
 		return false;
+	}
+
+	private static long getRootKey(String keyName)
+	{
+		long hRootKey;
+		if (keyName.startsWith("HKCR\\") || keyName.startsWith("HKEY_CLASSES_ROOT\\")) { //$NON-NLS-1$ //$NON-NLS-2$
+			hRootKey = CoreNatives.HKEY_CLASSES_ROOT;
+		}
+		else if (keyName.startsWith("HKLM\\") || keyName.startsWith("HKEY_LOCAL_MACHINE\\")) { //$NON-NLS-1$ //$NON-NLS-2$
+			hRootKey = CoreNatives.HKEY_LOCAL_MACHINE;
+		}
+		else if (keyName.startsWith("HKCU\\") || keyName.startsWith("HKEY_CURRENT_USER\\")) { //$NON-NLS-1$ //$NON-NLS-2$
+			hRootKey = CoreNatives.HKEY_CURRENT_USER;
+		}
+		else
+		{
+			throw new IllegalArgumentException("Invalid registry key name"); //$NON-NLS-1$
+		}
+		return hRootKey;
 	}
 
 	/**
