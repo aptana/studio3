@@ -80,6 +80,19 @@ public class NodeJSService implements INodeJSService
 	{
 		if (PlatformUtil.isWindows())
 		{
+			// Look in the registry!
+			String installedPath = PlatformUtil.queryRegistryStringValue("HKEY_CURRENT_USER\\Software\\Node.js", //$NON-NLS-1$
+					"InstallPath"); //$NON-NLS-1$
+			if (!StringUtil.isEmpty(installedPath))
+			{
+				IPath regPath = Path.fromOSString(installedPath).append(NODE_EXE);
+				if (regPath.toFile().isFile())
+				{
+					return regPath;
+				}
+			}
+
+			// Look on the PATH and in standard locations
 			// @formatter:off
 			return ExecutableUtil.find(NODE_EXE, false, 
 					CollectionsUtil.newList(
