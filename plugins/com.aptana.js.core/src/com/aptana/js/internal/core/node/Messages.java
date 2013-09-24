@@ -35,6 +35,7 @@ public class Messages extends NLS
 	public static String NodePackageManager_FailedToDetermineLatestVersion;
 	public static String NodePackageManager_FailedUninstallError;
 	public static String NodePackageManager_InstallingTaskName;
+	public static String NodePackageManager_PasswordPrompt;
 	public static String NodePackageManager_SudoPrompt;
 
 	static
