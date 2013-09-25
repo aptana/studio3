@@ -144,6 +144,15 @@ public class NodePackageManager implements INodePackageManager
 				if (npmStatus.isOK())
 				{
 					String prefix = npmStatus.getMessage();
+
+					// If the sudo cache is timed out, then the password prompt and other details might appear in the
+					// console. So we should strip them off to get the real npm prefix value.
+					String passwordPrompt = StringUtil.makeFormLabel(Messages.NodePackageManager_PasswordPrompt);
+					if (prefix.contains(passwordPrompt))
+					{
+						prefix = prefix.substring(prefix.indexOf(passwordPrompt) + passwordPrompt.length());
+					}
+
 					// Set the global prefix path only if it is not the default value.
 					if (!prefixPath.toOSString().equals(prefix))
 					{
@@ -223,7 +232,8 @@ public class NodePackageManager implements INodePackageManager
 	{
 		List<String> sudoArgs = getNpmSudoArgs(global);
 		sudoArgs.addAll(args);
-		return ProcessUtil.run(CollectionsUtil.getFirstElement(sudoArgs), workingDirectory, password, ShellExecutable.getEnvironment(), monitor,
+		return ProcessUtil.run(CollectionsUtil.getFirstElement(sudoArgs), workingDirectory, password,
+				ShellExecutable.getEnvironment(), monitor,
 				sudoArgs.subList(1, sudoArgs.size()).toArray(new String[sudoArgs.size() - 1]));
 	}
 
