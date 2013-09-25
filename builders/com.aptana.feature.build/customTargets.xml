@@ -36,6 +36,11 @@
 		<!-- Grab the pre-defined set of bundles -->
 		<parallel>
 			<antcall target="clone-bundle">
+				<param name="bundle.name" value="coffeescript.ruble" />
+				<param name="bundle.dir.name" value="coffeescript.ruble" />
+				<param name="bundle.branch" value="${scs.branch.name}" />
+			</antcall>
+			<antcall target="clone-bundle">
 				<param name="bundle.name" value="text.ruble" />
 				<param name="bundle.dir.name" value="text.ruble" />
 				<param name="bundle.branch" value="${scs.branch.name}" />
@@ -43,11 +48,6 @@
 			<antcall target="clone-bundle">
 				<param name="bundle.name" value="source.ruble" />
 				<param name="bundle.dir.name" value="source.ruble" />
-				<param name="bundle.branch" value="${scs.branch.name}" />
-			</antcall>
-			<antcall target="clone-bundle">
-				<param name="bundle.name" value="math.ruble" />
-				<param name="bundle.dir.name" value="math.ruble" />
 				<param name="bundle.branch" value="${scs.branch.name}" />
 			</antcall>
 			<antcall target="clone-bundle">
