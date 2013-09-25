@@ -93,8 +93,6 @@ public interface INodePackageManager
 
 	public String getLatestVersionAvailable(String packageName) throws CoreException;
 
-	public IPath findNPM();
-
 	public String getConfigValue(String key) throws CoreException;
 
 	/**
@@ -128,11 +126,12 @@ public interface INodePackageManager
 	 * 
 	 * @param monitor
 	 * @return
+	 * @throws CoreException
 	 */
-	public IStatus cleanNpmCache(IProgressMonitor monitor);
+	public IStatus cleanNpmCache(IProgressMonitor monitor) throws CoreException;
 
 	/**
-	 * Uninstalls a npm package.
+	 * Uninstalls an npm package.
 	 * 
 	 * @param packageName
 	 * @param displayName
@@ -142,8 +141,42 @@ public interface INodePackageManager
 	 * @return
 	 * @throws CoreException
 	 */
-	IStatus uninstall(String packageName, String displayName, boolean global, char[] password, IProgressMonitor monitor)
-			throws CoreException;
+	public IStatus uninstall(String packageName, String displayName, boolean global, char[] password,
+			IProgressMonitor monitor) throws CoreException;
+
+	/**
+	 * Does the NPM path/install we're pointing to exist?
+	 * 
+	 * @return
+	 */
+	public boolean exists();
+
+	/**
+	 * The path to the NPM binary script
+	 * 
+	 * @return
+	 */
+	public IPath getPath();
+
+	/**
+	 * return the version of NPM.
+	 * 
+	 * @return
+	 * @throws CoreException
+	 *             if NPM isn't actually installed, or grabbing the version failed.
+	 */
+	public String getVersion() throws CoreException;
+
+	/**
+	 * A way to generically launch commands under NPM. Use sparingly. Ideally we'd have methods to invoke whatever
+	 * command you're hacking by using this.
+	 * 
+	 * @param args
+	 * @return
+	 * @throws CoreException
+	 *             May throw a CoreException to indicate that the NPM path is bad.
+	 */
+	public IStatus runInBackground(String... args) throws CoreException;
 
 	// TODO Update
 }

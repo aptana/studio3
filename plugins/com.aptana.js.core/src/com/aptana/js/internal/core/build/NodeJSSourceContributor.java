@@ -34,7 +34,7 @@ public class NodeJSSourceContributor implements IBuildPathContributor
 
 		// Add paths for NPM packages
 		INodePackageManager npm = getNodePackageManager();
-		if (npm != null && npm.findNPM() != null)
+		if (npm != null && npm.exists())
 		{
 			try
 			{
