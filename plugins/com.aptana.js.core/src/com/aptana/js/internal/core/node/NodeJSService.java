@@ -33,9 +33,9 @@ import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.ProcessStatus;
 import com.aptana.core.util.ProcessUtil;
 import com.aptana.core.util.StringUtil;
-import com.aptana.core.util.VersionUtil;
 import com.aptana.ide.core.io.downloader.DownloadManager;
 import com.aptana.js.core.JSCorePlugin;
+import com.aptana.js.core.node.INodeJS;
 import com.aptana.js.core.node.INodeJSService;
 
 /**
@@ -76,8 +76,9 @@ public class NodeJSService implements INodeJSService
 	 * (non-Javadoc)
 	 * @see com.appcelerator.titanium.nodejs.core.INodeJSService#find()
 	 */
-	public IPath find()
+	public INodeJS detectInstall()
 	{
+		IPath path = null;
 		if (PlatformUtil.isWindows())
 		{
 			// Look in the registry!
@@ -86,15 +87,16 @@ public class NodeJSService implements INodeJSService
 			if (!StringUtil.isEmpty(installedPath))
 			{
 				IPath regPath = Path.fromOSString(installedPath).append(NODE_EXE);
-				if (regPath.toFile().isFile())
+				NodeJS install = new NodeJS(regPath);
+				if (install.exists())
 				{
-					return regPath;
+					return install;
 				}
 			}
 
 			// Look on the PATH and in standard locations
 			// @formatter:off
-			return ExecutableUtil.find(NODE_EXE, false, 
+			path = ExecutableUtil.find(NODE_EXE, false, 
 					CollectionsUtil.newList(
 							Path.fromOSString(PlatformUtil.expandEnvironmentStrings(PROGRAM_FILES_NODEJS_NODE_PATH)),
 							Path.fromOSString(PlatformUtil.expandEnvironmentStrings(PROGRAM_FILES_X86_NODEJS_NODE_PATH))
@@ -102,8 +104,16 @@ public class NodeJSService implements INodeJSService
 					);
 			// @formatter:on
 		}
+		else
+		{
+			path = ExecutableUtil.find(NODE, false, CollectionsUtil.newList(Path.fromOSString(USR_LOCAL_BIN_NODE)));
+		}
 
-		return ExecutableUtil.find(NODE, false, CollectionsUtil.newList(Path.fromOSString(USR_LOCAL_BIN_NODE)));
+		if (path == null)
+		{
+			return null;
+		}
+		return new NodeJS(path);
 	}
 
 	/*
@@ -217,79 +227,41 @@ public class NodeJSService implements INodeJSService
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.appcelerator.titanium.nodejs.core.INodeJSService#acceptBinary(org.eclipse.core.runtime.IPath)
+	 * @see com.appcelerator.titanium.nodejs.core.INodeJSService#getInstallFromPreferences()
 	 */
-	public IStatus acceptBinary(IPath path)
-	{
-		if (path == null)
-		{
-			return new Status(Status.ERROR, JSCorePlugin.PLUGIN_ID, Messages.NodeJSService_NullPathError);
-		}
-
-		if (!path.toFile().isFile())
-		{
-			return new Status(Status.ERROR, JSCorePlugin.PLUGIN_ID, INodeJSService.ERR_DOES_NOT_EXIST,
-					MessageFormat.format(Messages.NodeJSService_FileDoesntExistError, path), null);
-		}
-
-		String version = getVersion(path);
-		if (version == null)
-		{
-			return new Status(Status.ERROR, JSCorePlugin.PLUGIN_ID, ERR_NOT_EXECUTABLE, MessageFormat.format(
-					Messages.NodeJSService_CouldntGetVersionError, path), null);
-		}
-
-		int index = version.indexOf('v');
-		if (index != -1)
-		{
-			version = version.substring(index + 1); // eliminate 'v'
-		}
-
-		if (VersionUtil.compareVersions(version, MIN_NODE_VERSION) >= 0)
-		{
-			return Status.OK_STATUS;
-		}
-
-		return new Status(Status.ERROR, JSCorePlugin.PLUGIN_ID, INodeJSService.ERR_INVALID_VERSION,
-				MessageFormat.format(Messages.NodeJSService_InvalidVersionError, path, version, MIN_NODE_VERSION), null);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.appcelerator.titanium.nodejs.core.INodeJSService#savedPath()
-	 */
-	public IPath getSavedPath()
+	public INodeJS getInstallFromPreferences()
 	{
 		String pref = EclipseUtil.instanceScope().getNode(JSCorePlugin.PLUGIN_ID)
 				.get(com.aptana.js.core.preferences.IPreferenceConstants.NODEJS_EXECUTABLE_PATH, null);
-		if (!StringUtil.isEmpty(pref))
+		if (StringUtil.isEmpty(pref))
 		{
-			IPath path = Path.fromOSString(pref);
-			if (path.toFile().isDirectory())
-			{
-				path = path.append(PlatformUtil.isWindows() ? NODE_EXE : NODE);
-			}
-			return path;
+			return null;
 		}
-		return null;
+
+		IPath path = Path.fromOSString(pref);
+		if (path.toFile().isDirectory())
+		{
+			path = path.append(PlatformUtil.isWindows() ? NODE_EXE : NODE);
+		}
+		return new NodeJS(path);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see com.appcelerator.titanium.nodejs.core.INodeJSService#validExecutable()
 	 */
-	public IPath getValidExecutable()
+	public INodeJS getValidExecutable()
 	{
 		// try user's saved path
-		IPath nodeExePath = getSavedPath();
-		if (acceptBinary(nodeExePath).isOK())
+		INodeJS nodeExePath = getInstallFromPreferences();
+		if (nodeExePath != null && nodeExePath.validate().isOK())
 		{
 			return nodeExePath;
 		}
 
 		// Search PATH
-		nodeExePath = find();
-		if (acceptBinary(nodeExePath).isOK())
+		nodeExePath = detectInstall();
+		if (nodeExePath != null && nodeExePath.validate().isOK())
 		{
 			return nodeExePath;
 		}
@@ -297,21 +269,16 @@ public class NodeJSService implements INodeJSService
 		return null;
 	}
 
-	private boolean isValidFile(IPath nodePath)
-	{
-		return nodePath != null && nodePath.toFile().isFile();
-	}
-
 	public boolean isInstalled()
 	{
-		IPath nodeExePath = getSavedPath();
-
-		if (isValidFile(nodeExePath))
+		INodeJS nodeExePath = getInstallFromPreferences();
+		if (nodeExePath != null && nodeExePath.exists())
 		{
 			return true;
 		}
-		nodeExePath = find();
-		return isValidFile(nodeExePath);
+
+		nodeExePath = detectInstall();
+		return nodeExePath != null && nodeExePath.exists();
 	}
 
 	public void addListener(Listener listener)
@@ -326,6 +293,7 @@ public class NodeJSService implements INodeJSService
 
 	private void fireNodeJSInstalled()
 	{
+		// TODO pass along the INodeJS instance we installed!
 		for (Listener listener : listeners)
 		{
 			listener.nodeJSInstalled();
@@ -341,8 +309,8 @@ public class NodeJSService implements INodeJSService
 
 		if (!path.toFile().isDirectory())
 		{
-			return new Status(Status.ERROR, JSCorePlugin.PLUGIN_ID, INodeJSService.ERR_DOES_NOT_EXIST,
-					MessageFormat.format(Messages.NodeJSService_NoDirectory_0, path), null);
+			return new Status(Status.ERROR, JSCorePlugin.PLUGIN_ID, INodeJS.ERR_DOES_NOT_EXIST, MessageFormat.format(
+					Messages.NodeJSService_NoDirectory_0, path), null);
 		}
 
 		if (!path.append(LIB).toFile().isDirectory())
@@ -355,12 +323,8 @@ public class NodeJSService implements INodeJSService
 		return Status.OK_STATUS;
 	}
 
-	public String getVersion(IPath path)
+	public IStatus acceptBinary(IPath nodeJSBinary)
 	{
-		if (path == null)
-		{
-			return null;
-		}
-		return ProcessUtil.outputForCommand(path.toOSString(), null, "-v"); //$NON-NLS-1$
+		return new NodeJS(nodeJSBinary).validate();
 	}
 }
