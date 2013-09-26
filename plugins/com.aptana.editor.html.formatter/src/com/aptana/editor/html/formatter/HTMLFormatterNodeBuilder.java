@@ -13,7 +13,7 @@ import java.util.HashSet;
 import org.eclipse.jface.text.Region;
 
 import com.aptana.core.util.StringUtil;
-import com.aptana.editor.html.IHTMLConstants;
+import com.aptana.editor.html.core.IHTMLConstants;
 import com.aptana.editor.html.formatter.nodes.FormatterDefaultElementNode;
 import com.aptana.editor.html.formatter.nodes.FormatterExcludedNode;
 import com.aptana.editor.html.formatter.nodes.FormatterForeignElementNode;

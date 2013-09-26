@@ -17,7 +17,7 @@ import com.aptana.core.build.IBuildParticipant;
 import com.aptana.core.build.IProblem;
 import com.aptana.css.core.ICSSConstants;
 import com.aptana.editor.html.HTMLPlugin;
-import com.aptana.editor.html.IHTMLConstants;
+import com.aptana.editor.html.core.IHTMLConstants;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.js.core.IJSConstants;
 
@@ -41,7 +41,7 @@ public class HTMLParseErrorValidatorTest extends AbstractValidatorTestCase
 	{
 		return "html";
 	}
-	
+
 	@Override
 	protected String getContentType()
 	{

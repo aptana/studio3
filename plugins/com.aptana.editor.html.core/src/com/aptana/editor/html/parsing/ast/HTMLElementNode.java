@@ -19,9 +19,8 @@ import beaver.Symbol;
 
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.StringUtil;
-import com.aptana.editor.html.HTMLPlugin;
-import com.aptana.editor.html.parsing.HTMLParser;
-import com.aptana.editor.html.preferences.IPreferenceConstants;
+import com.aptana.editor.html.core.preferences.IPreferenceConstants;
+import com.aptana.editor.html.parsing.HTMLParserConstants;
 import com.aptana.parsing.ast.INameNode;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseNodeAttribute;
@@ -62,7 +61,7 @@ public class HTMLElementNode extends HTMLNode
 
 	public HTMLElementNode(Symbol tagSymbol, int start, int end)
 	{
-		this(tagSymbol, HTMLParser.NO_HTML_NODES, start, end);
+		this(tagSymbol, HTMLParserConstants.NO_HTML_NODES, start, end);
 	}
 
 	public HTMLElementNode(Symbol tagSymbol, HTMLNode[] children, int start, int end)
@@ -276,7 +275,7 @@ public class HTMLElementNode extends HTMLNode
 	{
 		if (fCSSStyleNodes == null)
 		{
-			return HTMLParser.NO_PARSE_NODES;
+			return HTMLParserConstants.NO_PARSE_NODES;
 		}
 		return fCSSStyleNodes.toArray(new IParseNode[fCSSStyleNodes.size()]);
 	}
@@ -285,7 +284,7 @@ public class HTMLElementNode extends HTMLNode
 	{
 		if (fJSAttributeNodes == null)
 		{
-			return HTMLParser.NO_PARSE_NODES;
+			return HTMLParserConstants.NO_PARSE_NODES;
 		}
 		return fJSAttributeNodes.toArray(new IParseNode[fJSAttributeNodes.size()]);
 	}
@@ -358,7 +357,8 @@ public class HTMLElementNode extends HTMLNode
 
 	private static List<String> getAttributesToShow()
 	{
-		String value = Platform.getPreferencesService().getString(HTMLPlugin.PLUGIN_ID,
+		// FIXME: Migrating preferences is a different story. Avoid it now.
+		String value = Platform.getPreferencesService().getString(IPreferenceConstants.PREFERNCES_NODE,
 				IPreferenceConstants.HTML_OUTLINE_TAG_ATTRIBUTES_TO_SHOW, StringUtil.EMPTY, null);
 		StringTokenizer st = new StringTokenizer(value);
 		List<String> attributes = new ArrayList<String>();

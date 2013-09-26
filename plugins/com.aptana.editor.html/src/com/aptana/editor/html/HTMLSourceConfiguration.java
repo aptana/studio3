@@ -37,6 +37,7 @@ import com.aptana.editor.common.text.rules.TagRule;
 import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
 import com.aptana.editor.css.CSSSourceConfiguration;
 import com.aptana.editor.html.contentassist.HTMLContentAssistProcessor;
+import com.aptana.editor.html.core.IHTMLConstants;
 import com.aptana.editor.html.internal.text.rules.DocTypeRule;
 import com.aptana.editor.js.JSSourceConfiguration;
 import com.aptana.editor.svg.ISVGConstants;
