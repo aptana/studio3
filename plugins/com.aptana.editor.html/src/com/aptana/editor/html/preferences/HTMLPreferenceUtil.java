@@ -14,6 +14,7 @@ import org.osgi.service.prefs.BackingStoreException;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.html.HTMLPlugin;
+import com.aptana.editor.html.core.preferences.IPreferenceConstants;
 
 public class HTMLPreferenceUtil
 {

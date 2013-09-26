@@ -5,13 +5,18 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.html.preferences;
+package com.aptana.editor.html.core.preferences;
 
 /**
  * IPreferenceContants
  */
 public interface IPreferenceConstants
 {
+	/**
+	 * All the preferences are currently stored in this node. Use it for now until all the preferences are migrated.
+	 */
+	String PREFERNCES_NODE = "com.aptana.editor.html"; //$NON-NLS-1$
+
 	/**
 	 * The value is a double used to indicate the current format being used by the HTML index categories.
 	 */

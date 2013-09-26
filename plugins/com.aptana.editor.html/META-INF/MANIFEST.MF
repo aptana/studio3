@@ -28,7 +28,8 @@ Require-Bundle: com.aptana.jetty.util.epl,
  com.aptana.preview;visibility:=reexport,
  com.aptana.build.ui,
  com.aptana.ui.epl,
- org.eclipse.ui.forms
+ org.eclipse.ui.forms,
+ com.aptana.editor.html.core;visibility:=reexport
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
@@ -36,6 +37,5 @@ Export-Package: com.aptana.editor.html,
  com.aptana.editor.html.contentassist.index,
  com.aptana.editor.html.outline,
  com.aptana.editor.html.parsing,
- com.aptana.editor.html.parsing.ast,
  com.aptana.editor.html.parsing.lexer
 Eclipse-ExtensibleAPI: true

@@ -16,10 +16,10 @@ import com.aptana.css.core.ICSSConstants;
 import com.aptana.css.core.parsing.ast.ICSSNodeTypes;
 import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.html.HTMLPlugin;
+import com.aptana.editor.html.core.preferences.IPreferenceConstants;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.HTMLParser;
 import com.aptana.editor.html.preferences.HTMLPreferenceUtil;
-import com.aptana.editor.html.preferences.IPreferenceConstants;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
 
