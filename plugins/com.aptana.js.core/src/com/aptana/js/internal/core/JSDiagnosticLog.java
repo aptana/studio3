@@ -13,6 +13,7 @@ import org.eclipse.core.runtime.IStatus;
 import com.aptana.core.ShellExecutable;
 import com.aptana.core.diagnostic.IDiagnosticLog;
 import com.aptana.core.util.FileUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.core.node.INodeJS;
 import com.aptana.js.core.node.INodeJSService;
@@ -28,21 +29,25 @@ public class JSDiagnosticLog implements IDiagnosticLog
 		INodeJSService service = JSCorePlugin.getDefault().getNodeJSService();
 		INodeJS nodeJS = service.getValidExecutable();
 
-		String version = nodeJS.getVersion();
-		if (version == null)
+		String version = "Not installed"; //$NON-NLS-1$
+		if (nodeJS != null)
 		{
-			version = "Not installed"; //$NON-NLS-1$
+			String nodeJSVersion = nodeJS.getVersion();
+			if (!StringUtil.isEmpty(nodeJSVersion))
+			{
+				version = nodeJSVersion;
+			}
 		}
 		buf.append("Node.JS Version: ").append(version).append(FileUtil.NEW_LINE); //$NON-NLS-1$
 
-		INodePackageManager npm = nodeJS.getNPM();
+		INodePackageManager npm = nodeJS == null ? null : nodeJS.getNPM();
 		String pathString = "Not installed"; //$NON-NLS-1$
-		if (npm.exists())
+		if (npm != null && npm.exists())
 		{
 			pathString = npm.getPath().toOSString();
 		}
 		buf.append("NPM Path: ").append(pathString).append(FileUtil.NEW_LINE); //$NON-NLS-1$
-		if (npm.exists())
+		if (npm != null && npm.exists())
 		{
 			try
 			{
