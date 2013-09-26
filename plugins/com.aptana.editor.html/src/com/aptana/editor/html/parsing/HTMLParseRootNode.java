@@ -9,7 +9,7 @@ package com.aptana.editor.html.parsing;
 
 import beaver.Symbol;
 
-import com.aptana.editor.html.IHTMLConstants;
+import com.aptana.editor.html.core.IHTMLConstants;
 import com.aptana.parsing.ast.ParseRootNode;
 
 /**

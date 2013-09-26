@@ -22,7 +22,7 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.parsing.CompositeParser;
 import com.aptana.editor.common.util.EditorUtil;
 import com.aptana.editor.html.HTMLPlugin;
-import com.aptana.editor.html.IHTMLConstants;
+import com.aptana.editor.html.core.IHTMLConstants;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.HTMLParser;
 import com.aptana.formatter.AbstractScriptFormatter;

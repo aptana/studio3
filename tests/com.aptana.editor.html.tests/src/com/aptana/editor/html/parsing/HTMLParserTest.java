@@ -25,7 +25,7 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.css.core.ICSSConstants;
 import com.aptana.css.core.parsing.ast.CSSParseRootNode;
 import com.aptana.editor.html.HTMLPlugin;
-import com.aptana.editor.html.IHTMLConstants;
+import com.aptana.editor.html.core.IHTMLConstants;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.js.core.IJSConstants;
 import com.aptana.js.core.parsing.ast.JSParseRootNode;

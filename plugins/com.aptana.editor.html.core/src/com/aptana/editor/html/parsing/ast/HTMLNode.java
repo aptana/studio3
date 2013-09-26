@@ -7,7 +7,7 @@
  */
 package com.aptana.editor.html.parsing.ast;
 
-import com.aptana.editor.html.IHTMLConstants;
+import com.aptana.editor.html.core.IHTMLConstants;
 import com.aptana.parsing.ast.ParseNode;
 
 public class HTMLNode extends ParseNode

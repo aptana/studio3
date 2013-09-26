@@ -25,7 +25,7 @@ import com.aptana.core.build.Problem;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.css.core.ICSSConstants;
-import com.aptana.editor.html.IHTMLConstants;
+import com.aptana.editor.html.core.IHTMLConstants;
 import com.aptana.index.core.build.BuildContext;
 import com.aptana.js.core.IJSConstants;
 import com.aptana.parsing.ast.IParseError;

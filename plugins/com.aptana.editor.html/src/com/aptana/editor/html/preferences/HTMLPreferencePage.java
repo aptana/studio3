@@ -20,6 +20,7 @@ import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.preferences.CommonEditorPreferencePage;
 import com.aptana.editor.html.HTMLEditor;
 import com.aptana.editor.html.HTMLPlugin;
+import com.aptana.editor.html.core.preferences.IPreferenceConstants;
 import com.aptana.ui.preferences.AptanaPreferencePage;
 
 public class HTMLPreferencePage extends CommonEditorPreferencePage
