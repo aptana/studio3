@@ -29,16 +29,19 @@ public class NodeJS implements INodeJS
 {
 
 	private final IPath path;
+	private String version;
+	private NodePackageManager fNodePackageManager;
 
 	NodeJS(IPath path)
 	{
 		// TODO Enforce non-null?
 		this.path = path;
+		fNodePackageManager = new NodePackageManager(this);
 	}
 
 	public INodePackageManager getNPM()
 	{
-		return new NodePackageManager(this);
+		return fNodePackageManager;
 	}
 
 	public IPath getPath()
@@ -48,11 +51,12 @@ public class NodeJS implements INodeJS
 
 	public String getVersion()
 	{
-		if (path == null)
+		if (version != null || path == null)
 		{
-			return null;
+			return version;
 		}
-		return ProcessUtil.outputForCommand(path.toOSString(), null, "-v"); //$NON-NLS-1$
+		version = ProcessUtil.outputForCommand(path.toOSString(), null, "-v"); //$NON-NLS-1$
+		return version;
 	}
 
 	public boolean exists()
