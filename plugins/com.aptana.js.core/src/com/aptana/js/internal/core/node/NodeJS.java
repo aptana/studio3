@@ -49,7 +49,7 @@ public class NodeJS implements INodeJS
 		return path;
 	}
 
-	public String getVersion()
+	public synchronized String getVersion()
 	{
 		if (version != null || path == null)
 		{
