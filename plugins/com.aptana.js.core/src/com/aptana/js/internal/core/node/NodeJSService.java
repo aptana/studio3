@@ -11,8 +11,10 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.MessageFormat;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
@@ -66,10 +68,12 @@ public class NodeJSService implements INodeJSService
 	private static final String WIN_EXTENSION = ".msi"; //$NON-NLS-1$
 
 	private Set<Listener> listeners;
+	private Map<IPath, INodeJS> nodeJsInstalls;
 
 	public NodeJSService()
 	{
 		listeners = new LinkedHashSet<Listener>();
+		nodeJsInstalls = new HashMap<IPath, INodeJS>();
 	}
 
 	/*
@@ -87,7 +91,7 @@ public class NodeJSService implements INodeJSService
 			if (!StringUtil.isEmpty(installedPath))
 			{
 				IPath regPath = Path.fromOSString(installedPath).append(NODE_EXE);
-				NodeJS install = new NodeJS(regPath);
+				INodeJS install = getNodeJsInstall(regPath);
 				if (install.exists())
 				{
 					return install;
@@ -113,7 +117,18 @@ public class NodeJSService implements INodeJSService
 		{
 			return null;
 		}
-		return new NodeJS(path);
+		return getNodeJsInstall(path);
+	}
+
+	private synchronized INodeJS getNodeJsInstall(IPath path)
+	{
+		if (nodeJsInstalls.containsKey(path))
+		{
+			return nodeJsInstalls.get(path);
+		}
+		INodeJS nodeJs = new NodeJS(path);
+		nodeJsInstalls.put(path, nodeJs);
+		return nodeJs;
 	}
 
 	/*
@@ -243,7 +258,7 @@ public class NodeJSService implements INodeJSService
 		{
 			path = path.append(PlatformUtil.isWindows() ? NODE_EXE : NODE);
 		}
-		return new NodeJS(path);
+		return getNodeJsInstall(path);
 	}
 
 	/*
@@ -325,6 +340,6 @@ public class NodeJSService implements INodeJSService
 
 	public IStatus acceptBinary(IPath nodeJSBinary)
 	{
-		return new NodeJS(nodeJSBinary).validate();
+		return getNodeJsInstall(nodeJSBinary).validate();
 	}
 }
