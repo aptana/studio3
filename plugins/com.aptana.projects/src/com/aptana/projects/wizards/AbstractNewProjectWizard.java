@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -225,6 +225,95 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 		return mainPage;
 	}
 
+	protected void doCreateProject(IProgressMonitor monitor) throws InvocationTargetException
+	{
+		IWorkspaceRunnable runnable = new IWorkspaceRunnable()
+		{
+			public void run(IProgressMonitor monitor) throws CoreException
+			{
+				SubMonitor subMonitor = SubMonitor.convert(monitor, 6);
+				try
+				{
+					createNewProject(subMonitor.newChild(4));
+				}
+				catch (InvocationTargetException e)
+				{
+					throw new CoreException(new Status(IStatus.ERROR, ProjectsPlugin.PLUGIN_ID, 0, e.getMessage(),
+							e.getTargetException()));
+				}
+
+				// Allow the project contributors to do work
+				ProjectWizardContributionManager projectWizardContributionManager = ProjectsPlugin.getDefault()
+						.getProjectWizardContributionManager();
+				final IStatus contributorStatus = projectWizardContributionManager.performProjectFinish(newProject,
+						subMonitor.newChild(1));
+				if (contributorStatus != null && !contributorStatus.isOK())
+				{
+					// FIXME This UI code shouldn't be here, throw an exception up and handle it!
+					// Show the error. Should we cancel project creation?
+					UIUtils.getDisplay().syncExec(new Runnable()
+					{
+						public void run()
+						{
+							MessageDialog.openError(UIUtils.getActiveWorkbenchWindow().getShell(),
+									Messages.AbstractNewProjectWizard_ProjectListenerErrorTitle,
+									contributorStatus.getMessage());
+						}
+					});
+				}
+
+				// Perform post project hooks
+
+				IStudioProjectListener[] projectListeners = new IStudioProjectListener[0];
+				IProjectDescription description = newProject.getDescription();
+				if (description != null)
+				{
+					projectListeners = StudioProjectListenersManager.getManager().getProjectListeners(
+							description.getNatureIds());
+				}
+
+				int listenerSize = projectListeners.length;
+				SubMonitor hookMonitor = SubMonitor.convert(subMonitor.newChild(1),
+						Messages.AbstractNewProjectWizard_ProjectListener_TaskName, Math.max(1, listenerSize));
+
+				for (IStudioProjectListener projectListener : projectListeners)
+				{
+					if (projectListener != null)
+					{
+						final IStatus status = projectListener.projectCreated(newProject, hookMonitor.newChild(1));
+
+						// Show a dialog if there are failures
+						if (status != null && status.matches(IStatus.ERROR))
+						{
+							// FIXME This UI code shouldn't be here, throw an exception up and handle it!
+							UIUtils.getDisplay().syncExec(new Runnable()
+							{
+								public void run()
+								{
+									String message = status.getMessage();
+									if (status instanceof ProcessStatus)
+									{
+										message = ((ProcessStatus) status).getStdErr();
+									}
+									MessageDialog.openError(UIUtils.getActiveWorkbenchWindow().getShell(),
+											Messages.AbstractNewProjectWizard_ProjectListenerErrorTitle, message);
+								}
+							});
+						}
+					}
+				}
+			}
+		};
+		try
+		{
+			ResourcesPlugin.getWorkspace().run(runnable, monitor);
+		}
+		catch (CoreException e)
+		{
+			throw new InvocationTargetException(e, Messages.AbstractNewProjectWizard_ProjectListener_NoDescriptor_Error);
+		}
+	}
+
 	@Override
 	public boolean performFinish()
 	{
@@ -255,99 +344,9 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 		{
 			getContainer().run(true, true, new IRunnableWithProgress()
 			{
-
 				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
 				{
-					IWorkspaceRunnable runnable = new IWorkspaceRunnable()
-					{
-
-						public void run(IProgressMonitor monitor) throws CoreException
-						{
-							SubMonitor subMonitor = SubMonitor.convert(monitor, 6);
-							try
-							{
-								createNewProject(subMonitor.newChild(4));
-							}
-							catch (InvocationTargetException e)
-							{
-								throw new CoreException(new Status(IStatus.ERROR, ProjectsPlugin.PLUGIN_ID, 0, e
-										.getMessage(), e.getTargetException()));
-							}
-
-							// Allow the project contributors to do work
-							ProjectWizardContributionManager projectWizardContributionManager = ProjectsPlugin
-									.getDefault().getProjectWizardContributionManager();
-							final IStatus contributorStatus = projectWizardContributionManager.performProjectFinish(
-									newProject, subMonitor.newChild(1));
-							if (contributorStatus != null && !contributorStatus.isOK())
-							{
-								// FIXME This UI code shouldn't be here, throw an exception up and handle it!
-								// Show the error. Should we cancel project creation?
-								UIUtils.getDisplay().syncExec(new Runnable()
-								{
-									public void run()
-									{
-										MessageDialog.openError(UIUtils.getActiveWorkbenchWindow().getShell(),
-												Messages.AbstractNewProjectWizard_ProjectListenerErrorTitle,
-												contributorStatus.getMessage());
-									}
-								});
-							}
-
-							// Perform post project hooks
-
-							IStudioProjectListener[] projectListeners = new IStudioProjectListener[0];
-							IProjectDescription description = newProject.getDescription();
-							if (description != null)
-							{
-								projectListeners = StudioProjectListenersManager.getManager().getProjectListeners(
-										description.getNatureIds());
-							}
-
-							int listenerSize = projectListeners.length;
-							SubMonitor hookMonitor = SubMonitor.convert(subMonitor.newChild(1),
-									Messages.AbstractNewProjectWizard_ProjectListener_TaskName,
-									Math.max(1, listenerSize));
-
-							for (IStudioProjectListener projectListener : projectListeners)
-							{
-								if (projectListener != null)
-								{
-									final IStatus status = projectListener.projectCreated(newProject,
-											hookMonitor.newChild(1));
-
-									// Show a dialog if there are failures
-									if (status != null && status.matches(IStatus.ERROR))
-									{
-										// FIXME This UI code shouldn't be here, throw an exception up and handle it!
-										UIUtils.getDisplay().syncExec(new Runnable()
-										{
-											public void run()
-											{
-												String message = status.getMessage();
-												if (status instanceof ProcessStatus)
-												{
-													message = ((ProcessStatus) status).getStdErr();
-												}
-												MessageDialog.openError(UIUtils.getActiveWorkbenchWindow().getShell(),
-														Messages.AbstractNewProjectWizard_ProjectListenerErrorTitle,
-														message);
-											}
-										});
-									}
-								}
-							}
-						}
-					};
-					try
-					{
-						ResourcesPlugin.getWorkspace().run(runnable, monitor);
-					}
-					catch (CoreException e)
-					{
-						throw new InvocationTargetException(e,
-								Messages.AbstractNewProjectWizard_ProjectListener_NoDescriptor_Error);
-					}
+					doCreateProject(monitor);
 				}
 			});
 			success = true;
