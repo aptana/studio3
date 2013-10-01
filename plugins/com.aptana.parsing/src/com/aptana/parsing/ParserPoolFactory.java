@@ -229,4 +229,13 @@ public class ParserPoolFactory implements ParsingEngine.IParserPoolProvider
 	{
 		return getInstance().fParsingEngine.parse(contentTypeId, parseState);
 	}
+
+	/**
+	 * To be used to force the cache to be cleaned. Primarily used for testing, but also if some settings/prefs change
+	 * and we need to wipe cached parse results that conatin markers/warnings/etc.
+	 */
+	public void clearCache()
+	{
+		fParsingEngine.clearCache();
+	}
 }
