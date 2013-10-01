@@ -8,17 +8,13 @@
 
 package com.aptana.ide.syncing.core;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -27,11 +23,6 @@ import org.eclipse.core.runtime.ListenerList;
 import com.aptana.core.epl.IMemento;
 import com.aptana.core.epl.XMLMemento;
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.StringUtil;
-import com.aptana.ide.core.io.CoreIOPlugin;
-import com.aptana.ide.core.io.IConnectionPoint;
-import com.aptana.ide.core.io.IConnectionPoint15Constants;
-import com.aptana.ide.core.io.IConnectionPointManager;
 import com.aptana.ide.syncing.core.events.ISiteConnectionListener;
 import com.aptana.ide.syncing.core.events.SiteConnectionEvent;
 
@@ -163,23 +154,10 @@ import com.aptana.ide.syncing.core.events.SiteConnectionEvent;
 					}
 				}
 			}
-			catch (IOException e)
+			catch (Exception e)
 			{
 				IdeLog.logError(SyncingPlugin.getDefault(), Messages.SiteConnectionManager_ERR_FailedToLoadConnections,
 						e);
-			}
-			catch (CoreException e)
-			{
-				// could be an 1.5 exported file; try to migrate
-				try
-				{
-					load15State(file);
-				}
-				catch (Exception e1)
-				{
-					IdeLog.logError(SyncingPlugin.getDefault(),
-							Messages.SiteConnectionManager_ERR_FailedToLoadConnections, e1);
-				}
 			}
 			finally
 			{
@@ -355,168 +333,5 @@ import com.aptana.ide.syncing.core.events.SiteConnectionEvent;
 		{
 			((ISiteConnectionListener) listener).siteConnectionChanged(event);
 		}
-	}
-
-	/**
-	 * Migrating the connection settings in 1.5 to 2.0.
-	 * 
-	 * @param file
-	 *            the settings file
-	 * @throws IOException
-	 */
-	private void load15State(File file) throws IOException, CoreException
-	{
-		StringBuilder contents = new StringBuilder();
-
-		BufferedReader input = null;
-		try
-		{
-			input = new BufferedReader(new FileReader(file));
-			String line = null;
-			while ((line = input.readLine()) != null)
-			{
-				contents.append(line);
-			}
-		}
-		finally
-		{
-			if (input != null)
-			{
-				try
-				{
-					input.close();
-				}
-				catch (IOException e)
-				{
-				}
-			}
-		}
-
-		String s = contents.toString();
-		if (s.indexOf(IConnectionPoint15Constants.DELIMITER) < 0)
-		{
-			s = StringUtil.replace(s, "%%%%", IConnectionPoint15Constants.DELIMITER); //$NON-NLS-1$
-			s = StringUtil.replace(s, "@@@@", IConnectionPoint15Constants.OBJ_DELIMITER); //$NON-NLS-1$
-			s = StringUtil.replace(s, "~~~~", IConnectionPoint15Constants.SECTION_DELIMITER); //$NON-NLS-1$
-			s = StringUtil.replace(s, "!!!!", IConnectionPoint15Constants.TYPE_DELIMITER); //$NON-NLS-1$
-			s = StringUtil.replace(s, "}}}}", IConnectionPoint15Constants.FILE_DELIMITER); //$NON-NLS-1$
-		}
-
-		String[] sections = s.split(IConnectionPoint15Constants.SECTION_DELIMITER);
-		if (sections.length > 0)
-		{
-			load15VirtualFileManagers(sections[0]);
-		}
-
-		if (sections.length > 1)
-		{
-			load15VirtualFileManagerSyncItems(sections[1]);
-		}
-	}
-
-	private void load15VirtualFileManagers(String s) throws CoreException
-	{
-		Map<String, List<String>> dataTypes = new HashMap<String, List<String>>();
-
-		String[] parts = s.split(IConnectionPoint15Constants.OBJ_DELIMITER);
-		String[] itemParts;
-		for (String item : parts)
-		{
-			itemParts = item.split(IConnectionPoint15Constants.TYPE_DELIMITER);
-
-			if (itemParts.length == 2)
-			{
-				String type = itemParts[0];
-				String data = itemParts[1];
-
-				if ("null".equals(type)) { //$NON-NLS-1$
-					continue;
-				}
-
-				List<String> list = dataTypes.get(type);
-				if (list == null)
-				{
-					list = new ArrayList<String>();
-					dataTypes.put(type, list);
-				}
-				list.add(data);
-			}
-		}
-
-		Set<String> types = dataTypes.keySet();
-		IConnectionPointManager manager = CoreIOPlugin.getConnectionPointManager();
-		IConnectionPoint connectionPoint;
-		for (String type : types)
-		{
-			List<String> connectionDatas = dataTypes.get(type);
-			for (String connectionData : connectionDatas)
-			{
-				connectionPoint = manager.restore15ConnectionPoint(type, connectionData);
-				if (connectionPoint != null)
-				{
-					manager.addConnectionPoint(connectionPoint);
-				}
-			}
-		}
-	}
-
-	private void load15VirtualFileManagerSyncItems(String s)
-	{
-		String[] parts = s.split(IConnectionPoint15Constants.OBJ_DELIMITER);
-
-		String[] itemParts;
-		ISiteConnection connection;
-		for (String item : parts)
-		{
-			itemParts = item.split(IConnectionPoint15Constants.TYPE_DELIMITER);
-
-			if (itemParts.length == 2)
-			{
-				String type = itemParts[0];
-				String data = itemParts[1];
-
-				if ("null".equals(type)) { //$NON-NLS-1$
-					continue;
-				}
-
-				connection = restore15Connection(data);
-				if (connection != null && connection.getSource() != null && connection.getDestination() != null)
-				{
-					addSiteConnection(connection);
-				}
-			}
-		}
-	}
-
-	private ISiteConnection restore15Connection(String data)
-	{
-		String[] args = data.split(IConnectionPoint15Constants.DELIMITER);
-
-		if (args.length < 3)
-		{
-			return null;
-		}
-
-		ISiteConnection siteConnection = createSiteConnection();
-		siteConnection.setName(args[0]);
-		String sourceId = args[1];
-		String destinationId = args[2];
-
-		IConnectionPoint[] connectionPoints = CoreIOPlugin.getConnectionPointManager().getConnectionPoints();
-		String id;
-		for (IConnectionPoint connectionPoint : connectionPoints)
-		{
-			id = connectionPoint.getId();
-			if (id.equals(sourceId))
-			{
-				siteConnection.setSource(connectionPoint);
-			}
-			else if (id.equals(destinationId))
-			{
-				siteConnection.setDestination(connectionPoint);
-			}
-		}
-
-		return siteConnection;
 	}
 }

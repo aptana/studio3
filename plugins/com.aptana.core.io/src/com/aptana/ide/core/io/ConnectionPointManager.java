@@ -457,53 +457,6 @@ import com.aptana.usage.StudioAnalytics;
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.ide.core.io.IConnectionPointManager#restore15ConnectionPoint (java.lang.String, java.lang.String)
-	 */
-	public ConnectionPoint restore15ConnectionPoint(String type, String data) throws CoreException
-	{
-		ConnectionPoint connectionPoint = null;
-		String typeId = null;
-		if (type.equals(COM_APTANA_IDE_CORE_UI_IO_FILE_LOCAL_FILE_MANAGER))
-		{
-			typeId = TYPE_LOCAL;
-		}
-		else if (type.equals(COM_APTANA_IDE_CORE_UI_IO_FILE_PROJECT_FILE_MANAGER))
-		{
-			typeId = TYPE_WORKSPACE;
-		}
-		else if (type.equals(COM_APTANA_IDE_IO_FTP_FTP_VIRTUAL_FILE_MANAGER))
-		{
-			typeId = TYPE_FTP;
-		}
-		else if (type.equals(COM_APTANA_IDE_IO_SFTP_SFTP_VIRTUAL_FILE_MANAGER))
-		{
-			typeId = TYPE_SFTP;
-		}
-		else if (type.equals(COM_APTANA_IDE_IO_FTPS_FTPS_VIRTUAL_FILE_MANAGER))
-		{
-			typeId = TYPE_FTPS;
-		}
-		if (typeId != null)
-		{
-			IConfigurationElement element = configurationElements.get(typeId);
-			if (element != null)
-			{
-				Object object = element.createExecutableExtension(ATT_CLASS);
-				if (object instanceof ConnectionPoint)
-				{
-					connectionPoint = (ConnectionPoint) object;
-					if (!connectionPoint.load15Data(data))
-					{
-						return null;
-					}
-				}
-			}
-		}
-		return connectionPoint;
-	}
-
-	/*
-	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.io.IConnectionPointManager#createConnectionPoint(
 	 * com.aptana.ide.core.io.ConnectionPointType)
 	 */

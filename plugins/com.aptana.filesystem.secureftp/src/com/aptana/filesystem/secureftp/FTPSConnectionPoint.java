@@ -17,12 +17,10 @@ import org.eclipse.core.runtime.Platform;
 
 import com.aptana.core.epl.IMemento;
 import com.aptana.core.io.vfs.IConnectionFileManager;
-import com.aptana.core.util.StringUtil;
 import com.aptana.filesystem.secureftp.internal.FTPSConnectionFileManager;
 import com.aptana.ide.core.io.ConnectionContext;
 import com.aptana.ide.core.io.ConnectionPoint;
 import com.aptana.ide.core.io.CoreIOPlugin;
-import com.aptana.ide.core.io.IConnectionPoint15Constants;
 
 /**
  * @author Max Stepanov
@@ -539,41 +537,5 @@ public class FTPSConnectionPoint extends ConnectionPoint implements IFTPSConnect
 					encoding, timezone, validateCertificate, noSSLSessionResumption);
 		}
 		return connectionFileManager;
-	}
-
-	@Override
-	public boolean load15Data(String data)
-	{
-		String[] items = data.split(IConnectionPoint15Constants.DELIMITER);
-
-		if (items.length < 7)
-		{
-			return false;
-		}
-
-		setName(items[0]);
-		setHost(items[1]);
-		if (StringUtil.isEmpty(items[2]))
-		{
-			setPath(Path.ROOT);
-		}
-		else
-		{
-			setPath(new Path(items[2]));
-		}
-		setLogin(items[3]);
-		setPassword(items[4].toCharArray());
-		setPassiveMode(items[5].equals(Boolean.TRUE.toString()));
-		setId(items[6]);
-
-		if (items.length >= 10)
-		{
-			setPort(Integer.parseInt(items[9]));
-		}
-		if (items.length >= 12)
-		{
-			setExplicit(items[11].equals(Boolean.TRUE.toString()));
-		}
-		return true;
 	}
 }
