@@ -23,49 +23,54 @@ import org.eclipse.core.runtime.Path;
 
 import com.aptana.core.epl.IMemento;
 import com.aptana.core.io.efs.WorkspaceFileSystem;
-import com.aptana.core.util.StringUtil;
-
 
 /**
  * @author Max Stepanov
- *
  */
-public final class WorkspaceConnectionPoint extends ConnectionPoint {
+public final class WorkspaceConnectionPoint extends ConnectionPoint
+{
 
 	public static final String TYPE = "workspace"; //$NON-NLS-1$
-    
+
 	private static final String ELEMENT_PATH = "path"; //$NON-NLS-1$
 
 	private static IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 
 	private IPath path; /* workspace-relative path */
-	
+
 	/**
 	 * Default constructor
 	 */
-	public WorkspaceConnectionPoint() {
+	public WorkspaceConnectionPoint()
+	{
 		super(TYPE);
 	}
 
 	/**
 	 * 
 	 */
-	/* package */ WorkspaceConnectionPoint(IContainer resource) {
+	/* package */WorkspaceConnectionPoint(IContainer resource)
+	{
 		super(TYPE);
 		this.path = resource.getFullPath();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
 	 */
 	@SuppressWarnings("rawtypes")
 	@Override
-	public Object getAdapter(Class adapter) {
-		if (IResource.class.isAssignableFrom(adapter)) {
+	public Object getAdapter(Class adapter)
+	{
+		if (IResource.class.isAssignableFrom(adapter))
+		{
 			IContainer resource = getResource();
-			if (resource != null) {
+			if (resource != null)
+			{
 				Object result = resource.getAdapter(adapter);
-				if (result != null) {
+				if (result != null)
+				{
 					return result;
 				}
 			}
@@ -73,89 +78,76 @@ public final class WorkspaceConnectionPoint extends ConnectionPoint {
 		return super.getAdapter(adapter);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.io.ConnectionPoint#getRootURI()
 	 */
 	@Override
-    public URI getRootURI() {
+	public URI getRootURI()
+	{
 		return WorkspaceFileSystem.getInstance().getStore(path).toURI();
-    }
+	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.io.ConnectionPoint#getRoot()
 	 */
 	@Override
-	public IFileStore getRoot() throws CoreException {
+	public IFileStore getRoot() throws CoreException
+	{
 		return WorkspaceFileSystem.getInstance().getStore(path);
 	}
 
 	/**
 	 * @return the resource
 	 */
-	public IContainer getResource() {
+	public IContainer getResource()
+	{
 		IResource resource = workspaceRoot.findMember(path);
-		if (resource instanceof IContainer) {
+		if (resource instanceof IContainer)
+		{
 			return (IContainer) resource;
 		}
 		return null;
 	}
 
 	/**
-	 * @param resource the resource to set
+	 * @param resource
+	 *            the resource to set
 	 */
-	public void setResource(IContainer resource) {
+	public void setResource(IContainer resource)
+	{
 		this.path = resource.getFullPath();
 	}
-	
-	public IPath getPath() {
+
+	public IPath getPath()
+	{
 		return path;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.io.ConnectionPoint#loadState(com.aptana.ide.core.epl.IMemento)
 	 */
 	@Override
-	protected void loadState(IMemento memento) {
+	protected void loadState(IMemento memento)
+	{
 		super.loadState(memento);
 		IMemento child = memento.getChild(ELEMENT_PATH);
-		if (child != null) {
+		if (child != null)
+		{
 			path = Path.fromPortableString(child.getTextData());
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.io.ConnectionPoint#saveState(com.aptana.ide.core.epl.IMemento)
 	 */
 	@Override
-	protected void saveState(IMemento memento) {
+	protected void saveState(IMemento memento)
+	{
 		super.saveState(memento);
 		memento.createChild(ELEMENT_PATH).putTextData(path.toPortableString());
 	}
-
-    @Override
-    public boolean load15Data(String data) {
-        String[] items = data.split(IConnectionPoint15Constants.DELIMITER);
-
-        if (items.length < 3) {
-            return false;
-        }
-
-        if (items[0] == null || StringUtil.EMPTY.equals(items[0])) {
-            return false;
-        }
-        setName(items[0]);
-        if (items[1] == null || StringUtil.EMPTY.equals(items[1])) {
-            return false;
-        } else {
-            IResource resource = workspaceRoot.findMember(items[1]);
-            if (resource instanceof IContainer) {
-                setResource((IContainer) resource);
-            } else {
-                return false;
-            }
-        }
-        setId(items[2]);
-
-        return true;
-    }
 }

@@ -19,7 +19,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
 import com.aptana.core.epl.IMemento;
-import com.aptana.core.util.StringUtil;
 
 /**
  * @author Max Stepanov
@@ -119,31 +118,4 @@ public class LocalConnectionPoint extends ConnectionPoint {
 		super.saveState(memento);
 		memento.createChild(ELEMENT_PATH).putTextData(path.toPortableString());
 	}
-
-    @Override
-    public boolean load15Data(String data) {
-        String[] items = data.split(IConnectionPoint15Constants.DELIMITER);
-
-        if (items.length < 3) {
-            return false;
-        }
-
-        if (items[0] == null || StringUtil.EMPTY.equals(items[0])) {
-            return false;
-        }
-        setName(items[0]);
-        if (items[1] == null || StringUtil.EMPTY.equals(items[1])) {
-            setPath(Path.ROOT);
-        } else {
-            Path path = new Path(items[1]);
-            if (path.toFile().exists()) {
-                setPath(path);
-            } else {
-                return false;
-            }
-        }
-        setId(items[2]);
-
-        return true;
-    }
 }
