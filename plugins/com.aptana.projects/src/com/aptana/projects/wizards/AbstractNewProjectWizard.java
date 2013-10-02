@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
@@ -102,6 +103,8 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 
 	// Specifies abstract data that has to be passed between wizard pages for validation.
 	protected Object data = new Object();
+
+	private boolean deferProjectCreation;
 
 	/**
 	 * Constructs a new Web Project Wizard.
@@ -214,6 +217,16 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 
 		// Finalize pages using contributors
 		projectWizardContributionManager.finalizeWizardPages(getPages(), getProjectNatures());
+	}
+
+	protected boolean deferCreatingProject()
+	{
+		return deferProjectCreation;
+	}
+
+	protected void setDeferCreatingProject(boolean deferProjectCreation)
+	{
+		this.deferProjectCreation = deferProjectCreation;
 	}
 
 	protected IWizardProjectCreationPage createMainPage()
@@ -339,17 +352,34 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 			refProjects = referencePage.getReferencedProjects();
 		}
 
-		boolean success = false;
+		if (!deferCreatingProject())
+		{
+			IStatus projectStatus = createAndRefreshProject(true, true, new NullProgressMonitor());
+			return projectStatus.isOK();
+		}
+		return true;
+	}
+
+	protected IStatus createAndRefreshProject(boolean isBlocking, boolean revealProject, IProgressMonitor monitor)
+	{
+		IStatus resultStatus = Status.CANCEL_STATUS;
 		try
 		{
-			getContainer().run(true, true, new IRunnableWithProgress()
+			if (isBlocking)
 			{
-				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
+				getContainer().run(true, true, new IRunnableWithProgress()
 				{
-					doCreateProject(monitor);
-				}
-			});
-			success = true;
+					public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
+					{
+						doCreateProject(monitor);
+					}
+				});
+			}
+			else
+			{
+				doCreateProject(monitor);
+			}
+			resultStatus = Status.OK_STATUS;
 		}
 		catch (InterruptedException e)
 		{
@@ -362,6 +392,7 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 			if (t instanceof ExecutionException && t.getCause() instanceof CoreException)
 			{
 				CoreException cause = (CoreException) t.getCause();
+				resultStatus = cause.getStatus();
 				StatusAdapter status;
 				if (cause.getStatus().getCode() == IResourceStatus.CASE_VARIANT_EXISTS)
 				{
@@ -379,25 +410,29 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 			}
 			else
 			{
-				StatusAdapter status = new StatusAdapter(new Status(IStatus.WARNING, ProjectsPlugin.PLUGIN_ID, 0,
-						NLS.bind(Messages.NewProjectWizard_InternalError, t.getMessage()), t));
+				resultStatus = new Status(IStatus.WARNING, ProjectsPlugin.PLUGIN_ID, 0, NLS.bind(
+						Messages.NewProjectWizard_InternalError, t.getMessage()), t);
+				StatusAdapter status = new StatusAdapter(resultStatus);
 				status.setProperty(IStatusAdapterConstants.TITLE_PROPERTY, Messages.NewProjectWizard_CreationProblem);
 				StatusManager.getManager().handle(status, StatusManager.LOG | StatusManager.BLOCK);
 			}
 		}
 
-		if (!success)
+		if (!resultStatus.isOK())
 		{
-			return false;
+			return resultStatus;
 		}
 
-		// TODO Run all of this in a job?
-		updatePerspective();
-		selectAndReveal(newProject);
-		openIndexFile();
+		if (revealProject)
+		{
+			// TODO Run all of this in a job?
+			updatePerspective();
+			selectAndReveal(newProject);
+		}
+		openIndexFile(revealProject);
 		sendProjectCreateEvent();
 
-		return true;
+		return resultStatus;
 	}
 
 	/**
@@ -667,7 +702,7 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 		sub.done();
 	}
 
-	protected void openIndexFile()
+	protected void openIndexFile(boolean activatateEditor)
 	{
 		IFile indexFile = newProject.getFile("index.html"); //$NON-NLS-1$
 		if (indexFile.exists())
@@ -677,7 +712,7 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 			{
 				try
 				{
-					IDE.openEditor(page, indexFile);
+					IDE.openEditor(page, indexFile, activatateEditor);
 				}
 				catch (PartInitException e)
 				{
