@@ -24,15 +24,6 @@
             viewerId="org.eclipse.ui.navigator.ProjectExplorer">
          <includes>
             <contentExtension
-                  pattern="com.aptana.ide.ui.io.navigatorContent">
-            </contentExtension>
-            <contentExtension
-                  pattern="com.aptana.ide.ui.io.navigator.filters.*">
-            </contentExtension>
-            <contentExtension
-                  pattern="com.aptana.ui.io.navigator.filters.*">
-            </contentExtension>
-            <contentExtension
                   pattern="com.aptana.ui.io.navigator.linkHelper">
             </contentExtension>
          </includes>
