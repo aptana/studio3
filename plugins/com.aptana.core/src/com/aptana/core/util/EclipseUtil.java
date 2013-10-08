@@ -241,27 +241,33 @@ public class EclipseUtil
 		try
 		{
 			IProduct product = Platform.getProduct();
-			String aboutText = product.getProperty("aboutText"); //$NON-NLS-1$
-
-			String pattern = "Version: (.*)\n"; //$NON-NLS-1$
-			Pattern p = Pattern.compile(pattern);
-			Matcher m = p.matcher(aboutText);
-			boolean found = m.find();
-			if (!found)
+			if (product != null)
 			{
-				p = Pattern.compile("build: (.*)\n"); //$NON-NLS-1$
-				m = p.matcher(aboutText);
-				found = m.find();
-			}
+				String aboutText = product.getProperty("aboutText"); //$NON-NLS-1$
+				if (!StringUtil.isEmpty(aboutText))
+				{
+					String pattern = "Version: (.*)\n"; //$NON-NLS-1$
+					Pattern p = Pattern.compile(pattern);
+					Matcher m = p.matcher(aboutText);
+					boolean found = m.find();
+					if (!found)
+					{
+						// fall back to trying to match build #
+						p = Pattern.compile("build: (.*)\n"); //$NON-NLS-1$
+						m = p.matcher(aboutText);
+						found = m.find();
+					}
 
-			if (found)
-			{
-				version = m.group(1);
+					if (found)
+					{
+						version = m.group(1);
+					}
+				}
 			}
 		}
 		catch (Exception e)
 		{
-			// ignores
+			// ignore
 		}
 		if (StringUtil.isEmpty(version))
 		{
