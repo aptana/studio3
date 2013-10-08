@@ -31,11 +31,14 @@ public class WebPerspectiveFactory implements IPerspectiveFactory
 
 		// Left
 		IFolderLayout left = layout.createFolder("left", IPageLayout.LEFT, 0.20f, editorArea); //$NON-NLS-1$
-		left.addView(APP_EXPLORER_ID);
+		left.addView(IPageLayout.ID_PROJECT_EXPLORER);
+		left.addPlaceholder(APP_EXPLORER_ID);
+		left.addPlaceholder("com.aptana.ui.io.remoteview"); //$NON-NLS-1$
 
 		// Bottom right: Console. Had to leave this programmatic to get the Console appear in bottom right
 		IFolderLayout bottomArea = layout.createFolder("terminalArea", IPageLayout.BOTTOM, 0.75f, //$NON-NLS-1$
 				editorArea);
 		bottomArea.addView(IConsoleConstants.ID_CONSOLE_VIEW);
+		bottomArea.addPlaceholder("com.aptana.terminal.views.terminal:*"); //$NON-NLS-1$
 	}
 }
