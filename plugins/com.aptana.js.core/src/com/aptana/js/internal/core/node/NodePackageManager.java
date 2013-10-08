@@ -8,6 +8,7 @@
 package com.aptana.js.internal.core.node;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.net.URL;
 import java.text.MessageFormat;
@@ -52,6 +53,11 @@ import com.aptana.js.core.node.INodePackageManager;
  */
 public class NodePackageManager implements INodePackageManager
 {
+
+	/**
+	 * The error string that appears in the npm command output.
+	 */
+	private static final String NPM_ERROR = "ERR!"; //$NON-NLS-1$
 
 	/**
 	 * Config value holding location where we install bianries/modules.
@@ -112,6 +118,11 @@ public class NodePackageManager implements INodePackageManager
 	 */
 	private final IPath npmPath;
 
+	/**
+	 * The local installation path of npm modules directory we're tied to.
+	 */
+	private final IPath LOCAL_NPM_INSTALL_PATH;
+
 	public NodePackageManager(INodeJS nodeJS)
 	{
 		this.nodeJS = nodeJS;
@@ -126,12 +137,16 @@ public class NodePackageManager implements INodePackageManager
 		{
 			npmPath = nodeJS.getPath().removeLastSegments(1).append(NODE_MODULES).append(NPM).append(BIN)
 					.append("npm-cli.js"); //$NON-NLS-1$
+			// Irrespective of whatever the local directory is set, Windows always installs the local npm packages
+			// directly under user home directory.
+			LOCAL_NPM_INSTALL_PATH = Path.fromOSString(PlatformUtil.expandEnvironmentStrings("%APPDATA%")); //$NON-NLS-1$
 		}
 		else
 		{
 			// For Mac/Linux, we just need to run:
 			// /path/to/node /path/to/npm <args>
 			npmPath = nodeJS.getPath().removeLastSegments(1).append(NPM);
+			LOCAL_NPM_INSTALL_PATH = Path.fromOSString(PlatformUtil.expandEnvironmentStrings("~/.titanium")); //$NON-NLS-1$
 		}
 	}
 
@@ -161,7 +176,7 @@ public class NodePackageManager implements INodePackageManager
 	public IStatus install(String packageName, String displayName, boolean global, char[] password,
 			IProgressMonitor monitor)
 	{
-		return install(packageName, displayName, global, password, null, monitor);
+		return install(packageName, displayName, global, password, LOCAL_NPM_INSTALL_PATH, monitor);
 	}
 
 	public IStatus install(String packageName, String displayName, boolean global, char[] password,
@@ -230,7 +245,7 @@ public class NodePackageManager implements INodePackageManager
 				if (!StringUtil.isEmpty(error))
 				{
 					String[] lines = error.split("\n"); //$NON-NLS-1$
-					if (lines.length > 0 && lines[lines.length - 1].contains("ERR!")) //$NON-NLS-1$
+					if (lines.length > 0 && lines[lines.length - 1].contains(NPM_ERROR)) //$NON-NLS-1$
 					{
 						IdeLog.logError(JSCorePlugin.getDefault(),
 								MessageFormat.format("Failed to install {0}.\n\n{1}", packageName, error)); //$NON-NLS-1$
@@ -415,13 +430,13 @@ public class NodePackageManager implements INodePackageManager
 					"Error getting the installed version of package {0}; falling back to use ''npm list''", //$NON-NLS-1$
 					packageName));
 		}
-		Set<String> listing = list(true);
+		Set<String> listing = list(false);
 		return listing.contains(packageName);
 	}
 
 	public IPath getModulesPath(String packageName) throws CoreException
 	{
-		IStatus status = runInBackground(PARSEABLE_ARG, LIST, packageName, GLOBAL_ARG);
+		IStatus status = runInBackground(PARSEABLE_ARG, LIST, packageName);
 		if (!status.isOK())
 		{
 			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
@@ -434,7 +449,7 @@ public class NodePackageManager implements INodePackageManager
 
 	public String getInstalledVersion(String packageName) throws CoreException
 	{
-		return getInstalledVersion(packageName, true, null);
+		return getInstalledVersion(packageName, false, LOCAL_NPM_INSTALL_PATH);
 	}
 
 	public String getInstalledVersion(String packageName, boolean global, IPath workingDir) throws CoreException
@@ -673,7 +688,13 @@ public class NodePackageManager implements INodePackageManager
 
 	public IStatus cleanNpmCache(IProgressMonitor monitor) throws CoreException
 	{
-		return runInBackground("cache", "clean"); //$NON-NLS-1$ //$NON-NLS-2$
+		IStatus status = runInBackground("cache", "clean"); //$NON-NLS-1$ //$NON-NLS-2$
+		String cacheCleanOutput = status.getMessage();
+		if (cacheCleanOutput.contains(NPM_ERROR))
+		{
+			return new Status(Status.ERROR, JSCorePlugin.PLUGIN_ID, cacheCleanOutput);
+		}
+		return status;
 	}
 
 	public String getVersion() throws CoreException
@@ -700,6 +721,13 @@ public class NodePackageManager implements INodePackageManager
 	{
 		List<String> newArgs = CollectionsUtil.newList(args);
 		newArgs.add(0, checkedNPMPath().toOSString());
-		return nodeJS.runInBackground(null, null, newArgs);
+		return nodeJS.runInBackground(LOCAL_NPM_INSTALL_PATH, null, newArgs);
+	}
+
+	public IPath findNpmPackagePath(String executableName, boolean appendExtension, List<IPath> searchLocations,
+			FileFilter filter)
+	{
+		searchLocations.add(LOCAL_NPM_INSTALL_PATH.append("node_modules").append(".bin")); //$NON-NLS-1$ //$NON-NLS-2$
+		return ExecutableUtil.find(executableName, true, searchLocations, filter);
 	}
 }

@@ -7,6 +7,8 @@
  */
 package com.aptana.js.core.node;
 
+import java.io.FileFilter;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
@@ -177,6 +179,18 @@ public interface INodePackageManager
 	 *             May throw a CoreException to indicate that the NPM path is bad.
 	 */
 	public IStatus runInBackground(String... args) throws CoreException;
+
+	/**
+	 * Search for the npm package installed locally based on the search locations.
+	 * 
+	 * @param executableName
+	 * @param appendExtension
+	 * @param searchLocations
+	 * @param fileFilter
+	 * @return
+	 */
+	public IPath findNpmPackagePath(String executableName, boolean appendExtension, List<IPath> searchLocations,
+			FileFilter fileFilter);
 
 	// TODO Update
 }
