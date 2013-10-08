@@ -455,13 +455,6 @@
          unpack="false"/>
 
    <plugin
-         id="com.aptana.portal.ui.eclipse36"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="org.mozilla.rhino"
          download-size="0"
          install-size="0"
