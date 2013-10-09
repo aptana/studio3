@@ -185,38 +185,7 @@ public class NodePackageManager implements INodePackageManager
 		String globalPrefixPath = null;
 		try
 		{
-			/*
-			 * HACK for environments with npm config prefix value set : when sudo npm -g install command is used, the
-			 * global prefix config value for the entire system overrides the global prefix value of the user. So, it
-			 * always install into /usr/lib even though user set a custom value for NPM_CONFIG_PREFIX.
-			 */
-			IPath prefixPath = getConfigPrefixPath();
-			if (prefixPath != null)
-			{
-				List<String> args = CollectionsUtil.newList(CONFIG, GET, PREFIX);
-				// TODO: should cache this value as config prefix path ?
-				IStatus npmStatus = runNpmConfig(args, password, global, workingDirectory, monitor);
-				if (npmStatus.isOK())
-				{
-					String prefix = npmStatus.getMessage();
-
-					// If the sudo cache is timed out, then the password prompt and other details might appear in the
-					// console. So we should strip them off to get the real npm prefix value.
-					String passwordPrompt = StringUtil.makeFormLabel(Messages.NodePackageManager_PasswordPrompt);
-					if (prefix.contains(passwordPrompt))
-					{
-						prefix = prefix.substring(prefix.indexOf(passwordPrompt) + passwordPrompt.length());
-					}
-
-					// Set the global prefix path only if it is not the default value.
-					if (!prefixPath.toOSString().equals(prefix))
-					{
-						globalPrefixPath = prefix;
-						setGlobalPrefixPath(password, workingDirectory, monitor, prefixPath.toOSString());
-					}
-				}
-			}
-
+			// TODO: Don't think we need to check npm config prefix value any more. Verify ?
 			IStatus status = runNpmInstaller(packageName, displayName, global, password, workingDirectory, INSTALL,
 					monitor);
 			if (status.getSeverity() == IStatus.CANCEL)
@@ -686,9 +655,14 @@ public class NodePackageManager implements INodePackageManager
 		return fConfigPrefixPath;
 	}
 
-	public IStatus cleanNpmCache(IProgressMonitor monitor) throws CoreException
+	public IStatus cleanNpmCache(char[] password, boolean global, IProgressMonitor monitor) throws CoreException
 	{
-		IStatus status = runInBackground("cache", "clean"); //$NON-NLS-1$ //$NON-NLS-2$
+		List<String> args = getNpmSudoArgs(global);
+		args.remove(GLOBAL_ARG);
+		CollectionsUtil.addToList(args, "cache", "clean"); //$NON-NLS-1$ //$NON-NLS-2$
+		IStatus status = ProcessUtil.run(CollectionsUtil.getFirstElement(args), null, password,
+				ShellExecutable.getEnvironment(), monitor, CollectionsUtil.toArray(args, 1, args.size()));
+
 		String cacheCleanOutput = status.getMessage();
 		if (cacheCleanOutput.contains(NPM_ERROR))
 		{
