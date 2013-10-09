@@ -130,7 +130,7 @@ public interface INodePackageManager
 	 * @return
 	 * @throws CoreException
 	 */
-	public IStatus cleanNpmCache(IProgressMonitor monitor) throws CoreException;
+	public IStatus cleanNpmCache(char[] password, boolean global, IProgressMonitor monitor) throws CoreException;
 
 	/**
 	 * Uninstalls an npm package.
