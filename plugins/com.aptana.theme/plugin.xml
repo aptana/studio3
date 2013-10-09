@@ -69,17 +69,6 @@
                style="push">
          </command>
       </menuContribution>
-      <menuContribution
-            allPopups="false"
-            locationURI="toolbar:com.aptana.ui.globalActionSet">
-         <command
-               commandId="com.aptana.theme.command.open_pref"
-               icon="icons/color_wheel.png"
-               id="com.aptana.theme.command.pulldown"
-               label="%theme.pulldown.label"
-               style="pulldown">
-         </command>
-      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ui.commands">

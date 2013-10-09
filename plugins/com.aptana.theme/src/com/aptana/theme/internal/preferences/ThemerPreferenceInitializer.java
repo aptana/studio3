@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -24,11 +24,12 @@ public class ThemerPreferenceInitializer extends AbstractPreferenceInitializer
 	{
 		IEclipsePreferences node = EclipseUtil.defaultScope().getNode(ThemePlugin.PLUGIN_ID);
 		node.put(IPreferenceConstants.ACTIVE_THEME, DEFAULT_THEME);
-		// Make "invasive theming" the default for our standalones.
+		// By default only apply theme to editors
+		node.putBoolean(IPreferenceConstants.APPLY_TO_ALL_VIEWS, false);
+
+		// For standalone products, apply our editor theme to 3rd-party editors
 		boolean isStandalone = (EclipseUtil.isStandalone() || EclipseUtil
 				.getPluginVersion("com.appcelerator.titanium.rcp") != null); //$NON-NLS-1$
-
-		node.putBoolean(IPreferenceConstants.APPLY_TO_ALL_VIEWS, isStandalone);
 		node.putBoolean(IPreferenceConstants.APPLY_TO_ALL_EDITORS, isStandalone);
 	}
 }
