@@ -297,21 +297,6 @@
    <extension
          point="org.eclipse.ui.menus">
       <menuContribution
-            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
-         <toolbar
-               id="com.aptana.ui.globalActionSet">
-            <command
-                  commandId="com.aptana.explorer.commands.toggleAppExplorer"
-                  style="toggle">
-               <visibleWhen>
-                  <reference
-                        definitionId="com.aptana.ui.contributions.inGlobalActionSet">
-                  </reference>
-               </visibleWhen>
-            </command>
-         </toolbar>
-      </menuContribution>
-      <menuContribution
             locationURI="popup:com.aptana.explorer.view?before=group.edit">
          <menu
                id="appExplorerShowIn"
