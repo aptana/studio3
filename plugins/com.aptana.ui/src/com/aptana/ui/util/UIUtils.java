@@ -774,4 +774,15 @@ public final class UIUtils
 	{
 		Assert.isTrue(Display.getCurrent() != null, "Function must be called from UI-thread."); //$NON-NLS-1$
 	}
+
+	public static void closeStudio(String title, String message, String productId)
+	{
+		MessageDialog.openError(UIUtils.getActiveShell(), title, message);
+		// not to use EclipseUtil.isStandalone() directly since it checks the existance of Aptana Studio RCP instead
+		// TODO fix EclipseUtil.isStandalone() to maybe read from a preference key on what plugin id to check.
+		if (EclipseUtil.getPluginVersion(productId) != null && !EclipseUtil.isTesting())
+		{
+			PlatformUI.getWorkbench().close();
+		}
+	}
 }
