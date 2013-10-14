@@ -647,7 +647,8 @@ public class StringUtil
 	}
 
 	/**
-	 * Truncates the string to a particular length if it's longer and appends ... in the end.
+	 * Truncates the string to a particular length if it's longer and appends ... in the end. So the string will
+	 * actually be length + 3
 	 * 
 	 * @param text
 	 *            the string to be truncated
@@ -662,6 +663,23 @@ public class StringUtil
 			return text;
 		}
 		return new String(ellipsify(text.substring(0, length)));
+	}
+
+	/**
+	 * A smarter truncation algorithm. The max length is truly enforced, meaning if we do truncate we always return a
+	 * string of length maxLength including the ellipses.
+	 * 
+	 * @param text
+	 * @param length
+	 * @return
+	 */
+	public static String smartTruncate(String text, int maxLength)
+	{
+		if (text == null || text.length() <= maxLength)
+		{
+			return text;
+		}
+		return new String(ellipsify(text.substring(0, maxLength - 3)));
 	}
 
 	/**
