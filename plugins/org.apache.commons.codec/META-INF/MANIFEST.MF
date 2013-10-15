@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Apache Commons Codec Plug-in
+Bundle-SymbolicName: org.apache.commons.codec
+Bundle-Version: 1.6.0
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: org.apache.commons.codec;version="1.6.0",
+ org.apache.commons.codec.binary;version="1.6.0",
+ org.apache.commons.codec.digest;version="1.6.0",
+ org.apache.commons.codec.language;version="1.6.0",
+ org.apache.commons.codec.language.bm;version="1.6.0",
+ org.apache.commons.codec.net;version="1.6.0"
+Bundle-Vendor: Apache Software Foundation
