@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -25,6 +25,7 @@ import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.MethodNotSupportedException;
+import org.apache.http.entity.ContentType;
 import org.apache.http.nio.entity.NFileEntity;
 import org.apache.http.nio.entity.NStringEntity;
 import org.apache.http.protocol.HTTP;
@@ -40,6 +41,7 @@ import org.eclipse.core.runtime.URIUtil;
 
 import com.aptana.core.IURIMapper;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.IOUtil;
 import com.aptana.webserver.core.WebServerCorePlugin;
 
 /**
@@ -67,9 +69,9 @@ import com.aptana.webserver.core.WebServerCorePlugin;
 	}
 
 	private void handleRequest(HttpRequest request, HttpResponse response, boolean head) throws HttpException,
-		IOException, CoreException, URISyntaxException
+			IOException, CoreException, URISyntaxException
 	{
-		String target = URLDecoder.decode(request.getRequestLine().getUri(), HTTP.UTF_8);
+		String target = URLDecoder.decode(request.getRequestLine().getUri(), IOUtil.UTF_8);
 		URI uri = URIUtil.fromString(target);
 		IFileStore fileStore = uriMapper.resolve(uri);
 		IFileInfo fileInfo = fileStore.fetchInfo();
@@ -85,7 +87,7 @@ import com.aptana.webserver.core.WebServerCorePlugin;
 		{
 			response.setStatusCode(HttpStatus.SC_NOT_FOUND);
 			response.setEntity(createTextEntity(MessageFormat.format(
-				Messages.LocalWebServerHttpRequestHandler_FILE_NOT_FOUND, uri.getPath())));
+					Messages.LocalWebServerHttpRequestHandler_FILE_NOT_FOUND, uri.getPath())));
 		}
 		else if (fileInfo.isDirectory())
 		{
@@ -102,18 +104,24 @@ import com.aptana.webserver.core.WebServerCorePlugin;
 			else
 			{
 				File file = fileStore.toLocalFile(EFS.NONE, new NullProgressMonitor());
-				final File temporaryFile = (file == null) ? fileStore.toLocalFile(EFS.CACHE,
-					new NullProgressMonitor()) : null;
+				final File temporaryFile = (file == null) ? fileStore.toLocalFile(EFS.CACHE, new NullProgressMonitor())
+						: null;
 				response.setEntity(new NFileEntity((file != null) ? file : temporaryFile, getMimeType(fileStore
-					.getName()))
+						.getName()))
 				{
 					@Override
-					public void finish()
+					public void close() throws IOException
 					{
-						super.finish();
-						if (temporaryFile != null && !temporaryFile.delete())
+						try
 						{
-							temporaryFile.deleteOnExit();
+							super.close();
+						}
+						finally
+						{
+							if (temporaryFile != null && !temporaryFile.delete())
+							{
+								temporaryFile.deleteOnExit();
+							}
 						}
 					}
 				});
@@ -157,8 +165,8 @@ import com.aptana.webserver.core.WebServerCorePlugin;
 	private static HttpEntity createTextEntity(String text) throws UnsupportedEncodingException
 	{
 		NStringEntity entity = new NStringEntity(MessageFormat.format("<html><body><h1>{0}</h1></body></html>", text), //$NON-NLS-1$
-				HTTP.UTF_8);
-		entity.setContentType(HTML_TEXT_TYPE + HTTP.CHARSET_PARAM + HTTP.UTF_8);
+				IOUtil.UTF_8);
+		entity.setContentType(HTML_TEXT_TYPE + HTTP.CHARSET_PARAM + IOUtil.UTF_8);
 		return entity;
 	}
 
@@ -174,9 +182,10 @@ import com.aptana.webserver.core.WebServerCorePlugin;
 		return EFS.getNullFileSystem().getStore(Path.EMPTY).fetchInfo();
 	}
 
-	private static String getMimeType(String fileName)
+	private static ContentType getMimeType(String fileName)
 	{
-		return MimeTypesRegistry.INSTANCE.getMimeType(Path.fromPortableString(fileName).getFileExtension());
+		return ContentType.create(MimeTypesRegistry.INSTANCE.getMimeType(Path.fromPortableString(fileName)
+				.getFileExtension()));
 	}
 
 }

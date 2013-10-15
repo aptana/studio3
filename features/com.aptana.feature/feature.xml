@@ -513,13 +513,6 @@
          unpack="false"/>
 
    <plugin
-         id="com.aptana.org.apache.httpcomponents.httpcore"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="com.aptana.editor.xml.formatter"
          download-size="0"
          install-size="0"
@@ -667,10 +660,17 @@
          unpack="false"/>
 
    <plugin
-         id="com.aptana.org.apache.httpcomponents.httpclient"
+         id="org.apache.httpcomponents.httpclient"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="4.2.2"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.httpcomponents.httpcore"
+         download-size="0"
+         install-size="0"
+         version="4.2.2"
          unpack="false"/>
 
    <plugin

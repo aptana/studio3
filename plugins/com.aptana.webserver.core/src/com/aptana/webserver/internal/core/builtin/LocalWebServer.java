@@ -20,11 +20,13 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import org.apache.http.impl.DefaultConnectionReuseStrategy;
-import org.apache.http.impl.DefaultHttpResponseFactory;
-import org.apache.http.impl.nio.DefaultServerIOEventDispatch;
+import org.apache.http.impl.nio.DefaultHttpServerIODispatch;
 import org.apache.http.impl.nio.reactor.DefaultListeningIOReactor;
-import org.apache.http.nio.protocol.BufferingHttpServiceHandler;
-import org.apache.http.nio.reactor.IOEventDispatch;
+import org.apache.http.impl.nio.reactor.IOReactorConfig;
+import org.apache.http.nio.protocol.BasicAsyncRequestHandler;
+import org.apache.http.nio.protocol.HttpAsyncRequestHandler;
+import org.apache.http.nio.protocol.HttpAsyncRequestHandlerRegistry;
+import org.apache.http.nio.protocol.HttpAsyncService;
 import org.apache.http.nio.reactor.IOReactorException;
 import org.apache.http.nio.reactor.IOReactorStatus;
 import org.apache.http.nio.reactor.ListeningIOReactor;
@@ -33,8 +35,6 @@ import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.BasicHttpProcessor;
-import org.apache.http.protocol.HttpRequestHandler;
-import org.apache.http.protocol.HttpRequestHandlerRegistry;
 import org.apache.http.protocol.ResponseConnControl;
 import org.apache.http.protocol.ResponseContent;
 import org.apache.http.protocol.ResponseDate;
@@ -146,7 +146,8 @@ public class LocalWebServer extends SimpleWebServer
 			@Override
 			public void run()
 			{
-				runServer(new InetSocketAddress(host, port), new LocalWebServerHttpRequestHandler(LocalWebServer.this));
+				runServer(new InetSocketAddress(host, port), new BasicAsyncRequestHandler(
+						new LocalWebServerHttpRequestHandler(LocalWebServer.this)));
 			}
 		};
 		thread.setDaemon(true);
@@ -172,7 +173,7 @@ public class LocalWebServer extends SimpleWebServer
 		}
 	}
 
-	private void runServer(InetSocketAddress socketAddress, HttpRequestHandler httpRequestHandler)
+	private void runServer(InetSocketAddress socketAddress, HttpAsyncRequestHandler httpRequestHandler)
 	{
 		HttpParams params = new BasicHttpParams();
 		params.setIntParameter(CoreConnectionPNames.SO_TIMEOUT, SOCKET_TIMEOUT)
@@ -188,18 +189,23 @@ public class LocalWebServer extends SimpleWebServer
 		httpProcessor.addInterceptor(new ResponseContent());
 		httpProcessor.addInterceptor(new ResponseConnControl());
 
-		HttpRequestHandlerRegistry handlerRegistry = new HttpRequestHandlerRegistry();
+		HttpAsyncRequestHandlerRegistry handlerRegistry = new HttpAsyncRequestHandlerRegistry();
 		handlerRegistry.register("*", httpRequestHandler); //$NON-NLS-1$
 
-		BufferingHttpServiceHandler serviceHandler = new BufferingHttpServiceHandler(httpProcessor,
-				new DefaultHttpResponseFactory(), new DefaultConnectionReuseStrategy(), params);
-		serviceHandler.setHandlerResolver(handlerRegistry);
-		serviceHandler.setEventListener(new LocalWebServerLogger());
+		HttpAsyncService serviceHandler = new HttpAsyncService(httpProcessor, new DefaultConnectionReuseStrategy(),
+				handlerRegistry, params);
+		// serviceHandler.setEventListener(new LocalWebServerLogger());
 
-		IOEventDispatch eventDispatch = new DefaultServerIOEventDispatch(serviceHandler, params);
+		IOReactorConfig config = new IOReactorConfig();
+		config.setIoThreadCount(WORKER_COUNT);
+		config.setConnectTimeout(SOCKET_TIMEOUT);
+		config.setTcpNoDelay(true);
+		config.setSoKeepalive(true);
+
+		DefaultHttpServerIODispatch eventDispatch = new DefaultHttpServerIODispatch(serviceHandler, params);
 		try
 		{
-			reactor = new DefaultListeningIOReactor(WORKER_COUNT, params);
+			reactor = new DefaultListeningIOReactor(config);
 			reactor.listen(socketAddress);
 			reactor.execute(eventDispatch);
 		}
