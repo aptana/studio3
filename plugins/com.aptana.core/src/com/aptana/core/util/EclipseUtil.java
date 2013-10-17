@@ -736,20 +736,24 @@ public class EclipseUtil
 	public static void migratePreference(String pluginId, String preferenceKey)
 	{
 		IEclipsePreferences configNode = EclipseUtil.configurationScope().getNode(pluginId);
-		if (StringUtil.EMPTY.equals(configNode.get(preferenceKey, StringUtil.EMPTY)))
+		if (!StringUtil.isEmpty(configNode.get(preferenceKey, null))) // no value in config scope
 		{
 			IEclipsePreferences instanceNode = EclipseUtil.instanceScope().getNode(pluginId);
-			String instancePrefValue = instanceNode.get(preferenceKey, StringUtil.EMPTY);
-			configNode.put(preferenceKey, instancePrefValue);
-			instanceNode.remove(preferenceKey);
-			try
+			String instancePrefValue = instanceNode.get(preferenceKey, null);
+			if (!StringUtil.isEmpty(instancePrefValue))
 			{
-				configNode.flush();
-				instanceNode.flush();
-			}
-			catch (BackingStoreException e)
-			{
-				IdeLog.logWarning(CorePlugin.getDefault(), e.getMessage(), e);
+				// only migrate if there is a value!
+				configNode.put(preferenceKey, instancePrefValue);
+				instanceNode.remove(preferenceKey);
+				try
+				{
+					configNode.flush();
+					instanceNode.flush();
+				}
+				catch (BackingStoreException e)
+				{
+					IdeLog.logWarning(CorePlugin.getDefault(), e.getMessage(), e);
+				}
 			}
 		}
 	}
