@@ -736,7 +736,7 @@ public class EclipseUtil
 	public static void migratePreference(String pluginId, String preferenceKey)
 	{
 		IEclipsePreferences configNode = EclipseUtil.configurationScope().getNode(pluginId);
-		if (!StringUtil.isEmpty(configNode.get(preferenceKey, null))) // no value in config scope
+		if (StringUtil.isEmpty(configNode.get(preferenceKey, null))) // no value in config scope
 		{
 			IEclipsePreferences instanceNode = EclipseUtil.instanceScope().getNode(pluginId);
 			String instancePrefValue = instanceNode.get(preferenceKey, null);
