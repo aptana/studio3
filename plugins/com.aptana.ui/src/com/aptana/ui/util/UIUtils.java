@@ -775,6 +775,28 @@ public final class UIUtils
 		Assert.isTrue(Display.getCurrent() != null, "Function must be called from UI-thread."); //$NON-NLS-1$
 	}
 
+	/**
+	 * Prompts to restart studio and if user accepts, then Studio is restarted immediately.
+	 * 
+	 * @param title
+	 * @param message
+	 */
+	public static void restartStudio(String title, String message)
+	{
+		boolean restart = MessageDialog.openQuestion(UIUtils.getActiveShell(), title, message);
+		if (restart)
+		{
+			PlatformUI.getWorkbench().restart();
+		}
+	}
+
+	/**
+	 * Prompts to shutdown studio and if user accepts, then Studio is shutdown immediately.
+	 * 
+	 * @param title
+	 * @param message
+	 * @param productId
+	 */
 	public static void closeStudio(String title, String message, String productId)
 	{
 		MessageDialog.openError(UIUtils.getActiveShell(), title, message);

@@ -664,7 +664,7 @@ public class NodePackageManager implements INodePackageManager
 				ShellExecutable.getEnvironment(), monitor, CollectionsUtil.toArray(args, 1, args.size()));
 
 		String cacheCleanOutput = status.getMessage();
-		if (cacheCleanOutput.contains(NPM_ERROR))
+		if (!status.isOK() || cacheCleanOutput.contains(NPM_ERROR))
 		{
 			return new Status(Status.ERROR, JSCorePlugin.PLUGIN_ID, cacheCleanOutput);
 		}
