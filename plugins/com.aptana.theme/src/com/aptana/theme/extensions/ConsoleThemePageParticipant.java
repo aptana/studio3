@@ -53,7 +53,10 @@ public class ConsoleThemePageParticipant implements IConsolePageParticipant
 						return; // Cannot handle it.
 					}
 				}
-				this.extension = new ConsoleThemer(textConsole, (Map) themeConsoleStreamToColor);
+				if (ThemePlugin.applyToViews())
+				{
+					this.extension = new ConsoleThemer(textConsole, (Map) themeConsoleStreamToColor);
+				}
 			}
 		}
 		this.page = page;
