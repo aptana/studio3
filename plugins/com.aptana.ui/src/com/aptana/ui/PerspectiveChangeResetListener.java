@@ -49,7 +49,7 @@ public class PerspectiveChangeResetListener extends PerspectiveAdapter
 
 	public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective)
 	{
-		if (perspectiveId.equals(perspective.getId()))
+		if (perspectiveId != null && perspective != null && perspectiveId.equals(perspective.getId()))
 		{
 			int version = Platform.getPreferencesService().getInt(pluginId, preferenceId, 0, null);
 			if (perspectiveVersion > version)
