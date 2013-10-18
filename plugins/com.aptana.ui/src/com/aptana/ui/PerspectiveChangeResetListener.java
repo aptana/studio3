@@ -68,16 +68,19 @@ public class PerspectiveChangeResetListener extends PerspectiveAdapter
 				}
 			}
 		}
-		String perspectiveId = perspective.getId();
-		if (!StringUtil.isEmpty(perspectiveId))
+		if (perspective != null)
 		{
-			int index = perspectiveId.lastIndexOf("."); //$NON-NLS-1$
-			if (index > -1)
+			String perspectiveId = perspective.getId();
+			if (!StringUtil.isEmpty(perspectiveId))
 			{
-				perspectiveId = perspectiveId.substring(index + 1);
+				int index = perspectiveId.lastIndexOf("."); //$NON-NLS-1$
+				if (index > -1)
+				{
+					perspectiveId = perspectiveId.substring(index + 1);
+				}
+				StudioAnalytics.getInstance().sendEvent(
+						new FeatureEvent(MessageFormat.format(PERSPECTIVE_ACTIVATE_EVENT, perspectiveId), null));
 			}
-			StudioAnalytics.getInstance().sendEvent(
-					new FeatureEvent(MessageFormat.format(PERSPECTIVE_ACTIVATE_EVENT, perspectiveId), null));
 		}
 	}
 
