@@ -1,0 +1,8 @@
+/*
+ *  Chrome Theme generate css dynamically, So do not inspect this file, See "ChromeCSSGenerator.xtend" instead
+ */
+.jeeeyul-chrome-theme { /*
+	 * This selector rule is exist for detect Chrome Theme to find rewrite target. 
+	 * See "RewriteChormeCSS.java"
+	 */
+}
