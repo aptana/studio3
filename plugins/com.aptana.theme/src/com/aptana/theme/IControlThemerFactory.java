@@ -7,30 +7,14 @@
  */
 package com.aptana.theme;
 
-import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.widgets.Control;
+import org.eclipse.jface.text.ITextViewer;
 
 public interface IControlThemerFactory
 {
 
-	public abstract void apply(Control control);
+	public abstract void apply(ITextViewer viewer);
 
-	public abstract void applyWithFontStyle(Control control, int fontStyle);
-
-	public abstract void applyWithAlpha(Control control, int alpha);
-
-	public abstract void apply(Control control, Color defaultBg);
-
-	public abstract void applyWithFontStyle(Control control, int fontStyle, Color defaultBg);
-
-	public abstract void applyWithAlpha(Control control, int alpha, Color defaultBg);
-
-	public abstract void dispose(Control control);
-
-	public abstract void apply(Viewer viewer);
-
-	public abstract void dispose(Viewer viewer);
+	public abstract void dispose(ITextViewer viewer);
 
 	public abstract void dispose();
 

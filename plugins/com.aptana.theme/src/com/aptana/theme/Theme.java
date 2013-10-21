@@ -948,17 +948,6 @@ public class Theme
 		save();
 	}
 
-	/**
-	 * Does the user have invasive themes turned on?
-	 * 
-	 * @deprecated Use {@link ThemePlugin#applyToViews()}
-	 * @return
-	 */
-	public boolean isInvasive()
-	{
-		return ThemePlugin.applyToViews();
-	}
-
 	public Color getForegroundColor()
 	{
 		return getColorManager().getColor(getForeground());

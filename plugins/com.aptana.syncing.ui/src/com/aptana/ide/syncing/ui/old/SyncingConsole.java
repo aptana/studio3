@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -9,8 +9,6 @@ package com.aptana.ide.syncing.ui.old;
 
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.console.ConsolePlugin;
@@ -20,8 +18,6 @@ import org.eclipse.ui.console.MessageConsoleStream;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
-import com.aptana.theme.ConsoleThemer;
-import com.aptana.theme.extensions.ConsoleThemePageParticipant;
 
 /**
  * @author Paul Colton
@@ -45,10 +41,6 @@ public class SyncingConsole extends MessageConsole
 	{
 		super(name, imageDescriptor);
 		_consoleStream = this.newMessageStream();
-
-		Map<MessageConsoleStream, String> themeConsoleStreamToColor = new HashMap<MessageConsoleStream, String>();
-		themeConsoleStreamToColor.put(_consoleStream, ConsoleThemer.CONSOLE_OUTPUT);
-		setAttribute(ConsoleThemePageParticipant.THEME_CONSOLE_STREAM_TO_COLOR_ATTRIBUTE, themeConsoleStreamToColor);
 	}
 
 	/**
