@@ -2,35 +2,6 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
-         id="id1"
-         point="org.eclipse.e4.workbench.model">
-      <processor
-            beforefragment="true"
-            class="net.jeeeyul.eclipse.themes.e4.ChromeProcessor">
-      </processor>
-   </extension>
-   <extension
-         point="org.eclipse.ui.preferenceTransfer">
-       <!-- 
-       	16: User can export their chrome theme preferences and reuse it with other workspace
-		https://github.com/jeeeyul/eclipse-themes/issues/issue/16
-		-->
-      <transfer
-            icon="icons/palette.gif"
-            id="net.jeeeyul.eclipse.themes.transfer"
-            name="%TransferName">
-         <mapping
-               scope="instance">
-            <entry
-                  node="net.jeeeyul.eclipse.themes">
-            </entry>
-         </mapping>
-         <description>
-            %TransferDescription
-         </description>
-      </transfer>
-   </extension>
-   <extension
          point="org.eclipse.e4.ui.css.core.propertyHandler">
       <handler
             adapter="org.eclipse.e4.ui.css.swt.dom.CTabFolderElement"
@@ -47,67 +18,6 @@
          </property-name>
          <property-name
                name="chrome-selected-tab-fill-highlight">
-         </property-name>
-      </handler>
-      <handler
-            adapter="org.eclipse.e4.ui.css.swt.dom.CompositeElement"
-            handler="net.jeeeyul.eclipse.themes.css.CompositeBorderHandler">
-         <property-name
-               name="chrome-border-top-color">
-         </property-name>
-         <property-name
-               name="chrome-border-top-visible">
-         </property-name>
-         <property-name
-               name="chrome-border-bottom-color">
-         </property-name>
-         <property-name
-               name="chrome-border-bottom-visible">
-         </property-name>
-         <property-name
-               name="chrome-border-left-color">
-         </property-name>
-         <property-name
-               name="chrome-border-left-visible">
-         </property-name>
-         <property-name
-               name="chrome-border-right-color">
-         </property-name>
-         <property-name
-               name="chrome-border-right-visible">
-         </property-name>
-      </handler>
-      <handler
-            adapter="org.eclipse.e4.ui.css.swt.dom.CompositeElement"
-            handler="net.jeeeyul.eclipse.themes.css.CompositePaddingHandler">
-         <property-name
-               name="chrome-padding-top">
-         </property-name>
-         <property-name
-               name="chrome-padding-left">
-         </property-name>
-         <property-name
-               name="chrome-padding-right">
-         </property-name>
-         <property-name
-               name="chrome-padding-bottom">
-         </property-name>
-      </handler>
-      <handler
-            adapter="org.eclipse.e4.ui.css.swt.dom.CompositeElement"
-            handler="net.jeeeyul.eclipse.themes.css.PerspectiveSwitcherCSSHandler">
-         <property-name
-               name="chrome-show-perspective-name">
-         </property-name>
-      </handler>
-      <handler
-            adapter="org.eclipse.e4.ui.css.swt.dom.CompositeElement"
-            handler="net.jeeeyul.eclipse.themes.css.StyleTextLineHandler">
-         <property-name
-               name="chrome-line-style">
-         </property-name>
-         <property-name
-               name="chrome-line-color">
          </property-name>
       </handler>
    </extension>
