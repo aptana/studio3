@@ -59,10 +59,7 @@
       <import plugin="org.eclipse.ecf"/>
       <import plugin="org.eclipse.ecf.filetransfer"/>
       <import plugin="org.eclipse.ecf.provider.filetransfer"/>
-      <import plugin="org.eclipse.e4.core.contexts"/>
       <import plugin="org.eclipse.e4.ui.css.swt.theme"/>
-      <import plugin="org.eclipse.e4.ui.model.workbench"/>
-      <import plugin="org.eclipse.e4.ui.workbench.swt"/>
       <import plugin="com.aptana.formatter.epl" version="3.2.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.formatter.ui.epl" version="3.0.0" match="greaterOrEqual"/>
       <import plugin="org.junit"/>
@@ -83,17 +80,10 @@
       <import plugin="org.eclipse.text"/>
       <import plugin="org.mozilla.rhino" version="1.7.4" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.net"/>
-      <import plugin="javax.annotation" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.e4.ui.workbench.renderers.swt"/>
       <import plugin="org.eclipse.e4.ui.css.core"/>
-      <import plugin="org.eclipse.e4.core.di"/>
       <import plugin="org.eclipse.e4.ui.css.swt"/>
-      <import plugin="org.eclipse.e4.core.services"/>
-      <import plugin="org.eclipse.e4.ui.workbench"/>
       <import plugin="javax.inject" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.osgi.services"/>
-      <import plugin="org.w3c.css.sac"/>
-      <import plugin="org.eclipse.e4.ui.widgets"/>
       <import plugin="org.eclipse.emf.ecore"/>
    </requires>
 
