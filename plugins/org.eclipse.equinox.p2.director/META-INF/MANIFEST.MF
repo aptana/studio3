@@ -1,0 +1,205 @@
+Manifest-Version: 1.0
+Bundle-Localization: plugin
+Service-Component: OSGI-INF/director.xml, OSGI-INF/planner.xml
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Built-By: e4Build
+Bundle-SymbolicName: org.eclipse.equinox.p2.director;singleton:=true
+Eclipse-SourceReferences: scm:git:git://git.eclipse.org/gitroot/equino
+ x/rt.equinox.p2.git;path="bundles/org.eclipse.equinox.p2.director";ta
+ g="I20130526-0051";commitId=fc958e5370b322d44ad3a807091617cf7d73545b
+Bundle-Activator: org.eclipse.equinox.internal.p2.director.DirectorAct
+ ivator
+Require-Bundle: org.eclipse.equinox.common;bundle-version="[3.3.0,4.0.
+ 0)",org.eclipse.core.jobs;bundle-version="[3.3.0,4.0.0)",org.eclipse.
+ equinox.p2.metadata;bundle-version="[2.0.0,3.0.0)",org.sat4j.core;bun
+ dle-version="[2.3.5,3.0.0)",org.sat4j.pb;bundle-version="[2.3.5,3.0.0
+ )"
+Bundle-Version: 2.3.0.v20130526-0335
+Export-Package: org.eclipse.equinox.internal.p2.director; x-friends:="
+ org.eclipse.equinox.p2.operations,  org.eclipse.equinox.p2.repository
+ .tools,  org.eclipse.pde.core,  org.eclipse.equinox.p2.reconciler.dro
+ pins,  org.eclipse.equinox.p2.ui,  org.eclipse.equinox.p2.director.ap
+ p",org.eclipse.equinox.internal.p2.rollback;x-internal:=true,org.ecli
+ pse.equinox.internal.provisional.p2.director; x-friends:="org.eclipse
+ .equinox.p2.console,  org.eclipse.equinox.p2.director.app,  org.eclip
+ se.equinox.p2.operations,  org.eclipse.equinox.p2.ui.admin,  org.ecli
+ pse.equinox.p2.installer",org.eclipse.equinox.p2.planner;version="2.0
+ .0"
+Build-Jdk: 1.7.0_11
+Bundle-ClassPath: .
+Bundle-ActivationPolicy: lazy
+Bundle-Vendor: %providerName
+Bundle-Name: %pluginName
+Archiver-Version: Plexus Archiver
+Created-By: Apache Maven
+Import-Package: org.eclipse.equinox.internal.p2.core.helpers,org.eclip
+ se.equinox.internal.provisional.configurator,org.eclipse.equinox.p2.c
+ ore;version="[2.0.0,3.0.0)",org.eclipse.equinox.p2.core.spi;version="
+ [2.0.0,3.0.0)",org.eclipse.equinox.p2.engine;version="[2.0.0,3.0.0)",
+ org.eclipse.equinox.p2.engine.query;version="[2.0.0,3.0.0)",org.eclip
+ se.osgi.util;version="1.0.0",org.osgi.framework;version="1.3.0"
+Bundle-ManifestVersion: 2
+
+Name: org/eclipse/equinox/internal/p2/rollback/FormerState.class
+SHA1-Digest: S1WAKihq2kiGNnqR9n39ZGkoOv8=
+
+Name: org/eclipse/equinox/internal/p2/director/SimpleDirector.class
+SHA1-Digest: 6zlqowfRXMvw8Vhdw7ga6PphEjA=
+
+Name: org/eclipse/equinox/internal/p2/director/ApplicablePatchQuery.cl
+ ass
+SHA1-Digest: V5C8i3dauz8q5oH686xzYItdkaw=
+
+Name: org/eclipse/equinox/internal/p2/director/PermissiveSlicer.class
+SHA1-Digest: hu73mvkFdNa86cKEQ6nCoR6vSk8=
+
+Name: org/eclipse/equinox/internal/p2/director/Slicer.class
+SHA1-Digest: A4BPw+DmgOocTTVpiHJp9pquBnY=
+
+Name: org/eclipse/equinox/internal/p2/director/InfiniteProgress.class
+SHA1-Digest: REQ+kcvaG6NoSnF69xw46LYA3aQ=
+
+Name: org/eclipse/equinox/internal/p2/director/Projector.class
+SHA1-Digest: c0AoBUFEr1REhpZbzR05tIgW9yU=
+
+Name: org/eclipse/equinox/p2/planner/IProfileChangeRequest.class
+SHA1-Digest: hsyseSBlTcY63h+Gk1lsQNqxueA=
+
+Name: org/eclipse/equinox/internal/p2/director/OptimizationFunction.cl
+ ass
+SHA1-Digest: oXama2xs0q++Rq5k/+MZuVCBk9w=
+
+Name: org/eclipse/equinox/internal/p2/director/SimplePlanner.class
+SHA1-Digest: 6cCIzllpW/GL6AbaqdE5r9YjyQo=
+
+Name: plugin.properties
+SHA1-Digest: L1t8uCWmBiRKoxVUC+iFblpx824=
+
+Name: org/eclipse/equinox/internal/p2/director/UserDefinedOptimization
+ Function$FakeExplanation.class
+SHA1-Digest: NLFchKGATzeEnn1UfglmTsF0DVE=
+
+Name: org/eclipse/equinox/internal/p2/director/UserDefinedOptimization
+ Function.class
+SHA1-Digest: DERtwlwRhYX4PzfgozC4xyP4EVI=
+
+Name: org/eclipse/equinox/internal/provisional/p2/director/IDirector.c
+ lass
+SHA1-Digest: wiGD5QoU4jANYXLXzxqKeknFtpU=
+
+Name: org/eclipse/equinox/internal/p2/director/Projector$ExplanationJo
+ b.class
+SHA1-Digest: AOqpBEYbBzpU9FUuUpIkZwcCiDs=
+
+Name: org/eclipse/equinox/internal/p2/director/OperationGenerator.clas
+ s
+SHA1-Digest: JKNLLZsQqpWjART2JQ0jzGOwXCk=
+
+Name: org/eclipse/equinox/internal/p2/director/Explanation$IUToInstall
+ .class
+SHA1-Digest: BN8MtdkurzToxPibwcgdMWZK4MA=
+
+Name: org/eclipse/equinox/internal/p2/director/Explanation$NotInstalla
+ bleRoot.class
+SHA1-Digest: UvSm3ERNDBc4fb809UtOeEKUWJk=
+
+Name: org/eclipse/equinox/internal/p2/director/AttachmentHelper.class
+SHA1-Digest: Zn5SN4O7YmylzkdnLzLz2ydbG6g=
+
+Name: org/eclipse/equinox/internal/p2/director/Projector$Pending.class
+SHA1-Digest: 8cds6qTJH1mj4lIzqyeYA8xqxGM=
+
+Name: org/eclipse/equinox/internal/p2/director/DirectorComponent.class
+SHA1-Digest: m3fZ4+qbnX9ZBJ3GT3PEOeg7mkM=
+
+Name: org/eclipse/equinox/internal/provisional/p2/director/RequestStat
+ us.class
+SHA1-Digest: T4pCAnH3aHxGTSdxzWzN6Y0vOcU=
+
+Name: org/eclipse/equinox/internal/provisional/p2/director/PlannerStat
+ us.class
+SHA1-Digest: TpLamNIqrOV1TcSsg9Vh71XNlAo=
+
+Name: org/eclipse/equinox/internal/p2/director/Explanation$PatchedHard
+ Requirement.class
+SHA1-Digest: ZXTnDxyDFkT32SrOw2Bjjxzl6+0=
+
+Name: OSGI-INF/planner.xml
+SHA1-Digest: mULn1V2dhBZNG2WSGEvaLQ2zZ3c=
+
+Name: org/eclipse/equinox/internal/p2/director/Explanation.class
+SHA1-Digest: WUddgNNleTWAOsDT4Yn3i3XNmJ4=
+
+Name: .api_description
+SHA1-Digest: 3yG9kf7JiFQS8Yl5/5QQD8ai3yw=
+
+Name: OSGI-INF/director.xml
+SHA1-Digest: lzc+OGdyMFYroQ0Rrb7XN8f9AQU=
+
+Name: about.html
+SHA1-Digest: ejOZra0kypGLQQ2bJtGTX+LI8tU=
+
+Name: org/eclipse/equinox/internal/p2/director/Projector$AbstractVaria
+ ble.class
+SHA1-Digest: S44Ar3iRf/5DPMm5LykgDAkqxPU=
+
+Name: org/eclipse/equinox/internal/p2/director/Explanation$Singleton.c
+ lass
+SHA1-Digest: krZP9b4wWwiCMut4B1u2fTLfUh8=
+
+Name: org/eclipse/equinox/internal/provisional/p2/director/PlannerStat
+ us$1.class
+SHA1-Digest: No66IGnrWIlzbHmBXqrkBRkT3Yg=
+
+Name: org/eclipse/equinox/p2/planner/ProfileInclusionRules.class
+SHA1-Digest: HJo3LHVhIco50RZqaTw4DkOh3cE=
+
+Name: org/eclipse/equinox/internal/p2/director/Explanation$IUInstalled
+ .class
+SHA1-Digest: f5lwXwD2nm7IywHD/duL3cqoRlE=
+
+Name: org/eclipse/equinox/internal/p2/director/PlannerComponent.class
+SHA1-Digest: zGU0dN2Kh6DIqBwSg6h5S6w9Ubk=
+
+Name: org/eclipse/equinox/p2/planner/IPlanner.class
+SHA1-Digest: a+LqFJhcDemBv9ebj2PKbTR0mLg=
+
+Name: org/eclipse/equinox/internal/p2/director/Messages.class
+SHA1-Digest: fNysUvYzSGMycKL9kqg7d1OE/2Q=
+
+Name: org/eclipse/equinox/internal/p2/director/Explanation$1.class
+SHA1-Digest: LNKQ9sPGfqdYeK9pk4+iuZpO+Uk=
+
+Name: org/eclipse/equinox/internal/p2/director/Explanation$MissingIU.c
+ lass
+SHA1-Digest: VHrC65CBwiP6owq2YLEUpC/U0K8=
+
+Name: org/eclipse/equinox/internal/p2/director/Explanation$MissingGree
+ dyIU.class
+SHA1-Digest: N/MGQ0BaETZOEQJrIYlkkqkhxKM=
+
+Name: org/eclipse/equinox/internal/p2/director/DirectorActivator.class
+SHA1-Digest: je72r/D4/z/ToKMvbkpQzG8G6BE=
+
+Name: org/eclipse/equinox/internal/p2/director/messages.properties
+SHA1-Digest: SCaiaDkFT83gIoqinyWTOBdRh7w=
+
+Name: org/eclipse/equinox/internal/p2/director/Explanation$HardRequire
+ ment.class
+SHA1-Digest: Q+mysp19XOv/aSoNnAIkN5XRawo=
+
+Name: org/eclipse/equinox/internal/provisional/p2/director/PlanExecuti
+ onHelper.class
+SHA1-Digest: n3jObfQOkUeuV6dBKVCXeROMB1U=
+
+Name: org/eclipse/equinox/internal/p2/director/ProfileChangeRequest.cl
+ ass
+SHA1-Digest: HGOAuLWlfQt8Quw+gDH9ZWXAeyk=
+
+Name: org/eclipse/equinox/internal/p2/director/QueryableArray.class
+SHA1-Digest: CWwIbupIlHoyWHxZFgeR5vJewaU=
+
+Name: org/eclipse/equinox/internal/p2/director/SimplePlanner$Everythin
+ gOptionalProfile.class
+SHA1-Digest: GXsL4cWYXOIs7mHKtpPZyDRCxrM=
+
