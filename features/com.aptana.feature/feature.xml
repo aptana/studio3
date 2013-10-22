@@ -23,34 +23,68 @@
          version="0.0.0"/>
 
    <requires>
-      <import plugin="org.eclipse.ui" version="3.4.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="org.eclipse.core.resources"/>
       <import plugin="org.eclipse.jface.text" version="3.4.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.debug.core" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.debug.ui" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.console" version="3.4.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ui.workbench"/>
+      <import plugin="org.eclipse.ui.browser" version="3.2.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.swt.webkitbrowser" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.team.core"/>
+      <import plugin="org.eclipse.debug.core" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.filesystem"/>
+      <import plugin="org.eclipse.equinox.security" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.ide" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.team.ui" version="3.4.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ui.externaltools"/>
       <import plugin="org.eclipse.compare" version="3.4.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ui.browser" version="3.2.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.editors" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.workbench.texteditor" version="3.4.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ui.navigator" version="3.3.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.expressions" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.navigator" version="3.3.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.search" version="3.2.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.views"/>
-      <import plugin="org.eclipse.osgi" version="3.1.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.equinox.security" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.jsch.core"/>
       <import plugin="com.aptana.ide.libraries.subscription"/>
-      <import plugin="com.aptana.swt.webkitbrowser" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="org.apache.commons.logging"/>
+      <import plugin="org.eclipse.jsch.core"/>
+      <import plugin="org.eclipse.osgi" version="3.1.0" match="greaterOrEqual"/>
       <import plugin="org.apache.commons.codec"/>
+      <import plugin="org.apache.commons.logging"/>
+      <import plugin="org.eclipse.ui.navigator.resources"/>
+      <import plugin="org.jruby" version="1.6.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.index.core.ui" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.js.core" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.forms"/>
+      <import plugin="org.eclipse.core.runtime" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.help.ui"/>
+      <import plugin="org.apache.ant"/>
+      <import plugin="com.ibm.icu"/>
+      <import plugin="org.eclipse.ecf"/>
+      <import plugin="org.eclipse.ecf.filetransfer"/>
+      <import plugin="org.eclipse.ecf.provider.filetransfer"/>
+      <import plugin="org.eclipse.e4.ui.css.swt.theme"/>
+      <import plugin="com.aptana.formatter.epl" version="3.2.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.formatter.ui.epl" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="org.junit"/>
+      <import plugin="com.aptana.theme" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.editor.common" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="org.apache.httpcomponents.httpcore"/>
+      <import plugin="org.eclipse.core.resources" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.help" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.jface" version="3.2.0" match="compatible"/>
+      <import plugin="org.apache.httpcomponents.httpclient"/>
+      <import plugin="com.aptana.ui" version="3.1.3" match="greaterOrEqual"/>
+      <import plugin="com.aptana.core" version="3.3.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.parsing" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.index.core" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.jetty.util.epl" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="json.simple" version="1.1.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.buildpath.core" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.text"/>
+      <import plugin="org.mozilla.rhino" version="1.7.4" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.net"/>
+      <import plugin="org.eclipse.e4.ui.css.core"/>
+      <import plugin="org.eclipse.e4.ui.css.swt"/>
+      <import plugin="javax.inject" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.osgi.services"/>
+      <import plugin="org.eclipse.emf.ecore"/>
    </requires>
 
    <plugin
@@ -556,6 +590,13 @@
 
    <plugin
          id="com.aptana.editor.epl"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.p2.director"
          download-size="0"
          install-size="0"
          version="0.0.0"
