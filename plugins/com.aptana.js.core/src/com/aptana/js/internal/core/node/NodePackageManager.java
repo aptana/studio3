@@ -701,7 +701,11 @@ public class NodePackageManager implements INodePackageManager
 	public IPath findNpmPackagePath(String executableName, boolean appendExtension, List<IPath> searchLocations,
 			FileFilter filter)
 	{
-		searchLocations.add(LOCAL_NPM_INSTALL_PATH.append("node_modules").append(".bin")); //$NON-NLS-1$ //$NON-NLS-2$
+		if (searchLocations == null)
+		{
+			searchLocations = new ArrayList<IPath>();
+		}
+		searchLocations.add(0, LOCAL_NPM_INSTALL_PATH.append("node_modules").append(".bin")); //$NON-NLS-1$ //$NON-NLS-2$
 		return ExecutableUtil.find(executableName, true, searchLocations, filter);
 	}
 }
