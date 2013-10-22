@@ -136,6 +136,24 @@ public final class ExecutableUtil
 		}
 
 		// Still no path. Let's try some default locations.
+		return findInLocations(executableName, appendExtension, searchLocations, filter);
+	}
+
+	/**
+	 * Finds the executable only in the specified search locations.
+	 * 
+	 * @param executableName
+	 * @param appendExtension
+	 * @param searchLocations
+	 * @param filter
+	 * @param workingDirectory
+	 * @return
+	 */
+	public static IPath findInLocations(String executableName, boolean appendExtension, List<IPath> searchLocations,
+			FileFilter filter)
+	{
+		boolean infoLoggingEnabled = IdeLog.isInfoEnabled(CorePlugin.getDefault(), IDebugScopes.SHELL);
+
 		if (searchLocations != null)
 		{
 			for (IPath location : searchLocations)
@@ -153,7 +171,6 @@ public final class ExecutableUtil
 				}
 			}
 		}
-
 		return null;
 	}
 
