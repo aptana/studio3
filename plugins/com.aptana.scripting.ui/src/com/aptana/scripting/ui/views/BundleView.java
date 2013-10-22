@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -33,7 +33,6 @@ import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.LoadCycleListener;
-import com.aptana.theme.ThemePlugin;
 
 public class BundleView extends ViewPart
 {
@@ -56,14 +55,6 @@ public class BundleView extends ViewPart
 	private void addListeners()
 	{
 		listenForScriptChanges();
-	}
-
-	/**
-	 * applyTheme
-	 */
-	private void applyTheme()
-	{
-		ThemePlugin.getDefault().getControlThemerFactory().apply(treeViewer);
 	}
 
 	/**
@@ -123,7 +114,6 @@ public class BundleView extends ViewPart
 		// listen to theme changes
 		hookContextMenu();
 		addListeners();
-		applyTheme();
 	}
 
 	/*
@@ -139,7 +129,6 @@ public class BundleView extends ViewPart
 		BundleManager.getInstance().removeLoadCycleListener(loadCycleListener);
 
 		super.dispose();
-		ThemePlugin.getDefault().getControlThemerFactory().dispose(treeViewer);
 	}
 
 	/**

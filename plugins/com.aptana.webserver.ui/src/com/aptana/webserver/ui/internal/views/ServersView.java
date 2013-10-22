@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -27,7 +27,6 @@ import org.eclipse.ui.services.IEvaluationService;
 
 import com.aptana.core.Identifiable;
 import com.aptana.core.util.StringUtil;
-import com.aptana.theme.ThemePlugin;
 import com.aptana.ui.ImageAssociations;
 import com.aptana.ui.util.UIUtils;
 import com.aptana.webserver.core.IServer;
@@ -87,15 +86,7 @@ public class ServersView extends ViewPart implements IServerChangeListener
 		tableViewer.setContentProvider(ArrayContentProvider.getInstance());
 		tableViewer.setInput(WebServerCorePlugin.getDefault().getServerManager().getServers());
 
-		ThemePlugin.getDefault().getControlThemerFactory().apply(tableViewer);
 		return tableViewer;
-	}
-
-	@Override
-	public void dispose()
-	{
-		super.dispose();
-		ThemePlugin.getDefault().getControlThemerFactory().dispose(serverTableViewer);
 	}
 
 	/**

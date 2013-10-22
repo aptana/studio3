@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -18,9 +18,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.navigator.CommonNavigator;
 
-import com.aptana.theme.IControlThemerFactory;
-import com.aptana.theme.ThemePlugin;
-
 public class RemoteNavigatorView extends CommonNavigator
 {
 
@@ -35,8 +32,6 @@ public class RemoteNavigatorView extends CommonNavigator
 				new FileNavigatorDecoratingLabelProvider(getNavigatorContentService().createCommonLabelProvider()));
 		getCommonViewer().setComparer(new FileSystemElementComparer());
 		ColumnViewerToolTipSupport.enableFor(getCommonViewer());
-
-		hookToThemes();
 
 		final Tree tree = getCommonViewer().getTree();
 		tree.addMouseListener(new MouseAdapter()
@@ -68,18 +63,4 @@ public class RemoteNavigatorView extends CommonNavigator
 			selectionExpander.setSelection(new TreePath(selectionPath));
 		}
 	}
-
-	/**
-	 * Hooks up to the active theme.
-	 */
-	private void hookToThemes()
-	{
-		getControlThemerFactory().apply(getCommonViewer());
-	}
-
-	private IControlThemerFactory getControlThemerFactory()
-	{
-		return ThemePlugin.getDefault().getControlThemerFactory();
-	}
-
 }

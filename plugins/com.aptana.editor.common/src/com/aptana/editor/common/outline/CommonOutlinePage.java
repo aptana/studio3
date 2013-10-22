@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -57,8 +57,6 @@ import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.lexer.IRange;
-import com.aptana.theme.IControlThemerFactory;
-import com.aptana.theme.ThemePlugin;
 import com.aptana.theme.ThemedDelegatingLabelProvider;
 import com.aptana.ui.util.UIUtils;
 
@@ -268,8 +266,6 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 			}
 		});
 
-		hookToThemes();
-
 		IActionBars actionBars = getSite().getActionBars();
 		registerActions(actionBars);
 		actionBars.updateActionBars();
@@ -350,22 +346,11 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		}
 	}
 
-	private void hookToThemes()
-	{
-		getIControlThemerFactory().apply(getTreeViewer());
-	}
-
-	protected IControlThemerFactory getIControlThemerFactory()
-	{
-		return ThemePlugin.getDefault().getControlThemerFactory();
-	}
-
 	@Override
 	public void dispose()
 	{
 		fPrefs.removePropertyChangeListener(this);
 		super.dispose();
-		getIControlThemerFactory().dispose(getTreeViewer());
 	}
 
 	@Override
