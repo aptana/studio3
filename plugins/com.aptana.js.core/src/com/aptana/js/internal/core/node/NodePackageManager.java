@@ -706,6 +706,6 @@ public class NodePackageManager implements INodePackageManager
 			searchLocations = new ArrayList<IPath>();
 		}
 		searchLocations.add(0, LOCAL_NPM_INSTALL_PATH.append("node_modules").append(".bin")); //$NON-NLS-1$ //$NON-NLS-2$
-		return ExecutableUtil.findInLocations(executableName, true, searchLocations, filter);
+		return ExecutableUtil.find(executableName, true, searchLocations, filter);
 	}
 }
