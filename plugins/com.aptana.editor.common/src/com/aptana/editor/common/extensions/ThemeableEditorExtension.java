@@ -13,13 +13,13 @@ import java.util.Iterator;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.ITextViewerExtension2;
 import org.eclipse.jface.text.source.CompositeRuler;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRulerColumn;
 import org.eclipse.jface.text.source.LineNumberRulerColumn;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.editors.text.EditorsUI;
@@ -73,7 +73,7 @@ public class ThemeableEditorExtension
 		IThemeableEditor editor = this.fEditor.get();
 		if (editor != null)
 		{
-			ThemePlugin.getDefault().getControlThemerFactory().apply((Viewer) editor.getISourceViewer());
+			ThemePlugin.getDefault().getControlThemerFactory().apply(editor.getISourceViewer());
 		}
 
 		setCharacterPairColor(getThemeManager().getCurrentTheme().getCharacterPairColor());

@@ -16,16 +16,6 @@ public interface IPreferenceConstants
 	public static final String ACTIVE_THEME = "ACTIVE_THEME"; //$NON-NLS-1$
 
 	/**
-	 * Pref key for enabling "invasive" themes (extend to JDT and other views that are not explicitly ours).
-	 */
-	public static final String APPLY_TO_ALL_VIEWS = "enable_invasive_themes"; //$NON-NLS-1$
-
-	/**
-	 * Pref key for a boolean value. Should we apply the monospaced text font to views?
-	 */
-	public static final String INVASIVE_FONT = "enable_invasive_font"; //$NON-NLS-1$
-
-	/**
 	 * When we have invasive themes on, should we apply to everything we can, or just the views (and leave non-Aptana
 	 * editors alone?)
 	 */

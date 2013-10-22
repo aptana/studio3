@@ -90,7 +90,6 @@ public class SamplesView extends ViewPart
 
 		getSite().setSelectionProvider(treeViewer);
 		hookContextMenu();
-		applyTheme();
 
 		getSamplesManager().addSampleListener(sampleListener);
 	}
@@ -105,7 +104,6 @@ public class SamplesView extends ViewPart
 	{
 		getSamplesManager().removeSampleListener(sampleListener);
 		super.dispose();
-		ThemePlugin.getDefault().getControlThemerFactory().dispose(treeViewer);
 	}
 
 	public void collapseAll()
@@ -173,11 +171,6 @@ public class SamplesView extends ViewPart
 		Menu menu = menuMgr.createContextMenu(treeViewer.getControl());
 		treeViewer.getControl().setMenu(menu);
 		getSite().registerContextMenu(menuMgr, treeViewer);
-	}
-
-	private void applyTheme()
-	{
-		ThemePlugin.getDefault().getControlThemerFactory().apply(treeViewer);
 	}
 
 	private static ISamplesManager getSamplesManager()

@@ -34,7 +34,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Tree;
 import org.eclipse.team.core.history.IFileRevision;
 import org.eclipse.team.internal.core.history.LocalFileRevision;
 import org.eclipse.team.internal.ui.Utils;
@@ -414,7 +413,8 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 				catch (CoreException e)
 				{
 					IdeLog.logError(GitUIPlugin.getDefault(),
-							Messages.GitCompareFileRevisionEditorInput_ProblemGettingContent_Error, e, IDebugScopes.DEBUG);
+							Messages.GitCompareFileRevisionEditorInput_ProblemGettingContent_Error, e,
+							IDebugScopes.DEBUG);
 				}
 			}
 			else
@@ -528,16 +528,11 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 			((TextMergeViewer) fPane.getViewer()).setForegroundColor(ThemePlugin.getDefault().getThemeManager()
 					.getCurrentTheme().getForeground());
 		}
-		if (fStructurePane != null && (fStructurePane.getContent() instanceof Tree))
-		{
-			getControlThemerFactory().apply(fStructurePane.getContent());
-		}
 	}
 
 	protected void handleDispose()
 	{
 		super.handleDispose();
-		getControlThemerFactory().dispose(fStructurePane.getContent());
 		fPane = null;
 	}
 
