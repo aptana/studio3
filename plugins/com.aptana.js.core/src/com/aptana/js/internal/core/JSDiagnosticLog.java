@@ -59,17 +59,15 @@ public class JSDiagnosticLog implements IDiagnosticLog
 				buf.append(FileUtil.NEW_LINE);
 
 				// Step1 : Get the installed version of a npm package - try to get titanium
-				IStatus titaniumStatus = npm.runInBackground(INodePackageManager.GLOBAL_ARG, "ls", "titanium"); //$NON-NLS-1$ //$NON-NLS-2$
+				IStatus titaniumStatus = npm.runInBackground("ls", "titanium"); //$NON-NLS-1$ //$NON-NLS-2$
 				String npmVersionOutput = titaniumStatus.getMessage();
-				buf.append("npm -g ls titanium: ").append(npmVersionOutput).append(FileUtil.NEW_LINE); //$NON-NLS-1$
+				buf.append("npm ls titanium: ").append(npmVersionOutput).append(FileUtil.NEW_LINE); //$NON-NLS-1$
 
 				// Step2: If Step1 fails for any reason, find the installed version of a package from the detailed list
-				// of
-				// all npm packages.
+				// of all npm packages.
 				// The original command (npm -g ls -p) is slightly different than this one, but the content and intent
-				// is
-				// the same.
-				IStatus listStatus = npm.runInBackground(INodePackageManager.GLOBAL_ARG, "list"); //$NON-NLS-1$
+				// is the same.
+				IStatus listStatus = npm.runInBackground("list"); //$NON-NLS-1$
 				String listOutput = listStatus.getMessage();
 				buf.append("Packages: ").append(listOutput).append(FileUtil.NEW_LINE); //$NON-NLS-1$
 
@@ -91,7 +89,7 @@ public class JSDiagnosticLog implements IDiagnosticLog
 
 	private String getInstalledNpmPackages(INodePackageManager npm) throws CoreException
 	{
-		IStatus status = npm.runInBackground(INodePackageManager.GLOBAL_ARG, "list", "--depth=0"); //$NON-NLS-1$ //$NON-NLS-2$
+		IStatus status = npm.runInBackground("list", "--depth=0"); //$NON-NLS-1$ //$NON-NLS-2$
 		String listOutput = status.getMessage();
 
 		// Hack : An issue in npm list command show errors or warnings because of depth option. Filter them out of the

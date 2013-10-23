@@ -201,4 +201,22 @@
          </dynamic>
       </menuContribution>
    </extension>
+      <extension
+         point="org.eclipse.debug.core.launchModes">
+      <launchMode
+            label="%package.label.name"
+            launchAsLabel="%package.label.launchas.name"
+            mode="package">
+      </launchMode>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchGroups">
+      <launchGroup
+            bannerImage="icons/full/elcl16/deploy_package.png"
+            id="com.appcelerator.titanium.publish.launchGroup"
+            image="icons/full/elcl16/deploy_package.png"
+            label="%package.label.name"
+            mode="package">
+      </launchGroup>
+   </extension>
 </plugin>

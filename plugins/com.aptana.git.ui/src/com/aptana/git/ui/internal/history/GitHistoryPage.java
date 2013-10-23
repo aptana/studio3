@@ -63,7 +63,6 @@ import com.aptana.git.core.model.GitRevList;
 import com.aptana.git.core.model.GitRevSpecifier;
 import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.git.ui.GitUIPlugin;
-import com.aptana.theme.ThemePlugin;
 import com.aptana.ui.util.UIUtils;
 
 public class GitHistoryPage extends HistoryPage
@@ -227,7 +226,6 @@ public class GitHistoryPage extends HistoryPage
 		hookContextMenu(commentViewer);
 		layout();
 
-		setTheme(false);
 		commentViewer.setText(MessageFormat.format(
 				"<html><head></head><body style=\"background-color: {0};\"></body></html>", toHex(getBackground()))); //$NON-NLS-1$
 
@@ -252,10 +250,6 @@ public class GitHistoryPage extends HistoryPage
 
 	protected RGB getBackground()
 	{
-		if (ThemePlugin.applyToViews())
-		{
-			return ThemePlugin.getDefault().getThemeManager().getCurrentTheme().getBackground();
-		}
 		return UIUtils.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND).getRGB();
 	}
 
@@ -486,28 +480,6 @@ public class GitHistoryPage extends HistoryPage
 		return false;
 	}
 
-	private void setTheme(boolean revert)
-	{
-		applyTheme(ourControl, revert);
-		applyTheme(graphDetailSplit, revert);
-		applyTheme(revInfoSplit, revert);
-		applyTheme(graph.getControl(), revert);
-		applyTheme(commentViewer, revert);
-		applyTheme(fileViewer.getControl(), revert);
-	}
-
-	private void applyTheme(Control control, boolean revert)
-	{
-		if (revert)
-		{
-			ThemePlugin.getDefault().getControlThemerFactory().dispose(control);
-		}
-		else
-		{
-			ThemePlugin.getDefault().getControlThemerFactory().apply(control);
-		}
-	}
-
 	// FIXME Copy-pasted from Theme
 	private String toHex(RGB rgb)
 	{
@@ -523,13 +495,6 @@ public class GitHistoryPage extends HistoryPage
 			builder.insert(0, padChar);
 		}
 		return builder.toString();
-	}
-
-	@Override
-	public void dispose()
-	{
-		setTheme(false);
-		super.dispose();
 	}
 
 	public void setRef(String branchName)

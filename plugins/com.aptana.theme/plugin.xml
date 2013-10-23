@@ -14,14 +14,6 @@
       </page>
    </extension>
    <extension
-         point="org.eclipse.ui.console.consolePageParticipants">
-      <consolePageParticipant
-            class="com.aptana.theme.extensions.ConsoleThemePageParticipant"
-            id="com.aptana.theme.extensions.consoleThemePageParticipant">
-         <enablement></enablement>
-      </consolePageParticipant>
-   </extension>
-   <extension
          point="org.eclipse.ui.themes">
       <fontDefinition
             categoryId="org.eclipse.ui.workbenchMisc"

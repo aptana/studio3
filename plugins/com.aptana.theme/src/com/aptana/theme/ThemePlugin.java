@@ -7,7 +7,12 @@
  */
 package com.aptana.theme;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.resource.ImageRegistry;
@@ -17,12 +22,15 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.theme.internal.ControlThemerFactory;
 import com.aptana.theme.internal.InvasiveThemeHijacker;
 import com.aptana.theme.internal.ThemeManager;
 import com.aptana.theme.preferences.IPreferenceConstants;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -119,7 +127,6 @@ public class ThemePlugin extends AbstractUIPlugin
 	private IControlThemerFactory fControlThemerFactory;
 
 	// Store latest value of whether invasive theme is on so we don't need to query platform prefs every time.
-	private Boolean fApplyThemeToAllViews;
 	private Boolean fApplyThemeToAllEditors;
 	private IPreferenceChangeListener fThemeChangeListener;
 	private IPreferenceChangeListener fEclipseColorsListener;
@@ -140,36 +147,97 @@ public class ThemePlugin extends AbstractUIPlugin
 		super.start(context);
 		plugin = this;
 
-		// Listen to when invasive themes is turned on or off and cache the value for perf sake
-		fThemeChangeListener = new IPreferenceChangeListener()
+		Job job = new Job("Initializing theme plugin...") //$NON-NLS-1$
 		{
-			public void preferenceChange(PreferenceChangeEvent event)
+			@Override
+			protected IStatus run(IProgressMonitor monitor)
 			{
-				if (IPreferenceConstants.APPLY_TO_ALL_VIEWS.equals(event.getKey()))
+				// Listen to when invasive themes is turned on or off and cache the value for perf sake
+				fThemeChangeListener = new IPreferenceChangeListener()
 				{
-					fApplyThemeToAllViews = Platform.getPreferencesService().getBoolean(ThemePlugin.PLUGIN_ID,
-							IPreferenceConstants.APPLY_TO_ALL_VIEWS, false, null);
-				}
-				else if (IPreferenceConstants.APPLY_TO_ALL_EDITORS.equals(event.getKey()))
-				{
-					fApplyThemeToAllEditors = Platform.getPreferencesService().getBoolean(ThemePlugin.PLUGIN_ID,
-							IPreferenceConstants.APPLY_TO_ALL_EDITORS, false, null);
-				}
+					public void preferenceChange(PreferenceChangeEvent event)
+					{
+						if (IPreferenceConstants.APPLY_TO_ALL_EDITORS.equals(event.getKey()))
+						{
+							fApplyThemeToAllEditors = Platform.getPreferencesService().getBoolean(
+									ThemePlugin.PLUGIN_ID, IPreferenceConstants.APPLY_TO_ALL_EDITORS, false, null);
+						}
+					}
+				};
+				EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID)
+						.addPreferenceChangeListener(fThemeChangeListener);
+
+				fApplyThemeToAllEditors = Platform.getPreferencesService().getBoolean(ThemePlugin.PLUGIN_ID,
+						IPreferenceConstants.APPLY_TO_ALL_EDITORS, false, null);
+
+				themeHijacker = new InvasiveThemeHijacker();
+				themeHijacker.apply();
+
+				// Listen for changes to eclipse editor colors and synch them back to our theme
+				fEclipseColorsListener = new EditorColorSyncher();
+				EclipseUtil.instanceScope().getNode("org.eclipse.ui.editors") //$NON-NLS-1$
+						.addPreferenceChangeListener(fEclipseColorsListener);
+
+				revertConsoleColors();
+
+				return Status.OK_STATUS;
 			}
 		};
-		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
-		fApplyThemeToAllViews = Platform.getPreferencesService().getBoolean(ThemePlugin.PLUGIN_ID,
-				IPreferenceConstants.APPLY_TO_ALL_VIEWS, false, null);
-		fApplyThemeToAllEditors = Platform.getPreferencesService().getBoolean(ThemePlugin.PLUGIN_ID,
-				IPreferenceConstants.APPLY_TO_ALL_EDITORS, false, null);
+		EclipseUtil.setSystemForJob(job);
+		job.schedule();
+	}
 
-		themeHijacker = new InvasiveThemeHijacker();
-		themeHijacker.apply();
+	/**
+	 * Reverts the console colors back to defaults.
+	 * 
+	 * @deprecated This is a one-time migration to revert back to defaults from invasive theming. This code should be
+	 *             removed in the next major revision of Studio (3.5? TISTUD 3.3)
+	 */
+	private void revertConsoleColors()
+	{
+		boolean reverted = Platform.getPreferencesService().getBoolean(ThemePlugin.PLUGIN_ID, "reverted_console",
+				false, null);
+		if (reverted)
+		{
+			// we've already reverted them
+			return;
+		}
 
-		// Listen for changes to eclipse editor colors and synch them back to our theme
-		fEclipseColorsListener = new EditorColorSyncher();
-		EclipseUtil.instanceScope().getNode("org.eclipse.ui.editors") //$NON-NLS-1$
-				.addPreferenceChangeListener(fEclipseColorsListener);
+		UIUtils.getDisplay().asyncExec(new Runnable()
+		{
+
+			public void run()
+			{
+				IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode("org.eclipse.debug.ui"); //$NON-NLS-1$
+
+				prefs.remove("org.eclipse.debug.ui.errorColor"); //$NON-NLS-1$
+				prefs.remove("org.eclipse.debug.ui.outColor"); //$NON-NLS-1$
+				prefs.remove("org.eclipse.debug.ui.inColor"); //$NON-NLS-1$
+				prefs.remove("org.eclipse.debug.ui.consoleBackground"); //$NON-NLS-1$
+				prefs.remove("org.eclipse.debug.ui.PREF_CHANGED_VALUE_BACKGROUND"); //$NON-NLS-1$
+
+				try
+				{
+					prefs.flush();
+
+					// Store that we've reverted the console
+					IEclipsePreferences themePrefs = EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID);
+					themePrefs.putBoolean("reverted_console", true); //$NON-NLS-1$
+					try
+					{
+						themePrefs.flush();
+					}
+					catch (BackingStoreException e)
+					{
+						IdeLog.logError(ThemePlugin.getDefault(), e);
+					}
+				}
+				catch (BackingStoreException e)
+				{
+					IdeLog.logError(ThemePlugin.getDefault(), e);
+				}
+			}
+		});
 	}
 
 	/*
@@ -266,13 +334,11 @@ public class ThemePlugin extends AbstractUIPlugin
 	}
 
 	/**
-	 * TODO Maybe these methods should live in the ThemeManager?
-	 * 
-	 * @return
+	 * @deprecated This option is being removed!
 	 */
 	public static synchronized boolean applyToViews()
 	{
-		return (plugin == null) ? false : plugin.fApplyThemeToAllViews;
+		return false;
 	}
 
 	public static synchronized boolean applyToAllEditors()

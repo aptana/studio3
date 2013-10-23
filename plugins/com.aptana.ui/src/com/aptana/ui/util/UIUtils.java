@@ -781,13 +781,21 @@ public final class UIUtils
 	 * @param title
 	 * @param message
 	 */
-	public static void restartStudio(String title, String message)
+	public static void restartStudio(final String title, final String message)
 	{
-		boolean restart = MessageDialog.openQuestion(UIUtils.getActiveShell(), title, message);
-		if (restart)
+		showMessageDialogFromBgThread(new SafeMessageDialogRunnable()
 		{
-			PlatformUI.getWorkbench().restart();
-		}
+			@Override
+			public int openMessageDialog()
+			{
+				boolean restart = MessageDialog.openQuestion(UIUtils.getActiveShell(), title, message);
+				if (restart)
+				{
+					PlatformUI.getWorkbench().restart();
+				}
+				return 0;
+			}
+		});
 	}
 
 	/**
