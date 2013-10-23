@@ -130,7 +130,7 @@ public interface INodePackageManager
 	 * @return
 	 * @throws CoreException
 	 */
-	public IStatus cleanNpmCache(char[] password, boolean runWithSudo, IProgressMonitor monitor) throws CoreException;
+	public IStatus cleanNpmCache(char[] password, boolean runWithSudo, IProgressMonitor monitor);
 
 	/**
 	 * Uninstalls an npm package.
@@ -200,9 +200,8 @@ public interface INodePackageManager
 	 * @param runWithSudo
 	 * @param monitor
 	 * @return
-	 * @throws CoreException
 	 */
-	IStatus changeNPMCacheOwner(char[] password, boolean runWithSudo, IProgressMonitor monitor) throws CoreException;
+	IStatus changeNPMCacheOwner(char[] password, boolean runWithSudo, IProgressMonitor monitor);
 
 	// TODO Update
 }

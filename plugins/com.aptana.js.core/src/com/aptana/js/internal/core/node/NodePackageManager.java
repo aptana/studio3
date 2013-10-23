@@ -148,6 +148,11 @@ public class NodePackageManager implements INodePackageManager
 			npmPath = nodeJS.getPath().removeLastSegments(1).append(NPM);
 			LOCAL_NPM_INSTALL_PATH = Path.fromOSString(PlatformUtil.expandEnvironmentStrings("~/.titanium")); //$NON-NLS-1$
 		}
+		File localNPMPath = new File(LOCAL_NPM_INSTALL_PATH.toOSString());
+		if (!localNPMPath.exists())
+		{
+			localNPMPath.mkdirs();
+		}
 	}
 
 	/**
@@ -658,9 +663,17 @@ public class NodePackageManager implements INodePackageManager
 		return fConfigPrefixPath;
 	}
 
-	public IStatus cleanNpmCache(char[] password, boolean runWithSudo, IProgressMonitor monitor) throws CoreException
+	public IStatus cleanNpmCache(char[] password, boolean runWithSudo, IProgressMonitor monitor)
 	{
-		List<String> args = getNpmSudoArgs(runWithSudo);
+		List<String> args = new ArrayList<String>();
+		try
+		{
+			args = getNpmSudoArgs(runWithSudo);
+		}
+		catch (CoreException e)
+		{
+			return e.getStatus();
+		}
 		args.remove(GLOBAL_ARG);
 		CollectionsUtil.addToList(args, "cache", "clean"); //$NON-NLS-1$ //$NON-NLS-2$
 		IStatus status = ProcessUtil.run(CollectionsUtil.getFirstElement(args), null, password,
@@ -675,7 +688,6 @@ public class NodePackageManager implements INodePackageManager
 	}
 
 	public IStatus changeNPMCacheOwner(char[] password, boolean runWithSudo, IProgressMonitor monitor)
-			throws CoreException
 	{
 		List<String> args = new ArrayList<String>();
 		if (runWithSudo)
