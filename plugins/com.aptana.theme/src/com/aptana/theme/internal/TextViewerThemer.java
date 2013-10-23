@@ -66,6 +66,9 @@ public class TextViewerThemer extends ControlThemer
 
 		if (invasiveThemesEnabled() && !controlIsDisposed())
 		{
+			// Don't always show the scrollbars, show them only when necessary
+			getTextWidget().setAlwaysShowScrollBars(false);
+			applyControlColors();
 			overrideSelectionColor();
 			overrideCursor();
 			overrideCaretColor();
