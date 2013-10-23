@@ -130,7 +130,7 @@ public interface INodePackageManager
 	 * @return
 	 * @throws CoreException
 	 */
-	public IStatus cleanNpmCache(char[] password, boolean global, IProgressMonitor monitor) throws CoreException;
+	public IStatus cleanNpmCache(char[] password, boolean runWithSudo, IProgressMonitor monitor);
 
 	/**
 	 * Uninstalls an npm package.
@@ -191,6 +191,17 @@ public interface INodePackageManager
 	 */
 	public IPath findNpmPackagePath(String executableName, boolean appendExtension, List<IPath> searchLocations,
 			FileFilter fileFilter);
+
+	/**
+	 * Changes the ownership of the entire NPM cache directory and its contents (on Mac, it is in ~/.npm) to the current
+	 * user.
+	 * 
+	 * @param password
+	 * @param runWithSudo
+	 * @param monitor
+	 * @return
+	 */
+	IStatus changeNPMCacheOwner(char[] password, boolean runWithSudo, IProgressMonitor monitor);
 
 	// TODO Update
 }

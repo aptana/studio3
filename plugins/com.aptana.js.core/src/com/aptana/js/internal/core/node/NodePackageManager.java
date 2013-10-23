@@ -148,6 +148,11 @@ public class NodePackageManager implements INodePackageManager
 			npmPath = nodeJS.getPath().removeLastSegments(1).append(NPM);
 			LOCAL_NPM_INSTALL_PATH = Path.fromOSString(PlatformUtil.expandEnvironmentStrings("~/.titanium")); //$NON-NLS-1$
 		}
+		File localNPMPath = new File(LOCAL_NPM_INSTALL_PATH.toOSString());
+		if (!localNPMPath.exists())
+		{
+			localNPMPath.mkdirs();
+		}
 	}
 
 	/**
@@ -558,9 +563,7 @@ public class NodePackageManager implements INodePackageManager
 		{
 			if (!PlatformUtil.isWindows())
 			{
-				args.add("sudo"); //$NON-NLS-1$
-				args.add("-S"); //$NON-NLS-1$
-				args.add("--"); //$NON-NLS-1$
+				args.addAll(getSudoArgs());
 			}
 			args.add(nodeJS.getPath().toOSString());
 			args.add(npmPath.toOSString());
@@ -572,6 +575,11 @@ public class NodePackageManager implements INodePackageManager
 			args.add(npmPath.toOSString());
 		}
 		return args;
+	}
+
+	private List<String> getSudoArgs()
+	{
+		return CollectionsUtil.newList("sudo", "-S", "--"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	public IStatus uninstall(String packageName, String displayName, boolean global, char[] password,
@@ -655,9 +663,17 @@ public class NodePackageManager implements INodePackageManager
 		return fConfigPrefixPath;
 	}
 
-	public IStatus cleanNpmCache(char[] password, boolean global, IProgressMonitor monitor) throws CoreException
+	public IStatus cleanNpmCache(char[] password, boolean runWithSudo, IProgressMonitor monitor)
 	{
-		List<String> args = getNpmSudoArgs(global);
+		List<String> args = new ArrayList<String>();
+		try
+		{
+			args = getNpmSudoArgs(runWithSudo);
+		}
+		catch (CoreException e)
+		{
+			return e.getStatus();
+		}
 		args.remove(GLOBAL_ARG);
 		CollectionsUtil.addToList(args, "cache", "clean"); //$NON-NLS-1$ //$NON-NLS-2$
 		IStatus status = ProcessUtil.run(CollectionsUtil.getFirstElement(args), null, password,
@@ -666,6 +682,29 @@ public class NodePackageManager implements INodePackageManager
 		String cacheCleanOutput = status.getMessage();
 		if (!status.isOK() || cacheCleanOutput.contains(NPM_ERROR))
 		{
+			return new Status(Status.ERROR, JSCorePlugin.PLUGIN_ID, cacheCleanOutput);
+		}
+		return status;
+	}
+
+	public IStatus changeNPMCacheOwner(char[] password, boolean runWithSudo, IProgressMonitor monitor)
+	{
+		List<String> args = new ArrayList<String>();
+		if (runWithSudo)
+		{
+			args.addAll(getSudoArgs());
+		}
+		// Finds the current user and then, assigns the ownership.
+		IStatus userStatus = ProcessUtil.runInBackground("whoami", null); //$NON-NLS-1$
+		String currentUser = userStatus.getMessage();
+		CollectionsUtil.addToList(args, "chown", "-R", currentUser, PlatformUtil.expandEnvironmentStrings("~/.npm")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		IStatus status = ProcessUtil.run(CollectionsUtil.getFirstElement(args), null, password,
+				ShellExecutable.getEnvironment(), monitor, CollectionsUtil.toArray(args, 1, args.size()));
+
+		String cacheCleanOutput = status.getMessage();
+		if (!status.isOK() || !StringUtil.isEmpty(cacheCleanOutput))
+		{
+			// Any output in this command indicates the operation is not permitted for the current user.
 			return new Status(Status.ERROR, JSCorePlugin.PLUGIN_ID, cacheCleanOutput);
 		}
 		return status;
