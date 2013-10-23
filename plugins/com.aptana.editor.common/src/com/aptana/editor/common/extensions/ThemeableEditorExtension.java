@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -13,13 +13,14 @@ import java.util.Iterator;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.ITextViewerExtension2;
 import org.eclipse.jface.text.source.CompositeRuler;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRulerColumn;
 import org.eclipse.jface.text.source.LineNumberRulerColumn;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.editors.text.EditorsUI;
@@ -159,19 +160,30 @@ public class ThemeableEditorExtension
 	{
 		IThemeableEditor editor = this.fEditor.get();
 
-		// Use normal parent gray bg
-		if (fParent == null || fLineColumn == null)
+		// default to bg color of surrounding composite
+		Color bg = fParent == null ? null : fParent.getBackground();
+		// Use editor background color if we can
+		if (editor != null)
 		{
-			return;
+			ISourceViewer sv = editor.getISourceViewer();
+			if (sv != null)
+			{
+				StyledText text = sv.getTextWidget();
+				bg = text.getBackground();
+			}
+
+			// force the colors for all the ruler columns (specifically so we force the folding bg to match).
+			Iterator<IVerticalRulerColumn> iter = ((CompositeRuler) editor.getIVerticalRuler()).getDecoratorIterator();
+			while (iter.hasNext())
+			{
+				IVerticalRulerColumn column = iter.next();
+				column.getControl().setBackground(bg);
+			}
 		}
 
-		fLineColumn.setBackground(fParent.getBackground());
-		// force the colors for all the ruler columns (specifically so we force the folding bg to match).
-		Iterator<IVerticalRulerColumn> iter = ((CompositeRuler) editor.getIVerticalRuler()).getDecoratorIterator();
-		while (iter.hasNext())
+		if (fLineColumn != null)
 		{
-			IVerticalRulerColumn column = iter.next();
-			column.getControl().setBackground(fParent.getBackground());
+			fLineColumn.setBackground(bg);
 		}
 	}
 
