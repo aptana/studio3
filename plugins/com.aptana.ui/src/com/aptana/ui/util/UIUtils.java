@@ -788,7 +788,8 @@ public final class UIUtils
 			@Override
 			public int openMessageDialog()
 			{
-				boolean restart = MessageDialog.openQuestion(UIUtils.getActiveShell(), title, message);
+				boolean restart = MessageDialog.openQuestion(UIUtils.getActiveWorkbenchWindow().getShell(), title,
+						message);
 				if (restart)
 				{
 					PlatformUI.getWorkbench().restart();
