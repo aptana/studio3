@@ -21,5 +21,18 @@
          </property-name>
       </handler>
    </extension>
+   <extension
+         point="org.eclipse.e4.ui.css.swt.theme">
+      <theme
+            basestylesheeturi="themes/dashboard.css"
+            id="com.appcelerator.titanium.rcp.theme.dashboard"
+            label="Light Studio">
+      </theme>
+      <theme
+            basestylesheeturi="themes/dark.css"
+            id="com.appcelerator.theme.dark"
+            label="Dark Studio">
+      </theme>
+   </extension>
 
 </plugin>
