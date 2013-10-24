@@ -108,6 +108,12 @@ public class ConsoleThemer
 					ColorManager colorManager = plugin.getColorManager();
 					Theme theme = plugin.getThemeManager().getCurrentTheme();
 
+					// set background color
+					// NOTE: we have to force the background color to change; otherwise, even
+					// with a forced redraw, the background will not be drawn
+					fConsole.setBackground(null);
+					fConsole.setBackground(colorManager.getColor(theme.getBackground()));
+
 					// set default stream colors
 					// Note that some colors are repeated because they're used in different scenarios.
 					HashMap<String, Color> colorNameToDefault = new HashMap<String, Color>();
@@ -201,7 +207,8 @@ public class ConsoleThemer
 			}
 		};
 
-		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(this.fThemeChangeListener);
+		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID)
+				.addPreferenceChangeListener(this.fThemeChangeListener);
 	}
 
 	/**
@@ -209,7 +216,8 @@ public class ConsoleThemer
 	 */
 	public void dispose()
 	{
-		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(this.fThemeChangeListener);
+		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID)
+				.removePreferenceChangeListener(this.fThemeChangeListener);
 		this.fConsole = null;
 		this.fThemeConsoleStreamToColor = null;
 	}

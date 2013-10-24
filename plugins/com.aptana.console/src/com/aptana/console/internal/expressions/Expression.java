@@ -110,10 +110,9 @@ public final class Expression
 		RGB defaultRGB = getCurrentTheme().getForeground();
 		if (ta.getForeground().getRGB().equals(defaultRGB))
 		{
-			return new TextAttribute(null, ThemePlugin.applyToViews() ? ta.getBackground() : null, ta.getStyle());
+			return new TextAttribute(null, ta.getBackground(), ta.getStyle());
 		}
-		return new TextAttribute(ta.getForeground(), ThemePlugin.applyToViews() ? ta.getBackground() : null,
-				ta.getStyle());
+		return ta;
 	}
 
 	/**
@@ -124,7 +123,7 @@ public final class Expression
 	 */
 	public Color calculateBackground(String lineText)
 	{
-		if (enabled && ThemePlugin.applyToViews() && getPattern().matcher(lineText).matches())
+		if (enabled && getPattern().matcher(lineText).matches())
 		{
 			return getCurrentTheme().getBackground(groupScopes.get(groupScopes.firstKey()));
 		}

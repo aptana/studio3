@@ -20,8 +20,6 @@ import org.eclipse.jface.text.source.IVerticalRulerColumn;
 import org.eclipse.jface.text.source.LineNumberRulerColumn;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
@@ -162,11 +160,8 @@ public class ThemeableEditorExtension
 	{
 		IThemeableEditor editor = this.fEditor.get();
 
-		// FIXME Somehow sometimes this color is getting disposed and busting the UI.
-
 		// default to bg color of surrounding composite
-		Color bg = fParent == null ? null : fParent.getBackground();
-
+		Color bg = null;
 		// Use editor background color if we can
 		if (editor != null)
 		{
@@ -177,11 +172,14 @@ public class ThemeableEditorExtension
 				if (text != null)
 				{
 					bg = text.getBackground();
+					// copy the color because for some reason it gets disposed
+					bg = ThemePlugin.getDefault().getColorManager().getColor(bg.getRGB());
 				}
 			}
 
 			// force the colors for all the ruler columns (specifically so we force the folding bg to match).
-			Iterator<IVerticalRulerColumn> iter = ((CompositeRuler) editor.getIVerticalRuler()).getDecoratorIterator();
+			CompositeRuler ruler = (CompositeRuler) editor.getIVerticalRuler();
+			Iterator<IVerticalRulerColumn> iter = ruler.getDecoratorIterator();
 			while (iter.hasNext())
 			{
 				IVerticalRulerColumn column = iter.next();

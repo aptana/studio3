@@ -25,6 +25,7 @@ import org.eclipse.jface.text.hyperlink.DefaultHyperlinkPresenter;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -37,6 +38,7 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.theme.ConsoleThemer;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.Theme;
 import com.aptana.theme.ThemePlugin;
@@ -75,7 +77,14 @@ public class InvasiveThemeHijacker extends UIJob implements IPreferenceChangeLis
 		}
 
 		// Apply to editors
-		applyThemeToEclipseEditors(getCurrentTheme(), !applyToAllEditors(), sub.newChild(8));
+		applyThemeToEclipseEditors(getCurrentTheme(), !applyToAllEditors(), sub.newChild(7));
+		if (sub.isCanceled())
+		{
+			return Status.CANCEL_STATUS;
+		}
+
+		// Apply to consoles
+		applyThemeToConsole(getCurrentTheme(), sub.newChild(1));
 		if (sub.isCanceled())
 		{
 			return Status.CANCEL_STATUS;
@@ -87,6 +96,44 @@ public class InvasiveThemeHijacker extends UIJob implements IPreferenceChangeLis
 
 		sub.done();
 		return Status.OK_STATUS;
+	}
+
+	private void applyThemeToConsole(Theme currentTheme, IProgressMonitor monitor)
+	{
+		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode("org.eclipse.debug.ui"); //$NON-NLS-1$
+		setColor(prefs, "org.eclipse.debug.ui.errorColor", currentTheme, ConsoleThemer.CONSOLE_ERROR, //$NON-NLS-1$
+				currentTheme.getForegroundAsRGB("console.error")); //$NON-NLS-1$
+		setColor(prefs, "org.eclipse.debug.ui.outColor", currentTheme, ConsoleThemer.CONSOLE_OUTPUT, //$NON-NLS-1$
+				currentTheme.getForeground());
+		setColor(prefs, "org.eclipse.debug.ui.inColor", currentTheme, ConsoleThemer.CONSOLE_INPUT, //$NON-NLS-1$
+				currentTheme.getForegroundAsRGB("console.input")); //$NON-NLS-1$
+		prefs.put("org.eclipse.debug.ui.consoleBackground", StringConverter.asString(currentTheme.getBackground())); //$NON-NLS-1$
+		prefs.put("org.eclipse.debug.ui.PREF_CHANGED_VALUE_BACKGROUND", //$NON-NLS-1$
+				StringConverter.asString(currentTheme.getBackgroundAsRGB("markup.changed.variable"))); //$NON-NLS-1$
+
+		if (monitor.isCanceled())
+		{
+			return;
+		}
+		try
+		{
+			prefs.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			IdeLog.logError(ThemePlugin.getDefault(), e);
+		}
+	}
+
+	protected void setColor(IEclipsePreferences prefs, String prefKey, Theme currentTheme, String tokenName,
+			RGB defaultColor)
+	{
+		RGB rgb = defaultColor;
+		if (currentTheme.hasEntry(tokenName))
+		{
+			rgb = currentTheme.getForegroundAsRGB(tokenName);
+		}
+		prefs.put(prefKey, StringConverter.asString(rgb));
 	}
 
 	private boolean applyToAllEditors()
