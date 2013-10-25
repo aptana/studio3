@@ -61,7 +61,15 @@ public class ControlThemerFactory implements IControlThemerFactory
 
 	public void dispose(ITextViewer viewer)
 	{
-		dispose(viewer);
+		IControlThemer themer;
+		synchronized (themers)
+		{
+			themer = themers.remove(viewer);
+		}
+		if (themer != null)
+		{
+			themer.dispose();
+		}
 	}
 
 }
