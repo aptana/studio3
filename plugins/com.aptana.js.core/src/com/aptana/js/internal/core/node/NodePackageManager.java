@@ -118,11 +118,6 @@ public class NodePackageManager implements INodePackageManager
 	 */
 	private final IPath npmPath;
 
-	/**
-	 * The local installation path of npm modules directory we're tied to.
-	 */
-	private final IPath LOCAL_NPM_INSTALL_PATH;
-
 	public NodePackageManager(INodeJS nodeJS)
 	{
 		this.nodeJS = nodeJS;
@@ -137,21 +132,12 @@ public class NodePackageManager implements INodePackageManager
 		{
 			npmPath = nodeJS.getPath().removeLastSegments(1).append(NODE_MODULES).append(NPM).append(BIN)
 					.append("npm-cli.js"); //$NON-NLS-1$
-			// Irrespective of whatever the local directory is set, Windows always installs the local npm packages
-			// directly under user home directory.
-			LOCAL_NPM_INSTALL_PATH = Path.fromOSString(PlatformUtil.expandEnvironmentStrings("%APPDATA%")); //$NON-NLS-1$
 		}
 		else
 		{
 			// For Mac/Linux, we just need to run:
 			// /path/to/node /path/to/npm <args>
 			npmPath = nodeJS.getPath().removeLastSegments(1).append(NPM);
-			LOCAL_NPM_INSTALL_PATH = Path.fromOSString(PlatformUtil.expandEnvironmentStrings("~/.titanium")); //$NON-NLS-1$
-		}
-		File localNPMPath = new File(LOCAL_NPM_INSTALL_PATH.toOSString());
-		if (!localNPMPath.exists())
-		{
-			localNPMPath.mkdirs();
 		}
 	}
 
@@ -181,7 +167,7 @@ public class NodePackageManager implements INodePackageManager
 	public IStatus install(String packageName, String displayName, boolean global, char[] password,
 			IProgressMonitor monitor)
 	{
-		return install(packageName, displayName, global, password, LOCAL_NPM_INSTALL_PATH, monitor);
+		return install(packageName, displayName, global, password, null, monitor);
 	}
 
 	public IStatus install(String packageName, String displayName, boolean global, char[] password,
@@ -190,7 +176,37 @@ public class NodePackageManager implements INodePackageManager
 		String globalPrefixPath = null;
 		try
 		{
-			// TODO: Don't think we need to check npm config prefix value any more. Verify ?
+			/*
+			 * HACK for environments with npm config prefix value set : when sudo npm -g install command is used, the
+			 * global prefix config value for the entire system overrides the global prefix value of the user. So, it
+			 * always install into /usr/lib even though user set a custom value for NPM_CONFIG_PREFIX.
+			 */
+			IPath prefixPath = getConfigPrefixPath();
+			if (prefixPath != null)
+			{
+				List<String> args = CollectionsUtil.newList(CONFIG, GET, PREFIX);
+				// TODO: should cache this value as config prefix path ?
+				IStatus npmStatus = runNpmConfig(args, password, global, workingDirectory, monitor);
+				if (npmStatus.isOK())
+				{
+					String prefix = npmStatus.getMessage();
+
+					// If the sudo cache is timed out, then the password prompt and other details might appear in the
+					// console. So we should strip them off to get the real npm prefix value.
+					String passwordPrompt = StringUtil.makeFormLabel(Messages.NodePackageManager_PasswordPrompt);
+					if (prefix.contains(passwordPrompt))
+					{
+						prefix = prefix.substring(prefix.indexOf(passwordPrompt) + passwordPrompt.length());
+					}
+
+					// Set the global prefix path only if it is not the default value.
+					if (!prefixPath.toOSString().equals(prefix))
+					{
+						globalPrefixPath = prefix;
+						setGlobalPrefixPath(password, workingDirectory, monitor, prefixPath.toOSString());
+					}
+				}
+			}
 			IStatus status = runNpmInstaller(packageName, displayName, global, password, workingDirectory, INSTALL,
 					monitor);
 			if (status.getSeverity() == IStatus.CANCEL)
@@ -404,13 +420,13 @@ public class NodePackageManager implements INodePackageManager
 					"Error getting the installed version of package {0}; falling back to use ''npm list''", //$NON-NLS-1$
 					packageName));
 		}
-		Set<String> listing = list(false);
+		Set<String> listing = list(true);
 		return listing.contains(packageName);
 	}
 
 	public IPath getModulesPath(String packageName) throws CoreException
 	{
-		IStatus status = runInBackground(PARSEABLE_ARG, LIST, packageName);
+		IStatus status = runInBackground(PARSEABLE_ARG, LIST, packageName, GLOBAL_ARG);
 		if (!status.isOK())
 		{
 			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
@@ -423,7 +439,7 @@ public class NodePackageManager implements INodePackageManager
 
 	public String getInstalledVersion(String packageName) throws CoreException
 	{
-		return getInstalledVersion(packageName, false, LOCAL_NPM_INSTALL_PATH);
+		return getInstalledVersion(packageName, true, null);
 	}
 
 	public String getInstalledVersion(String packageName, boolean global, IPath workingDir) throws CoreException
@@ -734,17 +750,12 @@ public class NodePackageManager implements INodePackageManager
 	{
 		List<String> newArgs = CollectionsUtil.newList(args);
 		newArgs.add(0, checkedNPMPath().toOSString());
-		return nodeJS.runInBackground(LOCAL_NPM_INSTALL_PATH, null, newArgs);
+		return nodeJS.runInBackground(null, null, newArgs);
 	}
 
 	public IPath findNpmPackagePath(String executableName, boolean appendExtension, List<IPath> searchLocations,
 			FileFilter filter)
 	{
-		if (searchLocations == null)
-		{
-			searchLocations = new ArrayList<IPath>();
-		}
-		searchLocations.add(0, LOCAL_NPM_INSTALL_PATH.append("node_modules").append(".bin")); //$NON-NLS-1$ //$NON-NLS-2$
 		return ExecutableUtil.find(executableName, true, searchLocations, filter);
 	}
 }
