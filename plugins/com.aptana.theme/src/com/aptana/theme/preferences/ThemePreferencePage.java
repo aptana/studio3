@@ -1179,14 +1179,10 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 	@Override
 	public boolean performOk()
 	{
-		if (getSelection() != null)
+		org.eclipse.e4.ui.css.swt.theme.ITheme selectedTheme = getSelection();
+		if (selectedTheme != null)
 		{
-			if (!getSelection().equals(currentE4Theme))
-			{
-				MessageDialog.openWarning(getShell(), "", //$NON-NLS-1$
-						""); //$NON-NLS-1$
-			}
-			e4ThemeEngine.setTheme(getSelection(), true);
+			e4ThemeEngine.setTheme(selectedTheme, true);
 		}
 
 		performOkFonts();
