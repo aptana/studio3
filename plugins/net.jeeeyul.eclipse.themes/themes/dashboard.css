@@ -23,9 +23,14 @@
 	swt-unselected-close-visible: true; /* let user close unselected tabs by showing close image on hover */
 	chrome-selected-tab-color: #484850;
 	chrome-unselected-tab-color: #484850;
+	color: #000000;
 }
-.MPartStack, .MPartStack .MPart, .MPartStack .MPart Tree, .MPartStack .MPart Table {
+.MPartStack,
+.MPartStack .MPart,
+.MPartStack .MPart Tree,
+.MPartStack .MPart Table {
 	background-color: #f1f1f1;
+	color: #000000;
 }
 
 /* White bg for active parts */
@@ -36,8 +41,12 @@
 	swt-selected-tab-fill: #ffffff;
 }
 
-.MPartStack.active, .MPartStack.active .MPart, .MPartStack.active .MPart Tree, .MPartStack.active .MPart Table {
+.MPartStack.active,
+.MPartStack.active .MPart,
+.MPartStack.active .MPart Tree,
+.MPartStack.active .MPart Table {
 	background-color: #ffffff;
+	color: #000000;
 }
 
 /* Empty editor - let's basically hide it */
@@ -61,6 +70,7 @@
 /* Bottom status bar */
 .MTrimBar {
 	background-color: #cccccc;
+	color: #484850;
 }
 
 /* Text in Status bar */
