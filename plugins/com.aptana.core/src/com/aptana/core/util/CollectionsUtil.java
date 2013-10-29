@@ -858,4 +858,13 @@ public class CollectionsUtil
 
 		return new ImmutableTuple<List<T>, List<T>>(trueResults, falseResults);
 	}
+
+	public static int size(Collection<? extends Object> collection)
+	{
+		if (collection == null)
+		{
+			return 0;
+		}
+		return collection.size();
+	}
 }
