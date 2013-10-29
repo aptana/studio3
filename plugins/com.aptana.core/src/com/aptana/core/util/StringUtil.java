@@ -513,6 +513,26 @@ public class StringUtil
 	}
 
 	/**
+	 * Forces a string to be padded by appending the given character to the end until the string is the desired length
+	 * 
+	 * @param string
+	 * @param c
+	 * @param length
+	 * @return
+	 */
+	public static String padEnd(String string, char c, int length)
+	{
+		if (string == null)
+		{
+			string = EMPTY;
+		}
+		int currentlength = string.length();
+		int diff = length - currentlength;
+
+		return concat(string, repeat(c, diff));
+	}
+
+	/**
 	 * Add single quotes around the given string.
 	 * 
 	 * @param string
