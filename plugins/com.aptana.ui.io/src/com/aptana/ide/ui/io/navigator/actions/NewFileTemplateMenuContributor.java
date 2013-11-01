@@ -71,6 +71,7 @@ public class NewFileTemplateMenuContributor extends ContributionItem
 
 	// @formatter:off
 	private static final Set<String> FILTERED_EDITORS = CollectionsUtil.newSet(
+			"com.aptana.editor.xml.alloy", //$NON-NLS-1$
 			"com.aptana.editor.dtd", //$NON-NLS-1$
 			"com.aptana.editor.svg" //$NON-NLS-1$
 			);
