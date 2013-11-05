@@ -17,7 +17,7 @@ import com.aptana.theme.preferences.IPreferenceConstants;
 public class ThemerPreferenceInitializer extends AbstractPreferenceInitializer
 {
 
-	public static final String DEFAULT_THEME = "Aptana Studio"; //$NON-NLS-1$
+	public static final String DEFAULT_THEME = "Light Studio"; //$NON-NLS-1$
 
 	@Override
 	public void initializeDefaultPreferences()
