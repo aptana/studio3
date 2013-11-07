@@ -57,14 +57,6 @@
             class="org.eclipse.ui.navigator.resources.ResourceDragAdapterAssistant"
             viewerId="com.aptana.explorer.view">
       </dragAssistant>
-      <viewerActionBinding
-            viewerId="org.eclipse.ui.navigator.ProjectExplorer">
-         <includes>
-            <actionExtension
-                  pattern="com.aptana.explorer.navigator.actions.DeployActions">
-            </actionExtension>
-         </includes>
-      </viewerActionBinding>
 	</extension>
    <extension
          point="com.aptana.scripting.contextContributors">
