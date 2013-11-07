@@ -1,0 +1,6 @@
+@import url("dashboard.css");
+
+.MPartStack {
+	font-size: 14;
+	font-family: 'PT Sans'; /* Available in Mac since Lion */
+}

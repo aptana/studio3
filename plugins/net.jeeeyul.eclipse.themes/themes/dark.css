@@ -9,8 +9,6 @@
 
 /* Black BG for inactive parts */
 .MPartStack {
-	font-size: 14;
-	font-family: 'PT Sans';
 	swt-simple: true;
 	swt-tab-renderer: url('bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering');
 	padding: 1px 6px 8px 6px; /* top left bottom right */

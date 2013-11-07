@@ -24,15 +24,41 @@
    <extension
          point="org.eclipse.e4.ui.css.swt.theme">
       <theme
-            basestylesheeturi="themes/dashboard.css"
+            basestylesheeturi="themes/gtk_dark.css"
             id="com.appcelerator.titanium.rcp.theme.dashboard"
-            label="Light Studio">
+            label="Light Studio"
+            os="linux">
       </theme>
       <theme
-            basestylesheeturi="themes/dark.css"
-            id="com.appcelerator.theme.dark"
-            label="Dark Studio">
+            basestylesheeturi="themes/win_dashboard.css"
+            id="com.appcelerator.titanium.rcp.theme.dashboard"
+            label="Light Studio"
+            os="win32">
       </theme>
+      <theme
+            basestylesheeturi="themes/mac_dashboard.css"
+            id="com.appcelerator.titanium.rcp.theme.dashboard"
+            label="Light Studio"
+            os="macosx">
+      </theme>
+      <theme
+            basestylesheeturi="themes/gtk_dark.css"
+            id="com.appcelerator.theme.dark"
+            label="Dark Studio"
+ 			os="linux">
+      </theme>
+      <theme
+            basestylesheeturi="themes/win_dark.css"
+            id="com.appcelerator.theme.dark"
+            label="Dark Studio"
+			os="win32">
+      </theme>
+      <theme
+            basestylesheeturi="themes/mac_dark.css"
+            id="com.appcelerator.theme.dark"
+            label="Dark Studio"
+            os="macosx">
+      </theme>     
    </extension>
 
 </plugin>
