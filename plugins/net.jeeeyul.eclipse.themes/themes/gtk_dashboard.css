@@ -1,5 +1,129 @@
-@import url("dashboard.css");
+.MTrimmedWindow.topLevel {
+	margin-top: 2px;
+	margin-bottom: 2px;
+	margin-left: 2px;
+	margin-right: 2px;
+}
 
+/* Slight off white BG for inactive parts */
+.MPartStack {
+	swt-simple: true;
+	swt-tab-renderer: url('bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering');
+	padding: 1px 6px 8px 6px; /* top left bottom right */
+	swt-tab-outline: #a2a2a2;
+	swt-outer-keyline-color: #a2a2a2;
+	swt-unselected-tabs-color: #e7e7e7 #e7e7e7 #f1f1f1 99% 100%;
+	swt-shadow-visible: true;
+	swt-selected-tab-fill: #f1f1f1;
+	swt-shadow-color: #cccccc;
+	swt-mru-visible: true;
+	swt-corner-radius: 6px;
+	swt-unselected-close-visible: true; /* let user close unselected tabs by showing close image on hover */
+	chrome-selected-tab-color: #484850;
+	chrome-unselected-tab-color: #484850;
+	color: #000000;
+}
+.MPartStack,
+.MPartStack .MPart,
+.MPartStack .MPart Tree,
+.MPartStack .MPart Table {
+	background-color: #f1f1f1;
+	color: #000000;
+}
+
+CTabItem {
+	font-style: normal;
+	font-weight: normal;
+}
+
+/* White bg for active parts */
+.MPartStack.active {
+	swt-tab-outline: #a2a2a2;
+	swt-outer-keyline-color: #a2a2a2;
+	swt-unselected-tabs-color: #f1f1f1 #f1f1f1 #ffffff 99% 100%;
+	swt-selected-tab-fill: #ffffff;
+}
+
+.MPartStack.active,
+.MPartStack.active .MPart,
+.MPartStack.active .MPart Tree,
+.MPartStack.active .MPart Table {
+	background-color: #ffffff;
+	color: #000000;
+}
+
+/* Empty editor - let's basically hide it */
+.MPartStack.empty {
+	swt-unselected-tabs-color: #cccccc #cccccc #cccccc 99% 100%;
+	swt-tab-outline: #cccccc;
+	swt-outer-keyline-color: #cccccc;
+	background-color: #cccccc;
+	maximize-visible: false;
+	minimize-visible: false;
+}
+
+.MTrimmedWindow {
+	margin-top: 2px;
+	margin-bottom: 2px;
+	margin-left: 2px;
+	margin-right: 2px;
+	background-color: #cccccc;
+}
+
+/* Bottom status bar */
+.MTrimBar {
+	background-color: #cccccc;
+	color: #484850;
+}
+
+/* Text in Status bar */
+.MTrimBar CLabel {
+	color: #484850;
+}
+
+.MTrimBar#org-eclipse-ui-main-toolbar {
+	background-color: #cccccc #cccccc;
+}
+
+/* This is the gutter and overview ruler background around editor */
+CTabFolder Canvas {
+	background-color: #FFFFFF;
+}
+
+CTabFolder.MArea .MPartStack, CTabFolder.MArea .MPartStack.active {
+	swt-shadow-visible: false;
+}
+
+.MPart.Editor, #org-eclipse-ui-editorss {
+	swt-tab-renderer: url('bundleclass://org.eclipse.e4.ui.workbench.renderers.swt/org.eclipse.e4.ui.workbench.renderers.swt.CTabRendering');
+	swt-tab-height: 8px;
+	padding: 0px 0px 0px;
+}
+
+.MToolControl.TrimStack {
+	handle-image: url(chrome://drag-handle?height=22&background-color=#cccccc&embossed=true);
+}
+
+.MTrimBar .Draggable {
+	handle-image: url(chrome://drag-handle?height=22&background-color=#cccccc&embossed=true);
+}
+
+.MTrimBar#org-eclipse-ui-main-toolbar .Draggable {
+	handle-image: url(chrome://drag-handle?height=22&background-color=#cccccc&embossed=true);
+}
+
+.MTrimBar#org-eclipse-ui-main-toolbar .TrimStack {
+	handle-image: url(chrome://drag-handle?height=22&background-color=#cccccc&embossed=true);
+}
+
+#org-eclipse-ui-main-toolbar #PerspectiveSwitcher {
+	eclipse-perspective-keyline-color: #cccccc;
+	background-color: #cccccc #cccccc 100%;
+	handle-image: none;
+}
+
+
+/* GTK specific */
 .MPartStack {
 	font-size: 12;
 }
