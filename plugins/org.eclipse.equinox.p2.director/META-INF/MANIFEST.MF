@@ -14,7 +14,7 @@ Require-Bundle: org.eclipse.equinox.common;bundle-version="[3.3.0,4.0.
  equinox.p2.metadata;bundle-version="[2.0.0,3.0.0)",org.sat4j.core;bun
  dle-version="[2.3.5,3.0.0)",org.sat4j.pb;bundle-version="[2.3.5,3.0.0
  )"
-Bundle-Version: 2.3.0.v20130526-0335
+Bundle-Version: 2.4.0.v20130526-0335
 Export-Package: org.eclipse.equinox.internal.p2.director; x-friends:="
  org.eclipse.equinox.p2.operations,  org.eclipse.equinox.p2.repository
  .tools,  org.eclipse.pde.core,  org.eclipse.equinox.p2.reconciler.dro
