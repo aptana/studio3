@@ -79,7 +79,6 @@ public class ConsoleAutoScrollPageParticipant extends PlatformObject implements 
 		textWidget.addListener(SWT.MouseUp, listener);
 		textWidget.addListener(SWT.KeyDown, listener);
 		textWidget.addListener(SWT.KeyUp, listener);
-		textWidget.addListener(SWT.Resize, listener);
 		ScrollBar vBar = textWidget.getVerticalBar();
 		if (vBar != null)
 		{
