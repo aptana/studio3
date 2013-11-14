@@ -82,6 +82,14 @@ public final class VersionUtil
 	 */
 	public static int compareVersions(String left, String right, boolean isStrict, boolean handleHyphen)
 	{
+		if (left == null)
+		{
+			left = StringUtil.EMPTY;
+		}
+		if (right == null)
+		{
+			right = StringUtil.EMPTY;
+		}
 		int result;
 		String[] lparts = VERSION_DOT_PATTERN.split(left);
 		String[] rparts = VERSION_DOT_PATTERN.split(right);
