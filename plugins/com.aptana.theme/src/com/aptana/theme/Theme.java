@@ -882,7 +882,7 @@ public class Theme
 		return searchResultBG;
 	}
 
-	RGB lighten(RGB color)
+	public RGB lighten(RGB color)
 	{
 		return lighten(color, (float) 0.15);
 	}
@@ -893,7 +893,7 @@ public class Theme
 		return new RGB(hsb[0], hsb[1], Math.min(1, hsb[2] + amount));
 	}
 
-	RGB darken(RGB color)
+	public RGB darken(RGB color)
 	{
 		return darken(color, (float) 0.15);
 	}
@@ -946,17 +946,6 @@ public class Theme
 		coloringRules.remove(entry);
 		wipeCache();
 		save();
-	}
-
-	/**
-	 * Does the user have invasive themes turned on?
-	 * 
-	 * @deprecated Use {@link ThemePlugin#applyToViews()}
-	 * @return
-	 */
-	public boolean isInvasive()
-	{
-		return ThemePlugin.applyToViews();
 	}
 
 	public Color getForegroundColor()

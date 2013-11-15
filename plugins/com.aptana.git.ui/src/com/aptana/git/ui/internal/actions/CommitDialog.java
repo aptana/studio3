@@ -85,12 +85,14 @@ import org.eclipse.ui.handlers.IHandlerActivation;
 import org.eclipse.ui.handlers.IHandlerService;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.git.core.IDebugScopes;
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.DiffFormatter;
 import com.aptana.git.ui.GitUIPlugin;
+import com.aptana.ui.util.UIUtils;
 
 class CommitDialog extends StatusDialog
 {
@@ -582,33 +584,7 @@ class CommitDialog extends StatusDialog
 				Point p = event.gc.stringExtent(text); // is text wider than available width?
 				if (p.x > width)
 				{
-					// chop string in half and drop a few characters
-					int middle = text.length() / 2;
-					String beginning = text.substring(0, middle - 1);
-					String end = text.substring(middle + 2, text.length());
-					// Now repeatedly chop off one char from each end until we fit
-					// TODO Chop each side separately? it'd take more loops, but text would fit tighter when uneven
-					// lengths work better..
-					while (event.gc.stringExtent(beginning + "..." + end).x > width) //$NON-NLS-1$
-					{
-						if (beginning.length() > 0)
-						{
-							beginning = beginning.substring(0, beginning.length() - 1);
-						}
-						else
-						{
-							break;
-						}
-						if (end.length() > 0)
-						{
-							end = end.substring(1);
-						}
-						else
-						{
-							break;
-						}
-					}
-					text = beginning + "..." + end; //$NON-NLS-1$
+					text = UIUtils.shortenText(text, width);
 				}
 				event.gc.drawText(text, event.x, event.y, true);
 
@@ -957,29 +933,47 @@ class CommitDialog extends StatusDialog
 	@Override
 	protected void okPressed()
 	{
-		// if there are still unstaged changes don't set return code and close.
-		if (unstagedTable.getItemCount() > 0)
+		// disable the buttons until commit is done
+		getButton(IDialogConstants.CANCEL_ID).setEnabled(false);
+		getButton(IDialogConstants.OK_ID).setEnabled(false);
+
+		// try the commit
+		IStatus status = gitRepository.index().commit(getCommitMessage());
+		if (status.isOK())
 		{
-			// disable the buttons until commit is done
-			getButton(IDialogConstants.CANCEL_ID).setEnabled(false);
-			getButton(IDialogConstants.OK_ID).setEnabled(false);
-			boolean success = gitRepository.index().commit(getCommitMessage());
-			if (success)
-			{
-				// commit worked, wipe commit message and staged files in table
-				commitMessage.setText(StringUtil.EMPTY);
-				stagedTable.removeAll();
-				// TODO Show some sort of success message?
-			}
-			// TODO What if the commit failed for some reason?!
-			// Re-enable buttons
-			getButton(IDialogConstants.CANCEL_ID).setEnabled(true);
-			getButton(IDialogConstants.OK_ID).setEnabled(true);
+			// commit worked, wipe commit message
+			commitMessage.setText(StringUtil.EMPTY);
 		}
-		else
+
+		// Force a reload of the staged/unstaged file listing
+		List<ChangedFile> changedFiles = gitRepository.index().changedFiles();
+		// If there are no more staged/unstaged files and the commit went OK, close the dialog.
+		if (CollectionsUtil.isEmpty(changedFiles) && status.isOK())
 		{
 			super.okPressed();
+			return;
 		}
+
+		Collections.sort(changedFiles);
+		stagedTable.removeAll();
+		unstagedTable.removeAll();
+		for (ChangedFile file : changedFiles)
+		{
+			if (file.hasStagedChanges())
+			{
+				createTableItem(stagedTable, file, false);
+			}
+			if (file.hasUnstagedChanges())
+			{
+				createTableItem(unstagedTable, file, false);
+			}
+		}
+		// Update our status
+		updateStatus(status);
+
+		// Re-enable buttons
+		getButton(IDialogConstants.CANCEL_ID).setEnabled(true);
+		getButton(IDialogConstants.OK_ID).setEnabled(true);
 	}
 
 	public String getCommitMessage()
@@ -1070,16 +1064,20 @@ class CommitDialog extends StatusDialog
 	 */
 	private void moveItems(final boolean staged, TableItem... selected)
 	{
-		Set<ChangedFile> selectedFiles = new HashSet<ChangedFile>();
+		Set<ChangedFile> selectedFiles = new HashSet<ChangedFile>(selected.length);
 		for (TableItem item : selected)
 		{
 			ChangedFile file = getChangedFile(item);
 			if (file == null)
+			{
 				continue;
+			}
 			selectedFiles.add(file);
 		}
 		if (selectedFiles.isEmpty())
+		{
 			return;
+		}
 
 		// Actually stage or unstage the files
 		if (staged)

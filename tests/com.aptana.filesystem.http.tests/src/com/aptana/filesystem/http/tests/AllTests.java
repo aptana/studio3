@@ -8,6 +8,7 @@
 package com.aptana.filesystem.http.tests;
 
 import junit.framework.Test;
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 import org.kohsuke.junit.ParallelTestSuite;
@@ -17,7 +18,15 @@ public class AllTests
 
 	public static Test suite()
 	{
-		TestSuite suite = new ParallelTestSuite(AllTests.class.getName(), 2);
+		TestSuite suite = new ParallelTestSuite(AllTests.class.getName(), 2)
+		{
+			@Override
+			public void runTest(Test test, TestResult result)
+			{
+				System.err.println("Running test: " + test.toString());
+				super.runTest(test, result);
+			}
+		};
 		// $JUnit-BEGIN$
 		suite.addTestSuite(HttpFileSystemTest.class);
 		suite.addTestSuite(HttpFileStoreTest.class);

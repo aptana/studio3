@@ -101,7 +101,8 @@ public abstract class GitTestCase extends TestCase
 		try
 		{
 			repo.waitForWrite();
-			assertTrue("Failed to commit", index.commit(commitMessage));
+			IStatus status = index.commit(commitMessage);
+			assertTrue("Failed to commit: " + status.getMessage(), status.isOK());
 			assertTrue("After a commit, the repository changed file listing should be empty but is not", index
 					.changedFiles().isEmpty());
 		}

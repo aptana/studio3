@@ -78,8 +78,6 @@ import com.aptana.core.util.PlatformUtil;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.ui.filter.AbstractResourceBasedViewerFilter;
 import com.aptana.explorer.ui.filter.PathFilter;
-import com.aptana.theme.Theme;
-import com.aptana.theme.ThemePlugin;
 import com.aptana.ui.util.UIUtils;
 import com.aptana.ui.widgets.SearchComposite;
 
@@ -1028,16 +1026,7 @@ public class FilteringProjectView extends GitProjectView
 
 	protected Color getHoverBackgroundColor()
 	{
-		if (ThemePlugin.applyToViews())
-		{
-			return ThemePlugin.getDefault().getColorManager().getColor(getActiveTheme().getLineHighlightAgainstBG());
-		}
 		return UIUtils.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
-	}
-
-	protected Theme getActiveTheme()
-	{
-		return getThemeManager().getCurrentTheme();
 	}
 
 	private boolean filterOn()

@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -29,6 +29,7 @@ import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IBreakpointManager;
 import org.eclipse.debug.core.IDebugEventSetListener;
+import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.osgi.service.prefs.BackingStoreException;
@@ -47,6 +48,11 @@ public final class DebugOptionsManager implements IDebugEventSetListener {
 	 * DEBUGGER_ACTIVE_SUFFIX
 	 */
 	private static final String DEBUGGER_ACTIVE_SUFFIX = ".debuggerActive"; //$NON-NLS-1$
+
+	/**
+	 * PROFILER_ACTIVE_SUFFIX
+	 */
+	private static final String PROFILER_ACTIVE_SUFFIX = ".profilerActive"; //$NON-NLS-1$
 
 	/**
 	 * DETAIL_FORMATTER_IS_ENABLED
@@ -98,7 +104,11 @@ public final class DebugOptionsManager implements IDebugEventSetListener {
 	}
 
 	public static boolean isDebuggerActive(String modelIdentifier) {
-		return "true".equals(System.getProperty(modelIdentifier + DEBUGGER_ACTIVE_SUFFIX)); //$NON-NLS-1$
+		return Boolean.TRUE.toString().equals(System.getProperty(modelIdentifier + DEBUGGER_ACTIVE_SUFFIX));
+	}
+
+	public static boolean isProfilerActive(String modelIdentifier) {
+		return Boolean.TRUE.toString().equals(System.getProperty(modelIdentifier + PROFILER_ACTIVE_SUFFIX));
 	}
 
 	/**
@@ -269,10 +279,16 @@ public final class DebugOptionsManager implements IDebugEventSetListener {
 					&& modelIdentifier.equals(((IDebugTarget) event.getSource()).getModelIdentifier())) {
 				switch (event.getKind()) {
 					case DebugEvent.CREATE:
-						System.setProperty(modelIdentifier + DEBUGGER_ACTIVE_SUFFIX, "true"); //$NON-NLS-1$
+						String launchMode = ((IDebugTarget) event.getSource()).getLaunch().getLaunchMode();
+						if (ILaunchManager.DEBUG_MODE.equals(launchMode)) {
+							System.setProperty(modelIdentifier + DEBUGGER_ACTIVE_SUFFIX, Boolean.TRUE.toString());
+						} else if (ILaunchManager.PROFILE_MODE.equals(launchMode)) {
+							System.setProperty(modelIdentifier + PROFILER_ACTIVE_SUFFIX, Boolean.TRUE.toString());
+						}
 						break;
 					case DebugEvent.TERMINATE:
 						System.getProperties().remove(modelIdentifier + DEBUGGER_ACTIVE_SUFFIX);
+						System.getProperties().remove(modelIdentifier + PROFILER_ACTIVE_SUFFIX);
 						cleanupBreakpoints();
 						break;
 					default:

@@ -7,8 +7,6 @@
  */
 package com.aptana.theme;
 
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.IFontProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -16,8 +14,6 @@ import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
-
-import com.aptana.theme.preferences.IPreferenceConstants;
 
 /**
  * This label provider wraps another label provider and extends it to use them active theme's colors and font. This is
@@ -66,7 +62,7 @@ public class ThemedDelegatingLabelProvider implements ILabelProvider, IColorProv
 
 	protected boolean invasiveThemesEnabled()
 	{
-		return getThemeManager().getCurrentTheme().isInvasive();
+		return ThemePlugin.applyToViews();
 	}
 
 	protected IThemeManager getThemeManager()
@@ -89,22 +85,8 @@ public class ThemedDelegatingLabelProvider implements ILabelProvider, IColorProv
 			}
 			return null;
 		}
-		if (!useEditorFont())
-		{
-			return null;
-		}
-		Font font = JFaceResources.getFont(IThemeManager.VIEW_FONT_NAME);
-		if (font == null)
-		{
-			font = JFaceResources.getTextFont();
-		}
-		return font;
-	}
 
-	protected boolean useEditorFont()
-	{
-		return Platform.getPreferencesService().getBoolean(ThemePlugin.PLUGIN_ID, IPreferenceConstants.INVASIVE_FONT,
-				false, null);
+		return null;
 	}
 
 	public void addListener(ILabelProviderListener listener)

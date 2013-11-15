@@ -30,9 +30,11 @@ public class ProjectData
 	public boolean cloneFromGit;
 	public IProject project;
 
+	public static String DEFAULT_PUBLISHER_URL = "http://"; //$NON-NLS-1$
+
 	public ProjectData()
 	{
-		this(null, null, null, false, null, null, null, null, false);
+		this(null, null, null, false, null, DEFAULT_PUBLISHER_URL, null, null, false);
 	}
 
 	public ProjectData(IProject project, String projectName, String directory, boolean isDefaultLocation, String appId,

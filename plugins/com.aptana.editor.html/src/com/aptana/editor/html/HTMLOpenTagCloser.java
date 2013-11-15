@@ -11,8 +11,8 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.ITypedRegion;
 
+import com.aptana.editor.html.core.preferences.IPreferenceConstants;
 import com.aptana.editor.html.parsing.HTMLParseState;
-import com.aptana.editor.html.preferences.IPreferenceConstants;
 import com.aptana.editor.xml.OpenTagCloser;
 
 public class HTMLOpenTagCloser extends OpenTagCloser

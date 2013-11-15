@@ -168,18 +168,18 @@ import com.aptana.scope.ScopeSelector;
 
 		for (ImmutableTuple<ScopeSelector, DelayedTextAttribute> tup : scopeToAttribute)
 		{
-			if (tup.o1.matches(scope))
+			if (tup.first.matches(scope))
 			{
-				return tup.o2;
+				return tup.second;
 			}
 		}
 		if (theme.hasDarkBG())
 		{
 			for (ImmutableTuple<ScopeSelector, DelayedTextAttribute> tup : scopeToAttributeDark)
 			{
-				if (tup.o1.matches(scope))
+				if (tup.first.matches(scope))
 				{
-					return tup.o2;
+					return tup.second;
 				}
 			}
 		}
@@ -187,9 +187,9 @@ import com.aptana.scope.ScopeSelector;
 		{
 			for (ImmutableTuple<ScopeSelector, DelayedTextAttribute> tup : scopeToAttributeLight)
 			{
-				if (tup.o1.matches(scope))
+				if (tup.first.matches(scope))
 				{
-					return tup.o2;
+					return tup.second;
 				}
 			}
 		}

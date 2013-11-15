@@ -18,7 +18,7 @@ import com.aptana.core.util.StringUtil;
  * @author Max Stepanov
  *
  */
-public class ResumableMultiLineRule extends MultiLineRule implements IResumableRule {
+public class ResumableMultiLineRule extends FixedMultiLineRule implements IResumableRule {
 
 	private boolean fResume;
 

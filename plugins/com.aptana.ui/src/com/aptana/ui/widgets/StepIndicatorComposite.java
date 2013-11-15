@@ -71,6 +71,7 @@ public class StepIndicatorComposite extends Composite
 		{
 			stepComposite = new Composite(this, SWT.NONE);
 			stepComposite.setLayout(new GridLayout());
+			stepComposite.setBackground(normalColor);
 			stepComposite.setLayoutData(GridDataFactory.swtDefaults().align(SWT.CENTER, SWT.CENTER).create());
 			stepComposite.addPaintListener(new PaintListener()
 			{
@@ -92,6 +93,7 @@ public class StepIndicatorComposite extends Composite
 			});
 
 			stepLabel = new Label(stepComposite, SWT.NONE);
+			stepLabel.setBackground(normalColor);
 			stepLabel.setText(MessageFormat.format("  {0}  ", stepName)); //$NON-NLS-1$
 			stepLabel.setLayoutData(GridDataFactory.swtDefaults().grab(false, false).align(SWT.CENTER, SWT.CENTER)
 					.create());
@@ -131,33 +133,26 @@ public class StepIndicatorComposite extends Composite
 					{
 						gc.setForeground(selectedColor);
 						gc.setBackground(selectedColor);
-						
-						int[] polygonPath = new int[] {
-								bounds.x, bounds.y,
-								bounds.x + bounds.width - 1, bounds.y + ((bounds.height - 1) / 2),
-								bounds.x, bounds.y + bounds.height - 1
-						};
-						
+
+						int[] polygonPath = new int[] { bounds.x, bounds.y, bounds.x + bounds.width - 1,
+								bounds.y + ((bounds.height - 1) / 2), bounds.x, bounds.y + bounds.height - 1 };
+
 						gc.fillPolygon(polygonPath);
 					}
 					else if (siblingSelected)
 					{
 						gc.setForeground(selectedColor);
 						gc.setBackground(selectedColor);
-						
-						int[] polygonPath = new int[] { 
-								bounds.x + 1, bounds.y + 1, 
-								bounds.x + bounds.width, bounds.y + ((bounds.height - 1) / 2) + 1,
-								bounds.x + bounds.width, bounds.y + 1};
-						
+
+						int[] polygonPath = new int[] { bounds.x + 1, bounds.y + 1, bounds.x + bounds.width,
+								bounds.y + ((bounds.height - 1) / 2) + 1, bounds.x + bounds.width, bounds.y + 1 };
+
 						gc.fillPolygon(polygonPath);
-						
-						polygonPath = new int[] {
-								bounds.x + 1, bounds.y + bounds.height - 1,
-								bounds.x + bounds.width, bounds.y + ((bounds.height - 1) / 2) + 1,
-								bounds.x + bounds.width, bounds.y + bounds.height - 1
-						};
-						
+
+						polygonPath = new int[] { bounds.x + 1, bounds.y + bounds.height - 1, bounds.x + bounds.width,
+								bounds.y + ((bounds.height - 1) / 2) + 1, bounds.x + bounds.width,
+								bounds.y + bounds.height - 1 };
+
 						gc.fillPolygon(polygonPath);
 					}
 
@@ -259,6 +254,57 @@ public class StepIndicatorComposite extends Composite
 		}
 	}
 
+	public void addStep(String newStepName)
+	{
+		// add a column for new step
+		GridLayout layout = (GridLayout) getLayout();
+		layout.numColumns++;
+
+		// TODO If the step already exists, don't add it?
+
+		// Add new step name
+		String[] newStepNames = new String[stepNames.length + 1];
+		System.arraycopy(stepNames, 0, newStepNames, 0, stepNames.length);
+		newStepNames[stepNames.length] = newStepName;
+		this.stepNames = newStepNames;
+
+		// Add new step composite
+		StepComposite[] newSteps = new StepComposite[steps.length + 1];
+		System.arraycopy(steps, 0, newSteps, 0, steps.length);
+		newSteps[steps.length] = new StepComposite(this, newStepName, false);
+		this.steps = newSteps;
+
+		// relayout and draw
+		layout();
+		redraw();
+	}
+
+	/**
+	 * removes the last step
+	 */
+	public void removeStep()
+	{
+
+		// remove column for step
+		GridLayout layout = (GridLayout) getLayout();
+		layout.numColumns--;
+
+		// Remove step name
+		String[] newStepNames = new String[stepNames.length - 1];
+		System.arraycopy(stepNames, 0, newStepNames, 0, stepNames.length - 1);
+		this.stepNames = newStepNames;
+
+		// Remove last step composite
+		StepComposite[] newSteps = new StepComposite[steps.length - 1];
+		steps[steps.length - 1].dispose();
+		System.arraycopy(steps, 0, newSteps, 0, steps.length - 1);
+		this.steps = newSteps;
+
+		// relayout and draw
+		layout();
+		redraw();
+	}
+
 	public void setSelection(int index)
 	{
 		if (steps != null)
@@ -300,5 +346,4 @@ public class StepIndicatorComposite extends Composite
 			normalColor.dispose();
 		}
 	}
-
 }

@@ -10,13 +10,12 @@ package com.aptana.portal.ui.dispatch;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 
-import com.aptana.core.logging.IdeLog;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.browserNotifications.AbstractBrowserNotification;
+import com.aptana.portal.ui.dispatch.browserNotifications.BrowserNotificationProxy;
 
 /**
  * A registry class for the browser-interaction extensions that were registered through the 'browserInteractions'
@@ -31,8 +30,6 @@ public class BrowserInteractionRegistry
 	private static final String TAG_NOTIFICATION = "browserNotification"; //$NON-NLS-1$
 	private static final String ATT_ID = "id"; //$NON-NLS-1$
 	private static final String ATT_CLASS = "class"; //$NON-NLS-1$
-	private static final String ATT_NOTIFICATION_TARGET = "notificationTarget"; //$NON-NLS-1$
-	private static final String ATT_CONFGURATION_PROCESSOR_ID = "configurationProcessor"; //$NON-NLS-1$
 
 	private static BrowserInteractionRegistry instance = null;
 	private Map<String, IActionController> controllers = new HashMap<String, IActionController>();
@@ -159,25 +156,15 @@ public class BrowserInteractionRegistry
 			{
 				return;
 			}
-			try
+			if (isControllerElement)
 			{
-				if (isControllerElement)
-				{
-					IActionController actionController = (IActionController) element.createExecutableExtension(ATT_CLASS);
-					actionController.setConfigurationProcessorId(element.getAttribute(ATT_CONFGURATION_PROCESSOR_ID));
-					controllers.put(id, actionController);
-				}
-				else
-				{
-					AbstractBrowserNotification notification = (AbstractBrowserNotification) element
-							.createExecutableExtension(ATT_CLASS);
-					notifiers.put(id, notification);
-					notification.setNotificationTargets(element.getAttribute(ATT_NOTIFICATION_TARGET));
-				}
+				IActionController actionController = new ActionControllerProxy(element);
+				controllers.put(id, actionController);
 			}
-			catch (CoreException e)
+			else
 			{
-				IdeLog.logError(PortalUIPlugin.getDefault(), "Failed creating a browser action contoller extension", e); //$NON-NLS-1$
+				AbstractBrowserNotification notification = new BrowserNotificationProxy(element);
+				notifiers.put(id, notification);
 			}
 		}
 	}

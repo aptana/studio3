@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+
+<!-- Applications -->
+   <extension
+         id="resultGenerator"
+         point="org.eclipse.core.runtime.applications">
+      <application>
+         <run
+               class="org.eclipse.test.performance.ui.Main">
+         </run>
+      </application>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="org.eclipse.test.internal.performance.results.ui.PerformanceResultsPreferencePage"
+            id="org.eclipse.test.performance.ui.prpp"
+            name="Performances">
+      </page>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            name="Performances"
+            id="Performances">
+      </category>
+      <view
+            category="Performances"
+            class="org.eclipse.test.internal.performance.results.ui.ComponentsView"
+            icon="icons/components.gif"
+            id="org.eclipse.test.internal.performance.results.ui.ComponentsView"
+            name="Components">
+      </view>
+      <view
+            category="Performances"
+            class="org.eclipse.test.internal.performance.results.ui.BuildsView"
+            icon="icons/builds.gif"
+            id="org.eclipse.test.internal.performance.results.ui.BuildsView"
+            name="Builds">
+      </view>
+      <view
+            category="Performances"
+            class="org.eclipse.test.internal.performance.results.ui.ComponentResultsView"
+            icon="icons/results.gif"
+            id="org.eclipse.test.internal.performance.results.ui.ComponentsResultsView"
+            name="Component Results"
+            restorable="true">
+      </view>
+      <view
+            category="Performances"
+            class="org.eclipse.test.internal.performance.results.ui.BuildsComparisonView"
+            icon="icons/compare_view.gif"
+            id="org.eclipse.test.internal.performance.results.ui.BuildsComparisonView"
+            name="Builds comparison"
+            restorable="true">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.eclipse.test.internal.performance.results.ui.PerformanceResultsPreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="org.eclipse.test.internal.performance.results.ui.PerformanceResultsPerspective"
+            icon="icons/perfs.gif"
+            id="org.eclipse.test.performance.ui.perspectives.PerformanceResultsPerspective"
+            name="Performances Results">
+         <description>
+            Perspective to survey the performances of the Eclipse components
+         </description>
+      </perspective>
+   </extension>
+   <extension
+         point="org.eclipse.help.contexts">
+      <contexts
+            file="contexts.xml">
+      </contexts>
+   </extension>
+   <extension
+         point="org.eclipse.help.toc">
+      <toc
+            file="toc.xml"
+            primary="true">
+      </toc>
+   </extension>
+</plugin>

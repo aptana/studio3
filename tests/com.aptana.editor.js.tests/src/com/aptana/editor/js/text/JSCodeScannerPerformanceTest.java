@@ -18,14 +18,13 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.Token;
-import org.eclipse.test.performance.PerformanceTestCase;
+import org.eclipse.test.performance.GlobalTimePerformanceTestCase;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.epl.tests.EditorTestHelper;
-import com.aptana.editor.js.text.JSCodeScanner;
 import com.aptana.js.core.JSCorePlugin;
 
-public class JSCodeScannerPerformanceTest extends PerformanceTestCase
+public class JSCodeScannerPerformanceTest extends GlobalTimePerformanceTestCase
 {
 	private ITokenScanner fScanner;
 

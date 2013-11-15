@@ -969,12 +969,7 @@ public class JSParserTest extends TestCase
 	{
 		String source = "// this is a single-line comment";
 
-		ParseState parseState = new ParseState(source);
-
-		IParseNode parseNode = fParser.parse(parseState).getRootNode();
-		assertTrue(parseNode instanceof ParseRootNode);
-
-		ParseRootNode root = (ParseRootNode) parseNode;
+		IParseRootNode root = parse(source);
 		IParseNode[] comments = root.getCommentNodes();
 		assertNotNull(comments);
 		assertEquals(1, comments.length);
@@ -1014,8 +1009,7 @@ public class JSParserTest extends TestCase
 	public void testNodeOffsetsAtEOF() throws Exception
 	{
 		String source = "a.foo()\n// this is a comment";
-		ParseState parseState = new ParseState(source);
-		IParseNode result = parse(parseState);
+		IParseNode result = parse(source);
 
 		assertNotNull(result);
 		assertEquals(1, result.getChildCount());
@@ -1064,6 +1058,30 @@ public class JSParserTest extends TestCase
 		assertParseErrors("Syntax Error: unexpected token \"/\"", "Missing semicolon", "Syntax Error: unexpected token \";\"", "Missing semicolon");
 	}
 
+	public void testReservedWordAsPropertyName() throws Exception
+	{
+		assertParseResult("this.default = 1;" + EOL);
+		assertTrue(fParseResult.getErrors().isEmpty());
+	}
+
+	public void testReservedWordAsPropertyName2() throws Exception
+	{
+		assertParseResult("a[\"public\"] = 1;" + EOL);
+		assertTrue(fParseResult.getErrors().isEmpty());
+	}
+
+	public void testReservedWordAsPropertyName3() throws Exception
+	{
+		assertParseResult("a = {default: \"test\"};" + EOL);
+		assertTrue(fParseResult.getErrors().isEmpty());
+	}
+
+	public void testReservedWordAsFunctionName() throws Exception
+	{
+		parse("function import() {};" + EOL);
+		assertParseErrors("Syntax Error: unexpected token \"import\"");
+	}
+
 	/**
 	 * This method is not being used for formal testing, but it's useful to determine how effective
 	 * {@link ParseNode#trimToSize()} is.
@@ -1076,9 +1094,15 @@ public class JSParserTest extends TestCase
 		ASTUtil.showBeforeAndAfterTrim(parse(parseState));
 	}
 
+	private IParseRootNode parse(String source) throws Exception
+	{
+		return parse(new ParseState(source));
+	}
+
 	private IParseRootNode parse(ParseState parseState) throws Exception
 	{
-		return fParser.parse(parseState).getRootNode();
+		fParseResult = fParser.parse(parseState);
+		return fParseResult.getRootNode();
 	}
 
 	// utility methods
@@ -1101,10 +1125,7 @@ public class JSParserTest extends TestCase
 
 	protected void assertParseResult(String source, String expected) throws Exception
 	{
-		ParseState parseState = new ParseState(source);
-
-		fParseResult = fParser.parse(parseState);
-		IParseNode result = fParseResult.getRootNode();
+		IParseNode result = parse(source);
 		StringBuilder text = new StringBuilder();
 		IParseNode[] children = result.getChildren();
 		for (IParseNode child : children)

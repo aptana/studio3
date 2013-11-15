@@ -30,12 +30,14 @@ import com.aptana.editor.common.text.SingleTokenScanner;
 import com.aptana.editor.common.text.rules.CaseInsensitiveMultiLineRule;
 import com.aptana.editor.common.text.rules.CommentScanner;
 import com.aptana.editor.common.text.rules.ExtendedToken;
+import com.aptana.editor.common.text.rules.FixedMultiLineRule;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.PartitionerSwitchingIgnoreRule;
 import com.aptana.editor.common.text.rules.TagRule;
 import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
 import com.aptana.editor.css.CSSSourceConfiguration;
 import com.aptana.editor.html.contentassist.HTMLContentAssistProcessor;
+import com.aptana.editor.html.core.IHTMLConstants;
 import com.aptana.editor.html.internal.text.rules.DocTypeRule;
 import com.aptana.editor.js.JSSourceConfiguration;
 import com.aptana.editor.svg.ISVGConstants;
@@ -70,7 +72,7 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
 			new CaseInsensitiveMultiLineRule("<!DOCTYPE ", ">", getToken(HTML_DOCTYPE)), //$NON-NLS-1$ //$NON-NLS-2$
 			new DocTypeRule(getToken(CDATA)),
-			new PartitionerSwitchingIgnoreRule(new MultiLineRule("<!--", "-->", getToken(HTML_COMMENT), (char) 0, true)), //$NON-NLS-1$ //$NON-NLS-2$
+			new PartitionerSwitchingIgnoreRule(new FixedMultiLineRule("<!--", "-->", getToken(HTML_COMMENT), (char) 0, true)), //$NON-NLS-1$ //$NON-NLS-2$
 			new TagRule("script", new ExtendedToken(getToken(HTML_SCRIPT)), true), //$NON-NLS-1$
 			new TagRule("style", new ExtendedToken(getToken(HTML_STYLE)), true), //$NON-NLS-1$
 			new TagRule("svg", new ExtendedToken(getToken(HTML_SVG)), true), //$NON-NLS-1$

@@ -45,6 +45,7 @@ import com.aptana.core.util.TarUtil;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.ide.core.io.downloader.DownloadManager;
 import com.aptana.js.core.JSCorePlugin;
+import com.aptana.js.core.node.INodeJS;
 import com.aptana.js.core.node.INodeJSService;
 import com.aptana.js.core.preferences.IPreferenceConstants;
 import com.aptana.ui.util.UIUtils;
@@ -251,14 +252,14 @@ public class NodePreferencePage extends FieldEditorPreferencePage implements IWo
 	{
 		super.initialize();
 
-		IPath path = getDetectedPath();
-		sfe.setStringValue(path == null ? Messages.NodePreferencePage_NotDetected : path.toOSString());
+		INodeJS path = getDetectedPath();
+		sfe.setStringValue(path == null ? Messages.NodePreferencePage_NotDetected : path.getPath().toOSString());
 		sfe.setEnabled(false, fep);
 	}
 
-	private IPath getDetectedPath()
+	private INodeJS getDetectedPath()
 	{
-		return getNodeService().find();
+		return getNodeService().detectInstall();
 	}
 
 	protected INodeJSService getNodeService()

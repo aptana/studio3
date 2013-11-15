@@ -7,12 +7,15 @@
  */
 package com.aptana.js.internal.core;
 
-import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
 
 import com.aptana.core.ShellExecutable;
 import com.aptana.core.diagnostic.IDiagnosticLog;
-import com.aptana.core.util.ProcessUtil;
+import com.aptana.core.util.FileUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.js.core.JSCorePlugin;
+import com.aptana.js.core.node.INodeJS;
 import com.aptana.js.core.node.INodeJSService;
 import com.aptana.js.core.node.INodePackageManager;
 
@@ -24,44 +27,69 @@ public class JSDiagnosticLog implements IDiagnosticLog
 		StringBuilder buf = new StringBuilder();
 
 		INodeJSService service = JSCorePlugin.getDefault().getNodeJSService();
-		IPath path = service.getValidExecutable();
+		INodeJS nodeJS = service.getValidExecutable();
 
-		String version = service.getVersion(path);
-		if (version == null)
+		String version = "Not installed"; //$NON-NLS-1$
+		if (nodeJS != null)
 		{
-			version = "Not installed"; //$NON-NLS-1$
+			String nodeJSVersion = nodeJS.getVersion();
+			if (!StringUtil.isEmpty(nodeJSVersion))
+			{
+				version = nodeJSVersion;
+			}
 		}
-		buf.append("Node.JS Version: ").append(version).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		buf.append("Node.JS Version: ").append(version).append(FileUtil.NEW_LINE); //$NON-NLS-1$
 
-		INodePackageManager npm = JSCorePlugin.getDefault().getNodePackageManager();
-		IPath npmPath = npm.findNPM();
+		INodePackageManager npm = nodeJS == null ? null : nodeJS.getNPM();
 		String pathString = "Not installed"; //$NON-NLS-1$
-		if (npmPath != null)
+		if (npm != null && npm.exists())
 		{
-			pathString = npmPath.toOSString();
+			pathString = npm.getPath().toOSString();
 		}
-		buf.append("NPM Path: ").append(pathString).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
-		if (npmPath != null)
+		buf.append("NPM Path: ").append(pathString).append(FileUtil.NEW_LINE); //$NON-NLS-1$
+		if (npm != null && npm.exists())
 		{
-			String npmVersion = ProcessUtil.outputForCommand(npmPath.toOSString(), null,
-					ShellExecutable.getEnvironment(), "-v"); //$NON-NLS-1$
-			buf.append("NPM Version: ").append(npmVersion).append('\n'); //$NON-NLS-1$
+			try
+			{
+				String npmVersion = npm.getVersion();
+				buf.append("NPM Version: ").append(npmVersion).append(FileUtil.NEW_LINE); //$NON-NLS-1$
 
-			String highLevelPackages = getInstalledNpmPackages(npmPath);
-			buf.append(highLevelPackages);
-			buf.append('\n');
+				String highLevelPackages = getInstalledNpmPackages(npm);
+				buf.append(highLevelPackages);
+				buf.append(FileUtil.NEW_LINE);
 
-			String listOutput = ProcessUtil.outputForCommand(npmPath.toOSString(), null,
-					ShellExecutable.getEnvironment(), INodePackageManager.GLOBAL_ARG, "list"); //$NON-NLS-1$
-			buf.append("Packages: ").append(listOutput).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
+				// Step1 : Get the installed version of a npm package - try to get titanium
+				IStatus titaniumStatus = npm.runInBackground("ls", "titanium"); //$NON-NLS-1$ //$NON-NLS-2$
+				String npmVersionOutput = titaniumStatus.getMessage();
+				buf.append("npm ls titanium: ").append(npmVersionOutput).append(FileUtil.NEW_LINE); //$NON-NLS-1$
+
+				// Step2: If Step1 fails for any reason, find the installed version of a package from the detailed list
+				// of all npm packages.
+				// The original command (npm -g ls -p) is slightly different than this one, but the content and intent
+				// is the same.
+				IStatus listStatus = npm.runInBackground("list"); //$NON-NLS-1$
+				String listOutput = listStatus.getMessage();
+				buf.append("Packages: ").append(listOutput).append(FileUtil.NEW_LINE); //$NON-NLS-1$
+
+				// NPM config prefix values.
+				buf.append("NPM_CONFIG_PREFIX env value: " + ShellExecutable.getEnvironment().get("NPM_CONFIG_PREFIX")) //$NON-NLS-1$ //$NON-NLS-2$
+						.append(FileUtil.NEW_LINE);
+
+				String configPrefixValue = JSCorePlugin.getDefault().getNodePackageManager().getConfigValue("prefix"); //$NON-NLS-1$
+				buf.append("Npm config prefix value : ").append(configPrefixValue).append(FileUtil.NEW_LINE); //$NON-NLS-1$
+			}
+			catch (CoreException ignore)
+			{
+				// Shouldn't happen so long as we guarded to enforce NPM exists.
+			}
 		}
 		return buf.toString();
 	}
 
-	private String getInstalledNpmPackages(IPath npmPath)
+	private String getInstalledNpmPackages(INodePackageManager npm) throws CoreException
 	{
-		String listOutput = ProcessUtil.outputForCommand(npmPath.toOSString(), null, ShellExecutable.getEnvironment(),
-				INodePackageManager.GLOBAL_ARG, "list", "--depth=0"); //$NON-NLS-1$ //$NON-NLS-2$
+		IStatus status = npm.runInBackground("list", "--depth=0"); //$NON-NLS-1$ //$NON-NLS-2$
+		String listOutput = status.getMessage();
 
 		// Hack : An issue in npm list command show errors or warnings because of depth option. Filter them out of the
 		// output.
@@ -72,5 +100,4 @@ public class JSDiagnosticLog implements IDiagnosticLog
 		}
 		return listOutput;
 	}
-
 }

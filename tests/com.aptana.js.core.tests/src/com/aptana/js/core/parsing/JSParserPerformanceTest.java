@@ -21,14 +21,14 @@ import java.util.Queue;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.test.performance.GlobalTimePerformanceTestCase;
 import org.eclipse.test.performance.Performance;
-import org.eclipse.test.performance.PerformanceTestCase;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.core.tests.ITestFiles;
 
-public class JSParserPerformanceTest extends PerformanceTestCase
+public class JSParserPerformanceTest extends GlobalTimePerformanceTestCase
 {
 
 	private JSParser fParser;

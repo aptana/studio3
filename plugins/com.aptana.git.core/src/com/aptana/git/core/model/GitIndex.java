@@ -55,6 +55,16 @@ import com.aptana.git.core.IDebugScopes;
 
 public class GitIndex
 {
+
+	/**
+	 * Short status constants
+	 */
+	private static final String ADD_STATUS = "A"; //$NON-NLS-1$
+	private static final String DELETED_STATUS = "D"; //$NON-NLS-1$
+	private static final String UNMERGED_STATUS = "U"; //$NON-NLS-1$
+
+	private static final String NULL_DELIMITER = "\0"; //$NON-NLS-1$
+
 	/**
 	 * File extensions we check against and use to assume if a file may be binary (to not show a diff/content in various
 	 * UI views)
@@ -230,6 +240,9 @@ public class GitIndex
 		}
 
 		// Copy the last full list of changed files we built up on refresh. Used to pass along the delta
+		// FIXME I think the values here may have already changed! I saw a file that had staged changes but no unstaged
+		// prior to commit
+		// but here it showed true for both (which should have only gotten modified by a pre-commit hook)
 		Collection<ChangedFile> preRefresh;
 		synchronized (this.changedFilesLock)
 		{
@@ -453,7 +466,7 @@ public class GitIndex
 		StringBuilder input = new StringBuilder();
 		for (ChangedFile file : discardFiles)
 		{
-			input.append(file.getPath()).append("\0"); //$NON-NLS-1$
+			input.append(file.getPath()).append(NULL_DELIMITER);
 		}
 
 		IStatus result = repository.executeWithInput(input.toString(),
@@ -481,36 +494,26 @@ public class GitIndex
 		return result;
 	}
 
-	public boolean commit(String commitMessage)
+	public IStatus commit(String commitMessage)
 	{
-		boolean success = doCommit(commitMessage);
-		if (!success)
+		IStatus status = doCommit(commitMessage);
+		if (status.isOK())
 		{
-			return false;
+			repository.hasChanged();
 		}
-
-		repository.hasChanged();
-
-		if (amend)
-		{
-			this.amend = false;
-		}
-		else
-		{
-			refresh(new NullProgressMonitor());
-		}
-		return true;
+		// even if a commit fails, the repository's changed files listing may have changed.
+		refresh(new NullProgressMonitor());
+		return status;
 	}
 
-	private boolean doCommit(String commitMessage)
+	private IStatus doCommit(String commitMessage)
 	{
 		if (Platform.OS_WIN32.equals(Platform.getOS()))
 		{
 			commitMessage = commitMessage.replace("\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		IStatus result = repository.execute(GitRepository.ReadWrite.WRITE, repository.workingDirectory(),
+		return repository.execute(GitRepository.ReadWrite.WRITE, repository.workingDirectory(),
 				ShellExecutable.getEnvironment(repository.workingDirectory()), "commit", "-m", commitMessage); //$NON-NLS-1$ //$NON-NLS-2$
-		return result != null && result.isOK();
 	}
 
 	/**
@@ -782,6 +785,7 @@ public class GitIndex
 
 	private abstract static class FilesRefreshJob implements Callable<IStatus>
 	{
+
 		protected GitRepository repo;
 		protected GitIndex index;
 		protected Set<String> filePaths;
@@ -802,7 +806,7 @@ public class GitIndex
 			}
 
 			// Strip trailing null
-			if (string.endsWith("\0")) //$NON-NLS-1$
+			if (string.endsWith(NULL_DELIMITER))
 			{
 				string = string.substring(0, string.length() - 1);
 			}
@@ -812,7 +816,7 @@ public class GitIndex
 				return Collections.emptyList();
 			}
 
-			return StringUtil.tokenize(string, "\0"); //$NON-NLS-1$
+			return StringUtil.tokenize(string, NULL_DELIMITER);
 		}
 
 		protected Map<String, List<String>> dictionaryForLines(List<String> lines)
@@ -866,11 +870,11 @@ public class GitIndex
 								{
 									file.hasUnstagedChanges = true;
 								}
-								if (fileStatus.get(4).equals("D")) //$NON-NLS-1$
+								if (fileStatus.get(4).equals(DELETED_STATUS))
 								{
 									file.status = ChangedFile.Status.DELETED;
 								}
-								else if (fileStatus.get(4).equals("U")) //$NON-NLS-1$
+								else if (fileStatus.get(4).equals(UNMERGED_STATUS))
 								{
 									file.status = ChangedFile.Status.UNMERGED;
 								}
@@ -929,11 +933,11 @@ public class GitIndex
 					List<String> fileStatus = dictionary.get(path);
 
 					ChangedFile.Status status = ChangedFile.Status.MODIFIED;
-					if (fileStatus.get(4).equals("D")) //$NON-NLS-1$
+					if (fileStatus.get(4).equals(DELETED_STATUS))
 					{
 						status = ChangedFile.Status.DELETED;
 					}
-					else if (fileStatus.get(4).equals("U")) //$NON-NLS-1$
+					else if (fileStatus.get(4).equals(UNMERGED_STATUS))
 					{
 						status = ChangedFile.Status.UNMERGED;
 					}
@@ -1034,6 +1038,7 @@ public class GitIndex
 
 	private static final class UntrackedFilesRefreshJob extends FilesRefreshJob
 	{
+
 		private UntrackedFilesRefreshJob(GitIndex index, Set<String> filePaths)
 		{
 			super(index, filePaths);
@@ -1064,13 +1069,12 @@ public class GitIndex
 			Map<String, List<String>> dictionary = new HashMap<String, List<String>>(lines.size());
 			// Other files are untracked, so we don't have any real index information. Instead, we can just fake it.
 			// The line below is not used at all, as for these files the commitBlob isn't set
-			List<String> fileStatus = new ArrayList<String>();
-			fileStatus.add(":000000"); // for new file //$NON-NLS-1$
-			fileStatus.add("100644"); //$NON-NLS-1$
-			fileStatus.add("0000000000000000000000000000000000000000"); // SHA //$NON-NLS-1$
-			fileStatus.add("0000000000000000000000000000000000000000"); //$NON-NLS-1$
-			fileStatus.add("A"); // A for Add, D for delete //$NON-NLS-1$
-			fileStatus.add(null);
+			List<String> fileStatus = CollectionsUtil.newList(":000000", // for new file //$NON-NLS-1$
+					"100644", //$NON-NLS-1$
+					"0000000000000000000000000000000000000000", // SHA //$NON-NLS-1$
+					"0000000000000000000000000000000000000000", //$NON-NLS-1$
+					ADD_STATUS, // A for Add, D for delete
+					null);
 			for (String path : lines)
 			{
 				if (path.length() == 0)

@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<title>Components Results view</title>
+</head>
+
+<body>
+<h1>Components Results view</h1>
+<p>
+This view show for each of the performance machine the entire results since the beginning.
+</p>
+
+<h2>Config tab</h2>
+<p>
+Each tab of this view represent a performance machine (also named config).
+The name of the machine is the name of the tab. The results are displayed in
+a table where each column represents a scenario and each line a build.
+The lines are ordered in descending order (from the most recent to the oldest build).
+</p><p>
+Here are some tips about this view:
+<ul>
+<li>when old builds are not filtered, the milestone build are highlighted in bold
++ blueref color background</li>
+<li>results color depends on the diff of the delta with the baseline:
+<ul>
+<li>red: <code>diff &lt;= -5%</code></li>
+<li>magenta: <code>-5% &lt; diff &lt; 0%</code></li>
+<li>black: <code>0% &lt;= diff &lt; +10%</code></li>
+<li>blue: <code>+10% &lt;= diff &lt; +25%</code></li>
+<li>green: <code>diff &gt;= +25%</code></li>
+</ul></li>
+<li>icons have the same meaning than in the Components view</li>
+<li>more information are available in the cell tooltip when either there's a
+warning/information icon and/or when the result is in displayed italic</li>
+</ul>
+
+<h2>Filters</h2>
+<p>
+There are 3 possible filters in this view:
+</p>
+<h3>Builds filters</h3>
+<ul>
+<li>Nightly: hide the nightly builds (starting with 'N')</li>
+<li>Old: hide all builds before last milestone except earlier milestones</li>
+</ul>
+
+<h3>Scenarios filter</h3>
+<ul>
+<li>Advanced scenarios: hide the scenarios which are not in the fingerprints</li>
+</ul>
+<p>
+These filters are synchronized with the Components view, hence have the same default.
+</p>
+</body>
+</html>

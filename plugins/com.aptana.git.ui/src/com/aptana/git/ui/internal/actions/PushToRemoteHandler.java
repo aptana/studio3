@@ -12,21 +12,14 @@ import java.util.List;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.debug.core.ILaunch;
 import org.eclipse.osgi.util.NLS;
 
-import com.aptana.core.logging.IdeLog;
-import com.aptana.git.core.GitPlugin;
-import com.aptana.git.core.IDebugScopes;
 import com.aptana.git.core.model.GitRepository;
-import com.aptana.git.ui.GitUIPlugin;
-import com.aptana.git.ui.internal.Launcher;
 import com.aptana.ui.MenuDialogItem;
 import com.aptana.ui.QuickMenuDialog;
 
@@ -56,7 +49,7 @@ public class PushToRemoteHandler extends AbstractGitHandler
 		}
 		if (!remotes.isEmpty())
 		{
-			QuickMenuDialog dialog = new QuickMenuDialog(getShell());
+			QuickMenuDialog dialog = new QuickMenuDialog(getShell(), Messages.PushToRemoteHandler_PopupTitle);
 			dialog.setInput(remotes);
 			if (dialog.open() != -1)
 			{
@@ -79,42 +72,7 @@ public class PushToRemoteHandler extends AbstractGitHandler
 				{
 					return Status.CANCEL_STATUS;
 				}
-
-				if (!repo.enterWriteProcess())
-				{
-					return new Status(IStatus.ERROR, GitPlugin.getPluginId(),
-							Messages.GitLaunchDelegate_FailedToAcquireWriteLock);
-				}
-				try
-				{
-					ILaunch launch = Launcher.launch(repo, subMonitor.newChild(75), "push", //$NON-NLS-1$
-							remoteName, branchName);
-					while (!launch.isTerminated())
-					{
-						if (subMonitor.isCanceled())
-						{
-							launch.terminate();
-							return Status.CANCEL_STATUS;
-						}
-						Thread.yield();
-					}
-				}
-				catch (CoreException e)
-				{
-					IdeLog.log(GitUIPlugin.getDefault(), e.getStatus());
-					return e.getStatus();
-				}
-				catch (Throwable e)
-				{
-					IdeLog.logError(GitUIPlugin.getDefault(), e, IDebugScopes.DEBUG);
-					return new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), e.getMessage());
-				}
-				finally
-				{
-					repo.exitWriteProcess();
-				}
-				subMonitor.done();
-				return Status.OK_STATUS;
+				return repo.push(remoteName, branchName);
 			}
 		};
 		job.setUser(true);

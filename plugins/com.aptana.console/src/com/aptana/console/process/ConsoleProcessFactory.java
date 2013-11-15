@@ -15,6 +15,8 @@ import org.eclipse.debug.core.IProcessFactory;
 import org.eclipse.debug.core.model.IProcess;
 
 import com.aptana.console.ConsolePlugin;
+import com.aptana.debug.core.FilterConsoleProcess;
+import com.aptana.debug.core.IProcessOutputFilter;
 
 /**
  * @author Max Stepanov

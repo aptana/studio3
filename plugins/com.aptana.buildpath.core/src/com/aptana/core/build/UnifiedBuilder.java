@@ -57,6 +57,7 @@ import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.IndexPlugin;
 import com.aptana.index.core.build.BuildContext;
 import com.aptana.index.core.filter.IIndexFilterParticipant;
+import com.aptana.parsing.ParserPoolFactory;
 
 public class UnifiedBuilder extends IncrementalProjectBuilder
 {
@@ -101,6 +102,8 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 
 		SubMonitor sub = SubMonitor.convert(monitor, participants.size() + 2);
 		sub.worked(1);
+
+		ParserPoolFactory.getInstance().clearCache();
 
 		removeProblemsAndTasksFor(project);
 		sub.worked(1);

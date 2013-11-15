@@ -44,6 +44,7 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
+import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.scope.IScopeSelector;
@@ -68,21 +69,6 @@ public class BundleManager
 	private static final String APPLICATION_BUNDLE_PATHS_ID = "applicationBundlePaths"; //$NON-NLS-1$
 	private static final String TAG_BUNDLE_PATH = "bundlePath"; //$NON-NLS-1$
 	private static final String ATTR_PATH = "path"; //$NON-NLS-1$
-
-	/**
-	 * System property that holds the OS name
-	 */
-	private static final String OS_NAME = "os.name"; //$NON-NLS-1$
-
-	/**
-	 * OS name fragment to use to match against Linux
-	 */
-	private static final String OS_NAME_LINUX = "linux"; //$NON-NLS-1$
-
-	/**
-	 * OS name fragment to use to match against Macs
-	 */
-	private static final String OS_NAME_MAC = "mac"; //$NON-NLS-1$
 
 	/**
 	 * System property to forcibly turn off caching.
@@ -287,7 +273,7 @@ public class BundleManager
 	 *            default location will be used
 	 * @return The singleton instance of BundleManager
 	 */
-	public static BundleManager getInstance(String applicationBundlesPath, String userBundlesPath)
+	public static synchronized BundleManager getInstance(String applicationBundlesPath, String userBundlesPath)
 	{
 		if (INSTANCE == null)
 		{
@@ -297,16 +283,15 @@ public class BundleManager
 		}
 
 		// setup application bundles path
-		if (applicationBundlesPath != null && applicationBundlesPath.length() > 0)
+		if (!StringUtil.isEmpty(applicationBundlesPath))
 		{
 			// NOTE: setting the application bundles path directly is done for testing purposes only, so we wipe any
 			// loaded application bundle paths and store the specified path only
-			INSTANCE.applicationBundlesPaths = new ArrayList<String>();
-			INSTANCE.applicationBundlesPaths.add(applicationBundlesPath);
+			INSTANCE.applicationBundlesPaths = CollectionsUtil.newList(applicationBundlesPath);
 		}
 
 		// setup user bundles path
-		if (userBundlesPath != null && userBundlesPath.length() > 0)
+		if (!StringUtil.isEmpty(userBundlesPath))
 		{
 			INSTANCE.userBundlesPath = userBundlesPath;
 		}
@@ -413,32 +398,11 @@ public class BundleManager
 			}
 		}
 
-		if (validUserBundlePath == false)
+		if (!validUserBundlePath)
 		{
-			String OS = null;
-
-			if (Platform.isRunning())
-			{
-				OS = Platform.getOS();
-			}
-			else
-			{
-				OS = System.getProperty(OS_NAME).toLowerCase();
-
-				if (OS.contains(OS_NAME_MAC))
-				{
-					OS = Platform.OS_MACOSX;
-				}
-				else if (OS.contains(OS_NAME_LINUX))
-				{
-					OS = Platform.OS_LINUX;
-				}
-			}
-
 			String userHome = System.getProperty(USER_HOME_PROPERTY);
-
 			// setup default user bundles path
-			if (OS.equals(Platform.OS_MACOSX) || OS.equals(Platform.OS_LINUX))
+			if (PlatformUtil.isMac() || PlatformUtil.isLinux())
 			{
 				this.userBundlesPath = userHome + USER_BUNDLE_DIRECTORY_MACOSX;
 			}
@@ -540,16 +504,11 @@ public class BundleManager
 			{
 				if (this._bundlesByPath.containsKey(bundleFile) == false)
 				{
-					List<BundleElement> bundles = new ArrayList<BundleElement>();
-
-					bundles.add(bundle);
-
-					this._bundlesByPath.put(bundleFile, bundles);
+					this._bundlesByPath.put(bundleFile, CollectionsUtil.newList(bundle));
 				}
 				else
 				{
 					List<BundleElement> bundles = this._bundlesByPath.get(bundleFile);
-
 					bundles.add(bundle);
 				}
 			}
@@ -562,15 +521,12 @@ public class BundleManager
 				if (this._entriesByName.containsKey(name) == false)
 				{
 					BundleEntry entry = new BundleEntry(name);
-
 					entry.addBundle(bundle);
-
 					this._entriesByName.put(name, entry);
 				}
 				else
 				{
 					BundleEntry entry = this._entriesByName.get(name);
-
 					entry.addBundle(bundle);
 				}
 			}
@@ -590,7 +546,7 @@ public class BundleManager
 		{
 			synchronized (this._bundleVisibilityListeners)
 			{
-				if (this._bundleVisibilityListeners.contains(listener) == false)
+				if (!this._bundleVisibilityListeners.contains(listener))
 				{
 					this._bundleVisibilityListeners.add(listener);
 				}
@@ -611,7 +567,7 @@ public class BundleManager
 		{
 			synchronized (this._elementVisibilityListeners)
 			{
-				if (this._elementVisibilityListeners.contains(listener) == false)
+				if (!this._elementVisibilityListeners.contains(listener))
 				{
 					this._elementVisibilityListeners.add(listener);
 				}
@@ -632,7 +588,7 @@ public class BundleManager
 		{
 			synchronized (this._loadCycleListeners)
 			{
-				if (this._loadCycleListeners.contains(listener) == false)
+				if (!this._loadCycleListeners.contains(listener))
 				{
 					this._loadCycleListeners.add(listener);
 				}
@@ -888,18 +844,11 @@ public class BundleManager
 	public List<CommandElement> getBundleCommands(String name)
 	{
 		BundleEntry entry = this.getBundleEntry(name);
-		List<CommandElement> result;
-
 		if (entry != null)
 		{
-			result = entry.getCommands();
+			return entry.getCommands();
 		}
-		else
-		{
-			result = Collections.emptyList();
-		}
-
-		return result;
+		return Collections.emptyList();
 	}
 
 	/**
@@ -913,18 +862,11 @@ public class BundleManager
 	public List<ContentAssistElement> getBundleContentAssists(String name)
 	{
 		BundleEntry entry = this.getBundleEntry(name);
-		List<ContentAssistElement> result;
-
 		if (entry != null)
 		{
-			result = entry.getContentAssists();
+			return entry.getContentAssists();
 		}
-		else
-		{
-			result = Collections.emptyList();
-		}
-
-		return result;
+		return Collections.emptyList();
 	}
 
 	/**
@@ -1003,14 +945,10 @@ public class BundleManager
 	 */
 	public BundleEntry getBundleEntry(String name)
 	{
-		BundleEntry result;
-
 		synchronized (this._entriesByName)
 		{
-			result = this._entriesByName.get(name);
+			return this._entriesByName.get(name);
 		}
-
-		return result;
 	}
 
 	/**
@@ -1024,18 +962,11 @@ public class BundleManager
 	public List<EnvironmentElement> getBundleEnvs(String name)
 	{
 		BundleEntry entry = this.getBundleEntry(name);
-		List<EnvironmentElement> result;
-
 		if (entry != null)
 		{
-			result = entry.getEnvs();
+			return entry.getEnvs();
 		}
-		else
-		{
-			result = Collections.emptyList();
-		}
-
-		return result;
+		return Collections.emptyList();
 	}
 
 	/**
@@ -1080,14 +1011,12 @@ public class BundleManager
 	 */
 	public BundleElement getBundleFromPath(String path)
 	{
-		BundleElement result = null;
-
 		if (path != null)
 		{
-			result = this.getBundleFromPath(new File(path));
+			return this.getBundleFromPath(new File(path));
 		}
 
-		return result;
+		return null;
 	}
 
 	/**
@@ -1118,9 +1047,7 @@ public class BundleManager
 
 			if (result == null)
 			{
-				result = new ArrayList<String>();
-
-				result.addAll(ScriptingEngine.getInstance().getContributedLoadPaths());
+				result = new ArrayList<String>(ScriptingEngine.getInstance().getContributedLoadPaths());
 			}
 
 			result.add(0, BundleUtils.getBundleLibDirectory(bundleDirectory));
@@ -1163,18 +1090,11 @@ public class BundleManager
 	public List<SnippetCategoryElement> getBundleSnippetCategories(String name)
 	{
 		BundleEntry entry = this.getBundleEntry(name);
-		List<SnippetCategoryElement> result;
-
 		if (entry != null)
 		{
-			result = entry.getSnippetCategories();
+			return entry.getSnippetCategories();
 		}
-		else
-		{
-			result = Collections.emptyList();
-		}
-
-		return result;
+		return Collections.emptyList();
 	}
 
 	/**
@@ -1188,18 +1108,11 @@ public class BundleManager
 	public List<SnippetElement> getBundleSnippets(String name)
 	{
 		BundleEntry entry = this.getBundleEntry(name);
-		List<SnippetElement> result;
-
 		if (entry != null)
 		{
-			result = entry.getSnippets();
+			return entry.getSnippets();
 		}
-		else
-		{
-			result = Collections.emptyList();
-		}
-
-		return result;
+		return Collections.emptyList();
 	}
 
 	/**
@@ -1213,18 +1126,11 @@ public class BundleManager
 	public List<MenuElement> getBundleMenus(String name)
 	{
 		BundleEntry entry = this.getBundleEntry(name);
-		List<MenuElement> result;
-
 		if (entry != null)
 		{
-			result = entry.getMenus();
+			return entry.getMenus();
 		}
-		else
-		{
-			result = Collections.emptyList();
-		}
-
-		return result;
+		return Collections.emptyList();
 	}
 
 	/**
@@ -1234,14 +1140,10 @@ public class BundleManager
 	 */
 	public List<String> getBundleNames()
 	{
-		List<String> names;
-
 		synchronized (this._entriesByName)
 		{
-			names = new ArrayList<String>(this._entriesByName.keySet());
+			return new ArrayList<String>(this._entriesByName.keySet());
 		}
-
-		return names;
 	}
 
 	/**
@@ -1255,18 +1157,11 @@ public class BundleManager
 	public List<SmartTypingPairsElement> getBundlePairs(String name)
 	{
 		BundleEntry entry = this.getBundleEntry(name);
-		List<SmartTypingPairsElement> result;
-
 		if (entry != null)
 		{
-			result = entry.getPairs();
+			return entry.getPairs();
 		}
-		else
-		{
-			result = Collections.emptyList();
-		}
-
-		return result;
+		return Collections.emptyList();
 	}
 
 	/**
@@ -1294,26 +1189,23 @@ public class BundleManager
 	 */
 	public BundlePrecedence getBundlePrecedence(String path)
 	{
-		BundlePrecedence result = BundlePrecedence.PROJECT;
-
 		if (path != null && applicationBundlesPaths != null)
 		{
 			for (String applicationBundlesPath : applicationBundlesPaths)
 			{
 				if (path.startsWith(applicationBundlesPath))
 				{
-					result = BundlePrecedence.APPLICATION;
-					break;
+					return BundlePrecedence.APPLICATION;
 				}
 			}
 
-			if (result == BundlePrecedence.PROJECT && this.userBundlesPath != null && path.startsWith(this.userBundlesPath))
+			if (this.userBundlesPath != null && path.startsWith(this.userBundlesPath))
 			{
-				result = BundlePrecedence.USER;
+				return BundlePrecedence.USER;
 			}
 		}
 
-		return result;
+		return BundlePrecedence.PROJECT;
 	}
 
 	/**
@@ -1397,14 +1289,10 @@ public class BundleManager
 	 */
 	protected List<BundleVisibilityListener> getBundleVisibilityListeners()
 	{
-		List<BundleVisibilityListener> listeners;
-
 		synchronized (this._bundleVisibilityListeners)
 		{
-			listeners = new ArrayList<BundleVisibilityListener>(this._bundleVisibilityListeners);
+			return new ArrayList<BundleVisibilityListener>(this._bundleVisibilityListeners);
 		}
-
-		return listeners;
 	}
 
 	/**
@@ -1493,14 +1381,10 @@ public class BundleManager
 	 */
 	protected List<ElementVisibilityListener> getElementVisibilityListeners()
 	{
-		List<ElementVisibilityListener> listeners;
-
 		synchronized (this._elementVisibilityListeners)
 		{
-			listeners = new ArrayList<ElementVisibilityListener>(this._elementVisibilityListeners);
+			return new ArrayList<ElementVisibilityListener>(this._elementVisibilityListeners);
 		}
-
-		return listeners;
 	}
 
 	/**
@@ -1628,14 +1512,10 @@ public class BundleManager
 	 */
 	protected List<LoadCycleListener> getLoadCycleListeners()
 	{
-		List<LoadCycleListener> listeners;
-
 		synchronized (this._loadCycleListeners)
 		{
-			listeners = new ArrayList<LoadCycleListener>(this._loadCycleListeners);
+			return new ArrayList<LoadCycleListener>(this._loadCycleListeners);
 		}
-
-		return listeners;
 	}
 
 	/**
@@ -1888,14 +1768,10 @@ public class BundleManager
 	 */
 	public boolean hasBundleAtPath(File bundleDirectory)
 	{
-		boolean result = false;
-
 		synchronized (this._bundlesByPath)
 		{
-			result = this._bundlesByPath.containsKey(bundleDirectory);
+			return this._bundlesByPath.containsKey(bundleDirectory);
 		}
-
-		return result;
 	}
 
 	/**
@@ -1906,14 +1782,12 @@ public class BundleManager
 	 */
 	protected boolean isUserBundleDirectory(File bundleDirectory)
 	{
-		boolean result = false;
-
 		if (bundleDirectory != null)
 		{
-			result = (getBundlePrecedence(bundleDirectory) == BundlePrecedence.USER);
+			return (getBundlePrecedence(bundleDirectory) == BundlePrecedence.USER);
 		}
 
-		return result;
+		return false;
 	}
 
 	/**
@@ -1926,8 +1800,6 @@ public class BundleManager
 	 */
 	protected boolean isValidBundleDirectory(File bundleDirectory)
 	{
-		boolean result = false;
-
 		if (bundleDirectory.isDirectory() && bundleDirectory.canRead())
 		{
 			File bundleFile = new File(bundleDirectory.getAbsolutePath(), BUNDLE_FILE);
@@ -1936,11 +1808,11 @@ public class BundleManager
 			// so, there's no need to do that here.
 			if (bundleFile.isFile())
 			{
-				result = true;
+				return true;
 			}
 		}
 
-		return result;
+		return false;
 	};
 
 	/**
@@ -1987,7 +1859,7 @@ public class BundleManager
 
 		// If we're running and not testing, schedule in parallel but limit how many run in parallel based on processor
 		// count
-		if (EclipseUtil.isTesting() == false && Platform.isRunning())
+		if (!EclipseUtil.isTesting() && Platform.isRunning())
 		{
 			job.setRule(new SerialPerObjectRule(counter++));
 
@@ -2143,35 +2015,26 @@ public class BundleManager
 	 */
 	public void loadScript(File script, boolean fireEvent, List<String> loadPaths)
 	{
-		boolean execute = true;
-
 		if (script == null)
 		{
-			String message = MessageFormat.format(Messages.BundleManager_Executed_Null_Script, new Object[] {});
-
-			ScriptLogger.logError(message);
-			execute = false;
+			ScriptLogger.logError(Messages.BundleManager_Executed_Null_Script);
+			return;
 		}
 
-		if (execute && script.canRead() == false)
+		if (!script.canRead())
 		{
-			String message = MessageFormat.format(Messages.BundleManager_UNREADABLE_SCRIPT,
-					new Object[] { script.getAbsolutePath() });
-
-			ScriptLogger.logError(message);
-			execute = false;
+			ScriptLogger.logError(MessageFormat.format(Messages.BundleManager_UNREADABLE_SCRIPT,
+					script.getAbsolutePath()));
+			return;
 		}
 
-		if (execute)
-		{
-			this.showBundleLoadInfo(MessageFormat.format("Loading script: {0}, fire event={1}", script, fireEvent)); //$NON-NLS-1$
-			ScriptingEngine.getInstance().runScript(script.getAbsolutePath(), loadPaths);
-			this.showBundleLoadInfo(MessageFormat.format("Loading complete: {0}", script)); //$NON-NLS-1$
+		this.showBundleLoadInfo(MessageFormat.format("Loading script: {0}, fire event={1}", script, fireEvent)); //$NON-NLS-1$
+		ScriptingEngine.getInstance().runScript(script.getAbsolutePath(), loadPaths);
+		this.showBundleLoadInfo(MessageFormat.format("Loading complete: {0}", script)); //$NON-NLS-1$
 
-			if (fireEvent)
-			{
-				this.fireScriptLoadedEvent(script);
-			}
+		if (fireEvent)
+		{
+			this.fireScriptLoadedEvent(script);
 		}
 	}
 
@@ -2219,28 +2082,25 @@ public class BundleManager
 	 */
 	public void reloadScript(File script)
 	{
-		if (script != null)
+		if (script == null)
 		{
-			this.unloadScript(script, false);
-
-			// determine bundle root directory
-			File bundleDirectory = this.getBundleDirectory(script);
-
-			// get bundle load paths
-			List<String> loadPaths = this.getBundleLoadPaths(bundleDirectory);
-
-			// execute script. Load order is important, so we force synchronous execution here
-			ScriptingEngine.getInstance().runScript(script.getAbsolutePath(), loadPaths, RunType.THREAD, false);
-
-			// fire reload event
-			this.fireScriptReloadedEvent(script);
+			ScriptLogger.logError(Messages.BundleManager_Reloaded_Null_Script);
+			return;
 		}
-		else
-		{
-			String message = MessageFormat.format(Messages.BundleManager_Reloaded_Null_Script, new Object[] {});
 
-			ScriptLogger.logError(message);
-		}
+		this.unloadScript(script, false);
+
+		// determine bundle root directory
+		File bundleDirectory = this.getBundleDirectory(script);
+
+		// get bundle load paths
+		List<String> loadPaths = this.getBundleLoadPaths(bundleDirectory);
+
+		// execute script. Load order is important, so we force synchronous execution here
+		ScriptingEngine.getInstance().runScript(script.getAbsolutePath(), loadPaths, RunType.THREAD, false);
+
+		// fire reload event
+		this.fireScriptReloadedEvent(script);
 	}
 
 	/**
@@ -2432,56 +2292,53 @@ public class BundleManager
 	 */
 	public void unloadScript(File script, boolean fireEvent)
 	{
-		if (script != null)
+		if (script == null)
 		{
-			String scriptPath = script.getAbsolutePath();
-			List<AbstractElement> elements = AbstractElement.getElementsByPath(scriptPath);
+			ScriptLogger.logError(Messages.BundleManager_Unloaded_Null_Script);
+			return;
+		}
 
-			// remove bundle members in pass 1
-			for (AbstractElement element : elements)
+		String scriptPath = script.getAbsolutePath();
+		List<AbstractElement> elements = AbstractElement.getElementsByPath(scriptPath);
+
+		// remove bundle members in pass 1
+		for (AbstractElement element : elements)
+		{
+			if (element instanceof AbstractBundleElement)
 			{
-				if (element instanceof AbstractBundleElement)
+				AbstractBundleElement bundleElement = (AbstractBundleElement) element;
+				BundleElement bundle = bundleElement.getOwningBundle();
+
+				if (bundle != null)
 				{
-					AbstractBundleElement bundleElement = (AbstractBundleElement) element;
-					BundleElement bundle = bundleElement.getOwningBundle();
-
-					if (bundle != null)
-					{
-						bundle.removeChild(bundleElement);
-					}
-					else
-					{
-						// TODO: this should not be happening
-					}
+					bundle.removeChild(bundleElement);
 				}
-			}
-
-			// clear (and possibly remove) bundles in pass 2
-			for (AbstractElement element : elements)
-			{
-				if (element instanceof BundleElement)
+				else
 				{
-					BundleElement bundle = (BundleElement) element;
-
-					bundle.clearMetadata();
-
-					if (bundle.isEmpty())
-					{
-						this.removeBundle(bundle);
-					}
+					// TODO: this should not be happening
 				}
-			}
-
-			if (fireEvent)
-			{
-				this.fireScriptUnloadedEvent(script);
 			}
 		}
-		else
-		{
-			String message = MessageFormat.format(Messages.BundleManager_Unloaded_Null_Script, new Object[] {});
 
-			ScriptLogger.logError(message);
+		// clear (and possibly remove) bundles in pass 2
+		for (AbstractElement element : elements)
+		{
+			if (element instanceof BundleElement)
+			{
+				BundleElement bundle = (BundleElement) element;
+
+				bundle.clearMetadata();
+
+				if (bundle.isEmpty())
+				{
+					this.removeBundle(bundle);
+				}
+			}
+		}
+
+		if (fireEvent)
+		{
+			this.fireScriptUnloadedEvent(script);
 		}
 	}
 

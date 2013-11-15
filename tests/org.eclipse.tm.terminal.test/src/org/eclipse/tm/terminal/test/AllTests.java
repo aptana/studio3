@@ -12,6 +12,7 @@ package org.eclipse.tm.terminal.test;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 /**
@@ -35,7 +36,15 @@ public class AllTests extends TestCase
 	 */
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite(AllTests.class.getName());
+		TestSuite suite = new TestSuite(AllTests.class.getName())
+		{
+			@Override
+			public void runTest(Test test, TestResult result)
+			{
+				System.err.println("Running test: " + test.toString());
+				super.runTest(test, result);
+			}
+		};
 		suite.addTest(AutomatedTests.suite());
 		suite.addTest(AutomatedPluginTests.suite());
 		return suite;

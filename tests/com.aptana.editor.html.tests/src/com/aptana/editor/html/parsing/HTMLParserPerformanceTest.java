@@ -12,7 +12,7 @@ import java.io.InputStream;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.test.performance.PerformanceTestCase;
+import org.eclipse.test.performance.GlobalTimePerformanceTestCase;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.epl.tests.EditorTestHelper;
@@ -21,7 +21,7 @@ import com.aptana.parsing.IParseState;
 /**
  * @author cwilliams
  */
-public class HTMLParserPerformanceTest extends PerformanceTestCase
+public class HTMLParserPerformanceTest extends GlobalTimePerformanceTestCase
 {
 
 	private HTMLParser fParser;

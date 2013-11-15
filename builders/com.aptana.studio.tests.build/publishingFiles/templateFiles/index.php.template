@@ -1,0 +1,483 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>Eclipse Project</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<meta name="author" content="Eclipse Foundation, Inc." />
+	<meta name="keywords" content="eclipse,project,plug-ins,plugins,java,ide,swt,refactoring,free java ide,tools,platform,open source,development environment,development,ide" />
+	<link rel="stylesheet" type="text/css" href="../../../eclipse.org-common/stylesheets/visual.css" media="screen" />
+	<link rel="stylesheet" type="text/css" href="../../../eclipse.org-common/stylesheets/layout.css" media="screen" />
+	<link rel="stylesheet" type="text/css" href="../../../eclipse.org-common/stylesheets/print.css" media="print" />
+	<script type="text/javascript">
+
+sfHover = function() {
+	var sfEls = document.getElementById("leftnav").getElementsByTagName("LI");
+	for (var i=0; i<sfEls.length; i++) {
+		sfEls[i].onmouseover=function() {
+			this.className+=" sfhover";
+		}
+		sfEls[i].onmouseout=function() {
+			this.className=this.className.replace(new RegExp(" sfhover\\b"), "");
+		}
+	}
+}
+if (window.attachEvent) window.attachEvent("onload", sfHover);
+</script>
+</head>
+<body>
+
+<div id="header">
+	<a href="http://www.eclipse.org/"><img src="../../../eclipse.org-common/stylesheets/header_logo.gif" width="163" height="68" border="0" alt="Eclipse Logo" class="logo" /></a>
+	<div id="searchbar">
+		<img src="../../../eclipse.org-common/stylesheets/searchbar_transition.gif" width="92" height="26" class="transition" alt="" />
+		<img src="../../../eclipse.org-common/stylesheets/searchbar_header.gif" width="64" height="17" class="header" alt="Search" />
+		<form method="get" action="http://www.eclipse.org/search/search.cgi">
+			<input type="hidden" name="t" value="All" />
+			<input type="hidden" name="t" value="Doc" />
+			<input type="hidden" name="t" value="Downloads" />
+			<input type="hidden" name="t" value="Wiki" />
+			<input type="hidden" name="wf" value="574a74" />
+			<input type="text" name="q" value="" />
+			<input type="image" class="button" src="../../../eclipse.org-common/stylesheets/searchbar_submit.gif" alt="Submit" onclick="this.submit();" />
+		</form>
+	</div>
+	<ul id="headernav">
+		<li class="first"><a href="http://www.eclipse.org/org/foundation/contact.php">Contact</a></li>
+		<li><a href="http://www.eclipse.org/legal/">Legal</a></li>
+	</ul>
+<?php
+				require_once("../../../eclipse.org-common/system/app.class.php");
+				$App = new App();
+				$clientOS = $App->getClientOS();
+				if($clientOS == "win32") {
+					$clientOS = Windows;
+					$anchor = "winPlatform.php#EclipseSDK";
+					$link = "winPlatform.php";
+					$code = 1;
+								}
+				else if($clientOS == "macosx") {
+					$clientOS = Macintosh;
+					$anchor = "macPlatform.php#EclipseSDK";
+					$link = "macPlatform.php";
+					$code = 1;
+				}
+				else if($clientOS == "linux") {
+					$clientOS = Linux;
+					$anchor = "linPlatform.php#EclipseSDK";
+					$link = "linPlatform.php";
+					$code = 1;
+					}
+				else if($clientOS == "solaris") {
+					$clientOS = Solaris;
+					$anchor = "solPlatform.php#EclipseSDK";
+					$link = "solPlatform.php";
+					$code = 1;
+					}				
+					else if($clientOS == "aix") {
+					$clientOS = AIX;
+					$anchor = "aixPlatform.php#EclipseSDK";
+					$link = "aixPlatform.php";
+					$code = 1;
+					}
+				else if($clientOS == "hpux") {
+					$clientOS = HPUX;
+					$anchor = "hpuxPlatform.php#EclipseSDK";
+					$link = "hpuxPlatform.php";
+					$code = 1;
+					}
+				else {
+					$anchor = "index.php#EclipseSDK";
+					$code = 0;
+				}
+?>
+
+</div><div id="topnav">
+	<ul>
+		<li><a>Downloads</a></li>
+		<li class="tabstartselected">&#160;&#160;&#160;</li>
+		<li><a class="tabselected" href="index.php" target="_self">All Platforms</a></li>
+		<li class="tabseparatorselected">&#160;&#160;&#160;</li>
+		<li><a class="" href="winPlatform.php" target="_self">Windows</a></li>
+		<li class="tabstart">&#160;&#160;&#160;</li>
+		<li><a class="" href="linPlatform.php" target="_self">Linux</a></li>
+		<li class="tabstart">&#160;&#160;&#160;</li>
+		<li><a class="" href="solPlatform.php" target="_self">Solaris</a></li>
+		<li class="tabstart">&#160;&#160;&#160;</li>
+		<li><a class="" href="aixPlatform.php" target="_self">AIX</a></li>
+		<li class="tabstart">&#160;&#160;&#160;</li>	
+		<li><a class="" href="macPlatform.php" target="_self">Macintosh</a></li>
+		<li class="tabseparator">&#160;&#160;&#160;</li>
+		<li><a class="" href="hpuxPlatform.php" target="_self">HP-UX</a></li>
+		<li class="tabseparator">&#160;&#160;&#160;</li>			
+	</ul>
+</div>
+<div id="topnavsep"></div>
+<div id="leftcol">
+<ul id="leftnav">
+<li><a href="#EclipseSDK">Eclipse SDK</a></li>
+<li><a href="#JUnitPlugin">JUnit Plugin Tests and Automated Testing Framework</a></li>
+<li><a href="#ExamplePlugins">Example Plug-ins</a></li>
+<li><a href="#RCPRuntime">RCP Runtime Binary</a></li>
+<li><a href="#RCPSDK">RCP SDK</a></li>
+<li><a href="#DeltaPack">Delta Pack</a></li>
+<li><a href="#com.ibm.icu">com.ibm.icu.base Binary and Source Plug-ins</a></li>
+<li><a href="#PlatformRuntime">Platform Runtime Binary</a></li>
+<li><a href="#PlatformSDK">Platform SDK</a></li>
+<li><a href="#JDTRuntime">JDT Runtime Binary</a></li>
+<li><a href="#JDTSDK">JDT SDK</a></li>
+<li><a href="#JDTCORE">JDT Core Batch Compiler</a></li>
+<li><a href="#PDERuntime">PDE Runtime Binary</a></li>
+<li><a href="#PDESDK">PDE SDK</a></li>
+<li><a href="#SWT">SWT binary and Source</a></li>
+<li><a href="#org.eclipse.releng">org.eclipse.releng.tools plug-in</a></li>
+ 
+  </li>
+  <li style="background-image: url(../../../eclipse.org-common/stylesheets/leftnav_fade.jpg); background-repeat: repeat-x; border-style: none;">
+			<br /><br /><br /><br /><br />
+  </li>
+</ul>
+
+</div>
+
+&nbsp; <!--?php
+	                                                                           
+        $remoteName = gethostbyaddr($_SERVER['REMOTE_ADDR']);
+                                    
+        if (strstr($remoteName, "ibm.com")) {
+                $jre = "http://w3.hursley.ibm.com/java/jim/";
+        } else {
+                $jre = "java-runtimes.html";
+        }
+		
+	
+?--> 
+<div id="midcolumn">
+		<table BORDER=0 CELLSPACING=5 CELLPADDING=2 WIDTH="100%" > 
+		<tr> 
+			<td> 
+				<p><b><font face="Verdana" size="+3">@type@ Build: @build@</font></b><br> @date@. 
+				These downloads are provided under the <a href="http://www.eclipse.org/legal/epl/notice.html">
+				<b>Eclipse Foundation Software User Agreement</b></a>.</p>
+			</td><tr><tr>
+		<tr>
+				<td width="75%">
+		   			The page provides access to the various sections of this build along with details
+					relating to its results. Test results are provided below and performance results
+					are posted once they are available. You may access the download page specific to 
+					each platform by selecting one of the tabs in the platform navigator above.
+				</td>
+			</tr>
+		</table>
+
+		<?php
+				if($code == 1) {
+					echo "<br /><br /><a href=\"$link\"><img align=\"left\" src=\"../../../eclipse.org-common/stylesheets/update_wiz.gif\" border=\"0\" alt=\"Download Eclipse SDK\" /></a>
+						&#160;&#160;<font size=\"+1\"><b>Download now: <a href=\"$anchor\">Eclipse SDK</a></b></font>, $clientOS<br /><br /> 
+						&#160;&#160;You are currently running on <a href=\"$link\"><b>$clientOS</b></a>";
+				}
+				else {
+					echo "<br /><br /><a href=\"$link\"><img align=\"left\" src=\"../../../eclipse.org-common/stylesheets/update_wiz.gif\" border=\"0\" alt=\"Download Eclipse SDK\" /></a>
+						&#160;&#160;<font size=\"+1\"><b>Download now: <a href=\"$anchor\">Eclipse SDK</a></b></font><br /><br />";
+				}
+				?>
+		<br /><br />
+		
+		<div>
+		<table BORDER=0 CELLSPACING=5 CELLPADDING=2 WIDTH="100%" > </br>
+		<?php
+		$servername = $_SERVER["SERVER_NAME"];
+		if (! preg_match("/.eclipse.org/i",$servername)) {
+        		echo "<tr> To download a file via HTTP click on its corresponding http link below.";			
+		} else {
+    			echo "<tr>";
+		} ?>  
+		</table>
+		</div>
+		
+		<div class="homeitem">
+			<h3>Related Links</h3>
+				<ul class="midlist">
+				<li><a href="buildNotes.php">View the <b>build notes</b> for the current build.</a></li>
+				
+				<?php
+				$testResultsStatus = "%testsStatus%";
+				if($testResultsStatus == "pending") {
+					echo "<li><a title=\"Tests are pending\" href=\"testResults.php\">View the <b>test results</b> for the current build.</a></li>";
+				}
+				else if($testResultsStatus == "successful") {
+					echo "<li><a title=\"Test results have no failures\" href=\"testResults.php\">View the <b><font color=\"#00FF00\">test results</font></b> for the current build.</a></li>";	
+				}
+				else if($testResultsStatus == "failed") {
+					echo "<li><a title=\"Test results have failures\" href=\"testResults.php\">View the <b><font color=\"#FF0000\">test results</font></b> for the current build.</a></li>";	
+				}
+				else {
+					echo "<li><a href=\"testResults.php\">View the <b>test results</b> for the current build.</a></li>";
+				}
+				if (file_exists("performance/performance.php")) {
+					echo "<li>";
+					$generated=file_exists("performance/global_fp.php");
+					if (!$generated) echo "<i>";
+					echo "<a href=\"performance/performance.php\">View the <b>performance results</b> for the current build.</a>";
+					if (!$generated) echo "</i>";
+					echo "</li>";
+				}
+				?>
+				
+				<li><a href="directory.txt">View the <b>map file entries</b> for the current build.</a></li></ul>
+		</div>
+
+		<div class="homeitem">
+			<h3>Source Builds</h3>
+				<ul class="midlist">
+				<li><a href="sourceBuilds.php">Access the <b>Source Builds</b> page.</a></li></ul>
+		</div>
+	<hr class="clearer" />
+	</div>
+
+<div id="rightcolumn">
+		</br></br></br>
+		<div class="sideitem">
+			<h6>Eclipse SDK's</h6>
+			<ul>
+				<li><a href="index.php#EclipseSDK">All Platforms</a></li>
+				<li><a href="winPlatform.php#EclipseSDK">Windows Platform</a></li>
+				<li><a href="linPlatform.php#EclipseSDK">Linux Platform</a></li>
+				<li><a href="solPlatform.php#EclipseSDK">Solaris Platform</a></li>
+				<li><a href="aixPlatform.php#EclipseSDK">AIX Platform</a></li>		
+				<li><a href="macPlatform.php#EclipseSDK">Macintosh Platform</a></li>
+			</ul>
+		</div>
+		</br></br></br>
+		<div class="sideitem">
+			<h6>Downloads Integrity</h6>
+			<ul>
+				<li><a href="verifyMD5.html">Click for instructions on how to verify the integrity of your downloads.</a></li>
+			</ul>			
+		</div>	
+		<div class="sideitem">
+            <h6>Support Eclipse!</h6>
+            <ul>
+                <img src="friendslogo.jpg" height="115" width="180"/><li><a href="http://www.eclipse.org/donate/">Become a friend</a></li>
+            </ul>
+        </div>
+</div>		
+
+<?php 
+
+function column($servername) {
+
+      echo "<td width=\"7%\"><b>Download</b></td>";
+      echo "<td width=\"7%\"><b>Size</b></td>";
+      echo "<td width=\"37%\"><b>File</b></td>";
+      echo "<td width=\"11%\"><b>Checksum</b></td>";
+      return;
+}
+
+function getDropSize($zipfile) {
+
+		 $filesize = "N/A";
+		 $filesizebytes  = filesize($zipfile);
+		 if($filesizebytes > 0) {
+			if($filesizebytes < 1048576)
+				$filesize = round($filesizebytes / 1048576, 2) . " MB";
+			else if ($filesizebytes >= 1048576 && $filesizebytes < 10485760)
+				$filesize = round($filesizebytes / 1048576, 1) . " MB";
+			else
+        		 	$filesize = round($filesizebytes / 1048576, 0) . " MB";
+		 }
+        return($filesize);
+}
+
+function genLinks($servername,$buildlabel,$zipfile) {
+
+     $httplink = "download.php?dropFile=$zipfile";
+     $httplabel = "(http)";
+     $httpline =  "<div align=\"left\"><a href=\"$httplink\">$httplabel</a>";
+     $filesize = getDropSize($zipfile);
+
+     echo "$httpline";
+     echo "&nbsp;&nbsp";
+     echo "<td>$filesize</td>";
+     echo "<td>$zipfile</td>";
+     echo "<td><a href=\"http://download.eclipse.org/eclipse/downloads/drops/@buildlabel@/checksum/$zipfile.md5\">(md5)</a>";
+     echo " <a href=\"http://download.eclipse.org/eclipse/downloads/drops/@buildlabel@/checksum/$zipfile.sha1\">(sha1)</a>";
+}
+?>	
+
+<table align="left" BORDER=0 CELLSPACING=5 CELLPADDING=2 WIDTH="100%">
+<tr><td><div class="homeitem3col">
+<h3><a name="EclipseSDK"> Eclipse SDK&nbsp;<a href="details.php#EclipseSDK"><img src="../../../eclipse.org-common/stylesheets/more.gif" title="More..." alt="[More]"></a></h3>
+<table BORDER=0 CELLSPACING=2 CELLPADDING=0 WIDTH="99%" bordercolor="#999999" > 
+<tr> <td align=RIGHT valign=TOP width="5%"> <div align="left"><b>Status</b></div></td><td width="36%"><b>Platform</b></td><?php column($_SERVER["SERVER_NAME"]); ?> 
+</tr> %sdk% </table><?php
+		 $parts = explode("/", getcwd());
+		 $parts2 = explode("-", $parts[count($parts) - 1]);
+		 $buildName = $parts2[1];
+		 
+		 // Get build type names
+
+		 $fileHandle = fopen("../../dlconfig2.txt", "r");
+		 while (!feof($fileHandle)) {
+		 		 
+		 		 $aLine = fgets($fileHandle, 4096); // Length parameter only optional after 4.2.0
+		 		 $parts = explode(",", $aLine);
+		 		 $dropNames[trim($parts[0])] = trim($parts[1]);
+ 		 }
+		 fclose($fileHandle);
+
+		 $buildType = $dropNames[$parts2[0]];
+		
+?> 
+</div></td></tr>
+
+<tr><td><div class="homeitem3col">
+<h3><a name="JUnitPlugin"> JUnit Plugin Tests and Automated Testing Framework&nbsp;<a href="details.php#JUnitPlugin"><img src="../../../eclipse.org-common/stylesheets/more.gif" title="More..." alt="[More]"></a></h3>
+<table border=0 cellspacing=2 cellpadding=0 width="99%" bordercolor="#999999" >   
+<tr> <td align=RIGHT valign=TOP width="5%"> <div align="left"><b>Status</b></div></td><td width="36%"><b>Platform</b></td><?php column($_SERVER["SERVER_NAME"]); ?> 
+</tr> %tests% </table>
+</div></td></tr>
+
+
+<tr><td><div class="homeitem3col">
+<h3><a name="ExamplePlugins"> Example Plug-ins&nbsp;<a href="details.php#ExamplePlugins"><img src="../../../eclipse.org-common/stylesheets/more.gif" title="More..." alt="[More]"></a></h3>
+<table border=0 cellspacing=2 cellpadding=0 width="99%" bordercolor="#999999" > 
+<tr> <td align=RIGHT valign=TOP width="5%"> <div align="left"><b>Status</b></div></td><td width="36%"><b>Platform</b></td><?php column($_SERVER["SERVER_NAME"]); ?> 
+</tr> %example% </table>
+</div></td></tr>
+
+
+<tr><td><div class="homeitem3col">
+<h3><a name="RCPRuntime"> RCP Runtime Binary&nbsp;<a href="details.php#RCPRuntime"><img src="../../../eclipse.org-common/stylesheets/more.gif" title="More..." alt="[More]"></a></h3>
+<table border=0 cellspacing=2 cellpadding=0 width="99%" bordercolor="#999999" >  
+<tr> <td align=RIGHT valign=TOP width="5%"> <div align="left"><b>Status</b></div></td><td width="36%"><b>Platform</b></td><?php column($_SERVER["SERVER_NAME"]); ?> 
+</tr> %rcpruntime% </table>
+</div></td></tr>
+
+
+<tr><td><div class="homeitem3col">
+<h3><a name="RCPSDK"> RCP SDK&nbsp;<a href="details.php#RCPSDK"><img src="../../../eclipse.org-common/stylesheets/more.gif" title="More..." alt="[More]"></a></h3>
+<table border=0 cellspacing=2 cellpadding=0 width="99%" bordercolor="#999999" > 
+<tr> <td align=RIGHT valign=TOP width="5%"> <div align="left"><b>Status</b></div></td><td width="36%"><b>Platform</b></td><?php column($_SERVER["SERVER_NAME"]); ?> 
+</tr> %rcpsdk% </table>
+</div></td></tr>
+
+<tr><td><div class="homeitem3col">
+<h3><a name="DeltaPack"> DeltaPack&nbsp;<a href="details.php#DeltaPack"><img src="../../../eclipse.org-common/stylesheets/more.gif" title="More..." alt="[More]"></a></h3>
+<table border=0 cellspacing=2 cellpadding=0 width="99%" bordercolor="#999999" > 
+<tr> <td align=RIGHT valign=TOP width="5%"> <div align="left"><b>Status</b></div></td><td width="36%"><b>Platform</b></td><?php column($_SERVER["SERVER_NAME"]); ?> 
+</tr> %deltapack% </table>
+</div></td></tr>
+
+<tr><td><div class="homeitem3col">
+<h3><a name="com.ibm.icu"> com.ibm.icu.base binary and source Plug-ins&nbsp;<a href="details.php#com.ibm.icu"><img src="../../../eclipse.org-common/stylesheets/more.gif" title="More..." alt="[More]"></a></h3>
+<TABLE BORDER=0 CELLSPACING=2 CELLPADDING=0 WIDTH="99%" BORDERCOLOR="#999999" >
+<TR> <TD ALIGN=RIGHT VALIGN=TOP WIDTH="5%"> <DIV ALIGN="left"><B>Status</B></DIV></TD><TD WIDTH="36%"><B>Platform</B></TD><?php column($_SERVER["SERVER_NAME"]); ?> 
+</TR> %icubase% </TABLE>
+</div></td></tr>
+
+
+<tr><td><div class="homeitem3col">
+<h3><a name="PlatformRuntime"> Platform Runtime Binary&nbsp;<a href="details.php#PlatformRuntime"><img src="../../../eclipse.org-common/stylesheets/more.gif" title="More..." alt="[More]"></a></h3>
+<table border=0 cellspacing=2 cellpadding=0 width="99%" bordercolor="#999999" > 
+<tr> <td align=RIGHT valign=TOP width="5%"> <div align="left"><b>Status</b></div></td><td width="36%"><b>Platform</b></td><?php column($_SERVER["SERVER_NAME"]); ?> 
+</tr> %runtime% </table>
+</div></td></tr>
+
+
+<tr><td><div class="homeitem3col">
+<h3><a name="PlatformSDK"> Platform SDK&nbsp;<a href="details.php#PlatformSDK"><img src="../../../eclipse.org-common/stylesheets/more.gif" title="More..." alt="[More]"></a></h3>
+<table border=0 cellspacing=2 cellpadding=0 width="99%" bordercolor="#999999" > 
+<tr> <td align=RIGHT valign=TOP width="5%"> <div align="left"><b>Status</b></div></td><td width="36%"><b>Platform</b></td><?php column($_SERVER["SERVER_NAME"]); ?> 
+</tr> %platformsdk% </table>
+</div></td></tr>
+
+
+<tr><td><div class="homeitem3col">
+<h3><a name="JDTRuntime"> JDT Runtime Binary&nbsp;<a href="details.php#JDTRuntime"><img src="../../../eclipse.org-common/stylesheets/more.gif" title="More..." alt="[More]"></a></h3>
+<table border=0 cellspacing=2 cellpadding=0 width="99%" bordercolor="#999999" > 
+<tr> <td align=RIGHT valign=TOP width="5%"> <div align="left"><b>Status</b></div></td><td width="36%"><b>Platform</b></td><?php column($_SERVER["SERVER_NAME"]); ?> 
+</tr> %jdt% </table>
+</div></td></tr>
+
+
+<tr><td><div class="homeitem3col">
+<h3><a name="JDTSDK"> JDT SDK &nbsp;<a href="details.php#JDTSDK"><img src="../../../eclipse.org-common/stylesheets/more.gif" title="More..." alt="[More]"></a></h3>
+<table border=0 cellspacing=2 cellpadding=0 width="99%" bordercolor="#999999" > 
+<tr> <td align=RIGHT valign=TOP width="5%"> <div align="left"><b>Status</b></div></td><td width="36%"><b>Platform</b></td><?php column($_SERVER["SERVER_NAME"]); ?> 
+</tr> %jdtsdk% </table>
+</div></td></tr>
+
+<tr><td><div class="homeitem3col">
+<h3><a name="JDTCORE"> JDT Core Batch Compiler &nbsp;<a href="details.php#JDTCORE"><img src="../../../eclipse.org-common/stylesheets/more.gif" title="More..." alt="[More]"></a></h3>
+<table border=0 cellspacing=2 cellpadding=0 width="99%" bordercolor="#999999" > 
+<tr> <td align=RIGHT valign=TOP width="5%"> <div align="left"><b>Status</b></div></td><td width="36%"><b>Platform</b></td><?php column($_SERVER["SERVER_NAME"]); ?> 
+</tr> %jdtc% </table>
+</div></td></tr>
+
+<tr><td><div class="homeitem3col">
+<h3><a name="JARPROCESSOR"> Jar Processor &nbsp;<a href="details.php#JARPROCESSOR"><img src="../../../eclipse.org-common/stylesheets/more.gif" title="More..." alt="[More]"></a></h3>
+<table border=0 cellspacing=2 cellpadding=0 width="99%" bordercolor="#999999" > 
+<tr> <td align=RIGHT valign=TOP width="5%"> <div align="left"><b>Status</b></div></td><td width="36%"><b>Platform</b></td><?php column($_SERVER["SERVER_NAME"]); ?> 
+</tr> %jarprocessor% </table>
+</div></td></tr>
+
+
+<tr><td><div class="homeitem3col">
+<h3><a name="PDERuntime"> PDE Runtime Binary&nbsp;<a href="details.php#PDERuntime"><img src="../../../eclipse.org-common/stylesheets/more.gif" title="More..." alt="[More]"></a></h3>
+<table border=0 cellspacing=2 cellpadding=0 width="99%" bordercolor="#999999" >  
+<tr> <td align=RIGHT valign=TOP width="5%"> <div align="left"><b>Status</b></div></td><td width="36%"><b>Platform</b></td><?php column($_SERVER["SERVER_NAME"]); ?> 
+</tr> %pde% </table>
+</div></td></tr>
+
+
+<tr><td><div class="homeitem3col">
+<h3><a name="PDESDK"> PDE SDK&nbsp;<a href="details.php#PDESDK"><img src="../../../eclipse.org-common/stylesheets/more.gif" title="More..." alt="[More]"></a></h3>
+<table border=0 cellspacing=2 cellpadding=0 width="99%" bordercolor="#999999" > 
+<tr> <td align=RIGHT valign=TOP width="5%"> <div align="left"><b>Status</b></div></td><td width="36%"><b>Platform</b></td><?php column($_SERVER["SERVER_NAME"]); ?> 
+%pdesdk% </table>
+</div></td></tr>
+
+<tr><td><div class="homeitem3col">
+<h3><a name="CVSRuntime"> CVS Client Runtime Binary&nbsp;<a href="details.php#CVSRuntime"><img src="../../../eclipse.org-common/stylesheets/more.gif" title="More..." alt="[More]"></a></h3>
+<table border=0 cellspacing=2 cellpadding=0 width="99%" bordercolor="#999999" >  
+<tr> <td align=RIGHT valign=TOP width="5%"> <div align="left"><b>Status</b></div></td><td width="36%"><b>Platform</b></td><?php column($_SERVER["SERVER_NAME"]); ?> 
+</tr> %cvs% </table>
+</div></td></tr>
+
+<tr><td><div class="homeitem3col">
+<h3><a name="CVSSDK"> CVS Client SDK&nbsp;<a href="details.php#CVSSDK"><img src="../../../eclipse.org-common/stylesheets/more.gif" title="More..." alt="[More]"></a></h3>
+<table border=0 cellspacing=2 cellpadding=0 width="99%" bordercolor="#999999" > 
+<tr> <td align=RIGHT valign=TOP width="5%"> <div align="left"><b>Status</b></div></td><td width="36%"><b>Platform</b></td><?php column($_SERVER["SERVER_NAME"]); ?> 
+%cvssdk% </table>
+</div></td></tr>
+
+
+
+<tr><td><div class="homeitem3col">
+<h3><a name="SWT"> SWT Binary and Source&nbsp;<a href="details.php#SWT"><img src="../../../eclipse.org-common/stylesheets/more.gif" title="More..." alt="[More]"></a></h3>
+<table border=0 cellspacing=2 cellpadding=0 width="99%" bordercolor="#999999" > 
+<tr> <td align=RIGHT valign=TOP width="5%"> <div align="left"><b>Status</b></div></td><td width="36%"><b>Platform</b></td><?php column($_SERVER["SERVER_NAME"]); ?> 
+</tr> %swt% </table>
+</div></td></tr>
+
+
+<tr><td><div class="homeitem3col">
+<h3><a name="org.eclipse.releng"> org.eclipse.releng.tools plug-in&nbsp;<a href="details.php#org.eclipse.releng"><img src="../../../eclipse.org-common/stylesheets/more.gif" title="More..." alt="[More]"></a></h3>
+<table border=0 cellspacing=2 cellpadding=0 width="99%" bordercolor="#999999" > 
+<tr> <td align=RIGHT valign=TOP width="5%"> <div align="left"><b>Status</b></div></td><td width="36%"><b>Platform</b></td><?php column($_SERVER["SERVER_NAME"]); ?> 
+</tr> %relengtools% </table>
+</div></td></tr>
+</table>
+<p><br /></p>
+
+<div id="footer">
+	<ul id="footernav">
+		<li class="first"><a href="http://www.eclipse.org">Home</a></li>
+		<li><a href="http://www.eclipse.org/legal/privacy.php">Privacy Policy</a></li>
+		<li><a href="http://www.eclipse.org/legal/termsofuse.php">Terms of Use</a></li>
+	</ul>
+	<p>Copyright &copy; 2006 The Eclipse Foundation. All Rights
+Reserved</p>
+</div>
+</body>
+</html>

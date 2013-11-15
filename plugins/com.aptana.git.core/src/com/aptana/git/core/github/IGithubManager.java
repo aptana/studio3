@@ -7,20 +7,51 @@
  */
 package com.aptana.git.core.github;
 
-import java.util.List;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 
+/**
+ * @author cwilliams
+ */
 public interface IGithubManager
 {
 
+	/**
+	 * Status code for reporting errors in operations due to user not being logged into Github API.
+	 */
+	public static final int GITHUB_LOGIN_CODE = 1234;
+
+	/**
+	 * Returns the currently logged in user.
+	 * 
+	 * @return
+	 */
 	public IGithubUser getUser();
 
 	public IStatus login(String username, String password);
 
 	public IStatus logout();
 
-	public List<String> getRepos() throws CoreException;
+	/**
+	 * Grabs the {@link IGithubRepository} model for a given repository by it's owner and name.
+	 * 
+	 * @param owner
+	 * @param repoName
+	 * @return
+	 * @throws CoreException
+	 *             if there is no logged in user, or if there is an error in grabbing the repo (permissions/404)
+	 */
+	public IGithubRepository getRepo(String owner, String repoName) throws CoreException;
 
+	/**
+	 * Sends a request to fork the repo at owner/repoName into the account destination. If destination is null, it will
+	 * be forked to the current user's account. destination must be an organization that user has access to.
+	 * 
+	 * @param owner
+	 * @param repoName
+	 * @param destination
+	 * @throws CoreException
+	 *             if there is no logged in user, or if there is an error in grabbing the repo (permissions/404)
+	 */
+	public IGithubRepository fork(String owner, String repoName, String destination) throws CoreException;
 }

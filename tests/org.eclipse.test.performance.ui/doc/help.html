@@ -1,0 +1,108 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<style type="text/css">p, table, td, th {  font-family: arial, helvetica, geneva; font-size: 10pt}
+pre {  font-family: "Courier New", Courier, mono; font-size: 10pt}
+h2 { font-family: arial, helvetica, geneva; font-size: 18pt; font-weight: bold ; line-height: 14px}
+code {  font-family: "Courier New", Courier, mono; font-size: 10pt}
+sup {  font-family: arial,helvetica,geneva; font-size: 10px}
+h3 {  font-family: arial, helvetica, geneva; font-size: 14pt; font-weight: bold}
+li {  font-family: arial, helvetica, geneva; font-size: 10pt}
+h1 {  font-family: arial, helvetica, geneva; font-size: 28px; font-weight: bold}
+body {  font-family: arial, helvetica, geneva; font-size: 10pt; clip:   rect(   ); margin-top: 5mm; margin-left: 3mm}
+.indextop { font-size: x-large;; font-family: Verdana, Arial, Helvetica, sans-serif; font-weight: bold}
+.indexsub { font-size: xx-small;; font-family: Arial, Helvetica, sans-serif; color: #8080FF}
+</style>
+<body>
+<p>
+<h1>Table of contents</h1>
+<ul>
+<li><a href="#scales">Scales</a>
+<ul>
+<li><a href="#percent">Percentage</a></li>
+<li><a href="#time">Time linear</a></li>
+<li><a href="#time">Time logarithmic</a></li>
+</ul>
+</li>
+<li><a href="#tips">Tips for time scales</a></li>
+</ul>
+</p>
+<h1><a name="scales">Scales</h1>
+Since 3.5, it's possible to see results in fingerprints with three different
+kinds of scale.
+<h3><a name="percent">Percentage scale</h3>
+<p>The X axis represents percentage of the variation vs. the given baseline</p>
+<p>This is the way fingerprints were displayed since the beginning:
+<p><img src="images/percentage.png">
+<ul>
+<li>Red bar means a regression, even if it's less than the 10% threshold.</li>
+<li>Green bar means an improvement</li>
+<li>Gray bar means an 'explained' regression.</li>
+</ul>
+</p>
+<h3><a name="time">Linear and logarithmic time scales</h3>
+<p>For these scales, the X axis represents the duration time of the test.<br>
+The colors meanings are the same than for the percentage scale.<br>
+These kind of graphs give a better idea of time duration for each test.</p>
+<p>Typically use linear scale if you want to see the tests relativeness for all the component tests:</p>
+<p><img src="images/linear.png">
+<p>But the logarithmic scale is more appropriate when there are a strong duration differences between tests, hence makes short duration tests easier to survey:</p>
+<p><img src="images/log.png">
+<p>Each test have two bars: the former is white and shows the baseline result, the latter is colored (red, green or gray) and shows the current build result.<br>
+The variation between the baseline and the build is displayed as a percentage on top of both bars.</p>
+<h1><a name="tips">Tips for time scales</h1>
+<p>Tips are almost the same for linear and logarithmic scales:</p>
+<table border="0">
+  <tr>
+    <td valign="top"><img src="../images/light.gif"></td>
+    <td><b>Flying over a bar displays its time value<b>:</td></tr>
+  </tr>
+  <tr>
+    <td></td>
+    <td><img src="images/help_time_baseline.png"></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td><img src="images/help_time_current.png"></td>
+  </tr>
+  <tr><td><br></td></tr>
+  <tr>
+    <td valign="top"><img src="../images/light.gif"></td>
+    <td><b>For <u>linear scale only</u>, when the error on the time result is noticeable,
+		then the measurement uncertainty is shown in yellow at the end of the bar<b>:</td></tr>
+  </tr>
+  <tr>
+    <td></td>
+    <td><img src="images/help_time_error.png"></td>
+  </tr>
+  <tr><td><br></td></tr>
+  <tr>
+    <td valign="top"><img src="../images/light.gif"></td>
+    <td><b>A performance regression may sometimes have a known good reason</b>.<br>
+    In this case, the current build bar is grayed and flying over it also shows the given explanation:</td></tr>
+  </tr>
+  <tr>
+    <td></td>
+    <td><img src="images/help_explained_regression.png"></td>
+  </tr>
+  <tr><td><br></td></tr>
+  <tr>
+    <td valign="top"><img src="../images/light.gif"></td>
+    <td><b>Test result may have big error which can make the test result not fully reliable</b>.<br>
+  In this case, a warning icon is shown after the variation value and flying over it gives the offending error value:</td></tr>
+  </tr>
+  <tr>
+    <td></td>
+    <td><img src="images/help_error_warning.png"></td>
+  </tr>
+  <tr><td><br></td></tr>
+  <tr>
+    <td valign="top"><img src="../images/light.gif"></td>
+    <td><b>Test may have no result for the used baseline, hence the first available build is used as a reference</b>.<br>
+  In this case, a warning icon is shown after the scenario title and flying over it gives the build ID used to compute the variation:</td></tr>
+  </tr>
+  <tr>
+    <td></td>
+    <td><img src="images/help_no_baseline.png"></td>
+  </tr>
+</table>
+</body>
+</html>

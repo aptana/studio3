@@ -15,7 +15,7 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.test.performance.PerformanceTestCase;
+import org.eclipse.test.performance.GlobalTimePerformanceTestCase;
 
 import com.aptana.core.build.AbstractBuildParticipant;
 import com.aptana.core.util.ResourceUtil;
@@ -29,7 +29,7 @@ import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ParseResult;
 import com.aptana.parsing.WorkingParseResult;
 
-public class JSLintValidatorPerformanceTest extends PerformanceTestCase
+public class JSLintValidatorPerformanceTest extends GlobalTimePerformanceTestCase
 {
 	private AbstractBuildParticipant validator;
 

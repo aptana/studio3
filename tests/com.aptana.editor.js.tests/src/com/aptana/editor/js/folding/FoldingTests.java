@@ -8,13 +8,22 @@
 package com.aptana.editor.js.folding;
 
 import junit.framework.Test;
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 public class FoldingTests
 {
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite("Tests for com.aptana.editor.js.folding");
+		TestSuite suite = new TestSuite("Tests for com.aptana.editor.js.folding")
+		{
+			@Override
+			public void runTest(Test test, TestResult result)
+			{
+				System.err.println("Running test: " + test.toString());
+				super.runTest(test, result);
+			}
+		};
 		// $JUnit-BEGIN$
 		suite.addTestSuite(JSEditorFoldingTest.class);
 		// $JUnit-END$

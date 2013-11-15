@@ -17,7 +17,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
-import org.eclipse.test.performance.PerformanceTestCase;
+import org.eclipse.test.performance.GlobalTimePerformanceTestCase;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
@@ -25,7 +25,7 @@ import com.aptana.editor.common.ExtendedFastPartitioner;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.epl.tests.EditorTestHelper;
 
-public class CSSSourcePartitionScannerPerformanceTest extends PerformanceTestCase
+public class CSSSourcePartitionScannerPerformanceTest extends GlobalTimePerformanceTestCase
 {
 	private IDocumentPartitioner fPartitioner;
 	private IPartitioningConfiguration configuration;

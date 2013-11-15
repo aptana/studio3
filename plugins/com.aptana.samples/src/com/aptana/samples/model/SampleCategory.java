@@ -7,19 +7,21 @@
  */
 package com.aptana.samples.model;
 
+import java.net.URL;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.samples.handlers.ISampleProjectHandler;
 
 public class SampleCategory
 {
-
+	private static final String ATTR_ICON = "icon"; //$NON-NLS-1$
 	private static final String ATTR_PROJECT_HANDLER = "projectHandler"; //$NON-NLS-1$
 
 	private final String id;
 	private final String name;
-	private String iconFile;
 	private final IConfigurationElement configElement;
 	private ISampleProjectHandler projectHandler;
 
@@ -40,9 +42,9 @@ public class SampleCategory
 		return name;
 	}
 
-	public String getIconFile()
+	public URL getIconFile()
 	{
-		return iconFile;
+		return EclipseUtil.getResourceURL(configElement, ATTR_ICON);
 	}
 
 	public ISampleProjectHandler getProjectHandler()
@@ -59,11 +61,6 @@ public class SampleCategory
 			}
 		}
 		return projectHandler;
-	}
-
-	public void setIconFile(String iconFile)
-	{
-		this.iconFile = iconFile;
 	}
 
 	@Override

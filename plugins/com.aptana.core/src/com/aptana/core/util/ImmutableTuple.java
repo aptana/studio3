@@ -12,13 +12,13 @@ public final class ImmutableTuple<X, Y> implements Serializable
 
 	private static final long serialVersionUID = 1L;
 
-	public final X o1;
-	public final Y o2;
+	public final X first;
+	public final Y second;
 
 	public ImmutableTuple(X o1, Y o2)
 	{
-		this.o1 = o1;
-		this.o2 = o2;
+		this.first = o1;
+		this.second = o2;
 	}
 
 	@Override
@@ -31,33 +31,33 @@ public final class ImmutableTuple<X, Y> implements Serializable
 
 		@SuppressWarnings("rawtypes")
 		ImmutableTuple t2 = (ImmutableTuple) obj;
-		if (o1 == t2.o1 && o2 == t2.o2)
+		if (first == t2.first && second == t2.second)
 		{ // all the same
 			return true;
 		}
 
-		if (o1 == null && t2.o1 != null)
+		if (first == null && t2.first != null)
 		{
 			return false;
 		}
-		if (o2 == null && t2.o2 != null)
+		if (second == null && t2.second != null)
 		{
 			return false;
 		}
-		if (o1 != null && t2.o1 == null)
+		if (first != null && t2.first == null)
 		{
 			return false;
 		}
-		if (o2 != null && t2.o2 == null)
+		if (second != null && t2.second == null)
 		{
 			return false;
 		}
 
-		if (!o1.equals(t2.o1))
+		if (!first.equals(t2.first))
 		{
 			return false;
 		}
-		if (!o2.equals(t2.o2))
+		if (!second.equals(t2.second))
 		{
 			return false;
 		}
@@ -67,17 +67,17 @@ public final class ImmutableTuple<X, Y> implements Serializable
 	@Override
 	public int hashCode()
 	{
-		if (o1 != null && o2 != null)
+		if (first != null && second != null)
 		{
-			return o1.hashCode() * o2.hashCode();
+			return first.hashCode() * second.hashCode();
 		}
-		if (o1 != null)
+		if (first != null)
 		{
-			return o1.hashCode();
+			return first.hashCode();
 		}
-		if (o2 != null)
+		if (second != null)
 		{
-			return o2.hashCode();
+			return second.hashCode();
 		}
 		return 7;
 	}
@@ -85,7 +85,7 @@ public final class ImmutableTuple<X, Y> implements Serializable
 	@Override
 	public String toString()
 	{
-		return StringUtil.concat("Tuple [", o1 != null ? o1.toString() : "null", " -- ", o2 != null ? o2.toString() //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		return StringUtil.concat("Tuple [", first != null ? first.toString() : "null", " -- ", second != null ? second.toString() //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				: "null", "]"); //$NON-NLS-1$//$NON-NLS-2$
 	}
 }

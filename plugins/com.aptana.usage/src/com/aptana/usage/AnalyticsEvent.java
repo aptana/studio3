@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -16,15 +16,12 @@ import java.util.TimeZone;
 import java.util.UUID;
 
 import org.eclipse.core.runtime.Platform;
-import com.aptana.jetty.util.epl.ajax.JSON;
 
 import com.aptana.core.CorePlugin;
-import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
-import com.aptana.usage.internal.AnalyticsInfo;
-import com.aptana.usage.internal.AnalyticsInfoManager;
+import com.aptana.jetty.util.epl.ajax.JSON;
 import com.aptana.usage.internal.DefaultAnalyticsInfo;
 import com.eaio.uuid.MACAddress;
 
@@ -37,7 +34,7 @@ public class AnalyticsEvent
 	private static final AnalyticsInfo APP_INFO;
 	static
 	{
-		AnalyticsInfo info = AnalyticsInfoManager.getInstance().getInfo("com.aptana.usage.analytics"); //$NON-NLS-1$
+		AnalyticsInfo info = UsagePlugin.getDefault().getAnalyticsInfoManager().getInfo("com.aptana.usage.analytics"); //$NON-NLS-1$
 		if (info == null)
 		{
 			APP_INFO = new DefaultAnalyticsInfo();
@@ -72,7 +69,7 @@ public class AnalyticsEvent
 		}
 		catch (Exception ex)
 		{
-			IdeLog.logError(UsagePlugin.getDefault(), "Unable to log analytics information", ex); //$NON-NLS-1$
+			UsagePlugin.logError("Unable to log analytics information: " + ex.getMessage()); //$NON-NLS-1$
 		}
 	}
 
@@ -87,7 +84,7 @@ public class AnalyticsEvent
 		}
 		catch (Exception ex)
 		{
-			IdeLog.logError(UsagePlugin.getDefault(), "Unable to log analytics information", ex); //$NON-NLS-1$
+			UsagePlugin.logError("Unable to log analytics information: " + ex.getMessage()); //$NON-NLS-1$
 		}
 	}
 

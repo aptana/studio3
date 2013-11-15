@@ -12,11 +12,11 @@ import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
 import org.osgi.util.tracker.ServiceTracker;
 
+import com.aptana.js.core.node.INodeJS;
 import com.aptana.js.core.node.INodeJSService;
 import com.aptana.js.core.node.INodePackageManager;
 import com.aptana.js.internal.core.index.JSMetadataLoader;
 import com.aptana.js.internal.core.node.NodeJSService;
-import com.aptana.js.internal.core.node.NodePackageManager;
 
 /**
  * @author cwilliams
@@ -29,7 +29,6 @@ public class JSCorePlugin extends Plugin
 	private static JSCorePlugin PLUGIN;
 
 	private INodeJSService fNodeService;
-	private INodePackageManager fNpm;
 
 	private ServiceTracker proxyTracker;
 
@@ -69,7 +68,6 @@ public class JSCorePlugin extends Plugin
 		{
 			proxyTracker = null;
 			fNodeService = null;
-			fNpm = null;
 			PLUGIN = null;
 			super.stop(context);
 		}
@@ -84,13 +82,19 @@ public class JSCorePlugin extends Plugin
 		return fNodeService;
 	}
 
-	public synchronized INodePackageManager getNodePackageManager()
+	/**
+	 * Returns the NPM instance tied to the Node instance user has set up (or we detected if they didn't).
+	 * 
+	 * @return
+	 */
+	public INodePackageManager getNodePackageManager()
 	{
-		if (fNpm == null)
+		INodeJS nodeJS = getNodeJSService().getValidExecutable();
+		if (nodeJS == null)
 		{
-			fNpm = new NodePackageManager();
+			return null;
 		}
-		return fNpm;
+		return nodeJS.getNPM();
 	}
 
 	public IProxyService getProxyService()

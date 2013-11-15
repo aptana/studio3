@@ -7,8 +7,6 @@
  */
 package com.aptana.ide.syncing.core;
 
-import java.io.File;
-
 import org.eclipse.core.resources.ISaveContext;
 import org.eclipse.core.resources.ISaveParticipant;
 import org.eclipse.core.resources.ISavedState;
@@ -23,14 +21,12 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.osgi.framework.BundleContext;
 
-import com.aptana.core.CorePlugin;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 
 /**
  * The activator class controls the plug-in life cycle
  */
-@SuppressWarnings("deprecation")
 public class SyncingPlugin extends Plugin
 {
 
@@ -63,7 +59,7 @@ public class SyncingPlugin extends Plugin
 
 				try
 				{
-					ISavedState lastState = ResourcesPlugin.getWorkspace().addSaveParticipant(getDefault(),
+					ISavedState lastState = ResourcesPlugin.getWorkspace().addSaveParticipant(PLUGIN_ID,
 							new WorkspaceSaveParticipant());
 					if (lastState != null)
 					{
@@ -76,42 +72,6 @@ public class SyncingPlugin extends Plugin
 						if (location != null)
 						{
 							DefaultSiteConnection.getInstance().loadState(getStateLocation().append(location));
-						}
-					}
-
-					// For 1.5 compatibility
-					lastState = ResourcesPlugin.getWorkspace().addSaveParticipant(CorePlugin.getDefault(),
-							new ISaveParticipant()
-							{
-
-								public void doneSaving(ISaveContext context)
-								{
-								}
-
-								public void prepareToSave(ISaveContext context) throws CoreException
-								{
-								}
-
-								public void rollback(ISaveContext context)
-								{
-								}
-
-								public void saving(ISaveContext context) throws CoreException
-								{
-								}
-							});
-					if (lastState != null)
-					{
-						IPath location = lastState.lookup(new Path("save")); //$NON-NLS-1$
-						if (location != null)
-						{
-							IPath absoluteLocation = CorePlugin.getDefault().getStateLocation().append(location);
-							// only loads it once
-							SiteConnectionManager.getInstance().loadState(absoluteLocation);
-							File file = absoluteLocation.toFile();
-							if (!file.renameTo(new File(absoluteLocation.toOSString() + ".bak"))) { //$NON-NLS-1$
-								file.delete();
-							}
 						}
 					}
 				}
@@ -137,8 +97,7 @@ public class SyncingPlugin extends Plugin
 	 */
 	public void stop(BundleContext context) throws Exception
 	{
-		ResourcesPlugin.getWorkspace().removeSaveParticipant(this);
-		ResourcesPlugin.getWorkspace().removeSaveParticipant(CorePlugin.getDefault());
+		ResourcesPlugin.getWorkspace().removeSaveParticipant(PLUGIN_ID);
 		plugin = null;
 		super.stop(context);
 	}

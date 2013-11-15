@@ -18,7 +18,7 @@ import com.aptana.core.build.IBuildParticipantWorkingCopy;
 import com.aptana.core.build.IProblem;
 import com.aptana.editor.html.HTMLMetadataLoader;
 import com.aptana.editor.html.HTMLPlugin;
-import com.aptana.editor.html.IHTMLConstants;
+import com.aptana.editor.html.core.IHTMLConstants;
 import com.aptana.editor.html.parsing.HTMLParseState;
 
 public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
@@ -46,6 +46,12 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 	protected String getFileExtension()
 	{
 		return "html";
+	}
+
+	@Override
+	protected String getContentType()
+	{
+		return IHTMLConstants.CONTENT_TYPE_HTML;
 	}
 
 	@Override

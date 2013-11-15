@@ -9,6 +9,7 @@ package com.aptana.js.core.tests;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 import com.aptana.js.core.build.CoreBuildTests;
@@ -27,7 +28,15 @@ public class AllJSCoreTests extends TestCase
 
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite(AllJSCoreTests.class.getName());
+		TestSuite suite = new TestSuite(AllJSCoreTests.class.getName())
+		{
+			@Override
+			public void runTest(Test test, TestResult result)
+			{
+				System.err.println("Running test: " + test.toString());
+				super.runTest(test, result);
+			}
+		};
 		// $JUnit-BEGIN$
 		suite.addTest(CoreBuildTests.suite());
 		suite.addTestSuite(JSIndexQueryHelperTest.class);

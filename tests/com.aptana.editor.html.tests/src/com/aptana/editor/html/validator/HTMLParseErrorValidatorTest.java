@@ -17,7 +17,7 @@ import com.aptana.core.build.IBuildParticipant;
 import com.aptana.core.build.IProblem;
 import com.aptana.css.core.ICSSConstants;
 import com.aptana.editor.html.HTMLPlugin;
-import com.aptana.editor.html.IHTMLConstants;
+import com.aptana.editor.html.core.IHTMLConstants;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.js.core.IJSConstants;
 
@@ -40,6 +40,12 @@ public class HTMLParseErrorValidatorTest extends AbstractValidatorTestCase
 	protected String getFileExtension()
 	{
 		return "html";
+	}
+
+	@Override
+	protected String getContentType()
+	{
+		return IHTMLConstants.CONTENT_TYPE_HTML;
 	}
 
 	public void testHTMLSelfClosingTagOnNonVoidElement() throws CoreException

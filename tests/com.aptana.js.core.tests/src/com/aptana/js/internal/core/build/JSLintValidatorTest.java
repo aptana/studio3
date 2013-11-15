@@ -63,6 +63,12 @@ public class JSLintValidatorTest extends AbstractValidatorTestCase
 	}
 
 	@Override
+	protected String getContentType()
+	{
+		return IJSConstants.CONTENT_TYPE_JS;
+	}
+
+	@Override
 	protected String getFileExtension()
 	{
 		return "js";

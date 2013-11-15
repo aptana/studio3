@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="en">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+		<title>org.eclipse.test.performance.ui readme</title>
+	</head>
+
+<p><b><font size="+2">README</font></b><br> </p><p>Last updated: October 26, 2005<br> 
+</p><p><b>Introduction</b><br> <br> This readme describes how to create performance 
+charts and tables similar to those available on the eclipse platform download 
+pages using the stand-alone java program <b>org.eclipse.test.performance.ui.Main</b> 
+stored in this project. Although the program is currently geared to generating 
+results for the Eclipse Platform builds, the program may work for you given the 
+following conditions:</p><ul> <li>The &quot;eclipse.perf.config&quot; system property 
+used to run tests used three keys config, build and jvm <ul> <li>for example, 
+"eclipse.perf.config=config=relengbuildwin2;build=I20050219-1500;jvm=sun1.4.2_06". 
+<br> <br> </li></ul></li><li>Values for the "build" key begin with either an 'I' 
+or 'N' with the exception of the reference builds (for example, 3.0). <ul> <li>The 
+line graphs plot the reference build, all builds starting with 'I' and the seven 
+'N' builds preceding the current build.</li><li>This can be overriden with the use of the &quot;-current.prefix&quot; parameter where you can specify a comma-separated list of prefixes for build ids to include in the main line graph.<br> <br> </li></ul></li><li>Scenario names 
+all contain a prefix &quot;&lt;component&gt;.test&quot; <ul> <li>For example, 
+it is assumed that the scenario &quot;org.eclipse.help.tests.performance.appserver.TestAppserver#testAppserverCycle()&quot; 
+belongs to the &quot;org.eclipse.help&quot; component. </li><li>Unique scenario 
+prefixes are derived from all the scenarios in the database and are used to group 
+results.</li></ul></li></ul><p><br> For purposes of this document, the term &quot;<a href="images/descriptions.html#fp">fingerprint</a>&quot; 
+will be used to refer to a bar graph which represents the performance summary 
+at a global or component level for each test configuration.<br> <br> The term 
+&quot;<a href="images/descriptions.html#sst">scenario status table</a>&quot; will 
+be used to refer to a table of scenarios with green checks and red x indicators 
+below a component fingerprint. This table gives an overall view of the status 
+for all scenarios for a component for all configurations.<br> </p><p>The term 
+&quot;<a href="images/descriptions.html#sr">scenario results</a>&quot; will be 
+used to refer to a web page comparing current performance measurements to the 
+baseline measurements for one scenario on one configuration. The web page displays 
+the raw data for the current and baseline measurements and also displays line 
+graphs showing the measured values over the course of builds between the current 
+and baseline.</p><p><br> <b>Requirements</b> </p><ul> <li>Windows or Linux (x86) 
+operating system</li><li>Cloudscape or Derby plug-in</li><li>org.eclipse.releng.basebuilder</li><li>1.4 
+level jvm installed and on path</li></ul><p><b>Setup</b><br> </p><ul> <li>Checkout 
+org.eclipse.releng.basebuilder from cvs repository dev.eclipse.org:/home/eclipse 
+(HEAD should be fine).</li><li>Create a Cloudscape or derby plug-in as described 
+<A HREF="http://dev.eclipse.org/viewcvs/index.cgi/*checkout*/org.eclipse.test.performance/doc/Performance%20Tests%20HowTo.html?rev=HEAD&content-type=text/html#cloudscape">here</A>.</li><li>Set 
+the environment variable &quot;dbloc&quot; to the location of the database containing 
+the performance data<br> For example:<br> <ul> <li> export dbloc=net://minsky.ottawa.ibm.com 
+(Linux)</li><li>set dbloc==net://minsky.ottawa.ibm.com (Windows)<br> </li></ul></li></ul><p><b>Running 
+the program</b></p><p>From a terminal or dos prompt,<br> </p><OL><LI>Set the environment 
+variable &quot;dbloc&quot; to the location of the database containing the performance 
+data<BR> For example:<UL><LI>export dbloc=net://minsky.ottawa.ibm.com (Linux)</LI><LI>set 
+dbloc==net://minsky.ottawa.ibm.com (Windows)<BR><BR></LI></UL></LI><LI>cd 
+to org.eclipse.releng.basebuilder\plugins\org.eclipse.test.performance.ui\scripts<BR></LI><LI>If 
+running on Linux, execute &quot;chmod 755 genresults&quot;</LI><LI>Execute the 
+following command:<b><br> <br> genresults -baseline &lt;baseline build id&gt; 
+-current &lt;current build id&gt; -config &lt;comma-separated list of configs&gt; 
+-jvm &lt;jvm name&gt; -output &lt;output dir&gt; [-config.properties &lt;properties&gt;] 
+[highlight &lt;buildid patterns&gt;] [scenario.pattern &lt;scenario prefix 
+patterns&gt;] [-fingerprints][-scenarioresults][-current.prefix &lt;comma-separated list of build id prefixes&gt;][-baseline.prefix &lt;comma-separated list of build id prefixes&gt;]</b></LI></OL><br> Parameter descriptions: 
+<blockquote> <p>-baseline &lt;baseline build id. A previous value used in the 
+&quot;build&quot; key in the eclipse.perf.config system property or the eclipse.perf.assertAgainst 
+property. &gt; <br> -current &lt;current build id. The value used in the &quot;build&quot; 
+key in the eclipse.perf.config system property.&gt;<br> -config &lt;a comma-separated 
+list of names of configurations for which to produce results. The values used 
+should be the same as values specified for the &quot;config&quot; key in the eclipse.perf.config 
+system property.&gt;<br> -jvm &lt;jvm description. The value used in the &quot;jvm&quot; 
+key in the eclipse.perf.config system property.&gt;<br> -output &lt;path to an 
+output directory for fingerprints and scenarios for each configuration specified 
+in -config parameter. Fingerprint gifs and html files are generated in the directory 
+specified, configuration specific subdirectories are created to store scenario 
+results and line graphs.&gt;</p></blockquote><p><br> Optional arguments:</p><blockquote> 
+<p>-config.properties &lt;semi-colon separated list of: config, alternate config 
+description.  The value should be quoted if there are spaces in the value.&gt;<BR>of builds which match any prefix in this list.  When omitted, a magenta line is draw on the graph which represents the baseline value specified in the -baseline parameter.&gt;<br> -highlight &lt;Comma-separated 
+list of build Id prefixes(excluding 'I' and 'N'), which are used to add and highlight 
+the most recent matching buildId on line graphs.&quot;&gt;<br> -scenario.pattern 
+&lt;Scenario prefix pattern used to query performance results database. Can be 
+used to generate results for a single component or subset of scenarios.&gt;<br> 
+-fingerprints or -scenarioresults &lt;use one or the other to generate fingerprints 
+or scenario results only. Not specifying either will execute both.&gt;<BR>-baseline.prefix &lt;semi-colon separated list of: build id prefixes used in eclipse.perf.assertAgainst property or eclipse.perf.config system property.  Values used to generate a second line graph representing changes in repeated baseline test runs&gt;.<BR>-current.prefix &lt;semi-colon separated list of: build id prefixes used in eclipse.perf.config system property.  Values here used to override default of &quot;N,I&quot;.  Used to select build id's to include in main line graph.&gt;</p></blockquote>
+</html>

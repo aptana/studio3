@@ -49,10 +49,8 @@ import org.eclipse.swt.widgets.Text;
 
 import com.aptana.core.CoreStrings;
 import com.aptana.core.util.StringUtil;
-import com.aptana.jira.core.JiraCorePlugin;
 import com.aptana.jira.core.JiraIssueSeverity;
 import com.aptana.jira.core.JiraIssueType;
-import com.aptana.jira.core.JiraManager;
 import com.aptana.jira.ui.JiraUIPlugin;
 import com.aptana.jira.ui.preferences.JiraPreferencePageProvider;
 import com.aptana.ui.preferences.IAccountPageProvider;
@@ -435,11 +433,6 @@ public class SubmitTicketDialog extends TitleAreaDialog
 			button.setEnabled(message == null);
 		}
 		return message == null;
-	}
-
-	protected JiraManager getJiraManager()
-	{
-		return JiraCorePlugin.getDefault().getJiraManager();
 	}
 
 	private void browse()

@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -34,6 +35,7 @@ import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.core.runtime.preferences.DefaultScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.osgi.framework.internal.core.FrameworkProperties;
 import org.eclipse.osgi.service.datalocation.Location;
@@ -41,6 +43,7 @@ import org.eclipse.osgi.service.debug.DebugOptions;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.CorePlugin;
 import com.aptana.core.ICorePreferenceConstants;
@@ -238,27 +241,33 @@ public class EclipseUtil
 		try
 		{
 			IProduct product = Platform.getProduct();
-			String aboutText = product.getProperty("aboutText"); //$NON-NLS-1$
-
-			String pattern = "Version: (.*)\n"; //$NON-NLS-1$
-			Pattern p = Pattern.compile(pattern);
-			Matcher m = p.matcher(aboutText);
-			boolean found = m.find();
-			if (!found)
+			if (product != null)
 			{
-				p = Pattern.compile("build: (.*)\n"); //$NON-NLS-1$
-				m = p.matcher(aboutText);
-				found = m.find();
-			}
+				String aboutText = product.getProperty("aboutText"); //$NON-NLS-1$
+				if (!StringUtil.isEmpty(aboutText))
+				{
+					String pattern = "Version: (.*)\n"; //$NON-NLS-1$
+					Pattern p = Pattern.compile(pattern);
+					Matcher m = p.matcher(aboutText);
+					boolean found = m.find();
+					if (!found)
+					{
+						// fall back to trying to match build #
+						p = Pattern.compile("build: (.*)\n"); //$NON-NLS-1$
+						m = p.matcher(aboutText);
+						found = m.find();
+					}
 
-			if (found)
-			{
-				version = m.group(1);
+					if (found)
+					{
+						version = m.group(1);
+					}
+				}
 			}
 		}
 		catch (Exception e)
 		{
-			// ignores
+			// ignore
 		}
 		if (StringUtil.isEmpty(version))
 		{
@@ -683,6 +692,70 @@ public class EclipseUtil
 	public static ConfigurationScope configurationScope()
 	{
 		return new ConfigurationScope();
+	}
+
+	/**
+	 * Use this to load resources from extension points. For relative paths this will convert to a URL referencing the
+	 * enclosing plugin and resolve the path. Otherwise this will convert the string to an URL (so a resource could be
+	 * pointed at in the plugin.xml definition using http:, ftp:, data:, platform:/plugin/plugin.id URLs)
+	 * 
+	 * @param element
+	 * @param attr
+	 * @return
+	 */
+	public static URL getResourceURL(IConfigurationElement element, String attr)
+	{
+		String iconPath = element.getAttribute(attr);
+		if (iconPath == null)
+		{
+			return null;
+		}
+
+		// If iconPath doesn't specify a scheme, then try to transform to a URL
+		// RFC 3986: scheme = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
+		// This allows using data:, http:, or other custom URL schemes
+		if (!iconPath.matches("\\p{Alpha}[\\p{Alnum}+.-]*:.*")) { //$NON-NLS-1$
+			String extendingPluginId = element.getDeclaringExtension().getContributor().getName();
+			iconPath = "platform:/plugin/" + extendingPluginId + "/" + iconPath; //$NON-NLS-1$//$NON-NLS-2$
+		}
+		try
+		{
+			return new URL(iconPath);
+		}
+		catch (MalformedURLException e)
+		{
+			/* IGNORE */
+		}
+		return null;
+	}
+
+	/**
+	 * Migrate the existing preferences from instance scope to configuration scope and then remove the preference key
+	 * from the instance scope.
+	 */
+	public static void migratePreference(String pluginId, String preferenceKey)
+	{
+		IEclipsePreferences configNode = EclipseUtil.configurationScope().getNode(pluginId);
+		if (StringUtil.isEmpty(configNode.get(preferenceKey, null))) // no value in config scope
+		{
+			IEclipsePreferences instanceNode = EclipseUtil.instanceScope().getNode(pluginId);
+			String instancePrefValue = instanceNode.get(preferenceKey, null);
+			if (!StringUtil.isEmpty(instancePrefValue))
+			{
+				// only migrate if there is a value!
+				configNode.put(preferenceKey, instancePrefValue);
+				instanceNode.remove(preferenceKey);
+				try
+				{
+					configNode.flush();
+					instanceNode.flush();
+				}
+				catch (BackingStoreException e)
+				{
+					IdeLog.logWarning(CorePlugin.getDefault(), e.getMessage(), e);
+				}
+			}
+		}
 	}
 
 }

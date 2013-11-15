@@ -12,9 +12,9 @@ import java.util.List;
 
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.test.performance.PerformanceTestCase;
+import org.eclipse.test.performance.GlobalTimePerformanceTestCase;
 
-public class PeerCharacterCloserPerfTest extends PerformanceTestCase
+public class PeerCharacterCloserPerfTest extends GlobalTimePerformanceTestCase
 {
 
 	public void testCheckUnpairedClose() throws Exception

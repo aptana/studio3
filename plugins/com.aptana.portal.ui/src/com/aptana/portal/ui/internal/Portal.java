@@ -38,6 +38,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.browser.WebBrowserEditorInput;
+import org.eclipse.ui.internal.registry.EditorRegistry;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.core.logging.IdeLog;
@@ -50,7 +51,7 @@ import com.aptana.portal.ui.browser.AbstractPortalBrowserEditor;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.ThemePlugin;
 import com.aptana.ui.util.UIUtils;
-import com.aptana.usage.PingStartup;
+import com.aptana.usage.UsagePlugin;
 
 /**
  * The portal class is a singleton that controls the portal browser and allows interacting with it.
@@ -175,6 +176,19 @@ public class Portal
 			public IStatus runInUIThread(IProgressMonitor monitor)
 			{
 				final IWorkbenchWindow workbenchWindow = UIUtils.getActiveWorkbenchWindow();
+
+				// TISTUD-5510 If there are existing busted portal/dashboard tabs, remove them
+				IWorkbenchPage activePage = workbenchWindow.getActivePage();
+				IEditorReference[] refs = activePage.getEditorReferences();
+				for (IEditorReference ref : refs)
+				{
+					String editorId = ref.getId();
+					if (EditorRegistry.EMPTY_EDITOR_ID.equals(editorId))
+					{
+						activePage.closeEditors(new IEditorReference[] { ref }, false);
+					}
+				}
+
 				AbstractPortalBrowserEditor portalBrowser = portalBrowsers.get(workbenchWindow);
 				if (portalBrowser != null && !portalBrowser.isDisposed())
 				{
@@ -403,7 +417,7 @@ public class Portal
 
 	protected String getGUID()
 	{
-		return PingStartup.getApplicationId();
+		return UsagePlugin.getApplicationId();
 	}
 
 	protected char getProjectType(IProject selectedProject)

@@ -16,10 +16,10 @@ import com.aptana.css.core.ICSSConstants;
 import com.aptana.css.core.parsing.ast.ICSSNodeTypes;
 import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.html.HTMLPlugin;
+import com.aptana.editor.html.core.preferences.IPreferenceConstants;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.HTMLParser;
 import com.aptana.editor.html.preferences.HTMLPreferenceUtil;
-import com.aptana.editor.html.preferences.IPreferenceConstants;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
 
@@ -115,16 +115,23 @@ public class HTMLOutlineProviderTest extends TestCase
 
 	public void testCustomAttributeFromPreference() throws Exception
 	{
-		String source = "<meta charset=\"utf-8\">";
-		fParseState = new HTMLParseState(source);
-		IParseNode astRoot = parse();
-
 		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(HTMLPlugin.PLUGIN_ID);
-		prefs.put(IPreferenceConstants.HTML_OUTLINE_TAG_ATTRIBUTES_TO_SHOW, "charset");
+		try
+		{
+			String source = "<meta charset=\"utf-8\">";
+			fParseState = new HTMLParseState(source);
+			IParseNode astRoot = parse();
 
-		Object[] outlineResult = fContentProvider.getElements(astRoot);
-		assertEquals(1, outlineResult.length);
-		assertEquals("meta utf-8", fLabelProvider.getText(outlineResult[0]));
+			prefs.put(IPreferenceConstants.HTML_OUTLINE_TAG_ATTRIBUTES_TO_SHOW, "charset");
+
+			Object[] outlineResult = fContentProvider.getElements(astRoot);
+			assertEquals(1, outlineResult.length);
+			assertEquals("meta utf-8", fLabelProvider.getText(outlineResult[0]));
+		}
+		finally
+		{
+			prefs.remove(IPreferenceConstants.HTML_OUTLINE_TAG_ATTRIBUTES_TO_SHOW);
+		}
 	}
 
 	public void testShowTextNode() throws Exception

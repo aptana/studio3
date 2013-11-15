@@ -1,0 +1,31 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<title>Verification</title>
+</head>
+
+<body>
+<h1>Verification</h1>
+<p>
+While verifying a build results, the first thing to do is to look for failures.
+The tool helps to know rapidly which components have failure showing a red-cross
+icon in the <a href="components.html">Components view</a>:
+<p><img src="images/verification-components.png" alt="Verification: failing components"/></p>
+</p><p>
+When clicking on one of the component having error(s), the tool automatically
+selects the first configuration (i.e. test machine) which has an error in its
+last build results. Then, flying over the failures may give a first indication
+whether the regressions are confirmed or not.
+</p><p>
+In the following example, a tool tip is displayed saying that the deviation has
+a small value and may be not enough important to report a bug:
+<p><img src="images/verification-failures.png" alt="Verification: failing test"/></p>
+<p>
+Then this analyze can be stored to see whether this scenario will still have
+a similar error on the next build performance run:
+<p><img src="images/verification-comment.png" alt="Verification: failure comment"/></p>
+
+</body>
+</html>

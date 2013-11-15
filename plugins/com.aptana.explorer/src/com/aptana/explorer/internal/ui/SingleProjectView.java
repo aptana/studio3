@@ -1,13 +1,15 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.explorer.internal.ui;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
@@ -26,7 +28,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
@@ -47,10 +48,8 @@ import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -82,13 +81,11 @@ import org.osgi.service.prefs.BackingStoreException;
 import com.aptana.core.IScopeReference;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.IProjectContext;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IExplorerUIConstants;
 import com.aptana.explorer.IPreferenceConstants;
-import com.aptana.theme.IControlThemerFactory;
-import com.aptana.theme.IThemeManager;
-import com.aptana.theme.ThemePlugin;
 import com.aptana.ui.util.UIUtils;
 import com.aptana.ui.widgets.SearchComposite;
 
@@ -159,8 +156,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	private Button createProjectWhenClosedButton;
 	private Button importProjectWhenClosedButton;
 
-	private IPreferenceChangeListener fThemeChangeListener;
-
 	private static final String CLOSE_ICON = "icons/full/elcl16/close.png"; //$NON-NLS-1$
 
 	@Override
@@ -209,8 +204,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 
 		addProjectResourceListener();
 		setActiveProject(detectSelectedProject());
-
-		hookToThemes();
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -274,8 +267,11 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		final ToolBar projectsToolbar = new ToolBar(parent, SWT.FLAT);
 		projectToolItem = new ToolItem(projectsToolbar, SWT.DROP_DOWN);
 		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+		List<IProject> sortedProjects = CollectionsUtil.newList(projects);
+		Collections.sort(sortedProjects, new CaseInsensitiveProjectComparator());
+
 		projectsMenu = new Menu(projectsToolbar);
-		for (IProject iProject : projects)
+		for (IProject iProject : sortedProjects)
 		{
 			// hide projects that don't exist
 			if (!iProject.exists())
@@ -626,69 +622,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(fProjectsListener, IResourceChangeEvent.POST_CHANGE);
 	}
 
-	/**
-	 * Hooks up to the active theme.
-	 */
-	private void hookToThemes()
-	{
-		getControlThemerFactory().apply(getCommonViewer());
-
-		getControlThemerFactory().apply(noProjectButtonsComp);
-		getControlThemerFactory().apply(noProjectslabel);
-
-		getControlThemerFactory().apply(closedProjectButtonsComp);
-		getControlThemerFactory().apply(closedProjectlabel);
-
-		if (Platform.OS_WIN32.equals(Platform.getOS()))
-		{
-			fThemeChangeListener = new IPreferenceChangeListener()
-			{
-
-				public void preferenceChange(PreferenceChangeEvent event)
-				{
-					if (IThemeManager.THEME_CHANGED.equals(event.getKey()))
-					{
-						setButtonBackgrounds();
-					}
-				}
-			};
-			EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID)
-					.addPreferenceChangeListener(fThemeChangeListener);
-			setButtonBackgrounds();
-		}
-	}
-
-	private void setButtonBackgrounds()
-	{
-		RGB bgRGB = getThemeManager().getCurrentTheme().getBackground();
-		Color bg = ThemePlugin.getDefault().getColorManager().getColor(bgRGB);
-		if (createProjectWhenClosedButton != null && !createProjectWhenClosedButton.isDisposed())
-		{
-			createProjectWhenClosedButton.setBackground(bg);
-		}
-		if (createProjectWhenNoneButton != null && !createProjectWhenNoneButton.isDisposed())
-		{
-			createProjectWhenNoneButton.setBackground(bg);
-		}
-		if (importProjectWhenClosedButton != null && !importProjectWhenClosedButton.isDisposed())
-		{
-			importProjectWhenClosedButton.setBackground(bg);
-		}
-		if (importProjectWhenNoneButton != null && !importProjectWhenNoneButton.isDisposed())
-		{
-			importProjectWhenNoneButton.setBackground(bg);
-		}
-		if (openProjectButton != null && !openProjectButton.isDisposed())
-		{
-			openProjectButton.setBackground(bg);
-		}
-	}
-
-	protected IThemeManager getThemeManager()
-	{
-		return ThemePlugin.getDefault().getThemeManager();
-	}
-
 	private IProject detectSelectedProject()
 	{
 		IProject project = null;
@@ -836,30 +769,9 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	public void dispose()
 	{
 		super.dispose();
-		getControlThemerFactory().dispose(getCommonViewer());
-		getControlThemerFactory().dispose(noProjectButtonsComp);
-		getControlThemerFactory().dispose(noProjectslabel);
-		getControlThemerFactory().dispose(closedProjectButtonsComp);
-		getControlThemerFactory().dispose(closedProjectlabel);
 
-		removeThemeChangeListener();
 		removeProjectResourceListener();
 		removeActiveProjectPrefListener();
-	}
-
-	private IControlThemerFactory getControlThemerFactory()
-	{
-		return ThemePlugin.getDefault().getControlThemerFactory();
-	}
-
-	private void removeThemeChangeListener()
-	{
-		if (fThemeChangeListener != null)
-		{
-			EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID)
-					.removePreferenceChangeListener(fThemeChangeListener);
-		}
-		fThemeChangeListener = null;
 	}
 
 	private void removeProjectResourceListener()

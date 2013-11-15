@@ -1,0 +1,47 @@
+{
+	"types": [
+		{
+			"name": "Titanium.UI",
+			"extends": "Something",
+			"events": [
+				{
+					"name": "update",
+					"deprecated": true,
+                    "properties": [
+                        {
+                            "name": "source", 
+                            "type": "Object",
+                            "description": "<p>Source object that fired the event.</p>"
+                        }, 
+                        {
+                            "name": "timestamp", 
+                            "type": "", 
+                            "description": "<p>Reference timestamp since the previous change. This is not a valid timestamp and should \nsimply be used to determine the number of milliseconds between events.</p>"
+                        }, 
+                        {
+                            "name": "type", 
+                            "type": "String", 
+                            "description": "<p>Name of the event fired.</p>"
+                        }, 
+                        {
+                            "name": "x", 
+                            "type": "", 
+                            "description": "<p>Current <code>x</code> axis of the device.</p>"
+                        }, 
+                        {
+                            "name": "y", 
+                            "type": "", 
+                            "description": "<p>Current <code>y</code> axis of the device.</p>"
+                        }, 
+                        {
+                            "name": "z", 
+                            "type": "", 
+                            "description": "<p>Current <code>z</code> axis of the device.</p>"
+                        }
+                    ], 
+                    "description": "<p>Fired when the accelerometer changes.</p>"
+				}
+			]
+		}
+	]
+}

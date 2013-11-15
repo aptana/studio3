@@ -32,12 +32,6 @@
       </fontDefinition>
    </extension>
    <extension
-         point="org.eclipse.ui.startup">
-      <startup
-            class="com.aptana.theme.internal.InvasiveThemeHijacker">
-      </startup>
-   </extension>
-   <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
             class="com.aptana.theme.internal.preferences.ThemerPreferenceInitializer">
@@ -67,17 +61,6 @@
                commandId="com.aptana.theme.command.open_pref"
                label="%open.theme.prefs.command.label"
                style="push">
-         </command>
-      </menuContribution>
-      <menuContribution
-            allPopups="false"
-            locationURI="toolbar:com.aptana.ui.globalActionSet">
-         <command
-               commandId="com.aptana.theme.command.open_pref"
-               icon="icons/color_wheel.png"
-               id="com.aptana.theme.command.pulldown"
-               label="%theme.pulldown.label"
-               style="pulldown">
          </command>
       </menuContribution>
    </extension>

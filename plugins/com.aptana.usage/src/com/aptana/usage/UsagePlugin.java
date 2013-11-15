@@ -7,12 +7,20 @@
  */
 package com.aptana.usage;
 
+import java.util.UUID;
+
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.usage.internal.AnalyticsInfoManager;
+import com.aptana.usage.internal.AptanaDB;
+import com.aptana.usage.internal.SendPingJob;
+import com.aptana.usage.preferences.IPreferenceConstants;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -25,12 +33,11 @@ public class UsagePlugin extends Plugin
 	// this is the incorrect id previously used; DO NOT USE it for future reference
 	public static final String OLD_PLUGIN_ID = "com.aptana.db"; //$NON-NLS-1$
 
-	// Events (since this is migrated from TiStudio, we will keep the constants as ti.*)
-	private static final String STUDIO_START = "ti.start"; //$NON-NLS-1$
-	private static final String STUDIO_END = "ti.end"; //$NON-NLS-1$
-
 	// The shared instance
 	private static UsagePlugin plugin;
+
+	private SendPingJob job;
+	private AnalyticsInfoManager fAnalyticsInfoManager;
 
 	/**
 	 * The constructor
@@ -47,6 +54,8 @@ public class UsagePlugin extends Plugin
 	{
 		super.start(context);
 		plugin = this;
+		job = new SendPingJob();
+		job.schedule();
 	}
 
 	/*
@@ -55,18 +64,59 @@ public class UsagePlugin extends Plugin
 	 */
 	public void stop(BundleContext context) throws Exception
 	{
-		// Send ping when we exit studio
-		if (!EclipseUtil.isTesting())
+		try
 		{
-			StudioAnalytics.getInstance().sendEvent(new AnalyticsEvent(STUDIO_END, STUDIO_END, null));
+			if (job != null)
+			{
+				job.shutdown(); // tell job to stop, clean up and send end event
+				job = null;
+			}
+			if (!Platform.inDevelopmentMode())
+			{
+				AptanaDB.getInstance().shutdown();
+			}
 		}
-		if (!Platform.inDevelopmentMode())
+		finally
 		{
-			AptanaDB.getInstance().shutdown();
+			fAnalyticsInfoManager = null;
+			plugin = null;
+			super.stop(context);
 		}
-		PingStartup.removeResourceListener();
-		plugin = null;
-		super.stop(context);
+	}
+
+	public static String getApplicationId()
+	{
+		String id = Platform.getPreferencesService().getString(PLUGIN_ID, IPreferenceConstants.P_IDE_ID, null, null);
+		boolean save = false;
+		if (id == null)
+		{
+			// see if there is an old id we could migrate
+			id = Platform.getPreferencesService().getString(OLD_PLUGIN_ID, IPreferenceConstants.P_IDE_ID, null, null);
+			if (id != null)
+			{
+				save = true;
+			}
+		}
+		if (id == null)
+		{
+			id = UUID.randomUUID().toString();
+			save = true;
+		}
+		if (save)
+		{
+			// saves the id in configuration scope so it's shared by all workspaces
+			IEclipsePreferences prefs = EclipseUtil.configurationScope().getNode(PLUGIN_ID);
+			prefs.put(IPreferenceConstants.P_IDE_ID, id);
+			try
+			{
+				prefs.flush();
+			}
+			catch (BackingStoreException e)
+			{
+				logError(e);
+			}
+		}
+		return id;
 	}
 
 	/**
@@ -95,5 +145,14 @@ public class UsagePlugin extends Plugin
 		{
 			IdeLog.logError(getDefault(), e);
 		}
+	}
+
+	public synchronized IAnalyticsInfoManager getAnalyticsInfoManager()
+	{
+		if (fAnalyticsInfoManager == null)
+		{
+			fAnalyticsInfoManager = new AnalyticsInfoManager();
+		}
+		return fAnalyticsInfoManager;
 	}
 }

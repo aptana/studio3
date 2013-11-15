@@ -15,14 +15,14 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.Token;
-import org.eclipse.test.performance.PerformanceTestCase;
+import org.eclipse.test.performance.GlobalTimePerformanceTestCase;
 
 import com.aptana.core.util.IOUtil;
 
 /**
  * JSONScannerPerformanceTest
  */
-public class JSONScannerPerformanceTest extends PerformanceTestCase
+public class JSONScannerPerformanceTest extends GlobalTimePerformanceTestCase
 {
 	private JSONSourceScanner fScanner;
 

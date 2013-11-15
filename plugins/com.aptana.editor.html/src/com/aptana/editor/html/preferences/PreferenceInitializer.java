@@ -15,6 +15,7 @@ import com.aptana.core.build.IProblem;
 import com.aptana.core.build.PreferenceUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.html.HTMLPlugin;
+import com.aptana.editor.html.core.preferences.IPreferenceConstants;
 import com.aptana.editor.html.validator.HTMLParserValidator;
 import com.aptana.editor.html.validator.HTMLTidyValidator;
 

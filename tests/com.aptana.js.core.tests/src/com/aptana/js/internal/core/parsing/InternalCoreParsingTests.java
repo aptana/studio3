@@ -8,6 +8,7 @@
 package com.aptana.js.internal.core.parsing;
 
 import junit.framework.Test;
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 /**
@@ -19,7 +20,15 @@ public class InternalCoreParsingTests
 
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite("Tests for com.aptana.js.internal.core.parsing");
+		TestSuite suite = new TestSuite("Tests for com.aptana.js.internal.core.parsing")
+		{
+			@Override
+			public void runTest(Test test, TestResult result)
+			{
+				System.err.println("Running test: " + test.toString());
+				super.runTest(test, result);
+			}
+		};
 		//$JUnit-BEGIN$
 		suite.addTestSuite(VSDocNodeAttachmentTest.class);
 		suite.addTestSuite(VSDocReaderTest.class);

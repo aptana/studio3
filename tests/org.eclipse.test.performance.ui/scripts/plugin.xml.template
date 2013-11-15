@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin
+   id="Cloudscape"
+   name="Cloudscape"
+   version="1.0.0">
+   
+   <runtime>
+      <library name="db2jcc.jar">
+         <export name="*"/>
+      </library>
+      <library name="db2jcc_license_c.jar">
+         <export name="*"/>
+      </library>
+      <library name="cstools.jar">
+         <export name="*"/>
+      </library>
+      <library name="csnet.jar">
+         <export name="*"/>
+      </library>
+      <library name="cs.jar">
+         <export name="*"/>
+      </library>
+   </runtime>
+   <requires>
+      <import plugin="org.eclipse.osgi"/>
+   </requires>
+</plugin>

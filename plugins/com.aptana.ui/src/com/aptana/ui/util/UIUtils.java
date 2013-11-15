@@ -29,6 +29,7 @@ import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -726,10 +727,93 @@ public final class UIUtils
 	}
 
 	/**
+	 * Based on the given available width to display the text, it strips of the middle section of the text and ellipsify
+	 * it.
+	 * 
+	 * @param text
+	 * @param width
+	 * @return
+	 */
+	public static String shortenText(String text, int width)
+	{
+		GC gc = new GC(UIUtils.getDisplay());
+		// chop string in half and drop a few characters
+		int middle = text.length() / 2;
+		String beginning = text.substring(0, middle - 1);
+		String end = text.substring(middle + 2, text.length());
+		// Now repeatedly chop off one char from each end until we fit
+		// TODO Chop each side separately? it'd take more loops, but text would fit tighter when uneven
+		// lengths work better..
+		while (gc.stringExtent(beginning + "..." + end).x > width) //$NON-NLS-1$
+		{
+			if (beginning.length() > 0)
+			{
+				beginning = beginning.substring(0, beginning.length() - 1);
+			}
+			else
+			{
+				break;
+			}
+			if (end.length() > 0)
+			{
+				end = end.substring(1);
+			}
+			else
+			{
+				break;
+			}
+		}
+		text = beginning + "..." + end; //$NON-NLS-1$
+		return text;
+	}
+
+	/**
 	 * Throws an AssertionError if the current thread is not the UI thread.
 	 */
 	public static void assertUIThread()
 	{
 		Assert.isTrue(Display.getCurrent() != null, "Function must be called from UI-thread."); //$NON-NLS-1$
+	}
+
+	/**
+	 * Prompts to restart studio and if user accepts, then Studio is restarted immediately.
+	 * 
+	 * @param title
+	 * @param message
+	 */
+	public static void restartStudio(final String title, final String message)
+	{
+		showMessageDialogFromBgThread(new SafeMessageDialogRunnable()
+		{
+			@Override
+			public int openMessageDialog()
+			{
+				boolean restart = MessageDialog.openQuestion(UIUtils.getActiveWorkbenchWindow().getShell(), title,
+						message);
+				if (restart)
+				{
+					PlatformUI.getWorkbench().restart();
+				}
+				return 0;
+			}
+		});
+	}
+
+	/**
+	 * Prompts to shutdown studio and if user accepts, then Studio is shutdown immediately.
+	 * 
+	 * @param title
+	 * @param message
+	 * @param productId
+	 */
+	public static void closeStudio(String title, String message, String productId)
+	{
+		MessageDialog.openError(UIUtils.getActiveShell(), title, message);
+		// not to use EclipseUtil.isStandalone() directly since it checks the existance of Aptana Studio RCP instead
+		// TODO fix EclipseUtil.isStandalone() to maybe read from a preference key on what plugin id to check.
+		if (EclipseUtil.getPluginVersion(productId) != null && !EclipseUtil.isTesting())
+		{
+			PlatformUI.getWorkbench().close();
+		}
 	}
 }

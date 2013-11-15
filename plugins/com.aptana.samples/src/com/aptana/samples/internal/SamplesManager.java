@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -21,12 +21,14 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.osgi.framework.Bundle;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
@@ -34,6 +36,7 @@ import com.aptana.samples.IDebugScopes;
 import com.aptana.samples.ISampleListener;
 import com.aptana.samples.ISamplesManager;
 import com.aptana.samples.SamplesPlugin;
+import com.aptana.samples.model.IProjectSample;
 import com.aptana.samples.model.SampleCategory;
 import com.aptana.samples.model.SamplesReference;
 import com.aptana.scripting.model.AbstractElement;
@@ -66,11 +69,11 @@ public class SamplesManager implements ISamplesManager
 	private static final String SAMPLES_SCRIPT = "project_samples.rb"; //$NON-NLS-1$
 
 	private Map<String, SampleCategory> categories;
-	private Map<String, List<SamplesReference>> sampleRefsByCategory;
-	private Map<String, SamplesReference> samplesById;
+	private Map<String, List<IProjectSample>> sampleRefsByCategory;
+	private Map<String, IProjectSample> samplesById;
 
-	private Map<String, List<SamplesReference>> bundleSamplesByCategory;
-	private Map<String, SamplesReference> bundleSamplesById;
+	private Map<String, List<IProjectSample>> bundleSamplesByCategory;
+	private Map<String, IProjectSample> bundleSamplesById;
 
 	private List<ProjectSampleElement> bundleSamples;
 
@@ -133,10 +136,10 @@ public class SamplesManager implements ISamplesManager
 	public SamplesManager()
 	{
 		categories = new HashMap<String, SampleCategory>();
-		sampleRefsByCategory = new HashMap<String, List<SamplesReference>>();
-		samplesById = new HashMap<String, SamplesReference>();
-		bundleSamplesByCategory = new HashMap<String, List<SamplesReference>>();
-		bundleSamplesById = Collections.synchronizedMap(new HashMap<String, SamplesReference>());
+		sampleRefsByCategory = new HashMap<String, List<IProjectSample>>();
+		samplesById = new HashMap<String, IProjectSample>();
+		bundleSamplesByCategory = new HashMap<String, List<IProjectSample>>();
+		bundleSamplesById = Collections.synchronizedMap(new HashMap<String, IProjectSample>());
 		bundleSamples = new ArrayList<ProjectSampleElement>();
 		sampleListeners = new ArrayList<ISampleListener>();
 
@@ -154,10 +157,10 @@ public class SamplesManager implements ISamplesManager
 		return sampleCategories;
 	}
 
-	public List<SamplesReference> getSamplesForCategory(String categoryId)
+	public List<IProjectSample> getSamplesForCategory(String categoryId)
 	{
-		List<SamplesReference> result = new ArrayList<SamplesReference>();
-		List<SamplesReference> samples = sampleRefsByCategory.get(categoryId);
+		List<IProjectSample> result = new ArrayList<IProjectSample>();
+		List<IProjectSample> samples = sampleRefsByCategory.get(categoryId);
 		if (samples != null)
 		{
 			result.addAll(samples);
@@ -170,9 +173,9 @@ public class SamplesManager implements ISamplesManager
 		return result;
 	}
 
-	public SamplesReference getSample(String id)
+	public IProjectSample getSample(String id)
 	{
-		SamplesReference sample = samplesById.get(id);
+		IProjectSample sample = samplesById.get(id);
 		return (sample == null) ? bundleSamplesById.get(id) : sample;
 	}
 
@@ -189,7 +192,33 @@ public class SamplesManager implements ISamplesManager
 		sampleListeners.remove(listener);
 	}
 
-	private void addSample(ProjectSampleElement sampleElement)
+	public void addSample(IProjectSample sample)
+	{
+		String categoryId = sample.getCategory().getId();
+		List<IProjectSample> samples = bundleSamplesByCategory.get(categoryId);
+		if (samples == null)
+		{
+			samples = new ArrayList<IProjectSample>();
+			bundleSamplesByCategory.put(categoryId, samples);
+		}
+		String id = sample.getId();
+		IProjectSample existingSample = bundleSamplesById.get(id);
+		if (existingSample != null)
+		{
+			samples.remove(existingSample);
+		}
+		samples.add(sample);
+		bundleSamplesById.put(id, sample);
+
+		fireSampleAdded(sample);
+	}
+
+	public SampleCategory getCategory(String categoryId)
+	{
+		return categories.get(categoryId);
+	}
+
+	public void addSample(ProjectSampleElement sampleElement)
 	{
 		String categoryId = sampleElement.getCategory();
 		SampleCategory category = categories.get(categoryId);
@@ -198,8 +227,10 @@ public class SamplesManager implements ISamplesManager
 			String id = sampleElement.getId();
 			String name = sampleElement.getDisplayName();
 			String location = sampleElement.getLocation();
-			boolean isRemote = !location.toLowerCase().endsWith(".zip"); //$NON-NLS-1$
-			if (!isRemote)
+			IPath destination = sampleElement.getDestinationPath();
+			File locationFile = new File(location);
+			boolean isRemote = !(FileUtil.isZipFile(locationFile) || new File(location).exists()); //$NON-NLS-1$
+			if (!isRemote && FileUtil.isZipFile(locationFile))
 			{
 				// retrieves the absolute location
 				location = (new File(sampleElement.getDirectory(), location)).getAbsolutePath();
@@ -207,24 +238,10 @@ public class SamplesManager implements ISamplesManager
 			String description = sampleElement.getDescription();
 			Map<String, URL> iconUrls = sampleElement.getIconUrls();
 			SamplesReference sample = new SamplesReference(category, id, name, location, isRemote, description,
-					iconUrls, null);
+					iconUrls, destination, null);
 			sample.setNatures(sampleElement.getNatures());
 
-			List<SamplesReference> samples = bundleSamplesByCategory.get(categoryId);
-			if (samples == null)
-			{
-				samples = new ArrayList<SamplesReference>();
-				bundleSamplesByCategory.put(categoryId, samples);
-			}
-			SamplesReference existingSample = bundleSamplesById.get(id);
-			if (existingSample != null)
-			{
-				samples.remove(existingSample);
-			}
-			samples.add(sample);
-			bundleSamplesById.put(id, sample);
-
-			fireSampleAdded(sample);
+			addSample(sample);
 		}
 		else
 		{
@@ -270,14 +287,6 @@ public class SamplesManager implements ISamplesManager
 			}
 			SampleCategory category = new SampleCategory(id, name, element);
 			categories.put(id, category);
-
-			String iconFile = element.getAttribute(ATTR_ICON);
-			if (!StringUtil.isEmpty(iconFile))
-			{
-				Bundle bundle = Platform.getBundle(element.getNamespaceIdentifier());
-				URL url = bundle.getEntry(iconFile);
-				category.setIconFile(ResourceUtil.resourcePathToString(url));
-			}
 		}
 		else if (ELEMENT_SAMPLESINFO.equals(elementName))
 		{
@@ -330,10 +339,10 @@ public class SamplesManager implements ISamplesManager
 				}
 			}
 
-			List<SamplesReference> samples = sampleRefsByCategory.get(categoryId);
+			List<IProjectSample> samples = sampleRefsByCategory.get(categoryId);
 			if (samples == null)
 			{
-				samples = new ArrayList<SamplesReference>();
+				samples = new ArrayList<IProjectSample>();
 				sampleRefsByCategory.put(categoryId, samples);
 			}
 
@@ -359,7 +368,7 @@ public class SamplesManager implements ISamplesManager
 			iconUrls.put(SamplesReference.DEFAULT_ICON_KEY, iconUrl);
 
 			SamplesReference samplesRef = new SamplesReference(category, id, name, path, isRemote, description,
-					iconUrls, element);
+					iconUrls, null, element);
 			samples.add(samplesRef);
 			samplesById.put(id, samplesRef);
 
@@ -422,15 +431,15 @@ public class SamplesManager implements ISamplesManager
 		bundleSamples = elements;
 
 		// removes the existing samples loaded from the rubles
-		Collection<SamplesReference> bundles = bundleSamplesById.values();
-		Collection<SamplesReference> samples;
+		Collection<IProjectSample> bundles = bundleSamplesById.values();
+		Collection<IProjectSample> samples;
 		synchronized (bundleSamplesById)
 		{
-			samples = new ArrayList<SamplesReference>(bundles);
+			samples = new ArrayList<IProjectSample>(bundles);
 			bundleSamplesByCategory.clear();
 			bundleSamplesById.clear();
 		}
-		for (SamplesReference sample : samples)
+		for (IProjectSample sample : samples)
 		{
 			fireSampleRemoved(sample);
 		}
@@ -442,7 +451,7 @@ public class SamplesManager implements ISamplesManager
 		}
 	}
 
-	private void fireSampleAdded(SamplesReference sample)
+	private void fireSampleAdded(IProjectSample sample)
 	{
 		if (IdeLog.isInfoEnabled(SamplesPlugin.getDefault(), IDebugScopes.MANAGER))
 		{
@@ -456,7 +465,7 @@ public class SamplesManager implements ISamplesManager
 		}
 	}
 
-	private void fireSampleRemoved(SamplesReference sample)
+	private void fireSampleRemoved(IProjectSample sample)
 	{
 		if (IdeLog.isInfoEnabled(SamplesPlugin.getDefault(), IDebugScopes.MANAGER))
 		{

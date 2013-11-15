@@ -1,12 +1,16 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.samples.ui.views;
 
+import java.util.Collections;
+
+import org.eclipse.core.commands.Command;
+import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -21,12 +25,19 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.commands.ICommandService;
+import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.ViewPart;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.samples.ISampleListener;
 import com.aptana.samples.ISamplesManager;
 import com.aptana.samples.SamplesPlugin;
+import com.aptana.samples.model.IProjectSample;
 import com.aptana.samples.model.SamplesReference;
+import com.aptana.samples.ui.SamplesUIPlugin;
+import com.aptana.samples.ui.handlers.ImportSampleHandler;
 import com.aptana.theme.ThemePlugin;
 import com.aptana.ui.util.UIUtils;
 
@@ -46,12 +57,12 @@ public class SamplesView extends ViewPart
 	private ISampleListener sampleListener = new ISampleListener()
 	{
 
-		public void sampleAdded(SamplesReference sample)
+		public void sampleAdded(IProjectSample sample)
 		{
 			refresh();
 		}
 
-		public void sampleRemoved(SamplesReference sample)
+		public void sampleRemoved(IProjectSample sample)
 		{
 			refresh();
 		}
@@ -79,7 +90,6 @@ public class SamplesView extends ViewPart
 
 		getSite().setSelectionProvider(treeViewer);
 		hookContextMenu();
-		applyTheme();
 
 		getSamplesManager().addSampleListener(sampleListener);
 	}
@@ -94,7 +104,6 @@ public class SamplesView extends ViewPart
 	{
 		getSamplesManager().removeSampleListener(sampleListener);
 		super.dispose();
-		ThemePlugin.getDefault().getControlThemerFactory().dispose(treeViewer);
 	}
 
 	public void collapseAll()
@@ -116,6 +125,29 @@ public class SamplesView extends ViewPart
 				IStructuredSelection thisSelection = (IStructuredSelection) event.getSelection();
 				Object element = thisSelection.getFirstElement();
 				treeViewer.setExpandedState(element, !treeViewer.getExpandedState(element));
+				if (element instanceof SamplesReference)
+				{
+					// Run the import command.
+					ICommandService commandService = (ICommandService) PlatformUI.getWorkbench().getService(
+							ICommandService.class);
+					Command command = commandService.getCommand(ImportSampleHandler.COMMAND_ID);
+					if (command != null)
+					{
+						try
+						{
+							IHandlerService handlerService = (IHandlerService) PlatformUI.getWorkbench().getService(
+									IHandlerService.class);
+							ExecutionEvent ee = new ExecutionEvent(command, Collections.emptyMap(), null,
+									handlerService.getCurrentState());
+
+							command.executeWithChecks(ee);
+						}
+						catch (Exception e)
+						{
+							IdeLog.logError(SamplesUIPlugin.getDefault(), e);
+						}
+					}
+				}
 			}
 		});
 		ColumnViewerToolTipSupport.enableFor(treeViewer);
@@ -139,11 +171,6 @@ public class SamplesView extends ViewPart
 		Menu menu = menuMgr.createContextMenu(treeViewer.getControl());
 		treeViewer.getControl().setMenu(menu);
 		getSite().registerContextMenu(menuMgr, treeViewer);
-	}
-
-	private void applyTheme()
-	{
-		ThemePlugin.getDefault().getControlThemerFactory().apply(treeViewer);
 	}
 
 	private static ISamplesManager getSamplesManager()

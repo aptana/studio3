@@ -28,7 +28,7 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.css.core.ICSSConstants;
 import com.aptana.css.core.parsing.ast.CSSDeclarationNode;
 import com.aptana.css.core.parsing.ast.CSSRuleNode;
-import com.aptana.editor.html.IHTMLConstants;
+import com.aptana.editor.html.core.IHTMLConstants;
 import com.aptana.editor.html.parsing.ast.HTMLCommentNode;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLNode;
@@ -54,8 +54,6 @@ import com.aptana.parsing.util.ParseUtil;
 public class HTMLParser extends AbstractParser
 {
 
-	public static final IParseNode[] NO_PARSE_NODES = new IParseNode[0];
-	public static final HTMLNode[] NO_HTML_NODES = new HTMLNode[0];
 	private static final String ATTR_TYPE = "type"; //$NON-NLS-1$
 	private static final String ATTR_LANG = "language"; //$NON-NLS-1$
 
@@ -298,7 +296,7 @@ public class HTMLParser extends AbstractParser
 			{
 			}
 		}
-		return NO_PARSE_NODES;
+		return HTMLParserConstants.NO_PARSE_NODES;
 	}
 
 	private void processComment()

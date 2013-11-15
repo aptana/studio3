@@ -14,12 +14,8 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Scrollable;
 
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.PlatformUtil;
@@ -28,7 +24,6 @@ import com.aptana.theme.IControlThemer;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.Theme;
 import com.aptana.theme.ThemePlugin;
-import com.aptana.theme.preferences.IPreferenceConstants;
 
 /**
  * Base class for applying our theme to a Control. More specific subclasses exist for Tables/Trees.
@@ -41,7 +36,7 @@ class ControlThemer implements IControlThemer
 	protected static final boolean isWindows = PlatformUtil.isWindows();
 	protected static final boolean isMacOSX = PlatformUtil.isMac();
 	protected static final boolean isCocoa = Platform.getWS().equals(Platform.WS_COCOA);
-	protected static final boolean isUbuntu = PlatformUtil.isOSName("Ubuntu"); //$NON-NLS-1$
+	protected static final boolean isUbuntu = PlatformUtil.isOSName("Ubuntu") || PlatformUtil.isOSName("LinuxMint"); //$NON-NLS-1$
 
 	private Control control;
 	private Color defaultBg;
@@ -68,27 +63,12 @@ class ControlThemer implements IControlThemer
 
 	protected void applyTheme()
 	{
-		if (invasiveThemesEnabled() && !controlIsDisposed())
-		{
-			getControl().setRedraw(false);
-			applyControlColors();
-			applyControlFont();
-			getControl().setRedraw(true);
-		}
 	}
 
 	protected void applyControlColors()
 	{
 		getControl().setBackground(getBackground());
 		getControl().setForeground(getForeground());
-	}
-
-	protected void applyControlFont()
-	{
-		if (useEditorFont() && !controlIsDisposed())
-		{
-			getControl().setFont(getFont());
-		}
 	}
 
 	protected boolean controlIsDisposed()
@@ -99,17 +79,6 @@ class ControlThemer implements IControlThemer
 			return true;
 		}
 		return control.isDisposed();
-	}
-
-	protected boolean invasiveThemesEnabled()
-	{
-		return ThemePlugin.applyToViews();
-	}
-
-	protected boolean useEditorFont()
-	{
-		return Platform.getPreferencesService().getBoolean(ThemePlugin.PLUGIN_ID, IPreferenceConstants.INVASIVE_FONT,
-				false, null);
 	}
 
 	public void dispose()
@@ -124,7 +93,6 @@ class ControlThemer implements IControlThemer
 		{
 			getControl().setRedraw(false);
 			unapplyControlColors();
-			unapplyControlFont();
 			getControl().setRedraw(true);
 		}
 	}
@@ -133,21 +101,6 @@ class ControlThemer implements IControlThemer
 	{
 		getControl().setBackground(defaultBg);
 		getControl().setForeground(null);
-	}
-
-	protected void unapplyControlFont()
-	{
-		if (!controlIsDisposed())
-		{
-			if (useEditorFont())
-			{
-				getControl().setFont(getFont());
-			}
-			else
-			{
-				getControl().setFont(null);
-			}
-		}
 	}
 
 	protected Font getFont()
@@ -197,60 +150,6 @@ class ControlThemer implements IControlThemer
 
 	protected void addSelectionColorOverride()
 	{
-		if (controlIsDisposed())
-		{
-			return;
-		}
-		// Override selection color to match what is set in theme
-		selectionOverride = new Listener()
-		{
-			public void handleEvent(Event event)
-			{
-				if (!invasiveThemesEnabled())
-				{
-					return;
-				}
-				GC gc = event.gc;
-				Color oldBackground = gc.getBackground();
-				if ((event.detail & SWT.SELECTED) != 0)
-				{
-					Scrollable scrollable = (Scrollable) event.widget;
-					Rectangle clientArea = scrollable.getClientArea();
-
-					gc.setBackground(getSelection());
-					// The +2 on width is for Linux, since clientArea begins at [-2,-2] and
-					// without it we don't properly color full width (see broken coloring when scrolling horizontally)
-					gc.fillRectangle(clientArea.x, event.y, clientArea.width + 2, event.height);
-
-					event.detail &= ~SWT.SELECTED;
-					event.detail &= ~SWT.BACKGROUND;
-
-					gc.setBackground(oldBackground);
-				}
-				else
-				{
-					// Draw normal background color. This seems to only be necessary for some variants of Linux,
-					// and is the correct way to force custom painting of background when setBackground() doesn't work
-					// properly.
-					if (!isWindows && !isMacOSX)
-					{
-						Color controlBG = control.getBackground();
-						if (controlBG.getRGB().equals(oldBackground.getRGB()))
-						{
-							gc.setBackground(getBackground());
-							gc.fillRectangle(event.x, event.y, event.width, event.height);
-							event.detail &= ~SWT.BACKGROUND;
-							gc.setBackground(oldBackground);
-						}
-					}
-				}
-
-				// force foreground color. Otherwise on dark themes we get black FG (all the time on Win, on
-				// non-focus for Mac)
-				gc.setForeground(getForeground());
-			}
-		};
-		getControl().addListener(SWT.EraseItem, selectionOverride);
 	}
 
 	protected void removeSelectionOverride()
@@ -272,29 +171,6 @@ class ControlThemer implements IControlThemer
 				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
 				{
 					applyTheme();
-				}
-				else if (event.getKey().equals(IPreferenceConstants.INVASIVE_FONT))
-				{
-					// Handle the invasive font setting change
-					if (Boolean.parseBoolean((String) event.getNewValue()))
-					{
-						applyControlFont();
-					}
-					else
-					{
-						unapplyControlFont();
-					}
-				}
-				else if (event.getKey().equals(IPreferenceConstants.APPLY_TO_ALL_VIEWS))
-				{
-					if (Boolean.parseBoolean((String) event.getNewValue()))
-					{
-						applyTheme();
-					}
-					else
-					{
-						unapplyTheme();
-					}
 				}
 			}
 		};

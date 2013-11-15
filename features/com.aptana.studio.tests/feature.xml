@@ -50,7 +50,6 @@
       <import plugin="com.aptana.syncing.ui"/>
       <import plugin="com.aptana.theme"/>
       <import plugin="com.aptana.org.eclipse.tm.terminal" version="3.0.100" match="greaterOrEqual"/>
-      <import plugin="com.aptana.filesystem.s3"/>
       <import plugin="com.aptana.editor.dtd"/>
       <import plugin="com.aptana.editor.css.formatter"/>
       <import plugin="com.aptana.editor.json"/>
@@ -234,10 +233,19 @@
 
    <plugin
          id="org.eclipse.test.performance"
+<<<<<<< HEAD
+=======
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
+
+   <plugin
+         id="org.eclipse.test.performance.ui"
+>>>>>>> development
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
 
    <plugin
          id="org.apache.derby"
@@ -258,14 +266,6 @@
          download-size="0"
          install-size="0"
          version="0.0.0"/>
-
-   <plugin
-         id="com.aptana.filesystem.s3.tests"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
 
    <plugin
          id="com.aptana.editor.dtd.tests"

@@ -13,6 +13,8 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.aptana.usage.internal.AptanaDB;
+
 public class AnalyticsLogger
 {
 

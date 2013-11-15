@@ -257,6 +257,7 @@ Regex = "/" ({CharClass}|{Character})+ "/" [a-z]*
 	"catch"			{ return newToken(JSTokenType.CATCH); }
 	"const"			{ return newToken(JSTokenType.VAR); }
 	"continue"		{ return newToken(JSTokenType.CONTINUE); }
+	"debugger"		{ return newToken(JSTokenType.DEBUGGER); }
 	"default"		{ return newToken(JSTokenType.DEFAULT); }
 	"delete"		{ return newToken(JSTokenType.DELETE); }
 	"do"			{ return newToken(JSTokenType.DO); }
@@ -281,6 +282,23 @@ Regex = "/" ({CharClass}|{Character})+ "/" [a-z]*
 	"void"			{ return newToken(JSTokenType.VOID); }
 	"while"			{ return newToken(JSTokenType.WHILE); }
 	"with"			{ return newToken(JSTokenType.WITH); }
+	
+	// Future Use Reserved Words
+	"class"			{ return newToken(JSTokenType.CLASS); }
+	"enum"			{ return newToken(JSTokenType.ENUM); }
+	"export"		{ return newToken(JSTokenType.EXPORT); }
+	"extends"		{ return newToken(JSTokenType.EXTENDS); }
+	"import"		{ return newToken(JSTokenType.IMPORT); }
+	"super"			{ return newToken(JSTokenType.SUPER); }
+	"implements"	{ return newToken(JSTokenType.IMPLEMENTS); }
+	"interface"		{ return newToken(JSTokenType.INTERFACE); }
+	"let"			{ return newToken(JSTokenType.LET); }
+	"package"		{ return newToken(JSTokenType.PACKAGE); }
+	"private"		{ return newToken(JSTokenType.PRIVATE); }
+	"protected"		{ return newToken(JSTokenType.PROTECTED); }
+	"public"		{ return newToken(JSTokenType.PUBLIC); }
+	"static"		{ return newToken(JSTokenType.STATIC); }
+	"yield"			{ return newToken(JSTokenType.YIELD); }
 
 	// identifiers
 	{Identifier}	{ return newToken(Terminals.IDENTIFIER, pool(yytext())); }

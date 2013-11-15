@@ -8,6 +8,7 @@
 package com.aptana.parsing.pool;
 
 import junit.framework.Test;
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 @SuppressWarnings("nls")
@@ -16,7 +17,15 @@ public class AllTests
 
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite("Test for com.aptana.parsing.pool");
+		TestSuite suite = new TestSuite("Test for com.aptana.parsing.pool")
+		{
+			@Override
+			public void runTest(Test test, TestResult result)
+			{
+				System.err.println("Running test: " + test.toString());
+				super.runTest(test, result);
+			}
+		};
 		//$JUnit-BEGIN$
 		suite.addTestSuite(ParsingPoolFactoryTest.class);
 		//$JUnit-END$

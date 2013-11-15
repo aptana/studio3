@@ -374,7 +374,7 @@
 		report = new JSEvents();
 
 		// @formatter:off
-		recoveryStrategies = new ArrayList<IRecoveryStrategy>();
+		recoveryStrategies = new ArrayList<IRecoveryStrategy>(10);
 
 		recoveryStrategies.add(new JSInsertionRecoveryStrategy(JSTokenType.SEMICOLON, ";")
 		{
@@ -382,6 +382,7 @@
 					throws IOException
 			{
 				boolean recovered = super.recover(parser, lastToken, currentToken, in, report);
+				if (recovered && fSemicolonSeverity != IProblem.Severity.IGNORE)
 				{
 					fWorking.addError(new ParseError(IJSConstants.CONTENT_TYPE_JS, lastToken, Messages.JSParser_MissingSemicolonMsg, fSemicolonSeverity));
 				}
@@ -446,7 +447,8 @@
 %terminals STAR, FORWARD_SLASH, PERCENT, LESS_LESS, GREATER_GREATER, GREATER_GREATER_GREATER;
 %terminals LESS, GREATER, LESS_EQUAL, GREATER_EQUAL, INSTANCEOF, IN, EQUAL_EQUAL, EXCLAMATION_EQUAL, EQUAL_EQUAL_EQUAL, EXCLAMATION_EQUAL_EQUAL;
 %terminals EQUAL, STAR_EQUAL, FORWARD_SLASH_EQUAL, PERCENT_EQUAL, PLUS_EQUAL, MINUS_EQUAL, LESS_LESS_EQUAL, GREATER_GREATER_EQUAL, GREATER_GREATER_GREATER_EQUAL, AMPERSAND_EQUAL, CARET_EQUAL, PIPE_EQUAL;
-
+%terminals DEBUGGER, CLASS, ENUM, EXPORT, EXTENDS, IMPORT, SUPER, IMPLEMENTS, INTERFACE, LET, PACKAGE, PRIVATE, PROTECTED, PUBLIC, STATIC, YIELD;
+	
 %typeof AssignmentExpression, AssignmentExpression_NoIn, LeftHandSideExpression, LeftHandSideExpression_NoLBF, UnaryExpression = "JSNode";
 %typeof AdditiveExpression, AdditiveExpression_NoLBF, MultiplicativeExpression, MultiplicativeExpression_NoLBF, RelationalExpression, RelationalExpression_NoIn, RelationalExpression_NoLBF = "JSNode";
 %typeof ShiftExpression, ShiftExpression_NoLBF, EqualityExpression, EqualityExpression_NoIn, EqualityExpression_NoLBF = "JSNode";
@@ -478,7 +480,7 @@ SourceElement
 	;
 
 FunctionDeclaration
-	=	FUNCTION IDENTIFIER.ident FunctionParameters.params FunctionBody.body
+	=	FUNCTION Identifier.ident FunctionParameters.params FunctionBody.body
 		{:
 			return new JSFunctionNode(
 				new JSIdentifierNode(ident),
@@ -486,6 +488,58 @@ FunctionDeclaration
 				body
 			);
 		:}
+	;
+
+Identifier
+	=	IDENTIFIER
+	;
+
+IdentifierName
+	=	Identifier	
+	|	BREAK
+	|	CASE
+	|	CATCH
+	|	CONTINUE
+	|	DEBUGGER
+	|	DEFAULT
+	|	DELETE
+	|	DO
+	|	ELSE
+	|	FALSE
+	|	FINALLY
+	|	FOR
+	|	FUNCTION
+	|	IF
+	|	INSTANCEOF
+	|	IN
+	|	NEW
+	|	NULL
+	|	RETURN
+	|	SWITCH
+	|	THIS
+	|	THROW
+	|	TRUE
+	|	TRY
+	|	TYPEOF
+	|	VAR
+	|	VOID
+	|	WHILE
+	|	WITH
+	|	CLASS
+	|	ENUM
+	|	EXPORT
+	|	EXTENDS
+	|	IMPORT
+	|	SUPER
+	|	IMPLEMENTS
+	|	INTERFACE
+	|	LET
+	|	PACKAGE
+	|	PRIVATE
+	|	PROTECTED
+	|	PUBLIC
+	|	STATIC
+	|	YIELD
 	;
 
 FunctionExpression
@@ -512,7 +566,7 @@ FunctionParameters
 	;
 
 FormalParameterList
-	=	FormalParameterList.list COMMA IDENTIFIER.ident
+	=	FormalParameterList.list COMMA Identifier.ident
 		{:
 			JSNode identifier = new JSIdentifierNode(ident);
 
@@ -521,7 +575,7 @@ FormalParameterList
 
 			return list;
 		:}
-	|	IDENTIFIER.ident
+	|	Identifier.ident
 		{:
 			JSNode identifier = new JSIdentifierNode(ident);
 
@@ -637,22 +691,22 @@ VariableDeclarationList_NoIn
 	;
 
 VariableDeclaration
-	=	IDENTIFIER.i
+	=	Identifier.i
 		{:
 			return new JSDeclarationNode(new JSIdentifierNode(i), null, new JSEmptyNode(i));
 		:}
-	|	IDENTIFIER.i EQUAL.e AssignmentExpression.expression
+	|	Identifier.i EQUAL.e AssignmentExpression.expression
 		{:
 			return new JSDeclarationNode(new JSIdentifierNode(i), e, expression);
 		:}
 	;
 
 VariableDeclaration_NoIn
-	=	IDENTIFIER.i
+	=	Identifier.i
 		{:
 			return new JSDeclarationNode(new JSIdentifierNode(i), null, new JSEmptyNode(i));
 		:}
-	|	IDENTIFIER.i EQUAL.e AssignmentExpression_NoIn.expression
+	|	Identifier.i EQUAL.e AssignmentExpression_NoIn.expression
 		{:
 			return new JSDeclarationNode(new JSIdentifierNode(i), e, expression);
 		:}
@@ -821,7 +875,7 @@ ContinueStatement
 			node.setSemicolonIncluded(true);
 			return node;
 		:}
-	|	CONTINUE IDENTIFIER.i SEMICOLON
+	|	CONTINUE Identifier.i SEMICOLON
 		{:
 			JSNode node = new JSContinueNode(i);
 			node.setSemicolonIncluded(true);
@@ -836,7 +890,7 @@ BreakStatement
 			node.setSemicolonIncluded(true);
 			return node;
 		:}
-	|	BREAK IDENTIFIER.i SEMICOLON
+	|	BREAK Identifier.i SEMICOLON
 		{:
 			JSNode node = new JSBreakNode(i);
 			node.setSemicolonIncluded(true);
@@ -975,7 +1029,7 @@ DefaultClause
 	;
 
 LabelledStatement
-	=	IDENTIFIER.i COLON.c Statement.s
+	=	Identifier.i COLON.c Statement.s
 		{:
 			JSNode id = new JSIdentifierNode(i);
 			id.setLocation(i.getStart(), i.getEnd());
@@ -985,7 +1039,7 @@ LabelledStatement
 	;
 
 LabelledStatement_NoIf
-	=	IDENTIFIER.i COLON.c Statement_NoIf.s
+	=	Identifier.i COLON.c Statement_NoIf.s
 		{:
 			JSNode id = new JSIdentifierNode(i);
 			id.setLocation(i.getStart(), i.getEnd());
@@ -1021,7 +1075,7 @@ TryStatement
 	;
 
 Catch
-	=	CATCH LPAREN IDENTIFIER.i RPAREN Block.b
+	=	CATCH LPAREN Identifier.i RPAREN Block.b
 		{:
 			JSNode id = new JSIdentifierNode(i);
 
@@ -1046,7 +1100,7 @@ PrimaryExpression_NoLBF
 		{:
 			return new JSThisNode(t);
 		:}
-	|	IDENTIFIER.i
+	|	Identifier.i
 		{:
 			return new JSIdentifierNode(i);
 		:}
@@ -1148,7 +1202,7 @@ PropertyNameAndValue
 	;
 
 PropertyName
-	=	IDENTIFIER.i
+	=	IdentifierName.i
 		{:
 			return new JSIdentifierNode(i);
 		:}
@@ -1169,7 +1223,7 @@ MemberExpression
 		{:
 			return new JSGetElementNode(l, lb, r, rb);
 		:}
-	|	MemberExpression.l DOT.o IDENTIFIER.r
+	|	MemberExpression.l DOT.o IdentifierName.r
 		{:
 			return new JSGetPropertyNode(l, o, new JSIdentifierNode(r));
 		:}
@@ -1185,7 +1239,7 @@ MemberExpression_NoLBF
 		{:
 			return new JSGetElementNode(l, lb, r, rb);
 		:}
-	|	MemberExpression_NoLBF.l DOT.o IDENTIFIER.r
+	|	MemberExpression_NoLBF.l DOT.o IdentifierName.r
 		{:
 			return new JSGetPropertyNode(l, o, new JSIdentifierNode(r));
 		:}
@@ -1224,7 +1278,7 @@ CallExpression
 		{:
 			return new JSGetElementNode(l, lb, r, rb);
 		:}
-	|	CallExpression.l DOT.o IDENTIFIER.r
+	|	CallExpression.l DOT.o IdentifierName.r
 		{:
 			return new JSGetPropertyNode(l, o, new JSIdentifierNode(r));
 		:}
@@ -1243,7 +1297,7 @@ CallExpression_NoLBF
 		{:
 			return new JSGetElementNode(l, lb, r, rb);
 		:}
-	|	CallExpression_NoLBF.l DOT.o IDENTIFIER.r
+	|	CallExpression_NoLBF.l DOT.o IdentifierName.r
 		{:
 			return new JSGetPropertyNode(l, o, new JSIdentifierNode(r));
 		:}

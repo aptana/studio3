@@ -568,7 +568,7 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 		String src = StringUtil.join(" ", storageTypes);
 		IDocument document = new Document(src);
 		scanner.setRange(document, 0, src.length());
-		Object[] expected = new Object[] { "storage.modifier.js", "null", "storage.modifier.js", "null",
+		Object[] expected = new Object[] { "undefined.js", "null", "storage.modifier.js", "null",
 				"storage.modifier.js", "null", "storage.modifier.js", "null", "storage.modifier.js", "null",
 				"storage.modifier.js", "null", "storage.modifier.js", "null", "storage.modifier.js", "null",
 				"storage.modifier.js", "null", "storage.modifier.js", "null", "storage.modifier.js", "null",

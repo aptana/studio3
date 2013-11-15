@@ -7,8 +7,6 @@
  */
 package com.aptana.scripting.ui.views;
 
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.IFontProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -16,11 +14,6 @@ import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
-
-import com.aptana.theme.IThemeManager;
-import com.aptana.theme.Theme;
-import com.aptana.theme.ThemePlugin;
-import com.aptana.theme.preferences.IPreferenceConstants;
 
 class BundleViewLabelProvider implements ILabelProvider, IColorProvider, IFontProvider
 {
@@ -55,23 +48,7 @@ class BundleViewLabelProvider implements ILabelProvider, IColorProvider, IFontPr
 	 */
 	public Font getFont(Object element)
 	{
-		if (!useEditorFont())
-		{
-			return null;
-		}
-
-		Font font = JFaceResources.getFont(IThemeManager.VIEW_FONT_NAME);
-		if (font == null)
-		{
-			font = JFaceResources.getTextFont();
-		}
-		return font;
-	}
-
-	protected boolean useEditorFont()
-	{
-		return Platform.getPreferencesService().getBoolean(ThemePlugin.PLUGIN_ID, IPreferenceConstants.INVASIVE_FONT,
-				false, null);
+		return null;
 	}
 
 	/*
@@ -80,16 +57,7 @@ class BundleViewLabelProvider implements ILabelProvider, IColorProvider, IFontPr
 	 */
 	public Color getForeground(Object element)
 	{
-		if (ThemePlugin.applyToViews())
-		{
-			return getCurrentTheme().getForegroundColor();
-		}
 		return null;
-	}
-
-	protected Theme getCurrentTheme()
-	{
-		return ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
 	}
 
 	/*

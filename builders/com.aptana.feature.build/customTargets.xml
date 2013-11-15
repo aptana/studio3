@@ -1,6 +1,6 @@
-<project name="customnTargets overrides" default="noDefault">
-	<import file="${eclipse.pdebuild.templates}/headless-build/customTargets.xml"/>
-	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
+<project name="customTargets overrides" default="noDefault">
+	<import file="${eclipse.pdebuild.templates}/headless-build/customTargets.xml" />
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
 		<classpath>
 			<pathelement location="${builder}/ant-contrib/ant-contrib.jar" />
 		</classpath>
@@ -13,15 +13,15 @@
 		<!-- Need to grab version qualifier for scripting plugin, we do that by cloning and checking 
 		last commit of each bundle vs last commit of plugin. This MUST be done before the generateScript target
 		or else the qualifier we insert into build.properties is ignored.  -->
-		<property name="scripting.plugin.dir" location="${buildDirectory}/plugins/com.aptana.scripting"/>
+		<property name="scripting.plugin" value="com.aptana.scripting"/>
+		<property name="scripting.plugin.dir" location="${buildDirectory}/plugins/${scripting.plugin}"/>
 		<property name="bundle.timestamps.file" location="${scripting.plugin.dir}/bundle_timestamps.txt"/>
 
 		<!-- Find latest commit date between this plugin and every bundle and use that as the build qualifier! -->
-		<exec executable="/bin/bash" dir="${scripting.plugin.dir}" append="true" output="${bundle.timestamps.file}">
+		<exec executable="/bin/bash" dir="${workspace}/plugins/${scripting.plugin}" append="true" output="${bundle.timestamps.file}">
 			<arg value="-c" />
-			<arg value="git log --max-count=1 --pretty=format:'%ct' ." />
+			<arg value="git log --max-count=1 --pretty=format:'%ct,' ." />
 		</exec>
-		<echo append="true" file="${bundle.timestamps.file}" message="," />
 
 		<!-- Pull down the cache pre-generation scripts -->
 		<delete dir="${scripting.plugin.dir}/bundles/studio3-sdk" failonerror="true" />
@@ -34,56 +34,58 @@
 		<!-- TODO Checkout the correct branch of the generator scripts... -->
 
 		<!-- Grab the pre-defined set of bundles -->
-		<antcall target="clone-bundle">
-			<param name="bundle.name" value="text.ruble" />
-			<param name="bundle.dir.name" value="text.ruble" />
-			<param name="bundle.branch" value="${scs.branch.name}" />
-		</antcall>
-		<antcall target="clone-bundle">
-			<param name="bundle.name" value="source.ruble" />
-			<param name="bundle.dir.name" value="source.ruble" />
-			<param name="bundle.branch" value="${scs.branch.name}" />
-		</antcall>
-		<antcall target="clone-bundle">
-			<param name="bundle.name" value="math.ruble" />
-			<param name="bundle.dir.name" value="math.ruble" />
-			<param name="bundle.branch" value="${scs.branch.name}" />
-		</antcall>
-		<antcall target="clone-bundle">
-			<param name="bundle.name" value="html.ruble" />
-			<param name="bundle.dir.name" value="html.ruble" />
-			<param name="bundle.branch" value="${scs.branch.name}" />
-		</antcall>
-		<antcall target="clone-bundle">
-			<param name="bundle.name" value="css.ruble" />
-			<param name="bundle.dir.name" value="css.ruble" />
-			<param name="bundle.branch" value="${scs.branch.name}" />
-		</antcall>
-		<antcall target="clone-bundle">
-			<param name="bundle.name" value="js.ruble" />
-			<param name="bundle.dir.name" value="js.ruble" />
-			<param name="bundle.branch" value="${scs.branch.name}" />
-		</antcall>
-		<antcall target="clone-bundle">
-			<param name="bundle.name" value="xml.ruble" />
-			<param name="bundle.dir.name" value="xml.ruble" />
-			<param name="bundle.branch" value="${scs.branch.name}" />
-		</antcall>
-		<antcall target="clone-bundle">
-			<param name="bundle.name" value="bundle-dev.ruble" />
-			<param name="bundle.dir.name" value="bundle-development.ruble" />
-			<param name="bundle.branch" value="${scs.branch.name}" />
-		</antcall>
-		<antcall target="clone-bundle">
-			<param name="bundle.name" value="json.ruble" />
-			<param name="bundle.dir.name" value="json.ruble" />
-			<param name="bundle.branch" value="${scs.branch.name}" />
-		</antcall>
-		<antcall target="clone-bundle">
-			<param name="bundle.name" value="shell-script.ruble" />
-			<param name="bundle.dir.name" value="shell-script.ruble" />
-			<param name="bundle.branch" value="${scs.branch.name}" />
-		</antcall>
+		<parallel>
+			<antcall target="clone-bundle">
+				<param name="bundle.name" value="coffeescript.ruble" />
+				<param name="bundle.dir.name" value="coffeescript.ruble" />
+				<param name="bundle.branch" value="${scs.branch.name}" />
+			</antcall>
+			<antcall target="clone-bundle">
+				<param name="bundle.name" value="text.ruble" />
+				<param name="bundle.dir.name" value="text.ruble" />
+				<param name="bundle.branch" value="${scs.branch.name}" />
+			</antcall>
+			<antcall target="clone-bundle">
+				<param name="bundle.name" value="source.ruble" />
+				<param name="bundle.dir.name" value="source.ruble" />
+				<param name="bundle.branch" value="${scs.branch.name}" />
+			</antcall>
+			<antcall target="clone-bundle">
+				<param name="bundle.name" value="html.ruble" />
+				<param name="bundle.dir.name" value="html.ruble" />
+				<param name="bundle.branch" value="${scs.branch.name}" />
+			</antcall>
+			<antcall target="clone-bundle">
+				<param name="bundle.name" value="css.ruble" />
+				<param name="bundle.dir.name" value="css.ruble" />
+				<param name="bundle.branch" value="${scs.branch.name}" />
+			</antcall>
+			<antcall target="clone-bundle">
+				<param name="bundle.name" value="js.ruble" />
+				<param name="bundle.dir.name" value="js.ruble" />
+				<param name="bundle.branch" value="${scs.branch.name}" />
+			</antcall>
+			<antcall target="clone-bundle">
+				<param name="bundle.name" value="xml.ruble" />
+				<param name="bundle.dir.name" value="xml.ruble" />
+				<param name="bundle.branch" value="${scs.branch.name}" />
+			</antcall>
+			<antcall target="clone-bundle">
+				<param name="bundle.name" value="bundle-dev.ruble" />
+				<param name="bundle.dir.name" value="bundle-development.ruble" />
+				<param name="bundle.branch" value="${scs.branch.name}" />
+			</antcall>
+			<antcall target="clone-bundle">
+				<param name="bundle.name" value="json.ruble" />
+				<param name="bundle.dir.name" value="json.ruble" />
+				<param name="bundle.branch" value="${scs.branch.name}" />
+			</antcall>
+			<antcall target="clone-bundle">
+				<param name="bundle.name" value="shell-script.ruble" />
+				<param name="bundle.dir.name" value="shell-script.ruble" />
+				<param name="bundle.branch" value="${scs.branch.name}" />
+			</antcall>
+		</parallel>
 		
 		<!-- Delete the pre-generation of cache scripts repo clone -->
 		<delete dir="${scripting.plugin.dir}/bundles/studio3-sdk" failonerror="true" />
@@ -125,14 +127,13 @@
 
 	<target name="clone-bundle">
 		<delete dir="${scripting.plugin.dir}/bundles/${bundle.dir.name}" failonerror="true" />
-		<echo message="git clone git://github.com/aptana/${bundle.name}.git ${bundle.dir.name}" />
+		<echo message="git clone git://github.com/aptana/${bundle.name}.git ${bundle.dir.name}" level="info" />
 		<exec executable="/bin/bash" dir="${scripting.plugin.dir}/bundles" failonerror="true">
 			<arg value="-c" />
 			<arg value="git clone git://github.com/aptana/${bundle.name}.git ${bundle.dir.name}" />
 		</exec>
 		<!-- Checkout the specified branch -->
-		<echo message="git checkout ${bundle.branch}">
-		</echo>
+		<echo message="git checkout ${bundle.branch}" level="info" />
 		<exec executable="/bin/bash" dir="${scripting.plugin.dir}/bundles/${bundle.dir.name}" failonerror="true">
 			<arg value="-c" />
 			<arg value="git checkout ${bundle.branch}" />
@@ -140,10 +141,9 @@
 		<!-- Grab lastmod and append it to file containing all of the lastmods for each packaged ruble -->
 		<exec executable="/bin/bash" dir="${scripting.plugin.dir}/bundles/${bundle.dir.name}" append="true" output="${bundle.timestamps.file}" failonerror="true">
 			<arg value="-c" />
-			<arg value="git log --max-count=1 --pretty=format:'%ct' ." />
+			<arg value="git log --max-count=1 --pretty=format:'%ct,' ." />
 		</exec>
 
-		<echo append="true" file="${bundle.timestamps.file}" message="," />
 		<!-- Now remove the .git subdirectory -->
 		<delete dir="${scripting.plugin.dir}/bundles/${bundle.dir.name}/.git" quiet="true" />
 		
@@ -153,7 +153,7 @@
 			<arg value="${ruby.executable} -KU ${cache.generator.script} ${scripting.plugin.dir}/bundles/${bundle.dir.name}" />
 		</exec>
 	</target>
-	
+
 	<!-- ===================================================================== -->
 	<!-- Steps to do before the repositories are being processed -->
 	<!-- ===================================================================== -->
@@ -161,11 +161,25 @@
 		<p2.mirror destination="file:${repoBaseLocation}/mirrored">
 			<source location="${libraries-com.p2.repo}" />
 			<source location="${webkit.p2.repo}" />
-			<!-- <source location="${patch.p2.repo}" /> -->
 			<iu id="com.aptana.ide.feature.libraries.subscription.feature.group" />
 			<iu id="com.aptana.webkitbrowser.feature.group" />
-			<!-- <iu id="org.eclipse.ui.workbench.patch.feature.feature.group" /> -->
 		</p2.mirror>
+	</target>
+
+	<!-- ===================================================================== -->
+	<!-- Steps to do after the repositories have been processed -->
+	<!-- ===================================================================== -->
+	<target name="postProcessRepos">
+		<!-- clean up repos now that they've been transformed. save disk space (necessary when compiling in RAM disk) -->
+		<delete dir="${repoBaseLocation}" />
+	</target>
+
+	<!-- ===================================================================== -->
+	<!-- Steps to do after running the build.xmls for the elements being built. -->
+	<!-- ===================================================================== -->
+	<target name="postProcess">
+		<!-- clean up nestedJars. save disk space (necessary when compiling in RAM disk) -->
+		<delete dir="${buildDirectory}/nestedJars" />
 	</target>
 
 	<!-- ===================================================================== -->
@@ -215,14 +229,13 @@
 			</fileset>
 
 			<!-- Mirrored dependencies -->
-			<fileset dir="${repoBaseLocation}/mirrored/plugins">
-				<include name="*.jar" />
+			<fileset dir="${transformedRepoLocation}/plugins">
+				<include name="**/*.jar" />
 			</fileset>
 
 			<!-- need to include the binaries of the non-included source packages like org.jruby or org.w3c -->
 			<dirset dir="${buildDirectory}/plugins">
 				<include name="beaver*/bin" />
-				<include name="com.amazon.*/bin" />
 				<include name="org.*/bin" />
 				<include name="json.*/bin" />
 			</dirset>
@@ -230,15 +243,24 @@
 				<include name="**/*.jar" />
 			</fileset>
 		</path>
-		<!-- Now generate the javadocs for com.aptana.* packages -->
-		<javadoc destdir="${deploy.dir}/docs" packagenames="com.aptana.*" classpathref="javadoc.classpath" author="true" version="true" use="true" windowtitle="Aptana Studio API" encoding="UTF-8" maxmemory="256m">
 
+		<!-- Now generate the javadocs for com.aptana.* packages -->
+		<mkdir dir="${buildDirectory}/docs"/>
+		<javadoc destdir="${buildDirectory}/docs" packagenames="com.aptana.*" classpathref="javadoc.classpath" author="true" version="true" use="true" windowtitle="Aptana Studio API" encoding="UTF-8" maxmemory="256m">
 			<sourcepath>
 				<dirset dir="${buildDirectory}/plugins">
 					<include name="com.*/src" />
 				</dirset>
 			</sourcepath>
 		</javadoc>
+
+		<!-- clean up transformedRepos now that we no lonegr need them. save disk space (necessary when compiling in RAM disk) -->
+		<delete dir="${transformedRepoLocation}" />
+
+		<!-- Copy docs to deploy.dir -->
+		<copy todir="${deploy.dir}/docs" overwrite="true">
+			<fileset dir="${buildDirectory}/docs" />
+		</copy>
 
 		<!-- Lastly, copy over the new stylesheet and files -->
 		<copy todir="${deploy.dir}/docs" overwrite="true">

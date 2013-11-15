@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -76,8 +76,6 @@ import com.aptana.ide.ui.io.navigator.FileTreeNameSorter;
 import com.aptana.ide.ui.io.navigator.actions.FileSystemDeleteAction;
 import com.aptana.ide.ui.io.navigator.actions.FileSystemRenameAction;
 import com.aptana.ide.ui.io.navigator.actions.OpenFileAction;
-import com.aptana.theme.IControlThemerFactory;
-import com.aptana.theme.ThemePlugin;
 import com.aptana.ui.util.SWTUtils;
 import com.aptana.ui.util.UIUtils;
 
@@ -122,13 +120,6 @@ public class ConnectionPointComposite implements SelectionListener, ISelectionCh
 		fEndPointData = new ArrayList<IAdaptable>();
 
 		fMain = createControl(parent);
-
-		getControlThemerFactory().apply(fTreeViewer);
-	}
-
-	protected IControlThemerFactory getControlThemerFactory()
-	{
-		return ThemePlugin.getDefault().getControlThemerFactory();
 	}
 
 	public Control getControl()
@@ -449,14 +440,6 @@ public class ConnectionPointComposite implements SelectionListener, ISelectionCh
 
 		TreeViewer treeViewer = createTreeViewer(main);
 		treeViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		treeViewer.getTree().addDisposeListener(new DisposeListener()
-		{
-
-			public void widgetDisposed(DisposeEvent e)
-			{
-				getControlThemerFactory().dispose(fTreeViewer);
-			}
-		});
 
 		return main;
 	}

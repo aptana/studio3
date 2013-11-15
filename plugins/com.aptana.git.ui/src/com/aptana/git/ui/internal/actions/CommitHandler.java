@@ -9,9 +9,12 @@ package com.aptana.git.ui.internal.actions;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
 
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.ui.util.UIUtils;
 
 public class CommitHandler extends AbstractGitHandler
 {
@@ -30,11 +33,9 @@ public class CommitHandler extends AbstractGitHandler
 			openError(Messages.CommitAction_MultipleRepos_Title, Messages.CommitAction_MultipleRepos_Message);
 			return null;
 		}
+
 		CommitDialog dialog = new CommitDialog(getShell(), theRepo);
-		if (dialog.open() == Window.OK)
-		{
-			theRepo.index().commit(dialog.getCommitMessage());
-		}
+		dialog.open(); // dialog handles doing actual commits.
 		return null;
 	}
 

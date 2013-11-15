@@ -18,6 +18,20 @@ public class Messages extends NLS
 	public static String CloneWizard_CloneFailedTitle;
 	public static String CloneWizard_Job_title;
 
+	public static String GithubForkWizard_FailedForkErr;
+
+	public static String GithubForkWizard_ForkSubTaskName;
+
+	public static String GithubForkWizard_UpstreamSubTaskName;
+
+	public static String GithubRepositorySelectionPage_NoOwnerErr;
+
+	public static String GithubRepositorySelectionPage_NoRepoNameErr;
+
+	public static String GithubRepositorySelectionPage_OwnerLabel;
+
+	public static String GithubRepositorySelectionPage_RepoNameLabel;
+
 	public static String RepositorySelectionPage_CannotCreateDirectory_ErrorMessage;
 	public static String RepositorySelectionPage_Description;
 	public static String RepositorySelectionPage_Destination_Label;
