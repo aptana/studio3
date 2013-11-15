@@ -926,43 +926,43 @@ public class JSParserTest extends TestCase
 	public void testMissingClosingParenthesis() throws Exception
 	{
 		assertParseResult("testing(", "testing();" + EOL);
-		assertParseErrors("Syntax Error: unexpected token \"end-of-file\"", "Missing semicolon");
+		assertParseErrors("Syntax Error: unexpected token \"end-of-file\"");
 	}
 
 	public void testMissingIdentifier() throws Exception
 	{
 		assertParseResult("var x =", "var x = " + EOL);
-		assertParseErrors("Syntax Error: unexpected token \"end-of-file\"", "Missing semicolon");
+		assertParseErrors("Syntax Error: unexpected token \"end-of-file\"");
 	}
 
 	public void testMissingIdentifier2() throws Exception
 	{
 		assertParseResult("x.", "x.;" + EOL);
-		assertParseErrors("Syntax Error: unexpected token \"end-of-file\"", "Missing semicolon");
+		assertParseErrors("Syntax Error: unexpected token \"end-of-file\"");
 	}
 
 	public void testMissingArg() throws Exception
 	{
 		assertParseResult("fun(a,);", "fun(a, );" + EOL);
-		assertParseErrors("Syntax Error: unexpected token \")\"", "Missing semicolon");
+		assertParseErrors("Syntax Error: unexpected token \")\"");
 	}
 
 	public void testMissingIdentifier3() throws Exception
 	{
 		assertParseResult("new", "new ;" + EOL);
-		assertParseErrors("Syntax Error: unexpected token \"end-of-file\"", "Missing semicolon");
+		assertParseErrors("Syntax Error: unexpected token \"end-of-file\"");
 	}
 
 	public void testMissingPropertyValue() throws Exception
 	{
 		assertParseResult("var x = { t };", "var x = {t: };" + EOL);
-		assertParseErrors("Syntax Error: unexpected token \"}\"", "Missing semicolon");
+		assertParseErrors("Syntax Error: unexpected token \"}\"");
 	}
 
 	public void testMissingPropertyValue2() throws Exception
 	{
 		assertParseResult("var x = { t: };", "var x = {t: };" + EOL);
-		assertParseErrors("Syntax Error: unexpected token \"}\"", "Missing semicolon");
+		assertParseErrors("Syntax Error: unexpected token \"}\"");
 	}
 
 	public void testSingleLineComment() throws Exception
@@ -1043,19 +1043,19 @@ public class JSParserTest extends TestCase
 	public void testUnclosedString() throws Exception
 	{
 		assertParseResult("var string = 'something", "var string = " + EOL);
-		assertParseErrors("Syntax Error: unexpected token \"'\"", "Missing semicolon");
+		assertParseErrors("Syntax Error: unexpected token \"'\"");
 	}
 
 	public void testUnclosedComment() throws Exception
 	{
 		assertParseResult("var thing; /* comment", "var thing;" + EOL + EOL);
-		assertParseErrors("Syntax Error: unexpected token \"/\"", "Missing semicolon");
+		assertParseErrors("Syntax Error: unexpected token \"/\"");
 	}
 
 	public void testUnclosedRegexp() throws Exception
 	{
 		assertParseResult("var regexp = /;", EOL);
-		assertParseErrors("Syntax Error: unexpected token \"/\"", "Missing semicolon", "Syntax Error: unexpected token \";\"", "Missing semicolon");
+		assertParseErrors("Syntax Error: unexpected token \"/\"", "Syntax Error: unexpected token \";\"");
 	}
 
 	public void testReservedWordAsPropertyName() throws Exception

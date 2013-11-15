@@ -31,7 +31,7 @@ public class AllTests
 			}
 		};
 		// $JUnit-BEGIN$
-		// suite.addTestSuite(CreateBranchDialogTest.class);
+		suite.addTestSuite(CreateBranchDialogTest.class);
 		suite.addTestSuite(DiffFormatterTest.class);
 		suite.addTestSuite(GitLightweightDecoratorTest.class);
 		suite.addTestSuite(HyperlinkDetectorTest.class);

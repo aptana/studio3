@@ -504,7 +504,6 @@ public class ProcessUtil
 		if (environment != null && !environment.isEmpty())
 		{
 			map = new TreeMap<String, String>(environment);
-			map.remove(TEXT_TO_OBFUSCATE);
 			processBuilder.environment().putAll(environment);
 		}
 		if (isInfoLoggingEnabled())

@@ -399,7 +399,8 @@ public class JSIndexTest extends TestCase
 			indexParticipant.processParseResults(myContext, index, ast, new NullProgressMonitor());
 			JSIndexQueryHelper queryHelper = new JSIndexQueryHelper(index);
 
-			Collection<PropertyElement> types = queryHelper.getGlobals("functionDocsWithoutReturn.js", "abc");
+			Collection<PropertyElement> types = queryHelper.getGlobals("functionDocsWithoutReturn.js",
+					"abc");
 			assertNotNull(types);
 			assertTrue("Expected at least a single property for 'abc'", !types.isEmpty());
 
@@ -434,7 +435,8 @@ public class JSIndexTest extends TestCase
 			indexParticipant.processParseResults(myContext, index, ast, new NullProgressMonitor());
 			JSIndexQueryHelper queryHelper = new JSIndexQueryHelper(index);
 
-			Collection<PropertyElement> types = queryHelper.getGlobals("functionDocsWithoutParam.js", "abc");
+			Collection<PropertyElement> types = queryHelper.getGlobals("functionDocsWithoutParam.js",
+					"abc");
 			assertNotNull(types);
 			assertTrue("Expected at least a single property for 'abc'", !types.isEmpty());
 

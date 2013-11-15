@@ -55,7 +55,7 @@ public class JSParserValidatorTest extends AbstractValidatorTestCase
 		String text = "var foo = function() {\nhello(\n};";
 
 		List<IProblem> items = getParseErrors(text);
-		assertEquals(2, items.size());
+		assertEquals(1, items.size());
 		IProblem item = items.get(0);
 
 		assertEquals("Error was not found on expected line", 3, item.getLineNumber());

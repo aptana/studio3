@@ -70,7 +70,7 @@ public class GitFileHistoryTest extends GitTestCase
 			assertRefresh(index);
 
 			// Stage the new file
-			int tries = 150;
+			int tries = 100;
 			List<ChangedFile> toStage = index.changedFiles();
 			// HACK Wait until we get a non-empty list?
 			while (CollectionsUtil.isEmpty(toStage))

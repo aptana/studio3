@@ -7,6 +7,7 @@
  */
 package com.aptana.css.core.parsing.ast;
 
+
 public abstract class CSSExpressionNode extends CSSNode
 {
 	/**
