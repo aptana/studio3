@@ -233,8 +233,6 @@
 
    <plugin
          id="org.eclipse.test.performance"
-<<<<<<< HEAD
-=======
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -242,7 +240,6 @@
 
    <plugin
          id="org.eclipse.test.performance.ui"
->>>>>>> development
          download-size="0"
          install-size="0"
          version="0.0.0"/>
