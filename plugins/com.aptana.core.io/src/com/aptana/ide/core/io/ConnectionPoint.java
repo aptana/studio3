@@ -250,16 +250,4 @@ public abstract class ConnectionPoint extends PlatformObject implements IConnect
 	{
 		return getName();
 	}
-
-	/**
-	 * Loads the connection data that has 1.5 format.
-	 * 
-	 * @param data
-	 *            the connection data
-	 * @return true if loading is successful, false otherwise
-	 */
-	public boolean load15Data(String data)
-	{
-		return false;
-	}
 }

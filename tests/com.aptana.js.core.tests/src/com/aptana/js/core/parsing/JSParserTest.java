@@ -926,55 +926,50 @@ public class JSParserTest extends TestCase
 	public void testMissingClosingParenthesis() throws Exception
 	{
 		assertParseResult("testing(", "testing();" + EOL);
-		assertParseErrors("Syntax Error: unexpected token \"end-of-file\"", "Missing semicolon");
+		assertParseErrors("Syntax Error: unexpected token \"end-of-file\"");
 	}
 
 	public void testMissingIdentifier() throws Exception
 	{
 		assertParseResult("var x =", "var x = " + EOL);
-		assertParseErrors("Syntax Error: unexpected token \"end-of-file\"", "Missing semicolon");
+		assertParseErrors("Syntax Error: unexpected token \"end-of-file\"");
 	}
 
 	public void testMissingIdentifier2() throws Exception
 	{
 		assertParseResult("x.", "x.;" + EOL);
-		assertParseErrors("Syntax Error: unexpected token \"end-of-file\"", "Missing semicolon");
+		assertParseErrors("Syntax Error: unexpected token \"end-of-file\"");
 	}
 
 	public void testMissingArg() throws Exception
 	{
 		assertParseResult("fun(a,);", "fun(a, );" + EOL);
-		assertParseErrors("Syntax Error: unexpected token \")\"", "Missing semicolon");
+		assertParseErrors("Syntax Error: unexpected token \")\"");
 	}
 
 	public void testMissingIdentifier3() throws Exception
 	{
 		assertParseResult("new", "new ;" + EOL);
-		assertParseErrors("Syntax Error: unexpected token \"end-of-file\"", "Missing semicolon");
+		assertParseErrors("Syntax Error: unexpected token \"end-of-file\"");
 	}
 
 	public void testMissingPropertyValue() throws Exception
 	{
 		assertParseResult("var x = { t };", "var x = {t: };" + EOL);
-		assertParseErrors("Syntax Error: unexpected token \"}\"", "Missing semicolon");
+		assertParseErrors("Syntax Error: unexpected token \"}\"");
 	}
 
 	public void testMissingPropertyValue2() throws Exception
 	{
 		assertParseResult("var x = { t: };", "var x = {t: };" + EOL);
-		assertParseErrors("Syntax Error: unexpected token \"}\"", "Missing semicolon");
+		assertParseErrors("Syntax Error: unexpected token \"}\"");
 	}
 
 	public void testSingleLineComment() throws Exception
 	{
 		String source = "// this is a single-line comment";
 
-		ParseState parseState = new ParseState(source);
-
-		IParseNode parseNode = fParser.parse(parseState).getRootNode();
-		assertTrue(parseNode instanceof ParseRootNode);
-
-		ParseRootNode root = (ParseRootNode) parseNode;
+		IParseRootNode root = parse(source);
 		IParseNode[] comments = root.getCommentNodes();
 		assertNotNull(comments);
 		assertEquals(1, comments.length);
@@ -1014,8 +1009,7 @@ public class JSParserTest extends TestCase
 	public void testNodeOffsetsAtEOF() throws Exception
 	{
 		String source = "a.foo()\n// this is a comment";
-		ParseState parseState = new ParseState(source);
-		IParseNode result = parse(parseState);
+		IParseNode result = parse(source);
 
 		assertNotNull(result);
 		assertEquals(1, result.getChildCount());
@@ -1049,19 +1043,43 @@ public class JSParserTest extends TestCase
 	public void testUnclosedString() throws Exception
 	{
 		assertParseResult("var string = 'something", "var string = " + EOL);
-		assertParseErrors("Syntax Error: unexpected token \"'\"", "Missing semicolon");
+		assertParseErrors("Syntax Error: unexpected token \"'\"");
 	}
 
 	public void testUnclosedComment() throws Exception
 	{
 		assertParseResult("var thing; /* comment", "var thing;" + EOL + EOL);
-		assertParseErrors("Syntax Error: unexpected token \"/\"", "Missing semicolon");
+		assertParseErrors("Syntax Error: unexpected token \"/\"");
 	}
 
 	public void testUnclosedRegexp() throws Exception
 	{
 		assertParseResult("var regexp = /;", EOL);
-		assertParseErrors("Syntax Error: unexpected token \"/\"", "Missing semicolon", "Syntax Error: unexpected token \";\"", "Missing semicolon");
+		assertParseErrors("Syntax Error: unexpected token \"/\"", "Syntax Error: unexpected token \";\"");
+	}
+
+	public void testReservedWordAsPropertyName() throws Exception
+	{
+		assertParseResult("this.default = 1;" + EOL);
+		assertTrue(fParseResult.getErrors().isEmpty());
+	}
+
+	public void testReservedWordAsPropertyName2() throws Exception
+	{
+		assertParseResult("a[\"public\"] = 1;" + EOL);
+		assertTrue(fParseResult.getErrors().isEmpty());
+	}
+
+	public void testReservedWordAsPropertyName3() throws Exception
+	{
+		assertParseResult("a = {default: \"test\"};" + EOL);
+		assertTrue(fParseResult.getErrors().isEmpty());
+	}
+
+	public void testReservedWordAsFunctionName() throws Exception
+	{
+		parse("function import() {};" + EOL);
+		assertParseErrors("Syntax Error: unexpected token \"import\"");
 	}
 
 	/**
@@ -1076,9 +1094,15 @@ public class JSParserTest extends TestCase
 		ASTUtil.showBeforeAndAfterTrim(parse(parseState));
 	}
 
+	private IParseRootNode parse(String source) throws Exception
+	{
+		return parse(new ParseState(source));
+	}
+
 	private IParseRootNode parse(ParseState parseState) throws Exception
 	{
-		return fParser.parse(parseState).getRootNode();
+		fParseResult = fParser.parse(parseState);
+		return fParseResult.getRootNode();
 	}
 
 	// utility methods
@@ -1101,10 +1125,7 @@ public class JSParserTest extends TestCase
 
 	protected void assertParseResult(String source, String expected) throws Exception
 	{
-		ParseState parseState = new ParseState(source);
-
-		fParseResult = fParser.parse(parseState);
-		IParseNode result = fParseResult.getRootNode();
+		IParseNode result = parse(source);
 		StringBuilder text = new StringBuilder();
 		IParseNode[] children = result.getChildren();
 		for (IParseNode child : children)

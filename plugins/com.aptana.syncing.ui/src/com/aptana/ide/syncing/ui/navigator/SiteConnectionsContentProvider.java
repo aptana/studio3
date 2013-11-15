@@ -31,9 +31,12 @@ import com.aptana.ide.ui.io.navigator.FileTreeContentProvider;
  * @author Michael Xia (mxia@aptana.com)
  */
 public class SiteConnectionsContentProvider extends FileTreeContentProvider
-{ /* using FileTreeContentProvider is correct here! */
+{
+
+	/* using FileTreeContentProvider is correct here! */
 
 	private static final Object[] EMPTY = new Object[0];
+	private static final String WEB_NATURE = "com.aptana.projects.webnature"; //$NON-NLS-1$
 
 	@Override
 	public Object[] getElements(Object inputElement)
@@ -53,8 +56,17 @@ public class SiteConnectionsContentProvider extends FileTreeContentProvider
 			IProject project = (IProject) element;
 			if (project.isAccessible())
 			{
-				Object[] children = new Object[1];
-				children[0] = ProjectSitesManager.getInstance().getProjectSites(project);
+				boolean isWebProject = isWebProject(project);
+				Object[] children;
+				if (isWebProject)
+				{
+					children = new Object[1];
+					children[0] = ProjectSitesManager.getInstance().getProjectSites(project);
+				}
+				else
+				{
+					children = new Object[0];
+				}
 				return children;
 			}
 		}
@@ -86,6 +98,25 @@ public class SiteConnectionsContentProvider extends FileTreeContentProvider
 			}
 		}
 		return super.getChildren(element);
+	}
+
+	private boolean isWebProject(IProject project)
+	{
+		boolean hasWebNature = false;
+		try
+		{
+			String[] natures = project.getDescription().getNatureIds();
+			if (natures != null && natures.length > 0)
+			{
+				// Verify whether the primary nature is web project.
+				hasWebNature = WEB_NATURE.equals(natures[0]);
+			}
+
+		}
+		catch (CoreException ignore)
+		{
+		}
+		return hasWebNature;
 	}
 
 	private static FileSystemObject[] fetchFileSystemChildren(IFileStore parent, IProgressMonitor monitor)

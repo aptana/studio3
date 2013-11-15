@@ -32,12 +32,6 @@
       </fontDefinition>
    </extension>
    <extension
-         point="org.eclipse.ui.startup">
-      <startup
-            class="com.aptana.theme.internal.InvasiveThemeHijacker">
-      </startup>
-   </extension>
-   <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
             class="com.aptana.theme.internal.preferences.ThemerPreferenceInitializer">

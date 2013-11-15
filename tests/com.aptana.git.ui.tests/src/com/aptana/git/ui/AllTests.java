@@ -8,6 +8,7 @@
 package com.aptana.git.ui;
 
 import junit.framework.Test;
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 import com.aptana.git.ui.dialogs.CreateBranchDialogTest;
@@ -20,9 +21,17 @@ public class AllTests
 
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite(AllTests.class.getName());
+		TestSuite suite = new TestSuite(AllTests.class.getName())
+		{
+			@Override
+			public void runTest(Test test, TestResult result)
+			{
+				System.err.println("Running test: " + test.toString());
+				super.runTest(test, result);
+			}
+		};
 		// $JUnit-BEGIN$
-		// suite.addTestSuite(CreateBranchDialogTest.class);
+		suite.addTestSuite(CreateBranchDialogTest.class);
 		suite.addTestSuite(DiffFormatterTest.class);
 		suite.addTestSuite(GitLightweightDecoratorTest.class);
 		suite.addTestSuite(HyperlinkDetectorTest.class);

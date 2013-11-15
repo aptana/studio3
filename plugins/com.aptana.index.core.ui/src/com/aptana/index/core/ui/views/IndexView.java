@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -34,8 +34,6 @@ import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.ViewPart;
 
-import com.aptana.theme.ThemePlugin;
-
 /**
  * IndexView
  */
@@ -68,14 +66,6 @@ public class IndexView extends ViewPart
 			}
 		);
 		// @formatter:on
-	}
-
-	/**
-	 * applyTheme
-	 */
-	private void applyTheme()
-	{
-		ThemePlugin.getDefault().getControlThemerFactory().apply(treeViewer);
 	}
 
 	/*
@@ -138,7 +128,6 @@ public class IndexView extends ViewPart
 		// listen to theme changes
 		hookContextMenu();
 		addListeners();
-		applyTheme();
 	}
 
 	/**

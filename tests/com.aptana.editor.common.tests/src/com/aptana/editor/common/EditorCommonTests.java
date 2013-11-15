@@ -8,6 +8,7 @@
 package com.aptana.editor.common;
 
 import junit.framework.Test;
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 public class EditorCommonTests
@@ -15,7 +16,15 @@ public class EditorCommonTests
 
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite(EditorCommonTests.class.getName());
+		TestSuite suite = new TestSuite(EditorCommonTests.class.getName())
+		{
+			@Override
+			public void runTest(Test test, TestResult result)
+			{
+				System.err.println("Running test: " + test.toString());
+				super.runTest(test, result);
+			}
+		};
 		//$JUnit-BEGIN$
 		suite.addTestSuite(RegionsTest.class);
 		suite.addTestSuite(SequenceCharacterScannerTest.class);

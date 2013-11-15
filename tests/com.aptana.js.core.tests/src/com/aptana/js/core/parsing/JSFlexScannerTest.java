@@ -611,7 +611,7 @@ public class JSFlexScannerTest extends TestCase
 		);
 		// @formatter:on
 	}
-	
+
 	public void testRegex4()
 	{
 		// @formatter:off

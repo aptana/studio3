@@ -47,6 +47,8 @@ import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.jetty.util.epl.ajax.JSON;
+import com.aptana.jira.core.internal.JiraProjectsRegistry;
+import com.aptana.jira.core.internal.JiraProjectsRegistry.JiraProjectInfo;
 
 /**
  * @author cwilliams
@@ -107,6 +109,17 @@ public class JiraManager
 	JiraManager()
 	{
 		loadCredentials();
+		loadProjectInfo();
+	}
+
+	private void loadProjectInfo()
+	{
+		JiraProjectsRegistry projectsRegistry = new JiraProjectsRegistry();
+		JiraProjectInfo projectProvider = projectsRegistry.getProjectInfo();
+		if (projectProvider != null)
+		{
+			setProjectInfo(projectProvider.getProjectName(), projectProvider.getProjectCode());
+		}
 	}
 
 	/**

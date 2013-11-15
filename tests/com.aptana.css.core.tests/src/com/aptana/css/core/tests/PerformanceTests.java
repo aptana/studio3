@@ -14,8 +14,6 @@ import junit.framework.TestCase;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
-import com.aptana.core.logging.IdeLog;
-import com.aptana.css.core.CSSCorePlugin;
 import com.aptana.css.core.parsing.CSSParserPerformanceTest;
 import com.aptana.css.core.parsing.CSSScannerPerformanceTest;
 
@@ -30,8 +28,7 @@ public class PerformanceTests extends TestCase
 			public void runTest(Test test, TestResult result)
 			{
 				String msg = MessageFormat.format("Running test: {0}", test.toString());
-				IdeLog.logError(CSSCorePlugin.getDefault(), msg);
-				System.out.println(msg);
+				System.err.println(msg);
 				super.runTest(test, result);
 			}
 		};

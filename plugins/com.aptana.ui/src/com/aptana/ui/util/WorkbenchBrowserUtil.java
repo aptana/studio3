@@ -107,7 +107,7 @@ public final class WorkbenchBrowserUtil
 	 * @param url
 	 */
 	@SuppressWarnings("nls")
-	private static void launchBrowserByCommand(URL url)
+	public static void launchBrowserByCommand(URL url)
 	{
 		// Can we fall back to running a command to load the URL?
 		if (PlatformUtil.isMac())

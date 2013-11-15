@@ -13,7 +13,13 @@
     </description>
 
 	<property file="build_local.properties" />
-	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
+	<property name="postingDirectory" value="${buildDirectory}" />
+	<property name="publishingContent" value="${basedir}/publishingFiles" />
+	<!--location for buildlogs-->
+	<property name="buildlogs" value="${postingDirectory}/${buildLabel}/buildlogs" />
+	<mkdir dir="${buildlogs}" />
+
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
 		<classpath>
 			<pathelement location="${basedir}/ant-contrib/ant-contrib.jar" />
 		</classpath>
@@ -63,63 +69,43 @@
 	</target>
 
 	<!-- ================================= 
-	      target: clean              
+	      target: clean
 	     ================================= -->
 	<target name="clean" depends="generate.build.properties" description="Clean up temp and build files">
-		<delete failonerror="false">
-			<fileset dir="${buildDirectory}" defaultexcludes="true">
-				<include name="assemble.*" />
-				<include name="finalFeaturesVersions.*" />
-				<include name="finalPluginsVersions.*" />
-				<include name="package.*" />
-			</fileset>
-		</delete>
-		<delete dir="${coverageDirectory}" failonerror="false" />
-		<delete dir="${testResultsDirectory}" failonerror="false" />
-		<delete dir="${buildDirectory}/${buildLabel}" failonerror="false" />
-		<delete dir="${baseLocation}" />
-		<delete dir="${buildDirectory}/features/org.eclipse.pde.build.container.feature" failonerror="false" />
-		<delete file="build.properties" failonerror="false" />
-	</target>
-
-	<!-- - - - - - - - - - - - - - - - - - 
-	      target: clean.after                      
-	     - - - - - - - - - - - - - - - - - -->
-	<target name="clean.after" if="cleanAfter">
-		<antcall target="clean" />
+		<delete dir="${buildDirectory}" failonerror="false" />
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 
           target: generate.base                      
          - - - - - - - - - - - - - - - - - -->
 	<target name="generate.base" depends="copy.base.windows,copy.base">
-		<!-- Wipe the non-test plugins-->
-		<antcall target="wipe.plugins" />
-		<!-- Copy test plugins into plugins dir -->
+		<!-- Copy test fragments into plugins dir -->
+		<echo message="Copying test fragments" level="info" />
+		<delete dir="${buildDirectory}/plugins" />
+		<mkdir dir="${buildDirectory}/plugins" />
 		<copy todir="${buildDirectory}/plugins">
-			<fileset dir="${buildDirectory}/tests">
+			<fileset dir="${workspace}/tests">
 				<include name="**/*" />
+			</fileset>
+		</copy>
+		<!-- copy features -->
+		<echo message="Copying features" level="info" />
+		<copy todir="${buildDirectory}">
+			<fileset dir="${workspace}" defaultexcludes="true">
+				<include name="features/**" />
 			</fileset>
 		</copy>
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 
-          target: wipe.plugins                      
-         - - - - - - - - - - - - - - - - - -->
-	<target name="wipe.plugins" unless="dont.wipe.plugins">
-		<delete verbose="false">
-			<fileset dir="${buildDirectory}/plugins">
-				<include name="**/*" />
-			</fileset>
-		</delete>
-	</target>
-
-	<!-- - - - - - - - - - - - - - - - - - 
-          target: copy.base                      
+          target: copy.base
+          On non-Windows machines, copy eclipse and plugins/features directories to buildDirectory to set up for build
          - - - - - - - - - - - - - - - - - -->
 	<target name="copy.base" unless="is.windows">
+		<mkdir dir="${buildDirectory}" />
 		<!-- Copy over the original base eclipse to a new location.
-						Have to use exec cp to retain permissions on *nix, Mac -->
+								Have to use exec cp to retain permissions on *nix, Mac -->
+		<echo message="Copying eclipse from ${vanilla.eclipse} to ${baseLocation}" level="info" />
 		<exec executable="cp">
 			<arg line="-R ${vanilla.eclipse} ${baseLocation}" />
 		</exec>
@@ -129,6 +115,8 @@
           target: copy.base.windows                      
          - - - - - - - - - - - - - - - - - -->
 	<target name="copy.base.windows" if="is.windows">
+		<mkdir dir="${buildDirectory}" />
+		<!-- copy eclipse -->
 		<copy todir="${baseLocation}">
 			<fileset dir="${vanilla.eclipse}" includes="**/*" defaultexcludes="false" />
 		</copy>
@@ -138,7 +126,7 @@
 		  target: run.director                      
 		 - - - - - - - - - - - - - - - - - -->
 	<target name="run.director" description="Runs the p2 director installs">
-		<java jar="${baseLocation}/plugins/${launcher.plugin}.jar" fork="true" failonerror="true" dir="${baseLocation}" timeout="900000">
+		<java jar="${baseLocation}/plugins/${launcher.plugin}.jar" fork="true" failonerror="true" dir="${baseLocation}" timeout="900000" error="${buildlogs}/error.txt" output="${buildlogs}/output.txt">
 			<arg line="-application org.eclipse.equinox.p2.director" />
 			<arg line="-nosplash" />
 			<arg line="-consoleLog" />
@@ -166,21 +154,23 @@
 			<property name="includes" value="com*.xml" />
 			<property name="output-file" value="test-results.xml" />
 		</ant>
+		<mkdir dir="${testResultsDirectory}"/>
 		<move file="${baseLocation}/test-results.xml" todir="${testResultsDirectory}" />
 	</target>
 
 	<target name="-instrument" description="Instrument the code using EMMA. Call before running tests. Call '-coverage' to produce reports after.">
 		<emma enabled="true">
-			<instr instrpathref="instrument.classpath" mode="overwrite" metadatafile="${coverageDirectory}/metadata.emma">
+			<instr instrpathref="instrument.classpath" mode="overwrite" metadatafile="${buildDirectory}/metadata.emma">
 				<filter file="emma-filters.txt" />
 			</instr>
 		</emma>
 	</target>
 
 	<target name="-coverage" description="Produce coverage analysis docs using EMMA. Assumes '-instrument' was called before running the tests.">
+		<mkdir dir="${coverageDirectory}"/>
 		<emma enabled="true">
 			<report>
-				<fileset dir="${coverageDirectory}">
+				<fileset dir="${buildDirectory}">
 					<include name="*.emma" />
 				</fileset>
 
@@ -207,7 +197,6 @@
 
 		<antcall target="-post-test" />
 		<antcall target="-coverage" />
-		<antcall target="clean.after" />
 	</target>
 
 	<target name="performance" depends="generate.build.properties,copy.base.windows,copy.base">
@@ -233,8 +222,10 @@
 			<param name="test.classname" value="com.aptana.studio.tests.all.PerformanceTests" />
 		</antcall>
 
+		<!-- Generate performance chart -->
+		<antcall target="generatePerformanceResults" />
+
 		<antcall target="-post-test" />
-		<antcall target="clean.after" />
 	</target>
 
 	<target name="run-ui-test">
@@ -249,7 +240,7 @@
 			<property name="data-dir" value="${baseLocation}/junit-workspace -clean" />
 			<property name="plugin-name" value="${test.plugin}" />
 			<property name="classname" value="${test.classname}" />
-			<property name="extraVMargs" value="-ea -Demma.coverage.out.file=${coverageDirectory}/coverage.emma -Dosgi.dev=${basedir}/lib/emma.jar -Djunit.properties=${basedir}/build.properties" />
+			<property name="extraVMargs" value="-ea -Demma.coverage.out.file=${buildDirectory}/coverage.emma -Dosgi.dev=${basedir}/lib/emma.jar -Djunit.properties=${basedir}/build.properties" />
 		</ant>
 	</target>
 
@@ -265,10 +256,9 @@
 			<property name="data-dir" value="${baseLocation}/junit-workspace -clean" />
 			<property name="plugin-name" value="${test.plugin}" />
 			<property name="classname" value="${test.classname}" />
-			<property name="extraVMargs" value="-Demma.coverage.out.file=${coverageDirectory}/coverage.emma -Dosgi.dev=${basedir}/lib/emma.jar -Djunit.properties=${basedir}/build.properties" />
+			<property name="extraVMargs" value="-Demma.coverage.out.file=${buildDirectory}/coverage.emma -Dosgi.dev=${basedir}/lib/emma.jar -Djunit.properties=${basedir}/build.properties" />
 		</ant>
 	</target>
-
 	<target name="run-perf-test">
 		<ant target="ui-test" antfile="${library-file}" dir="${baseLocation}">
 			<property name="timeout" value="${test.timeout}" />
@@ -282,5 +272,41 @@
 			<property name="classname" value="${test.classname}" />
 			<property name="extraVMargs" value="-XX:MaxPermSize=384m -Djunit.properties=${basedir}/build.properties -Declipse.perf.dbloc=${perf.db} -Declipse.perf.config=build=${studio.version};host=${computer.hostname};jvm=${java.version} -Dsetup.override.eclipseArgs=vm=/usr/bin/java ${extraPerfArgs}" />
 		</ant>
+	</target>
+	<target name="generatePerformanceResults" description="Generate performance charts">
+		<mkdir dir="${buildDirectory}/${studio.version}/performance" />
+		<mkdir dir="${postingDirectory}/${studio.version}/performance" />
+		<!--TODO run the generated performance results through the template to get better and consistent presentation of data.  
+		<taskdef name="performanceResults" classname="org.eclipse.releng.performance.PerformanceResultHtmlGenerator" /-->
+		<condition property="configArgs" value="-ws gtk -arch ppc">
+			<equals arg1="${os.arch}" arg2="ppc64" />
+		</condition>
+		<condition property="configArgs" value="-ws gtk -arch x86">
+			<equals arg1="${os.arch}" arg2="i386" />
+		</condition>
+		<property name="configArgs" value="" />
+
+		<java jar="${baseLocation}/plugins/${launcher.plugin}.jar" fork="true" failonerror="true" dir="${baseLocation}" error="${buildlogs}/perfgenerror.txt" output="${buildlogs}/perfgenoutput.txt">
+			<arg line="-consolelog -nosplash -data ${buildDirectory}/perf-workspace -application org.eclipse.test.performance.ui.resultGenerator
+						-current ${studio.version}
+						-print
+						-javaVersion ${java.version}
+						-output ${testResultsDirectory}
+						-config hudson-ubuntu_
+			            -dataDir ${postingDirectory}/data/studio
+						-scenario.pattern ${scenario.pattern}
+						-baseline ${baseline.version}
+						-fingerprints"/>
+			<!-- baselines arguments are no longer necessary since bug https://bugs.eclipse.org/bugs/show_bug.cgi?id=209322 has been fixed...
+						-baseline ${eclipse.perf.ref}
+						-baseline.prefix R-3.4_200806172000
+			-->
+			<!-- add this argument to list above when there are milestone builds to highlight 
+			-highlight.latest 3.3M1_
+			-->
+			<env key="LD_LIBRARY_PATH" value="${baseLocation}/plugins/org.apache.derby_10.6.1/" />
+			<!--performanceResults xmlDirectoryName="${postingDirectory}/${buildLabel}/performance/xml" dropDirectoryName="${postingDirectory}/${buildLabel}" testResultsTemplateFileName="${publishingContent}/templateFiles/performance.php.template" testResultsHtmlFileName="performance/performance.php" hrefTestResultsTargetPath="html" testManifestFileName="${publishingContent}/performanceTestManifest.xml" /-->
+			<sysproperty key="eclipse.perf.dbloc" value="${perf.db}" />
+		</java>
 	</target>
 </project>

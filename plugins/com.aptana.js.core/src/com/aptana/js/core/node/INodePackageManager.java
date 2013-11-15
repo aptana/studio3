@@ -7,6 +7,8 @@
  */
 package com.aptana.js.core.node;
 
+import java.io.FileFilter;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
@@ -93,8 +95,6 @@ public interface INodePackageManager
 
 	public String getLatestVersionAvailable(String packageName) throws CoreException;
 
-	public IPath findNPM();
-
 	public String getConfigValue(String key) throws CoreException;
 
 	/**
@@ -128,9 +128,80 @@ public interface INodePackageManager
 	 * 
 	 * @param monitor
 	 * @return
+	 * @throws CoreException
 	 */
-	public IStatus cleanNpmCache(IProgressMonitor monitor);
+	public IStatus cleanNpmCache(char[] password, boolean runWithSudo, IProgressMonitor monitor);
 
-	// TODO Uninstall
+	/**
+	 * Uninstalls an npm package.
+	 * 
+	 * @param packageName
+	 * @param displayName
+	 * @param global
+	 * @param password
+	 * @param monitor
+	 * @return
+	 * @throws CoreException
+	 */
+	public IStatus uninstall(String packageName, String displayName, boolean global, char[] password,
+			IProgressMonitor monitor) throws CoreException;
+
+	/**
+	 * Does the NPM path/install we're pointing to exist?
+	 * 
+	 * @return
+	 */
+	public boolean exists();
+
+	/**
+	 * The path to the NPM binary script
+	 * 
+	 * @return
+	 */
+	public IPath getPath();
+
+	/**
+	 * return the version of NPM.
+	 * 
+	 * @return
+	 * @throws CoreException
+	 *             if NPM isn't actually installed, or grabbing the version failed.
+	 */
+	public String getVersion() throws CoreException;
+
+	/**
+	 * A way to generically launch commands under NPM. Use sparingly. Ideally we'd have methods to invoke whatever
+	 * command you're hacking by using this.
+	 * 
+	 * @param args
+	 * @return
+	 * @throws CoreException
+	 *             May throw a CoreException to indicate that the NPM path is bad.
+	 */
+	public IStatus runInBackground(String... args) throws CoreException;
+
+	/**
+	 * Search for the npm package installed locally based on the search locations.
+	 * 
+	 * @param executableName
+	 * @param appendExtension
+	 * @param searchLocations
+	 * @param fileFilter
+	 * @return
+	 */
+	public IPath findNpmPackagePath(String executableName, boolean appendExtension, List<IPath> searchLocations,
+			FileFilter fileFilter);
+
+	/**
+	 * Changes the ownership of the entire NPM cache directory and its contents (on Mac, it is in ~/.npm) to the current
+	 * user.
+	 * 
+	 * @param password
+	 * @param runWithSudo
+	 * @param monitor
+	 * @return
+	 */
+	IStatus changeNPMCacheOwner(char[] password, boolean runWithSudo, IProgressMonitor monitor);
+
 	// TODO Update
 }

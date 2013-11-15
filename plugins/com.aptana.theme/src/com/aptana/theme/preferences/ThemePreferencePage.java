@@ -18,8 +18,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
+import org.eclipse.e4.ui.internal.workbench.swt.E4Application;
+import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
@@ -36,14 +39,21 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.BaseLabelProvider;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.EditingSupport;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TextCellEditor;
@@ -99,6 +109,8 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.themes.ThemeElementHelper;
+import org.eclipse.ui.internal.tweaklets.PreferencePageEnhancer;
+import org.eclipse.ui.internal.tweaklets.Tweaklets;
 import org.eclipse.ui.themes.ITheme;
 import org.osgi.service.prefs.BackingStoreException;
 
@@ -209,8 +221,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 	private Button deleteThemeButton;
 	private HashMap<Integer, Font> fFonts;
 
-	private Button fInvasiveThemeCheckbox;
-	private Button fInvasiveFontCheckbox;
+	private Button fAptanaEditorsOnlyCheckbox;
 	private Button fAddThemeButton;
 	private Button fImportButton;
 	private Button fAddTokenButton;
@@ -226,7 +237,10 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 	private ControlDecoration fScopeSelectorDecoration;
 
-	private Button fAptanaEditorsOnlyCheckbox;
+	private ComboViewer e4ThemeIdCombo;
+	private String defaultE4Theme;
+	private IThemeEngine e4ThemeEngine;
+	private org.eclipse.e4.ui.css.swt.theme.ITheme currentE4Theme;
 
 	@Override
 	protected Control createContents(Composite parent)
@@ -235,15 +249,18 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		composite.setLayout(new GridLayout());
 		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
+		createE4ThemeCombo(composite);
+
 		Group group = new Group(composite, SWT.SHADOW_IN);
 		group.setLayout(new GridLayout());
 		group.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		group.setText(Messages.ThemePreferencePage_EditorTheme);
 
 		createThemeListControls(group);
 		createGlobalColorControls(group);
 		createTokenEditTable(group);
-		createFontArea(composite);
-		createInvasivePrefArea(composite);
+		createFontArea(group);
+		createInvasivePrefArea(group);
 
 		setTheme(getThemeManager().getCurrentTheme().getName());
 		return composite;
@@ -297,26 +314,53 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		Composite themesComp = new Composite(composite, SWT.NONE);
 		themesComp.setLayout(new GridLayout(1, false));
 
-		// do we have "invasive" theming on? This applies our colors to non-Aptana views (and possibly editors)
-		fInvasiveThemeCheckbox = new Button(themesComp, SWT.CHECK);
-		fInvasiveThemeCheckbox.setText(Messages.ThemePreferencePage_ApplyToAllViews);
-		fInvasiveThemeCheckbox.setSelection(ThemePlugin.applyToViews());
-		fInvasiveThemeCheckbox.addSelectionListener(this);
-		fInvasiveThemeCheckbox.setToolTipText(Messages.ThemePreferencePage_ApplyToAllViewsToolTip);
-
 		// Do we apply the colors to editors that aren't ours?
 		fAptanaEditorsOnlyCheckbox = new Button(themesComp, SWT.CHECK);
 		fAptanaEditorsOnlyCheckbox.setText(Messages.ThemePreferencePage_ApplyToAllEditors);
 		fAptanaEditorsOnlyCheckbox.setSelection(ThemePlugin.applyToAllEditors());
 		fAptanaEditorsOnlyCheckbox.addSelectionListener(this);
+	}
 
-		// Do we force the views to use the editor font?
-		fInvasiveFontCheckbox = new Button(themesComp, SWT.CHECK);
-		fInvasiveFontCheckbox.setText(Messages.ThemePreferencePage_InvasiveFontLBL);
-		fInvasiveFontCheckbox.setSelection(Platform.getPreferencesService().getBoolean(ThemePlugin.PLUGIN_ID,
-				IPreferenceConstants.INVASIVE_FONT, false, null));
-		fInvasiveFontCheckbox.addSelectionListener(this);
-		fInvasiveFontCheckbox.setToolTipText(Messages.ThemePreferencePage_InvasiveFontToolTip);
+	private void createE4ThemeCombo(Composite themesComp)
+	{
+		Composite comp = new Composite(themesComp, SWT.NONE);
+		comp.setLayout(new GridLayout(2, false));
+		new Label(comp, SWT.NONE).setText(Messages.ThemePreferencePage_OverallTheme);
+
+		e4ThemeIdCombo = new ComboViewer(comp, SWT.READ_ONLY);
+		e4ThemeIdCombo.setLabelProvider(new LabelProvider()
+		{
+			@Override
+			public String getText(Object element)
+			{
+				return ((org.eclipse.e4.ui.css.swt.theme.ITheme) element).getLabel();
+			}
+		});
+		e4ThemeIdCombo.setContentProvider(new ArrayContentProvider());
+		e4ThemeIdCombo.setInput(e4ThemeEngine.getThemes());
+		e4ThemeIdCombo.getControl().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		this.currentE4Theme = e4ThemeEngine.getActiveTheme();
+		if (this.currentE4Theme != null)
+		{
+			e4ThemeIdCombo.setSelection(new StructuredSelection(currentE4Theme));
+		}
+		e4ThemeIdCombo.addSelectionChangedListener(new ISelectionChangedListener()
+		{
+
+			public void selectionChanged(SelectionChangedEvent event)
+			{
+				org.eclipse.e4.ui.css.swt.theme.ITheme selection = getSelection();
+				e4ThemeEngine.setTheme(selection, false);
+				((PreferencePageEnhancer) Tweaklets.get(PreferencePageEnhancer.KEY)).setSelection(selection);
+			}
+		});
+	}
+
+	/** @return the currently selected theme or null if there are no themes */
+	private org.eclipse.e4.ui.css.swt.theme.ITheme getSelection()
+	{
+		return (org.eclipse.e4.ui.css.swt.theme.ITheme) ((IStructuredSelection) e4ThemeIdCombo.getSelection())
+				.getFirstElement();
 	}
 
 	protected IThemeManager getThemeManager()
@@ -1126,11 +1170,21 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 	public void init(IWorkbench workbench)
 	{
+		MApplication application = (MApplication) workbench.getService(MApplication.class);
+		IEclipseContext context = application.getContext();
+		defaultE4Theme = (String) context.get(E4Application.THEME_ID);
+		e4ThemeEngine = context.get(IThemeEngine.class);
 	}
 
 	@Override
 	public boolean performOk()
 	{
+		org.eclipse.e4.ui.css.swt.theme.ITheme selectedTheme = getSelection();
+		if (selectedTheme != null)
+		{
+			e4ThemeEngine.setTheme(selectedTheme, true);
+		}
+
 		performOkFonts();
 		getTheme().save();
 		getThemeManager().setCurrentTheme(getTheme());
@@ -1193,6 +1247,11 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 	@Override
 	protected void performDefaults()
 	{
+		e4ThemeEngine.setTheme(defaultE4Theme, true);
+		if (e4ThemeEngine.getActiveTheme() != null)
+		{
+			e4ThemeIdCombo.setSelection(new StructuredSelection(e4ThemeEngine.getActiveTheme()));
+		}
 		// Reset the font to what it was originally!
 		setFont(JFaceResources.getFont(JFaceResources.TEXT_FONT));
 		try
@@ -1206,6 +1265,16 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			IdeLog.logError(ThemePlugin.getDefault(), e);
 		}
 		super.performDefaults();
+	}
+
+	@Override
+	public boolean performCancel()
+	{
+		if (currentE4Theme != null)
+		{
+			e4ThemeEngine.setTheme(currentE4Theme, false);
+		}
+		return super.performCancel();
 	}
 
 	protected Theme getTheme()
@@ -1236,36 +1305,10 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 	public void widgetSelected(SelectionEvent e)
 	{
 		Object source = e.getSource();
-		if (source == fInvasiveThemeCheckbox)
-		{
-			IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID);
-			prefs.putBoolean(IPreferenceConstants.APPLY_TO_ALL_VIEWS, fInvasiveThemeCheckbox.getSelection());
-			try
-			{
-				prefs.flush();
-			}
-			catch (BackingStoreException e1)
-			{
-				IdeLog.logError(ThemePlugin.getDefault(), e1);
-			}
-		}
-		else if (source == fAptanaEditorsOnlyCheckbox)
+		if (source == fAptanaEditorsOnlyCheckbox)
 		{
 			IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID);
 			prefs.putBoolean(IPreferenceConstants.APPLY_TO_ALL_EDITORS, fAptanaEditorsOnlyCheckbox.getSelection());
-			try
-			{
-				prefs.flush();
-			}
-			catch (BackingStoreException e1)
-			{
-				IdeLog.logError(ThemePlugin.getDefault(), e1);
-			}
-		}
-		else if (source == fInvasiveFontCheckbox)
-		{
-			IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID);
-			prefs.putBoolean(IPreferenceConstants.INVASIVE_FONT, fInvasiveFontCheckbox.getSelection());
 			try
 			{
 				prefs.flush();

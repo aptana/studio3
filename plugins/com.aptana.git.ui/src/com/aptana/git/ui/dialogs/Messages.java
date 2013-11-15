@@ -31,6 +31,14 @@ public class Messages extends NLS
 	public static String CreateBranchDialog_StartPoint_label;
 	public static String CreateBranchDialog_Track_label;
 
+	public static String CreatePullRequestDialog_BodyFieldLabel;
+
+	public static String CreatePullRequestDialog_EmptyTitleErrMsg;
+
+	public static String CreatePullRequestDialog_Title;
+
+	public static String CreatePullRequestDialog_TitleFieldLabel;
+
 	public static String CreateTagDialog_Title;
 	public static String CreateTagDialog_Message;
 	public static String CreateTagDialog_NonEmptyTagNameMessage;

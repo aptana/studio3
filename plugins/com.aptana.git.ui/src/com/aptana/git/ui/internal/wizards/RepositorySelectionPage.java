@@ -36,6 +36,7 @@ import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.github.IGithubManager;
+import com.aptana.git.core.github.IGithubRepository;
 import com.aptana.git.core.github.IGithubUser;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.GitUIPlugin;
@@ -334,12 +335,12 @@ class RepositorySelectionPage extends WizardPage
 		{
 			try
 			{
-				List<String> repoList = getGithubManager().getRepos();
+				List<IGithubRepository> repoList = user.getAllRepos();
 				if (!CollectionsUtil.isEmpty(repoList))
 				{
-					for (String repoURI : repoList)
+					for (IGithubRepository repo : repoList)
 					{
-						githubReposCombo.add(repoURI);
+						githubReposCombo.add(repo.getSSHURL());
 					}
 					githubReposCombo.addSelectionListener(new SelectionAdapter()
 					{

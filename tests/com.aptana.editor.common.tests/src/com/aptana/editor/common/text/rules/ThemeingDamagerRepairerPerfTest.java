@@ -8,7 +8,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.source.ISourceViewer;
-import org.eclipse.test.performance.PerformanceTestCase;
+import org.eclipse.test.performance.GlobalTimePerformanceTestCase;
 import org.eclipse.ui.ide.IDE;
 
 import com.aptana.core.util.ResourceUtil;
@@ -16,7 +16,7 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.epl.tests.EditorTestHelper;
 import com.aptana.ui.util.UIUtils;
 
-public class ThemeingDamagerRepairerPerfTest extends PerformanceTestCase
+public class ThemeingDamagerRepairerPerfTest extends GlobalTimePerformanceTestCase
 {
 	private AbstractThemeableEditor editor;
 

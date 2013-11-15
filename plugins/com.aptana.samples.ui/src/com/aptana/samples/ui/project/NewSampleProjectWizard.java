@@ -8,7 +8,6 @@
 package com.aptana.samples.ui.project;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.text.MessageFormat;
@@ -52,7 +51,6 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.ResourceUtil;
-import com.aptana.core.util.ZipUtil;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.CloneJob;
 import com.aptana.git.ui.actions.DisconnectHandler;
@@ -210,18 +208,15 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 			}
 			else
 			{
-				doBasicCreateProject(newProjectHandle, description);
+				ProjectData projectData = mainPage.getProjectData();
 
-				// FIXME Move the logic for extracting/applying samples to IProjectSample! See IProjectTemplate!
-				ZipUtil.extract(new File(sample.getLocation()), newProjectHandle.getLocation(),
-						ZipUtil.Conflict.PROMPT, new NullProgressMonitor());
-
+				// Initialize the basic project data
+				projectData.project = newProjectHandle;
+				projectData.directory = mainPage.getLocationURI().getRawPath();
+				projectData.appURL = "http://"; // TODO: not used here. //$NON-NLS-1$
+				doBasicCreateProject(newProjectHandle, description, sample, projectData);
 				doPostProjectCreation(newProjectHandle);
 			}
-		}
-		catch (IOException e)
-		{
-			return null;
 		}
 		catch (CoreException e)
 		{
@@ -232,27 +227,34 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 		return newProject;
 	}
 
-	private void doBasicCreateProject(IProject project, final IProjectDescription description) throws CoreException
+	private void doBasicCreateProject(final IProject project, final IProjectDescription description,
+			final IProjectSample sample, final ProjectData projectData) throws CoreException
 	{
 		// create the new project operation
 		IRunnableWithProgress op = new IRunnableWithProgress()
 		{
 			public void run(IProgressMonitor monitor) throws InvocationTargetException
 			{
-				CreateProjectOperation op = new CreateProjectOperation(description,
-						Messages.NewSampleProjectWizard_CreateOp_Title);
 				try
 				{
+					CreateProjectOperation op = new CreateProjectOperation(description,
+							Messages.NewSampleProjectWizard_CreateOp_Title);
 					// see bug https://bugs.eclipse.org/bugs/show_bug.cgi?id=219901
 					// directly execute the operation so that the undo state is
 					// not preserved. Making this undoable resulted in too many
 					// accidental file deletions.
 					op.execute(monitor, WorkspaceUndoUtil.getUIInfoAdapter(getShell()));
+					sample.createNewProject(project, projectData, monitor);
+				}
+				catch (CoreException e)
+				{
+					throw new InvocationTargetException(e);
 				}
 				catch (ExecutionException e)
 				{
 					throw new InvocationTargetException(e);
 				}
+
 			}
 		};
 

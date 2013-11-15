@@ -17,7 +17,7 @@ import com.aptana.core.build.IBuildParticipant;
 import com.aptana.core.build.IProblem;
 import com.aptana.css.core.ICSSConstants;
 import com.aptana.editor.html.HTMLPlugin;
-import com.aptana.editor.html.IHTMLConstants;
+import com.aptana.editor.html.core.IHTMLConstants;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.js.core.IJSConstants;
 
@@ -40,6 +40,12 @@ public class HTMLParseErrorValidatorTest extends AbstractValidatorTestCase
 	protected String getFileExtension()
 	{
 		return "html";
+	}
+
+	@Override
+	protected String getContentType()
+	{
+		return IHTMLConstants.CONTENT_TYPE_HTML;
 	}
 
 	public void testHTMLSelfClosingTagOnNonVoidElement() throws CoreException
@@ -127,16 +133,12 @@ public class HTMLParseErrorValidatorTest extends AbstractValidatorTestCase
 		assertEquals(0, htmlProblems.size());
 
 		List<IProblem> jsProblems = getParseErrors(text, IJSConstants.JS_PROBLEM_MARKER_TYPE);
-		assertEquals(2, jsProblems.size());
-
+		assertEquals(1, jsProblems.size());
 		IProblem item = jsProblems.get(0);
+
 		assertEquals("Error was not found on expected line", 5, item.getLineNumber());
 		assertEquals("Error message did not match expected error message", "Syntax Error: unexpected token \"}\"",
 				item.getMessage());
-		
-		item = jsProblems.get(1);
-		assertEquals("Warning was not found on expected line", 4, item.getLineNumber());
-		assertEquals("Warning message did not match expected message", "Missing semicolon", item.getMessage());
 	}
 
 	public void testInvalidClosingTag() throws CoreException

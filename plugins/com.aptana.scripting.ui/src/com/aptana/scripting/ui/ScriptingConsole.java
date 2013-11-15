@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -21,7 +21,6 @@ import org.eclipse.ui.console.MessageConsoleStream;
 import com.aptana.scripting.ScriptLogListener;
 import com.aptana.scripting.ScriptLogger;
 import com.aptana.theme.ConsoleThemer;
-import com.aptana.theme.extensions.ConsoleThemePageParticipant;
 
 /**
  * Singleton for the scripting console.
@@ -78,10 +77,6 @@ public class ScriptingConsole
 			getInfoConsoleStream();
 			getWarningConsoleStream();
 			getTraceConsoleStream();
-
-			// Will be used later on by the ConsoleThemePageParticipant to properly set the colors
-			// following the theme.
-			console.setAttribute(ConsoleThemePageParticipant.THEME_CONSOLE_STREAM_TO_COLOR_ATTRIBUTE, streamColorMap);
 
 			// register our console with Eclipse
 			ConsolePlugin.getDefault().getConsoleManager().addConsoles(new IConsole[] { console });

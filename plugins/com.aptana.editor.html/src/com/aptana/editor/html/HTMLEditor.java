@@ -38,9 +38,10 @@ import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IEditorLinkedResources;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
+import com.aptana.editor.html.core.IHTMLConstants;
+import com.aptana.editor.html.core.preferences.IPreferenceConstants;
 import com.aptana.editor.html.outline.HTMLOutlineContentProvider;
 import com.aptana.editor.html.outline.HTMLOutlineLabelProvider;
-import com.aptana.editor.html.preferences.IPreferenceConstants;
 import com.aptana.editor.xml.TagUtil;
 
 @SuppressWarnings("restriction")

@@ -207,7 +207,8 @@ public class ConsoleThemer
 			}
 		};
 
-		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(this.fThemeChangeListener);
+		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID)
+				.addPreferenceChangeListener(this.fThemeChangeListener);
 	}
 
 	/**
@@ -215,7 +216,8 @@ public class ConsoleThemer
 	 */
 	public void dispose()
 	{
-		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(this.fThemeChangeListener);
+		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID)
+				.removePreferenceChangeListener(this.fThemeChangeListener);
 		this.fConsole = null;
 		this.fThemeConsoleStreamToColor = null;
 	}

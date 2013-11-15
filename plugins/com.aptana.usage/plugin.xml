@@ -4,12 +4,6 @@
    <extension-point id="analyticsInfo" name="%extension-point.analytics.name" schema="schema/analyticsInfo.exsd"/>
    <extension-point id="analyticsHandlers" name="%analyticsHandlers-extension-point.name" schema="schema/analyticsHandlers.exsd"/>
    <extension
-         point="org.eclipse.ui.startup">
-      <startup
-            class="com.aptana.usage.PingStartup">
-      </startup>
-   </extension>
-   <extension
          point="com.aptana.usage.analyticsInfo">
       <analytics
             id="com.aptana.usage.analytics"

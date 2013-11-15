@@ -40,6 +40,7 @@ import net.contentobjects.jnotify.JNotifyAdapter;
 import net.contentobjects.jnotify.JNotifyException;
 import net.contentobjects.jnotify.JNotifyListener;
 
+import org.apache.tools.ant.util.CollectionUtils;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -66,6 +67,8 @@ import com.aptana.filewatcher.FileWatcher;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.IDebugScopes;
 import com.aptana.git.core.IPreferenceConstants;
+import com.aptana.git.core.github.IGithubManager;
+import com.aptana.git.core.github.IGithubRepository;
 import com.aptana.git.core.model.GitRef.TYPE;
 
 /**
@@ -82,11 +85,11 @@ public class GitRepository
 	{
 		public int compare(String o1, String o2)
 		{
-			if (o1.contains(BRANCH_DELIMITER) && !o2.contains(BRANCH_DELIMITER))
+			if (o1.indexOf(BRANCH_DELIMITER) != -1 && o2.indexOf(BRANCH_DELIMITER) == -1)
 			{
 				return 1;
 			}
-			if (o2.contains(BRANCH_DELIMITER) && !o1.contains(BRANCH_DELIMITER))
+			if (o2.indexOf(BRANCH_DELIMITER) != -1 && o1.indexOf(BRANCH_DELIMITER) == -1)
 			{
 				return -1;
 			}
@@ -132,9 +135,9 @@ public class GitRepository
 	}
 
 	/**
-	 * Delimiter used to separate remote name and remote brnahc name.
+	 * Delimiter used to separate remote name and remote branch name.
 	 */
-	private static final String BRANCH_DELIMITER = "/"; //$NON-NLS-1$
+	public static final char BRANCH_DELIMITER = '/';
 
 	/**
 	 * Extension of temporary git lock files.
@@ -197,7 +200,7 @@ public class GitRepository
 	/**
 	 * The default 'remote' name for git.
 	 */
-	private static final String ORIGIN = "origin"; //$NON-NLS-1$
+	public static final String ORIGIN = "origin"; //$NON-NLS-1$
 
 	public static final String GIT_DIR = ".git"; //$NON-NLS-1$
 
@@ -211,6 +214,16 @@ public class GitRepository
 	 */
 	private final static Pattern fgRemoteURLPattern = Pattern
 			.compile("\\[remote \"(.+?)\"\\](\\s+[^\\[]+)?\\s+url = (.+?)\\s+"); //$NON-NLS-1$
+
+	/**
+	 * The regexp used to parse out the repo name from a remote pointing at github
+	 */
+	private static final String GITHUB_REMOTE_REGEX = "((.+?github\\.com:)|((git|https)://github\\.com/))([^/]+?)/(.+?)\\.git"; //$NON-NLS-1$
+
+	/**
+	 * Status code for reporting inability to find the github related remote.
+	 */
+	public static final int NO_GITHUB_REMOTE_CODE = 1235;
 
 	/**
 	 * Monitor to allow simultaneous read processes, but only one "write" process which alters the repo/index.
@@ -420,7 +433,7 @@ public class GitRepository
 				@Override
 				public void fileDeleted(int wd, String rootPath, final String name)
 				{
-					if (name == null || name.endsWith(DOT_LOCK))
+					if (name == null || name.endsWith(DOT_LOCK) || branches == null)
 					{
 						return;
 					}
@@ -438,6 +451,10 @@ public class GitRepository
 						{
 							// the branch may in fact still exists
 							reloadRefs();
+							if (branches == null)
+							{
+								return Status.OK_STATUS;
+							}
 							// only fires the event if the branch is indeed removed
 							boolean contains = false;
 							synchronized (branches)
@@ -1070,40 +1087,64 @@ public class GitRepository
 
 	private void fireBranchChangeEvent(String oldBranchName, String newBranchName)
 	{
-		if (listeners == null || listeners.isEmpty())
+		if (CollectionsUtil.isEmpty(listeners))
 		{
 			return;
 		}
-		BranchChangedEvent e = new BranchChangedEvent(this, oldBranchName, newBranchName);
-		for (IGitRepositoryListener listener : listeners)
+		try
 		{
-			listener.branchChanged(e);
+			Set<IGitRepositoryListener> copy = new HashSet<IGitRepositoryListener>(listeners);
+			BranchChangedEvent e = new BranchChangedEvent(this, oldBranchName, newBranchName);
+			for (IGitRepositoryListener listener : copy)
+			{
+				listener.branchChanged(e);
+			}
+		}
+		catch (NullPointerException e)
+		{
+			// ignores
 		}
 	}
 
 	private void fireBranchRemovedEvent(String oldBranchName)
 	{
-		if (listeners == null || listeners.isEmpty())
+		if (CollectionsUtil.isEmpty(listeners))
 		{
 			return;
 		}
-		BranchRemovedEvent e = new BranchRemovedEvent(this, oldBranchName);
-		for (IGitRepositoryListener listener : listeners)
+		try
 		{
-			listener.branchRemoved(e);
+			Set<IGitRepositoryListener> copy = new HashSet<IGitRepositoryListener>(listeners);
+			BranchRemovedEvent e = new BranchRemovedEvent(this, oldBranchName);
+			for (IGitRepositoryListener listener : copy)
+			{
+				listener.branchRemoved(e);
+			}
+		}
+		catch (NullPointerException e)
+		{
+			// ignores
 		}
 	}
 
 	private void fireBranchAddedEvent(String newBranchName)
 	{
-		if (listeners == null || listeners.isEmpty())
+		if (CollectionsUtil.isEmpty(listeners))
 		{
 			return;
 		}
-		BranchAddedEvent e = new BranchAddedEvent(this, newBranchName);
-		for (IGitRepositoryListener listener : listeners)
+		try
 		{
-			listener.branchAdded(e);
+			Set<IGitRepositoryListener> copy = new HashSet<IGitRepositoryListener>(listeners);
+			BranchAddedEvent e = new BranchAddedEvent(this, newBranchName);
+			for (IGitRepositoryListener listener : copy)
+			{
+				listener.branchAdded(e);
+			}
+		}
+		catch (NullPointerException e)
+		{
+			// ignores
 		}
 	}
 
@@ -1120,9 +1161,17 @@ public class GitRepository
 		{
 			return;
 		}
-		for (IGitRepositoryListener listener : listeners)
+		try
 		{
-			listener.indexChanged(e);
+			Set<IGitRepositoryListener> copy = new HashSet<IGitRepositoryListener>(listeners);
+			for (IGitRepositoryListener listener : copy)
+			{
+				listener.indexChanged(e);
+			}
+		}
+		catch (NullPointerException npe)
+		{
+			// ignores
 		}
 	}
 
@@ -1328,18 +1377,37 @@ public class GitRepository
 	 */
 	public Set<String> remoteURLs()
 	{
-		Set<String> remoteURLs = new HashSet<String>();
+		try
+		{
+			return new HashSet<String>(remotePairs().values());
+		}
+		catch (CoreException e)
+		{
+			IdeLog.logError(GitPlugin.getDefault(), e);
+			return Collections.emptySet();
+		}
+	}
+
+	/**
+	 * Returns a Map from remote name to URL.
+	 * 
+	 * @return
+	 */
+	public Map<String, String> remotePairs() throws CoreException
+	{
+		Map<String, String> pairs = new HashMap<String, String>();
 		String contents = configContents();
 		if (contents != null)
 		{
 			Matcher m = fgRemoteURLPattern.matcher(contents);
 			while (m.find())
 			{
-				remoteURLs.add(m.group(3));
+				pairs.put(m.group(1), m.group(3));
 			}
+			return pairs;
 		}
-		// TODO If we can't acquire the config read lock, can we fall back to something else?
-		return remoteURLs;
+		throw new CoreException(new Status(IStatus.ERROR, GitPlugin.PLUGIN_ID,
+				"Unable to acquire read lock to read .git/config file"));
 	}
 
 	/**
@@ -2243,7 +2311,8 @@ public class GitRepository
 	}
 
 	/**
-	 * Adds a new remote with the given name and URL. If track is specified, it will track the current branch only.
+	 * Adds a new remote with the given name and URL. If track is specified, it will track the current branch only. Will
+	 * automatically fetch the remote after adding.
 	 * 
 	 * @param remoteName
 	 * @param url
@@ -2252,11 +2321,32 @@ public class GitRepository
 	 */
 	public IStatus addRemote(String remoteName, String url, boolean track)
 	{
+		return addRemote(remoteName, url, track, true);
+	}
+
+	/**
+	 * Adds a new remote with the given name and URL. If track is specified, it will track the current branch only.
+	 * 
+	 * @param remoteName
+	 * @param url
+	 * @param track
+	 * @param fetch
+	 *            Auto-fetch after adding remote?
+	 * @return
+	 */
+	public IStatus addRemote(String remoteName, String url, boolean track, boolean fetch)
+	{
+		List<String> args = CollectionsUtil.newList("remote", "add"); //$NON-NLS-1$ //$NON-NLS-2$
+		if (fetch)
+		{
+			args.add("-f"); //$NON-NLS-1$
+		}
 		if (track)
 		{
-			return execute(GitRepository.ReadWrite.WRITE, "remote", "add", "--track", currentBranch(), remoteName, url); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			CollectionsUtil.addToList(args, "--track", currentBranch()); //$NON-NLS-1$
 		}
-		return execute(GitRepository.ReadWrite.WRITE, "remote", "add", remoteName, url); //$NON-NLS-1$ //$NON-NLS-2$
+		CollectionsUtil.addToList(args, remoteName, url);
+		return execute(GitRepository.ReadWrite.WRITE, CollectionsUtil.toArray(args));
 	}
 
 	void forceRead()
@@ -2267,5 +2357,110 @@ public class GitRepository
 	void forceWrite()
 	{
 		monitor.writeLock().lock();
+	}
+
+	/**
+	 * Runs git push with any number of optional args.
+	 * 
+	 * @param args
+	 * @return
+	 */
+	public IStatus push(String... args)
+	{
+		String[] fullArgs = new String[args.length + 1];
+		fullArgs[0] = "push"; //$NON-NLS-1$
+		System.arraycopy(args, 0, fullArgs, 1, args.length);
+		IStatus result = execute(GitRepository.ReadWrite.WRITE, fullArgs);
+		if (result == null || !result.isOK())
+		{
+			return result;
+		}
+		firePushEvent();
+		return result;
+	}
+
+	/**
+	 * Runs git pull with any number of optional args.
+	 * 
+	 * @param args
+	 * @return
+	 */
+	public IStatus pull(String... args)
+	{
+		String[] fullArgs = new String[args.length + 1];
+		fullArgs[0] = "pull"; //$NON-NLS-1$
+		System.arraycopy(args, 0, fullArgs, 1, args.length);
+		IStatus result = execute(GitRepository.ReadWrite.WRITE, fullArgs);
+		if (result == null || !result.isOK())
+		{
+			return result;
+		}
+		firePullEvent();
+		return result;
+	}
+
+	/**
+	 * Returns the Github API model for this repository. User must be logged into github API/GithubManager.
+	 * 
+	 * @return
+	 * @throws CoreException
+	 */
+	public IGithubRepository getGithubRepo() throws CoreException
+	{
+		String repoName = getGithubRepoName();
+		if (StringUtil.isEmpty(repoName))
+		{
+			throw new CoreException(new Status(IStatus.ERROR, GitPlugin.PLUGIN_ID, NO_GITHUB_REMOTE_CODE,
+					Messages.GitRepository_NoGithubRemoteAttachedErr, null));
+		}
+
+		List<String> pair = StringUtil.split(repoName, '/');
+		return getGithubManager().getRepo(pair.get(0), pair.get(1));
+	}
+
+	protected IGithubManager getGithubManager()
+	{
+		return GitPlugin.getDefault().getGithubManager();
+	}
+
+	/**
+	 * Looks at the configured remotes and tries to parse out a github.com remote from 'origin'. If found, it grabs the
+	 * name of the repo at github.
+	 * 
+	 * @return
+	 */
+	String getGithubRepoName()
+	{
+		try
+		{
+			Map<String, String> pairs = remotePairs();
+			String remoteURL = pairs.get(GitRepository.ORIGIN);
+			if (remoteURL == null)
+			{
+				return null;
+			}
+
+			Pattern p = Pattern.compile(GITHUB_REMOTE_REGEX);
+			Matcher m = p.matcher(remoteURL);
+			if (!m.find())
+			{
+				return null;
+			}
+			return m.group(5) + '/' + m.group(6);
+		}
+		catch (CoreException e)
+		{
+			return null;
+		}
+	}
+
+	/**
+	 * Does the repo look like it has a remote attached to github.com?
+	 * 
+	 * @return
+	 */
+	public boolean hasGithubRemote()
+	{
+		return getGithubRepoName() != null;
 	}
 }

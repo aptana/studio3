@@ -1,0 +1,102 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<title>Builds view</title>
+</head>
+
+<body>
+<h1>Builds view</h1>
+<p>
+This view shows the list of all the builds contained in the connected database
+or in the local data files if no database is connected.
+</p>
+
+<h2>Information status</h2>
+<p>
+When starting the tool for the first time, this view is empty as no data has been
+populated, neither from the <a href="local_data.html">local data</a> files
+nor from the performance results database.
+</p><p>
+The typical usage of the performance tools is to read local data files copied
+from the server (see <a href="local_data.html">local data</a>). When this has
+been done, build names are displayed in this view using normal black color.
+</p>
+Some or all build names of the list may be displayed in a different font when
+a performance results database is connected:
+<ul>
+<li>
+<i><font color="#888888">gray and italic</font></i>: no local data files
+were read
+<p><img src="images/builds-nolocaldata.png" alt="Builds view with no local data"/></p>
+</li>
+<li>
+<font color="#888888">gray</font></i>: the local data files were read but contain
+no information about this build (typically new performance tests ran but the local
+data files were not copied since then):
+<p><img src="images/builds-missinglocaldata.png" alt="Builds view with missing local data"/></p>
+In this case it's possible to update those builds using the popup-menu:
+<p><img src="images/builds-update.png" alt="Update local data builds"/></p>
+It's also possible to rewrite the local data files from the database contents
+in one shot using the toolbar pull-up menu:
+<p><img src="images/builds-updateall.png" alt="Update all local data"/></p>
+</li>
+</ul>
+
+<h2>Generate</h2>
+<p>
+From this view, it is also possible to generate HTML pages using the generate
+command accessible from the popup-menu:
+<p><img src="images/builds-generate-menu.png" alt="Generate results: menu item"/></p>
+<p>
+After having selected the directory where to put the generated files, it's possible
+to choose the baseline to compare with:
+<p><img src="images/builds-generate-baseline.png" alt="Generate results: baseline selection"/></p>
+<p>
+And also whether you only want to generate the fingerprints or all the data:
+<p><img src="images/builds-generate-fingerprints.png" alt="Generate results: fingerprints"/></p>
+<p>
+After the generation ends, there should be in the specified directory similar
+files than the one generated on eclipsebuildserv.
+</p><p>
+<i>Note that a PHP server is neeeded to be able to read these files as it's done on
+eclipsebuildserv or fullmoon...</i>
+</p>
+
+<h2><a name="writecomparison">Write comparison</h2>
+<p>
+From this view, it is also possible to write the comparison between two 
+selected builds using the <b>Write comparison</b> item of the View menu:
+</p>
+<p><img src="images/write-comparison-menu.png" alt="Write comparison menu item"/></p>
+<p>
+The written HTML file will contain the Scenario Status Table as it would
+have been generated but comparing the two selected build instead of comparing
+a build vs a baseline.
+</p><p>
+This is helpful to see if a regression occurs after having made a change with 
+possible impact performance...
+</p>
+<p>Note that this comparison can also be shown in the
+<a href="builds-comparison.html">Builds Comparison view</a>...
+</p>
+
+<h2>Filters</h2>
+<p>
+There are several possible filters in this view.
+ 
+<h3>Builds filters</h3>
+<ul>
+<li>Baseline: hide the baselines (starting with R-3.x)</li>
+<li>Nightly: hide the nightly builds (starting with 'N')</li>
+<li>Old: hide all builds before last milestone except earlier milestones</li>
+</ul>
+<p>
+In this view baselines filter is not activated by default. It's because it may
+be interesting to know which baselines have results in the DB.
+Note that this filter is not synchronized with the one in Components view.
+</p>
+
+</body>
+</html>

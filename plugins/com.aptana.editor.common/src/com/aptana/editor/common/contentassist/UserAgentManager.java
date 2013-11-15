@@ -228,6 +228,11 @@ public class UserAgentManager implements IUserAgentManager
 		return CorePlugin.getDefault().getUserAgentManager().getAllUserAgents();
 	}
 
+	public boolean addUserAgent(IUserAgent agent)
+	{
+		return CorePlugin.getDefault().getUserAgentManager().addUserAgent(agent);
+	}
+
 	/**
 	 * Returns a list of user agent IDs which are the default IDs for the specified nature. This method is typically
 	 * used in part to reset the list of active user agents for a given nature ID, particularly in the Content Assist

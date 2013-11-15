@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?NLS TYPE="org.eclipse.help.toc"?>
+
+<toc label="Performance Results Guide">
+	<topic label="Overview"  href="html/overview.html"> 
+		<topic label="Preferences" href="html/preferences.html"/> 
+		<topic label="Local data" href="html/local_data.html"/> 
+	</topic>
+	<topic label="Views">
+		<topic label="Components" href="html/components.html"/> 
+		<topic label="Properties" href="html/properties.html"/> 
+		<topic label="Builds" href="html/builds.html"/> 
+		<topic label="Results" href="html/results.html"/>
+		<topic href="html/builds-comparison.html" label="Builds Comparison"/>
+	</topic>
+	<topic label="Verification" href="html/verification.html"/> 
+</toc>

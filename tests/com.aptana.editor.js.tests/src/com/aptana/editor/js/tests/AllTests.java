@@ -8,6 +8,7 @@
 package com.aptana.editor.js.tests;
 
 import junit.framework.Test;
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 public class AllTests
@@ -15,7 +16,15 @@ public class AllTests
 
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite("All tests for com.aptana.editor.js");
+		TestSuite suite = new TestSuite("All tests for com.aptana.editor.js")
+		{
+			@Override
+			public void runTest(Test test, TestResult result)
+			{
+				System.err.println("Running test: " + test.toString());
+				super.runTest(test, result);
+			}
+		};
 		// $JUnit-BEGIN$
 		suite.addTest(com.aptana.editor.js.EditorJSTests.suite());
 		suite.addTest(com.aptana.editor.js.contentassist.ContentAssistTests.suite());

@@ -15,6 +15,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.team.ui.TeamUI;
 import org.eclipse.ui.IFileEditorInput;
@@ -84,6 +85,7 @@ public class ShowInHistoryHandler extends AbstractHandler
 	@SuppressWarnings("unchecked")
 	private IResource getResource(IEvaluationContext evContext)
 	{
+		// If we have showIn value, use it
 		Object input = evContext.getVariable(ISources.SHOW_IN_INPUT);
 		if (input instanceof IFileEditorInput)
 		{
@@ -91,11 +93,25 @@ public class ShowInHistoryHandler extends AbstractHandler
 			return fei.getFile();
 		}
 
+		// Otherwise check if we are inside an editor
+		Object selection = evContext.getVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME);
+		if (selection instanceof ITextSelection)
+		{
+			// we're inside an editor!
+			input = evContext.getVariable(ISources.ACTIVE_EDITOR_INPUT_NAME);
+			if (input instanceof IFileEditorInput)
+			{
+				IFileEditorInput fei = (IFileEditorInput) input;
+				return fei.getFile();
+			}
+		}
+
+		// Try the default variable, probably a selection in Project/App Explorer
 		input = evContext.getDefaultVariable();
 		if (input instanceof IStructuredSelection)
 		{
-			IStructuredSelection selection = (IStructuredSelection) input;
-			Object[] selectedFiles = selection.toArray();
+			IStructuredSelection ss = (IStructuredSelection) input;
+			Object[] selectedFiles = ss.toArray();
 			for (Object selected : selectedFiles)
 			{
 				if (selected instanceof IResource)

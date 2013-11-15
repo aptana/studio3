@@ -45,6 +45,7 @@ public class HTMLSourcePartitionScannerTest extends TestCase
 	{
 		if (partitioner == null)
 		{
+			// FIXME Call HTMLDocumentProvider.connect?
 			IDocument document = new Document(content);
 			CompositePartitionScanner partitionScanner = new CompositePartitionScanner(HTMLSourceConfiguration
 					.getDefault().createSubPartitionScanner(), new NullSubPartitionScanner(),
@@ -93,6 +94,13 @@ public class HTMLSourcePartitionScannerTest extends TestCase
 		assertContentType(HTMLSourceConfiguration.HTML_COMMENT, source, 51);
 		assertContentType(HTMLSourceConfiguration.HTML_COMMENT, source, 52);
 		assertContentType(HTMLSourceConfiguration.DEFAULT, source, 53);
+	}
+	
+	public void testLessThan()
+	{
+		String source = "<";
+
+		assertContentType(HTMLSourceConfiguration.HTML_TAG, source, 0);
 	}
 
 	public void testAllPartitionTypes()

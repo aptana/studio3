@@ -12,10 +12,16 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 
 /**
+ * This is a service that handles installing NodeJS itself, checking if it's installed, detecting existing
+ * installations, Verifying valid executables, listening for installs, etcs.
+ * 
  * @author cwilliams
  */
 public interface INodeJSService
 {
+
+	// FIXME We need to introduce the conecpt of an INodeJSInstall or INodeJSExecutable. User may have multiple versions
+	// installed!
 
 	public static interface Listener
 	{
@@ -26,49 +32,34 @@ public interface INodeJSService
 	public static final String LINUX_DOCS_URL = "http://go.aptana.com/Installing+Node.js"; //$NON-NLS-1$
 	public static final String UPGRADE_URL = "http://go.aptana.com/Upgrading+Node.js"; //$NON-NLS-1$
 
-	public static final String MIN_NODE_VERSION = "0.8.13"; //$NON-NLS-1$
-
 	public static final String NODE = "node"; //$NON-NLS-1$
 
 	/**
-	 * Error codes returned by {@link #acceptBinary(IPath)}
-	 */
-	public static final int ERR_DOES_NOT_EXIST = 1;
-	public static final int ERR_NOT_EXECUTABLE = 2;
-	public static final int ERR_INVALID_VERSION = 3;
-
-	/**
-	 * Determines if the given path points to a valid nodejs executable (exists, can be run, is in the supported version
-	 * range).
-	 * 
-	 * @param path
-	 * @return {@link IStatus}
-	 */
-	public IStatus acceptBinary(IPath path);
-
-	/**
-	 * Searches PATH find the node executable and return it's {@link IPath}. This is not guaranteed to be a valid
-	 * version. Please check using {@link #acceptBinary(IPath)}
+	 * Searches PATH find the node executable and return it. This is not guaranteed to be a valid version. Please check
+	 * using {@link INodeJS#validate()}. This value should really only be used to display the detected version! Use
+	 * {@link #getValidExecutable()} to get the install to use for commands! May return null if no install detected!
 	 * 
 	 * @return
 	 */
-	public IPath find();
+	public INodeJS detectInstall();
 
 	/**
-	 * Returns the path saved in the user's preferences. This is not guaranteed to be a valid version. Please check
-	 * using {@link #acceptBinary(IPath)}
+	 * Returns the NodeJS install that user set path to in preferences. This is not guaranteed to be a valid version.
+	 * Please check using {@link INodeJS#validate()}. To actually run commands against executable use
+	 * {@link #getValidExecutable()}
 	 * 
 	 * @return
 	 */
-	public IPath getSavedPath();
+	public INodeJS getInstallFromPreferences();
 
 	/**
-	 * Attempts to return the {@link #getSavedPath()} if it passes {@link #acceptBinary(IPath)}. Otherwise, attempts to
-	 * return path from {@link #find()} if that passes {@link #acceptBinary(IPath)}.
+	 * Attempts to return the {@link #getInstallFromPreferences()} if it passes validation. Otherwise, attempts to
+	 * return path from {@link #detectInstall()} if that passes validation. This is what should be used to execute node
+	 * commands.
 	 * 
 	 * @return
 	 */
-	public IPath getValidExecutable();
+	public INodeJS getValidExecutable();
 
 	/**
 	 * Downloads and then installs NodeJS for the user on Windows and Mac.
@@ -91,12 +82,18 @@ public interface INodeJSService
 	 */
 	public IStatus validateSourcePath(IPath path);
 
-	public String getVersion(IPath path);
-
 	/**
 	 * Checks whether NodeJS is already installed on the machine.
 	 * 
 	 * @return true if NodeJS is already available on the machine.
 	 */
 	public boolean isInstalled();
+
+	/**
+	 * Calls {@link INodeJS#validate()} for the path.
+	 * 
+	 * @param fromOSString
+	 * @return
+	 */
+	public IStatus acceptBinary(IPath nodeJSBinary);
 }

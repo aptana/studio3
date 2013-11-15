@@ -81,6 +81,11 @@
                style="push">
             <visibleWhen
                   checkEnabled="true">
+                  <iterate>
+		               <instanceof
+		                     value="com.aptana.samples.model.IProjectSample">
+		               </instanceof>
+		           </iterate>
             </visibleWhen>
          </command>
       </menuContribution>

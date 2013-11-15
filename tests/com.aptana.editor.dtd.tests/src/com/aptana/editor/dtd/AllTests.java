@@ -8,6 +8,7 @@
 package com.aptana.editor.dtd;
 
 import junit.framework.Test;
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 public class AllTests
@@ -15,7 +16,15 @@ public class AllTests
 
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite("Tests for com.aptana.editor.dtd");
+		TestSuite suite = new TestSuite("Tests for com.aptana.editor.dtd")
+		{
+			@Override
+			public void runTest(Test test, TestResult result)
+			{
+				System.err.println("Running test: " + test.toString());
+				super.runTest(test, result);
+			}
+		};
 		// $JUnit-BEGIN$
 		suite.addTestSuite(DTDSourcePartitionScannerTest.class);
 		suite.addTestSuite(DTDTagScannerTest.class);

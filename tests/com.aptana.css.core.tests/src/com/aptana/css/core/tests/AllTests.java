@@ -9,6 +9,7 @@ package com.aptana.css.core.tests;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 import com.aptana.css.core.index.CSSIndexTests;
@@ -20,7 +21,15 @@ public class AllTests extends TestCase
 
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite(AllTests.class.getName());
+		TestSuite suite = new TestSuite(AllTests.class.getName())
+		{
+			@Override
+			public void runTest(Test test, TestResult result)
+			{
+				System.err.println("Running test: " + test.toString());
+				super.runTest(test, result);
+			}
+		};
 		// $JUnit-BEGIN$
 		suite.addTest(CSSParsingTests.suite());
 		suite.addTest(CSSIndexTests.suite());

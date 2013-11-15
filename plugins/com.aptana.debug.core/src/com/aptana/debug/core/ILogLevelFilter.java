@@ -10,8 +10,6 @@ package com.aptana.debug.core;
 import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.debug.core.model.IProcess;
 
-import com.aptana.console.process.IProcessOutputFilter;
-
 /**
  * Log-Level filter interface. Implementations of this interface can be added to the logLevelFilters extension point in
  * order to filter out console output that arrives from an IProcess.

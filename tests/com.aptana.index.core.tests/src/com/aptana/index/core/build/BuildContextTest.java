@@ -13,7 +13,6 @@ import org.eclipse.core.runtime.CoreException;
 
 import beaver.Symbol;
 
-import com.aptana.core.build.IProblem.Severity;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ParseResult;
 import com.aptana.parsing.ParseState;
@@ -52,7 +51,7 @@ public class BuildContextTest extends TestCase
 					throws Exception
 			{
 				reparses[0] += 1;
-				working.addError(new ParseError("language", new Symbol(1), Severity.ERROR));
+				working.addError(new ParseError("language", new Symbol(1), null));
 				working.setParseResult(parseRootNode);
 				return working.getImmutableResult();
 			}

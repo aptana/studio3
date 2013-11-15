@@ -60,7 +60,7 @@ public class RebaseBranchHandler extends AbstractGitHandler
 		}
 		if (!listOfMaps.isEmpty())
 		{
-			QuickMenuDialog dialog = new QuickMenuDialog(getShell());
+			QuickMenuDialog dialog = new QuickMenuDialog(getShell(), Messages.RebaseBranchHandler_PopupTitle);
 			dialog.setInput(listOfMaps);
 			if (dialog.open() != -1)
 			{

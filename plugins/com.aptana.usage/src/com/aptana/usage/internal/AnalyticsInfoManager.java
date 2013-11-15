@@ -21,10 +21,12 @@ import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.StringUtil;
+import com.aptana.usage.AnalyticsInfo;
+import com.aptana.usage.IAnalyticsInfoManager;
 import com.aptana.usage.IAnalyticsUserManager;
 import com.aptana.usage.UsagePlugin;
 
-public class AnalyticsInfoManager
+public class AnalyticsInfoManager implements IAnalyticsInfoManager
 {
 
 	private static final String EXTENSION_POINT_ID = "analyticsInfo"; //$NON-NLS-1$
@@ -40,28 +42,20 @@ public class AnalyticsInfoManager
 	private static final String ATTR_USER_AGENT = "userAgent"; //$NON-NLS-1$
 	private static final String ATTR_USER_MANAGER = "userManager"; //$NON-NLS-1$
 
-	private static AnalyticsInfoManager instance;
-
 	private Map<String, Analytics> fAnalyticsMap;
 
-	public synchronized static AnalyticsInfoManager getInstance()
-	{
-		if (instance == null)
-		{
-			instance = new AnalyticsInfoManager();
-		}
-		return instance;
-	}
-
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.usage.IAnalyticsInfoManager#getInfo(java.lang.String)
+	 */
 	public AnalyticsInfo getInfo(String id)
 	{
 		Analytics analytics = fAnalyticsMap.get(id);
 		return (analytics == null) ? null : analytics.info;
 	}
 
-	private AnalyticsInfoManager()
+	public AnalyticsInfoManager()
 	{
-
 		loadExtension();
 	}
 

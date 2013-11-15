@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -12,6 +12,8 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.eclipse.core.runtime.IPath;
 
 import com.aptana.core.util.SourcePrinter;
 
@@ -25,6 +27,7 @@ public class ProjectSampleElement extends AbstractBundleElement
 	private String fLocation;
 	private String fDescription;
 	private String[] fProjectNatures;
+	private IPath fDestinationPath;
 	private Map<String, String> fIconPaths;
 	private Map<String, URL> fIconUrls;
 
@@ -36,6 +39,31 @@ public class ProjectSampleElement extends AbstractBundleElement
 		super(path);
 		fIconPaths = new HashMap<String, String>();
 		fIconUrls = new HashMap<String, URL>();
+	}
+
+	/**
+	 * @param sourcePath
+	 * @param id
+	 * @param displayName
+	 * @param categoryId
+	 * @param description
+	 * @param icon
+	 * @param destinationPath
+	 */
+	public ProjectSampleElement(String sourcePath, String id, String displayName, String categoryId,
+			String description, URL icon, IPath destinationPath, String[] natures)
+	{
+		super(sourcePath);
+		fLocation = sourcePath;
+		fSampleId = id;
+		fCategoryId = categoryId;
+		fDescription = description;
+		fDestinationPath = destinationPath;
+		fProjectNatures = natures;
+		fIconPaths = new HashMap<String, String>();
+		fIconUrls = new HashMap<String, URL>();
+		setDisplayName(displayName);
+		setIcon(DEFAULT_ICON, icon.toExternalForm());
 	}
 
 	/**
@@ -155,6 +183,11 @@ public class ProjectSampleElement extends AbstractBundleElement
 	public void setNatures(String[] natures)
 	{
 		fProjectNatures = natures;
+	}
+
+	public IPath getDestinationPath()
+	{
+		return fDestinationPath;
 	}
 
 	public void setIcon(String defaultIcon)

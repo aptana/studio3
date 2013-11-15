@@ -17,5 +17,24 @@
          </enabledWhen>
       </page>
    </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            id="com.aptana.ui.command.preferences"
+            name="%preferences.command.name">
+         <commandParameter
+               id="preferencePageId"
+               name="%preferences.commandParameter.name"
+               optional="false">
+         </commandParameter>
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="com.aptana.ui.handlers.ShowFilteredPreferencePageHandler"
+            commandId="com.aptana.ui.command.preferences">
+      </handler>
+   </extension>
 
 </plugin>

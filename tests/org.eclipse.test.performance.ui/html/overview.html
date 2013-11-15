@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<title>Overview</title>
+</head>
+
+<body>
+<h1>Overview</h1>
+The performance results tool provide an easy way to look at results collected
+while running performance tests on a build. It is accessible using the
+<b>Performance Results</b> perspective:
+<p><img src="images/perspective.png" alt="Performance Results perspective"/></p>
+<p>
+There are 4 views in this perspective:
+<ul>
+<li><a href="components.html">Components view</a>: This is the view to see
+the results in details for each components</li>
+<li><a href="builds.html">Builds view</a>: This is the view to see all builds,
+update local data and generate results when necessary</li>
+<li><a href="results.html">Components Results view</a>: This is the view to
+see whole results for each machine in a single table</li>
+<li><a href="properties.html">Properties view</a>: Display element properties
+(typically results numbers and other database information)</li>
+</ul>
+</p><p>
+The goal of this tool is both to look at performance results database numbers
+and to verify whether a build result have scenarios showing performance regression.
+</p><p>
+The view to use to look at performance results number is the
+<a href="components.html">Components view</a>. In this view, results are
+displayed in a hierarchical tree which have a similar structure than
+the generated HTML pages (e.g.
+<a href="http://download.eclipse.org/eclipse/downloads/drops/R-3.6-201006080911/performance/performance.php">Eclipse 3.6.0</a>).
+The complete performance results information is provided on each element of the tree in the
+<a href="properties.html">Properties view</a>. This is typically useful when a scenario
+results looks weird to have the ability to verify that the numbers looks correct
+or not.
+</p><p>
+The view to verify whether a regression occurs is the <a href="results.html">Components Results view</a>.
+All results for one component are shown in a single table which also provides
+all necessary information to decide whether a noticed regression could be confirmed
+or not.
+</p>
+</body>
+</html>

@@ -8,6 +8,7 @@
 package com.aptana.editor.css.tests;
 
 import junit.framework.Test;
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 import com.aptana.editor.css.CSSCodeScannerFlexTest;
@@ -22,7 +23,15 @@ public class AllTests
 
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite("Test for com.aptana.editor.css.tests");
+		TestSuite suite = new TestSuite("Test for com.aptana.editor.css.tests")
+		{
+			@Override
+			public void runTest(Test test, TestResult result)
+			{
+				System.err.println("Running test: " + test.toString());
+				super.runTest(test, result);
+			}
+		};
 		// $JUnit-BEGIN$
 		suite.addTestSuite(CSSCodeScannerTest.class);
 		suite.addTestSuite(CSSCodeScannerFlexTest.class);

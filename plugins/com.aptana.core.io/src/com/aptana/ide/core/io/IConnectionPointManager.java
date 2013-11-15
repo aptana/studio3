@@ -55,15 +55,4 @@ public interface IConnectionPointManager extends IAdaptable
 	public List<IConnectionPoint> addConnectionsFrom(IPath path);
 
 	public List<IConnectionPoint> readConnectionsFrom(IPath path);
-
-	/**
-	 * For migrating connection point from Studio 1.5.
-	 * 
-	 * @param type
-	 *            the type of the connection point (in 1.5)
-	 * @param data
-	 *            the data that represents the connection point (in 1.5)
-	 * @return
-	 */
-	public IConnectionPoint restore15ConnectionPoint(String type, String data) throws CoreException;
 }

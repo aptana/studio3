@@ -17,16 +17,13 @@ import com.aptana.theme.preferences.IPreferenceConstants;
 public class ThemerPreferenceInitializer extends AbstractPreferenceInitializer
 {
 
-	public static final String DEFAULT_THEME = "Aptana Studio"; //$NON-NLS-1$
+	public static final String DEFAULT_THEME = "Light Studio"; //$NON-NLS-1$
 
 	@Override
 	public void initializeDefaultPreferences()
 	{
 		IEclipsePreferences node = EclipseUtil.defaultScope().getNode(ThemePlugin.PLUGIN_ID);
 		node.put(IPreferenceConstants.ACTIVE_THEME, DEFAULT_THEME);
-		// By default only apply theme to editors
-		node.putBoolean(IPreferenceConstants.APPLY_TO_ALL_VIEWS, false);
-
 		// For standalone products, apply our editor theme to 3rd-party editors
 		boolean isStandalone = (EclipseUtil.isStandalone() || EclipseUtil
 				.getPluginVersion("com.appcelerator.titanium.rcp") != null); //$NON-NLS-1$

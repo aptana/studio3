@@ -162,4 +162,11 @@ public class UserAgentManager implements IUserAgentManager
 		lazyLoad();
 		return fUserAgents.get(id);
 	}
+
+	public boolean addUserAgent(IUserAgent agent)
+	{
+		lazyLoad();
+		fUserAgents.put(agent.getID(), agent);
+		return true;
+	}
 }

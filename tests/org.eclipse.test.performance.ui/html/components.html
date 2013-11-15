@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<title>Components view</title>
+</head>
+
+<body>
+<h1>Components view</h1>
+<p>
+This view shows the performance results in similar way than the one used to generate
+the performance results, hence make it easy to match the numbers in the corresponding
+page HTML page.
+</p><p>
+When starting the tool for the first time, this view is empty as no data has been
+populated, neither from the <a href="local_data.html">local data</a> files
+nor from the performance results database.
+</p>
+
+
+<h2>Hierarchical tree</h2>
+<p>
+Typically, the Eclipse builder runs performance tests for each component after
+the build is made on several performance test machines. Each component defines one
+or several specific performance test suites made of several test (aka scenario).
+</p><p>
+Several performance numbers (e.g. Elapsed Process Time and CPU Time) are stored
+for each scenario and all build results are available in the performance results
+database.
+</p><p>
+Hence the tree structure is made as follow:
+<pre>
+Component
+   + Scenario
+      + Test machine
+         + Build
+            + Performance numbers
+</pre>
+and may look as follow:
+<p><img src="images/components.png" alt="Components view"/></p>
+
+<h2>Icons</h2>
+<p>
+Several icons are displayed on tree element, here are their meaning.
+</p><p>
+The red cross means that there's at least one scenario on one machine for
+the last build with a failure (i.e. a regression over 10%).
+</p><p>
+The warning icon means that some warnings occur for some results.
+The current possible warning are:
+<ul>
+<li>error over the 3% threshold on test(s)</li>
+<li>unreliable test(s): the deviation through the test(s) history is over 20%</li>
+<li>unstable test(s): the deviation through the test(s) history is between 10 and 20%</li>
+<li>no baseline for test(s)</li>
+<li>only one run on test(s)</li>
+</ul>
+</p><p>
+The information icon gives some other interesting information:
+<ul>
+<li>the Student T-test fails on test(s)</li>
+<li>the test(s) value or its delta is less than 100ms</li>
+</ul>
+</p><p>
+Note that for component and scenario level, the status is the aggregation of
+the children status. That means that as soon as one scenario is in error then
+the component is also flagged in error. And of course the higher severity is
+displayed masking lower possible icons.
+</p>
+
+<h2>Filters</h2>
+<p>
+There are several possible filters in this view:
+
+<h3>Builds filters</h3>
+<ul>
+<li>Baseline: hide the baselines (starting with R-3.x)</li>
+<li>Nightly: hide the nightly builds (starting with 'N')</li>
+<li>Old: hide all builds before last milestone except earlier milestones</li>
+</ul>
+
+<h3>Scenarios filter</h3>
+<ul>
+<li>Advanced scenarios: hide the scenarios which are not in the fingerprints</li>
+</ul>
+<p>
+As baselines results are not really useful for the survey, the filter is activated
+by default in this view. Currently the survey only concerns the fingerprints
+scenario, hence the corresponding filter is also activated by default.
+</p>
+
+<h2><a name="writestatus">Write status</h2>
+<p>
+From this view, it is also possible to write the status file for the last
+active build (see <a href="preferences.html#lastbuild">Last build</a>) by
+using the <b>Write status</b> item of the View menu:
+</p>
+<p><img src="images/write-status-menu.png" alt="Write status menu item"/></p>
+<p>
+The written status file will contain all scenarios which have failures,
+except those excluded by the status preferences set in the preferences page
+(see <a href="preferences.html#status">Status</a>)
+</p><p>
+Then it's easy to see the new regression occurring in a build when comparing
+to the previous build status file:
+</p>
+<p><img src="images/write-status-comparison.png" alt="Compare write status files"/></p>
+</body>
+</html>

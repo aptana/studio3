@@ -19,23 +19,13 @@
       <perspectiveExtension
             targetID="com.aptana.ui.WebPerspective">
          <viewShortcut
-               id="com.aptana.explorer.view">
-         </viewShortcut>
-         <view
-               id="org.eclipse.ui.navigator.ProjectExplorer"
-               minimized="false"
-               relationship="stack"
-               relative="com.aptana.explorer.view"
-               visible="true">
-         </view>
-         <viewShortcut
                id="org.eclipse.ui.navigator.ProjectExplorer">
          </viewShortcut>
          <view
                id="com.aptana.ui.io.remoteview"
                minimized="false"
                relationship="stack"
-               relative="com.aptana.explorer.view"
+               relative="org.eclipse.ui.navigator.ProjectExplorer"
                visible="false">
          </view>
          <viewShortcut
@@ -137,6 +127,13 @@
          <viewShortcut
                id="com.aptana.webserver.ui.view">
          </viewShortcut>
+         <view
+               id="com.aptana.explorer.view"
+               minimized="false"
+               relationship="stack"
+               relative="org.eclipse.ui.navigator.ProjectExplorer"
+               visible="false">
+         </view>
       </perspectiveExtension>
    </extension>
    <extension

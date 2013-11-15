@@ -7,14 +7,12 @@
  */
 package com.aptana.samples.ui.views;
 
-import java.io.File;
 import java.net.URL;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
@@ -53,21 +51,17 @@ public class SamplesViewLabelProvider extends ColumnLabelProvider
 	{
 		if (element instanceof SampleCategory)
 		{
-			String iconFile = ((SampleCategory) element).getIconFile();
+			SampleCategory category = (SampleCategory) element;
+			URL iconFile = category.getIconFile();
 			if (iconFile != null)
 			{
-				File file = new File(iconFile);
-				if (file.exists())
+				Image image = imageRegistry.get(category.getId());
+				if (image == null)
 				{
-					String iconFilename = file.getAbsolutePath();
-					Image image = imageRegistry.get(iconFilename);
-					if (image == null)
-					{
-						image = new Image(Display.getDefault(), iconFilename);
-						imageRegistry.put(iconFilename, image);
-					}
-					return image;
+					ImageDescriptor desc = ImageDescriptor.createFromURL(iconFile);
+					imageRegistry.put(category.getId(), desc);
 				}
+				return imageRegistry.get(category.getId());
 			}
 			// uses folder as the default image
 			return IMAGE_FOLDER;

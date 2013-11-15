@@ -16,6 +16,9 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.aptana.debug.core.FilterProxyInputStream;
+import com.aptana.debug.core.IProcessOutputFilter;
+
 import junit.framework.TestCase;
 
 /**

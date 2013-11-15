@@ -15,14 +15,14 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.test.performance.PerformanceTestCase;
+import org.eclipse.test.performance.GlobalTimePerformanceTestCase;
 import org.jruby.Ruby;
 import org.jruby.RubyRegexp;
 import org.jruby.util.RegexpOptions;
 
 import com.aptana.core.util.IOUtil;
 
-public class RubyRegexpFolderPerformanceTest extends PerformanceTestCase
+public class RubyRegexpFolderPerformanceTest extends GlobalTimePerformanceTestCase
 {
 
 	public void testYUICSSFolding() throws Exception

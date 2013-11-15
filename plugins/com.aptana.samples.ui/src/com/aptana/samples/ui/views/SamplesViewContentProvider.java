@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -16,6 +16,7 @@ import org.eclipse.jface.viewers.Viewer;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.samples.ISamplesManager;
 import com.aptana.samples.SamplesPlugin;
+import com.aptana.samples.model.IProjectSample;
 import com.aptana.samples.model.SampleCategory;
 import com.aptana.samples.model.SamplesReference;
 
@@ -43,7 +44,7 @@ public class SamplesViewContentProvider implements ITreeContentProvider
 			List<SampleCategory> result = new ArrayList<SampleCategory>();
 			for (SampleCategory category : categories)
 			{
-				List<SamplesReference> samples = manager.getSamplesForCategory(category.getId());
+				List<IProjectSample> samples = manager.getSamplesForCategory(category.getId());
 				if (samples != null && samples.size() > 0)
 				{
 					result.add(category);
@@ -53,10 +54,10 @@ public class SamplesViewContentProvider implements ITreeContentProvider
 		}
 		if (parentElement instanceof SampleCategory)
 		{
-			List<SamplesReference> samplesRefs = SamplesPlugin.getDefault().getSamplesManager()
+			List<IProjectSample> samplesRefs = SamplesPlugin.getDefault().getSamplesManager()
 					.getSamplesForCategory(((SampleCategory) parentElement).getId());
 			List<Object> children = new ArrayList<Object>();
-			for (SamplesReference ref : samplesRefs)
+			for (IProjectSample ref : samplesRefs)
 			{
 				children.add(ref);
 			}

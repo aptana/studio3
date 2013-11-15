@@ -19,10 +19,4 @@ public interface IDebugScopes
 	 * Items related to the connection process
 	 */
 	String CONNECTIONS = CoreIOPlugin.PLUGIN_ID + "/debug/connections"; //$NON-NLS-1$
-
-	/**
-	 * Items related to the download process
-	 */
-	String DOWNLOAD = CoreIOPlugin.PLUGIN_ID + "/debug/download"; //$NON-NLS-1$
-
 }
