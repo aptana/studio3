@@ -21,6 +21,7 @@ import org.eclipse.core.commands.NotEnabledException;
 import org.eclipse.core.commands.NotHandledException;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.e4.ui.services.EContextService;
 import org.eclipse.jface.bindings.Binding;
 import org.eclipse.jface.bindings.BindingManagerEvent;
 import org.eclipse.jface.bindings.IBindingManagerListener;
@@ -41,8 +42,6 @@ import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.contexts.IContextActivation;
-import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.handlers.IHandlerActivation;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.keys.IBindingService;
@@ -67,6 +66,8 @@ import com.aptana.ui.keybinding.KeyBindingHelper;
 public class FindBarActions
 {
 
+	private static final String CONTEXT_ID = "org.eclipse.ui.textEditorScope.findbar"; //$NON-NLS-1$
+
 	public static final String HIDE_FIND_BAR_COMMAND_ID = "org.eclipse.ui.edit.findbar.hide"; //$NON-NLS-1$
 	public static final String FIND_PREVIOUS_COMMAND_ID = "org.eclipse.ui.edit.findbar.findPrevious"; //$NON-NLS-1$
 	public static final String FIND_NEXT_COMMAND_ID = "org.eclipse.ui.edit.findbar.findNext"; //$NON-NLS-1$
@@ -88,7 +89,6 @@ public class FindBarActions
 	public static final String SHOW_OPTIONS_COMMAND_ID = "org.eclipse.ui.edit.findbar.showOptions"; //$NON-NLS-1$
 
 	private boolean fActivated;
-	private IContextActivation findBarContextActivation;
 
 	private final Map<String, AbstractHandler> fCommandToHandler = new HashMap<String, AbstractHandler>();
 	private final List<IHandlerActivation> fHandlerActivations = new ArrayList<IHandlerActivation>();
@@ -114,7 +114,6 @@ public class FindBarActions
 
 	// Map of context activations that the find bar is responsible for enabling/disabling contexts
 	private List<String> editorContextIds = new ArrayList<String>();
-	private List<IContextActivation> editorContextActivations = new ArrayList<IContextActivation>();
 
 	public FindBarActions(ITextEditor textEditor, FindBarDecorator findBarDecorator)
 	{
@@ -597,7 +596,7 @@ public class FindBarActions
 	{
 		fActivated = activate;
 		IWorkbenchPartSite site = textEditor.getSite();
-		IContextService contextService = (IContextService) site.getService(IContextService.class);
+		EContextService contextService = (EContextService) site.getService(EContextService.class);
 		IHandlerService handlerService = (IHandlerService) site.getService(IHandlerService.class);
 		IBindingService service = (IBindingService) site.getService(IBindingService.class);
 
@@ -620,22 +619,23 @@ public class FindBarActions
 			service.setKeyFilterEnabled(false);
 
 			service.addBindingManagerListener(fClearCommandToBindingOnChangesListener);
-			findBarContextActivation = contextService.activateContext("org.eclipse.ui.textEditorScope.findbar"); //$NON-NLS-1$
+			contextService.activateContext(CONTEXT_ID);
 
-			contextService.deactivateContexts(editorContextActivations);
+			for (String editorContextId : editorContextIds)
+			{
+				contextService.deactivateContext(editorContextId);
+			}
 		}
 		else
 		{
 			fCommandToBinding = null;
 			service.setKeyFilterEnabled(true);
-			if (findBarContextActivation != null)
-			{
-				service.removeBindingManagerListener(fClearCommandToBindingOnChangesListener);
-				handlerService.deactivateHandlers(fHandlerActivations);
-				fHandlerActivations.clear();
-				contextService.deactivateContext(findBarContextActivation);
-				findBarContextActivation = null;
-			}
+
+			service.removeBindingManagerListener(fClearCommandToBindingOnChangesListener);
+			handlerService.deactivateHandlers(fHandlerActivations);
+			fHandlerActivations.clear();
+			contextService.deactivateContext(CONTEXT_ID);
+			contextService.deferUpdates(false);
 
 			activateContexts(editorContextIds.toArray(new String[editorContextIds.size()]));
 		}
@@ -645,15 +645,14 @@ public class FindBarActions
 	{
 		if (textEditor != null)
 		{
-			IContextService contextService = (IContextService) textEditor.getSite().getService(IContextService.class);
+			EContextService contextService = (EContextService) textEditor.getSite().getService(EContextService.class);
 			if (contextService != null)
 			{
-				editorContextActivations.clear();
 				editorContextIds.clear();
 				for (String contextId : contextIds)
 				{
 					editorContextIds.add(contextId);
-					editorContextActivations.add(contextService.activateContext(contextId));
+					contextService.activateContext(contextId);
 				}
 			}
 		}

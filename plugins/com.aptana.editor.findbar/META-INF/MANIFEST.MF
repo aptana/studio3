@@ -8,7 +8,8 @@ Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: com.aptana.core,
  org.eclipse.ui.workbench.texteditor,
  org.eclipse.search,
- com.aptana.ui
+ com.aptana.ui,
+ org.eclipse.e4.ui.services
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
