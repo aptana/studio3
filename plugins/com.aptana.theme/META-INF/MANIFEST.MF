@@ -20,10 +20,10 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.search;resolution:=optional,
  com.aptana.ui,
  com.aptana.parsing,
- org.eclipse.e4.core.contexts,
- org.eclipse.e4.ui.css.swt.theme,
- org.eclipse.e4.ui.model.workbench,
- org.eclipse.e4.ui.workbench.swt
+ org.eclipse.e4.core.contexts;visibility:=reexport,
+ org.eclipse.e4.ui.css.swt.theme;visibility:=reexport,
+ org.eclipse.e4.ui.model.workbench;visibility:=reexport,
+ org.eclipse.e4.ui.workbench.swt;visibility:=reexport
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.theme,
