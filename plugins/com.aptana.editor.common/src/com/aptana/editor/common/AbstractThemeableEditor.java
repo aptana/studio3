@@ -613,8 +613,14 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 			if (dndService != null)
 			{
 				ProjectionViewer viewer = (ProjectionViewer) getSourceViewer();
-				StyledText st = viewer.getTextWidget();
-				dndService.removeMergedDropTarget(st);
+				if (viewer != null)
+				{
+					StyledText st = viewer.getTextWidget();
+					if (st != null)
+					{
+						dndService.removeMergedDropTarget(st);
+					}
+				}
 			}
 		}
 		finally
