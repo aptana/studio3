@@ -10,8 +10,18 @@ package com.aptana.portal.ui.dispatch.actionControllers;
 import java.text.MessageFormat;
 import java.util.Set;
 
+import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.ui.css.swt.theme.ITheme;
+import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
+import org.eclipse.e4.ui.model.application.MApplication;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.PlatformUI;
+
 import com.aptana.configurations.processor.ConfigurationStatus;
+import com.aptana.core.IFilter;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.jetty.util.epl.ajax.JSON;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.IBrowserNotificationConstants;
@@ -76,16 +86,35 @@ public class ThemeActionController extends AbstractActionController
 	@ControllerAction
 	public Object setActiveTheme(Object attributes)
 	{
-		Theme theme = getTheme(attributes);
-		if (theme != null)
+		final String themeName = getThemeName(attributes);
+		if (!StringUtil.isEmpty(themeName))
 		{
+			// FIXME this is a bit of a hack, and assumes we'll have an editor and overall theme with the exact same name
+			// Set editor theme
+			Theme theme = themeManager.getTheme(themeName);
 			themeManager.setCurrentTheme(theme);
+
+			// Also set overall theme
+			IWorkbench workbench = PlatformUI.getWorkbench();
+			MApplication application = (MApplication) workbench.getService(MApplication.class);
+			IEclipseContext context = application.getContext();
+
+			IThemeEngine e4ThemeEngine = context.get(IThemeEngine.class);
+			ITheme selection = CollectionsUtil.find(e4ThemeEngine.getThemes(), new IFilter<ITheme>()
+			{
+
+				public boolean include(ITheme item)
+				{
+					return themeName.equals(item.getLabel());
+				}
+			});
+			if (selection != null)
+			{
+				e4ThemeEngine.setTheme(selection, false);
+			}
 			return IBrowserNotificationConstants.JSON_OK;
 		}
-		else
-		{
-			return IBrowserNotificationConstants.JSON_ERROR;
-		}
+		return IBrowserNotificationConstants.JSON_ERROR;
 	}
 
 	/*
@@ -104,27 +133,24 @@ public class ThemeActionController extends AbstractActionController
 	 * @param attributes
 	 * @return A {@link Theme}; <code>null</code> if there is an error, or there is not theme with the given name.
 	 */
-	private Theme getTheme(Object attributes)
+	private String getThemeName(Object attributes)
 	{
 		if (attributes instanceof Object[])
 		{
 			Object[] arr = (Object[]) attributes;
 			if (arr.length == 1 && arr[0] != null)
 			{
-				return themeManager.getTheme((String) arr[0]);
+				return (String) arr[0];
 			}
-			else
-			{
-				String message = MessageFormat
-						.format("Wrong argument count passed to ThemeActionController::setActiveTheme. Expected 1 and got {0}", arr.length); //$NON-NLS-1$
-				IdeLog.logError(PortalUIPlugin.getDefault(), new Exception(message));
-			}
+			String message = MessageFormat
+					.format("Wrong argument count passed to ThemeActionController::setActiveTheme. Expected 1 and got {0}", arr.length); //$NON-NLS-1$
+			IdeLog.logError(PortalUIPlugin.getDefault(), new Exception(message));
 		}
 		else
 		{
 			String message = MessageFormat
 					.format("Wrong argument type passed to ThemeActionController::setActiveTheme. Expected Object[] and got {0}", //$NON-NLS-1$
-					((attributes == null) ? "null" : attributes.getClass().getName())); //$NON-NLS-1$
+							((attributes == null) ? "null" : attributes.getClass().getName())); //$NON-NLS-1$
 			IdeLog.logError(PortalUIPlugin.getDefault(), new Exception(message));
 		}
 		return null;
