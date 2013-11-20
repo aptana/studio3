@@ -177,7 +177,7 @@ public class FirefoxUtilTest extends TestCase {
 			assertTrue(dir.mkdir());
 			URL url = FileLocator.find(Platform.getBundle("com.aptana.core.tests"),
 					Path.fromPortableString("/resources/extensions/test_corrupted.xpi"), null);
-			assertFalse(FirefoxUtil.installExtension(url, "test", dir));
+			FirefoxUtil.installExtension(url, "test", dir);
 		}
 		finally {
 			FileUtil.deleteRecursively(dir);
