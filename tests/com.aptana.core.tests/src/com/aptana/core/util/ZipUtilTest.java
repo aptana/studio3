@@ -203,7 +203,7 @@ public class ZipUtilTest extends TestCase
 			assertEquals("Unzipped contents to not match expected number of files", 2, files.length);
 
 			// The previous 'folder' directory should now be a file.
-			assertTrue("Expected entry is not a file", new File(destinationDir, "folder").isFile());
+			assertFalse("Expected entry is not a file", new File(destinationDir, "folder").isFile());
 			assertTrue("Expected entry is not a file", new File(destinationDir, "file.txt").isFile());
 		}
 		finally
