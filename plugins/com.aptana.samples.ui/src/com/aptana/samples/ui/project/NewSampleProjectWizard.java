@@ -19,6 +19,7 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IProjectNatureDescriptor;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceStatus;
+import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -244,7 +245,15 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 					// not preserved. Making this undoable resulted in too many
 					// accidental file deletions.
 					op.execute(monitor, WorkspaceUndoUtil.getUIInfoAdapter(getShell()));
-					sample.createNewProject(project, projectData, monitor);
+					IWorkspaceRunnable runnable = new IWorkspaceRunnable()
+					{
+
+						public void run(IProgressMonitor monitor) throws CoreException
+						{
+							sample.createNewProject(project, projectData, monitor);
+						}
+					};
+					ResourcesPlugin.getWorkspace().run(runnable, monitor);
 				}
 				catch (CoreException e)
 				{
