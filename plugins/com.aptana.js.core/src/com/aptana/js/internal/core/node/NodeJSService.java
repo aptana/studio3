@@ -70,10 +70,14 @@ public class NodeJSService implements INodeJSService
 	private Set<Listener> listeners;
 	private Map<IPath, INodeJS> nodeJsInstalls;
 
+	private INodeJS fNodeExePath;
+
 	public NodeJSService()
 	{
 		listeners = new LinkedHashSet<Listener>();
 		nodeJsInstalls = new HashMap<IPath, INodeJS>();
+
+		fNodeExePath = findValidExecutable();
 	}
 
 	/*
@@ -261,27 +265,32 @@ public class NodeJSService implements INodeJSService
 		return getNodeJsInstall(path);
 	}
 
+	public INodeJS getValidExecutable()
+	{
+		return fNodeExePath;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.appcelerator.titanium.nodejs.core.INodeJSService#validExecutable()
 	 */
-	public INodeJS getValidExecutable()
+	private INodeJS findValidExecutable()
 	{
 		// try user's saved path
 		INodeJS nodeExePath = getInstallFromPreferences();
 		if (nodeExePath != null && nodeExePath.validate().isOK())
 		{
-			return nodeExePath;
+			fNodeExePath = nodeExePath;
 		}
 
 		// Search PATH
 		nodeExePath = detectInstall();
 		if (nodeExePath != null && nodeExePath.validate().isOK())
 		{
-			return nodeExePath;
+			fNodeExePath = nodeExePath;
 		}
 
-		return null;
+		return fNodeExePath;
 	}
 
 	public boolean isInstalled()
