@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -18,6 +18,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -58,12 +64,14 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.core.projects.templates.IProjectTemplate;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.projects.ProjectsPlugin;
 import com.aptana.projects.internal.wizards.Messages;
 import com.aptana.projects.templates.IDefaultProjectTemplate;
 import com.aptana.projects.templates.ProjectTemplatesManager;
 import com.aptana.ui.util.SWTUtils;
+import com.aptana.ui.util.UIUtils;
 import com.aptana.ui.widgets.StepIndicatorComposite;
 
 /**
@@ -454,7 +462,10 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 			templateControl.setBackground(background);
 
 			Label image = new Label(templateControl, SWT.CENTER);
-			image.setImage(getImage(template));
+			image.setImage(defaultTemplateImage);
+			templateImages.put(template, defaultTemplateImage);
+			loadImageInBackground(image, template);
+
 			image.setBackground(background);
 			image.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).align(SWT.CENTER, SWT.CENTER).create());
 			Label text = new Label(templateControl, SWT.CENTER | SWT.WRAP);
@@ -489,6 +500,66 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 			templateControlMap.put(templateControl, template);
 		}
 		templatesListComposite.layout(true, true);
+	}
+
+	private void loadImageInBackground(final Label label, final IProjectTemplate template)
+	{
+		final URL iconPath = template.getIconURL();
+		if (iconPath != null)
+		{
+			final ImageData[] imageData = new ImageData[1];
+			Job loadImageJob = new Job("Loading template image...") //$NON-NLS-1$
+			{
+				@Override
+				protected IStatus run(IProgressMonitor monitor)
+				{
+					try
+					{
+						ImageDescriptor descriptor = ImageDescriptor.createFromURL(iconPath);
+						imageData[0] = descriptor.getImageData();
+					}
+					catch (Exception e)
+					{
+						IdeLog.logWarning(ProjectsPlugin.getDefault(), "Failed to retrieve the template's image: " + e); //$NON-NLS-1$
+					}
+					return Status.OK_STATUS;
+				}
+			};
+			EclipseUtil.setSystemForJob(loadImageJob);
+			loadImageJob.schedule();
+			loadImageJob.addJobChangeListener(new JobChangeAdapter()
+			{
+				@Override
+				public void done(IJobChangeEvent event)
+				{
+					if (imageData[0] != null)
+					{
+						UIUtils.getDisplay().asyncExec(new Runnable()
+						{
+							public void run()
+							{
+								Image image = new Image(UIUtils.getDisplay(), imageData[0]);
+								if (image != null)
+								{
+									// Scale the image to 48x48 in case it's not.
+									ImageData scaledImageData = image.getImageData();
+									if (scaledImageData.x != IMAGE_SIZE || scaledImageData.y != IMAGE_SIZE)
+									{
+										// dispose the previous one
+										image.dispose();
+										// Scale the image data and create a new image
+										scaledImageData = scaledImageData.scaledTo(IMAGE_SIZE, IMAGE_SIZE);
+										image = ImageDescriptor.createFromImageData(scaledImageData).createImage();
+									}
+								}
+								label.setImage(image);
+								templateImages.put(template, image);
+							}
+						});
+					}
+				}
+			});
+		}
 	}
 
 	private void setSelectedTemplate(IProjectTemplate template)
@@ -535,41 +606,7 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 		Image image = templateImages.get(template);
 		if (image == null)
 		{
-			// Resolve and load the image
-			URL iconPath = template.getIconURL();
-			if (iconPath != null)
-			{
-				try
-				{
-					ImageDescriptor descriptor = ImageDescriptor.createFromURL(iconPath);
-					if (descriptor != null)
-					{
-						image = descriptor.createImage(false);
-						if (image != null)
-						{
-							// Scale the image to 48x48 in case it's not.
-							ImageData imageData = image.getImageData();
-							if (imageData.x != IMAGE_SIZE || imageData.y != IMAGE_SIZE)
-							{
-								// dispose the previous one
-								image.dispose();
-								// Scale the image data and create a new image
-								imageData = imageData.scaledTo(IMAGE_SIZE, IMAGE_SIZE);
-								image = ImageDescriptor.createFromImageData(imageData).createImage();
-							}
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					IdeLog.logWarning(ProjectsPlugin.getDefault(), "Failed to retrieve the template's image: " + e); //$NON-NLS-1$
-				}
-			}
-			if (image == null)
-			{
-				image = defaultTemplateImage;
-			}
-			templateImages.put(template, image);
+			image = defaultTemplateImage;
 		}
 		return image;
 	}
