@@ -105,8 +105,27 @@ public final class ZipUtil
 	public static IStatus extract(File zipFile, File destinationPath, boolean overwrite, IProgressMonitor monitor)
 			throws IOException
 	{
+		return extract(zipFile, destinationPath, overwrite, true, monitor);
+	}
+
+	/**
+	 * Extract zip file into specified local path. File that exist in the destination path will be overwritten if the
+	 * <code>overwrite</code> flag is <code>true</code>. Native unzip mechanism will be attempted if the
+	 * <code>isNative</code> flag is <code>true</code>
+	 * 
+	 * @param zipFile
+	 * @param destinationPath
+	 * @param overwrite
+	 * @param isNative
+	 * @param monitor
+	 * @return
+	 * @throws IOException
+	 */
+	public static IStatus extract(File zipFile, File destinationPath, boolean overwrite, boolean isNative,
+			IProgressMonitor monitor) throws IOException
+	{
 		Conflict whatToDo = overwrite ? Conflict.OVERWRITE : Conflict.SKIP;
-		if (canDoNativeUnzip(whatToDo, null))
+		if (canDoNativeUnzip(whatToDo, null) && isNative)
 		{
 			return nativeUnzip(zipFile, destinationPath, whatToDo, monitor);
 		}
