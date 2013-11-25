@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.git.core.GitPlugin;
@@ -115,7 +116,8 @@ class GitIndexRefreshJob extends Job
 		}
 		if (!errors.isOK())
 		{
-			return errors;
+			// Log this, but don't actually return an error status, or it bubbles up to UI in error dialog
+			IdeLog.log(GitPlugin.getDefault(), errors);
 		}
 		return Status.OK_STATUS;
 	}
