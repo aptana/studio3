@@ -50,7 +50,6 @@ import org.yaml.snakeyaml.representer.Representer;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.IOUtil;
-import com.aptana.core.util.StringUtil;
 import com.aptana.scope.ScopeSelector;
 import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.ScriptingEngine;
@@ -198,13 +197,16 @@ public class BundleCacher
 		{
 			if (be.getBundleDirectory().canRead())
 			{
-				if (cacheFile == null)
+				if (cacheFile == null || !cacheFile.exists())
 				{
 					return false;
 				}
 				reader = new InputStreamReader(new FileInputStream(cacheFile), IOUtil.UTF_8);
 				BundleElement be2 = (BundleElement) yaml.load(reader);
-
+				if (be2 == null)
+				{
+					return false;
+				}
 				// invoke blocks don't serialize correctly, so the comparison gets screwy.
 				String beString1 = be.toSource(false);
 				String beString2 = be2.toSource(false);
