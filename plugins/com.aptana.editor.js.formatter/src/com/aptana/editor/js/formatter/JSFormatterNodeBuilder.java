@@ -1596,7 +1596,8 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				caseBodyNode.setBegin(createTextNode(document, lastChild.getStartingOffset(),
 						lastChild.getStartingOffset() + 1));
 				push(caseBodyNode);
-				if (node.getNodeType() == IJSNodeTypes.CASE)
+				short nodeType = node.getNodeType();
+				if (nodeType == IJSNodeTypes.CASE || nodeType == IJSNodeTypes.DEFAULT)
 				{
 					visitChildren(lastChild);
 				}
