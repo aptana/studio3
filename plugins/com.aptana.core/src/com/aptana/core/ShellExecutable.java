@@ -278,31 +278,27 @@ public final class ShellExecutable
 			{
 				// OK, we do have a shell.
 				String envCommand = "env"; //$NON-NLS-1$
-				if (PlatformUtil.isWindows())
+				if (!PlatformUtil.isWindows())
 				{
-					IPath envPath = shellPath.removeLastSegments(1).append("env.exe"); //$NON-NLS-1$
-					if (envPath.toFile().isFile())
+					try
 					{
-						envCommand = envPath.toPortableString();
+						IStatus status = ProcessUtil.processResult(run(envCommand, workingDirectory, null));
+						if (status.isOK())
+						{
+							result = buildEnvironment(status.getMessage());
+						}
+						else
+						{
+							IdeLog.logError(CorePlugin.getDefault(),
+									"Get shell environment failed: " + status.getMessage()); //$NON-NLS-1$
+						}
 					}
-				}
-				try
-				{
-					IStatus status = ProcessUtil.processResult(run(envCommand, workingDirectory, null));
-					if (status.isOK())
+					catch (Exception e)
 					{
-						result = buildEnvironment(status.getMessage());
+						IdeLog.logError(CorePlugin.getDefault(), "Get shell environment failed.", e); //$NON-NLS-1$
+						// failed to generate an env, we'll use JVM env and not
+						// cache, see below...
 					}
-					else
-					{
-						IdeLog.logError(CorePlugin.getDefault(), "Get shell environment failed: " + status.getMessage()); //$NON-NLS-1$
-					}
-				}
-				catch (Exception e)
-				{
-					IdeLog.logError(CorePlugin.getDefault(), "Get shell environment failed.", e); //$NON-NLS-1$
-					// failed to generate an env, we'll use JVM env and not
-					// cache, see below...
 				}
 			}
 
