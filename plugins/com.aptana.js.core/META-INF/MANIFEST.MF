@@ -27,5 +27,9 @@ Export-Package: com.aptana.js.core,
  com.aptana.js.core.parsing.ast,
  com.aptana.js.core.preferences,
  com.aptana.js.internal.core.build;x-friends:="com.aptana.editor.js.tests",
- com.aptana.js.internal.core.index;x-friends:="com.aptana.editor.js.tests"
+ com.aptana.js.internal.core.index;x-friends:="com.aptana.editor.js.tests",
+ com.aptana.js.internal.core.inferencing;x-friends:="com.appcelerator.hyperloop.core",
+ com.aptana.js.internal.core.parsing;x-friends:="com.appcelerator.hyperloop.core",
+ com.aptana.js.internal.core.parsing.sdoc;x-friends:="com.appcelerator.hyperloop.core",
+ com.aptana.js.internal.core.parsing.sdoc.model;x-friends:="com.appcelerator.hyperloop.core"
 Eclipse-ExtensibleAPI: true
