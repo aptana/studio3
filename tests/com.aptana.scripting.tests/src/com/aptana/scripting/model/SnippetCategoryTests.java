@@ -15,7 +15,6 @@ import org.eclipse.swt.graphics.Image;
 
 import com.aptana.scripting.model.filters.IModelFilter;
 
-
 public class SnippetCategoryTests extends BundleTestBase
 {
 	private List<SnippetCategoryElement> categories = null;
@@ -131,7 +130,7 @@ public class SnippetCategoryTests extends BundleTestBase
 					Image image = descriptor.createImage(false);
 					assertNull(image);
 				}
-				catch (IllegalArgumentException e)
+				catch (Exception e)
 				{
 					e.printStackTrace();
 				}
