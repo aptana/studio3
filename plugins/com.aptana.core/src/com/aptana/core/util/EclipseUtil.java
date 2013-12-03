@@ -37,9 +37,9 @@ import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.osgi.framework.debug.FrameworkDebugOptions;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.osgi.service.debug.DebugOptions;
+import org.eclipse.osgi.service.environment.EnvironmentInfo;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -50,7 +50,6 @@ import com.aptana.core.ICorePreferenceConstants;
 import com.aptana.core.IDebugScopes;
 import com.aptana.core.logging.IdeLog;
 
-@SuppressWarnings("restriction")
 public class EclipseUtil
 {
 	/**
@@ -449,7 +448,21 @@ public class EclipseUtil
 	 */
 	public static void setPlatformDebugging(boolean debugEnabled)
 	{
-		FrameworkDebugOptions.getDefault().setDebugEnabled(debugEnabled);
+		BundleContext context = CorePlugin.getDefault().getContext();
+		if (context == null)
+		{
+			return;
+		}
+		ServiceReference<EnvironmentInfo> ref = context.getServiceReference(EnvironmentInfo.class);
+		if (ref == null)
+		{
+			return;
+		}
+		EnvironmentInfo info = context.getService(ref);
+		if (info != null)
+		{
+			info.setProperty("osgi.debug", Boolean.toString(debugEnabled));
+		}
 	}
 
 	/**
