@@ -37,7 +37,7 @@ import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.osgi.framework.internal.core.FrameworkProperties;
+import org.eclipse.osgi.framework.debug.FrameworkDebugOptions;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.osgi.service.debug.DebugOptions;
 import org.osgi.framework.Bundle;
@@ -449,14 +449,7 @@ public class EclipseUtil
 	 */
 	public static void setPlatformDebugging(boolean debugEnabled)
 	{
-		if (debugEnabled)
-		{
-			FrameworkProperties.setProperty("osgi.debug", "true"); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		else
-		{
-			FrameworkProperties.clearProperty("osgi.debug"); //$NON-NLS-1$
-		}
+		FrameworkDebugOptions.getDefault().setDebugEnabled(debugEnabled);
 	}
 
 	/**
