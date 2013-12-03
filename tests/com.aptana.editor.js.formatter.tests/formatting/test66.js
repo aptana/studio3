@@ -71,6 +71,7 @@ function bar(p){
 					{
 			fField.reset();
 					}
+		}
 	v = //
 	{
 		a: 0,
