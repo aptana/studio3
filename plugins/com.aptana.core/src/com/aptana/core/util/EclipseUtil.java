@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.MessageFormat;
@@ -37,12 +38,13 @@ import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.osgi.framework.internal.core.FrameworkProperties;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.osgi.service.debug.DebugOptions;
+import org.eclipse.osgi.service.environment.EnvironmentInfo;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.Version;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.CorePlugin;
@@ -50,7 +52,6 @@ import com.aptana.core.ICorePreferenceConstants;
 import com.aptana.core.IDebugScopes;
 import com.aptana.core.logging.IdeLog;
 
-@SuppressWarnings("restriction")
 public class EclipseUtil
 {
 	/**
@@ -108,6 +109,7 @@ public class EclipseUtil
 	private static String versionPluginId = "com.aptana.branding"; //$NON-NLS-1$
 
 	private static String fgPrefix;
+	private static Boolean fgNewAPI;
 
 	private EclipseUtil()
 	{
@@ -449,14 +451,68 @@ public class EclipseUtil
 	 */
 	public static void setPlatformDebugging(boolean debugEnabled)
 	{
-		if (debugEnabled)
+		// Platform only sees a null value as "false" for this, so we need to hack around to set a null value
+		// depending on what API version we're using. 4.3 and lower throw exceptions if we try to set the property to
+		// null.
+		final String propertyName = "osgi.debug"; //$NON-NLS-1$
+		if (!debugEnabled && !isNewOSGIAPI())
 		{
-			FrameworkProperties.setProperty("osgi.debug", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+			// Can't set a null property on EnivronmentInfo in 4.3 and lower. So we need to hack using reflection
+			// against old API
+			try
+			{
+				Class klazz = Class.forName("org.eclipse.osgi.framework.internal.core.FrameworkProperties"); //$NON-NLS-1$
+				Method m = klazz.getMethod("clearProperty", String.class); //$NON-NLS-1$
+				m.invoke(null, propertyName);
+				return;
+			}
+			catch (ClassNotFoundException cnfe)
+			{
+				// assume it's because we're on a 4.4+ build where we follow with the logic below...
+			}
+			catch (Exception e)
+			{
+				IdeLog.logError(CorePlugin.getDefault(), e);
+			}
 		}
-		else
+		BundleContext context = CorePlugin.getDefault().getContext();
+		if (context == null)
 		{
-			FrameworkProperties.clearProperty("osgi.debug"); //$NON-NLS-1$
+			return;
 		}
+		ServiceReference<EnvironmentInfo> ref = context.getServiceReference(EnvironmentInfo.class);
+		if (ref == null)
+		{
+			return;
+		}
+		EnvironmentInfo info = context.getService(ref);
+		if (info != null)
+		{
+			if (debugEnabled)
+			{
+				info.setProperty(propertyName, Boolean.toString(debugEnabled));
+			}
+			else
+			{
+				info.setProperty(propertyName, null);
+			}
+		}
+	}
+
+	/**
+	 * The 3.10.0 version of the OSGI bundle made a lot of breaking changes to internals (that we unfortunately used).
+	 * 
+	 * @return
+	 */
+	private synchronized static boolean isNewOSGIAPI()
+	{
+		if (fgNewAPI == null)
+		{
+			Bundle b = Platform.getBundle("org.eclipse.osgi"); //$NON-NLS-1$
+			Version v = b.getVersion();
+			fgNewAPI = v.compareTo(Version.parseVersion("3.9.100")) >= 0; //$NON-NLS-1$
+		}
+		return fgNewAPI;
 	}
 
 	/**

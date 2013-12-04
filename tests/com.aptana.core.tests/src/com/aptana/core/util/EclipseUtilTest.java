@@ -92,7 +92,7 @@ public class EclipseUtilTest
 	@Test
 	public void testGetSystemProperty()
 	{
-		assertEquals("1.6", EclipseUtil.getSystemProperty("java.specification.version"));
+		assertEquals(PlatformUtil.isWindows() ? "\\" : "/", EclipseUtil.getSystemProperty("file.separator"));
 		assertNull(EclipseUtil.getSystemProperty("random_property"));
 		assertNull(EclipseUtil.getSystemProperty(null));
 	}

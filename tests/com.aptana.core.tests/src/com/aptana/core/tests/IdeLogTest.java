@@ -34,6 +34,7 @@ public class IdeLogTest
 	{
 		listener = new LogListener();
 		CorePlugin.getDefault().getLog().addLogListener(listener);
+		IdeLog.flushCache();
 	}
 
 	@After
