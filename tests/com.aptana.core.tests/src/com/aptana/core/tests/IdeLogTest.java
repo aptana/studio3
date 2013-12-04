@@ -36,6 +36,7 @@ public class IdeLogTest extends TestCase
 
 		listener = new LogListener();
 		CorePlugin.getDefault().getLog().addLogListener(listener);
+		IdeLog.flushCache();
 	}
 
 	/*

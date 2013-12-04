@@ -82,7 +82,7 @@ public class EclipseUtilTest extends TestCase
 
 	public void testGetSystemProperty()
 	{
-		assertEquals("1.7", EclipseUtil.getSystemProperty("java.specification.version"));
+		assertEquals(PlatformUtil.isWindows() ? "\\" : "/", EclipseUtil.getSystemProperty("file.separator"));
 		assertNull(EclipseUtil.getSystemProperty("random_property"));
 		assertNull(EclipseUtil.getSystemProperty(null));
 	}
