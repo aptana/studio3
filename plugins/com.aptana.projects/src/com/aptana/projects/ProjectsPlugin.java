@@ -17,6 +17,8 @@ import org.osgi.framework.BundleContext;
 import com.aptana.core.projects.templates.ProjectTemplate;
 import com.aptana.core.projects.templates.TemplateType;
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.projects.internal.listeners.StudioProjectListenersManager;
+import com.aptana.projects.listeners.IProjectListenersManager;
 import com.aptana.projects.templates.IDefaultProjectTemplate;
 import com.aptana.projects.templates.ProjectTemplatesManager;
 import com.aptana.projects.wizards.ProjectWizardContributionManager;
@@ -35,6 +37,7 @@ public class ProjectsPlugin extends AbstractUIPlugin
 
 	private ProjectTemplatesManager templatesManager;
 	private ProjectWizardContributionManager projectWizardContributionManager;
+	private IProjectListenersManager projectListenersManager;
 
 	private static class DefaultWebProjectTemplate extends ProjectTemplate implements IDefaultProjectTemplate
 	{
@@ -87,6 +90,7 @@ public class ProjectsPlugin extends AbstractUIPlugin
 			templatesManager = null;
 		}
 		projectWizardContributionManager = null;
+		projectListenersManager = null;
 		super.stop(context);
 	}
 
@@ -130,5 +134,15 @@ public class ProjectsPlugin extends AbstractUIPlugin
 		}
 
 		return projectWizardContributionManager;
+	}
+
+	public synchronized IProjectListenersManager getProjectListenersManager()
+	{
+		if (projectListenersManager == null)
+		{
+			projectListenersManager = new StudioProjectListenersManager();
+		}
+
+		return projectListenersManager;
 	}
 }
