@@ -461,7 +461,7 @@ public class EclipseUtil
 		EnvironmentInfo info = context.getService(ref);
 		if (info != null)
 		{
-			info.setProperty("osgi.debug", Boolean.toString(debugEnabled));
+			info.setProperty("osgi.debug", Boolean.toString(debugEnabled)); //$NON-NLS-1$
 		}
 	}
 
