@@ -357,7 +357,7 @@ public class SamplesManager implements ISamplesManager
 				{
 					iconUrl = FileLocator.toFileURL(url);
 				}
-				catch (IOException e)
+				catch (Exception e)
 				{
 					IdeLog.logError(SamplesPlugin.getDefault(),
 							MessageFormat.format("Unable to retrieve the icon at {0} for sample {1}", iconPath, name), //$NON-NLS-1$
