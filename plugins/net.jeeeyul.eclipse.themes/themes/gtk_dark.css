@@ -83,8 +83,8 @@
 	swt-tab-outline: #2d2d30;
 	swt-outer-keyline-color: #2d2d30;
 	background-color: #2d2d30;
-	maximize-visible: false;
-	minimize-visible: false;
+	swt-maximize-visible: false;
+	swt-minimize-visible: false;
 }
 
 .MPart.Editor, #org-eclipse-ui-editorss {
