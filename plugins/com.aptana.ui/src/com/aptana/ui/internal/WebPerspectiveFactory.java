@@ -12,6 +12,8 @@ import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
 import org.eclipse.ui.console.IConsoleConstants;
 
+import com.aptana.ui.util.UIUtils;
+
 public class WebPerspectiveFactory implements IPerspectiveFactory
 {
 
@@ -40,5 +42,7 @@ public class WebPerspectiveFactory implements IPerspectiveFactory
 				editorArea);
 		bottomArea.addView(IConsoleConstants.ID_CONSOLE_VIEW);
 		bottomArea.addPlaceholder("com.aptana.terminal.views.terminal:*"); //$NON-NLS-1$
+
+		UIUtils.setCoolBarVisibility(true);
 	}
 }
