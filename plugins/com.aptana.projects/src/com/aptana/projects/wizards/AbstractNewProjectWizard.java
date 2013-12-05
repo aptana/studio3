@@ -67,7 +67,6 @@ import com.aptana.git.ui.CloneJob;
 import com.aptana.projects.ProjectsPlugin;
 import com.aptana.projects.internal.wizards.Messages;
 import com.aptana.projects.listeners.IStudioProjectListener;
-import com.aptana.projects.listeners.StudioProjectListenersManager;
 import com.aptana.projects.templates.IDefaultProjectTemplate;
 import com.aptana.ui.util.UIUtils;
 import com.aptana.usage.FeatureEvent;
@@ -281,8 +280,8 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 				IProjectDescription description = newProject.getDescription();
 				if (description != null)
 				{
-					projectListeners = StudioProjectListenersManager.getManager().getProjectListeners(
-							description.getNatureIds());
+					projectListeners = ProjectsPlugin.getDefault().getProjectListenersManager()
+							.getProjectListeners(description.getNatureIds());
 				}
 
 				int listenerSize = projectListeners.length;
