@@ -346,6 +346,10 @@ public class FileUtil
 				return fileExtension.equals(extension);
 			}
 		});
+		if (childFiles == null)
+		{
+			return null;
+		}
 		for (File childFile : childFiles)
 		{
 			String extension = getExtension(childFile.getName());
