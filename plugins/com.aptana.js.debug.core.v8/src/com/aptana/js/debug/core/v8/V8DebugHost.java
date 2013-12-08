@@ -509,6 +509,10 @@ public class V8DebugHost extends AbstractDebugHost {
 	}
 
 	private boolean isScriptFiltered(Script script) {
+		if (StringUtil.isEmpty(script.getName()))
+		{
+			return false;
+		}
 		String fileName = script.getName();
 		for (Pattern pattern : scriptFilters) {
 			if (pattern.matcher(fileName).matches()) {
@@ -1130,6 +1134,10 @@ public class V8DebugHost extends AbstractDebugHost {
 	}
 	
 	private void addScript(Script script) {
+		if (StringUtil.isEmpty(script.getName()))
+		{
+			return;
+		}
 		String fileName = makeAbsoluteURI(script.getName());
 		loadedScripts.put(fileName, script);
 		String[] scriptsData = listScripts(fileName, script);
