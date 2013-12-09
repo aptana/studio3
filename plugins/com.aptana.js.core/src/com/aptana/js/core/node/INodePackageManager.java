@@ -203,5 +203,13 @@ public interface INodePackageManager
 	 */
 	IStatus changeNPMCacheOwner(char[] password, boolean runWithSudo, IProgressMonitor monitor);
 
+	/**
+	 * Returns the list of available versions for a package, in ascending order.
+	 * 
+	 * @param packageName
+	 * @return
+	 */
+	public List<String> getVersions(String packageName);
+
 	// TODO Update
 }
