@@ -33,6 +33,8 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.osgi.framework.Bundle;
 
 import com.aptana.core.IMap;
@@ -282,7 +284,7 @@ public class NodePackageManager implements INodePackageManager
 	private IStatus runNpmConfig(List<String> args, char[] password, boolean global, IPath workingDirectory,
 			IProgressMonitor monitor) throws CoreException
 	{
-		List<String> sudoArgs = getNpmSudoArgs(global);
+		List<String> sudoArgs = getNpmSudoArgs(global, password);
 		sudoArgs.addAll(args);
 		return ProcessUtil.run(CollectionsUtil.getFirstElement(sudoArgs), workingDirectory, password,
 				ShellExecutable.getEnvironment(workingDirectory), monitor,
@@ -516,7 +518,7 @@ public class NodePackageManager implements INodePackageManager
 				MessageFormat.format(Messages.NodePackageManager_InstallingTaskName, displayName), 100);
 		try
 		{
-			List<String> args = getNpmSudoArgs(global);
+			List<String> args = getNpmSudoArgs(global, password);
 			CollectionsUtil.addToList(args, command, packageName, COLOR, FALSE);
 
 			Map<String, String> environment;
@@ -571,7 +573,7 @@ public class NodePackageManager implements INodePackageManager
 		}
 	}
 
-	private List<String> getNpmSudoArgs(boolean global) throws CoreException
+	private List<String> getNpmSudoArgs(boolean global, char[] sudoPassword) throws CoreException
 	{
 		IPath npmPath = checkedNPMPath();
 		List<String> args = new ArrayList<String>(8);
@@ -579,7 +581,7 @@ public class NodePackageManager implements INodePackageManager
 		{
 			if (!PlatformUtil.isWindows())
 			{
-				args.addAll(getSudoArgs());
+				args.addAll(getSudoArgs(sudoPassword));
 			}
 			args.add(nodeJS.getPath().toOSString());
 			args.add(npmPath.toOSString());
@@ -593,8 +595,13 @@ public class NodePackageManager implements INodePackageManager
 		return args;
 	}
 
-	private List<String> getSudoArgs()
+	private List<String> getSudoArgs(char[] sudoPassword)
 	{
+		// FIXME Centralize this logic in a core SudoManager class?
+		if (sudoPassword == null || sudoPassword.length == 0)
+		{
+			return CollectionsUtil.newList("sudo", "--"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
 		return CollectionsUtil.newList("sudo", "-S", "--"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
@@ -664,6 +671,7 @@ public class NodePackageManager implements INodePackageManager
 
 	public synchronized IPath getConfigPrefixPath() throws CoreException
 	{
+		// FIXME This caches the prefix value indefinitely. Is there any way to wipe the cache intelligently?
 		if (fConfigPrefixPath == null)
 		{
 			String npmConfigPrefixPath = ShellExecutable.getEnvironment().get(NPM_CONFIG_PREFIX);
@@ -684,7 +692,7 @@ public class NodePackageManager implements INodePackageManager
 		List<String> args = new ArrayList<String>();
 		try
 		{
-			args = getNpmSudoArgs(runWithSudo);
+			args = getNpmSudoArgs(runWithSudo, password);
 		}
 		catch (CoreException e)
 		{
@@ -692,6 +700,7 @@ public class NodePackageManager implements INodePackageManager
 		}
 		args.remove(GLOBAL_ARG);
 		CollectionsUtil.addToList(args, "cache", "clean"); //$NON-NLS-1$ //$NON-NLS-2$
+
 		IStatus status = ProcessUtil.run(CollectionsUtil.getFirstElement(args), null, password,
 				ShellExecutable.getEnvironment(), monitor, CollectionsUtil.toArray(args, 1, args.size()));
 
@@ -708,7 +717,7 @@ public class NodePackageManager implements INodePackageManager
 		List<String> args = new ArrayList<String>();
 		if (runWithSudo)
 		{
-			args.addAll(getSudoArgs());
+			args.addAll(getSudoArgs(password));
 		}
 		// Finds the current user and then, assigns the ownership.
 		IStatus userStatus = ProcessUtil.runInBackground("whoami", null); //$NON-NLS-1$
@@ -757,5 +766,31 @@ public class NodePackageManager implements INodePackageManager
 			FileFilter filter)
 	{
 		return ExecutableUtil.find(executableName, true, searchLocations, filter);
+	}
+
+	// TODO Throw a CoreException?
+	public List<String> getVersions(String packageName)
+	{
+		try
+		{
+			IStatus status = runInBackground("view", packageName, "versions", "-json", COLOR, FALSE); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			if (!status.isOK())
+			{
+				return Collections.emptyList();
+			}
+
+			String output = status.getMessage();
+			JSONParser parser = new JSONParser();
+			return (List<String>) parser.parse(output);
+		}
+		catch (CoreException ce)
+		{
+			IdeLog.logError(JSCorePlugin.getDefault(), ce);
+		}
+		catch (ParseException e)
+		{
+			IdeLog.logError(JSCorePlugin.getDefault(), e);
+		}
+		return Collections.emptyList();
 	}
 }

@@ -143,6 +143,7 @@ public class NodeJSService implements INodeJSService
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, Messages.NodeJSService_InstallingJobTitle, 100);
 		// TODO This smells strongly of needing to use subclasses based on platform so I can avoid all these ifs.
+		// TODO Allow for installing on Ubuntu? May need to build from source to get version we want...
 		// Verify we're Windows or Mac
 		if (!PlatformUtil.isWindows() && !PlatformUtil.isMac())
 		{
@@ -177,10 +178,22 @@ public class NodeJSService implements INodeJSService
 			}
 			else
 			{
-				status = ProcessUtil.run("sudo", Path.ROOT,//$NON-NLS-1$
-						password, null, sub.newChild(95), "-S", "--",//$NON-NLS-1$ //$NON-NLS-2$
-						"/usr/sbin/installer", "-pkg", file.getAbsolutePath(), "-target", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-						"/"); //$NON-NLS-1$
+				if (password == null || password.length == 0)
+				{
+					// if sudo doesn't require a password
+					status = ProcessUtil.run("sudo", Path.ROOT,//$NON-NLS-1$
+							null, null, sub.newChild(95), "--",//$NON-NLS-1$
+							"/usr/sbin/installer", "-pkg", file.getAbsolutePath(), "-target", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+							"/"); //$NON-NLS-1$
+				}
+				else
+				{
+					// sudo requires a password
+					status = ProcessUtil.run("sudo", Path.ROOT,//$NON-NLS-1$
+							password, null, sub.newChild(95), "-S", "--",//$NON-NLS-1$ //$NON-NLS-2$
+							"/usr/sbin/installer", "-pkg", file.getAbsolutePath(), "-target", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+							"/"); //$NON-NLS-1$
+				}
 			}
 			// Report the status from the installer.
 			if (!status.isOK())
