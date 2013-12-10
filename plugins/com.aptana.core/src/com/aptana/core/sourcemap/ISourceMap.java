@@ -125,6 +125,8 @@ public interface ISourceMap extends IExecutableExtension
 	 * generated result will have a value only when the {@link #getGeneratedLocationPrefix()} returns a non-empty/null
 	 * value.
 	 * 
+	 * @param originalFile
+	 *            resource that will be used to locate the map file
 	 * @param lineNumber
 	 *            1-based line number
 	 * @param columnNumber
