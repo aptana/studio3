@@ -80,7 +80,7 @@ public class FileUtil
 	{
 		String filePath = file.getAbsolutePath();
 		// TODO: should be generic to other archive formats ?
-		return filePath.toLowerCase().endsWith(".zip");
+		return filePath.toLowerCase().endsWith(".zip"); //$NON-NLS-1$
 	}
 
 	/**
@@ -453,6 +453,27 @@ public class FileUtil
 			return false;
 		}
 		return dir.listFiles().length == 0;
+	}
+
+	/**
+	 * Creates a symlink or shortcut folder.
+	 * 
+	 * @param symLinkName
+	 * @param sourcePath
+	 * @param targetPath
+	 * @return
+	 */
+	public static IStatus createSymlink(String symLinkName, IPath sourcePath, IPath targetPath)
+	{
+		if (PlatformUtil.isMac() || PlatformUtil.isLinux())
+		{
+			return ProcessUtil.runInBackground("ln", sourcePath, "-s", targetPath.toOSString(), symLinkName); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		else if (PlatformUtil.isWindows())
+		{
+			return ProcessUtil.runInBackground("mklink", sourcePath, "/D", symLinkName, targetPath.toOSString()); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		return Status.CANCEL_STATUS;
 	}
 
 	/**
