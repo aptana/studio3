@@ -27,7 +27,7 @@ public interface ISourceMapRegistry
 	 *            A project that needs a sourcemap.
 	 * @return An {@link ISourceMap}. <code>null</code> in case none can be located.
 	 */
-	ISourceMap getSourceMap(IProject project);
+	ISourceMap getSourceMap(IProject project, String platform);
 
 	/**
 	 * Returns a source map instance that was registered for the requested project nature ID.
@@ -36,5 +36,5 @@ public interface ISourceMapRegistry
 	 *            A project nature identifier.
 	 * @return An {@link ISourceMap}. <code>null</code> in case none can be located.
 	 */
-	ISourceMap getSourceMap(String projectNatureId);
+	ISourceMap getSourceMap(IProject project, String projectNatureId, String platform);
 }

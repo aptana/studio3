@@ -192,6 +192,11 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	 */
 	private static final int XOR_MASK = 0xFFF;
 
+	/**
+	 * Hack used to retrieve the platform used for the debug session.
+	 */
+	private static final String DEPLOY_TARGET = "ATTR_TITANIUM_DEPLOY_TARGET"; //$NON-NLS-1$
+
 	private static boolean checkUpdate = true;
 	private IJSConnection connection;
 	private int stepFilterMask = 0;
@@ -319,7 +324,8 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			if (projectName != null)
 			{
 				IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-				sourceMap = sourceMapRegistry.getSourceMap(project);
+				String platform = launch.getAttribute(DEPLOY_TARGET);
+				sourceMap = sourceMapRegistry.getSourceMap(project, platform);
 			}
 		}
 		catch (CoreException e)
