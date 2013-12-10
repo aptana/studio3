@@ -127,7 +127,7 @@ public class ThemePlugin extends AbstractUIPlugin
 	private IControlThemerFactory fControlThemerFactory;
 
 	// Store latest value of whether invasive theme is on so we don't need to query platform prefs every time.
-	private Boolean fApplyThemeToAllEditors;
+	private Boolean fApplyThemeToAllEditors = false;
 	private IPreferenceChangeListener fThemeChangeListener;
 	private IPreferenceChangeListener fEclipseColorsListener;
 
