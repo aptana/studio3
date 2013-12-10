@@ -43,7 +43,7 @@ public class SourceMapRegistry implements ISourceMapRegistry
 	 * (non-Javadoc)
 	 * @see com.aptana.core.sourcemap.ISourceMapRegistry#getSourceMap(org.eclipse.core.resources.IProject)
 	 */
-	public ISourceMap getSourceMap(IProject project)
+	public ISourceMap getSourceMap(IProject project, String platform)
 	{
 		if (project == null || !project.isAccessible())
 		{
@@ -67,14 +67,14 @@ public class SourceMapRegistry implements ISourceMapRegistry
 		{
 			return null;
 		}
-		return getSourceMap(natureIds[0]);
+		return getSourceMap(project, natureIds[0], platform);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.core.sourcemap.ISourceMapRegistry#getSourceMap(java.lang.String)
 	 */
-	public ISourceMap getSourceMap(String projectNatureId)
+	public ISourceMap getSourceMap(IProject project, String projectNatureId, String platform)
 	{
 		if (StringUtil.isEmpty(projectNatureId))
 		{
@@ -91,7 +91,7 @@ public class SourceMapRegistry implements ISourceMapRegistry
 		try
 		{
 			ISourceMap sourceMap = (ISourceMap) element.createExecutableExtension(CLASS_ATTR);
-			sourceMap.setInitializationData(element, null, null);
+			sourceMap.setInitializationData(element, platform, project);
 			return sourceMap;
 		}
 		catch (CoreException e)
