@@ -24,7 +24,7 @@
    <extension
          point="org.eclipse.e4.ui.css.swt.theme">
       <theme
-            basestylesheeturi="themes/gtk_dark.css"
+            basestylesheeturi="themes/gtk_dashboard.css"
             id="com.appcelerator.titanium.rcp.theme.dashboard"
             label="Light Studio"
             os="linux">
