@@ -183,7 +183,12 @@
 
 	<target name="test" depends="build">
 		<antcall target="-pre-test" />
-		<antcall target="-instrument" />
+		<if>
+		    <isset property="instrument.code"/>
+		    <then>
+		    	<antcall target="-instrument" />
+		    </then>
+		</if>
 
 		<!-- Run the tests. -->
 		<antcall target="run-core-test">
@@ -196,7 +201,12 @@
 		</antcall>
 
 		<antcall target="-post-test" />
-		<antcall target="-coverage" />
+		<if>
+		    <isset property="instrument.code"/>
+		    <then>
+		    	<antcall target="-coverage" />
+		    </then>
+		</if>
 	</target>
 
 	<target name="performance" depends="generate.build.properties,copy.base.windows,copy.base">
