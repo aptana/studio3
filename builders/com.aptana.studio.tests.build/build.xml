@@ -21,7 +21,6 @@
 
 	<!-- FindBugs -->
 	<property name="findbugs.home.dir" location="${basedir}/findbugs/findbugs-2.0.3"/>
-	<property name="report.findbugs.dir" location="${deploy.dir}/findbugs"/>
 
 	<taskdef resource="net/sf/antcontrib/antlib.xml">
 		<classpath>
