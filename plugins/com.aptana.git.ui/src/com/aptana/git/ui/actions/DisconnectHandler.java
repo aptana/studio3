@@ -95,7 +95,7 @@ public class DisconnectHandler extends AbstractGitHandler
 				{
 					RepositoryProvider.unmap(project);
 				}
-				catch (TeamException e)
+				catch (Exception e)
 				{
 					IdeLog.logError(GitUIPlugin.getDefault(), e);
 				}
