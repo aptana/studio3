@@ -8,6 +8,7 @@
 package com.aptana.git.core.model;
 
 import junit.framework.Test;
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 public class CoreModelTests
@@ -15,7 +16,15 @@ public class CoreModelTests
 
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite(CoreModelTests.class.getName());
+		TestSuite suite = new TestSuite(CoreModelTests.class.getName())
+		{
+			@Override
+			public void runTest(Test test, TestResult result)
+			{
+				System.err.println("Running test: " + test.toString());
+				super.runTest(test, result);
+			}
+		};
 		// $JUnit-BEGIN$
 		suite.addTestSuite(GitExecutableTest.class);
 		suite.addTestSuite(GitIndexRefreshJobTest.class);

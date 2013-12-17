@@ -8,6 +8,7 @@
 package com.aptana.git.internal.core.storage;
 
 import junit.framework.Test;
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 public class CoreStorageTests
@@ -15,7 +16,15 @@ public class CoreStorageTests
 
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite(CoreStorageTests.class.getName());
+		TestSuite suite = new TestSuite(CoreStorageTests.class.getName())
+		{
+			@Override
+			public void runTest(Test test, TestResult result)
+			{
+				System.err.println("Running test: " + test.toString());
+				super.runTest(test, result);
+			}
+		};
 		// $JUnit-BEGIN$
 		suite.addTestSuite(CommitFileRevisionTest.class);
 		suite.addTestSuite(GitFileHistoryProviderTest.class);
