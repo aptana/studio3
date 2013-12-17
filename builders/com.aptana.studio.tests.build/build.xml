@@ -19,6 +19,10 @@
 	<property name="buildlogs" value="${postingDirectory}/${buildLabel}/buildlogs" />
 	<mkdir dir="${buildlogs}" />
 
+	<!-- FindBugs -->
+	<property name="findbugs.home.dir" location="${basedir}/findbugs/findbugs-2.0.3"/>
+	<property name="report.findbugs.dir" location="${deploy.dir}/findbugs"/>
+
 	<taskdef resource="net/sf/antcontrib/antlib.xml">
 		<classpath>
 			<pathelement location="${basedir}/ant-contrib/ant-contrib.jar" />
@@ -154,7 +158,7 @@
 			<property name="includes" value="com*.xml" />
 			<property name="output-file" value="test-results.xml" />
 		</ant>
-		<mkdir dir="${testResultsDirectory}"/>
+		<mkdir dir="${testResultsDirectory}" />
 		<move file="${baseLocation}/test-results.xml" todir="${testResultsDirectory}" />
 	</target>
 
@@ -167,7 +171,7 @@
 	</target>
 
 	<target name="-coverage" description="Produce coverage analysis docs using EMMA. Assumes '-instrument' was called before running the tests.">
-		<mkdir dir="${coverageDirectory}"/>
+		<mkdir dir="${coverageDirectory}" />
 		<emma enabled="true">
 			<report>
 				<fileset dir="${buildDirectory}">
@@ -184,10 +188,10 @@
 	<target name="test" depends="build">
 		<antcall target="-pre-test" />
 		<if>
-		    <isset property="instrument.code"/>
-		    <then>
-		    	<antcall target="-instrument" />
-		    </then>
+			<isset property="instrument.code" />
+			<then>
+				<antcall target="-instrument" />
+			</then>
 		</if>
 
 		<!-- Run the tests. -->
@@ -202,10 +206,10 @@
 
 		<antcall target="-post-test" />
 		<if>
-		    <isset property="instrument.code"/>
-		    <then>
-		    	<antcall target="-coverage" />
-		    </then>
+			<isset property="instrument.code" />
+			<then>
+				<antcall target="-coverage" />
+			</then>
 		</if>
 	</target>
 
@@ -306,7 +310,7 @@
 			            -dataDir ${postingDirectory}/data/studio
 						-scenario.pattern ${scenario.pattern}
 						-baseline ${baseline.version}
-						-fingerprints"/>
+						-fingerprints" />
 			<!-- baselines arguments are no longer necessary since bug https://bugs.eclipse.org/bugs/show_bug.cgi?id=209322 has been fixed...
 						-baseline ${eclipse.perf.ref}
 						-baseline.prefix R-3.4_200806172000
@@ -318,5 +322,23 @@
 			<!--performanceResults xmlDirectoryName="${postingDirectory}/${buildLabel}/performance/xml" dropDirectoryName="${postingDirectory}/${buildLabel}" testResultsTemplateFileName="${publishingContent}/templateFiles/performance.php.template" testResultsHtmlFileName="performance/performance.php" hrefTestResultsTargetPath="html" testManifestFileName="${publishingContent}/performanceTestManifest.xml" /-->
 			<sysproperty key="eclipse.perf.dbloc" value="${perf.db}" />
 		</java>
+	</target>
+
+	<target name="findbugs">
+		<!-- Fail this target if FindBugs is not installed. -->
+		<available file="${findbugs.home.dir}/lib/findbugs.jar" property="findbugs.available" />
+		<fail unless="findbugs.available" message="Error: FINDBUGS_HOME not set or findbugs.jar not found." />
+
+		<!-- Run FindBugs. -->
+		<mkdir dir="${report.findbugs.dir}" />
+		<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask">
+			<classpath>
+				<pathelement location="lib/findbugs-ant.jar" />
+			</classpath>
+		</taskdef>
+
+		<findbugs home="${findbugs.home.dir}" output="xml" outputFile="${report.findbugs.dir}/findbugs.xml">
+			<fileset refid="instrument.classpath" />
+		</findbugs>
 	</target>
 </project>
