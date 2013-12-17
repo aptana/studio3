@@ -337,7 +337,7 @@
 		<mkdir dir="${report.findbugs.dir}" />
 		<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask">
 			<classpath>
-				<pathelement location="lib/findbugs-ant.jar" />
+				<pathelement location="${findbugs.home.dir}/lib/findbugs-ant.jar" />
 			</classpath>
 		</taskdef>
 
