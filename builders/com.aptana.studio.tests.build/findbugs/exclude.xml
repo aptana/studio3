@@ -1,0 +1,12 @@
+<FindBugsFilter>
+	<!-- Don't include unused fields warnings in Messages classes in all packages -->
+	<Match>
+		<Class name="~.*\.Messages" />
+		<Bug code="UUF" />
+	</Match>
+	<!-- Exclude JUnit-specific bugs in test classes -->
+	<Match>
+		<Class name="~.*\.*Test" />
+		<Bug code="IJU" />
+	</Match>
+</FindBugsFilter>
