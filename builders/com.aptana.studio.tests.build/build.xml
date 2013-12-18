@@ -341,7 +341,7 @@
 			</classpath>
 		</taskdef>
 
-		<findbugs home="${findbugs.home.dir}" output="xml" outputFile="${report.findbugs.dir}/findbugs.xml">
+		<findbugs home="${findbugs.home.dir}" output="xml" outputFile="${report.findbugs.dir}/findbugs.xml" includeFilter="${findbugs.home.dir}/../include.xml" excludeFilter="${findbugs.home.dir}/../exclude.xml">
 			<fileset dir="${baseLocation}/plugins">
 				<include name="com.aptana.*.jar" />
 				<exclude name="com.aptana.*.tests_*.jar" />
