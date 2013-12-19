@@ -26,8 +26,8 @@ import com.aptana.scripting.model.TemplateElement;
 @SuppressWarnings("restriction")
 public class NewFileWizard extends BasicNewFileResourceWizard
 {
-	protected static String TEMPLATE_PAGE_NAME = "templatePage";//$NON-NLS-1$
-	protected static String MAIN_PAGE_NAME = "mainPage";//$NON-NLS-1$
+	protected static final String TEMPLATE_PAGE_NAME = "templatePage";//$NON-NLS-1$
+	protected static final String MAIN_PAGE_NAME = "mainPage";//$NON-NLS-1$
 
 	private WizardNewFilePage mainPage;
 	private TemplateSelectionPage templateSelectionPage;

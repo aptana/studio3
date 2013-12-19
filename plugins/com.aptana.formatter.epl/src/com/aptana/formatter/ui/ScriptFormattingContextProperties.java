@@ -52,6 +52,6 @@ public class ScriptFormattingContextProperties
 	 * the {@link com.aptana.formatter.FormatterDocument} for an easy access when formatting the nodes that want to know
 	 * about this offset.
 	 */
-	public static String CONTEXT_ORIGINAL_OFFSET = "formatting.context.originalOffset"; //$NON-NLS-1$
+	public static final String CONTEXT_ORIGINAL_OFFSET = "formatting.context.originalOffset"; //$NON-NLS-1$
 
 }

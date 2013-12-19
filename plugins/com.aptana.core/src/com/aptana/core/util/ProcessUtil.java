@@ -51,7 +51,7 @@ public class ProcessUtil
 	 * When this flag is set in the environment for the process, it hints to redirect the error stream to redirect to
 	 * output stream itself.
 	 */
-	public static String REDIRECT_ERROR_STREAM = "redirectErrorStream"; //$NON-NLS-1$
+	public static final String REDIRECT_ERROR_STREAM = "redirectErrorStream"; //$NON-NLS-1$
 
 	protected ProcessUtil()
 	{
