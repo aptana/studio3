@@ -27,7 +27,7 @@ public class FileUtil
 	/**
 	 * The newline separator character
 	 */
-	public static String NEW_LINE = System.getProperty("line.separator"); //$NON-NLS-1$
+	public static final String NEW_LINE = System.getProperty("line.separator"); //$NON-NLS-1$
 
 	private FileUtil()
 	{
