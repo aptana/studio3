@@ -141,15 +141,17 @@
 	</target>
 
 	<target name="-pre-test" description="Install test features and do pre-test setup.">
-		<!-- Unzip Eclipse Testing Framework and... -->
-		<unzip src="eclipse-test-framework-3.6.zip" dest="${baseLocation}/dropins" />
+		<!-- Unzip the eclipse test framework zipfile -->
+		<property name="eclipse.tests.p2.repo.dir" location="${basedir}/eclipse-test-framework-4.3.1" />
+		<unzip src="${basedir}/eclipse-test-framework-4.3.1.zip" dest="${eclipse.tests.p2.repo.dir}" />
+		<property name="eclipse.tests.p2.repo" value="file:${eclipse.tests.p2.repo.dir}" />
 		<!-- Install the test feature we just built along with eclipse test framework -->
 		<antcall target="run.director">
-			<param name="p2.installIU" value="com.aptana.feature.feature.group,com.windowtester.runtime.feature.group,${topLevelElementId}.feature.group" />
-			<param name="p2.repo" value="${studio3.p2.repo},${windowtester.p2.repo},${studio3.tests.p2.repo}" />
+			<param name="p2.installIU" value="org.eclipse.test.feature.group,com.aptana.feature.feature.group,com.windowtester.runtime.feature.group,${topLevelElementId}.feature.group" />
+			<param name="p2.repo" value="${eclipse.tests.p2.repo},${studio3.p2.repo},${windowtester.p2.repo},${studio3.tests.p2.repo}" />
 		</antcall>
 		<!-- Modify the plugin_customization.ini to set initial properties for tests! -->
-		<concat append="true" destfile="${baseLocation}/plugins/org.eclipse.sdk_3.6.0.v201006080911/plugin_customization.ini">
+		<concat append="true" destfile="${baseLocation}/plugins/${platform.plugin}/plugin_customization.ini">
 			<filelist dir="${basedir}/prefs" files="plugin_customization.ini" />
 		</concat>
 	</target>
