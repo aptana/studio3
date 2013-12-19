@@ -4,9 +4,22 @@
 		<Class name="~.*\.Messages" />
 		<Bug code="UUF" />
 	</Match>
+	<!-- Don't include assignment of singleton plugin instance -->
+	<Match>
+		<Class name="~.*Plugin" />
+		<Or>
+			<Method name="start" />
+			<Method name="stop" />
+		</Or>
+		<Bug code="ST" />
+	</Match>
 	<!-- Exclude JUnit-specific bugs in test classes -->
 	<Match>
 		<Class name="~.*\.*Test" />
 		<Bug code="IJU" />
+	</Match>
+	<!-- Exclude Jetty -->
+	<Match>
+		<Package name="~com\.aptana\.jetty\.util\..*" />
 	</Match>
 </FindBugsFilter>
