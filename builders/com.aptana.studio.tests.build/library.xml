@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+    name="Library"
+    default="usage"
+    basedir=".">
+
+    <target name="usage">
+        <echo message="Please refer to http://wiki.eclipse.org/Platform-releng/Eclipse_Test_Framework for instructions on usage." />
+    </target>
+
+    <target
+        name="init"
+        unless="testframeworkinitialized">
+        <!--
+
+            Parameters:
+
+            (Mandatory)
+
+            data-dir    - the directory for Eclipse to write its data
+
+            plugin-name - the name of the plugin to test
+
+            classname   - the name of the test class
+
+
+            (Optional - added to (or overrides) defaults set in infrastructure scripts)
+
+            vmargs (1)   - a string containing arguments to pass to the VM. These
+                           parameters should be specific, but permanent, to the test plugin
+                           that uses them. For example, a jdt core test plugin might use
+                           vmargs="-DstoreMemory=jdtcoremodel_mem_trace,dir=${basedir}/../..".
+                           Note, normally test plugins do not need to specify -Xmx
+                           or -XX:MaxPermSize type parameters as they are set by
+                           the test infrastructure depending machine, OS, VM version, etc,
+                           unless of course the test plugins needs especially low or high values,
+                           as part of the test.
+
+            extraVMargs (1) - allows separate setting of VM args in a setting other than
+                           the production runs of automated tests. Should not normally be
+                           "hard coded" in to the test plugin itself, but instead reserved
+                           for someone to add arguments in some other setting other then
+                           the production test environment. For example,
+                           a committer to jdt.core might want to do a quick test before
+                           a commit, and use
+                           extraVMargs="-Dcompliance=1.7"
+                           in some local version of testing scripts.
+
+            timeout       - overrides default test timeout value (in milliseconds). [May not currently override default?]
+
+            test-output   - overrides default output file produced from test run. [May not currently override default?]
+
+            plugin-path   - path to root of plug-in
+
+            useEclipseExe - property setting forces test to launch via eclipse executable. [Not fully supported. See bug 387638.]
+
+            junit-report-output - output directory for junit reports produced for specified classname.
+
+
+            (Environment Variables - environment variables that the test framework uses or passes through)
+
+            ANT_OPTS (1)  - Carry through the ANT_OPTS environment variable settings, if any. As described in
+                            http://ant.apache.org/manual/running.html
+                            <quote>
+                            ANT_OPTS - command-line arguments that should be passed to the JVM.
+                            For example, you can define system properties or set the
+                            maximum Java heap size here.
+                            </quote>
+                            This can be important for some environments such as running tests on eclipse.org Hudson,
+                            where proxy servers, etc., can be defined for that Hudson instance by the machine itself.
+
+            (Reserved -     documented here for awareness, but reserved for use by the test infrastructure
+                            itself. The test infrastructure sets these based on typical, common, or required values
+                            for the production test environment.)
+
+            frameworkvmargs (1) - vm args provided by the automated test infrastructure. Normally, these arguments
+                            provide parameters for cases that apply to all test suites as ran in a production environment,
+                            such as -Xms, -Xmx, -XX:MaxPermSize, -XstartOnFirstThread
+                            where these values may vary based on machine or VM being used or
+                            even type of test (such as, for performance tests, ms and mx are set higher
+                            than for unit tests).
+
+            loglocation -   some VMs allow crash log location to specified as VM parameter (but,
+                            pretty special, limited usefulness and may be removed.
+
+            Notes:
+
+            1) Note how vm arguments are ordered. The vm arguments variables are combined in order:
+
+              ${frameworkvmargs} ${ANT_OPTS} ${vmargs} ${extraVMargs}
+
+              Typically (as far as is known) if the same argument is specified twice,
+              the one appearing last in the line takes priority. For example, if
+              vmargs specified -Dtestarg=one and
+              extraVMargs specified -Dtestarg=two,
+              then "two" could be the value of the testarg property at runtime.
+
+        -->
+        <property environment="env" />
+
+        <condition
+            property="envantopts"
+            value="${env.ANT_OPTS}"
+            else="">
+            <isset property="env.ANT_OPTS" />
+        </condition>
+
+
+        <echo message="ANT_OPTS: ${env.ANT_OPTS}" />
+
+        <tstamp>
+            <format
+                property="TIMENOW"
+                pattern="HHmmssSSSS" />
+        </tstamp>
+        <!--property setting useEclipseExe launches tests using the eclipse executable-->
+        <condition
+            property="launchTarget"
+            value="eclipse-test">
+            <isset property="useEclipseExe" />
+        </condition>
+        <!--default launch target for launching tests-->
+        <property
+            name="launchTarget"
+            value="java-test" />
+        <property
+            name="formatter"
+            value="org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter" />
+
+        <!--default heap sizes when running performance tests-->
+        <condition
+            property="frameworkvmargs"
+            value=" -Xms512M -Xmx1024M -XX:MaxPermSize=256m ${envantopts}">
+            <equals
+                arg1="${test.target}"
+                arg2="performance" />
+        </condition>
+        <tstamp prefix="NOW" />
+        <property
+            name="coverage-output"
+            value="${eclipse-home}/coverage" />
+        <property file="${basedir}/finalPluginsVersions.properties" />
+        <echo message="basedir = ${basedir}" />
+        <property
+            name="vmargs"
+            value="" />
+        <property
+            name="extraVMargs"
+            value="" />
+        <property
+            name="plugin-path"
+            value="" />
+        <property
+            name="timeout"
+            value="7200000" />
+        <property
+            name="test-output"
+            value="${eclipse-home}/${classname}.xml" />
+        <property
+            name="junit-report-output"
+            value="${eclipse-home}/results" />
+        <mkdir dir="${junit-report-output}" />
+        <property
+            name="junit-stylesheet"
+            value="${basedir}/JUNIT.XSL" />
+        <property
+            name="testframeworkinitialized"
+            value="true" />
+        <echoproperties description="Echo Properties at end of init in library.xml" />
+    </target>
+
+    <target
+        name="core-test"
+        description="Eclipse application used to launch HEADLESS plugin tests."
+        depends="init">
+        <antcall target="${launchTarget}">
+            <param
+                name="application"
+                value="org.eclipse.test.coretestapplication" />
+        </antcall>
+    </target>
+
+    <target
+        name="ui-test"
+        description="Eclipse application used to launch UI plugin tests."
+        depends="init">
+        <antcall target="${launchTarget}">
+            <param
+                name="application"
+                value="org.eclipse.test.uitestapplication" />
+        </antcall>
+    </target>
+
+    <target
+        name="java-test"
+        depends="init">
+        <echo
+            level="debug"
+            message="DEBUG: Running tests using java-test" />
+        <!--default vm args-->
+        <condition
+            property="frameworkvmargs"
+            value=" -Xms40m -Xmx512m -XX:MaxPermSize=256m ${envantopts}">
+            <os family="windows" />
+        </condition>
+        <!--
+            For more info on -XstartOnFirstThread, see
+            http://stackoverflow.com/questions/3976342/running-swt-based-cross-platform-jar-properly-on-a-mac
+        -->
+        <condition
+            property="frameworkvmargs"
+            value=" -XstartOnFirstThread -Xms40m -Xmx512m -XX:MaxPermSize=256m ${envantopts}">
+            <os family="mac" />
+        </condition>
+        <property
+            name="frameworkvmargs"
+            value=" -Xms40m -Xmx512m -XX:MaxPermSize=256m ${envantopts}" />
+
+        <condition
+            property="loglocation"
+            value=" ${loglocationarg}=${junit-report-output}/${classname}-crash.log"
+            else="">
+            <isset property="loglocationarg" />
+        </condition>
+
+        <!--set default jvm to use for testing-->
+        <property
+            name="jvm"
+            value="${java.home}/bin/java" />
+
+        <echo message="Running ${classname}. Result file: ${junit-report-output}/${classname}.xml" />
+        <echo message="timout property: ${timeout}" />
+
+        <echo message="frameworkvmargs: ${frameworkvmargs}" />
+        <echo message="vmargs: ${vmargs}" />
+        <echo message="extraVMargs: ${extraVMargs}" />
+
+        <echo message="crash loglocationarg (if any): ${loglocationarg}" />
+        <echo message="crash loglocation (if not default): ${loglocation}" />
+
+        <java
+            fork="true"
+            dir="."
+            timeout="${timeout}"
+            jvm="${jvm}"
+            logError="true"
+            classname="org.eclipse.core.launcher.Main"
+            output="${junit-report-output}/${classname}.txt">
+            <classpath>
+                <fileset dir="${eclipse-home}/plugins">
+                    <include name="org.eclipse.equinox.launcher_*.jar" />
+                </fileset>
+            </classpath>
+            <arg line="-application ${application}" />
+            <arg line="-data ${data-dir}" />
+            <arg line="formatter=${formatter},${test-output}" />
+            <arg line="-testPluginName ${plugin-name}" />
+            <arg line="-className ${classname}" />
+            <arg line="-os ${os}" />
+            <arg line="-ws ${ws}" />
+            <arg line="-arch ${arch}" />
+            <arg line="-consolelog" />
+            <arg line="-timeout ${timeout}" />
+            <arg value="-junitReportOutput" />
+            <arg path="${junit-report-output}" />
+            <jvmarg line="${frameworkvmargs} ${loglocation} ${vmargs} ${extraVMargs}" />
+            <sysproperty
+                key="PLUGIN_PATH"
+                value="${plugin-path}" />
+        </java>
+        <antcall target="collect-results" />
+    </target>
+
+    <target
+        name="eclipse-test"
+        description="Runs the specified classname as a plug-in test."
+        depends="init">
+        <echo
+            level="debug"
+            message="DEBUG: Running tests using eclipse-test" />
+        <property
+            name="frameworkvmargs"
+            value="-Xms256m -Xmx512m -XX:MaxPermSize=256m" />
+
+        <condition
+            property="loglocation"
+            value=" ${loglocationarg}=${junit-report-output}/${classname}-crash.log"
+            else="">
+            <isset property="loglocationarg" />
+        </condition>
+
+        <!--use -consolelog if launching a headless test-->
+        <condition
+            property="consolelog"
+            value="-consolelog">
+            <equals
+                arg1="${application}"
+                arg2="org.eclipse.test.coretestapplication" />
+        </condition>
+        <property
+            name="consolelog"
+            value="" />
+
+        <!--
+            vm selection priority:
+            1.  user-specified java executable via outer Ant property setting of "jvm".
+            2.  java executable on path.
+        -->
+        <condition
+            property="test-vm"
+            value="-vm ${jvm}">
+            <isset property="jvm" />
+        </condition>
+        <property
+            name="test-vm"
+            value="" />
+
+        <!--ensure executable has execute permission-->
+        <chmod
+            file="${eclipse-home}/eclipse"
+            perm="ugo+rx" />
+
+        <echo message="crash loglocationarg (if any): ${loglocationarg}" />
+        <echo message="crash loglocation (if not default): ${loglocation}" />
+        <echo message="Running ${classname}. Result file: ${junit-report-output}/${classname}.xml." />
+
+        <exec
+            executable="${eclipse-home}/eclipse"
+            dir="${eclipse-home}"
+            timeout="${timeout}"
+            logError="true"
+            failonerror="false"
+            output="${junit-report-output}/${classname}.txt">
+            <arg line="-data ${data-dir}" />
+            <arg line="${test-vm}" />
+            <arg line="-application ${application}" />
+            <arg line="formatter=${formatter},${test-output}" />
+            <arg line="-testPluginName ${plugin-name}" />
+            <arg line="-className ${classname}" />
+            <arg line="-nosplash" />
+            <arg line="--launcher.suppressErrors" />
+            <arg line="${consolelog}" />
+            <arg line="-vmargs ${frameworkvmargs} ${loglocation} ${vmargs} ${extraVMargs} -DPLUGIN_PATH=${plugin-path}" />
+        </exec>
+        <antcall target="collect-results" />
+    </target>
+
+    <target name="collect-results">
+        <dirname
+            property="output-dir"
+            file="${test-output}" />
+        <basename
+            property="output-file-name"
+            file="${test-output}" />
+        <junitreport
+            todir="${junit-report-output}"
+            tofile="${classname}.xml">
+            <fileset dir="${output-dir}">
+                <include name="${output-file-name}" />
+            </fileset>
+        </junitreport>
+
+
+        <!--save .log content and *.log content from configuration directory-->
+        <concat destfile="${junit-report-output}/${classname}.log">
+            <fileset
+                dir="${eclipse-home}"
+                includes="${data-dir}/.metadata/*.log" />
+            <fileset
+                dir="${eclipse-home}"
+                includes="configuration/*.log" />
+        </concat>
+
+        <!-- save any crash logs generated (before they are deleted by subsequent test runs -->
+        <!--
+             TODO: not all VM's call their crash logs "hs_err_pid*.log".
+             We can expand the list as we learn of others
+        -->
+        <copy todir="${junit-report-output}/crashlogs/">
+            <fileset dir="${eclipse-home}">
+                <include name="**/hs_err_pid*.log" />
+            </fileset>
+            <globmapper
+                from="*"
+                to="${classname}.*" />
+        </copy>
+    </target>
+
+    <target name="collect">
+        <!--
+            This target can be used to aggragate test runs from multiple test suites into a single report.
+
+            Parameters to this target:
+            includes        - the names of the files to include
+            output-file        - the name of the output file to produce
+        -->
+        <junitreport
+            todir="."
+            tofile="${output-file}">
+            <fileset dir=".">
+                <include name="${includes}" />
+            </fileset>
+        </junitreport>
+    </target>
+
+</project>
+
