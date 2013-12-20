@@ -8,6 +8,8 @@
 
 package com.aptana.core.util;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -21,8 +23,9 @@ import com.aptana.core.util.ProgressMonitorInterrupter.InterruptDelegate;
  * @author Max Stepanov
  */
 @SuppressWarnings("nls")
-public class ProgressMonitorInterrupterTest extends TestCase {
+public class ProgressMonitorInterrupterTest {
 
+	@Test
 	public void testInterruptJob() throws InterruptedException {
 		final boolean[] passed = new boolean[] { false };
 		Job job = new Job("Test") {
@@ -53,6 +56,7 @@ public class ProgressMonitorInterrupterTest extends TestCase {
 		assertTrue(passed[0]);
 	}
 
+	@Test
 	public void testInterruptJobWithDelegate() throws InterruptedException {
 		final boolean[] passed = new boolean[] { false };
 		Job job = new Job("Test") {
@@ -91,6 +95,7 @@ public class ProgressMonitorInterrupterTest extends TestCase {
 		assertTrue(passed[0]);
 	}
 
+	@Test
 	public void testEarlyDispose() throws InterruptedException {
 		final boolean[] passed = new boolean[] { false };
 		Job job = new Job("Test") {
@@ -123,6 +128,7 @@ public class ProgressMonitorInterrupterTest extends TestCase {
 		assertTrue(passed[0]);
 	}
 
+	@Test
 	public void testNull() {
 		ProgressMonitorInterrupter interrupter = new ProgressMonitorInterrupter(null);
 		interrupter.dispose();

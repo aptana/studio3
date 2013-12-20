@@ -7,6 +7,8 @@
  */
 package com.aptana.core.util;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -16,8 +18,9 @@ import java.io.OutputStream;
 
 import junit.framework.TestCase;
 
-public class OutputStreamThreadTest extends TestCase
+public class OutputStreamThreadTest
 {
+	@Test
 	public void testNoCharSet() throws FileNotFoundException, IOException, InterruptedException
 	{
 		File outputFile = File.createTempFile("test", "txt");
@@ -33,21 +36,23 @@ public class OutputStreamThreadTest extends TestCase
 		assertEquals("this is a test", result);
 	}
 
+	@Test
 	public void testWithUTF8CharSet() throws FileNotFoundException, IOException, InterruptedException
 	{
 		File outputFile = File.createTempFile("test", "txt");
 		outputFile.deleteOnExit();
 		OutputStream output = new FileOutputStream(outputFile);
 
-		OutputStreamThread outputThread = new OutputStreamThread(output, "this is a test è", "UTF-8");
+		OutputStreamThread outputThread = new OutputStreamThread(output, "this is a test ÔøΩ", "UTF-8");
 
 		outputThread.start();
 		outputThread.join();
 
 		String result = IOUtil.read(new FileInputStream(outputFile), "UTF-8");
-		assertEquals("this is a test è", result);
+		assertEquals("this is a test ÔøΩ", result);
 	}
 
+	@Test
 	public void testNullParameters()
 	{
 		try

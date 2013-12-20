@@ -7,6 +7,8 @@
  */
 package com.aptana.core.util;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -22,7 +24,7 @@ import org.eclipse.core.runtime.Platform;
 import com.aptana.core.CorePlugin;
 
 @SuppressWarnings("nls")
-public class FirefoxUtilTest extends TestCase {
+public class FirefoxUtilTest {
 
 	private static final String PROFILES_INI = "[General]\n" + "StartWithLastProfile=1\n" + "\n" + "[Profile0]\n"
 			+ "Name=default\n" + "IsRelative=1\n" + "Path=Profiles/0sw283qs.default\n" + "\n" + "[Profile1]\n"
@@ -33,6 +35,7 @@ public class FirefoxUtilTest extends TestCase {
 			+ "<Description about=\"urn:mozilla:install-manifest\">\n" + "<em:id>mytest.ext</em:id>\n"
 			+ "<em:version>1.7.3</em:version>\n" + "<em:type>2</em:type>\n" + "</Description>\n" + "</RDF>\n" + "";
 
+	@Test
 	public void testReadProfiles() throws IOException {
 		File dir = File.createTempFile(getClass().getSimpleName(), "temp");
 		try {
@@ -56,6 +59,7 @@ public class FirefoxUtilTest extends TestCase {
 
 	}
 
+	@Test
 	public void testFindDefaultProfileLocation() throws IOException {
 		File profileDir = File.createTempFile(getClass().getSimpleName(), "profile");
 		try {
@@ -78,6 +82,7 @@ public class FirefoxUtilTest extends TestCase {
 
 	}
 
+	@Test
 	public void testFindDefaultProfileLocationNoProfiles() throws IOException {
 		File dir = File.createTempFile(getClass().getSimpleName(), "temp");
 		try {
@@ -97,6 +102,7 @@ public class FirefoxUtilTest extends TestCase {
 
 	}
 
+	@Test
 	public void testGetExtensionVersion() throws IOException {
 		File profileDir = File.createTempFile(getClass().getSimpleName(), "profile");
 		try {
@@ -119,6 +125,7 @@ public class FirefoxUtilTest extends TestCase {
 
 	}
 
+	@Test
 	public void testGetExtensionVersionXPI() throws IOException {
 		URL url = FileLocator.find(Platform.getBundle("com.aptana.core.tests"), Path.fromPortableString("/resources"),
 				null);
@@ -126,6 +133,7 @@ public class FirefoxUtilTest extends TestCase {
 		assertEquals("1.7.0", FirefoxUtil.getExtensionVersion("test", Path.fromOSString(dir.getAbsolutePath())));
 	}
 
+	@Test
 	public void testInstallLinkedExtension() throws IOException {
 		File dir = File.createTempFile(getClass().getSimpleName(), "temp");
 		try {
@@ -141,6 +149,7 @@ public class FirefoxUtilTest extends TestCase {
 		}
 	}
 
+	@Test
 	public void testInstallExtensionNoFile() throws IOException {
 		File dir = File.createTempFile(getClass().getSimpleName(), "temp");
 		try {
@@ -155,6 +164,7 @@ public class FirefoxUtilTest extends TestCase {
 		}
 	}
 
+	@Test
 	public void testInstallExtensionExistingFile() throws IOException {
 		File dir = File.createTempFile(getClass().getSimpleName(), "temp");
 		try {
@@ -170,6 +180,7 @@ public class FirefoxUtilTest extends TestCase {
 		}
 	}
 
+	@Test
 	public void testInstallExtensionCorruptedUnzip() throws IOException {
 		File dir = File.createTempFile(getClass().getSimpleName(), "temp");
 		try {

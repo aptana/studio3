@@ -7,14 +7,17 @@
  */
 package com.aptana.core.util;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
-public class SourcePrinterTest extends TestCase
+public class SourcePrinterTest
 {
 
+	@Test
 	public void testGetIndexString()
 	{
 		String indexString = "  ";
@@ -23,6 +26,7 @@ public class SourcePrinterTest extends TestCase
 		assertEquals(indexString, printer.getIndentString());
 	}
 
+	@Test
 	public void testEmptyStringIndentText()
 	{
 		SourcePrinter printer = new SourcePrinter(StringUtil.EMPTY);
@@ -32,6 +36,7 @@ public class SourcePrinterTest extends TestCase
 
 	}
 
+	@Test
 	public void testIncreaseIndentLevel()
 	{
 		SourcePrinter printer = new SourcePrinter("  ");
@@ -43,6 +48,7 @@ public class SourcePrinterTest extends TestCase
 
 	}
 
+	@Test
 	public void testDecreaseIndentLevel()
 	{
 		SourcePrinter printer = new SourcePrinter(" ");
@@ -58,6 +64,7 @@ public class SourcePrinterTest extends TestCase
 
 	}
 
+	@Test
 	public void testLineDelimiter()
 	{
 		SourcePrinter printer = new SourcePrinter();
@@ -69,6 +76,7 @@ public class SourcePrinterTest extends TestCase
 		assertEquals(delimiter, printer.getLineDelimeter());
 	}
 
+	@Test
 	public void testPrintln()
 	{
 		SourcePrinter printer = new SourcePrinter();
@@ -81,6 +89,7 @@ public class SourcePrinterTest extends TestCase
 		assertEquals(printer.toString(), printer2.toString());
 	}
 
+	@Test
 	public void testComplexSource()
 	{
 		SourcePrinter printer = new SourcePrinter("  ");
@@ -95,6 +104,7 @@ public class SourcePrinterTest extends TestCase
 		assertEquals("Aptana Studio\n  is\nawesome!", printer.getBuffer().toString());
 	}
 
+	@Test
 	public void testPrintObject()
 	{
 		SourcePrinter printer = new SourcePrinter("  ");
@@ -105,6 +115,7 @@ public class SourcePrinterTest extends TestCase
 		assertEquals("File: AptanaStudio.exe", printer.toString());
 	}
 
+	@Test
 	public void testPrintIndent()
 	{
 		SourcePrinter printer = new SourcePrinter("  ");
@@ -116,6 +127,7 @@ public class SourcePrinterTest extends TestCase
 		assertEquals("Aptana  Studio", printer.toString());
 	}
 
+	@Test
 	public void testPrintWithIndent()
 	{
 		SourcePrinter printer = new SourcePrinter();
@@ -125,6 +137,7 @@ public class SourcePrinterTest extends TestCase
 		assertEquals("  Testing", printer.getBuffer().toString());
 	}
 
+	@Test
 	public void testPrintLnText()
 	{
 		SourcePrinter printer = new SourcePrinter();
@@ -135,6 +148,7 @@ public class SourcePrinterTest extends TestCase
 		assertEquals("abc\n", printer.toString());
 	}
 
+	@Test
 	public void testPrintCharTextWithIndent()
 	{
 		SourcePrinter printer = new SourcePrinter();
@@ -144,6 +158,7 @@ public class SourcePrinterTest extends TestCase
 		assertEquals("  a", printer.toString());
 	}
 
+	@Test
 	public void testPrintLnCharTextWithIndent()
 	{
 		SourcePrinter printer = new SourcePrinter();
