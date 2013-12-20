@@ -1,34 +1,34 @@
 package com.aptana.index.core;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.junit.After;
+import org.junit.Test;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
 
-public class FileStoreBuildContextTest extends TestCase
+public class FileStoreBuildContextTest
 {
 
 	private FileStoreBuildContext context;
 
-	protected void setUp() throws Exception
-	{
-		super.setUp();
-	}
-
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		context = null;
-		super.tearDown();
 	}
 
+	@Test
 	public void testWithEmptyJSFile() throws Exception
 	{
 		File file = File.createTempFile("fileStoreBuildContext", ".js");

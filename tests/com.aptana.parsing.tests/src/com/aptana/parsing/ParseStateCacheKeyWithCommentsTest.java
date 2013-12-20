@@ -7,14 +7,19 @@
  */
 package com.aptana.parsing;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
 
 /**
  * @author Fabio
  */
-public class ParseStateCacheKeyWithCommentsTest extends TestCase
+public class ParseStateCacheKeyWithCommentsTest
 {
 
+	@Test
 	public void testParseStateCacheKeyWithCommentsTest() throws Exception
 	{
 		ParseStateCacheKeyWithComments p0 = new ParseStateCacheKeyWithComments(true, true, new ParseStateCacheKey());

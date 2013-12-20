@@ -7,14 +7,16 @@
  */
 package com.aptana.editor.json;
 
-import java.text.MessageFormat;
+import static org.junit.Assert.assertEquals;
 
-import junit.framework.TestCase;
+import java.text.MessageFormat;
 
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.rules.FastPartitioner;
+import org.junit.After;
+import org.junit.Test;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IPartitioningConfiguration;
@@ -22,7 +24,7 @@ import com.aptana.editor.common.IPartitioningConfiguration;
 /**
  * JSONSourcePartitionerScannerTest
  */
-public class JSONSourcePartitionerScannerTest extends TestCase
+public class JSONSourcePartitionerScannerTest
 {
 	private IDocumentPartitioner _partitioner;
 
@@ -91,20 +93,16 @@ public class JSONSourcePartitionerScannerTest extends TestCase
 		return this._partitioner.getContentType(offset);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		this._partitioner = null;
-
-		super.tearDown();
 	}
 
 	/**
 	 * testDefaultPartition
 	 */
+	@Test
 	public void testDefaultPartition()
 	{
 		String source = "{ } [ ] , : true false null 10"; //$NON-NLS-1$
@@ -115,6 +113,7 @@ public class JSONSourcePartitionerScannerTest extends TestCase
 	/**
 	 * testDoubleQuotedStringPartition
 	 */
+	@Test
 	public void testDoubleQuotedStringPartition()
 	{
 		String source = "\"hello\""; //$NON-NLS-1$
@@ -125,6 +124,7 @@ public class JSONSourcePartitionerScannerTest extends TestCase
 	/**
 	 * testSingleQuotedStringPartition
 	 */
+	@Test
 	public void testSingleQuotedStringPartition()
 	{
 		String source = "'hello'"; //$NON-NLS-1$
@@ -135,6 +135,7 @@ public class JSONSourcePartitionerScannerTest extends TestCase
 	/**
 	 * testPropertyPartition
 	 */
+	@Test
 	public void testPropertyPartition()
 	{
 		String source = "'hello':"; //$NON-NLS-1$

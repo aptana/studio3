@@ -7,6 +7,8 @@
  */
 package com.aptana.index.core.build;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.CoreException;
@@ -24,9 +26,10 @@ import com.aptana.parsing.ast.ParseRootNode;
 /**
  * @author Fabio
  */
-public class BuildContextTest extends TestCase
+public class BuildContextTest
 {
 
+	@Test
 	public void testBuildContext() throws Exception
 	{
 		final int[] reparses = new int[] { 0 };
