@@ -152,13 +152,6 @@
       <handler
             class="com.aptana.samples.ui.handlers.ImportSampleHandler"
             commandId="com.aptana.samples.ui.commands.import">
-         <activeWhen>
-            <iterate>
-               <instanceof
-                     value="com.aptana.samples.model.IProjectSample">
-               </instanceof>
-            </iterate>
-         </activeWhen>
       </handler>
    </extension>
    <extension
