@@ -7,30 +7,18 @@
  */
 package com.aptana.theme.tests;
 
-import junit.framework.Test;
-import junit.framework.TestResult;
-import junit.framework.TestSuite;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
 
 import com.aptana.theme.ThemeTests;
 
+@RunWith(Suite.class)
+//@formatter:off
+@SuiteClasses({
+	ThemeTests.class
+})
+//@formatter:on
 public class AllTests
 {
-
-	public static Test suite()
-	{
-		TestSuite suite = new TestSuite(AllTests.class.getName())
-		{
-			@Override
-			public void runTest(Test test, TestResult result)
-			{
-				System.err.println("Running test: " + test.toString());
-				super.runTest(test, result);
-			}
-		};
-		// $JUnit-BEGIN$
-		suite.addTest(ThemeTests.suite());
-		// $JUnit-END$
-		return suite;
-	}
-
 }

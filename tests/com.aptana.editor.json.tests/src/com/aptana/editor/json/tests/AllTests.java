@@ -7,31 +7,20 @@
  */
 package com.aptana.editor.json.tests;
 
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
+
 import com.aptana.editor.json.outline.JSONOutlineProviderTest;
-
-import junit.framework.Test;
-import junit.framework.TestResult;
-import junit.framework.TestSuite;
-
+@RunWith(Suite.class)
+//@formatter:off
+@SuiteClasses({
+	com.aptana.editor.json.AllTests.class,
+	JSONOutlineProviderTest.class,
+	com.aptana.editor.json.internal.text.AllTests.class
+})
+//@formatter:on
 public class AllTests
 {
 
-	public static Test suite()
-	{
-		TestSuite suite = new TestSuite(AllTests.class.getName())
-		{
-			@Override
-			public void runTest(Test test, TestResult result)
-			{
-				System.err.println("Running test: " + test.toString());
-				super.runTest(test, result);
-			}
-		};
-		// $JUnit-BEGIN$
-		suite.addTest(com.aptana.editor.json.AllTests.suite());
-		suite.addTestSuite(JSONOutlineProviderTest.class);
-		suite.addTest(com.aptana.editor.json.internal.text.AllTests.suite());
-		// $JUnit-END$
-		return suite;
-	}
 }

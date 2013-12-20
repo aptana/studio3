@@ -7,38 +7,27 @@
  */
 package com.aptana.editor.html.tests;
 
-import junit.framework.Test;
-import junit.framework.TestResult;
-import junit.framework.TestSuite;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
 
 import com.aptana.editor.html.contentassist.index.HTMLFileIndexingParticipantTest;
 import com.aptana.editor.html.internal.build.HTMLTaskDetectorTest;
 import com.aptana.editor.html.validator.ValidatorTests;
 
+@RunWith(Suite.class)
+//@formatter:off
+@SuiteClasses({
+	com.aptana.editor.html.HTMLEditorTests.class,
+	com.aptana.editor.html.parsing.HTMLParsingTests.class,
+	com.aptana.editor.html.outline.AllTests.class,
+	com.aptana.editor.html.contentassist.AllTests.class,
+	ValidatorTests.class,
+	com.aptana.editor.html.text.AllTests.class,
+	HTMLFileIndexingParticipantTest.class,
+	HTMLTaskDetectorTest.class
+})
+// @formatter:on
 public class AllTests
 {
-
-	public static Test suite()
-	{
-		TestSuite suite = new TestSuite("Test for com.aptana.editor.html.tests")
-		{
-			@Override
-			public void runTest(Test test, TestResult result)
-			{
-				System.err.println("Running test: " + test.toString());
-				super.runTest(test, result);
-			}
-		};
-		// $JUnit-BEGIN$
-		suite.addTest(com.aptana.editor.html.HTMLEditorTests.suite());
-		suite.addTest(com.aptana.editor.html.parsing.HTMLParsingTests.suite());
-		suite.addTest(com.aptana.editor.html.outline.AllTests.suite());
-		suite.addTest(com.aptana.editor.html.contentassist.AllTests.suite());
-		suite.addTest(ValidatorTests.suite());
-		suite.addTest(com.aptana.editor.html.text.AllTests.suite());
-		suite.addTestSuite(HTMLFileIndexingParticipantTest.class);
-		suite.addTestSuite(HTMLTaskDetectorTest.class);
-		// $JUnit-END$
-		return suite;
-	}
 }

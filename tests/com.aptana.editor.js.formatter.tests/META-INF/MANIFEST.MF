@@ -5,7 +5,7 @@ Bundle-SymbolicName: com.aptana.editor.js.formatter.tests
 Bundle-Version: 3.0.0.qualifier
 Bundle-Vendor: %providerName
 Fragment-Host: com.aptana.editor.js.formatter;bundle-version="3.0.0"
-Require-Bundle: org.junit,
+Require-Bundle: org.junit;bundle-version="4.0.0",
  com.aptana.formatter.epl
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Import-Package: com.aptana.formatter,
