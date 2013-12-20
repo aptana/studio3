@@ -7,6 +7,10 @@
  */
 package com.aptana.editor.common.internal.peer;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +30,7 @@ import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
 
-public class PeerCharacterCloserTest extends TestCase
+public class PeerCharacterCloserTest
 {
 
 	private static List<Character> DEFAULT_PAIRS;
@@ -35,10 +39,11 @@ public class PeerCharacterCloserTest extends TestCase
 	private ITextViewer viewer;
 	private IDocument document;
 
-	@Override
-	protected void setUp() throws Exception
+//	@Override
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 		DEFAULT_PAIRS = new ArrayList<Character>();
 		DEFAULT_PAIRS.add('[');
 		DEFAULT_PAIRS.add(']');
@@ -70,17 +75,19 @@ public class PeerCharacterCloserTest extends TestCase
 		};
 	}
 
-	@Override
-	protected void tearDown() throws Exception
+//	@Override
+	@After
+	public void tearDown() throws Exception
 	{
 		viewer = null;
 		closer = null;
 		document = null;
-		super.tearDown();
+//		super.tearDown();
 	}
 
 	// TODO Add tests so we can verify that newline inside () inserts it, but in "" moves to exit of linked mode
 
+	@Test
 	public void testDoesntDoubleEndingUnclosedPair()
 	{
 		setDocument("\" ");
@@ -92,6 +99,7 @@ public class PeerCharacterCloserTest extends TestCase
 		assertEquals("\" ", document.get());
 	}
 
+	@Test
 	public void testAutoClosePair()
 	{
 		setDocument(" ");
@@ -101,6 +109,7 @@ public class PeerCharacterCloserTest extends TestCase
 		assertEquals("\"\" ", document.get());
 	}
 
+	@Test
 	public void testDontCloseWhenSimpleUnopenedPairCloseCharFollows()
 	{
 		setDocument(" ) ");
@@ -109,6 +118,7 @@ public class PeerCharacterCloserTest extends TestCase
 		assertTrue(event.doit); // don't interfere
 	}
 
+	@Test
 	public void testDontCloseWhenUnOpenedPairFollows()
 	{
 		setDocument(" ()) ");
@@ -117,6 +127,7 @@ public class PeerCharacterCloserTest extends TestCase
 		assertTrue(event.doit); // don't interfere
 	}
 
+	@Test
 	public void testWrapSelected()
 	{
 		setDocument("selected ");
@@ -127,6 +138,7 @@ public class PeerCharacterCloserTest extends TestCase
 		assertEquals("\"selected\" ", document.get());
 	}
 
+	@Test
 	public void testUnpairedClose() throws Exception
 	{
 		closer = new PeerCharacterCloser(null)
@@ -156,6 +168,7 @@ public class PeerCharacterCloserTest extends TestCase
 		assertTrue(closer.unpairedClose('(', ')', new Document(builder.toString()), times));
 	}
 
+	@Test
 	public void testDontCloseSingleQuotesInComment()
 	{
 		setDocument(" ");
@@ -183,6 +196,7 @@ public class PeerCharacterCloserTest extends TestCase
 		assertTrue(event.doit); // don't interfere
 	}
 
+	@Test
 	public void testDontCountCharsInTrailingCommentsForDeterminingPairBalance()
 	{
 		setDocument("\n // )");
@@ -208,6 +222,7 @@ public class PeerCharacterCloserTest extends TestCase
 		assertEquals("()\n // )", document.get());
 	}
 
+	@Test
 	public void testDontCountCharsInPrecedingCommentsForDeterminingPairBalance()
 	{
 		document = new Document("// '\n ");
@@ -246,6 +261,7 @@ public class PeerCharacterCloserTest extends TestCase
 		assertEquals("// '\n'' ", document.get());
 	}
 
+	@Test
 	public void testRR3_115()
 	{
 		setDocument("function x()\n" + "{\n" + "    if (false)\n" + "    \n" + "\n" + "    if (false)\n" + "    {\n"
@@ -274,6 +290,7 @@ public class PeerCharacterCloserTest extends TestCase
 				+ "        // scroll sub-regions\n" + "    }\n" + "};", document.get());
 	}
 
+	@Test
 	public void testStudio3_1213()
 	{
 		setDocument("bundle do |bundle|\n" + "  bundle.author = 'Ed Spencer'\n"
@@ -303,6 +320,7 @@ public class PeerCharacterCloserTest extends TestCase
 		assertTrue(event.doit); // Don't pair, insert single character!
 	}
 
+	@Test
 	public void testignoresRubyHashesForHTMLTagPairs()
 	{
 		// FIXME This is pretty ugly here. We should probably have just created a temp file, opened it with our editor

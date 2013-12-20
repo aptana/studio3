@@ -7,6 +7,10 @@
  */
 package com.aptana.editor.common.internal.commands;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +38,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.editor.epl.tests.EditorTestHelper;
 
-public class NextPreviousEditorHandlerTest extends TestCase
+public class NextPreviousEditorHandlerTest
 {
 
 	private static final String HTML_EDITOR_ID = "com.aptana.editor.html";
@@ -46,10 +50,11 @@ public class NextPreviousEditorHandlerTest extends TestCase
 	private List<IFile> files;
 	private List<ITextEditor> editors;
 
-	@Override
-	protected void setUp() throws Exception
+//	@Override
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 		Class.forName("com.aptana.editor.html.HTMLPlugin");
 		project = createProject();
 		files = new ArrayList<IFile>();
@@ -57,8 +62,9 @@ public class NextPreviousEditorHandlerTest extends TestCase
 		// FIXME Make sure there are no other editors open!
 	}
 
-	@Override
-	protected void tearDown() throws Exception
+//	@Override
+	@After
+	public void tearDown() throws Exception
 	{
 		try
 		{
@@ -80,7 +86,7 @@ public class NextPreviousEditorHandlerTest extends TestCase
 			editors = null;
 			files = null;
 			project = null;
-			super.tearDown();
+//			super.tearDown();
 		}
 	}
 
@@ -117,6 +123,7 @@ public class NextPreviousEditorHandlerTest extends TestCase
 		return editor;
 	}
 
+	@Test
 	public void testExecute() throws Exception
 	{
 		// Open multiple files!!!

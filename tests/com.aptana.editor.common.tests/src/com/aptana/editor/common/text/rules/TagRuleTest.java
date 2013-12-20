@@ -7,6 +7,8 @@
  */
 package com.aptana.editor.common.text.rules;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
 import org.eclipse.jface.text.Document;
@@ -15,9 +17,10 @@ import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.Token;
 
-public class TagRuleTest extends TestCase
+public class TagRuleTest
 {
 
+	@Test
 	public void testSimpleOpenTag()
 	{
 		IToken successToken = new Token("name");
@@ -30,6 +33,7 @@ public class TagRuleTest extends TestCase
 		assertEquals(document.getLength(), scanner.getTokenLength());
 	}
 
+	@Test
 	public void testOpenTagWithAttribute()
 	{
 		IToken successToken = new Token("name");
@@ -42,6 +46,7 @@ public class TagRuleTest extends TestCase
 		assertEquals(document.getLength(), scanner.getTokenLength());
 	}
 
+	@Test
 	public void testSelfClosingTagWithAttribute()
 	{
 		IToken successToken = new Token("name");
@@ -54,6 +59,7 @@ public class TagRuleTest extends TestCase
 		assertEquals(document.getLength(), scanner.getTokenLength());
 	}
 
+	@Test
 	public void testTagWithEndBraceInsideSingleQuotedString()
 	{
 		IToken successToken = new Token("name");
@@ -66,6 +72,7 @@ public class TagRuleTest extends TestCase
 		assertEquals(document.getLength(), scanner.getTokenLength());
 	}
 
+	@Test
 	public void testTagWithEndBraceInsideDoubleQuotedString()
 	{
 		IToken successToken = new Token("name");
@@ -78,6 +85,7 @@ public class TagRuleTest extends TestCase
 		assertEquals(document.getLength(), scanner.getTokenLength());
 	}
 
+	@Test
 	public void testTagWithEndBraceInsideMultiLineDoubleQuotedString()
 	{
 		IToken successToken = new Token("name");
@@ -90,6 +98,7 @@ public class TagRuleTest extends TestCase
 		assertEquals(document.getLength(), scanner.getTokenLength());
 	}
 
+	@Test
 	public void testTagWithEndBraceInsideMultiLineDoubleQuotedStringContainingEscapes()
 	{
 		IToken successToken = new Token("name");
@@ -102,6 +111,7 @@ public class TagRuleTest extends TestCase
 		assertEquals(document.getLength(), scanner.getTokenLength());
 	}
 
+	@Test
 	public void testTagWithEndBraceInsideMultiLineSingleQuotedString()
 	{
 		IToken successToken = new Token("name");
@@ -114,6 +124,7 @@ public class TagRuleTest extends TestCase
 		assertEquals(document.getLength(), scanner.getTokenLength());
 	}
 
+	@Test
 	public void testTagWithEndBraceInsideMultiLineSingleQuotedStringContainingEscapes()
 	{
 		IToken successToken = new Token("name");

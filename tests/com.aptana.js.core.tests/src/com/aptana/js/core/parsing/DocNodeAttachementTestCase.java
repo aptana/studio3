@@ -7,6 +7,9 @@
  */
 package com.aptana.js.core.parsing;
 
+import org.junit.After;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
@@ -37,22 +40,24 @@ import com.aptana.parsing.xpath.ParseNodeXPath;
 /**
  * DocNodeAttachementTestBase
  */
-public abstract class DocNodeAttachementTestCase extends TestCase
+public abstract class DocNodeAttachementTestCase
 {
 	private JSParser parser;
 
-	@Override
-	protected void setUp() throws Exception
+//	@Override
+	@Before
+	public void setUp() throws Exception
 	{
 		parser = new JSParser();
 	}
 
-	@Override
-	protected void tearDown() throws Exception
+//	@Override
+	@After
+	public void tearDown() throws Exception
 	{
 		parser = null;
 
-		super.tearDown();
+//		super.tearDown();
 	}
 
 	/**

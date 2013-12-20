@@ -7,8 +7,12 @@
  */
 package com.aptana.editor.js.text;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
@@ -23,16 +27,14 @@ public class JSTextHoverTest extends JSEditorBasedTestCase
 {
 	private JSTextHover hover;
 
-	@Override
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
-
 		hover = new JSTextHover();
 	}
 
 	@Override
-	protected void tearDown() throws Exception
+	public void tearDown() throws Exception
 	{
 		hover = null;
 		super.tearDown();
@@ -114,11 +116,13 @@ public class JSTextHoverTest extends JSEditorBasedTestCase
 
 	}
 
+	@Test
 	public void test1236()
 	{
 		assertHoverRegionAndInfo("hover/1236.js", "win2", "These are docs for win2", new Region(4, 4));
 	}
 
+	@Test
 	public void testTagStrippingAndTypeBolding()
 	{
 		TagStripperAndTypeBolder formatter = new TagStripperAndTypeBolder();

@@ -7,6 +7,10 @@
  */
 package com.aptana.scope.parsing;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
 import com.aptana.scope.ISelectorNode;
@@ -15,7 +19,7 @@ import com.aptana.scope.ScopeUtil;
 /**
  * ScopeParserTests
  */
-public class ScopeParserTests extends TestCase
+public class ScopeParserTests
 {
 	private ScopeParser parser;
 
@@ -23,9 +27,10 @@ public class ScopeParserTests extends TestCase
 	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 
 		parser = new ScopeParser();
 	}
@@ -34,11 +39,12 @@ public class ScopeParserTests extends TestCase
 	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		parser = null;
 
-		super.tearDown();
+//		super.tearDown();
 	}
 
 	protected void assertParseResult(String source, String treeString)
@@ -59,71 +65,85 @@ public class ScopeParserTests extends TestCase
 		}
 	}
 
+	@Test
 	public void testSimpleNameSelector()
 	{
 		assertParseResult("name", "name");
 	}
 
+	@Test
 	public void testDottedNameSelector()
 	{
 		assertParseResult("name.another", "name.another");
 	}
 
+	@Test
 	public void testDescendantSelector()
 	{
 		assertParseResult("javascript comment", "(> javascript comment)");
 	}
 
+	@Test
 	public void testCommaSelector()
 	{
 		assertParseResult("html, javascript", "(, html javascript)");
 	}
 
+	@Test
 	public void testPipeSelector()
 	{
 		assertParseResult("html | javascript", "(| html javascript)");
 	}
 
+	@Test
 	public void testGroupSelector()
 	{
 		assertParseResult("(html)", "(GROUP html)");
 	}
 
+	@Test
 	public void testNegativeLookaheadSelector()
 	{
 		assertParseResult("html - comment", "(- html comment)");
 	}
 
+	@Test
 	public void testIntersectionSelector()
 	{
 		assertParseResult("html & javascript", "(& html javascript)");
 	}
 
+	@Test
 	public void testPrecedence()
 	{
 		assertParseResult("a & b | c & d", "(| (& a b) (& c d))");
 	}
 
+	@Test
 	public void testPrecedence2()
 	{
 		assertParseResult("a & b, c & d", "(, (& a b) (& c d))");
 	}
 
+	@Test
 	public void testPrecedence3()
 	{
 		assertParseResult("a, b | c, d", "(| (, a b) (, c d))");
 	}
 
+	@Test
 	public void testPrecedence4()
 	{
 		assertParseResult("a & b | c & d - e", "(| (& a b) (- (& c d) e))");
 	}
 
+	@Test
 	public void testNegativeLookaheadWithOr()
 	{
 		assertParseResult("text.html - (source | string)", "(- text.html (GROUP (| source string)))");
 	}
 
+	@Test
 	public void testNegativeLookaheadWithDescendantSelector()
 	{
 		assertParseResult("text.html - source string", "(- text.html (> source string)))");

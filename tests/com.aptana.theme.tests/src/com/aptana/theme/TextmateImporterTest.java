@@ -7,6 +7,8 @@
  */
 package com.aptana.theme;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.io.File;
 import java.net.URL;
 
@@ -18,9 +20,10 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 
 @SuppressWarnings("nls")
-public class TextmateImporterTest extends TestCase
+public class TextmateImporterTest
 {
 
+	@Test
 	public void testImportOfMidnightTheme() throws Exception
 	{
 		TextmateImporter importer = new TextmateImporter();

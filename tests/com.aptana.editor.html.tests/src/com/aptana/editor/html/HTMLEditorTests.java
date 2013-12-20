@@ -7,36 +7,41 @@
  */
 package com.aptana.editor.html;
 
+import org.junit.runners.Suite.SuiteClasses;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
-public class HTMLEditorTests extends TestCase
+@RunWith(Suite.class)
+@SuiteClasses({HTMLDoctypeScannerTest.class, HTMLEditorTest.class, HTMLFoldingComputerTest.class, HTMLOpenTagCloserTest.class, HTMLScannerTest.class, HTMLSourcePartitionScannerTest.class, HTMLTagScannerTest.class, HTMLTagUtilTest.class, })
+public class HTMLEditorTests
 {
 
-	public static Test suite()
-	{
-		TestSuite suite = new TestSuite(HTMLEditorTests.class.getName())
-		{
-			@Override
-			public void runTest(Test test, TestResult result)
-			{
-				System.err.println("Running test: " + test.toString());
-				super.runTest(test, result);
-			}
-		};
-		// $JUnit-BEGIN$
-		suite.addTestSuite(HTMLDoctypeScannerTest.class);
-		suite.addTestSuite(HTMLEditorTest.class);
-		suite.addTestSuite(HTMLFoldingComputerTest.class);
-		suite.addTestSuite(HTMLOpenTagCloserTest.class);
-		suite.addTestSuite(HTMLScannerTest.class);
-		suite.addTestSuite(HTMLSourcePartitionScannerTest.class);
-		suite.addTestSuite(HTMLTagScannerTest.class);
-		suite.addTestSuite(HTMLTagUtilTest.class);
-		// $JUnit-END$
-		return suite;
-	}
-
+//	public static Test suite()
+//	{
+//		TestSuite suite = new TestSuite(HTMLEditorTests.class.getName())
+//		{
+//			@Override
+//			public void runTest(Test test, TestResult result)
+//			{
+//				System.err.println("Running test: " + test.toString());
+//				super.runTest(test, result);
+//			}
+//		};
+//		// $JUnit-BEGIN$
+//		suite.addTestSuite(HTMLDoctypeScannerTest.class);
+//		suite.addTestSuite(HTMLEditorTest.class);
+//		suite.addTestSuite(HTMLFoldingComputerTest.class);
+//		suite.addTestSuite(HTMLOpenTagCloserTest.class);
+//		suite.addTestSuite(HTMLScannerTest.class);
+//		suite.addTestSuite(HTMLSourcePartitionScannerTest.class);
+//		suite.addTestSuite(HTMLTagScannerTest.class);
+//		suite.addTestSuite(HTMLTagUtilTest.class);
+//		// $JUnit-END$
+//		return suite;
+//	}
+//
 }

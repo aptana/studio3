@@ -7,6 +7,8 @@
  */
 package com.aptana.editor.css.contentassist;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.text.MessageFormat;
 
 import junit.framework.TestCase;
@@ -16,7 +18,7 @@ import org.eclipse.jface.text.IDocument;
 import com.aptana.css.core.parsing.CSSTokenType;
 import com.aptana.editor.common.contentassist.ILexemeProvider;
 
-public class CoarseLocationTests extends TestCase
+public class CoarseLocationTests
 {
 	/**
 	 * coarseLocationTests
@@ -49,6 +51,7 @@ public class CoarseLocationTests extends TestCase
 	/**
 	 * testNoSource
 	 */
+	@Test
 	public void testNoSource()
 	{
 		String source = "";
@@ -62,6 +65,7 @@ public class CoarseLocationTests extends TestCase
 	/**
 	 * testElementOnly
 	 */
+	@Test
 	public void testElementOnly()
 	{
 		String source = "body";
@@ -75,6 +79,7 @@ public class CoarseLocationTests extends TestCase
 	/**
 	 * testElementAndClass
 	 */
+	@Test
 	public void testElementAndClass()
 	{
 		String source = "body.myClass";
@@ -88,6 +93,7 @@ public class CoarseLocationTests extends TestCase
 	/**
 	 * testElementAndID
 	 */
+	@Test
 	public void testElementAndID()
 	{
 		String source = "body#myID";
@@ -101,6 +107,7 @@ public class CoarseLocationTests extends TestCase
 	/**
 	 * testMultipleElements
 	 */
+	@Test
 	public void testMultipleElements()
 	{
 		String source = "a, b, body";
@@ -114,6 +121,7 @@ public class CoarseLocationTests extends TestCase
 	/**
 	 * testEmptyBody
 	 */
+	@Test
 	public void testEmptyBody()
 	{
 		String source = "body {}";
@@ -129,6 +137,7 @@ public class CoarseLocationTests extends TestCase
 	/**
 	 * testEmptyBody2
 	 */
+	@Test
 	public void testEmptyBody2()
 	{
 		String source = "body {\n  \n}";
@@ -144,6 +153,7 @@ public class CoarseLocationTests extends TestCase
 	/**
 	 * testEmptyBody2
 	 */
+	@Test
 	public void testTwoRules()
 	{
 		String source = "body {\n  \n}\n\ntable {\n  \n}";
@@ -158,6 +168,7 @@ public class CoarseLocationTests extends TestCase
 		);
 	}
 
+	@Test
 	public void testPseudoClassRegression()
 	{
 		String source = "a: {}";

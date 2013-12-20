@@ -7,6 +7,9 @@
  */
 package com.aptana.buildpath.core.tests;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.net.URI;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -15,44 +18,40 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.TestCase;
-
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.junit.After;
+import org.junit.Before;
 
 import com.aptana.core.IFilter;
 import com.aptana.core.IMap;
 import com.aptana.core.build.IBuildParticipant;
 import com.aptana.core.build.IProblem;
 import com.aptana.core.build.ReconcileContext;
-import com.aptana.core.tests.TestProject;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.build.BuildContext;
 import com.aptana.parsing.IParseState;
 
-public abstract class AbstractValidatorTestCase extends TestCase
+public abstract class AbstractValidatorTestCase
 {
 
 	protected IBuildParticipant fValidator;
 
-	@Override
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
 		fValidator = createValidator();
 	}
 
-	@Override
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		if (fValidator != null)
 		{
 			fValidator.restoreDefaults();
 			fValidator = null;
 		}
-		super.tearDown();
 	}
 
 	protected abstract IBuildParticipant createValidator();

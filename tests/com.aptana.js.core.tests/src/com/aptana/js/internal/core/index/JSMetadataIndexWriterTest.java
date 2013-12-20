@@ -7,6 +7,9 @@
  */
 package com.aptana.js.internal.core.index;
 
+import org.junit.After;
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -28,18 +31,19 @@ import com.aptana.js.core.model.FunctionElement;
 import com.aptana.js.core.model.PropertyElement;
 import com.aptana.js.core.model.TypeElement;
 
-public class JSMetadataIndexWriterTest extends TestCase
+public class JSMetadataIndexWriterTest
 {
 	/*
 	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
-	@Override
-	protected void tearDown() throws Exception
+//	@Override
+	@After
+	public void tearDown() throws Exception
 	{
 		getIndexManager().removeIndex(URI.create(IJSIndexConstants.METADATA_INDEX_LOCATION));
 
-		super.tearDown();
+//		super.tearDown();
 	}
 
 	protected IndexManager getIndexManager()
@@ -123,6 +127,7 @@ public class JSMetadataIndexWriterTest extends TestCase
 	 * 
 	 * @throws ScriptDocException
 	 */
+	@Test
 	public void testType() throws Exception
 	{
 		String typeName = "MyClass";
@@ -141,6 +146,7 @@ public class JSMetadataIndexWriterTest extends TestCase
 	 * 
 	 * @throws ScriptDocException
 	 */
+	@Test
 	public void testMethod() throws Exception
 	{
 		String typeName = "MyClass";
@@ -173,6 +179,7 @@ public class JSMetadataIndexWriterTest extends TestCase
 	 * 
 	 * @throws ScriptDocException
 	 */
+	@Test
 	public void testProperty() throws Exception
 	{
 		String typeName = "MyClass";
@@ -201,6 +208,7 @@ public class JSMetadataIndexWriterTest extends TestCase
 	 * 
 	 * @throws ScriptDocException
 	 */
+	@Test
 	public void testTypeDescription() throws Exception
 	{
 		String typeName = "MyClass";

@@ -1,23 +1,30 @@
 package com.aptana.git.ui.hyperlink;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 
-public class HyperlinkDetectorTest extends TestCase
+public class HyperlinkDetectorTest
 {
 
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 	}
 
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
-		super.tearDown();
+//		super.tearDown();
 	}
 
+	@Test
 	public void testDetectFileWithLinesAdded() throws Exception
 	{
 		HyperlinkDetector detector = new HyperlinkDetector();
@@ -29,6 +36,7 @@ public class HyperlinkDetectorTest extends TestCase
 		assertEquals(38, region.getLength());
 	}
 
+	@Test
 	public void testDetectFileWithLinesRemoved() throws Exception
 	{
 		HyperlinkDetector detector = new HyperlinkDetector();
@@ -40,6 +48,7 @@ public class HyperlinkDetectorTest extends TestCase
 		assertEquals(38, region.getLength());
 	}
 
+	@Test
 	public void testDetectFileWithLinesAddedAndRemoved() throws Exception
 	{
 		HyperlinkDetector detector = new HyperlinkDetector();
@@ -51,6 +60,7 @@ public class HyperlinkDetectorTest extends TestCase
 		assertEquals(38, region.getLength());
 	}
 
+	@Test
 	public void testDetectBinaryFileChanges() throws Exception
 	{
 		HyperlinkDetector detector = new HyperlinkDetector();
@@ -63,6 +73,7 @@ public class HyperlinkDetectorTest extends TestCase
 		assertEquals(36, region.getLength());
 	}
 
+	@Test
 	public void testIgnoresTruncatedFilepath() throws Exception
 	{
 		HyperlinkDetector detector = new HyperlinkDetector();
@@ -72,6 +83,7 @@ public class HyperlinkDetectorTest extends TestCase
 		assertEquals(0, links.length);
 	}
 
+	@Test
 	public void testAutoMergingLine() throws Exception
 	{
 		HyperlinkDetector detector = new HyperlinkDetector();
@@ -83,6 +95,7 @@ public class HyperlinkDetectorTest extends TestCase
 		assertEquals(42, region.getLength());
 	}
 
+	@Test
 	public void testRemovingLine() throws Exception
 	{
 		HyperlinkDetector detector = new HyperlinkDetector();
@@ -95,6 +108,7 @@ public class HyperlinkDetectorTest extends TestCase
 		assertEquals(57, region.getLength());
 	}
 
+	@Test
 	public void testCreateLine() throws Exception
 	{
 		HyperlinkDetector detector = new HyperlinkDetector();
@@ -106,6 +120,7 @@ public class HyperlinkDetectorTest extends TestCase
 		assertEquals(42, region.getLength());
 	}
 
+	@Test
 	public void testDeleteLine() throws Exception
 	{
 		HyperlinkDetector detector = new HyperlinkDetector();
@@ -118,6 +133,7 @@ public class HyperlinkDetectorTest extends TestCase
 		assertEquals(57, region.getLength());
 	}
 
+	@Test
 	public void testRenameLine() throws Exception
 	{
 		HyperlinkDetector detector = new HyperlinkDetector();
@@ -130,6 +146,7 @@ public class HyperlinkDetectorTest extends TestCase
 		assertEquals(136, region.getLength());
 	}
 
+	@Test
 	public void testRenameWithEmptySideLine() throws Exception
 	{
 		HyperlinkDetector detector = new HyperlinkDetector();

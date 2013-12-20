@@ -1,5 +1,8 @@
 package com.aptana.editor.html;
 
+import org.junit.After;
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.util.Collection;
 import java.util.Map;
 
@@ -16,18 +19,20 @@ import com.aptana.editor.html.parsing.HTMLParser;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ast.IParseRootNode;
 
-public class HTMLFoldingComputerTest extends TestCase
+public class HTMLFoldingComputerTest
 {
 
 	private IFoldingComputer folder;
 
-	@Override
-	protected void tearDown() throws Exception
+//	@Override
+	@After
+	public void tearDown() throws Exception
 	{
 		folder = null;
-		super.tearDown();
+//		super.tearDown();
 	}
 
+	@Test
 	public void testAPSTUD3151_JSComment() throws Exception
 	{
 		String src = "<!DOCTYPE html>\n" + //
@@ -55,6 +60,7 @@ public class HTMLFoldingComputerTest extends TestCase
 		assertFalse(positions.contains(new Position(1, 44)));
 	}
 
+	@Test
 	public void testAPSTUD3151_CSSComment() throws Exception
 	{
 		String src = "<!DOCTYPE html>\n" + //

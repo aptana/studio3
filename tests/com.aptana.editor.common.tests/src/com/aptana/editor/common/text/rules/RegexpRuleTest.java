@@ -7,6 +7,8 @@
  */
 package com.aptana.editor.common.text.rules;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
 import org.eclipse.jface.text.Document;
@@ -17,9 +19,10 @@ import org.eclipse.jface.text.rules.Token;
 
 import com.aptana.editor.common.text.rules.RegexpRule;
 
-public class RegexpRuleTest extends TestCase
+public class RegexpRuleTest
 {
 
+	@Test
 	public void testRegexp()
 	{
 		IToken successToken = new Token("name");
@@ -43,6 +46,7 @@ public class RegexpRuleTest extends TestCase
 		assertEquals(26, scanner.getColumn());
 	}
 	
+	@Test
 	public void testRegexp2()
 	{
 		IToken successToken = new Token("name");
@@ -66,6 +70,7 @@ public class RegexpRuleTest extends TestCase
 		assertEquals(26, scanner.getColumn());
 	}
 	
+	@Test
 	public void testRegexpWithOptimizationStillWorksJustIgnoresInvalidOptimization()
 	{
 		IToken successToken = new Token("name");
@@ -112,6 +117,7 @@ public class RegexpRuleTest extends TestCase
 //		assertEquals(26, scanner.getColumn());
 //	}
 	
+	@Test
 	public void testRegexpWithOptimization()
 	{
 		IToken successToken = new Token("name");

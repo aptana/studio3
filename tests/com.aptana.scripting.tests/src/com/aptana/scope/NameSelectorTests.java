@@ -7,13 +7,16 @@
  */
 package com.aptana.scope;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
-public class NameSelectorTests extends TestCase
+public class NameSelectorTests
 {
 	/**
 	 * testNameIsPrefix
 	 */
+	@Test
 	public void testNameIsPrefix()
 	{
 		NameSelector name = new NameSelector("source");
@@ -25,6 +28,7 @@ public class NameSelectorTests extends TestCase
 	/**
 	 * testNameIsIdentical
 	 */
+	@Test
 	public void testNameIsIdentical()
 	{
 		NameSelector name = new NameSelector("source.ruby");
@@ -36,6 +40,7 @@ public class NameSelectorTests extends TestCase
 	/**
 	 * testNameIsPartial
 	 */
+	@Test
 	public void testNameIsPartial()
 	{
 		NameSelector name = new NameSelector("sourc");
@@ -47,6 +52,7 @@ public class NameSelectorTests extends TestCase
 	/**
 	 * testNameIsEmpty
 	 */
+	@Test
 	public void testNameIsEmpty()
 	{
 		NameSelector name = new NameSelector("");
@@ -58,6 +64,7 @@ public class NameSelectorTests extends TestCase
 	/**
 	 * testScopeIsEmpty
 	 */
+	@Test
 	public void testScopeIsEmpty()
 	{
 		NameSelector name = new NameSelector("source");
@@ -69,6 +76,7 @@ public class NameSelectorTests extends TestCase
 	/**
 	 * testNameIsNull
 	 */
+	@Test
 	public void testNameIsNull()
 	{
 		NameSelector name = new NameSelector(null);
@@ -80,6 +88,7 @@ public class NameSelectorTests extends TestCase
 	/**
 	 * testScopeIsNull
 	 */
+	@Test
 	public void testScopeIsNull()
 	{
 		NameSelector name = new NameSelector("source");

@@ -7,7 +7,10 @@
  */
 package com.aptana.editor.common.util;
 
+import static org.junit.Assert.assertEquals;
+
 import org.eclipse.core.filesystem.IFileStore;
+import org.junit.Test;
 import org.osgi.framework.Bundle;
 
 import com.aptana.editor.common.CommonEditorPlugin;
@@ -22,6 +25,7 @@ public class EditorUtilTest extends EditorBasedTests
 	/**
 	 * Run the String convertIndent(String,int,boolean) method test.
 	 */
+	@Test
 	public void testConvertIndentSpacesNoTabs()
 	{
 		assertEquals(" ", EditorUtil.convertIndent(" ", 1, false));
@@ -40,6 +44,7 @@ public class EditorUtilTest extends EditorBasedTests
 	/**
 	 * Run the String convertIndent(String,int,boolean) method test.
 	 */
+	@Test
 	public void testConvertIndentMixedSpaces()
 	{
 		assertEquals("   ", EditorUtil.convertIndent("\t\t ", 1, false));
@@ -53,6 +58,7 @@ public class EditorUtilTest extends EditorBasedTests
 	/**
 	 * Run the String convertIndent(String,int,boolean) method test.
 	 */
+	@Test
 	public void testConvertIndentTabsNoSpaces()
 	{
 		assertEquals("\t", EditorUtil.convertIndent(" ", 1, true));
@@ -79,6 +85,7 @@ public class EditorUtilTest extends EditorBasedTests
 	/**
 	 * Run the String convertIndent(String,int,boolean) method test.
 	 */
+	@Test
 	public void testConvertIndentMixedTabs()
 	{
 		assertEquals("\t\t\t", EditorUtil.convertIndent("\t\t ", 1, true));
@@ -92,6 +99,7 @@ public class EditorUtilTest extends EditorBasedTests
 	/**
 	 * Run the String convertIndent(String,int,boolean) method test.
 	 */
+	@Test
 	public void testConvertIndentNull()
 	{
 		assertEquals("", EditorUtil.convertIndent(null, 1, false));
@@ -102,6 +110,7 @@ public class EditorUtilTest extends EditorBasedTests
 	/**
 	 * Run the String convertIndent(String,int,boolean) method test.
 	 */
+	@Test
 	public void testConvertIndentTabsUseTabs()
 	{
 		assertEquals("", EditorUtil.convertIndent("", 1, false));
@@ -111,6 +120,7 @@ public class EditorUtilTest extends EditorBasedTests
 	/**
 	 * Run the int getSpaceIndentSize() method test.
 	 */
+	@Test
 	public void testGetSpaceIndentSizeNoEditor()
 	{
 		int result = EditorUtil.getSpaceIndentSize();
@@ -129,6 +139,7 @@ public class EditorUtilTest extends EditorBasedTests
 	/**
 	 * Run the int getSpaceIndentSize() method test.
 	 */
+	@Test
 	public void testGetSpaceIndentSizeEditor()
 	{
 		IFileStore fileStore = createFileStore("proposal_tests", "txt", "");

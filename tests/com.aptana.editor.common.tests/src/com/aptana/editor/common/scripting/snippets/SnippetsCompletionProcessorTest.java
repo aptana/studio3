@@ -7,13 +7,16 @@
  */
 package com.aptana.editor.common.scripting.snippets;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
 import org.eclipse.jface.text.Document;
 
-public class SnippetsCompletionProcessorTest extends TestCase
+public class SnippetsCompletionProcessorTest
 {
 
+	@Test
 	public void testExtractPrefixFromDocument()
 	{
 		// Currently as a single test since they are all variations on testing one function, but could be broken up
@@ -49,6 +52,7 @@ public class SnippetsCompletionProcessorTest extends TestCase
 		assertEquals(">", extractPrefixFromDocument(">"));
 	}
 
+	@Test
 	public void testExtractPrefixFromDocumentWithWhitespace()
 	{
 		assertEquals(">echo", extractPrefixFromDocument(" >echo"));
@@ -57,6 +61,7 @@ public class SnippetsCompletionProcessorTest extends TestCase
 		assertEquals("]echo", extractPrefixFromDocument("\n]echo"));
 	}
 
+	@Test
 	public void testNarrowPrefix()
 	{
 		// Currently as a single test since they are all variations on testing one function, but could be broken up

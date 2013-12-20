@@ -1,8 +1,12 @@
 package com.aptana.jira.core;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
-public class JiraManagerTest extends TestCase
+public class JiraManagerTest
 {
 
 	private static final String TEST_USER = "studio-test";
@@ -10,18 +14,21 @@ public class JiraManagerTest extends TestCase
 
 	private JiraManager manager;
 
-	@Override
-	protected void setUp() throws Exception
+//	@Override
+	@Before
+	public void setUp() throws Exception
 	{
 		manager = JiraCorePlugin.getDefault().getJiraManager();
 	}
 
-	@Override
-	protected void tearDown() throws Exception
+//	@Override
+	@After
+	public void tearDown() throws Exception
 	{
 		manager = null;
 	}
 
+	@Test
 	public void testLogin()
 	{
 		try
@@ -34,6 +41,7 @@ public class JiraManagerTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testLoginWithInvalidUser()
 	{
 		try
@@ -46,6 +54,7 @@ public class JiraManagerTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testLoginWithInvalidPassword()
 	{
 		try

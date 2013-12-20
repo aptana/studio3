@@ -7,6 +7,9 @@
  */
 package com.aptana.editor.css.internal.text;
 
+import org.junit.After;
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.util.Collection;
 import java.util.Map;
 
@@ -27,11 +30,12 @@ import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseRootNode;
 
-public class CSSFoldingComputerTest extends TestCase
+public class CSSFoldingComputerTest
 {
 
-	@Override
-	protected void tearDown() throws Exception
+//	@Override
+	@After
+	public void tearDown() throws Exception
 	{
 		try
 		{
@@ -40,10 +44,11 @@ public class CSSFoldingComputerTest extends TestCase
 		}
 		finally
 		{
-			super.tearDown();
+//			super.tearDown();
 		}
 	}
 
+	@Test
 	public void testBasicCSSFolding() throws Exception
 	{
 		String src = "body {\n" + "	color: red;\n" + "}\n" + "\n" + "div p {\n" + "	background-color: green;\n" + "}\n"
@@ -82,6 +87,7 @@ public class CSSFoldingComputerTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testCSSCommentFolding() throws Exception
 	{
 		String src = "/*\n * This is a comment.\n */\n";
@@ -92,6 +98,7 @@ public class CSSFoldingComputerTest extends TestCase
 		assertTrue(positions.contains(new Position(0, src.length())));
 	}
 
+	@Test
 	public void testCSSCommentInitiallyFolded() throws Exception
 	{
 		String src = "/*\n * This is a comment.\n */\n";
@@ -108,6 +115,7 @@ public class CSSFoldingComputerTest extends TestCase
 		assertFalse(annotations.keySet().iterator().next().isCollapsed());
 	}
 
+	@Test
 	public void testCSSRuleInitiallyFolded() throws Exception
 	{
 		String src = "body {\n	color: red;\n}\n";
@@ -124,6 +132,7 @@ public class CSSFoldingComputerTest extends TestCase
 		assertFalse(annotations.keySet().iterator().next().isCollapsed());
 	}
 
+	@Test
 	public void testMediaFolding() throws Exception
 	{
 		String src = "@media print {\n  body {\n    color: red;\n  }\n}\n";
@@ -135,6 +144,7 @@ public class CSSFoldingComputerTest extends TestCase
 		assertTrue(positions.contains(new Position(17, 27)));
 	}
 
+	@Test
 	public void testPageFolding() throws Exception
 	{
 		String src = "@page {\n  margin: 3cm;\n}\n";
@@ -145,6 +155,7 @@ public class CSSFoldingComputerTest extends TestCase
 		assertTrue(positions.contains(new Position(0, src.length())));
 	}
 
+	@Test
 	public void testFontFaceFolding() throws Exception
 	{
 		String src = "@font-face {\n  font-family: Gentium;\n  src: url(http://site/fonts/Gentium.ttf);\n}\n";

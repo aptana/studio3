@@ -7,6 +7,9 @@
  */
 package com.aptana.editor.common.tests;
 
+import org.junit.After;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,24 +21,26 @@ import org.eclipse.jface.text.rules.Token;
 
 import com.aptana.core.util.StringUtil;
 
-public abstract class AbstractTokenScannerTestCase extends TestCase
+public abstract class AbstractTokenScannerTestCase
 {
 	protected ITokenScanner scanner;
 
-	@Override
-	protected void setUp() throws Exception
+//	@Override
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 
 		scanner = createTokenScanner();
 	}
 
-	@Override
-	protected void tearDown() throws Exception
+//	@Override
+	@After
+	public void tearDown() throws Exception
 	{
 		scanner = null;
 
-		super.tearDown();
+//		super.tearDown();
 	}
 
 	protected abstract ITokenScanner createTokenScanner();

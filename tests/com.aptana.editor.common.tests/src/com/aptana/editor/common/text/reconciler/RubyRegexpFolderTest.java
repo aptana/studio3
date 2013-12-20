@@ -7,6 +7,10 @@
  */
 package com.aptana.editor.common.text.reconciler;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.util.Collection;
 import java.util.Map;
 
@@ -22,26 +26,29 @@ import org.jruby.Ruby;
 import org.jruby.RubyRegexp;
 import org.jruby.util.RegexpOptions;
 
-public class RubyRegexpFolderTest extends TestCase
+public class RubyRegexpFolderTest
 {
 
 	private Ruby runtime;
 
-	@Override
-	protected void setUp() throws Exception
+//	@Override
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 		runtime = Ruby.newInstance();
 	}
 
-	@Override
-	protected void tearDown() throws Exception
+//	@Override
+	@After
+	public void tearDown() throws Exception
 	{
 		runtime = null;
 
-		super.tearDown();
+//		super.tearDown();
 	}
 
+	@Test
 	public void testBasicCSSFolding() throws Exception
 	{
 		String src = "body {\n" + "	color: red;\n" + "}\n" + "\n" + "div p {\n" + "	background-color: green;\n" + "}\n"
@@ -77,6 +84,7 @@ public class RubyRegexpFolderTest extends TestCase
 		assertTrue(positions.contains(new Position(91, 33))); // only can go so far as EOF
 	}
 
+	@Test
 	public void testScriptdocFolding() throws Exception
 	{
 		String src = "/**\n * This is a comment.\n **/\n";
@@ -110,6 +118,7 @@ public class RubyRegexpFolderTest extends TestCase
 		assertTrue(positions.contains(new Position(0, src.length()))); // eats whole line at end
 	}
 
+	@Test
 	public void testJSCommentFolding() throws Exception
 	{
 		String src = "/*\n * This is a comment.\n */\n";
@@ -143,6 +152,7 @@ public class RubyRegexpFolderTest extends TestCase
 		assertTrue(positions.contains(new Position(0, src.length()))); // eats whole line at end
 	}
 
+	@Test
 	public void testJSFunctionFolding() throws Exception
 	{
 		String src = "function listItems(itemList) \n" + "{\n" + "   document.write(\"<UL>\\n\")\n"

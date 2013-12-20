@@ -7,6 +7,10 @@
  */
 package com.aptana.editor.common.internal.commands;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.io.ByteArrayInputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -44,7 +48,7 @@ import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.epl.tests.EditorTestHelper;
 
-public class ExpandLevelHandlerTest extends TestCase
+public class ExpandLevelHandlerTest
 {
 
 	private static final String HTML_EDITOR_ID = "com.aptana.editor.html";
@@ -56,10 +60,11 @@ public class ExpandLevelHandlerTest extends TestCase
 	private IViewPart outline;
 	private TreeViewer treeViewer;
 
-	@Override
-	protected void setUp() throws Exception
+//	@Override
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 		Class.forName("com.aptana.editor.html.HTMLPlugin");
 		project = createProject();
 
@@ -76,8 +81,9 @@ public class ExpandLevelHandlerTest extends TestCase
 		// We're in the UI thread and this doesn't allow the treeviewer to refresh in a separate thread/job properly...
 	}
 
-	@Override
-	protected void tearDown() throws Exception
+//	@Override
+	@After
+	public void tearDown() throws Exception
 	{
 		try
 		{
@@ -97,28 +103,32 @@ public class ExpandLevelHandlerTest extends TestCase
 			project = null;
 			treeViewer = null;
 			outline = null;
-			super.tearDown();
+//			super.tearDown();
 		}
 	}
 
+	@Test
 	public void testExpandToLevel1() throws Exception
 	{
 		expandToLevel(outline, "1");
 		assertEquals(0, treeViewer.getExpandedElements().length); // collapsed (root)
 	}
 
+	@Test
 	public void testExpandtoLevel2() throws Exception
 	{
 		expandToLevel(outline, "2");
 		assertEquals(1, treeViewer.getExpandedElements().length); // html
 	}
 
+	@Test
 	public void testExpandtoLevel3() throws Exception
 	{
 		expandToLevel(outline, "3");
 		assertEquals(3, treeViewer.getExpandedElements().length); // html, head, body
 	}
 
+	@Test
 	public void testExpandtoLevel4() throws Exception
 	{
 		expandToLevel(outline, "4");

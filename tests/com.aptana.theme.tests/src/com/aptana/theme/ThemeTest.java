@@ -7,6 +7,9 @@
  */
 package com.aptana.theme;
 
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.util.List;
 import java.util.Properties;
 
@@ -20,16 +23,17 @@ import com.aptana.scope.ScopeSelector;
 import com.aptana.theme.internal.OrderedProperties;
 
 @SuppressWarnings("nls")
-public class ThemeTest extends TestCase
+public class ThemeTest
 {
 
 	private Theme theme;
 	private ColorManager colormanager;
 
-	@Override
-	protected void setUp() throws Exception
+//	@Override
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 		Properties props = new OrderedProperties();
 		props.put("background", "#ffffff");
 		props.put("foreground", "#ff0000");
@@ -61,6 +65,7 @@ public class ThemeTest extends TestCase
 		};
 	}
 
+	@Test
 	public void testBasics()
 	{
 		assertEquals("chris", theme.getName());
@@ -96,6 +101,7 @@ public class ThemeTest extends TestCase
 
 	}
 
+	@Test
 	public void testAddingTokens()
 	{
 		assertFalse(theme.hasEntry("chris"));
@@ -106,6 +112,7 @@ public class ThemeTest extends TestCase
 		assertEquals(new RGB(255, 0, 0), theme.getForegroundAsRGB("chris"));
 	}
 
+	@Test
 	public void testModifyingTokens()
 	{
 		ThemeRule rule = theme.getRuleForSelector(new ScopeSelector("constant"));
@@ -116,6 +123,7 @@ public class ThemeTest extends TestCase
 		assertEquals(new RGB(64, 0, 64), theme.getBackgroundAsRGB("constant.language"));
 	}
 
+	@Test
 	public void testUpdateGlobalBGColor()
 	{
 		theme.updateBG(new RGB(128, 128, 128));
@@ -124,11 +132,13 @@ public class ThemeTest extends TestCase
 		assertEquals(new RGB(128, 128, 128), theme.getBackground());
 	}
 
+	@Test
 	public void testGetBackAsRGBReturnsThemeBackgroundIfNoBackGroundSpecified()
 	{
 		assertEquals(theme.getBackground(), theme.getBackgroundAsRGB("something.that.inherits"));
 	}
 
+	@Test
 	public void testUpdateGlobalFGColor()
 	{
 		theme.updateFG(new RGB(128, 128, 128));
@@ -138,6 +148,7 @@ public class ThemeTest extends TestCase
 		assertEquals(new RGB(128, 128, 128), theme.getForegroundAsRGB("something.that.inherits"));
 	}
 
+	@Test
 	public void testUpdateGlobalCaretColor()
 	{
 		theme.updateCaret(new RGB(128, 128, 128));
@@ -146,6 +157,7 @@ public class ThemeTest extends TestCase
 		assertEquals(new RGB(128, 128, 128), theme.getCaret());
 	}
 
+	@Test
 	public void testUpdateGlobalLineHighlightColor()
 	{
 		theme.updateLineHighlight(new RGB(128, 128, 128));
@@ -154,6 +166,7 @@ public class ThemeTest extends TestCase
 		assertEquals(new RGBa(128, 128, 128, 255), theme.getLineHighlight());
 	}
 
+	@Test
 	public void testUpdateGlobalSelectionColor()
 	{
 		theme.updateSelection(new RGB(128, 128, 128));
@@ -162,6 +175,7 @@ public class ThemeTest extends TestCase
 		assertEquals(new RGBa(128, 128, 128, 255), theme.getSelection());
 	}
 
+	@Test
 	public void testGetTokens()
 	{
 		List<ThemeRule> tokens = theme.getTokens();
@@ -176,6 +190,7 @@ public class ThemeTest extends TestCase
 				new RGBa(0, 0, 0), new RGBa(255, 0, 0), SWT.BOLD))));
 	}
 
+	@Test
 	public void testCopy()
 	{
 		// TODO What if we try to copy with a name that's already taken!
@@ -184,6 +199,7 @@ public class ThemeTest extends TestCase
 		assertBasics(copy);
 	}
 
+	@Test
 	public void testCopyWithNullArgument()
 	{
 		assertNull(theme.copy(null));
@@ -191,6 +207,7 @@ public class ThemeTest extends TestCase
 
 	// TODO Add test for delete
 
+	@Test
 	public void testRemove()
 	{
 		// Now check tokens
@@ -227,28 +244,33 @@ public class ThemeTest extends TestCase
 		assertEquals(new RGB(255, 0, 255), theme.getBackgroundAsRGB("constant.language.js"));
 	}
 
+	@Test
 	public void testDarkenDoesntGoOutOfRange()
 	{
 		assertEquals(new RGB(0, 0, 0), theme.darken(new RGB(0, 0, 0)));
 	}
 
+	@Test
 	public void testLightenDoesntGoOutOfRange()
 	{
 		assertEquals(new RGB(255, 255, 255), theme.lighten(new RGB(255, 255, 255)));
 	}
 
+	@Test
 	public void testDarken()
 	{
 		// TODO Keep darkening until we hit black?
 		assertEquals(new RGB(90, 90, 90), theme.darken(new RGB(128, 128, 128)));
 	}
 
+	@Test
 	public void testLighten()
 	{
 		// TODO Keep lightening until we hit white?
 		assertEquals(new RGB(166, 166, 166), theme.lighten(new RGB(128, 128, 128)));
 	}
 
+	@Test
 	public void testAPSTUD2790_Doctype()
 	{
 		// Empty the theme
@@ -272,6 +294,7 @@ public class ThemeTest extends TestCase
 		assertEquals("Doctype", rule.getName());
 	}
 
+	@Test
 	public void testAPSTUD2790_CSSBody()
 	{
 		// Empty the theme

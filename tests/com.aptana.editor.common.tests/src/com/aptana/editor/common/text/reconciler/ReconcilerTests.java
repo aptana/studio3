@@ -7,30 +7,35 @@
  */
 package com.aptana.editor.common.text.reconciler;
 
+import org.junit.runners.Suite.SuiteClasses;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 import junit.framework.Test;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
+@RunWith(Suite.class)
+@SuiteClasses({CommonReconcilerTest.class, CommonReconcilingStrategyTest.class, RubyRegexpFolderTest.class, })
 public class ReconcilerTests
 {
 
-	public static Test suite()
-	{
-		TestSuite suite = new TestSuite(ReconcilerTests.class.getName())
-		{
-			@Override
-			public void runTest(Test test, TestResult result)
-			{
-				System.err.println("Running test: " + test.toString());
-				super.runTest(test, result);
-			}
-		};
-		// $JUnit-BEGIN$
-		suite.addTestSuite(CommonReconcilerTest.class);
-		suite.addTestSuite(CommonReconcilingStrategyTest.class);
-		suite.addTestSuite(RubyRegexpFolderTest.class);
-		// $JUnit-END$
-		return suite;
-	}
-
+//	public static Test suite()
+//	{
+//		TestSuite suite = new TestSuite(ReconcilerTests.class.getName())
+//		{
+//			@Override
+//			public void runTest(Test test, TestResult result)
+//			{
+//				System.err.println("Running test: " + test.toString());
+//				super.runTest(test, result);
+//			}
+//		};
+//		// $JUnit-BEGIN$
+//		suite.addTestSuite(CommonReconcilerTest.class);
+//		suite.addTestSuite(CommonReconcilingStrategyTest.class);
+//		suite.addTestSuite(RubyRegexpFolderTest.class);
+//		// $JUnit-END$
+//		return suite;
+//	}
+//
 }

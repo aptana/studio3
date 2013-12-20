@@ -8,6 +8,8 @@
 
 package com.aptana.core.io.tests;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 
 import org.eclipse.core.resources.IFolder;
@@ -21,23 +23,25 @@ import com.aptana.ide.core.io.WorkspaceConnectionPoint;
 
 /**
  * @author Max Stepanov
- *
  */
-public class WorkspaceConnectionPointTest extends CommonConnectionTest {
+public class WorkspaceConnectionPointTest extends CommonConnectionTest
+{
 
 	private IProject project;
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.core.io.tests.CommonConnectionTest#setUp()
 	 */
 	@Override
-	protected void setUp() throws Exception {
+	public void setUp() throws Exception
+	{
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		WorkspaceConnectionPoint wcp = new WorkspaceConnectionPoint();
 		wcp.setResource(workspace.getRoot());
 		cp = wcp;
 
-		String projectName = WorkspaceConnectionPointTest.class.getSimpleName()+System.currentTimeMillis();
+		String projectName = WorkspaceConnectionPointTest.class.getSimpleName() + System.currentTimeMillis();
 		File projectDir = File.createTempFile(projectName, null);
 		assertTrue(projectDir.delete());
 		assertTrue(projectDir.mkdirs());
@@ -51,44 +55,54 @@ public class WorkspaceConnectionPointTest extends CommonConnectionTest {
 		testPath = folder.getFullPath();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.core.io.tests.CommonConnectionTest#tearDown()
 	 */
 	@Override
-	protected void tearDown() throws Exception {
+	public void tearDown() throws Exception
+	{
 		super.tearDown();
 		project.delete(true, true, null);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.core.io.tests.CommonConnectionTest#persistentConnection()
 	 */
 	@Override
-	protected boolean persistentConnection() {
+	protected boolean persistentConnection()
+	{
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.core.io.tests.CommonConnectionTest#supportsSetModificationTime()
 	 */
 	@Override
-	protected boolean supportsSetModificationTime() {
+	protected boolean supportsSetModificationTime()
+	{
 		return true;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.core.io.tests.CommonConnectionTest#supportsChangePermissions()
 	 */
 	@Override
-	protected boolean supportsChangePermissions() {
+	protected boolean supportsChangePermissions()
+	{
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.core.io.tests.CommonConnectionTest#supportsChangeGroup()
 	 */
 	@Override
-	protected boolean supportsChangeGroup() {
+	protected boolean supportsChangeGroup()
+	{
 		return false;
 	}
 

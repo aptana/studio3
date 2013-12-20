@@ -7,6 +7,9 @@
  */
 package com.aptana.editor.js.outline;
 
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.io.StringReader;
 
 import javax.xml.namespace.QName;
@@ -30,12 +33,13 @@ import com.aptana.parsing.ast.IParseNode;
 /**
  * @author Kevin Lindsey
  */
-public abstract class OutlineItemTestCase extends TestCase
+public abstract class OutlineItemTestCase
 {
 	private JSParser fParser;
 
-	@Override
-	protected void setUp() throws Exception
+//	@Override
+	@Before
+	public void setUp() throws Exception
 	{
 		fParser = new JSParser();
 	}
@@ -100,6 +104,7 @@ public abstract class OutlineItemTestCase extends TestCase
 	 * @param childCount
 	 *            The expected number of children for the element
 	 */
+	@Test
 	protected void testItem(String source, String xpath, String label, int childCount)
 	{
 		String countPath = "count(" + xpath + ")";

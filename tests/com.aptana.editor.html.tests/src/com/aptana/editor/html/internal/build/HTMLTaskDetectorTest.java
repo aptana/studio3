@@ -1,5 +1,9 @@
 package com.aptana.editor.html.internal.build;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Collection;
@@ -20,23 +24,26 @@ import com.aptana.core.util.IOUtil;
 import com.aptana.index.core.FileStoreBuildContext;
 import com.aptana.index.core.build.BuildContext;
 
-public class HTMLTaskDetectorTest extends TestCase
+public class HTMLTaskDetectorTest
 {
 
 	private HTMLTaskDetector taskDetector;
 
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 		taskDetector = new HTMLTaskDetector();
 	}
 
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		taskDetector = null;
-		super.tearDown();
+//		super.tearDown();
 	}
 
+	@Test
 	public void testDetectTaskTagWithUnicodeCharactersInCSSHTMLAndJS() throws Exception
 	{
 		File tmpDir = null;

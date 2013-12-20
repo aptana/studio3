@@ -1,5 +1,9 @@
 package com.aptana.core.build;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,7 +39,7 @@ import com.aptana.core.util.CollectionsUtil;
 import com.aptana.index.core.build.BuildContext;
 import com.aptana.testing.utils.ProjectCreator;
 
-public class UnifiedBuilderTest extends TestCase
+public class UnifiedBuilderTest
 {
 
 	private static final class FileDelta implements IResourceDelta
@@ -141,9 +145,10 @@ public class UnifiedBuilderTest extends TestCase
 		}
 	};
 
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 		project = ProjectCreator.createAndOpen("project_to_build");
 		participant = context.mock(IBuildParticipant.class);
 		manager = new BuildParticipantManager()
@@ -186,7 +191,8 @@ public class UnifiedBuilderTest extends TestCase
 		};
 	}
 
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		if (project != null)
 		{
@@ -196,9 +202,10 @@ public class UnifiedBuilderTest extends TestCase
 		participant = null;
 		builder = null;
 		manager = null;
-		super.tearDown();
+//		super.tearDown();
 	}
 
+	@Test
 	public void testFullBuild() throws Exception
 	{
 		IFolder folder = project.getFolder("folder");
@@ -238,6 +245,7 @@ public class UnifiedBuilderTest extends TestCase
 		context.assertIsSatisfied();
 	}
 
+	@Test
 	public void testFullBuild2() throws Exception
 	{
 		final String taskMessage = "Fake task";
@@ -285,6 +293,7 @@ public class UnifiedBuilderTest extends TestCase
 		// PROBLEM/TASK types?
 	}
 
+	@Test
 	public void testIncrementalBuildWithNoDeltaDoesFullBuild() throws Exception
 	{
 		context.checking(new Expectations()
@@ -314,6 +323,7 @@ public class UnifiedBuilderTest extends TestCase
 		context.assertIsSatisfied();
 	}
 
+	@Test
 	public void testIncrementalBuildWithDeletedFileDelta() throws Exception
 	{
 		IFile file = project.getFile(IProjectDescription.DESCRIPTION_FILE_NAME);
@@ -345,6 +355,7 @@ public class UnifiedBuilderTest extends TestCase
 		context.assertIsSatisfied();
 	}
 
+	@Test
 	public void testIncrementalBuildWithAddededFileDelta() throws Exception
 	{
 		IFile file = project.getFile(IProjectDescription.DESCRIPTION_FILE_NAME);
@@ -376,6 +387,7 @@ public class UnifiedBuilderTest extends TestCase
 		context.assertIsSatisfied();
 	}
 
+	@Test
 	public void testClean() throws Exception
 	{
 		context.checking(new Expectations()
@@ -396,6 +408,7 @@ public class UnifiedBuilderTest extends TestCase
 		context.assertIsSatisfied();
 	}
 
+	@Test
 	public void testDontBuildDerivedFiles() throws Exception
 	{
 		IFile file = project.getFile(IProjectDescription.DESCRIPTION_FILE_NAME);
@@ -427,6 +440,7 @@ public class UnifiedBuilderTest extends TestCase
 		context.assertIsSatisfied();
 	}
 
+	@Test
 	public void testDontBuildFilesUnderDerivedAncestor() throws Exception
 	{
 		IFolder folder = project.getFolder("build");
@@ -467,6 +481,7 @@ public class UnifiedBuilderTest extends TestCase
 		context.assertIsSatisfied();
 	}
 
+	@Test
 	public void testDontBuildTeamPrivateFiles() throws Exception
 	{
 		IFile file = project.getFile(IProjectDescription.DESCRIPTION_FILE_NAME);
@@ -498,6 +513,7 @@ public class UnifiedBuilderTest extends TestCase
 		context.assertIsSatisfied();
 	}
 
+	@Test
 	public void testDontBuildFilesUnderTeamPrivateAncestor() throws Exception
 	{
 		IFolder folder = project.getFolder("git");

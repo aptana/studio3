@@ -7,32 +7,37 @@
  */
 package com.aptana.editor.html.contentassist;
 
+import org.junit.runners.Suite.SuiteClasses;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 import junit.framework.Test;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
+@RunWith(Suite.class)
+@SuiteClasses({ContentAssistFineLocationTests.class, ContentAssistCoarseLocationTests.class, HTMLContentAssistProcessorTest.class, MetadataTests.class, HTMLNestedLanguageContentAssistTests.class, })
 public class AllTests
 {
 
-	public static Test suite()
-	{
-		TestSuite suite = new TestSuite("Test for com.aptana.editor.html.contentassist")
-		{
-			@Override
-			public void runTest(Test test, TestResult result)
-			{
-				System.err.println("Running test: " + test.toString());
-				super.runTest(test, result);
-			}
-		};
-		// $JUnit-BEGIN$
-		suite.addTestSuite(ContentAssistFineLocationTests.class);
-		suite.addTestSuite(ContentAssistCoarseLocationTests.class);
-		suite.addTestSuite(HTMLContentAssistProcessorTest.class);
-		suite.addTestSuite(MetadataTests.class);
-		suite.addTestSuite(HTMLNestedLanguageContentAssistTests.class);
-		// $JUnit-END$
-		return suite;
-	}
-
+//	public static Test suite()
+//	{
+//		TestSuite suite = new TestSuite("Test for com.aptana.editor.html.contentassist")
+//		{
+//			@Override
+//			public void runTest(Test test, TestResult result)
+//			{
+//				System.err.println("Running test: " + test.toString());
+//				super.runTest(test, result);
+//			}
+//		};
+//		// $JUnit-BEGIN$
+//		suite.addTestSuite(ContentAssistFineLocationTests.class);
+//		suite.addTestSuite(ContentAssistCoarseLocationTests.class);
+//		suite.addTestSuite(HTMLContentAssistProcessorTest.class);
+//		suite.addTestSuite(MetadataTests.class);
+//		suite.addTestSuite(HTMLNestedLanguageContentAssistTests.class);
+//		// $JUnit-END$
+//		return suite;
+//	}
+//
 }

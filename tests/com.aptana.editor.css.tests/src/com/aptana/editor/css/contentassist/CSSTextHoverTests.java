@@ -7,6 +7,10 @@
  */
 package com.aptana.editor.css.contentassist;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.io.File;
 import java.io.FileWriter;
 
@@ -31,7 +35,7 @@ import com.aptana.ui.util.UIUtils;
 /**
  * CSSTextHoverTests
  */
-public class CSSTextHoverTests extends TestCase
+public class CSSTextHoverTests
 {
 	private CSSTextHover fHover;
 	private AbstractThemeableEditor editor;
@@ -43,10 +47,11 @@ public class CSSTextHoverTests extends TestCase
 	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
-	@Override
-	protected void setUp() throws Exception
+//	@Override
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 
 		CSSMetadataLoader loader = new CSSMetadataLoader();
 		loader.schedule();
@@ -69,8 +74,9 @@ public class CSSTextHoverTests extends TestCase
 	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
-	@Override
-	protected void tearDown() throws Exception
+//	@Override
+	@After
+	public void tearDown() throws Exception
 	{
 		try
 		{
@@ -95,7 +101,7 @@ public class CSSTextHoverTests extends TestCase
 			file = null;
 			editor = null;
 			fHover = null;
-			super.tearDown();
+//			super.tearDown();
 		}
 	}
 
@@ -144,62 +150,74 @@ public class CSSTextHoverTests extends TestCase
 		assertNull("Got a hover region when we didn't expect one", hoverRegion);
 	}
 
+	@Test
 	public void testElement() throws Exception
 	{
 		// CSSElementSelectorHover in HTML plugin handles these
 		assertNoHover("div { background: green; }", 1);
 	}
 
+	@Test
 	public void testProperty() throws Exception
 	{
 		assertHover("div { background: green; }", 7, 6, 10, queryHelper.getProperty("background"));
 	}
 
+	@Test
 	public void testNamedColor() throws Exception
 	{
 		assertHover("div { background: green; }", 19, 18, 5, new RGB(0, 128, 0));
 	}
 
+	@Test
 	public void testRGBFunction() throws Exception
 	{
 		assertHover("div { background: rgb(128,128,128); }", 19, 18, 16, new RGB(128, 128, 128));
 	}
 
+	@Test
 	public void testHexColor() throws Exception
 	{
 		assertHover("div { background: #888; }", 19, 18, 4, new RGB(136, 136, 136));
 	}
 
+	@Test
 	public void testHexColor2() throws Exception
 	{
 		assertHover("div { background: #818283; }", 19, 18, 7, new RGB(129, 130, 131));
 	}
 
+	@Test
 	public void testPseudoElementAfter() throws Exception
 	{
 		assertHover("q:after { content: \"#\"; }", 4, 1, 6, queryHelper.getPseudoElement("after"));
 	}
 
+	@Test
 	public void testPseudoElementAfterWithDoubleColon() throws Exception
 	{
 		assertHover("q::after { content: \"#\"; }", 5, 1, 7, queryHelper.getPseudoElement("after"));
 	}
 
+	@Test
 	public void testPseudoClassVisited() throws Exception
 	{
 		assertHover("a:visited { color: blue; }", 5, 1, 8, queryHelper.getPseudoClass("visited"));
 	}
 
+	@Test
 	public void testPseudoClassNthChild2nPlus1() throws Exception
 	{
 		assertHover("tr:nth-child(2n+1) { color: blue; }", 5, 3, 9, queryHelper.getPseudoClass("nth-child"));
 	}
 
+	@Test
 	public void testPseudoClassNthChildEven() throws Exception
 	{
 		assertHover("tr:nth-child(even) { color: blue; }", 5, 3, 9, queryHelper.getPseudoClass("nth-child"));
 	}
 
+	@Test
 	public void testPseudoClassNthChildOdd() throws Exception
 	{
 		assertHover("tr:nth-child(odd) { color: blue; }", 5, 3, 9, queryHelper.getPseudoClass("nth-child"));

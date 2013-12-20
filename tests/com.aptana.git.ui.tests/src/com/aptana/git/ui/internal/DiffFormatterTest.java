@@ -7,13 +7,16 @@
  */
 package com.aptana.git.ui.internal;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import com.aptana.git.ui.DiffFormatter;
 
 import junit.framework.TestCase;
 
-public class DiffFormatterTest extends TestCase
+public class DiffFormatterTest
 {
 	
+	@Test
 	public void testThing()
 	{
 		String rawDiff = "diff --git a/bundle.rb b/bundle.rb\nindex ce16112..a67a29f 100644\n--- a/bundle.rb\n+++ b/bundle.rb\n@@ -1,4 +1,4 @@\n-require 'ruble'\n+require 'ruble' # BLAH!\n \n # its ruby, so this just addscommands/snippets in bundle (or replaces those with same name)\n # many ruby files could add to a single bundle";
@@ -21,6 +24,7 @@ public class DiffFormatterTest extends TestCase
 		assertEquals(expected, DiffFormatter.toHTML("", rawDiff));
 	}
 	
+	@Test
 	public void testBackslashInTitle()
 	{
 		String rawDiff = "diff --git a/bundle.rb b/bundle.rb\nindex ce16112..a67a29f 100644\n--- a/bundle.rb\n+++ b/bundle.rb\n@@ -1,4 +1,4 @@\n-require 'ruble'\n+require 'ruble' # BLAH!\n \n # its ruby, so this just addscommands/snippets in bundle (or replaces those with same name)\n # many ruby files could add to a single bundle";

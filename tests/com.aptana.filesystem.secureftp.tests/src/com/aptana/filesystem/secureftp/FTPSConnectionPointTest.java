@@ -8,6 +8,8 @@
 
 package com.aptana.filesystem.secureftp;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.IPath;
@@ -22,7 +24,7 @@ import com.aptana.filesystem.ftp.IFTPConstants;
  *
  */
 @SuppressWarnings("nls")
-public class FTPSConnectionPointTest extends TestCase {
+public class FTPSConnectionPointTest {
 
 	private static final String name = "My FTPS Site";
 	private static final String host = "127.0.0.1";
@@ -39,42 +41,50 @@ public class FTPSConnectionPointTest extends TestCase {
 	private static final boolean validateCertificate = false;
 
 
+	@Test
 	public void testPersistance() {
 		createAndTestConnectionPoint(name, host, port, login, password, path, encoding, passiveMode, timezone, transferType, explicit, noSSLSessionResumption, validateCertificate);
 	}
 	
+	@Test
 	public void testPassiveMode() {
 		createAndTestConnectionPoint(name, host, port, login, password, path, encoding, true, timezone, transferType, explicit, noSSLSessionResumption, validateCertificate);
 		createAndTestConnectionPoint(name, host, port, login, password, path, encoding, false, timezone, transferType, explicit, noSSLSessionResumption, validateCertificate);
 	}
 	
+	@Test
 	public void testTransferTypes() {
 		createAndTestConnectionPoint(name, host, port, login, password, path, encoding, passiveMode, timezone, IFTPConstants.TRANSFER_TYPE_ASCII, explicit, noSSLSessionResumption, validateCertificate);
 		createAndTestConnectionPoint(name, host, port, login, password, path, encoding, passiveMode, timezone, IFTPConstants.TRANSFER_TYPE_BINARY, explicit, noSSLSessionResumption, validateCertificate);
 		createAndTestConnectionPoint(name, host, port, login, password, path, encoding, passiveMode, timezone, IFTPConstants.TRANSFER_TYPE_AUTO, explicit, noSSLSessionResumption, validateCertificate);
 	}
 
+	@Test
 	public void testExplicitMode() {
 		createAndTestConnectionPoint(name, host, port, login, password, path, encoding, passiveMode, timezone, transferType, true, noSSLSessionResumption, validateCertificate);
 		createAndTestConnectionPoint(name, host, port, login, password, path, encoding, passiveMode, timezone, transferType, false, noSSLSessionResumption, validateCertificate);
 	}
 
+	@Test
 	public void testSSLSessionResumptionMode() {
 		createAndTestConnectionPoint(name, host, port, login, password, path, encoding, passiveMode, timezone, transferType, explicit, true, validateCertificate);
 		createAndTestConnectionPoint(name, host, port, login, password, path, encoding, passiveMode, timezone, transferType, explicit, false, validateCertificate);
 	}
 
+	@Test
 	public void testValidateCertificateMode() {
 		createAndTestConnectionPoint(name, host, port, login, password, path, encoding, passiveMode, timezone, transferType, explicit, noSSLSessionResumption, true);
 		createAndTestConnectionPoint(name, host, port, login, password, path, encoding, passiveMode, timezone, transferType, explicit, noSSLSessionResumption, false);
 	}
 
+	@Test
 	public void testExplicitModeDefaultPort() {
 		FTPSConnectionPoint cp = new FTPSConnectionPoint();
 		cp.setExplicit(true);
 		assertEquals("Default explicit port doesn't match", IFTPSConstants.FTP_PORT_DEFAULT, cp.getPort());
 	}
 
+	@Test
 	public void testImplicitModeDefaultPort() {
 		FTPSConnectionPoint cp = new FTPSConnectionPoint();
 		cp.setExplicit(false);

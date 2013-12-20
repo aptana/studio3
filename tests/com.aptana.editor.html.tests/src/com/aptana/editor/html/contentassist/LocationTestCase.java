@@ -7,6 +7,7 @@
  */
 package com.aptana.editor.html.contentassist;
 
+import static org.junit.Assert.*;
 import java.text.MessageFormat;
 
 import junit.framework.TestCase;
@@ -18,7 +19,7 @@ import com.aptana.editor.html.HTMLTestUtil;
 import com.aptana.editor.html.contentassist.HTMLContentAssistProcessor.LocationType;
 import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
 
-public abstract class LocationTestCase extends TestCase
+public abstract class LocationTestCase
 {
 	/**
 	 * createDocument

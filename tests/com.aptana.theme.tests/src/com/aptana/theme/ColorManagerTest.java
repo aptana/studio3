@@ -7,6 +7,9 @@
  */
 package com.aptana.theme;
 
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +21,7 @@ import org.eclipse.swt.widgets.Display;
 
 import com.aptana.ui.util.UIUtils;
 
-public class ColorManagerTest extends TestCase
+public class ColorManagerTest
 {
 
 	private static final int MAX_TIMEOUT_FOR_CONDITION = 10000;
@@ -27,12 +30,13 @@ public class ColorManagerTest extends TestCase
 	boolean executed;
 	Color color;
 
-	@Override
-	protected void setUp() throws Exception
+//	@Override
+	@Before
+	public void setUp() throws Exception
 	{
 		executed = false;
 		finished = 0;
-		super.setUp();
+//		super.setUp();
 	}
 
 	private class ThreadColor extends Thread
@@ -64,6 +68,7 @@ public class ColorManagerTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testColorManager() throws Exception
 	{
 		UIUtils.assertUIThread(); // This test must be run from the UI-thread!

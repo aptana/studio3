@@ -21,7 +21,7 @@ public class FTPConnectionTest extends CommonConnectionTest
 {
 
 	@Override
-	protected void setUp() throws Exception
+	public void setUp() throws Exception
 	{
 		FTPConnectionPoint ftpcp = new FTPConnectionPoint();
 		ftpcp.setHost(getConfig().getProperty("ftp.host")); //$NON-NLS-1$

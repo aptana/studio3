@@ -7,6 +7,10 @@
  */
 package com.aptana.editor.html.outline;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
@@ -23,7 +27,7 @@ import com.aptana.editor.html.preferences.HTMLPreferenceUtil;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
 
-public class HTMLOutlineProviderTest extends TestCase
+public class HTMLOutlineProviderTest
 {
 
 	private HTMLOutlineLabelProvider fLabelProvider;
@@ -32,26 +36,29 @@ public class HTMLOutlineProviderTest extends TestCase
 	private HTMLParser fParser;
 	private HTMLParseState fParseState;
 
-	@Override
-	protected void setUp() throws Exception
+//	@Override
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 
 		fLabelProvider = new HTMLOutlineLabelProvider();
 		fContentProvider = new HTMLOutlineContentProvider(null);
 		fParser = new HTMLParser();
 	}
 
-	@Override
-	protected void tearDown() throws Exception
+//	@Override
+	@After
+	public void tearDown() throws Exception
 	{
 		fLabelProvider = null;
 		fContentProvider = null;
 		fParser = null;
 		fParseState = null;
-		super.tearDown();
+//		super.tearDown();
 	}
 
+	@Test
 	public void testBasicOutline() throws Exception
 	{
 		String source = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">\n"
@@ -70,6 +77,7 @@ public class HTMLOutlineProviderTest extends TestCase
 		assertEquals("body", fLabelProvider.getText(secondLevel[1]));
 	}
 
+	@Test
 	public void testIdAndClassAttributes() throws Exception
 	{
 		String source = "<div id=\"content\" class=\"name\"></div>";
@@ -81,6 +89,7 @@ public class HTMLOutlineProviderTest extends TestCase
 		assertEquals("div#content.name", fLabelProvider.getText(outlineResult[0]));
 	}
 
+	@Test
 	public void testSrcAttribute() throws Exception
 	{
 		String source = "<script src=\"test.js\">";
@@ -92,6 +101,7 @@ public class HTMLOutlineProviderTest extends TestCase
 		assertEquals("script test.js", fLabelProvider.getText(outlineResult[0]));
 	}
 
+	@Test
 	public void testHrefAttribute() throws Exception
 	{
 		String source = "<link href=\"stylesheet.css\">";
@@ -103,6 +113,7 @@ public class HTMLOutlineProviderTest extends TestCase
 		assertEquals("link stylesheet.css", fLabelProvider.getText(outlineResult[0]));
 	}
 
+	@Test
 	public void testCommentFilter() throws Exception
 	{
 		String source = "<!-- this is a comment -->";
@@ -113,6 +124,7 @@ public class HTMLOutlineProviderTest extends TestCase
 		assertEquals(0, outlineResult.length);
 	}
 
+	@Test
 	public void testCustomAttributeFromPreference() throws Exception
 	{
 		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(HTMLPlugin.PLUGIN_ID);
@@ -134,6 +146,7 @@ public class HTMLOutlineProviderTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testShowTextNode() throws Exception
 	{
 		String source = "some texts";
@@ -150,6 +163,7 @@ public class HTMLOutlineProviderTest extends TestCase
 		assertEquals("some texts", fLabelProvider.getText(outlineResult[0]));
 	}
 
+	@Test
 	public void testInlineCSS() throws Exception
 	{
 		String source = "<td style=\"color: red;\"></td>";
@@ -170,6 +184,7 @@ public class HTMLOutlineProviderTest extends TestCase
 		assertEquals(21, cssNode.getEndingOffset());
 	}
 
+	@Test
 	public void testAPSTUD4178() throws Exception
 	{
 		String source = "<script>\n(function() {\nvar foo = function() {};\nfoo.bar = function() {};\n})();\n</script>";

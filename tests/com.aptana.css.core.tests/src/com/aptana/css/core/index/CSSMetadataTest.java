@@ -7,6 +7,8 @@
  */
 package com.aptana.css.core.index;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -19,11 +21,12 @@ import org.eclipse.core.runtime.Path;
 import com.aptana.css.core.CSSCorePlugin;
 import com.aptana.css.core.internal.index.CSSMetadataReader;
 
-public class CSSMetadataTest extends TestCase
+public class CSSMetadataTest
 {
 	/**
 	 * testCSSMetadata
 	 */
+	@Test
 	public void testCSSMetadata()
 	{
 		this.loadMetadata("/metadata/css_metadata.xml");

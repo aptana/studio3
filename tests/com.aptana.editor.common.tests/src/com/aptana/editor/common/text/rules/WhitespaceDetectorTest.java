@@ -7,15 +7,18 @@
  */
 package com.aptana.editor.common.text.rules;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
 import org.eclipse.jface.text.rules.IWhitespaceDetector;
 
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
 
-public class WhitespaceDetectorTest extends TestCase
+public class WhitespaceDetectorTest
 {
 
+	@Test
 	public void testIsWhitespace()
 	{
 		IWhitespaceDetector detector = new WhitespaceDetector();

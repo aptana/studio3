@@ -1,5 +1,8 @@
 package com.aptana.core.io.tests;
 
+import org.junit.After;
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.io.File;
 import java.net.URL;
 import java.util.List;
@@ -16,16 +19,17 @@ import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.core.io.IConnectionPointManager;
 
-public class ConnectionPointManagerTest extends TestCase
+public class ConnectionPointManagerTest
 {
 
 	private static final String BUNDLE_ID = "com.aptana.core.io.tests";
 	private static final String RESOURCE_DIR = "resources";
 
-	@Override
-	protected void tearDown() throws Exception
+//	@Override
+	@After
+	public void tearDown() throws Exception
 	{
-		super.tearDown();
+//		super.tearDown();
 
 		IConnectionPointManager connectionPointManager = CoreIOPlugin.getConnectionPointManager();
 		IConnectionPoint[] connectionPoints = connectionPointManager.getConnectionPoints();
@@ -73,6 +77,7 @@ public class ConnectionPointManagerTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testEmptyConnections()
 	{
 		URL resourceURL = Platform.getBundle(BUNDLE_ID).getEntry(RESOURCE_DIR);

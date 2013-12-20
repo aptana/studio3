@@ -16,10 +16,12 @@ import com.aptana.filesystem.secureftp.SFTPConnectionPoint;
 /**
  * @author Max Stepanov
  */
-public class SFTPConnectionTest extends CommonConnectionTest {
+public class SFTPConnectionTest extends CommonConnectionTest
+{
 
 	@Override
-	protected void setUp() throws Exception {
+	public void setUp() throws Exception
+	{
 		SFTPConnectionPoint ftpcp = new SFTPConnectionPoint();
 		ftpcp.setHost(getConfig().getProperty("sftp.host")); //$NON-NLS-1$
 		ftpcp.setLogin(getConfig().getProperty("sftp.username")); //$NON-NLS-1$
@@ -35,7 +37,8 @@ public class SFTPConnectionTest extends CommonConnectionTest {
 	 * @see com.aptana.core.io.tests.CommonConnectionTest#supportsSetModificationTime()
 	 */
 	@Override
-	protected boolean supportsSetModificationTime() {
+	protected boolean supportsSetModificationTime()
+	{
 		return true;
 	}
 
@@ -44,7 +47,8 @@ public class SFTPConnectionTest extends CommonConnectionTest {
 	 * @see com.aptana.ide.core.io.tests.CommonConnectionTest#supportsChangeGroup()
 	 */
 	@Override
-	protected boolean supportsChangeGroup() {
+	protected boolean supportsChangeGroup()
+	{
 		return false;
 	}
 
@@ -53,7 +57,8 @@ public class SFTPConnectionTest extends CommonConnectionTest {
 	 * @see com.aptana.ide.core.io.tests.CommonConnectionTest#supportsChangePermissions()
 	 */
 	@Override
-	protected boolean supportsChangePermissions() {
+	protected boolean supportsChangePermissions()
+	{
 		return true;
 	}
 }

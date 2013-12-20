@@ -7,6 +7,10 @@
  */
 package com.aptana.css.core.parsing;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
@@ -43,7 +47,7 @@ import com.aptana.parsing.ast.ParseNode;
  * @author Michael Xia
  * @author Fabio Zadrozny
  */
-public class CSSParserTest extends TestCase
+public class CSSParserTest
 {
 	private static final String EOL = FileUtil.NEW_LINE;
 
@@ -52,8 +56,9 @@ public class CSSParserTest extends TestCase
 	private boolean expectToRecoverFromErrors = false;
 	private boolean recoveredFromError = false;
 
-	@Override
-	protected void setUp() throws Exception
+//	@Override
+	@Before
+	public void setUp() throws Exception
 	{
 		fParser = new CSSParser()
 		{
@@ -74,8 +79,9 @@ public class CSSParserTest extends TestCase
 		fScanner = new CSSFlexScanner();
 	}
 
-	@Override
-	protected void tearDown() throws Exception
+//	@Override
+	@After
+	public void tearDown() throws Exception
 	{
 		fParser = null;
 		fScanner = null;
@@ -100,6 +106,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testImportStringNoIdentifier() throws Exception
 	{
 		parseTest("@import 'test';" + EOL); //$NON-NLS-1$
@@ -110,6 +117,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testImportUrlNoIdentifier() throws Exception
 	{
 		parseTest("@import url('test');" + EOL); //$NON-NLS-1$
@@ -120,6 +128,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testImportStringSingleIdentifier() throws Exception
 	{
 		parseTest("@import 'test' abc123;" + EOL); //$NON-NLS-1$
@@ -130,6 +139,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testImportUrlSingleIdentifier() throws Exception
 	{
 		parseTest("@import url('test') abc123;" + EOL); //$NON-NLS-1$
@@ -140,6 +150,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testImportStringMultipleIdentifiers() throws Exception
 	{
 		parseTest("@import 'test' abc123, def456;" + EOL); //$NON-NLS-1$
@@ -150,6 +161,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testImportUrlMultipleIdentifiers() throws Exception
 	{
 		parseTest("@import url('test') abc123, def456;" + EOL); //$NON-NLS-1$
@@ -160,6 +172,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testMediaEmpty() throws Exception
 	{
 		parseTest("@media test{}" + EOL); //$NON-NLS-1$
@@ -170,6 +183,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testMediaStatement() throws Exception
 	{
 		parseTest("@media test{body {testing: 10;}}" + EOL); //$NON-NLS-1$
@@ -180,6 +194,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testMediaStatement2() throws Exception
 	{
 		parseTest("@media only screen and ( min-device-width : 320px ) and ( max-device-width : 480px ){body {background-color: #000;}}" + EOL); //$NON-NLS-1$
@@ -190,6 +205,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testPageEmpty() throws Exception
 	{
 		parseTest("@page {}" + EOL); //$NON-NLS-1$
@@ -200,6 +216,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testPagePseudoIdentifier() throws Exception
 	{
 		parseTest("@page :abc123 {}" + EOL); //$NON-NLS-1$
@@ -210,6 +227,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testPagePseudoIdentifier2() throws Exception
 	{
 		parseTest("@page :abc123 {testing: 10;}" + EOL); //$NON-NLS-1$
@@ -220,6 +238,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testPageNumberDeclaration() throws Exception
 	{
 		parseTest("@page {testing: 10;}" + EOL); //$NON-NLS-1$
@@ -230,6 +249,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testPagePercentDeclaration() throws Exception
 	{
 		parseTest("@page {testing: 10%;}" + EOL); //$NON-NLS-1$
@@ -240,6 +260,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testPagePixelDeclaration() throws Exception
 	{
 		parseTest("@page {testing: 10px;}" + EOL); //$NON-NLS-1$
@@ -250,6 +271,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testPageCentimeterDeclaration() throws Exception
 	{
 		parseTest("@page {testing: 10cm;}" + EOL); //$NON-NLS-1$
@@ -260,6 +282,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testPageMillimeterDeclaration() throws Exception
 	{
 		parseTest("@page {testing: 10mm;}" + EOL); //$NON-NLS-1$
@@ -270,6 +293,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testPageInchDeclaration() throws Exception
 	{
 		parseTest("@page {testing: 10in;}" + EOL); //$NON-NLS-1$
@@ -280,6 +304,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testPagePointDeclaration() throws Exception
 	{
 		parseTest("@page {testing: 10pt;}" + EOL); //$NON-NLS-1$
@@ -290,6 +315,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testPagePicaDeclaration() throws Exception
 	{
 		parseTest("@page {testing: 10pc;}" + EOL); //$NON-NLS-1$
@@ -300,6 +326,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testPageEmDeclaration() throws Exception
 	{
 		parseTest("@page {testing: 10em;}" + EOL); //$NON-NLS-1$
@@ -310,6 +337,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testPageExDeclaration() throws Exception
 	{
 		parseTest("@page {testing: 10ex;}" + EOL); //$NON-NLS-1$
@@ -320,6 +348,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testPageDegreeDeclaration() throws Exception
 	{
 		parseTest("@page {testing: 10deg;}" + EOL); //$NON-NLS-1$
@@ -330,6 +359,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testPageRadianDeclaration() throws Exception
 	{
 		parseTest("@page {testing: 10rad;}" + EOL); //$NON-NLS-1$
@@ -340,6 +370,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testPageGradianDeclaration() throws Exception
 	{
 		parseTest("@page {testing: 10grad;}" + EOL); //$NON-NLS-1$
@@ -350,6 +381,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testPageMillisecondDeclaration() throws Exception
 	{
 		parseTest("@page {testing: 10ms;}" + EOL);
@@ -360,6 +392,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testPageSecondDeclaration() throws Exception
 	{
 		parseTest("@page {testing: 10s;}" + EOL); //$NON-NLS-1$
@@ -370,6 +403,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testPageHertzDeclaration() throws Exception
 	{
 		parseTest("@page {testing: 10hz;}" + EOL); //$NON-NLS-1$
@@ -380,6 +414,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testPageKilohertzDeclaration() throws Exception
 	{
 		parseTest("@page {testing: 10khz;}" + EOL); //$NON-NLS-1$
@@ -390,6 +425,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testPageSingleQuotedStringDeclaration() throws Exception
 	{
 		parseTest("@page {testing: '10';}" + EOL); //$NON-NLS-1$
@@ -400,6 +436,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testPageDoubleQuotedStringDeclaration() throws Exception
 	{
 		parseTest("@page {testing: \"10\";}" + EOL); //$NON-NLS-1$
@@ -410,6 +447,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testPageIdentifierDeclaration() throws Exception
 	{
 		parseTest("@page {testing: abc123;}" + EOL); //$NON-NLS-1$
@@ -420,6 +458,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testPageUrlDeclaration() throws Exception
 	{
 		parseTest("@page {testing: url(abc123);}" + EOL); //$NON-NLS-1$
@@ -430,6 +469,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testPageThreeDigitColorDeclaration() throws Exception
 	{
 		parseTest("@page {testing: #eee;}" + EOL); //$NON-NLS-1$
@@ -440,6 +480,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testPageSixDigitColorDeclaration() throws Exception
 	{
 		parseTest("@page {testing: #80A0FF;}" + EOL); //$NON-NLS-1$
@@ -450,6 +491,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testPagePlusDeclaration() throws Exception
 	{
 		parseTest("@page {testing: +10;}" + EOL, "@page {testing: +10;}" + EOL); //$NON-NLS-1$
@@ -460,6 +502,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testPageMinusDeclaration() throws Exception
 	{
 		parseTest("@page {testing: -10;}" + EOL); //$NON-NLS-1$
@@ -470,6 +513,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testPageFunctionDeclaration() throws Exception
 	{
 		parseTest("@page {testing: rgb(10,20,30);}" + EOL); //$NON-NLS-1$
@@ -480,6 +524,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testPageImportantDeclaration() throws Exception
 	{
 		parseTest("@page {testing: aptana !important;}" + EOL); //$NON-NLS-1$
@@ -490,6 +535,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testPageSlashDeclaration() throws Exception
 	{
 		parseTest("@page {testing: abc/123;}" + EOL); //$NON-NLS-1$
@@ -500,6 +546,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testPageMultiSlashDeclaration() throws Exception
 	{
 		parseTest("@page {testing: abc/123/rgb(1,2,3);}" + EOL); //$NON-NLS-1$
@@ -510,6 +557,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testPageCommaDeclaration() throws Exception
 	{
 		parseTest("@page {testing: abc,123;}" + EOL); //$NON-NLS-1$
@@ -520,6 +568,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testPageMultiCommaDeclaration() throws Exception
 	{
 		parseTest("@page {testing: abc,123,rgb(1,2,3);}" + EOL); //$NON-NLS-1$
@@ -530,6 +579,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testPageSpaceDeclaration() throws Exception
 	{
 		parseTest("@page {testing: abc 123;}" + EOL); //$NON-NLS-1$
@@ -540,6 +590,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testPageMultiSpaceDeclaration() throws Exception
 	{
 		parseTest("@page {testing: abc 123 rgb(1,2,3);}" + EOL); //$NON-NLS-1$
@@ -550,6 +601,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testPageMultipleDeclarations() throws Exception
 	{
 		parseTest("@page {testing: abc123; forward: 10pt;}" + EOL); //$NON-NLS-1$
@@ -560,6 +612,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testCharsetSingleQuotedCharSet() throws Exception
 	{
 		parseTest("@charset 'test';" + EOL); //$NON-NLS-1$
@@ -570,6 +623,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testCharsetDoubleQuotedCharSet() throws Exception
 	{
 		parseTest("@charset \"test\";" + EOL); //$NON-NLS-1$
@@ -580,6 +634,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testFontFaceEmpty() throws Exception
 	{
 		parseTest("@font-face {}" + EOL); //$NON-NLS-1$
@@ -590,6 +645,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testFontFaceDeclaration() throws Exception
 	{
 		parseTest("@font-face {font-family: name;}" + EOL); //$NON-NLS-1$
@@ -600,6 +656,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testNamespaceString() throws Exception
 	{
 		parseTest("@namespace \"test\";" + EOL); //$NON-NLS-1$
@@ -610,6 +667,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testNamespacePrefixString() throws Exception
 	{
 		parseTest("@namespace foo \"test\";" + EOL); //$NON-NLS-1$
@@ -620,6 +678,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testAnyElementSelector() throws Exception
 	{
 		parseTest("* {}" + EOL); //$NON-NLS-1$
@@ -630,6 +689,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testElementSelector() throws Exception
 	{
 		parseTest("a {}" + EOL); //$NON-NLS-1$
@@ -640,6 +700,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testDescendantSelector() throws Exception
 	{
 		parseTest("table td {}" + EOL); //$NON-NLS-1$
@@ -650,6 +711,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testChildSelector() throws Exception
 	{
 		parseTest("table > tr {}" + EOL); //$NON-NLS-1$
@@ -660,6 +722,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testElementPseudoclassSelector() throws Exception
 	{
 		parseTest("td:first-child {}" + EOL); //$NON-NLS-1$
@@ -670,6 +733,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testElementPseudoclassSelector2() throws Exception
 	{
 		parseTest("td::first-child {}" + EOL); //$NON-NLS-1$
@@ -680,6 +744,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testElementPseudoclassFunctionSelector() throws Exception
 	{
 		parseTest("p:lang(en) {}" + EOL); //$NON-NLS-1$
@@ -690,6 +755,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testAdjacentSelector() throws Exception
 	{
 		parseTest("p + p {}" + EOL); //$NON-NLS-1$
@@ -700,6 +766,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testAttributeSetSelector() throws Exception
 	{
 		parseTest("a[href] {}" + EOL); //$NON-NLS-1$
@@ -710,6 +777,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testAttributeValueSelector() throws Exception
 	{
 		parseTest("p[lang = \"en\"] {}" + EOL); //$NON-NLS-1$
@@ -720,6 +788,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testAttributeIdSelector() throws Exception
 	{
 		parseTest("p#abc {}" + EOL); //$NON-NLS-1$
@@ -730,6 +799,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testAttributeValueInListSelector() throws Exception
 	{
 		parseTest("p[lang ~= \"en\"] {}" + EOL); //$NON-NLS-1$
@@ -740,6 +810,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testAttributeHyphenateInListSelector() throws Exception
 	{
 		parseTest("p[lang |= \"en\"] {}" + EOL); //$NON-NLS-1$
@@ -750,6 +821,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testClassSelector() throws Exception
 	{
 		parseTest("div.warning {}" + EOL); //$NON-NLS-1$
@@ -760,6 +832,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testIdSelector() throws Exception
 	{
 		parseTest("div#menu {}" + EOL); //$NON-NLS-1$
@@ -770,6 +843,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testMultipleElementSelector() throws Exception
 	{
 		parseTest("h1, h2, h3 {}" + EOL); //$NON-NLS-1$
@@ -780,6 +854,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testUniversalSelector() throws Exception
 	{
 		parseTest("* {}" + EOL); //$NON-NLS-1$
@@ -790,6 +865,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testUniversalDescendantSelector() throws Exception
 	{
 		parseTest("* td {}" + EOL); //$NON-NLS-1$
@@ -800,6 +876,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testUniversalChildSelector() throws Exception
 	{
 		parseTest("* > tr {}" + EOL); //$NON-NLS-1$
@@ -810,6 +887,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testUniversalPseudoclassSelector() throws Exception
 	{
 		parseTest("*:first-child {}" + EOL); //$NON-NLS-1$
@@ -821,6 +899,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testUniversalPseudoclassFunctionSelector() throws Exception
 	{
 		parseTest("*:lang(en) {}" + EOL); //$NON-NLS-1$
@@ -832,6 +911,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testUniversalAdjacentSelector() throws Exception
 	{
 		parseTest("* + p {}" + EOL); //$NON-NLS-1$
@@ -842,6 +922,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testUniversalAttributeSetSelector() throws Exception
 	{
 		parseTest("*[href] {}" + EOL); //$NON-NLS-1$
@@ -853,6 +934,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testUniveralAttributeValueSelector() throws Exception
 	{
 		parseTest("*[lang = \"en\"] {}" + EOL); //$NON-NLS-1$
@@ -864,6 +946,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testUniversalAttributeValueInListSelector() throws Exception
 	{
 		parseTest("*[lang ~= \"en\"] {}" + EOL); //$NON-NLS-1$
@@ -875,6 +958,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testUniversalAttributeHyphenateInListSelector() throws Exception
 	{
 		parseTest("*[lang |= \"en\"] {}" + EOL); //$NON-NLS-1$
@@ -886,6 +970,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testUniversalClassSelector() throws Exception
 	{
 		parseTest("*.warning {}" + EOL); //$NON-NLS-1$
@@ -897,6 +982,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testUniversalIdSelector() throws Exception
 	{
 		parseTest("*#menu {}" + EOL); //$NON-NLS-1$
@@ -908,6 +994,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testSimpleSelectorOneProperty() throws Exception
 	{
 		parseTest("a {testing: 10;}" + EOL); //$NON-NLS-1$
@@ -918,6 +1005,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testSimpleSelectorOneProperty2() throws Exception
 	{
 		parseTest("a {testing: 10}" + EOL); //$NON-NLS-1$
@@ -928,6 +1016,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testSimpleSelectorMultipleProperties() throws Exception
 	{
 		parseTest("a {testing: abc123; forward: 10pt;}" + EOL); //$NON-NLS-1$
@@ -938,6 +1027,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testSimpleSelectorMultipleProperties2() throws Exception
 	{
 		parseTest("a {testing: abc123; forward: 10pt}" + EOL); //$NON-NLS-1$
@@ -948,6 +1038,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testMultipleRuleSets() throws Exception
 	{
 		parseTest("a {}" + EOL + "b {}" + EOL); //$NON-NLS-1$ //$NON-NLS-2$
@@ -958,6 +1049,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testUnknownAtRule() throws Exception
 	{
 		parseTest("@at-rule 'test';" + EOL); //$NON-NLS-1$ //$NON-NLS-2$
@@ -969,6 +1061,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testCommentBug() throws Exception
 	{
 		parseTest("body {\n\tbackground: red;\n}\n\n/**\n * \n */", "body {background: red;}" + EOL);
@@ -979,6 +1072,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testStartsWith() throws Exception
 	{
 		parseTest("a[href ^= 'javascript:'] {}" + EOL);
@@ -989,6 +1083,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testEndsWith() throws Exception
 	{
 		parseTest("a[href $= 'http://abc.com'] {}" + EOL);
@@ -999,6 +1094,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testMultipleAttributeSelectors() throws Exception
 	{
 		parseTest("a#myId .myClass {}" + EOL); //$NON-NLS-1$
@@ -1009,6 +1105,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testMissingSemiColon() throws Exception
 	{
 		String src = "h1      , h2      , h3 {color   : #AA2808\ncolor   : #AA2808}";
@@ -1024,6 +1121,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testCommentsInsideDeclaration() throws Exception
 	{
 		String src = "body{color   : #AA2808;\n /*this is a comment*/}" + EOL;
@@ -1037,6 +1135,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testBlankCSSContent() throws Exception
 	{
 		String src = StringUtil.EMPTY + EOL;
@@ -1051,6 +1150,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testImportantProperty() throws Exception
 	{
 		parseTest("button {*overflow: visible;}" + EOL); //$NON-NLS-1$
@@ -1061,6 +1161,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testStarredImportantProperty() throws Exception
 	{
 		parseTest("button {*overflow: visible !important;}" + EOL); //$NON-NLS-1$
@@ -1071,6 +1172,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testEqualInFunction() throws Exception
 	{
 		parseTest("button {filter: alpha(opacity=30);}" + EOL); //$NON-NLS-1$
@@ -1081,6 +1183,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testMozDocument() throws Exception
 	{
 		parseTest("@-moz-document url-prefix() { .g-section {overflow: hidden;}}" + EOL);
@@ -1091,6 +1194,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testNotSupport() throws Exception
 	{
 		parseTest("audio:not([controls]) {height: 0;}" + EOL);
@@ -1101,6 +1205,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testNotSupportSvg() throws Exception
 	{
 		parseTest("svg:not(:root) {overflow: hidden;}" + EOL);
@@ -1111,6 +1216,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testNotSupport1() throws Exception
 	{
 		parseTest("html:not(:link) :not(:visited) {overflow: hidden;}" + EOL);
@@ -1121,6 +1227,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testNotSupport2() throws Exception
 	{
 		parseTest("html:not(:link) :visited {overflow: hidden;}" + EOL);
@@ -1131,6 +1238,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testNotSupport3() throws Exception
 	{
 		parseTest("a:not(*) {overflow: hidden;}" + EOL);
@@ -1141,6 +1249,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testExpectedSyntaxError() throws Exception
 	{
 		parseErrorTest("svg:not(:root :bar) {overflow: hidden;}" + EOL);
@@ -1151,6 +1260,7 @@ public class CSSParserTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testNotDoubleNegationError() throws Exception
 	{
 		parseErrorTest("svg:not(:not(:root)) {overflow: hidden;}" + EOL);

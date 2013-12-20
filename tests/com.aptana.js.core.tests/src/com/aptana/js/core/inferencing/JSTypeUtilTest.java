@@ -1,5 +1,7 @@
 package com.aptana.js.core.inferencing;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.text.MessageFormat;
 import java.util.List;
 
@@ -7,9 +9,10 @@ import com.aptana.js.core.inferencing.JSTypeUtil;
 
 import junit.framework.TestCase;
 
-public class JSTypeUtilTest extends TestCase
+public class JSTypeUtilTest
 {
 
+	@Test
 	public void testGetFunctionSignatureReturnTypeNames() throws Exception
 	{
 		List<String> returnTypeNames = JSTypeUtil.getFunctionSignatureReturnTypeNames("Function<Object,Number>");
@@ -18,6 +21,7 @@ public class JSTypeUtilTest extends TestCase
 		assertTrue(returnTypeNames.contains("Number"));
 	}
 
+	@Test
 	public void testGetFunctionSignatureReturnTypeNames2() throws Exception
 	{
 		List<String> returnTypeNames = JSTypeUtil.getFunctionSignatureReturnTypeNames("Function<Object,Array<Number>>");
@@ -26,6 +30,7 @@ public class JSTypeUtilTest extends TestCase
 		assertTrue(returnTypeNames.contains("Array<Number>"));
 	}
 
+	@Test
 	public void testGetFunctionSignatureReturnTypeNames3() throws Exception
 	{
 		List<String> returnTypeNames = JSTypeUtil
@@ -35,6 +40,7 @@ public class JSTypeUtilTest extends TestCase
 		assertTrue(returnTypeNames.contains("Function<Number,String>"));
 	}
 
+	@Test
 	public void testValidateTypeName() throws Exception
 	{
 		// Standard type

@@ -1,13 +1,16 @@
 package com.aptana.buildpath.core;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.io.File;
 import java.net.URI;
 
 import junit.framework.TestCase;
 
-public class BuildPathEntryTest extends TestCase
+public class BuildPathEntryTest
 {
 
+	@Test
 	public void testEqualsWithNullArg() throws Exception
 	{
 		String displayName = "name";
@@ -17,6 +20,7 @@ public class BuildPathEntryTest extends TestCase
 		assertFalse(entry.equals(null));
 	}
 
+	@Test
 	public void testEquals() throws Exception
 	{
 		String displayName = "name";
@@ -28,6 +32,7 @@ public class BuildPathEntryTest extends TestCase
 		assertTrue(entry.equals(new BuildPathEntry(displayName, path)));
 	}
 
+	@Test
 	public void testGetters() throws Exception
 	{
 		String displayName = "name";
@@ -38,6 +43,7 @@ public class BuildPathEntryTest extends TestCase
 		assertEquals(path, entry.getPath());
 	}
 
+	@Test
 	public void testIsSelected() throws Exception
 	{
 		String displayName = "name";

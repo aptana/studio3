@@ -7,6 +7,10 @@
  */
 package com.aptana.editor.html.parsing;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
@@ -39,7 +43,7 @@ import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.ast.ParseNode;
 import com.aptana.parsing.lexer.Range;
 
-public class HTMLParserTest extends TestCase
+public class HTMLParserTest
 {
 	private static final String EOL = FileUtil.NEW_LINE;
 
@@ -50,12 +54,14 @@ public class HTMLParserTest extends TestCase
 	private HTMLParser fParser;
 	private HTMLParseState fParseState;
 
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
 		fParser = new HTMLParser();
 	}
 
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		fParser = null;
 	}
@@ -74,12 +80,14 @@ public class HTMLParserTest extends TestCase
 		return IOUtil.read(stream);
 	}
 
+	@Test
 	public void testSelfClosing() throws Exception
 	{
 		String source = "<html/>";
 		parseTest(source, "<html></html>\n");
 	}
 
+	@Test
 	public void testTags() throws Exception
 	{
 		String source = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">"
@@ -87,6 +95,7 @@ public class HTMLParserTest extends TestCase
 		parseTest(source, "<html><head></head><body><p>Text</p></body></html>\n");
 	}
 
+	@Test
 	public void testEmptyTagInXHTML() throws Exception
 	{
 		String source = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"\n"
@@ -94,18 +103,21 @@ public class HTMLParserTest extends TestCase
 		parseTest(source, "<body><br></br><table></table></body>\n");
 	}
 
+	@Test
 	public void testQuotedPair() throws Exception
 	{
 		String source = "<html><head>shouldn't</head><body>can't</body></html>";
 		parseTest(source, source + EOL);
 	}
 
+	@Test
 	public void testAmpersand() throws Exception
 	{
 		String source = "<body><p>Gifts&nbsp; & Wish Lists</p><h3></h3></body>";
 		parseTest(source, source + EOL);
 	}
 
+	@Test
 	public void testOutlineAttributes() throws Exception
 	{
 		String source = "<html id=\"aptana\" class=\"cool\" height=\"100\">";
@@ -122,6 +134,7 @@ public class HTMLParserTest extends TestCase
 		return fParser.parse(fParseState).getRootNode();
 	}
 
+	@Test
 	public void testNameNode() throws Exception
 	{
 		String source = "<html><head></head></html>\n";
@@ -134,42 +147,49 @@ public class HTMLParserTest extends TestCase
 		assertEquals(new Range(0, 5), nameNode.getNameRange());
 	}
 
+	@Test
 	public void testStyle() throws Exception
 	{
 		String source = "<html><head><style>html {color: red;}</style></head></html>";
 		parseTest(source, source + EOL);
 	}
 
+	@Test
 	public void testScript() throws Exception
 	{
 		String source = "<html><head><script>var one = 1;</script></head></html>";
 		parseTest(source, source + EOL);
 	}
 
+	@Test
 	public void testHTML5() throws Exception
 	{
 		String source = "<HTML><HEAD><STYLE>html {color: red;}</STYLE><SCRIPT>var one = 1;</SCRIPT></HEAD></HTML>";
 		parseTest(source, source + EOL);
 	}
 
+	@Test
 	public void testComment() throws Exception
 	{
 		String source = "<html><head><!-- this is a comment --></head></html>";
 		parseTest(source, source + EOL);
 	}
 
+	@Test
 	public void testNestedUnclosedTag() throws Exception
 	{
 		String source = "<p><b></b><p>";
 		parseTest(source, "<p><b></b></p>\n<p></p>" + EOL);
 	}
 
+	@Test
 	public void testUnclosedTags() throws Exception
 	{
 		String source = "<body><p><li></body>";
 		parseTest(source, "<body><p><li></li></p></body>" + EOL);
 	}
 
+	@Test
 	public void testCloseTagPosition() throws Exception
 	{
 		String source = "<body><p>text</body>";
@@ -188,6 +208,7 @@ public class HTMLParserTest extends TestCase
 		assertEquals(new Range(12, 12), endTag.getNameRange());
 	}
 
+	@Test
 	public void testUnclosedRootTag() throws Exception
 	{
 		String source = "<body><p>text";
@@ -206,6 +227,7 @@ public class HTMLParserTest extends TestCase
 		assertEquals(new Range(12, 12), endTag.getNameRange());
 	}
 
+	@Test
 	public void testSpecialNodeEnd() throws Exception
 	{
 		String source = "<script>var one = 1;</script>";
@@ -218,6 +240,7 @@ public class HTMLParserTest extends TestCase
 		assertEquals(new Range(20, 28), endTag.getNameRange());
 	}
 
+	@Test
 	public void testAPSTUD3191() throws Exception
 	{
 		String source = "<html>\n" + //
@@ -250,6 +273,7 @@ public class HTMLParserTest extends TestCase
 		assertEquals(88, cssRootNode.getCommentNodes()[0].getEndingOffset());
 	}
 
+	@Test
 	public void testMissingEndTagError() throws Exception
 	{
 		String source = "<title><body><div><p></body>";
@@ -271,6 +295,7 @@ public class HTMLParserTest extends TestCase
 		assertEquals(MessageFormat.format(Messages.HTMLParser_missing_end_tag_error, "title"), titleError.getMessage());
 	}
 
+	@Test
 	public void testTypeAttributeForStyle() throws Exception
 	{
 		String source = "<style type=\"text/css\">html {color: red;}</style>";
@@ -283,6 +308,7 @@ public class HTMLParserTest extends TestCase
 		assertEquals(ICSSConstants.CONTENT_TYPE_CSS, cssNode.getLanguage());
 	}
 
+	@Test
 	public void testIncorrectTypeAttributeForStyle() throws Exception
 	{
 		String source = "<style type=\"text/incorrect\">html {color: red;}</style>";
@@ -295,6 +321,7 @@ public class HTMLParserTest extends TestCase
 		assertEquals(IHTMLConstants.CONTENT_TYPE_HTML, textNode.getLanguage());
 	}
 
+	@Test
 	public void testTypeAttributeForScript() throws Exception
 	{
 		for (String type : JS_VALID_TYPE_ATTR)
@@ -310,6 +337,7 @@ public class HTMLParserTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testIncorrectTypeAttributeForScript() throws Exception
 	{
 		String source = "<script type=\"text/incorrect\">var one = 1;</script>";
@@ -322,6 +350,7 @@ public class HTMLParserTest extends TestCase
 		assertEquals(IHTMLConstants.CONTENT_TYPE_HTML, textNode.getLanguage());
 	}
 
+	@Test
 	public void testAttributeWithNoValue() throws Exception
 	{
 		String source = "<li div=>item 1</li>";
@@ -336,6 +365,7 @@ public class HTMLParserTest extends TestCase
 		assertEquals("attribute value", StringUtil.EMPTY, attrs[0].getValue());
 	}
 
+	@Test
 	public void testAttributeWithNoValueOrEquals() throws Exception
 	{
 		String source = "<li div>item 1</li>";
@@ -350,6 +380,7 @@ public class HTMLParserTest extends TestCase
 		assertEquals("attribute value", StringUtil.EMPTY, attrs[0].getValue());
 	}
 
+	@Test
 	public void testNestedOptionalEndTag() throws Exception
 	{
 		String source = "<li>item 1<li>item 2";

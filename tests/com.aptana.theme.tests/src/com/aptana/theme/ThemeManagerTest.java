@@ -7,6 +7,9 @@
  */
 package com.aptana.theme;
 
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -24,15 +27,16 @@ import com.aptana.theme.internal.ThemeManager;
 import com.aptana.ui.util.UIUtils;
 
 @SuppressWarnings("restriction")
-public class ThemeManagerTest extends TestCase implements ILogListener
+public class ThemeManagerTest implements ILogListener
 {
 
 	private static final int MAX_TIMEOUT_FOR_CONDITION = 10000;
 	private boolean executed;
 	private List<IStatus> loggedMessages;
 
-	@Override
-	protected void setUp() throws Exception
+//	@Override
+	@Before
+	public void setUp() throws Exception
 	{
 		executed = false;
 		loggedMessages = new ArrayList<IStatus>();
@@ -47,6 +51,7 @@ public class ThemeManagerTest extends TestCase implements ILogListener
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testThemeManager() throws Exception
 	{
 		UIUtils.assertUIThread(); // This test must be run from the UI-thread!

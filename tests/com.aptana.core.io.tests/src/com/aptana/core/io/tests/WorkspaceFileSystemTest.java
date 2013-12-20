@@ -7,6 +7,9 @@
  */
 package com.aptana.core.io.tests;
 
+import org.junit.After;
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -30,13 +33,14 @@ import com.aptana.core.io.efs.WorkspaceFileSystem;
 import com.aptana.core.util.FileUtil;
 
 @SuppressWarnings("nls")
-public class WorkspaceFileSystemTest extends TestCase
+public class WorkspaceFileSystemTest
 {
 
 	private IProject project;
 
-	@Override
-	protected void tearDown() throws Exception
+//	@Override
+	@After
+	public void tearDown() throws Exception
 	{
 		try
 		{
@@ -63,37 +67,43 @@ public class WorkspaceFileSystemTest extends TestCase
 		finally
 		{
 			project = null;
-			super.tearDown();
+//			super.tearDown();
 		}
 	}
 
+	@Test
 	public void testGetInstance()
 	{
 		assertNotNull(WorkspaceFileSystem.getInstance());
 	}
 
+	@Test
 	public void testAttributes()
 	{
 		assertEquals("Workspace FS attributes should match Local FS", EFS.getLocalFileSystem().attributes(),
 				WorkspaceFileSystem.getInstance().attributes());
 	}
 
+	@Test
 	public void testCanDelete() throws IOException
 	{
 		assertTrue(WorkspaceFileSystem.getInstance().canDelete());
 	}
 
+	@Test
 	public void testCanWrite() throws IOException
 	{
 		assertTrue(WorkspaceFileSystem.getInstance().canWrite());
 	}
 
+	@Test
 	public void testIsCaseSensitive()
 	{
 		assertEquals("Workspace FS case-sensitivity should match Local FS", EFS.getLocalFileSystem().isCaseSensitive(),
 				WorkspaceFileSystem.getInstance().isCaseSensitive());
 	}
 
+	@Test
 	public void testNonWorkspaceLocalFile() throws IOException
 	{
 		File tempFile = File.createTempFile("test", ".txt").getCanonicalFile();
@@ -108,6 +118,7 @@ public class WorkspaceFileSystemTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testWorkspaceLocalFile() throws IOException, CoreException, InvocationTargetException,
 			InterruptedException
 	{
@@ -135,6 +146,7 @@ public class WorkspaceFileSystemTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testGetFileStoreByPath() throws IOException, CoreException, InvocationTargetException,
 			InterruptedException
 	{
@@ -165,6 +177,7 @@ public class WorkspaceFileSystemTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testGetFileStoreByURI() throws IOException, CoreException, InvocationTargetException,
 			InterruptedException, URISyntaxException
 	{
@@ -195,6 +208,7 @@ public class WorkspaceFileSystemTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testGetNonExistingFileStoreByPath()
 	{
 		IPath path = Path.fromPortableString("/nonexistingProject/nonexistingFile.txt");
@@ -204,6 +218,7 @@ public class WorkspaceFileSystemTest extends TestCase
 		assertEquals("Path doesn't match", path.toPortableString(), fs.toURI().getPath());
 	}
 
+	@Test
 	public void testGetNonExistingFileStoreByURI() throws URISyntaxException
 	{
 		URI uri = new URI(WorkspaceFileSystem.getInstance().getScheme(), "/nonexistingProject/nonexistingFile.txt",
@@ -214,6 +229,7 @@ public class WorkspaceFileSystemTest extends TestCase
 		assertEquals("URI doesn't match", uri, fs.toURI());
 	}
 
+	@Test
 	public void testPathWithSpecialCharacters()
 	{
 		IFileStore fs = WorkspaceFileSystem.getInstance().getStore(

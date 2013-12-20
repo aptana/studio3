@@ -7,6 +7,9 @@
  */
 package com.aptana.editor.css.tests.performance;
 
+import org.junit.runners.Suite.SuiteClasses;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -33,6 +36,8 @@ import com.aptana.editor.epl.tests.EditorTestHelper;
 import com.aptana.editor.epl.tests.OpenEditorTest;
 import com.aptana.editor.epl.tests.ResourceTestHelper;
 
+@RunWith(Suite.class)
+@SuiteClasses({})
 public class OpenCSSEditorTest extends OpenEditorTest
 {
 
@@ -66,28 +71,28 @@ public class OpenCSSEditorTest extends OpenEditorTest
 		super(name);
 	}
 
-	public static Test suite()
-	{
-		// ensure sequence
-		TestSuite suite = new TestSuite(OpenCSSEditorTest.class.getName());
-		suite.addTest(new OpenCSSEditorTest("testOpenCSSEditor1")); // YUI
-		// suite.addTest(new OpenCSSEditorTest("testOpenFromMetadata"));
-		// suite.addTest(new OpenCSSEditorTest("testOpenGithubFormatted"));
-		// suite.addTest(new OpenCSSEditorTest("testOpenGithubMinimized"));
-		suite.addTest(new OpenCSSEditorTest("testOpenLargeMinifiedFileFoldingOnOutlineOn")); // WORDPRESS_MINIMIZED
-		// suite.addTest(new OpenCSSEditorTest("testOpenLargeMinifiedFileFoldingOffOutlineOn")); // WORDPRESS_MINIMIZED
-		suite.addTest(new OpenCSSEditorTest("testOpenLargeMinifiedFileFoldingOnOutlineOff")); // WORDPRESS_MINIMIZED
-		// suite.addTest(new OpenCSSEditorTest("testOpenLargeMinifiedFileFoldingOffOutlineOff")); // WORDPRESS_MINIMIZED
-		suite.addTest(new OpenCSSEditorTest("testOpenLargeFileFoldingOnOutlineOn")); // WORDPRESS_ADMIN
-		// suite.addTest(new OpenCSSEditorTest("testOpenLargeFileFoldingOffOutlineOn")); // WORDPRESS_ADMIN
-		suite.addTest(new OpenCSSEditorTest("testOpenLargeFileFoldingOnOutlineOff")); // WORDPRESS_ADMIN
-		// suite.addTest(new OpenCSSEditorTest("testOpenLargeFileFoldingOffOutlineOff")); // WORDPRESS_ADMIN
-		return new Setup(suite);
-	}
-
-	/*
-	 * @see junit.framework.TestCase#setUp()
-	 */
+//	public static Test suite()
+//	{
+//		// ensure sequence
+//		TestSuite suite = new TestSuite(OpenCSSEditorTest.class.getName());
+//		suite.addTest(new OpenCSSEditorTest("testOpenCSSEditor1")); // YUI
+//		// suite.addTest(new OpenCSSEditorTest("testOpenFromMetadata"));
+//		// suite.addTest(new OpenCSSEditorTest("testOpenGithubFormatted"));
+//		// suite.addTest(new OpenCSSEditorTest("testOpenGithubMinimized"));
+//		suite.addTest(new OpenCSSEditorTest("testOpenLargeMinifiedFileFoldingOnOutlineOn")); // WORDPRESS_MINIMIZED
+//		// suite.addTest(new OpenCSSEditorTest("testOpenLargeMinifiedFileFoldingOffOutlineOn")); // WORDPRESS_MINIMIZED
+//		suite.addTest(new OpenCSSEditorTest("testOpenLargeMinifiedFileFoldingOnOutlineOff")); // WORDPRESS_MINIMIZED
+//		// suite.addTest(new OpenCSSEditorTest("testOpenLargeMinifiedFileFoldingOffOutlineOff")); // WORDPRESS_MINIMIZED
+//		suite.addTest(new OpenCSSEditorTest("testOpenLargeFileFoldingOnOutlineOn")); // WORDPRESS_ADMIN
+//		// suite.addTest(new OpenCSSEditorTest("testOpenLargeFileFoldingOffOutlineOn")); // WORDPRESS_ADMIN
+//		suite.addTest(new OpenCSSEditorTest("testOpenLargeFileFoldingOnOutlineOff")); // WORDPRESS_ADMIN
+//		// suite.addTest(new OpenCSSEditorTest("testOpenLargeFileFoldingOffOutlineOff")); // WORDPRESS_ADMIN
+//		return new Setup(suite);
+//	}
+//
+//	/*
+//	 * @see junit.framework.TestCase#setUp()
+//	 */
 	protected void setUp() throws Exception
 	{
 		super.setUp();

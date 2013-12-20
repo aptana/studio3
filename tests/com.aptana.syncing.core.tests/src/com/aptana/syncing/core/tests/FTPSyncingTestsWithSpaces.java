@@ -21,7 +21,7 @@ public class FTPSyncingTestsWithSpaces extends SyncingTests
 {
 
 	@Override
-	protected void setUp() throws Exception
+	public void setUp() throws Exception
 	{
 		File baseTempFile = File.createTempFile("test", ".txt"); //$NON-NLS-1$ //$NON-NLS-2$
 		baseTempFile.deleteOnExit();

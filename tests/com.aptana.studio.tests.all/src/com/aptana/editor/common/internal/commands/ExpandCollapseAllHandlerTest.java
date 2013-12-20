@@ -7,18 +7,36 @@
  */
 package com.aptana.editor.common.internal.commands;
 
+import static org.junit.Assert.assertEquals;
+
+import java.lang.reflect.Method;
+
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.ui.IPageLayout;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.handlers.IHandlerService;
+import org.eclipse.ui.part.IPage;
+import org.eclipse.ui.views.contentoutline.ContentOutline;
+import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.tests.SingleEditorTestCase;
 import com.aptana.editor.html.HTMLPlugin;
 
 public class ExpandCollapseAllHandlerTest extends SingleEditorTestCase
 {
 
-//	private static final String EXPAND_ALL_COMMAND_ID = "com.aptana.editor.commands.ExpandAll";
-//	private static final String COLLAPSE_ALL_COMMAND_ID = "com.aptana.editor.commands.CollapseAll";
+	private static final String EXPAND_ALL_COMMAND_ID = "com.aptana.editor.commands.ExpandAll";
+	private static final String COLLAPSE_ALL_COMMAND_ID = "com.aptana.editor.commands.CollapseAll";
 	private static final String PROJECT_NAME = "expand_collapse";
 
 	@Override
-	protected void setUp() throws Exception
+	public void setUp() throws Exception
 	{
 		HTMLPlugin.getDefault();
 		super.setUp();
@@ -30,10 +48,11 @@ public class ExpandCollapseAllHandlerTest extends SingleEditorTestCase
 		return PROJECT_NAME;
 	}
 
+	@Ignore("This assumes that the bundles are loaded and the folding is set up")
+	@Test
 	public void testExecute() throws Exception
 	{
-		// FIXME This assumes that the bundles are loaded and the folding is set up
-		/*
+
 		// Create an open an HTML file
 		createAndOpenFile("example" + System.currentTimeMillis() + ".html",
 				"<html>\n<head>\n<title>Title goes here</title>\n</head>\n<body>\n<div>\n<p>Hi</p>\n</div>\n</body>");
@@ -71,7 +90,6 @@ public class ExpandCollapseAllHandlerTest extends SingleEditorTestCase
 		// check expansion state
 		expanded = treeViewer.getExpandedElements();
 		assertEquals(4, expanded.length); // html, head, body, div
-		*/
 	}
 
 }

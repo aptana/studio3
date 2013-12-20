@@ -7,13 +7,17 @@
  */
 package com.aptana.editor.xml.outline;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
 import com.aptana.editor.xml.XMLPlugin;
 import com.aptana.parsing.ParseState;
 import com.aptana.xml.core.parsing.XMLParser;
 
-public class XMLOutlineTest extends TestCase
+public class XMLOutlineTest
 {
 
 	private XMLOutlineContentProvider fContentProvider;
@@ -21,16 +25,18 @@ public class XMLOutlineTest extends TestCase
 
 	private XMLParser fParser;
 
-	@Override
-	protected void setUp() throws Exception
+//	@Override
+	@Before
+	public void setUp() throws Exception
 	{
 		fContentProvider = new XMLOutlineContentProvider();
 		fLabelProvider = new XMLOutlineLabelProvider();
 		fParser = new XMLParser();
 	}
 
-	@Override
-	protected void tearDown() throws Exception
+//	@Override
+	@After
+	public void tearDown() throws Exception
 	{
 		if (fContentProvider != null)
 		{
@@ -45,6 +51,7 @@ public class XMLOutlineTest extends TestCase
 		fParser = null;
 	}
 
+	@Test
 	public void testContent() throws Exception
 	{
 		String source = "<test></test>";
@@ -56,6 +63,7 @@ public class XMLOutlineTest extends TestCase
 		assertEquals(XMLPlugin.getImage("icons/element.png"), fLabelProvider.getImage(elements[0]));
 	}
 	
+	@Test
 	public void testContentWithAttributesShowsFirstAttributeValueInLabel() throws Exception
 	{
 		String source = "<test x=\"100\" y=\"10\"></test>";

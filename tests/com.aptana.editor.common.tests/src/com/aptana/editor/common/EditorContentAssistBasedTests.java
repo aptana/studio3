@@ -7,6 +7,9 @@
  */
 package com.aptana.editor.common;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -177,9 +180,10 @@ public abstract class EditorContentAssistBasedTests<T extends CommonContentAssis
 			if (enforceOrder || enforceSize)
 			{
 
-				assertEquals("Length of expected proposal list and actual proposal list did not match. Non-overlapping: "
-						+ (CollectionsUtil.getNonOverlapping(Arrays.asList(displayNames), names)), displayNames.length,
-						names.size());
+				assertEquals(
+						"Length of expected proposal list and actual proposal list did not match. Non-overlapping: "
+								+ (CollectionsUtil.getNonOverlapping(Arrays.asList(displayNames), names)),
+						displayNames.length, names.size());
 			}
 
 			// this only really makes sense with enforce size
@@ -235,12 +239,8 @@ public abstract class EditorContentAssistBasedTests<T extends CommonContentAssis
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
 	@Override
-	protected void tearDown() throws Exception
+	public void tearDown() throws Exception
 	{
 		processor = null;
 		super.tearDown();

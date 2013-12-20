@@ -7,11 +7,15 @@
  */
 package com.aptana.js.core.inferencing;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.Path;
+import org.junit.Test;
 
 import com.aptana.core.IMap;
 import com.aptana.core.tests.TestProject;
@@ -20,7 +24,6 @@ import com.aptana.index.core.IFileStoreIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.build.BuildContext;
 import com.aptana.js.core.index.JSFileIndexingParticipant;
-import com.aptana.js.core.index.JSIndexQueryHelper;
 import com.aptana.js.core.model.PropertyElement;
 import com.aptana.js.core.model.TypeElement;
 import com.aptana.js.internal.core.index.JSIndexReader;
@@ -28,53 +31,63 @@ import com.aptana.js.internal.core.index.JSIndexReader;
 public class FunctionInferencingTest extends InferencingTestsBase
 {
 
+	@Test
 	public void testReturnsBoolean()
 	{
 		this.lastStatementTypeTests(Path.fromPortableString("inferencing/function-returns-boolean.js"), "Boolean");
 	}
 
+	@Test
 	public void testReturnsFunction()
 	{
 		this.lastStatementTypeTests(Path.fromPortableString("inferencing/function-returns-function.js"), "Function");
 	}
 
+	@Test
 	public void testReturnsNumber()
 	{
 		this.lastStatementTypeTests(Path.fromPortableString("inferencing/function-returns-number.js"), "Number");
 	}
 
+	@Test
 	public void testReturnsRegExp()
 	{
 		this.lastStatementTypeTests(Path.fromPortableString("inferencing/function-returns-regexp.js"), "RegExp");
 	}
 
+	@Test
 	public void testReturnsString()
 	{
 		this.lastStatementTypeTests(Path.fromPortableString("inferencing/function-returns-string.js"), "String");
 	}
 
+	@Test
 	public void testReturnsArray()
 	{
 		this.lastStatementTypeTests(Path.fromPortableString("inferencing/function-returns-array.js"), "Array");
 	}
 
+	@Test
 	public void testReturnsArrayOfNumbers()
 	{
 		this.lastStatementTypeTests(Path.fromPortableString("inferencing/function-returns-array-of-numbers.js"),
 				"Array<Number>");
 	}
 
+	@Test
 	public void testReturnsObject()
 	{
 		this.lastStatementTypeTests(Path.fromPortableString("inferencing/function-returns-object.js"), "Object");
 	}
 
+	@Test
 	public void testReturnsUserObject()
 	{
 		this.lastStatementTypeTests(Path.fromPortableString("inferencing/function-returns-user-object.js"), "foo");
 	}
 
 	// https://jira.appcelerator.org/browse/APSTUD-4207
+	@Test
 	public void testCreateTypeNamesBasedOnContext() throws Exception
 	{
 		String source = "var x = {};\nx.y = {};\nx.y.z = function () {}";
@@ -122,42 +135,49 @@ public class FunctionInferencingTest extends InferencingTestsBase
 		}
 	}
 
+	@Test
 	public void testConstructedArray() throws Exception
 	{
 		loadJSMetadata();
 		this.lastStatementTypeTests(Path.fromPortableString("inferencing/constructed-array.js"), "Array");
 	}
 
+	@Test
 	public void testConstructedBoolean() throws Exception
 	{
 		loadJSMetadata();
 		this.lastStatementTypeTests(Path.fromPortableString("inferencing/constructed-boolean.js"), "Boolean");
 	}
 
+	@Test
 	public void testConstructedDate() throws Exception
 	{
 		loadJSMetadata();
 		this.lastStatementTypeTests(Path.fromPortableString("inferencing/constructed-date.js"), "Date");
 	}
 
+	@Test
 	public void testConstructedError() throws Exception
 	{
 		loadJSMetadata();
 		this.lastStatementTypeTests(Path.fromPortableString("inferencing/constructed-error.js"), "Error");
 	}
 
+	@Test
 	public void testConstructedFunction() throws Exception
 	{
 		loadJSMetadata();
 		this.lastStatementTypeTests(Path.fromPortableString("inferencing/constructed-function.js"), "Function");
 	}
 
+	@Test
 	public void testConstructedNumber() throws Exception
 	{
 		loadJSMetadata();
 		this.lastStatementTypeTests(Path.fromPortableString("inferencing/constructed-number.js"), "Number");
 	}
 
+	@Test
 	public void testConstructedRegExp() throws Exception
 	{
 		loadJSMetadata();
