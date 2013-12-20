@@ -7,18 +7,23 @@
  */
 package com.aptana.core.util;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
-public class ExpiringMapTests extends TestCase
+public class ExpiringMapTests
 {
 
 	private static final int LONG_TIMEOUT = 60000 * 5; // 5 minutes
 	private static final int SHORT_TIMEOUT = 200; // 200 ms
 
+	@Test
 	public void testPutAll()
 	{
 		ExpiringMap<String, String> map = setUpExpirationMap(LONG_TIMEOUT);
@@ -31,12 +36,14 @@ public class ExpiringMapTests extends TestCase
 		assertNotNull("Failed to insert map into expiration map", map.get("four"));
 	}
 
+	@Test
 	public void testGetItem()
 	{
 		ExpiringMap<String, String> map = setUpExpirationMap(LONG_TIMEOUT);
 		assertTrue("Failed to get item", map.get("one").equals("cat"));
 	}
 
+	@Test
 	public void testRemoveItem()
 	{
 		ExpiringMap<String, String> map = setUpExpirationMap(LONG_TIMEOUT);
@@ -44,6 +51,7 @@ public class ExpiringMapTests extends TestCase
 		assertNull("Failed to remove item", map.get("two"));
 	}
 
+	@Test
 	public void testExpiredItem() throws InterruptedException
 	{
 		ExpiringMap<String, String> map = setUpExpirationMap(SHORT_TIMEOUT);
@@ -51,6 +59,7 @@ public class ExpiringMapTests extends TestCase
 		assertNull("An expired item was retrieved", map.get("two"));
 	}
 
+	@Test
 	public void testRemoveExpiredItem() throws InterruptedException
 	{
 		ExpiringMap<String, String> map = setUpExpirationMap(SHORT_TIMEOUT);
@@ -59,6 +68,7 @@ public class ExpiringMapTests extends TestCase
 		assertNull("Failed to remove expired item", map.get("two"));
 	}
 
+	@Test
 	public void testClearMap()
 	{
 		ExpiringMap<String, String> map = setUpExpirationMap(LONG_TIMEOUT);
@@ -66,6 +76,7 @@ public class ExpiringMapTests extends TestCase
 		assertNull("Failed to clear map", map.get("one"));
 	}
 
+	@Test
 	public void testKeySet()
 	{
 		ExpiringMap<String, String> map = setUpExpirationMap(LONG_TIMEOUT);
@@ -73,6 +84,7 @@ public class ExpiringMapTests extends TestCase
 		assertTrue("Could not find valid keys in keyset.", keySet.contains("one") && keySet.contains("two"));
 	}
 
+	@Test
 	public void testIsEmpty()
 	{
 		ExpiringMap<String, String> map = setUpExpirationMap(LONG_TIMEOUT);
@@ -89,6 +101,7 @@ public class ExpiringMapTests extends TestCase
 		assertTrue(hasException);
 	}
 
+	@Test
 	public void testContainsKey()
 	{
 		ExpiringMap<String, String> map = setUpExpirationMap(LONG_TIMEOUT);
@@ -105,6 +118,7 @@ public class ExpiringMapTests extends TestCase
 		assertTrue(hasException);
 	}
 
+	@Test
 	public void testContainsValue()
 	{
 		ExpiringMap<String, String> map = setUpExpirationMap(LONG_TIMEOUT);
@@ -121,6 +135,7 @@ public class ExpiringMapTests extends TestCase
 		assertTrue(hasException);
 	}
 
+	@Test
 	public void testEntrySet()
 	{
 		ExpiringMap<String, String> map = setUpExpirationMap(LONG_TIMEOUT);
@@ -137,6 +152,7 @@ public class ExpiringMapTests extends TestCase
 		assertTrue(hasException);
 	}
 
+	@Test
 	public void testSize()
 	{
 		ExpiringMap<String, String> map = setUpExpirationMap(LONG_TIMEOUT);
@@ -154,6 +170,7 @@ public class ExpiringMapTests extends TestCase
 
 	}
 
+	@Test
 	public void testValues()
 	{
 		ExpiringMap<String, String> map = setUpExpirationMap(LONG_TIMEOUT);
@@ -170,6 +187,7 @@ public class ExpiringMapTests extends TestCase
 		assertTrue(hasException);
 	}
 
+	@Test
 	public void testInsertEmptyValues()
 	{
 		ExpiringMap<String, String> map = setUpExpirationMap(LONG_TIMEOUT);
@@ -177,6 +195,7 @@ public class ExpiringMapTests extends TestCase
 		assertTrue("Failed to insert empty values", map.get("three").equals(StringUtil.EMPTY));
 	}
 
+	@Test
 	public void testInsertNullValues()
 	{
 		ExpiringMap<String, String> map = setUpExpirationMap(LONG_TIMEOUT);

@@ -7,43 +7,31 @@
  */
 package com.aptana.studio.tests.all;
 
-import junit.framework.Test;
-import junit.framework.TestResult;
-import junit.framework.TestSuite;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
+@RunWith(Suite.class)
+//@formatter:off
+@Suite.SuiteClasses({
+	com.aptana.buildpath.core.tests.BuildPathCoreTests.class,
+	com.aptana.core.tests.AllTests.class,
+	com.aptana.core.io.tests.AllTests.class,
+	// com.aptana.filesystem.ftp.tests.AllTests.class, // TODO Re-enable when FTP server is set back up?
+	// com.aptana.filesystem.secureftp.tests.AllTests.class, // TODO Re-enable when FTP server is set back up?
+	com.aptana.filesystem.http.tests.AllTests.class,
+	com.aptana.git.core.tests.AllGitCoreTests.class,
+	com.aptana.index.core.tests.AllIndexCoreTests.class,
+	com.aptana.parsing.tests.AllTests.class,
+	com.aptana.dtd.core.tests.AllTests.class,
+	com.aptana.css.core.tests.AllTests.class,
+	com.aptana.js.core.tests.AllJSCoreTests.class,
+	com.aptana.xml.core.tests.AllTests.class,
+	com.aptana.samples.tests.AllTests.class,
+	com.aptana.scripting.tests.AllTests.class,
+	com.aptana.jira.core.tests.AllJiraCoreTests.class,
+	// com.aptana.syncing.core.tests.AllTests.class // TODO Re-enable when FTP server is set back up?
+})
+// @formatter:on
 public class CoreTests
 {
-
-	public static Test suite()
-	{
-		TestSuite suite = new TestSuite(CoreTests.class.getName())
-		{
-			@Override
-			public void runTest(Test test, TestResult result)
-			{
-				System.err.println("Running test: " + test.toString());
-				super.runTest(test, result);
-			}
-		};
-		// $JUnit-BEGIN$
-		suite.addTest(com.aptana.buildpath.core.tests.BuildPathCoreTests.suite());
-		suite.addTest(com.aptana.core.tests.AllTests.suite());
-		suite.addTest(com.aptana.core.io.tests.AllTests.suite());
-		// suite.addTest(com.aptana.filesystem.ftp.tests.AllTests.suite());
-		// suite.addTest(com.aptana.filesystem.secureftp.tests.AllTests.suite());
-		suite.addTest(com.aptana.filesystem.http.tests.AllTests.suite());
-		suite.addTest(com.aptana.git.core.tests.AllGitCoreTests.suite());
-		suite.addTest(com.aptana.index.core.tests.AllIndexCoreTests.suite());
-		suite.addTest(com.aptana.parsing.tests.AllTests.suite());
-		suite.addTest(com.aptana.dtd.core.tests.AllTests.suite());
-		suite.addTest(com.aptana.css.core.tests.AllTests.suite());
-		suite.addTest(com.aptana.js.core.tests.AllJSCoreTests.suite());
-		suite.addTest(com.aptana.xml.core.tests.AllTests.suite());
-		suite.addTest(com.aptana.samples.tests.AllTests.suite());
-		suite.addTest(com.aptana.scripting.tests.AllTests.suite());
-		suite.addTest(com.aptana.jira.core.tests.AllJiraCoreTests.suite());
-		// suite.addTest(com.aptana.syncing.core.tests.AllTests.suite());
-		// $JUnit-END$
-		return suite;
-	}
 }

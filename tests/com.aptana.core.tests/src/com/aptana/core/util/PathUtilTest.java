@@ -7,21 +7,23 @@
  */
 package com.aptana.core.util;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
 
 import org.eclipse.core.runtime.Path;
+import org.junit.After;
+import org.junit.Test;
 
 import com.aptana.core.ShellExecutable;
 
-public class PathUtilTest extends TestCase
+public class PathUtilTest
 {
 
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		ShellExecutable.setPreferenceShellPath(null);
-		super.tearDown();
 	}
-
+	@Test
 	public void testCygwinPath() throws Exception
 	{
 		ShellExecutable.setPreferenceShellPath(Path.fromOSString("C:\\cygwin\\bin\\sh.exe"));
@@ -30,7 +32,7 @@ public class PathUtilTest extends TestCase
 		String expected = "C:\\cygwin\\usr\\local\\bin;C:\\cygwin\\bin;C:\\Windows\\system32;C:\\Windows;C:\\Windows\\System32\\Wbem;C:\\Windows\\System32\\WindowsPowerShell\\v1.0;C:\\apache-ant-1.7.1\\bin;C:\\RailsInstaller\\Git\\cmd;C:\\RailsInstaller\\Ruby1.8.7\\bin;C:\\Program Files (x86)\\CVSNT";
 		assertEquals(expected, actual);
 	}
-
+	@Test
 	public void testNormalWindowsPath() throws Exception
 	{
 		String rawPATH = "C:\\Windows\\system32;C:\\Windows;C:\\Windows\\System32\\Wbem;C:\\Windows\\System32\\WindowsPowerShell\\v1.0;C:\\apache-ant-1.7.1\\bin;C:\\RailsInstaller\\Git\\cmd;C:\\RailsInstaller\\Ruby1.8.7\\bin;C:\\Program Files (x86)\\CVSNT";

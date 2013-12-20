@@ -7,65 +7,49 @@
  */
 package com.aptana.studio.tests.all;
 
-import junit.framework.Test;
-import junit.framework.TestResult;
-import junit.framework.TestSuite;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
 import com.aptana.editor.common.internal.commands.ExpandCollapseAllHandlerTest;
 import com.aptana.editor.common.internal.commands.NextPreviousEditorHandlerTest;
 
+@RunWith(Suite.class)
+// @formatter:off
+@Suite.SuiteClasses({ 
+	com.aptana.browser.tests.AllTests.class,
+	com.aptana.console.tests.AllTests.class,
+	com.aptana.deploy.ftp.tests.AllTests.class,
+	com.aptana.editor.common.tests.AllTests.class,
+	com.aptana.editor.css.tests.AllTests.class,
+	com.aptana.editor.css.formatter.tests.AllTests.class,
+	com.aptana.editor.dtd.AllTests.class,
+	com.aptana.editor.html.tests.AllTests.class,
+	com.aptana.editor.html.formatter.tests.AllTests.class,
+	com.aptana.editor.js.tests.AllTests.class,
+	com.aptana.editor.js.formatter.tests.AllTests.class,
+	com.aptana.editor.json.tests.AllTests.class,
+	com.aptana.editor.xml.tests.AllTests.class,
+	com.aptana.editor.xml.formatter.tests.AllTests.class,
+	// com.aptana.editor.text.tests.AllTests.class, // TODO Add Tests for editor.text
+	// com.aptana.explorer.tests.AllTests.class, // TODO Add Tests for explorer
+	// com.aptana.filesystem.s3.tests.AllTests.class // FIXME I think the way we do passwords causes us to have to run s3 tests in the UI!
+	com.aptana.git.ui.AllTests.class,
+	com.aptana.portal.ui.tests.AllTests.class,
+	// com.aptana.scripting.ui.tests.AllTests.class, // TODO Add Tests for scripting.ui
+	// com.aptana.syncing.ui.tests.AllTests.class, // FIXME Re-enable when we have ftp server set back up...
+	com.aptana.theme.tests.AllTests.class,
+	org.eclipse.tm.terminal.test.AllTests.class,
+	
+	// Now add special test cases which require to be run after all plugins are loaded (dependency inversion in
+	// test)
+	// require HTML editor to have outline contents to test common editor commands
+	ExpandCollapseAllHandlerTest.class,
+	// FIXME These tests are inconsistent and fail intermittently on test build
+	// ExpandLevelHandlerTest.class,
+	NextPreviousEditorHandlerTest.class
+})
+// @formatter:on
 public class UITests
 {
-
-	public static Test suite()
-	{
-		TestSuite suite = new TestSuite(UITests.class.getName())
-		{
-			@Override
-			public void runTest(Test test, TestResult result)
-			{
-				System.err.println("Running test: " + test.toString());
-				super.runTest(test, result);
-			}
-		};
-
-		// $JUnit-BEGIN$
-		suite.addTest(com.aptana.browser.tests.AllTests.suite());
-		suite.addTest(com.aptana.console.tests.AllTests.suite());
-		suite.addTest(com.aptana.deploy.ftp.tests.AllTests.suite());
-		suite.addTest(com.aptana.editor.common.tests.AllTests.suite());
-		suite.addTest(com.aptana.editor.css.tests.AllTests.suite());
-		suite.addTest(com.aptana.editor.css.formatter.tests.AllTests.suite());
-		suite.addTest(com.aptana.editor.dtd.AllTests.suite());
-		suite.addTest(com.aptana.editor.html.tests.AllTests.suite());
-		suite.addTest(com.aptana.editor.html.formatter.tests.AllTests.suite());
-		suite.addTest(com.aptana.editor.js.tests.AllTests.suite());
-		suite.addTest(com.aptana.editor.js.formatter.tests.AllTests.suite());
-		suite.addTest(com.aptana.editor.json.tests.AllTests.suite());
-		// suite.addTest(com.aptana.editor.text.tests.AllTests.suite()); // TODO Add Tests for editor.text
-		suite.addTest(com.aptana.editor.xml.tests.AllTests.suite());
-		suite.addTest(com.aptana.editor.xml.formatter.tests.AllTests.suite());
-		// suite.addTest(com.aptana.explorer.tests.AllTests.suite()); // TODO Add Tests for explorer
-		// FIXME I think the way we do passwords causes us to have to run s3 tests in the UI!
-//		suite.addTest(com.aptana.filesystem.s3.tests.AllTests.suite());
-		suite.addTest(com.aptana.git.ui.AllTests.suite());
-		suite.addTest(com.aptana.portal.ui.tests.AllTests.suite());
-		// suite.addTest(com.aptana.scripting.ui.tests.AllTests.suite()); // TODO Add Tests for scripting.ui
-		// suite.addTest(com.aptana.syncing.ui.tests.AllTests.suite()); // commenting out for the moment to reduce unit
-		// test times
-		suite.addTest(com.aptana.theme.tests.AllTests.suite());
-		suite.addTest(org.eclipse.tm.terminal.test.AllTests.suite());
-		// $JUnit-END$
-
-		// Now add special test cases which require to be run after all plugins are loaded (dependency inversion in
-		// test)
-
-		// require HTML editor to have outline contents to test common editor commands
-		suite.addTestSuite(ExpandCollapseAllHandlerTest.class);
-		// FIXME These tests are inconsistent and fail intermittently on test build
-		// suite.addTestSuite(ExpandLevelHandlerTest.class);
-		suite.addTestSuite(NextPreviousEditorHandlerTest.class);
-		return suite;
-	}
 
 }

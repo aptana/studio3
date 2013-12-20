@@ -7,27 +7,34 @@ import java.util.UUID;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.test.performance.Performance;
 import org.eclipse.test.performance.PerformanceMeter;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TestName;
 
 public class GitIndexPerformanceTest extends GitTestCase
 {
 
+	@Rule
+	public TestName name = new TestName();
 	private PerformanceMeter fPerformanceMeter;
 
-	@Override
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
 		Performance performance = Performance.getDefault();
-		fPerformanceMeter = performance.createPerformanceMeter(performance.getDefaultScenarioId(this));
+		fPerformanceMeter = performance
+				.createPerformanceMeter(getClass().getName() + '#' + name.getMethodName() + "()"); //$NON-NLS-1$
 	}
 
 	@Override
-	protected void tearDown() throws Exception
+	public void tearDown() throws Exception
 	{
 		fPerformanceMeter.dispose();
 		super.tearDown();
 	}
 
+	@Test
 	public void testRefresh() throws Exception
 	{
 		GitRepository repo = getRepo();
@@ -76,6 +83,7 @@ public class GitIndexPerformanceTest extends GitTestCase
 		}
 	}
 
+	@Test
 	public void testRefreshWithListeners() throws Exception
 	{
 		GitRepository repo = getRepo();

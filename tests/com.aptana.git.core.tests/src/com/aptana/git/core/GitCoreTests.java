@@ -7,29 +7,13 @@
  */
 package com.aptana.git.core;
 
-import junit.framework.Test;
-import junit.framework.TestResult;
-import junit.framework.TestSuite;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
 
+@RunWith(Suite.class)
+@SuiteClasses({ GitMoveDeleteIntegrationTest.class, GitMoveDeleteHookTest.class })
 public class GitCoreTests
 {
-
-	public static Test suite()
-	{
-		TestSuite suite = new TestSuite(GitCoreTests.class.getName())
-		{
-			@Override
-			public void runTest(Test test, TestResult result)
-			{
-				System.err.println("Running test: " + test.toString());
-				super.runTest(test, result);
-			}
-		};
-		// $JUnit-BEGIN$
-		suite.addTestSuite(GitMoveDeleteIntegrationTest.class);
-		suite.addTestSuite(GitMoveDeleteHookTest.class);
-		// $JUnit-END$
-		return suite;
-	}
 
 }

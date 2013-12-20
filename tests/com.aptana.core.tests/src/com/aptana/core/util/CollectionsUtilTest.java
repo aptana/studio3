@@ -7,6 +7,14 @@
  */
 package com.aptana.core.util;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -14,12 +22,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import com.aptana.core.IFilter;
 import com.aptana.core.IMap;
 
-public class CollectionsUtilTest extends TestCase
+public class CollectionsUtilTest
 {
 	private IMap<Object, String> toStringMap = new IMap<Object, String>()
 	{
@@ -29,6 +37,7 @@ public class CollectionsUtilTest extends TestCase
 		}
 	};
 
+	@Test
 	public void testRemoveDuplicates() throws Exception
 	{
 		Integer[] array = { 0, 1, 1, 2, 3, 3, 3 };
@@ -44,6 +53,7 @@ public class CollectionsUtilTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testGetNonOverlapping() throws Exception
 	{
 		List<Integer> coll1 = new ArrayList<Integer>();
@@ -69,6 +79,7 @@ public class CollectionsUtilTest extends TestCase
 		assertFalse(result.contains(5));
 	}
 
+	@Test
 	public void testNullListValue()
 	{
 		List<String> list = CollectionsUtil.getListValue(null);
@@ -77,6 +88,7 @@ public class CollectionsUtilTest extends TestCase
 		assertEquals(0, list.size());
 	}
 
+	@Test
 	public void testListValue()
 	{
 		List<String> list = new ArrayList<String>();
@@ -85,16 +97,19 @@ public class CollectionsUtilTest extends TestCase
 		assertSame(list, result);
 	}
 
+	@Test
 	public void testIsEmptyWithNullList()
 	{
 		assertTrue(CollectionsUtil.<List<?>> isEmpty(null));
 	}
 
+	@Test
 	public void testIsEmptyWithNullMap()
 	{
 		assertTrue(CollectionsUtil.<Map<?, ?>> isEmpty(null));
 	}
 
+	@Test
 	public void testIsEmptyWithEmptyList()
 	{
 		List<String> list = new ArrayList<String>();
@@ -102,6 +117,7 @@ public class CollectionsUtilTest extends TestCase
 		assertTrue(CollectionsUtil.isEmpty(list));
 	}
 
+	@Test
 	public void testIsEmptyWithNonEmptyList()
 	{
 		List<String> list = new ArrayList<String>();
@@ -110,6 +126,7 @@ public class CollectionsUtilTest extends TestCase
 		assertFalse(CollectionsUtil.isEmpty(list));
 	}
 
+	@Test
 	public void testNewList()
 	{
 		List<String> list = CollectionsUtil.newList("item1", "item2");
@@ -120,6 +137,7 @@ public class CollectionsUtilTest extends TestCase
 		assertEquals("'item2' should be at index 1", 1, list.indexOf("item2"));
 	}
 
+	@Test
 	public void testNewListNullItems()
 	{
 		String[] items = null;
@@ -129,6 +147,7 @@ public class CollectionsUtilTest extends TestCase
 		assertTrue("List should be empty", list.isEmpty());
 	}
 
+	@Test
 	public void testAddToListSubclass()
 	{
 		Number doubleOne = 1.0;
@@ -147,6 +166,7 @@ public class CollectionsUtilTest extends TestCase
 		assertEquals("Float 1.0f should be at index 2", 2, list.indexOf(floatOne));
 	}
 
+	@Test
 	public void testAddToList()
 	{
 		List<String> list = CollectionsUtil.newList("a", "b");
@@ -159,6 +179,7 @@ public class CollectionsUtilTest extends TestCase
 		assertEquals("'c' should be at index 2", 2, list.indexOf("c"));
 	}
 
+	@Test
 	public void testAddToListNullItems()
 	{
 		List<String> list = CollectionsUtil.newList("a", "b");
@@ -171,6 +192,7 @@ public class CollectionsUtilTest extends TestCase
 		assertEquals("'b' should be at index 1", 1, list.indexOf("b"));
 	}
 
+	@Test
 	public void testAddToListNullList()
 	{
 		try
@@ -183,6 +205,7 @@ public class CollectionsUtilTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testAddToListListSubclass()
 	{
 		Number doubleOne = 1.0;
@@ -201,6 +224,7 @@ public class CollectionsUtilTest extends TestCase
 		assertEquals("Float 1.0f should be at index 2", 2, list.indexOf(floatOne));
 	}
 
+	@Test
 	public void testAddToListList()
 	{
 		List<String> list = CollectionsUtil.newList("a", "b");
@@ -213,6 +237,7 @@ public class CollectionsUtilTest extends TestCase
 		assertEquals("'c' should be at index 2", 2, list.indexOf("c"));
 	}
 
+	@Test
 	public void testAddToListListNullItems()
 	{
 		List<String> list = CollectionsUtil.newList("a", "b");
@@ -225,6 +250,7 @@ public class CollectionsUtilTest extends TestCase
 		assertEquals("'b' should be at index 1", 1, list.indexOf("b"));
 	}
 
+	@Test
 	public void testAddToListListNullList()
 	{
 		try
@@ -237,6 +263,7 @@ public class CollectionsUtilTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testNewSet()
 	{
 		Set<String> set = CollectionsUtil.newSet("item1", "item2");
@@ -247,6 +274,7 @@ public class CollectionsUtilTest extends TestCase
 		assertTrue("'item2' should exist in the set", set.contains("item2"));
 	}
 
+	@Test
 	public void testNewSetNullItems()
 	{
 		String[] items = null;
@@ -256,6 +284,7 @@ public class CollectionsUtilTest extends TestCase
 		assertTrue("Set should be empty", set.isEmpty());
 	}
 
+	@Test
 	public void testAddToSetSubclass()
 	{
 		Number doubleOne = 1.0;
@@ -274,6 +303,7 @@ public class CollectionsUtilTest extends TestCase
 		assertTrue("Set should contain float 1.0f", set.contains(floatOne));
 	}
 
+	@Test
 	public void testAddToSet()
 	{
 		Set<String> set = CollectionsUtil.newSet("a", "b");
@@ -286,6 +316,7 @@ public class CollectionsUtilTest extends TestCase
 		assertTrue("'c' should exist in the set", set.contains("c"));
 	}
 
+	@Test
 	public void testAddToSetNullItems()
 	{
 		Set<String> set = CollectionsUtil.newSet("a", "b");
@@ -298,6 +329,7 @@ public class CollectionsUtilTest extends TestCase
 		assertTrue("'b' should exist in the set", set.contains("b"));
 	}
 
+	@Test
 	public void testAddToSetNullSet()
 	{
 		try
@@ -310,6 +342,7 @@ public class CollectionsUtilTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testNewInOrderSet()
 	{
 		Set<String> list = new LinkedHashSet<String>();
@@ -320,6 +353,7 @@ public class CollectionsUtilTest extends TestCase
 		assertEquals(list, CollectionsUtil.newInOrderSet("item1", "item2"));
 	}
 
+	@Test
 	public void testCollectionFind()
 	{
 		List<String> list = CollectionsUtil.newList("a", "ab", "ba", "b", "bc", "cb");
@@ -336,6 +370,7 @@ public class CollectionsUtilTest extends TestCase
 		assertEquals("Should have found first 'a'", "a", found);
 	}
 
+	@Test
 	public void testCollectionFind2()
 	{
 		List<String> list = CollectionsUtil.newList("a", "ab", "ba", "b", "bc", "cb");
@@ -352,6 +387,7 @@ public class CollectionsUtilTest extends TestCase
 		assertEquals("Should have found 'ba'", "ba", found);
 	}
 
+	@Test
 	public void testCollectionFindNullCollection()
 	{
 		IFilter<String> selectWithA = new IFilter<String>()
@@ -366,6 +402,7 @@ public class CollectionsUtilTest extends TestCase
 		assertNull(found);
 	}
 
+	@Test
 	public void testCollectionFindNullFilter()
 	{
 		List<String> list = CollectionsUtil.newList("a", "ab", "ba", "b", "bc", "cb");
@@ -374,6 +411,7 @@ public class CollectionsUtilTest extends TestCase
 		assertNull(found);
 	}
 
+	@Test
 	public void testCollectionFilter()
 	{
 		List<String> list = CollectionsUtil.newList("a", "ab", "ba", "b", "bc", "cb");
@@ -393,6 +431,7 @@ public class CollectionsUtilTest extends TestCase
 		assertTrue("List should contain 'ba'", filteredList.contains("ba"));
 	}
 
+	@Test
 	public void testCollectionFilterNullCollection()
 	{
 		IFilter<String> selectWithA = new IFilter<String>()
@@ -408,6 +447,7 @@ public class CollectionsUtilTest extends TestCase
 		assertEquals("List should contain 0 items", 0, filteredList.size());
 	}
 
+	@Test
 	public void testCollectionFilterNullFilter()
 	{
 		List<String> list = CollectionsUtil.newList("a", "ab", "ba", "b", "bc", "cb");
@@ -417,6 +457,7 @@ public class CollectionsUtilTest extends TestCase
 		assertEquals("List should contain 6 items", 6, filteredList.size());
 	}
 
+	@Test
 	public void testCollectionFilterInPlace()
 	{
 		List<String> list = CollectionsUtil.newList("a", "ab", "ba", "b", "bc", "cb");
@@ -436,6 +477,7 @@ public class CollectionsUtilTest extends TestCase
 		assertTrue("List should contain 'ba'", list.contains("ba"));
 	}
 
+	@Test
 	public void testCollectionFilterInPlaceNullCollection()
 	{
 		IFilter<String> selectWithA = new IFilter<String>()
@@ -456,6 +498,7 @@ public class CollectionsUtilTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testCollectionFilterInPlaceNullFilter()
 	{
 		List<String> list = CollectionsUtil.newList("a", "ab", "ba", "b", "bc", "cb");
@@ -464,6 +507,7 @@ public class CollectionsUtilTest extends TestCase
 		assertEquals("List should contain 6 items", 6, list.size());
 	}
 
+	@Test
 	public void testCollectionFilterWithDestinationCollection()
 	{
 		List<String> list1 = CollectionsUtil.newList("a", "b", "c");
@@ -487,6 +531,7 @@ public class CollectionsUtilTest extends TestCase
 		assertTrue("List should contain 'ba'", accumulator.contains("ba"));
 	}
 
+	@Test
 	public void testCollectionFilterWithDestinationCollectionNullSource()
 	{
 		IFilter<String> selectWithA = new IFilter<String>()
@@ -510,6 +555,7 @@ public class CollectionsUtilTest extends TestCase
 		assertEquals("List should contain 0 items", 0, accumulator.size());
 	}
 
+	@Test
 	public void testCollectionFilterWithDestinationCollectionNullFilter()
 	{
 		List<String> list1 = CollectionsUtil.newList("a", "b", "c");
@@ -523,6 +569,7 @@ public class CollectionsUtilTest extends TestCase
 		assertEquals("List should contain 7 items", 7, accumulator.size());
 	}
 
+	@Test
 	public void testMapObjectToString()
 	{
 		List<Integer> numbers = CollectionsUtil.newList(1, 2, 3);
@@ -537,6 +584,7 @@ public class CollectionsUtilTest extends TestCase
 		assertEquals("'3' should be at index 0", 2, strings.indexOf("3"));
 	}
 
+	@Test
 	public void testMapNullCollection()
 	{
 		Collection<Object> items = null;
@@ -546,6 +594,7 @@ public class CollectionsUtilTest extends TestCase
 		assertTrue(strings.isEmpty());
 	}
 
+	@Test
 	public void testMapNullMapper()
 	{
 		List<Integer> numbers = CollectionsUtil.newList(1, 2, 3);
@@ -555,6 +604,7 @@ public class CollectionsUtilTest extends TestCase
 		assertTrue(strings.isEmpty());
 	}
 
+	@Test
 	public void testMapNullSource()
 	{
 		Collection<Object> source = null;
@@ -565,6 +615,7 @@ public class CollectionsUtilTest extends TestCase
 		assertTrue(destination.isEmpty());
 	}
 
+	@Test
 	public void testMapNullDestination()
 	{
 		List<Integer> source = CollectionsUtil.newList(1, 2, 3);
@@ -580,6 +631,7 @@ public class CollectionsUtilTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testMapNullMapper2()
 	{
 		List<Integer> source = CollectionsUtil.newList(1, 2, 3);
@@ -589,6 +641,7 @@ public class CollectionsUtilTest extends TestCase
 		assertTrue(destination.isEmpty());
 	}
 
+	@Test
 	public void testNewMap()
 	{
 		Map<String, String> map = CollectionsUtil.newMap("item1", "item2");
@@ -600,6 +653,7 @@ public class CollectionsUtilTest extends TestCase
 		assertEquals("item2", map.get("item1"));
 	}
 
+	@Test
 	public void testNewMapNullItems()
 	{
 		String[] items = null;
@@ -609,6 +663,7 @@ public class CollectionsUtilTest extends TestCase
 		assertTrue("Map should be empty", map.isEmpty());
 	}
 
+	@Test
 	public void testNewMapUnevenItems()
 	{
 		try
@@ -622,6 +677,7 @@ public class CollectionsUtilTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testNewMapDefinedTypes()
 	{
 		// @formatter:off
@@ -639,6 +695,7 @@ public class CollectionsUtilTest extends TestCase
 		assertEquals(Integer.valueOf(3), map.get("item3"));
 	}
 
+	@Test
 	public void testNewMapDefinedTypesUnevenItems()
 	{
 		try
@@ -652,6 +709,7 @@ public class CollectionsUtilTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testAddToMapSubclass()
 	{
 		Number doubleOne = 1.0;
@@ -674,6 +732,7 @@ public class CollectionsUtilTest extends TestCase
 		assertEquals(floatTwo, map.get(floatOne));
 	}
 
+	@Test
 	public void testAddToMap()
 	{
 		Map<String, String> map = CollectionsUtil.newMap("a", "b");
@@ -689,6 +748,7 @@ public class CollectionsUtilTest extends TestCase
 		assertTrue("'d' should exist in the map", map.containsValue("d"));
 	}
 
+	@Test
 	public void testAddToMapNullItems()
 	{
 		Map<String, String> map = CollectionsUtil.newMap("a", "b", "c", "d");
@@ -705,6 +765,7 @@ public class CollectionsUtilTest extends TestCase
 		assertTrue("'d' should exist in the map", map.containsValue("d"));
 	}
 
+	@Test
 	public void testAddToMapNullMap()
 	{
 		try
@@ -717,6 +778,7 @@ public class CollectionsUtilTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testAddUnevenItemsToMap()
 	{
 		Map<String, String> map = CollectionsUtil.newMap("a", "b");
@@ -732,6 +794,7 @@ public class CollectionsUtilTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testAddUnevenItemsToMapDefinedTypes()
 	{
 		Map<String, Integer> map = CollectionsUtil.newTypedMap(String.class, Integer.class, "a", 1);
@@ -747,6 +810,7 @@ public class CollectionsUtilTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testMapFromValues()
 	{
 		List<Integer> numbers = CollectionsUtil.newList(1, 2, 3);
@@ -765,6 +829,7 @@ public class CollectionsUtilTest extends TestCase
 		assertEquals(Integer.valueOf(3), cache.get("3"));
 	}
 
+	@Test
 	public void testFirstElementEmpty()
 	{
 		List<String> strings = new ArrayList<String>();
@@ -772,17 +837,20 @@ public class CollectionsUtilTest extends TestCase
 		assertNull(firstElement);
 	}
 
+	@Test
 	public void testFirstElementNullElement()
 	{
 		String firstElement = CollectionsUtil.getFirstElement(CollectionsUtil.newList((String) null));
 		assertNull(firstElement);
 	}
 
+	@Test
 	public void testFirstElementNullList()
 	{
 		assertNull(CollectionsUtil.getFirstElement(null));
 	}
 
+	@Test
 	public void testFirstElementList()
 	{
 		List<Integer> numbers = CollectionsUtil.newList(1, 2, 3);
@@ -790,6 +858,7 @@ public class CollectionsUtilTest extends TestCase
 		assertEquals(new Integer(1), firstElement);
 	}
 
+	@Test
 	public void testCollectionPartition()
 	{
 		List<String> list = CollectionsUtil.newList("a", "ab", "ba", "b", "bc", "cb");

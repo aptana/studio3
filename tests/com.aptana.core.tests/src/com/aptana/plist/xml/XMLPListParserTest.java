@@ -7,16 +7,20 @@
  */
 package com.aptana.plist.xml;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.Map;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.junit.Test;
 
 import com.aptana.plist.AbstractPlistParserTestCase;
 
 public class XMLPListParserTest extends AbstractPlistParserTestCase
 {
-
+	@Test
 	public void testParseXMLWithInvalidCharacters() throws Exception
 	{
 		XMLPListParser plistParser = new XMLPListParser();

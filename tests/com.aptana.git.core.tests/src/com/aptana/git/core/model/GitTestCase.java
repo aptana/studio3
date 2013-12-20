@@ -1,46 +1,43 @@
 package com.aptana.git.core.model;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.text.MessageFormat;
 import java.util.List;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.junit.After;
 
 import com.aptana.core.util.FileUtil;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.ChangedFile.Status;
 
-public abstract class GitTestCase extends TestCase
+public abstract class GitTestCase
 {
 
 	private GitRepository fRepo;
 	private IPath fPath;
 
-	@Override
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
-		try
+		if (fRepo != null)
 		{
-			if (fRepo != null)
+			File generatedRepo = fRepo.workingDirectory().toFile();
+			if (generatedRepo.exists())
 			{
-				File generatedRepo = fRepo.workingDirectory().toFile();
-				if (generatedRepo.exists())
-				{
-					delete(generatedRepo);
-				}
-				fRepo = null;
+				delete(generatedRepo);
 			}
-			fPath = null;
+			fRepo = null;
 		}
-		finally
-		{
-			super.tearDown();
-		}
+		fPath = null;
 	}
 
 	protected synchronized IPath repoToGenerate() throws Exception
