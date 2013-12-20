@@ -1,5 +1,9 @@
 package com.aptana.editor.common.util;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +25,7 @@ import com.aptana.core.util.StringUtil;
  * 
  * @author Shalom Gibly <sgibly@appcelerator.com>
  */
-public class MarkerUtilsTest extends TestCase
+public class MarkerUtilsTest
 {
 	private static String TEST_BUNDLE_ID = "com.aptana.editor.common.tests";
 	private static final String TEST_RESOURCE_PATH = "resources/markerutils/markers_001.js";
@@ -34,10 +38,11 @@ public class MarkerUtilsTest extends TestCase
 	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
-	@Override
-	protected void setUp() throws Exception
+//	@Override
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 		URL entry = Platform.getBundle(TEST_BUNDLE_ID).getEntry(TEST_RESOURCE_PATH);
 		uniformResource = new FileStoreUniformResource(EFS.getLocalFileSystem().getStore(entry.toURI()));
 	}
@@ -46,14 +51,16 @@ public class MarkerUtilsTest extends TestCase
 	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
-	@Override
-	protected void tearDown() throws Exception
+//	@Override
+	@After
+	public void tearDown() throws Exception
 	{
 		MarkerUtils.deleteMarkers(uniformResource, null, false);
 		uniformResource = null;
-		super.tearDown();
+//		super.tearDown();
 	}
 
+	@Test
 	public void testMarkerCreation() throws Exception
 	{
 		assertNoMarkers();
@@ -73,6 +80,7 @@ public class MarkerUtilsTest extends TestCase
 		assertEquals(message, marker.getAttribute(IMarker.MESSAGE, StringUtil.EMPTY));
 	}
 
+	@Test
 	public void testMultiMarkersCreation() throws Exception
 	{
 		assertNoMarkers();
@@ -109,6 +117,7 @@ public class MarkerUtilsTest extends TestCase
 		assertEquals(warnMgs, marker.getAttribute(IMarker.MESSAGE, StringUtil.EMPTY));
 	}
 
+	@Test
 	public void testMarkerDeletion() throws Exception
 	{
 		assertNoMarkers();

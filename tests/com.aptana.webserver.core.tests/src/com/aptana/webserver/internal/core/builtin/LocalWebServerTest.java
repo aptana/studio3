@@ -11,6 +11,8 @@
 
 package com.aptana.webserver.internal.core.builtin;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -29,11 +31,12 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 /**
  * @author Max Stepanov
  */
-public class LocalWebServerTest extends TestCase
+public class LocalWebServerTest
 {
 
 	private static final String PAGE_CONTENTS = "<html><head><title>Test</title></head><body><h1>Test Page</h1></body>"; //$NON-NLS-1$
 
+	@Test
 	public void testBasicGet() throws IOException, CoreException
 	{
 		File dir = File.createTempFile(getClass().getSimpleName(), "temp"); //$NON-NLS-1$

@@ -7,6 +7,9 @@
  */
 package com.aptana.editor.common.contentassist;
 
+import org.junit.runners.Suite.SuiteClasses;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 import junit.framework.Test;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
@@ -14,23 +17,25 @@ import junit.framework.TestSuite;
 /**
  * AllTests
  */
+@RunWith(Suite.class)
+@SuiteClasses({CompletionProposalTest.class, UserAgentManagerTests.class, })
 public class ContentAssistTests
 {
-	public static Test suite()
-	{
-		TestSuite suite = new TestSuite(ContentAssistTests.class.getName())
-		{
-			@Override
-			public void runTest(Test test, TestResult result)
-			{
-				System.err.println("Running test: " + test.toString());
-				super.runTest(test, result);
-			}
-		};
-		// $JUnit-BEGIN$
-		suite.addTestSuite(CompletionProposalTest.class);
-		suite.addTestSuite(UserAgentManagerTests.class);
-		// $JUnit-END$
-		return suite;
-	}
+//	public static Test suite()
+//	{
+//		TestSuite suite = new TestSuite(ContentAssistTests.class.getName())
+//		{
+//			@Override
+//			public void runTest(Test test, TestResult result)
+//			{
+//				System.err.println("Running test: " + test.toString());
+//				super.runTest(test, result);
+//			}
+//		};
+//		// $JUnit-BEGIN$
+//		suite.addTestSuite(CompletionProposalTest.class);
+//		suite.addTestSuite(UserAgentManagerTests.class);
+//		// $JUnit-END$
+//		return suite;
+//	}
 }

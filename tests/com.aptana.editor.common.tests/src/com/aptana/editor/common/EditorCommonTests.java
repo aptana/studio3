@@ -7,30 +7,35 @@
  */
 package com.aptana.editor.common;
 
+import org.junit.runners.Suite.SuiteClasses;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 import junit.framework.Test;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
+@RunWith(Suite.class)
+@SuiteClasses({RegionsTest.class, SequenceCharacterScannerTest.class, TextUtilsTest.class, })
 public class EditorCommonTests
 {
 
-	public static Test suite()
-	{
-		TestSuite suite = new TestSuite(EditorCommonTests.class.getName())
-		{
-			@Override
-			public void runTest(Test test, TestResult result)
-			{
-				System.err.println("Running test: " + test.toString());
-				super.runTest(test, result);
-			}
-		};
-		//$JUnit-BEGIN$
-		suite.addTestSuite(RegionsTest.class);
-		suite.addTestSuite(SequenceCharacterScannerTest.class);
-		suite.addTestSuite(TextUtilsTest.class);
-		//$JUnit-END$
-		return suite;
-	}
-
+//	public static Test suite()
+//	{
+//		TestSuite suite = new TestSuite(EditorCommonTests.class.getName())
+//		{
+//			@Override
+//			public void runTest(Test test, TestResult result)
+//			{
+//				System.err.println("Running test: " + test.toString());
+//				super.runTest(test, result);
+//			}
+//		};
+//		//$JUnit-BEGIN$
+//		suite.addTestSuite(RegionsTest.class);
+//		suite.addTestSuite(SequenceCharacterScannerTest.class);
+//		suite.addTestSuite(TextUtilsTest.class);
+//		//$JUnit-END$
+//		return suite;
+//	}
+//
 }

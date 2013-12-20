@@ -7,6 +7,9 @@
  */
 package com.aptana.editor.js.internal.text;
 
+import org.junit.After;
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.util.Collection;
 import java.util.Map;
 
@@ -27,18 +30,20 @@ import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseRootNode;
 
-public class JSFoldingComputerTest extends TestCase
+public class JSFoldingComputerTest
 {
 
 	private IFoldingComputer folder;
 
-	@Override
-	protected void tearDown() throws Exception
+//	@Override
+	@After
+	public void tearDown() throws Exception
 	{
 		folder = null;
-		super.tearDown();
+//		super.tearDown();
 	}
 
+	@Test
 	public void testScriptdocFolding() throws Exception
 	{
 		String src = "/**\n * This is a comment.\n **/\n";
@@ -69,6 +74,7 @@ public class JSFoldingComputerTest extends TestCase
 		return folder.emitFoldingRegions(initialReconcile, new NullProgressMonitor(), ast);
 	}
 
+	@Test
 	public void testJSCommentFolding() throws Exception
 	{
 		String src = "/*\n * This is a comment.\n */\n";
@@ -79,6 +85,7 @@ public class JSFoldingComputerTest extends TestCase
 		assertTrue(positions.contains(new Position(0, src.length()))); // eats whole line at end
 	}
 
+	@Test
 	public void testJSFunctionFolding() throws Exception
 	{
 		String src = "function listItems(itemList) \n" + //
@@ -99,6 +106,7 @@ public class JSFoldingComputerTest extends TestCase
 		assertTrue(positions.contains(new Position(63, 96)));
 	}
 
+	@Test
 	public void testJSCommentInitiallyFolded() throws Exception
 	{
 		String src = "/*\n * This is a comment.\n */\n";
@@ -115,6 +123,7 @@ public class JSFoldingComputerTest extends TestCase
 		assertFalse(annotations.keySet().iterator().next().isCollapsed());
 	}
 
+	@Test
 	public void testJSFunctionInitiallyFolded() throws Exception
 	{
 		String src = "function listItems(itemList) \n" + //
@@ -135,6 +144,7 @@ public class JSFoldingComputerTest extends TestCase
 		assertFalse(annotations.keySet().iterator().next().isCollapsed());
 	}
 
+	@Test
 	public void testArrayInitiallyFolded() throws Exception
 	{
 		String src = "{\n" + //
@@ -159,6 +169,7 @@ public class JSFoldingComputerTest extends TestCase
 		assertFalse(annotation.isCollapsed());
 	}
 
+	@Test
 	public void testObjectInitiallyFolded() throws Exception
 	{
 		String src = "object = {\n" + //

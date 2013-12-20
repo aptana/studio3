@@ -1,5 +1,9 @@
 package com.aptana.editor.html.contentassist.index;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Collection;
@@ -21,29 +25,32 @@ import com.aptana.index.core.IndexPlugin;
 import com.aptana.index.core.build.BuildContext;
 import com.aptana.js.core.index.JSFileIndexingParticipant;
 
-public class HTMLFileIndexingParticipantTest extends TestCase
+public class HTMLFileIndexingParticipantTest
 {
 
 	private HTMLFileIndexingParticipant indexer;
 	private CSSFileIndexingParticipant cssIndexer;
 	private JSFileIndexingParticipant jsIndexer;
 
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 		cssIndexer = new CSSFileIndexingParticipant();
 		jsIndexer = new JSFileIndexingParticipant();
 		indexer = new HTMLFileIndexingParticipant();
 	}
 
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		jsIndexer = null;
 		cssIndexer = null;
 		indexer = null;
-		super.tearDown();
+//		super.tearDown();
 	}
 
+	@Test
 	public void testDetectTaskTagWithUnicodeCharactersInCSSHTMLAndJS() throws Exception
 	{
 		File tmpDir = null;

@@ -7,11 +7,14 @@
  */
 package com.aptana.editor.common;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
-public class TextUtilsTest extends TestCase
+public class TextUtilsTest
 {
 
+	@Test
 	public void testCombine()
 	{
 		String[][] arrays = new String[][] { new String[] { "one", "two" }, new String[] { "two", "three" } };
@@ -22,6 +25,7 @@ public class TextUtilsTest extends TestCase
 		assertEquals("three", result[2]);
 	}
 
+	@Test
 	public void testCombineArrays()
 	{
 		String[][] array1 = new String[][] { new String[] { "one", "two" }, new String[] { "two", "three" } };
@@ -42,6 +46,7 @@ public class TextUtilsTest extends TestCase
 		assertEquals("2three", result4[1]);
 	}
 
+	@Test
 	public void testRemoveDuplicates()
 	{
 		char[][] arrays = new char[][] { new char[] { 'h', 'i' }, new char[] { 't', 'h', 'e', 'r', 'e' },

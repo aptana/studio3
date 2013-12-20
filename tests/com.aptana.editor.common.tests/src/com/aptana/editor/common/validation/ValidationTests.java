@@ -7,27 +7,32 @@
  */
 package com.aptana.editor.common.validation;
 
+import org.junit.runners.Suite.SuiteClasses;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 import junit.framework.Test;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
+@RunWith(Suite.class)
+@SuiteClasses({})
 public class ValidationTests
 {
 
-	public static Test suite()
-	{
-		TestSuite suite = new TestSuite(ValidationTests.class.getName())
-		{
-			@Override
-			public void runTest(Test test, TestResult result)
-			{
-				System.err.println("Running test: " + test.toString());
-				super.runTest(test, result);
-			}
-		};
-		// $JUnit-BEGIN$
-		// $JUnit-END$
-		return suite;
-	}
-
+//	public static Test suite()
+//	{
+//		TestSuite suite = new TestSuite(ValidationTests.class.getName())
+//		{
+//			@Override
+//			public void runTest(Test test, TestResult result)
+//			{
+//				System.err.println("Running test: " + test.toString());
+//				super.runTest(test, result);
+//			}
+//		};
+//		// $JUnit-BEGIN$
+//		// $JUnit-END$
+//		return suite;
+//	}
+//
 }

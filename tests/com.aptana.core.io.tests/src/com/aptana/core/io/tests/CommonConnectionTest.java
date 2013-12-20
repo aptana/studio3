@@ -7,6 +7,10 @@
  */
 package com.aptana.core.io.tests;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -49,7 +53,7 @@ import com.aptana.ide.core.io.IConnectionPoint;
  * @author Max Stepanov
  */
 @SuppressWarnings("nls")
-public abstract class CommonConnectionTest extends TestCase
+public abstract class CommonConnectionTest
 {
 	protected static final String TEXT = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse nunc tellus, condimentum quis luctus fermentum, tincidunt eget dui. Sed bibendum iaculis ligula, fringilla ullamcorper justo ullamcorper non. Curabitur tristique mi a magna vestibulum fermentum. Praesent sed neque feugiat purus egestas tristique. Sed non nisi velit. Maecenas placerat, nisi quis iaculis porta, nisi mauris facilisis est, at rutrum lacus sem non ante. Morbi et cursus nibh. Aliquam tincidunt urna quis quam semper ut congue est auctor. Curabitur malesuada, diam ut congue elementum, orci eros rhoncus felis, vel elementum felis velit id eros. Quisque eros diam, malesuada nec tincidunt eget, gravida iaculis tortor. Donec sollicitudin ultricies ante ac facilisis. In egestas malesuada erat id vehicula.\n" + //$NON-NLS-1$
 			"Integer non urna nunc, et rhoncus eros. Suspendisse tincidunt laoreet enim vel pretium. Nam bibendum sodales risus nec adipiscing. Pellentesque fringilla interdum odio posuere consectetur. Nullam venenatis augue sed felis tempus eu posuere quam facilisis. Pellentesque commodo rutrum bibendum. Ut sit amet sapien in purus vestibulum sodales. Integer pharetra mi in dui auctor in tristique erat malesuada. Integer nec ipsum quam. Quisque non enim et quam consequat mollis id ac sem. Nunc ut elit ac odio adipiscing pretium vel eget mauris. Aenean diam diam, porttitor sit amet lobortis a, accumsan at ante. Phasellus ut nulla enim. In nec diam magna. In molestie vulputate viverra. Etiam at justo tellus, sed rutrum erat.\r\n" //$NON-NLS-1$
@@ -119,8 +123,9 @@ public abstract class CommonConnectionTest extends TestCase
 		return cachedProperties;
 	}
 
-	@Override
-	protected void setUp() throws Exception
+//	@Override
+	@Before
+	public void setUp() throws Exception
 	{
 		ConnectionContext context = new ConnectionContext();
 		context.put(ConnectionContext.COMMAND_LOG, System.out);
@@ -137,8 +142,9 @@ public abstract class CommonConnectionTest extends TestCase
 		}
 	}
 
-	@Override
-	protected void tearDown() throws Exception
+//	@Override
+	@After
+	public void tearDown() throws Exception
 	{
 		try
 		{
@@ -165,11 +171,12 @@ public abstract class CommonConnectionTest extends TestCase
 			{
 				cp = null;
 				testPath = null;
-				super.tearDown();
+//				super.tearDown();
 			}
 		}
 	}
 
+	@Test
 	public final void testURI() throws CoreException
 	{
 		assertEquals(cp.getRootURI(), cp.getRoot().toURI());
@@ -179,6 +186,7 @@ public abstract class CommonConnectionTest extends TestCase
 		assertEquals(fs, fs2);
 	}
 
+	@Test
 	public final void testConnectDisconnect() throws CoreException
 	{
 		cp.connect(null);
@@ -195,6 +203,7 @@ public abstract class CommonConnectionTest extends TestCase
 		assertFalse(cp.canDisconnect());
 	}
 
+	@Test
 	public final void testFetchRootInfo() throws CoreException
 	{
 		IFileStore fs = cp.getRoot();
@@ -214,6 +223,7 @@ public abstract class CommonConnectionTest extends TestCase
 		assertEquals(Path.ROOT.toPortableString(), fi.getName());
 	}
 
+	@Test
 	public final void testFetchInfoWillConnectIfDisconnected() throws CoreException
 	{
 		IFileStore fs = cp.getRoot();
@@ -234,6 +244,7 @@ public abstract class CommonConnectionTest extends TestCase
 		assertNotNull(fi);
 	}
 
+	@Test
 	public final void testNonexisting() throws CoreException
 	{
 		IFileStore fs = cp.getRoot().getFileStore(new Path("/some/path/nonexisting.file")); //$NON-NLS-1$
@@ -258,6 +269,7 @@ public abstract class CommonConnectionTest extends TestCase
 		fs.delete(EFS.NONE, null);
 	}
 
+	@Test
 	public final void testParent() throws CoreException
 	{
 		IFileStore fs = cp.getRoot().getFileStore(new Path("/some/path/some.file")); //$NON-NLS-1$
@@ -289,6 +301,7 @@ public abstract class CommonConnectionTest extends TestCase
 		assertEquals(null, cp.getRoot().getParent());
 	}
 
+	@Test
 	public final void testCreateEmptyFile() throws CoreException, IOException
 	{
 		IFileStore fs = cp.getRoot().getFileStore(testPath.append("/emptyfile.txt")); //$NON-NLS-1$
@@ -305,6 +318,7 @@ public abstract class CommonConnectionTest extends TestCase
 		assertEquals(0, fi.getLength());
 	}
 
+	@Test
 	public final void testCreateEmptyDotFile() throws CoreException, IOException
 	{
 		IFileStore fs = cp.getRoot().getFileStore(testPath.append("/.emptyfile.txt")); //$NON-NLS-1$
@@ -334,6 +348,7 @@ public abstract class CommonConnectionTest extends TestCase
 		assertEquals(0, fi.getLength());
 	}
 
+	@Test
 	public final void testCreateEmptyFileRecursive() throws CoreException
 	{
 		IFileStore fs = cp.getRoot().getFileStore(testPath.append("/nonexisting/emptyfile.txt")); //$NON-NLS-1$
@@ -359,6 +374,7 @@ public abstract class CommonConnectionTest extends TestCase
 		assertFalse(fi.exists());
 	}
 
+	@Test
 	public final void testCreateFolder() throws CoreException
 	{
 		IFileStore fs = cp.getRoot().getFileStore(testPath.append("/newfolder")); //$NON-NLS-1$
@@ -375,6 +391,7 @@ public abstract class CommonConnectionTest extends TestCase
 		fs.mkdir(EFS.SHALLOW, null); // retry to show no errors
 	}
 
+	@Test
 	public final void testCreateFolderRecursive() throws CoreException
 	{
 		IFileStore fs = cp.getRoot().getFileStore(testPath.append("/leve1/level2/level3")); //$NON-NLS-1$
@@ -404,6 +421,7 @@ public abstract class CommonConnectionTest extends TestCase
 		assertTrue(fi.exists());
 	}
 
+	@Test
 	public final void testWriteReadBinFile() throws CoreException, IOException
 	{
 		IFileStore fs = cp.getRoot().getFileStore(testPath.append("/rwfile.bin")); //$NON-NLS-1$
@@ -431,6 +449,7 @@ public abstract class CommonConnectionTest extends TestCase
 		assertTrue(Arrays.equals(BYTES, bout.toByteArray()));
 	}
 
+	@Test
 	public final void testWriteReadTextFile() throws CoreException, IOException
 	{
 		IFileStore fs = cp.getRoot().getFileStore(testPath.append("/rwfile.txt")); //$NON-NLS-1$
@@ -458,6 +477,7 @@ public abstract class CommonConnectionTest extends TestCase
 		assertTrue(Arrays.equals(TEXT.toCharArray(), sw.toString().toCharArray()));
 	}
 
+	@Test
 	public final void testWriteReadExistingFile() throws CoreException, IOException
 	{
 		IFileStore fs = cp.getRoot().getFileStore(testPath.append("/rwfile.txt")); //$NON-NLS-1$
@@ -489,6 +509,7 @@ public abstract class CommonConnectionTest extends TestCase
 		assertTrue(Arrays.equals(TEXT.toCharArray(), sw.toString().toCharArray()));
 	}
 
+	@Test
 	public final void testWriteReadTextFileSimultanesously() throws CoreException, IOException
 	{
 		IFileStore[] fslist = new IFileStore[4];
@@ -544,6 +565,7 @@ public abstract class CommonConnectionTest extends TestCase
 		}
 	}
 
+	@Test
 	public final void testDeleteFile() throws CoreException, IOException
 	{
 		IFileStore fs = cp.getRoot().getFileStore(testPath.append("/deleteme.ext")); //$NON-NLS-1$
@@ -559,6 +581,7 @@ public abstract class CommonConnectionTest extends TestCase
 		assertFalse(fi.exists());
 	}
 
+	@Test
 	public final void testDeleteFolder() throws CoreException
 	{
 		IFileStore fs = cp.getRoot().getFileStore(testPath.append("/deleteme")); //$NON-NLS-1$
@@ -573,6 +596,7 @@ public abstract class CommonConnectionTest extends TestCase
 		assertFalse(fi.exists());
 	}
 
+	@Test
 	public final void testDeleteFolderRecursive() throws CoreException
 	{
 		IFileStore fs = cp.getRoot().getFileStore(testPath.append("/delete.me/level1/level2/level3")); //$NON-NLS-1$
@@ -588,6 +612,7 @@ public abstract class CommonConnectionTest extends TestCase
 		assertFalse(fi.exists());
 	}
 
+	@Test
 	public final void testListFiles() throws CoreException, IOException
 	{
 		String[] NAMES = new String[] { "file1.txt", "file2.txt", "file3.txt" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -637,6 +662,7 @@ public abstract class CommonConnectionTest extends TestCase
 		}
 	}
 
+	@Test
 	public final void testListFolders() throws CoreException
 	{
 		String[] NAMES = new String[] { "folder1", "folder2", "folder3" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -700,6 +726,7 @@ public abstract class CommonConnectionTest extends TestCase
 		return true;
 	}
 
+	@Test
 	public final void testPutInfoFileBase() throws CoreException, IOException
 	{
 		IFileStore fs = cp.getRoot().getFileStore(testPath.append("/file.txt")); //$NON-NLS-1$
@@ -726,6 +753,7 @@ public abstract class CommonConnectionTest extends TestCase
 		assertEquals(lastModified, fi.getLastModified());
 	}
 
+	@Test
 	public final void testPutInfoFolderBase() throws CoreException
 	{
 		IFileStore fs = cp.getRoot().getFileStore(testPath.append("/newfolder")); //$NON-NLS-1$
@@ -759,6 +787,7 @@ public abstract class CommonConnectionTest extends TestCase
 		return false;
 	}
 
+	@Test
 	public final void testPutInfoPermissions() throws CoreException, IOException
 	{
 		IFileStore fs = cp.getRoot().getFileStore(testPath.append("/file.txt")); //$NON-NLS-1$
@@ -799,6 +828,7 @@ public abstract class CommonConnectionTest extends TestCase
 		return true;
 	}
 
+	@Test
 	public final void testPutInfoGroup() throws CoreException, IOException
 	{
 		IFileStore fs = cp.getRoot().getFileStore(testPath.append("/file.txt")); //$NON-NLS-1$
@@ -829,6 +859,7 @@ public abstract class CommonConnectionTest extends TestCase
 		}
 	}
 
+	@Test
 	public final void testMoveFileSameFolder() throws CoreException, IOException
 	{
 		IFileStore fs = cp.getRoot().getFileStore(testPath.append("/file.txt")); //$NON-NLS-1$
@@ -850,6 +881,7 @@ public abstract class CommonConnectionTest extends TestCase
 		assertEquals(BYTES.length, fi.getLength());
 	}
 
+	@Test
 	public final void testMoveFileAnotherFolder() throws CoreException, IOException
 	{
 		IFileStore fs = cp.getRoot().getFileStore(testPath.append("/file.txt")); //$NON-NLS-1$
@@ -884,6 +916,7 @@ public abstract class CommonConnectionTest extends TestCase
 		assertEquals(BYTES.length, fi.getLength());
 	}
 
+	@Test
 	public final void testMoveFileToExisting() throws CoreException, IOException
 	{
 		IFileStore fs = cp.getRoot().getFileStore(testPath.append("/file.txt")); //$NON-NLS-1$
@@ -918,6 +951,7 @@ public abstract class CommonConnectionTest extends TestCase
 		assertEquals(BYTES.length, fi.getLength());
 	}
 
+	@Test
 	public final void testMoveFolderSameFolder() throws CoreException, IOException
 	{
 		IFileStore fs = cp.getRoot().getFileStore(testPath.append("/fromfolder")); //$NON-NLS-1$
@@ -940,6 +974,7 @@ public abstract class CommonConnectionTest extends TestCase
 		assertEquals(BYTES.length, fi.getLength());
 	}
 
+	@Test
 	public final void testMoveFolderAnotherFolder() throws CoreException, IOException
 	{
 		IFileStore fs = cp.getRoot().getFileStore(testPath.append("/fromfolder")); //$NON-NLS-1$
@@ -976,6 +1011,7 @@ public abstract class CommonConnectionTest extends TestCase
 		assertEquals(BYTES.length, fi.getLength());
 	}
 
+	@Test
 	public final void testMoveFolderToExisting() throws CoreException, IOException
 	{
 		IFileStore fs = cp.getRoot().getFileStore(testPath.append("/fromfolder")); //$NON-NLS-1$
@@ -1012,6 +1048,7 @@ public abstract class CommonConnectionTest extends TestCase
 		assertEquals(BYTES.length, fi.getLength());
 	}
 
+	@Test
 	public final void testMoveFileToLocal() throws CoreException, IOException
 	{
 		IFileStore fs = cp.getRoot().getFileStore(testPath.append("/file.txt")); //$NON-NLS-1$
@@ -1036,6 +1073,7 @@ public abstract class CommonConnectionTest extends TestCase
 		assertEquals(BYTES.length, fi.getLength());
 	}
 
+	@Test
 	public final void testMoveFolderToLocal() throws CoreException, IOException
 	{
 		IFileStore fs = cp.getRoot().getFileStore(testPath.append("/fromfolder")); //$NON-NLS-1$
@@ -1062,6 +1100,7 @@ public abstract class CommonConnectionTest extends TestCase
 		assertEquals(BYTES.length, fi.getLength());
 	}
 
+	@Test
 	public final void testFetchTree() throws CoreException, IOException
 	{
 		IFileStore fs = cp.getRoot().getFileStore(testPath);

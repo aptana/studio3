@@ -7,6 +7,9 @@
  */
 package com.aptana.portal.ui.tests;
 
+import org.junit.runners.Suite.SuiteClasses;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
@@ -14,23 +17,25 @@ import junit.framework.TestSuite;
 
 import com.aptana.portal.ui.internal.PortalTest;
 
-public class AllTests extends TestCase
+@RunWith(Suite.class)
+@SuiteClasses({PortalTest.class, })
+public class AllTests
 {
 
-	public static Test suite()
-	{
-		TestSuite suite = new TestSuite(AllTests.class.getName())
-		{
-			@Override
-			public void runTest(Test test, TestResult result)
-			{
-				System.err.println("Running test: " + test.toString());
-				super.runTest(test, result);
-			}
-		};
-		// $JUnit-BEGIN$
-		suite.addTestSuite(PortalTest.class);
-		// $JUnit-END$
-		return suite;
-	}
+//	public static Test suite()
+//	{
+//		TestSuite suite = new TestSuite(AllTests.class.getName())
+//		{
+//			@Override
+//			public void runTest(Test test, TestResult result)
+//			{
+//				System.err.println("Running test: " + test.toString());
+//				super.runTest(test, result);
+//			}
+//		};
+//		// $JUnit-BEGIN$
+//		suite.addTestSuite(PortalTest.class);
+//		// $JUnit-END$
+//		return suite;
+//	}
 }

@@ -1,5 +1,9 @@
 package com.aptana.editor.common.text.reconciler;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -11,15 +15,16 @@ import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
 
-public class CommonReconcilerTest extends TestCase
+public class CommonReconcilerTest
 {
 
 	private Mockery context;
 	private CommonReconcilingStrategy strategy;
 
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 
 		context = new Mockery()
 		{
@@ -30,7 +35,8 @@ public class CommonReconcilerTest extends TestCase
 		strategy = context.mock(CommonReconcilingStrategy.class);
 	}
 
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		try
 		{
@@ -39,10 +45,11 @@ public class CommonReconcilerTest extends TestCase
 		}
 		finally
 		{
-			super.tearDown();
+//			super.tearDown();
 		}
 	}
 
+	@Test
 	public void testCallsFullReconcileOnBatchReconcilingStrategiesAtEnd() throws Exception
 	{
 		final ITypedRegion[] partitions = new ITypedRegion[] { new TypedRegion(0, 4, "word"),

@@ -7,30 +7,35 @@
  */
 package com.aptana.editor.common.internal.peer;
 
+import org.junit.runners.Suite.SuiteClasses;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 import junit.framework.Test;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
+@RunWith(Suite.class)
+@SuiteClasses({PeerCharacterCloserTest.class, CharacterPairMatcherTest.class, ExitPolicyTest.class, })
 public class PeerTests
 {
 
-	public static Test suite()
-	{
-		TestSuite suite = new TestSuite(PeerTests.class.getName())
-		{
-			@Override
-			public void runTest(Test test, TestResult result)
-			{
-				System.err.println("Running test: " + test.toString());
-				super.runTest(test, result);
-			}
-		};
-		// $JUnit-BEGIN$
-		suite.addTestSuite(PeerCharacterCloserTest.class);
-		suite.addTestSuite(CharacterPairMatcherTest.class);
-		suite.addTestSuite(ExitPolicyTest.class);
-		// $JUnit-END$
-		return suite;
-	}
-
+//	public static Test suite()
+//	{
+//		TestSuite suite = new TestSuite(PeerTests.class.getName())
+//		{
+//			@Override
+//			public void runTest(Test test, TestResult result)
+//			{
+//				System.err.println("Running test: " + test.toString());
+//				super.runTest(test, result);
+//			}
+//		};
+//		// $JUnit-BEGIN$
+//		suite.addTestSuite(PeerCharacterCloserTest.class);
+//		suite.addTestSuite(CharacterPairMatcherTest.class);
+//		suite.addTestSuite(ExitPolicyTest.class);
+//		// $JUnit-END$
+//		return suite;
+//	}
+//
 }

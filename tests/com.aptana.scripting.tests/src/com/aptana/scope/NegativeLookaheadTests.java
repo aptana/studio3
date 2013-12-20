@@ -7,13 +7,16 @@
  */
 package com.aptana.scope;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
-public class NegativeLookaheadTests extends TestCase
+public class NegativeLookaheadTests
 {
 	/**
 	 * testLookaheadMatches
 	 */
+	@Test
 	public void testLookaheadMatches()
 	{
 		IScopeSelector selector = new ScopeSelector("A B - C");
@@ -25,6 +28,7 @@ public class NegativeLookaheadTests extends TestCase
 	/**
 	 * testLookaheadDoesNotMatch
 	 */
+	@Test
 	public void testLookaheadDoesNotMatch()
 	{
 		IScopeSelector selector = new ScopeSelector("A B - C");
@@ -35,6 +39,7 @@ public class NegativeLookaheadTests extends TestCase
 	/**
 	 * testLookaheadAgainstNothing
 	 */
+	@Test
 	public void testLookaheadAgainstNothing()
 	{
 		IScopeSelector selector = new ScopeSelector("A B - C");
@@ -45,6 +50,7 @@ public class NegativeLookaheadTests extends TestCase
 	/**
 	 * testMultipleLookahead
 	 */
+	@Test
 	public void testMultipleLookahead()
 	{
 		IScopeSelector selector = new ScopeSelector("A B - C D");
@@ -56,6 +62,7 @@ public class NegativeLookaheadTests extends TestCase
 		assertTrue(selector.matches("A B C E"));
 	}
 
+	@Test
 	public void testAS3_894()
 	{
 		IScopeSelector selector = new ScopeSelector("source -meta.source.embedded");

@@ -7,6 +7,9 @@
  */
 package com.aptana.css.core.tests;
 
+import org.junit.runners.Suite.SuiteClasses;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 import java.text.MessageFormat;
 
 import junit.framework.Test;
@@ -17,26 +20,28 @@ import junit.framework.TestSuite;
 import com.aptana.css.core.parsing.CSSParserPerformanceTest;
 import com.aptana.css.core.parsing.CSSScannerPerformanceTest;
 
-public class PerformanceTests extends TestCase
+@RunWith(Suite.class)
+@SuiteClasses({CSSScannerPerformanceTest.class, CSSParserPerformanceTest.class, })
+public class PerformanceTests
 {
 
-	public static Test suite()
-	{
-		TestSuite suite = new TestSuite("CSS Core performance tests")
-		{
-			@Override
-			public void runTest(Test test, TestResult result)
-			{
-				String msg = MessageFormat.format("Running test: {0}", test.toString());
-				System.err.println(msg);
-				super.runTest(test, result);
-			}
-		};
-
-		// $JUnit-BEGIN$
-		suite.addTestSuite(CSSScannerPerformanceTest.class);
-		suite.addTestSuite(CSSParserPerformanceTest.class);
-		// $JUnit-END$
-		return suite;
-	}
+//	public static Test suite()
+//	{
+//		TestSuite suite = new TestSuite("CSS Core performance tests")
+//		{
+//			@Override
+//			public void runTest(Test test, TestResult result)
+//			{
+//				String msg = MessageFormat.format("Running test: {0}", test.toString());
+//				System.err.println(msg);
+//				super.runTest(test, result);
+//			}
+//		};
+//
+//		// $JUnit-BEGIN$
+//		suite.addTestSuite(CSSScannerPerformanceTest.class);
+//		suite.addTestSuite(CSSParserPerformanceTest.class);
+//		// $JUnit-END$
+//		return suite;
+//	}
 }

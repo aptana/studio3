@@ -7,6 +7,7 @@
  */
 package com.aptana.scripting;
 
+import static org.junit.Assert.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -22,7 +23,7 @@ import org.eclipse.core.runtime.IPath;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ResourceUtil;
 
-public class TestUtils extends TestCase
+public class TestUtils
 {
 	private TestUtils()
 	{

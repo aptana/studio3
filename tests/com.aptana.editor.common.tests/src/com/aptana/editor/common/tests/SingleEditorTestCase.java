@@ -7,6 +7,9 @@
  */
 package com.aptana.editor.common.tests;
 
+import org.junit.After;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.io.ByteArrayInputStream;
 
 import junit.framework.TestCase;
@@ -28,22 +31,24 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.editor.epl.tests.EditorTestHelper;
 
-public abstract class SingleEditorTestCase extends TestCase
+public abstract class SingleEditorTestCase
 {
 
 	private IProject project;
 	private IFile file;
 	private ITextEditor editor;
 
-	@Override
-	protected void setUp() throws Exception
+//	@Override
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 		project = createProject();
 	}
 
-	@Override
-	protected void tearDown() throws Exception
+//	@Override
+	@After
+	public void tearDown() throws Exception
 	{
 		try
 		{
@@ -63,7 +68,7 @@ public abstract class SingleEditorTestCase extends TestCase
 			editor = null;
 			file = null;
 			project = null;
-			super.tearDown();
+//			super.tearDown();
 		}
 	}
 

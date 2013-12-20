@@ -1,5 +1,7 @@
 package com.aptana.editor.common.scripting.snippets;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -8,6 +10,7 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.swt.events.VerifyEvent;
+import org.junit.Test;
 import org.osgi.framework.Bundle;
 
 import com.aptana.core.util.CollectionsUtil;
@@ -18,24 +21,28 @@ import com.aptana.scripting.model.CommandElement;
 public class ExpandSnippetVerifyKeyListenerTest extends EditorBasedTests
 {
 
+	@Test
 	public void testVerifyKeySpace() throws IOException
 	{
 		// try sending a space, nothing should happen
 		assertVerifyKey("", "fun", ' ', true, true);
 	}
 
+	@Test
 	public void testVerifyKeyFunctionListenerOn() throws IOException
 	{
 		// full prefix, should pop CA
 		assertVerifyKey("fun", "fun", '\t', true, false);
 	}
 
+	@Test
 	public void testVerifyKeyFunctionListenerOff() throws IOException
 	{
 		// full prefix, listener off, should not pop CA
 		assertVerifyKey("fun", "fun", '\t', false, true);
 	}
 
+	@Test
 	public void testVerifyKeyFunctionIncorrectPrefix() throws IOException
 	{
 		// Should not pop CA here as prefix is not == snippet

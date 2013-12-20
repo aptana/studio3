@@ -7,12 +7,17 @@
  */
 package com.aptana.editor.common.scripting.commands;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
 import com.aptana.editor.common.tests.SingleEditorTestCase;
 
 public class TextEditorUtilsTest extends SingleEditorTestCase
 {
 	private static final String PROJECT_NAME = "text_editors_util";
 
+	@Test
 	public void testNonZeroCaretOffset() throws Exception
 	{
 		createAndOpenFile("non_zero_caret.txt", "Hello world!");
@@ -20,11 +25,13 @@ public class TextEditorUtilsTest extends SingleEditorTestCase
 		assertEquals(5, TextEditorUtils.getCaretOffset(getEditor()));
 	}
 
+	@Test
 	public void testCaretOffsetWithNull()
 	{
 		assertEquals(-1, TextEditorUtils.getCaretOffset(null));
 	}
 
+	@Test
 	public void testCaretOffset() throws Exception
 	{
 		createAndOpenFile("newfile.txt", "This is a brand new file!");

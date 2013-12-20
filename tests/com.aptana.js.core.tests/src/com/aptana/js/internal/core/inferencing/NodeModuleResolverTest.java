@@ -7,13 +7,19 @@
  */
 package com.aptana.js.internal.core.inferencing;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.IPath;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TestName;
 
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.FileUtil;
@@ -22,20 +28,23 @@ import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.core.preferences.IPreferenceConstants;
 
 @SuppressWarnings("nls")
-public class NodeModuleResolverTest extends TestCase
+public class NodeModuleResolverTest
 {
 
+	@Rule
+	public TestName name = new TestName();
 	private File baseDir;
 	private IPath dir;
 	private NodeModuleResolver resolver;
 
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+		// super.setUp();
 
 		// Create a tmp dir to hold the structure we'll be traversing
 		IPath tmp = FileUtil.getTempDirectory();
-		IPath baseDirPath = tmp.append(getName() + System.currentTimeMillis());
+		IPath baseDirPath = tmp.append(name.getMethodName() + System.currentTimeMillis());
 		baseDir = baseDirPath.toFile();
 		dir = baseDirPath.append("grand_parent").append("parent").append("child");
 		assertTrue(dir.toFile().mkdirs());
@@ -44,7 +53,8 @@ public class NodeModuleResolverTest extends TestCase
 		resolver = new NodeModuleResolver();
 	}
 
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		try
 		{
@@ -52,10 +62,11 @@ public class NodeModuleResolverTest extends TestCase
 		}
 		finally
 		{
-			super.tearDown();
+			// super.tearDown();
 		}
 	}
 
+	@Test
 	public void testResolveCoreModule() throws Exception
 	{
 		IPath nodeSrc = FileUtil.getTempDirectory().append("node_src");
@@ -78,6 +89,7 @@ public class NodeModuleResolverTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testResolveRelativeJSFile() throws Exception
 	{
 		IPath expected = dir.append("sibling.js");
@@ -87,6 +99,7 @@ public class NodeModuleResolverTest extends TestCase
 		assertEquals(expected, resolver.resolve("/sibling", null, dir, null));
 	}
 
+	@Test
 	public void testResolveRelativeNodeFile() throws Exception
 	{
 		IPath expected = dir.append("sibling.node");
@@ -96,6 +109,7 @@ public class NodeModuleResolverTest extends TestCase
 		assertEquals(expected, resolver.resolve("/sibling", null, dir, null));
 	}
 
+	@Test
 	public void testResolveRelativeDirectory() throws Exception
 	{
 		IPath expected = createNodeDirectory(dir, "sibling", "main.js");
@@ -104,6 +118,7 @@ public class NodeModuleResolverTest extends TestCase
 		assertEquals(expected, resolver.resolve("/sibling", null, dir, null));
 	}
 
+	@Test
 	public void testResolveJSFileUnderNodeModules() throws Exception
 	{
 		// "node_modules" directory which is sibling to parent
@@ -129,6 +144,7 @@ public class NodeModuleResolverTest extends TestCase
 		assertEquals(file2, resolver.resolve("file2", null, dir, null));
 	}
 
+	@Test
 	public void testResolveDirectoryUnderNodeModules() throws Exception
 	{
 		// "node_modules" directory which is sibling to parent

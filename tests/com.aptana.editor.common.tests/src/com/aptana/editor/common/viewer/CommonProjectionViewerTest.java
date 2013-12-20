@@ -1,5 +1,10 @@
 package com.aptana.editor.common.viewer;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 
 import org.eclipse.core.filesystem.IFileStore;
@@ -14,6 +19,7 @@ import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.texteditor.ITextEditor;
+import org.junit.Test;
 import org.osgi.framework.Bundle;
 
 import com.aptana.core.util.EclipseUtil;
@@ -37,6 +43,7 @@ public class CommonProjectionViewerTest extends EditorBasedTests
 	 * 
 	 * @throws IOException
 	 */
+	@Test
 	public void testSnippetProposalActivation() throws IOException
 	{
 
@@ -70,6 +77,7 @@ public class CommonProjectionViewerTest extends EditorBasedTests
 		prefs.putInt(IPreferenceConstants.CONTENT_ASSIST_DELAY, delay);
 	}
 
+	@Test
 	public void testCreateFormattingContextText()
 	{
 		IFileStore fileStore = createFileStore("proposal_tests", "txt", "");
@@ -83,6 +91,7 @@ public class CommonProjectionViewerTest extends EditorBasedTests
 		context.dispose();
 	}
 
+	@Test
 	public void testCreateFormattingContextHtml()
 	{
 		IFileStore fileStore = createFileStore("proposal_tests", "html", "");

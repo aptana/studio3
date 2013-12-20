@@ -8,6 +8,8 @@
 
 package com.aptana.filesystem.ftp;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.IPath;
@@ -21,7 +23,7 @@ import com.aptana.core.epl.XMLMemento;
  *
  */
 @SuppressWarnings("nls")
-public class FTPConnectionPointTest extends TestCase {
+public class FTPConnectionPointTest {
 	
 	private static final String name = "My FTP Site";
 	private static final String host = "127.0.0.1";
@@ -35,15 +37,18 @@ public class FTPConnectionPointTest extends TestCase {
 	private static final String transferType = IFTPConstants.TRANSFER_TYPE_BINARY;
 
 
+	@Test
 	public void testPersistance() {
 		createAndTestConnectionPoint(name, host, port, login, password, path, encoding, passiveMode, timezone, transferType);
 	}
 	
+	@Test
 	public void testPassiveMode() {
 		createAndTestConnectionPoint(name, host, port, login, password, path, encoding, true, timezone, transferType);
 		createAndTestConnectionPoint(name, host, port, login, password, path, encoding, false, timezone, transferType);
 	}
 	
+	@Test
 	public void testTransferTypes() {
 		createAndTestConnectionPoint(name, host, port, login, password, path, encoding, passiveMode, timezone, IFTPConstants.TRANSFER_TYPE_ASCII);
 		createAndTestConnectionPoint(name, host, port, login, password, path, encoding, passiveMode, timezone, IFTPConstants.TRANSFER_TYPE_BINARY);

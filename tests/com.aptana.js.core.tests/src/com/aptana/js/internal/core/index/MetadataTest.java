@@ -7,6 +7,8 @@
  */
 package com.aptana.js.internal.core.index;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -18,11 +20,12 @@ import org.eclipse.core.runtime.Path;
 
 import com.aptana.js.core.JSCorePlugin;
 
-public class MetadataTest extends TestCase
+public class MetadataTest
 {
 	/**
 	 * testDOM0
 	 */
+	@Test
 	public void testDOM0()
 	{
 		this.loadMetadata("/metadata/dom_0.xml");
@@ -31,6 +34,7 @@ public class MetadataTest extends TestCase
 	/**
 	 * testDOM2
 	 */
+	@Test
 	public void testDOM2()
 	{
 		this.loadMetadata("/metadata/dom_2.xml");
@@ -39,6 +43,7 @@ public class MetadataTest extends TestCase
 	/**
 	 * testDOM3
 	 */
+	@Test
 	public void testDOM3()
 	{
 		this.loadMetadata("/metadata/dom_3.xml");
@@ -47,6 +52,7 @@ public class MetadataTest extends TestCase
 	/**
 	 * testDOM5
 	 */
+	@Test
 	public void testDOM5()
 	{
 		this.loadMetadata("/metadata/dom_5.xml");
@@ -55,6 +61,7 @@ public class MetadataTest extends TestCase
 	/**
 	 * testJSCore
 	 */
+	@Test
 	public void testJSCore()
 	{
 		this.loadMetadata("/metadata/js_core.xml");

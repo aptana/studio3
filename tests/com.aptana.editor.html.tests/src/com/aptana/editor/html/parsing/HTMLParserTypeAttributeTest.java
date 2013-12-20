@@ -7,13 +7,17 @@
  */
 package com.aptana.editor.html.parsing;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.HTMLParser;
 import com.aptana.parsing.ast.IParseNode;
 
-public class HTMLParserTypeAttributeTest extends TestCase
+public class HTMLParserTypeAttributeTest
 {
 
 	private static final String EOL = "\n";
@@ -21,106 +25,124 @@ public class HTMLParserTypeAttributeTest extends TestCase
 	private HTMLParser fParser;
 	private HTMLParseState fParseState;
 
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
 		fParser = new HTMLParser();
 	}
 
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		fParser = null;
 	}
 
+	@Test
 	public void testStyleWithTypeEmpty() throws Exception
 	{
 		String source = "<html><head><style>html {color: red;}</style></head></html>";
 		parseTest(source, source + EOL);
 	}
 
+	@Test
 	public void testStyleWithTypeCSS() throws Exception
 	{
 		String source = "<html><head><style type=\"text/css\">html {color: red;}</style></head></html>";
 		parseTest(source, source + EOL);
 	}
 
+	@Test
 	public void testStyleWithTypeJS() throws Exception
 	{
 		String source = "<html><head><style type=\"text/javascript\">var one = 1;</style></head></html>";
 		parseTest(source, source + EOL);
 	}
 
+	@Test
 	public void testStyleWithInvalidType() throws Exception
 	{
 		String source = "<html><head><style type=\"css\">html {color: red;}</style></head></html>";
 		parseTest(source, source + EOL);
 	}
 
+	@Test
 	public void testScriptWithTypeEmpty() throws Exception
 	{
 		String source = "<html><head><script>var one = 1;</script></head></html>";
 		parseTest(source, source + EOL);
 	}
 
+	@Test
 	public void testScriptWithTypeApplicationJS() throws Exception
 	{
 		String source = "<html><head><script type=\"application/javascript\">var one = 1;</script></head></html>";
 		parseTest(source, source + EOL);
 	}
 
+	@Test
 	public void testScriptWithTypeApplicationEcma() throws Exception
 	{
 		String source = "<html><head><script type=\"application/ecmascript\">var one = 1;</script></head></html>";
 		parseTest(source, source + EOL);
 	}
 
+	@Test
 	public void testScriptWithTypeApplicationXJS() throws Exception
 	{
 		String source = "<html><head><script type=\"application/x-javascript\">var one = 1;</script></head></html>";
 		parseTest(source, source + EOL);
 	}
 
+	@Test
 	public void testScriptWithTypeApplicationXEcma() throws Exception
 	{
 		String source = "<html><head><script type=\"application/x-ecmascript\">var one = 1;</script></head></html>";
 		parseTest(source, source + EOL);
 	}
 
+	@Test
 	public void testScriptWithTypeTextJS() throws Exception
 	{
 		String source = "<html><head><script type=\"text/javascript\">var one = 1;</script></head></html>";
 		parseTest(source, source + EOL);
 	}
 
+	@Test
 	public void testScriptWithTypeTextEcma() throws Exception
 	{
 		String source = "<html><head><script type=\"text/ecmascript\">var one = 1;</script></head></html>";
 		parseTest(source, source + EOL);
 	}
 
+	@Test
 	public void testScriptWithTypeTextJScript() throws Exception
 	{
 		String source = "<html><head><script type=\"text/jscript\">var one = 1;</script></head></html>";
 		parseTest(source, source + EOL);
 	}
 
+	@Test
 	public void testScriptWithTypeVersion() throws Exception
 	{
 		String source = "<html><head><script type=\"text/javascript;version=1.5\">var one = 1;</script></head></html>";
 		parseTest(source, source + EOL);
 	}
 
+	@Test
 	public void testScriptWithLanguageJS() throws Exception
 	{
 		String source = "<html><head><script language=\"JavaScript\">var one = 1;</script></head></html>";
 		parseTest(source, source + EOL);
 	}
 
+	@Test
 	public void testScriptWithLanguageVersion() throws Exception
 	{
 		String source = "<html><head><script language=\"JavaScript1.5\">var one = 1;</script></head></html>";
 		parseTest(source, source + EOL);
 	}
 
+	@Test
 	public void testScriptWithInvalidType() throws Exception
 	{
 		String source = "<html><head><script type=\"javascript\">var one = 1;</script></head></html>";

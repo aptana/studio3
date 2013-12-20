@@ -1,5 +1,9 @@
 package com.aptana.core.build;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.util.Collections;
 
 import junit.framework.TestCase;
@@ -10,23 +14,26 @@ import com.aptana.buildpath.core.BuildPathCorePlugin;
 import com.aptana.core.build.IBuildParticipant.BuildType;
 import com.aptana.index.core.build.BuildContext;
 
-public class RequiredBuildParticipantTest extends TestCase
+public class RequiredBuildParticipantTest
 {
 
 	private RequiredBuildParticipant participant;
 
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 		participant = new TestParticipant();
 	}
 
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		participant = null;
-		super.tearDown();
+//		super.tearDown();
 	}
 
+	@Test
 	public void testRequiredParticipantCantBeDisabled() throws Exception
 	{
 		assertTrue(participant.isRequired());
@@ -42,6 +49,7 @@ public class RequiredBuildParticipantTest extends TestCase
 		assertTrue(participant.isEnabled(BuildType.RECONCILE));
 	}
 
+	@Test
 	public void testRequiredParticipantCantSetFilters() throws Exception
 	{
 		assertTrue(participant.isRequired());

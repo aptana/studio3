@@ -7,6 +7,8 @@
  */
 package com.aptana.js.internal.core.parsing;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,7 +41,7 @@ import com.aptana.js.internal.core.parsing.sdoc.model.TagType;
 import com.aptana.js.internal.core.parsing.sdoc.model.Type;
 import com.aptana.js.internal.core.parsing.sdoc.model.Usage;
 
-public class VSDocReaderTest extends TestCase
+public class VSDocReaderTest
 {
 	/**
 	 * getContent
@@ -125,6 +127,7 @@ public class VSDocReaderTest extends TestCase
 	/**
 	 * testSummary
 	 */
+	@Test
 	public void testSummary()
 	{
 		DocumentationBlock block = this.getDocumentationBlock("vsdoc/summary.vsdoc");
@@ -135,6 +138,7 @@ public class VSDocReaderTest extends TestCase
 	/**
 	 * testPara
 	 */
+	@Test
 	public void testPara()
 	{
 		DocumentationBlock block = this.getDocumentationBlock("vsdoc/para.vsdoc");
@@ -145,6 +149,7 @@ public class VSDocReaderTest extends TestCase
 	/**
 	 * testException
 	 */
+	@Test
 	public void testException()
 	{
 		DocumentationBlock block = this.getDocumentationBlock("vsdoc/exception.vsdoc");
@@ -166,6 +171,7 @@ public class VSDocReaderTest extends TestCase
 	/**
 	 * testParam
 	 */
+	@Test
 	public void testParam()
 	{
 		DocumentationBlock block = this.getDocumentationBlock("vsdoc/param.vsdoc");
@@ -191,6 +197,7 @@ public class VSDocReaderTest extends TestCase
 	/**
 	 * testReturns
 	 */
+	@Test
 	public void testReturns()
 	{
 		DocumentationBlock block = this.getDocumentationBlock("vsdoc/returns.vsdoc");
@@ -213,6 +220,7 @@ public class VSDocReaderTest extends TestCase
 	/**
 	 * testSee
 	 */
+	@Test
 	public void testSee()
 	{
 		DocumentationBlock block = this.getDocumentationBlock("vsdoc/see.vsdoc");
@@ -229,6 +237,7 @@ public class VSDocReaderTest extends TestCase
 	/**
 	 * testPrivate
 	 */
+	@Test
 	public void testPrivate()
 	{
 		DocumentationBlock block = this.getDocumentationBlock("vsdoc/private.vsdoc");
@@ -245,6 +254,7 @@ public class VSDocReaderTest extends TestCase
 	/**
 	 * testExample
 	 */
+	@Test
 	public void testExample()
 	{
 		DocumentationBlock block = this.getDocumentationBlock("vsdoc/example.vsdoc");

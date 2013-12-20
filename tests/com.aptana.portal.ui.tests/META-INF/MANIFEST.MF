@@ -6,6 +6,6 @@ Bundle-Version: 3.0.0.qualifier
 Bundle-Vendor: Aptana
 Fragment-Host: com.aptana.portal.ui;bundle-version="3.0.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Import-Package: junit.framework
 Export-Package: com.aptana.portal.ui.tests
-Require-Bundle: com.aptana.editor.common;bundle-version="3.0.3"
+Require-Bundle: com.aptana.editor.common;bundle-version="3.0.3",
+ org.junit;bundle-version="4.0.0"

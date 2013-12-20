@@ -7,6 +7,10 @@
  */
 package com.aptana.filesystem.secureftp.tests;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
 import org.eclipse.core.filesystem.IFileInfo;
@@ -22,12 +26,13 @@ import com.aptana.ide.core.io.IConnectionPoint;
 /**
  * @author Max Stepanov
  */
-public class ImplicitFTPSConnectionTest extends TestCase {
+public class ImplicitFTPSConnectionTest {
 
 	protected IConnectionPoint cp;
 
-	@Override
-	protected void setUp() throws Exception {
+//	@Override
+	@Before
+	public void setUp() throws Exception {
 		FTPSConnectionPoint ftpcp = new FTPSConnectionPoint();
 		ftpcp.setHost("ftp.secureftp-test.com"); //$NON-NLS-1$
 		ftpcp.setLogin("test"); //$NON-NLS-1$
@@ -41,13 +46,15 @@ public class ImplicitFTPSConnectionTest extends TestCase {
 		CoreIOPlugin.setConnectionContext(cp, context);
 	}
 
-	@Override
-	protected void tearDown() throws Exception {
+//	@Override
+	@After
+	public void tearDown() throws Exception {
 		if (cp.isConnected()) {
 			cp.disconnect(null);
 		}
 	}
 
+	@Test
 	public final void testConnect() throws CoreException {
 		cp.connect(null);
 		assertTrue(cp.isConnected());
@@ -57,6 +64,7 @@ public class ImplicitFTPSConnectionTest extends TestCase {
 		assertFalse(cp.canDisconnect());
 	}
 
+	@Test
 	public final void testFetchRootInfo() throws CoreException {
 		IFileStore fs = cp.getRoot();
 		assertNotNull(fs);

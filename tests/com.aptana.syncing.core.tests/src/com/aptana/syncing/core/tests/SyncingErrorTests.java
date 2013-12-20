@@ -7,6 +7,10 @@
  */
 package com.aptana.syncing.core.tests;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -34,7 +38,7 @@ import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
  * @author Kevin Lindsey
  */
 @SuppressWarnings("nls")
-public abstract class SyncingErrorTests extends TestCase
+public abstract class SyncingErrorTests
 {
 	protected IFileStore clientDirectory;
 	protected IFileStore serverDirectory;
@@ -50,7 +54,8 @@ public abstract class SyncingErrorTests extends TestCase
 	/**
 	 * @see junit.framework.TestCase#setUp()
 	 */
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
 		ConnectionContext context = new ConnectionContext();
 		context.put(ConnectionContext.COMMAND_LOG, System.out);
@@ -67,13 +72,14 @@ public abstract class SyncingErrorTests extends TestCase
 		assertNotNull(serverDirectory);
 		serverDirectory.mkdir(EFS.NONE, null);
 
-		super.setUp();
+//		super.setUp();
 	}
 
 	/**
 	 * @see junit.framework.TestCase#tearDown()
 	 */
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		try
 		{
@@ -107,12 +113,13 @@ public abstract class SyncingErrorTests extends TestCase
 			}
 		}
 
-		super.tearDown();
+//		super.tearDown();
 	}
 
 	/*
 	 * Sync Item Tests
 	 */
+	@Test
 	public void testCancelMonitorDuringSync() throws IOException, CoreException
 	{
 		syncTest(false, System.currentTimeMillis());

@@ -7,6 +7,8 @@
  */
 package com.aptana.scripting.tests;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.io.File;
 
 import junit.framework.TestCase;
@@ -20,9 +22,10 @@ import org.jruby.util.JRubyFile;
 /**
  * @author Fabio
  */
-public class UnicodeCharsJRubyTest extends TestCase
+public class UnicodeCharsJRubyTest
 {
 
+	@Test
 	public void testUnicodeChars() throws Exception
 	{
 		File file = new File("unicodeáéíóú");

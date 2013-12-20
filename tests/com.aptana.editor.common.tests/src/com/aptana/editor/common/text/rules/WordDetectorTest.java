@@ -7,15 +7,18 @@
  */
 package com.aptana.editor.common.text.rules;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
 import org.eclipse.jface.text.rules.IWordDetector;
 
 import com.aptana.editor.common.text.rules.WordDetector;
 
-public class WordDetectorTest extends TestCase
+public class WordDetectorTest
 {
 
+	@Test
 	public void testWordStart()
 	{
 		IWordDetector detector = new WordDetector();
@@ -32,6 +35,7 @@ public class WordDetectorTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testWordPart()
 	{
 		IWordDetector detector = new WordDetector();

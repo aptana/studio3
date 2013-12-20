@@ -7,6 +7,9 @@
  */
 package com.aptana.editor.js.folding;
 
+import org.junit.After;
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.lang.reflect.Field;
@@ -41,21 +44,23 @@ import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.util.ParseUtil;
 import com.aptana.ui.util.UIUtils;
 
-public class JSEditorFoldingTest extends TestCase
+public class JSEditorFoldingTest
 {
 	private JSSourceEditor editor;
 
-	@Override
-	protected void tearDown() throws Exception
+//	@Override
+	@After
+	public void tearDown() throws Exception
 	{
 		if (editor != null)
 		{
 			EditorTestHelper.closeEditor(editor);
 			editor = null;
 		}
-		super.tearDown();
+//		super.tearDown();
 	}
 
+	@Test
 	public void testExecute() throws Exception
 	{
 		IWorkbenchPage page = UIUtils.getActivePage();

@@ -7,18 +7,21 @@
  */
 package com.aptana.theme;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.net.URL;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.junit.Assert;
+import org.junit.Test;
 
-public class ThemeExporterTest extends TestCase
+public class ThemeExporterTest
 {
 
+	@Test
 	public void testExport() throws Exception
 	{
 		TextmateImporter importer = new TextmateImporter();
@@ -37,6 +40,7 @@ public class ThemeExporterTest extends TestCase
 		assertEquals(theme, afterExport);
 	}
 
+	@Test
 	public void test4068() throws Exception
 	{
 		TextmateImporter importer = new TextmateImporter();
@@ -58,21 +62,21 @@ public class ThemeExporterTest extends TestCase
 	protected void assertEquals(Theme theme, Theme afterExport)
 	{
 		// Make sure the global options remain equal after an import/export/import
-		assertEquals("Foreground", theme.getForeground(), afterExport.getForeground());
-		assertEquals("Background", theme.getBackground(), afterExport.getBackground());
-		assertEquals("Line highlight", theme.getLineHighlight(), afterExport.getLineHighlight());
-		assertEquals("Caret", theme.getCaret(), afterExport.getCaret());
-		assertEquals("Selection", theme.getSelection(), afterExport.getSelection());
-		assertEquals("Name", theme.getName(), afterExport.getName());
+		Assert.assertEquals("Foreground", theme.getForeground(), afterExport.getForeground());
+		Assert.assertEquals("Background", theme.getBackground(), afterExport.getBackground());
+		Assert.assertEquals("Line highlight", theme.getLineHighlight(), afterExport.getLineHighlight());
+		Assert.assertEquals("Caret", theme.getCaret(), afterExport.getCaret());
+		Assert.assertEquals("Selection", theme.getSelection(), afterExport.getSelection());
+		Assert.assertEquals("Name", theme.getName(), afterExport.getName());
 
 		List<ThemeRule> origRules = theme.getTokens();
 		List<ThemeRule> afterRules = afterExport.getTokens();
 		// Same amount of tokens
-		assertEquals("Rule count", origRules.size(), afterRules.size());
+		Assert.assertEquals("Rule count", origRules.size(), afterRules.size());
 		// Maintains ordering of rules
 		for (int i = 0; i < origRules.size(); i++)
 		{
-			assertEquals("Rule " + (i + 1), origRules.get(i), afterRules.get(i));
+			Assert.assertEquals("Rule " + (i + 1), origRules.get(i), afterRules.get(i));
 		}
 	}
 

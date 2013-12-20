@@ -7,6 +7,9 @@
  */
 package com.aptana.filesystem.ftp.tests;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
@@ -38,7 +41,7 @@ public class FTPConnectionWithBasePathTest extends CommonConnectionTest {
 	}
 
 	@Override
-	protected void setUp() throws Exception {
+	public void setUp() throws Exception {
 		initBasePath();
 		FTPConnectionPoint ftpcp = setupConnection();
 		ftpcp.setPath(constructBasePath());
@@ -47,7 +50,7 @@ public class FTPConnectionWithBasePathTest extends CommonConnectionTest {
 	}
 
 	@Override
-	protected void tearDown() throws Exception {
+	public void tearDown() throws Exception {
 		super.tearDown();
 		cleanupBasePath();
 	}

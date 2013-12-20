@@ -7,32 +7,37 @@
  */
 package com.aptana.editor.common.scripting.snippets;
 
+import org.junit.runners.Suite.SuiteClasses;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 import junit.framework.Test;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
+@RunWith(Suite.class)
+@SuiteClasses({CommandTemplateTest.class, ExpandSnippetVerifyKeyListenerTest.class, SnippetsCompletionProcessorTest.class, SnippetTemplateTranslatorTest.class, SnippetsCompletionProcessorTest.class, })
 public class SnippetsTests
 {
 
-	public static Test suite()
-	{
-		TestSuite suite = new TestSuite(SnippetsTests.class.getName())
-		{
-			@Override
-			public void runTest(Test test, TestResult result)
-			{
-				System.err.println("Running test: " + test.toString());
-				super.runTest(test, result);
-			}
-		};
-		// $JUnit-BEGIN$
-		suite.addTestSuite(CommandTemplateTest.class);
-		suite.addTestSuite(ExpandSnippetVerifyKeyListenerTest.class);
-		suite.addTestSuite(SnippetsCompletionProcessorTest.class);
-		suite.addTestSuite(SnippetTemplateTranslatorTest.class);
-		suite.addTestSuite(SnippetsCompletionProcessorTest.class);
-		// $JUnit-END$
-		return suite;
-	}
-
+//	public static Test suite()
+//	{
+//		TestSuite suite = new TestSuite(SnippetsTests.class.getName())
+//		{
+//			@Override
+//			public void runTest(Test test, TestResult result)
+//			{
+//				System.err.println("Running test: " + test.toString());
+//				super.runTest(test, result);
+//			}
+//		};
+//		// $JUnit-BEGIN$
+//		suite.addTestSuite(CommandTemplateTest.class);
+//		suite.addTestSuite(ExpandSnippetVerifyKeyListenerTest.class);
+//		suite.addTestSuite(SnippetsCompletionProcessorTest.class);
+//		suite.addTestSuite(SnippetTemplateTranslatorTest.class);
+//		suite.addTestSuite(SnippetsCompletionProcessorTest.class);
+//		// $JUnit-END$
+//		return suite;
+//	}
+//
 }

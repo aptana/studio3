@@ -7,12 +7,16 @@
  */
 package com.aptana.editor.js.contentassist;
 
+import static org.junit.Assert.fail;
+
 import java.net.URI;
 
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
@@ -93,20 +97,14 @@ public class JSUserAgentFilteringTest extends JSEditorBasedTestCase
 		return IndexPlugin.getDefault().getIndexManager();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
-
 		prefs = EclipseUtil.instanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
 	}
 
 	@Override
-	protected void tearDown() throws Exception
+	public void tearDown() throws Exception
 	{
 		try
 		{
@@ -130,6 +128,7 @@ public class JSUserAgentFilteringTest extends JSEditorBasedTestCase
 		prefs.put(IPreferenceConstants.USER_AGENT_PREFERENCE, ids);
 	}
 
+	@Test
 	public void testNoFilterNoUserAgentsActive()
 	{
 		// set filter preference
@@ -153,6 +152,7 @@ public class JSUserAgentFilteringTest extends JSEditorBasedTestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testNoFilterOneUserAgentActive()
 	{
 		// set filter preference
@@ -176,6 +176,7 @@ public class JSUserAgentFilteringTest extends JSEditorBasedTestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testNoFilterTwoUserAgentsActive()
 	{
 		// set filter preference
@@ -199,6 +200,7 @@ public class JSUserAgentFilteringTest extends JSEditorBasedTestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testNoFilterThreeUserAgentsActive()
 	{
 		// set filter preference
@@ -222,6 +224,7 @@ public class JSUserAgentFilteringTest extends JSEditorBasedTestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testSomeFilterNoUserAgentsActive()
 	{
 		// set filter preference
@@ -245,6 +248,7 @@ public class JSUserAgentFilteringTest extends JSEditorBasedTestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testSomeFilterOneUserAgentActive()
 	{
 		// set filter preference
@@ -267,6 +271,7 @@ public class JSUserAgentFilteringTest extends JSEditorBasedTestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testSomeFilterTwoUserAgentsActive()
 	{
 		// set filter preference
@@ -289,6 +294,7 @@ public class JSUserAgentFilteringTest extends JSEditorBasedTestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testSomeFilterThreeUserAgentsActive()
 	{
 		// set filter preference
@@ -311,6 +317,7 @@ public class JSUserAgentFilteringTest extends JSEditorBasedTestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testAllFilterNoUserAgentsActive()
 	{
 		// set filter preference
@@ -334,6 +341,7 @@ public class JSUserAgentFilteringTest extends JSEditorBasedTestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testAllFilterOneUserAgentActive()
 	{
 		// set filter preference
@@ -356,6 +364,7 @@ public class JSUserAgentFilteringTest extends JSEditorBasedTestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testAllFilterTwoUserAgentsActive()
 	{
 		// set filter preference
@@ -375,6 +384,7 @@ public class JSUserAgentFilteringTest extends JSEditorBasedTestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testAllFilterThreeUserAgentsActive()
 	{
 		// set filter preference

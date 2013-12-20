@@ -7,6 +7,8 @@
  */
 package com.aptana.editor.common.parsing;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
 import com.aptana.core.util.StringUtil;
@@ -18,7 +20,7 @@ import com.aptana.parsing.util.ParseUtil;
 /**
  * CompositeParserTestBase
  */
-public abstract class CompositeParserTestBase extends TestCase
+public abstract class CompositeParserTestBase
 {
 	static interface IMerger
 	{
@@ -89,6 +91,7 @@ public abstract class CompositeParserTestBase extends TestCase
 		merger.merge(root, nodes);
 	}
 
+	@Test
 	public void testNodeBeforeRoot()
 	{
 		IParseRootNode root = new NamedParseRootNode("html", 5, 4);
@@ -99,6 +102,7 @@ public abstract class CompositeParserTestBase extends TestCase
 		assertEquals("Merged tree does not match expected shape", "(html (php:print))", ParseUtil.toTreeString(root));
 	}
 
+	@Test
 	public void testNodeAfterRoot()
 	{
 		IParseRootNode root = new NamedParseRootNode("html", 0, -1);
@@ -110,6 +114,7 @@ public abstract class CompositeParserTestBase extends TestCase
 		assertEquals("Merged tree does not match expected shape", "(html (php:print))", ParseUtil.toTreeString(root));
 	}
 
+	@Test
 	public void testNodeBeforeChild()
 	{
 		IParseRootNode root = new NamedParseRootNode("html", 0, 9);
@@ -126,6 +131,7 @@ public abstract class CompositeParserTestBase extends TestCase
 				ParseUtil.toTreeString(root));
 	}
 
+	@Test
 	public void testNodeEndTouchesChildStart()
 	{
 		IParseRootNode root = new NamedParseRootNode("html", 0, 9);
@@ -141,6 +147,7 @@ public abstract class CompositeParserTestBase extends TestCase
 		assertEquals("Merged tree does not match expected shape", "(html (php:print))", ParseUtil.toTreeString(root));
 	}
 
+	@Test
 	public void testNodeEndInsideChild()
 	{
 		IParseRootNode root = new NamedParseRootNode("html", 0, 9);
@@ -156,6 +163,7 @@ public abstract class CompositeParserTestBase extends TestCase
 		assertEquals("Merged tree does not match expected shape", "(html (php:print))", ParseUtil.toTreeString(root));
 	}
 
+	@Test
 	public void testNodeEndTouchesChildEnd()
 	{
 		IParseRootNode root = new NamedParseRootNode("html", 0, 9);
@@ -171,6 +179,7 @@ public abstract class CompositeParserTestBase extends TestCase
 		assertEquals("Merged tree does not match expected shape", "(html (php:printing))", ParseUtil.toTreeString(root));
 	}
 
+	@Test
 	public void testNodeEndAfterChild()
 	{
 		IParseRootNode root = new NamedParseRootNode("html", 0, 11);
@@ -186,6 +195,7 @@ public abstract class CompositeParserTestBase extends TestCase
 		assertEquals("Merged tree does not match expected shape", "(html (php:printing))", ParseUtil.toTreeString(root));
 	}
 
+	@Test
 	public void testNodeStartTouchesChildStart()
 	{
 		IParseRootNode root = new NamedParseRootNode("html", 0, 12);
@@ -201,6 +211,7 @@ public abstract class CompositeParserTestBase extends TestCase
 		assertEquals("Merged tree does not match expected shape", "(html (php:printing))", ParseUtil.toTreeString(root));
 	}
 
+	@Test
 	public void testNodeStartInsideChild()
 	{
 		IParseRootNode root = new NamedParseRootNode("html", 0, 13);
@@ -216,6 +227,7 @@ public abstract class CompositeParserTestBase extends TestCase
 		assertEquals("Merged tree does not match expected shape", "(html (php:printing))", ParseUtil.toTreeString(root));
 	}
 
+	@Test
 	public void testNodeStartTouchesChildEnd()
 	{
 		IParseRootNode root = new NamedParseRootNode("html", 0, 16);
@@ -231,6 +243,7 @@ public abstract class CompositeParserTestBase extends TestCase
 		assertEquals("Merged tree does not match expected shape", "(html (php:printing))", ParseUtil.toTreeString(root));
 	}
 
+	@Test
 	public void testNodeAfterChild()
 	{
 		IParseRootNode root = new NamedParseRootNode("html", 0, 17);

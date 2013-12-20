@@ -7,6 +7,10 @@
  */
 package com.aptana.css.core.index;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.io.File;
 import java.io.FileOutputStream;
 
@@ -25,23 +29,26 @@ import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.IndexPlugin;
 import com.aptana.index.core.build.BuildContext;
 
-public class CSSFileIndexingParticipantTest extends TestCase
+public class CSSFileIndexingParticipantTest
 {
 
 	private CSSFileIndexingParticipant indexer;
 
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 		indexer = new CSSFileIndexingParticipant();
 	}
 
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		indexer = null;
-		super.tearDown();
+//		super.tearDown();
 	}
 
+	@Test
 	public void testIsColorWithNames() throws Exception
 	{
 		assertTrue(CSSColors.isColor("aqua"));
@@ -65,6 +72,7 @@ public class CSSFileIndexingParticipantTest extends TestCase
 		assertFalse(CSSColors.isColor("grey"));
 	}
 
+	@Test
 	public void testIsColorWithHexValues() throws Exception
 	{
 		// various correct hex values
@@ -95,6 +103,7 @@ public class CSSFileIndexingParticipantTest extends TestCase
 		assertFalse(CSSColors.isColor("#aaaaaaa"));
 	}
 
+	@Test
 	public void testDetectTaskTagWithUnicodeCharacters() throws Exception
 	{
 		File tmpDir = null;

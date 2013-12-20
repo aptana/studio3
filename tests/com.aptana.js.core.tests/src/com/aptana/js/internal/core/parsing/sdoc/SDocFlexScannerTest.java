@@ -7,12 +7,16 @@
  */
 package com.aptana.js.internal.core.parsing.sdoc;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.io.IOException;
 
 import junit.framework.TestCase;
 import beaver.Symbol;
 
-public class SDocFlexScannerTest extends TestCase
+public class SDocFlexScannerTest
 {
 	private SDocFlexScanner _scanner;
 
@@ -20,10 +24,11 @@ public class SDocFlexScannerTest extends TestCase
 	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
-	@Override
-	protected void setUp() throws Exception
+//	@Override
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 
 		_scanner = new SDocFlexScanner();
 	}
@@ -32,12 +37,13 @@ public class SDocFlexScannerTest extends TestCase
 	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
-	@Override
-	protected void tearDown() throws Exception
+//	@Override
+	@After
+	public void tearDown() throws Exception
 	{
 		_scanner = null;
 
-		super.tearDown();
+//		super.tearDown();
 	}
 
 	/**
@@ -72,6 +78,7 @@ public class SDocFlexScannerTest extends TestCase
 	/**
 	 * testNoTypes
 	 */
+	@Test
 	public void testNoTypes()
 	{
 		String source = "{}";
@@ -88,6 +95,7 @@ public class SDocFlexScannerTest extends TestCase
 	/**
 	 * testTypes
 	 */
+	@Test
 	public void testTypes()
 	{
 		String source = "{Number}";
@@ -105,6 +113,7 @@ public class SDocFlexScannerTest extends TestCase
 	/**
 	 * testLeftBracket
 	 */
+	@Test
 	public void testLeftBracket()
 	{
 		String source = "[";
@@ -115,6 +124,7 @@ public class SDocFlexScannerTest extends TestCase
 	/**
 	 * testRightBracket
 	 */
+	@Test
 	public void testRightBracket()
 	{
 		String source = "]";
@@ -125,6 +135,7 @@ public class SDocFlexScannerTest extends TestCase
 	/**
 	 * testStartDocumentation
 	 */
+	@Test
 	public void testStartDocumentation()
 	{
 		String source = "/**";
@@ -135,6 +146,7 @@ public class SDocFlexScannerTest extends TestCase
 	/**
 	 * testEndDocumentation
 	 */
+	@Test
 	public void testEndDocumentation()
 	{
 		String source = "*/";
@@ -145,6 +157,7 @@ public class SDocFlexScannerTest extends TestCase
 	/**
 	 * testAdvanced
 	 */
+	@Test
 	public void testAdvanced()
 	{
 		String source = "@advanced";
@@ -155,6 +168,7 @@ public class SDocFlexScannerTest extends TestCase
 	/**
 	 * testAlias
 	 */
+	@Test
 	public void testAlias()
 	{
 		String source = "@alias";
@@ -165,6 +179,7 @@ public class SDocFlexScannerTest extends TestCase
 	/**
 	 * testAuthor
 	 */
+	@Test
 	public void testAuthor()
 	{
 		String source = "@author";
@@ -175,6 +190,7 @@ public class SDocFlexScannerTest extends TestCase
 	/**
 	 * testClassDescription
 	 */
+	@Test
 	public void testClassDescription()
 	{
 		String source = "@classDescription";
@@ -185,6 +201,7 @@ public class SDocFlexScannerTest extends TestCase
 	/**
 	 * testConstructor
 	 */
+	@Test
 	public void testConstructor()
 	{
 		String source = "@constructor";
@@ -195,6 +212,7 @@ public class SDocFlexScannerTest extends TestCase
 	/**
 	 * testExample
 	 */
+	@Test
 	public void testExample()
 	{
 		String source = "@example";
@@ -205,6 +223,7 @@ public class SDocFlexScannerTest extends TestCase
 	/**
 	 * testException
 	 */
+	@Test
 	public void testException()
 	{
 		String source = "@exception";
@@ -215,6 +234,7 @@ public class SDocFlexScannerTest extends TestCase
 	/**
 	 * testExtends
 	 */
+	@Test
 	public void testExtends()
 	{
 		String source = "@extends";
@@ -225,6 +245,7 @@ public class SDocFlexScannerTest extends TestCase
 	/**
 	 * testInternal
 	 */
+	@Test
 	public void testInternal()
 	{
 		String source = "@internal";
@@ -235,6 +256,7 @@ public class SDocFlexScannerTest extends TestCase
 	/**
 	 * testMethod
 	 */
+	@Test
 	public void testMethod()
 	{
 		String source = "@method";
@@ -242,6 +264,7 @@ public class SDocFlexScannerTest extends TestCase
 		lexemeTypeTests(source, SDocTokenType.METHOD);
 	}
 
+	@Test
 	public void testModule()
 	{
 		String source = "@module";
@@ -252,6 +275,7 @@ public class SDocFlexScannerTest extends TestCase
 	/**
 	 * testNamespace
 	 */
+	@Test
 	public void testNamespace()
 	{
 		String source = "@namespace";
@@ -262,6 +286,7 @@ public class SDocFlexScannerTest extends TestCase
 	/**
 	 * testOverview
 	 */
+	@Test
 	public void testOverview()
 	{
 		String source = "@overview";
@@ -272,6 +297,7 @@ public class SDocFlexScannerTest extends TestCase
 	/**
 	 * testParam
 	 */
+	@Test
 	public void testParam()
 	{
 		String source = "@param";
@@ -282,6 +308,7 @@ public class SDocFlexScannerTest extends TestCase
 	/**
 	 * testPrivate
 	 */
+	@Test
 	public void testPrivate()
 	{
 		String source = "@private";
@@ -292,6 +319,7 @@ public class SDocFlexScannerTest extends TestCase
 	/**
 	 * testProperty
 	 */
+	@Test
 	public void testProperty()
 	{
 		String source = "@property";
@@ -302,6 +330,7 @@ public class SDocFlexScannerTest extends TestCase
 	/**
 	 * testReturn
 	 */
+	@Test
 	public void testReturn()
 	{
 		String source = "@return";
@@ -312,6 +341,7 @@ public class SDocFlexScannerTest extends TestCase
 	/**
 	 * testSee
 	 */
+	@Test
 	public void testSee()
 	{
 		String source = "@see";
@@ -322,6 +352,7 @@ public class SDocFlexScannerTest extends TestCase
 	/**
 	 * testUserTag
 	 */
+	@Test
 	public void testUserTag()
 	{
 		String source = "@myCustomTag";
@@ -332,6 +363,7 @@ public class SDocFlexScannerTest extends TestCase
 	/**
 	 * testCR
 	 */
+	@Test
 	public void testCR()
 	{
 		String source = "\r";
@@ -342,6 +374,7 @@ public class SDocFlexScannerTest extends TestCase
 	/**
 	 * testLF
 	 */
+	@Test
 	public void testLF()
 	{
 		String source = "\n";
@@ -352,6 +385,7 @@ public class SDocFlexScannerTest extends TestCase
 	/**
 	 * testCRLF
 	 */
+	@Test
 	public void testCRLF()
 	{
 		String source = "\r\n";
@@ -362,6 +396,7 @@ public class SDocFlexScannerTest extends TestCase
 	/**
 	 * testSpace
 	 */
+	@Test
 	public void testSpace()
 	{
 		String source = " ";
@@ -372,6 +407,7 @@ public class SDocFlexScannerTest extends TestCase
 	/**
 	 * testTab
 	 */
+	@Test
 	public void testTab()
 	{
 		String source = "\t";

@@ -7,6 +7,8 @@
  */
 package com.aptana.editor.js.contentassist;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -21,7 +23,7 @@ import com.aptana.js.core.model.UserAgentElement;
 /**
  * JSUserAgentCachingTests
  */
-public class JSUserAgentCachingTest extends TestCase
+public class JSUserAgentCachingTest
 {
 	protected ListCrossProduct<String> createCrossProduct(List<String>... lists)
 	{
@@ -46,6 +48,7 @@ public class JSUserAgentCachingTest extends TestCase
 		return UserAgentElement.createUserAgentElement(product, version, os, osVersion, description);
 	}
 
+	@Test
 	public void testNewUserAgent()
 	{
 		UserAgentElement.clearCache();
@@ -57,6 +60,7 @@ public class JSUserAgentCachingTest extends TestCase
 	}
 
 	@SuppressWarnings("unchecked")
+	@Test
 	public void testCachedUserAgent()
 	{
 		UserAgentElement.clearCache();
@@ -89,6 +93,7 @@ public class JSUserAgentCachingTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testHasAllUserAgents()
 	{
 		UserAgentElement.clearCache();
@@ -106,6 +111,7 @@ public class JSUserAgentCachingTest extends TestCase
 		assertFalse(uaListAfter.isEmpty());
 	}
 
+	@Test
 	public void testAddExistingUserAgentToAllUserAgents()
 	{
 		UserAgentElement.clearCache();
@@ -117,6 +123,7 @@ public class JSUserAgentCachingTest extends TestCase
 		assertTrue(property.hasAllUserAgents());
 	}
 
+	@Test
 	public void testAddNewUserAgentToAllUserAgents()
 	{
 		UserAgentElement.clearCache();

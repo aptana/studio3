@@ -7,6 +7,8 @@
  */
 package com.aptana.editor.css.contentassist;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.text.MessageFormat;
 
 import junit.framework.TestCase;
@@ -16,7 +18,7 @@ import org.eclipse.jface.text.IDocument;
 import com.aptana.css.core.parsing.CSSTokenType;
 import com.aptana.editor.common.contentassist.ILexemeProvider;
 
-public class FineLocationTests extends TestCase
+public class FineLocationTests
 {
 	/**
 	 * fineLocationTests
@@ -51,6 +53,7 @@ public class FineLocationTests extends TestCase
 	/**
 	 * testEmptyBody
 	 */
+	@Test
 	public void testEmptyBody()
 	{
 		String source = "body {}";
@@ -64,6 +67,7 @@ public class FineLocationTests extends TestCase
 	/**
 	 * testEmptyBody2
 	 */
+	@Test
 	public void testEmptyBody2()
 	{
 		String source = "body {\n  \n}";
@@ -77,6 +81,7 @@ public class FineLocationTests extends TestCase
 	/**
 	 * testTwoRules
 	 */
+	@Test
 	public void testTwoRules()
 	{
 		String source = "body {\n  \n}\n\ntable {\n  \n}";
@@ -91,6 +96,7 @@ public class FineLocationTests extends TestCase
 	/**
 	 * testProperty
 	 */
+	@Test
 	public void testProperty()
 	{
 		String source = "body{background}";
@@ -104,6 +110,7 @@ public class FineLocationTests extends TestCase
 	/**
 	 * testProperty2
 	 */
+	@Test
 	public void testProperty2()
 	{
 		String source = "body{\n  background}";
@@ -117,6 +124,7 @@ public class FineLocationTests extends TestCase
 	/**
 	 * testPropertyNoValue
 	 */
+	@Test
 	public void testPropertyNoValue()
 	{
 		String source = "body{background:}";
@@ -131,6 +139,7 @@ public class FineLocationTests extends TestCase
 	/**
 	 * testPropertyNoValue
 	 */
+	@Test
 	public void testPropertyNoValue2()
 	{
 		String source = "body{\n  background:}";
@@ -145,6 +154,7 @@ public class FineLocationTests extends TestCase
 	/**
 	 * testPropertyAndValueNoSemi
 	 */
+	@Test
 	public void testPropertyAndValueNoSemi()
 	{
 		String source = "body{background:red}";
@@ -159,6 +169,7 @@ public class FineLocationTests extends TestCase
 	/**
 	 * testPropertyAndValueNoSemi2
 	 */
+	@Test
 	public void testPropertyAndValueNoSemi2()
 	{
 		String source = "body{\n  background:red\n}";
@@ -174,6 +185,7 @@ public class FineLocationTests extends TestCase
 	/**
 	 * testPropertyAndValue
 	 */
+	@Test
 	public void testPropertyAndValue()
 	{
 		String source = "body{background:red;}";
@@ -189,6 +201,7 @@ public class FineLocationTests extends TestCase
 	/**
 	 * testPropertyAndValue2
 	 */
+	@Test
 	public void testPropertyAndValue2()
 	{
 		String source = "body{\n  background:red;\n}";
@@ -204,6 +217,7 @@ public class FineLocationTests extends TestCase
 	/**
 	 * testMultipleProperties
 	 */
+	@Test
 	public void testMultipleProperties()
 	{
 		String source = "body{background:red;border: 1 solid black}";
@@ -220,6 +234,7 @@ public class FineLocationTests extends TestCase
 	/**
 	 * testMultipleProperties2
 	 */
+	@Test
 	public void testMultipleProperties2()
 	{
 		String source = "body{\n  background: red;\n  border: 1 solid black\n}";
@@ -237,6 +252,7 @@ public class FineLocationTests extends TestCase
 	/**
 	 * testSpaceAfterColon
 	 */
+	@Test
 	public void testSpaceAfterColon()
 	{
 		String source = ".hello {\n  background: \n}";
@@ -251,6 +267,7 @@ public class FineLocationTests extends TestCase
 	/**
 	 * testDotInProperty
 	 */
+	@Test
 	public void testDotInProperty()
 	{
 		String source = "body { background-color.}";
@@ -265,6 +282,7 @@ public class FineLocationTests extends TestCase
 	/**
 	 * testHashInProperty
 	 */
+	@Test
 	public void testHashInProperty()
 	{
 		String source = "body { background-color#}";

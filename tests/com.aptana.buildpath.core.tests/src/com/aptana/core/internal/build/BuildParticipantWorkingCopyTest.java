@@ -1,5 +1,9 @@
 package com.aptana.core.internal.build;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.util.Collections;
 import java.util.List;
 
@@ -14,14 +18,15 @@ import com.aptana.core.build.IBuildParticipantWorkingCopy;
 import com.aptana.index.core.build.BuildContext;
 
 @SuppressWarnings("nls")
-public class BuildParticipantWorkingCopyTest extends TestCase
+public class BuildParticipantWorkingCopyTest
 {
 
 	private AbstractBuildParticipant participant;
 
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 
 		participant = new AbstractBuildParticipant()
 		{
@@ -42,13 +47,15 @@ public class BuildParticipantWorkingCopyTest extends TestCase
 		};
 	}
 
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		participant = null;
 
-		super.tearDown();
+//		super.tearDown();
 	}
 
+	@Test
 	public void testCanToggleEnablement() throws Exception
 	{
 		assertFalse(participant.isRequired());
@@ -75,6 +82,7 @@ public class BuildParticipantWorkingCopyTest extends TestCase
 		wc.doSave();
 	}
 
+	@Test
 	public void testChangeFilters() throws Exception
 	{
 		assertEquals(Collections.emptyList(), participant.getFilters());

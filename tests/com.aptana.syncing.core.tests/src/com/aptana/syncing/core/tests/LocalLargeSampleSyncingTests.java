@@ -17,13 +17,13 @@ public class LocalLargeSampleSyncingTests extends LargeSampleSyncingTests
 {
 
 	@Override
-	protected void setUp() throws Exception
+	public void setUp() throws Exception
 	{
 		File baseTempFile = File.createTempFile("test", ".txt"); //$NON-NLS-1$ //$NON-NLS-2$
 		baseTempFile.deleteOnExit();
-		
+
 		File baseDirectory = baseTempFile.getParentFile();
-		
+
 		LocalConnectionPoint lcp = new LocalConnectionPoint();
 		lcp.setPath(new Path(baseDirectory.getAbsolutePath()));
 		clientManager = lcp;

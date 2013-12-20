@@ -7,9 +7,14 @@
  */
 package com.aptana.editor.html.text;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
 import org.eclipse.ui.IEditorPart;
+import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.Bundle;
 
@@ -26,11 +31,9 @@ public class CSSElementSelectorHoverTest extends CSSEditorBasedTests
 	private Object fHeaderElement;
 	private HTMLIndexQueryHelper fQueryHelper;
 
-	@Override
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
-
 		HTMLMetadataLoader loader = new HTMLMetadataLoader();
 		loader.schedule();
 		loader.join();
@@ -49,7 +52,7 @@ public class CSSElementSelectorHoverTest extends CSSEditorBasedTests
 	}
 
 	@Override
-	protected void tearDown() throws Exception
+	public void tearDown() throws Exception
 	{
 		hover = null;
 		fHeaderElement = null;

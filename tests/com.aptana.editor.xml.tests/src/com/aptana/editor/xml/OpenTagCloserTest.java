@@ -7,6 +7,9 @@
  */
 package com.aptana.editor.xml;
 
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.CoreException;
@@ -20,16 +23,17 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
-public class OpenTagCloserTest extends TestCase
+public class OpenTagCloserTest
 {
 
 	protected TextViewer viewer;
 	protected OpenTagCloser closer;
 
-	@Override
-	protected void setUp() throws Exception
+//	@Override
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 		Display display = PlatformUI.getWorkbench().getDisplay();
 		Shell shell = display.getActiveShell();
 		if (shell == null)
@@ -40,6 +44,7 @@ public class OpenTagCloserTest extends TestCase
 		closer = new OpenTagCloser(viewer);
 	}
 
+	@Test
 	public void testAPSTUD3323() throws Exception
 	{
 		IDocument document = setDocument("<test abc=\"\"");
@@ -51,6 +56,7 @@ public class OpenTagCloserTest extends TestCase
 		assertTrue(event.doit);
 	}
 
+	@Test
 	public void testLessThanInsideAttributeValue() throws Exception
 	{
 		IDocument document = setDocument("<test abc=\"<\"");
@@ -62,6 +68,7 @@ public class OpenTagCloserTest extends TestCase
 		assertFalse(event.doit);
 	}
 
+	@Test
 	public void testGreaterThanAtFirstChar() throws Exception
 	{
 		IDocument document = setDocument("");
@@ -73,6 +80,7 @@ public class OpenTagCloserTest extends TestCase
 		assertTrue(event.doit);
 	}
 
+	@Test
 	public void testTwoGreaterThanChars() throws Exception
 	{
 		IDocument document = setDocument(">");
@@ -84,6 +92,7 @@ public class OpenTagCloserTest extends TestCase
 		assertTrue(event.doit);
 	}
 
+	@Test
 	public void testEmptyTag() throws Exception
 	{
 		IDocument document = setDocument("<");
@@ -95,6 +104,7 @@ public class OpenTagCloserTest extends TestCase
 		assertTrue(event.doit);
 	}
 
+	@Test
 	public void testCloseEmptyTag() throws Exception
 	{
 		IDocument document = setDocument("<>");

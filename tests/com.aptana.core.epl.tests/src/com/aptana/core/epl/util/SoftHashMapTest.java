@@ -7,12 +7,15 @@
  */
 package com.aptana.core.epl.util;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.util.Map;
 
 import junit.framework.TestCase;
 
-public class SoftHashMapTest extends TestCase
+public class SoftHashMapTest
 {
+	@Test
 	public void testSoftHashMap() throws Exception
 	{
 		// This test grows our memory until the values are prunned (or we'd get an out of memory error).

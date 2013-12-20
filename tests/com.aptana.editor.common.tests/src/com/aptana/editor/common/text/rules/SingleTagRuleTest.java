@@ -7,6 +7,8 @@
  */
 package com.aptana.editor.common.text.rules;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
 import org.eclipse.jface.text.Document;
@@ -17,9 +19,10 @@ import org.eclipse.jface.text.rules.Token;
 
 import com.aptana.editor.common.text.rules.SingleTagRule;
 
-public class SingleTagRuleTest extends TestCase
+public class SingleTagRuleTest
 {
 
+	@Test
 	public void testSingleTagRule()
 	{
 		IToken successToken = new Token("name");

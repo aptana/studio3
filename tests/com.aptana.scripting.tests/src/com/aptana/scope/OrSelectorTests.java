@@ -7,13 +7,16 @@
  */
 package com.aptana.scope;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
-public class OrSelectorTests extends TestCase
+public class OrSelectorTests
 {
 	/**
 	 * testPrefixThenNonMatch
 	 */
+	@Test
 	public void testPrefixThenNonMatch()
 	{
 		IScopeSelector selector = new ScopeSelector("source, string.quoted.single.ruby");
@@ -25,6 +28,7 @@ public class OrSelectorTests extends TestCase
 	/**
 	 * testNonMatchThenPrefix
 	 */
+	@Test
 	public void testNonMatchThenPrefix()
 	{
 		IScopeSelector selector = new ScopeSelector("source.php, string.quoted");
@@ -36,6 +40,7 @@ public class OrSelectorTests extends TestCase
 	/**
 	 * testNamesArePrefixes
 	 */
+	@Test
 	public void testNamesArePrefixes()
 	{
 		IScopeSelector selector = new ScopeSelector("source, string.quoted");
@@ -47,6 +52,7 @@ public class OrSelectorTests extends TestCase
 	/**
 	 * testExactThenNonMatch
 	 */
+	@Test
 	public void testExactThenNonMatch()
 	{
 		IScopeSelector selector = new ScopeSelector("source.ruby, string.quoted.single.ruby");
@@ -58,6 +64,7 @@ public class OrSelectorTests extends TestCase
 	/**
 	 * testNonMatchThenExact
 	 */
+	@Test
 	public void testNonMatchThenExact()
 	{
 		IScopeSelector selector = new ScopeSelector("source.php, string.quoted.double.ruby");
@@ -69,6 +76,7 @@ public class OrSelectorTests extends TestCase
 	/**
 	 * testNamesAreExact
 	 */
+	@Test
 	public void testNamesAreExact()
 	{
 		IScopeSelector selector = new ScopeSelector("source.ruby, string.quoted.double.ruby");
@@ -80,6 +88,7 @@ public class OrSelectorTests extends TestCase
 	/**
 	 * testMixedMatch
 	 */
+	@Test
 	public void testMixedMatch()
 	{
 		IScopeSelector selector = new ScopeSelector("source.ruby string, source.php string");

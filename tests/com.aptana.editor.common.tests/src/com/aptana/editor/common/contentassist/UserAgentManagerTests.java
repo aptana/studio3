@@ -7,6 +7,10 @@
  */
 package com.aptana.editor.common.contentassist;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,7 +25,7 @@ import com.aptana.ui.epl.UIEplPlugin;
 /**
  * UserAgentManagerTests
  */
-public class UserAgentManagerTests extends TestCase
+public class UserAgentManagerTests
 {
 	/**
 	 * 
@@ -33,10 +37,11 @@ public class UserAgentManagerTests extends TestCase
 	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
-	@Override
-	protected void setUp() throws Exception
+//	@Override
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 
 		manager = UserAgentManager.getInstance();
 
@@ -63,12 +68,13 @@ public class UserAgentManagerTests extends TestCase
 	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
-	@Override
-	protected void tearDown() throws Exception
+//	@Override
+	@After
+	public void tearDown() throws Exception
 	{
 		manager = null;
 
-		super.tearDown();
+//		super.tearDown();
 	}
 
 	public void assertIDs(String natureID, String... expectedUserAgentIDs)
@@ -94,6 +100,7 @@ public class UserAgentManagerTests extends TestCase
 		assertEquals(expected, actual);
 	}
 
+	@Test
 	public void testWebDefaults()
 	{
 		// @formatter:off
@@ -104,6 +111,7 @@ public class UserAgentManagerTests extends TestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testOtherDefaults()
 	{
 		// @formatter:off
@@ -114,6 +122,7 @@ public class UserAgentManagerTests extends TestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testPreferenceMigration()
 	{
 		// set preference to older format

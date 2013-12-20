@@ -1,5 +1,9 @@
 package com.aptana.js.core.build;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Collection;
@@ -21,23 +25,26 @@ import com.aptana.index.core.FileStoreBuildContext;
 import com.aptana.index.core.build.BuildContext;
 import com.aptana.js.core.build.JSTaskDetector;
 
-public class JSTaskDetectorTest extends TestCase
+public class JSTaskDetectorTest
 {
 
 	private JSTaskDetector indexer;
 
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 		indexer = new JSTaskDetector();
 	}
 
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		indexer = null;
-		super.tearDown();
+//		super.tearDown();
 	}
 
+	@Test
 	public void testDetectTaskTagWithUnicodeCharacters() throws Exception
 	{
 		File tmpDir = null;

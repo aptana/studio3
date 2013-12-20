@@ -1,5 +1,8 @@
 package com.aptana.editor.js.tests.performance;
 
+import org.junit.runners.Suite.SuiteClasses;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -33,6 +36,8 @@ import com.aptana.editor.js.JSPlugin;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.internal.core.build.JSLintValidator;
 
+@RunWith(Suite.class)
+@SuiteClasses({})
 public class OpenJSEditorTest extends OpenEditorTest
 {
 
@@ -66,24 +71,24 @@ public class OpenJSEditorTest extends OpenEditorTest
 		super(name);
 	}
 
-	public static Test suite()
-	{
-		// ensure sequence
-		TestSuite suite = new TestSuite(OpenJSEditorTest.class.getName());
-		// suite.addTest(new OpenJSEditorTest("testOpenTiMobile"));
-		// suite.addTest(new OpenJSEditorTest("testOpenDojo"));
-		suite.addTest(new OpenJSEditorTest("testOpenDojoMinified"));
-		// suite.addTest(new OpenJSEditorTest("testOpenTinyMCE"));
-		// suite.addTest(new OpenJSEditorTest("testOpenExtMinifiedFoldingOnOutlineOn"));
-		// suite.addTest(new OpenJSEditorTest("testOpenExtMinifiedFoldingOnOutlineOff"));
-		// suite.addTest(new OpenJSEditorTest("testOpenExtDevFoldingOnOutlineOn"));
-		// suite.addTest(new OpenJSEditorTest("testOpenExtDevFoldingOnOutlineOff"));
-		return new Setup(suite);
-	}
-
-	/*
-	 * @see junit.framework.TestCase#setUp()
-	 */
+//	public static Test suite()
+//	{
+//		// ensure sequence
+//		TestSuite suite = new TestSuite(OpenJSEditorTest.class.getName());
+//		// suite.addTest(new OpenJSEditorTest("testOpenTiMobile"));
+//		// suite.addTest(new OpenJSEditorTest("testOpenDojo"));
+//		suite.addTest(new OpenJSEditorTest("testOpenDojoMinified"));
+//		// suite.addTest(new OpenJSEditorTest("testOpenTinyMCE"));
+//		// suite.addTest(new OpenJSEditorTest("testOpenExtMinifiedFoldingOnOutlineOn"));
+//		// suite.addTest(new OpenJSEditorTest("testOpenExtMinifiedFoldingOnOutlineOff"));
+//		// suite.addTest(new OpenJSEditorTest("testOpenExtDevFoldingOnOutlineOn"));
+//		// suite.addTest(new OpenJSEditorTest("testOpenExtDevFoldingOnOutlineOff"));
+//		return new Setup(suite);
+//	}
+//
+//	/*
+//	 * @see junit.framework.TestCase#setUp()
+//	 */
 	protected void setUp() throws Exception
 	{
 		super.setUp();

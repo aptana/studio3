@@ -7,6 +7,11 @@
  */
 package com.aptana.editor.xml.contentassist;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.List;
 
 import org.eclipse.core.filesystem.IFileStore;
@@ -19,6 +24,7 @@ import org.eclipse.jface.text.link.LinkedModeModel;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
+import org.junit.Test;
 
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
@@ -77,53 +83,62 @@ public class XMLContentAssistProcessorTest extends XMLEditorBasedTests
 	}
 
 	@Override
-	protected void tearDown() throws Exception
+	public void tearDown() throws Exception
 	{
 		fDocument = null;
 
 		super.tearDown();
 	}
 
+	@Test
 	public void testEmptyDocumentYieldsNoProposals()
 	{
 		assertCompletionCorrect("|", '\t', 0, null, StringUtil.EMPTY, null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testElementProposalTagUnclosedNoPrefix()
 	{
 		assertCompletionCorrect("<|", '\t', 1, "element", "<element></element>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testElementProposalTagClosedNoPrefix()
 	{
 		assertCompletionCorrect("<|>", '\t', 1, "element", "<element></element>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testElementProposalTagUnclosedWithPrefix()
 	{
 		assertCompletionCorrect("<e|", '\t', 1, "element", "<element></element>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testElementProposalTagClosedWithPrefix()
 	{
 		assertCompletionCorrect("<e|>", '\t', 1, "element", "<element></element>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testElementWhichIsClosedProposal()
 	{
 		assertCompletionCorrect("<|></element>", '\t', 1, "element", "<element></element>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testNoSuggestionsInTextAreaBetweenTags()
 	{
 		assertCompletionCorrect("<element>|</element>", '\t', 0, null, "<element></element>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testNoSuggestionsInTextAreaWithWhitespaceBetweenTags()
 	{
 		assertCompletionCorrect("<element>\n  |\n</element>", '\t', 0, null, "<element>\n  \n</element>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testProposalsBadLocation()
 	{
 		String document = "<body>&|";
@@ -145,17 +160,20 @@ public class XMLContentAssistProcessorTest extends XMLEditorBasedTests
 		return processor;
 	}
 
+	@Test
 	public void testAttributeProposalWithNoPrefix()
 	{
 		assertCompletionCorrect(
 				"<element |></element>", '\t', 3, "attribute", "<element attribute=\"\"></element>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testAttributeProposalWithTrailingSpaceAfterCursor()
 	{
 		assertCompletionCorrect("<element | />", '\t', 3, "attribute", "<element attribute=\"\" />", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testAttributeProposalWithPrefix()
 	{
 		// FIXME Here we "expect" 3 proposals, but really only one is valid
@@ -163,6 +181,7 @@ public class XMLContentAssistProcessorTest extends XMLEditorBasedTests
 				"<element att|></element>", '\t', 3, "attribute", "<element attribute=\"\"></element>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testAttributeProposalWithPrefixAndTrailingEquals()
 	{
 		// FIXME Here we "expect" 3 proposals, but really only one is valid
@@ -171,6 +190,7 @@ public class XMLContentAssistProcessorTest extends XMLEditorBasedTests
 	}
 
 	@SuppressWarnings("rawtypes")
+	@Test
 	public void testAttributeProposalHasExitTabstopAfterQuotes()
 	{
 		assertCompletionCorrect("<element |>", '\t', 3, "attribute", "<element attribute=\"\">", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -190,6 +210,7 @@ public class XMLContentAssistProcessorTest extends XMLEditorBasedTests
 		assertEquals(0, pos.getLength());
 	}
 
+	@Test
 	public void testAttributeNameAtSpace()
 	{
 		String document = "<element | align=\"\"></p>";
@@ -202,6 +223,7 @@ public class XMLContentAssistProcessorTest extends XMLEditorBasedTests
 		AssertUtil.assertProposalFound("attribute", proposals);
 	}
 
+	@Test
 	public void testAttributeNameAtSpace2()
 	{
 		String document = "<element align=\"\" | ></p>";
@@ -214,6 +236,7 @@ public class XMLContentAssistProcessorTest extends XMLEditorBasedTests
 		AssertUtil.assertProposalFound("attribute", proposals);
 	}
 
+	@Test
 	public void testAttributeAfterElementName()
 	{
 		String document = "<element a|></body>";
@@ -226,6 +249,7 @@ public class XMLContentAssistProcessorTest extends XMLEditorBasedTests
 		AssertUtil.assertProposalFound("attribute", proposals);
 	}
 
+	@Test
 	public void testAttributeValueProposalsBeforeEquals()
 	{
 		String document = "<li><element clas|s=</li>";
@@ -237,7 +261,7 @@ public class XMLContentAssistProcessorTest extends XMLEditorBasedTests
 		assertTrue(proposals.length > 0);
 	}
 
-	// public void testIsValidAutoActivationLocationElement()
+	// @Test public void testIsValidAutoActivationLocationElement()
 	// {
 	// String source = "<e|>";
 	//
@@ -255,7 +279,7 @@ public class XMLContentAssistProcessorTest extends XMLEditorBasedTests
 	// processor.isValidAutoActivationLocation('l', 'l', document, offset));
 	// }
 
-	// public void testIsValidAutoActivationLocationAttribute()
+	// @Test public void testIsValidAutoActivationLocationAttribute()
 	// {
 	// String source = "<element |>";
 	// IFileStore fileStore = createFileStore("proposal_tests", "html", source);
@@ -268,7 +292,7 @@ public class XMLContentAssistProcessorTest extends XMLEditorBasedTests
 	//
 	// }
 
-	// public void testIsValidAutoActivationLocationAttributeValue()
+	// @Test public void testIsValidAutoActivationLocationAttributeValue()
 	// {
 	// String source = "<a class=\"|\"|>";
 	// IFileStore fileStore = createFileStore("proposal_tests", "html", source);
@@ -279,6 +303,7 @@ public class XMLContentAssistProcessorTest extends XMLEditorBasedTests
 	// assertTrue(processor.isValidAutoActivationLocation('f', 'f', document, offset));
 	// }
 
+	@Test
 	public void testIsValidAutoActivationLocationText()
 	{
 		String source = "<element>|";

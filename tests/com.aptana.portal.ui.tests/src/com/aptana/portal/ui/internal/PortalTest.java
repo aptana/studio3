@@ -1,13 +1,20 @@
 package com.aptana.portal.ui.internal;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.net.URL;
 import java.util.Map;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.aptana.core.tests.TestProject;
 import com.aptana.core.util.EclipseUtil;
@@ -19,11 +26,12 @@ import com.aptana.usage.UsagePlugin;
 
 /**
  */
-public class PortalTest extends TestCase
+public class PortalTest
 {
 	/**
 	 * testGetDefaultURLEmpty
 	 */
+	@Test
 	public void testGetDefaultURLEmpty() throws Exception
 	{
 		Portal fixture = Portal.getInstance();
@@ -34,6 +42,7 @@ public class PortalTest extends TestCase
 	/**
 	 * testGetDefaultURLEmpty
 	 */
+	@Test
 	public void testGetDefaultURLNull() throws Exception
 	{
 		Portal fixture = Portal.getInstance();
@@ -50,6 +59,7 @@ public class PortalTest extends TestCase
 	/**
 	 * testGetDefaultURLOffline
 	 */
+	@Test
 	public void testGetDefaultURLOffline() throws Exception
 	{
 		URL localFileURL = new File("").toURI().toURL(); //$NON-NLS-1$
@@ -72,6 +82,7 @@ public class PortalTest extends TestCase
 	/**
 	 * testGetDeployParam
 	 */
+	@Test
 	public void testGetDeployParamNullProject() throws Exception
 	{
 		Portal fixture = Portal.getInstance();
@@ -92,6 +103,7 @@ public class PortalTest extends TestCase
 	/**
 	 * testGetGUID
 	 */
+	@Test
 	public void testGetGUID() throws Exception
 	{
 		Portal fixture = Portal.getInstance();
@@ -102,6 +114,7 @@ public class PortalTest extends TestCase
 	/**
 	 * testGetInstance
 	 */
+	@Test
 	public void testGetInstance() throws Exception
 	{
 		Portal result = Portal.getInstance();
@@ -111,6 +124,7 @@ public class PortalTest extends TestCase
 	/**
 	 * testGetProjectTypeNull
 	 */
+	@Test
 	public void testGetProjectTypeNull() throws Exception
 	{
 		Portal fixture = Portal.getInstance();
@@ -123,6 +137,7 @@ public class PortalTest extends TestCase
 	/**
 	 * testGetProjectTypeWeb
 	 */
+	@Test
 	public void testGetProjectTypeWeb() throws Exception
 	{
 		Portal fixture = Portal.getInstance();
@@ -141,6 +156,7 @@ public class PortalTest extends TestCase
 	/**
 	 * testGetProjectTypeRuby
 	 */
+	@Test
 	public void testGetProjectTypeRuby() throws Exception
 	{
 		Portal fixture = Portal.getInstance();
@@ -159,6 +175,7 @@ public class PortalTest extends TestCase
 	/**
 	 * testGetProjectTypePHP
 	 */
+	@Test
 	public void testGetProjectTypePHP() throws Exception
 	{
 		Portal fixture = Portal.getInstance();
@@ -177,6 +194,7 @@ public class PortalTest extends TestCase
 	/**
 	 * testGetProjectTypeWeb
 	 */
+	@Test
 	public void testGetProjectTypePydev() throws Exception
 	{
 		Portal fixture = Portal.getInstance();
@@ -195,6 +213,7 @@ public class PortalTest extends TestCase
 	/**
 	 * testGetProjectTypeNull
 	 */
+	@Test
 	public void testGetThemeManager() throws Exception
 	{
 		Portal fixture = Portal.getInstance();
@@ -206,6 +225,7 @@ public class PortalTest extends TestCase
 	/**
 	 * testGetURLParametersForProjectNull
 	 */
+	@Test
 	public void testGetURLParametersForProjectNull() throws Exception
 	{
 		Portal fixture = Portal.getInstance();
@@ -218,6 +238,7 @@ public class PortalTest extends TestCase
 	/**
 	 * testOpenPortal
 	 */
+	@Test
 	public void testOpenPortal() throws Exception
 	{
 		Portal fixture = Portal.getInstance();
@@ -228,6 +249,7 @@ public class PortalTest extends TestCase
 	/**
 	 * testOpenPortalNull
 	 */
+	@Test
 	public void testOpenPortalNull() throws Exception
 	{
 		Portal fixture = Portal.getInstance();
@@ -241,6 +263,7 @@ public class PortalTest extends TestCase
 	/**
 	 * testOpenPortalBringToTop
 	 */
+	@Test
 	public void testOpenPortalBringToTop() throws Exception
 	{
 		Portal fixture = Portal.getInstance();
@@ -253,6 +276,7 @@ public class PortalTest extends TestCase
 	/**
 	 * testShouldOpenPortal
 	 */
+	@Test
 	public void testShouldOpenPortal() throws Exception
 	{
 		Portal fixture = Portal.getInstance();
@@ -277,6 +301,7 @@ public class PortalTest extends TestCase
 	 *             if the initialization fails for some reason
 	 * @generatedBy CodePro at 8/31/11 2:51 PM
 	 */
+	@Before
 	public void setUp() throws Exception
 	{
 		// add additional set up code here
@@ -289,6 +314,7 @@ public class PortalTest extends TestCase
 	 *             if the clean-up fails for some reason
 	 * @generatedBy CodePro at 8/31/11 2:51 PM
 	 */
+	@After
 	public void tearDown() throws Exception
 	{
 		// Add additional tear down code here

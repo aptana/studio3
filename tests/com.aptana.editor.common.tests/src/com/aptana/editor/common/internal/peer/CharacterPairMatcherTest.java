@@ -7,6 +7,10 @@
  */
 package com.aptana.editor.common.internal.peer;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,14 +24,15 @@ import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.TypedRegion;
 import org.eclipse.jface.text.source.ICharacterPairMatcher;
 
-public class CharacterPairMatcherTest extends TestCase
+public class CharacterPairMatcherTest
 {
 	private static final char[] pairs = new char[] { '(', ')', '{', '}', '[', ']', '`', '`', '\'', '\'', '"', '"', '<',
 			'>' };
 	private ICharacterPairMatcher matcher;
 
-	@Override
-	protected void setUp() throws Exception
+//	@Override
+	@Before
+	public void setUp() throws Exception
 	{
 		matcher = new CharacterPairMatcher(pairs)
 		{
@@ -52,20 +57,22 @@ public class CharacterPairMatcherTest extends TestCase
 				return new ITypedRegion[] { new TypedRegion(0, doc.getLength(), IDocument.DEFAULT_CONTENT_TYPE) };
 			}
 		};
-		super.setUp();
+//		super.setUp();
 	}
 
-	@Override
-	protected void tearDown() throws Exception
+//	@Override
+	@After
+	public void tearDown() throws Exception
 	{
 		if (matcher != null)
 		{
 			matcher.dispose();
 		}
 		matcher = null;
-		super.tearDown();
+//		super.tearDown();
 	}
 
+	@Test
 	public void testPairMatching()
 	{
 		String source = "( { [ `ruby command`, 'single quoted string', \"double quoted string\" ] } )";
@@ -78,6 +85,7 @@ public class CharacterPairMatcherTest extends TestCase
 		assertMatch(document, source, 46, 67); // ""
 	}
 
+	@Test
 	public void testPairMatching2()
 	{
 		String source = "<?xml version=\"1.0\"\n encoding=\"ISO-8859-1\"?>";
@@ -87,6 +95,7 @@ public class CharacterPairMatcherTest extends TestCase
 		assertMatch(document, source, 30, 41);
 	}
 
+	@Test
 	public void testMatchesCharToRightIfNothingOnLeft()
 	{
 		String source = "( )";
@@ -94,6 +103,7 @@ public class CharacterPairMatcherTest extends TestCase
 		assertRawMatch(document, 0, 2, 0, 3);
 	}
 
+	@Test
 	public void testMatchesCharToRightIfNothingOnLeft2()
 	{
 		String source = "( { [ `ruby command`, 'single quoted string', \"double quoted string\" ] } )";
@@ -106,6 +116,7 @@ public class CharacterPairMatcherTest extends TestCase
 		assertRawMatch(document, 46, 67, 46, 22); // ""
 	}
 
+	@Test
 	public void testDoesntPairMatchInComments()
 	{
 		final String source = "# ( { [ `ruby command`, 'single quoted string', \"double quoted string\" ] } )";
@@ -146,6 +157,7 @@ public class CharacterPairMatcherTest extends TestCase
 		assertNull(matcher.match(document, 48));
 	}
 
+	@Test
 	public void testAPSTUD3926()
 	{
 		// --------------------01234567890123456789012345678
@@ -161,6 +173,7 @@ public class CharacterPairMatcherTest extends TestCase
 		assertRawMatch(document, 21, 27, 21, 6);
 	}
 
+	@Test
 	public void testAPSTUD3926_2()
 	{
 		// --------------------0123456789012345678901 2345
@@ -212,6 +225,7 @@ public class CharacterPairMatcherTest extends TestCase
 		assertMatchFromRight(document, 24, 5, 19);
 	}
 
+	@Test
 	public void testSkipsPairsInComments()
 	{
 		String source = "(\n# )\n)";

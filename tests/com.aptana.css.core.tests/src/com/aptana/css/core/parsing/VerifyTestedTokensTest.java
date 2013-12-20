@@ -7,6 +7,8 @@
  */
 package com.aptana.css.core.parsing;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -19,7 +21,7 @@ import com.aptana.core.util.StringUtil;
 /**
  * VerifyTestedTokensTest
  */
-public class VerifyTestedTokensTest extends TestCase
+public class VerifyTestedTokensTest
 {
 	/**
 	 * Maintain a list of all token types that were visited during testing
@@ -56,9 +58,10 @@ public class VerifyTestedTokensTest extends TestCase
 
 	public VerifyTestedTokensTest()
 	{
-		super("testTestedTokens");
+//		super("testTestedTokens");
 	}
 
+	@Test
 	public void testTestedTokens()
 	{
 		List<String> untestedTokens = new ArrayList<String>();

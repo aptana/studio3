@@ -7,6 +7,10 @@
  */
 package com.aptana.css.core.internal.build;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Collection;
@@ -27,22 +31,25 @@ import com.aptana.css.core.build.CSSTaskDetector;
 import com.aptana.index.core.FileStoreBuildContext;
 import com.aptana.index.core.build.BuildContext;
 
-public class CSSTaskDetectorTest extends TestCase
+public class CSSTaskDetectorTest
 {
 	private CSSTaskDetector taskDetector;
 
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 		taskDetector = new CSSTaskDetector();
 	}
 
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		taskDetector = null;
-		super.tearDown();
+//		super.tearDown();
 	}
 
+	@Test
 	public void testDetectTaskTagWithUnicodeCharacters() throws Exception
 	{
 		File tmpDir = null;
@@ -98,6 +105,7 @@ public class CSSTaskDetectorTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testDeleteFileNullContext() throws Exception
 	{
 		taskDetector.deleteFile(null, null);

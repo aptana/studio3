@@ -7,6 +7,11 @@
  */
 package com.aptana.js.core.inferencing;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
@@ -17,8 +22,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
@@ -26,6 +29,10 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.TestName;
 
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.IOUtil;
@@ -50,8 +57,11 @@ import com.aptana.js.internal.core.index.JSMetadataLoader;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseNode;
 
-public abstract class InferencingTestsBase extends TestCase
+public abstract class InferencingTestsBase
 {
+	@Rule
+	public TestName name = new TestName();
+
 	public class Indexer extends JSFileIndexingParticipant
 	{
 		public void indexTree(IFileStore file, String source, Index index, JSParseRootNode root)
@@ -150,7 +160,7 @@ public abstract class InferencingTestsBase extends TestCase
 	 */
 	protected URI getIndexURI()
 	{
-		IPath dir = FileUtil.getTempDirectory().append(getName());
+		IPath dir = FileUtil.getTempDirectory().append(name.getMethodName());
 		dir.toFile().mkdirs();
 		dir.toFile().deleteOnExit();
 		return dir.toFile().toURI();
@@ -252,7 +262,7 @@ public abstract class InferencingTestsBase extends TestCase
 	{
 		if (dir == null)
 		{
-			IPath tmpDir = FileUtil.getTempDirectory().append(getName() + System.currentTimeMillis());
+			IPath tmpDir = FileUtil.getTempDirectory().append(name.getMethodName() + System.currentTimeMillis());
 			dir = tmpDir.toFile();
 			assertTrue(dir.mkdirs());
 		}
@@ -301,7 +311,8 @@ public abstract class InferencingTestsBase extends TestCase
 	 */
 	protected List<String> getTypes(JSScope globals, JSNode node)
 	{
-		JSNodeTypeInferrer walker = new JSNodeTypeInferrer(globals, getIndex(), getLocation(), new JSIndexQueryHelper(getIndex()));
+		JSNodeTypeInferrer walker = new JSNodeTypeInferrer(globals, getIndex(), getLocation(), new JSIndexQueryHelper(
+				getIndex()));
 
 		node.accept(walker);
 
@@ -320,7 +331,8 @@ public abstract class InferencingTestsBase extends TestCase
 
 		for (IParseNode node : nodes)
 		{
-			JSNodeTypeInferrer walker = new JSNodeTypeInferrer(globals, getIndex(), getLocation(), new JSIndexQueryHelper(getIndex()));
+			JSNodeTypeInferrer walker = new JSNodeTypeInferrer(globals, getIndex(), getLocation(),
+					new JSIndexQueryHelper(getIndex()));
 
 			assertTrue(node instanceof JSNode);
 
@@ -389,10 +401,11 @@ public abstract class InferencingTestsBase extends TestCase
 	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
-	@Override
-	protected void setUp() throws Exception
+	// @Override
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+		// super.setUp();
 
 		reader = new JSIndexReader();
 		loadJSMetadata();
@@ -448,8 +461,9 @@ public abstract class InferencingTestsBase extends TestCase
 	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
-	@Override
-	protected void tearDown() throws Exception
+	// @Override
+	@After
+	public void tearDown() throws Exception
 	{
 		try
 		{
@@ -458,7 +472,7 @@ public abstract class InferencingTestsBase extends TestCase
 				FileUtil.deleteRecursively(dir);
 				dir = null;
 			}
-			
+
 			URI indexURI = getIndexURI();
 			if (indexURI != null)
 			{
@@ -469,7 +483,7 @@ public abstract class InferencingTestsBase extends TestCase
 		{
 			reader = null;
 
-			super.tearDown();
+			// super.tearDown();
 		}
 	}
 

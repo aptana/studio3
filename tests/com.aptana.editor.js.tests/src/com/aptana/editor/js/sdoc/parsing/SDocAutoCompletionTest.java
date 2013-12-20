@@ -7,7 +7,11 @@
  */
 package com.aptana.editor.js.sdoc.parsing;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.List;
+
+import org.junit.Test;
 
 import com.aptana.editor.js.contentassist.ParseUtil;
 import com.aptana.editor.js.tests.JSEditorBasedTestCase;
@@ -37,6 +41,7 @@ public class SDocAutoCompletionTest extends JSEditorBasedTestCase
 		}
 	}
 
+	@Test
 	public void testFunctionDeclaration()
 	{
 		// @formatter:off
@@ -49,6 +54,7 @@ public class SDocAutoCompletionTest extends JSEditorBasedTestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testFunctionDeclaration2()
 	{
 		// @formatter:off
@@ -61,6 +67,7 @@ public class SDocAutoCompletionTest extends JSEditorBasedTestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testFunctionDeclaration3()
 	{
 		// @formatter:off
@@ -73,6 +80,7 @@ public class SDocAutoCompletionTest extends JSEditorBasedTestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testSelfInvokingLambda()
 	{
 		// @formatter:off
@@ -85,6 +93,7 @@ public class SDocAutoCompletionTest extends JSEditorBasedTestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testSelfInvokingLambda2()
 	{
 		// @formatter:off
@@ -97,6 +106,7 @@ public class SDocAutoCompletionTest extends JSEditorBasedTestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testSelfInvokingLambda3()
 	{
 		// @formatter:off
@@ -109,6 +119,7 @@ public class SDocAutoCompletionTest extends JSEditorBasedTestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testVarDeclaration()
 	{
 		// @formatter:off
@@ -121,6 +132,7 @@ public class SDocAutoCompletionTest extends JSEditorBasedTestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testKeyValuePair()
 	{
 		// @formatter:off
@@ -133,6 +145,7 @@ public class SDocAutoCompletionTest extends JSEditorBasedTestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testKeyValuePair2()
 	{
 		// @formatter:off
@@ -145,6 +158,7 @@ public class SDocAutoCompletionTest extends JSEditorBasedTestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testAssignment()
 	{
 		// @formatter:off
@@ -157,6 +171,7 @@ public class SDocAutoCompletionTest extends JSEditorBasedTestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testDottedAssignment()
 	{
 		// @formatter:off

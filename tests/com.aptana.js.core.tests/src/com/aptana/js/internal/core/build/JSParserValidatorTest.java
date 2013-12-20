@@ -7,10 +7,13 @@
  */
 package com.aptana.js.internal.core.build;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.junit.Test;
 
 import com.aptana.buildpath.core.tests.AbstractValidatorTestCase;
 import com.aptana.core.build.IBuildParticipant;
@@ -50,6 +53,7 @@ public class JSParserValidatorTest extends AbstractValidatorTestCase
 		return IJSConstants.CONTENT_TYPE_JS;
 	}
 
+	@Test
 	public void testJSParseErrors() throws CoreException
 	{
 		String text = "var foo = function() {\nhello(\n};";
@@ -63,6 +67,7 @@ public class JSParserValidatorTest extends AbstractValidatorTestCase
 				item.getMessage());
 	}
 
+	@Test
 	public void testNoJSParseErrors() throws CoreException
 	{
 		String text = "var foo = function() {\nhello();\n};";
@@ -71,6 +76,7 @@ public class JSParserValidatorTest extends AbstractValidatorTestCase
 		assertEquals(0, items.size());
 	}
 
+	@Test
 	public void testMissingSemicolonReportsWarning() throws CoreException
 	{
 		// @formatter:off
@@ -88,6 +94,7 @@ public class JSParserValidatorTest extends AbstractValidatorTestCase
 		assertEquals(IProblem.Severity.WARNING, problem.getSeverity());
 	}
 
+	@Test
 	public void testMissingSemicolonSetToIgnoreReportsNoWarning() throws Exception
 	{
 		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(JSCorePlugin.PLUGIN_ID);

@@ -7,6 +7,8 @@
  */
 package com.aptana.editor.html;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -19,7 +21,7 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
 import com.aptana.parsing.lexer.Lexeme;
 
-public class HTMLTagUtilTest extends TestCase
+public class HTMLTagUtilTest
 {
 	private static final Pattern CURSOR = Pattern.compile("\\|");
 
@@ -61,6 +63,7 @@ public class HTMLTagUtilTest extends TestCase
 		return source;
 	}
 
+	@Test
 	public void testIsTag()
 	{
 		assertTrue(HTMLTagUtil.isTag(new Lexeme<HTMLTokenType>(HTMLTokenType.BLOCK_TAG, 0, 2, "<a>")));
@@ -69,6 +72,7 @@ public class HTMLTagUtilTest extends TestCase
 		assertFalse(HTMLTagUtil.isTag(new Lexeme<HTMLTokenType>(HTMLTokenType.ATTRIBUTE, 0, 2, "<a>")));
 	}
 
+	@Test
 	public void testCloseTags1()
 	{
 		IDocument document = createDocument("<a>Test <b>Item</b>", false); //$NON-NLS-1$
@@ -77,24 +81,28 @@ public class HTMLTagUtilTest extends TestCase
 		assertEquals(0, HTMLTagUtil.getUnclosedTagNames(document, 0).size());
 	}
 
+	@Test
 	public void testCloseTags2()
 	{
 		IDocument document = createDocument("<a>Test <b>Item</b>", false); //$NON-NLS-1$
 		assertEquals(0, HTMLTagUtil.getUnclosedTagNames(document, 1).size());
 	}
 
+	@Test
 	public void testCloseTags3()
 	{
 		IDocument document = createDocument("<a>Test <b>Item</b>", false); //$NON-NLS-1$
 		assertEquals(0, HTMLTagUtil.getUnclosedTagNames(document, 2).size());
 	}
 
+	@Test
 	public void testCloseTags4()
 	{
 		IDocument document = createDocument("<a>Test <b>Item</b>", false); //$NON-NLS-1$
 		assertEquals(1, HTMLTagUtil.getUnclosedTagNames(document, 3).size());
 	}
 
+	@Test
 	public void testCloseTags5()
 	{
 		IDocument document = createDocument("<a>Test <b>Item</b>", false); //$NON-NLS-1$
@@ -102,6 +110,7 @@ public class HTMLTagUtilTest extends TestCase
 		assertEquals(1, HTMLTagUtil.getUnclosedTagNames(document, 4).size());
 	}
 
+	@Test
 	public void testCloseTags6()
 	{
 		IDocument document = createDocument("<a>Test</a> <b>Item</b>", false); //$NON-NLS-1$
@@ -109,6 +118,7 @@ public class HTMLTagUtilTest extends TestCase
 		assertEquals(0, HTMLTagUtil.getUnclosedTagNames(document, 4).size());
 	}
 
+	@Test
 	public void testCloseTags7()
 	{
 		String doc = "<html><head></head><body><h1>New Web Project Page</h1><div><span><| </body></html>";
@@ -121,6 +131,7 @@ public class HTMLTagUtilTest extends TestCase
 		assertEquals("span,div", StringUtil.join(",", unclosed));
 	}
 
+	@Test
 	public void testCloseTags8()
 	{
 		String doc = "<html><head></head><body><h1>New Web Project Page</h1><div><a><| </a></body></html>";
@@ -132,6 +143,7 @@ public class HTMLTagUtilTest extends TestCase
 		// should present nothing
 	}
 
+	@Test
 	public void testCloseTags9()
 	{
 		String doc = "<html><head></head><body><h1>New Web Project Page</h1><div><span><br></span><| </body></html>";

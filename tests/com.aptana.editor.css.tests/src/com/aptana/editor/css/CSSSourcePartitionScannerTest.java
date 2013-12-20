@@ -7,11 +7,15 @@
  */
 package com.aptana.editor.css;
 
+import static org.junit.Assert.assertEquals;
+
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.rules.FastPartitioner;
 import org.eclipse.jface.text.rules.IPartitionTokenScanner;
+import org.junit.After;
+import org.junit.Test;
 
 import com.aptana.editor.common.AbstractPartitionTestCase;
 import com.aptana.editor.common.CommonEditorPlugin;
@@ -32,11 +36,10 @@ public class CSSSourcePartitionScannerTest extends AbstractPartitionTestCase
 				getContentType(code, offset));
 	}
 
-	@Override
+	@After
 	protected void tearDown() throws Exception
 	{
 		partitioner = null;
-		super.tearDown();
 	}
 
 	@Override
@@ -69,6 +72,7 @@ public class CSSSourcePartitionScannerTest extends AbstractPartitionTestCase
 		return partitioner.getContentType(offset);
 	}
 
+	@Test
 	public void testPartitioningOfDefaultPartition()
 	{
 		String source =
@@ -85,6 +89,7 @@ public class CSSSourcePartitionScannerTest extends AbstractPartitionTestCase
 		assertContentType(IDocument.DEFAULT_CONTENT_TYPE, source, 39);
 	}
 
+	@Test
 	public void testPartitioningOfCommentSpanningSingleLine()
 	{
 		String source =
@@ -99,6 +104,7 @@ public class CSSSourcePartitionScannerTest extends AbstractPartitionTestCase
 		assertContentType(IDocument.DEFAULT_CONTENT_TYPE, source, 37);
 	}
 
+	@Test
 	public void testPartitioningOfCommentSpanningMultipleLines()
 	{
 		String source =
@@ -113,6 +119,7 @@ public class CSSSourcePartitionScannerTest extends AbstractPartitionTestCase
 		assertContentType(IDocument.DEFAULT_CONTENT_TYPE, source, 49);
 	}
 
+	@Test
 	public void testPartitioningOfSingleQuotedString()
 	{
 		String source =
@@ -126,6 +133,7 @@ public class CSSSourcePartitionScannerTest extends AbstractPartitionTestCase
 		assertContentType(IDocument.DEFAULT_CONTENT_TYPE, source, 37);
 	}
 
+	@Test
 	public void testPartitioningOfEmptySingleQuotedString()
 	{
 		String source =
@@ -139,6 +147,7 @@ public class CSSSourcePartitionScannerTest extends AbstractPartitionTestCase
 		assertContentType(IDocument.DEFAULT_CONTENT_TYPE, source, 2);
 	}
 
+	@Test
 	public void testPartitioningOfSingleQuotedStringWithEscape()
 	{
 		String source =
@@ -153,6 +162,7 @@ public class CSSSourcePartitionScannerTest extends AbstractPartitionTestCase
 		assertContentType(IDocument.DEFAULT_CONTENT_TYPE, source, 53);
 	}
 
+	@Test
 	public void testPartitioningOfSingleQuotedStringWithDoubleQuote()
 	{
 		String source =
@@ -167,6 +177,7 @@ public class CSSSourcePartitionScannerTest extends AbstractPartitionTestCase
 		assertContentType(IDocument.DEFAULT_CONTENT_TYPE, source, 58);
 	}
 
+	@Test
 	public void testPartitioningOfDoubleQuotedString()
 	{
 		String source =
@@ -180,6 +191,7 @@ public class CSSSourcePartitionScannerTest extends AbstractPartitionTestCase
 		assertContentType(IDocument.DEFAULT_CONTENT_TYPE, source, 37);
 	}
 
+	@Test
 	public void testPartitioningOfEmptyDoubleQuotedString()
 	{
 		String source =
@@ -193,6 +205,7 @@ public class CSSSourcePartitionScannerTest extends AbstractPartitionTestCase
 		assertContentType(IDocument.DEFAULT_CONTENT_TYPE, source, 2);
 	}
 
+	@Test
 	public void testPartitioningOfDoubleQuotedStringWithEscape()
 	{
 		String source =
@@ -207,6 +220,7 @@ public class CSSSourcePartitionScannerTest extends AbstractPartitionTestCase
 		assertContentType(IDocument.DEFAULT_CONTENT_TYPE, source, 53);
 	}
 
+	@Test
 	public void testPartitioningOfDoubleQuotedStringWithSingleQuote()
 	{
 		String source =
@@ -221,6 +235,7 @@ public class CSSSourcePartitionScannerTest extends AbstractPartitionTestCase
 		assertContentType(IDocument.DEFAULT_CONTENT_TYPE, source, 58);
 	}
 
+	@Test
 	public void testPartitioningOfAllPartitions()
 	{
 		String source =

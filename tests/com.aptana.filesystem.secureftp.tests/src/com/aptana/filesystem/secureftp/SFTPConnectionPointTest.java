@@ -8,6 +8,8 @@
 
 package com.aptana.filesystem.secureftp;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.IPath;
@@ -22,7 +24,7 @@ import com.aptana.filesystem.ftp.IFTPConstants;
  *
  */
 @SuppressWarnings("nls")
-public class SFTPConnectionPointTest extends TestCase {
+public class SFTPConnectionPointTest {
 
 	private static final String name = "My SFTP Site";
 	private static final String host = "127.0.0.1";
@@ -36,22 +38,26 @@ public class SFTPConnectionPointTest extends TestCase {
 	private static final String transferType = IFTPConstants.TRANSFER_TYPE_BINARY;
 
 
+	@Test
 	public void testPersistance() {
 		createAndTestConnectionPoint(name, host, port, login, password, path, encoding, compression, keyFilePath, transferType);
 	}
 	
+	@Test
 	public void testCompression() {
 		createAndTestConnectionPoint(name, host, port, login, password, path, encoding, ISFTPConstants.COMPRESSION_AUTO, keyFilePath, transferType);
 		createAndTestConnectionPoint(name, host, port, login, password, path, encoding, ISFTPConstants.COMPRESSION_NONE, keyFilePath, transferType);
 		createAndTestConnectionPoint(name, host, port, login, password, path, encoding, ISFTPConstants.COMPRESSION_ZLIB, keyFilePath, transferType);
 	}
 	
+	@Test
 	public void testTransferTypes() {
 		createAndTestConnectionPoint(name, host, port, login, password, path, encoding, compression, keyFilePath, IFTPConstants.TRANSFER_TYPE_ASCII);
 		createAndTestConnectionPoint(name, host, port, login, password, path, encoding, compression, keyFilePath, IFTPConstants.TRANSFER_TYPE_BINARY);
 		createAndTestConnectionPoint(name, host, port, login, password, path, encoding, compression, keyFilePath, IFTPConstants.TRANSFER_TYPE_AUTO);
 	}
 
+	@Test
 	public void testKeyFilePath() {
 		createAndTestConnectionPoint(name, host, port, login, password, path, encoding, compression, null, transferType);
 		createAndTestConnectionPoint(name, host, port, login, password, path, encoding, compression, Path.fromPortableString("/home/user/id_rsa"), transferType);

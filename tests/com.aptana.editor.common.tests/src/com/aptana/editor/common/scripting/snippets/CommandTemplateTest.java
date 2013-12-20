@@ -7,13 +7,16 @@
  */
 package com.aptana.editor.common.scripting.snippets;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
 import com.aptana.scripting.model.CommandElement;
 
-public class CommandTemplateTest extends TestCase
+public class CommandTemplateTest
 {
 
+	@Test
 	public void testMatchesPrefixWhenExactlyTheSame()
 	{
 		assertTrue(matches("j.u", "j.u"));
@@ -22,36 +25,43 @@ public class CommandTemplateTest extends TestCase
 	/**
 	 * Test that we keep chopping down the prefix at whitespaces and non-letter/digits from beginning until we match.
 	 */
+	@Test
 	public void testMatchesPartialPrefixes()
 	{
 		assertTrue(matches("j.u", "u"));
 	}
 
+	@Test
 	public void testMatchesWhenTriggerStartsWithPrefix()
 	{
 		assertTrue(matches("echo", "echoh"));
 	}
 
+	@Test
 	public void testMatchesWhenTriggerStartsWithPrefixSegment()
 	{
 		assertTrue(matches("<div>echo", "echoh"));
 	}
 
+	@Test
 	public void testMatchesWithCaseDifferences()
 	{
 		assertTrue(matches("EcHo", "echo"));
 	}
 
+	@Test
 	public void testMatchesWithCaseDifferencesAndTriggerStartsWithPrefix()
 	{
 		assertTrue(matches("EcHo", "echoh"));
 	}
 
+	@Test
 	public void testMatchesWithPrefixTriggerParen()
 	{
 		assertTrue(matches(")echo", "echo"));
 	}
 
+	@Test
 	public void testMatchesWithPrefixTriggerBracketColon()
 	{
 		assertTrue(matches("[:echo", "echo"));

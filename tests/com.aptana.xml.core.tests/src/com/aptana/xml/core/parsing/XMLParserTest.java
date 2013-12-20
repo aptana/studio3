@@ -7,6 +7,10 @@
  */
 package com.aptana.xml.core.parsing;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
 import com.aptana.parsing.ParseState;
@@ -17,19 +21,21 @@ import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.xml.core.parsing.ast.XMLElementNode;
 import com.aptana.xml.core.parsing.ast.XMLNodeType;
 
-public class XMLParserTest extends TestCase
+public class XMLParserTest
 {
 
 	private XMLParser fParser;
 
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 
 		fParser = new XMLParser();
 	}
 
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		try
 		{
@@ -37,10 +43,11 @@ public class XMLParserTest extends TestCase
 		}
 		finally
 		{
-			super.tearDown();
+//			super.tearDown();
 		}
 	}
 
+	@Test
 	public void testSelfClosing() throws Exception
 	{
 		String source = "<html/>\n";
@@ -50,6 +57,7 @@ public class XMLParserTest extends TestCase
 		assertElement(0, 6, "html", 0, 6, html);
 	}
 
+	@Test
 	public void testAttributes() throws Exception
 	{
 		String source = "<html class=\"myClass\" id=\"myId\"/>\n";
@@ -73,6 +81,7 @@ public class XMLParserTest extends TestCase
 		assertEquals("nameEnd", nameEnd, nameNode.getNameRange().getEndingOffset());
 	}
 
+	@Test
 	public void testTags() throws Exception
 	{
 		String source = "<html><head></head><body><p>Text</p></html>\n";
@@ -89,6 +98,7 @@ public class XMLParserTest extends TestCase
 		assertElement(19, 42, "body", 19, 24, body);
 	}
 
+	@Test
 	public void testBlah() throws Exception
 	{
 		// @formatter:off
@@ -114,6 +124,7 @@ public class XMLParserTest extends TestCase
 		assertElement(65, 81, "from", 65, 70, from);
 	}
 
+	@Test
 	public void testComment() throws Exception
 	{
 		String source = "<!-- this is a comment -->";
@@ -131,6 +142,7 @@ public class XMLParserTest extends TestCase
 		assertEquals(source, comments[0].getText());
 	}
 
+	@Test
 	public void testCDATA() throws Exception
 	{
 		String source = "<![CDATA[<author>Appcelerator</author>]]>";

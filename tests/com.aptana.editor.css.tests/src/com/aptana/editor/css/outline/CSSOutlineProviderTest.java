@@ -7,6 +7,10 @@
  */
 package com.aptana.editor.css.outline;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
 import com.aptana.css.core.parsing.CSSParser;
@@ -16,7 +20,7 @@ import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.parsing.CSSScanner;
 import com.aptana.parsing.ast.IParseNode;
 
-public class CSSOutlineProviderTest extends TestCase
+public class CSSOutlineProviderTest
 {
 
 	private CSSOutlineLabelProvider fLabelProvider;
@@ -25,8 +29,9 @@ public class CSSOutlineProviderTest extends TestCase
 	private CSSParser fParser;
 	private CSSScanner fScanner;
 
-	@Override
-	protected void setUp() throws Exception
+//	@Override
+	@Before
+	public void setUp() throws Exception
 	{
 		fLabelProvider = new CSSOutlineLabelProvider();
 		fContentProvider = new CSSOutlineContentProvider();
@@ -34,8 +39,9 @@ public class CSSOutlineProviderTest extends TestCase
 		fScanner = new CSSScanner();
 	}
 
-	@Override
-	protected void tearDown() throws Exception
+//	@Override
+	@After
+	public void tearDown() throws Exception
 	{
 		fLabelProvider = null;
 		fContentProvider = null;
@@ -43,6 +49,7 @@ public class CSSOutlineProviderTest extends TestCase
 		fScanner = null;
 	}
 
+	@Test
 	public void testMultipleSelectors() throws Exception
 	{
 		String source = "textarea.JScript, textarea.HTML {height:10em;}";
@@ -66,6 +73,7 @@ public class CSSOutlineProviderTest extends TestCase
 		assertEquals(rule.getDeclarations()[0], getNode(declarations[0]));
 	}
 
+	@Test
 	public void testElementAt() throws Exception
 	{
 		String source = "textarea.JScript, textarea.HTML {height:10em;}";
@@ -81,6 +89,7 @@ public class CSSOutlineProviderTest extends TestCase
 				getNode(CSSOutlineContentProvider.getElementAt(result, source.length() - 1)));
 	}
 
+	@Test
 	public void testAtCharsetRule() throws Exception
 	{
 		String source = "@charset \"utf-8\";";

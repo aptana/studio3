@@ -7,6 +7,9 @@
  */
 package com.aptana.editor.common.parsing;
 
+import org.junit.runners.Suite.SuiteClasses;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
@@ -15,25 +18,27 @@ import junit.framework.TestSuite;
 /**
  * AllCompositeParserTests
  */
-public class AllCompositeParserTests extends TestCase
+@RunWith(Suite.class)
+@SuiteClasses({CompositeParserTests.class, OldCompositeParserTests.class, })
+public class AllCompositeParserTests
 {
 
-	public static Test suite()
-	{
-		TestSuite suite = new TestSuite(AllCompositeParserTests.class.getName())
-		{
-			@Override
-			public void runTest(Test test, TestResult result)
-			{
-				System.err.println("Running test: " + test.toString());
-				super.runTest(test, result);
-			}
-		};
-		// $JUnit-BEGIN$
-		suite.addTestSuite(CompositeParserTests.class);
-		suite.addTestSuite(OldCompositeParserTests.class);
-		// $JUnit-END$
-		return suite;
-	}
-
+//	public static Test suite()
+//	{
+//		TestSuite suite = new TestSuite(AllCompositeParserTests.class.getName())
+//		{
+//			@Override
+//			public void runTest(Test test, TestResult result)
+//			{
+//				System.err.println("Running test: " + test.toString());
+//				super.runTest(test, result);
+//			}
+//		};
+//		// $JUnit-BEGIN$
+//		suite.addTestSuite(CompositeParserTests.class);
+//		suite.addTestSuite(OldCompositeParserTests.class);
+//		// $JUnit-END$
+//		return suite;
+//	}
+//
 }

@@ -1,5 +1,9 @@
 package com.aptana.git.ui.internal;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
 import org.eclipse.core.resources.IProject;
@@ -11,7 +15,7 @@ import org.jmock.lib.legacy.ClassImposteriser;
 
 import com.aptana.git.core.model.GitRepository;
 
-public class GitLightweightDecoratorTest extends TestCase
+public class GitLightweightDecoratorTest
 {
 
 	private Mockery context;
@@ -19,9 +23,10 @@ public class GitLightweightDecoratorTest extends TestCase
 	private IProject project;
 	private IDecoration decoration;
 
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 		context = new Mockery()
 		{
 			{
@@ -33,7 +38,8 @@ public class GitLightweightDecoratorTest extends TestCase
 		decoration = context.mock(IDecoration.class);
 	}
 
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		try
 		{
@@ -44,10 +50,11 @@ public class GitLightweightDecoratorTest extends TestCase
 		}
 		finally
 		{
-			super.tearDown();
+//			super.tearDown();
 		}
 	}
 
+	@Test
 	public void testAPSTUD3496() throws Exception
 	{
 		context.checking(new Expectations()

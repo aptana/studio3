@@ -7,6 +7,8 @@
  */
 package com.aptana.scope;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -14,11 +16,12 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-public class ScopeSelectorTests extends TestCase
+public class ScopeSelectorTests
 {
 	/**
 	 * testParseSimpleName
 	 */
+	@Test
 	public void testParseSimpleName()
 	{
 		String scope = "source.ruby";
@@ -38,6 +41,7 @@ public class ScopeSelectorTests extends TestCase
 	/**
 	 * testParseSimpleAndSelector
 	 */
+	@Test
 	public void testParseSimpleAndSelector()
 	{
 		String scope = "text.html source.ruby";
@@ -62,6 +66,7 @@ public class ScopeSelectorTests extends TestCase
 	/**
 	 * testParseSimpleOrSelector
 	 */
+	@Test
 	public void testParseSimpleOrSelector()
 	{
 		String scope = "text.html, source.ruby";
@@ -86,6 +91,7 @@ public class ScopeSelectorTests extends TestCase
 	/**
 	 * testParseMultiAndSelector
 	 */
+	@Test
 	public void testParseMultiAndSelector()
 	{
 		String scope = "text.html source.ruby string.ruby";
@@ -110,6 +116,7 @@ public class ScopeSelectorTests extends TestCase
 	/**
 	 * testParseMultiOrSelector
 	 */
+	@Test
 	public void testParseMultiOrSelector()
 	{
 		String scope = "text.html, source.ruby, string.ruby";
@@ -134,6 +141,7 @@ public class ScopeSelectorTests extends TestCase
 	/**
 	 * testParseMultiMixedSelector
 	 */
+	@Test
 	public void testParseMultiMixedSelector()
 	{
 		String scope = "text.html source.ruby, text.erb source.ruby, source.ruby string.ruby";
@@ -172,6 +180,7 @@ public class ScopeSelectorTests extends TestCase
 	// background to blue for string.quoted and another theme item sets the foreground to white,
 	// again for string.quoted, the result would be that the foreground was taken from the latter
 	// item and background from the former.
+	@Test
 	public void testBestMatch()
 	{
 		ScopeSelector entity = new ScopeSelector("entity");
@@ -183,6 +192,7 @@ public class ScopeSelectorTests extends TestCase
 				"text.html.markdown meta.disable-markdown meta.tag.block.any.html entity.name.tag.block.any.html"));
 	}
 
+	@Test
 	public void testMatchResults()
 	{
 		ScopeSelector entity = new ScopeSelector("entity");
@@ -197,6 +207,7 @@ public class ScopeSelectorTests extends TestCase
 		assertEquals(Arrays.asList(0, 0, 8, 6), metaTagEntity.getMatchResults());
 	}
 
+	@Test
 	public void testBestMatchExample()
 	{
 		ScopeSelector string = new ScopeSelector(
@@ -215,6 +226,7 @@ public class ScopeSelectorTests extends TestCase
 				"text.html.markdown meta.disable-markdown meta.tag.block.any.html string.quoted.double.html"));
 	}
 
+	@Test
 	public void testBestMatchDeepestElementWins()
 	{
 		ScopeSelector string = new ScopeSelector("string");
@@ -225,6 +237,7 @@ public class ScopeSelectorTests extends TestCase
 		assertEquals(string, ScopeSelector.bestMatch(selectors, "source.php string.quoted"));
 	}
 
+	@Test
 	public void testMatchResultsDeepestElementWins()
 	{
 		ScopeSelector string = new ScopeSelector("string");
@@ -239,6 +252,7 @@ public class ScopeSelectorTests extends TestCase
 		assertEquals(Arrays.asList(10, 0), source.getMatchResults());
 	}
 
+	@Test
 	public void testBestMatchLengthOfDeepestElementWins()
 	{
 		ScopeSelector string = new ScopeSelector("string");
@@ -249,6 +263,7 @@ public class ScopeSelectorTests extends TestCase
 		assertEquals(quoted, ScopeSelector.bestMatch(selectors, "source.php string.quoted"));
 	}
 
+	@Test
 	public void test2357()
 	{
 		ScopeSelector jsStorage = new ScopeSelector(
@@ -273,6 +288,7 @@ public class ScopeSelectorTests extends TestCase
 	/**
 	 * Test that ensures we move up the scope chain when deepest level match is of same length.
 	 */
+	@Test
 	public void testBestMatchAdvanced()
 	{
 		ScopeSelector metaTagBlockEntity = new ScopeSelector("meta.tag.block entity");
@@ -285,6 +301,7 @@ public class ScopeSelectorTests extends TestCase
 				"text.html.markdown meta.disable-markdown meta.tag.block.any.html entity.name.tag.block.any.html"));
 	}
 
+	@Test
 	public void testAPSTUD2790()
 	{
 		IScopeSelector entityName = new ScopeSelector("entity.name.tag");
@@ -302,6 +319,7 @@ public class ScopeSelectorTests extends TestCase
 		assertEquals(doctype, ScopeSelector.bestMatch(Arrays.asList(entityName, doctype), scope));
 	}
 
+	@Test
 	public void testMatchWhenScopeHasSegmentsBetweenScopeSelectorSegments()
 	{
 		ScopeSelector textSourceSelector = new ScopeSelector("text source");
@@ -313,6 +331,7 @@ public class ScopeSelectorTests extends TestCase
 				textSourceSelector.matches("text.haml meta.line.ruby.haml source.ruby.embedded.haml"));
 	}
 
+	@Test
 	public void testBestMatchWhenScopeHasSegmentsBetweenScopeSelectorSegments()
 	{
 		String scope = "text.haml meta.line.ruby.haml source.ruby.embedded.haml";
@@ -330,6 +349,7 @@ public class ScopeSelectorTests extends TestCase
 				ScopeSelector.bestMatch(Arrays.asList(textSourceSelector, metaSourceSelector), scope));
 	}
 
+	@Test
 	public void testNegativeLookaheadAppliesAsANDToTrailingScopes()
 	{
 		String scope = "text.haml";
@@ -357,6 +377,7 @@ public class ScopeSelectorTests extends TestCase
 						Arrays.asList(textMinusMetaSourceSelector, textSourceSelector, textMinusMetaSelector), scope));
 	}
 
+	@Test
 	public void testAdvancedScenario()
 	{
 		String scope = "text.haml meta.line.ruby.haml source.ruby.embedded.haml comment.line.number-sign.ruby";
@@ -392,6 +413,7 @@ public class ScopeSelectorTests extends TestCase
 				metaSourceSelector, textMinusMetaSelector, textMinusMetaSourceSelector), scope2));
 	}
 
+	@Test
 	public void testSortAfterMatching()
 	{
 		String scope = "text.haml meta.line.ruby.haml source.ruby.embedded.haml";
@@ -431,6 +453,7 @@ public class ScopeSelectorTests extends TestCase
 		assertEquals(sourceRubySelector, matches.get(3));
 	}
 
+	@Test
 	public void testNegativeOr()
 	{
 		IScopeSelector textSourceSelector = new ScopeSelector("text.html - (source | string)");
