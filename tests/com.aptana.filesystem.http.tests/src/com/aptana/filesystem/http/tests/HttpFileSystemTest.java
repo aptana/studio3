@@ -7,17 +7,19 @@
  */
 package com.aptana.filesystem.http.tests;
 
+import static org.junit.Assert.assertNotNull;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.filesystem.IFileStore;
+import org.junit.Test;
 
 import com.aptana.filesystem.http.HttpFileSystem;
 
-public class HttpFileSystemTest extends TestCase
+public class HttpFileSystemTest
 {
+	@Test
 	public void testHttpFileSystem() throws URISyntaxException
 	{
 		HttpFileSystem fs = new HttpFileSystem();

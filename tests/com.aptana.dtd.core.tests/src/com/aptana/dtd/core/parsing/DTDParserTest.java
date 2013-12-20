@@ -7,9 +7,15 @@
  */
 package com.aptana.dtd.core.parsing;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+
 import beaver.Parser.Exception;
 
 import com.aptana.dtd.core.parsing.ast.DTDAndExpressionNode;
@@ -31,11 +37,9 @@ import com.aptana.dtd.core.parsing.ast.DTDTypeNode;
 import com.aptana.dtd.core.parsing.ast.DTDZeroOrMoreNode;
 import com.aptana.parsing.ast.IParseNode;
 
-public class DTDParserTest extends TestCase
+public class DTDParserTest
 {
-	/**
-	 * testEmptyElement
-	 */
+	@Test
 	public void testEmptyElement()
 	{
 		String source = "<!ELEMENT svg EMPTY>";
@@ -47,9 +51,7 @@ public class DTDParserTest extends TestCase
 		assertEquals("svg", elementDecl.getName());
 	}
 
-	/**
-	 * testAnyElement
-	 */
+	@Test
 	public void testAnyElement()
 	{
 		String source = "<!ELEMENT svg ANY>";
@@ -61,9 +63,7 @@ public class DTDParserTest extends TestCase
 		assertEquals("svg", elementDecl.getName());
 	}
 
-	/**
-	 * testPCDataElement
-	 */
+	@Test
 	public void testPCDataElement()
 	{
 		String source = "<!ELEMENT svg (#PCDATA)>";
@@ -75,9 +75,7 @@ public class DTDParserTest extends TestCase
 		assertEquals("svg", elementDecl.getName());
 	}
 
-	/**
-	 * testZeroOrMorePCDataElement
-	 */
+	@Test
 	public void testZeroOrMorePCDataElement()
 	{
 		String source = "<!ELEMENT svg (#PCDATA)*>";
@@ -90,9 +88,7 @@ public class DTDParserTest extends TestCase
 		assertEquals("svg", elementDecl.getName());
 	}
 
-	/**
-	 * testZeroOrMorePCDataAndNamesElement
-	 */
+	@Test
 	public void testZeroOrMorePCDataAndNamesElement()
 	{
 		String source = "<!ELEMENT svg (#PCDATA | circle)*>";
@@ -113,9 +109,7 @@ public class DTDParserTest extends TestCase
 		assertEquals("circle", ((DTDElementNode) element).getName());
 	}
 
-	/**
-	 * testSingleChild
-	 */
+	@Test
 	public void testSingleChild()
 	{
 		String source = "<!ELEMENT svg (circle)>";
@@ -132,9 +126,7 @@ public class DTDParserTest extends TestCase
 		assertEquals("circle", ((DTDElementNode) element).getName());
 	}
 
-	/**
-	 * testZeroOrMoreSingleChild
-	 */
+	@Test
 	public void testZeroOrMoreSingleChild()
 	{
 		String source = "<!ELEMENT svg (circle)*>";
@@ -155,9 +147,7 @@ public class DTDParserTest extends TestCase
 		assertEquals("circle", ((DTDElementNode) element).getName());
 	}
 
-	/**
-	 * testOneOrMoreSingleChild
-	 */
+	@Test
 	public void testOneOrMoreSingleChild()
 	{
 		String source = "<!ELEMENT svg (circle)+>";
@@ -178,9 +168,7 @@ public class DTDParserTest extends TestCase
 		assertEquals("circle", ((DTDElementNode) element).getName());
 	}
 
-	/**
-	 * testOptionalSingleChild
-	 */
+	@Test
 	public void testOptionalSingleChild()
 	{
 		String source = "<!ELEMENT svg (circle)?>";
@@ -201,9 +189,7 @@ public class DTDParserTest extends TestCase
 		assertEquals("circle", ((DTDElementNode) element).getName());
 	}
 
-	/**
-	 * testOrExpression
-	 */
+	@Test
 	public void testOrExpression()
 	{
 		String source = "<!ELEMENT svg (circle | ellipse)>";
@@ -227,9 +213,7 @@ public class DTDParserTest extends TestCase
 		assertEquals("ellipse", ((DTDElementNode) ellipse).getName());
 	}
 
-	/**
-	 * testZeroOrMoreOrExpression
-	 */
+	@Test
 	public void testZeroOrMoreOrExpression()
 	{
 		String source = "<!ELEMENT svg (circle | ellipse)*>";
@@ -256,9 +240,7 @@ public class DTDParserTest extends TestCase
 		assertEquals("ellipse", ((DTDElementNode) ellipse).getName());
 	}
 
-	/**
-	 * testOneOrMoreOrExpression
-	 */
+	@Test
 	public void testOneOrMoreOrExpression()
 	{
 		String source = "<!ELEMENT svg (circle | ellipse)+>";
@@ -285,9 +267,7 @@ public class DTDParserTest extends TestCase
 		assertEquals("ellipse", ((DTDElementNode) ellipse).getName());
 	}
 
-	/**
-	 * testOptionalOrExpression
-	 */
+	@Test
 	public void testOptionalOrExpression()
 	{
 		String source = "<!ELEMENT svg (circle | ellipse)?>";
@@ -314,9 +294,7 @@ public class DTDParserTest extends TestCase
 		assertEquals("ellipse", ((DTDElementNode) ellipse).getName());
 	}
 
-	/**
-	 * testAndExpression
-	 */
+	@Test
 	public void testAndExpression()
 	{
 		String source = "<!ELEMENT svg (circle, ellipse)>";
@@ -340,9 +318,7 @@ public class DTDParserTest extends TestCase
 		assertEquals("ellipse", ((DTDElementNode) ellipse).getName());
 	}
 
-	/**
-	 * testZeroOrMoreAndExpression
-	 */
+	@Test
 	public void testZeroOrMoreAndExpression()
 	{
 		String source = "<!ELEMENT svg (circle, ellipse)*>";
@@ -369,9 +345,7 @@ public class DTDParserTest extends TestCase
 		assertEquals("ellipse", ((DTDElementNode) ellipse).getName());
 	}
 
-	/**
-	 * testOneOrMoreAndExpression
-	 */
+	@Test
 	public void testOneOrMoreAndExpression()
 	{
 		String source = "<!ELEMENT svg (circle, ellipse)+>";
@@ -398,9 +372,7 @@ public class DTDParserTest extends TestCase
 		assertEquals("ellipse", ((DTDElementNode) ellipse).getName());
 	}
 
-	/**
-	 * testOptionalAndExpression
-	 */
+	@Test
 	public void testOptionalAndExpression()
 	{
 		String source = "<!ELEMENT svg (circle, ellipse)?>";
@@ -427,9 +399,7 @@ public class DTDParserTest extends TestCase
 		assertEquals("ellipse", ((DTDElementNode) ellipse).getName());
 	}
 
-	/**
-	 * testNestedAndExpression
-	 */
+	@Test
 	public void testNestedAndExpression()
 	{
 		String source = "<!ELEMENT svg ((circle, ellipse), (rectangle, path))>";
@@ -439,9 +409,7 @@ public class DTDParserTest extends TestCase
 				DTDNodeType.ELEMENT);
 	}
 
-	/**
-	 * testNestedOrExpression
-	 */
+	@Test
 	public void testNestedOrExpression()
 	{
 		String source = "<!ELEMENT svg ((circle | ellipse) | (rectangle | path))>";
@@ -451,9 +419,7 @@ public class DTDParserTest extends TestCase
 				DTDNodeType.ELEMENT);
 	}
 
-	/**
-	 * testMixedExpression
-	 */
+	@Test
 	public void testMixedExpression()
 	{
 		String source = "<!ELEMENT svg ((circle | ellipse), (rectangle | path))>";
@@ -463,9 +429,7 @@ public class DTDParserTest extends TestCase
 				DTDNodeType.ELEMENT);
 	}
 
-	/**
-	 * testMixedExpression2
-	 */
+	@Test
 	public void testMixedExpression2()
 	{
 		String source = "<!ELEMENT svg ((circle, ellipse) | (rectangle, path))>";
@@ -475,9 +439,7 @@ public class DTDParserTest extends TestCase
 				DTDNodeType.ELEMENT);
 	}
 
-	/**
-	 * testEmptyAttList
-	 */
+	@Test
 	public void testEmptyAttList()
 	{
 		String source = "<!ATTLIST svg>";
@@ -488,9 +450,7 @@ public class DTDParserTest extends TestCase
 		assertEquals("svg", attListDecl.getName());
 	}
 
-	/**
-	 * testRequiredStringAttribute
-	 */
+	@Test
 	public void testRequiredStringAttribute()
 	{
 		String source = "<!ATTLIST svg name CDATA #REQUIRED>";
@@ -511,9 +471,7 @@ public class DTDParserTest extends TestCase
 		assertEquals("CDATA", ((DTDTypeNode) type).getType());
 	}
 
-	/**
-	 * testRequiredIDAttribute
-	 */
+	@Test
 	public void testRequiredIDAttribute()
 	{
 		String source = "<!ATTLIST svg name ID #REQUIRED>";
@@ -534,9 +492,7 @@ public class DTDParserTest extends TestCase
 		assertEquals("ID", ((DTDTypeNode) type).getType());
 	}
 
-	/**
-	 * testRequiredIDRefAttribute
-	 */
+	@Test
 	public void testRequiredIDRefAttribute()
 	{
 		String source = "<!ATTLIST svg name IDREF #REQUIRED>";
@@ -557,9 +513,7 @@ public class DTDParserTest extends TestCase
 		assertEquals("IDREF", ((DTDTypeNode) type).getType());
 	}
 
-	/**
-	 * testRequiredIDRefsAttribute
-	 */
+	@Test
 	public void testRequiredIDRefsAttribute()
 	{
 		String source = "<!ATTLIST svg name IDREFS #REQUIRED>";
@@ -580,9 +534,7 @@ public class DTDParserTest extends TestCase
 		assertEquals("IDREFS", ((DTDTypeNode) type).getType());
 	}
 
-	/**
-	 * testRequiredEntityAttribute
-	 */
+	@Test
 	public void testRequiredEntityAttribute()
 	{
 		String source = "<!ATTLIST svg name ENTITY #REQUIRED>";
@@ -603,9 +555,7 @@ public class DTDParserTest extends TestCase
 		assertEquals("ENTITY", ((DTDTypeNode) type).getType());
 	}
 
-	/**
-	 * testRequiredEntitiesAttribute
-	 */
+	@Test
 	public void testRequiredEntitiesAttribute()
 	{
 		String source = "<!ATTLIST svg name ENTITIES #REQUIRED>";
@@ -626,9 +576,7 @@ public class DTDParserTest extends TestCase
 		assertEquals("ENTITIES", ((DTDTypeNode) type).getType());
 	}
 
-	/**
-	 * testRequiredNMTokenAttribute
-	 */
+	@Test
 	public void testRequiredNMTokenAttribute()
 	{
 		String source = "<!ATTLIST svg name NMTOKEN #REQUIRED>";
@@ -649,9 +597,7 @@ public class DTDParserTest extends TestCase
 		assertEquals("NMTOKEN", ((DTDTypeNode) type).getType());
 	}
 
-	/**
-	 * testRequiredNMTokensAttribute
-	 */
+	@Test
 	public void testRequiredNMTokensAttribute()
 	{
 		String source = "<!ATTLIST svg name NMTOKENS #REQUIRED>";
@@ -672,9 +618,7 @@ public class DTDParserTest extends TestCase
 		assertEquals("NMTOKENS", ((DTDTypeNode) type).getType());
 	}
 
-	/**
-	 * testRequiredNotationAttribute
-	 */
+	@Test
 	public void testRequiredNotationAttribute()
 	{
 		String source = "<!ATTLIST svg name NOTATION(abc) #REQUIRED>";
@@ -694,9 +638,7 @@ public class DTDParserTest extends TestCase
 		assertTrue(type instanceof DTDNotationTypeNode);
 	}
 
-	/**
-	 * testRequiredEnumerationAttribute
-	 */
+	@Test
 	public void testRequiredEnumerationAttribute()
 	{
 		String source = "<!ATTLIST svg name (abc) #REQUIRED>";
@@ -716,9 +658,7 @@ public class DTDParserTest extends TestCase
 		assertTrue(type instanceof DTDEnumerationTypeNode);
 	}
 
-	/**
-	 * testRequiredEnumerationAttribute2
-	 */
+	@Test
 	public void testRequiredEnumerationAttribute2()
 	{
 		String source = "<!ATTLIST svg name (abc | def) #REQUIRED>";
@@ -738,9 +678,7 @@ public class DTDParserTest extends TestCase
 		assertTrue(type instanceof DTDEnumerationTypeNode);
 	}
 
-	/**
-	 * testRequiredEnumerationAttribute3
-	 */
+	@Test
 	public void testRequiredEnumerationAttribute3()
 	{
 		String source = "<!ATTLIST svg font-weight (bold | 100) #REQUIRED>";
@@ -760,9 +698,7 @@ public class DTDParserTest extends TestCase
 		assertTrue(type instanceof DTDEnumerationTypeNode);
 	}
 
-	/**
-	 * testImpliedStringAttribute
-	 */
+	@Test
 	public void testImpliedStringAttribute()
 	{
 		String source = "<!ATTLIST svg name CDATA #IMPLIED>";
@@ -783,9 +719,7 @@ public class DTDParserTest extends TestCase
 		assertEquals("CDATA", ((DTDTypeNode) type).getType());
 	}
 
-	/**
-	 * testStringAttribute
-	 */
+	@Test
 	public void testStringAttribute()
 	{
 		String source = "<!ATTLIST svg name CDATA \"default\">";
@@ -806,9 +740,7 @@ public class DTDParserTest extends TestCase
 		assertEquals("CDATA", ((DTDTypeNode) type).getType());
 	}
 
-	/**
-	 * testFixedStringAttribute
-	 */
+	@Test
 	public void testFixedStringAttribute()
 	{
 		String source = "<!ATTLIST svg name CDATA #FIXED \"default\">";
@@ -829,9 +761,7 @@ public class DTDParserTest extends TestCase
 		assertEquals("CDATA", ((DTDTypeNode) type).getType());
 	}
 
-	/**
-	 * testGeneralEntityString
-	 */
+	@Test
 	public void testGeneralEntityString()
 	{
 		String source = "<!ENTITY test \"hello\">";
@@ -844,9 +774,7 @@ public class DTDParserTest extends TestCase
 		// TODO: test value
 	}
 
-	/**
-	 * testGeneralEntitySystemString
-	 */
+	@Test
 	public void testGeneralEntitySystemString()
 	{
 		String source = "<!ENTITY test SYSTEM \"hello\">";
@@ -859,9 +787,7 @@ public class DTDParserTest extends TestCase
 		// TODO: test values
 	}
 
-	/**
-	 * testGeneralEntityExternalPublicString
-	 */
+	@Test
 	public void testGeneralEntityExternalPublicString()
 	{
 		String source = "<!ENTITY test PUBLIC \"hello\" \"world\">";
@@ -874,9 +800,7 @@ public class DTDParserTest extends TestCase
 		// TODO: test values
 	}
 
-	/**
-	 * testGeneralEntityExternalIDWithNDataDeclaration
-	 */
+	@Test
 	public void testGeneralEntityExternalIDWithNDataDeclaration()
 	{
 		String source = "<!ENTITY test SYSTEM \"hello\" NDATA world>";
@@ -889,9 +813,7 @@ public class DTDParserTest extends TestCase
 		// TODO: test values
 	}
 
-	/**
-	 * testParsedEntityString
-	 */
+	@Test
 	public void testParsedEntityString()
 	{
 		String source = "<!ENTITY % test \"hello\">";
@@ -904,9 +826,7 @@ public class DTDParserTest extends TestCase
 		// TODO: test value
 	}
 
-	/**
-	 * testParsedEntitySystemString
-	 */
+	@Test
 	public void testParsedEntitySystemString()
 	{
 		String source = "<!ENTITY % test SYSTEM \"hello\">";
@@ -919,9 +839,7 @@ public class DTDParserTest extends TestCase
 		// TODO: test values
 	}
 
-	/**
-	 * testParsedEntityPublicString
-	 */
+	@Test
 	public void testParsedEntityPublicString()
 	{
 		String source = "<!ENTITY % test PUBLIC \"hello\" \"world\">";
@@ -934,9 +852,7 @@ public class DTDParserTest extends TestCase
 		// TODO: test values
 	}
 
-	/**
-	 * testNotationDeclarationSystemString
-	 */
+	@Test
 	public void testNotationDeclarationSystemString()
 	{
 		String source = "<!NOTATION test SYSTEM \"hello\">";
@@ -949,9 +865,7 @@ public class DTDParserTest extends TestCase
 		// TODO: test value
 	}
 
-	/**
-	 * testNotationDeclarationPublicString
-	 */
+	@Test
 	public void testNotationDeclarationPublicString()
 	{
 		String source = "<!NOTATION test PUBLIC \"hello\" \"world\">";
@@ -964,9 +878,7 @@ public class DTDParserTest extends TestCase
 		// TODO: test value
 	}
 
-	/**
-	 * testNotationDeclarationPublicID
-	 */
+	@Test
 	public void testNotationDeclarationPublicID()
 	{
 		String source = "<!NOTATION test PUBLIC \"id\">";
@@ -979,9 +891,7 @@ public class DTDParserTest extends TestCase
 		// TODO: test value
 	}
 
-	/**
-	 * testProcessingInstruction
-	 */
+	@Test
 	public void testProcessingInstruction()
 	{
 		String source = "<?TEST this is a test?>";
@@ -992,9 +902,7 @@ public class DTDParserTest extends TestCase
 		assertEquals("TEST this is a test", pi.getText());
 	}
 
-	/**
-	 * testEmptyIncludeSection
-	 */
+	@Test
 	public void testEmptyIncludeSection()
 	{
 		String source = "<![INCLUDE[]]>";
@@ -1002,9 +910,7 @@ public class DTDParserTest extends TestCase
 		this.parse(source, DTDNodeType.INCLUDE_SECTION);
 	}
 
-	/**
-	 * testSimpleIncludeSection
-	 */
+	@Test
 	public void testSimpleIncludeSection()
 	{
 		String source = "<![INCLUDE[\n<!ELEMENT svg EMPTY>\n]]>";
@@ -1012,9 +918,7 @@ public class DTDParserTest extends TestCase
 		this.parse(source, DTDNodeType.INCLUDE_SECTION, DTDNodeType.ELEMENT_DECLARATION, DTDNodeType.EMPTY);
 	}
 
-	/**
-	 * testEmptyIgnoreSection
-	 */
+	@Test
 	public void testEmptyIgnoreSection()
 	{
 		String source = "<![IGNORE[]]>";
@@ -1022,9 +926,7 @@ public class DTDParserTest extends TestCase
 		this.parse(source, DTDNodeType.IGNORE_SECTION);
 	}
 
-	/**
-	 * testSimpleIgnoreSection
-	 */
+	@Test
 	public void testSimpleIgnoreSection()
 	{
 		String source = "<![IGNORE[\n<!ELEMENT svg EMPTY>\n]]>";
@@ -1032,9 +934,7 @@ public class DTDParserTest extends TestCase
 		this.parse(source, DTDNodeType.IGNORE_SECTION);
 	}
 
-	/**
-	 * testNestedIgnoreSectionAfter
-	 */
+	@Test
 	public void testNestedIgnoreSectionAfter()
 	{
 		String source = "<![IGNORE[\n<!ELEMENT svg EMPTY>\n<![IGNORE[]]>]]>";
@@ -1042,9 +942,7 @@ public class DTDParserTest extends TestCase
 		this.parse(source, DTDNodeType.IGNORE_SECTION);
 	}
 
-	/**
-	 * testNestedIgnoreSectionAfter
-	 */
+	@Test
 	public void testNestedIncludeSectionAfter()
 	{
 		String source = "<![IGNORE[\n<!ELEMENT svg EMPTY>\n<![INCLUDE[]]>]]>";
@@ -1052,9 +950,7 @@ public class DTDParserTest extends TestCase
 		this.parse(source, DTDNodeType.IGNORE_SECTION);
 	}
 
-	/**
-	 * testNestedIgnoreSectionBefore
-	 */
+	@Test
 	public void testNestedIgnoreSectionBefore()
 	{
 		String source = "<![IGNORE[<![IGNORE[]]>\n<!ELEMENT svg EMPTY>\n]]>";
@@ -1062,9 +958,7 @@ public class DTDParserTest extends TestCase
 		this.parse(source, DTDNodeType.IGNORE_SECTION);
 	}
 
-	/**
-	 * testNestedIgnoreSectionBefore
-	 */
+	@Test
 	public void testNestedIncludeSectionBefore()
 	{
 		String source = "<![IGNORE[<![INCLUDE[]]>\n<!ELEMENT svg EMPTY>\n]]>";
@@ -1072,9 +966,7 @@ public class DTDParserTest extends TestCase
 		this.parse(source, DTDNodeType.IGNORE_SECTION);
 	}
 
-	/**
-	 * testNestedIgnoreSectionBeforeAndAfter
-	 */
+	@Test
 	public void testNestedIgnoreSectionBeforeAndAfter()
 	{
 		String source = "<![IGNORE[<![IGNORE[]]>\n<!ELEMENT svg EMPTY>\n<![IGNORE[]]>]]>";
@@ -1082,9 +974,7 @@ public class DTDParserTest extends TestCase
 		this.parse(source, DTDNodeType.IGNORE_SECTION);
 	}
 
-	/**
-	 * testNestedIgnoreSectionBefore
-	 */
+	@Test
 	public void testNestedIncludeSectionBeforeAndAfter()
 	{
 		String source = "<![IGNORE[<![INCLUDE[]]>\n<!ELEMENT svg EMPTY>\n<![INCLUDE[]]>]]>";

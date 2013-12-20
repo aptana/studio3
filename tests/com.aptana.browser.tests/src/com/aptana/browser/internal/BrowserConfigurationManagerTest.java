@@ -7,30 +7,36 @@
  */
 package com.aptana.browser.internal;
 
-import org.eclipse.ui.plugin.AbstractUIPlugin;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-import junit.framework.TestCase;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.aptana.browser.BrowserPlugin;
 
-public class BrowserConfigurationManagerTest extends TestCase
+public class BrowserConfigurationManagerTest
 {
 
 	private BrowserConfigurationManager manager;
 
-	@Override
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
 		manager = BrowserPlugin.getDefault().getBrowserConfigurationManager();
 	}
 
-	@Override
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		manager.clear();
 		manager = null;
 	}
-
+	
+	@Test
 	public void testGetSizeCategories()
 	{
 		BrowserSizeCategory[] categories = manager.getSizeCategories();

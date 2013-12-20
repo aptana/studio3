@@ -1,19 +1,16 @@
 package com.aptana.dtd.core.parsing;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
 
-public class DTDCoreParsingTests extends TestCase
+@RunWith(Suite.class)
+//@formatter:off
+@SuiteClasses({
+	DTDParserTest.class
+})
+//@formatter:on
+public class DTDCoreParsingTests
 {
-
-	public static Test suite()
-	{
-		TestSuite suite = new TestSuite(DTDCoreParsingTests.class.getName());
-		// $JUnit-BEGIN$
-		suite.addTestSuite(DTDParserTest.class);
-		// $JUnit-END$
-		return suite;
-	}
 
 }
