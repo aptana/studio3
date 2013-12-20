@@ -7,30 +7,11 @@
  */
 package com.aptana.filesystem.http.tests;
 
-import junit.framework.Test;
-import junit.framework.TestResult;
-import junit.framework.TestSuite;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
-import org.kohsuke.junit.ParallelTestSuite;
-
+@RunWith(Suite.class)
+@Suite.SuiteClasses({ HttpFileSystemTest.class, HttpFileStoreTest.class })
 public class AllTests
 {
-
-	public static Test suite()
-	{
-		TestSuite suite = new ParallelTestSuite(AllTests.class.getName(), 2)
-		{
-			@Override
-			public void runTest(Test test, TestResult result)
-			{
-				System.err.println("Running test: " + test.toString());
-				super.runTest(test, result);
-			}
-		};
-		// $JUnit-BEGIN$
-		suite.addTestSuite(HttpFileSystemTest.class);
-		suite.addTestSuite(HttpFileStoreTest.class);
-		// $JUnit-END$
-		return suite;
-	}
 }

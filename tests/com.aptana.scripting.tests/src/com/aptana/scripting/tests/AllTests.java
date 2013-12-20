@@ -7,34 +7,22 @@
  */
 package com.aptana.scripting.tests;
 
-import junit.framework.Test;
-import junit.framework.TestResult;
-import junit.framework.TestSuite;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
 import com.aptana.scripting.BundleConverterTest;
 
+@RunWith(Suite.class)
+//@formatter:off
+@Suite.SuiteClasses({
+	com.aptana.scripting.model.AllTests.class,
+	com.aptana.scope.AllTests.class,
+	com.aptana.scope.parsing.AllScopeParsingTests.class,
+	BundleConverterTest.class,
+	UnicodeCharsJRubyTest.class
+})
+//@formatter:on
 public class AllTests
 {
-
-	public static Test suite()
-	{
-		TestSuite suite = new TestSuite(AllTests.class.getName())
-		{
-			@Override
-			public void runTest(Test test, TestResult result)
-			{
-				System.err.println("Running test: " + test.toString());
-				super.runTest(test, result);
-			}
-		};
-		// $JUnit-BEGIN$
-		suite.addTest(com.aptana.scripting.model.AllTests.suite());
-		suite.addTest(com.aptana.scope.AllTests.suite());
-		suite.addTest(com.aptana.scope.parsing.AllScopeParsingTests.suite());
-		suite.addTestSuite(BundleConverterTest.class);
-		suite.addTestSuite(UnicodeCharsJRubyTest.class);
-		// $JUnit-END$
-		return suite;
-	}
 
 }

@@ -6,13 +6,14 @@
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.deploy.ftp;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
@@ -20,6 +21,9 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.aptana.deploy.IDeployProvider;
 import com.aptana.deploy.util.DeployProviderUtil;
@@ -31,7 +35,7 @@ import com.aptana.ide.syncing.core.SiteConnectionUtils;
 import com.aptana.ide.syncing.core.SyncingPlugin;
 import com.aptana.ide.syncing.ui.internal.SyncUtils;
 
-public class FTPDeployProviderTest extends TestCase
+public class FTPDeployProviderTest
 {
 
 	private IProject testProject;
@@ -39,7 +43,7 @@ public class FTPDeployProviderTest extends TestCase
 	private IConnectionPoint destinationConnectionPoint;
 	private ISiteConnection siteConnection;
 
-	@Override
+	@Before
 	protected void setUp() throws Exception
 	{
 		testProject = createProject();
@@ -52,19 +56,18 @@ public class FTPDeployProviderTest extends TestCase
 				MessageFormat.format("{0} <-> {1}", testProject.getName(), destinationConnectionPoint.getName()),
 				sourceConnectionPoint, destinationConnectionPoint);
 		SyncingPlugin.getSiteConnectionManager().addSiteConnection(siteConnection);
-		super.setUp();
 	}
 
-	@Override
+	@After
 	protected void tearDown() throws Exception
 	{
 		SyncingPlugin.getSiteConnectionManager().removeSiteConnection(siteConnection);
 		CoreIOPlugin.getConnectionPointManager().removeConnectionPoint(sourceConnectionPoint);
 		CoreIOPlugin.getConnectionPointManager().removeConnectionPoint(destinationConnectionPoint);
 		deleteProject(testProject);
-		super.tearDown();
 	}
 
+	@Test
 	public void testHandleDeploy()
 	{
 		IDeployProvider provider = DeployProviderUtil.getDeployProvider(testProject);
