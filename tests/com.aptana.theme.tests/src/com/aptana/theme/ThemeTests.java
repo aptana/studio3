@@ -7,32 +7,21 @@
  */
 package com.aptana.theme;
 
-import junit.framework.Test;
-import junit.framework.TestResult;
-import junit.framework.TestSuite;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
 
+@RunWith(Suite.class)
+//@formatter:off
+@SuiteClasses({
+	ColorManagerTest.class,
+	TextmateImporterTest.class,
+	ThemeExporterTest.class,
+	ThemeManagerTest.class,
+	ThemeTest.class
+})
+//@formatter:on
 public class ThemeTests
 {
-
-	public static Test suite()
-	{
-		TestSuite suite = new TestSuite(ThemeTests.class.getName())
-		{
-			@Override
-			public void runTest(Test test, TestResult result)
-			{
-				System.err.println("Running test: " + test.toString());
-				super.runTest(test, result);
-			}
-		};
-		// $JUnit-BEGIN$
-		suite.addTestSuite(TextmateImporterTest.class);
-		suite.addTestSuite(ThemeExporterTest.class);
-		suite.addTestSuite(ThemeTest.class);
-		suite.addTestSuite(ColorManagerTest.class);
-		suite.addTestSuite(ThemeManagerTest.class);
-		// $JUnit-END$
-		return suite;
-	}
 
 }

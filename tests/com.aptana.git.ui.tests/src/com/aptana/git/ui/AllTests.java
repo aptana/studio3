@@ -7,36 +7,24 @@
  */
 package com.aptana.git.ui;
 
-import junit.framework.Test;
-import junit.framework.TestResult;
-import junit.framework.TestSuite;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
 
 import com.aptana.git.ui.dialogs.CreateBranchDialogTest;
 import com.aptana.git.ui.hyperlink.HyperlinkDetectorTest;
 import com.aptana.git.ui.internal.DiffFormatterTest;
 import com.aptana.git.ui.internal.GitLightweightDecoratorTest;
 
+@RunWith(Suite.class)
+//@formatter:off
+@SuiteClasses({
+	CreateBranchDialogTest.class,
+	DiffFormatterTest.class,
+	GitLightweightDecoratorTest.class,
+	HyperlinkDetectorTest.class
+})
+//@formatter:on
 public class AllTests
 {
-
-	public static Test suite()
-	{
-		TestSuite suite = new TestSuite(AllTests.class.getName())
-		{
-			@Override
-			public void runTest(Test test, TestResult result)
-			{
-				System.err.println("Running test: " + test.toString());
-				super.runTest(test, result);
-			}
-		};
-		// $JUnit-BEGIN$
-		suite.addTestSuite(CreateBranchDialogTest.class);
-		suite.addTestSuite(DiffFormatterTest.class);
-		suite.addTestSuite(GitLightweightDecoratorTest.class);
-		suite.addTestSuite(HyperlinkDetectorTest.class);
-		// $JUnit-END$
-		return suite;
-	}
-
 }
