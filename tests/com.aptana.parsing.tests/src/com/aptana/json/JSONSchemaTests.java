@@ -7,12 +7,12 @@
  */
 package com.aptana.json;
 
+import static org.junit.Assert.fail;
+
 import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URI;
 import java.net.URL;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.junit.Test;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ResourceUtil;
@@ -32,7 +33,7 @@ import com.aptana.parsing.ParsingPlugin;
  * JSONSchemaTests
  */
 @SuppressWarnings("nls")
-public class JSONSchemaTests extends TestCase
+public class JSONSchemaTests
 {
 	/**
 	 * getContent
@@ -119,6 +120,7 @@ public class JSONSchemaTests extends TestCase
 	/**
 	 * testBooleanSchema
 	 */
+	@Test
 	public void testBooleanSchema()
 	{
 		this.validate("boolean-schema.json");
@@ -127,6 +129,7 @@ public class JSONSchemaTests extends TestCase
 	/**
 	 * testNumberSchema
 	 */
+	@Test
 	public void testNumberSchema()
 	{
 		this.validate("number-schema.json");
@@ -135,6 +138,7 @@ public class JSONSchemaTests extends TestCase
 	/**
 	 * testNullSchema
 	 */
+	@Test
 	public void testNullSchema()
 	{
 		this.validate("null-schema.json");
@@ -143,6 +147,7 @@ public class JSONSchemaTests extends TestCase
 	/**
 	 * testStringSchema
 	 */
+	@Test
 	public void testStringSchema()
 	{
 		this.validate("string-schema.json");
@@ -151,6 +156,7 @@ public class JSONSchemaTests extends TestCase
 	/**
 	 * testSampleSchema
 	 */
+	@Test
 	public void testSampleSchema()
 	{
 		this.validate("sample-schema.json");

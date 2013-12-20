@@ -7,16 +7,20 @@
  */
 package com.aptana.parsing.tests;
 
-import com.aptana.parsing.ParseState;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+
+import com.aptana.parsing.ParseState;
 
 /**
  * @author Fabio
  */
-public class ParseStateTest extends TestCase
+public class ParseStateTest
 {
 
+	@Test
 	public void testParseState() throws Exception
 	{
 		ParseState parseState = new ParseState("test");

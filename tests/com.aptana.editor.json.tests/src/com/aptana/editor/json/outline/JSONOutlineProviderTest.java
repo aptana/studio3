@@ -7,7 +7,11 @@
  */
 package com.aptana.editor.json.outline;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.aptana.editor.json.JSONPlugin;
 import com.aptana.json.core.parsing.JSONParser;
@@ -15,29 +19,30 @@ import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ParseResult;
 import com.aptana.parsing.ParseState;
 
-public class JSONOutlineProviderTest extends TestCase
+public class JSONOutlineProviderTest
 {
 
 	private JSONOutlineContentProvider fContentProvider;
 	private JSONOutlineLabelProvider fLabelProvider;
 	private JSONParser fParser;
 
-	@Override
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
 		fContentProvider = new JSONOutlineContentProvider();
 		fLabelProvider = new JSONOutlineLabelProvider();
 		fParser = new JSONParser();
 	}
 
-	@Override
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		fContentProvider = null;
 		fLabelProvider = null;
 		fParser = null;
 	}
 
+	@Test
 	public void testOutline() throws Exception
 	{
 		String source = "{\n\"name\": \"Product\",\n\"properties\": {\n\"required\": true,\n\"width\": 1024,\n\"optional\": null,\n\"days\": [\"Sunday\", \"Saturday\"]\n}\n}";

@@ -7,22 +7,25 @@
  */
 package com.aptana.internal.index.core;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.junit.Test;
 
 import com.aptana.core.util.ResourceUtil;
 
 @SuppressWarnings("nls")
-public class DiskIndexTest extends TestCase
+public class DiskIndexTest
 {
 
+	@Test
 	public void testAPSTUD3393() throws Exception
 	{
 		URL url = FileLocator.find(Platform.getBundle("com.aptana.index.core.tests"),

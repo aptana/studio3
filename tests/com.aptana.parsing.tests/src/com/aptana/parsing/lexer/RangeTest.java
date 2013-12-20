@@ -1,20 +1,15 @@
 package com.aptana.parsing.lexer;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class RangeTest extends TestCase
+import org.junit.Test;
+
+public class RangeTest
 {
 
-	protected void setUp() throws Exception
-	{
-		super.setUp();
-	}
-
-	protected void tearDown() throws Exception
-	{
-		super.tearDown();
-	}
-
+	@Test
 	public void testContains() throws Exception
 	{
 		Range r = new Range(0);
@@ -31,6 +26,7 @@ public class RangeTest extends TestCase
 		assertFalse(r.contains(11));
 	}
 
+	@Test
 	public void testOffsets() throws Exception
 	{
 		Range r = new Range(0);
@@ -44,6 +40,7 @@ public class RangeTest extends TestCase
 		assertEquals(11, r.getLength());
 	}
 
+	@Test
 	public void testIsEmpty() throws Exception
 	{
 		Range r = new Range(0);

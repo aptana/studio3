@@ -1,5 +1,11 @@
 package com.aptana.index.core;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -7,39 +13,30 @@ import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.Set;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Test;
 
 @SuppressWarnings({ "nls", "deprecation" })
-public class IndexTest extends TestCase
+public class IndexTest
 {
 
 	private Index index;
 	private File indexDir;
 
-	protected void setUp() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
-		super.setUp();
-	}
+		if (indexDir != null)
+		{
+			indexDir.delete();
+			indexDir = null;
+		}
+		if (index != null)
+		{
+			getIndexManager().removeIndex(index.getRoot());
+			index = null;
+		}
 
-	protected void tearDown() throws Exception
-	{
-		try
-		{
-			if (indexDir != null)
-			{
-				indexDir.delete();
-				indexDir = null;
-			}
-			if (index != null)
-			{
-				getIndexManager().removeIndex(index.getRoot());
-				index = null;
-			}
-		}
-		finally
-		{
-			super.tearDown();
-		}
 	}
 
 	protected void createIndex(String name) throws IOException
@@ -64,6 +61,7 @@ public class IndexTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testMultiThreadedRemoveAndQuery() throws Exception
 	{
 		createIndex("multi_threaded");
@@ -137,6 +135,7 @@ public class IndexTest extends TestCase
 		assertFalse("Received a ConcurrentModificationException while accessing index", failures[0]);
 	}
 
+	@Test
 	public void testAddEntry() throws Exception
 	{
 		createIndex("add_entry");
@@ -164,6 +163,7 @@ public class IndexTest extends TestCase
 		assertEquals("relative_path.rb", docs.iterator().next());
 	}
 
+	@Test
 	public void testQueryDocumentNames() throws Exception
 	{
 		createIndex("query_doc_names");
@@ -194,6 +194,7 @@ public class IndexTest extends TestCase
 		assertTrue(docNames.contains("blah.rb"));
 	}
 
+	@Test
 	public void testRemove() throws Exception
 	{
 		// add an entry...
@@ -209,6 +210,7 @@ public class IndexTest extends TestCase
 		assertTrue(result.isEmpty());
 	}
 
+	@Test
 	public void testRemoveCategories() throws Exception
 	{
 		createIndex("remove_categories");
@@ -260,6 +262,7 @@ public class IndexTest extends TestCase
 		// categories/words/files?
 	}
 
+	@Test
 	public void testSave() throws Exception
 	{
 		// add an entry...

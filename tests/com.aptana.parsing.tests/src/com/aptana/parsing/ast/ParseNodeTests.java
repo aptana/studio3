@@ -7,10 +7,13 @@
  */
 package com.aptana.parsing.ast;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
+import org.junit.Test;
 
 @SuppressWarnings("nls")
-public class ParseNodeTests extends TestCase
+public class ParseNodeTests
 {
 	static class TextNode extends ParseNode
 	{
@@ -39,6 +42,7 @@ public class ParseNodeTests extends TestCase
 	/**
 	 * testFirstChild
 	 */
+	@Test
 	public void testFirstChild()
 	{
 		IParseNode a = new TextNode("A");
@@ -59,6 +63,7 @@ public class ParseNodeTests extends TestCase
 	/**
 	 * testLastChild
 	 */
+	@Test
 	public void testLastChild()
 	{
 		IParseNode a = new TextNode("A");
@@ -79,6 +84,7 @@ public class ParseNodeTests extends TestCase
 	/**
 	 * testParent
 	 */
+	@Test
 	public void testParent()
 	{
 		IParseNode a = new TextNode("A");
@@ -99,6 +105,7 @@ public class ParseNodeTests extends TestCase
 	/**
 	 * testFollowingSibling
 	 */
+	@Test
 	public void testFollowingSibling()
 	{
 		IParseNode a = new TextNode("A");
@@ -119,6 +126,7 @@ public class ParseNodeTests extends TestCase
 	/**
 	 * testPrecedingSibling
 	 */
+	@Test
 	public void testPrecedingSibling()
 	{
 		IParseNode a = new TextNode("A");
@@ -139,6 +147,7 @@ public class ParseNodeTests extends TestCase
 	/**
 	 * testFollowingNode
 	 */
+	@Test
 	public void testFollowingNode()
 	{
 		// create members
@@ -189,6 +198,7 @@ public class ParseNodeTests extends TestCase
 	/**
 	 * testPrecedingNode
 	 */
+	@Test
 	public void testPrecedingNode()
 	{
 		// create members

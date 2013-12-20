@@ -7,16 +7,18 @@
  */
 package com.aptana.sax;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.junit.Test;
 import org.osgi.framework.Bundle;
 import org.xml.sax.SAXException;
 
@@ -25,7 +27,7 @@ import com.aptana.parsing.ParsingPlugin;
 /**
  * XMLSchemaTests
  */
-public class XMLSchemaTests extends TestCase
+public class XMLSchemaTests
 {
 	/**
 	 * getBundle
@@ -122,6 +124,7 @@ public class XMLSchemaTests extends TestCase
 	 * @throws SAXException
 	 * @throws ParserConfigurationException
 	 */
+	@Test
 	public void testFollowSchema() throws Exception
 	{
 		loadTest("/xml-schema/StrictSchema.xml", "/xml-schema/follow-schema.xml");
@@ -134,6 +137,7 @@ public class XMLSchemaTests extends TestCase
 	 * @throws SAXException
 	 * @throws ParserConfigurationException
 	 */
+	@Test
 	public void testViolateSchema()
 	{
 		try
@@ -154,6 +158,7 @@ public class XMLSchemaTests extends TestCase
 	 * @throws SAXException
 	 * @throws ParserConfigurationException
 	 */
+	@Test
 	public void testFreeFormSchema() throws Exception
 	{
 		loadTest("/xml-schema/FreeFormNodeSchema.xml", "/xml-schema/freeform.xml");
@@ -166,6 +171,7 @@ public class XMLSchemaTests extends TestCase
 	 * @throws SAXException
 	 * @throws ParserConfigurationException
 	 */
+	@Test
 	public void testInvalidFreeform()
 	{
 		try
