@@ -1,15 +1,20 @@
 package com.aptana.core.tests;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.ILogListener;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.aptana.core.CorePlugin;
 import com.aptana.core.ICorePreferenceConstants;
@@ -19,35 +24,21 @@ import com.aptana.core.logging.IdeLog.StatusLevel;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 
-public class IdeLogTest extends TestCase
+public class IdeLogTest
 {
 	public static String LOG_MESSAGE = "IdeLogTest";
 	private LogListener listener;
 
-	/*
-	 * (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
-		// TODO Auto-generated method stub
-		super.setUp();
-
 		listener = new LogListener();
 		CorePlugin.getDefault().getLog().addLogListener(listener);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	@Override
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
-		// TODO Auto-generated method stub
-		super.tearDown();
-
 		if (listener != null)
 		{
 			CorePlugin.getDefault().getLog().removeLogListener(listener);
@@ -68,6 +59,7 @@ public class IdeLogTest extends TestCase
 	/**
 	 * Test to see if items are logged with correct severity
 	 */
+	@Test
 	public void testSeverityLogging()
 	{
 		boolean isDebugging = Platform.inDebugMode();
@@ -144,6 +136,7 @@ public class IdeLogTest extends TestCase
 	/**
 	 * Test to see if items are logged with correct severity
 	 */
+	@Test
 	public void testSeverityLoggingDebuggerOn()
 	{
 		// even if debugging is on, this should not affect messages with no scopes attached
@@ -218,6 +211,7 @@ public class IdeLogTest extends TestCase
 		EclipseUtil.setPlatformDebugging(isDebugging);
 	}
 
+	@Test
 	public void testScopesDebuggerOff()
 	{
 		// If debugging is off, we write out messages independent of scopes
@@ -251,6 +245,7 @@ public class IdeLogTest extends TestCase
 		EclipseUtil.setPlatformDebugging(isDebugging);
 	}
 
+	@Test
 	public void testScopesDebuggerOn()
 	{
 		// If debugging is on, we write out messages is the scope is null or there is a match
@@ -295,6 +290,7 @@ public class IdeLogTest extends TestCase
 		EclipseUtil.setPlatformDebugging(isDebugging);
 	}
 
+	@Test
 	public void testPreferenceChange()
 	{
 		IEclipsePreferences prefs = (EclipseUtil.instanceScope()).getNode(CorePlugin.PLUGIN_ID);

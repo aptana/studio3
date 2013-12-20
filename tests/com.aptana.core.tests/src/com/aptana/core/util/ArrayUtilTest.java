@@ -7,11 +7,14 @@
  */
 package com.aptana.core.util;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class ArrayUtilTest extends TestCase
+import org.junit.Test;
+
+public class ArrayUtilTest
 {
-
+	@Test
 	public void testFlatten() throws Exception
 	{
 		Integer[] array1 = { 0, 1, 2 };

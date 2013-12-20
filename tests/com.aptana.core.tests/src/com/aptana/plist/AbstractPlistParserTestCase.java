@@ -7,6 +7,11 @@
  */
 package com.aptana.plist;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -16,15 +21,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
+import org.junit.Test;
 
-import com.aptana.plist.PListParserFactory;
-
-public abstract class AbstractPlistParserTestCase extends TestCase
+public abstract class AbstractPlistParserTestCase
 {
 
 	protected File getFileInTestFragment(IPath path) throws URISyntaxException, IOException
@@ -35,6 +37,7 @@ public abstract class AbstractPlistParserTestCase extends TestCase
 	}
 
 	@SuppressWarnings("unchecked")
+	@Test
 	public void testParseExample() throws Exception
 	{
 		Map<String, Object> result = PListParserFactory.parse(getFileInTestFragment(getExampleFilePath()));

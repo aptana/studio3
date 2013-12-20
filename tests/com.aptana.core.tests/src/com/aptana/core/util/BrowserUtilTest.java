@@ -7,15 +7,18 @@
  */
 package com.aptana.core.util;
 
+import static org.junit.Assert.fail;
+
 import java.util.List;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import com.aptana.core.util.IBrowserUtil.BrowserInfo;
 
-public class BrowserUtilTest extends TestCase
+public class BrowserUtilTest
 {
 
+	@Test
 	public void testFindBrowser() throws Exception
 	{
 		List<BrowserInfo> browsers = BrowserUtil.discoverInstalledBrowsers();
@@ -36,6 +39,7 @@ public class BrowserUtilTest extends TestCase
 	 * Test that prints what's found in the current machine (used for debugging purposes as it may be hard to predict
 	 * the environment used to run the tests).
 	 */
+	@Test
 	public void testFindBrowserManual() throws Exception
 	{
 		List<BrowserInfo> browsers = BrowserUtil.discoverInstalledBrowsers();

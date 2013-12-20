@@ -1,5 +1,11 @@
 package com.aptana.git.core.model;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.FileWriter;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -10,6 +16,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.junit.Test;
 
 import com.aptana.core.IFilter;
 import com.aptana.core.IMap;
@@ -20,7 +27,7 @@ import com.aptana.git.core.model.ChangedFile.Status;
 
 public class GitIndexTest extends GitTestCase
 {
-
+	@Test
 	public void testStageFilesUpdatesStagedFlagsOnAffectedFiles() throws Exception
 	{
 		GitRepository repo = createRepo();
@@ -71,6 +78,7 @@ public class GitIndexTest extends GitTestCase
 				fileToStage.hasUnstagedChanges());
 	}
 
+	@Test
 	public void testUnstageFilesUpdatesStagedFlagsOnAffectedFiles() throws Exception
 	{
 		GitRepository repo = createRepo();
@@ -131,6 +139,7 @@ public class GitIndexTest extends GitTestCase
 				fileToStage.hasUnstagedChanges());
 	}
 
+	@Test
 	public void testBatchRefreshRepoWithNoCommitsAndNewUnstagedFile() throws Exception
 	{
 		GitRepository repo = createRepo();
@@ -146,6 +155,7 @@ public class GitIndexTest extends GitTestCase
 	}
 
 	// FIXME There seems to be no way to tell if an untracked file is staged or unstaged...?
+	// @Test
 	// public void testBatchRefreshRepoWithNoCommitsAndNewStagedFile() throws Exception
 	// {
 	// testBatchRefreshRepoWithNoCommitsAndNewUnstagedFile();
@@ -162,6 +172,7 @@ public class GitIndexTest extends GitTestCase
 	// assertContains(files, "somefile.txt", Status.NEW, true, false);
 	// }
 
+	@Test
 	public void testBatchRefreshRepoWithEveryStatus() throws Exception
 	{
 		GitRepository repo = createRepo();
@@ -245,6 +256,7 @@ public class GitIndexTest extends GitTestCase
 		assertContains(files, "file6.txt", Status.NEW, false, true);
 	}
 
+	@Test
 	public void testDiffRefreshRepoWithEveryStatus() throws Exception
 	{
 		GitRepository repo = createRepo();
@@ -358,6 +370,7 @@ public class GitIndexTest extends GitTestCase
 				status, hasStaged, hasUnstaged, StringUtil.join(", ", fileStrings)), CollectionsUtil.isEmpty(matching));
 	}
 
+	@Test
 	public void testDeadlock() throws Exception
 	{
 		final GitRepository repo = getRepo();

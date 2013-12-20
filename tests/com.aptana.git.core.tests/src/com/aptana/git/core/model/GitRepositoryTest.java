@@ -7,6 +7,14 @@
  */
 package com.aptana.git.core.model;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
@@ -25,6 +33,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.junit.Test;
 import org.osgi.framework.Version;
 
 import com.aptana.core.util.CollectionsUtil;
@@ -34,6 +43,7 @@ import com.aptana.core.util.IOUtil;
 public class GitRepositoryTest extends GitTestCase
 {
 
+	@Test
 	public void testCreate() throws Throwable
 	{
 		IPath path = repoToGenerate();
@@ -45,6 +55,7 @@ public class GitRepositoryTest extends GitTestCase
 		assertNotNull(repo);
 	}
 
+	@Test
 	public void testRepoRelativePath() throws Throwable
 	{
 		IProject project = null;
@@ -75,6 +86,7 @@ public class GitRepositoryTest extends GitTestCase
 		}
 	}
 
+	@Test
 	public void testAddFileStageUnstageAndCommit() throws Exception
 	{
 		GitRepository repo = createRepo();
@@ -112,6 +124,7 @@ public class GitRepositoryTest extends GitTestCase
 		assertCommit(index, "Initial commit");
 	}
 
+	@Test
 	public void testCommitMessageWithDoubleQuotes() throws Throwable
 	{
 		GitRepository repo = createRepo();
@@ -159,6 +172,7 @@ public class GitRepositoryTest extends GitTestCase
 		}
 	}
 
+	@Test
 	public void testMultipleLineCommitMessage() throws Throwable
 	{
 		GitRepository repo = createRepo();
@@ -210,6 +224,7 @@ public class GitRepositoryTest extends GitTestCase
 		}
 	}
 
+	@Test
 	public void testDeleteFile() throws Throwable
 	{
 		testAddFileStageUnstageAndCommit();
@@ -249,6 +264,7 @@ public class GitRepositoryTest extends GitTestCase
 	}
 
 	// Test modifying file that isn't new (already checked in)
+	@Test
 	public void testModifyCheckedInFile() throws Throwable
 	{
 		testAddFileStageUnstageAndCommit();
@@ -286,6 +302,7 @@ public class GitRepositoryTest extends GitTestCase
 		assertCommit(index, "Add second line");
 	}
 
+	@Test
 	public void testAddRemoveListeners() throws Throwable
 	{
 		final List<RepositoryEvent> eventsReceived = new ArrayList<RepositoryEvent>();
@@ -355,7 +372,7 @@ public class GitRepositoryTest extends GitTestCase
 	}
 
 	// TODO Test deleting folder
-
+	@Test
 	public void testAddBranch() throws Throwable
 	{
 		// Must be at least one file for us to be able to get branches and add them properly!
@@ -378,6 +395,7 @@ public class GitRepositoryTest extends GitTestCase
 		// TODO Add tests for creating tracking branches!
 	}
 
+	@Test
 	public void testDeleteBranch() throws Throwable
 	{
 		testAddBranch();
@@ -392,6 +410,7 @@ public class GitRepositoryTest extends GitTestCase
 		assertFalse(branches.contains("my_new_branch"));
 	}
 
+	@Test
 	public void testSwitchBranch() throws Throwable
 	{
 		testAddBranch();
@@ -401,6 +420,7 @@ public class GitRepositoryTest extends GitTestCase
 		assertSwitchBranch("master");
 	}
 
+	@Test
 	public void testSwitchBranchClosesOpenProjectsThatDontExistOnDestinationBranch() throws Throwable
 	{
 		testAddBranch();
@@ -452,6 +472,7 @@ public class GitRepositoryTest extends GitTestCase
 		assertFalse(dotProject.exists());
 	}
 
+	@Test
 	public void testDeleteUnMergedBranch() throws Throwable
 	{
 		testAddBranch();
@@ -497,6 +518,7 @@ public class GitRepositoryTest extends GitTestCase
 		// status.getMessage());
 	}
 
+	@Test
 	public void testRemoteURLs() throws Exception
 	{
 		GitRepository repo = createRepo();
@@ -512,6 +534,7 @@ public class GitRepositoryTest extends GitTestCase
 		assertTrue(urls.contains("git@github.com:aptana/bob.git"));
 	}
 
+	@Test
 	public void testMatchingRemoteBranchWithTrackedBranch() throws Exception
 	{
 		// Must be at least one file for us to be able to get branches and add them properly!
@@ -547,6 +570,7 @@ public class GitRepositoryTest extends GitTestCase
 				GitRef.refFromString(GitRef.REFS_REMOTES + "origin/master"), repo.matchingRemoteBranch("master"));
 	}
 
+	@Test
 	public void testMatchingRemoteBranchWithImplicitlyTrackedBranch() throws Exception
 	{
 		// Must be at least one file for us to be able to get branches and add them properly!
@@ -578,6 +602,7 @@ public class GitRepositoryTest extends GitTestCase
 				GitRef.refFromString(GitRef.REFS_REMOTES + "origin/master"), repo.matchingRemoteBranch("master"));
 	}
 
+	@Test
 	public void testFirePullEvent() throws Exception
 	{
 		GitRepository repo = createRepo();
@@ -596,6 +621,7 @@ public class GitRepositoryTest extends GitTestCase
 		assertSame(repo, pullEvents.get(0).getRepository());
 	}
 
+	@Test
 	public void testFirePushEvent() throws Exception
 	{
 		GitRepository repo = createRepo();
@@ -614,6 +640,7 @@ public class GitRepositoryTest extends GitTestCase
 		assertSame(repo, pushEvents.get(0).getRepository());
 	}
 
+	@Test
 	public void testDontBlockToAcquireLocks() throws Exception
 	{
 		// Force a write operation on repo, then while it is running, ask for a read operation
@@ -664,6 +691,7 @@ public class GitRepositoryTest extends GitTestCase
 		}
 	}
 
+	@Test
 	public void testRemoveRemote() throws Throwable
 	{
 		// Generate remotes
@@ -683,6 +711,7 @@ public class GitRepositoryTest extends GitTestCase
 		assertTrue(urls.contains("git@github.com:aptana/bob.git"));
 	}
 
+	@Test
 	public void testAddRemote() throws Throwable
 	{
 		// Generate remotes
@@ -705,6 +734,7 @@ public class GitRepositoryTest extends GitTestCase
 		return getRepo().workingDirectory() + File.separator + "file.txt";
 	}
 
+	@Test
 	public void testSSHGithubURL() throws Exception
 	{
 		GitRepository repo = new GitRepository(repoToGenerate().toFile().toURI())
@@ -719,6 +749,7 @@ public class GitRepositoryTest extends GitTestCase
 		assertEquals("appcelerator/titanium_studio", repo.getGithubRepoName());
 	}
 
+	@Test
 	public void testHTTPSGithubURL() throws Exception
 	{
 		GitRepository repo = new GitRepository(repoToGenerate().toFile().toURI())
@@ -733,6 +764,7 @@ public class GitRepositoryTest extends GitTestCase
 		assertEquals("appcelerator/titanium_studio", repo.getGithubRepoName());
 	}
 
+	@Test
 	public void testPeriodInRepoName() throws Exception
 	{
 		GitRepository repo = new GitRepository(repoToGenerate().toFile().toURI())
@@ -746,6 +778,7 @@ public class GitRepositoryTest extends GitTestCase
 		assertEquals("aptana/html.ruble", repo.getGithubRepoName());
 	}
 
+	@Test
 	public void testDeprecatedGitReadOnlyGithubURL() throws Exception
 	{
 		GitRepository repo = new GitRepository(repoToGenerate().toFile().toURI())
