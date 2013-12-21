@@ -113,7 +113,6 @@ public class JSONSchemaTransitionTests
 	 * 
 	 * @param state
 	 */
-	@Test
 	protected void testStates(IState state, StateInitializer initializer, EventResult... results)
 	{
 		for (EventResult result : results)
@@ -154,7 +153,6 @@ public class JSONSchemaTransitionTests
 	 * @param goodValue
 	 * @param badValue
 	 */
-	@Test
 	protected void testPrimitive(Class<? extends IState> stateClass, Object goodValue, Object badValue)
 	{
 		try

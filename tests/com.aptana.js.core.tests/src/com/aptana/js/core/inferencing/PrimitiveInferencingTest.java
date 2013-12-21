@@ -7,11 +7,14 @@
  */
 package com.aptana.js.core.inferencing;
 
+import org.junit.Test;
+
 public class PrimitiveInferencingTest extends InferencingTestsBase
 {
 	/**
 	 * testTrueVar
 	 */
+	@Test
 	public void testTrueVar()
 	{
 		this.varTypeTests("var trueVar = true;", "trueVar", "Boolean");
@@ -20,6 +23,7 @@ public class PrimitiveInferencingTest extends InferencingTestsBase
 	/**
 	 * testFalseVar
 	 */
+	@Test
 	public void testFalseVar()
 	{
 		this.varTypeTests("var falseVar = false;", "falseVar", "Boolean");
@@ -28,6 +32,7 @@ public class PrimitiveInferencingTest extends InferencingTestsBase
 	/**
 	 * testIntVar
 	 */
+	@Test
 	public void testIntVar()
 	{
 		this.varTypeTests("var intVar = 10;", "intVar", "Number");
@@ -36,6 +41,7 @@ public class PrimitiveInferencingTest extends InferencingTestsBase
 	/**
 	 * testHexVar
 	 */
+	@Test
 	public void testHexVar()
 	{
 		this.varTypeTests("var hexVar = 0x10;", "hexVar", "Number");
@@ -44,6 +50,7 @@ public class PrimitiveInferencingTest extends InferencingTestsBase
 	/**
 	 * testFloatVar
 	 */
+	@Test
 	public void testFloatVar()
 	{
 		this.varTypeTests("var floatVar = 10.01;", "floatVar", "Number");
@@ -52,6 +59,7 @@ public class PrimitiveInferencingTest extends InferencingTestsBase
 	/**
 	 * testArrayLiteralVar
 	 */
+	@Test
 	public void testArrayLiteralVar()
 	{
 		this.varTypeTests("var arrayLiteralVar = [];", "arrayLiteralVar", "Array");
@@ -60,6 +68,7 @@ public class PrimitiveInferencingTest extends InferencingTestsBase
 	/**
 	 * testObjectLiteralVar
 	 */
+	@Test
 	public void testObjectLiteralVar()
 	{
 		this.varTypeTests("var objectLiteralVar = {};", "objectLiteralVar", "Object");
@@ -68,6 +77,7 @@ public class PrimitiveInferencingTest extends InferencingTestsBase
 	/**
 	 * testRegExpLiteralVar
 	 */
+	@Test
 	public void testRegExpLiteralVar()
 	{
 		this.varTypeTests("var regExpLiteralVar = /abc/i;", "regExpLiteralVar", "RegExp");
@@ -76,6 +86,7 @@ public class PrimitiveInferencingTest extends InferencingTestsBase
 	/**
 	 * testFunctionLiteralVar
 	 */
+	@Test
 	public void testFunctionLiteralVar()
 	{
 		this.varTypeTests("var functionLiteralVar = function() {};", "functionLiteralVar", "Function");
@@ -84,6 +95,7 @@ public class PrimitiveInferencingTest extends InferencingTestsBase
 	/**
 	 * testSingleQuotedStringVar
 	 */
+	@Test
 	public void testSingleQuotedStringVar()
 	{
 		this.varTypeTests("var singleQuotedStringVar = 'abc';", "singleQuotedStringVar", "String");
@@ -92,6 +104,7 @@ public class PrimitiveInferencingTest extends InferencingTestsBase
 	/**
 	 * testDoubleQuotedStringVar
 	 */
+	@Test
 	public void testDoubleQuotedStringVar()
 	{
 		this.varTypeTests("var doubleQuotedStringVar = \"abc\";", "doubleQuotedStringVar", "String");

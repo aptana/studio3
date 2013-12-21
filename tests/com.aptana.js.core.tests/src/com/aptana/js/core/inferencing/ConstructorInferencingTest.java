@@ -7,11 +7,14 @@
  */
 package com.aptana.js.core.inferencing;
 
+import org.junit.Test;
+
 public class ConstructorInferencingTest extends InferencingTestsBase
 {
 	/**
 	 * testNewArray
 	 */
+	@Test
 	public void testNewArray()
 	{
 		String source = "var x = new Array(); x";
@@ -22,6 +25,7 @@ public class ConstructorInferencingTest extends InferencingTestsBase
 	/**
 	 * testNewBoolean
 	 */
+	@Test
 	public void testNewBoolean()
 	{
 		String source = "var x = new Boolean(); x";
@@ -32,6 +36,7 @@ public class ConstructorInferencingTest extends InferencingTestsBase
 	/**
 	 * testNewDate
 	 */
+	@Test
 	public void testNewDate()
 	{
 		String source = "var x = new Date(); x";
@@ -42,6 +47,7 @@ public class ConstructorInferencingTest extends InferencingTestsBase
 	/**
 	 * testNewFunction
 	 */
+	@Test
 	public void testNewFunction()
 	{
 		String source = "var x = new Function(); x";
@@ -52,6 +58,7 @@ public class ConstructorInferencingTest extends InferencingTestsBase
 	/**
 	 * testNewObject
 	 */
+	@Test
 	public void testNewObject()
 	{
 		String source = "var x = new Object(); x";
@@ -62,6 +69,7 @@ public class ConstructorInferencingTest extends InferencingTestsBase
 	/**
 	 * testNewNumber
 	 */
+	@Test
 	public void testNewNumber()
 	{
 		String source = "var x = new Number(); x";
@@ -72,6 +80,7 @@ public class ConstructorInferencingTest extends InferencingTestsBase
 	/**
 	 * testNewString
 	 */
+	@Test
 	public void testNewString()
 	{
 		String source = "var x = new String(); x";
@@ -82,6 +91,7 @@ public class ConstructorInferencingTest extends InferencingTestsBase
 	/**
 	 * testNewRegeExp
 	 */
+	@Test
 	public void testNewRegExp()
 	{
 		String source = "var x = new RegExp(); x";
