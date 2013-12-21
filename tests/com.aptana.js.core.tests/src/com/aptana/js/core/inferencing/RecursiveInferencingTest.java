@@ -8,12 +8,14 @@
 package com.aptana.js.core.inferencing;
 
 import org.eclipse.core.runtime.Path;
+import org.junit.Test;
 
 public class RecursiveInferencingTest extends InferencingTestsBase
 {
 	/**
 	 * testIdentifierCycle
 	 */
+	@Test
 	public void testIdentifierCycle()
 	{
 		this.varTypeTests("var a = b, b = a;", "a");
@@ -22,6 +24,7 @@ public class RecursiveInferencingTest extends InferencingTestsBase
 	/**
 	 * testIdentifierCycle2
 	 */
+	@Test
 	public void testIdentifierCycle2()
 	{
 		this.varTypeTests("var a = b, b = a;", "b");
@@ -30,6 +33,7 @@ public class RecursiveInferencingTest extends InferencingTestsBase
 	/**
 	 * testIdentifierCycle3
 	 */
+	@Test
 	public void testIdentifierCycle3()
 	{
 		this.varTypeTests("var a = b, b = c, c = a;", "a");
@@ -38,6 +42,7 @@ public class RecursiveInferencingTest extends InferencingTestsBase
 	/**
 	 * testIdentifierCycle4
 	 */
+	@Test
 	public void testIdentifierCycle4()
 	{
 		this.varTypeTests("var a = b, b = c, c = a;", "b");
@@ -46,6 +51,7 @@ public class RecursiveInferencingTest extends InferencingTestsBase
 	/**
 	 * testIdentifierCycle5
 	 */
+	@Test
 	public void testIdentifierCycle5()
 	{
 		this.varTypeTests("var a = b, b = c, c = a;", "c");
@@ -54,6 +60,7 @@ public class RecursiveInferencingTest extends InferencingTestsBase
 	/**
 	 * testInvocationCycle
 	 */
+	@Test
 	public void testInvocationCycle()
 	{
 		this.lastStatementTypeTests(Path.fromPortableString("inferencing/invocation-cycle-1.js"), "Function");
@@ -62,6 +69,7 @@ public class RecursiveInferencingTest extends InferencingTestsBase
 	/**
 	 * testInvocationCycle2
 	 */
+	@Test
 	public void testInvocationCycle2()
 	{
 		this.lastStatementTypeTests(Path.fromPortableString("inferencing/invocation-cycle-2.js"), "Number");
@@ -70,6 +78,7 @@ public class RecursiveInferencingTest extends InferencingTestsBase
 	/**
 	 * testInvocationCycle3
 	 */
+	@Test
 	public void testInvocationCycle3()
 	{
 		this.lastStatementTypeTests(Path.fromPortableString("inferencing/invocation-cycle-3.js"), "Number");
@@ -80,6 +89,7 @@ public class RecursiveInferencingTest extends InferencingTestsBase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testObjectPropertyReturnsSelf() throws Exception
 	{
 		this.lastStatementTypeTests(Path.fromPortableString("inferencing/chaining.js"), "Utils.create.utilsSelf");
@@ -88,6 +98,7 @@ public class RecursiveInferencingTest extends InferencingTestsBase
 	/*
 	 * APSTUD-4864 JS Type Inferencing fails to check local scope for variable type before checking globals
 	 */
+	@Test
 	public void testReturnSelfVarDefinedInLocalScopeBeforeConsultingGlobals() throws Exception
 	{
 		this.lastStatementTypeTests(Path.fromPortableString("inferencing/chaining-self.js"), "Utils.create.self");

@@ -10,6 +10,8 @@ package com.aptana.css.core.parsing;
 import java.util.List;
 import java.util.Random;
 
+import org.junit.Test;
+
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.ListCrossProduct;
 import com.aptana.core.util.StringUtil;
@@ -17,16 +19,19 @@ import com.aptana.core.util.StringUtil;
 public class CSSLiteralTest extends CSSTokensTest
 {
 
+	@Test
 	public void testDoubleQuotedString()
 	{
 		assertToken("\"this is a string\"", CSSTokenType.DOUBLE_QUOTED_STRING, 0, 18); //$NON-NLS-1$
 	}
 
+	@Test
 	public void testSingleQuotedString()
 	{
 		assertToken("'this is a string'", CSSTokenType.SINGLE_QUOTED_STRING, 0, 18); //$NON-NLS-1$
 	}
 
+	@Test
 	public void testNumber()
 	{
 		ListCrossProduct<String> crossProduct = new ListCrossProduct<String>();
@@ -44,6 +49,7 @@ public class CSSLiteralTest extends CSSTokensTest
 		}
 	}
 
+	@Test
 	public void testNumber2()
 	{
 		ListCrossProduct<String> crossProduct = new ListCrossProduct<String>();
@@ -70,6 +76,7 @@ public class CSSLiteralTest extends CSSTokensTest
 		}
 	}
 
+	@Test
 	public void testRGB()
 	{
 		ListCrossProduct<String> crossProduct = new ListCrossProduct<String>();
@@ -105,6 +112,7 @@ public class CSSLiteralTest extends CSSTokensTest
 	/*
 	 * NOTE: only test uppercase hex values; otherwise, this unit test will take a very long time
 	 */
+	@Test
 	public void testRGB2()
 	{
 		Random r = new Random();
@@ -159,11 +167,13 @@ public class CSSLiteralTest extends CSSTokensTest
 		// }
 	}
 
+	@Test
 	public void testClass()
 	{
 		assertToken(".class", CSSTokenType.CLASS, 0, 6); //$NON-NLS-1$
 	}
 
+	@Test
 	public void testClass2()
 	{
 		String source = "{.class}";
@@ -178,16 +188,19 @@ public class CSSLiteralTest extends CSSTokensTest
 		// @formatter:on
 	}
 
+	@Test
 	public void testClassWithDashes()
 	{
 		assertToken(".class-with-dashes", CSSTokenType.CLASS, 0, 18); //$NON-NLS-1$
 	}
 
+	@Test
 	public void testHash()
 	{
 		assertToken("#hash", CSSTokenType.ID, 0, 5); //$NON-NLS-1$
 	}
 
+	@Test
 	public void testHash2()
 	{
 		String source = "{#hash}";
@@ -202,31 +215,37 @@ public class CSSLiteralTest extends CSSTokensTest
 		// @formatter:on
 	}
 
+	@Test
 	public void testHashLikeRGB1()
 	{
 		assertToken("#a", CSSTokenType.ID, 0, 2); //$NON-NLS-1$
 	}
 
+	@Test
 	public void testHashLikeRGB2()
 	{
 		assertToken("#ab", CSSTokenType.ID, 0, 3); //$NON-NLS-1$
 	}
 
+	@Test
 	public void testHashLikeRGB3()
 	{
 		assertToken("#abcde", CSSTokenType.ID, 0, 6); //$NON-NLS-1$
 	}
 
+	@Test
 	public void testHashLikeRGB4()
 	{
 		assertToken("#abcdefa", CSSTokenType.ID, 0, 8); //$NON-NLS-1$
 	}
 
+	@Test
 	public void testHashLikeRGB5()
 	{
 		assertToken("#abcx", CSSTokenType.ID, 0, 5); //$NON-NLS-1$
 	}
 
+	@Test
 	public void testFunction()
 	{
 		String source = "function("; //$NON-NLS-1$
@@ -240,6 +259,7 @@ public class CSSLiteralTest extends CSSTokensTest
 		// @formatter:on
 	}
 
+	@Test
 	public void testPercentage()
 	{
 		assertToken("10%", CSSTokenType.PERCENTAGE, 0, 3); //$NON-NLS-1$
@@ -289,76 +309,91 @@ public class CSSLiteralTest extends CSSTokensTest
 		}
 	}
 
+	@Test
 	public void testEms()
 	{
 		assertTokens("{", CSSTokenType.LCURLY, "em", CSSTokenType.EMS, "}", CSSTokenType.RCURLY);
 	}
 
+	@Test
 	public void testExs()
 	{
 		assertTokens("{", CSSTokenType.LCURLY, "ex", CSSTokenType.EXS, "}", CSSTokenType.RCURLY);
 	}
 
+	@Test
 	public void testPixels()
 	{
 		assertTokens("{", CSSTokenType.LCURLY, "px", CSSTokenType.LENGTH, "}", CSSTokenType.RCURLY);
 	}
 
+	@Test
 	public void testCentimeters()
 	{
 		assertTokens("{", CSSTokenType.LCURLY, "cm", CSSTokenType.LENGTH, "}", CSSTokenType.RCURLY);
 	}
 
+	@Test
 	public void testMillimeters()
 	{
 		assertTokens("{", CSSTokenType.LCURLY, "mm", CSSTokenType.LENGTH, "}", CSSTokenType.RCURLY);
 	}
 
+	@Test
 	public void testInches()
 	{
 		assertTokens("{", CSSTokenType.LCURLY, "in", CSSTokenType.LENGTH, "}", CSSTokenType.RCURLY);
 	}
 
+	@Test
 	public void testPoints()
 	{
 		assertTokens("{", CSSTokenType.LCURLY, "pt", CSSTokenType.LENGTH, "}", CSSTokenType.RCURLY);
 	}
 
+	@Test
 	public void testPicas()
 	{
 		assertTokens("{", CSSTokenType.LCURLY, "pc", CSSTokenType.LENGTH, "}", CSSTokenType.RCURLY);
 	}
 
+	@Test
 	public void testDegrees()
 	{
 		assertTokens("{", CSSTokenType.LCURLY, "deg", CSSTokenType.ANGLE, "}", CSSTokenType.RCURLY);
 	}
 
+	@Test
 	public void testRads()
 	{
 		assertTokens("{", CSSTokenType.LCURLY, "rad", CSSTokenType.ANGLE, "}", CSSTokenType.RCURLY);
 	}
 
+	@Test
 	public void testGrads()
 	{
 		assertTokens("{", CSSTokenType.LCURLY, "grad", CSSTokenType.ANGLE, "}", CSSTokenType.RCURLY);
 	}
 
+	@Test
 	public void testMilliseconds()
 	{
 		assertTokens("{", CSSTokenType.LCURLY, "ms", CSSTokenType.TIME, "}", CSSTokenType.RCURLY);
 	}
 
+	@Test
 	public void testSeconds()
 	{
 		assertTokens("{", CSSTokenType.LCURLY, "s", CSSTokenType.TIME, "}", CSSTokenType.RCURLY);
 	}
 
+	@Test
 	public void testHertz()
 	{
 		assertTokens("{", CSSTokenType.LCURLY, "hz", CSSTokenType.FREQUENCY, "}", CSSTokenType.RCURLY);
 	}
 
+	@Test
 	public void testKiloHertz()
 	{
 		assertTokens("{", CSSTokenType.LCURLY, "khz", CSSTokenType.FREQUENCY, "}", CSSTokenType.RCURLY);

@@ -7,17 +7,20 @@
  */
 package com.aptana.scripting.model;
 
-import org.junit.After;
-import org.junit.Test;
-import org.junit.Before;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.aptana.core.util.FileUtil;
 import com.aptana.scripting.TestUtils;
@@ -49,7 +52,9 @@ public abstract class BundleMonitorTests
 	@Before
 	public void setUp() throws Exception
 	{
-//		super.setUp();
+		// store reference to bundle manager
+		this._manager = BundleManager.getInstance();
+		this._manager.reset();
 
 		// setup test bundle
 		this._fileSystemService = new BundleFileSystemService(this.createFileSystem());
@@ -87,7 +92,7 @@ public abstract class BundleMonitorTests
 		}
 		finally
 		{
-//			super.tearDown();
+			// super.tearDown();
 		}
 	}
 
