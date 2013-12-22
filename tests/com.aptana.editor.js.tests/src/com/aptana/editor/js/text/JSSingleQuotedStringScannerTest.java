@@ -10,9 +10,9 @@ package com.aptana.editor.js.text;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.ITokenScanner;
+import org.junit.Test;
 
 import com.aptana.editor.common.tests.AbstractTokenScannerTestCase;
-import com.aptana.editor.js.text.JSEscapeSequenceScanner;
 
 public class JSSingleQuotedStringScannerTest extends AbstractTokenScannerTestCase
 {
@@ -22,6 +22,7 @@ public class JSSingleQuotedStringScannerTest extends AbstractTokenScannerTestCas
 		return new JSEscapeSequenceScanner("string.quoted.single.js");
 	}
 
+	@Test
 	public void testBasicTokenizing()
 	{
 		String src = "This is a single quoted JS string with escape \\x20";

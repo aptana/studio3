@@ -7,13 +7,14 @@
  */
 package com.aptana.js.core.parsing;
 
-
+import org.junit.Test;
 
 /**
  * SDocNodeAttachmentTests
  */
 public class SDocNodeAttachmentTest extends DocNodeAttachementTestCase
 {
+	@Test
 	public void testSDocOnFunction()
 	{
 		String resource = "sdoc/sdocOnFunction.js";
@@ -23,6 +24,7 @@ public class SDocNodeAttachmentTest extends DocNodeAttachementTestCase
 		assertDescription(resource, xpath, description);
 	}
 
+	@Test
 	public void testSDocOnSelfInvokingLambda()
 	{
 		String resource = "sdoc/sdocOnSelfInvokingLambda.js";
@@ -32,6 +34,7 @@ public class SDocNodeAttachmentTest extends DocNodeAttachementTestCase
 		assertDescription(resource, xpath, description);
 	}
 
+	@Test
 	public void testSDocOnObjectLiteralProperty()
 	{
 		String resource = "sdoc/sdocOnObjectLiteralProperty.js";
@@ -44,6 +47,7 @@ public class SDocNodeAttachmentTest extends DocNodeAttachementTestCase
 	/**
 	 * APSTUD-4706
 	 */
+	@Test
 	public void testSDocOnObjectLiteralProperty2()
 	{
 		String resource = "sdoc/sdocOnObjectLiteralProperty2.js";
@@ -53,6 +57,7 @@ public class SDocNodeAttachmentTest extends DocNodeAttachementTestCase
 		assertDescription(resource, xpath, description);
 	}
 
+	@Test
 	public void testSDocOnAssignment()
 	{
 		String resource = "sdoc/sdocOnAssignment.js";
@@ -62,6 +67,7 @@ public class SDocNodeAttachmentTest extends DocNodeAttachementTestCase
 		assertDescription(resource, xpath, description);
 	}
 
+	@Test
 	public void testSDocOnDeclaration()
 	{
 		String resource = "sdoc/sdocOnDeclaration.js";

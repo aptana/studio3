@@ -12,5 +12,4 @@ Require-Bundle: org.junit;bundle-version="4.0.0",
 Export-Package: com.aptana.editor.common.formatting,
  com.aptana.editor.common.tests,
  com.aptana.editor.common.tests.util,
- com.aptana.editor.common.validation,
  com.aptana.editor.epl.tests

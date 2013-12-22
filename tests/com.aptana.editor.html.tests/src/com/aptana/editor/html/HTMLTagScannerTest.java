@@ -12,6 +12,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.Token;
+import org.junit.Test;
 
 import com.aptana.editor.common.tests.AbstractTokenScannerTestCase;
 
@@ -30,6 +31,7 @@ public class HTMLTagScannerTest extends AbstractTokenScannerTestCase
 		};
 	}
 
+	@Test
 	public void testBasicTokenizing()
 	{
 		String src = "<html id=\"chris\" class=\"cool\" height=\"100\">";
@@ -53,6 +55,7 @@ public class HTMLTagScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("punctuation.definition.tag.end.html"), 42, 1);
 	}
 
+	@Test
 	public void testMultiLineSingleQuoteString()
 	{
 		String src = "<html attribute='\nchris'>";
@@ -68,6 +71,7 @@ public class HTMLTagScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("punctuation.definition.tag.end.html"), 24, 1);
 	}
 
+	@Test
 	public void testMultiLineDoubleQuoteString()
 	{
 		String src = "<html attribute=\"\nchris\">";
@@ -83,6 +87,7 @@ public class HTMLTagScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("punctuation.definition.tag.end.html"), 24, 1);
 	}
 
+	@Test
 	public void testWhitespaces()
 	{
 		String src = "<html attribute = \"chris\" >";
@@ -101,6 +106,7 @@ public class HTMLTagScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("punctuation.definition.tag.end.html"), 26, 1);
 	}
 
+	@Test
 	public void testSelfClosingWhitespace()
 	{
 		String src = "<html attribute='nchris' />";
@@ -117,6 +123,7 @@ public class HTMLTagScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("punctuation.definition.tag.self_close.html"), 25, 2);
 	}
 
+	@Test
 	public void testSelfClosing()
 	{
 		String src = "<html attribute='nchris'/>";
@@ -132,6 +139,7 @@ public class HTMLTagScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("punctuation.definition.tag.self_close.html"), 24, 2);
 	}
 
+	@Test
 	public void testNoValueAttribute()
 	{
 		String src = "<html attribute='nchris' selected>";
@@ -149,6 +157,7 @@ public class HTMLTagScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("punctuation.definition.tag.end.html"), 33, 1);
 	}
 
+	@Test
 	public void testEmptyStyleAttribute()
 	{
 		String src = "<html style=''>";
@@ -164,6 +173,7 @@ public class HTMLTagScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("punctuation.definition.tag.end.html"), 14, 1);
 	}
 
+	@Test
 	public void testStyleAttribute()
 	{
 		String src = "<html style='color:red'>";
@@ -183,6 +193,7 @@ public class HTMLTagScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("punctuation.definition.tag.end.html"), 23, 1);
 	}
 
+	@Test
 	public void testEmptyScriptAttribute()
 	{
 		String src = "<body onload=''>";
@@ -198,6 +209,7 @@ public class HTMLTagScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("punctuation.definition.tag.end.html"), 15, 1);
 	}
 
+	@Test
 	public void testScriptAttribute()
 	{
 		String src = "<body onclick='document.body'>";
@@ -217,6 +229,7 @@ public class HTMLTagScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("punctuation.definition.tag.end.html"), 29, 1);
 	}
 
+	@Test
 	public void testIncompleteTag1()
 	{
 		String src = "<";
@@ -226,6 +239,7 @@ public class HTMLTagScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("punctuation.definition.tag.begin.html"), 0, 1);
 	}
 
+	@Test
 	public void testIncompleteTag2()
 	{
 		String src = "<html";
@@ -236,6 +250,7 @@ public class HTMLTagScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("entity.name.tag.structure.any.html"), 1, 4);
 	}
 
+	@Test
 	public void testIncompleteTagWithAttributeName()
 	{
 		String src = "<body class=";
@@ -249,6 +264,7 @@ public class HTMLTagScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("punctuation.separator.key-value.html"), 11, 1);
 	}
 
+	@Test
 	public void testIncompleteTagWithIncompleteAttribute()
 	{
 		String src = "<body class='";
@@ -263,6 +279,7 @@ public class HTMLTagScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("string.quoted.single.html"), 12, 1);
 	}
 
+	@Test
 	public void testIncompleteTagWithAttribute()
 	{
 		String src = "<body class=''";
@@ -277,6 +294,7 @@ public class HTMLTagScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("string.quoted.single.html"), 12, 2);
 	}
 
+	@Test
 	public void testIncompleteCloseTag1()
 	{
 		String src = "</";
@@ -286,6 +304,7 @@ public class HTMLTagScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("punctuation.definition.tag.begin.html"), 0, 2);
 	}
 
+	@Test
 	public void testIncompleteCloseTag2()
 	{
 		String src = "</html";
@@ -296,6 +315,7 @@ public class HTMLTagScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("entity.name.tag.structure.any.html"), 2, 4);
 	}
 
+	@Test
 	public void testCompleteTag1()
 	{
 		String src = "<>";
@@ -306,6 +326,7 @@ public class HTMLTagScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("punctuation.definition.tag.end.html"), 1, 1);
 	}
 
+	@Test
 	public void testCompleteCloseTag1()
 	{
 		String src = "</>";
@@ -316,6 +337,7 @@ public class HTMLTagScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("punctuation.definition.tag.end.html"), 2, 1);
 	}
 
+	@Test
 	public void testCompleteTagWithAttribute()
 	{
 		String src = "< class=''>";
@@ -330,6 +352,7 @@ public class HTMLTagScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("punctuation.definition.tag.end.html"), 10, 1);
 	}
 
+	@Test
 	public void testCompleteTagWithIncompleteAttribute1()
 	{
 		String src = "< class='>";
@@ -344,6 +367,7 @@ public class HTMLTagScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("punctuation.definition.tag.end.html"), 9, 1);
 	}
 
+	@Test
 	public void testCompleteTagWithIncompleteAttribute2()
 	{
 		String src = "< class='/>";
@@ -358,6 +382,7 @@ public class HTMLTagScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("punctuation.definition.tag.self_close.html"), 9, 2);
 	}
 
+	@Test
 	public void testCompleteTagWithIncompleteAttribute3()
 	{
 		String src = "< class=' >";
@@ -372,6 +397,7 @@ public class HTMLTagScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("punctuation.definition.tag.end.html"), 10, 1);
 	}
 
+	@Test
 	public void testCompleteTagWithIncompleteAttribute4()
 	{
 		String src = "< class=' />";

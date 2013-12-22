@@ -23,7 +23,6 @@ import com.aptana.editor.common.text.TextTests;
 import com.aptana.editor.common.text.reconciler.ReconcilerTests;
 import com.aptana.editor.common.text.rules.RulesTests;
 import com.aptana.editor.common.util.UtilTests;
-import com.aptana.editor.common.validation.ValidationTests;
 import com.aptana.editor.common.viewer.ViewerTests;
 
 @RunWith(Suite.class)
@@ -37,7 +36,6 @@ import com.aptana.editor.common.viewer.ViewerTests;
 	ScriptingCommandsTests.class,
 	TextTests.class,
 	UtilTests.class,
-	ValidationTests.class,
 	ViewerTests.class,
 	ScriptingInputOutputTest.class,
 	DocumentScopeManagerTest.class,

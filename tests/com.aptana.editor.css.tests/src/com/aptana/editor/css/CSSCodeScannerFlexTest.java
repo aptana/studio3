@@ -10,6 +10,7 @@ package com.aptana.editor.css;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.ITokenScanner;
+import org.junit.Test;
 
 /**
  * Note: inheriting from CSSCodeScannerTest because it must pass all of its existing tests.
@@ -24,6 +25,7 @@ public class CSSCodeScannerFlexTest extends CSSCodeScannerTest
 	}
 
 	@Override
+	@Test
 	public void testImportant() throws Exception
 	{
 		String src = "!  impORtant what!impORtantwhat\n!impORtant\n!important something";
@@ -34,6 +36,7 @@ public class CSSCodeScannerFlexTest extends CSSCodeScannerTest
 				"null", "support.constant.property-value.css", "null", "source.css", "null");
 	}
 
+	@Test
 	public void testNotConstruct() throws Exception
 	{
 		String src = "svg:not(:root) {overflow: hidden;}";

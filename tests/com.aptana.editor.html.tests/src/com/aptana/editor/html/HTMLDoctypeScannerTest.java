@@ -12,6 +12,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.Token;
+import org.junit.Test;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.tests.AbstractTokenScannerTestCase;
@@ -31,6 +32,7 @@ public class HTMLDoctypeScannerTest extends AbstractTokenScannerTestCase
 		};
 	}
 
+	@Test
 	public void testHTML5Doctype()
 	{
 		String src = "<!DOCTYPE html>";
@@ -45,6 +47,7 @@ public class HTMLDoctypeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("punctuation.definition.tag.end.html"), 14, 1);
 	}
 
+	@Test
 	public void testHTML4Doctype()
 	{
 		String src = "<!DOCTYPE PUBLIC '-//W3C//DTD HTML 4.0//EN'>";
@@ -60,7 +63,8 @@ public class HTMLDoctypeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("string.quoted.single.doctype.identifiers-and-DTDs.html"), 17, 26);
 		assertToken(getToken("punctuation.definition.tag.end.html"), 43, 1);
 	}
-	
+
+	@Test
 	public void testHTML4StrictDoctype()
 	{
 		String src = "<!DOCTYPE PUBLIC '-//W3C//DTD HTML 4.0//EN' 'http://www.w3.org/TR/REC-html40/strict.dtd'>";
@@ -78,7 +82,8 @@ public class HTMLDoctypeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("string.quoted.single.doctype.identifiers-and-DTDs.html"), 44, 44);
 		assertToken(getToken("punctuation.definition.tag.end.html"), 88, 1);
 	}
-	
+
+	@Test
 	public void testHTML401Doctype()
 	{
 		String src = "<!DOCTYPE PUBLIC \"-//W3C//DTD HTML 4.01//EN\">";
@@ -94,7 +99,8 @@ public class HTMLDoctypeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("string.quoted.double.doctype.identifiers-and-DTDs.html"), 17, 27);
 		assertToken(getToken("punctuation.definition.tag.end.html"), 44, 1);
 	}
-	
+
+	@Test
 	public void testHTML401StrictDoctype()
 	{
 		String src = "<!DOCTYPE PUBLIC '-//W3C//DTD HTML 4.01//EN' 'http://www.w3.org/TR/html4/strict.dtd'>";
@@ -112,7 +118,8 @@ public class HTMLDoctypeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("string.quoted.single.doctype.identifiers-and-DTDs.html"), 45, 39);
 		assertToken(getToken("punctuation.definition.tag.end.html"), 84, 1);
 	}
-	
+
+	@Test
 	public void testXHTML1StrictDoctype()
 	{
 		String src = "<!DOCTYPE PUBLIC '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>";
@@ -130,7 +137,8 @@ public class HTMLDoctypeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("string.quoted.single.doctype.identifiers-and-DTDs.html"), 52, 51);
 		assertToken(getToken("punctuation.definition.tag.end.html"), 103, 1);
 	}
-	
+
+	@Test
 	public void testXHTML11StrictDoctype()
 	{
 		String src = "<!DOCTYPE PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'>";
