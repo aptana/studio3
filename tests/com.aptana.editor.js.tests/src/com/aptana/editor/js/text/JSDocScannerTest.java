@@ -11,9 +11,9 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
+import org.junit.Test;
 
 import com.aptana.editor.common.tests.AbstractTokenScannerTestCase;
-import com.aptana.editor.js.text.JSDocScanner;
 
 public class JSDocScannerTest extends AbstractTokenScannerTestCase
 {
@@ -31,6 +31,7 @@ public class JSDocScannerTest extends AbstractTokenScannerTestCase
 		};
 	}
 
+	@Test
 	public void testBasicTokenizing()
 	{
 		String src = "@param {int} <i>size</i>";

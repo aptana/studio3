@@ -37,7 +37,7 @@ public class CSSSourcePartitionScannerTest extends AbstractPartitionTestCase
 	}
 
 	@After
-	protected void tearDown() throws Exception
+	public void tearDown() throws Exception
 	{
 		partitioner = null;
 	}

@@ -12,6 +12,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.Token;
+import org.junit.Test;
 
 import com.aptana.editor.common.tests.AbstractTokenScannerTestCase;
 
@@ -30,6 +31,7 @@ public class XMLTagScannerTest extends AbstractTokenScannerTestCase
 		};
 	}
 
+	@Test
 	public void testBasicTokenizing()
 	{
 		String src = "<html id=\"chris\" class=\"cool\" height=\"100\">";
@@ -52,7 +54,8 @@ public class XMLTagScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("string.quoted.double.xml"), 37, 5);
 		assertToken(getToken("punctuation.definition.tag.xml"), 42, 1);
 	}
-	
+
+	@Test
 	public void testMultiLineSingleQuoteString()
 	{
 		String src = "<html attribute='\nchris'>";
@@ -67,7 +70,8 @@ public class XMLTagScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("string.quoted.single.xml"), 16, 8);
 		assertToken(getToken("punctuation.definition.tag.xml"), 24, 1);
 	}
-	
+
+	@Test
 	public void testMultiLineDoubleQuoteString()
 	{
 		String src = "<html attribute=\"\nchris\">";

@@ -11,6 +11,8 @@ import java.net.URI;
 
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import com.aptana.editor.js.tests.JSEditorBasedTestCase;
 import com.aptana.index.core.FileStoreBuildContext;
@@ -265,31 +267,35 @@ public class SDocMLIndexingTest extends JSEditorBasedTestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testJQuerySymbolStatics_1_6_2() throws Exception
 	{
 		assertStaticProperties_1_6_2("sdocml/jQuery-statics.js");
 	}
 
+	@Test
 	public void testDollarSymbolStatics_1_6_2() throws Exception
 	{
 		assertStaticProperties_1_6_2("sdocml/$-statics.js");
 	}
 
+	@Test
 	public void testJQueryAddReturnValueProperties() throws Exception
 	{
 		assertInstanceProperties_1_6_2("sdocml/jQuery-add-properties.js");
 	}
 
+	@Test
 	public void testDollarAddReturnValueProperties() throws Exception
 	{
 		assertInstanceProperties_1_6_2("sdocml/$-add-properties.js");
 	}
 
-	// @formatter:off
-	// Commented out ATM, as the following test fail. Attached to ticket APSTUD-3389
-	/*
+	@Test
+	@Ignore(" Commented out ATM, as the following test fail. Attached to ticket APSTUD-3389")
 	public void testDollarJQXHR() throws Exception
 	{
+		// @formatter:off
 		indexAndCheckProposals(
 			"sdocml/jquery.1.6.2.sdocml",
 			"sdocml/$-jqXHR.js",
@@ -312,10 +318,14 @@ public class SDocMLIndexingTest extends JSEditorBasedTestCase
 			"isRejected",
 			"isResolved"
 		);
+		// @formatter:on
 	}
 
+	@Test
+	@Ignore(" Commented out ATM, as the following test fail. Attached to ticket APSTUD-3389")
 	public void testDollarDeferred() throws Exception
 	{
+		// @formatter:off
 		indexAndCheckProposals(
 			"sdocml/jquery.1.6.2.sdocml",
 			"sdocml/$-Deferred.js",
@@ -332,8 +342,11 @@ public class SDocMLIndexingTest extends JSEditorBasedTestCase
 			"isResolved",
 			"resolve"
 		);
+		// @formatter:on
 	}
 
+	@Test
+	@Ignore(" Commented out ATM, as the following test fail. Attached to ticket APSTUD-3389")
 	public void testPromise() throws Exception
 	{
 		// @formatter:off
@@ -349,8 +362,7 @@ public class SDocMLIndexingTest extends JSEditorBasedTestCase
 			"isRejected",
 			"isResolved"
 		);
+		// @formatter:on
 	}
-	*/
-	// @formatter:on
 
 }

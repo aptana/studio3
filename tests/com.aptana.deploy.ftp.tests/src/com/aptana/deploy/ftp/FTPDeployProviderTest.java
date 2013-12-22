@@ -6,6 +6,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.deploy.ftp;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -44,7 +45,7 @@ public class FTPDeployProviderTest
 	private ISiteConnection siteConnection;
 
 	@Before
-	protected void setUp() throws Exception
+	public void setUp() throws Exception
 	{
 		testProject = createProject();
 		sourceConnectionPoint = SyncUtils.findOrCreateConnectionPointFor(testProject);
@@ -59,7 +60,7 @@ public class FTPDeployProviderTest
 	}
 
 	@After
-	protected void tearDown() throws Exception
+	public void tearDown() throws Exception
 	{
 		SyncingPlugin.getSiteConnectionManager().removeSiteConnection(siteConnection);
 		CoreIOPlugin.getConnectionPointManager().removeConnectionPoint(sourceConnectionPoint);

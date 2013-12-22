@@ -12,6 +12,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.Token;
+import org.junit.Test;
 
 import com.aptana.editor.common.tests.AbstractTokenScannerTestCase;
 
@@ -30,6 +31,7 @@ public class XMLScannerTest extends AbstractTokenScannerTestCase
 		};
 	}
 
+	@Test
 	public void testEntities()
 	{
 		String src = "&nbsp; & text &#123; &#xabc012; &#bad; &#xnotgood;";
@@ -57,6 +59,7 @@ public class XMLScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("text"), 49, 1);
 	}
 
+	@Test
 	public void testEntityAndNormalWordWithNoSpaceBetween()
 	{
 		String src = "good&nbsp;good";

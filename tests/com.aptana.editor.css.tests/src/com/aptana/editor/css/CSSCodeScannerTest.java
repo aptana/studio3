@@ -13,6 +13,7 @@ import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.rules.FastPartitioner;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.Token;
+import org.junit.Test;
 
 import com.aptana.editor.common.tests.AbstractTokenScannerTestCase;
 
@@ -25,6 +26,7 @@ public class CSSCodeScannerTest extends AbstractTokenScannerTestCase
 		return new CSSCodeScannerRuleBased();
 	}
 
+	@Test
 	public void testH1Through6()
 	{
 		String src = "h1 h2 h3 h4 h5 h6 ";
@@ -38,6 +40,7 @@ public class CSSCodeScannerTest extends AbstractTokenScannerTestCase
 		}
 	}
 
+	@Test
 	public void testNum()
 	{
 		String src = "10em;";
@@ -49,6 +52,7 @@ public class CSSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("punctuation.terminator.rule.css"), 4, 1);
 	}
 
+	@Test
 	public void testImportant() throws Exception
 	{
 		String src = "!  impORtant what!impORtantwhat\n!impORtant\n!important something";
@@ -58,6 +62,7 @@ public class CSSCodeScannerTest extends AbstractTokenScannerTestCase
 				"null", "", "source.css", "null", "source.css", "null");
 	}
 
+	@Test
 	public void testIdentifierWithKeyword()
 	{
 		String src = "table-row-group";
@@ -67,6 +72,7 @@ public class CSSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("source.css"), 0, 15);
 	}
 
+	@Test
 	public void testBrowserSpecificPropertyNames2()
 	{
 		String src = "body {\n-moz-border-radius: 4px;\n" + "-webkit-border-radius: 4px";
@@ -88,6 +94,7 @@ public class CSSCodeScannerTest extends AbstractTokenScannerTestCase
 				"meta.property-list.css meta.property-value.css keyword.other.unit.css", "null");
 	}
 
+	@Test
 	public void testBrowserSpecificPropertyNames()
 	{
 		String src = "body {\n-moz-border-radius: 4px;\n" + "-webkit-border-radius: 4px";
@@ -110,6 +117,7 @@ public class CSSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("meta.property-list.css meta.property-value.css keyword.other.unit.css"), 56, 2);
 	}
 
+	@Test
 	public void testURLFunctionArgWithNoString()
 	{
 		String src = "background: url(/images/blah_header.jpg)";
@@ -123,6 +131,7 @@ public class CSSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("meta.property-value.css punctuation.section.function.css"), 15, 1);
 	}
 
+	@Test
 	public void testURLFunctionArgWithNoString2()
 	{
 		String src = "background: url(/images/blah_header.jpg)";
@@ -139,6 +148,7 @@ public class CSSCodeScannerTest extends AbstractTokenScannerTestCase
 				"meta.selector.css meta.property-value.css punctuation.section.function.css", "null");
 	}
 
+	@Test
 	public void testSmallCaps()
 	{
 		String src = "small { font: small-caps; }";
@@ -160,6 +170,7 @@ public class CSSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("meta.property-list.css punctuation.section.property-list.css"), 26, 1);
 	}
 
+	@Test
 	public void testSmallCaps2()
 	{
 		String src = "background: url(/images/blah_header.jpg)";
@@ -176,6 +187,7 @@ public class CSSCodeScannerTest extends AbstractTokenScannerTestCase
 				"meta.selector.css meta.property-value.css punctuation.section.function.css", "null");
 	}
 
+	@Test
 	public void testCSSEmTag()
 	{
 		// the preceding elements are to make sure "em" does not corrupt the rest of tokenizing
@@ -200,6 +212,7 @@ public class CSSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("meta.property-list.css punctuation.section.property-list.css"), 45, 1);
 	}
 
+	@Test
 	public void testCSSEmTag2()
 	{
 		// the preceding elements are to make sure "em" does not corrupt the rest of tokenizing
@@ -219,6 +232,7 @@ public class CSSCodeScannerTest extends AbstractTokenScannerTestCase
 				"meta.property-list.css punctuation.section.property-list.css", "null");
 	}
 
+	@Test
 	public void testBasicTokenizing()
 	{
 		String src = "html { color: red; background-color: #333; }";
@@ -249,6 +263,7 @@ public class CSSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("meta.property-list.css punctuation.section.property-list.css"), 43, 1);
 	}
 
+	@Test
 	public void testBasicTokenizing3()
 	{
 		String src = "html { color: red; background-color: #333; }";
@@ -271,6 +286,7 @@ public class CSSCodeScannerTest extends AbstractTokenScannerTestCase
 				"meta.property-list.css", "meta.property-list.css punctuation.section.property-list.css", "null");
 	}
 
+	@Test
 	public void testBasicTokenizing4()
 	{
 		String src = "body {\n" + // 1
@@ -455,6 +471,7 @@ public class CSSCodeScannerTest extends AbstractTokenScannerTestCase
 				"null");
 	}
 
+	@Test
 	public void testBasicTokenizing2()
 	{
 		String src = "body {\n" + // 1
@@ -631,6 +648,7 @@ public class CSSCodeScannerTest extends AbstractTokenScannerTestCase
 		// line 20
 	}
 
+	@Test
 	public void testMediaWithRules()
 	{
 		String src = "@media screen {\n" + //
@@ -678,6 +696,7 @@ public class CSSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(Token.WHITESPACE, 58, 1);
 	}
 
+	@Test
 	public void testMediaWithRules2()
 	{
 		String src = "@media screen {\n" + //
@@ -709,6 +728,7 @@ public class CSSCodeScannerTest extends AbstractTokenScannerTestCase
 				"meta.property-list.css punctuation.section.property-list.css", "null", "null");
 	}
 
+	@Test
 	public void testCurliesInStringsBeforePartition()
 	{
 		String src = "@import 'ch{.css';\n" + //
@@ -728,6 +748,7 @@ public class CSSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(Token.WHITESPACE, 28, 1);
 	}
 
+	@Test
 	public void testCurliesInCommentBeforePartition()
 	{
 		String src = "/*         {   */;\n" + //
@@ -747,6 +768,7 @@ public class CSSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(Token.WHITESPACE, 28, 1);
 	}
 
+	@Test
 	public void testMediaSplitAcrossPartitions()
 	{
 		String src = "@media screen {\n" + // 1
@@ -770,6 +792,7 @@ public class CSSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(Token.WHITESPACE, 37, 1);
 	}
 
+	@Test
 	public void testPropertyListSplitAcrossPartitions()
 	{
 		String src = "body {\n" + // 1
@@ -797,6 +820,7 @@ public class CSSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(Token.WHITESPACE, 32, 1);
 	}
 
+	@Test
 	public void testMediaClosedBeforePartitionSplit()
 	{
 		String src = "@media screen {\n" + // 1
@@ -815,6 +839,7 @@ public class CSSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(Token.WHITESPACE, 31, 1);
 	}
 
+	@Test
 	public void testTopAndLeftPropertyNames()
 	{
 		String src = ".class {\n" + // 1

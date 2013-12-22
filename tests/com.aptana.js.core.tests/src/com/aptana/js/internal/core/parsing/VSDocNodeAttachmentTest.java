@@ -7,6 +7,8 @@
  */
 package com.aptana.js.internal.core.parsing;
 
+import org.junit.Test;
+
 import com.aptana.js.core.parsing.DocNodeAttachementTestCase;
 
 /**
@@ -14,6 +16,7 @@ import com.aptana.js.core.parsing.DocNodeAttachementTestCase;
  */
 public class VSDocNodeAttachmentTest extends DocNodeAttachementTestCase
 {
+	@Test
 	public void testVDocOnFunction()
 	{
 		String resource = "vsdoc/vsdocOnFunction.js";
@@ -23,6 +26,7 @@ public class VSDocNodeAttachmentTest extends DocNodeAttachementTestCase
 		assertDescription(resource, xpath, description);
 	}
 
+	@Test
 	public void testVDocOnNonFunction()
 	{
 		String resource = "vsdoc/vsdocOnArray.js";

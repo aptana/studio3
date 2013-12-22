@@ -9,6 +9,7 @@ package com.aptana.editor.css;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.rules.IPartitionTokenScanner;
+import org.junit.Test;
 
 /**
  * Note: running all the tests from this class + tests from CSSSourcePartitionScannerTest
@@ -30,6 +31,7 @@ public class CSSSourcePartitionScannerFlexTest extends CSSSourcePartitionScanner
 		return CSSSourceConfiguration.getDefault().getContentTypes();
 	}
 
+	@Test
 	public void testFlexPartitioning() throws BadLocationException
 	{
 		String source = " /* comment */ 'str' \"double\"\n";
@@ -38,24 +40,28 @@ public class CSSSourcePartitionScannerFlexTest extends CSSSourcePartitionScanner
 				"__dftl_partition_content_type:20:21", "__css_string_double:21:29", "__dftl_partition_content_type:29:");
 	}
 
+	@Test
 	public void testFlexPartitioningIncomplete() throws BadLocationException
 	{
 		String source = "'str\nfoo";
 		assertPartitions(source, "__css_string_single:0:5", "__dftl_partition_content_type:5:");
 	}
 
+	@Test
 	public void testFlexPartitioningIncomplete2() throws BadLocationException
 	{
 		String source = "\"str\nfoo";
 		assertPartitions(source, "__css_string_double:0:5", "__dftl_partition_content_type:5:");
 	}
 
+	@Test
 	public void testFlexCommentIncomplete() throws BadLocationException
 	{
 		String source = "/*comment\nfoo";
 		assertPartitions(source, "__css_multiline_comment:0:");
 	}
 
+	@Test
 	public void testFlexStringEscaping() throws BadLocationException
 	{
 		String source = "'aaa\\\nfoo' something";

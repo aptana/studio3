@@ -10,9 +10,9 @@ package com.aptana.editor.js.text;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.ITokenScanner;
+import org.junit.Test;
 
 import com.aptana.editor.common.tests.AbstractTokenScannerTestCase;
-import com.aptana.editor.js.text.JSEscapeSequenceScanner;
 
 public class JSRegexScannerTest extends AbstractTokenScannerTestCase
 {
@@ -22,6 +22,7 @@ public class JSRegexScannerTest extends AbstractTokenScannerTestCase
 		return new JSEscapeSequenceScanner("string.regexp.js");
 	}
 
+	@Test
 	public void testBasicTokenizing()
 	{
 		String src = "[\\x20-\\x7F]+";
