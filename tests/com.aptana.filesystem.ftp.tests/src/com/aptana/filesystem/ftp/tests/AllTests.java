@@ -7,29 +7,14 @@
  */
 package com.aptana.filesystem.ftp.tests;
 
-import org.junit.runners.Suite.SuiteClasses;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
-import org.kohsuke.junit.ParallelTestSuite;
+import org.junit.runners.Suite.SuiteClasses;
 
 import com.aptana.filesystem.ftp.FTPConnectionPointTest;
 
 @RunWith(Suite.class)
-@SuiteClasses({FTPConnectionPointTest.class, FTPConnectionTest.class, FTPConnectionWithBasePathTest.class, })
+@SuiteClasses({ FTPConnectionPointTest.class, FTPConnectionTest.class, FTPConnectionWithBasePathTest.class, })
 public class AllTests
 {
-
-//	public static Test suite()
-//	{
-//		TestSuite suite = new ParallelTestSuite(AllTests.class.getName(), 2);
-//		// $JUnit-BEGIN$
-//		suite.addTestSuite(FTPConnectionPointTest.class);
-//		suite.addTestSuite(FTPConnectionTest.class);
-//		suite.addTestSuite(FTPConnectionWithBasePathTest.class);
-//		// $JUnit-END$
-//		return suite;
-//	}
 }

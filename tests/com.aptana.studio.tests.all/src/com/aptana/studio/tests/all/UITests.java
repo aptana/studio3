@@ -30,24 +30,25 @@ import com.aptana.editor.common.internal.commands.NextPreviousEditorHandlerTest;
 	com.aptana.editor.json.tests.AllTests.class,
 	com.aptana.editor.xml.tests.AllTests.class,
 	com.aptana.editor.xml.formatter.tests.AllTests.class,
-	// com.aptana.editor.text.tests.AllTests.class, // TODO Add Tests for editor.text
-	// com.aptana.explorer.tests.AllTests.class, // TODO Add Tests for explorer
-	// com.aptana.filesystem.s3.tests.AllTests.class // FIXME I think the way we do passwords causes us to have to run s3 tests in the UI!
-	com.aptana.git.ui.AllTests.class,
-	com.aptana.portal.ui.tests.AllTests.class,
-	// com.aptana.scripting.ui.tests.AllTests.class, // TODO Add Tests for scripting.ui
-	// com.aptana.syncing.ui.tests.AllTests.class, // FIXME Re-enable when we have ftp server set back up...
-	com.aptana.theme.tests.AllTests.class,
-	org.eclipse.tm.terminal.test.AllTests.class,
-	
-	// Now add special test cases which require to be run after all plugins are loaded (dependency inversion in
-	// test)
-	// require HTML editor to have outline contents to test common editor commands
-	ExpandCollapseAllHandlerTest.class,
-	// FIXME These tests are inconsistent and fail intermittently on test build
-	// ExpandLevelHandlerTest.class,
-	NextPreviousEditorHandlerTest.class
 })
+//	// com.aptana.editor.text.tests.AllTests.class, // TODO Add Tests for editor.text
+//	// com.aptana.explorer.tests.AllTests.class, // TODO Add Tests for explorer
+//	// com.aptana.filesystem.s3.tests.AllTests.class // FIXME I think the way we do passwords causes us to have to run s3 tests in the UI!
+//	com.aptana.git.ui.AllTests.class,
+//	com.aptana.portal.ui.tests.AllTests.class,
+//	// com.aptana.scripting.ui.tests.AllTests.class, // TODO Add Tests for scripting.ui
+//	// com.aptana.syncing.ui.tests.AllTests.class, // FIXME Re-enable when we have ftp server set back up...
+//	com.aptana.theme.tests.AllTests.class,
+//	org.eclipse.tm.terminal.test.AllTests.class,
+//	
+//	// Now add special test cases which require to be run after all plugins are loaded (dependency inversion in
+//	// test)
+//	// require HTML editor to have outline contents to test common editor commands
+//	ExpandCollapseAllHandlerTest.class,
+//	// FIXME These tests are inconsistent and fail intermittently on test build
+//	// ExpandLevelHandlerTest.class,
+//	NextPreviousEditorHandlerTest.class
+//})
 // @formatter:on
 public class UITests
 {

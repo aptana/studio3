@@ -7,14 +7,13 @@
  */
 package com.aptana.syncing.core.tests;
 
-import org.junit.After;
-import org.junit.Test;
-import org.junit.Before;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.util.Properties;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -24,6 +23,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.aptana.core.io.efs.EFSUtils;
 import com.aptana.git.core.model.GitExecutable;
@@ -71,8 +73,6 @@ public abstract class SyncingErrorTests
 		serverDirectory = serverManager.getRoot().getFileStore(new Path("/server" + System.currentTimeMillis()));
 		assertNotNull(serverDirectory);
 		serverDirectory.mkdir(EFS.NONE, null);
-
-//		super.setUp();
 	}
 
 	/**
@@ -112,8 +112,6 @@ public abstract class SyncingErrorTests
 				serverManager.disconnect(null);
 			}
 		}
-
-//		super.tearDown();
 	}
 
 	/*
