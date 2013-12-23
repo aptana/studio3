@@ -7,16 +7,18 @@
  */
 package com.aptana.filesystem.secureftp.tests;
 
-import org.junit.After;
-import org.junit.Test;
-import org.junit.Before;
-import static org.junit.Assert.*;
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.aptana.filesystem.secureftp.FTPSConnectionPoint;
 import com.aptana.ide.core.io.ConnectionContext;
@@ -26,13 +28,14 @@ import com.aptana.ide.core.io.IConnectionPoint;
 /**
  * @author Max Stepanov
  */
-public class ImplicitFTPSConnectionTest {
+public class ImplicitFTPSConnectionTest
+{
 
 	protected IConnectionPoint cp;
 
-//	@Override
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() throws Exception
+	{
 		FTPSConnectionPoint ftpcp = new FTPSConnectionPoint();
 		ftpcp.setHost("ftp.secureftp-test.com"); //$NON-NLS-1$
 		ftpcp.setLogin("test"); //$NON-NLS-1$
@@ -46,16 +49,18 @@ public class ImplicitFTPSConnectionTest {
 		CoreIOPlugin.setConnectionContext(cp, context);
 	}
 
-//	@Override
 	@After
-	public void tearDown() throws Exception {
-		if (cp.isConnected()) {
+	public void tearDown() throws Exception
+	{
+		if (cp.isConnected())
+		{
 			cp.disconnect(null);
 		}
 	}
 
 	@Test
-	public final void testConnect() throws CoreException {
+	public final void testConnect() throws CoreException
+	{
 		cp.connect(null);
 		assertTrue(cp.isConnected());
 		assertTrue(cp.canDisconnect());
@@ -65,7 +70,8 @@ public class ImplicitFTPSConnectionTest {
 	}
 
 	@Test
-	public final void testFetchRootInfo() throws CoreException {
+	public final void testFetchRootInfo() throws CoreException
+	{
 		IFileStore fs = cp.getRoot();
 		assertNotNull(fs);
 		assertFalse(cp.isConnected());
