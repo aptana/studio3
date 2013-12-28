@@ -18,15 +18,15 @@ import org.junit.runners.Suite;
 	
 	com.aptana.editor.common.tests.AllTests.class,
 	com.aptana.editor.css.tests.AllTests.class,
-	com.aptana.editor.css.formatter.tests.AllTests.class,
+//	com.aptana.editor.css.formatter.tests.AllTests.class,
 	com.aptana.editor.dtd.AllTests.class,
 	com.aptana.editor.html.tests.AllTests.class,
-	com.aptana.editor.html.formatter.tests.AllTests.class,
+//	com.aptana.editor.html.formatter.tests.AllTests.class,
 	com.aptana.editor.js.tests.AllTests.class,
-	com.aptana.editor.js.formatter.tests.AllTests.class,
+//	com.aptana.editor.js.formatter.tests.AllTests.class,
 	com.aptana.editor.json.tests.AllTests.class,
 	com.aptana.editor.xml.tests.AllTests.class,
-	com.aptana.editor.xml.formatter.tests.AllTests.class,
+//	com.aptana.editor.xml.formatter.tests.AllTests.class,
 })
 //	com.aptana.deploy.ftp.tests.AllTests.class,
 //	// com.aptana.editor.text.tests.AllTests.class, // TODO Add Tests for editor.text
