@@ -14,7 +14,7 @@ import org.junit.runners.Suite;
 // @formatter:off
 @Suite.SuiteClasses({ 
 	com.aptana.browser.tests.AllTests.class,
-//	com.aptana.console.tests.AllTests.class,
+	com.aptana.console.tests.AllTests.class,
 	
 //	com.aptana.editor.common.tests.AllTests.class,
 //	com.aptana.editor.css.tests.AllTests.class,
