@@ -14,20 +14,19 @@ import org.junit.runners.Suite;
 // @formatter:off
 @Suite.SuiteClasses({ 
 	com.aptana.browser.tests.AllTests.class,
-	com.aptana.console.tests.AllTests.class,
+//	com.aptana.console.tests.AllTests.class,
 	
-	com.aptana.editor.common.tests.AllTests.class,
-	com.aptana.editor.css.tests.AllTests.class,
+//	com.aptana.editor.common.tests.AllTests.class,
+//	com.aptana.editor.css.tests.AllTests.class,
 //	com.aptana.editor.css.formatter.tests.AllTests.class,
-	com.aptana.editor.dtd.AllTests.class,
-	com.aptana.editor.html.tests.AllTests.class,
+//	com.aptana.editor.dtd.AllTests.class,
+//	com.aptana.editor.html.tests.AllTests.class,
 //	com.aptana.editor.html.formatter.tests.AllTests.class,
-	com.aptana.editor.js.tests.AllTests.class,
+//	com.aptana.editor.js.tests.AllTests.class,
 //	com.aptana.editor.js.formatter.tests.AllTests.class,
-	com.aptana.editor.json.tests.AllTests.class,
-	com.aptana.editor.xml.tests.AllTests.class,
+//	com.aptana.editor.json.tests.AllTests.class,
+//	com.aptana.editor.xml.tests.AllTests.class,
 //	com.aptana.editor.xml.formatter.tests.AllTests.class,
-})
 //	com.aptana.deploy.ftp.tests.AllTests.class,
 //	// com.aptana.editor.text.tests.AllTests.class, // TODO Add Tests for editor.text
 //	// com.aptana.explorer.tests.AllTests.class, // TODO Add Tests for explorer
@@ -46,7 +45,7 @@ import org.junit.runners.Suite;
 //	// FIXME These tests are inconsistent and fail intermittently on test build
 //	// ExpandLevelHandlerTest.class,
 //	NextPreviousEditorHandlerTest.class
-//})
+})
 // @formatter:on
 public class UITests
 {
