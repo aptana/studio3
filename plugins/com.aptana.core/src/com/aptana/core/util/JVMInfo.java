@@ -32,7 +32,7 @@ public class JVMInfo
 	private static final String JAVAC = "javac"; //$NON-NLS-1$
 	private static final String VERSION_CMD = "-version"; //$NON-NLS-1$
 
-	private static final String JAVA_6_SPECIFICATION = "1.6"; //$NON-NLS-1$
+	public static final String JAVA_6_SPECIFICATION = "1.6"; //$NON-NLS-1$
 
 	protected boolean isJDKInstalled;
 	protected boolean is32bit;
