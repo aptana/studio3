@@ -17,7 +17,7 @@ import org.junit.runners.Suite;
 	com.aptana.console.tests.AllTests.class,
 	
 	com.aptana.editor.common.tests.AllTests.class,
-//	com.aptana.editor.css.tests.AllTests.class,
+	com.aptana.editor.css.tests.AllTests.class,
 //	com.aptana.editor.css.formatter.tests.AllTests.class,
 //	com.aptana.editor.dtd.AllTests.class,
 //	com.aptana.editor.html.tests.AllTests.class,
