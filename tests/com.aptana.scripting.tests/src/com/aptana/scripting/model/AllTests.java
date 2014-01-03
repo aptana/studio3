@@ -28,7 +28,7 @@ import org.junit.runners.Suite.SuiteClasses;
 	WithDefaultsTests.class,
 	ProjectBundleMonitorTests.class,
 	// TODO: uncomment once timing issues are resolved. We're still getting intermittent failures
-	UserBundleMonitorTests.class,
+	// UserBundleMonitorTests.class,
 })
 // @formatter:on
 public class AllTests
