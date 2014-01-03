@@ -52,18 +52,13 @@ public abstract class BundleMonitorTests
 	@Before
 	public void setUp() throws Exception
 	{
-		// store reference to bundle manager
-		this._manager = BundleManager.getInstance();
-		this._manager.reset();
-
 		// setup test bundle
 		this._fileSystemService = new BundleFileSystemService(this.createFileSystem());
 		this._fileSystemService.createBundleDirectory();
 
 		// setup application and user bundles paths
-		List<String> applicationBundlesPaths = this._manager.getApplicationBundlesPaths();
 		String userBundlesPath = new File(FileUtil.getTempDirectory().toOSString(), "bundles").getAbsolutePath();
-		this._manager = BundleManager.getInstance(applicationBundlesPaths.get(0), userBundlesPath);
+		this._manager = BundleManager.getInstance(null, userBundlesPath);
 		this._manager.reset();
 
 		this._monitor = new BundleMonitor(this._manager);
@@ -85,15 +80,8 @@ public abstract class BundleMonitorTests
 	@After
 	public void tearDown() throws Exception
 	{
-		try
-		{
-			_monitor.endMonitoring();
-			this._fileSystemService.cleanUp();
-		}
-		finally
-		{
-			// super.tearDown();
-		}
+		_monitor.endMonitoring();
+		this._fileSystemService.cleanUp();
 	}
 
 	/**
