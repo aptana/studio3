@@ -22,7 +22,7 @@ import org.junit.runners.Suite;
 	com.aptana.editor.dtd.AllTests.class,
 //	com.aptana.editor.html.tests.AllTests.class,
 //	com.aptana.editor.html.formatter.tests.AllTests.class,
-//	com.aptana.editor.js.tests.AllTests.class,
+	com.aptana.editor.js.tests.AllTests.class,
 //	com.aptana.editor.js.formatter.tests.AllTests.class,
 //	com.aptana.editor.json.tests.AllTests.class,
 //	com.aptana.editor.xml.tests.AllTests.class,
