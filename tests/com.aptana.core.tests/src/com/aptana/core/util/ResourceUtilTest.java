@@ -7,18 +7,17 @@
  */
 package com.aptana.core.util;
 
-import org.junit.After;
-import org.junit.Test;
-import org.junit.Before;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URL;
 import java.text.MessageFormat;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;
@@ -28,6 +27,9 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 public class ResourceUtilTest
 {
@@ -257,10 +259,8 @@ public class ResourceUtilTest
 	 */
 	private IProject createProject() throws IOException, InvocationTargetException, InterruptedException, CoreException
 	{
-
-		File baseTempFile = File.createTempFile("test", ".txt"); //$NON-NLS-1$ //$NON-NLS-2$
 		String projectName = "ResourceUtilTest" + System.currentTimeMillis();
-		File projectFolder = new File(baseTempFile.getParentFile(), projectName);
+		File projectFolder = FileUtil.getTempDirectory().append(projectName).toFile();
 		projectFolder.mkdirs();
 
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();

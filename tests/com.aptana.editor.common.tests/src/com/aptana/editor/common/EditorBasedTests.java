@@ -7,8 +7,10 @@
  */
 package com.aptana.editor.common;
 
-import org.junit.After;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -18,8 +20,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -40,8 +40,10 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.ITextEditor;
+import org.junit.After;
 import org.osgi.framework.Bundle;
 
+import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
@@ -183,7 +185,7 @@ public abstract class EditorBasedTests
 		}
 		try
 		{
-			tempFile = File.createTempFile(prefix, extension);
+			tempFile = FileUtil.createTempFile(prefix, extension);
 			IOUtil.write(new FileOutputStream(tempFile), contents);
 			fileStore = EFS.getStore(tempFile.toURI());
 		}
