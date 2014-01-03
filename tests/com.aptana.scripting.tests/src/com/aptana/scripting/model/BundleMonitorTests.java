@@ -57,7 +57,7 @@ public abstract class BundleMonitorTests
 		this._fileSystemService.createBundleDirectory();
 
 		// setup application and user bundles paths
-		String userBundlesPath = new File(FileUtil.getTempDirectory().toOSString(), "bundles").getAbsolutePath();
+		String userBundlesPath = FileUtil.getTempDirectory().append("bundles").toOSString();
 		this._manager = BundleManager.getInstance(null, userBundlesPath);
 		this._manager.reset();
 
