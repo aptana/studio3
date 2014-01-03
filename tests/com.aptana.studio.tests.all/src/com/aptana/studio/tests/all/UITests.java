@@ -35,7 +35,7 @@ import org.junit.runners.Suite;
 //	com.aptana.portal.ui.tests.AllTests.class,
 //	// com.aptana.scripting.ui.tests.AllTests.class, // TODO Add Tests for scripting.ui
 //	// com.aptana.syncing.ui.tests.AllTests.class, // FIXME Re-enable when we have ftp server set back up...
-//	com.aptana.theme.tests.AllTests.class,
+	com.aptana.theme.tests.AllTests.class,
 //	org.eclipse.tm.terminal.test.AllTests.class,
 //	
 //	// Now add special test cases which require to be run after all plugins are loaded (dependency inversion in
