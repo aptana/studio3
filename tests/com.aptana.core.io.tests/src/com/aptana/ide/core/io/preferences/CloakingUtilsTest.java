@@ -25,8 +25,7 @@ public class CloakingUtilsTest
 	@Test
 	public void testFile() throws IOException
 	{
-		File file = File.createTempFile("test", "txt");
-		file.deleteOnExit();
+		File file = FileUtil.createTempFile("test", "txt");
 		IFileStore fileStore = EFS.getLocalFileSystem().fromLocalFile(file);
 
 		CloakingUtils.addCloakFileType(file.getName());

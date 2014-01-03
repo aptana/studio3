@@ -37,7 +37,11 @@ public abstract class GitTestCase
 			}
 			fRepo = null;
 		}
-		fPath = null;
+		if (fPath != null)
+		{
+			delete(fPath.toFile());
+			fPath = null;
+		}
 	}
 
 	protected synchronized IPath repoToGenerate() throws Exception

@@ -36,6 +36,7 @@ import org.junit.Test;
 import org.junit.rules.TestName;
 
 import com.aptana.core.tests.TestProject;
+import com.aptana.core.util.FileUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.contentassist.ICommonCompletionProposal;
 import com.aptana.editor.epl.tests.EditorTestHelper;
@@ -394,13 +395,12 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 	@Test
 	public void testStringFPrefix() throws IOException
 	{
-		File bundleFile = File.createTempFile("editor_unit_tests", "rb");
-		bundleFile.deleteOnExit();
+		File bundleFile = FileUtil.createTempFile("editor_unit_tests", "rb");
 
 		BundleElement bundleElement = new BundleElement(bundleFile.getAbsolutePath());
 		bundleElement.setDisplayName("Editor Unit Tests");
 
-		File f = File.createTempFile("snippet", "rb");
+		File f = FileUtil.createTempFile("snippet", "rb");
 		SnippetElement se = createSnippet(f.getAbsolutePath(), "FunctionTemplate", "fun", "source.js");
 		bundleElement.addChild(se);
 		BundleManager.getInstance().addBundle(bundleElement);
@@ -446,13 +446,12 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 	@Test
 	public void testStringThis() throws IOException
 	{
-		File bundleFile = File.createTempFile("editor_unit_tests", "rb");
-		bundleFile.deleteOnExit();
+		File bundleFile = FileUtil.createTempFile("editor_unit_tests", "rb");
 
 		BundleElement bundleElement = new BundleElement(bundleFile.getAbsolutePath());
 		bundleElement.setDisplayName("Editor Unit Tests");
 
-		File f = File.createTempFile("snippet", "rb");
+		File f = FileUtil.createTempFile("snippet", "rb");
 		SnippetElement se = createSnippet(f.getAbsolutePath(), "$(this)", "this", "source.js");
 		bundleElement.addChild(se);
 		BundleManager.getInstance().addBundle(bundleElement);

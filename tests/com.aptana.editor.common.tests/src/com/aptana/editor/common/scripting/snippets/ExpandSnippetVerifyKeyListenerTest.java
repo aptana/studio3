@@ -14,6 +14,7 @@ import org.junit.Test;
 import org.osgi.framework.Bundle;
 
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.FileUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.EditorBasedTests;
 import com.aptana.scripting.model.CommandElement;
@@ -53,7 +54,7 @@ public class ExpandSnippetVerifyKeyListenerTest extends EditorBasedTests
 			boolean listenerEnabled, boolean expectedOutcome) throws IOException
 	{
 
-		File file = File.createTempFile("snippet", "rb");
+		File file = FileUtil.createTempFile("snippet", "rb");
 		final CommandElement se = createSnippet(file.getAbsolutePath(), "FunctionTemplate", snippetTrigger, "", "text");
 
 		IFileStore fileStore = createFileStore("proposal_tests", "txt", documentSource);
