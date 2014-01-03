@@ -1,11 +1,15 @@
 package com.aptana.buildpath.core;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.net.URI;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+
+import com.aptana.core.util.FileUtil;
 
 public class BuildPathEntryTest
 {
@@ -14,7 +18,7 @@ public class BuildPathEntryTest
 	public void testEqualsWithNullArg() throws Exception
 	{
 		String displayName = "name";
-		File tmpFile = File.createTempFile("for_uri", null);
+		File tmpFile = FileUtil.createTempFile("for_uri", null);
 		URI path = tmpFile.toURI();
 		BuildPathEntry entry = new BuildPathEntry(displayName, path);
 		assertFalse(entry.equals(null));
@@ -24,7 +28,7 @@ public class BuildPathEntryTest
 	public void testEquals() throws Exception
 	{
 		String displayName = "name";
-		File tmpFile = File.createTempFile("for_uri", null);
+		File tmpFile = FileUtil.createTempFile("for_uri", null);
 		URI path = tmpFile.toURI();
 		BuildPathEntry entry = new BuildPathEntry(displayName, path);
 		assertTrue(entry.equals(entry));
@@ -36,7 +40,7 @@ public class BuildPathEntryTest
 	public void testGetters() throws Exception
 	{
 		String displayName = "name";
-		File tmpFile = File.createTempFile("for_uri", null);
+		File tmpFile = FileUtil.createTempFile("for_uri", null);
 		URI path = tmpFile.toURI();
 		BuildPathEntry entry = new BuildPathEntry(displayName, path);
 		assertEquals(displayName, entry.getDisplayName());
@@ -47,7 +51,7 @@ public class BuildPathEntryTest
 	public void testIsSelected() throws Exception
 	{
 		String displayName = "name";
-		File tmpFile = File.createTempFile("for_uri", null);
+		File tmpFile = FileUtil.createTempFile("for_uri", null);
 		URI path = tmpFile.toURI();
 		BuildPathEntry entry = new BuildPathEntry(displayName, path);
 		assertFalse(entry.isSelected());
