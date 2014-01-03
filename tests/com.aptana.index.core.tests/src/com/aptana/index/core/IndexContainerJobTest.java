@@ -66,7 +66,7 @@ public class IndexContainerJobTest
 	@Test
 	public void testTypicalIndex() throws Exception
 	{
-		final File indexFile = File.createTempFile("fake_indexFile", ".index");
+		final File indexFile = FileUtil.createTempFile("fake_indexFile", ".index");
 
 		// Generate some structure in the tmp dir
 		final File file1 = new File(tmpDir, "file1");
