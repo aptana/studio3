@@ -11,23 +11,15 @@
 package org.eclipse.tm.internal.terminal.model;
 
 import junit.framework.Test;
-import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 /**
- * Internal Terminal Model test cases. 
- * Runs in internal model package to allow access to default visible items.
+ * Internal Terminal Model test cases. Runs in internal model package to allow access to default visible items.
  */
-public class AllTests extends TestCase {
-	public AllTests() {
-		super(null);
-	}
-
-	public AllTests(String name) {
-		super(name);
-	}
-
-	public static Test suite() {
+public class AllTests
+{
+	public static Test suite()
+	{
 		TestSuite suite = new TestSuite(AllTests.class.getName());
 		suite.addTestSuite(SnapshotChangesTest.class);
 		suite.addTestSuite(SynchronizedTerminalTextDataTest.class);
