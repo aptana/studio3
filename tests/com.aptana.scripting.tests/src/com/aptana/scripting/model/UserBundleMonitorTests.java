@@ -7,8 +7,6 @@
  */
 package com.aptana.scripting.model;
 
-import com.aptana.scripting.internal.model.BundleMonitor;
-
 public class UserBundleMonitorTests extends BundleMonitorTests
 {
 	private static final int WAIT_TIME = 5000;
