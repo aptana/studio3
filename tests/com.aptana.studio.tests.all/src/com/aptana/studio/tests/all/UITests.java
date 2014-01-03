@@ -31,7 +31,7 @@ import org.junit.runners.Suite;
 //	// com.aptana.editor.text.tests.AllTests.class, // TODO Add Tests for editor.text
 //	// com.aptana.explorer.tests.AllTests.class, // TODO Add Tests for explorer
 //	// com.aptana.filesystem.s3.tests.AllTests.class // FIXME I think the way we do passwords causes us to have to run s3 tests in the UI!
-//	com.aptana.git.ui.AllTests.class,
+	com.aptana.git.ui.AllTests.class,
 //	com.aptana.portal.ui.tests.AllTests.class,
 //	// com.aptana.scripting.ui.tests.AllTests.class, // TODO Add Tests for scripting.ui
 //	// com.aptana.syncing.ui.tests.AllTests.class, // FIXME Re-enable when we have ftp server set back up...
