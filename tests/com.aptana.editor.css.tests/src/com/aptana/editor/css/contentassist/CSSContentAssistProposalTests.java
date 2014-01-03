@@ -24,6 +24,7 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.swt.graphics.Point;
 import org.junit.Test;
 
+import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.css.core.parsing.CSSTokenType;
 import com.aptana.editor.common.contentassist.ILexemeProvider;
@@ -730,13 +731,12 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	@Test
 	public void testBackgroundProposals() throws IOException
 	{
-		File bundleFile = File.createTempFile("editor_unit_tests", "rb");
-		bundleFile.deleteOnExit();
+		File bundleFile = FileUtil.createTempFile("editor_unit_tests", "rb");
 
 		BundleElement bundleElement = new BundleElement(bundleFile.getAbsolutePath());
 		bundleElement.setDisplayName("Editor Unit Tests");
 
-		File f = File.createTempFile("snippet", "rb");
+		File f = FileUtil.createTempFile("snippet", "rb");
 		SnippetElement se = createSnippet(f.getAbsolutePath(), "background-color-template", "background", "source.css");
 		bundleElement.addChild(se);
 		BundleManager.getInstance().addBundle(bundleElement);

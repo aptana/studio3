@@ -7,10 +7,11 @@
  */
 package com.aptana.core.io.tests;
 
-import org.junit.After;
-import org.junit.Test;
-import org.junit.Before;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,8 +31,6 @@ import java.util.Comparator;
 import java.util.Properties;
 import java.util.Random;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
@@ -40,11 +39,15 @@ import org.eclipse.core.filesystem.provider.FileInfo;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.aptana.core.io.vfs.ExtendedFileInfo;
 import com.aptana.core.io.vfs.IExtendedFileInfo;
 import com.aptana.core.io.vfs.IExtendedFileStore;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.FileUtil;
 import com.aptana.ide.core.io.ConnectionContext;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IConnectionPoint;
@@ -123,7 +126,7 @@ public abstract class CommonConnectionTest
 		return cachedProperties;
 	}
 
-//	@Override
+	// @Override
 	@Before
 	public void setUp() throws Exception
 	{
@@ -142,7 +145,7 @@ public abstract class CommonConnectionTest
 		}
 	}
 
-//	@Override
+	// @Override
 	@After
 	public void tearDown() throws Exception
 	{
@@ -171,7 +174,7 @@ public abstract class CommonConnectionTest
 			{
 				cp = null;
 				testPath = null;
-//				super.tearDown();
+				// super.tearDown();
 			}
 		}
 	}
@@ -1087,17 +1090,25 @@ public abstract class CommonConnectionTest
 		File file = File.createTempFile("testMoveFolderToLocal", ".tmp"); //$NON-NLS-1$ //$NON-NLS-2$
 		file.delete();
 		file.deleteOnExit();
-		IFileStore fs2 = EFS.getLocalFileSystem()
-				.fromLocalFile(new File(file.getParentFile(), file.getName() + "_dir")); //$NON-NLS-1$
+		File dest = new File(file.getParentFile(), file.getName() + "_dir"); //$NON-NLS-1$
+		IFileStore fs2 = EFS.getLocalFileSystem().fromLocalFile(dest);
 		assertNotNull(fs2);
 		assertFalse(fs2.fetchInfo().exists());
 		fs.move(fs2, EFS.NONE, null);
-		assertFalse(fs.fetchInfo().exists());
+		try
+		{
+			assertFalse(fs.fetchInfo().exists());
 
-		IFileInfo fi = fs2.getChild("file.txt").fetchInfo(); //$NON-NLS-1$
-		assertNotNull(fi);
-		assertTrue(fi.exists());
-		assertEquals(BYTES.length, fi.getLength());
+			IFileInfo fi = fs2.getChild("file.txt").fetchInfo(); //$NON-NLS-1$
+			assertNotNull(fi);
+			assertTrue(fi.exists());
+			assertEquals(BYTES.length, fi.getLength());
+		}
+		finally
+		{
+			// cleanup moved dir
+			FileUtil.deleteRecursively(dest);
+		}
 	}
 
 	@Test

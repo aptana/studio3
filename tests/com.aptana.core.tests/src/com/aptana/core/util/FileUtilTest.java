@@ -32,11 +32,24 @@ public class FileUtilTest
 		assertFalse("null directory argument should return false", FileUtil.isDirectoryAccessible(null));
 		IPath tmp = FileUtil.getTempDirectory();
 		IPath subdir = tmp.append("subdir" + System.currentTimeMillis());
-		assertTrue("tmp dir should be accessible", FileUtil.isDirectoryAccessible(tmp.toFile()));
-		assertFalse("Non-existant directory shouldn't be accessible", FileUtil.isDirectoryAccessible(subdir.toFile()));
-		assertTrue("Failed to create subdir of tmp dir", subdir.toFile().mkdirs());
-		assertTrue("After creating subdir, it should be accessible", FileUtil.isDirectoryAccessible(subdir.toFile()));
-		// TODO Use chmod to not allow directory to be accessible?
+		try
+		{
+			assertTrue("tmp dir should be accessible", FileUtil.isDirectoryAccessible(tmp.toFile()));
+			assertFalse("Non-existant directory shouldn't be accessible",
+					FileUtil.isDirectoryAccessible(subdir.toFile()));
+			assertTrue("Failed to create subdir of tmp dir", subdir.toFile().mkdirs());
+			assertTrue("After creating subdir, it should be accessible",
+					FileUtil.isDirectoryAccessible(subdir.toFile()));
+			// TODO Use chmod to not allow directory to be accessible?
+		}
+		finally
+		{
+			File blah = subdir.toFile();
+			if (!FileUtil.deleteRecursively(blah))
+			{
+				blah.deleteOnExit();
+			}
+		}
 	}
 
 	@Test

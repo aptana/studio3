@@ -7,6 +7,8 @@ import java.io.IOException;
 
 import org.junit.Test;
 
+import com.aptana.core.util.FileUtil;
+
 public class CommandBlockRunnerTests extends BundleTestBase
 {
 
@@ -29,7 +31,7 @@ public class CommandBlockRunnerTests extends BundleTestBase
 		CommandElement command = bundle.getCommandByName("Test");
 		assertNotNull(command);
 
-		File f = File.createTempFile("snippet", "rb");
+		File f = FileUtil.createTempFile("snippet", "rb");
 		EnvironmentElement ee = createEnvironment(f.getAbsolutePath(), "environment", null);
 		bundle.addChild(ee);
 
