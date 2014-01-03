@@ -7,34 +7,13 @@
  */
 package com.aptana.editor.dtd;
 
-import org.junit.runners.Suite.SuiteClasses;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-import junit.framework.Test;
-import junit.framework.TestResult;
-import junit.framework.TestSuite;
+import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({DTDSourcePartitionScannerTest.class, DTDTagScannerTest.class, })
+@SuiteClasses({ DTDSourcePartitionScannerTest.class, DTDTagScannerTest.class, })
 public class AllTests
 {
 
-//	public static Test suite()
-//	{
-//		TestSuite suite = new TestSuite("Tests for com.aptana.editor.dtd")
-//		{
-//			@Override
-//			public void runTest(Test test, TestResult result)
-//			{
-//				System.err.println("Running test: " + test.toString());
-//				super.runTest(test, result);
-//			}
-//		};
-//		// $JUnit-BEGIN$
-//		suite.addTestSuite(DTDSourcePartitionScannerTest.class);
-//		suite.addTestSuite(DTDTagScannerTest.class);
-//		// $JUnit-END$
-//		return suite;
-//	}
-//
 }

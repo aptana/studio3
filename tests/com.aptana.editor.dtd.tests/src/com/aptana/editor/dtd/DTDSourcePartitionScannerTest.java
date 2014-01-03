@@ -7,14 +7,13 @@
  */
 package com.aptana.editor.dtd;
 
-import org.junit.After;
-import org.junit.Test;
-import static org.junit.Assert.*;
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
 
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
+import org.junit.After;
+import org.junit.Test;
 
 import com.aptana.editor.common.ExtendedFastPartitioner;
 import com.aptana.editor.common.IExtendedPartitioner;
@@ -24,33 +23,41 @@ import com.aptana.editor.common.text.rules.NullSubPartitionScanner;
 
 /**
  */
-public class DTDSourcePartitionScannerTest {
+public class DTDSourcePartitionScannerTest
+{
 
 	private IDocumentPartitioner partitioner;
 
-	private void assertContentType(String contentType, String code, int offset) {
-		assertEquals("Content type doesn't match expectations for: " + code.charAt(offset), contentType, getContentType(code, offset));
+	private void assertContentType(String contentType, String code, int offset)
+	{
+		assertEquals("Content type doesn't match expectations for: " + code.charAt(offset), contentType,
+				getContentType(code, offset));
 	}
 
-	private void assertContentType(String contentType, String code, int offset, int length) {
-		for (int i = 0; i < length; ++i) {
+	private void assertContentType(String contentType, String code, int offset, int length)
+	{
+		for (int i = 0; i < length; ++i)
+		{
 			assertContentType(contentType, code, offset + i);
 		}
 	}
 
-//	@Override
 	@After
-	public void tearDown() throws Exception {
+	public void tearDown() throws Exception
+	{
 		partitioner = null;
-//		super.tearDown();
 	}
 
-	private String getContentType(String content, int offset) {
-		if (partitioner == null) {
+	private String getContentType(String content, int offset)
+	{
+		if (partitioner == null)
+		{
 			IDocument document = new Document(content);
-			CompositePartitionScanner partitionScanner = new CompositePartitionScanner(DTDSourceConfiguration.getDefault().createSubPartitionScanner(),
-					new NullSubPartitionScanner(), new NullPartitionerSwitchStrategy());
-			partitioner = new ExtendedFastPartitioner(partitionScanner, DTDSourceConfiguration.getDefault().getContentTypes());
+			CompositePartitionScanner partitionScanner = new CompositePartitionScanner(DTDSourceConfiguration
+					.getDefault().createSubPartitionScanner(), new NullSubPartitionScanner(),
+					new NullPartitionerSwitchStrategy());
+			partitioner = new ExtendedFastPartitioner(partitionScanner, DTDSourceConfiguration.getDefault()
+					.getContentTypes());
 			partitionScanner.setPartitioner((IExtendedPartitioner) partitioner);
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);
@@ -59,7 +66,8 @@ public class DTDSourcePartitionScannerTest {
 	}
 
 	@Test
-	public void testDefaultPartition() {
+	public void testDefaultPartition()
+	{
 		String source = " <!-- comment -->  ";
 		assertContentType(DTDSourceConfiguration.DEFAULT, source, 0);
 		assertContentType(DTDSourceConfiguration.COMMENT, source, 1, 16);
@@ -68,7 +76,8 @@ public class DTDSourcePartitionScannerTest {
 	}
 
 	@Test
-	public void testCommentPartition() {
+	public void testCommentPartition()
+	{
 		String source = " <!-- comment\ncomment\r\ncomment <!ATTR> -->  ";
 		assertContentType(DTDSourceConfiguration.DEFAULT, source, 0);
 		assertContentType(DTDSourceConfiguration.COMMENT, source, 1, 41);
@@ -77,7 +86,8 @@ public class DTDSourcePartitionScannerTest {
 	}
 
 	@Test
-	public void testTagPartition() {
+	public void testTagPartition()
+	{
 		String source = " <!ELEMENT note   \n\n (to+,from?,heading,img,body*)> ";
 		assertContentType(DTDSourceConfiguration.DEFAULT, source, 0);
 		assertContentType(DTDSourceConfiguration.TAG, source, 1, 50);
@@ -85,7 +95,8 @@ public class DTDSourcePartitionScannerTest {
 	}
 
 	@Test
-	public void testSectionPartition() {
+	public void testSectionPartition()
+	{
 		String source = " <![%draft;[\n<!ELEMENT book (comments*, title, body, supplements?)>\n]]> ";
 		assertContentType(DTDSourceConfiguration.DEFAULT, source, 0);
 		assertContentType(DTDSourceConfiguration.SECTION, source, 1, 11);
@@ -97,7 +108,8 @@ public class DTDSourcePartitionScannerTest {
 	}
 
 	@Test
-	public void testPIPartition() {
+	public void testPIPartition()
+	{
 		String source = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!-- comment -->  ";
 		assertContentType(DTDSourceConfiguration.PROLOG, source, 0, 38);
 		assertContentType(DTDSourceConfiguration.DEFAULT, source, 38);
@@ -106,7 +118,8 @@ public class DTDSourcePartitionScannerTest {
 	}
 
 	@Test
-	public void testPIPartition2() {
+	public void testPIPartition2()
+	{
 		String source = "<?tst version=\"1.0\" encoding=\"UTF-8\"?>\n<!-- comment -->  ";
 		assertContentType(DTDSourceConfiguration.PI, source, 0, 38);
 		assertContentType(DTDSourceConfiguration.DEFAULT, source, 38);
