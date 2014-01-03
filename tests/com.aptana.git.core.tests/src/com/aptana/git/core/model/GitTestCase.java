@@ -242,16 +242,7 @@ public abstract class GitTestCase
 		{
 			return;
 		}
-		File[] children = generatedRepo.listFiles();
-		if (children != null)
-		{
-			for (File child : children)
-			{
-				delete(child);
-			}
-		}
-
-		if (!generatedRepo.delete())
+		if (!FileUtil.deleteRecursively(generatedRepo))
 		{
 			generatedRepo.deleteOnExit();
 		}

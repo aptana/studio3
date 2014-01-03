@@ -495,4 +495,19 @@ public class FileUtil
 		}
 		return canCreateSubdir(parent.getParentFile());
 	}
+
+	/**
+	 * Wraps {@link File#createTempFile(String, String)} and marks the file to be deleted on JVM exit.
+	 * 
+	 * @param prefix
+	 * @param suffix
+	 * @return
+	 * @throws IOException
+	 */
+	public static File createTempFile(String prefix, String suffix) throws IOException
+	{
+		File f = File.createTempFile(prefix, suffix);
+		f.deleteOnExit();
+		return f;
+	}
 }
