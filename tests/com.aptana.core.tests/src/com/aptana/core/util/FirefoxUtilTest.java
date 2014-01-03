@@ -61,11 +61,12 @@ public class FirefoxUtilTest {
 
 	@Test
 	public void testFindDefaultProfileLocation() throws IOException {
+		File dir = null;
 		File profileDir = File.createTempFile(getClass().getSimpleName(), "profile");
 		try {
 			assertTrue(profileDir.delete());
 			assertTrue(profileDir.mkdir());
-			File dir = File.createTempFile(getClass().getSimpleName(), "temp");
+			dir = File.createTempFile(getClass().getSimpleName(), "temp");
 			assertTrue(dir.delete());
 			assertTrue(dir.mkdir());
 			File file = new File(dir, "profiles.ini");
@@ -78,6 +79,10 @@ public class FirefoxUtilTest {
 		}
 		finally {
 			FileUtil.deleteRecursively(profileDir);
+			if (dir != null)
+			{
+				FileUtil.deleteRecursively(dir);
+			}
 		}
 
 	}
@@ -146,6 +151,7 @@ public class FirefoxUtilTest {
 		}
 		finally {
 			FileUtil.deleteRecursively(CorePlugin.getDefault().getStateLocation().append("test").toFile());
+			FileUtil.deleteRecursively(dir);
 		}
 	}
 
@@ -161,6 +167,7 @@ public class FirefoxUtilTest {
 		}
 		finally {
 			FileUtil.deleteRecursively(CorePlugin.getDefault().getStateLocation().append("test").toFile());
+			FileUtil.deleteRecursively(dir);
 		}
 	}
 

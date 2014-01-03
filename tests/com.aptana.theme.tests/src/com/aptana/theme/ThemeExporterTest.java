@@ -18,9 +18,10 @@ import org.eclipse.core.runtime.Path;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.aptana.core.util.FileUtil;
+
 public class ThemeExporterTest
 {
-
 	@Test
 	public void testExport() throws Exception
 	{
@@ -31,7 +32,7 @@ public class ThemeExporterTest
 		Theme theme = importer.convert(new File(url.toURI()));
 
 		ThemeExporter exporter = new ThemeExporter();
-		File expected = File.createTempFile("theme_exporter", ".tmTheme");
+		File expected = FileUtil.createTempFile("theme_exporter", ".tmTheme");
 		exporter.export(expected, theme);
 
 		assertTrue(expected.isFile());
@@ -50,7 +51,7 @@ public class ThemeExporterTest
 		Theme theme = importer.convert(new File(url.toURI()));
 
 		ThemeExporter exporter = new ThemeExporter();
-		File expected = File.createTempFile("theme_exporter", ".tmTheme");
+		File expected = FileUtil.createTempFile("theme_exporter", ".tmTheme");
 		exporter.export(expected, theme);
 
 		assertTrue(expected.isFile());
