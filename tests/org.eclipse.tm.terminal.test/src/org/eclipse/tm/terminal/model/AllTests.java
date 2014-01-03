@@ -11,23 +11,15 @@
 package org.eclipse.tm.terminal.model;
 
 import junit.framework.Test;
-import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 /**
- * Public Terminal Model test cases. 
- * Runs in internal model package to allow access to default visible items.
+ * Public Terminal Model test cases. Runs in internal model package to allow access to default visible items.
  */
-public class AllTests extends TestCase {
-	public AllTests() {
-		super(null);
-	}
-
-	public AllTests(String name) {
-		super(name);
-	}
-
-	public static Test suite() {
+public class AllTests
+{
+	public static Test suite()
+	{
 		TestSuite suite = new TestSuite(AllTests.class.getName());
 		suite.addTestSuite(StyleColorTest.class);
 		suite.addTestSuite(StyleTest.class);

@@ -11,23 +11,16 @@
 package org.eclipse.tm.internal.terminal.emulator;
 
 import junit.framework.Test;
-import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 /**
- * Terminal emulator test cases. 
- * Runs in emulator package to allow access to default visible items.
+ * Terminal emulator test cases. Runs in emulator package to allow access to default visible items.
  */
-public class AllTests extends TestCase {
-	public AllTests() {
-		super(null);
-	}
+public class AllTests
+{
 
-	public AllTests(String name) {
-		super(name);
-	}
-
-	public static Test suite() {
+	public static Test suite()
+	{
 		TestSuite suite = new TestSuite(AllTests.class.getName());
 		suite.addTestSuite(VT100EmulatorBackendTest.class);
 		return suite;

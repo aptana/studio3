@@ -11,25 +11,14 @@
 package org.eclipse.tm.terminal.test;
 
 import junit.framework.Test;
-import junit.framework.TestCase;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 /**
  * Master test suite to run all terminal unit tests.
  */
-public class AllTests extends TestCase
+public class AllTests
 {
-
-	public AllTests()
-	{
-		super(null);
-	}
-
-	public AllTests(String name)
-	{
-		super(name);
-	}
 
 	/**
 	 * Call each AllTests class from each of the test packages.
