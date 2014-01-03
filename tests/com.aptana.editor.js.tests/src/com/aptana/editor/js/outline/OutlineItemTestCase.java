@@ -7,9 +7,8 @@
  */
 package com.aptana.editor.js.outline;
 
-import org.junit.Test;
-import org.junit.Before;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+
 import java.io.StringReader;
 
 import javax.xml.namespace.QName;
@@ -18,8 +17,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import junit.framework.TestCase;
-
+import org.junit.Before;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -37,7 +35,6 @@ public abstract class OutlineItemTestCase
 {
 	private JSParser fParser;
 
-//	@Override
 	@Before
 	public void setUp() throws Exception
 	{
@@ -104,7 +101,6 @@ public abstract class OutlineItemTestCase
 	 * @param childCount
 	 *            The expected number of children for the element
 	 */
-	@Test
 	protected void testItem(String source, String xpath, String label, int childCount)
 	{
 		String countPath = "count(" + xpath + ")";

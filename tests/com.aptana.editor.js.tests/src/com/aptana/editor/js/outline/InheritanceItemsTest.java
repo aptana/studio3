@@ -7,6 +7,8 @@
  */
 package com.aptana.editor.js.outline;
 
+import org.junit.Test;
+
 /**
  * @author Kevin Lindsey
  */
@@ -19,41 +21,49 @@ public class InheritanceItemsTest extends OutlineItemTestCase
 		testItem(source, "/outline/object-literal/boolean", "a");
 	}
 
+	@Test
 	public void testDojoLangExtend()
 	{
 		testInheritance("dojo.lang.extend(Subclass, { a: true });");
 	}
 
+	@Test
 	public void testMochiKitBaseUpdate()
 	{
 		testInheritance("MochiKit.Base.update(Subclass, { a: true });");
 	}
 
+	@Test
 	public void testObjectExtend()
 	{
 		testInheritance("Object.extend(Subclass, { a: true });");
 	}
 
+	@Test
 	public void testExtExtend()
 	{
 		testInheritance("Ext.extend(Subclass, Superclass, { a: true });");
 	}
 
+	@Test
 	public void testQxClassDefine()
 	{
 		testInheritance("qx.Class.define(Subclass, { a: true });");
 	}
 
+	@Test
 	public void testQxInterfaceDefine()
 	{
 		testInheritance("qx.Interface.define(Subclass, { a: true });");
 	}
 
+	@Test
 	public void testQxThemeDefine()
 	{
 		testInheritance("qx.Theme.define(Subclass, { a: true });");
 	}
 
+	@Test
 	public void testQxMixinDefine()
 	{
 		testInheritance("qx.Mixin.define(Subclass, { a: true });");
