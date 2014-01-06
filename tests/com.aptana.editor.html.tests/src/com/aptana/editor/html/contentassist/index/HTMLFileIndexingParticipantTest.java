@@ -1,53 +1,40 @@
 package com.aptana.editor.html.contentassist.index;
 
-import org.junit.After;
-import org.junit.Test;
-import org.junit.Before;
-import static org.junit.Assert.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Collection;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.aptana.core.build.IProblem;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.IOUtil;
-import com.aptana.css.core.index.CSSFileIndexingParticipant;
 import com.aptana.index.core.FileStoreBuildContext;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.IndexPlugin;
 import com.aptana.index.core.build.BuildContext;
-import com.aptana.js.core.index.JSFileIndexingParticipant;
 
 public class HTMLFileIndexingParticipantTest
 {
 
 	private HTMLFileIndexingParticipant indexer;
-	private CSSFileIndexingParticipant cssIndexer;
-	private JSFileIndexingParticipant jsIndexer;
 
 	@Before
 	public void setUp() throws Exception
 	{
-//		super.setUp();
-		cssIndexer = new CSSFileIndexingParticipant();
-		jsIndexer = new JSFileIndexingParticipant();
 		indexer = new HTMLFileIndexingParticipant();
 	}
 
 	@After
 	public void tearDown() throws Exception
 	{
-		jsIndexer = null;
-		cssIndexer = null;
 		indexer = null;
-//		super.tearDown();
 	}
 
 	@Test

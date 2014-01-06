@@ -7,14 +7,12 @@
  */
 package com.aptana.editor.html.parsing;
 
-import org.junit.After;
-import org.junit.Test;
-import org.junit.Before;
-import static org.junit.Assert.*;
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
 
-import com.aptana.editor.html.parsing.HTMLParseState;
-import com.aptana.editor.html.parsing.HTMLParser;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 import com.aptana.parsing.ast.IParseNode;
 
 public class HTMLParserTypeAttributeTest

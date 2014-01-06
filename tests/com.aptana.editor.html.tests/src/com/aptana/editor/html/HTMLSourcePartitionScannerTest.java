@@ -7,13 +7,12 @@
  */
 package com.aptana.editor.html;
 
-import org.junit.After;
-import org.junit.Test;
-import static org.junit.Assert.*;
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
 
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
+import org.junit.After;
+import org.junit.Test;
 
 import com.aptana.editor.common.ExtendedFastPartitioner;
 import com.aptana.editor.common.NullPartitionerSwitchStrategy;
@@ -37,12 +36,10 @@ public class HTMLSourcePartitionScannerTest
 				getContentType(code, offset));
 	}
 
-//	@Override
 	@After
 	public void tearDown() throws Exception
 	{
 		partitioner = null;
-//		super.tearDown();
 	}
 
 	private String getContentType(String content, int offset)
@@ -101,7 +98,7 @@ public class HTMLSourcePartitionScannerTest
 		assertContentType(HTMLSourceConfiguration.HTML_COMMENT, source, 52);
 		assertContentType(HTMLSourceConfiguration.DEFAULT, source, 53);
 	}
-	
+
 	@Test
 	public void testLessThan()
 	{
@@ -150,12 +147,8 @@ public class HTMLSourcePartitionScannerTest
 	@Test
 	public void testHTML5()
 	{
-		String source = "<!DOCTYPE html>\n"
-				+ "<HTML><HEAD>\n"
-				+ "<STYLE>html {color: red;}</STYLE>\n"
-				+ "<SCRIPT>var one = 1;</SCRIPT>\n"
-				+ "</HEAD><BODY>\n"
-				+ "</BODY></HTML>";
+		String source = "<!DOCTYPE html>\n" + "<HTML><HEAD>\n" + "<STYLE>html {color: red;}</STYLE>\n"
+				+ "<SCRIPT>var one = 1;</SCRIPT>\n" + "</HEAD><BODY>\n" + "</BODY></HTML>";
 		// DOCTYPE
 		assertContentType(HTMLSourceConfiguration.HTML_DOCTYPE, source, 0);
 		// html tag
@@ -193,7 +186,7 @@ public class HTMLSourcePartitionScannerTest
 		// DOCTYPE
 		assertContentType(HTMLSourceConfiguration.HTML_DOCTYPE, source, 0);
 	}
-	
+
 	@Test
 	public void testIncompleteTag1()
 	{

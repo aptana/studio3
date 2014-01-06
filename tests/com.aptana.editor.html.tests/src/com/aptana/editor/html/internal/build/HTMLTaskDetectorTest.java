@@ -1,21 +1,21 @@
 package com.aptana.editor.html.internal.build;
 
-import org.junit.After;
-import org.junit.Test;
-import org.junit.Before;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.aptana.core.build.IProblem;
 import com.aptana.core.resources.IMarkerConstants;
@@ -32,7 +32,6 @@ public class HTMLTaskDetectorTest
 	@Before
 	public void setUp() throws Exception
 	{
-//		super.setUp();
 		taskDetector = new HTMLTaskDetector();
 	}
 
@@ -40,7 +39,6 @@ public class HTMLTaskDetectorTest
 	public void tearDown() throws Exception
 	{
 		taskDetector = null;
-//		super.tearDown();
 	}
 
 	@Test
