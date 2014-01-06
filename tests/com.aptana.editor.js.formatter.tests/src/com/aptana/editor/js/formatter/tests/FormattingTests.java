@@ -22,7 +22,7 @@ public class FormattingTests extends AbstractFormatterTestCase
 	private static String FILE_TYPE = "js"; //$NON-NLS-1$
 
 	@BeforeClass
-	protected void initializePlugin() throws Exception
+	public static void initializePlugin() throws Exception
 	{
 		// force JS plugin to load and ensure we use spaces for tabs!
 		JSPlugin.getDefault().getPreferenceStore()
