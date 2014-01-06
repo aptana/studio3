@@ -1,33 +1,32 @@
 package com.aptana.editor.html.formatter.tests;
 
+import java.util.Arrays;
+
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
+import org.junit.BeforeClass;
+import org.junit.runners.Parameterized.Parameters;
 
 import com.aptana.editor.common.formatting.AbstractFormatterTestCase;
 import com.aptana.editor.html.HTMLPlugin;
 
 public class FormattingTests extends AbstractFormatterTestCase
 {
-	// Turn this flag on for development only (used to generate the formatted files)
-	// To generate formatted files, place html files under the 'formatting' folder and run these tests from the
-	// com.aptana.editor.html.formatter.tests plugin
-	// NOTE: Ensure that the contents section ends with a newline, or the generation may not work.
-	private static boolean INITIALIZE_MODE = false;
-	// Turning on the overwrite will re-generate the formatted block and overwrite it into the test files.
-	// This is a drastic move that will require a review of the output right after to make sure we have the
-	// right formatting for all the test file, so turn it on at your own risk.
-	private static boolean OVERWRITE_MODE = false;
+	@Parameters(name = "{0}")
+	public static Iterable<Object[]> data()
+	{
+		return Arrays.asList(AbstractFormatterTestCase.getFiles(TEST_BUNDLE_ID, FILE_TYPE));
+	}
 
 	private static String FORMATTER_FACTORY_ID = "com.aptana.editor.html.formatterFactory"; //$NON-NLS-1$
 	private static String TEST_BUNDLE_ID = "com.aptana.editor.html.formatter.tests"; //$NON-NLS-1$
 	private static String FILE_TYPE = "html"; //$NON-NLS-1$
 
-	@Override
-	protected void setUpSuite() throws Exception
+	@BeforeClass
+	public static void initializePlugin() throws Exception
 	{
 		IPreferenceStore prefs = HTMLPlugin.getDefault().getPreferenceStore();
 		prefs.setValue(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS, true);
-		super.setUpSuite();
 	}
 
 	/*
@@ -58,26 +57,6 @@ public class FormattingTests extends AbstractFormatterTestCase
 	protected String getFileType()
 	{
 		return FILE_TYPE;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.formatting.AbstractFormatterTestCase#isOverriteMode()
-	 */
-	@Override
-	protected boolean isOverriteMode()
-	{
-		return OVERWRITE_MODE;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.formatting.AbstractFormatterTestCase#isInitializeMode()
-	 */
-	@Override
-	protected boolean isInitializeMode()
-	{
-		return INITIALIZE_MODE;
 	}
 
 	/*
