@@ -7,13 +7,12 @@
  */
 package com.aptana.editor.html.outline;
 
-import org.junit.After;
-import org.junit.Test;
-import org.junit.Before;
-import static org.junit.Assert.*;
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.css.core.ICSSConstants;
@@ -36,18 +35,14 @@ public class HTMLOutlineProviderTest
 	private HTMLParser fParser;
 	private HTMLParseState fParseState;
 
-//	@Override
 	@Before
 	public void setUp() throws Exception
 	{
-//		super.setUp();
-
 		fLabelProvider = new HTMLOutlineLabelProvider();
 		fContentProvider = new HTMLOutlineContentProvider(null);
 		fParser = new HTMLParser();
 	}
 
-//	@Override
 	@After
 	public void tearDown() throws Exception
 	{
@@ -55,7 +50,6 @@ public class HTMLOutlineProviderTest
 		fContentProvider = null;
 		fParser = null;
 		fParseState = null;
-//		super.tearDown();
 	}
 
 	@Test

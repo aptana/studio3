@@ -7,9 +7,6 @@
  */
 package com.aptana.editor.html.tests.performance;
 
-import org.junit.runners.Suite.SuiteClasses;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
 import java.io.IOException;
 import java.text.MessageFormat;
 
@@ -32,8 +29,6 @@ import com.aptana.editor.epl.tests.EditorTestHelper;
 import com.aptana.editor.epl.tests.OpenEditorTest;
 import com.aptana.editor.epl.tests.ResourceTestHelper;
 
-@RunWith(Suite.class)
-@SuiteClasses({})
 public class OpenHTMLEditorTest extends OpenEditorTest
 {
 
@@ -68,24 +63,24 @@ public class OpenHTMLEditorTest extends OpenEditorTest
 		super(name);
 	}
 
-//	public static Test suite()
-//	{
-//		// ensure sequence
-//		TestSuite suite = new TestSuite(OpenHTMLEditorTest.class.getName());
-//		suite.addTest(new OpenHTMLEditorTest("testOpenHTMLEditor1"));
-////		suite.addTest(new OpenHTMLEditorTest("testOpenReddit"));
-////		suite.addTest(new OpenHTMLEditorTest("testOpenRedditNoCSSNoJS"));
-//		// suite.addTest(new OpenHTMLEditorTest("testOpenBigHTML"));
-//		suite.addTest(new OpenHTMLEditorTest("testOpenLargeFileFoldingOnOutlineOn"));
-//		// suite.addTest(new OpenHTMLEditorTest("testOpenLargeFileFoldingOffOutlineOn"));
-//		suite.addTest(new OpenHTMLEditorTest("testOpenLargeFileFoldingOnOutlineOff"));
-//		// suite.addTest(new OpenHTMLEditorTest("testOpenLargeFileFoldingOffOutlineOff"));
-//		return new Setup(suite);
-//	}
-//
-//	/*
-//	 * @see junit.framework.TestCase#setUp()
-//	 */
+	public static Test suite()
+	{
+		// ensure sequence
+		TestSuite suite = new TestSuite(OpenHTMLEditorTest.class.getName());
+		suite.addTest(new OpenHTMLEditorTest("testOpenHTMLEditor1"));
+		// suite.addTest(new OpenHTMLEditorTest("testOpenReddit"));
+		// suite.addTest(new OpenHTMLEditorTest("testOpenRedditNoCSSNoJS"));
+		// suite.addTest(new OpenHTMLEditorTest("testOpenBigHTML"));
+		suite.addTest(new OpenHTMLEditorTest("testOpenLargeFileFoldingOnOutlineOn"));
+		// suite.addTest(new OpenHTMLEditorTest("testOpenLargeFileFoldingOffOutlineOn"));
+		suite.addTest(new OpenHTMLEditorTest("testOpenLargeFileFoldingOnOutlineOff"));
+		// suite.addTest(new OpenHTMLEditorTest("testOpenLargeFileFoldingOffOutlineOff"));
+		return new Setup(suite);
+	}
+
+	/*
+	 * @see junit.framework.TestCase#setUp()
+	 */
 	protected void setUp() throws Exception
 	{
 		super.setUp();
