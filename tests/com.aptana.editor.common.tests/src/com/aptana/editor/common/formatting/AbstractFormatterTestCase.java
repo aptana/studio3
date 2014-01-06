@@ -1,19 +1,22 @@
 package com.aptana.editor.common.formatting;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
-
-import junit.extensions.TestSetup;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.text.edits.TextEdit;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.formatter.IScriptFormatter;
@@ -25,54 +28,21 @@ import com.aptana.formatter.ScriptFormatterManager;
  * This class provides the basic functionality that should be used for all formatting tests. A formatting test should
  * extend this class and implement the method to compare the two formatted files (with white space).
  */
-public abstract class AbstractFormatterTestCase extends TestCase
+@RunWith(Parameterized.class)
+public abstract class AbstractFormatterTestCase
 {
 	// Folder where the formatting files are located
 	protected static String FORMATTING_FOLDER = "formatting"; //$NON-NLS-1$
 	protected IScriptFormatterFactory factory;
 
-	/**
-	 * Creates a test suite that loads a dynamic list of test-cases, one for each file in the working-directory.
-	 * 
-	 * @return A {@link Test} that wraps a {@link TestSuite}.
-	 */
-	public Test suite()
+	@Parameter(0)
+	public String fFilename;
+
+	@org.junit.Test
+	public void test() throws Exception
 	{
-		TestSuite suite = new TestSuite("Formatter Tests");
-		String[] files = getFiles();
-		for (final String fileName : files)
-		{
-			suite.addTest(new TestCase(fileName)
-			{
-				@Override
-				protected void runTest() throws Throwable
-				{
-					FormatterTestFile file = new FormatterTestFile(factory, getTestBundleId(), fileName,
-							getWorkingDirectory());
-					if (isInitializeMode())
-					{
-						file.generateFormattedContent(isOverriteMode());
-					}
-					formatterTest(file, fileName, getFileType());
-				}
-
-			});
-		}
-
-		// Wrap everything in a TestSetup
-		TestSetup setup = new TestSetup(suite)
-		{
-			protected void setUp() throws Exception
-			{
-				setUpSuite();
-			}
-
-			protected void tearDown() throws Exception
-			{
-				tearDownSuite();
-			}
-		};
-		return setup;
+		FormatterTestFile file = new FormatterTestFile(factory, getTestBundleId(), fFilename, FORMATTING_FOLDER);
+		formatterTest(file, fFilename, getFileType());
 	}
 
 	/**
@@ -80,7 +50,8 @@ public abstract class AbstractFormatterTestCase extends TestCase
 	 * 
 	 * @throws Exception
 	 */
-	protected void setUpSuite() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
 		factory = (IScriptFormatterFactory) ScriptFormatterManager.getInstance().getContributionById(getFormatterId());
 	}
@@ -90,7 +61,8 @@ public abstract class AbstractFormatterTestCase extends TestCase
 	 * 
 	 * @throws Exception
 	 */
-	protected void tearDownSuite()
+	@After
+	public void tearDown()
 	{
 		factory = null;
 	}
@@ -131,13 +103,11 @@ public abstract class AbstractFormatterTestCase extends TestCase
 	}
 
 	/**
-	 * Returns the file that will be tested.
+	 * Returns the files that will be tested.
 	 */
-	protected String[] getFiles()
+	public static Object[][] getFiles(String testBundleId, String fileType)
 	{
-		String directory = getWorkingDirectory();
-		String fileType = getFileType();
-		String testBundleId = getTestBundleId();
+		String directory = FORMATTING_FOLDER;
 		Enumeration<String> entryPaths = Platform.getBundle(testBundleId).getEntryPaths(directory);
 		ArrayList<String> filePaths = new ArrayList<String>();
 		String path;
@@ -154,7 +124,13 @@ public abstract class AbstractFormatterTestCase extends TestCase
 			}
 		}
 
-		return (String[]) filePaths.toArray(new String[filePaths.size()]);
+		Object[][] value = new Object[filePaths.size()][];
+		int x = 0;
+		for (String filePath : filePaths)
+		{
+			value[x++] = new Object[] { filePath };
+		}
+		return value;
 	}
 
 	protected void assertEqualsWithWhiteSpace(String message, String expected, String actual)
@@ -191,14 +167,6 @@ public abstract class AbstractFormatterTestCase extends TestCase
 	}
 
 	/**
-	 * Returns the directory that contains that files to test.
-	 */
-	protected String getWorkingDirectory()
-	{
-		return FORMATTING_FOLDER;
-	}
-
-	/**
 	 * Returns the test-bundle Id.
 	 */
 	protected abstract String getTestBundleId();
@@ -212,25 +180,5 @@ public abstract class AbstractFormatterTestCase extends TestCase
 	 * Returns the file-type that is being formatter.
 	 */
 	protected abstract String getFileType();
-
-	/**
-	 * Returns true if the tests are running in an overwrite mode.<br>
-	 * The overwrite will re-generate the formatted block and overwrite it into the test files. This is a drastic move
-	 * that will require a review of the output right after to make sure we have the right formatting for all the test
-	 * file.<br>
-	 * Note: Overwrite mode will only work when {@link #isInitializeMode()} returns <code>true</code> as well.
-	 * 
-	 * @see #isInitializeMode()
-	 */
-	protected abstract boolean isOverriteMode();
-
-	/**
-	 * Returns true if the tests are running in an initialization mode.<br>
-	 * The initialize mode will generate the ==FORMATTED== block for files that don't have it.<br>
-	 * NOTE: Ensure that the contents section ends with a newline, or the generation may not work.
-	 * 
-	 * @see #isOverriteMode()
-	 */
-	protected abstract boolean isInitializeMode();
 
 }

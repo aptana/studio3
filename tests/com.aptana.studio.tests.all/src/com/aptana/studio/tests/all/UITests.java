@@ -21,15 +21,15 @@ import com.aptana.editor.common.internal.commands.NextPreviousEditorHandlerTest;
 	
 	com.aptana.editor.common.tests.AllTests.class,
 	com.aptana.editor.css.tests.AllTests.class,
-//	com.aptana.editor.css.formatter.tests.AllTests.class,
+	com.aptana.editor.css.formatter.tests.AllTests.class,
 	com.aptana.editor.dtd.AllTests.class,
 //	com.aptana.editor.html.tests.AllTests.class, // FIXME Including HTML tests cause the tests to not run on build machine!
 //	com.aptana.editor.html.formatter.tests.AllTests.class,
 	com.aptana.editor.js.tests.AllTests.class,
-//	com.aptana.editor.js.formatter.tests.AllTests.class,
+	com.aptana.editor.js.formatter.tests.AllTests.class,
 	com.aptana.editor.json.tests.AllTests.class,
 	com.aptana.editor.xml.tests.AllTests.class,
-//	com.aptana.editor.xml.formatter.tests.AllTests.class,
+	com.aptana.editor.xml.formatter.tests.AllTests.class,
 	com.aptana.deploy.ftp.tests.AllTests.class,
 //	// com.aptana.editor.text.tests.AllTests.class, // TODO Add Tests for editor.text
 //	// com.aptana.explorer.tests.AllTests.class, // TODO Add Tests for explorer
