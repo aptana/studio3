@@ -7,6 +7,9 @@
  */
 package com.aptana.scripting.model;
 
+import org.junit.Ignore;
+
+@Ignore("We're still getting intermittent failures due to timing issues")
 public class ProjectBundleMonitorTests extends BundleMonitorTests
 {
 	/**
@@ -33,7 +36,7 @@ public class ProjectBundleMonitorTests extends BundleMonitorTests
 	protected void waitForAction(FileSystemAction action) throws Exception
 	{
 		action.performAction();
-		
+
 		// TODO: Should be relying on events or monitors here
 		Thread.sleep(750);
 	}
