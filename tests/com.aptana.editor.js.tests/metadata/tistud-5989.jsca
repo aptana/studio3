@@ -1,0 +1,36 @@
+{
+	"types": [
+		{
+			"name": "Titanium.UI.Thing",
+		},
+		{
+			"name": "Titanium.UI",
+            "functions": [
+            {
+            	"name": "create2DMatrix",
+            	"parameters": [
+                    {
+                        "name": "parameters", 
+                        "usage": "optional", 
+                        "type": "MatrixCreationDict", 
+                        "description": "<p>Initial transformation of the matrix.</p>"
+                    }
+                ],
+                "returnTypes": [
+                    {
+                        "type": "Titanium.UI._2DMatrix", 
+                        "description": ""
+                    }
+                ], 
+                "isConstructor": false, 
+                "isClassProperty": false, 
+                "examples": [], 
+                "exceptions": [], 
+                "references": [], 
+                "isMethod": true, 
+                "isInstanceProperty": true, 
+                "description": "<p>Creates and returns an instance of Titanium.UI.2DMatrix.</p>"
+            }]
+		}
+	]
+}

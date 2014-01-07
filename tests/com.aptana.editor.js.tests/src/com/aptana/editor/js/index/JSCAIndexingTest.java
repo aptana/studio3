@@ -266,6 +266,25 @@ public class JSCAIndexingTest extends JSEditorBasedTestCase
 		assertUserAgents(p.getUserAgentNames(), "android", "iphone", "ipad", "mobileweb");
 	}
 
+	/**
+	 * Test for TISTUD-5989
+	 * 
+	 * @throws CoreException
+	 */
+	@Test
+	public void testChildTypeEncounteredFirstDoesntClobberFullDefinitionOfParent() throws CoreException
+	{
+		Index index = indexResource("metadata/tistud-5989.jsca");
+
+		// make sure target type exists
+		TypeElement t = assertTypeInIndex(index, "Titanium.UI", true);
+
+		PropertyElement p = t.getProperty("create2DMatrix");
+		assertNotNull(
+				"Titanium.UI is missing the create2DMatrix function. Did a temporary type not get merged with real definition?",
+				p);
+	}
+
 	protected IndexManager getIndexManager()
 	{
 		return IndexPlugin.getDefault().getIndexManager();
