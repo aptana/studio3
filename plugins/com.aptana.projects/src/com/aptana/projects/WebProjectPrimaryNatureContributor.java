@@ -18,8 +18,8 @@ public class WebProjectPrimaryNatureContributor extends AbstractPrimaryNatureCon
 
 	public int getPrimaryNatureRank(IPath projectPath)
 	{
-		//FIXME This is the default primary nature if no other contributor vote to be a primary one.
-		// Since the web perspective is overridden by Titanium Studio, it is not valid to rely on the 
+		// FIXME This is the default primary nature if no other contributor vote to be a primary one.
+		// Since the web perspective is overridden by Titanium Studio, it is not valid to rely on the
 		// web perspective. Is there is any specific condition to enforce web primary nature ?
 		return IPrimaryNatureContributor.NOT_PRIMARY;
 	}

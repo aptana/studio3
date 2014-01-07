@@ -7,18 +7,21 @@
  */
 package com.aptana.projects.primary.natures;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 
+import com.aptana.core.epl.CoreEPLPlugin;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.StringUtil;
-import com.aptana.ui.epl.UIEplPlugin;
 
 /**
  * @author pinnamuri
@@ -50,7 +53,7 @@ public class PrimaryNaturesManager
 
 	private void readExtensionRegistry()
 	{
-		EclipseUtil.processConfigurationElements(UIEplPlugin.PLUGIN_ID, EXTENSION_POINT,
+		EclipseUtil.processConfigurationElements(CoreEPLPlugin.PLUGIN_ID, EXTENSION_POINT,
 				new IConfigurationElementProcessor()
 				{
 
@@ -89,14 +92,57 @@ public class PrimaryNaturesManager
 		}
 	}
 
+	/**
+	 * Returns the potential natures applicable to the project, with the primary nature being first in the list.
+	 * 
+	 * @param project
+	 * @return
+	 */
+	public List<String> getPotentialNatures(IProject project)
+	{
+		lazyInit();
+		List<String> potentialNatures = new ArrayList<String>(natureIdRanks.size());
+		for (String natureId : natureIdRanks.keySet())
+		{
+			IPrimaryNatureContributor primaryNatureContributor = natureIdRanks.get(natureId);
+			int primaryNatureRank = primaryNatureContributor.getPrimaryNatureRank(project.getLocation());
+			if (primaryNatureRank == IPrimaryNatureContributor.CAN_BE_PRIMARY)
+			{
+				potentialNatures.add(natureId);
+			}
+			else if (primaryNatureRank == IPrimaryNatureContributor.IS_PRIMARY)
+			{
+				potentialNatures.add(0, natureId);
+			}
+		}
+		return potentialNatures;
+	}
+
+	/**
+	 * Returns the contributed primary nature contributor for the provided nature id.
+	 * 
+	 * @param natureId
+	 * @return
+	 */
+	public IPrimaryNatureContributor getPrimaryNatureContributor(String natureId)
+	{
+		lazyInit();
+		return natureIdRanks.get(natureId);
+	}
+
 	public Map<String, IPrimaryNatureContributor> getContributorsMap()
+	{
+		lazyInit();
+		return natureIdRanks;
+	}
+
+	private synchronized void lazyInit()
 	{
 		if (natureIdRanks == null)
 		{
 			natureIdRanks = new HashMap<String, IPrimaryNatureContributor>();
 			readExtensionRegistry();
 		}
-		return natureIdRanks;
 	}
 
 }

@@ -9,7 +9,6 @@ package com.aptana.git.ui;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -168,20 +167,7 @@ public class CloneJob extends Job
 
 	private void setNatureFromContributions(IProject project)
 	{
-		List<String> potentialNatures = new ArrayList<String>(natureContributors.size());
-		for (String natureId : natureContributors.keySet())
-		{
-			IPrimaryNatureContributor primaryNatureContributor = natureContributors.get(natureId);
-			int primaryNatureRank = primaryNatureContributor.getPrimaryNatureRank(project.getLocation());
-			if (primaryNatureRank == IPrimaryNatureContributor.CAN_BE_PRIMARY)
-			{
-				potentialNatures.add(natureId);
-			}
-			else if (primaryNatureRank == IPrimaryNatureContributor.IS_PRIMARY)
-			{
-				potentialNatures.add(0, natureId);
-			}
-		}
+		List<String> potentialNatures = PrimaryNaturesManager.getManager().getPotentialNatures(project);
 		if (potentialNatures.size() > 0)
 		{
 			String[] natureIds = (String[]) potentialNatures.toArray(new String[potentialNatures.size()]);
