@@ -194,6 +194,8 @@
 			<param name="test.plugin" value="com.aptana.studio.tests.all" />
 			<param name="test.classname" value="com.aptana.studio.tests.all.UITests" />
 		</antcall>
+
+		<antcall target="-post-test" />
 	</target>
 
 	<target name="performance" depends="generate.build.properties,copy.base.windows,copy.base">
