@@ -175,16 +175,19 @@ class JSCAModel implements IJSCAModel
 		{
 			// Otherwise, use the current empty type, set its name, and store it in the type map
 			currentType = new TypeElement();
-			currentType.fromJSON(json);
 			currentType.setName(typeName);
-			typesByName.put(typeName, currentType);
 		}
+		// let's merge in the data from JSON/JSCA into the type here
+		currentType.fromJSON(json);
+		typesByName.put(typeName, currentType);
 
 		// Build up namespace (so if we define "a.b.c" only, this will add "a", "a.b", etc)
 		String[] parts = DOT_PATTERN.split(typeName);
 		if (parts.length > 1)
 		{
 			String accumulatedName = parts[0];
+			// We create parent types on demand to hang the properties off of. If we encounter teh definition later
+			// we'll use fromJSON to populate the info we get into this type.
 			TypeElement type = getType(accumulatedName);
 
 			for (int i = 1; i < parts.length; i++)
