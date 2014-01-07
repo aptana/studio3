@@ -11,13 +11,13 @@ Require-Bundle: org.eclipse.core.filesystem,
  org.eclipse.ui.editors,
  org.eclipse.ui.ide,
  org.eclipse.ui.forms,
- com.aptana.core;bundle-version="3.0.0"
+ com.aptana.core;bundle-version="3.0.0",
+ com.aptana.core.epl;visibility:=reexport
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: com.aptana.editor.common.contentassist,
  com.aptana.editor.common.hover,
  com.aptana.editor.common.text.rules,
- com.aptana.projects.primary.natures,
  com.aptana.ui.dialogs,
  com.aptana.ui.epl,
  com.aptana.ui.epl.scripting.snippets;x-friends:="com.aptana.editor.common",
