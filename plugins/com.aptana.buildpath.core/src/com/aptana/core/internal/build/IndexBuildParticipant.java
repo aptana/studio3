@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -18,6 +19,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.buildpath.core.BuildPathCorePlugin;
+import com.aptana.buildpath.core.BuildPathManager;
+import com.aptana.buildpath.core.IBuildPathEntry;
 import com.aptana.core.CorePlugin;
 import com.aptana.core.IDebugScopes;
 import com.aptana.core.build.RequiredBuildParticipant;
@@ -38,6 +41,7 @@ public class IndexBuildParticipant extends RequiredBuildParticipant
 
 	public void clean(IProject project, IProgressMonitor monitor)
 	{
+		IndexManager im = getIndexManager();
 		URI uri = getURI(project);
 		if (uri != null)
 		{
@@ -45,11 +49,25 @@ public class IndexBuildParticipant extends RequiredBuildParticipant
 			{
 				logTrace(MessageFormat.format("Cleaning index for project ''{0}'' ({1})", project.getName(), uri)); //$NON-NLS-1$
 			}
-			getIndexManager().resetIndex(uri);
+			im.resetIndex(uri);
 		}
+		// Reset any additional build paths
+		BuildPathManager pathManager = BuildPathManager.getInstance();
+		Set<IBuildPathEntry> entries = pathManager.getBuildPaths(project);
+		if (!CollectionsUtil.isEmpty(entries))
+		{
+			for (IBuildPathEntry entry : entries)
+			{
+				URI path = entry.getPath();
+				if (path != null)
+				{
+					im.resetIndex(path);
+				}
+			}
+		}
+
 		index_trace_enabled = IdeLog.isTraceEnabled(BuildPathCorePlugin.getDefault(), IDebugScopes.BUILDER_INDEXER);
 		advanced_trace_enabled = IdeLog.isTraceEnabled(BuildPathCorePlugin.getDefault(), IDebugScopes.BUILDER_ADVANCED);
-
 	}
 
 	public void buildStarting(IProject project, int kind, IProgressMonitor monitor)
@@ -164,10 +182,10 @@ public class IndexBuildParticipant extends RequiredBuildParticipant
 		fIndex.remove(context.getURI());
 		if (advanced_trace_enabled)
 		{
-			IdeLog.logTrace(BuildPathCorePlugin.getDefault(),
+			IdeLog.logTrace(
+					BuildPathCorePlugin.getDefault(),
 					MessageFormat.format("Wiped index for file ''{0}''", context.getURI()), IDebugScopes.BUILDER_ADVANCED); //$NON-NLS-1$
 		}
-
 	}
 
 	protected URI getURI(IProject project)
