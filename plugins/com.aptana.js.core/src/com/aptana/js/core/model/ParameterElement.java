@@ -11,12 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.aptana.jetty.util.epl.ajax.JSON.Convertible;
-import com.aptana.jetty.util.epl.ajax.JSON.Output;
-
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.IndexUtil;
+import com.aptana.jetty.util.epl.ajax.JSON.Convertible;
+import com.aptana.jetty.util.epl.ajax.JSON.Output;
 
 public class ParameterElement implements Convertible
 {
@@ -66,7 +65,16 @@ public class ParameterElement implements Convertible
 		this.setUsage(StringUtil.getStringValue(object.get(USAGE_PROPERTY)));
 		this.setDescription(StringUtil.getStringValue(object.get(DESCRIPTION_PROPERTY)));
 
-		this._types = IndexUtil.createList(object.get(TYPES_PROPERTY));
+		// JSCA contains a single "type" value
+		if (object.containsKey("type"))
+		{
+			this._types = CollectionsUtil.newList((String) object.get("type"));
+		}
+		else
+		{
+			// Our index contains multiple types as a list
+			this._types = IndexUtil.createList(object.get(TYPES_PROPERTY));
+		}
 	}
 
 	/**

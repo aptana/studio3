@@ -1,0 +1,81 @@
+{
+	"types": [
+		{
+			"name": "Titanium.UI",
+            "functions": [
+            {
+                    "name": "createView", 
+                    "isInternal": false, 
+                    "parameters": [
+                        {
+                            "name": "parameters", 
+                            "usage": "optional", 
+                            "type": "Titanium.UI.View", 
+                            "description": "<p>Properties to set on a new object, including any defined by Titanium.UI.View except those marked not-creation or read-only.</p>"
+                        }
+                    ], 
+                    "deprecated": false, 
+                    "since": [
+                        {
+                            "name": "Titanium Mobile SDK - Android", 
+                            "version": "0.9"
+                        }, 
+                        {
+                            "name": "Titanium Mobile SDK - BlackBerry", 
+                            "version": "3.1.2"
+                        }, 
+                        {
+                            "name": "Titanium Mobile SDK - iPhone", 
+                            "version": "0.9"
+                        }, 
+                        {
+                            "name": "Titanium Mobile SDK - iPad", 
+                            "version": "0.9"
+                        }, 
+                        {
+                            "name": "Titanium Mobile SDK - Mobile Web", 
+                            "version": "1.8"
+                        }, 
+                        {
+                            "name": "Titanium Mobile SDK - Tizen", 
+                            "version": "3.1"
+                        }
+                    ], 
+                    "returnTypes": [
+                        {
+                            "type": "Titanium.UI.View", 
+                            "description": ""
+                        }
+                    ], 
+                    "isConstructor": false, 
+                    "isClassProperty": false, 
+                    "examples": [], 
+                    "userAgents": [
+                        {
+                            "platform": "android"
+                        }, 
+                        {
+                            "platform": "blackberry"
+                        }, 
+                        {
+                            "platform": "iphone"
+                        }, 
+                        {
+                            "platform": "ipad"
+                        }, 
+                        {
+                            "platform": "mobileweb"
+                        }, 
+                        {
+                            "platform": "tizen"
+                        }
+                    ], 
+                    "exceptions": [], 
+                    "references": [], 
+                    "isMethod": true, 
+                    "isInstanceProperty": true, 
+                    "description": "<p>Creates and returns an instance of Titanium.UI.View.</p>"
+                }]
+		}
+	]
+}
