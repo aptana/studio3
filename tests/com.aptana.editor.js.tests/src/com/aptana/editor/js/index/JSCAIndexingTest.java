@@ -39,6 +39,8 @@ import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.IndexPlugin;
 import com.aptana.js.core.index.JSCAFileIndexingParticipant;
 import com.aptana.js.core.index.JSIndexQueryHelper;
+import com.aptana.js.core.model.FunctionElement;
+import com.aptana.js.core.model.ParameterElement;
 import com.aptana.js.core.model.PropertyElement;
 import com.aptana.js.core.model.TypeElement;
 import com.aptana.js.internal.core.index.JSIndexReader;
@@ -287,6 +289,32 @@ public class JSCAIndexingTest extends JSEditorBasedTestCase
 		assertNotNull(
 				"Titanium.UI is missing the create2DMatrix function. Did a temporary type not get merged with real definition?",
 				p);
+	}
+
+	/**
+	 * Test for TISTUD-6018
+	 * 
+	 * @throws CoreException
+	 */
+	@Test
+	public void testSingleTypeForParameterIsHandledProperly() throws CoreException
+	{
+		Index index = indexResource("metadata/tistud-6018.jsca");
+
+		// make sure target type exists
+		TypeElement t = assertTypeInIndex(index, "Titanium.UI", true);
+
+		PropertyElement p = t.getProperty("createView");
+		assertNotNull(
+				"Titanium.UI is missing the createView function. Did a temporary type not get merged with real definition?",
+				p);
+
+		List<ParameterElement> params = ((FunctionElement) p).getParameters();
+		assertEquals(1, params.size());
+		ParameterElement param = params.get(0);
+		List<String> types = param.getTypes();
+		assertEquals(1, types.size());
+		assertEquals("Titanium.UI.View", types.get(0));
 	}
 
 	protected IndexManager getIndexManager()
