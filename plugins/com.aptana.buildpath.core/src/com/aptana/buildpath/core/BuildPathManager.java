@@ -227,8 +227,12 @@ public class BuildPathManager
 	// FIXME We need this to be a list, because order matters!
 	public Set<IBuildPathEntry> getBuildPaths(IProject project)
 	{
-		Set<IBuildPathEntry> result = new LinkedHashSet<IBuildPathEntry>();
+		if (project == null)
+		{
+			return Collections.emptySet();
+		}
 
+		Set<IBuildPathEntry> result = new LinkedHashSet<IBuildPathEntry>();
 		try
 		{
 			String property = project.getPersistentProperty(getBuildPathPropertyName());
