@@ -273,7 +273,6 @@ public class JSCAIndexingTest extends JSEditorBasedTestCase
 	 * 
 	 * @throws CoreException
 	 */
-	@Test
 	public void testChildTypeEncounteredFirstDoesntClobberFullDefinitionOfParent() throws CoreException
 	{
 		Index index = indexResource("metadata/tistud-5989.jsca");
@@ -292,7 +291,6 @@ public class JSCAIndexingTest extends JSEditorBasedTestCase
 	 * 
 	 * @throws CoreException
 	 */
-	@Test
 	public void testSingleTypeForParameterIsHandledProperly() throws CoreException
 	{
 		Index index = indexResource("metadata/tistud-6018.jsca");
