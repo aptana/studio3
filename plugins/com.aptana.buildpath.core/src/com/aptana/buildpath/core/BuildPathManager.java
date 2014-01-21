@@ -228,7 +228,10 @@ public class BuildPathManager
 	public Set<IBuildPathEntry> getBuildPaths(IProject project)
 	{
 		Set<IBuildPathEntry> result = new LinkedHashSet<IBuildPathEntry>();
-
+		if (project == null)
+		{
+			return result;
+		}
 		try
 		{
 			String property = project.getPersistentProperty(getBuildPathPropertyName());
