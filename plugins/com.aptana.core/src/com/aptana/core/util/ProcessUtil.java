@@ -338,14 +338,7 @@ public class ProcessUtil
 		{
 			Process p = run(command, workingDirectory, environment, args);
 			ProcessRunnable runnable;
-			if (PlatformUtil.isWindows())
-			{
-				runnable = new ProcessRunnable(p, monitor, true);
-			}
-			else
-			{
-				runnable = new SudoCommandProcessRunnable(p, monitor, true, input);
-			}
+			runnable = new SudoCommandProcessRunnable(p, monitor, true, input);
 			Thread t = new Thread(runnable, "Runnable for " + command); //$NON-NLS-1$
 			t.start();
 			t.join();
