@@ -8,7 +8,6 @@
 package com.aptana.buildpath.core;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -31,6 +30,7 @@ import org.eclipse.core.runtime.QualifiedName;
 import org.osgi.framework.Bundle;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.BuildUtil;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.ConfigurationElementDispatcher;
 import com.aptana.core.util.EclipseUtil;
@@ -39,6 +39,8 @@ import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.IndexContainerJob;
 import com.aptana.index.core.IndexFileJob;
+import com.aptana.projects.primary.natures.IPrimaryNatureContributor;
+import com.aptana.projects.primary.natures.PrimaryNaturesManager;
 
 /**
  * BuildPathManager
@@ -46,8 +48,6 @@ import com.aptana.index.core.IndexFileJob;
 public class BuildPathManager
 {
 	private static final String PROJECT_BUILD_PATH_PROPERTY_NAME = "projectBuildPath"; //$NON-NLS-1$
-	private static final String NAME_AND_PATH_DELIMITER = "\t"; //$NON-NLS-1$
-	private static final String BUILD_PATH_ENTRY_DELIMITER = "\0"; //$NON-NLS-1$
 
 	private static final String BUILD_PATHS_ID = "buildPaths"; //$NON-NLS-1$
 	private static final String ELEMENT_BUILD_PATH = "buildPath"; //$NON-NLS-1$
@@ -235,30 +235,31 @@ public class BuildPathManager
 		Set<IBuildPathEntry> result = new LinkedHashSet<IBuildPathEntry>();
 		try
 		{
-			String property = project.getPersistentProperty(getBuildPathPropertyName());
-
-			if (property != null)
+			PrimaryNaturesManager manager = PrimaryNaturesManager.getManager();
+			String[] natureIds = project.getDescription().getNatureIds();
+			List<String> entries = new ArrayList<String>();
+			for (String natureId : natureIds)
 			{
-				String[] entries = property.split(BUILD_PATH_ENTRY_DELIMITER);
+				IPrimaryNatureContributor contributor = manager.getPrimaryNatureContributor(natureId);
+				entries.addAll(contributor.getBuildPathEntries(project, getBuildPathPropertyName()));
+			}
+			for (String entry : entries)
+			{
+				String[] nameAndPath = entry.split(BuildUtil.NAME_AND_PATH_DELIMITER);
 
-				for (String entry : entries)
+				if (nameAndPath.length >= 2)
 				{
-					String[] nameAndPath = entry.split(NAME_AND_PATH_DELIMITER);
+					String name = nameAndPath[0];
+					String uri = nameAndPath[1];
 
-					if (nameAndPath.length >= 2)
+					try
 					{
-						String name = nameAndPath[0];
-						String uri = nameAndPath[1];
-
-						try
-						{
-							URI path = new URI(uri);
-
-							result.add(new BuildPathEntry(name, path));
-						}
-						catch (URISyntaxException e)
-						{
-							// @formatter:off
+						URI path = Path.fromOSString(uri).toFile().toURI();
+						result.add(new BuildPathEntry(name, path));
+					}
+					catch (Exception e)
+					{
+						// @formatter:off
 							String message = MessageFormat.format(
 								Messages.BuildPathManager_UnableToConvertURI,
 								uri,
@@ -267,8 +268,7 @@ public class BuildPathManager
 							);
 							// @formatter:on
 
-							IdeLog.logError(BuildPathCorePlugin.getDefault(), message, e);
-						}
+						IdeLog.logError(BuildPathCorePlugin.getDefault(), message, e);
 					}
 				}
 			}
@@ -562,12 +562,12 @@ public class BuildPathManager
 
 			for (IBuildPathEntry entry : entries)
 			{
-				String nameAndPath = entry.getDisplayName() + NAME_AND_PATH_DELIMITER + entry.getPath();
+				String nameAndPath = entry.getDisplayName() + BuildUtil.NAME_AND_PATH_DELIMITER + entry.getPath();
 
 				nameAndPaths.add(nameAndPath);
 			}
 
-			String value = StringUtil.join(BUILD_PATH_ENTRY_DELIMITER, nameAndPaths);
+			String value = StringUtil.join(BuildUtil.BUILD_PATH_ENTRY_DELIMITER, nameAndPaths);
 
 			// FIXME This severely limits the value's size, which we could run into over time! It also does not make the
 			// value portable across users/workspaces

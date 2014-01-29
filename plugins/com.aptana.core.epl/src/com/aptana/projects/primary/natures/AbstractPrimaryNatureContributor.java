@@ -7,9 +7,17 @@
  */
 package com.aptana.projects.primary.natures;
 
+import java.util.List;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.QualifiedName;
+
+import com.aptana.core.epl.CoreEPLPlugin;
+import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.BuildUtil;
+import com.aptana.core.util.CollectionsUtil;
 
 /**
  * An abstract base implementation of an {@link IPrimaryNatureContributor}. This class provides an empty implementation
@@ -31,5 +39,23 @@ public abstract class AbstractPrimaryNatureContributor implements IPrimaryNature
 	public IPath getLibraryContainerPath(IPath projectPath)
 	{
 		return projectPath;
+	}
+
+	public List<String> getBuildPathEntries(IProject project, QualifiedName buildPropertyName)
+	{
+		try
+		{
+			String property = project.getPersistentProperty(buildPropertyName);
+			if (property != null)
+			{
+				String[] entries = property.split(BuildUtil.BUILD_PATH_ENTRY_DELIMITER);
+				return CollectionsUtil.newList(entries);
+			}
+		}
+		catch (CoreException e)
+		{
+			IdeLog.logError(CoreEPLPlugin.getDefault(), e);
+		}
+		return CollectionsUtil.newList();
 	}
 }
