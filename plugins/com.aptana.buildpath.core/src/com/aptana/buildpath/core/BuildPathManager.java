@@ -241,7 +241,10 @@ public class BuildPathManager
 			for (String natureId : natureIds)
 			{
 				IPrimaryNatureContributor contributor = manager.getPrimaryNatureContributor(natureId);
-				entries.addAll(contributor.getBuildPathEntries(project, getBuildPathPropertyName()));
+				if (contributor != null)
+				{
+					entries.addAll(contributor.getBuildPathEntries(project, getBuildPathPropertyName()));
+				}
 			}
 			for (String entry : entries)
 			{
