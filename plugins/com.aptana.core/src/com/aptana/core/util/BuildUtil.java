@@ -33,6 +33,9 @@ import com.aptana.core.CorePlugin;
 public class BuildUtil
 {
 
+	public static final String BUILD_PATH_ENTRY_DELIMITER = "\0"; //$NON-NLS-1$
+	public static final String NAME_AND_PATH_DELIMITER = "\t"; //$NON-NLS-1$
+
 	/**
 	 * Synchronous run of a builder with the given name on the given project.
 	 * 

@@ -7,9 +7,12 @@
  */
 package com.aptana.projects.primary.natures;
 
+import java.util.List;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.QualifiedName;
 
 /**
  * @author pinnamuri
@@ -54,4 +57,10 @@ public interface IPrimaryNatureContributor
 	 * @return
 	 */
 	public IPath getLibraryContainerPath(IPath projectPath);
+
+	/**
+	 * @param project
+	 * @return
+	 */
+	public List<String> getBuildPathEntries(IProject project, QualifiedName buildPropertyName);
 }
