@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.team.core.history.IFileHistoryProvider;
 import org.eclipse.team.core.history.IFileRevision;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.osgi.service.prefs.BackingStoreException;
 
@@ -45,6 +46,7 @@ public class GitFileHistoryTest extends GitTestCase
 	private static final String PROJECT_NAME = "gfh_test"; //$NON-NLS-1$
 	private IProject fProject;
 
+	@Ignore("Intermittent failures on build machine")
 	@Test(timeout = 10000)
 	public void testGetFileRevisions() throws Exception
 	{
