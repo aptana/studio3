@@ -22,6 +22,7 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
+import org.junit.Test;
 
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
