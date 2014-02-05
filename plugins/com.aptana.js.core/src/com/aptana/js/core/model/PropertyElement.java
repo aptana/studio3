@@ -29,7 +29,6 @@ public class PropertyElement extends BaseElement
 	private static final String IS_INSTANCE_PROPERTY = "isInstanceProperty"; //$NON-NLS-1$
 	private static final String IS_CLASS_PROPERTY = "isClassProperty"; //$NON-NLS-1$
 	private static final String OWNING_TYPE_PROPERTY = "owningType"; //$NON-NLS-1$
-	private static final String DEPRECATED_PROPERTY = "deprecated"; //$NON-NLS-1$
 
 	private String _owningType;
 	private boolean _isInstanceProperty;
@@ -37,7 +36,6 @@ public class PropertyElement extends BaseElement
 	private boolean _isInternal;
 	private List<ReturnTypeElement> _types;
 	private List<String> _examples;
-	private boolean _deprecated;
 
 	/**
 	 * PropertyElement
@@ -165,7 +163,6 @@ public class PropertyElement extends BaseElement
 		this.setIsClassProperty(Boolean.TRUE == object.get(IS_CLASS_PROPERTY)); // $codepro.audit.disable useEquals
 		this.setIsInstanceProperty(Boolean.TRUE == object.get(IS_INSTANCE_PROPERTY)); // $codepro.audit.disable
 																						// useEquals
-		this.setIsDeprecated(Boolean.TRUE == object.get(DEPRECATED_PROPERTY)); // $codepro.audit.disable useEquals
 		this.setIsInternal(Boolean.TRUE == object.get(IS_INTERNAL_PROPERTY)); // $codepro.audit.disable useEquals
 
 		this._types = IndexUtil.createList(object.get(TYPES_PROPERTY), ReturnTypeElement.class);
@@ -288,26 +285,6 @@ public class PropertyElement extends BaseElement
 		this._owningType = type;
 	}
 
-	/**
-	 * isDeprecated
-	 * 
-	 * @return
-	 */
-	public boolean isDeprecated()
-	{
-		return this._deprecated;
-	}
-
-	/**
-	 * setIsDeprecated
-	 * 
-	 * @param value
-	 */
-	public void setIsDeprecated(boolean value)
-	{
-		this._deprecated = value;
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.contentassist.model.BaseElement#toJSON(com.aptana.jetty.util.epl.ajax.JSON.Output)
@@ -321,7 +298,6 @@ public class PropertyElement extends BaseElement
 		out.add(IS_CLASS_PROPERTY, this.isClassProperty());
 		out.add(IS_INSTANCE_PROPERTY, this.isInstanceProperty());
 		out.add(IS_INTERNAL_PROPERTY, this.isInternal());
-		out.add(DEPRECATED_PROPERTY, this.isDeprecated());
 		out.add(TYPES_PROPERTY, this.getTypes());
 		out.add(EXAMPLES_PROPERTY, this.getExamples());
 	}

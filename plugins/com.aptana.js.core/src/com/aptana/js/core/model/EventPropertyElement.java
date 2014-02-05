@@ -20,11 +20,8 @@ public class EventPropertyElement extends BaseElement
 {
 
 	private static final String TYPE_PROPERTY = "type"; //$NON-NLS-1$
-	private static final String DEPRECATED_PROPERTY = "deprecated"; //$NON-NLS-1$
 
 	private String _type;
-
-	private boolean _deprecated;
 
 	/**
 	 * EventProperty
@@ -44,7 +41,6 @@ public class EventPropertyElement extends BaseElement
 		super.fromJSON(object);
 
 		this.setType(StringUtil.getStringValue(object.get(TYPE_PROPERTY)));
-		this.setIsDeprecated(Boolean.TRUE == object.get(DEPRECATED_PROPERTY)); // $codepro.audit.disable useEquals
 	}
 
 	/**
@@ -64,26 +60,6 @@ public class EventPropertyElement extends BaseElement
 		this._type = type;
 	}
 
-	/**
-	 * isDeprecated
-	 * 
-	 * @return
-	 */
-	public boolean isDeprecated()
-	{
-		return this._deprecated;
-	}
-
-	/**
-	 * setIsDeprecated
-	 * 
-	 * @param value
-	 */
-	public void setIsDeprecated(boolean value)
-	{
-		this._deprecated = value;
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.contentassist.model.BaseElement#toJSON(com.aptana.jetty.util.epl.ajax.JSON.Output)
@@ -94,7 +70,6 @@ public class EventPropertyElement extends BaseElement
 		super.toJSON(out);
 
 		out.add(TYPE_PROPERTY, this.getType());
-		out.add(DEPRECATED_PROPERTY, this.isDeprecated());
 	}
 
 	/**

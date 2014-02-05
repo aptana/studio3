@@ -26,7 +26,6 @@ public class TypeElement extends BaseElement
 	private static final String EVENTS_PROPERTY = "events"; //$NON-NLS-1$
 	private static final String EXAMPLES_PROPERTY = "examples"; //$NON-NLS-1$
 	private static final String REMARKS_PROPERTY = "remarks"; //$NON-NLS-1$
-	private static final String DEPRECATED_PROPERTY = "deprecated"; //$NON-NLS-1$
 	private static final String IS_INTERNAL_PROPERTY = "internal"; //$NON-NLS-1$
 
 	private List<String> _parentTypes;
@@ -34,7 +33,6 @@ public class TypeElement extends BaseElement
 	private List<EventElement> _events;
 	private List<String> _examples;
 	private List<String> _remarks;
-	private boolean _deprecated;
 	private boolean _serializeProperties;
 	private boolean _isInternal;
 
@@ -214,8 +212,6 @@ public class TypeElement extends BaseElement
 				}
 			}
 		}
-
-		this.setIsDeprecated(Boolean.TRUE == object.get(DEPRECATED_PROPERTY)); // $codepro.audit.disable useEquals
 
 		// JSCA holds "isInternal", but we serialize as "internal"
 		if (object.containsKey("isInternal")) //$NON-NLS-1$
@@ -401,16 +397,6 @@ public class TypeElement extends BaseElement
 	}
 
 	/**
-	 * isDeprecated
-	 * 
-	 * @return
-	 */
-	public boolean isDeprecated()
-	{
-		return this._deprecated;
-	}
-
-	/**
 	 * removeProperty
 	 * 
 	 * @param property
@@ -425,16 +411,6 @@ public class TypeElement extends BaseElement
 		}
 
 		return result;
-	}
-
-	/**
-	 * setIsDeprecated
-	 * 
-	 * @param value
-	 */
-	public void setIsDeprecated(boolean value)
-	{
-		this._deprecated = value;
 	}
 
 	/**
@@ -487,7 +463,6 @@ public class TypeElement extends BaseElement
 			out.add(EVENTS_PROPERTY, this.getEvents());
 			out.add(EXAMPLES_PROPERTY, this.getExamples());
 			out.add(REMARKS_PROPERTY, this.getRemarks());
-			out.add(DEPRECATED_PROPERTY, this.isDeprecated());
 			out.add(IS_INTERNAL_PROPERTY, this.isInternal());
 		}
 	}
