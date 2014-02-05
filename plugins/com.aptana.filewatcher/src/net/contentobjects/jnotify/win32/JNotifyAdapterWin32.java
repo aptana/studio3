@@ -28,7 +28,6 @@
  ******************************************************************************
  * Author : Omry Yadan
  ******************************************************************************/
- 
 
 package net.contentobjects.jnotify.win32;
 
@@ -55,17 +54,14 @@ public class JNotifyAdapterWin32 implements IJNotify
 		_id2Data = new Hashtable<Integer, WatchData>();
 	}
 
-	public int addWatch(String path, int mask, boolean watchSubtree, JNotifyListener listener)
-		throws JNotifyException
+	public int addWatch(String path, int mask, boolean watchSubtree, boolean recursive, JNotifyListener listener)
+			throws JNotifyException
 	{
 		// register to everything on system level.
 		int wd = JNotify_win32.addWatch(path, JNotify_win32.FILE_NOTIFY_CHANGE_SECURITY
-				| JNotify_win32.FILE_NOTIFY_CHANGE_CREATION
-				| JNotify_win32.FILE_NOTIFY_CHANGE_LAST_ACCESS
-				| JNotify_win32.FILE_NOTIFY_CHANGE_LAST_WRITE
-				| JNotify_win32.FILE_NOTIFY_CHANGE_SIZE
-				| JNotify_win32.FILE_NOTIFY_CHANGE_ATTRIBUTES
-				| JNotify_win32.FILE_NOTIFY_CHANGE_DIR_NAME
+				| JNotify_win32.FILE_NOTIFY_CHANGE_CREATION | JNotify_win32.FILE_NOTIFY_CHANGE_LAST_ACCESS
+				| JNotify_win32.FILE_NOTIFY_CHANGE_LAST_WRITE | JNotify_win32.FILE_NOTIFY_CHANGE_SIZE
+				| JNotify_win32.FILE_NOTIFY_CHANGE_ATTRIBUTES | JNotify_win32.FILE_NOTIFY_CHANGE_DIR_NAME
 				| JNotify_win32.FILE_NOTIFY_CHANGE_FILE_NAME, watchSubtree);
 		_id2Data.put(Integer.valueOf(wd), new WatchData(wd, mask, listener));
 		return wd;
@@ -98,10 +94,10 @@ public class JNotifyAdapterWin32 implements IJNotify
 			_mask = mask;
 			_notifyListener = listener;
 		}
-		
+
 		public String toString()
 		{
-			return "wd=" + _wd + ", action " + Util.getMaskDesc(_mask);  //$NON-NLS-1$//$NON-NLS-2$
+			return "wd=" + _wd + ", action " + Util.getMaskDesc(_mask); //$NON-NLS-1$//$NON-NLS-2$
 		}
 	}
 
@@ -114,74 +110,71 @@ public class JNotifyAdapterWin32 implements IJNotify
 			{
 				int mask = watchData._mask;
 				int mapped = mapAction(action);
-				if (action == JNotify_win32.FILE_ACTION_ADDED &&  (mask & mapped) != 0)
+				if (action == JNotify_win32.FILE_ACTION_ADDED && (mask & mapped) != 0)
 				{
 					watchData._notifyListener.fileCreated(wd, rootPath, filePath);
 				}
-				else
-				if (action == JNotify_win32.FILE_ACTION_MODIFIED &&  (mask & mapped) != 0)
+				else if (action == JNotify_win32.FILE_ACTION_MODIFIED && (mask & mapped) != 0)
 				{
 					watchData._notifyListener.fileModified(wd, rootPath, filePath);
 				}
-				else
-				if (action == JNotify_win32.FILE_ACTION_REMOVED &&  (mask & mapped) != 0)
+				else if (action == JNotify_win32.FILE_ACTION_REMOVED && (mask & mapped) != 0)
 				{
 					watchData._notifyListener.fileDeleted(wd, rootPath, filePath);
 				}
-				else
-				if (action == JNotify_win32.FILE_ACTION_RENAMED_OLD_NAME &&  (mask & mapped) != 0)
+				else if (action == JNotify_win32.FILE_ACTION_RENAMED_OLD_NAME && (mask & mapped) != 0)
 				{
 					watchData.renameOldName = filePath;
 				}
-				else
-				if (action == JNotify_win32.FILE_ACTION_RENAMED_NEW_NAME &&  (mask & mapped) != 0)
+				else if (action == JNotify_win32.FILE_ACTION_RENAMED_NEW_NAME && (mask & mapped) != 0)
 				{
 					watchData._notifyListener.fileRenamed(wd, rootPath, watchData.renameOldName, filePath);
 					watchData.renameOldName = null;
 				}
 			}
-//			else
-//			{
-//				System.out.println("JNotifyAdapterWin32: IGNORED Unregistered : " + wd + " . " +getDebugWinAction(action) + " root=" + rootPath + " , path=" + filePath);
-//			}
+			// else
+			// {
+			// System.out.println("JNotifyAdapterWin32: IGNORED Unregistered : " + wd + " . " +getDebugWinAction(action)
+			// + " root=" + rootPath + " , path=" + filePath);
+			// }
 		}
 	}
 
-//	private static String getDebugWinAction(int action)
-//	{
-//		switch (action)
-//		{
-//		case JNotify_win32.FILE_ACTION_ADDED:
-//			return "FILE_ACTION_ADDED";
-//		case JNotify_win32.FILE_ACTION_MODIFIED:
-//			return "FILE_ACTION_MODIFIED";
-//		case JNotify_win32.FILE_ACTION_REMOVED:
-//			return "FILE_ACTION_REMOVED";
-//		case JNotify_win32.FILE_ACTION_RENAMED_NEW_NAME:
-//			return "FILE_ACTION_RENAMED_NEW_NAME";
-//		case JNotify_win32.FILE_ACTION_RENAMED_OLD_NAME:
-//			return "FILE_ACTION_RENAMED_OLD_NAME";
-//		default:
-//			return "UNKNOWN " + action; 
-//		}
-//	}	
-	
+	// private static String getDebugWinAction(int action)
+	// {
+	// switch (action)
+	// {
+	// case JNotify_win32.FILE_ACTION_ADDED:
+	// return "FILE_ACTION_ADDED";
+	// case JNotify_win32.FILE_ACTION_MODIFIED:
+	// return "FILE_ACTION_MODIFIED";
+	// case JNotify_win32.FILE_ACTION_REMOVED:
+	// return "FILE_ACTION_REMOVED";
+	// case JNotify_win32.FILE_ACTION_RENAMED_NEW_NAME:
+	// return "FILE_ACTION_RENAMED_NEW_NAME";
+	// case JNotify_win32.FILE_ACTION_RENAMED_OLD_NAME:
+	// return "FILE_ACTION_RENAMED_OLD_NAME";
+	// default:
+	// return "UNKNOWN " + action;
+	// }
+	// }
+
 	private int mapAction(int action)
 	{
 		switch (action)
 		{
-		case JNotify_win32.FILE_ACTION_ADDED:
-			return IJNotify.FILE_CREATED;
-		case JNotify_win32.FILE_ACTION_MODIFIED:
-			return IJNotify.FILE_MODIFIED;
-		case JNotify_win32.FILE_ACTION_REMOVED:
-			return IJNotify.FILE_DELETED;
-		case JNotify_win32.FILE_ACTION_RENAMED_NEW_NAME:
-			return IJNotify.FILE_RENAMED;
-		case JNotify_win32.FILE_ACTION_RENAMED_OLD_NAME:
-			return IJNotify.FILE_RENAMED;
-		default:
-			return -1; // silently fail, in case future windows versions will add more actions.
+			case JNotify_win32.FILE_ACTION_ADDED:
+				return IJNotify.FILE_CREATED;
+			case JNotify_win32.FILE_ACTION_MODIFIED:
+				return IJNotify.FILE_MODIFIED;
+			case JNotify_win32.FILE_ACTION_REMOVED:
+				return IJNotify.FILE_DELETED;
+			case JNotify_win32.FILE_ACTION_RENAMED_NEW_NAME:
+				return IJNotify.FILE_RENAMED;
+			case JNotify_win32.FILE_ACTION_RENAMED_OLD_NAME:
+				return IJNotify.FILE_RENAMED;
+			default:
+				return -1; // silently fail, in case future windows versions will add more actions.
 		}
 	}
 }

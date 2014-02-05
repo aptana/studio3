@@ -34,8 +34,8 @@ public class PollingNotifier implements IJNotify
 	private int id = 0;
 	private Map<Integer, DirectoryWatcher> watchers = new HashMap<Integer, DirectoryWatcher>();
 
-	public int addWatch(String path, final int mask, boolean watchSubtree, final JNotifyListener listener)
-			throws JNotifyException
+	public int addWatch(String path, final int mask, boolean watchSubtree, boolean recursive,
+			final JNotifyListener listener) throws JNotifyException
 	{
 		DirectoryWatcher watcher = new DirectoryWatcher(new File(path), watchSubtree);
 		watcher.addListener(new DirectoryChangeListener()
@@ -128,7 +128,7 @@ public class PollingNotifier implements IJNotify
 	public boolean removeWatch(int wd) throws JNotifyException
 	{
 		DirectoryWatcher watcher = watchers.remove(wd);
-		if (watcher  == null)
+		if (watcher == null)
 		{
 			return false;
 		}
