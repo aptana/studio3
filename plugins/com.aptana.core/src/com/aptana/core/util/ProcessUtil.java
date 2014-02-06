@@ -337,8 +337,7 @@ public class ProcessUtil
 		try
 		{
 			Process p = run(command, workingDirectory, environment, args);
-			ProcessRunnable runnable;
-			runnable = new SudoCommandProcessRunnable(p, monitor, true, input);
+			ProcessRunnable runnable = new SudoCommandProcessRunnable(p, monitor, true, input);
 			Thread t = new Thread(runnable, "Runnable for " + command); //$NON-NLS-1$
 			t.start();
 			t.join();
