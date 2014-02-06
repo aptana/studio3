@@ -9,9 +9,7 @@ package com.aptana.xml.core.parsing;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Stack;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -22,12 +20,17 @@ import com.aptana.parsing.AbstractParser;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.WorkingParseResult;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseNodeAttribute;
 import com.aptana.parsing.ast.ParseNode;
+import com.aptana.parsing.ast.ParseNodeAttribute;
 import com.aptana.parsing.ast.ParseRootNode;
+import com.aptana.parsing.lexer.IRange;
+import com.aptana.parsing.lexer.Range;
 import com.aptana.xml.core.parsing.ast.XMLCDATANode;
 import com.aptana.xml.core.parsing.ast.XMLCommentNode;
 import com.aptana.xml.core.parsing.ast.XMLElementNode;
 import com.aptana.xml.core.parsing.ast.XMLNode;
+import com.aptana.xml.core.parsing.ast.XMLNodeType;
 import com.aptana.xml.core.parsing.ast.XMLParseRootNode;
 
 public class XMLParser extends AbstractParser
@@ -146,11 +149,16 @@ public class XMLParser extends AbstractParser
 	 * @throws IOException
 	 * @throws beaver.Scanner.Exception
 	 */
-	protected Map<String, String> parseAttributes() throws beaver.Scanner.Exception, IOException
+	protected List<IParseNodeAttribute> parseAttributes() throws beaver.Scanner.Exception, IOException
 	{
-		// NOTE: use linked hash map to preserve add order
-		Map<String, String> result = new LinkedHashMap<String, String>();
+		// NOTE: Use a list to preserve add order
+		List<IParseNodeAttribute> result = new ArrayList<IParseNodeAttribute>();
+		// ParseNodeAttribute requires a parent, so we generate a fake one while we collect attributes, then set the
+		// attributes on the true parent. True parent can't be passed in because it needs the closing tag which is past
+		// the attributes
+		IParseNode fakeParent = new XMLNode(XMLNodeType.ELEMENT, 0, 0);
 		String name = null;
+		IRange nameRegion = null;
 		// Keep advancing until we hit EOF or GREATER or SLASH_GREATER
 		while (true)
 		{
@@ -165,11 +173,14 @@ public class XMLParser extends AbstractParser
 				case Terminals.IDENTIFIER:
 				case Terminals.TEXT:
 					name = (String) fCurrentLexeme.value;
+					nameRegion = new Range(fCurrentLexeme.getStart(), fCurrentLexeme.getEnd());
 					break;
 
 				case Terminals.STRING:
-					result.put(name, (String) fCurrentLexeme.value);
+					result.add(new ParseNodeAttribute(fakeParent, name, (String) fCurrentLexeme.value, nameRegion,
+							new Range(fCurrentLexeme.getStart(), fCurrentLexeme.getEnd())));
 					name = null;
+					nameRegion = null;
 					break;
 
 				default:
@@ -240,14 +251,14 @@ public class XMLParser extends AbstractParser
 		int start = fCurrentLexeme.getStart();
 		// grab the element name
 		advance();
-		String tagName = (String) fCurrentLexeme.value;
+		Symbol tag = fCurrentLexeme;
 
-		Map<String, String> attrs = parseAttributes();
+		List<IParseNodeAttribute> attrs = parseAttributes();
 
-		XMLElementNode element = new XMLElementNode(tagName, start, fCurrentLexeme);
-		for (Map.Entry<String, String> pair : attrs.entrySet())
+		XMLElementNode element = new XMLElementNode(tag, start, fCurrentLexeme);
+		for (IParseNodeAttribute attr : attrs)
 		{
-			element.setAttribute(pair.getKey(), pair.getValue());
+			element.setAttribute(attr.getName(), attr.getValue(), attr.getNameRange(), attr.getValueRange());
 		}
 		// pushes the element onto the stack
 		openElement(element);

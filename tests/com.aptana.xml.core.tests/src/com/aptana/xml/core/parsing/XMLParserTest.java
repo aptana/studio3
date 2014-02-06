@@ -67,8 +67,8 @@ public class XMLParserTest
 		assertElement(0, 32, "html", 0, 32, html);
 		IParseNodeAttribute[] attrs = html.getAttributes();
 		assertEquals(2, attrs.length);
-		assertEquals("myId", html.getAttribute("id"));
-		assertEquals("myClass", html.getAttribute("class"));
+		assertEquals("myId", html.getAttributeValue("id"));
+		assertEquals("myClass", html.getAttributeValue("class"));
 	}
 
 	private void assertElement(int start, int end, String name, int nameStart, int nameEnd, IParseNode elementNode)
