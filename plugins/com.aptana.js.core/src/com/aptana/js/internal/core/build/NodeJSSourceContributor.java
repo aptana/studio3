@@ -9,8 +9,10 @@ package com.aptana.js.internal.core.build;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -61,6 +63,11 @@ public class NodeJSSourceContributor implements IBuildPathContributor
 	protected INodePackageManager getNodePackageManager()
 	{
 		return JSCorePlugin.getDefault().getNodePackageManager();
+	}
+
+	public List<IBuildPathEntry> getBuildPathEntries(IProject project)
+	{
+		return Collections.emptyList();
 	}
 
 }

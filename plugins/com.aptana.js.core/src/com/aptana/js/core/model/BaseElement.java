@@ -33,6 +33,7 @@ public abstract class BaseElement implements Convertible, IndexDocument
 	private static final String SINCE_PROPERTY = "since"; //$NON-NLS-1$
 	private static final String DESCRIPTION_PROPERTY = "description"; //$NON-NLS-1$
 	private static final String NAME_PROPERTY = "name"; //$NON-NLS-1$
+	private static final String DEPRECATED_PROPERTY = "deprecated"; //$NON-NLS-1$
 
 	// A special instance used to indicate that this element should associate all user agents with it
 	private static final Set<UserAgentElement> ALL_USER_AGENTS = Collections.emptySet();
@@ -42,6 +43,7 @@ public abstract class BaseElement implements Convertible, IndexDocument
 	private Set<UserAgentElement> _userAgents;
 	private List<SinceElement> _sinceList;
 	private List<String> _documents;
+	private boolean _deprecated;
 
 	/**
 	 * addDocument
@@ -156,6 +158,7 @@ public abstract class BaseElement implements Convertible, IndexDocument
 		this.setName(StringUtil.getStringValue(object.get(NAME_PROPERTY)));
 		this.setDescription(StringUtil.getStringValue(object.get(DESCRIPTION_PROPERTY)));
 		this._sinceList = IndexUtil.createList(object.get(SINCE_PROPERTY), SinceElement.class);
+		this.setIsDeprecated(Boolean.TRUE == object.get(DEPRECATED_PROPERTY)); // $codepro.audit.disable useEquals
 
 		Object userAgentsProperty = object.get(USER_AGENTS_PROPERTY);
 
@@ -167,6 +170,26 @@ public abstract class BaseElement implements Convertible, IndexDocument
 		{
 			this._userAgents = createUserAgentSet(userAgentsProperty);
 		}
+	}
+	
+	/**
+	 * isDeprecated
+	 * 
+	 * @return
+	 */
+	public boolean isDeprecated()
+	{
+		return this._deprecated;
+	}
+
+	/**
+	 * setIsDeprecated
+	 * 
+	 * @param value
+	 */
+	public void setIsDeprecated(boolean value)
+	{
+		this._deprecated = value;
 	}
 
 	/**
@@ -338,6 +361,7 @@ public abstract class BaseElement implements Convertible, IndexDocument
 		// TODO To shrink string size, don't write out empty descriptions?
 		out.add(DESCRIPTION_PROPERTY, this.getDescription());
 		out.add(SINCE_PROPERTY, this.getSinceList());
+		out.add(DEPRECATED_PROPERTY, this.isDeprecated());
 
 		if (hasAllUserAgents())
 		{
