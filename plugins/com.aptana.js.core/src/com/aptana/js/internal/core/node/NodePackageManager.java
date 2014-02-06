@@ -411,10 +411,7 @@ public class NodePackageManager implements INodePackageManager
 		try
 		{
 			String version = getInstalledVersion(packageName);
-			if (!StringUtil.isEmpty(version))
-			{
-				return true;
-			}
+			return !StringUtil.isEmpty(version); // Assume it's not installed if process returned OK, but had no entry
 		}
 		catch (CoreException e)
 		{
