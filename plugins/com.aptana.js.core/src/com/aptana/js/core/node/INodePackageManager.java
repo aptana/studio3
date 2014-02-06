@@ -193,17 +193,6 @@ public interface INodePackageManager
 			FileFilter fileFilter);
 
 	/**
-	 * Changes the ownership of the entire NPM cache directory and its contents (on Mac, it is in ~/.npm) to the current
-	 * user.
-	 * 
-	 * @param password
-	 * @param runWithSudo
-	 * @param monitor
-	 * @return
-	 */
-	IStatus changeNPMCacheOwner(char[] password, boolean runWithSudo, IProgressMonitor monitor);
-
-	/**
 	 * Returns the list of available versions for a package, in ascending order.
 	 * 
 	 * @param packageName

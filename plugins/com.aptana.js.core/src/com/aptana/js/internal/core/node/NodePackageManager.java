@@ -175,6 +175,7 @@ public class NodePackageManager implements INodePackageManager
 	public IStatus install(String packageName, String displayName, boolean global, char[] password,
 			IPath workingDirectory, IProgressMonitor monitor)
 	{
+		SubMonitor sub = SubMonitor.convert(monitor, 10);
 		String globalPrefixPath = null;
 		try
 		{
@@ -183,12 +184,13 @@ public class NodePackageManager implements INodePackageManager
 			 * global prefix config value for the entire system overrides the global prefix value of the user. So, it
 			 * always install into /usr/lib even though user set a custom value for NPM_CONFIG_PREFIX.
 			 */
+			sub.subTask("Checking global NPM prefix");
 			IPath prefixPath = getConfigPrefixPath();
 			if (prefixPath != null)
 			{
 				List<String> args = CollectionsUtil.newList(CONFIG, GET, PREFIX);
 				// TODO: should cache this value as config prefix path ?
-				IStatus npmStatus = runNpmConfig(args, password, global, workingDirectory, monitor);
+				IStatus npmStatus = runNpmConfig(args, password, global, workingDirectory, sub.newChild(1));
 				if (npmStatus.isOK())
 				{
 					String prefix = npmStatus.getMessage();
@@ -205,12 +207,14 @@ public class NodePackageManager implements INodePackageManager
 					if (!prefixPath.toOSString().equals(prefix))
 					{
 						globalPrefixPath = prefix;
-						setGlobalPrefixPath(password, workingDirectory, monitor, prefixPath.toOSString());
+						setGlobalPrefixPath(password, workingDirectory, sub.newChild(1), prefixPath.toOSString());
 					}
 				}
 			}
+			sub.setWorkRemaining(8);
+			sub.subTask("Running npm install command");
 			IStatus status = runNpmInstaller(packageName, displayName, global, password, workingDirectory, INSTALL,
-					monitor);
+					sub.newChild(6));
 			if (status.getSeverity() == IStatus.CANCEL)
 			{
 				return Status.OK_STATUS;
@@ -237,7 +241,7 @@ public class NodePackageManager implements INodePackageManager
 				if (!StringUtil.isEmpty(error))
 				{
 					String[] lines = error.split("\n"); //$NON-NLS-1$
-					if (lines.length > 0 && lines[lines.length - 1].contains(NPM_ERROR)) //$NON-NLS-1$
+					if (lines.length > 0 && lines[lines.length - 1].contains(NPM_ERROR))
 					{
 						IdeLog.logError(JSCorePlugin.getDefault(),
 								MessageFormat.format("Failed to install {0}.\n\n{1}", packageName, error)); //$NON-NLS-1$
@@ -264,13 +268,15 @@ public class NodePackageManager implements INodePackageManager
 			{
 				try
 				{
-					setGlobalPrefixPath(password, workingDirectory, monitor, globalPrefixPath);
+					sub.subTask("Resetting global NPM prefix");
+					setGlobalPrefixPath(password, workingDirectory, sub.newChild(1), globalPrefixPath);
 				}
 				catch (CoreException e)
 				{
 					return e.getStatus();
 				}
 			}
+			sub.done();
 		}
 	}
 
@@ -562,7 +568,7 @@ public class NodePackageManager implements INodePackageManager
 			}
 
 			return ProcessUtil.run(CollectionsUtil.getFirstElement(args), workingDirectory, password, environment,
-					monitor, CollectionsUtil.toArray(args, 1, args.size()));
+					sub.newChild(100), CollectionsUtil.toArray(args, 1, args.size()));
 		}
 		finally
 		{
@@ -704,29 +710,6 @@ public class NodePackageManager implements INodePackageManager
 		String cacheCleanOutput = status.getMessage();
 		if (!status.isOK() || cacheCleanOutput.contains(NPM_ERROR))
 		{
-			return new Status(Status.ERROR, JSCorePlugin.PLUGIN_ID, cacheCleanOutput);
-		}
-		return status;
-	}
-
-	public IStatus changeNPMCacheOwner(char[] password, boolean runWithSudo, IProgressMonitor monitor)
-	{
-		List<String> args = new ArrayList<String>();
-		if (runWithSudo)
-		{
-			args.addAll(getSudoArgs(password));
-		}
-		// Finds the current user and then, assigns the ownership.
-		IStatus userStatus = ProcessUtil.runInBackground("whoami", null); //$NON-NLS-1$
-		String currentUser = userStatus.getMessage();
-		CollectionsUtil.addToList(args, "chown", "-R", currentUser, PlatformUtil.expandEnvironmentStrings("~/.npm")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		IStatus status = ProcessUtil.run(CollectionsUtil.getFirstElement(args), null, password,
-				ShellExecutable.getEnvironment(), monitor, CollectionsUtil.toArray(args, 1, args.size()));
-
-		String cacheCleanOutput = status.getMessage();
-		if (!status.isOK() || !StringUtil.isEmpty(cacheCleanOutput))
-		{
-			// Any output in this command indicates the operation is not permitted for the current user.
 			return new Status(Status.ERROR, JSCorePlugin.PLUGIN_ID, cacheCleanOutput);
 		}
 		return status;
