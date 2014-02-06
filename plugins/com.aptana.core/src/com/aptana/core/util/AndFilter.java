@@ -9,13 +9,20 @@ package com.aptana.core.util;
 
 import com.aptana.core.IFilter;
 
-public class ChainedFilter<T> implements IFilter<T>
+/**
+ * Combines multiple filters using "and". If any filter returns false for an item, we return false. If all filters
+ * return true for an item, we return true.
+ * 
+ * @author Chris Williams <cwilliams@appcelerator.com>
+ * @param <T>
+ */
+public class AndFilter<T> implements IFilter<T>
 {
 
 	private IFilter<T>[] filters;
 	private int filterLength;
 
-	public ChainedFilter(IFilter<T>... filters)
+	public AndFilter(IFilter<T>... filters)
 	{
 		if (filters == null)
 		{

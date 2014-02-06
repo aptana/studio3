@@ -31,7 +31,7 @@ import org.eclipse.swt.graphics.Image;
 import beaver.Scanner;
 
 import com.aptana.core.IFilter;
-import com.aptana.core.util.ChainedFilter;
+import com.aptana.core.util.AndFilter;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
@@ -622,7 +622,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		// add properties and methods
 		Collection<PropertyElement> properties = getQueryHelper().getTypeMembers(allTypes);
 		URI projectURI = getProjectURI();
-		for (PropertyElement property : CollectionsUtil.filter(properties, new ChainedFilter<PropertyElement>(
+		for (PropertyElement property : CollectionsUtil.filter(properties, new AndFilter<PropertyElement>(
 				isNotConstructorFilter, isVisibleFilter)))
 		{
 			addProposal(proposals, property, offset, projectURI, null);
