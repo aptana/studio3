@@ -66,7 +66,7 @@ public class PathUtil
 			try
 			{
 				String cygPathExe = ShellExecutable.getPath().removeLastSegments(1).append("cygpath.exe").toOSString(); //$NON-NLS-1$
-				IStatus result = ProcessUtil.runInBackground(cygPathExe, null, "-w", "-p", rawPATH); //$NON-NLS-1$ //$NON-NLS-2$
+				IStatus result = new ProcessRunner().runInBackground(cygPathExe, "-w", "-p", rawPATH); //$NON-NLS-1$ //$NON-NLS-2$
 				if (result.isOK())
 				{
 					return result.getMessage();

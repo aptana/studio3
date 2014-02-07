@@ -28,6 +28,7 @@ import org.junit.runners.Suite;
 	OutputStreamThreadTest.class,
 	PatternReplacerTest.class,
 	PlatformUtilTest.class,
+	ProcessRunnerTest.class,
 	ProcessStatusTest.class,
 	ProcessUtilTest.class,
 	ProgressMonitorInterrupterTest.class,

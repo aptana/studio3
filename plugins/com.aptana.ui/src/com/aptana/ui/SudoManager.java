@@ -21,6 +21,7 @@ import org.eclipse.swt.widgets.Shell;
 import com.aptana.core.ShellExecutable;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.IProcessRunner;
 import com.aptana.core.util.ProcessRunnable;
 import com.aptana.core.util.ProcessUtil;
 import com.aptana.core.util.StringUtil;
@@ -75,7 +76,7 @@ public class SudoManager
 		try
 		{
 			Map<String, String> environment = ShellExecutable.getEnvironment();
-			environment.put(ProcessUtil.REDIRECT_ERROR_STREAM, StringUtil.EMPTY);
+			environment.put(IProcessRunner.REDIRECT_ERROR_STREAM, StringUtil.EMPTY);
 
 			ProcessRunnable runnable;
 			// If the password is empty/null, don't add -S!

@@ -31,7 +31,9 @@ import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.FileUtil;
+import com.aptana.core.util.IProcessRunner;
 import com.aptana.core.util.PlatformUtil;
+import com.aptana.core.util.ProcessRunner;
 import com.aptana.core.util.ProcessStatus;
 import com.aptana.core.util.ProcessUtil;
 import com.aptana.core.util.StringUtil;
@@ -174,26 +176,25 @@ public class NodeJSService implements INodeJSService
 			IStatus status;
 			if (PlatformUtil.isWindows())
 			{
-				status = ProcessUtil.runInBackground("msiexec", Path.ROOT, "/i", file.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
+				status = new ProcessRunner().runInBackground(Path.ROOT, "msiexec", "/i", file.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			else
 			{
+				List<String> args = CollectionsUtil.newList("sudo"); //$NON-NLS-1$
 				if (password == null || password.length == 0)
 				{
 					// if sudo doesn't require a password
-					status = ProcessUtil.run("sudo", Path.ROOT,//$NON-NLS-1$
-							null, null, sub.newChild(95), "--",//$NON-NLS-1$
-							"/usr/sbin/installer", "-pkg", file.getAbsolutePath(), "-target", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-							"/"); //$NON-NLS-1$
+					args.add("-n"); //$NON-NLS-1$
 				}
 				else
 				{
 					// sudo requires a password
-					status = ProcessUtil.run("sudo", Path.ROOT,//$NON-NLS-1$
-							password, null, sub.newChild(95), "-S", "--",//$NON-NLS-1$ //$NON-NLS-2$
-							"/usr/sbin/installer", "-pkg", file.getAbsolutePath(), "-target", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-							"/"); //$NON-NLS-1$
+					args.add("-S"); //$NON-NLS-1$
 				}
+				CollectionsUtil.addToList(args, "--",//$NON-NLS-1$
+						"/usr/sbin/installer", "-pkg", file.getAbsolutePath(), "-target", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						"/"); //$NON-NLS-1$
+				status = createProcessRunner().run(Path.ROOT, null, password, args, sub.newChild(95));
 			}
 			// Report the status from the installer.
 			if (!status.isOK())
@@ -230,6 +231,11 @@ public class NodeJSService implements INodeJSService
 		sub.done();
 		fireNodeJSInstalled();
 		return Status.OK_STATUS;
+	}
+
+	protected IProcessRunner createProcessRunner()
+	{
+		return new ProcessRunner();
 	}
 
 	/**
