@@ -603,7 +603,9 @@ public class NodePackageManager implements INodePackageManager
 		// FIXME Centralize this logic in a core SudoManager class?
 		if (sudoPassword == null || sudoPassword.length == 0)
 		{
-			return CollectionsUtil.newList("sudo", "--"); //$NON-NLS-1$ //$NON-NLS-2$
+			// Force non-interactive mode so that if sudo decides we do need a password it exits with an error instead
+			// of hanging
+			return CollectionsUtil.newList("sudo", "-n", "--"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
 		return CollectionsUtil.newList("sudo", "-S", "--"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
@@ -703,8 +705,9 @@ public class NodePackageManager implements INodePackageManager
 		}
 		args.remove(GLOBAL_ARG);
 		CollectionsUtil.addToList(args, "cache", "clean"); //$NON-NLS-1$ //$NON-NLS-2$
-
-		IStatus status = ProcessUtil.run(CollectionsUtil.getFirstElement(args), null, password,
+		String path = PlatformUtil.expandEnvironmentStrings("~"); //$NON-NLS-1$
+		IPath userHome = Path.fromOSString(path);
+		IStatus status = ProcessUtil.run(CollectionsUtil.getFirstElement(args), userHome, password,
 				ShellExecutable.getEnvironment(), monitor, CollectionsUtil.toArray(args, 1, args.size()));
 
 		String cacheCleanOutput = status.getMessage();
