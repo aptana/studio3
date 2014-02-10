@@ -42,6 +42,8 @@ public class SudoManager
 	private static final String ECHO = "echo"; //$NON-NLS-1$
 	private static final String SUDO_INPUT_PWD = "-S"; //$NON-NLS-1$
 	private static final String ECHO_MESSAGE = "SUCCESS"; //$NON-NLS-1$
+	private static final String NON_INTERACTIVE = "-n"; //$NON-NLS-1$
+	private static final String END_OF_OPTIONS = "--"; //$NON-NLS-1$
 
 	// We can run -k alone to invalidate cached credentials (forcing prompt next time)
 	// We can run -k <command> to run ignoring cached credentials (forcing prompt now)
@@ -81,7 +83,8 @@ public class SudoManager
 			{
 				password = new char[0]; // when we store the password, store it as "empty", not null
 				// Just try running sudo -k echo SUCCESS with no password
-				Process p = ProcessUtil.run(SUDO, null, environment, DISREGARD_CACHED_CREDENTIALS, ECHO, ECHO_MESSAGE);
+				Process p = ProcessUtil.run(SUDO, null, environment, DISREGARD_CACHED_CREDENTIALS, NON_INTERACTIVE,
+						ECHO, ECHO_MESSAGE);
 
 				// Don't pass along password...
 				runnable = new SudoProcessRunnable(p, null, ECHO_MESSAGE);
@@ -90,7 +93,7 @@ public class SudoManager
 			{
 				// Try running and pass password on STDIN
 				Process p = ProcessUtil.run(SUDO, null, environment, DISREGARD_CACHED_CREDENTIALS, SUDO_INPUT_PWD,
-						ECHO, ECHO_MESSAGE);
+						END_OF_OPTIONS, ECHO, ECHO_MESSAGE);
 				runnable = new SudoProcessRunnable(p, password, ECHO_MESSAGE);
 			}
 
