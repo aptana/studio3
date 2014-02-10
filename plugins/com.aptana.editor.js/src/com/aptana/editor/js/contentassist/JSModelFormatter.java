@@ -185,7 +185,7 @@ public class JSModelFormatter
 	 * @param projectURI
 	 * @return
 	 */
-	public String getDescription(PropertyElement property, URI projectURI)
+	public String getDescription(BaseElement property, URI projectURI)
 	{
 		StringBuilder buffer = new StringBuilder();
 		buffer.append(getHeader(property, projectURI));
