@@ -12,6 +12,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -22,7 +25,7 @@ import org.eclipse.core.runtime.Status;
 import com.aptana.core.ShellExecutable;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.IOUtil;
-import com.aptana.core.util.ProcessUtil;
+import com.aptana.core.util.ProcessRunner;
 import com.aptana.scripting.ScriptLogger;
 import com.aptana.scripting.ScriptingActivator;
 
@@ -108,13 +111,16 @@ public class CommandScriptRunner extends AbstractCommandRunner
 			IdeLog.logError(ScriptingActivator.getDefault(), Messages.CommandScriptRunner_CANNOT_LOCATE_SHELL, e);
 			this._exitValue = 1;
 			this.setExecutedSuccessfully(false);
-			return MessageFormat.format(Messages.CommandScriptRunner_UNABLE_TO_LOCATE_SHELL_FOR_COMMAND, new Object[] { this.getCommand().getPath() });
+			return MessageFormat.format(Messages.CommandScriptRunner_UNABLE_TO_LOCATE_SHELL_FOR_COMMAND,
+					new Object[] { this.getCommand().getPath() });
 		}
 		String[] commandLine = this.getCommandLineArguments();
 		String resultText = null;
 		String input = IOUtil.read(this.getContext().getInputStream(), IOUtil.UTF_8);
-		IStatus result = ProcessUtil.runInBackground(shell.toOSString(), this.getCommand().getWorkingDirectory(), input, this
-			.getContributedEnvironment(), commandLine);
+		List<String> args = new ArrayList<String>(Arrays.asList(commandLine));
+		args.add(0, shell.toOSString());
+		IStatus result = new ProcessRunner().runInBackground(this.getCommand().getWorkingDirectory(),
+				this.getContributedEnvironment(), input, args);
 
 		if (result == null)
 		{

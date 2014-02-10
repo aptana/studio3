@@ -90,8 +90,7 @@ public class URIUtil
 		}
 
 		// TODO Do we also need to try 'gnome-open' or 'dolphin' if nautilus fails?
-		IStatus result = ProcessUtil.runInBackground("nautilus", null, //$NON-NLS-1$
-				file.getAbsolutePath());
+		IStatus result = new ProcessRunner().runInBackground("nautilus", file.getAbsolutePath()); //$NON-NLS-1$
 		if (result == null)
 		{
 			return false;
@@ -132,7 +131,7 @@ public class URIUtil
 		String path = file.getAbsolutePath();
 		String subcommand = reveal ? "reveal" : "open"; //$NON-NLS-1$ //$NON-NLS-2$
 		String appleScript = "tell application \"Finder\" to " + subcommand + " (POSIX file \"" + path + "\")\ntell application \"Finder\" to activate"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		IStatus result = ProcessUtil.runInBackground("osascript", null, "-e", appleScript); //$NON-NLS-1$ //$NON-NLS-2$
+		IStatus result = new ProcessRunner().runInBackground("osascript", "-e", appleScript); //$NON-NLS-1$ //$NON-NLS-2$
 		if (result != null && result.isOK())
 		{
 			return true;

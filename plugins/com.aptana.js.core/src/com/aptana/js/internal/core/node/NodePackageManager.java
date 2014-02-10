@@ -42,9 +42,10 @@ import com.aptana.core.ShellExecutable;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.ExecutableUtil;
+import com.aptana.core.util.IProcessRunner;
 import com.aptana.core.util.PlatformUtil;
+import com.aptana.core.util.ProcessRunner;
 import com.aptana.core.util.ProcessStatus;
-import com.aptana.core.util.ProcessUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.core.node.INodeJS;
@@ -141,6 +142,11 @@ public class NodePackageManager implements INodePackageManager
 			// /path/to/node /path/to/npm <args>
 			npmPath = nodeJS.getPath().removeLastSegments(1).append(NPM);
 		}
+	}
+
+	protected IProcessRunner getProcessRunner()
+	{
+		return new ProcessRunner();
 	}
 
 	/**
@@ -299,9 +305,8 @@ public class NodePackageManager implements INodePackageManager
 	{
 		List<String> sudoArgs = getNpmSudoArgs(global, password);
 		sudoArgs.addAll(args);
-		return ProcessUtil.run(CollectionsUtil.getFirstElement(sudoArgs), workingDirectory, password,
-				ShellExecutable.getEnvironment(workingDirectory), monitor,
-				CollectionsUtil.toArray(sudoArgs, 1, sudoArgs.size()));
+		return getProcessRunner().run(workingDirectory, ShellExecutable.getEnvironment(workingDirectory), password,
+				sudoArgs, monitor);
 	}
 
 	/**
@@ -354,7 +359,7 @@ public class NodePackageManager implements INodePackageManager
 			String password = data.getPassword();
 			builder.append(password);
 			builder.append('@');
-			env.put(ProcessUtil.TEXT_TO_OBFUSCATE, password);
+			env.put(IProcessRunner.TEXT_TO_OBFUSCATE, password);
 		}
 		builder.append(data.getHost());
 		if (data.getPort() != -1)
@@ -399,7 +404,7 @@ public class NodePackageManager implements INodePackageManager
 			try
 			{
 				// The paths we get are locations on disk. We can tell a module's name by looking for a path
-				// that is a child of 'nod_modules', i.e. "/usr/local/lib/node_modules/alloy"
+				// that is a child of 'node_modules', i.e. "/usr/local/lib/node_modules/alloy"
 				int count = path.segmentCount();
 				if (count >= 2 && NODE_MODULES.equals(path.segment(count - 2)))
 				{
@@ -541,7 +546,7 @@ public class NodePackageManager implements INodePackageManager
 				environment = ShellExecutable.getEnvironment();
 			}
 			args.addAll(proxySettings(environment));
-			environment.put(ProcessUtil.REDIRECT_ERROR_STREAM, StringUtil.EMPTY);
+			environment.put(IProcessRunner.REDIRECT_ERROR_STREAM, StringUtil.EMPTY);
 
 			// HACK for TISTUD-4101
 			if (PlatformUtil.isWindows())
@@ -574,8 +579,7 @@ public class NodePackageManager implements INodePackageManager
 				}
 			}
 
-			return ProcessUtil.run(CollectionsUtil.getFirstElement(args), workingDirectory, password, environment,
-					sub.newChild(100), CollectionsUtil.toArray(args, 1, args.size()));
+			return getProcessRunner().run(workingDirectory, environment, password, args, sub.newChild(100));
 		}
 		finally
 		{
@@ -701,7 +705,7 @@ public class NodePackageManager implements INodePackageManager
 
 	public IStatus cleanNpmCache(char[] password, boolean runWithSudo, IProgressMonitor monitor)
 	{
-		List<String> args = new ArrayList<String>();
+		List<String> args;
 		try
 		{
 			args = getNpmSudoArgs(runWithSudo, password);
@@ -714,8 +718,7 @@ public class NodePackageManager implements INodePackageManager
 		CollectionsUtil.addToList(args, "cache", "clean"); //$NON-NLS-1$ //$NON-NLS-2$
 		String path = PlatformUtil.expandEnvironmentStrings("~"); //$NON-NLS-1$
 		IPath userHome = Path.fromOSString(path);
-		IStatus status = ProcessUtil.run(CollectionsUtil.getFirstElement(args), userHome, password,
-				ShellExecutable.getEnvironment(), monitor, CollectionsUtil.toArray(args, 1, args.size()));
+		IStatus status = getProcessRunner().run(userHome, ShellExecutable.getEnvironment(), password, args, monitor);
 
 		String cacheCleanOutput = status.getMessage();
 		if (!status.isOK() || cacheCleanOutput.contains(NPM_ERROR))

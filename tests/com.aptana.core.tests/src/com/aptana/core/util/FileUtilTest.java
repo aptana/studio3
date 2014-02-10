@@ -304,8 +304,8 @@ public class FileUtilTest
 					new File(subDir, Integer.toString(i)).createNewFile();
 				}
 
-				IStatus status = ProcessUtil.runInBackground("ln", Path.fromOSString(subDir.getAbsolutePath()), "-s",
-						dir.getAbsolutePath(), "symlink");
+				IStatus status = new ProcessRunner().runInBackground(Path.fromOSString(subDir.getAbsolutePath()), "ln",
+						"-s", dir.getAbsolutePath(), "symlink");
 				assertTrue(status.isOK());
 			}
 			assertEquals(dirCount * (fileCount + 1), FileUtil.countFiles(dir));

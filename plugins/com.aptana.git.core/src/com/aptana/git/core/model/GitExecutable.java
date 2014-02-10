@@ -12,6 +12,7 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -37,8 +38,10 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.ExecutableUtil;
+import com.aptana.core.util.IProcessRunner;
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.ProcessRunnable;
+import com.aptana.core.util.ProcessRunner;
 import com.aptana.core.util.ProcessUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.VersionUtil;
@@ -346,13 +349,17 @@ public class GitExecutable
 	 */
 	public IStatus runInBackground(IPath workingDir, String... args)
 	{
-		return ProcessUtil.runInBackground(gitPath.toOSString(), workingDir, args);
+		List<String> arguments = new ArrayList<String>(Arrays.asList(args));
+		arguments.add(0, gitPath.toOSString());
+		return new ProcessRunner().runInBackground(workingDir, arguments.toArray(new String[arguments.size()]));
 	}
 
 	IStatus runInBackground(IPath workingDir, Map<String, String> env, String... args)
 	{
 		// FIXME Inline into GitRepository.execute?
-		return ProcessUtil.runInBackground(gitPath.toOSString(), workingDir, env, args);
+		List<String> arguments = new ArrayList<String>(Arrays.asList(args));
+		arguments.add(0, gitPath.toOSString());
+		return new ProcessRunner().runInBackground(workingDir, env, arguments.toArray(new String[arguments.size()]));
 	}
 
 	/**
@@ -366,7 +373,9 @@ public class GitExecutable
 	IStatus runInBackground(String input, IPath workingDirectory, String... args)
 	{
 		// FIXME Inline into GitRepository.executeWithInput?
-		return ProcessUtil.runInBackground(gitPath.toOSString(), workingDirectory, input, null, args);
+		List<String> arguments = new ArrayList<String>(Arrays.asList(args));
+		arguments.add(0, gitPath.toOSString());
+		return new ProcessRunner().runInBackground(workingDirectory, null, input, arguments);
 	}
 
 	/**
@@ -381,7 +390,9 @@ public class GitExecutable
 	Process run(IPath directory, String... arguments) throws IOException, CoreException
 	{
 		// FIXME Inline into GitRevList.walkRevisionListWithSpecifier
-		return ProcessUtil.run(gitPath.toOSString(), directory, arguments);
+		List<String> args = new ArrayList<String>(Arrays.asList(arguments));
+		args.add(0, gitPath.toOSString());
+		return new ProcessRunner().run(directory, args.toArray(new String[args.size()]));
 	}
 
 	/**
@@ -539,7 +550,14 @@ public class GitExecutable
 
 	protected Process run(Map<String, String> env, String... args) throws IOException, CoreException
 	{
-		return ProcessUtil.run(path().toOSString(), null, env, args);
+		List<String> arguments = new ArrayList<String>(Arrays.asList(args));
+		arguments.add(0, path().toOSString());
+		return createProcessRunner().run(null, env, arguments.toArray(new String[arguments.size()]));
+	}
+
+	protected IProcessRunner createProcessRunner()
+	{
+		return new ProcessRunner();
 	}
 
 	/**
