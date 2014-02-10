@@ -194,7 +194,7 @@ public class NodePackageManager implements INodePackageManager
 				if (npmStatus.isOK())
 				{
 					String prefix = npmStatus.getMessage();
-
+					sub.subTask("Global NPM prefix is " + prefix);
 					// If the sudo cache is timed out, then the password prompt and other details might appear in the
 					// console. So we should strip them off to get the real npm prefix value.
 					String passwordPrompt = StringUtil.makeFormLabel(Messages.NodePackageManager_PasswordPrompt);
@@ -206,9 +206,16 @@ public class NodePackageManager implements INodePackageManager
 					// Set the global prefix path only if it is not the default value.
 					if (!prefixPath.toOSString().equals(prefix))
 					{
+						sub.subTask("Global and user NPM prefix don't match, setting global prefix temporarily to: "
+								+ prefixPath.toOSString());
 						globalPrefixPath = prefix;
 						setGlobalPrefixPath(password, workingDirectory, sub.newChild(1), prefixPath.toOSString());
 					}
+				}
+				else
+				{
+					IdeLog.logWarning(JSCorePlugin.getDefault(),
+							"Failed to get global prefix for NPM: " + npmStatus.getMessage());
 				}
 			}
 			sub.setWorkRemaining(8);
@@ -459,7 +466,7 @@ public class NodePackageManager implements INodePackageManager
 		if (!status.isOK())
 		{
 			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
-					Messages.NodePackageManager_FailedToDetermineInstalledVersion, packageName)));
+					Messages.NodePackageManager_FailedToDetermineInstalledVersion, packageName, status.getMessage())));
 		}
 		String output = status.getMessage();
 		int index = output.indexOf(packageName + '@');
@@ -490,7 +497,7 @@ public class NodePackageManager implements INodePackageManager
 		if (!status.isOK())
 		{
 			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
-					Messages.NodePackageManager_FailedToDetermineLatestVersion, packageName)));
+					Messages.NodePackageManager_FailedToDetermineLatestVersion, packageName, status.getMessage())));
 		}
 		String message = status.getMessage().trim();
 		Matcher m = VERSION_PATTERN.matcher(message);
@@ -508,7 +515,7 @@ public class NodePackageManager implements INodePackageManager
 		if (!status.isOK())
 		{
 			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
-					Messages.NodePackageManager_ConfigFailure, key)));
+					Messages.NodePackageManager_ConfigFailure, key, status.getMessage())));
 		}
 		return status.getMessage().trim();
 	}
