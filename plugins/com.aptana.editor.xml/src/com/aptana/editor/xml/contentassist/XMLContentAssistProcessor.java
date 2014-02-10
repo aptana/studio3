@@ -102,10 +102,10 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 		IN_ATTRIBUTE_VALUE
 	};
 
-	static final Image ELEMENT_ICON = XMLPlugin.getImage("/icons/element.png"); //$NON-NLS-1$
+	public static final Image ELEMENT_ICON = XMLPlugin.getImage("/icons/element.png"); //$NON-NLS-1$
 	static final Image ATTRIBUTE_ICON = XMLPlugin.getImage("/icons/attribute.png"); //$NON-NLS-1$
 
-	private XMLIndexQueryHelper _queryHelper;
+	protected XMLIndexQueryHelper _queryHelper;
 	private Lexeme<XMLTokenType> _currentLexeme;
 	private IRange _replaceRange;
 	private IDocument _document;
@@ -417,12 +417,18 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 				}
 			}
 			positions.add(0, cursorPosition);
-			CommonCompletionProposal proposal = new XMLTagProposal(replacement.toString(), replaceOffset,
-					replaceLength, element, positions.toArray(new Integer[positions.size()]));
+			CommonCompletionProposal proposal = createElementProposal(replaceLength, replaceOffset, element, replacement, positions);
 			proposals.add(proposal);
 		}
 
 		return proposals;
+	}
+
+	protected XMLTagProposal createElementProposal(int replaceLength, int replaceOffset, ElementElement element,
+			StringBuilder replacement, List<Integer> positions)
+	{
+		return new XMLTagProposal(replacement.toString(), replaceOffset,
+				replaceLength, element, positions.toArray(new Integer[positions.size()]));
 	}
 
 	private boolean isEmptyTagType(ElementElement element)
