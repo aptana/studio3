@@ -30,6 +30,7 @@ public class XMLElementNode extends XMLNode
 	private NameNode fNameNode;
 	private final boolean fIsSelfClosing;
 	private Map<String, IParseNodeAttribute> fAttributes;
+	private int startClose;
 
 	/**
 	 * XMLElementNode
@@ -44,6 +45,18 @@ public class XMLElementNode extends XMLNode
 
 		this.fNameNode = new NameNode((String) tag.value, tag.getStart(), tag.getEnd());
 		fIsSelfClosing = (close.getId() == Terminals.SLASH_GREATER);
+		this.startClose = close.getEnd();
+	}
+
+	/**
+	 * Returns the end of the entire start tag, i.e. for "&lt;html>&lt;/html>" it will return 6. Whereas
+	 * #getEndingOffset() would return 12.
+	 * 
+	 * @return
+	 */
+	public int getStartTagEndOffset()
+	{
+		return this.startClose;
 	}
 
 	/*
@@ -57,6 +70,7 @@ public class XMLElementNode extends XMLNode
 
 		fNameNode = new NameNode(fNameNode.getName(), range.getStartingOffset() + offset, range.getEndingOffset()
 				+ offset);
+		startClose += offset;
 
 		super.addOffset(offset);
 	}

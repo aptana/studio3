@@ -7,11 +7,11 @@
  */
 package com.aptana.xml.core.parsing;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.After;
-import org.junit.Test;
 import org.junit.Before;
-import static org.junit.Assert.*;
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.INameNode;
@@ -29,22 +29,13 @@ public class XMLParserTest
 	@Before
 	public void setUp() throws Exception
 	{
-//		super.setUp();
-
 		fParser = new XMLParser();
 	}
 
 	@After
 	public void tearDown() throws Exception
 	{
-		try
-		{
-			fParser = null;
-		}
-		finally
-		{
-//			super.tearDown();
-		}
+		fParser = null;
 	}
 
 	@Test
@@ -54,7 +45,7 @@ public class XMLParserTest
 		IParseNode root = parseTest(source, "<html></html>\n");
 		assertEquals(1, root.getChildCount());
 		IParseNode html = root.getFirstChild();
-		assertElement(0, 6, "html", 0, 6, html);
+		assertElement(0, 6, "html", 1, 4, html);
 	}
 
 	@Test
@@ -64,7 +55,7 @@ public class XMLParserTest
 		IParseNode root = parseTest(source, "<html></html>\n");
 		assertEquals(1, root.getChildCount());
 		XMLElementNode html = (XMLElementNode) root.getFirstChild();
-		assertElement(0, 32, "html", 0, 32, html);
+		assertElement(0, 32, "html", 1, 4, html);
 		IParseNodeAttribute[] attrs = html.getAttributes();
 		assertEquals(2, attrs.length);
 		assertEquals("myId", html.getAttributeValue("id"));
@@ -88,14 +79,14 @@ public class XMLParserTest
 		IParseNode root = parseTest(source, "<html><head></head><body><p></p></body></html>\n");
 		assertEquals(1, root.getChildCount());
 		IParseNode html = root.getFirstChild();
-		assertElement(0, 5, "html", 0, 5, html);
+		assertElement(0, 5, "html", 1, 4, html);
 		assertEquals(2, html.getChildCount());
 		IParseNode head = html.getFirstChild();
-		assertElement(6, 18, "head", 6, 11, head);
+		assertElement(6, 18, "head", 7, 10, head);
 		assertEquals(0, head.getChildCount());
 		IParseNode body = html.getChild(1);
 		assertEquals(1, body.getChildCount());
-		assertElement(19, 42, "body", 19, 24, body);
+		assertElement(19, 42, "body", 20, 23, body);
 	}
 
 	@Test
@@ -114,14 +105,14 @@ public class XMLParserTest
 		IParseNode root = parseTest(source, "<note><to></to><from></from><heading></heading><body></body></note>\n");
 		assertEquals(1, root.getChildCount());
 		IParseNode note = root.getFirstChild();
-		assertElement(44, 160, "note", 44, 49, note);
+		assertElement(44, 160, "note", 45, 48, note);
 		assertEquals(4, note.getChildCount());
 		IParseNode to = note.getFirstChild();
-		assertElement(51, 63, "to", 51, 54, to);
+		assertElement(51, 63, "to", 52, 53, to);
 		assertEquals(0, to.getChildCount());
 		IParseNode from = note.getChild(1);
 		assertEquals(0, from.getChildCount());
-		assertElement(65, 81, "from", 65, 70, from);
+		assertElement(65, 81, "from", 66, 69, from);
 	}
 
 	@Test
