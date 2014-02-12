@@ -19,7 +19,11 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
@@ -71,6 +75,11 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	private URI _location;
 	private List<String> _types;
 	private JSIndexQueryHelper _queryHelper;
+	/**
+	 * A monitor we use mostly to monitor cancellation, but also to report progress (though it's on an unknown/number of
+	 * units!)
+	 */
+	private SubMonitor _monitor;
 
 	/**
 	 * @param scope
@@ -84,10 +93,17 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	 */
 	public JSNodeTypeInferrer(JSScope scope, Index projectIndex, URI location, JSIndexQueryHelper queryHelper)
 	{
+		this(scope, projectIndex, location, queryHelper, new NullProgressMonitor());
+	}
+
+	public JSNodeTypeInferrer(JSScope scope, Index projectIndex, URI location, JSIndexQueryHelper queryHelper,
+			IProgressMonitor monitor)
+	{
 		this._scope = scope;
 		this._index = projectIndex;
 		this._location = location;
 		this._queryHelper = queryHelper;
+		this._monitor = SubMonitor.convert(monitor, IProgressMonitor.UNKNOWN);
 	}
 
 	/**
@@ -198,32 +214,26 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	 */
 	protected JSScope getActiveScope(int offset)
 	{
-		JSScope result = null;
-
-		if (this._scope != null)
+		if (this._scope == null)
 		{
-			// find the global scope
-			JSScope root = this._scope;
+			return null;
+		}
+		// find the global scope
+		JSScope root = this._scope;
 
-			while (true)
+		while (true)
+		{
+			JSScope candidate = root.getParentScope();
+
+			if (candidate == null)
 			{
-				JSScope candidate = root.getParentScope();
-
-				if (candidate == null)
-				{
-					break;
-				}
-				else
-				{
-					root = candidate;
-				}
+				break;
 			}
-
-			// find scope containing the specified offset
-			result = root.getScopeAtOffset(offset);
+			root = candidate;
 		}
 
-		return result;
+		// find scope containing the specified offset
+		return root.getScopeAtOffset(offset);
 	}
 
 	/**
@@ -255,25 +265,21 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	 */
 	public List<String> getTypes(IParseNode node, JSScope scope)
 	{
-		List<String> result;
-
 		if (node instanceof JSNode)
 		{
 			// create new nested walker
-			JSNodeTypeInferrer walker = new JSNodeTypeInferrer(scope, this._index, this._location, this._queryHelper);
+			// FIXME How can we avoid total recursion here? can we re-use ourself somehow?
+			JSNodeTypeInferrer walker = new JSNodeTypeInferrer(scope, this._index, this._location, this._queryHelper,
+					_monitor.newChild(1));
 
 			// collect types
 			walker.visit((JSNode) node);
 
 			// return collected types
-			result = walker.getTypes();
-		}
-		else
-		{
-			result = Collections.emptyList();
+			return walker.getTypes();
 		}
 
-		return result;
+		return Collections.emptyList();
 	}
 
 	/*
@@ -283,6 +289,8 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	@Override
 	public void visit(JSArrayNode node)
 	{
+		checkCancellation();
+
 		if (!node.hasChildren())
 		{
 			this.addType(JSTypeConstants.ARRAY_TYPE);
@@ -296,6 +304,16 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 				this.addType(JSTypeUtil.createGenericArrayType(type));
 			}
 		}
+
+		_monitor.worked(1);
+	}
+
+	private void checkCancellation()
+	{
+		if (_monitor.isCanceled())
+		{
+			throw new OperationCanceledException();
+		}
 	}
 
 	/*
@@ -305,6 +323,8 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	@Override
 	public void visit(JSAssignmentNode node)
 	{
+		checkCancellation();
+
 		switch (node.getNodeType())
 		{
 			case IJSNodeTypes.ASSIGN:
@@ -328,6 +348,8 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 				this.addType(JSTypeConstants.DEFAULT_ASSIGNMENT_TYPE);
 				break;
 		}
+
+		_monitor.worked(1);
 	}
 
 	/*
@@ -338,8 +360,9 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	@Override
 	public void visit(JSBinaryArithmeticOperatorNode node)
 	{
-		String type = JSTypeConstants.NUMBER_TYPE;
+		checkCancellation();
 
+		String type = JSTypeConstants.NUMBER_TYPE;
 		if (node.getNodeType() == IJSNodeTypes.ADD)
 		{
 			IParseNode lhs = node.getLeftHandSide();
@@ -372,8 +395,9 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 				}
 			}
 		}
-
 		this.addType(type);
+
+		_monitor.worked(1);
 	}
 
 	/*
@@ -383,8 +407,9 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	@Override
 	public void visit(JSBinaryBooleanOperatorNode node)
 	{
-		JSTokenType token = JSTokenType.get((String) node.getOperator().value);
+		checkCancellation();
 
+		JSTokenType token = JSTokenType.get((String) node.getOperator().value);
 		switch (token)
 		{
 			case AMPERSAND_AMPERSAND:
@@ -396,6 +421,8 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 			default:
 				this.addType(JSTypeConstants.BOOLEAN_TYPE);
 		}
+
+		_monitor.worked(1);
 	}
 
 	/*
@@ -405,8 +432,12 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	@Override
 	public void visit(JSConditionalNode node)
 	{
+		checkCancellation();
+
 		this.addTypes(node.getTrueExpression());
 		this.addTypes(node.getFalseExpression());
+
+		_monitor.worked(1);
 	}
 
 	/*
@@ -416,13 +447,15 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	@Override
 	public void visit(JSConstructNode node)
 	{
+		checkCancellation();
+
 		// TODO: Need to handle any property assignments off of "this"
 		IParseNode child = node.getExpression();
 
 		if (child instanceof JSNode)
 		{
 			List<String> types = this.getTypes(child);
-			List<String> returnTypes = new ArrayList<String>();
+			List<String> returnTypes = new ArrayList<String>(types.size());
 
 			for (String typeName : types)
 			{
@@ -460,6 +493,8 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 				}
 			}
 		}
+
+		_monitor.worked(1);
 	}
 
 	/*
@@ -469,7 +504,9 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	@Override
 	public void visit(JSFalseNode node)
 	{
+		checkCancellation();
 		this.addType(JSTypeConstants.BOOLEAN_TYPE);
+		_monitor.worked(1);
 	}
 
 	/*
@@ -479,6 +516,8 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	@Override
 	public void visit(JSFunctionNode node)
 	{
+		checkCancellation();
+
 		List<String> types = new ArrayList<String>();
 		JSScope scope = this.getActiveScope(node.getBody().getStartingOffset());
 		boolean foundReturnExpression = false;
@@ -506,6 +545,8 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		// build function type, including return values
 		String type = JSTypeUtil.toFunctionType(types);
 		this.addType(type);
+
+		_monitor.worked(1);
 	}
 
 	/*
@@ -515,11 +556,12 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	@Override
 	public void visit(JSGetElementNode node)
 	{
+		checkCancellation();
+
 		// TODO: Should check subscript to determine if the type is a Number or
 		// a String. If it is a String, then this should behave like get-property
 		// assuming we can retrieve a literal string.
 		IParseNode lhs = node.getLeftHandSide();
-
 		if (lhs instanceof JSNode)
 		{
 			for (String typeName : this.getTypes(lhs))
@@ -536,6 +578,8 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 				}
 			}
 		}
+
+		_monitor.worked(1);
 	}
 
 	/*
@@ -545,8 +589,9 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	@Override
 	public void visit(JSGetPropertyNode node)
 	{
-		IParseNode lhs = node.getLeftHandSide();
+		checkCancellation();
 
+		IParseNode lhs = node.getLeftHandSide();
 		if (lhs instanceof JSNode)
 		{
 			IParseNode rhs = node.getRightHandSide();
@@ -591,6 +636,8 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 				}
 			}
 		}
+
+		_monitor.worked(1);
 	}
 
 	/*
@@ -600,12 +647,15 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	@Override
 	public void visit(JSGroupNode node)
 	{
-		IParseNode expression = node.getExpression();
+		checkCancellation();
 
+		IParseNode expression = node.getExpression();
 		if (expression instanceof JSNode)
 		{
 			((JSNode) expression).accept(this);
 		}
+
+		_monitor.worked(1);
 	}
 
 	/*
@@ -615,6 +665,8 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	@Override
 	public void visit(JSIdentifierNode node)
 	{
+		checkCancellation();
+
 		String name = node.getText();
 		Collection<PropertyElement> properties = null;
 
@@ -634,7 +686,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 				// Check the local scope for type first
 				JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(this._scope, this._index,
 						this._location, this._queryHelper);
-				PropertyElement property = symbolInferrer.getSymbolPropertyElement(name);
+				PropertyElement property = symbolInferrer.getSymbolPropertyElement(name, _monitor.newChild(1));
 				if (property != null)
 				{
 					// We found a match in the local scope
@@ -675,6 +727,8 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 				}
 			}
 		}
+
+		_monitor.worked(1);
 	}
 
 	protected String getFileName()
@@ -705,8 +759,9 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	@Override
 	public void visit(JSInvokeNode node)
 	{
-		IParseNode child = node.getExpression();
+		checkCancellation();
 
+		IParseNode child = node.getExpression();
 		if (child instanceof JSNode)
 		{
 			// TODO hang the "require" string as a constant somewhere!
@@ -775,6 +830,8 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 				}
 			}
 		}
+
+		_monitor.worked(1);
 	}
 
 	protected IPath resolve(String moduleId)
@@ -790,7 +847,9 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	@Override
 	public void visit(JSNumberNode node)
 	{
+		checkCancellation();
 		this.addType(JSTypeConstants.NUMBER_TYPE);
+		_monitor.worked(1);
 	}
 
 	/*
@@ -800,6 +859,8 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	@Override
 	public void visit(JSObjectNode node)
 	{
+		checkCancellation();
+
 		if (node.hasChildren())
 		{
 			// collect all descendants into a property collection
@@ -814,7 +875,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 					this._queryHelper);
 			Set<String> types = new LinkedHashSet<String>();
 
-			inferrer.processProperties(symbol, types);
+			inferrer.processProperties(symbol, types, _monitor.newChild(1));
 
 			this.addTypes(new ArrayList<String>(types));
 		}
@@ -822,6 +883,8 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		{
 			this.addType(JSTypeConstants.OBJECT_TYPE);
 		}
+
+		_monitor.worked(1);
 	}
 
 	/*
@@ -832,7 +895,9 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	@Override
 	public void visit(JSPostUnaryOperatorNode node)
 	{
+		checkCancellation();
 		this.addType(JSTypeConstants.NUMBER_TYPE);
+		_monitor.worked(1);
 	}
 
 	/*
@@ -842,6 +907,8 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	@Override
 	public void visit(JSPreUnaryOperatorNode node)
 	{
+		checkCancellation();
+
 		switch (node.getNodeType())
 		{
 			case IJSNodeTypes.DELETE:
@@ -862,6 +929,8 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 				this.addType(JSTypeConstants.NUMBER_TYPE);
 				break;
 		}
+
+		_monitor.worked(1);
 	}
 
 	/*
@@ -871,7 +940,9 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	@Override
 	public void visit(JSRegexNode node)
 	{
+		checkCancellation();
 		this.addType(JSTypeConstants.REG_EXP_TYPE);
+		_monitor.worked(1);
 	}
 
 	/*
@@ -881,7 +952,9 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	@Override
 	public void visit(JSStringNode node)
 	{
+		checkCancellation();
 		this.addType(JSTypeConstants.STRING_TYPE);
+		_monitor.worked(1);
 	}
 
 	/*
@@ -891,6 +964,8 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	@Override
 	public void visit(JSTrueNode node)
 	{
+		checkCancellation();
 		this.addType(JSTypeConstants.BOOLEAN_TYPE);
+		_monitor.worked(1);
 	}
 }

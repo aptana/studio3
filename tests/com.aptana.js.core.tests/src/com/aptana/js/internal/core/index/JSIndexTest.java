@@ -147,13 +147,13 @@ public class JSIndexTest
 	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
-//	@Override
+	// @Override
 	@After
 	public void tearDown() throws Exception
 	{
 		getIndexManager().removeIndex(URI.create(IJSIndexConstants.METADATA_INDEX_LOCATION));
 
-//		super.tearDown();
+		// super.tearDown();
 	}
 
 	/**
@@ -410,8 +410,7 @@ public class JSIndexTest
 			indexParticipant.processParseResults(myContext, index, ast, new NullProgressMonitor());
 			JSIndexQueryHelper queryHelper = new JSIndexQueryHelper(index);
 
-			Collection<PropertyElement> types = queryHelper.getGlobals("functionDocsWithoutReturn.js",
-					"abc");
+			Collection<PropertyElement> types = queryHelper.getGlobals("functionDocsWithoutReturn.js", "abc");
 			assertNotNull(types);
 			assertTrue("Expected at least a single property for 'abc'", !types.isEmpty());
 
@@ -434,7 +433,7 @@ public class JSIndexTest
 	 * APSTUD-4116
 	 */
 	@Test
-	public void testFunctionDocumenationWithoutParamTag()
+	public void testFunctionDocumentationWithoutParamTag()
 	{
 		TestBuildContext myContext = new TestBuildContext("indexing/functionDocsWithoutParam.js");
 
@@ -447,8 +446,7 @@ public class JSIndexTest
 			indexParticipant.processParseResults(myContext, index, ast, new NullProgressMonitor());
 			JSIndexQueryHelper queryHelper = new JSIndexQueryHelper(index);
 
-			Collection<PropertyElement> types = queryHelper.getGlobals("functionDocsWithoutParam.js",
-					"abc");
+			Collection<PropertyElement> types = queryHelper.getGlobals("functionDocsWithoutParam.js", "abc");
 			assertNotNull(types);
 			assertTrue("Expected at least a single property for 'abc'", !types.isEmpty());
 
@@ -463,6 +461,26 @@ public class JSIndexTest
 			assertEquals("Expected parameter 1's name to be 'a'", "a", parameters.get(0));
 			assertEquals("Expected parameter 2's name to be 'b'", "b", parameters.get(1));
 			assertEquals("Expected parameter 3's name to be 'c'", "c", parameters.get(2));
+		}
+		catch (CoreException e)
+		{
+			fail(e.getMessage());
+		}
+	}
+
+	@Test(timeout = 30000)
+	public void testTISTUD_6113()
+	{
+		TestBuildContext myContext = new TestBuildContext("indexing/d3.v3.min.js");
+
+		try
+		{
+			IParseRootNode ast = myContext.getAST();
+			JSFileIndexingParticipant indexParticipant = new JSFileIndexingParticipant();
+			Index index = getIndex();
+
+			indexParticipant.processParseResults(myContext, index, ast, new NullProgressMonitor());
+			assertTrue(true); // Can we parse/index it without hanging?
 		}
 		catch (CoreException e)
 		{
