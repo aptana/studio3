@@ -13,6 +13,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.junit.Test;
 
@@ -57,7 +58,7 @@ public class InferencingBugsTest extends InferencingTestsBase
 
 		JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(scope, getIndex(), getLocation(),
 				new JSIndexQueryHelper(getIndex()));
-		PropertyElement property = symbolInferrer.getSymbolPropertyElement("m");
+		PropertyElement property = symbolInferrer.getSymbolPropertyElement("m", new NullProgressMonitor());
 		FunctionElement function = (FunctionElement) property;
 
 		// When we had the bad type names being generated, we returned:
