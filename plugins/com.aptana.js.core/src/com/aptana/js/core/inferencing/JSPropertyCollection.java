@@ -16,6 +16,7 @@ import java.util.Map;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
+import com.aptana.js.core.model.PropertyElement;
 import com.aptana.js.core.parsing.ast.JSNode;
 
 /**
@@ -29,6 +30,7 @@ public class JSPropertyCollection
 
 	private String name;
 	private JSPropertyCollection parentProperty;
+	private PropertyElement _element;
 
 	/**
 	 * addType
@@ -132,21 +134,19 @@ public class JSPropertyCollection
 	}
 
 	/**
-	 * getProperty
+	 * getProperty May return null
 	 * 
 	 * @param name
 	 * @return
 	 */
 	public JSPropertyCollection getProperty(String name)
 	{
-		JSPropertyCollection result = null;
-
 		if (properties != null)
 		{
-			result = properties.get(name);
+			return properties.get(name);
 		}
 
-		return result;
+		return null;
 	}
 
 	/**
@@ -310,5 +310,20 @@ public class JSPropertyCollection
 				}
 			}
 		}
+	}
+
+	public void setElement(PropertyElement result)
+	{
+		this._element = result;
+	}
+
+	public boolean hasElement()
+	{
+		return _element != null;
+	}
+
+	public PropertyElement getElement()
+	{
+		return _element;
 	}
 }

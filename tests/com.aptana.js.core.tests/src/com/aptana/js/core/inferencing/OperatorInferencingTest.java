@@ -13,6 +13,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.junit.Test;
 
 import com.aptana.js.core.index.JSIndexQueryHelper;
@@ -38,7 +39,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 		// as a side-effect caches each JSObject's type values.
 		JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(globals, null, null, new JSIndexQueryHelper(
 				getIndex()));
-		symbolInferrer.getScopeProperties();
+		symbolInferrer.getScopeProperties(new NullProgressMonitor());
 
 		List<String> symbolTypes = object.getTypes();
 		assertNotNull(symbolTypes);
