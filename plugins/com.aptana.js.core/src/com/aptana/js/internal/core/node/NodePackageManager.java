@@ -634,10 +634,9 @@ public class NodePackageManager implements INodePackageManager
 			if (!status.isOK())
 			{
 				String message = status.getMessage();
-				IdeLog.logError(JSCorePlugin.getDefault(),
-						MessageFormat.format("Failed to uninstall {0}.\n{1}", packageName, message)); //$NON-NLS-1$
-				return new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
-						Messages.NodePackageManager_FailedInstallError, packageName));
+				String logMsg = MessageFormat.format("Failed to uninstall {0}.\n{1}", packageName, message); //$NON-NLS-1$
+				IdeLog.logError(JSCorePlugin.getDefault(), logMsg);
+				return new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, logMsg);
 			}
 			return status;
 		}
