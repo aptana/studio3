@@ -74,14 +74,20 @@ public class FindBarVisibilityControl
 
 				for (FindBarDecorator d : decs)
 				{
-					d.showFindBar(d == requester);
+					if (d == requester)
+					{
+						d.showFindBar(true);
+					}
 				}
 			}
 			else
 			{
 				for (FindBarDecorator d : decs)
 				{
-					d.hideFindBar(d == requester);
+					if (d == requester)
+					{
+						d.hideFindBar(true);
+					}
 				}
 			}
 		}
