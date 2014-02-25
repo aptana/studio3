@@ -134,6 +134,9 @@
                relative="org.eclipse.ui.navigator.ProjectExplorer"
                visible="false">
          </view>
+         <viewShortcut
+               id="com.aptana.explorer.view">
+         </viewShortcut>
       </perspectiveExtension>
    </extension>
    <extension
