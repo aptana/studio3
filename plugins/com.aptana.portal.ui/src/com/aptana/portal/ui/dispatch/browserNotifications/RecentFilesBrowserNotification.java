@@ -86,10 +86,14 @@ public class RecentFilesBrowserNotification extends AbstractBrowserNotification
 				IWorkbench workbench = PortalUIPlugin.getDefault().getWorkbench();
 				if (!workbench.isClosing())
 				{
-					IWorkbenchPage activePage = workbench.getActiveWorkbenchWindow().getActivePage();
-					if (activePage != null)
+					IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+					if (window != null)
 					{
-						activePage.removePartListener(partListener);
+						IWorkbenchPage activePage = window.getActivePage();
+						if (activePage != null)
+						{
+							activePage.removePartListener(partListener);
+						}
 					}
 				}
 				return Status.OK_STATUS;
