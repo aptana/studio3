@@ -7,6 +7,7 @@
  */
 package com.aptana.editor.common.scripting.snippets;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -31,6 +32,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.TextStyle;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.contentassist.ICommonCompletionProposal;
@@ -177,18 +179,53 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 			if (completionProposals[i] instanceof SnippetTemplateProposal)
 			{
 				SnippetTemplateProposal snippetTemplateProposal = (SnippetTemplateProposal) completionProposals[i];
-				snippetTemplateProposal.setTemplateProposals(completionProposals);
+				ICompletionProposal[] similarProposals = getTemplatesWithSameName(snippetTemplateProposal,
+						completionProposals);
+				snippetTemplateProposal.setTemplateProposals(similarProposals);
 				snippetTemplateProposal.setStyler(getStyler());
-				if (i < 9)
-				{
-					snippetTemplateProposal.setTriggerChar((char) ('1' + i));
-				}
 			}
 		}
 
 		String prefix = extractPrefix(viewer, offset);
 		setSelectedProposal(prefix, completionProposals);
 		return completionProposals;
+	}
+
+	/**
+	 * We need to only group the templates with the same name. Otherwise, we might end up auto inserting the snippet for
+	 * the wrong prefix.
+	 * 
+	 * @param srcTemplate
+	 * @param completionProposals
+	 * @return
+	 */
+	private ICompletionProposal[] getTemplatesWithSameName(SnippetTemplateProposal srcTemplate,
+			ICompletionProposal[] completionProposals)
+	{
+		int i = 0;
+		ArrayList<ICompletionProposal> result = new ArrayList<ICompletionProposal>(completionProposals.length);
+		for (ICompletionProposal proposal : completionProposals)
+		{
+			if (proposal instanceof SnippetTemplateProposal)
+			{
+				SnippetTemplateProposal snippetProposal = (SnippetTemplateProposal) proposal;
+				if (snippetProposal.getTemplateSuper().getName().equals(srcTemplate.getTemplateSuper().getName()))
+				{
+					result.add(proposal);
+					if (i < 9)
+					{
+						snippetProposal.setTriggerChar((char) ('1' + i));
+					}
+					i++;
+				}
+			}
+			else
+			{
+				result.add(proposal);
+			}
+		}
+		result.trimToSize();
+		return CollectionsUtil.toArray(result);
 	}
 
 	/**
