@@ -7,6 +7,8 @@
  */
 package com.aptana.editor.xml;
 
+import java.util.Map;
+
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -44,6 +46,17 @@ public class XMLSourceViewerConfiguration extends SimpleSourceViewerConfiguratio
 	{
 		return new IAutoEditStrategy[] { new RubyRegexpAutoIndentStrategy(contentType, this, sourceViewer, XMLPlugin
 				.getDefault().getPreferenceStore()) };
+	}
+
+	@Override
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	protected Map getHyperlinkDetectorTargets(ISourceViewer sourceViewer)
+	{
+		Map targets = super.getHyperlinkDetectorTargets(sourceViewer);
+
+		targets.put("com.aptana.editor.xml.sourceCode", getEditor()); //$NON-NLS-1$
+
+		return targets;
 	}
 
 }
