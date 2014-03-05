@@ -31,15 +31,45 @@ import com.aptana.editor.common.CommonEditorPlugin;
 public class EditorSearchHyperlink implements IHyperlink
 {
 
-	private IRegion region;
-	private URI document;
-	private String searchString;
+	private final IRegion region;
+	private final URI document;
+	private final String searchString;
+	private final boolean caseSensitive;
+	private final boolean wholeWord;
 
 	public EditorSearchHyperlink(IRegion region, String searchString, URI document)
+	{
+		this(region, searchString, document, true, true);
+	}
+
+	public EditorSearchHyperlink(IRegion region, String searchString, URI document, boolean caseSensitive,
+			boolean wholeWord)
 	{
 		this.region = region;
 		this.searchString = searchString;
 		this.document = document;
+		this.caseSensitive = caseSensitive;
+		this.wholeWord = wholeWord;
+	}
+
+	public String getSearchString()
+	{
+		return searchString;
+	}
+
+	public boolean isCaseSensitive()
+	{
+		return caseSensitive;
+	}
+
+	public URI getURI()
+	{
+		return document;
+	}
+
+	public boolean isWholeWord()
+	{
+		return wholeWord;
 	}
 
 	public IRegion getHyperlinkRegion()
@@ -69,7 +99,7 @@ public class EditorSearchHyperlink implements IHyperlink
 			IFindReplaceTarget target = (IFindReplaceTarget) part.getAdapter(IFindReplaceTarget.class);
 			if (target != null && target.canPerformFind())
 			{
-				target.findAndSelect(0, searchString, true, true, true);
+				target.findAndSelect(0, searchString, true, caseSensitive, wholeWord);
 			}
 		}
 		catch (Exception e)
