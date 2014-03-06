@@ -21,7 +21,6 @@ import org.eclipse.jface.text.Region;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
-import com.aptana.core.util.URIUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.util.EditorUtil;
 import com.aptana.editor.js.IDebugScopes;
@@ -136,47 +135,12 @@ public class JSHyperlinkCollector extends JSTreeWalker
 			IRegion hyperlinkRegion = getNodeRegion(linkNode);
 			URI projectURI = EditorUtil.getProjectURI(editor);
 			String targetFilePath = EditorUtil.getURI(editor).toString();
-			String hyperlinkText = getDocumentDisplayName(projectURI, targetFilePath);
+			String hyperlinkText = JSHyperlinkUtil.getDocumentDisplayName(projectURI, targetFilePath);
 			IRegion targetRegion = getNodeRegion(targetNode);
 
 			addHyperlink(new JSTargetRegionHyperlink(hyperlinkRegion, linkType, hyperlinkText, targetFilePath,
 					targetRegion));
 		}
-	}
-
-	/**
-	 * Format the document to a relative path within the project, including the project name in the result. If the
-	 * document is not within the project path, then it is returned unchanged
-	 * 
-	 * @param projectURI
-	 *            The URI to the project containing the file in the editor associated with this instance
-	 * @param document
-	 *            A string representation of the document name to trim.
-	 * @return Returns a trimmed or untouched version of the document parameter
-	 */
-	protected String getDocumentDisplayName(URI projectURI, String document)
-	{
-		String prefix = (projectURI != null) ? URIUtil.decodeURI(projectURI.toString()) : null;
-
-		// back up one segment so we include the project name in the document
-		if (prefix != null && prefix.length() > 2)
-		{
-			int index = prefix.lastIndexOf('/', prefix.length() - 2);
-
-			if (index != -1 && index > 0)
-			{
-				prefix = prefix.substring(0, index - 1);
-			}
-		}
-
-		String result = URIUtil.decodeURI(document);
-
-		if (prefix != null && result.startsWith(prefix))
-		{
-			result = result.substring(prefix.length() + 1);
-		}
-
-		return result;
 	}
 
 	/**
@@ -245,28 +209,6 @@ public class JSHyperlinkCollector extends JSTreeWalker
 		}
 
 		return new Region(start, length);
-	}
-
-	/**
-	 * Determine if the document is within the specified project
-	 * 
-	 * @param projectURI
-	 * @param document
-	 * @return
-	 */
-	protected boolean isInCurrentProject(URI projectURI, String document)
-	{
-		String prefix = (projectURI != null) ? URIUtil.decodeURI(projectURI.toString()) : null;
-		boolean result = false;
-
-		String path = URIUtil.decodeURI(document);
-
-		if (prefix != null && path.startsWith(prefix))
-		{
-			result = true;
-		}
-
-		return result;
 	}
 
 	/**
@@ -502,9 +444,9 @@ public class JSHyperlinkCollector extends JSTreeWalker
 				for (String document : documents)
 				{
 					// NOTE: projectURI is null during unit testing
-					if (projectURI == null || isInCurrentProject(projectURI, document))
+					if (projectURI == null || JSHyperlinkUtil.isInCurrentProject(projectURI, document))
 					{
-						String text = getDocumentDisplayName(projectURI, document);
+						String text = JSHyperlinkUtil.getDocumentDisplayName(projectURI, document);
 
 						addHyperlink(new JSSearchStringHyperlink(region, linkType, text, document, elementName));
 					}

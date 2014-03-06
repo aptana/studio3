@@ -16,6 +16,7 @@ import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IStorage;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -35,6 +36,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.editors.text.ILocationProvider;
 import org.eclipse.ui.editors.text.ILocationProviderExtension;
+import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
@@ -423,5 +425,31 @@ public class EditorUtil
 		});
 
 		return result[0];
+	}
+
+	/**
+	 * Returns the resource file that the editor belongs to.
+	 * 
+	 * @param editor
+	 * @return
+	 */
+	public static IFile getEditorFile(AbstractThemeableEditor editor)
+	{
+		IEditorInput editorInput = editor.getEditorInput();
+		if (editorInput instanceof IFileEditorInput)
+		{
+			IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
+			return fileEditorInput.getFile();
+		}
+		else if (editorInput instanceof FileStoreEditorInput)
+		{
+			FileStoreEditorInput input = (FileStoreEditorInput) editorInput;
+			IFile[] files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(input.getURI());
+			if (files != null && files.length > 0)
+			{
+				return files[0];
+			}
+		}
+		return null;
 	}
 }

@@ -31,6 +31,7 @@ Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: com.aptana.editor.js,
  com.aptana.editor.js.contentassist,
+ com.aptana.editor.js.hyperlink,
  com.aptana.editor.js.internal.text;x-friends:="com.aptana.editor.html",
  com.aptana.editor.js.outline,
  com.aptana.editor.js.text,
