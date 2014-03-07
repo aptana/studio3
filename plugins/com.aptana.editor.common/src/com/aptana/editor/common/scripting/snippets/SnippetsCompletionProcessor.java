@@ -7,11 +7,12 @@
  */
 package com.aptana.editor.common.scripting.snippets;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.BadLocationException;
@@ -48,6 +49,8 @@ import com.aptana.scripting.model.filters.ScopeFilter;
 
 public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 {
+
+	private static final String NON_SNIPPETS = "NON_SNIPPETS"; //$NON-NLS-1$
 
 	private static class TextFontStyler extends Styler
 	{
@@ -173,59 +176,64 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset)
 	{
 		ICompletionProposal[] completionProposals = super.computeCompletionProposals(viewer, offset);
+		Map<String, SnippetElementsGroup> nameToProposalsMap = new HashMap<String, SnippetElementsGroup>();
 
-		for (int i = 0; i < completionProposals.length; i++)
+		// Iterate through each proposal and group the proposals with same name in each group. If the proposal is not a
+		// snippet, then categorize them as under non-snippet group.
+		for (ICompletionProposal proposal : completionProposals)
 		{
-			if (completionProposals[i] instanceof SnippetTemplateProposal)
+			String snippetName;
+			if (proposal instanceof SnippetTemplateProposal)
 			{
-				SnippetTemplateProposal snippetTemplateProposal = (SnippetTemplateProposal) completionProposals[i];
-				ICompletionProposal[] similarProposals = getTemplatesWithSameName(snippetTemplateProposal,
-						completionProposals);
-				snippetTemplateProposal.setTemplateProposals(similarProposals);
-				snippetTemplateProposal.setStyler(getStyler());
+				SnippetTemplateProposal snippetTemplateProposal = (SnippetTemplateProposal) proposal;
+				snippetName = snippetTemplateProposal.getTemplateSuper().getName();
+			}
+			else
+			{
+				snippetName = NON_SNIPPETS;
+			}
+
+			if (nameToProposalsMap.containsKey(snippetName))
+			{
+				SnippetElementsGroup snippetsGroup = nameToProposalsMap.get(snippetName);
+				snippetsGroup.addSnippetProposal(proposal);
+			}
+			else
+			{
+				SnippetElementsGroup snippetsGroup = new SnippetElementsGroup();
+				snippetsGroup.addSnippetProposal(proposal);
+				nameToProposalsMap.put(snippetName, snippetsGroup);
+			}
+		}
+
+		// Now since we got different groups, let's reference the similar proposals to each snippet proposal.
+		List<ICompletionProposal> nonSnippets = null;
+		SnippetElementsGroup nonSnippetsGroup = nameToProposalsMap.get(NON_SNIPPETS);
+		if (nonSnippetsGroup != null)
+		{
+			nonSnippets = nonSnippetsGroup.getSnippetProposals();
+		}
+		for (ICompletionProposal proposal : completionProposals)
+		{
+			if (proposal instanceof SnippetTemplateProposal)
+			{
+				SnippetTemplateProposal snippetProposal = (SnippetTemplateProposal) proposal;
+				String snippetName = snippetProposal.getTemplateSuper().getName();
+				SnippetElementsGroup snippetsGroup = nameToProposalsMap.get(snippetName);
+				if (snippetsGroup == null)
+				{
+					continue;
+				}
+				List<ICompletionProposal> snippets = snippetsGroup.getSnippetProposals();
+				CollectionsUtil.addToList(snippets, nonSnippets);
+				snippetProposal.setTemplateProposals(CollectionsUtil.toArray(snippets));
+				snippetProposal.setStyler(getStyler());
 			}
 		}
 
 		String prefix = extractPrefix(viewer, offset);
 		setSelectedProposal(prefix, completionProposals);
 		return completionProposals;
-	}
-
-	/**
-	 * We need to only group the templates with the same name. Otherwise, we might end up auto inserting the snippet for
-	 * the wrong prefix.
-	 * 
-	 * @param srcTemplate
-	 * @param completionProposals
-	 * @return
-	 */
-	private ICompletionProposal[] getTemplatesWithSameName(SnippetTemplateProposal srcTemplate,
-			ICompletionProposal[] completionProposals)
-	{
-		int i = 0;
-		ArrayList<ICompletionProposal> result = new ArrayList<ICompletionProposal>(completionProposals.length);
-		for (ICompletionProposal proposal : completionProposals)
-		{
-			if (proposal instanceof SnippetTemplateProposal)
-			{
-				SnippetTemplateProposal snippetProposal = (SnippetTemplateProposal) proposal;
-				if (snippetProposal.getTemplateSuper().getName().equals(srcTemplate.getTemplateSuper().getName()))
-				{
-					result.add(proposal);
-					if (i < 9)
-					{
-						snippetProposal.setTriggerChar((char) ('1' + i));
-					}
-					i++;
-				}
-			}
-			else
-			{
-				result.add(proposal);
-			}
-		}
-		result.trimToSize();
-		return CollectionsUtil.toArray(result);
 	}
 
 	/**
