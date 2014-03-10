@@ -409,7 +409,7 @@
          unpack="false"/>
 
    <plugin
-         id="com.appcelerator.titanium.usage.tests"
+         id="com.aptana.usage.tests"
          download-size="0"
          install-size="0"
          version="0.0.0"
