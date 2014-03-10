@@ -41,7 +41,7 @@ import com.aptana.usage.UsagePlugin;
  */
 public class DefaultAnalyticsEventHandler implements IAnalyticsEventHandler
 {
-	static final String DEFAULT_URL = "https://api.appcelerator.com/p/v1/app-track"; //$NON-NLS-1$
+	static final String DEFAULT_URL = "https://api.appcelerator.net/p/v1/app-track"; //$NON-NLS-1$
 	static final int DEFAULT_TIMEOUT = 5 * 1000; // 5 seconds
 
 	private final String url;
