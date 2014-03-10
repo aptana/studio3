@@ -49,7 +49,7 @@ public class DefaultAnalyticsEventHandler implements IAnalyticsEventHandler
 	protected int responseCode = 0;
 	protected Object lock = new Object();
 
-	DefaultAnalyticsEventHandler()
+	public DefaultAnalyticsEventHandler()
 	{
 		this(DEFAULT_TIMEOUT, EclipseUtil.getSystemProperty(IUsageSystemProperties.ANALYTICS_URL));
 	}
