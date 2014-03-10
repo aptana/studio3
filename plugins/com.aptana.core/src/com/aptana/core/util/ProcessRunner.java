@@ -403,4 +403,19 @@ public class ProcessRunner implements IProcessRunner
 		}
 		return null;
 	}
+
+	public IStatus processResult(Process p)
+	{
+		return processData(p, null);
+	}
+
+	public String outputForProcess(Process process)
+	{
+		IStatus result = processData(process, null);
+		if (result == null)
+		{
+			return null;
+		}
+		return result.getMessage();
+	}
 }

@@ -1,9 +1,11 @@
 package com.aptana.core.util;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -12,7 +14,9 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.After;
@@ -262,5 +266,39 @@ public class ProcessRunnerTest
 		// Verify we obfuscate only in the key-value pair, not in the filepath!
 		assertEquals(MessageFormat.format(Messages.ProcessUtil_RunningProcess,
 				"\"binary\" \"/User/cwilliams/path\" \"password=**********\"", null, null), logs.get(0));
+	}
+
+	@Test
+	public void testProcessResultReturnsExitCodeAndOutputsInProcessStatusObject() throws Exception
+	{
+		final String stdOutText = "stdout";
+		final String stdErrText = "stdout";
+		final int exitCode = 0;
+
+		final Process process = context.mock(Process.class);
+		context.checking(new Expectations()
+		{
+			{
+				oneOf(process).getInputStream();
+				will(returnValue(new ByteArrayInputStream(stdOutText.getBytes())));
+
+				oneOf(process).getErrorStream();
+				will(returnValue(new ByteArrayInputStream(stdErrText.getBytes())));
+
+				oneOf(process).getOutputStream();
+
+				oneOf(process).waitFor();
+				will(returnValue(exitCode));
+			}
+		});
+
+		IStatus status = runner.processResult(process);
+		assertNotNull(status);
+		assertTrue(status instanceof ProcessStatus);
+		ProcessStatus pStatus = (ProcessStatus) status;
+		assertEquals(exitCode, pStatus.getCode());
+		assertEquals(stdOutText, pStatus.getStdOut());
+		assertEquals(stdErrText, pStatus.getStdErr());
+		context.assertIsSatisfied();
 	}
 }

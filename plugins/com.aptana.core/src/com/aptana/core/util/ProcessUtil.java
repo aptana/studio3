@@ -8,8 +8,6 @@
 package com.aptana.core.util;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -18,9 +16,6 @@ import java.util.Map;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
-
-import com.aptana.core.CorePlugin;
-import com.aptana.core.logging.IdeLog;
 
 /**
  * A Utility for launching process synch and async via ProcessBuilder. Does not go through the Eclipse launching
@@ -101,14 +96,14 @@ public class ProcessUtil
 		return new ProcessRunner().runInBackground(workingDir, env, arguments.toArray(new String[arguments.size()]));
 	}
 
+	/**
+	 * @deprecated Use {@link IProcessRunner#outputForProcess(Process)}
+	 * @param process
+	 * @return
+	 */
 	public static String outputForProcess(Process process)
 	{
-		IStatus result = processData(process, null);
-		if (result == null)
-		{
-			return null;
-		}
-		return result.getMessage();
+		return new ProcessRunner().outputForProcess(process);
 	}
 
 	/**
@@ -117,71 +112,11 @@ public class ProcessUtil
 	 * 
 	 * @param process
 	 * @return
+	 * @deprecated Use {@link IProcessRunner#processResult(Process)}
 	 */
 	public static IStatus processResult(Process process)
 	{
-		return processData(process, null);
-	}
-
-	private static IStatus processData(Process process, String input)
-	{
-		return processData(process.getInputStream(), process.getErrorStream(), process.getOutputStream(), input,
-				process, false);
-	}
-
-	private static IStatus processData(InputStream inputStream, InputStream errorStream, OutputStream outputStream,
-			String input, Process process, boolean earlyWait)
-	{
-		String lineSeparator = ResourceUtil.getLineSeparatorValue(null);
-		try
-		{
-			int exitValue = 0;
-			if (earlyWait)
-			{
-				exitValue = process.waitFor();
-			}
-			// Read and write in threads to avoid from choking the process streams
-			OutputStreamThread writerThread = null;
-			if (!StringUtil.isEmpty(input))
-			{
-				// TODO - Use EditorUtils.getEncoding once we have an IFile reference.
-				// Using the UTF-8 will not work for all cases.
-				writerThread = new OutputStreamThread(outputStream, input, IOUtil.UTF_8);
-			}
-			InputStreamGobbler readerGobbler = new InputStreamGobbler(inputStream, lineSeparator, IOUtil.UTF_8);
-			InputStreamGobbler errorGobbler = new InputStreamGobbler(errorStream, lineSeparator, null);
-
-			// Start the threads
-			if (writerThread != null)
-			{
-				writerThread.start();
-			}
-			readerGobbler.start();
-			errorGobbler.start();
-			if (!earlyWait)
-			{
-				// This will wait till the process is done.
-				exitValue = process.waitFor();
-			}
-			if (writerThread != null)
-			{
-				writerThread.interrupt();
-				writerThread.join();
-			}
-			readerGobbler.interrupt();
-			errorGobbler.interrupt();
-			readerGobbler.join();
-			errorGobbler.join();
-
-			String stdout = readerGobbler.getResult();
-			String stderr = errorGobbler.getResult();
-			return new ProcessStatus(exitValue, stdout, stderr);
-		}
-		catch (InterruptedException e)
-		{
-			IdeLog.logError(CorePlugin.getDefault(), e);
-		}
-		return null;
+		return new ProcessRunner().processResult(process);
 	}
 
 	/**

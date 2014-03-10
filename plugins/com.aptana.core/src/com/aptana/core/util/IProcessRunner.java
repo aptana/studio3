@@ -192,4 +192,23 @@ public interface IProcessRunner
 	 */
 	public IStatus runInBackground(IPath workingDirectory, Map<String, String> environment, String input,
 			boolean redirect, List<String> args);
+
+	/**
+	 * Reads the stdout and stderr from process, returns an IStatus with the exit code, and results. Cast to
+	 * ProcessStatus to get at each stream's output separately.
+	 * 
+	 * @param process
+	 * @return
+	 */
+	public IStatus processResult(Process process);
+
+	/**
+	 * Returns the output of the process. See {@link ProcessStatus} for details on whether it will return STDOUT or
+	 * STDERR based on the exit code. Typically this will return STDOUT. If that is empty and the exit code is non-zero
+	 * it will return STDERR.
+	 * 
+	 * @param process
+	 * @return
+	 */
+	public String outputForProcess(Process process);
 }
