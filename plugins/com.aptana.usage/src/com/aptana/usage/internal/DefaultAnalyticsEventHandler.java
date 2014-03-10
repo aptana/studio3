@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.jobs.Job;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.usage.AnalyticsEvent;
 import com.aptana.usage.AnalyticsLogger;
 import com.aptana.usage.IAnalyticsEventHandler;
@@ -40,15 +41,24 @@ import com.aptana.usage.UsagePlugin;
  */
 public class DefaultAnalyticsEventHandler implements IAnalyticsEventHandler
 {
-	private static final String ANALYTICS_URL;
-	static
-	{
-		String url = EclipseUtil.getSystemProperty(IUsageSystemProperties.ANALYTICS_URL);
-		ANALYTICS_URL = (url == null) ? "https://api.appcelerator.net/p/v1/app-track" : url; //$NON-NLS-1$
-	}
-	private static final int TIMEOUT = 5 * 1000; // 5 seconds
+	static final String DEFAULT_URL = "https://api.appcelerator.com/p/v1/app-track"; //$NON-NLS-1$
+	static final int DEFAULT_TIMEOUT = 5 * 1000; // 5 seconds
+
+	private final String url;
+	private final int timeout;
 	protected int responseCode = 0;
 	protected Object lock = new Object();
+
+	DefaultAnalyticsEventHandler()
+	{
+		this(DEFAULT_TIMEOUT, EclipseUtil.getSystemProperty(IUsageSystemProperties.ANALYTICS_URL));
+	}
+
+	DefaultAnalyticsEventHandler(int timeout, String url)
+	{
+		this.timeout = timeout;
+		this.url = url;
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -127,7 +137,11 @@ public class DefaultAnalyticsEventHandler implements IAnalyticsEventHandler
 	 */
 	public String getAnalyticsURL()
 	{
-		return ANALYTICS_URL;
+		if (StringUtil.isEmpty(url))
+		{
+			return DEFAULT_URL;
+		}
+		return url;
 	}
 
 	/*
@@ -136,7 +150,7 @@ public class DefaultAnalyticsEventHandler implements IAnalyticsEventHandler
 	 */
 	public int getTimeout()
 	{
-		return TIMEOUT;
+		return timeout;
 	}
 
 	/*
@@ -191,7 +205,7 @@ public class DefaultAnalyticsEventHandler implements IAnalyticsEventHandler
 				UsagePlugin.logError(MessageFormat.format(Messages.StudioAnalytics_connection_unauthorized,
 						Integer.toString(code)));
 			}
-			else if (code < 200 || code > 205)
+			else if (code < HttpURLConnection.HTTP_OK || code > HttpURLConnection.HTTP_RESET)
 			{
 				UsagePlugin.logError(MessageFormat.format(Messages.StudioAnalytics_connection_failed,
 						Integer.toString(code)));
