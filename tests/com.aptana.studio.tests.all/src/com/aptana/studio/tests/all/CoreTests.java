@@ -30,6 +30,7 @@ import org.junit.runners.Suite;
 	com.aptana.scripting.tests.AllTests.class,
 	com.aptana.jira.core.tests.AllJiraCoreTests.class,
 	// com.aptana.syncing.core.tests.AllTests.class // TODO Re-enable when FTP server is set back up?
+	com.aptana.usage.tests.AllTests.class,
 })
 // @formatter:on
 public class CoreTests
