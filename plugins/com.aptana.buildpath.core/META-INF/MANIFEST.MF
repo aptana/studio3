@@ -8,7 +8,8 @@ Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: com.aptana.core,
  com.aptana.index.core;visibility:=reexport,
  com.aptana.parsing;visibility:=reexport,
- com.aptana.core.epl;bundle-version="3.0.0"
+ com.aptana.core.epl;bundle-version="3.0.0",
+ org.eclipse.text
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.buildpath.core,
