@@ -82,4 +82,18 @@ public class ProcessStatus extends Status
 		return new Status(getSeverity(), getPlugin(), getCode(), getStdErr(), null);
 	}
 
+	@Override
+	public String toString()
+	{
+		StringBuilder buf = new StringBuilder();
+		buf.append("ProcessStatus"); //$NON-NLS-1$
+		buf.append(" exitcode="); //$NON-NLS-1$
+		buf.append(getCode());
+		buf.append(" stdout='"); //$NON-NLS-1$
+		buf.append(getStdOut());
+		buf.append("' stderr='"); //$NON-NLS-1$
+		buf.append(getStdErr());
+		buf.append('\'');
+		return buf.toString();
+	}
 }

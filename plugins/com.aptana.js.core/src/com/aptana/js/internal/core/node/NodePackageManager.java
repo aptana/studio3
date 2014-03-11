@@ -379,8 +379,8 @@ public class NodePackageManager implements INodePackageManager
 
 		if (!status.isOK())
 		{
-			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID,
-					Messages.NodePackageManager_FailedListingError));
+			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
+					Messages.NodePackageManager_FailedListingError, status)));
 		}
 
 		// Need to parse the output!
