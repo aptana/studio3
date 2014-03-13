@@ -40,7 +40,6 @@ public class XMLSourceQuickFixProcessorTest
 	private static final String ERROR_MESSAGE = "error_message";
 	private static final String CONTENT_TYPE = "org.eclipse.core.runtime.xml";
 	private Mockery context;
-	private IRegistryProvider registryProvider;
 
 	@Before
 	public void setUp() throws CoreException
@@ -51,9 +50,6 @@ public class XMLSourceQuickFixProcessorTest
 				setImposteriser(ClassImposteriser.INSTANCE);
 			}
 		};
-		registryProvider = context.mock(IRegistryProvider.class);
-		RegistryProviderFactory.releaseDefault();
-		RegistryFactory.setDefaultRegistryProvider(registryProvider);
 	}
 
 	private IQuickAssistProcessor createProcessor()
@@ -86,6 +82,7 @@ public class XMLSourceQuickFixProcessorTest
 	@Test
 	public void testQuickFixContribution() throws Exception
 	{
+		final IRegistryProvider registryProvider = context.mock(IRegistryProvider.class);
 		final IExtensionRegistry extensionRegistry = context.mock(IExtensionRegistry.class);
 		final IExtensionPoint extensionPoint = context.mock(IExtensionPoint.class);
 		final IExtension extension = context.mock(IExtension.class);
@@ -120,24 +117,32 @@ public class XMLSourceQuickFixProcessorTest
 
 				allowing(editor).getContentType();
 				will(returnValue(CONTENT_TYPE));
-
 			}
 		});
+		try
+		{
 
-		XMLSourceViewerConfiguration viewerConfiguration = new XMLSourceViewerConfiguration(null, editor);
-		IQuickAssistAssistant quickAssistant = viewerConfiguration.getQuickAssistAssistant(null);
-		IQuickAssistProcessor assistProcessor = quickAssistant.getQuickAssistProcessor();
-		assertNotNull(assistProcessor);
-		Assert.assertEquals("Error messages are not equal", ERROR_MESSAGE, quickFixProcessor.getErrorMessage());
+			RegistryProviderFactory.releaseDefault();
+			RegistryFactory.setDefaultRegistryProvider(registryProvider);
 
-		context.assertIsSatisfied();
+			XMLSourceViewerConfiguration viewerConfiguration = new XMLSourceViewerConfiguration(null, editor);
+			IQuickAssistAssistant quickAssistant = viewerConfiguration.getQuickAssistAssistant(null);
+			IQuickAssistProcessor assistProcessor = quickAssistant.getQuickAssistProcessor();
+			assertNotNull(assistProcessor);
+			Assert.assertEquals("Error messages are not equal", ERROR_MESSAGE, quickFixProcessor.getErrorMessage());
+
+			context.assertIsSatisfied();
+		}
+		finally
+		{
+			RegistryProviderFactory.releaseDefault();
+			RegistryFactory.setDefaultRegistryProvider(new RegistryProviderOSGI());
+		}
 	}
 
 	@After
 	public void tearDown() throws CoreException
 	{
 		context = null;
-		RegistryProviderFactory.releaseDefault();
-		RegistryFactory.setDefaultRegistryProvider(new RegistryProviderOSGI());
 	}
 }
