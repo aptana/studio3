@@ -9,6 +9,8 @@ package com.aptana.editor.xml.contentassist;
 import static org.junit.Assert.assertNotNull;
 
 import org.eclipse.core.internal.registry.RegistryProviderFactory;
+import org.eclipse.core.internal.registry.osgi.RegistryProviderOSGI;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
@@ -38,9 +40,10 @@ public class XMLSourceQuickFixProcessorTest
 	private static final String ERROR_MESSAGE = "error_message";
 	private static final String CONTENT_TYPE = "org.eclipse.core.runtime.xml";
 	private Mockery context;
+	private IRegistryProvider registryProvider;
 
 	@Before
-	public void setUp()
+	public void setUp() throws CoreException
 	{
 		context = new Mockery()
 		{
@@ -48,7 +51,9 @@ public class XMLSourceQuickFixProcessorTest
 				setImposteriser(ClassImposteriser.INSTANCE);
 			}
 		};
-
+		registryProvider = context.mock(IRegistryProvider.class);
+		RegistryProviderFactory.releaseDefault();
+		RegistryFactory.setDefaultRegistryProvider(registryProvider);
 	}
 
 	private IQuickAssistProcessor createProcessor()
@@ -88,10 +93,6 @@ public class XMLSourceQuickFixProcessorTest
 		final IQuickAssistProcessor quickFixProcessor = createProcessor();
 
 		final AbstractThemeableEditor editor = context.mock(AbstractThemeableEditor.class);
-
-		final IRegistryProvider registryProvider = context.mock(IRegistryProvider.class);
-		RegistryProviderFactory.releaseDefault();
-		RegistryFactory.setDefaultRegistryProvider(registryProvider);
 
 		context.checking(new Expectations()
 		{
@@ -133,8 +134,10 @@ public class XMLSourceQuickFixProcessorTest
 	}
 
 	@After
-	public void tearDown()
+	public void tearDown() throws CoreException
 	{
 		context = null;
+		RegistryProviderFactory.releaseDefault();
+		RegistryFactory.setDefaultRegistryProvider(new RegistryProviderOSGI());
 	}
 }
