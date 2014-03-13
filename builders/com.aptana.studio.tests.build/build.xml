@@ -177,7 +177,7 @@
 			<isset property="instrument.code" />
 			<then>
 				<mkdir dir="${coverageDirectory}" />
-				<property name="agentvmparam" value="-javaagent:${basedir}/lib/jacocoagent.jar=destfile=${coverageDirectory}/coverage.exec" />
+				<property name="agentvmparam" value="-javaagent:${basedir}/lib/jacocoagent.jar=destfile=${coverageDirectory}/coverage.exec,excludes=${jacoco.excludes}" />
 			</then>
 			<else>
 				<property name="agentvmparam" value="" />
