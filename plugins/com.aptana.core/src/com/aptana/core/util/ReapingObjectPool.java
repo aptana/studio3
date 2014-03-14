@@ -78,12 +78,12 @@ public abstract class ReapingObjectPool<T> implements IObjectPool<T>
 			reaper = new ConnectionReaper(this);
 		}
 	}
-	
+
 	protected void start()
 	{
 		if (reaper != null)
 		{
-			reaper.start();			
+			reaper.start();
 		}
 	}
 
@@ -121,8 +121,7 @@ public abstract class ReapingObjectPool<T> implements IObjectPool<T>
 		if (locked != null && locked.size() > 0)
 		{
 			IdeLog.logWarning(CorePlugin.getDefault(),
-					MessageFormat.format(
-					"Killed a connection pool that still has {0} locked items", locked.size())); //$NON-NLS-1$
+					MessageFormat.format("Killed a connection pool that still has {0} locked items", locked.size())); //$NON-NLS-1$
 		}
 		try
 		{
@@ -159,6 +158,10 @@ public abstract class ReapingObjectPool<T> implements IObjectPool<T>
 		}
 
 		T c = create();
+		if (c == null)
+		{
+			return null;
+		}
 		locked.put(c, now);
 		return c;
 	}
@@ -170,6 +173,10 @@ public abstract class ReapingObjectPool<T> implements IObjectPool<T>
 	 */
 	public synchronized void checkIn(T t)
 	{
+		if (t == null)
+		{
+			return;
+		}
 		locked.remove(t);
 		unlocked.put(t, System.currentTimeMillis());
 	}

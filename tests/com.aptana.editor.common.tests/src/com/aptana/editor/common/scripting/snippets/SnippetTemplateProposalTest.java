@@ -7,23 +7,29 @@
  */
 package com.aptana.editor.common.scripting.snippets;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.TextViewer;
+import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.eclipse.jface.text.templates.Template;
+import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
+import org.junit.Test;
 
 import com.aptana.scripting.model.SnippetElement;
+import com.aptana.ui.util.UIUtils;
 
 public class SnippetTemplateProposalTest
 {
@@ -67,6 +73,76 @@ public class SnippetTemplateProposalTest
 		// Now make sure the snippet got applied correctly
 		p.apply(viewer, '\t', 0, 9);
 		assertEquals("<div>Yahoo!\n", document.get());
+		context.assertIsSatisfied();
+	}
+
+	@Test
+	public void testTriggerNumberMatches() throws BadLocationException
+	{
+		Mockery context = new Mockery()
+		{
+			{
+				setImposteriser(ClassImposteriser.INSTANCE);
+			}
+		};
+
+		// Set up the document we're operating on
+		final IDocument document = new Document("echo \n");
+		final ITextViewer viewer = new TextViewer(UIUtils.getActiveShell(), 0);
+		viewer.setDocument(document);
+
+		final Template[] templates = new Template[3];
+
+		SnippetsCompletionProcessor snippetsCompletionProcessor = new SnippetsCompletionProcessor()
+		{
+			protected org.eclipse.jface.text.templates.Template[] getTemplates(String contextTypeId)
+			{
+				String contextId = "com.aptana.contenttype.unknown __dftl_partition_content_type";
+				// Create the snippet we want to apply
+				SnippetElement se1 = new SnippetElement("");
+				se1.setDisplayName("something1");
+				se1.setExpansion("Yahoo1!");
+				templates[0] = new SnippetTemplate(se1, "echo", contextId);
+
+				SnippetElement se2 = new SnippetElement("");
+				se2.setDisplayName("something1");
+				se2.setExpansion("Yahoo2!");
+				templates[1] = new SnippetTemplate(se2, "echo", contextId);
+
+				SnippetElement se3 = new SnippetElement("");
+				se3.setDisplayName("other");
+				se3.setExpansion("Bingo!");
+				templates[2] = new SnippetTemplate(se3, "ego", contextId);
+
+				return templates;
+			};
+		};
+		ICompletionProposal[] snippets = snippetsCompletionProcessor.computeCompletionProposals(viewer, 1);
+
+		assertEquals("Expected snippets length do not match", 3, snippets.length);
+		// Let's check the 1st and 2nd snippets
+		for (int i = 0; i < snippets.length - 1; i++)
+		{
+			assertTrue(snippets[i] instanceof SnippetTemplateProposal);
+			StyledString styledActivationString = ((SnippetTemplateProposal) snippets[i]).getStyledActivationString();
+			String styleStr = "echo » " + (i + 1);
+			assertEquals("Style string of snippets templates do not match", styleStr, styledActivationString
+					.getString().trim());
+		}
+
+		// Create snippet proposal, then apply it to the document
+		DocumentSnippetTemplateContext tc = new DocumentSnippetTemplateContext(new SnippetTemplateContextType("scope"),
+				document, 0, 4);
+		SnippetTemplateProposal p = new SnippetTemplateProposal(templates[1], tc, new Region(0, 0), null, 0);
+
+		// Make sure the snippet validates
+		DocumentEvent event = new DocumentEvent(document, 4, 0, "");
+		assertTrue("Snippet proposal incorrectly failed validation!", p.validate(document, 4, event));
+
+		// Now make sure the snippet got applied correctly
+		p.apply(viewer, '2', 0, 4);
+		assertEquals("Yahoo2! \n", document.get());
+
 		context.assertIsSatisfied();
 	}
 
