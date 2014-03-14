@@ -457,7 +457,8 @@ public class EclipseUtil
 		final String propertyName = "osgi.debug"; //$NON-NLS-1$
 		if (!debugEnabled && !isNewOSGIAPI())
 		{
-			// Can't set a null property on EnivronmentInfo in 4.3 and lower. So we need to hack using reflection against old API
+			// Can't set a null property on EnivronmentInfo in 4.3 and lower. So we need to hack using reflection
+			// against old API
 			try
 			{
 				Class klazz = Class.forName("org.eclipse.osgi.framework.internal.core.FrameworkProperties"); //$NON-NLS-1$
@@ -661,11 +662,18 @@ public class EclipseUtil
 
 			if (registry != null)
 			{
+				IdeLog.logInfo(CorePlugin.getDefault(), MessageFormat.format(
+						"Geting Extension Point for {0} and extensionPoint {1} from {2}", pluginId, extensionPointId,
+						registry));
 				IExtensionPoint extensionPoint = registry.getExtensionPoint(pluginId, extensionPointId);
 
 				if (extensionPoint != null)
 				{
 					Set<String> elementNames = processor.getSupportElementNames();
+					IdeLog.logInfo(
+							CorePlugin.getDefault(),
+							MessageFormat.format("Extension point : {0} and elements : {1}", extensionPoint,
+									StringUtil.join(",", elementNames)));
 					IExtension[] extensions = extensionPoint.getExtensions();
 					for (String elementName : elementNames)
 					{

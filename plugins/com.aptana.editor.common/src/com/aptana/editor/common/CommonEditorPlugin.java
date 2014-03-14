@@ -235,6 +235,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	private DocumentScopeManager fDocumentScopeManager;
 	private IPreferenceChangeListener fThemeChangeListener;
 	private SpellingPreferences spellingPreferences;
+	private QuickFixProcessorsRegistry quickFixRegistry;
 
 	/**
 	 * The constructor
@@ -362,6 +363,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		{
 			fDocumentScopeManager = null;
 			differentiator = null;
+			quickFixRegistry = null;
 			plugin = null;
 			super.stop(context);
 		}
@@ -489,5 +491,14 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 			}
 			PlatformUI.getWorkbench().removeWindowListener(fWindowListener);
 		}
+	}
+
+	public synchronized QuickFixProcessorsRegistry getQuickFixProcessorRegistry()
+	{
+		if (quickFixRegistry == null)
+		{
+			quickFixRegistry = new QuickFixProcessorsRegistry();
+		}
+		return quickFixRegistry;
 	}
 }
