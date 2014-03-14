@@ -18,7 +18,7 @@ import com.aptana.editor.xml.XMLPartitionScannerTest;
 import com.aptana.editor.xml.XMLScannerTest;
 import com.aptana.editor.xml.XMLTagScannerTest;
 import com.aptana.editor.xml.contentassist.XMLContentAssistProcessorTest;
-import com.aptana.editor.xml.contentassist.XMLSourceQuickFixProcessorTest;
+import com.aptana.editor.xml.contentassist.QuickFixProcessorsRegistryTest;
 import com.aptana.editor.xml.internal.text.XMLFoldingComputerTest;
 import com.aptana.editor.xml.outline.XMLOutlineTest;
 
@@ -27,7 +27,7 @@ import com.aptana.editor.xml.outline.XMLOutlineTest;
 @SuiteClasses({
 	TagUtilTest.class,
 	XMLContentAssistProcessorTest.class,
-	XMLSourceQuickFixProcessorTest.class,
+	QuickFixProcessorsRegistryTest.class,
 	XMLPartitionScannerTest.class,
 	XMLScannerTest.class,
 	XMLFoldingComputerTest.class,

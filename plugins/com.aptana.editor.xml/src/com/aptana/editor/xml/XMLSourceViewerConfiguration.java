@@ -56,12 +56,17 @@ public class XMLSourceViewerConfiguration extends SimpleSourceViewerConfiguratio
 
 	private void setQuickAssistProcessor(QuickAssistAssistant assistant)
 	{
-		QuickFixProcessorsRegistry registry = CommonEditorPlugin.getDefault().getQuickFixProcessorRegistry();
+		QuickFixProcessorsRegistry registry = getQuickFixRegistry();
 		IQuickAssistProcessor quickFixProcessor = registry.getQuickFixProcessor(getEditor().getContentType());
 		if (quickFixProcessor != null)
 		{
 			assistant.setQuickAssistProcessor(quickFixProcessor);
 		}
+	}
+
+	protected QuickFixProcessorsRegistry getQuickFixRegistry()
+	{
+		return CommonEditorPlugin.getDefault().getQuickFixProcessorRegistry();
 	}
 
 	private IInformationControlCreator getQuickAssistAssistantInformationControlCreator()

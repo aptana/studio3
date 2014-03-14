@@ -42,9 +42,10 @@ import com.aptana.core.logging.IdeLog.StatusLevel;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.QuickFixProcessorsRegistry;
 import com.aptana.editor.xml.XMLSourceViewerConfiguration;
 
-public class XMLSourceQuickFixProcessorTest
+public class QuickFixProcessorsRegistryTest
 {
 
 	private static final String ERROR_MESSAGE = "error_message";
@@ -102,6 +103,7 @@ public class XMLSourceQuickFixProcessorTest
 	}
 
 	@Test
+	@SuppressWarnings("restriction")
 	public void testQuickFixContribution() throws Exception
 	{
 		final IRegistryProvider registryProvider = context.mock(IRegistryProvider.class);
@@ -124,6 +126,29 @@ public class XMLSourceQuickFixProcessorTest
 			}
 		};
 
+		final Action getExtensionPointAction = new Action()
+		{
+			public Object invoke(Invocation invocation) throws Throwable
+			{
+				System.err.println("Invoking:: " + invocation);
+				String pluginId = (String) invocation.getParameter(0);
+				String extnPoint = (String) invocation.getParameter(1);
+				if (pluginId.equals(CommonEditorPlugin.PLUGIN_ID) && extnPoint.equals("quickFixProcessors"))
+				{
+					return extensionPoint;
+				}
+				else
+				{
+					IExtensionRegistry registry = new RegistryProviderOSGI().getRegistry();
+					return registry.getExtensionPoint(pluginId, extnPoint);
+				}
+			}
+
+			public void describeTo(Description description)
+			{
+			}
+		};
+
 		final AbstractThemeableEditor editor = context.mock(AbstractThemeableEditor.class);
 
 		context.checking(new Expectations()
@@ -132,8 +157,8 @@ public class XMLSourceQuickFixProcessorTest
 				allowing(registryProvider).getRegistry();
 				will(doAll(printLogAction, returnValue(extensionRegistry)));
 
-				oneOf(extensionRegistry).getExtensionPoint(CommonEditorPlugin.PLUGIN_ID, "quickFixProcessors");
-				will(doAll(printLogAction, returnValue(extensionPoint)));
+				oneOf(extensionRegistry).getExtensionPoint(with(any(String.class)), with(any(String.class)));
+				will(doAll(getExtensionPointAction));
 
 				oneOf(extensionPoint).getExtensions();
 				will(doAll(printLogAction, returnValue(new IExtension[] { extension })));
@@ -163,6 +188,8 @@ public class XMLSourceQuickFixProcessorTest
 			RegistryProviderFactory.releaseDefault();
 			RegistryFactory.setDefaultRegistryProvider(registryProvider);
 			Assert.assertEquals(extensionRegistry, Platform.getExtensionRegistry());
+			final QuickFixProcessorsRegistry quickFixProcessorsRegistry = context
+					.mock(QuickFixProcessorsRegistry.class);
 			XMLSourceViewerConfiguration viewerConfiguration = new XMLSourceViewerConfiguration(null, editor);
 			IQuickAssistAssistant quickAssistant = viewerConfiguration.getQuickAssistAssistant(null);
 			IQuickAssistProcessor assistProcessor = quickAssistant.getQuickAssistProcessor();
