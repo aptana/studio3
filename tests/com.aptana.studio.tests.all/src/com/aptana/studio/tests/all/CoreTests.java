@@ -10,7 +10,9 @@ package com.aptana.studio.tests.all;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-@RunWith(Suite.class)
+import com.aptana.core.tests.StdErrLoggingSuite;
+
+@RunWith(StdErrLoggingSuite.class)
 //@formatter:off
 @Suite.SuiteClasses({
 	com.aptana.buildpath.core.tests.BuildPathCoreTests.class,
