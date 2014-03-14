@@ -296,7 +296,7 @@ public class GitExecutableTest
 			protected Process run(Map<String, String> env, String... args) throws IOException, CoreException
 			{
 				// Assert the args are what we expect
-				assertEquals("Wrong number of arguments to git clone invocation", 6, args.length);
+				assertEquals("Wrong number of arguments to git clone invocation", 8, args.length);
 				assertEquals("clone", args[0]);
 				assertEquals("-b", args[1]);
 				assertEquals("3.3.0", args[2]);
