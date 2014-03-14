@@ -10,10 +10,11 @@ package com.aptana.studio.tests.all;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
+import com.aptana.core.tests.StdErrLoggingSuite;
 import com.aptana.editor.common.internal.commands.ExpandCollapseAllHandlerTest;
 import com.aptana.editor.common.internal.commands.NextPreviousEditorHandlerTest;
 
-@RunWith(Suite.class)
+@RunWith(StdErrLoggingSuite.class)
 // @formatter:off
 @Suite.SuiteClasses({ 
 	com.aptana.browser.tests.AllTests.class,
