@@ -54,6 +54,7 @@ import com.aptana.git.core.IPreferenceConstants;
  */
 public class GitExecutable
 {
+	private static final String REFS_TAGS = "refs/tags/"; //$NON-NLS-1$
 	/**
 	 * Special ENV variables used for git processes.
 	 */
@@ -110,7 +111,6 @@ public class GitExecutable
 				EclipseUtil.instanceScope().getNode(GitPlugin.getPluginId())
 						.addPreferenceChangeListener(new IEclipsePreferences.IPreferenceChangeListener()
 						{
-
 							public void preferenceChange(PreferenceChangeEvent event)
 							{
 								if (!event.getKey().equals(IPreferenceConstants.GIT_EXECUTABLE_PATH))
@@ -476,6 +476,91 @@ public class GitExecutable
 		}
 	}
 
+	private IStatus runGitProcess(List<String> args, Map<String, String> env, IProgressMonitor monitor)
+	{
+		SubMonitor subMonitor = SubMonitor.convert(monitor, 1000);
+		try
+		{
+			// Now run it!
+			Process p = run(env, args.toArray(new String[args.size()]));
+			if (p == null)
+			{
+				return new Status(IStatus.ERROR, GitPlugin.PLUGIN_ID, "The git process has failed to run");
+			}
+
+			if (monitor.isCanceled())
+			{
+				return Status.CANCEL_STATUS;
+			}
+			subMonitor.worked(100);
+			CloneRunnable runnable = new CloneRunnable(p, subMonitor.newChild(900));
+			Thread t = new Thread(runnable);
+			t.start();
+			t.join();
+			return runnable.getResult();
+		}
+		catch (Throwable t)
+		{
+			return new Status(IStatus.ERROR, GitPlugin.PLUGIN_ID, t.getMessage(), t);
+		}
+		finally
+		{
+			subMonitor.done();
+		}
+
+	}
+
+	public List<String> remoteTagsList(String sourceURI, String productVersion, IProgressMonitor monitor)
+	{
+
+		boolean includeProgress = hasProgress();
+
+		Map<String, String> env = GitExecutable.getEnvironment();
+		List<String> args = new ArrayList<String>();
+		args.add("ls-remote"); //$NON-NLS-1$
+		args.add(sourceURI);
+		Version version = VersionUtil.parseVersion(productVersion);
+		String queryVersion = MessageFormat.format("{0}?{1}?{2}*", version.getMajor(), version.getMinor(),
+				version.getMicro());
+		args.add(REFS_TAGS + queryVersion);
+
+		// Use --progress switch if git version is 1.7+!
+		if (includeProgress)
+		{
+			args.add("--progress"); //$NON-NLS-1$
+		}
+
+		IStatus result = runGitProcess(args, env, monitor);
+		if (!result.isOK())
+		{
+			IdeLog.logError(GitPlugin.getDefault(), result.getMessage(), result.getException());
+		}
+		String lsRemoteOutput = result.getMessage();
+		if (StringUtil.isEmpty(lsRemoteOutput))
+		{
+			// There are no tags with the generic product version.
+			return null;
+		}
+		String lineSeperator = System.getProperty("line.separator"); //$NON-NLS-1$
+		String[] outputLines = lsRemoteOutput.split(lineSeperator);
+		List<String> tagVersions = new ArrayList<String>(outputLines.length);
+		for (String line : outputLines)
+		{
+			if (line.indexOf(REFS_TAGS) > 0)
+			{
+				tagVersions.add(line.substring(line.indexOf(REFS_TAGS) + REFS_TAGS.length()));
+			}
+		}
+		return tagVersions;
+	}
+
+	private boolean hasProgress()
+	{
+		Version gitVersion = version();
+		boolean includeProgress = gitVersion.compareTo(new Version(1, 7, 0)) >= 0;
+		return includeProgress;
+	}
+
 	/**
 	 * Clones a git repo to a local location.
 	 * 
@@ -488,64 +573,42 @@ public class GitExecutable
 	 * @param shallow
 	 *            a boolean indicating whether or not we want the full history of the repo. If the clone is going to be
 	 *            temporary, discarded or disconnected from git you should specify a shallow clone.
+	 * @param remoteBranch
 	 * @param monitor
 	 * @return
 	 * @throws CoreException
 	 */
-	public IStatus clone(String sourceURI, IPath dest, boolean shallow, IProgressMonitor monitor)
+	public IStatus clone(String sourceURI, IPath dest, boolean shallow, String remoteBranch, IProgressMonitor monitor)
 	{
-		SubMonitor subMonitor = SubMonitor.convert(monitor, 1000);
-		try
-		{
-			Version version = version();
-			boolean includeProgress = version.compareTo(new Version(1, 7, 0)) >= 0;
+		boolean includeProgress = hasProgress();
 
-			Map<String, String> env = GitExecutable.getEnvironment();
-			List<String> args = new ArrayList<String>();
-			args.add("clone"); //$NON-NLS-1$
-			if (shallow)
-			{
-				args.add("--depth"); //$NON-NLS-1$
-				args.add("1"); //$NON-NLS-1$
-			}
-			// Use --progress switch if git version is 1.7+!
-			if (includeProgress)
-			{
-				args.add("--progress"); //$NON-NLS-1$
-			}
-			args.add("--"); //$NON-NLS-1$
-			args.add(sourceURI);
-			args.add(dest.toOSString());
-			// Now run it!
-			Process p = run(env, args.toArray(new String[args.size()]));
-			if (p == null)
-			{
-				return new Status(IStatus.ERROR, GitPlugin.getPluginId(), MessageFormat.format(
-						Messages.GitExecutable_UnableToLaunchCloneError, sourceURI, dest));
-			}
-
-			subMonitor.worked(100);
-			CloneRunnable runnable = new CloneRunnable(p, subMonitor.newChild(900));
-			Thread t = new Thread(runnable);
-			t.start();
-			t.join();
-
-			return runnable.getResult();
-		}
-		catch (CoreException e)
+		Map<String, String> env = GitExecutable.getEnvironment();
+		List<String> args = new ArrayList<String>();
+		args.add("clone"); //$NON-NLS-1$
+		if (!StringUtil.isEmpty(remoteBranch))
 		{
-			IdeLog.log(GitPlugin.getDefault(), e.getStatus());
-			return e.getStatus();
+			args.add("-b");
+			args.add(remoteBranch);
 		}
-		catch (Throwable e)
+		if (shallow)
 		{
-			IdeLog.logError(GitPlugin.getDefault(), e, IDebugScopes.DEBUG);
-			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), e.getMessage(), e);
+			args.add("--depth"); //$NON-NLS-1$
+			args.add("1"); //$NON-NLS-1$
 		}
-		finally
+		// Use --progress switch if git version is 1.7+!
+		if (includeProgress)
 		{
-			subMonitor.done();
+			args.add("--progress"); //$NON-NLS-1$
 		}
+		args.add("--"); //$NON-NLS-1$
+		args.add(sourceURI);
+		args.add(dest.toOSString());
+		IStatus result = runGitProcess(args, env, monitor);
+		if (!result.isOK())
+		{
+			IdeLog.logError(GitPlugin.getDefault(), result.getMessage(), result.getException());
+		}
+		return result;
 	}
 
 	protected Process run(Map<String, String> env, String... args) throws IOException, CoreException

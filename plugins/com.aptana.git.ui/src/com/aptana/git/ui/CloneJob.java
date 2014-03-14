@@ -38,6 +38,7 @@ import org.eclipse.ui.statushandlers.StatusManager;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.IDebugScopes;
@@ -68,6 +69,8 @@ public class CloneJob extends Job
 
 	private Map<String, IPrimaryNatureContributor> natureContributors = new HashMap<String, IPrimaryNatureContributor>();
 
+	private boolean remoteTag;
+
 	public CloneJob(String sourceURI, String dest)
 	{
 		this(sourceURI, dest, false);
@@ -75,7 +78,7 @@ public class CloneJob extends Job
 
 	public CloneJob(String sourceURI, String dest, boolean forceRootAsProject)
 	{
-		this(sourceURI, dest, forceRootAsProject, false);
+		this(sourceURI, dest, forceRootAsProject, false, false);
 	}
 
 	/**
@@ -90,7 +93,7 @@ public class CloneJob extends Job
 	 *            project. Please note that if connectProvider is false, we also do not clone over teh full history of
 	 *            the repo since it will be deleted.
 	 */
-	public CloneJob(String sourceURI, String dest, boolean forceRootAsProject, boolean shallow)
+	public CloneJob(String sourceURI, String dest, boolean forceRootAsProject, boolean shallow, boolean tag)
 	{
 		super(Messages.CloneWizard_Job_title);
 		setUser(true);
@@ -98,6 +101,7 @@ public class CloneJob extends Job
 		this.dest = dest;
 		this.forceRootAsProject = forceRootAsProject;
 		this.shallowClone = shallow;
+		this.remoteTag = tag;
 		this.createdProjects = new HashSet<IProject>();
 		natureContributors = PrimaryNaturesManager.getManager().getContributorsMap();
 	}
@@ -114,8 +118,21 @@ public class CloneJob extends Job
 						Messages.CloneJob_UnableToFindGitExecutableError));
 			}
 
-			IStatus result = getGitExecutable().clone(sourceURI, Path.fromOSString(dest), shallowClone,
-					subMonitor.newChild(900));
+			String remoteBranch = null;
+			if (remoteTag)
+			{
+				String productVersion = EclipseUtil.getProductVersion();
+				List<String> remoteTagsList = getGitExecutable().remoteTagsList(sourceURI, productVersion,
+						subMonitor.newChild(200));
+				// Mostly we will get only one remote tag with the matching product version. If there are multiple, then
+				// git already sorted the list, so it's easy for us to pick up the last one in the list.
+				if (!CollectionsUtil.isEmpty(remoteTagsList))
+				{
+					remoteBranch = remoteTagsList.get(remoteTagsList.size() - 1);
+				}
+			}
+			IStatus result = getGitExecutable().clone(sourceURI, Path.fromOSString(dest), shallowClone, remoteBranch,
+					subMonitor.newChild(700));
 			if (!result.isOK())
 			{
 				return result;

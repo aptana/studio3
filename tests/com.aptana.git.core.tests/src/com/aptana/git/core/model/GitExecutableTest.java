@@ -15,6 +15,8 @@ import static org.junit.Assert.assertTrue;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.text.MessageFormat;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.filesystem.EFS;
@@ -37,6 +39,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.Version;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.ProcessStatus;
@@ -195,13 +198,69 @@ public class GitExecutableTest
 			}
 		};
 
-		IStatus status = executable.clone(sourceURI, dest, false, new NullProgressMonitor());
+		IStatus status = executable.clone(sourceURI, dest, false, null, new NullProgressMonitor());
 		assertNotNull(status);
 		assertTrue(status instanceof ProcessStatus);
 		ProcessStatus pStatus = (ProcessStatus) status;
 		assertEquals(exitCode, pStatus.getCode());
 		assertEquals(stdOutText, pStatus.getStdOut());
 		assertEquals(stdErrText, pStatus.getStdErr());
+		context.assertIsSatisfied();
+	}
+
+	@Test
+	public void testGetRemoteTags() throws Throwable
+	{
+		String shaCode = "85825bd939e6d7c3040f64188991eaab4da8b596";
+		String[] remoteTags = new String[] { "3_3_0_GA", "3.3.0_GA", "3-3-0.GA" };
+		final String stdOutText = MessageFormat.format("{0} refs/tags/{1}\n{0} refs/tags/{2}\n{0} refs/tags/{3}",
+				shaCode, remoteTags[0], remoteTags[1], remoteTags[2]);
+		final String stdErrText = "stderr";
+		final int exitCode = 0;
+		final Process process = context.mock(Process.class);
+		context.checking(new Expectations()
+		{
+			{
+				allowing(process).getOutputStream();
+
+				oneOf(process).getInputStream();
+				will(returnValue(new ByteArrayInputStream(stdOutText.getBytes())));
+
+				oneOf(process).getErrorStream();
+				will(returnValue(new ByteArrayInputStream(stdErrText.getBytes())));
+
+				oneOf(process).waitFor();
+				will(returnValue(exitCode));
+			}
+		});
+
+		final String sourceURI = "git@github.com:appcelerator/KitchenSink.git";
+		IPath gitPath = Path.fromPortableString("/fake/git/path");
+		GitExecutable executable = new GitExecutable(gitPath)
+		{
+			@Override
+			protected Process run(Map<String, String> env, String... args) throws IOException, CoreException
+			{
+				// Assert the args are what we expect
+				assertEquals("Wrong number of arguments to git clone invocation", 3, args.length);
+				assertEquals("ls-remote", args[0]);
+				assertEquals(sourceURI, args[1]);
+				assertEquals("refs/tags/3?3?0*", args[2]);
+				return process;
+			}
+
+			@Override
+			public Version version()
+			{
+				return new Version("1.6.0");
+			}
+		};
+
+		List<String> tagsList = executable.remoteTagsList(sourceURI, "3.3.0.v874934", new NullProgressMonitor());
+		assertEquals(tagsList.size(), 3);
+		List<String> expectedTagsList = CollectionsUtil.newList(remoteTags);
+		assertEquals("Invalid number of remote tags list", CollectionsUtil
+				.getNonOverlapping(expectedTagsList, tagsList).size(), 0);
 		context.assertIsSatisfied();
 	}
 
@@ -239,11 +298,13 @@ public class GitExecutableTest
 				// Assert the args are what we expect
 				assertEquals("Wrong number of arguments to git clone invocation", 6, args.length);
 				assertEquals("clone", args[0]);
-				assertEquals("--depth", args[1]);
-				assertEquals("1", args[2]);
-				assertEquals("--", args[3]);
-				assertEquals(sourceURI, args[4]);
-				assertEquals(dest.toOSString(), args[5]);
+				assertEquals("-b", args[1]);
+				assertEquals("3.3.0", args[2]);
+				assertEquals("--depth", args[3]);
+				assertEquals("1", args[4]);
+				assertEquals("--", args[5]);
+				assertEquals(sourceURI, args[6]);
+				assertEquals(dest.toOSString(), args[7]);
 				return process;
 			}
 
@@ -254,7 +315,7 @@ public class GitExecutableTest
 			}
 		};
 
-		IStatus status = executable.clone(sourceURI, dest, true, new NullProgressMonitor());
+		IStatus status = executable.clone(sourceURI, dest, true, "3.3.0", new NullProgressMonitor());
 		assertNotNull(status);
 		assertTrue(status instanceof ProcessStatus);
 		ProcessStatus pStatus = (ProcessStatus) status;
