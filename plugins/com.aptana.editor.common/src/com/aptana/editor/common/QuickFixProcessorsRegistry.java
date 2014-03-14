@@ -35,6 +35,7 @@ public class QuickFixProcessorsRegistry
 		{
 			return null;
 		}
+		IdeLog.logInfo(CommonEditorPlugin.getDefault(), "GetQuickFixProcessor:" + contentType);
 		lazyLoad();
 		LazyQuickFixProcessor processor = processorsMap.get(contentType);
 		if (processor != null)
@@ -48,6 +49,7 @@ public class QuickFixProcessorsRegistry
 	{
 		if (processorsMap == null)
 		{
+			IdeLog.logInfo(CommonEditorPlugin.getDefault(), "lazyload");
 			final ArrayList<LazyQuickFixProcessor> temp = new ArrayList<LazyQuickFixProcessor>();
 			EclipseUtil.processConfigurationElements(CommonEditorPlugin.PLUGIN_ID, EXTENSION_POINT_ID,
 					new IConfigurationElementProcessor()
