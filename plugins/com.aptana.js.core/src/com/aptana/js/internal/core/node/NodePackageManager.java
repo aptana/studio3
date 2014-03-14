@@ -377,14 +377,27 @@ public class NodePackageManager implements INodePackageManager
 			status = runInBackground(PARSEABLE_ARG, LIST);
 		}
 
+		String output;
 		if (!status.isOK())
 		{
-			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
-					Messages.NodePackageManager_FailedListingError, status)));
+			if (status.getCode() == 1 && status instanceof ProcessStatus)
+			{
+				ProcessStatus ps = (ProcessStatus) status;
+				output = ps.getStdOut();
+				// TODO What else can we do to validate that this output is OK?
+			}
+			else
+			{
+				throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
+						Messages.NodePackageManager_FailedListingError, status)));
+			}
+		}
+		else
+		{
+			output = status.getMessage();
 		}
 
 		// Need to parse the output!
-		String output = status.getMessage();
 		String[] lines = StringUtil.LINE_SPLITTER.split(output);
 		List<IPath> paths = CollectionsUtil.map(CollectionsUtil.newSet(lines), new IMap<String, IPath>()
 		{
@@ -465,6 +478,7 @@ public class NodePackageManager implements INodePackageManager
 		IStatus status = nodeJS.runInBackground(workingDir, ShellExecutable.getEnvironment(), args);
 		if (!status.isOK())
 		{
+			// TODO This may return a non zero exit code but still give output we can use, not sure. Similar to what we saw with list command
 			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
 					Messages.NodePackageManager_FailedToDetermineInstalledVersion, packageName, status.getMessage())));
 		}
