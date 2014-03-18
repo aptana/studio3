@@ -20,6 +20,7 @@ import com.aptana.editor.common.internal.commands.NextPreviousEditorHandlerTest;
 	com.aptana.browser.tests.AllTests.class,
 	com.aptana.console.tests.AllTests.class,
 	
+	com.aptana.editor.coffee.tests.AllTests.class,
 	com.aptana.editor.common.tests.AllTests.class,
 	com.aptana.editor.css.tests.AllTests.class,
 	com.aptana.editor.css.formatter.tests.AllTests.class,
