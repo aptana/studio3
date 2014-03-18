@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Coffeescript Editor Tests
+Bundle-SymbolicName: com.aptana.editor.coffee.tests
+Bundle-Version: 3.0.0.qualifier
+Bundle-Vendor: Aptana
+Fragment-Host: com.aptana.editor.coffee;bundle-version="3.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: org.junit,
+ org.eclipse.ui.ide,
+ com.aptana.ui,
+ com.windowtester.swt.runtime,
+ org.eclipse.test.performance;bundle-version="3.6.0"
+Export-Package: com.aptana.editor.coffee.tests

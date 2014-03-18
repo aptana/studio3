@@ -10,15 +10,17 @@ package com.aptana.studio.tests.all;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
+import com.aptana.core.tests.StdErrLoggingSuite;
 import com.aptana.editor.common.internal.commands.ExpandCollapseAllHandlerTest;
 import com.aptana.editor.common.internal.commands.NextPreviousEditorHandlerTest;
 
-@RunWith(Suite.class)
+@RunWith(StdErrLoggingSuite.class)
 // @formatter:off
 @Suite.SuiteClasses({ 
 	com.aptana.browser.tests.AllTests.class,
 	com.aptana.console.tests.AllTests.class,
 	
+	com.aptana.editor.coffee.tests.AllTests.class,
 	com.aptana.editor.common.tests.AllTests.class,
 	com.aptana.editor.css.tests.AllTests.class,
 	com.aptana.editor.css.formatter.tests.AllTests.class,
