@@ -118,20 +118,18 @@ public class CloneJob extends Job
 						Messages.CloneJob_UnableToFindGitExecutableError));
 			}
 
-			String remoteBranch = null;
+			String tagRevision = null;
 			if (remoteTag)
 			{
-				String productVersion = EclipseUtil.getProductVersion();
-				List<String> remoteTagsList = getGitExecutable().remoteTagsList(sourceURI, productVersion,
-						subMonitor.newChild(200));
-				// Mostly we will get only one remote tag with the matching product version. If there are multiple, then
-				// git already sorted the list, so it's easy for us to pick up the last one in the list.
+				List<String> remoteTagsList = getGitExecutable().remoteTagsList(sourceURI, subMonitor.newChild(200));
+				// If there are multiple tag revisions, then git would have already sorted the list, so it's easy for us
+				// to pick up the last one in the list.
 				if (!CollectionsUtil.isEmpty(remoteTagsList))
 				{
-					remoteBranch = remoteTagsList.get(remoteTagsList.size() - 1);
+					tagRevision = remoteTagsList.get(remoteTagsList.size() - 1);
 				}
 			}
-			IStatus result = getGitExecutable().clone(sourceURI, Path.fromOSString(dest), shallowClone, remoteBranch,
+			IStatus result = getGitExecutable().clone(sourceURI, Path.fromOSString(dest), shallowClone, tagRevision,
 					subMonitor.newChild(700));
 			if (!result.isOK())
 			{

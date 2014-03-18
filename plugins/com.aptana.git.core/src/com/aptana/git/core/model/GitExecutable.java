@@ -54,7 +54,6 @@ import com.aptana.git.core.IPreferenceConstants;
  */
 public class GitExecutable
 {
-	private static final String REFS_TAGS = "refs/tags/"; //$NON-NLS-1$
 	/**
 	 * Special ENV variables used for git processes.
 	 */
@@ -510,48 +509,61 @@ public class GitExecutable
 
 	}
 
-	public List<String> remoteTagsList(String sourceURI, String productVersion, IProgressMonitor monitor)
+	/**
+	 * This tries to find all the tag versions of the specified git URI with version in any format matching to current
+	 * product version.
+	 * 
+	 * @param sourceURI
+	 * @param productVersion
+	 * @param monitor
+	 * @return
+	 */
+	public List<String> remoteTagsList(String sourceURI, IProgressMonitor monitor)
 	{
-
-		boolean includeProgress = hasProgress();
-
-		Map<String, String> env = GitExecutable.getEnvironment();
 		List<String> args = new ArrayList<String>();
 		args.add("ls-remote"); //$NON-NLS-1$
 		args.add(sourceURI);
-		Version version = VersionUtil.parseVersion(productVersion);
-		String queryVersion = MessageFormat.format("{0}?{1}?{2}*", version.getMajor(), version.getMinor(),
-				version.getMicro());
-		args.add(REFS_TAGS + queryVersion);
+		args.add(GitRef.REFS_TAGS + "*"); //$NON-NLS-1$
 
-		// Use --progress switch if git version is 1.7+!
-		if (includeProgress)
+		Process p;
+		try
 		{
-			args.add("--progress"); //$NON-NLS-1$
-		}
-
-		IStatus result = runGitProcess(args, env, monitor);
-		if (!result.isOK())
-		{
-			IdeLog.logError(GitPlugin.getDefault(), result.getMessage(), result.getException());
-		}
-		String lsRemoteOutput = result.getMessage();
-		if (StringUtil.isEmpty(lsRemoteOutput))
-		{
-			// There are no tags with the generic product version.
-			return null;
-		}
-		String lineSeperator = System.getProperty("line.separator"); //$NON-NLS-1$
-		String[] outputLines = lsRemoteOutput.split(lineSeperator);
-		List<String> tagVersions = new ArrayList<String>(outputLines.length);
-		for (String line : outputLines)
-		{
-			if (line.indexOf(REFS_TAGS) > 0)
+			p = run(GitExecutable.getEnvironment(), args.toArray(new String[args.size()]));
+			if (p == null || monitor.isCanceled())
 			{
-				tagVersions.add(line.substring(line.indexOf(REFS_TAGS) + REFS_TAGS.length()));
+				return null;
 			}
+			IStatus result = new ProcessRunner().processResult(p);
+			if (!result.isOK())
+			{
+				IdeLog.logError(GitPlugin.getDefault(), result.getMessage(), result.getException());
+			}
+			String lsRemoteOutput = result.getMessage();
+			if (StringUtil.isEmpty(lsRemoteOutput))
+			{
+				// There are no tags with the generic product version.
+				return null;
+			}
+			String[] outputLines = StringUtil.LINE_SPLITTER.split(lsRemoteOutput);
+			List<String> tagVersions = new ArrayList<String>(outputLines.length);
+			for (String line : outputLines)
+			{
+				if (line.indexOf(GitRef.REFS_TAGS) > 0)
+				{
+					tagVersions.add(line.substring(line.indexOf(GitRef.REFS_TAGS) + GitRef.REFS_TAGS.length()));
+				}
+			}
+			return tagVersions;
 		}
-		return tagVersions;
+		catch (IOException e)
+		{
+			IdeLog.logError(GitPlugin.getDefault(), e);
+		}
+		catch (CoreException e)
+		{
+			IdeLog.logError(GitPlugin.getDefault(), e);
+		}
+		return null;
 	}
 
 	private boolean hasProgress()
@@ -573,22 +585,20 @@ public class GitExecutable
 	 * @param shallow
 	 *            a boolean indicating whether or not we want the full history of the repo. If the clone is going to be
 	 *            temporary, discarded or disconnected from git you should specify a shallow clone.
-	 * @param remoteBranch
+	 * @param tagRevision
 	 * @param monitor
 	 * @return
 	 * @throws CoreException
 	 */
-	public IStatus clone(String sourceURI, IPath dest, boolean shallow, String remoteBranch, IProgressMonitor monitor)
+	public IStatus clone(String sourceURI, IPath dest, boolean shallow, String tagRevision, IProgressMonitor monitor)
 	{
-		boolean includeProgress = hasProgress();
-
 		Map<String, String> env = GitExecutable.getEnvironment();
 		List<String> args = new ArrayList<String>();
 		args.add("clone"); //$NON-NLS-1$
-		if (!StringUtil.isEmpty(remoteBranch))
+		if (!StringUtil.isEmpty(tagRevision))
 		{
 			args.add("-b");
-			args.add(remoteBranch);
+			args.add(tagRevision);
 		}
 		if (shallow)
 		{
@@ -596,7 +606,7 @@ public class GitExecutable
 			args.add("1"); //$NON-NLS-1$
 		}
 		// Use --progress switch if git version is 1.7+!
-		if (includeProgress)
+		if (hasProgress())
 		{
 			args.add("--progress"); //$NON-NLS-1$
 		}

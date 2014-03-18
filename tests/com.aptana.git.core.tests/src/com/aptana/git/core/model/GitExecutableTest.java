@@ -209,6 +209,127 @@ public class GitExecutableTest
 	}
 
 	@Test
+	public void testCloneUsesProperArgsForShallow() throws Throwable
+	{
+		final String stdOutText = "stdout";
+		final String stdErrText = "stderr";
+		final int exitCode = 0;
+		final Process process = context.mock(Process.class);
+		context.checking(new Expectations()
+		{
+			{
+				allowing(process).getOutputStream();
+
+				oneOf(process).getInputStream();
+				will(returnValue(new ByteArrayInputStream(stdOutText.getBytes())));
+
+				oneOf(process).getErrorStream();
+				will(returnValue(new ByteArrayInputStream(stdErrText.getBytes())));
+
+				oneOf(process).waitFor();
+				will(returnValue(exitCode));
+			}
+		});
+
+		final String sourceURI = "git@github.com:aptana/studio3.git";
+		final IPath dest = FileUtil.getTempDirectory().append("clone_dest");
+		IPath gitPath = Path.fromPortableString("/fake/git/path");
+		GitExecutable executable = new GitExecutable(gitPath)
+		{
+			@Override
+			protected Process run(Map<String, String> env, String... args) throws IOException, CoreException
+			{
+				// Assert the args are what we expect
+				assertEquals("Wrong number of arguments to git clone invocation", 6, args.length);
+				assertEquals("clone", args[0]);
+				assertEquals("--depth", args[1]);
+				assertEquals("1", args[2]);
+				assertEquals("--", args[3]);
+				assertEquals(sourceURI, args[4]);
+				assertEquals(dest.toOSString(), args[5]);
+				return process;
+			}
+
+			@Override
+			public Version version()
+			{
+				return new Version("1.6.0");
+			}
+		};
+
+		IStatus status = executable.clone(sourceURI, dest, true, null, new NullProgressMonitor());
+		assertNotNull(status);
+		assertTrue(status instanceof ProcessStatus);
+		ProcessStatus pStatus = (ProcessStatus) status;
+		assertEquals(exitCode, pStatus.getCode());
+		assertEquals(stdOutText, pStatus.getStdOut());
+		assertEquals(stdErrText, pStatus.getStdErr());
+		context.assertIsSatisfied();
+	}
+
+	@Test
+	public void testTagCloneWithProgress() throws Throwable
+	{
+		final String stdOutText = "stdout";
+		final String stdErrText = "stderr";
+		final int exitCode = 0;
+		final Process process = context.mock(Process.class);
+		context.checking(new Expectations()
+		{
+			{
+				allowing(process).getOutputStream();
+
+				oneOf(process).getInputStream();
+				will(returnValue(new ByteArrayInputStream(stdOutText.getBytes())));
+
+				oneOf(process).getErrorStream();
+				will(returnValue(new ByteArrayInputStream(stdErrText.getBytes())));
+
+				oneOf(process).waitFor();
+				will(returnValue(exitCode));
+			}
+		});
+
+		final String sourceURI = "git@github.com:aptana/studio3.git";
+		final IPath dest = FileUtil.getTempDirectory().append("clone_dest");
+		IPath gitPath = Path.fromPortableString("/fake/git/path");
+		GitExecutable executable = new GitExecutable(gitPath)
+		{
+			@Override
+			protected Process run(Map<String, String> env, String... args) throws IOException, CoreException
+			{
+				// Assert the args are what we expect
+				assertEquals("Wrong number of arguments to git clone invocation", 9, args.length);
+				assertEquals("clone", args[0]);
+				assertEquals("-b", args[1]);
+				assertEquals("3.3.0", args[2]);
+				assertEquals("--depth", args[3]);
+				assertEquals("1", args[4]);
+				assertEquals("--progress", args[5]);
+				assertEquals("--", args[6]);
+				assertEquals(sourceURI, args[7]);
+				assertEquals(dest.toOSString(), args[8]);
+				return process;
+			}
+
+			@Override
+			public Version version()
+			{
+				return new Version("1.7.5");
+			}
+		};
+
+		IStatus status = executable.clone(sourceURI, dest, true, "3.3.0", new NullProgressMonitor());
+		assertNotNull(status);
+		assertTrue(status instanceof ProcessStatus);
+		ProcessStatus pStatus = (ProcessStatus) status;
+		assertEquals(exitCode, pStatus.getCode());
+		assertEquals(stdOutText, pStatus.getStdOut());
+		assertEquals(stdErrText, pStatus.getStdErr());
+		context.assertIsSatisfied();
+	}
+
+	@Test
 	public void testGetRemoteTags() throws Throwable
 	{
 		String shaCode = "85825bd939e6d7c3040f64188991eaab4da8b596";
@@ -245,7 +366,7 @@ public class GitExecutableTest
 				assertEquals("Wrong number of arguments to git clone invocation", 3, args.length);
 				assertEquals("ls-remote", args[0]);
 				assertEquals(sourceURI, args[1]);
-				assertEquals("refs/tags/3?3?0*", args[2]);
+				assertEquals("refs/tags/*", args[2]);
 				return process;
 			}
 
@@ -256,72 +377,11 @@ public class GitExecutableTest
 			}
 		};
 
-		List<String> tagsList = executable.remoteTagsList(sourceURI, "3.3.0.v874934", new NullProgressMonitor());
-		assertEquals(tagsList.size(), 3);
+		List<String> tagsList = executable.remoteTagsList(sourceURI, new NullProgressMonitor());
+		assertEquals(3, tagsList.size());
 		List<String> expectedTagsList = CollectionsUtil.newList(remoteTags);
 		assertEquals("Invalid number of remote tags list", CollectionsUtil
 				.getNonOverlapping(expectedTagsList, tagsList).size(), 0);
-		context.assertIsSatisfied();
-	}
-
-	@Test
-	public void testCloneUsesProperArgsForShallow() throws Throwable
-	{
-		final String stdOutText = "stdout";
-		final String stdErrText = "stderr";
-		final int exitCode = 0;
-		final Process process = context.mock(Process.class);
-		context.checking(new Expectations()
-		{
-			{
-				allowing(process).getOutputStream();
-
-				oneOf(process).getInputStream();
-				will(returnValue(new ByteArrayInputStream(stdOutText.getBytes())));
-
-				oneOf(process).getErrorStream();
-				will(returnValue(new ByteArrayInputStream(stdErrText.getBytes())));
-
-				oneOf(process).waitFor();
-				will(returnValue(exitCode));
-			}
-		});
-
-		final String sourceURI = "git@github.com:aptana/studio3.git";
-		final IPath dest = FileUtil.getTempDirectory().append("clone_dest");
-		IPath gitPath = Path.fromPortableString("/fake/git/path");
-		GitExecutable executable = new GitExecutable(gitPath)
-		{
-			@Override
-			protected Process run(Map<String, String> env, String... args) throws IOException, CoreException
-			{
-				// Assert the args are what we expect
-				assertEquals("Wrong number of arguments to git clone invocation", 8, args.length);
-				assertEquals("clone", args[0]);
-				assertEquals("-b", args[1]);
-				assertEquals("3.3.0", args[2]);
-				assertEquals("--depth", args[3]);
-				assertEquals("1", args[4]);
-				assertEquals("--", args[5]);
-				assertEquals(sourceURI, args[6]);
-				assertEquals(dest.toOSString(), args[7]);
-				return process;
-			}
-
-			@Override
-			public Version version()
-			{
-				return new Version("1.6.0");
-			}
-		};
-
-		IStatus status = executable.clone(sourceURI, dest, true, "3.3.0", new NullProgressMonitor());
-		assertNotNull(status);
-		assertTrue(status instanceof ProcessStatus);
-		ProcessStatus pStatus = (ProcessStatus) status;
-		assertEquals(exitCode, pStatus.getCode());
-		assertEquals(stdOutText, pStatus.getStdOut());
-		assertEquals(stdErrText, pStatus.getStdErr());
 		context.assertIsSatisfied();
 	}
 
