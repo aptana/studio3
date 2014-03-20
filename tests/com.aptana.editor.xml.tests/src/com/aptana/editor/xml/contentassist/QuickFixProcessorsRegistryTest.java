@@ -106,9 +106,6 @@ public class QuickFixProcessorsRegistryTest
 				oneOf(element).getAttribute("contentType");
 				will(doAll(returnValue(CONTENT_TYPE)));
 
-				oneOf(element).getAttributeNames();
-				will(returnValue(new String[] {}));
-
 				oneOf(element).createExecutableExtension("class");
 				will(doAll(returnValue(quickFixProcessor)));
 
