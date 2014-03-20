@@ -121,7 +121,6 @@ public class ProcessRunnerTest
 	public void testObfuscation() throws Exception
 	{
 		List<String> args = CollectionsUtil.newList("binary", "C:\\Users\\QEtester\\", "--password", "password");
-
 		assertEquals("\"binary\" \"C:\\Users\\QEtester\\\" \"--password\" \"**********\"",
 				new ProcessRunner().getObfuscatedCommandString(args, "password"));
 
@@ -132,6 +131,22 @@ public class ProcessRunnerTest
 		args = CollectionsUtil.newList("binary", "C:\\Users\\tester\\", "--password", "tester");
 		assertEquals("\"binary\" \"C:\\Users\\tester\\\" \"--password\" \"**********\"",
 				new ProcessRunner().getObfuscatedCommandString(args, "tester"));
+
+		args = CollectionsUtil.newList("binary", "C:\\Users\\tester\\", "--password", "passwordWith@");
+		assertEquals("\"binary\" \"C:\\Users\\tester\\\" \"--password\" \"**********\"",
+				new ProcessRunner().getObfuscatedCommandString(args, "passwordWith@"));
+
+		args = CollectionsUtil.newList("binary", "C:\\Users\\tester\\", "myuser:mypassword@host:port", "command");
+		assertEquals("\"binary\" \"C:\\Users\\tester\\\" \"myuser:**********@host:port\" \"command\"",
+				new ProcessRunner().getObfuscatedCommandString(args, "mypassword"));
+
+		args = CollectionsUtil.newList("binary", "C:\\Users\\tester\\", "myuser:passwordWith@@host:port", "command");
+		assertEquals("\"binary\" \"C:\\Users\\tester\\\" \"myuser:**********@host:port\" \"command\"",
+				new ProcessRunner().getObfuscatedCommandString(args, "passwordWith@"));
+
+		args = CollectionsUtil.newList("binary", "C:\\Users\\tester\\", "--password=passwordWith@", "command");
+		assertEquals("\"binary\" \"C:\\Users\\tester\\\" \"--password=**********\" \"command\"",
+				new ProcessRunner().getObfuscatedCommandString(args, "passwordWith@"));
 	}
 
 	@Test

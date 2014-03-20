@@ -188,7 +188,8 @@ public class ProcessRunner implements IProcessRunner
 			// key=password 		// key pair value
 			// @formatter:on
 			String quoted = RegexUtil.quote(textToObfuscate);
-			Pattern hideMePattern = Pattern.compile("[^:]+:" + quoted + "@|^" + quoted + "$|.*?=" + quoted); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			String urlPattern = "[^:]+:" + quoted + "@"; //$NON-NLS-1$ //$NON-NLS-2$
+			Pattern hideMePattern = Pattern.compile(urlPattern + "|^" + quoted + "$|.*?=" + quoted); //$NON-NLS-1$ //$NON-NLS-2$
 			List<String> commandMessage = new ArrayList<String>(command.size());
 			for (String arg : command)
 			{
@@ -201,7 +202,7 @@ public class ProcessRunner implements IProcessRunner
 					{
 						String found = m.group();
 						String replacement = MASK;
-						if (found.charAt(found.length() - 1) == '@')
+						if (found.matches(urlPattern))
 						{
 							replacement = found.substring(0, found.length() - (textToObfuscate.length() + 2)) + ':'
 									+ MASK + '@';
