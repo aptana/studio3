@@ -23,8 +23,8 @@ import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.IQuickFixProcessorsRegistry;
 import com.aptana.editor.common.ISourceViewerConfiguration;
-import com.aptana.editor.common.QuickFixProcessorsRegistry;
 import com.aptana.editor.common.SimpleSourceViewerConfiguration;
 import com.aptana.editor.common.text.RubyRegexpAutoIndentStrategy;
 
@@ -46,7 +46,12 @@ public class XMLSourceViewerConfiguration extends SimpleSourceViewerConfiguratio
 	public IQuickAssistAssistant getQuickAssistAssistant(ISourceViewer sourceViewer)
 	{
 		QuickAssistAssistant assistant = new QuickAssistAssistant();
-		setQuickAssistProcessor(assistant);
+		IQuickAssistProcessor quickFixProcessor = getQuickAssistProcessor();
+		if (quickFixProcessor != null)
+		{
+			assistant.setQuickAssistProcessor(quickFixProcessor);
+		}
+
 		assistant.setRestoreCompletionProposalSize(EditorsPlugin.getDefault().getDialogSettingsSection(
 				"quick_assist_proposal_size")); //$NON-NLS-1$
 		assistant.setInformationControlCreator(getQuickAssistAssistantInformationControlCreator());
@@ -54,17 +59,13 @@ public class XMLSourceViewerConfiguration extends SimpleSourceViewerConfiguratio
 		return assistant;
 	}
 
-	private void setQuickAssistProcessor(QuickAssistAssistant assistant)
+	private IQuickAssistProcessor getQuickAssistProcessor()
 	{
-		QuickFixProcessorsRegistry registry = getQuickFixRegistry();
-		IQuickAssistProcessor quickFixProcessor = registry.getQuickFixProcessor(getEditor().getContentType());
-		if (quickFixProcessor != null)
-		{
-			assistant.setQuickAssistProcessor(quickFixProcessor);
-		}
+		IQuickFixProcessorsRegistry registry = getQuickFixRegistry();
+		return registry.getQuickFixProcessor(getEditor().getContentType());
 	}
 
-	protected QuickFixProcessorsRegistry getQuickFixRegistry()
+	protected IQuickFixProcessorsRegistry getQuickFixRegistry()
 	{
 		return CommonEditorPlugin.getDefault().getQuickFixProcessorRegistry();
 	}

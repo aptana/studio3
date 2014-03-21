@@ -24,7 +24,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.QuickFixProcessorsRegistry;
+import com.aptana.editor.common.IQuickFixProcessorsRegistry;
+import com.aptana.editor.common.internal.QuickFixProcessorsRegistry;
 import com.aptana.editor.xml.XMLSourceViewerConfiguration;
 
 public class QuickFixProcessorsRegistryTest
@@ -33,6 +34,12 @@ public class QuickFixProcessorsRegistryTest
 	private static final String ERROR_MESSAGE = "error_message";
 	private static final String CONTENT_TYPE = "org.eclipse.core.runtime.xml";
 	private Mockery context;
+	private IExtensionPoint extensionPoint;
+	private IExtension extension;
+	private IConfigurationElement element;
+	private IQuickAssistProcessor quickFixProcessor;
+	private AbstractThemeableEditor editor;
+	private IQuickFixProcessorsRegistry registry;
 
 	@Before
 	public void setUp() throws CoreException
@@ -43,13 +50,33 @@ public class QuickFixProcessorsRegistryTest
 				setImposteriser(ClassImposteriser.INSTANCE);
 			}
 		};
+		extensionPoint = context.mock(IExtensionPoint.class);
+		extension = context.mock(IExtension.class);
+		element = context.mock(IConfigurationElement.class);
+		quickFixProcessor = createProcessor();
+		editor = context.mock(AbstractThemeableEditor.class);
+
+		registry = new QuickFixProcessorsRegistry()
+		{
+			@Override
+			protected IExtensionPoint getExtensionPoint()
+			{
+				return extensionPoint;
+			}
+		};
+		context.checking(new Expectations()
+		{
+			{
+				// oneOf(extensionPoint).getExtensions();
+				// will(doAll(returnValue(new IExtension[] {})));
+			}
+		});
 	}
 
 	private IQuickAssistProcessor createProcessor()
 	{
 		return new IQuickAssistProcessor()
 		{
-
 			public String getErrorMessage()
 			{
 				return ERROR_MESSAGE;
@@ -73,24 +100,8 @@ public class QuickFixProcessorsRegistryTest
 	}
 
 	@Test
-	public void testQuickFixContribution() throws Exception
+	public void testQuickFixValidContribution() throws Exception
 	{
-		final IExtensionPoint extensionPoint = context.mock(IExtensionPoint.class);
-		final IExtension extension = context.mock(IExtension.class);
-		final IConfigurationElement element = context.mock(IConfigurationElement.class);
-		final IQuickAssistProcessor quickFixProcessor = createProcessor();
-
-		final AbstractThemeableEditor editor = context.mock(AbstractThemeableEditor.class);
-
-		final QuickFixProcessorsRegistry registry = new QuickFixProcessorsRegistry()
-		{
-			@Override
-			protected IExtensionPoint getExtensionPoint()
-			{
-				return extensionPoint;
-			}
-		};
-
 		context.checking(new Expectations()
 		{
 			{
@@ -115,34 +126,61 @@ public class QuickFixProcessorsRegistryTest
 		});
 		XMLSourceViewerConfiguration viewerConfiguration = new XMLSourceViewerConfiguration(null, editor)
 		{
-			protected QuickFixProcessorsRegistry getQuickFixRegistry()
+			protected IQuickFixProcessorsRegistry getQuickFixRegistry()
+			{
+				return registry;
+			}
+		};
+		IQuickAssistAssistant quickAssistant = viewerConfiguration.getQuickAssistAssistant(null);
+		IQuickAssistProcessor expectedQuickFixProcessor = quickAssistant.getQuickAssistProcessor();
+		Assert.assertNotNull(expectedQuickFixProcessor);
+		Assert.assertEquals("Quick Fix Processors are not equal", quickFixProcessor, expectedQuickFixProcessor);
+
+		context.assertIsSatisfied();
+	}
+
+	@Test
+	public void testQuickFixInvalidContributions() throws Exception
+	{
+		context.checking(new Expectations()
+		{
+			{
+				oneOf(extensionPoint).getExtensions();
+				will(doAll(returnValue(new IExtension[] { extension })));
+
+				oneOf(extension).getConfigurationElements();
+				will(doAll(returnValue(new IConfigurationElement[] { element })));
+
+				allowing(element).getName();
+				will(doAll(returnValue("processor")));
+
+				oneOf(element).getAttribute("contentType");
+				will(doAll(returnValue("xyz")));
+
+				never(element).createExecutableExtension("class");
+				will(doAll(returnValue(quickFixProcessor)));
+
+				allowing(editor).getContentType();
+				will(returnValue(CONTENT_TYPE));
+			}
+		});
+		XMLSourceViewerConfiguration viewerConfiguration = new XMLSourceViewerConfiguration(null, editor)
+		{
+			protected IQuickFixProcessorsRegistry getQuickFixRegistry()
 			{
 				return registry;
 			}
 		};
 		IQuickAssistAssistant quickAssistant = viewerConfiguration.getQuickAssistAssistant(null);
 		IQuickAssistProcessor assistProcessor = quickAssistant.getQuickAssistProcessor();
-		Assert.assertNotNull(assistProcessor);
-		Assert.assertEquals("Error messages are not equal", ERROR_MESSAGE, quickFixProcessor.getErrorMessage());
+		Assert.assertNull(assistProcessor);
 
 		context.assertIsSatisfied();
 	}
 
 	@Test
-	public void testInvalidQuickFixContribution() throws Exception
+	public void testQuickFixEmptyContributions() throws Exception
 	{
-		final IExtensionPoint extensionPoint = context.mock(IExtensionPoint.class);
-		final AbstractThemeableEditor editor = context.mock(AbstractThemeableEditor.class);
-
-		final QuickFixProcessorsRegistry registry = new QuickFixProcessorsRegistry()
-		{
-			@Override
-			protected IExtensionPoint getExtensionPoint()
-			{
-				return extensionPoint;
-			}
-		};
-
 		context.checking(new Expectations()
 		{
 			{
@@ -155,7 +193,7 @@ public class QuickFixProcessorsRegistryTest
 		});
 		XMLSourceViewerConfiguration viewerConfiguration = new XMLSourceViewerConfiguration(null, editor)
 		{
-			protected QuickFixProcessorsRegistry getQuickFixRegistry()
+			protected IQuickFixProcessorsRegistry getQuickFixRegistry()
 			{
 				return registry;
 			}
@@ -171,5 +209,10 @@ public class QuickFixProcessorsRegistryTest
 	public void tearDown() throws CoreException
 	{
 		context = null;
+		extensionPoint = null;
+		extension = null;
+		element = null;
+		quickFixProcessor = null;
+		editor = null;
 	}
 }

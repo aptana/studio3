@@ -4,7 +4,7 @@
  * Proprietary and Confidential - This source code is not for redistribution
  */
 
-package com.aptana.editor.common;
+package com.aptana.editor.common.internal;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -21,8 +21,10 @@ import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.StringUtil;
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.IQuickFixProcessorsRegistry;
 
-public class QuickFixProcessorsRegistry
+public class QuickFixProcessorsRegistry implements IQuickFixProcessorsRegistry
 {
 
 	private static final String EXTENSION_POINT_ID = "quickFixProcessors"; //$NON-NLS-1$
@@ -30,7 +32,11 @@ public class QuickFixProcessorsRegistry
 
 	private Map<String, LazyQuickFixProcessor> processorsMap;
 
-	public IQuickAssistProcessor getQuickFixProcessor(String contentType)
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.IQuickFixProcessorsRegistry#getQuickFixProcessor(java.lang.String)
+	 */
+	public synchronized IQuickAssistProcessor getQuickFixProcessor(String contentType)
 	{
 		if (StringUtil.isEmpty(contentType))
 		{
@@ -58,7 +64,7 @@ public class QuickFixProcessorsRegistry
 			IdeLog.logInfo(CommonEditorPlugin.getDefault(), "lazyload");
 			final ArrayList<LazyQuickFixProcessor> temp = new ArrayList<LazyQuickFixProcessor>();
 			IExtensionPoint extensionPoint = getExtensionPoint();
-			EclipseUtil.doProcessElements(extensionPoint, new IConfigurationElementProcessor()
+			EclipseUtil.processElements(extensionPoint, new IConfigurationElementProcessor()
 			{
 				public void processElement(IConfigurationElement element)
 				{
@@ -74,7 +80,6 @@ public class QuickFixProcessorsRegistry
 					return CollectionsUtil.newSet(ELEMENT_TYPE);
 				}
 			});
-			temp.trimToSize();
 
 			processorsMap = CollectionsUtil.mapFromValues(temp, new IMap<LazyQuickFixProcessor, String>()
 			{

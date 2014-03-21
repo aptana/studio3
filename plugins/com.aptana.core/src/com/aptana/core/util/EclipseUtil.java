@@ -658,7 +658,7 @@ public class EclipseUtil
 		IExtensionPoint extensionPoint = getExtensionPoint(pluginId, extensionPointId);
 		if (extensionPoint != null)
 		{
-			doProcessElements(extensionPoint, processor);
+			processElements(extensionPoint, processor);
 		}
 	}
 
@@ -680,7 +680,7 @@ public class EclipseUtil
 		return null;
 	}
 
-	public static void doProcessElements(IExtensionPoint extensionPoint, IConfigurationElementProcessor processor)
+	public static void processElements(IExtensionPoint extensionPoint, IConfigurationElementProcessor processor)
 	{
 		if (processor == null || processor.getSupportElementNames().isEmpty())
 		{
