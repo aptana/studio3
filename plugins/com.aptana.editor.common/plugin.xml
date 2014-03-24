@@ -3,6 +3,7 @@
 <plugin>   
    <extension-point id="validator" name="%extension-point.validator.name" schema="schema/validator.exsd"/>
    <extension-point id="textHovers" name="%extension-point.textHovers.name" schema="schema/textHovers.exsd"/>
+   <extension-point id="quickFixProcessors" name="%extension-point.quickFixAssistant.name" schema="schema/quickFixProcessors.exsd"/>
    <extension
          point="org.eclipse.ui.commands">
        <command
