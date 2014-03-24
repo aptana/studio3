@@ -72,14 +72,14 @@ public class DefaultAnalyticsEventHandler implements IAnalyticsEventHandler
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
-				IAnalyticsUserManager userManager = AnalyticsEvent.getUserManager();
+				IAnalyticsUserManager userManager = getUserManager();
 				if (userManager == null)
 				{
 					// send as anonymous user
 					if (!isValidResponse(responseCode = sendPing(event, null)))
 					{
 						// log the event to the database
-						AnalyticsLogger.getInstance().logEvent(event);
+						getAnalyticsLogger().logEvent(event);
 					}
 					return Status.OK_STATUS;
 				}
@@ -89,14 +89,14 @@ public class DefaultAnalyticsEventHandler implements IAnalyticsEventHandler
 				if (user == null || !user.isOnline() || !isValidResponse(responseCode = sendPing(event, user)))
 				{
 					// log the event to the database
-					AnalyticsLogger.getInstance().logEvent(event);
+					getAnalyticsLogger().logEvent(event);
 				}
 				else
 				{
 					// Send out all previous events from the db
 					synchronized (lock)
 					{
-						List<AnalyticsEvent> events = AnalyticsLogger.getInstance().getEvents();
+						List<AnalyticsEvent> events = getAnalyticsLogger().getEvents();
 						// Sort the events. We want all project.create events to be first, and all project.delete events
 						// to be last
 						Collections.sort(events, new AnalyticsEventComparator());
@@ -107,7 +107,7 @@ public class DefaultAnalyticsEventHandler implements IAnalyticsEventHandler
 								return Status.OK_STATUS;
 							}
 							// Remove the event after it has been sent
-							AnalyticsLogger.getInstance().clearEvent(aEvent);
+							getAnalyticsLogger().clearEvent(aEvent);
 						}
 					}
 				}
@@ -177,7 +177,7 @@ public class DefaultAnalyticsEventHandler implements IAnalyticsEventHandler
 		try
 		{
 			URL url = new URL(getAnalyticsURL());
-			connection = (HttpURLConnection) url.openConnection();
+			connection = createConnection(url);
 			if (user != null)
 			{
 				connection.setRequestProperty("Cookie", user.getCookie() + "; uid=" + user.getGUID()); //$NON-NLS-1$ //$NON-NLS-2$
@@ -186,13 +186,10 @@ public class DefaultAnalyticsEventHandler implements IAnalyticsEventHandler
 			connection.setDoOutput(true);
 			connection.setReadTimeout(getTimeout());
 			connection.setConnectTimeout(getTimeout());
-
 			connection.setRequestMethod("POST"); //$NON-NLS-1$
-			// writes POST
-			output = new DataOutputStream(connection.getOutputStream());
+
 			String data = event.getEventString();
-			output.writeBytes(data);
-			output.flush();
+			output = createOutputStream(connection, data);
 
 			if (IdeLog.isTraceEnabled(UsagePlugin.getDefault(), IDebugScopes.USAGE))
 			{
@@ -235,6 +232,29 @@ public class DefaultAnalyticsEventHandler implements IAnalyticsEventHandler
 				connection.disconnect();
 			}
 		}
+	}
+
+	protected DataOutputStream createOutputStream(HttpURLConnection connection, String data) throws IOException
+	{
+		DataOutputStream dos = new DataOutputStream(connection.getOutputStream());
+		dos.writeBytes(data);
+		dos.flush();
+		return dos;
+	}
+
+	protected HttpURLConnection createConnection(URL url) throws IOException
+	{
+		return (HttpURLConnection) url.openConnection();
+	}
+
+	protected AnalyticsLogger getAnalyticsLogger()
+	{
+		return AnalyticsLogger.getInstance();
+	}
+
+	protected IAnalyticsUserManager getUserManager()
+	{
+		return AnalyticsEvent.getUserManager();
 	}
 
 	/**
