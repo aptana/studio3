@@ -35,6 +35,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 
 		// mark occurrences
 		prefs.putBoolean(IPreferenceConstants.EDITOR_MARK_OCCURRENCES, false);
+		// camelCase selection
+		prefs.putBoolean(IPreferenceConstants.EDITOR_SUB_WORD_NAVIGATION, true);
 
 		// content assist
 		prefs.putInt(IPreferenceConstants.CONTENT_ASSIST_DELAY,

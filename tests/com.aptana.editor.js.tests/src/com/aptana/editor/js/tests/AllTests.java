@@ -23,7 +23,8 @@ import org.junit.runners.Suite.SuiteClasses;
 	com.aptana.editor.js.internal.text.InternalTextTests.class,
 	com.aptana.editor.js.outline.OutlineTests.class,
 	com.aptana.editor.js.sdoc.parsing.SDocParsingTests.class,
-	com.aptana.editor.js.text.TextTests.class
+	com.aptana.editor.js.text.TextTests.class,
+	com.aptana.editor.js.navigate.selection.JSSubWordSelectTest.class
 })
 //@formatter:on
 public class AllTests
