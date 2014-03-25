@@ -197,7 +197,7 @@
 				<for list="${core.test.suite}" param="suite" keepgoing="true">
 					<sequential>
 						<antcall target="run-core-test">
-							<param name="test.plugin" value="com.appcelerator.titanium.tests.all" />
+							<param name="test.plugin" value="com.aptana.studio.tests.all" />
 							<param name="test.classname" value="@{suite}" />
 						</antcall>
 					</sequential>
@@ -218,7 +218,7 @@
 				<for list="${ui.test.suite}" param="suite" keepgoing="true">
 					<sequential>
 						<antcall target="run-ui-test">
-							<param name="test.plugin" value="com.appcelerator.titanium.tests.all" />
+							<param name="test.plugin" value="com.aptana.studio.tests.all" />
 							<param name="test.classname" value="@{suite}" />
 						</antcall>
 					</sequential>
