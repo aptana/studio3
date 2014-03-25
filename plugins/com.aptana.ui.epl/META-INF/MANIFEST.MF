@@ -17,6 +17,7 @@ Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: com.aptana.editor.common.contentassist,
  com.aptana.editor.common.hover,
+ com.aptana.editor.common.iterators,
  com.aptana.editor.common.text.rules,
  com.aptana.ui.dialogs,
  com.aptana.ui.epl,
