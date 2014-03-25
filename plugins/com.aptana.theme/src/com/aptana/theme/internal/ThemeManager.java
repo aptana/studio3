@@ -33,10 +33,6 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.core.runtime.preferences.IScopeContext;
-import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.e4.ui.css.swt.theme.ITheme;
-import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
-import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.resource.DataFormatException;
 import org.eclipse.jface.resource.JFaceResources;
@@ -46,8 +42,6 @@ import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
@@ -57,7 +51,6 @@ import org.osgi.framework.Bundle;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
-import com.aptana.core.IFilter;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
@@ -208,7 +201,7 @@ public class ThemeManager implements IThemeManager
 	/**
 	 * Set the new theme to use, this involves setting prefs across a number of plugins.
 	 */
-	public void setCurrentTheme(final Theme theme)
+	public void setCurrentTheme(Theme theme)
 	{
 		fCurrentTheme = theme;
 
@@ -225,31 +218,14 @@ public class ThemeManager implements IThemeManager
 		setCompareColors("com.aptana.editor.common", true); //$NON-NLS-1$
 		setCompareColors("org.eclipse.ui.editors", ThemePlugin.applyToAllEditors()); //$NON-NLS-1$
 
+		// We notify in UI-thread because of APSTUD-7392
+		// (in practice this almost always happens in the UI thread anyways, but it's
+		// possible that at some circumstance this happens from a background thread).
 		UIUtils.runInUIThread(new Runnable()
 		{
+
 			public void run()
 			{
-				// Also set overall theme
-				IWorkbench workbench = PlatformUI.getWorkbench();
-				MApplication application = (MApplication) workbench.getService(MApplication.class);
-				IEclipseContext context = application.getContext();
-
-				IThemeEngine e4ThemeEngine = context.get(IThemeEngine.class);
-				ITheme selection = CollectionsUtil.find(e4ThemeEngine.getThemes(), new IFilter<ITheme>()
-				{
-					public boolean include(ITheme item)
-					{
-						return theme.getName().equals(item.getLabel());
-					}
-				});
-				if (selection != null)
-				{
-					e4ThemeEngine.setTheme(selection, false);
-				}
-
-				// We notify in UI-thread because of APSTUD-7392
-				// (in practice this almost always happens in the UI thread anyways, but it's
-				// possible that at some circumstance this happens from a background thread).
 				notifyThemeChangeListeners(fCurrentTheme);
 			}
 		});

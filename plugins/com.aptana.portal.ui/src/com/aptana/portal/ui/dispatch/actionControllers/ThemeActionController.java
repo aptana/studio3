@@ -10,8 +10,17 @@ package com.aptana.portal.ui.dispatch.actionControllers;
 import java.text.MessageFormat;
 import java.util.Set;
 
+import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.ui.css.swt.theme.ITheme;
+import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
+import org.eclipse.e4.ui.model.application.MApplication;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.PlatformUI;
+
 import com.aptana.configurations.processor.ConfigurationStatus;
+import com.aptana.core.IFilter;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.jetty.util.epl.ajax.JSON;
 import com.aptana.portal.ui.PortalUIPlugin;
@@ -80,12 +89,29 @@ public class ThemeActionController extends AbstractActionController
 		final String themeName = getThemeName(attributes);
 		if (!StringUtil.isEmpty(themeName))
 		{
-			// FIXME this is a bit of a hack, and assumes we'll have an editor and overall theme with the exact same
-			// name
+			// FIXME this is a bit of a hack, and assumes we'll have an editor and overall theme with the exact same name
 			// Set editor theme
 			Theme theme = themeManager.getTheme(themeName);
 			themeManager.setCurrentTheme(theme);
 
+			// Also set overall theme
+			IWorkbench workbench = PlatformUI.getWorkbench();
+			MApplication application = (MApplication) workbench.getService(MApplication.class);
+			IEclipseContext context = application.getContext();
+
+			IThemeEngine e4ThemeEngine = context.get(IThemeEngine.class);
+			ITheme selection = CollectionsUtil.find(e4ThemeEngine.getThemes(), new IFilter<ITheme>()
+			{
+
+				public boolean include(ITheme item)
+				{
+					return themeName.equals(item.getLabel());
+				}
+			});
+			if (selection != null)
+			{
+				e4ThemeEngine.setTheme(selection, false);
+			}
 			return IBrowserNotificationConstants.JSON_OK;
 		}
 		return IBrowserNotificationConstants.JSON_ERROR;
