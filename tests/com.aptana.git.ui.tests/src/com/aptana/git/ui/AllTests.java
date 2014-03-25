@@ -11,7 +11,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import com.aptana.git.ui.dialogs.CreateBranchDialogTest;
 import com.aptana.git.ui.hyperlink.HyperlinkDetectorTest;
 import com.aptana.git.ui.internal.DiffFormatterTest;
 import com.aptana.git.ui.internal.GitLightweightDecoratorTest;
@@ -19,7 +18,6 @@ import com.aptana.git.ui.internal.GitLightweightDecoratorTest;
 @RunWith(Suite.class)
 //@formatter:off
 @SuiteClasses({
-	CreateBranchDialogTest.class,
 	DiffFormatterTest.class,
 	GitLightweightDecoratorTest.class,
 	HyperlinkDetectorTest.class
