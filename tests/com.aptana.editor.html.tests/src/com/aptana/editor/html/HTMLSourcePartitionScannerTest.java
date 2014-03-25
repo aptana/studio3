@@ -11,13 +11,10 @@ import static org.junit.Assert.assertEquals;
 
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IDocumentPartitioner;
 import org.junit.After;
 import org.junit.Test;
 
-import com.aptana.editor.common.ExtendedFastPartitioner;
-import com.aptana.editor.common.NullPartitionerSwitchStrategy;
-import com.aptana.editor.common.text.rules.CompositePartitionScanner;
-import com.aptana.editor.common.text.rules.NullSubPartitionScanner;
 import com.aptana.editor.css.CSSSourceConfiguration;
 import com.aptana.editor.js.JSSourceConfiguration;
 
@@ -28,7 +25,7 @@ import com.aptana.editor.js.JSSourceConfiguration;
 public class HTMLSourcePartitionScannerTest
 {
 
-	private ExtendedFastPartitioner partitioner;
+	private IDocumentPartitioner partitioner;
 
 	private void assertContentType(String contentType, String code, int offset)
 	{
@@ -49,6 +46,7 @@ public class HTMLSourcePartitionScannerTest
 			// FIXME Call HTMLDocumentProvider.connect?
 			IDocument document = new Document(content);
 			HTMLTestUtil.attachPartitioner(document);
+			partitioner = document.getDocumentPartitioner();
 		}
 		return partitioner.getContentType(offset);
 	}
