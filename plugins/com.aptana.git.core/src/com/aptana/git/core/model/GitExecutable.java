@@ -110,7 +110,6 @@ public class GitExecutable
 				EclipseUtil.instanceScope().getNode(GitPlugin.getPluginId())
 						.addPreferenceChangeListener(new IEclipsePreferences.IPreferenceChangeListener()
 						{
-
 							public void preferenceChange(PreferenceChangeEvent event)
 							{
 								if (!event.getKey().equals(IPreferenceConstants.GIT_EXECUTABLE_PATH))
@@ -476,6 +475,104 @@ public class GitExecutable
 		}
 	}
 
+	private IStatus runGitProcess(List<String> args, Map<String, String> env, IProgressMonitor monitor)
+	{
+		SubMonitor subMonitor = SubMonitor.convert(monitor, 1000);
+		try
+		{
+			// Now run it!
+			Process p = run(env, args.toArray(new String[args.size()]));
+			if (p == null)
+			{
+				return new Status(IStatus.ERROR, GitPlugin.PLUGIN_ID, "The git process has failed to run");
+			}
+
+			if (monitor.isCanceled())
+			{
+				return Status.CANCEL_STATUS;
+			}
+			subMonitor.worked(100);
+			CloneRunnable runnable = new CloneRunnable(p, subMonitor.newChild(900));
+			Thread t = new Thread(runnable);
+			t.start();
+			t.join();
+			return runnable.getResult();
+		}
+		catch (Throwable t)
+		{
+			return new Status(IStatus.ERROR, GitPlugin.PLUGIN_ID, t.getMessage(), t);
+		}
+		finally
+		{
+			subMonitor.done();
+		}
+
+	}
+
+	/**
+	 * This tries to find all the tag versions of the specified git URI with version in any format matching to current
+	 * product version.
+	 * 
+	 * @param sourceURI
+	 * @param productVersion
+	 * @param monitor
+	 * @return
+	 */
+	public List<String> remoteTagsList(String sourceURI, IProgressMonitor monitor)
+	{
+		List<String> args = new ArrayList<String>();
+		args.add("ls-remote"); //$NON-NLS-1$
+		args.add(sourceURI);
+		args.add(GitRef.REFS_TAGS + "*"); //$NON-NLS-1$
+
+		Process p;
+		try
+		{
+			p = run(GitExecutable.getEnvironment(), args.toArray(new String[args.size()]));
+			if (p == null || monitor.isCanceled())
+			{
+				return null;
+			}
+			IStatus result = new ProcessRunner().processResult(p);
+			if (!result.isOK())
+			{
+				IdeLog.logError(GitPlugin.getDefault(), result.getMessage(), result.getException());
+			}
+			String lsRemoteOutput = result.getMessage();
+			if (StringUtil.isEmpty(lsRemoteOutput))
+			{
+				// There are no tags with the generic product version.
+				return null;
+			}
+			String[] outputLines = StringUtil.LINE_SPLITTER.split(lsRemoteOutput);
+			List<String> tagVersions = new ArrayList<String>(outputLines.length);
+			for (String line : outputLines)
+			{
+				if (line.indexOf(GitRef.REFS_TAGS) > 0)
+				{
+					tagVersions.add(line.substring(line.indexOf(GitRef.REFS_TAGS) + GitRef.REFS_TAGS.length()));
+				}
+			}
+			return tagVersions;
+		}
+		catch (IOException e)
+		{
+			IdeLog.logError(GitPlugin.getDefault(), e);
+		}
+		catch (CoreException e)
+		{
+			IdeLog.logError(GitPlugin.getDefault(), e);
+		}
+		return null;
+	}
+
+	private boolean hasProgress()
+	{
+		Version gitVersion = version();
+		boolean includeProgress = gitVersion.compareTo(new Version(1, 7, 0)) >= 0;
+		return includeProgress;
+	}
+
 	/**
 	 * Clones a git repo to a local location.
 	 * 
@@ -488,64 +585,40 @@ public class GitExecutable
 	 * @param shallow
 	 *            a boolean indicating whether or not we want the full history of the repo. If the clone is going to be
 	 *            temporary, discarded or disconnected from git you should specify a shallow clone.
+	 * @param tagRevision
 	 * @param monitor
 	 * @return
 	 * @throws CoreException
 	 */
-	public IStatus clone(String sourceURI, IPath dest, boolean shallow, IProgressMonitor monitor)
+	public IStatus clone(String sourceURI, IPath dest, boolean shallow, String tagRevision, IProgressMonitor monitor)
 	{
-		SubMonitor subMonitor = SubMonitor.convert(monitor, 1000);
-		try
+		Map<String, String> env = GitExecutable.getEnvironment();
+		List<String> args = new ArrayList<String>();
+		args.add("clone"); //$NON-NLS-1$
+		if (!StringUtil.isEmpty(tagRevision))
 		{
-			Version version = version();
-			boolean includeProgress = version.compareTo(new Version(1, 7, 0)) >= 0;
-
-			Map<String, String> env = GitExecutable.getEnvironment();
-			List<String> args = new ArrayList<String>();
-			args.add("clone"); //$NON-NLS-1$
-			if (shallow)
-			{
-				args.add("--depth"); //$NON-NLS-1$
-				args.add("1"); //$NON-NLS-1$
-			}
-			// Use --progress switch if git version is 1.7+!
-			if (includeProgress)
-			{
-				args.add("--progress"); //$NON-NLS-1$
-			}
-			args.add("--"); //$NON-NLS-1$
-			args.add(sourceURI);
-			args.add(dest.toOSString());
-			// Now run it!
-			Process p = run(env, args.toArray(new String[args.size()]));
-			if (p == null)
-			{
-				return new Status(IStatus.ERROR, GitPlugin.getPluginId(), MessageFormat.format(
-						Messages.GitExecutable_UnableToLaunchCloneError, sourceURI, dest));
-			}
-
-			subMonitor.worked(100);
-			CloneRunnable runnable = new CloneRunnable(p, subMonitor.newChild(900));
-			Thread t = new Thread(runnable);
-			t.start();
-			t.join();
-
-			return runnable.getResult();
+			args.add("-b");
+			args.add(tagRevision);
 		}
-		catch (CoreException e)
+		if (shallow)
 		{
-			IdeLog.log(GitPlugin.getDefault(), e.getStatus());
-			return e.getStatus();
+			args.add("--depth"); //$NON-NLS-1$
+			args.add("1"); //$NON-NLS-1$
 		}
-		catch (Throwable e)
+		// Use --progress switch if git version is 1.7+!
+		if (hasProgress())
 		{
-			IdeLog.logError(GitPlugin.getDefault(), e, IDebugScopes.DEBUG);
-			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), e.getMessage(), e);
+			args.add("--progress"); //$NON-NLS-1$
 		}
-		finally
+		args.add("--"); //$NON-NLS-1$
+		args.add(sourceURI);
+		args.add(dest.toOSString());
+		IStatus result = runGitProcess(args, env, monitor);
+		if (!result.isOK())
 		{
-			subMonitor.done();
+			IdeLog.logError(GitPlugin.getDefault(), result.getMessage(), result.getException());
 		}
+		return result;
 	}
 
 	protected Process run(Map<String, String> env, String... args) throws IOException, CoreException

@@ -625,7 +625,7 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 		File tmpFile = File.createTempFile("delete_me", "tmp"); //$NON-NLS-1$ //$NON-NLS-2$
 		File dest = new File(tmpFile.getParent(), "git_clone_tmp"); //$NON-NLS-1$
 		GitExecutable.instance().clone(selectedTemplate.getLocation(), Path.fromOSString(dest.getAbsolutePath()), true,
-				sub.newChild(85));
+				null, sub.newChild(85));
 
 		IFileStore tmpClone = EFS.getStore(dest.toURI());
 		// Wipe the .git folder before copying? Wipe the .project file before copying?
@@ -684,7 +684,7 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 			final IProjectDescription projectDescription, IProgressMonitor monitor) throws InvocationTargetException
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
-		CloneJob job = new CloneJob(sourceURI, destPath.toOSString(), true, true);
+		CloneJob job = new CloneJob(sourceURI, destPath.toOSString(), true, true, false);
 		// We're executing inside the wizard's container already, run sync.
 		IStatus status = job.run(sub.newChild(100));
 		if (!status.isOK())

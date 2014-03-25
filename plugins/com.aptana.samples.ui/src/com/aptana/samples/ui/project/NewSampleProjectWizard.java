@@ -327,7 +327,7 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 		}
 
 		// FIXME Run an IRunnableWithProgress in wizard container, have it just do job.run(monitor)!
-		Job job = new CloneJob(gitURL, path.toOSString(), true, true);
+		Job job = new CloneJob(gitURL, path.toOSString(), true, true, true);
 		job.addJobChangeListener(new JobChangeAdapter()
 		{
 			@Override
