@@ -151,8 +151,8 @@
 		<property name="eclipse.tests.p2.repo" value="file:${eclipse.tests.p2.repo.dir}" />
 		<!-- Install the test feature we just built along with eclipse test framework -->
 		<antcall target="run.director">
-			<param name="p2.installIU" value="org.eclipse.test.feature.group,com.aptana.feature.feature.group,com.windowtester.runtime.feature.group,${topLevelElementId}.feature.group" />
-			<param name="p2.repo" value="${eclipse.tests.p2.repo},${studio3.p2.repo},${windowtester.p2.repo},${studio3.tests.p2.repo}" />
+			<param name="p2.installIU" value="org.eclipse.test.feature.group,com.aptana.feature.feature.group,${topLevelElementId}.feature.group" />
+			<param name="p2.repo" value="${eclipse.tests.p2.repo},${studio3.p2.repo},${studio3.tests.p2.repo}" />
 		</antcall>
 		<!-- Modify the plugin_customization.ini to set initial properties for tests! -->
 		<concat append="true" destfile="${baseLocation}/plugins/${platform.plugin}/plugin_customization.ini">
