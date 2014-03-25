@@ -48,14 +48,7 @@ public class HTMLSourcePartitionScannerTest
 		{
 			// FIXME Call HTMLDocumentProvider.connect?
 			IDocument document = new Document(content);
-			CompositePartitionScanner partitionScanner = new CompositePartitionScanner(HTMLSourceConfiguration
-					.getDefault().createSubPartitionScanner(), new NullSubPartitionScanner(),
-					new NullPartitionerSwitchStrategy());
-			partitioner = new ExtendedFastPartitioner(partitionScanner, HTMLSourceConfiguration.getDefault()
-					.getContentTypes());
-			partitionScanner.setPartitioner(partitioner);
-			partitioner.connect(document);
-			document.setDocumentPartitioner(partitioner);
+			HTMLTestUtil.attachPartitioner(document);
 		}
 		return partitioner.getContentType(offset);
 	}

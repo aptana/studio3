@@ -184,16 +184,50 @@
 			</else>
 		</if>
 
-		<!-- Run the tests. -->
-		<antcall target="run-core-test">
-			<param name="test.plugin" value="com.aptana.studio.tests.all" />
-			<param name="test.classname" value="com.aptana.studio.tests.all.CoreTests" />
-		</antcall>
-
-		<antcall target="run-ui-test">
-			<param name="test.plugin" value="com.aptana.studio.tests.all" />
-			<param name="test.classname" value="com.aptana.studio.tests.all.UITests" />
-		</antcall>
+		<!-- Run the tests. Skip suite if none specified, or overridden to be empty. 
+		This can handle comma-delimited lists of suites to run for core and ui, and will execute them in sequence.-->
+		<if>
+			<and>
+				<isset property="core.test.suite" />
+				<not>
+					<equals arg1="${core.test.suite}" arg2="" />
+				</not>
+			</and>
+			<then>
+				<for list="${core.test.suite}" param="suite" keepgoing="true">
+					<sequential>
+						<antcall target="run-core-test">
+							<param name="test.plugin" value="com.appcelerator.titanium.tests.all" />
+							<param name="test.classname" value="@{suite}" />
+						</antcall>
+					</sequential>
+				</for>
+			</then>
+			<else>
+				<echo message="No core test suite specified" />
+			</else>
+		</if>
+		<if>
+			<and>
+				<isset property="ui.test.suite" />
+				<not>
+					<equals arg1="${ui.test.suite}" arg2="" />
+				</not>
+			</and>
+			<then>
+				<for list="${ui.test.suite}" param="suite" keepgoing="true">
+					<sequential>
+						<antcall target="run-ui-test">
+							<param name="test.plugin" value="com.appcelerator.titanium.tests.all" />
+							<param name="test.classname" value="@{suite}" />
+						</antcall>
+					</sequential>
+				</for>
+			</then>
+			<else>
+				<echo message="No UI test suite specified" />
+			</else>
+		</if>
 
 		<antcall target="-post-test" />
 	</target>
