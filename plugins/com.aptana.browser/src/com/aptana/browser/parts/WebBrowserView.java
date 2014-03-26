@@ -10,6 +10,7 @@ package com.aptana.browser.parts;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.IStatusLineManager;
+import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.ProgressEvent;
 import org.eclipse.swt.browser.ProgressListener;
 import org.eclipse.swt.browser.TitleEvent;
@@ -19,77 +20,94 @@ import org.eclipse.ui.part.ViewPart;
 
 import com.aptana.browser.WebBrowserViewer;
 import com.aptana.core.util.StringUtil;
-import com.aptana.swt.webkitbrowser.WebKitBrowser;
 
 /**
  * @author Max Stepanov
- *
  */
-public class WebBrowserView extends ViewPart {
+public class WebBrowserView extends ViewPart
+{
 
 	public static final String VIEW_ID = "com.aptana.browser.views.webbrowser"; //$NON-NLS-1$
 
 	private WebBrowserViewer browserViewer;
 	private int progressWorked;
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
 	 */
 	@Override
-	public void createPartControl(Composite parent) {
+	public void createPartControl(Composite parent)
+	{
 		browserViewer = new WebBrowserViewer(parent, WebBrowserViewer.NAVIGATION_BAR);
-		WebKitBrowser browser = (WebKitBrowser) browserViewer.getBrowser();
-		browser.addProgressListener(new ProgressListener() {
-			public void changed(ProgressEvent event) {
-				if (event.total == 0) {
+		Browser browser = (Browser) browserViewer.getBrowser();
+		browser.addProgressListener(new ProgressListener()
+		{
+			public void changed(ProgressEvent event)
+			{
+				if (event.total == 0)
+				{
 					return;
 				}
-				if (event.current == 0) {
+				if (event.current == 0)
+				{
 					IProgressMonitor progressMonitor = getStatusBarProgressMonitor();
 					progressMonitor.done();
 					progressMonitor.beginTask(StringUtil.EMPTY, event.total);
 					progressWorked = 0;
 				}
-				if (progressWorked < event.current) {
-					getStatusBarProgressMonitor().worked(event.current-progressWorked);
+				if (progressWorked < event.current)
+				{
+					getStatusBarProgressMonitor().worked(event.current - progressWorked);
 					progressWorked = event.current;
 				}
 			}
-			
-			public void completed(ProgressEvent event) {
+
+			public void completed(ProgressEvent event)
+			{
 				getStatusBarProgressMonitor().done();
 			}
 		});
-		browser.addTitleListener(new TitleListener() {
-			public void changed(TitleEvent event) {
+		browser.addTitleListener(new TitleListener()
+		{
+			public void changed(TitleEvent event)
+			{
 				setTitleToolTip(event.title);
 			}
 		});
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
 	 */
 	@Override
-	public void setFocus() {
+	public void setFocus()
+	{
 		browserViewer.setFocus();
 	}
 
-	private IProgressMonitor getStatusBarProgressMonitor() {
+	private IProgressMonitor getStatusBarProgressMonitor()
+	{
 		IStatusLineManager statusLineManager = getViewSite().getActionBars().getStatusLineManager();
 		return statusLineManager.getProgressMonitor();
 	}
-	
-	public boolean close() {
-		try {
+
+	public boolean close()
+	{
+		try
+		{
 			getSite().getPage().hideView(this);
 			return true;
-		} catch (Exception e) {
+		}
+		catch (Exception e)
+		{
 			return false;
 		}
 	}
-	
-	public void setURL(String url) {
+
+	public void setURL(String url)
+	{
 		browserViewer.setURL(url);
 	}
 

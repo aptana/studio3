@@ -17,66 +17,71 @@ import org.eclipse.swt.browser.ProgressListener;
 import org.eclipse.swt.browser.TitleListener;
 import org.eclipse.swt.events.DisposeListener;
 
-import com.aptana.swt.webkitbrowser.WebKitBrowser;
-
 /**
  * @author Max Stepanov
- *
  */
-public final class BrowserWrapper {
+public final class BrowserWrapper
+{
 
 	private final Object browser;
-	
+
 	/**
 	 * 
 	 */
-	public BrowserWrapper(Object browser) {
+	public BrowserWrapper(Object browser)
+	{
 		this.browser = browser;
 	}
-	
-	public BrowserFunctionWrapper createBrowserFunction(String name, final IBrowserFunctionHandler handler) {
-		if (browser instanceof WebKitBrowser) {
-			return new BrowserFunctionWrapper(new com.aptana.swt.webkitbrowser.BrowserFunction((WebKitBrowser)browser, name) {
-				@Override
-				public Object function(Object[] arguments) {
-					return handler.function(arguments);
-				}
-				
-			});
-			
-		} else {
-			return new BrowserFunctionWrapper(new org.eclipse.swt.browser.BrowserFunction((Browser)browser, name) {
-				@Override
-				public Object function(Object[] arguments) {
-					return handler.function(arguments);
-				}
-				
-			});
-		}
+
+	public BrowserFunctionWrapper createBrowserFunction(String name, final IBrowserFunctionHandler handler)
+	{
+		return new BrowserFunctionWrapper(new org.eclipse.swt.browser.BrowserFunction((Browser) browser, name)
+		{
+			@Override
+			public Object function(Object[] arguments)
+			{
+				return handler.function(arguments);
+			}
+
+		});
 	}
-	
-	private Object callMethod(String name, Class<?>[] parameterTypes, Object[] arguments) {
-		try {
+
+	private Object callMethod(String name, Class<?>[] parameterTypes, Object[] arguments)
+	{
+		try
+		{
 			Method method = browser.getClass().getMethod(name, parameterTypes);
 			return method.invoke(browser, arguments);
-		} catch (SecurityException e) {
+		}
+		catch (SecurityException e)
+		{
 			throw new RuntimeException(e);
-		} catch (NoSuchMethodException e) {
+		}
+		catch (NoSuchMethodException e)
+		{
 			throw new RuntimeException(e);
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e)
+		{
 			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
+		}
+		catch (IllegalAccessException e)
+		{
 			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
+		}
+		catch (InvocationTargetException e)
+		{
 			throw new RuntimeException(e);
 		}
 	}
 
-	private Object callMethod(String name, Class<?> parameterType, Object argument) {
+	private Object callMethod(String name, Class<?> parameterType, Object argument)
+	{
 		return callMethod(name, new Class[] { parameterType }, new Object[] { argument });
 	}
 
-	private Object callMethod(String name) {
+	private Object callMethod(String name)
+	{
 		return callMethod(name, new Class[0], new Object[0]);
 	}
 
@@ -84,7 +89,8 @@ public final class BrowserWrapper {
 	 * @param listener
 	 * @see org.eclipse.swt.browser.Browser#addTitleListener(org.eclipse.swt.browser.TitleListener)
 	 */
-	public void addTitleListener(TitleListener listener) {
+	public void addTitleListener(TitleListener listener)
+	{
 		callMethod("addTitleListener", TitleListener.class, listener); //$NON-NLS-1$
 	}
 
@@ -92,7 +98,8 @@ public final class BrowserWrapper {
 	 * @param listener
 	 * @see org.eclipse.swt.browser.Browser#addProgressListener(org.eclipse.swt.browser.ProgressListener)
 	 */
-	public void addProgressListener(ProgressListener listener) {
+	public void addProgressListener(ProgressListener listener)
+	{
 		callMethod("addProgressListener", ProgressListener.class, listener); //$NON-NLS-1$
 	}
 
@@ -100,7 +107,8 @@ public final class BrowserWrapper {
 	 * @param listener
 	 * @see org.eclipse.swt.browser.Browser#addLocationListener(org.eclipse.swt.browser.LocationListener)
 	 */
-	public void addLocationListener(LocationListener listener) {
+	public void addLocationListener(LocationListener listener)
+	{
 		callMethod("addLocationListener", LocationListener.class, listener); //$NON-NLS-1$
 	}
 
@@ -108,7 +116,8 @@ public final class BrowserWrapper {
 	 * @param listener
 	 * @see org.eclipse.swt.widgets.Widget#addDisposeListener(org.eclipse.swt.events.DisposeListener)
 	 */
-	public void addDisposeListener(DisposeListener listener) {
+	public void addDisposeListener(DisposeListener listener)
+	{
 		callMethod("addDisposeListener", DisposeListener.class, listener); //$NON-NLS-1$
 	}
 
@@ -116,7 +125,8 @@ public final class BrowserWrapper {
 	 * @return
 	 * @see org.eclipse.swt.widgets.Widget#isDisposed()
 	 */
-	public boolean isDisposed() {
+	public boolean isDisposed()
+	{
 		return (Boolean) callMethod("isDisposed"); //$NON-NLS-1$
 	}
 
@@ -125,15 +135,17 @@ public final class BrowserWrapper {
 	 * @return
 	 * @see org.eclipse.swt.browser.Browser#execute(java.lang.String)
 	 */
-	public boolean execute(String script) {
-		return (Boolean)callMethod("execute", String.class, script); //$NON-NLS-1$
+	public boolean execute(String script)
+	{
+		return (Boolean) callMethod("execute", String.class, script); //$NON-NLS-1$
 	}
 
 	/**
 	 * @param enabled
 	 * @see org.eclipse.swt.browser.Browser#setJavascriptEnabled(boolean)
 	 */
-	public void setJavascriptEnabled(boolean enabled) {
+	public void setJavascriptEnabled(boolean enabled)
+	{
 		callMethod("setJavascriptEnabled", boolean.class, enabled); //$NON-NLS-1$
 	}
 
@@ -141,26 +153,27 @@ public final class BrowserWrapper {
 	 * @return
 	 * @see org.eclipse.swt.browser.Browser#getUrl()
 	 */
-	public String getUrl() {
+	public String getUrl()
+	{
 		return (String) callMethod("getUrl"); //$NON-NLS-1$
 	}
 
 	/**
-	 * 
 	 * @param url
 	 * @return
 	 * @see org.eclipse.swt.browser.Browser#setUrl(java.lang.String)
 	 */
-	public boolean setUrl (String url) {
+	public boolean setUrl(String url)
+	{
 		return (Boolean) callMethod("setUrl", String.class, url); //$NON-NLS-1$
 	}
-	
+
 	/**
-	 * 
 	 * @return
 	 * @see org.eclipse.swt.browser.Browser#setFocus()
 	 */
-	public boolean setFocus () {
+	public boolean setFocus()
+	{
 		return (Boolean) callMethod("setFocus"); //$NON-NLS-1$
 	}
 
