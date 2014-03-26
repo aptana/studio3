@@ -9,29 +9,26 @@ package com.aptana.portal.ui.internal;
 
 /**
  * @author Max Stepanov
- *
  */
-public final class BrowserFunctionWrapper {
+public final class BrowserFunctionWrapper
+{
 
 	private Object browserFunction;
-	
+
 	/**
 	 * 
 	 */
-	public BrowserFunctionWrapper(Object browserFunction) {
+	public BrowserFunctionWrapper(Object browserFunction)
+	{
 		this.browserFunction = browserFunction;
 	}
 
 	/**
-	 * 
 	 * @see org.eclipse.swt.browser.BrowserFunction#dispose()
 	 */
-	public void dispose() {
-		if (browserFunction instanceof com.aptana.swt.webkitbrowser.BrowserFunction) {
-			((com.aptana.swt.webkitbrowser.BrowserFunction) browserFunction).dispose();
-		} else {
-			((org.eclipse.swt.browser.BrowserFunction) browserFunction).dispose();			
-		}
+	public void dispose()
+	{
+		((org.eclipse.swt.browser.BrowserFunction) browserFunction).dispose();
 	}
 
 }

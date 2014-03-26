@@ -12,10 +12,8 @@
 	<target name="preProcessRepos">
 		<p2.mirror destination="file:${repoBaseLocation}/mirrored">
 			<source location="${libraries-com.p2.repo}" />
-			<source location="${webkit.p2.repo}" />
 			<source location="${studio3.p2.repo}" />
 			<iu id="com.aptana.ide.feature.libraries.subscription.feature.group" />
-			<iu id="com.aptana.webkitbrowser.feature.group" />
 			<iu id="com.aptana.feature.feature.group" />
 		</p2.mirror>
 	</target>
