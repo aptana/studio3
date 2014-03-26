@@ -144,7 +144,7 @@ public class WebBrowserViewer extends Composite
 			createCommandBar(container);
 			createNavigationBar(container);
 		}
-		browser = new Browser(browserArea, SWT.WEBKIT);
+		browser = new Browser(browserArea, SWT.NONE);
 		browser.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 		if (showNavigatorBar)
 		{
