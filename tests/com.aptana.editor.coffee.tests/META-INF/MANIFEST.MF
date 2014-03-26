@@ -9,6 +9,5 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: org.junit,
  org.eclipse.ui.ide,
  com.aptana.ui,
- com.windowtester.swt.runtime,
  org.eclipse.test.performance;bundle-version="3.6.0"
 Export-Package: com.aptana.editor.coffee.tests

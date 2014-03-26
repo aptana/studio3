@@ -151,8 +151,8 @@
 		<property name="eclipse.tests.p2.repo" value="file:${eclipse.tests.p2.repo.dir}" />
 		<!-- Install the test feature we just built along with eclipse test framework -->
 		<antcall target="run.director">
-			<param name="p2.installIU" value="org.eclipse.test.feature.group,com.aptana.feature.feature.group,com.windowtester.runtime.feature.group,${topLevelElementId}.feature.group" />
-			<param name="p2.repo" value="${eclipse.tests.p2.repo},${studio3.p2.repo},${windowtester.p2.repo},${studio3.tests.p2.repo}" />
+			<param name="p2.installIU" value="org.eclipse.test.feature.group,com.aptana.feature.feature.group,${topLevelElementId}.feature.group" />
+			<param name="p2.repo" value="${eclipse.tests.p2.repo},${studio3.p2.repo},${studio3.tests.p2.repo}" />
 		</antcall>
 		<!-- Modify the plugin_customization.ini to set initial properties for tests! -->
 		<concat append="true" destfile="${baseLocation}/plugins/${platform.plugin}/plugin_customization.ini">
@@ -184,16 +184,50 @@
 			</else>
 		</if>
 
-		<!-- Run the tests. -->
-		<antcall target="run-core-test">
-			<param name="test.plugin" value="com.aptana.studio.tests.all" />
-			<param name="test.classname" value="com.aptana.studio.tests.all.CoreTests" />
-		</antcall>
-
-		<antcall target="run-ui-test">
-			<param name="test.plugin" value="com.aptana.studio.tests.all" />
-			<param name="test.classname" value="com.aptana.studio.tests.all.UITests" />
-		</antcall>
+		<!-- Run the tests. Skip suite if none specified, or overridden to be empty. 
+		This can handle comma-delimited lists of suites to run for core and ui, and will execute them in sequence.-->
+		<if>
+			<and>
+				<isset property="core.test.suite" />
+				<not>
+					<equals arg1="${core.test.suite}" arg2="" />
+				</not>
+			</and>
+			<then>
+				<for list="${core.test.suite}" param="suite" keepgoing="true">
+					<sequential>
+						<antcall target="run-core-test">
+							<param name="test.plugin" value="com.aptana.studio.tests.all" />
+							<param name="test.classname" value="@{suite}" />
+						</antcall>
+					</sequential>
+				</for>
+			</then>
+			<else>
+				<echo message="No core test suite specified" />
+			</else>
+		</if>
+		<if>
+			<and>
+				<isset property="ui.test.suite" />
+				<not>
+					<equals arg1="${ui.test.suite}" arg2="" />
+				</not>
+			</and>
+			<then>
+				<for list="${ui.test.suite}" param="suite" keepgoing="true">
+					<sequential>
+						<antcall target="run-ui-test">
+							<param name="test.plugin" value="com.aptana.studio.tests.all" />
+							<param name="test.classname" value="@{suite}" />
+						</antcall>
+					</sequential>
+				</for>
+			</then>
+			<else>
+				<echo message="No UI test suite specified" />
+			</else>
+		</if>
 
 		<antcall target="-post-test" />
 	</target>
