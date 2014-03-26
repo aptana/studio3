@@ -99,6 +99,11 @@ public interface IProblem
 	public static final String ARGUMENTS = "arguments"; //$NON-NLS-1$
 
 	/**
+	 * The attribute used for differentiating multiple markers.
+	 */
+	public static final String MARKER_PROBLEM_ID = "id"; //$NON-NLS-1$
+
+	/**
 	 * Gets the text offset where the error starts.
 	 * 
 	 * @return the offset
