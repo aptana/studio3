@@ -37,18 +37,21 @@ public class HTMLTestUtil
 		{
 			source = source.replaceAll("\\|", "");
 		}
+		final IDocument document = new Document(source);
+		attachPartitioner(document);
 
+		return document;
+	}
+
+	public static void attachPartitioner(final IDocument document)
+	{
 		CompositePartitionScanner partitionScanner = new CompositePartitionScanner(HTMLSourceConfiguration.getDefault()
 				.createSubPartitionScanner(), new NullSubPartitionScanner(), new NullPartitionerSwitchStrategy());
 		IDocumentPartitioner partitioner = new ExtendedFastPartitioner(partitionScanner, HTMLSourceConfiguration
 				.getDefault().getContentTypes());
 		partitionScanner.setPartitioner((IExtendedPartitioner) partitioner);
-
-		final IDocument document = new Document(source);
 		partitioner.connect(document);
 		document.setDocumentPartitioner(partitioner);
-
-		return document;
 	}
 
 	/**
@@ -65,15 +68,8 @@ public class HTMLTestUtil
 			source = source.replaceAll("\\|", "");
 		}
 
-		CompositePartitionScanner partitionScanner = new CompositePartitionScanner(HTMLSourceConfiguration.getDefault()
-				.createSubPartitionScanner(), new NullSubPartitionScanner(), new NullPartitionerSwitchStrategy());
-		IDocumentPartitioner partitioner = new ExtendedFastPartitioner(partitionScanner, HTMLSourceConfiguration
-				.getDefault().getContentTypes());
-		partitionScanner.setPartitioner((IExtendedPartitioner) partitioner);
-
 		final IDocument document = new BadDocument(source);
-		partitioner.connect(document);
-		document.setDocumentPartitioner(partitioner);
+		attachPartitioner(document);
 
 		return document;
 	}

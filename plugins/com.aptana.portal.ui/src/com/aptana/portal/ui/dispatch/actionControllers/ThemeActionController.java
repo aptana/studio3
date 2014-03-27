@@ -110,7 +110,7 @@ public class ThemeActionController extends AbstractActionController
 			});
 			if (selection != null)
 			{
-				e4ThemeEngine.setTheme(selection, false);
+				e4ThemeEngine.setTheme(selection, true);
 			}
 			return IBrowserNotificationConstants.JSON_OK;
 		}

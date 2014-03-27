@@ -181,6 +181,11 @@ public class ProblemAnnotation extends Annotation implements IAnnotationPresenta
 		return fProblem.getMessage();
 	}
 
+	public IProblem getProblem()
+	{
+		return fProblem;
+	}
+
 	public void setQuickFixable(boolean state)
 	{
 		fIsQuickFixable = state;

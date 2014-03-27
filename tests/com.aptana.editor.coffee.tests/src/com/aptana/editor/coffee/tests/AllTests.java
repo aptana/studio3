@@ -13,13 +13,12 @@ import com.aptana.editor.coffee.internal.text.CoffeeFoldingComputerTest;
 import com.aptana.editor.coffee.outline.CoffeeOutlineProviderTest;
 import com.aptana.editor.coffee.parsing.CoffeeParserTest;
 import com.aptana.editor.coffee.parsing.lexer.CoffeeScannerTest;
-import com.aptana.editor.coffee.preferences.CoffeePreferencePageTest;
 
 @RunWith(Suite.class)
 @SuiteClasses({ CoffeeScannerTest.class, CoffeeParserTest.class, CoffeeFoldingComputerTest.class,
 		CoffeeDoubleClickStrategyTest.class, CoffeeFileIndexingParticipantTest.class, CoffeeTaskDetectorTest.class,
 		CoffeeCodeScannerTest.class, CoffeeOutlineProviderTest.class, CoffeeSourcePartitionScannerTest.class,
-		CoffeescriptScopesTest.class, CoffeePreferencePageTest.class, })
+		CoffeescriptScopesTest.class })
 public class AllTests
 {
 }

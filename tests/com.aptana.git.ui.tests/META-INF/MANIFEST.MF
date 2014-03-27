@@ -7,5 +7,4 @@ Bundle-Vendor: %providerName
 Fragment-Host: com.aptana.git.ui;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: org.junit;bundle-version="4.0.0",
- com.aptana.testing.mocks;bundle-version="1.0.0",
- com.windowtester.swt.runtime;bundle-version="6.0.0"
+ com.aptana.testing.mocks;bundle-version="1.0.0"

@@ -75,6 +75,7 @@ import com.aptana.parsing.lexer.Range;
 import com.aptana.preview.ProjectPreviewUtil;
 import com.aptana.ui.util.UIUtils;
 import com.aptana.webserver.core.IServer;
+import com.aptana.webserver.core.IServerManager;
 import com.aptana.webserver.core.WebServerCorePlugin;
 
 public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
@@ -546,7 +547,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					IServer serverConfiguration = ProjectPreviewUtil.getServerConfiguration(getProject());
 					if (serverConfiguration == null)
 					{
-						for (IServer server : WebServerCorePlugin.getDefault().getServerManager().getServers())
+						for (IServer server : getServerManager().getServers())
 						{
 							if (server.resolve(editorStore) != null)
 							{
@@ -667,6 +668,11 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		}
 
 		return Collections.emptyList();
+	}
+
+	protected IServerManager getServerManager()
+	{
+		return WebServerCorePlugin.getDefault().getServerManager();
 	}
 
 	/**

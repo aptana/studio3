@@ -307,32 +307,10 @@ public abstract class EditorBasedTests
 		this.fileUri = store.toURI();
 		this.editor = this.createEditor(editorInput);
 		this.document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
-		this.source = document.get();
 
 		// find offsets
-		this.cursorOffsets = new ArrayList<Integer>();
-		int offset = this.source.indexOf('|');
-
-		while (offset != -1)
-		{
-			// NOTE: we have to account for the deletion of previous offsets
-			this.cursorOffsets.add(offset - this.cursorOffsets.size());
-			offset = this.source.indexOf('|', offset + 1);
-		}
-
-		if (this.cursorOffsets.isEmpty())
-		{
-			// use last position if we didn't find any cursors
-			this.cursorOffsets.add(source.length());
-		}
-		else
-		{
-			// clean source
-			this.source = CURSOR.matcher(this.source).replaceAll(StringUtil.EMPTY);
-
-			// update document
-			document.set(this.source);
-		}
+		handleCursorOffsets(document);
+		this.source = document.get();
 
 		IFileStoreIndexingParticipant indexer = this.createIndexer();
 		if (indexer != null)
@@ -354,6 +332,36 @@ public abstract class EditorBasedTests
 				fail("Error indexing file: " + e.getMessage());
 			}
 		}
+	}
+
+	protected void handleCursorOffsets(IDocument document)
+	{
+		String source = document.get();
+		ArrayList cursorOffsets = new ArrayList<Integer>();
+		int offset = source.indexOf('|');
+
+		while (offset != -1)
+		{
+			// NOTE: we have to account for the deletion of previous offsets
+			cursorOffsets.add(offset - cursorOffsets.size());
+			offset = source.indexOf('|', offset + 1);
+		}
+
+		if (cursorOffsets.isEmpty())
+		{
+			// use last position if we didn't find any cursors
+			cursorOffsets.add(source.length());
+		}
+		else
+		{
+			// clean source
+			source = CURSOR.matcher(source).replaceAll(StringUtil.EMPTY);
+
+			// update document
+			document.set(source);
+		}
+		cursorOffsets.trimToSize();
+		this.cursorOffsets = cursorOffsets;
 	}
 
 	/**
@@ -420,7 +428,7 @@ public abstract class EditorBasedTests
 	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
-//	@Override
+	// @Override
 	@After
 	public void tearDown() throws Exception
 	{
@@ -431,6 +439,6 @@ public abstract class EditorBasedTests
 		source = null;
 		cursorOffsets = null;
 
-//		super.tearDown();
+		// super.tearDown();
 	}
 }
