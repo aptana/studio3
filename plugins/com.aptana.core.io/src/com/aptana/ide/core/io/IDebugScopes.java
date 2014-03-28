@@ -13,7 +13,7 @@ package com.aptana.ide.core.io;
  * 
  * @author Ingo Muschenetz
  */
-public interface IDebugScopes
+interface IDebugScopes
 {
 	/**
 	 * Items related to the connection process

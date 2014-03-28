@@ -9,22 +9,21 @@ package com.aptana.ide.core.io;
 
 import org.eclipse.core.runtime.IPath;
 
-
 /**
  * @author Max Stepanov
- *
  */
-public interface IBaseRemoteConnectionPoint extends IConnectionPoint {
-
-    public static final String CATEGORY = "com.aptana.filesystem.ftp.ftpCategory"; //$NON-NLS-1$
+public interface IBaseRemoteConnectionPoint extends IConnectionPoint
+{
 
 	/**
-	 * @param name the name to set
+	 * @param name
+	 *            the name to set
 	 */
 	public void setName(String name);
 
 	/**
-	 * @param id the id to set
+	 * @param id
+	 *            the id to set
 	 */
 	public void setId(String id);
 
@@ -34,7 +33,8 @@ public interface IBaseRemoteConnectionPoint extends IConnectionPoint {
 	public String getHost();
 
 	/**
-	 * @param host the host to set
+	 * @param host
+	 *            the host to set
 	 */
 	public void setHost(String host);
 
@@ -44,7 +44,8 @@ public interface IBaseRemoteConnectionPoint extends IConnectionPoint {
 	public int getPort();
 
 	/**
-	 * @param port the port to set
+	 * @param port
+	 *            the port to set
 	 */
 	public void setPort(int port);
 
@@ -54,7 +55,8 @@ public interface IBaseRemoteConnectionPoint extends IConnectionPoint {
 	public IPath getPath();
 
 	/**
-	 * @param path the path to set
+	 * @param path
+	 *            the path to set
 	 */
 	public void setPath(IPath path);
 
@@ -64,7 +66,8 @@ public interface IBaseRemoteConnectionPoint extends IConnectionPoint {
 	public String getLogin();
 
 	/**
-	 * @param login the login to set
+	 * @param login
+	 *            the login to set
 	 */
 	public void setLogin(String login);
 
@@ -74,7 +77,8 @@ public interface IBaseRemoteConnectionPoint extends IConnectionPoint {
 	public char[] getPassword();
 
 	/**
-	 * @param password the password to set
+	 * @param password
+	 *            the password to set
 	 */
 	public void setPassword(char[] password);
 

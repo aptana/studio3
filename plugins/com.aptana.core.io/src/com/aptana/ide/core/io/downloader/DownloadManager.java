@@ -138,7 +138,7 @@ public class DownloadManager
 	 * 
 	 * @param monitor
 	 */
-	protected IStatus download(IProgressMonitor monitor)
+	private IStatus download(IProgressMonitor monitor)
 	{
 		SubMonitor subMonitor = SubMonitor.convert(monitor, Messages.DownloadManager_downloadingContent,
 				downloads.size());

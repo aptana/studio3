@@ -37,7 +37,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.ExpiringMap;
 import com.aptana.core.util.ProgressMonitorInterrupter;
 import com.aptana.core.util.ProgressMonitorInterrupter.InterruptDelegate;
 import com.aptana.core.util.StringUtil;
@@ -57,9 +56,9 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 
 	private static final int RETRIES_AFTER_FAILURE = 2;
 	protected static final char[] EMPTY_PASSWORD = StringUtil.EMPTY.toCharArray();
-	protected static final String[] EMPTY_STRING_ARRAY = new String[0];
-	protected static final byte[] EMPTY_BYTES = new byte[0];
-	protected static final IExtendedFileInfo[] EMPTY_FILEINFO_ARRAY = new IExtendedFileInfo[0];
+	private static final String[] EMPTY_STRING_ARRAY = new String[0];
+	private static final byte[] EMPTY_BYTES = new byte[0];
+	private static final IExtendedFileInfo[] EMPTY_FILEINFO_ARRAY = new IExtendedFileInfo[0];
 
 	protected String login;
 	protected char[] password = EMPTY_PASSWORD;
@@ -94,24 +93,6 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 		{
 			password = EMPTY_PASSWORD;
 			promptPassword(title, message);
-		}
-	}
-
-	protected final void setCaching(boolean enabled)
-	{
-		if ((fileInfoCache != null) == enabled)
-		{
-			return;
-		}
-		if (enabled)
-		{
-			fileInfoCache = new ExpiringMap<IPath, ExtendedFileInfo>(CACHE_TTL);
-			fileInfosCache = new ExpiringMap<IPath, ExtendedFileInfo[]>(CACHE_TTL);
-		}
-		else
-		{
-			fileInfoCache = null;
-			fileInfosCache = null;
 		}
 	}
 
@@ -694,7 +675,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 	protected abstract void changeFileGroup(IPath path, String group, IProgressMonitor monitor) throws CoreException,
 			FileNotFoundException;
 
-	protected final ExtendedFileInfo[] fetchFilesInternal(IPath path, int options, IProgressMonitor monitor)
+	private final ExtendedFileInfo[] fetchFilesInternal(IPath path, int options, IProgressMonitor monitor)
 			throws CoreException, FileNotFoundException, PermissionDeniedException
 	{
 		MultiStatus multiStatus = null;

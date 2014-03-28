@@ -67,18 +67,6 @@ import com.aptana.usage.StudioAnalytics;
 	private static final String ATTR_ID = "id"; //$NON-NLS-1$
 	private static final String ATTR_TYPE = "type"; //$NON-NLS-1$
 
-	private static final String COM_APTANA_IDE_IO_FTPS_FTPS_VIRTUAL_FILE_MANAGER = "com.aptana.ide.io.ftps.FtpsVirtualFileManager"; //$NON-NLS-1$
-	private static final String COM_APTANA_IDE_IO_SFTP_SFTP_VIRTUAL_FILE_MANAGER = "com.aptana.ide.io.sftp.SftpVirtualFileManager"; //$NON-NLS-1$
-	private static final String COM_APTANA_IDE_IO_FTP_FTP_VIRTUAL_FILE_MANAGER = "com.aptana.ide.io.ftp.FtpVirtualFileManager"; //$NON-NLS-1$
-	private static final String COM_APTANA_IDE_CORE_UI_IO_FILE_PROJECT_FILE_MANAGER = "com.aptana.ide.core.ui.io.file.ProjectFileManager"; //$NON-NLS-1$
-	private static final String COM_APTANA_IDE_CORE_UI_IO_FILE_LOCAL_FILE_MANAGER = "com.aptana.ide.core.ui.io.file.LocalFileManager"; //$NON-NLS-1$
-
-	private static final String TYPE_FTPS = "ftps"; //$NON-NLS-1$
-	private static final String TYPE_SFTP = "sftp"; //$NON-NLS-1$
-	private static final String TYPE_FTP = "ftp"; //$NON-NLS-1$
-	private static final String TYPE_WORKSPACE = "workspace"; //$NON-NLS-1$
-	private static final String TYPE_LOCAL = "local"; //$NON-NLS-1$
-
 	private static ConnectionPointManager instance;
 
 	private List<ConnectionPoint> connections = Collections.synchronizedList(new ArrayList<ConnectionPoint>());

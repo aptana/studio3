@@ -237,7 +237,7 @@ public final class EFSUtils
 	{
 		List<IFileStore> fileList = new ArrayList<IFileStore>();
 		fileList.addAll(Arrays.asList(files));
-		fileList.addAll(Arrays.asList(getFiles(files, true, false, monitor)));
+		fileList.addAll(Arrays.asList(getFiles(files, recurse, includeCloakedFiles, monitor)));
 
 		return fileList.toArray(new IFileStore[fileList.size()]);
 	}
