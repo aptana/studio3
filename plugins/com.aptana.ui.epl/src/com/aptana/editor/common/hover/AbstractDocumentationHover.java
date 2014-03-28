@@ -671,7 +671,6 @@ public abstract class AbstractDocumentationHover extends AbstractCommonTextHover
 					return;
 				}
 				uri = file.toURI();
-				loc = uri.toASCIIString();
 			}
 			control.notifyDelayedInputChange(null);
 			control.dispose();
@@ -683,7 +682,7 @@ public abstract class AbstractDocumentationHover extends AbstractCommonTextHover
 				IWebBrowser webBrowser = workbenchBrowserSupport.createBrowser(null);
 				if (webBrowser != null)
 				{
-					webBrowser.openURL(new URL(loc));
+					webBrowser.openURL(uri.toURL());
 				}
 				return;
 			}
