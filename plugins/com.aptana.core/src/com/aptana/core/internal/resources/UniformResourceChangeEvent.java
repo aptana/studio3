@@ -19,7 +19,7 @@ import com.aptana.core.resources.IUniformResourceChangeEvent;
  * @author Max Stepanov
  *
  */
-public class UniformResourceChangeEvent extends EventObject implements IUniformResourceChangeEvent {
+class UniformResourceChangeEvent extends EventObject implements IUniformResourceChangeEvent {
 
 	private static final IMarkerDelta[] NO_MARKER_DELTAS = new IMarkerDelta[0];
 	private static final long serialVersionUID = 1L;
@@ -34,7 +34,7 @@ public class UniformResourceChangeEvent extends EventObject implements IUniformR
 	 * @param resource
 	 * @param deltas
 	 */
-	public UniformResourceChangeEvent(Object source, IUniformResource resource, IMarkerDelta[] deltas) {
+	UniformResourceChangeEvent(Object source, IUniformResource resource, IMarkerDelta[] deltas) {
 		super(source);
 		this.resource = resource;
 		this.deltas = deltas;

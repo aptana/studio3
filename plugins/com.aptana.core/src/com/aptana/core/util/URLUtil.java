@@ -46,7 +46,7 @@ public class URLUtil
 	 * @return
 	 * @throws UnsupportedEncodingException
 	 */
-	public static String joinParameters(Map<String, String> parameters, boolean encode)
+	static String joinParameters(Map<String, String> parameters, boolean encode)
 			throws UnsupportedEncodingException
 	{
 		if (parameters == null)
@@ -124,7 +124,7 @@ public class URLUtil
 	 * @throws MalformedURLException
 	 * @throws UnsupportedEncodingException
 	 */
-	public static URL appendDefaultParameters(URL url) throws MalformedURLException, UnsupportedEncodingException
+	static URL appendDefaultParameters(URL url) throws MalformedURLException, UnsupportedEncodingException
 	{
 		Map<String, String> parameters = getDefaultParameters();
 		return appendParameters(url, parameters, true);

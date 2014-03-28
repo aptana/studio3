@@ -20,7 +20,7 @@ import com.aptana.core.logging.IdeLog;
  * 
  * @author Shalom Gibly <sgibly@aptana.com>
  */
-public class OutputStreamThread extends Thread
+class OutputStreamThread extends Thread
 {
 	private OutputStream is;
 	private String charset;
@@ -33,7 +33,7 @@ public class OutputStreamThread extends Thread
 	 * @param content
 	 * @param charset
 	 */
-	public OutputStreamThread(OutputStream os, String content, String charset)
+	OutputStreamThread(OutputStream os, String content, String charset)
 	{
 		if (os == null || content == null)
 		{

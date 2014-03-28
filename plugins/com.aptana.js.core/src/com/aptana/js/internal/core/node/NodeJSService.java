@@ -176,7 +176,7 @@ public class NodeJSService implements INodeJSService
 			IStatus status;
 			if (PlatformUtil.isWindows())
 			{
-				status = new ProcessRunner().runInBackground(Path.ROOT, "msiexec", "/i", file.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
+				status = createProcessRunner().runInBackground(Path.ROOT, "msiexec", "/i", file.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			else
 			{

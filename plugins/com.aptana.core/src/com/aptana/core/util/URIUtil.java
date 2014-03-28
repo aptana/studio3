@@ -126,7 +126,7 @@ public class URIUtil
 	 * @param reveal
 	 * @return
 	 */
-	public static boolean openInFinder(File file, boolean reveal)
+	private static boolean openInFinder(File file, boolean reveal)
 	{
 		String path = file.getAbsolutePath();
 		String subcommand = reveal ? "reveal" : "open"; //$NON-NLS-1$ //$NON-NLS-2$

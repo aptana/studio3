@@ -57,33 +57,6 @@ public class StringUtil
 		ENTITY_SANITIZER.addPattern("<", "&lt;"); //$NON-NLS-1$ //$NON-NLS-2$
 		ENTITY_SANITIZER.addPattern(">", "&gt;"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	private static final Pattern HTML_TAG_PATTERN = Pattern.compile("\\<.*?\\>"); //$NON-NLS-1$
-
-	/**
-	 * Compares two strings for equality taking into account that none, one, or both may be null
-	 * 
-	 * @param s1
-	 * @param s2
-	 * @return
-	 * @deprecated Use the more generic {@link ObjectUtil#areEqual(Object, Object)} in place of this method
-	 */
-	public static boolean areEqual(String s1, String s2)
-	{
-		return ObjectUtil.areEqual(s1, s2);
-	}
-
-	/**
-	 * Compares two strings for equality taking into account that none, one, or both may be null
-	 * 
-	 * @param s1
-	 * @param s2
-	 * @return
-	 * @deprecated Use the more generic {@link ObjectUtil#areNotEqual(Object, Object)} in place of this method
-	 */
-	public static boolean areNotEqual(String s1, String s2)
-	{
-		return ObjectUtil.areNotEqual(s1, s2);
-	}
 
 	/**
 	 * characterInstanceCount
@@ -179,7 +152,7 @@ public class StringUtil
 	 *            The string to search for in the array of strings
 	 * @return
 	 */
-	public static boolean contains(String[] set, String toFind)
+	static boolean contains(String[] set, String toFind)
 	{
 		if (set != null && toFind != null)
 		{
@@ -513,26 +486,6 @@ public class StringUtil
 	}
 
 	/**
-	 * Forces a string to be padded by appending the given character to the end until the string is the desired length
-	 * 
-	 * @param string
-	 * @param c
-	 * @param length
-	 * @return
-	 */
-	public static String padEnd(String string, char c, int length)
-	{
-		if (string == null)
-		{
-			string = EMPTY;
-		}
-		int currentlength = string.length();
-		int diff = length - currentlength;
-
-		return concat(string, repeat(c, diff));
-	}
-
-	/**
 	 * Add single quotes around the given string.
 	 * 
 	 * @param string
@@ -631,21 +584,6 @@ public class StringUtil
 	public static boolean startsWith(String string, String prefix)
 	{
 		return !StringUtil.isEmpty(string) && string.startsWith(prefix);
-	}
-
-	/**
-	 * Removes <.*?> inside a string. If the specified value is empty or null, then it is returned untouched
-	 * 
-	 * @param textWithHTML
-	 * @return
-	 */
-	public static String stripHTMLTags(String textWithHTML)
-	{
-		// @formatter:off
-		return (!StringUtil.isEmpty(textWithHTML))
-			?	HTML_TAG_PATTERN.matcher(textWithHTML).replaceAll(EMPTY)
-			:	textWithHTML;
-		// @formatter:on
 	}
 
 	/**
@@ -767,11 +705,6 @@ public class StringUtil
 		return ret;
 	}
 
-	public static List<String> dotSplit(String string)
-	{
-		return split(string, '.');
-	}
-
 	public static String dotFirst(String string)
 	{
 		int i = string.indexOf('.');
@@ -792,22 +725,6 @@ public class StringUtil
 			return text.substring(1, text.length() - 1);
 		}
 		return text;
-	}
-
-	/**
-	 * This is the equivalent of {@link String#indexOf(int)} but for searching for one of many characters (not a
-	 * substring).
-	 * 
-	 * @param string
-	 *            the string to search
-	 * @param chars
-	 *            The set of characters we're looking for. If we find any of these characters we stop and return the
-	 *            index.
-	 * @return
-	 */
-	public static int indexOf(String string, char... chars)
-	{
-		return indexOf(string, 0, chars);
 	}
 
 	public static int indexOf(String string, int offset, char... chars)
@@ -839,21 +756,6 @@ public class StringUtil
 			}
 		}
 		return -1;
-	}
-
-	/**
-	 * @see String#lastIndexOf(int)
-	 * @param string
-	 * @param chars
-	 * @return
-	 */
-	public static int lastIndexOf(String string, char... chars)
-	{
-		if (string == null)
-		{
-			return -1;
-		}
-		return lastIndexOf(string, string.length() - 1, chars);
 	}
 
 	/**

@@ -279,7 +279,7 @@ public class UniformResourceMarker extends PlatformObject implements IUniformRes
 	 * 
 	 * @return MarkerInfo
 	 */
-	protected MarkerInfo getInfo()
+	private MarkerInfo getInfo()
 	{
 		return getMarkerManager().findMarkerInfo(resource, id);
 	}

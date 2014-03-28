@@ -92,7 +92,7 @@ public class ImmutableTupleN
 	/**
 	 * @return the size of this tuple.
 	 */
-	public int size()
+	int size()
 	{
 		return this.tuple.length;
 	}

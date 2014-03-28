@@ -105,7 +105,7 @@ public class TaskTag
 	 * Add a pref change listener for changes to values, set up starting values. This is a performance change so we
 	 * don't lookup the preference values repeatedly.
 	 */
-	protected synchronized static void initializeValues()
+	private synchronized static void initializeValues()
 	{
 		if (fgPrefListener == null)
 		{
@@ -151,7 +151,7 @@ public class TaskTag
 	 * 
 	 * @return
 	 */
-	protected static List<TaskTag> getCurrentTaskTags()
+	private static List<TaskTag> getCurrentTaskTags()
 	{
 		try
 		{

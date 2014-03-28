@@ -183,7 +183,7 @@ public class ResourceUtil
 	 *            An {@link IProject} reference. Can be null.
 	 * @return the currently stored line separator
 	 */
-	public static String getLineSeparatorValue(IProject project)
+	static String getLineSeparatorValue(IProject project)
 	{
 		IScopeContext scope;
 		if (project != null)
@@ -299,7 +299,7 @@ public class ResourceUtil
 	 * @param builderId
 	 * @throws CoreException
 	 */
-	public static boolean removeBuilder(IProjectDescription description, String builderId)
+	private static boolean removeBuilder(IProjectDescription description, String builderId)
 	{
 		ICommand[] commands = description.getBuildSpec();
 		boolean removeBuilder = false;
@@ -378,7 +378,7 @@ public class ResourceUtil
 	 * @param id
 	 * @throws CoreException
 	 */
-	public static boolean removeNature(IProject project, String id) throws CoreException
+	static boolean removeNature(IProject project, String id) throws CoreException
 	{
 		IProjectDescription desc = project.getDescription();
 		if (removeNature(desc, id))
@@ -396,7 +396,7 @@ public class ResourceUtil
 	 * @param natureId
 	 * @return
 	 */
-	public static boolean removeNature(IProjectDescription description, String natureId)
+	static boolean removeNature(IProjectDescription description, String natureId)
 	{
 		String[] natures = description.getNatureIds();
 		boolean removeNature = false;

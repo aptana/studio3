@@ -246,7 +246,7 @@ public final class ZipUtil
 	 * @return
 	 * @throws IOException
 	 */
-	public static InputStream openEntry(File zipFile, IPath path) throws IOException
+	static InputStream openEntry(File zipFile, IPath path) throws IOException
 	{
 		ZipFile zip = new ZipFile(zipFile);
 		ZipEntry entry = zip.getEntry(path.makeRelative().toPortableString());

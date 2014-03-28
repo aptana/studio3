@@ -90,13 +90,9 @@ public interface IProblem
 	 */
 	public static final String ID = "id"; //$NON-NLS-1$
 
-	/**
-	 */
-	public static final String FLAGS = "flags"; //$NON-NLS-1$
+	
 
-	/**
-	 */
-	public static final String ARGUMENTS = "arguments"; //$NON-NLS-1$
+	
 
 	/**
 	 * The attribute used for differentiating multiple markers.

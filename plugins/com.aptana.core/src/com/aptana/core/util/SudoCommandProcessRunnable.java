@@ -16,11 +16,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
  * 
  * @author pinnamuri
  */
-public class SudoCommandProcessRunnable extends ProcessRunnable
+class SudoCommandProcessRunnable extends ProcessRunnable
 {
 	private char[] password;
 
-	public SudoCommandProcessRunnable(Process p, IProgressMonitor monitor, boolean isErrRedirected, char[] password)
+	SudoCommandProcessRunnable(Process p, IProgressMonitor monitor, boolean isErrRedirected, char[] password)
 	{
 		super(p, monitor, isErrRedirected);
 		this.password = password;

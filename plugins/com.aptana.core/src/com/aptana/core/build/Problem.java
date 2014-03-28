@@ -31,7 +31,7 @@ public class Problem implements IProblem
 		this(severity, message, offset, length, lineNumber, sourcePath, IMarker.PRIORITY_NORMAL);
 	}
 
-	public Problem(int severity, String message, int offset, int length, int lineNumber, String sourcePath, int priority)
+	Problem(int severity, String message, int offset, int length, int lineNumber, String sourcePath, int priority)
 	{
 		this.severity = severity;
 		this.message = message;

@@ -75,7 +75,7 @@ public final class IdeLog
 	 * 
 	 * @return - true if debugging
 	 */
-	public static boolean isSeverityEnabled(StatusLevel debugLevel)
+	private static boolean isSeverityEnabled(StatusLevel debugLevel)
 	{
 		if (caching)
 		{
@@ -137,7 +137,7 @@ public final class IdeLog
 	 * @param scope
 	 * @return
 	 */
-	public static boolean isScopeEnabled(String scope)
+	private static boolean isScopeEnabled(String scope)
 	{
 		if (scope != null)
 		{
@@ -196,7 +196,7 @@ public final class IdeLog
 	 * 
 	 * @return
 	 */
-	public static boolean isOutputEnabled(Plugin plugin, StatusLevel severity, String scope)
+	private static boolean isOutputEnabled(Plugin plugin, StatusLevel severity, String scope)
 	{
 		if (!isSeverityEnabled(severity))
 		{
@@ -581,7 +581,7 @@ public final class IdeLog
 	 * @param message
 	 * @param th
 	 */
-	public static void log(Plugin plugin, int severity, String message, String scope, Throwable th)
+	private static void log(Plugin plugin, int severity, String message, String scope, Throwable th)
 	{
 		String tempMessage = buildMessage(plugin, severity, message, scope, th);
 		String symbolicName = CorePlugin.PLUGIN_ID;
@@ -603,7 +603,7 @@ public final class IdeLog
 	 * @param th
 	 * @return
 	 */
-	public static String buildMessage(Plugin plugin, int severity, String message, String scope, Throwable th)
+	private static String buildMessage(Plugin plugin, int severity, String message, String scope, Throwable th)
 	{
 		if (scope == null)
 		{

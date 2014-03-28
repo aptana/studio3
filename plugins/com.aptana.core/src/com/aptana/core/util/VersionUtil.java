@@ -367,7 +367,7 @@ public final class VersionUtil
 	 * @param versionString
 	 * @return True, if the given string is a range representation.
 	 */
-	protected static boolean isRange(String versionString)
+	private static boolean isRange(String versionString)
 	{
 		versionString = versionString.trim();
 		if (versionString.charAt(0) == '[' || versionString.charAt(0) == '(')
@@ -394,7 +394,7 @@ public final class VersionUtil
 	 * @param installedVer
 	 * @return The 'synthesized' version of the given version string; <code>null</code> if no version was detected.
 	 */
-	public static Version getVersion(String version)
+	private static Version getVersion(String version)
 	{
 		return VersionUtil.parseVersion(version);
 	}

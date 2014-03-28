@@ -89,7 +89,7 @@ public final class ExecutableUtil
 	 * @param workingDirectory
 	 * @return
 	 */
-	public static IPath find(String executableName, boolean appendExtension, List<IPath> searchLocations,
+	private static IPath find(String executableName, boolean appendExtension, List<IPath> searchLocations,
 			FileFilter filter, IPath workingDirectory)
 	{
 		if (executableName == null)
@@ -149,7 +149,7 @@ public final class ExecutableUtil
 	 * @param workingDirectory
 	 * @return
 	 */
-	public static IPath findInLocations(String executableName, boolean appendExtension, List<IPath> searchLocations,
+	private static IPath findInLocations(String executableName, boolean appendExtension, List<IPath> searchLocations,
 			FileFilter filter)
 	{
 		boolean infoLoggingEnabled = IdeLog.isInfoEnabled(CorePlugin.getDefault(), IDebugScopes.SHELL);

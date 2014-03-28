@@ -67,7 +67,7 @@ public abstract class ReapingObjectPool<T> implements IObjectPool<T>
 	}
 
 	// TODO Enforce pool size!
-	public ReapingObjectPool(int expirationTime)
+	private ReapingObjectPool(int expirationTime)
 	{
 		this.expirationTime = expirationTime;
 		this.locked = new Hashtable<T, Long>(poolsize);
@@ -90,7 +90,7 @@ public abstract class ReapingObjectPool<T> implements IObjectPool<T>
 	/**
 	 * Expires all unlocked instances that have past expiration time and don't validate.
 	 */
-	public synchronized void reap()
+	synchronized void reap()
 	{
 		long now = System.currentTimeMillis();
 		Enumeration<T> e = unlocked.keys();

@@ -16,8 +16,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.StringTokenizer;
+import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
@@ -63,6 +63,7 @@ public final class ShellExecutable
 
 	public static final String PATH_SEPARATOR = ":"; //$NON-NLS-1$
 	private static final String PATH = "PATH"; //$NON-NLS-1$
+	private static final String PATH_MIXED_CASE = "Path"; //$NON-NLS-1$
 
 	private static final String SH_EXE = "sh.exe"; //$NON-NLS-1$
 	private static final String BASH = "bash"; //$NON-NLS-1$
@@ -233,7 +234,7 @@ public final class ShellExecutable
 			String resultPath = workingDirEnvironment.get(PATH);
 			if (StringUtil.isEmpty(resultPath))
 			{
-				resultPath = workingDirEnvironment.get("Path");
+				resultPath = workingDirEnvironment.get(PATH_MIXED_CASE);
 			}
 			resultPath = PathUtil.convertPATH(resultPath);
 			for (String newPath : newPathLocations)
@@ -248,7 +249,7 @@ public final class ShellExecutable
 			resultPath = StringUtil.join(File.pathSeparator, pathLocations);
 			workingDirEnvironment.put(PATH, resultPath);
 			// As wonderful Windows has case-sensitive Path variable to be updated.
-			workingDirEnvironment.put("Path", resultPath);// Duplicate to Path variable as well.
+			workingDirEnvironment.put(PATH_MIXED_CASE, resultPath);// Duplicate to Path variable as well.
 		}
 	}
 
@@ -384,14 +385,7 @@ public final class ShellExecutable
 		return environment;
 	}
 
-	public static List<String> toShellCommand(String command, String... arguments) throws CoreException
-	{
-		List<String> commands = new ArrayList<String>(Arrays.asList(arguments));
-		commands.add(0, command);
-		return toShellCommand(commands);
-	}
-
-	public static Process run(List<String> command, IPath workingDirectory, Map<String, String> environment)
+	private static Process run(List<String> command, IPath workingDirectory, Map<String, String> environment)
 			throws IOException, CoreException
 	{
 		ProcessBuilder processBuilder = new ProcessBuilder(toShellCommand(command));
@@ -413,20 +407,5 @@ public final class ShellExecutable
 		List<String> commands = new ArrayList<String>(Arrays.asList(arguments));
 		commands.add(0, command);
 		return run(commands, workingDirectory, environment);
-	}
-
-	public static Process run(IPath executablePath, IPath workingDirectory, Map<String, String> environment,
-			String... arguments) throws IOException, CoreException
-	{
-		return run(executablePath.toOSString(), workingDirectory, environment, arguments);
-	}
-
-	/**
-	 * To be called when we know the ENV has changed (typically after an installer runs and alters PATH).
-	 */
-	public static void wipeCache()
-	{
-		shellEnvironment = null;
-		workingDirToEnvCache.clear();
 	}
 }
