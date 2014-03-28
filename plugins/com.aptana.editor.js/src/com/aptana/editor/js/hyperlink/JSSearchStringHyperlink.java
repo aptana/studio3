@@ -13,7 +13,6 @@ import org.eclipse.jface.text.IFindReplaceTarget;
 import org.eclipse.jface.text.IRegion;
 
 import com.aptana.core.util.CollectionsUtil;
-import com.aptana.core.util.ObjectUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.js.core.parsing.ast.IJSNodeTypes;
 import com.aptana.js.core.parsing.ast.JSIdentifierNode;
@@ -44,21 +43,43 @@ public class JSSearchStringHyperlink extends JSAbstractHyperlink
 		this.searchString = searchString;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
+	@Override
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((searchString == null) ? 0 : searchString.hashCode());
+		return result;
+	}
+
 	@Override
 	public boolean equals(Object obj)
 	{
-		boolean result = super.equals(obj);
-
-		if (result && obj instanceof JSSearchStringHyperlink)
+		if (this == obj)
 		{
-			result = ObjectUtil.areEqual(getSearchString(), ((JSSearchStringHyperlink) obj).getSearchString());
+			return true;
 		}
-
-		return result;
+		if (!super.equals(obj))
+		{
+			return false;
+		}
+		if (getClass() != obj.getClass())
+		{
+			return false;
+		}
+		JSSearchStringHyperlink other = (JSSearchStringHyperlink) obj;
+		if (searchString == null)
+		{
+			if (other.searchString != null)
+			{
+				return false;
+			}
+		}
+		else if (!searchString.equals(other.searchString))
+		{
+			return false;
+		}
+		return true;
 	}
 
 	/**
