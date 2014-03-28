@@ -28,7 +28,7 @@ import com.aptana.index.core.filter.IIndexFilterParticipant;
 
 abstract class IndexRequestJob extends Job
 {
-	public static final String INDEX_REQUEST_JOB_FAMILY = "index-request-job-family";
+	public static final String INDEX_REQUEST_JOB_FAMILY = "index-request-job-family"; //$NON-NLS-1$
 
 	private URI containerURI;
 
@@ -72,15 +72,15 @@ abstract class IndexRequestJob extends Job
 	 * 
 	 * @return
 	 */
-	protected Set<IFileStore> filterFileStores(Set<IFileStore> fileStores)
+	private Set<IFileStore> filterFileStores(Set<IFileStore> fileStores)
 	{
 		if (!CollectionsUtil.isEmpty(fileStores))
 		{
-			IndexManager manager = getIndexManager();
+			IndexManager indexManager = getIndexManager();
 
-			if (manager != null)
+			if (indexManager != null)
 			{
-				for (IIndexFilterParticipant filterParticipant : manager.getFilterParticipants())
+				for (IIndexFilterParticipant filterParticipant : indexManager.getFilterParticipants())
 				{
 					fileStores = filterParticipant.applyFilter(fileStores);
 				}
@@ -109,11 +109,11 @@ abstract class IndexRequestJob extends Job
 	protected Set<IFileStore> getContributedFiles(URI container)
 	{
 		Set<IFileStore> result = new HashSet<IFileStore>();
-		IndexManager manager = getIndexManager();
+		IndexManager indexManager = getIndexManager();
 
-		if (manager != null)
+		if (indexManager != null)
 		{
-			for (IIndexFileContributor contributor : manager.getFileContributors())
+			for (IIndexFileContributor contributor : indexManager.getFileContributors())
 			{
 				Set<IFileStore> files = contributor.getFiles(container);
 
@@ -134,9 +134,9 @@ abstract class IndexRequestJob extends Job
 	 */
 	protected Index getIndex()
 	{
-		IndexManager manager = getIndexManager();
+		IndexManager indexManager = getIndexManager();
 
-		return (manager != null) ? manager.getIndex(getContainerURI()) : null;
+		return (indexManager != null) ? indexManager.getIndex(getContainerURI()) : null;
 	}
 
 	/**

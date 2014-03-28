@@ -76,7 +76,7 @@ public class HTMLFileIndexingParticipantTest
 				@Override
 				public void putProblems(String markerType, Collection<IProblem> newItems)
 				{
-					problems.put(markerType, newItems);
+					fProblems.put(markerType, newItems);
 				}
 			};
 			indexer.index(context, index, new NullProgressMonitor());

@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class CategoryInfo
 {
-	public final String name;
+	private final String name;
 	public final int count;
 	public final int minLength;
 	public final int maxLength;
@@ -23,7 +23,7 @@ public class CategoryInfo
 	public final int median;
 	public final int average;
 
-	public CategoryInfo(String name, List<Integer> lengths)
+	CategoryInfo(String name, List<Integer> lengths)
 	{
 		this.name = name;
 
@@ -39,36 +39,36 @@ public class CategoryInfo
 		// find min, max, and sum of lengths
 		int min = (count > 0) ? Integer.MAX_VALUE : 0;
 		int max = (count > 0) ? Integer.MIN_VALUE : 0;
-		long sum = 0;
+		long tmpSum = 0;
 
 		for (int length : lengths)
 		{
 			min = Math.min(min, length);
 			max = Math.max(max, length);
-			sum += length;
+			tmpSum += length;
 		}
 
 		this.minLength = min;
 		this.maxLength = max;
-		this.sum = sum;
+		this.sum = tmpSum;
 
 		// find median
 		if (count > 0)
 		{
 			Collections.sort(lengths);
 			int mid = count / 2;
-			int median;
+			int tmpMedian;
 
 			if (count % 2 == 1 || lengths.size() == 1)
 			{
-				median = lengths.get(mid);
+				tmpMedian = lengths.get(mid);
 			}
 			else
 			{
-				median = (lengths.get(mid - 1) + lengths.get(mid)) / 2;
+				tmpMedian = (lengths.get(mid - 1) + lengths.get(mid)) / 2;
 			}
 
-			this.median = median;
+			this.median = tmpMedian;
 		}
 		else
 		{
@@ -76,6 +76,6 @@ public class CategoryInfo
 		}
 
 		// find average
-		this.average = (count > 0) ? (int) (sum / count) : 0;
+		this.average = (count > 0) ? (int) (tmpSum / count) : 0;
 	}
 }

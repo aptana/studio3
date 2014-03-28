@@ -11,7 +11,6 @@ import java.util.Set;
 
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.CollectionsUtil;
-import com.aptana.js.core.parsing.Terminals;
 
 public class JSLanguageConstants
 {

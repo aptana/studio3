@@ -156,7 +156,7 @@ public class IndexUtil
 	 * @param monitor
 	 * @return
 	 */
-	public static Set<IFileStore> getAllFiles(IFileStore file, IProgressMonitor monitor)
+	static Set<IFileStore> getAllFiles(IFileStore file, IProgressMonitor monitor)
 	{
 		// TODO We should likely call IFileSystem.fetchTree and use that if it doesn't return null (because that is more
 		// efficient in some schemes)!

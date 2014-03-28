@@ -35,7 +35,6 @@ import com.aptana.core.util.IProcessRunner;
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.ProcessRunner;
 import com.aptana.core.util.ProcessStatus;
-import com.aptana.core.util.ProcessUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.downloader.DownloadManager;
 import com.aptana.js.core.JSCorePlugin;

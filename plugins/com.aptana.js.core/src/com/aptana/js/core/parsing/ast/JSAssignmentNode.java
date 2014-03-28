@@ -23,6 +23,7 @@ public class JSAssignmentNode extends JSNode
 	 * @param assignOperator
 	 * @param right
 	 */
+	@SuppressWarnings("incomplete-switch")
 	public JSAssignmentNode(JSNode left, Symbol assignOperator, JSNode right)
 	{
 		this._operator = assignOperator;

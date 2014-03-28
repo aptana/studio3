@@ -371,7 +371,7 @@ public class IndexManager
 	 * Recreates the index for a given path, keeping the same read-write monitor. Returns the new empty index or null if
 	 * it didn't exist before. Warning: Does not check whether index is consistent (not being used)
 	 */
-	public synchronized Index recreateIndex(URI path)
+	private synchronized Index recreateIndex(URI path)
 	{
 		try
 		{

@@ -15,9 +15,6 @@ import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.Document;
-import org.eclipse.jface.text.IDocument;
 
 import com.aptana.core.IMap;
 import com.aptana.core.build.AbstractBuildParticipant;
@@ -39,13 +36,6 @@ public class JSParserValidator extends AbstractBuildParticipant
 	 * Temporary problem collector used during {@link #buildFile(BuildContext, IProgressMonitor)}.
 	 */
 	private List<IProblem> fProblems;
-
-	/**
-	 * A re-used {@link IDocument} object wrapping the current {@link BuildContext}s source. Useful for asking for line
-	 * numbers in a performant way. Temporary lifecycle, should get instantiated on-demand, and cleaned up at the end of
-	 * {@link #buildFile(BuildContext, IProgressMonitor)}
-	 */
-	private Document fDocument;
 
 	private URI fLocation;
 	private String fPath;
@@ -95,7 +85,7 @@ public class JSParserValidator extends AbstractBuildParticipant
 					public IProblem map(IParseError parseError)
 					{
 						return new Problem(parseError.getSeverity().intValue(), parseError.getMessage(), parseError
-								.getOffset(), parseError.getLength(), getLine(parseError.getOffset()), fPath);
+								.getOffset(), parseError.getLength(), getLine(fContext, parseError.getOffset()), fPath);
 					}
 				}));
 			}
@@ -113,41 +103,5 @@ public class JSParserValidator extends AbstractBuildParticipant
 		this.fPath = null;
 		this.fLocation = null;
 		this.fContext = null;
-	}
-
-	/**
-	 * Determine the line number for the offset.
-	 * 
-	 * @param offset
-	 * @return
-	 */
-	private int getLine(int offset)
-	{
-		try
-		{
-			return getDocument(fContext).getLineOfOffset(offset) + 1;
-		}
-		catch (BadLocationException e)
-		{
-			// ignore
-		}
-		return -1;
-	}
-
-	/**
-	 * Lazily instantiate an {@link IDocument} to wrap the source for querying line numbers. See
-	 * {@link #getLine(BuildContext, int)}
-	 * 
-	 * @param context
-	 * @return
-	 */
-	private IDocument getDocument(BuildContext context)
-	{
-		if (this.fDocument == null)
-		{
-			String source = context.getContents();
-			this.fDocument = new Document(source);
-		}
-		return this.fDocument;
 	}
 }
