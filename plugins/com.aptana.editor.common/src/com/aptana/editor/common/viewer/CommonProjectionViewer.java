@@ -52,9 +52,9 @@ public class CommonProjectionViewer extends ProjectionViewer implements IAdaptab
 	private static final int RULER_EDITOR_GAP = 5;
 
 	protected ExpandSnippetVerifyKeyListener fKeyListener;
-	protected IContentAssistant fSnippetContentAssistant;
+	private IContentAssistant fSnippetContentAssistant;
 
-	protected IEclipsePreferences fPreferenceStore;
+	private IEclipsePreferences fPreferenceStore;
 
 	/**
 	 * @param parent

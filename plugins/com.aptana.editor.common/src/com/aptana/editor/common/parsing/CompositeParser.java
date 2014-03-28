@@ -27,10 +27,10 @@ import com.aptana.parsing.ast.ParseNode;
 
 public class CompositeParser extends AbstractParser
 {
-	protected CompositeParserScanner fScanner;
+	private CompositeParserScanner fScanner;
 	private String fParserLanguage;
-	protected IParseNode fEmbeddedlanguageRoot;
-	protected Symbol fCurrentSymbol;
+	private IParseNode fEmbeddedlanguageRoot;
+	private Symbol fCurrentSymbol;
 
 	public CompositeParser(CompositeParserScanner defaultScanner, String primaryParserLanguage)
 	{

@@ -107,7 +107,7 @@ class TaskTagInputDialog extends StatusDialog
 		return new TaskTag(fTagName, fPriority);
 	}
 
-	protected void verifyUniqueTagName()
+	private void verifyUniqueTagName()
 	{
 		if (fTagName.length() == 0)
 		{

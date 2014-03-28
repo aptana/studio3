@@ -83,7 +83,7 @@ public class FoldingActionsGroup extends ActionGroup
 	/**
 	 * Update all the actions
 	 */
-	protected void update()
+	private void update()
 	{
 		collapseAction.update();
 		expandAction.update();

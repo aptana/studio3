@@ -73,7 +73,7 @@ public class URIResolver implements IPathResolver
 		return IOUtil.read(new FileInputStream(aFile));
 	}
 
-	protected IFileStore getFileStore(URI uri) throws CoreException
+	private IFileStore getFileStore(URI uri) throws CoreException
 	{
 		IFileSystem fileSystem = EFS.getFileSystem(uri.getScheme());
 		if (fileSystem == null)

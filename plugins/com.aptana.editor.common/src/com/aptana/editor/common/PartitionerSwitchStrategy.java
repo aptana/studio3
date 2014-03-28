@@ -23,7 +23,7 @@ public abstract class PartitionerSwitchStrategy implements IPartitionerSwitchStr
 		this(switchSequencePairs, null, null);
 	}
 
-	protected PartitionerSwitchStrategy(String[][] switchSequencePairs, ISequenceBypassHandler startBypassHandler, ISequenceBypassHandler endBypassHandler) {
+	private PartitionerSwitchStrategy(String[][] switchSequencePairs, ISequenceBypassHandler startBypassHandler, ISequenceBypassHandler endBypassHandler) {
 		char[][] startSequences = new char[switchSequencePairs.length][];
 		char[][] endSequences = new char[switchSequencePairs.length][];
 		for (int i = 0; i < switchSequencePairs.length; ++i) {

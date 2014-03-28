@@ -58,7 +58,7 @@ public final class TextUtils {
 	 * @param arraysArray
 	 * @return
 	 */
-	public static String[][] combineArrays(String[][]... arraysArray) {
+	static String[][] combineArrays(String[][]... arraysArray) {
 		List<String[]> list = new ArrayList<String[]>();
 		for (String[][] arrays : arraysArray) {
 			for (String[] array : arrays) {
@@ -73,7 +73,7 @@ public final class TextUtils {
 		return arrays;
 	}
 
-	public static char[][] removeDuplicates(char[][] arrays) {
+	static char[][] removeDuplicates(char[][] arrays) {
 		List<char[]> list = new ArrayList<char[]>();
 		Set<String> strings = new HashSet<String>();
 		for (char[] i : arrays) {

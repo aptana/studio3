@@ -37,7 +37,7 @@ public final class Utilities
 	 * @param fileName
 	 * @return IEditorInput
 	 */
-	public static IEditorInput createFileEditorInput(File file, final String name)
+	static IEditorInput createFileEditorInput(File file, final String name)
 	{
 		IEditorInput input = null;
 		IFileSystem fs = EFS.getLocalFileSystem();
@@ -53,7 +53,7 @@ public final class Utilities
 		return input;
 	}
 
-	public static File getFile()
+	static File getFile()
 	{
 		IPath stateLocation = CommonEditorPlugin.getDefault().getStateLocation();
 		IPath path = stateLocation.append("/_" + new Object().hashCode()); //$NON-NLS-1$ 

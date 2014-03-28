@@ -27,10 +27,10 @@ import com.aptana.scripting.model.SnippetElement;
 public class SnippetTransfer extends ByteArrayTransfer
 {
 
-	static SnippetTransfer _instance = new SnippetTransfer();
+	private static SnippetTransfer _instance = new SnippetTransfer();
 
-	static final String ID_NAME = "SNIPPET_TRANSFER"; //$NON-NLS-1$
-	static final int[] IDS = new int[] { registerType(ID_NAME) };
+	private static final String ID_NAME = "SNIPPET_TRANSFER"; //$NON-NLS-1$
+	private static final int[] IDS = new int[] { registerType(ID_NAME) };
 
 	public static SnippetTransfer getInstance()
 	{

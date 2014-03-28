@@ -160,7 +160,7 @@ public class EditorUtil
 	 *            A file URI
 	 * @return the descriptor of the default editor, or null if not found
 	 */
-	public static IEditorDescriptor getEditorDescriptor(URI uri)
+	private static IEditorDescriptor getEditorDescriptor(URI uri)
 	{
 		// NOTE: Moved from PHP's EditorUtils
 		String uriPath = uri.getPath();
@@ -211,7 +211,7 @@ public class EditorUtil
 		return null;
 	}
 
-	protected static IndexManager getIndexManager()
+	private static IndexManager getIndexManager()
 	{
 		return IndexPlugin.getDefault().getIndexManager();
 	}

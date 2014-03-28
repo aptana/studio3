@@ -29,7 +29,7 @@ public class ExtendedToken extends Token {
 	/**
 	 * @param data
 	 */
-	public ExtendedToken(Object data) {
+	private ExtendedToken(Object data) {
 		super(data);
 	}
 
@@ -52,7 +52,7 @@ public class ExtendedToken extends Token {
 	 * @param beginIndex
 	 * @return
 	 */
-	public String getContentSubstring(int beginIndex) {
+	String getContentSubstring(int beginIndex) {
 		if (contents != null && contents.length() > beginIndex) {
 			return contents.substring(beginIndex);
 		}

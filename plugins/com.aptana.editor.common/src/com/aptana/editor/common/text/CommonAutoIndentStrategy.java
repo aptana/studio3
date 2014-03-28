@@ -32,10 +32,10 @@ import com.aptana.editor.common.preferences.IPreferenceConstants;
 public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 {
 	private static final String SPACE = " "; //$NON-NLS-1$
-	protected static final char COMMENT_CHAR = '*';
-	protected static final String DOCUMENTATION_START = "/**"; //$NON-NLS-1$
-	protected static final String COMMENT_END = "*/"; //$NON-NLS-1$
-	protected static final String COMMENT_START = "/*"; //$NON-NLS-1$
+	private static final char COMMENT_CHAR = '*';
+	private static final String DOCUMENTATION_START = "/**"; //$NON-NLS-1$
+	private static final String COMMENT_END = "*/"; //$NON-NLS-1$
+	private static final String COMMENT_START = "/*"; //$NON-NLS-1$
 	private String fContentType;
 	private SourceViewerConfiguration fViewerConfiguration;
 	private ISourceViewer fSourceViewer;
@@ -237,7 +237,7 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 		return buf.toString();
 	}
 
-	protected boolean checkNextLineForComment(IDocument document, DocumentCommand command)
+	private boolean checkNextLineForComment(IDocument document, DocumentCommand command)
 	{
 		try
 		{
@@ -252,7 +252,7 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 		return false;
 	}
 
-	protected void handleScriptDoc(IDocument document, DocumentCommand command, StringBuilder buf,
+	private void handleScriptDoc(IDocument document, DocumentCommand command, StringBuilder buf,
 			String commentIndent, String lineDelimiter)
 	{
 		buf.append(commentIndent).append(COMMENT_CHAR).append(SPACE);
@@ -295,71 +295,6 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 		}
 		// TODO Check the scope?
 		return false;
-	}
-
-	/**
-	 * Calculates the whitespace prefix based on user preferences and the existing line, e.g. if the line prefix is five
-	 * spaces, and user pref is tabs of width 4, then the result will be "/t ".
-	 * 
-	 * @param d
-	 *            the document
-	 * @param offset
-	 *            the offset at which searching starts
-	 * @param end
-	 *            the offset at which searching ends
-	 * @return Returns the whitespace prefix based on user preferences and the existing line
-	 */
-	protected String getIndentationString(IDocument d, int offset, int end)
-	{
-		String lineIndent = ""; //$NON-NLS-1$
-		try
-		{
-			lineIndent = d.get(offset, end - offset);
-		}
-		catch (BadLocationException e)
-		{
-		}
-		if (lineIndent.equals("")) { //$NON-NLS-1$
-			return lineIndent;
-		}
-
-		int indentSize = 0;
-		int tabWidth = Math.max(1, getTabWidth());
-		char[] indentChars = lineIndent.toCharArray();
-		for (char e : indentChars)
-		{
-			if (e == '\t')
-			{
-				indentSize += tabWidth - (indentSize % tabWidth);
-			}
-			else
-			{
-				indentSize++;
-			}
-		}
-
-		String indentCharStr = getIndentCharString();
-		int indentStringWidth = indentCharStr.equals("\t") ? tabWidth : indentCharStr.length(); //$NON-NLS-1$
-		// return in case tab width is zero
-		if (indentStringWidth == 0)
-		{
-			return ""; //$NON-NLS-1$
-		}
-
-		String indentation = ""; //$NON-NLS-1$
-		int indentCount = indentSize / indentStringWidth;
-		for (int i = 0; i < indentCount; ++i)
-		{
-			indentation += indentCharStr;
-		}
-
-		int spaceCount = indentSize % indentStringWidth;
-		for (int i = 0; i < spaceCount; ++i)
-		{
-			indentation += SPACE;
-		}
-
-		return indentation;
 	}
 
 	protected int getTabWidth()

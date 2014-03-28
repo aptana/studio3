@@ -29,7 +29,7 @@ import com.aptana.theme.ThemeRule;
 public class EditorPropertySource implements IPropertySource
 {
 	// Property Descriptors
-	static protected IPropertyDescriptor[] propertyDescriptors;
+	static private IPropertyDescriptor[] propertyDescriptors;
 
 	static
 	{
@@ -76,7 +76,7 @@ public class EditorPropertySource implements IPropertySource
 
 	private final IAdaptable adaptableObject;
 
-	public EditorPropertySource(IAdaptable adaptableObject)
+	EditorPropertySource(IAdaptable adaptableObject)
 	{
 		this.adaptableObject = adaptableObject;
 	}

@@ -55,9 +55,9 @@ import com.aptana.ui.epl.scripting.snippets.PositionBasedCompletionProposal;
 public class SnippetTemplateProposal extends TemplateProposal implements ICommonCompletionProposal,
 		ICompletionProposalExtension6, Comparable<ICompletionProposal>
 {
-	protected ICompletionProposal[] templateProposals;
-	protected char triggerChar;
-	protected char[] triggerChars;
+	private ICompletionProposal[] templateProposals;
+	private char triggerChar;
+	private char[] triggerChars;
 
 	private final Template fTemplate;
 	private final TemplateContext fContext;
@@ -79,7 +79,7 @@ public class SnippetTemplateProposal extends TemplateProposal implements ICommon
 	 */
 	private Integer fReplaceOffset;
 
-	public SnippetTemplateProposal(Template template, TemplateContext context, IRegion region, Image image,
+	SnippetTemplateProposal(Template template, TemplateContext context, IRegion region, Image image,
 			int relevance)
 	{
 		super(template, context, region, image, relevance);
@@ -387,7 +387,7 @@ public class SnippetTemplateProposal extends TemplateProposal implements ICommon
 	 * @param indentedPattern
 	 * @return
 	 */
-	protected String conformIndents(String prefix, String indentedPattern)
+	private String conformIndents(String prefix, String indentedPattern)
 	{
 		boolean useTabs = prefix.contains("\t"); //$NON-NLS-1$
 		int indentSize = EditorUtil.getSpaceIndentSize();
@@ -559,7 +559,7 @@ public class SnippetTemplateProposal extends TemplateProposal implements ICommon
 		TRIGGER_CHARS.getChars(0, triggerChars.length, triggerChars, 0);
 	}
 
-	protected static boolean contains(char[] characters, char c)
+	private static boolean contains(char[] characters, char c)
 	{
 		if (characters == null)
 			return false;

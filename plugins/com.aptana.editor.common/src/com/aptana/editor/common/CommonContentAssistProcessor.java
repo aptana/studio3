@@ -465,7 +465,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 * @param index
 	 * @param completionProposals
 	 */
-	protected void computeCompletionProposalsUsingIndex(ITextViewer viewer, int offset, Index index,
+	private void computeCompletionProposalsUsingIndex(ITextViewer viewer, int offset, Index index,
 			List<ICompletionProposal> completionProposals)
 	{
 	}
@@ -535,7 +535,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 * 
 	 * @return
 	 */
-	protected BundleManager getBundleManager()
+	private BundleManager getBundleManager()
 	{
 		return BundleManager.getInstance();
 	}
@@ -567,7 +567,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		return null;
 	}
 
-	protected IDocumentScopeManager getDocumentScopeManager()
+	private IDocumentScopeManager getDocumentScopeManager()
 	{
 		return CommonEditorPlugin.getDefault().getDocumentScopeManager();
 	}

@@ -34,7 +34,7 @@ public class SequenceCharacterScanner implements ICharacterScanner {
 	/**
 	 * @param baseCharacterScanner
 	 */
-	public SequenceCharacterScanner(ICharacterScanner characterScanner, IPartitionScannerSwitchStrategy switchStrategy) {
+	SequenceCharacterScanner(ICharacterScanner characterScanner, IPartitionScannerSwitchStrategy switchStrategy) {
 		this(characterScanner, switchStrategy, false);
 	}
 
@@ -100,7 +100,7 @@ public class SequenceCharacterScanner implements ICharacterScanner {
 		return foundSequence(true);
 	}
 
-	public boolean foundSequence(boolean reset) {
+	boolean foundSequence(boolean reset) {
 		try {
 			return found;
 		} finally {

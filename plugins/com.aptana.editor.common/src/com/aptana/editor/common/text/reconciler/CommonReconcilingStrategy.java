@@ -135,7 +135,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		fDocument = document;
 	}
 
-	protected IFoldingComputer createFoldingComputer(IDocument document)
+	private IFoldingComputer createFoldingComputer(IDocument document)
 	{
 		return fEditor.createFoldingComputer(document);
 	}
@@ -156,7 +156,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	}
 
 	// FIXME Can folding be made into a build participant?
-	protected void calculatePositions(boolean initialReconcile, IProgressMonitor monitor, IParseRootNode ast)
+	private void calculatePositions(boolean initialReconcile, IProgressMonitor monitor, IParseRootNode ast)
 	{
 		if (monitor != null && monitor.isCanceled())
 		{
@@ -215,7 +215,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	/**
 	 * Update the folding positions in the document
 	 */
-	protected void updatePositions()
+	private void updatePositions()
 	{
 		AbstractThemeableEditor editor = fEditor;
 		if (editor != null)
@@ -344,7 +344,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		sub.done();
 	}
 
-	protected IBuildParticipantManager getBuildParticipantManager()
+	private IBuildParticipantManager getBuildParticipantManager()
 	{
 		return BuildPathCorePlugin.getDefault().getBuildParticipantManager();
 	}

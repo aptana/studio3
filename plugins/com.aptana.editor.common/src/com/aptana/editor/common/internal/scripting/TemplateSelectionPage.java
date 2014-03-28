@@ -153,12 +153,12 @@ public class TemplateSelectionPage extends WizardPage implements ISelectionChang
 		return null;
 	}
 
-	protected void initializeViewer()
+	private void initializeViewer()
 	{
 		selectInitialTemplate();
 	}
 
-	protected void selectInitialTemplate()
+	private void selectInitialTemplate()
 	{
 		// Select the first one on the list as the initial one
 		if (templates.length > 0)
@@ -174,7 +174,7 @@ public class TemplateSelectionPage extends WizardPage implements ISelectionChang
 	 * @param composite
 	 *            Parent composite.
 	 */
-	protected void createPreview(Composite composite)
+	private void createPreview(Composite composite)
 	{
 		scroll = new ScrolledComposite(composite, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
 		scroll.setLayout(new GridLayout());
@@ -191,7 +191,7 @@ public class TemplateSelectionPage extends WizardPage implements ISelectionChang
 	 * 
 	 * @param template
 	 */
-	protected void setPreviewContent(TemplateElement template)
+	private void setPreviewContent(TemplateElement template)
 	{
 		WizardNewFileCreationPage fileCreationPage = (WizardNewFileCreationPage) getPreviousPage();
 		String templateContent = null;
@@ -216,7 +216,7 @@ public class TemplateSelectionPage extends WizardPage implements ISelectionChang
 		scroll.setMinSize(templatePreview.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 	}
 
-	protected void createAbove(Composite container, int span)
+	private void createAbove(Composite container, int span)
 	{
 		useTemplateBt = new Button(container, SWT.CHECK);
 		useTemplateBt.setText(Messages.TemplateSelectionPage_use_templates_button_text);

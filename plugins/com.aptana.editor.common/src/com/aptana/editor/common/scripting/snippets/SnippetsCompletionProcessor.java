@@ -121,7 +121,7 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 		return new SnippetTemplateContextType(contentTypeString);
 	}
 
-	protected IDocumentScopeManager getDocumentScopeManager()
+	private IDocumentScopeManager getDocumentScopeManager()
 	{
 		return CommonEditorPlugin.getDefault().getDocumentScopeManager();
 	}
@@ -242,7 +242,7 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 	 * @param prefix
 	 * @param proposals
 	 */
-	public void setSelectedProposal(String prefix, ICompletionProposal[] proposals)
+	private void setSelectedProposal(String prefix, ICompletionProposal[] proposals)
 	{
 		if (prefix == null || prefix.equals(StringUtil.EMPTY) || proposals == null)
 		{

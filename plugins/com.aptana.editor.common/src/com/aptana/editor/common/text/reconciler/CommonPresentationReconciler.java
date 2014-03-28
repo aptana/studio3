@@ -34,8 +34,6 @@ import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.ICommonEditorSystemProperties;
 import com.aptana.editor.common.IDebugScopes;
 import com.aptana.editor.common.Regions;
-import com.aptana.theme.Theme;
-import com.aptana.theme.ThemePlugin;
 import com.aptana.ui.util.UIUtils;
 
 /**
@@ -130,7 +128,7 @@ public class CommonPresentationReconciler extends PresentationReconciler
 		}
 	}
 
-	protected TextPresentation createPresentation(IRegion damage, IDocument document, IProgressMonitor monitor)
+	private TextPresentation createPresentation(IRegion damage, IDocument document, IProgressMonitor monitor)
 	{
 		try
 		{
@@ -196,11 +194,6 @@ public class CommonPresentationReconciler extends PresentationReconciler
 		{
 			return null;
 		}
-	}
-
-	protected Theme getCurrentTheme()
-	{
-		return ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
 	}
 
 	private void processDamage(IRegion damage, IDocument document, IProgressMonitor monitor)

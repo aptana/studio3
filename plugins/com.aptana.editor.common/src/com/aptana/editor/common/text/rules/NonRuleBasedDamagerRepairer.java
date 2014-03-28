@@ -43,9 +43,9 @@ public class NonRuleBasedDamagerRepairer implements IPresentationDamager, IPrese
 {
 
 	/** The document this object works on */
-	protected IDocument fDocument;
+	private IDocument fDocument;
 	/** The default text attribute if non is returned as data by the current token */
-	protected IToken fDefaultTextAttribute;
+	private IToken fDefaultTextAttribute;
 	private String fFullScope;
 
 	/**
@@ -76,7 +76,7 @@ public class NonRuleBasedDamagerRepairer implements IPresentationDamager, IPrese
 	 * @exception BadLocationException
 	 *                if offset is invalid in the current document
 	 */
-	protected int endOfLineOf(int offset) throws BadLocationException
+	private int endOfLineOf(int offset) throws BadLocationException
 	{
 
 		IRegion info = fDocument.getLineInformationOfOffset(offset);
@@ -230,7 +230,7 @@ public class NonRuleBasedDamagerRepairer implements IPresentationDamager, IPrese
 		return object;
 	}
 
-	protected TextAttribute getTextAttribute(ITypedRegion region)
+	private TextAttribute getTextAttribute(ITypedRegion region)
 	{
 		Object data = fDefaultTextAttribute.getData();
 		if (data instanceof String)
@@ -281,7 +281,7 @@ public class NonRuleBasedDamagerRepairer implements IPresentationDamager, IPrese
 	 * @param attr
 	 *            the attribute describing the style of the range to be styled
 	 */
-	protected void addRange(TextPresentation presentation, int offset, int length, TextAttribute attr)
+	private void addRange(TextPresentation presentation, int offset, int length, TextAttribute attr)
 	{
 		if (attr != null)
 		{
@@ -290,12 +290,12 @@ public class NonRuleBasedDamagerRepairer implements IPresentationDamager, IPrese
 		}
 	}
 
-	protected IDocumentScopeManager getDocumentScopeManager()
+	private IDocumentScopeManager getDocumentScopeManager()
 	{
 		return CommonEditorPlugin.getDefault().getDocumentScopeManager();
 	}
 
-	protected IThemeManager getThemeManager()
+	private IThemeManager getThemeManager()
 	{
 		return ThemePlugin.getDefault().getThemeManager();
 	}

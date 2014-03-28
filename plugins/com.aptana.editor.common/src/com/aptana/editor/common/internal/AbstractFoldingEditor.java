@@ -191,7 +191,7 @@ public class AbstractFoldingEditor extends AbstractDecoratedTextEditor implement
 		}
 	}
 
-	protected ProjectionAnnotationModel getAnnotationModel()
+	private ProjectionAnnotationModel getAnnotationModel()
 	{
 		ISourceViewer viewer = getSourceViewer();
 		if (viewer instanceof ProjectionViewer)

@@ -78,17 +78,17 @@ public abstract class CommonMergeViewer extends TextMergeViewer
 		return IDocumentExtension3.DEFAULT_PARTITIONING;
 	}
 
-	protected Theme getCurrentTheme()
+	private Theme getCurrentTheme()
 	{
 		return getThemeManager().getCurrentTheme();
 	}
 
-	protected IThemeManager getThemeManager()
+	private IThemeManager getThemeManager()
 	{
 		return ThemePlugin.getDefault().getThemeManager();
 	}
 
-	protected ColorManager getColorManager()
+	private ColorManager getColorManager()
 	{
 		return ThemePlugin.getDefault().getColorManager();
 	}

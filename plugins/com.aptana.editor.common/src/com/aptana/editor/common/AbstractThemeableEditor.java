@@ -909,7 +909,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		}
 	}
 
-	public Object computeHighlightedOutlineNode(int caretOffset)
+	private Object computeHighlightedOutlineNode(int caretOffset)
 	{
 		return getOutlineElementAt(caretOffset);
 	}
@@ -1169,7 +1169,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	/**
 	 * Override this method to calculate the ast (while maintaining the document time based cache).
 	 */
-	protected ParseResult doGetAST(IDocument document) throws Exception
+	private ParseResult doGetAST(IDocument document) throws Exception
 	{
 		return ParserPoolFactory.parse(getContentType(), document.get());
 	}

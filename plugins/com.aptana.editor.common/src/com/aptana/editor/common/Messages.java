@@ -42,7 +42,7 @@ public class Messages extends NLS
 	{
 	}
 
-	public static ResourceBundle getBundleForConstructedKeys()
+	static ResourceBundle getBundleForConstructedKeys()
 	{
 		return fgBundleForConstructedKeys;
 	}

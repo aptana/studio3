@@ -51,7 +51,7 @@ public final class Regions implements Iterable<IRegion> {
 	/**
 	 * Construct from list of regions
 	 */
-	public Regions(IRegion... region) {
+	Regions(IRegion... region) {
 		append(region);
 	}
 

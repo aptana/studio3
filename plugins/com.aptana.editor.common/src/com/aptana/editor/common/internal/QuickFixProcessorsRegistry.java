@@ -42,7 +42,7 @@ public class QuickFixProcessorsRegistry implements IQuickFixProcessorsRegistry
 		{
 			return null;
 		}
-		IdeLog.logInfo(CommonEditorPlugin.getDefault(), "GetQuickFixProcessor:" + contentType);
+		IdeLog.logInfo(CommonEditorPlugin.getDefault(), "GetQuickFixProcessor:" + contentType); //$NON-NLS-1$
 		lazyLoad();
 		LazyQuickFixProcessor processor = processorsMap.get(contentType);
 		if (processor != null)
@@ -61,7 +61,7 @@ public class QuickFixProcessorsRegistry implements IQuickFixProcessorsRegistry
 	{
 		if (processorsMap == null)
 		{
-			IdeLog.logInfo(CommonEditorPlugin.getDefault(), "lazyload");
+			IdeLog.logInfo(CommonEditorPlugin.getDefault(), "lazyload"); //$NON-NLS-1$
 			final ArrayList<LazyQuickFixProcessor> temp = new ArrayList<LazyQuickFixProcessor>();
 			IExtensionPoint extensionPoint = getExtensionPoint();
 			EclipseUtil.processElements(extensionPoint, new IConfigurationElementProcessor()
@@ -99,7 +99,7 @@ public class QuickFixProcessorsRegistry implements IQuickFixProcessorsRegistry
 		private IConfigurationElement element;
 		private IQuickAssistProcessor wrapped;
 
-		public LazyQuickFixProcessor(IConfigurationElement element)
+		private LazyQuickFixProcessor(IConfigurationElement element)
 		{
 			this.element = element;
 		}

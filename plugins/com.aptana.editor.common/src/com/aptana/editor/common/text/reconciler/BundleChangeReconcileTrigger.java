@@ -43,13 +43,13 @@ public class BundleChangeReconcileTrigger implements LoadCycleListener
 	/**
 	 *
 	 */
-	public BundleChangeReconcileTrigger(CommonReconciler reconciler)
+	BundleChangeReconcileTrigger(CommonReconciler reconciler)
 	{
 		this.reconciler = reconciler;
 		BundleManager.getInstance().addLoadCycleListener(this);
 	}
 
-	public void dispose()
+	void dispose()
 	{
 		BundleManager.getInstance().removeLoadCycleListener(this);
 	}

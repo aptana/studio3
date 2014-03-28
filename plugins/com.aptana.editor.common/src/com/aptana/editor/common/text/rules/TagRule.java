@@ -44,7 +44,7 @@ public class TagRule extends ResumableMultiLineRule {
 		this("<" + tag, ">", token, ignoreCase); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
-	protected TagRule(String startSequence, String endSequence, IToken token, boolean ignoreCase) {
+	private TagRule(String startSequence, String endSequence, IToken token, boolean ignoreCase) {
 		super(startSequence, endSequence, token, (char) 0, true);
 		fIgnoreCase = ignoreCase;
 	}

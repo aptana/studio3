@@ -123,7 +123,7 @@ public class ThemedInformationControl extends InformationControl implements IInf
 		return ThemePlugin.getDefault().getColorManager();
 	}
 
-	protected Theme getCurrentTheme() {
+	private Theme getCurrentTheme() {
 		return ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
 	}
 

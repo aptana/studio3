@@ -253,7 +253,7 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener {
 	 * 
 	 * @param editor
 	 */
-	public CommonOccurrencesUpdater(AbstractThemeableEditor editor) {
+	CommonOccurrencesUpdater(AbstractThemeableEditor editor) {
 		this.editor = editor;
 	}
 
@@ -284,7 +284,7 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener {
 	 * 
 	 * @return
 	 */
-	protected IAnnotationModel getAnnotationModel() {
+	private IAnnotationModel getAnnotationModel() {
 		IDocumentProvider documentProvider = getDocumentProvider();
 		IEditorInput editorInput = getEditorInput();
 		IAnnotationModel result = null;
@@ -321,7 +321,7 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener {
 	 * 
 	 * @return
 	 */
-	protected IDocument getDocument() {
+	private IDocument getDocument() {
 		ISourceViewer sourceViewer = getSourceViewer();
 		IDocument result = null;
 
@@ -337,7 +337,7 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener {
 	 * 
 	 * @return
 	 */
-	protected IDocumentProvider getDocumentProvider() {
+	private IDocumentProvider getDocumentProvider() {
 		return editor.getDocumentProvider();
 	}
 
@@ -346,7 +346,7 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener {
 	 * 
 	 * @return
 	 */
-	protected IEditorInput getEditorInput() {
+	private IEditorInput getEditorInput() {
 		return editor.getEditorInput();
 	}
 
@@ -355,7 +355,7 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener {
 	 * 
 	 * @return
 	 */
-	protected ISelectionListener getSelectionListener() {
+	private ISelectionListener getSelectionListener() {
 		if (selectionListener == null) {
 			selectionListener = new ISelectionListener() {
 				public void selectionChanged(IWorkbenchPart part, ISelection selection) {
@@ -374,7 +374,7 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener {
 	 * 
 	 * @return
 	 */
-	protected ISelectionService getSelectionService() {
+	private ISelectionService getSelectionService() {
 		return editor.getSite().getWorkbenchWindow().getSelectionService();
 	}
 
@@ -383,7 +383,7 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener {
 	 * 
 	 * @return
 	 */
-	protected ISourceViewer getSourceViewer() {
+	private ISourceViewer getSourceViewer() {
 		return editor.getISourceViewer();
 	}
 
@@ -392,7 +392,7 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener {
 	 * 
 	 * @param store
 	 */
-	public void initialize(IPreferenceStore store) {
+	void initialize(IPreferenceStore store) {
 		preferenceStore = store;
 		if (editor.isMarkingOccurrences()) {
 			install();
@@ -402,7 +402,7 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener {
 		preferenceStore.addPropertyChangeListener(this);
 	}
 
-	public void dispose() {
+	void dispose() {
 		if (preferenceStore != null) {
 			preferenceStore.removePropertyChangeListener(this);
 			preferenceStore = null;
@@ -479,7 +479,7 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener {
 	 * 
 	 * @param selection
 	 */
-	protected void updateAnnotations(ISelection selection) {
+	private void updateAnnotations(ISelection selection) {
 		if (findOccurrencesJob != null) {
 			findOccurrencesJob.cancel();
 		}

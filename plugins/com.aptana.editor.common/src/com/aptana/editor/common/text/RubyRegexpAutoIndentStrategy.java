@@ -147,11 +147,6 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 		return TAB_CHAR;
 	}
 
-	protected boolean shouldAutoDedent()
-	{
-		return true;
-	}
-
 	/**
 	 * @param d
 	 *            the document to work on
@@ -283,7 +278,7 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 	 * @return
 	 * @throws BadLocationException
 	 */
-	protected String dedentBasedOnPreviousLine(IDocument d, int lineNumber, String currentLineIndent)
+	private String dedentBasedOnPreviousLine(IDocument d, int lineNumber, String currentLineIndent)
 			throws BadLocationException
 	{
 		int endIndex;

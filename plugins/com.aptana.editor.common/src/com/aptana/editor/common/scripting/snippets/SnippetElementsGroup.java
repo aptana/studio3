@@ -32,7 +32,7 @@ public class SnippetElementsGroup
 		return snippetProposals;
 	}
 
-	public void addSnippetProposal(ICompletionProposal snippetProposal)
+	void addSnippetProposal(ICompletionProposal snippetProposal)
 	{
 		if (snippetProposal instanceof SnippetTemplateProposal && currTriggerNumber < 9)
 		{

@@ -20,12 +20,12 @@ public class Messages
 	{
 	}
 
-	public static ResourceBundle getResourceBundle()
+	static ResourceBundle getResourceBundle()
 	{
 		return RESOURCE_BUNDLE;
 	}
 
-	public static String getString(String key)
+	static String getString(String key)
 	{
 		try
 		{

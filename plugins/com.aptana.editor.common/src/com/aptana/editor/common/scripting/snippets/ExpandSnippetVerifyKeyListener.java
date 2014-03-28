@@ -113,7 +113,7 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener
 		return getBundleManager().getExecutableCommands(filter);
 	}
 
-	protected ITextSelection getSelection()
+	private ITextSelection getSelection()
 	{
 		if (textEditor == null || textEditor.getSelectionProvider() == null)
 		{
@@ -122,12 +122,12 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener
 		return (ITextSelection) textEditor.getSelectionProvider().getSelection();
 	}
 
-	protected BundleManager getBundleManager()
+	private BundleManager getBundleManager()
 	{
 		return BundleManager.getInstance();
 	}
 
-	protected boolean hasMatchingSnippet(String prefix, List<CommandElement> commandsFromScope)
+	private boolean hasMatchingSnippet(String prefix, List<CommandElement> commandsFromScope)
 	{
 		for (CommandElement commandElement : commandsFromScope)
 		{
@@ -197,7 +197,7 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener
 		return scope;
 	}
 
-	protected IDocumentScopeManager getDocumentScopeManager()
+	private IDocumentScopeManager getDocumentScopeManager()
 	{
 		return CommonEditorPlugin.getDefault().getDocumentScopeManager();
 	}

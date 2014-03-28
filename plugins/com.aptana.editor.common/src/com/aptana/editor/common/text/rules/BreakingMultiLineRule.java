@@ -16,25 +16,15 @@ import com.aptana.editor.common.IPartitionScannerSwitchStrategy;
 import com.aptana.editor.common.PartitionScannerSwitchStrategy;
 
 /**
- * A rule for detecting patterns which begin with a given
- * sequence and may end with a given sequence thereby spanning
- * multiple lines. In addition, the rule ends on the provided break sequences
- * as if if would a end-of-file.
+ * A rule for detecting patterns which begin with a given sequence and may end with a given sequence thereby spanning
+ * multiple lines. In addition, the rule ends on the provided break sequences as if if would a end-of-file.
  * 
  * @author Max Stepanov
  */
-public class BreakingMultiLineRule extends MultiLineRule {
+public class BreakingMultiLineRule extends MultiLineRule
+{
 
 	private final IPartitionScannerSwitchStrategy scannerSwitchStrategy;
-	
-	/**
-	 * @param startSequence
-	 * @param endSequence
-	 * @param token
-	 */
-	public BreakingMultiLineRule(String startSequence, String endSequence, String[] breakSequences, IToken token) {
-		this(startSequence, endSequence, breakSequences, token, (char) 0);
-	}
 
 	/**
 	 * @param startSequence
@@ -42,16 +32,20 @@ public class BreakingMultiLineRule extends MultiLineRule {
 	 * @param token
 	 * @param escapeCharacter
 	 */
-	public BreakingMultiLineRule(String startSequence, String endSequence, String[] breakSequences, IToken token, char escapeCharacter) {
+	public BreakingMultiLineRule(String startSequence, String endSequence, String[] breakSequences, IToken token,
+			char escapeCharacter)
+	{
 		super(startSequence, endSequence, token, escapeCharacter, true);
 		scannerSwitchStrategy = new PartitionScannerSwitchStrategy(breakSequences);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.rules.PatternRule#endSequenceDetected(org.eclipse.jface.text.rules.ICharacterScanner)
 	 */
 	@Override
-	protected boolean endSequenceDetected(ICharacterScanner scanner) {
+	protected boolean endSequenceDetected(ICharacterScanner scanner)
+	{
 		return super.endSequenceDetected(new SequenceCharacterScanner(scanner, scannerSwitchStrategy));
 	}
 

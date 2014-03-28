@@ -76,23 +76,6 @@ public enum CompletionProposalComparator implements Comparator<ICompletionPropos
 	}
 
 	/**
-	 * Sort items in ascending order
-	 * 
-	 * @param other
-	 * @return
-	 */
-	public static Comparator<ICompletionProposal> ascending(final Comparator<ICompletionProposal> other)
-	{
-		return new Comparator<ICompletionProposal>()
-		{
-			public int compare(ICompletionProposal o1, ICompletionProposal o2)
-			{
-				return other.compare(o1, o2);
-			}
-		};
-	}
-
-	/**
 	 * Iterates though each of the comparison operators, returning the result if the items are not equal
 	 * 
 	 * @param multipleOptions

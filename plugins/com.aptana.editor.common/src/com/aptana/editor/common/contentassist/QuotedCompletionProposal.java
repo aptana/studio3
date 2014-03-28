@@ -21,12 +21,6 @@ public class QuotedCompletionProposal extends CommonCompletionProposal
 	private boolean addTrailing;
 
 	public QuotedCompletionProposal(String name, String description, String location, IRange range, Image image,
-			Image[] userAgents)
-	{
-		this(name, description, location, range, image, userAgents, true, true);
-	}
-
-	public QuotedCompletionProposal(String name, String description, String location, IRange range, Image image,
 			Image[] userAgents, boolean addleading, boolean addTrailing)
 	{
 		super(name, range.getStartingOffset(), range.getLength(), name.length(), image, name, null, description);

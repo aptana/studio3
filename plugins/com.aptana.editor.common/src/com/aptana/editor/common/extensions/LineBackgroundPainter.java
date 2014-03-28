@@ -64,7 +64,7 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 	private Point fLastSelection = new Point(0, 0);
 	private boolean fEnabled;
 
-	public LineBackgroundPainter(ISourceViewer viewer)
+	LineBackgroundPainter(ISourceViewer viewer)
 	{
 		this.fViewer = viewer;
 	}
@@ -246,7 +246,7 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 		return false;
 	}
 
-	protected Position getCurrentLinePosition()
+	private Position getCurrentLinePosition()
 	{
 		Point selection = fViewer.getTextWidget().getSelectionRange();
 		if (selection.y != 0)
@@ -467,12 +467,12 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 		}
 	}
 
-	protected ColorManager getColorManager()
+	private ColorManager getColorManager()
 	{
 		return ThemePlugin.getDefault().getColorManager();
 	}
 
-	protected boolean isCurrentLine(int line)
+	private boolean isCurrentLine(int line)
 	{
 		try
 		{
@@ -568,17 +568,12 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 		e.gc.setBackground(previousBG);
 	}
 
-	protected Color getThemeBG()
-	{
-		return getColorManager().getColor(getCurrentTheme().getBackground());
-	}
-
-	protected Theme getCurrentTheme()
+	private Theme getCurrentTheme()
 	{
 		return ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
 	}
 
-	protected IDocumentScopeManager getScopeManager()
+	private IDocumentScopeManager getScopeManager()
 	{
 		return CommonEditorPlugin.getDefault().getDocumentScopeManager();
 	}
