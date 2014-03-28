@@ -51,12 +51,12 @@ public class OrderedProperties extends Properties
 
 	private final LinkedHashSet<Object> keys = new LinkedHashSet<Object>();
 
-	public Enumeration<Object> keys()
+	public synchronized Enumeration<Object> keys()
 	{
 		return Collections.<Object> enumeration(keys);
 	}
 
-	public Object put(Object key, Object value)
+	public synchronized Object put(Object key, Object value)
 	{
 		keys.add(key);
 		return super.put(key, value);

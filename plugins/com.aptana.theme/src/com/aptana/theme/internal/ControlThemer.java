@@ -7,18 +7,14 @@
  */
 package com.aptana.theme.internal;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Listener;
 
 import com.aptana.core.util.EclipseUtil;
-import com.aptana.core.util.PlatformUtil;
 import com.aptana.theme.ColorManager;
 import com.aptana.theme.IControlThemer;
 import com.aptana.theme.IThemeManager;
@@ -33,15 +29,9 @@ import com.aptana.theme.ThemePlugin;
 class ControlThemer implements IControlThemer
 {
 
-	protected static final boolean isWindows = PlatformUtil.isWindows();
-	protected static final boolean isMacOSX = PlatformUtil.isMac();
-	protected static final boolean isCocoa = Platform.getWS().equals(Platform.WS_COCOA);
-	protected static final boolean isUbuntu = PlatformUtil.isOSName("Ubuntu") || PlatformUtil.isOSName("LinuxMint"); //$NON-NLS-1$
+	private Control fControl;
+	private Color fDefaultBg;
 
-	private Control control;
-	private Color defaultBg;
-
-	private Listener selectionOverride;
 	private IPreferenceChangeListener fThemeChangeListener;
 
 	public ControlThemer(Control control)
@@ -49,10 +39,10 @@ class ControlThemer implements IControlThemer
 		this(control, null);
 	}
 
-	public ControlThemer(Control control, Color defaultBg)
+	private ControlThemer(Control control, Color defaultBg)
 	{
-		this.control = control;
-		this.defaultBg = defaultBg;
+		this.fControl = control;
+		this.fDefaultBg = defaultBg;
 	}
 
 	public void apply()
@@ -87,7 +77,7 @@ class ControlThemer implements IControlThemer
 		removeThemeListener();
 	}
 
-	protected void unapplyTheme()
+	private void unapplyTheme()
 	{
 		if (!controlIsDisposed())
 		{
@@ -97,9 +87,9 @@ class ControlThemer implements IControlThemer
 		}
 	}
 
-	protected void unapplyControlColors()
+	private void unapplyControlColors()
 	{
-		getControl().setBackground(defaultBg);
+		getControl().setBackground(fDefaultBg);
 		getControl().setForeground(null);
 	}
 
@@ -123,7 +113,7 @@ class ControlThemer implements IControlThemer
 		return ThemePlugin.getDefault().getThemeManager();
 	}
 
-	protected Color getBackground()
+	private Color getBackground()
 	{
 		return getColorManager().getColor(getThemeManager().getCurrentTheme().getBackground());
 	}
@@ -133,11 +123,6 @@ class ControlThemer implements IControlThemer
 		return getColorManager().getColor(getThemeManager().getCurrentTheme().getForeground());
 	}
 
-	protected Color getSelection()
-	{
-		return getColorManager().getColor(getThemeManager().getCurrentTheme().getSelectionAgainstBG());
-	}
-
 	protected ColorManager getColorManager()
 	{
 		return ThemePlugin.getDefault().getColorManager();
@@ -145,20 +130,7 @@ class ControlThemer implements IControlThemer
 
 	protected Control getControl()
 	{
-		return control;
-	}
-
-	protected void addSelectionColorOverride()
-	{
-	}
-
-	protected void removeSelectionOverride()
-	{
-		if (selectionOverride != null && !controlIsDisposed())
-		{
-			getControl().removeListener(SWT.EraseItem, selectionOverride);
-		}
-		selectionOverride = null;
+		return fControl;
 	}
 
 	private void addThemeChangeListener()

@@ -61,7 +61,7 @@ public class TextmateImporter
 		return null;
 	}
 
-	protected ColorManager getColorManager()
+	private ColorManager getColorManager()
 	{
 		return ThemePlugin.getDefault().getColorManager();
 	}

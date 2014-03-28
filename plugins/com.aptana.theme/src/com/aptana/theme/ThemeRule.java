@@ -114,7 +114,7 @@ public class ThemeRule
 		return new ThemeRule(newName, getScopeSelector(), getTextAttribute());
 	}
 
-	public ThemeRule setTextAttribute(RGBa fg, RGBa bg, int style)
+	ThemeRule setTextAttribute(RGBa fg, RGBa bg, int style)
 	{
 		return new ThemeRule(getName(), getScopeSelector(), new DelayedTextAttribute(fg, bg, style));
 	}

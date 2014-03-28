@@ -22,12 +22,12 @@ public class RGBa
 		this(rgb.red, rgb.green, rgb.blue);
 	}
 
-	public RGBa(int red, int green, int blue)
+	RGBa(int red, int green, int blue)
 	{
 		this(red, green, blue, 255);
 	}
 
-	public RGBa(int red, int green, int blue, int alpha)
+	RGBa(int red, int green, int blue, int alpha)
 	{
 		this.red = red;
 		this.blue = blue;

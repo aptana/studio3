@@ -17,10 +17,8 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.InvalidPropertiesFormatException;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -38,7 +36,6 @@ import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.scope.IScopeSelector;
-import com.aptana.scope.ISelectorNode;
 import com.aptana.scope.ScopeSelector;
 import com.aptana.theme.internal.OrderedProperties;
 import com.aptana.theme.internal.ThemeManager;
@@ -414,7 +411,7 @@ public class Theme
 	 * 
 	 * @return
 	 */
-	public Properties toProps()
+	private Properties toProps()
 	{
 		Properties props = new OrderedProperties();
 		props.put(THEME_NAME_PROP_KEY, getName());
@@ -526,7 +523,7 @@ public class Theme
 		}
 	}
 
-	protected IThemeManager getThemeManager()
+	private IThemeManager getThemeManager()
 	{
 		return ThemePlugin.getDefault().getThemeManager();
 	}
@@ -796,7 +793,7 @@ public class Theme
 		deleteDefaultVersion();
 	}
 
-	protected void removeTheme()
+	private void removeTheme()
 	{
 		getThemeManager().removeTheme(this);
 	}
@@ -882,7 +879,7 @@ public class Theme
 		return searchResultBG;
 	}
 
-	public RGB lighten(RGB color)
+	RGB lighten(RGB color)
 	{
 		return lighten(color, (float) 0.15);
 	}
@@ -893,7 +890,7 @@ public class Theme
 		return new RGB(hsb[0], hsb[1], Math.min(1, hsb[2] + amount));
 	}
 
-	public RGB darken(RGB color)
+	RGB darken(RGB color)
 	{
 		return darken(color, (float) 0.15);
 	}
@@ -961,44 +958,5 @@ public class Theme
 	protected ColorManager getColorManager()
 	{
 		return ThemePlugin.getDefault().getColorManager();
-	}
-
-	/**
-	 * Helper function just to print information on the theme.
-	 */
-	public void printSummary(boolean complete)
-	{
-		Map<String, Integer> counts = new HashMap<String, Integer>();
-		int total = 0;
-		for (ThemeRule rule : getTokens())
-		{
-			if (rule.isSeparator())
-			{
-				continue;
-			}
-			total += 1;
-			ISelectorNode root = ((ScopeSelector) rule.getScopeSelector()).getRoot();
-			Class<? extends ISelectorNode> class1 = root.getClass();
-			Integer i = counts.get(class1.getName());
-			if (i == null)
-			{
-				i = 0;
-			}
-			counts.put(class1.getName(), i + 1);
-
-			if (complete)
-			{
-				System.out.println();
-				System.out.println(rule);
-				System.out.println(root.toString());
-				System.out.println(class1);
-			}
-		}
-		System.out.println("Theme: " + this.getName()); //$NON-NLS-1$
-		System.out.println("Non-separator rules: " + total); //$NON-NLS-1$
-		for (Map.Entry<String, Integer> entry : counts.entrySet())
-		{
-			System.out.println(entry.getKey() + ": " + entry.getValue()); //$NON-NLS-1$
-		}
 	}
 }

@@ -157,7 +157,7 @@ import com.aptana.scope.ScopeSelector;
 				// Need to merge bg color up the scope!
 				DelayedTextAttribute parentAttr = getParent(scope);
 				// Now do actual merge
-				attr = merge(attr, (DelayedTextAttribute) parentAttr);
+				attr = merge(attr, parentAttr);
 			}
 			return attr;
 		}
@@ -279,7 +279,7 @@ import com.aptana.scope.ScopeSelector;
 
 	private TextAttribute toTextAttribute(DelayedTextAttribute delayedOrTextAttr, boolean forceColor)
 	{
-		DelayedTextAttribute attr = (DelayedTextAttribute) delayedOrTextAttr;
+		DelayedTextAttribute attr = delayedOrTextAttr;
 		Color fg = null;
 		if (attr.foreground != null || forceColor)
 		{
