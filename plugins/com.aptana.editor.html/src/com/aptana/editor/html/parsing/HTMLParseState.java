@@ -93,6 +93,7 @@ public class HTMLParseState extends ParseState
 	 *            the name of the tag
 	 * @return true if the tag is of the empty type, false otherwise
 	 */
+	// FIXME Determine empty tag types by document type? Do they differ over various versions of HTML?
 	public static boolean isEmptyTagType(String tagName)
 	{
 		String key = tagName.toLowerCase();
