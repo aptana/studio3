@@ -161,7 +161,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	 * 
 	 * @param type
 	 */
-	public void addType(String type)
+	private void addType(String type)
 	{
 		if (type != null && type.length() > 0)
 		{
@@ -182,7 +182,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	 * 
 	 * @param node
 	 */
-	protected void addTypes(IParseNode node)
+	private void addTypes(IParseNode node)
 	{
 		if (node instanceof JSNode)
 		{
@@ -195,7 +195,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	 * 
 	 * @param types
 	 */
-	protected void addTypes(List<String> types)
+	private void addTypes(List<String> types)
 	{
 		if (types != null)
 		{
@@ -212,7 +212,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	 * @param offset
 	 * @return
 	 */
-	protected JSScope getActiveScope(int offset)
+	private JSScope getActiveScope(int offset)
 	{
 		if (this._scope == null)
 		{
@@ -252,7 +252,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	 * @param node
 	 * @return
 	 */
-	public List<String> getTypes(IParseNode node)
+	private List<String> getTypes(IParseNode node)
 	{
 		return this.getTypes(node, this._scope);
 	}
@@ -263,7 +263,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	 * @param node
 	 * @return
 	 */
-	public List<String> getTypes(IParseNode node, JSScope scope)
+	private List<String> getTypes(IParseNode node, JSScope scope)
 	{
 		if (node instanceof JSNode)
 		{
@@ -731,12 +731,12 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		_monitor.worked(1);
 	}
 
-	protected String getFileName()
+	private String getFileName()
 	{
 		return URIUtil.getFileName(_location);
 	}
 
-	protected IProject getProject()
+	private IProject getProject()
 	{
 		URI root = _index.getRoot();
 		IPath containerPath = org.eclipse.core.filesystem.URIUtil.toPath(root);
@@ -834,7 +834,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		_monitor.worked(1);
 	}
 
-	protected IPath resolve(String moduleId)
+	private IPath resolve(String moduleId)
 	{
 		return RequireResolverFactory.resolve(moduleId, getProject(), Path.fromPortableString(_location.getPath())
 				.removeLastSegments(1), Path.fromPortableString(_index.getRoot().getPath()));

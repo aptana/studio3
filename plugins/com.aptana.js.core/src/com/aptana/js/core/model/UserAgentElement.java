@@ -50,7 +50,7 @@ public class UserAgentElement implements Convertible
 	 * @param map
 	 * @return
 	 */
-	public static UserAgentElement createUserAgentElement(Map<?, ?> map)
+	static UserAgentElement createUserAgentElement(Map<?, ?> map)
 	{
 		String platform = StringUtil.getStringValue(map.get(PLATFORM_PROPERTY));
 		String version = StringUtil.getStringValue(map.get(VERSION_PROPERTY));

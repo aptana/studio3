@@ -38,7 +38,7 @@ public enum JiraIssueType
 		return displayName;
 	}
 
-	public String getParameterValue(String projectKey)
+	String getParameterValue(String projectKey)
 	{
 		if (projectKeysToParameterValues != null)
 		{

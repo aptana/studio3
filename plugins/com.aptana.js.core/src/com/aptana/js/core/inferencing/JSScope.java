@@ -289,7 +289,7 @@ public class JSScope
 	 * 
 	 * @param parent
 	 */
-	protected void setParent(JSScope parent)
+	private void setParent(JSScope parent)
 	{
 		this.parent = parent;
 	}

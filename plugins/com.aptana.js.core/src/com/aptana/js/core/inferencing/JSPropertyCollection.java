@@ -278,7 +278,7 @@ public class JSPropertyCollection
 	 * 
 	 * @param printer
 	 */
-	protected void toSource(SourcePrinter printer)
+	private void toSource(SourcePrinter printer)
 	{
 		if (properties != null)
 		{

@@ -68,7 +68,7 @@ public class TypeElement extends BaseElement
 	 * 
 	 * @param example
 	 */
-	public void addExample(String example)
+	private void addExample(String example)
 	{
 		if (example != null && example.length() > 0)
 		{
@@ -127,7 +127,7 @@ public class TypeElement extends BaseElement
 	 * 
 	 * @param remark
 	 */
-	public void addRemark(String remark)
+	private void addRemark(String remark)
 	{
 		if (remark != null && remark.length() > 0)
 		{
@@ -325,7 +325,7 @@ public class TypeElement extends BaseElement
 	 * @param name
 	 * @return
 	 */
-	protected int getPropertyIndex(String name)
+	private int getPropertyIndex(String name)
 	{
 		int result = -1;
 
@@ -371,7 +371,7 @@ public class TypeElement extends BaseElement
 	 * 
 	 * @return
 	 */
-	public boolean hasParentTypes()
+	private boolean hasParentTypes()
 	{
 		return this._parentTypes != null && !this._parentTypes.isEmpty();
 	}

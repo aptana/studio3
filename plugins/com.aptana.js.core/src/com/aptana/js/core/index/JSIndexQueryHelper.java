@@ -54,7 +54,7 @@ public class JSIndexQueryHelper
 		return manager == null ? null : manager.getIndex(URI.create(IJSIndexConstants.METADATA_INDEX_LOCATION));
 	}
 
-	protected static IndexManager getIndexManager()
+	private static IndexManager getIndexManager()
 	{
 		IndexPlugin plugin = IndexPlugin.getDefault();
 		return plugin == null ? null : plugin.getIndexManager();
@@ -131,7 +131,7 @@ public class JSIndexQueryHelper
 		return indices.toArray(new Index[indices.size()]);
 	}
 
-	protected static BuildPathManager getBuildPathManager()
+	private static BuildPathManager getBuildPathManager()
 	{
 		return BuildPathManager.getInstance();
 	}

@@ -233,7 +233,7 @@ public class NodeJSService implements INodeJSService
 		return Status.OK_STATUS;
 	}
 
-	protected IProcessRunner createProcessRunner()
+	private IProcessRunner createProcessRunner()
 	{
 		return new ProcessRunner();
 	}

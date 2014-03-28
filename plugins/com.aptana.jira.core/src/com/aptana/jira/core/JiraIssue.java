@@ -14,7 +14,7 @@ public class JiraIssue
 	private final String id;
 	private final String url;
 
-	public JiraIssue(String name, String id, String url)
+	JiraIssue(String name, String id, String url)
 	{
 		this.name = name;
 		this.id = id;

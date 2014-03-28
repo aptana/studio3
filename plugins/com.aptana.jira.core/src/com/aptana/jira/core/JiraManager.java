@@ -36,13 +36,13 @@ import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.BasicHttpContext;
-import org.eclipse.core.internal.preferences.Base64;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
 import org.osgi.framework.Version;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.Base64;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
@@ -178,13 +178,12 @@ public class JiraManager
 	 * @param username
 	 * @return
 	 */
-	protected String getUserURL(String username)
+	private String getUserURL(String username)
 	{
 		return REST_API_ENDPOINT + "user?username=" + username; //$NON-NLS-1$
 	}
 
-	@SuppressWarnings("restriction")
-	protected HttpURLConnection createConnection(String urlString, String username, String password)
+	private HttpURLConnection createConnection(String urlString, String username, String password)
 			throws MalformedURLException, IOException
 	{
 		HttpURLConnection connection;
@@ -196,8 +195,7 @@ public class JiraManager
 		connection.setUseCaches(false);
 		connection.setAllowUserInteraction(false);
 		String usernamePassword = username + ":" + password; //$NON-NLS-1$
-		connection.setRequestProperty(AUTHORIZATION_HEADER,
-				"Basic " + new String(Base64.encode(usernamePassword.getBytes()))); //$NON-NLS-1$
+		connection.setRequestProperty(AUTHORIZATION_HEADER, "Basic " + Base64.encodeBytes(usernamePassword.getBytes())); //$NON-NLS-1$
 		return connection;
 	}
 
@@ -327,7 +325,7 @@ public class JiraManager
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	protected JiraIssue createIssueFromJSON(String output)
+	private JiraIssue createIssueFromJSON(String output)
 	{
 		Map<String, Object> map = (Map<String, Object>) JSON.parse(output);
 		String issueKey = (String) map.get("key"); //$NON-NLS-1$
@@ -336,7 +334,7 @@ public class JiraManager
 		return new JiraIssue(issueKey, issueId, issueUrl);
 	}
 
-	protected String getCreateIssueURL()
+	private String getCreateIssueURL()
 	{
 		return REST_API_ENDPOINT + "issue"; //$NON-NLS-1$
 	}
@@ -416,7 +414,7 @@ public class JiraManager
 		}
 	}
 
-	protected String createAttachmentURL(JiraIssue issue)
+	private String createAttachmentURL(JiraIssue issue)
 	{
 		return REST_API_ENDPOINT + "issue/" + issue.getName() + "/attachments"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
@@ -429,7 +427,7 @@ public class JiraManager
 	 * @param projectKey
 	 *            the key of the JIRA project (e.g. APSTUD for Aptana Studio)
 	 */
-	public static void setProjectInfo(String projectName, String projectKey)
+	private static void setProjectInfo(String projectName, String projectKey)
 	{
 		if (!StringUtil.isEmpty(projectName))
 		{
@@ -483,7 +481,7 @@ public class JiraManager
 				version.getMicro());
 	}
 
-	protected ISecurePreferences getSecurePreferences()
+	private ISecurePreferences getSecurePreferences()
 	{
 		return SecurePreferencesFactory.getDefault().node(SECURE_PREF_NODE);
 	}

@@ -12,17 +12,12 @@ public class JiraException extends Exception
 
 	private static final long serialVersionUID = 7533530410878760897L;
 
-	public JiraException(String message)
+	JiraException(String message)
 	{
 		super(message);
 	}
 
-	public JiraException(Throwable exception)
-	{
-		super(exception);
-	}
-
-	public JiraException(String message, Throwable exception)
+	JiraException(String message, Throwable exception)
 	{
 		super(message, exception);
 	}

@@ -10,7 +10,7 @@ package com.aptana.js.internal.core.parsing.sdoc.model;
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
 
-public class TagWithName extends Tag
+class TagWithName extends Tag
 {
 	private String _name;
 

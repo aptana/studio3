@@ -89,10 +89,10 @@ public class JiraProjectsRegistry
 
 	public class JiraProjectInfo
 	{
-		String projectName;
-		String projectCode;
+		private String projectName;
+		private String projectCode;
 
-		public JiraProjectInfo(String projectName, String projectCode)
+		private JiraProjectInfo(String projectName, String projectCode)
 		{
 			this.projectName = projectName;
 			this.projectCode = projectCode;

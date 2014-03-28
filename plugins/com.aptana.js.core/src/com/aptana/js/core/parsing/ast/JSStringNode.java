@@ -16,7 +16,7 @@ public class JSStringNode extends JSPrimitiveNode
 	 * 
 	 * @param text
 	 */
-	public JSStringNode(String text)
+	private JSStringNode(String text)
 	{
 		super(IJSNodeTypes.STRING, text);
 	}

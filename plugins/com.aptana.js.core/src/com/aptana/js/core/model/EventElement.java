@@ -40,7 +40,7 @@ public class EventElement extends BaseElement
 	 * 
 	 * @param property
 	 */
-	public void addProperty(EventPropertyElement property)
+	private void addProperty(EventPropertyElement property)
 	{
 		if (property != null)
 		{

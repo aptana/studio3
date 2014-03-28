@@ -39,7 +39,7 @@ public class JSIndexReader extends IndexReader
 	 * @param index
 	 * @throws IOException
 	 */
-	protected void attachMembers(TypeElement type, Index index)
+	private void attachMembers(TypeElement type, Index index)
 	{
 		// members
 		if (type != null && index != null)
@@ -72,7 +72,7 @@ public class JSIndexReader extends IndexReader
 	 * @param event
 	 * @return
 	 */
-	protected EventElement createEvent(QueryResult event)
+	private EventElement createEvent(QueryResult event)
 	{
 		return this.populateElement(new EventElement(), event, 2);
 	}
@@ -83,7 +83,7 @@ public class JSIndexReader extends IndexReader
 	 * @param function
 	 * @return
 	 */
-	protected FunctionElement createFunction(QueryResult function)
+	private FunctionElement createFunction(QueryResult function)
 	{
 		return this.populateElement(new FunctionElement(), function, 2);
 	}
@@ -94,7 +94,7 @@ public class JSIndexReader extends IndexReader
 	 * @param property
 	 * @return
 	 */
-	protected PropertyElement createProperty(QueryResult property)
+	private PropertyElement createProperty(QueryResult property)
 	{
 		return this.populateElement(new PropertyElement(), property, 2);
 	}
@@ -106,7 +106,7 @@ public class JSIndexReader extends IndexReader
 	 * @return
 	 * @throws IOException
 	 */
-	protected TypeElement createType(QueryResult type)
+	private TypeElement createType(QueryResult type)
 	{
 		TypeElement result;
 		String[] columns = this.getDelimiterPattern().split(type.getWord());
@@ -203,7 +203,7 @@ public class JSIndexReader extends IndexReader
 	 * @return
 	 * @throws IOException
 	 */
-	public List<EventElement> getEvents(Index index, String owningType)
+	private List<EventElement> getEvents(Index index, String owningType)
 	{
 		return getEvents(index, CollectionsUtil.newList(owningType));
 	}
@@ -283,7 +283,7 @@ public class JSIndexReader extends IndexReader
 	 * @return
 	 * @throws IOException
 	 */
-	public List<FunctionElement> getFunctions(Index index, String owningType)
+	private List<FunctionElement> getFunctions(Index index, String owningType)
 	{
 		return getFunctions(index, CollectionsUtil.newList(owningType));
 	}

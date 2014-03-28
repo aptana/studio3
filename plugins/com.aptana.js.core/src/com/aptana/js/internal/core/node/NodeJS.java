@@ -15,8 +15,8 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
-import com.aptana.core.ShellExecutable;
-import com.aptana.core.util.ProcessUtil;
+import com.aptana.core.util.IProcessRunner;
+import com.aptana.core.util.ProcessRunner;
 import com.aptana.core.util.VersionUtil;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.core.node.INodeJS;
@@ -25,17 +25,17 @@ import com.aptana.js.core.node.INodePackageManager;
 /**
  * @author cwilliams
  */
-public class NodeJS implements INodeJS
+class NodeJS implements INodeJS
 {
 
-	private final IPath path;
-	private String version;
+	private final IPath fPath;
+	private String fVersion;
 	private NodePackageManager fNodePackageManager;
 
 	NodeJS(IPath path)
 	{
 		// TODO Enforce non-null?
-		this.path = path;
+		this.fPath = path;
 		fNodePackageManager = new NodePackageManager(this);
 	}
 
@@ -46,38 +46,42 @@ public class NodeJS implements INodeJS
 
 	public IPath getPath()
 	{
-		return path;
+		return fPath;
 	}
 
 	public synchronized String getVersion()
 	{
-		if (version != null || path == null)
+		if (fVersion != null || fPath == null)
 		{
-			return version;
+			return fVersion;
 		}
-		version = ProcessUtil.outputForCommand(path.toOSString(), null, "-v"); //$NON-NLS-1$
-		return version;
+		IStatus status = createProcessRunner().runInBackground(fPath.toOSString(), "-v"); //$NON-NLS-1$
+		if (status != null)
+		{
+			fVersion = status.getMessage();
+		}
+		return fVersion;
+	}
+
+	protected IProcessRunner createProcessRunner()
+	{
+		return new ProcessRunner();
 	}
 
 	public boolean exists()
 	{
-		return path != null && path.toFile().isFile();
-	}
-
-	public IStatus runInBackground(String... args)
-	{
-		return ProcessUtil.runInBackground(getPath().toOSString(), null, ShellExecutable.getEnvironment(), args);
+		return fPath != null && fPath.toFile().isFile();
 	}
 
 	public IStatus runInBackground(IPath workingDir, Map<String, String> environment, List<String> args)
 	{
-		return ProcessUtil.runInBackground(getPath().toOSString(), workingDir, environment,
-				args.toArray(new String[args.size()]));
+		args.add(0, getPath().toOSString());
+		return createProcessRunner().runInBackground(workingDir, environment, args.toArray(new String[args.size()]));
 	}
 
 	public IStatus validate()
 	{
-		if (path == null)
+		if (fPath == null)
 		{
 			return new Status(Status.ERROR, JSCorePlugin.PLUGIN_ID, Messages.NodeJSService_NullPathError);
 		}
@@ -85,14 +89,14 @@ public class NodeJS implements INodeJS
 		if (!exists())
 		{
 			return new Status(Status.ERROR, JSCorePlugin.PLUGIN_ID, ERR_DOES_NOT_EXIST, MessageFormat.format(
-					Messages.NodeJSService_FileDoesntExistError, path), null);
+					Messages.NodeJSService_FileDoesntExistError, fPath), null);
 		}
 
 		String version = getVersion();
 		if (version == null)
 		{
 			return new Status(Status.ERROR, JSCorePlugin.PLUGIN_ID, ERR_NOT_EXECUTABLE, MessageFormat.format(
-					Messages.NodeJSService_CouldntGetVersionError, path), null);
+					Messages.NodeJSService_CouldntGetVersionError, fPath), null);
 		}
 
 		int index = version.indexOf('v');
@@ -107,7 +111,7 @@ public class NodeJS implements INodeJS
 		}
 
 		return new Status(Status.ERROR, JSCorePlugin.PLUGIN_ID, ERR_INVALID_VERSION, MessageFormat.format(
-				Messages.NodeJSService_InvalidVersionError, path, version, MIN_NODE_VERSION), null);
+				Messages.NodeJSService_InvalidVersionError, fPath, version, MIN_NODE_VERSION), null);
 	}
 
 }

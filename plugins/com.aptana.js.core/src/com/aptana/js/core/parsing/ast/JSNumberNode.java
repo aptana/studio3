@@ -16,7 +16,7 @@ public class JSNumberNode extends JSPrimitiveNode
 	 * 
 	 * @param text
 	 */
-	public JSNumberNode(String text)
+	private JSNumberNode(String text)
 	{
 		super(IJSNodeTypes.NUMBER, text);
 	}

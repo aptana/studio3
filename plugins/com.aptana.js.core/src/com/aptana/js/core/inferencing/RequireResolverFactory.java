@@ -25,7 +25,7 @@ import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.js.core.JSCorePlugin;
 
-public class RequireResolverFactory
+class RequireResolverFactory
 {
 
 	private static List<IRequireResolver> fgProxies;

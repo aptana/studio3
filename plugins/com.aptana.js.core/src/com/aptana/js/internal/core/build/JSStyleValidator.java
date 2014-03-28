@@ -1514,7 +1514,7 @@ public class JSStyleValidator extends AbstractBuildParticipant
 		}
 	}
 
-	protected String stripQuotes(String name)
+	private String stripQuotes(String name)
 	{
 		if (StringUtil.isEmpty(name))
 		{
@@ -1855,22 +1855,22 @@ public class JSStyleValidator extends AbstractBuildParticipant
 		return option.defaultValue();
 	}
 
-	protected IProblem createWarning(String msg, IParseNode node)
+	private IProblem createWarning(String msg, IParseNode node)
 	{
 		return createWarning(msg, node.getStartingOffset(), node.getLength());
 	}
 
-	protected IProblem createError(String msg, IParseNode node)
+	private IProblem createError(String msg, IParseNode node)
 	{
 		return createError(msg, node.getStartingOffset(), node.getLength());
 	}
 
-	protected IProblem createWarningAtEndOfNode(String msg, IParseNode node)
+	private IProblem createWarningAtEndOfNode(String msg, IParseNode node)
 	{
 		return createWarning(msg, node.getEndingOffset() + 1, 1);
 	}
 
-	protected IProblem createWarning(String msg, int start, int length)
+	private IProblem createWarning(String msg, int start, int length)
 	{
 		int line = -1;
 		try
@@ -1884,7 +1884,7 @@ public class JSStyleValidator extends AbstractBuildParticipant
 		return createWarning(msg, line, start, length, sourcePath);
 	}
 
-	protected IProblem createError(String msg, int start, int length)
+	private IProblem createError(String msg, int start, int length)
 	{
 		int line = -1;
 		try

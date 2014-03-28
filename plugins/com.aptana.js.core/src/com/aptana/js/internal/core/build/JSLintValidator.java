@@ -183,14 +183,14 @@ public class JSLintValidator extends AbstractBuildParticipant
 		private ContextFactory contextFactory;
 		private ScriptableObject scope;
 
-		JSLint(ContextFactory contextFactory, ScriptableObject scope)
+		private JSLint(ContextFactory contextFactory, ScriptableObject scope)
 		{
 			this.contextFactory = contextFactory;
 			this.scope = scope;
 			this.scope.sealObject();
 		}
 
-		public List<IProblem> getProblems(final String source, final String path)
+		private List<IProblem> getProblems(final String source, final String path)
 		{
 			final List<IProblem> items = new ArrayList<IProblem>();
 

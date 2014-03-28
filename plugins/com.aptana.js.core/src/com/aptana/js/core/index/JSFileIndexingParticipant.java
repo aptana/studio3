@@ -85,7 +85,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 	 * @param root
 	 * @return
 	 */
-	protected JSScope getGlobals(IParseNode root)
+	private JSScope getGlobals(IParseNode root)
 	{
 		if (root instanceof JSParseRootNode)
 		{
@@ -333,7 +333,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 	 * @param location
 	 * @param monitor
 	 */
-	protected void processModule(BuildContext context, Index index, IParseNode ast, URI location,
+	private void processModule(BuildContext context, Index index, IParseNode ast, URI location,
 			IProgressMonitor monitor)
 	{
 		JSScope globals = getGlobals(ast);

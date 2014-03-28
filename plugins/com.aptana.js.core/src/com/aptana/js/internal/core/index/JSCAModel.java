@@ -156,7 +156,7 @@ class JSCAModel implements IJSCAModel
 		return new ArrayList<TypeElement>(typesByName.values());
 	}
 
-	protected TypeElement createType(JSONObject json)
+	private TypeElement createType(JSONObject json)
 	{
 		String typeName = (String) json.get("name"); //$NON-NLS-1$
 		// If type is a property explicitly hanging off Global, strip the name down
@@ -250,7 +250,7 @@ class JSCAModel implements IJSCAModel
 	 * @param isInternal
 	 *            The value to use when setting the type's isInternal flag
 	 */
-	protected void setIsInternal(String typeName, boolean isInternal)
+	private void setIsInternal(String typeName, boolean isInternal)
 	{
 		String namespace = getNamespace(typeName);
 
@@ -300,7 +300,7 @@ class JSCAModel implements IJSCAModel
 	 * @param namespace
 	 *            The namespace to process
 	 */
-	protected void hideNamespace(String namespace)
+	private void hideNamespace(String namespace)
 	{
 		while (!StringUtil.isEmpty(namespace))
 		{
@@ -336,7 +336,7 @@ class JSCAModel implements IJSCAModel
 	 * 
 	 * @param message
 	 */
-	protected void log(String message)
+	private void log(String message)
 	{
 		if (Platform.inDevelopmentMode())
 		{

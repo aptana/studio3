@@ -11,6 +11,7 @@ import java.util.Set;
 
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.js.core.parsing.Terminals;
 
 public class JSLanguageConstants
 {
@@ -90,6 +91,22 @@ public class JSLanguageConstants
 	public static final String FOR = "for"; //$NON-NLS-1$
 	public static final String IN = "in"; //$NON-NLS-1$
 	public static final String GREATER_GREATER_EQUAL = ">>="; //$NON-NLS-1$
+	public static final String DEBUGGER = "debugger"; //$NON-NLS-1$
+	public static final String CLASS = "class"; //$NON-NLS-1$
+	public static final String ENUM = "enum"; //$NON-NLS-1$
+	public static final String EXPORT = "export"; //$NON-NLS-1$
+	public static final String EXTENDS = "extends"; //$NON-NLS-1$
+	public static final String IMPORT = "import"; //$NON-NLS-1$
+	public static final String SUPER = "super"; //$NON-NLS-1$
+	public static final String IMPLEMENTS = "implements"; //$NON-NLS-1$
+	public static final String INTERFACE = "interface"; //$NON-NLS-1$
+	public static final String LET = "let"; //$NON-NLS-1$
+	public static final String PACKAGE = "package"; //$NON-NLS-1$
+	public static final String PRIVATE = "private"; //$NON-NLS-1$
+	public static final String PROTECTED = "protected"; //$NON-NLS-1$
+	public static final String PUBLIC = "public"; //$NON-NLS-1$
+	public static final String STATIC = "static"; //$NON-NLS-1$
+	public static final String YIELD = "yield"; //$NON-NLS-1$
 
 	public static final String[] KEYWORD_OPERATORS = new String[] { DELETE, INSTANCEOF, IN, NEW, TYPEOF, WITH };
 	@SuppressWarnings("nls")

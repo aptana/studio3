@@ -21,7 +21,7 @@ public abstract class JSBinaryOperatorNode extends JSNode
 	 * @param left
 	 * @param right
 	 */
-	protected JSBinaryOperatorNode(JSNode left, JSNode right)
+	private JSBinaryOperatorNode(JSNode left, JSNode right)
 	{
 		this.setLocation(left.getStart(), right.getEnd());
 		this.setChildren(new JSNode[] { left, right });

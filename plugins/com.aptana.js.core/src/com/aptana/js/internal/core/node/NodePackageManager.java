@@ -54,7 +54,7 @@ import com.aptana.js.core.node.INodePackageManager;
 /**
  * @author cwilliams
  */
-public class NodePackageManager implements INodePackageManager
+class NodePackageManager implements INodePackageManager
 {
 
 	/**
@@ -121,7 +121,7 @@ public class NodePackageManager implements INodePackageManager
 	 */
 	private final IPath npmPath;
 
-	public NodePackageManager(INodeJS nodeJS)
+	NodePackageManager(INodeJS nodeJS)
 	{
 		this.nodeJS = nodeJS;
 

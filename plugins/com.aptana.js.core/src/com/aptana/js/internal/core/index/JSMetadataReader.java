@@ -112,9 +112,9 @@ public class JSMetadataReader extends MetadataReader
 		}
 	}
 
-	static final Pattern DOT_PATTERN = Pattern.compile("\\."); //$NON-NLS-1$
-	static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+"); //$NON-NLS-1$
-	static final Pattern PROPERTY_TYPE_DELIMITER_PATTERN = Pattern.compile("\\s*\\|\\s*"); //$NON-NLS-1$
+	private static final Pattern DOT_PATTERN = Pattern.compile("\\."); //$NON-NLS-1$
+	private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+"); //$NON-NLS-1$
+	private static final Pattern PROPERTY_TYPE_DELIMITER_PATTERN = Pattern.compile("\\s*\\|\\s*"); //$NON-NLS-1$
 
 	private static final String JS_METADATA_SCHEMA = "/metadata/JSMetadataSchema.xml"; //$NON-NLS-1$
 	private static final Pattern IDENTIFIER_PATTERN = Pattern.compile("[$_a-zA-Z][$_a-zA-Z0-9]*"); //$NON-NLS-1$
@@ -314,7 +314,7 @@ public class JSMetadataReader extends MetadataReader
 	 * @param qname
 	 * @param attributes
 	 */
-	public void enterAlias(String ns, String name, String qname, Attributes attributes)
+	private void enterAlias(String ns, String name, String qname, Attributes attributes)
 	{
 		AliasElement alias = new AliasElement();
 		Map<String, String> attrs = attributesToMap(attributes, true);
@@ -333,7 +333,7 @@ public class JSMetadataReader extends MetadataReader
 	 * @param qname
 	 * @param attributes
 	 */
-	public void enterBrowser(String ns, String name, String qname, Attributes attributes)
+	private void enterBrowser(String ns, String name, String qname, Attributes attributes)
 	{
 		// create a new item documentation object
 		Map<String, String> attrs = attributesToMap(attributes, true);
@@ -355,7 +355,7 @@ public class JSMetadataReader extends MetadataReader
 	 * @param qname
 	 * @param attributes
 	 */
-	public void enterClass(String ns, String name, String qname, Attributes attributes)
+	private void enterClass(String ns, String name, String qname, Attributes attributes)
 	{
 		Map<String, String> attrs = attributesToMap(attributes, true);
 		String typeName = attrs.get("type"); //$NON-NLS-1$
@@ -444,7 +444,7 @@ public class JSMetadataReader extends MetadataReader
 	 * @param qname
 	 * @param attributes
 	 */
-	public void enterConstructors(String ns, String name, String qname, Attributes attributes)
+	private void enterConstructors(String ns, String name, String qname, Attributes attributes)
 	{
 		parsingCtors = true;
 	}
@@ -457,7 +457,7 @@ public class JSMetadataReader extends MetadataReader
 	 * @param qname
 	 * @param attributes
 	 */
-	public void enterException(String ns, String name, String qname, Attributes attributes)
+	private void enterException(String ns, String name, String qname, Attributes attributes)
 	{
 		Map<String, String> attrs = attributesToMap(attributes, true);
 		String exceptionName = attrs.get("type"); //$NON-NLS-1$
@@ -484,7 +484,7 @@ public class JSMetadataReader extends MetadataReader
 	 * @param qname
 	 * @param attributes
 	 */
-	public void enterMethod(String ns, String name, String qname, Attributes attributes)
+	private void enterMethod(String ns, String name, String qname, Attributes attributes)
 	{
 		Map<String, String> attrs = attributesToMap(attributes, true);
 		String mname = attrs.get("name"); //$NON-NLS-1$
@@ -538,7 +538,7 @@ public class JSMetadataReader extends MetadataReader
 	 * @param qname
 	 * @param attributes
 	 */
-	public void enterMixin(String ns, String name, String qname, Attributes attributes)
+	private void enterMixin(String ns, String name, String qname, Attributes attributes)
 	{
 	}
 
@@ -550,7 +550,7 @@ public class JSMetadataReader extends MetadataReader
 	 * @param qname
 	 * @param attributes
 	 */
-	public void enterMixins(String ns, String name, String qname, Attributes attributes)
+	private void enterMixins(String ns, String name, String qname, Attributes attributes)
 	{
 	}
 
@@ -562,7 +562,7 @@ public class JSMetadataReader extends MetadataReader
 	 * @param qname
 	 * @param attributes
 	 */
-	public void enterParameter(String ns, String name, String qname, Attributes attributes)
+	private void enterParameter(String ns, String name, String qname, Attributes attributes)
 	{
 		Map<String, String> attrs = attributesToMap(attributes, true);
 		String parameterName = attrs.get("name"); //$NON-NLS-1$
@@ -608,7 +608,7 @@ public class JSMetadataReader extends MetadataReader
 	 * @param qname
 	 * @param attributes
 	 */
-	public void enterProperty(String ns, String name, String qname, Attributes attributes)
+	private void enterProperty(String ns, String name, String qname, Attributes attributes)
 	{
 		Map<String, String> attrs = attributesToMap(attributes, true);
 		String propertyName = attrs.get("name"); //$NON-NLS-1$
@@ -665,7 +665,7 @@ public class JSMetadataReader extends MetadataReader
 	 * @param qname
 	 * @param attributes
 	 */
-	public void enterReference(String ns, String name, String qname, Attributes attributes)
+	private void enterReference(String ns, String name, String qname, Attributes attributes)
 	{
 		if (currentFunction != null)
 		{
@@ -683,7 +683,7 @@ public class JSMetadataReader extends MetadataReader
 	 * @param qname
 	 * @param attributes
 	 */
-	public void enterReturnType(String ns, String name, String qname, Attributes attributes)
+	private void enterReturnType(String ns, String name, String qname, Attributes attributes)
 	{
 		Map<String, String> attrs = attributesToMap(attributes, true);
 		String type = attrs.get("type"); //$NON-NLS-1$
@@ -711,7 +711,7 @@ public class JSMetadataReader extends MetadataReader
 	 * @param qname
 	 * @param attributes
 	 */
-	public void enterSpecification(String ns, String name, String qname, Attributes attributes)
+	private void enterSpecification(String ns, String name, String qname, Attributes attributes)
 	{
 		SinceElement since = new SinceElement();
 		Map<String, String> attrs = attributesToMap(attributes, true);
@@ -749,7 +749,7 @@ public class JSMetadataReader extends MetadataReader
 	 * @param qname
 	 * @param attributes
 	 */
-	public void enterTypeMap(String ns, String name, String qname, Attributes attributes)
+	private void enterTypeMap(String ns, String name, String qname, Attributes attributes)
 	{
 		Map<String, String> attrs = attributesToMap(attributes, true);
 		String sourceType = attrs.get("source-type"); //$NON-NLS-1$
@@ -769,7 +769,7 @@ public class JSMetadataReader extends MetadataReader
 	 * @param qname
 	 * @param attributes
 	 */
-	public void enterValue(String ns, String name, String qname, Attributes attributes)
+	private void enterValue(String ns, String name, String qname, Attributes attributes)
 	{
 	}
 
@@ -780,7 +780,7 @@ public class JSMetadataReader extends MetadataReader
 	 * @param name
 	 * @param qname
 	 */
-	public void exitBrowser(String ns, String name, String qname)
+	private void exitBrowser(String ns, String name, String qname)
 	{
 		if (currentUserAgent != null)
 		{
@@ -809,7 +809,7 @@ public class JSMetadataReader extends MetadataReader
 	 * @param name
 	 * @param qname
 	 */
-	public void exitClass(String ns, String name, String qname)
+	private void exitClass(String ns, String name, String qname)
 	{
 		if (currentType != null)
 		{
@@ -833,7 +833,7 @@ public class JSMetadataReader extends MetadataReader
 	 * @param name
 	 * @param qname
 	 */
-	public void exitConstructors(String ns, String name, String qname)
+	private void exitConstructors(String ns, String name, String qname)
 	{
 		parsingCtors = false;
 	}
@@ -845,7 +845,7 @@ public class JSMetadataReader extends MetadataReader
 	 * @param name
 	 * @param qname
 	 */
-	public void exitDeprecated(String ns, String name, String qname)
+	private void exitDeprecated(String ns, String name, String qname)
 	{
 		// TODO Get text and save that as some sort of deprecation comment!
 		boolean deprecated = true;
@@ -871,7 +871,7 @@ public class JSMetadataReader extends MetadataReader
 	 * @param name
 	 * @param qname
 	 */
-	public void exitDescription(String ns, String name, String qname)
+	private void exitDescription(String ns, String name, String qname)
 	{
 		String description = normalizeText(getText());
 
@@ -923,7 +923,7 @@ public class JSMetadataReader extends MetadataReader
 	 * @param name
 	 * @param qname
 	 */
-	public void exitExample(String ns, String name, String qname)
+	private void exitExample(String ns, String name, String qname)
 	{
 		String example = getText();
 
@@ -946,7 +946,7 @@ public class JSMetadataReader extends MetadataReader
 	 * @param name
 	 * @param qname
 	 */
-	public void exitException(String ns, String name, String qname)
+	private void exitException(String ns, String name, String qname)
 	{
 		if (currentException != null)
 		{
@@ -971,7 +971,7 @@ public class JSMetadataReader extends MetadataReader
 	 * @param name
 	 * @param qname
 	 */
-	public void exitJavaScript(String ns, String name, String qname)
+	private void exitJavaScript(String ns, String name, String qname)
 	{
 	}
 
@@ -982,7 +982,7 @@ public class JSMetadataReader extends MetadataReader
 	 * @param name
 	 * @param qname
 	 */
-	public void exitMethod(String ns, String name, String qname)
+	private void exitMethod(String ns, String name, String qname)
 	{
 		if (currentFunction != null)
 		{
@@ -1013,7 +1013,7 @@ public class JSMetadataReader extends MetadataReader
 	 * @param name
 	 * @param qname
 	 */
-	public void exitParameter(String ns, String name, String qname)
+	private void exitParameter(String ns, String name, String qname)
 	{
 		if (currentParameter != null)
 		{
@@ -1035,7 +1035,7 @@ public class JSMetadataReader extends MetadataReader
 	 * @param name
 	 * @param qname
 	 */
-	public void exitProperty(String ns, String name, String qname)
+	private void exitProperty(String ns, String name, String qname)
 	{
 		if (currentProperty != null)
 		{
@@ -1066,7 +1066,7 @@ public class JSMetadataReader extends MetadataReader
 	 * @param name
 	 * @param qname
 	 */
-	public void exitRemarks(String ns, String name, String qname)
+	private void exitRemarks(String ns, String name, String qname)
 	{
 		getText();
 	}
@@ -1078,7 +1078,7 @@ public class JSMetadataReader extends MetadataReader
 	 * @param name
 	 * @param qname
 	 */
-	public void exitReturnDescription(String ns, String name, String qname)
+	private void exitReturnDescription(String ns, String name, String qname)
 	{
 		getText();
 	}
@@ -1090,7 +1090,7 @@ public class JSMetadataReader extends MetadataReader
 	 * @param name
 	 * @param qname
 	 */
-	public void exitReturnType(String ns, String name, String qname)
+	private void exitReturnType(String ns, String name, String qname)
 	{
 		if (currentReturnType != null)
 		{
@@ -1110,7 +1110,7 @@ public class JSMetadataReader extends MetadataReader
 	 * @param name
 	 * @param qname
 	 */
-	public void exitValue(String ns, String name, String qname)
+	private void exitValue(String ns, String name, String qname)
 	{
 	}
 
@@ -1188,7 +1188,7 @@ public class JSMetadataReader extends MetadataReader
 	 * @param name
 	 * @return
 	 */
-	protected boolean isValidIdentifier(String name)
+	private boolean isValidIdentifier(String name)
 	{
 		boolean result = false;
 
@@ -1208,7 +1208,7 @@ public class JSMetadataReader extends MetadataReader
 	 * @param name
 	 * @return
 	 */
-	protected boolean isValidTypeIdentifier(String name)
+	private boolean isValidTypeIdentifier(String name)
 	{
 		boolean result = false;
 
@@ -1228,7 +1228,7 @@ public class JSMetadataReader extends MetadataReader
 	 * @param typeSpec
 	 * @return
 	 */
-	protected List<Type> parseTypes(String typeSpec)
+	private List<Type> parseTypes(String typeSpec)
 	{
 		List<Type> types = null;
 

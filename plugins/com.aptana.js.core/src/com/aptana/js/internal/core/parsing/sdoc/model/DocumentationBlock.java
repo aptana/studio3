@@ -190,7 +190,7 @@ public class DocumentationBlock extends Symbol
 	 * 
 	 * @param writer
 	 */
-	public void toSource(SourcePrinter writer)
+	private void toSource(SourcePrinter writer)
 	{
 		writer.println("/**").increaseIndent(); //$NON-NLS-1$
 
