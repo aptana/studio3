@@ -44,8 +44,8 @@ public class CommonWizardNewProjectCreationPage extends WizardNewProjectCreation
 	private IProjectTemplate projectTemplate = null;
 
 	// Used for step indicator composite
-	protected StepIndicatorComposite stepIndicatorComposite;
-	protected String[] stepNames;
+	private StepIndicatorComposite stepIndicatorComposite;
+	private String[] stepNames;
 
 	/**
 	 * Constructs a new common new project creation page.
@@ -109,7 +109,7 @@ public class CommonWizardNewProjectCreationPage extends WizardNewProjectCreation
 	 * @param parent
 	 *            the parent composite
 	 */
-	protected void createTopArea(Composite parent)
+	private void createTopArea(Composite parent)
 	{
 	}
 
@@ -136,13 +136,13 @@ public class CommonWizardNewProjectCreationPage extends WizardNewProjectCreation
 		});
 	}
 
-	protected void createProjectTemplateSection(Composite parent)
+	@SuppressWarnings("unused")
+	private void createProjectTemplateSection(Composite parent)
 	{
 		if (projectTemplate != null)
 		{
 			new SelectedTemplateComposite(parent, projectTemplate);
 		}
-
 		return;
 	}
 

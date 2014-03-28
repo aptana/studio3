@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.filesystem.EFS;
@@ -56,7 +55,6 @@ import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.projects.templates.IProjectTemplate;
-import com.aptana.core.projects.templates.ProjectTemplate;
 import com.aptana.core.projects.templates.TemplateType;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.ProcessStatus;
@@ -85,12 +83,12 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 	// The pages in the wizard. DO NOT ACCESS VALUES FROM THEM OUTSIDE performFinish()!
 	protected IWizardProjectCreationPage mainPage;
 	protected ProjectTemplateSelectionPage templatesPage;
-	protected WizardNewProjectReferencePage referencePage;
+	private WizardNewProjectReferencePage referencePage;
 
 	protected String projectTemplateId;
 	protected IProjectTemplate selectedTemplate;
 
-	protected IConfigurationElement configElement;
+	private IConfigurationElement configElement;
 	protected IProject newProject;
 
 	private URI location; // null if defaults are used (under workspace)
@@ -218,7 +216,7 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 		projectWizardContributionManager.finalizeWizardPages(getPages(), getProjectNatures());
 	}
 
-	protected boolean deferCreatingProject()
+	private boolean deferCreatingProject()
 	{
 		return deferProjectCreation;
 	}
@@ -237,7 +235,7 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 		return mainPage;
 	}
 
-	protected void doCreateProject(IProgressMonitor monitor) throws InvocationTargetException
+	private void doCreateProject(IProgressMonitor monitor) throws InvocationTargetException
 	{
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable()
 		{
@@ -497,7 +495,7 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 		}
 	}
 
-	protected void validateProjectTemplate(TemplateType[] templateType)
+	private void validateProjectTemplate(TemplateType[] templateType)
 	{
 		selectedTemplate = null;
 
@@ -724,50 +722,6 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 	protected IPath getDestinationPath()
 	{
 		return destPath;
-	}
-
-	/**
-	 * @deprecated Please use {@link IProjectTemplate#apply(IProject, boolean)}
-	 * @param template
-	 * @param project
-	 * @param preExistingResources
-	 *            A possible conflicting list of resources that the extraction should notify about to the user.
-	 */
-	public static void extractZip(IProjectTemplate template, IProject project, Set<IPath> preExistingResources)
-	{
-		template.apply(project, !preExistingResources.isEmpty());
-	}
-
-	/**
-	 * @deprecated Please use {@link IProjectTemplate#apply(IProject, boolean)}
-	 * @param template
-	 * @param project
-	 * @param promptForOverwrite
-	 */
-	public static void extractZip(IProjectTemplate template, IProject project, boolean promptForOverwrite)
-	{
-		template.apply(project, promptForOverwrite);
-	}
-
-	/**
-	 * Extracts a zip into a given project.
-	 * 
-	 * @deprecated Please use {@link IProjectTemplate#apply(IProject, boolean)}
-	 * @param zipPath
-	 * @param project
-	 * @param promptForOverwrite
-	 *            Indicate that we should display a prompt in case the zip overwrites some of the existing project
-	 *            files.
-	 * @param preExistingResources
-	 *            A defined list of resources that will be used when prompting for overwrite conflicts. In case of an
-	 *            empty list, the function will prompt on any overwritten file.
-	 * @param isReplacingParameters
-	 */
-	public static void extractZip(final File zipPath, final IProject project, boolean promptForOverwrite,
-			Set<IPath> preExistingResources, final boolean isReplacingParameters)
-	{
-		new ProjectTemplate(zipPath.getAbsolutePath(), null, "", isReplacingParameters, "", null, "").apply(project, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				promptForOverwrite);
 	}
 
 	private static boolean hasNonDefaultTemplates(List<IProjectTemplate> templates)

@@ -8,11 +8,9 @@
 
 package com.aptana.ui.util;
 
-import java.net.URI;
 import java.net.URL;
 
 import org.eclipse.core.expressions.IEvaluationContext;
-import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Assert;
@@ -26,6 +24,7 @@ import org.eclipse.help.ui.internal.views.HelpView;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
@@ -37,11 +36,9 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IPageLayout;
-import org.eclipse.ui.IPathEditorInput;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.ISources;
-import org.eclipse.ui.IURIEditorInput;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
@@ -209,30 +206,6 @@ public final class UIUtils
 		return page.getDirtyEditors();
 	}
 
-	/**
-	 * Returns the URI for the specific editor input.
-	 * 
-	 * @param input
-	 *            the editor input
-	 * @return the URI, or null if none could be determined
-	 */
-	public static URI getURI(IEditorInput input)
-	{
-		if (input instanceof IFileEditorInput)
-		{
-			return ((IFileEditorInput) input).getFile().getLocationURI();
-		}
-		if (input instanceof IURIEditorInput)
-		{
-			return ((IURIEditorInput) input).getURI();
-		}
-		if (input instanceof IPathEditorInput)
-		{
-			return URIUtil.toURI(((IPathEditorInput) input).getPath());
-		}
-		return null;
-	}
-
 	public static IResource getSelectedResource()
 	{
 		IEvaluationService evaluationService = (IEvaluationService) PlatformUI.getWorkbench().getService(
@@ -257,10 +230,10 @@ public final class UIUtils
 	private static IProject getSelectedProject(String viewID)
 	{
 		ISelectionService service = UIUtils.getActiveWorkbenchWindow().getSelectionService();
-		IStructuredSelection structured = (IStructuredSelection) service.getSelection(viewID);
-		if (structured instanceof IStructuredSelection)
+		ISelection selection = service.getSelection(viewID);
+		if (selection instanceof IStructuredSelection)
 		{
-			Object selectedObject = ((IStructuredSelection) structured).getFirstElement();
+			Object selectedObject = ((IStructuredSelection) selection).getFirstElement();
 			if (selectedObject instanceof IAdaptable)
 			{
 				IResource resource = (IResource) ((IAdaptable) selectedObject).getAdapter(IResource.class);
@@ -337,17 +310,6 @@ public final class UIUtils
 			return page.findView(viewID);
 		}
 		return null;
-	}
-
-	/**
-	 * Shows the view specified
-	 * 
-	 * @param viewID
-	 * @return whether the view was shown
-	 */
-	public static boolean showView(String viewID)
-	{
-		return showView(viewID, IWorkbenchPage.VIEW_ACTIVATE);
 	}
 
 	/**
@@ -476,7 +438,7 @@ public final class UIUtils
 	 *            The return code from SafeMessageDialogRunnable.openMessageDialog() that would trigger
 	 *            SafeMessageDialogRunnable.run()
 	 */
-	public static void showMessageDialogFromBgThread(final SafeMessageDialogRunnable runnable,
+	private static void showMessageDialogFromBgThread(final SafeMessageDialogRunnable runnable,
 			final int runnableCondition)
 	{
 		UIJob job = new UIJob("Modal Message Dialog Job") //$NON-NLS-1$
@@ -547,10 +509,7 @@ public final class UIUtils
 			}
 			return job.getResult() == Status.OK_STATUS;
 		}
-		else
-		{
-			return showPromptDialogUI(title, message);
-		}
+		return showPromptDialogUI(title, message);
 	}
 
 	private static boolean showPromptDialogUI(String title, String message)
@@ -578,20 +537,6 @@ public final class UIUtils
 	public static ImageDescriptor getImageDescriptor(String pluginId, String path)
 	{
 		return AbstractUIPlugin.imageDescriptorFromPlugin(pluginId, path);
-	}
-
-	public static boolean getCoolBarVisibility()
-	{
-		IWorkbench workbench = PlatformUI.getWorkbench();
-		if (workbench != null)
-		{
-			IWorkbenchWindow activeWorkbenchWindow = getActiveWorkbenchWindow();
-			if (activeWorkbenchWindow instanceof WorkbenchWindow)
-			{
-				return ((WorkbenchWindow) activeWorkbenchWindow).getCoolBarVisible();
-			}
-		}
-		return true;
 	}
 
 	public static void setCoolBarVisibility(boolean visible)
@@ -661,11 +606,8 @@ public final class UIUtils
 				return openInBroswer(resolvedURL, true, IWorkbenchBrowserSupport.AS_EDITOR
 						| IWorkbenchBrowserSupport.STATUS);
 			}
-			else
-			{
-				IdeLog.logError(UIPlugin.getDefault(), "Unable to resolve the Help URL for " + url); //$NON-NLS-1$
-				return false;
-			}
+			IdeLog.logError(UIPlugin.getDefault(), "Unable to resolve the Help URL for " + url); //$NON-NLS-1$
+			return false;
 		}
 		return false;
 	}

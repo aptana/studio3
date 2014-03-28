@@ -44,9 +44,8 @@ public class DefaultAnalyticsEventHandler implements IAnalyticsEventHandler
 	static final String DEFAULT_URL = "https://api.appcelerator.net/p/v1/app-track"; //$NON-NLS-1$
 	static final int DEFAULT_TIMEOUT = 5 * 1000; // 5 seconds
 
-	private final String url;
-	private final int timeout;
-	protected int responseCode = 0;
+	private final String fURL;
+	private final int fTimeout;
 	protected Object lock = new Object();
 
 	public DefaultAnalyticsEventHandler()
@@ -56,8 +55,8 @@ public class DefaultAnalyticsEventHandler implements IAnalyticsEventHandler
 
 	DefaultAnalyticsEventHandler(int timeout, String url)
 	{
-		this.timeout = timeout;
-		this.url = url;
+		this.fTimeout = timeout;
+		this.fURL = url;
 	}
 
 	/*
@@ -76,7 +75,7 @@ public class DefaultAnalyticsEventHandler implements IAnalyticsEventHandler
 				if (userManager == null)
 				{
 					// send as anonymous user
-					if (!isValidResponse(responseCode = sendPing(event, null)))
+					if (!isValidResponse(sendPing(event, null)))
 					{
 						// log the event to the database
 						getAnalyticsLogger().logEvent(event);
@@ -86,7 +85,7 @@ public class DefaultAnalyticsEventHandler implements IAnalyticsEventHandler
 
 				IAnalyticsUser user = userManager.getUser();
 				// Only send ping if user is logged in. Otherwise, we log it to the database
-				if (user == null || !user.isOnline() || !isValidResponse(responseCode = sendPing(event, user)))
+				if (user == null || !user.isOnline() || !isValidResponse(sendPing(event, user)))
 				{
 					// log the event to the database
 					getAnalyticsLogger().logEvent(event);
@@ -102,7 +101,7 @@ public class DefaultAnalyticsEventHandler implements IAnalyticsEventHandler
 						Collections.sort(events, new AnalyticsEventComparator());
 						for (AnalyticsEvent aEvent : events)
 						{
-							if (!isValidResponse(responseCode = sendPing(aEvent, user)))
+							if (!isValidResponse(sendPing(aEvent, user)))
 							{
 								return Status.OK_STATUS;
 							}
@@ -137,11 +136,11 @@ public class DefaultAnalyticsEventHandler implements IAnalyticsEventHandler
 	 */
 	public String getAnalyticsURL()
 	{
-		if (StringUtil.isEmpty(url))
+		if (StringUtil.isEmpty(fURL))
 		{
 			return DEFAULT_URL;
 		}
-		return url;
+		return fURL;
 	}
 
 	/*
@@ -150,16 +149,7 @@ public class DefaultAnalyticsEventHandler implements IAnalyticsEventHandler
 	 */
 	public int getTimeout()
 	{
-		return timeout;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.usage.IAnalyticsEventHandler#getLastResponseCode()
-	 */
-	public int getLastResponseCode()
-	{
-		return responseCode;
+		return fTimeout;
 	}
 
 	/**
@@ -271,7 +261,7 @@ public class DefaultAnalyticsEventHandler implements IAnalyticsEventHandler
 	/**
 	 * An analytics events comparator.
 	 */
-	protected static class AnalyticsEventComparator implements Comparator<AnalyticsEvent>
+	private static class AnalyticsEventComparator implements Comparator<AnalyticsEvent>
 	{
 
 		private static String PROJECT_CREATE = "project.create"; //$NON-NLS-1$

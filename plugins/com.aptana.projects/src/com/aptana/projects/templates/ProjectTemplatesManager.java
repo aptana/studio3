@@ -172,7 +172,7 @@ public class ProjectTemplatesManager
 		}
 	}
 
-	protected ImageRegistry getImageRegistry()
+	private ImageRegistry getImageRegistry()
 	{
 		try
 		{

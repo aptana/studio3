@@ -22,7 +22,7 @@ import com.aptana.core.util.StringUtil;
 
 public abstract class AbstractProjectWizardContributor implements IProjectWizardContributor
 {
-	public static final String ATTRIBUTE_NATURE_ID = "natureId"; //$NON-NLS-1$
+	private static final String ATTRIBUTE_NATURE_ID = "natureId"; //$NON-NLS-1$
 	private String natureId = StringUtil.EMPTY;
 
 	public void setInitializationData(IConfigurationElement config, String propertyName, Object data)

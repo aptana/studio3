@@ -66,12 +66,6 @@ public class SendPingJob extends Job
 	@Override
 	protected IStatus run(IProgressMonitor monitor)
 	{
-		earlyStartup();
-		return Status.OK_STATUS;
-	}
-
-	public void earlyStartup()
-	{
 		sendFirstRunEvent();
 
 		enroll();
@@ -82,6 +76,7 @@ public class SendPingJob extends Job
 
 		// Send ping when we start studio
 		sendStartEvent();
+		return Status.OK_STATUS;
 	}
 
 	private void sendStartEvent()

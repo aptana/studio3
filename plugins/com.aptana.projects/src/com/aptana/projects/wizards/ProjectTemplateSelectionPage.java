@@ -15,8 +15,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -102,8 +102,8 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 	private Map<Composite, IProjectTemplate> templateControlMap;
 	private Map<String, List<IProjectTemplate>> templateTagsMap;
 
-	protected StepIndicatorComposite stepIndicatorComposite;
-	protected String[] stepNames;
+	private StepIndicatorComposite stepIndicatorComposite;
+	private String[] stepNames;
 
 	private Composite templatesDescriptionComp;
 
@@ -280,7 +280,7 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 		return -1;
 	}
 
-	protected IProjectTemplate getPreviousTemplate(IProjectTemplate selectedTemplate)
+	private IProjectTemplate getPreviousTemplate(IProjectTemplate selectedTemplate)
 	{
 		int index = getTemplateIndex(selectedTemplate);
 		if (index == -1)
@@ -296,7 +296,7 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 		return templateControlMap.get(children[prevIndex]);
 	}
 
-	protected IProjectTemplate getNextTemplate(IProjectTemplate selectedTemplate)
+	private IProjectTemplate getNextTemplate(IProjectTemplate selectedTemplate)
 	{
 		int index = getTemplateIndex(selectedTemplate);
 		if (index == -1)
@@ -394,7 +394,7 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 		return main;
 	}
 
-	protected Composite createTemplateDescription(final Composite parent)
+	private Composite createTemplateDescription(final Composite parent)
 	{
 		ScrolledComposite scrolledComp = new ScrolledComposite(parent, SWT.V_SCROLL);
 		scrolledComp.setLayout(new FillLayout());
@@ -653,7 +653,7 @@ public class ProjectTemplateSelectionPage extends WizardPage implements IStepInd
 		return getTitle();
 	}
 
-	protected ProjectTemplatesManager getProjectTemplatesManager()
+	private ProjectTemplatesManager getProjectTemplatesManager()
 	{
 		return ProjectsPlugin.getDefault().getTemplatesManager();
 	}

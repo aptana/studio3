@@ -35,11 +35,4 @@ public interface IAnalyticsEventHandler
 	 */
 	int getTimeout();
 
-	/**
-	 * Returns the last response code from the Analytics server.
-	 * 
-	 * @return The last response code.
-	 */
-	int getLastResponseCode();
-
 }

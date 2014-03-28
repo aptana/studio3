@@ -24,10 +24,7 @@ import com.aptana.ui.wizards.WizardFolderImportPage;
 public class PromoteToProjectWizard extends BasicNewResourceWizard implements IExecutableExtension
 {
 
-	/**
-	 * The wizard ID
-	 */
-	public static final String ID = "com.aptana.ui.wizards.PromoteToProject"; //$NON-NLS-1$
+	
 
 	private static final String IMAGE = "icons/importdir_wiz.png"; //$NON-NLS-1$
 
@@ -103,7 +100,7 @@ public class PromoteToProjectWizard extends BasicNewResourceWizard implements IE
 		setDefaultPageImageDescriptor(ProjectsPlugin.getImageDescriptor(IMAGE));
 	}
 
-	protected void updatePerspective()
+	private void updatePerspective()
 	{
 		BasicNewProjectResourceWizard.updatePerspective(configElement);
 	}
