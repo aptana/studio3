@@ -353,11 +353,11 @@ public class ProcessRunnerTest
 		assertTrue("Log messages should not be empty", !logs.isEmpty());
 		String processOutput = CollectionsUtil.getFirstElement(logs);
 		String[] outputLines = processOutput.split(FileUtil.NEW_LINE);
-		assertEquals(outputLines.length, 2);
+		assertEquals(outputLines.length, 4);
 		// As we always log the error messages first for better visibility of the issues with process, we need to verify
 		// for the stdErr output first.
-		assertEquals(stdErrText, outputLines[0]);
-		assertEquals(stdOutText, outputLines[1]);
+		assertEquals(stdErrText, outputLines[1]);
+		assertEquals(stdOutText, outputLines[3]);
 		context.assertIsSatisfied();
 	}
 
