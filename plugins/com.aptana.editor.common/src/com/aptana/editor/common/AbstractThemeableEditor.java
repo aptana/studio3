@@ -83,6 +83,7 @@ import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
+import org.eclipse.ui.texteditor.ITextEditorActionDefinitionIds;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
 import org.eclipse.ui.texteditor.TextOperationAction;
 import org.eclipse.ui.views.contentoutline.ContentOutline;
@@ -1036,6 +1037,18 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		setAction(ICommonConstants.FORMATTER_ACTION_ID, action);
 		markAsStateDependentAction(ICommonConstants.FORMATTER_ACTION_ID, true);
 		markAsSelectionDependentAction(ICommonConstants.FORMATTER_ACTION_ID, true);
+
+		StyledText textWidget = getSourceViewer().getTextWidget();
+
+		action = new SelectPreviousSubWordAction(IPreferenceConstants.EDITOR_SUB_WORD_NAVIGATION);
+		action.setActionDefinitionId(ITextEditorActionDefinitionIds.SELECT_WORD_PREVIOUS);
+		setAction(ITextEditorActionDefinitionIds.SELECT_WORD_PREVIOUS, action);
+		textWidget.setKeyBinding(SWT.CTRL | SWT.SHIFT | SWT.ARROW_LEFT, SWT.NULL);
+
+		action = new SelectNextSubWordAction(IPreferenceConstants.EDITOR_SUB_WORD_NAVIGATION);
+		action.setActionDefinitionId(ITextEditorActionDefinitionIds.SELECT_WORD_NEXT);
+		setAction(ITextEditorActionDefinitionIds.SELECT_WORD_NEXT, action);
+		textWidget.setKeyBinding(SWT.CTRL | SWT.SHIFT | SWT.ARROW_RIGHT, SWT.NULL);
 
 		// Folding setup
 		foldingActionsGroup = new FoldingActionsGroup(this);
