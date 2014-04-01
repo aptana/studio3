@@ -42,9 +42,9 @@ import org.eclipse.ui.texteditor.IDocumentProviderExtension;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.editor.common.AbstractBaseTextEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IFoldingEditor;
-import com.aptana.editor.iterators.AbstractBaseTextEditor;
 import com.aptana.index.core.IndexFilesOfProjectJob;
 import com.aptana.index.core.RemoveIndexOfFilesOfProjectJob;
 

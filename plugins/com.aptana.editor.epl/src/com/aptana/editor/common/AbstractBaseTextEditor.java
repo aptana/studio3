@@ -1,10 +1,17 @@
-/**
- * Appcelerator Titanium Studio
- * Copyright (c) 2014 by Appcelerator, Inc. All Rights Reserved.
- * Proprietary and Confidential - This source code is not for redistribution
- */
+/*******************************************************************************
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ *     Tom Eicher <eclipse@tom.eicher.name> - [formatting] 'Format Element' in JavaDoc does also format method body - https://bugs.eclipse.org/bugs/show_bug.cgi?id=238746
+ *     Tom Eicher (Avaloq Evolution AG) - block selection mode
+ *******************************************************************************/
 
-package com.aptana.editor.iterators;
+package com.aptana.editor.common;
 
 import java.text.BreakIterator;
 import java.text.CharacterIterator;
@@ -19,6 +26,9 @@ import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
 import org.eclipse.ui.texteditor.TextNavigationAction;
+
+import com.aptana.editor.iterators.CamelCaseWordIterator;
+import com.aptana.editor.iterators.DocumentCharacterIterator;
 
 /**
  * Represents a common base editor that needs to provide the functionality for camelCase selection of the words.
@@ -58,7 +68,7 @@ public abstract class AbstractBaseTextEditor extends AbstractDecoratedTextEditor
 		@Override
 		public void run()
 		{
-			// Check whether we are in a java code partition and the preference is enabled
+			// Check whether we are in a code partition and the preference is enabled
 			final IPreferenceStore store = getPreferenceStore();
 			if (!store.getBoolean(prefKey))
 			{
@@ -167,9 +177,6 @@ public abstract class AbstractBaseTextEditor extends AbstractDecoratedTextEditor
 			super(ST.SELECT_WORD_NEXT, prefKey);
 		}
 
-		/*
-		 * @see org.eclipse.jdt.internal.ui.javaeditor.JavaEditor.NextSubWordAction#setCaretPosition(int)
-		 */
 		@Override
 		protected void setCaretPosition(final int position)
 		{
@@ -220,7 +227,7 @@ public abstract class AbstractBaseTextEditor extends AbstractDecoratedTextEditor
 		@Override
 		public void run()
 		{
-			// Check whether we are in a java code partition and the preference is enabled
+			// Check whether we are in a code partition and the preference is enabled
 			final IPreferenceStore store = getPreferenceStore();
 			if (!store.getBoolean(prefKey))
 			{
@@ -326,9 +333,6 @@ public abstract class AbstractBaseTextEditor extends AbstractDecoratedTextEditor
 			super(ST.SELECT_WORD_PREVIOUS, prefKey);
 		}
 
-		/*
-		 * @see org.eclipse.jdt.internal.ui.javaeditor.JavaEditor.PreviousSubWordAction#setCaretPosition(int)
-		 */
 		@Override
 		protected void setCaretPosition(final int position)
 		{
