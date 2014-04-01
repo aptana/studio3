@@ -23,6 +23,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.aptana.core.IDebugScopes;
+
 public class ProcessRunnerTest
 {
 	private ProcessBuilder builder;
@@ -173,13 +175,17 @@ public class ProcessRunnerTest
 			}
 
 			@Override
-			protected boolean isInfoLoggingEnabled()
+			protected boolean isInfoLoggingEnabled(String scope)
 			{
-				return true;
+				if (IDebugScopes.SHELL.equals(scope))
+				{
+					return true;
+				}
+				return false;
 			}
 
 			@Override
-			protected void logInfo(String msg)
+			protected void logInfo(String msg, String scope)
 			{
 				logs.add(msg);
 			}
@@ -217,13 +223,17 @@ public class ProcessRunnerTest
 			}
 
 			@Override
-			protected boolean isInfoLoggingEnabled()
+			protected boolean isInfoLoggingEnabled(String scope)
 			{
-				return true;
+				if (IDebugScopes.SHELL.equals(scope))
+				{
+					return true;
+				}
+				return false;
 			}
 
 			@Override
-			protected void logInfo(String msg)
+			protected void logInfo(String msg, String scope)
 			{
 				logs.add(msg);
 			}
@@ -261,13 +271,17 @@ public class ProcessRunnerTest
 			}
 
 			@Override
-			protected boolean isInfoLoggingEnabled()
+			protected boolean isInfoLoggingEnabled(String scope)
 			{
-				return true;
+				if (IDebugScopes.SHELL.equals(scope))
+				{
+					return true;
+				}
+				return false;
 			}
 
 			@Override
-			protected void logInfo(String msg)
+			protected void logInfo(String msg, String scope)
 			{
 				logs.add(msg);
 			}
@@ -284,10 +298,74 @@ public class ProcessRunnerTest
 	}
 
 	@Test
+	public void testProcessOutputLogging() throws Exception
+	{
+		final String stdOutText = "stdout";
+		final String stdErrText = "stdErr";
+		final int exitCode = 0;
+
+		final Process process = context.mock(Process.class);
+		context.checking(new Expectations()
+		{
+			{
+				oneOf(process).getInputStream();
+				will(returnValue(new ByteArrayInputStream(stdOutText.getBytes())));
+
+				oneOf(process).getErrorStream();
+				will(returnValue(new ByteArrayInputStream(stdErrText.getBytes())));
+
+				oneOf(process).getOutputStream();
+
+				oneOf(process).waitFor();
+				will(returnValue(exitCode));
+			}
+		});
+
+		final List<String> logs = new ArrayList<String>();
+		runner = new ProcessRunner()
+		{
+			@Override
+			protected ProcessBuilder createProcessBuilder(List<String> command)
+			{
+				return builder = new ProcessBuilder(command);
+			}
+
+			@Override
+			protected Process startProcess(ProcessBuilder processBuilder) throws IOException
+			{
+				return null;
+			}
+
+			@Override
+			protected boolean isInfoLoggingEnabled(String scope)
+			{
+				return IDebugScopes.SHELL_OUTPUT.equals(scope);
+			}
+
+			@Override
+			protected void logInfo(String msg, String scope)
+			{
+				logs.add(msg);
+			}
+		};
+		IStatus status = runner.processResult(process);
+		assertNotNull(status);
+		assertTrue("Log messages should not be empty", !logs.isEmpty());
+		String processOutput = CollectionsUtil.getFirstElement(logs);
+		String[] outputLines = processOutput.split(FileUtil.NEW_LINE);
+		assertEquals(outputLines.length, 4);
+		// As we always log the error messages first for better visibility of the issues with process, we need to verify
+		// for the stdErr output first.
+		assertEquals(stdErrText, outputLines[1]);
+		assertEquals(stdOutText, outputLines[3]);
+		context.assertIsSatisfied();
+	}
+
+	@Test
 	public void testProcessResultReturnsExitCodeAndOutputsInProcessStatusObject() throws Exception
 	{
 		final String stdOutText = "stdout";
-		final String stdErrText = "stdout";
+		final String stdErrText = "stdErr";
 		final int exitCode = 0;
 
 		final Process process = context.mock(Process.class);

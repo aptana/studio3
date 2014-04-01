@@ -129,19 +129,15 @@ public class ProcessRunner implements IProcessRunner
 			map = new TreeMap<String, String>(environment);
 			processBuilder.environment().putAll(environment);
 		}
-		if (isInfoLoggingEnabled())
+		if (isInfoLoggingEnabled(IDebugScopes.SHELL))
 		{
 			String path = null;
 			if (processBuilder.directory() != null)
 			{
 				path = processBuilder.directory().getAbsolutePath();
 			}
-
-			if (isInfoLoggingEnabled())
-			{
-				logInfo(MessageFormat.format(Messages.ProcessUtil_RunningProcess,
-						getObfuscatedCommandString(command, textToObfuscate), path, map));
-			}
+			logInfo(MessageFormat.format(Messages.ProcessUtil_RunningProcess,
+					getObfuscatedCommandString(command, textToObfuscate), path, map), IDebugScopes.SHELL);
 		}
 		if (environment != null && environment.containsKey(REDIRECT_ERROR_STREAM))
 		{
@@ -159,9 +155,9 @@ public class ProcessRunner implements IProcessRunner
 		return new ProcessBuilder(command);
 	}
 
-	protected boolean isInfoLoggingEnabled()
+	protected boolean isInfoLoggingEnabled(String scope)
 	{
-		return IdeLog.isInfoEnabled(CorePlugin.getDefault(), IDebugScopes.SHELL);
+		return IdeLog.isInfoEnabled(CorePlugin.getDefault(), scope);
 	}
 
 	protected Process startProcess(ProcessBuilder processBuilder) throws IOException
@@ -227,9 +223,9 @@ public class ProcessRunner implements IProcessRunner
 		return MessageFormat.format("\"{0}\"", message); //$NON-NLS-1$
 	}
 
-	protected void logInfo(String msg)
+	protected void logInfo(String msg, String scope)
 	{
-		IdeLog.logInfo(CorePlugin.getDefault(), msg, IDebugScopes.SHELL);
+		IdeLog.logInfo(CorePlugin.getDefault(), msg, scope);
 	}
 
 	public IStatus runInBackground(String... args)
@@ -396,6 +392,8 @@ public class ProcessRunner implements IProcessRunner
 
 			String stdout = readerGobbler.getResult();
 			String stderr = errorGobbler.getResult();
+			logProcessOutput(stdout, stderr);
+
 			return new ProcessStatus(exitValue, stdout, stderr);
 		}
 		catch (InterruptedException e)
@@ -403,6 +401,30 @@ public class ProcessRunner implements IProcessRunner
 			IdeLog.logError(CorePlugin.getDefault(), e);
 		}
 		return null;
+	}
+
+	private void logProcessOutput(String stdout, String stderr)
+	{
+		if (isInfoLoggingEnabled(IDebugScopes.SHELL_OUTPUT))
+		{
+			// We can try to always log the error stream prior to standard output for better visibility of the
+			// issues with process.
+			StringBuilder sb = new StringBuilder();
+			if (!StringUtil.isEmpty(stderr))
+			{
+				sb.append("Process Error Output:"); //$NON-NLS-1$
+				sb.append(FileUtil.NEW_LINE);
+				sb.append(stderr);
+				sb.append(FileUtil.NEW_LINE);
+			}
+			if (!StringUtil.isEmpty(stdout))
+			{
+				sb.append("Process Output:"); //$NON-NLS-1$
+				sb.append(FileUtil.NEW_LINE);
+				sb.append(stdout);
+			}
+			logInfo(sb.toString(), IDebugScopes.SHELL_OUTPUT);
+		}
 	}
 
 	public IStatus processResult(Process p)
