@@ -60,4 +60,9 @@ public interface IDebugScopes
 	 */
 	String ZIPUTIL = CorePlugin.PLUGIN_ID + "/debug/ziputil"; //$NON-NLS-1$
 
+	/**
+	 * Items related to the process output on command line.
+	 */
+	String SHELL_OUTPUT = CorePlugin.PLUGIN_ID + "/debug/shell/output"; //$NON-NLS-1$
+
 }

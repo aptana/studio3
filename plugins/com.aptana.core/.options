@@ -5,6 +5,7 @@ com.aptana.core/debug/builder/indexer=true
 com.aptana.core/debug/builder/participants=true
 com.aptana.core/debug/builder/advanced=true
 com.aptana.core/debug/shell=true
+com.aptana.core/debug/shell/output=true
 com.aptana.core/debug/ziputil=true
 com.aptana.core/debug/firefox=true
 com.aptana.core/debug/extension_points=true
