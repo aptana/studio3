@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package com.aptana.editor.common.iterators;
+package com.aptana.editor.iterators;
 
 import java.text.BreakIterator;
 import java.text.CharacterIterator;
