@@ -392,15 +392,7 @@ public class ProcessRunner implements IProcessRunner
 
 			String stdout = readerGobbler.getResult();
 			String stderr = errorGobbler.getResult();
-			if (isInfoLoggingEnabled(IDebugScopes.SHELL_OUTPUT))
-			{
-				// We can try to always log the error stream prior to standard output for better visibility of the
-				// issues with process.
-				StringBuilder sb = new StringBuilder(stderr);
-				sb.append(FileUtil.NEW_LINE);
-				sb.append(stdout);
-				logInfo(sb.toString(), IDebugScopes.SHELL_OUTPUT);
-			}
+			logProcessOutput(stdout, stderr);
 
 			return new ProcessStatus(exitValue, stdout, stderr);
 		}
@@ -409,6 +401,30 @@ public class ProcessRunner implements IProcessRunner
 			IdeLog.logError(CorePlugin.getDefault(), e);
 		}
 		return null;
+	}
+
+	private void logProcessOutput(String stdout, String stderr)
+	{
+		if (isInfoLoggingEnabled(IDebugScopes.SHELL_OUTPUT))
+		{
+			// We can try to always log the error stream prior to standard output for better visibility of the
+			// issues with process.
+			StringBuilder sb = new StringBuilder();
+			if (!StringUtil.isEmpty(stderr))
+			{
+				sb.append("Process Error Output:"); //$NON-NLS-1$
+				sb.append(FileUtil.NEW_LINE);
+				sb.append(stderr);
+				sb.append(FileUtil.NEW_LINE);
+			}
+			if (!StringUtil.isEmpty(stdout))
+			{
+				sb.append("Process Output:"); //$NON-NLS-1$
+				sb.append(FileUtil.NEW_LINE);
+				sb.append(stdout);
+			}
+			logInfo(sb.toString(), IDebugScopes.SHELL_OUTPUT);
+		}
 	}
 
 	public IStatus processResult(Process p)

@@ -177,7 +177,7 @@ public class ProcessRunnerTest
 			@Override
 			protected boolean isInfoLoggingEnabled(String scope)
 			{
-				if (scope == IDebugScopes.SHELL)
+				if (IDebugScopes.SHELL.equals(scope))
 				{
 					return true;
 				}
@@ -225,7 +225,7 @@ public class ProcessRunnerTest
 			@Override
 			protected boolean isInfoLoggingEnabled(String scope)
 			{
-				if (scope == IDebugScopes.SHELL)
+				if (IDebugScopes.SHELL.equals(scope))
 				{
 					return true;
 				}
@@ -273,7 +273,7 @@ public class ProcessRunnerTest
 			@Override
 			protected boolean isInfoLoggingEnabled(String scope)
 			{
-				if (scope == IDebugScopes.SHELL)
+				if (IDebugScopes.SHELL.equals(scope))
 				{
 					return true;
 				}
@@ -339,11 +339,7 @@ public class ProcessRunnerTest
 			@Override
 			protected boolean isInfoLoggingEnabled(String scope)
 			{
-				if (scope == IDebugScopes.SHELL_OUTPUT)
-				{
-					return true;
-				}
-				return false;
+				return IDebugScopes.SHELL_OUTPUT.equals(scope);
 			}
 
 			@Override
