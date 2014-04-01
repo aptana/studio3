@@ -12,6 +12,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.editors
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
-Export-Package: com.aptana.editor.epl,
+Export-Package: com.aptana.editor.common,
+ com.aptana.editor.epl,
  com.aptana.editor.hover,
+ com.aptana.editor.iterators,
  org.eclipse.jface.text.source
