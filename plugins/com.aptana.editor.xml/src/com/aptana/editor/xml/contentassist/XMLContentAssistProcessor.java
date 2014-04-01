@@ -353,6 +353,8 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 				}
 			}
 		}
+		// Track tag names to enforce unique proposals by tag name (no repeats)
+		Set<String> uniques = new HashSet<String>(elements.size());
 
 		// TODO If user doesn't want tags closed for them, then don't do it!
 		// boolean addCloseTag = XMLPlugin.getDefault().getPreferenceStore()
@@ -365,6 +367,13 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
 		for (ElementElement element : elements)
 		{
+			// Enforce unique proposals for elements (avoid duplicates)
+			String tagName = element.getName();
+			if (uniques.contains(tagName))
+			{
+				continue;
+			}
+
 			StringBuilder replacement = new StringBuilder(element.getName());
 			List<Integer> positions = new ArrayList<Integer>();
 			int cursorPosition = replacement.length();
@@ -417,8 +426,10 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 				}
 			}
 			positions.add(0, cursorPosition);
-			CommonCompletionProposal proposal = createElementProposal(replaceLength, replaceOffset, element, replacement, positions);
+			CommonCompletionProposal proposal = createElementProposal(replaceLength, replaceOffset, element,
+					replacement, positions);
 			proposals.add(proposal);
+			uniques.add(tagName);
 		}
 
 		return proposals;
@@ -427,8 +438,8 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 	protected XMLTagProposal createElementProposal(int replaceLength, int replaceOffset, ElementElement element,
 			StringBuilder replacement, List<Integer> positions)
 	{
-		return new XMLTagProposal(replacement.toString(), replaceOffset,
-				replaceLength, element, positions.toArray(new Integer[positions.size()]));
+		return new XMLTagProposal(replacement.toString(), replaceOffset, replaceLength, element,
+				positions.toArray(new Integer[positions.size()]));
 	}
 
 	private boolean isEmptyTagType(ElementElement element)
