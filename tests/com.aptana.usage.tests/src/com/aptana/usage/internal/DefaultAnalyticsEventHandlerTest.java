@@ -6,9 +6,11 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Collections;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
+import org.jmock.lib.concurrent.Synchroniser;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.After;
 import org.junit.Before;
@@ -38,6 +40,7 @@ public class DefaultAnalyticsEventHandlerTest
 		{
 			{
 				setImposteriser(ClassImposteriser.INSTANCE);
+				setThreadingPolicy(new Synchroniser());
 			}
 		};
 		userManager = context.mock(IAnalyticsUserManager.class);
@@ -142,6 +145,9 @@ public class DefaultAnalyticsEventHandlerTest
 				oneOf(connection).disconnect();
 
 				never(logger).logEvent(event);
+
+				allowing(logger).getEvents();
+				will(returnValue(Collections.emptyList()));
 			}
 		});
 		handler.sendEvent(event);
