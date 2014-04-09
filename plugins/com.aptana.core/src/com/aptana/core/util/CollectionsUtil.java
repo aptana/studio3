@@ -615,7 +615,12 @@ public class CollectionsUtil
 
 				Object valueObject = items[i + 1];
 				U value;
-				if (valueType.isAssignableFrom(valueObject.getClass()))
+				if (valueObject == null)
+				{
+					value = null;
+					map.put(key, value);
+				}
+				else if (valueType.isAssignableFrom(valueObject.getClass()))
 				{
 					value = valueType.cast(valueObject);
 

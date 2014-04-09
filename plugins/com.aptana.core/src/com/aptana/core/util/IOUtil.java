@@ -202,7 +202,8 @@ public abstract class IOUtil
 			}
 		}
 
-		return new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, IStatus.ERROR, Messages.IOUtil_Source_Not_Directory_Error, null);
+		return new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, IStatus.ERROR,
+				Messages.IOUtil_Source_Not_Directory_Error, null);
 	}
 
 	private static int countFiles(File source)
@@ -340,7 +341,7 @@ public abstract class IOUtil
 	}
 
 	/**
-	 * Copy the contents of one file to another. Uses Attempts to use channels for files < 20Mb, uses streams for larger
+	 * Copy the contents of one file to another. Attempts to use channels for files < 20Mb, uses streams for larger
 	 * files. Closes the streams after transfer.
 	 * 
 	 * @param source

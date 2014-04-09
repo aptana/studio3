@@ -10,11 +10,12 @@ package com.aptana.core.io.tests;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
+import com.aptana.ide.core.io.downloader.DownloadManagerTest;
 import com.aptana.ide.core.io.preferences.CloakingUtilsTest;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({ EFSUtilsTest.class, WorkspaceFileSystemTest.class, WorkspaceConnectionPointTest.class,
-		ConnectionPointManagerTest.class, CloakingUtilsTest.class })
+		ConnectionPointManagerTest.class, CloakingUtilsTest.class, DownloadManagerTest.class })
 public class AllTests
 {
 }

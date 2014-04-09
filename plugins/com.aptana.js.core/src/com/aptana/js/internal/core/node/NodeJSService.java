@@ -8,8 +8,8 @@
 package com.aptana.js.internal.core.node;
 
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -35,7 +35,6 @@ import com.aptana.core.util.IProcessRunner;
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.ProcessRunner;
 import com.aptana.core.util.ProcessStatus;
-import com.aptana.core.util.ProcessUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.downloader.DownloadManager;
 import com.aptana.js.core.JSCorePlugin;
@@ -155,15 +154,15 @@ public class NodeJSService implements INodeJSService
 		// Grab the URL for the platform
 		String rawURL = PlatformUtil.isWindows() ? WIN_NODE_URL : MAC_NODE_URL;
 		String extension = PlatformUtil.isWindows() ? WIN_EXTENSION : MAC_EXTENSION;
-		URL url;
+		URI uri;
 		try
 		{
-			url = new URL(rawURL);
+			uri = new URI(rawURL);
 		}
-		catch (MalformedURLException e)
+		catch (URISyntaxException e)
 		{
 			IdeLog.logError(JSCorePlugin.getDefault(),
-					MessageFormat.format("Bad Download URL for node: {0}", rawURL), e); //$NON-NLS-1$
+					MessageFormat.format("Bad Download URI for node: {0}", rawURL), e); //$NON-NLS-1$
 			return new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
 					Messages.NodeJSService_BadURLError, rawURL), e);
 		}
@@ -171,7 +170,7 @@ public class NodeJSService implements INodeJSService
 		try
 		{
 			// download the installer
-			File file = download(url, extension, sub.newChild(90));
+			File file = download(uri, extension, sub.newChild(90));
 			// run the installer
 			IStatus status;
 			if (PlatformUtil.isWindows())
@@ -239,21 +238,21 @@ public class NodeJSService implements INodeJSService
 	}
 
 	/**
-	 * Downloads a file from url, return the {@link File} on disk where it was saved.
+	 * Downloads a file from uri, return the {@link File} on disk where it was saved.
 	 * 
-	 * @param url
+	 * @param uri
 	 * @param monitor
 	 * @return
 	 * @throws CoreException
 	 */
-	private File download(URL url, String extension, IProgressMonitor monitor) throws CoreException
+	private File download(URI uri, String extension, IProgressMonitor monitor) throws CoreException
 	{
 		DownloadManager manager = new DownloadManager();
-		IPath path = Path.fromPortableString(url.getPath());
+		IPath path = Path.fromPortableString(uri.getPath());
 		String name = path.lastSegment();
 		File f = new File(FileUtil.getTempDirectory().toFile(), name + extension);
 		f.deleteOnExit();
-		manager.addURL(url, f);
+		manager.addURI(uri, f);
 		IStatus status = manager.start(monitor);
 		if (!status.isOK())
 		{
