@@ -8,7 +8,7 @@
 package com.aptana.editor.js.preferences;
 
 import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
+import java.net.URI;
 import java.text.MessageFormat;
 import java.util.List;
 
@@ -192,7 +192,7 @@ public class NodePreferencePage extends FieldEditorPreferencePage implements IWo
 					final DownloadManager dm = new DownloadManager();
 					try
 					{
-						dm.addURL(new URL(NODE_JS_SOURCE_URL));
+						dm.addURI(new URI(NODE_JS_SOURCE_URL));
 						IStatus status = dm.start(monitor);
 						if (status.isOK())
 						{
