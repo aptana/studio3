@@ -259,7 +259,7 @@ public class UserAgentManager implements IUserAgentManager
 		return CorePlugin.getDefault().getUserAgentManager().getDefaultUserAgents(natureID);
 	}
 
-	public Image getDisabledIcon(IUserAgent agent)
+	private Image getDisabledIcon(IUserAgent agent)
 	{
 		return getImage(agent, agent.getDisabledIconPath());
 	}

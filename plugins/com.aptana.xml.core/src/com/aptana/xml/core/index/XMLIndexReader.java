@@ -41,7 +41,7 @@ public class XMLIndexReader
 	 * @return
 	 * @throws IOException
 	 */
-	private ElementElement createElementFromKey(Index index, String key)
+	private ElementElement createElementFromKey(String key)
 	{
 		String[] columns = key.split(IXMLIndexConstants.DELIMITER);
 		ElementElement element = new ElementElement();
@@ -84,7 +84,7 @@ public class XMLIndexReader
 			{
 				String key = item.getWord();
 
-				result = this.createElementFromKey(index, key);
+				result = this.createElementFromKey(key);
 
 				break;
 			}
@@ -110,7 +110,7 @@ public class XMLIndexReader
 			for (QueryResult item : items)
 			{
 				String key = item.getWord();
-				ElementElement element = this.createElementFromKey(index, key);
+				ElementElement element = this.createElementFromKey(key);
 
 				result.add(element);
 			}

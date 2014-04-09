@@ -183,7 +183,7 @@ public final class SocketUtil
 	 * 
 	 * @return
 	 */
-	public static InetAddress[] getNonLoopbackLocalAdresses()
+	static InetAddress[] getNonLoopbackLocalAdresses()
 	{
 		List<InetAddress> addrs = new ArrayList<InetAddress>();
 		for (InetAddress inetAddr : getLocalAddresses())

@@ -24,7 +24,7 @@ import com.aptana.index.core.build.BuildContext;
  * 
  * @author cwilliams
  */
-public class LazyBuildParticipant extends AbstractBuildParticipant
+class LazyBuildParticipant extends AbstractBuildParticipant
 {
 
 	private IConfigurationElement ice;

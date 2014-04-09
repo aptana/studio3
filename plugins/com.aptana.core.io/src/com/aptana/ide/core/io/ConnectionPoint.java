@@ -194,7 +194,7 @@ public abstract class ConnectionPoint extends PlatformObject implements IConnect
 	 */
 	public void connect(boolean force, IProgressMonitor monitor) throws CoreException
 	{
-		StudioAnalytics.getInstance().sendEvent(new FeatureEvent("remote.connect." + getType(), null));
+		StudioAnalytics.getInstance().sendEvent(new FeatureEvent("remote.connect." + getType(), null)); //$NON-NLS-1$
 	}
 
 	/*

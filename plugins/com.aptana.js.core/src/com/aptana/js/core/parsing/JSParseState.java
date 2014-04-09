@@ -86,7 +86,7 @@ public class JSParseState extends ParseState
 	 * 
 	 * @return
 	 */
-	protected CommentContext getCurrentCommentContext()
+	private CommentContext getCurrentCommentContext()
 	{
 		return commentContentStack.peek();
 	}

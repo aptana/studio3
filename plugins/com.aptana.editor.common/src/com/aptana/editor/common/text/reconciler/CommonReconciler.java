@@ -7,7 +7,6 @@
  */
 package com.aptana.editor.common.text.reconciler;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -65,18 +64,6 @@ public class CommonReconciler extends Reconciler
 	{
 		super.setReconcilingStrategy(strategy, contentType);
 		reconcilingStrategies.add(strategy);
-	}
-
-	/**
-	 * @param strategy
-	 * @param contentTypes
-	 */
-	public void setReconcilingStrategy(IReconcilingStrategy strategy, Collection<String> contentTypes)
-	{
-		for (String contentType : contentTypes)
-		{
-			setReconcilingStrategy(strategy, contentType);
-		}
 	}
 
 	/*

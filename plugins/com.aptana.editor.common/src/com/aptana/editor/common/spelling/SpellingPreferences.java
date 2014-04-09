@@ -79,7 +79,7 @@ public final class SpellingPreferences implements IPreferenceChangeListener {
 	 * Returns set of enabled scopes in preferences
 	 * @return
 	 */
-	public static Set<String> getEnabledScopes() {
+	static Set<String> getEnabledScopes() {
 		Set<String> result = new HashSet<String>();
 		String enabledScopes = Platform.getPreferencesService().getString(CommonEditorPlugin.PLUGIN_ID, IPreferenceConstants.ENABLED_SPELLING_SCOPES, StringUtil.EMPTY,
 				new IScopeContext[] { EclipseUtil.instanceScope(), EclipseUtil.defaultScope() });
@@ -92,7 +92,7 @@ public final class SpellingPreferences implements IPreferenceChangeListener {
 		return result;
 	}
 
-	public static void setEnabledScopes(Collection<String> scopes) {
+	static void setEnabledScopes(Collection<String> scopes) {
 		StringBuilder sb = new StringBuilder();
 		for (String scope : scopes) {
 			scope = scope.trim();

@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ecf.filetransfer.UserCancelledException;
 import org.eclipse.osgi.util.NLS;
 
 import com.aptana.core.epl.downloader.FileReader;
@@ -33,18 +32,18 @@ import com.aptana.ide.core.io.CoreIOPlugin;
  * 
  * @author Shalom Gibly <sgibly@aptana.com>
  */
-public class ContentDownloadRequest
+class ContentDownloadRequest
 {
 	private URL url;
 	private File saveTo;
 	private IStatus result;
 
-	public ContentDownloadRequest(URL url) throws CoreException
+	ContentDownloadRequest(URL url) throws CoreException
 	{
 		this(url, getTempFile(url));
 	}
 
-	public ContentDownloadRequest(URL url, File saveTo)
+	ContentDownloadRequest(URL url, File saveTo)
 	{
 		this.url = url;
 		this.saveTo = saveTo;
@@ -69,12 +68,12 @@ public class ContentDownloadRequest
 		return Path.fromOSString(saveTo.getAbsolutePath());
 	}
 
-	protected void setResult(IStatus result)
+	private void setResult(IStatus result)
 	{
 		this.result = result;
 	}
 
-	public void execute(IProgressMonitor monitor)
+	void execute(IProgressMonitor monitor)
 	{
 		monitor.subTask(NLS.bind(Messages.ContentDownloadRequest_downloading, url.toString()));
 		IStatus status = download(monitor);
@@ -130,7 +129,7 @@ public class ContentDownloadRequest
 	 * @return
 	 * @throws CoreException
 	 */
-	protected static File getTempFile(URL url) throws CoreException
+	private static File getTempFile(URL url) throws CoreException
 	{
 		String tempPath = FileUtil.getTempDirectory().toOSString();
 		try

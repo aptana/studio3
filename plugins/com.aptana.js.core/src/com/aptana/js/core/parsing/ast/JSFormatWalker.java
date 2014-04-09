@@ -13,7 +13,7 @@ import beaver.Symbol;
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.parsing.ast.IParseNode;
 
-public class JSFormatWalker extends JSTreeWalker
+class JSFormatWalker extends JSTreeWalker
 {
 	private SourcePrinter _printer;
 
@@ -30,7 +30,7 @@ public class JSFormatWalker extends JSTreeWalker
 	 * 
 	 * @param node
 	 */
-	protected void addSemicolon(IParseNode node)
+	private void addSemicolon(IParseNode node)
 	{
 		if (node instanceof JSNode)
 		{
@@ -49,7 +49,7 @@ public class JSFormatWalker extends JSTreeWalker
 	 * @param operator
 	 * @param rhs
 	 */
-	protected void formatBinaryOperator(IParseNode node, IParseNode lhs, Symbol operator, IParseNode rhs)
+	private void formatBinaryOperator(IParseNode node, IParseNode lhs, Symbol operator, IParseNode rhs)
 	{
 		this.formatNode(lhs);
 		this._printer.print(' ').print(operator.value).print(' ');
@@ -65,7 +65,7 @@ public class JSFormatWalker extends JSTreeWalker
 	 * @param delimiter
 	 * @param closeText
 	 */
-	protected void formatNaryNode(IParseNode node, String openText, String delimiter, String closeText)
+	private void formatNaryNode(IParseNode node, String openText, String delimiter, String closeText)
 	{
 		this._printer.print(openText);
 
@@ -94,7 +94,7 @@ public class JSFormatWalker extends JSTreeWalker
 	 * 
 	 * @param node
 	 */
-	protected void formatNode(IParseNode node)
+	private void formatNode(IParseNode node)
 	{
 		if (node instanceof JSNode)
 		{
@@ -118,7 +118,7 @@ public class JSFormatWalker extends JSTreeWalker
 	 * @param node
 	 * @return
 	 */
-	protected boolean hasSemicolon(IParseNode node)
+	private boolean hasSemicolon(IParseNode node)
 	{
 		return (node instanceof JSNode) ? ((JSNode) node).getSemicolonIncluded() : false;
 	}
@@ -129,7 +129,7 @@ public class JSFormatWalker extends JSTreeWalker
 	 * @param node
 	 * @return
 	 */
-	protected boolean isNotEmpty(IParseNode node)
+	private boolean isNotEmpty(IParseNode node)
 	{
 		boolean result = true;
 

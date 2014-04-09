@@ -121,7 +121,7 @@ public abstract class BaseElement implements Convertible, IndexDocument
 	 * @param object
 	 * @return
 	 */
-	protected Set<UserAgentElement> createUserAgentSet(Object object)
+	private Set<UserAgentElement> createUserAgentSet(Object object)
 	{
 		Set<UserAgentElement> result = null;
 

@@ -331,7 +331,7 @@ public final class FirefoxUtil
 	 * @param dir
 	 * @return boolean
 	 */
-	public static boolean installLinkedExtension(URL extensionURL, String extensionID, File dir)
+	static boolean installLinkedExtension(URL extensionURL, String extensionID, File dir)
 	{
 		File file = new File(dir, extensionID);
 		if (file.exists() && file.isDirectory())

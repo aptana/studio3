@@ -34,13 +34,13 @@ public class URIHyperlink extends URLHyperlink
 	private URI uri;
 	private boolean wrapped;
 
-	public URIHyperlink(IRegion region, URI uri)
+	URIHyperlink(IRegion region, URI uri)
 	{
 		super(region, uri.toString());
 		this.uri = uri;
 	}
 
-	public URIHyperlink(URLHyperlink hyperlink) throws URISyntaxException, MalformedURLException
+	URIHyperlink(URLHyperlink hyperlink) throws URISyntaxException, MalformedURLException
 	{
 		this(hyperlink.getHyperlinkRegion(), URLEncoder.encode(new URL(hyperlink.getURLString())).toURI());
 		wrapped = true;
@@ -83,12 +83,12 @@ public class URIHyperlink extends URLHyperlink
 		}
 	}
 
-	public boolean hasAssociatedEditor()
+	boolean hasAssociatedEditor()
 	{
 		return getEditorDescriptor() != null;
 	}
 
-	protected IEditorDescriptor getEditorDescriptor()
+	private IEditorDescriptor getEditorDescriptor()
 	{
 		IEditorRegistry editorReg = PlatformUI.getWorkbench().getEditorRegistry();
 		if (uri.getPath() == null || uri.getPath().equals("/") || uri.getPath().trim().equals("")) //$NON-NLS-1$ //$NON-NLS-2$

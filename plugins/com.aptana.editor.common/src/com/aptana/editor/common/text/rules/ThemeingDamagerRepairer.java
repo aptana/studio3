@@ -425,17 +425,17 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 		}
 	}
 
-	protected Theme getCurrentTheme()
+	private Theme getCurrentTheme()
 	{
 		return getThemeManager().getCurrentTheme();
 	}
 
-	protected IThemeManager getThemeManager()
+	private IThemeManager getThemeManager()
 	{
 		return ThemePlugin.getDefault().getThemeManager();
 	}
 
-	protected IDocumentScopeManager getDocumentScopeManager()
+	private IDocumentScopeManager getDocumentScopeManager()
 	{
 		return CommonEditorPlugin.getDefault().getDocumentScopeManager();
 	}

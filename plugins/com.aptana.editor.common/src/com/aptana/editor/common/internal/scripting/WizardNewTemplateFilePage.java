@@ -22,7 +22,7 @@ public class WizardNewTemplateFilePage extends WizardNewFileCreationPage
 
 	private TemplateElement template;
 
-	public WizardNewTemplateFilePage(String pageName, IStructuredSelection selection, TemplateElement template)
+	WizardNewTemplateFilePage(String pageName, IStructuredSelection selection, TemplateElement template)
 	{
 		super(pageName, selection);
 		this.template = template;

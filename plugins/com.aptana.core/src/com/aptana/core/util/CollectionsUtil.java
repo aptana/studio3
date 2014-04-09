@@ -90,7 +90,7 @@ public class CollectionsUtil
 	 * @return
 	 */
 	@SuppressWarnings({ "unchecked", "cast" })
-	public static final <T> T[] toArray(List<T> list, int startIndex, int endIndex)
+	private static final <T> T[] toArray(List<T> list, int startIndex, int endIndex)
 	{
 		if (isEmpty(list))
 		{
@@ -267,25 +267,6 @@ public class CollectionsUtil
 		if (list == null)
 		{
 			return Collections.emptyList();
-		}
-
-		return list;
-	}
-
-	/**
-	 * This is a convenience method that essentially checks for a null list and returns Collections.emptyList in that
-	 * case. If the list is non-null, then this is an identity function.
-	 * 
-	 * @param <T>
-	 * @param <U>
-	 * @param list
-	 * @return
-	 */
-	public static <T, U> Map<T, U> getMapValue(Map<T, U> list)
-	{
-		if (list == null)
-		{
-			return Collections.emptyMap();
 		}
 
 		return list;
@@ -584,7 +565,7 @@ public class CollectionsUtil
 	 * @param items
 	 *            An interleaved list of keys and values
 	 */
-	public static final <T, U> void addToMap(Class<T> keyType, Class<U> valueType, Map<T, U> map, Object... items)
+	static final <T, U> void addToMap(Class<T> keyType, Class<U> valueType, Map<T, U> map, Object... items)
 	{
 		if (keyType != null && valueType != null && map != null && !ArrayUtil.isEmpty(items))
 		{
@@ -678,7 +659,7 @@ public class CollectionsUtil
 	 * @param items
 	 *            A list of items to add
 	 */
-	public static final <T, U extends T> Map<T, T> addToMap(Map<T, T> map, U... items)
+	static final <T, U extends T> Map<T, T> addToMap(Map<T, T> map, U... items)
 	{
 		if (map != null && items != null)
 		{
@@ -823,7 +804,7 @@ public class CollectionsUtil
 	 * @return
 	 * @see http://ruby-doc.org/core-2.0/Enumerable.html#method-i-partition
 	 */
-	public static <T> ImmutableTuple<List<T>, List<T>> partition(Collection<T> collection, IFilter<T> filter)
+	static <T> ImmutableTuple<List<T>, List<T>> partition(Collection<T> collection, IFilter<T> filter)
 	{
 		if (isEmpty(collection))
 		{

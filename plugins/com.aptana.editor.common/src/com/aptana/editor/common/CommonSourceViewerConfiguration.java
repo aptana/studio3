@@ -104,7 +104,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	private IPreferenceChangeListener fThemeChangeListener;
 	private IPreferenceChangeListener fAutoActivationListener;
 	protected CommonReconciler fReconciler;
-	List<IContentAssistProcessor> fCAProcessors = new ArrayList<IContentAssistProcessor>();
+	private List<IContentAssistProcessor> fCAProcessors = new ArrayList<IContentAssistProcessor>();
 
 	/**
 	 * CommonSourceViewerConfiguration
@@ -123,7 +123,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	/**
 	 * dispose
 	 */
-	public void dispose()
+	void dispose()
 	{
 		fTextEditor = null;
 		fDoubleClickStrategy = null;
@@ -457,19 +457,19 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		};
 	}
 
-	protected Color getThemeBackground()
+	private Color getThemeBackground()
 	{
 		RGB bg = getCurrentTheme().getBackground();
 		return ThemePlugin.getDefault().getColorManager().getColor(bg);
 	}
 
-	protected Color getThemeForeground()
+	private Color getThemeForeground()
 	{
 		RGB bg = getCurrentTheme().getForeground();
 		return ThemePlugin.getDefault().getColorManager().getColor(bg);
 	}
 
-	protected Color getThemeSelection()
+	private Color getThemeSelection()
 	{
 		RGB bg = getCurrentTheme().getSelectionAgainstBG();
 		return ThemePlugin.getDefault().getColorManager().getColor(bg);
@@ -487,7 +487,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		return new TextHover(sourceViewer);
 	}
 
-	protected IInformationControl createTextHoverInformationControl(Shell parent, String statusFieldText)
+	private IInformationControl createTextHoverInformationControl(Shell parent, String statusFieldText)
 	{
 		return new ThemedInformationControl(parent, SWT.NONE, new HTMLTextPresenter(true), statusFieldText);
 	}
@@ -607,7 +607,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		return new MultipleHyperlinkPresenter(rgb);
 	}
 
-	protected Theme getCurrentTheme()
+	private Theme getCurrentTheme()
 	{
 		return ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
 	}

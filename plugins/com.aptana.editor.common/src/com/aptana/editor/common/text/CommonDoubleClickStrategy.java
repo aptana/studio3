@@ -38,7 +38,7 @@ public class CommonDoubleClickStrategy implements ITextDoubleClickStrategy
 		}
 	}
 
-	protected boolean selectComment(int caretPos)
+	private boolean selectComment(int caretPos)
 	{
 		IDocument doc = fText.getDocument();
 		int startPos, endPos;

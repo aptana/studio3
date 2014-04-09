@@ -55,12 +55,6 @@ public class AnalyticsLogger
 		AptanaDB.getInstance().execute(query);
 	}
 
-	public void clearEvents()
-	{
-		String query = "DELETE FROM " + TABLE_NAME; //$NON-NLS-1$
-		AptanaDB.getInstance().execute(query);
-	}
-
 	public void clearEvent(AnalyticsEvent event)
 	{
 		String query = MessageFormat.format(

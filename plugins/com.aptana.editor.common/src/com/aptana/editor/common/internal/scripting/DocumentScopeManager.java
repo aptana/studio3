@@ -172,7 +172,7 @@ public class DocumentScopeManager implements IDocumentScopeManager
 	 * @param viewer
 	 * @return
 	 */
-	protected String prependNaturesToScope(ITextViewer viewer)
+	private String prependNaturesToScope(ITextViewer viewer)
 	{
 		if (!(viewer instanceof IAdaptable))
 		{
@@ -261,7 +261,7 @@ public class DocumentScopeManager implements IDocumentScopeManager
 		return null;
 	}
 
-	public String getPartitionScopeFragmentsAtOffset(IDocument document, int offset) throws BadLocationException
+	private String getPartitionScopeFragmentsAtOffset(IDocument document, int offset) throws BadLocationException
 	{
 		QualifiedContentType contentType = getContentType(document, offset);
 		if (contentType != null)
@@ -286,7 +286,7 @@ public class DocumentScopeManager implements IDocumentScopeManager
 		}
 	}
 
-	protected IContentTypeTranslator getContentTypeTranslator()
+	private IContentTypeTranslator getContentTypeTranslator()
 	{
 		return CommonEditorPlugin.getDefault().getContentTypeTranslator();
 	}

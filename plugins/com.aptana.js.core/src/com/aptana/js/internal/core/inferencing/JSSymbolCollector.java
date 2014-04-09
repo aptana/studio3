@@ -97,7 +97,7 @@ public class JSSymbolCollector extends JSTreeWalker
 	 * 
 	 * @param node
 	 */
-	protected void accept(IParseNode node)
+	private void accept(IParseNode node)
 	{
 		if (node instanceof JSNode)
 		{
@@ -111,7 +111,7 @@ public class JSSymbolCollector extends JSTreeWalker
 	 * @param name
 	 * @param value
 	 */
-	public void addPropertyValue(String name, JSNode value)
+	private void addPropertyValue(String name, JSNode value)
 	{
 		if (!StringUtil.isEmpty(name) && value != null)
 		{
@@ -202,7 +202,7 @@ public class JSSymbolCollector extends JSTreeWalker
 	/**
 	 * popScope
 	 */
-	protected void popScope()
+	private void popScope()
 	{
 		if (this._scope != null)
 		{
@@ -213,7 +213,7 @@ public class JSSymbolCollector extends JSTreeWalker
 	/**
 	 * pushScope
 	 */
-	protected void pushScope()
+	private void pushScope()
 	{
 		JSScope childScope = new JSScope();
 
@@ -230,7 +230,7 @@ public class JSSymbolCollector extends JSTreeWalker
 	 * 
 	 * @param range
 	 */
-	protected void setScopeRange(IRange range)
+	private void setScopeRange(IRange range)
 	{
 		if (this._scope != null)
 		{

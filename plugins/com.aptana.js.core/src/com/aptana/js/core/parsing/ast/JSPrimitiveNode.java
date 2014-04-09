@@ -11,7 +11,7 @@ import com.aptana.core.util.ObjectUtil;
 import com.aptana.parsing.ast.IParseNodeAttribute;
 import com.aptana.parsing.ast.ParseNodeAttribute;
 
-public abstract class JSPrimitiveNode extends JSNode
+abstract class JSPrimitiveNode extends JSNode
 {
 	private String fText;
 

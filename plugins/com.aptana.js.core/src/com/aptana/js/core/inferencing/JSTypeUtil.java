@@ -249,7 +249,7 @@ public class JSTypeUtil
 	 * @param function
 	 * @param typeName
 	 */
-	public static void applySignature(FunctionElement function, String typeName)
+	private static void applySignature(FunctionElement function, String typeName)
 	{
 		if (function != null && typeName != null)
 		{
@@ -323,7 +323,7 @@ public class JSTypeUtil
 	 * @param elementType
 	 * @return
 	 */
-	public static String createGenericArrayType(String elementType)
+	static String createGenericArrayType(String elementType)
 	{
 		return JSTypeConstants.GENERIC_ARRAY_OPEN + elementType + JSTypeConstants.GENERIC_CLOSE;
 	}
@@ -335,7 +335,7 @@ public class JSTypeUtil
 	 * @param type
 	 * @return
 	 */
-	public static String getArrayElementType(String type)
+	static String getArrayElementType(String type)
 	{
 		String result = null;
 

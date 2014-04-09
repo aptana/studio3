@@ -22,7 +22,7 @@ public class CommandTemplate extends Template
 		this.commandElement = command;
 	}
 
-	public CommandTemplate(CommandElement commandElement, String trigger, String contextTypeId)
+	CommandTemplate(CommandElement commandElement, String trigger, String contextTypeId)
 	{
 		this(commandElement, trigger, commandElement.getDisplayName(), contextTypeId, commandElement.getDisplayName(),
 				true);
@@ -55,11 +55,6 @@ public class CommandTemplate extends Template
 	protected boolean matches(String prefix)
 	{
 		return getName().toLowerCase().startsWith(prefix.toLowerCase());
-	}
-
-	boolean exactMatches(String prefix)
-	{
-		return prefix != null && prefix.length() != 0 && getName().equalsIgnoreCase(prefix);
 	}
 
 	@Override

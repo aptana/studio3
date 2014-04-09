@@ -51,7 +51,7 @@ public class StreamUtil
 	 * @return the content
 	 * @throws IOException
 	 */
-	public static String readContent(InputStream stream, String charset) throws IOException
+	private static String readContent(InputStream stream, String charset) throws IOException
 	{
 		if (stream == null)
 		{

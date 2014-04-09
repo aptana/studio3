@@ -98,7 +98,7 @@ public class JSTypeMapper
 	/**
 	 * loadMappings
 	 */
-	protected void loadMappings()
+	private void loadMappings()
 	{
 		// @formatter:off
 		EclipseUtil.processConfigurationElements(

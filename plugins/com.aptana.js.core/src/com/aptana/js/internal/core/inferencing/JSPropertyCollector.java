@@ -40,7 +40,7 @@ public class JSPropertyCollector extends JSTreeWalker
 	 * 
 	 * @param name
 	 */
-	public void activateProperty(String name)
+	void activateProperty(String name)
 	{
 		if (this._currentObject.hasProperty(name))
 		{
@@ -61,7 +61,7 @@ public class JSPropertyCollector extends JSTreeWalker
 	 * @param name
 	 * @param value
 	 */
-	public void addPropertyValue(String name, IParseNode value)
+	private void addPropertyValue(String name, IParseNode value)
 	{
 		if (name != null && name.length() > 0 && value instanceof JSNode)
 		{
@@ -79,7 +79,7 @@ public class JSPropertyCollector extends JSTreeWalker
 	 * @param name
 	 * @param values
 	 */
-	public void addPropertyValues(String name, List<JSNode> values)
+	private void addPropertyValues(String name, List<JSNode> values)
 	{
 		if (name != null && name.length() > 0 && values != null && !values.isEmpty())
 		{
@@ -141,7 +141,7 @@ public class JSPropertyCollector extends JSTreeWalker
 	/**
 	 * resetGlobal
 	 */
-	public void resetGlobal()
+	private void resetGlobal()
 	{
 		this._currentObject = this._object;
 	}

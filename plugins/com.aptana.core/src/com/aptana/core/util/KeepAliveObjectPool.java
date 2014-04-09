@@ -70,7 +70,7 @@ public abstract class KeepAliveObjectPool<T> implements IObjectPool<T> {
 		reaper.exit();
 	}
 
-	protected synchronized void reap() {
+	private synchronized void reap() {
 		long now = System.currentTimeMillis();
 		for (T c : unlocked.keySet()) {
 			if ((now - unlocked.get(c)) > timeToRelease()) {

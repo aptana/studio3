@@ -90,7 +90,7 @@ public class EclipseUtil
 		}
 	}
 
-	public static final String STANDALONE_PLUGIN_ID = "com.aptana.rcp"; //$NON-NLS-1$
+	private static final String STANDALONE_PLUGIN_ID = "com.aptana.rcp"; //$NON-NLS-1$
 
 	@SuppressWarnings("nls")
 	private static final String[] UNIT_TEST_IDS = { "org.eclipse.pde.junit.runtime.uitestapplication",
@@ -365,7 +365,7 @@ public class EclipseUtil
 	 * @param asSplashLauncher
 	 * @return
 	 */
-	public static IPath getApplicationLauncher(boolean asSplashLauncher)
+	private static IPath getApplicationLauncher(boolean asSplashLauncher)
 	{
 		IPath launcher = null;
 		String cmdline = System.getProperty("eclipse.commands"); //$NON-NLS-1$
@@ -541,7 +541,7 @@ public class EclipseUtil
 	 * @param bundle
 	 * @return
 	 */
-	public static Properties getTraceOptions(Bundle bundle)
+	private static Properties getTraceOptions(Bundle bundle)
 	{
 		Path path = new Path(".options"); //$NON-NLS-1$
 		URL fileURL = FileLocator.find(bundle, path, null);
@@ -569,7 +569,7 @@ public class EclipseUtil
 	 * 
 	 * @return
 	 */
-	public static Map<String, BundleContext> getCurrentBundleContexts()
+	private static Map<String, BundleContext> getCurrentBundleContexts()
 	{
 		Map<String, BundleContext> contexts = new HashMap<String, BundleContext>();
 
@@ -722,7 +722,7 @@ public class EclipseUtil
 	 * @param element
 	 * @return
 	 */
-	public static Map<String, String> collectElementAttributes(IConfigurationElement element)
+	private static Map<String, String> collectElementAttributes(IConfigurationElement element)
 	{
 		Map<String, String> map = new TreeMap<String, String>();
 		String[] attributes = element.getAttributeNames();

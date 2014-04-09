@@ -22,9 +22,9 @@ public class MarkerDelta extends org.eclipse.core.internal.resources.MarkerDelta
 	/**
 	 * uniform resource
 	 */
-	protected IUniformResource resource;
+	private IUniformResource resource;
 	
-	public MarkerDelta(int kind, IUniformResource resource, MarkerInfo info)
+	MarkerDelta(int kind, IUniformResource resource, MarkerInfo info)
 	{
 		super(kind, ResourcesPlugin.getWorkspace().getRoot(), info);
 		this.resource = resource;

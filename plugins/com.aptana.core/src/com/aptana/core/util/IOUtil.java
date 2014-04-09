@@ -453,7 +453,7 @@ public abstract class IOUtil
 	 * @param file
 	 * @throws IOException
 	 */
-	public static void extractFile(String bundleId, IPath path, File file) throws IOException
+	static void extractFile(String bundleId, IPath path, File file) throws IOException
 	{
 		URL url = FileLocator.find(Platform.getBundle(bundleId), path, null);
 		InputStream in = null;
@@ -549,7 +549,7 @@ public abstract class IOUtil
 	 * @param numberOfUpdates
 	 * @return
 	 */
-	public static int determineProgressBatchUpdateCount(int numberOfUpdates)
+	private static int determineProgressBatchUpdateCount(int numberOfUpdates)
 	{
 		int updateSize = 2;
 

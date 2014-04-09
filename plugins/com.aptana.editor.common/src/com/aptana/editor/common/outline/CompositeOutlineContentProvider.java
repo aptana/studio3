@@ -59,7 +59,7 @@ public class CompositeOutlineContentProvider extends CommonOutlineContentProvide
 		fProvidersByLanguage.put(language, provider);
 	}
 
-	protected Object[] getDefaultChildren(Object parent)
+	private Object[] getDefaultChildren(Object parent)
 	{
 		Object[] children = super.getChildren(parent);
 		if (children.length == 1 && children[0] instanceof ParseRootNode)
@@ -70,7 +70,7 @@ public class CompositeOutlineContentProvider extends CommonOutlineContentProvide
 		return children;
 	}
 
-	protected CommonOutlineContentProvider getContentProviderForLanguage(String language)
+	private CommonOutlineContentProvider getContentProviderForLanguage(String language)
 	{
 		return fProvidersByLanguage.get(language);
 	}

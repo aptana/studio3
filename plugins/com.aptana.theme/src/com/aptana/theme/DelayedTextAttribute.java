@@ -16,14 +16,14 @@ public class DelayedTextAttribute
 	public final RGBa background;
 	public final int style;
 
-	public DelayedTextAttribute(RGBa foreground, RGBa background, int style)
+	DelayedTextAttribute(RGBa foreground, RGBa background, int style)
 	{
 		this.foreground = foreground;
 		this.background = background;
 		this.style = style;
 	}
 
-	public DelayedTextAttribute(RGBa foreground)
+	DelayedTextAttribute(RGBa foreground)
 	{
 		this(foreground, null, SWT.NORMAL);
 	}

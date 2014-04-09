@@ -23,7 +23,7 @@ public class AdaptableTextSelection extends TextSelection implements IAdaptable
 	/**
 	 * @param element
 	 */
-	public AdaptableTextSelection(ISourceViewer viewer, ITextSelection textSelection)
+	AdaptableTextSelection(ISourceViewer viewer, ITextSelection textSelection)
 	{
 		super(textSelection.getOffset(), textSelection.getLength());
 		this.viewer = viewer;

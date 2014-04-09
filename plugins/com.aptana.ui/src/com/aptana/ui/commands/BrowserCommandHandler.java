@@ -20,13 +20,13 @@ import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.ui.UIPlugin;
 
-public class BrowserCommandHandler extends AbstractHandler
+class BrowserCommandHandler extends AbstractHandler
 {
 
 	private URL browserURL;
 	private String browserId;
 
-	public BrowserCommandHandler(String url, String browserId)
+	BrowserCommandHandler(String url, String browserId)
 	{
 		setURL(url);
 		this.browserId = browserId;

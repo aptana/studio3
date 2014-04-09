@@ -43,7 +43,7 @@ public class JSIndexWriter extends IndexWriter
 	 * @param event
 	 * @param location
 	 */
-	protected void writeEvent(Index index, EventElement event, URI location)
+	private void writeEvent(Index index, EventElement event, URI location)
 	{
 		// @formatter:off
 		String value = StringUtil.join(
@@ -79,7 +79,7 @@ public class JSIndexWriter extends IndexWriter
 	 * @param function
 	 * @param location
 	 */
-	protected void writeFunction(Index index, FunctionElement function, URI location)
+	private void writeFunction(Index index, FunctionElement function, URI location)
 	{
 		// @formatter:off
 		String value = StringUtil.join(

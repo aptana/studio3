@@ -44,7 +44,7 @@ public abstract class AbstractFlexPartitionScanner extends AbstractFlexTokenScan
 	}
 
 	private static final Token DEFAULT_CONTENT_TYPE_TOKEN = new Token(IDocument.DEFAULT_CONTENT_TYPE);
-	protected final Queue<TokenOffsetAndLen> preCalculatedTokenOffsetAndLen = new LinkedList<TokenOffsetAndLen>();
+	private final Queue<TokenOffsetAndLen> preCalculatedTokenOffsetAndLen = new LinkedList<TokenOffsetAndLen>();
 
 	protected AbstractFlexPartitionScanner(Scanner scanner)
 	{

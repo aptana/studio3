@@ -157,7 +157,7 @@ public class ConsoleThemer
 	/**
 	 * refresh
 	 */
-	public void refresh()
+	private void refresh()
 	{
 		// refresh the display
 		ConsolePlugin.getDefault().getConsoleManager().refresh(fConsole);

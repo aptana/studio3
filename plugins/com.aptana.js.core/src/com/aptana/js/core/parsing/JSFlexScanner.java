@@ -742,7 +742,7 @@ public class JSFlexScanner extends Scanner {
    *
    * @param   in  the java.io.Reader to read input from.
    */
-  public JSFlexScanner(java.io.Reader in) {
+  private JSFlexScanner(java.io.Reader in) {
     this.zzReader = in;
   }
 
@@ -851,7 +851,7 @@ public class JSFlexScanner extends Scanner {
    *
    * @param reader   the new input stream 
    */
-  public final void yyreset(java.io.Reader reader) {
+  private final void yyreset(java.io.Reader reader) {
     zzReader = reader;
     zzAtBOL  = true;
     zzAtEOF  = false;
@@ -876,7 +876,7 @@ public class JSFlexScanner extends Scanner {
    *
    * @param newState the new lexical state
    */
-  public final void yybegin(int newState) {
+  private final void yybegin(int newState) {
     zzLexicalState = newState;
   }
 
@@ -884,7 +884,7 @@ public class JSFlexScanner extends Scanner {
   /**
    * Returns the text matched by the current regular expression.
    */
-  public final String yytext() {
+  private final String yytext() {
     return new String( zzBuffer, zzStartRead, zzMarkedPos-zzStartRead );
   }
 
@@ -908,7 +908,7 @@ public class JSFlexScanner extends Scanner {
   /**
    * Returns the length of the matched text region.
    */
-  public final int yylength() {
+  private final int yylength() {
     return zzMarkedPos-zzStartRead;
   }
 
@@ -948,7 +948,7 @@ public class JSFlexScanner extends Scanner {
    * @param number  the number of characters to be read again.
    *                This number must not be greater than yylength()!
    */
-  public void yypushback(int number)  {
+  private void yypushback(int number)  {
     if ( number > yylength() )
       zzScanError(ZZ_PUSHBACK_2BIG);
 
@@ -963,7 +963,7 @@ public class JSFlexScanner extends Scanner {
    * @return      the next token
    * @exception   java.io.IOException  if any I/O-Error occurs
    */
-  public Symbol yylex() throws java.io.IOException, Scanner.Exception {
+  private Symbol yylex() throws java.io.IOException, Scanner.Exception {
     int zzInput;
     int zzAction;
 

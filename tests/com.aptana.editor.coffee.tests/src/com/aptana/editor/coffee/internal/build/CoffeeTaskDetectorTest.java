@@ -60,7 +60,7 @@ public class CoffeeTaskDetectorTest
 				@Override
 				public void putProblems(String markerType, Collection<IProblem> newItems)
 				{
-					problems.put(markerType, newItems);
+					fProblems.put(markerType, newItems);
 				}
 			};
 			taskDetector.buildFile(context, new NullProgressMonitor());
@@ -107,7 +107,7 @@ public class CoffeeTaskDetectorTest
 				@Override
 				public void putProblems(String markerType, Collection<IProblem> newItems)
 				{
-					problems.put(markerType, newItems);
+					fProblems.put(markerType, newItems);
 				}
 			};
 

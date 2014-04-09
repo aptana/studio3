@@ -20,7 +20,7 @@ public class CommonOutlinePageInput
 {
 	public IParseRootNode ast;
 
-	public CommonOutlinePageInput(IParseRootNode ast)
+	CommonOutlinePageInput(IParseRootNode ast)
 	{
 		this.ast = ast;
 	}

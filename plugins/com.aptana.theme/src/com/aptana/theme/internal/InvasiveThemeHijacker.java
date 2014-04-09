@@ -125,7 +125,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPreferenceChangeLis
 		}
 	}
 
-	protected void setColor(IEclipsePreferences prefs, String prefKey, Theme currentTheme, String tokenName,
+	private void setColor(IEclipsePreferences prefs, String prefKey, Theme currentTheme, String tokenName,
 			RGB defaultColor)
 	{
 		RGB rgb = defaultColor;

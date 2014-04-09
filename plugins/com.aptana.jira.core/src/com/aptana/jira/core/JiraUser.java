@@ -13,7 +13,7 @@ public class JiraUser
 	private final String username;
 	private final String password;
 
-	public JiraUser(String username, String password)
+	JiraUser(String username, String password)
 	{
 		this.username = username;
 		this.password = password;

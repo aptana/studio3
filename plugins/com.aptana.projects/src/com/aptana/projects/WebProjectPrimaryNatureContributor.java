@@ -14,7 +14,6 @@ import com.aptana.projects.primary.natures.IPrimaryNatureContributor;
 
 public class WebProjectPrimaryNatureContributor extends AbstractPrimaryNatureContributor
 {
-	private static final String WEB_PERSPECTIVE_ID = "com.aptana.ui.WebPerspective"; //$NON-NLS-1$
 
 	public int getPrimaryNatureRank(IPath projectPath)
 	{

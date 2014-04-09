@@ -70,29 +70,6 @@ public class ArrayUtil
 		return array == null || array.length == 0;
 	}
 
-	/**
-	 * Returns <code>true</code> in case all the elements in the given array are <code>null</code>.
-	 * 
-	 * @param array
-	 * @return <code>true</code> in case all the array's elements are <code>null</code>. Also, returns <code>true</code>
-	 *         in case the given array itself is <code>null</code>.
-	 */
-	public static boolean isAllNulls(Object[] array)
-	{
-		if (array == null)
-		{
-			return true;
-		}
-		for (Object obj : array)
-		{
-			if (obj != null)
-			{
-				return false;
-			}
-		}
-		return true;
-	}
-
 	public static int length(Object[] array)
 	{
 		if (isEmpty(array))

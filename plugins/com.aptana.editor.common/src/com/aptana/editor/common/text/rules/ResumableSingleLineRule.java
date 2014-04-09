@@ -16,9 +16,9 @@ import com.aptana.core.util.StringUtil;
 
 /**
  * @author Max Stepanov
- *
  */
-public class ResumableSingleLineRule extends SingleLineRule implements IResumableRule {
+public class ResumableSingleLineRule extends SingleLineRule implements IResumableRule
+{
 
 	private boolean fResume;
 
@@ -29,44 +29,46 @@ public class ResumableSingleLineRule extends SingleLineRule implements IResumabl
 	 * @param escapeCharacter
 	 * @param breaksOnEOF
 	 */
-	public ResumableSingleLineRule(String startSequence, String endSequence, IToken token, char escapeCharacter, boolean breaksOnEOF) {
+	public ResumableSingleLineRule(String startSequence, String endSequence, IToken token, char escapeCharacter,
+			boolean breaksOnEOF)
+	{
 		super(startSequence, endSequence, token, escapeCharacter, breaksOnEOF);
 	}
 
-	/**
-	 * @param startSequence
-	 * @param endSequence
-	 * @param token
-	 * @param escapeCharacter
-	 * @param breaksOnEOF
-	 * @param escapeContinuesLine
-	 */
-	public ResumableSingleLineRule(String startSequence, String endSequence, IToken token, char escapeCharacter, boolean breaksOnEOF, boolean escapeContinuesLine) {
-		super(startSequence, endSequence, token, escapeCharacter, breaksOnEOF, escapeContinuesLine);
-	}
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.rules.PatternRule#doEvaluate(org.eclipse.jface.text.rules.ICharacterScanner, boolean)
 	 */
 	@Override
-	protected IToken doEvaluate(ICharacterScanner scanner, boolean resume) {
-		try {
+	protected IToken doEvaluate(ICharacterScanner scanner, boolean resume)
+	{
+		try
+		{
 			fResume = resume;
 			return super.doEvaluate(scanner, resume);
-		} finally {
+		}
+		finally
+		{
 			fResume = false;
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.rules.PatternRule#endSequenceDetected(org.eclipse.jface.text.rules.ICharacterScanner)
 	 */
 	@Override
-	protected boolean endSequenceDetected(ICharacterScanner scanner) {
-		CollectingCharacterScanner collectingCharacterScanner = new CollectingCharacterScanner(scanner, fResume ? "" : String.valueOf(fStartSequence)); //$NON-NLS-1$
-		scanner = (fResume && fToken instanceof ExtendedToken) ? new PrefixedCharacterScanner(((ExtendedToken) fToken).getContentSubstring(fStartSequence.length), collectingCharacterScanner) : collectingCharacterScanner;
-		if (doDetectEndSequence(scanner)) {
-			if (fToken instanceof ExtendedToken) {
+	protected boolean endSequenceDetected(ICharacterScanner scanner)
+	{
+		CollectingCharacterScanner collectingCharacterScanner = new CollectingCharacterScanner(scanner,
+				fResume ? "" : String.valueOf(fStartSequence)); //$NON-NLS-1$
+		scanner = (fResume && fToken instanceof ExtendedToken) ? new PrefixedCharacterScanner(
+				((ExtendedToken) fToken).getContentSubstring(fStartSequence.length), collectingCharacterScanner)
+				: collectingCharacterScanner;
+		if (doDetectEndSequence(scanner))
+		{
+			if (fToken instanceof ExtendedToken)
+			{
 				ExtendedToken extendedToken = (ExtendedToken) fToken;
 				String prefix = fResume ? extendedToken.getContents() : ""; //$NON-NLS-1$
 				extendedToken.setContents(prefix.concat(collectingCharacterScanner.getContents()));
@@ -76,15 +78,19 @@ public class ResumableSingleLineRule extends SingleLineRule implements IResumabl
 		return false;
 	}
 
-	protected boolean doDetectEndSequence(ICharacterScanner scanner) {
+	private boolean doDetectEndSequence(ICharacterScanner scanner)
+	{
 		return super.endSequenceDetected(scanner);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.text.rules.IResumableRule#resetRule()
 	 */
-	public void resetRule() {
-		if (fToken instanceof ExtendedToken) {
+	public void resetRule()
+	{
+		if (fToken instanceof ExtendedToken)
+		{
 			((ExtendedToken) fToken).setContents(StringUtil.EMPTY);
 		}
 	}

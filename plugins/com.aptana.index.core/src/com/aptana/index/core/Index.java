@@ -378,12 +378,12 @@ public class Index
 		}
 	}
 
-	protected static void logTrace(String msg)
+	private static void logTrace(String msg)
 	{
 		IdeLog.logTrace(IndexPlugin.getDefault(), msg, IDebugScopes.INDEXER);
 	}
 
-	protected static boolean isTraceEnabled()
+	private static boolean isTraceEnabled()
 	{
 		return IdeLog.isTraceEnabled(IndexPlugin.getDefault(), IDebugScopes.INDEXER);
 	}
@@ -574,7 +574,7 @@ public class Index
 	/**
 	 * Returns the document names that contain the given substring, if null then returns all of them.
 	 */
-	public Set<String> queryDocumentNames(String substring) throws IOException
+	Set<String> queryDocumentNames(String substring) throws IOException
 	{
 		Set<String> results;
 		this.enterRead();
@@ -638,7 +638,7 @@ public class Index
 	 * 
 	 * @param categoryNames
 	 */
-	public void removeCategories(String... categoryNames)
+	void removeCategories(String... categoryNames)
 	{
 		this.enterWrite();
 		try
@@ -735,7 +735,7 @@ public class Index
 	 * 
 	 * @throws IOException
 	 */
-	public void reset() throws IOException
+	void reset() throws IOException
 	{
 		this.memoryIndex = new MemoryIndex();
 		this.diskIndex = new DiskIndex(this.diskIndex.indexFile.getCanonicalPath());

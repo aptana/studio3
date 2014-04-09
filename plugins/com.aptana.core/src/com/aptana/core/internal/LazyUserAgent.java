@@ -15,7 +15,7 @@ import com.aptana.core.util.StringUtil;
 /**
  * @author cwilliams
  */
-public class LazyUserAgent implements IUserAgent
+class LazyUserAgent implements IUserAgent
 {
 
 	private static final String ATTR_NAME = "name"; //$NON-NLS-1$
@@ -25,7 +25,7 @@ public class LazyUserAgent implements IUserAgent
 
 	private IConfigurationElement element;
 
-	public LazyUserAgent(IConfigurationElement element)
+	LazyUserAgent(IConfigurationElement element)
 	{
 		this.element = element;
 	}

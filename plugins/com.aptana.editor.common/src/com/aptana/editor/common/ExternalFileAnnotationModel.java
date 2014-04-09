@@ -43,7 +43,7 @@ public class ExternalFileAnnotationModel extends AbstractMarkerAnnotationModel i
 	private IUniformResource resource;
 	private IUniformResourceChangeListener resourceChangeListener;
 
-	public ExternalFileAnnotationModel(IFileStore fileStore)
+	ExternalFileAnnotationModel(IFileStore fileStore)
 	{
 		resource = new FileStoreUniformResource(fileStore);
 		resourceChangeListener = new ResourceChangeListener();
@@ -97,7 +97,7 @@ public class ExternalFileAnnotationModel extends AbstractMarkerAnnotationModel i
 	 * @param markerDeltas
 	 *            the array of marker deltas
 	 */
-	protected void update(IMarkerDelta[] markerDeltas)
+	private void update(IMarkerDelta[] markerDeltas)
 	{
 		if (markerDeltas.length == 0)
 		{

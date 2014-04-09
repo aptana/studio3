@@ -191,7 +191,7 @@ public class AbstractFoldingEditor extends AbstractBaseTextEditor implements IFo
 		}
 	}
 
-	protected ProjectionAnnotationModel getAnnotationModel()
+	private ProjectionAnnotationModel getAnnotationModel()
 	{
 		ISourceViewer viewer = getSourceViewer();
 		if (viewer instanceof ProjectionViewer)

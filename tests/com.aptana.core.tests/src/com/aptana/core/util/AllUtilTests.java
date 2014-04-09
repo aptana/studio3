@@ -44,7 +44,6 @@ import org.junit.runners.Suite;
 	URLEncoderTest.class,
 	URLUtilTest.class,
 	VersionUtilTest.class,
-	WriterOutputStreamTest.class,
 	ZipUtilTest.class })
 //@formatter:on
 public class AllUtilTests

@@ -35,7 +35,7 @@ import com.aptana.scripting.model.OutputType;
 public class CommandProposal extends SnippetTemplateProposal
 {
 
-	public CommandProposal(Template template, TemplateContext context, IRegion region, Image image, int relevance)
+	CommandProposal(Template template, TemplateContext context, IRegion region, Image image, int relevance)
 	{
 		super(template, context, region, image, relevance);
 	}

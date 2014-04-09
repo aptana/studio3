@@ -210,7 +210,7 @@ public class SourcePrinter
 	 * @param text
 	 * @return Returns self
 	 */
-	public SourcePrinter printlnWithIndent(char text)
+	SourcePrinter printlnWithIndent(char text)
 	{
 		this._buffer.append(this._currentIndent).append(text).append(_newLine);
 

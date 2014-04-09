@@ -36,7 +36,7 @@ public class CommonAnnotationModel extends ResourceMarkerAnnotationModel impleme
 
 	private List<ProblemAnnotation> fGeneratedAnnotations;
 
-	public CommonAnnotationModel(IResource resource)
+	CommonAnnotationModel(IResource resource)
 	{
 		super(resource);
 		fGeneratedAnnotations = new ArrayList<ProblemAnnotation>();

@@ -3,7 +3,7 @@
 // $codepro.audit.disable
 /**
  * Aptana Studio
- * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2014 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -12,9 +12,6 @@ package com.aptana.xml.core.parsing;
 
 import java.io.Reader;
 import java.io.StringReader;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import beaver.Symbol;
 import beaver.Scanner;
@@ -28,6 +25,7 @@ import org.eclipse.core.internal.utils.StringPool;
  * on 12/5/12 1:59 PM from the specification file
  * <tt>/Users/cwilliams/repos/studio3/plugins/com.aptana.xml.core/parsing/XML.flex</tt>
  */
+@SuppressWarnings({"restriction", "nls", "unused"})
 public class XMLScanner extends Scanner {
 
   /** This character denotes the end of file */
@@ -53,7 +51,7 @@ public class XMLScanner extends Scanner {
   /** 
    * Translates characters to character classes
    */
-  private static final String ZZ_CMAP_PACKED = 
+private static final String ZZ_CMAP_PACKED = 
     "\11\0\1\3\1\2\1\0\1\3\1\1\22\0\1\3\1\12\1\7"+
     "\4\0\1\11\5\0\1\13\1\5\1\33\12\5\1\4\1\0\1\6"+
     "\1\34\1\14\1\27\1\0\1\26\1\4\1\17\1\15\1\23\11\4"+

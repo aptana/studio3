@@ -88,7 +88,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		}
 	}
 
-	protected void createTextEditingOptions(Composite parent, String groupName)
+	private void createTextEditingOptions(Composite parent, String groupName)
 	{
 		Composite group = AptanaPreferencePage.createGroup(parent, groupName);
 		group.setLayout(GridLayoutFactory.swtDefaults().numColumns(3).create());
@@ -299,7 +299,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		}
 	}
 
-	protected void createAutoIndentOptions(Composite parent)
+	private void createAutoIndentOptions(Composite parent)
 	{
 		Composite autoIndentGroup = new Composite(parent, SWT.NONE);
 		autoIndentGroup.setLayoutData(GridDataFactory.fillDefaults().span(3, 1).create());
@@ -361,7 +361,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	 * scope of the plugin preference store. The default values are taken from getDefaultTabWidth() and
 	 * getDefaultSpacesForTabs(). The default scope getDefaultPluginPreferenceStore() is used.
 	 */
-	protected void setPluginDefaults()
+	private void setPluginDefaults()
 	{
 		IEclipsePreferences store = getDefaultPluginPreferenceStore();
 		if (store == null)
@@ -386,7 +386,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	 * This method removes the spaces for tabs and tab width preferences from the default scope of the plugin preference
 	 * store.
 	 */
-	protected void removePluginDefaults()
+	private void removePluginDefaults()
 	{
 		IEclipsePreferences store = getDefaultPluginPreferenceStore();
 		if (store == null)

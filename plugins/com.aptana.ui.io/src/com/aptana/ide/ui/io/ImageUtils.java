@@ -33,19 +33,18 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.misc.ExternalProgramImageDescriptor;
 
 import com.aptana.core.util.PlatformUtil;
-import com.aptana.theme.ThemePlugin;
 import com.aptana.ui.util.UIUtils;
 
 /**
  * @author Max Stepanov
- *
  */
 @SuppressWarnings("restriction")
-public final class ImageUtils {
+public final class ImageUtils
+{
 
-    private static final String USER_HOME = PlatformUtil.expandEnvironmentStrings(PlatformUtil.HOME_DIRECTORY);
-    private static final String DESKTOP = PlatformUtil.expandEnvironmentStrings(PlatformUtil.DESKTOP_DIRECTORY);
-    private static final boolean ON_WINDOWS = Platform.OS_WIN32.equals(Platform.getOS());
+	private static final String USER_HOME = PlatformUtil.expandEnvironmentStrings(PlatformUtil.HOME_DIRECTORY);
+	private static final String DESKTOP = PlatformUtil.expandEnvironmentStrings(PlatformUtil.DESKTOP_DIRECTORY);
+	private static final boolean ON_WINDOWS = Platform.OS_WIN32.equals(Platform.getOS());
 
 	private static javax.swing.JFileChooser jFileChooser;
 	private static final Map<Object, String> iconToKeyMap = new WeakHashMap<Object, String>();
@@ -57,73 +56,103 @@ public final class ImageUtils {
 	/**
 	 * 
 	 */
-	private ImageUtils() {
+	private ImageUtils()
+	{
 	}
-	
-	public static ImageDescriptor getImageDescriptor(File file) {
-		if (file.isFile()) {
-			ImageDescriptor imageDescriptor = PlatformUI.getWorkbench().getEditorRegistry().getImageDescriptor(file.getName());
-			if (imageDescriptor != null) {
+
+	public static ImageDescriptor getImageDescriptor(File file)
+	{
+		if (file.isFile())
+		{
+			ImageDescriptor imageDescriptor = PlatformUI.getWorkbench().getEditorRegistry()
+					.getImageDescriptor(file.getName());
+			if (imageDescriptor != null)
+			{
 				return imageDescriptor;
 			}
 		}
-		if (file.exists()) {
-			if (jFileChooser == null) {
+		if (file.exists())
+		{
+			if (jFileChooser == null)
+			{
 				jFileChooser = new javax.swing.JFileChooser();
 			}
 			String fileType = jFileChooser.getTypeDescription(file);
-			if (fileType == null || fileType.length() == 0 || "Directory".equals(fileType) || "System Folder".equals(fileType) || "Generic File".equals(fileType)) {  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+			if (fileType == null
+					|| fileType.length() == 0
+					|| "Directory".equals(fileType) || "System Folder".equals(fileType) || "Generic File".equals(fileType)) { //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 				String name = file.getName();
-				try {
-                    name = file.getCanonicalFile().getName();
-                } catch (IOException e) {
-                    name = file.getName();
-                }
-                if (name.equals((new Path(DESKTOP)).lastSegment())) {
-                    fileType = "Desktop"; //$NON-NLS-1$
-                } else if (!file.isDirectory()) {
+				try
+				{
+					name = file.getCanonicalFile().getName();
+				}
+				catch (IOException e)
+				{
+					name = file.getName();
+				}
+				if (name.equals((new Path(DESKTOP)).lastSegment()))
+				{
+					fileType = "Desktop"; //$NON-NLS-1$
+				}
+				else if (!file.isDirectory())
+				{
 					int index = name.lastIndexOf('.');
-					if (index >= 0 && index < name.length()-1) {
-						fileType = name.substring(index+1);
-					} else {
+					if (index >= 0 && index < name.length() - 1)
+					{
+						fileType = name.substring(index + 1);
+					}
+					else
+					{
 						fileType = "unknown"; //$NON-NLS-1$
 					}
-				} else if ("Directory".equals(fileType) || name.length() == 0) { //$NON-NLS-1$
-                    fileType = file.getAbsolutePath();
-                } else if ("System Folder".equals(fileType)) { //$NON-NLS-1$
-                    if (file.getAbsolutePath().equals(USER_HOME)) {
-                        fileType = "UserHome"; //$NON-NLS-1$
-                    }
-                }
+				}
+				else if ("Directory".equals(fileType) || name.length() == 0) { //$NON-NLS-1$
+					fileType = file.getAbsolutePath();
+				}
+				else if ("System Folder".equals(fileType)) { //$NON-NLS-1$
+					if (file.getAbsolutePath().equals(USER_HOME))
+					{
+						fileType = "UserHome"; //$NON-NLS-1$
+					}
+				}
 			}
 			String imageKey = "os.fileType_" + fileType; //$NON-NLS-1$
 
 			ImageRegistry imageRegistry = JFaceResources.getImageRegistry();
-			if (resetMap.get(imageKey) != null && resetMap.get(imageKey)) {
+			if (resetMap.get(imageKey) != null && resetMap.get(imageKey))
+			{
 				imageRegistry.remove(imageKey);
 				resetMap.remove(imageKey);
 			}
 			ImageDescriptor imageDescriptor = imageRegistry.getDescriptor(imageKey);
-			if (imageDescriptor != null) {
+			if (imageDescriptor != null)
+			{
 				return imageDescriptor;
 			}
-	
+
 			Icon icon;
-			if (ON_WINDOWS) {
-			    icon = FileSystemView.getFileSystemView().getSystemIcon(file);
-			} else {
-			    icon = jFileChooser.getIcon(file);
+			if (ON_WINDOWS)
+			{
+				icon = FileSystemView.getFileSystemView().getSystemIcon(file);
 			}
-			if (icon != null) {
+			else
+			{
+				icon = jFileChooser.getIcon(file);
+			}
+			if (icon != null)
+			{
 				String existingImageKey = iconToKeyMap.get(icon);
-				if (existingImageKey != null) {
+				if (existingImageKey != null)
+				{
 					imageDescriptor = imageRegistry.getDescriptor(existingImageKey);
-					if (imageDescriptor != null) {
+					if (imageDescriptor != null)
+					{
 						return imageDescriptor;
 					}
 				}
 				ImageData imageData = awtImageIconToSWTImageData(icon, null);
-				if (imageData != null) {
+				if (imageData != null)
+				{
 					imageDescriptor = ImageDescriptor.createFromImageData(imageData);
 					imageRegistry.put(imageKey, imageDescriptor);
 					iconToKeyMap.put(icon, imageKey);
@@ -134,10 +163,12 @@ public final class ImageUtils {
 		}
 		return getImageDescriptor(file.getName());
 	}
-	
-	public static ImageDescriptor getImageDescriptor(String filename) {
+
+	public static ImageDescriptor getImageDescriptor(String filename)
+	{
 		ImageDescriptor imageDescriptor = PlatformUI.getWorkbench().getEditorRegistry().getImageDescriptor(filename);
-		if (imageDescriptor == null) {
+		if (imageDescriptor == null)
+		{
 			imageDescriptor = getExtensionImageDescriptor(new Path(filename).getFileExtension());
 		}
 		return imageDescriptor;
@@ -152,15 +183,20 @@ public final class ImageUtils {
 		}
 	}
 
-	private static ImageDescriptor getExtensionImageDescriptor(String extension) {
+	private static ImageDescriptor getExtensionImageDescriptor(String extension)
+	{
 		ImageRegistry imageRegistry = JFaceResources.getImageRegistry();
 		String imageKey = "extension_" + extension; //$NON-NLS-1$
 		ImageDescriptor imageDescriptor = imageRegistry.getDescriptor(imageKey);
-		if (imageDescriptor == null) {
+		if (imageDescriptor == null)
+		{
 			Program program = Program.findProgram(extension);
-			if (program != null) {
+			if (program != null)
+			{
 				imageDescriptor = new ExternalProgramImageDescriptor(program);
-			} else {
+			}
+			else
+			{
 				return null;
 			}
 			imageRegistry.put(imageKey, imageDescriptor);
@@ -168,64 +204,75 @@ public final class ImageUtils {
 		}
 		return imageDescriptor;
 	}
-	
-	private static ImageData awtImageIconToSWTImageData(javax.swing.Icon icon, Color backgroundColor) {
+
+	private static ImageData awtImageIconToSWTImageData(javax.swing.Icon icon, Color backgroundColor)
+	{
 		if (backgroundColor == null)
 		{
-			if (ThemePlugin.applyToViews())
-			{
-				backgroundColor = ThemePlugin.getDefault().getColorManager()
-						.getColor(ThemePlugin.getDefault().getThemeManager().getCurrentTheme().getBackground());
-			}
-			else
-			{
-				backgroundColor = UIUtils.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND);
-			}
+			backgroundColor = UIUtils.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND);
 		}
 		java.awt.Color bgColor = swtColorToAWTColor(backgroundColor);
 
-		java.awt.image.BufferedImage bi = new java.awt.image.BufferedImage(icon.getIconWidth(), icon.getIconHeight(), java.awt.image.BufferedImage.TYPE_INT_RGB);
+		java.awt.image.BufferedImage bi = new java.awt.image.BufferedImage(icon.getIconWidth(), icon.getIconHeight(),
+				java.awt.image.BufferedImage.TYPE_INT_RGB);
 		java.awt.Graphics2D imageGraphics = bi.createGraphics();
 
-		try {
-			if (icon instanceof javax.swing.ImageIcon) {
-				imageGraphics.drawImage(((javax.swing.ImageIcon) icon).getImage(), 0, 0, bgColor, (java.awt.image.ImageObserver) null);
-			} else {
-				if (jFileChooser == null) {
+		try
+		{
+			if (icon instanceof javax.swing.ImageIcon)
+			{
+				imageGraphics.drawImage(((javax.swing.ImageIcon) icon).getImage(), 0, 0, bgColor,
+						(java.awt.image.ImageObserver) null);
+			}
+			else
+			{
+				if (jFileChooser == null)
+				{
 					jFileChooser = new javax.swing.JFileChooser();
 				}
 				imageGraphics.setBackground(bgColor);
 				imageGraphics.clearRect(0, 0, icon.getIconWidth(), icon.getIconHeight());
-				icon.paintIcon(jFileChooser, imageGraphics, 0, 0);				
+				icon.paintIcon(jFileChooser, imageGraphics, 0, 0);
 			}
 			return awtBufferedImageToSWTImageData(bi);
-		} finally {
+		}
+		finally
+		{
 			imageGraphics.dispose();
 		}
 	}
 
-	private static java.awt.Color swtColorToAWTColor(Color color) {
+	private static java.awt.Color swtColorToAWTColor(Color color)
+	{
 		return new java.awt.Color(color.getRed(), color.getGreen(), color.getBlue());
 	}
 
-	private static ImageData awtBufferedImageToSWTImageData(java.awt.image.BufferedImage bufferedImage) {
-		if (bufferedImage.getColorModel() instanceof java.awt.image.DirectColorModel) {
-			java.awt.image.DirectColorModel colorModel = (java.awt.image.DirectColorModel) bufferedImage.getColorModel();
-			PaletteData palette = new PaletteData(colorModel.getRedMask(), colorModel.getGreenMask(), colorModel.getBlueMask());
+	private static ImageData awtBufferedImageToSWTImageData(java.awt.image.BufferedImage bufferedImage)
+	{
+		if (bufferedImage.getColorModel() instanceof java.awt.image.DirectColorModel)
+		{
+			java.awt.image.DirectColorModel colorModel = (java.awt.image.DirectColorModel) bufferedImage
+					.getColorModel();
+			PaletteData palette = new PaletteData(colorModel.getRedMask(), colorModel.getGreenMask(),
+					colorModel.getBlueMask());
 			ImageData data = new ImageData(bufferedImage.getWidth(), bufferedImage.getHeight(),
 					colorModel.getPixelSize(), palette);
 			java.awt.image.WritableRaster raster = bufferedImage.getRaster();
 			int[] pixelArray = new int[3];
 			int pixel;
-			for (int y = 0; y < data.height; y++) {
-				for (int x = 0; x < data.width; x++) {
+			for (int y = 0; y < data.height; y++)
+			{
+				for (int x = 0; x < data.width; x++)
+				{
 					raster.getPixel(x, y, pixelArray);
 					pixel = palette.getPixel(new RGB(pixelArray[0], pixelArray[1], pixelArray[2]));
 					data.setPixel(x, y, pixel);
 				}
 			}
 			return data;
-		} else if (bufferedImage.getColorModel() instanceof java.awt.image.IndexColorModel) {
+		}
+		else if (bufferedImage.getColorModel() instanceof java.awt.image.IndexColorModel)
+		{
 			java.awt.image.IndexColorModel colorModel = (java.awt.image.IndexColorModel) bufferedImage.getColorModel();
 			int size = colorModel.getMapSize();
 			byte[] reds = new byte[size];
@@ -236,19 +283,22 @@ public final class ImageUtils {
 			colorModel.getBlues(blues);
 			RGB[] rgbs = new RGB[size];
 
-			for (int i = 0; i < rgbs.length; i++) {
+			for (int i = 0; i < rgbs.length; i++)
+			{
 				rgbs[i] = new RGB(reds[i] & 0xFF, greens[i] & 0xFF, blues[i] & 0xFF);
 			}
 
 			PaletteData palette = new PaletteData(rgbs);
-			ImageData data = new ImageData(bufferedImage.getWidth(), bufferedImage.getHeight(), colorModel
-					.getPixelSize(), palette);
+			ImageData data = new ImageData(bufferedImage.getWidth(), bufferedImage.getHeight(),
+					colorModel.getPixelSize(), palette);
 			data.transparentPixel = colorModel.getTransparentPixel();
 			java.awt.image.WritableRaster raster = bufferedImage.getRaster();
 			int[] pixelArray = new int[1];
 
-			for (int y = 0; y < data.height; y++) {
-				for (int x = 0; x < data.width; x++) {
+			for (int y = 0; y < data.height; y++)
+			{
+				for (int x = 0; x < data.width; x++)
+				{
 					raster.getPixel(x, y, pixelArray);
 					data.setPixel(x, y, pixelArray[0]);
 				}

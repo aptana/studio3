@@ -19,6 +19,7 @@ import com.aptana.jetty.util.epl.ajax.JSON.Output;
 
 public class ParameterElement implements Convertible
 {
+	private static final String TYPE_PROPERTY = "type"; //$NON-NLS-1$
 	private static final String TYPES_PROPERTY = "types"; //$NON-NLS-1$
 	private static final String DESCRIPTION_PROPERTY = "description"; //$NON-NLS-1$
 	private static final String USAGE_PROPERTY = "usage"; //$NON-NLS-1$
@@ -66,9 +67,9 @@ public class ParameterElement implements Convertible
 		this.setDescription(StringUtil.getStringValue(object.get(DESCRIPTION_PROPERTY)));
 
 		// JSCA contains a single "type" value
-		if (object.containsKey("type"))
+		if (object.containsKey(TYPE_PROPERTY))
 		{
-			this._types = CollectionsUtil.newList((String) object.get("type"));
+			this._types = CollectionsUtil.newList((String) object.get(TYPE_PROPERTY));
 		}
 		else
 		{
@@ -161,9 +162,6 @@ public class ParameterElement implements Convertible
 		{
 			return "[" + this.getName() + "]"; //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		else
-		{
-			return this.getName();
-		}
+		return this.getName();
 	}
 }

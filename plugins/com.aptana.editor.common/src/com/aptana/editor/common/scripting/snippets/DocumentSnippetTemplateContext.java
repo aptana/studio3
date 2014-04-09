@@ -21,12 +21,12 @@ public class DocumentSnippetTemplateContext extends DocumentTemplateContext
 {
 	private Template template;
 
-	public DocumentSnippetTemplateContext(TemplateContextType type, IDocument document, int offset, int length)
+	DocumentSnippetTemplateContext(TemplateContextType type, IDocument document, int offset, int length)
 	{
 		super(type, document, offset, length);
 	}
 
-	public DocumentSnippetTemplateContext(TemplateContextType type, IDocument document, Position position)
+	DocumentSnippetTemplateContext(TemplateContextType type, IDocument document, Position position)
 	{
 		super(type, document, position);
 	}

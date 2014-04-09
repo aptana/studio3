@@ -180,7 +180,7 @@ public class JSMetadataLoader extends MetadataLoader<JSMetadataReader>
 		}
 	}
 
-	protected IndexManager getIndexManager()
+	private IndexManager getIndexManager()
 	{
 		return IndexPlugin.getDefault().getIndexManager();
 	}

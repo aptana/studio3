@@ -121,7 +121,7 @@ public class StatusCollector
 	 *            severities together.
 	 * @return A status count.
 	 */
-	public int getStatusCount(int severity)
+	int getStatusCount(int severity)
 	{
 		return getStatuses(severity).length;
 	}

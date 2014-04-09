@@ -19,14 +19,14 @@ import com.aptana.core.util.StringUtil;
 /**
  * TextPatternReplacer
  */
-public abstract class TextPatternReplacer
+abstract class TextPatternReplacer
 {
 	private static final String CLOSE_GROUP = ")"; //$NON-NLS-1$
 	private static final String OPEN_GROUP = "("; //$NON-NLS-1$
 	private static final String OR_OPERATOR = "|"; //$NON-NLS-1$
 	private static final String GROUP_DELIMITER = CLOSE_GROUP + OR_OPERATOR + OPEN_GROUP;
 
-	public static final IMap<String, String> REPLACE_WITH_NOTHING = new IMap<String, String>()
+	private static final IMap<String, String> REPLACE_WITH_NOTHING = new IMap<String, String>()
 	{
 		public String map(String item)
 		{
@@ -121,7 +121,7 @@ public abstract class TextPatternReplacer
 	 * @param matcher
 	 * @return
 	 */
-	protected String getReplacementText(Matcher matcher)
+	private String getReplacementText(Matcher matcher)
 	{
 		IMap<String, String> action = getAction(matcher);
 

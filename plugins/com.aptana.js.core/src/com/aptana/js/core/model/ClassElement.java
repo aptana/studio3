@@ -12,8 +12,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.aptana.core.util.ObjectUtil;
-
 /**
  * ClassElement
  */
@@ -58,30 +56,46 @@ public class ClassElement extends TypeElement
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
+	@Override
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((getName() == null) ? 0 : getName().hashCode());
+		return result;
+	}
+
 	@Override
 	public boolean equals(Object obj)
 	{
-		boolean result = false;
-
-		if (obj instanceof ClassElement)
+		// NOTE: This model element is only being used in the Index View which currently exists for debugging
+		// purposes only. TreeViews use "equals" to find nodes during selection, so we essentially only need to
+		// compare label names
+		if (this == obj)
 		{
-			ClassElement element = (ClassElement) obj;
-
-			// NOTE: This model element is only being used in the Index View which currently exists for debugging
-			// purposes only. TreeViews use "equals" to find nodes during selection, so we essentially only need to
-			// compare label names
-			result = ObjectUtil.areEqual(getName(), element.getName());
+			return true;
 		}
-		else
+		if (obj == null)
 		{
-			result = super.equals(obj);
+			return false;
 		}
-
-		return result;
+		if (getClass() != obj.getClass())
+		{
+			return false;
+		}
+		ClassElement other = (ClassElement) obj;
+		if (getName() == null)
+		{
+			if (other.getName() != null)
+			{
+				return false;
+			}
+		}
+		else if (!getName().equals(other.getName()))
+		{
+			return false;
+		}
+		return true;
 	}
 
 	/*

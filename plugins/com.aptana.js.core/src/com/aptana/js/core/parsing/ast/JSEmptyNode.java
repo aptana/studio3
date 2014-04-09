@@ -24,7 +24,7 @@ public class JSEmptyNode extends JSNode
 	/**
 	 * JSEmptyNode
 	 */
-	public JSEmptyNode(int offset)
+	private JSEmptyNode(int offset)
 	{
 		super(IJSNodeTypes.EMPTY);
 

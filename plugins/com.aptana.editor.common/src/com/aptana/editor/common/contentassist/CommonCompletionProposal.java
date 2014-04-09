@@ -34,9 +34,9 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 	protected int _replacementLength;
 	protected int _cursorPosition;
 	protected Image _image;
-	protected String _displayString;
-	protected IContextInformation _contextInformation;
-	protected String _additionalProposalInformation;
+	private String _displayString;
+	private IContextInformation _contextInformation;
+	private String _additionalProposalInformation;
 	protected String _fileLocation;
 	private int _hash;
 
@@ -44,7 +44,7 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 	private char[] _triggerChars;
 
 	/** @deprecated Use _relevance instead */
-	protected boolean _isDefaultSelection;
+	private boolean _isDefaultSelection;
 	/** @deprecated Use _relevance instead */
 	private boolean _isSuggestedSelection;
 
@@ -437,7 +437,7 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 	 * @param ignoreCase
 	 *            Do we ignore the case of the prefix during comparisons?
 	 */
-	protected boolean isValidPrefix(String prefix, String displayString, boolean ignoreCase)
+	private boolean isValidPrefix(String prefix, String displayString, boolean ignoreCase)
 	{
 		if (prefix == null || displayString == null || prefix.length() > displayString.length())
 			return false;

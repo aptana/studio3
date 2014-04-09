@@ -135,7 +135,7 @@ public class FindBarEditorExtension
 		return null;
 	}
 
-	IFindBarDecorated getFindBarDecorated()
+	private IFindBarDecorated getFindBarDecorated()
 	{
 		if (fFindBarDecorated == null)
 		{

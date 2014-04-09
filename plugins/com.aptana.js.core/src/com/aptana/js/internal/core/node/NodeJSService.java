@@ -35,7 +35,6 @@ import com.aptana.core.util.IProcessRunner;
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.ProcessRunner;
 import com.aptana.core.util.ProcessStatus;
-import com.aptana.core.util.ProcessUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.downloader.DownloadManager;
 import com.aptana.js.core.JSCorePlugin;
@@ -176,7 +175,7 @@ public class NodeJSService implements INodeJSService
 			IStatus status;
 			if (PlatformUtil.isWindows())
 			{
-				status = new ProcessRunner().runInBackground(Path.ROOT, "msiexec", "/i", file.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
+				status = createProcessRunner().runInBackground(Path.ROOT, "msiexec", "/i", file.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			else
 			{
@@ -233,7 +232,7 @@ public class NodeJSService implements INodeJSService
 		return Status.OK_STATUS;
 	}
 
-	protected IProcessRunner createProcessRunner()
+	private IProcessRunner createProcessRunner()
 	{
 		return new ProcessRunner();
 	}

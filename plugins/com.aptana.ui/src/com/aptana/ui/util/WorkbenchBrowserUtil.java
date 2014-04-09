@@ -18,9 +18,9 @@ import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.IProcessRunner;
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.ProcessRunner;
-import com.aptana.core.util.ProcessUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ui.UIPlugin;
 
@@ -41,17 +41,12 @@ public final class WorkbenchBrowserUtil
 	{
 		try
 		{
-			launchExternalBrowser(new URL(url));
+			launchExternalBrowser(new URL(url), null);
 		}
 		catch (MalformedURLException e)
 		{
 			IdeLog.logError(UIPlugin.getDefault(), e);
 		}
-	}
-
-	public static void launchExternalBrowser(URL url)
-	{
-		launchExternalBrowser(url, null);
 	}
 
 	public static IWebBrowser launchExternalBrowser(String url, String browserId)
@@ -67,7 +62,7 @@ public final class WorkbenchBrowserUtil
 		return null;
 	}
 
-	public static IWebBrowser launchExternalBrowser(URL url, String browserId)
+	private static IWebBrowser launchExternalBrowser(URL url, String browserId)
 	{
 		IWorkbenchBrowserSupport support = PlatformUI.getWorkbench().getBrowserSupport();
 		if (browserId != null)
@@ -110,10 +105,11 @@ public final class WorkbenchBrowserUtil
 	@SuppressWarnings("nls")
 	public static void launchBrowserByCommand(URL url)
 	{
+		IProcessRunner runner = new ProcessRunner();
 		// Can we fall back to running a command to load the URL?
 		if (PlatformUtil.isMac())
 		{
-			new ProcessRunner().runInBackground("open", url.toString());
+			runner.runInBackground("open", url.toString());
 		}
 		else if (PlatformUtil.isWindows())
 		{
@@ -127,11 +123,11 @@ public final class WorkbenchBrowserUtil
 			output = output.substring(0, output.length() - 8);
 			output = output.trim();
 			output = StringUtil.stripQuotes(output);
-			new ProcessRunner().runInBackground(output, url.toString());
+			runner.runInBackground(output, url.toString());
 		}
 		else
 		{
-			new ProcessRunner().runInBackground("xdg-open", url.toString());
+			runner.runInBackground("xdg-open", url.toString());
 		}
 	}
 

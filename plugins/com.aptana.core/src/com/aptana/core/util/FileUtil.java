@@ -54,7 +54,7 @@ public class FileUtil
 	 * @return
 	 * @throws IOException
 	 */
-	public static boolean isSymlink(File file) throws IOException
+	static boolean isSymlink(File file) throws IOException
 	{
 		Assert.isLegal(file != null);
 		File canonical;
@@ -377,7 +377,7 @@ public class FileUtil
 	 *            The file whose permissions we are modifying.
 	 * @return
 	 */
-	public static IStatus chmod(String permString, File file)
+	static IStatus chmod(String permString, File file)
 	{
 		char group = permString.charAt(1);
 		char all = permString.charAt(2);

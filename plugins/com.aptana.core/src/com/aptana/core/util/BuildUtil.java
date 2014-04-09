@@ -16,7 +16,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -56,22 +55,5 @@ public class BuildUtil
 		{
 			return new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, "Error while getting the Workspace", e); //$NON-NLS-1$
 		}
-	}
-
-	/**
-	 * Asynchronous run of a builder with the given name on the given project.
-	 * 
-	 * @param project
-	 * @param kind
-	 *            See {@link IncrementalProjectBuilder} for the available types.
-	 * @param builderName
-	 * @param args
-	 * @param monitor
-	 * @throws CoreException
-	 */
-	public static void asyncBuild(IProject project, int kind, String builderName, Map args, IProgressMonitor monitor)
-			throws CoreException
-	{
-		project.build(kind, builderName, args, monitor);
 	}
 }

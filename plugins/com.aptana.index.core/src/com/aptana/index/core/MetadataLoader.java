@@ -70,7 +70,7 @@ public abstract class MetadataLoader<T extends MetadataReader> extends Job
 	 * 
 	 * @return
 	 */
-	protected double getDefaultIndexVersion()
+	private double getDefaultIndexVersion()
 	{
 		return 0.0;
 	}
@@ -131,8 +131,8 @@ public abstract class MetadataLoader<T extends MetadataReader> extends Job
 				}
 				catch (Throwable t)
 				{
-					IdeLog.logError(IndexPlugin.getDefault(), Messages.MetadataLoader_Error_Loading_Metadata
-							+ resource, t);
+					IdeLog.logError(IndexPlugin.getDefault(),
+							Messages.MetadataLoader_Error_Loading_Metadata + resource, t);
 				}
 				finally
 				{
@@ -161,7 +161,7 @@ public abstract class MetadataLoader<T extends MetadataReader> extends Job
 	 * 
 	 * @param monitor
 	 */
-	protected void rebuildMetadataIndex(IProgressMonitor monitor)
+	private void rebuildMetadataIndex(IProgressMonitor monitor)
 	{
 		T reader = this.createMetadataReader();
 
@@ -194,7 +194,7 @@ public abstract class MetadataLoader<T extends MetadataReader> extends Job
 	 * 
 	 * @return
 	 */
-	protected boolean indexCorrupt()
+	private boolean indexCorrupt()
 	{
 		Index index = getIndex();
 		if (index == null)
@@ -223,7 +223,7 @@ public abstract class MetadataLoader<T extends MetadataReader> extends Job
 	 * Update the current metadata index version number so that it matches the value returned by getIndexVersion. This
 	 * is called once the metadata index has been updated
 	 */
-	protected void updateVersionPreference()
+	private void updateVersionPreference()
 	{
 		IEclipsePreferences prefs = (EclipseUtil.instanceScope()).getNode(this.getPluginId());
 
@@ -244,7 +244,7 @@ public abstract class MetadataLoader<T extends MetadataReader> extends Job
 	 * 
 	 * @return
 	 */
-	protected boolean versionChanged()
+	private boolean versionChanged()
 	{
 		double expectedVersion = Platform.getPreferencesService().getDouble( //
 				this.getPluginId(), //
@@ -267,11 +267,11 @@ public abstract class MetadataLoader<T extends MetadataReader> extends Job
 	/**
 	 * Scheduling rule to allow loaders to have exclusive access while loading a particular set of metadata files.
 	 */
-	static class MetadataRule implements ISchedulingRule
+	private static class MetadataRule implements ISchedulingRule
 	{
-		List<String> files;
+		private List<String> files;
 
-		public MetadataRule(String[] files)
+		private MetadataRule(String[] files)
 		{
 			this.files = Arrays.asList(files);
 		}

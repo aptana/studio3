@@ -177,7 +177,7 @@ class FilenameDifferentiator extends UIJob implements IPartListener
 		}
 	}
 
-	protected String getBaseName(IWorkbenchPart part)
+	private String getBaseName(IWorkbenchPart part)
 	{
 		String title = part.getTitle();
 		return title.split(Pattern.quote(SEPARATOR))[0];

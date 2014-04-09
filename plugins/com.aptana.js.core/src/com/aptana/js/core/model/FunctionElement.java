@@ -289,7 +289,7 @@ public class FunctionElement extends PropertyElement
 	 * 
 	 * @return
 	 */
-	public boolean hasExceptions()
+	private boolean hasExceptions()
 	{
 		return !CollectionsUtil.isEmpty(_exceptions);
 	}

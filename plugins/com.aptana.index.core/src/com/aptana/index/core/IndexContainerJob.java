@@ -137,7 +137,7 @@ public class IndexContainerJob extends IndexRequestJob
 		return Status.OK_STATUS;
 	}
 
-	protected IFileStore getContainerFileStore() throws CoreException
+	private IFileStore getContainerFileStore() throws CoreException
 	{
 		return EFS.getStore(getContainerURI());
 	}

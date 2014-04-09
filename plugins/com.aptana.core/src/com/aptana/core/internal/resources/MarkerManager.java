@@ -89,7 +89,7 @@ public final class MarkerManager
 	 * @param id
 	 * @return MarkerInfo
 	 */
-	public MarkerInfo findMarkerInfo(IUniformResource resource, long id)
+	MarkerInfo findMarkerInfo(IUniformResource resource, long id)
 	{
 		ResourceInfo info = getResourceInfo(resource);
 		if (info == null)
@@ -158,7 +158,7 @@ public final class MarkerManager
 	 * @param id
 	 * @throws CoreException
 	 */
-	public void removeMarker(IUniformResource resource, long id) throws CoreException
+	void removeMarker(IUniformResource resource, long id) throws CoreException
 	{
 		MarkerInfo marker = findMarkerInfo(resource, id);
 		if (marker == null)
@@ -194,7 +194,7 @@ public final class MarkerManager
 	 * @param changes
 	 * @throws CoreException
 	 */
-	public void changedMarkers(IUniformResource resource, IMarkerSetElement[] changes) throws CoreException
+	void changedMarkers(IUniformResource resource, IMarkerSetElement[] changes) throws CoreException
 	{
 		if (changes == null || changes.length == 0)
 		{
@@ -225,7 +225,7 @@ public final class MarkerManager
 		}
 	}
 
-	protected synchronized IMarker getRootMarker()
+	private synchronized IMarker getRootMarker()
 	{
 		if (rootMarker == null)
 		{
@@ -250,7 +250,7 @@ public final class MarkerManager
 	 * @param superType
 	 * @return boolean
 	 */
-	public boolean isSubtype(String type, String superType)
+	boolean isSubtype(String type, String superType)
 	{
 		return cache.isSubtype(type, superType);
 	}

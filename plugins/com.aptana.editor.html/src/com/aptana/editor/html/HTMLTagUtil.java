@@ -37,10 +37,7 @@ public class HTMLTagUtil
 			return HTMLTokenType.STRUCTURE_TAG.equals(type) || HTMLTokenType.BLOCK_TAG.equals(type)
 					|| HTMLTokenType.INLINE_TAG.equals(type);
 		}
-		else
-		{
-			return false;
-		}
+		return false;
 	}
 
 	/**
@@ -56,8 +53,6 @@ public class HTMLTagUtil
 	 */
 	public static List<String> getUnclosedTagNames(IDocument document, int offset)
 	{
-		HTMLParseState state = new HTMLParseState(document.get());
-
 		List<String> unclosedElements = new ArrayList<String>();
 		try
 		{
@@ -72,7 +67,7 @@ public class HTMLTagUtil
 
 				if (!StringUtil.EMPTY.equals(tagName))
 				{
-					if (TagUtil.isStartTag(src) && !state.isEmptyTagType(tagName))
+					if (TagUtil.isStartTag(src) && !HTMLParseState.isEmptyTagType(tagName))
 					{
 						if (TagUtil.tagClosed(document, tagName))
 						{
@@ -106,7 +101,7 @@ public class HTMLTagUtil
 					// get name of element and see if we are closed elsewhere in the document
 					String tagName = TagUtil.getTagName(src);
 					tagName = tagName.toLowerCase();
-					if (!unclosedElements.contains(tagName) && !state.isEmptyTagType(tagName)
+					if (!unclosedElements.contains(tagName) && !HTMLParseState.isEmptyTagType(tagName)
 							&& !TagUtil.tagClosed(document, tagName))
 					{
 						unclosedElements.add(tagName);

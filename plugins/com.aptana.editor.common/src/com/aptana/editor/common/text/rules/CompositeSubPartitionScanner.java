@@ -23,9 +23,9 @@ public abstract class CompositeSubPartitionScanner implements ISubPartitionScann
 	protected static final int TYPE_DEFAULT = 0;
 
 	protected ISubPartitionScanner[] subPartitionScanners;
-	protected IPartitionScannerSwitchStrategy[] switchStrategies;
-	protected SequenceCharacterScanner[] sequenceCharacterScanners;
-	protected SequenceCharacterScanner parentSequenceCharacterScanner;
+	private IPartitionScannerSwitchStrategy[] switchStrategies;
+	private SequenceCharacterScanner[] sequenceCharacterScanners;
+	private SequenceCharacterScanner parentSequenceCharacterScanner;
 	protected int current = 0;
 	private IToken lastToken;
 	protected IToken resumeToken;
@@ -78,7 +78,7 @@ public abstract class CompositeSubPartitionScanner implements ISubPartitionScann
 		return parentSequenceCharacterScanner.foundSequence();
 	}
 
-	protected boolean foundSequence(boolean reset) {
+	private boolean foundSequence(boolean reset) {
 		return parentSequenceCharacterScanner.foundSequence(reset);
 	}
 

@@ -34,15 +34,15 @@ public class JVMInfo
 
 	public static final String JAVA_6_SPECIFICATION = "1.6"; //$NON-NLS-1$
 
-	protected boolean isJDKInstalled;
-	protected boolean is32bit;
-	protected String javaVersion;
+	private boolean isJDKInstalled;
+	private boolean is32bit;
+	private String javaVersion;
 	// The JAVA_HOME value that will be used as an alternative in case the system does not point to a valid one.
-	protected String javaHome;
+	private String javaHome;
 	// A JAVA_HOME that was detected when looking for the javac command.
 	private String detectedJavaHome;
-	protected int javaUpdateVersion;
-	protected IPath javacPath;
+	private int javaUpdateVersion;
+	private IPath javacPath;
 	private static JVMInfo instance;
 
 	/**

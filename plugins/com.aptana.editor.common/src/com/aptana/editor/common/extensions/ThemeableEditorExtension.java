@@ -150,7 +150,7 @@ public class ThemeableEditorExtension
 		}
 	}
 
-	protected IThemeManager getThemeManager()
+	private IThemeManager getThemeManager()
 	{
 		return ThemePlugin.getDefault().getThemeManager();
 	}

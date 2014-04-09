@@ -43,28 +43,12 @@ public class TextViewerThemer extends ControlThemer
 		super(viewer.getTextWidget());
 	}
 
-	/**
-	 * Themes always apply to text viewers.
-	 */
-	protected boolean invasiveThemesEnabled()
-	{
-		return true;
-	}
-
-	/**
-	 * Always use the editor font.
-	 */
-	protected boolean useEditorFont()
-	{
-		return true;
-	}
-
 	@Override
 	protected void applyTheme()
 	{
 		super.applyTheme();
 
-		if (invasiveThemesEnabled() && !controlIsDisposed())
+		if (!controlIsDisposed())
 		{
 			// Don't always show the scrollbars, show them only when necessary
 			getTextWidget().setAlwaysShowScrollBars(false);

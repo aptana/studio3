@@ -194,7 +194,7 @@ public class MultiRegionSpellingReconcileStrategy extends SpellingReconcileStrat
 						}
 					}
 				}
-				Annotation[] annotationsToRemove = (Annotation[]) toRemove.toArray(new Annotation[toRemove.size()]);
+				Annotation[] annotationsToRemove = toRemove.toArray(new Annotation[toRemove.size()]);
 
 				if (fAnnotationModel instanceof IAnnotationModelExtension) {
 					((IAnnotationModelExtension) fAnnotationModel).replaceAnnotations(annotationsToRemove, fAddAnnotations);
@@ -203,7 +203,7 @@ public class MultiRegionSpellingReconcileStrategy extends SpellingReconcileStrat
 						fAnnotationModel.removeAnnotation(annotationsToRemove[i]);
 					for (Iterator iter = fAddAnnotations.keySet().iterator(); iter.hasNext(); ) {
 						Annotation annotation = (Annotation) iter.next();
-						fAnnotationModel.addAnnotation(annotation, (Position) fAddAnnotations.get(annotation));
+						fAnnotationModel.addAnnotation(annotation, fAddAnnotations.get(annotation));
 					}
 				}
 			}

@@ -153,7 +153,7 @@ public class RubyRegexpFolder implements IFoldingComputer
 		return getDocumentScopeManager().getScopeAtOffset(fDocument, offset);
 	}
 
-	protected IDocumentScopeManager getDocumentScopeManager()
+	private IDocumentScopeManager getDocumentScopeManager()
 	{
 		return CommonEditorPlugin.getDefault().getDocumentScopeManager();
 	}

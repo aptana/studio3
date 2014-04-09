@@ -26,7 +26,7 @@ public class MultiCharacterRule implements IPredicateRule {
 		this(sequence.toCharArray(), successToken);
 	}
 
-	public MultiCharacterRule(char[] sequence, IToken successToken) {
+	private MultiCharacterRule(char[] sequence, IToken successToken) {
 		this.sequence = sequence;
 		this.successToken = successToken;
 	}

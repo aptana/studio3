@@ -76,7 +76,7 @@ public class Parameter extends Symbol
 	 * 
 	 * @param writer
 	 */
-	public void toSource(SourcePrinter writer)
+	void toSource(SourcePrinter writer)
 	{
 		switch (this._usage)
 		{

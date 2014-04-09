@@ -12,7 +12,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.resource.ImageRegistry;
@@ -22,15 +21,12 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.osgi.framework.BundleContext;
-import org.osgi.service.prefs.BackingStoreException;
 
-import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.theme.internal.ControlThemerFactory;
 import com.aptana.theme.internal.InvasiveThemeHijacker;
 import com.aptana.theme.internal.ThemeManager;
 import com.aptana.theme.preferences.IPreferenceConstants;
-import com.aptana.ui.util.UIUtils;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -178,66 +174,11 @@ public class ThemePlugin extends AbstractUIPlugin
 				EclipseUtil.instanceScope().getNode("org.eclipse.ui.editors") //$NON-NLS-1$
 						.addPreferenceChangeListener(fEclipseColorsListener);
 
-				revertConsoleColors();
-
 				return Status.OK_STATUS;
 			}
 		};
 		EclipseUtil.setSystemForJob(job);
 		job.schedule();
-	}
-
-	/**
-	 * Reverts the console colors back to defaults.
-	 * 
-	 * @deprecated This is a one-time migration to revert back to defaults from invasive theming. This code should be
-	 *             removed in the next major revision of Studio (3.5? TISTUD 3.3)
-	 */
-	private void revertConsoleColors()
-	{
-		boolean reverted = Platform.getPreferencesService().getBoolean(ThemePlugin.PLUGIN_ID, "reverted_console",
-				false, null);
-		if (reverted)
-		{
-			// we've already reverted them
-			return;
-		}
-
-		UIUtils.getDisplay().asyncExec(new Runnable()
-		{
-
-			public void run()
-			{
-				IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode("org.eclipse.debug.ui"); //$NON-NLS-1$
-
-				prefs.remove("org.eclipse.debug.ui.errorColor"); //$NON-NLS-1$
-				prefs.remove("org.eclipse.debug.ui.outColor"); //$NON-NLS-1$
-				prefs.remove("org.eclipse.debug.ui.inColor"); //$NON-NLS-1$
-				prefs.remove("org.eclipse.debug.ui.consoleBackground"); //$NON-NLS-1$
-				prefs.remove("org.eclipse.debug.ui.PREF_CHANGED_VALUE_BACKGROUND"); //$NON-NLS-1$
-
-				try
-				{
-					prefs.flush();
-
-					// Store that we've reverted the console
-					IEclipsePreferences themePrefs = EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID);
-					themePrefs.putBoolean("reverted_console", true); //$NON-NLS-1$
-					try
-					{
-						themePrefs.flush();
-					}
-					catch (BackingStoreException e)
-					{
-						IdeLog.logError(ThemePlugin.getDefault(), e);
-					}
-				}
-				catch (BackingStoreException e)
-				{
-					IdeLog.logError(ThemePlugin.getDefault(), e);
-				}
-			}
-		});
 	}
 
 	/*
@@ -331,14 +272,6 @@ public class ThemePlugin extends AbstractUIPlugin
 			fControlThemerFactory = new ControlThemerFactory();
 		}
 		return fControlThemerFactory;
-	}
-
-	/**
-	 * @deprecated This option is being removed!
-	 */
-	public static synchronized boolean applyToViews()
-	{
-		return false;
 	}
 
 	public static synchronized boolean applyToAllEditors()

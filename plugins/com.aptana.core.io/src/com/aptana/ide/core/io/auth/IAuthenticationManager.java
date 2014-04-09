@@ -8,19 +8,18 @@
 
 package com.aptana.ide.core.io.auth;
 
-
 /**
  * @author Max Stepanov
- *
  */
-public interface IAuthenticationManager {
+public interface IAuthenticationManager
+{
 
 	public void setPassword(String authId, char[] password, boolean persistent);
-		
+
 	public boolean hasPersistent(String authId);
+
 	public char[] getPassword(String authId);
+
 	public char[] promptPassword(String authId, String login, String title, String message);
 
-	public void resetPassword(String authId);
-	
 }

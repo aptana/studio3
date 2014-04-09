@@ -49,7 +49,7 @@ public class ConfigurationElementDispatcher implements IConfigurationElementProc
 	 * 
 	 * @param processor
 	 */
-	public void addElementProcessor(IConfigurationElementProcessor processor)
+	private void addElementProcessor(IConfigurationElementProcessor processor)
 	{
 		if (processor != null)
 		{

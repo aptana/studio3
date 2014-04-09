@@ -60,7 +60,7 @@ public abstract class AbstractFlexTokenScanner implements ITokenScanner
 	/**
 	 * Whether the last returned token was a 'generated' whitespace token.
 	 */
-	protected boolean fLastWasWhitespace = false;
+	private boolean fLastWasWhitespace = false;
 
 	protected final Scanner fScanner;
 

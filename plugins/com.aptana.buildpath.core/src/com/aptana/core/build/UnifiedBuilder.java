@@ -431,7 +431,7 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 	 * @param container
 	 * @return
 	 */
-	protected Set<IFileStore> getContributedFiles(URI container)
+	private Set<IFileStore> getContributedFiles(URI container)
 	{
 		// FIXME This shoves all contributed files into the same index as the project!
 		// We want the notion of a project referring to build path entries that are maintained in their own indices,

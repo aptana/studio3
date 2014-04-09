@@ -12,7 +12,7 @@ import beaver.Symbol;
 /**
  * Represents continue and break statements.
  */
-public abstract class JSLabelStatementNode extends JSNode
+abstract class JSLabelStatementNode extends JSNode
 {
 	private Symbol _label;
 

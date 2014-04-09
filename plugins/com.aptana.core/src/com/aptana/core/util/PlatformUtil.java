@@ -80,7 +80,7 @@ public final class PlatformUtil
 	/**
 	 * The platform we're in.
 	 */
-	public static final PlatformOs platform;
+	private static final PlatformOs platform;
 
 	static
 	{
@@ -358,7 +358,7 @@ public final class PlatformUtil
 	 * 
 	 * @return child processes list as ProcessItem[]
 	 */
-	public static ProcessItem[] getRunningChildProcesses()
+	static ProcessItem[] getRunningChildProcesses()
 	{
 		int currentPid = 0;
 		ProcessItem[] allProcesses = getRunningProcesses();
@@ -443,7 +443,7 @@ public final class PlatformUtil
 		return NO_PROCESS_ITEMS;
 	}
 
-	public static void killProcess(int pid)
+	static void killProcess(int pid)
 	{
 		killProcess(pid, 9);
 	}

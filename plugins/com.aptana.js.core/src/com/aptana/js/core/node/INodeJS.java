@@ -13,7 +13,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 
-import com.aptana.core.util.ProcessUtil;
+import com.aptana.core.util.IProcessRunner;
 
 /**
  * This represents an installation of NodeJS. There may be multiple installs on the user's machine. Just because you
@@ -67,16 +67,7 @@ public interface INodeJS
 
 	/**
 	 * Run something under NodeJS. Under the hood calls out to
-	 * {@link ProcessUtil#runInBackground(String, IPath, Map, String...)}
-	 * 
-	 * @param args
-	 * @return
-	 */
-	public IStatus runInBackground(String... args);
-
-	/**
-	 * Run something under NodeJS. Under the hood calls out to
-	 * {@link ProcessUtil#runInBackground(String, IPath, Map, String...)}
+	 * {@link IProcessRunner#runInBackground(IPath, Map, String...)}
 	 * 
 	 * @param env
 	 * @param args

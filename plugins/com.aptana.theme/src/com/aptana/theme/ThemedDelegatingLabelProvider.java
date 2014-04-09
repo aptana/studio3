@@ -25,16 +25,10 @@ public class ThemedDelegatingLabelProvider implements ILabelProvider, IColorProv
 {
 
 	private ILabelProvider wrapped;
-	private boolean disabled;
 
 	public ThemedDelegatingLabelProvider(ILabelProvider wrapped)
 	{
 		this.wrapped = wrapped;
-	}
-
-	public void disable()
-	{
-		disabled = true;
 	}
 
 	public Image getImage(Object element)
@@ -49,25 +43,11 @@ public class ThemedDelegatingLabelProvider implements ILabelProvider, IColorProv
 
 	public Color getForeground(Object element)
 	{
-		if (disabled || !invasiveThemesEnabled())
+		if (wrapped instanceof IColorProvider)
 		{
-			if (wrapped instanceof IColorProvider)
-			{
-				return ((IColorProvider) wrapped).getForeground(element);
-			}
-			return null;
+			return ((IColorProvider) wrapped).getForeground(element);
 		}
-		return getThemeManager().getCurrentTheme().getForegroundColor();
-	}
-
-	protected boolean invasiveThemesEnabled()
-	{
-		return ThemePlugin.applyToViews();
-	}
-
-	protected IThemeManager getThemeManager()
-	{
-		return ThemePlugin.getDefault().getThemeManager();
+		return null;
 	}
 
 	public Color getBackground(Object element)
@@ -77,15 +57,6 @@ public class ThemedDelegatingLabelProvider implements ILabelProvider, IColorProv
 
 	public Font getFont(Object element)
 	{
-		if (disabled)
-		{
-			if (wrapped instanceof IFontProvider)
-			{
-				return ((IFontProvider) wrapped).getFont(element);
-			}
-			return null;
-		}
-
 		return null;
 	}
 
@@ -107,11 +78,6 @@ public class ThemedDelegatingLabelProvider implements ILabelProvider, IColorProv
 	public void removeListener(ILabelProviderListener listener)
 	{
 		wrapped.removeListener(listener);
-	}
-
-	public void enable()
-	{
-		disabled = false;
 	}
 
 }

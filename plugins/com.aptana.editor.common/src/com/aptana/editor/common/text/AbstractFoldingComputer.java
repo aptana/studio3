@@ -77,7 +77,7 @@ public abstract class AbstractFoldingComputer implements IFoldingComputer
 			int length = parseNode.getChildCount();
 			if (parseNode instanceof IParseRootNode)
 			{
-				IParseRootNode prn = (IParseRootNode) parseNode;
+				IParseRootNode prn = parseNode;
 				IParseNode[] comments = prn.getCommentNodes();
 				if (comments != null && comments.length > 0)
 				{

@@ -204,7 +204,7 @@ public class VSDocReader extends MetadataReader
 	 * @param qname
 	 * @param attributes
 	 */
-	public void enterDocs(String ns, String name, String qname, Attributes attributes)
+	private void enterDocs(String ns, String name, String qname, Attributes attributes)
 	{
 		this._tags = new ArrayList<Tag>();
 	}
@@ -217,7 +217,7 @@ public class VSDocReader extends MetadataReader
 	 * @param qname
 	 * @param attributes
 	 */
-	public void enterException(String ns, String name, String qname, Attributes attributes)
+	private void enterException(String ns, String name, String qname, Attributes attributes)
 	{
 		this._exceptionTypes = this.parseTypes(attributes.getValue("cref")); //$NON-NLS-1$
 
@@ -232,7 +232,7 @@ public class VSDocReader extends MetadataReader
 	 * @param qname
 	 * @param attributes
 	 */
-	public void enterPara(String ns, String name, String qname, Attributes attributes)
+	private void enterPara(String ns, String name, String qname, Attributes attributes)
 	{
 		if (this.isBufferingText())
 		{
@@ -255,7 +255,7 @@ public class VSDocReader extends MetadataReader
 	 * @param qname
 	 * @param attributes
 	 */
-	public void enterParam(String ns, String name, String qname, Attributes attributes)
+	private void enterParam(String ns, String name, String qname, Attributes attributes)
 	{
 		String parameterName = attributes.getValue("name"); //$NON-NLS-1$
 		boolean optional = Boolean.parseBoolean(attributes.getValue("optional")); //$NON-NLS-1$
@@ -301,7 +301,7 @@ public class VSDocReader extends MetadataReader
 	 * @param qname
 	 * @param attributes
 	 */
-	public void enterReturns(String ns, String name, String qname, Attributes attributes)
+	private void enterReturns(String ns, String name, String qname, Attributes attributes)
 	{
 		this._currentTypes = this.parseTypes(attributes.getValue("type")); //$NON-NLS-1$
 
@@ -316,7 +316,7 @@ public class VSDocReader extends MetadataReader
 	 * @param qname
 	 * @param attributes
 	 */
-	public void enterSee(String ns, String name, String qname, Attributes attributes)
+	private void enterSee(String ns, String name, String qname, Attributes attributes)
 	{
 		String type = attributes.getValue("cref"); //$NON-NLS-1$
 
@@ -331,7 +331,7 @@ public class VSDocReader extends MetadataReader
 	 * @param qname
 	 * @param attributes
 	 */
-	public void enterUserAgent(String ns, String name, String qname, Attributes attributes)
+	private void enterUserAgent(String ns, String name, String qname, Attributes attributes)
 	{
 		UserAgent ua = new UserAgent();
 		String uaName = attributes.getValue("name"); //$NON-NLS-1$
@@ -350,7 +350,7 @@ public class VSDocReader extends MetadataReader
 	 * @param name
 	 * @param qname
 	 */
-	public void exitDocs(String ns, String name, String qname)
+	private void exitDocs(String ns, String name, String qname)
 	{
 		this._block = new DocumentationBlock(this._summary, this._tags);
 
@@ -366,7 +366,7 @@ public class VSDocReader extends MetadataReader
 	 * @param name
 	 * @param qname
 	 */
-	public void exitExample(String ns, String name, String qname)
+	private void exitExample(String ns, String name, String qname)
 	{
 		String text = this.getText();
 
@@ -380,7 +380,7 @@ public class VSDocReader extends MetadataReader
 	 * @param name
 	 * @param qname
 	 */
-	public void exitException(String ns, String name, String qname)
+	private void exitException(String ns, String name, String qname)
 	{
 		String text = this.getText();
 		List<Type> types = new ArrayList<Type>();
@@ -407,7 +407,7 @@ public class VSDocReader extends MetadataReader
 	 * @param name
 	 * @param qname
 	 */
-	public void exitParam(String ns, String name, String qname)
+	private void exitParam(String ns, String name, String qname)
 	{
 		String text = this.getText();
 		List<Type> types = new ArrayList<Type>();
@@ -436,7 +436,7 @@ public class VSDocReader extends MetadataReader
 	 * @param qname
 	 * @param attributes
 	 */
-	public void exitPrivate(String ns, String name, String qname)
+	private void exitPrivate(String ns, String name, String qname)
 	{
 		String text = this.getText();
 
@@ -450,7 +450,7 @@ public class VSDocReader extends MetadataReader
 	 * @param name
 	 * @param qname
 	 */
-	public void exitReturns(String ns, String name, String qname)
+	private void exitReturns(String ns, String name, String qname)
 	{
 		String text = this.getText();
 		List<Type> types = new ArrayList<Type>();
@@ -477,7 +477,7 @@ public class VSDocReader extends MetadataReader
 	 * @param name
 	 * @param qname
 	 */
-	public void exitSummary(String ns, String name, String qname)
+	private void exitSummary(String ns, String name, String qname)
 	{
 		this._summary = this.resolveEntities(this.getText());
 	}
@@ -525,7 +525,7 @@ public class VSDocReader extends MetadataReader
 	 * 
 	 * @param types
 	 */
-	protected List<Type> parseTypes(String types)
+	private List<Type> parseTypes(String types)
 	{
 		List<Type> result = Collections.emptyList();
 

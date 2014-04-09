@@ -23,7 +23,7 @@ public class PrefixedCharacterScanner implements ICharacterScanner {
 	/**
 	 * 
 	 */
-	public PrefixedCharacterScanner(String prefix, ICharacterScanner baseCharacterScanner) {
+	PrefixedCharacterScanner(String prefix, ICharacterScanner baseCharacterScanner) {
 		this.prefix = prefix.toCharArray();
 		this.baseCharacterScanner = baseCharacterScanner;
 	}

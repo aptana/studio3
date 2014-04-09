@@ -218,7 +218,7 @@ public class CommonMultiPassContentFormatter extends MultiPassContentFormatter
 		}
 	}
 
-	protected String extractContentType(QualifiedContentType qualifiedContentType)
+	private String extractContentType(QualifiedContentType qualifiedContentType)
 	{
 		if (qualifiedContentType == null)
 		{

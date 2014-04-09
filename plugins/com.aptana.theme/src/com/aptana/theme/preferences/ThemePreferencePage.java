@@ -207,7 +207,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 	private static final int ROW_HEIGHT = 20;
 
-	protected Theme fSelectedTheme;
+	private Theme fSelectedTheme;
 
 	private ColorSelector fgSelector;
 	private ColorSelector bgSelector;
@@ -363,7 +363,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				.getFirstElement();
 	}
 
-	protected IThemeManager getThemeManager()
+	private IThemeManager getThemeManager()
 	{
 		return ThemePlugin.getDefault().getThemeManager();
 	}
@@ -926,7 +926,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		});
 	}
 
-	protected Font lazyFont(Font font, int style)
+	private Font lazyFont(Font font, int style)
 	{
 		if (fFonts == null)
 			fFonts = new HashMap<Integer, Font>();
@@ -940,7 +940,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		return returnFont;
 	}
 
-	static class TokenLabelProvider extends BaseLabelProvider implements ITableLabelProvider
+	private static class TokenLabelProvider extends BaseLabelProvider implements ITableLabelProvider
 	{
 
 		public Image getColumnImage(Object element, int columnIndex)
@@ -970,7 +970,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 	}
 
-	protected void setTheme(Theme newTheme)
+	private void setTheme(Theme newTheme)
 	{
 		fSelectedTheme = newTheme;
 		newTheme.save();
@@ -1155,7 +1155,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		});
 	}
 
-	protected Image createColorImage(final Table table, final RGBa color)
+	private Image createColorImage(final Table table, final RGBa color)
 	{
 		Image image = new Image(table.getDisplay(), 16, 16);
 		GC gc = new GC(image);
@@ -1191,7 +1191,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		return super.performOk();
 	}
 
-	protected void performOkFonts()
+	private void performOkFonts()
 	{
 		final String[] fontIds = new String[] { JFaceResources.TEXT_FONT,
 				"org.eclipse.ui.workbench.texteditor.blockSelectionModeFont" }; //$NON-NLS-1$
@@ -1277,7 +1277,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		return super.performCancel();
 	}
 
-	protected Theme getTheme()
+	private Theme getTheme()
 	{
 		return fSelectedTheme;
 	}
@@ -1526,7 +1526,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		setTheme(fSelectedTheme);
 	}
 
-	protected void setFont(Font font)
+	private void setFont(Font font)
 	{
 		if (fFont.equals(font)) // TODO Also same if FontData arrays are equal!
 		{

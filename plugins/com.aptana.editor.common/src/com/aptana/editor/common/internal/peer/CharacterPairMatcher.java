@@ -70,7 +70,7 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 	 * @param partitioning
 	 *            the partitioning to match within
 	 */
-	public CharacterPairMatcher(char[] chars, String partitioning)
+	private CharacterPairMatcher(char[] chars, String partitioning)
 	{
 		Assert.isLegal(chars.length % 2 == 0);
 		Assert.isNotNull(partitioning);
@@ -372,7 +372,7 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 		return open;
 	}
 
-	protected boolean isComment(IDocument doc, ITypedRegion partition) throws BadLocationException
+	private boolean isComment(IDocument doc, ITypedRegion partition) throws BadLocationException
 	{
 		if (partitionIsComment.containsKey(partition.getType()))
 		{

@@ -46,23 +46,23 @@ import com.aptana.parsing.ast.IParseRootNode;
 public class BuildContext
 {
 
-	public static final IContentType[] NO_CONTENT_TYPES = new IContentType[0];
+	private static final IContentType[] NO_CONTENT_TYPES = new IContentType[0];
 
-	private IFile file;
-	protected Map<String, Collection<IProblem>> problems;
+	private IFile fIFile;
+	protected Map<String, Collection<IProblem>> fProblems;
 	private ParseResult fParseResult;
 
 	private String fContents;
 
 	protected BuildContext()
 	{
-		this.problems = new HashMap<String, Collection<IProblem>>();
+		this.fProblems = new HashMap<String, Collection<IProblem>>();
 	}
 
-	public BuildContext(IFile file)
+	public BuildContext(IFile iFile)
 	{
 		this();
-		this.file = file;
+		this.fIFile = iFile;
 	}
 
 	public IProject getProject()
@@ -77,7 +77,7 @@ public class BuildContext
 
 	public IFile getFile()
 	{
-		return file;
+		return fIFile;
 	}
 
 	public URI getURI()
@@ -140,11 +140,6 @@ public class BuildContext
 		return ParserPoolFactory.parse(contentType, parseState);
 	}
 
-	public synchronized void resetAST()
-	{
-		fParseResult = null;
-	}
-
 	public synchronized String getContents()
 	{
 		if (fContents == null)
@@ -181,7 +176,7 @@ public class BuildContext
 		return types[0].getId();
 	}
 
-	protected IContentType[] getContentTypes() throws CoreException
+	private IContentType[] getContentTypes() throws CoreException
 	{
 		// TODO Cache this?
 		IProject theProject = getProject();
@@ -227,19 +222,19 @@ public class BuildContext
 
 	public void removeProblems(String markerType)
 	{
-		this.problems.remove(markerType);
+		this.fProblems.remove(markerType);
 	}
 
 	public void putProblems(String markerType, Collection<IProblem> problems)
 	{
 		// TODO Maybe just add problems?
-		this.problems.put(markerType, problems);
+		this.fProblems.put(markerType, problems);
 	}
 
 	public Map<String, Collection<IProblem>> getProblems()
 	{
 		// TODO Handle possible concurrent modification exceptions
-		return Collections.unmodifiableMap(problems);
+		return Collections.unmodifiableMap(fProblems);
 	}
 
 	public Collection<IParseError> getParseErrors()
@@ -261,7 +256,7 @@ public class BuildContext
 		{
 			return new ByteArrayInputStream(ArrayUtil.NO_BYTES);
 		}
-		file.refreshLocal(IResource.DEPTH_ZERO, null);
+		file.refreshLocal(IResource.DEPTH_ZERO, monitor);
 		if (!file.exists())
 		{
 			return new ByteArrayInputStream(ArrayUtil.NO_BYTES);

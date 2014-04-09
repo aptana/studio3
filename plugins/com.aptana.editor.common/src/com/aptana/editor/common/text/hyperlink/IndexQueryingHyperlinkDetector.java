@@ -38,17 +38,17 @@ public abstract class IndexQueryingHyperlinkDetector extends AbstractHyperlinkDe
 		return null;
 	}
 
-	protected IndexManager getIndexManager()
+	private IndexManager getIndexManager()
 	{
 		return IndexPlugin.getDefault().getIndexManager();
 	}
 
-	protected IEditorPart getEditor()
+	private IEditorPart getEditor()
 	{
 		return (IEditorPart) getAdapter(IEditorPart.class);
 	}
 
-	protected IEditorInput getEditorInput()
+	private IEditorInput getEditorInput()
 	{
 		IEditorPart part = getEditor();
 		if (part == null)

@@ -530,7 +530,7 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 	 */
 	static class BracketLevel
 	{
-		LinkedModeUI fUI;
+		private LinkedModeUI fUI;
 		Position fFirstPosition;
 		Position fSecondPosition;
 	}

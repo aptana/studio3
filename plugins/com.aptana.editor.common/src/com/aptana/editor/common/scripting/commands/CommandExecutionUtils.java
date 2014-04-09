@@ -98,12 +98,12 @@ public class CommandExecutionUtils
 	 */
 	private static final String HTML_FILE_EXTENSION = ".html"; //$NON-NLS-1$
 
-	public static final FilterInputProvider EOF = new StringInputProvider();
+	private static final FilterInputProvider EOF = new StringInputProvider();
 
 	// Delay after which the tooltip is hidden.
 	private static final long DELAY = 10000;
 
-	static final String DEFAULT_CONSOLE_NAME = Messages.CommandExecutionUtils_DefaultConsoleName;
+	private static final String DEFAULT_CONSOLE_NAME = Messages.CommandExecutionUtils_DefaultConsoleName;
 
 	public interface FilterInputProvider
 	{
@@ -112,14 +112,14 @@ public class CommandExecutionUtils
 
 	public interface FilterOutputConsumer
 	{
-		public void consume(InputStream input);
+
 	}
 
 	public static class FileInputProvider implements FilterInputProvider
 	{
 		private final String path;
 
-		public FileInputProvider(String path)
+		private FileInputProvider(String path)
 		{
 			this.path = path;
 		}
@@ -153,7 +153,7 @@ public class CommandExecutionUtils
 			this(StringUtil.EMPTY);
 		}
 
-		public StringInputProvider(String string)
+		private StringInputProvider(String string)
 		{
 			this.string = string;
 		}
@@ -181,7 +181,7 @@ public class CommandExecutionUtils
 			this(DEFAULT_CONSOLE_NAME);
 		}
 
-		public EclipseConsoleInputProvider(String consoleName)
+		private EclipseConsoleInputProvider(String consoleName)
 		{
 			this.consoleName = consoleName;
 		}
@@ -202,7 +202,7 @@ public class CommandExecutionUtils
 		{
 		}
 
-		public PrintStreamOutputConsumer(PrintStream printStream)
+		private PrintStreamOutputConsumer(PrintStream printStream)
 		{
 			this.printStream = printStream;
 		}
@@ -210,11 +210,6 @@ public class CommandExecutionUtils
 		public PrintStream getPrintStream()
 		{
 			return printStream;
-		}
-
-		protected void setPrintStream(PrintStream printStream)
-		{
-			this.printStream = printStream;
 		}
 
 		public void consume(final InputStream outputStream)
@@ -420,7 +415,7 @@ public class CommandExecutionUtils
 		return command.execute(commandContext);
 	}
 
-	protected static FilterInputProvider getInputProvider(ITextViewer textWidget, CommandElement command,
+	private static FilterInputProvider getInputProvider(ITextViewer textWidget, CommandElement command,
 			InputType inputType) throws BadLocationException
 	{
 		Point selectionRange = textWidget.getSelectedRange();
@@ -701,7 +696,7 @@ public class CommandExecutionUtils
 		return caretOffset;
 	}
 
-	protected static void replaceWord(ITextViewer textWidget, CommandResult commandResult) throws BadLocationException
+	private static void replaceWord(ITextViewer textWidget, CommandResult commandResult) throws BadLocationException
 	{
 		IRegion wordRegion = findWordRegion(textWidget);
 		replaceTextRange(textWidget, wordRegion, commandResult.getOutputString());
@@ -724,19 +719,19 @@ public class CommandExecutionUtils
 		return new Region(textWidget.getSelectedRange().x, textWidget.getSelectedRange().y);
 	}
 
-	protected static IRegion getCurrentLineRegion(ITextViewer textWidget) throws BadLocationException
+	private static IRegion getCurrentLineRegion(ITextViewer textWidget) throws BadLocationException
 	{
 		final int caretOffset = getCaretOffset(textWidget);
 		int lineAtCaret = textWidget.getDocument().getLineOfOffset(caretOffset);
 		return textWidget.getDocument().getLineInformation(lineAtCaret);
 	}
 
-	protected static void replaceDocument(ITextViewer textWidget, CommandResult commandResult)
+	private static void replaceDocument(ITextViewer textWidget, CommandResult commandResult)
 	{
 		textWidget.getDocument().set(commandResult.getOutputString());
 	}
 
-	protected static void replaceLine(ITextViewer textWidget, CommandResult commandResult) throws BadLocationException
+	private static void replaceLine(ITextViewer textWidget, CommandResult commandResult) throws BadLocationException
 	{
 		IRegion region = getCurrentLineRegion(textWidget);
 		String output = commandResult.getOutputString();
@@ -797,7 +792,7 @@ public class CommandExecutionUtils
 		copyToClipboard(commandResult.getOutputString());
 	}
 
-	public static void copyToClipboard(String contents)
+	private static void copyToClipboard(String contents)
 	{
 		getClipboard().setContents(new Object[] { contents }, new Transfer[] { TextTransfer.getInstance() });
 	}
@@ -807,7 +802,7 @@ public class CommandExecutionUtils
 		return (String) getClipboard().getContents(TextTransfer.getInstance());
 	}
 
-	protected static Clipboard getClipboard()
+	private static Clipboard getClipboard()
 	{
 		Display display = Display.getCurrent();
 		if (display == null)
@@ -1034,7 +1029,7 @@ public class CommandExecutionUtils
 	 *            the offset
 	 * @return the word or <code>null</code> if none
 	 */
-	protected static IRegion findWordRegion(String line, int offset)
+	private static IRegion findWordRegion(String line, int offset)
 	{
 		BreakIterator breakIter = BreakIterator.getWordInstance();
 		breakIter.setText(line);

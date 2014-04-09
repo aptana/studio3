@@ -7,8 +7,6 @@
  */
 package com.aptana.js.core.index;
 
-import java.util.Random;
-
 public interface IJSIndexConstants
 {
 	// the content format version of the JS index files

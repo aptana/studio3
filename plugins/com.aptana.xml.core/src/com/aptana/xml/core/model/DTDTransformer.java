@@ -135,7 +135,7 @@ public class DTDTransformer
 		catch (Exception e)
 		{
 			// Failed to parse
-			throw new DTDTransformException(MessageFormat.format("Failed to parse DTD source: {0}", source), e);
+			throw new DTDTransformException(MessageFormat.format("Failed to parse DTD source: {0}", source), e); //$NON-NLS-1$
 		}
 	}
 
