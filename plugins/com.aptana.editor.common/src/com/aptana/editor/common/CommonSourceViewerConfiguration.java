@@ -188,6 +188,34 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 				CommonEditorPlugin.getDefault().getPreferenceStore()) };
 	}
 
+	protected void applyTheme(final ContentAssistant assistant)
+	{
+		assistant.setProposalSelectorBackground(getThemeBackground());
+		assistant.setProposalSelectorForeground(getThemeForeground());
+		assistant.setProposalSelectorSelectionColor(getThemeSelection());
+
+		assistant.setContextInformationPopupOrientation(IContentAssistant.CONTEXT_INFO_BELOW);
+		assistant.setContextInformationPopupBackground(getThemeBackground());
+		assistant.setContextInformationPopupForeground(getThemeForeground());
+
+		fThemeChangeListener = new IPreferenceChangeListener()
+		{
+
+			public void preferenceChange(PreferenceChangeEvent event)
+			{
+				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
+				{
+					assistant.setProposalSelectorBackground(getThemeBackground());
+					assistant.setProposalSelectorForeground(getThemeForeground());
+					assistant.setProposalSelectorSelectionColor(getThemeSelection());
+					assistant.setContextInformationPopupBackground(getThemeBackground());
+					assistant.setContextInformationPopupForeground(getThemeForeground());
+				}
+			}
+		};
+		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getContentAssistant(org.eclipse.jface.text.source.
@@ -197,11 +225,9 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	public IContentAssistant getContentAssistant(ISourceViewer sourceViewer)
 	{
 		final ContentAssistant assistant = new ContentAssistant();
-		assistant.setProposalSelectorBackground(getThemeBackground());
-		assistant.setProposalSelectorForeground(getThemeForeground());
-		assistant.setProposalSelectorSelectionColor(getThemeSelection());
-
 		assistant.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
+
+		applyTheme(assistant);
 
 		String[] contentTypes = getConfiguredContentTypes(sourceViewer);
 
@@ -235,27 +261,6 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		};
 		EclipseUtil.instanceScope().getNode(CommonEditorPlugin.PLUGIN_ID)
 				.addPreferenceChangeListener(fAutoActivationListener);
-
-		assistant.setContextInformationPopupOrientation(IContentAssistant.CONTEXT_INFO_BELOW);
-		assistant.setContextInformationPopupBackground(getThemeBackground());
-		assistant.setContextInformationPopupForeground(getThemeForeground());
-
-		fThemeChangeListener = new IPreferenceChangeListener()
-		{
-
-			public void preferenceChange(PreferenceChangeEvent event)
-			{
-				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
-				{
-					assistant.setProposalSelectorBackground(getThemeBackground());
-					assistant.setProposalSelectorForeground(getThemeForeground());
-					assistant.setProposalSelectorSelectionColor(getThemeSelection());
-					assistant.setContextInformationPopupBackground(getThemeBackground());
-					assistant.setContextInformationPopupForeground(getThemeForeground());
-				}
-			}
-		};
-		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
 
 		return assistant;
 	}
