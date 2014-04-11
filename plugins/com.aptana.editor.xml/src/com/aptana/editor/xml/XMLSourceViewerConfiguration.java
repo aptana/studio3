@@ -16,7 +16,6 @@ import org.eclipse.jface.text.IInformationControl;
 import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.quickassist.IQuickAssistAssistant;
 import org.eclipse.jface.text.quickassist.IQuickAssistProcessor;
-import org.eclipse.jface.text.quickassist.QuickAssistAssistant;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
@@ -26,6 +25,7 @@ import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IQuickFixProcessorsRegistry;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.SimpleSourceViewerConfiguration;
+import com.aptana.editor.common.contentassist.QuickAssistAssistant;
 import com.aptana.editor.common.text.RubyRegexpAutoIndentStrategy;
 
 public class XMLSourceViewerConfiguration extends SimpleSourceViewerConfiguration
@@ -51,10 +51,10 @@ public class XMLSourceViewerConfiguration extends SimpleSourceViewerConfiguratio
 		{
 			assistant.setQuickAssistProcessor(quickFixProcessor);
 		}
-
+		assistant.setInformationControlCreator(getInformationControlCreator(sourceViewer));
 		assistant.setRestoreCompletionProposalSize(EditorsPlugin.getDefault().getDialogSettingsSection(
 				"quick_assist_proposal_size")); //$NON-NLS-1$
-		assistant.setInformationControlCreator(getQuickAssistAssistantInformationControlCreator());
+		applyTheme(assistant);
 
 		return assistant;
 	}
