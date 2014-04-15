@@ -101,7 +101,11 @@ public abstract class GitTestCase
 		GitRepository repo = getRepo();
 		try
 		{
-			repo.waitForWrite();
+			// Aquiring the write lock before commit might cause deadlock with a git refresh job that is already
+			// triggered (due to resource changes). After the commit is done, it refreshes and that requires the write
+			// lock.
+
+			// repo.waitForWrite();
 			IStatus status = index.commit(commitMessage);
 			assertTrue("Failed to commit: " + status.getMessage(), status.isOK());
 			assertTrue("After a commit, the repository changed file listing should be empty but is not", index
@@ -109,7 +113,7 @@ public abstract class GitTestCase
 		}
 		finally
 		{
-			repo.exitWriteProcess();
+			// repo.exitWriteProcess();
 		}
 	}
 
