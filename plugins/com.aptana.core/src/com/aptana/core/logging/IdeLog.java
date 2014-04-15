@@ -198,8 +198,7 @@ public final class IdeLog
 	 */
 	public static boolean isOutputEnabled(Plugin plugin, StatusLevel severity, String scope)
 	{
-		boolean inSeverity = isSeverityEnabled(severity);
-		if (!inSeverity)
+		if (!isSeverityEnabled(severity))
 		{
 			return false;
 		}

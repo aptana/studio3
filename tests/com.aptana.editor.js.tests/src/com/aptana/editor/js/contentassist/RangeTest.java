@@ -7,10 +7,15 @@
  */
 package com.aptana.editor.js.contentassist;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.junit.Test;
 
 import beaver.Parser.Exception;
 
@@ -121,7 +126,7 @@ public class RangeTest extends JSEditorBasedTestCase
 	/**
 	 * testFunctionWithoutArgs
 	 */
-	public void testFunctionWithoutArgs()
+	@Test public void testFunctionWithoutArgs()
 	{
 		this.rangeTests(
 			"ranges/functionWithoutArgs.js",
@@ -134,7 +139,7 @@ public class RangeTest extends JSEditorBasedTestCase
 	/**
 	 * testFunctionWithArgs
 	 */
-	public void testFunctionWithArgs()
+	@Test public void testFunctionWithArgs()
 	{
 		this.rangeTests(
 			"ranges/functionWithArgs.js",
@@ -147,7 +152,7 @@ public class RangeTest extends JSEditorBasedTestCase
 	/**
 	 * testInvokeWithoutParams
 	 */
-	public void testInvokeWithoutParams()
+	@Test public void testInvokeWithoutParams()
 	{
 		this.rangeTests(
 			"ranges/invokeWithoutParams.js",
@@ -162,7 +167,7 @@ public class RangeTest extends JSEditorBasedTestCase
 	/**
 	 * testInvokeWithParams
 	 */
-	public void testInvokeWithParams()
+	@Test public void testInvokeWithParams()
 	{
 		this.rangeTests(
 			"ranges/invokeWithParams.js",
@@ -186,7 +191,7 @@ public class RangeTest extends JSEditorBasedTestCase
 	/**
 	 * testIfStatement
 	 */
-	public void testIfStatement()
+	@Test public void testIfStatement()
 	{
 		this.rangeTests(
 			"ranges/ifStatement.js",
@@ -204,7 +209,7 @@ public class RangeTest extends JSEditorBasedTestCase
 	/**
 	 * testWhileStatement
 	 */
-	public void testWhileStatement()
+	@Test public void testWhileStatement()
 	{
 		this.rangeTests(
 			"ranges/whileStatement.js",
@@ -220,7 +225,7 @@ public class RangeTest extends JSEditorBasedTestCase
 	/**
 	 * testForStatement
 	 */
-	public void testForStatement()
+	@Test public void testForStatement()
 	{
 		this.rangeTests(
 			"ranges/forStatement.js",
@@ -242,7 +247,7 @@ public class RangeTest extends JSEditorBasedTestCase
 	/**
 	 * testForInStatement
 	 */
-	public void testForInStatement()
+	@Test public void testForInStatement()
 	{
 		this.rangeTests(
 			"ranges/forInStatement.js",
@@ -263,7 +268,7 @@ public class RangeTest extends JSEditorBasedTestCase
 	 * @throws IOException
 	 * @throws Exception
 	 */
-	public void testApstud3005() throws IOException, Exception
+	@Test public void testApstud3005() throws IOException, Exception
 	{
 		rangeTest("ranges/apstud-3005.js", 14, 2);
 	}
@@ -274,7 +279,7 @@ public class RangeTest extends JSEditorBasedTestCase
 	 * @throws IOException
 	 * @throws Exception
 	 */
-	public void testApstud3017() throws IOException, Exception
+	@Test public void testApstud3017() throws IOException, Exception
 	{
 		rangeTest("ranges/apstud-3017.js", 40, 1);
 	}
@@ -285,7 +290,7 @@ public class RangeTest extends JSEditorBasedTestCase
 	 * @throws IOException
 	 * @throws Exception
 	 */
-	public void testApstud3017_2() throws IOException, Exception
+	@Test public void testApstud3017_2() throws IOException, Exception
 	{
 		rangeTest("ranges/apstud-3017-2.js", 55, 1);
 	}

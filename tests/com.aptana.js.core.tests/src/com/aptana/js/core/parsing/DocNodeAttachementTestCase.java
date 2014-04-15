@@ -7,12 +7,15 @@
  */
 package com.aptana.js.core.parsing;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -24,6 +27,8 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.jaxen.JaxenException;
 import org.jaxen.XPath;
+import org.junit.After;
+import org.junit.Before;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ResourceUtil;
@@ -37,22 +42,20 @@ import com.aptana.parsing.xpath.ParseNodeXPath;
 /**
  * DocNodeAttachementTestBase
  */
-public abstract class DocNodeAttachementTestCase extends TestCase
+public abstract class DocNodeAttachementTestCase
 {
 	private JSParser parser;
 
-	@Override
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
 		parser = new JSParser();
 	}
 
-	@Override
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		parser = null;
-
-		super.tearDown();
 	}
 
 	/**

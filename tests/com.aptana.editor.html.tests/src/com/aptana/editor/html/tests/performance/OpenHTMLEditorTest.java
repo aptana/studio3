@@ -68,8 +68,8 @@ public class OpenHTMLEditorTest extends OpenEditorTest
 		// ensure sequence
 		TestSuite suite = new TestSuite(OpenHTMLEditorTest.class.getName());
 		suite.addTest(new OpenHTMLEditorTest("testOpenHTMLEditor1"));
-//		suite.addTest(new OpenHTMLEditorTest("testOpenReddit"));
-//		suite.addTest(new OpenHTMLEditorTest("testOpenRedditNoCSSNoJS"));
+		// suite.addTest(new OpenHTMLEditorTest("testOpenReddit"));
+		// suite.addTest(new OpenHTMLEditorTest("testOpenRedditNoCSSNoJS"));
 		// suite.addTest(new OpenHTMLEditorTest("testOpenBigHTML"));
 		suite.addTest(new OpenHTMLEditorTest("testOpenLargeFileFoldingOnOutlineOn"));
 		// suite.addTest(new OpenHTMLEditorTest("testOpenLargeFileFoldingOffOutlineOn"));

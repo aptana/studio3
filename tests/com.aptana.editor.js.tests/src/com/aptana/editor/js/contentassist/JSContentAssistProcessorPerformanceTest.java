@@ -13,6 +13,10 @@ import org.eclipse.swt.SWT;
 import org.eclipse.test.performance.Performance;
 import org.eclipse.test.performance.PerformanceMeter;
 import org.eclipse.test.performance.PerformanceTestCase;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TestName;
 
 import com.aptana.editor.js.tests.JSEditorBasedTestCase;
 import com.aptana.index.core.IFileStoreIndexingParticipant;
@@ -21,19 +25,21 @@ import com.aptana.ui.util.UIUtils;
 
 public class JSContentAssistProcessorPerformanceTest extends JSEditorBasedTestCase
 {
+	@Rule
+	public TestName name = new TestName();
 	private PerformanceMeter fPerformanceMeter;
 
-	@Override
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
 
 		Performance performance = Performance.getDefault();
-		fPerformanceMeter = performance.createPerformanceMeter(performance.getDefaultScenarioId(this));
+		fPerformanceMeter = performance
+				.createPerformanceMeter(getClass().getName() + '#' + name.getMethodName() + "()");
 	}
 
 	@Override
-	protected void tearDown() throws Exception
+	public void tearDown() throws Exception
 	{
 		try
 		{
@@ -45,6 +51,7 @@ public class JSContentAssistProcessorPerformanceTest extends JSEditorBasedTestCa
 		}
 	}
 
+	@Test
 	public void testMathFunctions()
 	{
 		setupTestContext("contentAssist/math.js");
@@ -63,6 +70,7 @@ public class JSContentAssistProcessorPerformanceTest extends JSEditorBasedTestCa
 		assertPerformance();
 	}
 
+	@Test
 	public void testDocumentFunctions()
 	{
 		setupTestContext("contentAssist/document.js");
@@ -81,6 +89,7 @@ public class JSContentAssistProcessorPerformanceTest extends JSEditorBasedTestCa
 		assertPerformance();
 	}
 
+	@Test
 	public void testWindowFunctions()
 	{
 		setupTestContext("contentAssist/window.js");

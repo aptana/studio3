@@ -7,6 +7,8 @@
  */
 package com.aptana.editor.common.text;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
 import org.eclipse.jface.text.BadLocationException;
@@ -17,9 +19,10 @@ import org.jruby.Ruby;
 import org.jruby.RubyRegexp;
 import org.jruby.util.ByteList;
 
-public class RubyRegexpAutoIndentStrategyTest extends TestCase
+public class RubyRegexpAutoIndentStrategyTest
 {
 
+	@Test
 	public void testDoesntEraseRestofLineAfternewlineCharSentAndDedentMatches()
 	{
 		RubyRegexpAutoIndentStrategy strategy = new AlwaysMatchRubyRegexpAutoIndentStrategy();
@@ -33,6 +36,7 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 		assertEquals(">", command.text);
 	}
 
+	@Test
 	public void testDedent() throws Exception
 	{
 		RubyRegexpAutoIndentStrategy strategy = new AlwaysMatchRubyRegexpAutoIndentStrategy()
@@ -59,6 +63,7 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 		assertEquals("if a.nil?\n  a=1\nelse", document.get());
 	}
 
+	@Test
 	public void testDedentWontPushPastMatchingIndentLevel()
 	{
 		RubyRegexpAutoIndentStrategy strategy = new AlwaysMatchRubyRegexpAutoIndentStrategy()
@@ -86,6 +91,7 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 		assertEquals(23, command.offset);
 	}
 
+	@Test
 	public void testDoesntDedentWhenMultipleCharsArePasted() throws Exception
 	{
 		RubyRegexpAutoIndentStrategy strategy = new AlwaysMatchRubyRegexpAutoIndentStrategy()
@@ -112,6 +118,7 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 		assertEquals("if a.nil?\n  a=1\n  else", document.get());
 	}
 
+	@Test
 	public void testIndentAndPushTrailingContentAfterNewlineAndCursorForTagPair() throws Exception
 	{
 		RubyRegexpAutoIndentStrategy strategy = new AlwaysMatchRubyRegexpAutoIndentStrategy()
@@ -145,6 +152,7 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 		assertEquals("    <div>\n    \t\n    </div>", document.get());
 	}
 
+	@Test
 	public void testDoesNotIndentAndPushTrailingContentAfterNewlineAndCursorForTagTag()
 	{
 		RubyRegexpAutoIndentStrategy strategy = new AlwaysMatchRubyRegexpAutoIndentStrategy();
@@ -163,6 +171,7 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 	/**
 	 * 
 	 */
+	@Test
 	public void testRR3_129()
 	{
 		RubyRegexpAutoIndentStrategy strategy = new AlwaysMatchRubyRegexpAutoIndentStrategy()
@@ -194,6 +203,7 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 	/**
 	 * APSTUD-1218
 	 */
+	@Test
 	public void testDontAddStarAfterBlockComment() throws Exception
 	{
 		RubyRegexpAutoIndentStrategy strategy = new AlwaysMatchRubyRegexpAutoIndentStrategy()
@@ -220,6 +230,7 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 	/**
 	 * APSTUD-1218
 	 */
+	@Test
 	public void testInsideBlockCommentAddStar()
 	{
 		RubyRegexpAutoIndentStrategy strategy = new AlwaysMatchRubyRegexpAutoIndentStrategy()
@@ -248,6 +259,7 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 	/**
 	 * APSTUD-3326
 	 */
+	@Test
 	public void testInsideBlockCommentAddStarSdoc()
 	{
 		// JavaScript and PHP have more than one multi-line comment type. Make sure we're checking
@@ -278,6 +290,7 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 	/**
 	 * APSTUD-1218
 	 */
+	@Test
 	public void testAddNewlineInsideEndBlockComment()
 	{
 		RubyRegexpAutoIndentStrategy strategy = new AlwaysMatchRubyRegexpAutoIndentStrategy()
@@ -306,6 +319,7 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 	/**
 	 * APSTUD-1218
 	 */
+	@Test
 	public void testNewlineInsideEndBlockComment()
 	{
 		RubyRegexpAutoIndentStrategy strategy = new AlwaysMatchRubyRegexpAutoIndentStrategy()
@@ -336,6 +350,7 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testNewlineAfterEndBlockComment() throws Exception
 	{
 		RubyRegexpAutoIndentStrategy strategy = new CSSRubleRubyRegexpAutoIndentStrategy();
@@ -358,6 +373,7 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testNewlineAfterEndBlockCommentText() throws Exception
 	{
 		RubyRegexpAutoIndentStrategy strategy = new CSSRubleRubyRegexpAutoIndentStrategy();
@@ -380,6 +396,7 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testNoIndentAfterComment() throws Exception
 	{
 		RubyRegexpAutoIndentStrategy strategy = new CSSRubleRubyRegexpAutoIndentStrategy()
@@ -405,6 +422,7 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 		assertEquals(" *\n ", document.get());
 	}
 
+	@Test
 	public void testNewlineAtBlockCommentClose() throws Exception
 	{
 		RubyRegexpAutoIndentStrategy strategy = new CSSRubleRubyRegexpAutoIndentStrategy();
@@ -422,6 +440,7 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 		assertEquals("/* comment \n */hello", document.get());
 	}
 
+	@Test
 	public void testAutoCloseBlockCommentStart() throws Exception
 	{
 		RubyRegexpAutoIndentStrategy strategy = new CSSRubleRubyRegexpAutoIndentStrategy();
@@ -443,6 +462,7 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testDontAddLeadingSpaceAfterBlockCOmmentCloseBeforeNextLineContent() throws Exception
 	{
 		RubyRegexpAutoIndentStrategy strategy = new CSSRubleRubyRegexpAutoIndentStrategy();

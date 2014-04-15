@@ -7,6 +7,8 @@
  */
 package com.aptana.editor.common;
 
+import org.junit.After;
+import static org.junit.Assert.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -53,7 +55,7 @@ import com.aptana.index.core.build.BuildContext;
 import com.aptana.scripting.model.SnippetElement;
 import com.aptana.ui.util.UIUtils;
 
-public abstract class EditorBasedTests extends TestCase
+public abstract class EditorBasedTests
 {
 	private static final Pattern CURSOR = Pattern.compile("\\|");
 
@@ -416,8 +418,9 @@ public abstract class EditorBasedTests extends TestCase
 	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
-	@Override
-	protected void tearDown() throws Exception
+//	@Override
+	@After
+	public void tearDown() throws Exception
 	{
 		tearDownTestContext();
 
@@ -426,6 +429,6 @@ public abstract class EditorBasedTests extends TestCase
 		source = null;
 		cursorOffsets = null;
 
-		super.tearDown();
+//		super.tearDown();
 	}
 }

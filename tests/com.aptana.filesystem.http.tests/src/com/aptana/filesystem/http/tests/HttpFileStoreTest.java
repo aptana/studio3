@@ -7,22 +7,31 @@
  */
 package com.aptana.filesystem.http.tests;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.aptana.filesystem.http.HttpFileStore;
 import com.aptana.filesystem.http.HttpFileSystem;
 
-public class HttpFileStoreTest extends TestCase
+public class HttpFileStoreTest
 {
 	HttpFileSystem fs = null;
 	HttpFileStore store = null;
@@ -30,42 +39,42 @@ public class HttpFileStoreTest extends TestCase
 	String page = "https://www.google.com/ads/"; //$NON-NLS-1$
 	String pageParent = "https://www.google.com/"; //$NON-NLS-1$
 
-	@Override
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
 		fs = new HttpFileSystem();
 		store = getStoreByString(page);
-
-		super.setUp();
 	}
 
-	@Override
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		fs = null;
 		store = null;
 		storeMalformed = null;
-
-		super.tearDown();
 	}
 
+	@Test
 	public void testHttpFileStore() throws URISyntaxException
 	{
 		assertNotNull(store);
 	}
 
+	@Test
 	public void testChildNamesIntIProgressMonitor() throws CoreException
 	{
 		String[] children = store.childNames(EFS.CACHE, null);
 		assertEquals(0, children.length);
 	}
 
+	@Test
 	public void testFetchInfoIntIProgressMonitor() throws CoreException
 	{
 		IFileInfo info = store.fetchInfo(EFS.CACHE, null);
 		assertTrue(info.exists());
 	}
 
+	@Test
 	public void testGetChildString() throws CoreException
 	{
 		IFileStore childStore = store.getChild("searchads"); //$NON-NLS-1$
@@ -73,21 +82,25 @@ public class HttpFileStoreTest extends TestCase
 		assertTrue(info.exists());
 	}
 
+	@Test
 	public void testGetName()
 	{
 		assertEquals(page, store.getName());
 	}
 
+	@Test
 	public void testGetParent() throws URISyntaxException
 	{
 		assertEquals(new URI(pageParent), store.getParent().toURI());
 	}
 
+	@Test
 	public void testToURI() throws URISyntaxException
 	{
 		assertEquals(new URI(page), store.toURI());
 	}
 
+	@Test
 	public void testToLocalFileNoCache() throws CoreException
 	{
 		// will create a file at this location
@@ -96,6 +109,7 @@ public class HttpFileStoreTest extends TestCase
 		assertNull(parentFile);
 	}
 
+	@Test
 	public void testToLocalFile() throws CoreException
 	{
 		File file = store.toLocalFile(EFS.CACHE, null);
@@ -103,6 +117,7 @@ public class HttpFileStoreTest extends TestCase
 		assertTrue(file.isFile());
 	}
 
+	@Test
 	public void testToLocalFileDownloadTwice() throws CoreException
 	{
 		File file = store.toLocalFile(EFS.CACHE, null);
@@ -117,6 +132,7 @@ public class HttpFileStoreTest extends TestCase
 		assertTrue(file.exists());
 	}
 
+	@Test
 	public void testToLocalFileGetChildThenParent() throws CoreException
 	{
 		// will get the parent file (i.e. www.google.com)
@@ -141,6 +157,7 @@ public class HttpFileStoreTest extends TestCase
 		assertTrue(parentFile.isFile());
 	}
 
+	@Test
 	public void testGetPathNoProtocol() throws CoreException, URISyntaxException
 	{
 		String path1 = HttpFileStore.getPath(new URI("www.google.com")); //$NON-NLS-1$
@@ -149,6 +166,7 @@ public class HttpFileStoreTest extends TestCase
 		assertNotSame(path1, path2);
 	}
 
+	@Test
 	public void testGetPathTrailingSlash() throws CoreException, URISyntaxException
 	{
 		String path1 = HttpFileStore.getPath(new URI("http://www.google.com")); //$NON-NLS-1$
@@ -157,6 +175,7 @@ public class HttpFileStoreTest extends TestCase
 		assertNotSame(path1, path2);
 	}
 
+	@Test
 	public void testGetPathIndexFile() throws CoreException, URISyntaxException
 	{
 		String path1 = HttpFileStore.getPath(new URI("http://www.google.com/")); //$NON-NLS-1$
@@ -165,6 +184,7 @@ public class HttpFileStoreTest extends TestCase
 		assertNotSame(path1, path2);
 	}
 
+	@Test
 	public void testGetPathPorts() throws CoreException, URISyntaxException
 	{
 		String path1 = HttpFileStore.getPath(new URI("http://www.google.com/")); //$NON-NLS-1$
@@ -173,6 +193,7 @@ public class HttpFileStoreTest extends TestCase
 		assertNotSame(path1, path2);
 	}
 
+	@Test
 	public void testGetPathPorts2() throws CoreException, URISyntaxException
 	{
 		String path1 = HttpFileStore.getPath(new URI("http://www.google.com:80/")); //$NON-NLS-1$
@@ -181,6 +202,7 @@ public class HttpFileStoreTest extends TestCase
 		assertNotSame(path1, path2);
 	}
 
+	@Test
 	public void testGetPathCaseSensitive() throws CoreException, URISyntaxException
 	{
 		String path1 = HttpFileStore.getPath(new URI("http://www.google.com/")); //$NON-NLS-1$
@@ -189,12 +211,14 @@ public class HttpFileStoreTest extends TestCase
 		assertNotSame(path1, path2);
 	}
 
+	@Test
 	public void testGetPathMultilingual() throws CoreException, URISyntaxException
 	{
 		String path1 = HttpFileStore.getPath(new URI("스타벅스코리아.com")); //$NON-NLS-1$ (Starbucks Korea)
 		assertNotNull(path1);
 	}
 
+	@Test
 	public void testToLocalFileSimilarUrls() throws CoreException, URISyntaxException
 	{
 		HttpFileStore store1 = getStoreByString("http://www.google.com"); //$NON-NLS-1$
@@ -226,6 +250,7 @@ public class HttpFileStoreTest extends TestCase
 		assertNotSame(file3, file4);
 	}
 
+	@Test
 	public void testOpenInputStreamIntIProgressMonitor() throws CoreException
 	{
 		InputStream stream = store.openInputStream(0, null);
@@ -233,6 +258,7 @@ public class HttpFileStoreTest extends TestCase
 
 	}
 
+	@Test
 	public void testOpenInputStreamMalformedIntIProgressMonitor() throws CoreException, URISyntaxException
 	{
 		try

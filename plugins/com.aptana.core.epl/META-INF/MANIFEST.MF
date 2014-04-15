@@ -8,11 +8,14 @@ Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ecf;visibility:=reexport,
  org.eclipse.ecf.filetransfer;visibility:=reexport,
- org.eclipse.ecf.provider.filetransfer
+ org.eclipse.ecf.provider.filetransfer,
+ org.eclipse.core.resources,
+ com.aptana.core
 Export-Package: com.aptana.core.epl,
  com.aptana.core.epl.downloader,
  com.aptana.core.epl.util,
- com.aptana.filewatcher.poller.epl
+ com.aptana.filewatcher.poller.epl,
+ com.aptana.projects.primary.natures
 Bundle-ActivationPolicy: lazy
 Eclipse-LazyStart: true
 Bundle-Activator: com.aptana.core.epl.CoreEPLPlugin

@@ -1,0 +1,6 @@
+<FindBugsFilter>
+	<!-- Only include com.aptana.* -->
+	<Match>
+		<Package name="~com\.aptana\..*" />
+	</Match>
+</FindBugsFilter>

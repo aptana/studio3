@@ -7,6 +7,10 @@
  */
 package com.aptana.editor.common.parsing;
 
+import static org.junit.Assert.fail;
+
+import org.junit.Test;
+
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
 
@@ -38,6 +42,7 @@ public class CompositeParserTests extends CompositeParserTestBase
 		return new MergingParser();
 	}
 
+	@Test
 	public void testNullRoot()
 	{
 		try
@@ -51,6 +56,7 @@ public class CompositeParserTests extends CompositeParserTestBase
 		}
 	}
 
+	@Test
 	public void testNullNodes()
 	{
 		try

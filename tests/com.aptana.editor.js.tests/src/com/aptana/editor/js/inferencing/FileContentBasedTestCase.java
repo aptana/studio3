@@ -7,6 +7,7 @@
  */
 package com.aptana.editor.js.inferencing;
 
+import static org.junit.Assert.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -23,7 +24,7 @@ import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.editor.js.JSPlugin;
 
-abstract class FileContentBasedTestCase extends TestCase
+abstract class FileContentBasedTestCase
 {
 	/**
 	 * getContent

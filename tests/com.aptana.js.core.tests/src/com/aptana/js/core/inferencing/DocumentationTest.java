@@ -8,30 +8,36 @@
 package com.aptana.js.core.inferencing;
 
 import org.eclipse.core.runtime.Path;
+import org.junit.Test;
 
 public class DocumentationTest extends InferencingTestsBase
 {
 	/**
 	 * testFunctionReturnType
 	 */
+	@Test
 	public void testFunctionReturnType()
 	{
-		this.lastStatementTypeTests(Path.fromPortableString("inferencing/return-type-documentation.js"), "Function<Number>");
+		this.lastStatementTypeTests(Path.fromPortableString("inferencing/return-type-documentation.js"),
+				"Function<Number>");
 	}
-	
+
 	/**
 	 * testFunctionReturnTypes
 	 */
+	@Test
 	public void testFunctionReturnTypes()
-	{		
-		this.lastStatementTypeTests(Path.fromPortableString("inferencing/return-types-documentation.js"), "Function<Number,RegExp>");
+	{
+		this.lastStatementTypeTests(Path.fromPortableString("inferencing/return-types-documentation.js"),
+				"Function<Number,RegExp>");
 	}
-	
+
 	/**
 	 * testVarType
 	 */
+	@Test
 	public void testVarType()
-	{		
+	{
 		this.lastStatementTypeTests(Path.fromPortableString("inferencing/type-documentation.js"), "Node");
 	}
 }

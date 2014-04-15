@@ -7,14 +7,18 @@
  */
 package com.aptana.js.core.inferencing;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.List;
 
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.junit.Test;
 
 import com.aptana.js.core.JSTypeConstants;
 import com.aptana.js.core.index.JSIndexQueryHelper;
-import com.aptana.js.core.inferencing.JSScope;
 import com.aptana.js.core.model.FunctionElement;
 import com.aptana.js.core.model.PropertyElement;
 import com.aptana.js.core.model.TypeElement;
@@ -27,6 +31,7 @@ import com.aptana.js.internal.core.inferencing.JSSymbolTypeInferrer;
  */
 public class InferencingBugsTest extends InferencingTestsBase
 {
+	@Test
 	public void testReadObject()
 	{
 		JSIndexWriter writer = new JSIndexWriter();
@@ -42,6 +47,7 @@ public class InferencingBugsTest extends InferencingTestsBase
 		assertNotNull(type2);
 	}
 
+	@Test
 	public void testOverloadedVarTypesWithFunction()
 	{
 		IFileStore store = getFileStore(Path.fromPortableString("inferencing/shCore.js"));
@@ -50,8 +56,9 @@ public class InferencingBugsTest extends InferencingTestsBase
 		JSScope globals = getGlobals(source);
 		JSScope scope = globals.getScopeAtOffset(1125);
 
-		JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(scope, getIndex(), getLocation(), new JSIndexQueryHelper(getIndex()));
-		PropertyElement property = symbolInferrer.getSymbolPropertyElement("m");
+		JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(scope, getIndex(), getLocation(),
+				new JSIndexQueryHelper(getIndex()));
+		PropertyElement property = symbolInferrer.getSymbolPropertyElement("m", new NullProgressMonitor());
 		FunctionElement function = (FunctionElement) property;
 
 		// When we had the bad type names being generated, we returned:

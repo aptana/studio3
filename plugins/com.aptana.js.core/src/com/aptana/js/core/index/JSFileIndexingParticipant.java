@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
 import org.jaxen.JaxenException;
@@ -86,14 +87,12 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 	 */
 	protected JSScope getGlobals(IParseNode root)
 	{
-		JSScope result = null;
-
 		if (root instanceof JSParseRootNode)
 		{
-			result = ((JSParseRootNode) root).getGlobals();
+			return ((JSParseRootNode) root).getGlobals();
 		}
 
-		return result;
+		return null;
 	}
 
 	public void index(BuildContext context, Index index, IProgressMonitor monitor) throws CoreException
@@ -123,7 +122,8 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 	 * @param location
 	 */
 	@SuppressWarnings("unchecked")
-	private List<PropertyElement> processLambdas(Index index, JSScope globals, IParseNode node, URI location)
+	private List<PropertyElement> processLambdas(Index index, JSScope globals, IParseNode node, URI location,
+			IProgressMonitor monitor)
 	{
 		List<PropertyElement> result = Collections.emptyList();
 
@@ -137,18 +137,21 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 				if (!functions.isEmpty())
 				{
-					result = new ArrayList<PropertyElement>();
+					SubMonitor sub = SubMonitor.convert(monitor, functions.size() * 11);
+					result = new ArrayList<PropertyElement>(functions.size());
 
 					for (JSFunctionNode function : functions)
 					{
 						// grab the correct scope for this function's body
 						JSScope scope = globals.getScopeAtOffset(function.getBody().getStartingOffset());
+						sub.worked(1);
 
+						JSSymbolTypeInferrer infer = new JSSymbolTypeInferrer(scope, index, location, queryHelper);
 						// add all properties off of "window" to our list
-						result.addAll(processWindowAssignments(index, scope, location));
+						result.addAll(processWindowAssignments(scope, infer, sub.newChild(5)));
 
 						// handle any nested lambdas in this function
-						result.addAll(processLambdas(index, globals, function, location));
+						result.addAll(processLambdas(index, globals, function, location, sub.newChild(5)));
 					}
 				}
 			}
@@ -170,14 +173,13 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 	 */
 	public void processParseResults(BuildContext context, Index index, IParseNode ast, IProgressMonitor monitor)
 	{
-		SubMonitor sub = SubMonitor.convert(monitor, 80);
+		SubMonitor sub = SubMonitor.convert(monitor, 100);
 
 		queryHelper = new JSIndexQueryHelper(context.getProject());
-
-		// build symbol tables
 		URI location = context.getURI();
 
-		if (IdeLog.isTraceEnabled(JSCorePlugin.getDefault(), IDebugScopes.INDEXING_STEPS))
+		boolean traceEnabled = IdeLog.isTraceEnabled(JSCorePlugin.getDefault(), IDebugScopes.INDEXING_STEPS);
+		if (traceEnabled)
 		{
 			// @formatter:off
 			String message = MessageFormat.format(
@@ -191,129 +193,156 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		}
 
 		JSScope globals = getGlobals(ast);
-
-		// process globals
-		if (globals != null)
+		try
 		{
-			// TODO Should we have a big if/else that switches between this style of indexing and module indexing based
-			// on if there's a module or exports property?
-
-			// create new Global type for this file
-			TypeElement globalType = JSTypeUtil.createGlobalType(JSTypeConstants.GLOBAL_TYPE);
-
-			// add declared variables and functions from the global scope
-			if (IdeLog.isTraceEnabled(JSCorePlugin.getDefault(), IDebugScopes.INDEXING_STEPS))
+			// process globals
+			if (globals != null)
 			{
-				// @formatter:off
-				String message = MessageFormat.format(
-					"Processing globally declared variables and functions in file ''{0}'' for index ''{1}''", //$NON-NLS-1$
-					location.toString(),
-					index.toString()
-				);
-				// @formatter:on
+				// TODO Should we have a big if/else that switches between this style of indexing and module indexing
+				// based on if there's a module or exports property?
 
-				IdeLog.logTrace(JSCorePlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
+				// create new Global type for this file
+				TypeElement globalType = JSTypeUtil.createGlobalType(JSTypeConstants.GLOBAL_TYPE);
+
+				if (sub.isCanceled())
+				{
+					throw new OperationCanceledException();
+				}
+
+				// add declared variables and functions from the global scope
+				if (traceEnabled)
+				{
+					// @formatter:off
+					String message = MessageFormat.format(
+						"Processing globally declared variables and functions in file ''{0}'' for index ''{1}''", //$NON-NLS-1$
+						location.toString(),
+						index.toString()
+					);
+					// @formatter:on
+
+					IdeLog.logTrace(JSCorePlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
+				}
+
+				JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(globals, index, location, queryHelper);
+				for (PropertyElement property : symbolInferrer.getScopeProperties(sub.newChild(25)))
+				{
+					globalType.addProperty(property);
+				}
+
+				if (sub.isCanceled())
+				{
+					throw new OperationCanceledException();
+				}
+
+				// include any assignments to Window
+				if (traceEnabled)
+				{
+					// @formatter:off
+					String message = MessageFormat.format(
+						"Processing assignments to ''window'' in file ''{0}'' for index ''{1}''", //$NON-NLS-1$
+						location.toString(),
+						index.toString()
+					);
+					// @formatter:on
+
+					IdeLog.logTrace(JSCorePlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
+				}
+
+				for (PropertyElement property : processWindowAssignments(globals, symbolInferrer, sub.newChild(25)))
+				{
+					globalType.addProperty(property);
+				}
+
+				if (sub.isCanceled())
+				{
+					throw new OperationCanceledException();
+				}
+				// process window assignments in lambdas (self-invoking functions)
+				if (traceEnabled)
+				{
+					// @formatter:off
+					String message = MessageFormat.format(
+						"Processing assignments to ''window'' within self-invoking function literals in file ''{0}'' for index ''{1}''", //$NON-NLS-1$
+						location.toString(),
+						index.toString()
+					);
+					// @formatter:on
+
+					IdeLog.logTrace(JSCorePlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
+				}
+
+				for (PropertyElement property : processLambdas(index, globals, ast, location, sub.newChild(25)))
+				{
+					globalType.addProperty(property);
+				}
+
+				// associate all user agents with these properties
+				if (traceEnabled)
+				{
+					// @formatter:off
+					String message = MessageFormat.format(
+						"Assigning user agents to properties in file ''{0}'' for index ''{1}''", //$NON-NLS-1$
+						location.toString(),
+						index.toString()
+					);
+					// @formatter:on
+
+					IdeLog.logTrace(JSCorePlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
+				}
+				for (PropertyElement property : globalType.getProperties())
+				{
+					property.setHasAllUserAgents();
+				}
+
+				// write new Window type to index
+				if (traceEnabled)
+				{
+					// @formatter:off
+					String message = MessageFormat.format(
+						"Writing indexing results to index ''{0}'' for file ''{1}''", //$NON-NLS-1$
+						index.toString(),
+						location.toString()
+					);
+					// @formatter:on
+
+					IdeLog.logTrace(JSCorePlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
+				}
+
+				indexWriter.writeType(index, globalType, location);
+				sub.worked(5);
 			}
 
-			JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(globals, index, location, queryHelper);
-
-			for (PropertyElement property : symbolInferrer.getScopeProperties())
-			{
-				globalType.addProperty(property);
-			}
-
-			// include any assignments to Window
-			if (IdeLog.isTraceEnabled(JSCorePlugin.getDefault(), IDebugScopes.INDEXING_STEPS))
-			{
-				// @formatter:off
-				String message = MessageFormat.format(
-					"Processing assignments to ''window'' in file ''{0}'' for index ''{1}''", //$NON-NLS-1$
-					location.toString(),
-					index.toString()
-				);
-				// @formatter:on
-
-				IdeLog.logTrace(JSCorePlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
-			}
-
-			for (PropertyElement property : processWindowAssignments(index, globals, location))
-			{
-				globalType.addProperty(property);
-			}
-
-			// process window assignments in lambdas (self-invoking functions)
-			if (IdeLog.isTraceEnabled(JSCorePlugin.getDefault(), IDebugScopes.INDEXING_STEPS))
-			{
-				// @formatter:off
-				String message = MessageFormat.format(
-					"Processing assignments to ''window'' within self-invoking function literals in file ''{0}'' for index ''{1}''", //$NON-NLS-1$
-					location.toString(),
-					index.toString()
-				);
-				// @formatter:on
-
-				IdeLog.logTrace(JSCorePlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
-			}
-
-			for (PropertyElement property : processLambdas(index, globals, ast, location))
-			{
-				globalType.addProperty(property);
-			}
-
-			// associate all user agents with these properties
-			if (IdeLog.isTraceEnabled(JSCorePlugin.getDefault(), IDebugScopes.INDEXING_STEPS))
-			{
-				// @formatter:off
-				String message = MessageFormat.format(
-					"Assigning user agents to properties in file ''{0}'' for index ''{1}''", //$NON-NLS-1$
-					location.toString(),
-					index.toString()
-				);
-				// @formatter:on
-
-				IdeLog.logTrace(JSCorePlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
-			}
-
-			for (PropertyElement property : globalType.getProperties())
-			{
-				property.setHasAllUserAgents();
-			}
-
-			// write new Window type to index
-			if (IdeLog.isTraceEnabled(JSCorePlugin.getDefault(), IDebugScopes.INDEXING_STEPS))
-			{
-				// @formatter:off
-				String message = MessageFormat.format(
-					"Writing indexing results to index ''{0}'' for file ''{1}''", //$NON-NLS-1$
-					index.toString(),
-					location.toString()
-				);
-				// @formatter:on
-
-				IdeLog.logTrace(JSCorePlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
-			}
-
-			indexWriter.writeType(index, globalType, location);
+			sub.setWorkRemaining(20);
+			// process module API exports
+			processModule(context, index, ast, location, sub.newChild(20));
 		}
-
-		// process module API exports
-		processModule(context, index, ast, location);
-
-		sub.done();
+		catch (OperationCanceledException oce)
+		{
+			IdeLog.logWarning(JSCorePlugin.getDefault(),
+					MessageFormat.format("User cancelled indexing operation on {0}", context.getURI()));
+		}
+		finally
+		{
+			sub.done();
+		}
 	}
 
 	/**
 	 * @param index
 	 * @param ast
 	 * @param location
+	 * @param monitor
 	 */
-	protected void processModule(BuildContext context, Index index, IParseNode ast, URI location)
+	protected void processModule(BuildContext context, Index index, IParseNode ast, URI location,
+			IProgressMonitor monitor)
 	{
 		JSScope globals = getGlobals(ast);
 		if (globals == null)
 		{
 			return;
 		}
+
+		SubMonitor sub = SubMonitor.convert(monitor, 100);
 
 		// Autogenerate some unique type name to hold the module's exports
 		// Then record the mapping between the filepath and the generated type's name
@@ -335,7 +364,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		{
 			JSSymbolTypeInferrer infer = new JSSymbolTypeInferrer(globals, index, location, queryHelper);
 			// Now grab "module.exports" and attach that property to our hand-generated module type from above
-			PropertyElement exports = infer.getSymbolPropertyElement(module, "exports"); //$NON-NLS-1$
+			PropertyElement exports = infer.getSymbolPropertyElement(module, "exports", sub.newChild(90)); //$NON-NLS-1$
 			moduleType.addProperty(exports);
 
 			// Now copy over the type info from the module.exports property to the hand-generated module instance
@@ -364,12 +393,18 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 			// instance type.
 			JSSymbolTypeInferrer infer = new JSSymbolTypeInferrer(globals, index, location, queryHelper);
 			List<String> properties = exports.getPropertyNames();
-			for (String property : properties)
+			if (!CollectionsUtil.isEmpty(properties))
 			{
-				PropertyElement propElement = infer.getSymbolPropertyElement(exports, property);
-				moduleExportsType.addProperty(propElement);
+				int work = 90 / properties.size();
+				for (String property : properties)
+				{
+					PropertyElement propElement = infer.getSymbolPropertyElement(exports, property, sub.newChild(work));
+					moduleExportsType.addProperty(propElement);
+				}
 			}
 		}
+
+		sub.setWorkRemaining(10);
 
 		// Now we also add special properties that modules define
 		// Add an id property to the module instance (module.exports)!
@@ -390,9 +425,13 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		uriElement.setDescription(location.toString()); // Just pass in the actual value?
 		moduleExportsType.addProperty(uriElement);
 
+		sub.worked(2);
+
 		// Now write our hand-generated module type and module instance type.
 		indexWriter.writeType(index, moduleExportsType, location);
 		indexWriter.writeType(index, moduleType, location);
+
+		sub.worked(5);
 
 		// Record a mapping for the auto-generated type name we're recording (so we can look it up by the filepath)
 		index.addEntry(IJSIndexConstants.MODULE_DEFINITION, moduleTypeName, location);
@@ -457,29 +496,26 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 	 * @param symbols
 	 * @param location
 	 */
-	private Collection<PropertyElement> processWindowAssignments(Index index, JSScope symbols, URI location)
+	private Collection<PropertyElement> processWindowAssignments(JSScope symbols, JSSymbolTypeInferrer symbolInferrer,
+			IProgressMonitor monitor)
 	{
-		Collection<PropertyElement> result = Collections.emptyList();
-
-		if (symbols != null)
+		if (symbols == null || !symbols.hasLocalSymbol(JSTypeConstants.WINDOW_PROPERTY))
 		{
-			if (symbols.hasLocalSymbol(JSTypeConstants.WINDOW_PROPERTY))
-			{
-				JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(symbols, index, location, queryHelper);
-				PropertyElement property = symbolInferrer.getSymbolPropertyElement(JSTypeConstants.WINDOW_PROPERTY);
-
-				if (property != null)
-				{
-					List<String> typeNames = property.getTypeNames();
-
-					if (!CollectionsUtil.isEmpty(typeNames))
-					{
-						result = queryHelper.getTypeMembers(typeNames);
-					}
-				}
-			}
+			return Collections.emptyList();
 		}
 
-		return result;
+		PropertyElement property = symbolInferrer.getSymbolPropertyElement(JSTypeConstants.WINDOW_PROPERTY, monitor);
+		if (property == null)
+		{
+			return Collections.emptyList();
+		}
+
+		List<String> typeNames = property.getTypeNames();
+		if (!CollectionsUtil.isEmpty(typeNames))
+		{
+			return queryHelper.getTypeMembers(typeNames);
+		}
+
+		return Collections.emptyList();
 	}
 }

@@ -7,16 +7,21 @@
  */
 package com.aptana.editor.json.internal.text;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.Collection;
 import java.util.Map;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
+import org.junit.After;
+import org.junit.Test;
 
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
@@ -29,18 +34,18 @@ import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
 
 @SuppressWarnings("nls")
-public class JSONFoldingComputerTest extends TestCase
+public class JSONFoldingComputerTest
 {
 
 	private IFoldingComputer folder;
 
-	@Override
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		folder = null;
-		super.tearDown();
 	}
 
+	@Test
 	public void testObjectFolding() throws Exception
 	{
 		String src = "{\n" + "    \"description\": \"event object\", \n" + "    \"name\": \"event\", \n"
@@ -68,6 +73,7 @@ public class JSONFoldingComputerTest extends TestCase
 		return folder.emitFoldingRegions(initialReconcile, new NullProgressMonitor(), ast);
 	}
 
+	@Test
 	public void testArrayFolding() throws Exception
 	{
 		String src = "{\n" + //
@@ -100,6 +106,7 @@ public class JSONFoldingComputerTest extends TestCase
 		assertTrue(positions.contains(new Position(21, 64)));
 	}
 
+	@Test
 	public void testObjectInitiallyFolded() throws Exception
 	{
 		String src = "{\n" + "    \"description\": \"event object\", \n" + "    \"name\": \"event\", \n"
@@ -133,6 +140,7 @@ public class JSONFoldingComputerTest extends TestCase
 		assertFalse(annotations.keySet().iterator().next().isCollapsed());
 	}
 
+	@Test
 	public void testArrayInitiallyFolded() throws Exception
 	{
 		String src = "{\n" + //

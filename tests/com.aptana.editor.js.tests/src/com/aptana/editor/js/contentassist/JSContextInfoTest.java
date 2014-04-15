@@ -7,6 +7,11 @@
  */
 package com.aptana.editor.js.contentassist;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Iterator;
 
 import org.eclipse.jface.text.ITextViewer;
@@ -14,6 +19,7 @@ import org.eclipse.jface.text.TextPresentation;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
+import org.junit.Test;
 
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.editor.common.tests.TextViewer;
@@ -171,46 +177,55 @@ public class JSContextInfoTest extends JSEditorBasedTestCase
 		return validator;
 	}
 
+	@Test
 	public void testArrayArguments()
 	{
 		assertArgIndexes("contextInfo/arrayArgs.js");
 	}
 
+	@Test
 	public void testArrayStyles()
 	{
 		assertArgStyleRanges("contextInfo/arrayArgs.js");
 	}
 
+	@Test
 	public void testInvocationArguments()
 	{
 		assertArgIndexes("contextInfo/invocationArgs.js");
 	}
 
+	@Test
 	public void testInvocationStyles()
 	{
 		assertArgStyleRanges("contextInfo/invocationArgs.js");
 	}
 
+	@Test
 	public void testNumberArguments()
 	{
 		assertArgIndexes("contextInfo/numberArgs.js");
 	}
 
+	@Test
 	public void testNumberStyles()
 	{
 		assertArgStyleRanges("contextInfo/numberArgs.js");
 	}
 
+	@Test
 	public void testObjectArguments()
 	{
 		assertArgIndexes("contextInfo/objectArgs.js");
 	}
 
+	@Test
 	public void testObjectStyles()
 	{
 		assertArgStyleRanges("contextInfo/objectArgs.js");
 	}
 
+	@Test
 	public void testTagStripperAndTypeBolder()
 	{
 		JSContextInformationValidator validator = getValidator("contextInfo/invocationArgsWithTagsAndTypes.js");

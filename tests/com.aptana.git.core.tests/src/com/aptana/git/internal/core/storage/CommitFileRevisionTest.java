@@ -7,6 +7,11 @@
  */
 package com.aptana.git.internal.core.storage;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.util.HashMap;
@@ -17,6 +22,7 @@ import java.util.Map.Entry;
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.junit.Test;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.git.core.model.ChangedFile;
@@ -30,6 +36,7 @@ import com.aptana.git.core.model.GitTestCase;
 public class CommitFileRevisionTest extends GitTestCase
 {
 
+	@Test
 	public void testCommitFileRevision() throws Exception
 	{
 		GitRepository repo = createRepo();
@@ -62,6 +69,7 @@ public class CommitFileRevisionTest extends GitTestCase
 		assertEquals(contents, IOUtil.read(storage.getContents()));
 	}
 
+	@Test
 	public void testCommitFileRevisionMultipleCommits() throws Exception
 	{
 		GitRepository repo = createRepo();

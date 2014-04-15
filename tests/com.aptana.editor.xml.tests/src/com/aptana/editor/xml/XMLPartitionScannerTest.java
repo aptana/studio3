@@ -7,6 +7,9 @@
  */
 package com.aptana.editor.xml;
 
+import org.junit.After;
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.text.MessageFormat;
 
 import junit.framework.TestCase;
@@ -24,7 +27,7 @@ import com.aptana.editor.dtd.DTDSourceConfiguration;
  * @author Chris Williams
  * @author Max Stepanov
  */
-public class XMLPartitionScannerTest extends TestCase {
+public class XMLPartitionScannerTest {
 
 	private ExtendedFastPartitioner partitioner;
 
@@ -38,10 +41,11 @@ public class XMLPartitionScannerTest extends TestCase {
 		}
 	}
 
-	@Override
-	protected void tearDown() throws Exception {
+//	@Override
+	@After
+	public void tearDown() throws Exception {
 		partitioner = null;
-		super.tearDown();
+//		super.tearDown();
 	}
 
 	private String getContentType(String content, int offset) {
@@ -57,46 +61,55 @@ public class XMLPartitionScannerTest extends TestCase {
 		return partitioner.getContentType(offset);
 	}
 
+	@Test
 	public void testPreProcessorSpanningSingleLine() {
 		String source = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>";
 		assertContentType(XMLSourceConfiguration.PRE_PROCESSOR, source, 0, source.length());
 	}
 
+	@Test
 	public void testPreProcessorSpanningMultipleLines() {
 		String source = "<?xml version=\"1.0\"\n encoding=\"ISO-8859-1\"?>";
 		assertContentType(XMLSourceConfiguration.PRE_PROCESSOR, source, 0, source.length());
 	}
 
+	@Test
 	public void testCDataSpanningSingleLine() {
 		String source = "<![CDATA[var one = 1;]]>";
 		assertContentType(XMLSourceConfiguration.CDATA, source, 0, source.length());
 	}
 
+	@Test
 	public void testCDataSpanningMultipleLines() {
 		String source = "<![CDATA[var\n one\n = 1;\n]]>";
 		assertContentType(XMLSourceConfiguration.CDATA, source, 0, source.length());
 	}
 
+	@Test
 	public void testCommentSpanningSingleLine() {
 		String source = "<!-- This is XML comment on one Line -->";
 		assertContentType(XMLSourceConfiguration.COMMENT, source, 0, source.length());
 	}
 
+	@Test
 	public void testCommentSpanningMultipleLines() {
 		String source = "<!-- This is XML comment\nspanning multiple lines -->";
 		assertContentType(XMLSourceConfiguration.COMMENT, source, 0, source.length());
 	}
 
+	@Test
 	public void testOpeningTag() {
 		String source = "<tag>";
 		assertContentType(XMLSourceConfiguration.TAG, source, 0, source.length());
 	}
 
+	@Test
 	public void testClosingTag() {
 		String source = "</tag>";
 		assertContentType(XMLSourceConfiguration.TAG, source, 0, source.length());
 	}
 
+	@Test
 	public void testAllPartitions() {
 		String source = "<?xml version=\"1.0\"\n encoding=\"ISO-8859-1\"?>\n"
 			+ "<xml><head attr='single' name=\"double\"><style><![CDATA[var one =\n 1;]]></style></head><body>\n"
@@ -115,6 +128,7 @@ public class XMLPartitionScannerTest extends TestCase {
 		assertContentType(XMLSourceConfiguration.COMMENT, source, 138, 31);
 	}
 
+	@Test
 	public void testDocType() {
 		String source = "<?xml version=\"1.0\"\n encoding=\"ISO-8859-1\"?>\n"
 			+ "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n"
@@ -126,6 +140,7 @@ public class XMLPartitionScannerTest extends TestCase {
 		assertContentType(XMLSourceConfiguration.TAG, source, 167, 6);
 	}
 
+	@Test
 	public void testDocTypeWithDTD() {
 		String source = "<?xml version=\"1.0\"\n encoding=\"ISO-8859-1\"?>\n"
 			+ "<!DOCTYPE note [\n"

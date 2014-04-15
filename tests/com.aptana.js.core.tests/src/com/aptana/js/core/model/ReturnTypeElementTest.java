@@ -1,12 +1,15 @@
 package com.aptana.js.core.model;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import com.aptana.js.core.model.ReturnTypeElement;
 
 import junit.framework.TestCase;
 
-public class ReturnTypeElementTest extends TestCase
+public class ReturnTypeElementTest
 {
 
+	@Test
 	public void testEquals() throws Exception
 	{
 		ReturnTypeElement first = new ReturnTypeElement();

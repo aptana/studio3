@@ -7,6 +7,8 @@
  */
 package com.aptana.editor.html.contentassist;
 
+import org.junit.Test;
+
 import com.aptana.editor.html.tests.HTMLEditorBasedTests;
 
 /**
@@ -17,6 +19,7 @@ public class HTMLNestedLanguageContentAssistTests extends HTMLEditorBasedTests
 	/**
 	 * testJSEventAttribute
 	 */
+	@Test
 	public void testJSEventAttribute()
 	{
 		this.checkProposals("contentAssist/js-event-attribute.html", false, false, "alert");
@@ -25,6 +28,7 @@ public class HTMLNestedLanguageContentAssistTests extends HTMLEditorBasedTests
 	/**
 	 * testJSMathInAttribute
 	 */
+	@Test
 	public void testJSMathInAttribute()
 	{
 		// @formatter:off
@@ -63,6 +67,7 @@ public class HTMLNestedLanguageContentAssistTests extends HTMLEditorBasedTests
 	/**
 	 * testCSSStyleAttribute
 	 */
+	@Test
 	public void testCSSStyleAttribute()
 	{
 		// we check the style attribute twice to confirm that calling the same processor multiple times is not an issue.
@@ -72,6 +77,7 @@ public class HTMLNestedLanguageContentAssistTests extends HTMLEditorBasedTests
 	/**
 	 * testCSSIDAttribute
 	 */
+	@Test
 	public void testCSSIDAttribute()
 	{
 		this.checkProposals("contentAssist/css-id-attribute.html", "testid");
@@ -80,6 +86,7 @@ public class HTMLNestedLanguageContentAssistTests extends HTMLEditorBasedTests
 	/**
 	 * testCSSIDAttribute
 	 */
+	@Test
 	public void testCSSClassAttribute()
 	{
 		this.checkProposals("contentAssist/css-class-attribute.html", "testclass");
@@ -88,6 +95,7 @@ public class HTMLNestedLanguageContentAssistTests extends HTMLEditorBasedTests
 	/**
 	 * testCSSClassAttributeDuplicated
 	 */
+	@Test
 	public void testCSSClassAttributeDuplicated()
 	{
 		this.checkProposals("contentAssist/css-class-attribute-duplicated.html", "testclass2");
@@ -96,6 +104,7 @@ public class HTMLNestedLanguageContentAssistTests extends HTMLEditorBasedTests
 	/**
 	 * testCSSIDAttributeDuplicated
 	 */
+	@Test
 	public void testCSSIDAttributeDuplicated()
 	{
 		this.checkProposals("contentAssist/css-id-attribute-duplicated.html", "testid2");

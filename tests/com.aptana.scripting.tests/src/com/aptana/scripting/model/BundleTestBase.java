@@ -7,6 +7,8 @@
  */
 package com.aptana.scripting.model;
 
+import org.junit.After;
+import static org.junit.Assert.*;
 import java.io.File;
 import java.util.List;
 
@@ -16,7 +18,7 @@ import org.eclipse.core.runtime.Path;
 
 import com.aptana.scripting.TestUtils;
 
-public abstract class BundleTestBase extends TestCase
+public abstract class BundleTestBase
 {
 	private static final String APPLICATION_BUNDLES = TestUtils.getFile(new Path("application-bundles")).getAbsolutePath();
 	private static final String USER_BUNDLES = TestUtils.getFile(new Path("user-bundles")).getAbsolutePath();
@@ -108,10 +110,11 @@ public abstract class BundleTestBase extends TestCase
 	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		BundleManager.getInstance().reset();
 
-		super.tearDown();
+//		super.tearDown();
 	}
 }

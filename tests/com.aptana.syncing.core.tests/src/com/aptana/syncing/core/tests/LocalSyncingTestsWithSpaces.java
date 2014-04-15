@@ -18,13 +18,13 @@ public class LocalSyncingTestsWithSpaces extends SyncingTests
 {
 
 	@Override
-	protected void setUp() throws Exception
+	public void setUp() throws Exception
 	{
 		File baseTempFile = File.createTempFile("test", ".txt"); //$NON-NLS-1$ //$NON-NLS-2$
 		baseTempFile.deleteOnExit();
-		
+
 		File baseDirectory = baseTempFile.getParentFile();
-		
+
 		LocalConnectionPoint lcp = new LocalConnectionPoint();
 		lcp.setPath(new Path(baseDirectory.getAbsolutePath()));
 		clientManager = lcp;
@@ -35,7 +35,7 @@ public class LocalSyncingTestsWithSpaces extends SyncingTests
 
 		fileName = "file name.txt";
 		folderName = "folder name";
-		
+
 		super.setUp();
 	}
 

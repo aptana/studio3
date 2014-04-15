@@ -7,34 +7,42 @@
  */
 package com.aptana.css.core.parsing;
 
+import org.junit.Test;
+
 public class CSSIdentifierTest extends CSSTokensTest
 {
 
+	@Test
 	public void testSimpleIdentifier()
 	{
 		assertToken("abc", CSSTokenType.IDENTIFIER); //$NON-NLS-1$
 	}
 
+	@Test
 	public void testIdentifierWithNumber()
 	{
 		assertToken("abc0", CSSTokenType.IDENTIFIER); //$NON-NLS-1$
 	}
 
+	@Test
 	public void testIdentifierWithHyphen()
 	{
 		assertToken("abc-def", CSSTokenType.IDENTIFIER); //$NON-NLS-1$
 	}
 
+	@Test
 	public void testIdentifierWithLeadingHyphen()
 	{
 		assertToken("-abc", CSSTokenType.IDENTIFIER); //$NON-NLS-1$
 	}
 
+	@Test
 	public void testIdentifierWithUnderscore()
 	{
 		assertToken("abc_def", CSSTokenType.IDENTIFIER); //$NON-NLS-1$
 	}
 
+	@Test
 	public void testIdentifierWithLeadingUnderscore()
 	{
 		assertToken("_abc", CSSTokenType.IDENTIFIER); //$NON-NLS-1$
@@ -43,6 +51,7 @@ public class CSSIdentifierTest extends CSSTokensTest
 	/**
 	 * APSTUD-4646
 	 */
+	@Test
 	public void testMSIdentifier()
 	{
 		assertToken("progid:DXImageTransform.Microsoft.DropShadow", CSSTokenType.IDENTIFIER);

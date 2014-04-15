@@ -7,9 +7,9 @@
  */
 package com.aptana.editor.common.tests;
 
-import junit.framework.Test;
-import junit.framework.TestResult;
-import junit.framework.TestSuite;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
 
 import com.aptana.editor.common.EditorCommonTests;
 import com.aptana.editor.common.contentassist.ContentAssistTests;
@@ -23,40 +23,26 @@ import com.aptana.editor.common.text.TextTests;
 import com.aptana.editor.common.text.reconciler.ReconcilerTests;
 import com.aptana.editor.common.text.rules.RulesTests;
 import com.aptana.editor.common.util.UtilTests;
-import com.aptana.editor.common.validation.ValidationTests;
 import com.aptana.editor.common.viewer.ViewerTests;
 
+@RunWith(Suite.class)
+// @formatter:off
+@SuiteClasses({
+	EditorCommonTests.class,
+	PeerTests.class,
+	RulesTests.class,
+	SnippetsTests.class,
+	ReconcilerTests.class,
+	ScriptingCommandsTests.class,
+	TextTests.class,
+	UtilTests.class,
+	ViewerTests.class,
+	ScriptingInputOutputTest.class,
+	DocumentScopeManagerTest.class,
+	ContentAssistTests.class,
+	AllCompositeParserTests.class
+})
+// @formatter:on
 public class AllTests
 {
-
-	public static Test suite()
-	{
-		TestSuite suite = new TestSuite(AllTests.class.getName())
-		{
-			@Override
-			public void runTest(Test test, TestResult result)
-			{
-				System.err.println("Running test: " + test.toString());
-				super.runTest(test, result);
-			}
-		};
-		// $JUnit-BEGIN$
-		suite.addTest(EditorCommonTests.suite());
-		suite.addTest(PeerTests.suite());
-		suite.addTest(RulesTests.suite());
-		suite.addTest(SnippetsTests.suite());
-		suite.addTest(ReconcilerTests.suite());
-		suite.addTest(ScriptingCommandsTests.suite());
-		suite.addTest(TextTests.suite());
-		suite.addTest(UtilTests.suite());
-		suite.addTest(ValidationTests.suite());
-		suite.addTest(ViewerTests.suite());
-		suite.addTestSuite(ScriptingInputOutputTest.class);
-		suite.addTestSuite(DocumentScopeManagerTest.class);
-		suite.addTest(ContentAssistTests.suite());
-		suite.addTest(AllCompositeParserTests.suite());
-		// $JUnit-END$
-		return suite;
-	}
-
 }

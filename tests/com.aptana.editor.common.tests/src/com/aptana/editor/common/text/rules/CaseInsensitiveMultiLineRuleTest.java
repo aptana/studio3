@@ -7,6 +7,8 @@
  */
 package com.aptana.editor.common.text.rules;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
 import org.eclipse.jface.text.Document;
@@ -16,7 +18,7 @@ import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.Token;
 
-public class CaseInsensitiveMultiLineRuleTest extends TestCase
+public class CaseInsensitiveMultiLineRuleTest
 {
 
 	protected void assertMatches(String startSequence, String src)
@@ -30,26 +32,31 @@ public class CaseInsensitiveMultiLineRuleTest extends TestCase
 		assertEquals(found, rule.evaluate(scanner));
 	}
 
+	@Test
 	public void testRuleMatchesSamecase()
 	{
 		assertMatches("<!DOCTYPE", "<!DOCTYPE>");
 	}
 
+	@Test
 	public void testRuleMatchesMixedcase()
 	{
 		assertMatches("<!DOCTYPE", "<!DoCtYpE>");
 	}
 
+	@Test
 	public void testMexiedCaseRuleMatchesMixedcase()
 	{
 		assertMatches("<!DoCtYpE", "<!dOcTyPe>");
 	}
 
+	@Test
 	public void testRuleMatchesUppercase()
 	{
 		assertMatches("<!doctype", "<!DOCTYPE>");
 	}
 
+	@Test
 	public void testRuleMatchesLowercase()
 	{
 		assertMatches("<!DOCTYPE", "<!doctype>");

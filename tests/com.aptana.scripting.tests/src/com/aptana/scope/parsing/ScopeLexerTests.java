@@ -7,13 +7,17 @@
  */
 package com.aptana.scope.parsing;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 import beaver.Symbol;
 
 /**
  * ScopeLexerTests
  */
-public class ScopeLexerTests extends TestCase
+public class ScopeLexerTests
 {
 	private ScopeFlexScanner scanner;
 
@@ -21,10 +25,11 @@ public class ScopeLexerTests extends TestCase
 	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
-	@Override
-	protected void setUp() throws Exception
+//	@Override
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 
 		scanner = new ScopeFlexScanner();
 	}
@@ -33,12 +38,13 @@ public class ScopeLexerTests extends TestCase
 	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
-	@Override
-	protected void tearDown() throws Exception
+//	@Override
+	@After
+	public void tearDown() throws Exception
 	{
 		scanner = null;
 
-		super.tearDown();
+//		super.tearDown();
 	}
 
 	protected void assertTokenType(String source, ScopeTokenType type)
@@ -64,21 +70,25 @@ public class ScopeLexerTests extends TestCase
 		}
 	}
 
+	@Test
 	public void testSimpleIdentifier()
 	{
 		assertTokenType("name", ScopeTokenType.IDENTIFIER);
 	}
 
+	@Test
 	public void testIdentifierWithDashes()
 	{
 		assertTokenType("name-with-dashes", ScopeTokenType.IDENTIFIER);
 	}
 
+	@Test
 	public void testIdentifierWithUnderscores()
 	{
 		assertTokenType("name_with_underscores", ScopeTokenType.IDENTIFIER);
 	}
 
+	@Test
 	public void testIdentifierWithNumbers()
 	{
 		assertTokenType("name0", ScopeTokenType.IDENTIFIER);
@@ -94,41 +104,49 @@ public class ScopeLexerTests extends TestCase
 		assertTokenType("name10", ScopeTokenType.IDENTIFIER);
 	}
 
+	@Test
 	public void testDottedIdentifier()
 	{
 		assertTokenType("name.another", ScopeTokenType.IDENTIFIER);
 	}
 
+	@Test
 	public void testDottedIdentifier2()
 	{
 		assertTokenType("name.another.yet-another", ScopeTokenType.IDENTIFIER);
 	}
 
+	@Test
 	public void testComma()
 	{
 		assertTokenType(",", ScopeTokenType.COMMA);
 	}
 
+	@Test
 	public void testAmpersand()
 	{
 		assertTokenType("&", ScopeTokenType.AMPERSAND);
 	}
 
+	@Test
 	public void testPipe()
 	{
 		assertTokenType("|", ScopeTokenType.PIPE);
 	}
 
+	@Test
 	public void testLeftParen()
 	{
 		assertTokenType("(", ScopeTokenType.LPAREN);
 	}
 
+	@Test
 	public void testRightParen()
 	{
 		assertTokenType(")", ScopeTokenType.RPAREN);
 	}
 
+	@Test
 	public void testMinus()
 	{
 		assertTokenType("-", ScopeTokenType.MINUS);

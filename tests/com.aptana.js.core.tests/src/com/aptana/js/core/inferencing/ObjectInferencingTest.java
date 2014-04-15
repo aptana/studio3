@@ -7,9 +7,13 @@
  */
 package com.aptana.js.core.inferencing;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.List;
 
 import org.eclipse.core.runtime.Path;
+import org.junit.Test;
 
 import com.aptana.js.core.model.PropertyElement;
 import com.aptana.js.core.model.TypeElement;
@@ -19,6 +23,7 @@ public class ObjectInferencingTest extends InferencingTestsBase
 	/**
 	 * testObject
 	 */
+	@Test
 	public void testObject()
 	{
 		String source = "var x = {}; x;";
@@ -29,6 +34,7 @@ public class ObjectInferencingTest extends InferencingTestsBase
 	/**
 	 * testObjectWithAddedProperties
 	 */
+	@Test
 	public void testObjectWithAddedProperties()
 	{
 		String source = "var x = {}; x.a = true; x;";
@@ -43,6 +49,7 @@ public class ObjectInferencingTest extends InferencingTestsBase
 	/**
 	 * testObjectWithProperties
 	 */
+	@Test
 	public void testObjectWithProperties()
 	{
 		String source = "var x = { a: true }; x;";
@@ -57,6 +64,7 @@ public class ObjectInferencingTest extends InferencingTestsBase
 	/**
 	 * testObjectWithPropertiesAndAddedProperties
 	 */
+	@Test
 	public void testObjectWithPropertiesAndAddedProperties()
 	{
 		String source = "var x = { a: true }; x.b = true; x;";
@@ -71,6 +79,7 @@ public class ObjectInferencingTest extends InferencingTestsBase
 	/**
 	 * testNestedObjects
 	 */
+	@Test
 	public void testNestedObjects()
 	{
 		List<String> types = getLastStatementTypes(Path.fromPortableString("inferencing/nested-objects.js"));

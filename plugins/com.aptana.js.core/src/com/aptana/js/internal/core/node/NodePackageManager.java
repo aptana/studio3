@@ -33,6 +33,8 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.osgi.framework.Bundle;
 
 import com.aptana.core.IMap;
@@ -173,6 +175,7 @@ public class NodePackageManager implements INodePackageManager
 	public IStatus install(String packageName, String displayName, boolean global, char[] password,
 			IPath workingDirectory, IProgressMonitor monitor)
 	{
+		SubMonitor sub = SubMonitor.convert(monitor, 10);
 		String globalPrefixPath = null;
 		try
 		{
@@ -181,16 +184,17 @@ public class NodePackageManager implements INodePackageManager
 			 * global prefix config value for the entire system overrides the global prefix value of the user. So, it
 			 * always install into /usr/lib even though user set a custom value for NPM_CONFIG_PREFIX.
 			 */
+			sub.subTask("Checking global NPM prefix");
 			IPath prefixPath = getConfigPrefixPath();
 			if (prefixPath != null)
 			{
 				List<String> args = CollectionsUtil.newList(CONFIG, GET, PREFIX);
 				// TODO: should cache this value as config prefix path ?
-				IStatus npmStatus = runNpmConfig(args, password, global, workingDirectory, monitor);
+				IStatus npmStatus = runNpmConfig(args, password, global, workingDirectory, sub.newChild(1));
 				if (npmStatus.isOK())
 				{
 					String prefix = npmStatus.getMessage();
-
+					sub.subTask("Global NPM prefix is " + prefix);
 					// If the sudo cache is timed out, then the password prompt and other details might appear in the
 					// console. So we should strip them off to get the real npm prefix value.
 					String passwordPrompt = StringUtil.makeFormLabel(Messages.NodePackageManager_PasswordPrompt);
@@ -202,13 +206,22 @@ public class NodePackageManager implements INodePackageManager
 					// Set the global prefix path only if it is not the default value.
 					if (!prefixPath.toOSString().equals(prefix))
 					{
+						sub.subTask("Global and user NPM prefix don't match, setting global prefix temporarily to: "
+								+ prefixPath.toOSString());
 						globalPrefixPath = prefix;
-						setGlobalPrefixPath(password, workingDirectory, monitor, prefixPath.toOSString());
+						setGlobalPrefixPath(password, workingDirectory, sub.newChild(1), prefixPath.toOSString());
 					}
 				}
+				else
+				{
+					IdeLog.logWarning(JSCorePlugin.getDefault(),
+							"Failed to get global prefix for NPM: " + npmStatus.getMessage());
+				}
 			}
+			sub.setWorkRemaining(8);
+			sub.subTask("Running npm install command");
 			IStatus status = runNpmInstaller(packageName, displayName, global, password, workingDirectory, INSTALL,
-					monitor);
+					sub.newChild(6));
 			if (status.getSeverity() == IStatus.CANCEL)
 			{
 				return Status.OK_STATUS;
@@ -235,7 +248,7 @@ public class NodePackageManager implements INodePackageManager
 				if (!StringUtil.isEmpty(error))
 				{
 					String[] lines = error.split("\n"); //$NON-NLS-1$
-					if (lines.length > 0 && lines[lines.length - 1].contains(NPM_ERROR)) //$NON-NLS-1$
+					if (lines.length > 0 && lines[lines.length - 1].contains(NPM_ERROR))
 					{
 						IdeLog.logError(JSCorePlugin.getDefault(),
 								MessageFormat.format("Failed to install {0}.\n\n{1}", packageName, error)); //$NON-NLS-1$
@@ -262,13 +275,15 @@ public class NodePackageManager implements INodePackageManager
 			{
 				try
 				{
-					setGlobalPrefixPath(password, workingDirectory, monitor, globalPrefixPath);
+					sub.subTask("Resetting global NPM prefix");
+					setGlobalPrefixPath(password, workingDirectory, sub.newChild(1), globalPrefixPath);
 				}
 				catch (CoreException e)
 				{
 					return e.getStatus();
 				}
 			}
+			sub.done();
 		}
 	}
 
@@ -282,7 +297,7 @@ public class NodePackageManager implements INodePackageManager
 	private IStatus runNpmConfig(List<String> args, char[] password, boolean global, IPath workingDirectory,
 			IProgressMonitor monitor) throws CoreException
 	{
-		List<String> sudoArgs = getNpmSudoArgs(global);
+		List<String> sudoArgs = getNpmSudoArgs(global, password);
 		sudoArgs.addAll(args);
 		return ProcessUtil.run(CollectionsUtil.getFirstElement(sudoArgs), workingDirectory, password,
 				ShellExecutable.getEnvironment(workingDirectory), monitor,
@@ -362,14 +377,27 @@ public class NodePackageManager implements INodePackageManager
 			status = runInBackground(PARSEABLE_ARG, LIST);
 		}
 
+		String output;
 		if (!status.isOK())
 		{
-			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID,
-					Messages.NodePackageManager_FailedListingError));
+			if (status.getCode() == 1 && status instanceof ProcessStatus)
+			{
+				ProcessStatus ps = (ProcessStatus) status;
+				output = ps.getStdOut();
+				// TODO What else can we do to validate that this output is OK?
+			}
+			else
+			{
+				throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
+						Messages.NodePackageManager_FailedListingError, status)));
+			}
+		}
+		else
+		{
+			output = status.getMessage();
 		}
 
 		// Need to parse the output!
-		String output = status.getMessage();
 		String[] lines = StringUtil.LINE_SPLITTER.split(output);
 		List<IPath> paths = CollectionsUtil.map(CollectionsUtil.newSet(lines), new IMap<String, IPath>()
 		{
@@ -409,10 +437,7 @@ public class NodePackageManager implements INodePackageManager
 		try
 		{
 			String version = getInstalledVersion(packageName);
-			if (!StringUtil.isEmpty(version))
-			{
-				return true;
-			}
+			return !StringUtil.isEmpty(version); // Assume it's not installed if process returned OK, but had no entry
 		}
 		catch (CoreException e)
 		{
@@ -453,8 +478,9 @@ public class NodePackageManager implements INodePackageManager
 		IStatus status = nodeJS.runInBackground(workingDir, ShellExecutable.getEnvironment(), args);
 		if (!status.isOK())
 		{
+			// TODO This may return a non zero exit code but still give output we can use, not sure. Similar to what we saw with list command
 			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
-					Messages.NodePackageManager_FailedToDetermineInstalledVersion, packageName)));
+					Messages.NodePackageManager_FailedToDetermineInstalledVersion, packageName, status.getMessage())));
 		}
 		String output = status.getMessage();
 		int index = output.indexOf(packageName + '@');
@@ -485,7 +511,7 @@ public class NodePackageManager implements INodePackageManager
 		if (!status.isOK())
 		{
 			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
-					Messages.NodePackageManager_FailedToDetermineLatestVersion, packageName)));
+					Messages.NodePackageManager_FailedToDetermineLatestVersion, packageName, status.getMessage())));
 		}
 		String message = status.getMessage().trim();
 		Matcher m = VERSION_PATTERN.matcher(message);
@@ -503,7 +529,7 @@ public class NodePackageManager implements INodePackageManager
 		if (!status.isOK())
 		{
 			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
-					Messages.NodePackageManager_ConfigFailure, key)));
+					Messages.NodePackageManager_ConfigFailure, key, status.getMessage())));
 		}
 		return status.getMessage().trim();
 	}
@@ -516,7 +542,7 @@ public class NodePackageManager implements INodePackageManager
 				MessageFormat.format(Messages.NodePackageManager_InstallingTaskName, displayName), 100);
 		try
 		{
-			List<String> args = getNpmSudoArgs(global);
+			List<String> args = getNpmSudoArgs(global, password);
 			CollectionsUtil.addToList(args, command, packageName, COLOR, FALSE);
 
 			Map<String, String> environment;
@@ -563,7 +589,7 @@ public class NodePackageManager implements INodePackageManager
 			}
 
 			return ProcessUtil.run(CollectionsUtil.getFirstElement(args), workingDirectory, password, environment,
-					monitor, CollectionsUtil.toArray(args, 1, args.size()));
+					sub.newChild(100), CollectionsUtil.toArray(args, 1, args.size()));
 		}
 		finally
 		{
@@ -571,7 +597,7 @@ public class NodePackageManager implements INodePackageManager
 		}
 	}
 
-	private List<String> getNpmSudoArgs(boolean global) throws CoreException
+	private List<String> getNpmSudoArgs(boolean global, char[] sudoPassword) throws CoreException
 	{
 		IPath npmPath = checkedNPMPath();
 		List<String> args = new ArrayList<String>(8);
@@ -579,7 +605,7 @@ public class NodePackageManager implements INodePackageManager
 		{
 			if (!PlatformUtil.isWindows())
 			{
-				args.addAll(getSudoArgs());
+				args.addAll(getSudoArgs(sudoPassword));
 			}
 			args.add(nodeJS.getPath().toOSString());
 			args.add(npmPath.toOSString());
@@ -593,8 +619,15 @@ public class NodePackageManager implements INodePackageManager
 		return args;
 	}
 
-	private List<String> getSudoArgs()
+	private List<String> getSudoArgs(char[] sudoPassword)
 	{
+		// FIXME Centralize this logic in a core SudoManager class?
+		if (sudoPassword == null || sudoPassword.length == 0)
+		{
+			// Force non-interactive mode so that if sudo decides we do need a password it exits with an error instead
+			// of hanging
+			return CollectionsUtil.newList("sudo", "-n", "--"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		}
 		return CollectionsUtil.newList("sudo", "-S", "--"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
@@ -611,10 +644,9 @@ public class NodePackageManager implements INodePackageManager
 			if (!status.isOK())
 			{
 				String message = status.getMessage();
-				IdeLog.logError(JSCorePlugin.getDefault(),
-						MessageFormat.format("Failed to uninstall {0}.\n{1}", packageName, message)); //$NON-NLS-1$
-				return new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
-						Messages.NodePackageManager_FailedInstallError, packageName));
+				String logMsg = MessageFormat.format("Failed to uninstall {0}.\n{1}", packageName, message); //$NON-NLS-1$
+				IdeLog.logError(JSCorePlugin.getDefault(), logMsg);
+				return new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, logMsg);
 			}
 			return status;
 		}
@@ -664,6 +696,7 @@ public class NodePackageManager implements INodePackageManager
 
 	public synchronized IPath getConfigPrefixPath() throws CoreException
 	{
+		// FIXME This caches the prefix value indefinitely. Is there any way to wipe the cache intelligently?
 		if (fConfigPrefixPath == null)
 		{
 			String npmConfigPrefixPath = ShellExecutable.getEnvironment().get(NPM_CONFIG_PREFIX);
@@ -684,7 +717,7 @@ public class NodePackageManager implements INodePackageManager
 		List<String> args = new ArrayList<String>();
 		try
 		{
-			args = getNpmSudoArgs(runWithSudo);
+			args = getNpmSudoArgs(runWithSudo, password);
 		}
 		catch (CoreException e)
 		{
@@ -692,35 +725,14 @@ public class NodePackageManager implements INodePackageManager
 		}
 		args.remove(GLOBAL_ARG);
 		CollectionsUtil.addToList(args, "cache", "clean"); //$NON-NLS-1$ //$NON-NLS-2$
-		IStatus status = ProcessUtil.run(CollectionsUtil.getFirstElement(args), null, password,
+		String path = PlatformUtil.expandEnvironmentStrings("~"); //$NON-NLS-1$
+		IPath userHome = Path.fromOSString(path);
+		IStatus status = ProcessUtil.run(CollectionsUtil.getFirstElement(args), userHome, password,
 				ShellExecutable.getEnvironment(), monitor, CollectionsUtil.toArray(args, 1, args.size()));
 
 		String cacheCleanOutput = status.getMessage();
 		if (!status.isOK() || cacheCleanOutput.contains(NPM_ERROR))
 		{
-			return new Status(Status.ERROR, JSCorePlugin.PLUGIN_ID, cacheCleanOutput);
-		}
-		return status;
-	}
-
-	public IStatus changeNPMCacheOwner(char[] password, boolean runWithSudo, IProgressMonitor monitor)
-	{
-		List<String> args = new ArrayList<String>();
-		if (runWithSudo)
-		{
-			args.addAll(getSudoArgs());
-		}
-		// Finds the current user and then, assigns the ownership.
-		IStatus userStatus = ProcessUtil.runInBackground("whoami", null); //$NON-NLS-1$
-		String currentUser = userStatus.getMessage();
-		CollectionsUtil.addToList(args, "chown", "-R", currentUser, PlatformUtil.expandEnvironmentStrings("~/.npm")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		IStatus status = ProcessUtil.run(CollectionsUtil.getFirstElement(args), null, password,
-				ShellExecutable.getEnvironment(), monitor, CollectionsUtil.toArray(args, 1, args.size()));
-
-		String cacheCleanOutput = status.getMessage();
-		if (!status.isOK() || !StringUtil.isEmpty(cacheCleanOutput))
-		{
-			// Any output in this command indicates the operation is not permitted for the current user.
 			return new Status(Status.ERROR, JSCorePlugin.PLUGIN_ID, cacheCleanOutput);
 		}
 		return status;
@@ -757,5 +769,31 @@ public class NodePackageManager implements INodePackageManager
 			FileFilter filter)
 	{
 		return ExecutableUtil.find(executableName, true, searchLocations, filter);
+	}
+
+	// TODO Throw a CoreException?
+	public List<String> getVersions(String packageName)
+	{
+		try
+		{
+			IStatus status = runInBackground("view", packageName, "versions", "-json", COLOR, FALSE); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			if (!status.isOK())
+			{
+				return Collections.emptyList();
+			}
+
+			String output = status.getMessage();
+			JSONParser parser = new JSONParser();
+			return (List<String>) parser.parse(output);
+		}
+		catch (CoreException ce)
+		{
+			IdeLog.logError(JSCorePlugin.getDefault(), ce);
+		}
+		catch (ParseException e)
+		{
+			IdeLog.logError(JSCorePlugin.getDefault(), e);
+		}
+		return Collections.emptyList();
 	}
 }

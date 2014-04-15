@@ -7,6 +7,9 @@
  */
 package com.aptana.parsing.pool;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -14,7 +17,9 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
+
 import beaver.Symbol;
 
 import com.aptana.core.epl.util.LRUCacheWithSoftPrunedValues;
@@ -34,7 +39,7 @@ import com.aptana.parsing.ast.ParseRootNode;
 /**
  * @author Fabio
  */
-public class ParsingPoolFactoryTest extends TestCase
+public class ParsingPoolFactoryTest
 {
 
 	private final int PARSE_TIMEOUT = 20;
@@ -197,7 +202,8 @@ public class ParsingPoolFactoryTest extends TestCase
 
 	ParseRootNode parseRootNode;
 
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
 
 		queue = new ConcurrentLinkedQueue<ParseRootNode>();
@@ -220,6 +226,7 @@ public class ParsingPoolFactoryTest extends TestCase
 		};
 	};
 
+	@Test
 	public void testParserPoolFactory() throws Exception
 	{
 		queue.add(parseRootNode);
@@ -235,6 +242,7 @@ public class ParsingPoolFactoryTest extends TestCase
 		assertEquals(1, parser.parses);
 	}
 
+	@Test
 	public void testParserPoolFactoryThreaded() throws Exception
 	{
 
@@ -310,6 +318,7 @@ public class ParsingPoolFactoryTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testParseStateWithComments() throws Exception
 	{
 		queue.add(parseRootNode);
@@ -385,6 +394,7 @@ public class ParsingPoolFactoryTest extends TestCase
 	}
 
 	@SuppressWarnings({ "rawtypes" })
+	@Test
 	public void testParseWithSubParses() throws Exception
 	{
 		ParserWithSubParse mainParser = new ParserWithSubParse();

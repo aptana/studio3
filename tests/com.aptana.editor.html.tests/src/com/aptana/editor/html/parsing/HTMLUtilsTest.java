@@ -7,7 +7,12 @@
  */
 package com.aptana.editor.html.parsing;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
 
 import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
 import com.aptana.parsing.lexer.Lexeme;
@@ -16,10 +21,11 @@ import com.aptana.parsing.lexer.Range;
 /**
  * The class <code>HTMLUtilsTest</code> contains tests for the class <code>{@link HTMLUtils}</code>.
  */
-public class HTMLUtilsTest extends TestCase
+public class HTMLUtilsTest
 {
 	/**
 	 */
+	@Test
 	public void testGetAttributeValueRange() throws Exception
 	{
 		Lexeme<HTMLTokenType> lexeme = new Lexeme<HTMLTokenType>(null, 1, 1, "");
@@ -29,6 +35,7 @@ public class HTMLUtilsTest extends TestCase
 		assertNull(HTMLUtils.getAttributeValueRange(lexeme, offset));
 	}
 
+	@Test
 	public void testGetAttributeValueRangeSingleValueQuote() throws Exception
 	{
 		Lexeme<HTMLTokenType> lexemeSingleValueQuote = new Lexeme<HTMLTokenType>(HTMLTokenType.DOUBLE_QUOTED_STRING, 0,
@@ -39,6 +46,7 @@ public class HTMLUtilsTest extends TestCase
 		assertEquals(null, HTMLUtils.getAttributeValueRange(lexemeSingleValueQuote, 3));
 	}
 
+	@Test
 	public void testGetAttributeValueRangeTwoValueQuote() throws Exception
 	{
 		Lexeme<HTMLTokenType> lexemeTwoValueQuote = new Lexeme<HTMLTokenType>(HTMLTokenType.DOUBLE_QUOTED_STRING, 0, 4,
@@ -51,6 +59,7 @@ public class HTMLUtilsTest extends TestCase
 		assertEquals(null, HTMLUtils.getAttributeValueRange(lexemeTwoValueQuote, 5));
 	}
 
+	@Test
 	public void testGetAttributeValueRangeThreeValueQuote() throws Exception
 	{
 		Lexeme<HTMLTokenType> lexemeThreeValueQuote = new Lexeme<HTMLTokenType>(HTMLTokenType.DOUBLE_QUOTED_STRING, 0,
@@ -66,6 +75,7 @@ public class HTMLUtilsTest extends TestCase
 		assertEquals(null, HTMLUtils.getAttributeValueRange(lexemeThreeValueQuote, 8));
 	}
 
+	@Test
 	public void testGetAttributeValueRangeSingleValueNoQuote() throws Exception
 	{
 		Lexeme<HTMLTokenType> lexemeSingleValueNoQuote = new Lexeme<HTMLTokenType>(HTMLTokenType.UNDEFINED, 0, 0, "a");
@@ -75,6 +85,7 @@ public class HTMLUtilsTest extends TestCase
 
 	/**
 	 */
+	@Test
 	public void testIsCSSAttribute() throws Exception
 	{
 		assertFalse(HTMLUtils.isCSSAttribute(null));
@@ -84,6 +95,7 @@ public class HTMLUtilsTest extends TestCase
 
 	/**
 	 */
+	@Test
 	public void testIsJSAttribute() throws Exception
 	{
 		assertFalse(HTMLUtils.isJSAttribute(null, null));
@@ -95,6 +107,7 @@ public class HTMLUtilsTest extends TestCase
 
 	/**
 	 */
+	@Test
 	public void testIsJavaScriptTag() throws Exception
 	{
 		assertFalse(HTMLUtils.isJavaScriptTag(""));
@@ -109,6 +122,7 @@ public class HTMLUtilsTest extends TestCase
 
 	/**
 	 */
+	@Test
 	public void testIsTagComplete() throws Exception
 	{
 		assertTrue(HTMLUtils.isTagComplete(">"));
@@ -122,6 +136,7 @@ public class HTMLUtilsTest extends TestCase
 
 	/**
 	 */
+	@Test
 	public void testIsTagSelfClosing() throws Exception
 	{
 		assertTrue(HTMLUtils.isTagSelfClosing("<br />"));
@@ -132,6 +147,7 @@ public class HTMLUtilsTest extends TestCase
 
 	/**
 	 */
+	@Test
 	public void testStripTagEndings() throws Exception
 	{
 		assertEquals("", HTMLUtils.stripTagEndings(""));

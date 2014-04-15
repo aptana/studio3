@@ -1,5 +1,9 @@
 package com.aptana.scripting.model;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -17,7 +21,7 @@ import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.FileUtil;
 import com.aptana.scope.ScopeSelector;
 
-public class BundleCacherTest extends TestCase
+public class BundleCacherTest
 {
 	private BundleElement nonCached;
 	private BundleElement deserialized;
@@ -25,15 +29,17 @@ public class BundleCacherTest extends TestCase
 	private File bundleDirectory;
 	private BundleManager bundleManager;
 
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 		bundleManager = BundleManager.getInstance();
 		bundleManager.reset();
 		cacher = new BundleCacher();
 	}
 
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		try
 		{
@@ -46,10 +52,11 @@ public class BundleCacherTest extends TestCase
 		}
 		finally
 		{
-			super.tearDown();
+//			super.tearDown();
 		}
 	}
 
+	@Test
 	public void testAPSTUD4562() throws Exception
 	{
 		// @formatter:off
@@ -82,6 +89,7 @@ public class BundleCacherTest extends TestCase
 		assertEquals("(?-mix:^.*(\\{[^}\"'']*|\\([^)\"'']*)$)", regexp.toString());
 	}
 
+	@Test
 	public void testSerializeAndDeserializeSnippet() throws Exception
 	{
 		// @formatter:off
@@ -99,6 +107,7 @@ public class BundleCacherTest extends TestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testSerializeAndDeserializeSmartTypingPairs() throws Exception
 	{
 		// @formatter:off
@@ -110,6 +119,7 @@ public class BundleCacherTest extends TestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testSerializeAndDeserializeContentAssist() throws Exception
 	{
 		// @formatter:off
@@ -126,6 +136,7 @@ public class BundleCacherTest extends TestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testSerializeAndDeserializeCommand() throws Exception
 	{
 		// @formatter:off
@@ -144,6 +155,7 @@ public class BundleCacherTest extends TestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testSerializeAndDeserializeEnvironmentElement() throws Exception
 	{
 		// FIXME This doesn't match because the invoke block isn't getting pulled up!
@@ -160,6 +172,7 @@ public class BundleCacherTest extends TestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testSerializeAndDeserializeMenus() throws Exception
 	{
 		// @formatter:off
@@ -178,6 +191,7 @@ public class BundleCacherTest extends TestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testSerializeAndDeserializeFileTemplates() throws Exception
 	{
 		// FIXME This doesn't match because the invoke block isn't getting pulled up!
@@ -196,6 +210,7 @@ public class BundleCacherTest extends TestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testSerializeAndDeserializeProjectTemplate() throws Exception
 	{
 		// @formatter:off
@@ -210,6 +225,7 @@ public class BundleCacherTest extends TestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testSerializeAndDeserializeProjectBuildPath() throws Exception
 	{
 		// @formatter:off
@@ -221,6 +237,7 @@ public class BundleCacherTest extends TestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testNewerTranslationFileBlowsAwayCache() throws Exception
 	{
 		// @formatter:off

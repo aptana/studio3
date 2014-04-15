@@ -27,7 +27,7 @@ public class FileUtil
 	/**
 	 * The newline separator character
 	 */
-	public static String NEW_LINE = System.getProperty("line.separator"); //$NON-NLS-1$
+	public static final String NEW_LINE = System.getProperty("line.separator"); //$NON-NLS-1$
 
 	private FileUtil()
 	{
@@ -80,7 +80,7 @@ public class FileUtil
 	{
 		String filePath = file.getAbsolutePath();
 		// TODO: should be generic to other archive formats ?
-		return filePath.toLowerCase().endsWith(".zip");
+		return filePath.toLowerCase().endsWith(".zip"); //$NON-NLS-1$
 	}
 
 	/**
@@ -456,6 +456,27 @@ public class FileUtil
 	}
 
 	/**
+	 * Creates a symlink or shortcut folder.
+	 * 
+	 * @param symLinkName
+	 * @param sourcePath
+	 * @param targetPath
+	 * @return
+	 */
+	public static IStatus createSymlink(String symLinkName, IPath sourcePath, IPath targetPath)
+	{
+		if (PlatformUtil.isMac() || PlatformUtil.isLinux())
+		{
+			return ProcessUtil.runInBackground("ln", sourcePath, "-s", targetPath.toOSString(), symLinkName); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		else if (PlatformUtil.isWindows())
+		{
+			return ProcessUtil.runInBackground("mklink", sourcePath, "/D", symLinkName, targetPath.toOSString()); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		return Status.CANCEL_STATUS;
+	}
+
+	/**
 	 * this is actually just an optimistic heuristic - should be named isThereHopeThatCanCreateSubdir() as probably
 	 * there is no 100% reliable way to check that in Java for Windows
 	 * 
@@ -473,5 +494,20 @@ public class FileUtil
 			return parent.isDirectory() && parent.canWrite();
 		}
 		return canCreateSubdir(parent.getParentFile());
+	}
+
+	/**
+	 * Wraps {@link File#createTempFile(String, String)} and marks the file to be deleted on JVM exit.
+	 * 
+	 * @param prefix
+	 * @param suffix
+	 * @return
+	 * @throws IOException
+	 */
+	public static File createTempFile(String prefix, String suffix) throws IOException
+	{
+		File f = File.createTempFile(prefix, suffix);
+		f.deleteOnExit();
+		return f;
 	}
 }

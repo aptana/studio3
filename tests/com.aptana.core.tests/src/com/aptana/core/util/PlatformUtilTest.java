@@ -8,13 +8,17 @@
 
 package com.aptana.core.util;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Arrays;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.Platform;
+import org.junit.Test;
 
 import com.aptana.core.util.PlatformUtil.ProcessItem;
 
@@ -22,9 +26,10 @@ import com.aptana.core.util.PlatformUtil.ProcessItem;
  * @author Max Stepanov
  */
 @SuppressWarnings("nls")
-public class PlatformUtilTest extends TestCase
+public class PlatformUtilTest
 {
 
+	@Test
 	public void testGetRunningProcesses()
 	{
 		ProcessItem[] processes = PlatformUtil.getRunningProcesses();
@@ -37,6 +42,7 @@ public class PlatformUtilTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testGetRunningChildProcesses() throws IOException
 	{
 		String cmd = Platform.OS_WIN32.equals(Platform.getOS()) ? "cmd.exe" : (Platform.OS_MACOSX.equals(Platform
@@ -67,6 +73,7 @@ public class PlatformUtilTest extends TestCase
 		assertTrue("Expected child process \"" + cmd + "\" not found in " + Arrays.asList(processes).toString(), passed);
 	}
 
+	@Test
 	public void testKillProcesses() throws IOException
 	{
 		String cmd = Platform.OS_WIN32.equals(Platform.getOS()) ? "cmd.exe" : (Platform.OS_MACOSX.equals(Platform
@@ -105,6 +112,7 @@ public class PlatformUtilTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testExpandEnvironmentStrings()
 	{
 		assertEquals("abc/d", PlatformUtil.expandEnvironmentStrings("abc/d"));

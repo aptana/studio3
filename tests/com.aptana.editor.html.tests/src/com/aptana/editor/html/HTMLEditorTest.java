@@ -7,9 +7,10 @@
  */
 package com.aptana.editor.html;
 
-import java.io.File;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-import junit.framework.TestCase;
+import java.io.File;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -19,26 +20,28 @@ import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.ITextEditor;
+import org.junit.After;
+import org.junit.Test;
 
 import com.aptana.editor.epl.tests.EditorTestHelper;
 
 @SuppressWarnings("restriction")
-public class HTMLEditorTest extends TestCase
+public class HTMLEditorTest
 {
 
 	private ITextEditor editor;
 
-	@Override
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		if (editor != null)
 		{
 			EditorTestHelper.closeEditor(editor);
 			editor = null;
 		}
-		super.tearDown();
 	}
 
+	@Test
 	public void testExecute() throws Exception
 	{
 		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
@@ -47,6 +50,7 @@ public class HTMLEditorTest extends TestCase
 		assertEquals(getClassName(), editor.getClass().getName());
 	}
 
+	@Test
 	public void testEditorPreferences()
 	{
 		String spacesForTabs;

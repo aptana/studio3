@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.test.performance.GlobalTimePerformanceTestCase;
+import org.junit.Test;
 
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.editor.epl.tests.EditorTestHelper;
@@ -29,7 +30,7 @@ public class HTMLTidyValidatorPerformanceTest extends GlobalTimePerformanceTestC
 	private HTMLTidyValidator validator;
 
 	@Override
-	protected void setUp() throws Exception
+	public void setUp() throws Exception
 	{
 		super.setUp();
 
@@ -51,12 +52,13 @@ public class HTMLTidyValidatorPerformanceTest extends GlobalTimePerformanceTestC
 	}
 
 	@Override
-	protected void tearDown() throws Exception
+	public void tearDown() throws Exception
 	{
 		validator = null;
 		super.tearDown();
 	}
 
+	@Test
 	public void testValidate() throws Exception
 	{
 		// read in the file

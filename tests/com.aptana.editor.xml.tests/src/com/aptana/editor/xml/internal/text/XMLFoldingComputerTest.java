@@ -7,6 +7,9 @@
  */
 package com.aptana.editor.xml.internal.text;
 
+import org.junit.After;
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.util.Collection;
 import java.util.Map;
 
@@ -24,18 +27,20 @@ import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.xml.core.parsing.XMLParser;
 
-public class XMLFoldingComputerTest extends TestCase
+public class XMLFoldingComputerTest
 {
 
 	private IFoldingComputer folder;
 
-	@Override
-	protected void tearDown() throws Exception
+//	@Override
+	@After
+	public void tearDown() throws Exception
 	{
 		folder = null;
-		super.tearDown();
+//		super.tearDown();
 	}
 
+	@Test
 	public void testSingleLineOpenAndCloseTagDoesntFold() throws Exception
 	{
 		String src = "<root>some text</root>";
@@ -65,6 +70,7 @@ public class XMLFoldingComputerTest extends TestCase
 		return folder.emitFoldingRegions(false, new NullProgressMonitor(), ast);
 	}
 
+	@Test
 	public void testBasicXMLFolding() throws Exception
 	{
 		String src = "<root>\n<child>\n<name>Chris</name>\n<age>103</age>\n</child>\n</root>";
@@ -91,6 +97,7 @@ public class XMLFoldingComputerTest extends TestCase
 		assertTrue(positions.contains(new Position(7, src.length() - 14)));
 	}
 
+	@Test
 	public void testXMLCommentFolding() throws Exception
 	{
 		String src = "<!--\n  This is a comment.\n -->\n";
@@ -116,6 +123,7 @@ public class XMLFoldingComputerTest extends TestCase
 		assertTrue(positions.contains(new Position(0, src.length())));
 	}
 
+	@Test
 	public void testXMLCDATAFolding() throws Exception
 	{
 		String src = "<root>\n<![CDATA[\n  This is cdata.\n]]>\n</root>\n";
@@ -142,6 +150,7 @@ public class XMLFoldingComputerTest extends TestCase
 		assertTrue(positions.contains(new Position(7, 31)));
 	}
 
+	@Test
 	public void testCombinedXMLFolding() throws Exception
 	{
 		String src = "<yeah>\n<!--\n  This is a comment.\n -->\n<root>\n<![CDATA[\n  This is cdata.\n]]>\n</root>\n</yeah>";

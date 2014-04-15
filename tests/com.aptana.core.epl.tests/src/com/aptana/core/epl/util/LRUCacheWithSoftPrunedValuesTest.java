@@ -7,6 +7,8 @@
  */
 package com.aptana.core.epl.util;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -15,7 +17,7 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
-public class LRUCacheWithSoftPrunedValuesTest extends TestCase
+public class LRUCacheWithSoftPrunedValuesTest
 {
 
 	class SizedEntry implements ILRUCacheable
@@ -42,6 +44,7 @@ public class LRUCacheWithSoftPrunedValuesTest extends TestCase
 
 	}
 
+	@Test
 	public void testLRUWithSoftPrunnedValues() throws Exception
 	{
 		HashMap<String, SizedEntry> auxiliaryCache = new HashMap<String, SizedEntry>();
@@ -101,6 +104,7 @@ public class LRUCacheWithSoftPrunedValuesTest extends TestCase
 		assertEquals(0, auxiliaryCache.size());
 	}
 
+	@Test
 	public void testLRUWithSoftCache() throws Exception
 	{
 		// Check the soft map

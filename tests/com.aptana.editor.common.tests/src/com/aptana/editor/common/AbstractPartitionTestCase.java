@@ -7,10 +7,10 @@
  */
 package com.aptana.editor.common;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import junit.framework.TestCase;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
@@ -20,7 +20,7 @@ import org.eclipse.jface.text.rules.IPartitionTokenScanner;
 
 import com.aptana.core.util.StringUtil;
 
-public abstract class AbstractPartitionTestCase extends TestCase
+public abstract class AbstractPartitionTestCase
 {
 
 	protected abstract IPartitionTokenScanner createPartitionScanner();

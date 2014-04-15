@@ -51,7 +51,7 @@ public class ProcessUtil
 	 * When this flag is set in the environment for the process, it hints to redirect the error stream to redirect to
 	 * output stream itself.
 	 */
-	public static String REDIRECT_ERROR_STREAM = "redirectErrorStream"; //$NON-NLS-1$
+	public static final String REDIRECT_ERROR_STREAM = "redirectErrorStream"; //$NON-NLS-1$
 
 	protected ProcessUtil()
 	{
@@ -337,15 +337,7 @@ public class ProcessUtil
 		try
 		{
 			Process p = run(command, workingDirectory, environment, args);
-			ProcessRunnable runnable;
-			if (PlatformUtil.isWindows())
-			{
-				runnable = new ProcessRunnable(p, monitor, true);
-			}
-			else
-			{
-				runnable = new SudoCommandProcessRunnable(p, monitor, true, input);
-			}
+			ProcessRunnable runnable = new SudoCommandProcessRunnable(p, monitor, true, input);
 			Thread t = new Thread(runnable, "Runnable for " + command); //$NON-NLS-1$
 			t.start();
 			t.join();
@@ -546,7 +538,8 @@ public class ProcessUtil
 			// key=password 		// key pair value
 			// @formatter:on
 			String quoted = RegexUtil.quote(textToObfuscate);
-			Pattern hideMePattern = Pattern.compile("[^:]+:" + quoted + "@|^" + quoted + "$|.*?=" + quoted); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			String urlPattern = "[^:]+:" + quoted + "@"; //$NON-NLS-1$ //$NON-NLS-2$
+			Pattern hideMePattern = Pattern.compile(urlPattern + "|^" + quoted + "$|.*?=" + quoted); //$NON-NLS-1$ //$NON-NLS-2$
 			List<String> commandMessage = new ArrayList<String>(command.size());
 			for (String arg : command)
 			{
@@ -559,7 +552,7 @@ public class ProcessUtil
 					{
 						String found = m.group();
 						String replacement = MASK;
-						if (found.charAt(found.length() - 1) == '@')
+						if (found.matches(urlPattern))
 						{
 							replacement = found.substring(0, found.length() - (textToObfuscate.length() + 2)) + ':'
 									+ MASK + '@';

@@ -7,7 +7,11 @@
  */
 package com.aptana.editor.js.contentassist;
 
+import static org.junit.Assert.assertEquals;
+
 import java.text.MessageFormat;
+
+import org.junit.Test;
 
 import com.aptana.editor.js.tests.JSEditorBasedTestCase;
 
@@ -18,13 +22,13 @@ public class LocationTest extends JSEditorBasedTestCase
 		public final LocationType location;
 		public final int startingOffset;
 		public final int endingOffset;
-		
+
 		public LocationTypeRange(LocationType location, int offset)
 		{
 			this.location = location;
 			this.startingOffset = this.endingOffset = offset;
 		}
-		
+
 		public LocationTypeRange(LocationType location, int startingOffset, int endingOffset)
 		{
 			this.location = location;
@@ -32,7 +36,7 @@ public class LocationTest extends JSEditorBasedTestCase
 			this.endingOffset = endingOffset;
 		}
 	}
-	
+
 	/**
 	 * testLocations
 	 * 
@@ -68,7 +72,7 @@ public class LocationTest extends JSEditorBasedTestCase
 	/**
 	 * testInvokeWithoutParams
 	 */
-	public void testInvokeWithoutParams()
+	@Test public void testInvokeWithoutParams()
 	{
 		this.testLocations(
 			"locations/functionAndInvokeWithoutParams.js",
@@ -83,7 +87,7 @@ public class LocationTest extends JSEditorBasedTestCase
 	/**
 	 * testInvokeWithIncompleteParams
 	 */
-	public void testInvokeWithIncompleteParams()
+	@Test public void testInvokeWithIncompleteParams()
 	{
 		this.testLocations(
 			"locations/functionAndInvokeWithIncompleteParams.js",
@@ -100,7 +104,7 @@ public class LocationTest extends JSEditorBasedTestCase
 	/**
 	 * testSimpleAssignment1
 	 */
-	public void testSimpleAssignment1()
+	@Test public void testSimpleAssignment1()
 	{
 		this.testLocations(
 			"locations/simpleAssignment1.js",
@@ -115,7 +119,7 @@ public class LocationTest extends JSEditorBasedTestCase
 	/**
 	 * testSimpleAssignment2
 	 */
-	public void testSimpleAssignment2()
+	@Test public void testSimpleAssignment2()
 	{
 		this.testLocations(
 			"locations/simpleAssignment2.js",
@@ -130,7 +134,7 @@ public class LocationTest extends JSEditorBasedTestCase
 	/**
 	 * testSimpleBinaryOperator1
 	 */
-	public void testSimpleBinaryOperator1()
+	@Test public void testSimpleBinaryOperator1()
 	{
 		this.testLocations(
 			"locations/simpleBinaryOperator1.js",
@@ -146,7 +150,7 @@ public class LocationTest extends JSEditorBasedTestCase
 	/**
 	 * testSimpleBinaryOperator2
 	 */
-	public void testSimpleBinaryOperator2()
+	@Test public void testSimpleBinaryOperator2()
 	{
 		this.testLocations(
 			"locations/simpleBinaryOperator2.js",
@@ -163,7 +167,7 @@ public class LocationTest extends JSEditorBasedTestCase
 	/**
 	 * testGetSimpleProperty1
 	 */
-	public void testGetSimpleProperty1()
+	@Test public void testGetSimpleProperty1()
 	{
 		this.testLocations(
 			"locations/simpleGetProperty1.js",
@@ -180,7 +184,7 @@ public class LocationTest extends JSEditorBasedTestCase
 	/**
 	 * testSimpleGetProperty2
 	 */
-	public void testSimpleGetProperty2()
+	@Test public void testSimpleGetProperty2()
 	{
 		this.testLocations(
 			"locations/simpleGetProperty2.js",
@@ -199,7 +203,7 @@ public class LocationTest extends JSEditorBasedTestCase
 	/**
 	 * testSimpleGetElement1
 	 */
-	public void testSimpleGetElement1()
+	@Test public void testSimpleGetElement1()
 	{
 		this.testLocations(
 			"locations/simpleGetElement1.js",
@@ -216,7 +220,7 @@ public class LocationTest extends JSEditorBasedTestCase
 	/**
 	 * testSimpleGetElement2
 	 */
-	public void testSimpleGetElement2()
+	@Test public void testSimpleGetElement2()
 	{
 		this.testLocations(
 			"locations/simpleGetElement2.js",
@@ -233,7 +237,7 @@ public class LocationTest extends JSEditorBasedTestCase
 	/**
 	 * testTryCatchFinally
 	 */
-	public void testTryCatchFinally()
+	@Test public void testTryCatchFinally()
 	{
 		this.testLocations(
 			"locations/tryCatchFinally.js",
@@ -250,7 +254,7 @@ public class LocationTest extends JSEditorBasedTestCase
 	/**
 	 * testConditional
 	 */
-	public void testConditional()
+	@Test public void testConditional()
 	{
 		this.testLocations(
 			"locations/conditional.js",
@@ -273,7 +277,7 @@ public class LocationTest extends JSEditorBasedTestCase
 	/**
 	 * testNew
 	 */
-	public void testNew()
+	@Test public void testNew()
 	{
 		this.testLocations(
 			"locations/new.js",
@@ -290,7 +294,7 @@ public class LocationTest extends JSEditorBasedTestCase
 	/**
 	 * testVar1
 	 */
-	public void testVar1()
+	@Test public void testVar1()
 	{
 		this.testLocations(
 			"locations/var1.js",
@@ -304,7 +308,7 @@ public class LocationTest extends JSEditorBasedTestCase
 	/**
 	 * testVar2
 	 */
-	public void testVar2()
+	@Test public void testVar2()
 	{
 		this.testLocations(
 			"locations/var2.js",
@@ -320,7 +324,7 @@ public class LocationTest extends JSEditorBasedTestCase
 	/**
 	 * testVar3
 	 */
-	public void testVar3()
+	@Test public void testVar3()
 	{
 		this.testLocations(
 			"locations/var3.js",
@@ -337,7 +341,7 @@ public class LocationTest extends JSEditorBasedTestCase
 	/**
 	 * testDo
 	 */
-	public void testDo()
+	@Test public void testDo()
 	{
 		this.testLocations(
 			"locations/do.js",
@@ -354,7 +358,7 @@ public class LocationTest extends JSEditorBasedTestCase
 	/**
 	 * testForIn
 	 */
-	public void testForIn()
+	@Test public void testForIn()
 	{
 		this.testLocations(
 			"locations/forIn.js",
@@ -372,7 +376,7 @@ public class LocationTest extends JSEditorBasedTestCase
 	/**
 	 * testFor
 	 */
-	public void testFor()
+	@Test public void testFor()
 	{
 		this.testLocations(
 			"locations/for.js",
@@ -396,7 +400,7 @@ public class LocationTest extends JSEditorBasedTestCase
 	/**
 	 * testIf
 	 */
-	public void testIf()
+	@Test public void testIf()
 	{
 		this.testLocations(
 			"locations/if.js",
@@ -413,7 +417,7 @@ public class LocationTest extends JSEditorBasedTestCase
 	/**
 	 * testIfAtEOF
 	 */
-	public void testIfAtEOF()
+	@Test public void testIfAtEOF()
 	{
 		this.testLocations(
 			"locations/if-eof.js",
@@ -424,7 +428,7 @@ public class LocationTest extends JSEditorBasedTestCase
 	/**
 	 * testLabelledFor
 	 */
-	public void testLabelledFor()
+	@Test public void testLabelledFor()
 	{
 		this.testLocations(
 			"locations/labelledFor.js",
@@ -461,7 +465,7 @@ public class LocationTest extends JSEditorBasedTestCase
 	/**
 	 * testArrayLiteral
 	 */
-	public void testArrayLiteral()
+	@Test public void testArrayLiteral()
 	{
 		this.testLocations(
 			"locations/arrayLiteral.js",
@@ -482,7 +486,7 @@ public class LocationTest extends JSEditorBasedTestCase
 	/**
 	 * testObjectLiteral
 	 */
-	public void testObjectLiteral()
+	@Test public void testObjectLiteral()
 	{
 		this.testLocations(
 			"locations/objectLiteral.js",
@@ -506,7 +510,7 @@ public class LocationTest extends JSEditorBasedTestCase
 	/**
 	 * testSwitch
 	 */
-	public void testSwitch()
+	@Test public void testSwitch()
 	{
 		this.testLocations(
 			"locations/switch.js",
@@ -530,7 +534,7 @@ public class LocationTest extends JSEditorBasedTestCase
 	/**
 	 * testGroup
 	 */
-	public void testGroup()
+	@Test public void testGroup()
 	{
 		this.testLocations(
 			"locations/group.js",
@@ -543,7 +547,7 @@ public class LocationTest extends JSEditorBasedTestCase
 	/**
 	 * testFunctionWithReturn
 	 */
-	public void testFunctionWithReturn()
+	@Test public void testFunctionWithReturn()
 	{
 		this.testLocations(
 			"locations/functionWithReturn.js",
@@ -560,7 +564,7 @@ public class LocationTest extends JSEditorBasedTestCase
 	/**
 	 * testFunctionWithThrow
 	 */
-	public void testFunctionWithThrow()
+	@Test public void testFunctionWithThrow()
 	{
 		this.testLocations(
 			"locations/functionWithThrow.js",
@@ -577,7 +581,7 @@ public class LocationTest extends JSEditorBasedTestCase
 	/**
 	 * testWhile
 	 */
-	public void testWhile()
+	@Test public void testWhile()
 	{
 		this.testLocations(
 			"locations/while.js",
@@ -592,7 +596,7 @@ public class LocationTest extends JSEditorBasedTestCase
 	/**
 	 * testWith
 	 */
-	public void testWith()
+	@Test public void testWith()
 	{
 		this.testLocations(
 			"locations/with.js",
@@ -608,7 +612,7 @@ public class LocationTest extends JSEditorBasedTestCase
 	/**
 	 * testErrorInObjectLiteral
 	 */
-	public void testErrorInObjectLiteral()
+	@Test public void testErrorInObjectLiteral()
 	{
 		this.testLocations(
 			"locations/errorInObjectLiteral.js",
@@ -616,7 +620,7 @@ public class LocationTest extends JSEditorBasedTestCase
 		);
 	}
 	
-	public void testThis()
+	@Test public void testThis()
 	{
 		this.testLocations(
 			"locations/this.js",

@@ -1,5 +1,9 @@
 package com.aptana.js.core.index;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -14,7 +18,7 @@ import com.aptana.js.core.model.TypeElement;
 import com.aptana.js.internal.core.index.JSIndexWriter;
 import com.aptana.js.internal.core.index.JSMetadataLoader;
 
-public class JSIndexQueryHelperTest extends TestCase
+public class JSIndexQueryHelperTest
 {
 
 	private Index index;
@@ -22,9 +26,10 @@ public class JSIndexQueryHelperTest extends TestCase
 	private JSIndexQueryHelper helper;
 	private TestProject project;
 
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 
 		project = new TestProject("index_helper", new String[] { "com.aptana.projects..webnature" });
 
@@ -34,7 +39,8 @@ public class JSIndexQueryHelperTest extends TestCase
 		index = manager.getIndex(project.getURI());
 	}
 
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		manager.removeIndex(index.getRoot());
 		index = null;
@@ -42,9 +48,10 @@ public class JSIndexQueryHelperTest extends TestCase
 		manager = null;
 		project.delete();
 		project = null;
-		super.tearDown();
+//		super.tearDown();
 	}
 
+	@Test
 	public void testGetTypeAncestorNames() throws Exception
 	{
 		TypeElement type = new TypeElement();

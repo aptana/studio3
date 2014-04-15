@@ -7,6 +7,10 @@
  */
 package com.aptana.js.internal.core.index;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.net.URL;
 import java.util.List;
 
@@ -18,23 +22,26 @@ import org.eclipse.core.runtime.Path;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.core.model.TypeElement;
 
-public class JSCAParserTest extends TestCase
+public class JSCAParserTest
 {
 
 	private IJSCAParser parser;
 
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 		parser = new JSCAParser();
 	}
 
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		parser = null;
-		super.tearDown();
+//		super.tearDown();
 	}
 
+	@Test
 	public void testTISTUD5079() throws Exception
 	{
 		URL url = FileLocator.find(JSCorePlugin.getDefault().getBundle(),

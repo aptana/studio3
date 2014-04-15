@@ -123,8 +123,8 @@ public abstract class AbstractDebugHost {
 	protected static final String ARG_VARIABLE_NAME = "variableName"; //$NON-NLS-1$
 	protected static final String ARG_EVAL_ID = "evalId"; //$NON-NLS-1$	
 
-	protected static Pattern VARIABLE_FRAME_PATTERN = Pattern.compile("^frame\\[(\\d+)\\]\\.?(.*)$"); //$NON-NLS-1$
-	protected static Pattern VARIABLE_EVAL_PATTERN = Pattern.compile("^eval\\[(\\d+)\\]\\.?(.*)$"); //$NON-NLS-1$
+	protected static final Pattern VARIABLE_FRAME_PATTERN = Pattern.compile("^frame\\[(\\d+)\\]\\.?(.*)$"); //$NON-NLS-1$
+	protected static final Pattern VARIABLE_EVAL_PATTERN = Pattern.compile("^eval\\[(\\d+)\\]\\.?(.*)$"); //$NON-NLS-1$
 
 	protected static final String PROTOCOL_VERSION = "1"; //$NON-NLS-1$
 	public static final int SOCKET_TIMEOUT = 1000;

@@ -7,35 +7,34 @@
  */
 package com.aptana.editor.common.tests;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import junit.framework.TestCase;
 
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.Token;
+import org.junit.After;
+import org.junit.Before;
 
 import com.aptana.core.util.StringUtil;
 
-public abstract class AbstractTokenScannerTestCase extends TestCase
+public abstract class AbstractTokenScannerTestCase
 {
 	protected ITokenScanner scanner;
 
-	@Override
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
-
 		scanner = createTokenScanner();
 	}
 
-	@Override
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		scanner = null;
-
-		super.tearDown();
 	}
 
 	protected abstract ITokenScanner createTokenScanner();

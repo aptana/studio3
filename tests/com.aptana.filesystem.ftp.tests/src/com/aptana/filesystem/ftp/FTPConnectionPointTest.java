@@ -8,21 +8,22 @@
 
 package com.aptana.filesystem.ftp;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.junit.Test;
 
 import com.aptana.core.epl.IMemento;
 import com.aptana.core.epl.XMLMemento;
 
 /**
  * @author Max Stepanov
- *
  */
 @SuppressWarnings("nls")
-public class FTPConnectionPointTest extends TestCase {
-	
+public class FTPConnectionPointTest
+{
+
 	private static final String name = "My FTP Site";
 	private static final String host = "127.0.0.1";
 	private static final int port = 2222;
@@ -34,23 +35,34 @@ public class FTPConnectionPointTest extends TestCase {
 	private static final String timezone = "GMT";
 	private static final String transferType = IFTPConstants.TRANSFER_TYPE_BINARY;
 
-
-	public void testPersistance() {
-		createAndTestConnectionPoint(name, host, port, login, password, path, encoding, passiveMode, timezone, transferType);
+	@Test
+	public void testPersistance()
+	{
+		createAndTestConnectionPoint(name, host, port, login, password, path, encoding, passiveMode, timezone,
+				transferType);
 	}
-	
-	public void testPassiveMode() {
+
+	@Test
+	public void testPassiveMode()
+	{
 		createAndTestConnectionPoint(name, host, port, login, password, path, encoding, true, timezone, transferType);
 		createAndTestConnectionPoint(name, host, port, login, password, path, encoding, false, timezone, transferType);
 	}
-	
-	public void testTransferTypes() {
-		createAndTestConnectionPoint(name, host, port, login, password, path, encoding, passiveMode, timezone, IFTPConstants.TRANSFER_TYPE_ASCII);
-		createAndTestConnectionPoint(name, host, port, login, password, path, encoding, passiveMode, timezone, IFTPConstants.TRANSFER_TYPE_BINARY);
-		createAndTestConnectionPoint(name, host, port, login, password, path, encoding, passiveMode, timezone, IFTPConstants.TRANSFER_TYPE_AUTO);
+
+	@Test
+	public void testTransferTypes()
+	{
+		createAndTestConnectionPoint(name, host, port, login, password, path, encoding, passiveMode, timezone,
+				IFTPConstants.TRANSFER_TYPE_ASCII);
+		createAndTestConnectionPoint(name, host, port, login, password, path, encoding, passiveMode, timezone,
+				IFTPConstants.TRANSFER_TYPE_BINARY);
+		createAndTestConnectionPoint(name, host, port, login, password, path, encoding, passiveMode, timezone,
+				IFTPConstants.TRANSFER_TYPE_AUTO);
 	}
-	
-	private static void createAndTestConnectionPoint(String name, String host, int port, String login, char[] password, IPath path, String encoding, boolean passiveMode, String timezone, String transferType) {
+
+	private static void createAndTestConnectionPoint(String name, String host, int port, String login, char[] password,
+			IPath path, String encoding, boolean passiveMode, String timezone, String transferType)
+	{
 		FTPConnectionPoint cp = new FTPConnectionPoint();
 		cp.setName(name);
 		cp.setHost(host);
@@ -62,11 +74,11 @@ public class FTPConnectionPointTest extends TestCase {
 		cp.setTimezone(timezone);
 		cp.setTransferType(transferType);
 		cp.setEncoding(encoding);
-		
+
 		XMLMemento root = XMLMemento.createWriteRoot("root");
 		IMemento memento = root.createChild("item");
 		cp.saveState(memento);
-		
+
 		cp = new FTPConnectionPoint();
 		cp.loadState(memento);
 		assertEquals("Name doesn't match", name, cp.getName());

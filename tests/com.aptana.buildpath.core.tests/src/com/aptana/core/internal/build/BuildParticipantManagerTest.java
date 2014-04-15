@@ -1,5 +1,9 @@
 package com.aptana.core.internal.build;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Set;
@@ -14,25 +18,28 @@ import com.aptana.core.build.IBuildParticipant;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.index.core.build.BuildContext;
 
-public class BuildParticipantManagerTest extends TestCase
+public class BuildParticipantManagerTest
 {
 
 	private BuildParticipantManager fManager;
 
-	@Override
-	protected void setUp() throws Exception
+//	@Override
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 		fManager = new BuildParticipantManager();
 	}
 
-	@Override
-	protected void tearDown() throws Exception
+//	@Override
+	@After
+	public void tearDown() throws Exception
 	{
 		fManager = null;
-		super.tearDown();
+//		super.tearDown();
 	}
 
+	@Test
 	public void testGetAllBuildParticipants() throws Exception
 	{
 		List<IBuildParticipant> participants = fManager.getAllBuildParticipants();
@@ -51,6 +58,7 @@ public class BuildParticipantManagerTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testBuildParticipantsByContentType() throws Exception
 	{
 		// Two registered explicitly, one has no binding, so applies to all
@@ -66,6 +74,7 @@ public class BuildParticipantManagerTest extends TestCase
 		assertGetBuildParticipantsByContentTypeId("com.aptana.buildpath.core.fake_content_type4", 1);
 	}
 
+	@Test
 	public void testGetContentTypes() throws Exception
 	{
 		Set<IContentType> types = fManager.getContentTypes();
@@ -76,6 +85,7 @@ public class BuildParticipantManagerTest extends TestCase
 				"com.aptana.buildpath.core.fake_content_type2", "com.aptana.buildpath.core.fake_content_type3");
 	}
 
+	@Test
 	public void testFilterParticipants() throws Exception
 	{
 		List<IBuildParticipant> participants = fManager.getAllBuildParticipants();

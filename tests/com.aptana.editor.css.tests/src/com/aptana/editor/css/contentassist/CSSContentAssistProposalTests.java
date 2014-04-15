@@ -7,6 +7,10 @@
  */
 package com.aptana.editor.css.contentassist;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -18,7 +22,9 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.swt.graphics.Point;
+import org.junit.Test;
 
+import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.css.core.parsing.CSSTokenType;
 import com.aptana.editor.common.contentassist.ILexemeProvider;
@@ -42,6 +48,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/*
 	 * Universal selector. Matches any element
 	 */
+	@Test
 	public void testUniversalSelectors()
 	{
 		// Should be in the list
@@ -51,6 +58,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/*
 	 * Type selectors
 	 */
+	@Test
 	public void testTypeSelectors()
 	{
 		assertCompletionCorrect("p| {}", '\t', "p", "p {}");
@@ -59,6 +67,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/*
 	 * Type selectors
 	 */
+	@Test
 	public void testTypeSelectorsMidElement()
 	{
 		assertCompletionCorrect("tab|le {}", '\t', "table", "table {}");
@@ -67,6 +76,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/*
 	 * Type selectors
 	 */
+	@Test
 	public void testTypeSelectorsListNoSpace()
 	{
 		assertCompletionCorrect("p,| {}", '\t', "table", "p,table {}");
@@ -75,6 +85,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/*
 	 * Type selectors
 	 */
+	@Test
 	public void testTypeSelectorsListSpace()
 	{
 		assertCompletionCorrect("p, | {}", '\t', "table", "p, table {}");
@@ -83,6 +94,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/*
 	 * Type selectors
 	 */
+	@Test
 	public void testTypeSelectorsPreCurlyNoSpace()
 	{
 		// I think this should test addOutsideRuleProposals.LCURLY, but does not because we reset the current
@@ -93,6 +105,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/*
 	 * Type selectors
 	 */
+	@Test
 	public void testTypeSelectorsPreCurlySpace()
 	{
 		assertCompletionCorrect("p | {}", '\t', "div", "p div {}");
@@ -101,6 +114,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/*
 	 * Type selectors
 	 */
+	@Test
 	public void testTypeSelectorsPostCurlyNoSpace()
 	{
 
@@ -112,6 +126,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/*
 	 * Type selectors
 	 */
+	@Test
 	public void testTypeSelectorsPostCurlySpace()
 	{
 		assertCompletionCorrect("p, table {} |", '\t', "div", "p, table {} div");
@@ -121,6 +136,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	 * E:lang(c) Matches element of type E if it is in (human) language c (the document language specifies how language
 	 * is determined)
 	 */
+	@Test
 	public void testTypeSelectorsPostRParenNoSpace()
 	{
 		// Currently inserting as html:lang()en, for example
@@ -130,6 +146,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/*
 	 * E F Matches any F element that is a descendant of an E element. Descendant selectors
 	 */
+	@Test
 	public void testDescendantSelectors()
 	{
 		assertCompletionCorrect("p | {}", '\t', "table", "p table {}");
@@ -138,16 +155,19 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/*
 	 * E > F Matches any F element that is a child of an element E.
 	 */
+	@Test
 	public void testChildSelectorsSpace()
 	{
 		assertCompletionCorrect("p > | {}", '\t', "table", "p > table {}");
 	}
 
+	@Test
 	public void testChildSelectorsNoSpace()
 	{
 		assertCompletionCorrect("p>| {}", '\t', "table", "p>table {}");
 	}
 
+	@Test
 	public void testChildSelectorsDescendant()
 	{
 		// matches a P element that is a descendant of an LI; the LI element must be the child of an OL element; the OL
@@ -158,6 +178,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/*
 	 * Matches element E when E is the first child of its parent.
 	 */
+	@Test
 	public void testPseudoClass()
 	{
 		assertCompletionCorrect("p:| {}", '\t', "first-child", "p:first-child {}");
@@ -166,6 +187,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/*
 	 * Matches element E when E is the first child of its parent.
 	 */
+	@Test
 	public void testPseudoClassPrefix()
 	{
 		assertCompletionCorrect("p:f| {}", '\t', "first-child", "p:first-child {}");
@@ -175,6 +197,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	 * Matches element E if E is the source anchor of a hyperlink of which the target is not yet visited (:link) or
 	 * already visited (:visited).
 	 */
+	@Test
 	public void testLinkPseudoClass()
 	{
 		assertCompletionCorrect("a:| {}", '\t', "link", "a:link {}");
@@ -184,6 +207,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	 * Matches element E if E is the source anchor of a hyperlink of which the target is not yet visited (:link) or
 	 * already visited (:visited).
 	 */
+	@Test
 	public void testLinkPseudoClassPrefix()
 	{
 		assertCompletionCorrect("a:l| {}", '\t', "link", "a:link {}");
@@ -193,6 +217,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	 * Matches element E if E is the source anchor of a hyperlink of which the target is not yet visited (:link) or
 	 * already visited (:visited).
 	 */
+	@Test
 	public void testVistedPseudoClass()
 	{
 		assertCompletionCorrect("a:| {}", '\t', "visited", "a:visited {}");
@@ -202,6 +227,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	 * Matches element E if E is the source anchor of a hyperlink of which the target is not yet visited (:link) or
 	 * already visited (:visited).
 	 */
+	@Test
 	public void testVistedPseudoClassPrefix()
 	{
 		assertCompletionCorrect("a:v| {}", '\t', "visited", "a:visited {}");
@@ -210,6 +236,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/*
 	 * testDynamicPseudoClassActivePrefix
 	 */
+	@Test
 	public void testDynamicPseudoClassActive()
 	{
 		assertCompletionCorrect("a:| {}", '\t', "active", "a:active {}");
@@ -218,6 +245,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/*
 	 * testDynamicPseudoClassActivePrefix
 	 */
+	@Test
 	public void testDynamicPseudoClassActivePrefix()
 	{
 		assertCompletionCorrect("a:a| {}", '\t', "active", "a:active {}");
@@ -226,6 +254,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/*
 	 * testDynamicPseudoClassHover
 	 */
+	@Test
 	public void testDynamicPseudoClassHover()
 	{
 		assertCompletionCorrect("a:| {}", '\t', "hover", "a:hover {}");
@@ -234,6 +263,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/*
 	 * testDynamicPseudoClassHoverPrefix
 	 */
+	@Test
 	public void testDynamicPseudoClassHoverPrefix()
 	{
 		assertCompletionCorrect("a:h| {}", '\t', "hover", "a:hover {}");
@@ -242,6 +272,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/*
 	 * testDynamicPseudoClassFocus
 	 */
+	@Test
 	public void testDynamicPseudoClassFocus()
 	{
 		assertCompletionCorrect("a:| {}", '\t', "focus", "a:focus {}");
@@ -250,6 +281,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/*
 	 * testDynamicPseudoClassFocusPrefix
 	 */
+	@Test
 	public void testDynamicPseudoClassFocusPrefix()
 	{
 		assertCompletionCorrect("a:f| {}", '\t', "focus", "a:focus {}");
@@ -259,6 +291,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	 * E:lang(c) Matches element of type E if it is in (human) language c (the document language specifies how language
 	 * is determined)
 	 */
+	@Test
 	public void testLangPseudoClass()
 	{
 		assertCompletionCorrect("html:| { quotes: '« ' ' »' }", '\t', "lang", "html:lang { quotes: '« ' ' »' }");
@@ -268,6 +301,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	 * E:lang(c) Matches element of type E if it is in (human) language c (the document language specifies how language
 	 * is determined)
 	 */
+	@Test
 	public void testLangPseudoClassPrefix()
 	{
 		assertCompletionCorrect("html:l| { quotes: '« ' ' »' }", '\t', "lang", "html:lang { quotes: '« ' ' »' }");
@@ -277,6 +311,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	 * E:lang(c) Matches element of type E if it is in (human) language c (the document language specifies how language
 	 * is determined)
 	 */
+	@Test
 	public void testLangPseudoClassNoElement()
 	{
 		assertCompletionCorrect(":|", '\t', "lang", ":lang");
@@ -286,6 +321,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	 * E:lang(c) Matches element of type E if it is in (human) language c (the document language specifies how language
 	 * is determined)
 	 */
+	@Test
 	public void testLangPseudoClassNoElementPrefix()
 	{
 		assertCompletionCorrect(":l|", '\t', "lang", ":lang");
@@ -295,6 +331,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	 * E:lang(c) Matches element of type E if it is in (human) language c (the document language specifies how language
 	 * is determined)
 	 */
+	@Test
 	public void testLangPseudoClassPreviousElement()
 	{
 		// currently reports pseduo-elements as proposals _before_ the colon
@@ -305,6 +342,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	 * E:lang(c) Matches element of type E if it is in (human) language c (the document language specifies how language
 	 * is determined)
 	 */
+	@Test
 	public void testLangPseudoClassProperties()
 	{
 		assertCompletionCorrect("html:lang(|) { quotes: '« ' ' »' }", '\t', "fr-ca",
@@ -315,6 +353,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	 * E:lang(c) Matches element of type E if it is in (human) language c (the document language specifies how language
 	 * is determined)
 	 */
+	@Test
 	public void testLangPseudoClassPropertiesPrefix()
 	{
 		assertCompletionCorrect("html:lang(f|) { quotes: '« ' ' »' }", '\t', "fr-ca",
@@ -325,6 +364,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	 * E:lang(c) Matches element of type E if it is in (human) language c (the document language specifies how language
 	 * is determined)
 	 */
+	@Test
 	public void testLangPseudoClassPropertiesPrefixSpace()
 	{
 		assertCompletionCorrect("html:lang(f| ) { quotes: '« ' ' »' }", '\t', "fr-ca",
@@ -334,6 +374,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/**
 	 * testPseudoElements
 	 */
+	@Test
 	public void testPseudoClassesAndElements()
 	{
 		this.checkProposals("contentAssist/pseduo-class-proposal.css", true, true, "active", "after", "before",
@@ -346,6 +387,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/**
 	 * testPseudoElements
 	 */
+	@Test
 	public void testPseudoElements()
 	{
 		this.checkProposals("contentAssist/pseduo-element-proposal.css", true, true, "after", "before", "first-letter",
@@ -355,6 +397,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/**
 	 * testPseudoElementsPrefix
 	 */
+	@Test
 	public void testPseudoElementsPrefix()
 	{
 		this.checkProposals("contentAssist/pseduo-element-proposal-prefix.css", true, true, "first-letter",
@@ -364,6 +407,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/**
 	 * same pseduo-class test as above, but has a more complete list of the items being tested
 	 */
+	@Test
 	public void testPseudoClassPrefixFull()
 	{
 		this.checkProposals("contentAssist/pseduo-class-proposal-prefix.css", true, true, "first-child",
@@ -373,6 +417,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/**
 	 * testPseudoClassParen
 	 */
+	@Test
 	public void testPseudoClassParen()
 	{
 		// @formatter:off
@@ -386,6 +431,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/*
 	 * Matches any F element immediately preceded by a sibling element E.
 	 */
+	@Test
 	public void testAdjacentSelector()
 	{
 		assertCompletionCorrect("p + |", '\t', "div", "p + div");
@@ -394,6 +440,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/*
 	 * Matches any F element immediately preceded by a sibling element E.
 	 */
+	@Test
 	public void testAdjacentSelectorWithClass()
 	{
 		/* Special formatting only occurs when H1 has class="opener" */
@@ -403,6 +450,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/**
 	 * Matches any E element with the "foo" attribute set (whatever the value)
 	 */
+	@Test
 	public void testAttributeSelector()
 	{
 
@@ -441,6 +489,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/**
 	 * testPropertyProposalPostLCurly
 	 */
+	@Test
 	public void testPropertyProposalPostLCurly()
 	{
 		assertCompletionCorrect("p {| }", '\t', "background-position", "p {background-position:  }");
@@ -449,6 +498,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/**
 	 * testPropertyProposalPostLCurly
 	 */
+	@Test
 	public void testPropertyProposalPreRCurly()
 	{
 		assertCompletionCorrect("p { |}", '\t', "background-position", "p { background-position: }");
@@ -457,6 +507,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/**
 	 * testPropertyProposalPreColon
 	 */
+	@Test
 	public void testPropertyProposalPreColon()
 	{
 		assertCompletionCorrect("p {background-position|:}", '\t', "background-position", "p {background-position:}");
@@ -465,6 +516,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/**
 	 * testPropertyProposalPreColon
 	 */
+	@Test
 	public void testPropertyProposalPostSemicolon()
 	{
 		assertCompletionCorrect("p {background-position:top;| }", '\t', "background-color",
@@ -474,6 +526,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/**
 	 * testPropertyProposalProperty
 	 */
+	@Test
 	public void testPropertyProposalProperty()
 	{
 		assertCompletionCorrect("p {background-po|sition: }", '\t', "background-position", "p {background-position: }");
@@ -482,6 +535,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/**
 	 * testPropertyProposalWithMinus
 	 */
+	@Test
 	public void testPropertyProposalWithMinus()
 	{
 		assertCompletionCorrect("p {|-moz-binding: }", '\t', "-moz-binding", "p {-moz-binding: }");
@@ -490,6 +544,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/**
 	 * testPropertyProposalPostColonNoSpace
 	 */
+	@Test
 	public void testPropertyValueProposalPostColonNoSpace()
 	{
 		assertCompletionCorrect("p {background-position:|top;}", '\t', "top", "p {background-position:top;}");
@@ -498,6 +553,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/**
 	 * testPropertyProposalPostColonSpace
 	 */
+	@Test
 	public void testPropertyValueProposalPostColonSpace()
 	{
 		assertCompletionCorrect("p {background-position: |top;}", '\t', "top", "p {background-position: top;}");
@@ -506,6 +562,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/**
 	 * testPropertyValueProposalPreSemiColonNoSpace
 	 */
+	@Test
 	public void testPropertyValueProposalPreSemiColonNoSpace()
 	{
 		assertCompletionCorrect("p {background-position:top|;}", '\t', "top", "p {background-position:top;}");
@@ -514,6 +571,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/**
 	 * testPropertyValueProposalPreSemiColonSpace
 	 */
+	@Test
 	public void testPropertyValueProposalPreSemiColonSpace()
 	{
 		assertCompletionCorrect("p {background-position:top| ;}", '\t', "top", "p {background-position:top ;}");
@@ -522,6 +580,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/**
 	 * testPropertyValueProposalPreLCurlyNoSpace
 	 */
+	@Test
 	public void testPropertyValueProposalPreLCurlyNoSpace()
 	{
 		assertCompletionCorrect("p {background-position:top|}", '\t', "top", "p {background-position:top}");
@@ -530,6 +589,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/**
 	 * testPropertyValueProposalPreLCurlySpace
 	 */
+	@Test
 	public void testPropertyValueProposalPreLCurlySpace()
 	{
 		assertCompletionCorrect("p {background-position:top| }", '\t', "top", "p {background-position:top }");
@@ -538,6 +598,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/**
 	 * testClasses
 	 */
+	@Test
 	public void testClasses()
 	{
 		this.setupTestContext("contentAssist/class-proposal.css");
@@ -555,6 +616,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/**
 	 * testClasses
 	 */
+	@Test
 	public void testClassesChild()
 	{
 		this.setupTestContext("contentAssist/class-proposal.css");
@@ -573,6 +635,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/**
 	 * testIds
 	 */
+	@Test
 	public void testIds()
 	{
 		this.setupTestContext("contentAssist/id-proposal.css");
@@ -590,6 +653,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/**
 	 * testIds
 	 */
+	@Test
 	public void testIdsChild()
 	{
 		this.setupTestContext("contentAssist/id-proposal.css");
@@ -608,6 +672,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/**
 	 * testClasses
 	 */
+	@Test
 	public void testClassesIds()
 	{
 		this.setupTestContext("contentAssist/class-id-proposal.css");
@@ -643,6 +708,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/**
 	 * testFailureAfterColon
 	 */
+	@Test
 	public void testFailureAfterColon()
 	{
 		// @formatter:off
@@ -662,15 +728,15 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	 * 
 	 * @throws IOException
 	 */
+	@Test
 	public void testBackgroundProposals() throws IOException
 	{
-		File bundleFile = File.createTempFile("editor_unit_tests", "rb");
-		bundleFile.deleteOnExit();
+		File bundleFile = FileUtil.createTempFile("editor_unit_tests", "rb");
 
 		BundleElement bundleElement = new BundleElement(bundleFile.getAbsolutePath());
 		bundleElement.setDisplayName("Editor Unit Tests");
 
-		File f = File.createTempFile("snippet", "rb");
+		File f = FileUtil.createTempFile("snippet", "rb");
 		SnippetElement se = createSnippet(f.getAbsolutePath(), "background-color-template", "background", "source.css");
 		bundleElement.addChild(se);
 		BundleManager.getInstance().addBundle(bundleElement);
@@ -688,6 +754,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/**
 	 * testClasses
 	 */
+	@Test
 	public void testColorProposals()
 	{
 		this.setupTestContext("contentAssist/color-proposal.css");
@@ -706,6 +773,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	/**
 	 * testClasses
 	 */
+	@Test
 	public void testColorProposalsBackground()
 	{
 		this.setupTestContext("contentAssist/color-proposal.css");
@@ -721,6 +789,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 		AssertUtil.assertProposalApplies(document, "#CCCCCC", proposals, offset);
 	}
 
+	@Test
 	public void testCreateLexemeProviderEmptyDocument()
 	{
 
@@ -741,6 +810,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 		assertEquals(expectedRange, actualRange);
 	}
 
+	@Test
 	public void testCreateLexemeProvider()
 	{
 
@@ -761,6 +831,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 		assertEquals(expectedRange, actualRange);
 	}
 
+	@Test
 	public void testCreateLexemeProviderMedia()
 	{
 
@@ -781,6 +852,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 		assertEquals(expectedRange, actualRange);
 	}
 
+	@Test
 	public void testCreateLexemeProviderEndingBrace()
 	{
 
@@ -801,6 +873,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 		assertEquals(expectedRange, actualRange);
 	}
 
+	@Test
 	public void testIsValidAutoActivationLocation()
 	{
 		EnumSet<CSSTokenType> validTokenTypes = EnumSet.of(CSSTokenType.LCURLY, CSSTokenType.COMMA, CSSTokenType.COLON,
@@ -863,72 +936,84 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 		}
 	}
 
+	@Test
 	public void testIsValidActivationCharacter_space()
 	{
 		processor = createContentAssistProcessor(null);
 		assertTrue(processor.isValidActivationCharacter(' ', ' '));
 	}
 
+	@Test
 	public void testIsValidActivationCharacter_a()
 	{
 		processor = createContentAssistProcessor(null);
 		assertFalse(processor.isValidActivationCharacter('a', 'a'));
 	}
 
+	@Test
 	public void testIsValidIdentifier_a()
 	{
 		processor = createContentAssistProcessor(null);
 		assertTrue(processor.isValidIdentifier('a', 'a'));
 	}
 
+	@Test
 	public void testIsValidIdentifier_z()
 	{
 		processor = createContentAssistProcessor(null);
 		assertTrue(processor.isValidIdentifier('z', 'z'));
 	}
 
+	@Test
 	public void testIsValidIdentifier_A()
 	{
 		processor = createContentAssistProcessor(null);
 		assertTrue(processor.isValidIdentifier('A', 'A'));
 	}
 
+	@Test
 	public void testIsValidIdentifier_Z()
 	{
 		processor = createContentAssistProcessor(null);
 		assertTrue(processor.isValidIdentifier('Z', 'Z'));
 	}
 
+	@Test
 	public void testIsValidIdentifier_underscore()
 	{
 		processor = createContentAssistProcessor(null);
 		assertTrue(processor.isValidIdentifier('_', '_'));
 	}
 
+	@Test
 	public void testIsValidIdentifier_hash()
 	{
 		processor = createContentAssistProcessor(null);
 		assertTrue(processor.isValidIdentifier('#', '#'));
 	}
 
+	@Test
 	public void testIsValidIdentifier_dot()
 	{
 		processor = createContentAssistProcessor(null);
 		assertTrue(processor.isValidIdentifier('.', '.'));
 	}
 
+	@Test
 	public void testIsValidIdentifier_dash()
 	{
 		processor = createContentAssistProcessor(null);
 		assertTrue(processor.isValidIdentifier('-', '-'));
 	}
 
+	@Test
 	public void testIsValidIdentifier_dollar()
 	{
 		processor = createContentAssistProcessor(null);
 		assertFalse(processor.isValidIdentifier('$', '$'));
 	}
 
+	@Test
 	public void testIsValidIdentifier_space()
 	{
 		processor = createContentAssistProcessor(null);

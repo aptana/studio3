@@ -1,5 +1,9 @@
 package com.aptana.editor.common.text.reconciler;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
 import org.eclipse.jface.text.TypedRegion;
@@ -10,15 +14,16 @@ import org.jmock.lib.legacy.ClassImposteriser;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 
-public class CommonReconcilingStrategyTest extends TestCase
+public class CommonReconcilingStrategyTest
 {
 
 	private Mockery context;
 	private AbstractThemeableEditor editor;
 
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 
 		context = new Mockery()
 		{
@@ -29,7 +34,8 @@ public class CommonReconcilingStrategyTest extends TestCase
 		editor = context.mock(AbstractThemeableEditor.class);
 	}
 
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		try
 		{
@@ -38,10 +44,11 @@ public class CommonReconcilingStrategyTest extends TestCase
 		}
 		finally
 		{
-			super.tearDown();
+//			super.tearDown();
 		}
 	}
 
+	@Test
 	public void testNoOpOnIncrementalReconcile() throws Exception
 	{
 		context.checking(new Expectations()

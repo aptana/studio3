@@ -7,10 +7,14 @@
  */
 package com.aptana.core.util;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.util.Map;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -18,15 +22,17 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.osgi.service.datalocation.Location;
+import org.junit.Test;
 import org.osgi.framework.Version;
 
 import com.aptana.core.CorePlugin;
 import com.aptana.core.ICorePreferenceConstants;
 import com.aptana.core.util.EclipseUtil.LauncherFilter;
 
-public class EclipseUtilTest extends TestCase
+public class EclipseUtilTest
 {
 
+	@Test
 	public void testGetApplicationLauncher()
 	{
 		IPath path = EclipseUtil.getApplicationLauncher();
@@ -45,6 +51,7 @@ public class EclipseUtilTest extends TestCase
 		assertTrue(match);
 	}
 
+	@Test
 	public void testGetProductVersion()
 	{
 		String productVersion = EclipseUtil.getProductVersion();
@@ -53,6 +60,7 @@ public class EclipseUtilTest extends TestCase
 		assertEquals(version.getMajor() + "." + version.getMinor() + "." + version.getMicro(), productVersion);
 	}
 
+	@Test
 	public void testGetTraceableItems()
 	{
 		Map<String, String> items = EclipseUtil.getTraceableItems();
@@ -63,6 +71,7 @@ public class EclipseUtilTest extends TestCase
 		assertTrue(items.containsKey("com.aptana.core/debug/shell"));
 	}
 
+	@Test
 	public void testGetCurrentDebuggableComponents()
 	{
 		String[] components = EclipseUtil.getCurrentDebuggableComponents();
@@ -80,13 +89,15 @@ public class EclipseUtilTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testGetSystemProperty()
 	{
-		assertEquals("1.6", EclipseUtil.getSystemProperty("java.specification.version"));
+		assertEquals(PlatformUtil.isWindows() ? "\\" : "/", EclipseUtil.getSystemProperty("file.separator"));
 		assertNull(EclipseUtil.getSystemProperty("random_property"));
 		assertNull(EclipseUtil.getSystemProperty(null));
 	}
 
+	@Test
 	public void testIsSystemPropertyEnabled()
 	{
 		assertTrue(EclipseUtil.isSystemPropertyEnabled("java.specification.version"));
@@ -94,12 +105,14 @@ public class EclipseUtilTest extends TestCase
 		assertFalse(EclipseUtil.isSystemPropertyEnabled(null));
 	}
 
+	@Test
 	public void testIsPluginLoaded()
 	{
 		assertTrue(EclipseUtil.isPluginLoaded(CorePlugin.getDefault()));
 		assertFalse(EclipseUtil.isPluginLoaded(null));
 	}
 
+	@Test
 	public void testGetPluginVersion()
 	{
 		assertNotNull(EclipseUtil.getPluginVersion(CorePlugin.getDefault()));
@@ -108,6 +121,7 @@ public class EclipseUtilTest extends TestCase
 		assertNull(EclipseUtil.getPluginVersion((String) null));
 	}
 
+	@Test
 	public void testLauncherFilter()
 	{
 		Location location = Platform.getInstallLocation();

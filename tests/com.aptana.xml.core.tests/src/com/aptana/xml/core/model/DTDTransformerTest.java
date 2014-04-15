@@ -7,6 +7,10 @@
  */
 package com.aptana.xml.core.model;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
@@ -24,23 +28,25 @@ import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
 
-public class DTDTransformerTest extends TestCase
+public class DTDTransformerTest
 {
 	private DTDTransformer transformer;
 
-	@Override
-	protected void setUp() throws Exception
+//	@Override
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 
 		transformer = new DTDTransformer();
 	}
 
-	@Override
-	protected void tearDown() throws Exception
+//	@Override
+	@After
+	public void tearDown() throws Exception
 	{
 		transformer = null;
-		super.tearDown();
+//		super.tearDown();
 	}
 
 	protected String getContent(String path)
@@ -116,30 +122,35 @@ public class DTDTransformerTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testSingleElement() throws DTDTransformException
 	{
 		transform("DTD/singleElement.dtd");
 		assertElements("svg");
 	}
 
+	@Test
 	public void testMultipleElements() throws DTDTransformException
 	{
 		transform("DTD/multipleElements.dtd");
 		assertElements("svg", "circle", "ellipse", "rectangle", "path");
 	}
 
+	@Test
 	public void testSingleAttribute() throws DTDTransformException
 	{
 		transform("DTD/elementAttribute.dtd");
 		assertAttributes("svg", "x");
 	}
 
+	@Test
 	public void testMultipleAttributes() throws DTDTransformException
 	{
 		transform("DTD/multipleElementAttributes.dtd");
 		assertAttributes("svg", "x", "y", "width", "height");
 	}
 
+	@Test
 	public void testSVGDTD() throws DTDTransformException
 	{
 		transform("DTD/svg11-flat.dtd");

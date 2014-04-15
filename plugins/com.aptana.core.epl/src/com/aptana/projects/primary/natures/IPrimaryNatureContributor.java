@@ -46,4 +46,12 @@ public interface IPrimaryNatureContributor
 	 * @throws CoreException
 	 */
 	public void configure(IProject project) throws CoreException;
+
+	/**
+	 * Returns the absolute location of the folder that contains the primary library contents for the project type.
+	 * 
+	 * @param projectPath
+	 * @return
+	 */
+	public IPath getLibraryContainerPath(IPath projectPath);
 }

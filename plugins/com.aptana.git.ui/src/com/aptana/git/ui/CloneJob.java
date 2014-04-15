@@ -11,7 +11,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFolder;
@@ -43,6 +46,9 @@ import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.internal.sharing.ConnectProviderOperation;
 import com.aptana.git.ui.internal.wizards.Messages;
+import com.aptana.projects.primary.natures.IPrimaryNatureContributor;
+import com.aptana.projects.primary.natures.PrimaryNaturesManager;
+import com.aptana.ui.util.UIUtils;
 
 //FIXME Move to some different package?
 public class CloneJob extends Job
@@ -59,6 +65,8 @@ public class CloneJob extends Job
 	private boolean shallowClone;
 
 	private Set<IProject> createdProjects;
+
+	private Map<String, IPrimaryNatureContributor> natureContributors = new HashMap<String, IPrimaryNatureContributor>();
 
 	public CloneJob(String sourceURI, String dest)
 	{
@@ -91,6 +99,7 @@ public class CloneJob extends Job
 		this.forceRootAsProject = forceRootAsProject;
 		this.shallowClone = shallow;
 		this.createdProjects = new HashSet<IProject>();
+		natureContributors = PrimaryNaturesManager.getManager().getContributorsMap();
 	}
 
 	@Override
@@ -154,6 +163,25 @@ public class CloneJob extends Job
 			subMonitor.done();
 		}
 		return Status.OK_STATUS;
+	}
+
+	private void setNatureFromContributions(IProject project)
+	{
+		List<String> potentialNatures = PrimaryNaturesManager.getManager().getPotentialNatures(project);
+		if (potentialNatures.size() > 0)
+		{
+			String[] natureIds = (String[]) potentialNatures.toArray(new String[potentialNatures.size()]);
+			try
+			{
+				IProjectDescription description = project.getDescription();
+				description.setNatureIds(natureIds);
+				project.setDescription(description, null);
+			}
+			catch (CoreException e)
+			{
+				IdeLog.logError(GitUIPlugin.getDefault(), e);
+			}
+		}
 	}
 
 	protected GitExecutable getGitExecutable()
@@ -321,6 +349,15 @@ public class CloneJob extends Job
 					}
 				}
 			}
+			UIUtils.getDisplay().asyncExec(new Runnable()
+			{
+				public void run()
+				{
+					// Set the primary natures - Ideally this does not need to run in UI thread, however some nature
+					// contributors rely on UI calls to determine the nature of the project.
+					setNatureFromContributions(project);
+				}
+			});
 		}
 		finally
 		{

@@ -7,9 +7,12 @@
  */
 package com.aptana.css.core.internal.build;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
+import org.junit.Test;
 
 import com.aptana.buildpath.core.tests.AbstractValidatorTestCase;
 import com.aptana.core.build.IBuildParticipant;
@@ -51,6 +54,7 @@ public class CSSParserValidatorTest extends AbstractValidatorTestCase
 		return getParseErrors(source, new ParseState(source), ICSSConstants.CSS_PROBLEM);
 	}
 
+	@Test
 	public void testCSSParseErrors() throws CoreException
 	{
 		String text = "div#paginator {\nfloat: left\nwidth: 65px\n}";
@@ -65,6 +69,7 @@ public class CSSParserValidatorTest extends AbstractValidatorTestCase
 				item.getMessage());
 	}
 
+	@Test
 	public void testCSSParseErrorsAtNot() throws CoreException
 	{
 		//@formatter:off

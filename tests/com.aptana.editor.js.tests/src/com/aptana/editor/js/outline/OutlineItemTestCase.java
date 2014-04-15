@@ -7,6 +7,8 @@
  */
 package com.aptana.editor.js.outline;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.StringReader;
 
 import javax.xml.namespace.QName;
@@ -15,8 +17,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import junit.framework.TestCase;
-
+import org.junit.Before;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -30,12 +31,12 @@ import com.aptana.parsing.ast.IParseNode;
 /**
  * @author Kevin Lindsey
  */
-public abstract class OutlineItemTestCase extends TestCase
+public abstract class OutlineItemTestCase
 {
 	private JSParser fParser;
 
-	@Override
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
 		fParser = new JSParser();
 	}

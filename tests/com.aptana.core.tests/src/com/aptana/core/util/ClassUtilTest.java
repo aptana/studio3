@@ -7,22 +7,24 @@
  */
 package com.aptana.core.util;
 
-import java.util.List;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-import junit.framework.TestCase;
+import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.junit.Test;
 import org.osgi.framework.BundleActivator;
 
 import com.aptana.core.CorePlugin;
 import com.aptana.core.resources.IUniformResourceMarker;
 
-public class ClassUtilTest extends TestCase
+public class ClassUtilTest
 {
-
+	@Test
 	public void testGetClassesTree()
 	{
 		List<Class<?>> classes = ClassUtil.getClassesTree(CorePlugin.class);
@@ -35,6 +37,7 @@ public class ClassUtilTest extends TestCase
 		assertTrue(classes.contains(Object.class));
 	}
 
+	@Test
 	public void testGetInterfaceTree()
 	{
 		List<Class<?>> classes = ClassUtil.getClassesTree(IUniformResourceMarker.class);

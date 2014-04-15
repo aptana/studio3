@@ -7,6 +7,8 @@
  */
 package com.aptana.editor.js.text;
 
+import static org.junit.Assert.assertEquals;
+
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collection;
@@ -15,12 +17,12 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.Token;
+import org.junit.Test;
 
 import com.aptana.core.IFilter;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.tests.AbstractTokenScannerTestCase;
-import com.aptana.editor.js.text.JSCodeScanner;
 import com.aptana.js.core.JSLanguageConstants;
 
 /**
@@ -88,7 +90,7 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 		}
 	}
 
-	public void testBasicTokenizing()
+	@Test public void testBasicTokenizing()
 	{
 		String src = "var one = 1;";
 		IDocument document = new Document(src);
@@ -113,7 +115,7 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 
 	}
 
-	public void testStartWithWhitespace() throws Exception
+	@Test public void testStartWithWhitespace() throws Exception
 	{
 		String src = " / ";
 		IDocument document = new Document(src);
@@ -124,7 +126,7 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(Token.EOF, 3, 0);
 	}
 
-	public void testNumbers()
+	@Test public void testNumbers()
 	{
 		String src = "0xff 0X123 1 9.234 1E8 .1 0.";
 		IDocument document = new Document(src);
@@ -145,7 +147,7 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("constant.numeric.js"), 26, 2);
 	}
 
-	public void testHexNumbers()
+	@Test public void testHexNumbers()
 	{
 		// @formatter:off
 		String[][] lists = {
@@ -160,7 +162,7 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 		this.enumerateLists(lists, "constant.numeric.js");
 	}
 
-	public void testScientificNotation()
+	@Test public void testScientificNotation()
 	{
 		// @formatter:off
 		String[][] lists = {
@@ -175,7 +177,7 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 		this.enumerateLists(lists, "constant.numeric.js");
 	}
 
-	public void testConstantWords()
+	@Test public void testConstantWords()
 	{
 		String src = "true false null Infinity NaN undefined super this debugger";
 		IDocument document = new Document(src);
@@ -200,7 +202,7 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("keyword.other.js"), 50, 8);
 	}
 
-	public void testMetaChars()
+	@Test public void testMetaChars()
 	{
 		String src = "(){}[],;";
 		IDocument document = new Document(src);
@@ -216,7 +218,7 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("punctuation.terminator.statement.js"), 7, 1);
 	}
 
-	public void testPrototypeSnippet()
+	@Test public void testPrototypeSnippet()
 	{
 		//@formatter:off
 		String src = 
@@ -318,7 +320,7 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 		// TODO Test all the rest of the lines! (Or at least the "interesting" parts with new token types
 	}
 
-	public void testUnderscoreInIdentifierWithKeyword()
+	@Test public void testUnderscoreInIdentifierWithKeyword()
 	{
 		String src = "add_child";
 		IDocument document = new Document(src);
@@ -327,7 +329,7 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("source.js"), 0, 9);
 	}
 
-	public void testFunctionName()
+	@Test public void testFunctionName()
 	{
 		String src = "function chris() {}";
 		IDocument document = new Document(src);
@@ -343,7 +345,7 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("meta.brace.curly.js"), 18, 1);
 	}
 
-	public void testAnonymousFunctionName()
+	@Test public void testAnonymousFunctionName()
 	{
 		String src = "var eatCakeAnon = function(){};";
 		IDocument document = new Document(src);
@@ -363,7 +365,7 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("punctuation.terminator.statement.js"), 30, 1);
 	}
 
-	public void testFunctionWithArguments()
+	@Test public void testFunctionWithArguments()
 	{
 		String src = "function Pet(name, species, hello){}";
 		IDocument document = new Document(src);
@@ -385,7 +387,7 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("meta.brace.curly.js"), 35, 1);
 	}
 
-	public void testBrokenStuff()
+	@Test public void testBrokenStuff()
 	{
 		String src = "function sayHello() { alert(this.hello); }";
 		IDocument document = new Document(src);
@@ -420,7 +422,7 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 	 * Note: just aAdding exception just for the 'log' function that was properly gotten as a firebug function.
 	 */
 	//@formatter:on
-	public void testSupportFunctions() throws Exception
+	@Test public void testSupportFunctions() throws Exception
 	{
 		Object[] tokens = new Object[] { "meta.delimiter.method.period.js", "source.js", "meta.brace.round.js",
 				"meta.brace.round.js", "null", "source.js", "meta.delimiter.method.period.js", "source.js", "null",
@@ -473,7 +475,7 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 
 	}
 
-	public void testKeywordOperators() throws Exception
+	@Test public void testKeywordOperators() throws Exception
 	{
 		String src = StringUtil.join(" ", JSLanguageConstants.KEYWORD_OPERATORS);
 		IDocument document = new Document(src);
@@ -483,7 +485,7 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 
 	}
 
-	public void testOperators() throws Exception
+	@Test public void testOperators() throws Exception
 	{
 
 		String src = StringUtil.join(" ", JSLanguageConstants.OPERATORS);
@@ -499,7 +501,7 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 				"keyword.operator.js", "null", "keyword.operator.js", "null", "keyword.operator.js", "null");
 	}
 
-	public void testSingleCharacterOperators() throws Exception
+	@Test public void testSingleCharacterOperators() throws Exception
 	{
 
 		String src = StringUtil.join(" ", JSLanguageConstants.SINGLE_CHARACTER_OPERATORS);
@@ -512,7 +514,7 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 				"keyword.operator.js", "null", "keyword.operator.js", "null");
 	}
 
-	public void testKeyWordControl() throws Exception
+	@Test public void testKeyWordControl() throws Exception
 	{
 
 		String src = StringUtil.join(" ", JSLanguageConstants.KEYWORD_CONTROL);
@@ -525,7 +527,7 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 				"keyword.control.js", "null", "keyword.control.js", "null", "keyword.control.js", "null");
 	}
 
-	public void testKeyWordControlFuture() throws Exception
+	@Test public void testKeyWordControlFuture() throws Exception
 	{
 
 		String src = StringUtil.join(" ", JSLanguageConstants.KEYWORD_CONTROL_FUTURE);
@@ -534,7 +536,7 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertTokens("keyword.control.js", "null", "keyword.control.js", "null", "keyword.control.js", "null");
 	}
 
-	public void testStorageTypes() throws Exception
+	@Test public void testStorageTypes() throws Exception
 	{
 
 		String[] storageTypes = JSLanguageConstants.STORAGE_TYPES;
@@ -561,7 +563,7 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 				"null", "storage.type.js", "null", "storage.type.js", "null", "storage.type.js", "null");
 	}
 
-	public void testStorageModifiers() throws Exception
+	@Test public void testStorageModifiers() throws Exception
 	{
 
 		String[] storageTypes = JSLanguageConstants.STORAGE_MODIFIERS;
@@ -586,7 +588,7 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 		}
 	}
 
-	public void testSupportClasses() throws Exception
+	@Test public void testSupportClasses() throws Exception
 	{
 		String src = StringUtil.join(" ", JSLanguageConstants.SUPPORT_CLASSES);
 		IDocument document = new Document(src);
@@ -608,7 +610,7 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 				"null");
 	}
 
-	public void testSupportDomConstants() throws Exception
+	@Test public void testSupportDomConstants() throws Exception
 	{
 		String src = StringUtil.join(" ", JSLanguageConstants.SUPPORT_DOM_CONSTANTS);
 		IDocument document = new Document(src);
@@ -624,7 +626,7 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 				"support.constant.dom.js", "null", "support.constant.dom.js", "null");
 	}
 
-	public void testOperatorTokens()
+	@Test public void testOperatorTokens()
 	{
 		// Note: the original testOperatorTokens did have a '/' in the end which was removed because
 		// it matched a regexp with /= %= += -= &= |= ^= ? ! % & * - + ~ = < > ^ | /
@@ -659,7 +661,7 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 
 	}
 
-	public void testNumberRegression()
+	@Test public void testNumberRegression()
 	{
 		String src = "var i = 1+\n//\n2;";
 		IDocument document = new Document(src);
@@ -686,7 +688,7 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 	/**
 	 * This is a new test for corner-cases in the jflex scanner that the old scanner did not support.
 	 */
-	public void testFunctionHandlingOnJFlex() throws Exception
+	@Test public void testFunctionHandlingOnJFlex() throws Exception
 	{
 		String src = "a = a = function"; // a should be a function name (i.e.: deal with look-ahead issues).
 		IDocument document = new Document(src);

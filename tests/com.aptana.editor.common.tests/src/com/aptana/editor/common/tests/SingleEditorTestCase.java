@@ -7,9 +7,9 @@
  */
 package com.aptana.editor.common.tests;
 
-import java.io.ByteArrayInputStream;
+import static org.junit.Assert.assertEquals;
 
-import junit.framework.TestCase;
+import java.io.ByteArrayInputStream;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -25,25 +25,26 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.texteditor.ITextEditor;
+import org.junit.After;
+import org.junit.Before;
 
 import com.aptana.editor.epl.tests.EditorTestHelper;
 
-public abstract class SingleEditorTestCase extends TestCase
+public abstract class SingleEditorTestCase
 {
 
 	private IProject project;
 	private IFile file;
 	private ITextEditor editor;
 
-	@Override
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
 		project = createProject();
 	}
 
-	@Override
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		try
 		{
@@ -55,15 +56,15 @@ public abstract class SingleEditorTestCase extends TestCase
 			// Delete the generated file
 			if (file != null)
 				file.delete(true, new NullProgressMonitor());
-			// Delete the generated project FIXME This hangs if we try to do it, probably because of UI thread running sync. So for now, comment it out
-//			project.delete(true, new NullProgressMonitor());
+			// Delete the generated project FIXME This hangs if we try to do it, probably because of UI thread running
+			// sync. So for now, comment it out
+			// project.delete(true, new NullProgressMonitor());
 		}
 		finally
 		{
 			editor = null;
 			file = null;
 			project = null;
-			super.tearDown();
 		}
 	}
 

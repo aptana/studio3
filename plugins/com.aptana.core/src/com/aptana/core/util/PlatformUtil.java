@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.service.environment.Constants;
 
@@ -722,6 +724,16 @@ public final class PlatformUtil
 			return StringUtil.EMPTY;
 		}
 		return null;
+	}
+
+	/**
+	 * Returns the install location of the Studio installation
+	 * 
+	 * @return
+	 */
+	public static IPath getInstallLocation()
+	{
+		return new Path(Platform.getInstallLocation().getURL().getFile());
 	}
 
 	/**

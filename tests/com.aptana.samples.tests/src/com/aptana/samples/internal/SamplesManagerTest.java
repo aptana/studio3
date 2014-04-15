@@ -7,6 +7,10 @@
  */
 package com.aptana.samples.internal;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -17,25 +21,28 @@ import com.aptana.samples.model.IProjectSample;
 import com.aptana.samples.model.SampleCategory;
 import com.aptana.samples.model.SamplesReference;
 
-public class SamplesManagerTest extends TestCase
+public class SamplesManagerTest
 {
 
 	private ISamplesManager samplesManager;
 
-	@Override
-	protected void setUp() throws Exception
+//	@Override
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 		samplesManager = SamplesPlugin.getDefault().getSamplesManager();
 	}
 
-	@Override
-	protected void tearDown() throws Exception
+//	@Override
+	@After
+	public void tearDown() throws Exception
 	{
 		samplesManager = null;
-		super.tearDown();
+//		super.tearDown();
 	}
 
+	@Test
 	public void testGetCategories()
 	{
 		List<SampleCategory> categories = samplesManager.getCategories();
@@ -67,6 +74,7 @@ public class SamplesManagerTest extends TestCase
 		return null;
 	}
 
+	@Test
 	public void testGetSamplesForCategory()
 	{
 		List<IProjectSample> samples = samplesManager.getSamplesForCategory("com.aptana.samples.tests.category");

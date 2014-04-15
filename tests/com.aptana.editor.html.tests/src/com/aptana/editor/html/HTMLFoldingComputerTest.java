@@ -1,14 +1,18 @@
 package com.aptana.editor.html;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Collection;
 import java.util.Map;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
+import org.junit.After;
+import org.junit.Test;
 
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.html.parsing.HTMLParseState;
@@ -16,18 +20,18 @@ import com.aptana.editor.html.parsing.HTMLParser;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ast.IParseRootNode;
 
-public class HTMLFoldingComputerTest extends TestCase
+public class HTMLFoldingComputerTest
 {
 
 	private IFoldingComputer folder;
 
-	@Override
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		folder = null;
-		super.tearDown();
 	}
 
+	@Test
 	public void testAPSTUD3151_JSComment() throws Exception
 	{
 		String src = "<!DOCTYPE html>\n" + //
@@ -55,6 +59,7 @@ public class HTMLFoldingComputerTest extends TestCase
 		assertFalse(positions.contains(new Position(1, 44)));
 	}
 
+	@Test
 	public void testAPSTUD3151_CSSComment() throws Exception
 	{
 		String src = "<!DOCTYPE html>\n" + //

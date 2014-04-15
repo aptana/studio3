@@ -7,16 +7,20 @@
  */
 package com.aptana.css.core.parsing;
 
+import org.junit.Test;
+
 /**
  * CSSSpecialTokenHandlingTest
  */
 public class CSSSpecialTokenHandlingTest extends CSSTokensTest
 {
+	@Test
 	public void testRGBIsId()
 	{
 		assertToken("#808080", CSSTokenType.ID, 0, 7); //$NON-NLS-1$
 	}
 
+	@Test
 	public void testRGBIsId2()
 	{
 		// @formatter:off
@@ -28,6 +32,7 @@ public class CSSSpecialTokenHandlingTest extends CSSTokensTest
 		// @formatter:on
 	}
 
+	@Test
 	public void testRGBIsColor()
 	{
 		// @formatter:off
@@ -42,6 +47,7 @@ public class CSSSpecialTokenHandlingTest extends CSSTokensTest
 		// @formatter:on
 	}
 
+	@Test
 	public void testRGBIsIdInMedia()
 	{
 		// @formatter:off
@@ -60,6 +66,7 @@ public class CSSSpecialTokenHandlingTest extends CSSTokensTest
 		// @formatter:on
 	}
 
+	@Test
 	public void testRGBIsColorInMedia()
 	{
 		// @formatter:off

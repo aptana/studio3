@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension-point id="primaryNatureContributors" name="%extension-point.primaryNatureContributors.name" schema="schema/primaryNatureContributors.exsd"/>
    <extension
          point="org.eclipse.ui.propertyPages">
       <page

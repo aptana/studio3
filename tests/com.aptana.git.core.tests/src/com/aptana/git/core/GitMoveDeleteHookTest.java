@@ -7,9 +7,10 @@
  */
 package com.aptana.git.core;
 
-import java.io.File;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-import junit.framework.TestCase;
+import java.io.File;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -28,13 +29,16 @@ import org.eclipse.core.runtime.Status;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.GitRepositoryManager;
 import com.aptana.git.core.model.IGitRepositoryManager;
 
-public class GitMoveDeleteHookTest extends TestCase
+public class GitMoveDeleteHookTest
 {
 	private Mockery context;
 	private IResourceTree tree;
@@ -45,9 +49,9 @@ public class GitMoveDeleteHookTest extends TestCase
 	private GitRepositoryManager repoManager;
 	private GitMoveDeleteHook hook;
 
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
 		context = new Mockery()
 		{
 			{
@@ -75,25 +79,19 @@ public class GitMoveDeleteHookTest extends TestCase
 		};
 	}
 
-	@Override
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
-		try
-		{
-			hook = null;
-			context = null;
-			tree = null;
-			file = null;
-			project = null;
-			folder = null;
-			repo = null;
-		}
-		finally
-		{
-			super.tearDown();
-		}
+		hook = null;
+		context = null;
+		tree = null;
+		file = null;
+		project = null;
+		folder = null;
+		repo = null;
 	}
 
+	@Test
 	public void testDeleteFileUnforcedWithHistorySucceeds()
 	{
 		context.checking(new Expectations()
@@ -122,6 +120,7 @@ public class GitMoveDeleteHookTest extends TestCase
 		context.assertIsSatisfied();
 	}
 
+	@Test
 	public void testDeleteFileThatIsNewDoesntGoThroughRepo()
 	{
 		context.checking(new Expectations()
@@ -142,6 +141,7 @@ public class GitMoveDeleteHookTest extends TestCase
 		context.assertIsSatisfied();
 	}
 
+	@Test
 	public void testDeleteFileForcedDoesntCheckSynchronized()
 	{
 		hook = new GitMoveDeleteHook()
@@ -165,6 +165,7 @@ public class GitMoveDeleteHookTest extends TestCase
 		context.assertIsSatisfied();
 	}
 
+	@Test
 	public void testDeleteFileFailsInGitRepo()
 	{
 		context.checking(new Expectations()
@@ -192,6 +193,7 @@ public class GitMoveDeleteHookTest extends TestCase
 		context.assertIsSatisfied();
 	}
 
+	@Test
 	public void testDeleteFolderUnforcedWithHistorySucceeds()
 	{
 		final boolean[] addFilesToHistoryCalled = new boolean[1];
@@ -249,6 +251,7 @@ public class GitMoveDeleteHookTest extends TestCase
 		context.assertIsSatisfied();
 	}
 
+	@Test
 	public void testDeleteFolderForcedNeverChecksSynch()
 	{
 		hook = new GitMoveDeleteHook()
@@ -271,6 +274,7 @@ public class GitMoveDeleteHookTest extends TestCase
 		context.assertIsSatisfied();
 	}
 
+	@Test
 	public void testPuntsDeleteFolderWhenUnderGitRepoButUncommitted()
 	{
 		hook = new GitMoveDeleteHook()
@@ -313,6 +317,7 @@ public class GitMoveDeleteHookTest extends TestCase
 		context.assertIsSatisfied();
 	}
 
+	@Test
 	public void testCallsStandardDeleteFolderWhenFilesUnderneathAreCommittedButAlreadyDeletedFromDisk()
 	{
 		final IProgressMonitor monitor = new NullProgressMonitor();
@@ -351,6 +356,7 @@ public class GitMoveDeleteHookTest extends TestCase
 		context.assertIsSatisfied();
 	}
 
+	@Test
 	public void testWontDeleteDotGitFolderIfRepoIsAttached()
 	{
 		context.checking(new Expectations()
@@ -374,6 +380,7 @@ public class GitMoveDeleteHookTest extends TestCase
 		context.assertIsSatisfied();
 	}
 
+	@Test
 	public void testWillLetFilesystemAPIDeleteDotGitFolderIfRepoIsNotAttached()
 	{
 		hook = new GitMoveDeleteHook()
@@ -396,6 +403,7 @@ public class GitMoveDeleteHookTest extends TestCase
 	}
 
 	// Add test to ensure that we don't delete .git dir if user doesn't check to delete project!
+	@Test
 	public void testDeleteProjectButNotContentsDoesntDeleteGitDir()
 	{
 		context.checking(new Expectations()
@@ -434,6 +442,7 @@ public class GitMoveDeleteHookTest extends TestCase
 		context.assertIsSatisfied();
 	}
 
+	@Test
 	public void testDeleteProjectUnforcedSucceeds()
 	{
 		context.checking(new Expectations()
@@ -469,6 +478,7 @@ public class GitMoveDeleteHookTest extends TestCase
 		context.assertIsSatisfied();
 	}
 
+	@Test
 	public void testDeleteProjectUnforcedUnsynchedReturnsFalse()
 	{
 		context.checking(new Expectations()
@@ -496,6 +506,7 @@ public class GitMoveDeleteHookTest extends TestCase
 		context.assertIsSatisfied();
 	}
 
+	@Test
 	public void testDeleteProjectWhenUnderGitRepoButUncommitted()
 	{
 		hook = new GitMoveDeleteHook()
@@ -532,6 +543,7 @@ public class GitMoveDeleteHookTest extends TestCase
 		context.assertIsSatisfied();
 	}
 
+	@Test
 	public void testPuntsOnDeleteProjectWhenItIsNotAttachedToGit()
 	{
 		hook = new GitMoveDeleteHook()
@@ -546,6 +558,7 @@ public class GitMoveDeleteHookTest extends TestCase
 				new NullProgressMonitor()));
 	}
 
+	@Test
 	public void testPuntsOnDeleteProjectWhenItIsGitRoot()
 	{
 		context.checking(new Expectations()
@@ -580,7 +593,7 @@ public class GitMoveDeleteHookTest extends TestCase
 
 	// TODO Add tests for moving files
 	// TODO Add tests for moving folders
-
+	@Test
 	public void testMoveProjectWhenProjectRootIsRootOfRepo() throws Exception
 	{
 		hook = new GitMoveDeleteHook()
@@ -628,6 +641,7 @@ public class GitMoveDeleteHookTest extends TestCase
 		context.assertIsSatisfied();
 	}
 
+	@Test
 	public void testMoveProjectWithNoGitRepoPunts() throws Exception
 	{
 		hook = new GitMoveDeleteHook()
@@ -642,6 +656,7 @@ public class GitMoveDeleteHookTest extends TestCase
 		assertFalse(hook.moveProject(tree, project, description, IResource.FORCE, new NullProgressMonitor()));
 	}
 
+	@Test
 	public void testMoveProjectWhenProjectIsChildOfRepoRoot() throws Exception
 	{
 		hook = new GitMoveDeleteHook()
@@ -700,6 +715,7 @@ public class GitMoveDeleteHookTest extends TestCase
 		context.assertIsSatisfied();
 	}
 
+	@Test
 	public void testMoveProjectWhenProjectIsChildOfRepoRootAndDestinationIsOutsideRepo() throws Exception
 	{
 		hook = new GitMoveDeleteHook()

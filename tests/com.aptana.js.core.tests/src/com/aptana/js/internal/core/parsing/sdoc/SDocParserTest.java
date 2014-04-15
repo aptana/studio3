@@ -7,6 +7,8 @@
  */
 package com.aptana.js.internal.core.parsing.sdoc;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -27,7 +29,7 @@ import com.aptana.core.util.ResourceUtil;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.internal.core.parsing.sdoc.model.DocumentationBlock;
 
-public class SDocParserTest extends TestCase
+public class SDocParserTest
 {
 	/**
 	 * getContent
@@ -114,6 +116,7 @@ public class SDocParserTest extends TestCase
 	/**
 	 * testAdvanced
 	 */
+	@Test
 	public void testAdvanced()
 	{
 		this.parseTest("sdoc/advanced.sdoc");
@@ -122,6 +125,7 @@ public class SDocParserTest extends TestCase
 	/**
 	 * testAlias
 	 */
+	@Test
 	public void testAlias()
 	{
 		this.parseTest("sdoc/alias.sdoc");
@@ -130,6 +134,7 @@ public class SDocParserTest extends TestCase
 	/**
 	 * testArrays
 	 */
+	@Test
 	public void testArrays()
 	{
 		this.parseTest("sdoc/arrays.sdoc");
@@ -138,6 +143,7 @@ public class SDocParserTest extends TestCase
 	/**
 	 * testClassDescription
 	 */
+	@Test
 	public void testClassDescription()
 	{
 		this.parseTest("sdoc/classDescription.sdoc");
@@ -146,6 +152,7 @@ public class SDocParserTest extends TestCase
 	/**
 	 * testConstructor
 	 */
+	@Test
 	public void testConstructor()
 	{
 		this.parseTest("sdoc/constructor.sdoc");
@@ -154,6 +161,7 @@ public class SDocParserTest extends TestCase
 	/**
 	 * testExample
 	 */
+	@Test
 	public void testExample()
 	{
 		this.parseTest("sdoc/example.sdoc");
@@ -162,6 +170,7 @@ public class SDocParserTest extends TestCase
 	/**
 	 * testException
 	 */
+	@Test
 	public void testException()
 	{
 		this.parseTest("sdoc/exception.sdoc");
@@ -170,6 +179,7 @@ public class SDocParserTest extends TestCase
 	/**
 	 * testFunctions
 	 */
+	@Test
 	public void testFunctions()
 	{
 		this.parseTest("sdoc/functions.sdoc");
@@ -178,6 +188,7 @@ public class SDocParserTest extends TestCase
 	/**
 	 * testFunctions2
 	 */
+	@Test
 	public void testFunctions2()
 	{
 		this.parseTest("sdoc/functions2.sdoc");
@@ -186,6 +197,7 @@ public class SDocParserTest extends TestCase
 	/**
 	 * testInternal
 	 */
+	@Test
 	public void testInternal()
 	{
 		this.parseTest("sdoc/internal.sdoc");
@@ -194,11 +206,13 @@ public class SDocParserTest extends TestCase
 	/**
 	 * testMethod
 	 */
+	@Test
 	public void testMethod()
 	{
 		this.parseTest("sdoc/method.sdoc");
 	}
 
+	@Test
 	public void testModule()
 	{
 		this.parseTest("sdoc/module.sdoc");
@@ -207,6 +221,7 @@ public class SDocParserTest extends TestCase
 	/**
 	 * testNamespace
 	 */
+	@Test
 	public void testNamespace()
 	{
 		this.parseTest("sdoc/namespace.sdoc");
@@ -215,6 +230,7 @@ public class SDocParserTest extends TestCase
 	/**
 	 * testOverview
 	 */
+	@Test
 	public void testOverview()
 	{
 		this.parseTest("sdoc/overview.sdoc");
@@ -223,6 +239,7 @@ public class SDocParserTest extends TestCase
 	/**
 	 * testParam
 	 */
+	@Test
 	public void testParam()
 	{
 		this.parseTest("sdoc/param.sdoc");
@@ -231,6 +248,7 @@ public class SDocParserTest extends TestCase
 	/**
 	 * testPrivate
 	 */
+	@Test
 	public void testPrivate()
 	{
 		this.parseTest("sdoc/private.sdoc");
@@ -239,6 +257,7 @@ public class SDocParserTest extends TestCase
 	/**
 	 * testProperty
 	 */
+	@Test
 	public void testProperty()
 	{
 		this.parseTest("sdoc/property.sdoc");
@@ -247,6 +266,7 @@ public class SDocParserTest extends TestCase
 	/**
 	 * testReturn
 	 */
+	@Test
 	public void testReturn()
 	{
 		this.parseTest("sdoc/return.sdoc");
@@ -255,6 +275,7 @@ public class SDocParserTest extends TestCase
 	/**
 	 * testSee
 	 */
+	@Test
 	public void testSee()
 	{
 		this.parseTest("sdoc/see.sdoc");
@@ -263,6 +284,7 @@ public class SDocParserTest extends TestCase
 	/**
 	 * testText
 	 */
+	@Test
 	public void testText()
 	{
 		this.parseTest("sdoc/text.sdoc");
@@ -271,6 +293,7 @@ public class SDocParserTest extends TestCase
 	/**
 	 * testTextAndAlias
 	 */
+	@Test
 	public void testTextAndAlias()
 	{
 		this.parseTest("sdoc/textAndAlias.sdoc");
@@ -279,6 +302,7 @@ public class SDocParserTest extends TestCase
 	/**
 	 * testTextAndAuthor
 	 */
+	@Test
 	public void testTextAndAuthor()
 	{
 		this.parseTest("sdoc/textAndAuthor.sdoc");
@@ -287,6 +311,7 @@ public class SDocParserTest extends TestCase
 	/**
 	 * testTextAndParam
 	 */
+	@Test
 	public void testTextAndParam()
 	{
 		this.parseTest("sdoc/textAndParam.sdoc");
@@ -295,6 +320,7 @@ public class SDocParserTest extends TestCase
 	/**
 	 * testTextAndAliasAndTags
 	 */
+	@Test
 	public void testTextAndAliasAndTags()
 	{
 		this.parseTest("sdoc/textAndAliasAndTags.sdoc");
@@ -303,6 +329,7 @@ public class SDocParserTest extends TestCase
 	/**
 	 * testTextAndAliasAndTagsAndReturn
 	 */
+	@Test
 	public void testTextAndAliasAndTagsAndReturn()
 	{
 		this.parseTest("sdoc/textAndAliasAndTagsAndReturn.sdoc");
@@ -311,6 +338,7 @@ public class SDocParserTest extends TestCase
 	/**
 	 * testTextAndPrivateAndAliasAndTagsAndReturn
 	 */
+	@Test
 	public void testTextAndPrivateAndAliasAndTagsAndReturn()
 	{
 		this.parseTest("sdoc/textAndPrivateAndAliasAndTagsAndReturn.sdoc");
@@ -319,6 +347,7 @@ public class SDocParserTest extends TestCase
 	/**
 	 * testUnknownTag
 	 */
+	@Test
 	public void testUnknownTag()
 	{
 		this.parseTest("sdoc/unknown.sdoc");

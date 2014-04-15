@@ -7,13 +7,15 @@
  */
 package com.aptana.core.epl.util;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 import junit.framework.TestCase;
 
-public class LRUCacheTest extends TestCase
+public class LRUCacheTest
 {
 
 	class SizedEntry implements ILRUCacheable
@@ -33,6 +35,7 @@ public class LRUCacheTest extends TestCase
 
 	}
 
+	@Test
 	public void testLRU() throws Exception
 	{
 		LRUCache<String, SizedEntry> cache = new LRUCache<String, SizedEntry>();

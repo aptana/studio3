@@ -7,11 +7,16 @@
  */
 package com.aptana.js.core.inferencing;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.List;
 
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.junit.Test;
+
 import com.aptana.js.core.index.JSIndexQueryHelper;
-import com.aptana.js.core.inferencing.JSPropertyCollection;
-import com.aptana.js.core.inferencing.JSScope;
 import com.aptana.js.internal.core.inferencing.JSSymbolTypeInferrer;
 
 public class OperatorInferencingTest extends InferencingTestsBase
@@ -32,8 +37,9 @@ public class OperatorInferencingTest extends InferencingTestsBase
 
 		// NOTE: getting property elements of all symbols in the specified scope
 		// as a side-effect caches each JSObject's type values.
-		JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(globals, null, null, new JSIndexQueryHelper(getIndex()));
-		symbolInferrer.getScopeProperties();
+		JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(globals, null, null, new JSIndexQueryHelper(
+				getIndex()));
+		symbolInferrer.getScopeProperties(new NullProgressMonitor());
 
 		List<String> symbolTypes = object.getTypes();
 		assertNotNull(symbolTypes);
@@ -49,6 +55,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testAddNumbersVar
 	 */
+	@Test
 	public void testAddNumbersVar()
 	{
 		this.varTypeTests("var addNumbersVar = 4 + 5;", "addNumbersVar", "Number");
@@ -57,6 +64,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testAddStringsVar
 	 */
+	@Test
 	public void testAddStringsVar()
 	{
 		this.varTypeTests("var addStringsVar = 'ab' + 'cd';", "addStringsVar", "String");
@@ -65,6 +73,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testAddMixedVar
 	 */
+	@Test
 	public void testAddMixedVar()
 	{
 		this.varTypeTests("var addMixedVar = 'ab' + 10;", "addMixedVar", "String");
@@ -73,6 +82,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testSubtractVar
 	 */
+	@Test
 	public void testSubtractVar()
 	{
 		this.varTypeTests("var subVar = a - b;", "subVar", "Number");
@@ -83,6 +93,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testShiftLeftVar
 	 */
+	@Test
 	public void testShiftLeftVar()
 	{
 		this.varTypeTests("var shiftLeftVar = a << b;", "shiftLeftVar", "Number");
@@ -91,6 +102,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testShiftRightVar
 	 */
+	@Test
 	public void testShiftRightVar()
 	{
 		this.varTypeTests("var shiftRightVar = a >> b;", "shiftRightVar", "Number");
@@ -99,6 +111,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testArithmeticShiftRightVar
 	 */
+	@Test
 	public void testArithmeticShiftRightVar()
 	{
 		this.varTypeTests("var arithmeticShiftRightVar = a >> b;", "arithmeticShiftRightVar", "Number");
@@ -109,6 +122,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testBitAndVar
 	 */
+	@Test
 	public void testBitAndVar()
 	{
 		this.varTypeTests("var bitAndVar = a & b;", "bitAndVar", "Number");
@@ -117,6 +131,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testBitXorVar
 	 */
+	@Test
 	public void testBitXorVar()
 	{
 		this.varTypeTests("var bitXorVar = a ^ b;", "bitXorVar", "Number");
@@ -125,6 +140,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testBitOrVar
 	 */
+	@Test
 	public void testBitOrVar()
 	{
 		this.varTypeTests("var bitOrVar = a | b;", "bitOrVar", "Number");
@@ -135,6 +151,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testMultiplyVar
 	 */
+	@Test
 	public void testMultiplyVar()
 	{
 		this.varTypeTests("var multiplyVar = a * b;", "multiplyVar", "Number");
@@ -143,6 +160,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testDivideVar
 	 */
+	@Test
 	public void testDivideVar()
 	{
 		this.varTypeTests("var divideVar = a * b;", "divideVar", "Number");
@@ -151,6 +169,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testModVar
 	 */
+	@Test
 	public void testModVar()
 	{
 		this.varTypeTests("var modVar = a % b;", "modVar", "Number");
@@ -161,6 +180,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testEqualVar
 	 */
+	@Test
 	public void testEqualVar()
 	{
 		this.varTypeTests("var equalVar = a == b;", "equalVar", "Boolean");
@@ -169,6 +189,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testNotEqualVar
 	 */
+	@Test
 	public void testNotEqualVar()
 	{
 		this.varTypeTests("var notEqualVar = a != b;", "notEqualVar", "Boolean");
@@ -177,6 +198,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testInstanceEqualVar
 	 */
+	@Test
 	public void testInstanceEqualVar()
 	{
 		this.varTypeTests("var equalVar = a === b;", "equalVar", "Boolean");
@@ -185,6 +207,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testInstanceNotEqualVar
 	 */
+	@Test
 	public void testInstanceNotEqualVar()
 	{
 		this.varTypeTests("var notEqualVar = a !== b;", "notEqualVar", "Boolean");
@@ -195,6 +218,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testLessThanVar
 	 */
+	@Test
 	public void testLessThanVar()
 	{
 		this.varTypeTests("var lessThanVar = a < b;", "lessThanVar", "Boolean");
@@ -203,6 +227,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testGreaterThanVar
 	 */
+	@Test
 	public void testGreaterThanVar()
 	{
 		this.varTypeTests("var greaterThanVar = a > b;", "greaterThanVar", "Boolean");
@@ -211,6 +236,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testLessThanEqualVar
 	 */
+	@Test
 	public void testLessThanEqualVar()
 	{
 		this.varTypeTests("var lessThanEqualVar = a <= b;", "lessThanEqualVar", "Boolean");
@@ -219,6 +245,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testGreaterThanEqualVar
 	 */
+	@Test
 	public void testGreaterThanEqualVar()
 	{
 		this.varTypeTests("var greaterThanEqualVar = a >= b;", "greaterThanEqualVar", "Boolean");
@@ -227,6 +254,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testInstanceOfVar
 	 */
+	@Test
 	public void testInstanceOfVar()
 	{
 		this.varTypeTests("var instanceOfVar = a instanceof b;", "instanceOfVar", "Boolean");
@@ -235,6 +263,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testInVar
 	 */
+	@Test
 	public void testInVar()
 	{
 		this.varTypeTests("var inVar = a in b;", "inVar", "Boolean");
@@ -245,6 +274,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testLogicalAndVar
 	 */
+	@Test
 	public void testLogicalAndVar()
 	{
 		this.varTypeTests("var logicalAndVar = \"\" && 10;", "logicalAndVar", "String", "Number");
@@ -253,6 +283,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testLogicalOrVar
 	 */
+	@Test
 	public void testLogicalOrVar()
 	{
 		this.varTypeTests("var logicalOrVar = \"\" || 10;", "logicalOrVar", "String", "Number");
@@ -263,6 +294,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testDeleteVar
 	 */
+	@Test
 	public void testDeleteVar()
 	{
 		this.varTypeTests("var deleteVar = delete a.b;", "deleteVar", "Boolean");
@@ -271,6 +303,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testLogicalNotVar
 	 */
+	@Test
 	public void testLogicalNotVar()
 	{
 		this.varTypeTests("var logicalNotVar = !b;", "logicalNotVar", "Boolean");
@@ -279,6 +312,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testNegationVar
 	 */
+	@Test
 	public void testNegationVar()
 	{
 		this.varTypeTests("var negationVar = -a;", "negationVar", "Number");
@@ -287,6 +321,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testPreDecrementVar
 	 */
+	@Test
 	public void testPreDecrementVar()
 	{
 		this.varTypeTests("var preDecrementVar = --a;", "preDecrementVar", "Number");
@@ -295,6 +330,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testPreIncrementVar
 	 */
+	@Test
 	public void testPreIncrementVar()
 	{
 		this.varTypeTests("var preIncrementVar = ++a;", "preIncrementVar", "Number");
@@ -303,6 +339,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testBitNotVar
 	 */
+	@Test
 	public void testBitNotVar()
 	{
 		this.varTypeTests("var bitNotVar = ~a;", "bitNotVar", "Number");
@@ -311,6 +348,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testTypeofVar
 	 */
+	@Test
 	public void testTypeofVar()
 	{
 		this.varTypeTests("var typeofVar = typeof a;", "typeofVar", "String");
@@ -319,6 +357,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testVoidVar
 	 */
+	@Test
 	public void testVoidVar()
 	{
 		this.varTypeTests("var voidVar = void a;", "voidVar");
@@ -329,6 +368,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testPostDecrementVar
 	 */
+	@Test
 	public void testPostDecrementVar()
 	{
 		this.varTypeTests("var postDecrementVar = a--;", "postDecrementVar", "Number");
@@ -337,6 +377,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testPostIncrementVar
 	 */
+	@Test
 	public void testPostIncrementVar()
 	{
 		this.varTypeTests("var postIncrementVar = a++;", "postIncrementVar", "Number");
@@ -347,6 +388,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testConditionalVar
 	 */
+	@Test
 	public void testConditionalVar()
 	{
 		this.varTypeTests("var conditionalVar = (a == true) ? 10 : 20;", "conditionalVar", "Number");
@@ -355,9 +397,11 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testMixedConditionalVar
 	 */
+	@Test
 	public void testMixedConditionalVar()
 	{
-		this.varTypeTests("var mixedConditionalVar = (a == true) ? 10 : '20';", "mixedConditionalVar", "Number", "String");
+		this.varTypeTests("var mixedConditionalVar = (a == true) ? 10 : '20';", "mixedConditionalVar", "Number",
+				"String");
 	}
 
 	/* assignment operators */
@@ -365,6 +409,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testSimpleAssignment
 	 */
+	@Test
 	public void testSimpleAssignment()
 	{
 		this.assignmentTypeTests("abc = 10;", "Number");
@@ -373,6 +418,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testMultiAssignment
 	 */
+	@Test
 	public void testMultiAssignment()
 	{
 		this.assignmentTypeTests("abc = def = 10;", "Number");
@@ -381,6 +427,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testPlusAssignNumbers
 	 */
+	@Test
 	public void testPlusAssignNumbers()
 	{
 		this.assignmentTypeTests("var abc = 10; abc += 20", "Number");
@@ -389,6 +436,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testPlusAssignStrings
 	 */
+	@Test
 	public void testPlusAssignStrings()
 	{
 		this.assignmentTypeTests("var abc = '10'; abc += '20'", "String");
@@ -397,6 +445,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testPlusAssignMixed
 	 */
+	@Test
 	public void testPlusAssignMixed()
 	{
 		this.assignmentTypeTests("var abc = 10; abc += '20'", "Number", "String");
@@ -405,6 +454,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testPlusAssignMixed2
 	 */
+	@Test
 	public void testPlusAssignMixed2()
 	{
 		this.assignmentTypeTests("var abc = '10'; abc += 20", "String", "Number");
@@ -413,6 +463,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testArithmeticShiftRightAssign
 	 */
+	@Test
 	public void testArithmeticShiftRightAssign()
 	{
 		this.assignmentTypeTests("abc >>= b;", "Number");
@@ -421,6 +472,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testBitwiseAndAssign
 	 */
+	@Test
 	public void testBitwiseAndAssign()
 	{
 		this.assignmentTypeTests("abc &= b;", "Number");
@@ -429,6 +481,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testBitwiseOrAssign
 	 */
+	@Test
 	public void testBitwiseOrAssign()
 	{
 		this.assignmentTypeTests("abc |= b;", "Number");
@@ -437,6 +490,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testBitwiseXorAssign
 	 */
+	@Test
 	public void testBitwiseXorAssign()
 	{
 		this.assignmentTypeTests("abc ^= b;", "Number");
@@ -445,6 +499,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testBitwiseDivideAssign
 	 */
+	@Test
 	public void testBitwiseDivideAssign()
 	{
 		this.assignmentTypeTests("abc /= b;", "Number");
@@ -453,6 +508,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testModAssign
 	 */
+	@Test
 	public void testModAssign()
 	{
 		this.assignmentTypeTests("abc %= b;", "Number");
@@ -461,6 +517,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testMultiplyAssign
 	 */
+	@Test
 	public void testMultiplyAssign()
 	{
 		this.assignmentTypeTests("abc *= b;", "Number");
@@ -469,6 +526,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testShiftLeftAssign
 	 */
+	@Test
 	public void testShiftLeftAssign()
 	{
 		this.assignmentTypeTests("abc <<= b;", "Number");
@@ -477,6 +535,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testShiftRightAssign
 	 */
+	@Test
 	public void testShiftRightAssign()
 	{
 		this.assignmentTypeTests("abc >>= b;", "Number");
@@ -485,6 +544,7 @@ public class OperatorInferencingTest extends InferencingTestsBase
 	/**
 	 * testSubtractAssign
 	 */
+	@Test
 	public void testSubtractAssign()
 	{
 		this.assignmentTypeTests("abc -= b;", "Number");

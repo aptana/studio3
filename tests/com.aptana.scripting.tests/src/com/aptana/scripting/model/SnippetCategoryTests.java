@@ -7,11 +7,18 @@
  */
 package com.aptana.scripting.model;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
 import java.net.URL;
 import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.aptana.scripting.model.filters.IModelFilter;
 
@@ -19,19 +26,15 @@ public class SnippetCategoryTests extends BundleTestBase
 {
 	private List<SnippetCategoryElement> categories = null;
 
-	/*
-	 * (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
 		String bundleName = "bundleWithSnippetCategory";
 		BundleEntry entry = this.getBundleEntry(bundleName, BundlePrecedence.APPLICATION);
 		categories = entry.getSnippetCategories();
 	}
 
+	@Test
 	public void testGetBundleSnippetCategoriesUsingFilter()
 	{
 		List<SnippetCategoryElement> snippetCategories = BundleManager.getInstance().getSnippetCategories(
@@ -51,42 +54,50 @@ public class SnippetCategoryTests extends BundleTestBase
 		assertEquals("getSnippetCategories(IModelFilter) return the wrong elements", 5, snippetCategories.size());
 	}
 
+	@Test
 	public void testGetBundleSnippetCategoriesUsingNullFilter()
 	{
 		List<SnippetCategoryElement> snippetCategories = BundleManager.getInstance().getSnippetCategories(null);
 		assertEquals("getSnippetCategories(IModelFilter) return the wrong elements", 6, snippetCategories.size());
 	}
 
+	@Test
 	public void testGetSnippetCategories()
 	{
 		assertEquals("getSnippetCategories() returned the wrong contents", 6, categories.size());
 	}
 
+	@Test
 	public void testValidIconURL()
 	{
 		validateCategory("GoodCategory", "close.gif", true);
 	}
 
+	@Test
 	public void testInValidIconURL()
 	{
 		validateCategory("InvalidIconCategory", "invalid.gif", false);
 	}
 
+	@Test
 	public void testMalformedIconURL()
 	{
 		validateCategory("MalformedIconCategory", "\\ad/a\"\"invalid.gif", false);
 	}
 
+	@Test
 	public void testNoIcon()
 	{
 		validateCategory("NoIconCategory", null, false);
 	}
 
+	@Test
 	public void testWebIconURL()
 	{
 		validateCategory("UrlCategory", "http://preview.appcelerator.com/dashboard/img/icons/icon_to_do_list.png", true);
 	}
 
+	@Test
 	public void testInvalidWebIconURL()
 	{
 		validateCategory("InvalidUrlCategory",

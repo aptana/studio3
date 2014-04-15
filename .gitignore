@@ -27,3 +27,5 @@ tests/com.aptana.studio.tests.all/wintest
 runtime-New_configuration/
 plugins/com.aptana.scripting/bundles/**/
 .mu_repo
+builders/com.aptana.studio.tests.build/build.properties
+builders/com.aptana.studio.tests.build/eclipse-test-framework-4.3.1/**/*

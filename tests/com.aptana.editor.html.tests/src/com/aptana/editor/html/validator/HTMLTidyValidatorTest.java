@@ -7,10 +7,13 @@
  */
 package com.aptana.editor.html.validator;
 
+import static org.junit.Assert.assertTrue;
+
 import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
+import org.junit.Test;
 
 import com.aptana.buildpath.core.tests.AbstractValidatorTestCase;
 import com.aptana.core.build.IBuildParticipant;
@@ -55,7 +58,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 	}
 
 	@Override
-	protected void setUp() throws Exception
+	public void setUp() throws Exception
 	{
 		super.setUp();
 
@@ -65,6 +68,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 		loader.join();
 	}
 
+	@Test
 	public void testOKDoctype() throws CoreException
 	{
 		String text = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"\n"
@@ -74,6 +78,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 		assertDoesntContain(items, "SYSTEM, PUBLIC, W3C, DTD, EN must be upper case");
 	}
 
+	@Test
 	public void testUnknownAttribute() throws CoreException
 	{
 		// @formatter:off
@@ -94,6 +99,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 		assertContains(items, "a proprietary attribute \"div\"");
 	}
 
+	@Test
 	public void testEventNotMarkedAsUnknownAttribute() throws CoreException
 	{
 		// @formatter:off
@@ -114,6 +120,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 		assertDoesntContain(items, "a proprietary attribute \"onclick\"");
 	}
 
+	@Test
 	public void testLowercaseDoctypeW3C() throws CoreException
 	{
 		String text = "<!DOCTYPE HTML PUBLIC \"-//w3c//DTD HTML 4.01//EN\"\n"
@@ -125,6 +132,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 				26, 3);
 	}
 
+	@Test
 	public void testUsesSeverityAssignedByUser() throws CoreException
 	{
 		String text = "<!DOCTYPE HTML PUBLIC \"-//w3c//DTD HTML 4.01//EN\"\n"
@@ -166,6 +174,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 		assertContainsProblem(items, "SYSTEM, PUBLIC, W3C, DTD, EN must be upper case", IMarker.SEVERITY_INFO, 1, 26, 3);
 	}
 
+	@Test
 	public void testRestoreDefaultsResetsProblemSeverities() throws CoreException
 	{
 		String text = "<!DOCTYPE HTML PUBLIC \"-//w3c//DTD HTML 4.01//EN\"\n"
@@ -195,6 +204,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 				26, 3);
 	}
 
+	@Test
 	public void testLowercaseDoctypeEN() throws CoreException
 	{
 		String text = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//en\"\n"
@@ -206,6 +216,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 				46, 2);
 	}
 
+	@Test
 	public void testLowercaseDoctypeDTD() throws CoreException
 	{
 		String text = "<!DOCTYPE HTML PUBLIC \"-//W3C//dtd HTML 4.01//EN\"\n"
@@ -217,6 +228,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 				31, 3);
 	}
 
+	@Test
 	public void testLowercaseDoctypeSYSTEM() throws CoreException
 	{
 		String text = "<!DOCTYPE HTML system 'about:legacy-compat'>";
@@ -227,6 +239,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 				15, 6);
 	}
 
+	@Test
 	public void testOKSystemDoctype() throws CoreException
 	{
 		String text = "<!DOCTYPE HTML SYSTEM \"about:legacy-compat\">";
@@ -243,6 +256,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 		assertContainsProblem(items, "expected \"html PUBLIC\" or \"html SYSTEM\"", IMarker.SEVERITY_WARNING, 1, 0, 9);
 	}
 
+	@Test
 	public void testMissingDoctype() throws CoreException
 	{
 		String text = "<html><head><title></title></head></html>";
@@ -251,6 +265,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 		assertContainsProblem(items, "Missing DOCTYPE", IMarker.SEVERITY_WARNING, 1, 0, 0);
 	}
 
+	@Test
 	public void testDoctypeAfterElements() throws CoreException
 	{
 		String text = "<html>\n<!DOCTYPE html>\n</html>";
@@ -259,6 +274,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 		assertContainsProblem(items, "<!DOCTYPE> isn't allowed after elements", IMarker.SEVERITY_WARNING, 2, 7, 9);
 	}
 
+	@Test
 	public void testMissingTitleElement() throws CoreException
 	{
 		String text = "<html><head></head><body></body></html>";
@@ -267,6 +283,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 		assertContainsProblem(items, "should insert missing 'title' element", IMarker.SEVERITY_WARNING, 1, 0, 0);
 	}
 
+	@Test
 	public void testTrimEmptyH1() throws CoreException
 	{
 		// @formatter:off
@@ -286,6 +303,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 	}
 
 	// public void testNonEmptyElementThatDoesntSupportContent() throws CoreException
+//	@Test
 	// {
 //		// @formatter:off
 //		String text = "<!DOCTYPE html>\n" +
@@ -302,9 +320,8 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 	// List<IProblem> items = getParseErrors(text);
 	// assertContains(items, "meta element not empty or not closed");
 	// }
-
 	// TODO Test for unrecognized attribute!
-
+	@Test
 	public void testDeprecatedElement() throws CoreException
 	{
 		// @formatter:off
@@ -324,6 +341,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 				IMarker.SEVERITY_WARNING, 7, 69, 17);
 	}
 
+	@Test
 	public void testDuplicateIdValues() throws CoreException
 	{
 		// @formatter:off
@@ -342,6 +360,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 		assertContainsProblem(items, "<p> 'id' attribute value 'a' not unique", IMarker.SEVERITY_WARNING, 7, 93, 10);
 	}
 
+	@Test
 	public void testOKMultipleFramesetElements() throws CoreException
 	{
 		// @formatter:off
@@ -373,6 +392,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 		assertDoesntContain(items, "Repeated FRAMESET element");
 	}
 
+	@Test
 	public void testDuplicateFramesetElements() throws CoreException
 	{
 		// @formatter:off
@@ -404,6 +424,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 		assertContainsProblem(items, "repeated FRAMESET element", IMarker.SEVERITY_WARNING, 18, 553, 26);
 	}
 
+	@Test
 	public void testInsertImplicitNOFRAMES() throws CoreException
 	{
 		// @formatter:off
@@ -429,6 +450,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 		assertContainsProblem(items, "should insert implicit <noframes>", IMarker.SEVERITY_WARNING, 11, 286, 6);
 	}
 
+	@Test
 	public void testElementOutsideNoFramesContent() throws CoreException
 	{
 		// @formatter:off
@@ -451,6 +473,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 		assertContainsProblem(items, "<h1> not inside 'noframes' element", IMarker.SEVERITY_WARNING, 12, 340, 4);
 	}
 
+	@Test
 	public void testMissingNoFrames() throws CoreException
 	{
 		// @formatter:off
@@ -472,6 +495,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 		assertContainsProblem(items, "missing </noframes>", IMarker.SEVERITY_WARNING, 11, 286, 4);
 	}
 
+	@Test
 	public void testUnescapedAmpersand() throws CoreException
 	{
 		// @formatter:off
@@ -490,6 +514,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 		assertContainsProblem(items, "unescaped & which should be written as &amp;", IMarker.SEVERITY_WARNING, 7, 79, 1);
 	}
 
+	@Test
 	public void testEntityNotEndingInSemicolon() throws CoreException
 	{
 		// @formatter:off
@@ -508,6 +533,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 		assertContainsProblem(items, "entity \"&amp\" doesn't end in ';'", IMarker.SEVERITY_WARNING, 7, 79, 4);
 	}
 
+	@Test
 	public void testUnescapedOrUnknownEntity() throws CoreException
 	{
 		// @formatter:off
@@ -526,6 +552,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 		assertContainsProblem(items, "unescaped & or unknown entity \"&am\"", IMarker.SEVERITY_WARNING, 7, 79, 3);
 	}
 
+	@Test
 	public void testAttributeValueOutsidePredefinedValues() throws CoreException
 	{
 		// @formatter:off
@@ -545,6 +572,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 				7, 68, 19);
 	}
 
+	@Test
 	public void testAttributeValueOutsidePredefinedValues2() throws CoreException
 	{
 		// @formatter:off
@@ -564,6 +592,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 				IMarker.SEVERITY_WARNING, 7, 68, 22);
 	}
 
+	@Test
 	public void testAttributeValueInPredefinedValues() throws CoreException
 	{
 		// @formatter:off
@@ -582,6 +611,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 		assertDoesntContain(items, "button attribute \"type\" has invalid value \"reset\"");
 	}
 
+	@Test
 	public void testBooleanAttributeWithMatchingValue() throws CoreException
 	{
 		// @formatter:off
@@ -606,6 +636,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 		assertDoesntContain(items, "input attribute \"disabled\" has invalid value \"disabled\"");
 	}
 
+	@Test
 	public void testBooleanAttributeWithNoValue() throws CoreException
 	{
 		// @formatter:off
@@ -630,6 +661,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 		assertDoesntContain(items, "input attribute \"disabled\" has invalid value \"\"");
 	}
 
+	@Test
 	public void testBooleanAttributeWithEmptyValue() throws CoreException
 	{
 		// @formatter:off
@@ -654,6 +686,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 		assertDoesntContain(items, "input attribute \"disabled\" has invalid value \"\"");
 	}
 
+	@Test
 	public void testAttributeValueWithAsteriskDefinedInMetadata() throws CoreException
 	{
 		// @formatter:off
@@ -672,6 +705,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 		assertDoesntContain(items, "meta attribute \"content\" has invalid value \"not specified\"");
 	}
 
+	@Test
 	public void testArbitraryRelAttributeValue() throws CoreException
 	{
 		// @formatter:off
@@ -690,6 +724,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 		assertDoesntContain(items, "link attribute \"rel\" has invalid value \"shortcut icon\"");
 	}
 
+	@Test
 	public void testArbitraryRevAttributeValue() throws CoreException
 	{
 		// @formatter:off
@@ -708,6 +743,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 		assertDoesntContain(items, "link attribute \"rev\" has invalid value \"shortcut icon\"");
 	}
 
+	@Test
 	public void testDoesntComplainAboutScriptTagWithSrcAttributeHavingNoContent() throws CoreException
 	{
 		// @formatter:off
@@ -726,6 +762,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 		assertDoesntContain(items, "should trim empty <script>");
 	}
 
+	@Test
 	public void testComplainsAboutScriptTagWithNoSrcAttributeHavingNoContent() throws CoreException
 	{
 		// @formatter:off
@@ -744,6 +781,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 		assertContains(items, "should trim empty <script>");
 	}
 
+	@Test
 	public void testFilter() throws CoreException
 	{
 		// @formatter:off

@@ -7,6 +7,9 @@
  */
 package com.aptana.js.internal.core.index;
 
+import org.junit.After;
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -45,7 +48,7 @@ import com.aptana.js.core.model.TypeElement;
 import com.aptana.js.core.model.UserAgentElement;
 import com.aptana.parsing.ast.IParseRootNode;
 
-public class JSIndexTest extends TestCase
+public class JSIndexTest
 {
 	private class TestBuildContext extends BuildContext
 	{
@@ -144,12 +147,13 @@ public class JSIndexTest extends TestCase
 	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
-	@Override
-	protected void tearDown() throws Exception
+	// @Override
+	@After
+	public void tearDown() throws Exception
 	{
 		getIndexManager().removeIndex(URI.create(IJSIndexConstants.METADATA_INDEX_LOCATION));
 
-		super.tearDown();
+		// super.tearDown();
 	}
 
 	/**
@@ -167,6 +171,7 @@ public class JSIndexTest extends TestCase
 	/**
 	 * Test for APSTUD-4289. Make sure we don't allow duplicate user agents into the JS index
 	 */
+	@Test
 	public void testDuplicateUserAgents()
 	{
 		// create property
@@ -207,6 +212,7 @@ public class JSIndexTest extends TestCase
 	/**
 	 * testMethod
 	 */
+	@Test
 	public void testMethod()
 	{
 		String typeName = "MyClass";
@@ -248,6 +254,7 @@ public class JSIndexTest extends TestCase
 	/**
 	 * testProperty
 	 */
+	@Test
 	public void testProperty()
 	{
 		String typeName = "MyClass";
@@ -282,6 +289,7 @@ public class JSIndexTest extends TestCase
 		assertEquals(propertyName, retrievedProperty.getName());
 	}
 
+	@Test
 	public void testSpecialAllUserAgentFlag()
 	{
 		// create property and use all user agents
@@ -332,6 +340,7 @@ public class JSIndexTest extends TestCase
 	/**
 	 * testType
 	 */
+	@Test
 	public void testType()
 	{
 		String typeName = "MyClass";
@@ -350,6 +359,7 @@ public class JSIndexTest extends TestCase
 	/**
 	 * Test for APSTUD-4535
 	 */
+	@Test
 	public void testTypeCaching()
 	{
 		TestBuildContext myContext = new TestBuildContext("indexing/dottedTypes.js");
@@ -386,6 +396,7 @@ public class JSIndexTest extends TestCase
 	/**
 	 * APSTUD-4117
 	 */
+	@Test
 	public void testFunctionDocumentationWithoutReturnTag()
 	{
 		TestBuildContext myContext = new TestBuildContext("indexing/functionDocsWithoutReturn.js");
@@ -399,8 +410,7 @@ public class JSIndexTest extends TestCase
 			indexParticipant.processParseResults(myContext, index, ast, new NullProgressMonitor());
 			JSIndexQueryHelper queryHelper = new JSIndexQueryHelper(index);
 
-			Collection<PropertyElement> types = queryHelper.getGlobals("functionDocsWithoutReturn.js",
-					"abc");
+			Collection<PropertyElement> types = queryHelper.getGlobals("functionDocsWithoutReturn.js", "abc");
 			assertNotNull(types);
 			assertTrue("Expected at least a single property for 'abc'", !types.isEmpty());
 
@@ -422,7 +432,8 @@ public class JSIndexTest extends TestCase
 	/**
 	 * APSTUD-4116
 	 */
-	public void testFunctionDocumenationWithoutParamTag()
+	@Test
+	public void testFunctionDocumentationWithoutParamTag()
 	{
 		TestBuildContext myContext = new TestBuildContext("indexing/functionDocsWithoutParam.js");
 
@@ -435,8 +446,7 @@ public class JSIndexTest extends TestCase
 			indexParticipant.processParseResults(myContext, index, ast, new NullProgressMonitor());
 			JSIndexQueryHelper queryHelper = new JSIndexQueryHelper(index);
 
-			Collection<PropertyElement> types = queryHelper.getGlobals("functionDocsWithoutParam.js",
-					"abc");
+			Collection<PropertyElement> types = queryHelper.getGlobals("functionDocsWithoutParam.js", "abc");
 			assertNotNull(types);
 			assertTrue("Expected at least a single property for 'abc'", !types.isEmpty());
 
@@ -451,6 +461,26 @@ public class JSIndexTest extends TestCase
 			assertEquals("Expected parameter 1's name to be 'a'", "a", parameters.get(0));
 			assertEquals("Expected parameter 2's name to be 'b'", "b", parameters.get(1));
 			assertEquals("Expected parameter 3's name to be 'c'", "c", parameters.get(2));
+		}
+		catch (CoreException e)
+		{
+			fail(e.getMessage());
+		}
+	}
+
+	@Test(timeout = 30000)
+	public void testTISTUD_6113()
+	{
+		TestBuildContext myContext = new TestBuildContext("indexing/d3.v3.min.js");
+
+		try
+		{
+			IParseRootNode ast = myContext.getAST();
+			JSFileIndexingParticipant indexParticipant = new JSFileIndexingParticipant();
+			Index index = getIndex();
+
+			indexParticipant.processParseResults(myContext, index, ast, new NullProgressMonitor());
+			assertTrue(true); // Can we parse/index it without hanging?
 		}
 		catch (CoreException e)
 		{

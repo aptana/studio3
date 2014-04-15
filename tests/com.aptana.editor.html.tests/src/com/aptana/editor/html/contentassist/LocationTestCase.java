@@ -7,9 +7,9 @@
  */
 package com.aptana.editor.html.contentassist;
 
-import java.text.MessageFormat;
+import static org.junit.Assert.assertEquals;
 
-import junit.framework.TestCase;
+import java.text.MessageFormat;
 
 import org.eclipse.jface.text.IDocument;
 
@@ -18,7 +18,7 @@ import com.aptana.editor.html.HTMLTestUtil;
 import com.aptana.editor.html.contentassist.HTMLContentAssistProcessor.LocationType;
 import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
 
-public abstract class LocationTestCase extends TestCase
+public abstract class LocationTestCase
 {
 	/**
 	 * createDocument
@@ -31,7 +31,7 @@ public abstract class LocationTestCase extends TestCase
 	{
 		return HTMLTestUtil.createDocument(source, stripCursor);
 	}
-	
+
 	/**
 	 * coarseLocationTests
 	 * 
@@ -40,28 +40,24 @@ public abstract class LocationTestCase extends TestCase
 	 * @param endingOffset
 	 * @param expectedLocation
 	 */
-	protected void coarseLocationTests(String source, LocationTypeRange ... ranges)
+	protected void coarseLocationTests(String source, LocationTypeRange... ranges)
 	{
 		IDocument document = this.createDocument(source, false);
 		HTMLContentAssistProcessor processor = new HTMLContentAssistProcessor(null);
-		
+
 		for (LocationTypeRange range : ranges)
 		{
 			for (int offset = range.startingOffset; offset <= range.endingOffset; offset++)
 			{
 				ILexemeProvider<HTMLTokenType> lexemeProvider = processor.createLexemeProvider(document, offset);
 				LocationType LocationType = processor.getCoarseLocationType(document, lexemeProvider, offset);
-				String message = MessageFormat.format(
-					"Expected {0} at LocationType {1} of ''{2}''",
-					range.LocationType.toString(),
-					Integer.toString(offset),
-					source
-				);
+				String message = MessageFormat.format("Expected {0} at LocationType {1} of ''{2}''",
+						range.LocationType.toString(), Integer.toString(offset), source);
 				assertEquals(message, range.LocationType, LocationType);
 			}
 		}
 	}
-	
+
 	/**
 	 * fineLocationTests
 	 * 
@@ -70,25 +66,21 @@ public abstract class LocationTestCase extends TestCase
 	 * @param endingOffset
 	 * @param expectedLocation
 	 */
-	protected void fineLocationTests(String source, LocationTypeRange ... ranges)
+	protected void fineLocationTests(String source, LocationTypeRange... ranges)
 	{
 		IDocument document = this.createDocument(source, false);
 		HTMLContentAssistProcessor processor = new HTMLContentAssistProcessor(null);
-		
+
 		for (LocationTypeRange range : ranges)
 		{
 			for (int offset = range.startingOffset; offset <= range.endingOffset; offset++)
 			{
 				ILexemeProvider<HTMLTokenType> lexemeProvider = processor.createLexemeProvider(document, offset);
 				LocationType LocationType = processor.getOpenTagLocationType(lexemeProvider, offset);
-				String message = MessageFormat.format(
-					"Expected {0} at LocationType {1} of ''{2}''",
-					range.LocationType.toString(),
-					Integer.toString(offset),
-					source
-				);
+				String message = MessageFormat.format("Expected {0} at LocationType {1} of ''{2}''",
+						range.LocationType.toString(), Integer.toString(offset), source);
 				assertEquals(message, range.LocationType, LocationType);
 			}
 		}
-	}	
+	}
 }

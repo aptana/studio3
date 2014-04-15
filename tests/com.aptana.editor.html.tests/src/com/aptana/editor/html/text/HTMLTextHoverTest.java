@@ -7,9 +7,14 @@
  */
 package com.aptana.editor.html.text;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
 import org.eclipse.ui.IEditorPart;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.aptana.editor.html.HTMLMetadataLoader;
@@ -24,11 +29,9 @@ public class HTMLTextHoverTest extends HTMLEditorBasedTests
 	private Object fHeaderElement;
 	private HTMLIndexQueryHelper fQueryHelper;
 
-	@Override
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
-
 		HTMLMetadataLoader loader = new HTMLMetadataLoader();
 		loader.schedule();
 		loader.join();
@@ -47,7 +50,7 @@ public class HTMLTextHoverTest extends HTMLEditorBasedTests
 	}
 
 	@Override
-	protected void tearDown() throws Exception
+	public void tearDown() throws Exception
 	{
 		hover = null;
 		fHeaderElement = null;

@@ -33,7 +33,7 @@ public class WorkbenchBrowserSupport extends DefaultBrowserSupport
 	/**
 	 * Flag that force to use internal browser without webkit.
 	 */
-	public static int AS_INTERNAL = 1 << 0;
+	public static final int AS_INTERNAL = 1 << 0;
 
 	/**
 	 * 

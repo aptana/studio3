@@ -7,11 +7,16 @@
  */
 package com.aptana.scripting.model;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import org.junit.Test;
 public class KeyBindingTests extends BundleTestBase
 {
 	/**
 	 * testEclipseLinuxPlatformToScriptingPlatformMapping
 	 */
+	@Test
 	public void testEclipseLinuxPlatformToScriptingPlatformMapping()
 	{
 		Platform[] platforms = Platform.getPlatformsForEclipsePlatform(org.eclipse.core.runtime.Platform.OS_LINUX);

@@ -7,6 +7,10 @@
  */
 package com.aptana.editor.js.inferencing;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -14,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.Path;
+import org.junit.Test;
 
 import com.aptana.index.core.Index;
 import com.aptana.js.core.index.JSIndexQueryHelper;
@@ -161,7 +166,7 @@ public class ScopeTest extends FileContentBasedTestCase
 	 * 
 	 * @throws Exception
 	 */
-	public void testGlobalNamedFunction() throws Exception
+	@Test public void testGlobalNamedFunction() throws Exception
 	{
 		JSScope symbols = this.getSymbols("ast-queries/globalNamedFunction.js");
 		List<String> names;
@@ -191,7 +196,7 @@ public class ScopeTest extends FileContentBasedTestCase
 	 * 
 	 * @throws Exception
 	 */
-	public void testGlobalVarFunction() throws Exception
+	@Test public void testGlobalVarFunction() throws Exception
 	{
 		JSScope symbols = this.getSymbols("ast-queries/globalVarFunction.js");
 		List<String> names;
@@ -221,7 +226,7 @@ public class ScopeTest extends FileContentBasedTestCase
 	 * 
 	 * @throws Exception
 	 */
-	public void testGlobalNamedVarFunction() throws Exception
+	@Test public void testGlobalNamedVarFunction() throws Exception
 	{
 		JSScope symbols = this.getSymbols("ast-queries/globalNamedVarFunction.js");
 		List<String> names;
@@ -252,7 +257,7 @@ public class ScopeTest extends FileContentBasedTestCase
 	 * 
 	 * @throws Exception
 	 */
-	public void testGlobalVars() throws Exception
+	@Test public void testGlobalVars() throws Exception
 	{
 		JSScope symbols = this.getSymbols("ast-queries/globalVars.js");
 		List<String> names;
@@ -281,7 +286,7 @@ public class ScopeTest extends FileContentBasedTestCase
 	 * 
 	 * @throws Exception
 	 */
-	public void testLocalVars() throws Exception
+	@Test public void testLocalVars() throws Exception
 	{
 		JSScope symbols = this.getSymbols("ast-queries/localVars.js");
 		List<String> names;
@@ -317,7 +322,7 @@ public class ScopeTest extends FileContentBasedTestCase
 	 * 
 	 * @throws Exception
 	 */
-	public void testParameters() throws Exception
+	@Test public void testParameters() throws Exception
 	{
 		JSScope symbols = this.getSymbols("ast-queries/parameters.js");
 		List<String> names;
@@ -348,7 +353,7 @@ public class ScopeTest extends FileContentBasedTestCase
 	 * 
 	 * @throws Exception
 	 */
-	public void testNestedFunctions() throws Exception
+	@Test public void testNestedFunctions() throws Exception
 	{
 		JSScope symbols = this.getSymbols("ast-queries/nestedFunctions.js");
 		List<String> names;
@@ -393,7 +398,7 @@ public class ScopeTest extends FileContentBasedTestCase
 	 * 
 	 * @throws Exception
 	 */
-	public void testNestedFunctions2() throws Exception
+	@Test public void testNestedFunctions2() throws Exception
 	{
 		JSScope symbols = this.getSymbols("ast-queries/nestedFunctions2.js");
 		List<String> names;
@@ -465,7 +470,7 @@ public class ScopeTest extends FileContentBasedTestCase
 	 * 
 	 * @throws Exception
 	 */
-	public void testPrimitives() throws Exception
+	@Test public void testPrimitives() throws Exception
 	{
 		JSScope symbols = this.getSymbols("ast-queries/primitives.js");
 		List<String> names;
@@ -495,7 +500,7 @@ public class ScopeTest extends FileContentBasedTestCase
 	 * 
 	 * @throws Exception
 	 */
-	public void testMultipleTypes() throws Exception
+	@Test public void testMultipleTypes() throws Exception
 	{
 		JSScope symbols = this.getSymbols("ast-queries/multipleTypes.js");
 		List<String> names;
@@ -513,7 +518,7 @@ public class ScopeTest extends FileContentBasedTestCase
 		// this.showSymbols("multipleTypes.js", symbols);
 	}
 
-	public void testImpliedGlobal() throws Exception
+	@Test public void testImpliedGlobal() throws Exception
 	{
 		JSScope symbols = this.getSymbols("ast-queries/impliedGlobal.js");
 		Set<String> names;
@@ -536,7 +541,7 @@ public class ScopeTest extends FileContentBasedTestCase
 		assertTrue(names.contains("def"));
 	}
 
-	public void testImpliedGlobal2() throws Exception
+	@Test public void testImpliedGlobal2() throws Exception
 	{
 		JSScope symbols = this.getSymbols("ast-queries/impliedGlobal2.js");
 		Set<String> names;

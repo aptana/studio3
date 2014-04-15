@@ -1,17 +1,21 @@
 package com.aptana.editor.html.internal.build;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.aptana.core.build.IProblem;
 import com.aptana.core.resources.IMarkerConstants;
@@ -20,23 +24,24 @@ import com.aptana.core.util.IOUtil;
 import com.aptana.index.core.FileStoreBuildContext;
 import com.aptana.index.core.build.BuildContext;
 
-public class HTMLTaskDetectorTest extends TestCase
+public class HTMLTaskDetectorTest
 {
 
 	private HTMLTaskDetector taskDetector;
 
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
 		taskDetector = new HTMLTaskDetector();
 	}
 
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		taskDetector = null;
-		super.tearDown();
 	}
 
+	@Test
 	public void testDetectTaskTagWithUnicodeCharactersInCSSHTMLAndJS() throws Exception
 	{
 		File tmpDir = null;

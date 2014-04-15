@@ -7,21 +7,25 @@
  */
 package com.aptana.core.util;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.junit.Test;
 
-public class ExecutableUtilTest extends TestCase
+public class ExecutableUtilTest
 {
 	private static final String tempDir = FileUtil.getTempDirectory().toOSString();
 
+	@Test
 	public void testFindExecutableFile()
 	{
 		IPath path;
@@ -38,16 +42,19 @@ public class ExecutableUtilTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testTestingNullExecutable()
 	{
 		assertFalse(ExecutableUtil.isExecutable(null));
 	}
 
+	@Test
 	public void testInvalidExecutable()
 	{
 		assertNull(ExecutableUtil.find("invalid_executable", false, null));
 	}
 
+	@Test
 	public void testFindFileInWorkingDirectory() throws IOException, InterruptedException
 	{
 		String executableFileName = "executableTest";
@@ -73,6 +80,7 @@ public class ExecutableUtilTest extends TestCase
 		assertNotNull("Could not find executable file in working directory", path);
 	}
 
+	@Test
 	public void testFindFileNotExecutable() throws IOException
 	{
 		String executableFileName = "executableTest";
@@ -94,6 +102,7 @@ public class ExecutableUtilTest extends TestCase
 
 	}
 
+	@Test
 	public void testFindWithNullWorkingDirectory() throws IOException, InterruptedException
 	{
 		String executableFileName = "executableTest";
@@ -118,6 +127,7 @@ public class ExecutableUtilTest extends TestCase
 		assertNotNull("Could not find executable with valid search location", path);
 	}
 
+	@Test
 	public void testFindNullDirectory()
 	{
 		IPath path = ExecutableUtil.find(null, false, null);

@@ -7,6 +7,8 @@
  */
 package com.aptana.editor.css.contentassist;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
 import org.eclipse.jface.text.IDocument;
@@ -17,7 +19,7 @@ import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.common.tests.TextViewer;
 import com.aptana.parsing.lexer.Range;
 
-public class RangeTests extends TestCase
+public class RangeTests
 {
 	static class OffsetSelection
 	{
@@ -84,6 +86,7 @@ public class RangeTests extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testEmptyBody()
 	{
 		String source = "body {}";
@@ -99,6 +102,7 @@ public class RangeTests extends TestCase
 	/**
 	 * testEmptyBody2
 	 */
+	@Test
 	public void testEmptyBody2()
 	{
 		String source = "body {\n  \n}";
@@ -114,6 +118,7 @@ public class RangeTests extends TestCase
 	/**
 	 * testEmptyA - This came from a bug report
 	 */
+	@Test
 	public void testEmptyA()
 	{
 		String source = "a{\n  \n}";
@@ -131,6 +136,7 @@ public class RangeTests extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testEmptyUnknownElement()
 	{
 		String source = "xxyyzz {}";
@@ -146,6 +152,7 @@ public class RangeTests extends TestCase
 	/**
 	 * testProperty
 	 */
+	@Test
 	public void testProperty()
 	{
 		String source = "body{background}";
@@ -163,6 +170,7 @@ public class RangeTests extends TestCase
 	/**
 	 * testProperty2
 	 */
+	@Test
 	public void testProperty2()
 	{
 		String source = "body{\n  background}";
@@ -180,6 +188,7 @@ public class RangeTests extends TestCase
 	/**
 	 * testPropertyNoValue
 	 */
+	@Test
 	public void testPropertyNoValue()
 	{
 		String source = "body{background:}";
@@ -197,6 +206,7 @@ public class RangeTests extends TestCase
 	/**
 	 * testPropertyNoValue
 	 */
+	@Test
 	public void testPropertyNoValue2()
 	{
 		String source = "body{\n  background:}";
@@ -214,6 +224,7 @@ public class RangeTests extends TestCase
 	/**
 	 * testPropertyAndValueNoSemi
 	 */
+	@Test
 	public void testPropertyAndValueNoSemi()
 	{
 		String source = "body{background:red}";
@@ -233,6 +244,7 @@ public class RangeTests extends TestCase
 	/**
 	 * testPropertyAndValueNoSemi2
 	 */
+	@Test
 	public void testPropertyAndValueNoSemi2()
 	{
 		String source = "body{\n  background:red\n}";
@@ -252,6 +264,7 @@ public class RangeTests extends TestCase
 	/**
 	 * testPropertyAndValue
 	 */
+	@Test
 	public void testPropertyAndValue()
 	{
 		String source = "body{background:red;}";
@@ -271,6 +284,7 @@ public class RangeTests extends TestCase
 	/**
 	 * testPropertyAndValue2
 	 */
+	@Test
 	public void testPropertyAndValue2()
 	{
 		String source = "body{\n  background:red;\n}";
@@ -290,6 +304,7 @@ public class RangeTests extends TestCase
 	/**
 	 * testMultipleProperties
 	 */
+	@Test
 	public void testMultipleProperties()
 	{
 		String source = "body{background:red;border: 1 solid black}";
@@ -317,6 +332,7 @@ public class RangeTests extends TestCase
 	/**
 	 * testMultipleProperties2
 	 */
+	@Test
 	public void testMultipleProperties2()
 	{
 		String source = "body{\n  background: red;\n  border: 1 solid black\n}";

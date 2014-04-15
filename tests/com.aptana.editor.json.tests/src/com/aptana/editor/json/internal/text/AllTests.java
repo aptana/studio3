@@ -7,32 +7,21 @@
  */
 package com.aptana.editor.json.internal.text;
 
-import junit.framework.Test;
-import junit.framework.TestResult;
-import junit.framework.TestSuite;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
 
+@RunWith(Suite.class)
+//@formatter:off
+@SuiteClasses({
+	JSONFoldingComputerTest.class
+})
+//@formatter:on
 /**
  * @author klindsey
  *
  */
 public class AllTests
 {
-
-	public static Test suite()
-	{
-		TestSuite suite = new TestSuite(AllTests.class.getName())
-		{
-			@Override
-			public void runTest(Test test, TestResult result)
-			{
-				System.err.println("Running test: " + test.toString());
-				super.runTest(test, result);
-			}
-		};
-		//$JUnit-BEGIN$
-		suite.addTestSuite(JSONFoldingComputerTest.class);
-		//$JUnit-END$
-		return suite;
-	}
 
 }

@@ -7,10 +7,13 @@
  */
 package com.aptana.syncing.core.tests;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.util.Properties;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -20,6 +23,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.aptana.core.io.efs.EFSUtils;
 import com.aptana.git.core.model.GitExecutable;
@@ -34,7 +40,7 @@ import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
  * @author Kevin Lindsey
  */
 @SuppressWarnings("nls")
-public abstract class SyncingErrorTests extends TestCase
+public abstract class SyncingErrorTests
 {
 	protected IFileStore clientDirectory;
 	protected IFileStore serverDirectory;
@@ -50,7 +56,8 @@ public abstract class SyncingErrorTests extends TestCase
 	/**
 	 * @see junit.framework.TestCase#setUp()
 	 */
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
 		ConnectionContext context = new ConnectionContext();
 		context.put(ConnectionContext.COMMAND_LOG, System.out);
@@ -66,14 +73,13 @@ public abstract class SyncingErrorTests extends TestCase
 		serverDirectory = serverManager.getRoot().getFileStore(new Path("/server" + System.currentTimeMillis()));
 		assertNotNull(serverDirectory);
 		serverDirectory.mkdir(EFS.NONE, null);
-
-		super.setUp();
 	}
 
 	/**
 	 * @see junit.framework.TestCase#tearDown()
 	 */
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		try
 		{
@@ -106,13 +112,12 @@ public abstract class SyncingErrorTests extends TestCase
 				serverManager.disconnect(null);
 			}
 		}
-
-		super.tearDown();
 	}
 
 	/*
 	 * Sync Item Tests
 	 */
+	@Test
 	public void testCancelMonitorDuringSync() throws IOException, CoreException
 	{
 		syncTest(false, System.currentTimeMillis());

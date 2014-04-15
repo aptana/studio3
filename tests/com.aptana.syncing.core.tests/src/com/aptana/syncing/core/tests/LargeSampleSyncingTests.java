@@ -7,6 +7,10 @@
  */
 package com.aptana.syncing.core.tests;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -35,7 +39,7 @@ import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
  * @author Ingo Muschenetz
  */
 @SuppressWarnings({ "nls", "deprecation" })
-public abstract class LargeSampleSyncingTests extends TestCase
+public abstract class LargeSampleSyncingTests
 {
 	protected IFileStore clientDirectory;
 	protected IFileStore serverDirectory;
@@ -51,7 +55,8 @@ public abstract class LargeSampleSyncingTests extends TestCase
 	/**
 	 * @see junit.framework.TestCase#setUp()
 	 */
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
 		ConnectionContext context = new ConnectionContext();
 		context.put(ConnectionContext.COMMAND_LOG, System.out);
@@ -68,13 +73,14 @@ public abstract class LargeSampleSyncingTests extends TestCase
 		assertNotNull(serverDirectory);
 		serverDirectory.mkdir(EFS.NONE, null);
 
-		super.setUp();
+//		super.setUp();
 	}
 
 	/**
 	 * @see junit.framework.TestCase#tearDown()
 	 */
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		try
 		{
@@ -108,12 +114,13 @@ public abstract class LargeSampleSyncingTests extends TestCase
 			}
 		}
 
-		super.tearDown();
+//		super.tearDown();
 	}
 
 	/*
 	 * Sync Item Tests
 	 */
+	@Test
 	public void testSyncIgnoreCloakedFiles() throws IOException, CoreException
 	{
 		syncTest(false, System.currentTimeMillis());
@@ -222,6 +229,7 @@ public abstract class LargeSampleSyncingTests extends TestCase
 		testDirectoriesEqual(clientTestDirectory, serverTestDirectory, includeCloakedFiles, timeTolerance);
 	}
 
+	@Test
 	protected void testDirectoriesEqual(IFileStore root1, IFileStore root2, boolean includeCloakedFiles,
 			int timeTolerance) throws CoreException
 	{
@@ -247,6 +255,7 @@ public abstract class LargeSampleSyncingTests extends TestCase
 		}
 	}
 
+	@Test
 	protected void testFilesEqual(IFileStore root1, IFileStore root2, IFileStore file1, IFileStore file2)
 			throws CoreException
 	{
@@ -266,6 +275,7 @@ public abstract class LargeSampleSyncingTests extends TestCase
 		}
 	}
 
+	@Test
 	protected void testFilesExists(HashMap<String, IFileStore> destMap, IFileStore sourceRoot, IFileStore sourceFile,
 			int timeTolerance) throws CoreException
 	{

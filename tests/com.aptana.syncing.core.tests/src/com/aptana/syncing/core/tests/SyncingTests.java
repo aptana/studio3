@@ -7,6 +7,10 @@
  */
 package com.aptana.syncing.core.tests;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -43,7 +47,7 @@ import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
  * @author Kevin Lindsey
  */
 @SuppressWarnings("nls")
-public abstract class SyncingTests extends TestCase
+public abstract class SyncingTests
 {
 	protected IFileStore clientDirectory;
 	protected IFileStore serverDirectory;
@@ -108,7 +112,8 @@ public abstract class SyncingTests extends TestCase
 	/**
 	 * @see junit.framework.TestCase#setUp()
 	 */
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
 		ConnectionContext context = new ConnectionContext();
 		context.put(ConnectionContext.COMMAND_LOG, System.out);
@@ -126,14 +131,15 @@ public abstract class SyncingTests extends TestCase
 		assertNotNull(serverDirectory);
 		serverDirectory.mkdir(EFS.NONE, null);
 
-		super.setUp();
+//		super.setUp();
 
 	}
 
 	/**
 	 * @see junit.framework.TestCase#tearDown()
 	 */
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		try
 		{
@@ -166,7 +172,7 @@ public abstract class SyncingTests extends TestCase
 			}
 		}
 
-		super.tearDown();
+//		super.tearDown();
 	}
 
 	/**
@@ -468,6 +474,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testClientFileOnly() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -485,6 +492,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testClientDirectoryOnly() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -502,6 +510,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testClientFileIsNewer() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -521,6 +530,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testClientDirectoryIsNewer() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -541,6 +551,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testServerFileOnly() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -558,6 +569,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testServerDirectoryOnly() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -575,6 +587,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testServerFileIsNewer() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -594,6 +607,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testServerDirectoryIsNewer() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -614,6 +628,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testFileTimesMatch() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -633,6 +648,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testDirectoryTimesMatch() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -653,6 +669,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testFileTimesWithinTolerance1() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -672,6 +689,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testFileTimesWithinTolerance2() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -691,6 +709,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testFileTimesOutsideTolerance1() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -710,6 +729,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testFileTimesOutsideTolerance2() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -729,6 +749,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testDirectoryTimesWithinTolerance1() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -749,6 +770,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testDirectoryTimesWithinTolerance2() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -769,6 +791,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testDirectoryTimesOutsideTolerance1() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -789,6 +812,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testDirectoryTimesOutsideTolerance2() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -809,6 +833,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testFilesCRCsDiffer() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -829,6 +854,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testFilesCRCsMatch() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -849,6 +875,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testDirectoryCRCsMatch() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -869,6 +896,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testTypeMismatch1() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -888,6 +916,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testTypeMismatch2() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -907,6 +936,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testClientOnlyFileUpload() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -945,6 +975,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testClientOnlyDirectoryUpload() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -984,6 +1015,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testClientNewerFileUpload() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -1016,6 +1048,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testClientNewerDirectoryUpload() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -1048,6 +1081,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testFileCRCsDifferUpload() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -1080,6 +1114,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testFileCRCsMatchUpload() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -1112,6 +1147,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testDirectoryCRCsMatchUpload() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -1144,6 +1180,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testServerOnlyFileUploadAndDelete() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -1179,6 +1216,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testServerOnlyDirectoryUploadAndDelete() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -1213,6 +1251,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testServerOnlyFileDownload() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -1248,6 +1287,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testServerOnlyDirectoryDownload() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -1284,6 +1324,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testServerNewerFileDownload() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -1316,6 +1357,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testServerNewerDirectoryDownload() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -1348,6 +1390,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testFileCRCsDifferDownload() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -1380,6 +1423,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testFileCRCsMatchDownload() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -1412,6 +1456,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testDirectoryCRCsMatchDownload() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -1444,6 +1489,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testClientOnlyFileDownloadAndDelete() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -1478,6 +1524,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testClientOnlyDirectoryDownloadAndDelete() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -1512,6 +1559,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testClientOnlyFileFullSync() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -1548,6 +1596,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testClientOnlyDirectoryFullSync() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -1583,6 +1632,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testClientOnlyFileFullSyncAndDelete() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -1617,6 +1667,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testClientOnlyDirectoryFullSyncAndDelete() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -1651,6 +1702,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testClientNewerFileFullSync() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -1683,6 +1735,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testClientNewerDirectoryFullSync() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -1715,6 +1768,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testServerOnlyFileFullSync() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -1750,6 +1804,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testServerOnlyDirectoryFullSync() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -1785,6 +1840,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testServerOnlyFileFullSyncAndDelete() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -1820,6 +1876,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testServerOnlyDirectoryFullSyncAndDelete() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -1854,6 +1911,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testServerNewerFileFullSync() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -1894,6 +1952,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testServerNewerDirectoryFullSync() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -1926,6 +1985,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testFileCRCsDifferFullSync() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -1958,6 +2018,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testFileCRCsMatchFullSync() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -1990,6 +2051,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testDirectoryCRCsMatchFullSync() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
@@ -2022,6 +2084,7 @@ public abstract class SyncingTests extends TestCase
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	@Test
 	public void testSubDirectoryFullSync() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();

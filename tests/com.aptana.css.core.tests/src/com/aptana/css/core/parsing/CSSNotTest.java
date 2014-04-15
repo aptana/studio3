@@ -7,9 +7,11 @@
  */
 package com.aptana.css.core.parsing;
 
+import org.junit.Test;
+
 public class CSSNotTest extends CSSTokensTest
 {
-
+	@Test
 	public void testNotSelector()
 	{
 		assertToken("div:not(.home){}", new TokenInfo(CSSTokenType.IDENTIFIER, 0, 3), new TokenInfo(CSSTokenType.COLON,

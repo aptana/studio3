@@ -13,6 +13,15 @@
             <projectNatureBinding
                natureId="com.aptana.projects.webnature">
             </projectNatureBinding>
+            <projectNatureBinding
+               natureId="com.appcelerator.titanium.mobile.nature">
+            </projectNatureBinding>
+            <projectNatureBinding
+               natureId="com.appcelerator.titanium.alloy.core.nature">
+            </projectNatureBinding>
+            <projectNatureBinding
+               natureId="com.appcelerator.titanium.mobile.module.nature">
+            </projectNatureBinding>
       </participant>
   </extension>
   <extension

@@ -7,6 +7,10 @@
  */
 package com.aptana.editor.js.text;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,6 +19,7 @@ import java.util.List;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.DocumentCommand;
 import org.eclipse.jface.text.IDocument;
+import org.junit.Test;
 
 import com.aptana.editor.common.text.RubyRegexpAutoIndentStrategyTest;
 import com.aptana.editor.js.JSSourceConfiguration;
@@ -26,6 +31,7 @@ import com.aptana.editor.js.JSSourceConfiguration;
  */
 public class JSAutoIndentStrategyTest extends RubyRegexpAutoIndentStrategyTest
 {
+	@Test
 	public void testIsComment()
 	{
 		List<String> validTokenTypes = new ArrayList<String>(Arrays.asList(JSSourceConfiguration.JS_MULTILINE_COMMENT,
@@ -48,6 +54,7 @@ public class JSAutoIndentStrategyTest extends RubyRegexpAutoIndentStrategyTest
 	/**
 	 * Test empty
 	 */
+	@Test
 	public void testEmpty()
 	{
 		assertSDocParams("/**\n", "\n * ");
@@ -56,6 +63,7 @@ public class JSAutoIndentStrategyTest extends RubyRegexpAutoIndentStrategyTest
 	/**
 	 * Test no params
 	 */
+	@Test
 	public void testSDocNoParams()
 	{
 		assertSDocParams("/**\nfunction abc() {\n}\n", "\n * ");
@@ -64,6 +72,7 @@ public class JSAutoIndentStrategyTest extends RubyRegexpAutoIndentStrategyTest
 	/**
 	 * Test /**function abc(a, b) {} 2. <sdoc-comment>(function() {})()<br>
 	 */
+	@Test
 	public void testSDocAddParams1()
 	{
 		assertSDocParams("/**\nfunction abc(a, b) {\n}\n", "\n * \n * @param {Object} a\n * @param {Object} b");
@@ -72,6 +81,7 @@ public class JSAutoIndentStrategyTest extends RubyRegexpAutoIndentStrategyTest
 	/**
 	 * Test /**(function(a, b) {})()
 	 */
+	@Test
 	public void testSDocAddParams2()
 	{
 		assertSDocParams("/**(function(a, b) {})()", "\n * \n * @param {Object} a\n * @param {Object} b");
@@ -80,6 +90,7 @@ public class JSAutoIndentStrategyTest extends RubyRegexpAutoIndentStrategyTest
 	/**
 	 * Test /**key: function(a, b) {}
 	 */
+	@Test
 	public void testSDocAddParams3()
 	{
 		assertSDocParams("/**key: function(a, b) {}", "\n * \n * @param {Object} a\n * @param {Object} b");
@@ -88,6 +99,7 @@ public class JSAutoIndentStrategyTest extends RubyRegexpAutoIndentStrategyTest
 	/**
 	 * Test /**"key": function(a, b) {}
 	 */
+	@Test
 	public void testSDocAddParams4()
 	{
 		assertSDocParams("/**\"key\": function(a, b) {}", "\n * \n * @param {Object} a\n * @param {Object} b");
@@ -96,6 +108,7 @@ public class JSAutoIndentStrategyTest extends RubyRegexpAutoIndentStrategyTest
 	/**
 	 * Test /**var x = function(a, b) {}
 	 */
+	@Test
 	public void testSDocAddParams5()
 	{
 		assertSDocParams("/**var x = function(a, b) {}", "\n * \n * @param {Object} a\n * @param {Object} b");
@@ -104,6 +117,7 @@ public class JSAutoIndentStrategyTest extends RubyRegexpAutoIndentStrategyTest
 	/**
 	 * Test /**x = function(a, b) {}
 	 */
+	@Test
 	public void testSDocAddParams6()
 	{
 		assertSDocParams("/**x = function(a, b) {}", "\n * \n * @param {Object} a\n * @param {Object} b");
@@ -112,6 +126,7 @@ public class JSAutoIndentStrategyTest extends RubyRegexpAutoIndentStrategyTest
 	/**
 	 * Test /**x.y = function(a, b) {}
 	 */
+	@Test
 	public void testSDocAddParams7()
 	{
 		assertSDocParams("/**x.y = function(a, b) {}", "\n * \n * @param {Object} a\n * @param {Object} b");

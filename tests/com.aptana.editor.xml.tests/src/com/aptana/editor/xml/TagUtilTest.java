@@ -1,5 +1,7 @@
 package com.aptana.editor.xml;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -11,7 +13,7 @@ import org.eclipse.jface.text.IRegion;
 
 import com.aptana.editor.xml.tests.XMLTestUtil;
 
-public class TagUtilTest extends TestCase
+public class TagUtilTest
 {
 	/**
 	 * createDocument
@@ -25,6 +27,7 @@ public class TagUtilTest extends TestCase
 		return XMLTestUtil.createDocument(source, stripCursor);
 	}
 
+	@Test
 	public void testTagClosed()
 	{
 		IDocument document = createDocument("<a>Test</a> <b>Item</b>", false); //$NON-NLS-1$
@@ -34,6 +37,7 @@ public class TagUtilTest extends TestCase
 		assertFalse(TagUtil.tagClosed(document, "a"));
 	}
 
+	@Test
 	public void testFindMatchingTag() throws BadLocationException
 	{
 		String source = "<a>Test</a> <b /> <c><d>ItemM</d></c>"; //$NON-NLS-1$
@@ -68,6 +72,7 @@ public class TagUtilTest extends TestCase
 
 	}
 
+	@Test
 	public void testGetTagName()
 	{
 		assertEquals("span", TagUtil.getTagName("<span id=\"test\">"));
@@ -76,12 +81,14 @@ public class TagUtilTest extends TestCase
 		assertEquals("br", TagUtil.getTagName("<br />"));
 	}
 
+	@Test
 	public void testIsStartTag()
 	{
 		assertTrue(TagUtil.isStartTag("<span>"));
 		assertFalse(TagUtil.isStartTag("</span>"));
 	}
 
+	@Test
 	public void testIsEndTag()
 	{
 		assertTrue(TagUtil.isEndTag("</span>"));

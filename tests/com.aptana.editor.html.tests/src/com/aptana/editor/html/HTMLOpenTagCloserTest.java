@@ -7,7 +7,9 @@
  */
 package com.aptana.editor.html;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.Document;
@@ -19,16 +21,17 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
+import org.junit.Before;
+import org.junit.Test;
 
-public class HTMLOpenTagCloserTest extends TestCase
+public class HTMLOpenTagCloserTest
 {
 	protected TextViewer viewer;
 	protected HTMLOpenTagCloser closer;
 
-	@Override
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
 		Display display = PlatformUI.getWorkbench().getDisplay();
 		Shell shell = display.getActiveShell();
 		if (shell == null)
@@ -39,6 +42,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 		closer = new HTMLOpenTagCloser(viewer);
 	}
 
+	@Test
 	public void testDoesntCloseIfIsClosingTag() throws Exception
 	{
 		IDocument document = setDocument("</p");
@@ -50,6 +54,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 		assertTrue(event.doit);
 	}
 
+	@Test
 	public void testCloseOpenTag() throws Exception
 	{
 		IDocument document = setDocument("<p");
@@ -60,6 +65,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 		assertFalse(event.doit);
 	}
 
+	@Test
 	public void testCloseOpenScriptTag() throws Exception
 	{
 		IDocument document = setDocument("<script");
@@ -70,6 +76,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 		assertFalse(event.doit);
 	}
 
+	@Test
 	public void testCloseOpenStyleTag() throws Exception
 	{
 		IDocument document = setDocument("<style");
@@ -80,6 +87,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 		assertFalse(event.doit);
 	}
 
+	@Test
 	public void testDoesntCloseIfNextTagIsClosingTag() throws Exception
 	{
 		IDocument document = setDocument("<p </p>");
@@ -91,6 +99,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 		assertTrue(event.doit);
 	}
 
+	@Test
 	public void testDoesCloseIfNextTagIsNotClosingTag() throws Exception
 	{
 		IDocument document = setDocument("<p <div></div>");
@@ -102,6 +111,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 		assertEquals(3, viewer.getSelectedRange().x);
 	}
 
+	@Test
 	public void testDoesntCloseIfClosedLater() throws Exception
 	{
 		IDocument document = setDocument("<p <b></b></p>");
@@ -112,6 +122,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 		assertTrue(event.doit);
 	}
 
+	@Test
 	public void testDoesCloseIfNotClosedButPairFollows() throws Exception
 	{
 		IDocument document = setDocument("<p <b></b><p></p>");
@@ -123,6 +134,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 		assertEquals(3, viewer.getSelectedRange().x);
 	}
 
+	@Test
 	public void testDoesCloseIfNextCharIsLessThanAndWeNeedToClose() throws Exception
 	{
 		IDocument document = setDocument("<p>");
@@ -134,6 +146,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 		assertEquals(3, viewer.getSelectedRange().x);
 	}
 
+	@Test
 	public void testDoesCloseProperlyWithOpenTagContaingAttrsIfNextCharIsLessThanAndWeNeedToClose() throws Exception
 	{
 		IDocument document = setDocument("<a href=\"\">");
@@ -145,6 +158,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 		assertEquals(11, viewer.getSelectedRange().x);
 	}
 
+	@Test
 	public void testDoesntCloseIfNextCharIsLessThanAndWeDontNeedToCloseButOverwritesExistingLessThan() throws Exception
 	{
 		IDocument document = setDocument("<p></p>");
@@ -156,6 +170,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 		assertEquals(3, viewer.getSelectedRange().x);
 	}
 
+	@Test
 	public void testDoesntCloseImplicitSelfClosingTag() throws Exception
 	{
 		IDocument document = setDocument("<br");
@@ -166,6 +181,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 		assertTrue(event.doit);
 	}
 
+	@Test
 	public void testDoesntCloseExplicitSelfClosingTag() throws Exception
 	{
 		IDocument document = setDocument("<br/");
@@ -177,6 +193,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 		assertEquals(4, viewer.getSelectedRange().x);
 	}
 
+	@Test
 	public void testDoesntCloseExplicitSelfClosingTagWithExtraSpaces() throws Exception
 	{
 		IDocument document = setDocument("<br /");
@@ -187,6 +204,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 		assertTrue(event.doit);
 	}
 
+	@Test
 	public void testDoesntCloseComments() throws Exception
 	{
 		IDocument document = setDocument("<!-- ");
@@ -198,6 +216,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 	}
 
 	// test for http://jira.appcelerator.org/browse/TISTUD-270
+	@Test
 	public void testTISTUD_270() throws Exception
 	{
 		IDocument document = setDocument("<p><span</p>");
@@ -209,6 +228,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 	}
 
 	// https://aptana.lighthouseapp.com/projects/35272/tickets/1592-cursor-moves-back-one-column-when-auto-inserting-closing-tag-in-html
+	@Test
 	public void testDoesStickCursorBetweenAutoClosedTagPair() throws Exception
 	{
 		IDocument document = setDocument("<html>");
@@ -221,6 +241,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 		assertEquals(6, viewer.getSelectedRange().x);
 	}
 
+	@Test
 	public void testDoesntCloseIfHasSpacesInOpenTagAndHasClosingTag() throws Exception
 	{
 		IDocument document = setDocument("<script src=\"http://example.org/src.js\">\n\n</script>");
@@ -232,6 +253,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 		assertEquals(40, viewer.getSelectedRange().x);
 	}
 
+	@Test
 	public void testOverwritesExistingGreaterThanAtEndOfPHPTag() throws Exception
 	{
 		IDocument document = setDocument("<input type='text' name='foo' <?=$blah?>>");
@@ -242,6 +264,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 		assertFalse(event.doit);
 	}
 
+	@Test
 	public void testDoesntOverwriteExistingGreaterThanIfPHPTagIsClosedButHTMLIsnt() throws Exception
 	{
 		IDocument document = setDocument("<input type='text' name='foo' <?=$blah?>");
@@ -255,6 +278,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 		assertEquals("<input type='text' name='foo' <?=$blah?>>", document.get());
 	}
 
+	@Test
 	public void testWhatever() throws Exception
 	{
 		IDocument document = setDocument("<input type='text' name='foo' <?=$blah? >");
@@ -268,6 +292,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 		assertEquals("<input type='text' name='foo' <?=$blah?> >", document.get());
 	}
 
+	@Test
 	public void testWhatever2() throws Exception
 	{
 		IDocument document = setDocument("<input type='text' name='foo' <?=$blah?");

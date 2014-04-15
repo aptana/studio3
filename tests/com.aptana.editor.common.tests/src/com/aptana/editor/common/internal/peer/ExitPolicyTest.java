@@ -7,6 +7,10 @@
  */
 package com.aptana.editor.common.internal.peer;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
 import org.eclipse.jface.text.ITextViewer;
@@ -18,40 +22,45 @@ import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
 
-public class ExitPolicyTest extends TestCase
+public class ExitPolicyTest
 {
 
 	private ITextViewer viewer;
 
-	@Override
-	protected void setUp() throws Exception
+//	@Override
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 		viewer = new TextViewer(new Shell(), SWT.NONE);
 	}
 
-	@Override
-	protected void tearDown() throws Exception
+//	@Override
+	@After
+	public void tearDown() throws Exception
 	{
 		viewer = null;
-		super.tearDown();
+//		super.tearDown();
 	}
 
 	// TODO Add tests for typing close character over top end!
 	// TODO Add tests with escaped chars!
 	
+	@Test
 	public void testNewLineExitsInsideDoubleQuotedStringPair()
 	{
 		ExitFlags flags = send('"', '\n');
 		assertNull(flags);
 	}
 
+	@Test
 	public void testNewLineExitsInsideSingleQuotedStringPair()
 	{
 		ExitFlags flags = send('\'', '\n');
 		assertNull(flags);
 	}
 
+	@Test
 	public void testNewLineInsertsInsideParentheses()
 	{
 		ExitFlags flags = send(')', '\n');
@@ -59,6 +68,7 @@ public class ExitPolicyTest extends TestCase
 		assertEquals(ILinkedModeListener.EXIT_ALL, flags.flags);
 	}
 	
+	@Test
 	public void testNewLineInsertsInsideCurlyBraces()
 	{
 		ExitFlags flags = send('}', '\n');
@@ -66,6 +76,7 @@ public class ExitPolicyTest extends TestCase
 		assertEquals(ILinkedModeListener.EXIT_ALL, flags.flags);
 	}
 	
+	@Test
 	public void testNewLineInsertsInsideBrackets()
 	{
 		ExitFlags flags = send(']', '\n');
@@ -73,6 +84,7 @@ public class ExitPolicyTest extends TestCase
 		assertEquals(ILinkedModeListener.EXIT_ALL, flags.flags);
 	}
 	
+	@Test
 	public void testNewLineInsertsInsideGreaterAndLessThanPair()
 	{
 		ExitFlags flags = send('>', '\n');

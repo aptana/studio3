@@ -7,6 +7,10 @@
  */
 package com.aptana.js.internal.core.parsing.sdoc;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.io.IOException;
 
 import junit.framework.TestCase;
@@ -15,7 +19,7 @@ import beaver.Symbol;
 import com.aptana.js.internal.core.parsing.sdoc.SDocFlexScanner;
 import com.aptana.js.internal.core.parsing.sdoc.SDocTokenType;
 
-public class SDocTypeTokenScannerTest extends TestCase
+public class SDocTypeTokenScannerTest
 {
 	private SDocFlexScanner _scanner;
 
@@ -23,10 +27,11 @@ public class SDocTypeTokenScannerTest extends TestCase
 	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
-	@Override
-	protected void setUp() throws Exception
+//	@Override
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 
 		_scanner = new SDocFlexScanner();
 	}
@@ -35,12 +40,13 @@ public class SDocTypeTokenScannerTest extends TestCase
 	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
-	@Override
-	protected void tearDown() throws Exception
+//	@Override
+	@After
+	public void tearDown() throws Exception
 	{
 		_scanner = null;
 
-		super.tearDown();
+//		super.tearDown();
 	}
 
 	/**
@@ -76,6 +82,7 @@ public class SDocTypeTokenScannerTest extends TestCase
 	/**
 	 * testLeftParen
 	 */
+	@Test
 	public void testLeftParen()
 	{
 		String source = "(";
@@ -86,6 +93,7 @@ public class SDocTypeTokenScannerTest extends TestCase
 	/**
 	 * testRightParen
 	 */
+	@Test
 	public void testRightParen()
 	{
 		String source = ")";
@@ -96,6 +104,7 @@ public class SDocTypeTokenScannerTest extends TestCase
 	/**
 	 * testLeftCurly
 	 */
+	@Test
 	public void testLeftCurly()
 	{
 		String source = "{";
@@ -106,6 +115,7 @@ public class SDocTypeTokenScannerTest extends TestCase
 	/**
 	 * testRightCurly
 	 */
+	@Test
 	public void testRightCurly()
 	{
 		String source = "}";
@@ -116,6 +126,7 @@ public class SDocTypeTokenScannerTest extends TestCase
 	/**
 	 * testLeftBracket
 	 */
+	@Test
 	public void testLeftBracket()
 	{
 		String source = "[";
@@ -126,6 +137,7 @@ public class SDocTypeTokenScannerTest extends TestCase
 	/**
 	 * testRightBracket
 	 */
+	@Test
 	public void testRightBracket()
 	{
 		String source = "]";
@@ -136,6 +148,7 @@ public class SDocTypeTokenScannerTest extends TestCase
 	/**
 	 * testLessThan
 	 */
+	@Test
 	public void testLessThan()
 	{
 		String source = "<";
@@ -146,6 +159,7 @@ public class SDocTypeTokenScannerTest extends TestCase
 	/**
 	 * testGreaterThan
 	 */
+	@Test
 	public void testGreaterThan()
 	{
 		String source = ">";
@@ -156,6 +170,7 @@ public class SDocTypeTokenScannerTest extends TestCase
 	/**
 	 * testColon
 	 */
+	@Test
 	public void testColon()
 	{
 		String source = ":";
@@ -166,6 +181,7 @@ public class SDocTypeTokenScannerTest extends TestCase
 	/**
 	 * testComma
 	 */
+	@Test
 	public void testComma()
 	{
 		String source = ",";
@@ -176,6 +192,7 @@ public class SDocTypeTokenScannerTest extends TestCase
 	/**
 	 * testPipe
 	 */
+	@Test
 	public void testPipe()
 	{
 		String source = "|";
@@ -186,6 +203,7 @@ public class SDocTypeTokenScannerTest extends TestCase
 	/**
 	 * testArrow
 	 */
+	@Test
 	public void testArrow()
 	{
 		String source = "->";
@@ -196,6 +214,7 @@ public class SDocTypeTokenScannerTest extends TestCase
 	/**
 	 * testEllipsis
 	 */
+	@Test
 	public void testEllipsis()
 	{
 		String source = "...";
@@ -206,6 +225,7 @@ public class SDocTypeTokenScannerTest extends TestCase
 	/**
 	 * testFunction
 	 */
+	@Test
 	public void testFunction()
 	{
 		String source = "Function";
@@ -216,6 +236,7 @@ public class SDocTypeTokenScannerTest extends TestCase
 	/**
 	 * testArray
 	 */
+	@Test
 	public void testArray()
 	{
 		String source = "Array";
@@ -226,6 +247,7 @@ public class SDocTypeTokenScannerTest extends TestCase
 	/**
 	 * testSimpleIdentifiers
 	 */
+	@Test
 	public void testSimpleIdentifiers()
 	{
 		String source = "Number $number _number";
@@ -243,6 +265,7 @@ public class SDocTypeTokenScannerTest extends TestCase
 	/**
 	 * testDottedIdentifier
 	 */
+	@Test
 	public void testDottedIdentifier()
 	{
 		String source = "Namespace.ClassName";
@@ -253,6 +276,7 @@ public class SDocTypeTokenScannerTest extends TestCase
 	/**
 	 * testNearIdentifiers
 	 */
+	@Test
 	public void testNearIdentifiers()
 	{
 		String source = "Functions Arrays";
@@ -263,6 +287,7 @@ public class SDocTypeTokenScannerTest extends TestCase
 	/**
 	 * testCR
 	 */
+	@Test
 	public void testCR()
 	{
 		String source = "\r";
@@ -273,6 +298,7 @@ public class SDocTypeTokenScannerTest extends TestCase
 	/**
 	 * testLF
 	 */
+	@Test
 	public void testLF()
 	{
 		String source = "\n";
@@ -283,6 +309,7 @@ public class SDocTypeTokenScannerTest extends TestCase
 	/**
 	 * testCRLF
 	 */
+	@Test
 	public void testCRLF()
 	{
 		String source = "\r\n";
@@ -293,6 +320,7 @@ public class SDocTypeTokenScannerTest extends TestCase
 	/**
 	 * testSpace
 	 */
+	@Test
 	public void testSpace()
 	{
 		String source = " ";
@@ -303,6 +331,7 @@ public class SDocTypeTokenScannerTest extends TestCase
 	/**
 	 * testTab
 	 */
+	@Test
 	public void testTab()
 	{
 		String source = "\t";
@@ -313,6 +342,7 @@ public class SDocTypeTokenScannerTest extends TestCase
 	/**
 	 * testNoTypes
 	 */
+	@Test
 	public void testNoTypes()
 	{
 		String source = "{}";
@@ -323,6 +353,7 @@ public class SDocTypeTokenScannerTest extends TestCase
 	/**
 	 * testSimpleType
 	 */
+	@Test
 	public void testSimpleType()
 	{
 		String source = "{Number}";
@@ -335,6 +366,7 @@ public class SDocTypeTokenScannerTest extends TestCase
 	/**
 	 * testGenericArrayType
 	 */
+	@Test
 	public void testGenericArrayType()
 	{
 		String source = "{Array<String>}";
@@ -355,6 +387,7 @@ public class SDocTypeTokenScannerTest extends TestCase
 	/**
 	 * testFuntionType
 	 */
+	@Test
 	public void testFuntionType()
 	{
 		String source = "{Function(String)->Boolean}";
@@ -377,6 +410,7 @@ public class SDocTypeTokenScannerTest extends TestCase
 	/**
 	 * testFuntionType2
 	 */
+	@Test
 	public void testFuntionType2()
 	{
 		String source = "{Function(String):Boolean}";

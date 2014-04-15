@@ -7,23 +7,26 @@
  */
 package com.aptana.editor.html.contentassist;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.junit.Test;
 
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.contentassist.index.HTMLMetadataReader;
 
-public class MetadataTests extends TestCase
+public class MetadataTests
 {
 	/**
 	 * testHTMLMetadata
 	 */
+	@Test
 	public void testHTMLMetadata()
 	{
 		this.loadMetadata("/metadata/html_metadata.xml");

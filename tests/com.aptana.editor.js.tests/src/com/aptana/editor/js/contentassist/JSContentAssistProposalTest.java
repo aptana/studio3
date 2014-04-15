@@ -7,6 +7,10 @@
  */
 package com.aptana.editor.js.contentassist;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -26,8 +30,13 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.texteditor.ITextEditor;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TestName;
 
 import com.aptana.core.tests.TestProject;
+import com.aptana.core.util.FileUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.contentassist.ICommonCompletionProposal;
 import com.aptana.editor.epl.tests.EditorTestHelper;
@@ -49,16 +58,12 @@ import com.aptana.scripting.model.SnippetElement;
 public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 {
 
+	@Rule
+	public TestName name = new TestName();
 	private TestProject project;
 
 	@Override
-	protected void setUp() throws Exception
-	{
-		super.setUp();
-	}
-
-	@Override
-	protected void tearDown() throws Exception
+	public void tearDown() throws Exception
 	{
 		if (project != null)
 		{
@@ -70,7 +75,7 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 
 	private TestProject createTestProject() throws CoreException
 	{
-		return new TestProject(getName(), new String[] { "com.aptana.projects.webnature" });
+		return new TestProject(name.getMethodName(), new String[] { "com.aptana.projects.webnature" });
 	}
 
 	private void index(IFile... files) throws CoreException
@@ -172,31 +177,37 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 		return new JSFileIndexingParticipant();
 	}
 
+	@Test
 	public void testAutoAactivationCommaWithSpace()
 	{
 		assertAutoActivation("a(abc, \t\r\n|", true);
 	}
 
+	@Test
 	public void testAutoActivationComma()
 	{
 		assertAutoActivation("a(abc,|", true);
 	}
 
+	@Test
 	public void testAutoActivationIdentifier()
 	{
 		assertAutoActivation("a|(abc,", false);
 	}
 
+	@Test
 	public void testAutoActivationIdentifierWithSpace()
 	{
 		assertAutoActivation("a \t\r\n|(abc,", false);
 	}
 
+	@Test
 	public void testAutoActivationLeftParen()
 	{
 		assertAutoActivation("a(|abc,", true);
 	}
 
+	@Test
 	public void testAutoActivationLeftParenWithSpace()
 	{
 		assertAutoActivation("a( \t\r\n|abc,", true);
@@ -205,6 +216,7 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 	/**
 	 * testBug_Math
 	 */
+	@Test
 	public void testBug_Math()
 	{
 		// @formatter:off
@@ -243,6 +255,7 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 	/**
 	 * testBug_VarAssignWithEndingDot
 	 */
+	@Test
 	public void testBug_VarAssignWithEndingDot()
 	{
 		// @formatter:off
@@ -281,6 +294,7 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 	/**
 	 * testObjectLiteral
 	 */
+	@Test
 	public void testObjectLiteral()
 	{
 		// @formatter:off
@@ -306,6 +320,7 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testAPSTUD2944() throws Exception
 	{
 		// Create a test project and file
@@ -356,6 +371,7 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 	/**
 	 * testStringCharCodeAt
 	 */
+	@Test
 	public void testStringCharCodeAt()
 	{
 		this.checkProposals("contentAssist/string-charCodeAt.js", "charCodeAt");
@@ -364,6 +380,7 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 	/**
 	 * testStringD
 	 */
+	@Test
 	public void testStringDPrefix()
 	{
 		this.checkProposals("contentAssist/d-prefix.js", true, true, "decodeURI", "decodeURIComponent", "default",
@@ -375,15 +392,15 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 	 * 
 	 * @throws IOException
 	 */
+	@Test
 	public void testStringFPrefix() throws IOException
 	{
-		File bundleFile = File.createTempFile("editor_unit_tests", "rb");
-		bundleFile.deleteOnExit();
+		File bundleFile = FileUtil.createTempFile("editor_unit_tests", "rb");
 
 		BundleElement bundleElement = new BundleElement(bundleFile.getAbsolutePath());
 		bundleElement.setDisplayName("Editor Unit Tests");
 
-		File f = File.createTempFile("snippet", "rb");
+		File f = FileUtil.createTempFile("snippet", "rb");
 		SnippetElement se = createSnippet(f.getAbsolutePath(), "FunctionTemplate", "fun", "source.js");
 		bundleElement.addChild(se);
 		BundleManager.getInstance().addBundle(bundleElement);
@@ -404,6 +421,7 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 	/**
 	 * testStringFunction
 	 */
+	@Test
 	public void testStringFunction()
 	{
 		this.checkProposals("contentAssist/function.js", true, true, "function", "Function");
@@ -412,12 +430,12 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 	/**
 	 * testStringFunction
 	 */
+	@Test
+	@Ignore("Commented out for the moment until we resolve an issue with indexing")
 	public void testStringFunctionCaseOrder()
 	{
-		// Commented out for the moment until we resolve an issue with indexing
-		// this.checkProposals("contentAssist/function-case-order.js", true, true, "focus", "foo", "fooa", "foob",
-		// "for",
-		// "forward");
+		this.checkProposals("contentAssist/function-case-order.js", true, true, "focus", "foo", "fooa", "foob", "for",
+				"forward");
 	}
 
 	/**
@@ -425,15 +443,15 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 	 * 
 	 * @throws IOException
 	 */
+	@Test
 	public void testStringThis() throws IOException
 	{
-		File bundleFile = File.createTempFile("editor_unit_tests", "rb");
-		bundleFile.deleteOnExit();
+		File bundleFile = FileUtil.createTempFile("editor_unit_tests", "rb");
 
 		BundleElement bundleElement = new BundleElement(bundleFile.getAbsolutePath());
 		bundleElement.setDisplayName("Editor Unit Tests");
 
-		File f = File.createTempFile("snippet", "rb");
+		File f = FileUtil.createTempFile("snippet", "rb");
 		SnippetElement se = createSnippet(f.getAbsolutePath(), "$(this)", "this", "source.js");
 		bundleElement.addChild(se);
 		BundleManager.getInstance().addBundle(bundleElement);
@@ -444,11 +462,13 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 
 	}
 
+	@Test
 	public void testDottedConstructor()
 	{
 		this.checkProposals("contentAssist/dotted-constructor.js", "aptana");
 	}
 
+	@Test
 	public void testAPSTUD3694()
 	{
 		// @formatter:off
@@ -477,6 +497,7 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testAPSTUD3695()
 	{
 		// @formatter:off
@@ -531,6 +552,7 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testThisInFunction()
 	{
 		// @formatter:off
@@ -542,6 +564,7 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testThisInFunctionAndPrototypes()
 	{
 		// @formatter:off
@@ -555,6 +578,7 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testThisInFunctionAndPrototypes2()
 	{
 		// @formatter:off
@@ -568,6 +592,7 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testUnnamedFunctionWithThis()
 	{
 		// @formatter:off
@@ -579,6 +604,7 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testThisInCurrentFunctionOnly()
 	{
 		// @formatter:off
@@ -590,6 +616,7 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testThisInNestedFunction()
 	{
 		// @formatter:off
@@ -601,6 +628,7 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testAPSTUD4538() throws Exception
 	{
 		final String fileName = "apstud4538.js";
@@ -619,6 +647,7 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 		assertEquals("Expected 'location' to show filename, not owning type", fileName, p2.getFileLocation());
 	}
 
+	@Test
 	public void testParameterInsideFunction()
 	{
 		// @formatter:off
@@ -631,6 +660,7 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 	}
 
 	// APSTUD-4206
+	@Test
 	public void testUndefinedFunctionReturnShowsObjectProposals()
 	{
 		// @formatter:off
@@ -651,6 +681,7 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testDontShowStringConstructorOffInstance()
 	{
 		ICompletionProposal[] proposals = getProposals("contentAssist/string-constructor-off-instance.js");
@@ -659,6 +690,7 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 		assertContains(proposals, "charAt", "indexOf", "toLowerCase");
 	}
 
+	@Test
 	public void testInstanceMethodDefinedOnPrototypeOffInstance()
 	{
 		ICompletionProposal[] proposals = getProposals("contentAssist/instance-method-off-instance.js");
@@ -667,6 +699,7 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 		assertContains(proposals, "play");
 	}
 
+	@Test
 	public void testDontShowStaticMethodOffInstance()
 	{
 		ICompletionProposal[] proposals = getProposals("contentAssist/static-method-off-instance.js");
@@ -676,6 +709,7 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 	}
 
 	// https://jira.appcelerator.org/browse/APSTUD-4017
+	@Test
 	public void testOffersCAOnMultipleTypesInferredForSameVariable() throws Exception
 	{
 		project = createTestProject();
@@ -693,6 +727,7 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 		assertContains(proposals, "charAt", "concat", "indexOf", "length", "toUpperCase", "toLowerCase");
 	}
 
+	@Test
 	public void testExportsWithNameFunctionAsProperty() throws Exception
 	{
 		project = createTestProject();
@@ -708,6 +743,7 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 		assertContains(proposals, "name");
 	}
 
+	@Test
 	public void testModuleExportsAsInstanceOfArray() throws Exception
 	{
 		project = createTestProject();
@@ -724,6 +760,7 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 		assertContains(proposals, "length", "push", "pop", "slice", "unshift", "join");
 	}
 
+	@Test
 	public void testModuleExportsWithNameFunctionAsProperty() throws Exception
 	{
 		project = createTestProject();
@@ -739,6 +776,7 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 		assertContains(proposals, "rock_me");
 	}
 
+	@Test
 	public void testModuleInstanceHasIdAndURIProperty() throws Exception
 	{
 		project = createTestProject();
@@ -754,6 +792,7 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 		assertContains(proposals, "id", "uri", "something");
 	}
 
+	@Test
 	public void testRelativeSiblingModuleReference() throws Exception
 	{
 		project = createTestProject();
@@ -769,6 +808,7 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 		assertContains(proposals, "relative_func");
 	}
 
+	@Test
 	public void testRelativeUpFolderModuleReference() throws Exception
 	{
 		project = createTestProject();
@@ -787,6 +827,7 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 		assertContains(proposals, "relative_func2");
 	}
 
+	@Test
 	public void testAbsoluteNestedModuleReference() throws Exception
 	{
 		project = createTestProject();
@@ -805,26 +846,27 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 		assertContains(proposals, "nested_func");
 	}
 
-	// FIXME I'm not sure this test is valid. I can't find any documentation stating that @module is used in any way by CommonJs/NodeJS require loading.
-//	public void testModuleIdDefinedByDocTag() throws Exception
-//	{
-//		project = createTestProject();
-//		project.createFolder("a");
-//		project.createFolder("a/b");
-//		project.createFolder("a/b/c");
-//
-//		IFile module = project.createFile("a/b/c/d.js",
-//				"/** @module my/id */\nmodule.exports.my_id_func = function() {\n"
-//						+ "    console.log('My name is Lemmy Kilmister');\n" + "};\n");
-//		index(module);
-//
-//		IFile file = project.createFile("nested.js", "var r = require('my/id');\nr.");
-//		ICompletionProposal[] proposals = openAndGetProposals(file, 28);
-//
-//		// make sure we get "my_id_func" as a proposal
-//		assertContains(proposals, "my_id_func");
-//	}
-
+	// FIXME I'm not sure this test is valid. I can't find any documentation stating that @module is used in any way by
+	// CommonJs/NodeJS require loading.
+	// public void testModuleIdDefinedByDocTag() throws Exception
+	// {
+	// project = createTestProject();
+	// project.createFolder("a");
+	// project.createFolder("a/b");
+	// project.createFolder("a/b/c");
+	//
+	// IFile module = project.createFile("a/b/c/d.js",
+	// "/** @module my/id */\nmodule.exports.my_id_func = function() {\n"
+	// + "    console.log('My name is Lemmy Kilmister');\n" + "};\n");
+	// index(module);
+	//
+	// IFile file = project.createFile("nested.js", "var r = require('my/id');\nr.");
+	// ICompletionProposal[] proposals = openAndGetProposals(file, 28);
+	//
+	// // make sure we get "my_id_func" as a proposal
+	// assertContains(proposals, "my_id_func");
+	// }
+	@Test
 	public void testModuleIdDefinedByDocTagDoesntGetPickedUpByItsPath() throws Exception
 	{
 		project = createTestProject();

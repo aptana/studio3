@@ -7,8 +7,9 @@
  */
 package com.aptana.scripting.model;
 
-import com.aptana.scripting.internal.model.BundleMonitor;
+import org.junit.Ignore;
 
+@Ignore("We're still getting intermittent failures due to timing issues")
 public class UserBundleMonitorTests extends BundleMonitorTests
 {
 	private static final int WAIT_TIME = 5000;

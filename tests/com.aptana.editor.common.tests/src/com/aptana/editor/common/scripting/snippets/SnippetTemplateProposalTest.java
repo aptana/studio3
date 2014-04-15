@@ -7,6 +7,8 @@
  */
 package com.aptana.editor.common.scripting.snippets;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
 import org.eclipse.jface.text.Document;
@@ -23,9 +25,10 @@ import org.jmock.lib.legacy.ClassImposteriser;
 
 import com.aptana.scripting.model.SnippetElement;
 
-public class SnippetTemplateProposalTest extends TestCase
+public class SnippetTemplateProposalTest
 {
 
+	@Test
 	public void testReplacesCorrectRegionWhenPortionOfFullPrefixMatches()
 	{
 		Mockery context = new Mockery()
@@ -67,6 +70,7 @@ public class SnippetTemplateProposalTest extends TestCase
 		context.assertIsSatisfied();
 	}
 
+	@Test
 	public void testSnippetLinkedMode()
 	{
 		// Create the snippet we want to apply
@@ -96,6 +100,7 @@ public class SnippetTemplateProposalTest extends TestCase
 		assertEquals("<?php\nif (condition) {\n\t\n}?>", document.get());
 	}
 
+	@Test
 	public void testAPSTUD2445()
 	{
 		Mockery context = new Mockery()
@@ -137,6 +142,7 @@ public class SnippetTemplateProposalTest extends TestCase
 		context.assertIsSatisfied();
 	}
 
+	@Test
 	public void testDoublePrefix()
 	{
 		Mockery context = new Mockery()
@@ -181,6 +187,7 @@ public class SnippetTemplateProposalTest extends TestCase
 		// also consider case of two snippets with activation characters b.a and .a. in TM, b.a wins.
 	}
 
+	@Test
 	public void testIsTriggerEnabled()
 	{
 		// Create the snippet we want to apply

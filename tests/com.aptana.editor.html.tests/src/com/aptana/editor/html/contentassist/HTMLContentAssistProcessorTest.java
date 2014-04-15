@@ -7,6 +7,12 @@
  */
 package com.aptana.editor.html.contentassist;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.net.URI;
 import java.net.URL;
@@ -31,6 +37,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.part.FileEditorInput;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.aptana.core.tests.TestProject;
 import com.aptana.core.util.FileUtil;
@@ -63,11 +71,9 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 	private HTMLContentAssistProcessor fProcessor;
 	private IDocument fDocument;
 
-	@Override
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
-
 		HTMLMetadataLoader loader = new HTMLMetadataLoader();
 		loader.schedule();
 		loader.join();
@@ -77,7 +83,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 	}
 
 	@Override
-	protected void tearDown() throws Exception
+	public void tearDown() throws Exception
 	{
 		HTMLPlugin.getDefault().getPreferenceStore().setValue(IPreferenceConstants.HTML_REMOTE_HREF_PROPOSALS, true);
 		fProcessor = null;
@@ -86,6 +92,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		super.tearDown();
 	}
 
+	@Test
 	public void testGetContextInformationValidator()
 	{
 		IContextInformationValidator validator = fProcessor.getContextInformationValidator();
@@ -94,59 +101,70 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		assertEquals(validator, fProcessor.getContextInformationValidator());
 	}
 
+	@Test
 	public void testEmptyDocument()
 	{
 		assertCompletionCorrect("|", '\t', 0, null, StringUtil.EMPTY, null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testLinkProposal()
 	{
 		assertCompletionCorrect("<|", '\t', ELEMENT_PROPOSALS_COUNT, "a", "<a></a>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testDOCTYPEProposal1()
 	{
 		assertCompletionCorrect("<!|", '\t', ELEMENT_PROPOSALS_COUNT, "!DOCTYPE", "<!DOCTYPE >", new Point(10, 0)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testDOCTYPEProposal2()
 	{
 		assertCompletionCorrect("<!D|", '\t', ELEMENT_PROPOSALS_COUNT, "!DOCTYPE", "<!DOCTYPE >", new Point(10, 0)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testDOCTYPEProposal3()
 	{
 		assertCompletionCorrect(
 				"<!D| html>", '\t', ELEMENT_PROPOSALS_COUNT, "!DOCTYPE", "<!DOCTYPE html>", new Point(10, 0)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testDOCTYPEProposal4()
 	{
 		assertCompletionCorrect("<|>", '\t', ELEMENT_PROPOSALS_COUNT, "!DOCTYPE", "<!DOCTYPE >", new Point(10, 0)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testDOCTYPEProposal5()
 	{
 		assertCompletionCorrect("<!|>", '\t', ELEMENT_PROPOSALS_COUNT, "!DOCTYPE", "<!DOCTYPE >", new Point(10, 0)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testDOCTYPEProposal6()
 	{
 		assertCompletionCorrect(
 				"<!D|OCTYP >", '\t', ELEMENT_PROPOSALS_COUNT, "!DOCTYPE", "<!DOCTYPE >", new Point(10, 0)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testDOCTYPEProposal7()
 	{
 		assertCompletionCorrect(
 				"<!D|OCTYPE >", '\t', ELEMENT_PROPOSALS_COUNT, "!DOCTYPE", "<!DOCTYPE >", new Point(10, 0)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testDOCTYPEValueReplacement1()
 	{
 		assertCompletionCorrect("<!DOCTYPE |html>", '\t', DOCTYPE_PROPOSALS_COUNT, "HTML 5", "<!DOCTYPE HTML>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testDOCTYPEValueReplacement2()
 	{
 		assertCompletionCorrect(
@@ -154,103 +172,123 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 				'\t', DOCTYPE_PROPOSALS_COUNT, "HTML 5", "<!DOCTYPE HTML>", null); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
+	@Test
 	public void testABBRProposal1()
 	{
 		assertCompletionCorrect("<a|>", '\t', ELEMENT_PROPOSALS_COUNT, "abbr", "<abbr></abbr>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testABBRProposal2()
 	{
 		assertCompletionCorrect("<A|>", '\t', ELEMENT_PROPOSALS_COUNT, "abbr", "<abbr></abbr>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testElementWhichIsClosedProposal()
 	{
 		assertCompletionCorrect("<|></a>", '\t', ELEMENT_PROPOSALS_COUNT, "a", "<a></a>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testElementWhichIsClosedProposal2()
 	{
 		assertCompletionCorrect("<|></a>", '\t', ELEMENT_PROPOSALS_COUNT, "abbr", "<abbr></abbr></a>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testElementWhichIsClosedProposal3()
 	{
 		assertCompletionCorrect("<|</a>", '\t', ELEMENT_PROPOSALS_COUNT, "abbr", "<abbr></abbr></a>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testElementWhichIsClosedProposal4()
 	{
 		assertCompletionCorrect("<b><a><|</b>", '\t', ELEMENT_PROPOSALS_COUNT + 1, "/a", "<b><a></a></b>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testElementWhichIsClosedProposal5()
 	{
 		assertCompletionCorrect("<b><a><|></b>", '\t', ELEMENT_PROPOSALS_COUNT + 1, "/a", "<b><a></a></b>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testElementWhichIsClosedProposal6()
 	{
 		assertCompletionCorrect("<b><a></|</b>", '\t', 1, "/a", "<b><a></a></b>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testSuggestOnlyUnclosedTagForCloseTagWithNoElementName()
 	{
 		assertCompletionCorrect("<b><a></|></b>", '\t', 1, "/a", "<b><a></a></b>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testSuggestOnlyUnclosedTagForCloseTagWithElementName()
 	{
 		assertCompletionCorrect("<b><a></a|</b>", '\t', 1, "/a", "<b><a></a></b>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testSuggestAllPossibleCloseTagsOnExistingCloseTagRegardlessOfPrefix()
 	{
 		assertCompletionCorrect("<b><a></a|></b>", '\t', CLOSE_TAG_PROPOSALS_COUNT, "/a", "<b><a></a></b>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testCloseTagWithNoUnclosedTagsProposal()
 	{
 		assertCompletionCorrect("</|>", '\t', CLOSE_TAG_PROPOSALS_COUNT, "/ul", "</ul>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testNoSuggestionsInTextAreaBetweenTags()
 	{
 		assertCompletionCorrect("<p>|</p>", '\t', 0, null, "<p></p>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testNoSuggestionsInTextAreaWithWhitespaceBetweenTags()
 	{
 		assertCompletionCorrect("<p>\n  |\n</p>", '\t', 0, null, "<p>\n  \n</p>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testOnlySuggestEntityIfPrecededByAmpersand()
 	{
 		assertCompletionCorrect("<p>\n  &|\n</p>", '\t', ENTITY_PROPOSAL_COUNT, "&amp;", "<p>\n  &amp;\n</p>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testEntitySuggestionWithNoSurroundingWhitespace()
 	{
 		assertCompletionCorrect("<div>&|</div>", '\t', ENTITY_PROPOSAL_COUNT, "&amp;", "<div>&amp;</div>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testExistingEntityGetsFullyReplaced1()
 	{
 		assertCompletionCorrect(
 				"<body>\n  &a|acute;\n</body>", '\t', ENTITY_PROPOSAL_COUNT, "&acirc;", "<body>\n  &acirc;\n</body>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testExistingEntityGetsFullyReplaced2()
 	{
 		assertCompletionCorrect("<div>&a|acute;</div>", '\t', ENTITY_PROPOSAL_COUNT, "&amp;", "<div>&amp;</div>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testEntityDoesntReplaceNonEntityText()
 	{
 		assertCompletionCorrect(
 				"<div>ind&u|stria</div>", '\t', ENTITY_PROPOSAL_COUNT, "&uacute;", "<div>ind&uacute;stria</div>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testProposalsBadLocation()
 	{
 		String document = "<body>&|";
@@ -263,58 +301,69 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
 	}
 
+	@Test
 	public void testIMGProposal()
 	{
 		assertCompletionCorrect("<|", '\t', ELEMENT_PROPOSALS_COUNT, "img", "<img />", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testHTML5DoctypeProposal()
 	{
 		assertCompletionCorrect("<!doctype |>", '\t', DOCTYPE_PROPOSALS_COUNT, "HTML 5", "<!doctype HTML>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testHTML401StrictDoctypeProposal()
 	{
 		assertCompletionCorrect("<!DOCTYPE |", '\t', DOCTYPE_PROPOSALS_COUNT, "HTML 4.01 Strict", //$NON-NLS-1$ //$NON-NLS-2$
 				"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"\n\"http://www.w3.org/TR/html4/strict.dtd\"", null); //$NON-NLS-1$
 	}
 
+	@Test
 	public void testStyleAttributeProposalWithNoPrefix()
 	{
 		assertCompletionCorrect("<div |></div>", '\t', 64, "style", "<div style=\"\"></div>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testStyleAttributeProposalOnSelfClosingTag()
 	{
 		assertCompletionCorrect("<br |/>", '\t', 8, "style", "<br style=\"\"/>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testStyleAttributeProposalOnSelfClosingTagWithTrailingSpaceAfterCursor()
 	{
 		assertCompletionCorrect("<br | />", '\t', 8, "style", "<br style=\"\" />", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testStyleAttributeProposalWithPrefix()
 	{
 		assertCompletionCorrect("<div sty|></div>", '\t', 64, "style", "<div style=\"\"></div>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testStyleAttributeProposalWithPrefixAndTrailingEquals()
 	{
 		assertCompletionCorrect("<div sty|=\"\"></div>", '\t', 64, "style", "<div style=\"\"></div>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testDontOverwriteTagEnd1()
 	{
 		assertCompletionCorrect("<div dir=\"|></div>", '\t', 2, "ltr", "<div dir=\"ltr\"></div>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@Test
 	public void testDontOverwriteTagEnd2()
 	{
 		assertCompletionCorrect("<br dir=\"|/>", '\t', 2, "ltr", "<br dir=\"ltr\"/>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	@SuppressWarnings("rawtypes")
+	@Test
 	public void testStyleAttributeProposalHasExitTabstopAfterQuotes()
 	{
 		assertCompletionCorrect("<div |>", '\t', 64, "style", "<div style=\"\">", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -335,6 +384,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 	}
 
 	@SuppressWarnings("rawtypes")
+	@Test
 	public void testEventProposalHasExitTabstopAfterQuotes()
 	{
 		assertCompletionCorrect("<div |>", '\t', 64, "onmouseenter", "<div onmouseenter=\"\">", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -355,6 +405,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 	}
 
 	// https://aptana.lighthouseapp.com/projects/35272/tickets/1719-html-code-completion-for-tag-attributes-goes-wrong
+	@Test
 	public void testIMGSrcContentAssistDoesntAutoInsertCloseTag()
 	{
 		String document = "<div><img src='|' />";
@@ -366,12 +417,14 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		assertEquals(0, proposals.length);
 	}
 
+	@Test
 	public void testLinkHREFFolderProposal() throws Exception
 	{
 		assertHREFProposal("<link rel=\"stylesheet\" href=\"|\" />", "<link rel=\"stylesheet\" href=\"folder\" />",
 				"folder");
 	}
 
+	@Test
 	public void testLinkHREFFileProposal() throws Exception
 	{
 		assertHREFProposal("<link rel='stylesheet' href='|' />", "<link rel='stylesheet' href='root.css' />",
@@ -379,6 +432,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 
 	}
 
+	@Test
 	public void testLinkHREFFileUnderFolderProposal() throws Exception
 	{
 		assertHREFProposal("<link rel='stylesheet' href='folder/|' />",
@@ -386,6 +440,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 
 	}
 
+	@Test
 	public void testLinkHREFFileProposalWithPrefix() throws Exception
 	{
 		assertHREFProposal("<link rel='stylesheet' href='roo|' />", "<link rel='stylesheet' href='root.css' />",
@@ -393,18 +448,21 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 
 	}
 
+	@Test
 	public void testLinkHREFFolderProposalWithPrefix() throws Exception
 	{
 		assertHREFProposal("<link rel='stylesheet' href='fo|' />", "<link rel='stylesheet' href='folder' />", "folder");
 
 	}
 
+	@Test
 	public void testLinkHREFFileInsideFolderProposalWithPrefix() throws Exception
 	{
 		assertHREFProposal("<link rel='stylesheet' href='folder/in|' />",
 				"<link rel='stylesheet' href='folder/inside_folder.css' />", "inside_folder.css");
 	}
 
+	@Test
 	public void testApstud2959() throws Exception
 	{
 		String document = "<a href='http://|' />";
@@ -431,6 +489,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		project.delete();
 	}
 
+	@Test
 	public void testRootFileSystemForHREF() throws Exception
 	{
 		String document = "<a href='file://|' />";
@@ -464,6 +523,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 
 	}
 
+	@Test
 	public void testRootFileSystemForHREFBadPrefix() throws Exception
 	{
 		// Busted scheme
@@ -487,6 +547,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 
 	}
 
+	@Test
 	public void testServerHREF() throws Exception
 	{
 		// Generate some folders/files to use as proposals
@@ -514,6 +575,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 
 	}
 
+	@Test
 	public void testRailsServerHREF() throws Exception
 	{
 		// Generate some folders/files to use as proposals
@@ -535,6 +597,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 
 	}
 
+	@Test
 	public void testRootFileSystemForHREFWithFolderPrefix() throws Exception
 	{
 		// Generate some folders/files to use as proposals
@@ -570,6 +633,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		project.delete();
 	}
 
+	@Test
 	public void testRootFileSystemForHREFWithFolderAndFilePrefix() throws Exception
 	{
 		// Generate some folders/files to use as proposals
@@ -607,6 +671,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 
 	}
 
+	@Test
 	public void testNoProposalsForHTTPURIPath() throws Exception
 	{
 		TestProject project = null;
@@ -662,6 +727,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		}
 	}
 
+	@Test
 	public void testDontHitRemoteURIForChildrenIfPrefIsTurnedOff() throws Exception
 	{
 		TestProject project = null;
@@ -709,6 +775,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		}
 	}
 
+	@Test
 	public void testNoProposalsForURIEndingInColonSlash() throws Exception
 	{
 		TestProject project = null;
@@ -763,6 +830,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		project.delete();
 	}
 
+	@Test
 	public void testAttributeNameAtSpace()
 	{
 		String document = "<p | align=\"\"></p>";
@@ -775,6 +843,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		AssertUtil.assertProposalFound("class", proposals);
 	}
 
+	@Test
 	public void testAttributeNameAtSpace2()
 	{
 		String document = "<p align=\"\" | ></p>";
@@ -787,6 +856,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		AssertUtil.assertProposalFound("class", proposals);
 	}
 
+	@Test
 	public void testAttributeAfterElementName()
 	{
 		String document = "<body s|></body>";
@@ -799,6 +869,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		AssertUtil.assertProposalFound("scroll", proposals);
 	}
 
+	@Test
 	public void testAttributeValueProposals()
 	{
 		String document = "<li><a class=|</li>";
@@ -810,6 +881,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		assertTrue(proposals.length == 0);
 	}
 
+	@Test
 	public void testAttributeValueProposalsBeforeEquals()
 	{
 		String document = "<li><a clas|s=</li>";
@@ -821,6 +893,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		assertTrue(proposals.length > 0);
 	}
 
+	@Test
 	public void testAPSTUD5017()
 	{
 		String document = "<video autoplay=|preload=\"none\"></video>";
@@ -836,6 +909,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 				"autoplay", proposals, offset, null);
 	}
 
+	@Test
 	public void testAtrributeValueMidValueNoCloseQuoteAtEOF()
 	{
 		String document = "<script type=\"te|";
@@ -851,6 +925,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 				offset, null);
 	}
 
+	@Test
 	public void testAtrributeValueMidValueWithExistingQuotes()
 	{
 		String document = "<script type=\"te|\"";
@@ -866,6 +941,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 				offset, null);
 	}
 
+	@Test
 	public void testAtrributeValueNoValueWithExistingQuotes()
 	{
 		String document = "<script type=\"|\"";
@@ -881,6 +957,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 				offset, null);
 	}
 
+	@Test
 	public void testAtrributeValueNoValueNoQuotes()
 	{
 		String document = "<script type=|";
@@ -896,6 +973,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 				offset, null);
 	}
 
+	@Test
 	public void testAtrributeValueNoValueLeadingSingleQuoteTrailingGT()
 	{
 		String document = "<script type='|>";
@@ -911,6 +989,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 				offset, null);
 	}
 
+	@Test
 	public void testAtrributeValuePartialValueNoLeadingQuote()
 	{
 		String document = "<link rel=alt| />";
@@ -926,6 +1005,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 				new Point(21, 0));
 	}
 
+	@Test
 	public void testAtrributeValueNoValueWrappingSingleQuoteTrailingAttributeName()
 	{
 		String document = "<script type='|'id='1'>";
@@ -941,7 +1021,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 				proposals, offset, null);
 	}
 
-	// public void testAtrributeValueNoValueLeadingSingleQuoteTrailingAttributeName()
+	// @Test public void testAtrributeValueNoValueLeadingSingleQuoteTrailingAttributeName()
 	// {
 	// String document = "<script type='|id='1'>";
 	// int offset = HTMLTestUtil.findCursorOffset(document);
@@ -956,6 +1036,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 	// proposals, offset, null);
 	// }
 
+	@Test
 	public void testRelativeHREFFileProposals() throws Exception
 	{
 		// FIXME I need to set up files on the filesystem and relative to editor to test those!
@@ -986,6 +1067,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		AssertUtil.assertProposalFound("sibling.html", proposals);
 	}
 
+	@Test
 	public void testIsValidAutoActivationLocationElement()
 	{
 
@@ -1002,6 +1084,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		assertFalse(processor.isValidAutoActivationLocation('b', 'b', document, offset));
 	}
 
+	@Test
 	public void testIsValidAutoActivationLocationAttribute()
 	{
 		String source = "<a |>";
@@ -1014,6 +1097,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 
 	}
 
+	@Test
 	public void testIsValidAutoActivationLocationAttributeValue()
 	{
 		String source = "<a class=\"|\"|>";
@@ -1025,6 +1109,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		assertTrue(processor.isValidAutoActivationLocation('f', 'f', document, offset));
 	}
 
+	@Test
 	public void testIsValidAutoActivationLocationText()
 	{
 		// need to close previous editor
@@ -1036,6 +1121,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		assertFalse(processor.isValidAutoActivationLocation('t', 't', document, offset));
 	}
 
+	@Test
 	public void testIsValidIdentifier()
 	{
 		assertTrue(fProcessor.isValidIdentifier('a', 'a'));
@@ -1047,6 +1133,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		assertFalse(fProcessor.isValidIdentifier(' ', ' '));
 	}
 
+	@Test
 	public void testAPSTUD3862() throws Exception
 	{
 		TestProject project = createWebProject("3862_");
@@ -1108,6 +1195,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		}
 	}
 
+	@Test
 	public void testDoubleQuotedEventAttributeValueType()
 	{
 		setupTestContext("contentAssist/js-event-attribute-double-quoted.html");
@@ -1124,6 +1212,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		}
 	}
 
+	@Test
 	public void testSingleQuotedEventAttributeValueType()
 	{
 		setupTestContext("contentAssist/js-event-attribute-single-quoted.html");
@@ -1140,6 +1229,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		}
 	}
 
+	@Test
 	public void testDoubleQuotedStyleAttributeValueType()
 	{
 		setupTestContext("contentAssist/css-style-attribute-double-quoted.html");
@@ -1156,6 +1246,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		}
 	}
 
+	@Test
 	public void testSingleQuotedStyleAttributeValueType()
 	{
 		setupTestContext("contentAssist/css-style-attribute-single-quoted.html");

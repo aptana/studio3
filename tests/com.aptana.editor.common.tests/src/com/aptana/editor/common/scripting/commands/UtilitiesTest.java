@@ -7,6 +7,8 @@
  */
 package com.aptana.editor.common.scripting.commands;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
@@ -19,9 +21,10 @@ import org.eclipse.ui.ide.FileStoreEditorInput;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 
-public class UtilitiesTest extends TestCase
+public class UtilitiesTest
 {
 
+	@Test
 	public void testGetFile()
 	{
 		File file = Utilities.getFile();
@@ -31,6 +34,7 @@ public class UtilitiesTest extends TestCase
 		assertTrue(file.getAbsolutePath().startsWith(path.toOSString() + File.separator + "_"));
 	}
 
+	@Test
 	public void testGetFileGeneratesUniqueNames()
 	{
 		Set<String> filePaths = new HashSet<String>();
@@ -42,6 +46,7 @@ public class UtilitiesTest extends TestCase
 		}
 	}
 	
+	@Test
 	public void testCreateFileEditorInputCreatesFileStoreEditorInput()
 	{
 		File file = Utilities.getFile();

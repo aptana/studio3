@@ -1,5 +1,7 @@
 package com.aptana.core.internal.build;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.io.File;
 import java.net.URI;
 import java.util.List;
@@ -20,7 +22,7 @@ import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.build.BuildContext;
 
-public class IndexBuildParticipantTest extends TestCase
+public class IndexBuildParticipantTest
 {
 
 	private Mockery context = new Mockery()
@@ -30,6 +32,7 @@ public class IndexBuildParticipantTest extends TestCase
 		}
 	};
 
+	@Test
 	public void testTypicalBuild() throws Exception
 	{
 		// TODO Index multiple files, maybe mixing add/delete
@@ -73,6 +76,7 @@ public class IndexBuildParticipantTest extends TestCase
 		context.assertIsSatisfied();
 	}
 
+	@Test
 	public void testTypicalBuildWithDeletedFile() throws Exception
 	{
 		final Index index = context.mock(Index.class);
@@ -113,6 +117,7 @@ public class IndexBuildParticipantTest extends TestCase
 		context.assertIsSatisfied();
 	}
 
+	@Test
 	public void testCleanBuild() throws Exception
 	{
 		File file = File.createTempFile("index_bp", ".js");

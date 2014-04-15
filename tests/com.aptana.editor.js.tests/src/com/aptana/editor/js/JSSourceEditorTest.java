@@ -7,6 +7,9 @@
  */
 package com.aptana.editor.js;
 
+import org.junit.After;
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.io.File;
 
 import junit.framework.TestCase;
@@ -23,22 +26,24 @@ import com.aptana.editor.epl.tests.EditorTestHelper;
 import com.aptana.ui.util.UIUtils;
 
 @SuppressWarnings("restriction")
-public class JSSourceEditorTest extends TestCase
+public class JSSourceEditorTest
 {
 
 	private ITextEditor editor;
 
-	@Override
-	protected void tearDown() throws Exception
+//	@Override
+	@After
+	public void tearDown() throws Exception
 	{
 		if (editor != null)
 		{
 			EditorTestHelper.closeEditor(editor);
 			editor = null;
 		}
-		super.tearDown();
+//		super.tearDown();
 	}
 
+	@Test
 	public void testExecute() throws Exception
 	{
 		IWorkbenchPage page = UIUtils.getActivePage();
@@ -47,6 +52,7 @@ public class JSSourceEditorTest extends TestCase
 		assertEquals(getClassName(), editor.getClass().getName());
 	}
 
+	@Test
 	public void testEditorPreferences()
 	{
 		String spacesForTabs;

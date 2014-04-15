@@ -7,21 +7,13 @@
  */
 package com.aptana.git.internal.core.storage;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
 
+@RunWith(Suite.class)
+@SuiteClasses({ CommitFileRevisionTest.class, GitFileHistoryProviderTest.class, GitFileHistoryTest.class })
 public class CoreStorageTests
 {
-
-	public static Test suite()
-	{
-		TestSuite suite = new TestSuite(CoreStorageTests.class.getName());
-		// $JUnit-BEGIN$
-		suite.addTestSuite(CommitFileRevisionTest.class);
-		suite.addTestSuite(GitFileHistoryProviderTest.class);
-		suite.addTestSuite(GitFileHistoryTest.class);
-		// $JUnit-END$
-		return suite;
-	}
 
 }

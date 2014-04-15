@@ -209,7 +209,7 @@
       </statusHandler>
    </extension>
    <extension
-         point="com.aptana.ui.epl.primaryNatureContributors">
+         point="com.aptana.core.epl.primaryNatureContributors">
       <contributor
             class="com.aptana.projects.WebProjectPrimaryNatureContributor"
             natureId="com.aptana.projects.webnature">

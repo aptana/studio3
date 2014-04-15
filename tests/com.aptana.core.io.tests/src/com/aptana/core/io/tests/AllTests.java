@@ -7,33 +7,14 @@
  */
 package com.aptana.core.io.tests;
 
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+
 import com.aptana.ide.core.io.preferences.CloakingUtilsTest;
 
-import junit.framework.Test;
-import junit.framework.TestResult;
-import junit.framework.TestSuite;
-
+@RunWith(Suite.class)
+@Suite.SuiteClasses({ EFSUtilsTest.class, WorkspaceFileSystemTest.class, WorkspaceConnectionPointTest.class,
+		ConnectionPointManagerTest.class, CloakingUtilsTest.class })
 public class AllTests
 {
-
-	public static Test suite()
-	{
-		TestSuite suite = new TestSuite(AllTests.class.getName())
-		{
-			@Override
-			public void runTest(Test test, TestResult result)
-			{
-				System.err.println("Running test: " + test.toString()); //$NON-NLS-1$
-				super.runTest(test, result);
-			}
-		};
-		// $JUnit-BEGIN$
-		suite.addTestSuite(EFSUtilsTest.class);
-		suite.addTestSuite(WorkspaceFileSystemTest.class);
-		suite.addTestSuite(WorkspaceConnectionPointTest.class);
-		suite.addTestSuite(ConnectionPointManagerTest.class);
-		suite.addTestSuite(CloakingUtilsTest.class);
-		// $JUnit-END$
-		return suite;
-	}
 }

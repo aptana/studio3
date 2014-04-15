@@ -20,8 +20,7 @@ public class OutputStreamThreadTest extends TestCase
 {
 	public void testNoCharSet() throws FileNotFoundException, IOException, InterruptedException
 	{
-		File outputFile = File.createTempFile("test", "txt");
-		outputFile.deleteOnExit();
+		File outputFile = FileUtil.createTempFile("test", "txt");
 		OutputStream output = new FileOutputStream(outputFile);
 
 		OutputStreamThread outputThread = new OutputStreamThread(output, "this is a test", null);
@@ -35,8 +34,7 @@ public class OutputStreamThreadTest extends TestCase
 
 	public void testWithUTF8CharSet() throws FileNotFoundException, IOException, InterruptedException
 	{
-		File outputFile = File.createTempFile("test", "txt");
-		outputFile.deleteOnExit();
+		File outputFile = FileUtil.createTempFile("test", "txt");
 		OutputStream output = new FileOutputStream(outputFile);
 
 		OutputStreamThread outputThread = new OutputStreamThread(output, "this is a test è", "UTF-8");

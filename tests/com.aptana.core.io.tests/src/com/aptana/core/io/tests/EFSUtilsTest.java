@@ -7,49 +7,59 @@
  */
 package com.aptana.core.io.tests;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import java.io.File;
 import java.io.IOException;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.aptana.core.io.efs.EFSUtils;
+import com.aptana.core.util.FileUtil;
 import com.aptana.ide.core.io.LocalConnectionPoint;
 
-import junit.framework.TestCase;
-
-public class EFSUtilsTest extends TestCase
+public class EFSUtilsTest
 {
 
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 	}
 
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
-		super.tearDown();
+//		super.tearDown();
 	}
 
+	@Test
 	public void testGetAbsolutePath() throws IOException, CoreException
 	{
-		File f = File.createTempFile("test", "txt"); //$NON-NLS-1$ //$NON-NLS-2$
+		File f = FileUtil.createTempFile("test", "txt"); //$NON-NLS-1$ //$NON-NLS-2$
 		LocalConnectionPoint lcp = new LocalConnectionPoint(Path.fromOSString(f.getAbsolutePath()));
 		assertEquals(f.getAbsolutePath(), EFSUtils.getAbsolutePath(lcp.getRoot()));
 	}
 
+	@Test
 	public void testGetPath() throws IOException, CoreException
 	{
-		File f = File.createTempFile("test", "txt"); //$NON-NLS-1$ //$NON-NLS-2$
+		File f = FileUtil.createTempFile("test", "txt"); //$NON-NLS-1$ //$NON-NLS-2$
 		LocalConnectionPoint lcp = new LocalConnectionPoint(Path.fromOSString(f.getAbsolutePath()));
 		assertEquals(f.getAbsolutePath(), EFSUtils.getAbsolutePath(lcp.getRoot()));
 	}
 
+	@Test
 	public void testGetRelativePath() throws IOException, CoreException
 	{
-		File f = File.createTempFile("test", "txt"); //$NON-NLS-1$ //$NON-NLS-2$
-		File f2 = File.createTempFile("test", "txt"); //$NON-NLS-1$ //$NON-NLS-2$
+		File f = FileUtil.createTempFile("test", "txt"); //$NON-NLS-1$ //$NON-NLS-2$
+		File f2 = FileUtil.createTempFile("test", "txt"); //$NON-NLS-1$ //$NON-NLS-2$
 		assertEquals(f.getName(), EFSUtils.getRelativePath(EFS.getLocalFileSystem().fromLocalFile(
 				f.getParentFile()), EFS.getLocalFileSystem().fromLocalFile(f)).toPortableString());
 

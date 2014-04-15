@@ -1,5 +1,9 @@
 package com.aptana.core.build;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.util.Collection;
 
 import junit.framework.TestCase;
@@ -12,14 +16,15 @@ import com.aptana.index.core.build.BuildContext;
 import com.aptana.parsing.ast.ParseNode;
 
 @SuppressWarnings("nls")
-public class AbstractBuildParticipantTest extends TestCase
+public class AbstractBuildParticipantTest
 {
 
 	private AbstractBuildParticipant participant;
 
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 
 		participant = new AbstractBuildParticipant()
 		{
@@ -40,13 +45,15 @@ public class AbstractBuildParticipantTest extends TestCase
 		};
 	}
 
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		participant = null;
 
-		super.tearDown();
+//		super.tearDown();
 	}
 
+	@Test
 	public void testGetLineNumber() throws Exception
 	{
 		String source = "1\n2\n3\n4\n";
@@ -61,6 +68,7 @@ public class AbstractBuildParticipantTest extends TestCase
 		assertEquals("Offset past end of source should return -1", -1, participant.getLineNumber(8, source));
 	}
 
+	@Test
 	public void testCreateError() throws Exception
 	{
 		String message = "message";
@@ -79,6 +87,7 @@ public class AbstractBuildParticipantTest extends TestCase
 		assertEquals(IMarker.PRIORITY_NORMAL, error.getPriority());
 	}
 
+	@Test
 	public void testCreateWarning() throws Exception
 	{
 		String message = "message";
@@ -97,6 +106,7 @@ public class AbstractBuildParticipantTest extends TestCase
 		assertEquals(IMarker.PRIORITY_NORMAL, error.getPriority());
 	}
 
+	@Test
 	public void testCreateInfo() throws Exception
 	{
 		String message = "message";
@@ -115,6 +125,7 @@ public class AbstractBuildParticipantTest extends TestCase
 		assertEquals(IMarker.PRIORITY_NORMAL, error.getPriority());
 	}
 
+	@Test
 	public void testCreateTask() throws Exception
 	{
 		String message = "message";
@@ -134,6 +145,7 @@ public class AbstractBuildParticipantTest extends TestCase
 		assertEquals(priority, error.getPriority());
 	}
 
+	@Test
 	public void testProcessCommentNode() throws Exception
 	{
 		String filePath = "example.js";
@@ -154,6 +166,7 @@ public class AbstractBuildParticipantTest extends TestCase
 		assertEquals(1, problems.size());
 	}
 
+	@Test
 	public void testProcessCommentNodeWithNullNodeReturnsEmptyCollection() throws Exception
 	{
 		String filePath = "example.js";

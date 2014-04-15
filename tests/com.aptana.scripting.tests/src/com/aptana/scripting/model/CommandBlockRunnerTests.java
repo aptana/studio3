@@ -1,21 +1,28 @@
 package com.aptana.scripting.model;
 
+import static org.junit.Assert.assertNotNull;
+
 import java.io.File;
 import java.io.IOException;
+
+import org.junit.Test;
+
+import com.aptana.core.util.FileUtil;
 
 public class CommandBlockRunnerTests extends BundleTestBase
 {
 
-	// public void testCommandBlockRunner()
+	// @Test public void testCommandBlockRunner()
 	// {
 	// fail("Not yet implemented");
 	// }
 	//
-	// public void testAfterExecute()
+	// @Test public void testAfterExecute()
 	// {
 	// fail("Not yet implemented");
 	// }
 	//
+	@Test
 	public void testApplyEnvironment() throws IOException
 	{
 		BundleElement bundle = this.loadBundle("invokeString", BundlePrecedence.PROJECT);
@@ -24,7 +31,7 @@ public class CommandBlockRunnerTests extends BundleTestBase
 		CommandElement command = bundle.getCommandByName("Test");
 		assertNotNull(command);
 
-		File f = File.createTempFile("snippet", "rb");
+		File f = FileUtil.createTempFile("snippet", "rb");
 		EnvironmentElement ee = createEnvironment(f.getAbsolutePath(), "environment", null);
 		bundle.addChild(ee);
 
@@ -36,82 +43,82 @@ public class CommandBlockRunnerTests extends BundleTestBase
 	}
 
 	//
-	// public void testApplyStreams()
+	// @Test public void testApplyStreams()
 	// {
 	// fail("Not yet implemented");
 	// }
 	//
-	// public void testBeforeExecute()
+	// @Test public void testBeforeExecute()
 	// {
 	// fail("Not yet implemented");
 	// }
 	//
-	// public void testCloseStreams()
+	// @Test public void testCloseStreams()
 	// {
 	// fail("Not yet implemented");
 	// }
 	//
-	// public void testExecuteBlock()
+	// @Test public void testExecuteBlock()
 	// {
 	// fail("Not yet implemented");
 	// }
 	//
-	// public void testGetRuntime()
+	// @Test public void testGetRuntime()
 	// {
 	// fail("Not yet implemented");
 	// }
 	//
-	// public void testRunIProgressMonitor()
+	// @Test public void testRunIProgressMonitor()
 	// {
 	// fail("Not yet implemented");
 	// }
 	//
-	// public void testSetConsoleIRubyObject()
+	// @Test public void testSetConsoleIRubyObject()
 	// {
 	// fail("Not yet implemented");
 	// }
 	//
-	// public void testSetConsoleOutputStream()
+	// @Test public void testSetConsoleOutputStream()
 	// {
 	// fail("Not yet implemented");
 	// }
 	//
-	// public void testSetErrorWriterIRubyObject()
+	// @Test public void testSetErrorWriterIRubyObject()
 	// {
 	// fail("Not yet implemented");
 	// }
 	//
-	// public void testSetErrorWriterOutputStream()
+	// @Test public void testSetErrorWriterOutputStream()
 	// {
 	// fail("Not yet implemented");
 	// }
 	//
-	// public void testSetReaderInputStream()
+	// @Test public void testSetReaderInputStream()
 	// {
 	// fail("Not yet implemented");
 	// }
 	//
-	// public void testSetReaderIRubyObject()
+	// @Test public void testSetReaderIRubyObject()
 	// {
 	// fail("Not yet implemented");
 	// }
 	//
-	// public void testSetWriterIRubyObject()
+	// @Test public void testSetWriterIRubyObject()
 	// {
 	// fail("Not yet implemented");
 	// }
 	//
-	// public void testSetWriterOutputStream()
+	// @Test public void testSetWriterOutputStream()
 	// {
 	// fail("Not yet implemented");
 	// }
 	//
-	// public void testUnapplyEnvironment()
+	// @Test public void testUnapplyEnvironment()
 	// {
 	// fail("Not yet implemented");
 	// }
 	//
-	// public void testUnapplyStreams()
+	// @Test public void testUnapplyStreams()
 	// {
 	// fail("Not yet implemented");
 	// }

@@ -7,6 +7,10 @@
  */
 package com.aptana.js.core.inferencing;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
@@ -16,6 +20,7 @@ import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.junit.Test;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.index.core.Index;
@@ -31,6 +36,7 @@ import com.aptana.parsing.ast.IParseNode;
  */
 public class DynamicTypeInferencingTest extends InferencingTestsBase
 {
+	@Test
 	public void testDynamicTypes() throws IOException, CoreException
 	{
 		String source = "one.two = 10;";

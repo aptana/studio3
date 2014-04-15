@@ -7,10 +7,10 @@
  */
 package com.aptana.git.internal.core.storage;
 
+import static org.junit.Assert.assertTrue;
+
 import java.net.URI;
 import java.util.Map;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IMarker;
@@ -30,17 +30,20 @@ import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.team.core.history.IFileHistory;
 import org.eclipse.team.core.history.IFileRevision;
+import org.junit.Test;
 
-public class GitFileHistoryProviderTest extends TestCase
+public class GitFileHistoryProviderTest
 {
 
 	// Just testing we return correct tpe of result here, we test the impls in their own class' unit test
+	@Test
 	public void testGetFileHistoryForIResourceIntIProgressMonitor()
 	{
 		IFileHistory history = new GitFileHistoryProvider().getFileHistoryFor((IResource) null, 0, null);
 		assertTrue(history instanceof GitFileHistory);
 	}
 
+	@Test
 	public void testGetWorkspaceFileRevision()
 	{
 		IResource resource = new IResource()

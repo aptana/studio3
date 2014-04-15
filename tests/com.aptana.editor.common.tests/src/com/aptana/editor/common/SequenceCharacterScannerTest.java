@@ -7,6 +7,10 @@
  */
 package com.aptana.editor.common;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
 import org.eclipse.jface.text.Document;
@@ -16,28 +20,30 @@ import org.eclipse.jface.text.rules.RuleBasedScanner;
 
 import com.aptana.editor.common.text.rules.SequenceCharacterScanner;
 
-public class SequenceCharacterScannerTest extends TestCase
+public class SequenceCharacterScannerTest
 {
 
 	private SequenceCharacterScanner scanner;
 	private RuleBasedScanner ruleBasedScanner;
 
-	@Override
-	protected void setUp() throws Exception
+//	@Override
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 
 		ruleBasedScanner = new RuleBasedScanner();
 		IPartitionScannerSwitchStrategy switchStrategy = new PartitionScannerSwitchStrategy(new String[] { "</script>" });
 		scanner = new SequenceCharacterScanner(ruleBasedScanner, switchStrategy, true);
 	}
 
-	@Override
-	protected void tearDown() throws Exception
+//	@Override
+	@After
+	public void tearDown() throws Exception
 	{
 		ruleBasedScanner = null;
 		scanner = null;
-		super.tearDown();
+//		super.tearDown();
 	}
 
 	private void setSource(String src)
@@ -46,6 +52,7 @@ public class SequenceCharacterScannerTest extends TestCase
 		ruleBasedScanner.setRange(document, 0, src.length());
 	}
 
+	@Test
 	public void testFindSwitch()
 	{
 		setSource("<script>'hi'</script>");
@@ -58,6 +65,7 @@ public class SequenceCharacterScannerTest extends TestCase
 		assertFalse(scanner.foundSequence());
 	}
 
+	@Test
 	public void testFindSwitchAndUnreadBeforeQuerying()
 	{
 		// FIXME Is this actually correct behavior? Do we want it to drop found flag as soon as we unread EOF?
@@ -71,6 +79,7 @@ public class SequenceCharacterScannerTest extends TestCase
 		assertFalse(scanner.foundSequence());
 	}
 
+	@Test
 	public void testFindSwitchUnreadEOFThenReadAgain()
 	{
 		setSource("<script>'hi'</script>");
@@ -82,6 +91,7 @@ public class SequenceCharacterScannerTest extends TestCase
 		assertEquals(ICharacterScanner.EOF, scanner.read());
 	}
 
+	@Test
 	public void testReturnsEOFOnSwitch()
 	{
 		setSource("<script>'hi'</script>");
@@ -92,6 +102,7 @@ public class SequenceCharacterScannerTest extends TestCase
 		assertEquals(ICharacterScanner.EOF, scanner.read());
 	}
 
+	@Test
 	public void testIgnoreCase()
 	{
 		setSource("<SCRIPT>'hi'</SCRIPT>");

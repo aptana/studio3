@@ -7,6 +7,9 @@
  */
 package com.aptana.editor.common.contentassist;
 
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
 import org.eclipse.jface.text.contentassist.ContextInformation;
@@ -18,7 +21,7 @@ import com.aptana.ui.util.UIUtils;
 /**
  * CompletionProposalTest
  */
-public class CompletionProposalTest extends TestCase
+public class CompletionProposalTest
 {
 	Image image;
 
@@ -26,14 +29,16 @@ public class CompletionProposalTest extends TestCase
 	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
-	@Override
-	protected void setUp() throws Exception
+//	@Override
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 
 		image = UIUtils.getImage(CommonEditorPlugin.getDefault(), "icons/proposal.png");
 	}
 
+	@Test
 	public void testProposalsAreEqual()
 	{
 		CommonCompletionProposal proposal1 = new CommonCompletionProposal("a", 0, 1, 2, image, "abc", null, "none");
@@ -42,6 +47,7 @@ public class CompletionProposalTest extends TestCase
 		assertEquals("Proposals should be equal", proposal1, proposal2);
 	}
 
+	@Test
 	public void testProposalsReplacementStringsDiffer()
 	{
 		CommonCompletionProposal proposal1 = new CommonCompletionProposal("a", 0, 1, 2, image, "abc", null, "none");
@@ -50,6 +56,7 @@ public class CompletionProposalTest extends TestCase
 		assertFalse("Replacement strings should not match", proposal1.equals(proposal2));
 	}
 
+	@Test
 	public void testProposalsReplacementOffsetsDiffer()
 	{
 		CommonCompletionProposal proposal1 = new CommonCompletionProposal("a", 0, 1, 2, image, "abc", null, "none");
@@ -58,6 +65,7 @@ public class CompletionProposalTest extends TestCase
 		assertFalse("Replacement offsets should not match", proposal1.equals(proposal2));
 	}
 
+	@Test
 	public void testProposalsReplacementLengthsDiffer()
 	{
 		CommonCompletionProposal proposal1 = new CommonCompletionProposal("a", 0, 1, 2, image, "abc", null, "none");
@@ -66,6 +74,7 @@ public class CompletionProposalTest extends TestCase
 		assertFalse("Replacement lengths should not match", proposal1.equals(proposal2));
 	}
 
+	@Test
 	public void testProposalsCursorPositionsDiffer()
 	{
 		CommonCompletionProposal proposal1 = new CommonCompletionProposal("a", 0, 1, 2, image, "abc", null, "none");
@@ -74,6 +83,7 @@ public class CompletionProposalTest extends TestCase
 		assertFalse("Cursor positions should not match", proposal1.equals(proposal2));
 	}
 
+	@Test
 	public void testProposalsImagesDiffer()
 	{
 		CommonCompletionProposal proposal1 = new CommonCompletionProposal("a", 0, 1, 2, image, "abc", null, "none");
@@ -82,6 +92,7 @@ public class CompletionProposalTest extends TestCase
 		assertFalse("Images should not match", proposal1.equals(proposal2));
 	}
 
+	@Test
 	public void testProposalsDisplayStringsDiffer()
 	{
 		CommonCompletionProposal proposal1 = new CommonCompletionProposal("a", 0, 1, 2, image, "abc", null, "none");
@@ -90,6 +101,7 @@ public class CompletionProposalTest extends TestCase
 		assertFalse("Display strings should not match", proposal1.equals(proposal2));
 	}
 
+	@Test
 	public void testProposalsContextInfosDiffer()
 	{
 		CommonCompletionProposal proposal1 = new CommonCompletionProposal("a", 0, 1, 2, image, "abc",
@@ -100,6 +112,7 @@ public class CompletionProposalTest extends TestCase
 		assertFalse("Context infos should not match", proposal1.equals(proposal2));
 	}
 
+	@Test
 	public void testProposalsAdditionalInfosDiffer()
 	{
 		CommonCompletionProposal proposal1 = new CommonCompletionProposal("a", 0, 1, 2, image, "abc", null, "none");
@@ -108,6 +121,7 @@ public class CompletionProposalTest extends TestCase
 		assertFalse("Additional infos should not match", proposal1.equals(proposal2));
 	}
 
+	@Test
 	public void testProposalsLocationsDiffer()
 	{
 		CommonCompletionProposal proposal1 = new CommonCompletionProposal("a", 0, 1, 2, image, "abc", null, "none");

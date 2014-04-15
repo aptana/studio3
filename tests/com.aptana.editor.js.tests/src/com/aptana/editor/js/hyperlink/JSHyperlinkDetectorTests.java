@@ -7,8 +7,15 @@
  */
 package com.aptana.editor.js.hyperlink;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
+import org.junit.Test;
 
 import com.aptana.core.util.ObjectUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
@@ -110,6 +117,7 @@ public class JSHyperlinkDetectorTests extends JSEditorBasedTestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testGlobal()
 	{
 		String resource = "hyperlinks/global.js";
@@ -118,6 +126,7 @@ public class JSHyperlinkDetectorTests extends JSEditorBasedTestCase
 				3)));
 	}
 
+	@Test
 	public void testPropertyIsFunctionDeclaration()
 	{
 		String resource = "hyperlinks/propertyIsFunctionDeclaration.js";
@@ -126,6 +135,7 @@ public class JSHyperlinkDetectorTests extends JSEditorBasedTestCase
 		assertHyperlinks(resource);
 	}
 
+	@Test
 	public void testPropertyIsFunction()
 	{
 		String resource = "hyperlinks/propertyIsFunction.js";
@@ -134,6 +144,7 @@ public class JSHyperlinkDetectorTests extends JSEditorBasedTestCase
 		assertHyperlinks(resource, link);
 	}
 
+	@Test
 	public void testParameter()
 	{
 		String resource = "hyperlinks/parameter.js";
@@ -143,6 +154,7 @@ public class JSHyperlinkDetectorTests extends JSEditorBasedTestCase
 		assertHyperlinks(resource, link);
 	}
 
+	@Test
 	public void testNestedParameter()
 	{
 		String resource = "hyperlinks/nestedParameter.js";
@@ -152,6 +164,7 @@ public class JSHyperlinkDetectorTests extends JSEditorBasedTestCase
 		assertHyperlinks(resource, link);
 	}
 
+	@Test
 	public void testLocalDeclaration()
 	{
 		String resource = "hyperlinks/localDeclaration.js";
@@ -161,6 +174,7 @@ public class JSHyperlinkDetectorTests extends JSEditorBasedTestCase
 		assertHyperlinks(resource, link);
 	}
 
+	@Test
 	public void testLocalAssignment()
 	{
 		String resource = "hyperlinks/localAssignment.js";
@@ -170,6 +184,7 @@ public class JSHyperlinkDetectorTests extends JSEditorBasedTestCase
 		assertHyperlinks(resource, link);
 	}
 
+	@Test
 	public void testDuplicateSymbols()
 	{
 		String resource = "hyperlinks/duplicateSymbols.js";
@@ -180,6 +195,7 @@ public class JSHyperlinkDetectorTests extends JSEditorBasedTestCase
 		assertHyperlinks(resource, link);
 	}
 
+	@Test
 	public void testDuplicateSymbols2()
 	{
 		String resource = "hyperlinks/duplicateSymbols2.js";

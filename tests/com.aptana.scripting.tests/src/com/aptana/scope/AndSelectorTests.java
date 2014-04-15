@@ -7,13 +7,16 @@
  */
 package com.aptana.scope;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
-public class AndSelectorTests extends TestCase
+public class AndSelectorTests
 {
 	/**
 	 * testNamesArePrefixes
 	 */
+	@Test
 	public void testNamesArePrefixes()
 	{
 		IScopeSelector selector = new ScopeSelector("source string.quoted");
@@ -24,6 +27,7 @@ public class AndSelectorTests extends TestCase
 	/**
 	 * testPrefixThenExact
 	 */
+	@Test
 	public void testPrefixThenExact()
 	{
 		IScopeSelector selector = new ScopeSelector("source string.quoted.double.ruby");
@@ -34,6 +38,7 @@ public class AndSelectorTests extends TestCase
 	/**
 	 * testExactThenPrefix
 	 */
+	@Test
 	public void testExactThenPrefix()
 	{
 		IScopeSelector selector = new ScopeSelector("source.ruby string.quoted");
@@ -44,6 +49,7 @@ public class AndSelectorTests extends TestCase
 	/**
 	 * testNamesAreExact
 	 */
+	@Test
 	public void testNamesAreExact()
 	{
 		IScopeSelector selector = new ScopeSelector("source.ruby string.quoted.double.ruby");
@@ -54,6 +60,7 @@ public class AndSelectorTests extends TestCase
 	/**
 	 * testFirstNonMatching
 	 */
+	@Test
 	public void testFirstNonMatching()
 	{
 		IScopeSelector selector = new ScopeSelector("source.ruby string.quoted.double.ruby");
@@ -64,6 +71,7 @@ public class AndSelectorTests extends TestCase
 	/**
 	 * testSecondNonMatching
 	 */
+	@Test
 	public void testSecondNonMatching()
 	{
 		IScopeSelector selector = new ScopeSelector("source.ruby string.quoted.double.ruby");
@@ -74,6 +82,7 @@ public class AndSelectorTests extends TestCase
 	/**
 	 * testEmptySelector
 	 */
+	@Test
 	public void testEmptySelector()
 	{
 		IScopeSelector selector = new ScopeSelector("");
@@ -84,6 +93,7 @@ public class AndSelectorTests extends TestCase
 	/**
 	 * testEmptyScope
 	 */
+	@Test
 	public void testEmptyScope()
 	{
 		IScopeSelector selector = new ScopeSelector("source.ruby string.quoted.double.ruby");
@@ -94,6 +104,7 @@ public class AndSelectorTests extends TestCase
 	/**
 	 * testNullSelector
 	 */
+	@Test
 	public void testNullSelector()
 	{
 		IScopeSelector selector = new ScopeSelector((String) null);
@@ -104,6 +115,7 @@ public class AndSelectorTests extends TestCase
 	/**
 	 * testNullScope
 	 */
+	@Test
 	public void testNullScope()
 	{
 		IScopeSelector selector = new ScopeSelector("source.ruby string.quoted.double.ruby");
@@ -114,6 +126,7 @@ public class AndSelectorTests extends TestCase
 	/**
 	 * testBeginsWith
 	 */
+	@Test
 	public void testBeginsWith()
 	{
 		IScopeSelector selector = new ScopeSelector("source.ruby");
@@ -124,6 +137,7 @@ public class AndSelectorTests extends TestCase
 	/**
 	 * testWithin
 	 */
+	@Test
 	public void testWithin()
 	{
 		IScopeSelector selector = new ScopeSelector("source.ruby");
@@ -134,6 +148,7 @@ public class AndSelectorTests extends TestCase
 	/**
 	 * testEndsWith
 	 */
+	@Test
 	public void testEndsWith()
 	{
 		IScopeSelector selector = new ScopeSelector("source.ruby");

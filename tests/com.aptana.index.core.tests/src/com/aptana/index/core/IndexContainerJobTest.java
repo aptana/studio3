@@ -1,10 +1,11 @@
 package com.aptana.index.core;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
 import java.io.File;
 import java.net.URI;
 import java.util.List;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -13,12 +14,15 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.FileUtil;
 import com.aptana.index.core.build.BuildContext;
 
-public class IndexContainerJobTest extends TestCase
+public class IndexContainerJobTest
 {
 
 	private Mockery context = new Mockery()
@@ -29,20 +33,20 @@ public class IndexContainerJobTest extends TestCase
 	};
 	private File tmpDir;
 
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
 		tmpDir = new File(FileUtil.getTempDirectory().toOSString(), "index_container");
 		tmpDir.mkdirs();
 	}
 
-	@Override
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		FileUtil.deleteRecursively(tmpDir);
-		super.tearDown();
 	}
 
+	@Test
 	public void testNoIndexReturnsCancelStatus() throws Exception
 	{
 		IndexContainerJob job = new IndexContainerJob(tmpDir.toURI())
@@ -59,9 +63,10 @@ public class IndexContainerJobTest extends TestCase
 		context.assertIsSatisfied();
 	}
 
+	@Test
 	public void testTypicalIndex() throws Exception
 	{
-		final File indexFile = File.createTempFile("fake_indexFile", ".index");
+		final File indexFile = FileUtil.createTempFile("fake_indexFile", ".index");
 
 		// Generate some structure in the tmp dir
 		final File file1 = new File(tmpDir, "file1");

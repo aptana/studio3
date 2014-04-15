@@ -1,5 +1,9 @@
 package com.aptana.editor.common.internal.scripting;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -26,7 +30,7 @@ import com.aptana.editor.common.scripting.commands.TextEditorUtils;
 import com.aptana.editor.epl.tests.EditorTestHelper;
 import com.aptana.ui.util.UIUtils;
 
-public class DocumentScopeManagerTest extends TestCase
+public class DocumentScopeManagerTest
 {
 
 	private IDocumentScopeManager manager;
@@ -35,9 +39,10 @@ public class DocumentScopeManagerTest extends TestCase
 	private File file;
 	private TestProject project;
 
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 		setUpBasicScopes();
 
 		EditorTestHelper.closeAllEditors();
@@ -56,7 +61,8 @@ public class DocumentScopeManagerTest extends TestCase
 		manager = CommonEditorPlugin.getDefault().getDocumentScopeManager();
 	}
 
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		if (editor != null)
 		{
@@ -79,7 +85,7 @@ public class DocumentScopeManagerTest extends TestCase
 		}
 
 		manager = null;
-		super.tearDown();
+//		super.tearDown();
 	}
 
 	protected IContentTypeTranslator getContentTypeTranslator()
@@ -117,17 +123,20 @@ public class DocumentScopeManagerTest extends TestCase
 
 	// ---------------------------------------------------------------------------------------------------------
 
+	@Test
 	public void testGetScopeAtOffsetDocument() throws Exception
 	{
 		assertScope("text", 0, new Document("src"));
 	}
 
+	@Test
 	public void testGetContentTypeNullDocument() throws Exception
 	{
 		assertEquals(new QualifiedContentType(ICommonConstants.CONTENT_TYPE_UKNOWN), getDocumentScopeManager()
 				.getContentType(null, 0));
 	}
 
+	@Test
 	public void testGetContentType() throws Exception
 	{
 		IDocument document = new Document("src")
@@ -142,6 +151,7 @@ public class DocumentScopeManagerTest extends TestCase
 				getDocumentScopeManager().getContentType(document, 0));
 	}
 
+	@Test
 	public void testGetContentTypeAfterSettingDocumentScope() throws Exception
 	{
 		IDocument document = new Document("src")
@@ -162,6 +172,7 @@ public class DocumentScopeManagerTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testGetScopeAtOffsetSourceViewer() throws Exception
 	{
 		setUpStandardScopes();
@@ -176,6 +187,7 @@ public class DocumentScopeManagerTest extends TestCase
 		assertScope("source.js support.class.js", 7);
 	}
 
+	@Test
 	public void testGetScopeWithMetaProjectNaturePrepended() throws Exception
 	{
 		setUpStandardScopes();
@@ -191,6 +203,7 @@ public class DocumentScopeManagerTest extends TestCase
 		assertScope("meta.project.com.aptana.projects.webnature source.js support.class.js", 7);
 	}
 
+	@Test
 	public void testGetScopeAtEndOfFile() throws Exception
 	{
 		setUpStandardScopes();
@@ -201,6 +214,7 @@ public class DocumentScopeManagerTest extends TestCase
 		assertScope("source.js comment.line.double-slash.js", 20);
 	}
 
+	@Test
 	public void testOffByOneBug() throws Exception
 	{
 		setUpStandardScopes();
@@ -221,6 +235,7 @@ public class DocumentScopeManagerTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testGetScopeAtOffsetDoc() throws Exception
 	{
 		setUpStandardScopes();

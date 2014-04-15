@@ -7,19 +7,26 @@
  */
 package com.aptana.scripting.model;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.aptana.core.util.FileUtil;
 import com.aptana.scripting.TestUtils;
 import com.aptana.scripting.internal.model.BundleMonitor;
 
-public abstract class BundleMonitorTests extends TestCase
+public abstract class BundleMonitorTests
 {
 	public interface FileSystemAction
 	{
@@ -42,9 +49,12 @@ public abstract class BundleMonitorTests extends TestCase
 	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+		// store reference to bundle manager
+		this._manager = BundleManager.getInstance();
+		this._manager.reset();
 
 		// setup test bundle
 		this._fileSystemService = new BundleFileSystemService(this.createFileSystem());
@@ -72,7 +82,8 @@ public abstract class BundleMonitorTests extends TestCase
 	 * (non-Javadoc)
 	 * @see com.aptana.scripting.model.BundleTestBase#tearDown()
 	 */
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		try
 		{
@@ -81,7 +92,7 @@ public abstract class BundleMonitorTests extends TestCase
 		}
 		finally
 		{
-			super.tearDown();
+			// super.tearDown();
 		}
 	}
 
@@ -344,6 +355,7 @@ public abstract class BundleMonitorTests extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testAddBundleFile() throws Exception
 	{
 		this.addBundleFile("simple-bundle.rb");
@@ -357,6 +369,7 @@ public abstract class BundleMonitorTests extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testAddCommandAfterBundleFile() throws Exception
 	{
 		// create bundle
@@ -380,6 +393,7 @@ public abstract class BundleMonitorTests extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testAddCommandBeforeBundleFile() throws Exception
 	{
 		// add a command to an invalid bundle directory
@@ -406,6 +420,7 @@ public abstract class BundleMonitorTests extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testAddSnippetAfterBundleFile() throws Exception
 	{
 		this.addBundleFile("simple-bundle.rb");
@@ -427,6 +442,7 @@ public abstract class BundleMonitorTests extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testAddSnippetBeforeBundleFile() throws Exception
 	{
 		this.addSnippet("simple-snippet.rb");
@@ -451,6 +467,7 @@ public abstract class BundleMonitorTests extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testRemoveCommand() throws Exception
 	{
 		this.addBundleFile("simple-bundle.rb");
@@ -476,6 +493,7 @@ public abstract class BundleMonitorTests extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testRemoveCommandNoBundleFile() throws Exception
 	{
 		this.addCommand("simple-command.rb");
@@ -494,6 +512,7 @@ public abstract class BundleMonitorTests extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testRemoveSnippet() throws Exception
 	{
 		this.addBundleFile("simple-bundle.rb");
@@ -519,6 +538,7 @@ public abstract class BundleMonitorTests extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testRemoveSnippetNoBundleFile() throws Exception
 	{
 		this.addSnippet("simple-snippet.rb");
@@ -537,6 +557,7 @@ public abstract class BundleMonitorTests extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testRemoveBundleFileWithoutMembers() throws Exception
 	{
 		this.addBundleFile("simple-bundle.rb");
@@ -555,6 +576,7 @@ public abstract class BundleMonitorTests extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testRemoveBundleFileBeforeMembers() throws Exception
 	{
 		this.addBundleFile("simple-bundle.rb");
@@ -575,6 +597,7 @@ public abstract class BundleMonitorTests extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testRemoveBundleFileAfterMembers() throws Exception
 	{
 		this.addBundleFile("simple-bundle.rb");
@@ -597,6 +620,7 @@ public abstract class BundleMonitorTests extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testRemoveBundleDirectory() throws Exception
 	{
 		this.addBundleFile("simple-bundle.rb");
@@ -617,6 +641,7 @@ public abstract class BundleMonitorTests extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testRemoveCommandsDirectory() throws Exception
 	{
 		this.addBundleFile("simple-bundle.rb");
@@ -642,6 +667,7 @@ public abstract class BundleMonitorTests extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testRemoveSnippetsDirectory() throws Exception
 	{
 		this.addBundleFile("simple-bundle.rb");
@@ -667,6 +693,7 @@ public abstract class BundleMonitorTests extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testRenameCommand() throws Exception
 	{
 		this.addBundleFile("simple-bundle.rb");
@@ -697,6 +724,7 @@ public abstract class BundleMonitorTests extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testRenameSnippet() throws Exception
 	{
 		this.addBundleFile("simple-bundle.rb");
@@ -727,6 +755,7 @@ public abstract class BundleMonitorTests extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testRenameBundleFile() throws Exception
 	{
 		this.addBundleFile("simple-bundle.rb");
@@ -756,6 +785,7 @@ public abstract class BundleMonitorTests extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testRenameBundleDirectory() throws Exception
 	{
 		this.addBundleFile("simple-bundle.rb");

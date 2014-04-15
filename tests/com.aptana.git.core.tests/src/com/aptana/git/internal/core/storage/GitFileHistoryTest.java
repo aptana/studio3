@@ -7,6 +7,12 @@
  */
 package com.aptana.git.internal.core.storage;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +20,6 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -22,10 +27,10 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.team.core.history.IFileHistoryProvider;
 import org.eclipse.team.core.history.IFileRevision;
+import org.junit.Test;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.util.CollectionsUtil;
-import com.aptana.core.util.IOUtil;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.IPreferenceConstants;
 import com.aptana.git.core.model.ChangedFile;
@@ -40,6 +45,7 @@ public class GitFileHistoryTest extends GitTestCase
 	private static final String PROJECT_NAME = "gfh_test"; //$NON-NLS-1$
 	private IProject fProject;
 
+	@Test(timeout = 10000)
 	public void testGetFileRevisions() throws Exception
 	{
 		GitRepository repo = getRepo();
@@ -136,7 +142,7 @@ public class GitFileHistoryTest extends GitTestCase
 	}
 
 	@Override
-	protected void tearDown() throws Exception
+	public void tearDown() throws Exception
 	{
 		try
 		{

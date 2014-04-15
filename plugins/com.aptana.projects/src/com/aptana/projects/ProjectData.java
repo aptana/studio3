@@ -30,7 +30,7 @@ public class ProjectData
 	public boolean cloneFromGit;
 	public IProject project;
 
-	public static String DEFAULT_PUBLISHER_URL = "http://"; //$NON-NLS-1$
+	public static final String DEFAULT_PUBLISHER_URL = "http://"; //$NON-NLS-1$
 
 	public ProjectData()
 	{

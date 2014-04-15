@@ -7,6 +7,8 @@
  */
 package com.aptana.ide.core.io.preferences;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.io.File;
 import java.io.IOException;
 
@@ -17,13 +19,13 @@ import org.eclipse.core.filesystem.IFileStore;
 
 import com.aptana.core.util.FileUtil;
 
-public class CloakingUtilsTest extends TestCase
+public class CloakingUtilsTest
 {
 
+	@Test
 	public void testFile() throws IOException
 	{
-		File file = File.createTempFile("test", "txt");
-		file.deleteOnExit();
+		File file = FileUtil.createTempFile("test", "txt");
 		IFileStore fileStore = EFS.getLocalFileSystem().fromLocalFile(file);
 
 		CloakingUtils.addCloakFileType(file.getName());
@@ -33,6 +35,7 @@ public class CloakingUtilsTest extends TestCase
 		assertFalse("the file should not be cloaked but is", CloakingUtils.isFileCloaked(fileStore));
 	}
 
+	@Test
 	public void testDirectory() throws IOException
 	{
 		File dir = new File(FileUtil.getTempDirectory().toOSString(), "cloaking");
@@ -47,6 +50,7 @@ public class CloakingUtilsTest extends TestCase
 		assertFalse("the directory should not be cloaked but is", CloakingUtils.isFileCloaked(fileStore));
 	}
 
+	@Test
 	public void testRegex() throws IOException
 	{
 		File dir = new File(FileUtil.getTempDirectory().toOSString(), "cloaking");

@@ -9,6 +9,7 @@ package com.aptana.projects.primary.natures;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 
 /**
  * An abstract base implementation of an {@link IPrimaryNatureContributor}. This class provides an empty implementation
@@ -25,5 +26,10 @@ public abstract class AbstractPrimaryNatureContributor implements IPrimaryNature
 	public void configure(IProject project) throws CoreException
 	{
 		// No-Op
+	}
+
+	public IPath getLibraryContainerPath(IPath projectPath)
+	{
+		return projectPath;
 	}
 }

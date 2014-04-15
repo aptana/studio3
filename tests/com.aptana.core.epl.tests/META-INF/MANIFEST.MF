@@ -4,7 +4,7 @@ Bundle-Name: %pluginName
 Bundle-SymbolicName: com.aptana.core.epl.tests
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: %providerName
-Fragment-Host: com.aptana.core;bundle-version="3.0.0"
+Fragment-Host: com.aptana.core.epl
 Require-Bundle: org.eclipse.core.runtime,
  org.junit,
  com.aptana.core.epl
