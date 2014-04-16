@@ -8,39 +8,39 @@
          point="org.eclipse.ui.commands">
        <command
        		categoryId="org.eclipse.ui.category.edit"
-            description="%command.filter.description"
+            description="%command.filter.description Filter Through Command"
             id="com.aptana.editor.common.scripting.commands.FilterThroughCommand"
-            name="%command.filter.name">
+            name="%command.filter.name Filter Through Command">
       </command>
       <command
             categoryId="org.eclipse.ui.category.edit"
-            description="%command.format.description"
+            description="%command.format.description Format the selected text"
             id="com.aptana.editor.commands.Format"
-            name="%command.format.name">
+            name="%command.format.name Format">
       </command>
        <command
              categoryId="org.eclipse.ui.category.views"
              defaultHandler="com.aptana.editor.common.internal.commands.ExpandAllHandler"
-             description="%command.expandall.description"
+             description="%command.expandall.description Expand All"
              id="com.aptana.editor.commands.ExpandAll"
-             name="%command.expandall.name">
+             name="%command.expandall.name Expand All">
        </command>
        <command
              categoryId="org.eclipse.ui.category.views"
              defaultHandler="com.aptana.editor.common.internal.commands.CollapseAllHandler"
-             description="%command.collapseall.description"
+             description="%command.collapseall.description Collapse All"
              id="com.aptana.editor.commands.CollapseAll"
-             name="%command.collapseall.name">
+             name="%command.collapseall.name Collapse All">
        </command>
        <command
              categoryId="org.eclipse.ui.category.views"
              defaultHandler="com.aptana.editor.common.internal.commands.ExpandLevelHandler"
-             description="%command.expandLevel.description"
+             description="%command.expandLevel.description Expand to Level"
              id="com.aptana.editor.commands.ExpandLevel"
-             name="%command.expandLevel.name">
+             name="%command.expandLevel.name Expand to Level">
           <commandParameter
                 id="level"
-                name="%commandParameter.level.name"
+                name="%commandParameter.level.name Level"
                 optional="true">
           </commandParameter>
        </command>
@@ -180,7 +180,7 @@
       <command
             defaultHandler="com.aptana.editor.common.scripting.commands.ShowCommandsMenuHandler"
             id="com.aptana.editor.common.scripting.commands.show"
-            name="%command.name">
+            name="%command.name Show Commands Menu">
       </command>
    </extension>
    <extension
@@ -196,11 +196,11 @@
             locationURI="menu:org.eclipse.ui.main.menu?after=edit">
          <menu
                id="com.aptana.source.menu"
-               label="%menu.source.label"
+               label="%menu.source.label Source"
                mnemonic="%menu.source.mnemonic">
             <command
                   commandId="com.aptana.editor.commands.Format"
-                  label="%command.format.label"
+                  label="%command.format.label Format"
                   mnemonic="%command.format.mnemonic"
                   style="push">
                <visibleWhen
@@ -219,11 +219,11 @@
             locationURI="popup:org.eclipse.ui.popup.any?after=group.edit">
          <menu
                id="com.aptana.source.popup.menu"
-               label="%menu.popup.source.label"
+               label="%menu.popup.source.label Source"
                mnemonic="%menu.popup.source.mnemonic">
             <command
                   commandId="com.aptana.editor.commands.Format"
-                  label="%command.popup.format.label"
+                  label="%command.popup.format.label Format"
                   mnemonic="%command.popup.format.mnemonic"
                   style="push">
                <visibleWhen
@@ -287,13 +287,13 @@
    <extension
          point="org.eclipse.ui.newWizards">
       <wizard
-            name="%NewWizards.file"
+            name="%NewWizards.file File"
             icon="$nl$/icons/full/etool16/text.png"
             category="com.aptana.ui.wizards.category"
             class="com.aptana.editor.common.internal.scripting.NewFileWizard"
             id="com.aptana.ui.wizards.new.file">
          <description>
-            %NewWizards.file.description
+            %NewWizards.file.description Create a new file resource
          </description>
          <selection
                class="org.eclipse.core.resources.IResource">
@@ -301,7 +301,7 @@
       </wizard>
       <category
             id="com.aptana.ui.wizards.category"
-            name="%category.web.name">
+            name="%category.web.name Web">
       </category>
    </extension>
    <extension
@@ -310,19 +310,19 @@
             categoryId="org.eclipse.ui.category.window"
             defaultHandler="com.aptana.editor.common.internal.commands.NextEditorHandler"
             id="com.aptana.editor.NextEditorCommand"
-            name="%command.NextEditorNoPrompt">
+            name="%command.NextEditorNoPrompt Next Editor (Aptana)">
       </command>
       <command
             categoryId="org.eclipse.ui.category.window"
             defaultHandler="com.aptana.editor.common.internal.commands.PreviousEditorHandler"
             id="com.aptana.editor.PreviousEditorCommand"
-            name="%command.PreviousEditorNoPrompt">
+            name="%command.PreviousEditorNoPrompt Previous Editor (Aptana)">
       </command>
       <command
             categoryId="org.eclipse.ui.category.window"
             defaultHandler="com.aptana.editor.common.internal.commands.ToggleWordWrapHandler"
             id="com.aptana.editor.toggleWordWrapCommand"
-            name="%command.wordwrap.name">
+            name="%command.wordwrap.name Word Wrap">
          <state
          	id="org.eclipse.ui.commands.toggleState">
             <class
@@ -336,9 +336,9 @@
       </command>
       <command
             categoryId="com.aptana.ui.category"
-            description="%mark.occurrence.description"
+            description="%mark.occurrence.description Toggle mark occurrences"
             id="com.aptana.editor.common.toggleMarkOccurrences"
-            name="%mark.occurrence.command">
+            name="%mark.occurrence.command Mark Occurrences">
       </command>
    </extension>
    <extension
@@ -385,11 +385,11 @@
          point="org.eclipse.ui.contexts">
       <context
             id="com.aptana.editor.common.outline"
-            name="%context.outline.name">
+            name="%context.outline.name Aptana Outline">
       </context>
       <context
             id="com.aptana.editor.context"
-            name="%context.editor.name"
+            name="%context.editor.name Aptana Editor"
             parentId="org.eclipse.ui.contexts.window">
       </context>
    </extension>
@@ -404,10 +404,10 @@
                commandId="com.aptana.editor.commands.CollapseAll">
          </command>
          <menu
-               label="%menu.expand.label">
+               label="%menu.expand.label Expand to Level">
             <command
                   commandId="com.aptana.editor.commands.ExpandLevel"
-                  label="%command.label">
+                  label="%command.label 1">
                <parameter
                      name="level"
                      value="1">
@@ -415,7 +415,7 @@
             </command>
             <command
                   commandId="com.aptana.editor.commands.ExpandLevel"
-                  label="%command.label.0">
+                  label="%command.label.0 2">
                <parameter
                      name="level"
                      value="2">
@@ -423,7 +423,7 @@
             </command>
             <command
                   commandId="com.aptana.editor.commands.ExpandLevel"
-                  label="%command.label.1">
+                  label="%command.label.1 3">
                <parameter
                      name="level"
                      value="3">
@@ -431,7 +431,7 @@
             </command>
             <command
                   commandId="com.aptana.editor.commands.ExpandLevel"
-                  label="%command.label.2">
+                  label="%command.label.2 4">
                <parameter
                      name="level"
                      value="4">
@@ -439,7 +439,7 @@
             </command>
             <command
                   commandId="com.aptana.editor.commands.ExpandLevel"
-                  label="%command.label.3">
+                  label="%command.label.3 5">
                <parameter
                      name="level"
                      value="5">
@@ -447,7 +447,7 @@
             </command>
             <command
                   commandId="com.aptana.editor.commands.ExpandLevel"
-                  label="%command.label.4">
+                  label="%command.label.4 6">
                <parameter
                      name="level"
                      value="6">
@@ -455,7 +455,7 @@
             </command>
             <command
                   commandId="com.aptana.editor.commands.ExpandLevel"
-                  label="%command.label.5">
+                  label="%command.label.5 7">
                <parameter
                      name="level"
                      value="7">
@@ -463,7 +463,7 @@
             </command>
             <command
                   commandId="com.aptana.editor.commands.ExpandLevel"
-                  label="%command.label.6">
+                  label="%command.label.6 8">
                <parameter
                      name="level"
                      value="8">
@@ -471,7 +471,7 @@
             </command>
             <command
                   commandId="com.aptana.editor.commands.ExpandLevel"
-                  label="%command.label.7">
+                  label="%command.label.7 9">
                <parameter
                      name="level"
                      value="9">
@@ -501,9 +501,9 @@
       <command
             categoryId="org.eclipse.ui.category.views"
             defaultHandler="com.aptana.editor.common.internal.handlers.ToggleOutlineHandler"
-            description="%command.toggleoutline.description"
+            description="%command.toggleoutline.description Toggle to show or hide Outline view"
             id="com.aptana.editor.common.commands.toggleOutline"
-            name="%command.toggleoutline.name">
+            name="%command.toggleoutline.name Show/Hide Outline">
          <state
                class="org.eclipse.ui.handlers.RegistryToggleState:true"
                id="org.eclipse.ui.commands.toggleState">
@@ -511,9 +511,9 @@
       </command>
       <command
             categoryId="org.eclipse.ui.category.textEditor"
-            description="%command.gotomatchingbracket.description"
+            description="%command.gotomatchingbracket.description Goto Matching Bracket"
             id="com.aptana.editor.common.gotoMatchingBracket"
-            name="%command.gotomatchingbracket.name">
+            name="%command.gotomatchingbracket.name Goto Matching Bracket">
       </command>
    </extension>
    <extension
@@ -533,7 +533,7 @@
          </dynamic>
          <command
                commandId="com.aptana.terminal.commands.openTerminal"
-               label="%command.terminal.label"
+               label="%command.terminal.label Terminal"
                style="push">
          </command>
       </menuContribution>
@@ -541,7 +541,7 @@
             locationURI="menu:file?before=new.ext">
          <menu
                id="com.aptana.file.template.menu"
-               label="%menu.file.template.label">
+               label="%menu.file.template.label New From Template">
          </menu>
       </menuContribution>
 	</extension>
@@ -657,7 +657,7 @@
       <page
             class="com.aptana.editor.common.preferences.ContentAssistPreferencePage"
             id="com.aptana.editor.common.contentAssistPropertyPage"
-            name="%content.assist.pref.page.title">
+            name="%content.assist.pref.page.title Content Assist">
          <enabledWhen>
             <instanceof
                   value="org.eclipse.core.resources.IProject">
@@ -671,7 +671,7 @@
             activate="true"
             class="com.aptana.editor.common.text.hyperlink.HyperlinkDetector"
             id="com.aptana.editor.common.hyperlinkDetector"
-            name="%hyperlinkDetector.name"
+            name="%hyperlinkDetector.name URL Links"
             targetId="com.aptana.editor.ui.hyperlinkTarget">
       </hyperlinkDetector>
    </extension>
@@ -733,7 +733,7 @@
          point="org.eclipse.ui.actionSets">
       <actionSet
             id="com.aptana.editor.common.presentation"
-            label="%editor.presentation"
+            label="%editor.presentation Common Editor Presentation"
             visible="false">
          <action
                allowLabelUpdate="true"
@@ -741,11 +741,11 @@
                disabledIcon="icons/full/dtool16/mark_occurrences.gif"
                icon="icons/full/etool16/mark_occurrences.gif"
                id="com.aptana.editor.common.toggleMarkOccurrences"
-               label="%presentation.label"
+               label="%presentation.label Mark Occurrences"
                retarget="true"
                style="toggle"
                toolbarPath="org.eclipse.ui.edit.text.actionSet.presentation/Presentation"
-               tooltip="%presentation.tooltip">
+               tooltip="%presentation.tooltip Mark Occurrences">
          </action>
       </actionSet>
    </extension>

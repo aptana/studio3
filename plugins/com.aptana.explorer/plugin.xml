@@ -292,14 +292,14 @@
             locationURI="popup:com.aptana.explorer.view?before=group.edit">
          <menu
                id="appExplorerShowIn"
-               label="%ShowIn.label">
+               label="%ShowIn.label Show In">
             <dynamic
                   class="com.aptana.ui.commands.OpenFileManagerContributionItem"
                   id="com.aptana.explorer.open.file.manager">
             </dynamic>
             <command
                   commandId="com.aptana.terminal.commands.openTerminal"
-                  label="%command.terminal.label"
+                  label="%command.terminal.label Terminal"
                   style="push">
             </command>
             <visibleWhen
