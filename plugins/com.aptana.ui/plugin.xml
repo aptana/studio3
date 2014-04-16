@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension-point id="propertyDialogs" name="%extension-point.propertydialogs.name" schema="schema/propertyDialogs.exsd"/>
-   <extension-point id="imageAssociations" name="%extension-point.imageassociations.name" schema="schema/imageAssociations.exsd"/>
-   <extension-point id="accountsPreferencePage" name="%extension-point.accounts.name" schema="schema/accountsPreferencePage.exsd"/>
+   <extension-point id="propertyDialogs" name="%extension-point.propertydialogs.name propertyDialogs" schema="schema/propertyDialogs.exsd"/>
+   <extension-point id="imageAssociations" name="%extension-point.imageassociations.name imageAssociations" schema="schema/imageAssociations.exsd"/>
+   <extension-point id="accountsPreferencePage" name="%extension-point.accounts.name Accounts Preference Page" schema="schema/accountsPreferencePage.exsd"/>
 
    <extension
          point="org.eclipse.ui.perspectives">
@@ -11,7 +11,7 @@
             class="com.aptana.ui.internal.WebPerspectiveFactory"
             icon="icons/web.png"
             id="com.aptana.ui.WebPerspective"
-            name="%perspective.name.web">
+            name="%perspective.name.web Web">
       </perspective>
    </extension>
    <extension
@@ -143,54 +143,54 @@
          point="org.eclipse.ui.commands">
       <category
             id="com.aptana.ui.category"
-            name="%CommandsCategory.name">
+            name="%CommandsCategory.name Aptana">
       </category>
       <command
             categoryId="com.aptana.ui.category"
             defaultHandler="com.aptana.ui.internal.commands.ViewReleaseNotesCommandHandler"
-            description="%ViewReleaseNotes.description"
+            description="%ViewReleaseNotes.description View the Release Notes for Studio 3 Release"
             id="com.aptana.ui.command.viewreleasenotes"
-            name="%ViewReleaseNotes.label">
+            name="%ViewReleaseNotes.label View Release Notes...">
       </command>
       <command
             categoryId="com.aptana.ui.category"
             defaultHandler="com.aptana.ui.commands.SendFeedbackCommandHandler"
-            description="%SendFeedbackCommand.description"
+            description="%SendFeedbackCommand.description Send feedback on the Studio 3 Release"
             id="com.aptana.ui.command.sendfeedback"
-            name="%SendFeedbackCommand.label">
+            name="%SendFeedbackCommand.label Send Feedback...">
       </command>
       <command
             categoryId="com.aptana.ui.category"
             defaultHandler="com.aptana.ui.commands.ReportBugCommandHandler"
-            description="%ReportBugCommand.description"
+            description="%ReportBugCommand.description Report a bug on Studio 3 Release"
             id="com.aptana.ui.command.reportbug"
-            name="%ReportBugCommand.label">
+            name="%ReportBugCommand.label Report Bug...">
       </command>
       <command
             categoryId="com.aptana.ui.category"
             defaultHandler="com.aptana.ui.internal.commands.ViewLogCommandHandler"
-            description="%ViewLogCommand.description"
+            description="%ViewLogCommand.description View Studio log file"
             id="com.aptana.ui.command.viewlog"
-            name="%ViewLogCommand.Label">
+            name="%ViewLogCommand.Label View Log File">
       </command>
       <command
             categoryId="com.aptana.ui.category"
             defaultHandler="com.aptana.ui.internal.commands.ClearLogCommandHandler"
-            description="%ClearLogCommand.description"
+            description="%ClearLogCommand.description Clear Studio log file"
             id="com.aptana.ui.command.clearlog"
-            name="%ClearLogCommand.Label">
+            name="%ClearLogCommand.Label Clear Log File">
       </command>
       <command
             defaultHandler="com.aptana.ui.internal.commands.OpenInFinderHandler"
             id="com.aptana.ui.command.ShowInFileManager"
-            name="%ShowInFileManager.label">
+            name="%ShowInFileManager.label Show In File Manager">
       </command>
       <command
             categoryId="com.aptana.ui.category"
             defaultHandler="com.aptana.ui.commands.DiagnosticHandler"
-            description="%runDiagnostic.description"
+            description="%runDiagnostic.description Runs Diagnostic Test"
             id="com.aptana.ui.command.diagnostic"
-            name="%runDiagnostic.name">
+            name="%runDiagnostic.name Run Diagnostic Test...">
       </command>
    </extension>
    <extension
@@ -199,7 +199,7 @@
             locationURI="menu:help?before=helpEnd">
          <menu
                id="aptanahelp"
-               label="%Menu.Help.Aptana.label">
+               label="%Menu.Help.Aptana.label Aptana">
             <command
                   commandId="com.aptana.ui.command.diagnostic"
                   style="push">
@@ -246,14 +246,14 @@
             locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?before=group.edit">
          <menu
                id="projectExplorerShowIn"
-               label="%ShowIn.label">
+               label="%ShowIn.label Show In">
             <dynamic
                   class="com.aptana.ui.commands.OpenFileManagerContributionItem"
                   id="com.aptana.ui.open.file.manager">
             </dynamic>
             <command
                   commandId="com.aptana.terminal.commands.openTerminal"
-                  label="%command.terminal.label"
+                  label="%command.terminal.label Terminal"
                   style="push">
             </command>
             <visibleWhen
@@ -297,7 +297,7 @@
          point="org.eclipse.ui.actionSets">
       <actionSet
             id="com.aptana.ui.globalActionSet"
-            label="%actionSet.global.label"
+            label="%actionSet.global.label Aptana"
             visible="false">
       </actionSet>
    </extension>
@@ -320,28 +320,28 @@
          point="org.eclipse.ui.newWizards">
       <category
             id="com.aptana.ui.wizards.category"
-            name="%category.web.name">
+            name="%category.web.name Web">
       </category>
    </extension>
    <extension
          point="org.eclipse.ui.views">
       <category
             id="com.aptana"
-            name="%category.name">
+            name="%category.name Aptana">
       </category>
    </extension>
    <extension
          point="org.eclipse.ui.importWizards">
       <category
             id="com.aptana.ui.wizards.import.category"
-            name="%category.wizards.import.name">
+            name="%category.wizards.import.name Studio">
       </category>
    </extension>
    <extension
          point="org.eclipse.ui.exportWizards">
       <category
             id="com.aptana.ui.wizards.export.category"
-            name="%category.wizards.export.name">
+            name="%category.wizards.export.name Studio">
       </category>
    </extension>
    <extension
@@ -362,7 +362,7 @@
       <page
             class="com.aptana.ui.preferences.ProjectBuildPathPropertyPage"
             id="com.aptana.editor.common.projectBuildPath"
-            name="%buildPath.property.page.name">
+            name="%buildPath.property.page.name Project Build Path">
             <enabledWhen>
             <and>
                <instanceof
