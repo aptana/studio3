@@ -52,7 +52,7 @@ import com.aptana.ui.util.UIUtils;
 
 public class NodePreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage
 {
-	public static final String NODE_JS_SOURCE_URL = "http://go.aptana.com/nodejs-source"; //$NON-NLS-1$
+	public static final String NODE_JS_SOURCE_URL = "http://go.appcelerator.com/nodejs-source"; //$NON-NLS-1$
 	public static final String NODE_JS_ROOT_NAME = "node-v0.8.3"; //$NON-NLS-1$
 
 	public static final String ID = "com.aptana.editor.js.nodejs.page"; //$NON-NLS-1$

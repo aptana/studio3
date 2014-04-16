@@ -2,16 +2,16 @@
 <?NLS TYPE="org.eclipse.help.toc"?>
 
 <toc label="Getting Started" link_to="toc.xml#getting_started">
-   <topic href="http://go.aptana.com/Studio+Home" label="Studio Guides">
-      <topic href="http://go.aptana.com/Basic+Studio+Concepts" label="Basic Concepts">
+   <topic href="http://go.appcelerator.com/Studio+Home" label="Studio Guides">
+      <topic href="http://go.appcelerator.com/Basic+Studio+Concepts" label="Basic Concepts">
       </topic>
-      <topic href="http://go.aptana.com/Titanium+Development" label="Titanium Development">
+      <topic href="http://go.appcelerator.com/Titanium+Development" label="Titanium Development">
       </topic>
-      <topic href="http://go.aptana.com/Web+Development" label="Web Development">
+      <topic href="http://go.appcelerator.com/Web+Development" label="Web Development">
       </topic>
-      <topic href="http://go.aptana.com/Customizing+Studio" label="Customizing Studio">
+      <topic href="http://go.appcelerator.com/Customizing+Studio" label="Customizing Studio">
       </topic>
-      <topic href="http://go.aptana.com/Troubleshooting" label="Troubleshooting">
+      <topic href="http://go.appcelerator.com/Troubleshooting" label="Troubleshooting">
       </topic>
    </topic> 
 </toc>

@@ -1,1 +1,1 @@
-The most current version lives here: http://go.aptana.com/Scripting
+The most current version lives here: http://go.appcelerator.com/Scripting
