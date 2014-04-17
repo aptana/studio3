@@ -17,8 +17,7 @@ import com.aptana.editor.coffee.parsing.lexer.CoffeeScannerTest;
 @RunWith(Suite.class)
 @SuiteClasses({ CoffeeScannerTest.class, CoffeeParserTest.class, CoffeeFoldingComputerTest.class,
 		CoffeeDoubleClickStrategyTest.class, CoffeeFileIndexingParticipantTest.class, CoffeeTaskDetectorTest.class,
-		CoffeeCodeScannerTest.class, CoffeeOutlineProviderTest.class, CoffeeSourcePartitionScannerTest.class,
-		CoffeescriptScopesTest.class })
+		CoffeeCodeScannerTest.class, CoffeeOutlineProviderTest.class, CoffeeSourcePartitionScannerTest.class, })
 public class AllTests
 {
 }

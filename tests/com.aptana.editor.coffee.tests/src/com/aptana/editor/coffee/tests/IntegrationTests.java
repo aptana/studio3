@@ -1,11 +1,11 @@
-package com.aptana.editor.js.hyperlink;
+package com.aptana.editor.coffee.tests;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({})
-public class HyperlinkTests
+@SuiteClasses({ CoffeescriptScopesIntegrationTest.class })
+public class IntegrationTests
 {
 }

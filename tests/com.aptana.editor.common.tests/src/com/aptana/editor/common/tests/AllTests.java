@@ -16,7 +16,6 @@ import com.aptana.editor.common.contentassist.ContentAssistTests;
 import com.aptana.editor.common.internal.peer.PeerTests;
 import com.aptana.editor.common.internal.scripting.DocumentScopeManagerTest;
 import com.aptana.editor.common.parsing.AllCompositeParserTests;
-import com.aptana.editor.common.scripting.ScriptingInputOutputTest;
 import com.aptana.editor.common.scripting.commands.ScriptingCommandsTests;
 import com.aptana.editor.common.scripting.snippets.SnippetsTests;
 import com.aptana.editor.common.text.TextTests;
@@ -37,7 +36,6 @@ import com.aptana.editor.common.viewer.ViewerTests;
 	TextTests.class,
 	UtilTests.class,
 	ViewerTests.class,
-	ScriptingInputOutputTest.class,
 	DocumentScopeManagerTest.class,
 	ContentAssistTests.class,
 	AllCompositeParserTests.class
