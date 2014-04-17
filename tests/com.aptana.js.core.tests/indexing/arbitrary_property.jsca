@@ -1,7 +1,7 @@
 {
 	"types": [
 		{
-			"name": "Titanium.UI",
+			"name": "Titanium",
 			"extends": "Something",
 			"events": [
 				{

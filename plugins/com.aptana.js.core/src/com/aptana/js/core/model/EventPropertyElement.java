@@ -7,21 +7,25 @@
  */
 package com.aptana.js.core.model;
 
+import java.util.List;
 import java.util.Map;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
+import com.aptana.index.core.IndexUtil;
 import com.aptana.jetty.util.epl.ajax.JSON.Output;
 
 /**
  * EventProperty
  */
-public class EventPropertyElement extends BaseElement
+public class EventPropertyElement extends BaseElement implements IHasPredefinedValues
 {
 
 	private static final String TYPE_PROPERTY = "type"; //$NON-NLS-1$
 
 	private String _type;
+	private List<String> _constants;
 
 	/**
 	 * EventProperty
@@ -41,6 +45,7 @@ public class EventPropertyElement extends BaseElement
 		super.fromJSON(object);
 
 		this.setType(StringUtil.getStringValue(object.get(TYPE_PROPERTY)));
+		this._constants = IndexUtil.createList(object.get(CONSTANTS_PROPERTY));
 	}
 
 	/**
@@ -49,6 +54,16 @@ public class EventPropertyElement extends BaseElement
 	public String getType()
 	{
 		return this._type;
+	}
+
+	/**
+	 * getConstants
+	 * 
+	 * @return
+	 */
+	public List<String> getConstants()
+	{
+		return CollectionsUtil.getListValue(this._constants);
 	}
 
 	/**
@@ -70,6 +85,7 @@ public class EventPropertyElement extends BaseElement
 		super.toJSON(out);
 
 		out.add(TYPE_PROPERTY, this.getType());
+		out.add(CONSTANTS_PROPERTY, this.getConstants());
 	}
 
 	/**

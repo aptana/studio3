@@ -17,8 +17,12 @@ import com.aptana.index.core.IndexUtil;
 import com.aptana.jetty.util.epl.ajax.JSON.Convertible;
 import com.aptana.jetty.util.epl.ajax.JSON.Output;
 
-public class ParameterElement implements Convertible
+public class ParameterElement implements Convertible, IHasPredefinedValues
 {
+	/**
+	 * JSCA Uses "type" holding one String, we used "types" holding a list/array of Strings
+	 */
+	private static final String TYPE = "type"; //$NON-NLS-1$
 	private static final String TYPES_PROPERTY = "types"; //$NON-NLS-1$
 	private static final String DESCRIPTION_PROPERTY = "description"; //$NON-NLS-1$
 	private static final String USAGE_PROPERTY = "usage"; //$NON-NLS-1$
@@ -28,6 +32,7 @@ public class ParameterElement implements Convertible
 	private List<String> _types;
 	private String _usage;
 	private String _description;
+	private List<String> _constants;
 
 	/**
 	 * ParameterElement
@@ -64,11 +69,12 @@ public class ParameterElement implements Convertible
 		this.setName(StringUtil.getStringValue(object.get(NAME_PROPERTY)));
 		this.setUsage(StringUtil.getStringValue(object.get(USAGE_PROPERTY)));
 		this.setDescription(StringUtil.getStringValue(object.get(DESCRIPTION_PROPERTY)));
+		this._constants = IndexUtil.createList(object.get(CONSTANTS_PROPERTY));
 
 		// JSCA contains a single "type" value
-		if (object.containsKey("type"))
+		if (object.containsKey(TYPE))
 		{
-			this._types = CollectionsUtil.newList((String) object.get("type"));
+			this._types = CollectionsUtil.newList((String) object.get(TYPE));
 		}
 		else
 		{
@@ -101,6 +107,16 @@ public class ParameterElement implements Convertible
 	public List<String> getTypes()
 	{
 		return CollectionsUtil.getListValue(this._types);
+	}
+
+	/**
+	 * getConstants
+	 * 
+	 * @return
+	 */
+	public List<String> getConstants()
+	{
+		return CollectionsUtil.getListValue(this._constants);
 	}
 
 	/**
@@ -149,6 +165,7 @@ public class ParameterElement implements Convertible
 		out.add(USAGE_PROPERTY, this.getUsage());
 		out.add(DESCRIPTION_PROPERTY, this.getDescription());
 		out.add(TYPES_PROPERTY, this.getTypes());
+		out.add(CONSTANTS_PROPERTY, this.getConstants());
 	}
 
 	/*
@@ -161,9 +178,6 @@ public class ParameterElement implements Convertible
 		{
 			return "[" + this.getName() + "]"; //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		else
-		{
-			return this.getName();
-		}
+		return this.getName();
 	}
 }

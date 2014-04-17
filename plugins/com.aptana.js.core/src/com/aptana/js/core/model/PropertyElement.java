@@ -20,7 +20,7 @@ import com.aptana.index.core.IndexUtil;
 import com.aptana.jetty.util.epl.ajax.JSON.Output;
 import com.aptana.js.core.JSTypeConstants;
 
-public class PropertyElement extends BaseElement
+public class PropertyElement extends BaseElement implements IHasPredefinedValues
 {
 
 	private static final String EXAMPLES_PROPERTY = "examples"; //$NON-NLS-1$
@@ -36,6 +36,7 @@ public class PropertyElement extends BaseElement
 	private boolean _isInternal;
 	private List<ReturnTypeElement> _types;
 	private List<String> _examples;
+	private List<String> _constants;
 
 	/**
 	 * PropertyElement
@@ -58,6 +59,7 @@ public class PropertyElement extends BaseElement
 		this._isInternal = base.isInternal();
 		this._types = new ArrayList<ReturnTypeElement>(base.getTypes());
 		this._examples = new ArrayList<String>(base.getExamples());
+		this._constants = new ArrayList<String>(base.getConstants());
 	}
 
 	/**
@@ -143,10 +145,7 @@ public class PropertyElement extends BaseElement
 		{
 			return ObjectUtil.areEqual(toSource(), ((PropertyElement) obj).toSource());
 		}
-		else
-		{
-			return super.equals(obj);
-		}
+		return super.equals(obj);
 	}
 
 	/*
@@ -167,6 +166,7 @@ public class PropertyElement extends BaseElement
 
 		this._types = IndexUtil.createList(object.get(TYPES_PROPERTY), ReturnTypeElement.class);
 		this._examples = IndexUtil.createList(object.get(EXAMPLES_PROPERTY));
+		this._constants = IndexUtil.createList(object.get(CONSTANTS_PROPERTY));
 	}
 
 	/**
@@ -177,6 +177,16 @@ public class PropertyElement extends BaseElement
 	public List<String> getExamples()
 	{
 		return CollectionsUtil.getListValue(this._examples);
+	}
+
+	/**
+	 * getConstants
+	 * 
+	 * @return
+	 */
+	public List<String> getConstants()
+	{
+		return CollectionsUtil.getListValue(this._constants);
 	}
 
 	/**
@@ -300,6 +310,7 @@ public class PropertyElement extends BaseElement
 		out.add(IS_INTERNAL_PROPERTY, this.isInternal());
 		out.add(TYPES_PROPERTY, this.getTypes());
 		out.add(EXAMPLES_PROPERTY, this.getExamples());
+		out.add(CONSTANTS_PROPERTY, this.getConstants());
 	}
 
 	/**
