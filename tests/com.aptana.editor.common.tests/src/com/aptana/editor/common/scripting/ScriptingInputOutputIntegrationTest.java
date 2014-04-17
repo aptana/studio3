@@ -24,7 +24,7 @@ import com.aptana.scripting.model.OutputType;
  * 
  * @author cwilliams
  */
-public class ScriptingInputOutputTest extends SingleEditorTestCase
+public class ScriptingInputOutputIntegrationTest extends SingleEditorTestCase
 {
 
 	private static final String PROJECT_NAME = "scripting_io";

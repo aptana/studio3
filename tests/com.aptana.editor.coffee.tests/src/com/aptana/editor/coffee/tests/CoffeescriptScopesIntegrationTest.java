@@ -29,7 +29,7 @@ import com.aptana.editor.epl.tests.EditorTestHelper;
 import com.aptana.ui.util.UIUtils;
 
 @SuppressWarnings({ "nls" })
-public class CoffeescriptScopesTest
+public class CoffeescriptScopesIntegrationTest
 {
 
 	private ITextEditor editor;
