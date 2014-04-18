@@ -1944,12 +1944,12 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	{
 		IMarker marker = breakpoint.getMarker();
 		String exceptionTypeName = marker.getAttribute(IJSDebugConstants.EXCEPTION_TYPE_NAME, StringUtil.EMPTY);
-		IdeLog.logInfo(DebugCorePlugin.getDefault(),
-				MessageFormat.format("Adding exception breakpoint for {0}", marker.getResource()), IDebugScopes.DEBUG);
 		if (exceptionTypeName == null || exceptionTypeName.length() == 0)
 		{
 			return;
 		}
+		IdeLog.logInfo(DebugCorePlugin.getDefault(), MessageFormat.format("Adding {0} exception breakpoint for {1}",
+				exceptionTypeName, marker.getResource()), IDebugScopes.DEBUG);
 
 		boolean enabled = false;
 		try
