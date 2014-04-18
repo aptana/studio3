@@ -23,6 +23,7 @@ import org.eclipse.debug.core.model.IThread;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.sourcemap.ISourceMapResult;
 import com.aptana.core.util.StringUtil;
+import com.aptana.debug.core.DebugCorePlugin;
 import com.aptana.js.debug.core.JSDebugPlugin;
 import com.aptana.js.debug.core.internal.Util;
 import com.aptana.js.debug.core.model.IJSLineBreakpoint;
@@ -30,7 +31,8 @@ import com.aptana.js.debug.core.model.IJSLineBreakpoint;
 /**
  * @author Max Stepanov
  */
-public class JSDebugThread extends JSDebugElement implements IThread {
+public class JSDebugThread extends JSDebugElement implements IThread
+{
 
 	protected static final String SUSPENDED = "suspended"; //$NON-NLS-1$
 	private static final String SUSPEND = "suspend"; //$NON-NLS-1$
@@ -59,7 +61,8 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 	private static final String STEP_TO_FRAME_0 = "stepToFrame*{1,number,integer}"; //$NON-NLS-1$
 	private static final String STEP_TO_FRAME_0_V2 = "stepToFrame*{0}*{1,number,integer}"; //$NON-NLS-1$
 
-	private enum State {
+	private enum State
+	{
 		STARTING, RUNNING, SUSPENDED, SUSPENDING, STEPPPING
 	}
 
@@ -78,7 +81,8 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 	 * 
 	 * @param target
 	 */
-	public JSDebugThread(IDebugTarget target, String threadId, String label) {
+	public JSDebugThread(IDebugTarget target, String threadId, String label)
+	{
 		super(target);
 		this.threadId = threadId;
 		this.label = label;
@@ -87,8 +91,10 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 	/*
 	 * @see org.eclipse.debug.core.model.IThread#getStackFrames()
 	 */
-	public IStackFrame[] getStackFrames() throws DebugException {
-		if (!isSuspended()) {
+	public IStackFrame[] getStackFrames() throws DebugException
+	{
+		if (!isSuspended())
+		{
 			return emptyStack;
 		}
 		getStackFrames0();
@@ -98,8 +104,10 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 	/*
 	 * @see org.eclipse.debug.core.model.IThread#hasStackFrames()
 	 */
-	public boolean hasStackFrames() throws DebugException {
-		if (!isSuspended()) {
+	public boolean hasStackFrames() throws DebugException
+	{
+		if (!isSuspended())
+		{
 			return false;
 		}
 		getStackFrames0();
@@ -109,15 +117,18 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 	/*
 	 * @see org.eclipse.debug.core.model.IThread#getPriority()
 	 */
-	public int getPriority() throws DebugException {
+	public int getPriority() throws DebugException
+	{
 		return 0;
 	}
 
 	/*
 	 * @see org.eclipse.debug.core.model.IThread#getTopStackFrame()
 	 */
-	public IStackFrame getTopStackFrame() throws DebugException {
-		if (!isSuspended()) {
+	public IStackFrame getTopStackFrame() throws DebugException
+	{
+		if (!isSuspended())
+		{
 			return null;
 		}
 		getStackFrames0();
@@ -127,7 +138,8 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 	/*
 	 * @see org.eclipse.debug.core.model.IThread#getName()
 	 */
-	public String getName() throws DebugException {
+	public String getName() throws DebugException
+	{
 		String name = (label != null) ? label
 				: (threadId == JSDebugTarget.DEFAULT_THREAD_ID) ? Messages.JSDebugThread_main_label : threadId;
 		return MessageFormat.format(Messages.JSDebugThread_Thread_Label, name,
@@ -138,36 +150,42 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 	/*
 	 * @see org.eclipse.debug.core.model.IThread#getBreakpoints()
 	 */
-	public IBreakpoint[] getBreakpoints() {
+	public IBreakpoint[] getBreakpoints()
+	{
 		return isSuspended() && breakpoints != null ? breakpoints : emptyBreakpoints;
 	}
 
 	/*
 	 * @see org.eclipse.debug.core.model.ISuspendResume#canResume()
 	 */
-	public boolean canResume() {
+	public boolean canResume()
+	{
 		return isSuspended();
 	}
 
 	/*
 	 * @see org.eclipse.debug.core.model.ISuspendResume#canSuspend()
 	 */
-	public boolean canSuspend() {
+	public boolean canSuspend()
+	{
 		return !isSuspended() && runningState != State.STARTING;
 	}
 
 	/*
 	 * @see org.eclipse.debug.core.model.ISuspendResume#isSuspended()
 	 */
-	public boolean isSuspended() {
+	public boolean isSuspended()
+	{
 		return runningState == State.SUSPENDED;
 	}
 
 	/*
 	 * @see org.eclipse.debug.core.model.ISuspendResume#resume()
 	 */
-	public void resume() throws DebugException {
-		if (runningState != State.SUSPENDED) {
+	public void resume() throws DebugException
+	{
+		if (runningState != State.SUSPENDED)
+		{
 			return;
 		}
 		runningState = State.STEPPPING;
@@ -180,8 +198,10 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 	/*
 	 * @see org.eclipse.debug.core.model.ISuspendResume#suspend()
 	 */
-	public void suspend() throws DebugException {
-		if (runningState != State.RUNNING) {
+	public void suspend() throws DebugException
+	{
+		if (runningState != State.RUNNING)
+		{
 			return;
 		}
 		runningState = State.SUSPENDING;
@@ -194,36 +214,42 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 	/*
 	 * @see org.eclipse.debug.core.model.IStep#canStepInto()
 	 */
-	public boolean canStepInto() {
+	public boolean canStepInto()
+	{
 		return isSuspended() && !isStepping();
 	}
 
 	/*
 	 * @see org.eclipse.debug.core.model.IStep#canStepOver()
 	 */
-	public boolean canStepOver() {
+	public boolean canStepOver()
+	{
 		return isSuspended() && !isStepping();
 	}
 
 	/*
 	 * @see org.eclipse.debug.core.model.IStep#canStepReturn()
 	 */
-	public boolean canStepReturn() {
+	public boolean canStepReturn()
+	{
 		return isSuspended() && !isStepping();
 	}
 
 	/*
 	 * @see org.eclipse.debug.core.model.IStep#isStepping()
 	 */
-	public boolean isStepping() {
+	public boolean isStepping()
+	{
 		return runningState == State.STEPPPING;
 	}
 
 	/*
 	 * @see org.eclipse.debug.core.model.IStep#stepInto()
 	 */
-	public void stepInto() throws DebugException {
-		if (runningState != State.SUSPENDED) {
+	public void stepInto() throws DebugException
+	{
+		if (runningState != State.SUSPENDED)
+		{
 			return;
 		}
 		runningState = State.STEPPPING;
@@ -236,8 +262,10 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 	/*
 	 * @see org.eclipse.debug.core.model.IStep#stepOver()
 	 */
-	public void stepOver() throws DebugException {
-		if (runningState != State.SUSPENDED) {
+	public void stepOver() throws DebugException
+	{
+		if (runningState != State.SUSPENDED)
+		{
 			return;
 		}
 		runningState = State.STEPPPING;
@@ -250,8 +278,10 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 	/*
 	 * @see org.eclipse.debug.core.model.IStep#stepReturn()
 	 */
-	public void stepReturn() throws DebugException {
-		if (runningState != State.SUSPENDED) {
+	public void stepReturn() throws DebugException
+	{
+		if (runningState != State.SUSPENDED)
+		{
 			return;
 		}
 		runningState = State.STEPPPING;
@@ -265,85 +295,123 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 	/*
 	 * @see org.eclipse.debug.core.model.ITerminate#canTerminate()
 	 */
-	public boolean canTerminate() {
+	public boolean canTerminate()
+	{
 		return getDebugTarget().canTerminate();
 	}
 
 	/*
 	 * @see org.eclipse.debug.core.model.ITerminate#isTerminated()
 	 */
-	public boolean isTerminated() {
+	public boolean isTerminated()
+	{
 		return getDebugTarget().isTerminated();
 	}
 
 	/*
 	 * @see org.eclipse.debug.core.model.ITerminate#terminate()
 	 */
-	public void terminate() throws DebugException {
+	public void terminate() throws DebugException
+	{
 		getDebugTarget().terminate();
 	}
 
-	/* package */void handleMessage(String[] args) {
+	/* package */void handleMessage(String[] args)
+	{
 		String action = args[0];
 		int details = DebugEvent.UNSPECIFIED;
-		if (SUSPENDED.equals(action)) {
+		if (SUSPENDED.equals(action))
+		{
 			invalidateStackFrames();
 			runningState = State.SUSPENDED;
 			breakpoints = null;
 			String reason = args[1];
 			if (BREAKPOINT.equals(reason) || KEYWORD.equals(reason) || FIRST_LINE.equals(reason)
-					|| EXCEPTION.equals(reason) || WATCHPOINT.equals(reason)) {
+					|| EXCEPTION.equals(reason) || WATCHPOINT.equals(reason))
+			{
 				details = DebugEvent.BREAKPOINT;
 				stackFrames = null;
 				/* find breakpoint(s) */
 				URI sourceFile = getJSDebugTarget().resolveSourceFile(Util.decodeData(args[2]));
-				try {
-					if (BREAKPOINT.equals(reason)) {
+				try
+				{
+					if (BREAKPOINT.equals(reason))
+					{
 						breakpointHit(sourceFile, Integer.parseInt(args[3]));
-					} else {
+					}
+					else
+					{
 						JSDebugImplicitBreakpoint.Type type = null;
-						if (KEYWORD.equals(reason)) {
+						if (KEYWORD.equals(reason))
+						{
 							type = JSDebugImplicitBreakpoint.Type.DEBUGGER_KEYWORD;
-						} else if (FIRST_LINE.equals(reason)) {
+						}
+						else if (FIRST_LINE.equals(reason))
+						{
 							type = JSDebugImplicitBreakpoint.Type.FIRST_LINE;
-						} else if (EXCEPTION.equals(reason)) {
+						}
+						else if (EXCEPTION.equals(reason))
+						{
 							type = JSDebugImplicitBreakpoint.Type.EXCEPTION;
-						} else if (WATCHPOINT.equals(reason)) {
+						}
+						else if (WATCHPOINT.equals(reason))
+						{
 							type = JSDebugImplicitBreakpoint.Type.WATCHPOINT;
 						}
 						implicitBreakpointHit(sourceFile, Integer.parseInt(args[3]), type);
 					}
-				} catch (NumberFormatException e) {
 				}
-			} else if (reason.startsWith(STEP)) {
+				catch (NumberFormatException e)
+				{
+				}
+			}
+			else if (reason.startsWith(STEP))
+			{
 				details = DebugEvent.STEP_END;
-			} else {
+			}
+			else
+			{
 				details = DebugEvent.CLIENT_REQUEST;
 				stackFrames = null;
 			}
 
 			fireSuspendEvent(details);
 			fireChangeEvent(DebugEvent.STATE);
-		} else if (RESUMED.equals(action)) {
+		}
+		else if (RESUMED.equals(action))
+		{
 			String reason = args[1];
-			if (STEP_INTO.equals(reason)) {
+			if (STEP_INTO.equals(reason))
+			{
 				details = DebugEvent.STEP_INTO;
-			} else if (STEP_OVER.equals(reason)) {
+			}
+			else if (STEP_OVER.equals(reason))
+			{
 				details = DebugEvent.STEP_OVER;
-			} else if (STEP_RETURN.equals(reason) || STEP_TO_FRAME.equals(reason)) {
+			}
+			else if (STEP_RETURN.equals(reason) || STEP_TO_FRAME.equals(reason))
+			{
 				details = DebugEvent.STEP_RETURN;
-			} else if (RESUME.equals(reason)) {
+			}
+			else if (RESUME.equals(reason))
+			{
 				details = DebugEvent.CLIENT_REQUEST;
 				runningState = State.RUNNING;
-			} else if (ABORT.equals(reason) || START.equals(reason)) {
+			}
+			else if (ABORT.equals(reason) || START.equals(reason))
+			{
 				details = DebugEvent.UNSPECIFIED;
 				runningState = State.RUNNING;
-			} else {
+			}
+			else
+			{
 				runningState = State.RUNNING;
 			}
-			if (reason.startsWith(STEP)) {
+			if (reason.startsWith(STEP))
+			{
 				/* top-level frame */
-				if (stackFrames != null && stackFrames.length == 1) {
+				if (stackFrames != null && stackFrames.length == 1)
+				{
 					details = DebugEvent.CLIENT_REQUEST;
 				}
 			}
@@ -352,8 +420,10 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 		}
 	}
 
-	/* package */void stepToFrame(IStackFrame frame) throws DebugException {
-		if (runningState != State.SUSPENDED) {
+	/* package */void stepToFrame(IStackFrame frame) throws DebugException
+	{
+		if (runningState != State.SUSPENDED)
+		{
 			return;
 		}
 		int targetFrameId = ((JSDebugStackFrame) frame).getFrameId();
@@ -365,26 +435,35 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 		target.getConnection().sendCommand(command);
 	}
 
-	/* package */boolean isInSuspendState() {
+	/* package */boolean isInSuspendState()
+	{
 		return runningState == State.SUSPENDED || runningState == State.SUSPENDING;
 	}
 
-	/* package */String getThreadId() {
+	/* package */String getThreadId()
+	{
 		return threadId;
 	}
 
-	private JSDebugTarget getJSDebugTarget() {
+	private JSDebugTarget getJSDebugTarget()
+	{
 		return (JSDebugTarget) getDebugTarget();
 	}
 
-	private void breakpointHit(URI filename, int lineNumber) {
+	private void breakpointHit(URI filename, int lineNumber)
+	{
 		IBreakpoint breakpoint = getJSDebugTarget().findBreakpointAt(filename, lineNumber);
-		if (breakpoint != null && breakpoint instanceof IJSLineBreakpoint) {
-			try {
-				if (((IJSLineBreakpoint) breakpoint).getHitCount() > 0) {
+		if (breakpoint != null && breakpoint instanceof IJSLineBreakpoint)
+		{
+			try
+			{
+				if (((IJSLineBreakpoint) breakpoint).getHitCount() > 0)
+				{
 					breakpoint.setEnabled(false);
 				}
-			} catch (CoreException e) {
+			}
+			catch (CoreException e)
+			{
 				JSDebugPlugin.log(e);
 			}
 		}
@@ -392,36 +471,47 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 		// TODO: where to find runToLine breakpoint ?
 	}
 
-	private void implicitBreakpointHit(URI filename, int line, JSDebugImplicitBreakpoint.Type type) {
+	private void implicitBreakpointHit(URI filename, int line, JSDebugImplicitBreakpoint.Type type)
+	{
 		/* TODO: use project-related path ? */
 		breakpoints = new IBreakpoint[] { new JSDebugImplicitBreakpoint(filename, line, type) };
 	}
 
-	private synchronized void getStackFrames0() throws DebugException {
-		if (!validateFrames && stackFrames != null) {
+	private synchronized void getStackFrames0() throws DebugException
+	{
+		if (!validateFrames && stackFrames != null)
+		{
 			return;
 		}
 		JSDebugTarget target = getJSDebugTarget();
 		String command = MessageFormat.format(target.getProtocolVersion() >= 2 ? FRAMES_V2 : FRAMES, threadId);
 		String[] args = target.getConnection().sendCommandAndWait(command);
-		if (args != null) {
+		if (args != null)
+		{
 			Vector<IStackFrame> frames = new Vector<IStackFrame>();
 			int frameIndex = (stackFrames != null) ? stackFrames.length - 1 : -1;
-			for (int i = args.length - 1; i >= 1; --i) {
+			for (int i = args.length - 1; i >= 1; --i)
+			{
 				int j = 0;
 				String[] subargs = args[i].split(SUBARGS_SPLIT);
 				int depth = Integer.parseInt(subargs[j++]);
 				String function = Util.decodeData(subargs[j++]);
 				String arguments = Util.decodeData(subargs[j++]);
-				if (function.length() == 0) {
+				if (function.length() == 0)
+				{
 					function = MessageFormat.format("[{0}]", //$NON-NLS-1$
 							i == args.length - 1 ? Messages.JSDebugTarget_TopLevelScript
 									: Messages.JSDebugTarget_EvalScript);
-				} else {
+				}
+				else
+				{
 					function += MessageFormat.format("({0})", arguments); //$NON-NLS-1$
 				}
 				URI sourceFile = target.resolveSourceFile(Util.decodeData(subargs[j++]));
 				int sourceLine = Integer.parseInt(subargs[j++]);
+				IdeLog.logInfo(DebugCorePlugin.getDefault(), MessageFormat.format(
+						"Stack traces requesting original mapped location for {0}:{1}", sourceFile, sourceLine),
+						com.aptana.debug.core.IDebugScopes.DEBUG);
 				ISourceMapResult sourceMapResult = target.getOriginalMappedLocation(sourceFile, sourceLine);
 				if (sourceMapResult != null)
 				{
@@ -441,23 +531,33 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 				long pc = Long.parseLong(subargs[j++]);
 				int scriptTag = Integer.parseInt(subargs[j++]);
 				IStackFrame frame = null;
-				if (frameIndex >= 0) {
+				if (frameIndex >= 0)
+				{
 					JSDebugStackFrame oldFrame = (JSDebugStackFrame) stackFrames[frameIndex];
-					if ((oldFrame.scriptTag == scriptTag) && (oldFrame.pc == pc)) {
+					if ((oldFrame.scriptTag == scriptTag) && (oldFrame.pc == pc))
+					{
 						/* update depth */
 						oldFrame.invalidate(depth, sourceLine, pc);
 						frame = oldFrame;
 						--frameIndex;
-					} else if (oldFrame.scriptTag == scriptTag) {
+					}
+					else if (oldFrame.scriptTag == scriptTag)
+					{
 						// update line/pc
 						oldFrame.invalidate(depth, sourceLine, pc);
 						frameIndex = -1;
-					} else {
+					}
+					else
+					{
 						frameIndex = -1;
 					}
 				}
-				if (frame == null) {
+				if (frame == null)
+				{
 					frame = new JSDebugStackFrame(target, this, depth, function, sourceFile, sourceLine, pc, scriptTag);
+					IdeLog.logInfo(DebugCorePlugin.getDefault(),
+							MessageFormat.format("Adding Debug stack frame for {0}:{1}", sourceFile, sourceLine),
+							com.aptana.debug.core.IDebugScopes.DEBUG);
 				}
 				frames.add(0, frame);
 			}
@@ -466,9 +566,12 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 		}
 	}
 
-	private synchronized void invalidateStackFrames() {
-		if (stackFrames != null) {
-			for (IStackFrame stackFrame : stackFrames) {
+	private synchronized void invalidateStackFrames()
+	{
+		if (stackFrames != null)
+		{
+			for (IStackFrame stackFrame : stackFrames)
+			{
 				((JSDebugStackFrame) stackFrame).invalidate();
 			}
 		}

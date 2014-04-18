@@ -250,7 +250,12 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 
 						public void run(IProgressMonitor monitor) throws CoreException
 						{
-							sample.createNewProject(project, projectData, monitor);
+							IStatus status = sample.createNewProject(project, projectData, monitor);
+							if (status != null && !status.isOK())
+							{
+								IdeLog.logError(SamplesUIPlugin.getDefault(), status.getMessage(),
+										status.getException());
+							}
 						}
 					};
 					ResourcesPlugin.getWorkspace().run(runnable, monitor);
