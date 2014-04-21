@@ -87,10 +87,10 @@ public class JiraProjectsRegistry
 		return projectProviderInfo;
 	}
 
-	public class JiraProjectInfo
+	public static class JiraProjectInfo
 	{
-		String projectName;
-		String projectCode;
+		final String projectName;
+		final String projectCode;
 
 		public JiraProjectInfo(String projectName, String projectCode)
 		{
