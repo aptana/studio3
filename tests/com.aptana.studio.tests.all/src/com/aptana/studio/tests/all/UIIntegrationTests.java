@@ -15,6 +15,7 @@ import com.aptana.editor.common.internal.commands.ExpandCollapseAllHandlerTest;
 import com.aptana.editor.common.internal.commands.NextPreviousEditorHandlerTest;
 import com.aptana.editor.common.scripting.ScriptingInputOutputIntegrationTest;
 import com.aptana.editor.html.contentassist.HTMLContentAssistProcessorIntegrationTest;
+import com.aptana.jira.core.JiraManagerIntegrationTest;
 
 @RunWith(StdErrLoggingSuite.class)
 // @formatter:off
@@ -24,6 +25,7 @@ import com.aptana.editor.html.contentassist.HTMLContentAssistProcessorIntegratio
 	com.aptana.editor.coffee.tests.IntegrationTests.class,
 	com.aptana.editor.css.tests.IntegrationTests.class,
 	com.aptana.editor.js.tests.IntegrationTests.class,
+	JiraManagerIntegrationTest.class,
 //	// Now add special test cases which require to be run after all plugins are loaded (dependency inversion in
 //	// test)
 //	// require HTML editor to have outline contents to test common editor commands
