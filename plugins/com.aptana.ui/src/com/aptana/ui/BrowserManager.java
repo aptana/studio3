@@ -74,8 +74,7 @@ public class BrowserManager implements IBrowserProvider
 	 */
 	public Collection<BrowserInfo> searchMoreBrowsers()
 	{
-		org.eclipse.ui.internal.browser.BrowserManager eclipseBrowserManager = org.eclipse.ui.internal.browser.BrowserManager
-				.getInstance();
+		org.eclipse.ui.internal.browser.BrowserManager eclipseBrowserManager = getEclipseBrowserManager();
 		List<IBrowserDescriptor> webBrowsers = eclipseBrowserManager.getWebBrowsers();
 		Set<String> currentBrowsers = new HashSet<String>();
 		for (IBrowserDescriptor iBrowserDescriptor : webBrowsers)
@@ -114,18 +113,26 @@ public class BrowserManager implements IBrowserProvider
 		return browsersFound;
 	}
 
+	protected org.eclipse.ui.internal.browser.BrowserManager getEclipseBrowserManager()
+	{
+		return org.eclipse.ui.internal.browser.BrowserManager.getInstance();
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.ui.IBrowserProvider#getWebBrowsers()
 	 */
 	public List<BrowserInfo> getWebBrowsers()
 	{
-		List<IBrowserDescriptor> webBrowsers = org.eclipse.ui.internal.browser.BrowserManager.getInstance()
-				.getWebBrowsers();
+		List<IBrowserDescriptor> webBrowsers = getEclipseBrowserManager().getWebBrowsers();
 		return CollectionsUtil.map(webBrowsers, new IMap<IBrowserDescriptor, BrowserInfo>()
 		{
 			public BrowserInfo map(IBrowserDescriptor browser)
 			{
+				if (browser == null)
+				{
+					return null;
+				}
 				return new BrowserInfo(browser.getName(), browser.getLocation());
 			}
 		});
@@ -137,8 +144,11 @@ public class BrowserManager implements IBrowserProvider
 	 */
 	public BrowserInfo getCurrentWebBrowser()
 	{
-		IBrowserDescriptor currentWebBrowser = org.eclipse.ui.internal.browser.BrowserManager.getInstance()
-				.getCurrentWebBrowser();
+		IBrowserDescriptor currentWebBrowser = getEclipseBrowserManager().getCurrentWebBrowser();
+		if (currentWebBrowser == null)
+		{
+			return null;
+		}
 		return new BrowserInfo(currentWebBrowser.getName(), currentWebBrowser.getLocation());
 	}
 
