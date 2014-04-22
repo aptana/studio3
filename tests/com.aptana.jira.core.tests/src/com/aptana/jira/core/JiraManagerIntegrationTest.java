@@ -4,7 +4,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,26 +49,4 @@ public class JiraManagerIntegrationTest
 		assertFalse("User is able to log into JIRA with an invalid password", status.isOK());
 	}
 
-	/**
-	 * For manual testing/debugging of creating issues!
-	 */
-	// @Test
-	// public void testCreateIssue() throws Exception
-	// {
-	// manager.login(TEST_USER, TEST_PASSWORD);
-	// JiraIssue issue = manager.createIssue(JiraIssueType.BUG, JiraIssueSeverity.TRIVIAL,
-	// "Testing creating an issue", "This is a test");
-	// System.out.println(issue.getUrl());
-	// }
-
-	/**
-	 * For manual testing/debugging of attachments!
-	 */
-	@Test
-	public void testAttachFile() throws JiraException
-	{
-		manager.login(TEST_USER, TEST_PASSWORD);
-		manager.addAttachment(Path.fromOSString("/Users/cwilliams/Documents/debug.txt"), new JiraIssue("TC-4030", "something",
-				"http://jira.appcelerator.org/browse/TC-4030"));
-	}
 }
