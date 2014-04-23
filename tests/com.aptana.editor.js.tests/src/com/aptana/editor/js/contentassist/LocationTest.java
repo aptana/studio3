@@ -122,7 +122,8 @@ public class LocationTest
 			new LocationTypeRange(LocationType.NONE, 1, 15),
 			new LocationTypeRange(LocationType.IN_GLOBAL, 16, 20),
 			new LocationTypeRange(LocationType.IN_VARIABLE_NAME, 21, 23),
-			new LocationTypeRange(LocationType.IN_GLOBAL, 24, 25)
+			new LocationTypeRange(LocationType.IN_ARGUMENTS, 24),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 25)
 		);
 	}
 
@@ -135,9 +136,10 @@ public class LocationTest
 			new LocationTypeRange(LocationType.NONE, 1, 15),
 			new LocationTypeRange(LocationType.IN_GLOBAL, 16, 20),
 			new LocationTypeRange(LocationType.IN_VARIABLE_NAME, 21, 23),
-			new LocationTypeRange(LocationType.IN_GLOBAL, 24),
+			new LocationTypeRange(LocationType.IN_ARGUMENTS, 24),
 			new LocationTypeRange(LocationType.NONE, 25, 31),
-			new LocationTypeRange(LocationType.IN_GLOBAL, 32, 33)
+			new LocationTypeRange(LocationType.IN_ARGUMENTS, 32),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 33)
 		);
 	}
 	
@@ -532,7 +534,9 @@ public class LocationTest
 			"locations/group.js",
 			new LocationTypeRange(LocationType.IN_GLOBAL, 0, 1),
 			new LocationTypeRange(LocationType.NONE, 2, 12),
-			new LocationTypeRange(LocationType.IN_GLOBAL, 13, 20)
+			new LocationTypeRange(LocationType.IN_GLOBAL, 13, 16),
+			new LocationTypeRange(LocationType.IN_ARGUMENTS, 17),
+			new LocationTypeRange(LocationType.IN_GLOBAL, 18, 20)
 		);
 	}
 

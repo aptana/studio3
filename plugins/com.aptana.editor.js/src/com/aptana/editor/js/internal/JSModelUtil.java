@@ -71,7 +71,7 @@ public class JSModelUtil
 				break;
 
 			case IN_OBJECT_LITERAL_PROPERTY:
-			case IN_PARAMETERS:
+			case IN_ARGUMENTS:
 			case IN_LABEL:
 			case UNKNOWN:
 			case NONE:
