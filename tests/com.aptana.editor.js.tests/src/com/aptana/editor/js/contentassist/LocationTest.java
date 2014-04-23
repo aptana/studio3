@@ -8,15 +8,49 @@
 package com.aptana.editor.js.contentassist;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
+import java.io.IOException;
 import java.text.MessageFormat;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.IDocument;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
-import com.aptana.editor.js.tests.JSEditorBasedTestCase;
+import com.aptana.core.util.IOUtil;
 
-public class LocationTest extends JSEditorBasedTestCase
+public class LocationTest
 {
+	private JSContentAssistProcessor processor;
+	private IDocument document;
+	private String source;
+
+	@Before
+	public void setup()
+	{
+		processor = new JSContentAssistProcessor(null)
+		{
+			@Override
+			protected IDocument getDocument()
+			{
+				return document;
+			}
+		};
+	}
+
+	@After
+	public void teardown()
+	{
+		processor = null;
+		document = null;
+		source = null;
+	}
+
 	private static class LocationTypeRange
 	{
 		public final LocationType location;
@@ -45,34 +79,42 @@ public class LocationTest extends JSEditorBasedTestCase
 	 */
 	protected void testLocations(String resource, LocationTypeRange... ranges)
 	{
-		// setup everything for the test
-		this.setupTestContext(resource);
 
-		for (LocationTypeRange range : ranges)
+		try
 		{
-			for (int offset = range.startingOffset; offset <= range.endingOffset; offset++)
+			// setup everything for the test
+			this.source = IOUtil.read(FileLocator.openStream(Platform.getBundle("com.aptana.editor.js.tests"),
+					Path.fromPortableString(resource), false));
+			this.document = new Document(this.source);
+
+			for (LocationTypeRange range : ranges)
 			{
-				LocationType location = this.processor.getLocationType(this.document, offset);
-				// @formatter:off
-				String message = MessageFormat.format(
-					"Expected {0} at location {1} of ''{2}'': character = ''{3}''",
-					range.location.toString(),
-					Integer.toString(offset),
-					this.source,
-					(offset < this.source.length()) ? this.source.charAt(offset) : '\0'
-				);
-				// @formatter:on
-				assertEquals(message, range.location, location);
+				for (int offset = range.startingOffset; offset <= range.endingOffset; offset++)
+				{
+					LocationType location = this.processor.getLocationType(this.document, offset);
+					// @formatter:off
+					String message = MessageFormat.format(
+						"Expected {0} at location {1} of ''{2}'': character = ''{3}''",
+						range.location.toString(),
+						Integer.toString(offset),
+						this.source,
+						(offset < this.source.length()) ? this.source.charAt(offset) : '\0'
+					);
+					// @formatter:on
+					assertEquals(message, range.location, location);
+				}
 			}
+		}
+		catch (IOException e)
+		{
+			fail(e.getMessage());
 		}
 	}
 
 	// @formatter:off
 	
-	/**
-	 * testInvokeWithoutParams
-	 */
-	@Test public void testInvokeWithoutParams()
+	@Test
+	public void testInvokeWithoutParams()
 	{
 		this.testLocations(
 			"locations/functionAndInvokeWithoutParams.js",
@@ -83,11 +125,9 @@ public class LocationTest extends JSEditorBasedTestCase
 			new LocationTypeRange(LocationType.IN_GLOBAL, 24, 25)
 		);
 	}
-	
-	/**
-	 * testInvokeWithIncompleteParams
-	 */
-	@Test public void testInvokeWithIncompleteParams()
+
+	@Test
+	public void testInvokeWithIncompleteParams()
 	{
 		this.testLocations(
 			"locations/functionAndInvokeWithIncompleteParams.js",
@@ -101,10 +141,8 @@ public class LocationTest extends JSEditorBasedTestCase
 		);
 	}
 	
-	/**
-	 * testSimpleAssignment1
-	 */
-	@Test public void testSimpleAssignment1()
+	@Test
+	public void testSimpleAssignment1()
 	{
 		this.testLocations(
 			"locations/simpleAssignment1.js",
@@ -116,10 +154,8 @@ public class LocationTest extends JSEditorBasedTestCase
 		);
 	}
 	
-	/**
-	 * testSimpleAssignment2
-	 */
-	@Test public void testSimpleAssignment2()
+	@Test
+	public void testSimpleAssignment2()
 	{
 		this.testLocations(
 			"locations/simpleAssignment2.js",
@@ -131,10 +167,8 @@ public class LocationTest extends JSEditorBasedTestCase
 		);
 	}
 	
-	/**
-	 * testSimpleBinaryOperator1
-	 */
-	@Test public void testSimpleBinaryOperator1()
+	@Test
+	public void testSimpleBinaryOperator1()
 	{
 		this.testLocations(
 			"locations/simpleBinaryOperator1.js",
@@ -147,10 +181,8 @@ public class LocationTest extends JSEditorBasedTestCase
 		);
 	}
 	
-	/**
-	 * testSimpleBinaryOperator2
-	 */
-	@Test public void testSimpleBinaryOperator2()
+	@Test
+	public void testSimpleBinaryOperator2()
 	{
 		this.testLocations(
 			"locations/simpleBinaryOperator2.js",
@@ -164,10 +196,8 @@ public class LocationTest extends JSEditorBasedTestCase
 		);
 	}
 	
-	/**
-	 * testGetSimpleProperty1
-	 */
-	@Test public void testGetSimpleProperty1()
+	@Test
+	public void testGetSimpleProperty1()
 	{
 		this.testLocations(
 			"locations/simpleGetProperty1.js",
@@ -181,10 +211,8 @@ public class LocationTest extends JSEditorBasedTestCase
 		);
 	}
 	
-	/**
-	 * testSimpleGetProperty2
-	 */
-	@Test public void testSimpleGetProperty2()
+	@Test
+	public void testSimpleGetProperty2()
 	{
 		this.testLocations(
 			"locations/simpleGetProperty2.js",
@@ -200,10 +228,8 @@ public class LocationTest extends JSEditorBasedTestCase
 		);
 	}
 	
-	/**
-	 * testSimpleGetElement1
-	 */
-	@Test public void testSimpleGetElement1()
+	@Test
+	public void testSimpleGetElement1()
 	{
 		this.testLocations(
 			"locations/simpleGetElement1.js",
@@ -217,10 +243,8 @@ public class LocationTest extends JSEditorBasedTestCase
 		);
 	}
 	
-	/**
-	 * testSimpleGetElement2
-	 */
-	@Test public void testSimpleGetElement2()
+	@Test
+	public void testSimpleGetElement2()
 	{
 		this.testLocations(
 			"locations/simpleGetElement2.js",
@@ -234,10 +258,8 @@ public class LocationTest extends JSEditorBasedTestCase
 		);
 	}
 	
-	/**
-	 * testTryCatchFinally
-	 */
-	@Test public void testTryCatchFinally()
+	@Test
+	public void testTryCatchFinally()
 	{
 		this.testLocations(
 			"locations/tryCatchFinally.js",
@@ -250,11 +272,9 @@ public class LocationTest extends JSEditorBasedTestCase
 			new LocationTypeRange(LocationType.IN_GLOBAL, 33, 36)
 		);
 	}
-	
-	/**
-	 * testConditional
-	 */
-	@Test public void testConditional()
+
+	@Test
+	public void testConditional()
 	{
 		this.testLocations(
 			"locations/conditional.js",
@@ -273,11 +293,9 @@ public class LocationTest extends JSEditorBasedTestCase
 			new LocationTypeRange(LocationType.IN_GLOBAL, 22, 23)
 		);
 	}
-	
-	/**
-	 * testNew
-	 */
-	@Test public void testNew()
+
+	@Test
+	public void testNew()
 	{
 		this.testLocations(
 			"locations/new.js",
@@ -290,11 +308,9 @@ public class LocationTest extends JSEditorBasedTestCase
 			new LocationTypeRange(LocationType.IN_GLOBAL, 10, 11)
 		);
 	}
-	
-	/**
-	 * testVar1
-	 */
-	@Test public void testVar1()
+
+	@Test
+	public void testVar1()
 	{
 		this.testLocations(
 			"locations/var1.js",
@@ -304,11 +320,9 @@ public class LocationTest extends JSEditorBasedTestCase
 			new LocationTypeRange(LocationType.IN_GLOBAL, 8, 9)
 		);
 	}
-	
-	/**
-	 * testVar2
-	 */
-	@Test public void testVar2()
+
+	@Test
+	public void testVar2()
 	{
 		this.testLocations(
 			"locations/var2.js",
@@ -320,11 +334,9 @@ public class LocationTest extends JSEditorBasedTestCase
 			new LocationTypeRange(LocationType.IN_GLOBAL, 13, 14)
 		);
 	}
-	
-	/**
-	 * testVar3
-	 */
-	@Test public void testVar3()
+
+	@Test
+	public void testVar3()
 	{
 		this.testLocations(
 			"locations/var3.js",
@@ -337,11 +349,9 @@ public class LocationTest extends JSEditorBasedTestCase
 			new LocationTypeRange(LocationType.IN_GLOBAL, 13, 14)
 		);
 	}
-	
-	/**
-	 * testDo
-	 */
-	@Test public void testDo()
+
+	@Test
+	public void testDo()
 	{
 		this.testLocations(
 			"locations/do.js",
@@ -354,11 +364,9 @@ public class LocationTest extends JSEditorBasedTestCase
 			new LocationTypeRange(LocationType.IN_GLOBAL, 19, 20)
 		);
 	}
-	
-	/**
-	 * testForIn
-	 */
-	@Test public void testForIn()
+
+	@Test
+	public void testForIn()
 	{
 		this.testLocations(
 			"locations/forIn.js",
@@ -372,11 +380,9 @@ public class LocationTest extends JSEditorBasedTestCase
 			new LocationTypeRange(LocationType.IN_GLOBAL, 20, 22)
 		);
 	}
-	
-	/**
-	 * testFor
-	 */
-	@Test public void testFor()
+
+	@Test
+	public void testFor()
 	{
 		this.testLocations(
 			"locations/for.js",
@@ -396,11 +402,9 @@ public class LocationTest extends JSEditorBasedTestCase
 			new LocationTypeRange(LocationType.IN_GLOBAL, 30, 33)
 		);
 	}
-	
-	/**
-	 * testIf
-	 */
-	@Test public void testIf()
+
+	@Test
+	public void testIf()
 	{
 		this.testLocations(
 			"locations/if.js",
@@ -414,21 +418,17 @@ public class LocationTest extends JSEditorBasedTestCase
 		);
 	}
 
-	/**
-	 * testIfAtEOF
-	 */
-	@Test public void testIfAtEOF()
+	@Test
+	public void testIfAtEOF()
 	{
 		this.testLocations(
 			"locations/if-eof.js",
 			new LocationTypeRange(LocationType.IN_PROPERTY_NAME, 21)
 		);
 	}
-	
-	/**
-	 * testLabelledFor
-	 */
-	@Test public void testLabelledFor()
+
+	@Test
+	public void testLabelledFor()
 	{
 		this.testLocations(
 			"locations/labelledFor.js",
@@ -461,11 +461,9 @@ public class LocationTest extends JSEditorBasedTestCase
 			new LocationTypeRange(LocationType.IN_GLOBAL, 90, 96)
 		);
 	}
-	
-	/**
-	 * testArrayLiteral
-	 */
-	@Test public void testArrayLiteral()
+
+	@Test
+	public void testArrayLiteral()
 	{
 		this.testLocations(
 			"locations/arrayLiteral.js",
@@ -482,11 +480,9 @@ public class LocationTest extends JSEditorBasedTestCase
 			new LocationTypeRange(LocationType.IN_GLOBAL, 31, 34)
 		);
 	}
-	
-	/**
-	 * testObjectLiteral
-	 */
-	@Test public void testObjectLiteral()
+
+	@Test
+	public void testObjectLiteral()
 	{
 		this.testLocations(
 			"locations/objectLiteral.js",
@@ -506,11 +502,9 @@ public class LocationTest extends JSEditorBasedTestCase
 			new LocationTypeRange(LocationType.IN_GLOBAL, 38, 39)
 		);
 	}
-	
-	/**
-	 * testSwitch
-	 */
-	@Test public void testSwitch()
+
+	@Test
+	public void testSwitch()
 	{
 		this.testLocations(
 			"locations/switch.js",
@@ -530,11 +524,9 @@ public class LocationTest extends JSEditorBasedTestCase
 			new LocationTypeRange(LocationType.IN_GLOBAL, 56, 57)
 		);
 	}
-	
-	/**
-	 * testGroup
-	 */
-	@Test public void testGroup()
+
+	@Test
+	public void testGroup()
 	{
 		this.testLocations(
 			"locations/group.js",
@@ -543,11 +535,9 @@ public class LocationTest extends JSEditorBasedTestCase
 			new LocationTypeRange(LocationType.IN_GLOBAL, 13, 20)
 		);
 	}
-	
-	/**
-	 * testFunctionWithReturn
-	 */
-	@Test public void testFunctionWithReturn()
+
+	@Test
+	public void testFunctionWithReturn()
 	{
 		this.testLocations(
 			"locations/functionWithReturn.js",
@@ -560,11 +550,9 @@ public class LocationTest extends JSEditorBasedTestCase
 			new LocationTypeRange(LocationType.IN_GLOBAL, 30, 33)
 		);
 	}
-	
-	/**
-	 * testFunctionWithThrow
-	 */
-	@Test public void testFunctionWithThrow()
+
+	@Test
+	public void testFunctionWithThrow()
 	{
 		this.testLocations(
 			"locations/functionWithThrow.js",
@@ -577,11 +565,9 @@ public class LocationTest extends JSEditorBasedTestCase
 			new LocationTypeRange(LocationType.IN_GLOBAL, 32, 35)
 		);
 	}
-	
-	/**
-	 * testWhile
-	 */
-	@Test public void testWhile()
+
+	@Test
+	public void testWhile()
 	{
 		this.testLocations(
 			"locations/while.js",
@@ -592,11 +578,9 @@ public class LocationTest extends JSEditorBasedTestCase
 			new LocationTypeRange(LocationType.IN_GLOBAL, 14, 17)
 		);
 	}
-	
-	/**
-	 * testWith
-	 */
-	@Test public void testWith()
+
+	@Test
+	public void testWith()
 	{
 		this.testLocations(
 			"locations/with.js",
@@ -609,10 +593,8 @@ public class LocationTest extends JSEditorBasedTestCase
 		);
 	}
 
-	/**
-	 * testErrorInObjectLiteral
-	 */
-	@Test public void testErrorInObjectLiteral()
+	@Test
+	public void testErrorInObjectLiteral()
 	{
 		this.testLocations(
 			"locations/errorInObjectLiteral.js",
@@ -620,7 +602,8 @@ public class LocationTest extends JSEditorBasedTestCase
 		);
 	}
 	
-	@Test public void testThis()
+	@Test
+	public void testThis()
 	{
 		this.testLocations(
 			"locations/this.js",

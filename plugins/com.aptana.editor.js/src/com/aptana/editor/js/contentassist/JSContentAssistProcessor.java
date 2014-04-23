@@ -795,7 +795,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		try
 		{
 			// grab document
-			IDocument doc = editor.getDocumentProvider().getDocument(editor.getEditorInput());
+			IDocument doc = getDocument();
 
 			// grab source which is either the whole document for JS files or a subset for nested JS
 			// @formatter:off
@@ -837,6 +837,11 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 
 		return result;
+	}
+
+	protected IDocument getDocument()
+	{
+		return editor.getDocumentProvider().getDocument(editor.getEditorInput());
 	}
 
 	/**
