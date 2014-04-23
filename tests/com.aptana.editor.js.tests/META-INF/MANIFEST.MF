@@ -13,6 +13,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.ide,
  org.eclipse.test.performance;bundle-version="3.4.0",
  com.aptana.scripting;bundle-version="3.0.0",
- com.aptana.ui.epl
+ com.aptana.ui.epl,
+ com.aptana.testing.mocks
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: com.aptana.editor.js.tests
