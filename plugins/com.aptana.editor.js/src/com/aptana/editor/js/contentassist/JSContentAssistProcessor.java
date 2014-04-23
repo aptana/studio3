@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2014 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -19,6 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
@@ -72,6 +73,7 @@ import com.aptana.parsing.ast.INameNode;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Lexeme;
+import com.aptana.parsing.lexer.Range;
 
 public class JSContentAssistProcessor extends CommonContentAssistProcessor
 {
@@ -140,6 +142,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	private IParseNode statementNode;
 	private IRange replaceRange;
 	private IRange activeRange;
+	private ITextViewer textViewer;
 
 	/**
 	 * JSIndexContentAssistProcessor
@@ -170,17 +173,19 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	private void addKeywords(Set<ICompletionProposal> proposals, int offset)
 	{
+		String[] activeUserAgentIds = getActiveUserAgentIds();
 		for (String name : JSLanguageConstants.KEYWORDS)
 		{
 			// TODO Create a KeywordProposal class that lazily generates description, etc?
 			String description = MessageFormat.format(Messages.JSContentAssistProcessor_KeywordDescription, name);
-			addProposal(proposals, name, JS_KEYWORD, description, getActiveUserAgentIds(),
+			addProposal(proposals, name, JS_KEYWORD, description, activeUserAgentIds,
 					Messages.JSContentAssistProcessor_KeywordLocation, offset);
 		}
 	}
 
 	/**
-	 * addObjectLiteralProperties
+	 * If we're invoked inside a function that takes an object literal, propose the properties for the function's
+	 * parameter type. Useful for things like Ti.UI.create* functions.
 	 * 
 	 * @param proposals
 	 * @param offset
@@ -188,25 +193,25 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	protected void addObjectLiteralProperties(Set<ICompletionProposal> proposals, ITextViewer viewer, int offset)
 	{
 		FunctionElement function = getFunctionElement(viewer, offset);
-
-		if (function != null)
+		if (function == null)
 		{
-			List<ParameterElement> params = function.getParameters();
-			int index = getArgumentIndex(offset);
+			return;
+		}
+		List<ParameterElement> params = function.getParameters();
+		int index = getArgumentIndex(offset);
 
-			if (0 <= index && index < params.size())
+		if (0 <= index && index < params.size())
+		{
+			ParameterElement param = params.get(index);
+			URI projectURI = getProjectURI();
+
+			for (String type : param.getTypes())
 			{
-				ParameterElement param = params.get(index);
-				URI projectURI = getProjectURI();
+				Collection<PropertyElement> properties = getQueryHelper().getTypeProperties(type);
 
-				for (String type : param.getTypes())
+				for (PropertyElement property : CollectionsUtil.filter(properties, isVisibleFilter))
 				{
-					Collection<PropertyElement> properties = getQueryHelper().getTypeProperties(type);
-
-					for (PropertyElement property : CollectionsUtil.filter(properties, isVisibleFilter))
-					{
-						addProposal(proposals, property, offset, projectURI, null);
-					}
+					addProposal(proposals, property, offset, projectURI, null);
 				}
 			}
 		}
@@ -221,32 +226,32 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	private void addGlobals(Set<ICompletionProposal> proposals, int offset)
 	{
 		Collection<PropertyElement> projectGlobals = getQueryHelper().getGlobals(getFilename());
-
-		if (!CollectionsUtil.isEmpty(projectGlobals))
+		if (CollectionsUtil.isEmpty(projectGlobals))
 		{
-			String[] userAgentNames = getActiveUserAgentIds();
-			URI projectURI = getProjectURI();
+			return;
+		}
 
-			for (PropertyElement property : CollectionsUtil.filter(projectGlobals, isVisibleFilter))
+		String[] userAgentIds = getActiveUserAgentIds();
+		URI projectURI = getProjectURI();
+		for (PropertyElement property : CollectionsUtil.filter(projectGlobals, isVisibleFilter))
+		{
+			// TODO Use Messages.JSContentAssistProcessor_KeywordLocation for core stuff!
+			String location = null;
+			List<String> documents = property.getDocuments();
+			if (!CollectionsUtil.isEmpty(documents))
 			{
-				// TODO Use Messages.JSContentAssistProcessor_KeywordLocation for core stuff!
-				String location = null;
-				List<String> documents = property.getDocuments();
-				if (!CollectionsUtil.isEmpty(documents))
+				String docString = documents.get(0);
+				int index = docString.lastIndexOf('/');
+				if (index != -1)
 				{
-					String docString = documents.get(0);
-					int index = docString.lastIndexOf('/');
-					if (index != -1)
-					{
-						location = docString.substring(index + 1);
-					}
-					else
-					{
-						location = docString;
-					}
+					location = docString.substring(index + 1);
 				}
-				addProposal(proposals, property, offset, projectURI, location, userAgentNames);
+				else
+				{
+					location = docString;
+				}
 			}
+			addProposal(proposals, property, offset, projectURI, location, userAgentIds);
 		}
 	}
 
@@ -368,56 +373,53 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 	}
 
-	/**
-	 * addSymbolsInScope
-	 * 
-	 * @param proposals
-	 */
 	protected void addSymbolsInScope(Set<ICompletionProposal> proposals, int offset)
 	{
-		if (targetNode != null)
+		if (targetNode == null)
 		{
-			JSScope globalScope = ParseUtil.getGlobalScope(targetNode);
+			return;
+		}
 
-			if (globalScope != null)
+		JSScope globalScope = ParseUtil.getGlobalScope(targetNode);
+		if (globalScope == null)
+		{
+			return;
+		}
+		JSScope localScope = globalScope.getScopeAtOffset(offset);
+		String fileLocation = getFilename();
+		String[] userAgentNames = getActiveUserAgentIds();
+
+		while (localScope != null && localScope != globalScope)
+		{
+			List<String> symbols = localScope.getLocalSymbolNames();
+
+			for (String symbol : symbols)
 			{
-				JSScope localScope = globalScope.getScopeAtOffset(offset);
-				String fileLocation = getFilename();
-				String[] userAgentNames = getActiveUserAgentIds();
+				boolean isFunction = false;
+				JSPropertyCollection object = localScope.getLocalSymbol(symbol);
+				List<JSNode> nodes = object.getValues();
 
-				while (localScope != null && localScope != globalScope)
+				if (nodes != null)
 				{
-					List<String> symbols = localScope.getLocalSymbolNames();
-
-					for (String symbol : symbols)
+					for (JSNode node : nodes)
 					{
-						boolean isFunction = false;
-						JSPropertyCollection object = localScope.getLocalSymbol(symbol);
-						List<JSNode> nodes = object.getValues();
-
-						if (nodes != null)
+						if (node instanceof JSFunctionNode)
 						{
-							for (JSNode node : nodes)
-							{
-								if (node instanceof JSFunctionNode)
-								{
-									isFunction = true;
-									break;
-								}
-							}
+							isFunction = true;
+							break;
 						}
-
-						String name = symbol;
-						String description = null;
-						Image image = (isFunction) ? JS_FUNCTION : JS_PROPERTY;
-
-						// TODO Add a JSPropertyCollectionProposal that takes the object and generates the rest?
-						addProposal(proposals, name, image, description, userAgentNames, fileLocation, offset);
 					}
-
-					localScope = localScope.getParentScope();
 				}
+
+				String name = symbol;
+				String description = null;
+				Image image = (isFunction) ? JS_FUNCTION : JS_PROPERTY;
+
+				// TODO Add a JSPropertyCollectionProposal that takes the object and generates the rest?
+				addProposal(proposals, name, image, description, userAgentNames, fileLocation, offset);
 			}
+
+			localScope = localScope.getParentScope();
 		}
 	}
 
@@ -638,6 +640,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	@Override
 	public IContextInformation[] computeContextInformation(ITextViewer viewer, int offset)
 	{
+		this.textViewer = viewer;
+
 		List<IContextInformation> result = new ArrayList<IContextInformation>(2);
 		FunctionElement function = getFunctionElement(viewer, offset);
 
@@ -713,6 +717,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	protected ICompletionProposal[] doComputeCompletionProposals(ITextViewer viewer, int offset, char activationChar,
 			boolean autoActivated)
 	{
+		this.textViewer = viewer;
+
 		// NOTE: Using a linked hash set to preserve add-order. We need this in case we end up filtering proposals. This
 		// will give precedence to the first of a collection of proposals with like names
 		Set<ICompletionProposal> result = new LinkedHashSet<ICompletionProposal>();
@@ -730,7 +736,10 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				addProperties(result, offset);
 				break;
 
+			case IN_ARGUMENTS:
 			case IN_VARIABLE_NAME:
+				addFunctionArgumentProposals(result, viewer, offset);
+				//$FALL-THROUGH$
 			case IN_GLOBAL:
 			case IN_CONSTRUCTOR:
 				addKeywords(result, offset);
@@ -773,6 +782,52 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		return resultList;
 	}
 
+	private void addFunctionArgumentProposals(Set<ICompletionProposal> result, ITextViewer viewer, int offset)
+	{
+		FunctionElement function = getFunctionElement(viewer, offset);
+		if (function == null)
+		{
+			return;
+		}
+
+		List<ParameterElement> params = function.getParameters();
+		int index = getArgumentIndex(offset);
+		if (index == -1)
+		{
+			// if we're not on a specific arg, assume no args yet exist and we want CA for first param
+			index = 0;
+		}
+
+		if (0 <= index && index < params.size())
+		{
+			ParameterElement param = params.get(index);
+			List<String> constants = param.getConstants();
+			if (!CollectionsUtil.isEmpty(constants))
+			{
+				IProject project = getProject();
+				String[] userAgentIds = getActiveUserAgentIds();
+				Image[] userAgents = UserAgentManager.getInstance().getUserAgentImages(getProject(), userAgentIds);
+				for (String displayName : constants)
+				{
+					if (replaceRange == null)
+					{
+						replaceRange = new Range(offset);
+					}
+					// FIXME For constants we may want to replace back to start of where argument is, not just back to
+					// last period
+
+					// build proposal
+					FunctionArgumentProposal proposal = new FunctionArgumentProposal(displayName,
+							replaceRange.getStartingOffset(), replaceRange.getLength(), project);
+					proposal.setUserAgentImages(userAgents);
+					proposal.setTriggerCharacters(getProposalTriggerCharacters());
+					// add the proposal to the list
+					result.add(proposal);
+				}
+			}
+		}
+	}
+
 	protected JSIndexQueryHelper getQueryHelper()
 	{
 		if (indexHelper == null)
@@ -811,6 +866,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 			// parse and grab resulting AST
 			IParseNode ast = ParserPoolFactory.parse(IJSConstants.CONTENT_TYPE_JS, parseState).getRootNode();
+			// TODO Use getAST()?
 
 			if (ast != null)
 			{
@@ -841,19 +897,18 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 	protected IDocument getDocument()
 	{
-		return editor.getDocumentProvider().getDocument(editor.getEditorInput());
+		return textViewer.getDocument();
 	}
 
 	/**
 	 * getArgumentIndex
 	 * 
 	 * @param offset
-	 * @return
+	 * @return -1 if none match
 	 */
 	private int getArgumentIndex(int offset)
 	{
 		JSArgumentsNode arguments = getArgumentsNode(offset);
-		int result = -1;
 
 		if (arguments != null)
 		{
@@ -861,13 +916,12 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				if (child.contains(offset))
 				{
-					result = child.getIndex();
-					break;
+					return child.getIndex();
 				}
 			}
 		}
 
-		return result;
+		return -1;
 	}
 
 	/**
