@@ -18,6 +18,7 @@ import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.js.core.index.JSIndexQueryHelper;
+import com.aptana.js.core.inferencing.JSTypeUtil;
 import com.aptana.js.core.model.PropertyElement;
 
 /**
@@ -93,9 +94,22 @@ public class FunctionArgumentProposal extends CommonCompletionProposal implement
 		{
 			String fullName = getDisplayString();
 			int index = StringUtil.lastIndexOf(fullName, '.');
+			// If there's no period, look up global type and assume the property is on that
+			String typeName = null;
+			String propName = null;
+			if (index == -1)
+			{
+				typeName = JSTypeUtil.getGlobalType(project, null);
+				propName = fullName;
+			}
+			else
+			{
+				// property has an owning type
+				typeName = fullName.substring(0, index);
+				propName = fullName.substring(index + 1);
+			}
 
-			List<PropertyElement> props = getQueryHelper().getProperties(fullName.substring(0, index),
-					fullName.substring(index + 1));
+			List<PropertyElement> props = getQueryHelper().getProperties(typeName, propName);
 			if (!CollectionsUtil.isEmpty(props))
 			{
 				fProp = props.get(0);
