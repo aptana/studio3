@@ -61,7 +61,7 @@ public abstract class EditorContentAssistBasedTests<T extends CommonContentAssis
 	 * @param proposals
 	 * @param displayNames
 	 */
-	protected void assertContains(ICompletionProposal[] proposals, String... displayNames)
+	public static void assertContains(ICompletionProposal[] proposals, String... displayNames)
 	{
 		Set<String> uniqueDisplayNames = new HashSet<String>(Arrays.asList(displayNames));
 		for (ICompletionProposal proposal : proposals)

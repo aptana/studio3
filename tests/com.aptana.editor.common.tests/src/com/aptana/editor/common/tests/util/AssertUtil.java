@@ -114,6 +114,19 @@ public class AssertUtil
 	}
 
 	/**
+	 * Assert that the proposal doesn't exist
+	 * 
+	 * @param proposal
+	 * @param proposals
+	 */
+	public static void assertProposalNotFound(String proposal, ICompletionProposal[] proposals)
+	{
+		ICompletionProposal p = findProposal(proposal, proposals);
+		TestCase.assertNull(MessageFormat.format("Proposal {0} found in list, when it shouldn't have been: {1}",
+				proposal, StringUtil.join(", ", proposals)), p);
+	}
+
+	/**
 	 * Have we found the proposal in the list of proposals
 	 * 
 	 * @param string

@@ -814,13 +814,21 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 			{
 				if (displayString.toLowerCase().startsWith(prefix.toLowerCase()))
 				{
+					// Only change relevance if this new value is higher than old!
+					ICommonCompletionProposal common = (ICommonCompletionProposal) proposal;
 					if (displayString.startsWith(prefix))
 					{
-						((ICommonCompletionProposal) proposal).setRelevance(ICommonCompletionProposal.RELEVANCE_HIGH);
+						if (common.getRelevance() < ICommonCompletionProposal.RELEVANCE_HIGH)
+						{
+							common.setRelevance(ICommonCompletionProposal.RELEVANCE_HIGH);
+						}
 					}
 					else
 					{
-						((ICommonCompletionProposal) proposal).setRelevance(ICommonCompletionProposal.RELEVANCE_MEDIUM);
+						if (common.getRelevance() < ICommonCompletionProposal.RELEVANCE_MEDIUM)
+						{
+							common.setRelevance(ICommonCompletionProposal.RELEVANCE_MEDIUM);
+						}
 					}
 				}
 			}
