@@ -14,7 +14,6 @@ import org.junit.runners.Suite.SuiteClasses;
 import com.aptana.editor.js.contentassist.JSContentAssistProposalTest;
 import com.aptana.editor.js.contentassist.JSContextInfoTest;
 import com.aptana.editor.js.contentassist.JSUserAgentFilteringTest;
-import com.aptana.editor.js.contentassist.RangeTest;
 import com.aptana.editor.js.hyperlink.JSHyperlinkDetectorTests;
 import com.aptana.editor.js.sdoc.parsing.SDocAutoCompletionTest;
 
@@ -25,7 +24,6 @@ import com.aptana.editor.js.sdoc.parsing.SDocAutoCompletionTest;
 	JSContextInfoTest.class,
 	JSHyperlinkDetectorTests.class,
 	JSUserAgentFilteringTest.class,
-	RangeTest.class,
 	SDocAutoCompletionTest.class
 })
 //@formatter:on

@@ -13,21 +13,27 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import beaver.Parser.Exception;
 
 import com.aptana.core.util.ArrayUtil;
-import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.core.util.IOUtil;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.common.tests.TextViewer;
-import com.aptana.editor.js.tests.JSEditorBasedTestCase;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Range;
 
-public class RangeTest extends JSEditorBasedTestCase
+public class RangeTest
 {
 	static class OffsetSelection
 	{
@@ -50,6 +56,37 @@ public class RangeTest extends JSEditorBasedTestCase
 		}
 	}
 
+	private JSContentAssistProcessor processor;
+	private IDocument document;
+	private String source;
+
+	@Before
+	public void setup()
+	{
+		processor = new JSContentAssistProcessor(null)
+		{
+			@Override
+			protected IDocument getDocument()
+			{
+				return document;
+			}
+
+			@Override
+			protected String getFilename()
+			{
+				return "something.js";
+			}
+		};
+	}
+
+	@After
+	public void teardown()
+	{
+		processor = null;
+		document = null;
+		source = null;
+	}
+
 	/**
 	 * rangeTests
 	 * 
@@ -59,9 +96,7 @@ public class RangeTest extends JSEditorBasedTestCase
 	protected void rangeTests(String resource, OffsetSelection... selections)
 	{
 		this.setupTestContext(resource);
-
 		ITextViewer viewer = new TextViewer(this.document);
-		JSContentAssistProcessor processor = new JSContentAssistProcessor((AbstractThemeableEditor) this.editor);
 
 		for (OffsetSelection selection : selections)
 		{
@@ -112,7 +147,6 @@ public class RangeTest extends JSEditorBasedTestCase
 		this.setupTestContext(resource);
 
 		// discard type since we only care about the side-effect that sets the replace range
-		JSContentAssistProcessor processor = new JSContentAssistProcessor((AbstractThemeableEditor) this.editor);
 		processor.getLocationType(document, offset);
 
 		IRange range = processor.getReplaceRange();
@@ -121,12 +155,24 @@ public class RangeTest extends JSEditorBasedTestCase
 		assertEquals(length, range.getLength());
 	}
 
+	private void setupTestContext(String resource)
+	{
+		try
+		{
+			this.source = IOUtil.read(FileLocator.openStream(Platform.getBundle("com.aptana.editor.js.tests"),
+					Path.fromPortableString(resource), false));
+			this.document = new Document(this.source);
+		}
+		catch (IOException ioe)
+		{
+			fail(ioe.getMessage());
+		}
+	}
+
 	// @formatter:off
 
-	/**
-	 * testFunctionWithoutArgs
-	 */
-	@Test public void testFunctionWithoutArgs()
+	@Test
+	public void testFunctionWithoutArgs()
 	{
 		this.rangeTests(
 			"ranges/functionWithoutArgs.js",
@@ -135,11 +181,9 @@ public class RangeTest extends JSEditorBasedTestCase
 			new OffsetSelection(16, 17, Range.EMPTY)
 		);
 	}
-	
-	/**
-	 * testFunctionWithArgs
-	 */
-	@Test public void testFunctionWithArgs()
+
+	@Test
+	public void testFunctionWithArgs()
 	{
 		this.rangeTests(
 			"ranges/functionWithArgs.js",
@@ -148,11 +192,9 @@ public class RangeTest extends JSEditorBasedTestCase
 			new OffsetSelection(25, 26, Range.EMPTY)
 		);
 	}
-	
-	/**
-	 * testInvokeWithoutParams
-	 */
-	@Test public void testInvokeWithoutParams()
+
+	@Test
+	public void testInvokeWithoutParams()
 	{
 		this.rangeTests(
 			"ranges/invokeWithoutParams.js",
@@ -163,11 +205,9 @@ public class RangeTest extends JSEditorBasedTestCase
 			new OffsetSelection(4, 5, Range.EMPTY)
 		);
 	}
-	
-	/**
-	 * testInvokeWithParams
-	 */
-	@Test public void testInvokeWithParams()
+
+	@Test
+	public void testInvokeWithParams()
 	{
 		this.rangeTests(
 			"ranges/invokeWithParams.js",
@@ -187,11 +227,9 @@ public class RangeTest extends JSEditorBasedTestCase
 			new OffsetSelection(14, Range.EMPTY)
 		);
 	}
-	
-	/**
-	 * testIfStatement
-	 */
-	@Test public void testIfStatement()
+
+	@Test
+	public void testIfStatement()
 	{
 		this.rangeTests(
 			"ranges/ifStatement.js",
@@ -205,11 +243,9 @@ public class RangeTest extends JSEditorBasedTestCase
 			new OffsetSelection(16, 17, Range.EMPTY)
 		);
 	}
-	
-	/**
-	 * testWhileStatement
-	 */
-	@Test public void testWhileStatement()
+
+	@Test
+	public void testWhileStatement()
 	{
 		this.rangeTests(
 			"ranges/whileStatement.js",
@@ -221,11 +257,9 @@ public class RangeTest extends JSEditorBasedTestCase
 			new OffsetSelection(11, 12, Range.EMPTY)
 		);
 	}
-	
-	/**
-	 * testForStatement
-	 */
-	@Test public void testForStatement()
+
+	@Test
+	public void testForStatement()
 	{
 		this.rangeTests(
 			"ranges/forStatement.js",
@@ -243,11 +277,9 @@ public class RangeTest extends JSEditorBasedTestCase
 			new OffsetSelection(30, 31, Range.EMPTY)
 		);
 	}
-	
-	/**
-	 * testForInStatement
-	 */
-	@Test public void testForInStatement()
+
+	@Test
+	public void testForInStatement()
 	{
 		this.rangeTests(
 			"ranges/forInStatement.js",
@@ -262,35 +294,20 @@ public class RangeTest extends JSEditorBasedTestCase
 		);
 	}
 
-	/**
-	 * Test fix for APSTUD-3005
-	 * 
-	 * @throws IOException
-	 * @throws Exception
-	 */
-	@Test public void testApstud3005() throws IOException, Exception
+	@Test
+	public void testApstud3005() throws IOException, Exception
 	{
 		rangeTest("ranges/apstud-3005.js", 14, 2);
 	}
 
-	/**
-	 * Test fix for APSTUD-3017
-	 * 
-	 * @throws IOException
-	 * @throws Exception
-	 */
-	@Test public void testApstud3017() throws IOException, Exception
+	@Test
+	public void testApstud3017() throws IOException, Exception
 	{
 		rangeTest("ranges/apstud-3017.js", 40, 1);
 	}
 
-	/**
-	 * Test secondary fix for APSTUD-3017
-	 * 
-	 * @throws IOException
-	 * @throws Exception
-	 */
-	@Test public void testApstud3017_2() throws IOException, Exception
+	@Test
+	public void testApstud3017_2() throws IOException, Exception
 	{
 		rangeTest("ranges/apstud-3017-2.js", 55, 1);
 	}

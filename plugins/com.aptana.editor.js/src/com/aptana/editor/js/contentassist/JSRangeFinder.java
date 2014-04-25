@@ -49,7 +49,7 @@ public class JSRangeFinder extends JSTreeWalker
 	 * @param startingOffset
 	 * @param endingOffset
 	 */
-	public void setRange(int startingOffset, int endingOffset)
+	private void setRange(int startingOffset, int endingOffset)
 	{
 		this._range = new Range(startingOffset, endingOffset);
 	}
@@ -59,7 +59,7 @@ public class JSRangeFinder extends JSTreeWalker
 	 * 
 	 * @param node
 	 */
-	public void setRange(IParseNode node)
+	private void setRange(IParseNode node)
 	{
 		if (node instanceof JSNode)
 		{

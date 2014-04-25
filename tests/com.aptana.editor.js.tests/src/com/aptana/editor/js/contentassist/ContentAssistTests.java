@@ -12,7 +12,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({ JSUserAgentCachingTest.class, LocationTest.class, JSContentAssistProcessorTest.class })
+@SuiteClasses({ JSUserAgentCachingTest.class, LocationTest.class, JSContentAssistProcessorTest.class, RangeTest.class })
 public class ContentAssistTests
 {
 }
