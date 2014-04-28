@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
@@ -32,6 +33,7 @@ import com.aptana.js.core.node.INodeJS;
 public class NodePackageManagerTest
 {
 
+	private static final String NPM_ON_PATH = "/path/to/bin/npm";
 	private Mockery context;
 	private INodeJS node;
 	private IProcessRunner runner;
@@ -39,6 +41,8 @@ public class NodePackageManagerTest
 	private IProgressMonitor monitor;
 	private char[] password = new char[0];
 	private IPath userHome;
+	private IPath path;
+	private File file;
 
 	@Before
 	public void setUp() throws Exception
@@ -50,19 +54,14 @@ public class NodePackageManagerTest
 			}
 		};
 
-		String path = PlatformUtil.expandEnvironmentStrings("~"); //$NON-NLS-1$
-		userHome = Path.fromOSString(path);
+		String userHomePath = PlatformUtil.expandEnvironmentStrings("~"); //$NON-NLS-1$
+		userHome = Path.fromOSString(userHomePath);
 
 		node = context.mock(INodeJS.class);
 		runner = context.mock(IProcessRunner.class);
+		path = context.mock(IPath.class);
+		file = context.mock(File.class);
 		monitor = new NullProgressMonitor();
-		context.checking(new Expectations()
-		{
-			{
-				atLeast(1).of(node).getPath();
-				will(returnValue(Path.fromPortableString("/usr/bin/node")));
-			}
-		});
 		npm = new NodePackageManager(node)
 		{
 			@Override
@@ -76,7 +75,48 @@ public class NodePackageManagerTest
 			{
 				return true;
 			}
+
+			@Override
+			protected IPath findNPMOnPATH(IPath possible)
+			{
+				return Path.fromPortableString(NPM_ON_PATH);
+			}
 		};
+
+		context.checking(new Expectations()
+		{
+			{
+				// first time it's called, return the mock path so we can play with it below and toggle whether
+				// co-located npm exists
+				oneOf(node).getPath();
+				will(returnValue(path));
+
+				// all the other times, return an actual IPath for node.
+				allowing(node).getPath();
+				will(returnValue(Path.fromPortableString("/usr/bin/node")));
+
+				// Building path to potential NPM file...
+				oneOf(path).removeLastSegments(1);
+				will(returnValue(path));
+
+				oneOf(path).append("npm");
+				will(returnValue(path));
+
+				oneOf(path).toFile();
+				will(returnValue(file));
+
+				// Now each test will say whether the co-located NPM exists or not by specifying expectation for
+				// file.exists()
+
+				// Ok, if we're not returning npm from PATH, use /usr/bin/npm
+				allowing(path).toOSString();
+				will(returnValue("/usr/bin/npm"));
+
+				// Anytime we ask if NPM exists after we've resolved the path to it, return true
+				allowing(file).isFile();
+				will(returnValue(true));
+			}
+		});
 	}
 
 	@After
@@ -88,6 +128,8 @@ public class NodePackageManagerTest
 		node = null;
 		runner = null;
 		context = null;
+		path = null;
+		file = null;
 	}
 
 	@Test
@@ -96,6 +138,9 @@ public class NodePackageManagerTest
 		context.checking(new Expectations()
 		{
 			{
+				oneOf(file).exists();
+				will(returnValue(true));
+
 				// Don't add arg for passing password to stdin, add arg forcing non-interactive so if we do get prompted
 				// it exits
 				oneOf(runner).run(userHome, ShellExecutable.getEnvironment(), password,
@@ -118,6 +163,9 @@ public class NodePackageManagerTest
 		context.checking(new Expectations()
 		{
 			{
+				oneOf(file).exists();
+				will(returnValue(true));
+
 				// pass password in on stdin
 				oneOf(runner).run(userHome, ShellExecutable.getEnvironment(), password,
 						CollectionsUtil.newList("sudo", "-S", "--", "/usr/bin/node", "/usr/bin/npm", "cache", "clean"),
@@ -137,6 +185,9 @@ public class NodePackageManagerTest
 		context.checking(new Expectations()
 		{
 			{
+				oneOf(file).exists();
+				will(returnValue(true));
+
 				oneOf(runner).run(userHome, ShellExecutable.getEnvironment(), null,
 						CollectionsUtil.newList("/usr/bin/node", "/usr/bin/npm", "cache", "clean"), monitor);
 				will(returnValue(Status.OK_STATUS));
@@ -158,6 +209,9 @@ public class NodePackageManagerTest
 		context.checking(new Expectations()
 		{
 			{
+				oneOf(file).exists();
+				will(returnValue(true));
+
 				oneOf(node).runInBackground(userHome, ShellExecutable.getEnvironment(),
 						CollectionsUtil.newList("/usr/bin/npm", "ls", "titanium", "--color", "false", "-g"));
 				will(returnValue(status));
@@ -176,6 +230,9 @@ public class NodePackageManagerTest
 		context.checking(new Expectations()
 		{
 			{
+				oneOf(file).exists();
+				will(returnValue(true));
+
 				oneOf(node).runInBackground(userHome, ShellExecutable.getEnvironment(),
 						CollectionsUtil.newList("/usr/bin/npm", "ls", "titanium", "--color", "false", "-g"));
 				will(returnValue(status));
@@ -194,6 +251,9 @@ public class NodePackageManagerTest
 		context.checking(new Expectations()
 		{
 			{
+				oneOf(file).exists();
+				will(returnValue(true));
+
 				oneOf(node).runInBackground(userHome, ShellExecutable.getEnvironment(),
 						CollectionsUtil.newList("/usr/bin/npm", "ls", "titanium", "--color", "false", "-g"));
 				will(returnValue(status));
@@ -211,6 +271,9 @@ public class NodePackageManagerTest
 		context.checking(new Expectations()
 		{
 			{
+				oneOf(file).exists();
+				will(returnValue(true));
+
 				oneOf(node).runInBackground(null, ShellExecutable.getEnvironment(),
 						CollectionsUtil.newList("/usr/bin/npm", "ls", "titanium", "--color", "false", "-g"));
 				will(returnValue(status));
@@ -231,6 +294,9 @@ public class NodePackageManagerTest
 		context.checking(new Expectations()
 		{
 			{
+				oneOf(file).exists();
+				will(returnValue(true));
+
 				oneOf(node).runInBackground(null, ShellExecutable.getEnvironment(),
 						CollectionsUtil.newList("/usr/bin/npm", "ls", "titanium", "--color", "false", "-g"));
 				will(returnValue(status));
@@ -252,6 +318,9 @@ public class NodePackageManagerTest
 		context.checking(new Expectations()
 		{
 			{
+				oneOf(file).exists();
+				will(returnValue(true));
+
 				// Pretend that ls fails for some reason
 				oneOf(node).runInBackground(null, ShellExecutable.getEnvironment(),
 						CollectionsUtil.newList("/usr/bin/npm", "ls", "titanium", "--color", "false", "-g"));
@@ -270,205 +339,210 @@ public class NodePackageManagerTest
 	@Test
 	public void testListProcessReturnsExitCodeBecauseDependenciesAreBusted() throws CoreException
 	{
-		final ProcessStatus listStatus = new ProcessStatus(1, "/usr/lib\n" +
-"/usr/lib/node_modules/alloy\n" +
-"/mnt/jenkins/jenkins-data/jobs/titanium-nightly-development/workspace/eclipse/node_modules/colors\n" +
-"/mnt/jenkins/jenkins-data/jobs/titanium-nightly-development/workspace/eclipse/node_modules/commander\n" +
-"/mnt/jenkins/jenkins-data/jobs/titanium-nightly-development/workspace/eclipse/node_modules/jsonlint\n" +
-"/mnt/jenkins/jenkins-data/jobs/titanium-nightly-development/workspace/eclipse/node_modules/pkginfo\n" +
-"/mnt/jenkins/jenkins-data/jobs/titanium-nightly-development/workspace/eclipse/node_modules/source-map\n" +
-"/mnt/jenkins/jenkins-data/jobs/titanium-nightly-development/workspace/eclipse/node_modules/uglify-js\n" +
-"/mnt/jenkins/jenkins-data/jobs/titanium-nightly-development/workspace/eclipse/node_modules/wrench\n" +
-"/mnt/jenkins/jenkins-data/jobs/titanium-nightly-development/workspace/eclipse/node_modules/xml2tss\n" +
-"/mnt/jenkins/jenkins-data/jobs/titanium-nightly-development/workspace/eclipse/node_modules/xmldom\n" +
-"/usr/lib/node_modules/npm\n" +
-"/usr/lib/node_modules/npm/node_modules/abbrev\n" +
-"/usr/lib/node_modules/npm/node_modules/ansi\n" +
-"/usr/lib/node_modules/npm/node_modules/ansicolors\n" +
-"/usr/lib/node_modules/npm/node_modules/ansistyles\n" +
-"/usr/lib/node_modules/npm/node_modules/archy\n" +
-"/usr/lib/node_modules/npm/node_modules/block-stream\n" +
-"/usr/lib/node_modules/npm/node_modules/child-process-close\n" +
-"/usr/lib/node_modules/npm/node_modules/chmodr\n" +
-"/usr/lib/node_modules/npm/node_modules/chownr\n" +
-"/usr/lib/node_modules/npm/node_modules/cmd-shim\n" +
-"/usr/lib/node_modules/npm/node_modules/columnify\n" +
-"/usr/lib/node_modules/npm/node_modules/editor\n" +
-"/usr/lib/node_modules/npm/node_modules/fstream\n" +
-"/usr/lib/node_modules/npm/node_modules/fstream-npm\n" +
-"/usr/lib/node_modules/npm/node_modules/fstream-npm/node_modules/fstream-ignore\n" +
-"/usr/lib/node_modules/npm/node_modules/github-url-from-git\n" +
-"/usr/lib/node_modules/npm/node_modules/github-url-from-username-repo\n" +
-"/usr/lib/node_modules/npm/node_modules/glob\n" +
-"/usr/lib/node_modules/npm/node_modules/graceful-fs\n" +
-"/usr/lib/node_modules/npm/node_modules/inherits\n" +
-"/usr/lib/node_modules/npm/node_modules/ini\n" +
-"/usr/lib/node_modules/npm/node_modules/init-package-json\n" +
-"/usr/lib/node_modules/npm/node_modules/init-package-json/node_modules/promzard\n" +
-"/usr/lib/node_modules/npm/node_modules/lockfile\n" +
-"/usr/lib/node_modules/npm/node_modules/lru-cache\n" +
-"/usr/lib/node_modules/npm/node_modules/minimatch\n" +
-"/usr/lib/node_modules/npm/node_modules/minimatch/node_modules/sigmund\n" +
-"/usr/lib/node_modules/npm/node_modules/mkdirp\n" +
-"/usr/lib/node_modules/npm/node_modules/node-gyp\n" +
-"/usr/lib/node_modules/npm/node_modules/nopt\n" +
-"/usr/lib/node_modules/npm/node_modules/npm-registry-client\n" +
-"/usr/lib/node_modules/npm/node_modules/npm-registry-client/node_modules/couch-login\n" +
-"/usr/lib/node_modules/npm/node_modules/npm-user-validate\n" +
-"/usr/lib/node_modules/npm/node_modules/npmconf\n" +
-"/usr/lib/node_modules/npm/node_modules/npmconf/node_modules/config-chain\n" +
-"/usr/lib/node_modules/npm/node_modules/npmconf/node_modules/config-chain/node_modules/proto-list\n" +
-"/usr/lib/node_modules/npm/node_modules/npmlog\n" +
-"/usr/lib/node_modules/npm/node_modules/once\n" +
-"/usr/lib/node_modules/npm/node_modules/opener\n" +
-"/usr/lib/node_modules/npm/node_modules/osenv\n" +
-"/usr/lib/node_modules/npm/node_modules/path-is-inside\n" +
-"/usr/lib/node_modules/npm/node_modules/read\n" +
-"/usr/lib/node_modules/npm/node_modules/read/node_modules/mute-stream\n" +
-"/usr/lib/node_modules/npm/node_modules/read-installed\n" +
-"/usr/lib/node_modules/npm/node_modules/read-package-json\n" +
-"/usr/lib/node_modules/npm/node_modules/read-package-json/node_modules/normalize-package-data\n" +
-"/usr/lib/node_modules/npm/node_modules/request\n" +
-"/usr/lib/node_modules/npm/node_modules/request/node_modules/aws-sign2\n" +
-"/usr/lib/node_modules/npm/node_modules/request/node_modules/forever-agent\n" +
-"/usr/lib/node_modules/npm/node_modules/request/node_modules/form-data\n" +
-"/usr/lib/node_modules/npm/node_modules/request/node_modules/form-data/node_modules/async\n" +
-"/usr/lib/node_modules/npm/node_modules/request/node_modules/form-data/node_modules/combined-stream\n" +
-"/usr/lib/node_modules/npm/node_modules/request/node_modules/form-data/node_modules/combined-stream/node_modules/delayed-stream\n" +
-"/usr/lib/node_modules/npm/node_modules/request/node_modules/hawk\n" +
-"/usr/lib/node_modules/npm/node_modules/request/node_modules/hawk/node_modules/boom\n" +
-"/usr/lib/node_modules/npm/node_modules/request/node_modules/hawk/node_modules/cryptiles\n" +
-"/usr/lib/node_modules/npm/node_modules/request/node_modules/hawk/node_modules/hoek\n" +
-"/usr/lib/node_modules/npm/node_modules/request/node_modules/hawk/node_modules/sntp\n" +
-"/usr/lib/node_modules/npm/node_modules/request/node_modules/http-signature\n" +
-"/usr/lib/node_modules/npm/node_modules/request/node_modules/http-signature/node_modules/asn1\n" +
-"/usr/lib/node_modules/npm/node_modules/request/node_modules/http-signature/node_modules/assert-plus\n" +
-"/usr/lib/node_modules/npm/node_modules/request/node_modules/http-signature/node_modules/ctype\n" +
-"/usr/lib/node_modules/npm/node_modules/request/node_modules/json-stringify-safe\n" +
-"/usr/lib/node_modules/npm/node_modules/request/node_modules/mime\n" +
-"/usr/lib/node_modules/npm/node_modules/request/node_modules/node-uuid\n" +
-"/usr/lib/node_modules/npm/node_modules/request/node_modules/oauth-sign\n" +
-"/usr/lib/node_modules/npm/node_modules/request/node_modules/qs\n" +
-"/usr/lib/node_modules/npm/node_modules/request/node_modules/tough-cookie\n" +
-"/usr/lib/node_modules/npm/node_modules/request/node_modules/tough-cookie/node_modules/punycode\n" +
-"/usr/lib/node_modules/npm/node_modules/request/node_modules/tunnel-agent\n" +
-"/usr/lib/node_modules/npm/node_modules/retry\n" +
-"/usr/lib/node_modules/npm/node_modules/rimraf\n" +
-"/usr/lib/node_modules/npm/node_modules/semver\n" +
-"/usr/lib/node_modules/npm/node_modules/sha\n" +
-"/usr/lib/node_modules/npm/node_modules/sha/node_modules/readable-stream\n" +
-"/usr/lib/node_modules/npm/node_modules/slide\n" +
-"/usr/lib/node_modules/npm/node_modules/tar\n" +
-"/usr/lib/node_modules/npm/node_modules/text-table\n" +
-"/usr/lib/node_modules/npm/node_modules/uid-number\n" +
-"/usr/lib/node_modules/npm/node_modules/which\n" +
-"/usr/lib/node_modules/titanium\n" +
-"/usr/lib/node_modules/titanium/node_modules/async\n" +
-"/usr/lib/node_modules/titanium/node_modules/colors\n" +
-"/usr/lib/node_modules/titanium/node_modules/fields\n" +
-"/usr/lib/node_modules/titanium/node_modules/fields/node_modules/keypress\n" +
-"/usr/lib/node_modules/titanium/node_modules/humanize\n" +
-"/usr/lib/node_modules/titanium/node_modules/jade\n" +
-"/usr/lib/node_modules/titanium/node_modules/jade/node_modules/character-parser\n" +
-"/usr/lib/node_modules/titanium/node_modules/jade/node_modules/commander\n" +
-"/usr/lib/node_modules/titanium/node_modules/jade/node_modules/constantinople\n" +
-"/usr/lib/node_modules/titanium/node_modules/jade/node_modules/constantinople/node_modules/uglify-js\n" +
-"/usr/lib/node_modules/titanium/node_modules/jade/node_modules/constantinople/node_modules/uglify-js/node_modules/optimist\n" +
-"/usr/lib/node_modules/titanium/node_modules/jade/node_modules/constantinople/node_modules/uglify-js/node_modules/optimist/node_modules/wordwrap\n" +
-"/usr/lib/node_modules/titanium/node_modules/jade/node_modules/constantinople/node_modules/uglify-js/node_modules/source-map\n" +
-"/usr/lib/node_modules/titanium/node_modules/jade/node_modules/constantinople/node_modules/uglify-js/node_modules/source-map/node_modules/amdefine\n" +
-"/usr/lib/node_modules/titanium/node_modules/jade/node_modules/constantinople/node_modules/uglify-js/node_modules/uglify-to-browserify\n" +
-"/usr/lib/node_modules/titanium/node_modules/jade/node_modules/mkdirp\n" +
-"/usr/lib/node_modules/titanium/node_modules/jade/node_modules/monocle\n" +
-"/usr/lib/node_modules/titanium/node_modules/jade/node_modules/monocle/node_modules/readdirp\n" +
-"/usr/lib/node_modules/titanium/node_modules/jade/node_modules/monocle/node_modules/readdirp/node_modules/minimatch\n" +
-"/usr/lib/node_modules/titanium/node_modules/jade/node_modules/monocle/node_modules/readdirp/node_modules/minimatch/node_modules/lru-cache\n" +
-"/usr/lib/node_modules/titanium/node_modules/jade/node_modules/monocle/node_modules/readdirp/node_modules/minimatch/node_modules/sigmund\n" +
-"/usr/lib/node_modules/titanium/node_modules/jade/node_modules/transformers\n" +
-"/usr/lib/node_modules/titanium/node_modules/jade/node_modules/transformers/node_modules/css\n" +
-"/usr/lib/node_modules/titanium/node_modules/jade/node_modules/transformers/node_modules/css/node_modules/css-parse\n" +
-"/usr/lib/node_modules/titanium/node_modules/jade/node_modules/transformers/node_modules/css/node_modules/css-stringify\n" +
-"/usr/lib/node_modules/titanium/node_modules/jade/node_modules/transformers/node_modules/promise\n" +
-"/usr/lib/node_modules/titanium/node_modules/jade/node_modules/transformers/node_modules/promise/node_modules/is-promise\n" +
-"/usr/lib/node_modules/titanium/node_modules/jade/node_modules/transformers/node_modules/uglify-js\n" +
-"/usr/lib/node_modules/titanium/node_modules/jade/node_modules/transformers/node_modules/uglify-js/node_modules/optimist\n" +
-"/usr/lib/node_modules/titanium/node_modules/jade/node_modules/transformers/node_modules/uglify-js/node_modules/optimist/node_modules/wordwrap\n" +
-"/usr/lib/node_modules/titanium/node_modules/jade/node_modules/transformers/node_modules/uglify-js/node_modules/source-map\n" +
-"/usr/lib/node_modules/titanium/node_modules/jade/node_modules/transformers/node_modules/uglify-js/node_modules/source-map/node_modules/amdefine\n" +
-"/usr/lib/node_modules/titanium/node_modules/jade/node_modules/with\n" +
-"/usr/lib/node_modules/titanium/node_modules/jade/node_modules/with/node_modules/uglify-js\n" +
-"/usr/lib/node_modules/titanium/node_modules/jade/node_modules/with/node_modules/uglify-js/node_modules/optimist\n" +
-"/usr/lib/node_modules/titanium/node_modules/jade/node_modules/with/node_modules/uglify-js/node_modules/optimist/node_modules/wordwrap\n" +
-"/usr/lib/node_modules/titanium/node_modules/jade/node_modules/with/node_modules/uglify-js/node_modules/source-map\n" +
-"/usr/lib/node_modules/titanium/node_modules/jade/node_modules/with/node_modules/uglify-js/node_modules/source-map/node_modules/amdefine\n" +
-"/usr/lib/node_modules/titanium/node_modules/jade/node_modules/with/node_modules/uglify-js/node_modules/uglify-to-browserify\n" +
-"/usr/lib/node_modules/titanium/node_modules/longjohn\n" +
-"/usr/lib/node_modules/titanium/node_modules/moment\n" +
-"/usr/lib/node_modules/titanium/node_modules/node-appc\n" +
-"/usr/lib/node_modules/titanium/node_modules/node-appc/node_modules/adm-zip\n" +
-"/usr/lib/node_modules/titanium/node_modules/node-appc/node_modules/diff\n" +
-"/usr/lib/node_modules/titanium/node_modules/node-appc/node_modules/dox\n" +
-"/usr/lib/node_modules/titanium/node_modules/node-appc/node_modules/dox/node_modules/commander\n" +
-"/usr/lib/node_modules/titanium/node_modules/node-appc/node_modules/dox/node_modules/github-flavored-markdown\n" +
-"/usr/lib/node_modules/titanium/node_modules/node-appc/node_modules/node-uuid\n" +
-"/usr/lib/node_modules/titanium/node_modules/node-appc/node_modules/semver\n" +
-"/usr/lib/node_modules/titanium/node_modules/node-appc/node_modules/uglify-js\n" +
-"/usr/lib/node_modules/titanium/node_modules/node-appc/node_modules/uglify-js/node_modules/optimist\n" +
-"/usr/lib/node_modules/titanium/node_modules/node-appc/node_modules/uglify-js/node_modules/optimist/node_modules/wordwrap\n" +
-"/usr/lib/node_modules/titanium/node_modules/node-appc/node_modules/uglify-js/node_modules/source-map\n" +
-"/usr/lib/node_modules/titanium/node_modules/node-appc/node_modules/uglify-js/node_modules/source-map/node_modules/amdefine\n" +
-"/usr/lib/node_modules/titanium/node_modules/node-appc/node_modules/xmldom\n" +
-"/usr/lib/node_modules/titanium/node_modules/optimist\n" +
-"/usr/lib/node_modules/titanium/node_modules/optimist/node_modules/minimist\n" +
-"/usr/lib/node_modules/titanium/node_modules/optimist/node_modules/wordwrap\n" +
-"/usr/lib/node_modules/titanium/node_modules/request\n" +
-"/usr/lib/node_modules/titanium/node_modules/request/node_modules/aws-sign\n" +
-"/usr/lib/node_modules/titanium/node_modules/request/node_modules/cookie-jar\n" +
-"/usr/lib/node_modules/titanium/node_modules/request/node_modules/forever-agent\n" +
-"/usr/lib/node_modules/titanium/node_modules/request/node_modules/form-data\n" +
-"/usr/lib/node_modules/titanium/node_modules/request/node_modules/form-data/node_modules/combined-stream\n" +
-"/usr/lib/node_modules/titanium/node_modules/request/node_modules/form-data/node_modules/combined-stream/node_modules/delayed-stream\n" +
-"/usr/lib/node_modules/titanium/node_modules/request/node_modules/hawk\n" +
-"/usr/lib/node_modules/titanium/node_modules/request/node_modules/hawk/node_modules/boom\n" +
-"/usr/lib/node_modules/titanium/node_modules/request/node_modules/hawk/node_modules/cryptiles\n" +
-"/usr/lib/node_modules/titanium/node_modules/request/node_modules/hawk/node_modules/hoek\n" +
-"/usr/lib/node_modules/titanium/node_modules/request/node_modules/hawk/node_modules/sntp\n" +
-"/usr/lib/node_modules/titanium/node_modules/request/node_modules/http-signature\n" +
-"/usr/lib/node_modules/titanium/node_modules/request/node_modules/http-signature/node_modules/asn1\n" +
-"/usr/lib/node_modules/titanium/node_modules/request/node_modules/http-signature/node_modules/assert-plus\n" +
-"/usr/lib/node_modules/titanium/node_modules/request/node_modules/http-signature/node_modules/ctype\n" +
-"/usr/lib/node_modules/titanium/node_modules/request/node_modules/json-stringify-safe\n" +
-"/usr/lib/node_modules/titanium/node_modules/request/node_modules/mime\n" +
-"/usr/lib/node_modules/titanium/node_modules/request/node_modules/node-uuid\n" +
-"/usr/lib/node_modules/titanium/node_modules/request/node_modules/oauth-sign\n" +
-"/usr/lib/node_modules/titanium/node_modules/request/node_modules/qs\n" +
-"/usr/lib/node_modules/titanium/node_modules/request/node_modules/tunnel-agent\n" +
-"/usr/lib/node_modules/titanium/node_modules/semver\n" +
-"/usr/lib/node_modules/titanium/node_modules/sprintf\n" +
-"/usr/lib/node_modules/titanium/node_modules/temp\n" +
-"/usr/lib/node_modules/titanium/node_modules/temp/node_modules/osenv\n" +
-"/usr/lib/node_modules/titanium/node_modules/temp/node_modules/rimraf\n" +
-"/usr/lib/node_modules/titanium/node_modules/temp/node_modules/rimraf/node_modules/graceful-fs\n" +
-"/usr/lib/node_modules/titanium/node_modules/winston\n" +
-"/usr/lib/node_modules/titanium/node_modules/winston/node_modules/async\n" +
-"/usr/lib/node_modules/titanium/node_modules/winston/node_modules/cycle\n" +
-"/usr/lib/node_modules/titanium/node_modules/winston/node_modules/eyes\n" +
-"/usr/lib/node_modules/titanium/node_modules/winston/node_modules/pkginfo\n" +
-"/usr/lib/node_modules/titanium/node_modules/winston/node_modules/request\n" +
-"/usr/lib/node_modules/titanium/node_modules/winston/node_modules/stack-trace\n" +
-"/usr/lib/node_modules/titanium/node_modules/wrench", "npm ERR! missing: colors@0.6.0-1, required by alloy@1.3.1\n" +
-"npm ERR! missing: pkginfo@0.2.2, required by alloy@1.3.1\n" +
-"npm ERR! missing: commander@0.6.1, required by alloy@1.3.1\n" +
-"npm ERR! missing: wrench@1.3.9, required by alloy@1.3.1\n" +
-"npm ERR! missing: xmldom@0.1.13, required by alloy@1.3.1\n" +
-"npm ERR! missing: jsonlint@1.5.1, required by alloy@1.3.1\n" +
-"npm ERR! missing: uglify-js@2.2.5, required by alloy@1.3.1\n" +
-"npm ERR! missing: source-map@0.1.9, required by alloy@1.3.1\n" +
-"npm ERR! missing: xml2tss@0.0.5, required by alloy@1.3.1\n" +
-"npm ERR! not ok code 0");
+		final ProcessStatus listStatus = new ProcessStatus(
+				1,
+				"/usr/lib\n"
+						+ "/usr/lib/node_modules/alloy\n"
+						+ "/mnt/jenkins/jenkins-data/jobs/titanium-nightly-development/workspace/eclipse/node_modules/colors\n"
+						+ "/mnt/jenkins/jenkins-data/jobs/titanium-nightly-development/workspace/eclipse/node_modules/commander\n"
+						+ "/mnt/jenkins/jenkins-data/jobs/titanium-nightly-development/workspace/eclipse/node_modules/jsonlint\n"
+						+ "/mnt/jenkins/jenkins-data/jobs/titanium-nightly-development/workspace/eclipse/node_modules/pkginfo\n"
+						+ "/mnt/jenkins/jenkins-data/jobs/titanium-nightly-development/workspace/eclipse/node_modules/source-map\n"
+						+ "/mnt/jenkins/jenkins-data/jobs/titanium-nightly-development/workspace/eclipse/node_modules/uglify-js\n"
+						+ "/mnt/jenkins/jenkins-data/jobs/titanium-nightly-development/workspace/eclipse/node_modules/wrench\n"
+						+ "/mnt/jenkins/jenkins-data/jobs/titanium-nightly-development/workspace/eclipse/node_modules/xml2tss\n"
+						+ "/mnt/jenkins/jenkins-data/jobs/titanium-nightly-development/workspace/eclipse/node_modules/xmldom\n"
+						+ "/usr/lib/node_modules/npm\n"
+						+ "/usr/lib/node_modules/npm/node_modules/abbrev\n"
+						+ "/usr/lib/node_modules/npm/node_modules/ansi\n"
+						+ "/usr/lib/node_modules/npm/node_modules/ansicolors\n"
+						+ "/usr/lib/node_modules/npm/node_modules/ansistyles\n"
+						+ "/usr/lib/node_modules/npm/node_modules/archy\n"
+						+ "/usr/lib/node_modules/npm/node_modules/block-stream\n"
+						+ "/usr/lib/node_modules/npm/node_modules/child-process-close\n"
+						+ "/usr/lib/node_modules/npm/node_modules/chmodr\n"
+						+ "/usr/lib/node_modules/npm/node_modules/chownr\n"
+						+ "/usr/lib/node_modules/npm/node_modules/cmd-shim\n"
+						+ "/usr/lib/node_modules/npm/node_modules/columnify\n"
+						+ "/usr/lib/node_modules/npm/node_modules/editor\n"
+						+ "/usr/lib/node_modules/npm/node_modules/fstream\n"
+						+ "/usr/lib/node_modules/npm/node_modules/fstream-npm\n"
+						+ "/usr/lib/node_modules/npm/node_modules/fstream-npm/node_modules/fstream-ignore\n"
+						+ "/usr/lib/node_modules/npm/node_modules/github-url-from-git\n"
+						+ "/usr/lib/node_modules/npm/node_modules/github-url-from-username-repo\n"
+						+ "/usr/lib/node_modules/npm/node_modules/glob\n"
+						+ "/usr/lib/node_modules/npm/node_modules/graceful-fs\n"
+						+ "/usr/lib/node_modules/npm/node_modules/inherits\n"
+						+ "/usr/lib/node_modules/npm/node_modules/ini\n"
+						+ "/usr/lib/node_modules/npm/node_modules/init-package-json\n"
+						+ "/usr/lib/node_modules/npm/node_modules/init-package-json/node_modules/promzard\n"
+						+ "/usr/lib/node_modules/npm/node_modules/lockfile\n"
+						+ "/usr/lib/node_modules/npm/node_modules/lru-cache\n"
+						+ "/usr/lib/node_modules/npm/node_modules/minimatch\n"
+						+ "/usr/lib/node_modules/npm/node_modules/minimatch/node_modules/sigmund\n"
+						+ "/usr/lib/node_modules/npm/node_modules/mkdirp\n"
+						+ "/usr/lib/node_modules/npm/node_modules/node-gyp\n"
+						+ "/usr/lib/node_modules/npm/node_modules/nopt\n"
+						+ "/usr/lib/node_modules/npm/node_modules/npm-registry-client\n"
+						+ "/usr/lib/node_modules/npm/node_modules/npm-registry-client/node_modules/couch-login\n"
+						+ "/usr/lib/node_modules/npm/node_modules/npm-user-validate\n"
+						+ "/usr/lib/node_modules/npm/node_modules/npmconf\n"
+						+ "/usr/lib/node_modules/npm/node_modules/npmconf/node_modules/config-chain\n"
+						+ "/usr/lib/node_modules/npm/node_modules/npmconf/node_modules/config-chain/node_modules/proto-list\n"
+						+ "/usr/lib/node_modules/npm/node_modules/npmlog\n"
+						+ "/usr/lib/node_modules/npm/node_modules/once\n"
+						+ "/usr/lib/node_modules/npm/node_modules/opener\n"
+						+ "/usr/lib/node_modules/npm/node_modules/osenv\n"
+						+ "/usr/lib/node_modules/npm/node_modules/path-is-inside\n"
+						+ "/usr/lib/node_modules/npm/node_modules/read\n"
+						+ "/usr/lib/node_modules/npm/node_modules/read/node_modules/mute-stream\n"
+						+ "/usr/lib/node_modules/npm/node_modules/read-installed\n"
+						+ "/usr/lib/node_modules/npm/node_modules/read-package-json\n"
+						+ "/usr/lib/node_modules/npm/node_modules/read-package-json/node_modules/normalize-package-data\n"
+						+ "/usr/lib/node_modules/npm/node_modules/request\n"
+						+ "/usr/lib/node_modules/npm/node_modules/request/node_modules/aws-sign2\n"
+						+ "/usr/lib/node_modules/npm/node_modules/request/node_modules/forever-agent\n"
+						+ "/usr/lib/node_modules/npm/node_modules/request/node_modules/form-data\n"
+						+ "/usr/lib/node_modules/npm/node_modules/request/node_modules/form-data/node_modules/async\n"
+						+ "/usr/lib/node_modules/npm/node_modules/request/node_modules/form-data/node_modules/combined-stream\n"
+						+ "/usr/lib/node_modules/npm/node_modules/request/node_modules/form-data/node_modules/combined-stream/node_modules/delayed-stream\n"
+						+ "/usr/lib/node_modules/npm/node_modules/request/node_modules/hawk\n"
+						+ "/usr/lib/node_modules/npm/node_modules/request/node_modules/hawk/node_modules/boom\n"
+						+ "/usr/lib/node_modules/npm/node_modules/request/node_modules/hawk/node_modules/cryptiles\n"
+						+ "/usr/lib/node_modules/npm/node_modules/request/node_modules/hawk/node_modules/hoek\n"
+						+ "/usr/lib/node_modules/npm/node_modules/request/node_modules/hawk/node_modules/sntp\n"
+						+ "/usr/lib/node_modules/npm/node_modules/request/node_modules/http-signature\n"
+						+ "/usr/lib/node_modules/npm/node_modules/request/node_modules/http-signature/node_modules/asn1\n"
+						+ "/usr/lib/node_modules/npm/node_modules/request/node_modules/http-signature/node_modules/assert-plus\n"
+						+ "/usr/lib/node_modules/npm/node_modules/request/node_modules/http-signature/node_modules/ctype\n"
+						+ "/usr/lib/node_modules/npm/node_modules/request/node_modules/json-stringify-safe\n"
+						+ "/usr/lib/node_modules/npm/node_modules/request/node_modules/mime\n"
+						+ "/usr/lib/node_modules/npm/node_modules/request/node_modules/node-uuid\n"
+						+ "/usr/lib/node_modules/npm/node_modules/request/node_modules/oauth-sign\n"
+						+ "/usr/lib/node_modules/npm/node_modules/request/node_modules/qs\n"
+						+ "/usr/lib/node_modules/npm/node_modules/request/node_modules/tough-cookie\n"
+						+ "/usr/lib/node_modules/npm/node_modules/request/node_modules/tough-cookie/node_modules/punycode\n"
+						+ "/usr/lib/node_modules/npm/node_modules/request/node_modules/tunnel-agent\n"
+						+ "/usr/lib/node_modules/npm/node_modules/retry\n"
+						+ "/usr/lib/node_modules/npm/node_modules/rimraf\n"
+						+ "/usr/lib/node_modules/npm/node_modules/semver\n"
+						+ "/usr/lib/node_modules/npm/node_modules/sha\n"
+						+ "/usr/lib/node_modules/npm/node_modules/sha/node_modules/readable-stream\n"
+						+ "/usr/lib/node_modules/npm/node_modules/slide\n"
+						+ "/usr/lib/node_modules/npm/node_modules/tar\n"
+						+ "/usr/lib/node_modules/npm/node_modules/text-table\n"
+						+ "/usr/lib/node_modules/npm/node_modules/uid-number\n"
+						+ "/usr/lib/node_modules/npm/node_modules/which\n"
+						+ "/usr/lib/node_modules/titanium\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/async\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/colors\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/fields\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/fields/node_modules/keypress\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/humanize\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/jade\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/jade/node_modules/character-parser\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/jade/node_modules/commander\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/jade/node_modules/constantinople\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/jade/node_modules/constantinople/node_modules/uglify-js\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/jade/node_modules/constantinople/node_modules/uglify-js/node_modules/optimist\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/jade/node_modules/constantinople/node_modules/uglify-js/node_modules/optimist/node_modules/wordwrap\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/jade/node_modules/constantinople/node_modules/uglify-js/node_modules/source-map\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/jade/node_modules/constantinople/node_modules/uglify-js/node_modules/source-map/node_modules/amdefine\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/jade/node_modules/constantinople/node_modules/uglify-js/node_modules/uglify-to-browserify\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/jade/node_modules/mkdirp\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/jade/node_modules/monocle\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/jade/node_modules/monocle/node_modules/readdirp\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/jade/node_modules/monocle/node_modules/readdirp/node_modules/minimatch\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/jade/node_modules/monocle/node_modules/readdirp/node_modules/minimatch/node_modules/lru-cache\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/jade/node_modules/monocle/node_modules/readdirp/node_modules/minimatch/node_modules/sigmund\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/jade/node_modules/transformers\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/jade/node_modules/transformers/node_modules/css\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/jade/node_modules/transformers/node_modules/css/node_modules/css-parse\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/jade/node_modules/transformers/node_modules/css/node_modules/css-stringify\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/jade/node_modules/transformers/node_modules/promise\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/jade/node_modules/transformers/node_modules/promise/node_modules/is-promise\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/jade/node_modules/transformers/node_modules/uglify-js\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/jade/node_modules/transformers/node_modules/uglify-js/node_modules/optimist\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/jade/node_modules/transformers/node_modules/uglify-js/node_modules/optimist/node_modules/wordwrap\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/jade/node_modules/transformers/node_modules/uglify-js/node_modules/source-map\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/jade/node_modules/transformers/node_modules/uglify-js/node_modules/source-map/node_modules/amdefine\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/jade/node_modules/with\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/jade/node_modules/with/node_modules/uglify-js\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/jade/node_modules/with/node_modules/uglify-js/node_modules/optimist\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/jade/node_modules/with/node_modules/uglify-js/node_modules/optimist/node_modules/wordwrap\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/jade/node_modules/with/node_modules/uglify-js/node_modules/source-map\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/jade/node_modules/with/node_modules/uglify-js/node_modules/source-map/node_modules/amdefine\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/jade/node_modules/with/node_modules/uglify-js/node_modules/uglify-to-browserify\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/longjohn\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/moment\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/node-appc\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/node-appc/node_modules/adm-zip\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/node-appc/node_modules/diff\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/node-appc/node_modules/dox\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/node-appc/node_modules/dox/node_modules/commander\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/node-appc/node_modules/dox/node_modules/github-flavored-markdown\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/node-appc/node_modules/node-uuid\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/node-appc/node_modules/semver\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/node-appc/node_modules/uglify-js\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/node-appc/node_modules/uglify-js/node_modules/optimist\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/node-appc/node_modules/uglify-js/node_modules/optimist/node_modules/wordwrap\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/node-appc/node_modules/uglify-js/node_modules/source-map\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/node-appc/node_modules/uglify-js/node_modules/source-map/node_modules/amdefine\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/node-appc/node_modules/xmldom\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/optimist\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/optimist/node_modules/minimist\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/optimist/node_modules/wordwrap\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/request\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/request/node_modules/aws-sign\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/request/node_modules/cookie-jar\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/request/node_modules/forever-agent\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/request/node_modules/form-data\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/request/node_modules/form-data/node_modules/combined-stream\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/request/node_modules/form-data/node_modules/combined-stream/node_modules/delayed-stream\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/request/node_modules/hawk\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/request/node_modules/hawk/node_modules/boom\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/request/node_modules/hawk/node_modules/cryptiles\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/request/node_modules/hawk/node_modules/hoek\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/request/node_modules/hawk/node_modules/sntp\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/request/node_modules/http-signature\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/request/node_modules/http-signature/node_modules/asn1\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/request/node_modules/http-signature/node_modules/assert-plus\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/request/node_modules/http-signature/node_modules/ctype\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/request/node_modules/json-stringify-safe\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/request/node_modules/mime\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/request/node_modules/node-uuid\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/request/node_modules/oauth-sign\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/request/node_modules/qs\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/request/node_modules/tunnel-agent\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/semver\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/sprintf\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/temp\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/temp/node_modules/osenv\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/temp/node_modules/rimraf\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/temp/node_modules/rimraf/node_modules/graceful-fs\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/winston\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/winston/node_modules/async\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/winston/node_modules/cycle\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/winston/node_modules/eyes\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/winston/node_modules/pkginfo\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/winston/node_modules/request\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/winston/node_modules/stack-trace\n"
+						+ "/usr/lib/node_modules/titanium/node_modules/wrench",
+				"npm ERR! missing: colors@0.6.0-1, required by alloy@1.3.1\n"
+						+ "npm ERR! missing: pkginfo@0.2.2, required by alloy@1.3.1\n"
+						+ "npm ERR! missing: commander@0.6.1, required by alloy@1.3.1\n"
+						+ "npm ERR! missing: wrench@1.3.9, required by alloy@1.3.1\n"
+						+ "npm ERR! missing: xmldom@0.1.13, required by alloy@1.3.1\n"
+						+ "npm ERR! missing: jsonlint@1.5.1, required by alloy@1.3.1\n"
+						+ "npm ERR! missing: uglify-js@2.2.5, required by alloy@1.3.1\n"
+						+ "npm ERR! missing: source-map@0.1.9, required by alloy@1.3.1\n"
+						+ "npm ERR! missing: xml2tss@0.0.5, required by alloy@1.3.1\n" + "npm ERR! not ok code 0");
 		context.checking(new Expectations()
 		{
 			{
+				oneOf(file).exists();
+				will(returnValue(true));
+
 				// ask for list, it will return exit code of 1, but usable output
 				oneOf(node).runInBackground(null, null, CollectionsUtil.newList("/usr/bin/npm", "-g", "-p", "list"));
 				will(returnValue(listStatus));
@@ -479,6 +553,36 @@ public class NodePackageManagerTest
 		assertTrue(installed.contains("titanium"));
 		assertTrue(installed.contains("npm"));
 		assertFalse(installed.contains("madeupmodule"));
+		context.assertIsSatisfied();
+	}
+
+	@Test
+	public void testNPMCoLocatedWithNode() throws CoreException
+	{
+		context.checking(new Expectations()
+		{
+			{
+				oneOf(file).exists();
+				will(returnValue(true));
+			}
+		});
+
+		assertEquals("/usr/bin/npm", npm.getPath().toOSString());
+		context.assertIsSatisfied();
+	}
+
+	@Test
+	public void testAllowsForNPMNotCoInstalledAtSamePathAsNode() throws CoreException
+	{
+		context.checking(new Expectations()
+		{
+			{
+				oneOf(file).exists();
+				will(returnValue(false));
+			}
+		});
+
+		assertEquals(Path.fromPortableString(NPM_ON_PATH), npm.getPath());
 		context.assertIsSatisfied();
 	}
 }

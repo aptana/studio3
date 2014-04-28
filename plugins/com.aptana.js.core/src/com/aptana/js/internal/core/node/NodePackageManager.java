@@ -119,29 +119,16 @@ public class NodePackageManager implements INodePackageManager
 	/**
 	 * Where the NPM binary script should live.
 	 */
-	private final IPath npmPath;
+	private IPath npmPath;
 
 	public NodePackageManager(INodeJS nodeJS)
 	{
 		this.nodeJS = nodeJS;
+	}
 
-		// TODO Is there any way a user can install NPM in non-standard location relative to node?
-
-		// Windows "npm" script is a sh script that tries to execute $basedir/node_modules/npm/bin/npm-cli.js under
-		// "$basedir/node.exe" if it exists.
-		// So for Windows, it would appear we'd need to run:
-		// /path/to/node.exe /path/to/node/node_modules/npm/bin/npm-cli.js <args>
-		if (PlatformUtil.isWindows())
-		{
-			npmPath = nodeJS.getPath().removeLastSegments(1).append(NODE_MODULES).append(NPM).append(BIN)
-					.append("npm-cli.js"); //$NON-NLS-1$
-		}
-		else
-		{
-			// For Mac/Linux, we just need to run:
-			// /path/to/node /path/to/npm <args>
-			npmPath = nodeJS.getPath().removeLastSegments(1).append(NPM);
-		}
+	protected IPath findNPMOnPATH(IPath possible)
+	{
+		return ExecutableUtil.find(NPM, false, CollectionsUtil.newList(possible));
 	}
 
 	protected IProcessRunner getProcessRunner()
@@ -160,7 +147,7 @@ public class NodePackageManager implements INodePackageManager
 	{
 		if (exists())
 		{
-			return npmPath;
+			return getPath();
 		}
 
 		throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID,
@@ -483,7 +470,8 @@ public class NodePackageManager implements INodePackageManager
 		IStatus status = nodeJS.runInBackground(workingDir, ShellExecutable.getEnvironment(), args);
 		if (!status.isOK())
 		{
-			// TODO This may return a non zero exit code but still give output we can use, not sure. Similar to what we saw with list command
+			// TODO This may return a non zero exit code but still give output we can use, not sure. Similar to what we
+			// saw with list command
 			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
 					Messages.NodePackageManager_FailedToDetermineInstalledVersion, packageName, status.getMessage())));
 		}
@@ -753,11 +741,45 @@ public class NodePackageManager implements INodePackageManager
 
 	public boolean exists()
 	{
-		return npmPath.toFile().isFile();
+		IPath path = getPath();
+		if (path == null)
+		{
+			return false;
+		}
+		return path.toFile().isFile();
 	}
 
-	public IPath getPath()
+	public synchronized IPath getPath()
 	{
+		if (npmPath == null)
+		{
+			IPath nodeParent = nodeJS.getPath().removeLastSegments(1);
+
+			// Windows "npm" script is a sh script that tries to execute $basedir/node_modules/npm/bin/npm-cli.js under
+			// "$basedir/node.exe" if it exists.
+			// So for Windows, it would appear we'd need to run:
+			// /path/to/node.exe /path/to/node/node_modules/npm/bin/npm-cli.js <args>
+			if (PlatformUtil.isWindows())
+			{
+				npmPath = nodeParent.append(NODE_MODULES).append(NPM).append(BIN).append("npm-cli.js"); //$NON-NLS-1$
+			}
+			else
+			{
+
+				IPath possible = nodeParent.append(NPM);
+				if (possible.toFile().exists())
+				{
+					// Typically node is co-located with npm (i.e. /usr/bin/npm and /usr/bin/node).
+					npmPath = possible;
+				}
+				else
+				{
+					// However if installed from source they may live in separate locations.
+					// So let's search the PATH for NPM
+					npmPath = findNPMOnPATH(possible);
+				}
+			}
+		}
 		return npmPath;
 	}
 
