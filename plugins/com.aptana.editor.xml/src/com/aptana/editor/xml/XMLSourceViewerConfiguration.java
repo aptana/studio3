@@ -62,6 +62,10 @@ public class XMLSourceViewerConfiguration extends SimpleSourceViewerConfiguratio
 	private IQuickAssistProcessor getQuickAssistProcessor()
 	{
 		IQuickFixProcessorsRegistry registry = getQuickFixRegistry();
+		if (registry == null)
+		{
+			return null;
+		}
 		return registry.getQuickFixProcessor(getEditor().getContentType());
 	}
 
