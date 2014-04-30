@@ -11,7 +11,7 @@
  *     Tom Eicher (Avaloq Evolution AG) - block selection mode
  *******************************************************************************/
 
-package com.aptana.editor.common;
+package com.aptana.editor.epl;
 
 import java.text.BreakIterator;
 import java.text.CharacterIterator;
