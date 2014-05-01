@@ -45,6 +45,7 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IBreakpointManagerListener;
 import org.eclipse.debug.core.ILaunch;
+import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.debug.core.model.IDebugTarget;
@@ -263,6 +264,8 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 		}
 
 	};
+	private boolean debugMode;
+	private String mode;
 
 	/**
 	 * JSDebugTarget
@@ -275,10 +278,10 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	 * @param debugMode
 	 * @throws CoreException
 	 */
-	public JSDebugTarget(ILaunch launch, IProcess process, IURIMapper uriMapper, IJSConnection connection,
-			boolean debugMode) throws CoreException
+	public JSDebugTarget(ILaunch launch, IProcess process, IURIMapper uriMapper, IJSConnection connection, String mode)
+			throws CoreException
 	{
-		this(launch, null, process, uriMapper, connection, debugMode);
+		this(launch, null, process, uriMapper, connection, mode, ILaunchManager.DEBUG_MODE.equals(mode));
 	}
 
 	/**
@@ -290,11 +293,12 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	 * @param httpServer
 	 * @param resourceMapper
 	 * @param socket
+	 * @param mode
 	 * @param debugMode
 	 * @throws CoreException
 	 */
 	public JSDebugTarget(ILaunch launch, String label, IProcess process, IURIMapper uriMapper,
-			IJSConnection connection, boolean debugMode) throws CoreException
+			IJSConnection connection, String mode, boolean debugMode) throws CoreException
 	{
 		super(null);
 		this.launch = launch;
@@ -302,6 +306,9 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 		this.process = process;
 		this.connection = connection;
 		this.uriMapper = uriMapper;
+		this.mode = mode;
+		this.debugMode = debugMode;
+
 		initSourceMapping();
 		try
 		{
@@ -1298,11 +1305,14 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			handleDetailFormattersChange();
 			JSDebugPlugin.getDefault().getDebugOptionsManager().addChangeListener(this);
 
-			/* restore breakpoints */
-			for (IBreakpoint breakpoint : DebugPlugin.getDefault().getBreakpointManager()
-					.getBreakpoints(getModelIdentifier()))
+			if (ILaunchManager.DEBUG_MODE.equals(mode))
 			{
-				breakpointAdded(breakpoint);
+				/* restore breakpoints */
+				for (IBreakpoint breakpoint : DebugPlugin.getDefault().getBreakpointManager()
+						.getBreakpoints(getModelIdentifier()))
+				{
+					breakpointAdded(breakpoint);
+				}
 			}
 
 			// Register listeners

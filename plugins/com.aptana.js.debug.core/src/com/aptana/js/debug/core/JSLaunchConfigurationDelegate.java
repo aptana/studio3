@@ -478,7 +478,7 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate
 					JSDebugProcess debugProcess = new JSDebugProcess(launch, browserExecutable, null);
 					DebugConnection controller = DebugConnection.createConnection(socket, new ProtocolLogger(
 							"jsdebugger", JSDebugPlugin.PLUGIN_ID)); //$NON-NLS-1$
-					debugTarget = new JSDebugTarget(launch, debugProcess, urlMapper, controller, debug);
+					debugTarget = new JSDebugTarget(launch, debugProcess, urlMapper, controller, mode);
 					monitor.subTask(MessageFormat.format(Messages.JSLaunchConfigurationDelegate_OpeningPage, launchURL));
 					debugTarget.openURL(launchURL);
 				}
