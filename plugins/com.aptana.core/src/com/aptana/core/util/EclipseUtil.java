@@ -674,7 +674,7 @@ public class EclipseUtil
 		{
 			IdeLog.logInfo(CorePlugin.getDefault(), MessageFormat.format(
 					"Geting Extension Point for {0} and extensionPoint {1} from {2}", pluginId, extensionPointId,
-					registry));
+					registry), IDebugScopes.EXTENSION_POINTS);
 			return registry.getExtensionPoint(pluginId, extensionPointId);
 		}
 		return null;
@@ -691,7 +691,7 @@ public class EclipseUtil
 		IdeLog.logInfo(
 				CorePlugin.getDefault(),
 				MessageFormat.format("Extension point : {0} and elements : {1}", extensionPoint,
-						StringUtil.join(",", elementNames)));
+						StringUtil.join(",", elementNames)), IDebugScopes.EXTENSION_POINTS);
 		IExtension[] extensions = extensionPoint.getExtensions();
 		for (String elementName : elementNames)
 		{
