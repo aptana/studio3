@@ -5,7 +5,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({ JSDebugThreadTest.class })
+@SuiteClasses({ JSDebugThreadTest.class, JSDebugTargetTest.class })
 public class InternalModelTests
 {
 
