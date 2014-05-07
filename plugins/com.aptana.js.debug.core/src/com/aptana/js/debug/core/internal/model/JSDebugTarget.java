@@ -43,6 +43,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.debug.core.IBreakpointManager;
 import org.eclipse.debug.core.IBreakpointManagerListener;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchManager;
@@ -71,6 +72,7 @@ import com.aptana.core.sourcemap.ISourceMapResult;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.debug.core.DebugCorePlugin;
+import com.aptana.debug.core.DebugOptionsManager;
 import com.aptana.debug.core.DetailFormatter;
 import com.aptana.debug.core.IDebugCoreConstants;
 import com.aptana.debug.core.IDebugScopes;
@@ -345,14 +347,14 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	 */
 	private void initSourceMapping()
 	{
-		ISourceMapRegistry sourceMapRegistry = CorePlugin.getDefault().getSourceMapRegistry();
+		ISourceMapRegistry sourceMapRegistry = getSourceMapRegistry();
 		try
 		{
 			String projectName = launch.getLaunchConfiguration().getAttribute(
 					ILaunchConfigurationConstants.ATTR_PROJECT_NAME, (String) null);
 			if (projectName != null)
 			{
-				IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+				IProject project = getWorkspaceRoot().getProject(projectName);
 				String platform = launch.getAttribute(DEPLOY_TARGET);
 				sourceMap = sourceMapRegistry.getSourceMap(project, platform);
 			}
@@ -361,6 +363,16 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 		{
 			IdeLog.logError(JSDebugPlugin.getDefault(), e);
 		}
+	}
+
+	protected IWorkspaceRoot getWorkspaceRoot()
+	{
+		return ResourcesPlugin.getWorkspace().getRoot();
+	}
+
+	protected ISourceMapRegistry getSourceMapRegistry()
+	{
+		return CorePlugin.getDefault().getSourceMapRegistry();
 	}
 
 	/**
@@ -378,7 +390,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 		}
 		try
 		{
-			IResource resource = ResourcesPlugin.getWorkspace().getRoot()
+			IResource resource = getWorkspaceRoot()
 					.findMember(Path.fromOSString(generatedLocation.getPath()));
 			return sourceMap.getOriginalMapping(resource, sourceLine);
 		}
@@ -808,7 +820,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	 * 
 	 * @param args
 	 */
-	private void handleThreads(String[] args)
+	void handleThreads(String[] args)
 	{
 		String action = args[1];
 		String threadId = args[2];
@@ -817,7 +829,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			if (threadId.length() > 0 && !threads.containsKey(threadId))
 			{
 				String label = args[3];
-				JSDebugThread thread = new JSDebugThread(this, threadId, label.length() > 0 ? label : null);
+				JSDebugThread thread = createThread(this, threadId, label.length() > 0 ? label : null);
 				threads.put(threadId, thread);
 				thread.fireCreationEvent();
 				fireChangeEvent(DebugEvent.CONTENT);
@@ -833,6 +845,11 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 				fireChangeEvent(DebugEvent.CONTENT);
 			}
 		}
+	}
+
+	protected JSDebugThread createThread(JSDebugTarget jsDebugTarget, String threadId, String string)
+	{
+		return new JSDebugThread(jsDebugTarget, threadId, string);
 	}
 
 	/**
@@ -1233,7 +1250,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	private void handleDetailFormattersChange() throws DebugException
 	{
 		StringBuffer sb = new StringBuffer(DETAIL_FORMATTERS);
-		for (DetailFormatter detailFormatter : JSDebugPlugin.getDefault().getDebugOptionsManager()
+		for (DetailFormatter detailFormatter : getDebugOptionsManager()
 				.getDetailFormatters())
 		{
 			if (!detailFormatter.isEnabled())
@@ -1280,7 +1297,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 
 			if (protocolVersion < 2)
 			{
-				JSDebugThread thread = new JSDebugThread(this, DEFAULT_THREAD_ID, null);
+				JSDebugThread thread = createThread(this, DEFAULT_THREAD_ID, null);
 				threads.put(DEFAULT_THREAD_ID, thread);
 				thread.fireCreationEvent();
 				fireChangeEvent(DebugEvent.CONTENT);
@@ -1303,12 +1320,12 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 				connection.sendCommandAndWait(sb.toString());
 			}
 			handleDetailFormattersChange();
-			JSDebugPlugin.getDefault().getDebugOptionsManager().addChangeListener(this);
+			getDebugOptionsManager().addChangeListener(this);
 
 			if (ILaunchManager.DEBUG_MODE.equals(mode))
 			{
 				/* restore breakpoints */
-				for (IBreakpoint breakpoint : DebugPlugin.getDefault().getBreakpointManager()
+				for (IBreakpoint breakpoint : getBreakpointManager()
 						.getBreakpoints(getModelIdentifier()))
 				{
 					breakpointAdded(breakpoint);
@@ -1316,11 +1333,21 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			}
 
 			// Register listeners
-			DebugPlugin.getDefault().getBreakpointManager().addBreakpointManagerListener(this);
-			DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
+			getBreakpointManager().addBreakpointManagerListener(this);
+			getBreakpointManager().addBreakpointListener(this);
 
 			connection.sendCommandAndWait(ENABLE);
 		}
+	}
+
+	protected DebugOptionsManager getDebugOptionsManager()
+	{
+		return JSDebugPlugin.getDefault().getDebugOptionsManager();
+	}
+
+	protected IBreakpointManager getBreakpointManager()
+	{
+		return DebugPlugin.getDefault().getBreakpointManager();
 	}
 
 	/**
@@ -1475,12 +1502,12 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 				// Unregister listeners
 				if (JSDebugPlugin.getDefault() != null)
 				{
-					JSDebugPlugin.getDefault().getDebugOptionsManager().removeChangeListener(this);
+					getDebugOptionsManager().removeChangeListener(this);
 				}
 				if (DebugPlugin.getDefault() != null)
 				{
-					DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(this);
-					DebugPlugin.getDefault().getBreakpointManager().removeBreakpointManagerListener(this);
+					getBreakpointManager().removeBreakpointListener(this);
+					getBreakpointManager().removeBreakpointManagerListener(this);
 				}
 			}
 
@@ -1520,7 +1547,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	 */
 	public void breakpointManagerEnablementChanged(boolean enabled)
 	{
-		for (IBreakpoint breakpoint : DebugPlugin.getDefault().getBreakpointManager()
+		for (IBreakpoint breakpoint : getBreakpointManager()
 				.getBreakpoints(getModelIdentifier()))
 		{
 			if (enabled)
@@ -1840,7 +1867,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 								"Generated mapping while adding breakpoint for {0}:{1} is {2}:{3}", resource,
 								lineNumber, generatedMapping.getFile(), generatedMapping.getLineNumber()),
 								com.aptana.debug.core.IDebugScopes.DEBUG);
-						IResource mappedResource = ResourcesPlugin.getWorkspace().getRoot()
+						IResource mappedResource = getWorkspaceRoot()
 								.findMember(resource.getProject().getFullPath().append(generatedMapping.getFile()));
 						if (mappedResource != null)
 						{
@@ -2062,7 +2089,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	 */
 	protected IBreakpoint findBreakpointAt(URI fileName, int lineNumber)
 	{
-		IBreakpoint[] breakpoints = DebugPlugin.getDefault().getBreakpointManager()
+		IBreakpoint[] breakpoints = getBreakpointManager()
 				.getBreakpoints(getModelIdentifier());
 		IBreakpoint breakpoint = findBreakpointIn(fileName, lineNumber, breakpoints);
 		if (breakpoint != null)
