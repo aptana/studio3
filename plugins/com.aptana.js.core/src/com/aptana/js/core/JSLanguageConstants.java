@@ -91,6 +91,8 @@ public class JSLanguageConstants
 	public static final String IN = "in"; //$NON-NLS-1$
 	public static final String GREATER_GREATER_EQUAL = ">>="; //$NON-NLS-1$
 
+	public static final String REQUIRE = "require"; //$NON-NLS-1$
+
 	public static final String[] KEYWORD_OPERATORS = new String[] { DELETE, INSTANCEOF, IN, NEW, TYPEOF, WITH };
 	@SuppressWarnings("nls")
 	public static final String[] SUPPORT_FUNCTIONS = new String[] { "small", "savePreferences", "slice", "sqrt",
