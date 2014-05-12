@@ -213,9 +213,22 @@ public class ProjectWizardContributionManager
 	public IStatus performProjectFinish(IProject project, IProgressMonitor monitor)
 	{
 		loadExtensions();
+		String[] natureIds = null;
+		try
+		{
+			natureIds = project.getDescription().getNatureIds();
+		}
+		catch (CoreException e)
+		{
+			IdeLog.log(ProjectsPlugin.getDefault(), e.getStatus());
+		}
 		SubMonitor sub = SubMonitor.convert(monitor, contributors == null ? 0 : contributors.size());
 		for (IProjectWizardContributor contributor : contributors)
 		{
+			if (!ArrayUtil.isEmpty(natureIds) && !contributor.hasNatureId(natureIds))
+			{
+				continue;
+			}
 			IStatus status = contributor.performWizardFinish(project, sub.newChild(1));
 			if (status != null && !status.isOK())
 			{
