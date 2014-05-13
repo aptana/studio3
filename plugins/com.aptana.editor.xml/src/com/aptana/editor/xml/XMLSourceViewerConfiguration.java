@@ -10,14 +10,10 @@ package com.aptana.editor.xml;
 import java.util.Map;
 
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.text.DefaultInformationControl;
 import org.eclipse.jface.text.IAutoEditStrategy;
-import org.eclipse.jface.text.IInformationControl;
-import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.quickassist.IQuickAssistAssistant;
 import org.eclipse.jface.text.quickassist.IQuickAssistProcessor;
 import org.eclipse.jface.text.source.ISourceViewer;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
@@ -27,6 +23,7 @@ import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.SimpleSourceViewerConfiguration;
 import com.aptana.editor.common.contentassist.QuickAssistAssistant;
 import com.aptana.editor.common.text.RubyRegexpAutoIndentStrategy;
+import com.aptana.xml.core.IXMLConstants;
 
 public class XMLSourceViewerConfiguration extends SimpleSourceViewerConfiguration
 {
@@ -66,23 +63,13 @@ public class XMLSourceViewerConfiguration extends SimpleSourceViewerConfiguratio
 		{
 			return null;
 		}
-		return registry.getQuickFixProcessor(getEditor().getContentType());
+		AbstractThemeableEditor ate = getEditor();
+		return registry.getQuickFixProcessor(ate == null ? IXMLConstants.CONTENT_TYPE_XML : ate.getContentType());
 	}
 
 	protected IQuickFixProcessorsRegistry getQuickFixRegistry()
 	{
 		return CommonEditorPlugin.getDefault().getQuickFixProcessorRegistry();
-	}
-
-	private IInformationControlCreator getQuickAssistAssistantInformationControlCreator()
-	{
-		return new IInformationControlCreator()
-		{
-			public IInformationControl createInformationControl(Shell parent)
-			{
-				return new DefaultInformationControl(parent, EditorsPlugin.getAdditionalInfoAffordanceString());
-			}
-		};
 	}
 
 	/*
