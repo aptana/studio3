@@ -72,63 +72,12 @@ public class DefaultAnalyticsEventHandler implements IAnalyticsEventHandler
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
-				IAnalyticsUserManager userManager = getUserManager();
-				if (userManager == null)
-				{
-					// send as anonymous user
-					if (!isValidResponse(responseCode = sendPing(event, null)))
-					{
-						// log the event to the database
-						getAnalyticsLogger().logEvent(event);
-					}
-					return Status.OK_STATUS;
-				}
-
-				IAnalyticsUser user = userManager.getUser();
-				// Only send ping if user is logged in. Otherwise, we log it to the database
-				if (user == null || !user.isOnline() || !isValidResponse(responseCode = sendPing(event, user)))
-				{
-					// log the event to the database
-					getAnalyticsLogger().logEvent(event);
-				}
-				else
-				{
-					// Send out all previous events from the db
-					synchronized (lock)
-					{
-						List<AnalyticsEvent> events = getAnalyticsLogger().getEvents();
-						// Sort the events. We want all project.create events to be first, and all project.delete events
-						// to be last
-						Collections.sort(events, new AnalyticsEventComparator());
-						for (AnalyticsEvent aEvent : events)
-						{
-							if (!isValidResponse(responseCode = sendPing(aEvent, user)))
-							{
-								return Status.OK_STATUS;
-							}
-							// Remove the event after it has been sent
-							getAnalyticsLogger().clearEvent(aEvent);
-						}
-					}
-				}
-				return Status.OK_STATUS;
+				return sendEventSync(event);
 			}
 		};
 		job.setSystem(true);
 		job.setPriority(Job.BUILD);
 		job.schedule();
-
-		// Make this a blocking job for unit tests
-		if (EclipseUtil.isTesting())
-		{
-			try
-			{
-				job.join();
-			}
-			catch (InterruptedException e)
-			{
-			}
-		}
 	}
 
 	/*
@@ -255,6 +204,50 @@ public class DefaultAnalyticsEventHandler implements IAnalyticsEventHandler
 	protected IAnalyticsUserManager getUserManager()
 	{
 		return AnalyticsEvent.getUserManager();
+	}
+
+	protected IStatus sendEventSync(final AnalyticsEvent event)
+	{
+		IAnalyticsUserManager userManager = getUserManager();
+		if (userManager == null)
+		{
+			// send as anonymous user
+			if (!isValidResponse(responseCode = sendPing(event, null)))
+			{
+				// log the event to the database
+				getAnalyticsLogger().logEvent(event);
+			}
+			return Status.OK_STATUS;
+		}
+
+		IAnalyticsUser user = userManager.getUser();
+		// Only send ping if user is logged in. Otherwise, we log it to the database
+		if (user == null || !user.isOnline() || !isValidResponse(responseCode = sendPing(event, user)))
+		{
+			// log the event to the database
+			getAnalyticsLogger().logEvent(event);
+		}
+		else
+		{
+			// Send out all previous events from the db
+			synchronized (lock)
+			{
+				List<AnalyticsEvent> events = getAnalyticsLogger().getEvents();
+				// Sort the events. We want all project.create events to be first, and all project.delete events
+				// to be last
+				Collections.sort(events, new AnalyticsEventComparator());
+				for (AnalyticsEvent aEvent : events)
+				{
+					if (!isValidResponse(responseCode = sendPing(aEvent, user)))
+					{
+						return Status.OK_STATUS;
+					}
+					// Remove the event after it has been sent
+					getAnalyticsLogger().clearEvent(aEvent);
+				}
+			}
+		}
+		return Status.OK_STATUS;
 	}
 
 	/**

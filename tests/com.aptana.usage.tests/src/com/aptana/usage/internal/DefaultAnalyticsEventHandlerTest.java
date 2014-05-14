@@ -150,7 +150,7 @@ public class DefaultAnalyticsEventHandlerTest
 				will(returnValue(Collections.emptyList()));
 			}
 		});
-		handler.sendEvent(event);
+		handler.sendEventSync(event);
 		context.assertIsSatisfied();
 	}
 
@@ -192,7 +192,7 @@ public class DefaultAnalyticsEventHandlerTest
 				never(connection).disconnect();
 			}
 		});
-		handler.sendEvent(event);
+		handler.sendEventSync(event);
 		context.assertIsSatisfied();
 	}
 
@@ -225,7 +225,7 @@ public class DefaultAnalyticsEventHandlerTest
 				never(connection).disconnect();
 			}
 		});
-		handler.sendEvent(event);
+		handler.sendEventSync(event);
 		context.assertIsSatisfied();
 	}
 
@@ -256,7 +256,7 @@ public class DefaultAnalyticsEventHandlerTest
 				never(logger).logEvent(event);
 			}
 		});
-		handler.sendEvent(event);
+		handler.sendEventSync(event);
 		context.assertIsSatisfied();
 	}
 
