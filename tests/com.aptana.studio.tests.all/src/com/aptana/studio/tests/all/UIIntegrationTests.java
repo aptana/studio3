@@ -7,10 +7,14 @@
  */
 package com.aptana.studio.tests.all;
 
+import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
+import com.aptana.core.logging.IdeLog;
+import com.aptana.core.logging.IdeLog.StatusLevel;
 import com.aptana.core.tests.StdErrLoggingSuite;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.internal.commands.ExpandCollapseAllHandlerTest;
 import com.aptana.editor.common.internal.commands.NextPreviousEditorHandlerTest;
 import com.aptana.editor.common.scripting.ScriptingInputOutputIntegrationTest;
@@ -37,5 +41,18 @@ import com.aptana.jira.core.JiraManagerIntegrationTest;
 // @formatter:on
 public class UIIntegrationTests
 {
-
+	/**
+	 * We turn logging level to INFO and turn on debugging for everything (basically setting logging to TRACE)
+	 */
+	@BeforeClass
+	public static void turnUpLogging()
+	{
+		System.err.println("Turning logging to INFO");
+		IdeLog.setCurrentSeverity(StatusLevel.INFO);
+		System.err.println("Turning on all debug options");
+		String[] currentOptions = EclipseUtil.getCurrentDebuggableComponents();
+		EclipseUtil.setBundleDebugOptions(currentOptions, true);
+		System.err.println("Turning on platform debugging flag");
+		EclipseUtil.setPlatformDebugging(true);
+	}
 }
