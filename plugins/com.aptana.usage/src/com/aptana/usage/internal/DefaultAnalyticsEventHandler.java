@@ -74,6 +74,12 @@ public class DefaultAnalyticsEventHandler implements IAnalyticsEventHandler
 			{
 				return sendEventSync(event);
 			}
+
+			@Override
+			public boolean belongsTo(Object family)
+			{
+				return family.equals(IAnalyticsEventHandler.class);
+			}
 		};
 		job.setSystem(true);
 		job.setPriority(Job.BUILD);
