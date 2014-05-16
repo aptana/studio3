@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Usage Plugin Tests
+Bundle-SymbolicName: com.aptana.usage.tests
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: Appcelerator, Inc.
+Fragment-Host: com.aptana.usage;bundle-version="3.0.0"
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Require-Bundle: org.junit;bundle-version="4.0.0",
+ com.aptana.testing.mocks;bundle-version="1.0.0"
+Export-Package: com.aptana.usage.tests

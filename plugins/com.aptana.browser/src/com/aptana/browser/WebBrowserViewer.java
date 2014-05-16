@@ -51,8 +51,6 @@ import com.aptana.browser.internal.BrowserBackgroundImage;
 import com.aptana.browser.internal.BrowserSize;
 import com.aptana.browser.internal.BrowserSizeCategory;
 import com.aptana.core.CoreStrings;
-import com.aptana.swt.webkitbrowser.OpenWindowEvent;
-import com.aptana.swt.webkitbrowser.WebKitBrowser;
 
 /**
  * @author Max Stepanov
@@ -62,7 +60,7 @@ public class WebBrowserViewer extends Composite
 
 	public static final int NAVIGATION_BAR = 1 << 0;
 
-	private WebKitBrowser browser;
+	private Browser browser;
 	private IAction backAction;
 	private IAction forwardAction;
 	private IAction stopAction;
@@ -146,7 +144,7 @@ public class WebBrowserViewer extends Composite
 			createCommandBar(container);
 			createNavigationBar(container);
 		}
-		browser = new WebKitBrowser(browserArea, SWT.NONE);
+		browser = new Browser(browserArea, SWT.NONE);
 		browser.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 		if (showNavigatorBar)
 		{
@@ -200,14 +198,7 @@ public class WebBrowserViewer extends Composite
 				WebBrowserViewer browser2 = new WebBrowserViewer(shell2, style);
 				shell2.layout();
 				browser2.newWindow = true;
-				if (event instanceof OpenWindowEvent)
-				{
-					((OpenWindowEvent) event).browser = browser2.browser;
-				}
-				else
-				{
-					event.browser = (Browser) browser2.getBrowser();
-				}
+				event.browser = (Browser) browser2.getBrowser();
 			}
 		});
 		browser.addCloseWindowListener(new CloseWindowListener()

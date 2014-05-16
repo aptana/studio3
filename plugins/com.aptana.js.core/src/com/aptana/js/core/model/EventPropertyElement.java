@@ -7,24 +7,25 @@
  */
 package com.aptana.js.core.model;
 
+import java.util.List;
 import java.util.Map;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
+import com.aptana.index.core.IndexUtil;
 import com.aptana.jetty.util.epl.ajax.JSON.Output;
 
 /**
  * EventProperty
  */
-public class EventPropertyElement extends BaseElement
+public class EventPropertyElement extends BaseElement implements IHasPredefinedValues
 {
 
 	private static final String TYPE_PROPERTY = "type"; //$NON-NLS-1$
-	private static final String DEPRECATED_PROPERTY = "deprecated"; //$NON-NLS-1$
 
 	private String _type;
-
-	private boolean _deprecated;
+	private List<String> _constants;
 
 	/**
 	 * EventProperty
@@ -44,7 +45,7 @@ public class EventPropertyElement extends BaseElement
 		super.fromJSON(object);
 
 		this.setType(StringUtil.getStringValue(object.get(TYPE_PROPERTY)));
-		this.setIsDeprecated(Boolean.TRUE == object.get(DEPRECATED_PROPERTY)); // $codepro.audit.disable useEquals
+		this._constants = IndexUtil.createList(object.get(CONSTANTS_PROPERTY));
 	}
 
 	/**
@@ -56,32 +57,22 @@ public class EventPropertyElement extends BaseElement
 	}
 
 	/**
+	 * getConstants
+	 * 
+	 * @return
+	 */
+	public List<String> getConstants()
+	{
+		return CollectionsUtil.getListValue(this._constants);
+	}
+
+	/**
 	 * @param type
 	 *            the type to set
 	 */
 	public void setType(String type)
 	{
 		this._type = type;
-	}
-
-	/**
-	 * isDeprecated
-	 * 
-	 * @return
-	 */
-	public boolean isDeprecated()
-	{
-		return this._deprecated;
-	}
-
-	/**
-	 * setIsDeprecated
-	 * 
-	 * @param value
-	 */
-	public void setIsDeprecated(boolean value)
-	{
-		this._deprecated = value;
 	}
 
 	/*
@@ -94,7 +85,7 @@ public class EventPropertyElement extends BaseElement
 		super.toJSON(out);
 
 		out.add(TYPE_PROPERTY, this.getType());
-		out.add(DEPRECATED_PROPERTY, this.isDeprecated());
+		out.add(CONSTANTS_PROPERTY, this.getConstants());
 	}
 
 	/**

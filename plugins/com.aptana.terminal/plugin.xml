@@ -97,7 +97,7 @@
             category="com.aptana.ui.AptanaPreferencePage"
             class="com.aptana.terminal.preferences.TerminalPreferencePage"
             id="com.aptana.terminal.page"
-            name="%page.name">
+            name="%page.name Aptana Studio">
       </page>
    </extension>
    <extension

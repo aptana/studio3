@@ -86,5 +86,11 @@
             id="com.aptana.editor.xml.contentMergeViewer">
       </viewer>
    </extension>
-
+ 	<extension
+         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectorTargets">
+      <target
+            id="com.aptana.editor.xml.sourceCode"
+            name="XML Editors">
+      </target>
+   </extension>
 </plugin>

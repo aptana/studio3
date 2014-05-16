@@ -187,7 +187,7 @@ public class ExternalFileAnnotationModel extends AbstractMarkerAnnotationModel i
 							{
 								try
 								{
-									ProblemAnnotation annotation = new ProblemAnnotation(problem);
+									ProblemAnnotation annotation = new ProblemAnnotation(null, problem);
 									addAnnotation(annotation, position, false);
 									fGeneratedAnnotations.add(annotation);
 

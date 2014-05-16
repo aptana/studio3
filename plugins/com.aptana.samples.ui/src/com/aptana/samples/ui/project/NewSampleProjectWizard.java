@@ -16,7 +16,6 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
-import org.eclipse.core.resources.IProjectNatureDescriptor;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceStatus;
 import org.eclipse.core.resources.IWorkspaceRunnable;
@@ -81,8 +80,6 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 	private IProject newProject;
 	private IConfigurationElement configElement;
 
-	public String[] availableProjectNatures;
-
 	/**
 	 * A wizard to create a new sample project.
 	 * 
@@ -91,12 +88,6 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 	 */
 	public NewSampleProjectWizard(IProjectSample sample)
 	{
-		IProjectNatureDescriptor[] natureDescriptors = ResourcesPlugin.getWorkspace().getNatureDescriptors();
-		availableProjectNatures = new String[natureDescriptors.length];
-		for (int i = 0; i < natureDescriptors.length; i++)
-		{
-			availableProjectNatures[i] = natureDescriptors[i].getNatureId();
-		}
 		this.sample = sample;
 		initDialogSettings();
 	}
@@ -106,7 +97,7 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 	{
 		super.addPages();
 
-		mainPage = new SampleNewProjectCreationPage("basicNewProjectPage", availableProjectNatures); //$NON-NLS-1$
+		mainPage = new SampleNewProjectCreationPage("basicNewProjectPage", sample.getNatures()); //$NON-NLS-1$
 		mainPage.setTitle(Messages.NewSampleProjectWizard_ProjectPage_Title);
 		mainPage.setDescription(Messages.NewSampleProjectWizard_ProjectPage_Description);
 		addPage(mainPage);
@@ -120,7 +111,7 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 		// Add contributed pages
 		ProjectWizardContributionManager projectWizardContributionManager = ProjectsPlugin.getDefault()
 				.getProjectWizardContributionManager();
-		IWizardPage[] extraPages = projectWizardContributionManager.createPages(null, availableProjectNatures);
+		IWizardPage[] extraPages = projectWizardContributionManager.createPages(null, sample.getNatures());
 		if (!ArrayUtil.isEmpty(extraPages))
 		{
 			for (IWizardPage page : extraPages)
@@ -130,7 +121,7 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 		}
 
 		// Finalize pages using contributors
-		projectWizardContributionManager.finalizeWizardPages(getPages(), availableProjectNatures);
+		projectWizardContributionManager.finalizeWizardPages(getPages(), sample.getNatures());
 	}
 
 	@Override
@@ -250,7 +241,12 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 
 						public void run(IProgressMonitor monitor) throws CoreException
 						{
-							sample.createNewProject(project, projectData, monitor);
+							IStatus status = sample.createNewProject(project, projectData, monitor);
+							if (status != null && !status.isOK())
+							{
+								IdeLog.logError(SamplesUIPlugin.getDefault(), status.getMessage(),
+										status.getException());
+							}
 						}
 					};
 					ResourcesPlugin.getWorkspace().run(runnable, monitor);

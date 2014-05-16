@@ -15,13 +15,15 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
-import com.aptana.core.util.URIUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.util.EditorUtil;
 import com.aptana.editor.js.IDebugScopes;
@@ -32,13 +34,17 @@ import com.aptana.editor.js.contentassist.ParseUtil;
 import com.aptana.editor.js.internal.JSModelUtil;
 import com.aptana.index.core.Index;
 import com.aptana.js.core.index.JSIndexQueryHelper;
+import com.aptana.js.core.inferencing.CommonJSResolver;
 import com.aptana.js.core.inferencing.JSPropertyCollection;
 import com.aptana.js.core.inferencing.JSScope;
+import com.aptana.js.core.inferencing.RequireResolverFactory;
 import com.aptana.js.core.model.PropertyElement;
 import com.aptana.js.core.parsing.ast.IJSNodeTypes;
+import com.aptana.js.core.parsing.ast.JSArgumentsNode;
 import com.aptana.js.core.parsing.ast.JSFunctionNode;
 import com.aptana.js.core.parsing.ast.JSGetPropertyNode;
 import com.aptana.js.core.parsing.ast.JSIdentifierNode;
+import com.aptana.js.core.parsing.ast.JSInvokeNode;
 import com.aptana.js.core.parsing.ast.JSNode;
 import com.aptana.js.core.parsing.ast.JSParseRootNode;
 import com.aptana.js.core.parsing.ast.JSTreeWalker;
@@ -136,47 +142,12 @@ public class JSHyperlinkCollector extends JSTreeWalker
 			IRegion hyperlinkRegion = getNodeRegion(linkNode);
 			URI projectURI = EditorUtil.getProjectURI(editor);
 			String targetFilePath = EditorUtil.getURI(editor).toString();
-			String hyperlinkText = getDocumentDisplayName(projectURI, targetFilePath);
+			String hyperlinkText = JSHyperlinkUtil.getDocumentDisplayName(projectURI, targetFilePath);
 			IRegion targetRegion = getNodeRegion(targetNode);
 
 			addHyperlink(new JSTargetRegionHyperlink(hyperlinkRegion, linkType, hyperlinkText, targetFilePath,
 					targetRegion));
 		}
-	}
-
-	/**
-	 * Format the document to a relative path within the project, including the project name in the result. If the
-	 * document is not within the project path, then it is returned unchanged
-	 * 
-	 * @param projectURI
-	 *            The URI to the project containing the file in the editor associated with this instance
-	 * @param document
-	 *            A string representation of the document name to trim.
-	 * @return Returns a trimmed or untouched version of the document parameter
-	 */
-	protected String getDocumentDisplayName(URI projectURI, String document)
-	{
-		String prefix = (projectURI != null) ? URIUtil.decodeURI(projectURI.toString()) : null;
-
-		// back up one segment so we include the project name in the document
-		if (prefix != null && prefix.length() > 2)
-		{
-			int index = prefix.lastIndexOf('/', prefix.length() - 2);
-
-			if (index != -1 && index > 0)
-			{
-				prefix = prefix.substring(0, index - 1);
-			}
-		}
-
-		String result = URIUtil.decodeURI(document);
-
-		if (prefix != null && result.startsWith(prefix))
-		{
-			result = result.substring(prefix.length() + 1);
-		}
-
-		return result;
 	}
 
 	/**
@@ -248,28 +219,6 @@ public class JSHyperlinkCollector extends JSTreeWalker
 	}
 
 	/**
-	 * Determine if the document is within the specified project
-	 * 
-	 * @param projectURI
-	 * @param document
-	 * @return
-	 */
-	protected boolean isInCurrentProject(URI projectURI, String document)
-	{
-		String prefix = (projectURI != null) ? URIUtil.decodeURI(projectURI.toString()) : null;
-		boolean result = false;
-
-		String path = URIUtil.decodeURI(document);
-
-		if (prefix != null && path.startsWith(prefix))
-		{
-			result = true;
-		}
-
-		return result;
-	}
-
-	/**
 	 * Process all symbols that are in scope for the offset being processed within the editor. This method creates links
 	 * for symbols that refer to function parameters, local variable declarations, and local assignments, taking
 	 * function nesting into account. Note that all of these link types imply links within the editor only.
@@ -279,6 +228,32 @@ public class JSHyperlinkCollector extends JSTreeWalker
 	 */
 	protected void processEditorSymbols(JSIdentifierNode node)
 	{
+		// If the identifier is "require" and the parent is a JSInvokeNode, can we resolve the path and open the
+		// file?
+		if (node.getParent() instanceof JSInvokeNode && node.getNameNode().getName().equals("require"))
+		{
+			JSInvokeNode invoke = (JSInvokeNode) node.getParent();
+			JSArgumentsNode args = (JSArgumentsNode) invoke.getArguments();
+			String moduleId = getPath(args);
+
+			IProject project = EditorUtil.getProject(editor);
+			URI editorURI = EditorUtil.getURI(editor);
+			IPath currentDirectory = Path.fromPortableString(editorURI.getPath()).removeLastSegments(1);
+
+			IPath requiredFile = RequireResolverFactory.resolve(moduleId, project, currentDirectory,
+					project.getLocation());
+			if (requiredFile != null && requiredFile.toFile().exists())
+			{
+				IRegion hyperlinkRegion = getNodeRegion(node);
+				String targetFilePath = requiredFile.toFile().toURI().toASCIIString();
+				String hyperlinkText = JSHyperlinkUtil.getDocumentDisplayName(project.getLocationURI(), targetFilePath);
+
+				addHyperlink(new JSTargetRegionHyperlink(hyperlinkRegion, JSAbstractHyperlink.INVOCATION_TYPE,
+						hyperlinkText, targetFilePath, new Region(0, 0)));
+			}
+			return;
+		}
+
 		JSScope globalScope = ast.getGlobals();
 		JSScope activeScope = globalScope.getScopeAtOffset(offset);
 		JSPropertyCollection properties = activeScope.getSymbol(node.getText());
@@ -330,6 +305,22 @@ public class JSHyperlinkCollector extends JSTreeWalker
 				}
 			}
 		}
+	}
+
+	/**
+	 * Take the arguments to a require invocation and determine the string it's building up.
+	 * 
+	 * @param args
+	 * @return
+	 */
+	private String getPath(JSArgumentsNode args)
+	{
+		if (args.getChildCount() > 0)
+		{
+			IParseNode child = args.getChild(0);
+			return CommonJSResolver.getModuleId(child);
+		}
+		return null;
 	}
 
 	/**
@@ -502,9 +493,9 @@ public class JSHyperlinkCollector extends JSTreeWalker
 				for (String document : documents)
 				{
 					// NOTE: projectURI is null during unit testing
-					if (projectURI == null || isInCurrentProject(projectURI, document))
+					if (projectURI == null || JSHyperlinkUtil.isInCurrentProject(projectURI, document))
 					{
-						String text = getDocumentDisplayName(projectURI, document);
+						String text = JSHyperlinkUtil.getDocumentDisplayName(projectURI, document);
 
 						addHyperlink(new JSSearchStringHyperlink(region, linkType, text, document, elementName));
 					}

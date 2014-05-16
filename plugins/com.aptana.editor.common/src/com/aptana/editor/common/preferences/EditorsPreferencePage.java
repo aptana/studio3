@@ -60,6 +60,8 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 				Messages.EditorsPreferencePage_Close_Matching_Character_Pairs, group));
 		addField(new BooleanFieldEditor(IPreferenceConstants.EDITOR_WRAP_SELECTION,
 				Messages.EditorsPreferencePage_Wrap_Selection, group));
+		addField(new BooleanFieldEditor(IPreferenceConstants.EDITOR_SUB_WORD_NAVIGATION,
+				Messages.EditorsPreferencePage_camelCaseSelection, group));
 
 		// Save Actions
 		group = AptanaPreferencePage.createGroup(appearanceComposite, Messages.EditorsPreferencePage_saveActionsGroup);

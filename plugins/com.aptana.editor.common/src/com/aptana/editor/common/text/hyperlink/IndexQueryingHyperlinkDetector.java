@@ -27,8 +27,7 @@ public abstract class IndexQueryingHyperlinkDetector extends AbstractHyperlinkDe
 	protected Index getIndex()
 	{
 		// Now try and resolve the value as a URI...
-		IEditorPart part = (IEditorPart) getAdapter(IEditorPart.class);
-		IEditorInput input = part.getEditorInput();
+		IEditorInput input = getEditorInput();
 		// TODO What about IFileStoreEditorInputs? IURIEditorInputs?
 		if (input instanceof IFileEditorInput)
 		{
@@ -44,11 +43,25 @@ public abstract class IndexQueryingHyperlinkDetector extends AbstractHyperlinkDe
 		return IndexPlugin.getDefault().getIndexManager();
 	}
 
+	protected IEditorPart getEditor()
+	{
+		return (IEditorPart) getAdapter(IEditorPart.class);
+	}
+
+	protected IEditorInput getEditorInput()
+	{
+		IEditorPart part = getEditor();
+		if (part == null)
+		{
+			return null;
+		}
+		return part.getEditorInput();
+	}
+
 	protected URI getURI()
 	{
 		// Now try and resolve the value as a URI...
-		IEditorPart part = (IEditorPart) getAdapter(IEditorPart.class);
-		IEditorInput input = part.getEditorInput();
+		IEditorInput input = getEditorInput();
 		if (input instanceof IURIEditorInput)
 		{
 			return ((IURIEditorInput) input).getURI();

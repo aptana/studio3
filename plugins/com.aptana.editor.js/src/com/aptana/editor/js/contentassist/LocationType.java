@@ -14,7 +14,10 @@ public enum LocationType
 	NONE,
 
 	IN_GLOBAL,
-	IN_PARAMETERS,
+	/**
+	 * Inside a function invocation where arguments would go (but _not_ on an argument)
+	 */
+	IN_ARGUMENTS,
 	IN_CONSTRUCTOR,
 	IN_PROPERTY_NAME,
 

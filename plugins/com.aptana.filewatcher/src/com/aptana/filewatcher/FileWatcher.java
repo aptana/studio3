@@ -62,7 +62,13 @@ public class FileWatcher
 	public static int addWatch(String path, int mask, boolean watchSubtree, final JNotifyListener listener)
 			throws JNotifyException
 	{
-		return instance().addWatch(path, mask, watchSubtree, listener);
+		return addWatch(path, mask, watchSubtree, true, listener);
+	}
+
+	public static int addWatch(String path, int mask, boolean watchSubtree, boolean recursive,
+			final JNotifyListener listener) throws JNotifyException
+	{
+		return instance().addWatch(path, mask, watchSubtree, recursive, listener);
 	}
 
 	public static boolean removeWatch(int watchId) throws JNotifyException

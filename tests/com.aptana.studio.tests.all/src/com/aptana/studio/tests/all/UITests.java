@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.studio.tests.all;
 
 import org.junit.runner.RunWith;
@@ -19,7 +19,7 @@ import com.aptana.editor.common.internal.commands.NextPreviousEditorHandlerTest;
 @Suite.SuiteClasses({ 
 	com.aptana.browser.tests.AllTests.class,
 	com.aptana.console.tests.AllTests.class,
-	
+	com.aptana.editor.coffee.tests.AllTests.class,
 	com.aptana.editor.common.tests.AllTests.class,
 	com.aptana.editor.css.tests.AllTests.class,
 	com.aptana.editor.css.formatter.tests.AllTests.class,

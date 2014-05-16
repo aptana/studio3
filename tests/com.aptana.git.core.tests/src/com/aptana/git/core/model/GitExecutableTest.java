@@ -13,7 +13,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
@@ -32,6 +31,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
+import org.jmock.lib.concurrent.Synchroniser;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.After;
 import org.junit.Before;
@@ -39,6 +39,7 @@ import org.junit.Test;
 import org.osgi.framework.Version;
 
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.ProcessStatus;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.IPreferenceConstants;
@@ -59,6 +60,7 @@ public class GitExecutableTest
 		{
 			{
 				setImposteriser(ClassImposteriser.INSTANCE);
+				setThreadingPolicy(new Synchroniser());
 			}
 		};
 	}
@@ -171,8 +173,7 @@ public class GitExecutableTest
 		});
 
 		final String sourceURI = "git@github.com:aptana/studio3.git";
-		final IPath dest = Path.fromOSString(new File(File.createTempFile("clone_dest", "tmp").getParent(),
-				"clone_dest").getAbsolutePath());
+		final IPath dest = FileUtil.getTempDirectory().append("clone_dest");
 		IPath gitPath = Path.fromPortableString("/fake/git/path");
 		GitExecutable executable = new GitExecutable(gitPath)
 		{
@@ -230,8 +231,7 @@ public class GitExecutableTest
 		});
 
 		final String sourceURI = "git@github.com:aptana/studio3.git";
-		final IPath dest = Path.fromOSString(new File(File.createTempFile("clone_dest", "tmp").getParent(),
-				"clone_dest").getAbsolutePath());
+		final IPath dest = FileUtil.getTempDirectory().append("clone_dest");
 		IPath gitPath = Path.fromPortableString("/fake/git/path");
 		GitExecutable executable = new GitExecutable(gitPath)
 		{

@@ -24,11 +24,9 @@ public class EventElement extends BaseElement
 {
 	private static final String OWNING_TYPE_PROPERTY = "owningType"; //$NON-NLS-1$
 	private static final String PROPERTIES_PROPERTY = "properties"; //$NON-NLS-1$
-	private static final String DEPRECATED_PROPERTY = "deprecated"; //$NON-NLS-1$
 
 	private String _owningType;
 	private List<EventPropertyElement> _properties;
-	private boolean _deprecated;
 
 	/**
 	 * EventElement
@@ -77,7 +75,6 @@ public class EventElement extends BaseElement
 				this.addProperty(property);
 			}
 		}
-		this.setIsDeprecated(Boolean.TRUE == object.get(DEPRECATED_PROPERTY)); // $codepro.audit.disable useEquals
 	}
 
 	/**
@@ -109,26 +106,6 @@ public class EventElement extends BaseElement
 	{
 		this._owningType = type;
 	}
-	
-	/**
-	 * isDeprecated
-	 * 
-	 * @return
-	 */
-	public boolean isDeprecated()
-	{
-		return this._deprecated;
-	}
-
-	/**
-	 * setIsDeprecated
-	 * 
-	 * @param value
-	 */
-	public void setIsDeprecated(boolean value)
-	{
-		this._deprecated = value;
-	}
 
 	/*
 	 * (non-Javadoc)
@@ -140,7 +117,6 @@ public class EventElement extends BaseElement
 		super.toJSON(out);
 
 		out.add(OWNING_TYPE_PROPERTY, this.getOwningType());
-		out.add(DEPRECATED_PROPERTY, this.isDeprecated());
 		out.add(PROPERTIES_PROPERTY, this.getProperties());
 	}
 

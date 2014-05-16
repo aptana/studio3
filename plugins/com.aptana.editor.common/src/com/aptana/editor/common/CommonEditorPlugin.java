@@ -48,6 +48,7 @@ import com.aptana.core.CorePlugin;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.editor.common.internal.QuickFixProcessorsRegistry;
 import com.aptana.editor.common.internal.scripting.ContentTypeTranslation;
 import com.aptana.editor.common.internal.scripting.DocumentScopeManager;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
@@ -235,6 +236,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	private DocumentScopeManager fDocumentScopeManager;
 	private IPreferenceChangeListener fThemeChangeListener;
 	private SpellingPreferences spellingPreferences;
+	private IQuickFixProcessorsRegistry quickFixRegistry;
 
 	/**
 	 * The constructor
@@ -362,6 +364,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		{
 			fDocumentScopeManager = null;
 			differentiator = null;
+			quickFixRegistry = null;
 			plugin = null;
 			super.stop(context);
 		}
@@ -489,5 +492,14 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 			}
 			PlatformUI.getWorkbench().removeWindowListener(fWindowListener);
 		}
+	}
+
+	public synchronized IQuickFixProcessorsRegistry getQuickFixProcessorRegistry()
+	{
+		if (quickFixRegistry == null)
+		{
+			quickFixRegistry = new QuickFixProcessorsRegistry();
+		}
+		return quickFixRegistry;
 	}
 }

@@ -8,6 +8,7 @@
 package com.aptana.projects.primary.natures;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,7 @@ import java.util.Set;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IPath;
 
 import com.aptana.core.epl.CoreEPLPlugin;
 import com.aptana.core.util.CollectionsUtil;
@@ -100,19 +102,27 @@ public class PrimaryNaturesManager
 	 */
 	public List<String> getPotentialNatures(IProject project)
 	{
+		if (project == null || !project.isAccessible())
+		{
+			return Collections.emptyList();
+		}
 		lazyInit();
 		List<String> potentialNatures = new ArrayList<String>(natureIdRanks.size());
 		for (String natureId : natureIdRanks.keySet())
 		{
 			IPrimaryNatureContributor primaryNatureContributor = natureIdRanks.get(natureId);
-			int primaryNatureRank = primaryNatureContributor.getPrimaryNatureRank(project.getLocation());
-			if (primaryNatureRank == IPrimaryNatureContributor.CAN_BE_PRIMARY)
+			IPath location = project.getLocation();
+			if (location != null)
 			{
-				potentialNatures.add(natureId);
-			}
-			else if (primaryNatureRank == IPrimaryNatureContributor.IS_PRIMARY)
-			{
-				potentialNatures.add(0, natureId);
+				int primaryNatureRank = primaryNatureContributor.getPrimaryNatureRank(location);
+				if (primaryNatureRank == IPrimaryNatureContributor.CAN_BE_PRIMARY)
+				{
+					potentialNatures.add(natureId);
+				}
+				else if (primaryNatureRank == IPrimaryNatureContributor.IS_PRIMARY)
+				{
+					potentialNatures.add(0, natureId);
+				}
 			}
 		}
 		return potentialNatures;

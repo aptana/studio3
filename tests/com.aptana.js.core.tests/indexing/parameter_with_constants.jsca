@@ -1,0 +1,89 @@
+{
+	"types": [
+		{
+			"name": "Titanium",
+			"extends": "Something",
+			"functions": [
+				{
+                    "name": "convertUnits", 
+                    "isInternal": false, 
+                    "parameters": [
+                        {
+                            "name": "convertFromValue", 
+                            "usage": "required", 
+                            "type": "String", 
+                            "description": "<p>Measurement and optional unit to convert from, i.e. 160, \"120dip\".  Percentages are \nnot accepted.</p>"
+                        }, 
+                        {
+                            "name": "convertToUnits", 
+                            "usage": "required", 
+                            "type": "String", 
+                            "description": "<p>Desired unit for the conversion result. Use one of the unit constants in Titanium.UI.</p>",
+                        	"constants": [
+                        				"Titanium.UI.UNIT_CM",
+                        				"Titanium.UI.UNIT_DIP",
+                        				"Titanium.UI.UNIT_IN",
+                        				"Titanium.UI.UNIT_MM",
+                        				"Titanium.UI.UNIT_PX"
+                        	]
+                        }
+                    ], 
+                    "deprecated": false, 
+                    "since": [
+                        {
+                            "name": "Titanium Mobile SDK - Android", 
+                            "version": "2.0.0"
+                        }, 
+                        {
+                            "name": "Titanium Mobile SDK - iPhone", 
+                            "version": "2.0.0"
+                        }, 
+                        {
+                            "name": "Titanium Mobile SDK - iPad", 
+                            "version": "2.0.0"
+                        }, 
+                        {
+                            "name": "Titanium Mobile SDK - Mobile Web", 
+                            "version": "2.0.0"
+                        }, 
+                        {
+                            "name": "Titanium Mobile SDK - Tizen", 
+                            "version": "3.1"
+                        }
+                    ], 
+                    "returnTypes": [
+                        {
+                            "type": "Number", 
+                            "description": ""
+                        }
+                    ], 
+                    "isConstructor": false, 
+                    "isClassProperty": false, 
+                    "examples": [], 
+                    "userAgents": [
+                        {
+                            "platform": "android"
+                        }, 
+                        {
+                            "platform": "iphone"
+                        }, 
+                        {
+                            "platform": "ipad"
+                        }, 
+                        {
+                            "platform": "mobileweb"
+                        }, 
+                        {
+                            "platform": "tizen"
+                        }
+                    ], 
+                    "exceptions": [], 
+                    "references": [], 
+                    "isMethod": true, 
+                    "isInstanceProperty": true, 
+                    "description": "<p>Converts one type of unit to another using the metrics of the main display.</p>"
+                }
+			]
+		}
+	]
+}

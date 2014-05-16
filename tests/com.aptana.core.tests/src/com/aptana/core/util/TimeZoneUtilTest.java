@@ -7,11 +7,14 @@
  */
 package com.aptana.core.util;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
-public class TimeZoneUtilTest extends TestCase
+public class TimeZoneUtilTest
 {
 
+	@Test
 	public void testGetCommonTimeZone()
 	{
 		assertEquals("", TimeZoneUtil.getCommonTimeZone(null));

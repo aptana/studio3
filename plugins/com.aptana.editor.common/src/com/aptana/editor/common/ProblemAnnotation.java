@@ -30,7 +30,7 @@ import com.aptana.core.build.IProblem;
 /**
  * Annotation representing an <code>IProblem</code>.
  */
-class ProblemAnnotation extends Annotation implements IAnnotationPresentation, IQuickFixableAnnotation
+public class ProblemAnnotation extends Annotation implements IAnnotationPresentation, IQuickFixableAnnotation
 {
 
 	private static final String ERROR_ANNOTATION_TYPE = "com.aptana.editor.common.error"; //$NON-NLS-1$
@@ -90,10 +90,11 @@ class ProblemAnnotation extends Annotation implements IAnnotationPresentation, I
 	private int fLayer = IAnnotationAccessExtension.DEFAULT_LAYER;
 	private boolean fIsQuickFixable;
 	private boolean fIsQuickFixableStateSet = false;
+	private String markerId;
 
-	public ProblemAnnotation(IProblem problem)
+	public ProblemAnnotation(String markerId, IProblem problem)
 	{
-
+		this.markerId = markerId;
 		fProblem = problem;
 
 		if (fProblem.isTask())
@@ -180,6 +181,11 @@ class ProblemAnnotation extends Annotation implements IAnnotationPresentation, I
 		return fProblem.getMessage();
 	}
 
+	public IProblem getProblem()
+	{
+		return fProblem;
+	}
+
 	public void setQuickFixable(boolean state)
 	{
 		fIsQuickFixable = state;
@@ -195,5 +201,10 @@ class ProblemAnnotation extends Annotation implements IAnnotationPresentation, I
 	{
 		Assert.isTrue(isQuickFixableStateSet());
 		return fIsQuickFixable;
+	}
+
+	public String getMarkerId()
+	{
+		return markerId;
 	}
 }

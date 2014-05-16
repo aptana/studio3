@@ -8,8 +8,8 @@
 package com.aptana.portal.ui.dispatch.configurationProcessors;
 
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -88,21 +88,21 @@ public abstract class InstallerConfigurationProcessor extends AbstractConfigurat
 		}
 		downloadedPaths = null;
 		DownloadManager downloadManager = new DownloadManager();
-		List<URL> urlsList = new ArrayList<URL>(URLs.length);
+		List<URI> urlsList = new ArrayList<URI>(URLs.length);
 		for (int i = 0; i < URLs.length; i++)
 		{
 			try
 			{
-				urlsList.add(new URL(urls[i]));
+				urlsList.add(new URI(urls[i]));
 			}
-			catch (MalformedURLException mue)
+			catch (URISyntaxException mue)
 			{
 				IdeLog.logError(PortalUIPlugin.getDefault(), mue);
 			}
 		}
 		try
 		{
-			downloadManager.addURLs(urlsList);
+			downloadManager.addURIs(urlsList);
 			IStatus status = downloadManager.start(progressMonitor);
 			if (status.isOK())
 			{

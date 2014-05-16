@@ -1,0 +1,8 @@
+{
+	"types": [
+		{
+			"name": "Titanium.UI",
+			"extends": "Something"
+		}
+	]
+}

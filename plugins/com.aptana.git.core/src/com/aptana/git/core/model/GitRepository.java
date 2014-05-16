@@ -40,7 +40,6 @@ import net.contentobjects.jnotify.JNotifyAdapter;
 import net.contentobjects.jnotify.JNotifyException;
 import net.contentobjects.jnotify.JNotifyListener;
 
-import org.apache.tools.ant.util.CollectionUtils;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -666,7 +665,7 @@ public class GitRepository
 	 */
 	public Set<String> remotes()
 	{
-		Set<String> set = new HashSet<String>();
+		SortedSet<String> set = new TreeSet<String>();
 		String contents = configContents();
 		if (!StringUtil.isEmpty(contents))
 		{

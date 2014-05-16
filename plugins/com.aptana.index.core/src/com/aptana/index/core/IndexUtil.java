@@ -8,6 +8,8 @@
 package com.aptana.index.core;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +22,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 
+import com.aptana.core.IMap;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.CollectionsUtil;
@@ -91,7 +94,7 @@ public class IndexUtil
 					// Wrap loop because if newInstance fails once, it will fail for all iterations
 					try
 					{
-						for (Object value : (List) object)
+						for (Object value : objects)
 						{
 							if (value instanceof Map)
 							{
@@ -126,25 +129,34 @@ public class IndexUtil
 	 * @param list
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	public static List<String> createList(Object object)
 	{
 		List<String> result = null;
-
-		if (object != null && object.getClass().isArray())
+		if (object != null)
 		{
-			Object[] objects = (Object[]) object;
-
-			if (objects.length > 0)
+			Collection<Object> objects = null;
+			if (object.getClass().isArray())
 			{
-				result = new ArrayList<String>();
+				objects = Arrays.asList((Object[]) object);
+			}
+			else if (object instanceof Collection)
+			{
+				objects = (Collection<Object>) object;
+			}
 
-				for (Object value : (Object[]) object)
+			if (!CollectionsUtil.isEmpty(objects))
+			{
+				return CollectionsUtil.map(objects, new IMap<Object, String>()
 				{
-					result.add(value.toString());
-				}
+					@Override
+					public String map(Object item)
+					{
+						return item.toString();
+					}
+				});
 			}
 		}
-
 		return result;
 	}
 

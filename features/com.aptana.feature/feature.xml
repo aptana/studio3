@@ -2,7 +2,7 @@
 <feature
       id="com.aptana.feature"
       label="%featureName"
-      version="3.5.1.qualifier"
+      version="3.6.0.qualifier"
       provider-name="%providerName"
       plugin="com.aptana.branding">
 
@@ -18,17 +18,12 @@
          id="com.aptana.ide.feature.libraries.subscription"
          version="0.0.0"/>
 
-   <includes
-         id="com.aptana.webkitbrowser"
-         version="0.0.0"/>
-
    <requires>
       <import plugin="org.eclipse.jface.text" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.debug.ui" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.console" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.browser" version="3.2.0" match="greaterOrEqual"/>
-      <import plugin="com.aptana.swt.webkitbrowser" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.team.core"/>
       <import plugin="org.eclipse.debug.core" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.filesystem"/>

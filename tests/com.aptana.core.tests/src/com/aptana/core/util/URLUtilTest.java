@@ -7,6 +7,8 @@
  */
 package com.aptana.core.util;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -16,8 +18,9 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-public class URLUtilTest extends TestCase
+public class URLUtilTest
 {
+	@Test
 	public void testJoinParameters() throws Exception
 	{
 		Map<String, String> params = new HashMap<String, String>();
@@ -43,6 +46,7 @@ public class URLUtilTest extends TestCase
 		assertEquals("Parameter list incorrectly joined", "", URLUtil.joinParameters(null, false));
 	}
 
+	@Test
 	public void testAppendParametersString() throws MalformedURLException, UnsupportedEncodingException
 	{
 
@@ -118,6 +122,7 @@ public class URLUtilTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testAppendParameters() throws MalformedURLException, UnsupportedEncodingException
 	{
 
@@ -190,6 +195,7 @@ public class URLUtilTest extends TestCase
 				URLUtil.appendParameters(null, (Map<String, String>) null));
 	}
 
+	@Test
 	public void testAppendDefaultParameters() throws MalformedURLException, UnsupportedEncodingException
 	{
 		// not encoding
@@ -199,6 +205,7 @@ public class URLUtilTest extends TestCase
 		assertEquals(URLUtil.joinParameters(URLUtil.getDefaultParameters()), newUrl.getQuery());
 	}
 
+	@Test
 	public void testGetDefaultParameters()
 	{
 		Map<String, String> parameters = URLUtil.getDefaultParameters();

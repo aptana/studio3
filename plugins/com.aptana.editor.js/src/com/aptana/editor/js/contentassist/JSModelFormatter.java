@@ -12,6 +12,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -33,10 +34,12 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.hover.TagStripperAndTypeBolder;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.js.core.JSTypeConstants;
+import com.aptana.js.core.model.BaseElement;
 import com.aptana.js.core.model.FunctionElement;
 import com.aptana.js.core.model.ParameterElement;
 import com.aptana.js.core.model.PropertyElement;
 import com.aptana.js.core.model.SinceElement;
+import com.aptana.js.core.model.TypeElement;
 import com.aptana.js.core.model.UserAgentElement;
 
 public class JSModelFormatter
@@ -107,13 +110,13 @@ public class JSModelFormatter
 		private static final String BULLET = "\u2022"; //$NON-NLS-1$
 		private TagStripperAndTypeBolder stripAndBold = new TagStripperAndTypeBolder();
 
-		public String getDocumentation(Collection<PropertyElement> properties)
+		public String getDocumentation(Collection<? extends BaseElement> properties)
 		{
 			if (CollectionsUtil.isEmpty(properties))
 			{
 				return null;
 			}
-			PropertyElement prop = properties.iterator().next();
+			BaseElement prop = properties.iterator().next();
 
 			if (prop instanceof FunctionElement)
 			{
@@ -182,7 +185,7 @@ public class JSModelFormatter
 	 * @param projectURI
 	 * @return
 	 */
-	public String getDescription(PropertyElement property, URI projectURI)
+	public String getDescription(BaseElement property, URI projectURI)
 	{
 		StringBuilder buffer = new StringBuilder();
 		buffer.append(getHeader(property, projectURI));
@@ -202,7 +205,7 @@ public class JSModelFormatter
 	 * @param root
 	 * @return
 	 */
-	public String getHeader(PropertyElement property, URI root)
+	public String getHeader(BaseElement property, URI root)
 	{
 		return getHeader(CollectionsUtil.newList(property), root);
 	}
@@ -214,7 +217,7 @@ public class JSModelFormatter
 	 * @param root
 	 * @return
 	 */
-	public String getHeader(final Collection<PropertyElement> properties, URI root)
+	public String getHeader(final Collection<? extends BaseElement> properties, URI root)
 	{
 		if (CollectionsUtil.isEmpty(properties))
 		{
@@ -255,7 +258,7 @@ public class JSModelFormatter
 	 * @param property
 	 * @return
 	 */
-	public String getDocumentation(PropertyElement property)
+	public String getDocumentation(BaseElement property)
 	{
 		return getDocumentation(CollectionsUtil.newList(property));
 	}
@@ -266,7 +269,7 @@ public class JSModelFormatter
 	 * @param properties
 	 * @return
 	 */
-	public String getDocumentation(final Collection<PropertyElement> properties)
+	public String getDocumentation(final Collection<? extends BaseElement> properties)
 	{
 		List<Section> docSections = CollectionsUtil.filter(fSections, new IFilter<Section>()
 		{
@@ -443,7 +446,7 @@ public class JSModelFormatter
 			return builder.toString();
 		}
 
-		public abstract String generate(Collection<PropertyElement> properties, URI root);
+		public abstract String generate(Collection<? extends BaseElement> properties, URI root);
 
 		protected String formatTypes(List<String> typeNames)
 		{
@@ -473,22 +476,26 @@ public class JSModelFormatter
 				return true;
 			}
 
-			public String generate(Collection<PropertyElement> properties, URI root)
+			public String generate(Collection<? extends BaseElement> properties, URI root)
 			{
-				PropertyElement prop = properties.iterator().next();
+				BaseElement base = properties.iterator().next();
 				List<String> builder = new ArrayList<String>();
-				builder.add(prop.getName());
-				List<String> typeNames = prop.getTypeNames();
-				if (prop instanceof FunctionElement)
+				builder.add(base.getName());
+				if (base instanceof PropertyElement)
 				{
-					FunctionElement fe = (FunctionElement) prop;
-					builder.add("("); //$NON-NLS-1$
-					builder.add(formatParameters(fe.getParameters()));
-					builder.add(")"); //$NON-NLS-1$
-					typeNames = fe.getReturnTypeNames();
+					PropertyElement prop = (PropertyElement) base;
+					List<String> typeNames = prop.getTypeNames();
+					if (prop instanceof FunctionElement)
+					{
+						FunctionElement fe = (FunctionElement) prop;
+						builder.add("("); //$NON-NLS-1$
+						builder.add(formatParameters(fe.getParameters()));
+						builder.add(")"); //$NON-NLS-1$
+						typeNames = fe.getReturnTypeNames();
+					}
+					builder.add(COLON_SPACE);
+					builder.add(formatTypes(typeNames));
 				}
-				builder.add(COLON_SPACE);
-				builder.add(formatTypes(typeNames));
 				return StringUtil.concat(builder);
 			}
 
@@ -529,12 +536,12 @@ public class JSModelFormatter
 			}
 
 			@Override
-			public String generate(Collection<PropertyElement> properties, URI root)
+			public String generate(Collection<? extends BaseElement> properties, URI root)
 			{
 				Set<String> documents = new LinkedHashSet<String>(); // linked hash set to preserve add order
 
 				// collect all documents
-				for (PropertyElement pe : properties)
+				for (BaseElement pe : properties)
 				{
 					documents.addAll(pe.getDocuments());
 				}
@@ -578,17 +585,17 @@ public class JSModelFormatter
 		final static Section EXAMPLE = new Section()
 		{
 			@Override
-			public String generate(Collection<PropertyElement> properties, URI root)
+			public String generate(Collection<? extends BaseElement> properties, URI root)
 			{
 				String example = getFirstExample(properties);
 				return addSection(Messages.JSTextHover_Example, example);
 			}
 
-			private String getFirstExample(Collection<PropertyElement> properties)
+			private String getFirstExample(Collection<? extends BaseElement> properties)
 			{
-				for (PropertyElement prop : properties)
+				for (BaseElement prop : properties)
 				{
-					List<String> examples = prop.getExamples();
+					List<String> examples = getExamples(prop);
 					for (String example : examples)
 					{
 						if (!StringUtil.isEmpty(example))
@@ -607,12 +614,12 @@ public class JSModelFormatter
 		final static Section EXAMPLES = new Section()
 		{
 			@Override
-			public String generate(Collection<PropertyElement> properties, URI root)
+			public String generate(Collection<? extends BaseElement> properties, URI root)
 			{
 				List<String> examples = new ArrayList<String>();
-				for (PropertyElement prop : properties)
+				for (BaseElement prop : properties)
 				{
-					examples.addAll(prop.getExamples());
+					examples.addAll(getExamples(prop));
 				}
 				examples = CollectionsUtil.filter(examples, new IFilter<String>()
 				{
@@ -641,10 +648,10 @@ public class JSModelFormatter
 		final static Section SPECIFICATIONS = new Section()
 		{
 			@Override
-			public String generate(Collection<PropertyElement> properties, URI root)
+			public String generate(Collection<? extends BaseElement> properties, URI root)
 			{
 				Set<SinceElement> sinceElements = new HashSet<SinceElement>();
-				for (PropertyElement property : properties)
+				for (BaseElement property : properties)
 				{
 					sinceElements.addAll(property.getSinceList());
 				}
@@ -679,10 +686,10 @@ public class JSModelFormatter
 			private TagStripperAndTypeBolder stripAndBold = new TagStripperAndTypeBolder();
 
 			@Override
-			public String generate(Collection<PropertyElement> properties, URI root)
+			public String generate(Collection<? extends BaseElement> properties, URI root)
 			{
 				Set<String> descriptions = new HashSet<String>();
-				for (PropertyElement property : properties)
+				for (BaseElement property : properties)
 				{
 					// strip p elements and bold any items that look like open tags with dotted local names
 					stripAndBold.setUseHTML(useHTML);
@@ -713,10 +720,10 @@ public class JSModelFormatter
 		final static Section PLATFORMS = new Section()
 		{
 			@Override
-			public String generate(Collection<PropertyElement> properties, URI root)
+			public String generate(Collection<? extends BaseElement> properties, URI root)
 			{
 				Set<UserAgentElement> userAgents = new HashSet<UserAgentElement>();
-				for (PropertyElement property : properties)
+				for (BaseElement property : properties)
 				{
 					userAgents.addAll(property.getUserAgents());
 				}
@@ -749,10 +756,10 @@ public class JSModelFormatter
 		final static Section RETURNS = new Section()
 		{
 			@Override
-			public String generate(Collection<PropertyElement> properties, URI root)
+			public String generate(Collection<? extends BaseElement> properties, URI root)
 			{
 				List<String> returnTypeNames = new ArrayList<String>();
-				for (PropertyElement property : properties)
+				for (BaseElement property : properties)
 				{
 					if (property instanceof FunctionElement)
 					{
@@ -770,11 +777,11 @@ public class JSModelFormatter
 		final static Section PARAMETERS = new Section()
 		{
 			@Override
-			public String generate(Collection<PropertyElement> properties, URI root)
+			public String generate(Collection<? extends BaseElement> properties, URI root)
 			{
 				List<ParameterElement> parameters = new ArrayList<ParameterElement>();
 
-				for (PropertyElement property : properties)
+				for (BaseElement property : properties)
 				{
 					if (property instanceof FunctionElement)
 					{
@@ -812,5 +819,20 @@ public class JSModelFormatter
 				return StringUtil.join(COMMA_SPACE, strings);
 			}
 		};
+
+		protected static List<String> getExamples(BaseElement prop)
+		{
+			if (prop instanceof TypeElement)
+			{
+				TypeElement te = (TypeElement) prop;
+				return te.getExamples();
+			}
+			if (prop instanceof PropertyElement)
+			{
+				PropertyElement pe = (PropertyElement) prop;
+				return pe.getExamples();
+			}
+			return Collections.emptyList();
+		}
 	}
 }

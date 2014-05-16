@@ -10,8 +10,7 @@ package com.aptana.ide.core.io.downloader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.net.URI;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -20,12 +19,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ecf.filetransfer.UserCancelledException;
 import org.eclipse.osgi.util.NLS;
 
 import com.aptana.core.epl.downloader.FileReader;
-import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.FileUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.CoreIOPlugin;
 
 /**
@@ -35,18 +33,18 @@ import com.aptana.ide.core.io.CoreIOPlugin;
  */
 public class ContentDownloadRequest
 {
-	private URL url;
+	protected final URI uri;
 	private File saveTo;
 	private IStatus result;
 
-	public ContentDownloadRequest(URL url) throws CoreException
+	public ContentDownloadRequest(URI uri) throws CoreException
 	{
-		this(url, getTempFile(url));
+		this(uri, getTempFile(uri));
 	}
 
-	public ContentDownloadRequest(URL url, File saveTo)
+	public ContentDownloadRequest(URI uri, File saveTo)
 	{
-		this.url = url;
+		this.uri = uri;
 		this.saveTo = saveTo;
 	}
 
@@ -76,7 +74,7 @@ public class ContentDownloadRequest
 
 	public void execute(IProgressMonitor monitor)
 	{
-		monitor.subTask(NLS.bind(Messages.ContentDownloadRequest_downloading, url.toString()));
+		monitor.subTask(NLS.bind(Messages.ContentDownloadRequest_downloading, uri.toString()));
 		IStatus status = download(monitor);
 		setResult(status);
 	}
@@ -96,7 +94,7 @@ public class ContentDownloadRequest
 			// Use ECF FileTransferJob implementation to get the remote file.
 			FileReader reader = new FileReader(null);
 			FileOutputStream anOutputStream = new FileOutputStream(this.saveTo);
-			reader.readInto(this.url.toURI(), anOutputStream, 0, monitor);
+			reader.readInto(this.uri, anOutputStream, 0, monitor);
 			// check that job ended ok - throw exceptions otherwise
 			IStatus result = reader.getResult();
 			if (result != null)
@@ -130,23 +128,16 @@ public class ContentDownloadRequest
 	 * @return
 	 * @throws CoreException
 	 */
-	protected static File getTempFile(URL url) throws CoreException
+	protected static File getTempFile(URI uri) throws CoreException
 	{
-		String tempPath = FileUtil.getTempDirectory().toOSString();
-		try
+		IPath path = Path.fromOSString(uri.getPath());
+		String name = path.lastSegment();
+		if (!StringUtil.isEmpty(name))
 		{
-			IPath path = Path.fromOSString(url.toURI().getPath());
-			String name = path.lastSegment();
-			if (name != null && name.length() > 0)
-			{
-				File f = new File(tempPath, name);
-				f.deleteOnExit();
-				return f;
-			}
-		}
-		catch (URISyntaxException e)
-		{
-			IdeLog.logError(CoreIOPlugin.getDefault(), e);
+			String tempPath = FileUtil.getTempDirectory().toOSString();
+			File f = new File(tempPath, name);
+			f.deleteOnExit();
+			return f;
 		}
 
 		try

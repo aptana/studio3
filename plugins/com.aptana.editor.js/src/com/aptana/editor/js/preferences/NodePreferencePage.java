@@ -8,7 +8,7 @@
 package com.aptana.editor.js.preferences;
 
 import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
+import java.net.URI;
 import java.text.MessageFormat;
 import java.util.List;
 
@@ -52,7 +52,7 @@ import com.aptana.ui.util.UIUtils;
 
 public class NodePreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage
 {
-	public static final String NODE_JS_SOURCE_URL = "http://go.aptana.com/nodejs-source"; //$NON-NLS-1$
+	public static final String NODE_JS_SOURCE_URL = "http://go.appcelerator.com/nodejs-source"; //$NON-NLS-1$
 	public static final String NODE_JS_ROOT_NAME = "node-v0.8.3"; //$NON-NLS-1$
 
 	public static final String ID = "com.aptana.editor.js.nodejs.page"; //$NON-NLS-1$
@@ -192,7 +192,7 @@ public class NodePreferencePage extends FieldEditorPreferencePage implements IWo
 					final DownloadManager dm = new DownloadManager();
 					try
 					{
-						dm.addURL(new URL(NODE_JS_SOURCE_URL));
+						dm.addURI(new URI(NODE_JS_SOURCE_URL));
 						IStatus status = dm.start(monitor);
 						if (status.isOK())
 						{

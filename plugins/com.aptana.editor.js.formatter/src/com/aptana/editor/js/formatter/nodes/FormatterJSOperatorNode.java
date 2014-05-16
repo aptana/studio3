@@ -74,6 +74,7 @@ public class FormatterJSOperatorNode extends FormatterJSTextNode
 			case PLUS_EQUAL:
 			case MINUS_EQUAL:
 			case MULTIPLY_EQUAL:
+			case MODULUS_EQUAL:
 			case DIVIDE_EQUAL:
 			case OR_EQUAL:
 			case AND_EQUAL:
@@ -163,6 +164,7 @@ public class FormatterJSOperatorNode extends FormatterJSTextNode
 			case PLUS_EQUAL:
 			case MINUS_EQUAL:
 			case MULTIPLY_EQUAL:
+			case MODULUS_EQUAL:
 			case DIVIDE_EQUAL:
 			case OR_EQUAL:
 			case AND_EQUAL:

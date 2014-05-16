@@ -7,37 +7,12 @@
  */
 package com.aptana.editor.css.contentassist;
 
-import org.junit.runners.Suite.SuiteClasses;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-import junit.framework.Test;
-import junit.framework.TestResult;
-import junit.framework.TestSuite;
+import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({CoarseLocationTests.class, CSSContentAssistProposalTests.class, CSSTextHoverTests.class, FineLocationTests.class, RangeTests.class, })
+@SuiteClasses({ CoarseLocationTests.class, FineLocationTests.class })
 public class AllTests
 {
-
-//	public static Test suite()
-//	{
-//		TestSuite suite = new TestSuite("Test for com.aptana.editor.css.contentassist")
-//		{
-//			@Override
-//			public void runTest(Test test, TestResult result)
-//			{
-//				System.err.println("Running test: " + test.toString());
-//				super.runTest(test, result);
-//			}
-//		};
-//		// $JUnit-BEGIN$
-//		suite.addTestSuite(CoarseLocationTests.class);
-//		suite.addTestSuite(CSSContentAssistProposalTests.class);
-//		suite.addTestSuite(CSSTextHoverTests.class);
-//		suite.addTestSuite(FineLocationTests.class);
-//		suite.addTestSuite(RangeTests.class);
-//		// $JUnit-END$
-//		return suite;
-//	}
-//
 }

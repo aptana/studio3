@@ -104,7 +104,7 @@ public class JNotifyAdapterMacOSX implements IJNotify
 			JNFile j = (JNFile) o;
 			return j.inode == inode && j.deviceid == deviceid;
 		}
-		
+
 		@Override
 		public int hashCode()
 		{
@@ -127,8 +127,7 @@ public class JNotifyAdapterMacOSX implements IJNotify
 	{
 		JNotify_macosx.setNotifyListener(new FSEventListener()
 		{
-			public void notifyChange(int wd, String rootPath, String filePath,
-					boolean recurse)
+			public void notifyChange(int wd, String rootPath, String filePath, boolean recurse)
 			{
 				notifyChangeEvent(wd, rootPath, filePath, recurse);
 			}
@@ -146,8 +145,8 @@ public class JNotifyAdapterMacOSX implements IJNotify
 		_id2Data = new Hashtable<Integer, WatchData>();
 	}
 
-	public int addWatch(String path, int mask, boolean watchSubtree,
-			JNotifyListener listener) throws JNotifyException
+	public int addWatch(String path, int mask, boolean watchSubtree, boolean recursive, JNotifyListener listener)
+			throws JNotifyException
 	{
 		File f;
 		try
@@ -156,12 +155,10 @@ public class JNotifyAdapterMacOSX implements IJNotify
 		}
 		catch (IOException e)
 		{
-			throw new JNotifyException_macosx(
-					"Could not resolve canonical path for " + path);
+			throw new JNotifyException_macosx("Could not resolve canonical path for " + path);
 		}
 		int wd = JNotify_macosx.addWatch(f.getPath());
-		_id2Data.put(Integer.valueOf(wd), new WatchData(wd, mask, listener,
-				path, f, watchSubtree));
+		_id2Data.put(Integer.valueOf(wd), new WatchData(wd, mask, listener, path, f, watchSubtree, recursive));
 		return wd;
 	}
 
@@ -209,7 +206,8 @@ public class JNotifyAdapterMacOSX implements IJNotify
 		TreeMap<JNFile, TreeSet<String>> deleted;
 		TreeMap<String, String> renamed;
 
-		JNEvents(int mask) {
+		JNEvents(int mask)
+		{
 			if ((mask & FILE_MODIFIED) != 0)
 			{
 				modified = new TreeSet<String>();
@@ -238,8 +236,8 @@ public class JNotifyAdapterMacOSX implements IJNotify
 		String fullpath;
 		boolean watchSubtree;
 
-		WatchData(int wd, int mask, JNotifyListener listener, String path,
-				File pathFile, boolean watchSubtree)
+		WatchData(int wd, int mask, JNotifyListener listener, String path, File pathFile, boolean watchSubtree,
+				boolean recursive)
 		{
 			_wd = wd;
 			_mask = mask;
@@ -249,7 +247,7 @@ public class JNotifyAdapterMacOSX implements IJNotify
 			this.watchSubtree = watchSubtree;
 			paths = new TreeMap<JNFile, TreeSet<String>>();
 			jnfiles = new TreeMap<String, JNFile>();
-			scan(pathFile, true, null);
+			scan(pathFile, recursive, null);
 			toScan = new LinkedList<ScanJob>();
 		}
 
@@ -260,8 +258,11 @@ public class JNotifyAdapterMacOSX implements IJNotify
 
 		/**
 		 * Checks a directory for changes.
-		 * @param job the directory to scan
-		 * @param events the set to place the changes in
+		 * 
+		 * @param job
+		 *            the directory to scan
+		 * @param events
+		 *            the set to place the changes in
 		 */
 		private void scan(ScanJob job, JNEvents events)
 		{
@@ -270,9 +271,13 @@ public class JNotifyAdapterMacOSX implements IJNotify
 
 		/**
 		 * Checks a directory for changes.
-		 * @param root the directory to scan
-		 * @param recursive whether subdirectories should be scanned
-		 * @param events the set to place the changes in
+		 * 
+		 * @param root
+		 *            the directory to scan
+		 * @param recursive
+		 *            whether subdirectories should be scanned
+		 * @param events
+		 *            the set to place the changes in
 		 */
 		private void scan(File root, boolean recursive, JNEvents events)
 		{
@@ -352,7 +357,8 @@ public class JNotifyAdapterMacOSX implements IJNotify
 							plist.add(path);
 
 							// record change in events
-							if (events != null && events.created != null) {
+							if (events != null && events.created != null)
+							{
 								TreeSet<String> eplist = events.created.get(jnf);
 								if (eplist == null)
 								{
@@ -380,7 +386,8 @@ public class JNotifyAdapterMacOSX implements IJNotify
 								{
 									// this shouldn't happen!
 								}
-								if (oldPaths.size() == 0) {
+								if (oldPaths.size() == 0)
+								{
 									// inode is gone
 									paths.remove(oldjnf);
 								}
@@ -404,7 +411,7 @@ public class JNotifyAdapterMacOSX implements IJNotify
 							scan(files[i], recursive, events);
 						}
 					}
-					catch(IOException e)
+					catch (IOException e)
 					{
 						// should be fine here
 						e.printStackTrace();
@@ -477,7 +484,8 @@ public class JNotifyAdapterMacOSX implements IJNotify
 					{
 						// this shouldn't happen!
 					}
-					if (oldPaths.size() == 0) {
+					if (oldPaths.size() == 0)
+					{
 						// inode is gone
 						paths.remove(jnf);
 					}
@@ -501,8 +509,7 @@ public class JNotifyAdapterMacOSX implements IJNotify
 		}
 	}
 
-	void notifyChangeEvent(int wd, String rootPath, String filePath,
-			boolean recurse)
+	void notifyChangeEvent(int wd, String rootPath, String filePath, boolean recurse)
 	{
 		synchronized (_id2Data)
 		{
@@ -532,7 +539,7 @@ public class JNotifyAdapterMacOSX implements IJNotify
 			JNEvents e = new JNEvents(watchData._mask);
 			// scan all jobs
 			ScanJob job;
-			while((job = watchData.toScan.poll()) != null)
+			while ((job = watchData.toScan.poll()) != null)
 			{
 				if (watchData.watchSubtree || watchData.fullpath.equals(job.path))
 				{
@@ -635,7 +642,8 @@ public class JNotifyAdapterMacOSX implements IJNotify
 				{
 					for (String path : cpaths)
 					{
-						watchData._notifyListener.fileCreated(wd, watchData.path, path.substring(watchData.fullpath.length()));
+						watchData._notifyListener.fileCreated(wd, watchData.path,
+								path.substring(watchData.fullpath.length()));
 					}
 				}
 			}
@@ -645,7 +653,8 @@ public class JNotifyAdapterMacOSX implements IJNotify
 				{
 					for (String path : cpaths)
 					{
-						watchData._notifyListener.fileDeleted(wd, watchData.path, path.substring(watchData.fullpath.length()));
+						watchData._notifyListener.fileDeleted(wd, watchData.path,
+								path.substring(watchData.fullpath.length()));
 					}
 				}
 			}
@@ -653,14 +662,17 @@ public class JNotifyAdapterMacOSX implements IJNotify
 			{
 				for (String path : e.modified)
 				{
-					watchData._notifyListener.fileModified(wd, watchData.path, path.substring(watchData.fullpath.length()));
+					watchData._notifyListener.fileModified(wd, watchData.path,
+							path.substring(watchData.fullpath.length()));
 				}
 			}
 			if ((watchData._mask & FILE_RENAMED) != 0)
 			{
 				for (Map.Entry<String, String> entry : e.renamed.entrySet())
 				{
-					watchData._notifyListener.fileRenamed(wd, watchData.path, entry.getKey().substring(watchData.fullpath.length()), entry.getValue().substring(watchData.fullpath.length()));
+					watchData._notifyListener.fileRenamed(wd, watchData.path,
+							entry.getKey().substring(watchData.fullpath.length()),
+							entry.getValue().substring(watchData.fullpath.length()));
 				}
 			}
 		}

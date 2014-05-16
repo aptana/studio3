@@ -13,6 +13,8 @@ import java.util.Map;
 import org.eclipse.core.runtime.Platform;
 
 import com.aptana.core.util.IOUtil;
+import com.aptana.core.util.IProcessRunner;
+import com.aptana.core.util.ProcessRunner;
 import com.aptana.core.util.ProcessUtil;
 import com.aptana.scripting.model.CommandContext;
 import com.aptana.scripting.model.CommandElement;
@@ -73,7 +75,7 @@ public class FullnameEnvContextContributor implements ContextContributor, Enviro
 			{
 				try
 				{
-					Process p = ProcessUtil.run("/usr/bin/getent", null, "passwd", username); //$NON-NLS-1$ //$NON-NLS-2$
+					Process p = createProcessRunner().run("/usr/bin/getent", "passwd", username); //$NON-NLS-1$ //$NON-NLS-2$
 					String read = IOUtil.read(p.getInputStream(), IOUtil.UTF_8);
 					String raw = read.split(":")[4]; //$NON-NLS-1$
 					String fullname = raw.split(",")[0]; //$NON-NLS-1$
@@ -87,6 +89,11 @@ public class FullnameEnvContextContributor implements ContextContributor, Enviro
 		}
 		fgCache.put(username, map);
 		return map;
+	}
+
+	protected IProcessRunner createProcessRunner()
+	{
+		return new ProcessRunner();
 	}
 
 }

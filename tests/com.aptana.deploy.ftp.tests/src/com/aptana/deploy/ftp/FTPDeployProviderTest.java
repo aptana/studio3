@@ -26,6 +26,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.aptana.core.util.FileUtil;
 import com.aptana.deploy.IDeployProvider;
 import com.aptana.deploy.util.DeployProviderUtil;
 import com.aptana.filesystem.ftp.FTPConnectionPoint;
@@ -89,10 +90,8 @@ public class FTPDeployProviderTest
 	 */
 	private IProject createProject() throws IOException, InvocationTargetException, InterruptedException, CoreException
 	{
-
-		File baseTempFile = File.createTempFile("test", ".txt"); //$NON-NLS-1$ //$NON-NLS-2$
 		String projectName = "FTPDeployProviderTest" + System.currentTimeMillis();
-		File projectFolder = new File(baseTempFile.getParentFile(), projectName);
+		File projectFolder = FileUtil.getTempDirectory().append(projectName).toFile();
 		projectFolder.mkdirs();
 
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();

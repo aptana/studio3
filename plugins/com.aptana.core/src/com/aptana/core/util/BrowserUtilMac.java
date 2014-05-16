@@ -104,7 +104,7 @@ public class BrowserUtilMac extends BrowserUtilNull
 
 	private String getFirefoxVersion(BrowserInfo info)
 	{
-		IStatus status = ProcessUtil.runInBackground(info.getLocation(), Path.ROOT, "-v"); //$NON-NLS-1$
+		IStatus status = new ProcessRunner().runInBackground(Path.ROOT, info.getLocation(), "-v"); //$NON-NLS-1$
 		if (status == null || !status.isOK())
 		{
 			return null;

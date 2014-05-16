@@ -7,6 +7,8 @@
  */
 package com.aptana.core.util;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
 import com.aptana.core.IMap;
@@ -16,8 +18,9 @@ import com.aptana.core.util.replace.SimpleTextPatternReplacer;
 /**
  * PatternReplacerTest
  */
-public class PatternReplacerTest extends TestCase
+public class PatternReplacerTest
 {
+	@Test
 	public void testSimpleTextPatternReplacer()
 	{
 		String text = "<p>This is line one.</p><p>This is line <b>two</b></p>.";
@@ -37,6 +40,7 @@ public class PatternReplacerTest extends TestCase
 		assertEquals(expected, actual);
 	}
 
+	@Test
 	public void testRegexPatternReplacer()
 	{
 		String text = "This is a type name One.Two.Three: <One.Two.Three>";

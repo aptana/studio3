@@ -1,0 +1,61 @@
+{
+	"types": [
+		{
+			"name": "Titanium",
+			"extends": "Something",
+			"events": [
+                {
+                    "name": "beforeload", 
+                    "deprecated": false, 
+                    "properties": [
+                        {
+                            "name": "bubbles", 
+                            "deprecated": false, 
+                            "type": "Boolean", 
+                            "description": "<p>True if the event will try to bubble up if possible.</p>"
+                        }, 
+                        {
+                            "name": "cancelBubble", 
+                            "deprecated": false, 
+                            "type": "Boolean", 
+                            "description": "<p>Set to true to stop the event from bubbling.</p>"
+                        }, 
+                        {
+                            "name": "navigationType", 
+                            "deprecated": false, 
+                            "type": "Number", 
+                            "constants": [
+                                "Titanium.UI.iOS.WEBVIEW_NAVIGATIONTYPE_LINK_CLICKED", 
+                                "Titanium.UI.iOS.WEBVIEW_NAVIGATIONTYPE_FORM_SUBMITTED", 
+                                "Titanium.UI.iOS.WEBVIEW_NAVIGATIONTYPE_BACK_FORWARD", 
+                                "Titanium.UI.iOS.WEBVIEW_NAVIGATIONTYPE_RELOAD", 
+                                "Titanium.UI.iOS.WEBVIEW_NAVIGATIONTYPE_FORM_RESUBMITTED", 
+                                "Titanium.UI.iOS.WEBVIEW_NAVIGATIONTYPE_OTHER"
+                            ], 
+                            "description": "<p>Constant indicating the user's action.</p>"
+                        }, 
+                        {
+                            "name": "source", 
+                            "deprecated": false, 
+                            "type": "Object", 
+                            "description": "<p>Source object that fired the event.</p>"
+                        }, 
+                        {
+                            "name": "type", 
+                            "deprecated": false, 
+                            "type": "String", 
+                            "description": "<p>Name of the event fired.</p>"
+                        }, 
+                        {
+                            "name": "url", 
+                            "deprecated": false, 
+                            "type": "", 
+                            "description": "<p>URL of the web document being loaded.</p>"
+                        }
+                    ], 
+                    "description": "<p>Fired before the web view starts loading its content.</p>"
+                }
+			]
+		}
+	]
+}

@@ -11,6 +11,7 @@ import java.util.EnumSet;
 
 import beaver.Symbol;
 
+import com.aptana.js.core.parsing.ast.JSArgumentsNode;
 import com.aptana.js.core.parsing.ast.JSArrayNode;
 import com.aptana.js.core.parsing.ast.JSBinaryBooleanOperatorNode;
 import com.aptana.js.core.parsing.ast.JSBreakNode;
@@ -905,6 +906,25 @@ public class JSLocationIdentifier extends JSTreeWalker
 				this.setType(LocationType.NONE);
 			}
 		}
+	}
+
+	@Override
+	public void visit(JSArgumentsNode node)
+	{
+		if (node.hasChildren())
+		{
+			for (IParseNode child : node)
+			{
+				if (child.contains(this._offset))
+				{
+					// If any child overlaps offset, use it's location type
+					this.setType(child);
+					return;
+				}
+			}
+		}
+		// otherwise assume in parameters
+		this.setType(LocationType.IN_ARGUMENTS);
 	}
 
 	/*

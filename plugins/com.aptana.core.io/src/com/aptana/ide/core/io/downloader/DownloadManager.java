@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2013 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2014 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -8,12 +8,15 @@
 package com.aptana.ide.core.io.downloader;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -52,36 +55,75 @@ public class DownloadManager
 	 *            A URL with a file-name to be downloaded.
 	 * @throws CoreException
 	 *             In case the URL file name cannot be extracted from the URL.
+	 * @deprecated Use {@link #addURI(URI)}
 	 */
 	public void addURL(URL url) throws CoreException
 	{
 		if (url != null)
 		{
-			addDownload(new ContentDownloadRequest(url));
+			try
+			{
+				addURI(url.toURI());
+			}
+			catch (URISyntaxException e)
+			{
+				throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID, e.getMessage(), e));
+			}
 		}
 	}
 
 	/**
-	 * Adds a URL for the pending downloads list.<br>
-	 * This method also accepts a {@link File} that the download process will write to.<br>
+	 * Adds a URI for the pending downloads list.<br>
 	 * Note that this method should be called <b>before</b> the {@link #start(IProgressMonitor)} is called.
 	 * 
-	 * @param url
-	 *            A URL with a file-name to be downloaded.
-	 * @param saveTo
-	 *            The file to write to.
+	 * @param uri
+	 *            A URI with a file-name to be downloaded.
 	 * @throws CoreException
-	 *             In case the URL file name cannot be extracted from the URL.
+	 *             In case the URI file name cannot be extracted from the URI.
 	 */
-	public void addURL(URL url, File saveTo) throws CoreException
+	public void addURI(URI uri) throws CoreException
 	{
-		if (url != null)
+		if (uri != null)
 		{
-			addDownload(new ContentDownloadRequest(url, saveTo));
+			if (EFS.SCHEME_FILE.equals(uri.getScheme()))
+			{
+				addDownload(new FileDownloadRequest(uri));
+			}
+			else
+			{
+				addDownload(new ContentDownloadRequest(uri));
+			}
 		}
 	}
 
-	private synchronized void addDownload(ContentDownloadRequest request)
+	/**
+	 * Adds a URI for the pending downloads list.<br>
+	 * This method also accepts a {@link File} that the download process will write to.<br>
+	 * Note that this method should be called <b>before</b> the {@link #start(IProgressMonitor)} is called.
+	 * 
+	 * @param uri
+	 *            A URI with a file-name to be downloaded.
+	 * @param saveTo
+	 *            The file to write to.
+	 * @throws CoreException
+	 *             In case the URI file name cannot be extracted from the URI.
+	 */
+	public void addURI(URI uri, File saveTo) throws CoreException
+	{
+		if (uri != null)
+		{
+			if (EFS.SCHEME_FILE.equals(uri.getScheme()))
+			{
+				addDownload(new FileDownloadRequest(uri, saveTo));
+			}
+			else
+			{
+				addDownload(new ContentDownloadRequest(uri, saveTo));
+			}
+		}
+	}
+
+	protected synchronized void addDownload(ContentDownloadRequest request)
 	{
 		if (downloads == null)
 		{
@@ -99,13 +141,13 @@ public class DownloadManager
 	 * @throws CoreException
 	 *             In case one or more of the given URLs do not contain a file name.
 	 */
-	public void addURLs(List<URL> urls) throws CoreException
+	public void addURIs(List<URI> uris) throws CoreException
 	{
-		if (!CollectionsUtil.isEmpty(urls))
+		if (!CollectionsUtil.isEmpty(uris))
 		{
-			for (URL url : urls)
+			for (URI uri : uris)
 			{
-				addURL(url);
+				addURI(uri);
 			}
 		}
 	}
@@ -151,6 +193,9 @@ public class DownloadManager
 				// TODO Append to multi status and return that?
 				return Status.CANCEL_STATUS;
 			}
+
+			// FIXME If the request if for a file URI, we should cheat and not "download" anything. We should just
+			// basically do a no-op and return the original path (or copy to intended saveLocation)
 
 			ContentDownloadRequest request = iterator.next();
 			request.execute(subMonitor.newChild(1));

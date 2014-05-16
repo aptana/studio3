@@ -154,7 +154,7 @@ public interface INodePackageManager
 	public boolean exists();
 
 	/**
-	 * The path to the NPM binary script
+	 * The path to the NPM binary script. This may return null if we were unable to find npm!
 	 * 
 	 * @return
 	 */

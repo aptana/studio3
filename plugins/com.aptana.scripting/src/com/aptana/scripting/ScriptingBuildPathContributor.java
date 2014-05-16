@@ -9,9 +9,12 @@ package com.aptana.scripting;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import org.eclipse.core.resources.IProject;
 
 import com.aptana.buildpath.core.BuildPathEntry;
 import com.aptana.buildpath.core.IBuildPathContributor;
@@ -48,5 +51,10 @@ public class ScriptingBuildPathContributor implements IBuildPathContributor
 		}
 
 		return new ArrayList<IBuildPathEntry>(result);
+	}
+
+	public List<IBuildPathEntry> getBuildPathEntries(IProject project)
+	{
+		return Collections.emptyList();
 	}
 }

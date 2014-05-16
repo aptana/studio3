@@ -241,7 +241,7 @@ public class FileUtilTest
 	@Test
 	public void testCountFilesWithDirectory() throws Exception
 	{
-		File dir = new File(FileUtil.getTempDirectory().toOSString(), "count_dir_" + System.currentTimeMillis());
+		File dir = FileUtil.getTempDirectory().append("count_dir_" + System.currentTimeMillis()).toFile();
 		try
 		{
 			dir.mkdirs();
@@ -261,7 +261,7 @@ public class FileUtilTest
 	@Test
 	public void testCountFilesWithMultipleDirectories() throws Exception
 	{
-		File dir = new File(FileUtil.getTempDirectory().toOSString(), "count_dir_" + System.currentTimeMillis());
+		File dir = FileUtil.getTempDirectory().append("count_dir_" + System.currentTimeMillis()).toFile();
 		try
 		{
 			dir.mkdirs();
@@ -289,7 +289,7 @@ public class FileUtilTest
 	@Test
 	public void testCountFilesWithMultipleDirectoriesAndSymlinkLoop() throws Exception
 	{
-		File dir = new File(FileUtil.getTempDirectory().toOSString(), "count_dir_" + System.currentTimeMillis());
+		File dir = FileUtil.getTempDirectory().append("count_dir_" + System.currentTimeMillis()).toFile();
 		try
 		{
 			dir.mkdirs();
@@ -304,8 +304,8 @@ public class FileUtilTest
 					new File(subDir, Integer.toString(i)).createNewFile();
 				}
 
-				IStatus status = ProcessUtil.runInBackground("ln", Path.fromOSString(subDir.getAbsolutePath()), "-s",
-						dir.getAbsolutePath(), "symlink");
+				IStatus status = new ProcessRunner().runInBackground(Path.fromOSString(subDir.getAbsolutePath()), "ln",
+						"-s", dir.getAbsolutePath(), "symlink");
 				assertTrue(status.isOK());
 			}
 			assertEquals(dirCount * (fileCount + 1), FileUtil.countFiles(dir));

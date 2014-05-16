@@ -55,7 +55,7 @@
                   
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn="com.aptana.projects.wizards.AbstractProjectWizardContributor:com.appcelerator.titanium.mobile.ui.wizard.IMobileWizardContributor"/>
+                  <meta.attribute kind="java" basedOn="com.aptana.projects.wizards.AbstractProjectWizardContributor:com.aptana.projects.wizards.IProjectWizardContributor"/>
                </appinfo>
             </annotation>
          </attribute>
