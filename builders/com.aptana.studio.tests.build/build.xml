@@ -151,13 +151,8 @@
 		<property name="eclipse.tests.p2.repo" value="file:${eclipse.tests.p2.repo.dir}" />
 		<!-- Install the test feature we just built along with eclipse test framework -->
 		<antcall target="run.director">
-<<<<<<< HEAD
-			<param name="p2.installIU" value="org.eclipse.test.feature.group,com.aptana.feature.feature.group,com.windowtester.runtime.feature.group,${topLevelElementId}.feature.group" />
-			<param name="p2.repo" value="${eclipse.tests.p2.repo},${studio3.p2.repo},${windowtester.p2.repo},${studio3.tests.p2.repo}" />
-=======
 			<param name="p2.installIU" value="org.eclipse.test.feature.group,com.aptana.feature.feature.group,${topLevelElementId}.feature.group" />
 			<param name="p2.repo" value="${eclipse.tests.p2.repo},${studio3.p2.repo},${studio3.tests.p2.repo}" />
->>>>>>> development
 		</antcall>
 		<!-- Modify the plugin_customization.ini to set initial properties for tests! -->
 		<concat append="true" destfile="${baseLocation}/plugins/${platform.plugin}/plugin_customization.ini">
@@ -177,31 +172,6 @@
 	<!-- Runs unit tests. Typically assumes build was already called. May be called without build if we're using pre-built unit test repo (like in nightly) -->
 	<target name="test" depends="generate.build.properties,copy.base.windows,copy.base">
 		<antcall target="-pre-test" />
-<<<<<<< HEAD
-
-		<if>
-			<isset property="instrument.code" />
-			<then>
-				<mkdir dir="${coverageDirectory}" />
-				<property name="agentvmparam" value="-javaagent:${basedir}/lib/jacocoagent.jar=destfile=${coverageDirectory}/coverage.exec" />
-			</then>
-			<else>
-				<property name="agentvmparam" value="" />
-			</else>
-		</if>
-
-		<!-- Run the tests. -->
-		<antcall target="run-core-test">
-			<param name="test.plugin" value="com.aptana.studio.tests.all" />
-			<param name="test.classname" value="com.aptana.studio.tests.all.CoreTests" />
-		</antcall>
-
-		<antcall target="run-ui-test">
-			<param name="test.plugin" value="com.aptana.studio.tests.all" />
-			<param name="test.classname" value="com.aptana.studio.tests.all.UITests" />
-		</antcall>
-=======
-
 		<if>
 			<isset property="instrument.code" />
 			<then>
@@ -257,8 +227,6 @@
 				<echo message="No UI test suite specified" />
 			</else>
 		</if>
->>>>>>> development
-
 		<antcall target="-post-test" />
 	</target>
 
