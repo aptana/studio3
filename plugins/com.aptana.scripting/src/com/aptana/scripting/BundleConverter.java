@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.Path;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.IOUtil;
+import com.aptana.core.util.ProcessRunner;
 import com.aptana.core.util.ProcessUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.plist.PListParserFactory;
@@ -170,7 +171,7 @@ public class BundleConverter
 		{
 			destPath.toFile().mkdirs();
 
-			Process p = ProcessUtil.run("cp", null, "-R", srcPath.toOSString(), destPath.toOSString());
+			Process p = new ProcessRunner().run("cp", "-R", srcPath.toOSString(), destPath.toOSString());
 			p.waitFor();
 			return true;
 		}

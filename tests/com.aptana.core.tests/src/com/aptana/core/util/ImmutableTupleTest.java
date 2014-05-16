@@ -7,11 +7,14 @@
  */
 package com.aptana.core.util;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
-public class ImmutableTupleTest extends TestCase
+public class ImmutableTupleTest
 {
 
+	@Test
 	public void testImmutableTuple() throws Exception
 	{
 		ImmutableTuple<Integer, Integer> tuple1 = new ImmutableTuple<Integer, Integer>(1, 2);

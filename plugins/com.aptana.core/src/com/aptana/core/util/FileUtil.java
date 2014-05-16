@@ -384,7 +384,7 @@ public class FileUtil
 		if (all != group)
 		{
 			// If group and all permissions don't match, force running chmod, since Java 6 APIs aren't granular enough
-			return ProcessUtil.runInBackground("chmod", null, permString, file.getAbsolutePath()); //$NON-NLS-1$
+			return new ProcessRunner().runInBackground("chmod", permString, file.getAbsolutePath()); //$NON-NLS-1$
 		}
 
 		// Set 'all' permissions first, then we can override owner permissions later if they're not the same.
@@ -467,11 +467,12 @@ public class FileUtil
 	{
 		if (PlatformUtil.isMac() || PlatformUtil.isLinux())
 		{
-			return ProcessUtil.runInBackground("ln", sourcePath, "-s", targetPath.toOSString(), symLinkName); //$NON-NLS-1$ //$NON-NLS-2$
+			return new ProcessRunner().runInBackground(sourcePath, "ln", "-s", targetPath.toOSString(), symLinkName); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		else if (PlatformUtil.isWindows())
 		{
-			return ProcessUtil.runInBackground("mklink", sourcePath, "/D", symLinkName, targetPath.toOSString()); //$NON-NLS-1$ //$NON-NLS-2$
+			return new ProcessRunner()
+					.runInBackground(sourcePath, "mklink", "/D", symLinkName, targetPath.toOSString()); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		return Status.CANCEL_STATUS;
 	}

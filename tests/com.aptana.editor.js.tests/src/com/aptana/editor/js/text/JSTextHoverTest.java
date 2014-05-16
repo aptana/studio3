@@ -136,6 +136,12 @@ public class JSTextHoverTest extends JSEditorBasedTestCase
 	}
 
 	@Test
+	public void testPropertyHoverInfo()
+	{
+		assertHoverRegionAndInfo("hover/deprecatedProp.js", "win2", "These are docs for win2", new Region(96, 7));
+	}
+
+	@Test
 	public void testVariableReference()
 	{
 		assertHoverRegionAndInfo("hover/var_ref.js", "win2", "These are docs for win2", new Region(91, 4));

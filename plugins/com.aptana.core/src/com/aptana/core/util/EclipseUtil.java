@@ -655,41 +655,60 @@ public class EclipseUtil
 	public static void processConfigurationElements(String pluginId, String extensionPointId,
 			IConfigurationElementProcessor processor)
 	{
-		if (!StringUtil.isEmpty(pluginId) && !StringUtil.isEmpty(extensionPointId) && processor != null
-				&& !processor.getSupportElementNames().isEmpty())
+		IExtensionPoint extensionPoint = getExtensionPoint(pluginId, extensionPointId);
+		if (extensionPoint != null)
 		{
-			IExtensionRegistry registry = Platform.getExtensionRegistry();
+			processElements(extensionPoint, processor);
+		}
+	}
 
-			if (registry != null)
+	public static IExtensionPoint getExtensionPoint(String pluginId, String extensionPointId)
+	{
+		if (StringUtil.isEmpty(pluginId) || StringUtil.isEmpty(extensionPointId))
+		{
+			return null;
+		}
+		IExtensionRegistry registry = Platform.getExtensionRegistry();
+
+		if (registry != null)
+		{
+			IdeLog.logInfo(CorePlugin.getDefault(), MessageFormat.format(
+					"Geting Extension Point for {0} and extensionPoint {1} from {2}", pluginId, extensionPointId,
+					registry), IDebugScopes.EXTENSION_POINTS);
+			return registry.getExtensionPoint(pluginId, extensionPointId);
+		}
+		return null;
+	}
+
+	public static void processElements(IExtensionPoint extensionPoint, IConfigurationElementProcessor processor)
+	{
+		if (processor == null || processor.getSupportElementNames().isEmpty())
+		{
+			return;
+		}
+
+		Set<String> elementNames = processor.getSupportElementNames();
+		IdeLog.logInfo(
+				CorePlugin.getDefault(),
+				MessageFormat.format("Extension point : {0} and elements : {1}", extensionPoint,
+						StringUtil.join(",", elementNames)), IDebugScopes.EXTENSION_POINTS);
+		IExtension[] extensions = extensionPoint.getExtensions();
+		for (String elementName : elementNames)
+		{
+			for (IExtension extension : extensions)
 			{
-				IExtensionPoint extensionPoint = registry.getExtensionPoint(pluginId, extensionPointId);
+				IConfigurationElement[] elements = extension.getConfigurationElements();
 
-				if (extensionPoint != null)
+				for (IConfigurationElement element : elements)
 				{
-					Set<String> elementNames = processor.getSupportElementNames();
-					IExtension[] extensions = extensionPoint.getExtensions();
-					for (String elementName : elementNames)
+					if (element.getName().equals(elementName))
 					{
-						for (IExtension extension : extensions)
+						processor.processElement(element);
+						if (IdeLog.isTraceEnabled(CorePlugin.getDefault(), IDebugScopes.EXTENSION_POINTS))
 						{
-							IConfigurationElement[] elements = extension.getConfigurationElements();
-
-							for (IConfigurationElement element : elements)
-							{
-								if (element.getName().equals(elementName))
-								{
-									processor.processElement(element);
-									if (IdeLog.isTraceEnabled(CorePlugin.getDefault(), IDebugScopes.EXTENSION_POINTS))
-									{
-										IdeLog.logTrace(
-												CorePlugin.getDefault(),
-												MessageFormat
-														.format("Processing extension element {0} with attributes {1}", element.getName(), //$NON-NLS-1$
-																collectElementAttributes(element)),
-												IDebugScopes.EXTENSION_POINTS);
-									}
-								}
-							}
+							IdeLog.logTrace(CorePlugin.getDefault(), MessageFormat.format(
+									"Processing extension element {0} with attributes {1}", element.getName(), //$NON-NLS-1$
+									collectElementAttributes(element)), IDebugScopes.EXTENSION_POINTS);
 						}
 					}
 				}

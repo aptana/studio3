@@ -26,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.scripting.ScriptLogListener;
 import com.aptana.scripting.model.filters.IModelFilter;
 
@@ -288,11 +289,12 @@ public class BundleTests extends BundleTestBase
 	public void testLoadBundleWithSnippetUsingNullFilter()
 	{
 		String bundleName = "bundleWithSnippet";
+		int origSize = CollectionsUtil.size(getBundleManagerInstance().getSnippets(null));
 		BundleEntry entry = this.getBundleEntry(bundleName, BundlePrecedence.APPLICATION);
 		List<SnippetElement> snippets = getBundleManagerInstance().getSnippets(null);
 
 		assertNotNull(snippets);
-		assertEquals(1, snippets.size());
+		assertEquals(origSize + 1, snippets.size());
 	}
 
 	/**

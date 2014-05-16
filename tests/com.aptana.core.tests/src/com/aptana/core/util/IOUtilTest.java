@@ -7,6 +7,8 @@
  */
 package com.aptana.core.util;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,7 +31,7 @@ import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
 
-public class IOUtilTest extends TestCase
+public class IOUtilTest
 {
 	private static final String BUNDLE_ID = "com.aptana.core.tests";
 	private static final String RESOURCE_DIR = "resources";
@@ -44,6 +46,7 @@ public class IOUtilTest extends TestCase
 		}
 	};
 
+	@Test
 	public void testReadClosesStreamWhenIOExceptionThrown() throws Exception
 	{
 		final byte[] b = new byte[8192];
@@ -64,6 +67,7 @@ public class IOUtilTest extends TestCase
 		context.assertIsSatisfied();
 	}
 
+	@Test
 	public void testReadWithNoCharsetAndStreamDoesntSupportMarkAssumesUTF8() throws Exception
 	{
 		final byte[] b = new byte[8192];
@@ -97,6 +101,7 @@ public class IOUtilTest extends TestCase
 
 	// TODO Add tests for reading a known charset and for reading a BOM
 
+	@Test
 	public void testReadWithNoCharsetAndMarkSupportedSniffsCharset() throws Exception
 	{
 		final byte[] b = new byte[8192];
@@ -126,11 +131,13 @@ public class IOUtilTest extends TestCase
 		context.assertIsSatisfied();
 	}
 
+	@Test
 	public void testReadWithNullInputReturnsNull() throws Exception
 	{
 		assertNull(IOUtil.read(null));
 	}
 
+	@Test
 	public void testReadWithUnicodeCharacters() throws Exception
 	{
 		String stringwithUnicode = "abc\u5639\u563b";
@@ -138,6 +145,7 @@ public class IOUtilTest extends TestCase
 		assertEquals(stringwithUnicode, IOUtil.read(stream, "UTF-8"));
 	}
 
+	@Test
 	public void testReadWithMultipleLinesWithSlashN() throws Exception
 	{
 		String multilineString = "line one\nline two\nline three";
@@ -145,6 +153,7 @@ public class IOUtilTest extends TestCase
 		assertEquals(multilineString, IOUtil.read(stream, "UTF-8"));
 	}
 
+	@Test
 	public void testReadWithMultipleLinesWithSlashRSlashN() throws Exception
 	{
 		String multilineString = "line one\r\nline two\r\nline three";
@@ -152,6 +161,7 @@ public class IOUtilTest extends TestCase
 		assertEquals("line one\r\nline two\r\nline three", IOUtil.read(stream, "UTF-8"));
 	}
 
+	@Test
 	public void testReadWithMultipleLinesWithSlashR() throws Exception
 	{
 		String multilineString = "line one\rline two\rline three";
@@ -159,6 +169,7 @@ public class IOUtilTest extends TestCase
 		assertEquals("line one\rline two\rline three", IOUtil.read(stream, "UTF-8"));
 	}
 
+	@Test
 	public void testReadWithEndingnewline() throws Exception
 	{
 		String multilineString = "line one\r\nline two\r\nline three\r\n";
@@ -166,6 +177,7 @@ public class IOUtilTest extends TestCase
 		assertEquals("line one\r\nline two\r\nline three\r\n", IOUtil.read(stream, "UTF-8"));
 	}
 
+	@Test
 	public void testCopyDirectory() throws Exception
 	{
 		URL resourceURL = Platform.getBundle(BUNDLE_ID).getEntry(RESOURCE_DIR);
@@ -185,6 +197,7 @@ public class IOUtilTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testCopyDirectorytoFile() throws IOException
 	{
 		URL resourceURL = Platform.getBundle(BUNDLE_ID).getEntry(RESOURCE_DIR);
@@ -205,6 +218,7 @@ public class IOUtilTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testCopyFromNonReadableDirectory() throws Exception
 	{
 		// We can use source.setReadable(false) when we decide to use java 1.6
@@ -235,6 +249,7 @@ public class IOUtilTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testCopyToNotWriteableExistingDirectory() throws IOException
 	{
 		URL resourceURL = Platform.getBundle(BUNDLE_ID).getEntry(RESOURCE_DIR);
@@ -261,6 +276,7 @@ public class IOUtilTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testCopyToNotWritableDirectory() throws IOException
 	{
 		URL resourceURL = Platform.getBundle(BUNDLE_ID).getEntry(RESOURCE_DIR);
@@ -287,6 +303,7 @@ public class IOUtilTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testExtractFile() throws IOException
 	{
 		URL resourceURL = Platform.getBundle(BUNDLE_ID).getEntry(RESOURCE_DIR);
@@ -306,6 +323,7 @@ public class IOUtilTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testExtractFileWithInvalidPath() throws IOException
 	{
 		File dest = new File(tempDir, "testfile");
@@ -315,6 +333,7 @@ public class IOUtilTest extends TestCase
 		assertFalse(dest.exists());
 	}
 
+	@Test
 	public void testWrite() throws IOException
 	{
 		File dest = new File(tempDir, "test.txt");
@@ -336,6 +355,7 @@ public class IOUtilTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testWriteWithNullText() throws IOException
 	{
 		File dest = new File(tempDir, "test.txt");
@@ -357,6 +377,7 @@ public class IOUtilTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testPipe() throws IOException
 	{
 		URL resourceURL = Platform.getBundle(BUNDLE_ID).getEntry(RESOURCE_DIR);

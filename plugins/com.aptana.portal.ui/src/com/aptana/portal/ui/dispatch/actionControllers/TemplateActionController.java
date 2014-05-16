@@ -7,17 +7,19 @@
  */
 package com.aptana.portal.ui.dispatch.actionControllers;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.aptana.jetty.util.epl.ajax.JSON;
-
 import com.aptana.configurations.processor.ConfigurationStatus;
 import com.aptana.core.projects.templates.IProjectTemplate;
 import com.aptana.core.projects.templates.TemplateType;
+import com.aptana.core.util.ResourceUtil;
+import com.aptana.core.util.StringUtil;
+import com.aptana.jetty.util.epl.ajax.JSON;
 import com.aptana.projects.ProjectsPlugin;
 
 /**
@@ -35,7 +37,9 @@ public class TemplateActionController extends AbstractActionController
 		ID("id"), //$NON-NLS-1$
 		NAME("name"), //$NON-NLS-1$
 		DESCRIPTION("description"), //$NON-NLS-1$
-		TEMPLATE_TYPE("type"); //$NON-NLS-1$
+		TEMPLATE_TYPE("type"), //$NON-NLS-1$
+		IMAGE_URL("image"), //$NON-NLS-1$
+		TAG("tag"); //$NON-NLS-1$
 
 		private String key;
 
@@ -111,6 +115,12 @@ public class TemplateActionController extends AbstractActionController
 			properties.put(TEMPLATE_INFO.NAME.toString(), template.getDisplayName());
 			properties.put(TEMPLATE_INFO.DESCRIPTION.toString(), template.getDescription());
 			properties.put(TEMPLATE_INFO.TEMPLATE_TYPE.toString(), template.getType().name());
+			if (template.getIconURL() != null)
+			{
+				URI iconPath = ResourceUtil.resourcePathToURI(template.getIconURL());
+				properties.put(TEMPLATE_INFO.IMAGE_URL.toString(), iconPath.toASCIIString());
+			}
+			properties.put(TEMPLATE_INFO.TAG.toString(), StringUtil.join(",", template.getTags())); //$NON-NLS-1$
 			templateObjects.add(properties);
 		}
 

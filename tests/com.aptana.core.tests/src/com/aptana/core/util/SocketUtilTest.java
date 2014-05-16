@@ -8,6 +8,8 @@
 
 package com.aptana.core.util;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -18,9 +20,10 @@ import junit.framework.TestCase;
  * @author Max Stepanov
  */
 @SuppressWarnings("nls")
-public class SocketUtilTest extends TestCase
+public class SocketUtilTest
 {
 
+	@Test
 	public void testFindFreePort()
 	{
 		int port = SocketUtil.findFreePort(null);
@@ -35,6 +38,7 @@ public class SocketUtilTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testFindFreePortInRange()
 	{
 		int port = SocketUtil.findFreePort(null, 8000, 8010);
@@ -49,12 +53,14 @@ public class SocketUtilTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testFindFreePortInInvalidRange()
 	{
 		int port = SocketUtil.findFreePort(null, 1, 10);
 		assertEquals("Found free port in invalid range", -1, port);
 	}
 
+	@Test
 	public void testFindFreePortInTakenRange() throws IOException
 	{
 		ServerSocket socket = new ServerSocket(9000);
@@ -63,6 +69,7 @@ public class SocketUtilTest extends TestCase
 		assertEquals("Found free port in taken range", -1, port);
 	}
 
+	@Test
 	public void testGetLocalAddresses()
 	{
 		InetAddress[] addresses = SocketUtil.getLocalAddresses();
@@ -78,6 +85,7 @@ public class SocketUtilTest extends TestCase
 		assertTrue("Finding loopback 127.0.0.1 address failed", passed);
 	}
 
+	@Test
 	public void testGetNonLoopbackLocalAdresses()
 	{
 		InetAddress[] addresses = SocketUtil.getNonLoopbackLocalAdresses();
@@ -90,6 +98,7 @@ public class SocketUtilTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testIPv4() throws Exception
 	{
 		assertTrue("Expected a valid IPv4 address for '127.0.0.1'", SocketUtil.isValidIPv4("127.0.0.1"));

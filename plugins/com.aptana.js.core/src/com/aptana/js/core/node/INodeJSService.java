@@ -20,17 +20,13 @@ import org.eclipse.core.runtime.IStatus;
 public interface INodeJSService
 {
 
-	// FIXME We need to introduce the conecpt of an INodeJSInstall or INodeJSExecutable. User may have multiple versions
-	// installed!
-
 	public static interface Listener
 	{
 
 		public void nodeJSInstalled();
 	}
 
-	public static final String LINUX_DOCS_URL = "http://go.aptana.com/Installing+Node.js"; //$NON-NLS-1$
-	public static final String UPGRADE_URL = "http://go.aptana.com/Upgrading+Node.js"; //$NON-NLS-1$
+	public static final String LINUX_DOCS_URL = "http://go.appcelerator.com/Installing+Node.js"; //$NON-NLS-1$
 
 	public static final String NODE = "node"; //$NON-NLS-1$
 

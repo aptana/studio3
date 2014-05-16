@@ -14,3 +14,4 @@ Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.usage,
  com.aptana.usage.preferences
+Eclipse-ExtensibleAPI: true

@@ -29,6 +29,7 @@ import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.URIUtil;
 import com.aptana.index.core.Index;
+import com.aptana.js.core.JSLanguageConstants;
 import com.aptana.js.core.JSTypeConstants;
 import com.aptana.js.core.index.JSIndexQueryHelper;
 import com.aptana.js.core.model.FunctionElement;
@@ -764,19 +765,16 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		IParseNode child = node.getExpression();
 		if (child instanceof JSNode)
 		{
-			// TODO hang the "require" string as a constant somewhere!
-			if (child instanceof JSIdentifierNode && "require".equals(child.getNameNode().getName())) //$NON-NLS-1$
+			if (child instanceof JSIdentifierNode && JSLanguageConstants.REQUIRE.equals(child.getNameNode().getName()))
 			{
 				// it's a requires!
 				JSArgumentsNode args = (JSArgumentsNode) node.getArguments();
 				IParseNode[] children = args.getChildren();
 				for (IParseNode arg : children)
 				{
-					if (arg instanceof JSStringNode)
+					String moduleId = CommonJSResolver.getModuleId(arg);
+					if (!StringUtil.isEmpty(moduleId))
 					{
-						JSStringNode string = (JSStringNode) arg;
-						String moduleId = StringUtil.stripQuotes(string.getText());
-
 						IPath absolutePath = resolve(moduleId);
 						String typeName = _queryHelper.getModuleType(absolutePath);
 						if (typeName != null)

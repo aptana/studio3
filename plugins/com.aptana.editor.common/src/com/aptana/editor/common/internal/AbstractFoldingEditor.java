@@ -36,7 +36,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
-import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.IDocumentProviderExtension;
@@ -45,10 +44,11 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IFoldingEditor;
+import com.aptana.editor.epl.AbstractBaseTextEditor;
 import com.aptana.index.core.IndexFilesOfProjectJob;
 import com.aptana.index.core.RemoveIndexOfFilesOfProjectJob;
 
-public class AbstractFoldingEditor extends AbstractDecoratedTextEditor implements IFoldingEditor
+public class AbstractFoldingEditor extends AbstractBaseTextEditor implements IFoldingEditor
 {
 
 	/**

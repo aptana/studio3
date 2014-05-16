@@ -7,8 +7,10 @@
  */
 package com.aptana.editor.common;
 
-import org.junit.After;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -18,8 +20,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -40,8 +40,10 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.ITextEditor;
+import org.junit.After;
 import org.osgi.framework.Bundle;
 
+import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
@@ -183,7 +185,7 @@ public abstract class EditorBasedTests
 		}
 		try
 		{
-			tempFile = File.createTempFile(prefix, extension);
+			tempFile = FileUtil.createTempFile(prefix, extension);
 			IOUtil.write(new FileOutputStream(tempFile), contents);
 			fileStore = EFS.getStore(tempFile.toURI());
 		}
@@ -305,32 +307,10 @@ public abstract class EditorBasedTests
 		this.fileUri = store.toURI();
 		this.editor = this.createEditor(editorInput);
 		this.document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
-		this.source = document.get();
 
 		// find offsets
-		this.cursorOffsets = new ArrayList<Integer>();
-		int offset = this.source.indexOf('|');
-
-		while (offset != -1)
-		{
-			// NOTE: we have to account for the deletion of previous offsets
-			this.cursorOffsets.add(offset - this.cursorOffsets.size());
-			offset = this.source.indexOf('|', offset + 1);
-		}
-
-		if (this.cursorOffsets.isEmpty())
-		{
-			// use last position if we didn't find any cursors
-			this.cursorOffsets.add(source.length());
-		}
-		else
-		{
-			// clean source
-			this.source = CURSOR.matcher(this.source).replaceAll(StringUtil.EMPTY);
-
-			// update document
-			document.set(this.source);
-		}
+		handleCursorOffsets(document);
+		this.source = document.get();
 
 		IFileStoreIndexingParticipant indexer = this.createIndexer();
 		if (indexer != null)
@@ -352,6 +332,36 @@ public abstract class EditorBasedTests
 				fail("Error indexing file: " + e.getMessage());
 			}
 		}
+	}
+
+	protected void handleCursorOffsets(IDocument document)
+	{
+		String source = document.get();
+		ArrayList cursorOffsets = new ArrayList<Integer>();
+		int offset = source.indexOf('|');
+
+		while (offset != -1)
+		{
+			// NOTE: we have to account for the deletion of previous offsets
+			cursorOffsets.add(offset - cursorOffsets.size());
+			offset = source.indexOf('|', offset + 1);
+		}
+
+		if (cursorOffsets.isEmpty())
+		{
+			// use last position if we didn't find any cursors
+			cursorOffsets.add(source.length());
+		}
+		else
+		{
+			// clean source
+			source = CURSOR.matcher(source).replaceAll(StringUtil.EMPTY);
+
+			// update document
+			document.set(source);
+		}
+		cursorOffsets.trimToSize();
+		this.cursorOffsets = cursorOffsets;
 	}
 
 	/**
@@ -418,7 +428,7 @@ public abstract class EditorBasedTests
 	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
-//	@Override
+	// @Override
 	@After
 	public void tearDown() throws Exception
 	{
@@ -429,6 +439,6 @@ public abstract class EditorBasedTests
 		source = null;
 		cursorOffsets = null;
 
-//		super.tearDown();
+		// super.tearDown();
 	}
 }

@@ -21,7 +21,7 @@ public interface IProjectWizardContributor extends IExecutableExtension
 {
 
 	/**
-	 * Reponsible for creating the project wizard pages
+	 * Responsible for creating the project wizard pages
 	 * 
 	 * @return
 	 */

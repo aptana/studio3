@@ -7,6 +7,8 @@
  */
 package com.aptana.core.util;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.io.InputStream;
 
 import junit.framework.TestCase;
@@ -14,13 +16,14 @@ import junit.framework.TestCase;
 /**
  * @author Shalom
  */
-public class InputStreamGobblerTest extends TestCase
+public class InputStreamGobblerTest
 {
 	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
 	/*
 	 * Test a gobbler on a process that should not yield any errors.s
 	 */
+	@Test
 	public void testGobblerNoErrors() throws Exception
 	{
 		ProcessBuilder pb = new ProcessBuilder("java", "-version");
@@ -57,6 +60,7 @@ public class InputStreamGobblerTest extends TestCase
 	/*
 	 * Test a gobbler on a process that should not yield any errors.s
 	 */
+	@Test
 	public void testGobblerWithErrors() throws Exception
 	{
 		ProcessBuilder pb = new ProcessBuilder("java", "-vers");
@@ -82,6 +86,7 @@ public class InputStreamGobblerTest extends TestCase
 		assertTrue("Expected process output, but got none", !StringUtil.isEmpty(stderr));
 	}
 
+	@Test
 	public void testBadInitialization_1() throws Exception
 	{
 		try
@@ -95,6 +100,7 @@ public class InputStreamGobblerTest extends TestCase
 		assertTrue("An InputStreamGobbler was created with invalid arguments", false);
 	}
 
+	@Test
 	public void testBadInitialization_2() throws Exception
 	{
 		ProcessBuilder pb = new ProcessBuilder("java", "-version");
@@ -114,6 +120,7 @@ public class InputStreamGobblerTest extends TestCase
 		assertTrue("An InputStreamGobbler was created with invalid arguments", false);
 	}
 
+	@Test
 	public void testTerminatedProcess() throws Exception
 	{
 		ProcessBuilder pb = new ProcessBuilder("java", "-version");

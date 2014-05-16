@@ -22,3 +22,4 @@ Export-Package: com.aptana.js.debug.core,
  com.aptana.js.debug.core.model.provisional,
  com.aptana.js.debug.core.model.xhr,
  com.aptana.js.debug.core.preferences
+Eclipse-ExtensibleAPI: true

@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.jobs.Job;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.usage.AnalyticsEvent;
 import com.aptana.usage.AnalyticsLogger;
 import com.aptana.usage.IAnalyticsEventHandler;
@@ -40,15 +41,24 @@ import com.aptana.usage.UsagePlugin;
  */
 public class DefaultAnalyticsEventHandler implements IAnalyticsEventHandler
 {
-	private static final String ANALYTICS_URL;
-	static
-	{
-		String url = EclipseUtil.getSystemProperty(IUsageSystemProperties.ANALYTICS_URL);
-		ANALYTICS_URL = (url == null) ? "https://api.appcelerator.net/p/v1/app-track" : url; //$NON-NLS-1$
-	}
-	private static final int TIMEOUT = 5 * 1000; // 5 seconds
+	static final String DEFAULT_URL = "https://api.appcelerator.com/p/v1/app-track"; //$NON-NLS-1$
+	static final int DEFAULT_TIMEOUT = 5 * 1000; // 5 seconds
+
+	private final String url;
+	private final int timeout;
 	protected int responseCode = 0;
 	protected Object lock = new Object();
+
+	public DefaultAnalyticsEventHandler()
+	{
+		this(DEFAULT_TIMEOUT, EclipseUtil.getSystemProperty(IUsageSystemProperties.ANALYTICS_URL));
+	}
+
+	DefaultAnalyticsEventHandler(int timeout, String url)
+	{
+		this.timeout = timeout;
+		this.url = url;
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -62,63 +72,18 @@ public class DefaultAnalyticsEventHandler implements IAnalyticsEventHandler
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
-				IAnalyticsUserManager userManager = AnalyticsEvent.getUserManager();
-				if (userManager == null)
-				{
-					// send as anonymous user
-					if (!isValidResponse(responseCode = sendPing(event, null)))
-					{
-						// log the event to the database
-						AnalyticsLogger.getInstance().logEvent(event);
-					}
-					return Status.OK_STATUS;
-				}
+				return sendEventSync(event);
+			}
 
-				IAnalyticsUser user = userManager.getUser();
-				// Only send ping if user is logged in. Otherwise, we log it to the database
-				if (user == null || !user.isOnline() || !isValidResponse(responseCode = sendPing(event, user)))
-				{
-					// log the event to the database
-					AnalyticsLogger.getInstance().logEvent(event);
-				}
-				else
-				{
-					// Send out all previous events from the db
-					synchronized (lock)
-					{
-						List<AnalyticsEvent> events = AnalyticsLogger.getInstance().getEvents();
-						// Sort the events. We want all project.create events to be first, and all project.delete events
-						// to be last
-						Collections.sort(events, new AnalyticsEventComparator());
-						for (AnalyticsEvent aEvent : events)
-						{
-							if (!isValidResponse(responseCode = sendPing(aEvent, user)))
-							{
-								return Status.OK_STATUS;
-							}
-							// Remove the event after it has been sent
-							AnalyticsLogger.getInstance().clearEvent(aEvent);
-						}
-					}
-				}
-				return Status.OK_STATUS;
+			@Override
+			public boolean belongsTo(Object family)
+			{
+				return family.equals(IAnalyticsEventHandler.class);
 			}
 		};
 		job.setSystem(true);
 		job.setPriority(Job.BUILD);
 		job.schedule();
-
-		// Make this a blocking job for unit tests
-		if (EclipseUtil.isTesting())
-		{
-			try
-			{
-				job.join();
-			}
-			catch (InterruptedException e)
-			{
-			}
-		}
 	}
 
 	/*
@@ -127,7 +92,11 @@ public class DefaultAnalyticsEventHandler implements IAnalyticsEventHandler
 	 */
 	public String getAnalyticsURL()
 	{
-		return ANALYTICS_URL;
+		if (StringUtil.isEmpty(url))
+		{
+			return DEFAULT_URL;
+		}
+		return url;
 	}
 
 	/*
@@ -136,7 +105,7 @@ public class DefaultAnalyticsEventHandler implements IAnalyticsEventHandler
 	 */
 	public int getTimeout()
 	{
-		return TIMEOUT;
+		return timeout;
 	}
 
 	/*
@@ -163,7 +132,7 @@ public class DefaultAnalyticsEventHandler implements IAnalyticsEventHandler
 		try
 		{
 			URL url = new URL(getAnalyticsURL());
-			connection = (HttpURLConnection) url.openConnection();
+			connection = createConnection(url);
 			if (user != null)
 			{
 				connection.setRequestProperty("Cookie", user.getCookie() + "; uid=" + user.getGUID()); //$NON-NLS-1$ //$NON-NLS-2$
@@ -172,13 +141,10 @@ public class DefaultAnalyticsEventHandler implements IAnalyticsEventHandler
 			connection.setDoOutput(true);
 			connection.setReadTimeout(getTimeout());
 			connection.setConnectTimeout(getTimeout());
-
 			connection.setRequestMethod("POST"); //$NON-NLS-1$
-			// writes POST
-			output = new DataOutputStream(connection.getOutputStream());
+
 			String data = event.getEventString();
-			output.writeBytes(data);
-			output.flush();
+			output = createOutputStream(connection, data);
 
 			if (IdeLog.isTraceEnabled(UsagePlugin.getDefault(), IDebugScopes.USAGE))
 			{
@@ -191,7 +157,7 @@ public class DefaultAnalyticsEventHandler implements IAnalyticsEventHandler
 				UsagePlugin.logError(MessageFormat.format(Messages.StudioAnalytics_connection_unauthorized,
 						Integer.toString(code)));
 			}
-			else if (code < 200 || code > 205)
+			else if (code < HttpURLConnection.HTTP_OK || code > HttpURLConnection.HTTP_RESET)
 			{
 				UsagePlugin.logError(MessageFormat.format(Messages.StudioAnalytics_connection_failed,
 						Integer.toString(code)));
@@ -221,6 +187,73 @@ public class DefaultAnalyticsEventHandler implements IAnalyticsEventHandler
 				connection.disconnect();
 			}
 		}
+	}
+
+	protected DataOutputStream createOutputStream(HttpURLConnection connection, String data) throws IOException
+	{
+		DataOutputStream dos = new DataOutputStream(connection.getOutputStream());
+		dos.writeBytes(data);
+		dos.flush();
+		return dos;
+	}
+
+	protected HttpURLConnection createConnection(URL url) throws IOException
+	{
+		return (HttpURLConnection) url.openConnection();
+	}
+
+	protected AnalyticsLogger getAnalyticsLogger()
+	{
+		return AnalyticsLogger.getInstance();
+	}
+
+	protected IAnalyticsUserManager getUserManager()
+	{
+		return AnalyticsEvent.getUserManager();
+	}
+
+	protected IStatus sendEventSync(final AnalyticsEvent event)
+	{
+		IAnalyticsUserManager userManager = getUserManager();
+		if (userManager == null)
+		{
+			// send as anonymous user
+			if (!isValidResponse(responseCode = sendPing(event, null)))
+			{
+				// log the event to the database
+				getAnalyticsLogger().logEvent(event);
+			}
+			return Status.OK_STATUS;
+		}
+
+		IAnalyticsUser user = userManager.getUser();
+		// Only send ping if user is logged in. Otherwise, we log it to the database
+		if (user == null || !user.isOnline() || !isValidResponse(responseCode = sendPing(event, user)))
+		{
+			// log the event to the database
+			getAnalyticsLogger().logEvent(event);
+		}
+		else
+		{
+			// Send out all previous events from the db
+			synchronized (lock)
+			{
+				List<AnalyticsEvent> events = getAnalyticsLogger().getEvents();
+				// Sort the events. We want all project.create events to be first, and all project.delete events
+				// to be last
+				Collections.sort(events, new AnalyticsEventComparator());
+				for (AnalyticsEvent aEvent : events)
+				{
+					if (!isValidResponse(responseCode = sendPing(aEvent, user)))
+					{
+						return Status.OK_STATUS;
+					}
+					// Remove the event after it has been sent
+					getAnalyticsLogger().clearEvent(aEvent);
+				}
+			}
+		}
+		return Status.OK_STATUS;
 	}
 
 	/**

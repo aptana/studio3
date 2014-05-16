@@ -13,6 +13,7 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 //@formatter:off
 @Suite.SuiteClasses({ArrayUtilTest.class,
+	Base64Test.class,
 	BrowserUtilTest.class,
 	ClassUtilTest.class,
 	CollectionsUtilTest.class,
@@ -28,6 +29,7 @@ import org.junit.runners.Suite;
 	OutputStreamThreadTest.class,
 	PatternReplacerTest.class,
 	PlatformUtilTest.class,
+	ProcessRunnerTest.class,
 	ProcessStatusTest.class,
 	ProcessUtilTest.class,
 	ProgressMonitorInterrupterTest.class,

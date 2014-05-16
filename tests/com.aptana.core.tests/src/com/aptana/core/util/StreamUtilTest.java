@@ -7,6 +7,8 @@
  */
 package com.aptana.core.util;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.io.InputStream;
 
 import junit.framework.TestCase;
@@ -15,9 +17,10 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 
-public class StreamUtilTest extends TestCase
+public class StreamUtilTest
 {
 
+	@Test
 	public void testReadContent() throws Exception
 	{
 		InputStream stream = FileLocator.openStream(Platform.getBundle("com.aptana.core.tests"),

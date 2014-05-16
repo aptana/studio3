@@ -59,7 +59,7 @@ import com.aptana.ui.util.WorkbenchBrowserUtil;
 public abstract class AbstractPortalBrowserEditor extends EditorPart
 {
 
-	private static final String BROWSER_DOCS = "http://go.aptana.com/troubleshooting_linux"; //$NON-NLS-1$
+	private static final String BROWSER_DOCS = "http://go.appcelerator.com/troubleshooting_linux"; //$NON-NLS-1$
 
 	private static final String BROWSER_SWT = "swt"; //$NON-NLS-1$
 	private static final String BROWSER_CHROMIUM = "chromium"; //$NON-NLS-1$

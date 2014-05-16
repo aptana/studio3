@@ -7,24 +7,29 @@
  */
 package com.aptana.core.util;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
 import org.osgi.framework.Version;
 
-public class VersionUtilTest extends TestCase
+public class VersionUtilTest
 {
 
+	@Test
 	public void testParseVersionQualifierSeparatedByHyphen()
 	{
 		assertVersion(3, 0, 24, "cr", VersionUtil.parseVersion("3.0.24-cr"));
 	}
 
+	@Test
 	public void testParseVersionWithMajorMinorMicro()
 	{
 		assertVersion(3, 0, 24, VersionUtil.parseVersion("3.0.24"));
 		assertVersion(1, 12, 127, VersionUtil.parseVersion("1.12.127"));
 	}
 
+	@Test
 	public void testParseVersionWithMajorMinorMicroQualifier()
 	{
 		assertVersion(3, 0, 0, "GA", VersionUtil.parseVersion("3.0.0.GA"));
@@ -33,18 +38,21 @@ public class VersionUtilTest extends TestCase
 		assertVersion(1, 2, 3, "1000a", VersionUtil.parseVersion("1.2.3.1000a"));
 	}
 
+	@Test
 	public void testParseVersionWithMajorMinorMicroQualifierWithNoLeadingSeparator()
 	{
 		assertVersion(3, 0, 0, "GA", VersionUtil.parseVersion("3.0.0GA"));
 		assertVersion(1, 2, 1, "b1", VersionUtil.parseVersion("1.2.1b1"));
 	}
 
+	@Test
 	public void testParseVersionWithMajorMinor()
 	{
 		assertVersion(2, 0, 0, VersionUtil.parseVersion("2.0"));
 		assertVersion(2, 10, 0, VersionUtil.parseVersion("2.10"));
 	}
 
+	@Test
 	public void testParseVersionWithMajorMinorQualifierWithNoSeparator()
 	{
 		assertVersion(2, 1, 0, "a", VersionUtil.parseVersion("2.1a"));
@@ -67,6 +75,7 @@ public class VersionUtilTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testCompareVersions()
 	{
 		assertTrue(VersionUtil.compareVersions("2.0", "1.0") > 0);
@@ -99,6 +108,7 @@ public class VersionUtilTest extends TestCase
 		assertTrue(VersionUtil.compareVersions("3.1.3-cr", "3.1.3-cr", true, true) == 0);
 	}
 
+	@Test
 	public void testCompareVersionsNotStrict()
 	{
 		assertTrue(VersionUtil.compareVersions("2.0", "1.0", false) > 0);
@@ -132,6 +142,7 @@ public class VersionUtilTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testVersionRanges() throws Exception
 	{
 		assertTrue("Expected empty version values to be compatible",

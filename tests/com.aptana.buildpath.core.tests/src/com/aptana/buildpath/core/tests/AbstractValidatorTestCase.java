@@ -72,7 +72,7 @@ public abstract class AbstractValidatorTestCase
 
 	protected abstract String getContentType();
 
-	protected IProblem assertContains(List<IProblem> items, String message)
+	public static IProblem assertContains(List<IProblem> items, String message)
 	{
 		for (IProblem item : items)
 		{
@@ -93,7 +93,7 @@ public abstract class AbstractValidatorTestCase
 		return null;
 	}
 
-	protected void assertProblem(IProblem item, String msg, int line, int severity, int offset)
+	public static void assertProblem(IProblem item, String msg, int line, int severity, int offset)
 	{
 		assertEquals("message", msg, item.getMessage());
 		assertEquals("line", line, item.getLineNumber());
@@ -101,20 +101,20 @@ public abstract class AbstractValidatorTestCase
 		assertEquals("offset", offset, item.getOffset());
 	}
 
-	protected void assertProblem(IProblem item, String msg, int line, int severity, int offset, int length)
+	public static void assertProblem(IProblem item, String msg, int line, int severity, int offset, int length)
 	{
 		assertProblem(item, msg, line, severity, offset);
 		assertEquals("length", length, item.getLength());
 	}
 
-	protected void assertContainsProblem(List<IProblem> items, String msg, int severity, int line, int offset,
+	public static void assertContainsProblem(List<IProblem> items, String msg, int severity, int line, int offset,
 			int length)
 	{
 		IProblem problem = assertContains(items, msg);
 		assertProblem(problem, msg, line, severity, offset, length);
 	}
 
-	protected List<IProblem> getProblems(List<IProblem> items, final String message)
+	public static List<IProblem> getProblems(List<IProblem> items, final String message)
 	{
 		return CollectionsUtil.filter(items, new IFilter<IProblem>()
 		{
@@ -125,7 +125,7 @@ public abstract class AbstractValidatorTestCase
 		});
 	}
 
-	protected void assertDoesntContain(List<IProblem> items, String message)
+	public static void assertDoesntContain(List<IProblem> items, String message)
 	{
 		for (IProblem item : items)
 		{
@@ -137,13 +137,13 @@ public abstract class AbstractValidatorTestCase
 		}
 	}
 
-	protected void assertProblemExists(List<IProblem> items, String msg, int line, int severity, int offset)
+	public static void assertProblemExists(List<IProblem> items, String msg, int line, int severity, int offset)
 	{
 		IProblem item = assertContains(items, msg);
 		assertProblem(item, msg, line, severity, offset);
 	}
 
-	protected void assertCountOfProblems(List<IProblem> items, int count, final String msg)
+	public static void assertCountOfProblems(List<IProblem> items, int count, final String msg)
 	{
 		List<IProblem> filtered = CollectionsUtil.filter(items, new IFilter<IProblem>()
 		{

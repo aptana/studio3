@@ -8,19 +8,17 @@
 package com.aptana.xml.core.parsing.ast;
 
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import beaver.Symbol;
 
-import com.aptana.core.IMap;
-import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.ObjectUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.parsing.ast.INameNode;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseNodeAttribute;
+import com.aptana.parsing.ast.ParseNode;
 import com.aptana.parsing.ast.ParseNodeAttribute;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.xml.core.parsing.Terminals;
@@ -29,9 +27,10 @@ import com.aptana.xml.core.parsing.XMLParser;
 public class XMLElementNode extends XMLNode
 {
 
-	private INameNode fNameNode;
+	private NameNode fNameNode;
 	private final boolean fIsSelfClosing;
-	private Map<String, String> fAttributes;
+	private Map<String, IParseNodeAttribute> fAttributes;
+	private int startClose;
 
 	/**
 	 * XMLElementNode
@@ -40,12 +39,24 @@ public class XMLElementNode extends XMLNode
 	 * @param start
 	 * @param end
 	 */
-	public XMLElementNode(String tag, int start, Symbol close)
+	public XMLElementNode(Symbol tag, int start, Symbol close)
 	{
 		super(XMLNodeType.ELEMENT, XMLParser.NO_XML_NODES, start, close.getEnd());
 
-		fNameNode = new NameNode(tag, start, close.getEnd());
+		this.fNameNode = new NameNode((String) tag.value, tag.getStart(), tag.getEnd());
 		fIsSelfClosing = (close.getId() == Terminals.SLASH_GREATER);
+		this.startClose = close.getEnd();
+	}
+
+	/**
+	 * Returns the end of the entire start tag, i.e. for "&lt;html>&lt;/html>" it will return 6. Whereas
+	 * #getEndingOffset() would return 12.
+	 * 
+	 * @return
+	 */
+	public int getStartTagEndOffset()
+	{
+		return this.startClose;
 	}
 
 	/*
@@ -59,6 +70,7 @@ public class XMLElementNode extends XMLNode
 
 		fNameNode = new NameNode(fNameNode.getName(), range.getStartingOffset() + offset, range.getEndingOffset()
 				+ offset);
+		startClose += offset;
 
 		super.addOffset(offset);
 	}
@@ -83,45 +95,59 @@ public class XMLElementNode extends XMLNode
 		return ObjectUtil.areEqual(getName(), ((XMLElementNode) obj).getName());
 	}
 
-	/**
-	 * getAttribute
-	 * 
-	 * @param name
-	 * @return
-	 */
-	public String getAttribute(String name)
+	public String getAttributeValue(String name)
 	{
 		if (fAttributes == null)
 		{
-			// TODO Return null to distinguish between no value and empty string?
-			return StringUtil.EMPTY;
+			return null;
 		}
-
-		return fAttributes.get(name);
+		IParseNodeAttribute attr = fAttributes.get(name);
+		if (attr == null)
+		{
+			return null;
+		}
+		return attr.getValue();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.ParseNode#getAttributes()
-	 */
 	@Override
 	public IParseNodeAttribute[] getAttributes()
 	{
-		if (CollectionsUtil.isEmpty(fAttributes))
+		if (fAttributes == null)
 		{
-			return NO_ATTRIBUTES;
+			return ParseNode.NO_ATTRIBUTES;
 		}
-		final XMLElementNode self = this;
-		List<IParseNodeAttribute> attributes = CollectionsUtil.map(fAttributes.entrySet(),
-				new IMap<Map.Entry<String, String>, IParseNodeAttribute>()
-				{
+		return fAttributes.values().toArray(new IParseNodeAttribute[fAttributes.size()]);
+	}
 
-					public IParseNodeAttribute map(Entry<String, String> entry)
-					{
-						return new ParseNodeAttribute(self, entry.getKey(), entry.getValue());
-					}
-				});
-		return attributes.toArray(new IParseNodeAttribute[attributes.size()]);
+	/**
+	 * If the offset covers an attribute's name or value ranges, return the attribute.
+	 * 
+	 * @param offset
+	 * @return
+	 */
+	public IParseNodeAttribute getAttributeAtOffset(int offset)
+	{
+		IParseNodeAttribute[] attrs = getAttributes();
+		if (ArrayUtil.isEmpty(attrs))
+		{
+			return null;
+		}
+
+		for (IParseNodeAttribute attr : attrs)
+		{
+			IRange nameRange = attr.getNameRange();
+			if (nameRange != null && nameRange.contains(offset))
+			{
+				return attr;
+			}
+
+			IRange valueRange = attr.getValueRange();
+			if (valueRange != null && valueRange.contains(offset))
+			{
+				return attr;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -180,17 +206,17 @@ public class XMLElementNode extends XMLNode
 	 * 
 	 * @param name
 	 * @param value
+	 * @param range
+	 * @param nameRegion
 	 */
-	public void setAttribute(String name, String value)
+	public void setAttribute(String name, String value, IRange nameRange, IRange valueRange)
 	{
-		// FIXME Take in the ranges of the name and values!
 		if (fAttributes == null)
 		{
 			// NOTE: use linked hash map to preserve add order
-			fAttributes = new LinkedHashMap<String, String>();
+			fAttributes = new LinkedHashMap<String, IParseNodeAttribute>(2);
 		}
-
-		fAttributes.put(name, StringUtil.stripQuotes(value));
+		fAttributes.put(name, new ParseNodeAttribute(this, name, StringUtil.stripQuotes(value), nameRange, valueRange));
 	}
 
 	/*

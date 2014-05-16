@@ -71,6 +71,7 @@ public class NodeTypes
 		MULTIPLY_EQUAL("*="), //$NON-NLS-1$
 		DIVIDE_EQUAL("/="), //$NON-NLS-1$
 		TILDE_EQUAL("~="), //$NON-NLS-1$
+		MODULUS_EQUAL("%="), //$NON-NLS-1$
 		MULTIPLY("*"), //$NON-NLS-1$
 		PLUS("+"), //$NON-NLS-1$
 		MINUS("-"), //$NON-NLS-1$

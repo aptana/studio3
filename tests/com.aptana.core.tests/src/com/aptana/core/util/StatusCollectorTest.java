@@ -7,6 +7,10 @@
  */
 package com.aptana.core.util;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.util.Arrays;
 import java.util.List;
 
@@ -22,7 +26,7 @@ import com.aptana.core.CorePlugin;
  * 
  * @author Shalom Gibly <sgibly@appcelerator.com>
  */
-public class StatusCollectorTest extends TestCase
+public class StatusCollectorTest
 {
 	private static final int OLD_STATUS = 0;
 	private static final int NEW_STATUS = 1;
@@ -43,8 +47,9 @@ public class StatusCollectorTest extends TestCase
 	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
-	@Override
-	protected void setUp() throws Exception
+//	@Override
+	@Before
+	public void setUp() throws Exception
 	{
 		statusCollector = new StatusCollector();
 		notification = new IStatus[2];
@@ -55,14 +60,16 @@ public class StatusCollectorTest extends TestCase
 	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
-	@Override
-	protected void tearDown() throws Exception
+//	@Override
+	@After
+	public void tearDown() throws Exception
 	{
 		statusCollector = null;
 		notification = null;
-		super.tearDown();
+//		super.tearDown();
 	}
 
+	@Test
 	public void testAddRemoveStatus() throws Exception
 	{
 		Status status1 = new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, "Error1");
@@ -82,6 +89,7 @@ public class StatusCollectorTest extends TestCase
 		assertNull("Expected null status", statusCollector.getStatus("def"));
 	}
 
+	@Test
 	public void testStatusAddNotifications() throws Exception
 	{
 		Status status1 = new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, "Error1");
@@ -97,6 +105,7 @@ public class StatusCollectorTest extends TestCase
 
 	}
 
+	@Test
 	public void testStatusAddSameNotification() throws Exception
 	{
 		Status status1 = new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, "Error1");
@@ -115,6 +124,7 @@ public class StatusCollectorTest extends TestCase
 		assertNull("Expected null oldStatus in the notification", notification[OLD_STATUS]);
 	}
 
+	@Test
 	public void testStatusOverideNotification() throws Exception
 	{
 		Status status1 = new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, "Error1");
@@ -127,6 +137,7 @@ public class StatusCollectorTest extends TestCase
 		assertEquals("Expected an oldStatus in the notification", status1, notification[OLD_STATUS]);
 	}
 
+	@Test
 	public void testStatusRemoveNotification() throws Exception
 	{
 		Status status1 = new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, "Error1");
@@ -144,6 +155,7 @@ public class StatusCollectorTest extends TestCase
 		assertEquals("Expected an oldStatus in the notification", status2, notification[OLD_STATUS]);
 	}
 
+	@Test
 	public void testGetStatuses() throws Exception
 	{
 		Status status1 = new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, "Error1");
@@ -173,6 +185,7 @@ public class StatusCollectorTest extends TestCase
 		assertEquals("Unexpected statuse", status3, statuses[0]);
 	}
 
+	@Test
 	public void testGetMixedStatuses() throws Exception
 	{
 		Status status1 = new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, "Error1");
@@ -204,6 +217,7 @@ public class StatusCollectorTest extends TestCase
 		assertTrue("Expected a status", statusList.contains(status4));
 	}
 
+	@Test
 	public void testGetStatusCount() throws Exception
 	{
 		Status status1 = new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, "Error1");

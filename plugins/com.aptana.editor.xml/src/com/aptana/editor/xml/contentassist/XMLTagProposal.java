@@ -42,7 +42,7 @@ public class XMLTagProposal extends CommonCompletionProposal
 	 * @param element
 	 * @param positions
 	 */
-	XMLTagProposal(String replacementString, int replacementOffset, int replacementLength, ElementElement element,
+	protected XMLTagProposal(String replacementString, int replacementOffset, int replacementLength, ElementElement element,
 			Integer... positions)
 	{
 		super(replacementString, replacementOffset, replacementLength, positions[0],

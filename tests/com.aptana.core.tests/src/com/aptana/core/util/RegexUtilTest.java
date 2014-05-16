@@ -7,13 +7,16 @@
  */
 package com.aptana.core.util;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.TestCase;
 
-public class RegexUtilTest extends TestCase
+public class RegexUtilTest
 {
+	@Test
 	public void testCreateQuotedListPattern()
 	{
 		List<String> sports = new ArrayList<String>();

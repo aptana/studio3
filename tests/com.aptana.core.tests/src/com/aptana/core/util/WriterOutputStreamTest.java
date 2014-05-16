@@ -7,6 +7,10 @@
  */
 package com.aptana.core.util;
 
+import org.junit.After;
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,7 +28,7 @@ import junit.framework.TestCase;
  * 
  * @author Shalom
  */
-public class WriterOutputStreamTest extends TestCase
+public class WriterOutputStreamTest
 {
 	private File testFile;
 
@@ -32,10 +36,11 @@ public class WriterOutputStreamTest extends TestCase
 	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
-	@Override
-	protected void setUp() throws Exception
+//	@Override
+	@Before
+	public void setUp() throws Exception
 	{
-		super.setUp();
+//		super.setUp();
 		testFile = new File(FileUtil.getTempDirectory().toOSString(), "resources/test.txt");
 		testFile.getParentFile().mkdirs();
 	}
@@ -44,13 +49,15 @@ public class WriterOutputStreamTest extends TestCase
 	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
-	@Override
-	protected void tearDown() throws Exception
+//	@Override
+	@After
+	public void tearDown() throws Exception
 	{
 		testFile.delete();
-		super.tearDown();
+//		super.tearDown();
 	}
 
+	@Test
 	public void testWriteUTF8() throws Exception
 	{
 		String toWrite = "Hello I'm a UTF-8 string that is using Umlauts - alt - älter - am ältesten";
@@ -69,6 +76,7 @@ public class WriterOutputStreamTest extends TestCase
 		assertEquals("UFT-8 write-read process failed", toWrite, line);
 	}
 
+	@Test
 	public void testWriteCP1255() throws Exception
 	{
 		String toWrite = "Hello I'm a CP-1255 string that has Hebrew - שלום";
@@ -86,6 +94,7 @@ public class WriterOutputStreamTest extends TestCase
 		assertEquals("CP1255 write-read process failed", toWrite, line);
 	}
 
+	@Test
 	public void testWriteBytes() throws Exception
 	{
 		String shortS = "P";
@@ -105,6 +114,7 @@ public class WriterOutputStreamTest extends TestCase
 		assertEquals("Write-read process failed", "PA B", line);
 	}
 
+	@Test
 	public void testWriteBytesWithCharset() throws Exception
 	{
 		String shortS = "P";

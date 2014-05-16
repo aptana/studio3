@@ -201,8 +201,10 @@ public final class ZipUtil
 		{
 			overwriteFlag = "-n"; //$NON-NLS-1$
 		}
-		return ProcessUtil.run("unzip", null, null, null, monitor, overwriteFlag, zip.getAbsolutePath(), "-d", //$NON-NLS-1$ //$NON-NLS-2$
-				destination.getAbsolutePath());
+		// We use this call so we pipe output to the monitor.
+		return new ProcessRunner().run(null, null, null,
+				CollectionsUtil.newList("unzip", overwriteFlag, zip.getAbsolutePath(), "-d", //$NON-NLS-1$ //$NON-NLS-2$
+						destination.getAbsolutePath()), monitor);
 	}
 
 	/**
@@ -578,8 +580,8 @@ public final class ZipUtil
 			{
 				file.getParentFile().mkdirs();
 				String target = IOUtil.read(zip.getInputStream(entry), IOUtil.UTF_8);
-				return ProcessUtil.runInBackground(
-						"ln", null, "-s", new File(destinationPath, target).getAbsolutePath(), file.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
+				return new ProcessRunner().runInBackground(
+						"ln", "-s", new File(destinationPath, target).getAbsolutePath(), file.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			catch (ZipException e)
 			{

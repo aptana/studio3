@@ -11,7 +11,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -37,7 +39,6 @@ import org.eclipse.swt.widgets.Text;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.jira.core.JiraCorePlugin;
-import com.aptana.jira.core.JiraException;
 import com.aptana.jira.core.JiraManager;
 import com.aptana.jira.core.JiraUser;
 import com.aptana.jira.ui.JiraUIPlugin;
@@ -284,21 +285,24 @@ public class JiraPreferencePageProvider extends AbstractAccountPageProvider
 					monitor.beginTask(Messages.JiraPreferencePageProvider_ValidateCredentials, IProgressMonitor.UNKNOWN);
 					try
 					{
-						getJiraManager().login(username, password);
-						// successful; now re-layout to show the logout components
-						UIUtils.getDisplay().asyncExec(new Runnable()
+						IStatus status = getJiraManager().login(username, password);
+						if (status.isOK())
 						{
-
-							public void run()
+							// successful; now re-layout to show the logout components
+							UIUtils.getDisplay().asyncExec(new Runnable()
 							{
-								updateUserText();
-								layout();
-							}
-						});
-					}
-					catch (JiraException e)
-					{
-						throw new InvocationTargetException(e);
+
+								public void run()
+								{
+									updateUserText();
+									layout();
+								}
+							});
+						}
+						else
+						{
+							throw new InvocationTargetException(new CoreException(status));
+						}
 					}
 					finally
 					{

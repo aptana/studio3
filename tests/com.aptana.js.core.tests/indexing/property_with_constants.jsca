@@ -1,0 +1,44 @@
+{
+	"types": [
+		{
+			"name": "Titanium",
+			"extends": "Something",
+			"properties": [
+				{
+                    "name": "appearance", 
+                    "since": [
+                        {
+                            "name": "Titanium Mobile SDK - iPhone", 
+                            "version": "0.8"
+                        }, 
+                        {
+                            "name": "Titanium Mobile SDK - iPad", 
+                            "version": "0.8"
+                        }
+                    ], 
+                    "isInternal": false, 
+                    "permission": "read-write", 
+                    "deprecated": false, 
+                    "isInstanceProperty": true, 
+                    "examples": [], 
+                    "userAgents": [
+                        {
+                            "platform": "iphone"
+                        }, 
+                        {
+                            "platform": "ipad"
+                        }
+                    ], 
+                    "type": "Number", 
+                    "isClassProperty": false, 
+                    "availability": "always", 
+                    "constants": [
+                        "Titanium.UI.KEYBOARD_APPEARANCE_ALERT", 
+                        "Titanium.UI.KEYBOARD_APPEARANCE_DEFAULT"
+                    ], 
+                    "description": "<p>Determines the appearance of the keyboard displayed when this text area is focused.</p>"
+                }
+			]
+		}
+	]
+}

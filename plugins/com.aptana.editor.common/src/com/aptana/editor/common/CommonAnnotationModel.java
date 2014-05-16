@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
@@ -85,33 +86,35 @@ public class CommonAnnotationModel extends ResourceMarkerAnnotationModel impleme
 
 			if (!CollectionsUtil.isEmpty(map))
 			{
-				for (Collection<IProblem> problems : map.values())
+				for (Entry<String, Collection<IProblem>> entry : map.entrySet())
 				{
-					if (!CollectionsUtil.isEmpty(problems))
+					Collection<IProblem> problems = entry.getValue();
+					if (CollectionsUtil.isEmpty(problems))
 					{
-						for (IProblem problem : problems)
+						continue;
+					}
+					for (IProblem problem : problems)
+					{
+						if (monitor != null && monitor.isCanceled())
 						{
+							break;
+						}
 
-							if (monitor != null && monitor.isCanceled())
+						Position position = generatePosition(problem);
+						if (position != null)
+						{
+							try
 							{
-								break;
+								String markerId = entry.getKey();
+								ProblemAnnotation annotation = new ProblemAnnotation(markerId, problem);
+								addAnnotation(annotation, position, false);
+								fGeneratedAnnotations.add(annotation);
+
+								temporaryProblemsChanged = true;
 							}
-
-							Position position = generatePosition(problem);
-							if (position != null)
+							catch (BadLocationException x)
 							{
-								try
-								{
-									ProblemAnnotation annotation = new ProblemAnnotation(problem);
-									addAnnotation(annotation, position, false);
-									fGeneratedAnnotations.add(annotation);
-
-									temporaryProblemsChanged = true;
-								}
-								catch (BadLocationException x)
-								{
-									// ignore invalid position
-								}
+								// ignore invalid position
 							}
 						}
 					}

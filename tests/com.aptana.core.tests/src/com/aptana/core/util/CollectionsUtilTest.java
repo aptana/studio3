@@ -766,6 +766,23 @@ public class CollectionsUtilTest
 	}
 
 	@Test
+	public void testAddToMapWithNonNullKeyMappedToNullValue()
+	{
+		Map<String, String> map = CollectionsUtil.newMap("a", "b", "c", "d");
+		assertNotNull(map);
+
+		CollectionsUtil.addToMap(String.class, String.class, map, "e", null);
+		assertEquals("The map should have three items", 3, map.size());
+		assertTrue("'a' should exist in the map", map.containsKey("a"));
+		assertEquals("b", map.get("a"));
+		assertTrue("'b' should exist in the map", map.containsValue("b"));
+		assertTrue("'c' should exist in the map", map.containsKey("c"));
+		assertEquals("d", map.get("c"));
+		assertTrue("'d' should exist in the map", map.containsValue("d"));
+		assertNull(map.get("e"));
+	}
+
+	@Test
 	public void testAddToMapNullMap()
 	{
 		try

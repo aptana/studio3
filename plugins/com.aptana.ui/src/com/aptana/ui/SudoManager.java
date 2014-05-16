@@ -21,8 +21,9 @@ import org.eclipse.swt.widgets.Shell;
 import com.aptana.core.ShellExecutable;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.IProcessRunner;
 import com.aptana.core.util.ProcessRunnable;
-import com.aptana.core.util.ProcessUtil;
+import com.aptana.core.util.ProcessRunner;
 import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.SudoProcessRunnable;
 import com.aptana.ui.dialogs.SudoPasswordPromptDialog;
@@ -75,7 +76,7 @@ public class SudoManager
 		try
 		{
 			Map<String, String> environment = ShellExecutable.getEnvironment();
-			environment.put(ProcessUtil.REDIRECT_ERROR_STREAM, StringUtil.EMPTY);
+			environment.put(IProcessRunner.REDIRECT_ERROR_STREAM, StringUtil.EMPTY);
 
 			ProcessRunnable runnable;
 			// If the password is empty/null, don't add -S!
@@ -83,8 +84,8 @@ public class SudoManager
 			{
 				password = new char[0]; // when we store the password, store it as "empty", not null
 				// Just try running sudo -k echo SUCCESS with no password
-				Process p = ProcessUtil.run(SUDO, null, environment, DISREGARD_CACHED_CREDENTIALS, NON_INTERACTIVE,
-						ECHO, ECHO_MESSAGE);
+				Process p = new ProcessRunner().run(environment, SUDO, DISREGARD_CACHED_CREDENTIALS, NON_INTERACTIVE,
+						END_OF_OPTIONS, ECHO, ECHO_MESSAGE);
 
 				// Don't pass along password...
 				runnable = new SudoProcessRunnable(p, null, ECHO_MESSAGE);
@@ -92,7 +93,7 @@ public class SudoManager
 			else
 			{
 				// Try running and pass password on STDIN
-				Process p = ProcessUtil.run(SUDO, null, environment, DISREGARD_CACHED_CREDENTIALS, SUDO_INPUT_PWD,
+				Process p = new ProcessRunner().run(environment, SUDO, DISREGARD_CACHED_CREDENTIALS, SUDO_INPUT_PWD,
 						END_OF_OPTIONS, ECHO, ECHO_MESSAGE);
 				runnable = new SudoProcessRunnable(p, password, ECHO_MESSAGE);
 			}

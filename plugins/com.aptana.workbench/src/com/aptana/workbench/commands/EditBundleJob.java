@@ -30,7 +30,7 @@ import org.eclipse.ui.PlatformUI;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.IProjectContext;
 import com.aptana.core.util.IOUtil;
-import com.aptana.core.util.ProcessUtil;
+import com.aptana.core.util.ProcessRunner;
 import com.aptana.git.core.model.GitExecutable;
 import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.model.BundleElement;
@@ -278,8 +278,8 @@ public class EditBundleJob extends Job
 		{
 			// FIXME What if svn isn't installed?
 			// wasn't git, but appears it's probably SVN
-			result = ProcessUtil.runInBackground("svn", workingDirectory, new String[] { "checkout", repoURI, //$NON-NLS-1$ //$NON-NLS-2$
-					destRuble.toOSString() });
+			result = new ProcessRunner().runInBackground(workingDirectory, "svn", "checkout", repoURI, //$NON-NLS-1$ //$NON-NLS-2$
+					destRuble.toOSString());
 		}
 		else
 		{

@@ -7,14 +7,17 @@
  */
 package com.aptana.core.util;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URL;
 import java.text.MessageFormat;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;
@@ -24,8 +27,11 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-public class ResourceUtilTest extends TestCase
+public class ResourceUtilTest
 {
 
 	private static final String WEBNATUREID = "com.aptana.projects.webnature";
@@ -39,16 +45,19 @@ public class ResourceUtilTest extends TestCase
 
 	private IProject testProject;
 
-	protected void setUp() throws Exception
+	@Before
+	public void setUp() throws Exception
 	{
 		testProject = createProject();
 	}
 
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		deleteProject(testProject);
 	}
 
+	@Test
 	public void testResourcePathToFile()
 	{
 		URL url = Platform.getBundle("com.aptana.core.tests").getEntry("resources");
@@ -57,11 +66,13 @@ public class ResourceUtilTest extends TestCase
 		assertTrue(file.exists());
 	}
 
+	@Test
 	public void testResourcePathToFileWithNull()
 	{
 		assertNull(ResourceUtil.resourcePathToFile(null));
 	}
 
+	@Test
 	public void testResourcePathToString()
 	{
 		URL url = Platform.getBundle("com.aptana.core.tests").getEntry("resources");
@@ -72,11 +83,13 @@ public class ResourceUtilTest extends TestCase
 				path.endsWith(expectedPostfix));
 	}
 
+	@Test
 	public void testResourcePathToStringWithNull()
 	{
 		assertNull(ResourceUtil.resourcePathToString(null));
 	}
 
+	@Test
 	public void testResourcePathToURI()
 	{
 		URL url = Platform.getBundle("com.aptana.core.tests").getEntry("resources");
@@ -87,11 +100,13 @@ public class ResourceUtilTest extends TestCase
 				expectedPostfix), uri.toString().endsWith(expectedPostfix));
 	}
 
+	@Test
 	public void testResourcePathToURIWithNull()
 	{
 		assertNull(ResourceUtil.resourcePathToURI(null));
 	}
 
+	@Test
 	public void testToURIWithSpaceInURL() throws Exception
 	{
 		String urlString = "file:/Applications/Aptana Studio 3/";
@@ -99,6 +114,7 @@ public class ResourceUtilTest extends TestCase
 		assertEquals("file:/Applications/Aptana%20Studio%203/", ResourceUtil.toURI(new URL(urlString)).toString());
 	}
 
+	@Test
 	public void testToURIWithUNCPath() throws Exception
 	{
 		String urlString = "file://Server/Volume/File";
@@ -106,6 +122,7 @@ public class ResourceUtilTest extends TestCase
 		assertEquals("file:////Server/Volume/File", ResourceUtil.toURI(new URL(urlString)).toString());
 	}
 
+	@Test
 	public void testToURIWithHttpProtocol() throws Exception
 	{
 		String urlString = "http://www.appcelerator.com";
@@ -113,17 +130,20 @@ public class ResourceUtilTest extends TestCase
 		assertEquals(urlString, ResourceUtil.toURI(new URL(urlString)).toString());
 	}
 
+	@Test
 	public void testToURIWithNullURL() throws Exception
 	{
 		assertNull(ResourceUtil.toURI(null));
 	}
 
+	@Test
 	public void testGetLineSeparatorValue()
 	{
 		assertEquals(System.getProperty("line.separator"), ResourceUtil.getLineSeparatorValue(null));
 		assertEquals(System.getProperty("line.separator"), ResourceUtil.getLineSeparatorValue(testProject));
 	}
 
+	@Test
 	public void testBuilders() throws CoreException
 	{
 		IProjectDescription desc = testProject.getDescription();
@@ -188,6 +208,7 @@ public class ResourceUtilTest extends TestCase
 		assertEquals(numCommands, testProject.getDescription().getBuildSpec().length);
 	}
 
+	@Test
 	public void testIsAptanaNature()
 	{
 		assertTrue(ResourceUtil.isAptanaNature(WEBNATUREID));
@@ -199,6 +220,7 @@ public class ResourceUtilTest extends TestCase
 		assertFalse(ResourceUtil.isAptanaNature(JAVANATUREID));
 	}
 
+	@Test
 	public void testNatures() throws CoreException
 	{
 		IProjectDescription desc = testProject.getDescription();
@@ -237,10 +259,8 @@ public class ResourceUtilTest extends TestCase
 	 */
 	private IProject createProject() throws IOException, InvocationTargetException, InterruptedException, CoreException
 	{
-
-		File baseTempFile = File.createTempFile("test", ".txt"); //$NON-NLS-1$ //$NON-NLS-2$
 		String projectName = "ResourceUtilTest" + System.currentTimeMillis();
-		File projectFolder = new File(baseTempFile.getParentFile(), projectName);
+		File projectFolder = FileUtil.getTempDirectory().append(projectName).toFile();
 		projectFolder.mkdirs();
 
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();

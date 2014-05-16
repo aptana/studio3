@@ -7,6 +7,8 @@
  */
 package com.aptana.core.util;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -23,7 +25,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 
 @SuppressWarnings("nls")
-public class ZipUtilTest extends TestCase
+public class ZipUtilTest
 {
 
 	private static final String BUNDLE_ID = "com.aptana.core.tests";
@@ -40,6 +42,7 @@ public class ZipUtilTest extends TestCase
 	private static final HashSet<String> TOP_ENTRIES_SYMLINK = new HashSet<String>(Arrays.asList("folder", "file.txt",
 			"filesym.txt", "othersym"));
 
+	@Test
 	public void testUnzipFile() throws IOException
 	{
 		URL resourceURL = Platform.getBundle(BUNDLE_ID).getEntry(TEST_ZIP);
@@ -79,6 +82,7 @@ public class ZipUtilTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testUnzipFileWithOverwrite() throws Exception
 	{
 		URL resourceURL = Platform.getBundle(BUNDLE_ID).getEntry(TEST_ZIP);
@@ -121,6 +125,7 @@ public class ZipUtilTest extends TestCase
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testUnzipWithChangedOverwrite() throws Exception
 	{
 		URL resourceURL = Platform.getBundle(BUNDLE_ID).getEntry(TEST_ZIP);
@@ -175,6 +180,7 @@ public class ZipUtilTest extends TestCase
 	/*
 	 * Test a case where the overriding Zip has a file that overwrite a folder on the target directory.
 	 */
+	@Test
 	public void testOverwriteDirWithFile() throws Exception
 	{
 		URL resourceURL = Platform.getBundle(BUNDLE_ID).getEntry(TEST_ZIP);
@@ -213,6 +219,7 @@ public class ZipUtilTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testUnzipFileWithSymlinks() throws IOException
 	{
 		URL resourceURL = Platform.getBundle(BUNDLE_ID).getEntry(TEST_ZIP_SYMLINKS);
@@ -251,6 +258,7 @@ public class ZipUtilTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testZipFile() throws IOException
 	{
 		URL resourceURL = Platform.getBundle(BUNDLE_ID).getEntry(TEST_ZIP);
@@ -327,6 +335,7 @@ public class ZipUtilTest extends TestCase
 		}
 	}
 
+	@Test
 	public void testOpenEntry() throws IOException
 	{
 		URL zipURL = Platform.getBundle(BUNDLE_ID).getEntry(STREAM_TEST_ZIP);

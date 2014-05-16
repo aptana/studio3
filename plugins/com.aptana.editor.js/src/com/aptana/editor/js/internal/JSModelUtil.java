@@ -13,7 +13,6 @@ import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 
-import com.aptana.core.IFilter;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.util.EditorUtil;
@@ -21,7 +20,6 @@ import com.aptana.editor.js.contentassist.JSLocationIdentifier;
 import com.aptana.editor.js.contentassist.ParseUtil;
 import com.aptana.index.core.Index;
 import com.aptana.js.core.index.JSIndexQueryHelper;
-import com.aptana.js.core.model.FunctionElement;
 import com.aptana.js.core.model.PropertyElement;
 import com.aptana.js.core.parsing.ast.JSGetPropertyNode;
 import com.aptana.parsing.ast.IParseNode;
@@ -68,20 +66,12 @@ public class JSModelUtil
 
 				if (typeName != null && methodName != null)
 				{
-					Collection<PropertyElement> properties = queryHelper.getTypeMembers(typeName, methodName);
-					// filter to only functions
-					return CollectionsUtil.filter(properties, new IFilter<PropertyElement>()
-					{
-						public boolean include(PropertyElement item)
-						{
-							return (item instanceof FunctionElement);
-						}
-					});
+					return queryHelper.getTypeMembers(typeName, methodName);
 				}
 				break;
 
 			case IN_OBJECT_LITERAL_PROPERTY:
-			case IN_PARAMETERS:
+			case IN_ARGUMENTS:
 			case IN_LABEL:
 			case UNKNOWN:
 			case NONE:

@@ -7,6 +7,8 @@
  */
 package com.aptana.core.util;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -16,7 +18,7 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-public class StringUtilTest extends TestCase
+public class StringUtilTest
 {
 	/**
 	 * Create a string by concatenating the elements of a string array using a delimited between each item
@@ -67,6 +69,7 @@ public class StringUtilTest extends TestCase
 		return result;
 	}
 
+	@Test
 	public void testMd5()
 	{
 		assertEquals("d41d8cd98f00b204e9800998ecf8427e", StringUtil.md5(""));
@@ -75,17 +78,20 @@ public class StringUtilTest extends TestCase
 		assertNull(StringUtil.md5(null));
 	}
 
+	@Test
 	public void testSanitizeHTML()
 	{
 		assertEquals("Heckle &amp; Jeckle", StringUtil.sanitizeHTML("Heckle & Jeckle"));
 	}
 
+	@Test
 	public void testSanitizeHTML2()
 	{
 		assertEquals("&lt;html&gt;Heckle &amp; Jeckle&lt;/html&gt;",
 				StringUtil.sanitizeHTML("<html>Heckle & Jeckle</html>"));
 	}
 
+	@Test
 	public void testReplaceAll()
 	{
 		String template = "_replace_ me";
@@ -96,6 +102,7 @@ public class StringUtilTest extends TestCase
 
 	}
 
+	@Test
 	public void testReplaceWithNull()
 	{
 		String template = "_replace_ me";
@@ -106,6 +113,7 @@ public class StringUtilTest extends TestCase
 		assertEquals("me", result);
 	}
 
+	@Test
 	public void testReplaceAllHandlesDollarSignsInValues()
 	{
 		String template = "_replace_ me";
@@ -115,6 +123,7 @@ public class StringUtilTest extends TestCase
 		assertEquals("Pa$$ me", result);
 	}
 
+	@Test
 	public void testReplaceAllReplacesMultipleInstances()
 	{
 		String template = "_replace_ me. _replace_!";
@@ -124,6 +133,7 @@ public class StringUtilTest extends TestCase
 		assertEquals("Pass me. Pass!", result);
 	}
 
+	@Test
 	public void testReplaceAllWithNull()
 	{
 		assertNull(StringUtil.replaceAll(null, new HashMap<String, String>()));
@@ -133,6 +143,7 @@ public class StringUtilTest extends TestCase
 		assertEquals(template, StringUtil.replaceAll(template, new HashMap<String, String>()));
 	}
 
+	@Test
 	public void testTokenize()
 	{
 		String inputString = "chris\0williams";
@@ -148,126 +159,151 @@ public class StringUtilTest extends TestCase
 		assertEquals(" williams", tokens.get(1));
 	}
 
+	@Test
 	public void testTokenizeWithNull()
 	{
 		assertEquals(0, StringUtil.tokenize(null, "\0").size());
 	}
 
+	@Test
 	public void testCompare1()
 	{
 		assertTrue(StringUtil.compare(null, null) == 0);
 	}
 
+	@Test
 	public void testCompare2()
 	{
 		assertTrue(StringUtil.compare(null, "a") < 0);
 	}
 
+	@Test
 	public void testCompare3()
 	{
 		assertTrue(StringUtil.compare("", "a") < 0);
 	}
 
+	@Test
 	public void testCompare4()
 	{
 		assertTrue(StringUtil.compare("a", null) > 0);
 	}
 
+	@Test
 	public void testCompare5()
 	{
 		assertTrue(StringUtil.compare("a", "") > 0);
 	}
 
+	@Test
 	public void testCompare6()
 	{
 		assertTrue(StringUtil.compare("A", "A") == 0);
 	}
 
+	@Test
 	public void testCompare7()
 	{
 		assertTrue(StringUtil.compare("A", "a") < 0);
 	}
 
+	@Test
 	public void testCompare8()
 	{
 		assertTrue(StringUtil.compare("a", "a") == 0);
 	}
 
+	@Test
 	public void testCompare9()
 	{
 		assertTrue(StringUtil.compare("b", "A") > 0);
 	}
 
+	@Test
 	public void testCompare10()
 	{
 		assertTrue(StringUtil.compare("A", "b") < 0);
 	}
 
+	@Test
 	public void testCompare11()
 	{
 		assertTrue(StringUtil.compare("a", "A") > 0);
 	}
 
+	@Test
 	public void testCompareCaseInsensitive1()
 	{
 		assertTrue(StringUtil.compareCaseInsensitive(null, null) == 0);
 	}
 
+	@Test
 	public void testCompareCaseInsensitive2()
 	{
 		assertTrue(StringUtil.compareCaseInsensitive(null, "a") < 0);
 	}
 
+	@Test
 	public void testCompareCaseInsensitive3()
 	{
 		assertTrue(StringUtil.compareCaseInsensitive("", "a") < 0);
 	}
 
+	@Test
 	public void testCompareCaseInsensitive4()
 	{
 		assertTrue(StringUtil.compareCaseInsensitive("a", null) > 0);
 	}
 
+	@Test
 	public void testCompareCaseInsensitive5()
 	{
 		assertTrue(StringUtil.compareCaseInsensitive("a", "") > 0);
 	}
 
+	@Test
 	public void testCompareCaseInsensitive6()
 	{
 		assertTrue(StringUtil.compareCaseInsensitive("A", "A") == 0);
 	}
 
+	@Test
 	public void testCompareCaseInsensitive7()
 	{
 		assertTrue(StringUtil.compareCaseInsensitive("A", "a") == 0);
 	}
 
+	@Test
 	public void testCompareCaseInsensitive8()
 	{
 		assertTrue(StringUtil.compareCaseInsensitive("a", "a") == 0);
 	}
 
+	@Test
 	public void testCompareCaseInsensitive9()
 	{
 		assertTrue(StringUtil.compareCaseInsensitive("a", "A") == 0);
 	}
 
+	@Test
 	public void testCompareCaseInsensitive10()
 	{
 		assertTrue(StringUtil.compareCaseInsensitive("b", "A") > 0);
 	}
 
+	@Test
 	public void testCompareCaseInsensitive11()
 	{
 		assertTrue(StringUtil.compareCaseInsensitive("A", "b") < 0);
 	}
 
+	@Test
 	public void testGetStringValueWithNull()
 	{
 		assertSame(StringUtil.EMPTY, StringUtil.getStringValue(null));
 	}
 
+	@Test
 	public void testGetStringValueWithString()
 	{
 		String text = "abc";
@@ -275,6 +311,7 @@ public class StringUtilTest extends TestCase
 		assertSame(text, StringUtil.getStringValue(text));
 	}
 
+	@Test
 	public void testGetStringValueWithObject()
 	{
 		final String text = "hello";
@@ -289,6 +326,7 @@ public class StringUtilTest extends TestCase
 		assertSame(text, StringUtil.getStringValue(item));
 	}
 
+	@Test
 	public void testCharacterInstanceCount()
 	{
 		String text = "how_many_character_one_has";
@@ -297,11 +335,13 @@ public class StringUtilTest extends TestCase
 		assertEquals(0, StringUtil.characterInstanceCount(text, 'g'));
 	}
 
+	@Test
 	public void testCharacterInstanceCountWithNull()
 	{
 		assertEquals(-1, StringUtil.characterInstanceCount(null, 'a'));
 	}
 
+	@Test
 	public void testContains()
 	{
 		String[] array = new String[] { "test", "test1", "test2" };
@@ -311,11 +351,13 @@ public class StringUtilTest extends TestCase
 		assertFalse(StringUtil.contains(array, null));
 	}
 
+	@Test
 	public void testContainsWithNull()
 	{
 		assertFalse(StringUtil.contains(null, "test"));
 	}
 
+	@Test
 	public void testEllipsify()
 	{
 		String text = "Ellipsify";
@@ -324,6 +366,7 @@ public class StringUtilTest extends TestCase
 		assertNull(StringUtil.ellipsify(null));
 	}
 
+	@Test
 	public void testJoinCollection()
 	{
 		Collection<String> test = CollectionsUtil.newList("test", "test1");
@@ -331,6 +374,7 @@ public class StringUtilTest extends TestCase
 		assertEquals("test&test1", StringUtil.join("&", test));
 	}
 
+	@Test
 	public void testJoinList()
 	{
 		Collection<String> test = CollectionsUtil.newList("test", "test1");
@@ -338,16 +382,19 @@ public class StringUtilTest extends TestCase
 		assertEquals("test&test1", StringUtil.join("&", test));
 	}
 
+	@Test
 	public void testJoinListWithNull()
 	{
 		assertNull(StringUtil.join("&", (List<String>) null));
 	}
 
+	@Test
 	public void testJoinEmptyList()
 	{
 		assertEquals(StringUtil.EMPTY, StringUtil.join("&", new ArrayList<String>()));
 	}
 
+	@Test
 	public void testJoinArray()
 	{
 		String[] test = new String[] { "test", "test1" };
@@ -355,6 +402,7 @@ public class StringUtilTest extends TestCase
 		assertEquals("test&test1", StringUtil.join("&", test));
 	}
 
+	@Test
 	public void testJoinCharArray()
 	{
 		char[] test = new char[] { 'a', 'b', 'c' };
@@ -362,16 +410,19 @@ public class StringUtilTest extends TestCase
 		assertEquals("a b c", StringUtil.join(" ", test));
 	}
 
+	@Test
 	public void testJoinArrayWithNull()
 	{
 		assertNull(StringUtil.join("&", (String[]) null));
 	}
 
+	@Test
 	public void testJoinEmptyArray()
 	{
 		assertEquals(StringUtil.EMPTY, StringUtil.join("&", new String[0]));
 	}
 
+	@Test
 	public void testMakeFormLabel()
 	{
 		String text = "label";
@@ -380,6 +431,7 @@ public class StringUtilTest extends TestCase
 		assertNull(StringUtil.makeFormLabel(null));
 	}
 
+	@Test
 	public void testQuote()
 	{
 		String text = "quote";
@@ -388,6 +440,7 @@ public class StringUtilTest extends TestCase
 		assertNull(StringUtil.quote(null));
 	}
 
+	@Test
 	public void testReplace()
 	{
 		String text = "this##is##replace##test";
@@ -396,6 +449,7 @@ public class StringUtilTest extends TestCase
 		assertNull(StringUtil.replace(null, "##", "@"));
 	}
 
+	@Test
 	public void testTruncate()
 	{
 		String text = "truncate test";
@@ -405,6 +459,7 @@ public class StringUtilTest extends TestCase
 		assertNull(StringUtil.truncate(null, 8));
 	}
 
+	@Test
 	public void testStartsWith()
 	{
 		String text = "starts with";
@@ -414,17 +469,20 @@ public class StringUtilTest extends TestCase
 		assertFalse(StringUtil.startsWith(null, 'c'));
 	}
 
+	@Test
 	public void testEmptyString()
 	{
 		assertTrue(StringUtil.isEmpty(null));
 	}
 
+	@Test
 	public void testVoidString()
 	{
 		assertTrue(StringUtil.isEmpty(""));
 		assertTrue(StringUtil.isEmpty(StringUtil.EMPTY));
 	}
 
+	@Test
 	public void testPad()
 	{
 		assertEquals("", StringUtil.pad(null, 0, ' '));
@@ -434,6 +492,7 @@ public class StringUtilTest extends TestCase
 		assertEquals(" a", StringUtil.pad("a", 2, ' '));
 	}
 
+	@Test
 	public void testfindPreviousWhitespaceOffset()
 	{
 		assertEquals(-1, StringUtil.findPreviousWhitespaceOffset(null, 0));
@@ -451,6 +510,7 @@ public class StringUtilTest extends TestCase
 		assertEquals(3, StringUtil.findPreviousWhitespaceOffset("a b c", 4));
 	}
 
+	@Test
 	public void testfindNextWhitespaceOffset()
 	{
 		assertEquals(-1, StringUtil.findNextWhitespaceOffset(null, 0));
@@ -469,6 +529,7 @@ public class StringUtilTest extends TestCase
 		assertEquals(-1, StringUtil.findNextWhitespaceOffset("a b c", 4));
 	}
 
+	@Test
 	public void testJoinSpeed()
 	{
 		// @formatter:off
@@ -480,6 +541,7 @@ public class StringUtilTest extends TestCase
 		// @formatter:on
 	}
 
+	@Test
 	public void testEmptyDelimiterJoinSpeed()
 	{
 		// @formatter:off
@@ -523,6 +585,7 @@ public class StringUtilTest extends TestCase
 		System.out.println("old join " + title + ": " + diff + "ms");
 	}
 
+	@Test
 	public void testConcatVersusStringBuilder()
 	{
 		timeConcatArray();
@@ -591,11 +654,13 @@ public class StringUtilTest extends TestCase
 		System.out.println("string builder: " + diff + "ms");
 	}
 
+	@Test
 	public void testRepeat() throws Exception
 	{
 		assertEquals("ttt", StringUtil.repeat('t', 3));
 	}
 
+	@Test
 	public void testSplit() throws Exception
 	{
 		String[] split = StringUtil.split("aaa bb  ", ' ').toArray(new String[0]);
@@ -629,6 +694,7 @@ public class StringUtilTest extends TestCase
 		assertTrue(Arrays.equals(new String[] { "aaa" }, split));
 	}
 
+	@Test
 	public void testDotFirst() throws Exception
 	{
 		assertEquals("aa", StringUtil.dotFirst("aa.bb"));
@@ -639,6 +705,7 @@ public class StringUtilTest extends TestCase
 		assertEquals("aa", StringUtil.dotFirst("aa"));
 	}
 
+	@Test
 	public void testIndexOf() throws Exception
 	{
 		assertEquals(0, StringUtil.indexOf("abcdabcd", 0, 'a'));
@@ -654,6 +721,7 @@ public class StringUtilTest extends TestCase
 		assertEquals(3, StringUtil.indexOf("abcdabcd", 1, 'x', 'd'));
 	}
 
+	@Test
 	public void testLastIndexOf() throws Exception
 	{
 		assertEquals("Should find from fromIndex inclusively", 0, StringUtil.lastIndexOf("abcdabcd", 0, 'a'));

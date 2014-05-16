@@ -7,8 +7,7 @@ Bundle-Activator: com.aptana.browser.BrowserPlugin
 Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: com.aptana.core,
  org.eclipse.ui,
- org.eclipse.ui.browser;visibility:=reexport,
- com.aptana.swt.webkitbrowser;visibility:=reexport
+ org.eclipse.ui.browser;visibility:=reexport
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.browser,
