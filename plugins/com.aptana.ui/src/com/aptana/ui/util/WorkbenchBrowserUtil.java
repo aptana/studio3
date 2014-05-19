@@ -10,6 +10,10 @@ package com.aptana.ui.util;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.ui.PartInitException;
@@ -18,23 +22,35 @@ import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.IProcessRunner;
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.ProcessRunner;
-import com.aptana.core.util.ProcessUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ui.UIPlugin;
 
 /**
  * @author Max Stepanov
  */
-public final class WorkbenchBrowserUtil
+public class WorkbenchBrowserUtil
 {
+
+	private static final Pattern ARG_SPLITTER = Pattern.compile("([^\"]\\S*|\".+?\")\\s*"); //$NON-NLS-1$
+	
+	private IProcessRunner runner;
+	private IWorkbenchBrowserSupport support;
 
 	/**
 	 * 
 	 */
 	private WorkbenchBrowserUtil()
 	{
+		this(new ProcessRunner(), PlatformUI.getWorkbench().getBrowserSupport());
+	}
+
+	protected WorkbenchBrowserUtil(IProcessRunner runner, IWorkbenchBrowserSupport support)
+	{
+		this.runner = runner;
+		this.support = support;
 	}
 
 	public static void launchExternalBrowser(String url)
@@ -69,7 +85,11 @@ public final class WorkbenchBrowserUtil
 
 	public static IWebBrowser launchExternalBrowser(URL url, String browserId)
 	{
-		IWorkbenchBrowserSupport support = PlatformUI.getWorkbench().getBrowserSupport();
+		return new WorkbenchBrowserUtil().doLaunchExternalBrowser(url, browserId);
+	}
+
+	IWebBrowser doLaunchExternalBrowser(URL url, String browserId)
+	{
 		if (browserId != null)
 		{
 			try
@@ -107,32 +127,63 @@ public final class WorkbenchBrowserUtil
 	 * 
 	 * @param url
 	 */
-	@SuppressWarnings("nls")
 	public static void launchBrowserByCommand(URL url)
 	{
+		new WorkbenchBrowserUtil().doLaunchBrowserByCommand(url);
+	}
+
+	@SuppressWarnings("nls")
+	void doLaunchBrowserByCommand(URL url)
+	{
 		// Can we fall back to running a command to load the URL?
-		if (PlatformUtil.isMac())
+		if (isMac())
 		{
-			new ProcessRunner().runInBackground("open", url.toString());
+			runner.runInBackground("open", url.toString());
 		}
-		else if (PlatformUtil.isWindows())
+		else if (isWindows())
 		{
-			// Windows
-			IStatus result = new ProcessRunner().runInBackground("reg", "query",
-					"HKEY_CLASSES_ROOT\\http\\shell\\open\\command");
-			String output = result.getMessage();
-			output = output.trim();
-			int index = output.indexOf("REG_SZ");
-			output = output.substring(index + 6);
-			output = output.substring(0, output.length() - 8);
-			output = output.trim();
-			output = StringUtil.stripQuotes(output);
-			new ProcessRunner().runInBackground(output, url.toString());
+			List<String> args = new ArrayList<String>();
+			IStatus result = runner.runInBackground("reg", "query", "HKEY_CLASSES_ROOT\\http\\shell\\open\\command");
+			if (result.isOK())
+			{
+				String output = result.getMessage();
+				int index = output.indexOf("REG_SZ");
+				if (index != -1)
+				{
+					output = output.substring(index + 6);
+					// Split by lines, take first line, remove leading and trailing whitespace
+					String firstLine = StringUtil.LINE_SPLITTER.split(output)[0].trim();
+					// Now grab all the args which are delimited by spaces, unless quoted.
+					Matcher m = ARG_SPLITTER.matcher(firstLine);
+					while (m.find())
+					{
+						// Replace %1 with the url we want to hit
+						args.add(StringUtil.stripQuotes(m.group(1)).replace("%1", url.toString()));
+					}
+				}
+			}
+			// We failed to grab the location of the default browser from the registry!
+			if (args.isEmpty())
+			{
+				args.add("iexplore.exe");
+				args.add(url.toString());
+			}
+			runner.runInBackground(args.toArray(new String[args.size()]));
 		}
 		else
 		{
-			new ProcessRunner().runInBackground("xdg-open", url.toString());
+			runner.runInBackground("xdg-open", url.toString());
 		}
+	}
+
+	protected boolean isWindows()
+	{
+		return PlatformUtil.isWindows();
+	}
+
+	protected boolean isMac()
+	{
+		return PlatformUtil.isMac();
 	}
 
 	/**
@@ -144,10 +195,14 @@ public final class WorkbenchBrowserUtil
 	 */
 	public static IWebBrowser openURL(String url)
 	{
+		return new WorkbenchBrowserUtil().doOpenURL(url);
+	}
+
+	IWebBrowser doOpenURL(String url)
+	{
 		try
 		{
-			IWorkbenchBrowserSupport workbenchBrowserSupport = PlatformUI.getWorkbench().getBrowserSupport();
-			IWebBrowser webBrowser = workbenchBrowserSupport.createBrowser(null);
+			IWebBrowser webBrowser = support.createBrowser(null);
 			if (webBrowser != null)
 			{
 				webBrowser.openURL(new URL(url));
