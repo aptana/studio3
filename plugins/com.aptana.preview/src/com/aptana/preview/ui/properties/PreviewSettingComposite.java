@@ -345,13 +345,16 @@ public class PreviewSettingComposite extends Composite implements SelectionListe
 		{
 			public void run()
 			{
-				ISelection selection = fServersCombo.getSelection();
-				fServersCombo.setInput(servers);
-				// keeps the selection if there was one
-				fServersCombo.setSelection(selection);
-				if (fServersCombo.getSelection().isEmpty())
+				if (!isDisposed())
 				{
-					fServersCombo.setSelection(new StructuredSelection(servers.get(0)));
+					ISelection selection = fServersCombo.getSelection();
+					fServersCombo.setInput(servers);
+					// keeps the selection if there was one
+					fServersCombo.setSelection(selection);
+					if (fServersCombo.getSelection().isEmpty())
+					{
+						fServersCombo.setSelection(new StructuredSelection(servers.get(0)));
+					}
 				}
 			}
 		};

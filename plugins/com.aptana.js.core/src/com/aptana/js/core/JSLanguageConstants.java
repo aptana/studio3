@@ -12,6 +12,11 @@ import java.util.Set;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.CollectionsUtil;
 
+import java.util.Set;
+
+import com.aptana.core.util.ArrayUtil;
+import com.aptana.core.util.CollectionsUtil;
+
 public class JSLanguageConstants
 {
 	public static final String TRUE = "true"; //$NON-NLS-1$

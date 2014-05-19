@@ -161,7 +161,7 @@ public class GitExecutable
 					GitPlugin.getDefault(),
 					MessageFormat
 							.format("You entered a custom git path in the Preferences pane, but this path is not a valid git v{0} or higher binary. We're going to use the default search paths instead", //$NON-NLS-1$
-									MIN_GIT_VERSION), IDebugScopes.DEBUG);
+							MIN_GIT_VERSION), IDebugScopes.DEBUG);
 		}
 		return null;
 	}

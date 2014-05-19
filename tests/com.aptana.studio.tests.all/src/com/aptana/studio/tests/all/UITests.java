@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.studio.tests.all;
 
 import org.junit.runner.RunWith;
@@ -19,7 +19,6 @@ import com.aptana.editor.common.internal.commands.NextPreviousEditorHandlerTest;
 @Suite.SuiteClasses({ 
 	com.aptana.browser.tests.AllTests.class,
 	com.aptana.console.tests.AllTests.class,
-	
 	com.aptana.editor.coffee.tests.AllTests.class,
 	com.aptana.editor.common.tests.AllTests.class,
 	com.aptana.editor.css.tests.AllTests.class,
@@ -41,6 +40,7 @@ import com.aptana.editor.common.internal.commands.NextPreviousEditorHandlerTest;
 //	// com.aptana.scripting.ui.tests.AllTests.class, // TODO Add Tests for scripting.ui
 //	// com.aptana.syncing.ui.tests.AllTests.class, // FIXME Re-enable when we have ftp server set back up...
 	com.aptana.theme.tests.AllTests.class,
+	com.aptana.ui.tests.AllTests.class,
 	org.eclipse.tm.terminal.test.AllTests.class,
 //	
 //	// Now add special test cases which require to be run after all plugins are loaded (dependency inversion in

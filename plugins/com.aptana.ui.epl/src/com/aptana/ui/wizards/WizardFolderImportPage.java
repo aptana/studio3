@@ -515,9 +515,10 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 
 	private void setProjectName()
 	{
-		if (directoryPathField.getText() != null)
+		String text = directoryPathField.getText();
+		if (!StringUtil.isEmpty(text))
 		{
-			IPath path = new Path(directoryPathField.getText());
+			IPath path = new Path(text);
 			if (path.segmentCount() > 0)
 			{
 				projectNameField.setText(path.lastSegment());
@@ -813,7 +814,7 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 	public void setDirectoryPath(String directoryPath)
 	{
 		this.directoryPath = directoryPath;
-		if (directoryPathField != null)
+		if (directoryPathField != null && !StringUtil.isEmpty(directoryPath))
 		{
 			directoryPathField.setText(directoryPath);
 			setProjectName();

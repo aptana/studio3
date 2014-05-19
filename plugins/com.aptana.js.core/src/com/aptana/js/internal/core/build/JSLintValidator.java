@@ -34,6 +34,7 @@ import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
+
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.buildpath.core.BuildPathCorePlugin;

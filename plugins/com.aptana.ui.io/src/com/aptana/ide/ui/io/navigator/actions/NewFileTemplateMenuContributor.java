@@ -94,7 +94,6 @@ public class NewFileTemplateMenuContributor extends ContributionItem
 		return true;
 	}
 
-	@SuppressWarnings("unused")
 	@Override
 	public void fill(Menu menu, int index)
 	{

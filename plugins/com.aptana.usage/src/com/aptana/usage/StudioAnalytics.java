@@ -34,7 +34,6 @@ public class StudioAnalytics
 		{
 			return;
 		}
-
 		// Cascade the event to all the registered handlers.
 		Set<IAnalyticsEventHandler> handlers = AnalyticsHandlersManager.getInstance().getHandlers();
 		for (IAnalyticsEventHandler handler : handlers)

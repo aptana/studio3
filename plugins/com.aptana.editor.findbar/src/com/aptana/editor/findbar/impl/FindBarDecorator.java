@@ -692,9 +692,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	private GridData createdDefaultGridData(int horizontalAlignment, int verticalAlignment,
 			boolean grabExcessHorizontalSpace, boolean grabExcessVerticalSpace)
 	{
-		GridData gridData = new GridData(horizontalAlignment, verticalAlignment, grabExcessHorizontalSpace,
-				grabExcessVerticalSpace);
-		return gridData;
+		return new GridData(horizontalAlignment, verticalAlignment, grabExcessHorizontalSpace, grabExcessVerticalSpace);
 	}
 
 	private GridData createdDefaultGridData()
@@ -888,7 +886,10 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	private Text createText(String preferenceName)
 	{
 		final Text text = new Text(findBar, SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL | SWT.BORDER);
-		text.setLayoutData(createdDefaultGridData(SWT.FILL, SWT.FILL, true, true));
+		GridData gd = createdDefaultGridData(SWT.FILL, SWT.FILL, true, true);
+		gd.heightHint = text.getLineHeight() * 3 + 3;
+		gd.widthHint = 250;
+		text.setLayoutData(gd);
 
 		entriesControlHandles.add(findBarEntriesHelper.register(text, modifyListener, preferenceName));
 

@@ -7,9 +7,9 @@
  */
 package com.aptana.js.core.parsing.ast;
 
-import com.aptana.js.core.JSLanguageConstants;
-
 import beaver.Symbol;
+
+import com.aptana.js.core.JSLanguageConstants;
 
 public class JSNullNode extends JSPrimitiveNode
 {

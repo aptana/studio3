@@ -133,7 +133,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			return !((FunctionElement) item).isConstructor();
 		}
 	};
-
 	private static Set<String> AUTO_ACTIVATION_PARTITION_TYPES = CollectionsUtil.newSet(JSSourceConfiguration.DEFAULT,
 			IDocument.DEFAULT_CONTENT_TYPE);
 

@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Aptana UI Tests
+Bundle-SymbolicName: com.aptana.ui.tests
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: Appcelerator, Inc.
+Fragment-Host: com.aptana.ui;bundle-version="3.1.4"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: org.junit,
+ com.aptana.testing.mocks;bundle-version="1.0.0"
+Export-Package: com.aptana.ui.tests

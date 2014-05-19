@@ -45,7 +45,7 @@ public class JSParseState extends ParseState
 	 */
 	public JSParseState(String source)
 	{
-		this(source, 0, false, false);
+		this(source, 0, true, true);
 	}
 
 	/**
