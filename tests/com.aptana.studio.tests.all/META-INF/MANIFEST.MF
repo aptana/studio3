@@ -54,6 +54,7 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.js.core;bundle-version="3.0.0",
  com.aptana.usage;bundle-version="3.0.0",
  com.aptana.editor.coffee;bundle-version="3.0.0",
- com.aptana.js.debug.core;bundle-version="3.0.3"
+ com.aptana.js.debug.core;bundle-version="3.0.3",
+ com.aptana.ui;bundle-version="3.1.4"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: com.aptana.studio.tests.all
