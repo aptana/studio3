@@ -24,6 +24,7 @@ public class WorkbenchBrowserUtilTest
 	private IWorkbenchBrowserSupport support;
 	private boolean isMac = false;
 	private boolean isWindows = false;
+	private boolean programLaunchSuccessful = false;
 
 	@Before
 	public void setUp() throws Exception
@@ -48,6 +49,12 @@ public class WorkbenchBrowserUtilTest
 			protected boolean isWindows()
 			{
 				return isWindows;
+			}
+
+			@Override
+			protected boolean launchProgram(URL url)
+			{
+				return programLaunchSuccessful;
 			}
 		};
 	}
@@ -128,6 +135,20 @@ public class WorkbenchBrowserUtilTest
 			{
 				oneOf(runner).runInBackground("xdg-open", "http://example.com");
 				will(returnValue(Status.OK_STATUS));
+			}
+		});
+		util.doLaunchBrowserByCommand(new URL("http://example.com"));
+		context.assertIsSatisfied();
+	}
+
+	@Test
+	public void testLaunchBrowserByCommandUsesProgramLaunchSuccessfully() throws MalformedURLException
+	{
+		programLaunchSuccessful = true;
+		context.checking(new Expectations()
+		{
+			{
+				never(runner).runInBackground("xdg-open", "http://example.com");
 			}
 		});
 		util.doLaunchBrowserByCommand(new URL("http://example.com"));

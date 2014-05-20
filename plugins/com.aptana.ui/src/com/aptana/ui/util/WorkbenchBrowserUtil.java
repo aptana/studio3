@@ -16,6 +16,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.swt.program.Program;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
@@ -35,7 +36,7 @@ public class WorkbenchBrowserUtil
 {
 
 	private static final Pattern ARG_SPLITTER = Pattern.compile("([^\"]\\S*|\".+?\")\\s*"); //$NON-NLS-1$
-	
+
 	private IProcessRunner runner;
 	private IWorkbenchBrowserSupport support;
 
@@ -135,6 +136,11 @@ public class WorkbenchBrowserUtil
 	@SuppressWarnings("nls")
 	void doLaunchBrowserByCommand(URL url)
 	{
+		if (launchProgram(url))
+		{
+			return;
+		}
+
 		// Can we fall back to running a command to load the URL?
 		if (isMac())
 		{
@@ -174,6 +180,17 @@ public class WorkbenchBrowserUtil
 		{
 			runner.runInBackground("xdg-open", url.toString());
 		}
+	}
+
+	/**
+	 * Attempts to use {@link Program#launch(String)} to open a URL.
+	 * 
+	 * @param url
+	 * @return
+	 */
+	protected boolean launchProgram(URL url)
+	{
+		return Program.launch(url.toString());
 	}
 
 	protected boolean isWindows()
