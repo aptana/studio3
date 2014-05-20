@@ -8,6 +8,7 @@
 package com.aptana.git.core.github;
 
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -20,7 +21,7 @@ import com.aptana.git.core.model.GitRepository;
 public interface IGithubRepository
 {
 
-	public int getID();
+	public long getID();
 
 	/**
 	 * Name of the repo.
@@ -62,6 +63,22 @@ public interface IGithubRepository
 	public IGithubRepository getParent() throws CoreException;
 
 	/**
+	 * The original source for the network of the repo.
+	 * 
+	 * @return
+	 * @throws CoreException
+	 */
+	public IGithubRepository getSource() throws CoreException;
+
+	/**
+	 * Gets the list of forks for a given repository. https://developer.github.com/v3/repos/forks/
+	 * 
+	 * @return
+	 * @throws CoreException
+	 */
+	public List<IGithubRepository> getForks() throws CoreException;
+
+	/**
 	 * Creates a PR. This PR is done on the parent. so this assume this repo is the fork holding the feature
 	 * branch/changes you'd like merged to the parent.
 	 * 
@@ -69,11 +86,17 @@ public interface IGithubRepository
 	 *            required
 	 * @param body
 	 *            optional
-	 * @param repo
+	 * @param head
+	 *            The local repo to use as the head of the PR (it's current branch is the assumed headBranch)
+	 * @param baseRepo
+	 *            The repo to use as the base for the PR
+	 * @param baseBranch
+	 *            The name of the branch from the base repo
 	 * @return
+	 * @throws CoreException
 	 */
-	public IGithubPullRequest createPullRequest(String title, String body, GitRepository repo, IProgressMonitor monitor)
-			throws CoreException;
+	public IGithubPullRequest createPullRequest(String title, String body, GitRepository head,
+			IGithubRepository baseRepo, String baseBranch, IProgressMonitor monitor) throws CoreException;
 
 	/**
 	 * The default branch for this repo.
@@ -89,4 +112,16 @@ public interface IGithubRepository
 	 * @throws CoreException
 	 */
 	public List<IGithubPullRequest> getOpenPullRequests() throws CoreException;
+
+	/**
+	 * Returns the Set of branch names for the remote repo.
+	 */
+	public Set<String> getBranches();
+
+	/**
+	 * Fully qualified name. Equivalent to getOwner() + '/' + getName();
+	 * 
+	 * @return
+	 */
+	public String getFullName();
 }

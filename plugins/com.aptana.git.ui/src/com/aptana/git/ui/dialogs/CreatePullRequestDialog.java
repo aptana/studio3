@@ -7,6 +7,9 @@
  */
 package com.aptana.git.ui.dialogs;
 
+import java.util.List;
+import java.util.Set;
+
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -17,16 +20,24 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import com.aptana.core.IFilter;
+import com.aptana.core.IMap;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.git.core.github.IGithubRepository;
 import com.aptana.git.ui.GitUIPlugin;
 import com.aptana.theme.ThemePlugin;
 
@@ -41,18 +52,24 @@ public class CreatePullRequestDialog extends StatusDialog
 
 	private Text titleText;
 	private String title;
-	private String base;
+	private String baseBranch;
 	private String head;
+	private IGithubRepository baseRepo;
+	private Combo baseBranchCombo;
+	private Combo baseRepoCombo;
+	private Set<IGithubRepository> repos;
 
-	public CreatePullRequestDialog(final Shell parentShell, String defaultTitle, String defaultBody, String base,
-			String head)
+	public CreatePullRequestDialog(final Shell parentShell, String defaultTitle, String defaultBody,
+			IGithubRepository defaultRepo, Set<IGithubRepository> repos, String head)
 	{
 		super(parentShell);
 		setTitle(Messages.CreatePullRequestDialog_Title);
 		this.title = defaultTitle;
 		this.body = defaultBody;
-		this.base = base;
 		this.head = head;
+		this.repos = repos;
+		this.baseRepo = defaultRepo;
+		this.baseBranch = baseRepo.getDefaultBranch();
 	}
 
 	@Override
@@ -62,7 +79,7 @@ public class CreatePullRequestDialog extends StatusDialog
 
 		// --- Overview of the two endpoints this PR is for
 		Composite overview = new Composite(composite, SWT.NONE);
-		overview.setLayout(GridLayoutFactory.fillDefaults().numColumns(4).create());
+		overview.setLayout(GridLayoutFactory.fillDefaults().numColumns(5).create());
 
 		// icon
 		Label icon = new Label(overview, SWT.NONE);
@@ -70,10 +87,66 @@ public class CreatePullRequestDialog extends StatusDialog
 
 		Color lightBlue = ThemePlugin.getDefault().getColorManager().getColor(new RGB(209, 227, 237));
 		// base
-		Label baseLabel = new Label(overview, SWT.WRAP);
-		baseLabel.setText(base);
-		baseLabel.setFont(JFaceResources.getTextFont());
-		baseLabel.setBackground(lightBlue);
+		baseRepoCombo = new Combo(overview, SWT.DROP_DOWN | SWT.READ_ONLY);
+		baseRepoCombo.setFont(JFaceResources.getTextFont());
+		baseRepoCombo.setBackground(lightBlue);
+		List<String> names = CollectionsUtil.map(repos, new IMap<IGithubRepository, String>()
+		{
+			public String map(IGithubRepository item)
+			{
+				return item.getFullName();
+			}
+		});
+		baseRepoCombo.setItems(names.toArray(new String[names.size()]));
+		baseRepoCombo.setText(baseRepo.getFullName());
+		baseRepoCombo.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				final String repoOwnerAndName = baseRepoCombo.getText();
+				// Get the repo out of some map?
+				baseRepo = CollectionsUtil.find(repos, new IFilter<IGithubRepository>()
+				{
+					public boolean include(IGithubRepository item)
+					{
+						return item.getFullName().equals(repoOwnerAndName);
+					}
+				});
+				baseBranch = baseRepo.getDefaultBranch();
+
+				// Reload the branches in the branch combo!
+				Set<String> branches = baseRepo.getBranches();
+				baseBranchCombo.setItems(branches.toArray(new String[branches.size()]));
+				baseBranchCombo.setText(baseBranch);
+			}
+		});
+
+		// FIXME Use toolbars so we want maintain the blue bg?
+		baseBranchCombo = new Combo(overview, SWT.DROP_DOWN | SWT.READ_ONLY);
+		baseBranchCombo.setFont(JFaceResources.getTextFont());
+		baseBranchCombo.setBackground(lightBlue);
+
+		baseBranchCombo.setItems(new String[] { baseBranch });
+		baseBranchCombo.setText(baseBranch);
+		// We need to set the items to be the list of branches on the base repo
+		Display.getCurrent().asyncExec(new Runnable()
+		{
+			public void run()
+			{
+				Set<String> branches = baseRepo.getBranches();
+				baseBranchCombo.setItems(branches.toArray(new String[branches.size()]));
+				baseBranchCombo.setText(baseBranch);
+			}
+		});
+		baseBranchCombo.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				baseBranch = baseBranchCombo.getText();
+			}
+		});
 
 		// ...
 		Label ellipsis = new Label(overview, SWT.WRAP);
@@ -148,5 +221,15 @@ public class CreatePullRequestDialog extends StatusDialog
 		}
 
 		updateStatus(Status.OK_STATUS);
+	}
+
+	public String getBaseBranch()
+	{
+		return baseBranch;
+	}
+
+	public IGithubRepository getBaseRepo()
+	{
+		return baseRepo;
 	}
 }
