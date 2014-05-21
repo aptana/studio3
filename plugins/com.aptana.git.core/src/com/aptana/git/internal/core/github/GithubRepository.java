@@ -128,7 +128,7 @@ public class GithubRepository implements IGithubRepository
 	{
 		if (!isFork())
 		{
-			return null;
+			return this;
 		}
 
 		if (!json.containsKey(SOURCE))
@@ -212,7 +212,7 @@ public class GithubRepository implements IGithubRepository
 
 	public Set<String> getBranches()
 	{
-		IStatus status = GitExecutable.instance().runInBackground(null, "ls-remote", "--heads", getSSHURL()); //$NON-NLS-1$ //$NON-NLS-2$
+		IStatus status = getGitExecutable().runInBackground(null, "ls-remote", "--heads", getSSHURL()); //$NON-NLS-1$ //$NON-NLS-2$
 		if (!status.isOK())
 		{
 			return Collections.emptySet();
@@ -228,6 +228,11 @@ public class GithubRepository implements IGithubRepository
 			}
 		}
 		return branches;
+	}
+
+	protected GitExecutable getGitExecutable()
+	{
+		return GitExecutable.instance();
 	}
 
 	public List<IGithubRepository> getForks() throws CoreException

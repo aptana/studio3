@@ -38,7 +38,7 @@ public class GithubManager implements IGithubManager
 	private static final String USERNAME = "username"; //$NON-NLS-1$
 	private static final String PASSWORD = "password"; //$NON-NLS-1$
 
-	private IGithubUser user;
+	private IGithubUser fUser;
 
 	public GithubManager()
 	{
@@ -47,7 +47,7 @@ public class GithubManager implements IGithubManager
 
 	public IGithubUser getUser()
 	{
-		return user;
+		return fUser;
 	}
 
 	public IStatus login(String username, String password)
@@ -56,9 +56,9 @@ public class GithubManager implements IGithubManager
 		try
 		{
 			// This API can take username or email address.
-			JSONObject result = (JSONObject) new GithubAPI(username, password).get("user"); //$NON-NLS-1$
+			JSONObject result = (JSONObject) getAPI(new GithubUser(username, password)).get("user"); //$NON-NLS-1$
 			String actualUsername = (String) result.get(USERNAME_PROPERTY);
-			this.user = new GithubUser(actualUsername, password);
+			this.fUser = new GithubUser(actualUsername, password);
 			saveCredentials();
 			return new Status(IStatus.OK, GitPlugin.PLUGIN_ID, 0, null, null);
 		}
@@ -90,7 +90,7 @@ public class GithubManager implements IGithubManager
 			prefs.remove(USERNAME);
 			prefs.remove(PASSWORD);
 			prefs.flush();
-			user = null;
+			fUser = null;
 			return Status.OK_STATUS;
 		}
 		catch (Exception e)
@@ -108,7 +108,7 @@ public class GithubManager implements IGithubManager
 			String password = prefs.get(PASSWORD, null);
 			if (!StringUtil.isEmpty(username) && !StringUtil.isEmpty(password))
 			{
-				user = new GithubUser(username, password);
+				fUser = new GithubUser(username, password);
 			}
 		}
 		catch (Exception e)
@@ -122,8 +122,8 @@ public class GithubManager implements IGithubManager
 		ISecurePreferences prefs = getSecurePreferences();
 		try
 		{
-			prefs.put(USERNAME, user.getUsername(), true /* encrypt */);
-			prefs.put(PASSWORD, user.getPassword(), true /* encrypt */);
+			prefs.put(USERNAME, fUser.getUsername(), true /* encrypt */);
+			prefs.put(PASSWORD, fUser.getPassword(), true /* encrypt */);
 			prefs.flush();
 		}
 		catch (Exception e)
@@ -140,19 +140,19 @@ public class GithubManager implements IGithubManager
 
 	public IGithubRepository getRepo(String owner, String repoName) throws CoreException
 	{
-		if (user == null)
+		if (fUser == null)
 		{
 			throw new CoreException(new Status(IStatus.ERROR, GitPlugin.PLUGIN_ID, GITHUB_LOGIN_CODE,
 					Messages.GithubManager_ERR_Github_NotLoggedIn, null));
 		}
 
-		JSONObject result = (JSONObject) new GithubAPI(user).get("repos/" + owner + '/' + repoName); //$NON-NLS-1$
+		JSONObject result = (JSONObject) getAPI(fUser).get("repos/" + owner + '/' + repoName); //$NON-NLS-1$
 		return new GithubRepository(result);
 	}
 
 	public IGithubRepository fork(String owner, String repoName, String destination) throws CoreException
 	{
-		if (user == null)
+		if (fUser == null)
 		{
 			throw new CoreException(new Status(IStatus.ERROR, GitPlugin.PLUGIN_ID, GITHUB_LOGIN_CODE,
 					Messages.GithubManager_ERR_Github_NotLoggedIn, null));
@@ -164,7 +164,12 @@ public class GithubManager implements IGithubManager
 			data = "{organization: \"" + destination + "\"}"; //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		JSONObject result = (JSONObject) new GithubAPI(user).post("repos/" + owner + '/' + repoName + "/forks", data); //$NON-NLS-1$ //$NON-NLS-2$
+		JSONObject result = (JSONObject) getAPI(fUser).post("repos/" + owner + '/' + repoName + "/forks", data); //$NON-NLS-1$ //$NON-NLS-2$
 		return new GithubRepository(result);
+	}
+
+	protected GithubAPI getAPI(IGithubUser user)
+	{
+		return new GithubAPI(user);
 	}
 }

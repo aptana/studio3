@@ -17,7 +17,7 @@ import org.eclipse.core.runtime.CoreException;
 public interface IGithubOrganization
 {
 
-	public int getID();
+	public long getID();
 
 	/**
 	 * Name of the org.
