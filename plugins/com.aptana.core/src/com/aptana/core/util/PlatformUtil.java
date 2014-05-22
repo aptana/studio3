@@ -29,7 +29,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.service.environment.Constants;
 
 import com.aptana.core.CorePlugin;
-import com.aptana.core.internal.platform.CoreMacOSX;
 import com.aptana.core.internal.platform.CoreNatives;
 import com.aptana.core.logging.IdeLog;
 
@@ -487,7 +486,7 @@ public final class PlatformUtil
 	 */
 	public static synchronized String expandEnvironmentStrings(String path)
 	{
-		if (Platform.OS_WIN32.equals(Platform.getOS()))
+		if (isWindows())
 		{
 			String expanded = CoreNatives.ExpandEnvironmentStrings(path);
 			if (expanded != null)
@@ -519,23 +518,17 @@ public final class PlatformUtil
 				}
 			}
 		}
-		else if (Platform.OS_MACOSX.equals(Platform.getOS()))
+		else if (isMac())
 		{
+			// Here, we cheat and assume that the directories live underneath the user home
+			// Otherwise I get weird perf/lockup issues trying to access CoreMacOSX.FileManager_findFolder
 			if (path.startsWith(DESKTOP_DIRECTORY))
 			{
-				String desktopDirectory = CoreMacOSX.FileManager_findFolder(true, CoreMacOSX.kDesktopFolderType);
-				if (desktopDirectory != null)
-				{
-					path = desktopDirectory + path.substring(DESKTOP_DIRECTORY.length());
-				}
+				return expandEnvironmentStrings("~/Desktop" + path.substring(DESKTOP_DIRECTORY.length()));
 			}
 			else if (path.startsWith(DOCUMENTS_DIRECTORY))
 			{
-				String docsDirectory = CoreMacOSX.FileManager_findFolder(true, CoreMacOSX.kDocumentsFolderType);
-				if (docsDirectory != null)
-				{
-					path = docsDirectory + path.substring(DOCUMENTS_DIRECTORY.length());
-				}
+				return expandEnvironmentStrings("~/Documents" + path.substring(DOCUMENTS_DIRECTORY.length()));
 			}
 		}
 		if (path.length() > 0 && path.charAt(0) == '~')
@@ -550,11 +543,11 @@ public final class PlatformUtil
 	}
 
 	/**
-	 * queryRegestryStringValue
+	 * queryRegistryStringValue
 	 * 
 	 * @param keyName
 	 * @param valueName
-	 * @return value of regestry key
+	 * @return value of registry key
 	 */
 	public static String queryRegistryStringValue(String keyName, String valueName)
 	{
