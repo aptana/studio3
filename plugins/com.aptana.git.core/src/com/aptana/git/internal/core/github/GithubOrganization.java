@@ -34,9 +34,13 @@ public class GithubOrganization implements IGithubOrganization
 		this.json = json;
 	}
 
-	public int getID()
+	public long getID()
 	{
-		return (Integer) json.get(ID);
+		if (!json.containsKey(ID))
+		{
+			return -1;
+		}
+		return (Long) json.get(ID);
 	}
 
 	public String getName()
@@ -52,8 +56,7 @@ public class GithubOrganization implements IGithubOrganization
 	public List<IGithubRepository> getRepos() throws CoreException
 	{
 		@SuppressWarnings("unchecked")
-		List<JSONObject> result = (List<JSONObject>) new GithubAPI(GitPlugin.getDefault().getGithubManager().getUser())
-				.get("orgs/" + getName() + "/repos"); //$NON-NLS-1$ //$NON-NLS-2$
+		List<JSONObject> result = (List<JSONObject>) getAPI().get("orgs/" + getName() + "/repos"); //$NON-NLS-1$ //$NON-NLS-2$
 		List<IGithubRepository> repoURLs = new ArrayList<IGithubRepository>(result.size());
 		for (JSONObject repo : result)
 		{
@@ -62,4 +65,40 @@ public class GithubOrganization implements IGithubOrganization
 		return repoURLs;
 	}
 
+	protected GithubAPI getAPI()
+	{
+		return new GithubAPI(GitPlugin.getDefault().getGithubManager().getUser());
+	}
+
+	@Override
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (getID() ^ (getID() >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj)
+		{
+			return true;
+		}
+		if (obj == null)
+		{
+			return false;
+		}
+		if (!(obj instanceof GithubOrganization))
+		{
+			return false;
+		}
+		GithubOrganization other = (GithubOrganization) obj;
+		if (getID() != other.getID())
+		{
+			return false;
+		}
+		return true;
+	}
 }
