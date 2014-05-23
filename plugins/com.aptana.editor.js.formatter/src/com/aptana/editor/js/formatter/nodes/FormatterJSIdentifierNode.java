@@ -49,6 +49,10 @@ public class FormatterJSIdentifierNode extends FormatterJSTextNode
 			return false;
 		}
 		IParseNode parent = node.getParent();
+		if (parent == null)
+		{
+			return false;
+		}
 		boolean isFirstInLine = parent.getStartingOffset() == node.getStartingOffset();
 		if (parent instanceof JSNode && ((JSNode) parent).getSemicolonIncluded())
 		{
@@ -161,6 +165,7 @@ public class FormatterJSIdentifierNode extends FormatterJSTextNode
 					case IJSNodeTypes.BITWISE_NOT:
 					case IJSNodeTypes.GROUP:
 					case IJSNodeTypes.GET_PROPERTY:
+					case IJSNodeTypes.NAME_VALUE_PAIR:
 						return 0;
 					default:
 						return 1;

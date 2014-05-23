@@ -7,18 +7,19 @@
  */
 package com.aptana.js.core.parsing;
 
-import org.junit.Test;
-import org.junit.Before;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.junit.Before;
+import org.junit.Test;
 
 import beaver.Symbol;
 
@@ -32,17 +33,14 @@ import com.aptana.parsing.ast.IParseError;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.ast.ParseNode;
-import com.aptana.parsing.ast.ParseRootNode;
 
 public class JSParserTest
 {
 	private static final String EOL = FileUtil.NEW_LINE;
 
 	private JSParser fParser;
-
 	private ParseResult fParseResult;
 
-//	@Override
 	@Before
 	public void setUp() throws Exception
 	{
@@ -1271,6 +1269,20 @@ public class JSParserTest
 	{
 		parse("function import() {};" + EOL);
 		assertParseErrors("Syntax Error: unexpected token \"import\"");
+	}
+
+	@Test
+	public void testGetterProperty() throws Exception
+	{
+		parse("Field.prototype = { get value() { return this._value; } };" + EOL);
+		assertTrue(fParseResult.getErrors().isEmpty());
+	}
+
+	@Test
+	public void testSetterProperty() throws Exception
+	{
+		parse("Field.prototype = { set value(val) { this._value = val; } };" + EOL);
+		assertTrue(fParseResult.getErrors().isEmpty());
 	}
 
 	/**
