@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
 
+import com.aptana.core.IFilter;
 import com.aptana.core.IMap;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
@@ -69,25 +70,15 @@ public class JSSymbolTypeInferrer
 		// create new type
 		TypeElement result = new TypeElement();
 
-		// set parent types
-		boolean isFunction = false;
-
-		if (types != null)
+		// Set the name first so we can validate we don't end up setting self as a parent type
+		String functionSuper = CollectionsUtil.find(types, new IFilter<String>()
 		{
-			for (String superType : types)
+			public boolean include(String item)
 			{
-				if (JSTypeUtil.isFunctionPrefix(superType))
-				{
-					isFunction = true;
-
-					result.addParentType(JSTypeConstants.FUNCTION_TYPE);
-				}
-				else
-				{
-					result.addParentType(superType);
-				}
+				return JSTypeUtil.isFunctionPrefix(item);
 			}
-		}
+		});
+		boolean isFunction = functionSuper != null;
 
 		String name = null;
 		List<JSNode> values = property.getValues();
@@ -129,6 +120,22 @@ public class JSSymbolTypeInferrer
 
 		// give type a unique name
 		result.setName(name);
+
+		// set parent types
+		if (types != null)
+		{
+			for (String superType : types)
+			{
+				if (JSTypeUtil.isFunctionPrefix(superType))
+				{
+					result.addParentType(JSTypeConstants.FUNCTION_TYPE);
+				}
+				else
+				{
+					result.addParentType(superType);
+				}
+			}
+		}
 
 		return result;
 	}
@@ -576,11 +583,18 @@ public class JSSymbolTypeInferrer
 			TagType tagToCheck = isFunction ? TagType.RETURN : TagType.TYPE;
 			if (docs == null || !docs.hasTag(tagToCheck))
 			{
-				JSNodeTypeInferrer inferrer = getNodeInferrer(sub);
-				property.addType(isFunction ? JSTypeConstants.FUNCTION_TYPE : NO_TYPE);
-				inferrer.visit(value);
-				property.clearTypes();
-				types.addAll(inferrer.getTypes());
+				if (value instanceof JSObjectNode)
+				{
+					types.add(JSTypeConstants.OBJECT_TYPE);
+				}
+				else
+				{
+					JSNodeTypeInferrer inferrer = getNodeInferrer(sub);
+					property.addType(isFunction ? JSTypeConstants.FUNCTION_TYPE : NO_TYPE);
+					inferrer.visit(value);
+					property.clearTypes();
+					types.addAll(inferrer.getTypes());
+				}
 			}
 			else if (isFunction)
 			{
@@ -590,10 +604,6 @@ public class JSSymbolTypeInferrer
 			}
 			else
 			{
-				if (value instanceof JSObjectNode)
-				{
-					types.add(JSTypeConstants.OBJECT_TYPE);
-				}
 				PropertyElement p = new PropertyElement();
 				JSTypeUtil.applyDocumentation(p, value, docs);
 				types.addAll(p.getTypeNames());
