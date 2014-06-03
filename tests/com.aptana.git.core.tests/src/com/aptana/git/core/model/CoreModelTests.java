@@ -13,7 +13,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({ GitExecutableTest.class, GitIndexRefreshJobTest.class, GitIndexTest.class, GitRefTest.class,
-		GitRevSpecifierTest.class, GitRepositoryTest.class })
+		GitRevSpecifierTest.class, GitRepositoryTest.class, ChangedFileTest.class })
 public class CoreModelTests
 {
 }
