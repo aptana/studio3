@@ -634,7 +634,11 @@ class CommitDialog extends StatusDialog
 									final List<ChangedFile> copy = new ArrayList<ChangedFile>(changedFiles);
 									for (ChangedFile cf : changedFiles)
 									{
-										copy.add(new ChangedFile(cf));
+										ChangedFile changedFile = ChangedFile.createInstance(cf);
+										if (changedFile != null)
+										{
+											copy.add(changedFile);
+										}
 									}
 
 									gitRepository.index().discardChangesForFiles(changedFiles);
