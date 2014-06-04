@@ -25,6 +25,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -200,6 +201,10 @@ public class GitIndex
 				"Errors occurred while grabbing changed file listings", null); //$NON-NLS-1$
 		try
 		{
+			if (es.isShutdown())
+			{
+				return Status.CANCEL_STATUS;
+			}
 			List<Future<IStatus>> futures = es.invokeAll(jobs);
 
 			// Now wait for them to finish
@@ -1092,6 +1097,15 @@ public class GitIndex
 	{
 		if (es != null)
 		{
+			// If the git index is being refreshed at the same time, we shall give some time to wait until all its tasks
+			// are completed.
+			try
+			{
+				es.awaitTermination(2000, TimeUnit.MILLISECONDS);
+			}
+			catch (InterruptedException e)
+			{
+			}
 			es.shutdown();
 		}
 		if (refreshJob != null)
