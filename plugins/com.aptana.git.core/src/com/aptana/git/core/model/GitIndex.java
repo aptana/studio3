@@ -256,7 +256,11 @@ public class GitIndex
 				preRefresh = new ArrayList<ChangedFile>(this.changedFiles.size());
 				for (ChangedFile file : this.changedFiles)
 				{
-					preRefresh.add(new ChangedFile(file));
+					ChangedFile changedFile = ChangedFile.createInstance(file);
+					if (changedFile != null)
+					{
+						preRefresh.add(changedFile);
+					}
 				}
 			}
 			else
@@ -346,7 +350,11 @@ public class GitIndex
 			List<ChangedFile> copy = new ArrayList<ChangedFile>(this.changedFiles.size());
 			for (ChangedFile file : this.changedFiles)
 			{
-				copy.add(new ChangedFile(file));
+				ChangedFile changedFile = ChangedFile.createInstance(file);
+				if (changedFile != null)
+				{
+					copy.add(changedFile);
+				}
 			}
 			return copy;
 		}
@@ -384,7 +392,11 @@ public class GitIndex
 		// files.
 		for (ChangedFile file : stageFiles)
 		{
-			preFiles.add(new ChangedFile(file));
+			ChangedFile changedFile = ChangedFile.createInstance(file);
+			if (changedFile != null)
+			{
+				preFiles.add(changedFile);
+			}
 			synchronized (changedFilesLock)
 			{
 				if (this.changedFiles != null)
@@ -392,7 +404,6 @@ public class GitIndex
 					int index = Collections.binarySearch(this.changedFiles, file);
 					if (index >= 0)
 					{
-
 						ChangedFile orig = this.changedFiles.get(index);
 						orig.hasUnstagedChanges = false;
 						orig.hasStagedChanges = true;
@@ -440,7 +451,11 @@ public class GitIndex
 		ArrayList<ChangedFile> preFiles = new ArrayList<ChangedFile>(unstageFiles.size());
 		for (ChangedFile file : unstageFiles)
 		{
-			preFiles.add(new ChangedFile(file));
+			ChangedFile changedFile = ChangedFile.createInstance(file);
+			if (changedFile != null)
+			{
+				preFiles.add(changedFile);
+			}
 
 			synchronized (this.changedFilesLock)
 			{
@@ -490,8 +505,12 @@ public class GitIndex
 		ArrayList<ChangedFile> preFiles = new ArrayList<ChangedFile>(discardFiles.size());
 		for (ChangedFile file : discardFiles)
 		{
-			preFiles.add(new ChangedFile(file));
-			file.hasUnstagedChanges = false;
+			ChangedFile changedFile = ChangedFile.createInstance(file);
+			if (changedFile != null)
+			{
+				preFiles.add(changedFile);
+				file.hasUnstagedChanges = false;
+			}
 		}
 		preFiles.trimToSize();
 
@@ -955,7 +974,11 @@ public class GitIndex
 						status = ChangedFile.Status.MODIFIED;
 					}
 
-					ChangedFile file = new ChangedFile(path, status);
+					ChangedFile file = ChangedFile.createInstance(path, status);
+					if (file == null)
+					{
+						continue;
+					}
 					if (tracked)
 					{
 						file.commitBlobMode = fileStatus.get(0).substring(1);

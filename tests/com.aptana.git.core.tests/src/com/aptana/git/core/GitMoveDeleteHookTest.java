@@ -104,7 +104,7 @@ public class GitMoveDeleteHookTest
 				oneOf(file).getProject();
 
 				oneOf(repo).getChangedFileForResource(file);
-				ChangedFile changedFile = new ChangedFile("fake_path.txt", ChangedFile.Status.MODIFIED);
+				ChangedFile changedFile = ChangedFile.createInstance("fake_path.txt", ChangedFile.Status.MODIFIED);
 				will(returnValue(changedFile));
 
 				// keep history
@@ -133,7 +133,7 @@ public class GitMoveDeleteHookTest
 				oneOf(file).getProject();
 
 				oneOf(repo).getChangedFileForResource(file);
-				ChangedFile changedFile = new ChangedFile("fake_path.txt", ChangedFile.Status.NEW);
+				ChangedFile changedFile = ChangedFile.createInstance("fake_path.txt", ChangedFile.Status.NEW);
 				will(returnValue(changedFile));
 			}
 		});
@@ -178,7 +178,7 @@ public class GitMoveDeleteHookTest
 				oneOf(file).getProject();
 
 				oneOf(repo).getChangedFileForResource(file);
-				ChangedFile changedFile = new ChangedFile("fake_path.txt", ChangedFile.Status.MODIFIED);
+				ChangedFile changedFile = ChangedFile.createInstance("fake_path.txt", ChangedFile.Status.MODIFIED);
 				will(returnValue(changedFile));
 
 				oneOf(repo).deleteFile(changedFile.getPath());

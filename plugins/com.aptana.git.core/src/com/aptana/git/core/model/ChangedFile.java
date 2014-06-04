@@ -10,6 +10,7 @@ package com.aptana.git.core.model;
 import java.text.MessageFormat;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
 /**
@@ -33,7 +34,7 @@ public class ChangedFile implements Comparable<ChangedFile>
 	 * 
 	 * @param other
 	 */
-	public ChangedFile(ChangedFile other)
+	private ChangedFile(ChangedFile other)
 	{
 		this(other.portablePath, other.status);
 		this.hasStagedChanges = other.hasStagedChanges;
@@ -42,11 +43,49 @@ public class ChangedFile implements Comparable<ChangedFile>
 		this.commitBlobSHA = other.commitBlobSHA;
 	}
 
-	public ChangedFile(String path, Status status)
+	private ChangedFile(String path, Status status)
 	{
 		this.portablePath = path;
 		this.status = status;
 		this.osPath = Path.fromPortableString(path).toOSString();
+	}
+
+	/**
+	 * Creates an instance to the requested ChangedFile instance <code>other</code> only if its path is a relative path.
+	 * All resources in the workspace are referenced by relative path. If the requested path is an absolute path, then
+	 * it indicates the resource does not belong to the current workspace and we do not need to track the external
+	 * resource.
+	 * 
+	 * @param other
+	 * @return
+	 */
+	public static ChangedFile createInstance(ChangedFile other)
+	{
+		IPath portablePath = Path.fromOSString(other.portablePath);
+		if (portablePath.isAbsolute())
+		{
+			return null;
+		}
+		return new ChangedFile(other);
+	}
+
+	/**
+	 * Creates an instance to the requested <code>path</code> only if it is a relative path. All resources in the
+	 * workspace should be referenced by relative path. If the requested path is an absolute path, then it indicates the
+	 * resource does not belong to the current workspace and we do not need to track the external resource.
+	 * 
+	 * @param path
+	 * @param status
+	 * @return
+	 */
+	public static ChangedFile createInstance(String path, Status status)
+	{
+		IPath portablePath = Path.fromOSString(path);
+		if (portablePath.isAbsolute())
+		{
+			return null;
+		}
+		return new ChangedFile(path, status);
 	}
 
 	private String osPath;

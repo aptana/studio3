@@ -40,7 +40,7 @@ public class GitIndexTest extends GitTestCase
 
 		// Generate faked unmerged file in index
 		List<ChangedFile> blah = new ArrayList<ChangedFile>();
-		ChangedFile changedFile = new ChangedFile(fileName, Status.UNMERGED);
+		ChangedFile changedFile = ChangedFile.createInstance(fileName, Status.UNMERGED);
 		changedFile.hasUnstagedChanges = true;
 		blah.add(changedFile);
 		GitIndex index = new GitIndex(repo);
