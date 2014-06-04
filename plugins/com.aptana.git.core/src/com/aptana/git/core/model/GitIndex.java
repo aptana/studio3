@@ -37,6 +37,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
@@ -788,7 +789,7 @@ public class GitIndex
 		}
 	}
 
-	private abstract static class FilesRefreshJob implements Callable<IStatus>
+	private abstract class FilesRefreshJob implements Callable<IStatus>
 	{
 
 		protected GitRepository repo;
@@ -937,6 +938,16 @@ public class GitIndex
 				{
 					List<String> fileStatus = dictionary.get(path);
 
+					if (Path.fromPortableString(path).isAbsolute())
+					{
+						IdeLog.logWarning(
+								GitPlugin.getDefault(),
+								MessageFormat
+										.format("Found an entry for an absolute path ({0}), won't add to our changed file listing for repo at {1}",
+												path, workingDirectory().toOSString()));
+						continue;
+					}
+
 					ChangedFile.Status status = ChangedFile.Status.MODIFIED;
 					if (fileStatus.get(4).equals(DELETED_STATUS))
 					{
@@ -974,7 +985,7 @@ public class GitIndex
 
 	}
 
-	private static final class StagedFilesRefreshJob extends FilesRefreshJob
+	private final class StagedFilesRefreshJob extends FilesRefreshJob
 	{
 		private StagedFilesRefreshJob(GitIndex index, Set<String> filePaths)
 		{
@@ -1008,7 +1019,7 @@ public class GitIndex
 		}
 	}
 
-	private static final class UnstagedFilesRefreshJob extends FilesRefreshJob
+	private final class UnstagedFilesRefreshJob extends FilesRefreshJob
 	{
 		private UnstagedFilesRefreshJob(GitIndex index, Set<String> filePaths)
 		{
@@ -1041,7 +1052,7 @@ public class GitIndex
 		}
 	}
 
-	private static final class UntrackedFilesRefreshJob extends FilesRefreshJob
+	private final class UntrackedFilesRefreshJob extends FilesRefreshJob
 	{
 
 		private UntrackedFilesRefreshJob(GitIndex index, Set<String> filePaths)
