@@ -213,6 +213,14 @@ public class JSIndexWriter extends IndexWriter
 			// write properties
 			for (PropertyElement property : type.getProperties())
 			{
+				if (!property.getOwningType().equals(type.getName()))
+				{
+					// Should we enforce that the property's owning type must match the type name?
+					IdeLog.logWarning(JSCorePlugin.getDefault(), MessageFormat.format(
+							"Property is attached to type {0}, but states it's owning type is {1}", type.getName(),
+							property.getOwningType()));
+				}
+				// property.setOwningType(type.getName()); // enforce that the property's owning type is correct
 				if (property instanceof FunctionElement)
 				{
 					this.writeFunction(index, (FunctionElement) property, location);

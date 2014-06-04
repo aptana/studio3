@@ -20,6 +20,7 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 
 import com.aptana.buildpath.core.BuildPathManager;
 import com.aptana.buildpath.core.IBuildPathEntry;
@@ -465,6 +466,43 @@ public class JSIndexQueryHelper
 			if (!CollectionsUtil.isEmpty(functions))
 			{
 				return functions.iterator().next();
+			}
+		}
+		return null;
+	}
+
+	public String getModulePath(String generatedModuleId)
+	{
+		if (generatedModuleId == null || generatedModuleId.isEmpty())
+		{
+			return null;
+		}
+		if (generatedModuleId.endsWith(".exports"))
+		{
+			generatedModuleId = generatedModuleId.substring(0, generatedModuleId.length() - 8);
+		}
+
+		for (Index index : indices)
+		{
+			// Look up our mapping from generated type names to documents
+			List<QueryResult> results = index.query(new String[] { IJSIndexConstants.MODULE_DEFINITION },
+					generatedModuleId, SearchPattern.EXACT_MATCH | SearchPattern.CASE_SENSITIVE);
+			if (results != null && !results.isEmpty())
+			{
+				QueryResult match = results.get(0);
+				Set<String> docs = match.getDocuments();
+				if (docs != null && !docs.isEmpty())
+				{
+					String uri = docs.iterator().next();
+					String root = index.getRoot().toString();
+					if (uri.startsWith(root))
+					{
+						uri = uri.substring(root.length());
+					}
+					// Remove the .js extension
+					return Path.fromOSString(uri).removeFileExtension().toPortableString();
+				}
+
 			}
 		}
 		return null;
