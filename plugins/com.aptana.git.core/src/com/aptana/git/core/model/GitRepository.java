@@ -1495,9 +1495,9 @@ public class GitRepository
 		return result != null && result.isOK();
 	}
 
-	public IStatus deleteFile(String filePath)
+	public IStatus deleteFile(IPath filePath)
 	{
-		IStatus result = execute(GitRepository.ReadWrite.WRITE, "rm", "-f", filePath); //$NON-NLS-1$ //$NON-NLS-2$
+		IStatus result = execute(GitRepository.ReadWrite.WRITE, "rm", "-f", filePath.toPortableString()); //$NON-NLS-1$ //$NON-NLS-2$
 		if (result == null)
 		{
 			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), "Failed to execute git rm -f"); //$NON-NLS-1$

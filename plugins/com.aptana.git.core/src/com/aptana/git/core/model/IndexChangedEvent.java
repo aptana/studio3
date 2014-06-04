@@ -44,7 +44,7 @@ public class IndexChangedEvent extends RepositoryEvent
 		Set<IResource> files = new HashSet<IResource>(changedFiles.size());
 		for (ChangedFile changedFile : changedFiles)
 		{
-			IPath path = workingDirectory.append(changedFile.getPath()).makeAbsolute();
+			IPath path = workingDirectory.append(changedFile.getRelativePath()).makeAbsolute();
 			IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(path);
 			if (file == null)
 			{
