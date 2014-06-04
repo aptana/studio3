@@ -15,7 +15,7 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.team.core.history.IFileRevision;
 import org.eclipse.team.internal.ui.history.FileRevisionTypedElement;
 import org.eclipse.team.ui.synchronize.SaveableCompareEditorInput;
@@ -49,11 +49,10 @@ public class CompareWithHEADHandler extends AbstractCompareRevisionHandler
 			{
 				continue;
 			}
-			String name = repo.getChangedFileForResource(blah).getPath();
+			IPath name = repo.getChangedFileForResource(blah).getRelativePath();
 			IFile file = (IFile) blah;
 			ITypedElement base = SaveableCompareEditorInput.createFileElement(file);
-			final IFileRevision nextFile = GitPlugin.revisionForCommit(
-					new GitCommit(repo, "HEAD"), Path.fromOSString(name)); //$NON-NLS-1$
+			final IFileRevision nextFile = GitPlugin.revisionForCommit(new GitCommit(repo, "HEAD"), name); //$NON-NLS-1$
 			final ITypedElement next = new FileRevisionTypedElement(nextFile);
 			final GitCompareFileRevisionEditorInput in = new GitCompareFileRevisionEditorInput(base, next, null);
 			CompareUI.openCompareEditor(in);

@@ -58,7 +58,7 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 			tree.addToLocalHistory(file);
 
 		// Delete the file through the repo
-		IStatus status = repo.deleteFile(changed.getPath());
+		IStatus status = repo.deleteFile(changed.getRelativePath());
 		if (status.isOK())
 		{
 			tree.deletedFile(file);

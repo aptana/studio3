@@ -634,7 +634,7 @@ class CommitDialog extends StatusDialog
 									final List<ChangedFile> copy = new ArrayList<ChangedFile>(changedFiles);
 									for (ChangedFile cf : changedFiles)
 									{
-										copy.add(new ChangedFile(cf));
+										copy.add(cf.clone());
 									}
 
 									gitRepository.index().discardChangesForFiles(changedFiles);
@@ -774,14 +774,18 @@ class CommitDialog extends StatusDialog
 				&& !file.getStatus().equals(ChangedFile.Status.DELETED))
 		{
 			// Special code to draw the image if the binary file is an image
-			String[] imageExtensions = new String[] { ".png", ".gif", ".jpeg", ".jpg", ".ico" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-			for (String extension : imageExtensions)
+			String fileExtension = file.getRelativePath().getFileExtension();
+			if (fileExtension != null)
 			{
-				if (file.getPath().endsWith(extension))
+				String[] imageExtensions = new String[] { "png", "gif", "jpeg", "jpg", "ico" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+				for (String extension : imageExtensions)
 				{
-					IPath fullPath = gitRepository.workingDirectory().append(file.getPath());
-					updateDiff(file, "<img src=\"" + fullPath.toOSString() + "\" />"); //$NON-NLS-1$ //$NON-NLS-2$
-					return;
+					if (fileExtension.equalsIgnoreCase(extension))
+					{
+						IPath fullPath = gitRepository.workingDirectory().append(file.getRelativePath());
+						updateDiff(file, "<img src=\"" + fullPath.toOSString() + "\" />"); //$NON-NLS-1$ //$NON-NLS-2$
+						return;
+					}
 				}
 			}
 		}
@@ -796,7 +800,7 @@ class CommitDialog extends StatusDialog
 		{
 			try
 			{
-				diff = DiffFormatter.toHTML(file.getPath(), diff);
+				diff = DiffFormatter.toHTML(file.getRelativePath().toPortableString(), diff);
 			}
 			catch (Throwable t)
 			{
@@ -839,7 +843,7 @@ class CommitDialog extends StatusDialog
 			for (TableItem existing : items)
 			{
 				String path = existing.getText(1);
-				if (file.getPath().compareTo(path) < 0)
+				if (file.getRelativePath().toOSString().compareTo(path) < 0)
 				{
 					break;
 				}
@@ -866,7 +870,7 @@ class CommitDialog extends StatusDialog
 		}
 		// item.setText(0, text);
 		item.setImage(0, image);
-		item.setText(1, file.getPath());
+		item.setText(1, file.getRelativePath().toOSString());
 		item.setData(CHANGED_FILE_DATA_KEY, file);
 	}
 

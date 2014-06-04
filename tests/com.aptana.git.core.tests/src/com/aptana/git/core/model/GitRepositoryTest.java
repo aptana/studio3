@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.junit.Test;
 import org.osgi.framework.Version;
 
@@ -193,7 +194,7 @@ public class GitRepositoryTest extends GitTestCase
 
 		// Hold onto filename/path for getting it's history later.
 		ChangedFile file = changed.get(0);
-		String filePath = file.getPath();
+		IPath filePath = file.getRelativePath();
 
 		// stage
 		assertStageFiles(index, changed);
@@ -204,7 +205,8 @@ public class GitRepositoryTest extends GitTestCase
 		assertCommit(index, commitMessage);
 
 		GitRevList list = new GitRevList(repo);
-		IStatus result = list.walkRevisionListWithSpecifier(new GitRevSpecifier(filePath), new NullProgressMonitor());
+		IStatus result = list.walkRevisionListWithSpecifier(new GitRevSpecifier(filePath.toPortableString()),
+				new NullProgressMonitor());
 		assertTrue(result.isOK());
 
 		List<GitCommit> commits = list.getCommits();
@@ -233,7 +235,7 @@ public class GitRepositoryTest extends GitTestCase
 		// make sure it's there first
 		assertTrue("File we want to delete through git repo doesn't exist", addedFile.exists());
 		// delete it
-		IStatus status = getRepo().deleteFile(addedFile.getName());
+		IStatus status = getRepo().deleteFile(Path.fromPortableString(addedFile.getName()));
 		assertTrue(MessageFormat.format("Deleting file in git repo returned an error status: {0}", status),
 				status.isOK());
 		// make sure its deleted from filesystem

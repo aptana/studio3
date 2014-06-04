@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
@@ -32,11 +33,13 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
@@ -71,10 +74,9 @@ public class GitIndex
 	 * UI views)
 	 */
 	private static final String[] BINARY_EXTENSIONS = new String[] {
-			".pdf", ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".o", ".class", ".zip", ".gz", ".tar", ".ico", ".so", ".jar" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$ //$NON-NLS-12$ //$NON-NLS-13$ //$NON-NLS-14$
+			"pdf", "jpg", "jpeg", "png", "bmp", "gif", "o", "class", "zip", "gz", "tar", "ico", "so", "jar" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$ //$NON-NLS-12$ //$NON-NLS-13$ //$NON-NLS-14$
 
 	private GitRepository repository;
-	private boolean amend;
 
 	/**
 	 * The list of changed files that is a copy of the above list. Only copied at the very end of the refresh, so it
@@ -84,8 +86,6 @@ public class GitIndex
 	private Object changedFilesLock = new Object();
 
 	private boolean notify;
-
-	private List<ChangedFile> files;
 
 	/**
 	 * Service which launches the refresh commands in threads.
@@ -145,7 +145,7 @@ public class GitIndex
 	 * @param monitor
 	 * @return
 	 */
-	IStatus refresh(boolean notify, Collection<IPath> filePaths, IProgressMonitor monitor)
+	IStatus refresh(boolean notify, final Collection<IPath> filePaths, IProgressMonitor monitor)
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
 		if (sub.isCanceled())
@@ -153,15 +153,6 @@ public class GitIndex
 			return Status.CANCEL_STATUS;
 		}
 		this.notify = notify;
-
-		final Set<String> filePathStrings = new HashSet<String>(CollectionsUtil.map(filePaths,
-				new IMap<IPath, String>()
-				{
-					public String map(IPath location)
-					{
-						return location.toPortableString();
-					}
-				}));
 
 		// If we don't run this, we end up showing files as unstaged when they're no longer modified!
 		IStatus result;
@@ -182,10 +173,19 @@ public class GitIndex
 			return result;
 		}
 
-		Set<Callable<IStatus>> jobs = new HashSet<Callable<IStatus>>(3);
-		jobs.add(new UntrackedFilesRefreshJob(this, filePathStrings));
-		jobs.add(new UnstagedFilesRefreshJob(this, filePathStrings));
-		jobs.add(new StagedFilesRefreshJob(this, filePathStrings));
+		final Set<String> portablePathStrings = new HashSet<String>(CollectionsUtil.map(filePaths,
+				new IMap<IPath, String>()
+				{
+					public String map(IPath item)
+					{
+						return item.toPortableString();
+					}
+				}));
+
+		Set<Callable<Map<IPath, ChangedFile>>> jobs = new HashSet<Callable<Map<IPath, ChangedFile>>>(3);
+		jobs.add(new UntrackedFilesRefreshJob(this, portablePathStrings));
+		jobs.add(new UnstagedFilesRefreshJob(this, portablePathStrings));
+		jobs.add(new StagedFilesRefreshJob(this, portablePathStrings));
 
 		// Last chance to cancel...
 		if (monitor != null && monitor.isCanceled())
@@ -194,7 +194,7 @@ public class GitIndex
 		}
 
 		// Now create a new temporary list so we can build it up...
-		this.files = Collections.synchronizedList(new ArrayList<ChangedFile>());
+		Map<IPath, ChangedFile> newChangedFiles = new HashMap<IPath, ChangedFile>();
 
 		// Schedule all the jobs
 		MultiStatus errors = new MultiStatus(GitPlugin.PLUGIN_ID, 1,
@@ -205,10 +205,10 @@ public class GitIndex
 			{
 				return Status.CANCEL_STATUS;
 			}
-			List<Future<IStatus>> futures = es.invokeAll(jobs);
+			List<Future<Map<IPath, ChangedFile>>> futures = es.invokeAll(jobs);
 
 			// Now wait for them to finish
-			for (Future<IStatus> future : futures)
+			for (Future<Map<IPath, ChangedFile>> future : futures)
 			{
 				while (!future.isDone())
 				{
@@ -222,10 +222,29 @@ public class GitIndex
 				// When done, get their result
 				try
 				{
-					IStatus futureResult = future.get();
-					if (!futureResult.isOK())
+					Map<IPath, ChangedFile> map = future.get();
+					if (newChangedFiles.isEmpty())
 					{
-						errors.merge(futureResult);
+						newChangedFiles.putAll(map);
+					}
+					else
+					{
+						// we may get multiple entries for the same path, we need to be careful and merge them together
+						// (i.e. we may have staged and unstaged changes for same file)
+						for (Entry<IPath, ChangedFile> entry : map.entrySet())
+						{
+							IPath path = entry.getKey();
+							ChangedFile file = entry.getValue();
+							if (newChangedFiles.containsKey(path))
+							{
+								// Merge the two entries
+								newChangedFiles.put(path, file.merge(newChangedFiles.get(path)));
+							}
+							else
+							{
+								newChangedFiles.put(path, file);
+							}
+						}
 					}
 				}
 				catch (CancellationException ce)
@@ -235,7 +254,14 @@ public class GitIndex
 				catch (ExecutionException e)
 				{
 					Throwable t = e.getCause();
-					errors.merge(new Status(IStatus.ERROR, GitPlugin.PLUGIN_ID, t.getMessage(), t));
+					if (t instanceof CoreException)
+					{
+						errors.merge(((CoreException) t).getStatus());
+					}
+					else
+					{
+						errors.merge(new Status(IStatus.ERROR, GitPlugin.PLUGIN_ID, t.getMessage(), t));
+					}
 				}
 			}
 		}
@@ -251,12 +277,13 @@ public class GitIndex
 		Collection<ChangedFile> preRefresh;
 		synchronized (this.changedFilesLock)
 		{
+			// Make a copy of the changed file listing, pre-refresh
 			if (this.changedFiles != null)
 			{
 				preRefresh = new ArrayList<ChangedFile>(this.changedFiles.size());
 				for (ChangedFile file : this.changedFiles)
 				{
-					preRefresh.add(new ChangedFile(file));
+					preRefresh.add(file.clone());
 				}
 			}
 			else
@@ -266,7 +293,7 @@ public class GitIndex
 
 			// Now wipe any existing ChangedFile entries for any of the filePaths and add the ones we generated in
 			// dictionary
-			if (CollectionsUtil.isEmpty(filePathStrings))
+			if (CollectionsUtil.isEmpty(filePaths))
 			{
 				this.changedFiles = new ArrayList<ChangedFile>();
 			}
@@ -276,18 +303,18 @@ public class GitIndex
 				{
 					public boolean include(ChangedFile item)
 					{
-						return !filePathStrings.contains(item.portablePath);
+						return !portablePathStrings.contains(item.getRelativePath().toPortableString());
 					}
 				});
 			}
-			if (!CollectionsUtil.isEmpty(this.files))
+			if (!CollectionsUtil.isEmpty(newChangedFiles))
 			{
-				this.changedFiles.addAll(this.files);
+				this.changedFiles.addAll(newChangedFiles.values());
 			}
 		}
 
 		// Don't hold onto temp list in memory!
-		this.files = null;
+		newChangedFiles = null;
 
 		postIndexChange(preRefresh, this.changedFiles);
 		sub.done();
@@ -346,7 +373,7 @@ public class GitIndex
 			List<ChangedFile> copy = new ArrayList<ChangedFile>(this.changedFiles.size());
 			for (ChangedFile file : this.changedFiles)
 			{
-				copy.add(new ChangedFile(file));
+				copy.add(file.clone());
 			}
 			return copy;
 		}
@@ -360,10 +387,11 @@ public class GitIndex
 			return Status.OK_STATUS;
 		}
 
-		StringBuffer input = new StringBuffer(stageFiles.size() * stageFiles.iterator().next().getPath().length());
+		StringBuffer input = new StringBuffer(stageFiles.size()
+				* stageFiles.iterator().next().getRelativePath().toPortableString().length());
 		for (ChangedFile file : stageFiles)
 		{
-			input.append(file.getPath()).append('\n');
+			input.append(file.getRelativePath()).append('\n');
 		}
 
 		@SuppressWarnings("nls")
@@ -384,7 +412,7 @@ public class GitIndex
 		// files.
 		for (ChangedFile file : stageFiles)
 		{
-			preFiles.add(new ChangedFile(file));
+			preFiles.add(file.clone());
 			synchronized (changedFilesLock)
 			{
 				if (this.changedFiles != null)
@@ -394,14 +422,12 @@ public class GitIndex
 					{
 
 						ChangedFile orig = this.changedFiles.get(index);
-						orig.hasUnstagedChanges = false;
-						orig.hasStagedChanges = true;
+						orig.makeStaged();
 					}
 				}
 			}
 
-			file.hasUnstagedChanges = false;
-			file.hasStagedChanges = true;
+			file.makeStaged();
 		}
 		preFiles.trimToSize();
 
@@ -440,7 +466,7 @@ public class GitIndex
 		ArrayList<ChangedFile> preFiles = new ArrayList<ChangedFile>(unstageFiles.size());
 		for (ChangedFile file : unstageFiles)
 		{
-			preFiles.add(new ChangedFile(file));
+			preFiles.add(file.clone());
 
 			synchronized (this.changedFilesLock)
 			{
@@ -451,14 +477,12 @@ public class GitIndex
 					{
 
 						ChangedFile orig = this.changedFiles.get(index);
-						orig.hasUnstagedChanges = true;
-						orig.hasStagedChanges = false;
+						orig.makeUnstaged();
 					}
 				}
 			}
 
-			file.hasUnstagedChanges = true;
-			file.hasStagedChanges = false;
+			file.makeUnstaged();
 		}
 		preFiles.trimToSize();
 
@@ -471,7 +495,7 @@ public class GitIndex
 		StringBuilder input = new StringBuilder();
 		for (ChangedFile file : discardFiles)
 		{
-			input.append(file.getPath()).append(NULL_DELIMITER);
+			input.append(file.getRelativePath().toPortableString()).append(NULL_DELIMITER);
 		}
 
 		IStatus result = repository.executeWithInput(input.toString(),
@@ -490,8 +514,8 @@ public class GitIndex
 		ArrayList<ChangedFile> preFiles = new ArrayList<ChangedFile>(discardFiles.size());
 		for (ChangedFile file : discardFiles)
 		{
-			preFiles.add(new ChangedFile(file));
-			file.hasUnstagedChanges = false;
+			preFiles.add(file.clone());
+			file.setUnstaged(false);
 		}
 		preFiles.trimToSize();
 
@@ -573,7 +597,7 @@ public class GitIndex
 		String parameter = "-U" + contextLines; //$NON-NLS-1$
 		if (staged)
 		{
-			String indexPath = ":0:" + file.portablePath; //$NON-NLS-1$
+			String indexPath = ":0:" + file.getRelativePath().toPortableString(); //$NON-NLS-1$
 
 			if (file.status == ChangedFile.Status.NEW)
 			{
@@ -582,7 +606,7 @@ public class GitIndex
 			}
 
 			IStatus result = repository.execute(GitRepository.ReadWrite.READ, "diff-index", parameter, "--cached", //$NON-NLS-1$ //$NON-NLS-2$
-					GitRepository.HEAD, "--", file.portablePath); //$NON-NLS-1$
+					GitRepository.HEAD, "--", file.getRelativePath().toPortableString()); //$NON-NLS-1$
 			if (result == null || !result.isOK())
 			{
 				return null;
@@ -595,8 +619,9 @@ public class GitIndex
 		{
 			try
 			{
-				return IOUtil.read(new FileInputStream(workingDirectory().append(file.portablePath).toFile()),
-						IOUtil.UTF_8); // $codepro.audit.disable
+				return IOUtil.read(
+						new FileInputStream(workingDirectory().append(file.getRelativePath().toPortableString())
+								.toFile()), IOUtil.UTF_8); // $codepro.audit.disable
 				// closeWhereCreated
 			}
 			catch (FileNotFoundException e)
@@ -606,13 +631,14 @@ public class GitIndex
 		}
 
 		IStatus result = repository.execute(GitRepository.ReadWrite.READ,
-				"diff-files", parameter, "--", file.portablePath); //$NON-NLS-1$ //$NON-NLS-2$
+				"diff-files", parameter, "--", file.getRelativePath().toPortableString()); //$NON-NLS-1$ //$NON-NLS-2$
 		return result.getMessage();
 	}
 
 	public boolean hasBinaryAttributes(ChangedFile file)
 	{
-		IStatus result = repository.execute(GitRepository.ReadWrite.READ, "check-attr", "binary", file.getPath()); //$NON-NLS-1$ //$NON-NLS-2$
+		IStatus result = repository.execute(GitRepository.ReadWrite.READ,
+				"check-attr", "binary", file.getRelativePath().toPortableString()); //$NON-NLS-1$ //$NON-NLS-2$
 		String output = result.getMessage();
 		output = output.trim();
 		if (output.endsWith("binary: set")) //$NON-NLS-1$
@@ -625,12 +651,16 @@ public class GitIndex
 		}
 		if (output.endsWith("binary: unspecified")) //$NON-NLS-1$
 		{
-			// try common filename-extensions
-			for (String extension : BINARY_EXTENSIONS)
+			String fileExtension = file.getRelativePath().getFileExtension();
+			if (fileExtension != null)
 			{
-				if (file.getPath().endsWith(extension))
+				// try common filename-extensions
+				for (String extension : BINARY_EXTENSIONS)
 				{
-					return true;
+					if (fileExtension.equalsIgnoreCase(extension))
+					{
+						return true;
+					}
 				}
 			}
 		}
@@ -650,12 +680,12 @@ public class GitIndex
 		{
 			return false;
 		}
-
+		// FIXME Can we sort the changed files by path or something to help speed up this lookup?
 		IPath workingDirectory = repository.workingDirectory();
 		IPath resourcePath = resource.getLocation();
 		for (ChangedFile changedFile : changedFiles)
 		{
-			IPath fullPath = workingDirectory.append(changedFile.getPath()).makeAbsolute();
+			IPath fullPath = workingDirectory.append(changedFile.getRelativePath()).makeAbsolute();
 			if (resourcePath.isPrefixOf(fullPath))
 			{
 				return true;
@@ -708,7 +738,7 @@ public class GitIndex
 	IFile getResourceForChangedFile(ChangedFile changedFile)
 	{
 		return ResourcesPlugin.getWorkspace().getRoot()
-				.getFileForLocation(workingDirectory().append(changedFile.getPath()));
+				.getFileForLocation(workingDirectory().append(changedFile.getRelativePath()));
 	}
 
 	protected ChangedFile getChangedFileForResource(IResource resource)
@@ -720,11 +750,12 @@ public class GitIndex
 
 		IPath resourcePath = resource.getLocation();
 		List<ChangedFile> changedFiles = changedFiles();
+		// FIXME Doing searches like this every time
 		if (!CollectionsUtil.isEmpty(changedFiles))
 		{
 			for (ChangedFile changedFile : changedFiles)
 			{
-				IPath fullPath = workingDirectory().append(changedFile.getPath());
+				IPath fullPath = workingDirectory().append(changedFile.getRelativePath());
 				if (resourcePath.equals(fullPath))
 				{
 					return changedFile;
@@ -763,7 +794,7 @@ public class GitIndex
 		IPath workingDirectory = repository.workingDirectory();
 		for (ChangedFile changedFile : changedFiles)
 		{
-			IPath fullPath = workingDirectory.append(changedFile.getPath()).makeAbsolute();
+			IPath fullPath = workingDirectory.append(changedFile.getRelativePath()).makeAbsolute();
 			if (resourcePath.isPrefixOf(fullPath))
 			{
 				filtered.add(changedFile);
@@ -788,7 +819,7 @@ public class GitIndex
 		}
 	}
 
-	private abstract static class FilesRefreshJob implements Callable<IStatus>
+	private abstract class FilesRefreshJob implements Callable<Map<IPath, ChangedFile>>
 	{
 
 		protected GitRepository repo;
@@ -824,164 +855,92 @@ public class GitIndex
 			return StringUtil.tokenize(string, NULL_DELIMITER);
 		}
 
-		protected Map<String, List<String>> dictionaryForLines(List<String> lines)
+		protected Map<IPath, List<String>> dictionaryForLines(List<String> lines)
 		{
-			Map<String, List<String>> dictionary = new HashMap<String, List<String>>(lines.size() / 2);
+			Map<IPath, List<String>> dictionary = new HashMap<IPath, List<String>>(lines.size() / 2);
 
 			// Fill the dictionary with the new information. These lines are in the form of:
 			// :00000 :0644 OTHER INDEX INFORMATION
 			// Filename
-			Assert.isTrue(lines.size() % 2 == 0, "Lines must have an even number of lines: " + lines); //$NON-NLS-1$
+			Assert.isTrue(lines.size() % 2 == 0, "Must have an even number of lines: " + lines); //$NON-NLS-1$
 			Iterator<String> iter = lines.iterator();
 			while (iter.hasNext())
 			{
 				String fileStatus = iter.next();
 				String fileName = iter.next();
-				dictionary.put(fileName, StringUtil.tokenize(fileStatus, " ")); //$NON-NLS-1$
+				dictionary.put(Path.fromPortableString(fileName), StringUtil.tokenize(fileStatus, " ")); //$NON-NLS-1$
 			}
 
 			return dictionary;
 		}
 
-		protected void addFilesFromDictionary(Map<String, List<String>> dictionary, boolean staged, boolean tracked)
+		protected Map<IPath, ChangedFile> addFilesFromDictionary(final Map<IPath, List<String>> dictionary,
+				final boolean staged, final boolean tracked)
 		{
-			if (index.files == null)
-			{
-				return;
-			}
-			// Iterate over all existing files
-			synchronized (index.files)
-			{
-				for (ChangedFile file : index.files)
-				{
-					synchronized (dictionary)
-					{
-						List<String> fileStatus = dictionary.get(file.portablePath);
-						// Object found, this is still a cached / uncached thing
-						if (fileStatus != null)
-						{
-							if (tracked)
-							{
-								String mode = fileStatus.get(0).substring(1);
-								String sha = fileStatus.get(2);
-								file.commitBlobSHA = sha;
-								file.commitBlobMode = mode;
-
-								if (staged)
-								{
-									file.hasStagedChanges = true;
-								}
-								else
-								{
-									file.hasUnstagedChanges = true;
-								}
-								if (fileStatus.get(4).equals(DELETED_STATUS))
-								{
-									file.status = ChangedFile.Status.DELETED;
-								}
-								else if (fileStatus.get(4).equals(UNMERGED_STATUS))
-								{
-									file.status = ChangedFile.Status.UNMERGED;
-								}
-							}
-							else
-							{
-								// Untracked file, set status to NEW, only unstaged changes
-								file.hasStagedChanges = false;
-								file.hasUnstagedChanges = true;
-								file.status = ChangedFile.Status.NEW;
-							}
-
-							// We handled this file, remove it from the dictionary
-							dictionary.remove(file.portablePath);
-						}
-						else
-						{
-							// Object not found in the dictionary, so let's reset its appropriate
-							// change (stage or untracked) if necessary.
-
-							// Staged dictionary, so file does not have staged changes
-							if (staged)
-							{
-								file.hasStagedChanges = false;
-							}
-							// Tracked file does not have unstaged changes, file is not new,
-							// so we can set it to No. (If it would be new, it would not
-							// be in this dictionary, but in the "other dictionary").
-							else if (tracked && file.status != ChangedFile.Status.NEW)
-							{
-								file.hasUnstagedChanges = false;
-							}
-							// Unstaged, untracked dictionary ("Other" files), and file
-							// is indicated as new (which would be untracked), so let's
-							// remove it
-							else if (!tracked && file.status == ChangedFile.Status.NEW)
-							{
-								file.hasUnstagedChanges = false;
-							}
-						}
-					}
-				}
-			}
 			// Do new files only if necessary
-			if (dictionary.isEmpty())
+			if (dictionary == null || dictionary.isEmpty())
 			{
-				return;
+				return Collections.emptyMap();
 			}
 
 			// All entries left in the dictionary haven't been accounted for
 			// above, so we need to add them to the "files" array
-			synchronized (dictionary)
+			Map<IPath, ChangedFile> result = new HashMap<IPath, ChangedFile>(dictionary.size());
+			for (Map.Entry<IPath, List<String>> entry : dictionary.entrySet())
 			{
-				for (String path : dictionary.keySet())
+				IPath path = entry.getKey();
+				// try a simple check for a sane path here
+				if (path.isAbsolute())
 				{
-					List<String> fileStatus = dictionary.get(path);
-
-					ChangedFile.Status status = ChangedFile.Status.MODIFIED;
-					if (fileStatus.get(4).equals(DELETED_STATUS))
-					{
-						status = ChangedFile.Status.DELETED;
-					}
-					else if (fileStatus.get(4).equals(UNMERGED_STATUS))
-					{
-						status = ChangedFile.Status.UNMERGED;
-					}
-					else if (fileStatus.get(0).equals(":000000")) //$NON-NLS-1$
-					{
-						status = ChangedFile.Status.NEW;
-					}
-					else
-					{
-						status = ChangedFile.Status.MODIFIED;
-					}
-
-					ChangedFile file = new ChangedFile(path, status);
-					if (tracked)
-					{
-						file.commitBlobMode = fileStatus.get(0).substring(1);
-						file.commitBlobSHA = fileStatus.get(2);
-					}
-
-					file.hasStagedChanges = staged;
-					file.hasUnstagedChanges = !staged;
-					synchronized (index.files)
-					{
-						index.files.add(file);
-					}
+					IdeLog.logWarning(
+							GitPlugin.getDefault(),
+							MessageFormat
+									.format("Found an entry for an absoolute path ({0}), won't add to our changed file listing for repo at {1}",
+											path.toOSString(), workingDirectory().toOSString()));
+					continue;
 				}
-			}
-		}
 
+				List<String> fileStatus = entry.getValue();
+
+				ChangedFile.Status status = ChangedFile.Status.MODIFIED;
+				if (fileStatus.get(4).equals(DELETED_STATUS))
+				{
+					status = ChangedFile.Status.DELETED;
+				}
+				else if (fileStatus.get(4).equals(UNMERGED_STATUS))
+				{
+					status = ChangedFile.Status.UNMERGED;
+				}
+				else if (fileStatus.get(0).equals(":000000")) //$NON-NLS-1$
+				{
+					status = ChangedFile.Status.NEW;
+				}
+				else
+				{
+					status = ChangedFile.Status.MODIFIED;
+				}
+
+				String mode = null;
+				String sha = null;
+				if (tracked)
+				{
+					mode = fileStatus.get(0).substring(1);
+					sha = fileStatus.get(2);
+				}
+				result.put(path, new ChangedFile(repository, path, status, mode, sha, staged, !staged));
+			}
+			return result;
+		}
 	}
 
-	private static final class StagedFilesRefreshJob extends FilesRefreshJob
+	private final class StagedFilesRefreshJob extends FilesRefreshJob
 	{
 		private StagedFilesRefreshJob(GitIndex index, Set<String> filePaths)
 		{
 			super(index, filePaths);
 		}
 
-		public IStatus call() throws Exception
+		public Map<IPath, ChangedFile> call() throws Exception
 		{
 			// HEAD vs filesystem
 			List<String> args = CollectionsUtil.newList("diff-index", "--cached", //$NON-NLS-1$ //$NON-NLS-2$
@@ -995,27 +954,35 @@ public class GitIndex
 			IStatus result = repo.execute(GitRepository.ReadWrite.READ, args.toArray(new String[args.size()]));
 			if (result != null && result.isOK())
 			{
-				readStagedFiles(result.getMessage());
+				return readStagedFiles(result.getMessage());
 			}
-			return Status.OK_STATUS;
+			// We can get an error if this is a brand new repo with no commits (or staged changes)
+			if (result != null
+					&& result.getCode() == 128
+					&& result.getMessage().startsWith(
+							"fatal: ambiguous argument 'HEAD': unknown revision or path not in the working tree"))
+			{
+				return Collections.emptyMap();
+			}
+			throw new CoreException(result);
 		}
 
-		private void readStagedFiles(String string)
+		private Map<IPath, ChangedFile> readStagedFiles(String string)
 		{
 			List<String> lines = linesFromNotification(string);
-			Map<String, List<String>> dic = dictionaryForLines(lines);
-			addFilesFromDictionary(dic, true, true);
+			Map<IPath, List<String>> dic = dictionaryForLines(lines);
+			return addFilesFromDictionary(dic, true, true);
 		}
 	}
 
-	private static final class UnstagedFilesRefreshJob extends FilesRefreshJob
+	private final class UnstagedFilesRefreshJob extends FilesRefreshJob
 	{
 		private UnstagedFilesRefreshJob(GitIndex index, Set<String> filePaths)
 		{
 			super(index, filePaths);
 		}
 
-		public IStatus call() throws Exception
+		public Map<IPath, ChangedFile> call() throws Exception
 		{
 			// index vs filesystem
 			List<String> args = CollectionsUtil.newList("diff-files", "-z"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1028,20 +995,20 @@ public class GitIndex
 			IStatus result = repo.execute(GitRepository.ReadWrite.READ, args.toArray(new String[args.size()]));
 			if (result != null && result.isOK())
 			{
-				readUnstagedFiles(result.getMessage());
+				return readUnstagedFiles(result.getMessage());
 			}
-			return Status.OK_STATUS;
+			throw new CoreException(result);
 		}
 
-		private void readUnstagedFiles(String string)
+		private Map<IPath, ChangedFile> readUnstagedFiles(String string)
 		{
 			List<String> lines = linesFromNotification(string);
-			Map<String, List<String>> dic = dictionaryForLines(lines);
-			addFilesFromDictionary(dic, false, true);
+			Map<IPath, List<String>> dic = dictionaryForLines(lines);
+			return addFilesFromDictionary(dic, false, true);
 		}
 	}
 
-	private static final class UntrackedFilesRefreshJob extends FilesRefreshJob
+	private final class UntrackedFilesRefreshJob extends FilesRefreshJob
 	{
 
 		private UntrackedFilesRefreshJob(GitIndex index, Set<String> filePaths)
@@ -1049,7 +1016,7 @@ public class GitIndex
 			super(index, filePaths);
 		}
 
-		public IStatus call() throws Exception
+		public Map<IPath, ChangedFile> call() throws Exception
 		{
 			// index vs working tree (HEAD?)
 			List<String> args = CollectionsUtil.newList("ls-files", "--others", //$NON-NLS-1$ //$NON-NLS-2$
@@ -1063,15 +1030,15 @@ public class GitIndex
 			IStatus result = repo.execute(GitRepository.ReadWrite.READ, args.toArray(new String[args.size()]));
 			if (result != null && result.isOK())
 			{
-				readOtherFiles(result.getMessage());
+				return readOtherFiles(result.getMessage());
 			}
-			return Status.OK_STATUS;
+			throw new CoreException(result);
 		}
 
-		private void readOtherFiles(String string)
+		private Map<IPath, ChangedFile> readOtherFiles(String string)
 		{
 			List<String> lines = linesFromNotification(string);
-			Map<String, List<String>> dictionary = new HashMap<String, List<String>>(lines.size());
+			Map<IPath, List<String>> dictionary = new HashMap<IPath, List<String>>(lines.size());
 			// Other files are untracked, so we don't have any real index information. Instead, we can just fake it.
 			// The line below is not used at all, as for these files the commitBlob isn't set
 			List<String> fileStatus = CollectionsUtil.newList(":000000", // for new file //$NON-NLS-1$
@@ -1086,10 +1053,10 @@ public class GitIndex
 				{
 					continue;
 				}
-				dictionary.put(path, fileStatus);
+				dictionary.put(Path.fromPortableString(path), fileStatus);
 			}
 
-			addFilesFromDictionary(dictionary, false, false);
+			return addFilesFromDictionary(dictionary, false, false);
 		}
 	}
 

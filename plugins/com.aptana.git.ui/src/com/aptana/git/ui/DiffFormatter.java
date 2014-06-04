@@ -14,6 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 
@@ -165,16 +166,16 @@ public abstract class DiffFormatter
 	 * @param diffs
 	 * @return
 	 */
-	public static String toHTML(Map<String, String> diffs)
+	public static String toHTML(Map<IPath, String> diffs)
 	{
 		if (diffs == null)
 		{
 			return StringUtil.EMPTY;
 		}
 		StringBuilder combined = new StringBuilder();
-		for (Map.Entry<String, String> diffMap : diffs.entrySet())
+		for (Map.Entry<IPath, String> diffMap : diffs.entrySet())
 		{
-			combined.append(convertDiff(diffMap.getKey(), diffMap.getValue())).append('\n');
+			combined.append(convertDiff(diffMap.getKey().toOSString(), diffMap.getValue())).append('\n');
 		}
 		return injectIntoTemplate(combined.toString());
 	}

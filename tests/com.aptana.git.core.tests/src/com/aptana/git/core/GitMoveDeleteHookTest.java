@@ -104,13 +104,14 @@ public class GitMoveDeleteHookTest
 				oneOf(file).getProject();
 
 				oneOf(repo).getChangedFileForResource(file);
-				ChangedFile changedFile = new ChangedFile("fake_path.txt", ChangedFile.Status.MODIFIED);
+				ChangedFile changedFile = new ChangedFile(null, Path.fromPortableString("fake_path.txt"),
+						ChangedFile.Status.MODIFIED, null, null, false, false);
 				will(returnValue(changedFile));
 
 				// keep history
 				oneOf(tree).addToLocalHistory(file);
 
-				oneOf(repo).deleteFile(changedFile.getPath());
+				oneOf(repo).deleteFile(changedFile.getRelativePath());
 				will(returnValue(org.eclipse.core.runtime.Status.OK_STATUS));
 				// repo says we deleted ok, so we should mark that on the tree
 				oneOf(tree).deletedFile(file);
@@ -133,7 +134,8 @@ public class GitMoveDeleteHookTest
 				oneOf(file).getProject();
 
 				oneOf(repo).getChangedFileForResource(file);
-				ChangedFile changedFile = new ChangedFile("fake_path.txt", ChangedFile.Status.NEW);
+				ChangedFile changedFile = new ChangedFile(null, Path.fromPortableString("fake_path.txt"),
+						ChangedFile.Status.NEW, null, null, false, false);
 				will(returnValue(changedFile));
 			}
 		});
@@ -178,10 +180,11 @@ public class GitMoveDeleteHookTest
 				oneOf(file).getProject();
 
 				oneOf(repo).getChangedFileForResource(file);
-				ChangedFile changedFile = new ChangedFile("fake_path.txt", ChangedFile.Status.MODIFIED);
+				ChangedFile changedFile = new ChangedFile(null, Path.fromPortableString("fake_path.txt"),
+						ChangedFile.Status.MODIFIED, null, null, false, false);
 				will(returnValue(changedFile));
 
-				oneOf(repo).deleteFile(changedFile.getPath());
+				oneOf(repo).deleteFile(changedFile.getRelativePath());
 				IStatus status = org.eclipse.core.runtime.Status.CANCEL_STATUS;
 				will(returnValue(status));
 				// repo says we deleted ok, so we should mark that on the tree
