@@ -440,7 +440,7 @@
 		// @formatter:on
 :};
 
-%terminals FUNCTION, IDENTIFIER, STRING, NUMBER, NULL, TRUE, FALSE, REGEX;
+%terminals FUNCTION, IDENTIFIER, STRING, NUMBER, NULL, TRUE, FALSE, REGEX, GET, SET;
 %terminals LCURLY, RCURLY, LPAREN, RPAREN, LBRACKET, RBRACKET, COMMA, COLON, SEMICOLON, EQUAL, DOT, QUESTION;
 %terminals IF, ELSE, DO, WHILE, FOR, IN, CONTINUE, BREAK, RETURN, WITH, SWITCH, CASE, DEFAULT, THROW, TRY, CATCH, FINALLY;
 %terminals VAR, THIS, NEW, DELETE, PLUS_PLUS, MINUS_MINUS, PLUS, MINUS, EXCLAMATION, TILDE, TYPEOF, VOID, AMPERSAND, CARET, PIPE, AMPERSAND_AMPERSAND, PIPE_PIPE;
@@ -448,14 +448,14 @@
 %terminals LESS, GREATER, LESS_EQUAL, GREATER_EQUAL, INSTANCEOF, IN, EQUAL_EQUAL, EXCLAMATION_EQUAL, EQUAL_EQUAL_EQUAL, EXCLAMATION_EQUAL_EQUAL;
 %terminals EQUAL, STAR_EQUAL, FORWARD_SLASH_EQUAL, PERCENT_EQUAL, PLUS_EQUAL, MINUS_EQUAL, LESS_LESS_EQUAL, GREATER_GREATER_EQUAL, GREATER_GREATER_GREATER_EQUAL, AMPERSAND_EQUAL, CARET_EQUAL, PIPE_EQUAL;
 %terminals DEBUGGER, CLASS, ENUM, EXPORT, EXTENDS, IMPORT, SUPER, IMPLEMENTS, INTERFACE, LET, PACKAGE, PRIVATE, PROTECTED, PUBLIC, STATIC, YIELD;
-	
+
 %typeof AssignmentExpression, AssignmentExpression_NoIn, LeftHandSideExpression, LeftHandSideExpression_NoLBF, UnaryExpression = "JSNode";
 %typeof AdditiveExpression, AdditiveExpression_NoLBF, MultiplicativeExpression, MultiplicativeExpression_NoLBF, RelationalExpression, RelationalExpression_NoIn, RelationalExpression_NoLBF = "JSNode";
 %typeof ShiftExpression, ShiftExpression_NoLBF, EqualityExpression, EqualityExpression_NoIn, EqualityExpression_NoLBF = "JSNode";
 %typeof LogicalAndExpression, LogicalAndExpression_NoIn, LogicalAndExpression_NoLBF, LogicalOrExpression, LogicalOrExpression_NoIn, LogicalOrExpression_NoLBF = "JSNode";
 %typeof BitwiseOrExpression, BitwiseOrExpression_NoIn, BitwiseOrExpression_NoLBF, BitwiseXorExpression, BitwiseXorExpression_NoIn, BitwiseXorExpression_NoLBF, BitwiseAndExpression, BitwiseAndExpression_NoIn, BitwiseAndExpression_NoLBF = "JSNode";
 %typeof MemberExpression, MemberExpression_NoLBF, NewExpression, CallExpression, CallExpression_NoLBF, Expression, Expression_NoIn, Expression_NoLBF, Statement, Statement_NoIf, Arguments, Block, Catch, Finally = "JSNode";
-%typeof VariableDeclaration, VariableDeclaration_NoIn, PropertyName, PropertyNameAndValue, Elision, ElementList, FormalParameterList, FunctionParameters, FunctionBody, SourceElement = "JSNode";
+%typeof VariableDeclaration, VariableDeclaration_NoIn, PropertyName, PropertyAssignment, Elision, ElementList, FormalParameterList, FunctionParameters, FunctionBody, SourceElement = "JSNode";
 %typeof CaseClause, DefaultClause = "JSNode";
 
 %goal Program;
@@ -492,6 +492,8 @@ FunctionDeclaration
 
 Identifier
 	=	IDENTIFIER
+	|	GET
+	|	SET
 	;
 
 IdentifierName
@@ -1190,16 +1192,27 @@ ObjectLiteral
 	;
 
 PropertyNameAndValueList
-	=	PropertyNameAndValue
-	|	PropertyNameAndValueList COMMA PropertyNameAndValue
+	=	PropertyAssignment
+	|	PropertyNameAndValueList COMMA PropertyAssignment
 	;
 
-PropertyNameAndValue
+PropertyAssignment
 	=	PropertyName.n COLON.c AssignmentExpression.v
 		{:
 			return new JSNameValuePairNode(n, c, v);
 		:}
-	;
+	|	GET PropertyName.n LPAREN RPAREN FunctionBody.body
+		{:
+			return new JSNameValuePairNode(n, body);
+		:}
+	|	SET PropertyName.n LPAREN PropertySetParameterList.p RPAREN FunctionBody.body
+		{:
+			JSIdentifierNode ident = new JSIdentifierNode(p);
+			JSParametersNode params = new JSParametersNode(ident);
+			params.setLocation(ident.getStartingOffset(), ident.getEndingOffset());
+			return new JSNameValuePairNode(n, params, body);
+		:}
+	;	
 
 PropertyName
 	=	IdentifierName.i
@@ -1214,6 +1227,10 @@ PropertyName
 		{:
 			return new JSNumberNode(n);
 		:}
+	;
+
+PropertySetParameterList
+	=	Identifier
 	;
 
 MemberExpression

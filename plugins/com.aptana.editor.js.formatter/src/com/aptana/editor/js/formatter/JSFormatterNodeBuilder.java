@@ -745,20 +745,58 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		@Override
 		public void visit(JSNameValuePairNode node)
 		{
-			IParseNode name = node.getName();
-			// Create a formatter name-value node, but note that this node only holds the 'name' part for the
-			// formatting. The rest is handled in the same line.
-			FormatterJSNameValuePairNode nameValuePairNode = new FormatterJSNameValuePairNode(document, node,
-					hasAnyCommentBefore(node.getStartingOffset()));
-			nameValuePairNode.setBegin(createTextNode(document, name.getStartingOffset(), name.getEndingOffset() + 1));
-			push(nameValuePairNode);
-			checkedPop(nameValuePairNode, -1);
-			// Push the 'colon'
 			Symbol colon = node.getColon();
-			pushTypeOperator(TypeOperator.KEY_VALUE_COLON, colon.getStart(), false);
-			// Push the 'value'
-			JSNode value = (JSNode) node.getValue();
-			value.accept(this);
+			if (colon != null)
+			{
+				IParseNode name = node.getName();
+				// Create a formatter name-value node, but note that this node only holds the 'name' part for the
+				// formatting. The rest is handled in the same line.
+				FormatterJSNameValuePairNode nameValuePairNode = new FormatterJSNameValuePairNode(document, node,
+						hasAnyCommentBefore(node.getStartingOffset()));
+				nameValuePairNode.setBegin(createTextNode(document, name.getStartingOffset(),
+						name.getEndingOffset() + 1));
+				push(nameValuePairNode);
+				checkedPop(nameValuePairNode, -1);
+
+				pushTypeOperator(TypeOperator.KEY_VALUE_COLON, colon.getStart(), false);
+
+				// Push the 'value'
+				JSNode value = (JSNode) node.getValue();
+				value.accept(this);
+			}
+			else
+			{
+				// get or set
+				// First, push the 'get' or 'set' declaration part
+				int startingOffset = node.getStartingOffset();
+				int declarationEnd = startingOffset + 3;
+				FormatterJSDeclarationNode declarationNode = new FormatterJSDeclarationNode(document, true, node,
+						hasAnyCommentBefore(startingOffset));
+				declarationNode.setBegin(createTextNode(document, startingOffset, declarationEnd));
+				push(declarationNode);
+				checkedPop(declarationNode, -1);
+
+				// Push the property name
+				JSNode functionName = (JSNode) node.getName();
+				visitTextNode(functionName, true, 1);
+				declarationEnd = functionName.getEnd() + 1;
+
+				// Push the function body
+				JSNode body = (JSNode) node.getValue();
+				FormatterJSFunctionBodyNode bodyNode = new FormatterJSFunctionBodyNode(document,
+						FormatterJSDeclarationNode.isPartOfExpression(node.getParent()),
+						hasAnyCommentBefore(body.getStartingOffset()));
+				bodyNode.setBegin(createTextNode(document, body.getStartingOffset(), body.getStartingOffset() + 1));
+				push(bodyNode);
+				visitChildren(body);
+				checkedPop(bodyNode, body.getEndingOffset());
+				int end = body.getEndingOffset() + 1;
+				bodyNode.setEnd(createTextNode(document, body.getEndingOffset(), end));
+				if (node.getSemicolonIncluded())
+				{
+					findAndPushPunctuationNode(TypePunctuation.SEMICOLON, node.getEnd(), false, true);
+				}
+			}
 		}
 
 		/*

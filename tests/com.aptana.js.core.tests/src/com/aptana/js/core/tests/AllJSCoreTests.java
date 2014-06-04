@@ -14,7 +14,7 @@ import org.junit.runners.Suite.SuiteClasses;
 import com.aptana.js.core.build.CoreBuildTests;
 import com.aptana.js.core.index.JSIndexQueryHelperTest;
 import com.aptana.js.core.inferencing.CoreInferencingTests;
-import com.aptana.js.core.model.ReturnTypeElementTest;
+import com.aptana.js.core.model.CoreModelTests;
 import com.aptana.js.core.parsing.CoreParsingTests;
 import com.aptana.js.internal.core.build.InternalCoreBuildTests;
 import com.aptana.js.internal.core.index.InternalCoreIndexTests;
@@ -26,7 +26,7 @@ import com.aptana.js.internal.core.parsing.sdoc.InternalCoreParsingSDocTests;
 @RunWith(Suite.class)
 @SuiteClasses({ CoreBuildTests.class, JSIndexQueryHelperTest.class, CoreInferencingTests.class, CoreParsingTests.class,
 		InternalCoreBuildTests.class, InternalCoreIndexTests.class, InternalCoreInferencingTests.class,
-		InternalCoreParsingTests.class, InternalCoreParsingSDocTests.class, ReturnTypeElementTest.class,
+		InternalCoreParsingTests.class, InternalCoreParsingSDocTests.class, CoreModelTests.class,
 		NodePackageManagerTest.class })
 public class AllJSCoreTests
 {

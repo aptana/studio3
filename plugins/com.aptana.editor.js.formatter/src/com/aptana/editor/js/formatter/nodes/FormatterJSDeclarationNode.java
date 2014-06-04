@@ -64,6 +64,12 @@ public class FormatterJSDeclarationNode extends FormatterBlockWithBeginNode
 		{
 			return false;
 		}
+		switch (node.getNodeType())
+		{
+			case IJSNodeTypes.NAME_VALUE_PAIR:
+				return node.getParent().getChild(0) == node
+						|| getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_NAME_VALUE_PAIRS);
+		}
 		if (isPartOfExpression(node))
 		{
 			return false;

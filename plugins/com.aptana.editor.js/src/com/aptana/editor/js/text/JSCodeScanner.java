@@ -169,6 +169,8 @@ public class JSCodeScanner extends AbstractFlexTokenScanner
 			case Terminals.NEW:
 			case Terminals.TYPEOF:
 			case Terminals.WITH:
+			case Terminals.GET:
+			case Terminals.SET:
 				return KEYWORD_OPERATOR_TOKEN;
 
 			case Terminals.FUNCTION:

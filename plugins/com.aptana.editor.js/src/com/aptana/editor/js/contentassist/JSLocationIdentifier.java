@@ -996,18 +996,32 @@ public class JSLocationIdentifier extends JSTreeWalker
 		{
 			Symbol colon = node.getColon();
 			IParseNode value = node.getValue();
-
-			if (this._offset < colon.getStart())
+			if (colon != null)
 			{
-				this.setType(LocationType.IN_OBJECT_LITERAL_PROPERTY);
+				if (this._offset < colon.getStart())
+				{
+					this.setType(LocationType.IN_OBJECT_LITERAL_PROPERTY);
+				}
+				else if (this._offset < value.getStartingOffset())
+				{
+					this.setType(LocationType.IN_GLOBAL);
+				}
+				else if (value.contains(this._offset))
+				{
+					this.setType(value);
+				}
 			}
-			else if (this._offset < value.getStartingOffset())
+			else
 			{
-				this.setType(LocationType.IN_GLOBAL);
-			}
-			else if (value.contains(this._offset))
-			{
-				this.setType(value);
+				// get / set
+				if (value.contains(this._offset))
+				{
+					this.setType(value);
+				}
+				else
+				{
+					this.setType(LocationType.NONE);
+				}
 			}
 		}
 	}
