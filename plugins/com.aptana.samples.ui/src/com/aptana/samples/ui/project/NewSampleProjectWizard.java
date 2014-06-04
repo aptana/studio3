@@ -344,21 +344,20 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 					IdeLog.logError(SamplesUIPlugin.getDefault(), e);
 				}
 
-				doPostProjectCreation(newProject);
-
 				// Stop tracking the git repo
-				DisconnectHandler.disconnect(newProject, null);
+				DisconnectHandler.disconnect(projectHandle, null);
 				// Delete the .gitignore file and the .git folder
-				File toDelete = new File(newProject.getLocation().toFile(), GitRepository.GITIGNORE);
+				File toDelete = new File(projectHandle.getLocation().toFile(), GitRepository.GITIGNORE);
 				if (toDelete.exists())
 				{
 					toDelete.delete();
 				}
-				toDelete = new File(newProject.getLocation().toFile(), GitRepository.GIT_DIR);
+				toDelete = new File(projectHandle.getLocation().toFile(), GitRepository.GIT_DIR);
 				if (toDelete.exists())
 				{
 					FileUtil.deleteRecursively(toDelete);
 				}
+				doPostProjectCreation(projectHandle);
 			}
 		});
 		job.schedule();
