@@ -104,6 +104,7 @@ import com.aptana.js.core.parsing.ast.JSVarNode;
 import com.aptana.js.core.parsing.ast.JSWhileNode;
 import com.aptana.js.core.parsing.ast.JSWithNode;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 
 /**
  * JS formatter node builder.<br>
@@ -1309,7 +1310,17 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		@Override
 		public void visit(JSStringNode node)
 		{
-			visitTextNode(node, true, 0);
+			// We have to handle directives properly! Directives are strings on one line as a full "statement"
+			// themselves. See http://dmitrysoshnikov.com/ecmascript/es5-chapter-2-strict-mode/
+			IParseNode parent = node.getParent();
+			if (parent instanceof JSStatementsNode || parent instanceof IParseRootNode)
+			{
+				visitTextNode(node.getStartingOffset(), node.getEndingOffset(), true, 0, 0, true);
+			}
+			else
+			{
+				visitTextNode(node, true, 0);
+			}
 		}
 
 		/*
