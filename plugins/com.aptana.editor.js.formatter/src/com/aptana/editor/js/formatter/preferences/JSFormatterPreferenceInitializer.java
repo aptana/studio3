@@ -117,7 +117,7 @@ public class JSFormatterPreferenceInitializer extends AbstractPreferenceInitiali
 		store.putInt(WRAP_COMMENTS_LENGTH, 80);
 		store.putBoolean(INDENT_BLOCKS, true);
 		store.putBoolean(INDENT_FUNCTION_BODY, true);
-		store.putBoolean(INDENT_SWITCH_BODY, true);
+		store.putBoolean(INDENT_SWITCH_BODY, false);
 		store.putBoolean(INDENT_CASE_BODY, true);
 		store.putBoolean(INDENT_GROUP_BODY, true);
 		store.putBoolean(NEW_LINES_BEFORE_CATCH_STATEMENT, false);
