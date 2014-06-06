@@ -79,21 +79,8 @@ public class FormatterJSIdentifierNode extends FormatterJSTextNode
 				public void accept(IFormatterContext context, IFormatterWriter visitor) throws Exception
 				{
 					visitor.ensureLineStarted(context);
-					visitor.writeIndent(context); // write the normal indent level
+					visitor.writeText(context, "    ", false); //$NON-NLS-1$
 					super.accept(context, visitor);
-				}
-
-				@Override
-				public boolean shouldConsumePreviousWhiteSpaces()
-				{
-					return true;
-				}
-
-				@Override
-				public int getSpacesCountBefore()
-				{
-					// Add an additional 4 spaces for "var " prefix from first var decl.
-					return 4;
 				}
 			};
 			begin = newBegin;
