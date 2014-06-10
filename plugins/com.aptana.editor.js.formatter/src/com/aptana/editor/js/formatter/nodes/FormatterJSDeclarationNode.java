@@ -8,11 +8,16 @@
 package com.aptana.editor.js.formatter.nodes;
 
 import com.aptana.editor.js.formatter.JSFormatterConstants;
+import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
+import com.aptana.formatter.IFormatterWriter;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
+import com.aptana.formatter.nodes.FormatterTextNode;
+import com.aptana.formatter.nodes.IFormatterTextNode;
 import com.aptana.js.core.parsing.ast.IJSNodeTypes;
 import com.aptana.js.core.parsing.ast.JSArgumentsNode;
 import com.aptana.js.core.parsing.ast.JSBinaryOperatorNode;
+import com.aptana.js.core.parsing.ast.JSVarNode;
 import com.aptana.parsing.ast.IParseNode;
 
 /**
@@ -46,6 +51,29 @@ public class FormatterJSDeclarationNode extends FormatterBlockWithBeginNode
 		this.hasCommentBefore = hasCommentBefore;
 	}
 
+	@Override
+	public void setBegin(IFormatterTextNode begin)
+	{
+		if (node.getNodeType() == IJSNodeTypes.DECLARATION && isMultipleVarDeclaration()
+				&& getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BETWEEN_VAR_DECLARATIONS))
+		{
+			// Hack the begin text node to increase indent!
+			IFormatterTextNode newBegin = new FormatterTextNode(begin.getDocument(), begin.getStartOffset(),
+					begin.getEndOffset())
+			{
+				@Override
+				public void accept(IFormatterContext context, IFormatterWriter visitor) throws Exception
+				{
+					visitor.ensureLineStarted(context);
+					visitor.writeText(context, "    ", false); //$NON-NLS-1$
+					super.accept(context, visitor);
+				}
+			};
+			begin = newBegin;
+		}
+		super.setBegin(begin);
+	}
+
 	/**
 	 * For a declaration, when this call returns true, a new line is added <b>before</b> the declaration.
 	 * 
@@ -69,6 +97,9 @@ public class FormatterJSDeclarationNode extends FormatterBlockWithBeginNode
 			case IJSNodeTypes.NAME_VALUE_PAIR:
 				return node.getParent().getChild(0) == node
 						|| getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_NAME_VALUE_PAIRS);
+			case IJSNodeTypes.DECLARATION:
+				return isMultipleVarDeclaration()
+						&& getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BETWEEN_VAR_DECLARATIONS);
 		}
 		if (isPartOfExpression(node))
 		{
@@ -86,6 +117,17 @@ public class FormatterJSDeclarationNode extends FormatterBlockWithBeginNode
 				return !isLoopOrExpressionNode(node.getParent());
 		}
 		return true;
+	}
+
+	/**
+	 * Determines if this is the child of a JSVarNode, but is not the first child. We have options to force multiple var
+	 * declarations to each be on a newline, with indentation matching.
+	 * 
+	 * @return
+	 */
+	protected boolean isMultipleVarDeclaration()
+	{
+		return node.getParent() instanceof JSVarNode && node.getParent().getChild(0) != node;
 	}
 
 	/**

@@ -32,6 +32,7 @@ import static com.aptana.editor.js.formatter.JSFormatterConstants.NEW_LINES_BEFO
 import static com.aptana.editor.js.formatter.JSFormatterConstants.NEW_LINES_BEFORE_FINALLY_STATEMENT;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.NEW_LINES_BEFORE_IF_IN_ELSEIF_STATEMENT;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.NEW_LINES_BEFORE_NAME_VALUE_PAIRS;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.NEW_LINES_BETWEEN_VAR_DECLARATIONS;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.PRESERVED_LINES;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_AFTER_ARITHMETIC_OPERATOR;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_AFTER_ASSIGNMENT_OPERATOR;
@@ -126,6 +127,7 @@ public class JSFormatterPreferenceInitializer extends AbstractPreferenceInitiali
 		store.putBoolean(NEW_LINES_BEFORE_IF_IN_ELSEIF_STATEMENT, false);
 		store.putBoolean(NEW_LINES_BEFORE_DO_WHILE_STATEMENT, false);
 		store.putBoolean(NEW_LINES_BEFORE_NAME_VALUE_PAIRS, true);
+		store.putBoolean(NEW_LINES_BETWEEN_VAR_DECLARATIONS, true);
 		store.putInt(LINES_AFTER_FUNCTION_DECLARATION, 1);
 		store.putInt(LINES_AFTER_FUNCTION_DECLARATION_IN_EXPRESSION, 0);
 		store.putInt(PRESERVED_LINES, 1);

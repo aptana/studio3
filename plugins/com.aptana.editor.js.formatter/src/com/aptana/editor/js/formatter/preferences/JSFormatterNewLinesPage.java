@@ -63,6 +63,8 @@ public class JSFormatterNewLinesPage extends FormatterModifyTabPage
 				Messages.JSFormatterNewLinesPage_newLineBeforeWhileInDo);
 		manager.createCheckbox(group, JSFormatterConstants.NEW_LINES_BEFORE_NAME_VALUE_PAIRS,
 				Messages.JSFormatterNewLinesPage_newLineBeforeNameValuePairs);
+		manager.createCheckbox(group, JSFormatterConstants.NEW_LINES_BETWEEN_VAR_DECLARATIONS,
+				Messages.JSFormatterNewLinesPage_newLineBetweenVarDeclarations);
 	}
 
 	/*

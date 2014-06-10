@@ -7,7 +7,12 @@
  */
 package com.aptana.editor.js.formatter.nodes;
 
+import com.aptana.editor.js.formatter.JSFormatterConstants;
+import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
+import com.aptana.formatter.IFormatterWriter;
+import com.aptana.formatter.nodes.FormatterTextNode;
+import com.aptana.formatter.nodes.IFormatterTextNode;
 import com.aptana.js.core.parsing.ast.IJSNodeTypes;
 import com.aptana.js.core.parsing.ast.JSNode;
 import com.aptana.parsing.ast.IParseNode;
@@ -33,6 +38,92 @@ public class FormatterJSIdentifierNode extends FormatterJSTextNode
 		this.node = node;
 	}
 
+	private boolean isMultipleAssignment()
+	{
+		IParseNode parent = node.getParent();
+		if (parent == null)
+		{
+			return false;
+		}
+		// If parent is assignmentNode and grandparent is JSCommaNode, then that is a match too, I think?
+		short parentType = parent.getNodeType();
+		if (parentType != IJSNodeTypes.ASSIGN)
+		{
+			return false;
+		}
+
+		// Now we need to walk up the tree. If at any point we're not the first child of the parent, then we're not
+		// the first decl.
+		IParseNode grandParent = parent.getParent();
+		while (grandParent != null && grandParent.getNodeType() == IJSNodeTypes.COMMA)
+		{
+			if (grandParent.getChild(0) != parent)
+			{
+				return true;
+			}
+			parent = grandParent;
+			grandParent = grandParent.getParent();
+		}
+
+		return false;
+	}
+
+	private boolean isMultipleVarDeclaration()
+	{
+		IParseNode parent = node.getParent();
+		if (parent == null)
+		{
+			return false;
+		}
+		if (parent.getNodeType() != IJSNodeTypes.DECLARATION)
+		{
+			return false;
+		}
+		IParseNode grandParent = parent.getParent();
+		if (grandParent == null)
+		{
+			return false;
+		}
+		if (grandParent.getNodeType() != IJSNodeTypes.VAR)
+		{
+			return false;
+		}
+		if (grandParent.getChild(0) == parent)
+		{
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public void setBegin(IFormatterTextNode begin)
+	{
+		if (getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BETWEEN_VAR_DECLARATIONS))
+		{
+			final boolean isMultipleDecl = isMultipleVarDeclaration();
+			if (isMultipleDecl || isMultipleAssignment())
+			{
+				// Hack the begin text node to increase indent!
+				IFormatterTextNode newBegin = new FormatterTextNode(begin.getDocument(), begin.getStartOffset(),
+						begin.getEndOffset())
+				{
+					@Override
+					public void accept(IFormatterContext context, IFormatterWriter visitor) throws Exception
+					{
+						visitor.ensureLineStarted(context);
+						if (isMultipleDecl)
+						{
+							visitor.writeText(context, "    ", false); //$NON-NLS-1$
+						}
+						super.accept(context, visitor);
+					}
+				};
+				begin = newBegin;
+			}
+		}
+		super.setBegin(begin);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingBeginNewLine()
@@ -41,6 +132,13 @@ public class FormatterJSIdentifierNode extends FormatterJSTextNode
 	protected boolean isAddingBeginNewLine()
 	{
 		if (!shouldConsumePreviousSpaces || isAddingBeginLine)
+		{
+			return true;
+		}
+		// If we're in a multiple var declaration, we're not the first var, user has asked for newlines between, and
+		// we're assigning a value, add a preceding newline.
+		if (getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BETWEEN_VAR_DECLARATIONS)
+				&& (isMultipleVarDeclaration() || isMultipleAssignment()))
 		{
 			return true;
 		}
