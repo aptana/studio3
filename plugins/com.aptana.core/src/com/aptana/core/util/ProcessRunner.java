@@ -264,7 +264,6 @@ public class ProcessRunner implements IProcessRunner
 			{
 				outFile = File.createTempFile("studio", ".out"); //$NON-NLS-1$ //$NON-NLS-2$
 				errFile = File.createTempFile("studio", ".err"); //$NON-NLS-1$ //$NON-NLS-2$
-				CollectionsUtil.addToList(arguments, ">", outFile.getAbsolutePath(), "2>", errFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
 				Process p;
 				if (isJava7)
 				{
@@ -272,6 +271,7 @@ public class ProcessRunner implements IProcessRunner
 				}
 				else
 				{
+					CollectionsUtil.addToList(arguments, ">", outFile.getAbsolutePath(), "2>", errFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
 					p = run(workingDirectory, environment, arguments.toArray(new String[arguments.size()]));
 				}
 				return processData(p, outFile, errFile);
