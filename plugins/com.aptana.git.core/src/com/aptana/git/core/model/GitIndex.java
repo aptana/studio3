@@ -73,8 +73,9 @@ public class GitIndex
 	 * File extensions we check against and use to assume if a file may be binary (to not show a diff/content in various
 	 * UI views)
 	 */
-	private static final String[] BINARY_EXTENSIONS = new String[] {
-			"pdf", "jpg", "jpeg", "png", "bmp", "gif", "o", "class", "zip", "gz", "tar", "ico", "so", "jar" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$ //$NON-NLS-12$ //$NON-NLS-13$ //$NON-NLS-14$
+	@SuppressWarnings("nls")
+	private static final String[] BINARY_EXTENSIONS = new String[] { "pdf", "jpg", "jpeg", "png", "bmp", "gif", "o",
+			"class", "zip", "gz", "tar", "ico", "so", "jar", "exe", "7z", "app", "apk", "ipa", "war" };
 
 	private GitRepository repository;
 
