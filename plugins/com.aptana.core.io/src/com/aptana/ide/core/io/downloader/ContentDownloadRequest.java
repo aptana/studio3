@@ -115,6 +115,10 @@ public class ContentDownloadRequest
 		}
 		catch (Throwable t)
 		{
+			if (monitor != null && monitor.isCanceled())
+			{
+				return Status.CANCEL_STATUS;
+			}
 			return new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID, t.getMessage(), t);
 		}
 		return status;
