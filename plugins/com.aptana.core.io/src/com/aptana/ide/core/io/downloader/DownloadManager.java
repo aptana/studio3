@@ -190,8 +190,9 @@ public class DownloadManager
 		{
 			if (subMonitor.isCanceled())
 			{
-				// TODO Append to multi status and return that?
-				return Status.CANCEL_STATUS;
+				multi.add(Status.CANCEL_STATUS);
+				// TODO Add cancel status for all the rest of the downloads?
+				return multi;
 			}
 
 			// FIXME If the request if for a file URI, we should cheat and not "download" anything. We should just
