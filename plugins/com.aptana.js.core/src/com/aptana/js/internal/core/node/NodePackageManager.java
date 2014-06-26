@@ -191,10 +191,10 @@ public class NodePackageManager implements INodePackageManager
 					sub.subTask("Global NPM prefix is " + prefix);
 					// If the sudo cache is timed out, then the password prompt and other details might appear in the
 					// console. So we should strip them off to get the real npm prefix value.
-					String passwordPrompt = StringUtil.makeFormLabel(Messages.NodePackageManager_PasswordPrompt);
-					if (prefix.contains(passwordPrompt))
+					if (prefix.contains(SudoManager.PROMPT_MSG))
 					{
-						prefix = prefix.substring(prefix.indexOf(passwordPrompt) + passwordPrompt.length());
+						prefix = prefix.substring(prefix.indexOf(SudoManager.PROMPT_MSG)
+								+ SudoManager.PROMPT_MSG.length());
 					}
 
 					// Set the global prefix path only if it is not the default value.
