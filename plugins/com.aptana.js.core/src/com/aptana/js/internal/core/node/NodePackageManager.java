@@ -47,6 +47,7 @@ import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.ProcessRunner;
 import com.aptana.core.util.ProcessStatus;
 import com.aptana.core.util.StringUtil;
+import com.aptana.core.util.SudoManager;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.core.node.INodeJS;
 import com.aptana.js.core.node.INodePackageManager;
@@ -190,10 +191,10 @@ public class NodePackageManager implements INodePackageManager
 					sub.subTask("Global NPM prefix is " + prefix);
 					// If the sudo cache is timed out, then the password prompt and other details might appear in the
 					// console. So we should strip them off to get the real npm prefix value.
-					String passwordPrompt = StringUtil.makeFormLabel(Messages.NodePackageManager_PasswordPrompt);
-					if (prefix.contains(passwordPrompt))
+					if (prefix.contains(SudoManager.PROMPT_MSG))
 					{
-						prefix = prefix.substring(prefix.indexOf(passwordPrompt) + passwordPrompt.length());
+						prefix = prefix.substring(prefix.indexOf(SudoManager.PROMPT_MSG)
+								+ SudoManager.PROMPT_MSG.length());
 					}
 
 					// Set the global prefix path only if it is not the default value.
@@ -287,10 +288,10 @@ public class NodePackageManager implements INodePackageManager
 		return runNpmConfig(args, password, true, workingDirectory, monitor);
 	}
 
-	private IStatus runNpmConfig(List<String> args, char[] password, boolean global, IPath workingDirectory,
+	protected IStatus runNpmConfig(List<String> args, char[] password, boolean global, IPath workingDirectory,
 			IProgressMonitor monitor) throws CoreException
 	{
-		List<String> sudoArgs = getNpmSudoArgs(global, password);
+		List<String> sudoArgs = getNpmArguments(global, password);
 		sudoArgs.addAll(args);
 		return getProcessRunner().run(workingDirectory, ShellExecutable.getEnvironment(workingDirectory), password,
 				sudoArgs, monitor);
@@ -535,7 +536,7 @@ public class NodePackageManager implements INodePackageManager
 				MessageFormat.format(Messages.NodePackageManager_InstallingTaskName, displayName), 100);
 		try
 		{
-			List<String> args = getNpmSudoArgs(global, password);
+			List<String> args = getNpmArguments(global, password);
 			CollectionsUtil.addToList(args, command, packageName, COLOR, FALSE);
 
 			Map<String, String> environment;
@@ -589,16 +590,14 @@ public class NodePackageManager implements INodePackageManager
 		}
 	}
 
-	private List<String> getNpmSudoArgs(boolean global, char[] sudoPassword) throws CoreException
+	private List<String> getNpmArguments(boolean global, char[] sudoPassword) throws CoreException
 	{
 		IPath npmPath = checkedNPMPath();
 		List<String> args = new ArrayList<String>(8);
 		if (global)
 		{
-			if (!PlatformUtil.isWindows())
-			{
-				args.addAll(getSudoArgs(sudoPassword));
-			}
+			SudoManager sudoMngr = new SudoManager();
+			args.addAll(sudoMngr.getArguments(sudoPassword));
 			args.add(nodeJS.getPath().toOSString());
 			args.add(npmPath.toOSString());
 			args.add(GLOBAL_ARG);
@@ -609,18 +608,6 @@ public class NodePackageManager implements INodePackageManager
 			args.add(npmPath.toOSString());
 		}
 		return args;
-	}
-
-	private List<String> getSudoArgs(char[] sudoPassword)
-	{
-		// FIXME Centralize this logic in a core SudoManager class?
-		if (sudoPassword == null || sudoPassword.length == 0)
-		{
-			// Force non-interactive mode so that if sudo decides we do need a password it exits with an error instead
-			// of hanging
-			return CollectionsUtil.newList("sudo", "-n", "--"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		}
-		return CollectionsUtil.newList("sudo", "-S", "--"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	public IStatus uninstall(String packageName, String displayName, boolean global, char[] password,
@@ -709,7 +696,7 @@ public class NodePackageManager implements INodePackageManager
 		List<String> args;
 		try
 		{
-			args = getNpmSudoArgs(runWithSudo, password);
+			args = getNpmArguments(runWithSudo, password);
 		}
 		catch (CoreException e)
 		{

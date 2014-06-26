@@ -40,6 +40,7 @@ import org.junit.runners.Suite;
 	StatusCollectorTest.class,
 	StreamUtilTest.class,
 	StringUtilTest.class,
+	SudoManagerTest.class,
 	TimeZoneUtilTest.class,
 	URLEncoderTest.class,
 	URLUtilTest.class,

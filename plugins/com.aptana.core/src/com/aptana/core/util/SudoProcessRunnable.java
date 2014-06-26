@@ -39,7 +39,6 @@ public class SudoProcessRunnable extends ProcessRunnable
 
 	public void run()
 	{
-
 		StringBuilder builder = new StringBuilder();
 		BufferedReader br = null;
 		try
