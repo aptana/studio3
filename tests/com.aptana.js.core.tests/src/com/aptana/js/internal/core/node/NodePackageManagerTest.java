@@ -171,7 +171,7 @@ public class NodePackageManagerTest
 						userHome,
 						ShellExecutable.getEnvironment(),
 						password,
-						CollectionsUtil.newList("sudo", "-p", "password", "-S", "--", "/usr/bin/node", "/usr/bin/npm",
+						CollectionsUtil.newList("sudo", "-p", "password:", "-S", "--", "/usr/bin/node", "/usr/bin/npm",
 								"cache", "clean"), monitor);
 				will(returnValue(Status.OK_STATUS));
 			}
