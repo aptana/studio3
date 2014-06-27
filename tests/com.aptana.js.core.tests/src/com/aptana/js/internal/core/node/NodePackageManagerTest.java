@@ -167,9 +167,12 @@ public class NodePackageManagerTest
 				will(returnValue(true));
 
 				// pass password in on stdin
-				oneOf(runner).run(userHome, ShellExecutable.getEnvironment(), password,
-						CollectionsUtil.newList("sudo", "-S", "--", "/usr/bin/node", "/usr/bin/npm", "cache", "clean"),
-						monitor);
+				oneOf(runner).run(
+						userHome,
+						ShellExecutable.getEnvironment(),
+						password,
+						CollectionsUtil.newList("sudo", "-p", "password", "-S", "--", "/usr/bin/node", "/usr/bin/npm",
+								"cache", "clean"), monitor);
 				will(returnValue(Status.OK_STATUS));
 			}
 		});
