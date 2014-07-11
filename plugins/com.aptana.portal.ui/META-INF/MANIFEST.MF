@@ -17,7 +17,8 @@ Require-Bundle: com.aptana.jetty.util.epl,
  com.aptana.theme,
  com.aptana.explorer,
  com.aptana.browser;visibility:=reexport,
- com.aptana.projects
+ com.aptana.projects,
+ org.eclipse.e4.ui.workbench;resolution:=optional
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.portal.ui,
