@@ -123,7 +123,7 @@ public class DownloadManager
 		}
 	}
 
-	protected synchronized void addDownload(ContentDownloadRequest request)
+	public synchronized void addDownload(ContentDownloadRequest request)
 	{
 		if (downloads == null)
 		{

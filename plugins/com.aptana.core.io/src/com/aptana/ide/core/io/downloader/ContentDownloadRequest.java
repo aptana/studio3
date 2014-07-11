@@ -19,6 +19,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.ecf.core.security.ConnectContextFactory;
+import org.eclipse.ecf.core.security.IConnectContext;
 import org.eclipse.osgi.util.NLS;
 
 import com.aptana.core.epl.downloader.FileReader;
@@ -36,6 +38,7 @@ public class ContentDownloadRequest
 	protected final URI uri;
 	private File saveTo;
 	private IStatus result;
+	private IConnectContext context;
 
 	public ContentDownloadRequest(URI uri) throws CoreException
 	{
@@ -44,8 +47,14 @@ public class ContentDownloadRequest
 
 	public ContentDownloadRequest(URI uri, File saveTo)
 	{
+		this(uri, saveTo, null);
+	}
+
+	public ContentDownloadRequest(URI uri, File saveTo, IConnectContext context)
+	{
 		this.uri = uri;
 		this.saveTo = saveTo;
+		this.context = context;
 	}
 
 	public IStatus getResult()
@@ -92,7 +101,7 @@ public class ContentDownloadRequest
 		try
 		{
 			// Use ECF FileTransferJob implementation to get the remote file.
-			FileReader reader = new FileReader(null);
+			FileReader reader = new FileReader(getConnectionContext());
 			FileOutputStream anOutputStream = new FileOutputStream(this.saveTo);
 			reader.readInto(this.uri, anOutputStream, 0, monitor);
 			// check that job ended ok - throw exceptions otherwise
@@ -122,6 +131,11 @@ public class ContentDownloadRequest
 			return new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID, t.getMessage(), t);
 		}
 		return status;
+	}
+
+	protected IConnectContext getConnectionContext()
+	{
+		return context;
 	}
 
 	/**

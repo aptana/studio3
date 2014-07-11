@@ -59,7 +59,7 @@ public class DownloadManagerTest
 		dm = new DownloadManager()
 		{
 			@Override
-			protected synchronized void addDownload(ContentDownloadRequest request)
+			public synchronized void addDownload(ContentDownloadRequest request)
 			{
 				requests.add(request);
 				super.addDownload(cdr);
