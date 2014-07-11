@@ -19,13 +19,16 @@ import beaver.Symbol;
 import com.aptana.parsing.AbstractParser;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.WorkingParseResult;
+import com.aptana.parsing.ast.IParseError;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseNodeAttribute;
+import com.aptana.parsing.ast.ParseError;
 import com.aptana.parsing.ast.ParseNode;
 import com.aptana.parsing.ast.ParseNodeAttribute;
 import com.aptana.parsing.ast.ParseRootNode;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Range;
+import com.aptana.xml.core.IXMLConstants;
 import com.aptana.xml.core.parsing.ast.XMLCDATANode;
 import com.aptana.xml.core.parsing.ast.XMLCommentNode;
 import com.aptana.xml.core.parsing.ast.XMLElementNode;
@@ -44,6 +47,7 @@ public class XMLParser extends AbstractParser
 
 	private List<IParseNode> fCommentNodes;
 	protected Symbol fCurrentLexeme;
+	private WorkingParseResult fWorking;
 
 	public XMLParser()
 	{
@@ -91,6 +95,7 @@ public class XMLParser extends AbstractParser
 	protected void parse(IParseState parseState, WorkingParseResult working) throws Exception
 	{
 		fMonitor = parseState.getProgressMonitor();
+		fWorking = working;
 		fElementStack = new Stack<IParseNode>();
 
 		// create scanner and apply source
@@ -113,6 +118,7 @@ public class XMLParser extends AbstractParser
 		finally
 		{
 			fMonitor = null;
+			fWorking = null;
 			fElementStack = null;
 			fCurrentElement = null;
 			fCommentNodes.clear();
@@ -162,29 +168,41 @@ public class XMLParser extends AbstractParser
 		// Keep advancing until we hit EOF or GREATER or SLASH_GREATER
 		while (true)
 		{
-			advance();
-			switch (fCurrentLexeme.getId())
+			try
 			{
-				case Terminals.EOF:
-				case Terminals.GREATER:
-				case Terminals.SLASH_GREATER:
-					return result;
+				advance();
+				switch (fCurrentLexeme.getId())
+				{
+					case Terminals.EOF:
+					case Terminals.GREATER:
+					case Terminals.SLASH_GREATER:
+						return result;
 
-				case Terminals.IDENTIFIER:
-				case Terminals.TEXT:
-					name = (String) fCurrentLexeme.value;
-					nameRegion = new Range(fCurrentLexeme.getStart(), fCurrentLexeme.getEnd());
-					break;
+					case Terminals.IDENTIFIER:
+					case Terminals.TEXT:
+						name = (String) fCurrentLexeme.value;
+						nameRegion = new Range(fCurrentLexeme.getStart(), fCurrentLexeme.getEnd());
+						break;
 
-				case Terminals.STRING:
-					result.add(new ParseNodeAttribute(fakeParent, name, (String) fCurrentLexeme.value, nameRegion,
-							new Range(fCurrentLexeme.getStart(), fCurrentLexeme.getEnd())));
-					name = null;
-					nameRegion = null;
-					break;
+					case Terminals.STRING:
+						result.add(new ParseNodeAttribute(fakeParent, name, (String) fCurrentLexeme.value, nameRegion,
+								new Range(fCurrentLexeme.getStart(), fCurrentLexeme.getEnd())));
+						name = null;
+						nameRegion = null;
+						break;
 
-				default:
-					break;
+					default:
+						break;
+				}
+			}
+			catch (Throwable t)
+			{
+				// we get an Error if there's some sort of syntax error that scanner can't handle - like an unquoted
+				// attribute value starting with a digit.
+				// Try just swallowing the error and moving on?
+				fWorking.addError(new ParseError(IXMLConstants.CONTENT_TYPE_XML, fCurrentLexeme.getStart(), fCurrentLexeme.getEnd() - fCurrentLexeme.getStart(), "Invalid attribute value",
+						IParseError.Severity.ERROR));
+				return result;
 			}
 		}
 	}
