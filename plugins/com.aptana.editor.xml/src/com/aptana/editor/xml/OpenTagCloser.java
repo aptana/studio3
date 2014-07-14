@@ -261,39 +261,44 @@ public class OpenTagCloser implements VerifyKeyListener
 		}
 		tagContents = tagContents.substring(lessThanIndex);
 
-		if (tagContents.length() > 0 && tagContents.charAt(0) == '<')
+		// tagName should hold just the element name in it. Let's chop off leading/trailing space
+		String tagName = tagContents.trim();
+		// Strip off the leading < and any spaces that follow
+		if (tagName.startsWith("<"))
 		{
-			tagContents = tagContents.substring(1);
+			tagName = tagName.substring(1).trim();
 		}
-		// If it ends in a slash, we probably can just return null because it's self-closed!
-		if (tagContents.length() > 0 && tagContents.charAt(tagContents.length() - 1) == '/')
+		// "Sloppy" tag is everything inside the tag except the leading < and spaces (including attributes, >, etc)
+		String sloppyTag = tagName;
+		// then strip off trailing > and any leading whitespace up to it
+		if (tagName.endsWith(">"))
+		{
+			tagName = tagName.substring(0, tagName.length() - 1).trim();
+		}
+		// if this is a closing tag or self-closes, then don't try and close it
+		if (tagName.startsWith("/") || tagName.endsWith("/"))
 		{
 			return null;
 		}
-		String tagName = tagContents.trim();
-		// Modify tag for some tag name checks
+		// Strip down to just the base element name. first chop off attributes (and end)
 		int spaceIndex = tagName.indexOf(' ');
 		if (spaceIndex != -1)
 		{
 			tagName = tagName.substring(0, spaceIndex);
 		}
-		String toCheck = tagName;
-		if (toCheck.endsWith(">"))
-		{
-			toCheck = toCheck.substring(0, toCheck.length() - 1);
-		}
-		// Don't close self-closing tags, or tags with no tag name in them
-		if (tagContents.length() == 0 || toCheck.length() == 0 || toCheck.charAt(0) == '/')
+		// Don't close tags with no element name
+		if (tagContents.length() == 0 || tagName.length() == 0)
 		{
 			return null;
 		}
 		// Check to see if this tag type is one that self-closes by HTML definition based on doctype.
-		if (isEmptyTagType(document, toCheck))
+		if (isEmptyTagType(document, tagName))
 		{
 			return null;
 		}
+
 		// Return a not necessarily good tag. May contain attrs and an additional ">", but we rely on that later...
-		return new String("<" + tagName + ">");
+		return new String("<" + sloppyTag + ">");
 	}
 
 	protected boolean isEmptyTagType(IDocument doc, String tagName)
