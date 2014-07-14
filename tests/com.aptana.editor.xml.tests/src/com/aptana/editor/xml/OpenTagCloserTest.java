@@ -7,10 +7,9 @@
  */
 package com.aptana.editor.xml;
 
-import org.junit.Test;
-import org.junit.Before;
-import static org.junit.Assert.*;
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.Document;
@@ -22,6 +21,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
+import org.junit.Before;
+import org.junit.Test;
 
 public class OpenTagCloserTest
 {
@@ -29,11 +30,9 @@ public class OpenTagCloserTest
 	protected TextViewer viewer;
 	protected OpenTagCloser closer;
 
-//	@Override
 	@Before
 	public void setUp() throws Exception
 	{
-//		super.setUp();
 		Display display = PlatformUI.getWorkbench().getDisplay();
 		Shell shell = display.getActiveShell();
 		if (shell == null)
@@ -113,6 +112,17 @@ public class OpenTagCloserTest
 
 		// Adding a new > after the <>, so, do nothing.
 		assertEquals("<>", document.get());
+		assertTrue(event.doit);
+	}
+
+	@Test
+	public void testTISTUD5084() throws Exception
+	{
+		IDocument document = setDocument("<Label />");
+		VerifyEvent event = createGreaterThanKeyEvent(9);
+		closer.verifyKey(event);
+
+		assertEquals("<Label />", document.get());
 		assertTrue(event.doit);
 	}
 
