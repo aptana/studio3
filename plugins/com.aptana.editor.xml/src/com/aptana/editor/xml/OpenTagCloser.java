@@ -268,6 +268,8 @@ public class OpenTagCloser implements VerifyKeyListener
 		{
 			tagName = tagName.substring(1).trim();
 		}
+		// "Sloppy" tag is everything inside the tag except the leading < and spaces (including attributes, >, etc)
+		String sloppyTag = tagName;
 		// then strip off trailing > and any leading whitespace up to it
 		if (tagName.endsWith(">"))
 		{
@@ -294,8 +296,9 @@ public class OpenTagCloser implements VerifyKeyListener
 		{
 			return null;
 		}
+
 		// Return a not necessarily good tag. May contain attrs and an additional ">", but we rely on that later...
-		return new String("<" + tagName + ">");
+		return new String("<" + sloppyTag + ">");
 	}
 
 	protected boolean isEmptyTagType(IDocument doc, String tagName)
