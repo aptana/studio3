@@ -86,7 +86,7 @@ public abstract class AbstractWebServer implements IExecutableExtension, IServer
 
 	public final String getId()
 	{
-		return type.getId();
+		return type == null ? null : type.getId();
 	}
 
 	public final String getName()
