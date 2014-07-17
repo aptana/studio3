@@ -23,6 +23,7 @@ import java.text.MessageFormat;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.filesystem.IFileSystem;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
@@ -160,9 +161,9 @@ public abstract class IOUtil
 	/**
 	 * Recursively copy one directory to a new destination directory while showing progress. If a file is passed in
 	 * instead of a directory, this method will return an error. Various tests for existence, readability, and
-	 * writability are performed before copying. If any of these tests fail, the copy be aborted. Note that this means
-	 * that if a failure occurs somewhere in a descendant file/directory, all files up to that point will exist, but no
-	 * files after that point will be copied.
+	 * writability are performed before copying. If any of these tests fail, the copy will be aborted. Note that this
+	 * means that if a failure occurs somewhere in a descendant file/directory, all files up to that point will exist,
+	 * but no files after that point will be copied.
 	 * 
 	 * @param source
 	 * @param destination
@@ -206,6 +207,38 @@ public abstract class IOUtil
 				Messages.IOUtil_Source_Not_Directory_Error, null);
 	}
 
+	/**
+	 * This is UNTESTED CODE. This is really here in case we ever want to do more work on using native cp/robocopy for
+	 * copying directories.
+	 * 
+	 * @param source
+	 * @param dest
+	 * @param monitor
+	 * @return
+	 */
+	public static IStatus nativeCopy(IPath source, IPath dest, IProgressMonitor monitor)
+	{
+		// TODO Piping output to the monitor is nice, but if we're copying huge amounts of files, maybe we should limit
+		// how often we pipe the output?
+		// FIXME This will pipe output to the monitor, but won't actually provide real progress in terms of file counts
+		if (PlatformUtil.isWindows())
+		{
+			IStatus status = new ProcessRunner().run(null, null, null, CollectionsUtil.newList("robocopy",
+					source.toOSString(), dest.toOSString(), "/E", "/DCOPY:T", "/R:0"), monitor);
+			// looks like exit code of 1 here is actually expected for copying any files. 0 means no files copied. See
+			// http://ss64.com/nt/robocopy-exit.html
+			if (status.getCode() == 1)
+			{
+				ProcessStatus ps = (ProcessStatus) status;
+				return new ProcessStatus(0, ps.getStdOut(), ps.getStdErr());
+			}
+			return status;
+		}
+		// We use this call so we pipe output to the monitor.
+		return new ProcessRunner().run(null, null, null,
+				CollectionsUtil.newList("cp", "-f", "-R", source.toOSString(), dest.toOSString()), monitor);
+	}
+
 	private static int countFiles(File source)
 	{
 		String[] list = source.list();
@@ -225,9 +258,9 @@ public abstract class IOUtil
 	/**
 	 * Recursively copy one directory to a new destination directory while showing progress. If a file is passed in
 	 * instead of a directory, this method will delegate to copyFile to perform the copy. Various tests for existence,
-	 * readability, and writability are performed before copying. If any of these tests fail, the copy be aborted. Note
-	 * that this means that if a failure occurs somewhere in a descendant file/directory, all files up to that point
-	 * will exist, but no files after that point will be copied.
+	 * readability, and writeability are performed before copying. If any of these tests fail, the copy will be aborted.
+	 * Note that this means that if a failure occurs somewhere in a descendant file/directory, all files up to that
+	 * point will exist, but no files after that point will be copied.
 	 * 
 	 * @param source
 	 * @param destination
@@ -310,10 +343,12 @@ public abstract class IOUtil
 		}
 		else
 		{
-			IFileStore src = EFS.getLocalFileSystem().fromLocalFile(source);
 			try
 			{
-				src.copy(EFS.getLocalFileSystem().fromLocalFile(destination), EFS.OVERWRITE, new NullProgressMonitor());
+				// It's a file, can we copy with normal
+				IFileSystem system = EFS.getLocalFileSystem();
+				IFileStore src = system.fromLocalFile(source);
+				src.copy(system.fromLocalFile(destination), EFS.OVERWRITE, new NullProgressMonitor());
 			}
 			catch (CoreException e)
 			{
@@ -327,7 +362,7 @@ public abstract class IOUtil
 	/**
 	 * Recursively copy one directory to a new destination directory. If a file is passed in instead of a directory,
 	 * this method will delegate to copyFile to perform the copy. Various tests for existence, readability, and
-	 * writability are performed before copying. If any of these tests fail, the copy be aborted. Note that this means
+	 * writeability are performed before copying. If any of these tests fail, the copy be aborted. Note that this means
 	 * that if a failure occurs somewhere in a descendant file/directory, all files up to that point will exist, but no
 	 * files after that point will be copied.
 	 * 
