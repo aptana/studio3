@@ -61,15 +61,18 @@ public class SudoProcessRunnable extends ProcessRunnable
 			 * to the sudo prompts. Otherwise, kill the existing sudo process and re-run the sudo process with a new
 			 * valid password.
 			 */
-			if ((line = br.readLine()) != null)
+			while (br.ready())
 			{
-				builder.append(line).append('\n');
-				if (line.contains(echoMessage))
+				if ((line = br.readLine()) != null)
 				{
-					status = 0;
+					builder.append(line).append('\n');
+					if (line.contains(echoMessage))
+					{
+						// We're good, we got our success message, mark exit code of 0, break the loop
+						status = 0;
+						break;
+					}
 				}
-				// pwdWriter.println(password);
-				// pwdWriter.flush();
 			}
 
 			p.destroy(); // Force kill the sudo command as it is still expecting for the other 2 attempts
