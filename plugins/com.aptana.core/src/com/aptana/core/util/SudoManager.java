@@ -74,7 +74,7 @@ public class SudoManager
 			{
 				// Try running and pass password on STDIN
 				Process p = getProcessRunner().run(environment, SUDO, DISREGARD_CACHED_CREDENTIALS, SUDO_INPUT_PWD,
-						END_OF_OPTIONS, ECHO, ECHO_MESSAGE);
+						PASSWORD_PROMPT_FLAG, PROMPT_MSG, END_OF_OPTIONS, ECHO, ECHO_MESSAGE);
 				runnable = new SudoProcessRunnable(p, password, ECHO_MESSAGE);
 			}
 
