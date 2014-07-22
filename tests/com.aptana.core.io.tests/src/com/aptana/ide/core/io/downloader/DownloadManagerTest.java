@@ -170,4 +170,37 @@ public class DownloadManagerTest
 		dm.addURL(null);
 		assertEquals(0, requests.size());
 	}
+
+	@Test
+	public void testAddRequestObjectDirectly() throws CoreException, URISyntaxException
+	{
+		dm.addDownload(cdr);
+
+		final IPath downloadPath1 = Path.fromPortableString("/path/to/downloaded/file1");
+		context.checking(new Expectations()
+		{
+			{
+				exactly(1).of(cdr).execute(with(any(IProgressMonitor.class)));
+
+				exactly(1).of(cdr).getResult();
+				will(returnValue(Status.OK_STATUS));
+
+				exactly(1).of(cdr).getDownloadLocation();
+				will(returnValue(downloadPath1));
+			}
+		});
+
+		IStatus result = dm.start(new NullProgressMonitor());
+		assertTrue(result.isOK());
+		assertTrue(result.isMultiStatus());
+		MultiStatus multi = (MultiStatus) result;
+		IStatus[] children = multi.getChildren();
+		assertEquals(1, children.length);
+		assertTrue(children[0].isOK());
+
+		List<IPath> paths = dm.getContentsLocations();
+		assertEquals(1, paths.size());
+		assertEquals(downloadPath1, paths.get(0));
+		context.assertIsSatisfied();
+	}
 }

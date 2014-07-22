@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ecf.core.security.IConnectContext;
 import org.eclipse.ecf.core.util.Proxy;
@@ -58,7 +59,7 @@ import com.aptana.core.epl.CoreEPLPlugin;
 /**
  * FileReader is an ECF FileTransferJob implementation.
  */
-public final class FileReader extends FileTransferJob implements IFileTransferListener
+public class FileReader extends FileTransferJob implements IFileTransferListener
 {
 	private static IFileReaderProbe testProbe;
 	private boolean closeStreamWhenFinished = false;
@@ -373,14 +374,18 @@ public final class FileReader extends FileTransferJob implements IFileTransferLi
 			throws CoreException, FileNotFoundException, ProtocolException
 	{
 		if (monitor == null)
+		{
 			monitor = new NullProgressMonitor();
+		}
 		try
 		{
 			sendRetrieveRequest(uri, anOutputStream, (startPos != -1 ? new DownloadRange(startPos) : null), true,
 					monitor);
-			Job.getJobManager().join(this, new SubProgressMonitor(monitor, 0));
+			getTheJobManager().join(this, new SubProgressMonitor(monitor, 0));
 			if (monitor.isCanceled() && connectEvent != null)
+			{
 				connectEvent.cancel();
+			}
 			// check and throw exception if received in callback
 			checkException(uri, connectionRetryCount);
 		}
@@ -399,10 +404,17 @@ public final class FileReader extends FileTransferJob implements IFileTransferLi
 			}
 			// If monitor was never started, make sure it is balanced
 			if (!monitorStarted)
+			{
 				monitor.beginTask(null, 1);
+			}
 			monitorStarted = false;
 			// monitor.done();
 		}
+	}
+
+	protected IJobManager getTheJobManager()
+	{
+		return getJobManager();
 	}
 
 	protected synchronized void sendRetrieveRequest(URI uri, OutputStream outputStream, DownloadRange range,
@@ -410,7 +422,7 @@ public final class FileReader extends FileTransferJob implements IFileTransferLi
 			IProgressMonitor monitor) throws CoreException, FileNotFoundException, ProtocolException
 	{
 
-		IRetrieveFileTransferFactory factory = CoreEPLPlugin.getDefault().getRetrieveFileTransferFactory();
+		IRetrieveFileTransferFactory factory = getRetrieveFileTransferFactory();
 		if (factory == null)
 		{
 			throw new CoreException(new Status(IStatus.ERROR, CoreEPLPlugin.PLUGIN_ID,
@@ -421,7 +433,7 @@ public final class FileReader extends FileTransferJob implements IFileTransferLi
 		adapter.setConnectContextForAuthentication(connectContext);
 
 		// Set the proxy settings for download if Studio is configured with proxy.
-		Proxy proxy = ProxySetupHelper.getProxy(uri.toASCIIString());
+		Proxy proxy = getProxy(uri);
 		adapter.setProxy(proxy);
 
 		this.exception = null;
@@ -438,16 +450,21 @@ public final class FileReader extends FileTransferJob implements IFileTransferLi
 		for (int retryCount = 0;; retryCount++)
 		{
 			if (monitor != null && monitor.isCanceled())
+			{
 				throw new OperationCanceledException();
+			}
 
 			try
 			{
-				IFileID fileID = FileIDFactory.getDefault()
-						.createFileID(adapter.getRetrieveNamespace(), uri.toString());
+				IFileID fileID = getFileIDFactory().createFileID(adapter.getRetrieveNamespace(), uri.toString());
 				if (range != null)
+				{
 					adapter.sendRetrieveRequest(fileID, range, this, null);
+				}
 				else
+				{
 					adapter.sendRetrieveRequest(fileID, this, null);
+				}
 			}
 			catch (IncomingFileTransferException e)
 			{
@@ -460,11 +477,30 @@ public final class FileReader extends FileTransferJob implements IFileTransferLi
 			catch (Throwable t)
 			{
 				if (exception != null)
+				{
 					exception.printStackTrace();
+				}
 			}
 			if (checkException(uri, retryCount))
+			{
 				break;
+			}
 		}
+	}
+
+	protected Proxy getProxy(URI uri)
+	{
+		return ProxySetupHelper.getProxy(uri.toASCIIString());
+	}
+
+	protected FileIDFactory getFileIDFactory()
+	{
+		return FileIDFactory.getDefault();
+	}
+
+	protected IRetrieveFileTransferFactory getRetrieveFileTransferFactory()
+	{
+		return CoreEPLPlugin.getDefault().getRetrieveFileTransferFactory();
 	}
 
 	/**

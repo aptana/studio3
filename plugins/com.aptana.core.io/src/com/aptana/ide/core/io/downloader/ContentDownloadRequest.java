@@ -8,8 +8,10 @@
 package com.aptana.ide.core.io.downloader;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URI;
 
 import org.eclipse.core.runtime.CoreException;
@@ -19,7 +21,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ecf.core.security.ConnectContextFactory;
 import org.eclipse.ecf.core.security.IConnectContext;
 import org.eclipse.osgi.util.NLS;
 
@@ -48,6 +49,11 @@ public class ContentDownloadRequest
 	public ContentDownloadRequest(URI uri, File saveTo)
 	{
 		this(uri, saveTo, null);
+	}
+
+	public ContentDownloadRequest(URI uri, IConnectContext context) throws CoreException
+	{
+		this(uri, getTempFile(uri), context);
 	}
 
 	public ContentDownloadRequest(URI uri, File saveTo, IConnectContext context)
@@ -83,7 +89,10 @@ public class ContentDownloadRequest
 
 	public void execute(IProgressMonitor monitor)
 	{
-		monitor.subTask(NLS.bind(Messages.ContentDownloadRequest_downloading, uri.toString()));
+		if (monitor != null)
+		{
+			monitor.subTask(NLS.bind(Messages.ContentDownloadRequest_downloading, uri.toString()));
+		}
 		IStatus status = download(monitor);
 		setResult(status);
 	}
@@ -96,13 +105,12 @@ public class ContentDownloadRequest
 	 */
 	private IStatus download(IProgressMonitor monitor)
 	{
-		IStatus status = Status.OK_STATUS;
 		// perform the download
 		try
 		{
 			// Use ECF FileTransferJob implementation to get the remote file.
-			FileReader reader = new FileReader(getConnectionContext());
-			FileOutputStream anOutputStream = new FileOutputStream(this.saveTo);
+			FileReader reader = createReader();
+			OutputStream anOutputStream = createOutputStream(this.saveTo);
 			reader.readInto(this.uri, anOutputStream, 0, monitor);
 			// check that job ended ok - throw exceptions otherwise
 			IStatus result = reader.getResult();
@@ -130,12 +138,17 @@ public class ContentDownloadRequest
 			}
 			return new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID, t.getMessage(), t);
 		}
-		return status;
+		return Status.OK_STATUS;
 	}
 
-	protected IConnectContext getConnectionContext()
+	protected FileReader createReader()
 	{
-		return context;
+		return new FileReader(context);
+	}
+
+	protected OutputStream createOutputStream(File dest) throws FileNotFoundException
+	{
+		return new FileOutputStream(dest);
 	}
 
 	/**
