@@ -234,7 +234,7 @@ public class FunctionInferencingTest extends InferencingTestsBase
 	@Test
 	public void testCreateTypeWhenFunctionConstructorDeclaresThisProperties() throws Exception
 	{
-		String source = "var x = new function() { this.color = \"red\"; }";
+		String source = "var x = new function() { this.y = \"red\"; }";
 		TestProject project = null;
 		try
 		{

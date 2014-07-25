@@ -21,6 +21,7 @@ import com.aptana.js.core.parsing.ast.IJSNodeTypes;
 import com.aptana.js.core.parsing.ast.JSArgumentsNode;
 import com.aptana.js.core.parsing.ast.JSAssignmentNode;
 import com.aptana.js.core.parsing.ast.JSCatchNode;
+import com.aptana.js.core.parsing.ast.JSConstructNode;
 import com.aptana.js.core.parsing.ast.JSDeclarationNode;
 import com.aptana.js.core.parsing.ast.JSFunctionNode;
 import com.aptana.js.core.parsing.ast.JSGetPropertyNode;
@@ -267,6 +268,20 @@ public class JSSymbolCollector extends JSTreeWalker
 							// Get the surrounding function's "property" to hang it's own properties off of
 							JSFunctionNode funcNode = (JSFunctionNode) node.getParent().getParent();
 							String name = funcNode.getName().getText();
+							// The name may be empty, thus it's an anonymous function being invoked and assigned to some
+							// variable/identifier. We need _that_ name
+							if (StringUtil.isEmpty(name))
+							{
+								if (funcNode.getParent() instanceof JSConstructNode)
+								{
+									IParseNode possibleDecl = funcNode.getParent().getParent();
+									if (possibleDecl instanceof JSDeclarationNode)
+									{
+										JSDeclarationNode declNode = (JSDeclarationNode) possibleDecl;
+										name = declNode.getIdentifier().getText();
+									}
+								}
+							}
 							if (!StringUtil.isEmpty(name))
 							{
 								collector = new JSPropertyCollector(getScope().getParentScope().getLocalSymbol(name));
