@@ -10,11 +10,14 @@ package com.aptana.editor.js.views;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
+import com.aptana.buildpath.core.BuildPathManager;
+import com.aptana.buildpath.core.IBuildPathEntry;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
@@ -51,13 +54,22 @@ public class JSIndexViewContentProvider implements ITreeContentProvider
 		if (parentElement instanceof JSElement)
 		{
 			JSElement root = (JSElement) parentElement;
+			List<ClassGroupElement> temp = CollectionsUtil.newList(new ClassGroupElement(
+					Messages.JSIndexViewContentProvider_WorkspaceGroupLabel, JSIndexQueryHelper.getJSCoreIndex()),
+					new ClassGroupElement(Messages.JSIndexViewContentProvider_ProjectGroupLabel, root.getIndex()));
 
-			// @formatter:off
-			result = CollectionsUtil.newList(
-				new ClassGroupElement(Messages.JSIndexViewContentProvider_WorkspaceGroupLabel, JSIndexQueryHelper.getJSCoreIndex()),
-				new ClassGroupElement(Messages.JSIndexViewContentProvider_ProjectGroupLabel, root.getIndex())
-			);
-			// @formatter:on
+			IProject project = root.getProject();
+			if (project != null)
+			{
+				// Grab the project build paths and set up the indices
+				Set<IBuildPathEntry> entries = getBuildPathManager().getBuildPaths(project);
+				for (IBuildPathEntry entry : entries)
+				{
+					Index index = getIndexManager().getIndex(entry.getPath());
+					temp.add(new ClassGroupElement(index.getRoot().toASCIIString(), index));
+				}
+			}
+			result = temp;
 		}
 		else if (parentElement instanceof ClassGroupElement)
 		{
@@ -87,6 +99,11 @@ public class JSIndexViewContentProvider implements ITreeContentProvider
 		return result.toArray(new Object[result.size()]);
 	}
 
+	protected BuildPathManager getBuildPathManager()
+	{
+		return BuildPathManager.getInstance();
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getElements(java.lang.Object)
@@ -98,9 +115,8 @@ public class JSIndexViewContentProvider implements ITreeContentProvider
 		if (inputElement instanceof IProject)
 		{
 			IProject project = (IProject) inputElement;
-			Index index = getIndexManager().getIndex(project.getLocationURI());
 
-			result = new Object[] { new JSElement(index) };
+			result = new Object[] { new JSElement(project) };
 		}
 		else
 		{
