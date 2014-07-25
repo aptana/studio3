@@ -320,7 +320,6 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 			sub.setWorkRemaining(20);
 			// process module API exports
 			processModule(context, index, ast, location, globals, symbolInferrer, sub.newChild(20));
-			processModule(context, index, globals, ast, location, sub.newChild(20));
 		}
 		catch (OperationCanceledException oce)
 		{

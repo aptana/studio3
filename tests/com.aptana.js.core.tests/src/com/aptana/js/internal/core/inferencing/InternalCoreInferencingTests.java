@@ -7,34 +7,13 @@
  */
 package com.aptana.js.internal.core.inferencing;
 
-import org.junit.runners.Suite.SuiteClasses;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestResult;
-import junit.framework.TestSuite;
+import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({NodeModuleResolverTest.class, })
+@SuiteClasses({ NodeModuleResolverTest.class, })
 public class InternalCoreInferencingTests
 {
 
-//	public static Test suite()
-//	{
-//		TestSuite suite = new TestSuite(InternalCoreInferencingTests.class.getName())
-//		{
-//			@Override
-//			public void runTest(Test test, TestResult result)
-//			{
-//				System.err.println("Running test: " + test.toString());
-//				super.runTest(test, result);
-//			}
-//		};
-//		// $JUnit-BEGIN$
-//		suite.addTestSuite(NodeModuleResolverTest.class);
-//		// $JUnit-END$
-//		return suite;
-//	}
-//
 }

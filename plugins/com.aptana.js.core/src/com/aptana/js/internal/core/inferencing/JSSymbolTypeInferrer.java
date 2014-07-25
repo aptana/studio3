@@ -73,8 +73,7 @@ public class JSSymbolTypeInferrer
 		// Set the name first so we can validate we don't end up setting self as a parent type
 		String name = null;
 		List<JSNode> values = property.getValues();
-
-		if (values != null && values.size() > 0)
+		if (!CollectionsUtil.isEmpty(values))
 		{
 			// NOTE: Walk backwards so latest definition that has a valid name
 			// wins
@@ -91,7 +90,7 @@ public class JSSymbolTypeInferrer
 			}
 		}
 
-		// if no generated from values, then use property chain as type name
+		// if not generated from values, then use property chain as type name
 		if (StringUtil.isEmpty(name))
 		{
 			name = property.getQualifiedName();

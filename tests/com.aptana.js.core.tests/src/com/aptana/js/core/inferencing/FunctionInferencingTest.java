@@ -8,9 +8,9 @@
 package com.aptana.js.core.inferencing;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
 
 import java.util.List;
 import java.util.Map;
@@ -330,9 +330,9 @@ public class FunctionInferencingTest extends InferencingTestsBase
 	}
 
 	@Test
-	public void testConstructorFunction()
+	public void testComplexConstructorFunction()
 	{
-		List<String> types = getLastStatementTypes(Path.fromPortableString("inferencing/something.js"));
+		List<String> types = getLastStatementTypes(Path.fromPortableString("inferencing/mobware.js"));
 
 		// we construct a MobilewareSdk object
 		assertEquals(1, types.size());
@@ -342,20 +342,33 @@ public class FunctionInferencingTest extends InferencingTestsBase
 		// it has the following properties:
 		List<TypeElement> typeElements = getType(typeName);
 		assertNotNull(typeElements);
-		propertiesExist(typeElements.get(0), "name", "version", "organization", "url", "apis", "api", "toString");
+		propertiesExist(typeElements.get(0), CollectionsUtil.newMap("name", "String", "version", "String",
+				"organization", "String", "url", "String", "apis", "MobilewareSdk.apis", "api", "Function", "toString",
+				"Function"));
 
-		// TODO ensure we also record that it has an apis['customerevent'] with lots of functions!
+		// There should be a MobilewareSdk.apis type
+		typeElements = getType("MobilewareSdk.apis");
+		assertNotNull(typeElements);
+		propertiesExist(typeElements.get(0),
+				CollectionsUtil.newMap("customerevent", "MobilewareSdk.apis.customerevent"));
 
-		// PropertyElement property = typeElements.get(0).getProperty("b");
-		// assertNotNull(property);
-		// List<String> propertyTypeNames = property.getTypeNames();
-		// assertEquals(1, propertyTypeNames.size());
-		//
-		// String propertyTypeName = propertyTypeNames.get(0);
-		// List<TypeElement> propertyTypes = getType(propertyTypeName);
-		// assertNotNull(propertyTypes);
-		//
-		// structureTests(propertyTypes, "c");
+		// There should be a MobilewareSdk.apis.customerevent type
+		typeElements = getType("MobilewareSdk.apis.customerevent");
+		assertNotNull(typeElements);
+		propertiesExist(typeElements.get(0),
+				CollectionsUtil.newMap("name", "String", "version", "String", "login", "Function", "account", // FIXME
+																												// "MobilewareSdk.apis.customerevent.account",
+						"Function", "sync", "Function"));
+
+		// MobilewareSdk.apis.customerevent.account should really be a type with a number of functions hanging off of
+		// it, but I'm not sure how to handle it since we hang things off properties of it and then assign a function to
+		// the account object itself..
+
+		// There should be a MobilewareSdk.apis.customerevent.account type
+		// typeElements = getType("MobilewareSdk.apis.customerevent.account");
+		// assertNotNull(typeElements);
+		// propertiesExist(typeElements.get(0), CollectionsUtil.newMap("readAll", "Function", "create", "Function",
+		// "delete", "Function", "readOne", "Function"));
 	}
 
 	@Test
@@ -373,6 +386,49 @@ public class FunctionInferencingTest extends InferencingTestsBase
 		assertNotNull(typeElements);
 		propertiesExist(typeElements.get(0), CollectionsUtil.newMap("name", "String", "version", "String", "api",
 				"Function", "toString", "Function"));
+	}
+
+	@Test
+	public void testAddingPropertiesToNestedPropertyInsideConstructor()
+	{
+		List<String> types = getLastStatementTypes(Path
+				.fromPortableString("inferencing/nested-this-in-constructor-function.js"));
+
+		// we construct a MobilewareSdk object
+		assertEquals(1, types.size());
+		String typeName = types.get(0);
+		assertEquals("MobilewareSdk", typeName);
+
+		// it has a customerevent property with it's own type
+		List<TypeElement> typeElements = getType(typeName);
+		assertNotNull(typeElements);
+		propertiesExist(typeElements.get(0), CollectionsUtil.newMap("customerevent", "MobilewareSdk.customerevent"));
+
+		// The MobilewareSdk.customerevent type has properties
+		typeElements = getType("MobilewareSdk.customerevent");
+		assertNotNull(typeElements);
+		propertiesExist(typeElements.get(0), "name", "version", "login");
+	}
+
+	@Test
+	public void testAddingPropertyUsingThisAndAccessingPropertyNameUsingElementSyntax()
+	{
+		List<String> types = getLastStatementTypes(Path.fromPortableString("inferencing/assign-this-element-syntax.js"));
+
+		// we construct a MobilewareSdk object
+		assertEquals(1, types.size());
+		String typeName = types.get(0);
+		assertEquals("MobilewareSdk", typeName);
+
+		// it has a customerevent property with it's own type
+		List<TypeElement> typeElements = getType(typeName);
+		assertNotNull(typeElements);
+		propertiesExist(typeElements.get(0), CollectionsUtil.newMap("customerevent", "MobilewareSdk.customerevent"));
+
+		// The MobilewareSdk.customerevent type has properties
+		typeElements = getType("MobilewareSdk.customerevent");
+		assertNotNull(typeElements);
+		propertiesExist(typeElements.get(0), CollectionsUtil.newMap("name", "String", "version", "String"));
 	}
 
 	protected void propertiesExist(TypeElement type, String... propertyNames)

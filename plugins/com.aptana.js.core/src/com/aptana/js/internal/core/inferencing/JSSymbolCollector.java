@@ -13,10 +13,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.js.core.inferencing.IInvocationProcessor;
 import com.aptana.js.core.inferencing.JSPropertyCollection;
 import com.aptana.js.core.inferencing.JSScope;
+import com.aptana.js.core.inferencing.JSTypeUtil;
 import com.aptana.js.core.parsing.ast.IJSNodeTypes;
 import com.aptana.js.core.parsing.ast.JSArgumentsNode;
 import com.aptana.js.core.parsing.ast.JSAssignmentNode;
@@ -24,6 +26,7 @@ import com.aptana.js.core.parsing.ast.JSCatchNode;
 import com.aptana.js.core.parsing.ast.JSConstructNode;
 import com.aptana.js.core.parsing.ast.JSDeclarationNode;
 import com.aptana.js.core.parsing.ast.JSFunctionNode;
+import com.aptana.js.core.parsing.ast.JSGetElementNode;
 import com.aptana.js.core.parsing.ast.JSGetPropertyNode;
 import com.aptana.js.core.parsing.ast.JSGroupNode;
 import com.aptana.js.core.parsing.ast.JSInvokeNode;
@@ -266,26 +269,22 @@ public class JSSymbolCollector extends JSTreeWalker
 
 						case IJSNodeTypes.THIS:
 							// Get the surrounding function's "property" to hang it's own properties off of
-							JSFunctionNode funcNode = getSurroundingFunction(node);
-							String name = funcNode.getName().getText();
-							// The name may be empty, thus it's an anonymous function being invoked and assigned to some
-							// variable/identifier. We need _that_ name
-							if (StringUtil.isEmpty(name))
+							JSPropertyCollection parent = getSurroundingProperty(node);
+							if (parent != null)
 							{
-								if (funcNode.getParent() instanceof JSConstructNode)
+								// in cases where we're handling an assign whose lhs is a GetElement, it's adding the
+								// name of the root property after "this" to itself, causing a bad hierarchy.
+								// i.e. this.apis['customerevent'] ended up adding 'apis' as a property on 'apis', then
+								// adding 'customerevent' on the grandchild 'apis' property.
+								if (node.getFirstChild() instanceof JSGetElementNode)
 								{
-									IParseNode possibleDecl = funcNode.getParent().getParent();
-									if (possibleDecl instanceof JSDeclarationNode)
-									{
-										JSDeclarationNode declNode = (JSDeclarationNode) possibleDecl;
-										name = declNode.getIdentifier().getText();
-									}
+									parent = parent.getParentProperty();
 								}
-							}
-							if (!StringUtil.isEmpty(name))
-							{
-								collector = new JSPropertyCollector(getScope().getParentScope().getLocalSymbol(name));
-								collector.visit(node);
+								if (parent != null)
+								{
+									collector = new JSPropertyCollector(parent);
+									collector.visit(node);
+								}
 							}
 							break LOOP;
 
@@ -308,17 +307,38 @@ public class JSSymbolCollector extends JSTreeWalker
 		}
 	}
 
-	private JSFunctionNode getSurroundingFunction(JSNode node)
+	private JSPropertyCollection getSurroundingProperty(JSNode node)
 	{
-		while (node != null)
+		// Here we'll cheat to get the fully qualified name of the property we want to add
+		String fullyQualifiedName = JSTypeUtil.getName(node);
+		if (StringUtil.isEmpty(fullyQualifiedName))
 		{
-			if (node instanceof JSFunctionNode)
-			{
-				return (JSFunctionNode) node;
-			}
-			node = (JSNode) node.getParent();
+			return null;
 		}
-		return null;
+		// Now let's split it into it's parts
+		List<String> names = StringUtil.split(fullyQualifiedName, '.');
+		names.remove(names.size() - 1); // drop the last segment, which is the property we plan to add and get the path
+										// to it's parent
+		if (CollectionsUtil.isEmpty(names))
+		{
+			return null;
+		}
+
+		// Ok traverse the property chain get what "this" refers to so we can hang properties off of it!
+		String firstName = names.remove(0);
+		JSPropertyCollection collection = getScope().getSymbol(firstName);
+		if (!names.isEmpty())
+		{
+			for (String name : names)
+			{
+				if (collection == null)
+				{
+					return null;
+				}
+				collection = collection.getProperty(name);
+			}
+		}
+		return collection;
 	}
 
 	/*
@@ -352,6 +372,45 @@ public class JSSymbolCollector extends JSTreeWalker
 		this.accept(value);
 	}
 
+	private String getFunctionName(JSFunctionNode funcNode)
+	{
+		// normal named function?
+		String name = funcNode.getName().getText();
+		if (!StringUtil.isEmpty(name))
+		{
+			return name;
+		}
+
+		// The name may be empty, thus it's an anonymous function being invoked (suing new or self-invoking) and
+		// assigned to some variable/identifier/property. We need _that_ name
+		if (funcNode.getParent() instanceof JSConstructNode || funcNode.getParent() instanceof JSInvokeNode)
+		{
+			IParseNode possibleDecl = funcNode.getParent().getParent();
+			// being assigned to a var
+			if (possibleDecl instanceof JSDeclarationNode)
+			{
+				JSDeclarationNode declNode = (JSDeclarationNode) possibleDecl;
+				return declNode.getIdentifier().getText();
+			}
+			// This is being assigned to some property of an enclosing object. Get the name of
+			// the property we're assigning it to
+			else if (possibleDecl instanceof JSAssignmentNode)
+			{
+				JSAssignmentNode assign = (JSAssignmentNode) possibleDecl;
+				IParseNode left = assign.getChild(0);
+				if (left instanceof JSGetPropertyNode)
+				{
+					// FIXME What if we're using this sort of accessor: this['propName'] ?
+					JSGetPropertyNode getProp = (JSGetPropertyNode) left;
+					return getProp.getChild(1).getText();
+				}
+			}
+		}
+
+		// We weren't able to figure out the name. Hopefully this is an entirely anonymous function
+		return null;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSFunctionNode)
@@ -361,7 +420,6 @@ public class JSSymbolCollector extends JSTreeWalker
 	{
 		// add symbol if this has a name
 		String name = node.getName().getText();
-
 		if (!StringUtil.isEmpty(name))
 		{
 			this.addPropertyValue(name, node);
