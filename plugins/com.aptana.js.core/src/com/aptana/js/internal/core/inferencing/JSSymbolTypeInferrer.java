@@ -78,6 +78,10 @@ public class JSSymbolTypeInferrer
 				return JSTypeUtil.isFunctionPrefix(item);
 			}
 		});
+		// FIXME if this is a constructor function, we really don't want to set "Function" as the super type, nor do we
+		// want the type to be recorded as Function<x> where x is the function name. We should make Object the
+		// "superclass" and strip the Function<>.
+		// However, it _may_ be useful to retain that in cases where we explicitly return something else.
 		boolean isFunction = functionSuper != null;
 
 		String name = null;
@@ -538,6 +542,16 @@ public class JSSymbolTypeInferrer
 						subType.addProperty(pe);
 					}
 				}
+
+				// We're generating a new type. Let's give it a prototype property if we don't have one yet.
+				if (subType.getProperty(JSTypeConstants.PROTOTYPE_PROPERTY) == null)
+				{
+					PropertyElement pe = new PropertyElement();
+					pe.setName(JSTypeConstants.PROTOTYPE_PROPERTY);
+					pe.addType(JSTypeConstants.OBJECT_TYPE);
+					subType.addProperty(pe);
+				}
+
 				sub.setWorkRemaining(5);
 
 				// push type to the current index

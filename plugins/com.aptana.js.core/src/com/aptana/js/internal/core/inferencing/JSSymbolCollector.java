@@ -264,7 +264,14 @@ public class JSSymbolCollector extends JSTreeWalker
 							break LOOP;
 
 						case IJSNodeTypes.THIS:
-							// TODO: implement this once we're properly handling [[proto]]
+							// Get the surrounding function's "property" to hang it's own properties off of
+							JSFunctionNode funcNode = (JSFunctionNode) node.getParent().getParent();
+							String name = funcNode.getName().getText();
+							if (!StringUtil.isEmpty(name))
+							{
+								collector = new JSPropertyCollector(getScope().getParentScope().getLocalSymbol(name));
+								collector.visit(node);
+							}
 							break LOOP;
 
 						default:

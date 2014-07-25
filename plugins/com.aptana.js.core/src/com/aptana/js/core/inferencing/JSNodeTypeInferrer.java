@@ -479,16 +479,28 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 
 			for (String typeName : returnTypes)
 			{
-				Collection<PropertyElement> properties = this._queryHelper.getTypeMembers(typeName,
-						JSTypeConstants.PROTOTYPE_PROPERTY);
-
-				if (properties != null)
+				// If the type is a constructor, use Function<x> as the type name we inferred since that's where we
+				// added the type's properties.
+				if (JSTypeUtil.isFunctionPrefix(typeName))
 				{
-					for (PropertyElement property : properties)
+					this.addType(typeName);
+				}
+				else
+				{
+					// FIXME this seems wrong. We have the return type from the constructor, but we then ask for what
+					// the prototype property is pointing at for each return type?
+					// The type here is the return type(s) of the constructor function, not those types' prototypes.
+					Collection<PropertyElement> properties = this._queryHelper.getTypeMembers(typeName,
+							JSTypeConstants.PROTOTYPE_PROPERTY);
+
+					if (properties != null)
 					{
-						for (String propertyType : property.getTypeNames())
+						for (PropertyElement property : properties)
 						{
-							this.addType(propertyType);
+							for (String propertyType : property.getTypeNames())
+							{
+								this.addType(propertyType);
+							}
 						}
 					}
 				}
@@ -868,7 +880,6 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 			collector.visit(node);
 			symbol.addValue(node);
 
-			// infer type
 			JSSymbolTypeInferrer inferrer = new JSSymbolTypeInferrer(this._scope, this._index, this._location,
 					this._queryHelper);
 			Set<String> types = new LinkedHashSet<String>();

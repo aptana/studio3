@@ -88,7 +88,7 @@ public class FunctionInferencingTest extends InferencingTestsBase
 
 	// https://jira.appcelerator.org/browse/APSTUD-4207
 	@Test
-	public void testCreateTypeNamesBasedOnContext() throws Exception
+	public void testCreateTypeUsingObjectLiteralsAndChainedPropertyAccess() throws Exception
 	{
 		String source = "var x = {};\nx.y = {};\nx.y.z = function () {}";
 		TestProject project = null;
@@ -125,6 +125,151 @@ public class FunctionInferencingTest extends InferencingTestsBase
 			assertNotNull("property 'z' doesn't exist on type 'x.y'", z);
 			// Verify that z has a Function type
 			assertTrue("'z' property doesn't have a return type of 'Function'", z.getTypeNames().contains("Function"));
+		}
+		finally
+		{
+			if (project != null)
+			{
+				project.delete();
+			}
+		}
+	}
+
+	@Test
+	public void testCreateTypeUsingNestedObjectLiterals() throws Exception
+	{
+		String source = "var x = { y: { z: function () {} } };";
+		TestProject project = null;
+		try
+		{
+			// Create a test project and files
+			project = new TestProject("nested", new String[] { "com.aptana.projects.webnature" });
+			IFile number = project.createFile("nested.js", source);
+
+			Index index = getIndexManager().getIndex(number.getProject().getLocationURI());
+
+			// Index the file
+			IFileStoreIndexingParticipant part = new JSFileIndexingParticipant();
+			part.index(new BuildContext(number), index, null);
+
+			// Now query for types
+			JSIndexReader helper = new JSIndexReader();
+			List<TypeElement> types = helper.getTypes(index, true);
+			Map<String, TypeElement> blah = CollectionsUtil.mapFromValues(types, new IMap<TypeElement, String>()
+			{
+				public String map(TypeElement item)
+				{
+					return item.getName();
+				}
+			});
+
+			// Now verify there's an "x" type and an "x.y" type
+			assertTrue("Index doesn't contain type 'x'", blah.containsKey("x"));
+			assertTrue("Index doesn't contain type 'x.y'", blah.containsKey("x.y"));
+
+			// verify that 'x.y' type has a property 'z'
+			TypeElement xy = blah.get("x.y");
+			PropertyElement z = xy.getProperty("z");
+			assertNotNull("property 'z' doesn't exist on type 'x.y'", z);
+			// Verify that z has a Function type
+			assertTrue("'z' property doesn't have a return type of 'Function'", z.getTypeNames().contains("Function"));
+		}
+		finally
+		{
+			if (project != null)
+			{
+				project.delete();
+			}
+		}
+	}
+
+	// http://www.phpied.com/3-ways-to-define-a-javascript-class/
+	@Test
+	public void testCreateTypesWithConstructorUsingThisPropertyAssignment() throws Exception
+	{
+		String source = "function x() = { this.y = \"string\" };";
+		TestProject project = null;
+		try
+		{
+			// Create a test project and files
+			project = new TestProject("nested", new String[] { "com.aptana.projects.webnature" });
+			IFile number = project.createFile("nested.js", source);
+
+			Index index = getIndexManager().getIndex(number.getProject().getLocationURI());
+
+			// Index the file
+			IFileStoreIndexingParticipant part = new JSFileIndexingParticipant();
+			part.index(new BuildContext(number), index, null);
+
+			// Now query for types
+			JSIndexReader helper = new JSIndexReader();
+			List<TypeElement> types = helper.getTypes(index, true);
+			Map<String, TypeElement> blah = CollectionsUtil.mapFromValues(types, new IMap<TypeElement, String>()
+			{
+				public String map(TypeElement item)
+				{
+					return item.getName();
+				}
+			});
+
+			// Now verify there's an "x" type
+			assertTrue("Index doesn't contain type 'Function<x>'", blah.containsKey("Function<x>"));
+
+			// verify that 'x' type has a property 'y'
+			TypeElement x = blah.get("Function<x>");
+			PropertyElement y = x.getProperty("y");
+			assertNotNull("property 'y' doesn't exist on type 'Function<x>'", y);
+			// Verify that z has a Function type
+			assertTrue("'y' property doesn't have a return type of 'String'", y.getTypeNames().contains("String"));
+		}
+		finally
+		{
+			if (project != null)
+			{
+				project.delete();
+			}
+		}
+	}
+
+	@Test
+	public void testCreateTypeWhenFunctionConstructorDeclaresThisProperties() throws Exception
+	{
+		String source = "var x = new function() { this.color = \"red\"; }";
+		TestProject project = null;
+		try
+		{
+			// Create a test project and files
+			project = new TestProject("TISTUD-6735", new String[] { "com.aptana.projects.webnature" });
+			IFile number = project.createFile("tistud6735_apple.js", source);
+
+			Index index = getIndexManager().getIndex(number.getProject().getLocationURI());
+
+			// Index the file
+			IFileStoreIndexingParticipant part = new JSFileIndexingParticipant();
+			part.index(new BuildContext(number), index, null);
+
+			// Now query for types
+			JSIndexReader helper = new JSIndexReader();
+			List<TypeElement> types = helper.getTypes(index, true);
+			System.out.println(types);
+			Map<String, TypeElement> blah = CollectionsUtil.mapFromValues(types,
+					new IMap<TypeElement, String>()
+					{
+						public String map(TypeElement item)
+						{
+							return item.getName();
+						}
+					});
+
+			// Now verify there's an "x" type
+			assertTrue("Index doesn't contain type 'Function<x>'", blah.containsKey("Function<x>"));
+
+			// verify that 'x' type has a property 'y'
+			TypeElement x = blah.get("Function<x>");
+			PropertyElement y = x.getProperty("y");
+			assertNotNull("property 'y' doesn't exist on type 'Function<x>'", y);
+			// Verify that z has a Function type
+			assertTrue("'y' property doesn't have a return type of 'String'", y.getTypeNames().contains("String"));
 		}
 		finally
 		{

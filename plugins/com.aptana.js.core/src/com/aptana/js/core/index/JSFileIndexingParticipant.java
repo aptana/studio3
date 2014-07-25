@@ -319,6 +319,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 			sub.setWorkRemaining(20);
 			// process module API exports
 			processModule(context, index, ast, location, globals, symbolInferrer, sub.newChild(20));
+			processModule(context, index, globals, ast, location, sub.newChild(20));
 		}
 		catch (OperationCanceledException oce)
 		{
@@ -351,7 +352,9 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 		// Autogenerate some unique type name to hold the module's exports
 		// Then record the mapping between the filepath and the generated type's name
-		String moduleTypeName = JSTypeUtil.getUniqueTypeName(location.toString());
+		// FIXME Can we use better names here? The full  location is too long, and the uuid is ugly and long.
+		// Can we determine the true module id and use that? the relative path to the index root and use that?
+		String moduleTypeName = location.toString(); // JSTypeUtil.getUniqueTypeName(location.toString());
 
 		// Create a type for this module...
 		TypeElement moduleType = new TypeElement();
