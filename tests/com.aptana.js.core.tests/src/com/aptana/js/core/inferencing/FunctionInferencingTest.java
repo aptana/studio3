@@ -7,8 +7,10 @@
  */
 package com.aptana.js.core.inferencing;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 import java.util.List;
 import java.util.Map;
@@ -213,12 +215,12 @@ public class FunctionInferencingTest extends InferencingTestsBase
 			});
 
 			// Now verify there's an "x" type
-			assertTrue("Index doesn't contain type 'Function<x>'", blah.containsKey("Function<x>"));
+			assertTrue("Index doesn't contain type 'x'", blah.containsKey("x"));
 
 			// verify that 'x' type has a property 'y'
-			TypeElement x = blah.get("Function<x>");
+			TypeElement x = blah.get("x");
 			PropertyElement y = x.getProperty("y");
-			assertNotNull("property 'y' doesn't exist on type 'Function<x>'", y);
+			assertNotNull("property 'y' doesn't exist on type 'x'", y);
 			// Verify that z has a Function type
 			assertTrue("'y' property doesn't have a return type of 'String'", y.getTypeNames().contains("String"));
 		}
@@ -251,23 +253,21 @@ public class FunctionInferencingTest extends InferencingTestsBase
 			// Now query for types
 			JSIndexReader helper = new JSIndexReader();
 			List<TypeElement> types = helper.getTypes(index, true);
-			System.out.println(types);
-			Map<String, TypeElement> blah = CollectionsUtil.mapFromValues(types,
-					new IMap<TypeElement, String>()
-					{
-						public String map(TypeElement item)
-						{
-							return item.getName();
-						}
-					});
+			Map<String, TypeElement> blah = CollectionsUtil.mapFromValues(types, new IMap<TypeElement, String>()
+			{
+				public String map(TypeElement item)
+				{
+					return item.getName();
+				}
+			});
 
 			// Now verify there's an "x" type
-			assertTrue("Index doesn't contain type 'Function<x>'", blah.containsKey("Function<x>"));
+			assertTrue("Index doesn't contain type 'x'", blah.containsKey("x"));
 
 			// verify that 'x' type has a property 'y'
-			TypeElement x = blah.get("Function<x>");
+			TypeElement x = blah.get("x");
 			PropertyElement y = x.getProperty("y");
-			assertNotNull("property 'y' doesn't exist on type 'Function<x>'", y);
+			assertNotNull("property 'y' doesn't exist on type 'x'", y);
 			// Verify that z has a Function type
 			assertTrue("'y' property doesn't have a return type of 'String'", y.getTypeNames().contains("String"));
 		}
@@ -327,5 +327,77 @@ public class FunctionInferencingTest extends InferencingTestsBase
 	{
 		loadJSMetadata();
 		this.lastStatementTypeTests(Path.fromPortableString("inferencing/constructed-regexp.js"), "RegExp");
+	}
+
+	@Test
+	public void testConstructorFunction()
+	{
+		List<String> types = getLastStatementTypes(Path.fromPortableString("inferencing/something.js"));
+
+		// we construct a MobilewareSdk object
+		assertEquals(1, types.size());
+		String typeName = types.get(0);
+		assertEquals("MobilewareSdk", typeName);
+
+		// it has the following properties:
+		List<TypeElement> typeElements = getType(typeName);
+		assertNotNull(typeElements);
+		propertiesExist(typeElements.get(0), "name", "version", "organization", "url", "apis", "api", "toString");
+
+		// TODO ensure we also record that it has an apis['customerevent'] with lots of functions!
+
+		// PropertyElement property = typeElements.get(0).getProperty("b");
+		// assertNotNull(property);
+		// List<String> propertyTypeNames = property.getTypeNames();
+		// assertEquals(1, propertyTypeNames.size());
+		//
+		// String propertyTypeName = propertyTypeNames.get(0);
+		// List<TypeElement> propertyTypes = getType(propertyTypeName);
+		// assertNotNull(propertyTypes);
+		//
+		// structureTests(propertyTypes, "c");
+	}
+
+	@Test
+	public void testAddingPropertiesToPrototypeAddsToOwningType()
+	{
+		List<String> types = getLastStatementTypes(Path.fromPortableString("inferencing/prototype-additions.js"));
+
+		// we construct a MobilewareSdk object
+		assertEquals(1, types.size());
+		String typeName = types.get(0);
+		assertEquals("MobilewareSdk", typeName);
+
+		// it has the following properties:
+		List<TypeElement> typeElements = getType(typeName);
+		assertNotNull(typeElements);
+		propertiesExist(typeElements.get(0), CollectionsUtil.newMap("name", "String", "version", "String", "api",
+				"Function", "toString", "Function"));
+	}
+
+	protected void propertiesExist(TypeElement type, String... propertyNames)
+	{
+		for (String propertyName : propertyNames)
+		{
+			PropertyElement property = type.getProperty(propertyName);
+			assertNotNull(propertyName + " does not exist", property);
+
+			List<String> propertyTypeNames = property.getTypeNames();
+			assertNotNull(propertyName + " does not have a type", propertyTypeNames);
+		}
+	}
+
+	protected void propertiesExist(TypeElement type, Map<String, String> propToType)
+	{
+		for (Map.Entry<String, String> prop : propToType.entrySet())
+		{
+			PropertyElement property = type.getProperty(prop.getKey());
+			assertNotNull(prop.getKey() + " does not exist", property);
+
+			List<String> propertyTypeNames = property.getTypeNames();
+			assertNotNull(prop.getKey() + " does not have a type", propertyTypeNames);
+			assertFalse(prop.getKey() + " does not have a type", propertyTypeNames.isEmpty());
+			assertEquals(prop.getKey() + " does not have expected type", prop.getValue(), propertyTypeNames.get(0));
+		}
 	}
 }

@@ -20,10 +20,10 @@ import java.util.Queue;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
 
-import com.aptana.core.IFilter;
 import com.aptana.core.IMap;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
@@ -71,19 +71,6 @@ public class JSSymbolTypeInferrer
 		TypeElement result = new TypeElement();
 
 		// Set the name first so we can validate we don't end up setting self as a parent type
-		String functionSuper = CollectionsUtil.find(types, new IFilter<String>()
-		{
-			public boolean include(String item)
-			{
-				return JSTypeUtil.isFunctionPrefix(item);
-			}
-		});
-		// FIXME if this is a constructor function, we really don't want to set "Function" as the super type, nor do we
-		// want the type to be recorded as Function<x> where x is the function name. We should make Object the
-		// "superclass" and strip the Function<>.
-		// However, it _may_ be useful to retain that in cases where we explicitly return something else.
-		boolean isFunction = functionSuper != null;
-
 		String name = null;
 		List<JSNode> values = property.getValues();
 
@@ -116,28 +103,15 @@ public class JSSymbolTypeInferrer
 			name = JSTypeUtil.getUniqueTypeName();
 		}
 
-		// wrap the name
-		if (isFunction)
-		{
-			name = JSTypeConstants.FUNCTION_TYPE + JSTypeConstants.GENERIC_OPEN + name + JSTypeConstants.GENERIC_CLOSE;
-		}
-
-		// give type a unique name
 		result.setName(name);
 
 		// set parent types
-		if (types != null)
+		// FIXME We can't possibly have multiple super types. What the hell is going on here?
+		if (!CollectionsUtil.isEmpty(types))
 		{
 			for (String superType : types)
 			{
-				if (JSTypeUtil.isFunctionPrefix(superType))
-				{
-					result.addParentType(JSTypeConstants.FUNCTION_TYPE);
-				}
-				else
-				{
-					result.addParentType(superType);
-				}
+				result.addParentType(superType);
 			}
 		}
 
@@ -535,11 +509,31 @@ public class JSSymbolTypeInferrer
 				// infer types of the additional properties
 				if (!CollectionsUtil.isEmpty(additionalProperties))
 				{
-					int work = 70 / additionalProperties.size();
-					for (String pname : additionalProperties)
+					// FIXME This gives busted progress here
+					// If user hung additional properties off of "prototype" elevate those up to the type.
+					if (additionalProperties.contains(JSTypeConstants.PROTOTYPE_PROPERTY))
 					{
-						PropertyElement pe = this.getSymbolPropertyElement(property, pname, sub.newChild(work));
-						subType.addProperty(pe);
+						JSPropertyCollection collection = property.getProperty(JSTypeConstants.PROTOTYPE_PROPERTY);
+						if (collection.hasProperties())
+						{
+							for (String pname : collection.getPropertyNames())
+							{
+								PropertyElement pe = this.getSymbolPropertyElement(collection, pname,
+										new NullProgressMonitor());
+								subType.addProperty(pe);
+							}
+							additionalProperties.remove(JSTypeConstants.PROTOTYPE_PROPERTY);
+						}
+					}
+					// Now do all the non-prototype properties!
+					if (!CollectionsUtil.isEmpty(additionalProperties))
+					{
+						int work = 70 / additionalProperties.size();
+						for (String pname : additionalProperties)
+						{
+							PropertyElement pe = this.getSymbolPropertyElement(property, pname, sub.newChild(work));
+							subType.addProperty(pe);
+						}
 					}
 				}
 

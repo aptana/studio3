@@ -266,7 +266,7 @@ public class JSSymbolCollector extends JSTreeWalker
 
 						case IJSNodeTypes.THIS:
 							// Get the surrounding function's "property" to hang it's own properties off of
-							JSFunctionNode funcNode = (JSFunctionNode) node.getParent().getParent();
+							JSFunctionNode funcNode = getSurroundingFunction(node);
 							String name = funcNode.getName().getText();
 							// The name may be empty, thus it's an anonymous function being invoked and assigned to some
 							// variable/identifier. We need _that_ name
@@ -306,6 +306,19 @@ public class JSSymbolCollector extends JSTreeWalker
 		{
 			this.accept(rhs);
 		}
+	}
+
+	private JSFunctionNode getSurroundingFunction(JSNode node)
+	{
+		while (node != null)
+		{
+			if (node instanceof JSFunctionNode)
+			{
+				return (JSFunctionNode) node;
+			}
+			node = (JSNode) node.getParent();
+		}
+		return null;
 	}
 
 	/*
