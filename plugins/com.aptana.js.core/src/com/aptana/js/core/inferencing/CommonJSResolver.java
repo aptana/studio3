@@ -23,7 +23,7 @@ import com.aptana.js.core.parsing.ast.JSStringNode;
 import com.aptana.parsing.ast.IParseNode;
 
 /**
- * Resolves a module id relative to a base module namespace root, ore if the path is explicitly relative, relative to
+ * Resolves a module id relative to a base module namespace root, or if the path is explicitly relative, relative to
  * current location.
  * 
  * @author cwilliams

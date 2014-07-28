@@ -89,11 +89,36 @@ public interface INodePackageManager
 	 */
 	public IPath getModulesPath(String packageName) throws CoreException;
 
+	/**
+	 * Gets the latest installed version of a package.
+	 * 
+	 * @param packageName
+	 * @return
+	 * @throws CoreException
+	 */
 	public String getInstalledVersion(String packageName) throws CoreException;
 
 	public String getInstalledVersion(String packageName, boolean isGlobal, IPath workingDir) throws CoreException;
 
+	/**
+	 * Gets the latest version published for a package. Note that there may be "newer" RC/beta/alphas, but the NPM
+	 * "latest" pointer may not refer to them.
+	 * 
+	 * @param packageName
+	 * @return
+	 * @throws CoreException
+	 */
 	public String getLatestVersionAvailable(String packageName) throws CoreException;
+
+	/**
+	 * Gets the full list of published versions for a given package. NEVER RETURNS NULL! if anything goes wrong, we'll
+	 * throw a CoreException.
+	 * 
+	 * @param packageName
+	 * @return
+	 * @throws CoreException
+	 */
+	public List<String> getAvailableVersions(String packageName) throws CoreException;
 
 	public String getConfigValue(String key) throws CoreException;
 
@@ -191,14 +216,5 @@ public interface INodePackageManager
 	 */
 	public IPath findNpmPackagePath(String executableName, boolean appendExtension, List<IPath> searchLocations,
 			FileFilter fileFilter);
-
-	/**
-	 * Returns the list of available versions for a package, in ascending order.
-	 * 
-	 * @param packageName
-	 * @return
-	 */
-	public List<String> getVersions(String packageName);
-
 	// TODO Update
 }
