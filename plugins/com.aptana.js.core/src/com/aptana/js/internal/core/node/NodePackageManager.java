@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.osgi.framework.Bundle;
@@ -57,6 +58,10 @@ import com.aptana.js.core.node.INodePackageManager;
  */
 public class NodePackageManager implements INodePackageManager
 {
+
+	private static final String TRUE = "true";
+
+	private static final String JSON = "--json";
 
 	/**
 	 * The error string that appears in the npm command output.
@@ -463,7 +468,7 @@ public class NodePackageManager implements INodePackageManager
 	public String getInstalledVersion(String packageName, boolean global, IPath workingDir) throws CoreException
 	{
 		IPath npmPath = checkedNPMPath();
-		List<String> args = CollectionsUtil.newList(npmPath.toOSString(), "ls", packageName, COLOR, FALSE); //$NON-NLS-1$
+		List<String> args = CollectionsUtil.newList(npmPath.toOSString(), "ls", packageName, COLOR, FALSE, JSON, TRUE); //$NON-NLS-1$
 		if (global)
 		{
 			args.add(GLOBAL_ARG);
@@ -471,24 +476,30 @@ public class NodePackageManager implements INodePackageManager
 		IStatus status = nodeJS.runInBackground(workingDir, ShellExecutable.getEnvironment(), args);
 		if (!status.isOK())
 		{
-			// TODO This may return a non zero exit code but still give output we can use, not sure. Similar to what we
-			// saw with list command
 			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
 					Messages.NodePackageManager_FailedToDetermineInstalledVersion, packageName, status.getMessage())));
 		}
-		String output = status.getMessage();
-		int index = output.indexOf(packageName + '@');
-		if (index != -1)
+		try
 		{
-			output = output.substring(index + packageName.length() + 1);
-			int space = output.indexOf(' ');
-			if (space != -1)
+			String output = status.getMessage();
+			JSONObject json = (JSONObject) new JSONParser().parse(output);
+			if (!json.containsKey("dependencies"))
 			{
-				output = output.substring(0, space);
+				return null;
 			}
-			return output;
+			JSONObject dependencies = (JSONObject) json.get("dependencies");
+			if (!dependencies.containsKey(packageName))
+			{
+				return null;
+			}
+			JSONObject pkg = (JSONObject) dependencies.get(packageName);
+			return (String) pkg.get("version");
 		}
-		return null;
+		catch (ParseException e)
+		{
+			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
+					Messages.NodePackageManager_FailedToDetermineInstalledVersion, packageName, e.getMessage())));
+		}
 	}
 
 	public String getLatestVersionAvailable(String packageName) throws CoreException
@@ -514,6 +525,33 @@ public class NodePackageManager implements INodePackageManager
 			return m.group(1);
 		}
 		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<String> getAvailableVersions(String packageName) throws CoreException
+	{
+		IPath npmPath = checkedNPMPath();
+
+		Map<String, String> env = ShellExecutable.getEnvironment();
+		List<String> args = CollectionsUtil.newList(npmPath.toOSString(),
+				"view", packageName, "versions", COLOR, FALSE, JSON, TRUE);//$NON-NLS-1$ //$NON-NLS-2$
+		args.addAll(proxySettings(env));
+
+		IStatus status = nodeJS.runInBackground(null, env, args);
+		if (!status.isOK())
+		{
+			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
+					Messages.NodePackageManager_FailedToDetermineLatestVersion, packageName, status.getMessage())));
+		}
+		String message = status.getMessage().trim();
+		try
+		{
+			return (List<String>) new JSONParser().parse(message);
+		}
+		catch (ParseException e)
+		{
+			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, e.getMessage(), e));
+		}
 	}
 
 	public String getConfigValue(String key) throws CoreException
@@ -781,31 +819,5 @@ public class NodePackageManager implements INodePackageManager
 			FileFilter filter)
 	{
 		return ExecutableUtil.find(executableName, true, searchLocations, filter);
-	}
-
-	// TODO Throw a CoreException?
-	public List<String> getVersions(String packageName)
-	{
-		try
-		{
-			IStatus status = runInBackground("view", packageName, "versions", "-json", COLOR, FALSE); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			if (!status.isOK())
-			{
-				return Collections.emptyList();
-			}
-
-			String output = status.getMessage();
-			JSONParser parser = new JSONParser();
-			return (List<String>) parser.parse(output);
-		}
-		catch (CoreException ce)
-		{
-			IdeLog.logError(JSCorePlugin.getDefault(), ce);
-		}
-		catch (ParseException e)
-		{
-			IdeLog.logError(JSCorePlugin.getDefault(), e);
-		}
-		return Collections.emptyList();
 	}
 }
