@@ -32,25 +32,6 @@ public class BuildPathEntry implements IBuildPathEntry
 		this.path = path;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	@Override
-	public boolean equals(Object arg0)
-	{
-		boolean result = false;
-
-		if (arg0 instanceof BuildPathEntry)
-		{
-			BuildPathEntry other = (BuildPathEntry) arg0;
-
-			result = displayName.equals(other.displayName) && path.equals(other.path);
-		}
-
-		return result;
-	}
-
 	/**
 	 * getDisplayName
 	 * 
@@ -69,16 +50,6 @@ public class BuildPathEntry implements IBuildPathEntry
 	public URI getPath()
 	{
 		return path;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode()
-	{
-		return displayName.hashCode() * 31 + path.hashCode();
 	}
 
 	/**
@@ -109,5 +80,44 @@ public class BuildPathEntry implements IBuildPathEntry
 	public String toString()
 	{
 		return displayName + ":" + path.toString(); //$NON-NLS-1$
+	}
+
+	@Override
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((path == null) ? 0 : path.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj)
+		{
+			return true;
+		}
+		if (obj == null)
+		{
+			return false;
+		}
+		if (getClass() != obj.getClass())
+		{
+			return false;
+		}
+		BuildPathEntry other = (BuildPathEntry) obj;
+		if (path == null)
+		{
+			if (other.path != null)
+			{
+				return false;
+			}
+		}
+		else if (!path.equals(other.path))
+		{
+			return false;
+		}
+		return true;
 	}
 }
