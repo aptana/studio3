@@ -367,7 +367,6 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		JSPropertyCollection module = globals.getSymbol("module"); //$NON-NLS-1$
 		if (module != null)
 		{
-			// JSSymbolTypeInferrer infer = new JSSymbolTypeInferrer(globals, index, location, queryHelper);
 			// Now grab "module.exports" and attach that property to our hand-generated module type from above
 			PropertyElement exports = infer.getSymbolPropertyElement(module, "exports", sub.newChild(90)); //$NON-NLS-1$
 			moduleType.addProperty(exports);
@@ -396,7 +395,6 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 			}
 			// Grab all properties hanging off "exports" and attach them to our hand-generated "module.exports" module
 			// instance type.
-			// JSSymbolTypeInferrer infer = new JSSymbolTypeInferrer(globals, index, location, queryHelper);
 			List<String> properties = exports.getPropertyNames();
 			if (!CollectionsUtil.isEmpty(properties))
 			{
