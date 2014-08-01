@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2014 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -173,6 +173,10 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 	 */
 	public void processParseResults(BuildContext context, Index index, IParseNode ast, IProgressMonitor monitor)
 	{
+		if (monitor.isCanceled())
+		{
+			return;
+		}
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
 
 		queryHelper = new JSIndexQueryHelper(context.getProject());
@@ -195,6 +199,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		JSScope globals = getGlobals(ast);
 		try
 		{
+			JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(globals, index, location, queryHelper);
 			// process globals
 			if (globals != null)
 			{
@@ -223,7 +228,6 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 					IdeLog.logTrace(JSCorePlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
 				}
 
-				JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(globals, index, location, queryHelper);
 				for (PropertyElement property : symbolInferrer.getScopeProperties(sub.newChild(25)))
 				{
 					globalType.addProperty(property);
@@ -314,7 +318,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 			sub.setWorkRemaining(20);
 			// process module API exports
-			processModule(context, index, ast, location, sub.newChild(20));
+			processModule(context, index, ast, location, globals, symbolInferrer, sub.newChild(20));
 		}
 		catch (OperationCanceledException oce)
 		{
@@ -331,12 +335,13 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 	 * @param index
 	 * @param ast
 	 * @param location
+	 * @param globals
+	 * @param symbolInferrer
 	 * @param monitor
 	 */
-	protected void processModule(BuildContext context, Index index, IParseNode ast, URI location,
-			IProgressMonitor monitor)
+	protected void processModule(BuildContext context, Index index, IParseNode ast, URI location, JSScope globals,
+			JSSymbolTypeInferrer infer, IProgressMonitor monitor)
 	{
-		JSScope globals = getGlobals(ast);
 		if (globals == null)
 		{
 			return;
@@ -362,7 +367,6 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		JSPropertyCollection module = globals.getSymbol("module"); //$NON-NLS-1$
 		if (module != null)
 		{
-			JSSymbolTypeInferrer infer = new JSSymbolTypeInferrer(globals, index, location, queryHelper);
 			// Now grab "module.exports" and attach that property to our hand-generated module type from above
 			PropertyElement exports = infer.getSymbolPropertyElement(module, "exports", sub.newChild(90)); //$NON-NLS-1$
 			moduleType.addProperty(exports);
@@ -391,7 +395,6 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 			}
 			// Grab all properties hanging off "exports" and attach them to our hand-generated "module.exports" module
 			// instance type.
-			JSSymbolTypeInferrer infer = new JSSymbolTypeInferrer(globals, index, location, queryHelper);
 			List<String> properties = exports.getPropertyNames();
 			if (!CollectionsUtil.isEmpty(properties))
 			{
