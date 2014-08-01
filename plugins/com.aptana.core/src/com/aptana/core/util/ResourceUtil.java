@@ -210,6 +210,10 @@ public class ResourceUtil
 	 */
 	public static boolean addBuilder(IProject project, String id) throws CoreException
 	{
+		if (project == null)
+		{
+			return false;
+		}
 		IProjectDescription desc = project.getDescription();
 		if (addBuilder(desc, id))
 		{
