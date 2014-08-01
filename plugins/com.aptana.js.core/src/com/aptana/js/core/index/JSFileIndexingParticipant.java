@@ -318,7 +318,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 			sub.setWorkRemaining(20);
 			// process module API exports
-			processModule(context, index, ast, location, symbolInferrer, sub.newChild(20));
+			processModule(context, index, ast, location, globals, symbolInferrer, sub.newChild(20));
 		}
 		catch (OperationCanceledException oce)
 		{
@@ -335,13 +335,13 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 	 * @param index
 	 * @param ast
 	 * @param location
+	 * @param globals
 	 * @param symbolInferrer
 	 * @param monitor
 	 */
-	protected void processModule(BuildContext context, Index index, IParseNode ast, URI location,
+	protected void processModule(BuildContext context, Index index, IParseNode ast, URI location, JSScope globals,
 			JSSymbolTypeInferrer infer, IProgressMonitor monitor)
 	{
-		JSScope globals = getGlobals(ast);
 		if (globals == null)
 		{
 			return;
