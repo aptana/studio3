@@ -101,7 +101,7 @@ LineTerminator = \r|\n|\r\n
 Whitespace = {LineTerminator} | [ \t\f]
 
 Identifier = [:a-zA-Z_][:a-zA-Z_\-\.0-9]*
-InvalidIdentifier = {Identifier} | [:a-zA-Z_\-\.0-9]+
+InvalidIdentifier = [:a-zA-Z_\-\.0-9]+
 
 CharData = [^<]*
 

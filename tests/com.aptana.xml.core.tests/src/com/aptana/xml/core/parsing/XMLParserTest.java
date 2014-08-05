@@ -9,12 +9,17 @@ package com.aptana.xml.core.parsing;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.List;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.aptana.core.build.IProblem;
+import com.aptana.parsing.ParseResult;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.INameNode;
+import com.aptana.parsing.ast.IParseError;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseNodeAttribute;
 import com.aptana.parsing.ast.IParseRootNode;
@@ -147,6 +152,34 @@ public class XMLParserTest
 		assertEquals(0, cdataNode.getStartingOffset());
 		assertEquals(source.length() - 1, cdataNode.getEndingOffset());
 		assertEquals(source, cdataNode.getText());
+	}
+
+	@Test
+	public void testUnquotedAttributeValueBeginningWithDigitMarksParseError() throws Exception
+	{
+		String source = "<note attr=123></note>";
+		ParseState parseState = new ParseState(source);
+		ParseResult result = fParser.parse(parseState);
+		List<IParseError> errors = result.getErrors();
+		assertEquals(1, errors.size());
+		assertEquals("Unquoted attribute value", errors.get(0).getMessage());
+		assertEquals(IProblem.Severity.ERROR, errors.get(0).getSeverity());
+		assertEquals(11, errors.get(0).getOffset());
+		assertEquals(3, errors.get(0).getLength());
+	}
+
+	@Test
+	public void testAttributeWithNoValueMarksParseError() throws Exception
+	{
+		String source = "<note attr></note>";
+		ParseState parseState = new ParseState(source);
+		ParseResult result = fParser.parse(parseState);
+		List<IParseError> errors = result.getErrors();
+		assertEquals(1, errors.size());
+		assertEquals("Attribute declared with no value", errors.get(0).getMessage());
+		assertEquals(IProblem.Severity.ERROR, errors.get(0).getSeverity());
+		assertEquals(6, errors.get(0).getOffset());
+		assertEquals(4, errors.get(0).getLength());
 	}
 
 	protected IParseNode parseTest(String source) throws Exception
