@@ -8,13 +8,22 @@
 package com.aptana.xml.core.parsing;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.aptana.core.build.IProblem;
+import com.aptana.parsing.ParseResult;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.INameNode;
+import com.aptana.parsing.ast.IParseError;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseNodeAttribute;
 import com.aptana.parsing.ast.IParseRootNode;
@@ -147,6 +156,86 @@ public class XMLParserTest
 		assertEquals(0, cdataNode.getStartingOffset());
 		assertEquals(source.length() - 1, cdataNode.getEndingOffset());
 		assertEquals(source, cdataNode.getText());
+	}
+
+	@Test
+	public void testUnquotedAttributeValueBeginningWithDigit() throws Exception
+	{
+		String source = "<note attr=123></note><note attr1=321 attr2=\"something\"></note>";
+		ParseState parseState = new ParseState(source);
+		ParseResult result = fParser.parse(parseState);
+
+		List<IParseError> errors = new ArrayList<IParseError>(result.getErrors());
+		assertEquals(2, errors.size());
+		Collections.sort(errors, new Comparator<IParseError>()
+		{
+			public int compare(IParseError o1, IParseError o2)
+			{
+				return o1.getOffset() - o2.getOffset();
+			}
+		});
+		assertEquals("Unquoted attribute value", errors.get(0).getMessage());
+		assertEquals(IProblem.Severity.ERROR, errors.get(0).getSeverity());
+		assertEquals(11, errors.get(0).getOffset());
+		assertEquals(3, errors.get(0).getLength());
+
+		assertEquals("Unquoted attribute value", errors.get(1).getMessage());
+		assertEquals(IProblem.Severity.ERROR, errors.get(1).getSeverity());
+		assertEquals(34, errors.get(1).getOffset());
+		assertEquals(3, errors.get(1).getLength());
+
+		IParseRootNode root = result.getRootNode();
+		assertNotNull(root);
+		XMLElementNode ee = (XMLElementNode) root.getChild(0);
+		IParseNodeAttribute[] attrs = ee.getAttributes();
+		assertEquals(1, attrs.length);
+		assertEquals("123", ee.getAttributeValue("attr"));
+
+		ee = (XMLElementNode) root.getChild(1);
+		attrs = ee.getAttributes();
+		assertEquals(2, attrs.length);
+		assertEquals("321", ee.getAttributeValue("attr1"));
+		assertEquals("something", ee.getAttributeValue("attr2"));
+	}
+
+	@Test
+	public void testAttributeWithNoValue() throws Exception
+	{
+		String source = "<note attr></note><note attr1 attr2=\"true\"></note>";
+		ParseState parseState = new ParseState(source);
+		ParseResult result = fParser.parse(parseState);
+
+		List<IParseError> errors = new ArrayList<IParseError>(result.getErrors());
+		assertEquals(2, errors.size());
+		Collections.sort(errors, new Comparator<IParseError>()
+		{
+			public int compare(IParseError o1, IParseError o2)
+			{
+				return o1.getOffset() - o2.getOffset();
+			}
+		});
+		assertEquals("Attribute declared with no value", errors.get(0).getMessage());
+		assertEquals(IProblem.Severity.ERROR, errors.get(0).getSeverity());
+		assertEquals(6, errors.get(0).getOffset());
+		assertEquals(4, errors.get(0).getLength());
+
+		assertEquals("Attribute declared with no value", errors.get(1).getMessage());
+		assertEquals(IProblem.Severity.ERROR, errors.get(1).getSeverity());
+		assertEquals(24, errors.get(1).getOffset());
+		assertEquals(5, errors.get(1).getLength());
+
+		IParseRootNode root = result.getRootNode();
+		assertNotNull(root);
+		XMLElementNode ee = (XMLElementNode) root.getChild(0);
+		IParseNodeAttribute[] attrs = ee.getAttributes();
+		assertEquals(1, attrs.length);
+		assertEquals("attr", ee.getAttributeValue("attr")); // unquoted is treated like having value of it's own name
+
+		ee = (XMLElementNode) root.getChild(1);
+		attrs = ee.getAttributes();
+		assertEquals(2, attrs.length);
+		assertEquals("attr1", ee.getAttributeValue("attr1")); // unquoted is treated like having value of it's own name
+		assertEquals("true", ee.getAttributeValue("attr2"));
 	}
 
 	protected IParseNode parseTest(String source) throws Exception
