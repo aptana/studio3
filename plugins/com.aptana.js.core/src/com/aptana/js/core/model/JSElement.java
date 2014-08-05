@@ -7,7 +7,10 @@
  */
 package com.aptana.js.core.model;
 
+import org.eclipse.core.resources.IProject;
+
 import com.aptana.index.core.Index;
+import com.aptana.index.core.IndexPlugin;
 
 /**
  * JSElement
@@ -15,17 +18,17 @@ import com.aptana.index.core.Index;
 public class JSElement extends BaseElement
 {
 
-	private Index index;
+	private IProject project;
 
 	/**
 	 * An element used to group JS content in an Index
 	 * 
-	 * @param index
+	 * @param project
 	 *            The index that contains JS content
 	 */
-	public JSElement(Index index)
+	public JSElement(IProject project)
 	{
-		this.index = index;
+		this.project = project;
 		setName(Messages.JSElement_NodeLabel);
 	}
 
@@ -36,6 +39,11 @@ public class JSElement extends BaseElement
 	 */
 	public Index getIndex()
 	{
-		return index;
+		return IndexPlugin.getDefault().getIndexManager().getIndex(project.getLocationURI());
+	}
+
+	public IProject getProject()
+	{
+		return project;
 	}
 }

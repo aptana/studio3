@@ -34,6 +34,7 @@ import com.aptana.js.core.JSTypeConstants;
 import com.aptana.js.core.inferencing.JSPropertyCollection;
 import com.aptana.js.core.inferencing.JSScope;
 import com.aptana.js.core.inferencing.JSTypeUtil;
+import com.aptana.js.core.model.FunctionElement;
 import com.aptana.js.core.model.PropertyElement;
 import com.aptana.js.core.model.TypeElement;
 import com.aptana.js.core.parsing.ast.IJSNodeTypes;
@@ -351,6 +352,8 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 		// Autogenerate some unique type name to hold the module's exports
 		// Then record the mapping between the filepath and the generated type's name
+		// FIXME Can we use better names here? The full location is too long, and the uuid is ugly and long.
+		// Can we determine the true module id and use that? the relative path to the index root and use that?
 		String moduleTypeName = JSTypeUtil.getUniqueTypeName(location.toString());
 
 		// Create a type for this module...
@@ -371,8 +374,19 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 			PropertyElement exports = infer.getSymbolPropertyElement(module, "exports", sub.newChild(90)); //$NON-NLS-1$
 			moduleType.addProperty(exports);
 
-			// Now copy over the type info from the module.exports property to the hand-generated module instance
-			for (String type : exports.getTypeNames())
+			List<String> types;
+			if (exports instanceof FunctionElement)
+			{
+				// If "exports" is pointing at a constructor(or an instance using constructor), we need it's return
+				// type, not type - because it's type is a function!
+				types = ((FunctionElement) exports).getReturnTypeNames();
+			}
+			else
+			{
+				types = exports.getTypeNames();
+			}
+
+			for (String type : types)
 			{
 				// TODO Where should we strip out the type info on the elements in the collection? This doesn't seem
 				// like the right place, maybe we should do it in CA processor, or index query helper's get ancestor

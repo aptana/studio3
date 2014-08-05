@@ -43,9 +43,12 @@ import com.aptana.js.core.parsing.ast.IJSNodeTypes;
 import com.aptana.js.core.parsing.ast.JSAssignmentNode;
 import com.aptana.js.core.parsing.ast.JSDeclarationNode;
 import com.aptana.js.core.parsing.ast.JSFunctionNode;
+import com.aptana.js.core.parsing.ast.JSGetElementNode;
+import com.aptana.js.core.parsing.ast.JSGetPropertyNode;
 import com.aptana.js.core.parsing.ast.JSIdentifierNode;
 import com.aptana.js.core.parsing.ast.JSNameValuePairNode;
 import com.aptana.js.core.parsing.ast.JSNode;
+import com.aptana.js.core.parsing.ast.JSThisNode;
 import com.aptana.js.internal.core.parsing.sdoc.model.DocumentationBlock;
 import com.aptana.js.internal.core.parsing.sdoc.model.ExampleTag;
 import com.aptana.js.internal.core.parsing.sdoc.model.ParamTag;
@@ -562,6 +565,30 @@ public class JSTypeUtil
 						if (lhs instanceof JSIdentifierNode)
 						{
 							parts.add(lhs.getText());
+						}
+						else if (lhs instanceof JSGetPropertyNode)
+						{
+							JSGetPropertyNode getProp = (JSGetPropertyNode) lhs;
+							if (getProp.getChild(0) instanceof JSThisNode)
+							{
+								parts.add(getProp.getChild(1).getText());
+							}
+						}
+						else if (lhs instanceof JSGetElementNode)
+						{
+							JSGetElementNode getElement = (JSGetElementNode) lhs;
+							// add the property name held in the string
+							parts.add(StringUtil.stripQuotes(getElement.getChild(1).getText()));
+							IParseNode left = getElement.getFirstChild();
+							// could be invoke, getElement, getProperty, construct
+							if (left instanceof JSGetPropertyNode)
+							{
+								JSGetPropertyNode getProp = (JSGetPropertyNode) left;
+								if (getProp.getChild(0) instanceof JSThisNode)
+								{
+									parts.add(getProp.getChild(1).getText());
+								}
+							}
 						}
 						break;
 
