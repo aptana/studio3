@@ -64,6 +64,10 @@ public class EclipseUtil
 	 */
 	private static final String APTANA_STUDIO = MessageFormat.format("{0} Studio", APTANA_STUDIO_PREFIX); //$NON-NLS-1$
 
+	private static final Pattern VERSION_PATTERN = Pattern.compile("Version: (.*)\n"); //$NON-NLS-1$
+	private static final Pattern VERSION_4_4_PATTERN = Pattern.compile("Version: \\{1\\} (.*)\n"); //$NON-NLS-1$
+	private static final Pattern BUILD_PATTERN = Pattern.compile("build: (.*)\n"); //$NON-NLS-1$
+
 	protected static final class LauncherFilter implements FilenameFilter
 	{
 
@@ -239,7 +243,7 @@ public class EclipseUtil
 	 */
 	public static String getProductVersion()
 	{
-		String version = null;
+
 		try
 		{
 			IProduct product = Platform.getProduct();
@@ -248,21 +252,24 @@ public class EclipseUtil
 				String aboutText = product.getProperty("aboutText"); //$NON-NLS-1$
 				if (!StringUtil.isEmpty(aboutText))
 				{
-					String pattern = "Version: (.*)\n"; //$NON-NLS-1$
-					Pattern p = Pattern.compile(pattern);
-					Matcher m = p.matcher(aboutText);
-					boolean found = m.find();
-					if (!found)
+					Matcher m = VERSION_4_4_PATTERN.matcher(aboutText);
+					if (m.find())
 					{
-						// fall back to trying to match build #
-						p = Pattern.compile("build: (.*)\n"); //$NON-NLS-1$
-						m = p.matcher(aboutText);
-						found = m.find();
+						return m.group(1);
 					}
 
-					if (found)
+					// Try version pattern from before 4.4
+					m = VERSION_PATTERN.matcher(aboutText);
+					if (m.find())
 					{
-						version = m.group(1);
+						return m.group(1);
+					}
+
+					// fall back to trying to match build #
+					m = BUILD_PATTERN.matcher(aboutText);
+					if (m.find())
+					{
+						return m.group(1);
 					}
 				}
 			}
@@ -271,12 +278,9 @@ public class EclipseUtil
 		{
 			// ignore
 		}
-		if (StringUtil.isEmpty(version))
-		{
-			// falls back to the branding plugin version
-			return getStudioVersion();
-		}
-		return version;
+
+		// falls back to the branding plugin version
+		return getStudioVersion();
 	}
 
 	/**
