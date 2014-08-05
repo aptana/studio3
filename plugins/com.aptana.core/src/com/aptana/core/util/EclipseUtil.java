@@ -65,7 +65,7 @@ public class EclipseUtil
 	private static final String APTANA_STUDIO = MessageFormat.format("{0} Studio", APTANA_STUDIO_PREFIX); //$NON-NLS-1$
 
 	private static final Pattern VERSION_PATTERN = Pattern.compile("Version: (.*)\n"); //$NON-NLS-1$
-	private static final Pattern VERSION_4_4_PATTERN = Pattern.compile("Version: \\{1\\} (.*)\n"); //$NON-NLS-1$
+	private static final Pattern VERSION_4_4_PATTERN = Pattern.compile("Version: \\{1\\} \\((.*)\\)\n"); //$NON-NLS-1$
 	private static final Pattern BUILD_PATTERN = Pattern.compile("build: (.*)\n"); //$NON-NLS-1$
 
 	protected static final class LauncherFilter implements FilenameFilter
@@ -255,7 +255,7 @@ public class EclipseUtil
 					Matcher m = VERSION_4_4_PATTERN.matcher(aboutText);
 					if (m.find())
 					{
-						return m.group(1);
+						return Version.parseVersion(m.group(1)).toString();
 					}
 
 					// Try version pattern from before 4.4
