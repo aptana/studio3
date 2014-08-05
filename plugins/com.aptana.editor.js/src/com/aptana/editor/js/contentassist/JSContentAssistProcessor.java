@@ -60,6 +60,7 @@ import com.aptana.js.core.model.PropertyElement;
 import com.aptana.js.core.parsing.JSFlexScanner;
 import com.aptana.js.core.parsing.JSParseState;
 import com.aptana.js.core.parsing.JSTokenType;
+import com.aptana.js.core.parsing.ThisAssignmentCollector;
 import com.aptana.js.core.parsing.ast.IJSNodeTypes;
 import com.aptana.js.core.parsing.ast.JSArgumentsNode;
 import com.aptana.js.core.parsing.ast.JSAssignmentNode;

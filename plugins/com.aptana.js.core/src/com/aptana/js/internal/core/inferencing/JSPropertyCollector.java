@@ -203,6 +203,7 @@ public class JSPropertyCollector extends JSTreeWalker
 		IParseNode lhs = node.getLeftHandSide();
 		IParseNode rhs = node.getRightHandSide();
 
+		// FIXME This is adding "apis" as a property of the existing "apis" that is our current global collection!
 		if (lhs instanceof JSNode)
 		{
 			((JSNode) lhs).accept(this);
