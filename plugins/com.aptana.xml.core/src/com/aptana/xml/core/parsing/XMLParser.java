@@ -218,7 +218,7 @@ public class XMLParser extends AbstractParser
 						else
 						{
 							// Last attribute was just a name, no value!
-							fWorking.addError(new ParseError(IXMLConstants.CONTENT_TYPE_XML, fCurrentLexeme,
+							fWorking.addError(new ParseError(IXMLConstants.CONTENT_TYPE_XML, nameSymbol,
 									"Attribute declared with no value", Severity.ERROR));
 							String name = (String) nameSymbol.value;
 							Range nameRegion = new Range(nameSymbol.getStart(), nameSymbol.getEnd());
