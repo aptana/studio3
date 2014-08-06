@@ -47,7 +47,7 @@ public class AnalyticsLogger implements IAnalyticsLogger
 	 * (non-Javadoc)
 	 * @see com.aptana.usage.IAnalyticsLogger#logEvent(com.aptana.usage.AnalyticsEvent)
 	 */
-	public void logEvent(AnalyticsEvent event)
+	public synchronized void logEvent(AnalyticsEvent event)
 	{
 		// persist the event to disk
 		FileWriter writer = null;
@@ -81,7 +81,7 @@ public class AnalyticsLogger implements IAnalyticsLogger
 	 * (non-Javadoc)
 	 * @see com.aptana.usage.IAnalyticsLogger#clearEvents()
 	 */
-	public void clearEvents()
+	public synchronized void clearEvents()
 	{
 		// Erase all events from disk
 		File[] files = this.directory.toFile().listFiles();
@@ -103,7 +103,7 @@ public class AnalyticsLogger implements IAnalyticsLogger
 	 * (non-Javadoc)
 	 * @see com.aptana.usage.IAnalyticsLogger#clearEvent(com.aptana.usage.AnalyticsEvent)
 	 */
-	public void clearEvent(AnalyticsEvent event)
+	public synchronized void clearEvent(AnalyticsEvent event)
 	{
 		// erase specific event from disk
 		File file = getFile(event);
@@ -120,7 +120,7 @@ public class AnalyticsLogger implements IAnalyticsLogger
 	 * (non-Javadoc)
 	 * @see com.aptana.usage.IAnalyticsLogger#getEvents()
 	 */
-	public List<AnalyticsEvent> getEvents()
+	public synchronized List<AnalyticsEvent> getEvents()
 	{
 		// Load all persisted events from disk
 		File[] files = this.directory.toFile().listFiles();
