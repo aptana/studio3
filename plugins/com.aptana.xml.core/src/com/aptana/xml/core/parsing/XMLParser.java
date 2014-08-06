@@ -348,6 +348,7 @@ public class XMLParser extends AbstractParser
 				processComment();
 				break;
 
+			case Terminals.TEXT:
 			case Terminals.CDATA:
 				processCDATA();
 				break;

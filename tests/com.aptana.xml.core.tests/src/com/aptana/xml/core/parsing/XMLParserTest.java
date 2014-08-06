@@ -85,7 +85,7 @@ public class XMLParserTest
 	public void testTags() throws Exception
 	{
 		String source = "<html><head></head><body><p>Text</p></html>\n";
-		IParseNode root = parseTest(source, "<html><head></head><body><p></p></body></html>\n");
+		IParseNode root = parseTest(source, "<html><head></head><body><p>Text</p></body></html>\n");
 		assertEquals(1, root.getChildCount());
 		IParseNode html = root.getFirstChild();
 		assertElement(0, 5, "html", 1, 4, html);
@@ -111,16 +111,16 @@ public class XMLParserTest
 				"<body>Don't forget me this weekend!</body>\n" +
 				"</note>";
 		// @formatter:on
-		IParseNode root = parseTest(source, "<note><to></to><from></from><heading></heading><body></body></note>\n");
+		IParseNode root = parseTest(source, "<note><to>Tove</to><from>Jani</from><heading>Reminder</heading><body>Don't forget me this weekend!</body></note>\n");
 		assertEquals(1, root.getChildCount());
 		IParseNode note = root.getFirstChild();
 		assertElement(44, 160, "note", 45, 48, note);
 		assertEquals(4, note.getChildCount());
 		IParseNode to = note.getFirstChild();
 		assertElement(51, 63, "to", 52, 53, to);
-		assertEquals(0, to.getChildCount());
+		assertEquals(1, to.getChildCount()); // child is text
 		IParseNode from = note.getChild(1);
-		assertEquals(0, from.getChildCount());
+		assertEquals(1, from.getChildCount()); // child is text
 		assertElement(65, 81, "from", 66, 69, from);
 	}
 
