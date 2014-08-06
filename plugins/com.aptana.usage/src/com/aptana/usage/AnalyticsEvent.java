@@ -11,6 +11,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.UUID;
@@ -221,5 +222,77 @@ public class AnalyticsEvent
 			event.append(value);
 		}
 		event.append("&"); //$NON-NLS-1$
+	}
+
+	public String toJSON()
+	{
+		Map<String, Object> json = new HashMap<String, Object>();
+		json.put("dateTime", getDateTime());
+		json.put("type", getEventType());
+		json.put("name", getEventName());
+		json.put("payload", getJSONPayloadString());
+		return JSON.toString(json);
+	}
+
+	@SuppressWarnings("unchecked")
+	public static AnalyticsEvent fromJSON(String json)
+	{
+		Object map = JSON.parse(json);
+		Map<String, Object> jsonMap = (Map<String, Object>) map;
+		return new AnalyticsEvent((String) jsonMap.get("type"), (String) jsonMap.get("name"),
+				(String) jsonMap.get("payload"), (String) jsonMap.get("dateTime"));
+	}
+
+	@Override
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((JSONPayloadString == null) ? 0 : JSONPayloadString.hashCode());
+		result = prime * result + ((dateTime == null) ? 0 : dateTime.hashCode());
+		result = prime * result + ((eventName == null) ? 0 : eventName.hashCode());
+		result = prime * result + ((eventType == null) ? 0 : eventType.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		AnalyticsEvent other = (AnalyticsEvent) obj;
+		if (JSONPayloadString == null)
+		{
+			if (other.JSONPayloadString != null)
+				return false;
+		}
+		else if (!JSONPayloadString.equals(other.JSONPayloadString))
+			return false;
+		if (dateTime == null)
+		{
+			if (other.dateTime != null)
+				return false;
+		}
+		else if (!dateTime.equals(other.dateTime))
+			return false;
+		if (eventName == null)
+		{
+			if (other.eventName != null)
+				return false;
+		}
+		else if (!eventName.equals(other.eventName))
+			return false;
+		if (eventType == null)
+		{
+			if (other.eventType != null)
+				return false;
+		}
+		else if (!eventType.equals(other.eventType))
+			return false;
+		return true;
 	}
 }

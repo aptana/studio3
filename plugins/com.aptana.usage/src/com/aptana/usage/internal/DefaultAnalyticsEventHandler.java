@@ -25,8 +25,8 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.usage.AnalyticsEvent;
-import com.aptana.usage.AnalyticsLogger;
 import com.aptana.usage.IAnalyticsEventHandler;
+import com.aptana.usage.IAnalyticsLogger;
 import com.aptana.usage.IAnalyticsUser;
 import com.aptana.usage.IAnalyticsUserManager;
 import com.aptana.usage.IDebugScopes;
@@ -202,9 +202,9 @@ public class DefaultAnalyticsEventHandler implements IAnalyticsEventHandler
 		return (HttpURLConnection) url.openConnection();
 	}
 
-	protected AnalyticsLogger getAnalyticsLogger()
+	protected IAnalyticsLogger getAnalyticsLogger()
 	{
-		return AnalyticsLogger.getInstance();
+		return UsagePlugin.getDefault().getAnalyticsLogger();
 	}
 
 	protected IAnalyticsUserManager getUserManager()
