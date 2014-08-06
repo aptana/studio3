@@ -9,6 +9,7 @@ package com.aptana.xml.core.parsing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -65,10 +66,31 @@ public class XMLParserTest
 		assertEquals(1, root.getChildCount());
 		XMLElementNode html = (XMLElementNode) root.getFirstChild();
 		assertElement(0, 32, "html", 1, 4, html);
+		assertEquals("html", html.getText());
 		IParseNodeAttribute[] attrs = html.getAttributes();
 		assertEquals(2, attrs.length);
 		assertEquals("myId", html.getAttributeValue("id"));
 		assertEquals("myClass", html.getAttributeValue("class"));
+
+		// first letter of name
+		IParseNodeAttribute attr = html.getAttributeAtOffset(6);
+		assertEquals("class", attr.getName());
+		assertEquals("myClass", attr.getValue());
+
+		// opening quote of value
+		attr = html.getAttributeAtOffset(12);
+		assertEquals("class", attr.getName());
+		assertEquals("myClass", attr.getValue());
+		// = between name and value
+		assertNull(html.getAttributeAtOffset(24));
+		// last char of name
+		attr = html.getAttributeAtOffset(23);
+		assertEquals("id", attr.getName());
+		assertEquals("myId", attr.getValue());
+		// closing quote of value
+		attr = html.getAttributeAtOffset(30);
+		assertEquals("id", attr.getName());
+		assertEquals("myId", attr.getValue());
 	}
 
 	private void assertElement(int start, int end, String name, int nameStart, int nameEnd, IParseNode elementNode)
@@ -111,7 +133,8 @@ public class XMLParserTest
 				"<body>Don't forget me this weekend!</body>\n" +
 				"</note>";
 		// @formatter:on
-		IParseNode root = parseTest(source, "<note><to>Tove</to><from>Jani</from><heading>Reminder</heading><body>Don't forget me this weekend!</body></note>\n");
+		IParseNode root = parseTest(source,
+				"<note><to>Tove</to><from>Jani</from><heading>Reminder</heading><body>Don't forget me this weekend!</body></note>\n");
 		assertEquals(1, root.getChildCount());
 		IParseNode note = root.getFirstChild();
 		assertElement(44, 160, "note", 45, 48, note);
