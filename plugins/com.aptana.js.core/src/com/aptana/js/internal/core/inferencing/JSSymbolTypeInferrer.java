@@ -519,6 +519,8 @@ public class JSSymbolTypeInferrer
 							{
 								PropertyElement pe = this.getSymbolPropertyElement(collection, pname,
 										new NullProgressMonitor());
+								pe.setIsInstanceProperty(true);
+								pe.setIsClassProperty(false);
 								subType.addProperty(pe);
 							}
 							additionalProperties.remove(JSTypeConstants.PROTOTYPE_PROPERTY);
@@ -531,6 +533,7 @@ public class JSSymbolTypeInferrer
 						for (String pname : additionalProperties)
 						{
 							PropertyElement pe = this.getSymbolPropertyElement(property, pname, sub.newChild(work));
+							pe.setIsClassProperty(true);
 							subType.addProperty(pe);
 						}
 					}
@@ -542,6 +545,8 @@ public class JSSymbolTypeInferrer
 					PropertyElement pe = new PropertyElement();
 					pe.setName(JSTypeConstants.PROTOTYPE_PROPERTY);
 					pe.addType(JSTypeConstants.OBJECT_TYPE);
+					pe.setIsClassProperty(true);
+					pe.setIsInstanceProperty(false);
 					subType.addProperty(pe);
 				}
 

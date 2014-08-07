@@ -64,11 +64,15 @@ import com.aptana.js.core.parsing.ThisAssignmentCollector;
 import com.aptana.js.core.parsing.ast.IJSNodeTypes;
 import com.aptana.js.core.parsing.ast.JSArgumentsNode;
 import com.aptana.js.core.parsing.ast.JSAssignmentNode;
+import com.aptana.js.core.parsing.ast.JSConstructNode;
 import com.aptana.js.core.parsing.ast.JSFunctionNode;
 import com.aptana.js.core.parsing.ast.JSGetPropertyNode;
+import com.aptana.js.core.parsing.ast.JSIdentifierNode;
+import com.aptana.js.core.parsing.ast.JSInvokeNode;
 import com.aptana.js.core.parsing.ast.JSNode;
 import com.aptana.js.core.parsing.ast.JSObjectNode;
 import com.aptana.js.core.parsing.ast.JSParseRootNode;
+import com.aptana.js.core.parsing.ast.JSPrimitiveNode;
 import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.INameNode;
 import com.aptana.parsing.ast.IParseNode;
@@ -117,6 +121,33 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		public boolean include(PropertyElement item)
 		{
 			return !item.isInternal();
+		}
+	};
+
+	/**
+	 * Retains instance properties.
+	 */
+	private static final IFilter<PropertyElement> isInstanceFilter = new IFilter<PropertyElement>()
+	{
+		public boolean include(PropertyElement item)
+		{
+			String typeName = item.getOwningType();
+			if (typeName.equals("module.exports") || (typeName.startsWith("$module") && typeName.endsWith(".exports")))
+			{
+				return item.isClassProperty();
+			}
+			return item.isInstanceProperty();
+		}
+	};
+
+	/**
+	 * Retains class properties.
+	 */
+	private static final IFilter<PropertyElement> isStaticFilter = new IFilter<PropertyElement>()
+	{
+		public boolean include(PropertyElement item)
+		{
+			return item.isClassProperty();
 		}
 	};
 
@@ -265,13 +296,42 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	protected void addProperties(Set<ICompletionProposal> proposals, int offset)
 	{
 		JSGetPropertyNode node = ParseUtil.getGetPropertyNode(targetNode, statementNode);
+		boolean isInstance = isInstance(node);
 		List<String> types = getParentObjectTypes(node, offset);
 
 		// add all properties of each type to our proposal list
 		for (String type : types)
 		{
-			addTypeProperties(proposals, type, offset);
+			addTypeProperties(proposals, type, offset, isInstance);
 		}
+	}
+
+	private boolean isInstance(JSGetPropertyNode node)
+	{
+		IParseNode left = node.getChild(0);
+		// if receiver is a new call, or a primitive, we know it's an instance.
+		// FIXME what about "this"?
+		if (left instanceof JSConstructNode || left instanceof JSPrimitiveNode)
+		{
+			if (left instanceof JSIdentifierNode)
+			{
+				// FIXME Track back to last assignment to determine better
+				// cheat and assume identifiers beginning with upper case letter are types.
+				JSIdentifierNode ident = (JSIdentifierNode) left;
+				String name = ident.getNameNode().getName();
+				if (Character.isUpperCase(name.charAt(0)))
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+		if (left instanceof JSInvokeNode)
+		{
+			// FIXME what about here? We need to look up the return values to determine...
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -612,9 +672,10 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param proposals
 	 * @param typeName
 	 * @param offset
+	 * @param isInstance
 	 */
 	@SuppressWarnings("unchecked")
-	protected void addTypeProperties(Set<ICompletionProposal> proposals, String typeName, int offset)
+	protected void addTypeProperties(Set<ICompletionProposal> proposals, String typeName, int offset, boolean isInstance)
 	{
 		// grab all ancestors of the specified type
 		List<String> allTypes = getQueryHelper().getTypeAncestorNames(typeName);
@@ -626,7 +687,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		Collection<PropertyElement> properties = getQueryHelper().getTypeMembers(allTypes);
 		URI projectURI = getProjectURI();
 		for (PropertyElement property : CollectionsUtil.filter(properties, new AndFilter<PropertyElement>(
-				isNotConstructorFilter, isVisibleFilter)))
+				isNotConstructorFilter, isVisibleFilter, isInstance ? isInstanceFilter : isStaticFilter)))
 		{
 			addProposal(proposals, property, offset, projectURI, null);
 		}

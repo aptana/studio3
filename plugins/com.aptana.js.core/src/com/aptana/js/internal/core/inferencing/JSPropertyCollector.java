@@ -10,6 +10,7 @@ package com.aptana.js.internal.core.inferencing;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.aptana.js.core.JSTypeConstants;
 import com.aptana.js.core.inferencing.JSPropertyCollection;
 import com.aptana.js.core.parsing.ast.JSAssignmentNode;
 import com.aptana.js.core.parsing.ast.JSGetElementNode;
@@ -33,6 +34,8 @@ public class JSPropertyCollector extends JSTreeWalker
 	public JSPropertyCollector(JSPropertyCollection global)
 	{
 		this._object = this._currentObject = global;
+		// all properties defined in object literals are actually "instance" properties that hang off the prototype property of the type
+		activateProperty(JSTypeConstants.PROTOTYPE_PROPERTY);
 	}
 
 	/**
@@ -42,6 +45,7 @@ public class JSPropertyCollector extends JSTreeWalker
 	 */
 	public void activateProperty(String name)
 	{
+		// FIXME Really new properties should hang off of "prototype"!
 		if (this._currentObject.hasProperty(name))
 		{
 			this._currentObject = this._currentObject.getProperty(name);
