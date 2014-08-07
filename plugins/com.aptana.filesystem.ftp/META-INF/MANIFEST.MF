@@ -9,7 +9,7 @@ Bundle-Localization: plugin
 Require-Bundle: com.aptana.core,
  com.aptana.core.io,
  com.aptana.core.epl,
- com.aptana.ide.libraries.subscription
+ com.aptana.libraries
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Eclipse-LazyStart: true
