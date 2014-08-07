@@ -17,7 +17,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.aptana.usage.AnalyticsEvent;
-import com.aptana.usage.AnalyticsLogger;
+import com.aptana.usage.IAnalyticsLogger;
 import com.aptana.usage.IAnalyticsUser;
 import com.aptana.usage.IAnalyticsUserManager;
 import com.aptana.usage.IUsageSystemProperties;
@@ -28,7 +28,7 @@ public class DefaultAnalyticsEventHandlerTest
 	private Mockery context;
 	private DefaultAnalyticsEventHandler handler;
 	private IAnalyticsUserManager userManager;
-	private AnalyticsLogger logger;
+	private IAnalyticsLogger logger;
 	private IAnalyticsUser user;
 	private HttpURLConnection connection;
 	private DataOutputStream outputStream;
@@ -44,7 +44,7 @@ public class DefaultAnalyticsEventHandlerTest
 			}
 		};
 		userManager = context.mock(IAnalyticsUserManager.class);
-		logger = context.mock(AnalyticsLogger.class);
+		logger = context.mock(IAnalyticsLogger.class);
 		user = context.mock(IAnalyticsUser.class);
 		connection = context.mock(HttpURLConnection.class);
 		outputStream = context.mock(DataOutputStream.class);
@@ -57,7 +57,7 @@ public class DefaultAnalyticsEventHandlerTest
 			}
 
 			@Override
-			protected AnalyticsLogger getAnalyticsLogger()
+			protected IAnalyticsLogger getAnalyticsLogger()
 			{
 				return logger;
 			}
