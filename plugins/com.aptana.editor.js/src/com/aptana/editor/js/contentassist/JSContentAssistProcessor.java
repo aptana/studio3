@@ -57,6 +57,7 @@ import com.aptana.js.core.inferencing.JSTypeUtil;
 import com.aptana.js.core.model.FunctionElement;
 import com.aptana.js.core.model.ParameterElement;
 import com.aptana.js.core.model.PropertyElement;
+import com.aptana.js.core.model.TypeElement;
 import com.aptana.js.core.parsing.JSFlexScanner;
 import com.aptana.js.core.parsing.JSParseState;
 import com.aptana.js.core.parsing.JSTokenType;
@@ -73,6 +74,7 @@ import com.aptana.js.core.parsing.ast.JSNode;
 import com.aptana.js.core.parsing.ast.JSObjectNode;
 import com.aptana.js.core.parsing.ast.JSParseRootNode;
 import com.aptana.js.core.parsing.ast.JSPrimitiveNode;
+import com.aptana.js.core.parsing.ast.JSThisNode;
 import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.INameNode;
 import com.aptana.parsing.ast.IParseNode;
@@ -309,20 +311,31 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	private boolean isInstance(JSGetPropertyNode node)
 	{
 		IParseNode left = node.getChild(0);
-		// if receiver is a new call, or a primitive, we know it's an instance.
-		// FIXME what about "this"?
+		// if we're invoking on "this", then we should show instance properties...
+		if (left instanceof JSThisNode)
+		{
+			return true;
+		}
+		// if receiver is a "new something()" call, or a primitive we know it's typically an instance.
 		if (left instanceof JSConstructNode || left instanceof JSPrimitiveNode)
 		{
+			// Identifiers are special case. They're just variable names. We need to determine if they refer to a type
+			// or an instance
 			if (left instanceof JSIdentifierNode)
 			{
 				// FIXME Track back to last assignment to determine better
 				// cheat and assume identifiers beginning with upper case letter are types.
 				JSIdentifierNode ident = (JSIdentifierNode) left;
 				String name = ident.getNameNode().getName();
-				if (Character.isUpperCase(name.charAt(0)))
+				if ("$".equals(name) || "Ti".equals(name) || "jQuery".equals(name)) // HACK for jQuery
 				{
+					// FIXME Do a better handling of aliases like $ or Ti
+					// String global = JSTypeUtil.getGlobalType(getProject(), getFilename());
+					// List<PropertyElement> aliases = getQueryHelper().getProperties(global, name);
 					return false;
 				}
+				Collection<TypeElement> types = getQueryHelper().getTypes(name, false);
+				return CollectionsUtil.isEmpty(types); // if there are no types by this name, assume it's an instance
 			}
 			return true;
 		}
