@@ -64,7 +64,6 @@ public class SudoProcessRunnable extends ProcessRunnable
 			while ((line = br.readLine()) != null)
 			{
 				builder.append(line).append('\n');
-				System.out.println(line);
 				if (line.contains(echoMessage))
 				{
 					// We're good, we got our success message, mark exit code of 0, break the loop
