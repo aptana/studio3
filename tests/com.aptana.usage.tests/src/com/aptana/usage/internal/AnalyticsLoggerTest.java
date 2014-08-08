@@ -5,8 +5,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -83,16 +81,9 @@ public class AnalyticsLoggerTest
 		assertTrue(eventFile2.isFile());
 
 		List<AnalyticsEvent> events = logger.getEvents();
-		Collections.sort(events, new Comparator<AnalyticsEvent>()
-		{
-			public int compare(AnalyticsEvent o1, AnalyticsEvent o2)
-			{
-				return o1.getDateTime().compareTo(o2.getDateTime());
-			}
-		});
 		assertEquals(2, events.size());
-		assertEquals(event1, events.get(0));
-		assertEquals(event2, events.get(1));
+		assertTrue(events.contains(event1));
+		assertTrue(events.contains(event2));
 
 		logger.clearEvents();
 		assertFalse(eventFile1.exists());
