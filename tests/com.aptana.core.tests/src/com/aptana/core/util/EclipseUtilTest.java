@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.junit.Test;
 import org.osgi.framework.Version;
@@ -78,7 +79,7 @@ public class EclipseUtilTest
 		assertEquals(0, components.length);
 
 		String[] testComponents = new String[] { "com.aptana.core/debug", "com.aptana.rcp/debug" };
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(CorePlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(CorePlugin.PLUGIN_ID);
 		prefs.put(ICorePreferenceConstants.PREF_DEBUG_COMPONENT_LIST, StringUtil.join(",", testComponents));
 
 		components = EclipseUtil.getCurrentDebuggableComponents();

@@ -13,6 +13,7 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -28,7 +29,6 @@ import org.eclipse.tm.internal.terminal.provisional.api.ITerminalConnector;
 import org.eclipse.tm.internal.terminal.textcanvas.ILinelRenderer;
 import org.eclipse.tm.internal.terminal.textcanvas.ITextCanvasModel;
 
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.terminal.internal.hyperlink.HyperlinkManager;
 import com.aptana.theme.IThemeManager;
@@ -69,8 +69,7 @@ public class VT100TerminalControl extends org.eclipse.tm.internal.terminal.emula
 				}
 			}
 		};
-		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID)
-				.addPreferenceChangeListener(preferenceChangeListener);
+		InstanceScope.INSTANCE.getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(preferenceChangeListener);
 		propertyChangeListener = new IPropertyChangeListener()
 		{
 			public void propertyChange(PropertyChangeEvent event)
@@ -135,8 +134,7 @@ public class VT100TerminalControl extends org.eclipse.tm.internal.terminal.emula
 	public void disposeTerminal()
 	{
 		JFaceResources.getFontRegistry().removeListener(propertyChangeListener);
-		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID)
-				.removePreferenceChangeListener(preferenceChangeListener);
+		InstanceScope.INSTANCE.getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(preferenceChangeListener);
 		super.disposeTerminal();
 	}
 

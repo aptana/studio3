@@ -9,6 +9,7 @@ package com.aptana.js.debug.ui.internal.preferences;
 
 import java.io.IOException;
 
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.IPersistentPreferenceStore;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
@@ -33,7 +34,8 @@ import com.aptana.js.debug.ui.internal.IJSDebugUIConstants;
 /**
  * @author Max Stepanov
  */
-public class JSDebugPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
+public class JSDebugPreferencePage extends PreferencePage implements IWorkbenchPreferencePage
+{
 	private Button suspendOnFirstLine;
 	private Button suspendOnExceptions;
 	private Button suspendOnErrors;
@@ -44,15 +46,17 @@ public class JSDebugPreferencePage extends PreferencePage implements IWorkbenchP
 	/**
 	 * 
 	 */
-	public JSDebugPreferencePage() {
+	public JSDebugPreferencePage()
+	{
 		super();
-		setPreferenceStore(new ScopedPreferenceStore(EclipseUtil.instanceScope(), JSDebugPlugin.PLUGIN_ID));
+		setPreferenceStore(new ScopedPreferenceStore(InstanceScope.INSTANCE, JSDebugPlugin.PLUGIN_ID));
 	}
 
 	/**
 	 * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
 	 */
-	protected Control createContents(Composite parent) {
+	protected Control createContents(Composite parent)
+	{
 		Composite composite = new Composite(parent, SWT.NULL);
 		composite.setFont(parent.getFont());
 		composite.setLayout(new GridLayout());
@@ -84,25 +88,29 @@ public class JSDebugPreferencePage extends PreferencePage implements IWorkbenchP
 	/**
 	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
 	 */
-	public void init(IWorkbench workbench) {
+	public void init(IWorkbench workbench)
+	{
 	}
 
 	/**
 	 * @see org.eclipse.jface.preference.PreferencePage#performDefaults()
 	 */
-	protected void performDefaults() {
+	protected void performDefaults()
+	{
 		setDefaultValues();
 	}
 
 	/**
 	 * @see org.eclipse.jface.preference.IPreferencePage#performOk()
 	 */
-	public boolean performOk() {
+	public boolean performOk()
+	{
 		setValues();
 		return super.performOk();
 	}
 
-	private void setInitialValues() {
+	private void setInitialValues()
+	{
 		suspendOnFirstLine.setSelection(getPreferenceStore().getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE));
 		suspendOnExceptions
 				.setSelection(getPreferenceStore().getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_EXCEPTIONS));
@@ -111,16 +119,20 @@ public class JSDebugPreferencePage extends PreferencePage implements IWorkbenchP
 				IJSDebugPreferenceNames.SUSPEND_ON_DEBUGGER_KEYWORD));
 
 		IPreferenceStore uiStore = JSDebugUIPlugin.getDefault().getPreferenceStore();
-		if (!uiStore.contains(IJSDebugUIConstants.PREF_CONFIRM_EXIT_DEBUGGER)) {
+		if (!uiStore.contains(IJSDebugUIConstants.PREF_CONFIRM_EXIT_DEBUGGER))
+		{
 			confirmExitDebugger.setSelection(true); // for compatibility with
 													// existing
 													// workspace/preferences
-		} else {
+		}
+		else
+		{
 			confirmExitDebugger.setSelection(uiStore.getBoolean(IJSDebugUIConstants.PREF_CONFIRM_EXIT_DEBUGGER));
 		}
 	}
 
-	private void setDefaultValues() {
+	private void setDefaultValues()
+	{
 		suspendOnFirstLine.setSelection(getPreferenceStore().getDefaultBoolean(
 				IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE));
 		suspendOnExceptions.setSelection(getPreferenceStore().getDefaultBoolean(
@@ -133,7 +145,8 @@ public class JSDebugPreferencePage extends PreferencePage implements IWorkbenchP
 		confirmExitDebugger.setSelection(uiStore.getDefaultBoolean(IJSDebugUIConstants.PREF_CONFIRM_EXIT_DEBUGGER));
 	}
 
-	private void setValues() {
+	private void setValues()
+	{
 		getPreferenceStore().setValue(IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE, suspendOnFirstLine.getSelection());
 		getPreferenceStore()
 				.setValue(IJSDebugPreferenceNames.SUSPEND_ON_EXCEPTIONS, suspendOnExceptions.getSelection());
@@ -143,9 +156,12 @@ public class JSDebugPreferencePage extends PreferencePage implements IWorkbenchP
 
 		IPreferenceStore uiStore = JSDebugUIPlugin.getDefault().getPreferenceStore();
 		uiStore.setValue(IJSDebugUIConstants.PREF_CONFIRM_EXIT_DEBUGGER, confirmExitDebugger.getSelection());
-		try {
+		try
+		{
 			((IPersistentPreferenceStore) uiStore).save();
-		} catch (IOException e) {
+		}
+		catch (IOException e)
+		{
 			IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 		}
 	}

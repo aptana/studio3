@@ -16,8 +16,10 @@ import java.util.List;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.core.runtime.preferences.IScopeContext;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 
 import com.aptana.core.util.EclipseUtil;
 
@@ -103,8 +105,8 @@ public class PreferencesLookupDelegate
 	private IScopeContext[] getLookupScopes(IProject project)
 	{
 		List<IScopeContext> list = new ArrayList<IScopeContext>(3);
-		list.add(EclipseUtil.instanceScope());
-		list.add(EclipseUtil.defaultScope());
+		list.add(InstanceScope.INSTANCE);
+		list.add(DefaultScope.INSTANCE);
 
 		if (project != null)
 		{

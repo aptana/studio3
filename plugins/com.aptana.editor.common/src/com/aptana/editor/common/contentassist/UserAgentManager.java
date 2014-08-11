@@ -20,6 +20,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
@@ -467,7 +468,7 @@ public class UserAgentManager implements IUserAgentManager
 		else
 		{
 			// Save to the instance scope (plugin)
-			preferences = EclipseUtil.instanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
+			preferences = InstanceScope.INSTANCE.getNode(CommonEditorPlugin.PLUGIN_ID);
 		}
 
 		// convert active user agents to a string representation

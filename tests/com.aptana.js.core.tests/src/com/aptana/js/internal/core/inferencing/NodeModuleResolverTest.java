@@ -15,13 +15,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.js.core.JSCorePlugin;
@@ -75,8 +75,8 @@ public class NodeModuleResolverTest
 
 		try
 		{
-			EclipseUtil.defaultScope().getNode(JSCorePlugin.PLUGIN_ID)
-					.put(IPreferenceConstants.NODEJS_SOURCE_PATH, nodeSrc.toOSString());
+			DefaultScope.INSTANCE.getNode(JSCorePlugin.PLUGIN_ID).put(IPreferenceConstants.NODEJS_SOURCE_PATH,
+					nodeSrc.toOSString());
 
 			IPath expected = lib.append("http.js");
 			expected.toFile().createNewFile();

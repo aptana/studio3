@@ -11,14 +11,15 @@ import java.net.URI;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.core.runtime.preferences.IScopeContext;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.ui.IEditorPart;
 
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.hover.AbstractDocumentationHover;
@@ -43,7 +44,7 @@ public abstract class CommonTextHover extends AbstractDocumentationHover
 	 */
 	public Boolean isHoverEnabled()
 	{
-		IScopeContext[] scopes = new IScopeContext[] { EclipseUtil.instanceScope(), EclipseUtil.defaultScope() };
+		IScopeContext[] scopes = new IScopeContext[] { InstanceScope.INSTANCE, DefaultScope.INSTANCE };
 		return Platform.getPreferencesService().getBoolean(CommonEditorPlugin.PLUGIN_ID,
 				IPreferenceConstants.CONTENT_ASSIST_HOVER, true, scopes);
 	}
@@ -170,7 +171,7 @@ public abstract class CommonTextHover extends AbstractDocumentationHover
 		ThemeListener()
 		{
 			getThemeColors();
-			EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(this);
+			InstanceScope.INSTANCE.getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(this);
 		}
 
 		/*

@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.CorePlugin;
@@ -73,7 +74,7 @@ public class StartPageUtil
 			if (currentVersion != null)
 			{
 				// cache that version for the next startup
-				IEclipsePreferences store = EclipseUtil.instanceScope().getNode(PortalUIPlugin.PLUGIN_ID);
+				IEclipsePreferences store = InstanceScope.INSTANCE.getNode(PortalUIPlugin.PLUGIN_ID);
 				store.put(IPortalPreferences.LAST_KNOWN_STUDIO_VERSION, currentVersion);
 				try
 				{
@@ -106,7 +107,7 @@ public class StartPageUtil
 		{
 			return false;
 		}
-		IEclipsePreferences store = EclipseUtil.instanceScope().getNode(PortalUIPlugin.PLUGIN_ID);
+		IEclipsePreferences store = InstanceScope.INSTANCE.getNode(PortalUIPlugin.PLUGIN_ID);
 		String lastVersion = store.get(IPortalPreferences.LAST_KNOWN_STUDIO_VERSION, null);
 		if (lastVersion == null)
 		{

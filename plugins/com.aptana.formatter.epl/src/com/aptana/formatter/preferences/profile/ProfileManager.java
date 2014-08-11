@@ -23,14 +23,15 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IScopeContext;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.osgi.util.NLS;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.formatter.IContributedExtension;
 import com.aptana.formatter.IDebugScopes;
 import com.aptana.formatter.IScriptFormatterFactory;
@@ -139,7 +140,7 @@ public class ProfileManager implements IProfileManager
 		Collections.sort(fProfilesByName);
 		if (!fProfilesByName.isEmpty())
 		{
-			String storedActiveProfile = getActiveProfileKey().getStoredValue(EclipseUtil.instanceScope());
+			String storedActiveProfile = getActiveProfileKey().getStoredValue(InstanceScope.INSTANCE);
 			IProfile workspaceSelectedProfile = fProfiles.get(storedActiveProfile);
 			if (workspaceSelectedProfile == null)
 			{
@@ -156,7 +157,7 @@ public class ProfileManager implements IProfileManager
 		PreferenceKey[] keys = getPreferenceKeys();
 		if (keys != null)
 		{
-			IScopeContext scope = EclipseUtil.defaultScope();
+			IScopeContext scope = DefaultScope.INSTANCE;
 			for (PreferenceKey key : keys)
 			{
 				String name = key.getName();
@@ -185,7 +186,7 @@ public class ProfileManager implements IProfileManager
 		final PreferenceKey profilesKey = getProfilesKey();
 		if (profilesKey != null)
 		{
-			final String profilesSource = profilesKey.getStoredValue(EclipseUtil.instanceScope());
+			final String profilesSource = profilesKey.getStoredValue(InstanceScope.INSTANCE);
 			if (profilesSource != null && profilesSource.length() > 0)
 			{
 				final IProfileStore store = getProfileStore();

@@ -21,6 +21,7 @@ import org.eclipse.core.commands.NotEnabledException;
 import org.eclipse.core.commands.NotHandledException;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.ui.services.EContextService;
 import org.eclipse.jface.bindings.Binding;
 import org.eclipse.jface.bindings.BindingManagerEvent;
@@ -48,7 +49,6 @@ import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.core.util.CollectionsUtil;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.findbar.FindBarPlugin;
 import com.aptana.editor.findbar.impl.FindBarDecorator.FindScope;
@@ -438,7 +438,7 @@ public class FindBarActions
 			FindBarDecorator dec = findBarDecorator.get();
 			if (dec != null)
 			{
-				IEclipsePreferences preferenceStore = EclipseUtil.instanceScope().getNode(FindBarPlugin.PLUGIN_ID);
+				IEclipsePreferences preferenceStore = InstanceScope.INSTANCE.getNode(FindBarPlugin.PLUGIN_ID);
 				boolean openEclipseFindBar = preferenceStore.getBoolean(
 						IPreferencesConstants.CTRL_F_TWICE_OPENS_ECLIPSE_FIND_BAR, false);
 

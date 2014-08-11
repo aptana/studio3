@@ -94,7 +94,7 @@ public class SendPingJob extends Job
 
 	private boolean enroll()
 	{
-		IScopeContext scope = EclipseUtil.configurationScope();
+		IScopeContext scope = ConfigurationScope.INSTANCE;
 		boolean hasEnrolled = Platform.getPreferencesService().getBoolean(UsagePlugin.PLUGIN_ID,
 				IPreferenceConstants.HAS_ENROLLED, false, new IScopeContext[] { scope });
 		if (!hasEnrolled)
@@ -132,7 +132,7 @@ public class SendPingJob extends Job
 	// Send a first-run ping if it is the first time this instance of Studio is launched
 	private boolean sendFirstRunEvent()
 	{
-		IScopeContext scope = EclipseUtil.configurationScope();
+		IScopeContext scope = ConfigurationScope.INSTANCE;
 		boolean hasRun = Platform.getPreferencesService().getBoolean(UsagePlugin.PLUGIN_ID,
 				IPreferenceConstants.P_IDE_HAS_RUN, false, new IScopeContext[] { scope });
 		if (!hasRun)

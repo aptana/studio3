@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
@@ -267,8 +268,7 @@ public class IOUIPlugin extends AbstractUIPlugin
 						}
 					}
 				};
-				EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID)
-						.addPreferenceChangeListener(themeChangeListener);
+				InstanceScope.INSTANCE.getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(themeChangeListener);
 
 				saveRemoteJobs = new HashMap<IEditorInput, Job>();
 				addPartListener();
@@ -293,8 +293,7 @@ public class IOUIPlugin extends AbstractUIPlugin
 		}
 		if (themeChangeListener != null)
 		{
-			EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID)
-					.removePreferenceChangeListener(themeChangeListener);
+			InstanceScope.INSTANCE.getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(themeChangeListener);
 			themeChangeListener = null;
 		}
 		removePartListener();

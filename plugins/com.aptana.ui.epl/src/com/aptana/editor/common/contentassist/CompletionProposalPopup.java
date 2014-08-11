@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.contentassist.IContentAssistSubjectControl;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.preference.JFacePreferences;
@@ -76,7 +77,6 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ui.epl.UIEplPlugin;
 
@@ -650,7 +650,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 		{
 			projectScopeNode.addPreferenceChangeListener(prefListener);
 		}
-		instanceScopeNode = EclipseUtil.instanceScope().getNode(COM_APTANA_EDITOR_COMMON);
+		instanceScopeNode = InstanceScope.INSTANCE.getNode(COM_APTANA_EDITOR_COMMON);
 		if (instanceScopeNode != null)
 		{
 			instanceScopeNode.addPreferenceChangeListener(prefListener);

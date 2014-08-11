@@ -21,6 +21,7 @@ import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.internal.text.html.HTMLTextPresenter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
@@ -134,14 +135,13 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		}
 		if (fAutoActivationListener != null)
 		{
-			EclipseUtil.instanceScope().getNode(CommonEditorPlugin.PLUGIN_ID)
-					.removePreferenceChangeListener(fAutoActivationListener);
+			InstanceScope.INSTANCE.getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(
+					fAutoActivationListener);
 			fAutoActivationListener = null;
 		}
 		if (fThemeChangeListener != null)
 		{
-			EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID)
-					.removePreferenceChangeListener(fThemeChangeListener);
+			InstanceScope.INSTANCE.getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(fThemeChangeListener);
 			fThemeChangeListener = null;
 		}
 
@@ -213,7 +213,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 				}
 			}
 		};
-		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
+		InstanceScope.INSTANCE.getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
 	}
 
 	/*
@@ -259,8 +259,8 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 				setAutoActivationOptions(assistant);
 			}
 		};
-		EclipseUtil.instanceScope().getNode(CommonEditorPlugin.PLUGIN_ID)
-				.addPreferenceChangeListener(fAutoActivationListener);
+		InstanceScope.INSTANCE.getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(
+				fAutoActivationListener);
 
 		return assistant;
 	}

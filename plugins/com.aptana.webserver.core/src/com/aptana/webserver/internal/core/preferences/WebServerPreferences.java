@@ -14,7 +14,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IScopeContext;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
@@ -43,7 +45,7 @@ public class WebServerPreferences
 	{
 		String address = Platform.getPreferencesService().getString(WebServerCorePlugin.PLUGIN_ID,
 				IWebServerPreferenceConstants.PREF_HTTP_SERVER_ADDRESS, null,
-				new IScopeContext[] { EclipseUtil.instanceScope(), EclipseUtil.defaultScope() });
+				new IScopeContext[] { InstanceScope.INSTANCE, DefaultScope.INSTANCE });
 		for (InetAddress i : SocketUtil.getLocalAddresses())
 		{
 			if (i.getHostAddress().equals(address))
@@ -70,7 +72,7 @@ public class WebServerPreferences
 	{
 		String portsString = Platform.getPreferencesService().getString(WebServerCorePlugin.PLUGIN_ID,
 				IWebServerPreferenceConstants.PREF_HTTP_SERVER_PORTS, null,
-				new IScopeContext[] { EclipseUtil.instanceScope(), EclipseUtil.defaultScope() });
+				new IScopeContext[] { InstanceScope.INSTANCE, DefaultScope.INSTANCE });
 		int portsStart = IWebServerPreferenceConstants.DEFAULT_HTTP_SERVER_PORTS_RANGE[0];
 		int portsEnd = IWebServerPreferenceConstants.DEFAULT_HTTP_SERVER_PORTS_RANGE[1];
 		if (portsString != null && portsString.length() > 0)

@@ -9,10 +9,10 @@ package com.aptana.editor.html.preferences;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.core.preferences.IPreferenceConstants;
 
@@ -27,7 +27,7 @@ public class HTMLPreferenceUtil
 
 	public static void setShowTextNodesInOutline(boolean show)
 	{
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(HTMLPlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(HTMLPlugin.PLUGIN_ID);
 		prefs.putBoolean(IPreferenceConstants.HTML_OUTLINE_SHOW_TEXT_NODES, show);
 		try
 		{

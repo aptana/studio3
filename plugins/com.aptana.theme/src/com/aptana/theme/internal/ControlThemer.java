@@ -10,6 +10,7 @@ package com.aptana.theme.internal;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -17,7 +18,6 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Listener;
 
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.theme.ColorManager;
 import com.aptana.theme.IControlThemer;
@@ -174,15 +174,14 @@ class ControlThemer implements IControlThemer
 				}
 			}
 		};
-		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
+		InstanceScope.INSTANCE.getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
 	}
 
 	private void removeThemeListener()
 	{
 		if (fThemeChangeListener != null)
 		{
-			EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID)
-					.removePreferenceChangeListener(fThemeChangeListener);
+			InstanceScope.INSTANCE.getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(fThemeChangeListener);
 			fThemeChangeListener = null;
 		}
 	}

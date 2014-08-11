@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IWorkbenchPage;
@@ -56,7 +57,7 @@ public class PerspectiveChangeResetListener extends PerspectiveAdapter
 			{
 				resetPerspective(page);
 				// we will only ask once regardless if user chose to update the perspective
-				IEclipsePreferences prefs = (EclipseUtil.instanceScope()).getNode(pluginId);
+				IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(pluginId);
 				prefs.putInt(preferenceId, perspectiveVersion);
 				try
 				{

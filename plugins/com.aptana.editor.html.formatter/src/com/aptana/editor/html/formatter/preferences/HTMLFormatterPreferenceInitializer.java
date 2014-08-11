@@ -8,11 +8,11 @@
 package com.aptana.editor.html.formatter.preferences;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
+import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.util.EditorUtil;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.formatter.HTMLFormatterConstants;
@@ -36,7 +36,7 @@ public class HTMLFormatterPreferenceInitializer extends AbstractPreferenceInitia
 	@Override
 	public void initializeDefaultPreferences()
 	{
-		IEclipsePreferences store = EclipseUtil.defaultScope().getNode(HTMLFormatterPlugin.PLUGIN_ID);
+		IEclipsePreferences store = DefaultScope.INSTANCE.getNode(HTMLFormatterPlugin.PLUGIN_ID);
 		store.put(HTMLFormatterConstants.FORMATTER_TAB_CHAR, CodeFormatterConstants.EDITOR);
 		store.put(HTMLFormatterConstants.FORMATTER_TAB_SIZE,
 				Integer.toString(EditorUtil.getSpaceIndentSize(HTMLPlugin.getDefault().getBundle().getSymbolicName())));

@@ -16,14 +16,15 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.core.runtime.preferences.IScopeContext;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 
 import com.aptana.core.CorePlugin;
 import com.aptana.core.ICorePreferenceConstants;
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.EclipseUtil;
 
 public class TaskTag
 {
@@ -109,8 +110,7 @@ public class TaskTag
 	{
 		if (fgPrefListener == null)
 		{
-			final IScopeContext[] contexts = new IScopeContext[] { EclipseUtil.instanceScope(),
-					EclipseUtil.defaultScope() };
+			final IScopeContext[] contexts = new IScopeContext[] { InstanceScope.INSTANCE, DefaultScope.INSTANCE };
 			try
 			{
 				fgPrefListener = new IEclipsePreferences.IPreferenceChangeListener()
@@ -130,7 +130,7 @@ public class TaskTag
 						}
 					}
 				};
-				EclipseUtil.instanceScope().getNode(PREF_PLUGIN_ID).addPreferenceChangeListener(fgPrefListener);
+				InstanceScope.INSTANCE.getNode(PREF_PLUGIN_ID).addPreferenceChangeListener(fgPrefListener);
 			}
 			catch (Exception e)
 			{
@@ -155,8 +155,7 @@ public class TaskTag
 	{
 		try
 		{
-			final IScopeContext[] contexts = new IScopeContext[] { EclipseUtil.instanceScope(),
-					EclipseUtil.defaultScope() };
+			final IScopeContext[] contexts = new IScopeContext[] { InstanceScope.INSTANCE, DefaultScope.INSTANCE };
 			String rawTagNames = Platform.getPreferencesService().getString(PREF_PLUGIN_ID,
 					ICorePreferenceConstants.TASK_TAG_NAMES, null, contexts);
 			String rawTagPriorities = Platform.getPreferencesService().getString(PREF_PLUGIN_ID,

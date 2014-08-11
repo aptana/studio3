@@ -21,7 +21,9 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IScopeContext;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Composite;
@@ -33,7 +35,6 @@ import org.eclipse.ui.preferences.WorkingCopyManager;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.formatter.IDebugScopes;
 import com.aptana.formatter.preferences.PreferenceKey;
 import com.aptana.formatter.ui.epl.FormatterUIEplPlugin;
@@ -83,12 +84,12 @@ public abstract class OptionsConfigurationBlock
 
 		if (fProject != null)
 		{
-			fLookupOrder = new IScopeContext[] { new ProjectScope(fProject), EclipseUtil.instanceScope(),
-					EclipseUtil.defaultScope() };
+			fLookupOrder = new IScopeContext[] { new ProjectScope(fProject), InstanceScope.INSTANCE,
+					DefaultScope.INSTANCE };
 		}
 		else
 		{
-			fLookupOrder = new IScopeContext[] { EclipseUtil.instanceScope(), EclipseUtil.defaultScope() };
+			fLookupOrder = new IScopeContext[] { InstanceScope.INSTANCE, DefaultScope.INSTANCE };
 		}
 
 		testIfOptionsComplete(allKeys);
@@ -134,14 +135,14 @@ public abstract class OptionsConfigurationBlock
 
 	private int getRebuildCount()
 	{
-		return fManager.getWorkingCopy(EclipseUtil.defaultScope().getNode(FormatterUIEplPlugin.PLUGIN_ID)).getInt(
+		return fManager.getWorkingCopy(DefaultScope.INSTANCE.getNode(FormatterUIEplPlugin.PLUGIN_ID)).getInt(
 				REBUILD_COUNT_KEY, 0);
 	}
 
 	private void incrementRebuildCount()
 	{
 		fRebuildCount++;
-		fManager.getWorkingCopy(EclipseUtil.defaultScope().getNode(FormatterUIEplPlugin.PLUGIN_ID)).putInt(
+		fManager.getWorkingCopy(DefaultScope.INSTANCE.getNode(FormatterUIEplPlugin.PLUGIN_ID)).putInt(
 				REBUILD_COUNT_KEY, fRebuildCount);
 	}
 

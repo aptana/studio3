@@ -22,12 +22,12 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 
 import com.aptana.core.ShellExecutable;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.CollectionsUtil;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.PathUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.js.core.JSCorePlugin;
@@ -130,8 +130,7 @@ public class NodeModuleResolver extends AbstractRequireResolver
 					}
 				}
 			};
-			EclipseUtil.instanceScope().getNode(JSCorePlugin.PLUGIN_ID)
-					.addPreferenceChangeListener(fNodeSrcPathListener);
+			InstanceScope.INSTANCE.getNode(JSCorePlugin.PLUGIN_ID).addPreferenceChangeListener(fNodeSrcPathListener);
 
 			String value = Platform.getPreferencesService().getString(JSCorePlugin.PLUGIN_ID,
 					IPreferenceConstants.NODEJS_SOURCE_PATH, null, null);

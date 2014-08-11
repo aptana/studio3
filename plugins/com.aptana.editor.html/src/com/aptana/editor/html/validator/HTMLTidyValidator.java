@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.jaxen.JaxenException;
@@ -36,7 +37,6 @@ import com.aptana.core.build.Problem;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.CollectionsUtil;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.contentassist.HTMLIndexQueryHelper;
@@ -934,7 +934,7 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 	public void restoreDefaults()
 	{
 		// Wipe the user prefs for the problem severities
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(getPreferenceNode());
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(getPreferenceNode());
 		for (ProblemType type : ProblemType.values())
 		{
 			prefs.remove(type.getPrefKey());

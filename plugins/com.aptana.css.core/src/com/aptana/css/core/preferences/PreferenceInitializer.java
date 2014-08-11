@@ -8,12 +8,12 @@
 package com.aptana.css.core.preferences;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
+import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
 import com.aptana.core.build.AbstractBuildParticipant;
 import com.aptana.core.build.IBuildParticipant.BuildType;
 import com.aptana.core.build.PreferenceUtil;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.css.core.CSSCorePlugin;
 import com.aptana.css.core.internal.build.CSSParserValidator;
@@ -25,7 +25,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 	@Override
 	public void initializeDefaultPreferences()
 	{
-		IEclipsePreferences prefs = EclipseUtil.defaultScope().getNode(CSSCorePlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = DefaultScope.INSTANCE.getNode(CSSCorePlugin.PLUGIN_ID);
 
 		prefs.putDouble(IPreferenceConstants.CSS_INDEX_VERSION, 0);
 

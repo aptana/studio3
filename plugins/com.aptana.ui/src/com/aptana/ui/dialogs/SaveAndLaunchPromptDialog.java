@@ -14,7 +14,9 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IScopeContext;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.internal.ui.DebugUIPlugin;
 import org.eclipse.debug.internal.ui.IInternalDebugUIConstants;
 import org.eclipse.debug.ui.IDebugUIConstants;
@@ -33,7 +35,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.ListSelectionDialog;
 import org.eclipse.ui.model.AdaptableList;
 
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 
 public class SaveAndLaunchPromptDialog extends ListSelectionDialog
@@ -79,7 +80,7 @@ public class SaveAndLaunchPromptDialog extends ListSelectionDialog
 	{
 		String saveDirty = Platform.getPreferencesService().getString(IDebugUIConstants.PLUGIN_ID,
 				IInternalDebugUIConstants.PREF_SAVE_DIRTY_EDITORS_BEFORE_LAUNCH, StringUtil.EMPTY,
-				new IScopeContext[] { EclipseUtil.instanceScope(), EclipseUtil.defaultScope() });
+				new IScopeContext[] { InstanceScope.INSTANCE, DefaultScope.INSTANCE });
 		if (saveDirty.equals(MessageDialogWithToggle.ALWAYS))
 		{
 			setResult(dirtyResources);

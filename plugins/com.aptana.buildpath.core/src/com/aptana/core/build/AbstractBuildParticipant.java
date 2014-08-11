@@ -29,8 +29,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.content.IContentTypeManager;
+import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IScopeContext;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
@@ -41,7 +43,6 @@ import com.aptana.core.internal.build.BuildParticipantWorkingCopy;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.TaskTag;
 import com.aptana.core.util.CollectionsUtil;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.build.BuildContext;
 import com.aptana.parsing.ast.IParseNode;
@@ -56,8 +57,7 @@ import com.aptana.parsing.ast.IParseNode;
 public abstract class AbstractBuildParticipant implements IBuildParticipant, IExecutableExtension
 {
 
-	private static final IScopeContext[] CONTEXTS = new IScopeContext[] { EclipseUtil.instanceScope(),
-			EclipseUtil.defaultScope() };
+	private static final IScopeContext[] CONTEXTS = new IScopeContext[] { InstanceScope.INSTANCE, DefaultScope.INSTANCE };
 	public static final String FILTER_DELIMITER = "####"; //$NON-NLS-1$
 	private static final Pattern filterSplitter = Pattern.compile(FILTER_DELIMITER);
 
@@ -138,7 +138,7 @@ public abstract class AbstractBuildParticipant implements IBuildParticipant, IEx
 			return;
 		}
 
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(getPreferenceNode());
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(getPreferenceNode());
 		prefs.remove(getEnablementPreferenceKey(BuildType.BUILD));
 		prefs.remove(getEnablementPreferenceKey(BuildType.RECONCILE));
 		prefs.remove(getFiltersPreferenceKey());

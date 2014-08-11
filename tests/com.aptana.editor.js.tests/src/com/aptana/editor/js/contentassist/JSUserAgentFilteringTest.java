@@ -15,6 +15,7 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -100,7 +101,7 @@ public class JSUserAgentFilteringTest extends JSEditorBasedTestCase
 	@Before
 	public void setUp() throws Exception
 	{
-		prefs = EclipseUtil.instanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
+		prefs = InstanceScope.INSTANCE.getNode(CommonEditorPlugin.PLUGIN_ID);
 	}
 
 	@Override

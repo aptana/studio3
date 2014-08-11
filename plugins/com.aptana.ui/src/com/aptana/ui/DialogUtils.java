@@ -10,6 +10,7 @@ package com.aptana.ui;
 import java.util.Set;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -19,7 +20,6 @@ import org.eclipse.swt.widgets.Shell;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ui.epl.UIEplPlugin;
 import com.aptana.ui.preferences.IEplPreferenceConstants;
@@ -133,7 +133,7 @@ public final class DialogUtils
 	 */
 	public static boolean shouldShowDialog(String dialogKey)
 	{
-		final IEclipsePreferences prefs = (EclipseUtil.instanceScope()).getNode(UIEplPlugin.PLUGIN_ID);
+		final IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(UIEplPlugin.PLUGIN_ID);
 		String[] keys = prefs.get(IEplPreferenceConstants.HIDDEN_MESSAGES, StringUtil.EMPTY).split(","); //$NON-NLS-1$
 		Set<String> keysSet = CollectionsUtil.newSet(keys);
 
@@ -142,7 +142,7 @@ public final class DialogUtils
 
 	public static void setShouldShowDialog(String dialogKey, boolean shouldShow)
 	{
-		final IEclipsePreferences prefs = (EclipseUtil.instanceScope()).getNode(UIEplPlugin.PLUGIN_ID);
+		final IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(UIEplPlugin.PLUGIN_ID);
 		String[] keys = prefs.get(IEplPreferenceConstants.HIDDEN_MESSAGES, StringUtil.EMPTY).split(","); //$NON-NLS-1$
 		Set<String> keysSet = CollectionsUtil.newSet(keys);
 

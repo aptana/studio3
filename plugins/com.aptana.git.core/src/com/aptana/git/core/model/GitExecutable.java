@@ -30,13 +30,13 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.framework.Version;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.ShellExecutable;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.IProcessRunner;
 import com.aptana.core.util.PlatformUtil;
@@ -107,8 +107,8 @@ public class GitExecutable
 			fgExecutable = GitExecutable.find();
 			if (!fgAddedPrefListener)
 			{
-				EclipseUtil.instanceScope().getNode(GitPlugin.getPluginId())
-						.addPreferenceChangeListener(new IEclipsePreferences.IPreferenceChangeListener()
+				InstanceScope.INSTANCE.getNode(GitPlugin.getPluginId()).addPreferenceChangeListener(
+						new IEclipsePreferences.IPreferenceChangeListener()
 						{
 
 							public void preferenceChange(PreferenceChangeEvent event)
@@ -143,8 +143,8 @@ public class GitExecutable
 
 	private static IPath getPreferenceGitPath()
 	{
-		String pref = EclipseUtil.instanceScope().getNode(GitPlugin.PLUGIN_ID)
-				.get(IPreferenceConstants.GIT_EXECUTABLE_PATH, null);
+		String pref = InstanceScope.INSTANCE.getNode(GitPlugin.PLUGIN_ID).get(IPreferenceConstants.GIT_EXECUTABLE_PATH,
+				null);
 		if (!StringUtil.isEmpty(pref))
 		{
 			IPath path = Path.fromOSString(pref);
@@ -168,7 +168,7 @@ public class GitExecutable
 
 	public static void setPreferenceGitPath(IPath path)
 	{
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(GitPlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(GitPlugin.PLUGIN_ID);
 		if (path != null)
 		{
 			prefs.put(IPreferenceConstants.GIT_EXECUTABLE_PATH, path.toOSString());

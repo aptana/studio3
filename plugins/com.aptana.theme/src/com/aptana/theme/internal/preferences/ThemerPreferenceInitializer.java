@@ -8,6 +8,7 @@
 package com.aptana.theme.internal.preferences;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
+import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.osgi.service.prefs.BackingStoreException;
 
@@ -23,7 +24,7 @@ public class ThemerPreferenceInitializer extends AbstractPreferenceInitializer
 	@Override
 	public void initializeDefaultPreferences()
 	{
-		IEclipsePreferences node = EclipseUtil.defaultScope().getNode(ThemePlugin.PLUGIN_ID);
+		IEclipsePreferences node = DefaultScope.INSTANCE.getNode(ThemePlugin.PLUGIN_ID);
 		node.put(IPreferenceConstants.ACTIVE_THEME, DEFAULT_THEME);
 		// For standalone products, apply our editor theme to 3rd-party editors
 		boolean isStandalone = (EclipseUtil.isStandalone() || EclipseUtil

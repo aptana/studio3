@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -39,7 +40,6 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.TarUtil;
 import com.aptana.editor.js.JSPlugin;
@@ -270,6 +270,6 @@ public class NodePreferencePage extends FieldEditorPreferencePage implements IWo
 	@Override
 	protected IPreferenceStore doGetPreferenceStore()
 	{
-		return new ScopedPreferenceStore(EclipseUtil.instanceScope(), JSCorePlugin.PLUGIN_ID);
+		return new ScopedPreferenceStore(InstanceScope.INSTANCE, JSCorePlugin.PLUGIN_ID);
 	}
 }

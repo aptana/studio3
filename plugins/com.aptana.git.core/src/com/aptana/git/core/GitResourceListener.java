@@ -30,7 +30,9 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IScopeContext;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 
 import com.aptana.core.IMap;
 import com.aptana.core.logging.IdeLog;
@@ -128,12 +130,9 @@ class GitResourceListener implements IResourceChangeListener
 
 	protected boolean dontRefresh(IProject project)
 	{
-		return !Platform.getPreferencesService().getBoolean(
-				GitPlugin.getPluginId(),
-				IPreferenceConstants.REFRESH_INDEX_WHEN_RESOURCES_CHANGE,
-				true,
-				new IScopeContext[] { new ProjectScope(project), EclipseUtil.instanceScope(),
-						EclipseUtil.defaultScope() });
+		return !Platform.getPreferencesService().getBoolean(GitPlugin.getPluginId(),
+				IPreferenceConstants.REFRESH_INDEX_WHEN_RESOURCES_CHANGE, true,
+				new IScopeContext[] { new ProjectScope(project), InstanceScope.INSTANCE, DefaultScope.INSTANCE });
 	}
 
 	private boolean autoAttachGitRepos()

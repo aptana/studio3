@@ -12,6 +12,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -294,7 +295,7 @@ public class IdeLogTest
 	@Test
 	public void testPreferenceChange()
 	{
-		IEclipsePreferences prefs = (EclipseUtil.instanceScope()).getNode(CorePlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(CorePlugin.PLUGIN_ID);
 		prefs.put(ICorePreferenceConstants.PREF_DEBUG_LEVEL, StatusLevel.INFO.toString());
 		assertEquals(StatusLevel.INFO, IdeLog.getCurrentSeverity());
 

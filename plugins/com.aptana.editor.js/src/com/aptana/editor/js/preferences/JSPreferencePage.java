@@ -8,6 +8,7 @@
 package com.aptana.editor.js.preferences;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -15,7 +16,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.preferences.CommonEditorPreferencePage;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSSourceEditor;
@@ -42,7 +42,7 @@ public class JSPreferencePage extends CommonEditorPreferencePage
 	@Override
 	protected IEclipsePreferences getPluginPreferenceStore()
 	{
-		return EclipseUtil.instanceScope().getNode(JSPlugin.PLUGIN_ID);
+		return InstanceScope.INSTANCE.getNode(JSPlugin.PLUGIN_ID);
 	}
 
 	@Override

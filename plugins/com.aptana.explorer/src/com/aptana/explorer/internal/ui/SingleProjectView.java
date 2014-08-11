@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
@@ -704,7 +705,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	{
 		try
 		{
-			IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(ExplorerPlugin.PLUGIN_ID);
+			IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(ExplorerPlugin.PLUGIN_ID);
 			prefs.put(IPreferenceConstants.ACTIVE_PROJECT, selectedProject.getName());
 			prefs.flush();
 		}
@@ -718,7 +719,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	{
 		try
 		{
-			IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(ExplorerPlugin.PLUGIN_ID);
+			IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(ExplorerPlugin.PLUGIN_ID);
 			prefs.remove(IPreferenceConstants.ACTIVE_PROJECT);
 			prefs.flush();
 		}
@@ -784,8 +785,8 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	{
 		if (fActiveProjectPrefChangeListener != null)
 		{
-			EclipseUtil.instanceScope().getNode(ExplorerPlugin.PLUGIN_ID)
-					.removePreferenceChangeListener(fActiveProjectPrefChangeListener);
+			InstanceScope.INSTANCE.getNode(ExplorerPlugin.PLUGIN_ID).removePreferenceChangeListener(
+					fActiveProjectPrefChangeListener);
 		}
 		fActiveProjectPrefChangeListener = null;
 	}

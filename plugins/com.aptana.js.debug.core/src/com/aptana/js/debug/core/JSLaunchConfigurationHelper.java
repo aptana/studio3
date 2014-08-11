@@ -13,12 +13,13 @@ import java.util.Enumeration;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdapterManager;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IScopeContext;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.js.debug.core.internal.browsers.BrowserUtil;
@@ -29,13 +30,15 @@ import com.aptana.js.debug.core.preferences.IJSDebugPreferenceNames;
 /**
  * @author Max Stepanov
  */
-public final class JSLaunchConfigurationHelper {
+public final class JSLaunchConfigurationHelper
+{
 
 	public static final String FIREFOX = "Firefox"; //$NON-NLS-1$
 	public static final String INTERNET_EXPLORER = "Internet Explorer"; //$NON-NLS-1$
 	public static final String SAFARI = "Safari"; //$NON-NLS-1$
 
-	private JSLaunchConfigurationHelper() {
+	private JSLaunchConfigurationHelper()
+	{
 	}
 
 	/**
@@ -43,7 +46,8 @@ public final class JSLaunchConfigurationHelper {
 	 * 
 	 * @param configuration
 	 */
-	public static void setDefaults(ILaunchConfigurationWorkingCopy configuration, String nature) {
+	public static void setDefaults(ILaunchConfigurationWorkingCopy configuration, String nature)
+	{
 		setBrowserDefaults(configuration, nature);
 		setServerDefaults(configuration);
 		setHttpDefaults(configuration);
@@ -57,77 +61,104 @@ public final class JSLaunchConfigurationHelper {
 	 * @param configuration
 	 */
 	@SuppressWarnings("rawtypes")
-	public static void setBrowserDefaults(ILaunchConfigurationWorkingCopy configuration, String nature) {
+	public static void setBrowserDefaults(ILaunchConfigurationWorkingCopy configuration, String nature)
+	{
 		String browser = StringUtil.EMPTY;
-		if (nature == null) {
-			try {
+		if (nature == null)
+		{
+			try
+			{
 				nature = configuration.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_BROWSER_NATURE,
 						(String) null);
-			} catch (CoreException e) {
+			}
+			catch (CoreException e)
+			{
 			}
 		}
-		do {
-			if (Platform.OS_WIN32.equals(Platform.getOS())) {
+		do
+		{
+			if (Platform.OS_WIN32.equals(Platform.getOS()))
+			{
 				/* Firefox */
-				if (FIREFOX.equals(nature) || (nature == null)) {
-					for (String location : ILaunchConfigurationConstants.DEFAULT_BROWSER_WINDOWS_FIREFOX) {
+				if (FIREFOX.equals(nature) || (nature == null))
+				{
+					for (String location : ILaunchConfigurationConstants.DEFAULT_BROWSER_WINDOWS_FIREFOX)
+					{
 						location = PlatformUtil.expandEnvironmentStrings(location);
 						File file = new File(location);
-						if (file.exists() && !file.isDirectory()) {
+						if (file.exists() && !file.isDirectory())
+						{
 							browser = location;
 							break;
 						}
 					}
-					if (browser.length() != 0) {
+					if (browser.length() != 0)
+					{
 						break;
 					}
 				}
 
 				/* IE */
-				if (INTERNET_EXPLORER.equals(nature) || (nature == null)) {
+				if (INTERNET_EXPLORER.equals(nature) || (nature == null))
+				{
 					String path = PlatformUtil
 							.expandEnvironmentStrings(ILaunchConfigurationConstants.DEFAULT_BROWSER_WINDOWS_IE);
-					if (new File(path).exists()) {
+					if (new File(path).exists())
+					{
 						browser = path;
 						break;
 					}
 				}
-			} else if (Platform.OS_MACOSX.equals(Platform.getOS())) {
+			}
+			else if (Platform.OS_MACOSX.equals(Platform.getOS()))
+			{
 				/* Firefox */
-				if (FIREFOX.equals(nature) || (nature == null)) {
-					for (String location : ILaunchConfigurationConstants.DEFAULT_BROWSER_MACOSX_FIREFOX) {
+				if (FIREFOX.equals(nature) || (nature == null))
+				{
+					for (String location : ILaunchConfigurationConstants.DEFAULT_BROWSER_MACOSX_FIREFOX)
+					{
 						location = PlatformUtil.expandEnvironmentStrings(location);
 						File file = new File(location);
-						if (file.exists() && file.isDirectory()) {
+						if (file.exists() && file.isDirectory())
+						{
 							browser = location;
 							break;
 						}
 					}
-					if (browser.length() != 0) {
+					if (browser.length() != 0)
+					{
 						break;
 					}
 				}
 
 				/* Safari */
-				if (SAFARI.equals(nature) || (nature == null)) {
+				if (SAFARI.equals(nature) || (nature == null))
+				{
 					String path = ILaunchConfigurationConstants.DEFAULT_BROWSER_MACOSX_SAFARI;
-					if (new File(path).exists()) {
+					if (new File(path).exists())
+					{
 						browser = path;
 						break;
 					}
 				}
-			} else if (Platform.OS_LINUX.equals(Platform.getOS())) {
+			}
+			else if (Platform.OS_LINUX.equals(Platform.getOS()))
+			{
 				/* Firefox */
-				if (FIREFOX.equals(nature) || (nature == null)) {
-					for (String location : ILaunchConfigurationConstants.DEFAULT_BROWSER_LINUX_FIREFOX) {
+				if (FIREFOX.equals(nature) || (nature == null))
+				{
+					for (String location : ILaunchConfigurationConstants.DEFAULT_BROWSER_LINUX_FIREFOX)
+					{
 						location = PlatformUtil.expandEnvironmentStrings(location);
 						File file = new File(location);
-						if (file.exists() && file.isFile()) {
+						if (file.exists() && file.isFile())
+						{
 							browser = location;
 							break;
 						}
 					}
-					if (browser.length() != 0) {
+					if (browser.length() != 0)
+					{
 						break;
 					}
 				}
@@ -136,25 +167,32 @@ public final class JSLaunchConfigurationHelper {
 			/* Check configured browsers */
 			Enumeration enumeration = (Enumeration) new JSLaunchConfigurationHelper()
 					.getContributedAdapter(Enumeration.class);
-			if (enumeration != null) {
-				while (enumeration.hasMoreElements()) {
+			if (enumeration != null)
+			{
+				while (enumeration.hasMoreElements())
+				{
 					String path = (String) enumeration.nextElement();
 					/* Firefox */
-					if (FIREFOX.equals(nature) || (nature == null)) {
-						if (Firefox.isBrowserExecutable(path)) {
+					if (FIREFOX.equals(nature) || (nature == null))
+					{
+						if (Firefox.isBrowserExecutable(path))
+						{
 							browser = path;
 							break;
 						}
 					}
 					/* IE */
-					if (INTERNET_EXPLORER.equals(nature) || (nature == null)) {
-						if (InternetExplorer.isBrowserExecutable(path)) {
+					if (INTERNET_EXPLORER.equals(nature) || (nature == null))
+					{
+						if (InternetExplorer.isBrowserExecutable(path))
+						{
 							browser = path;
 							break;
 						}
 					}
 					/* Safari */
-					if (SAFARI.equals(nature) || (nature == null)) {
+					if (SAFARI.equals(nature) || (nature == null))
+					{
 						if (path.toLowerCase().indexOf("safari") != -1) { //$NON-NLS-1$
 							browser = path;
 							break;
@@ -163,10 +201,12 @@ public final class JSLaunchConfigurationHelper {
 				}
 			}
 
-		} while (false);
+		}
+		while (false);
 
 		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_BROWSER_EXECUTABLE, browser);
-		if (nature != null) {
+		if (nature != null)
+		{
 			configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_BROWSER_NATURE, nature);
 		}
 	}
@@ -176,7 +216,8 @@ public final class JSLaunchConfigurationHelper {
 	 * 
 	 * @param configuration
 	 */
-	public static void setServerDefaults(ILaunchConfigurationWorkingCopy configuration) {
+	public static void setServerDefaults(ILaunchConfigurationWorkingCopy configuration)
+	{
 		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_START_ACTION_TYPE,
 				ILaunchConfigurationConstants.DEFAULT_START_ACTION_TYPE);
 		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SERVER_TYPE,
@@ -192,8 +233,9 @@ public final class JSLaunchConfigurationHelper {
 	 * 
 	 * @param configuration
 	 */
-	public static void setDebugDefaults(ILaunchConfigurationWorkingCopy configuration) {
-		IScopeContext[] scopes = new IScopeContext[] { EclipseUtil.instanceScope(), EclipseUtil.defaultScope() };
+	public static void setDebugDefaults(ILaunchConfigurationWorkingCopy configuration)
+	{
+		IScopeContext[] scopes = new IScopeContext[] { InstanceScope.INSTANCE, DefaultScope.INSTANCE };
 		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_OVERRIDE_DEBUG_PREFERENCES, false);
 		configuration.setAttribute(
 				ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_FIRST_LINE,
@@ -218,7 +260,8 @@ public final class JSLaunchConfigurationHelper {
 	 * 
 	 * @param configuration
 	 */
-	public static void setAdvancedDefaults(ILaunchConfigurationWorkingCopy configuration) {
+	public static void setAdvancedDefaults(ILaunchConfigurationWorkingCopy configuration)
+	{
 		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_ADVANCED_RUN_ENABLED, false);
 	}
 
@@ -227,7 +270,8 @@ public final class JSLaunchConfigurationHelper {
 	 * 
 	 * @param configuration
 	 */
-	public static void setHttpDefaults(ILaunchConfigurationWorkingCopy configuration) {
+	public static void setHttpDefaults(ILaunchConfigurationWorkingCopy configuration)
+	{
 		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_HTTP_GET_QUERY, StringUtil.EMPTY);
 		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_HTTP_POST_DATA, StringUtil.EMPTY);
 		configuration
@@ -240,8 +284,10 @@ public final class JSLaunchConfigurationHelper {
 	 * @param browser
 	 * @return boolean
 	 */
-	public static boolean isBrowserDebugCompatible(String browser) {
-		if (browser != null && BrowserUtil.isBrowserDebugCompatible(browser)) {
+	public static boolean isBrowserDebugCompatible(String browser)
+	{
+		if (browser != null && BrowserUtil.isBrowserDebugCompatible(browser))
+		{
 			return new File(browser).exists();
 		}
 
@@ -255,12 +301,15 @@ public final class JSLaunchConfigurationHelper {
 	 * @param clazz
 	 * @return Object
 	 */
-	private static Object getContributedAdapter(Object object, Class<?> clazz) {
+	private static Object getContributedAdapter(Object object, Class<?> clazz)
+	{
 		Object adapter = null;
 		IAdapterManager manager = Platform.getAdapterManager();
-		if (manager.hasAdapter(object, clazz.getName())) {
+		if (manager.hasAdapter(object, clazz.getName()))
+		{
 			adapter = manager.getAdapter(object, clazz.getName());
-			if (adapter == null) {
+			if (adapter == null)
+			{
 				adapter = manager.loadAdapter(object, clazz.getName());
 			}
 		}
@@ -273,13 +322,16 @@ public final class JSLaunchConfigurationHelper {
 	 * @param clazz
 	 * @return Object
 	 */
-	private Object getContributedAdapter(Class<?> clazz) {
+	private Object getContributedAdapter(Class<?> clazz)
+	{
 		return getContributedAdapter(this, clazz);
 	}
 
 	public static void initializeLaunchAttributes(ILaunchConfiguration configuration, ILaunch launch)
-			throws CoreException {
-		if (configuration.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_OVERRIDE_DEBUG_PREFERENCES, false)) {
+			throws CoreException
+	{
+		if (configuration.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_OVERRIDE_DEBUG_PREFERENCES, false))
+		{
 			launch.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_FIRST_LINE, Boolean
 					.toString(configuration.getAttribute(
 							ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_FIRST_LINE, false)));
@@ -292,8 +344,10 @@ public final class JSLaunchConfigurationHelper {
 			launch.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_DEBUGGER_KEYWORDS, Boolean
 					.toString(configuration.getAttribute(
 							ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_DEBUGGER_KEYWORDS, false)));
-		} else {
-			IScopeContext[] scopes = new IScopeContext[] { EclipseUtil.instanceScope(), EclipseUtil.defaultScope() };
+		}
+		else
+		{
+			IScopeContext[] scopes = new IScopeContext[] { InstanceScope.INSTANCE, DefaultScope.INSTANCE };
 			launch.setAttribute(
 					ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_FIRST_LINE,
 					Boolean.toString(Platform.getPreferencesService().getBoolean(JSDebugPlugin.PLUGIN_ID,

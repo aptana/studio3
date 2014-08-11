@@ -17,6 +17,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.buildpath.core.BuildPathCorePlugin;
@@ -26,7 +27,6 @@ import com.aptana.core.build.IBuildParticipantWorkingCopy;
 import com.aptana.core.build.PreferenceUtil;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.index.core.build.BuildContext;
 
 /**
@@ -180,7 +180,7 @@ public class BuildParticipantWorkingCopy implements IBuildParticipantWorkingCopy
 
 	public IBuildParticipant doSave()
 	{
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(qualifier);
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(qualifier);
 		if (enabledForBuild != null)
 		{
 			prefs.putBoolean(PreferenceUtil.getEnablementPreferenceKey(getId(), BuildType.BUILD), enabledForBuild);
