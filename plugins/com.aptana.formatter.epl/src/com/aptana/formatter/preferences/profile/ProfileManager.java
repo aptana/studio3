@@ -23,8 +23,8 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.osgi.util.NLS;
@@ -156,7 +156,7 @@ public class ProfileManager implements IProfileManager
 		PreferenceKey[] keys = getPreferenceKeys();
 		if (keys != null)
 		{
-			DefaultScope scope = EclipseUtil.defaultScope();
+			IScopeContext scope = EclipseUtil.defaultScope();
 			for (PreferenceKey key : keys)
 			{
 				String name = key.getName();

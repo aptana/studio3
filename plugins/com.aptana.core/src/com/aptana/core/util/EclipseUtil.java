@@ -37,6 +37,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.osgi.service.debug.DebugOptions;
@@ -743,10 +744,9 @@ public class EclipseUtil
 	 * 
 	 * @return
 	 */
-	@SuppressWarnings("deprecation")
-	public static InstanceScope instanceScope()
+	public static IScopeContext instanceScope()
 	{
-		return new InstanceScope();
+		return InstanceScope.INSTANCE;
 	}
 
 	/**
@@ -755,10 +755,9 @@ public class EclipseUtil
 	 * 
 	 * @return
 	 */
-	@SuppressWarnings("deprecation")
-	public static DefaultScope defaultScope()
+	public static IScopeContext defaultScope()
 	{
-		return new DefaultScope();
+		return DefaultScope.INSTANCE;
 	}
 
 	/**
@@ -767,10 +766,9 @@ public class EclipseUtil
 	 * 
 	 * @return
 	 */
-	@SuppressWarnings("deprecation")
-	public static ConfigurationScope configurationScope()
+	public static IScopeContext configurationScope()
 	{
-		return new ConfigurationScope();
+		return ConfigurationScope.INSTANCE;
 	}
 
 	/**

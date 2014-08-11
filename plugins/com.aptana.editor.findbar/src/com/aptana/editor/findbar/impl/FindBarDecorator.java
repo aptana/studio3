@@ -25,7 +25,7 @@ import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.bindings.TriggerSequence;
@@ -1811,7 +1811,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 	String getLineDelimiter(IDocument document)
 	{
-		InstanceScope scope = EclipseUtil.instanceScope();
+		IScopeContext scope = EclipseUtil.instanceScope();
 		IEclipsePreferences node = scope.getNode(Platform.PI_RUNTIME);
 		String separator = node.get(Platform.PREF_LINE_SEPARATOR, StringUtil.EMPTY);
 		if (StringUtil.isEmpty(separator))
