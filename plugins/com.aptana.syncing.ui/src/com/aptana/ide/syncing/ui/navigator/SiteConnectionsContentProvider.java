@@ -19,6 +19,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 
+import com.aptana.core.util.ArrayUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.core.io.LocalConnectionPoint;
 import com.aptana.ide.core.io.WorkspaceConnectionPoint;
@@ -36,7 +38,17 @@ public class SiteConnectionsContentProvider extends FileTreeContentProvider
 	/* using FileTreeContentProvider is correct here! */
 
 	private static final Object[] EMPTY = new Object[0];
-	private static final String WEB_NATURE = "com.aptana.projects.webnature"; //$NON-NLS-1$
+	// @formatter:off
+	/**
+	 * The natures correspond
+	 */
+	private static final String[] APTANA_NATURES = new String[] {
+			"com.aptana.projects.webnature", //Web Nature //$NON-NLS-1$
+			"com.aptana.editor.php.phpNature",  //PHP Nature //$NON-NLS-1$
+			"org.python.pydev.pythonNature",  // PyDev Nature //$NON-NLS-1$
+			"org.radrails.rails.core.railsnature",  // Rails Nature //$NON-NLS-1$
+			"com.aptana.ruby.core.rubynature" }; //Ruby nature //$NON-NLS-1$
+	// @formatter:on
 
 	@Override
 	public Object[] getElements(Object inputElement)
@@ -56,9 +68,9 @@ public class SiteConnectionsContentProvider extends FileTreeContentProvider
 			IProject project = (IProject) element;
 			if (project.isAccessible())
 			{
-				boolean isWebProject = isWebProject(project);
+				boolean isAptanaProject = isAptanaProject(project);
 				Object[] children;
-				if (isWebProject)
+				if (isAptanaProject)
 				{
 					children = new Object[1];
 					children[0] = ProjectSitesManager.getInstance().getProjectSites(project);
@@ -100,23 +112,26 @@ public class SiteConnectionsContentProvider extends FileTreeContentProvider
 		return super.getChildren(element);
 	}
 
-	private boolean isWebProject(IProject project)
+	private boolean isAptanaProject(IProject project)
 	{
-		boolean hasWebNature = false;
 		try
 		{
 			String[] natures = project.getDescription().getNatureIds();
-			if (natures != null && natures.length > 0)
+			if (ArrayUtil.isEmpty(natures))
 			{
-				// Verify whether the primary nature is web project.
-				hasWebNature = WEB_NATURE.equals(natures[0]);
+				return false;
+			}
+			// Verify whether the primary nature is one of Aptana projects.
+			if (StringUtil.contains(APTANA_NATURES, natures[0]))
+			{
+				return true;
 			}
 
 		}
 		catch (CoreException ignore)
 		{
 		}
-		return hasWebNature;
+		return false;
 	}
 
 	private static FileSystemObject[] fetchFileSystemChildren(IFileStore parent, IProgressMonitor monitor)
