@@ -389,6 +389,11 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				replaceLength = replaceRange.getLength();
 			}
 
+			if (property.getOwningType().startsWith("$module"))
+			{
+				String path = getQueryHelper().getModulePath(property.getOwningType());
+				property.setOwningType(path);
+			}
 			PropertyElementProposal proposal = new PropertyElementProposal(property, offset, replaceLength, projectURI);
 			proposal.setTriggerCharacters(getProposalTriggerCharacters());
 			if (!StringUtil.isEmpty(overriddenLocation))
