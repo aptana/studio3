@@ -53,6 +53,8 @@ import com.aptana.core.logging.IdeLog;
 
 public class EclipseUtil
 {
+	private static final String DEV_VERSION = "0.0.0.qualifier";
+
 	/**
 	 * Default prefix for Studio
 	 */
@@ -268,7 +270,11 @@ public class EclipseUtil
 					m = BUILD_PATTERN.matcher(aboutText);
 					if (m.find())
 					{
-						return m.group(1);
+						String version = m.group(1);
+						if (!DEV_VERSION.equals(version))
+						{
+							return version;
+						}
 					}
 				}
 			}
