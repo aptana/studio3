@@ -27,15 +27,15 @@ public class EditorTargetRegionHyperlink implements IHyperlink
 {
 
 	private final IRegion hyperlinkRegion;
-	private final URI targetDocument;
+	private final URI targetFilePath;
 	private final IRegion targetRegion;
 	private String typeLabel;
 
-	public EditorTargetRegionHyperlink(IRegion hyperlinkRegion, URI targetDocument, String typeLabel,
+	public EditorTargetRegionHyperlink(IRegion hyperlinkRegion, URI targetFilePath, String typeLabel,
 			IRegion targetRegion)
 	{
 		this.hyperlinkRegion = hyperlinkRegion;
-		this.targetDocument = targetDocument;
+		this.targetFilePath = targetFilePath;
 		this.typeLabel = typeLabel;
 		this.targetRegion = targetRegion;
 	}
@@ -43,6 +43,16 @@ public class EditorTargetRegionHyperlink implements IHyperlink
 	public IRegion getHyperlinkRegion()
 	{
 		return hyperlinkRegion;
+	}
+
+	public IRegion getTargetRegion()
+	{
+		return targetRegion;
+	}
+
+	public URI getTargetURI()
+	{
+		return targetFilePath;
 	}
 
 	public String getTypeLabel()
@@ -57,13 +67,13 @@ public class EditorTargetRegionHyperlink implements IHyperlink
 
 	public void open()
 	{
-		if (targetDocument == null || targetRegion == null)
+		if (targetFilePath == null || targetRegion == null)
 		{
 			return;
 		}
 		try
 		{
-			File file = new File(targetDocument);
+			File file = new File(targetFilePath);
 			IEditorPart editor = EditorUtil.openInEditor(file);
 			if (editor instanceof AbstractTextEditor)
 			{
