@@ -7,6 +7,9 @@
  */
 package com.aptana.js.core.inferencing;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 
@@ -22,4 +25,8 @@ class NullRequireResolver implements IRequireResolver
 		return true;
 	}
 
+	public List<String> getPossibleModuleIds(IProject project, IPath currentDirectory, IPath indexRoot)
+	{
+		return Collections.emptyList();
+	}
 }

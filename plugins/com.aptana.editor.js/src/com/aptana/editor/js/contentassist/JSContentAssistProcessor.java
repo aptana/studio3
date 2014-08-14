@@ -21,6 +21,7 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
@@ -55,6 +56,7 @@ import com.aptana.js.core.inferencing.JSNodeTypeInferrer;
 import com.aptana.js.core.inferencing.JSPropertyCollection;
 import com.aptana.js.core.inferencing.JSScope;
 import com.aptana.js.core.inferencing.JSTypeUtil;
+import com.aptana.js.core.inferencing.RequireResolverFactory;
 import com.aptana.js.core.model.FunctionElement;
 import com.aptana.js.core.model.ParameterElement;
 import com.aptana.js.core.model.PropertyElement;
@@ -115,6 +117,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	private static final Image JS_FUNCTION = JSPlugin.getImage("/icons/js_function.png"); //$NON-NLS-1$
 	private static final Image JS_PROPERTY = JSPlugin.getImage("/icons/js_property.png"); //$NON-NLS-1$
 	private static final Image JS_KEYWORD = JSPlugin.getImage("/icons/keyword.png"); //$NON-NLS-1$
+	private static final Image STRING_ICON = JSPlugin.getImage("icons/string.png"); //$NON-NLS-1$
 
 	/**
 	 * Filters out internal properties.
@@ -422,8 +425,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param fileLocation
 	 * @param offset
 	 */
-	private void addProposal(Set<ICompletionProposal> proposals, String displayName, Image image, String description,
-			String[] userAgentIds, String fileLocation, int offset)
+	private CommonCompletionProposal addProposal(Set<ICompletionProposal> proposals, String displayName, Image image,
+			String description, String[] userAgentIds, String fileLocation, int offset)
 	{
 		if (isActiveByUserAgent(userAgentIds))
 		{
@@ -450,7 +453,9 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 			// add the proposal to the list
 			proposals.add(proposal);
+			return proposal;
 		}
+		return null;
 	}
 
 	protected void addSymbolsInScope(Set<ICompletionProposal> proposals, int offset)
@@ -879,6 +884,33 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			index = 0;
 		}
 
+		if ("require".equals(function.getName()))
+		{
+			// SPECIAL CASE!!!!
+
+			IProject project = EditorUtil.getProject(editor);
+			URI editorURI = EditorUtil.getURI(editor);
+			IPath currentDirectory = Path.fromPortableString(editorURI.getPath()).removeLastSegments(1);
+
+			List<String> possible = RequireResolverFactory.getPossibleModuleIds(project, currentDirectory,
+					project.getLocation());
+			String[] userAgentIds = getActiveUserAgentIds();
+			if (replaceRange == null)
+			{
+				replaceRange = new Range(offset);
+			}
+			for (String moduleId : possible)
+			{
+				CommonCompletionProposal proposal = addProposal(result, "'" + moduleId + "'", STRING_ICON, null,
+						userAgentIds, moduleId + ".js", offset);
+				if (proposal != null)
+				{
+					proposal.setRelevance(CommonCompletionProposal.RELEVANCE_EXACT);
+				}
+			}
+			return;
+		}
+
 		if (0 <= index && index < params.size())
 		{
 			ParameterElement param = params.get(index);
@@ -888,12 +920,12 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				IProject project = getProject();
 				String[] userAgentIds = getActiveUserAgentIds();
 				Image[] userAgents = UserAgentManager.getInstance().getUserAgentImages(getProject(), userAgentIds);
+				if (replaceRange == null)
+				{
+					replaceRange = new Range(offset);
+				}
 				for (String displayName : constants)
 				{
-					if (replaceRange == null)
-					{
-						replaceRange = new Range(offset);
-					}
 					// FIXME For constants we may want to replace back to start of where argument is, not just back to
 					// last period
 

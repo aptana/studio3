@@ -10,6 +10,7 @@ package com.aptana.js.internal.core.inferencing;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -220,4 +221,29 @@ public class NodeModuleResolver extends AbstractRequireResolver
 		return true;
 	}
 
+	public List<String> getPossibleModuleIds(IProject project, IPath currentDirectory, IPath indexRoot)
+	{
+		// Suggest core modules
+		Set<String> moduleIds = new HashSet<String>();
+		IPath node = nodeSrcPath();
+		if (node != null)
+		{
+			String[] files = node.append(LIB).toFile().list();
+			if (!ArrayUtil.isEmpty(files))
+			{
+				for (String file : files)
+				{
+					if (file.endsWith(".js"))
+					{
+						file = file.substring(0, file.length() - 3);
+					}
+					moduleIds.add(file);
+				}
+			}
+		}
+		moduleIds.addAll(CORE_MODULES);
+		// TODO Handle suggesting relative paths?
+		// TODO Suggest modules found in node_modules paths up the directory hierarchy!
+		return new ArrayList<String>(moduleIds);
+	}
 }
