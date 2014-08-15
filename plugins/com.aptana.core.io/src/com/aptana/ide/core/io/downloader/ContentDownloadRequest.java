@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.ecf.core.security.IConnectContext;
 import org.eclipse.osgi.util.NLS;
 
+import com.aptana.core.epl.downloader.ConnectionData;
 import com.aptana.core.epl.downloader.FileReader;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.StringUtil;
@@ -89,11 +90,16 @@ public class ContentDownloadRequest
 
 	public void execute(IProgressMonitor monitor)
 	{
+		execute(null, monitor);
+	}
+
+	public void execute(ConnectionData data, IProgressMonitor monitor)
+	{
 		if (monitor != null)
 		{
 			monitor.subTask(NLS.bind(Messages.ContentDownloadRequest_downloading, uri.toString()));
 		}
-		IStatus status = download(monitor);
+		IStatus status = download(data, monitor);
 		setResult(status);
 	}
 
@@ -103,13 +109,13 @@ public class ContentDownloadRequest
 	 * @param monitor
 	 * @return
 	 */
-	private IStatus download(IProgressMonitor monitor)
+	private IStatus download(ConnectionData data, IProgressMonitor monitor)
 	{
 		// perform the download
 		try
 		{
 			// Use ECF FileTransferJob implementation to get the remote file.
-			FileReader reader = createReader();
+			FileReader reader = createReader(data);
 			OutputStream anOutputStream = createOutputStream(this.saveTo);
 			reader.readInto(this.uri, anOutputStream, 0, monitor);
 			// check that job ended ok - throw exceptions otherwise
@@ -141,9 +147,9 @@ public class ContentDownloadRequest
 		return Status.OK_STATUS;
 	}
 
-	protected FileReader createReader()
+	protected FileReader createReader(ConnectionData data)
 	{
-		return new FileReader(context);
+		return new FileReader(data, context);
 	}
 
 	protected OutputStream createOutputStream(File dest) throws FileNotFoundException

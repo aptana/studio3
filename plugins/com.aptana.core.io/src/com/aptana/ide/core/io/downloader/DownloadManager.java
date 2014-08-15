@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
+import com.aptana.core.epl.downloader.ConnectionData;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.ide.core.io.CoreIOPlugin;
 
@@ -39,6 +40,7 @@ public class DownloadManager
 {
 	private List<ContentDownloadRequest> downloads;
 	private List<IPath> completedDownloadsPaths;
+	private ConnectionData connectData;
 
 	/**
 	 * Constructs a new DownloadManager
@@ -176,6 +178,16 @@ public class DownloadManager
 	}
 
 	/**
+	 * Sets the number of retry attempts in case if we are fail to download the file.
+	 * 
+	 * @param retryCount
+	 */
+	public void setConnectionData(ConnectionData connectData)
+	{
+		this.connectData = connectData;
+	}
+
+	/**
 	 * Download the remote content.
 	 * 
 	 * @param monitor
@@ -199,7 +211,7 @@ public class DownloadManager
 			// basically do a no-op and return the original path (or copy to intended saveLocation)
 
 			ContentDownloadRequest request = iterator.next();
-			request.execute(subMonitor.newChild(1));
+			request.execute(connectData, subMonitor.newChild(1));
 			IStatus result = request.getResult();
 			if (result != null)
 			{

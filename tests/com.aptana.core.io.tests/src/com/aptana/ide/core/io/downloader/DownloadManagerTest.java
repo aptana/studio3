@@ -31,6 +31,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.aptana.core.epl.downloader.ConnectionData;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.FileUtil;
 import com.aptana.ide.core.io.CoreIOPlugin;
@@ -101,7 +102,7 @@ public class DownloadManagerTest
 		context.checking(new Expectations()
 		{
 			{
-				oneOf(cdr).execute(with(any(IProgressMonitor.class)));
+				oneOf(cdr).execute(with(aNull(ConnectionData.class)), with(any(IProgressMonitor.class)));
 
 				oneOf(cdr).getResult();
 				will(returnValue(Status.OK_STATUS));
@@ -134,7 +135,7 @@ public class DownloadManagerTest
 		context.checking(new Expectations()
 		{
 			{
-				exactly(3).of(cdr).execute(with(any(IProgressMonitor.class)));
+				exactly(3).of(cdr).execute(with(aNull(ConnectionData.class)), with(any(IProgressMonitor.class)));
 
 				exactly(3).of(cdr).getResult();
 				will(onConsecutiveCalls(returnValue(Status.OK_STATUS), returnValue(errorStatus),
@@ -180,7 +181,7 @@ public class DownloadManagerTest
 		context.checking(new Expectations()
 		{
 			{
-				exactly(1).of(cdr).execute(with(any(IProgressMonitor.class)));
+				exactly(1).of(cdr).execute(with(aNull(ConnectionData.class)), with(any(IProgressMonitor.class)));
 
 				exactly(1).of(cdr).getResult();
 				will(returnValue(Status.OK_STATUS));
