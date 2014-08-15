@@ -105,7 +105,7 @@ public class CommonJSResolver implements IRequireResolver
 	}
 
 	/**
-	 * For a given argument, what is teh string value to use when we build up the full path. Treat __dirname as
+	 * For a given argument, what is the string value to use when we build up the full path. Treat __dirname as
 	 * equivalent to "."
 	 * 
 	 * @param node
@@ -129,4 +129,10 @@ public class CommonJSResolver implements IRequireResolver
 		return null;
 	}
 
+	public List<String> getPossibleModuleIds(IProject project, IPath currentDirectory, IPath indexRoot)
+	{
+		// So if we do this "iteratively", we can just suggest "." for all relative paths as first segment.
+		// TODO Suggest files in the index root?
+		return null;
+	}
 }
