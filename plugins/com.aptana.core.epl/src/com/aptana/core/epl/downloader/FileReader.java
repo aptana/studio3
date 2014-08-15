@@ -38,6 +38,7 @@ import org.eclipse.ecf.core.util.Proxy;
 import org.eclipse.ecf.filetransfer.FileTransferJob;
 import org.eclipse.ecf.filetransfer.IFileRangeSpecification;
 import org.eclipse.ecf.filetransfer.IFileTransferListener;
+import org.eclipse.ecf.filetransfer.IFileTransferPausable;
 import org.eclipse.ecf.filetransfer.IIncomingFileTransfer;
 import org.eclipse.ecf.filetransfer.IRetrieveFileTransferContainerAdapter;
 import org.eclipse.ecf.filetransfer.IncomingFileTransferException;
@@ -46,6 +47,8 @@ import org.eclipse.ecf.filetransfer.events.IFileTransferEvent;
 import org.eclipse.ecf.filetransfer.events.IIncomingFileTransferEvent;
 import org.eclipse.ecf.filetransfer.events.IIncomingFileTransferReceiveDataEvent;
 import org.eclipse.ecf.filetransfer.events.IIncomingFileTransferReceiveDoneEvent;
+import org.eclipse.ecf.filetransfer.events.IIncomingFileTransferReceivePausedEvent;
+import org.eclipse.ecf.filetransfer.events.IIncomingFileTransferReceiveResumedEvent;
 import org.eclipse.ecf.filetransfer.events.IIncomingFileTransferReceiveStartEvent;
 import org.eclipse.ecf.filetransfer.identity.FileCreateException;
 import org.eclipse.ecf.filetransfer.identity.FileIDFactory;
@@ -78,19 +81,31 @@ public class FileReader extends FileTransferJob implements IFileTransferListener
 	private Job cancelJob;
 	private boolean monitorStarted;
 
+	private boolean isPause = false;
+	private boolean hasPaused = false;
+	private IFileTransferPausable pausable = null;
+
 	/**
 	 * Create a new FileReader that will retry failed connection attempts and sleep some amount of time between each
 	 * attempt.
 	 */
-	public FileReader(IConnectContext aConnectContext)
+	public FileReader(ConnectionData connectionData, IConnectContext aConnectContext)
 	{
 		super(Messages.FileReader_fileTrasportReader); // job label
 
 		// Hide this job.
 		setSystem(true);
 		setUser(false);
-		connectionRetryCount = 1;
-		connectionRetryDelay = 200L;
+		if (connectionData == null)
+		{
+			connectionRetryCount = 1;
+			connectionRetryDelay = 200L;
+		}
+		else
+		{
+			connectionRetryCount = connectionData.getRetryCount();
+			connectionRetryDelay = connectionData.getRetryDelay();
+		}
 		connectContext = aConnectContext;
 	}
 
@@ -218,16 +233,50 @@ public class FileReader extends FileTransferJob implements IFileTransferListener
 					}
 				}
 			}
+			pauseIfPossible(source);
 			onData(source);
 		}
 		else if (event instanceof IIncomingFileTransferReceiveDoneEvent)
 		{
 			completeTransfer(event);
 		}
+		else if (event instanceof IIncomingFileTransferReceivePausedEvent)
+		{
+			this.hasPaused = true;
+		}
+		else if (event instanceof IIncomingFileTransferReceiveResumedEvent)
+		{
+			// we no longer need the cancel handler because we are about to resume the transfer job
+			if (cancelJob != null)
+				cancelJob.cancel();
+			try
+			{
+				((IIncomingFileTransferReceiveResumedEvent) event).receive(theOutputStream, this);
+			}
+			catch (IOException e)
+			{
+				exception = e;
+			}
+			finally
+			{
+				this.hasPaused = false;
+			}
+		}
+	}
+
+	private synchronized void pauseIfPossible(IIncomingFileTransfer source)
+	{
+		if (isSetToPause() && !hasPaused)
+		{
+			pausable = (IFileTransferPausable) source.getAdapter(IFileTransferPausable.class);
+			if (pausable != null)
+				pausable.pause();
+		}
 	}
 
 	protected void completeTransfer(IFileTransferEvent event)
 	{
+		System.err.println("recieved COMPLETE event");
 		if (closeStreamWhenFinished)
 		{
 			hardClose(theOutputStream);
@@ -382,6 +431,7 @@ public class FileReader extends FileTransferJob implements IFileTransferListener
 			sendRetrieveRequest(uri, anOutputStream, (startPos != -1 ? new DownloadRange(startPos) : null), true,
 					monitor);
 			getTheJobManager().join(this, new SubProgressMonitor(monitor, 0));
+			waitPaused(uri, anOutputStream, startPos, monitor);
 			if (monitor.isCanceled() && connectEvent != null)
 			{
 				connectEvent.cancel();
@@ -409,6 +459,22 @@ public class FileReader extends FileTransferJob implements IFileTransferListener
 			}
 			monitorStarted = false;
 			// monitor.done();
+		}
+	}
+
+	protected void waitPaused(URI uri, OutputStream anOutputStream, long startPos, IProgressMonitor monitor)
+			throws FileNotFoundException, CoreException, OperationCanceledException, InterruptedException
+	{
+		if (hasPaused)
+		{
+			while (hasPaused)
+			{
+				Thread.sleep(1000);
+				if (monitor.isCanceled())
+					throw new OperationCanceledException();
+			}
+			Job.getJobManager().join(this, monitor);
+			waitPaused(uri, anOutputStream, startPos, monitor);
 		}
 	}
 
@@ -501,6 +567,27 @@ public class FileReader extends FileTransferJob implements IFileTransferListener
 	protected IRetrieveFileTransferFactory getRetrieveFileTransferFactory()
 	{
 		return CoreEPLPlugin.getDefault().getRetrieveFileTransferFactory();
+	}
+
+	public synchronized boolean pause()
+	{
+		this.isPause = true;
+		return true;
+	}
+
+	public boolean isSetToPause()
+	{
+		return this.isPause;
+	}
+
+	public synchronized boolean resume()
+	{
+		this.isPause = false;
+		if (this.pausable != null)
+		{
+			return this.pausable.resume();
+		}
+		return false;
 	}
 
 	/**

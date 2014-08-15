@@ -17,6 +17,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.aptana.core.epl.downloader.ConnectionData;
 import com.aptana.core.epl.downloader.FileReader;
 
 public class ContentDownloadRequestTest
@@ -53,7 +54,7 @@ public class ContentDownloadRequestTest
 			}
 
 			@Override
-			protected FileReader createReader()
+			protected FileReader createReader(ConnectionData data)
 			{
 				return reader;
 			}

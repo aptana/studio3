@@ -54,7 +54,7 @@ public class FileReaderTest
 		out = context.mock(OutputStream.class);
 		uri = URI.create("http://example.com/index.html");
 		jobManager = context.mock(IJobManager.class);
-		reader = new FileReader(cc)
+		reader = new FileReader(null, cc)
 		{
 			@Override
 			protected IRetrieveFileTransferFactory getRetrieveFileTransferFactory()
