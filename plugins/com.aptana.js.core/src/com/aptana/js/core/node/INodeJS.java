@@ -11,9 +11,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 
-import com.aptana.core.util.ProcessUtil;
+import com.aptana.core.util.IProcessRunner;
 
 /**
  * This represents an installation of NodeJS. There may be multiple installs on the user's machine. Just because you
@@ -47,6 +48,8 @@ public interface INodeJS
 	public IPath getPath();
 
 	/**
+	 * Returns the result of running node -v, typical output will be "v0.10.13"
+	 * 
 	 * @return
 	 */
 	public String getVersion();
@@ -67,7 +70,7 @@ public interface INodeJS
 
 	/**
 	 * Run something under NodeJS. Under the hood calls out to
-	 * {@link ProcessUtil#runInBackground(String, IPath, Map, String...)}
+	 * {@link IProcessRunner#runInBackground(String, IPath, Map, String...)}
 	 * 
 	 * @param args
 	 * @return
@@ -76,11 +79,20 @@ public interface INodeJS
 
 	/**
 	 * Run something under NodeJS. Under the hood calls out to
-	 * {@link ProcessUtil#runInBackground(String, IPath, Map, String...)}
+	 * {@link IProcessRunner#runInBackground(String, IPath, Map, String...)}
 	 * 
 	 * @param env
 	 * @param args
 	 * @return
 	 */
 	public IStatus runInBackground(IPath workingDir, Map<String, String> environment, List<String> args);
+
+	/**
+	 * The path to the source code for this install.
+	 * 
+	 * @return
+	 */
+	public IPath getSourcePath();
+
+	public IStatus downloadSource(IProgressMonitor monitor);
 }

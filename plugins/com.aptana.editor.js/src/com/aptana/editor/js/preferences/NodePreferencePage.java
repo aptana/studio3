@@ -8,9 +8,7 @@
 package com.aptana.editor.js.preferences;
 
 import java.lang.reflect.InvocationTargetException;
-import java.net.URI;
 import java.text.MessageFormat;
-import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -41,9 +39,7 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
-import com.aptana.core.util.TarUtil;
 import com.aptana.editor.js.JSPlugin;
-import com.aptana.ide.core.io.downloader.DownloadManager;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.core.node.INodeJS;
 import com.aptana.js.core.node.INodeJSService;
@@ -174,13 +170,6 @@ public class NodePreferencePage extends FieldEditorPreferencePage implements IWo
 
 	private void downloadNodeJS()
 	{
-		// First, ask for the location that the source will be extracted into.
-		final IPath selectedDir = getDirectory();
-		if (selectedDir == null)
-		{
-			return;
-		}
-
 		final ProgressMonitorDialog downloadProgressMonitor = new ProgressMonitorDialog(UIUtils.getActiveShell());
 		try
 		{
@@ -189,34 +178,26 @@ public class NodePreferencePage extends FieldEditorPreferencePage implements IWo
 
 				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
 				{
-					final DownloadManager dm = new DownloadManager();
 					try
 					{
-						dm.addURI(new URI(NODE_JS_SOURCE_URL));
-						IStatus status = dm.start(monitor);
+						final INodeJS node = getDetectedPath();
+						IStatus status = node.downloadSource(monitor);
 						if (status.isOK())
 						{
-							// We got the source code. Now we need to extract it and set the value in the text field (or
-							// the preferences, in case the dialog was closed).
-							List<IPath> contentPaths = dm.getContentsLocations();
-							status = TarUtil.extractTGZFile(contentPaths.get(0), selectedDir);
-							if (status.isOK())
+							// Set the path in the editor field
+							Control control = NodePreferencePage.this.getControl();
+							if (control != null && !control.isDisposed())
 							{
-								// Set the path in the editor field
-								Control control = NodePreferencePage.this.getControl();
-								if (control != null && !control.isDisposed())
+								UIUtils.runInUIThread(new Runnable()
 								{
-									UIUtils.runInUIThread(new Runnable()
-									{
 
-										public void run()
-										{
-											sourceEditor.setStringValue(selectedDir.append(NODE_JS_ROOT_NAME)
-													.toOSString());
-										}
-									});
-								}
+									public void run()
+									{
+										sourceEditor.setStringValue(node.getSourcePath().toOSString());
+									}
+								});
 							}
+
 						}
 					}
 					catch (Exception e)

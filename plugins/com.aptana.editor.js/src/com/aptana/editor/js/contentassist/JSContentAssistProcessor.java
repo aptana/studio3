@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
@@ -389,6 +390,11 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				replaceLength = replaceRange.getLength();
 			}
 
+			if (property.getOwningType().startsWith("$module")) //$NON-NLS-1$
+			{
+				IPath path = getQueryHelper().getModulePath(property.getOwningType());
+				property.setOwningType(path.toOSString());
+			}
 			PropertyElementProposal proposal = new PropertyElementProposal(property, offset, replaceLength, projectURI);
 			proposal.setTriggerCharacters(getProposalTriggerCharacters());
 			if (!StringUtil.isEmpty(overriddenLocation))

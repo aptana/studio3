@@ -19,7 +19,7 @@ import com.aptana.js.core.parsing.CoreParsingTests;
 import com.aptana.js.internal.core.build.InternalCoreBuildTests;
 import com.aptana.js.internal.core.index.InternalCoreIndexTests;
 import com.aptana.js.internal.core.inferencing.InternalCoreInferencingTests;
-import com.aptana.js.internal.core.node.NodePackageManagerTest;
+import com.aptana.js.internal.core.node.InternalCoreNodeTests;
 import com.aptana.js.internal.core.parsing.InternalCoreParsingTests;
 import com.aptana.js.internal.core.parsing.sdoc.InternalCoreParsingSDocTests;
 
@@ -27,7 +27,7 @@ import com.aptana.js.internal.core.parsing.sdoc.InternalCoreParsingSDocTests;
 @SuiteClasses({ CoreBuildTests.class, JSIndexQueryHelperTest.class, CoreInferencingTests.class, CoreParsingTests.class,
 		InternalCoreBuildTests.class, InternalCoreIndexTests.class, InternalCoreInferencingTests.class,
 		InternalCoreParsingTests.class, InternalCoreParsingSDocTests.class, CoreModelTests.class,
-		NodePackageManagerTest.class })
+		InternalCoreNodeTests.class })
 public class AllJSCoreTests
 {
 }
