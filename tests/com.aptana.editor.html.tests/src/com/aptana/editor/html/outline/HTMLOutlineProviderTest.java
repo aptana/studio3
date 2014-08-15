@@ -10,6 +10,7 @@ package com.aptana.editor.html.outline;
 import static org.junit.Assert.assertEquals;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -121,7 +122,7 @@ public class HTMLOutlineProviderTest
 	@Test
 	public void testCustomAttributeFromPreference() throws Exception
 	{
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(HTMLPlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(HTMLPlugin.PLUGIN_ID);
 		try
 		{
 			String source = "<meta charset=\"utf-8\">";

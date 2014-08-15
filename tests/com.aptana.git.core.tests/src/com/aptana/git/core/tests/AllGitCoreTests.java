@@ -13,10 +13,11 @@ import org.junit.runners.Suite.SuiteClasses;
 
 import com.aptana.git.core.GitCoreTests;
 import com.aptana.git.core.model.CoreModelTests;
+import com.aptana.git.internal.core.github.InternalCoreGithubTests;
 import com.aptana.git.internal.core.storage.CoreStorageTests;
 
 @RunWith(Suite.class)
-@SuiteClasses({ CoreModelTests.class, CoreStorageTests.class, GitCoreTests.class })
+@SuiteClasses({ CoreModelTests.class, CoreStorageTests.class, GitCoreTests.class, InternalCoreGithubTests.class })
 public class AllGitCoreTests
 {
 

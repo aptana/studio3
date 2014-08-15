@@ -31,6 +31,7 @@ import javax.crypto.spec.SecretKeySpec;
 import org.eclipse.core.internal.preferences.Base64;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.equinox.security.storage.provider.IPreferencesContainer;
 import org.eclipse.equinox.security.storage.provider.IProviderHints;
 import org.eclipse.jface.window.Window;
@@ -39,7 +40,6 @@ import org.eclipse.ui.PlatformUI;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.ide.security.linux.Activator;
 
 @SuppressWarnings("restriction")
@@ -190,7 +190,7 @@ public class PasswordProvider extends org.eclipse.equinox.security.storage.provi
 				SecretKey skey = kgen.generateKey();
 				key = skey.getEncoded();
 				byte[] b64 = Base64.encode(skey.getEncoded());
-				IEclipsePreferences node = EclipseUtil.instanceScope().getNode(Activator.PLUGIN_ID);
+				IEclipsePreferences node = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
 				node.put(IPreferenceConstants.CACHED_KEY, new String(b64));
 				node.flush();
 			}

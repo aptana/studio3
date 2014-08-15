@@ -282,6 +282,8 @@ Regex = "/" ({CharClass}|{Character})+ "/" [a-z]*
 	"void"			{ return newToken(JSTokenType.VOID); }
 	"while"			{ return newToken(JSTokenType.WHILE); }
 	"with"			{ return newToken(JSTokenType.WITH); }
+	"get"			{ return newToken(JSTokenType.GET); }
+	"set"			{ return newToken(JSTokenType.SET); }
 	
 	// Future Use Reserved Words
 	"class"			{ return newToken(JSTokenType.CLASS); }

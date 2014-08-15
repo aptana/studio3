@@ -12,12 +12,12 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.aptana.core.tests.TestProject;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.portal.ui.IPortalPreferences;
 import com.aptana.portal.ui.PortalUIPlugin;
@@ -281,7 +281,7 @@ public class PortalTest
 	{
 		Portal fixture = Portal.getInstance();
 
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(PortalUIPlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(PortalUIPlugin.PLUGIN_ID);
 		boolean open = prefs.getBoolean(IPortalPreferences.SHOULD_OPEN_DEV_TOOLBOX, false);
 
 		prefs.putBoolean(IPortalPreferences.SHOULD_OPEN_DEV_TOOLBOX, true);

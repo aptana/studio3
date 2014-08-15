@@ -13,6 +13,7 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -24,7 +25,6 @@ import org.eclipse.ui.console.IOConsoleOutputStream;
 import org.eclipse.ui.console.TextConsole;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.EclipseUtil;
 
 /**
  * This extension will make sure that the colors for the console are always following the theme preferences.
@@ -207,8 +207,7 @@ public class ConsoleThemer
 			}
 		};
 
-		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID)
-				.addPreferenceChangeListener(this.fThemeChangeListener);
+		InstanceScope.INSTANCE.getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(this.fThemeChangeListener);
 	}
 
 	/**
@@ -216,8 +215,7 @@ public class ConsoleThemer
 	 */
 	public void dispose()
 	{
-		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID)
-				.removePreferenceChangeListener(this.fThemeChangeListener);
+		InstanceScope.INSTANCE.getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(this.fThemeChangeListener);
 		this.fConsole = null;
 		this.fThemeConsoleStreamToColor = null;
 	}

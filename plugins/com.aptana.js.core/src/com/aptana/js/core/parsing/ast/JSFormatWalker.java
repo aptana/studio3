@@ -619,10 +619,32 @@ public class JSFormatWalker extends JSTreeWalker
 	@Override
 	public void visit(JSNameValuePairNode node)
 	{
-		this.formatNode(node.getName());
-		this._printer.print(": "); //$NON-NLS-1$
-		this.formatNode(node.getValue());
-		this.addSemicolon(node);
+		if (node.getColon() != null)
+		{
+			this.formatNode(node.getName());
+			this._printer.print(": "); //$NON-NLS-1$
+			this.formatNode(node.getValue());
+			this.addSemicolon(node);
+		}
+		else if (node.getParameters() != null)
+		{
+			// set
+			this._printer.print("set "); //$NON-NLS-1$
+			this.formatNode(node.getName());
+			this.formatNode(node.getParameters());
+			this._printer.print(' ');
+			this.formatNode(node.getValue());
+			this.addSemicolon(node);
+		}
+		else
+		{
+			// get
+			this._printer.print("get "); //$NON-NLS-1$
+			this.formatNode(node.getName());
+			this._printer.print(' ');
+			this.formatNode(node.getValue());
+			this.addSemicolon(node);
+		}
 	}
 
 	/*

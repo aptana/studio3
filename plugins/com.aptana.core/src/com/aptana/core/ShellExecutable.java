@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.logging.IdeLog;
@@ -154,8 +155,8 @@ public final class ShellExecutable
 
 	private static IPath getPreferenceShellPath()
 	{
-		String pref = EclipseUtil.instanceScope().getNode(CorePlugin.PLUGIN_ID)
-				.get(ICorePreferenceConstants.PREF_SHELL_EXECUTABLE_PATH, null);
+		String pref = InstanceScope.INSTANCE.getNode(CorePlugin.PLUGIN_ID).get(
+				ICorePreferenceConstants.PREF_SHELL_EXECUTABLE_PATH, null);
 		if (pref != null && !StringUtil.isEmpty(pref))
 		{
 			IPath path = Path.fromOSString(pref);
@@ -175,7 +176,7 @@ public final class ShellExecutable
 
 	public static void setPreferenceShellPath(IPath path)
 	{
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(CorePlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(CorePlugin.PLUGIN_ID);
 		if (path != null)
 		{
 			prefs.put(ICorePreferenceConstants.PREF_SHELL_EXECUTABLE_PATH, path.toOSString());

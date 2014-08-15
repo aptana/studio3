@@ -7,6 +7,8 @@
  */
 package com.aptana.js.core.inferencing;
 
+import java.util.List;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 
@@ -22,7 +24,7 @@ public interface IRequireResolver
 	public IPath resolve(String moduleId, IProject project, IPath currentDirectory, IPath indexRoot);
 
 	/**
-	 * Does thie resolver apply under the current conditions?
+	 * Does this resolver apply under the current conditions?
 	 * 
 	 * @param project
 	 * @param currentDirectory
@@ -30,4 +32,15 @@ public interface IRequireResolver
 	 * @return
 	 */
 	public boolean applies(IProject project, IPath currentDirectory, IPath indexRoot);
+
+	/**
+	 * Given a current location, project and index - what are the possible moduleIds we can reach? Used for content
+	 * assist on require invocations.
+	 * 
+	 * @param project
+	 * @param currentDirectory
+	 * @param indexRoot
+	 * @return
+	 */
+	public List<String> getPossibleModuleIds(IProject project, IPath currentDirectory, IPath indexRoot);
 }

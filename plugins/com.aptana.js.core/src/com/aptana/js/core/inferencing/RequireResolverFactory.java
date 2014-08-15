@@ -157,4 +157,31 @@ public class RequireResolverFactory
 		}
 		return null;
 	}
+
+	public static List<String> getPossibleModuleIds(final IProject project, final IPath currentDirectory,
+			final IPath indexRoot)
+	{
+		List<IRequireResolver> resolvers = CollectionsUtil.filter(getResolvers(), new IFilter<IRequireResolver>()
+		{
+			public boolean include(IRequireResolver item)
+			{
+				// TODO Use expressions rather than calling applies?
+				// We can generate an evaluation context that holds a set of values for current location, project,
+				// current index, index root, module id, etc.
+				return item != null && item.applies(project, currentDirectory, indexRoot);
+			}
+		});
+
+		// Go through all resolvers that apply, from highest to lowest priority.
+		// First one to give us a non-null result wins!
+		for (IRequireResolver resolver : resolvers)
+		{
+			List<String> possible = resolver.getPossibleModuleIds(project, currentDirectory, indexRoot);
+			if (!CollectionsUtil.isEmpty(possible))
+			{
+				return possible;
+			}
+		}
+		return Collections.emptyList();
+	}
 }

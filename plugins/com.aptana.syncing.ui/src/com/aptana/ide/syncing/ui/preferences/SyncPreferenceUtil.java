@@ -12,9 +12,9 @@ import java.text.MessageFormat;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.service.prefs.BackingStoreException;
 
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
 import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants.SyncDirection;
 
@@ -52,7 +52,7 @@ public class SyncPreferenceUtil
 
 	public static void setAutoSync(IProject project, boolean autoSync)
 	{
-		IEclipsePreferences prefs = (EclipseUtil.instanceScope()).getNode(SyncingUIPlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(SyncingUIPlugin.PLUGIN_ID);
 		prefs.putBoolean(MessageFormat.format("{0}:{1}", IPreferenceConstants.AUTO_SYNC, project.getName()), autoSync); //$NON-NLS-1$
 		try
 		{
@@ -65,7 +65,7 @@ public class SyncPreferenceUtil
 
 	public static void setAutoSyncDirection(IProject project, SyncDirection direction)
 	{
-		IEclipsePreferences prefs = (EclipseUtil.instanceScope()).getNode(SyncingUIPlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(SyncingUIPlugin.PLUGIN_ID);
 		prefs.put(MessageFormat.format("{0}:{1}", IPreferenceConstants.AUTO_SYNC_DIRECTION, project.getName()), //$NON-NLS-1$
 				direction.toString());
 		try

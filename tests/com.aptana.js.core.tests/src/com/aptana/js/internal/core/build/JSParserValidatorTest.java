@@ -13,12 +13,12 @@ import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.junit.Test;
 
 import com.aptana.buildpath.core.tests.AbstractValidatorTestCase;
 import com.aptana.core.build.IBuildParticipant;
 import com.aptana.core.build.IProblem;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.js.core.IJSConstants;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.core.parsing.JSParseState;
@@ -97,7 +97,7 @@ public class JSParserValidatorTest extends AbstractValidatorTestCase
 	@Test
 	public void testMissingSemicolonSetToIgnoreReportsNoWarning() throws Exception
 	{
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(JSCorePlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(JSCorePlugin.PLUGIN_ID);
 		prefs.put(IPreferenceConstants.PREF_MISSING_SEMICOLON_SEVERITY, IProblem.Severity.IGNORE.id());
 		prefs.flush();
 

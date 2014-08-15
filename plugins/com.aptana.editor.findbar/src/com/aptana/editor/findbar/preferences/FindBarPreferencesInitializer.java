@@ -8,9 +8,9 @@
 package com.aptana.editor.findbar.preferences;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
+import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.findbar.FindBarPlugin;
 
 /**
@@ -22,7 +22,7 @@ public class FindBarPreferencesInitializer extends AbstractPreferenceInitializer
 	@Override
 	public void initializeDefaultPreferences()
 	{
-		IEclipsePreferences pref = EclipseUtil.defaultScope().getNode(FindBarPlugin.PLUGIN_ID);
+		IEclipsePreferences pref = DefaultScope.INSTANCE.getNode(FindBarPlugin.PLUGIN_ID);
 
 		pref.putBoolean(IPreferencesConstants.USE_CUSTOM_FIND_BAR, true);
 		pref.putBoolean(IPreferencesConstants.INCREMENTAL_SEARCH_ON_FIND_BAR, false); // default not incremental!

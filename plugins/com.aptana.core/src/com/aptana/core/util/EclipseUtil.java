@@ -35,7 +35,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
-import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.osgi.service.datalocation.Location;
@@ -54,6 +53,8 @@ import com.aptana.core.logging.IdeLog;
 
 public class EclipseUtil
 {
+	private static final String DEV_VERSION = "0.0.0.qualifier";
+
 	/**
 	 * Default prefix for Studio
 	 */
@@ -63,6 +64,10 @@ public class EclipseUtil
 	 * Default product name
 	 */
 	private static final String APTANA_STUDIO = MessageFormat.format("{0} Studio", APTANA_STUDIO_PREFIX); //$NON-NLS-1$
+
+	private static final Pattern VERSION_PATTERN = Pattern.compile("Version: (.*)\n"); //$NON-NLS-1$
+	private static final Pattern VERSION_4_4_PATTERN = Pattern.compile("Version: \\{1\\} \\((.*)\\)\n"); //$NON-NLS-1$
+	private static final Pattern BUILD_PATTERN = Pattern.compile("build: (.*)\n"); //$NON-NLS-1$
 
 	protected static final class LauncherFilter implements FilenameFilter
 	{
@@ -239,7 +244,7 @@ public class EclipseUtil
 	 */
 	public static String getProductVersion()
 	{
-		String version = null;
+
 		try
 		{
 			IProduct product = Platform.getProduct();
@@ -248,21 +253,28 @@ public class EclipseUtil
 				String aboutText = product.getProperty("aboutText"); //$NON-NLS-1$
 				if (!StringUtil.isEmpty(aboutText))
 				{
-					String pattern = "Version: (.*)\n"; //$NON-NLS-1$
-					Pattern p = Pattern.compile(pattern);
-					Matcher m = p.matcher(aboutText);
-					boolean found = m.find();
-					if (!found)
+					Matcher m = VERSION_4_4_PATTERN.matcher(aboutText);
+					if (m.find())
 					{
-						// fall back to trying to match build #
-						p = Pattern.compile("build: (.*)\n"); //$NON-NLS-1$
-						m = p.matcher(aboutText);
-						found = m.find();
+						return Version.parseVersion(m.group(1)).toString();
 					}
 
-					if (found)
+					// Try version pattern from before 4.4
+					m = VERSION_PATTERN.matcher(aboutText);
+					if (m.find())
 					{
-						version = m.group(1);
+						return m.group(1);
+					}
+
+					// fall back to trying to match build #
+					m = BUILD_PATTERN.matcher(aboutText);
+					if (m.find())
+					{
+						String version = m.group(1);
+						if (!DEV_VERSION.equals(version))
+						{
+							return version;
+						}
 					}
 				}
 			}
@@ -271,12 +283,9 @@ public class EclipseUtil
 		{
 			// ignore
 		}
-		if (StringUtil.isEmpty(version))
-		{
-			// falls back to the branding plugin version
-			return getStudioVersion();
-		}
-		return version;
+
+		// falls back to the branding plugin version
+		return getStudioVersion();
 	}
 
 	/**
@@ -734,42 +743,6 @@ public class EclipseUtil
 	}
 
 	/**
-	 * Wrapper for Eclipse 3.6- to collect all deprecated usages into a single location. Once Eclipse 3.7 is the default
-	 * base platform, we can remove this call.
-	 * 
-	 * @return
-	 */
-	@SuppressWarnings("deprecation")
-	public static InstanceScope instanceScope()
-	{
-		return new InstanceScope();
-	}
-
-	/**
-	 * Wrapper for Eclipse 3.6- to collect all deprecated usages into a single location. Once Eclipse 3.7 is the default
-	 * base platform, we can remove this call.
-	 * 
-	 * @return
-	 */
-	@SuppressWarnings("deprecation")
-	public static DefaultScope defaultScope()
-	{
-		return new DefaultScope();
-	}
-
-	/**
-	 * Wrapper for Eclipse 3.6- to collect all deprecated usages into a single location. Once Eclipse 3.7 is the default
-	 * base platform, we can remove this call.
-	 * 
-	 * @return
-	 */
-	@SuppressWarnings("deprecation")
-	public static ConfigurationScope configurationScope()
-	{
-		return new ConfigurationScope();
-	}
-
-	/**
 	 * Use this to load resources from extension points. For relative paths this will convert to a URL referencing the
 	 * enclosing plugin and resolve the path. Otherwise this will convert the string to an URL (so a resource could be
 	 * pointed at in the plugin.xml definition using http:, ftp:, data:, platform:/plugin/plugin.id URLs)
@@ -810,10 +783,10 @@ public class EclipseUtil
 	 */
 	public static void migratePreference(String pluginId, String preferenceKey)
 	{
-		IEclipsePreferences configNode = EclipseUtil.configurationScope().getNode(pluginId);
+		IEclipsePreferences configNode = ConfigurationScope.INSTANCE.getNode(pluginId);
 		if (StringUtil.isEmpty(configNode.get(preferenceKey, null))) // no value in config scope
 		{
-			IEclipsePreferences instanceNode = EclipseUtil.instanceScope().getNode(pluginId);
+			IEclipsePreferences instanceNode = InstanceScope.INSTANCE.getNode(pluginId);
 			String instancePrefValue = instanceNode.get(preferenceKey, null);
 			if (!StringUtil.isEmpty(instancePrefValue))
 			{

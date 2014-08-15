@@ -24,11 +24,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 
 import com.aptana.core.ShellExecutable;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.IProcessRunner;
@@ -268,8 +268,8 @@ public class NodeJSService implements INodeJSService
 	 */
 	public INodeJS getInstallFromPreferences()
 	{
-		String pref = EclipseUtil.instanceScope().getNode(JSCorePlugin.PLUGIN_ID)
-				.get(com.aptana.js.core.preferences.IPreferenceConstants.NODEJS_EXECUTABLE_PATH, null);
+		String pref = InstanceScope.INSTANCE.getNode(JSCorePlugin.PLUGIN_ID).get(
+				com.aptana.js.core.preferences.IPreferenceConstants.NODEJS_EXECUTABLE_PATH, null);
 		if (StringUtil.isEmpty(pref))
 		{
 			return null;

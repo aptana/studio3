@@ -20,6 +20,7 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 
 import com.aptana.buildpath.core.BuildPathManager;
 import com.aptana.buildpath.core.IBuildPathEntry;
@@ -47,6 +48,8 @@ import com.aptana.js.internal.core.index.JSIndexReader;
  */
 public class JSIndexQueryHelper
 {
+
+	private static final String DOT_EXPORTS = ".exports"; //$NON-NLS-1$
 
 	public static Index getJSCoreIndex()
 	{
@@ -371,7 +374,7 @@ public class JSIndexQueryHelper
 			if (match != null)
 			{
 				// Now use the stored generated type name...
-				return match.getWord() + ".exports"; //$NON-NLS-1$
+				return match.getWord() + DOT_EXPORTS; //$NON-NLS-1$
 			}
 		}
 		return null;
@@ -468,6 +471,47 @@ public class JSIndexQueryHelper
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * @param generatedModuleId
+	 * @return an IPath. NEVER NULL! If we can't look up the module by it's id, then we return an empty IPath.
+	 */
+	public IPath getModulePath(String generatedModuleId)
+	{
+		if (generatedModuleId == null || generatedModuleId.isEmpty())
+		{
+			return Path.EMPTY;
+		}
+		if (generatedModuleId.endsWith(DOT_EXPORTS))
+		{
+			generatedModuleId = generatedModuleId.substring(0, generatedModuleId.length() - DOT_EXPORTS.length());
+		}
+
+		for (Index index : indices)
+		{
+			// Look up our mapping from generated type names to documents
+			List<QueryResult> results = index.query(new String[] { IJSIndexConstants.MODULE_DEFINITION },
+					generatedModuleId, SearchPattern.EXACT_MATCH | SearchPattern.CASE_SENSITIVE);
+			if (results != null && !results.isEmpty())
+			{
+				QueryResult match = results.get(0);
+				Set<String> docs = match.getDocuments();
+				if (docs != null && !docs.isEmpty())
+				{
+					String uri = docs.iterator().next();
+					String root = index.getRoot().toString();
+					if (uri.startsWith(root))
+					{
+						uri = uri.substring(root.length());
+					}
+					// Remove the .js extension
+					return Path.fromOSString(uri).removeFileExtension();
+				}
+
+			}
+		}
+		return Path.EMPTY;
 	}
 
 }

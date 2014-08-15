@@ -31,6 +31,7 @@ import static com.aptana.editor.js.formatter.JSFormatterConstants.NEW_LINES_BEFO
 import static com.aptana.editor.js.formatter.JSFormatterConstants.NEW_LINES_BEFORE_FINALLY_STATEMENT;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.NEW_LINES_BEFORE_IF_IN_ELSEIF_STATEMENT;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.NEW_LINES_BEFORE_NAME_VALUE_PAIRS;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.NEW_LINES_BETWEEN_VAR_DECLARATIONS;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.PRESERVED_LINES;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_AFTER_ARITHMETIC_OPERATOR;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_AFTER_ASSIGNMENT_OPERATOR;
@@ -83,12 +84,12 @@ import java.net.URL;
 import java.util.Map;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.source.ISharedTextColors;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.ui.texteditor.ITextEditor;
 
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.util.EditorUtil;
 import com.aptana.editor.js.JSPlugin;
@@ -118,12 +119,13 @@ public class JSFormatterFactory extends AbstractScriptFormatterFactory
 			INDENT_FUNCTION_BODY, INDENT_GROUP_BODY, NEW_LINES_BEFORE_CATCH_STATEMENT,
 			NEW_LINES_BEFORE_DO_WHILE_STATEMENT, NEW_LINES_BEFORE_ELSE_STATEMENT,
 			NEW_LINES_BEFORE_IF_IN_ELSEIF_STATEMENT, NEW_LINES_BEFORE_FINALLY_STATEMENT,
-			NEW_LINES_BEFORE_NAME_VALUE_PAIRS, LINES_AFTER_FUNCTION_DECLARATION_IN_EXPRESSION,
-			LINES_AFTER_FUNCTION_DECLARATION, PRESERVED_LINES, BRACE_POSITION_BLOCK, BRACE_POSITION_BLOCK_IN_CASE,
-			BRACE_POSITION_BLOCK_IN_SWITCH, BRACE_POSITION_FUNCTION_DECLARATION, SPACES_BEFORE_COMMAS,
-			SPACES_AFTER_COMMAS, SPACES_BEFORE_UNARY_OPERATOR, SPACES_AFTER_UNARY_OPERATOR,
-			SPACES_BEFORE_KEY_VALUE_OPERATOR, SPACES_AFTER_KEY_VALUE_OPERATOR, SPACES_BEFORE_ASSIGNMENT_OPERATOR,
-			SPACES_AFTER_ASSIGNMENT_OPERATOR, SPACES_BEFORE_RELATIONAL_OPERATORS, SPACES_AFTER_RELATIONAL_OPERATORS,
+			NEW_LINES_BEFORE_NAME_VALUE_PAIRS, NEW_LINES_BETWEEN_VAR_DECLARATIONS,
+			LINES_AFTER_FUNCTION_DECLARATION_IN_EXPRESSION, LINES_AFTER_FUNCTION_DECLARATION, PRESERVED_LINES,
+			BRACE_POSITION_BLOCK, BRACE_POSITION_BLOCK_IN_CASE, BRACE_POSITION_BLOCK_IN_SWITCH,
+			BRACE_POSITION_FUNCTION_DECLARATION, SPACES_BEFORE_COMMAS, SPACES_AFTER_COMMAS,
+			SPACES_BEFORE_UNARY_OPERATOR, SPACES_AFTER_UNARY_OPERATOR, SPACES_BEFORE_KEY_VALUE_OPERATOR,
+			SPACES_AFTER_KEY_VALUE_OPERATOR, SPACES_BEFORE_ASSIGNMENT_OPERATOR, SPACES_AFTER_ASSIGNMENT_OPERATOR,
+			SPACES_BEFORE_RELATIONAL_OPERATORS, SPACES_AFTER_RELATIONAL_OPERATORS,
 			SPACES_BEFORE_CONCATENATION_OPERATOR, SPACES_AFTER_CONCATENATION_OPERATOR,
 			SPACES_BEFORE_CONDITIONAL_OPERATOR, SPACES_AFTER_CONDITIONAL_OPERATOR, SPACES_BEFORE_POSTFIX_OPERATOR,
 			SPACES_AFTER_POSTFIX_OPERATOR, SPACES_BEFORE_PREFIX_OPERATOR, SPACES_AFTER_PREFIX_OPERATOR,
@@ -198,7 +200,7 @@ public class JSFormatterFactory extends AbstractScriptFormatterFactory
 	@Override
 	protected IEclipsePreferences getEclipsePreferences()
 	{
-		return EclipseUtil.instanceScope().getNode(JSPlugin.PLUGIN_ID);
+		return InstanceScope.INSTANCE.getNode(JSPlugin.PLUGIN_ID);
 	}
 
 	/*

@@ -519,6 +519,8 @@ public class JSSymbolTypeInferrer
 							{
 								PropertyElement pe = this.getSymbolPropertyElement(collection, pname,
 										new NullProgressMonitor());
+								pe.setIsInstanceProperty(true);
+								pe.setIsClassProperty(false);
 								subType.addProperty(pe);
 							}
 							additionalProperties.remove(JSTypeConstants.PROTOTYPE_PROPERTY);
@@ -531,6 +533,7 @@ public class JSSymbolTypeInferrer
 						for (String pname : additionalProperties)
 						{
 							PropertyElement pe = this.getSymbolPropertyElement(property, pname, sub.newChild(work));
+							pe.setIsClassProperty(true);
 							subType.addProperty(pe);
 						}
 					}
@@ -542,6 +545,8 @@ public class JSSymbolTypeInferrer
 					PropertyElement pe = new PropertyElement();
 					pe.setName(JSTypeConstants.PROTOTYPE_PROPERTY);
 					pe.addType(JSTypeConstants.OBJECT_TYPE);
+					pe.setIsClassProperty(true);
+					pe.setIsInstanceProperty(false);
 					subType.addProperty(pe);
 				}
 
@@ -587,70 +592,33 @@ public class JSSymbolTypeInferrer
 			boolean isFunction = value instanceof JSFunctionNode;
 			DocumentationBlock docs = value.getDocumentation();
 
-			if (docs != null)
+			TagType tagToCheck = isFunction ? TagType.RETURN : TagType.TYPE;
+			if (docs == null || !docs.hasTag(tagToCheck))
 			{
-				// create a Property/FunctionElement and apply documentation to it
-				if (isFunction)
-				{
-					FunctionElement f = new FunctionElement();
-
-					JSTypeUtil.applyDocumentation(f, value, docs);
-
-					if (!docs.hasTag(TagType.RETURN))
-					{
-						JSNodeTypeInferrer inferrer = getNodeInferrer(sub);
-
-						// infer return type
-						property.addType(JSTypeConstants.FUNCTION_TYPE);
-						inferrer.visit(value);
-						property.clearTypes();
-
-						types.addAll(inferrer.getTypes());
-					}
-					else
-					{
-						types.addAll(f.getSignatureTypes());
-					}
-				}
-				else
-				{
-					PropertyElement p = new PropertyElement();
-					JSTypeUtil.applyDocumentation(p, value, docs);
-					types.addAll(p.getTypeNames());
-				}
-			}
-			else
-			{
-
 				if (value instanceof JSObjectNode)
 				{
 					types.add(JSTypeConstants.OBJECT_TYPE);
 				}
 				else
 				{
-					// infer the node's type
 					JSNodeTypeInferrer inferrer = getNodeInferrer(sub);
-					if (isFunction)
-					{
-						// We know this is a Function, so cache that type on the property collection. This serves as a
-						// fallback type if none can be inferred. Once we're done processing the node, we remove the
-						// cached type
-						property.addType(JSTypeConstants.FUNCTION_TYPE);
-					}
-					else
-					{
-						// We're not sure of the value's type, so cache NO_TYPE on the property collection. This serves
-						// as a
-						// fallback type if none can be inferred. Once we're done processing the node, we remove the
-						// cached type
-						property.addType(NO_TYPE);
-					}
-
+					property.addType(isFunction ? JSTypeConstants.FUNCTION_TYPE : NO_TYPE);
 					inferrer.visit(value);
 					property.clearTypes();
-					// add all collected types to the passed-in type set
 					types.addAll(inferrer.getTypes());
 				}
+			}
+			else if (isFunction)
+			{
+				FunctionElement f = new FunctionElement();
+				JSTypeUtil.applyDocumentation(f, value, docs);
+				types.addAll(f.getSignatureTypes());
+			}
+			else
+			{
+				PropertyElement p = new PropertyElement();
+				JSTypeUtil.applyDocumentation(p, value, docs);
+				types.addAll(p.getTypeNames());
 			}
 			sub.worked(1);
 		}

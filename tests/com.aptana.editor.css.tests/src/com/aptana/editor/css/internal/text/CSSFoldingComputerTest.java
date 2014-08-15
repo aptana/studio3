@@ -7,22 +7,24 @@
  */
 package com.aptana.editor.css.internal.text;
 
-import org.junit.After;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.Collection;
 import java.util.Map;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
+import org.junit.After;
+import org.junit.Test;
 
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.css.core.parsing.CSSParser;
 import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.preferences.IPreferenceConstants;
@@ -33,19 +35,10 @@ import com.aptana.parsing.ast.IParseRootNode;
 public class CSSFoldingComputerTest
 {
 
-//	@Override
 	@After
 	public void tearDown() throws Exception
 	{
-		try
-		{
-			EclipseUtil.instanceScope().getNode(CSSPlugin.PLUGIN_ID)
-					.remove(IPreferenceConstants.INITIALLY_FOLD_COMMENTS);
-		}
-		finally
-		{
-//			super.tearDown();
-		}
+		InstanceScope.INSTANCE.getNode(CSSPlugin.PLUGIN_ID).remove(IPreferenceConstants.INITIALLY_FOLD_COMMENTS);
 	}
 
 	@Test
@@ -104,8 +97,8 @@ public class CSSFoldingComputerTest
 		String src = "/*\n * This is a comment.\n */\n";
 
 		// Turn on initially folding comments
-		EclipseUtil.instanceScope().getNode(CSSPlugin.PLUGIN_ID)
-				.putBoolean(IPreferenceConstants.INITIALLY_FOLD_COMMENTS, true);
+		InstanceScope.INSTANCE.getNode(CSSPlugin.PLUGIN_ID).putBoolean(IPreferenceConstants.INITIALLY_FOLD_COMMENTS,
+				true);
 
 		Map<ProjectionAnnotation, Position> annotations = emitFoldingRegions(true, new NullProgressMonitor(), src);
 		assertTrue(annotations.keySet().iterator().next().isCollapsed());
@@ -121,8 +114,7 @@ public class CSSFoldingComputerTest
 		String src = "body {\n	color: red;\n}\n";
 
 		// Turn on initially folding rules
-		EclipseUtil.instanceScope().getNode(CSSPlugin.PLUGIN_ID)
-				.putBoolean(IPreferenceConstants.INITIALLY_FOLD_RULES, true);
+		InstanceScope.INSTANCE.getNode(CSSPlugin.PLUGIN_ID).putBoolean(IPreferenceConstants.INITIALLY_FOLD_RULES, true);
 
 		Map<ProjectionAnnotation, Position> annotations = emitFoldingRegions(true, new NullProgressMonitor(), src);
 		assertTrue(annotations.keySet().iterator().next().isCollapsed());

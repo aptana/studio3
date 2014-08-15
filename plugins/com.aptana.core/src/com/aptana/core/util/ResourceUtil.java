@@ -34,6 +34,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IScopeContext;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 
 import com.aptana.core.CorePlugin;
 import com.aptana.core.logging.IdeLog;
@@ -192,7 +193,7 @@ public class ResourceUtil
 		}
 		else
 		{
-			scope = EclipseUtil.instanceScope();
+			scope = InstanceScope.INSTANCE;
 		}
 
 		IScopeContext[] scopeContext = new IScopeContext[] { scope };

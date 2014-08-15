@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.framework.Bundle;
 import org.osgi.service.prefs.BackingStoreException;
 
@@ -131,8 +132,8 @@ public abstract class MetadataLoader<T extends MetadataReader> extends Job
 				}
 				catch (Throwable t)
 				{
-					IdeLog.logError(IndexPlugin.getDefault(), Messages.MetadataLoader_Error_Loading_Metadata
-							+ resource, t);
+					IdeLog.logError(IndexPlugin.getDefault(),
+							Messages.MetadataLoader_Error_Loading_Metadata + resource, t);
 				}
 				finally
 				{
@@ -225,7 +226,7 @@ public abstract class MetadataLoader<T extends MetadataReader> extends Job
 	 */
 	protected void updateVersionPreference()
 	{
-		IEclipsePreferences prefs = (EclipseUtil.instanceScope()).getNode(this.getPluginId());
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(this.getPluginId());
 
 		prefs.putDouble(this.getIndexVersionKey(), this.getIndexVersion());
 

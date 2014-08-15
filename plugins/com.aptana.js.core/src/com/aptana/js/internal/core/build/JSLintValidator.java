@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
@@ -44,7 +45,6 @@ import com.aptana.core.build.IProblem;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.CollectionsUtil;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StreamUtil;
 import com.aptana.index.core.build.BuildContext;
 import com.aptana.jetty.util.epl.ajax.JSON;
@@ -391,7 +391,7 @@ public class JSLintValidator extends AbstractBuildParticipant
 	protected void setJSONOptions(String optionsAsJSON) throws IllegalStateException
 	{
 		JSON.parse(optionsAsJSON);
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(getPreferenceNode());
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(getPreferenceNode());
 		prefs.put(IPreferenceConstants.JS_LINT_OPTIONS, optionsAsJSON);
 		try
 		{
@@ -412,7 +412,7 @@ public class JSLintValidator extends AbstractBuildParticipant
 	@Override
 	public void restoreDefaults()
 	{
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(getPreferenceNode());
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(getPreferenceNode());
 		prefs.remove(IPreferenceConstants.JS_LINT_OPTIONS);
 		try
 		{

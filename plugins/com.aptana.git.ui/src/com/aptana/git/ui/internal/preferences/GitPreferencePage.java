@@ -8,6 +8,7 @@
 package com.aptana.git.ui.internal.preferences;
 
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.FileFieldEditor;
@@ -17,7 +18,6 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.IPreferenceConstants;
 import com.aptana.git.core.model.GitExecutable;
@@ -70,12 +70,13 @@ public class GitPreferencePage extends FieldEditorPreferencePage implements IWor
 		addField(new BooleanFieldEditor(IPreferenceConstants.AUTO_ATTACH_REPOS,
 				Messages.GitExecutableLocationPage_AutoAttachProjectsLabel, getFieldEditorParent()));
 
-		addField(new BooleanFieldEditor(IPreferenceConstants.IGNORE_NO_GIT, Messages.GitPreferencePage_IgnoreMissingGitLabel, getFieldEditorParent()));
+		addField(new BooleanFieldEditor(IPreferenceConstants.IGNORE_NO_GIT,
+				Messages.GitPreferencePage_IgnoreMissingGitLabel, getFieldEditorParent()));
 	}
 
 	@Override
 	protected IPreferenceStore doGetPreferenceStore()
 	{
-		return new ScopedPreferenceStore(EclipseUtil.instanceScope(), GitPlugin.getPluginId());
+		return new ScopedPreferenceStore(InstanceScope.INSTANCE, GitPlugin.getPluginId());
 	}
 }

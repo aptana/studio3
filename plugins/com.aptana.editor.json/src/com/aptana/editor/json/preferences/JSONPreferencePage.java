@@ -8,6 +8,7 @@
 package com.aptana.editor.json.preferences;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -38,7 +39,7 @@ public class JSONPreferencePage extends CommonEditorPreferencePage
 	@Override
 	protected IEclipsePreferences getPluginPreferenceStore()
 	{
-		return EclipseUtil.instanceScope().getNode(JSONPlugin.PLUGIN_ID);
+		return InstanceScope.INSTANCE.getNode(JSONPlugin.PLUGIN_ID);
 	}
 
 	@Override

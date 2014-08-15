@@ -26,7 +26,6 @@ import com.aptana.jira.core.JiraManagerIntegrationTest;
 @Suite.SuiteClasses({ 
 	HTMLContentAssistProcessorIntegrationTest.class,
 	ScriptingInputOutputIntegrationTest.class,
-	com.aptana.editor.coffee.tests.IntegrationTests.class,
 	com.aptana.editor.css.tests.IntegrationTests.class,
 	com.aptana.editor.js.tests.IntegrationTests.class,
 	JiraManagerIntegrationTest.class,

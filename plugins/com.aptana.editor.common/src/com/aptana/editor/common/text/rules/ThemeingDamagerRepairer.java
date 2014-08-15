@@ -12,7 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IScopeContext;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.text.AbstractDocument;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.BadPositionCategoryException;
@@ -29,7 +31,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.ICommonConstants;
@@ -74,7 +75,7 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 		maxLinesToColor = Platform.getPreferencesService().getInt(CommonEditorPlugin.PLUGIN_ID,
 				IPreferenceConstants.EDITOR_MAX_COLORED_COLUMNS,
 				IPreferenceConstants.EDITOR_MAX_COLORED_COLUMNS_DEFAULT,
-				new IScopeContext[] { EclipseUtil.instanceScope(), EclipseUtil.defaultScope() });
+				new IScopeContext[] { InstanceScope.INSTANCE, DefaultScope.INSTANCE });
 	}
 
 	@Override

@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
@@ -178,7 +179,7 @@ public class UIPlugin extends AbstractUIPlugin
 	 */
 	private void addAutoBuildListener()
 	{
-		IEclipsePreferences node = EclipseUtil.instanceScope().getNode(ResourcesPlugin.PI_RESOURCES);
+		IEclipsePreferences node = InstanceScope.INSTANCE.getNode(ResourcesPlugin.PI_RESOURCES);
 		autoBuildListener = new AutoBuildListener();
 		node.addPreferenceChangeListener(autoBuildListener);
 	}
@@ -190,7 +191,7 @@ public class UIPlugin extends AbstractUIPlugin
 	{
 		if (autoBuildListener != null)
 		{
-			IEclipsePreferences node = EclipseUtil.instanceScope().getNode(ResourcesPlugin.PI_RESOURCES);
+			IEclipsePreferences node = InstanceScope.INSTANCE.getNode(ResourcesPlugin.PI_RESOURCES);
 			node.removePreferenceChangeListener(autoBuildListener);
 			autoBuildListener = null;
 		}
@@ -247,7 +248,7 @@ public class UIPlugin extends AbstractUIPlugin
 				IPreferenceConstants.IDE_HAS_LAUNCHED_BEFORE, false, null);
 		if (!hasStartedBefore)
 		{
-			IEclipsePreferences prefs = (EclipseUtil.instanceScope()).getNode(PLUGIN_ID);
+			IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(PLUGIN_ID);
 			prefs.putInt(IPreferenceConstants.PERSPECTIVE_VERSION, WebPerspectiveFactory.VERSION);
 			prefs.putBoolean(IPreferenceConstants.IDE_HAS_LAUNCHED_BEFORE, true);
 			try

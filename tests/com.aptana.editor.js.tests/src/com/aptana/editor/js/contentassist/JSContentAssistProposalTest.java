@@ -465,6 +465,13 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 	@Test
 	public void testDottedConstructor()
 	{
+		// Node proposals:
+		// com.__defineGetter__ com.__defineSetter__ com.__lookupGetter__ com.__lookupSetter__ com.constructor
+		// com.hasOwnProperty com.isPrototypeOf com.propertyIsEnumerable com.toLocaleString com.toString
+		// com.valueOf
+		// com.aptana
+		// in other words, it's suggesting "instance methods", those things hanging off Object.prototype and
+		// com.prototype.
 		this.checkProposals("contentAssist/dotted-constructor.js", "aptana");
 	}
 
@@ -695,6 +702,10 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 	{
 		ICompletionProposal[] proposals = getProposals("contentAssist/instance-method-off-instance.js");
 
+		// Here's the proposals Node offers:
+		// p.__defineGetter__ p.__defineSetter__ p.__lookupGetter__ p.__lookupSetter__ p.constructor p.hasOwnProperty
+		// p.isPrototypeOf p.propertyIsEnumerable p.toLocaleString p.toString p.valueOf
+		// p.play
 		assertDoesntContain(proposals, "download");
 		assertContains(proposals, "play");
 	}
@@ -704,6 +715,13 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 	{
 		ICompletionProposal[] proposals = getProposals("contentAssist/static-method-off-instance.js");
 
+		// Here's the proposals Node offers:
+		// Podcast.__defineGetter__ Podcast.__defineSetter__ Podcast.__lookupGetter__ Podcast.__lookupSetter__
+		// Podcast.constructor Podcast.hasOwnProperty Podcast.isPrototypeOf Podcast.propertyIsEnumerable
+		// Podcast.toLocaleString
+		// Podcast.toString Podcast.valueOf
+		// Podcast.apply Podcast.arguments Podcast.bind Podcast.call Podcast.caller Podcast.length Podcast.name
+		// Podcast.FILE_EXTENSION Podcast.download Podcast.prototype
 		assertDoesntContain(proposals, "play");
 		assertContains(proposals, "download");
 	}
@@ -805,7 +823,12 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 		ICompletionProposal[] proposals = openAndGetProposals(file, 33);
 
 		// make sure we get "relative_func" as a proposal
-		assertContains(proposals, "relative_func");
+		// Node suggests:
+		// r.__defineGetter__ r.__defineSetter__ r.__lookupGetter__ r.__lookupSetter__ r.constructor r.hasOwnProperty
+		// r.isPrototypeOf r.propertyIsEnumerable r.toLocaleString r.toString r.valueOf
+		// r.relative_func
+		assertContains(proposals, "hasOwnProperty", "constructor", "isPrototypeOf", "propertyIsEnumerable",
+				"toLocaleString", "toString", "valueOf", "relative_func");
 	}
 
 	@Test

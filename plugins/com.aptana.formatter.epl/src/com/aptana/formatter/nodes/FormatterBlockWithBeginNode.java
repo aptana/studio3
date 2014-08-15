@@ -52,7 +52,7 @@ public abstract class FormatterBlockWithBeginNode extends FormatterBlockNode
 		}
 		if (begin != null)
 		{
-			visitor.write(context, begin.getStartOffset(), begin.getEndOffset());
+			begin.accept(context, visitor);
 		}
 		context.resetBlankLines();
 		final boolean indenting = isIndenting();

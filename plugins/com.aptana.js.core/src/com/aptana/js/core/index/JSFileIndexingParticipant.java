@@ -418,7 +418,20 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 					PropertyElement propElement = infer.getSymbolPropertyElement(exports, property, sub.newChild(work));
 					moduleExportsType.addProperty(propElement);
 				}
+				// FIXME Somehow the owning type name is getting reset to just "exports" and not the fully guid name
+				// through the inference process!
+				List<PropertyElement> props = moduleExportsType.getProperties();
+				for (PropertyElement prop : props)
+				{
+					prop.setOwningType(moduleExportsType.getName());
+				}
 			}
+			PropertyElement exportsElement = new PropertyElement();
+			exportsElement.setIsInstanceProperty(true);
+			exportsElement.setHasAllUserAgents();
+			exportsElement.setName("exports"); //$NON-NLS-1$
+			exportsElement.addType(moduleExportsType.getName());
+			moduleType.addProperty(exportsElement);
 		}
 
 		sub.setWorkRemaining(10);

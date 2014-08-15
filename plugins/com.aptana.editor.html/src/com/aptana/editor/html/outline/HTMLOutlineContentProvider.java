@@ -24,12 +24,12 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ui.PlatformUI;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.css.core.ICSSConstants;
 import com.aptana.editor.common.AbstractThemeableEditor;
@@ -83,7 +83,7 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 		addSubLanguage(IJSConstants.CONTENT_TYPE_JS, new JSOutlineContentProvider());
 
 		showTextNode = HTMLPreferenceUtil.getShowTextNodesInOutline();
-		EclipseUtil.instanceScope().getNode(HTMLPlugin.PLUGIN_ID).addPreferenceChangeListener(preferenceListener);
+		InstanceScope.INSTANCE.getNode(HTMLPlugin.PLUGIN_ID).addPreferenceChangeListener(preferenceListener);
 		fEditor = editor;
 	}
 
@@ -92,8 +92,7 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 	{
 		try
 		{
-			EclipseUtil.instanceScope().getNode(HTMLPlugin.PLUGIN_ID)
-					.removePreferenceChangeListener(preferenceListener);
+			InstanceScope.INSTANCE.getNode(HTMLPlugin.PLUGIN_ID).removePreferenceChangeListener(preferenceListener);
 		}
 		finally
 		{

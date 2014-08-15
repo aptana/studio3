@@ -10,6 +10,7 @@ package com.aptana.js.internal.core.inferencing;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,21 +19,14 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 
 import com.aptana.core.ShellExecutable;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.CollectionsUtil;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.PathUtil;
-import com.aptana.core.util.StringUtil;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.core.inferencing.AbstractRequireResolver;
-import com.aptana.js.core.preferences.IPreferenceConstants;
 
 /**
  * See http://nodejs.org/api/modules.html#modules_all_together
@@ -56,12 +50,6 @@ public class NodeModuleResolver extends AbstractRequireResolver
 			"util", "vm", "zlib");
 
 	private IPath location;
-
-	/**
-	 * Cache the node src path, listen for changes to update it
-	 */
-	private IPreferenceChangeListener fNodeSrcPathListener;
-	private IPath fNodeSrcPath;
 
 	public IPath resolve(String moduleId, IProject project, IPath location, IPath indexRoot)
 	{
@@ -109,43 +97,7 @@ public class NodeModuleResolver extends AbstractRequireResolver
 
 	protected synchronized IPath nodeSrcPath()
 	{
-		// Cache value and hook pref listener
-		if (fNodeSrcPathListener == null)
-		{
-			fNodeSrcPathListener = new IEclipsePreferences.IPreferenceChangeListener()
-			{
-				public void preferenceChange(PreferenceChangeEvent event)
-				{
-					if (IPreferenceConstants.NODEJS_SOURCE_PATH.equals(event.getKey()))
-					{
-						String value = (String) event.getNewValue();
-						if (StringUtil.isEmpty(value))
-						{
-							fNodeSrcPath = null;
-						}
-						else
-						{
-							fNodeSrcPath = Path.fromOSString(value);
-						}
-					}
-				}
-			};
-			EclipseUtil.instanceScope().getNode(JSCorePlugin.PLUGIN_ID)
-					.addPreferenceChangeListener(fNodeSrcPathListener);
-
-			String value = Platform.getPreferencesService().getString(JSCorePlugin.PLUGIN_ID,
-					IPreferenceConstants.NODEJS_SOURCE_PATH, null, null);
-			if (StringUtil.isEmpty(value))
-			{
-				fNodeSrcPath = null;
-			}
-			else
-			{
-				fNodeSrcPath = Path.fromOSString(value);
-			}
-		}
-
-		return fNodeSrcPath;
+		return JSCorePlugin.getDefault().getNodeJSService().getValidExecutable().getSourcePath();
 	}
 
 	private boolean isCore(String text)
@@ -269,4 +221,29 @@ public class NodeModuleResolver extends AbstractRequireResolver
 		return true;
 	}
 
+	public List<String> getPossibleModuleIds(IProject project, IPath currentDirectory, IPath indexRoot)
+	{
+		// Suggest core modules
+		Set<String> moduleIds = new HashSet<String>();
+		IPath node = nodeSrcPath();
+		if (node != null)
+		{
+			String[] files = node.append(LIB).toFile().list();
+			if (!ArrayUtil.isEmpty(files))
+			{
+				for (String file : files)
+				{
+					if (file.endsWith(".js"))
+					{
+						file = file.substring(0, file.length() - 3);
+					}
+					moduleIds.add(file);
+				}
+			}
+		}
+		moduleIds.addAll(CORE_MODULES);
+		// TODO Handle suggesting relative paths?
+		// TODO Suggest modules found in node_modules paths up the directory hierarchy!
+		return new ArrayList<String>(moduleIds);
+	}
 }

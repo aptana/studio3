@@ -11,11 +11,12 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 import com.aptana.ide.core.io.downloader.CoreIODownloaderTests;
+import com.aptana.ide.core.io.internal.auth.InternalAuthTests;
 import com.aptana.ide.core.io.preferences.CloakingUtilsTest;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({ EFSUtilsTest.class, WorkspaceFileSystemTest.class, WorkspaceConnectionPointTest.class,
-		ConnectionPointManagerTest.class, CloakingUtilsTest.class, CoreIODownloaderTests.class })
+		ConnectionPointManagerTest.class, CloakingUtilsTest.class, CoreIODownloaderTests.class, InternalAuthTests.class })
 public class AllTests
 {
 }

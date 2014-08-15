@@ -8,9 +8,9 @@
 package com.aptana.js.debug.core.internal.preferences;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
+import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.js.debug.core.JSDebugPlugin;
 import com.aptana.js.debug.core.preferences.IJSDebugPreferenceNames;
 
@@ -23,7 +23,7 @@ public class JSDebugPreferenceInitializer extends AbstractPreferenceInitializer 
 	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
 	 */
 	public void initializeDefaultPreferences() {
-		IEclipsePreferences node = EclipseUtil.defaultScope().getNode(JSDebugPlugin.PLUGIN_ID);
+		IEclipsePreferences node = DefaultScope.INSTANCE.getNode(JSDebugPlugin.PLUGIN_ID);
 
 		// default preferences
 		node.putBoolean(IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE, false);

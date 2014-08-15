@@ -24,7 +24,9 @@ import java.util.Map;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IScopeContext;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.text.source.SourceViewer;
@@ -58,7 +60,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.formatter.ContributionExtensionManager;
 import com.aptana.formatter.IDebugScopes;
 import com.aptana.formatter.IScriptFormatterFactory;
@@ -145,7 +146,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		// Override the super preferences lookup order.
 		// All the changes to the formatter settings should go to the instance scope (no project scope here). Only the
 		// selected profile will be picked from the project scope and then the instance scope when requested.
-		fLookupOrder = new IScopeContext[] { EclipseUtil.instanceScope(), EclipseUtil.defaultScope() };
+		fLookupOrder = new IScopeContext[] { InstanceScope.INSTANCE, DefaultScope.INSTANCE };
 	}
 
 	protected IProfileManager getProfileManager()
@@ -193,7 +194,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			try
 			{
 				String value = ((ProfileStore) store).writeProfiles(manager.getSortedProfiles());
-				profilesKey.setStoredValue(EclipseUtil.instanceScope(), value);
+				profilesKey.setStoredValue(InstanceScope.INSTANCE, value);
 				manager.clearDirty();
 			}
 			catch (CoreException e)
@@ -215,7 +216,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		}
 		else
 		{
-			scope = EclipseUtil.instanceScope();
+			scope = InstanceScope.INSTANCE;
 		}
 		activeProfileKey.setStoredValue(scope, selected != null ? selected.getID() : null);
 		activeProfileKey.flush(scope);
@@ -436,7 +437,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 				{
 					Map<String, String> defaultSettings = defaultProfile.getSettings();
 					Map<String, String> activeSettings = manager.getSelected(fProject).getSettings();
-					IScopeContext context = EclipseUtil.instanceScope();
+					IScopeContext context = InstanceScope.INSTANCE;
 					for (PreferenceKey key : preferenceKeys)
 					{
 						String name = key.getName();

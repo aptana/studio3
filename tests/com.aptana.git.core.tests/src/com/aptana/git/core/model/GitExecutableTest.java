@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.lib.concurrent.Synchroniser;
@@ -38,7 +39,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.Version;
 
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.ProcessStatus;
 import com.aptana.git.core.GitPlugin;
@@ -69,7 +69,7 @@ public class GitExecutableTest
 	public void tearDown() throws Exception
 	{
 		GitExecutable.fgExecutable = null;
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(GitPlugin.getPluginId());
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(GitPlugin.getPluginId());
 		prefs.remove(IPreferenceConstants.GIT_EXECUTABLE_PATH);
 		prefs.flush();
 		context = null;
@@ -115,7 +115,7 @@ public class GitExecutableTest
 	{
 		URL url = makeURLForExecutableFile(new Path(FAKE_GIT_1_6));
 
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(GitPlugin.getPluginId());
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(GitPlugin.getPluginId());
 		prefs.put(IPreferenceConstants.GIT_EXECUTABLE_PATH, url.getPath());
 		prefs.flush();
 
@@ -142,7 +142,7 @@ public class GitExecutableTest
 	{
 		testUsesPrefLocationFirst();
 
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(GitPlugin.getPluginId());
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(GitPlugin.getPluginId());
 		prefs.remove(IPreferenceConstants.GIT_EXECUTABLE_PATH);
 		prefs.flush();
 

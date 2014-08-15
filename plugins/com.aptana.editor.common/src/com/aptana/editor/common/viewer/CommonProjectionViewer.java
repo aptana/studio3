@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.TextViewer;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
@@ -31,7 +32,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.ui.texteditor.ITextEditor;
 
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
@@ -174,7 +174,7 @@ public class CommonProjectionViewer extends ProjectionViewer implements IAdaptab
 		// add listener to our viewer
 		prependVerifyKeyListener(fKeyListener);
 
-		fPreferenceStore = EclipseUtil.instanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
+		fPreferenceStore = InstanceScope.INSTANCE.getNode(CommonEditorPlugin.PLUGIN_ID);
 		if (fPreferenceStore != null)
 		{
 			fPreferenceStore.addPreferenceChangeListener(this);

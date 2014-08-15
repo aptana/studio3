@@ -763,6 +763,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 						if (typeName != null)
 						{
 							this.addType(typeName);
+							return;
 						}
 					}
 				}

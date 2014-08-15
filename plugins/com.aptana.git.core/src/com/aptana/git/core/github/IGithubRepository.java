@@ -8,6 +8,7 @@
 package com.aptana.git.core.github;
 
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -20,7 +21,13 @@ import com.aptana.git.core.model.GitRepository;
 public interface IGithubRepository
 {
 
-	public int getID();
+	/**
+	 * The unique id for the repo. This is internal to github and probably shouldn't be used for anything. Used
+	 * internally for equals/hashcode implementations. #getFullName() should be unique for user purposes.
+	 * 
+	 * @return
+	 */
+	public long getID();
 
 	/**
 	 * Name of the repo.
@@ -43,6 +50,11 @@ public interface IGithubRepository
 	 */
 	public boolean isFork();
 
+	/**
+	 * The URi to use for cloning via SSH.
+	 * 
+	 * @return
+	 */
 	public String getSSHURL();
 
 	/**
@@ -62,21 +74,45 @@ public interface IGithubRepository
 	public IGithubRepository getParent() throws CoreException;
 
 	/**
-	 * Creates a PR. This PR is done on the parent. so this assume this repo is the fork holding the feature
-	 * branch/changes you'd like merged to the parent.
+	 * The original source for the network of the repo. If this is not a fork, this will return itself. Otherwise we
+	 * return othe source repo object. Throws CoreException if we're unable to get source repo from Github API.
+	 * 
+	 * @return
+	 * @throws CoreException
+	 */
+	public IGithubRepository getSource() throws CoreException;
+
+	/**
+	 * Gets the list of forks for a given repository.
+	 * 
+	 * @return
+	 * @throws CoreException
+	 */
+	public List<IGithubRepository> getForks() throws CoreException;
+
+	/**
+	 * Creates a PR. This PR is done on the baseRepo against the baseBranch. This assumes that this repo is the fork
+	 * holding the feature branch/changes you'd like merged - that is, it doesn't prompt for the branch on tusi repo and
+	 * assumes the current branch. This will push the current branch to the repo and then generate the PR..
 	 * 
 	 * @param title
 	 *            required
 	 * @param body
 	 *            optional
-	 * @param repo
+	 * @param head
+	 *            The local repo to use as the head of the PR (it's current branch is the assumed headBranch)
+	 * @param baseRepo
+	 *            The repo to use as the base for the PR
+	 * @param baseBranch
+	 *            The name of the branch from the base repo
 	 * @return
+	 * @throws CoreException
 	 */
-	public IGithubPullRequest createPullRequest(String title, String body, GitRepository repo, IProgressMonitor monitor)
-			throws CoreException;
+	public IGithubPullRequest createPullRequest(String title, String body, GitRepository head,
+			IGithubRepository baseRepo, String baseBranch, IProgressMonitor monitor) throws CoreException;
 
 	/**
-	 * The default branch for this repo.
+	 * The default branch for this repo. Typically "master".
 	 * 
 	 * @return
 	 */
@@ -89,4 +125,17 @@ public interface IGithubRepository
 	 * @throws CoreException
 	 */
 	public List<IGithubPullRequest> getOpenPullRequests() throws CoreException;
+
+	/**
+	 * Returns the Set of branch names for the remote repo. These are the short branch names, i.e. "master",
+	 * "development"
+	 */
+	public Set<String> getBranches();
+
+	/**
+	 * Fully qualified name. Equivalent to #getOwner() + '/' + #getName();
+	 * 
+	 * @return
+	 */
+	public String getFullName();
 }

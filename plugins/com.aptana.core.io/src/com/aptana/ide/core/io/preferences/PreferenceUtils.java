@@ -9,6 +9,7 @@ package com.aptana.ide.core.io.preferences;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.logging.IdeLog;
@@ -110,7 +111,7 @@ public class PreferenceUtils
 	 */
 	public static void setUpdatePermissions(boolean shouldUpdate, PermissionDirection direction)
 	{
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(CoreIOPlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(CoreIOPlugin.PLUGIN_ID);
 		switch (direction)
 		{
 			case UPLOAD:
@@ -140,7 +141,7 @@ public class PreferenceUtils
 	 */
 	public static void setSpecificPermissions(boolean shouldSpecific, PermissionDirection direction)
 	{
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(CoreIOPlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(CoreIOPlugin.PLUGIN_ID);
 		switch (direction)
 		{
 			case UPLOAD:
@@ -170,7 +171,7 @@ public class PreferenceUtils
 	 */
 	public static void setFilePermissions(long permissions, PermissionDirection direction)
 	{
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(CoreIOPlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(CoreIOPlugin.PLUGIN_ID);
 		switch (direction)
 		{
 			case UPLOAD:
@@ -200,7 +201,7 @@ public class PreferenceUtils
 	 */
 	public static void setFolderPermissions(long permissions, PermissionDirection direction)
 	{
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(CoreIOPlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(CoreIOPlugin.PLUGIN_ID);
 		switch (direction)
 		{
 			case UPLOAD:

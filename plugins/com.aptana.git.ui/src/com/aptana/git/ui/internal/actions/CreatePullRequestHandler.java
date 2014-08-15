@@ -10,6 +10,7 @@ package com.aptana.git.ui.internal.actions;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.MessageFormat;
+import java.util.Set;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -18,14 +19,13 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
-import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.github.IGithubPullRequest;
 import com.aptana.git.core.github.IGithubRepository;
 import com.aptana.git.core.model.GitRepository;
@@ -55,6 +55,37 @@ public class CreatePullRequestHandler extends AbstractGithubHandler
 			return null;
 		}
 
+		Set<IGithubRepository> repos = CollectionsUtil.newSet(ghRepo);
+		IGithubRepository defaultBaseRepo = ghRepo;
+		// By default set the base repo to be the parent of the current repo
+		try
+		{
+			defaultBaseRepo = ghRepo.getParent();
+			if (defaultBaseRepo != null)
+			{
+				repos.add(defaultBaseRepo);
+			}
+		}
+		catch (CoreException e)
+		{
+			// ignore
+		}
+
+		// Now try to gather all the forks
+		try
+		{
+			IGithubRepository source = ghRepo.getSource();
+			if (source != null)
+			{
+				repos.add(source);
+				repos.addAll(source.getForks());
+			}
+		}
+		catch (CoreException e2)
+		{
+			// ignore
+		}
+
 		// Prompt for title and body!
 		// Pre-populate title and body with details of commit log?
 
@@ -64,33 +95,11 @@ public class CreatePullRequestHandler extends AbstractGithubHandler
 		IStatus commitsStatus = repo.execute(ReadWrite.READ, "log", "-g", "--pretty"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		String branch = repo.currentBranch();
-		String parentName = Messages.CreatePullRequestHandler_UnknownParentRepoOwnerName;
-		String parentBranch = branch;
-		try
-		{
-			IGithubRepository parentRepo = ghRepo.getParent();
-			if (parentRepo == null)
-			{
-				// there is no parent!
-				// TODO Maybe just let user create a PR against this repo's default branch? Requires changes to pass along head to method (and dialog)
-				// parentRepo = ghRepo;
-				MessageDialog.openError(getShell(), "No parent repository",
-						"Repository has no parent to open PRs against. Is this repo a fork?");
-				throw new ExecutionException("Repository has no parent to open PRs against. Is this repo a fork?");
-			}
-			parentName = parentRepo.getOwner();
-			parentBranch = parentRepo.getDefaultBranch();
-		}
-		catch (CoreException e2)
-		{
-			IdeLog.logWarning(GitUIPlugin.getDefault(),
-					MessageFormat.format("Failed to get name of parent repo for repo: {0}", ghRepo)); //$NON-NLS-1$
-		}
-		String base = parentName + ':' + parentBranch;
+
 		String head = ghRepo.getOwner() + ':' + branch;
 		// TODO Allow user to select different local and remote branch for PR?
 		CreatePullRequestDialog id = new CreatePullRequestDialog(UIUtils.getActiveShell(), branch,
-				commitsStatus.isOK() ? commitsStatus.getMessage() : StringUtil.EMPTY, base, head);
+				commitsStatus.isOK() ? commitsStatus.getMessage() : StringUtil.EMPTY, defaultBaseRepo, repos, head);
 		if (id.open() == Window.CANCEL)
 		{
 			return null;
@@ -98,6 +107,8 @@ public class CreatePullRequestHandler extends AbstractGithubHandler
 
 		final String title = id.getTitle();
 		final String body = id.getBody();
+		final String baseBranch = id.getBaseBranch();
+		final IGithubRepository baseRepo = id.getBaseRepo();
 		final IGithubRepository theGhRepo = ghRepo;
 		Job job = new Job(Messages.CreatePullRequestHandler_SubmitPRJobName)
 		{
@@ -106,7 +117,8 @@ public class CreatePullRequestHandler extends AbstractGithubHandler
 			{
 				try
 				{
-					final IGithubPullRequest pr = theGhRepo.createPullRequest(title, body, repo, monitor);
+					final IGithubPullRequest pr = theGhRepo.createPullRequest(title, body, repo, baseRepo, baseBranch,
+							monitor);
 					// Ok we submitted a PR, let's show a popup/toast to let user know and let them click it to open it.
 					URL url = null;
 					try

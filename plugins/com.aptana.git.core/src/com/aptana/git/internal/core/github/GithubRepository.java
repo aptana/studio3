@@ -8,7 +8,10 @@
 package com.aptana.git.internal.core.github;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -17,10 +20,13 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.github.IGithubManager;
 import com.aptana.git.core.github.IGithubPullRequest;
 import com.aptana.git.core.github.IGithubRepository;
+import com.aptana.git.core.model.GitExecutable;
+import com.aptana.git.core.model.GitRef;
 import com.aptana.git.core.model.GitRepository;
 
 /**
@@ -33,6 +39,7 @@ public class GithubRepository implements IGithubRepository
 	 * Keys used in JSON describing the repository.
 	 */
 	private static final String PARENT = "parent"; //$NON-NLS-1$
+	private static final String SOURCE = "source"; //$NON-NLS-1$
 	private static final String LOGIN = "login"; //$NON-NLS-1$
 	private static final String OWNER = "owner"; //$NON-NLS-1$
 	private static final String DEFAULT_BRANCH = "default_branch"; //$NON-NLS-1$
@@ -49,9 +56,13 @@ public class GithubRepository implements IGithubRepository
 		this.json = repo;
 	}
 
-	public int getID()
+	public long getID()
 	{
-		return (Integer) json.get(ID);
+		if (!json.containsKey(ID))
+		{
+			return -1L;
+		}
+		return (Long) json.get(ID);
 	}
 
 	public String getName()
@@ -59,13 +70,26 @@ public class GithubRepository implements IGithubRepository
 		return (String) json.get(NAME);
 	}
 
+	public String getFullName()
+	{
+		return getOwner() + '/' + getName();
+	}
+
 	public boolean isPrivate()
 	{
+		if (!json.containsKey(PRIVATE))
+		{
+			return false;
+		}
 		return (Boolean) json.get(PRIVATE);
 	}
 
 	public boolean isFork()
 	{
+		if (!json.containsKey(FORK))
+		{
+			return false;
+		}
 		return (Boolean) json.get(FORK);
 	}
 
@@ -100,6 +124,21 @@ public class GithubRepository implements IGithubRepository
 		return new GithubRepository((JSONObject) json.get(PARENT));
 	}
 
+	public IGithubRepository getSource() throws CoreException
+	{
+		if (!isFork())
+		{
+			return this;
+		}
+
+		if (!json.containsKey(SOURCE))
+		{
+			getDetailedJSON();
+		}
+		// TODO Keep a cache of the repos inside the manager or something?
+		return new GithubRepository((JSONObject) json.get(SOURCE));
+	}
+
 	protected void getDetailedJSON() throws CoreException
 	{
 		this.json = (JSONObject) getAPI().get(getAPIURL());
@@ -121,15 +160,15 @@ public class GithubRepository implements IGithubRepository
 	}
 
 	@SuppressWarnings("unchecked")
-	public IGithubPullRequest createPullRequest(String title, String body, GitRepository repo, IProgressMonitor monitor)
-			throws CoreException
+	public IGithubPullRequest createPullRequest(String title, String body, GitRepository head,
+			IGithubRepository baseRepo, String baseBranch, IProgressMonitor monitor) throws CoreException
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, Messages.GithubRepository_GeneratingPRTaskName, 100);
-		String branch = repo.currentBranch();
+		String branch = head.currentBranch();
 
 		// push current branch to origin first!
 		sub.subTask(Messages.GithubRepository_PushingBranchSubtaskName);
-		IStatus pushStatus = repo.push(GitRepository.ORIGIN, branch);
+		IStatus pushStatus = head.push(GitRepository.ORIGIN, branch);
 		sub.worked(50);
 		if (!pushStatus.isOK())
 		{
@@ -137,18 +176,14 @@ public class GithubRepository implements IGithubRepository
 		}
 
 		sub.subTask(Messages.GithubRepository_SubmittingPRSubtaskName);
-		IGithubRepository parent = getParent();
 		JSONObject prObject = new JSONObject();
 		prObject.put("title", title); //$NON-NLS-1$
 		prObject.put("body", body); //$NON-NLS-1$
-		// TODO Allow user to choose branch on the fork to use as contents for PR?
 		prObject.put("head", getOwner() + ':' + branch); //$NON-NLS-1$
-		// FIXME Allow user to choose the branch from parent to merge against. Default to the parent's default
-		// branch
-		prObject.put("base", parent.getDefaultBranch()); //$NON-NLS-1$
+		prObject.put("base", baseBranch); //$NON-NLS-1$
 
 		JSONObject result = (JSONObject) getAPI().post(
-				((GithubRepository) parent).getAPIURL() + "/pulls", prObject.toJSONString()); //$NON-NLS-1$
+				((GithubRepository) baseRepo).getAPIURL() + "/pulls", prObject.toJSONString()); //$NON-NLS-1$
 		return new GithubPullRequest(result);
 	}
 
@@ -174,4 +209,74 @@ public class GithubRepository implements IGithubRepository
 		}
 		return prs;
 	}
+
+	public Set<String> getBranches()
+	{
+		IStatus status = getGitExecutable().runInBackground(null, "ls-remote", "--heads", getSSHURL()); //$NON-NLS-1$ //$NON-NLS-2$
+		if (!status.isOK())
+		{
+			return Collections.emptySet();
+		}
+		String[] lines = StringUtil.LINE_SPLITTER.split(status.getMessage());
+		Set<String> branches = new HashSet<String>(lines.length);
+		for (String line : lines)
+		{
+			String pastSha = line.substring(40).trim();
+			if (pastSha.startsWith(GitRef.REFS_HEADS))
+			{
+				branches.add(pastSha.substring(GitRef.REFS_HEADS.length()));
+			}
+		}
+		return branches;
+	}
+
+	protected GitExecutable getGitExecutable()
+	{
+		return GitExecutable.instance();
+	}
+
+	public List<IGithubRepository> getForks() throws CoreException
+	{
+		JSONArray result = (JSONArray) getAPI().get(getAPIURL() + "/forks"); //$NON-NLS-1$
+		List<IGithubRepository> repos = new ArrayList<IGithubRepository>(result.size());
+		for (Object blah : result)
+		{
+			JSONObject pr = (JSONObject) blah;
+			repos.add(new GithubRepository(pr));
+		}
+		return repos;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (getID() ^ (getID() >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj)
+		{
+			return true;
+		}
+		if (obj == null)
+		{
+			return false;
+		}
+		if (!(obj instanceof GithubRepository))
+		{
+			return false;
+		}
+		GithubRepository other = (GithubRepository) obj;
+		if (getID() != other.getID())
+		{
+			return false;
+		}
+		return true;
+	}
+
 }

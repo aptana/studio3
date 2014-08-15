@@ -717,13 +717,6 @@
          unpack="false"/>
 
    <plugin
-         id="com.aptana.editor.coffee"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="com.aptana.editor.html.core"
          download-size="0"
          install-size="0"
@@ -732,6 +725,13 @@
 
    <plugin
          id="net.jeeeyul.eclipse.themes"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="lib.org.chromium.sdk"
          download-size="0"
          install-size="0"
          version="0.0.0"

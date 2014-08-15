@@ -22,7 +22,6 @@ public interface INodeJSService
 
 	public static interface Listener
 	{
-
 		public void nodeJSInstalled();
 	}
 

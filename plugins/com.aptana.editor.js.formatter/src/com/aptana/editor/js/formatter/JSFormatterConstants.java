@@ -45,6 +45,7 @@ public interface JSFormatterConstants
 	public static final String NEW_LINES_BEFORE_FINALLY_STATEMENT = FORMATTER_ID + ".newline.before.finally"; //$NON-NLS-1$
 	public static final String NEW_LINES_BEFORE_DO_WHILE_STATEMENT = FORMATTER_ID + ".newline.before.dowhile"; //$NON-NLS-1$
 	public static final String NEW_LINES_BEFORE_NAME_VALUE_PAIRS = FORMATTER_ID + ".newline.before.name.value.pairs"; //$NON-NLS-1$
+	public static final String NEW_LINES_BETWEEN_VAR_DECLARATIONS = FORMATTER_ID + ".newline.between.var.declarations"; //$NON-NLS-1$
 
 	// Empty lines
 	public static final String LINES_AFTER_FUNCTION_DECLARATION = FORMATTER_ID + ".line.after.function.declaration"; //$NON-NLS-1$

@@ -11,12 +11,12 @@ import java.util.UUID;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.usage.internal.AnalyticsInfoManager;
 import com.aptana.usage.internal.AnalyticsLogger;
 import com.aptana.usage.internal.SendPingJob;
@@ -103,7 +103,7 @@ public class UsagePlugin extends Plugin
 		if (save)
 		{
 			// saves the id in configuration scope so it's shared by all workspaces
-			IEclipsePreferences prefs = EclipseUtil.configurationScope().getNode(PLUGIN_ID);
+			IEclipsePreferences prefs = ConfigurationScope.INSTANCE.getNode(PLUGIN_ID);
 			prefs.put(IPreferenceConstants.P_IDE_ID, id);
 			try
 			{

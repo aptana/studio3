@@ -20,7 +20,6 @@ Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-Localization: plugin
 Export-Package: com.aptana.editor.xml,
  com.aptana.editor.xml.contentassist;x-friends:="com.aptana.editor.svg,com.appcelerator.titanium.alloy.ui",
- com.aptana.editor.xml.parsing;x-friends:="com.aptana.editor.svg",
  com.aptana.editor.xml.text.rules
 Bundle-Activator: com.aptana.editor.xml.XMLPlugin
 Bundle-ActivationPolicy: lazy

@@ -16,10 +16,10 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IPreferencesService;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.deploy.DeployPlugin;
 import com.aptana.deploy.internal.ProjectPropertyTester;
 import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
@@ -165,7 +165,7 @@ public class DeployPreferenceUtil
 
 	public static void setDeployEndpoint(IContainer container, String endpoint)
 	{
-		IEclipsePreferences prefs = (EclipseUtil.instanceScope()).getNode(DEPLOY_PLUGIN_IDENTIFIER);
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(DEPLOY_PLUGIN_IDENTIFIER);
 		prefs.put(
 				MessageFormat.format("{0}:{1}", IPreferenceConstants.PROJECT_DEPLOY_ENDPOINT, container.getFullPath()), //$NON-NLS-1$
 				endpoint);
