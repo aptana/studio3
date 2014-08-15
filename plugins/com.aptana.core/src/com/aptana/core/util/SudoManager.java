@@ -35,7 +35,8 @@ public class SudoManager
 	private static final String ECHO_MESSAGE = "SUCCESS"; //$NON-NLS-1$
 	private static final String NON_INTERACTIVE = "-n"; //$NON-NLS-1$
 	private static final String PASSWORD_PROMPT_FLAG = "-p"; //$NON-NLS-1$
-	private static final String END_OF_OPTIONS = "--"; //$NON-NLS-1$
+	public static final String END_OF_OPTIONS = "--"; //$NON-NLS-1$
+	public static final String RETAIN_HOME = "-H"; //$NON-NLS-1$
 
 	/**
 	 * The prompt that is forced to appear on the sudo commands (if the sudo timeout is already expired).
