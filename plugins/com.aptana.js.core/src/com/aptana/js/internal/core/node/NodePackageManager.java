@@ -59,10 +59,6 @@ import com.aptana.js.core.node.INodePackageManager;
 public class NodePackageManager implements INodePackageManager
 {
 
-	private static final String TRUE = "true";
-
-	private static final String JSON = "--json";
-
 	/**
 	 * The error string that appears in the npm command output.
 	 */
@@ -87,14 +83,24 @@ public class NodePackageManager implements INodePackageManager
 	private static final String LIB = "lib"; //$NON-NLS-1$
 
 	/**
-	 * Argument to {@code COLOR} switch/config option so that ANSI colors aren't used in output.
-	 */
-	private static final String FALSE = "false"; //$NON-NLS-1$
-
-	/**
 	 * Special switch/config option to set ANSI color option. Set to {@code FALSE} to disable ANSI color output.
 	 */
 	private static final String COLOR = "--color"; //$NON-NLS-1$
+
+	/**
+	 * Config key/switch to ask for JSON parseable output
+	 */
+	private static final String JSON = "--json"; //$NON-NLS-1$
+
+	/**
+	 * config value to pass after {@value #JSON} to get json output
+	 */
+	private static final String TRUE = "true"; //$NON-NLS-1$
+
+	/**
+	 * Argument to {@code COLOR} switch/config option so that ANSI colors aren't used in output.
+	 */
+	private static final String FALSE = "false"; //$NON-NLS-1$
 
 	private static final Pattern VERSION_PATTERN = Pattern.compile("([0-9]+\\.[0-9]+\\.[0-9]+)"); //$NON-NLS-1$
 
@@ -575,6 +581,12 @@ public class NodePackageManager implements INodePackageManager
 		try
 		{
 			List<String> args = getNpmArguments(global, password);
+			if (!PlatformUtil.isWindows() && global)
+			{
+				// TISTUD-6786, force -H option under SUDO at end of args
+				int i = args.indexOf(SudoManager.END_OF_OPTIONS);
+				args.add(i, SudoManager.RETAIN_HOME);
+			}
 			CollectionsUtil.addToList(args, command, packageName, COLOR, FALSE);
 
 			Map<String, String> environment;
