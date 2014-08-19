@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.ComboFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -23,7 +24,6 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.SocketUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.webserver.core.WebServerCorePlugin;
@@ -111,7 +111,7 @@ public class LocalWebServerPreferencePage extends FieldEditorPreferencePage impl
 	@Override
 	protected IPreferenceStore doGetPreferenceStore()
 	{
-		return new ScopedPreferenceStore(EclipseUtil.instanceScope(), WebServerCorePlugin.PLUGIN_ID);
+		return new ScopedPreferenceStore(InstanceScope.INSTANCE, WebServerCorePlugin.PLUGIN_ID);
 	}
 
 }

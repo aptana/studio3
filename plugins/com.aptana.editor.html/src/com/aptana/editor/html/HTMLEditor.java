@@ -14,6 +14,7 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -32,7 +33,6 @@ import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IEditorLinkedResources;
@@ -90,7 +90,7 @@ public class HTMLEditor extends AbstractThemeableEditor
 	{
 		try
 		{
-			EclipseUtil.instanceScope().getNode(HTMLPlugin.PLUGIN_ID)
+			InstanceScope.INSTANCE.getNode(HTMLPlugin.PLUGIN_ID)
 					.removePreferenceChangeListener(fPreferenceListener);
 		}
 		finally
@@ -109,7 +109,7 @@ public class HTMLEditor extends AbstractThemeableEditor
 	protected CommonOutlinePage createOutlinePage()
 	{
 		CommonOutlinePage outlinePage = super.createOutlinePage();
-		EclipseUtil.instanceScope().getNode(HTMLPlugin.PLUGIN_ID).addPreferenceChangeListener(fPreferenceListener);
+		InstanceScope.INSTANCE.getNode(HTMLPlugin.PLUGIN_ID).addPreferenceChangeListener(fPreferenceListener);
 
 		return outlinePage;
 	}

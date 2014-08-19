@@ -50,12 +50,17 @@ class GithubPullRequest implements IGithubPullRequest
 
 	public URL getURL() throws MalformedURLException
 	{
-		return new URL((String) json.get(URL));
+		return new URL(getRawURL());
 	}
 
 	public URL getHTMLURL() throws MalformedURLException
 	{
 		return new URL((String) json.get(HTML_URL));
+	}
+
+	private String getRawURL()
+	{
+		return (String) json.get(URL);
 	}
 
 	public Long getNumber()
@@ -120,5 +125,44 @@ class GithubPullRequest implements IGithubPullRequest
 	{
 		JSONObject base = (JSONObject) json.get(HEAD);
 		return (String) base.get(REF);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((getRawURL() == null) ? 0 : getRawURL().hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj)
+		{
+			return true;
+		}
+		if (obj == null)
+		{
+			return false;
+		}
+		if (!(obj instanceof GithubPullRequest))
+		{
+			return false;
+		}
+		GithubPullRequest other = (GithubPullRequest) obj;
+		if (getRawURL() == null)
+		{
+			if (other.getRawURL() != null)
+			{
+				return false;
+			}
+		}
+		else if (!getRawURL().equals(other.getRawURL()))
+		{
+			return false;
+		}
+		return true;
 	}
 }

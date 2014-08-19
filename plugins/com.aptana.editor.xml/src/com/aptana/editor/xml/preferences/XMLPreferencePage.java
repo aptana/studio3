@@ -8,9 +8,9 @@
 package com.aptana.editor.xml.preferences;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.IPreferenceStore;
 
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.preferences.CommonEditorPreferencePage;
 import com.aptana.editor.xml.XMLEditor;
 import com.aptana.editor.xml.XMLPlugin;
@@ -32,7 +32,7 @@ public class XMLPreferencePage extends CommonEditorPreferencePage
 	@Override
 	protected IEclipsePreferences getPluginPreferenceStore()
 	{
-		return EclipseUtil.instanceScope().getNode(XMLPlugin.PLUGIN_ID);
+		return InstanceScope.INSTANCE.getNode(XMLPlugin.PLUGIN_ID);
 	}
 
 	@Override

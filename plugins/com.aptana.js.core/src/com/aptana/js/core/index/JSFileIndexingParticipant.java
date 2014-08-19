@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2014 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -34,6 +34,7 @@ import com.aptana.js.core.JSTypeConstants;
 import com.aptana.js.core.inferencing.JSPropertyCollection;
 import com.aptana.js.core.inferencing.JSScope;
 import com.aptana.js.core.inferencing.JSTypeUtil;
+import com.aptana.js.core.model.FunctionElement;
 import com.aptana.js.core.model.PropertyElement;
 import com.aptana.js.core.model.TypeElement;
 import com.aptana.js.core.parsing.ast.IJSNodeTypes;
@@ -173,6 +174,10 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 	 */
 	public void processParseResults(BuildContext context, Index index, IParseNode ast, IProgressMonitor monitor)
 	{
+		if (monitor.isCanceled())
+		{
+			return;
+		}
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
 
 		queryHelper = new JSIndexQueryHelper(context.getProject());
@@ -195,6 +200,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		JSScope globals = getGlobals(ast);
 		try
 		{
+			JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(globals, index, location, queryHelper);
 			// process globals
 			if (globals != null)
 			{
@@ -223,7 +229,6 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 					IdeLog.logTrace(JSCorePlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
 				}
 
-				JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(globals, index, location, queryHelper);
 				for (PropertyElement property : symbolInferrer.getScopeProperties(sub.newChild(25)))
 				{
 					globalType.addProperty(property);
@@ -314,7 +319,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 			sub.setWorkRemaining(20);
 			// process module API exports
-			processModule(context, index, ast, location, sub.newChild(20));
+			processModule(context, index, ast, location, globals, symbolInferrer, sub.newChild(20));
 		}
 		catch (OperationCanceledException oce)
 		{
@@ -331,12 +336,13 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 	 * @param index
 	 * @param ast
 	 * @param location
+	 * @param globals
+	 * @param symbolInferrer
 	 * @param monitor
 	 */
-	protected void processModule(BuildContext context, Index index, IParseNode ast, URI location,
-			IProgressMonitor monitor)
+	protected void processModule(BuildContext context, Index index, IParseNode ast, URI location, JSScope globals,
+			JSSymbolTypeInferrer infer, IProgressMonitor monitor)
 	{
-		JSScope globals = getGlobals(ast);
 		if (globals == null)
 		{
 			return;
@@ -346,6 +352,8 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 		// Autogenerate some unique type name to hold the module's exports
 		// Then record the mapping between the filepath and the generated type's name
+		// FIXME Can we use better names here? The full location is too long, and the uuid is ugly and long.
+		// Can we determine the true module id and use that? the relative path to the index root and use that?
 		String moduleTypeName = JSTypeUtil.getUniqueTypeName(location.toString());
 
 		// Create a type for this module...
@@ -362,13 +370,23 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		JSPropertyCollection module = globals.getSymbol("module"); //$NON-NLS-1$
 		if (module != null)
 		{
-			JSSymbolTypeInferrer infer = new JSSymbolTypeInferrer(globals, index, location, queryHelper);
 			// Now grab "module.exports" and attach that property to our hand-generated module type from above
 			PropertyElement exports = infer.getSymbolPropertyElement(module, "exports", sub.newChild(90)); //$NON-NLS-1$
 			moduleType.addProperty(exports);
 
-			// Now copy over the type info from the module.exports property to the hand-generated module instance
-			for (String type : exports.getTypeNames())
+			List<String> types;
+			if (exports instanceof FunctionElement)
+			{
+				// If "exports" is pointing at a constructor(or an instance using constructor), we need it's return
+				// type, not type - because it's type is a function!
+				types = ((FunctionElement) exports).getReturnTypeNames();
+			}
+			else
+			{
+				types = exports.getTypeNames();
+			}
+
+			for (String type : types)
 			{
 				// TODO Where should we strip out the type info on the elements in the collection? This doesn't seem
 				// like the right place, maybe we should do it in CA processor, or index query helper's get ancestor
@@ -391,7 +409,6 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 			}
 			// Grab all properties hanging off "exports" and attach them to our hand-generated "module.exports" module
 			// instance type.
-			JSSymbolTypeInferrer infer = new JSSymbolTypeInferrer(globals, index, location, queryHelper);
 			List<String> properties = exports.getPropertyNames();
 			if (!CollectionsUtil.isEmpty(properties))
 			{
@@ -401,7 +418,20 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 					PropertyElement propElement = infer.getSymbolPropertyElement(exports, property, sub.newChild(work));
 					moduleExportsType.addProperty(propElement);
 				}
+				// FIXME Somehow the owning type name is getting reset to just "exports" and not the fully guid name
+				// through the inference process!
+				List<PropertyElement> props = moduleExportsType.getProperties();
+				for (PropertyElement prop : props)
+				{
+					prop.setOwningType(moduleExportsType.getName());
+				}
 			}
+			PropertyElement exportsElement = new PropertyElement();
+			exportsElement.setIsInstanceProperty(true);
+			exportsElement.setHasAllUserAgents();
+			exportsElement.setName("exports"); //$NON-NLS-1$
+			exportsElement.addType(moduleExportsType.getName());
+			moduleType.addProperty(exportsElement);
 		}
 
 		sub.setWorkRemaining(10);

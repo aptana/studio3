@@ -30,6 +30,7 @@ import static com.aptana.editor.js.formatter.JSFormatterConstants.NEW_LINES_BEFO
 import static com.aptana.editor.js.formatter.JSFormatterConstants.NEW_LINES_BEFORE_FINALLY_STATEMENT;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.NEW_LINES_BEFORE_IF_IN_ELSEIF_STATEMENT;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.NEW_LINES_BEFORE_NAME_VALUE_PAIRS;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.NEW_LINES_BETWEEN_VAR_DECLARATIONS;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.PRESERVED_LINES;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_AFTER_ARITHMETIC_OPERATOR;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_AFTER_ASSIGNMENT_OPERATOR;
@@ -136,7 +137,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 	protected static final String[] NEW_LINES_POSITIONS = { NEW_LINES_BEFORE_CATCH_STATEMENT,
 			NEW_LINES_BEFORE_DO_WHILE_STATEMENT, NEW_LINES_BEFORE_ELSE_STATEMENT,
 			NEW_LINES_BEFORE_IF_IN_ELSEIF_STATEMENT, NEW_LINES_BEFORE_FINALLY_STATEMENT,
-			NEW_LINES_BEFORE_NAME_VALUE_PAIRS };
+			NEW_LINES_BEFORE_NAME_VALUE_PAIRS, NEW_LINES_BETWEEN_VAR_DECLARATIONS };
 
 	/**
 	 * Indentation constants

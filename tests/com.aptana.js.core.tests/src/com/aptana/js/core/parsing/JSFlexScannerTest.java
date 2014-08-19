@@ -7,13 +7,15 @@
  */
 package com.aptana.js.core.parsing;
 
-import org.junit.After;
-import org.junit.Test;
-import org.junit.Before;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.util.List;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 import beaver.Scanner.Exception;
 import beaver.Symbol;
 
@@ -25,30 +27,16 @@ public class JSFlexScannerTest
 {
 	private JSFlexScanner _scanner;
 
-	/*
-	 * (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-//	@Override
 	@Before
 	public void setUp() throws java.lang.Exception
 	{
-//		super.setUp();
-
 		_scanner = new JSFlexScanner();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-//	@Override
 	@After
 	public void tearDown() throws java.lang.Exception
 	{
 		_scanner = null;
-
-//		super.tearDown();
 	}
 
 	/**
@@ -657,6 +645,18 @@ public class JSFlexScannerTest
 	public void testPeriod()
 	{
 		assertTokenTypes(".", JSTokenType.DOT);
+	}
+	
+	@Test
+	public void testGet()
+	{
+		assertTokenTypes("get", JSTokenType.GET);
+	}
+	
+	@Test
+	public void testSet()
+	{
+		assertTokenTypes("set", JSTokenType.SET);
 	}
 
 	@Test

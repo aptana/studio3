@@ -7,6 +7,7 @@
  */
 package com.aptana.terminal.preferences;
 
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.DirectoryFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
@@ -15,10 +16,10 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.terminal.TerminalPlugin;
 
-public class TerminalPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
+public class TerminalPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage
+{
 
 	private BooleanFieldEditor closeOnExitEditor;
 	private DirectoryFieldEditor workingDirectoryEditor;
@@ -27,7 +28,8 @@ public class TerminalPreferencePage extends FieldEditorPreferencePage implements
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.preference.FieldEditorPreferencePage#createFieldEditors()
 	 */
-	protected void createFieldEditors() {
+	protected void createFieldEditors()
+	{
 		workingDirectoryEditor = new DirectoryFieldEditor(IPreferenceConstants.WORKING_DIRECTORY,
 				Messages.TerminalPreferencePage_LBL_WorkingDirectory, getFieldEditorParent());
 		closeOnExitEditor = new BooleanFieldEditor(IPreferenceConstants.CLOSE_VIEW_ON_EXIT,
@@ -41,14 +43,16 @@ public class TerminalPreferencePage extends FieldEditorPreferencePage implements
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
 	 */
-	public void init(IWorkbench workbench) {
+	public void init(IWorkbench workbench)
+	{
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.preference.PreferencePage#doGetPreferenceStore()
 	 */
-	protected IPreferenceStore doGetPreferenceStore() {
-		return new ScopedPreferenceStore(EclipseUtil.instanceScope(), TerminalPlugin.PLUGIN_ID);
+	protected IPreferenceStore doGetPreferenceStore()
+	{
+		return new ScopedPreferenceStore(InstanceScope.INSTANCE, TerminalPlugin.PLUGIN_ID);
 	}
 }

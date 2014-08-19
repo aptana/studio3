@@ -8,9 +8,9 @@
 package com.aptana.editor.svg.preferences;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
+import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.svg.SVGPlugin;
 
 public class PreferenceInitializer extends AbstractPreferenceInitializer
@@ -22,7 +22,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 	@Override
 	public void initializeDefaultPreferences()
 	{
-		IEclipsePreferences prefs = (EclipseUtil.defaultScope()).getNode(SVGPlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = DefaultScope.INSTANCE.getNode(SVGPlugin.PLUGIN_ID);
 
 		prefs.putDouble(IPreferenceConstants.SVG_INDEX_VERSION, 0);
 	}

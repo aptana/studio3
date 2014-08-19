@@ -37,7 +37,8 @@ public class SourceMapRegistry implements ISourceMapRegistry
 	private static final String ELEMENT_TYPE = "sourceMap"; //$NON-NLS-1$
 	private static final String CLASS_ATTR = "class"; //$NON-NLS-1$
 	private static final String NATURE_ID_ATTR = "projectNatureId"; //$NON-NLS-1$
-	private Map<String, IConfigurationElement> sourceMappers;
+
+	protected Map<String, IConfigurationElement> sourceMappers;
 
 	/*
 	 * (non-Javadoc)
@@ -104,7 +105,7 @@ public class SourceMapRegistry implements ISourceMapRegistry
 	/**
 	 * load the source maps contributors.
 	 */
-	private synchronized void lazyLoad()
+	protected synchronized void lazyLoad()
 	{
 		if (sourceMappers == null)
 		{

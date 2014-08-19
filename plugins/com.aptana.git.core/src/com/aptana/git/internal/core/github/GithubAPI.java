@@ -30,7 +30,7 @@ import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.github.IGithubUser;
 
 @SuppressWarnings("restriction")
-class GithubAPI
+public class GithubAPI
 {
 
 	// TODO Add support to get the list of orgs for a user

@@ -8,6 +8,7 @@
 package com.aptana.js.debug.ui.internal.launchConfigurations;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
@@ -36,7 +37,8 @@ import com.aptana.js.debug.ui.JSDebugUIPlugin;
 /**
  * @author Max Stepanov
  */
-public class DebugSettingsTab extends AbstractLaunchConfigurationTab {
+public class DebugSettingsTab extends AbstractLaunchConfigurationTab
+{
 	private Image image;
 
 	private Button overridePrefs;
@@ -50,7 +52,8 @@ public class DebugSettingsTab extends AbstractLaunchConfigurationTab {
 	/**
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#createControl(org.eclipse.swt.widgets.Composite)
 	 */
-	public void createControl(Composite parent) {
+	public void createControl(Composite parent)
+	{
 		Composite composite = new Composite(parent, SWT.NONE);
 		composite.setFont(parent.getFont());
 		composite.setLayout(new GridLayout());
@@ -76,14 +79,18 @@ public class DebugSettingsTab extends AbstractLaunchConfigurationTab {
 		suspendOnDebuggerKeyword = new Button(suspendOptionsGroup, SWT.CHECK);
 		suspendOnDebuggerKeyword.setText(Messages.DebugSettingsTab_SuspendOnDebuggerKeyword);
 
-		Listener dirtyListener = new Listener() {
-			public void handleEvent(Event event) {
+		Listener dirtyListener = new Listener()
+		{
+			public void handleEvent(Event event)
+			{
 				setDirty(true);
 				updateLaunchConfigurationDialog();
 			}
 		};
-		overridePrefs.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
+		overridePrefs.addSelectionListener(new SelectionAdapter()
+		{
+			public void widgetSelected(SelectionEvent e)
+			{
 				updateEnablement();
 				setDirty(true);
 				updateLaunchConfigurationDialog();
@@ -97,32 +104,43 @@ public class DebugSettingsTab extends AbstractLaunchConfigurationTab {
 		setControl(composite);
 	}
 
-	private void updateEnablement() {
+	private void updateEnablement()
+	{
 		boolean enableOverride = overridePrefs.getSelection();
 		suspendOnFirstLine.setEnabled(enableOverride);
 		suspendOnExceptions.setEnabled(enableOverride);
 		suspendOnErrors.setEnabled(enableOverride);
 		suspendOnDebuggerKeyword.setEnabled(enableOverride);
-		try {
-			if (enableOverride) {
+		try
+		{
+			if (enableOverride)
+			{
 				setValuesFrom(launchConfiguration);
-			} else {
-				setValuesFrom(new ScopedPreferenceStore(EclipseUtil.instanceScope(), JSDebugPlugin.PLUGIN_ID));
 			}
-		} catch (CoreException e) {
+			else
+			{
+				setValuesFrom(new ScopedPreferenceStore(InstanceScope.INSTANCE, JSDebugPlugin.PLUGIN_ID));
+			}
+		}
+		catch (CoreException e)
+		{
 			IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 		}
 	}
 
-	private void setValuesFrom(Object object) throws CoreException {
-		if (object instanceof IPreferenceStore) {
+	private void setValuesFrom(Object object) throws CoreException
+	{
+		if (object instanceof IPreferenceStore)
+		{
 			IPreferenceStore preferences = (IPreferenceStore) object;
 			suspendOnFirstLine.setSelection(preferences.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE));
 			suspendOnExceptions.setSelection(preferences.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_EXCEPTIONS));
 			suspendOnErrors.setSelection(preferences.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_ERRORS));
 			suspendOnDebuggerKeyword.setSelection(preferences
 					.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_DEBUGGER_KEYWORD));
-		} else if (object instanceof ILaunchConfiguration) {
+		}
+		else if (object instanceof ILaunchConfiguration)
+		{
 			ILaunchConfiguration configuration = (ILaunchConfiguration) object;
 			suspendOnFirstLine.setSelection(configuration.getAttribute(
 					ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_FIRST_LINE, false));
@@ -138,22 +156,29 @@ public class DebugSettingsTab extends AbstractLaunchConfigurationTab {
 	/**
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
 	 */
-	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
+	public void setDefaults(ILaunchConfigurationWorkingCopy configuration)
+	{
 		JSLaunchConfigurationHelper.setDebugDefaults(configuration);
 	}
 
 	/**
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#initializeFrom(org.eclipse.debug.core.ILaunchConfiguration)
 	 */
-	public void initializeFrom(ILaunchConfiguration configuration) {
+	public void initializeFrom(ILaunchConfiguration configuration)
+	{
 		this.launchConfiguration = configuration;
-		try {
+		try
+		{
 			overridePrefs.setSelection(configuration.getAttribute(
 					ILaunchConfigurationConstants.CONFIGURATION_OVERRIDE_DEBUG_PREFERENCES, false));
 			setValuesFrom(configuration);
-		} catch (CoreException e) {
+		}
+		catch (CoreException e)
+		{
 			IdeLog.logError(JSDebugUIPlugin.getDefault(), "Reading launch configuration fails", e); //$NON-NLS-1$
-		} finally {
+		}
+		finally
+		{
 			updateEnablement();
 		}
 	}
@@ -161,10 +186,12 @@ public class DebugSettingsTab extends AbstractLaunchConfigurationTab {
 	/**
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
 	 */
-	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
+	public void performApply(ILaunchConfigurationWorkingCopy configuration)
+	{
 		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_OVERRIDE_DEBUG_PREFERENCES,
 				overridePrefs.getSelection());
-		if (overridePrefs.getSelection()) {
+		if (overridePrefs.getSelection())
+		{
 			configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_FIRST_LINE,
 					suspendOnFirstLine.getSelection());
 			configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_EXCEPTIONS,
@@ -179,15 +206,18 @@ public class DebugSettingsTab extends AbstractLaunchConfigurationTab {
 	/**
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#getName()
 	 */
-	public String getName() {
+	public String getName()
+	{
 		return Messages.DebugSettingsTab_Debug;
 	}
 
 	/**
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#getImage()
 	 */
-	public Image getImage() {
-		if (image == null) {
+	public Image getImage()
+	{
+		if (image == null)
+		{
 			image = JSDebugUIPlugin.getImageDescriptor("icons/full/obj16/launch-debug.gif").createImage(); //$NON-NLS-1$
 		}
 		return image;
@@ -196,8 +226,10 @@ public class DebugSettingsTab extends AbstractLaunchConfigurationTab {
 	/**
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#dispose()
 	 */
-	public void dispose() {
-		if (image != null) {
+	public void dispose()
+	{
+		if (image != null)
+		{
 			image.dispose();
 		}
 		super.dispose();

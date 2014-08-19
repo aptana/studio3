@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceNode;
@@ -37,7 +38,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ui.epl.UIEplPlugin;
 
@@ -131,8 +131,7 @@ public abstract class GenericRootPreferencePage extends PreferencePage implement
 
 		Group dialogsResetGroup = new Group(composite, SWT.NONE);
 		dialogsResetGroup.setLayout(GridLayoutFactory.swtDefaults().numColumns(2).create());
-		dialogsResetGroup.setLayoutData(GridDataFactory.fillDefaults()
-				.create());
+		dialogsResetGroup.setLayoutData(GridDataFactory.fillDefaults().create());
 		dialogsResetGroup.setText(EplMessages.GenericRootPreferencePage_dialogsGroup);
 
 		Label label = new Label(dialogsResetGroup, SWT.WRAP);
@@ -144,7 +143,7 @@ public abstract class GenericRootPreferencePage extends PreferencePage implement
 		clearBt.setText(EplMessages.GenericRootPreferencePage_clearMessagesButtonLabel);
 		clearBt.setLayoutData(new GridData(GridData.FILL, GridData.BEGINNING, false, false));
 		// enable the 'reset' button only if there are dialogs to reset.
-		final IEclipsePreferences prefs = (EclipseUtil.instanceScope()).getNode(UIEplPlugin.PLUGIN_ID);
+		final IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(UIEplPlugin.PLUGIN_ID);
 		String messages = prefs.get(IEplPreferenceConstants.HIDDEN_MESSAGES, null);
 		clearBt.setEnabled(!StringUtil.isEmpty(messages));
 		clearBt.addSelectionListener(new SelectionAdapter()

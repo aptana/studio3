@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.swt.graphics.RGB;
@@ -164,8 +165,7 @@ public class ThemePlugin extends AbstractUIPlugin
 						}
 					}
 				};
-				EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID)
-						.addPreferenceChangeListener(fThemeChangeListener);
+				InstanceScope.INSTANCE.getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
 
 				fApplyThemeToAllEditors = Platform.getPreferencesService().getBoolean(ThemePlugin.PLUGIN_ID,
 						IPreferenceConstants.APPLY_TO_ALL_EDITORS, false, null);
@@ -175,7 +175,7 @@ public class ThemePlugin extends AbstractUIPlugin
 
 				// Listen for changes to eclipse editor colors and synch them back to our theme
 				fEclipseColorsListener = new EditorColorSyncher();
-				EclipseUtil.instanceScope().getNode("org.eclipse.ui.editors") //$NON-NLS-1$
+				InstanceScope.INSTANCE.getNode("org.eclipse.ui.editors") //$NON-NLS-1$
 						.addPreferenceChangeListener(fEclipseColorsListener);
 
 				revertConsoleColors();
@@ -208,7 +208,7 @@ public class ThemePlugin extends AbstractUIPlugin
 
 			public void run()
 			{
-				IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode("org.eclipse.debug.ui"); //$NON-NLS-1$
+				IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode("org.eclipse.debug.ui"); //$NON-NLS-1$
 
 				prefs.remove("org.eclipse.debug.ui.errorColor"); //$NON-NLS-1$
 				prefs.remove("org.eclipse.debug.ui.outColor"); //$NON-NLS-1$
@@ -221,7 +221,7 @@ public class ThemePlugin extends AbstractUIPlugin
 					prefs.flush();
 
 					// Store that we've reverted the console
-					IEclipsePreferences themePrefs = EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID);
+					IEclipsePreferences themePrefs = InstanceScope.INSTANCE.getNode(ThemePlugin.PLUGIN_ID);
 					themePrefs.putBoolean("reverted_console", true); //$NON-NLS-1$
 					try
 					{
@@ -250,14 +250,14 @@ public class ThemePlugin extends AbstractUIPlugin
 		{
 			if (fThemeChangeListener != null)
 			{
-				EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID)
-						.removePreferenceChangeListener(fThemeChangeListener);
+				InstanceScope.INSTANCE.getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(
+						fThemeChangeListener);
 				fThemeChangeListener = null;
 			}
 
 			if (fEclipseColorsListener != null)
 			{
-				EclipseUtil.instanceScope().getNode("org.eclipse.ui.editors") //$NON-NLS-1$
+				InstanceScope.INSTANCE.getNode("org.eclipse.ui.editors") //$NON-NLS-1$
 						.removePreferenceChangeListener(fEclipseColorsListener);
 				fEclipseColorsListener = null;
 			}

@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -713,7 +714,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 				if (dialog.getToggleState())
 				{
 					// the decision is remembered, so saves it
-					IEclipsePreferences prefs = (EclipseUtil.instanceScope()).getNode(CommonEditorPlugin.PLUGIN_ID);
+					IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(CommonEditorPlugin.PLUGIN_ID);
 					prefs.putBoolean(IPreferenceConstants.REMEMBER_UNTITLED_FILE_SAVE_TYPE, true);
 					prefs.putBoolean(IPreferenceConstants.SAVE_UNTITLED_FILE_TO_PROJECT, saveToProject);
 					try

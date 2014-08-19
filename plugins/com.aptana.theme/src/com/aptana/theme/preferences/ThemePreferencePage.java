@@ -19,6 +19,7 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.e4.ui.internal.workbench.swt.E4Application;
@@ -1307,7 +1308,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		Object source = e.getSource();
 		if (source == fAptanaEditorsOnlyCheckbox)
 		{
-			IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID);
+			IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(ThemePlugin.PLUGIN_ID);
 			prefs.putBoolean(IPreferenceConstants.APPLY_TO_ALL_EDITORS, fAptanaEditorsOnlyCheckbox.getSelection());
 			try
 			{

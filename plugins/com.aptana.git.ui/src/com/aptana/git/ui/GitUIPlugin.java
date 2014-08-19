@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -91,8 +92,7 @@ public class GitUIPlugin extends AbstractUIPlugin
 				{
 					themeChangeListener = new QuickDiffColorer();
 				}
-				EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID)
-						.addPreferenceChangeListener(themeChangeListener);
+				InstanceScope.INSTANCE.getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(themeChangeListener);
 				themeChangeListener.forceColors();
 
 				checkHasGit();
@@ -113,8 +113,8 @@ public class GitUIPlugin extends AbstractUIPlugin
 		{
 			if (themeChangeListener != null)
 			{
-				EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID)
-						.removePreferenceChangeListener(themeChangeListener);
+				InstanceScope.INSTANCE.getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(
+						themeChangeListener);
 			}
 			themeChangeListener = null;
 		}
@@ -296,10 +296,10 @@ public class GitUIPlugin extends AbstractUIPlugin
 
 					JFaceResources.getColorRegistry().put("CONFLICTING_COLOR", redBG); //$NON-NLS-1$
 					JFaceResources.getColorRegistry().put("RESOLVED_COLOR", greenBG); //$NON-NLS-1$
-					setQuickDiffColors(EclipseUtil.instanceScope().getNode("com.aptana.editor.common")); //$NON-NLS-1$
+					setQuickDiffColors(InstanceScope.INSTANCE.getNode("com.aptana.editor.common")); //$NON-NLS-1$
 					if (ThemePlugin.applyToAllEditors())
 					{
-						setQuickDiffColors(EclipseUtil.instanceScope().getNode("org.eclipse.ui.editors")); //$NON-NLS-1$
+						setQuickDiffColors(InstanceScope.INSTANCE.getNode("org.eclipse.ui.editors")); //$NON-NLS-1$
 					}
 				}
 

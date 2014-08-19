@@ -450,9 +450,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	{
 		checkCancellation();
 
-		// TODO: Need to handle any property assignments off of "this"
 		IParseNode child = node.getExpression();
-
 		if (child instanceof JSNode)
 		{
 			List<String> types = this.getTypes(child);
@@ -464,34 +462,19 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 				{
 					returnTypes.add(JSTypeUtil.getClassType(typeName));
 				}
+				else if (typeName.startsWith(JSTypeConstants.GENERIC_FUNCTION_OPEN))
+				{
+					returnTypes.addAll(JSTypeUtil.getFunctionSignatureReturnTypeNames(typeName));
+				}
 				else
 				{
-					// FIXME If this is a function that returns a type, assume that function is a constructor and we've
-					// defined the type as Function<Type>.
-					// This is where the properties for that type are going to be hung.
-					// That may not be "right". We may want to unwrap the function's return type and use that as the
-					// type we're dealing with.
-					// in that case, we need to change JSSymbolTypeInferrer#generateType to also unwrap Function<Type>
-					// properly.
 					returnTypes.add(typeName);
 				}
 			}
 
 			for (String typeName : returnTypes)
 			{
-				Collection<PropertyElement> properties = this._queryHelper.getTypeMembers(typeName,
-						JSTypeConstants.PROTOTYPE_PROPERTY);
-
-				if (properties != null)
-				{
-					for (PropertyElement property : properties)
-					{
-						for (String propertyType : property.getTypeNames())
-						{
-							this.addType(propertyType);
-						}
-					}
-				}
+				this.addType(typeName);
 			}
 		}
 
@@ -780,6 +763,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 						if (typeName != null)
 						{
 							this.addType(typeName);
+							return;
 						}
 					}
 				}
@@ -868,7 +852,6 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 			collector.visit(node);
 			symbol.addValue(node);
 
-			// infer type
 			JSSymbolTypeInferrer inferrer = new JSSymbolTypeInferrer(this._scope, this._index, this._location,
 					this._queryHelper);
 			Set<String> types = new LinkedHashSet<String>();

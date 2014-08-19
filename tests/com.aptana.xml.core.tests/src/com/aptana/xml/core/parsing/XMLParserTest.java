@@ -8,13 +8,23 @@
 package com.aptana.xml.core.parsing;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.aptana.core.build.IProblem;
+import com.aptana.parsing.ParseResult;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.INameNode;
+import com.aptana.parsing.ast.IParseError;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseNodeAttribute;
 import com.aptana.parsing.ast.IParseRootNode;
@@ -56,10 +66,31 @@ public class XMLParserTest
 		assertEquals(1, root.getChildCount());
 		XMLElementNode html = (XMLElementNode) root.getFirstChild();
 		assertElement(0, 32, "html", 1, 4, html);
+		assertEquals("html", html.getText());
 		IParseNodeAttribute[] attrs = html.getAttributes();
 		assertEquals(2, attrs.length);
 		assertEquals("myId", html.getAttributeValue("id"));
 		assertEquals("myClass", html.getAttributeValue("class"));
+
+		// first letter of name
+		IParseNodeAttribute attr = html.getAttributeAtOffset(6);
+		assertEquals("class", attr.getName());
+		assertEquals("myClass", attr.getValue());
+
+		// opening quote of value
+		attr = html.getAttributeAtOffset(12);
+		assertEquals("class", attr.getName());
+		assertEquals("myClass", attr.getValue());
+		// = between name and value
+		assertNull(html.getAttributeAtOffset(24));
+		// last char of name
+		attr = html.getAttributeAtOffset(23);
+		assertEquals("id", attr.getName());
+		assertEquals("myId", attr.getValue());
+		// closing quote of value
+		attr = html.getAttributeAtOffset(30);
+		assertEquals("id", attr.getName());
+		assertEquals("myId", attr.getValue());
 	}
 
 	private void assertElement(int start, int end, String name, int nameStart, int nameEnd, IParseNode elementNode)
@@ -76,7 +107,7 @@ public class XMLParserTest
 	public void testTags() throws Exception
 	{
 		String source = "<html><head></head><body><p>Text</p></html>\n";
-		IParseNode root = parseTest(source, "<html><head></head><body><p></p></body></html>\n");
+		IParseNode root = parseTest(source, "<html><head></head><body><p>Text</p></body></html>\n");
 		assertEquals(1, root.getChildCount());
 		IParseNode html = root.getFirstChild();
 		assertElement(0, 5, "html", 1, 4, html);
@@ -102,16 +133,17 @@ public class XMLParserTest
 				"<body>Don't forget me this weekend!</body>\n" +
 				"</note>";
 		// @formatter:on
-		IParseNode root = parseTest(source, "<note><to></to><from></from><heading></heading><body></body></note>\n");
+		IParseNode root = parseTest(source,
+				"<note><to>Tove</to><from>Jani</from><heading>Reminder</heading><body>Don't forget me this weekend!</body></note>\n");
 		assertEquals(1, root.getChildCount());
 		IParseNode note = root.getFirstChild();
 		assertElement(44, 160, "note", 45, 48, note);
 		assertEquals(4, note.getChildCount());
 		IParseNode to = note.getFirstChild();
 		assertElement(51, 63, "to", 52, 53, to);
-		assertEquals(0, to.getChildCount());
+		assertEquals(1, to.getChildCount()); // child is text
 		IParseNode from = note.getChild(1);
-		assertEquals(0, from.getChildCount());
+		assertEquals(1, from.getChildCount()); // child is text
 		assertElement(65, 81, "from", 66, 69, from);
 	}
 
@@ -147,6 +179,86 @@ public class XMLParserTest
 		assertEquals(0, cdataNode.getStartingOffset());
 		assertEquals(source.length() - 1, cdataNode.getEndingOffset());
 		assertEquals(source, cdataNode.getText());
+	}
+
+	@Test
+	public void testUnquotedAttributeValueBeginningWithDigit() throws Exception
+	{
+		String source = "<note attr=123></note><note attr1=321 attr2=\"something\"></note>";
+		ParseState parseState = new ParseState(source);
+		ParseResult result = fParser.parse(parseState);
+
+		List<IParseError> errors = new ArrayList<IParseError>(result.getErrors());
+		assertEquals(2, errors.size());
+		Collections.sort(errors, new Comparator<IParseError>()
+		{
+			public int compare(IParseError o1, IParseError o2)
+			{
+				return o1.getOffset() - o2.getOffset();
+			}
+		});
+		assertEquals("Unquoted attribute value", errors.get(0).getMessage());
+		assertEquals(IProblem.Severity.ERROR, errors.get(0).getSeverity());
+		assertEquals(11, errors.get(0).getOffset());
+		assertEquals(3, errors.get(0).getLength());
+
+		assertEquals("Unquoted attribute value", errors.get(1).getMessage());
+		assertEquals(IProblem.Severity.ERROR, errors.get(1).getSeverity());
+		assertEquals(34, errors.get(1).getOffset());
+		assertEquals(3, errors.get(1).getLength());
+
+		IParseRootNode root = result.getRootNode();
+		assertNotNull(root);
+		XMLElementNode ee = (XMLElementNode) root.getChild(0);
+		IParseNodeAttribute[] attrs = ee.getAttributes();
+		assertEquals(1, attrs.length);
+		assertEquals("123", ee.getAttributeValue("attr"));
+
+		ee = (XMLElementNode) root.getChild(1);
+		attrs = ee.getAttributes();
+		assertEquals(2, attrs.length);
+		assertEquals("321", ee.getAttributeValue("attr1"));
+		assertEquals("something", ee.getAttributeValue("attr2"));
+	}
+
+	@Test
+	public void testAttributeWithNoValue() throws Exception
+	{
+		String source = "<note attr></note><note attr1 attr2=\"true\"></note>";
+		ParseState parseState = new ParseState(source);
+		ParseResult result = fParser.parse(parseState);
+
+		List<IParseError> errors = new ArrayList<IParseError>(result.getErrors());
+		assertEquals(2, errors.size());
+		Collections.sort(errors, new Comparator<IParseError>()
+		{
+			public int compare(IParseError o1, IParseError o2)
+			{
+				return o1.getOffset() - o2.getOffset();
+			}
+		});
+		assertEquals("Attribute declared with no value", errors.get(0).getMessage());
+		assertEquals(IProblem.Severity.ERROR, errors.get(0).getSeverity());
+		assertEquals(6, errors.get(0).getOffset());
+		assertEquals(4, errors.get(0).getLength());
+
+		assertEquals("Attribute declared with no value", errors.get(1).getMessage());
+		assertEquals(IProblem.Severity.ERROR, errors.get(1).getSeverity());
+		assertEquals(24, errors.get(1).getOffset());
+		assertEquals(5, errors.get(1).getLength());
+
+		IParseRootNode root = result.getRootNode();
+		assertNotNull(root);
+		XMLElementNode ee = (XMLElementNode) root.getChild(0);
+		IParseNodeAttribute[] attrs = ee.getAttributes();
+		assertEquals(1, attrs.length);
+		assertEquals("attr", ee.getAttributeValue("attr")); // unquoted is treated like having value of it's own name
+
+		ee = (XMLElementNode) root.getChild(1);
+		attrs = ee.getAttributes();
+		assertEquals(2, attrs.length);
+		assertEquals("attr1", ee.getAttributeValue("attr1")); // unquoted is treated like having value of it's own name
+		assertEquals("true", ee.getAttributeValue("attr2"));
 	}
 
 	protected IParseNode parseTest(String source) throws Exception

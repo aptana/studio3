@@ -8,6 +8,7 @@
 package com.aptana.js.debug.ui.internal;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.swt.SWT;
@@ -48,7 +49,7 @@ public final class WorkbenchCloseListener implements Listener
 			boolean profilerActive = DebugOptionsManager.isProfilerActive(modelIdentifier);
 			if (debuggerActive || profilerActive)
 			{
-				IEclipsePreferences preferences = EclipseUtil.instanceScope().getNode(JSDebugUIPlugin.PLUGIN_ID);
+				IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(JSDebugUIPlugin.PLUGIN_ID);
 				if (!preferences.getBoolean(IJSDebugUIConstants.PREF_CONFIRM_EXIT_DEBUGGER, true))
 				{
 					return;

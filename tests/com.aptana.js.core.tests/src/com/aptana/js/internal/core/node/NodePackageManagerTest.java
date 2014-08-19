@@ -167,14 +167,124 @@ public class NodePackageManagerTest
 				will(returnValue(true));
 
 				// pass password in on stdin
-				oneOf(runner).run(userHome, ShellExecutable.getEnvironment(), password,
-						CollectionsUtil.newList("sudo", "-S", "--", "/usr/bin/node", "/usr/bin/npm", "cache", "clean"),
-						monitor);
+				oneOf(runner).run(
+						userHome,
+						ShellExecutable.getEnvironment(),
+						password,
+						CollectionsUtil.newList("sudo", "-p", "password:", "-S", "--", "/usr/bin/node", "/usr/bin/npm",
+								"cache", "clean"), monitor);
 				will(returnValue(Status.OK_STATUS));
 			}
 		});
 
 		IStatus returned = npm.cleanNpmCache(password, true, monitor);
+		assertTrue(returned.isOK());
+		context.assertIsSatisfied();
+	}
+
+	@Test
+	public void testInstallGlobally()
+	{
+		password = new char[] { 'p', 'a', 's', 's' };
+		npm = new NodePackageManager(node)
+		{
+			@Override
+			protected IProcessRunner getProcessRunner()
+			{
+				return runner;
+			}
+
+			@Override
+			public boolean exists()
+			{
+				return true;
+			}
+
+			@Override
+			protected IPath findNPMOnPATH(IPath possible)
+			{
+				return Path.fromPortableString(NPM_ON_PATH);
+			}
+
+			@Override
+			public synchronized IPath getConfigPrefixPath() throws CoreException
+			{
+				return null;
+			}
+		};
+		context.checking(new Expectations()
+		{
+			{
+				oneOf(file).exists();
+				will(returnValue(true));
+
+				// pass password in on stdin
+				oneOf(runner).run(
+						with(aNull(IPath.class)),
+						with(ShellExecutable.getEnvironment()),
+						with(password), // sudo password
+						// Run under sudo, force sudo to retain home (-H), use -g global flag to npm
+						with(CollectionsUtil.newList("sudo", "-p", "password:", "-S", "-H", "--", "/usr/bin/node",
+								"/usr/bin/npm", "-g", "install", "titanium", "--color", "false")),
+						with(any(IProgressMonitor.class)));
+				will(returnValue(Status.OK_STATUS));
+			}
+		});
+
+		IStatus returned = npm.install("titanium", "Titanium CLI", true, password, monitor);
+		assertTrue(returned.isOK());
+		context.assertIsSatisfied();
+	}
+
+	@Test
+	public void testInstallLocally()
+	{
+		npm = new NodePackageManager(node)
+		{
+			@Override
+			protected IProcessRunner getProcessRunner()
+			{
+				return runner;
+			}
+
+			@Override
+			public boolean exists()
+			{
+				return true;
+			}
+
+			@Override
+			protected IPath findNPMOnPATH(IPath possible)
+			{
+				return Path.fromPortableString(NPM_ON_PATH);
+			}
+
+			@Override
+			public synchronized IPath getConfigPrefixPath() throws CoreException
+			{
+				return null;
+			}
+		};
+		context.checking(new Expectations()
+		{
+			{
+				oneOf(file).exists();
+				will(returnValue(true));
+
+				// pass password in on stdin
+				oneOf(runner).run(
+						with(aNull(IPath.class)),
+						with(ShellExecutable.getEnvironment()),
+						with(aNull(char[].class)), // no password
+						// don't run under sudo, no -g global flag
+						with(CollectionsUtil.newList("/usr/bin/node", "/usr/bin/npm", "install", "titanium", "--color",
+								"false")), with(any(IProgressMonitor.class)));
+				will(returnValue(Status.OK_STATUS));
+			}
+		});
+
+		// FIXME Should we require a working directory for a local install? I think we should!
+		IStatus returned = npm.install("titanium", "Titanium CLI", false, null, monitor);
 		assertTrue(returned.isOK());
 		context.assertIsSatisfied();
 	}
@@ -205,36 +315,42 @@ public class NodePackageManagerTest
 		final IStatus status = new Status(
 				IStatus.OK,
 				JSCorePlugin.PLUGIN_ID,
-				"/usr/local/lib\n└── titanium@3.2.1  (git://github.com/appcelerator/titanium.git#8e262ccbd20b4a049ab2bdffd98ff940592da224)");
+				"{\n  \"dependencies\": {\n    \"titanium\": {\n      \"version\": \"3.3.0\",\n      \"from\": \"titanium@*\",\n      \"resolved\": \"https://registry.npmjs.org/titanium/-/titanium-3.3.0.tgz\"\n    }\n  }\n}");
 		context.checking(new Expectations()
 		{
 			{
 				oneOf(file).exists();
 				will(returnValue(true));
 
-				oneOf(node).runInBackground(userHome, ShellExecutable.getEnvironment(),
-						CollectionsUtil.newList("/usr/bin/npm", "ls", "titanium", "--color", "false", "-g"));
+				oneOf(node).runInBackground(
+						userHome,
+						ShellExecutable.getEnvironment(),
+						CollectionsUtil.newList("/usr/bin/npm", "ls", "titanium", "--color", "false", "--json", "true",
+								"-g"));
 				will(returnValue(status));
 			}
 		});
 
 		String returned = npm.getInstalledVersion("titanium", true, userHome);
-		assertEquals("3.2.1", returned);
+		assertEquals("3.3.0", returned);
 		context.assertIsSatisfied();
 	}
 
 	@Test
 	public void testGetInstalledVersionIsNotInstalled() throws CoreException
 	{
-		final IStatus status = new Status(IStatus.OK, JSCorePlugin.PLUGIN_ID, "/usr/local/lib\n└── (empty)");
+		final IStatus status = new Status(IStatus.OK, JSCorePlugin.PLUGIN_ID, "{}");
 		context.checking(new Expectations()
 		{
 			{
 				oneOf(file).exists();
 				will(returnValue(true));
 
-				oneOf(node).runInBackground(userHome, ShellExecutable.getEnvironment(),
-						CollectionsUtil.newList("/usr/bin/npm", "ls", "titanium", "--color", "false", "-g"));
+				oneOf(node).runInBackground(
+						userHome,
+						ShellExecutable.getEnvironment(),
+						CollectionsUtil.newList("/usr/bin/npm", "ls", "titanium", "--color", "false", "--json", "true",
+								"-g"));
 				will(returnValue(status));
 			}
 		});
@@ -254,8 +370,11 @@ public class NodePackageManagerTest
 				oneOf(file).exists();
 				will(returnValue(true));
 
-				oneOf(node).runInBackground(userHome, ShellExecutable.getEnvironment(),
-						CollectionsUtil.newList("/usr/bin/npm", "ls", "titanium", "--color", "false", "-g"));
+				oneOf(node).runInBackground(
+						userHome,
+						ShellExecutable.getEnvironment(),
+						CollectionsUtil.newList("/usr/bin/npm", "ls", "titanium", "--color", "false", "--json", "true",
+								"-g"));
 				will(returnValue(status));
 			}
 		});
@@ -267,15 +386,18 @@ public class NodePackageManagerTest
 	@Test
 	public void testIsInstalledCheckWhenNotInstalled() throws CoreException
 	{
-		final IStatus status = new Status(IStatus.OK, JSCorePlugin.PLUGIN_ID, "/usr/local/lib\n└── (empty)");
+		final IStatus status = new Status(IStatus.OK, JSCorePlugin.PLUGIN_ID, "{}");
 		context.checking(new Expectations()
 		{
 			{
 				oneOf(file).exists();
 				will(returnValue(true));
 
-				oneOf(node).runInBackground(null, ShellExecutable.getEnvironment(),
-						CollectionsUtil.newList("/usr/bin/npm", "ls", "titanium", "--color", "false", "-g"));
+				oneOf(node).runInBackground(
+						null,
+						ShellExecutable.getEnvironment(),
+						CollectionsUtil.newList("/usr/bin/npm", "ls", "titanium", "--color", "false", "--json", "true",
+								"-g"));
 				will(returnValue(status));
 			}
 		});
@@ -290,15 +412,18 @@ public class NodePackageManagerTest
 		final IStatus status = new Status(
 				IStatus.OK,
 				JSCorePlugin.PLUGIN_ID,
-				"/usr/local/lib\n└── titanium@3.2.1  (git://github.com/appcelerator/titanium.git#8e262ccbd20b4a049ab2bdffd98ff940592da224)");
+				"{\n  \"dependencies\": {\n    \"titanium\": {\n      \"version\": \"3.3.0\",\n      \"from\": \"titanium@*\",\n      \"resolved\": \"https://registry.npmjs.org/titanium/-/titanium-3.3.0.tgz\"\n    }\n  }\n}");
 		context.checking(new Expectations()
 		{
 			{
 				oneOf(file).exists();
 				will(returnValue(true));
 
-				oneOf(node).runInBackground(null, ShellExecutable.getEnvironment(),
-						CollectionsUtil.newList("/usr/bin/npm", "ls", "titanium", "--color", "false", "-g"));
+				oneOf(node).runInBackground(
+						null,
+						ShellExecutable.getEnvironment(),
+						CollectionsUtil.newList("/usr/bin/npm", "ls", "titanium", "--color", "false", "--json", "true",
+								"-g"));
 				will(returnValue(status));
 			}
 		});
@@ -322,8 +447,11 @@ public class NodePackageManagerTest
 				will(returnValue(true));
 
 				// Pretend that ls fails for some reason
-				oneOf(node).runInBackground(null, ShellExecutable.getEnvironment(),
-						CollectionsUtil.newList("/usr/bin/npm", "ls", "titanium", "--color", "false", "-g"));
+				oneOf(node).runInBackground(
+						null,
+						ShellExecutable.getEnvironment(),
+						CollectionsUtil.newList("/usr/bin/npm", "ls", "titanium", "--color", "false", "--json", "true",
+								"-g"));
 				will(returnValue(status));
 
 				// Falls back to checking list

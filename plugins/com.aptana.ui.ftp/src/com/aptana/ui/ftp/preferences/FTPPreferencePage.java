@@ -9,6 +9,7 @@ package com.aptana.ui.ftp.preferences;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.PreferencePage;
@@ -72,7 +73,7 @@ public class FTPPreferencePage extends PreferencePage implements IWorkbenchPrefe
 		PreferenceUtils
 				.setFolderPermissions(downloadPermComposite.getFolderPermissions(), PermissionDirection.DOWNLOAD);
 
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(FTPPlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(FTPPlugin.PLUGIN_ID);
 		prefs.putInt(IFTPPreferenceConstants.KEEP_ALIVE_TIME, Integer.parseInt(fKeepAliveText.getText()));
 		try
 		{

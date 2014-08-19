@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -975,7 +976,7 @@ public class SnippetsView extends ViewPart
 		toolItemMap.clear();
 		currentScope = null;
 
-		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(themeListener);
+		InstanceScope.INSTANCE.getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(themeListener);
 
 		List<String> expandedDrawers = new ArrayList<String>();
 		for (ExpandItem item : expandItems.values())
@@ -1002,7 +1003,7 @@ public class SnippetsView extends ViewPart
 
 		updateSnippetDrawers();
 
-		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(themeListener);
+		InstanceScope.INSTANCE.getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(themeListener);
 	}
 
 	/**
@@ -1446,7 +1447,7 @@ public class SnippetsView extends ViewPart
 		disabledImageRegistry.dispose();
 		hotTagImageRegistry.dispose();
 
-		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(themeListener);
+		InstanceScope.INSTANCE.getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(themeListener);
 		snippetBundleListener.dispose();
 
 		super.dispose();

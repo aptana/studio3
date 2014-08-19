@@ -303,4 +303,24 @@ public class JSScope
 	{
 		this.range = range;
 	}
+
+	@Override
+	public String toString()
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append("[JSScope\n");
+		sb.append("  range=[").append(range.getStartingOffset()).append(',').append(range.getEndingOffset())
+				.append("]\n");
+		sb.append("  object=").append(object.toSource()).append("\n");
+		if (children != null)
+		{
+			for (JSScope child : children)
+			{
+				sb.append(child.toString());
+			}
+			sb.append("\n");
+		}
+		sb.append("]\n");
+		return sb.toString();
+	}
 }

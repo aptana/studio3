@@ -69,7 +69,7 @@ public class DynamicTypeInferencingTest extends InferencingTestsBase
 		TypeElement type = types.iterator().next();
 		assertEquals("one", type.getName());
 		List<PropertyElement> properties = type.getProperties();
-		assertEquals(1, properties.size());
+		assertEquals(2, properties.size()); // prototype gets added too
 		PropertyElement property = properties.get(0);
 		assertEquals("two", property.getName());
 		List<String> typeNames = property.getTypeNames();

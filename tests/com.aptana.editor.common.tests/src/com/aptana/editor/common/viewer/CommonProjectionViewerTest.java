@@ -9,6 +9,7 @@ import java.io.IOException;
 
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.ITextViewer;
@@ -50,7 +51,7 @@ public class CommonProjectionViewerTest extends EditorBasedTests
 		IFileStore fileStore = createFileStore("proposal_tests", "html", "");
 		this.setupTestContext(fileStore);
 
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(CommonEditorPlugin.PLUGIN_ID);
 		int delay = prefs.getInt(IPreferenceConstants.CONTENT_ASSIST_DELAY,
 				CommonSourceViewerConfiguration.DEFAULT_CONTENT_ASSIST_DELAY);
 

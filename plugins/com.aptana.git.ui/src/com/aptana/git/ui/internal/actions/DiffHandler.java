@@ -16,6 +16,7 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
@@ -95,7 +96,7 @@ public class DiffHandler extends AbstractGitHandler
 	@Override
 	protected Object doExecute(ExecutionEvent event) throws ExecutionException
 	{
-		Map<String, String> diffs = new HashMap<String, String>();
+		Map<IPath, String> diffs = new HashMap<IPath, String>();
 		List<ChangedFile> changedFiles = getSelectedChangedFiles();
 		if (changedFiles == null || changedFiles.isEmpty())
 		{
@@ -114,12 +115,12 @@ public class DiffHandler extends AbstractGitHandler
 				continue;
 			}
 
-			if (diffs.containsKey(file.getPath()))
+			if (diffs.containsKey(file.getRelativePath()))
 			{
 				continue; // already calculated diff...
 			}
 			String diff = repo.index().diffForFile(file, file.hasStagedChanges(), 3);
-			diffs.put(file.getPath(), diff);
+			diffs.put(file.getRelativePath(), diff);
 		}
 		if (diffs.isEmpty())
 		{

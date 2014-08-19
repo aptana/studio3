@@ -177,6 +177,11 @@ public class Portal
 			{
 				final IWorkbenchWindow workbenchWindow = UIUtils.getActiveWorkbenchWindow();
 
+				if (workbenchWindow == null)
+				{
+					return Status.OK_STATUS;
+				}
+
 				// TISTUD-5510 If there are existing busted portal/dashboard tabs, remove them
 				IWorkbenchPage activePage = workbenchWindow.getActivePage();
 				IEditorReference[] refs = activePage.getEditorReferences();

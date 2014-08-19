@@ -15,11 +15,11 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.configurations.ConfigurationsPlugin;
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.jetty.util.epl.ajax.JSON;
 import com.aptana.jetty.util.epl.ajax.JSON.Convertible;
 import com.aptana.jetty.util.epl.ajax.JSON.Output;
@@ -225,7 +225,7 @@ public class ConfigurationStatus implements Convertible
 	public void store()
 	{
 		// We just store the attributes map as a JSON string
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(ConfigurationsPlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(ConfigurationsPlugin.PLUGIN_ID);
 		prefs.put(PREF_PREFIX + getProcessorId(), JSON.toString(attributes));
 		try
 		{
@@ -245,7 +245,7 @@ public class ConfigurationStatus implements Convertible
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected void load()
 	{
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(ConfigurationsPlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(ConfigurationsPlugin.PLUGIN_ID);
 		if (prefs != null)
 		{
 			try

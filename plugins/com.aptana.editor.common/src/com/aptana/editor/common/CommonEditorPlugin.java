@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.jface.text.templates.ContextTypeRegistry;
@@ -288,7 +289,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		{
 			private void setOccurrenceColors()
 			{
-				IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode("org.eclipse.ui.editors"); //$NON-NLS-1$
+				IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode("org.eclipse.ui.editors"); //$NON-NLS-1$
 				Theme theme = ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
 
 				prefs.put("OccurrenceIndicationColor", StringConverter.asString(theme.getSearchResultColor())); //$NON-NLS-1$
@@ -319,8 +320,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 
 				setOccurrenceColors();
 
-				EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID)
-						.addPreferenceChangeListener(fThemeChangeListener);
+				InstanceScope.INSTANCE.getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
 
 				return Status.OK_STATUS;
 			}
@@ -340,8 +340,8 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		{
 			if (fThemeChangeListener != null)
 			{
-				EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID)
-						.removePreferenceChangeListener(fThemeChangeListener);
+				InstanceScope.INSTANCE.getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(
+						fThemeChangeListener);
 
 				fThemeChangeListener = null;
 			}

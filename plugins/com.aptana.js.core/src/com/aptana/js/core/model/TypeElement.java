@@ -97,7 +97,11 @@ public class TypeElement extends BaseElement
 
 			if (!this._parentTypes.contains(type))
 			{
-				this._parentTypes.add(type);
+				// Don't allow adding self as parent!
+				if (!type.equals(getName()))
+				{
+					this._parentTypes.add(type);
+				}
 			}
 		}
 	}

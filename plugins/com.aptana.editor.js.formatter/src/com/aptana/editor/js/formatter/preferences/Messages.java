@@ -15,29 +15,37 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.editor.js.formatter.preferences.Messages"; //$NON-NLS-1$
+
 	public static String JSFormatterBlankLinesPage_afterFunctionDeclaration;
 	public static String JSFormatterBlankLinesPage_afterFunctionDeclarationInExpression;
 	public static String JSFormatterBlankLinesPage_blankLinesGroupLabel;
 	public static String JSFormatterBlankLinesPage_existingBlankLinesGroupLabel;
 	public static String JSFormatterBlankLinesPage_existingBlankLinesToPreserve;
+
 	public static String JSFormatterBracesPage_blocks;
 	public static String JSFormatterBracesPage_caseStateMent;
 	public static String JSFormatterBracesPage_functionDeclaraion;
 	public static String JSFormatterBracesPage_switchStatement;
+
 	public static String JSFormatterCommentsPage_enableWrapping;
 	public static String JSFormatterCommentsPage_formattingGroupLabel;
 	public static String JSFormatterCommentsPage_maxLineWidth;
-	public static String JSFormatterTabPage_indentGroupLabel;
-	public static String JSFormatterTabPage_newLinesGroupLabel;
+
 	public static String JSFormatterIndentationTabPage_indentationGeneralGroupLabel;
+	public static String JSFormatterIndentationTabPage_statementsWithinBlocks;
+	public static String JSFormatterIndentationTabPage_statementsWithinSwitch;
+	public static String JSFormatterIndentationTabPage_statementsWithinCase;
+	public static String JSFormatterIndentationTabPage_statementsWithinFunctions;
+	public static String JSFormatterIndentationTabPage_statementsWithinJSGroups;
+
 	public static String JSFormatterModifyDialog_blankLinesTabName;
 	public static String JSFormatterModifyDialog_commentsTabName;
 	public static String JSFormatterModifyDialog_jsFormatterTitle;
 	public static String JSFormatterModifyDialog_intentationTabName;
 	public static String JSFormatterModifyDialog_whiteSpacesTabName;
 	public static String JSFormatterModifyDialog_bracesTabName;
-
 	public static String JSFormatterModifyDialog_newLinesTabName;
+
 	public static String JSFormatterNewLinesPage_newLineBeforeBlocks;
 	public static String JSFormatterNewLinesPage_newLineBeforeCatch;
 	public static String JSFormatterNewLinesPage_newLineBeforeElse;
@@ -46,12 +54,11 @@ public class Messages extends NLS
 	public static String JSFormatterNewLinesPage_newLineBeforeIf;
 	public static String JSFormatterNewLinesPage_newLineBeforeWhileInDo;
 	public static String JSFormatterNewLinesPage_newLineBeforeNameValuePairs;
+	public static String JSFormatterNewLinesPage_newLineBetweenVarDeclarations;
 
-	public static String JSFormatterIndentationTabPage_statementsWithinBlocks;
-	public static String JSFormatterIndentationTabPage_statementsWithinSwitch;
-	public static String JSFormatterIndentationTabPage_statementsWithinCase;
-	public static String JSFormatterIndentationTabPage_statementsWithinFunctions;
-	public static String JSFormatterIndentationTabPage_statementsWithinJSGroups;
+	public static String JSFormatterTabPage_indentGroupLabel;
+	public static String JSFormatterTabPage_newLinesGroupLabel;
+
 	public static String JSFormatterWhiteSpacesPage_after;
 	public static String JSFormatterWhiteSpacesPage_before;
 	public static String JSFormatterWhiteSpacesPage_commas;
@@ -76,6 +83,7 @@ public class Messages extends NLS
 	public static String JSFormatterWhiteSpacesPage_parentheses_afterOpening;
 	public static String JSFormatterWhiteSpacesPage_parentheses_beforeClosing;
 	public static String JSFormatterWhiteSpacesPage_parenthesesGroupTitle;
+
 	static
 	{
 		// initialize resource bundle

@@ -11,12 +11,12 @@ import java.net.URL;
 import java.util.Map;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.source.ISharedTextColors;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.ui.texteditor.ITextEditor;
 
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.util.EditorUtil;
 import com.aptana.editor.json.JSONPlugin;
@@ -125,7 +125,7 @@ public class JSONFormatterFactory extends AbstractScriptFormatterFactory
 	@Override
 	protected IEclipsePreferences getEclipsePreferences()
 	{
-		return EclipseUtil.instanceScope().getNode(JSONPlugin.PLUGIN_ID);
+		return InstanceScope.INSTANCE.getNode(JSONPlugin.PLUGIN_ID);
 	}
 
 	/*

@@ -36,11 +36,11 @@ import org.osgi.framework.BundleContext;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
-import com.aptana.ide.core.io.auth.AuthenticationManager;
 import com.aptana.ide.core.io.auth.IAuthenticationManager;
 import com.aptana.ide.core.io.events.ConnectionPointEvent;
 import com.aptana.ide.core.io.events.IConnectionPointListener;
 import com.aptana.ide.core.io.internal.DeleteResourceShortcutListener;
+import com.aptana.ide.core.io.internal.auth.AuthenticationManager;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -59,6 +59,8 @@ public class CoreIOPlugin extends Plugin
 
 	private DeleteResourceShortcutListener deleteListener;
 	private IConnectionPointListener listener;
+
+	private IAuthenticationManager fAuthManager;
 
 	/**
 	 * The constructor
@@ -152,6 +154,7 @@ public class CoreIOPlugin extends Plugin
 		}
 		finally
 		{
+			fAuthManager = null;
 			plugin = null;
 			super.stop(context);
 		}
@@ -179,7 +182,16 @@ public class CoreIOPlugin extends Plugin
 
 	public static IAuthenticationManager getAuthenticationManager()
 	{
-		return AuthenticationManager.getInstance();
+		return getDefault().getAuthManager();
+	}
+
+	public synchronized IAuthenticationManager getAuthManager()
+	{
+		if (fAuthManager == null)
+		{
+			fAuthManager = new AuthenticationManager();
+		}
+		return fAuthManager;
 	}
 
 	public static void setConnectionContext(Object key, ConnectionContext context)

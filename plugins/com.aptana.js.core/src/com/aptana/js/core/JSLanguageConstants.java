@@ -19,6 +19,8 @@ import com.aptana.core.util.CollectionsUtil;
 
 public class JSLanguageConstants
 {
+	public static final String GET = "get"; //$NON-NLS-1$
+	public static final String SET = "set"; //$NON-NLS-1$
 	public static final String TRUE = "true"; //$NON-NLS-1$
 	public static final String FALSE = "false"; //$NON-NLS-1$
 	public static final String THIS = "this"; //$NON-NLS-1$

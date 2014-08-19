@@ -11,12 +11,12 @@ import java.net.URL;
 import java.util.Map;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.source.ISharedTextColors;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.ui.texteditor.ITextEditor;
 
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.util.EditorUtil;
 import com.aptana.editor.xml.XMLPlugin;
@@ -104,7 +104,7 @@ public class XMLFormatterFactory extends AbstractScriptFormatterFactory
 	@Override
 	protected IEclipsePreferences getEclipsePreferences()
 	{
-		return EclipseUtil.instanceScope().getNode(XMLPlugin.PLUGIN_ID);
+		return InstanceScope.INSTANCE.getNode(XMLPlugin.PLUGIN_ID);
 	}
 
 	/*

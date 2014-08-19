@@ -8,6 +8,7 @@
 package com.aptana.editor.html.preferences;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
@@ -16,7 +17,6 @@ import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.preferences.CommonEditorPreferencePage;
 import com.aptana.editor.html.HTMLEditor;
 import com.aptana.editor.html.HTMLPlugin;
@@ -79,7 +79,7 @@ public class HTMLPreferencePage extends CommonEditorPreferencePage
 	@Override
 	protected IEclipsePreferences getPluginPreferenceStore()
 	{
-		return EclipseUtil.instanceScope().getNode(HTMLPlugin.PLUGIN_ID);
+		return InstanceScope.INSTANCE.getNode(HTMLPlugin.PLUGIN_ID);
 	}
 
 	@Override

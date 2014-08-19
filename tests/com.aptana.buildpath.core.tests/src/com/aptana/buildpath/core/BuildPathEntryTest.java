@@ -34,6 +34,9 @@ public class BuildPathEntryTest
 		assertTrue(entry.equals(entry));
 		assertTrue(new BuildPathEntry(displayName, path).equals(entry));
 		assertTrue(entry.equals(new BuildPathEntry(displayName, path)));
+		// we ignore the display name for equality checks
+		assertTrue(entry.equals(new BuildPathEntry("some other display name", path)));
+		assertTrue(new BuildPathEntry("some other display name", path).equals(entry));
 	}
 
 	@Test

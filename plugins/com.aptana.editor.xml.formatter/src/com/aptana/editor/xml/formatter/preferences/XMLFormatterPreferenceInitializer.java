@@ -8,11 +8,11 @@
 package com.aptana.editor.xml.formatter.preferences;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
+import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.util.EditorUtil;
 import com.aptana.editor.xml.XMLPlugin;
@@ -31,7 +31,7 @@ public class XMLFormatterPreferenceInitializer extends AbstractPreferenceInitial
 	@Override
 	public void initializeDefaultPreferences()
 	{
-		IEclipsePreferences store = EclipseUtil.defaultScope().getNode(XMLFormatterPlugin.PLUGIN_ID);
+		IEclipsePreferences store = DefaultScope.INSTANCE.getNode(XMLFormatterPlugin.PLUGIN_ID);
 		store.put(XMLFormatterConstants.FORMATTER_TAB_CHAR, CodeFormatterConstants.EDITOR);
 		store.put(XMLFormatterConstants.FORMATTER_TAB_SIZE,
 				Integer.toString(EditorUtil.getSpaceIndentSize(XMLPlugin.getDefault().getBundle().getSymbolicName())));

@@ -31,6 +31,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.aptana.core.epl.downloader.ConnectionData;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.FileUtil;
 import com.aptana.ide.core.io.CoreIOPlugin;
@@ -59,7 +60,7 @@ public class DownloadManagerTest
 		dm = new DownloadManager()
 		{
 			@Override
-			protected synchronized void addDownload(ContentDownloadRequest request)
+			public synchronized void addDownload(ContentDownloadRequest request)
 			{
 				requests.add(request);
 				super.addDownload(cdr);
@@ -101,7 +102,7 @@ public class DownloadManagerTest
 		context.checking(new Expectations()
 		{
 			{
-				oneOf(cdr).execute(with(any(IProgressMonitor.class)));
+				oneOf(cdr).execute(with(aNull(ConnectionData.class)), with(any(IProgressMonitor.class)));
 
 				oneOf(cdr).getResult();
 				will(returnValue(Status.OK_STATUS));
@@ -134,7 +135,7 @@ public class DownloadManagerTest
 		context.checking(new Expectations()
 		{
 			{
-				exactly(3).of(cdr).execute(with(any(IProgressMonitor.class)));
+				exactly(3).of(cdr).execute(with(aNull(ConnectionData.class)), with(any(IProgressMonitor.class)));
 
 				exactly(3).of(cdr).getResult();
 				will(onConsecutiveCalls(returnValue(Status.OK_STATUS), returnValue(errorStatus),
@@ -169,5 +170,38 @@ public class DownloadManagerTest
 	{
 		dm.addURL(null);
 		assertEquals(0, requests.size());
+	}
+
+	@Test
+	public void testAddRequestObjectDirectly() throws CoreException, URISyntaxException
+	{
+		dm.addDownload(cdr);
+
+		final IPath downloadPath1 = Path.fromPortableString("/path/to/downloaded/file1");
+		context.checking(new Expectations()
+		{
+			{
+				exactly(1).of(cdr).execute(with(aNull(ConnectionData.class)), with(any(IProgressMonitor.class)));
+
+				exactly(1).of(cdr).getResult();
+				will(returnValue(Status.OK_STATUS));
+
+				exactly(1).of(cdr).getDownloadLocation();
+				will(returnValue(downloadPath1));
+			}
+		});
+
+		IStatus result = dm.start(new NullProgressMonitor());
+		assertTrue(result.isOK());
+		assertTrue(result.isMultiStatus());
+		MultiStatus multi = (MultiStatus) result;
+		IStatus[] children = multi.getChildren();
+		assertEquals(1, children.length);
+		assertTrue(children[0].isOK());
+
+		List<IPath> paths = dm.getContentsLocations();
+		assertEquals(1, paths.size());
+		assertEquals(downloadPath1, paths.get(0));
+		context.assertIsSatisfied();
 	}
 }

@@ -34,6 +34,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.osgi.service.prefs.BackingStoreException;
 
@@ -378,7 +379,7 @@ public class CloneJob extends Job
 			boolean autoAttach = Platform.getPreferencesService().getBoolean(GitPlugin.getPluginId(),
 					IPreferenceConstants.AUTO_ATTACH_REPOS, true, null);
 
-			IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(GitPlugin.PLUGIN_ID);
+			IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(GitPlugin.PLUGIN_ID);
 			if (autoAttach)
 			{
 				// Default value is true, so assuem they explicitly set false in instance prefs

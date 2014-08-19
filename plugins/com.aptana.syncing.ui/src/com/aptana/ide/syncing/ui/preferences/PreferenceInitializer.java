@@ -8,9 +8,9 @@
 package com.aptana.ide.syncing.ui.preferences;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
+import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
 
 public class PreferenceInitializer extends AbstractPreferenceInitializer
@@ -18,7 +18,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 
 	public void initializeDefaultPreferences()
 	{
-		IEclipsePreferences prefs = EclipseUtil.defaultScope().getNode(SyncingUIPlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = DefaultScope.INSTANCE.getNode(SyncingUIPlugin.PLUGIN_ID);
 		prefs.put(IPreferenceConstants.VIEW_MODE, IPreferenceConstants.VIEW_FLAT);
 		prefs.put(IPreferenceConstants.DIRECTION_MODE, IPreferenceConstants.DIRECTION_BOTH);
 	}

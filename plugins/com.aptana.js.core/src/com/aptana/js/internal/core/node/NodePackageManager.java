@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.osgi.framework.Bundle;
@@ -47,6 +48,7 @@ import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.ProcessRunner;
 import com.aptana.core.util.ProcessStatus;
 import com.aptana.core.util.StringUtil;
+import com.aptana.core.util.SudoManager;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.core.node.INodeJS;
 import com.aptana.js.core.node.INodePackageManager;
@@ -81,14 +83,24 @@ public class NodePackageManager implements INodePackageManager
 	private static final String LIB = "lib"; //$NON-NLS-1$
 
 	/**
-	 * Argument to {@code COLOR} switch/config option so that ANSI colors aren't used in output.
-	 */
-	private static final String FALSE = "false"; //$NON-NLS-1$
-
-	/**
 	 * Special switch/config option to set ANSI color option. Set to {@code FALSE} to disable ANSI color output.
 	 */
 	private static final String COLOR = "--color"; //$NON-NLS-1$
+
+	/**
+	 * Config key/switch to ask for JSON parseable output
+	 */
+	private static final String JSON = "--json"; //$NON-NLS-1$
+
+	/**
+	 * config value to pass after {@value #JSON} to get json output
+	 */
+	private static final String TRUE = "true"; //$NON-NLS-1$
+
+	/**
+	 * Argument to {@code COLOR} switch/config option so that ANSI colors aren't used in output.
+	 */
+	private static final String FALSE = "false"; //$NON-NLS-1$
 
 	private static final Pattern VERSION_PATTERN = Pattern.compile("([0-9]+\\.[0-9]+\\.[0-9]+)"); //$NON-NLS-1$
 
@@ -190,10 +202,10 @@ public class NodePackageManager implements INodePackageManager
 					sub.subTask("Global NPM prefix is " + prefix);
 					// If the sudo cache is timed out, then the password prompt and other details might appear in the
 					// console. So we should strip them off to get the real npm prefix value.
-					String passwordPrompt = StringUtil.makeFormLabel(Messages.NodePackageManager_PasswordPrompt);
-					if (prefix.contains(passwordPrompt))
+					if (prefix.contains(SudoManager.PROMPT_MSG))
 					{
-						prefix = prefix.substring(prefix.indexOf(passwordPrompt) + passwordPrompt.length());
+						prefix = prefix.substring(prefix.indexOf(SudoManager.PROMPT_MSG)
+								+ SudoManager.PROMPT_MSG.length());
 					}
 
 					// Set the global prefix path only if it is not the default value.
@@ -287,10 +299,10 @@ public class NodePackageManager implements INodePackageManager
 		return runNpmConfig(args, password, true, workingDirectory, monitor);
 	}
 
-	private IStatus runNpmConfig(List<String> args, char[] password, boolean global, IPath workingDirectory,
+	protected IStatus runNpmConfig(List<String> args, char[] password, boolean global, IPath workingDirectory,
 			IProgressMonitor monitor) throws CoreException
 	{
-		List<String> sudoArgs = getNpmSudoArgs(global, password);
+		List<String> sudoArgs = getNpmArguments(global, password);
 		sudoArgs.addAll(args);
 		return getProcessRunner().run(workingDirectory, ShellExecutable.getEnvironment(workingDirectory), password,
 				sudoArgs, monitor);
@@ -462,7 +474,7 @@ public class NodePackageManager implements INodePackageManager
 	public String getInstalledVersion(String packageName, boolean global, IPath workingDir) throws CoreException
 	{
 		IPath npmPath = checkedNPMPath();
-		List<String> args = CollectionsUtil.newList(npmPath.toOSString(), "ls", packageName, COLOR, FALSE); //$NON-NLS-1$
+		List<String> args = CollectionsUtil.newList(npmPath.toOSString(), "ls", packageName, COLOR, FALSE, JSON, TRUE); //$NON-NLS-1$
 		if (global)
 		{
 			args.add(GLOBAL_ARG);
@@ -470,24 +482,30 @@ public class NodePackageManager implements INodePackageManager
 		IStatus status = nodeJS.runInBackground(workingDir, ShellExecutable.getEnvironment(), args);
 		if (!status.isOK())
 		{
-			// TODO This may return a non zero exit code but still give output we can use, not sure. Similar to what we
-			// saw with list command
 			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
 					Messages.NodePackageManager_FailedToDetermineInstalledVersion, packageName, status.getMessage())));
 		}
-		String output = status.getMessage();
-		int index = output.indexOf(packageName + '@');
-		if (index != -1)
+		try
 		{
-			output = output.substring(index + packageName.length() + 1);
-			int space = output.indexOf(' ');
-			if (space != -1)
+			String output = status.getMessage();
+			JSONObject json = (JSONObject) new JSONParser().parse(output);
+			if (!json.containsKey("dependencies"))
 			{
-				output = output.substring(0, space);
+				return null;
 			}
-			return output;
+			JSONObject dependencies = (JSONObject) json.get("dependencies");
+			if (!dependencies.containsKey(packageName))
+			{
+				return null;
+			}
+			JSONObject pkg = (JSONObject) dependencies.get(packageName);
+			return (String) pkg.get("version");
 		}
-		return null;
+		catch (ParseException e)
+		{
+			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
+					Messages.NodePackageManager_FailedToDetermineInstalledVersion, packageName, e.getMessage())));
+		}
 	}
 
 	public String getLatestVersionAvailable(String packageName) throws CoreException
@@ -515,6 +533,33 @@ public class NodePackageManager implements INodePackageManager
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
+	public List<String> getAvailableVersions(String packageName) throws CoreException
+	{
+		IPath npmPath = checkedNPMPath();
+
+		Map<String, String> env = ShellExecutable.getEnvironment();
+		List<String> args = CollectionsUtil.newList(npmPath.toOSString(),
+				"view", packageName, "versions", COLOR, FALSE, JSON, TRUE);//$NON-NLS-1$ //$NON-NLS-2$
+		args.addAll(proxySettings(env));
+
+		IStatus status = nodeJS.runInBackground(null, env, args);
+		if (!status.isOK())
+		{
+			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
+					Messages.NodePackageManager_FailedToDetermineLatestVersion, packageName, status.getMessage())));
+		}
+		String message = status.getMessage().trim();
+		try
+		{
+			return (List<String>) new JSONParser().parse(message);
+		}
+		catch (ParseException e)
+		{
+			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, e.getMessage(), e));
+		}
+	}
+
 	public String getConfigValue(String key) throws CoreException
 	{
 		// npm config get <key>
@@ -535,7 +580,13 @@ public class NodePackageManager implements INodePackageManager
 				MessageFormat.format(Messages.NodePackageManager_InstallingTaskName, displayName), 100);
 		try
 		{
-			List<String> args = getNpmSudoArgs(global, password);
+			List<String> args = getNpmArguments(global, password);
+			if (!PlatformUtil.isWindows() && global)
+			{
+				// TISTUD-6786, force -H option under SUDO at end of args
+				int i = args.indexOf(SudoManager.END_OF_OPTIONS);
+				args.add(i, SudoManager.RETAIN_HOME);
+			}
 			CollectionsUtil.addToList(args, command, packageName, COLOR, FALSE);
 
 			Map<String, String> environment;
@@ -589,16 +640,14 @@ public class NodePackageManager implements INodePackageManager
 		}
 	}
 
-	private List<String> getNpmSudoArgs(boolean global, char[] sudoPassword) throws CoreException
+	private List<String> getNpmArguments(boolean global, char[] sudoPassword) throws CoreException
 	{
 		IPath npmPath = checkedNPMPath();
 		List<String> args = new ArrayList<String>(8);
 		if (global)
 		{
-			if (!PlatformUtil.isWindows())
-			{
-				args.addAll(getSudoArgs(sudoPassword));
-			}
+			SudoManager sudoMngr = new SudoManager();
+			args.addAll(sudoMngr.getArguments(sudoPassword));
 			args.add(nodeJS.getPath().toOSString());
 			args.add(npmPath.toOSString());
 			args.add(GLOBAL_ARG);
@@ -609,18 +658,6 @@ public class NodePackageManager implements INodePackageManager
 			args.add(npmPath.toOSString());
 		}
 		return args;
-	}
-
-	private List<String> getSudoArgs(char[] sudoPassword)
-	{
-		// FIXME Centralize this logic in a core SudoManager class?
-		if (sudoPassword == null || sudoPassword.length == 0)
-		{
-			// Force non-interactive mode so that if sudo decides we do need a password it exits with an error instead
-			// of hanging
-			return CollectionsUtil.newList("sudo", "-n", "--"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		}
-		return CollectionsUtil.newList("sudo", "-S", "--"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	public IStatus uninstall(String packageName, String displayName, boolean global, char[] password,
@@ -709,7 +746,7 @@ public class NodePackageManager implements INodePackageManager
 		List<String> args;
 		try
 		{
-			args = getNpmSudoArgs(runWithSudo, password);
+			args = getNpmArguments(runWithSudo, password);
 		}
 		catch (CoreException e)
 		{
@@ -794,31 +831,5 @@ public class NodePackageManager implements INodePackageManager
 			FileFilter filter)
 	{
 		return ExecutableUtil.find(executableName, true, searchLocations, filter);
-	}
-
-	// TODO Throw a CoreException?
-	public List<String> getVersions(String packageName)
-	{
-		try
-		{
-			IStatus status = runInBackground("view", packageName, "versions", "-json", COLOR, FALSE); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			if (!status.isOK())
-			{
-				return Collections.emptyList();
-			}
-
-			String output = status.getMessage();
-			JSONParser parser = new JSONParser();
-			return (List<String>) parser.parse(output);
-		}
-		catch (CoreException ce)
-		{
-			IdeLog.logError(JSCorePlugin.getDefault(), ce);
-		}
-		catch (ParseException e)
-		{
-			IdeLog.logError(JSCorePlugin.getDefault(), e);
-		}
-		return Collections.emptyList();
 	}
 }

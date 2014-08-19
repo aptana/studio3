@@ -19,10 +19,10 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.svg.contentassist.index.SVGIndexConstants;
 import com.aptana.editor.svg.preferences.IPreferenceConstants;
@@ -139,7 +139,7 @@ public class SVGMetadataLoader extends Job
 	 */
 	private void updateVersionPreference()
 	{
-		IEclipsePreferences prefs = (EclipseUtil.instanceScope()).getNode(SVGPlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(SVGPlugin.PLUGIN_ID);
 
 		prefs.putDouble(IPreferenceConstants.SVG_INDEX_VERSION, SVGIndexConstants.INDEX_VERSION);
 

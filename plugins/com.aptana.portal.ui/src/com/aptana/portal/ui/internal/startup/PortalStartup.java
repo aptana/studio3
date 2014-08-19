@@ -21,12 +21,12 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.ui.IStartup;
 import org.eclipse.ui.progress.UIJob;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.portal.ui.IPortalPreferences;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.browser.PortalBrowserEditor;
@@ -85,8 +85,7 @@ public class PortalStartup implements IStartup
 							if (resource instanceof IProject && resource.isAccessible()
 									&& ((IProject) resource).getNature(TITANIUM_MOBILE_NATURE) != null)
 							{
-								IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(
-										PortalUIPlugin.PLUGIN_ID);
+								IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(PortalUIPlugin.PLUGIN_ID);
 								prefs.put(IPortalPreferences.RECENTLY_CREATED_PROJECT, resource.getName());
 								try
 								{

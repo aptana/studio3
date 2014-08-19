@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.BaseLabelProvider;
 import org.eclipse.jface.viewers.IDecoration;
@@ -91,7 +92,7 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 				}
 			}
 		};
-		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
+		InstanceScope.INSTANCE.getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
 	}
 
 	protected IGitRepositoryManager getGitRepositoryManager()
@@ -277,8 +278,7 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 		{
 			getGitRepositoryManager().removeListener(this);
 			getGitRepositoryManager().removeListenerFromEachRepository(this);
-			EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID)
-					.removePreferenceChangeListener(fThemeChangeListener);
+			InstanceScope.INSTANCE.getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(fThemeChangeListener);
 			cache.clear();
 		}
 		finally

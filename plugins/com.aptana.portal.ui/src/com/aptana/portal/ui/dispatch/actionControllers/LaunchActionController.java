@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.internal.ui.DebugUIPlugin;
 import org.eclipse.debug.internal.ui.contextlaunching.LaunchingResourceManager;
@@ -32,7 +33,6 @@ import org.eclipse.ui.progress.UIJob;
 import com.aptana.configurations.processor.ConfigurationStatus;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.jetty.util.epl.ajax.JSON;
 import com.aptana.portal.ui.IPortalPreferences;
@@ -205,8 +205,8 @@ public class LaunchActionController extends AbstractActionController
 		if (StringUtil.isEmpty(projectName))
 		{
 			// Launch previously created project.
-			projectName = EclipseUtil.instanceScope().getNode(PortalUIPlugin.PLUGIN_ID)
-					.get(IPortalPreferences.RECENTLY_CREATED_PROJECT, null);
+			projectName = InstanceScope.INSTANCE.getNode(PortalUIPlugin.PLUGIN_ID).get(
+					IPortalPreferences.RECENTLY_CREATED_PROJECT, null);
 			if (StringUtil.isEmpty(projectName))
 			{
 				IdeLog.logError(PortalUIPlugin.getDefault(), new Exception(

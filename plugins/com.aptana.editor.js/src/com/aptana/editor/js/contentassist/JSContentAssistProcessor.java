@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
@@ -54,20 +56,28 @@ import com.aptana.js.core.inferencing.JSNodeTypeInferrer;
 import com.aptana.js.core.inferencing.JSPropertyCollection;
 import com.aptana.js.core.inferencing.JSScope;
 import com.aptana.js.core.inferencing.JSTypeUtil;
+import com.aptana.js.core.inferencing.RequireResolverFactory;
 import com.aptana.js.core.model.FunctionElement;
 import com.aptana.js.core.model.ParameterElement;
 import com.aptana.js.core.model.PropertyElement;
+import com.aptana.js.core.model.TypeElement;
 import com.aptana.js.core.parsing.JSFlexScanner;
 import com.aptana.js.core.parsing.JSParseState;
 import com.aptana.js.core.parsing.JSTokenType;
+import com.aptana.js.core.parsing.ThisAssignmentCollector;
 import com.aptana.js.core.parsing.ast.IJSNodeTypes;
 import com.aptana.js.core.parsing.ast.JSArgumentsNode;
 import com.aptana.js.core.parsing.ast.JSAssignmentNode;
+import com.aptana.js.core.parsing.ast.JSConstructNode;
 import com.aptana.js.core.parsing.ast.JSFunctionNode;
 import com.aptana.js.core.parsing.ast.JSGetPropertyNode;
+import com.aptana.js.core.parsing.ast.JSIdentifierNode;
+import com.aptana.js.core.parsing.ast.JSInvokeNode;
 import com.aptana.js.core.parsing.ast.JSNode;
 import com.aptana.js.core.parsing.ast.JSObjectNode;
 import com.aptana.js.core.parsing.ast.JSParseRootNode;
+import com.aptana.js.core.parsing.ast.JSPrimitiveNode;
+import com.aptana.js.core.parsing.ast.JSThisNode;
 import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.INameNode;
 import com.aptana.parsing.ast.IParseNode;
@@ -107,6 +117,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	private static final Image JS_FUNCTION = JSPlugin.getImage("/icons/js_function.png"); //$NON-NLS-1$
 	private static final Image JS_PROPERTY = JSPlugin.getImage("/icons/js_property.png"); //$NON-NLS-1$
 	private static final Image JS_KEYWORD = JSPlugin.getImage("/icons/keyword.png"); //$NON-NLS-1$
+	private static final Image STRING_ICON = JSPlugin.getImage("icons/string.png"); //$NON-NLS-1$
 
 	/**
 	 * Filters out internal properties.
@@ -116,6 +127,33 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		public boolean include(PropertyElement item)
 		{
 			return !item.isInternal();
+		}
+	};
+
+	/**
+	 * Retains instance properties.
+	 */
+	private static final IFilter<PropertyElement> isInstanceFilter = new IFilter<PropertyElement>()
+	{
+		public boolean include(PropertyElement item)
+		{
+			String typeName = item.getOwningType();
+			if (typeName.equals("module.exports") || (typeName.startsWith("$module") && typeName.endsWith(".exports")))
+			{
+				return item.isClassProperty();
+			}
+			return item.isInstanceProperty();
+		}
+	};
+
+	/**
+	 * Retains class properties.
+	 */
+	private static final IFilter<PropertyElement> isStaticFilter = new IFilter<PropertyElement>()
+	{
+		public boolean include(PropertyElement item)
+		{
+			return item.isClassProperty();
 		}
 	};
 
@@ -263,13 +301,53 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	protected void addProperties(Set<ICompletionProposal> proposals, int offset)
 	{
 		JSGetPropertyNode node = ParseUtil.getGetPropertyNode(targetNode, statementNode);
+		boolean isInstance = isInstance(node);
 		List<String> types = getParentObjectTypes(node, offset);
 
 		// add all properties of each type to our proposal list
 		for (String type : types)
 		{
-			addTypeProperties(proposals, type, offset);
+			addTypeProperties(proposals, type, offset, isInstance);
 		}
+	}
+
+	private boolean isInstance(JSGetPropertyNode node)
+	{
+		IParseNode left = node.getChild(0);
+		// if we're invoking on "this", then we should show instance properties...
+		if (left instanceof JSThisNode)
+		{
+			return true;
+		}
+		// if receiver is a "new something()" call, or a primitive we know it's typically an instance.
+		if (left instanceof JSConstructNode || left instanceof JSPrimitiveNode)
+		{
+			// Identifiers are special case. They're just variable names. We need to determine if they refer to a type
+			// or an instance
+			if (left instanceof JSIdentifierNode)
+			{
+				// FIXME Track back to last assignment to determine better
+				// cheat and assume identifiers beginning with upper case letter are types.
+				JSIdentifierNode ident = (JSIdentifierNode) left;
+				String name = ident.getNameNode().getName();
+				if ("$".equals(name) || "Ti".equals(name) || "jQuery".equals(name)) // HACK for jQuery
+				{
+					// FIXME Do a better handling of aliases like $ or Ti
+					// String global = JSTypeUtil.getGlobalType(getProject(), getFilename());
+					// List<PropertyElement> aliases = getQueryHelper().getProperties(global, name);
+					return false;
+				}
+				Collection<TypeElement> types = getQueryHelper().getTypes(name, false);
+				return CollectionsUtil.isEmpty(types); // if there are no types by this name, assume it's an instance
+			}
+			return true;
+		}
+		if (left instanceof JSInvokeNode)
+		{
+			// FIXME what about here? We need to look up the return values to determine...
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -314,6 +392,11 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				replaceLength = replaceRange.getLength();
 			}
 
+			if (property.getOwningType().startsWith("$module")) //$NON-NLS-1$
+			{
+				IPath path = getQueryHelper().getModulePath(property.getOwningType());
+				property.setOwningType(path.toOSString());
+			}
 			PropertyElementProposal proposal = new PropertyElementProposal(property, offset, replaceLength, projectURI);
 			proposal.setTriggerCharacters(getProposalTriggerCharacters());
 			if (!StringUtil.isEmpty(overriddenLocation))
@@ -341,8 +424,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param fileLocation
 	 * @param offset
 	 */
-	private void addProposal(Set<ICompletionProposal> proposals, String displayName, Image image, String description,
-			String[] userAgentIds, String fileLocation, int offset)
+	private CommonCompletionProposal addProposal(Set<ICompletionProposal> proposals, String displayName, Image image,
+			String description, String[] userAgentIds, String fileLocation, int offset)
 	{
 		if (isActiveByUserAgent(userAgentIds))
 		{
@@ -369,7 +452,9 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 			// add the proposal to the list
 			proposals.add(proposal);
+			return proposal;
 		}
+		return null;
 	}
 
 	protected void addSymbolsInScope(Set<ICompletionProposal> proposals, int offset)
@@ -610,9 +695,10 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param proposals
 	 * @param typeName
 	 * @param offset
+	 * @param isInstance
 	 */
 	@SuppressWarnings("unchecked")
-	protected void addTypeProperties(Set<ICompletionProposal> proposals, String typeName, int offset)
+	protected void addTypeProperties(Set<ICompletionProposal> proposals, String typeName, int offset, boolean isInstance)
 	{
 		// grab all ancestors of the specified type
 		List<String> allTypes = getQueryHelper().getTypeAncestorNames(typeName);
@@ -624,7 +710,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		Collection<PropertyElement> properties = getQueryHelper().getTypeMembers(allTypes);
 		URI projectURI = getProjectURI();
 		for (PropertyElement property : CollectionsUtil.filter(properties, new AndFilter<PropertyElement>(
-				isNotConstructorFilter, isVisibleFilter)))
+				isNotConstructorFilter, isVisibleFilter, isInstance ? isInstanceFilter : isStaticFilter)))
 		{
 			addProposal(proposals, property, offset, projectURI, null);
 		}
@@ -797,6 +883,33 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			index = 0;
 		}
 
+		if ("require".equals(function.getName()))
+		{
+			// SPECIAL CASE!!!!
+
+			IProject project = EditorUtil.getProject(editor);
+			URI editorURI = EditorUtil.getURI(editor);
+			IPath currentDirectory = Path.fromPortableString(editorURI.getPath()).removeLastSegments(1);
+
+			List<String> possible = RequireResolverFactory.getPossibleModuleIds(project, currentDirectory,
+					project.getLocation());
+			String[] userAgentIds = getActiveUserAgentIds();
+			if (replaceRange == null)
+			{
+				replaceRange = new Range(offset);
+			}
+			for (String moduleId : possible)
+			{
+				CommonCompletionProposal proposal = addProposal(result, "'" + moduleId + "'", STRING_ICON, null,
+						userAgentIds, moduleId + ".js", offset);
+				if (proposal != null)
+				{
+					proposal.setRelevance(CommonCompletionProposal.RELEVANCE_EXACT);
+				}
+			}
+			return;
+		}
+
 		if (0 <= index && index < params.size())
 		{
 			ParameterElement param = params.get(index);
@@ -806,12 +919,12 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				IProject project = getProject();
 				String[] userAgentIds = getActiveUserAgentIds();
 				Image[] userAgents = UserAgentManager.getInstance().getUserAgentImages(getProject(), userAgentIds);
+				if (replaceRange == null)
+				{
+					replaceRange = new Range(offset);
+				}
 				for (String displayName : constants)
 				{
-					if (replaceRange == null)
-					{
-						replaceRange = new Range(offset);
-					}
 					// FIXME For constants we may want to replace back to start of where argument is, not just back to
 					// last period
 

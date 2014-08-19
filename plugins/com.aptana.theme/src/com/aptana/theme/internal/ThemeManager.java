@@ -29,10 +29,12 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.core.runtime.preferences.IScopeContext;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.resource.DataFormatException;
 import org.eclipse.jface.resource.JFaceResources;
@@ -94,7 +96,7 @@ public class ThemeManager implements IThemeManager
 
 	private ThemeManager()
 	{
-		EclipseUtil.instanceScope().getNode("org.eclipse.ui.editors").addPreferenceChangeListener( //$NON-NLS-1$
+		InstanceScope.INSTANCE.getNode("org.eclipse.ui.editors").addPreferenceChangeListener( //$NON-NLS-1$
 				new IPreferenceChangeListener()
 				{
 
@@ -236,7 +238,7 @@ public class ThemeManager implements IThemeManager
 	// APSTUD-4152
 	private void setCompareColors(String nodeName, boolean override)
 	{
-		IEclipsePreferences instancePrefs = EclipseUtil.instanceScope().getNode(nodeName);
+		IEclipsePreferences instancePrefs = InstanceScope.INSTANCE.getNode(nodeName);
 
 		if (override)
 		{
@@ -251,7 +253,7 @@ public class ThemeManager implements IThemeManager
 		else
 		{
 			// Revert to defaults if we have them
-			IEclipsePreferences defPrefs = EclipseUtil.defaultScope().getNode(nodeName);
+			IEclipsePreferences defPrefs = DefaultScope.INSTANCE.getNode(nodeName);
 			String value = defPrefs.get("OUTGOING_COLOR", null); //$NON-NLS-1$
 			if (value != null)
 			{
@@ -302,7 +304,7 @@ public class ThemeManager implements IThemeManager
 
 	private void setSearchResultColor(Theme theme)
 	{
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode("org.eclipse.search"); //$NON-NLS-1$
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode("org.eclipse.search"); //$NON-NLS-1$
 		prefs.put("org.eclipse.search.potentialMatch.fgColor", toString(theme.getSearchResultColor())); //$NON-NLS-1$
 		try
 		{
@@ -352,7 +354,7 @@ public class ThemeManager implements IThemeManager
 	 */
 	private void notifyThemeChangeListeners(Theme theme)
 	{
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(ThemePlugin.PLUGIN_ID);
 		prefs.put(IPreferenceConstants.ACTIVE_THEME, theme.getName());
 		prefs.putLong(THEME_CHANGED, System.currentTimeMillis());
 		try
@@ -372,7 +374,7 @@ public class ThemeManager implements IThemeManager
 	 */
 	private void setAptanaEditorColorsToMatchTheme(Theme theme)
 	{
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode("com.aptana.editor.common"); //$NON-NLS-1$
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode("com.aptana.editor.common"); //$NON-NLS-1$
 		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND_SYSTEM_DEFAULT, false);
 		prefs.put(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND, toString(theme.getForeground()));
 
@@ -396,7 +398,7 @@ public class ThemeManager implements IThemeManager
 
 	private void setAnnotationColorsToMatchTheme(Theme theme)
 	{
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode("org.eclipse.ui.editors"); //$NON-NLS-1$
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode("org.eclipse.ui.editors"); //$NON-NLS-1$
 		if (!theme.hasEntry("override.searchResultIndication")) //$NON-NLS-1$
 		{
 			prefs.put("searchResultIndicationColor", toString(theme.getSearchResultColor())); //$NON-NLS-1$
@@ -526,7 +528,7 @@ public class ThemeManager implements IThemeManager
 			fThemeNames.addAll(getBuiltinThemeNames());
 
 			// Look in prefs to see what user themes are stored there, garb their names
-			IScopeContext[] scopes = new IScopeContext[] { EclipseUtil.instanceScope(), EclipseUtil.defaultScope() };
+			IScopeContext[] scopes = new IScopeContext[] { InstanceScope.INSTANCE, DefaultScope.INSTANCE };
 			for (IScopeContext scope : scopes)
 			{
 				IEclipsePreferences prefs = scope.getNode(ThemePlugin.PLUGIN_ID);

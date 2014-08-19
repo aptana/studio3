@@ -1,8 +1,5 @@
 package com.aptana.editor.js.tests.performance;
 
-import org.junit.runners.Suite.SuiteClasses;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -11,7 +8,6 @@ import java.util.Enumeration;
 
 import junit.extensions.TestSetup;
 import junit.framework.Test;
-import junit.framework.TestSuite;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -20,14 +16,17 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.test.performance.Performance;
 import org.eclipse.test.performance.PerformanceMeter;
 import org.eclipse.ui.PartInitException;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
 import org.osgi.framework.Bundle;
 
 import com.aptana.core.build.IBuildParticipant.BuildType;
 import com.aptana.core.build.PreferenceUtil;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.editor.epl.tests.EditorTestHelper;
 import com.aptana.editor.epl.tests.OpenEditorTest;
@@ -71,29 +70,11 @@ public class OpenJSEditorTest extends OpenEditorTest
 		super(name);
 	}
 
-//	public static Test suite()
-//	{
-//		// ensure sequence
-//		TestSuite suite = new TestSuite(OpenJSEditorTest.class.getName());
-//		// suite.addTest(new OpenJSEditorTest("testOpenTiMobile"));
-//		// suite.addTest(new OpenJSEditorTest("testOpenDojo"));
-//		suite.addTest(new OpenJSEditorTest("testOpenDojoMinified"));
-//		// suite.addTest(new OpenJSEditorTest("testOpenTinyMCE"));
-//		// suite.addTest(new OpenJSEditorTest("testOpenExtMinifiedFoldingOnOutlineOn"));
-//		// suite.addTest(new OpenJSEditorTest("testOpenExtMinifiedFoldingOnOutlineOff"));
-//		// suite.addTest(new OpenJSEditorTest("testOpenExtDevFoldingOnOutlineOn"));
-//		// suite.addTest(new OpenJSEditorTest("testOpenExtDevFoldingOnOutlineOff"));
-//		return new Setup(suite);
-//	}
-//
-//	/*
-//	 * @see junit.framework.TestCase#setUp()
-//	 */
 	protected void setUp() throws Exception
 	{
 		super.setUp();
 
-		IEclipsePreferences prefs = (EclipseUtil.instanceScope()).getNode(JSPlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(JSPlugin.PLUGIN_ID);
 
 		// Turn off all JS validators!!!!
 		prefs.putBoolean(PreferenceUtil.getEnablementPreferenceKey(JSLintValidator.ID, BuildType.BUILD), false);

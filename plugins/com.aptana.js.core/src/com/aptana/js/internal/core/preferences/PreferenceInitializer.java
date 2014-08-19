@@ -10,7 +10,9 @@ package com.aptana.js.internal.core.preferences;
 import java.text.MessageFormat;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
+import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.build.AbstractBuildParticipant;
@@ -18,7 +20,6 @@ import com.aptana.core.build.IBuildParticipant.BuildType;
 import com.aptana.core.build.IProblem;
 import com.aptana.core.build.PreferenceUtil;
 import com.aptana.core.util.ArrayUtil;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.js.core.IJSConstants;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.core.preferences.IPreferenceConstants;
@@ -36,7 +37,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 	@Override
 	public void initializeDefaultPreferences()
 	{
-		IEclipsePreferences prefs = EclipseUtil.defaultScope().getNode(JSCorePlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = DefaultScope.INSTANCE.getNode(JSCorePlugin.PLUGIN_ID);
 
 		prefs.putDouble(IPreferenceConstants.JS_INDEX_VERSION, 0);
 
@@ -78,7 +79,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 				PreferenceUtil.serializeFilters(defaultJSLintFilters));
 
 		// Migrate the old filter prefs to new validator
-		IEclipsePreferences cepPrefs = EclipseUtil.instanceScope().getNode("com.aptana.editor.common"); //$NON-NLS-1$
+		IEclipsePreferences cepPrefs = InstanceScope.INSTANCE.getNode("com.aptana.editor.common"); //$NON-NLS-1$
 		String oldKey = MessageFormat.format("{0}:{1}", IJSConstants.CONTENT_TYPE_JS, //$NON-NLS-1$
 				"com.aptana.editor.common.filterExpressions"); //$NON-NLS-1$
 		String oldFilters = cepPrefs.get(oldKey, null);
@@ -89,7 +90,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 				String[] oldFilterArray = oldFilters.split(AbstractBuildParticipant.FILTER_DELIMITER);
 				String[] combined = ArrayUtil.flatten(oldFilterArray, defaultJSLintFilters);
 
-				IEclipsePreferences newPrefs = EclipseUtil.instanceScope().getNode(JSCorePlugin.PLUGIN_ID);
+				IEclipsePreferences newPrefs = InstanceScope.INSTANCE.getNode(JSCorePlugin.PLUGIN_ID);
 				newPrefs.put(PreferenceUtil.getFiltersKey(JSLintValidator.ID),
 						PreferenceUtil.serializeFilters(combined));
 				newPrefs.flush();

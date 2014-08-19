@@ -13,6 +13,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
 import org.junit.After;
@@ -21,11 +22,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.IOUtil;
-import com.aptana.js.core.JSCorePlugin;
-import com.aptana.js.core.preferences.IPreferenceConstants;
 
 @SuppressWarnings("nls")
 public class NodeModuleResolverTest
@@ -35,13 +33,12 @@ public class NodeModuleResolverTest
 	public TestName name = new TestName();
 	private File baseDir;
 	private IPath dir;
+	private IPath nodeSrcPath;
 	private NodeModuleResolver resolver;
 
 	@Before
 	public void setUp() throws Exception
 	{
-		// super.setUp();
-
 		// Create a tmp dir to hold the structure we'll be traversing
 		IPath tmp = FileUtil.getTempDirectory();
 		IPath baseDirPath = tmp.append(name.getMethodName() + System.currentTimeMillis());
@@ -50,34 +47,31 @@ public class NodeModuleResolverTest
 		assertTrue(dir.toFile().mkdirs());
 
 		// Hook up the resolver to it
-		resolver = new NodeModuleResolver();
+		resolver = new NodeModuleResolver()
+		{
+			@Override
+			protected synchronized IPath nodeSrcPath()
+			{
+				return nodeSrcPath;
+			}
+		};
 	}
 
 	@After
 	public void tearDown() throws Exception
 	{
-		try
-		{
-			FileUtil.deleteRecursively(baseDir);
-		}
-		finally
-		{
-			// super.tearDown();
-		}
+		FileUtil.deleteRecursively(baseDir);
 	}
 
 	@Test
 	public void testResolveCoreModule() throws Exception
 	{
-		IPath nodeSrc = FileUtil.getTempDirectory().append("node_src");
-		IPath lib = nodeSrc.append("lib");
+		nodeSrcPath = FileUtil.getTempDirectory().append("node_src" + System.currentTimeMillis());
+		IPath lib = nodeSrcPath.append("lib");
 		lib.toFile().mkdirs();
 
 		try
 		{
-			EclipseUtil.defaultScope().getNode(JSCorePlugin.PLUGIN_ID)
-					.put(IPreferenceConstants.NODEJS_SOURCE_PATH, nodeSrc.toOSString());
-
 			IPath expected = lib.append("http.js");
 			expected.toFile().createNewFile();
 
@@ -85,7 +79,7 @@ public class NodeModuleResolverTest
 		}
 		finally
 		{
-			FileUtil.deleteRecursively(lib.toFile());
+			FileUtil.deleteRecursively(nodeSrcPath.toFile());
 		}
 	}
 
@@ -164,6 +158,40 @@ public class NodeModuleResolverTest
 		assertEquals(expected, resolver.resolve("file", null, dir, null));
 		// Finds file in second "node_modules" (one directory level higher)
 		assertEquals(file2, resolver.resolve("file2", null, dir, null));
+	}
+
+	@Test
+	public void testGetPossibleModuleIdsChecksNodeSourcePath() throws Exception
+	{
+		nodeSrcPath = FileUtil.getTempDirectory().append("nodeSrcTmp" + System.currentTimeMillis());
+		try
+		{
+			IPath nodeLib = nodeSrcPath.append("lib");
+			nodeLib.toFile().mkdirs();
+			nodeLib.append("my_example.js").toFile().createNewFile();
+			nodeLib.append("some_other_core_file.js").toFile().createNewFile();
+
+			List<String> moduleIds = resolver.getPossibleModuleIds(null, dir, null);
+			assertTrue(moduleIds.contains("my_example"));
+			assertTrue(moduleIds.contains("some_other_core_file"));
+		}
+		finally
+		{
+			FileUtil.deleteRecursively(nodeSrcPath.toFile());
+		}
+	}
+
+	@Test
+	public void testGetPossibleModuleIdsFakesCoreModuleIdsWhenNoNodeSourcePath() throws Exception
+	{
+		nodeSrcPath = null;
+
+		List<String> moduleIds = resolver.getPossibleModuleIds(null, dir, null);
+		// Check a few of the core modules
+		assertTrue(moduleIds.contains("cluster"));
+		assertTrue(moduleIds.contains("console"));
+		assertTrue(moduleIds.contains("sys"));
+		assertTrue(moduleIds.contains("util"));
 	}
 
 	// TODO Add test for "node" file underneath node_modules dir above the current location

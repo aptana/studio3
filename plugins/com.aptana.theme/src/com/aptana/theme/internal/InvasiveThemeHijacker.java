@@ -17,6 +17,8 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.IScopeContext;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.JFacePreferences;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.StringConverter;
@@ -100,7 +102,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPreferenceChangeLis
 
 	private void applyThemeToConsole(Theme currentTheme, IProgressMonitor monitor)
 	{
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode("org.eclipse.debug.ui"); //$NON-NLS-1$
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode("org.eclipse.debug.ui"); //$NON-NLS-1$
 		setColor(prefs, "org.eclipse.debug.ui.errorColor", currentTheme, ConsoleThemer.CONSOLE_ERROR, //$NON-NLS-1$
 				currentTheme.getForegroundAsRGB("console.error")); //$NON-NLS-1$
 		setColor(prefs, "org.eclipse.debug.ui.outColor", currentTheme, ConsoleThemer.CONSOLE_OUTPUT, //$NON-NLS-1$
@@ -172,16 +174,15 @@ public class InvasiveThemeHijacker extends UIJob implements IPreferenceChangeLis
 	private void applyThemeToEclipseEditors(Theme theme, boolean revertToDefaults, IProgressMonitor monitor)
 	{
 		// Set prefs for all editors
-		setHyperlinkValues(theme, EclipseUtil.instanceScope().getNode("org.eclipse.ui.workbench"), revertToDefaults); //$NON-NLS-1$
-		setHyperlinkValues(theme, EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID), revertToDefaults);
+		IScopeContext instance = InstanceScope.INSTANCE;
+		setHyperlinkValues(theme, instance.getNode("org.eclipse.ui.workbench"), revertToDefaults); //$NON-NLS-1$
+		setHyperlinkValues(theme, instance.getNode(ThemePlugin.PLUGIN_ID), revertToDefaults);
 
 		// FIXME only set these if egit or mercurial are installed!
-		setGitAndMercurialValues(theme,
-				EclipseUtil.instanceScope().getNode("org.eclipse.ui.workbench"), revertToDefaults); //$NON-NLS-1$
+		setGitAndMercurialValues(theme, instance.getNode("org.eclipse.ui.workbench"), revertToDefaults); //$NON-NLS-1$
 
-		setGeneralEditorValues(theme,
-				EclipseUtil.instanceScope().getNode("org.eclipse.ui.texteditor"), revertToDefaults); //$NON-NLS-1$
-		setEditorValues(theme, EclipseUtil.instanceScope().getNode("org.eclipse.ui.editors"), revertToDefaults); //$NON-NLS-1$
+		setGeneralEditorValues(theme, instance.getNode("org.eclipse.ui.texteditor"), revertToDefaults); //$NON-NLS-1$
+		setEditorValues(theme, instance.getNode("org.eclipse.ui.editors"), revertToDefaults); //$NON-NLS-1$
 
 		if (monitor.isCanceled())
 		{
@@ -192,7 +193,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPreferenceChangeLis
 		Bundle pde = Platform.getBundle(ORG_ECLIPSE_PDE_UI);
 		if (pde != null)
 		{
-			IEclipsePreferences pdePrefs = EclipseUtil.instanceScope().getNode(ORG_ECLIPSE_PDE_UI);
+			IEclipsePreferences pdePrefs = instance.getNode(ORG_ECLIPSE_PDE_UI);
 			setGeneralEditorValues(theme, pdePrefs, revertToDefaults);
 			setPDEEditorValues(theme, pdePrefs, revertToDefaults);
 		}
@@ -206,7 +207,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPreferenceChangeLis
 		Bundle ant = Platform.getBundle(ORG_ECLIPSE_ANT_UI);
 		if (ant != null)
 		{
-			IEclipsePreferences antPrefs = EclipseUtil.instanceScope().getNode(ORG_ECLIPSE_ANT_UI);
+			IEclipsePreferences antPrefs = instance.getNode(ORG_ECLIPSE_ANT_UI);
 			setGeneralEditorValues(theme, antPrefs, revertToDefaults);
 			setAntEditorValues(theme, antPrefs, revertToDefaults);
 		}
@@ -242,7 +243,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPreferenceChangeLis
 
 	private void applyToWST_HTMLEditor(Theme theme, boolean revertToDefaults)
 	{
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode("org.eclipse.wst.html.ui"); //$NON-NLS-1$
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode("org.eclipse.wst.html.ui"); //$NON-NLS-1$
 		setGeneralEditorValues(theme, prefs, revertToDefaults);
 		// TODO Add SCRIPT_AREA and SCRIPT_AREA_BORDER
 		setWSTToken(prefs, theme, "punctuation.definition.tag.html", "tagBorder", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
@@ -272,7 +273,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPreferenceChangeLis
 
 	private void applyToWST_JSDTEditor(Theme theme, boolean revertToDefaults)
 	{
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(ORG_ECLIPSE_WST_JSDT_UI);
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(ORG_ECLIPSE_WST_JSDT_UI);
 		setGeneralEditorValues(theme, prefs, revertToDefaults);
 
 		// TODO Add mapping for parameter variables, "functions" (which might be function calls)?
@@ -310,7 +311,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPreferenceChangeLis
 
 	private void applyToWST_CSSEditor(Theme theme, boolean revertToDefaults)
 	{
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode("org.eclipse.wst.css.ui"); //$NON-NLS-1$
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode("org.eclipse.wst.css.ui"); //$NON-NLS-1$
 		setGeneralEditorValues(theme, prefs, revertToDefaults);
 
 		setWSTToken(prefs, theme,
@@ -348,7 +349,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPreferenceChangeLis
 
 	private void applyToWST_XMLEditor(Theme theme, boolean revertToDefaults)
 	{
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode("org.eclipse.wst.xml.ui"); //$NON-NLS-1$
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode("org.eclipse.wst.xml.ui"); //$NON-NLS-1$
 		setGeneralEditorValues(theme, prefs, revertToDefaults);
 
 		// FIXME These were adapted from our scopes for DTD, but those don't appear correct to me!
@@ -384,7 +385,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPreferenceChangeLis
 	private void applyThemetoJDT(Theme theme, boolean revertToDefaults)
 	{
 		// Now set for JDT...
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(ORG_ECLIPSE_JDT_UI);
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(ORG_ECLIPSE_JDT_UI);
 		setGeneralEditorValues(theme, prefs, revertToDefaults);
 
 		// Set prefs for JDT so it's various tokens get colors that match up to our theme!
@@ -919,13 +920,13 @@ public class InvasiveThemeHijacker extends UIJob implements IPreferenceChangeLis
 			schedule();
 		}
 		// Listen for changes to prefs
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(ThemePlugin.PLUGIN_ID);
 		prefs.addPreferenceChangeListener(this);
 	}
 
 	public void dispose()
 	{
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(ThemePlugin.PLUGIN_ID);
 		prefs.removePreferenceChangeListener(this);
 	}
 }

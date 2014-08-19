@@ -1,0 +1,12 @@
+package com.aptana.js.internal.core.node;
+
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
+
+@RunWith(Suite.class)
+@SuiteClasses({ NodeJSTest.class, NodePackageManagerTest.class })
+public class InternalCoreNodeTests
+{
+
+}

@@ -32,6 +32,7 @@ import static com.aptana.editor.js.formatter.JSFormatterConstants.NEW_LINES_BEFO
 import static com.aptana.editor.js.formatter.JSFormatterConstants.NEW_LINES_BEFORE_FINALLY_STATEMENT;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.NEW_LINES_BEFORE_IF_IN_ELSEIF_STATEMENT;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.NEW_LINES_BEFORE_NAME_VALUE_PAIRS;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.NEW_LINES_BETWEEN_VAR_DECLARATIONS;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.PRESERVED_LINES;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_AFTER_ARITHMETIC_OPERATOR;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_AFTER_ASSIGNMENT_OPERATOR;
@@ -81,11 +82,11 @@ import static com.aptana.editor.js.formatter.JSFormatterConstants.WRAP_COMMENTS;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.WRAP_COMMENTS_LENGTH;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
+import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.util.EditorUtil;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.formatter.JSFormatterPlugin;
@@ -107,7 +108,7 @@ public class JSFormatterPreferenceInitializer extends AbstractPreferenceInitiali
 	@Override
 	public void initializeDefaultPreferences()
 	{
-		IEclipsePreferences store = EclipseUtil.defaultScope().getNode(JSFormatterPlugin.PLUGIN_ID);
+		IEclipsePreferences store = DefaultScope.INSTANCE.getNode(JSFormatterPlugin.PLUGIN_ID);
 
 		store.put(FORMATTER_TAB_CHAR, CodeFormatterConstants.EDITOR);
 		store.put(FORMATTER_TAB_SIZE,
@@ -126,6 +127,7 @@ public class JSFormatterPreferenceInitializer extends AbstractPreferenceInitiali
 		store.putBoolean(NEW_LINES_BEFORE_IF_IN_ELSEIF_STATEMENT, false);
 		store.putBoolean(NEW_LINES_BEFORE_DO_WHILE_STATEMENT, false);
 		store.putBoolean(NEW_LINES_BEFORE_NAME_VALUE_PAIRS, true);
+		store.putBoolean(NEW_LINES_BETWEEN_VAR_DECLARATIONS, true);
 		store.putInt(LINES_AFTER_FUNCTION_DECLARATION, 1);
 		store.putInt(LINES_AFTER_FUNCTION_DECLARATION_IN_EXPRESSION, 0);
 		store.putInt(PRESERVED_LINES, 1);

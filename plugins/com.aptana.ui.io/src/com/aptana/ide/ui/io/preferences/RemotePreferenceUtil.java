@@ -9,9 +9,9 @@ package com.aptana.ide.ui.io.preferences;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.service.prefs.BackingStoreException;
 
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.ide.ui.io.IOUIPlugin;
 
 public class RemotePreferenceUtil
@@ -24,7 +24,7 @@ public class RemotePreferenceUtil
 
 	public static void setReopenRemoteOnStartup(boolean reopen)
 	{
-		IEclipsePreferences prefs = (EclipseUtil.instanceScope()).getNode(IOUIPlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(IOUIPlugin.PLUGIN_ID);
 		prefs.putBoolean(IPreferenceConstants.REOPEN_REMOTE_FILES_ON_STARUP, reopen);
 		try
 		{

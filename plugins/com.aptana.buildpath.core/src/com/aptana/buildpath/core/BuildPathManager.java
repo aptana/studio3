@@ -46,6 +46,11 @@ import com.aptana.index.core.IndexFileJob;
  */
 public class BuildPathManager
 {
+	/**
+	 * cache the global list of available build paths
+	 */
+	private static final int CACHE_TIMEOUT = 30000;
+
 	private static final String BUILD_PATH_ENTRY_DELIMITER = "\0"; //$NON-NLS-1$
 	private static final String NAME_AND_PATH_DELIMITER = "\t"; //$NON-NLS-1$
 
@@ -79,6 +84,8 @@ public class BuildPathManager
 
 	private Set<IBuildPathEntry> whitelistedBuildPaths;
 	private List<IBuildPathContributor> contributors;
+	private long fTimestamp = -1;
+	private LinkedHashSet<IBuildPathEntry> fBuildPaths;
 
 	/**
 	 * Make sure this is a singleton
@@ -93,7 +100,7 @@ public class BuildPathManager
 	 * @param entry
 	 * @return whether the entry was added or not.
 	 */
-	public boolean addBuildPath(IBuildPathEntry entry)
+	public synchronized boolean addBuildPath(IBuildPathEntry entry)
 	{
 		if (entry == null)
 		{
@@ -106,7 +113,12 @@ public class BuildPathManager
 			whitelistedBuildPaths = new LinkedHashSet<IBuildPathEntry>();
 		}
 
-		return whitelistedBuildPaths.add(entry);
+		boolean result = whitelistedBuildPaths.add(entry);
+		if (result)
+		{
+			fBuildPaths = null;
+		}
+		return result;
 	}
 
 	/**
@@ -211,20 +223,27 @@ public class BuildPathManager
 	 * 
 	 * @return
 	 */
-	public Set<IBuildPathEntry> getBuildPaths()
+	public synchronized Set<IBuildPathEntry> getBuildPaths()
 	{
-		Set<IBuildPathEntry> result = new LinkedHashSet<IBuildPathEntry>();
-
-		// Add static paths, if we have any
-		if (whitelistedBuildPaths != null)
+		// keep a time based cache of the Set
+		if (fBuildPaths == null || System.currentTimeMillis() > fTimestamp + CACHE_TIMEOUT)
 		{
-			result.addAll(whitelistedBuildPaths);
+			LinkedHashSet<IBuildPathEntry> result = new LinkedHashSet<IBuildPathEntry>();
+			// Add static paths, if we have any
+			if (whitelistedBuildPaths != null)
+			{
+				result.addAll(whitelistedBuildPaths);
+			}
+
+			// Add dynamic paths
+			result.addAll(getDynamicBuildPaths());
+
+			// Now cache the result and record the time
+			fBuildPaths = result;
+			fTimestamp = System.currentTimeMillis();
 		}
 
-		// Add dynamic paths
-		result.addAll(getDynamicBuildPaths());
-
-		return result;
+		return new LinkedHashSet<IBuildPathEntry>(fBuildPaths);
 	}
 
 	/**
@@ -516,14 +535,19 @@ public class BuildPathManager
 	 * 
 	 * @param entry
 	 */
-	public boolean removeBuildPath(IBuildPathEntry entry)
+	public synchronized boolean removeBuildPath(IBuildPathEntry entry)
 	{
 		if (entry == null || whitelistedBuildPaths == null)
 		{
 			return false;
 		}
 
-		return whitelistedBuildPaths.remove(entry);
+		boolean result = whitelistedBuildPaths.remove(entry);
+		if (result)
+		{
+			fBuildPaths = null;
+		}
+		return result;
 	}
 
 	/**

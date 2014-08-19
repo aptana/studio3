@@ -16,17 +16,29 @@ public class JSNameValuePairNode extends JSNode
 	private Symbol _colon;
 
 	/**
-	 * JSNameValuePairNode
-	 * 
-	 * @param name
-	 * @param colon
-	 * @param value
+	 * This version represent a typical "key": "value" style property assignment.
 	 */
 	public JSNameValuePairNode(JSNode name, Symbol colon, JSNode value)
 	{
 		super(IJSNodeTypes.NAME_VALUE_PAIR, name, value);
 
 		this._colon = colon;
+	}
+
+	/**
+	 * Represents an ECMAScript 5 get property
+	 */
+	public JSNameValuePairNode(JSNode name, JSNode functionBody)
+	{
+		super(IJSNodeTypes.NAME_VALUE_PAIR, name, functionBody);
+	}
+
+	/**
+	 * Represents an ECMAScript 5 set property
+	 */
+	public JSNameValuePairNode(JSNode name, JSParametersNode param, JSNode functionBody)
+	{
+		super(IJSNodeTypes.NAME_VALUE_PAIR, name, param, functionBody);
 	}
 
 	/*
@@ -64,6 +76,15 @@ public class JSNameValuePairNode extends JSNode
 	 */
 	public IParseNode getValue()
 	{
-		return this.getChild(1);
+		return this.getChild(getChildCount() - 1);
+	}
+
+	public JSParametersNode getParameters()
+	{
+		if (getChildCount() == 3)
+		{
+			return (JSParametersNode) this.getChild(1);
+		}
+		return null;
 	}
 }

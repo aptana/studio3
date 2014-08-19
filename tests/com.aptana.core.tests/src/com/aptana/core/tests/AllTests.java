@@ -12,11 +12,13 @@ import org.junit.runners.Suite;
 
 import ch.randelshofer.quaqua.util.BinaryPListParserTest;
 
+import com.aptana.core.internal.sourcemap.InternalSourcemapTests;
 import com.aptana.core.util.AllUtilTests;
 import com.aptana.plist.xml.XMLPListParserTest;
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ IdeLogTest.class, BinaryPListParserTest.class, XMLPListParserTest.class, AllUtilTests.class })
+@Suite.SuiteClasses({ IdeLogTest.class, BinaryPListParserTest.class, XMLPListParserTest.class, AllUtilTests.class,
+		InternalSourcemapTests.class })
 public class AllTests
 {
 
