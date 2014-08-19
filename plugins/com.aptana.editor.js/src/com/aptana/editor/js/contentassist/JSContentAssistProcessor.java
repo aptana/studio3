@@ -140,6 +140,10 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			String typeName = item.getOwningType();
 			if (typeName.equals("module.exports") || (typeName.startsWith("$module") && typeName.endsWith(".exports")))
 			{
+				if ("id".equals(item.getName()) || "uri".equals(item.getName()))
+				{
+					return true;
+				}
 				return item.isClassProperty();
 			}
 			return item.isInstanceProperty();
@@ -153,6 +157,14 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		public boolean include(PropertyElement item)
 		{
+			String typeName = item.getOwningType();
+			if (typeName.equals("module.exports") || (typeName.startsWith("$module") && typeName.endsWith(".exports")))
+			{
+				if ("id".equals(item.getName()) || "uri".equals(item.getName()))
+				{
+					return true;
+				}
+			}
 			return item.isClassProperty();
 		}
 	};
