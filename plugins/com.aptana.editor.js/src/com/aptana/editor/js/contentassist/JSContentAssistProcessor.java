@@ -50,6 +50,7 @@ import com.aptana.editor.js.text.JSFlexLexemeProvider;
 import com.aptana.index.core.Index;
 import com.aptana.js.core.IJSConstants;
 import com.aptana.js.core.JSLanguageConstants;
+import com.aptana.js.core.JSTypeConstants;
 import com.aptana.js.core.index.IJSIndexConstants;
 import com.aptana.js.core.index.JSIndexQueryHelper;
 import com.aptana.js.core.inferencing.JSNodeTypeInferrer;
@@ -140,6 +141,10 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			String typeName = item.getOwningType();
 			if (typeName.equals("module.exports") || (typeName.startsWith("$module") && typeName.endsWith(".exports")))
 			{
+				if ("id".equals(item.getName()) || "uri".equals(item.getName()))
+				{
+					return true;
+				}
 				return item.isClassProperty();
 			}
 			return item.isInstanceProperty();
@@ -153,6 +158,14 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		public boolean include(PropertyElement item)
 		{
+			String typeName = item.getOwningType();
+			if (typeName.equals("module.exports") || (typeName.startsWith("$module") && typeName.endsWith(".exports")))
+			{
+				if ("id".equals(item.getName()) || "uri".equals(item.getName()))
+				{
+					return true;
+				}
+			}
 			return item.isClassProperty();
 		}
 	};
@@ -328,7 +341,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			if (left instanceof JSIdentifierNode)
 			{
 				// FIXME Track back to last assignment to determine better
-				// cheat and assume identifiers beginning with upper case letter are types.
 				JSIdentifierNode ident = (JSIdentifierNode) left;
 				String name = ident.getNameNode().getName();
 				if ("$".equals(name) || "Ti".equals(name) || "jQuery".equals(name)) // HACK for jQuery
@@ -339,7 +351,15 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					return false;
 				}
 				Collection<TypeElement> types = getQueryHelper().getTypes(name, false);
-				return CollectionsUtil.isEmpty(types); // if there are no types by this name, assume it's an instance
+				// FIXME If the type was defined using an object literal, the actual reference is an instance! How the
+				// hell do I handle that?
+				if (CollectionsUtil.isEmpty(types))
+				{
+					// if there are no types by this name, assume it's an instance
+					return true;
+				}
+				// cheat and assume identifiers beginning with upper case letter are types?
+				return !Character.isUpperCase(name.charAt(0));
 			}
 			return true;
 		}
