@@ -7,17 +7,18 @@
  */
 package com.aptana.editor.common.scripting.commands;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.ide.FileStoreEditorInput;
+import org.junit.Test;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 
@@ -45,7 +46,7 @@ public class UtilitiesTest
 			filePaths.add(path);
 		}
 	}
-	
+
 	@Test
 	public void testCreateFileEditorInputCreatesFileStoreEditorInput()
 	{

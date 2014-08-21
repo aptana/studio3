@@ -56,8 +56,16 @@ public final class Utilities
 	public static File getFile()
 	{
 		IPath stateLocation = CommonEditorPlugin.getDefault().getStateLocation();
-		IPath path = stateLocation.append("/_" + new Object().hashCode()); //$NON-NLS-1$ 
-		return new File(path.toOSString());
+		long unique = new Object().hashCode();
+		IPath path = stateLocation.append("_" + unique); //$NON-NLS-1$ 
+		File file = path.toFile();
+		while (file.exists())
+		{
+			unique++;
+			path = stateLocation.append("_" + unique); //$NON-NLS-1$ 
+			file = path.toFile();
+		}
+		return file;
 	}
 
 }
