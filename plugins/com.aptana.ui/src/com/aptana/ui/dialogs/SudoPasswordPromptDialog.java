@@ -7,6 +7,7 @@
  */
 package com.aptana.ui.dialogs;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -26,6 +27,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import com.aptana.core.util.PlatformUtil;
+import com.aptana.core.util.ProcessRunner;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ui.IDialogConstants;
 import com.aptana.ui.UIPlugin;
@@ -46,6 +49,12 @@ public class SudoPasswordPromptDialog extends Dialog
 	private static final int MAC_DIALOG_FONT_SIZE = 13;
 	private String promptMessage;
 	private static final String SECURITY_IMAGE = "/icons/full/security.png"; //$NON-NLS-1$
+
+	/**
+	 * Command/options to run osascript.
+	 */
+	private static final String ARG_STATEMENT = "-e"; //$NON-NLS-1$
+	private static final String OSASCRIPT = "osascript"; //$NON-NLS-1$
 
 	public SudoPasswordPromptDialog(IShellProvider parentShell, String promptMessage)
 	{
@@ -137,6 +146,17 @@ public class SudoPasswordPromptDialog extends Dialog
 		Text nameText = new Text(fieldsComp, SWT.BORDER | SWT.READ_ONLY);
 		nameText.setLayoutData(GridDataFactory.swtDefaults().grab(true, true).align(SWT.FILL, SWT.FILL).create());
 		nameText.setText(System.getProperty("user.name")); //$NON-NLS-1$
+
+		// Retrieves the full user name in password prompt dialog on Mac.
+		if (PlatformUtil.isMac())
+		{
+			IStatus status = new ProcessRunner().runInBackground(OSASCRIPT, ARG_STATEMENT,
+					"long user name of (system info)"); //$NON-NLS-1$
+			if (status != null && status.isOK() && !StringUtil.isEmpty(status.getMessage()))
+			{
+				nameText.setText(status.getMessage());
+			}
+		}
 		nameText.setForeground(parent.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 
 		Label pwdLbl = new Label(labels, SWT.None);
