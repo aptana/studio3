@@ -12,6 +12,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -41,8 +42,17 @@ public class UtilitiesTest
 		Set<String> filePaths = new HashSet<String>();
 		for (int i = 0; i < 1000; i++)
 		{
-			String path = Utilities.getFile().getAbsolutePath();
+			File file = Utilities.getFile();
+			String path = file.getAbsolutePath();
 			assertFalse("Generated a non-unique filename", filePaths.contains(path));
+			try
+			{
+				file.createNewFile();
+			}
+			catch (IOException e)
+			{
+				// ignore
+			}
 			filePaths.add(path);
 		}
 	}
