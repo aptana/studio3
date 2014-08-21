@@ -106,7 +106,7 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 	static final Image ATTRIBUTE_ICON = XMLPlugin.getImage("/icons/attribute.png"); //$NON-NLS-1$
 
 	protected XMLIndexQueryHelper _queryHelper;
-	private Lexeme<XMLTokenType> _currentLexeme;
+	protected Lexeme<XMLTokenType> _currentLexeme;
 	private IRange _replaceRange;
 	private IDocument _document;
 
@@ -192,7 +192,7 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param elementName
 	 * @param attributeName
 	 */
-	private List<ICompletionProposal> addAttributeValueProposals(int offset, String elementName, String attributeName)
+	protected List<ICompletionProposal> addAttributeValueProposals(int offset, String elementName, String attributeName)
 	{
 		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
 		AttributeElement attribute = this._queryHelper.getAttribute(elementName, attributeName);
