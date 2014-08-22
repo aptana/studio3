@@ -9,7 +9,7 @@
 /* Black BG for inactive parts */
 .MPartStack {
 	swt-simple: true;
-	swt-tab-renderer: url('bundleclass://net.jeeeyul.eclipse.themes/net.jeeeyul.eclipse.themes.rendering.ChromeTabRendering');
+	swt-tab-renderer: url('bundleclass://org.eclipse.e4.ui.workbench.renderers.swt/org.eclipse.e4.ui.workbench.renderers.swt.CTabRendering');
 	padding: 1px 6px 8px 6px; /* top left bottom right */
 	swt-tab-outline: #444444;
 	swt-outer-keyline-color: #444444;
@@ -20,9 +20,15 @@
 	swt-mru-visible: true;
 	swt-corner-radius: 6px;
 	swt-unselected-close-visible: true; /* let user close unselected tabs by showing close image on hover */
-	chrome-selected-tab-color: #ffffff;
-	chrome-unselected-tab-color: #484850;
 	color: #ffffff;
+}
+.MPartStack.active > CTabItem,
+.MPartStack.active > CTabItem CLabel {
+    color: #484850;
+}
+.MPartStack.active > CTabItem:selected,
+.MPartStack.active > CTabItem:selected CLabel {
+    color: #ffffff;
 }
 /* Black BG and White FG */
 .MPartStack,
@@ -132,10 +138,4 @@ CTabFolder.MArea .MPartStack, CTabFolder.MArea .MPartStack.active {
 /* Text in Status bar */
 .MTrimBar CLabel, .MTrimBar .MToolControl {
 	color: #ffffff;
-}
-
-/* Mac specific */
-.MPartStack {
-	font-size: 14;
-	font-family: 'PT Sans'; /* Available in Mac since Lion */
 }

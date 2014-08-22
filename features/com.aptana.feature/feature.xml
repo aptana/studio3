@@ -724,13 +724,6 @@
          unpack="false"/>
 
    <plugin
-         id="net.jeeeyul.eclipse.themes"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="lib.org.chromium.sdk"
          download-size="0"
          install-size="0"
