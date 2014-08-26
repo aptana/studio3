@@ -83,4 +83,20 @@ public class CSSSpecialTokenHandlingTest extends CSSTokensTest
 		);
 		// @formatter:on
 	}
+
+	@Test
+	public void testmsViewPort()
+	{
+		// @formatter:off
+		assertToken(
+			"@-ms-viewport{width:auto}",
+			new TokenInfo(CSSTokenType.MS_VIEWPORT, 0, 13),
+			new TokenInfo(CSSTokenType.LCURLY, 13, 1),
+			new TokenInfo(CSSTokenType.IDENTIFIER, 14, 5),
+			new TokenInfo(CSSTokenType.COLON, 19, 1),
+			new TokenInfo(CSSTokenType.IDENTIFIER, 20, 4),
+			new TokenInfo(CSSTokenType.RCURLY, 24, 1)
+		);
+		// @formatter:on
+	}
 }

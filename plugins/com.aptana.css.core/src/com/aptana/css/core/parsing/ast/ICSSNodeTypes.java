@@ -31,4 +31,5 @@ public interface ICSSNodeTypes
 	public static final short AT_RULE = 19;
 	public static final short LIST = 20;
 	public static final short MOZ_DOCUMENT = 21;
+	public static final short MS_VIEWPORT = 22;
 }
