@@ -7,10 +7,12 @@
  */
 package com.aptana.css.core.parsing;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.After;
 import org.junit.Before;
-import static org.junit.Assert.*;
-import junit.framework.TestCase;
+
 import beaver.Symbol;
 
 public class CSSTokensTest
@@ -31,14 +33,12 @@ public class CSSTokensTest
 
 	private CSSFlexScanner fScanner;
 
-//	@Override
 	@Before
 	public void setUp() throws Exception
 	{
 		fScanner = new CSSFlexScanner();
 	}
 
-//	@Override
 	@After
 	public void tearDown() throws Exception
 	{

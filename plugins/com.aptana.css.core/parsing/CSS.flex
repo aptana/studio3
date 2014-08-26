@@ -234,6 +234,7 @@ nl							= \r|\n|\r\n|\f
 	"@font-face"				{ return newToken(CSSTokenType.FONTFACE, yytext()); }
 	"@namespace"				{ return newToken(CSSTokenType.NAMESPACE, yytext()); }
 	"@-moz-document"			{ return newToken(CSSTokenType.MOZ_DOCUMENT, yytext()); }
+	"@-ms-viewport"				{ return newToken(CSSTokenType.MS_VIEWPORT, yytext()); }
 	"@"{name}					{ return newToken(CSSTokenType.AT_RULE, yytext()); }
 
 	"!"({s}|{comment})*"important"	{ return newToken(CSSTokenType.IMPORTANT, yytext()); }
