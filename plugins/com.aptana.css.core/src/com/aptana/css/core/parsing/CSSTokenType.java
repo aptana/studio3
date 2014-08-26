@@ -70,6 +70,7 @@ public enum CSSTokenType implements ITypePredicate
 	BEGINS_WITH(".css", Terminals.BEGINS_WITH), //$NON-NLS-1$
 	ENDS_WITH(".css", Terminals.ENDS_WITH), //$NON-NLS-1$
 	MOZ_DOCUMENT("keyword.control.at-rule.page.css", Terminals.MOZ_DOCUMENT), //$NON-NLS-1$
+	MS_VIEWPORT("keyword.control.at-rule.page.css", Terminals.MS_VIEWPORT), //$NON-NLS-1$
 
 	// stuff used internally for special scopes in CSSCodeScanner...
 	LCURLY_MEDIA("punctuation.section.at-rule.media.css", Terminals.LCURLY), //$NON-NLS-1$

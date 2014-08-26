@@ -24,7 +24,7 @@
 %terminals NOT, MINUS, PLUS, EQUAL, STAR, GREATER;
 %terminals IDENTIFIER, STRING, URL, NUMBER, CLASS, LENGTH, EMS, EXS, ANGLE, TIME, FREQUENCY, COLOR, PERCENTAGE;
 %terminals IMPORTANT, PROPERTY, SELECTOR, HASH, INCLUDES, DASHMATCH, BEGINS_WITH, ENDS_WITH;
-%terminals MOZ_DOCUMENT;
+%terminals MOZ_DOCUMENT, MS_VIEWPORT;
 
 %typeof IDENTIFIER, PROPERTY, STRING, URL, NUMBER, PERCENTAGE, LENGTH, EMS, EXS, ANGLE, TIME, FREQUENCY, COLOR = "String";
 %typeof HASH, NOT, CLASS, LBRACKET, RBRACKET, COLON, COMMA, PLUS, STAR, GREATER, AT_RULE = "String";
@@ -178,6 +178,7 @@ Statement
 	|	AtRule
 	|	Rule
 	|	MozDocument
+	|	MsViewPort
 	;
 
 CharSet
@@ -425,6 +426,18 @@ FunctionList
 			list.addChild(f);
 			
 			return list;
+		:}
+	;
+
+MsViewPort
+	=	MS_VIEWPORT LCURLY Declarations.d RCURLY
+		{:
+			CSSMsViewPort viewPort = new CSSMsViewPort(d);
+			for (CSSDeclarationNode declaration : d)
+			{
+				declaration.setParent(viewPort);
+			}			
+			return viewPort;
 		:}
 	;
 

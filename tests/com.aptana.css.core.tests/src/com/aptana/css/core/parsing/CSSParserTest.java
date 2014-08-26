@@ -7,20 +7,20 @@
  */
 package com.aptana.css.core.parsing;
 
-import org.junit.After;
-import org.junit.Test;
-import org.junit.Before;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import beaver.Symbol;
 
@@ -56,7 +56,6 @@ public class CSSParserTest
 	private boolean expectToRecoverFromErrors = false;
 	private boolean recoveredFromError = false;
 
-//	@Override
 	@Before
 	public void setUp() throws Exception
 	{
@@ -79,7 +78,6 @@ public class CSSParserTest
 		fScanner = new CSSFlexScanner();
 	}
 
-//	@Override
 	@After
 	public void tearDown() throws Exception
 	{
@@ -1264,6 +1262,23 @@ public class CSSParserTest
 	public void testNotDoubleNegationError() throws Exception
 	{
 		parseErrorTest("svg:not(:not(:root)) {overflow: hidden;}" + EOL);
+	}
+
+	/**
+	 * https://github.com/aptana/studio3/issues/108
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testMSViewPort() throws Exception
+	{
+		parseTest("@-ms-viewport {width: device-width;}" + EOL);
+	}
+
+	@Test
+	public void testMSViewPortInsideMediaQuery() throws Exception
+	{
+		parseTest("@media screen and ( max-width : 400px ){@-ms-viewport {width: 320px;}}" + EOL);
 	}
 
 	/**
