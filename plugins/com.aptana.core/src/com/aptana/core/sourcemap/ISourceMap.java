@@ -125,7 +125,7 @@ public interface ISourceMap extends IExecutableExtension
 	 * generated result will have a value only when the {@link #getGeneratedLocationPrefix()} returns a non-empty/null
 	 * value.
 	 * 
-	 * @param originalFile
+	 * @param originalFilePath
 	 *            resource that will be used to locate the map file
 	 * @param lineNumber
 	 *            1-based line number
@@ -134,7 +134,7 @@ public interface ISourceMap extends IExecutableExtension
 	 * @return A list of {@link ISourceMapResult} instances; <code>null</code> if there is no mapping.
 	 * @see #getGeneratedMapping(IResource, String, int, int)
 	 */
-	ISourceMapResult getGeneratedMapping(String originalFile, int lineNumber, int columnNumber);
+	ISourceMapResult getGeneratedMapping(IPath originalFilePath, int lineNumber, int columnNumber);
 
 	/**
 	 * Returns the prefix path for the location of the sourcemap files.
