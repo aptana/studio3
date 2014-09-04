@@ -204,7 +204,12 @@ public class DefaultAnalyticsEventHandler implements IAnalyticsEventHandler
 
 	protected IAnalyticsLogger getAnalyticsLogger()
 	{
-		return UsagePlugin.getDefault().getAnalyticsLogger();
+		UsagePlugin plugin = UsagePlugin.getDefault();
+		if (plugin == null)
+		{
+			return null;
+		}
+		return plugin.getAnalyticsLogger();
 	}
 
 	protected IAnalyticsUserManager getUserManager()
@@ -227,29 +232,43 @@ public class DefaultAnalyticsEventHandler implements IAnalyticsEventHandler
 		}
 
 		IAnalyticsUser user = userManager.getUser();
+
 		// Only send ping if user is logged in. Otherwise, we log it to the database
 		if (user == null || !user.isOnline() || !isValidResponse(responseCode = sendPing(event, user)))
 		{
 			// log the event to the database
-			getAnalyticsLogger().logEvent(event);
+			IAnalyticsLogger logger = getAnalyticsLogger();
+			if (logger != null)
+			{
+				logger.logEvent(event);
+			}
+			else
+			{
+				IdeLog.logError(UsagePlugin.getDefault(),
+						"No Analytics logger around to log event. Event will be dropped!"); //$NON-NLS-1$
+			}
 		}
 		else
 		{
-			// Send out all previous events from the db
-			synchronized (lock)
+			IAnalyticsLogger logger = getAnalyticsLogger();
+			if (logger != null)
 			{
-				List<AnalyticsEvent> events = getAnalyticsLogger().getEvents();
-				// Sort the events. We want all project.create events to be first, and all project.delete events
-				// to be last
-				Collections.sort(events, new AnalyticsEventComparator());
-				for (AnalyticsEvent aEvent : events)
+				// Send out all previous events from the db
+				synchronized (lock)
 				{
-					if (!isValidResponse(responseCode = sendPing(aEvent, user)))
+					List<AnalyticsEvent> events = logger.getEvents();
+					// Sort the events. We want all project.create events to be first, and all project.delete events
+					// to be last
+					Collections.sort(events, new AnalyticsEventComparator());
+					for (AnalyticsEvent aEvent : events)
 					{
-						return Status.OK_STATUS;
+						if (!isValidResponse(responseCode = sendPing(aEvent, user)))
+						{
+							return Status.OK_STATUS;
+						}
+						// Remove the event after it has been sent
+						logger.clearEvent(aEvent);
 					}
-					// Remove the event after it has been sent
-					getAnalyticsLogger().clearEvent(aEvent);
 				}
 			}
 		}

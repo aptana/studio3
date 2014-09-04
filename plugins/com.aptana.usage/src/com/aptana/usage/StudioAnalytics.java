@@ -14,20 +14,33 @@ import org.eclipse.core.runtime.Platform;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.usage.internal.AnalyticsHandlersManager;
 
-public class StudioAnalytics
+public class StudioAnalytics implements IStudioAnalytics
 {
 
-	private static StudioAnalytics instance;
-
-	public synchronized static StudioAnalytics getInstance()
+	/**
+	 * @deprecated Use {@link UsagePlugin#getStudioAnalytics()}
+	 * @return
+	 */
+	public static IStudioAnalytics getInstance()
 	{
-		if (instance == null)
+		UsagePlugin plugin = UsagePlugin.getDefault();
+		if (plugin == null)
 		{
-			instance = new StudioAnalytics();
+			return new IStudioAnalytics()
+			{
+				public void sendEvent(AnalyticsEvent event)
+				{
+					// do nothing. We're shutting down. Unfortunately that means this event will get dropped.
+				}
+			};
 		}
-		return instance;
+		return plugin.getStudioAnalytics();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.usage.IStudioAnalytics#sendEvent(com.aptana.usage.AnalyticsEvent)
+	 */
 	public void sendEvent(AnalyticsEvent event)
 	{
 		if (Platform.inDevelopmentMode() && !EclipseUtil.isTesting())
