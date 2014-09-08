@@ -17,7 +17,7 @@ public class JSGetPropertyNode extends JSBinaryOperatorNode
 	 * @param left
 	 * @param right
 	 */
-	public JSGetPropertyNode(JSNode left, Symbol operator, JSNode right)
+	public JSGetPropertyNode(JSNode left, Symbol operator, JSIdentifierNode right)
 	{
 		super(left, operator, right);
 
@@ -32,5 +32,10 @@ public class JSGetPropertyNode extends JSBinaryOperatorNode
 	public void accept(JSTreeWalker walker)
 	{
 		walker.visit(this);
+	}
+
+	public JSIdentifierNode getProperty()
+	{
+		return (JSIdentifierNode) getRightHandSide();
 	}
 }
