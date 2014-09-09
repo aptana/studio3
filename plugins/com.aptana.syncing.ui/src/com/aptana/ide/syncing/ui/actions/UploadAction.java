@@ -36,7 +36,6 @@ import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ide.ui.io.Utils;
 import com.aptana.ui.DialogUtils;
 import com.aptana.usage.FeatureEvent;
-import com.aptana.usage.StudioAnalytics;
 
 /**
  * @author Michael Xia (mxia@aptana.com)
@@ -141,8 +140,7 @@ public class UploadAction extends BaseSyncAction
 				}
 				finally
 				{
-					StudioAnalytics.getInstance().sendEvent(
-							new FeatureEvent("remote.upload." + site.getDestination().getType(), null)); //$NON-NLS-1$
+					sendEvent(new FeatureEvent("remote.upload." + site.getDestination().getType(), null)); //$NON-NLS-1$
 				}
 
 				return Status.OK_STATUS;

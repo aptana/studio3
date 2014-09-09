@@ -26,8 +26,10 @@ import org.osgi.service.prefs.BackingStoreException;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ui.util.UIUtils;
+import com.aptana.usage.AnalyticsEvent;
 import com.aptana.usage.FeatureEvent;
-import com.aptana.usage.StudioAnalytics;
+import com.aptana.usage.IStudioAnalytics;
+import com.aptana.usage.UsagePlugin;
 
 /**
  * @author Nam Le <nle@appcelerator.com>
@@ -79,10 +81,24 @@ public class PerspectiveChangeResetListener extends PerspectiveAdapter
 				{
 					perspectiveId = perspectiveId.substring(index + 1);
 				}
-				StudioAnalytics.getInstance().sendEvent(
-						new FeatureEvent(MessageFormat.format(PERSPECTIVE_ACTIVATE_EVENT, perspectiveId), null));
+				sendEvent(new FeatureEvent(MessageFormat.format(PERSPECTIVE_ACTIVATE_EVENT, perspectiveId), null));
 			}
 		}
+	}
+
+	private void sendEvent(AnalyticsEvent featureEvent)
+	{
+		UsagePlugin plugin = UsagePlugin.getDefault();
+		if (plugin == null)
+		{
+			return;
+		}
+		IStudioAnalytics analytics = plugin.getStudioAnalytics();
+		if (analytics == null)
+		{
+			return;
+		}
+		analytics.sendEvent(featureEvent);
 	}
 
 	private void resetPerspective(final IWorkbenchPage page)

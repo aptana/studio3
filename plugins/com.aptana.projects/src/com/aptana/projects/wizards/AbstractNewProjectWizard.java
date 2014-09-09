@@ -69,8 +69,10 @@ import com.aptana.projects.internal.wizards.Messages;
 import com.aptana.projects.listeners.IStudioProjectListener;
 import com.aptana.projects.templates.IDefaultProjectTemplate;
 import com.aptana.ui.util.UIUtils;
+import com.aptana.usage.AnalyticsEvent;
 import com.aptana.usage.FeatureEvent;
-import com.aptana.usage.StudioAnalytics;
+import com.aptana.usage.IStudioAnalytics;
+import com.aptana.usage.UsagePlugin;
 
 /**
  * New Project Wizard base class.
@@ -451,7 +453,22 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 	protected void sendProjectCreateEvent()
 	{
 		Map<String, String> payload = generatePayload();
-		StudioAnalytics.getInstance().sendEvent(new FeatureEvent(getProjectCreateEventName(), payload));
+		sendEvent(new FeatureEvent(getProjectCreateEventName(), payload));
+	}
+
+	private void sendEvent(AnalyticsEvent featureEvent)
+	{
+		UsagePlugin plugin = UsagePlugin.getDefault();
+		if (plugin == null)
+		{
+			return;
+		}
+		IStudioAnalytics analytics = plugin.getStudioAnalytics();
+		if (analytics == null)
+		{
+			return;
+		}
+		analytics.sendEvent(featureEvent);
 	}
 
 	/**
