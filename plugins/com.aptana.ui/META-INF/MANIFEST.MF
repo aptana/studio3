@@ -6,7 +6,7 @@ Bundle-Version: 3.1.4.qualifier
 Bundle-Activator: com.aptana.ui.UIPlugin
 Bundle-Vendor: %providerName
 Require-Bundle: com.aptana.core;bundle-version="3.0.4",
- com.aptana.usage,
+ com.aptana.usage;bundle-version="4.0.0",
  com.aptana.buildpath.core,
  com.aptana.index.core,
  org.eclipse.jface.text;visibility:=reexport,

@@ -24,7 +24,8 @@ import com.aptana.core.epl.IMemento;
 import com.aptana.core.io.vfs.VirtualConnectionManager;
 import com.aptana.core.util.StringUtil;
 import com.aptana.usage.FeatureEvent;
-import com.aptana.usage.StudioAnalytics;
+import com.aptana.usage.IStudioAnalytics;
+import com.aptana.usage.UsagePlugin;
 
 /**
  * Base class for all connection points
@@ -194,7 +195,22 @@ public abstract class ConnectionPoint extends PlatformObject implements IConnect
 	 */
 	public void connect(boolean force, IProgressMonitor monitor) throws CoreException
 	{
-		StudioAnalytics.getInstance().sendEvent(new FeatureEvent("remote.connect." + getType(), null));
+		sendEvent(new FeatureEvent("remote.connect." + getType(), null));
+	}
+
+	private void sendEvent(FeatureEvent featureEvent)
+	{
+		UsagePlugin plugin = UsagePlugin.getDefault();
+		if (plugin == null)
+		{
+			return;
+		}
+		IStudioAnalytics analytics = plugin.getStudioAnalytics();
+		if (analytics == null)
+		{
+			return;
+		}
+		analytics.sendEvent(featureEvent);
 	}
 
 	/*

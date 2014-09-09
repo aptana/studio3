@@ -37,6 +37,9 @@ import com.aptana.ide.syncing.core.SiteConnectionUtils;
 import com.aptana.ide.syncing.ui.dialogs.ChooseSiteConnectionDialog;
 import com.aptana.ide.syncing.ui.editors.EditorUtils;
 import com.aptana.ide.syncing.ui.internal.SyncUtils;
+import com.aptana.usage.AnalyticsEvent;
+import com.aptana.usage.IStudioAnalytics;
+import com.aptana.usage.UsagePlugin;
 
 /**
  * @author Michael Xia (mxia@aptana.com)
@@ -357,5 +360,20 @@ public abstract class BaseSyncAction implements IObjectActionDelegate, IViewActi
 			// remembers the last sync connection
 			ResourceSynchronizationUtils.setLastSyncConnection(container, site.getDestination().getName());
 		}
+	}
+
+	protected void sendEvent(AnalyticsEvent featureEvent)
+	{
+		UsagePlugin plugin = UsagePlugin.getDefault();
+		if (plugin == null)
+		{
+			return;
+		}
+		IStudioAnalytics analytics = plugin.getStudioAnalytics();
+		if (analytics == null)
+		{
+			return;
+		}
+		analytics.sendEvent(featureEvent);
 	}
 }

@@ -41,7 +41,8 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.events.ConnectionPointEvent;
 import com.aptana.ide.core.io.events.IConnectionPointListener;
 import com.aptana.usage.FeatureEvent;
-import com.aptana.usage.StudioAnalytics;
+import com.aptana.usage.IStudioAnalytics;
+import com.aptana.usage.UsagePlugin;
 
 /**
  * @author Max Stepanov
@@ -308,8 +309,23 @@ import com.aptana.usage.StudioAnalytics;
 			connections.add((ConnectionPoint) connectionPoint);
 			dirty = true;
 			broadcastEvent(new ConnectionPointEvent(this, ConnectionPointEvent.POST_ADD, connectionPoint));
-			StudioAnalytics.getInstance().sendEvent(new FeatureEvent("remote.new." + connectionPoint.getType(), null)); //$NON-NLS-1$
+			sendEvent(new FeatureEvent("remote.new." + connectionPoint.getType(), null)); //$NON-NLS-1$
 		}
+	}
+
+	private void sendEvent(FeatureEvent featureEvent)
+	{
+		UsagePlugin plugin = UsagePlugin.getDefault();
+		if (plugin == null)
+		{
+			return;
+		}
+		IStudioAnalytics analytics = plugin.getStudioAnalytics();
+		if (analytics == null)
+		{
+			return;
+		}
+		analytics.sendEvent(featureEvent);
 	}
 
 	/*
