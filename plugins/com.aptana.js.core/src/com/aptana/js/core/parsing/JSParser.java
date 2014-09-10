@@ -1858,7 +1858,7 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_e = _symbols[offset + 2];
 					final JSNode e = (JSNode) _symbol_e.value;
 					final Symbol _symbol_a = _symbols[offset + 3];
-					final JSNode a = (JSNode) _symbol_a.value;
+					final JSArgumentsNode a = (JSArgumentsNode) _symbol_a.value;
 					
 			return new JSConstructNode(e, a);
 			}
@@ -1887,7 +1887,7 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_e = _symbols[offset + 2];
 					final JSNode e = (JSNode) _symbol_e.value;
 					final Symbol _symbol_a = _symbols[offset + 3];
-					final JSNode a = (JSNode) _symbol_a.value;
+					final JSArgumentsNode a = (JSArgumentsNode) _symbol_a.value;
 					
 			return new JSConstructNode(e, a);
 			}
@@ -1910,7 +1910,7 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
 					final Symbol _symbol_r = _symbols[offset + 2];
-					final JSNode r = (JSNode) _symbol_r.value;
+					final JSArgumentsNode r = (JSArgumentsNode) _symbol_r.value;
 					
 			return new JSInvokeNode(l, r);
 			}
@@ -1919,7 +1919,7 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
 					final Symbol _symbol_r = _symbols[offset + 2];
-					final JSNode r = (JSNode) _symbol_r.value;
+					final JSArgumentsNode r = (JSArgumentsNode) _symbol_r.value;
 					
 			return new JSInvokeNode(l, r);
 			}
@@ -1948,7 +1948,7 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
 					final Symbol _symbol_r = _symbols[offset + 2];
-					final JSNode r = (JSNode) _symbol_r.value;
+					final JSArgumentsNode r = (JSArgumentsNode) _symbol_r.value;
 					
 			return new JSInvokeNode(l, r);
 			}
@@ -1957,7 +1957,7 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
 					final Symbol _symbol_r = _symbols[offset + 2];
-					final JSNode r = (JSNode) _symbol_r.value;
+					final JSArgumentsNode r = (JSArgumentsNode) _symbol_r.value;
 					
 			return new JSInvokeNode(l, r);
 			}

@@ -7,18 +7,18 @@
  */
 package com.aptana.js.core.parsing.ast;
 
-import com.aptana.parsing.ast.IParseNode;
 
 public class JSInvokeNode extends JSNode
 {
 	/**
 	 * JSInvokeNode
 	 * 
-	 * @param children
+	 * @param expression
+	 * @param args
 	 */
-	public JSInvokeNode(JSNode... children)
+	public JSInvokeNode(JSNode expression, JSArgumentsNode args)
 	{
-		super(IJSNodeTypes.INVOKE, children);
+		super(IJSNodeTypes.INVOKE, expression, args);
 	}
 
 	/*
@@ -36,9 +36,9 @@ public class JSInvokeNode extends JSNode
 	 * 
 	 * @return
 	 */
-	public IParseNode getArguments()
+	public JSArgumentsNode getArguments()
 	{
-		return this.getChild(1);
+		return (JSArgumentsNode) this.getChild(1);
 	}
 
 	/**
@@ -46,8 +46,8 @@ public class JSInvokeNode extends JSNode
 	 * 
 	 * @return
 	 */
-	public IParseNode getExpression()
+	public JSNode getExpression()
 	{
-		return this.getChild(0);
+		return (JSNode) this.getChild(0);
 	}
 }
