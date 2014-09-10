@@ -59,8 +59,9 @@ import com.aptana.index.core.IndexPlugin;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.Theme;
 import com.aptana.theme.ThemePlugin;
+import com.aptana.usage.AnalyticsEvent;
 import com.aptana.usage.FeatureEvent;
-import com.aptana.usage.StudioAnalytics;
+import com.aptana.usage.IStudioAnalytics;
 import com.aptana.usage.UsagePlugin;
 import com.aptana.usage.preferences.IPreferenceConstants;
 
@@ -114,9 +115,23 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 				{
 					payload.put("uid", UID); //$NON-NLS-1$
 				}
-				StudioAnalytics.getInstance()
-						.sendEvent(new FeatureEvent("editor.closed" + getLastSegment(id), payload)); //$NON-NLS-1$
+				sendEvent(new FeatureEvent("editor.closed" + getLastSegment(id), payload)); //$NON-NLS-1$
 			}
+		}
+
+		private void sendEvent(AnalyticsEvent featureEvent)
+		{
+			UsagePlugin plugin = UsagePlugin.getDefault();
+			if (plugin == null)
+			{
+				return;
+			}
+			IStudioAnalytics analytics = plugin.getStudioAnalytics();
+			if (analytics == null)
+			{
+				return;
+			}
+			analytics.sendEvent(featureEvent);
 		}
 
 		public void partDeactivated(IWorkbenchPart part)
@@ -135,8 +150,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 				{
 					payload.put("uid", UID); //$NON-NLS-1$
 				}
-				StudioAnalytics.getInstance()
-						.sendEvent(new FeatureEvent("editor.opened" + getLastSegment(id), payload)); //$NON-NLS-1$
+				sendEvent(new FeatureEvent("editor.opened" + getLastSegment(id), payload)); //$NON-NLS-1$
 			}
 		}
 

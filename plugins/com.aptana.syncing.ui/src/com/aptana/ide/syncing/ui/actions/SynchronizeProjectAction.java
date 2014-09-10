@@ -28,7 +28,6 @@ import com.aptana.ide.syncing.ui.internal.SyncUtils;
 import com.aptana.ide.syncing.ui.old.views.SmartSyncDialog;
 import com.aptana.ui.util.UIUtils;
 import com.aptana.usage.FeatureEvent;
-import com.aptana.usage.StudioAnalytics;
 
 public class SynchronizeProjectAction extends BaseSyncAction
 {
@@ -78,8 +77,7 @@ public class SynchronizeProjectAction extends BaseSyncAction
 				{
 					Map<String, String> payload = new HashMap<String, String>(2);
 					payload.put("sourceType", site.getSource().getType()); //$NON-NLS-1$}
-					StudioAnalytics.getInstance().sendEvent(
-							new FeatureEvent("remote.sync." + site.getDestination().getType(), payload)); //$NON-NLS-1$}
+					sendEvent(new FeatureEvent("remote.sync." + site.getDestination().getType(), payload)); //$NON-NLS-1$}
 				}
 			}
 		});

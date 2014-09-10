@@ -17,26 +17,6 @@ import com.aptana.usage.internal.AnalyticsHandlersManager;
 public class StudioAnalytics implements IStudioAnalytics
 {
 
-	/**
-	 * @deprecated Use {@link UsagePlugin#getStudioAnalytics()}
-	 * @return
-	 */
-	public static IStudioAnalytics getInstance()
-	{
-		UsagePlugin plugin = UsagePlugin.getDefault();
-		if (plugin == null)
-		{
-			return new IStudioAnalytics()
-			{
-				public void sendEvent(AnalyticsEvent event)
-				{
-					// do nothing. We're shutting down. Unfortunately that means this event will get dropped.
-				}
-			};
-		}
-		return plugin.getStudioAnalytics();
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.usage.IStudioAnalytics#sendEvent(com.aptana.usage.AnalyticsEvent)

@@ -32,7 +32,7 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.usage.AnalyticsEvent;
 import com.aptana.usage.AnalyticsInfo;
 import com.aptana.usage.FeatureEvent;
-import com.aptana.usage.StudioAnalytics;
+import com.aptana.usage.IStudioAnalytics;
 import com.aptana.usage.UsagePlugin;
 import com.aptana.usage.preferences.IPreferenceConstants;
 
@@ -88,7 +88,7 @@ public class SendPingJob extends Job
 	{
 		if (!EclipseUtil.isTesting())
 		{
-			StudioAnalytics.getInstance().sendEvent(new AnalyticsEvent(STUDIO_START, STUDIO_START, null));
+			sendEvent(new AnalyticsEvent(STUDIO_START, STUDIO_START, null));
 		}
 	}
 
@@ -111,7 +111,7 @@ public class SendPingJob extends Job
 					"mid", CorePlugin.getMID()); //$NON-NLS-1$
 				// @formatter:on
 
-				StudioAnalytics.getInstance().sendEvent(new AnalyticsEvent(STUDIO_ENROLL, STUDIO_ENROLL, payload));
+				sendEvent(new AnalyticsEvent(STUDIO_ENROLL, STUDIO_ENROLL, payload));
 			}
 
 			IEclipsePreferences store = scope.getNode(UsagePlugin.PLUGIN_ID);
@@ -129,6 +129,21 @@ public class SendPingJob extends Job
 		return false;
 	}
 
+	private static void sendEvent(AnalyticsEvent featureEvent)
+	{
+		UsagePlugin plugin = UsagePlugin.getDefault();
+		if (plugin == null)
+		{
+			return;
+		}
+		IStudioAnalytics analytics = plugin.getStudioAnalytics();
+		if (analytics == null)
+		{
+			return;
+		}
+		analytics.sendEvent(featureEvent);
+	}
+
 	// Send a first-run ping if it is the first time this instance of Studio is launched
 	private boolean sendFirstRunEvent()
 	{
@@ -142,7 +157,7 @@ public class SendPingJob extends Job
 					IPreferenceConstants.P_IDE_HAS_RUN, false, new IScopeContext[] { scope });
 			if (!hasRun)
 			{
-				StudioAnalytics.getInstance().sendEvent(new AnalyticsEvent(STUDIO_FIRST_RUN, STUDIO_FIRST_RUN, null));
+				sendEvent(new AnalyticsEvent(STUDIO_FIRST_RUN, STUDIO_FIRST_RUN, null));
 
 				IEclipsePreferences store = scope.getNode(UsagePlugin.PLUGIN_ID);
 				store.putBoolean(IPreferenceConstants.P_IDE_HAS_RUN, true);
@@ -194,7 +209,7 @@ public class SendPingJob extends Job
 	private static void sendProjectDeleteEvent(IProject project, String projectType)
 	{
 		Map<String, String> payload = CollectionsUtil.newMap("name", project.getName()); //$NON-NLS-1$
-		StudioAnalytics.getInstance().sendEvent(new FeatureEvent("project.delete." + projectType, payload)); //$NON-NLS-1$
+		sendEvent(new FeatureEvent("project.delete." + projectType, payload)); //$NON-NLS-1$
 	}
 
 	public void shutdown()
@@ -209,7 +224,7 @@ public class SendPingJob extends Job
 		// Send ping when we exit studio
 		if (!EclipseUtil.isTesting())
 		{
-			StudioAnalytics.getInstance().sendEvent(new AnalyticsEvent(STUDIO_END, STUDIO_END, null));
+			sendEvent(new AnalyticsEvent(STUDIO_END, STUDIO_END, null));
 		}
 	}
 }
