@@ -90,20 +90,6 @@ public interface ISourceMap extends IExecutableExtension
 	ISourceMapResult getOriginalMapping(IResource resource, int lineNumber) throws Exception;
 
 	/**
-	 * Returns an {@link ISourceMapResult} that represents the location of the original code. Note that in case the
-	 * original file name in the result is the same as the generated file name, there is no mapping, and the returned
-	 * value will be <code>null</code>.
-	 * 
-	 * @param lineNumber
-	 *            1-based line number
-	 * @param columnNumber
-	 *            1-based column number
-	 * @return An {@link ISourceMapResult}; <code>null</code> if there is no mapping.
-	 * @see #getOriginalMapping(IResource, int, int)
-	 */
-	ISourceMapResult getOriginalMapping(int lineNumber, int columnNumber);
-
-	/**
 	 * Initializes the source map with an {@link IResource} that will be used to locate the map file and returns an
 	 * {@link ISourceMapResult} that represents the location of the generated code.The file path in the generated result
 	 * will have a value only when the {@link #getGeneratedLocationPrefix()} returns a non-empty/null value.
