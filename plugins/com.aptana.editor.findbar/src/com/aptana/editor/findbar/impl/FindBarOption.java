@@ -219,9 +219,18 @@ abstract class FindBarOption extends SelectionAdapter implements SelectionListen
 		{
 			public void widgetSelected(SelectionEvent e)
 			{
-				if (isCheckable() && !StringUtil.isEmpty(preferencesKey))
+				if (isCheckable())
 				{
-					FindBarDecorator.findBarConfiguration.toggle(preferencesKey);
+					if (!StringUtil.isEmpty(preferencesKey))
+					{
+						FindBarDecorator.findBarConfiguration.toggle(preferencesKey);
+					}
+					// Search Selection is a checkable but does not store the selection
+					// in the preferences
+					else
+					{
+						toolItem.setSelection(!(toolItem.getSelection()));
+					}
 				}
 				else
 				{
