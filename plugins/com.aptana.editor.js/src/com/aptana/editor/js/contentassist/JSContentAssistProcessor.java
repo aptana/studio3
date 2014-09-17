@@ -710,7 +710,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		Collection<PropertyElement> properties = getQueryHelper().getTypeMembers(allTypes);
 		URI projectURI = getProjectURI();
 		for (PropertyElement property : CollectionsUtil.filter(properties, new AndFilter<PropertyElement>(
-				isNotConstructorFilter, isVisibleFilter, isInstance ? isInstanceFilter : isStaticFilter)))
+				isNotConstructorFilter, isVisibleFilter)))
 		{
 			addProposal(proposals, property, offset, projectURI, null);
 		}
