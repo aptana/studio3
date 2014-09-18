@@ -1,0 +1,7 @@
+@import url("platform:/plugin/com.aptana.theme/css/dashboard.css");
+
+/* Win specific */
+.MPartStack {
+	font-size: 11;
+	font-family: 'Segoe UI';
+}

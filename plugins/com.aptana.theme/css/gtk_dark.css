@@ -1,0 +1,6 @@
+@import url("platform:/plugin/com.aptana.theme/css/dark.css");
+
+/* GTK specific */
+.MPartStack {
+	font-size: 12;
+}
