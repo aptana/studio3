@@ -60,8 +60,11 @@ public class NodeJSService implements INodeJSService
 	private static final String PROGRAM_FILES_X86_NODEJS_NODE_PATH = "%ProgramFiles(x86)%\\nodejs"; //$NON-NLS-1$
 	private static final String PROGRAM_FILES_NODEJS_NODE_PATH = "%PROGRAMFILES%\\nodejs"; //$NON-NLS-1$
 	private static final String USR_LOCAL_BIN_NODE = "/usr/local/bin"; //$NON-NLS-1$
+	private static final String REGISTRY_PATH_NODE_JS = "HKEY_CURRENT_USER\\Software\\Node.js"; //$NON-NLS-1$
+	private static final String REG_NODEJS_INSTALL_KEY = "InstallPath"; //$NON-NLS-1$
 
 	private static final String NODE_EXE = "node.exe"; //$NON-NLS-1$
+	private static final String NPM_EXE = "npm.cmd"; //$NON-NLS-1$
 
 	private static final String MAC_NODE_URL = "http://go.appcelerator.com/installer_nodejs_osx"; //$NON-NLS-1$
 	private static final String WIN_NODE_URL = "http://go.appcelerator.com/installer_nodejs_windows"; //$NON-NLS-1$
@@ -81,6 +84,39 @@ public class NodeJSService implements INodeJSService
 		fNodeExePath = findValidExecutable();
 	}
 
+	private boolean isNpmInstalled()
+	{
+		IPath path = null;
+		if (PlatformUtil.isWindows())
+		{
+			// Look in the registry!
+			String installedPath = PlatformUtil.queryRegistryStringValue(REGISTRY_PATH_NODE_JS, REG_NODEJS_INSTALL_KEY);
+			if (!StringUtil.isEmpty(installedPath))
+			{
+				IPath regPath = Path.fromOSString(installedPath).append(NPM_EXE);
+				if (regPath.toFile().exists())
+				{
+					return true;
+				}
+			}
+
+			// Look on the PATH and in standard locations
+			path = ExecutableUtil.find(NPM_EXE, false, CollectionsUtil.newList(
+					Path.fromOSString(PlatformUtil.expandEnvironmentStrings(PROGRAM_FILES_NODEJS_NODE_PATH)),
+					Path.fromOSString(PlatformUtil.expandEnvironmentStrings(PROGRAM_FILES_X86_NODEJS_NODE_PATH))));
+		}
+		else
+		{
+			path = ExecutableUtil.find(NPM, false, CollectionsUtil.newList(Path.fromOSString(USR_LOCAL_BIN_NODE)));
+		}
+
+		if (path != null && path.toFile().exists())
+		{
+			return true;
+		}
+		return false;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.appcelerator.titanium.nodejs.core.INodeJSService#find()
@@ -91,8 +127,7 @@ public class NodeJSService implements INodeJSService
 		if (PlatformUtil.isWindows())
 		{
 			// Look in the registry!
-			String installedPath = PlatformUtil.queryRegistryStringValue("HKEY_CURRENT_USER\\Software\\Node.js", //$NON-NLS-1$
-					"InstallPath"); //$NON-NLS-1$
+			String installedPath = PlatformUtil.queryRegistryStringValue(REGISTRY_PATH_NODE_JS, REG_NODEJS_INSTALL_KEY);
 			if (!StringUtil.isEmpty(installedPath))
 			{
 				IPath regPath = Path.fromOSString(installedPath).append(NODE_EXE);
@@ -313,6 +348,12 @@ public class NodeJSService implements INodeJSService
 
 	public boolean isInstalled()
 	{
+		// Do a quick check whether npm executable is available on the machine.
+		if (!isNpmInstalled())
+		{
+			return false;
+		}
+
 		INodeJS nodeExePath = getInstallFromPreferences();
 		if (nodeExePath != null && nodeExePath.exists())
 		{
