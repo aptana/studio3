@@ -28,6 +28,7 @@ public interface INodeJSService
 	public static final String LINUX_DOCS_URL = "http://go.appcelerator.com/Installing+Node.js"; //$NON-NLS-1$
 
 	public static final String NODE = "node"; //$NON-NLS-1$
+	public static final String NPM = "npm"; //$NON-NLS-1$
 
 	/**
 	 * Searches PATH find the node executable and return it. This is not guaranteed to be a valid version. Please check
