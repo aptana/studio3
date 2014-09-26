@@ -20,6 +20,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.NotEnabledException;
 import org.eclipse.core.commands.NotHandledException;
 import org.eclipse.core.commands.ParameterizedCommand;
+import org.eclipse.core.commands.contexts.Context;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.ui.services.EContextService;
@@ -48,6 +49,7 @@ import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.findbar.FindBarPlugin;
@@ -651,6 +653,15 @@ public class FindBarActions
 				editorContextIds.clear();
 				for (String contextId : contextIds)
 				{
+					Context ctxt = contextService.getContext(contextId);
+					if (!ctxt.isDefined())
+					{
+						// Dynamically define context!
+						ctxt.define("Dynamic context: " + contextId, null, /* ScriptingActivator.EDITOR_CONTEXT_ID */
+								"com.aptana.editor.context");
+						IdeLog.logInfo(FindBarPlugin.getDefault(), "Dynamically generated context: " + contextId);
+					}
+
 					editorContextIds.add(contextId);
 					contextService.activateContext(contextId);
 				}

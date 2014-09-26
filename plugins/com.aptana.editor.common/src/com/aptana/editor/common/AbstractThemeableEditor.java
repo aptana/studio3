@@ -345,8 +345,10 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		fSelectionChangedListener.install(getSelectionProvider());
 		fThemeListener = new PropertyChangeListener();
 		ThemePlugin.getDefault().getPreferenceStore().addPropertyChangeListener(fThemeListener);
+
+		String partId = getEditorSite().getId();
 		this.fThemeableEditorFindBarExtension.activateContexts(new String[] { ScriptingActivator.EDITOR_CONTEXT_ID,
-				ScriptingUIPlugin.SCRIPTING_CONTEXT_ID });
+				ScriptingUIPlugin.SCRIPTING_CONTEXT_ID, partId + ".context" }); //$NON-NLS-1$
 
 		if (isWordWrapEnabled())
 		{
