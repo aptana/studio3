@@ -1,0 +1,7 @@
+#-*- mode: ruby -*-
+
+gemspec
+
+gem 'virtus'
+
+# vim: syntax=Ruby
