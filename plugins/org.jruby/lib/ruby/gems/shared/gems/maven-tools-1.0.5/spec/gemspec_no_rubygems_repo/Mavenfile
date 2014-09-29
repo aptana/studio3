@@ -1,0 +1,5 @@
+#-*- mode: ruby -*-
+
+gemspec :no_rubygems_repo => true
+
+# vim: syntax=Ruby

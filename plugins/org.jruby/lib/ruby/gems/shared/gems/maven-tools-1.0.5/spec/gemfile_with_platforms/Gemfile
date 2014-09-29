@@ -1,0 +1,17 @@
+#-*- mode: ruby -*-
+
+platforms :ruby, :mri_18 do
+  gem 'rspec',        '2.13.0'
+end
+
+platforms :jruby do
+  gem 'cucumber',        '2.13.0'
+end
+
+gem 'copyright-header', '1.0.3', :platform => [:mri_19, :mri_20]
+
+gem 'minitest', '0.5.3', :platform => :ruby
+
+gem 'virtus', '1.0.2', :platforms => :jruby
+
+# vim: syntax=Ruby

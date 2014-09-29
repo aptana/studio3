@@ -17,6 +17,14 @@
       </editor>
    </extension>
    <extension
+         point="org.eclipse.ui.contexts">
+      <context
+            id="com.aptana.editor.js.context"
+            name="JS Editor"
+            parentId="com.aptana.editor.context">
+      </context>
+   </extension>
+   <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
             class="com.aptana.editor.js.preferences.PreferenceInitializer">
@@ -57,7 +65,7 @@
       </key>
       <key
             commandId="com.aptana.editor.js.openDeclaration"
-            contextId="com.aptana.scripting.context"
+            contextId="com.aptana.editor.js.context"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="F3">
       </key>

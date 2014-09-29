@@ -1,0 +1,15 @@
+---
+name: virtus
+namespace:
+  - 'Virtus::Attribute'
+  - 'Virtus::AttributeSet'
+  - 'Virtus::Builder'
+  - 'Virtus::ClassInclusions'
+  - 'Virtus::ClassMethods'
+  - 'Virtus::Configuration'
+  - 'Virtus::ConstMissingExtensions'
+  - 'Virtus::Extensions'
+  - 'Virtus::InstanceMethods'
+  - 'Virtus::Model'
+  - 'Virtus::ModuleExtensions'
+  - 'Virtus::ValueObject'

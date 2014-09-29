@@ -73,6 +73,12 @@ public class ScriptingEngine
 		// ScriptingContainer result = new ScriptingContainer(scope, LocalVariableBehavior.PERSISTENT);
 		ScriptingContainer result = new ScriptingContainer(scope, LocalVariableBehavior.TRANSIENT);
 
+		// Fix for: APSTUD-4508 Rubles don't appear to load correctly when Aptana Studio is in a directory with foreign
+		// characters.
+		// This makes the jruby posix implementation use a java-only implementation which does handle unicode characters
+		// properly when on windows.
+		result.getProvider().getRubyInstanceConfig().setNativeEnabled(false);
+
 		try
 		{
 			File jrubyHome = null;
