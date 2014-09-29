@@ -1,0 +1,5 @@
+#-*- mode: ruby -*-
+
+gemfile :include_jars => true
+
+# vim: syntax=Ruby

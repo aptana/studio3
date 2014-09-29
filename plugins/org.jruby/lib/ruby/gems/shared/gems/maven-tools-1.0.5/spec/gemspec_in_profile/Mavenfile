@@ -1,0 +1,7 @@
+#-*- mode: ruby -*-
+
+profile :gem do
+  gemspec
+end
+
+# vim: syntax=Ruby

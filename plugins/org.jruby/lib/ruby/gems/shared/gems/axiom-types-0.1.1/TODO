@@ -1,0 +1,19 @@
+TODO
+----
+
+* Add finite limits to all "primitive" types.
+
+* Add optional constraint on Date for the timezone
+* Add optional constraint on DateTime for the timezone
+* Add optional constraint on Time for the timezone
+* Add optional regexp constraint to String
+  * format /\A[a-z]+\z/
+* Add optional allowed characters constraint to String
+  * allowed_characters 'a', 'b', 'c'
+  * allowed_characters 'a'..'c'
+  * allowed_characters 'a'..'c', 'e', 'f', 'g', 'i'
+  * allowed_characters 'a'..'c', 'e'..'g', 'i'
+
+* When axiom-logic is available, replace the Proc based constraints with real
+  predicates so that they can be serialized into SQL or optimized, etc.
+  * Can be performed as part of type finalization

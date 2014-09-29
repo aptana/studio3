@@ -1,0 +1,116 @@
+---
+Attribute:
+  enabled: true
+  exclude:
+  - Axiom::Types::LengthComparable
+  - Axiom::Types::ValueComparable
+BooleanParameter:
+  enabled: true
+  exclude: []
+ClassVariable:
+  enabled: true
+  exclude: []
+ControlParameter:
+  enabled: true
+  exclude:
+  - Axiom::Types::Boolean#self.infer_from_primitive_class
+  - Axiom::Types::Collection#self.infer_from
+  - Axiom::Types::Infinity#<=>
+  - Axiom::Types::Object#self.infer_from_primitive_class
+  - Axiom::Types::Type#self.infer
+DataClump:
+  enabled: true
+  exclude: []
+  max_copies: 0
+  min_clump_size: 2
+DuplicateMethodCall:
+  enabled: true
+  exclude:
+  - Axiom::Types::Infinity#self.coerce
+  max_calls: 1
+  allow_calls: []
+FeatureEnvy:
+  enabled: true
+  exclude:
+    - Axiom::Types::Encodable#has_encoding
+IrresponsibleModule:
+  enabled: true
+  exclude: []
+LongParameterList:
+  enabled: true
+  exclude: []
+  max_params: 2
+  overrides:
+    initialize:
+      max_params: 3
+LongYieldList:
+  enabled: true
+  exclude: []
+  max_params: 2
+NestedIterators:
+  enabled: true
+  exclude:
+    - Axiom::Types::Hash#self.matches_key_and_value_types
+    - Axiom::Types::Collection#self.matches_member_type
+  max_allowed_nesting: 1
+  ignore_iterators: []
+NilCheck:
+  enabled: true
+  exclude:
+    - Axiom::Types::Type#self.constraint
+RepeatedConditional:
+  enabled: true
+  exclude:
+  - Axiom::Types::Infinity
+  max_ifs: 1
+TooManyInstanceVariables:
+  enabled: true
+  exclude: []
+  max_instance_variables: 1
+TooManyMethods:
+  enabled: true
+  exclude: []
+  max_methods: 4
+TooManyStatements:
+  enabled: true
+  exclude:
+    - each
+  max_statements: 5
+UncommunicativeMethodName:
+  enabled: true
+  exclude: []
+  reject:
+  - !ruby/regexp /^[a-z]$/
+  - !ruby/regexp /[0-9]$/
+  - !ruby/regexp /[A-Z]/
+  accept: []
+UncommunicativeModuleName:
+  enabled: true
+  exclude: []
+  reject:
+  - !ruby/regexp /^.$/
+  - !ruby/regexp /[0-9]$/
+  accept: []
+UncommunicativeParameterName:
+  enabled: true
+  exclude: []
+  reject:
+  - !ruby/regexp /^.$/
+  - !ruby/regexp /[0-9]$/
+  - !ruby/regexp /[A-Z]/
+  accept: []
+UncommunicativeVariableName:
+  enabled: true
+  exclude: []
+  reject:
+  - !ruby/regexp /^.$/
+  - !ruby/regexp /[0-9]$/
+  - !ruby/regexp /[A-Z]/
+  accept: []
+UnusedParameters:
+  enabled: true
+  exclude: []
+UtilityFunction:
+  enabled: true
+  exclude: []
+  max_helper_calls: 0

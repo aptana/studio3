@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (c) 2012 to original author or authors
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License v1.0
+    which accompanies this distribution, and is available at
+    http://www.eclipse.org/legal/epl-v10.html
+
+-->
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>no_group_id_given</groupId>
+  <artifactId>pom_with_execute</artifactId>
+  <version>0.0.0</version>
+  <name>example with execute</name>
+  <properties>
+    <tesla.version>0.1.1</tesla.version>
+  </properties>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>io.tesla.polyglot</groupId>
+        <artifactId>tesla-polyglot-maven-plugin</artifactId>
+        <version>${tesla.version}</version>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <goals>
+              <goal>execute</goal>
+            </goals>
+            <configuration>
+              <nativePom>pom.rb</nativePom>
+            </configuration>
+          </execution>
+          <execution>
+            <id>second</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>execute</goal>
+            </goals>
+            <configuration>
+              <taskId>second</taskId>
+              <nativePom>pom.rb</nativePom>
+            </configuration>
+          </execution>
+          <execution>
+            <id>third</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>execute</goal>
+            </goals>
+            <configuration>
+              <taskId>third</taskId>
+              <nativePom>pom.rb</nativePom>
+            </configuration>
+          </execution>
+          <execution>
+            <id>forth</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>execute</goal>
+            </goals>
+            <configuration>
+              <taskId>forth</taskId>
+              <nativePom>pom.rb</nativePom>
+            </configuration>
+          </execution>
+          <execution>
+            <id>fifth</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>execute</goal>
+            </goals>
+            <configuration>
+              <taskId>fifth</taskId>
+              <nativePom>pom.rb</nativePom>
+            </configuration>
+          </execution>
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>io.tesla.polyglot</groupId>
+            <artifactId>tesla-polyglot-ruby</artifactId>
+            <version>${tesla.version}</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+    </plugins>
+  </build>
+</project>

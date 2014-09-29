@@ -1,0 +1,13 @@
+help
+
+jar 'asd:asd' do
+ help
+ exclusions 'asd:asd' do help; end
+ exclusion do help; end
+end
+
+pom 'asd:asd' do 
+  help
+end
+
+jruby do help; end
