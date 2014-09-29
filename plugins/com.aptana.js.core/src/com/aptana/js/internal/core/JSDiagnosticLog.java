@@ -82,7 +82,6 @@ public class JSDiagnosticLog implements IDiagnosticLog
 			{
 				// Shouldn't happen so long as we guarded to enforce NPM exists.
 			}
-
 		}
 		return buf.toString();
 	}
@@ -101,5 +100,4 @@ public class JSDiagnosticLog implements IDiagnosticLog
 		}
 		return listOutput;
 	}
-
 }

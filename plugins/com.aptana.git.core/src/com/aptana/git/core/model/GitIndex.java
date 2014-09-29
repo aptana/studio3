@@ -900,7 +900,6 @@ public class GitIndex
 											path.toOSString(), workingDirectory().toOSString()));
 					continue;
 				}
-
 				List<String> fileStatus = entry.getValue();
 
 				ChangedFile.Status status = ChangedFile.Status.MODIFIED;

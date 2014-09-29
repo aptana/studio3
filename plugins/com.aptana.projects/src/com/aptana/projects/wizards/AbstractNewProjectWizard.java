@@ -370,6 +370,7 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 			{
 				getContainer().run(true, true, new IRunnableWithProgress()
 				{
+
 					public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
 					{
 						doCreateProject(monitor);

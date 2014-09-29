@@ -27,7 +27,6 @@ public class StudioAnalytics implements IStudioAnalytics
 		{
 			return;
 		}
-
 		// Cascade the event to all the registered handlers.
 		Set<IAnalyticsEventHandler> handlers = AnalyticsHandlersManager.getInstance().getHandlers();
 		for (IAnalyticsEventHandler handler : handlers)

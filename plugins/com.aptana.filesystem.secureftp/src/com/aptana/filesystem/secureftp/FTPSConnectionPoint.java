@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.Platform;
 
 import com.aptana.core.epl.IMemento;
 import com.aptana.core.io.vfs.IConnectionFileManager;
+import com.aptana.core.util.StringUtil;
 import com.aptana.filesystem.secureftp.internal.FTPSConnectionFileManager;
 import com.aptana.ide.core.io.ConnectionContext;
 import com.aptana.ide.core.io.ConnectionPoint;

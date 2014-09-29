@@ -53,6 +53,7 @@ import com.aptana.parsing.util.ParseUtil;
 
 public class HTMLParser extends AbstractParser
 {
+
 	private static final String ATTR_TYPE = "type"; //$NON-NLS-1$
 	private static final String ATTR_LANG = "language"; //$NON-NLS-1$
 

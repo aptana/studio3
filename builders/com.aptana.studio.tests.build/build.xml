@@ -172,7 +172,6 @@
 	<!-- Runs unit tests. Typically assumes build was already called. May be called without build if we're using pre-built unit test repo (like in nightly) -->
 	<target name="test" depends="generate.build.properties,copy.base.windows,copy.base">
 		<antcall target="-pre-test" />
-
 		<if>
 			<isset property="instrument.code" />
 			<then>
@@ -228,7 +227,6 @@
 				<echo message="No UI test suite specified" />
 			</else>
 		</if>
-
 		<antcall target="-post-test" />
 	</target>
 
