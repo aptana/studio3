@@ -121,7 +121,7 @@ module Ruble
       end
 
       def []=(scope, array)
-        array.each do |file_type|
+        [array].flatten.each do |file_type|
           @jobj.associateFileType(file_type.to_s)
           @jobj.associateScope(file_type.to_s, scope.to_s.gsub(/_/, '.'))
         end
