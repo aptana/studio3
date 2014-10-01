@@ -50,7 +50,6 @@ import com.aptana.editor.js.text.JSFlexLexemeProvider;
 import com.aptana.index.core.Index;
 import com.aptana.js.core.IJSConstants;
 import com.aptana.js.core.JSLanguageConstants;
-import com.aptana.js.core.JSTypeConstants;
 import com.aptana.js.core.index.IJSIndexConstants;
 import com.aptana.js.core.index.JSIndexQueryHelper;
 import com.aptana.js.core.inferencing.JSNodeTypeInferrer;
@@ -182,6 +181,25 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				return true;
 			}
 			return !((FunctionElement) item).isConstructor();
+		}
+	};
+
+	/**
+	 * Filters out property elements that do not have associated file as current editor file
+	 */
+	private final IFilter<PropertyElement> isNotAssociatedFilter = new IFilter<PropertyElement>()
+	{
+		public boolean include(PropertyElement item)
+		{
+			// If the associated file was set for this property
+			// in the index we will compare it else we will pass it
+			// on to the next filter
+			if (!StringUtil.isEmpty(item.getAssociatedFile()))
+			{
+				return (item.getAssociatedFile().equals(getURI().getPath()));
+			}
+
+			return true;
 		}
 	};
 
@@ -731,7 +749,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		Collection<PropertyElement> properties = getQueryHelper().getTypeMembers(allTypes);
 		URI projectURI = getProjectURI();
 		for (PropertyElement property : CollectionsUtil.filter(properties, new AndFilter<PropertyElement>(
-				isNotConstructorFilter, isVisibleFilter, isInstance ? isInstanceFilter : isStaticFilter)))
+				isNotConstructorFilter, isVisibleFilter, isNotAssociatedFilter, isInstance ? isInstanceFilter
+						: isStaticFilter)))
 		{
 			addProposal(proposals, property, offset, projectURI, null);
 		}
