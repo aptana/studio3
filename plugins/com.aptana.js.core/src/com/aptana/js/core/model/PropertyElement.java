@@ -29,7 +29,6 @@ public class PropertyElement extends BaseElement implements IHasPredefinedValues
 	private static final String IS_INSTANCE_PROPERTY = "isInstanceProperty"; //$NON-NLS-1$
 	private static final String IS_CLASS_PROPERTY = "isClassProperty"; //$NON-NLS-1$
 	private static final String OWNING_TYPE_PROPERTY = "owningType"; //$NON-NLS-1$
-	private static final String ASSOCIATED_FILE_PROPERTY = "associatedFile"; //$NON-NLS-1$
 
 	private String _owningType;
 	private boolean _isInstanceProperty;
@@ -38,7 +37,6 @@ public class PropertyElement extends BaseElement implements IHasPredefinedValues
 	private List<ReturnTypeElement> _types;
 	private List<String> _examples;
 	private List<String> _constants;
-	private String _associatedFile;
 
 	/**
 	 * PropertyElement
@@ -62,7 +60,6 @@ public class PropertyElement extends BaseElement implements IHasPredefinedValues
 		this._types = new ArrayList<ReturnTypeElement>(base.getTypes());
 		this._examples = new ArrayList<String>(base.getExamples());
 		this._constants = new ArrayList<String>(base.getConstants());
-		this._associatedFile = base.getAssociatedFile();
 	}
 
 	/**
@@ -162,7 +159,6 @@ public class PropertyElement extends BaseElement implements IHasPredefinedValues
 		super.fromJSON(object);
 
 		this.setOwningType(StringUtil.getStringValue(object.get(OWNING_TYPE_PROPERTY)));
-		this.setAssociatedFile(StringUtil.getStringValue(object.get(ASSOCIATED_FILE_PROPERTY)));
 		this.setIsClassProperty(Boolean.TRUE == object.get(IS_CLASS_PROPERTY)); // $codepro.audit.disable useEquals
 		this.setIsInstanceProperty(Boolean.TRUE == object.get(IS_INSTANCE_PROPERTY)); // $codepro.audit.disable
 																						// useEquals
@@ -299,26 +295,6 @@ public class PropertyElement extends BaseElement implements IHasPredefinedValues
 		this._owningType = type;
 	}
 
-	/**
-	 * get associated controller file
-	 * 
-	 * @return
-	 */
-	public String getAssociatedFile()
-	{
-		return StringUtil.getStringValue(this._associatedFile);
-	}
-
-	/**
-	 * set associated controller file
-	 * 
-	 * @param type
-	 */
-	public void setAssociatedFile(String controller)
-	{
-		this._associatedFile = controller;
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.contentassist.model.BaseElement#toJSON(com.aptana.jetty.util.epl.ajax.JSON.Output)
@@ -329,7 +305,6 @@ public class PropertyElement extends BaseElement implements IHasPredefinedValues
 		super.toJSON(out);
 
 		out.add(OWNING_TYPE_PROPERTY, this.getOwningType());
-		out.add(ASSOCIATED_FILE_PROPERTY, this.getAssociatedFile());
 		out.add(IS_CLASS_PROPERTY, this.isClassProperty());
 		out.add(IS_INSTANCE_PROPERTY, this.isInstanceProperty());
 		out.add(IS_INTERNAL_PROPERTY, this.isInternal());

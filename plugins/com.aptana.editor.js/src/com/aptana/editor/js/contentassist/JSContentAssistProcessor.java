@@ -19,6 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -52,6 +53,7 @@ import com.aptana.js.core.IJSConstants;
 import com.aptana.js.core.JSLanguageConstants;
 import com.aptana.js.core.index.IJSIndexConstants;
 import com.aptana.js.core.index.JSIndexQueryHelper;
+import com.aptana.js.core.inferencing.AliasResolverFactory;
 import com.aptana.js.core.inferencing.JSNodeTypeInferrer;
 import com.aptana.js.core.inferencing.JSPropertyCollection;
 import com.aptana.js.core.inferencing.JSScope;
@@ -181,25 +183,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				return true;
 			}
 			return !((FunctionElement) item).isConstructor();
-		}
-	};
-
-	/**
-	 * Filters out property elements that do not have associated file as current editor file
-	 */
-	private final IFilter<PropertyElement> isNotAssociatedFilter = new IFilter<PropertyElement>()
-	{
-		public boolean include(PropertyElement item)
-		{
-			// If the associated file was set for this property
-			// in the index we will compare it else we will pass it
-			// on to the next filter
-			if (!StringUtil.isEmpty(item.getAssociatedFile()))
-			{
-				return (item.getAssociatedFile().equals(getURI().getPath()));
-			}
-
-			return true;
 		}
 	};
 
@@ -341,6 +324,17 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		{
 			addTypeProperties(proposals, type, offset, isInstance);
 		}
+	}
+
+	private List<String> resolveTypeAliases(List<String> types)
+	{
+		List<String> aliasTypes = new ArrayList<String>();
+		for (String srcType : types)
+		{
+			aliasTypes.add(AliasResolverFactory.getInstance().resolve(srcType, URIUtil.toPath(getURI()),
+					URIUtil.toPath(getProjectURI())));
+		}
+		return aliasTypes;
 	}
 
 	private boolean isInstance(JSGetPropertyNode node)
@@ -749,8 +743,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		Collection<PropertyElement> properties = getQueryHelper().getTypeMembers(allTypes);
 		URI projectURI = getProjectURI();
 		for (PropertyElement property : CollectionsUtil.filter(properties, new AndFilter<PropertyElement>(
-				isNotConstructorFilter, isVisibleFilter, isNotAssociatedFilter, isInstance ? isInstanceFilter
-						: isStaticFilter)))
+				isNotConstructorFilter, isVisibleFilter, isInstance ? isInstanceFilter : isStaticFilter)))
 		{
 			addProposal(proposals, property, offset, projectURI, null);
 		}
@@ -1410,7 +1403,9 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	protected List<String> getParentObjectTypes(JSGetPropertyNode node, int offset)
 	{
-		return ParseUtil.getReceiverTypeNames(getQueryHelper(), getIndex(), getURI(), targetNode, node, offset);
+		List<String> types = ParseUtil.getReceiverTypeNames(getQueryHelper(), getIndex(), getURI(), targetNode, node,
+				offset);
+		return resolveTypeAliases(types);
 	}
 
 	/*
