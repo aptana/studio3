@@ -145,7 +145,7 @@ public abstract class InstallerConfigurationProcessor extends AbstractConfigurat
 		}
 		Map<String, String> appVersionMap = new HashMap<String, String>();
 		Version version = VersionUtil.parseVersion(versionedFileLocation);
-		if (version != null)
+		if (!VersionUtil.isEmpty(version))
 		{
 			appVersionMap.put(IPortalPreferences.CACHED_VERSION_PROPERTY, version.toString());
 			appVersionMap.put(IPortalPreferences.CACHED_LOCATION_PROPERTY, installDir);

@@ -29,13 +29,11 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.progress.UIJob;
-import org.osgi.framework.Version;
 
 import com.aptana.configurations.processor.ConfigurationStatus;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
-import com.aptana.core.util.VersionUtil;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.configurationProcessors.installer.JavaScriptImporterOptionsDialog;
 
@@ -60,33 +58,6 @@ public class JavaScriptLibraryInstallProcessor extends InstallerConfigurationPro
 	protected String getApplicationName()
 	{
 		return libraryName;
-	}
-
-	/**
-	 * Returns the library's version.<br>
-	 * The version extraction will begin by trying to find a version in the library name. If failed, this call will try
-	 * to locate a version pattern in the download URLs. And if that fails, the method returns null.
-	 * 
-	 * @return The library's version; Null, if none is found.
-	 */
-	protected Version getLibraryVersion()
-	{
-		Version version = VersionUtil.parseVersion(getApplicationName());
-		if (version == null)
-		{
-			for (String url : this.urls)
-			{
-				if (version == null)
-				{
-					version = VersionUtil.parseVersion(url);
-				}
-				else
-				{
-					break;
-				}
-			}
-		}
-		return version;
 	}
 
 	/**

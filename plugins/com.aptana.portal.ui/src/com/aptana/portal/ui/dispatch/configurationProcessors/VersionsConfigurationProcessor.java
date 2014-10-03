@@ -103,7 +103,7 @@ public class VersionsConfigurationProcessor extends AbstractConfigurationProcess
 			if (commandResult != null)
 			{
 				Version version = VersionUtil.parseVersion(commandResult.toString());
-				if (version != null)
+				if (!VersionUtil.isEmpty(version))
 				{
 					Version minVersion = VersionUtil.parseVersion(attrItems.get(app));
 					String compatibility = (version.compareTo(minVersion) >= 0) ? COMPATIBILITY_OK
