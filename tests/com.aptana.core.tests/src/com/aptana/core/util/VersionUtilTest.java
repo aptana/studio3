@@ -203,4 +203,16 @@ public class VersionUtilTest
 		assertFalse("Expected incompatible versions",
 				VersionUtil.isCompatibleVersions(new String[] { "1.0" }, new String[] { "(1.0, 2.0)" }));
 	}
+
+	@Test
+	public void testVersionsWithHyphen()
+	{
+		assertTrue(VersionUtil.compareVersionsWithHyphen("1-rc", "1-rc2") < 0);
+		assertTrue(VersionUtil.compareVersionsWithHyphen("1-rc2", "1-rc3") < 0);
+		assertTrue(VersionUtil.compareVersionsWithHyphen("1-rc2", "1-rc2") == 0);
+		assertTrue(VersionUtil.compareVersionsWithHyphen("1-rc2", "1") < 0);
+		assertTrue(VersionUtil.compareVersionsWithHyphen("2-rc2", "1") > 0);
+		assertTrue(VersionUtil.compareVersionsWithHyphen("1-rc", "0-rc2") > 0);
+		assertTrue(VersionUtil.compareVersionsWithHyphen("1", "0-rc3") > 0);
+	}
 }
