@@ -458,11 +458,6 @@ public class GitExecutable
 	public Version version()
 	{
 		String versionString = GitExecutable.versionForPath(gitPath);
-		if (versionString == null)
-		{
-			return Version.emptyVersion;
-		}
-
 		try
 		{
 			return VersionUtil.parseVersion(versionString);

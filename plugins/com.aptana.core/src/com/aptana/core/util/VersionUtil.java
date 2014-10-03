@@ -200,10 +200,15 @@ public final class VersionUtil
 	 * Parse the raw output and return a {@link Version} instance out of it.
 	 * 
 	 * @param rawOutput
-	 * @return A {@link Version} instance. Null if the output did not contain a parseable version number.
+	 * @return A {@link Version} instance. {@link Version#emptyVersion} if the output did not contain a parseable
+	 *         version number.
 	 */
 	public static Version parseVersion(String rawOutput)
 	{
+		if (StringUtil.isEmpty(rawOutput))
+		{
+			return Version.emptyVersion;
+		}
 		Pattern pattern = Pattern.compile(VERSION_SPLIT_PATTERN);
 		Matcher matcher = pattern.matcher(rawOutput);
 		if (matcher.find())
@@ -250,7 +255,7 @@ public final class VersionUtil
 				IdeLog.logError(CorePlugin.getDefault(), "Error parsing the version string - " + version, iae); //$NON-NLS-1$
 			}
 		}
-		return null;
+		return Version.emptyVersion;
 	}
 
 	/**
@@ -280,15 +285,8 @@ public final class VersionUtil
 		{
 			try
 			{
-				Version version = getVersion(installedVer);
-				if (version != null)
-				{
-					installed.put(installedVer, version);
-				}
-				else
-				{
-					installed.put(installedVer, Version.emptyVersion);
-				}
+				Version version = parseVersion(installedVer);
+				installed.put(installedVer, version);
 			}
 			catch (Exception e)
 			{
@@ -404,15 +402,22 @@ public final class VersionUtil
 	}
 
 	/**
-	 * Extract a Version out of a given version string. We are looking for a pattern that will match a version in a form
-	 * of a.b.c (or less).
+	 * Returns true is version object is null or is {@link Version#emptyVersion}
 	 * 
-	 * @param installedVer
-	 * @return The 'synthesized' version of the given version string; <code>null</code> if no version was detected.
+	 * @param version
+	 * @return
 	 */
-	public static Version getVersion(String version)
+	public static boolean isEmpty(Version version)
 	{
-		return VersionUtil.parseVersion(version);
+		if (version == null)
+		{
+			return true;
+		}
+		if (version.equals(Version.emptyVersion))
+		{
+			return true;
+		}
+		return false;
 	}
 
 }
