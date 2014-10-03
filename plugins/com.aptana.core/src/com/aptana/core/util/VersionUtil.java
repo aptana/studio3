@@ -150,34 +150,50 @@ public final class VersionUtil
 	 * @param right
 	 * @return
 	 */
-	private static int compareVersionsWithHyphen(String left, String right)
+	static int compareVersionsWithHyphen(String left, String right)
 	{
 		boolean hasLeftHyphen = false, hasRightHyphen = false;
 		int hyphenIndex = left.indexOf('-');
+		String leftPreHyphen = left, leftPostHyphen = null;
 		if (hyphenIndex > -1)
 		{
 			hasLeftHyphen = true;
-			left = left.substring(0, hyphenIndex);
+			leftPreHyphen = left.substring(0, hyphenIndex);
+			leftPostHyphen = left.substring(hyphenIndex + 1, left.length());
 		}
 		hyphenIndex = right.indexOf('-');
+		String rightPreHyphen = right, rightPostHyphen = null;
 		if (hyphenIndex > -1)
 		{
 			hasRightHyphen = true;
-			right = right.substring(0, hyphenIndex);
+			rightPreHyphen = right.substring(0, hyphenIndex);
+			rightPostHyphen = right.substring(hyphenIndex + 1, right.length());
+		}
+		// If both the version doesn't have hyphen, then just compare them.
+		if (!hasLeftHyphen && !hasRightHyphen)
+		{
+			return left.compareTo(right);
 		}
 		// No need to check based on hyphen in version identifier if either both or none of them have hyphen.
-		if (left.equals(right) && hasLeftHyphen != hasRightHyphen)
+		if (leftPreHyphen.equals(rightPreHyphen))
 		{
-			if (hasLeftHyphen) // 1-cr < 1
+			if (hasLeftHyphen != hasRightHyphen)
 			{
-				return -1;
+				if (hasLeftHyphen) // 1-cr < 1
+				{
+					return -1;
+				}
+				else if (hasRightHyphen) // 1 > 1-cr
+				{
+					return 1;
+				}
 			}
-			else if (hasRightHyphen) // 1 > 1-cr
+			else
 			{
-				return 1;
+				return leftPostHyphen.compareTo(rightPostHyphen);
 			}
 		}
-		return left.compareTo(right);
+		return leftPreHyphen.compareTo(rightPreHyphen);
 	}
 
 	/**
