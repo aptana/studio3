@@ -686,6 +686,13 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		else
 		{
 			// Scope says it doesn't has a symbol with that name, so query the globals in index
+			// Let us ask the Alias resolver factory to resolve the alias name for this name in
+			// case it so exists
+			if (getProject() != null)
+			{
+				name = AliasResolverFactory.getInstance().resolve(name,
+						org.eclipse.core.filesystem.URIUtil.toPath(_location), getProject().getLocation());
+			}
 			properties = this._queryHelper.getGlobals(getFileName(), name);
 		}
 

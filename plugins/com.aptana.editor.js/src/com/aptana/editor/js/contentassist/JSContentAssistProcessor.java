@@ -1403,9 +1403,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	protected List<String> getParentObjectTypes(JSGetPropertyNode node, int offset)
 	{
-		List<String> types = ParseUtil.getReceiverTypeNames(getQueryHelper(), getIndex(), getURI(), targetNode, node,
-				offset);
-		return resolveTypeAliases(types);
+		return ParseUtil.getReceiverTypeNames(getQueryHelper(), getIndex(), getURI(), targetNode, node, offset);
 	}
 
 	/*
