@@ -19,7 +19,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -53,7 +52,6 @@ import com.aptana.js.core.IJSConstants;
 import com.aptana.js.core.JSLanguageConstants;
 import com.aptana.js.core.index.IJSIndexConstants;
 import com.aptana.js.core.index.JSIndexQueryHelper;
-import com.aptana.js.core.inferencing.AliasResolverFactory;
 import com.aptana.js.core.inferencing.JSNodeTypeInferrer;
 import com.aptana.js.core.inferencing.JSPropertyCollection;
 import com.aptana.js.core.inferencing.JSScope;
@@ -324,17 +322,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		{
 			addTypeProperties(proposals, type, offset, isInstance);
 		}
-	}
-
-	private List<String> resolveTypeAliases(List<String> types)
-	{
-		List<String> aliasTypes = new ArrayList<String>();
-		for (String srcType : types)
-		{
-			aliasTypes.add(AliasResolverFactory.getInstance().resolve(srcType, URIUtil.toPath(getURI()),
-					URIUtil.toPath(getProjectURI())));
-		}
-		return aliasTypes;
 	}
 
 	private boolean isInstance(JSGetPropertyNode node)
