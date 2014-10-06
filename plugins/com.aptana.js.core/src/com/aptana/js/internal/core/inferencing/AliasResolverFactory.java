@@ -5,7 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.js.core.inferencing;
+package com.aptana.js.internal.core.inferencing;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,12 +17,11 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
 
 import com.aptana.core.IFilter;
-import com.aptana.core.IMap;
-import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.js.core.JSCorePlugin;
+import com.aptana.js.core.inferencing.IAliasResolver;
 
 public class AliasResolverFactory
 {
@@ -31,20 +30,9 @@ public class AliasResolverFactory
 	private final String ELEMENT_PRIORITY = "priority";//$NON-NLS-1$
 	private final String ELEMENT_CLASS = "class";//$NON-NLS-1$
 
-	private static AliasResolverFactory INSTANCE;
-	private List<IAliasResolver> fgProxies;
+	private List<ResolverProxy> fProxies = null;
 
-	public synchronized static AliasResolverFactory getInstance()
-	{
-		if (INSTANCE == null)
-		{
-			INSTANCE = new AliasResolverFactory();
-		}
-
-		return INSTANCE;
-	}
-
-	private AliasResolverFactory()
+	public AliasResolverFactory()
 	{
 	}
 
@@ -53,18 +41,18 @@ public class AliasResolverFactory
 	 * 
 	 * @return
 	 */
-	private synchronized List<IAliasResolver> getResolvers()
+	private synchronized List<ResolverProxy> getResolverProxies()
 	{
-		if (fgProxies == null)
+		if (fProxies == null)
 		{
-			final ArrayList<ResolverProxy> proxies = new ArrayList<ResolverProxy>();
+			fProxies = new ArrayList<ResolverProxy>();
 			EclipseUtil.processConfigurationElements(JSCorePlugin.PLUGIN_ID, EXTENSION_POINT, //$NON-NLS-1$
 					new IConfigurationElementProcessor()
 					{
 
 						public void processElement(IConfigurationElement element)
 						{
-							proxies.add(new ResolverProxy(element));
+							fProxies.add(new ResolverProxy(element));
 						}
 
 						public Set<String> getSupportElementNames()
@@ -73,25 +61,9 @@ public class AliasResolverFactory
 						}
 					});
 
-			Collections.sort(proxies);
-			fgProxies = CollectionsUtil.map(proxies, new IMap<ResolverProxy, IAliasResolver>()
-			{
-
-				public IAliasResolver map(ResolverProxy item)
-				{
-					try
-					{
-						return item.getResolver();
-					}
-					catch (CoreException e)
-					{
-						IdeLog.logError(JSCorePlugin.getDefault(), e);
-						return null;
-					}
-				}
-			});
+			Collections.sort(fProxies);
 		}
-		return fgProxies;
+		return fProxies;
 	}
 
 	/**
@@ -104,9 +76,9 @@ public class AliasResolverFactory
 	 */
 	public String resolve(final String sourceType, final IPath editorPath, final IPath projectPath)
 	{
-		List<IAliasResolver> resolvers = CollectionsUtil.filter(getResolvers(), new IFilter<IAliasResolver>()
+		List<ResolverProxy> proxies = CollectionsUtil.filter(getResolverProxies(), new IFilter<ResolverProxy>()
 		{
-			public boolean include(IAliasResolver item)
+			public boolean include(ResolverProxy item)
 			{
 				return item != null;
 			}
@@ -114,13 +86,25 @@ public class AliasResolverFactory
 
 		// Go through all resolvers that apply
 		// First one to give us a non-null result wins!
-		for (IAliasResolver resolver : resolvers)
+		for (ResolverProxy resolverProxy : proxies)
 		{
-			String destinationType = resolver.resolve(sourceType, editorPath, projectPath);
-			if (destinationType != null)
+			// Get the resolver from the proxy
+			IAliasResolver resolver;
+			try
 			{
-				return destinationType;
+				resolver = resolverProxy.getResolver();
+				String destinationType = resolver.resolve(sourceType, editorPath, projectPath);
+				if (destinationType != null)
+				{
+					return destinationType;
+				}
 			}
+			catch (CoreException e)
+			{
+				e.printStackTrace();
+				continue;
+			}
+
 		}
 		return null;
 	}
@@ -129,6 +113,7 @@ public class AliasResolverFactory
 	{
 		private IConfigurationElement ice;
 		private int priority;
+		private IAliasResolver resolver;
 
 		ResolverProxy(IConfigurationElement ice)
 		{
@@ -139,7 +124,11 @@ public class AliasResolverFactory
 
 		IAliasResolver getResolver() throws CoreException
 		{
-			return (IAliasResolver) ice.createExecutableExtension(ELEMENT_CLASS); //$NON-NLS-1$
+			if (resolver == null)
+			{
+				resolver = (IAliasResolver) ice.createExecutableExtension(ELEMENT_CLASS); //$NON-NLS-1$
+			}
+			return resolver;
 		}
 
 		synchronized int getPriority()

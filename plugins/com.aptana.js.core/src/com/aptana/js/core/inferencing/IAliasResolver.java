@@ -12,7 +12,8 @@ import org.eclipse.core.runtime.IPath;
 public interface IAliasResolver
 {
 	/**
-	 * Resolves a destination type for a source type in the current editor path
+	 * Resolves a destination type for a source type in the current editor path. If the editor path or project path are
+	 * null then the destination type is resolved as the source type
 	 * 
 	 * @param sourceType
 	 * @return resolved Type
