@@ -61,7 +61,6 @@ import com.aptana.js.core.parsing.ast.JSReturnNode;
 import com.aptana.js.core.parsing.ast.JSStringNode;
 import com.aptana.js.core.parsing.ast.JSTreeWalker;
 import com.aptana.js.core.parsing.ast.JSTrueNode;
-import com.aptana.js.internal.core.inferencing.AliasResolverFactory;
 import com.aptana.js.internal.core.inferencing.JSPropertyCollector;
 import com.aptana.js.internal.core.inferencing.JSSymbolTypeInferrer;
 import com.aptana.js.internal.core.parsing.sdoc.model.DocumentationBlock;
@@ -78,7 +77,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	private URI _location;
 	private List<String> _types;
 	private JSIndexQueryHelper _queryHelper;
-	private AliasResolverFactory _factory;
+	private IAliasResolver _factory;
 	private IPath _projectLocation;
 	/**
 	 * A monitor we use mostly to monitor cancellation, but also to report progress (though it's on an unknown/number of
@@ -109,7 +108,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		this._location = location;
 		this._queryHelper = queryHelper;
 		this._monitor = SubMonitor.convert(monitor, IProgressMonitor.UNKNOWN);
-		this._factory = JSCorePlugin.getDefault().getAliasResolverFactory();
+		this._factory = JSCorePlugin.getDefault().getAliasResolver();
 	}
 
 	/**

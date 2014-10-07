@@ -17,13 +17,18 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
 
 import com.aptana.core.IFilter;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.core.inferencing.IAliasResolver;
 
-public class AliasResolverFactory
+/**
+ * Delegates to registered extension {@link IAliasResolver}s. First one to return a non-null value wins. Ordered by
+ * priority.
+ */
+public class AliasResolverFactory implements IAliasResolver
 {
 	private final String EXTENSION_POINT = "aliasResolver";//$NON-NLS-1$
 	private final String ELEMENT_CONTRIBUTOR = "resolver";//$NON-NLS-1$
@@ -46,7 +51,7 @@ public class AliasResolverFactory
 		if (fProxies == null)
 		{
 			fProxies = new ArrayList<ResolverProxy>();
-			EclipseUtil.processConfigurationElements(JSCorePlugin.PLUGIN_ID, EXTENSION_POINT, //$NON-NLS-1$
+			EclipseUtil.processConfigurationElements(JSCorePlugin.PLUGIN_ID, EXTENSION_POINT,
 					new IConfigurationElementProcessor()
 					{
 
@@ -57,7 +62,7 @@ public class AliasResolverFactory
 
 						public Set<String> getSupportElementNames()
 						{
-							return CollectionsUtil.newSet(ELEMENT_CONTRIBUTOR); //$NON-NLS-1$
+							return CollectionsUtil.newSet(ELEMENT_CONTRIBUTOR);
 						}
 					});
 
@@ -89,10 +94,9 @@ public class AliasResolverFactory
 		for (ResolverProxy resolverProxy : proxies)
 		{
 			// Get the resolver from the proxy
-			IAliasResolver resolver;
 			try
 			{
-				resolver = resolverProxy.getResolver();
+				IAliasResolver resolver = resolverProxy.getResolver();
 				String destinationType = resolver.resolve(sourceType, editorPath, projectPath);
 				if (destinationType != null)
 				{
@@ -101,8 +105,7 @@ public class AliasResolverFactory
 			}
 			catch (CoreException e)
 			{
-				e.printStackTrace();
-				continue;
+				IdeLog.logError(JSCorePlugin.getDefault(), e);
 			}
 
 		}
@@ -126,7 +129,7 @@ public class AliasResolverFactory
 		{
 			if (resolver == null)
 			{
-				resolver = (IAliasResolver) ice.createExecutableExtension(ELEMENT_CLASS); //$NON-NLS-1$
+				resolver = (IAliasResolver) ice.createExecutableExtension(ELEMENT_CLASS);
 			}
 			return resolver;
 		}
@@ -137,7 +140,7 @@ public class AliasResolverFactory
 			{
 				try
 				{
-					String pri = ice.getAttribute(ELEMENT_PRIORITY); //$NON-NLS-1$
+					String pri = ice.getAttribute(ELEMENT_PRIORITY);
 					this.priority = Integer.parseInt(pri);
 				}
 				catch (Exception e)

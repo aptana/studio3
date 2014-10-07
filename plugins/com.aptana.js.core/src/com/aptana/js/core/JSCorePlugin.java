@@ -12,6 +12,7 @@ import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
 import org.osgi.util.tracker.ServiceTracker;
 
+import com.aptana.js.core.inferencing.IAliasResolver;
 import com.aptana.js.core.node.INodeJS;
 import com.aptana.js.core.node.INodeJSService;
 import com.aptana.js.core.node.INodePackageManager;
@@ -86,7 +87,7 @@ public class JSCorePlugin extends Plugin
 		return fNodeService;
 	}
 
-	public synchronized AliasResolverFactory getAliasResolverFactory()
+	public synchronized IAliasResolver getAliasResolver()
 	{
 		if (fAliasResolverFactory == null)
 		{
