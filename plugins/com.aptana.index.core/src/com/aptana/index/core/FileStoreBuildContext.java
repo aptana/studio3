@@ -13,6 +13,7 @@ import java.util.Collection;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Assert;
@@ -58,6 +59,10 @@ public class FileStoreBuildContext extends BuildContext
 	@Override
 	public IFile getFile()
 	{
+		if (getProject() != null)
+		{
+			return getProject().getWorkspace().getRoot().getFileForLocation(URIUtil.toPath(getURI()));
+		}
 		return null;
 	}
 

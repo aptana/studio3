@@ -50,7 +50,6 @@ import com.aptana.editor.js.text.JSFlexLexemeProvider;
 import com.aptana.index.core.Index;
 import com.aptana.js.core.IJSConstants;
 import com.aptana.js.core.JSLanguageConstants;
-import com.aptana.js.core.JSTypeConstants;
 import com.aptana.js.core.index.IJSIndexConstants;
 import com.aptana.js.core.index.JSIndexQueryHelper;
 import com.aptana.js.core.inferencing.JSNodeTypeInferrer;

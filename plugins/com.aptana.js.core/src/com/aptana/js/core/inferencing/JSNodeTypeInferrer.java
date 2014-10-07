@@ -29,6 +29,7 @@ import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.URIUtil;
 import com.aptana.index.core.Index;
+import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.core.JSLanguageConstants;
 import com.aptana.js.core.JSTypeConstants;
 import com.aptana.js.core.index.JSIndexQueryHelper;
@@ -60,6 +61,7 @@ import com.aptana.js.core.parsing.ast.JSReturnNode;
 import com.aptana.js.core.parsing.ast.JSStringNode;
 import com.aptana.js.core.parsing.ast.JSTreeWalker;
 import com.aptana.js.core.parsing.ast.JSTrueNode;
+import com.aptana.js.internal.core.inferencing.AliasResolverFactory;
 import com.aptana.js.internal.core.inferencing.JSPropertyCollector;
 import com.aptana.js.internal.core.inferencing.JSSymbolTypeInferrer;
 import com.aptana.js.internal.core.parsing.sdoc.model.DocumentationBlock;
@@ -76,6 +78,8 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	private URI _location;
 	private List<String> _types;
 	private JSIndexQueryHelper _queryHelper;
+	private AliasResolverFactory _factory;
+	private IPath _projectLocation;
 	/**
 	 * A monitor we use mostly to monitor cancellation, but also to report progress (though it's on an unknown/number of
 	 * units!)
@@ -105,6 +109,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		this._location = location;
 		this._queryHelper = queryHelper;
 		this._monitor = SubMonitor.convert(monitor, IProgressMonitor.UNKNOWN);
+		this._factory = JSCorePlugin.getDefault().getAliasResolverFactory();
 	}
 
 	/**
@@ -686,6 +691,19 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		else
 		{
 			// Scope says it doesn't has a symbol with that name, so query the globals in index
+			// Let us ask the Alias resolver factory to resolve the alias name for this name in
+			// case it so exists
+			if (_projectLocation == null)
+			{
+				if (getProject() != null)
+				{
+					_projectLocation = getProject().getLocation();
+				}
+			}
+			if (_projectLocation != null)
+			{
+				name = _factory.resolve(name, org.eclipse.core.filesystem.URIUtil.toPath(_location), _projectLocation);
+			}
 			properties = this._queryHelper.getGlobals(getFileName(), name);
 		}
 
