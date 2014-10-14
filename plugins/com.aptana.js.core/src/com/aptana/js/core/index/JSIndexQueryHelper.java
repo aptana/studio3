@@ -374,7 +374,7 @@ public class JSIndexQueryHelper
 			if (match != null)
 			{
 				// Now use the stored generated type name...
-				return match.getWord() + DOT_EXPORTS; //$NON-NLS-1$
+				return match.getWord() + DOT_EXPORTS;
 			}
 		}
 		return null;
