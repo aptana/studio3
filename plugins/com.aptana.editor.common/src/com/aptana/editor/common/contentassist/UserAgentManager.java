@@ -33,7 +33,6 @@ import com.aptana.core.IUserAgent;
 import com.aptana.core.IUserAgentManager;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ArrayUtil;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
@@ -179,22 +178,22 @@ public class UserAgentManager implements IUserAgentManager
 	 */
 	private String[] getActiveUserAgentIDs(Map<String, String[]> userAgents, String... natureIDs)
 	{
-		String[] result = ArrayUtil.NO_STRINGS;
-
 		if (!ArrayUtil.isEmpty(natureIDs))
 		{
-			// NOTE: Currently, we only care about the primary nature.
-			String natureID = natureIDs[0];
+			// NOTE: We now loop through the natures and find the first match. if no matches, return empty array.
 
-			result = userAgents.get(natureID);
-		}
-		else
-		{
-			IdeLog.logWarning(CommonEditorPlugin.getDefault(), "UserAgentManager - Got empty natures list", //$NON-NLS-1$
-					IDebugScopes.CONTENT_ASSIST);
+			for (String natureID : natureIDs)
+			{
+				if (userAgents.containsKey(natureID))
+				{
+					return userAgents.get(natureID);
+				}
+			}
 		}
 
-		return result;
+		IdeLog.logWarning(CommonEditorPlugin.getDefault(), "UserAgentManager - Got empty natures list", //$NON-NLS-1$
+				IDebugScopes.CONTENT_ASSIST);
+		return ArrayUtil.NO_STRINGS;
 	}
 
 	/**

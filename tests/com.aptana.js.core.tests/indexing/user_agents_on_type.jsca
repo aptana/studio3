@@ -1,0 +1,16 @@
+{
+	"types": [
+		{
+			"name": "Titanium",
+			"extends": "Something",
+			"userAgents": [
+                {
+                    "platform": "mobileweb"
+                }, 
+                {
+                    "platform": "tizen"
+                }
+            ]
+		}
+	]
+}

@@ -28,6 +28,7 @@ import com.aptana.js.core.model.EventElement;
 import com.aptana.js.core.model.FunctionElement;
 import com.aptana.js.core.model.PropertyElement;
 import com.aptana.js.core.model.TypeElement;
+import com.aptana.js.core.model.UserAgentElement;
 
 // TODO Combine with JSIndexQueryHelper! They're both doing the same thing, but Query helper adds the JS Core index in to calls!
 public class JSIndexReader extends IndexReader
@@ -140,6 +141,34 @@ public class JSIndexReader extends IndexReader
 		if (column < columns.length)
 		{
 			result.setIsDeprecated(columns[column].equals("1")); //$NON-NLS-1$
+		}
+		column++;
+
+		// isInternal
+		if (column < columns.length)
+		{
+			result.setIsInternal(columns[column].equals("1")); //$NON-NLS-1$
+		}
+		column++;
+
+		// user agents
+		if (column < columns.length)
+		{
+			String value = columns[column];
+			if (IJSIndexConstants.ALL_AGENTS.equals(value))
+			{
+				result.setHasAllUserAgents();
+			}
+			else
+			{
+				String[] agents = value.split(IJSIndexConstants.SUB_DELIMITER);
+				for (String agent : agents)
+				{
+					UserAgentElement uaElement = new UserAgentElement();
+					uaElement.setPlatform(agent);
+					result.addUserAgent(uaElement);
+				}
+			}
 		}
 		column++;
 
