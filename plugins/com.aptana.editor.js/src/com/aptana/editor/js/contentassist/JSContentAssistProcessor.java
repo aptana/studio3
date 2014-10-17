@@ -33,10 +33,13 @@ import org.eclipse.swt.graphics.Image;
 
 import beaver.Scanner;
 
+import com.aptana.buildpath.core.BuildPathManager;
+import com.aptana.buildpath.core.IBuildPathEntry;
 import com.aptana.core.IFilter;
 import com.aptana.core.util.AndFilter;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.core.util.VersionUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
@@ -88,6 +91,9 @@ import com.aptana.parsing.lexer.Range;
 
 public class JSContentAssistProcessor extends CommonContentAssistProcessor
 {
+	private static final String SDK_3_4_0 = "3.4.0.GA"; //$NON-NLS-1$
+	private static final String API_JSCA = "api.jsca"; //$NON-NLS-1$
+
 	/**
 	 * This class is used via {@link CollectionsUtil#filter(Collection, IFilter)} to remove duplicate proposals based on
 	 * display names. Duplicate proposals are merged into a single entry
@@ -729,11 +735,49 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		// add properties and methods
 		Collection<PropertyElement> properties = getQueryHelper().getTypeMembers(allTypes);
 		URI projectURI = getProjectURI();
-		for (PropertyElement property : CollectionsUtil.filter(properties, new AndFilter<PropertyElement>(
-				isNotConstructorFilter, isVisibleFilter, isInstance ? isInstanceFilter : isStaticFilter)))
+		List<IFilter<PropertyElement>> propertyFilters = CollectionsUtil.newList(isNotConstructorFilter,
+				isVisibleFilter);
+
+		// Hack for SDK < 3.4.1.GA. The api.jsca file has correctly categorized whether the methods are static or
+		// instance only from 3.4.1.GA SDK. So, we can filter out static/instance based on the type. If the SDK <=
+		// 3.4.0, then we shouldn't filter them at all.
+		IProject project = getProject();
+		if (!hasSDKLessThanOrEqualToVersion(project, SDK_3_4_0))
+		{
+			CollectionsUtil.addToList(propertyFilters, isInstance ? isInstanceFilter : isStaticFilter);
+		}
+		IFilter<PropertyElement>[] filters = propertyFilters.toArray(new IFilter[propertyFilters.size()]);
+		for (PropertyElement property : CollectionsUtil.filter(properties, new AndFilter<PropertyElement>(filters)))
 		{
 			addProposal(proposals, property, offset, projectURI, null);
 		}
+	}
+
+	protected boolean hasSDKLessThanOrEqualToVersion(IProject project, String sdkVersion)
+	{
+		Set<IBuildPathEntry> entries = getBuildPathManager().getBuildPaths(project);
+		for (IBuildPathEntry entry : entries)
+		{
+			URI indexPathUri = entry.getPath();
+			IPath indexPath = Path.fromOSString(indexPathUri.getPath());
+			String apiJSCA = indexPath.lastSegment();
+			if (!API_JSCA.equals(apiJSCA))
+			{
+				continue;
+			}
+			indexPath = indexPath.removeLastSegments(1);
+			String projectSdk = indexPath.lastSegment();
+			if (VersionUtil.compareVersions(sdkVersion, projectSdk) >= 0)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	protected BuildPathManager getBuildPathManager()
+	{
+		return BuildPathManager.getInstance();
 	}
 
 	/*

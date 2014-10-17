@@ -1,0 +1,117 @@
+{
+    "types": [
+        {
+            "name": "Titanium.UI", 
+            "inherits": "Titanium.Module", 
+            "description": "<p>The main Titanium.UI module.</p>", 
+            "properties": [
+                {
+                    "name": "KEYBOARD_ASCII", 
+                    "isInternal": false, 
+                    "permission": "read-only", 
+                    "deprecated": false, 
+                    "isInstanceProperty": false, 
+                    "examples": [], 
+                    "userAgents": [], 
+                    "type": "Number", 
+                    "isClassProperty": true, 
+                    "availability": "always", 
+                    "description": "<p>Use an ASCII keyboard, with the standard keyboard layout.</p>"
+                },
+                {
+                    "name": "backgroundColor", 
+                    "isInternal": false, 
+                    "permission": "read-write", 
+                    "deprecated": false, 
+                    "isInstanceProperty": true, 
+                    "examples": [], 
+                    "userAgents": [], 
+                    "type": "String", 
+                    "isClassProperty": false, 
+                    "availability": "always", 
+                    "description": "<p>Sets the background color of the master view (when there are no windows or other top-level \ncontrols displayed).</p>"
+                }
+            ],
+            "functions": [
+                {
+                    "name": "addEventListener", 
+                    "isInternal": false, 
+                    "parameters": [
+                        {
+                            "name": "name", 
+                            "usage": "required", 
+                            "type": "String", 
+                            "description": "<p>Name of the event.</p>"
+                        }, 
+                        {
+                            "name": "callback", 
+                            "usage": "required", 
+                            "type": "Function", 
+                            "description": "<p>Callback function to invoke when the event is fired.</p>"
+                        }
+                    ], 
+                    "userAgents": [],
+                    "isConstructor": false, 
+                    "isClassProperty": false, 
+                    "examples": [], 
+                    "deprecated": false, 
+                    "exceptions": [], 
+                    "references": [], 
+                    "isMethod": true, 
+                    "isInstanceProperty": true, 
+                    "description": "<p>Adds the specified callback as an event listener for the named event.</p>"
+                },
+                {
+                
+                    "name": "createButton", 
+                    "isInternal": false, 
+                    "parameters": [
+                        {
+                            "name": "parameters", 
+                            "usage": "optional", 
+                            "type": "Titanium.UI.Button", 
+                            "description": "<p>Properties to set on a new object, including any defined by Titanium.UI.Button except those marked not-creation or read-only.</p>"
+                        }
+                    ], 
+                    "deprecated": false, 
+                    "returnTypes": [
+                        {
+                            "type": "Titanium.UI.Button", 
+                            "description": ""
+                        }
+                    ], 
+                    "isConstructor": false, 
+                    "isClassProperty": false, 
+                    "examples": [], 
+                    "userAgents": [], 
+                    "exceptions": [], 
+                    "references": [], 
+                    "isMethod": true, 
+                    "isInstanceProperty": true, 
+                    "description": "<p>Creates and returns an instance of Titanium.UI.Button.</p>"
+                },
+                {
+                
+                    "name": "getCurrentTab", 
+                    "isInternal": false, 
+                    "userAgents": [], 
+                    "returnTypes": [
+                        {
+                            "type": "Titanium.UI.Tab", 
+                            "description": ""
+                        }
+                    ], 
+                    "isConstructor": false, 
+                    "isClassProperty": false, 
+                    "examples": [], 
+                    "deprecated": false, 
+                    "exceptions": [], 
+                    "references": [], 
+                    "isMethod": true, 
+                    "isInstanceProperty": true, 
+                    "description": "<p>Gets the value of the <a href=\"Titanium.UI.currentTab\">currentTab</a> property.</p>"
+                }
+            ]
+        }
+    ]
+}
