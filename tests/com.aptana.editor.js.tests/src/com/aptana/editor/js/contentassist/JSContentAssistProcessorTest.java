@@ -79,7 +79,7 @@ public class JSContentAssistProcessorTest extends JSEditorBasedTestCase
 			}
 
 			@Override
-			protected boolean hasSDKLesserThan3_4_1(IProject project)
+			protected boolean hasSDKLessThanOrEqualToVersion(IProject project, String sdk)
 			{
 				return LESS_THAN_3_4_SDK;
 			}
@@ -188,7 +188,7 @@ public class JSContentAssistProcessorTest extends JSEditorBasedTestCase
 				will(returnValue(new URI("/path/to/sdk/mobilesdk/linux/3.4.0.GA/api.jsca")));
 			}
 		});
-		assertTrue(processor.hasSDKLesserThan3_4_1(project));
+		assertTrue(processor.hasSDKLessThanOrEqualToVersion(project, "3.4.0.GA"));
 	}
 
 	@Test
@@ -220,7 +220,7 @@ public class JSContentAssistProcessorTest extends JSEditorBasedTestCase
 				will(returnValue(new URI("/path/to/sdk/mobilesdk/linux/3.4.1.GA/api.jsca")));
 			}
 		});
-		assertFalse(processor.hasSDKLesserThan3_4_1(project));
+		assertFalse(processor.hasSDKLessThanOrEqualToVersion(project, "3.4.0.GA"));
 	}
 
 	@Test

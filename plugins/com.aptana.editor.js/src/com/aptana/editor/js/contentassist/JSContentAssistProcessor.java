@@ -742,7 +742,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		// instance only from 3.4.1.GA SDK. So, we can filter out static/instance based on the type. If the SDK <=
 		// 3.4.0, then we shouldn't filter them at all.
 		IProject project = getProject();
-		if (!hasSDKLesserThan3_4_1(project))
+		if (!hasSDKLessThanOrEqualToVersion(project, SDK_3_4_0))
 		{
 			CollectionsUtil.addToList(propertyFilters, isInstance ? isInstanceFilter : isStaticFilter);
 		}
@@ -753,7 +753,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 	}
 
-	protected boolean hasSDKLesserThan3_4_1(IProject project)
+	protected boolean hasSDKLessThanOrEqualToVersion(IProject project, String sdkVersion)
 	{
 		Set<IBuildPathEntry> entries = getBuildPathManager().getBuildPaths(project);
 		for (IBuildPathEntry entry : entries)
@@ -766,8 +766,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				continue;
 			}
 			indexPath = indexPath.removeLastSegments(1);
-			String sdkVersion = indexPath.lastSegment();
-			if (VersionUtil.compareVersions(SDK_3_4_0, sdkVersion) >= 0)
+			String projectSdk = indexPath.lastSegment();
+			if (VersionUtil.compareVersions(sdkVersion, projectSdk) >= 0)
 			{
 				return true;
 			}
