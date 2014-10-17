@@ -263,6 +263,7 @@ public class NodeJSService implements INodeJSService
 			return new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, e.getMessage(), e);
 		}
 		sub.done();
+		fNodeExePath = findValidExecutable();
 		fireNodeJSInstalled();
 		return Status.OK_STATUS;
 	}

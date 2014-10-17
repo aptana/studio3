@@ -12,10 +12,12 @@ import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
 import org.osgi.util.tracker.ServiceTracker;
 
+import com.aptana.js.core.inferencing.IAliasResolver;
 import com.aptana.js.core.node.INodeJS;
 import com.aptana.js.core.node.INodeJSService;
 import com.aptana.js.core.node.INodePackageManager;
 import com.aptana.js.internal.core.index.JSMetadataLoader;
+import com.aptana.js.internal.core.inferencing.AliasResolverFactory;
 import com.aptana.js.internal.core.node.NodeJSService;
 
 /**
@@ -31,6 +33,8 @@ public class JSCorePlugin extends Plugin
 	private INodeJSService fNodeService;
 
 	private ServiceTracker proxyTracker;
+
+	private AliasResolverFactory fAliasResolverFactory;
 
 	/**
 	 * Returns the shared instance
@@ -68,6 +72,7 @@ public class JSCorePlugin extends Plugin
 		{
 			proxyTracker = null;
 			fNodeService = null;
+			fAliasResolverFactory = null;
 			PLUGIN = null;
 			super.stop(context);
 		}
@@ -80,6 +85,15 @@ public class JSCorePlugin extends Plugin
 			fNodeService = new NodeJSService();
 		}
 		return fNodeService;
+	}
+
+	public synchronized IAliasResolver getAliasResolver()
+	{
+		if (fAliasResolverFactory == null)
+		{
+			fAliasResolverFactory = new AliasResolverFactory();
+		}
+		return fAliasResolverFactory;
 	}
 
 	/**

@@ -13,13 +13,14 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
+import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
+import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.TextEditorAction;
 
 import com.aptana.core.util.ArrayUtil;
-import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.js.JSSourceEditor;
-import com.aptana.editor.js.hyperlink.JSHyperlinkDetector;
 
 /**
  * OpenDeclarationAction
@@ -49,13 +50,20 @@ public class OpenDeclarationAction extends TextEditorAction
 		{
 			ITextSelection selection = (ITextSelection) textEditor.getSelectionProvider().getSelection();
 			IRegion region = new Region(selection.getOffset(), 1);
-			JSHyperlinkDetector detector = new JSHyperlinkDetector();
-			IHyperlink[] hyperlinks = detector.detectHyperlinks((AbstractThemeableEditor) textEditor, region, true);
 
-			if (!ArrayUtil.isEmpty(hyperlinks))
+			JSSourceEditor jsse = (JSSourceEditor) textEditor;
+			SourceViewerConfiguration svc = jsse.getISourceViewerConfiguration();
+			ISourceViewer sourceViewer = jsse.getISourceViewer();
+			// TODO Force JSHyperlinkDetector first?
+			IHyperlinkDetector[] detectors = svc.getHyperlinkDetectors(sourceViewer);
+			for (IHyperlinkDetector detector : detectors)
 			{
-				// give first link highest precedence
-				hyperlinks[0].open();
+				IHyperlink[] hyperlinks = detector.detectHyperlinks(sourceViewer, region, true);
+				if (!ArrayUtil.isEmpty(hyperlinks))
+				{
+					// give first link highest precedence
+					hyperlinks[0].open();
+				}
 			}
 		}
 	}

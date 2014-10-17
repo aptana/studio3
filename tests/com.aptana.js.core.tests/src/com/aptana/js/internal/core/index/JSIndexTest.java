@@ -652,4 +652,103 @@ public class JSIndexTest
 		}
 	}
 
+	@Test
+	public void testRetainsUserAgentsOnTypes()
+	{
+		// create property
+		TypeElement type = new TypeElement();
+		type.setName("Testing");
+
+		// add a user agent
+		IUserAgentManager manager = CorePlugin.getDefault().getUserAgentManager();
+		IUserAgent agent = manager.getAllUserAgents()[0];
+		UserAgentElement uaElement = new UserAgentElement();
+		uaElement.setPlatform(agent.getName());
+		type.addUserAgent(uaElement);
+
+		// write type and its properties
+		JSIndexWriter writer = new JSIndexWriter();
+		writer.writeType(getIndex(), type);
+
+		// read property back again
+		JSIndexReader reader = new JSIndexReader();
+		List<TypeElement> types = reader.getType(getIndex(), type.getName(), false);
+
+		// make sure we reconstruct the type with the agent
+		assertNotNull(types);
+		assertEquals(1, types.size());
+		List<UserAgentElement> agents = types.get(0).getUserAgents();
+		assertEquals(1, agents.size());
+	}
+
+	@Test
+	public void testRetainsUserAgentsOnTypesWhenSetToAll()
+	{
+		// create property
+		TypeElement type = new TypeElement();
+		type.setName("Testing");
+
+		type.setHasAllUserAgents();
+
+		// write type and its properties
+		JSIndexWriter writer = new JSIndexWriter();
+		writer.writeType(getIndex(), type);
+
+		// read property back again
+		JSIndexReader reader = new JSIndexReader();
+		List<TypeElement> types = reader.getType(getIndex(), type.getName(), false);
+
+		// make sure we reconstruct the type with the agent
+		assertNotNull(types);
+		assertEquals(1, types.size());
+		assertTrue(types.get(0).hasAllUserAgents());
+	}
+
+	@Test
+	public void testRetainsDeprecatedFlagOnTypes()
+	{
+		// create property
+		TypeElement type = new TypeElement();
+		type.setName("Testing");
+
+		// set deprecated
+		type.setIsDeprecated(true);
+
+		// write type and its properties
+		JSIndexWriter writer = new JSIndexWriter();
+		writer.writeType(getIndex(), type);
+
+		// read property back again
+		JSIndexReader reader = new JSIndexReader();
+		List<TypeElement> types = reader.getType(getIndex(), type.getName(), false);
+
+		// make sure we reconstruct the type with deprected set
+		assertNotNull(types);
+		assertEquals(1, types.size());
+		assertTrue(types.get(0).isDeprecated());
+	}
+
+	@Test
+	public void testRetainsInternalFlagOnTypes()
+	{
+		// create property
+		TypeElement type = new TypeElement();
+		type.setName("Testing");
+
+		// set internal
+		type.setIsInternal(true);
+
+		// write type and its properties
+		JSIndexWriter writer = new JSIndexWriter();
+		writer.writeType(getIndex(), type);
+
+		// read property back again
+		JSIndexReader reader = new JSIndexReader();
+		List<TypeElement> types = reader.getType(getIndex(), type.getName(), false);
+
+		// make sure we reconstruct the type with inetrnal set
+		assertNotNull(types);
+		assertEquals(1, types.size());
+		assertTrue(types.get(0).isInternal());
+	}
 }

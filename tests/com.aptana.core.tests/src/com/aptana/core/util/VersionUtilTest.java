@@ -25,6 +25,36 @@ public class VersionUtilTest
 	}
 
 	@Test
+	public void testParseVersionNull()
+	{
+		assertVersion(0, 0, 0, "", VersionUtil.parseVersion(null));
+	}
+
+	@Test
+	public void testParseVersionEmpty()
+	{
+		assertVersion(0, 0, 0, "", VersionUtil.parseVersion(""));
+	}
+
+	@Test
+	public void testIsEmptyNull()
+	{
+		assertTrue(VersionUtil.isEmpty(null));
+	}
+
+	@Test
+	public void testIsEmptyVersionEmptyVersion()
+	{
+		assertTrue(VersionUtil.isEmpty(Version.emptyVersion));
+	}
+
+	@Test
+	public void testIsEmpty()
+	{
+		assertFalse(VersionUtil.isEmpty(new Version(1, 0, 0)));
+	}
+
+	@Test
 	public void testParseVersionWithMajorMinorMicro()
 	{
 		assertVersion(3, 0, 24, VersionUtil.parseVersion("3.0.24"));
@@ -202,5 +232,17 @@ public class VersionUtilTest
 				VersionUtil.isCompatibleVersions(new String[] { "1.0" }, new String[] { "[1.0, 2.0)", "3\\.0" }));
 		assertFalse("Expected incompatible versions",
 				VersionUtil.isCompatibleVersions(new String[] { "1.0" }, new String[] { "(1.0, 2.0)" }));
+	}
+
+	@Test
+	public void testVersionsWithHyphen()
+	{
+		assertTrue(VersionUtil.compareVersionsWithHyphen("1-rc", "1-rc2") < 0);
+		assertTrue(VersionUtil.compareVersionsWithHyphen("1-rc2", "1-rc3") < 0);
+		assertTrue(VersionUtil.compareVersionsWithHyphen("1-rc2", "1-rc2") == 0);
+		assertTrue(VersionUtil.compareVersionsWithHyphen("1-rc2", "1") < 0);
+		assertTrue(VersionUtil.compareVersionsWithHyphen("2-rc2", "1") > 0);
+		assertTrue(VersionUtil.compareVersionsWithHyphen("1-rc", "0-rc2") > 0);
+		assertTrue(VersionUtil.compareVersionsWithHyphen("1", "0-rc3") > 0);
 	}
 }

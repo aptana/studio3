@@ -3,6 +3,7 @@
 <plugin>
    <extension-point id="typeMaps" name="%extension-point.typemaps.name" schema="schema/typeMaps.exsd"/>
    <extension-point id="requireResolvers" name="%extension-point.requireResolvers.name" schema="schema/requireResolvers.exsd"/>
+   <extension-point id="aliasResolver" name="%extension-point.aliasResolver.name" schema="schema/aliasResolver.exsd"/>
    <extension
          point="org.eclipse.core.contenttype.contentTypes">
       <content-type

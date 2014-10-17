@@ -190,7 +190,9 @@ public class JSIndexWriter extends IndexWriter
 				type.getName(),
 				parentType,
 				type.getDescription(),
-				type.isDeprecated() ? '1' : '0'
+				type.isDeprecated() ? '1' : '0',
+				type.isInternal() ? '1' : '0',
+				type.hasAllUserAgents() ? IJSIndexConstants.ALL_AGENTS : StringUtil.join(IJSIndexConstants.SUB_DELIMITER, type.getUserAgentNames())
 			);
 			// @formatter:on
 

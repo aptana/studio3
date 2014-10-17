@@ -287,6 +287,17 @@ public class StringUtil
 	}
 
 	/**
+	 * Computes the camel case of a string eg converts abC to Abc
+	 * 
+	 * @param string
+	 * @return
+	 */
+	public static String getCamelCase(String string)
+	{
+		return (string != null) ? Character.toUpperCase(string.charAt(0)) + string.substring(1).toLowerCase() : null;
+	}
+
+	/**
 	 * Create a string by concatenating the elements of a collection using a delimiter between each item
 	 * 
 	 * @param delimiter
