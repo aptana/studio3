@@ -513,14 +513,14 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @return
 	 */
-	ILexemeProvider<XMLTokenType> createLexemeProvider(IDocument document, int offset)
+	protected ILexemeProvider<XMLTokenType> createLexemeProvider(IDocument document, int offset)
 	{
 		int documentLength = document.getLength();
 
 		// account for last position returning an empty IDocument default partition
 		int lexemeProviderOffset = (offset >= documentLength) ? documentLength - 1 : offset;
 
-		return new XMLLexemeProvider(document, lexemeProviderOffset, new XMLTagScanner()
+		return new XMLLexemeProvider(document, lexemeProviderOffset, 0, new XMLTagScanner()
 		{
 			@Override
 			protected IToken createToken(XMLTokenType type)
