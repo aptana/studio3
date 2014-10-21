@@ -513,7 +513,7 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @return
 	 */
-	ILexemeProvider<XMLTokenType> createLexemeProvider(IDocument document, int offset)
+	protected ILexemeProvider<XMLTokenType> createLexemeProvider(IDocument document, int offset)
 	{
 		int documentLength = document.getLength();
 

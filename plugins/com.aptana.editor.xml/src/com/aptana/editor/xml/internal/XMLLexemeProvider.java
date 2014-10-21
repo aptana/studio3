@@ -41,7 +41,7 @@ public class XMLLexemeProvider extends LexemeProvider<XMLTokenType>
 	 */
 	public XMLLexemeProvider(IDocument document, int offset, ITokenScanner scanner)
 	{
-		super(document, offset, scanner);
+		super(document, offset, 0, scanner);
 	}
 
 	/**
