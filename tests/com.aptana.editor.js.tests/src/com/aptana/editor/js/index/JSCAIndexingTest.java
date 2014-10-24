@@ -272,6 +272,17 @@ public class JSCAIndexingTest extends JSEditorBasedTestCase
 		assertUserAgents(p.getUserAgentNames(), "android", "iphone", "ipad", "mobileweb");
 	}
 
+	@Test
+	public void testTypeUserAgentsOnType() throws CoreException
+	{
+		Index index = indexResource("metadata/userAgentOnType.jsca");
+
+		assertTypeInIndex(index, "Titanium.API");
+
+		TypeElement t = assertTypeInIndex(index, "Titanium.API", true);
+		assertUserAgents(t.getUserAgentNames(), "android", "iphone", "ipad", "mobileweb");
+	}
+
 	/**
 	 * Test for TISTUD-5989
 	 * 

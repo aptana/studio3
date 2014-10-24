@@ -38,6 +38,7 @@ public class JSConstructNode extends JSNode
 	 */
 	public IParseNode getArguments()
 	{
+		// FIXME This is either a JSArgumentsNode or JSEmptyNode
 		return this.getChild(1);
 	}
 

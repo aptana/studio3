@@ -11,10 +11,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFolder;
@@ -39,7 +37,6 @@ import org.eclipse.ui.statushandlers.StatusManager;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.IDebugScopes;
 import com.aptana.git.core.IPreferenceConstants;
@@ -47,7 +44,6 @@ import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.internal.sharing.ConnectProviderOperation;
 import com.aptana.git.ui.internal.wizards.Messages;
-import com.aptana.projects.primary.natures.IPrimaryNatureContributor;
 import com.aptana.projects.primary.natures.PrimaryNaturesManager;
 import com.aptana.ui.util.UIUtils;
 
@@ -66,8 +62,6 @@ public class CloneJob extends Job
 	private boolean shallowClone;
 
 	private Set<IProject> createdProjects;
-
-	private Map<String, IPrimaryNatureContributor> natureContributors = new HashMap<String, IPrimaryNatureContributor>();
 
 	public CloneJob(String sourceURI, String dest)
 	{
@@ -100,7 +94,6 @@ public class CloneJob extends Job
 		this.forceRootAsProject = forceRootAsProject;
 		this.shallowClone = shallow;
 		this.createdProjects = new HashSet<IProject>();
-		natureContributors = PrimaryNaturesManager.getManager().getContributorsMap();
 	}
 
 	@Override

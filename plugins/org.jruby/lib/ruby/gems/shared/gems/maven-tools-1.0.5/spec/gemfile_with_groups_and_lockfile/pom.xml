@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (c) 2012 to original author or authors
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License v1.0
+    which accompanies this distribution, and is available at
+    http://www.eclipse.org/legal/epl-v10.html
+
+-->
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>no_group_id_given</groupId>
+  <artifactId>gemfile_with_groups_and_lockfile</artifactId>
+  <version>0.0.0</version>
+  <name>gemfile_with_groups_and_lockfile</name>
+  <properties>
+    <project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
+    <jruby.plugins.version>1.0.4</jruby.plugins.version>
+  </properties>
+  <repositories>
+    <repository>
+      <id>rubygems-releases</id>
+      <url>http://rubygems-proxy.torquebox.org/releases</url>
+    </repository>
+  </repositories>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>de.saumya.mojo</groupId>
+        <artifactId>gem-maven-plugin</artifactId>
+        <version>${jruby.plugins.version}</version>
+        <executions>
+          <execution>
+            <id>install gems</id>
+            <goals>
+              <goal>initialize</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  <profiles>
+    <profile>
+      <id>gemfile</id>
+      <activation>
+        <file>
+          <missing>Gemfile.lock</missing>
+        </file>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>rubygems</groupId>
+          <artifactId>rspec</artifactId>
+          <version>2.13.0</version>
+          <type>gem</type>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>rubygems</groupId>
+          <artifactId>copyright-header</artifactId>
+          <version>1.0.12</version>
+          <type>gem</type>
+          <scope>provided</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>gemfile_lock</id>
+      <activation>
+        <file>
+          <exists>Gemfile.lock</exists>
+        </file>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>de.saumya.mojo</groupId>
+            <artifactId>gem-maven-plugin</artifactId>
+            <version>${jruby.plugins.version}</version>
+            <executions>
+              <execution>
+                <id>install gem sets for provided</id>
+                <phase>initialize</phase>
+                <goals>
+                  <goal>sets</goal>
+                </goals>
+                <configuration>
+                  <scope>provided</scope>
+                  <gems>
+                    <copyright-header>1.0.12</copyright-header>
+                    <github-linguist>2.6.7</github-linguist>
+                    <charlockHolmes>0.6.9.4</charlockHolmes>
+                    <escapeUtils>0.3.2</escapeUtils>
+                    <mime-types>1.25.1</mime-types>
+                    <pygments.rb>0.4.2</pygments.rb>
+                    <posix-spawn>0.3.8</posix-spawn>
+                    <yajl-ruby>1.1.0</yajl-ruby>
+                  </gems>
+                </configuration>
+              </execution>
+              <execution>
+                <id>install gem sets for test</id>
+                <phase>initialize</phase>
+                <goals>
+                  <goal>sets</goal>
+                </goals>
+                <configuration>
+                  <scope>test</scope>
+                  <gems>
+                    <rspec>2.13.0</rspec>
+                    <rspec-core>2.13.1</rspec-core>
+                    <rspec-expectations>2.13.0</rspec-expectations>
+                    <diff-lcs>1.2.5</diff-lcs>
+                    <rspec-mocks>2.13.1</rspec-mocks>
+                  </gems>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>
