@@ -87,7 +87,8 @@ public class SudoUIManager
 									return UIUtils.getActiveShell();
 								}
 							}, promptMessage);
-							if (sudoDialog.open() == Dialog.OK)
+							int open = sudoDialog.open();
+							if (open == Dialog.OK)
 							{
 								if (sudoMngr.authenticate(sudoDialog.getPassword()))
 								{
@@ -98,6 +99,10 @@ public class SudoUIManager
 									// Re-run the authentication dialog as long as user attempts to provide password.
 									retry = true;
 								}
+							}
+							else if (open == Dialog.CANCEL)
+							{
+								throw new CoreException(Status.CANCEL_STATUS);
 							}
 							promptMessage = Messages.Sudo_Invalid_Password_Prompt;
 						}
