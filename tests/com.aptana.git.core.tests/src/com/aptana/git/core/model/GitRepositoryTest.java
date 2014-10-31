@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -34,11 +35,15 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.jmock.Expectations;
+import org.jmock.Mockery;
+import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Test;
 import org.osgi.framework.Version;
 
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.IOUtil;
+import com.aptana.core.util.ProcessStatus;
 
 @SuppressWarnings("nls")
 public class GitRepositoryTest extends GitTestCase
@@ -792,5 +797,62 @@ public class GitRepositoryTest extends GitTestCase
 			}
 		};
 		assertEquals("user/repo", repo.getGithubRepoName());
+	}
+
+	@Test
+	public void testPullUsesGitExecutableEnvironment() throws Exception
+	{
+		Mockery mockery = new Mockery()
+		{
+			{
+				setImposteriser(ClassImposteriser.INSTANCE);
+			}
+		};
+		// Setup
+		final GitExecutable exe = mockery.mock(GitExecutable.class);
+		final Map<String, String> gitEnv = new HashMap<String, String>();
+		gitEnv.put("testing", "yup");
+		mockery.checking(new Expectations()
+		{
+			{
+				oneOf(exe).runInBackground(
+						with(any(IPath.class)),
+						with(aNull(Map.class)),
+						with(new String[] { "for-each-ref",
+								"--format=%(refname) %(objecttype) %(objectname) %(*objectname)", "refs" }));
+				will(returnValue(new ProcessStatus(0, "", "")));
+
+				oneOf(exe).runInBackground(with(any(IPath.class)), with(aNull(Map.class)),
+						with(new String[] { "symbolic-ref", "-q", "HEAD" }));
+				will(returnValue(new ProcessStatus(0, "", "")));
+			}
+		});
+		GitRepository repo = new GitRepository(repoToGenerate().append(".git").toFile().toURI())
+		{
+			@Override
+			protected GitExecutable getGitExecutable()
+			{
+				return exe;
+			}
+
+			@Override
+			protected Map<String, String> gitEnvironment()
+			{
+				return gitEnv;
+			}
+		};
+		// We expect to call pull and pass along our GitExecutable environment. otherwise we get
+		// errors like:
+		// http://stackoverflow.com/questions/24022582/osx-10-10-yosemite-beta-on-git-pull-git-sh-setup-no-such-file-or-directory
+		mockery.checking(new Expectations()
+		{
+			{
+				oneOf(exe).runInBackground(with(any(IPath.class)), with(gitEnv),
+						with(new String[] { "pull", "upstream", "development" }));
+				will(returnValue(new ProcessStatus(0, "", "")));
+			}
+		});
+		repo.pull("upstream", "development");
+		mockery.assertIsSatisfied();
 	}
 }
