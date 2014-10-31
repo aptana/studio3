@@ -1,4 +1,4 @@
-[![Build Status](http://studio-jenkins.appcelerator.org/job/studio3-core-master/badge/icon)](http://studio-jenkins.appcelerator.org/job/studio3-core-master)
+[![Build Status](http://studio-jenkins.appcelerator.org/job/studio3-core-development/badge/icon)](http://studio-jenkins.appcelerator.org/job/studio3-core-development)
 
 Aptana Studio 3 Core
 ========================
