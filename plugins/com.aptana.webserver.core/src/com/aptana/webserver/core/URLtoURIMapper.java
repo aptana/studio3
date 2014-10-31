@@ -48,7 +48,7 @@ public class URLtoURIMapper implements IURIMapper
 
 	public URI resolve(IFileStore file)
 	{
-		if (!isValid())
+		if (file == null || !isValid())
 		{
 			return null;
 		}
@@ -76,7 +76,7 @@ public class URLtoURIMapper implements IURIMapper
 
 	public IFileStore resolve(URI uri)
 	{
-		if (!isValid())
+		if (uri == null || !isValid())
 		{
 			return null;
 		}
