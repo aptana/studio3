@@ -245,4 +245,24 @@ public class VersionUtilTest
 		assertTrue(VersionUtil.compareVersionsWithHyphen("1-rc", "0-rc2") > 0);
 		assertTrue(VersionUtil.compareVersionsWithHyphen("1", "0-rc3") > 0);
 	}
+
+	@Test
+	public void testParsingMaxVersion() throws Exception
+	{
+		assertEquals("24", VersionUtil.parseMax(">=20.x <=24"));
+		assertEquals("24.x", VersionUtil.parseMax(">=20 <24.x"));
+		assertEquals("24.x", VersionUtil.parseMax("<=24.x"));
+		assertEquals("24.9", VersionUtil.parseMax("<24.9"));
+		assertEquals(null, VersionUtil.parseMax(">=24"));
+	}
+
+	@Test
+	public void testParsingMinVersion() throws Exception
+	{
+		assertEquals("20.x", VersionUtil.parseMin(">=20.x <=24"));
+		assertEquals("20", VersionUtil.parseMin(">20 <=24.x"));
+		assertEquals("24.x", VersionUtil.parseMin(">=24.x"));
+		assertEquals("24.9", VersionUtil.parseMin(">24.9"));
+		assertEquals(null, VersionUtil.parseMin("<=24"));
+	}
 }

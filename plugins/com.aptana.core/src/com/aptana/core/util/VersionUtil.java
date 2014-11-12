@@ -27,6 +27,13 @@ public final class VersionUtil
 {
 	// Match x.y and x.y.z
 	private static final String VERSION_SPLIT_PATTERN = "(\\d+)\\.(\\d+)(([a-zA-Z0-9_\\-]+)|(\\.(\\d+)(\\.?[a-zA-Z0-9_\\-]+)?))?"; //$NON-NLS-1$
+	/**
+	 * This pattern will help to match the patterns related to ">=24 <=20", or ">24", or "<=20" and helps to parse the
+	 * min or max version referenced.
+	 */
+	private static final Pattern VERSION_RANGE_PATTERN = Pattern
+			.compile("(>[=]?([0-9a-z.]+))?(\\s)*(<[=]?([0-9a-z.]+))?"); //$NON-NLS-1$
+
 	// Match any dot separated string
 	private static Pattern VERSION_DOT_PATTERN = Pattern.compile("\\."); //$NON-NLS-1$
 
@@ -418,6 +425,48 @@ public final class VersionUtil
 			return true;
 		}
 		return false;
+	}
+
+	/**
+	 * Parse the version range with the format <code>">=20.0 <24.x", or ">24", or "<=20"</code> and returns the minimum
+	 * required version from the range.
+	 * 
+	 * @param versionRange
+	 * @return
+	 */
+	public static String parseMin(String versionRange)
+	{
+		if (StringUtil.isEmpty(versionRange))
+		{
+			return null;
+		}
+		Matcher matcher = VERSION_RANGE_PATTERN.matcher(versionRange);
+		if (matcher.matches())
+		{
+			return matcher.group(2);
+		}
+		return null;
+	}
+
+	/**
+	 * Parse the version range with the format <code>">=20.0 <24.x", or ">24", or "<=20"</code> and returns the maximum
+	 * required version from the range.
+	 * 
+	 * @param versionRange
+	 * @return
+	 */
+	public static String parseMax(String versionRange)
+	{
+		if (StringUtil.isEmpty(versionRange))
+		{
+			return null;
+		}
+		Matcher matcher = VERSION_RANGE_PATTERN.matcher(versionRange);
+		if (matcher.matches())
+		{
+			return matcher.group(5);
+		}
+		return null;
 	}
 
 }
