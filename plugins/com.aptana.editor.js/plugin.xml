@@ -96,21 +96,6 @@
                type="com.aptana.contenttype.js">
          </contentType>
           <enablement>
-	        <with variable="activeEditorInput">
-	              <adapt type="org.eclipse.core.resources.IResource">
-	                 <and>
-	                 <not>
-	                     <test property="org.eclipse.core.resources.projectNature" value="com.appcelerator.titanium.mobile.nature" />
-	                 </not>
-	                 <not>
-	                     <test property="org.eclipse.core.resources.projectNature" value="com.appcelerator.titanium.alloy.core.nature" />
-	                 </not>
-	                 <not>
-	                     <test property="org.eclipse.core.resources.projectNature" value="com.appcelerator.titanium.mobile.module.nature" />
-	                 </not>
-	                </and>
-	              </adapt>
-	         </with>
          </enablement>
       </hover>
    </extension>
