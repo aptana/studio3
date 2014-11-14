@@ -55,6 +55,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.editors.text.EditorsUI;
@@ -633,6 +634,12 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 			if (site != null)
 			{
 				context.addVariable(ISources.ACTIVE_EDITOR_ID_NAME, site.getId());
+
+			}
+			IEditorInput editorInput = fTextEditor.getEditorInput();
+			if (editorInput != null)
+			{
+				context.addVariable(ISources.ACTIVE_EDITOR_INPUT_NAME, editorInput);
 			}
 			for (TextHoverDescriptor descriptor : TextHoverDescriptor.getContributedHovers())
 			{

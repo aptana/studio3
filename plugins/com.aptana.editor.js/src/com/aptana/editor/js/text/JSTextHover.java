@@ -116,8 +116,8 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 	@Override
 	public void populateToolbarActions(ToolBarManager tbm, CustomBrowserInformationControl iControl)
 	{
-		final OpenDeclarationAction openDeclarationAction = new OpenDeclarationAction(iControl);
-		final OpenHelpAction openHelpAction = new OpenHelpAction(iControl);
+		final OpenDeclarationAction openDeclarationAction = getDeclarationAction(iControl);
+		final OpenHelpAction openHelpAction = getHelpAction(iControl);
 		tbm.add(openDeclarationAction);
 		tbm.add(openHelpAction);
 		IInputChangedListener inputChangeListener = new IInputChangedListener()
@@ -132,6 +132,16 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 			}
 		};
 		iControl.addInputChangeListener(inputChangeListener);
+	}
+
+	protected OpenHelpAction getHelpAction(CustomBrowserInformationControl iControl)
+	{
+		return new OpenHelpAction(iControl);
+	}
+
+	protected OpenDeclarationAction getDeclarationAction(CustomBrowserInformationControl iControl)
+	{
+		return new OpenDeclarationAction(iControl);
 	}
 
 	/*
@@ -261,6 +271,11 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 			setEnabled(!CollectionsUtil.isEmpty(properties));
 		}
 
+		protected Collection<PropertyElement> getProperties()
+		{
+			return properties;
+		}
+
 		public void run()
 		{
 			iControl.dispose();
@@ -270,8 +285,7 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 			String owningType = element.getOwningType();
 			String name = element.getName();
 			List<ReturnTypeElement> types = element.getTypes();
-			String resolvedReturnType = (CollectionsUtil.isEmpty(types) ? null : JSModelFormatter
-					.getTypeDisplayName(types.get(0).getType()));
+			String resolvedReturnType = getResolvedType(types);
 			String url;
 			if (ObjectUtil.areEqual(resolvedReturnType, name) || ObjectUtil.areEqual(name, owningType))
 			{
@@ -288,6 +302,11 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 						BASE_HELP_DOCS_URL, owningType, name);
 			}
 			UIUtils.openHelpInBrowser(url);
+		}
+
+		protected String getResolvedType(List<ReturnTypeElement> types)
+		{
+			return (CollectionsUtil.isEmpty(types) ? null : JSModelFormatter.getTypeDisplayName(types.get(0).getType()));
 		}
 	}
 }
