@@ -652,6 +652,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		catch (BadLocationException e)
 		{
 		}
+		Collections.sort(result);
 		return result;
 	}
 
