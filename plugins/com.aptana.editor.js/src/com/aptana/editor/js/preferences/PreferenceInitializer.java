@@ -36,7 +36,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 				".("); //$NON-NLS-1$
 		// https://jira.appcelerator.org/browse/APSTUD-4665
 		prefs.put(com.aptana.editor.common.contentassist.IPreferenceConstants.PROPOSAL_TRIGGER_CHARACTERS, "."); //$NON-NLS-1$
-		//prefs.put(com.aptana.editor.common.contentassist.IPreferenceConstants.PROPOSAL_TRIGGER_CHARACTERS, ""); //$NON-NLS-1$
 		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.EDITOR_AUTO_INDENT, true);
 		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.EDITOR_ENABLE_FOLDING, true);
 
