@@ -816,7 +816,14 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 				{
 					// Only change relevance if this new value is higher than old!
 					ICommonCompletionProposal common = (ICommonCompletionProposal) proposal;
-					if (displayString.startsWith(prefix))
+					if (displayString.equalsIgnoreCase(prefix))
+					{
+						if (common.getRelevance() < ICommonCompletionProposal.RELEVANCE_EXACT)
+						{
+							common.setRelevance(ICommonCompletionProposal.RELEVANCE_EXACT);
+						}
+					}
+					else if (displayString.startsWith(prefix))
 					{
 						if (common.getRelevance() < ICommonCompletionProposal.RELEVANCE_HIGH)
 						{
@@ -843,7 +850,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	protected void sortProposals(ICompletionProposal[] proposals)
 	{
 		// Sort by relevance first, descending, and then alphabetically, ascending
-		Arrays.sort(proposals, CompletionProposalComparator.decending(CompletionProposalComparator.getComparator(
+		Arrays.sort(proposals, CompletionProposalComparator.descending(CompletionProposalComparator.getComparator(
 				CompletionProposalComparator.RelevanceSort, CompletionProposalComparator.NameSort)));
 	}
 }

@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -1361,43 +1360,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	protected List<ICompletionProposal> getMergedProposals(List<ICompletionProposal> proposals)
 	{
-		// order proposals by display name
-		Collections.sort(proposals, new Comparator<ICompletionProposal>()
-		{
-			public int compare(ICompletionProposal o1, ICompletionProposal o2)
-			{
-				int result = getImageIndex(o1) - getImageIndex(o2);
-
-				if (result == 0)
-				{
-					result = o1.getDisplayString().compareTo(o2.getDisplayString());
-				}
-
-				return result;
-			}
-
-			protected int getImageIndex(ICompletionProposal proposal)
-			{
-				Image image = proposal.getImage();
-				int result = 0;
-
-				if (image == JS_KEYWORD)
-				{
-					result = 1;
-				}
-				else if (image == JS_PROPERTY)
-				{
-					result = 2;
-				}
-				else if (image == JS_PROPERTY)
-				{
-					result = 3;
-				}
-
-				return result;
-			}
-		});
-
 		// remove duplicates, merging duplicates into a single proposal
 		return CollectionsUtil.filter(proposals, new ProposalMerger());
 	}
