@@ -53,7 +53,13 @@ public enum CompletionProposalComparator implements Comparator<ICompletionPropos
 		public int compare(ICompletionProposal o1, ICompletionProposal o2)
 		{
 			// note reversal of parameters
-			return o2.getDisplayString().compareTo(o1.getDisplayString());
+
+			int diff = o2.getDisplayString().compareToIgnoreCase(o1.getDisplayString());
+			if (diff == 0)
+			{
+				diff = o1.getDisplayString().compareTo(o2.getDisplayString());
+			}
+			return diff;
 		}
 	};
 
@@ -63,7 +69,7 @@ public enum CompletionProposalComparator implements Comparator<ICompletionPropos
 	 * @param other
 	 * @return
 	 */
-	public static Comparator<ICompletionProposal> decending(final Comparator<ICompletionProposal> other)
+	public static Comparator<ICompletionProposal> descending(final Comparator<ICompletionProposal> other)
 	{
 		return new Comparator<ICompletionProposal>()
 		{

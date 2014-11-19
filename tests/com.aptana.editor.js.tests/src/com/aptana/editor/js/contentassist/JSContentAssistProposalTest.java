@@ -30,7 +30,6 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.texteditor.ITextEditor;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
@@ -408,8 +407,8 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 		try
 		{
 			// note template is before true proposal, as we are ordering by trigger prefix
-			this.checkProposals("contentAssist/f-prefix.js", true, true, "FunctionTemplate", "false", "finally",
-					"focus", "for", "forward", "frames", "function", "Function");
+			this.checkProposals("contentAssist/f-prefix.js", true, true, "false", "finally", "focus", "for", "forward",
+					"frames", "function", "FunctionTemplate", "Function");
 		}
 		finally
 		{
@@ -431,11 +430,10 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 	 * testStringFunction
 	 */
 	@Test
-	@Ignore("Commented out for the moment until we resolve an issue with indexing")
 	public void testStringFunctionCaseOrder()
 	{
 		this.checkProposals("contentAssist/function-case-order.js", true, true, "focus", "foo", "fooa", "foob", "for",
-				"forward");
+				"forward", "Foo", "Fooa", "Foob");
 	}
 
 	/**
