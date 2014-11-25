@@ -446,7 +446,10 @@ public final class VersionUtil
 			String minVersion = matcher.group(2);
 			// The versions are sometimes tagged as 24.x, which has to be changed to 24.0 in order to parse without any
 			// errors.
-			return minVersion.replace('x', '0');
+			if (!StringUtil.isEmpty(minVersion))
+			{
+				return minVersion.replace('x', '0');
+			}
 		}
 		return null;
 	}
@@ -468,7 +471,10 @@ public final class VersionUtil
 		if (matcher.matches())
 		{
 			String maxVersion = matcher.group(5);
-			return maxVersion.replace('x', '0');
+			if (!StringUtil.isEmpty(maxVersion))
+			{
+				return maxVersion.replace('x', '0');
+			}
 		}
 		return null;
 	}
