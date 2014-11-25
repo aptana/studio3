@@ -29,10 +29,10 @@ public final class VersionUtil
 	private static final String VERSION_SPLIT_PATTERN = "(\\d+)\\.(\\d+)(([a-zA-Z0-9_\\-]+)|(\\.(\\d+)(\\.?[a-zA-Z0-9_\\-]+)?))?"; //$NON-NLS-1$
 	/**
 	 * This pattern will help to match the patterns related to ">=24 <=20", or ">24", or "<=20" and helps to parse the
-	 * min or max version referenced.
+	 * min or max version referenced in SDK configuration (package.json) files.
 	 */
 	private static final Pattern VERSION_RANGE_PATTERN = Pattern
-			.compile("(>[=]?([0-9a-z.]+))?(\\s)*(<[=]?([0-9a-z.]+))?"); //$NON-NLS-1$
+			.compile("([>]?[=]?([0-9a-z.]+))?(\\s)*([<]?[=]?([0-9a-z.]+))?"); //$NON-NLS-1$
 
 	// Match any dot separated string
 	private static Pattern VERSION_DOT_PATTERN = Pattern.compile("\\."); //$NON-NLS-1$
@@ -443,7 +443,10 @@ public final class VersionUtil
 		Matcher matcher = VERSION_RANGE_PATTERN.matcher(versionRange);
 		if (matcher.matches())
 		{
-			return matcher.group(2);
+			String minVersion = matcher.group(2);
+			// The versions are sometimes tagged as 24.x, which has to be changed to 24.0 in order to parse without any
+			// errors.
+			return minVersion.replace('x', '0');
 		}
 		return null;
 	}
@@ -464,7 +467,8 @@ public final class VersionUtil
 		Matcher matcher = VERSION_RANGE_PATTERN.matcher(versionRange);
 		if (matcher.matches())
 		{
-			return matcher.group(5);
+			String maxVersion = matcher.group(5);
+			return maxVersion.replace('x', '0');
 		}
 		return null;
 	}

@@ -259,6 +259,7 @@ public class VersionUtilTest
 	@Test
 	public void testParsingMinVersion() throws Exception
 	{
+		assertEquals("24.x", VersionUtil.parseMin("24.x"));
 		assertEquals("20.x", VersionUtil.parseMin(">=20.x <=24"));
 		assertEquals("20", VersionUtil.parseMin(">20 <=24.x"));
 		assertEquals("24.x", VersionUtil.parseMin(">=24.x"));
