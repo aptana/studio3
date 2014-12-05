@@ -326,13 +326,40 @@ public class NodePackageManagerTest
 						userHome,
 						ShellExecutable.getEnvironment(),
 						CollectionsUtil.newList("/usr/bin/npm", "ls", "titanium", "--color", "false", "--json", "true",
-								"-g"));
+								"-s", "-g"));
 				will(returnValue(status));
 			}
 		});
 
 		String returned = npm.getInstalledVersion("titanium", true, userHome);
 		assertEquals("3.3.0", returned);
+		context.assertIsSatisfied();
+	}
+
+	@Test
+	public void testGetInstalledVersionWithUnmetDependencies() throws CoreException
+	{
+		final IStatus status = new Status(
+				IStatus.ERROR,
+				JSCorePlugin.PLUGIN_ID,
+				"{\n \"problems\": [ \n \"invalid: titanium@3.4.1 /usr/local/lib/node_modules/titanium\" \n ], \n \"dependencies\": {\n    \"titanium\": {\n      \"version\": \"3.4.1\",\n      \"from\": \"titanium@*\",\n      \"invalid\": true,\n  \"problems\": [ \n \"invalid: titanium@3.4.1 /usr/local/lib/node_modules/titanium\" \n ] \n  }\n  }\n}");
+		context.checking(new Expectations()
+		{
+			{
+				oneOf(file).exists();
+				will(returnValue(true));
+
+				oneOf(node).runInBackground(
+						userHome,
+						ShellExecutable.getEnvironment(),
+						CollectionsUtil.newList("/usr/bin/npm", "ls", "titanium", "--color", "false", "--json", "true",
+								"-s", "-g"));
+				will(returnValue(status));
+			}
+		});
+
+		String returned = npm.getInstalledVersion("titanium", true, userHome);
+		assertEquals("3.4.1", returned);
 		context.assertIsSatisfied();
 	}
 
@@ -350,7 +377,7 @@ public class NodePackageManagerTest
 						userHome,
 						ShellExecutable.getEnvironment(),
 						CollectionsUtil.newList("/usr/bin/npm", "ls", "titanium", "--color", "false", "--json", "true",
-								"-g"));
+								"-s", "-g"));
 				will(returnValue(status));
 			}
 		});
@@ -374,7 +401,7 @@ public class NodePackageManagerTest
 						userHome,
 						ShellExecutable.getEnvironment(),
 						CollectionsUtil.newList("/usr/bin/npm", "ls", "titanium", "--color", "false", "--json", "true",
-								"-g"));
+								"-s", "-g"));
 				will(returnValue(status));
 			}
 		});
@@ -397,7 +424,7 @@ public class NodePackageManagerTest
 						null,
 						ShellExecutable.getEnvironment(),
 						CollectionsUtil.newList("/usr/bin/npm", "ls", "titanium", "--color", "false", "--json", "true",
-								"-g"));
+								"-s", "-g"));
 				will(returnValue(status));
 			}
 		});
@@ -423,7 +450,7 @@ public class NodePackageManagerTest
 						null,
 						ShellExecutable.getEnvironment(),
 						CollectionsUtil.newList("/usr/bin/npm", "ls", "titanium", "--color", "false", "--json", "true",
-								"-g"));
+								"-s", "-g"));
 				will(returnValue(status));
 			}
 		});
@@ -451,7 +478,7 @@ public class NodePackageManagerTest
 						null,
 						ShellExecutable.getEnvironment(),
 						CollectionsUtil.newList("/usr/bin/npm", "ls", "titanium", "--color", "false", "--json", "true",
-								"-g"));
+								"-s", "-g"));
 				will(returnValue(status));
 
 				// Falls back to checking list
