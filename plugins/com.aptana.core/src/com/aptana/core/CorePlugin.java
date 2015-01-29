@@ -32,6 +32,8 @@ import com.aptana.core.sourcemap.ISourceMapRegistry;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
 import com.eaio.uuid.MACAddress;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -55,6 +57,8 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 	private ISourceMapRegistry sourceMapRegistry;
 	private IDiagnosticManager diagnosticManager;
 
+	private ObjectMapper fJsonMapper;
+
 	/**
 	 * The constructor
 	 */
@@ -66,6 +70,7 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 	 * (non-Javadoc)
 	 * @see org.eclipse.core.runtime.Plugins#start(org.osgi.framework.BundleContext)
 	 */
+	@Override
 	public void start(BundleContext context) throws Exception
 	{
 		this.context = context;
@@ -121,6 +126,7 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 	 * (non-Javadoc)
 	 * @see org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
 	 */
+	@Override
 	public void stop(BundleContext context) throws Exception
 	{
 		sourceMapRegistry = null;
@@ -130,10 +136,8 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 			// Don't listen to debug changes anymore
 			InstanceScope.INSTANCE.getNode(CorePlugin.PLUGIN_ID).removePreferenceChangeListener(this);
 
-			if (fUserAgentManager != null)
-			{
-				fUserAgentManager = null;
-			}
+			fUserAgentManager = null;
+			fJsonMapper = null;
 		}
 		finally
 		{
@@ -144,7 +148,7 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 
 	/**
 	 * Returns the shared instance
-	 * 
+	 *
 	 * @return the shared instance
 	 */
 	public static CorePlugin getDefault()
@@ -154,7 +158,7 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 
 	/**
 	 * Returns the {@link ISourceMapRegistry}.
-	 * 
+	 *
 	 * @return {@link ISourceMapRegistry}.
 	 */
 	public synchronized ISourceMapRegistry getSourceMapRegistry()
@@ -168,7 +172,7 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 
 	/**
 	 * Returns the {@link IDiagnosticManager}.
-	 * 
+	 *
 	 * @return {@link IDiagnosticManager}.
 	 */
 	public synchronized IDiagnosticManager getDiagnosticManager()
@@ -184,6 +188,7 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 	 * @return
 	 * @deprecated uses {@link EclipseUtil#getStudioVersion()} instead
 	 */
+	@Deprecated
 	public static String getAptanaStudioVersion()
 	{
 		return EclipseUtil.getStudioVersion();
@@ -191,7 +196,7 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 
 	/**
 	 * Returns the current bundle context
-	 * 
+	 *
 	 * @return
 	 */
 	public BundleContext getContext()
@@ -263,6 +268,16 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 			}
 		}
 		return null;
+	}
+
+	public synchronized ObjectMapper getJsonMapper()
+	{
+		if (fJsonMapper == null)
+		{
+			fJsonMapper = new ObjectMapper();
+			fJsonMapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
+		}
+		return fJsonMapper;
 	}
 
 	public synchronized IUserAgentManager getUserAgentManager()
