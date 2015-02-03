@@ -1,12 +1,12 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Libraries
+Bundle-Name: Jackson JSON Libraries
 Bundle-SymbolicName: com.jackson.libraries
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: lib/jackson-annotations-2.5.0.jar,
  lib/jackson-core-2.5.0.jar,
- lib/jackson-databind-2.3.1.jar,
+ lib/jackson-databind-2.5.0.jar,
  .
 Export-Package: com.fasterxml.jackson.annotation,
  com.fasterxml.jackson.core,
