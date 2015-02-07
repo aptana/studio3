@@ -34,7 +34,7 @@ import com.aptana.samples.ui.SamplesUIPlugin;
  * An action controller for calling Studio's Samples.<br>
  * The controller allows quering for the existing Samples in the studio, and allows triggering an import-sample wizard
  * with a given sample ID.
- * 
+ *
  * @author Shalom Gibly <sgibly@appcelerator.com>
  */
 public class SamplesActionController extends AbstractActionController
@@ -50,13 +50,14 @@ public class SamplesActionController extends AbstractActionController
 		DESCRIPTION("description"), //$NON-NLS-1$
 		IMAGE("image"); //$NON-NLS-1$
 
-		private String name;
+		private final String name;
 
 		SAMPLE_INFO(String name)
 		{
 			this.name = name;
 		};
 
+		@Override
 		public String toString()
 		{
 			return name;
@@ -79,12 +80,12 @@ public class SamplesActionController extends AbstractActionController
 	 * <li>description</li>
 	 * <li>image (currently empty)</li>
 	 * </ul>
-	 * 
+	 *
 	 * <pre>
 	 *   <b>Sample JS code:</b>
 	 *   <code>result = dispatch($H({controller:'portal.samples', action:"getSamples"}).toJSON());</code>
 	 * </pre>
-	 * 
+	 *
 	 * @return A samples list. Each item in the list contains a map for the sample's attributes.
 	 */
 	@ControllerAction
@@ -113,12 +114,12 @@ public class SamplesActionController extends AbstractActionController
 	 * Import a sample into the workspace<br>
 	 * The attributes passed to this call should hold a sample ID that was collected through a previous call to
 	 * {@link #getSamples()}.
-	 * 
+	 *
 	 * <pre>
 	 *   <b>Sample JS code:</b>
 	 *   <code>result = dispatch($H({controller:'portal.samples', action:"importSample", args:"sample-id"}).toJSON());</code>
 	 * </pre>
-	 * 
+	 *
 	 * @param attributes
 	 *            Contains the Sample ID to import.
 	 * @return The import status
@@ -138,12 +139,13 @@ public class SamplesActionController extends AbstractActionController
 		CommandHandlerActionController commandHandler = new CommandHandlerActionController();
 		Map<String, String> commandArguments = new HashMap<String, String>();
 		commandArguments.put(IMPORT_SAMPLE_COMMAND_ID, sampleID);
-		return commandHandler.execute(new Object[] { IMPORT_SAMPLE_COMMAND, commandArguments });
+		String callback = getCallback(attributes);
+		return commandHandler.execute(new Object[] { IMPORT_SAMPLE_COMMAND, commandArguments, callback });
 	}
 
 	/**
 	 * Returns the Sample-Id from the attributes. Null, if an error occurred.
-	 * 
+	 *
 	 * @param attributes
 	 * @return A command Id, or null if an error occurs.
 	 */
@@ -152,7 +154,7 @@ public class SamplesActionController extends AbstractActionController
 		if (attributes instanceof Object[])
 		{
 			Object[] arr = (Object[]) attributes;
-			if (arr.length == 1 && arr[0] != null)
+			if (arr.length > 0 && arr[0] != null)
 			{
 				return arr[0].toString();
 			}

@@ -7,6 +7,7 @@
  */
 package com.aptana.samples.ui.project;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.PlatformUI;
 
@@ -22,21 +23,22 @@ public class SampleProjectCreator
 
 	/**
 	 * Opens a wizard for creating sample project.
-	 * 
+	 *
 	 * @param sample
 	 *            the sample
 	 */
-	public static void createSampleProject(IProjectSample sample)
+	public static IProject createSampleProject(IProjectSample sample)
 	{
-		openWizard(new NewSampleProjectWizard(sample));
+		return openWizard(new NewSampleProjectWizard(sample));
 	}
 
-	private static void openWizard(NewSampleProjectWizard wizard)
+	private static IProject openWizard(NewSampleProjectWizard wizard)
 	{
 		wizard.init(PlatformUI.getWorkbench(), null);
 		WizardDialog dialog = new WizardDialog(UIUtils.getActiveShell(), wizard);
 		dialog.create();
 		SWTUtils.centerAndPack(dialog.getShell(), UIUtils.getActiveWorkbenchWindow().getShell());
 		dialog.open();
+		return wizard.getCreatedProject();
 	}
 }
