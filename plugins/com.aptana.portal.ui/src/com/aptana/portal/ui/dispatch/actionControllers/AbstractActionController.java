@@ -253,7 +253,7 @@ public abstract class AbstractActionController implements IActionController, ICo
 		if (attributes instanceof Object[])
 		{
 			Object[] arr = (Object[]) attributes;
-			if (arr.length > 1 && arr[0] != null)
+			if (arr.length > 1 && arr[1] != null)
 			{
 				return String.valueOf(arr[1]);
 			}
