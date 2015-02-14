@@ -7,12 +7,17 @@
  */
 package com.aptana.samples.ui.portal.actionController;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.eclipse.core.runtime.Path;
 
 import com.aptana.configurations.processor.ConfigurationStatus;
 import com.aptana.core.logging.IdeLog;
@@ -28,6 +33,7 @@ import com.aptana.samples.ISamplesManager;
 import com.aptana.samples.SamplesPlugin;
 import com.aptana.samples.model.IProjectSample;
 import com.aptana.samples.model.SampleCategory;
+import com.aptana.samples.model.SamplesReference;
 import com.aptana.samples.ui.SamplesUIPlugin;
 
 /**
@@ -48,6 +54,8 @@ public class SamplesActionController extends AbstractActionController
 		ID("id"), //$NON-NLS-1$
 		NAME("name"), //$NON-NLS-1$
 		DESCRIPTION("description"), //$NON-NLS-1$
+		PATH("location"), //$NON-NLS-1$
+		NATURES("natures"), //$NON-NLS-1$
 		IMAGE("image"); //$NON-NLS-1$
 
 		private final String name;
@@ -66,6 +74,7 @@ public class SamplesActionController extends AbstractActionController
 
 	protected static final String IMPORT_SAMPLE_COMMAND = "com.aptana.samples.ui.commands.import"; //$NON-NLS-1$
 	protected static final String IMPORT_SAMPLE_COMMAND_ID = "id"; //$NON-NLS-1$
+	protected static final String WEB_NATURE = "com.aptana.projects.webnature"; //$NON-NLS-1$
 
 	// ############## Actions ###############
 
@@ -108,6 +117,151 @@ public class SamplesActionController extends AbstractActionController
 			}
 		}
 		return JSON.toString(samples.toArray(new Map[samples.size()]));
+	}
+
+	/**
+	 * Adds a new sample from the local file system or a remote URI into the Samples Manager<br>
+	 * The attributes passed to this call should hold the following required attributes of the sample to be added.
+	 * <ul>
+	 * <li>category</li>
+	 * <li>name</li>
+	 * <li>id</li>
+	 * <li>description</li>
+	 * <li>location</li>
+	 * </ul>
+	 *
+	 * <pre>
+	 *   <b>Sample JS code:</b>
+	 *   <code>result = dispatch($H({controller:'portal.samples', action:"addSample", 
+	 *   args:"{"category":"com.appcelerator.titanium.mobile.samples.category",
+	 *                 "description":"This is a dynamically imported sample",
+	 *                 "name":"dynamic_sample",
+	 *                 "location":"git://github.com/appcelerator-developer-relations/Sample.Mapping.git",
+	 *                 "id":"dyn",
+	 *                 "image":"http://preview.appcelerator.com/dashboard/img/icons/icon_geo.png",
+	 *                 "natures":"[com.appcelerator.titanium.mobile.nature, com.aptana.projects.webnature]"
+	 *                }"}).toJSON());</code>
+	 * </pre>
+	 *
+	 * @param attributes
+	 *            Contains the Sample data in JSON format.
+	 * @return The status
+	 * @see #getSamples()
+	 */
+	@ControllerAction
+	public Object addSample(Object attributes)
+	{
+		ISamplesManager samplesManager = SamplesPlugin.getDefault().getSamplesManager();
+		// We have got the sample data in a JSON format. Now lets try and parse it
+		// and create an IProjectSample object which we will add to the Samples Manager
+		Object[] arr = (Object[]) attributes;
+
+		if (arr == null || arr.length < 1 || arr[0] == null || !(arr[0] instanceof HashMap))
+		{
+			IdeLog.logError(SamplesUIPlugin.getDefault(),
+					"The addSample ControllerAction should get an attribute in JSON format", IDebugScopes.START_PAGE); //$NON-NLS-1$
+			return IBrowserNotificationConstants.JSON_ERROR;
+		}
+
+		@SuppressWarnings({ "rawtypes" })
+		HashMap sampleData = (HashMap) arr[0];
+
+		// Id for the sample
+		String id = (String) sampleData.get(SAMPLE_INFO.ID.toString());
+		if (StringUtil.isEmpty(id))
+		{
+			IdeLog.logError(SamplesUIPlugin.getDefault(),
+					"Sample Missing required attribute id", IDebugScopes.START_PAGE); //$NON-NLS-1$
+			return IBrowserNotificationConstants.JSON_ERROR;
+		}
+
+		// Name for the sample
+		String name = (String) sampleData.get(SAMPLE_INFO.NAME.toString());
+		if (StringUtil.isEmpty(name))
+		{
+			IdeLog.logError(SamplesUIPlugin.getDefault(),
+					"Sample Missing required attribute name", IDebugScopes.START_PAGE); //$NON-NLS-1$
+			return IBrowserNotificationConstants.JSON_ERROR;
+		}
+
+		// Description for the sample
+		String description = (String) sampleData.get(SAMPLE_INFO.DESCRIPTION.toString());
+		if (StringUtil.isEmpty(description))
+		{
+			IdeLog.logError(SamplesUIPlugin.getDefault(),
+					"Sample Missing required attribute description", IDebugScopes.START_PAGE); //$NON-NLS-1$
+			return IBrowserNotificationConstants.JSON_ERROR;
+		}
+
+		// Location for the sample
+		String location = (String) sampleData.get(SAMPLE_INFO.PATH.toString());
+		if (StringUtil.isEmpty(location))
+		{
+			IdeLog.logError(SamplesUIPlugin.getDefault(),
+					"Sample Missing required attribute path", IDebugScopes.START_PAGE); //$NON-NLS-1$
+			return IBrowserNotificationConstants.JSON_ERROR;
+		}
+
+		// If file does not exist it is remote.
+		boolean isRemote = !(new File(location).exists()); //$NON-NLS-1$
+
+		// Category of the sample
+		String category = (String) sampleData.get(SAMPLE_INFO.CATEGORY.toString());
+		if (StringUtil.isEmpty(category))
+		{
+			IdeLog.logError(SamplesUIPlugin.getDefault(),
+					"Sample Missing required attribute category", IDebugScopes.START_PAGE); //$NON-NLS-1$
+			return IBrowserNotificationConstants.JSON_ERROR;
+		}
+
+		SampleCategory sampleCategory = samplesManager.getCategory(category);
+		// If we could not find the category use the default category
+		if (sampleCategory == null)
+		{
+			sampleCategory = new SampleCategory(category, "Others", null);//$NON-NLS-1$
+		}
+
+		// Icons for the sample
+		URL iconUrl = null;
+		String iconPath = null;
+		try
+		{
+			iconPath = (String) sampleData.get(SAMPLE_INFO.IMAGE.toString());
+			if (StringUtil.isEmpty(iconPath))
+			{
+				IdeLog.logError(SamplesPlugin.getDefault(),
+						MessageFormat.format("Unable to retrieve the icon at {0} for sample {1}", iconPath, name)); //$NON-NLS-1$
+
+			}
+			else
+			{
+				iconUrl = new URL(iconPath);
+			}
+
+		}
+		catch (MalformedURLException e)
+		{
+			IdeLog.logError(SamplesPlugin.getDefault(), MessageFormat.format("malformed icon URL at {0}", iconPath)); //$NON-NLS-1$
+
+		}
+		Map<String, URL> iconUrls = new HashMap<String, URL>();
+		iconUrls.put(SamplesReference.DEFAULT_ICON_KEY, iconUrl);
+
+		// Create the sample and add it to the samples manager
+		SamplesReference sample = new SamplesReference(sampleCategory, id, name, location, isRemote, description,
+				iconUrls, new Path("app"), null);
+
+		// Project natures for the sample
+		String[] natures = (String[]) sampleData.get(SAMPLE_INFO.NATURES.toString());
+		if (natures == null || natures.length < 1)
+		{
+			natures = new String[1];
+			natures[0] = WEB_NATURE;
+		}
+
+		sample.setNatures(natures);
+		samplesManager.addSample(sample);
+		return IBrowserNotificationConstants.JSON_OK;
 	}
 
 	/**
