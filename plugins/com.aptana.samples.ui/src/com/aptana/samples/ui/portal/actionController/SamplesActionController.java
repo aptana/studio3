@@ -132,7 +132,15 @@ public class SamplesActionController extends AbstractActionController
 	 *
 	 * <pre>
 	 *   <b>Sample JS code:</b>
-	 *   <code>result = dispatch($H({controller:'portal.samples', action:"addSample", args:"sample_json_data"}).toJSON());</code>
+	 *   <code>result = dispatch($H({controller:'portal.samples', action:"addSample", 
+	 *   args:"{"category":"com.appcelerator.titanium.mobile.samples.category",
+	 *                 "description":"This is a dynamically imported sample",
+	 *                 "name":"dynamic_sample",
+	 *                 "location":"git://github.com/appcelerator-developer-relations/Sample.Mapping.git",
+	 *                 "id":"dyn",
+	 *                 "image":"http://preview.appcelerator.com/dashboard/img/icons/icon_geo.png",
+	 *                 "natures":"[com.appcelerator.titanium.mobile.nature, com.aptana.projects.webnature]"
+	 *                }"}).toJSON());</code>
 	 * </pre>
 	 *
 	 * @param attributes

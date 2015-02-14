@@ -15,7 +15,7 @@ Require-Bundle: com.aptana.jetty.util.epl,
  com.aptana.projects,
  com.aptana.configurations,
  com.aptana.portal.ui,
- com.aptana.scripting;bundle-version="3.1.0"
+ com.aptana.scripting
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Eclipse-LazyStart: true
 Bundle-Localization: plugin
