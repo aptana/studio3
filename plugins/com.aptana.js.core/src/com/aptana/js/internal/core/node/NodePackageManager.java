@@ -184,44 +184,11 @@ public class NodePackageManager implements INodePackageManager
 		String globalPrefixPath = null;
 		try
 		{
-			/*
-			 * HACK for environments with npm config prefix value set : when sudo npm -g install command is used, the
-			 * global prefix config value for the entire system overrides the global prefix value of the user. So, it
-			 * always install into /usr/lib even though user set a custom value for NPM_CONFIG_PREFIX.
-			 */
-			sub.subTask("Checking global NPM prefix");
-			IPath prefixPath = getConfigPrefixPath();
-			if (prefixPath != null)
+			// If we are doing a global install we will fetch the global prefix and set it back after the install
+			// completes to the original value
+			if (global)
 			{
-				List<String> args = CollectionsUtil.newList(CONFIG, GET, PREFIX);
-				// TODO: should cache this value as config prefix path ?
-				IStatus npmStatus = runNpmConfig(args, password, global, workingDirectory, sub.newChild(1));
-				if (npmStatus.isOK())
-				{
-					String prefix = npmStatus.getMessage();
-					sub.subTask("Global NPM prefix is " + prefix);
-					// If the sudo cache is timed out, then the password prompt and other details might appear in the
-					// console. So we should strip them off to get the real npm prefix value.
-					if (prefix.contains(SudoManager.PROMPT_MSG))
-					{
-						prefix = prefix.substring(prefix.indexOf(SudoManager.PROMPT_MSG)
-								+ SudoManager.PROMPT_MSG.length());
-					}
-
-					// Set the global prefix path only if it is not the default value.
-					if (!prefixPath.toOSString().equals(prefix))
-					{
-						sub.subTask("Global and user NPM prefix don't match, setting global prefix temporarily to: "
-								+ prefixPath.toOSString());
-						globalPrefixPath = prefix;
-						setGlobalPrefixPath(password, workingDirectory, sub.newChild(1), prefixPath.toOSString());
-					}
-				}
-				else
-				{
-					IdeLog.logWarning(JSCorePlugin.getDefault(),
-							"Failed to get global prefix for NPM: " + npmStatus.getMessage());
-				}
+				globalPrefixPath = getGlobalPrefix(global, password, workingDirectory, sub, globalPrefixPath);
 			}
 			sub.setWorkRemaining(8);
 			sub.subTask("Running npm install command");
@@ -290,6 +257,61 @@ public class NodePackageManager implements INodePackageManager
 			}
 			sub.done();
 		}
+	}
+
+	/**
+	 * Gets the global prefix for global installs
+	 * 
+	 * @param global
+	 * @param password
+	 * @param workingDirectory
+	 * @param sub
+	 * @param globalPrefixPath
+	 * @return
+	 * @throws CoreException
+	 */
+	protected String getGlobalPrefix(boolean global, char[] password, IPath workingDirectory, SubMonitor sub,
+			String globalPrefixPath) throws CoreException
+	{
+		/*
+		 * HACK for environments with npm config prefix value set : when sudo npm -g install command is used, the global
+		 * prefix config value for the entire system overrides the global prefix value of the user. So, it always
+		 * install into /usr/lib even though user set a custom value for NPM_CONFIG_PREFIX.
+		 */
+		sub.subTask("Checking global NPM prefix");
+		IPath prefixPath = getConfigPrefixPath();
+		if (prefixPath != null)
+		{
+			List<String> args = CollectionsUtil.newList(CONFIG, GET, PREFIX);
+			// TODO: should cache this value as config prefix path ?
+			IStatus npmStatus = runNpmConfig(args, password, global, workingDirectory, sub.newChild(1));
+			if (npmStatus.isOK())
+			{
+				String prefix = npmStatus.getMessage();
+				sub.subTask("Global NPM prefix is " + prefix);
+				// If the sudo cache is timed out, then the password prompt and other details might appear in the
+				// console. So we should strip them off to get the real npm prefix value.
+				if (prefix.contains(SudoManager.PROMPT_MSG))
+				{
+					prefix = prefix.substring(prefix.indexOf(SudoManager.PROMPT_MSG) + SudoManager.PROMPT_MSG.length());
+				}
+
+				// Set the global prefix path only if it is not the default value.
+				if (!prefixPath.toOSString().equals(prefix))
+				{
+					sub.subTask("Global and user NPM prefix don't match, setting global prefix temporarily to: "
+							+ prefixPath.toOSString());
+					globalPrefixPath = prefix;
+					setGlobalPrefixPath(password, workingDirectory, sub.newChild(1), prefixPath.toOSString());
+				}
+			}
+			else
+			{
+				IdeLog.logWarning(JSCorePlugin.getDefault(),
+						"Failed to get global prefix for NPM: " + npmStatus.getMessage());
+			}
+		}
+		return globalPrefixPath;
 	}
 
 	private IStatus setGlobalPrefixPath(char[] password, IPath workingDirectory, IProgressMonitor monitor,
@@ -660,12 +682,42 @@ public class NodePackageManager implements INodePackageManager
 		return args;
 	}
 
+	/**
+	 * Uninstalls an npm package.
+	 * 
+	 * @param packageName
+	 * @param displayName
+	 * @param global
+	 * @param password
+	 * @param monitor
+	 * @return
+	 * @throws CoreException
+	 */
 	public IStatus uninstall(String packageName, String displayName, boolean global, char[] password,
 			IProgressMonitor monitor) throws CoreException
 	{
+		return uninstall(packageName, displayName, global, password, null, monitor);
+	}
+
+	/**
+	 * Uninstalls an npm package.
+	 * 
+	 * @param packageName
+	 * @param displayName
+	 * @param global
+	 * @param password
+	 * @param workingDirectory
+	 * @param monitor
+	 * @return
+	 * @throws CoreException
+	 */
+	public IStatus uninstall(String packageName, String displayName, boolean global, char[] password,
+			IPath workingDirectory, IProgressMonitor monitor) throws CoreException
+	{
 		try
 		{
-			IStatus status = runNpmInstaller(packageName, displayName, global, password, null, REMOVE, monitor);
+			IStatus status = runNpmInstaller(packageName, displayName, global, password, workingDirectory, REMOVE,
+					monitor);
 			if (status.getSeverity() == IStatus.CANCEL)
 			{
 				return Status.OK_STATUS;
@@ -687,7 +739,6 @@ public class NodePackageManager implements INodePackageManager
 		{
 			return new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, e.getMessage(), e);
 		}
-
 	}
 
 	// When in global mode, executables are linked into {prefix}/bin on Unix, or directly into {prefix} on Windows.
@@ -832,4 +883,5 @@ public class NodePackageManager implements INodePackageManager
 	{
 		return ExecutableUtil.find(executableName, true, searchLocations, filter);
 	}
+
 }
