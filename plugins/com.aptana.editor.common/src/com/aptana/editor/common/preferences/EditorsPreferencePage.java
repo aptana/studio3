@@ -81,6 +81,10 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 		addField(new BooleanFieldEditor(IPreferenceConstants.ENABLE_WORD_WRAP,
 				Messages.EditorsPreferencePage_Enable_WordWrap, appearanceComposite));
 
+		//Open no extension files with JavaScript source editor.
+		addField(new BooleanFieldEditor(IPreferenceConstants.OPEN_WITH_JS_EDITOR,
+						Messages.EditorsPreferencePage_OpenWith_JSEditor, appearanceComposite));
+
 		createTextEditorLink(appearanceComposite);
 	}
 

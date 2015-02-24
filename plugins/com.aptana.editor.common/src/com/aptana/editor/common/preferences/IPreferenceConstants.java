@@ -124,6 +124,11 @@ public interface IPreferenceConstants
 	 * The preference key used to enable and disable word wrap
 	 */
 	public static final String ENABLE_WORD_WRAP = CommonEditorPlugin.PLUGIN_ID + ".enableWordWrap"; //$NON-NLS-1$
+	
+	/**
+	 * The preference key used to open non extension files with JavaScript editor.
+	 */
+	public static final String OPEN_WITH_JS_EDITOR = CommonEditorPlugin.PLUGIN_ID + ".openWithJSEditor"; //$NON-NLS-1$
 
 	/**
 	 * The preference key for if to show the dialog of where the untitled file should save to

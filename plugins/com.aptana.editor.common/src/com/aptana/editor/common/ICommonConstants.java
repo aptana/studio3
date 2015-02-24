@@ -33,4 +33,10 @@ public interface ICommonConstants
 	 * Code-formatter action ID ("com.aptana.editor.action.Format")
 	 */
 	public String FORMATTER_ACTION_ID = "com.aptana.editor.action.Format"; //$NON-NLS-1$
+	
+	/**
+	 * JavaScript Source editor id. Make sure will have the same id here and in the js editor extension.
+	 */
+	public static final String JS_EDITOR_ID = "com.aptana.editor.js"; //$NON-NLS-N$
+
 }

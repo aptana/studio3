@@ -79,6 +79,7 @@ public class Messages extends NLS
 	public static String EditorsPreferencePage_saveActionsGroup;
 	public static String EditorsPreferencePage_SyntaxColoring;
 	public static String EditorsPreferencePage_Wrap_Selection;
+	public static String EditorsPreferencePage_OpenWith_JSEditor;
 
 	public static String ValidationPreferencePage_ApplyingChangesToParticipants;
 	public static String ValidationPreferencePage_BuildColumn;
