@@ -172,6 +172,21 @@ public interface INodePackageManager
 			IProgressMonitor monitor) throws CoreException;
 
 	/**
+	 * Uninstalls an npm package.
+	 * 
+	 * @param packageName
+	 * @param displayName
+	 * @param global
+	 * @param password
+	 * @param workingDirectory
+	 * @param monitor
+	 * @return
+	 * @throws CoreException
+	 */
+	public IStatus uninstall(String packageName, String displayName, boolean global, char[] password,
+			IPath workingDirectory, IProgressMonitor monitor) throws CoreException;
+
+	/**
 	 * Does the NPM path/install we're pointing to exist?
 	 * 
 	 * @return
