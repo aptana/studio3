@@ -13,20 +13,25 @@ import org.eclipse.core.runtime.Platform;
 
 /**
  * @author Max Stepanov
- *
  */
-public class PlatformPropertyTester extends PropertyTester {
+public class PlatformPropertyTester extends PropertyTester
+{
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.expressions.IPropertyTester#test(java.lang.Object, java.lang.String, java.lang.Object[], java.lang.Object)
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.core.expressions.IPropertyTester#test(java.lang.Object, java.lang.String, java.lang.Object[],
+	 * java.lang.Object)
 	 */
-	public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
+	public boolean test(Object receiver, String property, Object[] args, Object expectedValue)
+	{
 		if ("os".equals(property)) { //$NON-NLS-1$
 			return Platform.getOS().equals(String.valueOf(expectedValue));
-		} else if ("ws".equals(property)) { //$NON-NLS-1$
+		}
+		else if ("ws".equals(property)) { //$NON-NLS-1$
 			return Platform.getWS().equals(String.valueOf(expectedValue));
-		} else if ("arch".equals(property)) { //$NON-NLS-1$
-			return Platform.getOSArch().equals(String.valueOf(expectedValue));				
+		}
+		else if ("arch".equals(property)) { //$NON-NLS-1$
+			return Platform.getOSArch().equals(String.valueOf(expectedValue));
 		}
 		return false;
 	}

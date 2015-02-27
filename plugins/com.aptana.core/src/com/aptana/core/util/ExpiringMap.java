@@ -14,157 +14,194 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Max Stepanov
- * TODO Merge/reuse IObjectPool? Very similar uses/implementations!
+ * @author Max Stepanov TODO Merge/reuse IObjectPool? Very similar uses/implementations!
  */
-public class ExpiringMap<K, V> implements Map<K, V> {
+public class ExpiringMap<K, V> implements Map<K, V>
+{
 
 	private LinkedHashMap<K, Item> map = new LinkedHashMap<K, Item>();
 	private long maxObjectTTL;
 
-
-	public ExpiringMap(long maxObjectTTL) {
+	public ExpiringMap(long maxObjectTTL)
+	{
 		super();
 		this.maxObjectTTL = maxObjectTTL;
 	}
-	
-	private boolean hasExpired(Object key, Item item) {
+
+	private boolean hasExpired(Object key, Item item)
+	{
 		long now = System.currentTimeMillis();
-		if (item.creationTime + maxObjectTTL < now) {
+		if (item.creationTime + maxObjectTTL < now)
+		{
 			map.remove(key);
 			return true;
 		}
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see java.util.Map#clear()
 	 */
-	public void clear() {
+	public void clear()
+	{
 		map.clear();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see java.util.Map#containsKey(java.lang.Object)
 	 */
-	public boolean containsKey(Object key) {
+	public boolean containsKey(Object key)
+	{
 		throw new UnsupportedOperationException();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see java.util.Map#containsValue(java.lang.Object)
 	 */
-	public boolean containsValue(Object value) {
+	public boolean containsValue(Object value)
+	{
 		throw new UnsupportedOperationException();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see java.util.Map#entrySet()
 	 */
-	public Set<Entry<K, V>> entrySet() {
+	public Set<Entry<K, V>> entrySet()
+	{
 		throw new UnsupportedOperationException();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see java.util.Map#get(java.lang.Object)
 	 */
-	public V get(Object key) {
+	public V get(Object key)
+	{
 		Item v = map.get(key);
-		if (v != null && !hasExpired(key, v)) {
+		if (v != null && !hasExpired(key, v))
+		{
 			return v.object;
 		}
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see java.util.Map#isEmpty()
 	 */
-	public boolean isEmpty() {
+	public boolean isEmpty()
+	{
 		throw new UnsupportedOperationException();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see java.util.Map#keySet()
 	 */
-	public Set<K> keySet() {
+	public Set<K> keySet()
+	{
 		return map.keySet();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see java.util.Map#put(java.lang.Object, java.lang.Object)
 	 */
-	public V put(K key, V value) {
-		Item v =  map.put(key, new Item(value));
-		if (v != null) {
+	public V put(K key, V value)
+	{
+		Item v = map.put(key, new Item(value));
+		if (v != null)
+		{
 			return v.object;
 		}
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see java.util.Map#putAll(java.util.Map)
 	 */
-	public void putAll(Map<? extends K, ? extends V> t) {
+	public void putAll(Map<? extends K, ? extends V> t)
+	{
 		Map<K, Item> all = new LinkedHashMap<K, Item>();
-		for (Entry<? extends K, ? extends V> i : t.entrySet()) {
+		for (Entry<? extends K, ? extends V> i : t.entrySet())
+		{
 			all.put(i.getKey(), new Item(i.getValue()));
 		}
 		map.putAll(all);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see java.util.Map#remove(java.lang.Object)
 	 */
-	public V remove(Object key) {
+	public V remove(Object key)
+	{
 		Item v = map.remove(key);
-		if (v != null && !hasExpired(key, v)) {
+		if (v != null && !hasExpired(key, v))
+		{
 			return v.object;
 		}
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see java.util.Map#size()
 	 */
-	public int size() {
+	public int size()
+	{
 		throw new UnsupportedOperationException();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see java.util.Map#values()
 	 */
-	public Collection<V> values() {
+	public Collection<V> values()
+	{
 		throw new UnsupportedOperationException();
 	}
 
-	private class Item {
-		
+	private class Item
+	{
+
 		protected V object;
 		protected long creationTime;
-		
-		public Item(V object) {
+
+		public Item(V object)
+		{
 			this.object = object;
 			this.creationTime = System.currentTimeMillis();
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
 		 * @see java.lang.Object#equals(java.lang.Object)
 		 */
 		@SuppressWarnings("rawtypes")
 		@Override
-		public boolean equals(Object obj) {
-			if (obj instanceof ExpiringMap.Item) {
+		public boolean equals(Object obj)
+		{
+			if (obj instanceof ExpiringMap.Item)
+			{
 				return object == ((ExpiringMap.Item) obj).object
-					|| (object != null && object.equals(((ExpiringMap.Item) obj).object));
+						|| (object != null && object.equals(((ExpiringMap.Item) obj).object));
 			}
 			return false;
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
 		 * @see java.lang.Object#hashCode()
 		 */
 		@Override
-		public int hashCode() {
+		public int hashCode()
+		{
 			return object != null ? object.hashCode() : 0;
 		}
 	}

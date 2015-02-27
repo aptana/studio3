@@ -13,13 +13,13 @@ import org.eclipse.core.runtime.IAdaptable;
 
 /**
  * @author Max Stepanov
- *
  */
-public interface IUniformResource extends IAdaptable {
-	
+public interface IUniformResource extends IAdaptable
+{
+
 	/**
 	 * Resource URI
-	 *
+	 * 
 	 * @return URI
 	 */
 	URI getURI();

@@ -224,7 +224,8 @@ public class FileUtil
 		boolean result = true;
 		if (dir.isDirectory())
 		{
-			// On *nix systems, defer to rm -rf. If for some reason it faiils, fall back to recursive delete via Java API
+			// On *nix systems, defer to rm -rf. If for some reason it faiils, fall back to recursive delete via Java
+			// API
 			if (!PlatformUtil.isWindows())
 			{
 				IStatus status = new ProcessRunner().runInBackground("/bin/rm", "-rf", dir.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$

@@ -11,12 +11,12 @@ import org.eclipse.core.resources.IMarker;
 
 /**
  * @author Max Stepanov
- *
  */
-public interface IUniformResourceMarker extends IMarker {
+public interface IUniformResourceMarker extends IMarker
+{
 	/**
 	 * getUniformResource
-	 *
+	 * 
 	 * @return IUniformResource
 	 */
 	IUniformResource getUniformResource();

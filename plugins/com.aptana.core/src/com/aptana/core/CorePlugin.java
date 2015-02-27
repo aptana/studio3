@@ -148,7 +148,7 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 
 	/**
 	 * Returns the shared instance
-	 *
+	 * 
 	 * @return the shared instance
 	 */
 	public static CorePlugin getDefault()
@@ -158,7 +158,7 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 
 	/**
 	 * Returns the {@link ISourceMapRegistry}.
-	 *
+	 * 
 	 * @return {@link ISourceMapRegistry}.
 	 */
 	public synchronized ISourceMapRegistry getSourceMapRegistry()
@@ -172,7 +172,7 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 
 	/**
 	 * Returns the {@link IDiagnosticManager}.
-	 *
+	 * 
 	 * @return {@link IDiagnosticManager}.
 	 */
 	public synchronized IDiagnosticManager getDiagnosticManager()
@@ -196,7 +196,7 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 
 	/**
 	 * Returns the current bundle context
-	 *
+	 * 
 	 * @return
 	 */
 	public BundleContext getContext()

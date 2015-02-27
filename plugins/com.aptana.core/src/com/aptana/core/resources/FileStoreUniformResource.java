@@ -14,24 +14,27 @@ import org.eclipse.core.filesystem.IFileStore;
 
 /**
  * @author Max Stepanov
- *
  */
-public final class FileStoreUniformResource extends AbstractUniformResource {
+public final class FileStoreUniformResource extends AbstractUniformResource
+{
 
 	private final IFileStore fileStore;
-	
+
 	/**
 	 * 
 	 */
-	public FileStoreUniformResource(IFileStore fileStore) {
+	public FileStoreUniformResource(IFileStore fileStore)
+	{
 		super();
 		this.fileStore = fileStore;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.core.resources.IUniformResource#getURI()
 	 */
-	public URI getURI() {
+	public URI getURI()
+	{
 		return fileStore.toURI();
 	}
 

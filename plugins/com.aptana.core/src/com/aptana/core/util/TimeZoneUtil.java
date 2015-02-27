@@ -14,11 +14,13 @@ import java.util.List;
 /**
  * @author Max Stepanov
  */
-public final class TimeZoneUtil {
+public final class TimeZoneUtil
+{
 
 	private static final List<String> commonTimeZones = new ArrayList<String>();
 
-	static {
+	static
+	{
 		commonTimeZones.add("EST"); //$NON-NLS-1$
 		commonTimeZones.add("CST"); //$NON-NLS-1$
 		commonTimeZones.add("MST"); //$NON-NLS-1$
@@ -29,25 +31,32 @@ public final class TimeZoneUtil {
 	/**
 	 * 
 	 */
-	private TimeZoneUtil() {
+	private TimeZoneUtil()
+	{
 	}
 
-	public static String getCommonTimeZone(String[] timezones) {
-		if (timezones == null || timezones.length == 0) {
+	public static String getCommonTimeZone(String[] timezones)
+	{
+		if (timezones == null || timezones.length == 0)
+		{
 			return StringUtil.EMPTY;
 		}
 
-		for (String i : timezones) {
-			if (commonTimeZones.contains(i)) {
+		for (String i : timezones)
+		{
+			if (commonTimeZones.contains(i))
+			{
 				return i;
 			}
 		}
-		for (String i : timezones) {
+		for (String i : timezones)
+		{
 			if (i.startsWith("GMT")) { //$NON-NLS-1$
 				return i;
 			}
 		}
-		for (String i : timezones) {
+		for (String i : timezones)
+		{
 			if (i.startsWith("Etc/GMT")) { //$NON-NLS-1$
 				return i;
 			}

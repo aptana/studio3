@@ -10,9 +10,9 @@ package com.aptana.core;
 
 /**
  * @author Max Stepanov
- *
  */
-public interface Identifiable {
+public interface Identifiable
+{
 
 	/**
 	 * @return id

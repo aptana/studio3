@@ -9,42 +9,45 @@ package com.aptana.core.internal.resources;
 
 /**
  * @author Max Stepanov
- *
  */
-/*package*/ class ResourceInfo {
+/* package */class ResourceInfo
+{
 
 	/** The collection of markers for this resource. */
 	private MarkerSet markers = null;
 
-	
-	/** 
-	 * Returns a copy of the collection of makers on this resource.
-	 * <code>null</code> is returned if there are none.
+	/**
+	 * Returns a copy of the collection of makers on this resource. <code>null</code> is returned if there are none.
+	 * 
 	 * @return MarkerSet
 	 */
-	public MarkerSet getMarkers() {
+	public MarkerSet getMarkers()
+	{
 		return getMarkers(true);
 	}
 
-	/** 
-	 * Returns the collection of makers on this resource.
-	 * <code>null</code> is returned if there are none.
-	 * @param makeCopy 
+	/**
+	 * Returns the collection of makers on this resource. <code>null</code> is returned if there are none.
+	 * 
+	 * @param makeCopy
 	 * @return MarkerSet
 	 */
-	public MarkerSet getMarkers(boolean makeCopy) {
-		if (markers == null) {
+	public MarkerSet getMarkers(boolean makeCopy)
+	{
+		if (markers == null)
+		{
 			return null;
 		}
 		return makeCopy ? (MarkerSet) markers.clone() : markers;
 	}
 
-	/** 
-	 * Sets the collection of makers for this resource.
-	 * <code>null</code> is passed in if there are no markers.
-	 * @param value 
+	/**
+	 * Sets the collection of makers for this resource. <code>null</code> is passed in if there are no markers.
+	 * 
+	 * @param value
 	 */
-	public void setMarkers(MarkerSet value) {
+	public void setMarkers(MarkerSet value)
+	{
 		markers = value;
 	}
 

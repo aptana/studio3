@@ -17,20 +17,22 @@ import com.aptana.core.resources.IUniformResource;
  *
  */
 @SuppressWarnings("restriction")
-public class MarkerDelta extends org.eclipse.core.internal.resources.MarkerDelta {
+public class MarkerDelta extends org.eclipse.core.internal.resources.MarkerDelta
+{
 
 	/**
 	 * uniform resource
 	 */
 	protected IUniformResource resource;
-	
+
 	public MarkerDelta(int kind, IUniformResource resource, MarkerInfo info)
 	{
 		super(kind, ResourcesPlugin.getWorkspace().getRoot(), info);
 		this.resource = resource;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.core.internal.resources.MarkerDelta#isSubtypeOf(java.lang.String)
 	 */
 	public boolean isSubtypeOf(String superType)
@@ -38,7 +40,8 @@ public class MarkerDelta extends org.eclipse.core.internal.resources.MarkerDelta
 		return MarkerManager.getInstance().isSubtype(getType(), superType);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.core.internal.resources.MarkerDelta#getMarker()
 	 */
 	public IMarker getMarker()
@@ -48,14 +51,16 @@ public class MarkerDelta extends org.eclipse.core.internal.resources.MarkerDelta
 
 	/**
 	 * getUniformResource
-	 *
+	 * 
 	 * @return IUniformResource
 	 */
-	public IUniformResource getUniformResource() {
+	public IUniformResource getUniformResource()
+	{
 		return resource;
 	}
 
-	protected static MarkerSet merge(MarkerSet oldChanges, IMarkerSetElement[] newChanges) {
+	protected static MarkerSet merge(MarkerSet oldChanges, IMarkerSetElement[] newChanges)
+	{
 		MarkerSet merged = new MarkerSet();
 		merged.addAll(org.eclipse.core.internal.resources.MarkerDelta.merge(oldChanges, newChanges).elements());
 		return merged;
