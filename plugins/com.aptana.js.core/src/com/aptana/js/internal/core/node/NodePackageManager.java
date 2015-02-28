@@ -74,11 +74,6 @@ public class NodePackageManager implements INodePackageManager
 	 */
 	private static final String NPM_CONFIG_PREFIX = "NPM_CONFIG_PREFIX"; //$NON-NLS-1$
 
-	/**
-	 * Folder where modules live.
-	 */
-	private static final String NODE_MODULES = "node_modules"; //$NON-NLS-1$
-
 	private static final String BIN = "bin"; //$NON-NLS-1$
 	private static final String LIB = "lib"; //$NON-NLS-1$
 
@@ -151,7 +146,7 @@ public class NodePackageManager implements INodePackageManager
 	/**
 	 * A method that grabs the path to the NPM script to run under node. If the file doesn't exist we throw a
 	 * CoreException.
-	 * 
+	 *
 	 * @return
 	 * @throws CoreException
 	 */
@@ -261,7 +256,7 @@ public class NodePackageManager implements INodePackageManager
 
 	/**
 	 * Gets the global prefix for global installs
-	 * 
+	 *
 	 * @param global
 	 * @param password
 	 * @param workingDirectory
@@ -332,7 +327,7 @@ public class NodePackageManager implements INodePackageManager
 
 	/**
 	 * This will return a list of arguments for proxy settings (if we have any, otherwise an empty list).
-	 * 
+	 *
 	 * @param env
 	 *            The environment map. Passed in so we can flag passwords to obfuscate (in other words, we may modify
 	 *            the map)
@@ -361,7 +356,7 @@ public class NodePackageManager implements INodePackageManager
 
 	/**
 	 * Given proxy data, we try to convert that back into a full URL
-	 * 
+	 *
 	 * @param data
 	 *            The {@link IProxyData} we're converting into a URL string.
 	 * @param env
@@ -684,7 +679,7 @@ public class NodePackageManager implements INodePackageManager
 
 	/**
 	 * Uninstalls an npm package.
-	 * 
+	 *
 	 * @param packageName
 	 * @param displayName
 	 * @param global
@@ -701,7 +696,7 @@ public class NodePackageManager implements INodePackageManager
 
 	/**
 	 * Uninstalls an npm package.
-	 * 
+	 *
 	 * @param packageName
 	 * @param displayName
 	 * @param global
