@@ -1,4 +1,4 @@
-@import url("dashboard.css");
+@import url("platform:/plugin/com.aptana.theme/css/dashboard.css");
 
 /* GTK specific */
 .MPartStack {
