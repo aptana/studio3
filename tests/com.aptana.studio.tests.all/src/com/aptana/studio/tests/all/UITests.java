@@ -31,6 +31,7 @@ import com.aptana.editor.common.internal.commands.NextPreviousEditorHandlerTest;
 	com.aptana.editor.xml.tests.AllTests.class,
 	com.aptana.editor.xml.formatter.tests.AllTests.class,
 	com.aptana.deploy.ftp.tests.AllTests.class,
+	com.aptana.samples.ui.tests.AllTests.class,
 //	// com.aptana.editor.text.tests.AllTests.class, // TODO Add Tests for editor.text
 //	// com.aptana.explorer.tests.AllTests.class, // TODO Add Tests for explorer
 //	// com.aptana.filesystem.s3.tests.AllTests.class // FIXME I think the way we do passwords causes us to have to run s3 tests in the UI!
