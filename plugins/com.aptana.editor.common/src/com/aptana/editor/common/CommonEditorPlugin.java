@@ -13,8 +13,6 @@ import java.util.Map;
 
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.State;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
@@ -27,16 +25,12 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.jface.text.templates.ContextTypeRegistry;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IPartService;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveListener;
-import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWindowListener;
 import org.eclipse.ui.IWorkbench;
@@ -45,11 +39,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
-import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.editors.text.templates.ContributionTemplateStore;
-import org.eclipse.ui.ide.IDE;
-import org.eclipse.ui.navigator.CommonNavigator;
-import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.progress.UIJob;
 import org.osgi.framework.BundleContext;
@@ -69,7 +59,6 @@ import com.aptana.index.core.IndexPlugin;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.Theme;
 import com.aptana.theme.ThemePlugin;
-import com.aptana.ui.util.UIUtils;
 import com.aptana.usage.AnalyticsEvent;
 import com.aptana.usage.FeatureEvent;
 import com.aptana.usage.IStudioAnalytics;
@@ -302,13 +291,19 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 				return Status.OK_STATUS;
 			}
 		}.schedule();
-		
+
 		new UIJob("registering double click listener to project explorer") //$NON-NLS-1$
 		{
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor)
 			{
-				handleOpenWithJSEditorPref();
+				String editorId = Platform.getPreferencesService().getString(CommonEditorPlugin.PLUGIN_ID,
+						com.aptana.editor.common.preferences.IPreferenceConstants.OPEN_WITH_EDITOR, StringUtil.EMPTY,
+						null);
+				if (editorId != null && !editorId.equals(ICommonConstants.ECLIPSE_DEFAULT_EDITOR))
+				{
+					CommonUtil.handleOpenWithEditorPref();
+				}
 				return Status.OK_STATUS;
 			}
 		}.schedule();
@@ -536,39 +531,5 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		}
 		return quickFixRegistry;
 	}
-	
-	/**
-	 * Registering double click listener to the project explorer viewer to handle "Open no extension files with JavaScript Source Editor" preference option.
-	 * Which is added under the "Editors" section. Based on the preference option while opening a file will overwrite the default editor id of a file.
-	 */
-	private void handleOpenWithJSEditorPref()
-	{
-		IViewPart explorerPart = UIUtils.findView(IPageLayout.ID_PROJECT_EXPLORER);
-		if (explorerPart != null)
-		{
-			CommonNavigator projectExplorer = (CommonNavigator) explorerPart;
-			CommonViewer viewer = projectExplorer.getCommonViewer();
-			viewer.addDoubleClickListener(new IDoubleClickListener()
-			{
-				public void doubleClick(DoubleClickEvent event)
-				{
-					IResource selectedResource = UIUtils.getSelectedResource();
-					if (selectedResource != null && selectedResource instanceof IFile)
-					{
-						IFile selectedFile = (IFile) selectedResource;
-						if (!selectedFile.getName().contains(".")) { ////$NON-NLS-N$
 
-							boolean isOpenWithJSEditor = Platform.getPreferencesService().getBoolean(
-									CommonEditorPlugin.PLUGIN_ID,
-									com.aptana.editor.common.preferences.IPreferenceConstants.OPEN_WITH_JS_EDITOR,
-									false, null);
-							IDE.setDefaultEditor(selectedFile, isOpenWithJSEditor ? ICommonConstants.JS_EDITOR_ID
-									: EditorsUI.DEFAULT_TEXT_EDITOR_ID);
-
-						}
-					}
-				}
-			});
-		}
-	}
 }

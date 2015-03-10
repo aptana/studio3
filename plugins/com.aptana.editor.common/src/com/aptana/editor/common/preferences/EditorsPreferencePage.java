@@ -7,14 +7,22 @@
  */
 package com.aptana.editor.common.preferences;
 
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
+import org.eclipse.jface.preference.ComboFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IntegerFieldEditor;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.IWorkbench;
@@ -23,6 +31,8 @@ import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.CommonUtil;
+import com.aptana.editor.common.util.EditorUtil;
 import com.aptana.ui.preferences.AptanaPreferencePage;
 
 /**
@@ -32,6 +42,7 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 {
 
 	private String GENERAL_TEXT_EDITOR_PREF_ID = "org.eclipse.ui.preferencePages.GeneralTextEditor"; //$NON-NLS-1$
+	private ComboFieldEditor editorsListCombo;
 
 	/**
 	 * EditorsPreferencePage
@@ -81,11 +92,56 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 		addField(new BooleanFieldEditor(IPreferenceConstants.ENABLE_WORD_WRAP,
 				Messages.EditorsPreferencePage_Enable_WordWrap, appearanceComposite));
 
-		//Open no extension files with JavaScript source editor.
-		addField(new BooleanFieldEditor(IPreferenceConstants.OPEN_WITH_JS_EDITOR,
-						Messages.EditorsPreferencePage_OpenWith_JSEditor, appearanceComposite));
+		createOpenWithEditor(appearanceComposite);
 
 		createTextEditorLink(appearanceComposite);
+	}
+
+	private void createOpenWithEditor(Composite appearanceComposite)
+	{
+		Map<String, String> editorsMap = EditorUtil.getAllRegistryEditors();
+
+		// Prepare the input for the combo
+		String[][] entryNamesAndValues = new String[editorsMap.size()][2];
+		Set<Entry<String, String>> entries = editorsMap.entrySet();
+		Iterator<Entry<String, String>> entriesIterator = entries.iterator();
+
+		int i = 0;
+		while (entriesIterator.hasNext())
+		{
+			Map.Entry<String, String> mapping = (Entry<String, String>) entriesIterator.next();
+			entryNamesAndValues[i][0] = mapping.getValue();
+			entryNamesAndValues[i][1] = mapping.getKey();
+			i++;
+		}
+
+		editorsListCombo = new ComboFieldEditor(IPreferenceConstants.OPEN_WITH_EDITOR,
+				Messages.EditorsPreferencePage_OpenWith_Editor, entryNamesAndValues, appearanceComposite);
+		addField(editorsListCombo);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * org.eclipse.jface.preference.FieldEditorPreferencePage#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
+	 */
+	@Override
+	public void propertyChange(PropertyChangeEvent event)
+	{
+		super.propertyChange(event);
+
+		// It's better to handle this functionality here rather than okPressed() and peformApply() considering these
+		// functions will be called every time, propertyChange() will be invoked for the changes only in Editor
+		// preferences.
+		if (event.getSource() == editorsListCombo)
+		{
+			Object newValue = event.getNewValue();
+			Object oldValue = event.getOldValue();
+			if (!(newValue != null && oldValue != null && newValue.equals(oldValue)))
+			{
+				CommonUtil.handleOpenWithEditorPref();
+			}
+		}
 	}
 
 	/**
@@ -100,6 +156,7 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 		// Link to general text editor prefs from Eclipse - they can set tabs/spaces/whitespace drawing, etc
 		Link link = new Link(appearanceComposite, SWT.NONE);
 		link.setText(Messages.EditorsPreferencePage_GeneralTextEditorPrefLink);
+		link.setLayoutData(new GridData(SWT.LEFT, SWT.NONE, false, false, 2, 1));
 		link.addSelectionListener(new SelectionAdapter()
 		{
 

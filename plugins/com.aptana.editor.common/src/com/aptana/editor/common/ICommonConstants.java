@@ -38,5 +38,9 @@ public interface ICommonConstants
 	 * JavaScript Source editor id. Make sure will have the same id here and in the js editor extension.
 	 */
 	public static final String JS_EDITOR_ID = "com.aptana.editor.js"; //$NON-NLS-N$
-
+	
+	/**
+	 * Flag to indicate use default eclipse editor while opening extensionless files, leave default behaviour to eclipse itself.- Either last opened type/Text Editor
+	 */
+	public static final String ECLIPSE_DEFAULT_EDITOR = "Default Editor"; //$NON-NLS-N$
 }
