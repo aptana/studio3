@@ -53,7 +53,7 @@ public final class CommonUtil
 	 * "Open no extension files with JavaScript Source Editor" preference option. Which is added under the "Editors"
 	 * section. Based on the preference option while opening a file will overwrite the default editor id of a file.
 	 */
-	public static void handleOpenWithEditorPref()
+	public static synchronized void handleOpenWithEditorPref()
 	{
 		if (!isDoubleClickRegistered)
 		{
@@ -67,19 +67,20 @@ public final class CommonUtil
 					public void doubleClick(DoubleClickEvent event)
 					{
 						IResource selectedResource = UIUtils.getSelectedResource();
-						if (selectedResource != null && selectedResource instanceof IFile)
+						if (!(selectedResource instanceof IFile))
 						{
-							IFile selectedFile = (IFile) selectedResource;
-							if (!selectedFile.getName().contains(".")) { ////$NON-NLS-N$
+							return;
+						}
+						IFile selectedFile = (IFile) selectedResource;
+						if (!selectedFile.getName().contains(".")) { ////$NON-NLS-N$
 
-								String selectedEditor = Platform.getPreferencesService().getString(
-										CommonEditorPlugin.PLUGIN_ID,
-										com.aptana.editor.common.preferences.IPreferenceConstants.OPEN_WITH_EDITOR,
-										StringUtil.EMPTY, null);
-								if (selectedEditor != ICommonConstants.ECLIPSE_DEFAULT_EDITOR)
-								{
-									IDE.setDefaultEditor(selectedFile, selectedEditor);
-								}
+							String selectedEditor = Platform.getPreferencesService().getString(
+									CommonEditorPlugin.PLUGIN_ID,
+									com.aptana.editor.common.preferences.IPreferenceConstants.OPEN_WITH_EDITOR,
+									StringUtil.EMPTY, null);
+							if (selectedEditor != ICommonConstants.ECLIPSE_DEFAULT_EDITOR)
+							{
+								IDE.setDefaultEditor(selectedFile, selectedEditor);
 							}
 						}
 					}

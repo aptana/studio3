@@ -29,6 +29,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
+import com.aptana.core.util.ObjectUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.CommonUtil;
@@ -137,7 +138,7 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 		{
 			Object newValue = event.getNewValue();
 			Object oldValue = event.getOldValue();
-			if (!(newValue != null && oldValue != null && newValue.equals(oldValue)))
+			if (ObjectUtil.areNotEqual(newValue, oldValue))
 			{
 				CommonUtil.handleOpenWithEditorPref();
 			}

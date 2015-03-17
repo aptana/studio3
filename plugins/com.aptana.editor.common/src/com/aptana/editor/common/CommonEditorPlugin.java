@@ -292,7 +292,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 			}
 		}.schedule();
 
-		new UIJob("registering double click listener to project explorer") //$NON-NLS-1$
+		Job registerDCJob = new UIJob("registering double click listener to project explorer") //$NON-NLS-1$
 		{
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor)
@@ -300,13 +300,15 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 				String editorId = Platform.getPreferencesService().getString(CommonEditorPlugin.PLUGIN_ID,
 						com.aptana.editor.common.preferences.IPreferenceConstants.OPEN_WITH_EDITOR, StringUtil.EMPTY,
 						null);
-				if (editorId != null && !editorId.equals(ICommonConstants.ECLIPSE_DEFAULT_EDITOR))
+				if (!ICommonConstants.ECLIPSE_DEFAULT_EDITOR.equals(editorId))
 				{
 					CommonUtil.handleOpenWithEditorPref();
 				}
 				return Status.OK_STATUS;
 			}
-		}.schedule();
+		};
+		EclipseUtil.setSystemForJob(registerDCJob);
+		registerDCJob.schedule();
 	}
 
 	/**
