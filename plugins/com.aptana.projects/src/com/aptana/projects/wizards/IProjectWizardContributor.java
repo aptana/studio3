@@ -7,6 +7,8 @@
  */
 package com.aptana.projects.wizards;
 
+import java.util.List;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -22,21 +24,21 @@ public interface IProjectWizardContributor extends IExecutableExtension
 
 	/**
 	 * Responsible for creating the project wizard pages
-	 * 
+	 *
 	 * @return
 	 */
 	public IWizardPage createWizardPage(Object data);
 
 	/**
 	 * Performs any specific finalization on all wizard pages
-	 * 
+	 *
 	 * @param page
 	 */
 	public void finalizeWizardPage(IWizardPage page);
 
 	/**
 	 * Responsible for contributing UI to the project creation page of the wizard
-	 * 
+	 *
 	 * @param data
 	 * @param page
 	 * @param parent
@@ -45,7 +47,7 @@ public interface IProjectWizardContributor extends IExecutableExtension
 
 	/**
 	 * Responsible for contributing UI to a Sample project creation page of the wizard
-	 * 
+	 *
 	 * @param data
 	 * @param page
 	 * @param parent
@@ -54,14 +56,22 @@ public interface IProjectWizardContributor extends IExecutableExtension
 
 	/**
 	 * Called to update the UI for the contributor
-	 * 
+	 *
 	 * @param data
 	 */
 	public void updateProjectCreationPage(Object data);
 
 	/**
+	 * Based on the current user selection of the options, it returns list of possible additional command line options
+	 * for creating a project.
+	 *
+	 * @return
+	 */
+	public List<String> getArguments();
+
+	/**
 	 * Validates the project settings
-	 * 
+	 *
 	 * @param data
 	 * @return
 	 */
@@ -69,7 +79,7 @@ public interface IProjectWizardContributor extends IExecutableExtension
 
 	/**
 	 * Returns the check whether this nature ids passed matches the contributor natureid
-	 * 
+	 *
 	 * @param natureIds
 	 * @return
 	 */
@@ -77,7 +87,7 @@ public interface IProjectWizardContributor extends IExecutableExtension
 
 	/**
 	 * Performs the work to finish the wizard. Provides an optional monitor to record progress
-	 * 
+	 *
 	 * @param project
 	 * @param monitor
 	 * @return
