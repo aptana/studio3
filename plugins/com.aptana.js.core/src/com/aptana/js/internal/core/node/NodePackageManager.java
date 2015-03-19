@@ -475,9 +475,22 @@ public class NodePackageManager implements INodePackageManager
 		return listing.contains(packageName);
 	}
 
-	public IPath getModulesPath(String packageName) throws CoreException
+	/**
+	 * FIXME Add Unit tests.
+	 */
+	public IPath getModulesPath(String packageName, boolean isGlobal, String... args) throws CoreException
 	{
-		IStatus status = runInBackground(PARSEABLE_ARG, LIST, packageName, GLOBAL_ARG);
+		List<String> processArgs = CollectionsUtil.newList(PARSEABLE_ARG, LIST, packageName, SILENT_ARG);
+		if (isGlobal)
+		{
+			CollectionsUtil.addToList(processArgs, GLOBAL_ARG);
+		}
+		if (args != null)
+		{
+			CollectionsUtil.addToList(processArgs, args);
+		}
+
+		IStatus status = runInBackground(CollectionsUtil.toArray(processArgs));
 		if (!status.isOK())
 		{
 			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
