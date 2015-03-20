@@ -34,6 +34,11 @@ public class AppcSocketMessagesHandler implements ISocketMessagesHandler
 	private final String actionName;
 	private final String description;
 
+	public AppcSocketMessagesHandler()
+	{
+		this(Messages.AppcSocketMessagesHandler_title, Messages.AppcSocketMessagesHandler_Description);
+	}
+
 	public AppcSocketMessagesHandler(String actionName, String description)
 	{
 		this.actionName = actionName;
