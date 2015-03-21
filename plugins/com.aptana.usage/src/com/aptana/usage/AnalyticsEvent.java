@@ -154,7 +154,7 @@ public class AnalyticsEvent
 		addPostEntry(event, "guid", APP_INFO.getAppGuid()); //$NON-NLS-1$
 		addPostEntry(event, "mid", CorePlugin.getMID()); //$NON-NLS-1$
 		addPostEntry(event, "app_id", APP_INFO.getAppId()); //$NON-NLS-1$
-		addPostEntry(event, "creator_user_id", (user == null) ? StringUtil.EMPTY : user.getUID()); //$NON-NLS-1$
+		addPostEntry(event, "creator_user_id", (user == null) ? StringUtil.EMPTY : user.getGUID()); //$NON-NLS-1$
 		addPostEntry(event, "app_name", APP_INFO.getAppName()); //$NON-NLS-1$
 		addPostEntry(event, "app_version", EclipseUtil.getPluginVersion(APP_INFO.getVersionPluginId())); //$NON-NLS-1$
 		addPostEntry(event, "mac_addr", MACAddress.getMACAddress()); //$NON-NLS-1$
@@ -259,40 +259,62 @@ public class AnalyticsEvent
 	public boolean equals(Object obj)
 	{
 		if (this == obj)
+		{
 			return true;
+		}
 		if (obj == null)
+		{
 			return false;
+		}
 		if (getClass() != obj.getClass())
+		{
 			return false;
+		}
 		AnalyticsEvent other = (AnalyticsEvent) obj;
 		if (JSONPayloadString == null)
 		{
 			if (other.JSONPayloadString != null)
+			{
 				return false;
+			}
 		}
 		else if (!JSONPayloadString.equals(other.JSONPayloadString))
+		{
 			return false;
+		}
 		if (dateTime == null)
 		{
 			if (other.dateTime != null)
+			{
 				return false;
+			}
 		}
 		else if (!dateTime.equals(other.dateTime))
+		{
 			return false;
+		}
 		if (eventName == null)
 		{
 			if (other.eventName != null)
+			{
 				return false;
+			}
 		}
 		else if (!eventName.equals(other.eventName))
+		{
 			return false;
+		}
 		if (eventType == null)
 		{
 			if (other.eventType != null)
+			{
 				return false;
+			}
 		}
 		else if (!eventType.equals(other.eventType))
+		{
 			return false;
+		}
 		return true;
 	}
 }
