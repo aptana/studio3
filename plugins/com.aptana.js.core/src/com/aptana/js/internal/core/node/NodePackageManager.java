@@ -510,7 +510,7 @@ public class NodePackageManager implements INodePackageManager
 	{
 		IPath npmPath = checkedNPMPath();
 		List<String> args = CollectionsUtil.newList(npmPath.toOSString(),
-				"ls", packageName, COLOR, FALSE, JSON, TRUE, SILENT); //$NON-NLS-1$
+				"ls", packageName, SILENT, COLOR, FALSE, JSON, TRUE); //$NON-NLS-1$
 		if (global)
 		{
 			args.add(GLOBAL_ARG);
