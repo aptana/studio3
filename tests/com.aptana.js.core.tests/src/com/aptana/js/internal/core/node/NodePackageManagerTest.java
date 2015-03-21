@@ -325,8 +325,8 @@ public class NodePackageManagerTest
 				oneOf(node).runInBackground(
 						userHome,
 						ShellExecutable.getEnvironment(),
-						CollectionsUtil.newList("/usr/bin/npm", "ls", "titanium", "--color", "false", "--json", "true",
-								"-s", "-g"));
+						CollectionsUtil.newList("/usr/bin/npm", "ls", "titanium", "-s", "--color", "false", "--json",
+								"true", "-g"));
 				will(returnValue(status));
 			}
 		});
@@ -376,8 +376,8 @@ public class NodePackageManagerTest
 				oneOf(node).runInBackground(
 						userHome,
 						ShellExecutable.getEnvironment(),
-						CollectionsUtil.newList("/usr/bin/npm", "ls", "titanium", "--color", "false", "--json", "true",
-								"-s", "-g"));
+						CollectionsUtil.newList("/usr/bin/npm", "ls", "titanium", "-s", "--color", "false", "--json",
+								"true", "-g"));
 				will(returnValue(status));
 			}
 		});
@@ -400,8 +400,8 @@ public class NodePackageManagerTest
 				oneOf(node).runInBackground(
 						userHome,
 						ShellExecutable.getEnvironment(),
-						CollectionsUtil.newList("/usr/bin/npm", "ls", "titanium", "--color", "false", "--json", "true",
-								"-s", "-g"));
+						CollectionsUtil.newList("/usr/bin/npm", "ls", "titanium", "-s", "--color", "false", "--json",
+								"true", "-g"));
 				will(returnValue(status));
 			}
 		});
@@ -423,8 +423,8 @@ public class NodePackageManagerTest
 				oneOf(node).runInBackground(
 						null,
 						ShellExecutable.getEnvironment(),
-						CollectionsUtil.newList("/usr/bin/npm", "ls", "titanium", "--color", "false", "--json", "true",
-								"-s", "-g"));
+						CollectionsUtil.newList("/usr/bin/npm", "ls", "titanium", "-s", "--color", "false", "--json",
+								"true", "-g"));
 				will(returnValue(status));
 			}
 		});
@@ -449,8 +449,8 @@ public class NodePackageManagerTest
 				oneOf(node).runInBackground(
 						null,
 						ShellExecutable.getEnvironment(),
-						CollectionsUtil.newList("/usr/bin/npm", "ls", "titanium", "--color", "false", "--json", "true",
-								"-s", "-g"));
+						CollectionsUtil.newList("/usr/bin/npm", "ls", "titanium", "-s", "--color", "false", "--json",
+								"true", "-g"));
 				will(returnValue(status));
 			}
 		});
@@ -477,8 +477,8 @@ public class NodePackageManagerTest
 				oneOf(node).runInBackground(
 						null,
 						ShellExecutable.getEnvironment(),
-						CollectionsUtil.newList("/usr/bin/npm", "ls", "titanium", "--color", "false", "--json", "true",
-								"-s", "-g"));
+						CollectionsUtil.newList("/usr/bin/npm", "ls", "titanium", "-s", "--color", "false", "--json",
+								"true", "-g"));
 				will(returnValue(status));
 
 				// Falls back to checking list
