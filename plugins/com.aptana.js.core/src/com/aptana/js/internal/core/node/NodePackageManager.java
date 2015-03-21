@@ -59,6 +59,8 @@ import com.aptana.js.core.node.INodePackageManager;
 public class NodePackageManager implements INodePackageManager
 {
 
+	private static final String SILENT = "-s"; //$NON-NLS-1$
+
 	/**
 	 * The error string that appears in the npm command output.
 	 */
@@ -504,7 +506,8 @@ public class NodePackageManager implements INodePackageManager
 	public String getInstalledVersion(String packageName, boolean global, IPath workingDir) throws CoreException
 	{
 		IPath npmPath = checkedNPMPath();
-		List<String> args = CollectionsUtil.newList(npmPath.toOSString(), "ls", packageName, COLOR, FALSE, JSON, TRUE); //$NON-NLS-1$
+		List<String> args = CollectionsUtil.newList(npmPath.toOSString(),
+				"ls", packageName, SILENT, COLOR, FALSE, JSON, TRUE); //$NON-NLS-1$
 		if (global)
 		{
 			args.add(GLOBAL_ARG);
