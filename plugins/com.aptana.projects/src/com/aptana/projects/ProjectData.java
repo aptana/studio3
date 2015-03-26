@@ -34,7 +34,7 @@ public class ProjectData
 
 	public ProjectData()
 	{
-		this(null, null, null, false, null, DEFAULT_PUBLISHER_URL, null, null, false);
+		this(null, null, null, true, null, DEFAULT_PUBLISHER_URL, null, null, false);
 	}
 
 	public ProjectData(IProject project, String projectName, String directory, boolean isDefaultLocation, String appId,
