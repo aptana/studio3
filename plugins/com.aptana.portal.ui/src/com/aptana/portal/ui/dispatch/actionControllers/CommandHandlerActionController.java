@@ -41,7 +41,7 @@ import com.aptana.portal.ui.dispatch.IBrowserNotificationConstants;
  * <br>
  * <b>Command with parameters (as map of name-value):</b><br>
  * <code>result = dispatch($H({controller:'portal.commands', action:"execute", args : [commandId, {name:value, name2:value2 ... }].toJSON()}).toJSON());</code>
- * 
+ *
  * @author Shalom Gibly <sgibly@appcelerator.com>
  */
 public class CommandHandlerActionController extends AbstractActionController
@@ -53,7 +53,7 @@ public class CommandHandlerActionController extends AbstractActionController
 
 	/**
 	 * Executes a command handler.<br>
-	 * 
+	 *
 	 * @param attributes
 	 *            We expect for an array that contains a single string Id for the command.
 	 */
@@ -115,7 +115,7 @@ public class CommandHandlerActionController extends AbstractActionController
 
 	/**
 	 * Returns the command-Id from the attributes. Null, if an error occurred.
-	 * 
+	 *
 	 * @param attributes
 	 * @return A command Id, or null if an error occurs.
 	 */
@@ -169,14 +169,14 @@ public class CommandHandlerActionController extends AbstractActionController
 
 	/**
 	 * Returns the event callback that should be fired via a notify call on the portal.
-	 * 
+	 *
 	 * @param attributes
 	 * @return The name of the event; <code>null</code> when undefined.
 	 */
 	private String getEventCallbackName(Object attributes)
 	{
 		Object[] arr = (Object[]) attributes;
-		if (arr.length == 3)
+		if (arr.length == 3 && arr[2] != null)
 		{
 			return (String) arr[2];
 		}
@@ -185,7 +185,7 @@ public class CommandHandlerActionController extends AbstractActionController
 
 	/**
 	 * Generate a JSON result from the given result.
-	 * 
+	 *
 	 * @param result
 	 * @return A result wrapped in a JSON representation.
 	 */

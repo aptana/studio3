@@ -123,9 +123,25 @@ public abstract class BaseElement implements Convertible, IndexDocument
 	 */
 	protected Set<UserAgentElement> createUserAgentSet(Object object)
 	{
+		if (object == null)
+		{
+			return null;
+		}
 		Set<UserAgentElement> result = null;
-
-		if (object != null && object.getClass().isArray())
+		if (object instanceof Iterable)
+		{
+			result = new HashSet<UserAgentElement>();
+			Iterable<?> objects = (Iterable<?>) object;
+			for (Object value : objects)
+			{
+				if (value instanceof Map)
+				{
+					UserAgentElement userAgent = UserAgentElement.createUserAgentElement((Map<?, ?>) value);
+					result.add(userAgent);
+				}
+			}
+		}
+		else if (object.getClass().isArray())
 		{
 			Object[] objects = (Object[]) object;
 
@@ -138,7 +154,6 @@ public abstract class BaseElement implements Convertible, IndexDocument
 					if (value instanceof Map)
 					{
 						UserAgentElement userAgent = UserAgentElement.createUserAgentElement((Map<?, ?>) value);
-
 						result.add(userAgent);
 					}
 				}
@@ -171,7 +186,7 @@ public abstract class BaseElement implements Convertible, IndexDocument
 			this._userAgents = createUserAgentSet(userAgentsProperty);
 		}
 	}
-	
+
 	/**
 	 * isDeprecated
 	 * 

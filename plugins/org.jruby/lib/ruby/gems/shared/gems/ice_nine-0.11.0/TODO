@@ -1,0 +1,7 @@
+* Add a utility method that allows "NoFreeze" subclasses to be easily added for
+  any constant.
+  * Refactor the existing NoFreeze subclasses to use the method.
+
+* Consider adding support for OpenStruct
+  * should freeze the singleton class too in order to prevent no new members
+  * being added (by new_ostruct_member)

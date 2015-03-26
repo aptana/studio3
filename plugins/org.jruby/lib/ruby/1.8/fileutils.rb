@@ -696,14 +696,15 @@ module FileUtils
     end
     # freeze tree root
     euid = Process.euid
-    File.open(fullpath + '/.') {|f|
-      unless fu_stat_identical_entry?(st, f.stat)
+    dot_file = fullpath + "/."
+    File.lstat(dot_file).tap {|fstat|
+      unless fu_stat_identical_entry?(st, fstat)
         # symlink (TOC-to-TOU attack?)
         File.unlink fullpath
         return
       end
-      f.chown euid, -1
-      f.chmod 0700
+      File.chown euid, -1, dot_file
+      File.chmod 0700, dot_file
       unless fu_stat_identical_entry?(st, File.lstat(fullpath))
         # TOC-to-TOU attack?
         File.unlink fullpath
@@ -1027,7 +1028,7 @@ module FileUtils
     created = nocreate = options[:nocreate]
     t = options[:mtime]
     if options[:verbose]
-      fu_output_message "touch #{nocreate ? ' -c' : ''}#{t ? t.strftime(' -t %Y%m%d%H%M.%S') : ''}#{list.join ' '}"
+      fu_output_message "touch #{nocreate ? '-c ' : ''}#{t ? t.strftime('-t %Y%m%d%H%M.%S ') : ''}#{list.join ' '}"
     end
     return if options[:noop]
     list.each do |path|

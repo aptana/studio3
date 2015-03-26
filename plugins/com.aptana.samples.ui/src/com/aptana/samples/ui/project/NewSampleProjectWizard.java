@@ -75,14 +75,14 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 
 	private static final String NEWPROJECT_WIZARD = "BasicNewProjectResourceWizard"; //$NON-NLS-1$
 
-	private IProjectSample sample;
+	private final IProjectSample sample;
 	private SampleNewProjectCreationPage mainPage;
 	private IProject newProject;
 	private IConfigurationElement configElement;
 
 	/**
 	 * A wizard to create a new sample project.
-	 * 
+	 *
 	 * @param localSample
 	 *            the root sample entry
 	 */
@@ -139,6 +139,11 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 		openIndexFile();
 
 		return true;
+	}
+
+	IProject getCreatedProject()
+	{
+		return newProject;
 	}
 
 	public void setInitializationData(IConfigurationElement config, String propertyName, Object data)

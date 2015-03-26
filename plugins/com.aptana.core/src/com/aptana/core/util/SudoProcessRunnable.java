@@ -8,10 +8,10 @@
 package com.aptana.core.util;
 
 import java.io.BufferedReader;
-import java.io.InputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.Reader;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -43,37 +43,44 @@ public class SudoProcessRunnable extends ProcessRunnable
 		BufferedReader br = null;
 		try
 		{
-			InputStream inputStream = p.getInputStream();
-			OutputStream outputStream = p.getOutputStream();
-			PrintWriter pwdWriter = new PrintWriter(outputStream);
-			br = new BufferedReader(new InputStreamReader(inputStream, IOUtil.UTF_8));
-			String line = null;
+			br = new BufferedReader(new InputStreamReader(p.getInputStream(), IOUtil.UTF_8));
 			if (password != null)
 			{
+				PrintWriter pwdWriter = new PrintWriter(p.getOutputStream());
 				pwdWriter.println(password); // writes the password to the prompt.
 				pwdWriter.flush();
 			}
 
-			int status = 1;
-
-			/*
-			 * If the user provides wrong password, either we need to request for the other valid password and pass it
-			 * to the sudo prompts. Otherwise, kill the existing sudo process and re-run the sudo process with a new
-			 * valid password.
-			 */
-			while ((line = br.readLine()) != null)
+			int exitCode = 1;
+			StringBuilder line = new StringBuilder();
+			int charRead = 0;
+			while ((charRead = br.read()) != -1)
 			{
-				builder.append(line).append('\n');
-				if (line.contains(echoMessage))
+				char c = (char) charRead;
+				line.append(c);
+				if (c == '\n')
 				{
-					// We're good, we got our success message, mark exit code of 0, break the loop
-					status = 0;
+					// end of line! record it, wipe our temp line builder, check for success
+					String lineString = line.toString();
+					line = new StringBuilder();
+					builder.append(lineString);
+					if (lineString.contains(echoMessage))
+					{
+						// We're good, we got our success message, mark exit code of 0, break the loop
+						exitCode = 0;
+						break;
+					}
+				}
+				// Now ensure there's more to read. If not, then let's assume we're blocked on more input and fail
+				if (!isReady(br, 3, 50))
+				{
+					exitCode = 1;
 					break;
 				}
 			}
 
-			p.destroy(); // Force kill the sudo command as it is still expecting for the other 2 attempts
-			this.status = new ProcessStatus(status, builder.toString(), builder.toString());
+			p.destroy(); // Force kill the sudo command as it may still be expecting input for the other 2 attempts
+			this.status = new ProcessStatus(exitCode, builder.toString(), builder.toString());
 		}
 		catch (Exception e)
 		{
@@ -95,6 +102,40 @@ public class SudoProcessRunnable extends ProcessRunnable
 			monitor.done();
 		}
 
+	}
+
+	/**
+	 * Tries to determine in a non-blocking way if the underlying reader has more data to read. If it does we return
+	 * true, otherwise we return false. This will attempt to wait up to the max attempts and will sleep for the given
+	 * interval between attempts. If after that has elapsed it's still not ready (guaranteed not to block on next read),
+	 * we return false.
+	 * 
+	 * @param br
+	 * @param maxAttempts
+	 * @param sleepInterval
+	 * @return
+	 * @throws IOException
+	 */
+	private boolean isReady(Reader br, int maxAttempts, long sleepInterval) throws IOException
+	{
+		int waitCount = 0;
+		while (!br.ready())
+		{
+			if (waitCount >= maxAttempts)
+			{
+				return false;
+			}
+			try
+			{
+				Thread.sleep(sleepInterval);
+			}
+			catch (Exception e)
+			{
+				// ignore
+			}
+			waitCount++;
+		}
+		return true;
 	}
 
 }

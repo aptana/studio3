@@ -14,6 +14,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,9 +28,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
+import org.jcodings.specific.UTF8Encoding;
 import org.jruby.Ruby;
 import org.jruby.RubyProc;
 import org.jruby.RubyRegexp;
+import org.jruby.util.ByteList;
 import org.jruby.util.KCode;
 import org.jruby.util.RegexpOptions;
 import org.yaml.snakeyaml.TypeDescription;
@@ -673,8 +676,18 @@ public class BundleCacher
 				{
 					val = val.substring(1, val.length() - 1);
 				}
-				return RubyRegexp.newRegexp(ScriptingEngine.getInstance().getScriptingContainer().getProvider()
-						.getRuntime(), val, RegexpOptions.NULL_OPTIONS);
+				try
+				{
+					ByteList bl = new ByteList(val.getBytes(IOUtil.UTF_8), UTF8Encoding.INSTANCE);
+					return RubyRegexp.newRegexp(ScriptingEngine.getInstance().getScriptingContainer().getProvider()
+							.getRuntime(), bl, new RegexpOptions(KCode.UTF8, false));
+				}
+				catch (UnsupportedEncodingException e)
+				{
+					// should never happen!
+					IdeLog.logError(ScriptingActivator.getDefault(), e);
+				}
+				return null;
 			}
 		}
 

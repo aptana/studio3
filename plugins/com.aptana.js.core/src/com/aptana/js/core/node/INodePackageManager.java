@@ -24,10 +24,17 @@ public interface INodePackageManager
 
 	public static final String GLOBAL_ARG = "-g"; //$NON-NLS-1$
 	public static final String PARSEABLE_ARG = "-p"; //$NON-NLS-1$
+	public static final String SILENT_ARG = "-s"; //$NON-NLS-1$
+	public static final String PREFIX_PATH = "--prefix"; //$NON-NLS-1$
+
+	/**
+	 * Folder where modules live.
+	 */
+	public static final String NODE_MODULES = "node_modules"; //$NON-NLS-1$
 
 	/**
 	 * Installs a package.
-	 * 
+	 *
 	 * @param packageName
 	 *            The name of the npm package to install
 	 * @param displayName
@@ -44,7 +51,7 @@ public interface INodePackageManager
 
 	/**
 	 * Installs a package.
-	 * 
+	 *
 	 * @param packageName
 	 *            The name of the npm package to install
 	 * @param displayName
@@ -62,7 +69,7 @@ public interface INodePackageManager
 
 	/**
 	 * Lists the installed packages.
-	 * 
+	 *
 	 * @param global
 	 * @return
 	 * @throws CoreException
@@ -72,7 +79,7 @@ public interface INodePackageManager
 
 	/**
 	 * Determines if a package is installed. Checks both local and global package listings.
-	 * 
+	 *
 	 * @param packageName
 	 * @return
 	 * @throws CoreException
@@ -81,17 +88,17 @@ public interface INodePackageManager
 
 	/**
 	 * Retrieves the node modules path for the specific package.
-	 * 
+	 *
 	 * @param packageName
 	 *            the package to get the path for
 	 * @return the node modules path
 	 * @throws CoreException
 	 */
-	public IPath getModulesPath(String packageName) throws CoreException;
+	public IPath getModulesPath(String packageName, boolean isGlobal, String... args) throws CoreException;
 
 	/**
 	 * Gets the latest installed version of a package.
-	 * 
+	 *
 	 * @param packageName
 	 * @return
 	 * @throws CoreException
@@ -103,7 +110,7 @@ public interface INodePackageManager
 	/**
 	 * Gets the latest version published for a package. Note that there may be "newer" RC/beta/alphas, but the NPM
 	 * "latest" pointer may not refer to them.
-	 * 
+	 *
 	 * @param packageName
 	 * @return
 	 * @throws CoreException
@@ -113,7 +120,7 @@ public interface INodePackageManager
 	/**
 	 * Gets the full list of published versions for a given package. NEVER RETURNS NULL! if anything goes wrong, we'll
 	 * throw a CoreException.
-	 * 
+	 *
 	 * @param packageName
 	 * @return
 	 * @throws CoreException
@@ -124,7 +131,7 @@ public interface INodePackageManager
 
 	/**
 	 * Returns the location where node packages' binary scripts get installed.
-	 * 
+	 *
 	 * @return
 	 * @throws CoreException
 	 */
@@ -132,7 +139,7 @@ public interface INodePackageManager
 
 	/**
 	 * Returns the location where node modules get installed.
-	 * 
+	 *
 	 * @return
 	 * @throws CoreException
 	 */
@@ -141,7 +148,7 @@ public interface INodePackageManager
 	/**
 	 * Returns the prefix path of npm. The prefix path can be configured either in the environment variable
 	 * NPM_CONFIG_PREFIX, or through the 'prefix' attribute from the npm configuration file.
-	 * 
+	 *
 	 * @return
 	 * @throws CoreException
 	 */
@@ -150,7 +157,7 @@ public interface INodePackageManager
 	/**
 	 * Clears the npm cache data. This might help to remove the conflicting dependent packages being referenced by new
 	 * installed npm packages.
-	 * 
+	 *
 	 * @param monitor
 	 * @return
 	 * @throws CoreException
@@ -159,7 +166,7 @@ public interface INodePackageManager
 
 	/**
 	 * Uninstalls an npm package.
-	 * 
+	 *
 	 * @param packageName
 	 * @param displayName
 	 * @param global
@@ -172,22 +179,37 @@ public interface INodePackageManager
 			IProgressMonitor monitor) throws CoreException;
 
 	/**
+	 * Uninstalls an npm package.
+	 *
+	 * @param packageName
+	 * @param displayName
+	 * @param global
+	 * @param password
+	 * @param workingDirectory
+	 * @param monitor
+	 * @return
+	 * @throws CoreException
+	 */
+	public IStatus uninstall(String packageName, String displayName, boolean global, char[] password,
+			IPath workingDirectory, IProgressMonitor monitor) throws CoreException;
+
+	/**
 	 * Does the NPM path/install we're pointing to exist?
-	 * 
+	 *
 	 * @return
 	 */
 	public boolean exists();
 
 	/**
 	 * The path to the NPM binary script. This may return null if we were unable to find npm!
-	 * 
+	 *
 	 * @return
 	 */
 	public IPath getPath();
 
 	/**
 	 * return the version of NPM.
-	 * 
+	 *
 	 * @return
 	 * @throws CoreException
 	 *             if NPM isn't actually installed, or grabbing the version failed.
@@ -197,7 +219,7 @@ public interface INodePackageManager
 	/**
 	 * A way to generically launch commands under NPM. Use sparingly. Ideally we'd have methods to invoke whatever
 	 * command you're hacking by using this.
-	 * 
+	 *
 	 * @param args
 	 * @return
 	 * @throws CoreException
@@ -207,7 +229,7 @@ public interface INodePackageManager
 
 	/**
 	 * Search for the npm package installed locally based on the search locations.
-	 * 
+	 *
 	 * @param executableName
 	 * @param appendExtension
 	 * @param searchLocations
