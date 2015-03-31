@@ -212,8 +212,8 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 				projectData.directory = mainPage.getLocationURI().getRawPath();
 				projectData.appURL = "http://"; // TODO: not used here. //$NON-NLS-1$
 				doBasicCreateProject(newProjectHandle, description, sample, projectData);
-				doPostProjectCreation(newProjectHandle);
 			}
+			doPostProjectCreation(newProjectHandle);
 		}
 		catch (CoreException e)
 		{
