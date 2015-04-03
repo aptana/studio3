@@ -53,7 +53,7 @@ import com.aptana.core.logging.IdeLog;
 
 public class EclipseUtil
 {
-	private static final String DEV_VERSION = "0.0.0.qualifier";
+	private static final String DEV_VERSION = "0.0.0.qualifier"; //$NON-NLS-1$
 
 	/**
 	 * Default prefix for Studio
@@ -68,6 +68,7 @@ public class EclipseUtil
 	private static final Pattern VERSION_PATTERN = Pattern.compile("Version: (.*)\n"); //$NON-NLS-1$
 	private static final Pattern VERSION_4_4_PATTERN = Pattern.compile("Version: \\{1\\} \\((.*)\\)\n"); //$NON-NLS-1$
 	private static final Pattern BUILD_PATTERN = Pattern.compile("build: (.*)\n"); //$NON-NLS-1$
+	private static final Pattern BUILD_BRANCH_PATTERN = Pattern.compile("Build: ([\\w\\-\\d]+) \\(origin/(\\w+)\\)\n"); //$NON-NLS-1$
 
 	protected static final class LauncherFilter implements FilenameFilter
 	{
@@ -196,8 +197,7 @@ public class EclipseUtil
 		{
 			return null;
 		}
-		return plugin.getBundle().getHeaders().get(org.osgi.framework.Constants.BUNDLE_VERSION).toString(); // $codepro.audit.disable
-																											// com.instantiations.assist.eclipse.analysis.unnecessaryToString
+		return getPluginVersion(plugin.getBundle());
 	}
 
 	/**
@@ -214,7 +214,11 @@ public class EclipseUtil
 			return null;
 		}
 
-		Bundle bundle = Platform.getBundle(pluginId);
+		return getPluginVersion(Platform.getBundle(pluginId));
+	}
+
+	private static String getPluginVersion(Bundle bundle)
+	{
 		if (bundle == null)
 		{
 			return null;
@@ -244,37 +248,32 @@ public class EclipseUtil
 	 */
 	public static String getProductVersion()
 	{
-
 		try
 		{
-			IProduct product = Platform.getProduct();
-			if (product != null)
+			String aboutText = getProductProperty("aboutText"); //$NON-NLS-1$
+			if (!StringUtil.isEmpty(aboutText))
 			{
-				String aboutText = product.getProperty("aboutText"); //$NON-NLS-1$
-				if (!StringUtil.isEmpty(aboutText))
+				Matcher m = VERSION_4_4_PATTERN.matcher(aboutText);
+				if (m.find())
 				{
-					Matcher m = VERSION_4_4_PATTERN.matcher(aboutText);
-					if (m.find())
-					{
-						return Version.parseVersion(m.group(1)).toString();
-					}
+					return Version.parseVersion(m.group(1)).toString();
+				}
 
-					// Try version pattern from before 4.4
-					m = VERSION_PATTERN.matcher(aboutText);
-					if (m.find())
-					{
-						return m.group(1);
-					}
+				// Try version pattern from before 4.4
+				m = VERSION_PATTERN.matcher(aboutText);
+				if (m.find())
+				{
+					return m.group(1);
+				}
 
-					// fall back to trying to match build #
-					m = BUILD_PATTERN.matcher(aboutText);
-					if (m.find())
+				// fall back to trying to match build #
+				m = BUILD_PATTERN.matcher(aboutText);
+				if (m.find())
+				{
+					String version = m.group(1);
+					if (!DEV_VERSION.equals(version))
 					{
-						String version = m.group(1);
-						if (!DEV_VERSION.equals(version))
-						{
-							return version;
-						}
+						return version;
 					}
 				}
 			}
@@ -307,17 +306,23 @@ public class EclipseUtil
 		if (fgPrefix == null)
 		{
 			fgPrefix = APTANA_STUDIO_PREFIX;
-			IProduct product = Platform.getProduct();
-			if (product != null)
+			String name = getProductProperty("studioPrefix"); //$NON-NLS-1$
+			if (!StringUtil.isEmpty(name))
 			{
-				String name = product.getProperty("studioPrefix"); //$NON-NLS-1$
-				if (!StringUtil.isEmpty(name))
-				{
-					fgPrefix = name;
-				}
+				fgPrefix = name;
 			}
 		}
 		return fgPrefix;
+	}
+
+	private static String getProductProperty(String propName)
+	{
+		IProduct product = Platform.getProduct();
+		if (product == null)
+		{
+			return null;
+		}
+		return product.getProperty(propName);
 	}
 
 	/**
@@ -682,7 +687,7 @@ public class EclipseUtil
 		if (registry != null)
 		{
 			IdeLog.logInfo(CorePlugin.getDefault(), MessageFormat.format(
-					"Geting Extension Point for {0} and extensionPoint {1} from {2}", pluginId, extensionPointId,
+					"Geting Extension Point for {0} and extensionPoint {1} from {2}", pluginId, extensionPointId, //$NON-NLS-1$
 					registry), IDebugScopes.EXTENSION_POINTS);
 			return registry.getExtensionPoint(pluginId, extensionPointId);
 		}
@@ -697,9 +702,8 @@ public class EclipseUtil
 		}
 
 		Set<String> elementNames = processor.getSupportElementNames();
-		IdeLog.logInfo(
-				CorePlugin.getDefault(),
-				MessageFormat.format("Extension point : {0} and elements : {1}", extensionPoint,
+		IdeLog.logInfo(CorePlugin.getDefault(),
+				MessageFormat.format("Extension point : {0} and elements : {1}", extensionPoint, //$NON-NLS-1$
 						StringUtil.join(",", elementNames)), IDebugScopes.EXTENSION_POINTS);
 		IExtension[] extensions = extensionPoint.getExtensions();
 		for (String elementName : elementNames)
@@ -804,6 +808,39 @@ public class EclipseUtil
 				}
 			}
 		}
+	}
+
+	/**
+	 * exposed at package level for testing.
+	 * 
+	 * @param aboutText
+	 * @return
+	 */
+	static String getProductBuildBranch(String aboutText)
+	{
+		try
+		{
+			if (StringUtil.isEmpty(aboutText))
+			{
+				return null;
+			}
+			Matcher m = BUILD_BRANCH_PATTERN.matcher(aboutText);
+			if (m.find())
+			{
+				return m.group(2);
+			}
+		}
+		catch (Exception e)
+		{
+			// ignore
+		}
+		return null;
+	}
+
+	public static String getProductBuildBranch()
+	{
+		return getProductBuildBranch(getProductProperty("aboutText")); //$NON-NLS-1$
+
 	}
 
 }
