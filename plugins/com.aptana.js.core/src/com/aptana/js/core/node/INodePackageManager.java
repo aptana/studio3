@@ -24,6 +24,9 @@ public interface INodePackageManager
 
 	public static final String GLOBAL_ARG = "-g"; //$NON-NLS-1$
 	public static final String PARSEABLE_ARG = "-p"; //$NON-NLS-1$
+	public static final String SILENT_ARG = "-s"; //$NON-NLS-1$
+	public static final String PREFIX_PATH = "--prefix"; //$NON-NLS-1$
+
 	/**
 	 * Folder where modules live.
 	 */
@@ -91,7 +94,7 @@ public interface INodePackageManager
 	 * @return the node modules path
 	 * @throws CoreException
 	 */
-	public IPath getModulesPath(String packageName) throws CoreException;
+	public IPath getModulesPath(String packageName, boolean isGlobal, String... args) throws CoreException;
 
 	/**
 	 * Gets the latest installed version of a package.

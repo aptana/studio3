@@ -28,9 +28,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.IJobChangeEvent;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -217,6 +214,7 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 		}
 		catch (CoreException e)
 		{
+			IdeLog.logError(SamplesUIPlugin.getDefault(), e);
 			return null;
 		}
 
@@ -310,7 +308,8 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 		}
 	}
 
-	private void cloneFromGit(String gitURL, final IProject projectHandle, final IProjectDescription projectDescription)
+	private void cloneFromGit(final String gitURL, final IProject projectHandle,
+			final IProjectDescription projectDescription)
 	{
 		IPath path = mainPage.getLocationPath();
 		// when default is used, getLocationPath() only returns the workspace root, so needs to append the project name
@@ -326,46 +325,57 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 		{
 			FileUtil.deleteRecursively(directory);
 		}
+		final IPath projectPath = path;
 
-		// FIXME Run an IRunnableWithProgress in wizard container, have it just do job.run(monitor)!
-		Job job = new CloneJob(gitURL, path.toOSString(), true, true);
-		job.addJobChangeListener(new JobChangeAdapter()
+		try
 		{
-			@Override
-			public void done(IJobChangeEvent event)
+			getContainer().run(true, true, new IRunnableWithProgress()
 			{
-				if (!event.getResult().isOK())
+				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
 				{
-					return;
-				}
+					CloneJob job = new CloneJob(gitURL, projectPath.toOSString(), true, true);
+					IStatus status = job.run(monitor);
 
-				try
-				{
-					projectHandle.setDescription(projectDescription, null);
-					projectHandle.refreshLocal(IResource.DEPTH_INFINITE, null);
-				}
-				catch (CoreException e)
-				{
-					IdeLog.logError(SamplesUIPlugin.getDefault(), e);
-				}
+					if (!status.isOK())
+					{
+						throw new InterruptedException(status.getMessage());
+					}
 
-				// Stop tracking the git repo
-				DisconnectHandler.disconnect(projectHandle, null);
-				// Delete the .gitignore file and the .git folder
-				File toDelete = new File(projectHandle.getLocation().toFile(), GitRepository.GITIGNORE);
-				if (toDelete.exists())
-				{
-					toDelete.delete();
+					try
+					{
+						projectHandle.setDescription(projectDescription, null);
+						projectHandle.refreshLocal(IResource.DEPTH_INFINITE, null);
+					}
+					catch (CoreException e)
+					{
+						IdeLog.logError(SamplesUIPlugin.getDefault(), e);
+					}
+
+					// Stop tracking the git repo
+					DisconnectHandler.disconnect(projectHandle, null);
+					// Delete the .gitignore file and the .git folder
+					File toDelete = new File(projectHandle.getLocation().toFile(), GitRepository.GITIGNORE);
+					if (toDelete.exists())
+					{
+						toDelete.delete();
+					}
+					toDelete = new File(projectHandle.getLocation().toFile(), GitRepository.GIT_DIR);
+					if (toDelete.exists())
+					{
+						FileUtil.deleteRecursively(toDelete);
+					}
+					doPostProjectCreation(projectHandle);
 				}
-				toDelete = new File(projectHandle.getLocation().toFile(), GitRepository.GIT_DIR);
-				if (toDelete.exists())
-				{
-					FileUtil.deleteRecursively(toDelete);
-				}
-				doPostProjectCreation(projectHandle);
-			}
-		});
-		job.schedule();
+			});
+		}
+		catch (InvocationTargetException e)
+		{
+			IdeLog.logError(SamplesUIPlugin.getDefault(), e);
+		}
+		catch (InterruptedException e)
+		{
+			IdeLog.logError(SamplesUIPlugin.getDefault(), e);
+		}
 	}
 
 	private void doPostProjectCreation(IProject newProject)
