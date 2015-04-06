@@ -55,7 +55,7 @@ import com.aptana.usage.UsagePlugin;
 
 /**
  * The portal class is a singleton that controls the portal browser and allows interacting with it.
- * 
+ *
  * @author Shalom Gibly <sgibly@aptana.com>
  */
 @SuppressWarnings("restriction")
@@ -76,18 +76,18 @@ public class Portal
 	protected static final String WEB_NATURE = "com.aptana.projects.webnature"; //$NON-NLS-1$
 	protected static final String PYDEV_NATURE = "org.python.pydev.pythonNature"; //$NON-NLS-1$
 
-	private Map<IWorkbenchWindow, AbstractPortalBrowserEditor> portalBrowsers;
+	private final Map<String, AbstractPortalBrowserEditor> portalBrowsers;
 	private static Portal instance;
 
 	// Private constructor
 	private Portal()
 	{
-		portalBrowsers = new HashMap<IWorkbenchWindow, AbstractPortalBrowserEditor>();
+		portalBrowsers = new HashMap<String, AbstractPortalBrowserEditor>();
 	}
 
 	/**
 	 * Returns a Portal instance.
-	 * 
+	 *
 	 * @return A singleton portal instance
 	 */
 	public static Portal getInstance()
@@ -101,7 +101,7 @@ public class Portal
 
 	/**
 	 * Returns true if the open-portal flag was set in the preferences.
-	 * 
+	 *
 	 * @return True, if we should display the portal as part of the startup; False, otherwise (the user disabled it)
 	 */
 	public boolean shouldOpenPortal()
@@ -115,7 +115,7 @@ public class Portal
 	 * portal to the new URL.<br>
 	 * This method must be called from the UI thread (preferably, through a UIJob).<br>
 	 * By default, this method will open the portal as the top editor.
-	 * 
+	 *
 	 * @param url
 	 *            A URL (can be null).
 	 * @param browserEditorId
@@ -132,7 +132,7 @@ public class Portal
 	 * Opens the portal with a given URL. In case the portal is already open, and the given URL is valid, direct the
 	 * portal to the new URL.<br>
 	 * This method must be called from the UI thread (preferably, through a UIJob).
-	 * 
+	 *
 	 * @param url
 	 *            A URL (can be null).
 	 * @param browserEditorId
@@ -173,6 +173,7 @@ public class Portal
 		final URL finalURL = url;
 		Job job = new UIJob("Launching the Studio portal...") //$NON-NLS-1$
 		{
+			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor)
 			{
 				final IWorkbenchWindow workbenchWindow = UIUtils.getActiveWorkbenchWindow();
@@ -194,7 +195,7 @@ public class Portal
 					}
 				}
 
-				AbstractPortalBrowserEditor portalBrowser = portalBrowsers.get(workbenchWindow);
+				AbstractPortalBrowserEditor portalBrowser = portalBrowsers.get(browserEditorId);
 				if (portalBrowser != null && !portalBrowser.isDisposed())
 				{
 					// Refresh the URL, bring to front, and return
@@ -251,7 +252,7 @@ public class Portal
 						{
 							public void widgetDisposed(DisposeEvent e)
 							{
-								portalBrowsers.remove(workbenchWindow);
+								portalBrowsers.remove(browserEditorId);
 							}
 						});
 					}
@@ -262,7 +263,7 @@ public class Portal
 				}
 				if (portalBrowser != null)
 				{
-					portalBrowsers.put(workbenchWindow, portalBrowser);
+					portalBrowsers.put(browserEditorId, portalBrowser);
 				}
 				return Status.OK_STATUS;
 			}
@@ -274,7 +275,7 @@ public class Portal
 	/**
 	 * Returns the default URL for the portal.<br>
 	 * In case we have a live Internet connection, return the remote content. Otherwise, return the local content.
-	 * 
+	 *
 	 * @return A default URL (can be null)
 	 * @throws IOException
 	 */
@@ -286,7 +287,7 @@ public class Portal
 	/**
 	 * Returns the default URL for the portal.<br>
 	 * In case we have a live Internet connection, return the remote content. Otherwise, return the local content.
-	 * 
+	 *
 	 * @return A default URL (can be null)
 	 * @throws IOException
 	 */
@@ -307,7 +308,7 @@ public class Portal
 
 	/**
 	 * Check for connection with the remote portal server.
-	 * 
+	 *
 	 * @return True, if and only if the remote server is alive.
 	 */
 	private boolean isConnected(URL url)
@@ -339,14 +340,16 @@ public class Portal
 		finally
 		{
 			if (connection != null)
+			{
 				connection.disconnect();
+			}
 		}
 		return connected;
 	}
 
 	/**
 	 * Build the URL GET parameters that will be appended to the original portal path.
-	 * 
+	 *
 	 * @param activeProject
 	 * @return The GET parameters string
 	 */
@@ -396,23 +399,31 @@ public class Portal
 		{
 			IFile file = selectedProject.getFile("deploy/default.rb");
 			if (file.exists())
+			{
 				builder.put("dep", "ch");
+			}
 			file = selectedProject.getFile("deploy/solo.rb");
 			if (file.exists())
+			{
 				builder.put("dep", "cs");
+			}
 			file = selectedProject.getFile("Capfile");
 			if (file.exists())
+			{
 				builder.put("dep", "cap");
+			}
 			file = selectedProject.getFile("capfile");
 			if (file.exists())
+			{
 				builder.put("dep", "cap");
+			}
 		}
 		return builder;
 	}
 
 	/**
 	 * Get the theme manager.
-	 * 
+	 *
 	 * @return
 	 */
 	protected IThemeManager getThemeManager()
