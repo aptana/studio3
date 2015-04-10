@@ -36,6 +36,9 @@ import org.eclipse.swt.widgets.Text;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ui.util.UIUtils;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * This dialog dynamically builds UI for a single question, and prompt the user for their response.
