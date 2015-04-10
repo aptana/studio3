@@ -27,8 +27,10 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.widgets.Composite;
 
+import com.aptana.core.IFilter;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ArrayUtil;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.projects.ProjectsPlugin;
 
 /**
@@ -208,6 +210,18 @@ public class ProjectWizardContributionManager
 				}
 			}
 		}
+	}
+
+	public List<IProjectWizardContributor> getContributors(final String[] natureIds)
+	{
+		return CollectionsUtil.filter(contributors, new IFilter<IProjectWizardContributor>()
+		{
+			public boolean include(IProjectWizardContributor item)
+			{
+				return item.hasNatureId(natureIds);
+			}
+		});
+
 	}
 
 	public IStatus performProjectFinish(IProject project, IProgressMonitor monitor)

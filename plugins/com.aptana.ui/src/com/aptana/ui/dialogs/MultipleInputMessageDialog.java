@@ -7,7 +7,6 @@
  */
 package com.aptana.ui.dialogs;
 
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -24,6 +23,7 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -52,6 +52,8 @@ import com.fasterxml.jackson.databind.node.POJONode;
 public class MultipleInputMessageDialog extends InputMessageDialog
 {
 
+	private static final int MIN_MESSAGE_WIDTH = 250;
+
 	/*
 	 * This will keep track of all user responses for each question in UI.
 	 */
@@ -73,7 +75,6 @@ public class MultipleInputMessageDialog extends InputMessageDialog
 						IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL }, 0);
 		this.questionsNode = questionNode;
 		userInput = JsonNodeFactory.instance.objectNode();
-
 	}
 
 	@Override
@@ -86,6 +87,19 @@ public class MultipleInputMessageDialog extends InputMessageDialog
 		return composite;
 	}
 
+	@Override
+	protected Control createMessageArea(Composite composite)
+	{
+		Control control = super.createMessageArea(composite);
+		if (message != null)
+		{
+			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).grab(true, false)
+					.hint(convertHorizontalDLUsToPixels(MIN_MESSAGE_WIDTH), SWT.DEFAULT).applyTo(messageLabel);
+		}
+
+		return control;
+	}
+
 	private void createInput(Composite composite)
 	{
 		for (JsonNode question : questionsNode)
@@ -94,10 +108,17 @@ public class MultipleInputMessageDialog extends InputMessageDialog
 
 			new Label(composite, SWT.NONE);
 			Composite parent = new Composite(composite, SWT.NONE);
-			parent.setLayout(GridLayoutFactory.fillDefaults().margins(0, 0).numColumns(2).create());
+			parent.setLayout(GridLayoutFactory.fillDefaults().margins(0, 0).numColumns(2).equalWidth(false).create());
 			Label label = new Label(parent, SWT.NONE);
-			label.setText(question.path(MESSAGE).asText());
-			GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.CENTER).grab(true, false).hint(SWT.DEFAULT, 25)
+			String lblTxt = question.path(MESSAGE).asText();
+			label.setText(lblTxt);
+			Point requiredSize = label.computeSize(SWT.DEFAULT, 25);
+			int minSize = convertHorizontalDLUsToPixels(80);
+			if (requiredSize.x > minSize)
+			{
+				minSize = requiredSize.x;
+			}
+			GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.CENTER).grab(true, false).hint(minSize, 25)
 					.applyTo(label);
 
 			Composite valueComp = new Composite(parent, SWT.NONE);
