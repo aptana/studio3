@@ -2,7 +2,7 @@
 <feature
       id="com.aptana.feature"
       label="%featureName"
-      version="3.6.3.qualifier"
+      version="4.0.0.qualifier"
       provider-name="%providerName"
       plugin="com.aptana.branding">
 
@@ -724,14 +724,14 @@
          unpack="false"/>
 
    <plugin
-         id="net.jeeeyul.eclipse.themes"
+         id="lib.org.chromium.sdk"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="lib.org.chromium.sdk"
+         id="com.jackson.libraries"
          download-size="0"
          install-size="0"
          version="0.0.0"

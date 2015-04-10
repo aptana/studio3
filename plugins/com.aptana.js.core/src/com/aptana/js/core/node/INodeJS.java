@@ -24,7 +24,7 @@ import com.aptana.core.util.IProcessRunner;
  */
 public interface INodeJS
 {
-	public static final String MIN_NODE_VERSION = "0.8.13"; //$NON-NLS-1$
+	public static final String MIN_NODE_VERSION = "0.10.13"; //$NON-NLS-1$
 
 	/**
 	 * Error codes returned by {@link #validate()}

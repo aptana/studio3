@@ -106,7 +106,7 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 	static final Image ATTRIBUTE_ICON = XMLPlugin.getImage("/icons/attribute.png"); //$NON-NLS-1$
 
 	protected XMLIndexQueryHelper _queryHelper;
-	private Lexeme<XMLTokenType> _currentLexeme;
+	protected Lexeme<XMLTokenType> _currentLexeme;
 	private IRange _replaceRange;
 	private IDocument _document;
 
@@ -192,7 +192,7 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param elementName
 	 * @param attributeName
 	 */
-	private List<ICompletionProposal> addAttributeValueProposals(int offset, String elementName, String attributeName)
+	protected List<ICompletionProposal> addAttributeValueProposals(int offset, String elementName, String attributeName)
 	{
 		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
 		AttributeElement attribute = this._queryHelper.getAttribute(elementName, attributeName);
@@ -513,14 +513,14 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @return
 	 */
-	ILexemeProvider<XMLTokenType> createLexemeProvider(IDocument document, int offset)
+	protected ILexemeProvider<XMLTokenType> createLexemeProvider(IDocument document, int offset)
 	{
 		int documentLength = document.getLength();
 
 		// account for last position returning an empty IDocument default partition
 		int lexemeProviderOffset = (offset >= documentLength) ? documentLength - 1 : offset;
 
-		return new XMLLexemeProvider(document, lexemeProviderOffset, new XMLTagScanner()
+		return new XMLLexemeProvider(document, lexemeProviderOffset, 0, new XMLTagScanner()
 		{
 			@Override
 			protected IToken createToken(XMLTokenType type)

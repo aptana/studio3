@@ -454,9 +454,10 @@
 %typeof ShiftExpression, ShiftExpression_NoLBF, EqualityExpression, EqualityExpression_NoIn, EqualityExpression_NoLBF = "JSNode";
 %typeof LogicalAndExpression, LogicalAndExpression_NoIn, LogicalAndExpression_NoLBF, LogicalOrExpression, LogicalOrExpression_NoIn, LogicalOrExpression_NoLBF = "JSNode";
 %typeof BitwiseOrExpression, BitwiseOrExpression_NoIn, BitwiseOrExpression_NoLBF, BitwiseXorExpression, BitwiseXorExpression_NoIn, BitwiseXorExpression_NoLBF, BitwiseAndExpression, BitwiseAndExpression_NoIn, BitwiseAndExpression_NoLBF = "JSNode";
-%typeof MemberExpression, MemberExpression_NoLBF, NewExpression, CallExpression, CallExpression_NoLBF, Expression, Expression_NoIn, Expression_NoLBF, Statement, Statement_NoIf, Arguments, Block, Catch, Finally = "JSNode";
+%typeof MemberExpression, MemberExpression_NoLBF, NewExpression, CallExpression, CallExpression_NoLBF, Expression, Expression_NoIn, Expression_NoLBF, Statement, Statement_NoIf, Block, Catch, Finally = "JSNode";
 %typeof VariableDeclaration, VariableDeclaration_NoIn, PropertyName, PropertyAssignment, Elision, ElementList, FormalParameterList, FunctionParameters, FunctionBody, SourceElement = "JSNode";
 %typeof CaseClause, DefaultClause = "JSNode";
+%typeof Arguments = "JSArgumentsNode";
 
 %goal Program;
 

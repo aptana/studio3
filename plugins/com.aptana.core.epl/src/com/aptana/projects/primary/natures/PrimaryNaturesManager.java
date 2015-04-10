@@ -106,23 +106,36 @@ public class PrimaryNaturesManager
 		{
 			return Collections.emptyList();
 		}
+		return getPotentialNaturesFromPath(project.getLocation());
+	}
+
+	/**
+	 * Returns the potential natures applicable to the project represented by this path, with the primary nature being
+	 * first in the list.
+	 * 
+	 * @param project
+	 * @return
+	 */
+	public List<String> getPotentialNaturesFromPath(IPath path)
+	{
+		if (path == null || path.isEmpty())
+		{
+			return Collections.emptyList();
+		}
 		lazyInit();
 		List<String> potentialNatures = new ArrayList<String>(natureIdRanks.size());
 		for (String natureId : natureIdRanks.keySet())
 		{
 			IPrimaryNatureContributor primaryNatureContributor = natureIdRanks.get(natureId);
-			IPath location = project.getLocation();
-			if (location != null)
+
+			int primaryNatureRank = primaryNatureContributor.getPrimaryNatureRank(path);
+			if (primaryNatureRank == IPrimaryNatureContributor.CAN_BE_PRIMARY)
 			{
-				int primaryNatureRank = primaryNatureContributor.getPrimaryNatureRank(location);
-				if (primaryNatureRank == IPrimaryNatureContributor.CAN_BE_PRIMARY)
-				{
-					potentialNatures.add(natureId);
-				}
-				else if (primaryNatureRank == IPrimaryNatureContributor.IS_PRIMARY)
-				{
-					potentialNatures.add(0, natureId);
-				}
+				potentialNatures.add(natureId);
+			}
+			else if (primaryNatureRank == IPrimaryNatureContributor.IS_PRIMARY)
+			{
+				potentialNatures.add(0, natureId);
 			}
 		}
 		return potentialNatures;

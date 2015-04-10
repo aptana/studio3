@@ -12,7 +12,9 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 //@formatter:off
-@Suite.SuiteClasses({ArrayUtilTest.class,
+@Suite.SuiteClasses({
+	AndFilterTest.class,
+	ArrayUtilTest.class,
 	Base64Test.class,
 	BrowserUtilTest.class,
 	ClassUtilTest.class,
@@ -26,6 +28,7 @@ import org.junit.runners.Suite;
 	InputStreamGobblerTest.class,
 	IOUtilTest.class,
 	ObjectUtilTest.class,
+	OrFilterTest.class,
 	OutputStreamThreadTest.class,
 	PatternReplacerTest.class,
 	PlatformUtilTest.class,

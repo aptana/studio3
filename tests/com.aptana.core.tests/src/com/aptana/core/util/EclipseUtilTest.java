@@ -62,6 +62,24 @@ public class EclipseUtilTest
 	}
 
 	@Test
+	public void testGetProductBuildBranch()
+	{
+		assertNull(EclipseUtil.getProductBuildBranch(""));
+		assertNull(EclipseUtil.getProductBuildBranch());
+		assertEquals("release", EclipseUtil.getProductBuildBranch("Appcelerator Studio, build: 4.0.0.201504010905\n"
+				+ "(c) Copyright 2012-2014 by Appcelerator, Inc.  All rights reserved.\n\n"
+				+ "Build: jenkins-appcelerator-rcp-release-446 (origin/release)\n" + "Date: 01 April 2015, 09:06:40"));
+		assertEquals("development",
+				EclipseUtil.getProductBuildBranch("Appcelerator Studio, build: 4.1.0.201504010726\n"
+						+ "(c) Copyright 2012-2014 by Appcelerator, Inc.  All rights reserved.\n\n"
+						+ "Build: jenkins-appcelerator-rcp-development-782 (origin/development)\n"
+						+ "Date: 01 April 2015, 07:27:30"));
+		assertEquals("master", EclipseUtil.getProductBuildBranch("Appcelerator Studio, build: 3.4.2.201503201423\n"
+				+ "(c) Copyright 2012-2014 by Appcelerator, Inc.  All rights reserved.\n\n"
+				+ "Build: jenkins-appcelerator-rcp-master-266 (origin/master)\n" + "Date: 20 March 2015, 14:24:28"));
+	}
+
+	@Test
 	public void testGetTraceableItems()
 	{
 		Map<String, String> items = EclipseUtil.getTraceableItems();

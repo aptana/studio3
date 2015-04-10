@@ -1,0 +1,5 @@
+#-*- mode: ruby -*-
+
+gemfile
+
+# vim: syntax=Ruby

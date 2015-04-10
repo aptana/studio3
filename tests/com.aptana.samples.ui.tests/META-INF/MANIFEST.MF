@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Tests
+Bundle-SymbolicName: com.aptana.samples.ui.tests
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: Aptana
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Import-Package: com.aptana.samples,
+ org.junit,
+ org.junit.runner,
+ org.junit.runners
+Export-Package: com.aptana.samples.ui.tests
+Require-Bundle: com.aptana.portal.ui,
+ com.aptana.samples.ui,
+ com.aptana.samples
+ 

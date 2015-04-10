@@ -39,6 +39,7 @@ public class UsagePlugin extends Plugin
 	private SendPingJob job;
 	private AnalyticsInfoManager fAnalyticsInfoManager;
 	private AnalyticsLogger fAnalyticsLogger;
+	private StudioAnalytics fStudioAnalytics;
 
 	/**
 	 * The constructor
@@ -75,6 +76,7 @@ public class UsagePlugin extends Plugin
 		}
 		finally
 		{
+			fStudioAnalytics = null;
 			fAnalyticsLogger = null;
 			fAnalyticsInfoManager = null;
 			plugin = null;
@@ -145,6 +147,15 @@ public class UsagePlugin extends Plugin
 		}
 	}
 
+	public synchronized IStudioAnalytics getStudioAnalytics()
+	{
+		if (fStudioAnalytics == null)
+		{
+			fStudioAnalytics = new StudioAnalytics();
+		}
+		return fStudioAnalytics;
+	}
+
 	public synchronized IAnalyticsInfoManager getAnalyticsInfoManager()
 	{
 		if (fAnalyticsInfoManager == null)
@@ -158,7 +169,7 @@ public class UsagePlugin extends Plugin
 	{
 		if (fAnalyticsLogger == null)
 		{
-			fAnalyticsLogger = new AnalyticsLogger(getStateLocation().append("events"));
+			fAnalyticsLogger = new AnalyticsLogger(getStateLocation().append("events")); //$NON-NLS-1$
 		}
 		return fAnalyticsLogger;
 	}

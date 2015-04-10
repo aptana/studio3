@@ -445,6 +445,17 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 					IdeLog.logWarning(UIEplPlugin.getDefault(), "Error reading project description for " + name, e); //$NON-NLS-1$
 				}
 			}
+			// .project file does not exist. Lets get the natures from the Primary natures manager
+			else
+			{
+				List<String> potentialNatures = PrimaryNaturesManager.getManager().getPotentialNaturesFromPath(path);
+
+				// Add web nature to potential natures
+				potentialNatures.add(APTANA_WEB_NATURE);
+
+				// set the natures checked in the nature table as they are the most relevant ones.
+				fTableViewer.setCheckedElements(potentialNatures.toArray(new String[potentialNatures.size()]));
+			}
 		}
 		setMessage(null);
 		setErrorMessage(null);

@@ -276,7 +276,6 @@ public class FileReader extends FileTransferJob implements IFileTransferListener
 
 	protected void completeTransfer(IFileTransferEvent event)
 	{
-		System.err.println("recieved COMPLETE event");
 		if (closeStreamWhenFinished)
 		{
 			hardClose(theOutputStream);

@@ -78,7 +78,7 @@ public class SynchronizeFilesAction extends BaseSyncAction
 				{
 					Map<String, String> payload = new HashMap<String, String>(2);
 					payload.put("sourceType", site.getSource().getType()); //$NON-NLS-1$}
-					StudioAnalytics.getInstance().sendEvent(
+					sendEvent(
 							new FeatureEvent("remote.sync." + site.getDestination().getType(), payload)); //$NON-NLS-1$
 				}
 			}

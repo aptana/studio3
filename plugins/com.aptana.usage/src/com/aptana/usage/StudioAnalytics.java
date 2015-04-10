@@ -14,20 +14,13 @@ import org.eclipse.core.runtime.Platform;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.usage.internal.AnalyticsHandlersManager;
 
-public class StudioAnalytics
+public class StudioAnalytics implements IStudioAnalytics
 {
 
-	private static StudioAnalytics instance;
-
-	public synchronized static StudioAnalytics getInstance()
-	{
-		if (instance == null)
-		{
-			instance = new StudioAnalytics();
-		}
-		return instance;
-	}
-
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.usage.IStudioAnalytics#sendEvent(com.aptana.usage.AnalyticsEvent)
+	 */
 	public void sendEvent(AnalyticsEvent event)
 	{
 		if (Platform.inDevelopmentMode() && !EclipseUtil.isTesting())

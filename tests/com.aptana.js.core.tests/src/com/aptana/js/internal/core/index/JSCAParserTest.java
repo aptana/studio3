@@ -148,6 +148,20 @@ public class JSCAParserTest
 		assertTrue(constants.contains("Titanium.UI.UNIT_PX"));
 	}
 
+	@Test
+	public void testUserAgentsOnTypes() throws Exception
+	{
+		IJSCAModel model = parse("indexing/user_agents_on_type.jsca");
+
+		List<TypeElement> types = model.getTypes();
+		assertEquals(1, types.size());
+		TypeElement type = types.get(0);
+		List<String> userAgents = type.getUserAgentNames();
+		assertEquals(2, userAgents.size());
+		assertTrue(userAgents.contains("mobileweb"));
+		assertTrue(userAgents.contains("tizen"));
+	}
+
 	protected IJSCAModel parse(String filePath) throws IOException
 	{
 		URL url = FileLocator.find(JSCorePlugin.getDefault().getBundle(), Path.fromPortableString(filePath), null);

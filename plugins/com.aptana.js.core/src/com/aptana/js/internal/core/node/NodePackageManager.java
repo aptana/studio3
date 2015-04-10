@@ -59,6 +59,8 @@ import com.aptana.js.core.node.INodePackageManager;
 public class NodePackageManager implements INodePackageManager
 {
 
+	private static final String SILENT = "-s"; //$NON-NLS-1$
+
 	/**
 	 * The error string that appears in the npm command output.
 	 */
@@ -73,11 +75,6 @@ public class NodePackageManager implements INodePackageManager
 	 * ENV variable that can override prefix config value.
 	 */
 	private static final String NPM_CONFIG_PREFIX = "NPM_CONFIG_PREFIX"; //$NON-NLS-1$
-
-	/**
-	 * Folder where modules live.
-	 */
-	private static final String NODE_MODULES = "node_modules"; //$NON-NLS-1$
 
 	private static final String BIN = "bin"; //$NON-NLS-1$
 	private static final String LIB = "lib"; //$NON-NLS-1$
@@ -151,7 +148,7 @@ public class NodePackageManager implements INodePackageManager
 	/**
 	 * A method that grabs the path to the NPM script to run under node. If the file doesn't exist we throw a
 	 * CoreException.
-	 * 
+	 *
 	 * @return
 	 * @throws CoreException
 	 */
@@ -184,44 +181,11 @@ public class NodePackageManager implements INodePackageManager
 		String globalPrefixPath = null;
 		try
 		{
-			/*
-			 * HACK for environments with npm config prefix value set : when sudo npm -g install command is used, the
-			 * global prefix config value for the entire system overrides the global prefix value of the user. So, it
-			 * always install into /usr/lib even though user set a custom value for NPM_CONFIG_PREFIX.
-			 */
-			sub.subTask("Checking global NPM prefix");
-			IPath prefixPath = getConfigPrefixPath();
-			if (prefixPath != null)
+			// If we are doing a global install we will fetch the global prefix and set it back after the install
+			// completes to the original value
+			if (global)
 			{
-				List<String> args = CollectionsUtil.newList(CONFIG, GET, PREFIX);
-				// TODO: should cache this value as config prefix path ?
-				IStatus npmStatus = runNpmConfig(args, password, global, workingDirectory, sub.newChild(1));
-				if (npmStatus.isOK())
-				{
-					String prefix = npmStatus.getMessage();
-					sub.subTask("Global NPM prefix is " + prefix);
-					// If the sudo cache is timed out, then the password prompt and other details might appear in the
-					// console. So we should strip them off to get the real npm prefix value.
-					if (prefix.contains(SudoManager.PROMPT_MSG))
-					{
-						prefix = prefix.substring(prefix.indexOf(SudoManager.PROMPT_MSG)
-								+ SudoManager.PROMPT_MSG.length());
-					}
-
-					// Set the global prefix path only if it is not the default value.
-					if (!prefixPath.toOSString().equals(prefix))
-					{
-						sub.subTask("Global and user NPM prefix don't match, setting global prefix temporarily to: "
-								+ prefixPath.toOSString());
-						globalPrefixPath = prefix;
-						setGlobalPrefixPath(password, workingDirectory, sub.newChild(1), prefixPath.toOSString());
-					}
-				}
-				else
-				{
-					IdeLog.logWarning(JSCorePlugin.getDefault(),
-							"Failed to get global prefix for NPM: " + npmStatus.getMessage());
-				}
+				globalPrefixPath = getGlobalPrefix(global, password, workingDirectory, sub, globalPrefixPath);
 			}
 			sub.setWorkRemaining(8);
 			sub.subTask("Running npm install command");
@@ -292,6 +256,61 @@ public class NodePackageManager implements INodePackageManager
 		}
 	}
 
+	/**
+	 * Gets the global prefix for global installs
+	 *
+	 * @param global
+	 * @param password
+	 * @param workingDirectory
+	 * @param sub
+	 * @param globalPrefixPath
+	 * @return
+	 * @throws CoreException
+	 */
+	protected String getGlobalPrefix(boolean global, char[] password, IPath workingDirectory, SubMonitor sub,
+			String globalPrefixPath) throws CoreException
+	{
+		/*
+		 * HACK for environments with npm config prefix value set : when sudo npm -g install command is used, the global
+		 * prefix config value for the entire system overrides the global prefix value of the user. So, it always
+		 * install into /usr/lib even though user set a custom value for NPM_CONFIG_PREFIX.
+		 */
+		sub.subTask("Checking global NPM prefix");
+		IPath prefixPath = getConfigPrefixPath();
+		if (prefixPath != null)
+		{
+			List<String> args = CollectionsUtil.newList(CONFIG, GET, PREFIX);
+			// TODO: should cache this value as config prefix path ?
+			IStatus npmStatus = runNpmConfig(args, password, global, workingDirectory, sub.newChild(1));
+			if (npmStatus.isOK())
+			{
+				String prefix = npmStatus.getMessage();
+				sub.subTask("Global NPM prefix is " + prefix);
+				// If the sudo cache is timed out, then the password prompt and other details might appear in the
+				// console. So we should strip them off to get the real npm prefix value.
+				if (prefix.contains(SudoManager.PROMPT_MSG))
+				{
+					prefix = prefix.substring(prefix.indexOf(SudoManager.PROMPT_MSG) + SudoManager.PROMPT_MSG.length());
+				}
+
+				// Set the global prefix path only if it is not the default value.
+				if (!prefixPath.toOSString().equals(prefix))
+				{
+					sub.subTask("Global and user NPM prefix don't match, setting global prefix temporarily to: "
+							+ prefixPath.toOSString());
+					globalPrefixPath = prefix;
+					setGlobalPrefixPath(password, workingDirectory, sub.newChild(1), prefixPath.toOSString());
+				}
+			}
+			else
+			{
+				IdeLog.logWarning(JSCorePlugin.getDefault(),
+						"Failed to get global prefix for NPM: " + npmStatus.getMessage());
+			}
+		}
+		return globalPrefixPath;
+	}
+
 	private IStatus setGlobalPrefixPath(char[] password, IPath workingDirectory, IProgressMonitor monitor,
 			String globalPrefixPath) throws CoreException
 	{
@@ -310,7 +329,7 @@ public class NodePackageManager implements INodePackageManager
 
 	/**
 	 * This will return a list of arguments for proxy settings (if we have any, otherwise an empty list).
-	 * 
+	 *
 	 * @param env
 	 *            The environment map. Passed in so we can flag passwords to obfuscate (in other words, we may modify
 	 *            the map)
@@ -339,7 +358,7 @@ public class NodePackageManager implements INodePackageManager
 
 	/**
 	 * Given proxy data, we try to convert that back into a full URL
-	 * 
+	 *
 	 * @param data
 	 *            The {@link IProxyData} we're converting into a URL string.
 	 * @param env
@@ -453,9 +472,22 @@ public class NodePackageManager implements INodePackageManager
 		return listing.contains(packageName);
 	}
 
-	public IPath getModulesPath(String packageName) throws CoreException
+	/**
+	 * FIXME Add Unit tests.
+	 */
+	public IPath getModulesPath(String packageName, boolean isGlobal, String... args) throws CoreException
 	{
-		IStatus status = runInBackground(PARSEABLE_ARG, LIST, packageName, GLOBAL_ARG);
+		List<String> processArgs = CollectionsUtil.newList(PARSEABLE_ARG, LIST, packageName, SILENT_ARG);
+		if (isGlobal)
+		{
+			CollectionsUtil.addToList(processArgs, GLOBAL_ARG);
+		}
+		if (args != null)
+		{
+			CollectionsUtil.addToList(processArgs, args);
+		}
+
+		IStatus status = runInBackground(CollectionsUtil.toArray(processArgs));
 		if (!status.isOK())
 		{
 			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
@@ -474,7 +506,8 @@ public class NodePackageManager implements INodePackageManager
 	public String getInstalledVersion(String packageName, boolean global, IPath workingDir) throws CoreException
 	{
 		IPath npmPath = checkedNPMPath();
-		List<String> args = CollectionsUtil.newList(npmPath.toOSString(), "ls", packageName, COLOR, FALSE, JSON, TRUE); //$NON-NLS-1$
+		List<String> args = CollectionsUtil.newList(npmPath.toOSString(),
+				"ls", packageName, SILENT, COLOR, FALSE, JSON, TRUE); //$NON-NLS-1$
 		if (global)
 		{
 			args.add(GLOBAL_ARG);
@@ -660,12 +693,42 @@ public class NodePackageManager implements INodePackageManager
 		return args;
 	}
 
+	/**
+	 * Uninstalls an npm package.
+	 *
+	 * @param packageName
+	 * @param displayName
+	 * @param global
+	 * @param password
+	 * @param monitor
+	 * @return
+	 * @throws CoreException
+	 */
 	public IStatus uninstall(String packageName, String displayName, boolean global, char[] password,
 			IProgressMonitor monitor) throws CoreException
 	{
+		return uninstall(packageName, displayName, global, password, null, monitor);
+	}
+
+	/**
+	 * Uninstalls an npm package.
+	 *
+	 * @param packageName
+	 * @param displayName
+	 * @param global
+	 * @param password
+	 * @param workingDirectory
+	 * @param monitor
+	 * @return
+	 * @throws CoreException
+	 */
+	public IStatus uninstall(String packageName, String displayName, boolean global, char[] password,
+			IPath workingDirectory, IProgressMonitor monitor) throws CoreException
+	{
 		try
 		{
-			IStatus status = runNpmInstaller(packageName, displayName, global, password, null, REMOVE, monitor);
+			IStatus status = runNpmInstaller(packageName, displayName, global, password, workingDirectory, REMOVE,
+					monitor);
 			if (status.getSeverity() == IStatus.CANCEL)
 			{
 				return Status.OK_STATUS;
@@ -687,7 +750,6 @@ public class NodePackageManager implements INodePackageManager
 		{
 			return new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, e.getMessage(), e);
 		}
-
 	}
 
 	// When in global mode, executables are linked into {prefix}/bin on Unix, or directly into {prefix} on Windows.
@@ -832,4 +894,5 @@ public class NodePackageManager implements INodePackageManager
 	{
 		return ExecutableUtil.find(executableName, true, searchLocations, filter);
 	}
+
 }

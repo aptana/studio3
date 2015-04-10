@@ -27,6 +27,13 @@ public final class VersionUtil
 {
 	// Match x.y and x.y.z
 	private static final String VERSION_SPLIT_PATTERN = "(\\d+)\\.(\\d+)(([a-zA-Z0-9_\\-]+)|(\\.(\\d+)(\\.?[a-zA-Z0-9_\\-]+)?))?"; //$NON-NLS-1$
+	/**
+	 * This pattern will help to match the patterns related to ">=24 <=20", or ">24", or "<=20" and helps to parse the
+	 * min or max version referenced.
+	 */
+	private static final Pattern VERSION_RANGE_PATTERN = Pattern
+			.compile("(>[=]?([0-9a-z.]+))?(\\s)*(<[=]?([0-9a-z.]+))?"); //$NON-NLS-1$
+
 	// Match any dot separated string
 	private static Pattern VERSION_DOT_PATTERN = Pattern.compile("\\."); //$NON-NLS-1$
 
@@ -150,44 +157,65 @@ public final class VersionUtil
 	 * @param right
 	 * @return
 	 */
-	private static int compareVersionsWithHyphen(String left, String right)
+	static int compareVersionsWithHyphen(String left, String right)
 	{
 		boolean hasLeftHyphen = false, hasRightHyphen = false;
 		int hyphenIndex = left.indexOf('-');
+		String leftPreHyphen = left, leftPostHyphen = null;
 		if (hyphenIndex > -1)
 		{
 			hasLeftHyphen = true;
-			left = left.substring(0, hyphenIndex);
+			leftPreHyphen = left.substring(0, hyphenIndex);
+			leftPostHyphen = left.substring(hyphenIndex + 1, left.length());
 		}
 		hyphenIndex = right.indexOf('-');
+		String rightPreHyphen = right, rightPostHyphen = null;
 		if (hyphenIndex > -1)
 		{
 			hasRightHyphen = true;
-			right = right.substring(0, hyphenIndex);
+			rightPreHyphen = right.substring(0, hyphenIndex);
+			rightPostHyphen = right.substring(hyphenIndex + 1, right.length());
+		}
+		// If both the version doesn't have hyphen, then just compare them.
+		if (!hasLeftHyphen && !hasRightHyphen)
+		{
+			return left.compareTo(right);
 		}
 		// No need to check based on hyphen in version identifier if either both or none of them have hyphen.
-		if (left.equals(right) && hasLeftHyphen != hasRightHyphen)
+		if (leftPreHyphen.equals(rightPreHyphen))
 		{
-			if (hasLeftHyphen) // 1-cr < 1
+			if (hasLeftHyphen != hasRightHyphen)
 			{
-				return -1;
+				if (hasLeftHyphen) // 1-cr < 1
+				{
+					return -1;
+				}
+				else if (hasRightHyphen) // 1 > 1-cr
+				{
+					return 1;
+				}
 			}
-			else if (hasRightHyphen) // 1 > 1-cr
+			else
 			{
-				return 1;
+				return leftPostHyphen.compareTo(rightPostHyphen);
 			}
 		}
-		return left.compareTo(right);
+		return leftPreHyphen.compareTo(rightPreHyphen);
 	}
 
 	/**
 	 * Parse the raw output and return a {@link Version} instance out of it.
 	 * 
 	 * @param rawOutput
-	 * @return A {@link Version} instance. Null if the output did not contain a parseable version number.
+	 * @return A {@link Version} instance. {@link Version#emptyVersion} if the output did not contain a parseable
+	 *         version number.
 	 */
 	public static Version parseVersion(String rawOutput)
 	{
+		if (StringUtil.isEmpty(rawOutput))
+		{
+			return Version.emptyVersion;
+		}
 		Pattern pattern = Pattern.compile(VERSION_SPLIT_PATTERN);
 		Matcher matcher = pattern.matcher(rawOutput);
 		if (matcher.find())
@@ -234,7 +262,7 @@ public final class VersionUtil
 				IdeLog.logError(CorePlugin.getDefault(), "Error parsing the version string - " + version, iae); //$NON-NLS-1$
 			}
 		}
-		return null;
+		return Version.emptyVersion;
 	}
 
 	/**
@@ -264,15 +292,8 @@ public final class VersionUtil
 		{
 			try
 			{
-				Version version = getVersion(installedVer);
-				if (version != null)
-				{
-					installed.put(installedVer, version);
-				}
-				else
-				{
-					installed.put(installedVer, Version.emptyVersion);
-				}
+				Version version = parseVersion(installedVer);
+				installed.put(installedVer, version);
 			}
 			catch (Exception e)
 			{
@@ -388,15 +409,64 @@ public final class VersionUtil
 	}
 
 	/**
-	 * Extract a Version out of a given version string. We are looking for a pattern that will match a version in a form
-	 * of a.b.c (or less).
+	 * Returns true is version object is null or is {@link Version#emptyVersion}
 	 * 
-	 * @param installedVer
-	 * @return The 'synthesized' version of the given version string; <code>null</code> if no version was detected.
+	 * @param version
+	 * @return
 	 */
-	public static Version getVersion(String version)
+	public static boolean isEmpty(Version version)
 	{
-		return VersionUtil.parseVersion(version);
+		if (version == null)
+		{
+			return true;
+		}
+		if (version.equals(Version.emptyVersion))
+		{
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Parse the version range with the format <code>">=20.0 <24.x", or ">24", or "<=20"</code> and returns the minimum
+	 * required version from the range.
+	 * 
+	 * @param versionRange
+	 * @return
+	 */
+	public static String parseMin(String versionRange)
+	{
+		if (StringUtil.isEmpty(versionRange))
+		{
+			return null;
+		}
+		Matcher matcher = VERSION_RANGE_PATTERN.matcher(versionRange);
+		if (matcher.matches())
+		{
+			return matcher.group(2);
+		}
+		return null;
+	}
+
+	/**
+	 * Parse the version range with the format <code>">=20.0 <24.x", or ">24", or "<=20"</code> and returns the maximum
+	 * required version from the range.
+	 * 
+	 * @param versionRange
+	 * @return
+	 */
+	public static String parseMax(String versionRange)
+	{
+		if (StringUtil.isEmpty(versionRange))
+		{
+			return null;
+		}
+		Matcher matcher = VERSION_RANGE_PATTERN.matcher(versionRange);
+		if (matcher.matches())
+		{
+			return matcher.group(5);
+		}
+		return null;
 	}
 
 }

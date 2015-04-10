@@ -38,7 +38,7 @@ public class ImportSampleHandler extends AbstractHandler
 
 				if (firstElement instanceof SamplesReference)
 				{
-					SampleProjectCreator.createSampleProject((SamplesReference) firstElement);
+					return SampleProjectCreator.createSampleProject((SamplesReference) firstElement);
 				}
 			}
 		}
@@ -47,7 +47,7 @@ public class ImportSampleHandler extends AbstractHandler
 			IProjectSample samplesRef = SamplesPlugin.getDefault().getSamplesManager().getSample(id);
 			if (samplesRef != null)
 			{
-				SampleProjectCreator.createSampleProject(samplesRef);
+				return SampleProjectCreator.createSampleProject(samplesRef);
 			}
 		}
 		return null;

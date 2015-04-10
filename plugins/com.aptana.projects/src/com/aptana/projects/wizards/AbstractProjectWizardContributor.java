@@ -7,6 +7,9 @@
  */
 package com.aptana.projects.wizards;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -48,6 +51,12 @@ public abstract class AbstractProjectWizardContributor implements IProjectWizard
 	public IStatus performWizardFinish(IProject project, IProgressMonitor monitor)
 	{
 		return Status.OK_STATUS;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<String> getArguments()
+	{
+		return Collections.EMPTY_LIST;
 	}
 
 	public void finalizeWizardPage(IWizardPage page)
