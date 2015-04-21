@@ -84,11 +84,14 @@ public class AppcSocketMessagesHandler implements ISocketMessagesHandler
 				}
 
 				int exitCode = dialog.open();
-				if (exitCode != 0)
+				if (exitCode == 0)
+				{
+					response[0] = (ObjectNode) dialog.getValue();
+				}
+				else
 				{
 					response[0] = null;
 				}
-				response[0] = (ObjectNode) dialog.getValue();
 			}
 		});
 

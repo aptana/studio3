@@ -15,7 +15,7 @@ import org.junit.runners.Suite.SuiteClasses;
 import com.aptana.webserver.internal.core.builtin.LocalWebServerTest;
 
 @RunWith(Suite.class)
-@SuiteClasses({ LocalWebServerTest.class, URLtoURIMapperTest.class })
+@SuiteClasses({ LocalWebServerTest.class })
 public class AllTests
 {
 
