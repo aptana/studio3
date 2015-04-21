@@ -108,6 +108,10 @@ public class AliasResolverFactory implements IAliasResolver
 				IdeLog.logError(JSCorePlugin.getDefault(), e);
 				continue;
 			}
+			catch (Exception e)
+			{
+				IdeLog.logError(JSCorePlugin.getDefault(), e);
+			}
 
 		}
 		return sourceType;
