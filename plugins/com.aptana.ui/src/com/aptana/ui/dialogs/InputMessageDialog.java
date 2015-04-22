@@ -7,7 +7,6 @@
  */
 package com.aptana.ui.dialogs;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,6 +54,7 @@ public class InputMessageDialog extends MessageDialog
 	protected static final String CHECKBOX = "checkbox"; //$NON-NLS-1$
 	protected static final String PASSWORD = "password"; //$NON-NLS-1$
 	protected static final String INPUT = "input"; //$NON-NLS-1$
+	protected static final String CONFIRMATION = "confirm"; // MessageDialog.CONFIRM already there! //$NON-NLS-1$
 
 	/**
 	 * Attributes.
