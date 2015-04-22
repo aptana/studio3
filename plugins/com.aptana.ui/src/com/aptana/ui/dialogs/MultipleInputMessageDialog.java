@@ -209,6 +209,10 @@ public class MultipleInputMessageDialog extends InputMessageDialog
 				combo.setSelection(new StructuredSelection(values.get(0)));
 				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).applyTo(valueComp);
 			}
+			else if (CONFIRMATION.equals(inputType))
+			{
+				input.add(Boolean.TRUE);
+			}
 
 			userInput.putPOJO(responseKey, input);
 
@@ -240,7 +244,11 @@ public class MultipleInputMessageDialog extends InputMessageDialog
 				List<Object> input = (List<Object>) controls;
 
 				Object firstElement = CollectionsUtil.getFirstElement(input);
-				if (firstElement instanceof Text)
+				if (firstElement instanceof Boolean)
+				{
+					response.put(fieldName, (Boolean) firstElement);
+				}
+				else if (firstElement instanceof Text)
 				{
 					response.put(fieldName, ((Text) firstElement).getText());
 
