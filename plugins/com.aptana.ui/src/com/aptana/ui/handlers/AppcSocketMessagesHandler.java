@@ -7,8 +7,8 @@
  */
 package com.aptana.ui.handlers;
 
-
 import com.aptana.core.resources.ISocketMessagesHandler;
+import com.aptana.core.util.StringUtil;
 import com.aptana.ui.dialogs.InputMessageDialog;
 import com.aptana.ui.dialogs.MultipleInputMessageDialog;
 import com.aptana.ui.util.UIUtils;
@@ -32,7 +32,7 @@ public class AppcSocketMessagesHandler implements ISocketMessagesHandler
 	private static final String QUESTION = "question"; //$NON-NLS-1$
 	private static final String TYPE = "type"; //$NON-NLS-1$
 	private final String actionName;
-	private final String description;
+	private String description;
 
 	public AppcSocketMessagesHandler()
 	{
@@ -68,7 +68,16 @@ public class AppcSocketMessagesHandler implements ISocketMessagesHandler
 	{
 		final JsonNode questionNode = type.path(QUESTION);
 		final ObjectNode[] response = new ObjectNode[1];
-
+		final JsonNode qType = type.path(TYPE);
+		String asText = type.path(MESSAGE).asText();
+		if (ERROR.equals(qType.asText()) && !StringUtil.isEmpty(asText))
+		{
+			description = asText;
+		}
+		else
+		{
+			description = Messages.AppcSocketMessagesHandler_Description;
+		}
 		UIUtils.getDisplay().syncExec(new Runnable()
 		{
 			public void run()
