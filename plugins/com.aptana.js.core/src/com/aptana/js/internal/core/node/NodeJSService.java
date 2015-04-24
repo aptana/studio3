@@ -36,6 +36,7 @@ import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.ProcessRunner;
 import com.aptana.core.util.ProcessStatus;
 import com.aptana.core.util.StringUtil;
+import com.aptana.core.util.SudoManager;
 import com.aptana.ide.core.io.downloader.DownloadManager;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.core.node.INodeJS;
@@ -214,19 +215,8 @@ public class NodeJSService implements INodeJSService
 			}
 			else
 			{
-				List<String> args = CollectionsUtil.newList("sudo"); //$NON-NLS-1$
-				if (password == null || password.length == 0)
-				{
-					// if sudo doesn't require a password
-					args.add("-n"); //$NON-NLS-1$
-				}
-				else
-				{
-					// sudo requires a password
-					args.add("-S"); //$NON-NLS-1$
-				}
-				CollectionsUtil.addToList(args, "--",//$NON-NLS-1$
-						"/usr/sbin/installer", "-pkg", file.getAbsolutePath(), "-target", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				List<String> args = new SudoManager().getArguments(password);
+				CollectionsUtil.addToList(args, "/usr/sbin/installer", "-pkg", file.getAbsolutePath(), "-target", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						"/"); //$NON-NLS-1$
 				status = createProcessRunner().run(Path.ROOT, null, password, args, sub.newChild(95));
 			}
