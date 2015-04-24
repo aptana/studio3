@@ -209,6 +209,11 @@ public class MultipleInputMessageDialog extends InputMessageDialog
 				combo.setSelection(new StructuredSelection(values.get(0)));
 				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).applyTo(valueComp);
 			}
+			else if (CONFIRMATION.equals(inputType))
+			{
+				input.add(Boolean.TRUE);
+				setButtonLabels(new String[] { IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL });//TISTUD-7408
+			}
 
 			userInput.putPOJO(responseKey, input);
 
