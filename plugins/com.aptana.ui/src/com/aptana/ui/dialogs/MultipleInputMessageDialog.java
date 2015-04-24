@@ -212,6 +212,7 @@ public class MultipleInputMessageDialog extends InputMessageDialog
 			else if (CONFIRMATION.equals(inputType))
 			{
 				input.add(Boolean.TRUE);
+				setButtonLabels(new String[] { IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL });//TISTUD-7408
 			}
 
 			userInput.putPOJO(responseKey, input);
