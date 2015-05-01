@@ -579,9 +579,13 @@ public class GitRepository
 						// pulled.
 						if (isProbablyBranch(name))
 						{
-							synchronized (branches)
+							if (branches != null)
 							{
-								branches.remove(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_REMOTES + name)));
+								synchronized (branches)
+								{
+									branches.remove(new GitRevSpecifier(GitRef
+											.refFromString(GitRef.REFS_REMOTES + name)));
+								}
 							}
 							Job job = new GitRepoJob(GitRepository.this, "Firing branch removed and pull event") //$NON-NLS-1$
 							{
@@ -707,6 +711,11 @@ public class GitRepository
 	public SortedSet<GitRef> simpleRefs()
 	{
 		SortedSet<GitRef> refs = new TreeSet<GitRef>(new GitRefComparator());
+		if (branches == null)
+		{
+			return refs;
+		}
+
 		synchronized (branches)
 		{
 			for (GitRevSpecifier revSpec : branches)
