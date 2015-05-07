@@ -112,13 +112,13 @@ public class MultipleInputMessageDialog extends InputMessageDialog
 			Label label = new Label(parent, SWT.NONE);
 			String lblTxt = question.path(MESSAGE).asText();
 			label.setText(lblTxt);
-			Point requiredSize = label.computeSize(SWT.DEFAULT, 25);
+			Point requiredSize = label.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 			int minSize = convertHorizontalDLUsToPixels(80);
 			if (requiredSize.x > minSize)
 			{
 				minSize = requiredSize.x;
 			}
-			GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.CENTER).grab(true, false).hint(minSize, 25)
+			GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.CENTER).grab(true, false).hint(minSize, SWT.DEFAULT)
 					.applyTo(label);
 
 			Composite valueComp = new Composite(parent, SWT.NONE);
