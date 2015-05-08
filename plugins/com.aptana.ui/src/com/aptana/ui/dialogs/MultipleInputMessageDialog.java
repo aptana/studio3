@@ -273,9 +273,11 @@ public class MultipleInputMessageDialog extends InputMessageDialog
 						}
 					}
 				}
-
+				else if (firstElement instanceof Boolean)
+				{
+					response.put(fieldName, Boolean.TRUE);
+				}
 			}
-
 		}
 		super.buttonPressed(buttonId);
 	}
