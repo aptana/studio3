@@ -64,6 +64,7 @@ public class InputMessageDialog extends MessageDialog
 	protected static final String CHOICES = "choices"; //$NON-NLS-1$
 	protected static final String MESSAGE = "message"; //$NON-NLS-1$
 	protected static final String VALUE = "value"; //$NON-NLS-1$
+	protected static final String DEFAULT = "default"; //$NON-NLS-1$
 
 	private List<Object> input;
 	private String inputType;
