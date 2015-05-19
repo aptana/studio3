@@ -102,7 +102,7 @@ public class NodePackageManager implements INodePackageManager
 	 */
 	private static final String FALSE = "false"; //$NON-NLS-1$
 
-	private static final Pattern VERSION_PATTERN = Pattern.compile("([0-9]+\\.[0-9]+\\.[0-9]+)"); //$NON-NLS-1$
+	private static final Pattern VERSION_PATTERN = Pattern.compile("([0-9]+\\.[0-9]+\\.[0-9]+[\\-a-z0-9]*)"); //$NON-NLS-1$
 
 	/**
 	 * Binary script name.
