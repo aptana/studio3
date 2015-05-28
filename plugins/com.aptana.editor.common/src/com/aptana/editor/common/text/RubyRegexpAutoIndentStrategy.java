@@ -19,6 +19,7 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.jruby.RubyRegexp;
 import org.jruby.RubyString;
+import org.jruby.runtime.Block;
 import org.jruby.runtime.builtin.IRubyObject;
 
 import com.aptana.core.logging.IdeLog;
@@ -29,7 +30,7 @@ import com.aptana.scripting.model.BundleManager;
 /**
  * This implementation uses ruby regular expressions contributed by bundles. It grabs the regexp with the best match for
  * the current scope and then applies that regexp against the line.
- * 
+ *
  * @author cwilliams
  */
 public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
@@ -72,7 +73,9 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 			// Only de-dent when at end of line!
 			int endOffset = curLineRegion.getOffset() + curLineRegion.getLength();
 			if (c.offset != endOffset)
+			{
 				return;
+			}
 
 			String scope = getScopeAtOffset(d, c.offset);
 			RubyRegexp decreaseIndentRegexp = getDecreaseIndentRegexp(scope);
@@ -135,7 +138,7 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 
 	/**
 	 * Returns the string that makes up ONE indent level (typically 2 spaces, maybe a tab char, or 4 spaces, etc).
-	 * 
+	 *
 	 * @return
 	 */
 	protected String getIndentString()
@@ -159,6 +162,7 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 	 *            the command to deal with
 	 * @return true if the indentation occurred, false otherwise
 	 */
+	@Override
 	protected boolean autoIndent(IDocument d, DocumentCommand c)
 	{
 		if (c.offset <= 0 || d.getLength() == 0 || !shouldAutoIndent())
@@ -219,9 +223,11 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 	protected boolean matchesRegexp(RubyRegexp regexp, String lineContent)
 	{
 		if (regexp == null)
+		{
 			return false;
+		}
 		RubyString string = regexp.getRuntime().newString(lineContent);
-		IRubyObject matcher = regexp.match_m(regexp.getRuntime().getCurrentContext(), string);
+		IRubyObject matcher = regexp.match_m19(regexp.getRuntime().getCurrentContext(), string, Block.NULL_BLOCK);
 		return !matcher.isNil();
 	}
 
@@ -229,7 +235,7 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 	 * This method determines the corrected indent string for the current line on dedent trigger. We walk the lines
 	 * backward and try to find the matching open/indent (by using the increase indent regexp). If found, we grab that
 	 * line's exact indent string and re-use it.
-	 * 
+	 *
 	 * @param d
 	 * @param lineNumber
 	 * @param currentLineIndent
@@ -276,7 +282,7 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 	/**
 	 * A less intelligent way of determining new indent on dedent trigger. We look at previous line and if our indent is
 	 * of same length or greater, we just assume we need to dedent from that previous line.
-	 * 
+	 *
 	 * @param d
 	 * @param lineNumber
 	 * @param currentLineIndent
@@ -324,7 +330,7 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 	 * This method attempts to determine tab width in the file as it already exists. It checks for two indents of
 	 * different sizes and returns their GCD if it's not 1. If we can't get two lines of different lenths, or their GCD
 	 * is 1 then we'll fall back to using the editor's expressed tab width via the preferences.
-	 * 
+	 *
 	 * @param d
 	 * @param startLine
 	 * @return
@@ -340,17 +346,25 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 				int endofWhitespace = findEndOfWhiteSpace(d, line.getOffset(), line.getOffset() + line.getLength());
 				int length = endofWhitespace - line.getOffset();
 				if (length == 0)
+				{
 					continue;
+				}
 				// We need two different lengths to guess at tab width
 				if (lengths.size() < 2 && !lengths.contains(length))
+				{
 					lengths.add(length);
+				}
 				if (lengths.size() >= 2)
+				{
 					break;
+				}
 			}
 			// now we need to do a GCD of the lengths
 			int tabWidth = gcd(lengths.get(0), lengths.get(1));
 			if (tabWidth != 1)
+			{
 				return tabWidth;
+			}
 		}
 		catch (BadLocationException e)
 		{
@@ -363,14 +377,16 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 	private int gcd(int a, int b)
 	{
 		if (b == 0)
+		{
 			return a;
+		}
 		return gcd(b, a % b);
 	}
 
 	/**
 	 * Method to determine if we want to insert an indent plus another newline and initial indent. Useful for turning
 	 * something like "[]" into "[\n  \n]"
-	 * 
+	 *
 	 * @param contentBeforeNewline
 	 * @param contentAfterNewline
 	 * @return
@@ -382,20 +398,30 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 		// <tag></tag>?
 		if (contentBeforeNewline == null || contentAfterNewline == null || contentBeforeNewline.trim().length() == 0
 				|| contentAfterNewline.trim().length() == 0)
+		{
 			return false;
+		}
 		char before = contentBeforeNewline.charAt(contentBeforeNewline.length() - 1);
 		char after = contentAfterNewline.charAt(0);
 		if (before == '[' && after == ']')
+		{
 			return true;
+		}
 		if (before == '{' && after == '}')
+		{
 			return true;
+		}
 		if (before == '(' && after == ')')
+		{
 			return true;
+		}
 		if (contentAfterNewline.length() >= 2)
 		{
 			char afterAfter = contentAfterNewline.charAt(1);
 			if (before == '>' && after == '<' && afterAfter == '/')
+			{
 				return true;
+			}
 		}
 		return false;
 	}
