@@ -7,9 +7,8 @@
  */
 package com.aptana.editor.common.text;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
@@ -18,6 +17,9 @@ import org.eclipse.jface.text.IDocument;
 import org.jruby.Ruby;
 import org.jruby.RubyRegexp;
 import org.jruby.util.ByteList;
+import org.jruby.util.KCode;
+import org.jruby.util.RegexpOptions;
+import org.junit.Test;
 
 public class RubyRegexpAutoIndentStrategyTest
 {
@@ -169,7 +171,7 @@ public class RubyRegexpAutoIndentStrategyTest
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	@Test
 	public void testRR3_129()
@@ -347,7 +349,7 @@ public class RubyRegexpAutoIndentStrategyTest
 
 	/**
 	 * APSTUD-2867
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -370,7 +372,7 @@ public class RubyRegexpAutoIndentStrategyTest
 
 	/**
 	 * APSTUD-2867
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -393,7 +395,7 @@ public class RubyRegexpAutoIndentStrategyTest
 
 	/**
 	 * See APSTUD-2868
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -459,7 +461,7 @@ public class RubyRegexpAutoIndentStrategyTest
 
 	/**
 	 * APSTUD3640
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -493,6 +495,18 @@ public class RubyRegexpAutoIndentStrategyTest
 		command.caretOffset = offset;
 		command.doit = true;
 		return command;
+	}
+
+	@Test(timeout = 10000)
+	public void testUmlautCharacters()
+	{
+		RubyRegexpAutoIndentStrategy strategy = new JSRubleRubyRegexpAutoIndentStrategy();
+
+		Ruby runtime = Ruby.newInstance();
+		String regPattern = "(?-mix:^(.*\\*\\/)?\\s*(\\}|\\))([^{]*\\{)?([;,]?\\s*|\\.[^{]*|\\s*\\)[;\\s]*)$)";
+		RubyRegexp regexp = RubyRegexp.newRegexp(runtime, regPattern, new RegexpOptions(KCode.UTF8, true));
+
+		strategy.matchesRegexp(regexp, "console.log('üadäf');");
 	}
 
 	private static class AlwaysMatchRubyRegexpAutoIndentStrategy extends RubyRegexpAutoIndentStrategy
@@ -531,6 +545,36 @@ public class RubyRegexpAutoIndentStrategyTest
 		protected boolean matchesRegexp(RubyRegexp regexp, String lineContent)
 		{
 			return true;
+		}
+	}
+
+	private static class JSRubleRubyRegexpAutoIndentStrategy extends RubyRegexpAutoIndentStrategy
+	{
+		JSRubleRubyRegexpAutoIndentStrategy()
+		{
+			super("", null, null, null);
+		}
+
+		// Use CSS ruble's indent regexps
+		@Override
+		protected RubyRegexp getDecreaseIndentRegexp(String scope)
+		{
+			return RubyRegexp.newRegexp(Ruby.getGlobalRuntime(), ByteList.create("(?<!\\*)\\*\\*\\/|^\\s*\\}"));
+		}
+
+		@Override
+		protected RubyRegexp getIncreaseIndentRegexp(String scope)
+		{
+
+			return RubyRegexp.newRegexp(Ruby.getGlobalRuntime(),
+					ByteList.create("\\/\\*\\*(?!\\*)|\\{\\s*($|\\/\\*(?!.*?\\*\\/.*\\S))"));
+		}
+
+		@Override
+		protected String getScopeAtOffset(IDocument d, int offset) throws BadLocationException
+		{
+			// just return an empty scope for testing
+			return "";
 		}
 	}
 
