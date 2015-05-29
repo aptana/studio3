@@ -15,14 +15,14 @@ Bundle-ActivationPolicy: lazy
 Eclipse-LazyStart: true
 Export-Package: com.aptana.webserver.core,
  com.aptana.webserver.core.preferences
-Import-Package: org.apache.http,
+Import-Package: org.apache.http;version="4.2.0",
  org.apache.http.entity;version="4.2.0",
- org.apache.http.impl,
+ org.apache.http.impl;version="4.2.0",
  org.apache.http.impl.nio;version="4.2.0",
  org.apache.http.impl.nio.reactor;version="4.2.0",
- org.apache.http.nio,
+ org.apache.http.nio;version="4.2.0",
  org.apache.http.nio.entity;version="4.2.0",
  org.apache.http.nio.protocol;version="4.2.0",
- org.apache.http.nio.reactor,
- org.apache.http.params,
- org.apache.http.protocol
+ org.apache.http.nio.reactor;version="4.2.0",
+ org.apache.http.params;version="4.2.0",
+ org.apache.http.protocol;version="4.2.0"
