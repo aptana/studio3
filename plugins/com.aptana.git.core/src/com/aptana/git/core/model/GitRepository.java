@@ -634,7 +634,7 @@ public class GitRepository
 		IStatus result = execute(ReadWrite.READ, gitDirPath(), "rev-parse", "--is-inside-work-tree"); //$NON-NLS-1$ //$NON-NLS-2$
 		if (result != null && result.isOK() && result.getMessage().trim().equals("true")) //$NON-NLS-1$
 		{
-			return GitExecutable.instance().path(); // FIXME This doesn't seem right....
+			return getGitExecutable().path(); // FIXME This doesn't seem right....
 		}
 
 		return null;
@@ -898,8 +898,7 @@ public class GitRepository
 			return Collections.emptySet();
 		}
 
-		IStatus result = GitExecutable.instance().runInBackground(input.toString(), workingDir,
-				"cat-file", "--batch-check"); //$NON-NLS-1$ //$NON-NLS-2$
+		IStatus result = getGitExecutable().runInBackground(input.toString(), workingDir, "cat-file", "--batch-check"); //$NON-NLS-1$ //$NON-NLS-2$
 		exitRead();
 		if (result.isOK())
 		{
@@ -1558,7 +1557,12 @@ public class GitRepository
 	 */
 	IStatus executeWithPromptHandling(ReadWrite readOrWrite, String... args)
 	{
-		return execute(readOrWrite, workingDirectory(), GitExecutable.getEnvironment(), args);
+		return execute(readOrWrite, workingDirectory(), gitEnvironment(), args);
+	}
+
+	protected Map<String, String> gitEnvironment()
+	{
+		return GitExecutable.getEnvironment();
 	}
 
 	IStatus execute(ReadWrite readOrWrite, IPath workingDir, Map<String, String> env, String... args)
@@ -1581,7 +1585,7 @@ public class GitRepository
 
 		try
 		{
-			return GitExecutable.instance().runInBackground(workingDir, env, args);
+			return getGitExecutable().runInBackground(workingDir, env, args);
 		}
 		finally
 		{
@@ -1598,6 +1602,11 @@ public class GitRepository
 		}
 	}
 
+	protected GitExecutable getGitExecutable()
+	{
+		return GitExecutable.instance();
+	}
+
 	IStatus executeWithInput(String input, String... args)
 	{
 		// All of these processes appear to be write, so just hard-code that
@@ -1607,7 +1616,7 @@ public class GitRepository
 		}
 		try
 		{
-			return GitExecutable.instance().runInBackground(input, workingDirectory(), args);
+			return getGitExecutable().runInBackground(input, workingDirectory(), args);
 		}
 		finally
 		{
@@ -2398,7 +2407,9 @@ public class GitRepository
 		String[] fullArgs = new String[args.length + 1];
 		fullArgs[0] = "pull"; //$NON-NLS-1$
 		System.arraycopy(args, 0, fullArgs, 1, args.length);
-		IStatus result = execute(GitRepository.ReadWrite.WRITE, fullArgs);
+		// Pass along our GitExecutable env explicitly, or else we get:
+		// http://stackoverflow.com/questions/24022582/osx-10-10-yosemite-beta-on-git-pull-git-sh-setup-no-such-file-or-directory
+		IStatus result = execute(GitRepository.ReadWrite.WRITE, workingDirectory(), gitEnvironment(), fullArgs);
 		if (result == null || !result.isOK())
 		{
 			return result;

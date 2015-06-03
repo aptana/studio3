@@ -1387,7 +1387,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	protected void sortProposals(ICompletionProposal[] proposals)
 	{
 		// Sort by relevance first, descending, and then alphabetically, ascending
-		Arrays.sort(proposals, CompletionProposalComparator.decending(CompletionProposalComparator.getComparator(
+		Arrays.sort(proposals, CompletionProposalComparator.descending(CompletionProposalComparator.getComparator(
 				CompletionProposalComparator.RelevanceSort, CompletionProposalComparator.NameSort)));
 	}
 

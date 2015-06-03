@@ -13,9 +13,9 @@
 	padding: 1px 6px 8px 6px; /* top left bottom right */
 	swt-tab-outline: #444444;
 	swt-outer-keyline-color: #444444;
-	swt-unselected-tabs-color: #141414 #141414 #f1f1f1 99% 100%;
+	swt-unselected-tabs-color: #242424 #242424 #242424 99% 100%;
 	swt-shadow-visible: true;
-	swt-selected-tab-fill: #141414;
+	swt-selected-tab-fill: #242424;
 	swt-shadow-color: #2d2d30;
 	swt-mru-visible: true;
 	swt-corner-radius: 6px;
@@ -24,7 +24,7 @@
 }
 .MPartStack.active > CTabItem,
 .MPartStack.active > CTabItem CLabel {
-    color: #484850;
+    color: #939399;
 }
 .MPartStack.active > CTabItem:selected,
 .MPartStack.active > CTabItem:selected CLabel {
@@ -37,33 +37,33 @@
 .MPartStack .MPart Table,
 .MPartStack .MPart Label,
 .MPartStack Canvas {
-	background-color: #141414;
+	background-color: #242424;
 	color: #ffffff;
 }
 #org-eclipse-ui-console-ConsoleView StyledText {
-	background-color: #141414;
+	background-color: #242424;
 	color: #ffffff;
 }
 /* off-black BG for active parts */
 .MPartStack.active {
 	swt-tab-outline: #444444;
 	swt-outer-keyline-color: #444444;
-	swt-unselected-tabs-color: #141414 #141414 #1d1f21 99% 100%;
-	swt-selected-tab-fill: #1d1f21;
+	swt-unselected-tabs-color: #242424 #242424 #2d2f31 99% 100%;
+	swt-selected-tab-fill: #2d2f31;
 }
 .MPartStack.active,
 .MPartStack.active .MPart,
 .MPartStack.active .MPart Tree,
 .MPartStack.active .MPart Table,
 .MPartStack.active .MPart Control {
-	background-color: #1d1f21;
+	background-color: #2d2f31;
 	color: #ffffff;
 }
 .MPartStack.active Canvas, .MPart.Editor Canvas {
-	background-color: #1d1f21;
+	background-color: #2d2f31;
 }
 #org-eclipse-ui-console-ConsoleView.active StyledText {
-	background-color: #1d1f21;
+	background-color: #2d2f31;
 }
 /**
  * 	Fix up form editors to use white FG, black BG, even for it's own tabs
@@ -73,14 +73,14 @@
 #org-eclipse-ui-editorss .MPartStack .MPart Table,
 #org-eclipse-ui-editorss .MPartStack .MPart Control,
 #org-eclipse-ui-editorss .MPartStack .MPart Label {
-  color: #141414;
+  color: #242424;
   background-color: #ffffff;
 }
 #org-eclipse-ui-editorss .MPartStack CTabFolder {
-	swt-unselected-tabs-color: #f1f1f1 #f1f1f1 #141414 99% 100%;
+	swt-unselected-tabs-color: #f1f1f1 #f1f1f1 #242424 99% 100%;
 }
 #org-eclipse-ui-editorss .MPartStack CTabFolder.active {
-	swt-unselected-tabs-color: #ffffff #ffffff #141414 99% 100%;
+	swt-unselected-tabs-color: #ffffff #ffffff #242424 99% 100%;
 }
 
 /* Empty editor - let's basically hide it by making its colors match window BG and hiding minimize/maximize */
