@@ -75,6 +75,7 @@ public class SamplesActionController extends AbstractActionController
 	protected static final String IMPORT_SAMPLE_COMMAND = "com.aptana.samples.ui.commands.import"; //$NON-NLS-1$
 	protected static final String IMPORT_SAMPLE_COMMAND_ID = "id"; //$NON-NLS-1$
 	protected static final String WEB_NATURE = "com.aptana.projects.webnature"; //$NON-NLS-1$
+	protected static final String MOBILE_NATURE = "com.appcelerator.titanium.mobile.nature";
 
 	// ############## Actions ###############
 
@@ -255,8 +256,9 @@ public class SamplesActionController extends AbstractActionController
 		String[] natures = (String[]) sampleData.get(SAMPLE_INFO.NATURES.toString());
 		if (natures == null || natures.length < 1)
 		{
-			natures = new String[1];
+			natures = new String[2];
 			natures[0] = WEB_NATURE;
+			natures[1] = MOBILE_NATURE;
 		}
 
 		sample.setNatures(natures);
