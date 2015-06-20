@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: XCodeParser
+Bundle-SymbolicName: mestevens.xcode.parser
+Bundle-Version: 1.0.0.qualifier
+Export-Package: ca.mestevens.ios.xcode.parser.exceptions,
+ ca.mestevens.ios.xcode.parser.models,
+ ca.mestevens.ios.xcode.parser.utils
+Bundle-ClassPath: libs/commons-codec-1.4.jar,
+ libs/commons-lang3-3.1.jar,
+ .
