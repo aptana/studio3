@@ -226,7 +226,11 @@ public class DefaultAnalyticsEventHandler implements IAnalyticsEventHandler
 			if (!isValidResponse(responseCode = sendPing(event, null)))
 			{
 				// log the event to the database
-				getAnalyticsLogger().logEvent(event);
+				IAnalyticsLogger logger = getAnalyticsLogger();
+				if (logger != null)
+				{
+					logger.logEvent(event);
+				}
 			}
 			return Status.OK_STATUS;
 		}
