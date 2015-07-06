@@ -59,8 +59,6 @@ import com.aptana.js.core.node.INodePackageManager;
 public class NodePackageManager implements INodePackageManager
 {
 
-	private static final String SILENT = "-s"; //$NON-NLS-1$
-
 	/**
 	 * The error string that appears in the npm command output.
 	 */
@@ -88,6 +86,11 @@ public class NodePackageManager implements INodePackageManager
 	 * Config key/switch to ask for JSON parseable output
 	 */
 	private static final String JSON = "--json"; //$NON-NLS-1$
+
+	/**
+	 * Special switch/config option to set the loglevel to silent so that warnings/errors are not displayed..
+	 */
+	private static final String SILENT = "-s"; //$NON-NLS-1$
 
 	/**
 	 * config value to pass after {@value #JSON} to get json output
@@ -515,12 +518,27 @@ public class NodePackageManager implements INodePackageManager
 		IStatus status = nodeJS.runInBackground(workingDir, ShellExecutable.getEnvironment(), args);
 		if (!status.isOK())
 		{
-			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
-					Messages.NodePackageManager_FailedToDetermineInstalledVersion, packageName, status.getMessage())));
+			// Sometimes due to unrelated un-met dependencies the status is not OK but the
+			// version information is still present so try first to read it. Log the issue
+			// so that user knows he has a problem with NPM
+			String version = getVersion(packageName, status.getMessage());
+			if (StringUtil.isEmpty(version))
+			{
+				throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID,
+						MessageFormat.format(Messages.NodePackageManager_FailedToDetermineInstalledVersion,
+								packageName, status.getMessage())));
+			}
+			IdeLog.logError(JSCorePlugin.getDefault(), status.getMessage());
+			return version;
 		}
+
+		return getVersion(packageName, status.getMessage());
+	}
+
+	private String getVersion(String packageName, String output) throws CoreException
+	{
 		try
 		{
-			String output = status.getMessage();
 			JSONObject json = (JSONObject) new JSONParser().parse(output);
 			if (!json.containsKey("dependencies"))
 			{

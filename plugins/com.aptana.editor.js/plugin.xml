@@ -95,6 +95,8 @@
          <contentType
                type="com.aptana.contenttype.js">
          </contentType>
+          <enablement>
+         </enablement>
       </hover>
    </extension>
       <extension

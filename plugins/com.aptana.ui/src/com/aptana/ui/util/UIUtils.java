@@ -518,7 +518,12 @@ public final class UIUtils
 	{
 		MessageDialog.openError(getActiveWorkbenchWindow().getShell(), title, message);
 	}
-
+	
+	public static void showErrorDialog(Shell shell, String title, String message)
+	{
+		MessageDialog.openError(shell, title, message);
+	}
+	
 	public static boolean showPromptDialog(final String title, final String message)
 	{
 		if (Display.getCurrent() == null)

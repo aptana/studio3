@@ -337,6 +337,32 @@ public class NodePackageManagerTest
 	}
 
 	@Test
+	public void testGetInstalledVersionWithUnmetDependencies() throws CoreException
+	{
+		final IStatus status = new Status(
+				IStatus.ERROR,
+				JSCorePlugin.PLUGIN_ID,
+				"{\n \"problems\": [ \n \"invalid: titanium@3.4.1 /usr/local/lib/node_modules/titanium\" \n ], \n \"dependencies\": {\n    \"titanium\": {\n      \"version\": \"3.4.1\",\n      \"from\": \"titanium@*\",\n      \"invalid\": true,\n  \"problems\": [ \n \"invalid: titanium@3.4.1 /usr/local/lib/node_modules/titanium\" \n ] \n  }\n  }\n}");
+		context.checking(new Expectations()
+		{
+			{
+				oneOf(file).exists();
+				will(returnValue(true));
+
+				oneOf(node).runInBackground(
+						userHome,
+						ShellExecutable.getEnvironment(),
+						CollectionsUtil.newList("/usr/bin/npm", "ls", "titanium", "-s", "--color", "false", "--json", "true", "-g"));
+				will(returnValue(status));
+			}
+		});
+
+		String returned = npm.getInstalledVersion("titanium", true, userHome);
+		assertEquals("3.4.1", returned);
+		context.assertIsSatisfied();
+	}
+
+	@Test
 	public void testGetInstalledVersionIsNotInstalled() throws CoreException
 	{
 		final IStatus status = new Status(IStatus.OK, JSCorePlugin.PLUGIN_ID, "{}");

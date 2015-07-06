@@ -27,6 +27,8 @@ import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.PathUtil;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.core.inferencing.AbstractRequireResolver;
+import com.aptana.js.core.node.INodeJS;
+import com.aptana.js.core.node.INodePackageManager;
 
 /**
  * See http://nodejs.org/api/modules.html#modules_all_together
@@ -97,7 +99,12 @@ public class NodeModuleResolver extends AbstractRequireResolver
 
 	protected synchronized IPath nodeSrcPath()
 	{
-		return JSCorePlugin.getDefault().getNodeJSService().getValidExecutable().getSourcePath();
+		INodeJS nodeExecutable = JSCorePlugin.getDefault().getNodeJSService().getValidExecutable();
+		if (nodeExecutable == null)
+		{
+			return null;
+		}
+		return nodeExecutable.getSourcePath();
 	}
 
 	private boolean isCore(String text)
@@ -211,7 +218,12 @@ public class NodeModuleResolver extends AbstractRequireResolver
 
 	protected synchronized IPath getModulesPath() throws CoreException
 	{
-		return JSCorePlugin.getDefault().getNodePackageManager().getModulesPath();
+		INodePackageManager npm = JSCorePlugin.getDefault().getNodePackageManager();
+		if (npm == null)
+		{
+			return null;
+		}
+		return npm.getModulesPath();
 	}
 
 	public boolean applies(IProject project, IPath currentDirectory, IPath indexRoot)

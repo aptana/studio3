@@ -33,4 +33,9 @@ public interface ICommonConstants
 	 * Code-formatter action ID ("com.aptana.editor.action.Format")
 	 */
 	public String FORMATTER_ACTION_ID = "com.aptana.editor.action.Format"; //$NON-NLS-1$
+	
+	/**
+	 * Flag to indicate use default eclipse editor while opening extensionless files, leave default behaviour to eclipse itself.- Either last opened type/Text Editor
+	 */
+	public static final String ECLIPSE_DEFAULT_EDITOR = "Default Editor"; //$NON-NLS-N$
 }

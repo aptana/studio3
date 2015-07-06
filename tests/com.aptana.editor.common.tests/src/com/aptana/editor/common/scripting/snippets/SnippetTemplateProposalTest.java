@@ -125,7 +125,7 @@ public class SnippetTemplateProposalTest
 		{
 			assertTrue(snippets[i] instanceof SnippetTemplateProposal);
 			StyledString styledActivationString = ((SnippetTemplateProposal) snippets[i]).getStyledActivationString();
-			String styleStr = "echo �� " + (i + 1);
+			String styleStr = "echo » " + (i + 1);
 			assertEquals("Style string of snippets templates do not match", styleStr, styledActivationString
 					.getString().trim());
 		}

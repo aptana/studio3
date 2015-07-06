@@ -11,6 +11,8 @@ import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.resources.IFile;
@@ -29,11 +31,13 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IFileEditorMapping;
 import org.eclipse.ui.IPathEditorInput;
 import org.eclipse.ui.IStorageEditorInput;
 import org.eclipse.ui.IURIEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.editors.text.ILocationProvider;
 import org.eclipse.ui.editors.text.ILocationProviderExtension;
 import org.eclipse.ui.ide.FileStoreEditorInput;
@@ -47,6 +51,7 @@ import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.ICommonConstants;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.IndexPlugin;
@@ -451,5 +456,43 @@ public class EditorUtil
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Computes all possible registry editors from eclipse. This list also includes {@link IEditorRegistry.SYSTEM_EXTERNAL_EDITOR_ID}, {@link EditorsUI.DEFAULT_TEXT_EDITOR_ID}
+	 * 
+	 * @return map<editor id, editor display name>
+	 */
+	public static Map<String, String> getAllRegistryEditors()
+	{
+		IEditorRegistry editorRegistry = PlatformUI.getWorkbench().getEditorRegistry();
+		Map<String, String> editorsMap = new TreeMap<String, String>();
+		IFileEditorMapping[] mappings = editorRegistry.getFileEditorMappings();
+		for (IFileEditorMapping iFileEditorMapping : mappings)
+		{
+			IEditorDescriptor[] editorDescs = iFileEditorMapping.getEditors();
+			for (IEditorDescriptor iEditorDescriptor : editorDescs)
+			{
+				editorsMap.put(iEditorDescriptor.getId(), iEditorDescriptor.getLabel());
+			}
+		}
+
+		// Add default system editor
+		IEditorDescriptor defaultEditorDesc = editorRegistry.findEditor(IEditorRegistry.SYSTEM_EXTERNAL_EDITOR_ID);
+		if (defaultEditorDesc != null)
+		{
+			editorsMap.put(defaultEditorDesc.getId(), defaultEditorDesc.getLabel());
+		}
+
+		// Add default text editor
+		IEditorDescriptor defaultTextEditorDesc = editorRegistry.findEditor(EditorsUI.DEFAULT_TEXT_EDITOR_ID);
+		if (defaultTextEditorDesc != null)
+		{
+			editorsMap.put(defaultTextEditorDesc.getId(), defaultTextEditorDesc.getLabel());
+		}
+
+		// Eclipse default
+		editorsMap.put(ICommonConstants.ECLIPSE_DEFAULT_EDITOR, ICommonConstants.ECLIPSE_DEFAULT_EDITOR);
+		return editorsMap;
 	}
 }

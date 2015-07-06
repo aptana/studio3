@@ -37,7 +37,7 @@ public class EventElement extends BaseElement
 
 	/**
 	 * addProperty
-	 * 
+	 *
 	 * @param property
 	 */
 	public void addProperty(EventPropertyElement property)
@@ -70,6 +70,10 @@ public class EventElement extends BaseElement
 			List<EventPropertyElement> properties = IndexUtil.createList(object.get(PROPERTIES_PROPERTY),
 					EventPropertyElement.class);
 
+			if (CollectionsUtil.isEmpty(properties))
+			{
+				return;
+			}
 			for (EventPropertyElement property : properties)
 			{
 				this.addProperty(property);
@@ -79,7 +83,7 @@ public class EventElement extends BaseElement
 
 	/**
 	 * getOwningType
-	 * 
+	 *
 	 * @return
 	 */
 	public String getOwningType()
@@ -89,7 +93,7 @@ public class EventElement extends BaseElement
 
 	/**
 	 * getProperties
-	 * 
+	 *
 	 * @return
 	 */
 	public List<EventPropertyElement> getProperties()
@@ -99,7 +103,7 @@ public class EventElement extends BaseElement
 
 	/**
 	 * setOwningType
-	 * 
+	 *
 	 * @param type
 	 */
 	public void setOwningType(String type)
@@ -122,9 +126,10 @@ public class EventElement extends BaseElement
 
 	/**
 	 * toSource
-	 * 
+	 *
 	 * @param printer
 	 */
+	@Override
 	public void toSource(SourcePrinter printer)
 	{
 		printer.printIndent();

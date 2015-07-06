@@ -354,7 +354,8 @@ public class GitExecutable
 		return new ProcessRunner().runInBackground(workingDir, arguments.toArray(new String[arguments.size()]));
 	}
 
-	IStatus runInBackground(IPath workingDir, Map<String, String> env, String... args)
+	// protected so that we can mock in tests
+	protected IStatus runInBackground(IPath workingDir, Map<String, String> env, String... args)
 	{
 		// FIXME Inline into GitRepository.execute?
 		List<String> arguments = new ArrayList<String>(Arrays.asList(args));

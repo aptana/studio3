@@ -106,10 +106,14 @@ public class AliasResolverFactory implements IAliasResolver
 			catch (CoreException e)
 			{
 				IdeLog.logError(JSCorePlugin.getDefault(), e);
+				continue;
 			}
-
+			catch (Exception e)
+			{
+				IdeLog.logError(JSCorePlugin.getDefault(), e);
+			}
 		}
-		return null;
+		return sourceType;
 	}
 
 	private class ResolverProxy implements Comparable<ResolverProxy>

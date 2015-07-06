@@ -35,6 +35,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.ObjectUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ui.util.UIUtils;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -184,7 +185,6 @@ public class MultipleInputMessageDialog extends InputMessageDialog
 					}
 				});
 				combo.setInput(values);
-
 				combo.setLabelProvider(new LabelProvider()
 				{
 					@Override
@@ -206,7 +206,23 @@ public class MultipleInputMessageDialog extends InputMessageDialog
 						return element.toString();
 					}
 				});
-				combo.setSelection(new StructuredSelection(values.get(0)));
+				JsonNode defaultValue = question.path(DEFAULT);
+				if (defaultValue != null && values instanceof ArrayNode)
+				{
+					ArrayNode arrayNode = (ArrayNode) values;
+					for (JsonNode node : arrayNode)
+					{
+						if (ObjectUtil.areEqual(node.get(VALUE).textValue(), defaultValue.textValue()))
+						{
+							combo.setSelection(new StructuredSelection(node));
+							break;
+						}
+					}
+				}
+				else
+				{
+					combo.setSelection(new StructuredSelection(values.get(0)));
+				}
 				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).applyTo(valueComp);
 			}
 			else if (CONFIRMATION.equals(inputType))
@@ -245,7 +261,11 @@ public class MultipleInputMessageDialog extends InputMessageDialog
 				List<Object> input = (List<Object>) controls;
 
 				Object firstElement = CollectionsUtil.getFirstElement(input);
-				if (firstElement instanceof Text)
+				if (firstElement instanceof Boolean)
+				{
+					response.put(fieldName, (Boolean) firstElement);
+				}
+				else if (firstElement instanceof Text)
 				{
 					response.put(fieldName, ((Text) firstElement).getText());
 
