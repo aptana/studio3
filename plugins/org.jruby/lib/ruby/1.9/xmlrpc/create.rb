@@ -178,8 +178,10 @@ module XMLRPC
     def conv2value(param)
 
         val = case param
-        when Fixnum, Bignum
-          # XML-RPC's int is 32bit int, and Fixnum also may be beyond 32bit
+        when Fixnum
+          @writer.tag("i4", param.to_s)
+
+        when Bignum
           if Config::ENABLE_BIGINT
             @writer.tag("i4", param.to_s)
           else
@@ -206,7 +208,6 @@ module XMLRPC
           end
 
         when Float
-          raise "Wrong value #{param}. Not allowed!" unless param.finite?
           @writer.tag("double", param.to_s)
 
         when Struct

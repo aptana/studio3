@@ -13,10 +13,16 @@ module IRB
     @RCS_ID='-$Id$-'
 
     LOCALE_NAME_RE = %r[
-      (?<language>[[:alpha:]]{2,3})
-      (?:_  (?<territory>[[:alpha:]]{2,3}) )?
-      (?:\. (?<codeset>[^@]+) )?
-      (?:@  (?<modifier>.*) )?
+      (?<language>[[:alpha:]]{2})
+      (?:_
+       (?<territory>[[:alpha:]]{2,3})
+       (?:\.
+	(?<codeset>[^@]+)
+       )?
+      )?
+      (?:@
+       (?<modifier>.*)
+      )?
     ]x
     LOCALE_DIR = "/lc/"
 
@@ -44,7 +50,7 @@ module IRB
     def String(mes)
       mes = super(mes)
       if @encoding
-	mes.encode(@encoding, undef: :replace)
+	mes.encode(@encoding)
       else
 	mes
       end
@@ -105,27 +111,22 @@ module IRB
     alias toplevel_load load
 
     def load(file, priv=nil)
-      found = find(file)
-      if found
-        return real_load(found, priv)
-      else
-        raise LoadError, "No such file to load -- #{file}"
-      end
-    end
-
-    def find(file , paths = $:)
       dir = File.dirname(file)
       dir = "" if dir == "."
       base = File.basename(file)
 
-      if dir.start_with?('/')
-        return each_localized_path(dir, base).find{|full_path| File.readable? full_path}
-      else
-        return search_file(paths, dir, base)
+      if dir[0] == ?/ #/
+	lc_path = search_file(dir, base)
+	return real_load(lc_path, priv) if lc_path
       end
+
+      for path in $:
+	lc_path = search_file(path + "/" + dir, base)
+	return real_load(lc_path, priv) if lc_path
+      end
+      raise LoadError, "No such file to load -- #{file}"
     end
 
-    private
     def real_load(path, priv)
       src = MagicFile.open(path){|f| f.read}
       if priv
@@ -134,30 +135,41 @@ module IRB
 	eval(src, TOPLEVEL_BINDING, path)
       end
     end
+    private :real_load
 
-    # @param paths load paths in which IRB find a localized file.
-    # @param dir directory
-    # @param file basename to be localized
-    #
-    # typically, for the parameters and a <path> in paths, it searches
-    #   <path>/<dir>/<locale>/<file>
-    def search_file(lib_paths, dir, file)
-      each_localized_path(dir, file) do |lc_path|
-        lib_paths.each do |libpath|
-          full_path = File.join(libpath, lc_path)
-          return full_path if File.readable?(full_path)
-        end
-        redo if defined?(Gem) and Gem.try_activate(lc_path)
+    def find(file , paths = $:)
+      dir = File.dirname(file)
+      dir = "" if dir == "."
+      base = File.basename(file)
+      if dir =~ /^\//
+	  return lc_path = search_file(dir, base)
+      else
+	for path in $:
+	  if lc_path = search_file(path + "/" + dir, base)
+	    return lc_path
+	  end
+	end
       end
       nil
     end
 
-    def each_localized_path(dir, file)
-      return enum_for(:each_localized_path) unless block_given?
+    def search_file(path, file)
       each_sublocale do |lc|
-        yield lc.nil? ? File.join(dir, LOCALE_DIR, file) : File.join(dir, LOCALE_DIR, lc, file)
+	full_path = path + lc_path(file, lc)
+	return full_path if File.exist?(full_path)
+      end
+      nil
+    end
+    private :search_file
+
+    def lc_path(file = "", lc = @locale)
+      if lc.nil?
+	LOCALE_DIR + file
+      else
+	LOCALE_DIR + @lang + "/" + file
       end
     end
+    private :lc_path
 
     def each_sublocale
       if @lang
@@ -169,14 +181,15 @@ module IRB
 	  yield "#{@lang}_#{@territory}@#{@modifier}" if @modifier
 	  yield "#{@lang}_#{@territory}"
 	end
-        if @encoding_name
-          yield "#{@lang}.#{@encoding_name}@#{@modifier}" if @modifier
-          yield "#{@lang}.#{@encoding_name}"
-        end
 	yield "#{@lang}@#{@modifier}" if @modifier
 	yield "#{@lang}"
       end
       yield nil
     end
+    private :each_sublocale
   end
 end
+
+
+
+

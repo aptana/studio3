@@ -2,15 +2,7 @@ require 'rss/parser'
 
 module RSS
   module Atom
-
-    ##
-    # The Atom URI W3C Namespace
-
     URI = "http://www.w3.org/2005/Atom"
-
-    ##
-    # The XHTML URI W3C Namespace
-
     XHTML_URI = "http://www.w3.org/1999/xhtml"
 
     module CommonModel
@@ -535,7 +527,7 @@ module RSS
             return false unless inline_other?
             return false if inline_other_xml?
 
-            media_type, = mime_split
+            media_type, subtype = mime_split
             return true if "text" == media_type.downcase
             false
           end

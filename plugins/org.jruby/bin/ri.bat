@@ -1,2 +1,6 @@
 @ECHO OFF
-@"%~dp0jruby.exe" -S ri %*
+IF NOT "%~f0" == "~f0" GOTO :WinNT
+@"jruby" -S "ri" %1 %2 %3 %4 %5 %6 %7 %8 %9
+GOTO :EOF
+:WinNT
+@"%~dp0jruby.exe" "%~dpn0" %*

@@ -1,5 +1,0 @@
-source "http://1.2.3.4/artifactory/"
-repository 'takari', "http://otto.takari.io:8081/nexus/content/groups/public"
-snapshot_repository 'tesla', "http://repository.tesla.io:8081/nexus/content/groups/public"
-
-jar 'junit:junit', '4.11'

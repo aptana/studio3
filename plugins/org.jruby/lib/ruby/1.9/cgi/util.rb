@@ -9,6 +9,7 @@ class CGI
     end.tr(' ', '+')
   end
 
+
   # URL-decode a string with encoding(optional).
   #   string = CGI::unescape("%27Stop%21%27+said+Fred")
   #      # => "'Stop!' said Fred"
@@ -19,7 +20,6 @@ class CGI
     str.valid_encoding? ? str : str.force_encoding(string.encoding)
   end
 
-  # The set of special characters and their escaped values
   TABLE_FOR_ESCAPE_HTML__ = {
     '&' => '&amp;',
     '"' => '&quot;',
@@ -33,6 +33,7 @@ class CGI
   def CGI::escapeHTML(string)
     string.gsub(/[&\"<>]/, TABLE_FOR_ESCAPE_HTML__)
   end
+
 
   # Unescape a string that has been HTML-escaped
   #   CGI::unescapeHTML("Usage: foo &quot;bar&quot; &lt;baz&gt;")
@@ -82,13 +83,9 @@ class CGI
       end
     end
   end
-
-  # Synonym for CGI::escapeHTML(str)
   def CGI::escape_html(str)
     escapeHTML(str)
   end
-  
-  # Synonym for CGI::unescapeHTML(str)
   def CGI::unescape_html(str)
     unescapeHTML(str)
   end
@@ -117,6 +114,7 @@ class CGI
     end
   end
 
+
   # Undo escaping such as that done by CGI::escapeElement()
   #
   #   print CGI::unescapeElement(
@@ -136,13 +134,9 @@ class CGI
       string
     end
   end
-
-  # Synonym for CGI::escapeElement(str)
   def CGI::escape_element(str)
     escapeElement(str)
   end
-  
-  # Synonym for CGI::unescapeElement(str)
   def CGI::unescape_element(str)
     unescapeElement(str)
   end

@@ -71,25 +71,24 @@ module Open3
   # Closing stdin, stdout and stderr does not wait the process.
   #
   def popen3(*cmd, &block)
-    return IO::popen3(*cmd, &block) if RUBY_ENGINE == 'jruby'
-    
-    if Hash === cmd.last
-      opts = cmd.pop.dup
-    else
-      opts = {}
-    end
-
-    in_r, in_w = IO.pipe
-    opts[:in] = in_r
-    in_w.sync = true
-
-    out_r, out_w = IO.pipe
-    opts[:out] = out_w
-
-    err_r, err_w = IO.pipe
-    opts[:err] = err_w
-
-    popen_run(cmd, opts, [in_r, out_w, err_w], [in_w, out_r, err_r], &block)
+    IO::popen3(*cmd, &p)
+    # if Hash === cmd.last
+    #   opts = cmd.pop.dup
+    # else
+    #   opts = {}
+    # end
+    # 
+    # in_r, in_w = IO.pipe
+    # opts[:in] = in_r
+    # in_w.sync = true
+    # 
+    # out_r, out_w = IO.pipe
+    # opts[:out] = out_w
+    # 
+    # err_r, err_w = IO.pipe
+    # opts[:err] = err_w
+    # 
+    # popen_run(cmd, opts, [in_r, out_w, err_w], [in_w, out_r, err_r], &block)
   end
   module_function :popen3
 
@@ -207,9 +206,9 @@ module Open3
     result = [*parent_io, wait_thr]
     if defined? yield
       begin
-        return yield(*result)
+	return yield(*result)
       ensure
-        parent_io.each{|io| io.close unless io.closed?}
+	parent_io.each{|io| io.close unless io.closed?}
         wait_thr.join
       end
     end
@@ -225,7 +224,7 @@ module Open3
   #   stdout_str, stderr_str, status = Open3.capture3([env,] cmd... [, opts])
   #
   # The arguments env, cmd and opts are passed to Open3.popen3 except
-  # opts[:stdin_data] and opts[:binmode].  See Process.spawn.
+  # opts[:stdin_data] and opts[:stdin_data].  See Process.spawn.
   #
   # If opts[:stdin_data] is specified, it is sent to the command's standard input.
   #
@@ -259,7 +258,7 @@ module Open3
   #     STDOUT.binmode; print thumnail
   #   end
   #
-  def capture3(*cmd)
+  def capture3(*cmd, &block)
     if Hash === cmd.last
       opts = cmd.pop.dup
     else
@@ -289,7 +288,7 @@ module Open3
   #   stdout_str, status = Open3.capture2([env,] cmd... [, opts])
   #
   # The arguments env, cmd and opts are passed to Open3.popen3 except
-  # opts[:stdin_data] and opts[:binmode].  See Process.spawn.
+  # opts[:stdin_data] and opts[:stdin_data].  See Process.spawn.
   #
   # If opts[:stdin_data] is specified, it is sent to the command's standard input.
   #
@@ -313,7 +312,7 @@ module Open3
   #   End
   #   image, s = Open3.capture2("gnuplot", :stdin_data=>gnuplot_commands, :binmode=>true)
   #
-  def capture2(*cmd)
+  def capture2(*cmd, &block)
     if Hash === cmd.last
       opts = cmd.pop.dup
     else
@@ -341,7 +340,7 @@ module Open3
   #   stdout_and_stderr_str, status = Open3.capture2e([env,] cmd... [, opts])
   #
   # The arguments env, cmd and opts are passed to Open3.popen3 except
-  # opts[:stdin_data] and opts[:binmode].  See Process.spawn.
+  # opts[:stdin_data] and opts[:stdin_data].  See Process.spawn.
   #
   # If opts[:stdin_data] is specified, it is sent to the command's standard input.
   #
@@ -352,7 +351,7 @@ module Open3
   #   # capture make log
   #   make_log, s = Open3.capture2e("make")
   #
-  def capture2e(*cmd)
+  def capture2e(*cmd, &block)
     if Hash === cmd.last
       opts = cmd.pop.dup
     else
@@ -655,7 +654,7 @@ module Open3
   end
   module_function :pipeline
 
-  def pipeline_run(cmds, pipeline_opts, child_io, parent_io) # :nodoc:
+  def pipeline_run(cmds, pipeline_opts, child_io, parent_io, &block) # :nodoc:
     if cmds.empty?
       raise ArgumentError, "no commands"
     end
@@ -702,9 +701,9 @@ module Open3
     child_io.each {|io| io.close }
     if defined? yield
       begin
-        return yield(*result)
+	return yield(*result)
       ensure
-        parent_io.each{|io| io.close unless io.closed?}
+	parent_io.each{|io| io.close unless io.closed?}
         wait_thrs.each {|t| t.join }
       end
     end

@@ -12,6 +12,8 @@ module DL
     extend FFI::DataConverter
     native_type FFI::Type::Builtin::POINTER
 
+    NULL = CPtr.new(FFI::Pointer::NULL, 0, 0)
+
     def self.to_native(value, ctx)
       if value.is_a?(CPtr)
         value.ffi_ptr
@@ -19,7 +21,7 @@ module DL
       elsif value.is_a?(Integer)
         FFI::Pointer.new(value)
 
-      elsif value.is_a?(String)
+      elsif value.is_a?(::String)
         value
       end
     end
@@ -30,10 +32,7 @@ module DL
 
     def self.to_ptr(value)
       if value.is_a?(String)
-        cptr = CPtr.malloc(value.bytesize + 1)
-        size = value.bytesize + 1
-        cptr.ffi_ptr.put_string(0, value)
-        cptr
+        CPtr.new(FFI::MemoryPointer.from_string(value))
 
       elsif value.respond_to?(:to_ptr)
         ptr = value.to_ptr
@@ -49,38 +48,20 @@ module DL
     end
 
     def initialize(addr, size = nil, free = nil)
-      ptr = if addr.is_a?(FFI::Pointer)
-        addr
+      
+
+      if addr.is_a?(FFI::Pointer)
+        @ffi_ptr = addr
 
       elsif addr.is_a?(Integer)
-        FFI::Pointer.new(addr)
+        @ffi_ptr = FFI::Pointer.new(addr)
       end
-
-      @size = size ? size : ptr.size
+      @size = size ? size : @ffi_ptr.size
       @free = free
-      @ffi_ptr = free.nil? ? ptr : FFI::AutoPointer.new(ptr, self.class.__freefunc__(free))
-    end
-
-    def self.__freefunc__(free)
-      if free.is_a?(FFI::Function)
-        free
-
-      elsif free.is_a?(FFI::Pointer)
-        free.null? ? Proc.new { |ptr| } : FFI::Function.new(:void, [ :pointer ], free)
-
-      elsif free.is_a?(Integer)
-        free == 0 ? Proc.new { |ptr| } : FFI::Function.new(:void, [ :pointer ], FFI::Pointer.new(free))
-
-      elsif free.respond_to?(:call)
-        free
-
-      else
-        raise ArgumentError.new("invalid free func")
-      end
     end
 
     def self.malloc(size, free = nil)
-      self.new(LibC.malloc(size), size, free ? free : LibC::FREE)
+      self.new(FFI::MemoryPointer.new(size))
     end
 
     def null?
@@ -122,7 +103,7 @@ module DL
     alias to_s to_str
 
     def inspect
-      "#<#{self.class.name} ptr=#{ffi_ptr.address.to_s(16)} size=#{@size} free=#{@free.inspect}>"
+      "#<#{self.class.name} ptr=:#{ffi_ptr.address.to_s(16)} size=#{@size} free=#{@free.to_i.to_s(16)}>"
     end
 
     def +(delta)
@@ -138,13 +119,13 @@ module DL
     end
 
     def ref
-      cptr = CPtr.malloc(FFI::Type::POINTER.size)
-      cptr.ffi_ptr.put_pointer(0, ffi_ptr)
-      cptr
+      mp = FFI::MemoryPointer.new(FFI::Type::POINTER, 1)
+      mp.put_pointer(0, ffi_ptr)
+      CPtr.new(mp)
     end
   end
 
-  NULL = CPtr.new(FFI::Pointer::NULL, 0)
+  NULL = CPtr.new(FFI::Pointer::NULL, 0, 0)
 
   TYPE_VOID         = 0
   TYPE_VOIDP        = 1
@@ -378,7 +359,13 @@ module DL
       arg_types = []
       type[1..-1].each_byte { |t| arg_types << DL.find_param_type(t.chr) } if type.length > 1
 
-      @invoker = FFI::Function.new(rt, arg_types, FFI::Pointer.new(address), :convention => :default)
+      @invoker = FFI::Invoker.new(address, arg_types, rt, "default")
+      
+      if rt == FFI::NativeType::POINTER
+        def self.call(*args)
+          [ PtrData.new(@invoker.call(*args)), args ]
+        end
+      end
     end
 
     def call(*args)
@@ -420,21 +407,17 @@ module DL
   module LibC
     extend FFI::Library
     ffi_lib FFI::Library::LIBC
-    MALLOC = attach_function :malloc, [ :size_t ], :pointer
-    REALLOC = attach_function :realloc, [ :pointer, :size_t ], :pointer
-    FREE = attach_function :free, [ :pointer ], :void
+    attach_function :malloc, [ :size_t ], :uintptr_t
+    attach_function :realloc, [ :uintptr_t, :size_t ], :uintptr_t
+    attach_function :free, [ :uintptr_t ], :void
   end
 
   def self.malloc(size)
-    LibC.malloc(size).address
+    LibC.malloc(size)
   end
 
   def self.realloc(ptr, size)
-    LibC.realloc(FFI::Pointer.new(ptr), size).address
-  end
-
-  def self.free(ptr)
-    LibC.free(FFI::Pointer.new(ptr))
+    LibC.realloc(ptr, size)
   end
 
   class CFunc
