@@ -1,5 +1,0 @@
-#-*- mode: ruby -*-
-
-gemspec :jar => 'green'
-
-# vim: syntax=Ruby

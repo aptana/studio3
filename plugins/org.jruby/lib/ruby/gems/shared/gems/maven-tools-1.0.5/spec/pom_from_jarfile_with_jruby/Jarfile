@@ -1,5 +1,0 @@
-jruby '1.7.16' do
-  no_asm true
-  scope :compile
-  jar 'joda-time:joda-time', '2.6'
-end

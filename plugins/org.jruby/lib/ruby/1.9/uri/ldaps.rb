@@ -1,10 +1,3 @@
-# = uri/ldap.rb
-#
-# License:: You can redistribute it and/or modify it under the same term as Ruby.
-#
-# See URI for general documentation
-#
-
 require 'uri/ldap'
 
 module URI
@@ -13,7 +6,6 @@ module URI
   # than 'ldap:'. Other than that, LDAPS URIs are identical to LDAP URIs;
   # see URI::LDAP.
   class LDAPS < LDAP
-    # A Default port of 636 for URI::LDAPS
     DEFAULT_PORT = 636
   end
   @@schemes['LDAPS'] = LDAPS

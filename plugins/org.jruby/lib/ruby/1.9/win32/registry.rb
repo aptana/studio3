@@ -1,4 +1,4 @@
-require 'Win32API'
+require 'dl/import'
 module Win32
 
 =begin rdoc
@@ -160,7 +160,11 @@ For detail, see the MSDN[http://msdn.microsoft.com/library/en-us/sysinfo/base/pr
     # Error
     #
     class Error < ::StandardError
-      FormatMessageA = Win32API.new('kernel32.dll', 'FormatMessageA', 'LPLLPLP', 'L')
+      module Kernel32
+        extend DL::Importer
+        dlload "kernel32.dll"
+      end
+      FormatMessageA = Kernel32.extern "int FormatMessageA(int, void *, int, int, void *, int, void *)", :stdcall
       def initialize(code)
         @code = code
         msg = "\0".force_encoding(Encoding::ASCII_8BIT) * 1024
@@ -194,7 +198,7 @@ For detail, see the MSDN[http://msdn.microsoft.com/library/en-us/sysinfo/base/pr
 
       # Make all
       Constants.constants.grep(/^HKEY_/) do |c|
-        Registry.const_set c, new(Constants.const_get(c), c)
+        Registry.const_set c, new(Constants.const_get(c), c.to_s)
       end
     end
 
@@ -202,20 +206,23 @@ For detail, see the MSDN[http://msdn.microsoft.com/library/en-us/sysinfo/base/pr
     # Win32 APIs
     #
     module API
+      extend DL::Importer
+      dlload "advapi32.dll"
       [
-        %w/RegOpenKeyExA    LPLLP        L/,
-        %w/RegCreateKeyExA  LPLLLLPPP    L/,
-        %w/RegEnumValueA    LLPPPPPP     L/,
-        %w/RegEnumKeyExA    LLPPLLLP     L/,
-        %w/RegQueryValueExA LPLPPP       L/,
-        %w/RegSetValueExA   LPLLPL       L/,
-        %w/RegDeleteValue   LP           L/,
-        %w/RegDeleteKey     LP           L/,
-        %w/RegFlushKey      L            L/,
-        %w/RegCloseKey      L            L/,
-        %w/RegQueryInfoKey  LPPPPPPPPPPP L/,
+        "long RegOpenKeyExA(void *, void *, long, long, void *)",
+        "long RegCreateKeyExA(void *, void *, long, long, long, long, void *, void *)",
+        "long RegEnumValueA(void *, long, void *, void *, void *, void *, void *, void *)",
+        "long RegEnumKeyExA(void *, long, void *, void *, void *, void *, void *, void *)",
+        "long RegQueryValueExA(void *, void *, void *, void *, void *, void *)",
+        "long RegSetValueExA(void *, void *, long, long, void *, long)",
+        "long RegDeleteValue(void *, void *)",
+        "long RegDeleteKey(void *, void *)",
+        "long RegFlushKey(void *)",
+        "long RegCloseKey(void *)",
+        "long RegQueryInfoKey(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *)",
       ].each do |fn|
-        const_set fn[0].intern, Win32API.new('advapi32.dll', *fn)
+        cfunc = extern fn, :stdcall
+        const_set cfunc.name.intern, cfunc
       end
 
       module_function

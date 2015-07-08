@@ -1,5 +1,0 @@
-jar 'junit:junit', '4.11'
-
-local './myfirst.jar'
-
-jruby :version => '1.7.13'

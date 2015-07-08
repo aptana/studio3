@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # -----------------------------------------------------------------------------
 # jruby.bash - Start Script for the JRuby interpreter
 #
@@ -17,29 +17,28 @@ cygwin=false
 case "`uname`" in
   CYGWIN*) cygwin=true;;
   Darwin) darwin=true;;
-  MINGW*) jruby.exe "$@"; exit $?;;
 esac
 
 # ----- Verify and Set Required Environment Variables -------------------------
-if [ -z "$JAVA_VM" ]; then
-  JAVA_VM=-client
-fi
+JAVA_VM=-client
 
-# get the absolute path of the executable
-SELF_PATH=$(builtin cd -P -- "$(dirname -- "$0")" >/dev/null && pwd -P) && SELF_PATH=$SELF_PATH/$(basename -- "$0")
+## resolve links - $0 may be a link to  home
+PRG=$0
+progname=`basename "$0"`
 
-# resolve symlinks
-while [ -h "$SELF_PATH" ]; do
-    # 1) cd to directory of the symlink
-    # 2) cd to the directory of where the symlink points
-    # 3) get the pwd
-    # 4) append the basename
-    DIR=$(dirname -- "$SELF_PATH")
-    SYM=$(readlink "$SELF_PATH")
-    SELF_PATH=$(cd "$DIR" && cd $(dirname -- "$SYM") && pwd)/$(basename -- "$SYM")
+while [ -h "$PRG" ] ; do
+  ls=`ls -ld "$PRG"`
+  link=`expr "$ls" : '.*-> \(.*\)$'`
+  if expr "$link" : '.*/.*' > /dev/null; then
+    if expr "$link" : '/' > /dev/null; then
+      PRG="$link"
+    else
+      PRG="`dirname ${PRG}`/${link}"
+    fi
+  else
+    PRG="`dirname $PRG`/$link"
+  fi
 done
-
-PRG=$SELF_PATH
 
 JRUBY_HOME_1=`dirname "$PRG"`           # the ./bin dir
 if [ "$JRUBY_HOME_1" = '.' ] ; then
@@ -171,7 +170,7 @@ else
         fi
     done
 
-    if [ "$CP" != "" ] && $cygwin; then
+    if $cygwin; then
         CP=`cygpath -p -w "$CP"`
     fi
 fi
@@ -188,9 +187,7 @@ declare -a java_args
 declare -a ruby_args
 mode=""
 
-JAVA_CLASS_JRUBY_MAIN=org.jruby.Main
-java_class=$JAVA_CLASS_JRUBY_MAIN
-JAVA_CLASS_NGSERVER=com.martiansoftware.nailgun.NGServer
+java_class=org.jruby.Main
 
 # Split out any -J argument for passing to the JVM.
 # Scanning for args is aborted by '--'.
@@ -269,16 +266,13 @@ do
         JAVA_VM=-client ;;
      --server)
         JAVA_VM=-server ;;
-     --dev)
-        JAVA_VM=-client
-        JAVA_OPTS="$JAVA_OPTS -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -Djruby.compile.mode=OFF -Djruby.compile.invokedynamic=false" ;;
      --noclient)         # JRUBY-4296
         unset JAVA_VM ;; # For IBM JVM, neither '-client' nor '-server' is applicable
      --sample)
         java_args=("${java_args[@]}" "-Xprof") ;;
      --ng-server)
         # Start up as Nailgun server
-        java_class=$JAVA_CLASS_NGSERVER
+        java_class=com.martiansoftware.nailgun.NGServer
         VERIFY_JRUBY=true ;;
      --ng)
         # Use native Nailgun client to toss commands to server
@@ -302,6 +296,9 @@ if [[ $darwin && -z "$JAVA_ENCODING" ]]; then
   java_args=("${java_args[@]}" "-Dfile.encoding=UTF-8")
 fi
 
+# Add a property to report memory max
+JAVA_OPTS="$JAVA_OPTS $JAVA_VM -Djruby.memory.max=${JAVA_MEM:4} -Djruby.stack.max=${JAVA_STACK:4}"
+
 # Append the rest of the arguments
 ruby_args=("${ruby_args[@]}" "$@")
 
@@ -310,7 +307,17 @@ set -- "${ruby_args[@]}"
 
 JAVA_OPTS="$JAVA_OPTS $JAVA_MEM $JAVA_MEM_MIN $JAVA_STACK"
 
-JFFI_OPTS="-Djffi.boot.library.path=$JRUBY_HOME/lib/jni"
+JFFI_BOOT=""
+if [ -d $JRUBY_HOME/lib/native/ ]; then
+  for d in $JRUBY_HOME/lib/native/*`uname -s`; do
+    if [ -z "$JFFI_BOOT" ]; then
+      JFFI_BOOT="$d"
+    else
+      JFFI_BOOT="$JFFI_BOOT:$d"
+    fi
+  done
+fi
+JFFI_OPTS="-Djffi.boot.library.path=$JFFI_BOOT"
 
 if $cygwin; then
   JRUBY_HOME=`cygpath --mixed "$JRUBY_HOME"`
@@ -333,7 +340,7 @@ fi
 
 if [ "$nailgun_client" != "" ]; then
   if [ -f $JRUBY_HOME/tool/nailgun/ng ]; then
-    exec $JRUBY_HOME/tool/nailgun/ng org.jruby.util.NailMain $mode "$@"
+    exec $JRUBY_HOME/tool/nailgun/ng org.jruby.util.NailMain "$@"
   else
     echo "error: ng executable not found; run 'make' in ${JRUBY_HOME}/tool/nailgun"
     exit 1
@@ -344,16 +351,11 @@ if [ "$VERIFY_JRUBY" != "" ]; then
       echo "Running with instrumented profiler"
   fi
 
-  if [[ "${java_class:-}" == "${JAVA_CLASS_NGSERVER:-}" && -n "${JRUBY_OPTS:-}" ]]; then
-    echo "warning: starting a nailgun server; discarding JRUBY_OPTS: ${JRUBY_OPTS}"
-    JRUBY_OPTS=''
-  fi
-
   "$JAVACMD" $PROFILE_ARGS $JAVA_OPTS "$JFFI_OPTS" "${java_args[@]}" -classpath "$JRUBY_CP$CP_DELIMITER$CP$CP_DELIMITER$CLASSPATH" \
     "-Djruby.home=$JRUBY_HOME" \
     "-Djruby.lib=$JRUBY_HOME/lib" -Djruby.script=jruby \
     "-Djruby.shell=$JRUBY_SHELL" \
-    $java_class $JRUBY_OPTS "$@"
+    $java_class "$@"
 
   # Record the exit status immediately, or it will be overridden.
   JRUBY_STATUS=$?

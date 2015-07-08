@@ -1,98 +1,104 @@
+require 'rdoc/code_object'
+
 ##
 # An attribute created by \#attr, \#attr_reader, \#attr_writer or
 # \#attr_accessor
 
-class RDoc::Attr < RDoc::MethodAttr
+class RDoc::Attr < RDoc::CodeObject
+
+  MARSHAL_VERSION = 0 # :nodoc:
 
   ##
-  # 3::
-  #   RDoc 4
-  #    Added parent name and class
-  #    Added section title
+  # Name of the attribute
 
-  MARSHAL_VERSION = 3 # :nodoc:
+  attr_accessor :name
 
   ##
-  # Is the attribute readable ('R'), writable ('W') or both ('RW')?
+  # Is the attribute readable, writable or both?
 
   attr_accessor :rw
 
   ##
-  # Creates a new Attr with body +text+, +name+, read/write status +rw+ and
-  # +comment+.  +singleton+ marks this as a class attribute.
+  # Source file token stream
 
-  def initialize(text, name, rw, comment, singleton = false)
-    super text, name
+  attr_accessor :text
 
+  ##
+  # public, protected, private
+
+  attr_accessor :visibility
+
+  def initialize(text, name, rw, comment)
+    super()
+    @text = text
+    @name = name
     @rw = rw
-    @singleton = singleton
+    @visibility = :public
     self.comment = comment
   end
 
   ##
-  # Attributes are equal when their names, singleton and rw are identical
+  # Attributes are ordered by name
+
+  def <=>(other)
+    self.name <=> other.name
+  end
+
+  ##
+  # Attributes are equal when their names and rw is identical
 
   def == other
     self.class == other.class and
       self.name == other.name and
-      self.rw == other.rw and
-      self.singleton == other.singleton
+      self.rw == other.rw
   end
 
   ##
-  # Add +an_alias+ as an attribute in +context+.
+  # Returns nil, for duck typing with RDoc::AnyMethod
 
-  def add_alias(an_alias, context)
-    new_attr = self.class.new(self.text, an_alias.new_name, self.rw,
-                              self.comment, self.singleton)
-
-    new_attr.record_location an_alias.file
-    new_attr.visibility = self.visibility
-    new_attr.is_alias_for = self
-    @aliases << new_attr
-    context.add_attribute new_attr
-    new_attr
+  def arglists
   end
 
   ##
-  # The #aref prefix for attributes
+  # Returns nil, for duck typing with RDoc::AnyMethod
 
-  def aref_prefix
-    'attribute'
+  def block_params
   end
 
   ##
-  # Attributes never call super.  See RDoc::AnyMethod#calls_super
-  #
-  # An RDoc::Attr can show up in the method list in some situations (see
-  # Gem::ConfigFile)
+  # Returns nil, for duck typing with RDoc::AnyMethod
 
-  def calls_super # :nodoc:
-    false
+  def call_seq
   end
 
   ##
-  # Returns attr_reader, attr_writer or attr_accessor as appropriate.
+  # Partially bogus as Attr has no parent.  For duck typing with
+  # RDoc::AnyMethod.
 
-  def definition
-    case @rw
-    when 'RW' then 'attr_accessor'
-    when 'R'  then 'attr_reader'
-    when 'W'  then 'attr_writer'
-    end
+  def full_name
+    @full_name ||= "#{@parent ? @parent.full_name : '(unknown)'}##{name}"
+  end
+
+  ##
+  # An HTML id-friendly representation of #name
+
+  def html_name
+    @name.gsub(/[^a-z]+/, '-')
   end
 
   def inspect # :nodoc:
-    alias_for = @is_alias_for ? " (alias for #{@is_alias_for.name})" : nil
-    visibility = self.visibility
-    visibility = "forced #{visibility}" if force_documentation
-    "#<%s:0x%x %s %s (%s)%s>" % [
-      self.class, object_id,
-      full_name,
-      rw,
-      visibility,
-      alias_for,
-    ]
+    attr = case rw
+           when 'RW' then :attr_accessor
+           when 'R'  then :attr_reader
+           when 'W'  then :attr_writer
+           else
+               " (#{rw})"
+           end
+
+      "#<%s:0x%x %s.%s :%s>" % [
+        self.class, object_id,
+        parent_name, attr, @name,
+      ]
   end
 
   ##
@@ -105,70 +111,67 @@ class RDoc::Attr < RDoc::MethodAttr
       @rw,
       @visibility,
       parse(@comment),
-      singleton,
-      @file.relative_name,
-      @parent.full_name,
-      @parent.class,
-      @section.title
     ]
   end
 
   ##
-  # Loads this Attr from +array+.  For a loaded Attr the following
+  # Loads this AnyMethod from +array+.  For a loaded AnyMethod the following
   # methods will return cached values:
   #
   # * #full_name
   # * #parent_name
 
   def marshal_load array
-    initialize_visibility
+    @name       = array[1]
+    @full_name  = array[2]
+    @rw         = array[3]
+    @visibility = array[4]
+    @comment    = array[5]
 
-    @aliases      = []
-    @parent       = nil
-    @parent_name  = nil
-    @parent_class = nil
-    @section      = nil
-    @file         = nil
-
-    version        = array[0]
-    @name          = array[1]
-    @full_name     = array[2]
-    @rw            = array[3]
-    @visibility    = array[4]
-    @comment       = array[5]
-    @singleton     = array[6] || false # MARSHAL_VERSION == 0
-    #                      7 handled below
-    @parent_name   = array[8]
-    @parent_class  = array[9]
-    @section_title = array[10]
-
-    @file = RDoc::TopLevel.new array[7] if version > 1
-
-    @parent_name ||= @full_name.split('#', 2).first
-  end
-
-  def pretty_print q # :nodoc:
-    q.group 2, "[#{self.class.name} #{full_name} #{rw} #{visibility}", "]" do
-      unless comment.empty? then
-        q.breakable
-        q.text "comment:"
-        q.breakable
-        q.pp @comment
-      end
-    end
-  end
-
-  def to_s # :nodoc:
-    "#{definition} #{name} in: #{parent}"
+    @parent_name = @full_name
   end
 
   ##
-  # Attributes do not have token streams.
-  #
-  # An RDoc::Attr can show up in the method list in some situations (see
-  # Gem::ConfigFile)
+  # Name of our parent with special handling for un-marshaled methods
 
-  def token_stream # :nodoc:
+  def parent_name
+    @parent_name || super
+  end
+
+  ##
+  # For duck typing with RDoc::AnyMethod, returns nil
+
+  def params
+    nil
+  end
+
+  ##
+  # URL path for this attribute
+
+  def path
+    "#{@parent.path}##{@name}"
+  end
+
+  ##
+  # For duck typing with RDoc::AnyMethod
+
+  def singleton
+    false
+  end
+
+  def to_s # :nodoc:
+    "#{type} #{name}\n#{comment}"
+  end
+
+  ##
+  # Returns attr_reader, attr_writer or attr_accessor as appropriate
+
+  def type
+    case @rw
+    when 'RW' then 'attr_accessor'
+    when 'R'  then 'attr_reader'
+    when 'W'  then 'attr_writer'
+    end
   end
 
 end

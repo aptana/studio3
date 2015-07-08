@@ -24,7 +24,7 @@ module RSS
       class Channel < ChannelBase
         def to_feed(rss)
           channel = Rss::Channel.new
-          setup_values(channel)
+          set = setup_values(channel)
           _not_set_required_variables = not_set_required_variables
           if _not_set_required_variables.empty?
             rss.channel = channel
@@ -257,7 +257,7 @@ module RSS
         class Item < ItemBase
           def to_feed(rss)
             item = Rss::Channel::Item.new
-            setup_values(item)
+            set = setup_values(item)
             _not_set_required_variables = not_set_required_variables
             if _not_set_required_variables.empty?
               rss.items << item
