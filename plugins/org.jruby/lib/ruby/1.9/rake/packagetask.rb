@@ -51,16 +51,13 @@ module Rake
     # Directory used to store the package files (default is 'pkg').
     attr_accessor :package_dir
 
-    # True if a gzipped tar file (tgz) should be produced (default is
-    # false).
+    # True if a gzipped tar file (tgz) should be produced (default is false).
     attr_accessor :need_tar
 
-    # True if a gzipped tar file (tar.gz) should be produced (default
-    # is false).
+    # True if a gzipped tar file (tar.gz) should be produced (default is false).
     attr_accessor :need_tar_gz
 
-    # True if a bzip2'd tar file (tar.bz2) should be produced (default
-    # is false).
+    # True if a bzip2'd tar file (tar.bz2) should be produced (default is false).
     attr_accessor :need_tar_bz2
 
     # True if a zip file should be produced (default is false)
@@ -75,10 +72,7 @@ module Rake
     # Zip command for zipped archives.  The default is 'zip'.
     attr_accessor :zip_command
 
-    # Create a Package Task with the given name and version.  Use +:noversion+
-    # as the version to build a package without a version or to provide a
-    # fully-versioned package name.
-
+    # Create a Package Task with the given name and version.
     def initialize(name=nil, version=nil)
       init(name, version)
       yield self if block_given?
@@ -124,8 +118,7 @@ module Rake
       ].each do |(need, file, flag)|
         if need
           task :package => ["#{package_dir}/#{file}"]
-          file "#{package_dir}/#{file}" =>
-            [package_dir_path] + package_files do
+          file "#{package_dir}/#{file}" => [package_dir_path] + package_files do
             chdir(package_dir) do
               sh %{#{@tar_command} #{flag}cvf #{file} #{package_name}}
             end
@@ -135,8 +128,7 @@ module Rake
 
       if need_zip
         task :package => ["#{package_dir}/#{zip_file}"]
-        file "#{package_dir}/#{zip_file}" =>
-          [package_dir_path] + package_files do
+        file "#{package_dir}/#{zip_file}" => [package_dir_path] + package_files do
           chdir(package_dir) do
             sh %{#{@zip_command} -r #{zip_file} #{package_name}}
           end
@@ -150,7 +142,7 @@ module Rake
         @package_files.each do |fn|
           f = File.join(package_dir_path, fn)
           fdir = File.dirname(f)
-          mkdir_p(fdir) unless File.exist?(fdir)
+          mkdir_p(fdir) if !File.exist?(fdir)
           if File.directory?(fn)
             mkdir_p(f)
           else

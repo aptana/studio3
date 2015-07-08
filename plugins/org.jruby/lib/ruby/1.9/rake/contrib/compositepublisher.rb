@@ -18,4 +18,3 @@ module Rake
   end
 
 end
-

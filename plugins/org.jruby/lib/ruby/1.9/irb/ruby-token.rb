@@ -17,6 +17,11 @@ module RubyToken
   EXPR_DOT = :EXPR_DOT
   EXPR_CLASS = :EXPR_CLASS
 
+  # for ruby 1.4X
+  if !defined?(Symbol)
+    Symbol = Integer
+  end
+
   class Token
     def initialize(seek, line_no, char_no)
       @seek = seek

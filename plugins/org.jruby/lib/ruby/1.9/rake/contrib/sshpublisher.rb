@@ -1,4 +1,3 @@
-require 'rake/dsl_definition'
 require 'rake/contrib/compositepublisher'
 
 module Rake
@@ -6,8 +5,6 @@ module Rake
   # Publish an entire directory to an existing remote directory using
   # SSH.
   class SshDirPublisher
-    include Rake::DSL
-
     def initialize(host, remote_dir, local_dir)
       @host = host
       @remote_dir = remote_dir
@@ -30,8 +27,6 @@ module Rake
 
   # Publish a list of files to an existing remote directory.
   class SshFilePublisher
-    include Rake::DSL
-
     # Create a publisher using the give host information.
     def initialize(host, remote_dir, local_dir, *files)
       @host = host

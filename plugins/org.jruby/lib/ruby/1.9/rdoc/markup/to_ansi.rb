@@ -1,18 +1,17 @@
+require 'rdoc/markup/inline'
+
 ##
 # Outputs RDoc markup with vibrant ANSI color!
 
 class RDoc::Markup::ToAnsi < RDoc::Markup::ToRdoc
 
-  ##
-  # Creates a new ToAnsi visitor that is ready to output vibrant ANSI color!
-
-  def initialize markup = nil
+  def initialize
     super
 
     @headings.clear
-    @headings[1] = ["\e[1;32m", "\e[m"] # bold
-    @headings[2] = ["\e[4;32m", "\e[m"] # underline
-    @headings[3] = ["\e[32m",   "\e[m"] # just green
+    @headings[1] = ["\e[1;32m", "\e[m"]
+    @headings[2] = ["\e[4;32m", "\e[m"]
+    @headings[3] = ["\e[32m",   "\e[m"]
   end
 
   ##
@@ -24,20 +23,12 @@ class RDoc::Markup::ToAnsi < RDoc::Markup::ToRdoc
     add_tag :EM,   "\e[4m", "\e[m"
   end
 
-  ##
-  # Overrides indent width to ensure output lines up correctly.
-
   def accept_list_item_end list_item
     width = case @list_type.last
             when :BULLET then
               2
             when :NOTE, :LABEL then
-              if @prefix then
-                @res << @prefix.strip
-                @prefix = nil
-              end
-
-              @res << "\n" unless res.length == 1
+              @res << "\n"
               2
             else
               bullet = @list_index.last.to_s
@@ -48,21 +39,12 @@ class RDoc::Markup::ToAnsi < RDoc::Markup::ToRdoc
     @indent -= width
   end
 
-  ##
-  # Adds coloring to note and label list items
-
   def accept_list_item_start list_item
     bullet = case @list_type.last
              when :BULLET then
                '*'
              when :NOTE, :LABEL then
-               labels = Array(list_item.label).map do |label|
-                 attributes(label).strip
-               end.join "\n"
-
-               labels << ":\n" unless labels.empty?
-
-               labels
+               attributes(list_item.label) + ":\n"
              else
                @list_index.last.to_s + '.'
              end
@@ -79,9 +61,6 @@ class RDoc::Markup::ToAnsi < RDoc::Markup::ToRdoc
       @indent += width
     end
   end
-
-  ##
-  # Starts accepting with a reset screen
 
   def start_accepting
     super

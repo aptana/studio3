@@ -1,9 +1,10 @@
+require 'rdoc/markup'
+require 'rdoc/markup/formatter'
+
 ##
 # This Markup outputter is used for testing purposes.
 
 class RDoc::Markup::ToTest < RDoc::Markup::Formatter
-
-  # :stopdoc:
 
   ##
   # :section: Visitor
@@ -18,15 +19,11 @@ class RDoc::Markup::ToTest < RDoc::Markup::Formatter
   end
 
   def accept_paragraph(paragraph)
-    @res << convert_flow(@am.flow(paragraph.text))
-  end
-
-  def accept_raw raw
-    @res << raw.parts.join
+    @res << paragraph.text
   end
 
   def accept_verbatim(verbatim)
-    @res << verbatim.text.gsub(/^(\S)/, '  \1')
+    @res << verbatim.text
   end
 
   def accept_list_start(list)
@@ -62,8 +59,6 @@ class RDoc::Markup::ToTest < RDoc::Markup::Formatter
   def accept_rule(rule)
     @res << '-' * rule.weight
   end
-
-  # :startdoc:
 
 end
 
